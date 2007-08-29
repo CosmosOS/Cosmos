@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ILReader.cs" />
+    <Compile Include="LdstrOp.cs" />
     <Compile Include="Noop.cs" />
     <Compile Include="Op.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
