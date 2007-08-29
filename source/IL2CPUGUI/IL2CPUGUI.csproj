@@ -80,7 +80,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Indy.IL2CPU.Core\Indy.IL2CPU.csproj">
+    <ProjectReference Include="..\Indy.IL2CPU\Indy.IL2CPU.csproj">
       <Project>{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}</Project>
       <Name>Indy.IL2CPU</Name>
     </ProjectReference>
