@@ -49,13 +49,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="OpCodeMap.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Indy.IL2CPU.Core\Indy.IL2CPU.Core.csproj">
+    <ProjectReference Include="..\Indy.IL2CPU.Core\Indy.IL2CPU.csproj">
       <Project>{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}</Project>
-      <Name>Indy.IL2CPU.Core</Name>
+      <Name>Indy.IL2CPU</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Indy.IL2CPU.CPU\Indy.IL2CPU.CPU.csproj">
+      <Project>{1E02BA2B-1BC1-4B5E-99ED-9A45EA88059F}</Project>
+      <Name>Indy.IL2CPU.CPU</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Indy.IL2CPU.IL\Indy.IL2CPU.IL.csproj">
+      <Project>{5A39A8DF-D99E-4112-9676-BD3EED969A9C}</Project>
+      <Name>Indy.IL2CPU.IL</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

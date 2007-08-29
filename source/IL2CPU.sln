@@ -3,30 +3,40 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IL2CPUGUI", "IL2CPUGUI\IL2CPUGUI.csproj", "{3534C874-6CDC-412C-884D-CD4F5D91D898}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU.Core", "Indy.IL2CPU.Core\Indy.IL2CPU.Core.csproj", "{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU", "Indy.IL2CPU.Core\Indy.IL2CPU.csproj", "{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IL2CPU", "IL2CPU\IL2CPU.csproj", "{B7E87073-CFFB-4972-BA0B-DCF0C3A0C930}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelloWorld", "HelloWorld\HelloWorld.csproj", "{0267F1AE-CA81-4EBD-86CA-C8E22BE9A6F1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU.IL", "Indy.IL2CPU.IL\Indy.IL2CPU.IL.csproj", "{5A39A8DF-D99E-4112-9676-BD3EED969A9C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU.CPU", "Indy.IL2CPU.CPU\Indy.IL2CPU.CPU.csproj", "{1E02BA2B-1BC1-4B5E-99ED-9A45EA88059F}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 5
+		SccNumberOfProjects = 7
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
 		SccProjectUniqueName1 = IL2CPUGUI\\IL2CPUGUI.csproj
 		SccProjectName1 = ../IL2CPUGUI
 		SccLocalPath1 = IL2CPUGUI
-		SccProjectUniqueName2 = Indy.IL2CPU.Core\\Indy.IL2CPU.Core.csproj
-		SccProjectName2 = ../Indy.IL2CPU.Core
-		SccLocalPath2 = Indy.IL2CPU.Core
-		SccProjectUniqueName3 = IL2CPU\\IL2CPU.csproj
-		SccProjectName3 = ../IL2CPU
-		SccLocalPath3 = IL2CPU
-		SccProjectUniqueName4 = HelloWorld\\HelloWorld.csproj
-		SccProjectName4 = ../HelloWorld
-		SccLocalPath4 = HelloWorld
+		SccProjectUniqueName2 = IL2CPU\\IL2CPU.csproj
+		SccProjectName2 = ../IL2CPU
+		SccLocalPath2 = IL2CPU
+		SccProjectUniqueName3 = HelloWorld\\HelloWorld.csproj
+		SccProjectName3 = ../HelloWorld
+		SccLocalPath3 = HelloWorld
+		SccProjectUniqueName4 = Indy.IL2CPU.IL\\Indy.IL2CPU.IL.csproj
+		SccProjectName4 = ../Indy.IL2CPU.IL
+		SccLocalPath4 = Indy.IL2CPU.IL
+		SccProjectUniqueName5 = Indy.IL2CPU.CPU\\Indy.IL2CPU.CPU.csproj
+		SccProjectName5 = ../Indy.IL2CPU.CPU
+		SccLocalPath5 = Indy.IL2CPU.CPU
+		SccProjectUniqueName6 = Indy.IL2CPU.Core\\Indy.IL2CPU.csproj
+		SccProjectName6 = ../Indy.IL2CPU.Core
+		SccLocalPath6 = Indy.IL2CPU.Core
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +59,14 @@ Global
 		{0267F1AE-CA81-4EBD-86CA-C8E22BE9A6F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0267F1AE-CA81-4EBD-86CA-C8E22BE9A6F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0267F1AE-CA81-4EBD-86CA-C8E22BE9A6F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A39A8DF-D99E-4112-9676-BD3EED969A9C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A39A8DF-D99E-4112-9676-BD3EED969A9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A39A8DF-D99E-4112-9676-BD3EED969A9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A39A8DF-D99E-4112-9676-BD3EED969A9C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E02BA2B-1BC1-4B5E-99ED-9A45EA88059F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E02BA2B-1BC1-4B5E-99ED-9A45EA88059F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E02BA2B-1BC1-4B5E-99ED-9A45EA88059F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E02BA2B-1BC1-4B5E-99ED-9A45EA88059F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
