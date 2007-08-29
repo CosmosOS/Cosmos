@@ -7,9 +7,6 @@ using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL {
 	[OpCode(Code.Nop)]
-	public class Noop: Op {
-        public override void Assemble(Instruction aInstruction) {
-			Console.WriteLine("NoOp encountered");
-		}
+	public abstract class Noop: Op {
 	}
 }
