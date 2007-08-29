@@ -7,9 +7,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU.Core", "Indy.IL
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IL2CPU", "IL2CPU\IL2CPU.csproj", "{B7E87073-CFFB-4972-BA0B-DCF0C3A0C930}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelloWorld", "HelloWorld\HelloWorld.csproj", "{0267F1AE-CA81-4EBD-86CA-C8E22BE9A6F1}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 4
+		SccNumberOfProjects = 5
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -22,6 +24,9 @@ Global
 		SccProjectUniqueName3 = IL2CPU\\IL2CPU.csproj
 		SccProjectName3 = ../IL2CPU
 		SccLocalPath3 = IL2CPU
+		SccProjectUniqueName4 = HelloWorld\\HelloWorld.csproj
+		SccProjectName4 = ../HelloWorld
+		SccLocalPath4 = HelloWorld
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,6 +45,10 @@ Global
 		{B7E87073-CFFB-4972-BA0B-DCF0C3A0C930}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B7E87073-CFFB-4972-BA0B-DCF0C3A0C930}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B7E87073-CFFB-4972-BA0B-DCF0C3A0C930}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0267F1AE-CA81-4EBD-86CA-C8E22BE9A6F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0267F1AE-CA81-4EBD-86CA-C8E22BE9A6F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0267F1AE-CA81-4EBD-86CA-C8E22BE9A6F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0267F1AE-CA81-4EBD-86CA-C8E22BE9A6F1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
