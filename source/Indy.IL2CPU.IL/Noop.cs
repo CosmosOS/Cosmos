@@ -3,14 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL {
-	class Noop: Op {
-		public override byte OpCode() {
-			return 0;
-		}
-
-		public override void Process(ILReader aReader) {
+	[OpCode(Code.Nop)]
+	public class Noop: Op {
+		public override void Process(Instruction aInstruction) {
 			Console.WriteLine("NoOp encountered");
 		}
 	}
