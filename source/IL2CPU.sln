@@ -23,19 +23,19 @@ Global
 		SccProjectName1 = ../IL2CPUGUI
 		SccLocalPath1 = IL2CPUGUI
 		SccProjectUniqueName2 = IL2CPU\\IL2CPU.csproj
-		SccProjectName2 = ../IL2CPU
+		SccProjectName2 = IL2CPU
 		SccLocalPath2 = IL2CPU
 		SccProjectUniqueName3 = HelloWorld\\HelloWorld.csproj
 		SccProjectName3 = ../HelloWorld
 		SccLocalPath3 = HelloWorld
 		SccProjectUniqueName4 = Indy.IL2CPU.IL\\Indy.IL2CPU.IL.csproj
-		SccProjectName4 = ../Indy.IL2CPU.IL
+		SccProjectName4 = Indy.IL2CPU.IL
 		SccLocalPath4 = Indy.IL2CPU.IL
 		SccProjectUniqueName5 = Indy.IL2CPU.CPU\\Indy.IL2CPU.CPU.csproj
 		SccProjectName5 = ../Indy.IL2CPU.CPU
 		SccLocalPath5 = Indy.IL2CPU.CPU
 		SccProjectUniqueName6 = Indy.IL2CPU.Core\\Indy.IL2CPU.csproj
-		SccProjectName6 = ../Indy.IL2CPU.Core
+		SccProjectName6 = Indy.IL2CPU.Core
 		SccLocalPath6 = Indy.IL2CPU.Core
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
