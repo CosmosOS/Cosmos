@@ -47,10 +47,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Call.cs" />
+    <Compile Include="Ret.cs" />
     <Compile Include="Ldstr.cs" />
     <Compile Include="Noop.cs" />
     <Compile Include="Op.cs" />
     <Compile Include="OpCodeAttribute.cs" />
+    <Compile Include="Pop.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

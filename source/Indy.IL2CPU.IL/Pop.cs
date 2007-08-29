@@ -5,12 +5,12 @@ using System.Text;
 using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL {
-	[OpCode(Code.Ldstr)]
-	public class Ldstr: Op {
+	[OpCode(Code.Pop)]
+	public class Pop: Op
+	{
 		public override void Process(Instruction aInstruction)
 		{
-			// Operand contains the string to be loaded
-			Console.WriteLine("LdStr, string = '{0}'", aInstruction.Operand);
+			Console.WriteLine("Pop");
 		}
 	}
 }

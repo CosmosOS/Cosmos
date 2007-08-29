@@ -49,6 +49,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\HelloWorld\HelloWorld.csproj">
+      <Project>{0267F1AE-CA81-4EBD-86CA-C8E22BE9A6F1}</Project>
+      <Name>HelloWorld</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Indy.IL2CPU\Indy.IL2CPU.csproj">
       <Project>{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}</Project>
       <Name>Indy.IL2CPU</Name>
