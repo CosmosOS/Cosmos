@@ -12,7 +12,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             return "Noop";
         }
 
-        public override void Assemble(BinaryWriter aWriter) {
+        public override void EmitParams(BinaryWriter aWriter) {
             // aWriter.Write( params. bla bla bla if this was not a nooop)
         }
     }
