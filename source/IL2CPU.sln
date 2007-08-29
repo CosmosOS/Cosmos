@@ -15,15 +15,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU.Assembler", "In
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU.Assembler.X86", "Indy.IL2CPU.Assembler.X86\Indy.IL2CPU.Assembler.X86.csproj", "{7F32CE06-13F2-4EDA-B588-3FAAFD25178A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU.Assembler.X86.Binary", "Indy.IL2CPU.Assembler.X86.Binary\Indy.IL2CPU.Assembler.X86.Binary.csproj", "{79566CB7-BC52-40FD-9C0C-E98EB71F6125}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU.Assembler.X86.Source", "Indy.IL2CPU.Assembler.X86.Source\Indy.IL2CPU.Assembler.X86.Source.csproj", "{B565964A-B136-4F61-B5EF-7F4233D9C83D}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU.IL.X86", "Indy.IL2CPU.IL.X86\Indy.IL2CPU.IL.X86.csproj", "{69C8D2C5-225C-4A00-BA55-AEF6719CBDBA}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 11
+		SccNumberOfProjects = 9
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -48,15 +44,9 @@ Global
 		SccProjectUniqueName7 = Indy.IL2CPU.Assembler.X86\\Indy.IL2CPU.Assembler.X86.csproj
 		SccProjectName7 = Indy.IL2CPU.Assembler.X86
 		SccLocalPath7 = Indy.IL2CPU.Assembler.X86
-		SccProjectUniqueName8 = Indy.IL2CPU.Assembler.X86.Binary\\Indy.IL2CPU.Assembler.X86.Binary.csproj
-		SccProjectName8 = Indy.IL2CPU.Assembler.X86.Binary
-		SccLocalPath8 = Indy.IL2CPU.Assembler.X86.Binary
-		SccProjectUniqueName9 = Indy.IL2CPU.Assembler.X86.Source\\Indy.IL2CPU.Assembler.X86.Source.csproj
-		SccProjectName9 = Indy.IL2CPU.Assembler.X86.Source
-		SccLocalPath9 = Indy.IL2CPU.Assembler.X86.Source
-		SccProjectUniqueName10 = Indy.IL2CPU.IL.X86\\Indy.IL2CPU.IL.X86.csproj
-		SccProjectName10 = Indy.IL2CPU.IL.X86
-		SccLocalPath10 = Indy.IL2CPU.IL.X86
+		SccProjectUniqueName8 = Indy.IL2CPU.IL.X86\\Indy.IL2CPU.IL.X86.csproj
+		SccProjectName8 = Indy.IL2CPU.IL.X86
+		SccLocalPath8 = Indy.IL2CPU.IL.X86
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -91,14 +81,6 @@ Global
 		{7F32CE06-13F2-4EDA-B588-3FAAFD25178A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7F32CE06-13F2-4EDA-B588-3FAAFD25178A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7F32CE06-13F2-4EDA-B588-3FAAFD25178A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{79566CB7-BC52-40FD-9C0C-E98EB71F6125}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{79566CB7-BC52-40FD-9C0C-E98EB71F6125}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{79566CB7-BC52-40FD-9C0C-E98EB71F6125}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{79566CB7-BC52-40FD-9C0C-E98EB71F6125}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B565964A-B136-4F61-B5EF-7F4233D9C83D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B565964A-B136-4F61-B5EF-7F4233D9C83D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B565964A-B136-4F61-B5EF-7F4233D9C83D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B565964A-B136-4F61-B5EF-7F4233D9C83D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{69C8D2C5-225C-4A00-BA55-AEF6719CBDBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{69C8D2C5-225C-4A00-BA55-AEF6719CBDBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{69C8D2C5-225C-4A00-BA55-AEF6719CBDBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
