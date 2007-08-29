@@ -48,8 +48,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Call.cs" />
-    <Compile Include="Ret.cs" />
-    <Compile Include="Ldstr.cs" />
+    <Compile Include="Return.cs" />
+    <Compile Include="LdStr.cs" />
     <Compile Include="Noop.cs" />
     <Compile Include="Op.cs" />
     <Compile Include="OpCodeAttribute.cs" />
