@@ -17,7 +17,7 @@ namespace Indy.IL2CPU {
 			if (xAD.EntryPoint == null)
 				throw new NotSupportedException("Libraries are not yet supported!");
 			foreach (Instruction xInstruction in xAD.EntryPoint.Body.Instructions) {
-				mMap.GetOpForOpCode(xInstruction.OpCode.Code).Process(xInstruction);
+                mMap.GetOpForOpCode(xInstruction.OpCode.Code).Assemble(xInstruction);
 			}
 		}
 	}

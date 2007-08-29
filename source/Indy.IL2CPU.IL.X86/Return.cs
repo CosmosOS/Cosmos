@@ -6,7 +6,7 @@ using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL.X86 {
     class Return : Indy.IL2CPU.IL.Return {
-        public override void Process(Instruction aInstruction) {
+        public override void Assemble(Instruction aInstruction) {
             Console.WriteLine("Ret");
         }
     }

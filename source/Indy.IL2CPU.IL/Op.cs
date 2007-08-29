@@ -7,6 +7,6 @@ using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL {
 	public abstract class Op {
-		public abstract void Process(Instruction aInstruction);
+		public abstract void Assemble(Instruction aInstruction);
 	}
 }

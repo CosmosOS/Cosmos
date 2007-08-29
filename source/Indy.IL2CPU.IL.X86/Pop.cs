@@ -6,7 +6,7 @@ using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL.X86 {
     class Pop : Indy.IL2CPU.IL.Pop {
-        public override void Process(Instruction aInstruction) {
+        public override void Assemble(Instruction aInstruction) {
             Console.WriteLine("Pop");
         }
     }
