@@ -53,6 +53,14 @@
       <Project>{0267F1AE-CA81-4EBD-86CA-C8E22BE9A6F1}</Project>
       <Name>HelloWorld</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Indy.IL2CPU.IL.X86\Indy.IL2CPU.IL.X86.csproj">
+      <Project>{69C8D2C5-225C-4A00-BA55-AEF6719CBDBA}</Project>
+      <Name>Indy.IL2CPU.IL.X86</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Indy.IL2CPU.IL\Indy.IL2CPU.IL.csproj">
+      <Project>{5A39A8DF-D99E-4112-9676-BD3EED969A9C}</Project>
+      <Name>Indy.IL2CPU.IL</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Indy.IL2CPU\Indy.IL2CPU.csproj">
       <Project>{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}</Project>
       <Name>Indy.IL2CPU</Name>

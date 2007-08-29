@@ -10,7 +10,7 @@ namespace IL2CPU {
 			try
 			{
 				Engine e = new Engine();
-				e.Execute("HelloWorld.exe");
+				e.Execute("HelloWorld.exe", typeof(Indy.IL2CPU.IL.X86.Noop).Assembly.GetName().ToString());
 			} catch (Exception E) {
 				Console.WriteLine(E.ToString());
 			}
