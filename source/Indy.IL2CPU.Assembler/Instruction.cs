@@ -6,6 +6,7 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler {
     public abstract class Instruction {
-        public abstract void EmitParams(BinaryWriter aWriter); 
+        public virtual void EmitParams(BinaryWriter aWriter) {
+        }
     }
 }

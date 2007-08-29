@@ -12,6 +12,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             return "Noop";
         }
 
+        // In fact this can be removed. EmitParams override is optional,its just here for example for the time being
         public override void EmitParams(BinaryWriter aWriter) {
             // aWriter.Write( params. bla bla bla if this was not a nooop)
         }
