@@ -11,11 +11,7 @@ namespace HelloWorldAssembler {
 				using (Assembler a = new Assembler(xSW)) {
 					a.OutputType = Assembler.OutputTypeEnum.DLL;
 					a.Includes.Add("win32w.inc");
-					new DataMember() {
-						Name = "_class",
-						DataType = "TCHAR",
-						DefaultValue = "'Win32 program template'"
-					};
+					new DataMember("_class", "TCHAR", "'Win32 program template'");
 					new Noop();
 					a.Flush();
 				}
