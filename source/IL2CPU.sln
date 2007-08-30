@@ -17,9 +17,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU.Assembler.X86",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU.IL.X86", "Indy.IL2CPU.IL.X86\Indy.IL2CPU.IL.X86.csproj", "{69C8D2C5-225C-4A00-BA55-AEF6719CBDBA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelloWorldAssembler", "HelloWorldAssembler\HelloWorldAssembler.csproj", "{E17BC1C6-3E4F-443F-804E-CB43A5610DDB}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 9
+		SccNumberOfProjects = 10
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -47,6 +49,9 @@ Global
 		SccProjectUniqueName8 = Indy.IL2CPU.IL.X86\\Indy.IL2CPU.IL.X86.csproj
 		SccProjectName8 = Indy.IL2CPU.IL.X86
 		SccLocalPath8 = Indy.IL2CPU.IL.X86
+		SccProjectUniqueName9 = HelloWorldAssembler\\HelloWorldAssembler.csproj
+		SccProjectName9 = HelloWorldAssembler
+		SccLocalPath9 = HelloWorldAssembler
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -85,6 +90,10 @@ Global
 		{69C8D2C5-225C-4A00-BA55-AEF6719CBDBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{69C8D2C5-225C-4A00-BA55-AEF6719CBDBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{69C8D2C5-225C-4A00-BA55-AEF6719CBDBA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E17BC1C6-3E4F-443F-804E-CB43A5610DDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E17BC1C6-3E4F-443F-804E-CB43A5610DDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E17BC1C6-3E4F-443F-804E-CB43A5610DDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E17BC1C6-3E4F-443F-804E-CB43A5610DDB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
