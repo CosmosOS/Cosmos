@@ -41,22 +41,28 @@ namespace Indy.IL2CPU {
 		/// crawled to see what is neccessary, same goes for all dependencies.
 		/// </summary>
 		/// <param name="aAssembly">The assembly of which to crawl the entry-point method.</param>
-		/// <param name="opAssembly">The assembly containing the architecture-specific implementation (x86, AMD64, etc)</param>
+		/// <param name="aOpAssembly">The assembly containing the architecture-specific implementation (x86, AMD64, etc)</param>
 		/// <param name="aOutput"></param>
-		public void Execute(string aAssembly, string opAssembly, BinaryWriter aOutput) {
+		public void Execute(string aAssembly, string aOpAssembly, StreamWriter aOutput) {
 			if (aOutput == null) {
 				throw new ArgumentNullException("aOutput");
 			}
-			mMap.LoadOpMapFromAssembly(opAssembly);
+			mMap.LoadOpMapFromAssembly(aOpAssembly);
 			mCrawledAssembly = AssemblyFactory.GetAssembly(aAssembly);
 			if (mCrawledAssembly.EntryPoint == null) {
-				throw new NotSupportedException("Libraries are not yet supported!");
+				throw new NotSupportedException("Libraries are not supported!");
 			}
-			mMethods.Add(mCrawledAssembly.EntryPoint, false);
-			ProcessAllMethods(aOutput);
+			using (Assembler.Assembler xAssembler = new Indy.IL2CPU.Assembler.Assembler(aOutput)) {
+				try {
+					//mMethods.Add(mCrawledAssembly.EntryPoint, false);
+					//ProcessAllMethods();
+				} finally {
+					xAssembler.Flush();
+				}
+			}
 		}
 
-		private void ProcessAllMethods(BinaryWriter aOutput) {
+		private void ProcessAllMethods() {
 			MethodDefinition xCurrentMethod;
 			while ((xCurrentMethod = (from item in mMethods.Keys
 																where !mMethods[item]
@@ -101,6 +107,7 @@ namespace Indy.IL2CPU {
 								}
 							}
 						}
+						mMap.GetOpForOpCode(xInstruction.OpCode.Code).Assemble(xInstruction);
 					}
 				}
 				mMethods[xCurrentMethod] = true;

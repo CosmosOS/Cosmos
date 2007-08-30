@@ -43,14 +43,6 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
-    <Reference Include="System.Xml.Linq">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data.DataSetExtensions">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Engine.cs" />
@@ -58,6 +50,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Indy.IL2CPU.Assembler\Indy.IL2CPU.Assembler.csproj">
+      <Project>{8E8CAD9B-C092-4071-AD92-E7A4E7BA776F}</Project>
+      <Name>Indy.IL2CPU.Assembler</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Indy.IL2CPU.IL\Indy.IL2CPU.IL.csproj">
       <Project>{5A39A8DF-D99E-4112-9676-BD3EED969A9C}</Project>
       <Name>Indy.IL2CPU.IL</Name>

@@ -10,18 +10,18 @@ namespace IL2CPU {
 			try {
 				Engine e = new Engine();
 				e.DebugLog += delegate(string aMessage) {
-				              	Console.WriteLine(aMessage);
-				              };
+					Console.WriteLine(aMessage);
+				};
 				using (FileStream fs = new FileStream(@"output", FileMode.Create)) {
-					using (BinaryWriter br = new BinaryWriter(fs)) {
-						e.Execute("HelloWorld.exe", typeof (Nop).Assembly.GetName().ToString(), br);
+					using (StreamWriter br = new StreamWriter(fs)) {
+						e.Execute("HelloWorld.exe", typeof(Nop).Assembly.GetName().ToString(), br);
 					}
 				}
 			} catch (Exception E) {
 				Console.WriteLine(E.ToString());
 			}
-            Console.WriteLine("");
-            Console.WriteLine("Completed");
+			Console.WriteLine("");
+			Console.WriteLine("Completed");
 			Console.ReadLine();
 		}
 	}
