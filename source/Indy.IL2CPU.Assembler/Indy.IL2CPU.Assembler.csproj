@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="Assembler.cs" />
     <Compile Include="Instruction.cs" />
+    <Compile Include="InstructionCPU.cs" />
     <Compile Include="OpCodeAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

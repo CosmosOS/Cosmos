@@ -19,7 +19,7 @@ namespace Indy.IL2CPU {
 				object[] xAttribs = t.GetCustomAttributes(typeof(OpCodeAttribute), true);
 				try {
 					mMap.Add(((OpCodeAttribute)xAttribs[0]).OpCode, xOp);
-				} catch (Exception E) {
+				} catch {
 					Console.WriteLine("Was adding op " + ((OpCodeAttribute)xAttribs[0]).OpCode.ToString());
 					throw;
 				}

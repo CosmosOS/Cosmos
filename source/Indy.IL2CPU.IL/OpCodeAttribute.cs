@@ -7,15 +7,10 @@ using Mono.Cecil.Cil;
 namespace Indy.IL2CPU.IL {
 	[AttributeUsage(AttributeTargets.Class, Inherited=true, AllowMultiple=false)]
 	public class OpCodeAttribute: Attribute {
-		private readonly Code mOpCode;
-		public OpCodeAttribute(Code aOpCode) {
-			mOpCode = aOpCode;
-		}
+		public readonly Code OpCode;
 
-		public Code OpCode {
-			get {
-				return mOpCode;
-			}
+        public OpCodeAttribute(Code aOpCode) {
+			OpCode = aOpCode;
 		}
 	}
 }
