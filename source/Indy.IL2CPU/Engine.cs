@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -9,7 +8,7 @@ using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU {
 	public class MethodDefinitionComparer: IComparer<MethodDefinition> {
-		private static string GenerateFullName(MethodDefinition aDefinition) {
+		private static string GenerateFullName(MethodReference aDefinition) {
 			StringBuilder sb = new StringBuilder();
 			sb.Append(aDefinition.DeclaringType.FullName + "." + aDefinition.Name);
 			sb.Append("(");
@@ -25,9 +24,12 @@ namespace Indy.IL2CPU {
 		}
 	}
 
+	public delegate void DebugLogHandler(string aMessage);
+
 	public class Engine {
 		protected OpCodeMap mMap = new OpCodeMap();
 		private AssemblyDefinition mCrawledAssembly;
+		private DebugLogHandler mDebugLog;
 
 		/// <summary>
 		/// Contains a list of all methods. This includes methods to be processed and already processed.
@@ -59,7 +61,7 @@ namespace Indy.IL2CPU {
 			while ((xCurrentMethod = (from item in mMethods.Keys
 																where !mMethods[item]
 																select item).FirstOrDefault()) != null) {
-				Console.WriteLine("Processing method '{0}'", xCurrentMethod.DeclaringType.FullName + "." + xCurrentMethod.Name);
+				OnDebugLog("Processing method '{0}'", xCurrentMethod.DeclaringType.FullName + "." + xCurrentMethod.Name);
 				if (xCurrentMethod.HasBody) {
 					// what to do if a method doesn't have a body?
 					foreach (Instruction xInstruction in xCurrentMethod.Body.Instructions) {
@@ -95,11 +97,10 @@ namespace Indy.IL2CPU {
 										}
 									}
 								} else {
-									Console.WriteLine("Error: Unhandled scope: " + xMethodReference.DeclaringType.Scope == null ? "**NULL**" : xMethodReference.DeclaringType.Scope.GetType().FullName);
+									OnDebugLog("Error: Unhandled scope: " + xMethodReference.DeclaringType.Scope == null ? "**NULL**" : xMethodReference.DeclaringType.Scope.GetType().FullName);
 								}
 							}
 						}
-						//	mMap.GetOpForOpCode(xInstruction.OpCode.Code).Assemble(xInstruction, aOutput);
 					}
 				}
 				mMethods[xCurrentMethod] = true;
@@ -109,6 +110,21 @@ namespace Indy.IL2CPU {
 		private void AddMethodForProcessing(MethodDefinition aMethod) {
 			if (!mMethods.ContainsKey(aMethod)) {
 				mMethods.Add(aMethod, false);
+			}
+		}
+
+		public event DebugLogHandler DebugLog {
+			add {
+				mDebugLog += value;
+			}
+			remove {
+				mDebugLog -= value;
+			}
+		}
+
+		private void OnDebugLog(string aMessage, params object[] args) {
+			if (mDebugLog != null) {
+				mDebugLog(String.Format(aMessage, args));
 			}
 		}
 	}
