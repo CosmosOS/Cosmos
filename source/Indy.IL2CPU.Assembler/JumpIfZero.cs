@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 
 namespace Indy.IL2CPU.Assembler {
-	public class Label: Instruction {
-		public readonly string Name;
-		public Label(string aName) {
-			Name = aName;
+	public class JumpIfZero: Instruction {
+		public readonly string Address;
+		public JumpIfZero(string aAddress) {
+			Address = aAddress;
 		}
 		public override string ToString() {
-			return Name + ":";
+			return "jz " + Address;
 		}
 	}
 }

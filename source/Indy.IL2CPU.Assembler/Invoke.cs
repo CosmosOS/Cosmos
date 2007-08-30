@@ -12,7 +12,7 @@ namespace Indy.IL2CPU.Assembler {
 			: this(aProcedureName, new object[0]) {
 		}
 
-		public Invoke(string aProcedureName, object[] aParams) {
+		public Invoke(string aProcedureName, params object[] aParams) {
 			ProcedureName = aProcedureName;
 			Params = aParams;
 		}

@@ -102,7 +102,12 @@ namespace Indy.IL2CPU.Assembler {
 			mOutputWriter.WriteLine();
 			mOutputWriter.WriteLine("    " + EntryPointLabelName + ":");
 			foreach (Instruction x in mInstructions) {
-				mOutputWriter.WriteLine("\t" + x);
+				string prefix = "\t";
+				if (x is Label) {
+					mOutputWriter.WriteLine();
+					prefix = "    ";
+				}
+				mOutputWriter.WriteLine(prefix + x);
 			}
 		}
 	}
