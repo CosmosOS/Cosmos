@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.IO;
 using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL.X86 {
-    class LdStr : Indy.IL2CPU.IL.LdStr {
-        public override void Assemble(Instruction aInstruction) {
-            // Operand contains the string to be loaded
-            Console.WriteLine("LdStr, string = '{0}'", aInstruction.Operand);
-        }
-    }
+	internal class LdStr: IL.LdStr {
+		public override void Assemble(Instruction aInstruction, BinaryWriter aOutput) {
+			// Operand contains the string to be loaded
+			//new CPU.
+			Console.WriteLine("LdStr, string = '{0}'", aInstruction.Operand);
+		}
+	}
 }
