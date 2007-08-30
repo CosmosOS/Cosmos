@@ -10,14 +10,19 @@ namespace Indy.IL2CPU {
 	public class OpCodeMap {
 		protected SortedList<Code, Op> mMap = new SortedList<Code, Op>();
 
-		public void LoadOpMapFromAssembly(string aAssemblyName){
+		public void LoadOpMapFromAssembly(string aAssemblyName) {
 			Assembly xA = Assembly.Load(aAssemblyName);
 			foreach (Type t in (from item in xA.GetTypes()
 													where item.IsSubclassOf(typeof(Op)) && item.GetCustomAttributes(typeof(OpCodeAttribute), true).Length > 0
 													select item)) {
 				Op xOp = Activator.CreateInstance(t) as Op;
 				object[] xAttribs = t.GetCustomAttributes(typeof(OpCodeAttribute), true);
-				mMap.Add(((OpCodeAttribute)xAttribs[0]).OpCode, xOp);
+				try {
+					mMap.Add(((OpCodeAttribute)xAttribs[0]).OpCode, xOp);
+				} catch (Exception E) {
+					Console.WriteLine("Was adding op " + ((OpCodeAttribute)xAttribs[0]).OpCode.ToString());
+					throw;
+				}
 			}
 		}
 

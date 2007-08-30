@@ -221,9 +221,7 @@
     <Compile Include="Rem_Un.cs" />
     <Compile Include="Ret.cs" />
     <Compile Include="Rethrow.cs" />
-    <Compile Include="Return.cs" />
     <Compile Include="LdStr.cs" />
-    <Compile Include="Noop.cs" />
     <Compile Include="Op.cs" />
     <Compile Include="OpCodeAttribute.cs" />
     <Compile Include="Pop.cs" />
@@ -271,9 +269,6 @@
     <Compile Include="Unbox_Any.cs" />
     <Compile Include="Volatile.cs" />
     <Compile Include="Xor.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Indy.IL2CPU.IL.csproj.vspscc" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
