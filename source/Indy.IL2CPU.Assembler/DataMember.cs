@@ -6,7 +6,6 @@ using System.Text;
 namespace Indy.IL2CPU.Assembler {
 	public class DataMember {
 		public DataMember(string aName, string aDataType, string aDefaultValue) {
-			Assembler.Current.Add(this);
 			Name = aName;
 			DataType = aDataType;
 			DefaultValue = aDefaultValue;

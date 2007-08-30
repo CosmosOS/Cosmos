@@ -9,10 +9,10 @@ namespace HelloWorldAssembler {
 		public static void Main(string[] args) {
 			using (StreamWriter xSW = new StreamWriter("out.asm")) {
 				using (Assembler a = new Assembler(xSW)) {
-					a.OutputType = Assembler.OutputTypeEnum.DLL;
+					a.OutputType = Assembler.OutputTypeEnum.Console;
 					a.Includes.Add("win32w.inc");
-					new DataMember("_class", "TCHAR", "'Win32 program template'");
-					new Noop();
+					a.DataMembers.Add(new DataMember("_class", "TCHAR", "'Win32 program template'"));
+					new Invoke("GetModuleHandle", new object[] {0});
 					a.Flush();
 				}
 			}

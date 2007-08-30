@@ -51,6 +51,12 @@ namespace Indy.IL2CPU.Assembler {
 			}
 		}
 
+		public List<DataMember> DataMembers {
+			get {
+				return mDataMembers;
+			}
+		}
+
 		#region IDisposable Members
 		public void Dispose() {
 			// MtW: I know, IDisposable usage for this isn't really nice, but for now this should be fine.
@@ -62,10 +68,6 @@ namespace Indy.IL2CPU.Assembler {
 
 		public void Add(Instruction aInstruction) {
 			mInstructions.Add(aInstruction);
-		}
-
-		public void Add(DataMember aMember) {
-			mDataMembers.Add(aMember);
 		}
 
 		public void Flush() {
@@ -82,6 +84,9 @@ namespace Indy.IL2CPU.Assembler {
 					mOutputWriter.WriteLine("format PE dll");
 					break;
 			}
+			if(mOutputType != OutputTypeEnum.DLL) {
+				mOutputWriter.WriteLine("entry " + EntryPointLabelName);
+			}
 			mOutputWriter.WriteLine();
 			foreach (string xInclude in mIncludes) {
 				mOutputWriter.WriteLine("include '{0}'", xInclude);
@@ -90,13 +95,14 @@ namespace Indy.IL2CPU.Assembler {
 			mOutputWriter.WriteLine("section '.data' data readable writeable");
 			mOutputWriter.WriteLine();
 			foreach(DataMember xMember in mDataMembers) {
-				mOutputWriter.WriteLine("\t" + xMember.ToString());
+				mOutputWriter.WriteLine("\t" + xMember);
 			}
 			mOutputWriter.WriteLine();
 			mOutputWriter.WriteLine("section '.code' code readable executable");
 			mOutputWriter.WriteLine();
+			mOutputWriter.WriteLine("    " + EntryPointLabelName + ":");
 			foreach (Instruction x in mInstructions) {
-				mOutputWriter.WriteLine("\t" + x.ToString());
+				mOutputWriter.WriteLine("\t" + x);
 			}
 		}
 	}
