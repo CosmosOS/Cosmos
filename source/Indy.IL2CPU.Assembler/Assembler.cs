@@ -40,8 +40,11 @@ namespace Indy.IL2CPU.Assembler {
 
 		public void Flush() {
 			// write .asm header
-			mOutputWriter.WriteLine("format PE console");
-			mOutputWriter.WriteLine("entry " + EntryPointLabelName);
+			// debug: we're generating .dll so we can test the outpu
+			mOutputWriter.WriteLine("format PE dll");
+			//mOutputWriter.WriteLine("entry " + EntryPointLabelName);
+			mOutputWriter.WriteLine();
+			mOutputWriter.WriteLine("section '.code' code readable executable");
 			mOutputWriter.WriteLine();
 			foreach (Instruction x in mInstructions) {
 				mOutputWriter.WriteLine(x.ToString());

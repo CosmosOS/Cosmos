@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Indy.IL2CPU.Assembler.X86;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Instruction=Mono.Cecil.Cil.Instruction;
 
 namespace Indy.IL2CPU {
 	public class MethodDefinitionComparer: IComparer<MethodDefinition> {
@@ -52,10 +54,11 @@ namespace Indy.IL2CPU {
 			if (mCrawledAssembly.EntryPoint == null) {
 				throw new NotSupportedException("Libraries are not supported!");
 			}
-			using (Assembler.Assembler xAssembler = new Indy.IL2CPU.Assembler.Assembler(aOutput)) {
+			using (Assembler.Assembler xAssembler = new Assembler.Assembler(aOutput)) {
 				try {
 					//mMethods.Add(mCrawledAssembly.EntryPoint, false);
 					//ProcessAllMethods();
+					new Noop();
 				} finally {
 					xAssembler.Flush();
 				}

@@ -12,7 +12,7 @@ namespace IL2CPU {
 				e.DebugLog += delegate(string aMessage) {
 					Console.WriteLine(aMessage);
 				};
-				using (FileStream fs = new FileStream(@"output", FileMode.Create)) {
+				using (FileStream fs = new FileStream(@"output.asm", FileMode.Create)) {
 					using (StreamWriter br = new StreamWriter(fs)) {
 						e.Execute("HelloWorld.exe", typeof(Nop).Assembly.GetName().ToString(), br);
 					}
