@@ -5,10 +5,19 @@ using System.Linq;
 
 namespace Indy.IL2CPU.Assembler {
 	public class Assembler: IDisposable {
+		public enum OutputTypeEnum {
+			DLL,
+			Console,
+			GUI
+		}
+
+		public const string EntryPointLabelName = "___ENTRYPOINT___";
 		private static Assembler mCurrentInstance;
 		private List<Instruction> mInstructions = new List<Instruction>();
+		private List<DataMember> mDataMembers = new List<DataMember>();
+		private OutputTypeEnum mOutputType = OutputTypeEnum.DLL;
 		private StreamWriter mOutputWriter;
-		public const string EntryPointLabelName = "___ENTRYPOINT___";
+		private List<string> mIncludes = new List<string>();
 
 		public Assembler(StreamWriter aOutputWriter) {
 			if (mCurrentInstance != null) {
@@ -27,10 +36,27 @@ namespace Indy.IL2CPU.Assembler {
 			}
 		}
 
+		public OutputTypeEnum OutputType {
+			get {
+				return mOutputType;
+			}
+			set {
+				mOutputType = value;
+			}
+		}
+
+		public List<string> Includes {
+			get {
+				return mIncludes;
+			}
+		}
+
 		#region IDisposable Members
 		public void Dispose() {
 			// MtW: I know, IDisposable usage for this isn't really nice, but for now this should be fine.
 			mCurrentInstance = null;
+			mInstructions.Clear();
+			mDataMembers.Clear();
 		}
 		#endregion
 
@@ -38,16 +64,39 @@ namespace Indy.IL2CPU.Assembler {
 			mInstructions.Add(aInstruction);
 		}
 
+		public void Add(DataMember aMember) {
+			mDataMembers.Add(aMember);
+		}
+
 		public void Flush() {
 			// write .asm header
 			// debug: we're generating .dll so we can test the outpu
-			mOutputWriter.WriteLine("format PE dll");
-			//mOutputWriter.WriteLine("entry " + EntryPointLabelName);
+			switch (mOutputType) {
+				case OutputTypeEnum.Console:
+					mOutputWriter.WriteLine("format PE console");
+					break;
+				case OutputTypeEnum.GUI:
+					mOutputWriter.WriteLine("format PE GUI 4.0");
+					break;
+				default:
+					mOutputWriter.WriteLine("format PE dll");
+					break;
+			}
+			mOutputWriter.WriteLine();
+			foreach (string xInclude in mIncludes) {
+				mOutputWriter.WriteLine("include '{0}'", xInclude);
+			}
+			mOutputWriter.WriteLine();
+			mOutputWriter.WriteLine("section '.data' data readable writeable");
+			mOutputWriter.WriteLine();
+			foreach(DataMember xMember in mDataMembers) {
+				mOutputWriter.WriteLine("\t" + xMember.ToString());
+			}
 			mOutputWriter.WriteLine();
 			mOutputWriter.WriteLine("section '.code' code readable executable");
 			mOutputWriter.WriteLine();
 			foreach (Instruction x in mInstructions) {
-				mOutputWriter.WriteLine(x.ToString());
+				mOutputWriter.WriteLine("\t" + x.ToString());
 			}
 		}
 	}
