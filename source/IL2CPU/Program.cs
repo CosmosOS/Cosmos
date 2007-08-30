@@ -20,6 +20,8 @@ namespace IL2CPU {
 			} catch (Exception E) {
 				Console.WriteLine(E.ToString());
 			}
+            Console.WriteLine("");
+            Console.WriteLine("Completed");
 			Console.ReadLine();
 		}
 	}
