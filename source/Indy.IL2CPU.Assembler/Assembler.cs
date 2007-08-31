@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace Indy.IL2CPU.Assembler {
 	public class Assembler: IDisposable {
@@ -19,6 +20,11 @@ namespace Indy.IL2CPU.Assembler {
 		private StreamWriter mOutputWriter;
 		private List<string> mIncludes = new List<string>();
 		private List<ImportMember> mImportMembers = new List<ImportMember>();
+
+		private uint mDataMemberCounter = 0;
+		public string GetIdentifier(string aPrefix) {
+			return aPrefix + mDataMemberCounter++.ToString("X8").ToUpper();
+		}
 
 		public Assembler(StreamWriter aOutputWriter) {
 			if (mCurrentInstance != null) {
@@ -122,6 +128,23 @@ namespace Indy.IL2CPU.Assembler {
 			foreach (ImportMember xImportMember in mImportMembers) {
 				mOutputWriter.WriteLine("\t" + xImportMember);
 			}
+		}
+
+		public static string GetLabelName(string aType, string aReturnType, string aMethodName, params string[] aParamTypes) {
+			StringBuilder xSB = new StringBuilder();
+			xSB.Append(aReturnType.Replace('.', '_').Replace('+', '_'));
+			xSB.Append("___");
+			xSB.Append(aType.Replace('.', '_').Replace('+', '_'));
+			xSB.Append("_");
+			xSB.Append(aMethodName.Replace('.', '_'));
+			xSB.Append("__");
+			foreach(string s in aParamTypes) {
+				xSB.Append("_");
+				xSB.Append(s.Replace('.', '_').Replace('+', '_'));
+				xSB.Append("_");
+			}
+			xSB.Append("__");
+			return xSB.ToString();
 		}
 	}
 }

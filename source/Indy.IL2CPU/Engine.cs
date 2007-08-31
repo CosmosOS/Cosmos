@@ -5,11 +5,16 @@ using System.Linq;
 using System.Text;
 using Indy.IL2CPU.Assembler.X86;
 using Mono.Cecil;
-using Mono.Cecil.Cil;
-using Instruction=Mono.Cecil.Cil.Instruction;
+using Instruction = Mono.Cecil.Cil.Instruction;
 
 namespace Indy.IL2CPU {
 	public class MethodDefinitionComparer: IComparer<MethodDefinition> {
+		#region IComparer<MethodDefinition> Members
+		public int Compare(MethodDefinition x, MethodDefinition y) {
+			return GenerateFullName(x).CompareTo(GenerateFullName(y));
+		}
+		#endregion
+
 		private static string GenerateFullName(MethodReference aDefinition) {
 			StringBuilder sb = new StringBuilder();
 			sb.Append(aDefinition.DeclaringType.FullName + "." + aDefinition.Name);
@@ -20,18 +25,15 @@ namespace Indy.IL2CPU {
 			}
 			return sb.ToString().TrimEnd(',') + ")";
 		}
-
-		public int Compare(MethodDefinition x, MethodDefinition y) {
-			return GenerateFullName(x).CompareTo(GenerateFullName(y));
-		}
 	}
 
 	public delegate void DebugLogHandler(string aMessage);
 
 	public class Engine {
-		protected OpCodeMap mMap = new OpCodeMap();
+		protected static Engine mCurrent;
 		private AssemblyDefinition mCrawledAssembly;
 		private DebugLogHandler mDebugLog;
+		protected OpCodeMap mMap = new OpCodeMap();
 
 		/// <summary>
 		/// Contains a list of all methods. This includes methods to be processed and already processed.
@@ -46,22 +48,29 @@ namespace Indy.IL2CPU {
 		/// <param name="aOpAssembly">The assembly containing the architecture-specific implementation (x86, AMD64, etc)</param>
 		/// <param name="aOutput"></param>
 		public void Execute(string aAssembly, string aOpAssembly, StreamWriter aOutput) {
-			if (aOutput == null) {
-				throw new ArgumentNullException("aOutput");
-			}
-			mMap.LoadOpMapFromAssembly(aOpAssembly);
-			mCrawledAssembly = AssemblyFactory.GetAssembly(aAssembly);
-			if (mCrawledAssembly.EntryPoint == null) {
-				throw new NotSupportedException("Libraries are not supported!");
-			}
-			using (Assembler.Assembler xAssembler = new Assembler.Assembler(aOutput)) {
-				try {
-					//mMethods.Add(mCrawledAssembly.EntryPoint, false);
-					//ProcessAllMethods();
-					new Noop();
-				} finally {
-					xAssembler.Flush();
+			mCurrent = this;
+			try {
+				if (aOutput == null) {
+					throw new ArgumentNullException("aOutput");
 				}
+				mMap.LoadOpMapFromAssembly(aOpAssembly);
+				mCrawledAssembly = AssemblyFactory.GetAssembly(aAssembly);
+				if (mCrawledAssembly.EntryPoint == null) {
+					throw new NotSupportedException("Libraries are not supported!");
+				}
+
+				using (Assembler.Assembler xAssembler = new Assembler.Assembler(aOutput)) {
+					IL.Op.QueueMethod += QueueMethod;
+					try {
+						mMethods.Add(mCrawledAssembly.EntryPoint, false);
+						ProcessAllMethods();
+					} finally {
+						xAssembler.Flush();
+						IL.Op.QueueMethod -= QueueMethod;
+					}
+				}
+			} finally {
+				mCurrent = null;
 			}
 		}
 
@@ -71,14 +80,18 @@ namespace Indy.IL2CPU {
 																where !mMethods[item]
 																select item).FirstOrDefault()) != null) {
 				OnDebugLog("Processing method '{0}'", xCurrentMethod.DeclaringType.FullName + "." + xCurrentMethod.Name);
+				string[] xParamTypes = new string[xCurrentMethod.Parameters.Count];
+				for (int i = 0; i < xParamTypes.Length; i++) {
+					xParamTypes[i] = xCurrentMethod.Parameters[i].ParameterType.FullName;
+				}
+				new Assembler.Label(Assembler.Assembler.GetLabelName(xCurrentMethod.DeclaringType.FullName, xCurrentMethod.ReturnType.ReturnType.FullName, xCurrentMethod.Name, xParamTypes));
+				// what to do if a method doesn't have a body?
 				if (xCurrentMethod.HasBody) {
-					// what to do if a method doesn't have a body?
+
 					foreach (Instruction xInstruction in xCurrentMethod.Body.Instructions) {
-						if (xInstruction.OpCode.Code == Code.Callvirt) {
-							//Debugger.Break();
-						}
 						MethodReference xMethodReference = xInstruction.Operand as MethodReference;
 						if (xMethodReference != null) {
+							#region add methods so that they get processed
 							// TODO: find a more efficient way to get the MethodDefinition from a MethodReference
 							AssemblyNameReference xAssemblyNameReference = xMethodReference.DeclaringType.Scope as AssemblyNameReference;
 							if (xAssemblyNameReference != null) {
@@ -89,7 +102,7 @@ namespace Indy.IL2CPU {
 										if (xReferencedType != null) {
 											var xMethodDef = xReferencedType.Methods.GetMethod(xMethodReference.Name, xMethodReference.Parameters);
 											if (xMethodDef != null) {
-												AddMethodForProcessing(xMethodDef);
+												QueueMethod(xMethodDef);
 											}
 											break;
 										}
@@ -102,13 +115,14 @@ namespace Indy.IL2CPU {
 									if (xReferencedType != null) {
 										var xMethodDef = xReferencedType.Methods.GetMethod(xMethodReference.Name, xMethodReference.Parameters);
 										if (xMethodDef != null) {
-											AddMethodForProcessing(xMethodDef);
+											QueueMethod(xMethodDef);
 										}
 									}
 								} else {
 									OnDebugLog("Error: Unhandled scope: " + xMethodReference.DeclaringType.Scope == null ? "**NULL**" : xMethodReference.DeclaringType.Scope.GetType().FullName);
 								}
 							}
+							#endregion
 						}
 						mMap.GetOpForOpCode(xInstruction.OpCode.Code).Assemble(xInstruction);
 					}
@@ -117,9 +131,49 @@ namespace Indy.IL2CPU {
 			}
 		}
 
-		private void AddMethodForProcessing(MethodDefinition aMethod) {
-			if (!mMethods.ContainsKey(aMethod)) {
-				mMethods.Add(aMethod, false);
+		// MtW: 
+		//		Right now, we only support one engine at a time per AppDomain. This might be changed
+		//		later. See for example NHibernate does this with the ICurrentSessionContext interface
+		public static void QueueMethod(MethodDefinition aMethod) {
+			if (mCurrent == null) {
+				throw new Exception("ERROR: No Current Engine found!");
+			}
+			if (!mCurrent.mMethods.ContainsKey(aMethod)) {
+				mCurrent.mMethods.Add(aMethod, false);
+			}
+		}
+
+		public static void QueueMethod(string aAssembly, string aType, string aMethod) {
+			if (mCurrent == null) {
+				throw new Exception("ERROR: No Current Engine found!");
+			}
+			AssemblyDefinition xAssemblyDef = mCurrent.mCrawledAssembly.Resolver.Resolve(aAssembly);
+			TypeDefinition xTypeDef = null;
+			foreach (ModuleDefinition xModDef in xAssemblyDef.Modules) {
+				if (xModDef.Types.Contains(aType)) {
+					xTypeDef = xModDef.Types[aType];
+					break;
+				}
+			}
+			if (xTypeDef == null) {
+				throw new Exception("Type '" + aType + "' not found in assembly '" + aAssembly + "'!");
+			}
+			// todo: find a way to specify one overload of a method
+			int xCount = 0;
+			foreach (MethodDefinition xMethodDef in xTypeDef.Methods) {
+				if (xMethodDef.Name == aMethod) {
+					QueueMethod(xMethodDef);
+					xCount++;
+				}
+			}
+			foreach (MethodDefinition xMethodDef in xTypeDef.Constructors) {
+				if (xMethodDef.Name == aMethod) {
+					QueueMethod(xMethodDef);
+					xCount++;
+				}
+			}
+			if (xCount == 0) {
+				throw new Exception("Method '" + aType + "." + aMethod + "' not found in assembly '" + aAssembly + "'!");
 			}
 		}
 
