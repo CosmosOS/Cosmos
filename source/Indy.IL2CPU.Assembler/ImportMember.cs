@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Indy.IL2CPU.Assembler {
-	public class Literal: Instruction {
+	public class ImportMember {
 		public readonly string Data;
-
-		public Literal(string aData) {
+		public ImportMember(string aData) {
 			Data = aData;
 		}
 

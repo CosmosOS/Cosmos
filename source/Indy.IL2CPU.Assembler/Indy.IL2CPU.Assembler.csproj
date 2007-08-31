@@ -52,10 +52,12 @@
     <Compile Include="Assembler.cs" />
     <Compile Include="Compare.cs" />
     <Compile Include="DataMember.cs" />
+    <Compile Include="ImportMember.cs" />
     <Compile Include="Instruction.cs" />
     <Compile Include="InstructionCPU.cs" />
     <Compile Include="Invoke.cs" />
     <Compile Include="JumpAlways.cs" />
+    <Compile Include="JumpIfEquals.cs" />
     <Compile Include="JumpIfGreater.cs" />
     <Compile Include="JumpIfNotZero.cs" />
     <Compile Include="JumpIfZero.cs" />
@@ -63,8 +65,12 @@
     <Compile Include="Literal.cs" />
     <Compile Include="Move.cs" />
     <Compile Include="OpCodeAttribute.cs" />
+    <Compile Include="Pop.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Push.cs" />
+    <Compile Include="Ret.cs" />
     <Compile Include="Test.cs" />
+    <Compile Include="Xor.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

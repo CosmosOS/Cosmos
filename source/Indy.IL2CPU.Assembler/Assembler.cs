@@ -18,6 +18,7 @@ namespace Indy.IL2CPU.Assembler {
 		private OutputTypeEnum mOutputType = OutputTypeEnum.DLL;
 		private StreamWriter mOutputWriter;
 		private List<string> mIncludes = new List<string>();
+		private List<ImportMember> mImportMembers = new List<ImportMember>();
 
 		public Assembler(StreamWriter aOutputWriter) {
 			if (mCurrentInstance != null) {
@@ -57,6 +58,12 @@ namespace Indy.IL2CPU.Assembler {
 			}
 		}
 
+		public List<ImportMember> ImportMembers {
+			get {
+				return mImportMembers;
+			}
+		}
+
 		#region IDisposable Members
 		public void Dispose() {
 			// MtW: I know, IDisposable usage for this isn't really nice, but for now this should be fine.
@@ -84,7 +91,7 @@ namespace Indy.IL2CPU.Assembler {
 					mOutputWriter.WriteLine("format PE dll");
 					break;
 			}
-			if(mOutputType != OutputTypeEnum.DLL) {
+			if (mOutputType != OutputTypeEnum.DLL) {
 				mOutputWriter.WriteLine("entry " + EntryPointLabelName);
 			}
 			mOutputWriter.WriteLine();
@@ -94,7 +101,7 @@ namespace Indy.IL2CPU.Assembler {
 			mOutputWriter.WriteLine();
 			mOutputWriter.WriteLine("section '.data' data readable writeable");
 			mOutputWriter.WriteLine();
-			foreach(DataMember xMember in mDataMembers) {
+			foreach (DataMember xMember in mDataMembers) {
 				mOutputWriter.WriteLine("\t" + xMember);
 			}
 			mOutputWriter.WriteLine();
@@ -108,6 +115,12 @@ namespace Indy.IL2CPU.Assembler {
 					prefix = "    ";
 				}
 				mOutputWriter.WriteLine(prefix + x);
+			}
+			mOutputWriter.WriteLine();
+			mOutputWriter.WriteLine("section '.idata' import data readable writeable");
+			mOutputWriter.WriteLine();
+			foreach (ImportMember xImportMember in mImportMembers) {
+				mOutputWriter.WriteLine("\t" + xImportMember);
 			}
 		}
 	}

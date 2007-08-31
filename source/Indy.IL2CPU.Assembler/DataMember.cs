@@ -15,7 +15,7 @@ namespace Indy.IL2CPU.Assembler {
 		public readonly string DataType;
 		public readonly string DefaultValue;
 		public override string ToString() {
-			return Name + " " + DataType + " " + DefaultValue + ",0";
+			return Name + " " + DataType + " " + DefaultValue;
 		}
 	}
 }

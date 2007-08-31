@@ -5,15 +5,15 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler {
 	/// <summary>
-	/// Represents the JB opcode
+	/// Represents the JE opcode
 	/// </summary>
-	public class JumpIfGreater: Instruction {
+	public class JumpIfEquals: Instruction {
 		public readonly string Address;
-		public JumpIfGreater(string aAddress) {
+		public JumpIfEquals(string aAddress) {
 			Address = aAddress;
 		}
 		public override string ToString() {
-			return "jb " + Address;
+			return "je " + Address;
 		}
 	}
 }
