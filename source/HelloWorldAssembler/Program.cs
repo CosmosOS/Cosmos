@@ -30,6 +30,16 @@ namespace HelloWorldAssembler {
 					new Label("msg_loop");
 					new Invoke("GetMessage", "msg", "NULL", 0, 0);
 					new Compare("eax", "1");
+					new JumpIfGreater("end_loop");
+					new JumpIfNotZero("msg_loop");
+					new Invoke("TranslateMessage", "msg");
+					new Invoke("DispatchMessage", "msg");
+					new JumpAlways("msg_loop");
+					new Label("error");
+					new Invoke("MessageBox", "NULL", "_error", "NULL", "MB_ICONERROR+MB_OK");
+					new Label("end_loop");
+					new Invoke("ExitProcess", "[msg.wParam]");
+
 
 					a.Flush();
 				}

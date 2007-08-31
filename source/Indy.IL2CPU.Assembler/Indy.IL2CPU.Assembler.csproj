@@ -55,6 +55,9 @@
     <Compile Include="Instruction.cs" />
     <Compile Include="InstructionCPU.cs" />
     <Compile Include="Invoke.cs" />
+    <Compile Include="JumpAlways.cs" />
+    <Compile Include="JumpIfGreater.cs" />
+    <Compile Include="JumpIfNotZero.cs" />
     <Compile Include="JumpIfZero.cs" />
     <Compile Include="Label.cs" />
     <Compile Include="Literal.cs" />
