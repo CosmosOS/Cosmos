@@ -15,8 +15,11 @@ namespace HelloWorld {
             object x = new string('t', 1);
         }
 
-        public static void Main(string[] args) {
+        public static void NewString() {
             string s = "Test";
+        }
+
+        public static void Main(string[] args) {
 			Console.WriteLine("Hello world!");
 			Console.ReadLine();
 		}
