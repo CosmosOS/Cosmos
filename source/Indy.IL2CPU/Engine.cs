@@ -82,16 +82,18 @@ namespace Indy.IL2CPU {
 																select item).FirstOrDefault()) != null) {
 				OnDebugLog("Processing method '{0}'", xCurrentMethod.DeclaringType.FullName + "." + xCurrentMethod.Name);
 				string[] xParamTypes = new string[xCurrentMethod.Parameters.Count];
-				for (int i = 0; i < xParamTypes.Length; i++) {
+                Change to List<string> and foreach - always avoid for whnever possible
+				foreach (int i = 0; i < xParamTypes.Length; i++) {
 					xParamTypes[i] = xCurrentMethod.Parameters[i].ParameterType.FullName;
 				}
 				// what to do if a method doesn't have a body?
 				if (xCurrentMethod.HasBody) {
 					new Assembler.Label(Assembler.Assembler.GetLabelName(xCurrentMethod.DeclaringType.FullName, xCurrentMethod.ReturnType.ReturnType.FullName, xCurrentMethod.Name, xParamTypes));
-					foreach(VariableDefinition xVarDef in xCurrentMethod.Body.Variables) {
+					-- Use var when possible insetad of type
+                    foreach(var xVarDef in xCurrentMethod.Body.Variables) {
 						new Assembler.Literal(";[" + xVarDef.Index + "] " + xVarDef.Name + ":" + xVarDef.VariableType.FullName + ". PackingSize = " + xVarDef.VariableType.Module.Types[xVarDef.VariableType.FullName].PackingSize + ", ClassSize = " + xVarDef.VariableType.Module.Types[xVarDef.VariableType.FullName].ClassSize);
 					}
-					foreach (Instruction xInstruction in xCurrentMethod.Body.Instructions) {
+					foreach (var xInstruction in xCurrentMethod.Body.Instructions) {
 						MethodReference xMethodReference = xInstruction.Operand as MethodReference;
 						if (xMethodReference != null) {
 							#region add methods so that they get processed
@@ -150,9 +152,9 @@ namespace Indy.IL2CPU {
 			if (mCurrent == null) {
 				throw new Exception("ERROR: No Current Engine found!");
 			}
-			AssemblyDefinition xAssemblyDef = mCurrent.mCrawledAssembly.Resolver.Resolve(aAssembly);
+			var xAssemblyDef = mCurrent.mCrawledAssembly.Resolver.Resolve(aAssembly);
 			TypeDefinition xTypeDef = null;
-			foreach (ModuleDefinition xModDef in xAssemblyDef.Modules) {
+			foreach (var xModDef in xAssemblyDef.Modules) {
 				if (xModDef.Types.Contains(aType)) {
 					xTypeDef = xModDef.Types[aType];
 					break;
@@ -163,13 +165,13 @@ namespace Indy.IL2CPU {
 			}
 			// todo: find a way to specify one overload of a method
 			int xCount = 0;
-			foreach (MethodDefinition xMethodDef in xTypeDef.Methods) {
+			foreach (var xMethodDef in xTypeDef.Methods) {
 				if (xMethodDef.Name == aMethod) {
 					QueueMethod(xMethodDef);
 					xCount++;
 				}
 			}
-			foreach (MethodDefinition xMethodDef in xTypeDef.Constructors) {
+			foreach (var xMethodDef in xTypeDef.Constructors) {
 				if (xMethodDef.Name == aMethod) {
 					QueueMethod(xMethodDef);
 					xCount++;
