@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Indy.IL2CPU.Assembler.X86;
 using Mono.Cecil;
+using Mono.Cecil.Cil;
 using Instruction = Mono.Cecil.Cil.Instruction;
 
 namespace Indy.IL2CPU {
@@ -84,10 +85,12 @@ namespace Indy.IL2CPU {
 				for (int i = 0; i < xParamTypes.Length; i++) {
 					xParamTypes[i] = xCurrentMethod.Parameters[i].ParameterType.FullName;
 				}
-				new Assembler.Label(Assembler.Assembler.GetLabelName(xCurrentMethod.DeclaringType.FullName, xCurrentMethod.ReturnType.ReturnType.FullName, xCurrentMethod.Name, xParamTypes));
 				// what to do if a method doesn't have a body?
 				if (xCurrentMethod.HasBody) {
-
+					new Assembler.Label(Assembler.Assembler.GetLabelName(xCurrentMethod.DeclaringType.FullName, xCurrentMethod.ReturnType.ReturnType.FullName, xCurrentMethod.Name, xParamTypes));
+					foreach(VariableDefinition xVarDef in xCurrentMethod.Body.Variables) {
+						new Assembler.Literal(";[" + xVarDef.Index + "] " + xVarDef.Name + ":" + xVarDef.VariableType.FullName + ". PackingSize = " + xVarDef.VariableType.Module.Types[xVarDef.VariableType.FullName].PackingSize + ", ClassSize = " + xVarDef.VariableType.Module.Types[xVarDef.VariableType.FullName].ClassSize);
+					}
 					foreach (Instruction xInstruction in xCurrentMethod.Body.Instructions) {
 						MethodReference xMethodReference = xInstruction.Operand as MethodReference;
 						if (xMethodReference != null) {
