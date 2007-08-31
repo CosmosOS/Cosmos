@@ -3,7 +3,7 @@
 namespace HelloWorld {
 	public class Program {
         
-        public static void Jump() {
+        public static void Main() {
             Integer();
         }
 
@@ -15,11 +15,8 @@ namespace HelloWorld {
             object x = new string('t', 1);
         }
 
-        public static void NewString() {
+        public static void ActualMain(string[] args) {
             string s = "Test";
-        }
-
-        public static void Main(string[] args) {
 			Console.WriteLine("Hello world!");
 			Console.ReadLine();
 		}
