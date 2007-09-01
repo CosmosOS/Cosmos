@@ -32,9 +32,10 @@ namespace Indy.IL2CPU {
 
 	public class Engine {
 		protected static Engine mCurrent;
-		private AssemblyDefinition mCrawledAssembly;
-		private DebugLogHandler mDebugLog;
+        protected AssemblyDefinition mCrawledAssembly;
+        protected DebugLogHandler mDebugLog;
 		protected OpCodeMap mMap = new OpCodeMap();
+        protected Assembler.Assembler mAssembler;
 
 		/// <summary>
 		/// Contains a list of all methods. This includes methods to be processed and already processed.
@@ -54,19 +55,19 @@ namespace Indy.IL2CPU {
 				if (aOutput == null) {
 					throw new ArgumentNullException("aOutput");
 				}
-				mMap.LoadOpMapFromAssembly(aOpAssembly);
 				mCrawledAssembly = AssemblyFactory.GetAssembly(aAssembly);
 				if (mCrawledAssembly.EntryPoint == null) {
 					throw new NotSupportedException("Libraries are not supported!");
 				}
 
-				using (Assembler.Assembler xAssembler = new Assembler.Assembler(aOutput)) {
-					IL.Op.QueueMethod += QueueMethod;
+				using (mAssembler = new Assembler.Assembler(aOutput)) {
+                    mMap.LoadOpMapFromAssembly(aOpAssembly, mAssembler);
+                    IL.Op.QueueMethod += QueueMethod;
 					try {
 						mMethods.Add(mCrawledAssembly.EntryPoint, false);
 						ProcessAllMethods();
 					} finally {
-						xAssembler.Flush();
+						mAssembler.Flush();
 						IL.Op.QueueMethod -= QueueMethod;
 					}
 				}
@@ -87,7 +88,7 @@ namespace Indy.IL2CPU {
 				}
 				// what to do if a method doesn't have a body?
 				if (xCurrentMethod.HasBody) {
-					new Assembler.Label(Assembler.Assembler.GetLabelName(xCurrentMethod.DeclaringType.FullName, xCurrentMethod.ReturnType.ReturnType.FullName, xCurrentMethod.Name, xParamTypes.ToArray()));
+					new Assembler.Label(mAssembler.GetLabelName(xCurrentMethod.DeclaringType.FullName, xCurrentMethod.ReturnType.ReturnType.FullName, xCurrentMethod.Name, xParamTypes.ToArray()));
                     foreach (VariableDefinition xVarDef in xCurrentMethod.Body.Variables) {
 						new Assembler.Literal(";[" + xVarDef.Index + "] " + xVarDef.Name + ":" + xVarDef.VariableType.FullName + ". PackingSize = " + xVarDef.VariableType.Module.Types[xVarDef.VariableType.FullName].PackingSize + ", ClassSize = " + xVarDef.VariableType.Module.Types[xVarDef.VariableType.FullName].ClassSize);
 					}

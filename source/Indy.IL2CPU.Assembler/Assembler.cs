@@ -130,7 +130,7 @@ namespace Indy.IL2CPU.Assembler {
 			}
 		}
 
-		public static string GetLabelName(string aType, string aReturnType, string aMethodName, params string[] aParamTypes) {
+		public string GetLabelName(string aType, string aReturnType, string aMethodName, params string[] aParamTypes) {
 			StringBuilder xSB = new StringBuilder();
 			xSB.Append(aReturnType.Replace('.', '_').Replace('+', '_'));
 			xSB.Append("___");

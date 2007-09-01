@@ -17,7 +17,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			Asm.Current.DataMembers.Add(new DataMember(xDataName, "db", xDataByteArray.ToString().TrimEnd(',')));
 			DoQueueMethod(typeof (String).Assembly.FullName, typeof (String).FullName, ".ctor");
-			new Newobj().Assemble(Asm.GetLabelName(typeof(String).FullName, typeof(void).FullName, ".ctor", typeof(Char).FullName + "*"));
+			new Newobj().Assemble(Assembler.GetLabelName(typeof(String).FullName, typeof(void).FullName, ".ctor", typeof(Char).FullName + "*"));
 		}
 	}
 }

@@ -17,7 +17,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			for (int i = 0; i < xParams.Length; i++) {
 				xParams[i] = xMethod.Parameters[i].ParameterType.FullName;
 			}
-			Assemble(Assembler.Assembler.GetLabelName(xMethod.DeclaringType.FullName, xMethod.ReturnType.ReturnType.FullName, xMethod.Name, xParams));
+			Assemble(Assembler.GetLabelName(xMethod.DeclaringType.FullName, xMethod.ReturnType.ReturnType.FullName, xMethod.Name, xParams));
 		}
 	}
 }
