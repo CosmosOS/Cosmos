@@ -8,7 +8,7 @@ using Instruction=Mono.Cecil.Cil.Instruction;
 
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Ldstr)]
-	public class LdStr: IL.Op {
+	public class LdStr: Op {
 		public override void Assemble(Instruction aInstruction) {
             // Make sure the crawler finds string constructors
             DoQueueMethod(typeof(String).Assembly.FullName, typeof(String).FullName, ".ctor");
