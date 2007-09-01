@@ -133,6 +133,7 @@
     <Compile Include="Endfinally.cs" />
     <Compile Include="Initblk.cs" />
     <Compile Include="Initobj.cs" />
+    <Compile Include="Op.cs" />
     <Compile Include="Isinst.cs" />
     <Compile Include="Jmp.cs" />
     <Compile Include="Ldarg.cs" />

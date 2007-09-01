@@ -211,7 +211,6 @@
     <Compile Include="Newarr.cs" />
     <Compile Include="Newobj.cs" />
     <Compile Include="No.cs" />
-    <Compile Include="Nop.cs" />
     <Compile Include="Not.cs" />
     <Compile Include="Or.cs" />
     <Compile Include="Readonly.cs" />
