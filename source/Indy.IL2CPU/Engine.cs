@@ -96,9 +96,6 @@ namespace Indy.IL2CPU {
 				// what to do if a method doesn't have a body?
 				if (xCurrentMethod.HasBody) {
 					new Assembler.Label(xCurrentMethod);
-					foreach (VariableDefinition xVarDef in xCurrentMethod.Body.Variables) {
-						new Assembler.Literal(";[" + xVarDef.Index + "] " + xVarDef.Name + ":" + xVarDef.VariableType.FullName + ". PackingSize = " + mCrawledAssembly.Resolver.Resolve((AssemblyNameReference)xVarDef.VariableType.Scope).FindType(xVarDef.VariableType.FullName).PackingSize + ", ClassSize = " + mCrawledAssembly.Resolver.Resolve((AssemblyNameReference)xVarDef.VariableType.Scope).FindType(xVarDef.VariableType.FullName).ClassSize);
-					}
 					foreach (Instruction xInstruction in xCurrentMethod.Body.Instructions) {
 						MethodReference xMethodReference = xInstruction.Operand as MethodReference;
 						if (xMethodReference != null) {

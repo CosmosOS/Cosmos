@@ -2,11 +2,13 @@
 using System.Linq;
 using System.Text;
 using Indy.IL2CPU.Assembler;
+using Mono.Cecil.Cil;
 using Asm = Indy.IL2CPU.Assembler.Assembler;
 using Instruction=Mono.Cecil.Cil.Instruction;
 
 namespace Indy.IL2CPU.IL.X86 {
-	public class LdStr: IL.LdStr {
+	[OpCode(Code.Ldstr)]
+	public class LdStr: IL.Op {
 		public override void Assemble(Instruction aInstruction) {
             // Make sure the crawler finds string constructors
             DoQueueMethod(typeof(String).Assembly.FullName, typeof(String).FullName, ".ctor");
