@@ -53,7 +53,6 @@
     <Compile Include="Call.cs" />
     <Compile Include="Compare.cs" />
     <Compile Include="Instruction.cs" />
-    <Compile Include="Invoke.cs" />
     <Compile Include="JumpAlways.cs" />
     <Compile Include="JumpIfEquals.cs" />
     <Compile Include="JumpIfGreater.cs" />

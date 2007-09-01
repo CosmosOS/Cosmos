@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Indy.IL2CPU.Assembler.X86 {
+namespace Indy.IL2CPU.Assembler {
 	public class Invoke: Instruction {
 		public readonly string ProcedureName;
 		public readonly object[] Params;
