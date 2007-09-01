@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Indy.IL2CPU.Assembler;
 using Indy.IL2CPU.Assembler.X86;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
@@ -60,7 +61,7 @@ namespace Indy.IL2CPU {
 					throw new NotSupportedException("Libraries are not supported!");
 				}
 
-				using (mAssembler = new Assembler.Assembler(aOutput)) {
+				using (mAssembler = new Assembler.X86.Assembler(aOutput)) {
                     mMap.LoadOpMapFromAssembly(aOpAssembly, mAssembler);
                     IL.Op.QueueMethod += QueueMethod;
 					try {
@@ -82,13 +83,9 @@ namespace Indy.IL2CPU {
 																where !mMethods[item]
 																select item).FirstOrDefault()) != null) {
 				OnDebugLog("Processing method '{0}'", xCurrentMethod.DeclaringType.FullName + "." + xCurrentMethod.Name);
-				var xParamTypes = new List<string>(xCurrentMethod.Parameters.Count);
-                foreach (ParameterDefinition xParam in xCurrentMethod.Parameters) {
-					xParamTypes.Add(xParam.ParameterType.FullName);
-				}
 				// what to do if a method doesn't have a body?
 				if (xCurrentMethod.HasBody) {
-					new Assembler.Label(mAssembler.GetLabelName(xCurrentMethod.DeclaringType.FullName, xCurrentMethod.ReturnType.ReturnType.FullName, xCurrentMethod.Name, xParamTypes.ToArray()));
+					new Assembler.Label(xCurrentMethod);
                     foreach (VariableDefinition xVarDef in xCurrentMethod.Body.Variables) {
 						new Assembler.Literal(";[" + xVarDef.Index + "] " + xVarDef.Name + ":" + xVarDef.VariableType.FullName + ". PackingSize = " + xVarDef.VariableType.Module.Types[xVarDef.VariableType.FullName].PackingSize + ", ClassSize = " + xVarDef.VariableType.Module.Types[xVarDef.VariableType.FullName].ClassSize);
 					}

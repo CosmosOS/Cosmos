@@ -13,7 +13,6 @@ namespace Indy.IL2CPU.Assembler {
 		}
 
 		public const string EntryPointLabelName = "___ENTRYPOINT___";
-		private static Assembler mCurrentInstance;
 		private List<Instruction> mInstructions = new List<Instruction>();
 		private List<DataMember> mDataMembers = new List<DataMember>();
 		private OutputTypeEnum mOutputType = OutputTypeEnum.DLL;
@@ -27,20 +26,7 @@ namespace Indy.IL2CPU.Assembler {
 		}
 
 		public Assembler(StreamWriter aOutputWriter) {
-			if (mCurrentInstance != null) {
-				throw new Exception("There already is an Assembler Instance!");
-			}
-			mCurrentInstance = this;
 			mOutputWriter = aOutputWriter;
-		}
-
-		public static Assembler Current {
-			get {
-				if (mCurrentInstance == null) {
-					throw new Exception("No current Assembler Instance!");
-				}
-				return mCurrentInstance;
-			}
 		}
 
 		public OutputTypeEnum OutputType {
@@ -70,14 +56,11 @@ namespace Indy.IL2CPU.Assembler {
 			}
 		}
 
-		#region IDisposable Members
 		public void Dispose() {
 			// MtW: I know, IDisposable usage for this isn't really nice, but for now this should be fine.
-			mCurrentInstance = null;
 			mInstructions.Clear();
 			mDataMembers.Clear();
 		}
-		#endregion
 
 		public void Add(Instruction aInstruction) {
 			mInstructions.Add(aInstruction);
@@ -130,21 +113,5 @@ namespace Indy.IL2CPU.Assembler {
 			}
 		}
 
-		public string GetLabelName(string aType, string aReturnType, string aMethodName, params string[] aParamTypes) {
-			StringBuilder xSB = new StringBuilder();
-			xSB.Append(aReturnType.Replace('.', '_').Replace('+', '_'));
-			xSB.Append("___");
-			xSB.Append(aType.Replace('.', '_').Replace('+', '_'));
-			xSB.Append("_");
-			xSB.Append(aMethodName.Replace('.', '_'));
-			xSB.Append("__");
-			foreach(string s in aParamTypes) {
-				xSB.Append("_");
-				xSB.Append(s.Replace('.', '_').Replace('+', '_'));
-				xSB.Append("_");
-			}
-			xSB.Append("__");
-			return xSB.ToString();
-		}
 	}
 }

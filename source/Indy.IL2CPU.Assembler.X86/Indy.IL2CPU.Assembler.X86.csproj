@@ -49,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assembler.cs" />
     <Compile Include="Call.cs" />
     <Compile Include="Compare.cs" />
     <Compile Include="Instruction.cs" />
