@@ -10,6 +10,16 @@ using Mono.Cecil.Cil;
 using Instruction = Mono.Cecil.Cil.Instruction;
 
 namespace Indy.IL2CPU {
+	public static class AssemblyDefinitionsExtensions {
+		public static TypeDefinition FindType(this AssemblyDefinition aAssembly, string aFullName) {
+			foreach(ModuleDefinition xModule in aAssembly.Modules) {
+				if(xModule.Types.Contains(aFullName)) {
+					return xModule.Types[aFullName];
+				}
+			}
+			throw new Exception("Type not found '" + aFullName + "'!");
+		}
+	}
 	public class MethodDefinitionComparer: IComparer<MethodDefinition> {
 		#region IComparer<MethodDefinition> Members
 		public int Compare(MethodDefinition x, MethodDefinition y) {
@@ -33,10 +43,10 @@ namespace Indy.IL2CPU {
 
 	public class Engine {
 		protected static Engine mCurrent;
-        protected AssemblyDefinition mCrawledAssembly;
-        protected DebugLogHandler mDebugLog;
+		protected AssemblyDefinition mCrawledAssembly;
+		protected DebugLogHandler mDebugLog;
 		protected OpCodeMap mMap = new OpCodeMap();
-        protected Assembler.Assembler mAssembler;
+		protected Assembler.Assembler mAssembler;
 
 		/// <summary>
 		/// Contains a list of all methods. This includes methods to be processed and already processed.
@@ -62,8 +72,8 @@ namespace Indy.IL2CPU {
 				}
 
 				using (mAssembler = new Assembler.X86.Assembler(aOutput)) {
-                    mMap.LoadOpMapFromAssembly(aOpAssembly, mAssembler);
-                    IL.Op.QueueMethod += QueueMethod;
+					mMap.LoadOpMapFromAssembly(aOpAssembly, mAssembler);
+					IL.Op.QueueMethod += QueueMethod;
 					try {
 						mMethods.Add(mCrawledAssembly.EntryPoint, false);
 						ProcessAllMethods();
@@ -86,10 +96,10 @@ namespace Indy.IL2CPU {
 				// what to do if a method doesn't have a body?
 				if (xCurrentMethod.HasBody) {
 					new Assembler.Label(xCurrentMethod);
-                    foreach (VariableDefinition xVarDef in xCurrentMethod.Body.Variables) {
-						new Assembler.Literal(";[" + xVarDef.Index + "] " + xVarDef.Name + ":" + xVarDef.VariableType.FullName + ". PackingSize = " + xVarDef.VariableType.Module.Types[xVarDef.VariableType.FullName].PackingSize + ", ClassSize = " + xVarDef.VariableType.Module.Types[xVarDef.VariableType.FullName].ClassSize);
+					foreach (VariableDefinition xVarDef in xCurrentMethod.Body.Variables) {
+						new Assembler.Literal(";[" + xVarDef.Index + "] " + xVarDef.Name + ":" + xVarDef.VariableType.FullName + ". PackingSize = " + mCrawledAssembly.Resolver.Resolve((AssemblyNameReference)xVarDef.VariableType.Scope).FindType(xVarDef.VariableType.FullName).PackingSize + ", ClassSize = " + mCrawledAssembly.Resolver.Resolve((AssemblyNameReference)xVarDef.VariableType.Scope).FindType(xVarDef.VariableType.FullName).ClassSize);
 					}
-                    foreach (Instruction xInstruction in xCurrentMethod.Body.Instructions) {
+					foreach (Instruction xInstruction in xCurrentMethod.Body.Instructions) {
 						MethodReference xMethodReference = xInstruction.Operand as MethodReference;
 						if (xMethodReference != null) {
 							#region add methods so that they get processed
@@ -167,7 +177,7 @@ namespace Indy.IL2CPU {
 					xCount++;
 				}
 			}
-            foreach (MethodDefinition xMethodDef in xTypeDef.Constructors) {
+			foreach (MethodDefinition xMethodDef in xTypeDef.Constructors) {
 				if (xMethodDef.Name == aMethod) {
 					QueueMethod(xMethodDef);
 					xCount++;
