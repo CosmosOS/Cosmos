@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text;
 using Indy.IL2CPU.Assembler;
+using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Asm = Indy.IL2CPU.Assembler.Assembler;
 using Instruction=Mono.Cecil.Cil.Instruction;

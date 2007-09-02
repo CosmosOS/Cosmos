@@ -1,9 +1,11 @@
 using System;
 using System.Linq;
+using Mono.Cecil;
+using Mono.Cecil.Cil;
 
 namespace HelloWorldAssembler {
 	public class DummyOp: Indy.IL2CPU.IL.X86.Op {
-		public override void Assemble(Mono.Cecil.Cil.Instruction aInstruction) {
+		public override void Assemble(Instruction aInstruction) {
 			Invoke("GetModuleHandle", 0);
 			Move("[wc.hInstance]", "eax");
 			Invoke("LoadIcon", 0, "IDI_APPLICATION");

@@ -13,7 +13,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public override void Assemble(Instruction aInstruction) {
-            Assemble((new Asm.Label((MethodDefinition)aInstruction.Operand)).Name);
+            Assemble(new Asm.Label((MethodDefinition)aInstruction.Operand).Name);
 		}
 	}
 }

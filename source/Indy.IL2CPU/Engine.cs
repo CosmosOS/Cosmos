@@ -5,21 +5,13 @@ using System.Linq;
 using System.Text;
 using Indy.IL2CPU.Assembler;
 using Indy.IL2CPU.Assembler.X86;
+using Indy.IL2CPU.IL;
+using Indy.IL2CPU.IL.X86;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Instruction = Mono.Cecil.Cil.Instruction;
 
 namespace Indy.IL2CPU {
-	public static class AssemblyDefinitionsExtensions {
-		public static TypeDefinition FindType(this AssemblyDefinition aAssembly, string aFullName) {
-			foreach(ModuleDefinition xModule in aAssembly.Modules) {
-				if(xModule.Types.Contains(aFullName)) {
-					return xModule.Types[aFullName];
-				}
-			}
-			throw new Exception("Type not found '" + aFullName + "'!");
-		}
-	}
 	public class MethodDefinitionComparer: IComparer<MethodDefinition> {
 		#region IComparer<MethodDefinition> Members
 		public int Compare(MethodDefinition x, MethodDefinition y) {
@@ -41,11 +33,15 @@ namespace Indy.IL2CPU {
 
 	public delegate void DebugLogHandler(string aMessage);
 
+	public enum TargetPlatformEnum {
+		x86
+	}
+
 	public class Engine {
 		protected static Engine mCurrent;
 		protected AssemblyDefinition mCrawledAssembly;
 		protected DebugLogHandler mDebugLog;
-		protected OpCodeMap mMap = new OpCodeMap();
+		protected OpCodeMap mMap;
 		protected Assembler.Assembler mAssembler;
 
 		/// <summary>
@@ -58,9 +54,9 @@ namespace Indy.IL2CPU {
 		/// crawled to see what is neccessary, same goes for all dependencies.
 		/// </summary>
 		/// <param name="aAssembly">The assembly of which to crawl the entry-point method.</param>
-		/// <param name="aOpAssembly">The assembly containing the architecture-specific implementation (x86, AMD64, etc)</param>
+		/// <param name="aTargetPlatform">The platform to target when assembling the code.</param>
 		/// <param name="aOutput"></param>
-		public void Execute(string aAssembly, string aOpAssembly, StreamWriter aOutput) {
+		public void Execute(string aAssembly, TargetPlatformEnum aTargetPlatform, StreamWriter aOutput) {
 			mCurrent = this;
 			try {
 				if (aOutput == null) {
@@ -70,9 +66,16 @@ namespace Indy.IL2CPU {
 				if (mCrawledAssembly.EntryPoint == null) {
 					throw new NotSupportedException("Libraries are not supported!");
 				}
-
 				using (mAssembler = new Assembler.X86.Assembler(aOutput)) {
-					mMap.LoadOpMapFromAssembly(aOpAssembly, mAssembler);
+					switch (aTargetPlatform) {
+						case TargetPlatformEnum.x86: {
+							mMap = new X86OpCodeMap();
+							break;
+						}
+						default:
+							throw new NotSupportedException("TargetPlatform '" + aTargetPlatform + "' not supported!");
+					}
+					mMap.Initialize(mAssembler);
 					IL.Op.QueueMethod += QueueMethod;
 					try {
 						mMethods.Add(mCrawledAssembly.EntryPoint, false);
@@ -90,12 +93,12 @@ namespace Indy.IL2CPU {
 		private void ProcessAllMethods() {
 			MethodDefinition xCurrentMethod;
 			while ((xCurrentMethod = (from item in mMethods.Keys
-																where !mMethods[item]
-																select item).FirstOrDefault()) != null) {
+									  where !mMethods[item]
+									  select item).FirstOrDefault()) != null) {
 				OnDebugLog("Processing method '{0}'", xCurrentMethod.DeclaringType.FullName + "." + xCurrentMethod.Name);
 				// what to do if a method doesn't have a body?
 				if (xCurrentMethod.HasBody) {
-					mAssembler.Add(new Assembler.Label(xCurrentMethod));
+					mMap.MethodHeaderOp.Assemble(xCurrentMethod);
 					foreach (Instruction xInstruction in xCurrentMethod.Body.Instructions) {
 						MethodReference xMethodReference = xInstruction.Operand as MethodReference;
 						if (xMethodReference != null) {

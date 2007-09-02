@@ -14,7 +14,7 @@ namespace IL2CPU {
 				};
 				using (FileStream fs = new FileStream(@"output.asm", FileMode.Create)) {
 					using (StreamWriter br = new StreamWriter(fs)) {
-						e.Execute("HelloWorld.exe", typeof(Nop).Assembly.GetName().ToString(), br);
+						e.Execute("HelloWorld.exe", TargetPlatformEnum.x86, br);
 					}
 				}
 			} catch (Exception E) {

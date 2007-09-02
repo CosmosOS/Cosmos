@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Mono.Cecil;
 using Mono.Cecil.Cil;
 using CPU = Indy.IL2CPU.Assembler.X86;
 

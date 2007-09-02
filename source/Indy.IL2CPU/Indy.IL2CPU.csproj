@@ -46,7 +46,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Engine.cs" />
-    <Compile Include="OpCodeMap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -57,6 +56,10 @@
     <ProjectReference Include="..\Indy.IL2CPU.Assembler\Indy.IL2CPU.Assembler.csproj">
       <Project>{8E8CAD9B-C092-4071-AD92-E7A4E7BA776F}</Project>
       <Name>Indy.IL2CPU.Assembler</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Indy.IL2CPU.IL.X86\Indy.IL2CPU.IL.X86.csproj">
+      <Project>{69C8D2C5-225C-4A00-BA55-AEF6719CBDBA}</Project>
+      <Name>Indy.IL2CPU.IL.X86</Name>
     </ProjectReference>
     <ProjectReference Include="..\Indy.IL2CPU.IL\Indy.IL2CPU.IL.csproj">
       <Project>{5A39A8DF-D99E-4112-9676-BD3EED969A9C}</Project>

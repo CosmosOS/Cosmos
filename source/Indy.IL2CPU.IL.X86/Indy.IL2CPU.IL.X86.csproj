@@ -133,6 +133,7 @@
     <Compile Include="Endfinally.cs" />
     <Compile Include="Initblk.cs" />
     <Compile Include="Initobj.cs" />
+    <Compile Include="X86MethodHeaderOp.cs" />
     <Compile Include="Op.cs" />
     <Compile Include="Isinst.cs" />
     <Compile Include="Jmp.cs" />
@@ -267,6 +268,7 @@
     <Compile Include="Unbox.cs" />
     <Compile Include="Unbox_Any.cs" />
     <Compile Include="Volatile.cs" />
+    <Compile Include="X86OpCodeMap.cs" />
     <Compile Include="Xor.cs" />
   </ItemGroup>
   <ItemGroup>
