@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MethodHeaderOp.cs" />
+    <Compile Include="MethodInformation.cs" />
     <Compile Include="Op.cs" />
     <Compile Include="OpCodeAttribute.cs" />
     <Compile Include="OpCodeMap.cs" />

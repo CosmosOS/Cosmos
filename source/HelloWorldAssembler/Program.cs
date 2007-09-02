@@ -19,7 +19,7 @@ namespace HelloWorldAssembler {
 					a.DataMembers.Add(new DataMember("msg", "MSG", ""));
 					DummyOp xDO = new DummyOp();
 					xDO.Assembler = a;
-					xDO.Assemble(null);
+					xDO.Assemble(null, null);
 					a.ImportMembers.Add(new ImportMember("library kernel32,'KERNEL32.DLL',\\"));
 					a.ImportMembers.Add(new ImportMember("\tuser32,'USER32.DLL'"));
 					a.ImportMembers.Add(new ImportMember("include 'api\\kernel32.inc'"));

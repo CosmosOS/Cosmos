@@ -69,9 +69,9 @@ namespace Indy.IL2CPU {
 				using (mAssembler = new Assembler.X86.Assembler(aOutput)) {
 					switch (aTargetPlatform) {
 						case TargetPlatformEnum.x86: {
-							mMap = new X86OpCodeMap();
-							break;
-						}
+								mMap = new X86OpCodeMap();
+								break;
+							}
 						default:
 							throw new NotSupportedException("TargetPlatform '" + aTargetPlatform + "' not supported!");
 					}
@@ -98,7 +98,19 @@ namespace Indy.IL2CPU {
 				OnDebugLog("Processing method '{0}'", xCurrentMethod.DeclaringType.FullName + "." + xCurrentMethod.Name);
 				// what to do if a method doesn't have a body?
 				if (xCurrentMethod.HasBody) {
-					mMap.MethodHeaderOp.Assemble(xCurrentMethod);
+					// todo: add support for types which need different stack size
+					MethodInformation xMethodInfo;
+					{
+						MethodInformation.Variable[] xVars = new MethodInformation.Variable[xCurrentMethod.Body.Variables.Count];
+						int xCurOffset = 0;
+						foreach (VariableDefinition xVarDef in xCurrentMethod.Body.Variables) {
+							int xVarSize = 4;
+							xVars[xVarDef.Index] = new MethodInformation.Variable(xCurOffset, xVarSize);
+							xCurOffset += xVarSize;
+						}
+						xMethodInfo = new MethodInformation(new Label(xCurrentMethod).Name, xVars);
+					}
+					mMap.MethodHeaderOp.Assemble(null, xMethodInfo);
 					foreach (Instruction xInstruction in xCurrentMethod.Body.Instructions) {
 						MethodReference xMethodReference = xInstruction.Operand as MethodReference;
 						if (xMethodReference != null) {
@@ -135,7 +147,7 @@ namespace Indy.IL2CPU {
 							}
 							#endregion
 						}
-						mMap.GetOpForOpCode(xInstruction.OpCode.Code).Assemble(xInstruction);
+						mMap.GetOpForOpCode(xInstruction.OpCode.Code).Assemble(xInstruction, xMethodInfo);
 					}
 				}
 				mMethods[xCurrentMethod] = true;

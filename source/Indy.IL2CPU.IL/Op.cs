@@ -10,7 +10,7 @@ using Cil = Mono.Cecil.Cil;
 namespace Indy.IL2CPU.IL {
 	public abstract class Op {
 		public delegate void QueueMethodHandler(string aAssembly, string aType, string aMethod);
-		public abstract void Assemble(Instruction aInstruction);
+		public abstract void Assemble(Instruction aInstruction, MethodInformation aMethodInfo);
 
         // This is a prop and not a constructor arg for two reasons. Ok, mostly for one
         // 1 - Adding a parameterized triggers annoying C# constructor hell, every descendant we'd have to reimplement it
