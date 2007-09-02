@@ -75,6 +75,7 @@ namespace Indy.IL2CPU {
 						default:
 							throw new NotSupportedException("TargetPlatform '" + aTargetPlatform + "' not supported!");
 					}
+					mAssembler.OutputType = Indy.IL2CPU.Assembler.Assembler.OutputTypeEnum.Console;
 					mMap.Initialize(mAssembler);
 					IL.Op.QueueMethod += QueueMethod;
 					try {
