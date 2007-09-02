@@ -2,6 +2,7 @@
 using System.Linq;
 
 namespace Indy.IL2CPU.Assembler.X86 {
+	[OpCode(0xFFFFFFFF, "pop")]
 	public class Pop: Instruction {
 		public readonly string[] Arguments;
 

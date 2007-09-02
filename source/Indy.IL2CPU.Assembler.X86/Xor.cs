@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
+	[OpCode(0xFFFFFFFF, "xor")]
 	public class Xor: Instruction {
 		public readonly string Arg1;
 		public readonly string Arg2;

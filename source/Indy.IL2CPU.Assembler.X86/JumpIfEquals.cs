@@ -7,6 +7,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
 	/// <summary>
 	/// Represents the JE opcode
 	/// </summary>
+	[OpCode(0xFFFFFFFF, "je")]
 	public class JumpIfEquals: Instruction {
 		public readonly string Address;
 		public JumpIfEquals(string aAddress) {

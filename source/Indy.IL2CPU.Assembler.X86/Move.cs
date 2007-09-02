@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
+	[OpCode(0xFFFFFFFF, "mov")]
 	public class Move: Instruction {
 		public readonly string Destination;
 		public readonly string Source;

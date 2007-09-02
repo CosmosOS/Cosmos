@@ -95,7 +95,7 @@ namespace Indy.IL2CPU {
 				OnDebugLog("Processing method '{0}'", xCurrentMethod.DeclaringType.FullName + "." + xCurrentMethod.Name);
 				// what to do if a method doesn't have a body?
 				if (xCurrentMethod.HasBody) {
-					new Assembler.Label(xCurrentMethod);
+					mAssembler.Add(new Assembler.Label(xCurrentMethod));
 					foreach (Instruction xInstruction in xCurrentMethod.Body.Instructions) {
 						MethodReference xMethodReference = xInstruction.Operand as MethodReference;
 						if (xMethodReference != null) {
