@@ -57,7 +57,6 @@
     <Compile Include="DataMember.cs" />
     <Compile Include="ImportMember.cs" />
     <Compile Include="Instruction.cs" />
-    <Compile Include="Invoke.cs" />
     <Compile Include="Label.cs" />
     <Compile Include="Literal.cs" />
     <Compile Include="OpCodeAttribute.cs" />
