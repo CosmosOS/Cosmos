@@ -6,6 +6,9 @@ using CPU = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
 	public abstract class Op: IL.Op {
+		public Op(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
+			: base(aInstruction, aMethodInfo) {
+		}
 		protected void Call(string aAddress) {
 			Assembler.Add(new Assembler.X86.Call(aAddress));
 		}

@@ -6,7 +6,10 @@ using Mono.Cecil.Cil;
 
 namespace HelloWorldAssembler {
 	public class DummyOp: Indy.IL2CPU.IL.X86.Op {
-		public override void Assemble(Instruction aInstruction, MethodInformation aMethodInfo) {
+		public DummyOp(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
+			: base(aInstruction, aMethodInfo) {
+		}
+		public override void Assemble() {
 			Invoke("GetModuleHandle", 0);
 			Move("[wc.hInstance]", "eax");
 			Invoke("LoadIcon", 0, "IDI_APPLICATION");

@@ -8,12 +8,17 @@ using Asm = Indy.IL2CPU.Assembler;
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Call)]
 	public class Call: Op {
+		public readonly string LabelName;
+		public Call(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
+			: base(aInstruction, aMethodInfo) {
+			LabelName = new Asm.Label(((MethodDefinition)aInstruction.Operand).Name).Name;
+		}
 		public void Assemble(string aMethod) {
 			Call(aMethod);
 		}
 
-		public override void Assemble(Instruction aInstruction, MethodInformation aMethodInfo) {
-            Assemble(new Asm.Label((MethodDefinition)aInstruction.Operand).Name);
+		public override void Assemble() {
+			Assemble(LabelName);
 		}
 	}
 }

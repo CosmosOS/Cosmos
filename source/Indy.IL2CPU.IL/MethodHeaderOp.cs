@@ -7,5 +7,8 @@ using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL {
 	public abstract class MethodHeaderOp: Op {
+		public MethodHeaderOp(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
+			: base(aInstruction, aMethodInfo) {
+		}
 	}
 }

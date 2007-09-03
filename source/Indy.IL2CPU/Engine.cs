@@ -120,7 +120,9 @@ namespace Indy.IL2CPU {
 						}
 						xMethodInfo = new MethodInformation(new Label(xCurrentMethod).Name, xVars, xArgs);
 					}
-					mMap.MethodHeaderOp.Assemble(null, xMethodInfo);
+					IL.Op xOp = GetOpFromType(mMap.MethodHeaderOp, null, xMethodInfo);
+					xOp.Assembler = mAssembler;
+					xOp.Assemble();
 					foreach (Instruction xInstruction in xCurrentMethod.Body.Instructions) {
 						MethodReference xMethodReference = xInstruction.Operand as MethodReference;
 						if (xMethodReference != null) {
@@ -158,12 +160,20 @@ namespace Indy.IL2CPU {
 							#endregion
 						}
 						mAssembler.Add(new Literal("; IL: " + xInstruction.OpCode.Code + " " + xInstruction.Operand));
-						mMap.GetOpForOpCode(xInstruction.OpCode.Code).Assemble(xInstruction, xMethodInfo);
+						xOp = GetOpFromType(mMap.GetOpForOpCode(xInstruction.OpCode.Code), xInstruction, xMethodInfo);
+						xOp.Assembler = mAssembler;
+						xOp.Assemble();
 					}
-					mMap.MethodFooterOp.Assemble(null, xMethodInfo);
+					xOp = GetOpFromType(mMap.MethodFooterOp, null, xMethodInfo);
+					xOp.Assembler = mAssembler;
+					xOp.Assemble();
 				}
 				mMethods[xCurrentMethod] = true;
 			}
+		}
+
+		private static IL.Op GetOpFromType(Type aType, Instruction aInstruction, MethodInformation aMethodInfo) {
+			return (IL.Op)Activator.CreateInstance(aType, aInstruction, aMethodInfo);
 		}
 
 		// MtW: 

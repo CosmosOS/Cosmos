@@ -6,12 +6,12 @@ using System.Text;
 
 namespace Indy.IL2CPU.IL.X86 {
 	public class X86OpCodeMap: OpCodeMap {
-		protected override MethodHeaderOp GetMethodHeaderOp() {
-			return new X86MethodHeaderOp();
+		protected override Type GetMethodHeaderOp() {
+			return typeof(X86MethodHeaderOp);
 		}
 
-		protected override MethodFooterOp GetMethodFooterOp() {
-			return new X86MethodFooterOp();
+		protected override Type GetMethodFooterOp() {
+			return typeof(X86MethodFooterOp);
 		}
 
 

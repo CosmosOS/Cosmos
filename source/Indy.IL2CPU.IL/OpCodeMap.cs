@@ -8,7 +8,7 @@ using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL {
 	public abstract class OpCodeMap {
-		private readonly SortedList<Code, Op> mMap = new SortedList<Code, Op>();
+		private readonly SortedList<Code, Type> mMap = new SortedList<Code, Type>();
 
 		protected OpCodeMap() {
 			MethodHeaderOp = GetMethodHeaderOp();
@@ -19,36 +19,32 @@ namespace Indy.IL2CPU.IL {
 			get;
 		}
 
-		protected abstract MethodHeaderOp GetMethodHeaderOp();
-		protected abstract MethodFooterOp GetMethodFooterOp();
+		protected abstract Type GetMethodHeaderOp();
+		protected abstract Type GetMethodFooterOp();
 		
 
 		public void Initialize(Assembler.Assembler aAssembler) {
 			foreach (Type t in (from item in ImplementationAssembly.GetTypes()
 								where item.IsSubclassOf(typeof(Op)) && item.GetCustomAttributes(typeof(OpCodeAttribute), true).Length > 0
 								select item)) {
-				Op xOp = Activator.CreateInstance(t) as Op;
-				xOp.Assembler = aAssembler;
 				object[] xAttribs = t.GetCustomAttributes(typeof(OpCodeAttribute), true);
 				try {
-					mMap.Add(((OpCodeAttribute)xAttribs[0]).OpCode, xOp);
+					mMap.Add(((OpCodeAttribute)xAttribs[0]).OpCode, t);
 				} catch {
-					Console.WriteLine("Was adding op " + ((OpCodeAttribute)xAttribs[0]).OpCode.ToString());
+					Console.WriteLine("Was adding op " + ((OpCodeAttribute)xAttribs[0]).OpCode);
 					throw;
 				}
 			}
-			MethodHeaderOp.Assembler = aAssembler;
-			MethodFooterOp.Assembler = aAssembler;
 		}
 
-		public Op GetOpForOpCode(Code code) {
+		public Type GetOpForOpCode(Code code) {
 			if (!mMap.ContainsKey(code)) {
 				throw new NotSupportedException("OpCode '" + code + "' not supported!");
 			}
 			return mMap[code];
 		}
 
-		public readonly MethodHeaderOp MethodHeaderOp;
-		public readonly MethodFooterOp MethodFooterOp;
+		public readonly Type MethodHeaderOp;
+		public readonly Type MethodFooterOp;
 	}
 }
