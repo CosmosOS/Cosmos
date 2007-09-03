@@ -104,7 +104,7 @@ namespace Indy.IL2CPU.Assembler {
 					string prefix = "\t\t";
 					if (x is Label) {
 						mOutputWriter.WriteLine();
-						prefix = "    ";
+						prefix = "\t";
 					}
 					mOutputWriter.WriteLine(prefix + x);
 				}

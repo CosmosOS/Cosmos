@@ -139,6 +139,10 @@ namespace Indy.IL2CPU {
 											if (xMethodDef != null) {
 												QueueMethod(xMethodDef);
 											}
+											var xCtorDef = xReferencedType.Constructors.GetConstructor(false, xMethodReference.Parameters);
+											if (xCtorDef != null) {
+												QueueMethod(xCtorDef);
+											}
 											break;
 										}
 									}
