@@ -80,6 +80,8 @@ namespace Indy.IL2CPU {
 					IL.Op.QueueMethod += QueueMethod;
 					try {
 						mMethods.Add(mCrawledAssembly.EntryPoint, false);
+						// first instructions are for calling the entrypoint
+						mAssembler.Add(new JumpAlways(new Label(mCrawledAssembly.EntryPoint).Name));
 						ProcessAllMethods();
 					} finally {
 						mAssembler.Flush();

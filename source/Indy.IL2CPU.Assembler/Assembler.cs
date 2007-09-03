@@ -88,28 +88,34 @@ namespace Indy.IL2CPU.Assembler {
 				mOutputWriter.WriteLine("include '{0}'", xInclude);
 			}
 			mOutputWriter.WriteLine();
-			mOutputWriter.WriteLine("section '.data' data readable writeable");
-			mOutputWriter.WriteLine();
-			foreach (DataMember xMember in mDataMembers) {
-				mOutputWriter.WriteLine("\t" + xMember);
-			}
-			mOutputWriter.WriteLine();
-			mOutputWriter.WriteLine("section '.code' code readable executable");
-			mOutputWriter.WriteLine();
-			mOutputWriter.WriteLine("    " + EntryPointLabelName + ":");
-			foreach (Instruction x in mInstructions) {
-				string prefix = "\t";
-				if (x is Label) {
-					mOutputWriter.WriteLine();
-					prefix = "    ";
+			if (mDataMembers.Count > 0) {
+				mOutputWriter.WriteLine("section '.data' data readable writeable");
+				mOutputWriter.WriteLine();
+				foreach (DataMember xMember in mDataMembers) {
+					mOutputWriter.WriteLine("\t" + xMember);
 				}
-				mOutputWriter.WriteLine(prefix + x);
+				mOutputWriter.WriteLine();
 			}
-			mOutputWriter.WriteLine();
-			mOutputWriter.WriteLine("section '.idata' import data readable writeable");
-			mOutputWriter.WriteLine();
-			foreach (ImportMember xImportMember in mImportMembers) {
-				mOutputWriter.WriteLine("\t" + xImportMember);
+			if (mInstructions.Count > 0) {
+				mOutputWriter.WriteLine("section '.code' code readable executable");
+				mOutputWriter.WriteLine();
+				mOutputWriter.WriteLine("\t" + EntryPointLabelName + ":");
+				foreach (Instruction x in mInstructions) {
+					string prefix = "\t\t";
+					if (x is Label) {
+						mOutputWriter.WriteLine();
+						prefix = "    ";
+					}
+					mOutputWriter.WriteLine(prefix + x);
+				}
+				mOutputWriter.WriteLine();
+			}
+			if (mImportMembers.Count > 0) {
+				mOutputWriter.WriteLine("section '.idata' import data readable writeable");
+				mOutputWriter.WriteLine();
+				foreach (ImportMember xImportMember in mImportMembers) {
+					mOutputWriter.WriteLine("\t" + xImportMember);
+				}
 			}
 		}
 
