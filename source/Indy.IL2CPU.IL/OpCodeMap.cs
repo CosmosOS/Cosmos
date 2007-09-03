@@ -12,6 +12,7 @@ namespace Indy.IL2CPU.IL {
 
 		protected OpCodeMap() {
 			MethodHeaderOp = GetMethodHeaderOp();
+			MethodFooterOp = GetMethodFooterOp();
 		}
 
 		protected abstract Assembly ImplementationAssembly {
@@ -19,6 +20,7 @@ namespace Indy.IL2CPU.IL {
 		}
 
 		protected abstract MethodHeaderOp GetMethodHeaderOp();
+		protected abstract MethodFooterOp GetMethodFooterOp();
 		
 
 		public void Initialize(Assembler.Assembler aAssembler) {
@@ -36,6 +38,7 @@ namespace Indy.IL2CPU.IL {
 				}
 			}
 			MethodHeaderOp.Assembler = aAssembler;
+			MethodFooterOp.Assembler = aAssembler;
 		}
 
 		public Op GetOpForOpCode(Code code) {
@@ -46,5 +49,6 @@ namespace Indy.IL2CPU.IL {
 		}
 
 		public readonly MethodHeaderOp MethodHeaderOp;
+		public readonly MethodFooterOp MethodFooterOp;
 	}
 }

@@ -8,7 +8,7 @@ namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Ret)]
 	public class Ret: Op {
 		public override void Assemble(Instruction aInstruction, MethodInformation aMethodInfo) {
-			Ret();
+			//Ret();
 		}
 	}
 }

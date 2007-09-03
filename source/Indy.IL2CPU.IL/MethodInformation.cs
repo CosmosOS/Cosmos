@@ -14,12 +14,24 @@ namespace Indy.IL2CPU.IL {
 			public readonly int Size;
 		}
 
-		public MethodInformation(string aLabelName, Variable[] aLocals) {
+		public struct Argument {
+			public Argument(int aSize, int aOffset) {
+				Size = aSize;
+				Offset = aOffset;
+			}
+
+			public readonly int Size;
+			public readonly int Offset;
+		}
+
+		public MethodInformation(string aLabelName, Variable[] aLocals, Argument[] aArguments) {
 			Locals = aLocals;
 			LabelName = aLabelName;
+			Arguments = aArguments;
 		}
 
 		public readonly string LabelName;
 		public readonly Variable[] Locals;
+		public readonly Argument[] Arguments;
 	}
 }

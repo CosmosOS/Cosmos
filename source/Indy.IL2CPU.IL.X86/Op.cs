@@ -67,7 +67,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		protected void Ret() {
-			Assembler.Add(new Assembler.X86.Ret());
+			Assembler.Add(new Assembler.X86.Ret(""));
 		}
 
 		protected void Invoke(string aProcedureName, params object[] aParams) {

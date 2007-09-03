@@ -11,7 +11,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			// TODO: add support for variables with a diff datasize, other than 32bit
 			Assembler.Add(new CPU.Label(aMethodInfo.LabelName));
 			foreach (MethodInformation.Variable xVarDef in aMethodInfo.Locals) {
-				Assembler.Add(new CPUx86.Pushd("dword 0"));
+				Assembler.Add(new CPUx86.Pushd(" 0"));
 			}
 		}
 	}

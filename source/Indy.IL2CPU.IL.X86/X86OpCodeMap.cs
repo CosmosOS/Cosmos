@@ -10,6 +10,10 @@ namespace Indy.IL2CPU.IL.X86 {
 			return new X86MethodHeaderOp();
 		}
 
+		protected override MethodFooterOp GetMethodFooterOp() {
+			return new X86MethodFooterOp();
+		}
+
 
 		protected override Assembly ImplementationAssembly {
 			get {

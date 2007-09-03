@@ -109,7 +109,14 @@ namespace Indy.IL2CPU {
 							xVars[xVarDef.Index] = new MethodInformation.Variable(xCurOffset, xVarSize);
 							xCurOffset += xVarSize;
 						}
-						xMethodInfo = new MethodInformation(new Label(xCurrentMethod).Name, xVars);
+						MethodInformation.Argument[] xArgs = new MethodInformation.Argument[xCurrentMethod.Parameters.Count];
+						xCurOffset = 0;
+						for (int i = 0; i < xArgs.Length; i++) {
+							int xArgSize = 4;
+							xArgs[i] = new MethodInformation.Argument(xArgSize, xCurOffset);
+							xCurOffset += xArgSize;
+						}
+						xMethodInfo = new MethodInformation(new Label(xCurrentMethod).Name, xVars, xArgs);
 					}
 					mMap.MethodHeaderOp.Assemble(null, xMethodInfo);
 					foreach (Instruction xInstruction in xCurrentMethod.Body.Instructions) {
@@ -148,8 +155,10 @@ namespace Indy.IL2CPU {
 							}
 							#endregion
 						}
+						mAssembler.Add(new Literal("; IL: " + xInstruction.OpCode.Code + " " + xInstruction.Operand));
 						mMap.GetOpForOpCode(xInstruction.OpCode.Code).Assemble(xInstruction, xMethodInfo);
 					}
+					mMap.MethodFooterOp.Assemble(null, xMethodInfo);
 				}
 				mMethods[xCurrentMethod] = true;
 			}
