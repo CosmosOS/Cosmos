@@ -99,30 +99,33 @@ namespace Indy.IL2CPU {
 									  where !mMethods[item]
 									  select item).FirstOrDefault()) != null) {
 				OnDebugLog("Processing method '{0}'", xCurrentMethod.DeclaringType.FullName + "." + xCurrentMethod.Name);
-				// what to do if a method doesn't have a body?
-				if (xCurrentMethod.HasBody) {
-					// todo: add support for types which need different stack size
-					MethodInformation xMethodInfo;
-					{
-						MethodInformation.Variable[] xVars = new MethodInformation.Variable[xCurrentMethod.Body.Variables.Count];
-						int xCurOffset = 0;
+				MethodInformation xMethodInfo;
+				{
+					MethodInformation.Variable[] xVars = new MethodInformation.Variable[0];
+					int xCurOffset = 0;
+					if (xCurrentMethod.HasBody) {
+						xVars = new MethodInformation.Variable[xCurrentMethod.Body.Variables.Count];
 						foreach (VariableDefinition xVarDef in xCurrentMethod.Body.Variables) {
 							int xVarSize = 4;
 							xVars[xVarDef.Index] = new MethodInformation.Variable(xCurOffset, xVarSize);
 							xCurOffset += xVarSize;
 						}
-						MethodInformation.Argument[] xArgs = new MethodInformation.Argument[xCurrentMethod.Parameters.Count];
-						xCurOffset = 0;
-						for (int i = 0; i < xArgs.Length; i++) {
-							int xArgSize = 4;
-							xArgs[i] = new MethodInformation.Argument(xArgSize, xCurOffset);
-							xCurOffset += xArgSize;
-						}
-						xMethodInfo = new MethodInformation(new Label(xCurrentMethod).Name, xVars, xArgs);
 					}
-					IL.Op xOp = GetOpFromType(mMap.MethodHeaderOp, null, xMethodInfo);
-					xOp.Assembler = mAssembler;
-					xOp.Assemble();
+					MethodInformation.Argument[] xArgs = new MethodInformation.Argument[xCurrentMethod.Parameters.Count];
+					xCurOffset = 0;
+					for (int i = 0; i < xArgs.Length; i++) {
+						int xArgSize = 4;
+						xArgs[i] = new MethodInformation.Argument(xArgSize, xCurOffset);
+						xCurOffset += xArgSize;
+					}
+					xMethodInfo = new MethodInformation(new Label(xCurrentMethod).Name, xVars, xArgs);
+				}
+				IL.Op xOp = GetOpFromType(mMap.MethodHeaderOp, null, xMethodInfo);
+				xOp.Assembler = mAssembler;
+				xOp.Assemble();
+				// what to do if a method doesn't have a body?
+				if (xCurrentMethod.HasBody) {
+					// todo: add support for types which need different stack size
 					foreach (Instruction xInstruction in xCurrentMethod.Body.Instructions) {
 						MethodReference xMethodReference = xInstruction.Operand as MethodReference;
 						if (xMethodReference != null) {
@@ -168,10 +171,12 @@ namespace Indy.IL2CPU {
 						xOp.Assembler = mAssembler;
 						xOp.Assemble();
 					}
-					xOp = GetOpFromType(mMap.MethodFooterOp, null, xMethodInfo);
-					xOp.Assembler = mAssembler;
-					xOp.Assemble();
+				} else {
+					mAssembler.Add(new Literal("; Method not being generated yet, as it's handled by an iCall"));
 				}
+				xOp = GetOpFromType(mMap.MethodFooterOp, null, xMethodInfo);
+				xOp.Assembler = mAssembler;
+				xOp.Assemble();
 				mMethods[xCurrentMethod] = true;
 			}
 		}

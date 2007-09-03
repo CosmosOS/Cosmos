@@ -8,9 +8,13 @@ namespace Indy.IL2CPU.IL {
 	[AttributeUsage(AttributeTargets.Class, Inherited=true, AllowMultiple=false)]
 	public class OpCodeAttribute: Attribute {
 		public readonly Code OpCode;
+		public readonly bool NeedsHeapSupport = false;
 
         public OpCodeAttribute(Code aOpCode) {
 			OpCode = aOpCode;
+		}
+		public OpCodeAttribute(Code aOpCode, bool aNeedsHeapSupport):this(aOpCode) {
+			NeedsHeapSupport = aNeedsHeapSupport;
 		}
 	}
 }

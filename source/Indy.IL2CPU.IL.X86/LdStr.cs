@@ -27,9 +27,11 @@ namespace Indy.IL2CPU.IL.X86 {
 				xDataByteArray.Append(",");
 			}
             Assembler.DataMembers.Add(new DataMember(xDataName, "db", xDataByteArray.ToString().TrimEnd(',')));
-
-			throw new NotImplementedException("Solve issue with reusing ops");
-			//new Newobj().Assemble((new Label(typeof(String).FullName, typeof(Char).FullName + "*")).Name);
+			Pushd(xDataName);
+			new Newobj() {
+				CtorName = (new Label(typeof(String).FullName, typeof(Char).FullName + "*")).Name,
+				Assembler = Assembler
+			}.Assemble();
 		}
 	}
 }

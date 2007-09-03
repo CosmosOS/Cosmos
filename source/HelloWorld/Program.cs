@@ -11,11 +11,22 @@ namespace HelloWorld {
             int i = 22;
         }
 
-        public static void Main() {
+        public static void StringViaCtor() {
             object x = new string('t', 45);
         }
 
-        public static void ActualMain(string[] args) {
+		public static void LiteralString() {
+			object x = "Hello, World!";
+		}
+
+		public static void Main() {
+			CallInteger();
+			Integer();
+			StringViaCtor();
+			LiteralString();
+		}
+
+		public static void ActualMain(string[] args) {
             string s = "Test";
 			Console.WriteLine("Hello world!");
 			Console.ReadLine();

@@ -8,11 +8,10 @@ namespace Indy.IL2CPU.Assembler {
     public class OpCodeAttribute : Attribute {
         public readonly uint OpCode;
         public readonly string Mnemonic;
-
+    	
         public OpCodeAttribute(uint aOpCode, string aMnemonic) {
             OpCode = aOpCode;
             Mnemonic = aMnemonic;
         }
-
     }
 }

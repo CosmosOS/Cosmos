@@ -11,7 +11,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		public readonly string LabelName;
 		public Call(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
-			LabelName = new Asm.Label(((MethodDefinition)aInstruction.Operand).Name).Name;
+			LabelName = new Asm.Label((MethodReference)aInstruction.Operand).Name;
 		}
 		public void Assemble(string aMethod) {
 			Call(aMethod);

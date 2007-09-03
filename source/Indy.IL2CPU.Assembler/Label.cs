@@ -20,7 +20,7 @@ namespace Indy.IL2CPU.Assembler {
             Name = Init(aType, typeof(void).FullName, ".ctor", aParamTypes);
         }
 
-        public Label(MethodDefinition aMethod) {
+        public Label(MethodReference aMethod) {
             var xParams = new List<string>(aMethod.Parameters.Count);
             foreach (ParameterDefinition xParam in aMethod.Parameters) {
                 //TODO: Is fullname just the name, or type too? IF just name, overloads could exist wtih same names but diff types...
@@ -53,6 +53,9 @@ namespace Indy.IL2CPU.Assembler {
             xSB.Append("__");
             xSB.Replace('.', '_');
             xSB.Replace('+', '_');
+        	xSB.Replace('*', '_');
+        	xSB.Replace('[', '_');
+			xSB.Replace(']', '_');
             return xSB.ToString();
         }
 
