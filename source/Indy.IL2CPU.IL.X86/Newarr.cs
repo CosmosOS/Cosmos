@@ -5,7 +5,7 @@ using Mono.Cecil.Cil;
 using CPU = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(Code.Newarr, true)]
+	[OpCode(Code.Newarr, false)]
 	public class Newarr: Op {
 		public Newarr(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {

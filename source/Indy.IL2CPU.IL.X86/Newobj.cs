@@ -6,7 +6,7 @@ using CPU = Indy.IL2CPU.Assembler.X86;
 using Asm = Indy.IL2CPU.Assembler;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(Code.Newobj, true)]
+	[OpCode(Code.Newobj, false)]
 	public class Newobj: Op {
 		public string CtorName;
 		public Newobj()
