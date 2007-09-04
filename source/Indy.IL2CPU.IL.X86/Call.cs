@@ -9,12 +9,17 @@ namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Call)]
 	public class Call: Op {
 		public readonly string LabelName;
+		public readonly bool HasResult;
 		public Call(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
+			HasResult = !((MethodReference)aInstruction.Operand).ReturnType.ReturnType.FullName.Contains("System.Void");
 			LabelName = new Asm.Label((MethodReference)aInstruction.Operand).Name;
 		}
 		public void Assemble(string aMethod) {
 			Call(aMethod);
+			if(HasResult) {
+				Push("EAX");
+			}
 		}
 
 		public override void Assemble() {

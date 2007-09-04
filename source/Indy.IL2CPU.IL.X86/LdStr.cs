@@ -18,7 +18,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		
 		public override void Assemble() {
             // Make sure the crawler finds string constructors
-            DoQueueMethod(typeof(String).Assembly.FullName, typeof(String).FullName, ".ctor");
+            //DoQueueMethod(typeof(String).Assembly.FullName, typeof(String).FullName, ".ctor");
             // todo: see if we need to output trailing bytes 00 00 or 00 01 depending on whether there are bytes >7F
 			string xDataName = Assembler.GetIdentifier("StringLiteral");
 			var xDataByteArray = new StringBuilder();
@@ -28,10 +28,10 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
             Assembler.DataMembers.Add(new DataMember(xDataName, "db", xDataByteArray.ToString().TrimEnd(',')));
 			Pushd(xDataName);
-			new Newobj() {
-				CtorName = (new Label(typeof(String).FullName, typeof(Char).FullName + "*")).Name,
-				Assembler = Assembler
-			}.Assemble();
+//			new Newobj() {
+//				CtorName = (new Label(typeof(String).FullName, typeof(Char).FullName + "*")).Name,
+//				Assembler = Assembler
+//			}.Assemble();
 		}
 	}
 }

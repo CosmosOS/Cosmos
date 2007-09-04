@@ -51,13 +51,7 @@ namespace Indy.IL2CPU.Assembler {
                 xSB.Append("_");
             }
             xSB.Append("__");
-            xSB.Replace('.', '_');
-            xSB.Replace('+', '_');
-        	xSB.Replace('*', '_');
-        	xSB.Replace('[', '_');
-			xSB.Replace(']', '_');
-            return xSB.ToString();
+            return xSB.ToString().Replace('.', '_').Replace('+', '_').Replace('*', '_').Replace('[', '_').Replace(']', '_').Replace('&', '_');
         }
-
     }
 }

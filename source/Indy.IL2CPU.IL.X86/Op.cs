@@ -2,6 +2,7 @@
 using System.Linq;
 using Indy.IL2CPU.Assembler;
 using Indy.IL2CPU.Assembler.X86;
+using Mono.Cecil;
 using CPU = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {

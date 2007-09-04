@@ -10,6 +10,7 @@ using Cil = Mono.Cecil.Cil;
 namespace Indy.IL2CPU.IL {
 	public abstract class Op {
 		public delegate void QueueMethodHandler(string aAssembly, string aType, string aMethod);
+
 		public abstract void Assemble();
 
 		public Op(Instruction aInstruction, MethodInformation aMethodInfo) {

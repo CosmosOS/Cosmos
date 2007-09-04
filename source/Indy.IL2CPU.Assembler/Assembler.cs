@@ -118,6 +118,5 @@ namespace Indy.IL2CPU.Assembler {
 				}
 			}
 		}
-
 	}
 }

@@ -49,6 +49,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\HelloWorldMetal\HelloWorldMetal.csproj">
+      <Project>{B57BEF6D-48D6-49DD-B4C5-893537E0EBB8}</Project>
+      <Name>HelloWorldMetal</Name>
+    </ProjectReference>
     <ProjectReference Include="..\HelloWorld\HelloWorld.csproj">
       <Project>{0267F1AE-CA81-4EBD-86CA-C8E22BE9A6F1}</Project>
       <Name>HelloWorld</Name>
