@@ -8,7 +8,7 @@ using Asm = Indy.IL2CPU.Assembler.Assembler;
 using Instruction=Mono.Cecil.Cil.Instruction;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(Code.Ldstr)]
+	[OpCode(Code.Ldstr, true)]
 	public class LdStr: Op {
 		public readonly string LiteralStr;
 		public LdStr(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)

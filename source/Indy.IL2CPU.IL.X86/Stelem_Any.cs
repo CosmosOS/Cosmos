@@ -5,7 +5,7 @@ using Mono.Cecil.Cil;
 using CPU = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(Code.Stelem_Any)]
+	[OpCode(Code.Stelem_Any, true)]
 	public class Stelem_Any: Op {
 		public Stelem_Any(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
