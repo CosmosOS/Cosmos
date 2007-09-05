@@ -11,9 +11,9 @@ using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Instruction = Mono.Cecil.Cil.Instruction;
 
-ERROR
+//ERROR
 
-We need a special local vars register in the assembly
+//We need a special local vars register in the assembly
 
 namespace Indy.IL2CPU {
 	public class MethodDefinitionComparer: IComparer<MethodDefinition> {
@@ -122,7 +122,7 @@ namespace Indy.IL2CPU {
 						xArgs[i] = new MethodInformation.Argument(xArgSize, xCurOffset);
 						xCurOffset += xArgSize;
 					}
-					xMethodInfo = new MethodInformation(new Label(xCurrentMethod).Name, xVars, xArgs);
+					xMethodInfo = new MethodInformation(new Label(xCurrentMethod).Name, xVars, xArgs, !xCurrentMethod.ReturnType.ReturnType.FullName.Contains("System.Void"));
 				}
 				IL.Op xOp = GetOpFromType(mMap.MethodHeaderOp, null, xMethodInfo);
 				xOp.Assembler = mAssembler;

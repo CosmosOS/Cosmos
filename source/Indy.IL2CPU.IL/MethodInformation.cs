@@ -9,9 +9,11 @@ namespace Indy.IL2CPU.IL {
 			public Variable(int aOffset, int aSize) {
 				Offset = aOffset;
 				Size = aSize;
+				VirtualAddress = "ebp + " + (Offset + Size + 8);
 			}
 			public readonly int Offset;
 			public readonly int Size;
+			public readonly string VirtualAddress;
 		}
 
 		public struct Argument {
@@ -24,14 +26,16 @@ namespace Indy.IL2CPU.IL {
 			public readonly int Offset;
 		}
 
-		public MethodInformation(string aLabelName, Variable[] aLocals, Argument[] aArguments) {
+		public MethodInformation(string aLabelName, Variable[] aLocals, Argument[] aArguments, bool aHasReturnValue) {
 			Locals = aLocals;
 			LabelName = aLabelName;
 			Arguments = aArguments;
+			HasReturnValue = aHasReturnValue;
 		}
 
 		public readonly string LabelName;
 		public readonly Variable[] Locals;
 		public readonly Argument[] Arguments;
+		public readonly bool HasReturnValue;
 	}
 }

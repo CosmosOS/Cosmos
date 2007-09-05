@@ -7,26 +7,29 @@ using CPU = Indy.IL2CPU.Assembler.X86;
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Ldc_I4)]
 	public class Ldc_I4: Op {
-		private int mOffset;
-		protected void SetLocalIndex(int aIndex, MethodInformation aMethodInfo) {
-			mOffset = aMethodInfo.Locals[aIndex].Offset + aMethodInfo.Locals[aIndex].Size + 4;
+		private string mValue;
+		protected void SetValue(int aValue) {
+			SetValue(aValue.ToString());
+		}
+
+		protected void SetValue(string aValue) {
+			mValue = aValue;
 		}
 
 		public Ldc_I4(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
-			int xLocalIndex;
-			if(Int32.TryParse((aInstruction.Operand ?? "").ToString(), out xLocalIndex)) {
-				SetLocalIndex(xLocalIndex, aMethodInfo);
+			if(aInstruction.Operand != null) {
+				SetValue(aInstruction.Operand.ToString());
 			}
 		}
 
-		public int Offset {
+		public string Value {
 			get {
-				return mOffset;
+				return mValue;
 			}
 		}
 		public override sealed void Assemble() {
-			Pushd("[esp + " + mOffset + "]");
+			Pushd(Value);
 		}
 	}
 }

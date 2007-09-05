@@ -19,7 +19,15 @@ namespace HelloWorld {
 			object x = "Hello, World!";
 		}
 
+		public static void EmptyMethod() {
+		}
+
+		public static void CallEmptyMethod() {
+			EmptyMethod();
+		}
+
 		public static void Main() {
+			CallEmptyMethod();
 			CallInteger();
 			Integer();
 			StringViaCtor();

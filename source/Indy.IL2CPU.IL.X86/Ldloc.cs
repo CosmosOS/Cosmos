@@ -9,7 +9,7 @@ namespace Indy.IL2CPU.IL.X86 {
 	public class Ldloc: Op {
 		private int mOffset;
 		protected void SetLocalIndex(int aIndex, MethodInformation aMethodInfo) {
-			mOffset = aMethodInfo.Locals[aIndex].Offset + aMethodInfo.Locals[aIndex].Size + 4;
+			mOffset = aMethodInfo.Locals[aIndex].Offset + aMethodInfo.Locals[aIndex].Size + 8;
 		}
 		public Ldloc(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
@@ -27,7 +27,7 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		public sealed override void Assemble() {
 			Push("eax");
-			Move("eax", "[esp+" + mOffset + "]");
+			Move("eax", "[ebp+" + mOffset + "]");
 		}
 	}
 }

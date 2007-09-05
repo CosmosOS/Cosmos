@@ -7,9 +7,9 @@ using CPU = Indy.IL2CPU.Assembler.X86;
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Stloc)]
 	public class Stloc: Op {
-		private int mOffset;
+		private string mAddress;
 		protected void SetLocalIndex(int aIndex, MethodInformation aMethodInfo) {
-			mOffset = aMethodInfo.Locals[aIndex].Offset + aMethodInfo.Locals[aIndex].Size + 4;
+			mAddress = aMethodInfo.Locals[aIndex].VirtualAddress;
 		}
 		public Stloc(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
@@ -19,15 +19,15 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 		}
 
-		public int Offset {
+		public string Address {
 			get {
-				return mOffset;
+				return mAddress;
 			}
 		}
 
 		public sealed override void Assemble() {
 			Pop("eax");
-			Move("[esp+" + mOffset + "]", "eax");
+			Move("[" + mAddress + "]", "eax");
 		}
 	}
 }

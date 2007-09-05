@@ -8,13 +8,17 @@ namespace IL2CPU {
 	public class Program {
 		public static void Main(string[] args) {
 			try {
+				string exeName = "HelloWorldMetal.exe";
+				if(args.Length ==1 ) {
+					exeName = args[0];
+				}
 				Engine e = new Engine();
 				e.DebugLog += delegate(string aMessage) {
 					Console.WriteLine(aMessage);
 				};
 				using (FileStream fs = new FileStream(@"output.asm", FileMode.Create)) {
 					using (StreamWriter br = new StreamWriter(fs)) {
-						e.Execute("HelloWorldMetal.exe", TargetPlatformEnum.x86, br);
+						e.Execute(exeName, TargetPlatformEnum.x86, br);
 					}
 				}
 			} catch (Exception E) {

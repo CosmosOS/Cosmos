@@ -15,7 +15,7 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		public Newobj(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
-			CtorName = new Asm.Label(((MethodReference)aInstruction.Operand).Name).Name;
+			CtorName = new Asm.Label((MethodReference)aInstruction.Operand).Name;
 		}
 
 		public override void Assemble() {

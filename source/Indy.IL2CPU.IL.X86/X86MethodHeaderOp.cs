@@ -18,8 +18,9 @@ namespace Indy.IL2CPU.IL.X86 {
 		public override void Assemble() {
 			// TODO: add support for variables with a diff datasize, other than 32bit
 			Assembler.Add(new CPU.Label(LabelName));
+			Assembler.Add(new CPUx86.Move("ebp", "esp"));
 			for (int i = 0; i < LocalsCount; i++) {
-				Assembler.Add(new CPUx86.Pushd(" 0"));
+				Assembler.Add(new CPUx86.Pushd("ebp"));
 			}
 		}
 	}
