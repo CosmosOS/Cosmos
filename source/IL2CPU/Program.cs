@@ -9,14 +9,18 @@ namespace IL2CPU {
 		public static void Main(string[] args) {
 			try {
 				string exeName = "HelloWorldMetal.exe";
-				if(args.Length ==1 ) {
+				if (args.Length > 0) {
 					exeName = args[0];
+				}
+				string outputFileName = @"output.asm";
+				if(args.Length > 1) {
+					outputFileName = args[1];
 				}
 				Engine e = new Engine();
 				e.DebugLog += delegate(string aMessage) {
 					Console.WriteLine(aMessage);
 				};
-				using (FileStream fs = new FileStream(@"output.asm", FileMode.Create)) {
+				using (FileStream fs = new FileStream(outputFileName, FileMode.Create)) {
 					using (StreamWriter br = new StreamWriter(fs)) {
 						e.Execute(exeName, TargetPlatformEnum.x86, br);
 					}
@@ -26,7 +30,6 @@ namespace IL2CPU {
 			}
 			Console.WriteLine("");
 			Console.WriteLine("Completed");
-			Console.ReadLine();
 		}
 	}
 }

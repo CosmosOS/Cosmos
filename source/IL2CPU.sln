@@ -21,9 +21,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelloWorldAssembler", "Hell
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelloWorldMetal", "HelloWorldMetal\HelloWorldMetal.csproj", "{B57BEF6D-48D6-49DD-B4C5-893537E0EBB8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IL2CPU.Tests", "IL2CPU.Tests\IL2CPU.Tests.csproj", "{3A0BAC46-1D4E-4E21-89CA-72903B9FCEB1}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 11
+		SccNumberOfProjects = 12
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -57,6 +59,9 @@ Global
 		SccProjectUniqueName10 = HelloWorldMetal\\HelloWorldMetal.csproj
 		SccProjectName10 = HelloWorldMetal
 		SccLocalPath10 = HelloWorldMetal
+		SccProjectUniqueName11 = IL2CPU.Tests\\IL2CPU.Tests.csproj
+		SccProjectName11 = IL2CPU.Tests
+		SccLocalPath11 = IL2CPU.Tests
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -103,6 +108,10 @@ Global
 		{B57BEF6D-48D6-49DD-B4C5-893537E0EBB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B57BEF6D-48D6-49DD-B4C5-893537E0EBB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B57BEF6D-48D6-49DD-B4C5-893537E0EBB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A0BAC46-1D4E-4E21-89CA-72903B9FCEB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A0BAC46-1D4E-4E21-89CA-72903B9FCEB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A0BAC46-1D4E-4E21-89CA-72903B9FCEB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A0BAC46-1D4E-4E21-89CA-72903B9FCEB1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
