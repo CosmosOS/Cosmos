@@ -26,7 +26,8 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public override void Assemble() {
-			Assembler.Add(new CPU.Add("esp", TotalLocalsSize.ToString()));
+			// MtW: after trial and a huge amount of errors, this line doesn't seem to be needed
+			//Assembler.Add(new CPU.Add("esp", TotalLocalsSize.ToString()));
 			for (int i = 0; i < LocalsCount; i++) {
 				Assembler.Add(new CPU.Pop("ebp"));
 			}

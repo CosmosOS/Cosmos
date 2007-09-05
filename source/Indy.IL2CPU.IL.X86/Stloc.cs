@@ -8,6 +8,7 @@ namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Stloc)]
 	public class Stloc: Op {
 		private string mAddress;
+		private bool mNeedsPop = true;
 		protected void SetLocalIndex(int aIndex, MethodInformation aMethodInfo) {
 			mAddress = aMethodInfo.Locals[aIndex].VirtualAddress;
 		}
@@ -17,6 +18,13 @@ namespace Indy.IL2CPU.IL.X86 {
 			if (Int32.TryParse((aInstruction.Operand ?? "").ToString(), out xLocalIndex)) {
 				SetLocalIndex(xLocalIndex, aMethodInfo);
 			}
+
+			if(aInstruction.Previous != null &&
+				(aInstruction.Previous.OpCode.Code == Code.Call ||
+				aInstruction.Previous.OpCode.Code == Code.Calli ||
+				aInstruction.Previous.OpCode.Code == Code.Callvirt)) {
+				mNeedsPop = false;
+			}
 		}
 
 		public string Address {
@@ -24,9 +32,16 @@ namespace Indy.IL2CPU.IL.X86 {
 				return mAddress;
 			}
 		}
+		public bool NeedsPop {
+			get {
+				return mNeedsPop;
+			}
+		}
 
 		public sealed override void Assemble() {
-			Pop("eax");
+			if (mNeedsPop) {
+				Pop("eax");
+			}
 			Move("[" + mAddress + "]", "eax");
 		}
 	}
