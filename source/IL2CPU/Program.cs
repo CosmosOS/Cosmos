@@ -8,7 +8,7 @@ namespace IL2CPU {
 	public class Program {
 		public static void Main(string[] args) {
 			try {
-				string exeName = "testexe.exe";
+				string exeName = "HelloWorldMetal.exe";
 				if(args.Length ==1 ) {
 					exeName = args[0];
 				}

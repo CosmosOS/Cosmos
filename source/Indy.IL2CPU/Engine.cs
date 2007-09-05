@@ -176,7 +176,11 @@ namespace Indy.IL2CPU {
 						xOp.Assemble();
 					}
 				} else {
-					mAssembler.Add(new Literal("; Method not being generated yet, as it's handled by an iCall"));
+					if (xCurrentMethod.IsPInvokeImpl) {
+						HandlePInvoke(xCurrentMethod, xMethodInfo);
+					} else {
+						mAssembler.Add(new Literal("; Method not being generated yet, as it's handled by an iCall"));
+					}
 				}
 				xOp = GetOpFromType(mMap.MethodFooterOp, null, xMethodInfo);
 				xOp.Assembler = mAssembler;
@@ -247,6 +251,16 @@ namespace Indy.IL2CPU {
 		private void OnDebugLog(string aMessage, params object[] args) {
 			if (mDebugLog != null) {
 				mDebugLog(String.Format(aMessage, args));
+			}
+		}
+
+		private void HandlePInvoke(MethodDefinition aMethod, MethodInformation aMethodInfo) {
+			mAssembler.Add(new Noop());
+			if(aMethodInfo.HasReturnValue) {
+//				mAssembler.Add(new Pushd("0"));
+				mAssembler.Add(new Pushd("eax"));
+				mAssembler.Add(new Move("eax", "0"));
+
 			}
 		}
 	}

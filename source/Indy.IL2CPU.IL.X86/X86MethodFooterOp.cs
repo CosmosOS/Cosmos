@@ -31,7 +31,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			for (int i = 0; i < LocalsCount; i++) {
 				Assembler.Add(new CPU.Pop("ebp"));
 			}
-			Assembler.Add(new CPU.Ret(TotalArgsSize.ToString()));
+			Assembler.Add(new CPU.Ret(""));
 		}
 	}
 }
