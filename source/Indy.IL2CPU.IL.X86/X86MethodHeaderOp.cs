@@ -20,7 +20,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			Assembler.Add(new CPU.Label(LabelName));
 			Assembler.Add(new CPUx86.Move("ebp", "esp"));
 			for (int i = 0; i < LocalsCount; i++) {
-				Assembler.Add(new CPUx86.Pushd("ebp"));
+			Assembler.Add(new CPUx86.Pushd("ebp"));
 			}
 		}
 	}

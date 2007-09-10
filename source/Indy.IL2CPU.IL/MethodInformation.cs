@@ -4,12 +4,13 @@ using System.Linq;
 using System.Text;
 
 namespace Indy.IL2CPU.IL {
+	// TODO: abstract this one out to a X86 specific one
 	public class MethodInformation {
 		public struct Variable {
 			public Variable(int aOffset, int aSize) {
 				Offset = aOffset;
 				Size = aSize;
-				VirtualAddress = "ebp + " + (Offset + Size + 8);
+				VirtualAddress = "ebp - " + (Offset + Size + 8);
 			}
 			public readonly int Offset;
 			public readonly int Size;

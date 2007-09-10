@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="Tests\SimpleFunctionCall\SimpleFunctionCall.cs" />
     <None Include="Tests\SimpleMethodCall\SimpleMethodCall.cs" />
     <None Include="Tests\SingleMethodWithParam\SingleMethodWithParam.cs" />
     <None Include="Tests\SimpleVar\SimpleVar.cs" />
@@ -79,12 +80,18 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Tests\SimpleFunctionCall\SimpleFunctionCall.expected.asm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Tests\SimpleMethodCall\SimpleMethodCall.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Tests\SingleMethodWithParam\SingleMethodWithParam.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Tests\SimpleFunctionCall\SimpleFunctionCall.exe" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
