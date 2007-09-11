@@ -20,10 +20,10 @@ namespace HelloWorldAssembler {
 					DummyOp xDO = new DummyOp(null, null);
 					xDO.Assembler = a;
 					xDO.Assemble();
-					a.ImportMembers.Add(new ImportMember("library kernel32,'KERNEL32.DLL',\\"));
-					a.ImportMembers.Add(new ImportMember("\tuser32,'USER32.DLL'"));
-					a.ImportMembers.Add(new ImportMember("include 'api\\kernel32.inc'"));
-					a.ImportMembers.Add(new ImportMember("include 'api\\user32.inc'"));
+//					a.ImportMembers.Add(new ImportMember("library kernel32,'KERNEL32.DLL',\\"));
+//					a.ImportMembers.Add(new ImportMember("\tuser32,'USER32.DLL'"));
+//					a.ImportMembers.Add(new ImportMember("include 'api\\kernel32.inc'"));
+//					a.ImportMembers.Add(new ImportMember("include 'api\\user32.inc'"));
 					a.Flush();
 				}
 			}

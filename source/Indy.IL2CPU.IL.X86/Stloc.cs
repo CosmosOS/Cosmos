@@ -23,7 +23,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				(aInstruction.Previous.OpCode.Code == Code.Call ||
 				aInstruction.Previous.OpCode.Code == Code.Calli ||
 				aInstruction.Previous.OpCode.Code == Code.Callvirt)) {
-				mNeedsPop = false;
+				//mNeedsPop = false;
 			}
 		}
 

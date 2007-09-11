@@ -57,6 +57,7 @@ namespace Indy.IL2CPU {
 		/// Compiles an assembly to CPU-specific code. The entrypoint of the assembly will be 
 		/// crawled to see what is neccessary, same goes for all dependencies.
 		/// </summary>
+		/// <remarks>For now, only entrypoints without params and return code are supported!</remarks>
 		/// <param name="aAssembly">The assembly of which to crawl the entry-point method.</param>
 		/// <param name="aTargetPlatform">The platform to target when assembling the code.</param>
 		/// <param name="aOutput"></param>
@@ -85,7 +86,14 @@ namespace Indy.IL2CPU {
 					try {
 						mMethods.Add(mCrawledAssembly.EntryPoint, false);
 						// first instructions are for calling the entrypoint
-						mAssembler.Add(new JumpAlways(new Label(mCrawledAssembly.EntryPoint).Name));
+						mAssembler.Add(new Assembler.X86.Call(new Label(mCrawledAssembly.EntryPoint).Name));
+						if (mCrawledAssembly.EntryPoint.ReturnType.ReturnType.FullName.StartsWith("System.Void", StringComparison.InvariantCultureIgnoreCase)) {
+							mAssembler.Add(new Assembler.X86.Pushd("0"));
+						}
+						mAssembler.Add(new Assembler.X86.Call("[ExitProcess]"));
+						ImportMember xKernel32 = new ImportMember("kernel", "KERNEL32.DLL");
+						xKernel32.Methods.Add(new ImportMethodMember("ExitProcess"));
+						mAssembler.ImportMembers.Add(xKernel32);
 						ProcessAllMethods();
 					} finally {
 						mAssembler.Flush();

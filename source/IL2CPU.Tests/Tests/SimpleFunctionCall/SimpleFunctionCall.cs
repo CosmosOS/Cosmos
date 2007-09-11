@@ -4,7 +4,7 @@ public static class Program
 {
 	public static void Main()
 	{
-		int theResult = TheMethod();
+		int theValue = TheMethod();
 	}
 	public static int TheMethod()
 	{

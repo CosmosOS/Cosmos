@@ -114,7 +114,27 @@ namespace Indy.IL2CPU.Assembler {
 				mOutputWriter.WriteLine("section '.idata' import data readable writeable");
 				mOutputWriter.WriteLine();
 				foreach (ImportMember xImportMember in mImportMembers) {
-					mOutputWriter.WriteLine("\t" + xImportMember);
+					mOutputWriter.WriteLine("\tdd 0,0,0,rva {0}_name,rva {0}_table", xImportMember.Name);
+				}
+				mOutputWriter.WriteLine("\tdd 0,0,0,0,0");
+				mOutputWriter.WriteLine();
+				foreach (ImportMember xImportMember in mImportMembers) {
+					mOutputWriter.WriteLine("\t{0}_table:", xImportMember.Name);
+					foreach (ImportMethodMember xImportMethod in xImportMember.Methods) {
+						mOutputWriter.WriteLine("\t\t{0} dd rva _{0}", xImportMethod.Name);
+					}
+					mOutputWriter.WriteLine("\t\tdd 0");
+					mOutputWriter.WriteLine();
+				}
+				foreach (ImportMember xImportMember in mImportMembers) {
+					mOutputWriter.WriteLine("\t{0}_name db '{1}',0", xImportMember.Name, xImportMember.FileName);
+				}
+				mOutputWriter.WriteLine();
+				foreach (ImportMember xImportMember in mImportMembers) {
+					foreach (ImportMethodMember xImportMethod in xImportMember.Methods) {
+						mOutputWriter.WriteLine("\t_{0} dw 0", xImportMethod.Name);
+						mOutputWriter.WriteLine("\tdb '{0}',0", xImportMethod.Name);
+					}
 				}
 			}
 		}

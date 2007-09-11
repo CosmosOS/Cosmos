@@ -56,6 +56,7 @@
     <Compile Include="Assembler.cs" />
     <Compile Include="DataMember.cs" />
     <Compile Include="ImportMember.cs" />
+    <Compile Include="ImportMethodMember.cs" />
     <Compile Include="Instruction.cs" />
     <Compile Include="Label.cs" />
     <Compile Include="Literal.cs" />

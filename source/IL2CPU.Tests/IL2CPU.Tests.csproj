@@ -91,7 +91,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Tests\SimpleFunctionCall\SimpleFunctionCall.exe" />
+    <None Include="Tests\SimpleFunctionCall\SimpleFunctionCall.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
