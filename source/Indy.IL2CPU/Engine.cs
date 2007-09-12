@@ -91,7 +91,7 @@ namespace Indy.IL2CPU {
 							mAssembler.Add(new Assembler.X86.Pushd("0"));
 						}
 						mAssembler.Add(new Assembler.X86.Call("[ExitProcess]"));
-						ImportMember xKernel32 = new ImportMember("kernel", "KERNEL32.DLL");
+						ImportMember xKernel32 = new ImportMember("kernel32_dll", "kernel32.dll");
 						xKernel32.Methods.Add(new ImportMethodMember("ExitProcess"));
 						mAssembler.ImportMembers.Add(xKernel32);
 						ProcessAllMethods();
@@ -263,13 +263,9 @@ namespace Indy.IL2CPU {
 		}
 
 		private void HandlePInvoke(MethodDefinition aMethod, MethodInformation aMethodInfo) {
-			mAssembler.Add(new Noop());
-			if(aMethodInfo.HasReturnValue) {
-//				mAssembler.Add(new Pushd("0"));
-				mAssembler.Add(new Pushd("eax"));
-				mAssembler.Add(new Move("eax", "0"));
-
-			}
+			IL.Op xPInvokeMethodBodyOp = (IL.Op)Activator.CreateInstance(mMap.PInvokeMethodBodyOp, aMethod, aMethodInfo);
+			xPInvokeMethodBodyOp.Assembler = mAssembler;
+			xPInvokeMethodBodyOp.Assemble();
 		}
 	}
 }

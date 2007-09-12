@@ -53,6 +53,7 @@
     <Compile Include="Op.cs" />
     <Compile Include="OpCodeAttribute.cs" />
     <Compile Include="OpCodeMap.cs" />
+    <Compile Include="PInvokeMethodBodyOp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities.cs" />
   </ItemGroup>

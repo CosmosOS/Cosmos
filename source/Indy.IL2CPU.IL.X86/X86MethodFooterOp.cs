@@ -21,7 +21,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			LocalsCount = aMethodInfo.Locals.Length;
 			if(aMethodInfo.HasReturnValue) {
 				TotalLocalsSize += 4;
-				LocalsCount++;
+				//LocalsCount++;
 			}
 		}
 

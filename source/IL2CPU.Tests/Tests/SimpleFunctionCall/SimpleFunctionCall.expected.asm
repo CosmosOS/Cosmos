@@ -19,7 +19,7 @@ section '.code' code readable executable
 		push EAX
 		; IL: Stloc_0 
 		pop eax
-		mov [ebp - 12],eax
+		mov [esp - 12],eax
 		; IL: Ret 
 		pop ebp
 		ret 
@@ -33,26 +33,25 @@ section '.code' code readable executable
 		pushd 5
 		; IL: Stloc_0 
 		pop eax
-		mov [ebp - 12],eax
+		mov [esp - 12],eax
 		; IL: Br_S Mono.Cecil.Cil.Instruction
 		; IL: Ldloc_0 
 		push eax
-		mov eax,[ebp - 12]
+		mov eax,[esp - 12]
 		; IL: Ret 
-		pop ebp
 		pop ebp
 		ret 
 
 section '.idata' import data readable writeable
 
-	dd 0,0,0,rva kernel_name,rva kernel_table
+	dd 0,0,0,rva kernel32_dll_name,rva kernel32_dll_table
 	dd 0,0,0,0,0
 
-	kernel_table:
+	kernel32_dll_table:
 		ExitProcess dd rva _ExitProcess
 		dd 0
 
-	kernel_name db 'KERNEL32.DLL',0
+	kernel32_dll_name db 'kernel32.dll',0
 
 	_ExitProcess dw 0
 	db 'ExitProcess',0

@@ -20,5 +20,9 @@ namespace Indy.IL2CPU.IL.X86 {
 				return typeof(X86OpCodeMap).Assembly;
 			}
 		}
+
+		protected override Type GetPInvokeMethodBodyOp() {
+			return typeof (X86PInvokeMethodBodyOp);
+		}
 	}
 }

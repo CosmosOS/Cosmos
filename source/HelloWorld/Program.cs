@@ -32,9 +32,10 @@ namespace HelloWorld {
 			Integer();
 			StringViaCtor();
 			LiteralString();
+			DoWriteLines();
 		}
 
-		public static void ActualMain(string[] args) {
+		public static void DoWriteLines() {
             string s = "Test";
 			Console.WriteLine("Hello world!");
 			Console.ReadLine();

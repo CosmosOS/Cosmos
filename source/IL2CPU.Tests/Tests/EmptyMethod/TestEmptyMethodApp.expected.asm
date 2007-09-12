@@ -18,14 +18,14 @@ section '.code' code readable executable
 
 section '.idata' import data readable writeable
 
-	dd 0,0,0,rva kernel_name,rva kernel_table
+	dd 0,0,0,rva kernel32_dll_name,rva kernel32_dll_table
 	dd 0,0,0,0,0
 
-	kernel_table:
+	kernel32_dll_table:
 		ExitProcess dd rva _ExitProcess
 		dd 0
 
-	kernel_name db 'KERNEL32.DLL',0
+	kernel32_dll_name db 'kernel32.dll',0
 
 	_ExitProcess dw 0
 	db 'ExitProcess',0

@@ -34,16 +34,18 @@ namespace HelloWorldMetal {
 			// around map replacement
 			// So the current test would be - declare a P/Invoke for writing to console in Win32
 			// then call it below with "HelloWorld"
-			IntPtr xHandle = GetStdHandle(-11);
-			uint xCharsWritten = 0;
-			WriteConsole(xHandle, theMessage, 13, out xCharsWritten, IntPtr.Zero);
+			bool result = MessageBeep(0xFFFFFFFF);
+			uint error = GetLastError();
+//			IntPtr xHandle = GetStdHandle(-11);
+//			uint xCharsWritten = 0;
+//			WriteConsole(xHandle, theMessage, 13, out xCharsWritten, IntPtr.Zero);
+//			error = GetLastError();
 		}
 
+		[DllImport("user32.dll")]
+		private static extern bool MessageBeep(uint aType);
+
 		[DllImport("kernel32.dll")]
-		static extern IntPtr GetStdHandle(int nStdHandle);
-		[DllImport("kernel32.dll")]
-		static extern bool WriteConsole(IntPtr hConsoleOutput, string lpBuffer,
-		   uint nNumberOfCharsToWrite, out uint lpNumberOfCharsWritten,
-		   IntPtr lpReserved);
+		private static extern uint GetLastError();
 	}
 }

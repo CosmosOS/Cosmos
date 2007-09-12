@@ -17,6 +17,10 @@ namespace Indy.IL2CPU.IL.X86 {
 			if (Int32.TryParse((aInstruction.Operand ?? "").ToString(), out xLocalIndex)) {
 				SetLocalIndex(xLocalIndex, aMethodInfo);
 			}
+			VariableDefinition xVarDef = aInstruction.Operand as VariableDefinition;
+			if (xVarDef != null) {
+				SetLocalIndex(xVarDef.Index, aMethodInfo);
+			}
 		}
 
 		public string Address {
@@ -26,8 +30,8 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public sealed override void Assemble() {
-			Push("eax");
-			Move("eax", "[" + mAddress + "]");
+			Push(Assembler, "eax");
+			Move(Assembler, "eax", "[" + mAddress + "]");
 		}
 	}
 }

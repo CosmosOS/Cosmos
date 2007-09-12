@@ -22,8 +22,8 @@ namespace Indy.IL2CPU.IL.X86 {
 			Assembler.Add(new Compare(aAddress1, aAddress2));
 		}
 
-		protected void Move(string aDestination, string aSource) {
-			Assembler.Add(new Move(aDestination, aSource));
+		public static void Move(Assembler.Assembler aAssembler, string aDestination, string aSource) {
+			aAssembler.Add(new Move(aDestination, aSource));
 		}
 
 		protected void Test(string aArg1, string aArg2) {
@@ -54,8 +54,8 @@ namespace Indy.IL2CPU.IL.X86 {
 			Assembler.Add(new Literal(aData));
 		}
 
-		protected void Push(params string[] aArguments) {
-			Assembler.Add(new Push(aArguments));
+		public static void Push(Assembler.Assembler aAssembler, params string[] aArguments) {
+			aAssembler.Add(new Push(aArguments));
 		}
 
 		protected void Pushd(params string[] aArguments) {
@@ -83,6 +83,11 @@ namespace Indy.IL2CPU.IL.X86 {
 				}
 			}
 			Literal(xResult);
+		}
+
+		public static void Ldarg(Assembler.Assembler aAssembler, string aAddress) {
+			Push(aAssembler, "eax");
+			Move(aAssembler, "eax", "[" + aAddress + "]");
 		}
 	}
 }

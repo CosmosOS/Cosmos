@@ -18,7 +18,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		public void Assemble(string aMethod) {
 			Call(aMethod);
 			if (HasResult) {
-				Push("EAX");
+				Push(Assembler, "EAX");
 			}
 		}
 

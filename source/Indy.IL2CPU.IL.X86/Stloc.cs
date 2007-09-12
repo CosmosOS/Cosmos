@@ -18,6 +18,10 @@ namespace Indy.IL2CPU.IL.X86 {
 			if (Int32.TryParse((aInstruction.Operand ?? "").ToString(), out xLocalIndex)) {
 				SetLocalIndex(xLocalIndex, aMethodInfo);
 			}
+			VariableDefinition xVarDef = aInstruction.Operand as VariableDefinition;
+			if (xVarDef != null) {
+				SetLocalIndex(xVarDef.Index, aMethodInfo);
+			}
 
 			if(aInstruction.Previous != null &&
 				(aInstruction.Previous.OpCode.Code == Code.Call ||
@@ -39,10 +43,13 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public sealed override void Assemble() {
+			if(String.IsNullOrEmpty(mAddress)) {
+				throw new Exception("No address specified!");
+			}
 			if (mNeedsPop) {
 				Pop("eax");
 			}
-			Move("[" + mAddress + "]", "eax");
+			Move(Assembler, "[" + mAddress + "]", "eax");
 		}
 	}
 }

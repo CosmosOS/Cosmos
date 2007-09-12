@@ -45,6 +45,10 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="Tests\SimplePInvoke\SimplePInvokeTest.cs">
+    </None>
+    <None Include="Tests\SimpleEchoFunction\SimpleEchoFunction.cs">
+    </None>
     <None Include="Tests\SimpleFunctionCall\SimpleFunctionCall.cs" />
     <None Include="Tests\SimpleMethodCall\SimpleMethodCall.cs" />
     <None Include="Tests\SingleMethodWithParam\SingleMethodWithParam.cs" />
@@ -91,7 +95,23 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Tests\SimpleEchoFunction\SimpleEchoFunction.expected.asm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Tests\SimpleFunctionCall\SimpleFunctionCall.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Tests\SimpleEchoFunction\SimpleEchoFunction.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Tests\SimplePInvoke\SimplePInvokeTest.expected.asm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Tests\SimplePInvoke\SimplePInvokeTest.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

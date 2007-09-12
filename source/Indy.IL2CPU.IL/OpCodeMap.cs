@@ -13,6 +13,7 @@ namespace Indy.IL2CPU.IL {
 		protected OpCodeMap() {
 			MethodHeaderOp = GetMethodHeaderOp();
 			MethodFooterOp = GetMethodFooterOp();
+			PInvokeMethodBodyOp = GetPInvokeMethodBodyOp();
 		}
 
 		protected abstract Assembly ImplementationAssembly {
@@ -21,7 +22,7 @@ namespace Indy.IL2CPU.IL {
 
 		protected abstract Type GetMethodHeaderOp();
 		protected abstract Type GetMethodFooterOp();
-		
+		protected abstract Type GetPInvokeMethodBodyOp();
 
 		public void Initialize(Assembler.Assembler aAssembler) {
 			foreach (Type t in (from item in ImplementationAssembly.GetTypes()
@@ -46,5 +47,6 @@ namespace Indy.IL2CPU.IL {
 
 		public readonly Type MethodHeaderOp;
 		public readonly Type MethodFooterOp;
+		public readonly Type PInvokeMethodBodyOp;
 	}
 }
