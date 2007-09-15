@@ -15,15 +15,15 @@ section '.code' code readable executable
 		; IL: Nop 
 		nop
 		; IL: Ldc_I4_0 
-		pushd 0
+		pushd 000000000h
 		; IL: Stloc_0 
 		pop eax
 		mov [esp - 12],eax
 		; IL: Ldc_I4_5 
-		pushd 5
+		pushd 000000005h
 		; IL: Call System.Int32 Program::DoEcho(System.Int32)
 		call System_Int32___Program_DoEcho___System_Int32___
-		push EAX
+		push eax
 		; IL: Stloc_0 
 		pop eax
 		mov [esp - 12],eax

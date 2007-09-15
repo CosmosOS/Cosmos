@@ -1,4 +1,7 @@
-﻿using System;
+﻿// this file supports the VERBOSE_DEBUG define. this makes it emit a bunch of comments in the assembler output.
+// note that the tests are supposed to NOT include these comments
+// #define VERBOSE_DEBUG
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -88,7 +91,7 @@ namespace Indy.IL2CPU {
 						// first instructions are for calling the entrypoint
 						mAssembler.Add(new Assembler.X86.Call(new Label(mCrawledAssembly.EntryPoint).Name));
 						if (mCrawledAssembly.EntryPoint.ReturnType.ReturnType.FullName.StartsWith("System.Void", StringComparison.InvariantCultureIgnoreCase)) {
-							mAssembler.Add(new Assembler.X86.Pushd("0"));
+							mAssembler.Add(new Pushd("0"));
 						}
 						mAssembler.Add(new Assembler.X86.Call("[ExitProcess]"));
 						ImportMember xKernel32 = new ImportMember("kernel32_dll", "kernel32.dll");
@@ -134,6 +137,24 @@ namespace Indy.IL2CPU {
 				}
 				IL.Op xOp = GetOpFromType(mMap.MethodHeaderOp, null, xMethodInfo);
 				xOp.Assembler = mAssembler;
+#if VERBOSE_DEBUG
+				string comment = "Method: " + xCurrentMethod + "\r\n";
+				if (xCurrentMethod.Body == null) {
+					comment += "  (No locals)\r\n";
+				} else {
+					comment += "  Locals:\r\n";
+					foreach (VariableDefinition xVarDef in xCurrentMethod.Body.Variables) {
+						comment += String.Format("    [{0}] {1}\r\n", xVarDef.Index, xVarDef.Name);
+					}
+				}
+									  	comment += "  Args:\r\n";
+				foreach (ParameterDefinition xParamDef in xCurrentMethod.Parameters) {
+					comment += String.Format("    [{0}] {1}\r\n", xParamDef.Sequence, xParamDef.Name);
+				}
+				foreach (string s in comment.Trim().Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries)) {
+					mAssembler.Add(new Literal(";" + s));
+				}
+#endif
 				xOp.Assemble();
 				// what to do if a method doesn't have a body?
 				if (xCurrentMethod.HasBody) {

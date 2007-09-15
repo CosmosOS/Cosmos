@@ -16,8 +16,6 @@ namespace HelloWorldMetal {
 
 		static void Main() {
 			// Local variables are ok too, since they are stack based
-			int i = 0;
-			string theMessage = "Hello, World!";
 			// String literals translate to ldstr - these would automatically be pulled out
 			// and put in the data section. String manipuation not permitted unless the actual
 			// bytes are modified directly.
@@ -34,16 +32,20 @@ namespace HelloWorldMetal {
 			// around map replacement
 			// So the current test would be - declare a P/Invoke for writing to console in Win32
 			// then call it below with "HelloWorld"
-			bool result = MessageBeep(0xFFFFFFFF);
-			uint error = GetLastError();
-//			IntPtr xHandle = GetStdHandle(-11);
-//			uint xCharsWritten = 0;
-//			WriteConsole(xHandle, theMessage, 13, out xCharsWritten, IntPtr.Zero);
-//			error = GetLastError();
+			IntPtr xHandle = GetStdHandle(-11);
+//			uint error = GetLastError();
+			uint xCharsWritten;
+			string theMessage = "Hello, World!";
+			WriteConsole(xHandle, theMessage, 13, out xCharsWritten, IntPtr.Zero);
+			//error = GetLastError();
 		}
 
-		[DllImport("user32.dll")]
-		private static extern bool MessageBeep(uint aType);
+		[DllImport("kernel32.dll")]
+		static extern IntPtr GetStdHandle(int nStdHandle);
+		[DllImport("kernel32.dll")]
+		static extern bool WriteConsole(IntPtr hConsoleOutput, string lpBuffer,
+		   uint nNumberOfCharsToWrite, out uint lpNumberOfCharsWritten,
+		   IntPtr lpReserved);
 
 		[DllImport("kernel32.dll")]
 		private static extern uint GetLastError();

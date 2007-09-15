@@ -44,7 +44,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			if (TheMethod.PInvokeInfo.IsCharSetNotSpec) {
 				foreach (ParameterDefinition xParam in TheMethod.Parameters) {
 					if (xParam.ParameterType.FullName.StartsWith("System.String")) {
-						xMethodName += "W";
+						xMethodName += "A";
 						break;
 					}
 				}
@@ -53,8 +53,11 @@ namespace Indy.IL2CPU.IL.X86 {
 				throw new Exception("Unable to determine what dll to use!");
 			}
 			MakeSureMethodIsRegistered(xDllName, xDllFileName, xMethodName);
-			for (int i = MethodInfo.Arguments.Length - 1; i >= 0; i--) {
-				Op.Ldarg(Assembler, MethodInfo.Arguments[i].VirtualAddress);
+//			for (int i = MethodInfo.Arguments.Length - 1; i >= 0; i--) {
+			for(int i =0;i< MethodInfo.Arguments.Length;i++){
+				Op.Move(Assembler, "eax", "[" + MethodInfo.Arguments[i].VirtualAddress + "]");
+				Op.Push(Assembler, "eax");
+				//Op.Ldarg(Assembler, MethodInfo.Arguments[i].VirtualAddress);
 			}
 			Assembler.Add(new CPUx86.Call("[" + xMethodName + "]"));
 //			if (MethodInfo.HasReturnValue) {

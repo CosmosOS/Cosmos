@@ -22,12 +22,14 @@ namespace Indy.IL2CPU.IL.X86 {
             // todo: see if we need to output trailing bytes 00 00 or 00 01 depending on whether there are bytes >7F
 			string xDataName = Assembler.GetIdentifier("StringLiteral");
 			var xDataByteArray = new StringBuilder();
-			foreach (byte x in Encoding.Unicode.GetBytes(LiteralStr)) {
+			foreach (byte x in Encoding.ASCII.GetBytes(LiteralStr)) {
 				xDataByteArray.Append(x.ToString());
 				xDataByteArray.Append(",");
 			}
+			xDataByteArray.Append("0,");
             Assembler.DataMembers.Add(new DataMember(xDataName, "db", xDataByteArray.ToString().TrimEnd(',')));
-			Pushd(xDataName);
+			Move(Assembler, "eax", xDataName);
+			Pushd("eax");
 //			new Newobj() {
 //				CtorName = (new Label(typeof(String).FullName, typeof(Char).FullName + "*")).Name,
 //				Assembler = Assembler

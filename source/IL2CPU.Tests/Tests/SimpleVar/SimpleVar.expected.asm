@@ -15,7 +15,7 @@ section '.code' code readable executable
 		; IL: Nop 
 		nop
 		; IL: Ldc_I4_5 
-		pushd 5
+		pushd 000000005h
 		; IL: Stloc_0 
 		pop eax
 		mov [esp - 12],eax

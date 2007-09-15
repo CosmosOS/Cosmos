@@ -4,7 +4,7 @@ entry ___ENTRYPOINT___
 
 section '.data' data readable writeable
 
-	StringLiteral00000000 db 72,0,101,0,108,0,108,0,111,0,44,0,32,0,87,0,111,0,114,0,108,0,100,0,33,0
+	StringLiteral00000000 db 72,101,108,108,111,44,32,87,111,114,108,100,33,0
 
 section '.code' code readable executable
 
@@ -22,26 +22,27 @@ section '.code' code readable executable
 		; IL: Nop 
 		nop
 		; IL: Ldc_I4_0 
-		pushd 0
+		pushd 000000000h
 		; IL: Stloc_0 
 		pop eax
 		mov [esp - 12],eax
 		; IL: Ldstr Hello, World!
-		pushd StringLiteral00000000
+		mov eax,StringLiteral00000000
+		pushd eax
 		; IL: Stloc_1 
 		pop eax
 		mov [esp - 16],eax
 		; IL: Ldc_I4_M1 
-		pushd -1
+		pushd 0FFFFFFFFh
 		; IL: Call System.Boolean SimplePInvokeTest.Program::MessageBeep(System.UInt32)
 		call System_Boolean___SimplePInvokeTest_Program_MessageBeep___System_UInt32___
-		push EAX
+		push eax
 		; IL: Stloc_2 
 		pop eax
 		mov [esp - 20],eax
 		; IL: Call System.UInt32 SimplePInvokeTest.Program::GetLastError()
 		call System_UInt32___SimplePInvokeTest_Program_GetLastError____
-		push EAX
+		push eax
 		; IL: Stloc_3 
 		pop eax
 		mov [esp - 24],eax
@@ -59,8 +60,8 @@ section '.code' code readable executable
 
 	System_Boolean___SimplePInvokeTest_Program_MessageBeep___System_UInt32___:
 		mov ebp,esp
-		push eax
 		mov eax,[ebp + 4]
+		push eax
 		call [MessageBeep]
 		ret 4
 

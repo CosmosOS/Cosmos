@@ -14,7 +14,7 @@ section '.code' code readable executable
 		; IL: Nop 
 		nop
 		; IL: Ldc_I4_2 
-		pushd 2
+		pushd 000000002h
 		; IL: Call System.Void Program::TheMethod(System.Int32)
 		call System_Void___Program_TheMethod___System_Int32___
 		; IL: Nop 
