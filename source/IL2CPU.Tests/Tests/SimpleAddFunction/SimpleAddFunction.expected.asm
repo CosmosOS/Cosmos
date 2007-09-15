@@ -12,19 +12,25 @@ section '.code' code readable executable
 	System_Void___Program_Main____:
 		mov ebp,esp
 		pushd ebp
+		pushd ebp
 		; IL: Nop 
 		nop
+		; IL: Ldc_I4_1 
+		pushd 01h
 		; IL: Ldc_I4_2 
 		pushd 02h
-		; IL: Call System.Void Program::TheMethod(System.Int32)
-		call System_Void___Program_TheMethod___System_Int32___
-		; IL: Nop 
-		nop
+		; IL: Call System.Int32 Program::Add(System.Int32,System.Int32)
+		call System_Int32___Program_Add___System_Int32__System_Int32___
+		push eax
+		; IL: Stloc_0 
+		pop eax
+		mov [ebp - 0Ch],eax
 		; IL: Ret 
+		pop ebp
 		pop ebp
 		ret 
 
-	System_Void___Program_TheMethod___System_Int32___:
+	System_Int32___Program_Add___System_Int32__System_Int32___:
 		mov ebp,esp
 		pushd ebp
 		pushd ebp
@@ -33,13 +39,25 @@ section '.code' code readable executable
 		; IL: Ldarg_0 
 		mov eax,[ebp + 04h]
 		push eax
+		; IL: Ldarg_1 
+		mov eax,[ebp + 08h]
+		push eax
+		; IL: Add 
+		pop eax
+		add eax,[ESP]
+		add ESP,4
+		mov [ESP],eax
 		; IL: Stloc_0 
 		pop eax
 		mov [ebp - 0Ch],eax
+		; IL: Br_S Mono.Cecil.Cil.Instruction
+		; IL: Ldloc_0 
+		mov eax,[ebp - 0Ch]
+		push eax
 		; IL: Ret 
 		pop ebp
 		pop ebp
-		ret 4
+		ret 8
 
 section '.idata' import data readable writeable
 

@@ -40,8 +40,8 @@ section '.code' code readable executable
 		; IL: Nop 
 		nop
 		; IL: Ldarg_0 
-		push eax
 		mov eax,[ebp + 04h]
+		push eax
 		; IL: Stloc_0 
 		pop eax
 		mov [ebp - 0Ch],eax

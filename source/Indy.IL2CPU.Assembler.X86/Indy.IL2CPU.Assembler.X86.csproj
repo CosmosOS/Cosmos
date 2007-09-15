@@ -67,6 +67,7 @@
     <Compile Include="Push.cs" />
     <Compile Include="Pushd.cs" />
     <Compile Include="Ret.cs" />
+    <Compile Include="Sub.cs" />
     <Compile Include="Test.cs" />
     <Compile Include="Xor.cs" />
   </ItemGroup>

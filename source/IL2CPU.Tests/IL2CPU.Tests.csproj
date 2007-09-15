@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="Tests\SimpleAddFunction\SimpleAddFunction.cs" />
     <None Include="Tests\SimplePInvoke\SimplePInvokeTest.cs">
     </None>
     <None Include="Tests\SimpleEchoFunction\SimpleEchoFunction.cs">
@@ -111,7 +112,15 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Tests\SimpleAddFunction\SimpleAddFunction.expected.asm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Tests\SimplePInvoke\SimplePInvokeTest.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Tests\SimpleAddFunction\SimpleAddFunction.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

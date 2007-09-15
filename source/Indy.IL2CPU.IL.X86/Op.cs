@@ -86,8 +86,8 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public static void Ldarg(Assembler.Assembler aAssembler, string aAddress) {
-			Push(aAssembler, "eax");
 			Move(aAssembler, "eax", "[" + aAddress + "]");
+			Push(aAssembler, "eax");
 		}
 	}
 }

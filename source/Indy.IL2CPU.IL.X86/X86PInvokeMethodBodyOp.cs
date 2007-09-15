@@ -55,9 +55,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			MakeSureMethodIsRegistered(xDllName, xDllFileName, xMethodName);
 //			for (int i = MethodInfo.Arguments.Length - 1; i >= 0; i--) {
 			for(int i =0;i< MethodInfo.Arguments.Length;i++){
-				Op.Move(Assembler, "eax", "[" + MethodInfo.Arguments[i].VirtualAddress + "]");
-				Op.Push(Assembler, "eax");
-				//Op.Ldarg(Assembler, MethodInfo.Arguments[i].VirtualAddress);
+				Op.Ldarg(Assembler, MethodInfo.Arguments[i].VirtualAddress);
 			}
 			Assembler.Add(new CPUx86.Call("[" + xMethodName + "]"));
 //			if (MethodInfo.HasReturnValue) {
