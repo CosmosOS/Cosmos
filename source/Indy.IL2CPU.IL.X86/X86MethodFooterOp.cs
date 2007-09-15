@@ -28,7 +28,8 @@ namespace Indy.IL2CPU.IL.X86 {
 		public override void Assemble() {
 			// MtW: after trial and a huge amount of errors, this line doesn't seem to be needed
 			//Assembler.Add(new CPU.Add("esp", TotalLocalsSize.ToString()));
-			for (int i = 0; i < LocalsCount; i++) {
+			// + 1 to restore the stack
+			for (int i = 0; i < LocalsCount+1; i++) {
 				Assembler.Add(new CPU.Pop("ebp"));
 			}
 			Assembler.Add(new CPU.Ret(TotalArgsSize == 0 ? "" : TotalArgsSize.ToString()));

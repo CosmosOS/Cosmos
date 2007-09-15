@@ -30,8 +30,8 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public sealed override void Assemble() {
-			Push(Assembler, "eax");
 			Move(Assembler, "eax", "[" + mAddress + "]");
+			Push(Assembler, "eax");
 		}
 	}
 }
