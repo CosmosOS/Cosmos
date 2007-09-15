@@ -15,12 +15,12 @@ section '.code' code readable executable
 		pushd ebp
 		; IL: Nop 
 		nop
-		; IL: Ldc_I4_1 
-		pushd 01h
+		; IL: Ldc_I4_3 
+		pushd 03h
 		; IL: Ldc_I4_2 
 		pushd 02h
-		; IL: Call System.Int32 Program::Add(System.Int32,System.Int32)
-		call System_Int32___Program_Add___System_Int32__System_Int32___
+		; IL: Call System.Int32 Program::Subtract(System.Int32,System.Int32)
+		call System_Int32___Program_Subtract___System_Int32__System_Int32___
 		push eax
 		; IL: Stloc_0 
 		pop eax
@@ -30,7 +30,7 @@ section '.code' code readable executable
 		pop ebp
 		ret 
 
-	System_Int32___Program_Add___System_Int32__System_Int32___:
+	System_Int32___Program_Subtract___System_Int32__System_Int32___:
 		mov ebp,esp
 		pushd ebp
 		pushd ebp
@@ -42,9 +42,9 @@ section '.code' code readable executable
 		; IL: Ldarg_1 
 		mov eax,[ebp + 08h]
 		push eax
-		; IL: Add 
+		; IL: Sub 
 		pop eax
-		add eax,[esp]
+		sub eax, [esp]
 		add esp,4
 		mov [esp],eax
 		; IL: Stloc_0 
