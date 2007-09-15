@@ -19,19 +19,20 @@ section '.code' code readable executable
 		pushd ebp
 		pushd ebp
 		pushd ebp
+		pushd ebp
 		; IL: Nop 
 		nop
 		; IL: Ldc_I4_0 
-		pushd 000000000h
+		pushd 00h
 		; IL: Stloc_0 
 		pop eax
-		mov [esp - 12],eax
+		mov [ebp - 0Ch],eax
 		; IL: Ldstr Hello, World!
 		mov eax,StringLiteral00000000
 		pushd eax
 		; IL: Stloc_1 
 		pop eax
-		mov [esp - 16],eax
+		mov [ebp - 010h],eax
 		; IL: Ldc_I4_M1 
 		pushd 0FFFFFFFFh
 		; IL: Call System.Boolean SimplePInvokeTest.Program::MessageBeep(System.UInt32)
@@ -39,14 +40,15 @@ section '.code' code readable executable
 		push eax
 		; IL: Stloc_2 
 		pop eax
-		mov [esp - 20],eax
+		mov [ebp - 014h],eax
 		; IL: Call System.UInt32 SimplePInvokeTest.Program::GetLastError()
 		call System_UInt32___SimplePInvokeTest_Program_GetLastError____
 		push eax
 		; IL: Stloc_3 
 		pop eax
-		mov [esp - 24],eax
+		mov [ebp - 018h],eax
 		; IL: Ret 
+		pop ebp
 		pop ebp
 		pop ebp
 		pop ebp
@@ -55,14 +57,18 @@ section '.code' code readable executable
 
 	System_UInt32___SimplePInvokeTest_Program_GetLastError____:
 		mov ebp,esp
+		pushd ebp
 		call [GetLastError]
+		pop ebp
 		ret 
 
 	System_Boolean___SimplePInvokeTest_Program_MessageBeep___System_UInt32___:
 		mov ebp,esp
-		mov eax,[ebp + 4]
+		pushd ebp
+		mov eax,[ebp + 04h]
 		push eax
 		call [MessageBeep]
+		pop ebp
 		ret 4
 
 section '.idata' import data readable writeable

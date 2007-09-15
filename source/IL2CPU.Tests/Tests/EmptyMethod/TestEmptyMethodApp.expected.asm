@@ -11,9 +11,11 @@ section '.code' code readable executable
 
 	System_Void___IL2CPU_Tests_Tests_TestEmptyMethodApp_Main____:
 		mov ebp,esp
+		pushd ebp
 		; IL: Nop 
 		nop
 		; IL: Ret 
+		pop ebp
 		ret 
 
 section '.idata' import data readable writeable

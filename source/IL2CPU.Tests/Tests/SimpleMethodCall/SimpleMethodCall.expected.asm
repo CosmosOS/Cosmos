@@ -11,6 +11,7 @@ section '.code' code readable executable
 
 	System_Void___Program_Main____:
 		mov ebp,esp
+		pushd ebp
 		; IL: Nop 
 		nop
 		; IL: Call System.Void Program::TheMethod()
@@ -18,13 +19,16 @@ section '.code' code readable executable
 		; IL: Nop 
 		nop
 		; IL: Ret 
+		pop ebp
 		ret 
 
 	System_Void___Program_TheMethod____:
 		mov ebp,esp
+		pushd ebp
 		; IL: Nop 
 		nop
 		; IL: Ret 
+		pop ebp
 		ret 
 
 section '.idata' import data readable writeable

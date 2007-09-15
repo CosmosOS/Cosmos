@@ -12,14 +12,16 @@ section '.code' code readable executable
 	System_Void___IL2CPU_Tests_Tests_TestEmptyMethodApp_Main____:
 		mov ebp,esp
 		pushd ebp
+		pushd ebp
 		; IL: Nop 
 		nop
 		; IL: Ldc_I4_5 
-		pushd 000000005h
+		pushd 05h
 		; IL: Stloc_0 
 		pop eax
-		mov [esp - 12],eax
+		mov [ebp - 0Ch],eax
 		; IL: Ret 
+		pop ebp
 		pop ebp
 		ret 
 

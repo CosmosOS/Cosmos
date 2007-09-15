@@ -12,6 +12,7 @@ section '.code' code readable executable
 	System_Void___Program_Main____:
 		mov ebp,esp
 		pushd ebp
+		pushd ebp
 		; IL: Nop 
 		nop
 		; IL: Call System.Int32 Program::TheMethod()
@@ -19,26 +20,29 @@ section '.code' code readable executable
 		push eax
 		; IL: Stloc_0 
 		pop eax
-		mov [esp - 12],eax
+		mov [ebp - 0Ch],eax
 		; IL: Ret 
+		pop ebp
 		pop ebp
 		ret 
 
 	System_Int32___Program_TheMethod____:
 		mov ebp,esp
 		pushd ebp
+		pushd ebp
 		; IL: Nop 
 		nop
 		; IL: Ldc_I4_5 
-		pushd 000000005h
+		pushd 05h
 		; IL: Stloc_0 
 		pop eax
-		mov [esp - 12],eax
+		mov [ebp - 0Ch],eax
 		; IL: Br_S Mono.Cecil.Cil.Instruction
 		; IL: Ldloc_0 
+		mov eax,[ebp - 0Ch]
 		push eax
-		mov eax,[esp - 12]
 		; IL: Ret 
+		pop ebp
 		pop ebp
 		ret 
 

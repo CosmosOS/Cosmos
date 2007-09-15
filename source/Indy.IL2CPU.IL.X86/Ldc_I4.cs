@@ -29,7 +29,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 		}
 		public override sealed void Assemble() {
-			Pushd("0" + mValue.ToString("X8") + "h");
+			Pushd("0" + mValue.ToString("X") + "h");
 		}
 	}
 }
