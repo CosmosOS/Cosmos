@@ -18,7 +18,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			CtorName = new Asm.Label((MethodReference)aInstruction.Operand).Name;
 		}
 
-		public override void Assemble() {
+		public override void DoAssemble() {
 			Call(CtorName);
 		}
 	}

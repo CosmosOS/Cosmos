@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -25,7 +25,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 		}
 
-		public override void Assemble() {
+		public override void DoAssemble() {
 			// MtW: after trial and a huge amount of errors, this line doesn't seem to be needed
 			//Assembler.Add(new CPU.Add("esp", TotalLocalsSize.ToString()));
 			// + 1 to restore the stack

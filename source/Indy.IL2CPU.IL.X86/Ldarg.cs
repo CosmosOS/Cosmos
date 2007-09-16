@@ -24,7 +24,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 		}
 
-		public sealed override void Assemble() {
+		public sealed override void DoAssemble() {
 			Ldarg(Assembler, mAddress);
 		}
 	}

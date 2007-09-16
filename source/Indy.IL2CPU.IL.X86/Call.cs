@@ -22,7 +22,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 		}
 
-		public override void Assemble() {
+		public override void DoAssemble() {
 			Assemble(LabelName);
 		}
 	}

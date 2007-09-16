@@ -28,7 +28,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				return mValue;
 			}
 		}
-		public override sealed void Assemble() {
+		public override sealed void DoAssemble() {
 			Pushd("0" + mValue.ToString("X") + "h");
 		}
 	}

@@ -5,31 +5,43 @@ entry ___ENTRYPOINT___
 section '.code' code readable executable
 
 	___ENTRYPOINT___:
-		call System_Void___Program_Main____
-		pushd 0
-		call [ExitProcess]
+			call System_Void___Program_Main____
+			pushd 0
+			call [ExitProcess]
 
 	System_Void___Program_Main____:
-		mov ebp,esp
-		pushd ebp
-		; IL: Nop 
-		nop
-		; IL: Call System.Void Program::TheMethod()
-		call System_Void___Program_TheMethod____
-		; IL: Nop 
-		nop
-		; IL: Ret 
-		pop ebp
-		ret 
+			mov ebp,esp
+			pushd ebp
+
+		.L00000000:
+			; IL: Nop 
+			nop
+
+		.L00000001:
+			; IL: Call System.Void Program::TheMethod()
+			call System_Void___Program_TheMethod____
+
+		.L00000006:
+			; IL: Nop 
+			nop
+
+		.L00000007:
+			; IL: Ret 
+			pop ebp
+			ret 
 
 	System_Void___Program_TheMethod____:
-		mov ebp,esp
-		pushd ebp
-		; IL: Nop 
-		nop
-		; IL: Ret 
-		pop ebp
-		ret 
+			mov ebp,esp
+			pushd ebp
+
+		.L00000000:
+			; IL: Nop 
+			nop
+
+		.L00000001:
+			; IL: Ret 
+			pop ebp
+			ret 
 
 section '.idata' import data readable writeable
 

@@ -9,7 +9,7 @@ namespace HelloWorldAssembler {
 		public DummyOp(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
 		}
-		public override void Assemble() {
+		public override void DoAssemble() {
 //			Invoke("GetModuleHandle", 0);
 //			Move("[wc.hInstance]", "eax");
 //			Invoke("LoadIcon", 0, "IDI_APPLICATION");

@@ -10,7 +10,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		public Sub(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
 		}
-		public override void Assemble() {
+		public override void DoAssemble() {
 			Assembler.Add(new CPU.Pop("eax"));
 			Assembler.Add(new CPU.Sub("eax", "[esp]"));
 			Assembler.Add(new CPU.Add("esp", "4"));

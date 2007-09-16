@@ -12,7 +12,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			: base(aInstruction, aMethodInfo) {
 			mHasReturn = aMethodInfo.HasReturnValue;
 		}
-		public override void Assemble() {
+		public override void DoAssemble() {
 			if (mHasReturn) {
 				//Push("eax");
 			}

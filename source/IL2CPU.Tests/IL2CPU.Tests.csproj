@@ -45,6 +45,8 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="Tests\SimpleIfStatement\SimpleIfStatement.cs">
+    </None>
     <None Include="Tests\SimpleSubtractFunction\SimpleSubtractFunction.cs">
     </None>
     <None Include="Tests\SimpleAddFunction\SimpleAddFunction.cs" />
@@ -130,7 +132,15 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Tests\SimpleIfStatement\SimpleIfStatement.expected.asm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Tests\SimpleSubtractFunction\SimpleSubtractFunction.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Tests\SimpleIfStatement\SimpleIfStatement.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

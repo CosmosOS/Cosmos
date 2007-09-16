@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Text;
 using Indy.IL2CPU.Assembler;
@@ -16,7 +16,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			LiteralStr = (string)aInstruction.Operand;
 		}
 		
-		public override void Assemble() {
+		public override void DoAssemble() {
             // Make sure the crawler finds string constructors
             //DoQueueMethod(typeof(String).Assembly.FullName, typeof(String).FullName, ".ctor");
             // todo: see if we need to output trailing bytes 00 00 or 00 01 depending on whether there are bytes >7F

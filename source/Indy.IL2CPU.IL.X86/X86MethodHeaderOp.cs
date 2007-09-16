@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
@@ -15,7 +15,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			LocalsCount = aMethodInfo.Locals.Length;
 		}
 
-		public override void Assemble() {
+		public override void DoAssemble() {
 			// TODO: add support for variables with a diff datasize, other than 32bit
 			Assembler.Add(new CPU.Label(LabelName));
 			Assembler.Add(new CPUx86.Move("ebp", "esp"));

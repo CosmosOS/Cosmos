@@ -5,18 +5,22 @@ entry ___ENTRYPOINT___
 section '.code' code readable executable
 
 	___ENTRYPOINT___:
-		call System_Void___IL2CPU_Tests_Tests_TestEmptyMethodApp_Main____
-		pushd 0
-		call [ExitProcess]
+			call System_Void___IL2CPU_Tests_Tests_TestEmptyMethodApp_Main____
+			pushd 0
+			call [ExitProcess]
 
 	System_Void___IL2CPU_Tests_Tests_TestEmptyMethodApp_Main____:
-		mov ebp,esp
-		pushd ebp
-		; IL: Nop 
-		nop
-		; IL: Ret 
-		pop ebp
-		ret 
+			mov ebp,esp
+			pushd ebp
+
+		.L00000000:
+			; IL: Nop 
+			nop
+
+		.L00000001:
+			; IL: Ret 
+			pop ebp
+			ret 
 
 section '.idata' import data readable writeable
 

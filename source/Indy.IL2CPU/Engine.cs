@@ -199,7 +199,6 @@ namespace Indy.IL2CPU {
 							}
 							#endregion
 						}
-						mAssembler.Add(new Literal("; IL: " + xInstruction.OpCode.Code + " " + xInstruction.Operand));
 						xOp = GetOpFromType(mMap.GetOpForOpCode(xInstruction.OpCode.Code), xInstruction, xMethodInfo);
 						xOp.Assembler = mAssembler;
 						xOp.Assemble();

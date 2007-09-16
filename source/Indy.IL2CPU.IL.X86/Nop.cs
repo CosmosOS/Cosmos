@@ -12,7 +12,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		public Nop(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
 		}
-		public override void Assemble() {
+		public override void DoAssemble() {
             // Assembler would be base type in IL
             // Cast to ours
             // var x = (X86.Assembler)Assembler

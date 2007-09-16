@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -34,7 +34,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			xTheMember.Methods.Add(new ImportMethodMember(aMethodName));
 		}
 
-		public override void Assemble() {
+		public override void DoAssemble() {
 			string xDllFileName = TheMethod.PInvokeInfo.Module.Name;
 			string xDllName = xDllFileName.Replace('.', '_');
 			string xMethodName = TheMethod.PInvokeInfo.EntryPoint;
