@@ -128,7 +128,7 @@ namespace Indy.IL2CPU {
 					}
 					MethodInformation.Argument[] xArgs = new MethodInformation.Argument[xCurrentMethod.Parameters.Count];
 					xCurOffset = 0;
-					for (int i = 0; i < xArgs.Length; i++) {
+					for (int i = xArgs.Length - 1; i >= 0; i--) {
 						int xArgSize = 4;
 						xArgs[i] = new MethodInformation.Argument(xArgSize, xCurOffset);
 						xCurOffset += xArgSize;

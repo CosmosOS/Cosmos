@@ -57,7 +57,7 @@
     <Compile Include="JumpAlways.cs" />
     <Compile Include="JumpIfEquals.cs" />
     <Compile Include="JumpIfGreater.cs" />
-    <Compile Include="JumpIfNotZero.cs" />
+    <Compile Include="JumpIfNotEquals.cs" />
     <Compile Include="JumpIfZero.cs" />
     <Compile Include="Move.cs" />
     <Compile Include="Noop.cs" />

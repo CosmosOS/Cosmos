@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Indy.IL2CPU.Assembler;
 using Indy.IL2CPU.Assembler.X86;
@@ -43,7 +43,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		protected void JumpIfNotZero(string aAddress) {
-			Assembler.Add(new JumpIfNotZero(aAddress));
+			Assembler.Add(new JumpIfNotEquals(aAddress));
 		}
 
 		protected void JumpAlways(string aAddress) {

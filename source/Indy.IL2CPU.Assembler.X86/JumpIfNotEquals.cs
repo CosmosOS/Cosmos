@@ -8,9 +8,9 @@ namespace Indy.IL2CPU.Assembler.X86 {
 	/// Represents the JNE opcode
 	/// </summary>
 	[OpCode(0xFFFFFFFF, "jne")]
-	public class JumpIfNotZero: Instruction {
+	public class JumpIfNotEquals: Instruction {
 		public readonly string Address;
-		public JumpIfNotZero(string aAddress) {
+		public JumpIfNotEquals(string aAddress) {
 			Address = aAddress;
 		}
 		public override string ToString() {

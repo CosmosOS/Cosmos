@@ -26,7 +26,7 @@ namespace HelloWorldAssembler {
 //			Invoke("GetMessage", "msg", "NULL", 0, 0);
 //			Compare("eax", "1");
 //			JumpIfGreater("end_loop");
-//			JumpIfNotZero("msg_loop");
+//			JumpIfNotEquals("msg_loop");
 //			Invoke("TranslateMessage", "msg");
 //			Invoke("DispatchMessage", "msg");
 //			JumpAlways("msg_loop");

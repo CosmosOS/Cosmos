@@ -73,17 +73,18 @@ section '.code' code readable executable
 			; IL: Ceq 
 			pop eax
 			cmp eax,[esp]
-			add esp,4
 			je .L00000003__True
 			jmp .L00000003__False
 
 		.L00000003__True:
+			add esp,4
 			push 01h
 			pop eax
 			mov [esp],eax
 			jmp .L00000005
 
 		.L00000003__False:
+			add esp,4
 			push 00h
 			pop eax
 			mov [esp],eax
