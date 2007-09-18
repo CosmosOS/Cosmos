@@ -111,7 +111,7 @@ section '.code' code readable executable
 
 		.L0000000A:
 			; IL: Ldc_I4_4 
-			pushd 03h
+			pushd 04h
 
 		.L0000000B:
 			; IL: Stloc_0 
