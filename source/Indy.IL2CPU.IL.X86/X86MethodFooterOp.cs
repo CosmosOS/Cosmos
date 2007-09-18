@@ -10,6 +10,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		public readonly int TotalLocalsSize = 0;
 		public readonly int TotalArgsSize = 0;
 		public readonly int LocalsCount = 0;
+		public readonly bool HasReturnValue = false;
 		public X86MethodFooterOp(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
 			if (aMethodInfo.Arguments.Length > 0) {
@@ -19,19 +20,23 @@ namespace Indy.IL2CPU.IL.X86 {
 				TotalLocalsSize += aMethodInfo.Locals[aMethodInfo.Locals.Length - 1].Offset + aMethodInfo.Locals[aMethodInfo.Locals.Length - 1].Size;
 			}
 			LocalsCount = aMethodInfo.Locals.Length;
-			if(aMethodInfo.HasReturnValue) {
+			if (aMethodInfo.HasReturnValue) {
 				TotalLocalsSize += 4;
-				//LocalsCount++;
+				//LocalsCount++;   
+				HasReturnValue = true;
 			}
 		}
 
 		public override void DoAssemble() {
 			// MtW: after trial and a huge amount of errors, this line doesn't seem to be needed
 			//Assembler.Add(new CPU.Add("esp", TotalLocalsSize.ToString()));
-			// + 1 to restore the stack
-			for (int i = 0; i < LocalsCount+1; i++) {
-				Assembler.Add(new CPU.Pop("ebp"));
+			if (HasReturnValue) {
+				Assembler.Add(new Assembler.X86.Pop("eax"));
 			}
+			for (int i = 0; i < LocalsCount; i++) {
+				Assembler.Add(new CPU.Add("esp", "4"));
+			}
+			Assembler.Add(new CPU.Pop("ebp"));
 			Assembler.Add(new CPU.Ret(TotalArgsSize == 0 ? "" : TotalArgsSize.ToString()));
 		}
 	}

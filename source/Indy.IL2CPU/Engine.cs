@@ -93,10 +93,17 @@ namespace Indy.IL2CPU {
 						if (mCrawledAssembly.EntryPoint.ReturnType.ReturnType.FullName.StartsWith("System.Void", StringComparison.InvariantCultureIgnoreCase)) {
 							mAssembler.Add(new Pushd("0"));
 						}
-						mAssembler.Add(new Assembler.X86.Call("[ExitProcess]"));
-						ImportMember xKernel32 = new ImportMember("kernel32_dll", "kernel32.dll");
-						xKernel32.Methods.Add(new ImportMethodMember("ExitProcess"));
-						mAssembler.ImportMembers.Add(xKernel32);
+						MethodDefinition xExitProcessMethodDef = null;
+						QueueMethod(typeof(PInvokes).Assembly.GetName().FullName, typeof(PInvokes).FullName, "Kernel32_ExitProcess", out xExitProcessMethodDef);
+#if DEBUG
+						if (xExitProcessMethodDef == null) {
+							throw new Exception("ExitProcess method not found!");
+						}
+#endif
+						mAssembler.Add(new Assembler.X86.Call(new Assembler.Label(xExitProcessMethodDef).Name));
+						//ImportMember xKernel32 = new ImportMember("kernel32_dll", "kernel32.dll");
+						//xKernel32.Methods.Add(new ImportMethodMember("ExitProcess"));
+						//mAssembler.ImportMembers.Add(xKernel32);
 						ProcessAllMethods();
 					} finally {
 						mAssembler.Flush();
@@ -234,6 +241,11 @@ namespace Indy.IL2CPU {
 		}
 
 		public static void QueueMethod(string aAssembly, string aType, string aMethod) {
+			MethodDefinition xMethodDef;
+			QueueMethod(aAssembly, aType, aMethod, out xMethodDef);
+		}
+
+		public static void QueueMethod(string aAssembly, string aType, string aMethod, out MethodDefinition aMethodDef) {
 			if (mCurrent == null) {
 				throw new Exception("ERROR: No Current Engine found!");
 			}
@@ -250,9 +262,13 @@ namespace Indy.IL2CPU {
 			}
 			// todo: find a way to specify one overload of a method
 			int xCount = 0;
+			aMethodDef = null;
 			foreach (MethodDefinition xMethodDef in xTypeDef.Methods) {
 				if (xMethodDef.Name == aMethod) {
 					QueueMethod(xMethodDef);
+					if (aMethodDef == null) {
+						aMethodDef = xMethodDef;
+					}
 					xCount++;
 				}
 			}

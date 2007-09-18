@@ -21,7 +21,7 @@ namespace Indy.IL2CPU.IL {
 			public Argument(int aSize, int aOffset) {
 				Size = aSize;
 				Offset = aOffset;
-				VirtualAddress = "ebp + 0" + (Offset + Size + 0).ToString("X") + "h";
+				VirtualAddress = "ebp + 0" + (Offset + Size + 4).ToString("X") + "h";
 			}
 
 			public readonly string VirtualAddress;
