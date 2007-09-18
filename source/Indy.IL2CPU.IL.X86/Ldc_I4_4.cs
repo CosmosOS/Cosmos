@@ -9,7 +9,7 @@ namespace Indy.IL2CPU.IL.X86 {
 	public class Ldc_I4_4: Ldc_I4 {
 		public Ldc_I4_4(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
-			SetValue(3);
+			SetValue(4);
 		}
 	}
 }
