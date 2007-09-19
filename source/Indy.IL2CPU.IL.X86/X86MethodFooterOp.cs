@@ -31,9 +31,12 @@ namespace Indy.IL2CPU.IL.X86 {
 			// MtW: after trial and a huge amount of errors, this line doesn't seem to be needed
 			//Assembler.Add(new CPU.Add("esp", TotalLocalsSize.ToString()));
 			if (HasReturnValue) {
-				Assembler.Add(new Assembler.X86.Pop("eax"));
+				//Assembler.Add(new Assembler.X86.Pop("eax"));
 			}
 			for (int i = 0; i < LocalsCount; i++) {
+				if (HasReturnValue && i == 0) {
+					continue;
+				}
 				Assembler.Add(new CPU.Add("esp", "4"));
 			}
 			Assembler.Add(new CPU.Pop("ebp"));

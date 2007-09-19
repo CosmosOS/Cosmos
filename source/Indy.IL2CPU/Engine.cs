@@ -14,10 +14,6 @@ using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Instruction = Mono.Cecil.Cil.Instruction;
 
-//ERROR
-
-//We need a special local vars register in the assembly
-
 namespace Indy.IL2CPU {
 	public class MethodDefinitionComparer: IComparer<MethodDefinition> {
 		#region IComparer<MethodDefinition> Members
@@ -38,6 +34,20 @@ namespace Indy.IL2CPU {
 		}
 	}
 
+	public class FieldDefinitionComparer: IComparer<FieldDefinition> {
+		#region IComparer<FieldDefinition> Members
+		public int Compare(FieldDefinition x, FieldDefinition y) {
+			return GenerateFullName(x).CompareTo(GenerateFullName(y));
+		}
+		#endregion
+
+		private static string GenerateFullName(FieldDefinition aDefinition) {
+			StringBuilder sb = new StringBuilder();
+			sb.Append(aDefinition.DeclaringType.FullName + "." + aDefinition.Name);
+			return sb.ToString().Trim();
+		}
+	}
+
 	public delegate void DebugLogHandler(string aMessage);
 
 	public enum TargetPlatformEnum {
@@ -55,6 +65,11 @@ namespace Indy.IL2CPU {
 		/// Contains a list of all methods. This includes methods to be processed and already processed.
 		/// </summary>
 		protected SortedList<MethodDefinition, bool> mMethods = new SortedList<MethodDefinition, bool>(new MethodDefinitionComparer());
+		/// <summary>
+		/// Contains a list of all static fields. This includes static fields to be processed and already processed.
+		/// </summary>
+		protected SortedList<FieldDefinition, bool> mStaticFields = new SortedList<FieldDefinition, bool>(new FieldDefinitionComparer());
+
 
 		/// <summary>
 		/// Compiles an assembly to CPU-specific code. The entrypoint of the assembly will be 
@@ -86,32 +101,85 @@ namespace Indy.IL2CPU {
 					mAssembler.OutputType = Indy.IL2CPU.Assembler.Assembler.OutputTypeEnum.Console;
 					mMap.Initialize(mAssembler);
 					IL.Op.QueueMethod += QueueMethod;
+					IL.Op.QueueStaticField += QueueStaticField;
 					try {
+						mMethods.Add(RuntimeEngineRefs.InitializeApplicationRef, false);
+						mMethods.Add(RuntimeEngineRefs.FinalizeApplicationRef, false);
 						mMethods.Add(mCrawledAssembly.EntryPoint, false);
-						// first instructions are for calling the entrypoint
-						mAssembler.Add(new Assembler.X86.Call(new Label(mCrawledAssembly.EntryPoint).Name));
+						// initialize the runtime engine
+						mAssembler.Add(
+							new Assembler.X86.Call(new Label(RuntimeEngineRefs.InitializeApplicationRef).Name),
+							new Assembler.X86.Call(new Label(mCrawledAssembly.EntryPoint).Name));
 						if (mCrawledAssembly.EntryPoint.ReturnType.ReturnType.FullName.StartsWith("System.Void", StringComparison.InvariantCultureIgnoreCase)) {
 							mAssembler.Add(new Pushd("0"));
+						} else {
+							mAssembler.Add(new Pushd("eax"));
 						}
-						MethodDefinition xExitProcessMethodDef = null;
-						QueueMethod(typeof(PInvokes).Assembly.GetName().FullName, typeof(PInvokes).FullName, "Kernel32_ExitProcess", out xExitProcessMethodDef);
-#if DEBUG
-						if (xExitProcessMethodDef == null) {
-							throw new Exception("ExitProcess method not found!");
-						}
-#endif
-						mAssembler.Add(new Assembler.X86.Call(new Assembler.Label(xExitProcessMethodDef).Name));
-						//ImportMember xKernel32 = new ImportMember("kernel32_dll", "kernel32.dll");
-						//xKernel32.Methods.Add(new ImportMethodMember("ExitProcess"));
-						//mAssembler.ImportMembers.Add(xKernel32);
+						mAssembler.Add(new Assembler.X86.Call(new Label(RuntimeEngineRefs.FinalizeApplicationRef).Name));
 						ProcessAllMethods();
+						ProcessAllStaticFields();
 					} finally {
 						mAssembler.Flush();
 						IL.Op.QueueMethod -= QueueMethod;
+						IL.Op.QueueStaticField -= QueueStaticField;
 					}
 				}
 			} finally {
 				mCurrent = null;
+			}
+		}
+
+		private static uint GetValueTypeSize(TypeReference aType) {
+			switch (aType.FullName) {
+				case "System.Byte":
+				case "System.SByte":
+					return 1;
+				case "System.UInt16":
+				case "System.Int16":
+					return 2;
+				case "System.UInt32":
+				case "System.Int32":
+					return 4;
+				case "System.UInt64":
+				case "System.Int64":
+					return 8;
+					// for now hardcode IntPtr and UIntPtr to be 32-bit
+				case "System.UIntPtr":
+				case "System.IntPtr":
+					return 4;
+			}
+			throw new Exception("Unable to determine ValueType size!");
+		}
+
+		private void ProcessAllStaticFields() {
+			FieldDefinition xCurrentField;
+			while ((xCurrentField = (from item in mStaticFields.Keys
+									 where !mStaticFields[item]
+									 select item).FirstOrDefault()) != null) {
+				string xFieldName = xCurrentField.DeclaringType.FullName + "." + xCurrentField.Name;
+				OnDebugLog("Processing Static Field '{0}', Constant = '{1}'({2})", xFieldName, xCurrentField.Constant, xCurrentField.Constant == null ? "**NULL**" : xCurrentField.Constant.GetType().FullName);
+									 	
+				xFieldName = DataMember.GetStaticFieldName(xCurrentField);
+								if (xCurrentField.HasConstant) {
+									// emit the constant, but first find out how we get it.
+									System.Diagnostics.Debugger.Break();
+								} else {
+									uint xTheSize;
+									if(xCurrentField.FieldType.IsValueType) {
+										xTheSize = GetValueTypeSize(xCurrentField.FieldType);
+									}
+									else {
+										xTheSize = 4;										
+									}
+									string xTheData = "";
+									for (uint i = 0; i < xTheSize; i++) {
+										xTheData += "0,";
+									}
+									xTheData = xTheData.TrimEnd(',');
+									mAssembler.DataMembers.Add(new DataMember(xFieldName, "dd", xTheData));
+
+								}
+				mStaticFields[xCurrentField] = true;
 			}
 		}
 
@@ -154,7 +222,7 @@ namespace Indy.IL2CPU {
 						comment += String.Format("    [{0}] {1}\r\n", xVarDef.Index, xVarDef.Name);
 					}
 				}
-									  	comment += "  Args:\r\n";
+				comment += "  Args:\r\n";
 				foreach (ParameterDefinition xParamDef in xCurrentMethod.Parameters) {
 					comment += String.Format("    [{0}] {1}\r\n", xParamDef.Sequence, xParamDef.Name);
 				}
@@ -228,6 +296,81 @@ namespace Indy.IL2CPU {
 			return (IL.Op)Activator.CreateInstance(aType, aInstruction, aMethodInfo);
 		}
 
+		public static void QueueStaticField(FieldDefinition aField) {
+			if (mCurrent == null) {
+				throw new Exception("ERROR: No Current Engine found!");
+			}
+			if (!mCurrent.mStaticFields.ContainsKey(aField)) {
+				mCurrent.mStaticFields.Add(aField, false);
+			}
+		}
+
+		public static void QueueStaticField(string aAssembly, string aType, string aField, out string aFieldName) {
+			if (mCurrent == null) {
+				throw new Exception("ERROR: No Current Engine found!");
+			}
+			AssemblyDefinition xReferencedFieldAssembly;
+			if (String.IsNullOrEmpty(aAssembly) || aAssembly == typeof(RuntimeEngine).Assembly.GetName().FullName) {
+				xReferencedFieldAssembly = RuntimeEngineRefs.RuntimeAssemblyDef;
+			} else {
+				xReferencedFieldAssembly = mCurrent.mCrawledAssembly.Resolver.Resolve(aAssembly);
+			}
+			if (xReferencedFieldAssembly != null) {
+				foreach (ModuleDefinition xModule in xReferencedFieldAssembly.Modules) {
+					var xReferencedType = xModule.Types[aType];
+					if (xReferencedType != null) {
+						var xFieldDef = xReferencedType.Fields.GetField(aField);
+						if (xFieldDef != null) {
+							QueueStaticField(xFieldDef);
+							aFieldName = DataMember.GetStaticFieldName(xFieldDef);
+							return;
+						}
+					}
+				}
+			}
+			throw new Exception("Field not found!");
+		}
+
+		public static void QueueStaticField(FieldReference aFieldRef) {
+			if (mCurrent == null) {
+				throw new Exception("ERROR: No Current Engine found!");
+			}
+			AssemblyNameReference xAssemblyNameReference = aFieldRef.DeclaringType.Scope as AssemblyNameReference;
+			if (xAssemblyNameReference != null) {
+				AssemblyDefinition xReferencedFieldAssembly;
+				if (xAssemblyNameReference.FullName == typeof(RuntimeEngine).Assembly.GetName().FullName) {
+					xReferencedFieldAssembly = RuntimeEngineRefs.RuntimeAssemblyDef;
+				} else {
+					xReferencedFieldAssembly = mCurrent.mCrawledAssembly.Resolver.Resolve(xAssemblyNameReference);
+				}
+				if (xReferencedFieldAssembly != null) {
+					foreach (ModuleDefinition xModule in xReferencedFieldAssembly.Modules) {
+						var xReferencedType = xModule.Types[aFieldRef.DeclaringType.FullName];
+						if (xReferencedType != null) {
+							var xFieldDef = xReferencedType.Fields.GetField(aFieldRef.Name);
+							if (xFieldDef != null) {
+								QueueStaticField(xFieldDef);
+							}
+							break;
+						}
+					}
+				}
+			} else {
+				ModuleDefinition xReferencedModule = aFieldRef.DeclaringType.Scope as ModuleDefinition;
+				if (xReferencedModule != null) {
+					var xReferencedType = xReferencedModule.Types[aFieldRef.DeclaringType.FullName];
+					if (xReferencedType != null) {
+						var xFieldDef = xReferencedType.Fields.GetField(aFieldRef.Name);
+						if (xFieldDef != null) {
+							QueueStaticField(xFieldDef);
+						}
+					}
+				} else {
+					mCurrent.OnDebugLog("Error: Unhandled scope: " + aFieldRef.DeclaringType.Scope == null ? "**NULL**" : aFieldRef.DeclaringType.Scope.GetType().FullName);
+				}
+			}
+		}
+
 		// MtW: 
 		//		Right now, we only support one engine at a time per AppDomain. This might be changed
 		//		later. See for example NHibernate does this with the ICurrentSessionContext interface
@@ -249,7 +392,12 @@ namespace Indy.IL2CPU {
 			if (mCurrent == null) {
 				throw new Exception("ERROR: No Current Engine found!");
 			}
-			var xAssemblyDef = mCurrent.mCrawledAssembly.Resolver.Resolve(aAssembly);
+			AssemblyDefinition xAssemblyDef;
+			if (String.IsNullOrEmpty(aAssembly) || aAssembly == typeof(Engine).Assembly.GetName().FullName) {
+				xAssemblyDef = AssemblyFactory.GetAssembly(typeof(Engine).Assembly.Location);
+			} else {
+				xAssemblyDef = mCurrent.mCrawledAssembly.Resolver.Resolve(aAssembly);
+			}
 			TypeDefinition xTypeDef = null;
 			foreach (ModuleDefinition xModDef in xAssemblyDef.Modules) {
 				if (xModDef.Types.Contains(aType)) {

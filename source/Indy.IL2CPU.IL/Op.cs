@@ -18,6 +18,8 @@ namespace Indy.IL2CPU.IL {
 
 		public delegate void QueueMethodHandler(string aAssembly, string aType, string aMethod);
 
+		public delegate void QueueStaticFieldHandler(string aAssembly, string aType, string aField, out string aDataName);
+
 		public void Assemble() {
 			if (!String.IsNullOrEmpty(mCurrentInstructionLabel)) {
 				Assembler.Add(new Label(mCurrentInstructionLabel));
@@ -60,6 +62,14 @@ namespace Indy.IL2CPU.IL {
 			QueueMethod(aAssembly, aType, aMethod);
 		}
 
+		protected void DoQueueStaticField(string aAssembly, string aType, string aField, out string aDataName) {
+			if (QueueStaticField == null) {
+				throw new Exception("IL Op wants to queue a static field, but no QueueStaticField handler supplied!");
+			}
+			QueueStaticField(aAssembly, aType, aField, out aDataName);
+		}
+
 		public static QueueMethodHandler QueueMethod;
+		public static QueueStaticFieldHandler QueueStaticField;
 	}
 }

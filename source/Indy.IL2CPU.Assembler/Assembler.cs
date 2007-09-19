@@ -62,13 +62,14 @@ namespace Indy.IL2CPU.Assembler {
 			mDataMembers.Clear();
 		}
 
-		public void Add(Instruction aInstruction) {
-			mInstructions.Add(aInstruction);
+		public void Add(params Instruction[] aInstructions) {
+			foreach (Instruction xInstruction in aInstructions) {
+				mInstructions.Add(xInstruction);
+			}
 		}
 
 		public void Flush() {
 			// write .asm header
-			// debug: we're generating .dll so we can test the outpu
 			switch (mOutputType) {
 				case OutputTypeEnum.Console:
 					mOutputWriter.WriteLine("format PE console");

@@ -53,8 +53,8 @@ namespace Indy.IL2CPU.IL.X86 {
 				throw new Exception("Unable to determine what dll to use!");
 			}
 			MakeSureMethodIsRegistered(xDllName, xDllFileName, xMethodName);
-//			for (int i = MethodInfo.Arguments.Length - 1; i >= 0; i--) {
-			for(int i =0;i< MethodInfo.Arguments.Length;i++){
+			for (int i = MethodInfo.Arguments.Length - 1; i >= 0; i--) {
+			//for(int i =0;i< MethodInfo.Arguments.Length;i++){
 				Op.Ldarg(Assembler, MethodInfo.Arguments[i].VirtualAddress);
 			}
 			Assembler.Add(new CPUx86.Call("[" + xMethodName + "]"));
