@@ -12,8 +12,12 @@ namespace HelloWorld {
         }
 
         public static void StringViaCtor() {
-            object x = new string('t', 45);
+            //object x = new string('t', 45);
         }
+
+		public static void Main() {
+			object x = new Object();
+		}
 
 		public static void LiteralString() {
 			object x = "Hello, World!";
@@ -26,19 +30,20 @@ namespace HelloWorld {
 			EmptyMethod();
 		}
 
-		public static void Main() {
+		public static void OrigMain() {
 			CallEmptyMethod();
 			CallInteger();
 			Integer();
 			StringViaCtor();
 			LiteralString();
+			Main();
 			DoWriteLines();
 		}
 
 		public static void DoWriteLines() {
             string s = "Test";
-			Console.WriteLine("Hello world!");
-			Console.ReadLine();
+			//Console.WriteLine("Hello world!");
+			//Console.ReadLine();
 		}
 	}
 }

@@ -8,6 +8,7 @@ namespace Indy.IL2CPU {
 		public static readonly AssemblyDefinition RuntimeAssemblyDef;
 		public static readonly MethodDefinition FinalizeApplicationRef;
 		public static readonly MethodDefinition InitializeApplicationRef;
+		public static readonly MethodDefinition Heap_AllocNewObjectRef;
 
 		static RuntimeEngineRefs() {
 			RuntimeAssemblyDef = AssemblyFactory.GetAssembly(typeof(RuntimeEngine).Assembly.Location);

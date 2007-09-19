@@ -9,7 +9,7 @@ using System.Text;
 using Indy.IL2CPU.Assembler;
 using Indy.IL2CPU.Assembler.X86;
 using Indy.IL2CPU.IL;
-using Indy.IL2CPU.IL.X86;
+//using Indy.IL2CPU.IL.X86;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Instruction = Mono.Cecil.Cil.Instruction;
@@ -92,7 +92,8 @@ namespace Indy.IL2CPU {
 				using (mAssembler = new Assembler.X86.Assembler(aOutput)) {
 					switch (aTargetPlatform) {
 						case TargetPlatformEnum.x86: {
-								mMap = new X86OpCodeMap();
+								mMap = (OpCodeMap)Activator.CreateInstance(Type.GetType("Indy.IL2CPU.IL.X86.X86OpCodeMap, Indy.IL2CPU.IL.X86", true));
+								//new X86OpCodeMap();
 								break;
 							}
 						default:
@@ -102,6 +103,7 @@ namespace Indy.IL2CPU {
 					mMap.Initialize(mAssembler);
 					IL.Op.QueueMethod += QueueMethod;
 					IL.Op.QueueStaticField += QueueStaticField;
+					IL.Op.QueueMethodRef += QueueMethodRef;
 					try {
 						mMethods.Add(RuntimeEngineRefs.InitializeApplicationRef, false);
 						mMethods.Add(RuntimeEngineRefs.FinalizeApplicationRef, false);
@@ -121,6 +123,7 @@ namespace Indy.IL2CPU {
 					} finally {
 						mAssembler.Flush();
 						IL.Op.QueueMethod -= QueueMethod;
+						IL.Op.QueueMethodRef -= QueueMethodRef;
 						IL.Op.QueueStaticField -= QueueStaticField;
 					}
 				}
@@ -143,7 +146,7 @@ namespace Indy.IL2CPU {
 				case "System.UInt64":
 				case "System.Int64":
 					return 8;
-					// for now hardcode IntPtr and UIntPtr to be 32-bit
+				// for now hardcode IntPtr and UIntPtr to be 32-bit
 				case "System.UIntPtr":
 				case "System.IntPtr":
 					return 4;
@@ -158,27 +161,26 @@ namespace Indy.IL2CPU {
 									 select item).FirstOrDefault()) != null) {
 				string xFieldName = xCurrentField.DeclaringType.FullName + "." + xCurrentField.Name;
 				OnDebugLog("Processing Static Field '{0}', Constant = '{1}'({2})", xFieldName, xCurrentField.Constant, xCurrentField.Constant == null ? "**NULL**" : xCurrentField.Constant.GetType().FullName);
-									 	
-				xFieldName = DataMember.GetStaticFieldName(xCurrentField);
-								if (xCurrentField.HasConstant) {
-									// emit the constant, but first find out how we get it.
-									System.Diagnostics.Debugger.Break();
-								} else {
-									uint xTheSize;
-									if(xCurrentField.FieldType.IsValueType) {
-										xTheSize = GetValueTypeSize(xCurrentField.FieldType);
-									}
-									else {
-										xTheSize = 4;										
-									}
-									string xTheData = "";
-									for (uint i = 0; i < xTheSize; i++) {
-										xTheData += "0,";
-									}
-									xTheData = xTheData.TrimEnd(',');
-									mAssembler.DataMembers.Add(new DataMember(xFieldName, "dd", xTheData));
 
-								}
+				xFieldName = DataMember.GetStaticFieldName(xCurrentField);
+				if (xCurrentField.HasConstant) {
+					// emit the constant, but first find out how we get it.
+					System.Diagnostics.Debugger.Break();
+				} else {
+					uint xTheSize;
+					if (xCurrentField.FieldType.IsValueType) {
+						xTheSize = GetValueTypeSize(xCurrentField.FieldType);
+					} else {
+						xTheSize = 4;
+					}
+					string xTheData = "";
+					for (uint i = 0; i < xTheSize; i++) {
+						xTheData += "0,";
+					}
+					xTheData = xTheData.TrimEnd(',');
+					mAssembler.DataMembers.Add(new DataMember(xFieldName, "dd", xTheData));
+
+				}
 				mStaticFields[xCurrentField] = true;
 			}
 		}
@@ -189,6 +191,13 @@ namespace Indy.IL2CPU {
 									  where !mMethods[item]
 									  select item).FirstOrDefault()) != null) {
 				OnDebugLog("Processing method '{0}'", xCurrentMethod.DeclaringType.FullName + "." + xCurrentMethod.Name);
+				string xMethodName = new Label(xCurrentMethod).Name;
+				foreach (CustomAttribute xAttrib in xCurrentMethod.CustomAttributes) {
+					if (xAttrib.Constructor.DeclaringType.FullName == typeof(MethodAliasAttribute).FullName) {
+						xMethodName = (string)xAttrib.Fields["Name"];
+						break;
+					}
+				}
 				MethodInformation xMethodInfo;
 				{
 					MethodInformation.Variable[] xVars = new MethodInformation.Variable[0];
@@ -208,7 +217,7 @@ namespace Indy.IL2CPU {
 						xArgs[i] = new MethodInformation.Argument(xArgSize, xCurOffset);
 						xCurOffset += xArgSize;
 					}
-					xMethodInfo = new MethodInformation(new Label(xCurrentMethod).Name, xVars, xArgs, !xCurrentMethod.ReturnType.ReturnType.FullName.Contains("System.Void"));
+					xMethodInfo = new MethodInformation(xMethodName, xVars, xArgs, !xCurrentMethod.ReturnType.ReturnType.FullName.Contains("System.Void"));
 				}
 				IL.Op xOp = GetOpFromType(mMap.MethodHeaderOp, null, xMethodInfo);
 				xOp.Assembler = mAssembler;
@@ -237,42 +246,7 @@ namespace Indy.IL2CPU {
 					foreach (Instruction xInstruction in xCurrentMethod.Body.Instructions) {
 						MethodReference xMethodReference = xInstruction.Operand as MethodReference;
 						if (xMethodReference != null) {
-							#region add methods so that they get processed
-							// TODO: find a more efficient way to get the MethodDefinition from a MethodReference
-							AssemblyNameReference xAssemblyNameReference = xMethodReference.DeclaringType.Scope as AssemblyNameReference;
-							if (xAssemblyNameReference != null) {
-								AssemblyDefinition xReferencedMethodAssembly = mCrawledAssembly.Resolver.Resolve(xAssemblyNameReference);
-								if (xReferencedMethodAssembly != null) {
-									foreach (ModuleDefinition xModule in xReferencedMethodAssembly.Modules) {
-										var xReferencedType = xModule.Types[xMethodReference.DeclaringType.FullName];
-										if (xReferencedType != null) {
-											var xMethodDef = xReferencedType.Methods.GetMethod(xMethodReference.Name, xMethodReference.Parameters);
-											if (xMethodDef != null) {
-												QueueMethod(xMethodDef);
-											}
-											var xCtorDef = xReferencedType.Constructors.GetConstructor(false, xMethodReference.Parameters);
-											if (xCtorDef != null) {
-												QueueMethod(xCtorDef);
-											}
-											break;
-										}
-									}
-								}
-							} else {
-								ModuleDefinition xReferencedModule = xMethodReference.DeclaringType.Scope as ModuleDefinition;
-								if (xReferencedModule != null) {
-									var xReferencedType = xReferencedModule.Types[xMethodReference.DeclaringType.FullName];
-									if (xReferencedType != null) {
-										var xMethodDef = xReferencedType.Methods.GetMethod(xMethodReference.Name, xMethodReference.Parameters);
-										if (xMethodDef != null) {
-											QueueMethod(xMethodDef);
-										}
-									}
-								} else {
-									OnDebugLog("Error: Unhandled scope: " + xMethodReference.DeclaringType.Scope == null ? "**NULL**" : xMethodReference.DeclaringType.Scope.GetType().FullName);
-								}
-							}
-							#endregion
+							QueueMethodRef(xMethodReference);
 						}
 						xOp = GetOpFromType(mMap.GetOpForOpCode(xInstruction.OpCode.Code), xInstruction, xMethodInfo);
 						xOp.Assembler = mAssembler;
@@ -378,8 +352,61 @@ namespace Indy.IL2CPU {
 			if (mCurrent == null) {
 				throw new Exception("ERROR: No Current Engine found!");
 			}
-			if (!mCurrent.mMethods.ContainsKey(aMethod)) {
-				mCurrent.mMethods.Add(aMethod, false);
+			MethodDefinition xActualMethod = aMethod;
+			#region replace real methods with their IL2CPU implementations
+			string xMethodName = aMethod.GetFullName();
+			switch (xMethodName) {
+				case "System.Object..ctor()":
+					xActualMethod = ObjectImplRefs.Object_Ctor;
+					break;
+			}
+			#endregion
+			if (!mCurrent.mMethods.ContainsKey(xActualMethod)) {
+				mCurrent.mMethods.Add(xActualMethod, false);
+			}
+		}
+
+		public static void QueueMethodRef(MethodReference aMethod) {
+			if (mCurrent == null) {
+				throw new Exception("ERROR: No Current Engine found!");
+			}
+			AssemblyNameReference xAssemblyNameReference = aMethod.DeclaringType.Scope as AssemblyNameReference;
+			if (xAssemblyNameReference != null) {
+				AssemblyDefinition xAssemblyDef;
+				if (xAssemblyNameReference.FullName == typeof(Engine).Assembly.GetName().FullName) {
+					xAssemblyDef = AssemblyFactory.GetAssembly(typeof(Engine).Assembly.Location);
+				} else {
+					xAssemblyDef = mCurrent.mCrawledAssembly.Resolver.Resolve(xAssemblyNameReference.FullName);
+				}
+				if (xAssemblyDef != null) {
+					foreach (ModuleDefinition xModule in xAssemblyDef.Modules) {
+						var xReferencedType = xModule.Types[aMethod.DeclaringType.FullName];
+						if (xReferencedType != null) {
+							var xMethodDef = xReferencedType.Methods.GetMethod(aMethod.Name, aMethod.Parameters);
+							if (xMethodDef != null) {
+								QueueMethod(xMethodDef);
+							}
+							var xCtorDef = xReferencedType.Constructors.GetConstructor(false, aMethod.Parameters);
+							if (xCtorDef != null) {
+								QueueMethod(xCtorDef);
+							}
+							break;
+						}
+					}
+				}
+			} else {
+				ModuleDefinition xReferencedModule = aMethod.DeclaringType.Scope as ModuleDefinition;
+				if (xReferencedModule != null) {
+					var xReferencedType = xReferencedModule.Types[aMethod.DeclaringType.FullName];
+					if (xReferencedType != null) {
+						var xMethodDef = xReferencedType.Methods.GetMethod(aMethod.Name, aMethod.Parameters);
+						if (xMethodDef != null) {
+							QueueMethod(xMethodDef);
+						}
+					}
+				} else {
+					mCurrent.OnDebugLog("Error: Unhandled scope: " + aMethod.DeclaringType.Scope == null ? "**NULL**" : aMethod.DeclaringType.Scope.GetType().FullName);
+				}
 			}
 		}
 

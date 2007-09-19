@@ -58,6 +58,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				Op.Ldarg(Assembler, MethodInfo.Arguments[i].VirtualAddress);
 			}
 			Assembler.Add(new CPUx86.Call("[" + xMethodName + "]"));
+			Assembler.Add(new CPUx86.Pushd("eax"));
 //			if (MethodInfo.HasReturnValue) {
 //				Assembler.Add(new CPUx86.Pushd("0"));
 //				Assembler.Add(new CPUx86.Pop("eax"));
