@@ -12,9 +12,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 		public override void DoAssemble() {
 			Assembler.Add(new CPU.Pop("eax"));
-			Assembler.Add(new CPU.Sub("eax", "[esp]"));
-			Assembler.Add(new CPU.Add("esp", "4"));
-			Assembler.Add(new CPU.Move("[esp]", "eax"));
+			Assembler.Add(new CPU.Sub("[esp]", "eax"));
 		}
 	}
 }

@@ -31,6 +31,8 @@ namespace IL2CPU.Tests {
 					xStartInfo.UseShellExecute = false;
 					xStartInfo.FileName = Path.Combine(xBaseDir, "IL2CPU.exe");
 					xStartInfo.Arguments = "\"" + xTestExe + "\" \"" + xActualOutputFile + "\"";
+					xStartInfo.RedirectStandardError = true;
+					xStartInfo.RedirectStandardOutput = true;
 					Process xProc = Process.Start(xStartInfo);
 					if (!xProc.WaitForExit(TestTimeout_Milliseconds)) {
 						xTests[xTestExe] = null;
