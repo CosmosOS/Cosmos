@@ -45,6 +45,10 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="Tests\ComplexerIfStatements\ComplexerIfStatements.cs">
+    </None>
+    <None Include="Tests\TwoIfStatements\TwoIfStatements.cs">
+    </None>
     <None Include="Tests\SimpleIfStatement\SimpleIfStatement.cs">
     </None>
     <None Include="Tests\SimpleSubtractFunction\SimpleSubtractFunction.cs">
@@ -144,7 +148,21 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Tests\ComplexerIfStatements\ComplexerIfStatements.expected.asm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Tests\SimpleIfStatement\SimpleIfStatement.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Tests\TwoIfStatements\TwoIfStatements.expected.asm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Tests\ComplexerIfStatements\ComplexerIfStatements.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Tests\TwoIfStatements\TwoIfStatements.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
