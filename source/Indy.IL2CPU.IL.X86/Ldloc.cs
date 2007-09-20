@@ -12,7 +12,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			mAddress = aMethodInfo.Locals[aIndex].VirtualAddress;
 		}
 		public Ldloc(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
+			: base(aInstruction, aMethodInfo, null) {
 			int xLocalIndex;
 			if (Int32.TryParse((aInstruction.Operand ?? "").ToString(), out xLocalIndex)) {
 				SetLocalIndex(xLocalIndex, aMethodInfo);

@@ -12,7 +12,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			mAddress = aMethodInfo.Arguments[aIndex].VirtualAddress;
 		}
 		public Ldarg(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
+			: base(aInstruction, aMethodInfo, null) {
 			int xArgIndex;
 			if (Int32.TryParse((aInstruction.Operand ?? "").ToString(), out xArgIndex)) {
 				SetArgIndex(xArgIndex, aMethodInfo);

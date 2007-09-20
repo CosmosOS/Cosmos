@@ -11,7 +11,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		private string mDataName;
 		
 		public Ldsfld(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
+			: base(aInstruction, aMethodInfo, null) {
 			FieldReference xField = (FieldReference)aInstruction.Operand;
 			IsIntPtrZero = aInstruction.Operand.ToString() == "System.IntPtr System.IntPtr::Zero";
 			if (!IsIntPtrZero) {

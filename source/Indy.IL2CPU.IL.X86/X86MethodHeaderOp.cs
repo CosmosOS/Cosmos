@@ -9,7 +9,7 @@ namespace Indy.IL2CPU.IL.X86 {
 	public class X86MethodHeaderOp: MethodHeaderOp {
 		public readonly int LocalsCount;
 		public readonly string LabelName;
-		public X86MethodHeaderOp(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
+		public X86MethodHeaderOp(Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
 			LabelName = aMethodInfo.LabelName;
 			LocalsCount = aMethodInfo.Locals.Length;

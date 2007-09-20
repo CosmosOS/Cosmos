@@ -6,8 +6,8 @@ using Mono.Cecil.Cil;
 
 namespace HelloWorldAssembler {
 	public class DummyOp: Indy.IL2CPU.IL.X86.Op {
-		public DummyOp(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
+		public DummyOp(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo, TypeInformation aTypeInfo)
+			: base(aInstruction, aMethodInfo, aTypeInfo) {
 		}
 		public override void DoAssemble() {
 //			Invoke("GetModuleHandle", 0);

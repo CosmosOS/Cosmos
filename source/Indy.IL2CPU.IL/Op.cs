@@ -7,6 +7,7 @@ using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Indy.IL2CPU.Assembler;
 using Cil = Mono.Cecil.Cil;
+using Instruction=Mono.Cecil.Cil.Instruction;
 
 namespace Indy.IL2CPU.IL {
 	public abstract class Op {
@@ -34,7 +35,7 @@ namespace Indy.IL2CPU.IL {
 
 		public abstract void DoAssemble();
 
-		public Op(Cil.Instruction aInstruction, MethodInformation aMethodInfo) {
+		public Op(Instruction aInstruction, MethodInformation aMethodInfo) {
 			if (aInstruction != null) {
 				mCurrentInstructionLabel = GetInstructionLabel(aInstruction);
 				mILComment = "; IL: " + aInstruction.OpCode.Code + " " + aInstruction.Operand;

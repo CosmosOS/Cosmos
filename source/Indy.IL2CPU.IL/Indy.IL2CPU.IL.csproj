@@ -55,6 +55,7 @@
     <Compile Include="OpCodeMap.cs" />
     <Compile Include="PInvokeMethodBodyOp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TypeInformation.cs" />
     <Compile Include="Utilities.cs" />
   </ItemGroup>
   <ItemGroup>

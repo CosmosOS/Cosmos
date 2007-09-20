@@ -17,7 +17,7 @@ namespace HelloWorldAssembler {
 					a.DataMembers.Add(new DataMember("_error", "TCHAR", "'Startup failed.',0"));
 					a.DataMembers.Add(new DataMember("wc", "WNDCLASS", "0,WindowProc,0,0,NULL,NULL,NULL,COLOR_BTNFACE+1,NULL,_class"));
 					a.DataMembers.Add(new DataMember("msg", "MSG", ""));
-					DummyOp xDO = new DummyOp(null, null);
+					DummyOp xDO = new DummyOp(null, null, null);
 					xDO.Assembler = a;
 					xDO.Assemble();
 //					a.ImportMembers.Add(new ImportMember("library kernel32,'KERNEL32.DLL',\\"));

@@ -29,16 +29,20 @@ namespace Indy.IL2CPU.IL {
 			public readonly int Offset;
 		}
 
-		public MethodInformation(string aLabelName, Variable[] aLocals, Argument[] aArguments, bool aHasReturnValue) {
+		public MethodInformation(string aLabelName, Variable[] aLocals, Argument[] aArguments, bool aHasReturnValue, bool aIsInstanceMethod, TypeInformation aTypeInfo) {
 			Locals = aLocals;
 			LabelName = aLabelName;
 			Arguments = aArguments;
 			HasReturnValue = aHasReturnValue;
+			IsInstanceMethod = aIsInstanceMethod;
+			TypeInfo = aTypeInfo;
 		}
 
 		public readonly string LabelName;
 		public readonly Variable[] Locals;
 		public readonly Argument[] Arguments;
 		public readonly bool HasReturnValue;
+		public readonly bool IsInstanceMethod;
+		public readonly TypeInformation TypeInfo;
 	}
 }

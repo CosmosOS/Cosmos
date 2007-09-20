@@ -132,7 +132,41 @@ namespace Indy.IL2CPU {
 			}
 		}
 
-		private static uint GetValueTypeSize(TypeReference aType) {
+		public static TypeDefinition GetDefinitionFromTypeReference(TypeReference aRef) {
+			if (mCurrent == null) {
+				throw new Exception("No Current engine found!");
+			}
+			AssemblyNameReference xAssemblyNameReference = aRef.Scope as AssemblyNameReference;
+			if (xAssemblyNameReference != null) {
+				AssemblyDefinition xReferencedFieldAssembly;
+				if (xAssemblyNameReference.FullName == typeof(RuntimeEngine).Assembly.GetName().FullName) {
+					xReferencedFieldAssembly = RuntimeEngineRefs.RuntimeAssemblyDef;
+				} else {
+					xReferencedFieldAssembly = mCurrent.mCrawledAssembly.Resolver.Resolve(xAssemblyNameReference);
+				}
+				if (xReferencedFieldAssembly != null) {
+					foreach (ModuleDefinition xModule in xReferencedFieldAssembly.Modules) {
+						var xReferencedType = xModule.Types[aRef.FullName];
+						if (xReferencedType != null) {
+							return xReferencedType;
+						}
+					}
+				}
+			} else {
+				ModuleDefinition xReferencedModule = aRef.Scope as ModuleDefinition;
+				if (xReferencedModule != null) {
+					var xReferencedType = xReferencedModule.Types[aRef.FullName];
+					if (xReferencedType != null) {
+						return xReferencedType;
+					}
+				} else {
+					mCurrent.OnDebugLog("Error: Unhandled scope: " + aRef.Scope == null ? "**NULL**" : aRef.Scope.GetType().FullName);
+				}
+			}
+			throw new Exception("Could not find TypeDefinition!");
+		}
+
+		public static uint GetValueTypeSize(TypeReference aType) {
 			switch (aType.FullName) {
 				case "System.Byte":
 				case "System.SByte":
@@ -198,6 +232,33 @@ namespace Indy.IL2CPU {
 						break;
 					}
 				}
+				TypeInformation xTypeInfo = null;
+				{
+					if (!xCurrentMethod.IsStatic) {
+						SortedList<string, TypeInformation.Field> xTypeFields = new SortedList<string, TypeInformation.Field>();
+						uint xObjectStorageSize = ObjectImpl.FieldDataOffset;
+						TypeDefinition xCurrentInspectedType = GetDefinitionFromTypeReference(xCurrentMethod.DeclaringType);
+						do {
+							foreach (FieldDefinition xField in xCurrentInspectedType.Fields) {
+								TypeDefinition xFieldType = GetDefinitionFromTypeReference(xField.FieldType);
+								uint xFieldSize;
+								if (xFieldType.IsClass) {
+									xFieldSize = 4;
+								} else {
+									xFieldSize = GetValueTypeSize(xFieldType);
+								}
+								xTypeFields.Add(xField.ToString(), new TypeInformation.Field(xObjectStorageSize, xFieldSize));
+								xObjectStorageSize += xFieldSize;
+							}
+							if (xCurrentInspectedType.FullName != "System.Object") {
+								xCurrentInspectedType = GetDefinitionFromTypeReference(xCurrentInspectedType.BaseType);
+							} else {
+								break;
+							}
+						} while (true);
+						xTypeInfo = new TypeInformation(xObjectStorageSize, xTypeFields);
+					}
+				}
 				MethodInformation xMethodInfo;
 				{
 					MethodInformation.Variable[] xVars = new MethodInformation.Variable[0];
@@ -210,14 +271,28 @@ namespace Indy.IL2CPU {
 							xCurOffset += xVarSize;
 						}
 					}
-					MethodInformation.Argument[] xArgs = new MethodInformation.Argument[xCurrentMethod.Parameters.Count];
-					xCurOffset = 0;
-					for (int i = xArgs.Length - 1; i >= 0; i--) {
-						int xArgSize = 4;
-						xArgs[i] = new MethodInformation.Argument(xArgSize, xCurOffset);
-						xCurOffset += xArgSize;
+					MethodInformation.Argument[] xArgs;
+					if (!xCurrentMethod.IsStatic) {
+						xArgs = new MethodInformation.Argument[xCurrentMethod.Parameters.Count + 1];
+						xCurOffset = 0;
+						int xArgSize;
+						for (int i = xArgs.Length - 1; i > 0; i--) {
+							xArgSize = 4;
+							xArgs[i] = new MethodInformation.Argument(xArgSize, xCurOffset);
+							xCurOffset += xArgSize;
+						}
+						xArgSize = 4;
+						xArgs[0] = new MethodInformation.Argument(xArgSize, xCurOffset);
+					} else {
+						xArgs = new MethodInformation.Argument[xCurrentMethod.Parameters.Count];
+						xCurOffset = 0;
+						for (int i = xArgs.Length - 1; i >= 0; i--) {
+							int xArgSize = 4;
+							xArgs[i] = new MethodInformation.Argument(xArgSize, xCurOffset);
+							xCurOffset += xArgSize;
+						}
 					}
-					xMethodInfo = new MethodInformation(xMethodName, xVars, xArgs, !xCurrentMethod.ReturnType.ReturnType.FullName.Contains("System.Void"));
+					xMethodInfo = new MethodInformation(xMethodName, xVars, xArgs, !xCurrentMethod.ReturnType.ReturnType.FullName.Contains("System.Void"), !xCurrentMethod.IsStatic, xTypeInfo);
 				}
 				IL.Op xOp = GetOpFromType(mMap.MethodHeaderOp, null, xMethodInfo);
 				xOp.Assembler = mAssembler;
@@ -266,7 +341,7 @@ namespace Indy.IL2CPU {
 			}
 		}
 
-		private static IL.Op GetOpFromType(Type aType, Instruction aInstruction, MethodInformation aMethodInfo) {
+		private static Op GetOpFromType(Type aType, Instruction aInstruction, MethodInformation aMethodInfo) {
 			return (IL.Op)Activator.CreateInstance(aType, aInstruction, aMethodInfo);
 		}
 
@@ -385,12 +460,13 @@ namespace Indy.IL2CPU {
 							var xMethodDef = xReferencedType.Methods.GetMethod(aMethod.Name, aMethod.Parameters);
 							if (xMethodDef != null) {
 								QueueMethod(xMethodDef);
+								return;
 							}
 							var xCtorDef = xReferencedType.Constructors.GetConstructor(false, aMethod.Parameters);
 							if (xCtorDef != null) {
 								QueueMethod(xCtorDef);
+								return;
 							}
-							break;
 						}
 					}
 				}
@@ -402,12 +478,19 @@ namespace Indy.IL2CPU {
 						var xMethodDef = xReferencedType.Methods.GetMethod(aMethod.Name, aMethod.Parameters);
 						if (xMethodDef != null) {
 							QueueMethod(xMethodDef);
+							return;
+						}
+						var xCtorDef = xReferencedType.Constructors.GetConstructor(false, aMethod.Parameters);
+						if (xCtorDef != null) {
+							QueueMethod(xCtorDef);
+							return;
 						}
 					}
 				} else {
 					mCurrent.OnDebugLog("Error: Unhandled scope: " + aMethod.DeclaringType.Scope == null ? "**NULL**" : aMethod.DeclaringType.Scope.GetType().FullName);
 				}
 			}
+			throw new Exception("Method not found: '" + aMethod.ToString() + "'");
 		}
 
 		public static void QueueMethod(string aAssembly, string aType, string aMethod) {

@@ -12,7 +12,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			mAddress = aMethodInfo.Arguments[aIndex].VirtualAddress;
 		}
 		public Starg(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
+			: base(aInstruction, aMethodInfo, null) {
 			ParameterDefinition xParam = aInstruction.Operand as ParameterDefinition;
 			if (xParam != null) {
 				SetArgIndex(xParam.Sequence - 1, aMethodInfo);

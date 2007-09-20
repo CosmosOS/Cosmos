@@ -4,10 +4,11 @@ using Indy.IL2CPU.Assembler;
 using Indy.IL2CPU.Assembler.X86;
 using Mono.Cecil;
 using CPU = Indy.IL2CPU.Assembler.X86;
+using Instruction=Mono.Cecil.Cil.Instruction;
 
 namespace Indy.IL2CPU.IL.X86 {
 	public abstract class Op: IL.Op {
-		public Op(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
+		public Op(Instruction aInstruction, MethodInformation aMethodInfo, TypeInformation aTypeInfo)
 			: base(aInstruction, aMethodInfo) {
 		}
 		protected void Call(string aAddress) {

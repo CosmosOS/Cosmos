@@ -17,7 +17,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public Ldc_I4(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
+			: base(aInstruction, aMethodInfo, null) {
 			if (aInstruction.Operand != null) {
 				SetValue(aInstruction.Operand.ToString());
 			}

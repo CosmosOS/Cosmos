@@ -52,6 +52,7 @@
     <Compile Include="MethodReferenceExtensions.cs" />
     <Compile Include="ObjectImpl.cs" />
     <Compile Include="ObjectImplRefs.cs" />
+    <Compile Include="ObjectUtilities.cs" />
     <Compile Include="PInvokes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RuntimeEngineImpl.cs" />

@@ -11,7 +11,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		public readonly int TotalArgsSize = 0;
 		public readonly int LocalsCount = 0;
 		public readonly bool HasReturnValue = false;
-		public X86MethodFooterOp(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
+		public X86MethodFooterOp(Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
 			if (aMethodInfo.Arguments.Length > 0) {
 				TotalArgsSize += aMethodInfo.Arguments[0].Offset + aMethodInfo.Arguments[0].Size;

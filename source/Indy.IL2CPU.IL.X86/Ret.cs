@@ -9,7 +9,7 @@ namespace Indy.IL2CPU.IL.X86 {
 	public class Ret: Op {
 		private bool mHasReturn;
 		public Ret(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
+			: base(aInstruction, aMethodInfo, null) {
 			mHasReturn = aMethodInfo.HasReturnValue;
 		}
 		public override void DoAssemble() {

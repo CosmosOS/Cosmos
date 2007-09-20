@@ -36,7 +36,7 @@ namespace HelloWorldMetal {
 //			uint error = GetLastError();
 			uint xCharsWritten;
 			string theMessage = "Hello, World!";
-			WriteConsole(xHandle, theMessage, 13, out xCharsWritten, IntPtr.Zero);
+			WriteConsole(xHandle, theMessage, 5, out xCharsWritten, IntPtr.Zero);
 			//error = GetLastError();
 		}
 
