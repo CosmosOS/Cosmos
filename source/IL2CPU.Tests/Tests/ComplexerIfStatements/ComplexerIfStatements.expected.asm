@@ -13,6 +13,10 @@ section '.code' code readable executable
 			call System_Void___Program_Main____
 			pushd 0
 			call System_Void___Indy_IL2CPU_RuntimeEngine_FinalizeApplication___System_UInt32___
+			;Method: System.Void Indy.IL2CPU.RuntimeEngine::FinalizeApplication(System.UInt32)
+			;  Locals:
+			;  Args:
+			;    [1] aExitCode
 
 	System_Void___Indy_IL2CPU_RuntimeEngine_FinalizeApplication___System_UInt32___:
 			push ebp
@@ -47,6 +51,10 @@ section '.code' code readable executable
 			; IL: Ret 
 			pop ebp
 			ret 4
+			;Method: System.Void Indy.IL2CPU.PInvokes::Kernel32_ExitProcess(System.UInt32)
+			;  (No locals)
+			;  Args:
+			;    [1] uExitCode
 
 	System_Void___Indy_IL2CPU_PInvokes_Kernel32_ExitProcess___System_UInt32___:
 			push ebp
@@ -57,6 +65,9 @@ section '.code' code readable executable
 			pushd eax
 			pop ebp
 			ret 4
+			;Method: System.Void Indy.IL2CPU.RuntimeEngine::InitializeApplication()
+			;  Locals:
+			;  Args:
 
 	System_Void___Indy_IL2CPU_RuntimeEngine_InitializeApplication____:
 			push ebp
@@ -78,6 +89,9 @@ section '.code' code readable executable
 			; IL: Ret 
 			pop ebp
 			ret 
+			;Method: System.Void Indy.IL2CPU.RuntimeEngine::ShutdownHeap()
+			;  Locals:
+			;  Args:
 
 	System_Void___Indy_IL2CPU_RuntimeEngine_ShutdownHeap____:
 			push ebp
@@ -113,6 +127,10 @@ section '.code' code readable executable
 			; IL: Ret 
 			pop ebp
 			ret 
+			;Method: System.Boolean Indy.IL2CPU.PInvokes::Kernel32_HeapDestroy(System.IntPtr)
+			;  (No locals)
+			;  Args:
+			;    [1] aHeap
 
 	System_Boolean___Indy_IL2CPU_PInvokes_Kernel32_HeapDestroy___System_IntPtr___:
 			push ebp
@@ -124,6 +142,9 @@ section '.code' code readable executable
 			pop eax
 			pop ebp
 			ret 4
+			;Method: System.Void Indy.IL2CPU.RuntimeEngine::StartupHeap()
+			;  Locals:
+			;  Args:
 
 	System_Void___Indy_IL2CPU_RuntimeEngine_StartupHeap____:
 			push ebp
@@ -159,6 +180,12 @@ section '.code' code readable executable
 			; IL: Ret 
 			pop ebp
 			ret 
+			;Method: System.IntPtr Indy.IL2CPU.PInvokes::Kernel32_HeapCreate(System.UInt32,System.UInt32,System.UInt32)
+			;  (No locals)
+			;  Args:
+			;    [1] flOptions
+			;    [2] dwInitialSize
+			;    [3] dwMaximumSize
 
 	System_IntPtr___Indy_IL2CPU_PInvokes_Kernel32_HeapCreate___System_UInt32__System_UInt32__System_UInt32___:
 			push ebp
@@ -174,6 +201,11 @@ section '.code' code readable executable
 			pop eax
 			pop ebp
 			ret 12
+			;Method: System.Void Program::Main()
+			;  Locals:
+			;    [0] V_0
+			;    [1] V_1
+			;  Args:
 
 	System_Void___Program_Main____:
 			push ebp
@@ -192,11 +224,11 @@ section '.code' code readable executable
 		.L00000002:
 			; IL: Stloc_0 
 			pop eax
-			mov [ebp - 0Ch],eax
+			mov [ebp - 04h],eax
 
 		.L00000003:
 			; IL: Ldloc_0 
-			mov eax,[ebp - 0Ch]
+			mov eax,[ebp - 04h]
 			push eax
 
 		.L00000004:
@@ -207,7 +239,7 @@ section '.code' code readable executable
 		.L00000009:
 			; IL: Stloc_1 
 			pop eax
-			mov [ebp - 010h],eax
+			mov [ebp - 08h],eax
 
 		.L0000000A:
 			; IL: Ret 
@@ -215,6 +247,12 @@ section '.code' code readable executable
 			add esp,4
 			pop ebp
 			ret 
+			;Method: System.Int32 Program::ConditionalFunction(System.Boolean)
+			;  Locals:
+			;    [0] V_0
+			;    [1] V_1
+			;  Args:
+			;    [1] aValue
 
 	System_Int32___Program_ConditionalFunction___System_Boolean___:
 			push ebp
@@ -255,11 +293,11 @@ section '.code' code readable executable
 		.L00000005:
 			; IL: Stloc_1 
 			pop eax
-			mov [ebp - 010h],eax
+			mov [ebp - 08h],eax
 
 		.L00000006:
 			; IL: Ldloc_1 
-			mov eax,[ebp - 010h]
+			mov eax,[ebp - 08h]
 			push eax
 
 		.L00000007:
@@ -301,11 +339,11 @@ section '.code' code readable executable
 		.L0000000E:
 			; IL: Stloc_1 
 			pop eax
-			mov [ebp - 010h],eax
+			mov [ebp - 08h],eax
 
 		.L0000000F:
 			; IL: Ldloc_1 
-			mov eax,[ebp - 010h]
+			mov eax,[ebp - 08h]
 			push eax
 
 		.L00000010:
@@ -325,7 +363,7 @@ section '.code' code readable executable
 		.L00000014:
 			; IL: Stloc_0 
 			pop eax
-			mov [ebp - 0Ch],eax
+			mov [ebp - 04h],eax
 
 		.L00000015:
 			; IL: Br_S Mono.Cecil.Cil.Instruction
@@ -342,7 +380,7 @@ section '.code' code readable executable
 		.L00000019:
 			; IL: Stloc_0 
 			pop eax
-			mov [ebp - 0Ch],eax
+			mov [ebp - 04h],eax
 
 		.L0000001A:
 			; IL: Br_S Mono.Cecil.Cil.Instruction
@@ -359,7 +397,7 @@ section '.code' code readable executable
 		.L0000001E:
 			; IL: Stloc_0 
 			pop eax
-			mov [ebp - 0Ch],eax
+			mov [ebp - 04h],eax
 
 		.L0000001F:
 			; IL: Br_S Mono.Cecil.Cil.Instruction
@@ -367,7 +405,7 @@ section '.code' code readable executable
 
 		.L00000021:
 			; IL: Ldloc_0 
-			mov eax,[ebp - 0Ch]
+			mov eax,[ebp - 04h]
 			push eax
 
 		.L00000022:

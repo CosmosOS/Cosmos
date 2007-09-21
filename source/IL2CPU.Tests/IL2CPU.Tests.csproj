@@ -45,6 +45,8 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="Tests\TwoMethodsWithLocals\TwoMethodsWithLocals.cs">
+    </None>
     <None Include="Tests\ComplexerIfStatements\ComplexerIfStatements.cs">
     </None>
     <None Include="Tests\TwoIfStatements\TwoIfStatements.cs">
@@ -163,6 +165,14 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Tests\TwoIfStatements\TwoIfStatements.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Tests\TwoMethodsWithLocals\TwoMethodsWithLocals.expected.asm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Tests\TwoMethodsWithLocals\TwoMethodsWithLocals.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

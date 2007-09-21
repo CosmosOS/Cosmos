@@ -10,15 +10,15 @@ section '.code' code readable executable
 
 	___ENTRYPOINT___:
 			call System_Void___Indy_IL2CPU_RuntimeEngine_InitializeApplication____
-			call System_Void___IL2CPU_Tests_Tests_TestEmptyMethodApp_Main____
+			call System_Void___ConsoleDrv_Main____
 			pushd 0
 			call System_Void___Indy_IL2CPU_RuntimeEngine_FinalizeApplication___System_UInt32___
-			;Method: System.Void IL2CPU.Tests.Tests.TestEmptyMethodApp::Main()
+			;Method: System.Void ConsoleDrv::Main()
 			;  Locals:
 			;    [0] V_0
 			;  Args:
 
-	System_Void___IL2CPU_Tests_Tests_TestEmptyMethodApp_Main____:
+	System_Void___ConsoleDrv_Main____:
 			push ebp
 			mov ebp,esp
 			pushd 0
@@ -28,8 +28,115 @@ section '.code' code readable executable
 			nop
 
 		.L00000001:
-			; IL: Ldc_I4_5 
-			pushd 05h
+			; IL: Call System.Int32 ConsoleDrv::Function2()
+			call System_Int32___ConsoleDrv_Function2____
+			push eax
+
+		.L00000006:
+			; IL: Stloc_0 
+			pop eax
+			mov [ebp - 04h],eax
+
+		.L00000007:
+			; IL: Ret 
+			add esp,4
+			pop ebp
+			ret 
+			;Method: System.Int32 ConsoleDrv::Function2()
+			;  Locals:
+			;    [0] V_0
+			;    [1] V_1
+			;    [2] V_2
+			;  Args:
+
+	System_Int32___ConsoleDrv_Function2____:
+			push ebp
+			mov ebp,esp
+			pushd 0
+			pushd 0
+			pushd 0
+
+		.L00000000:
+			; IL: Nop 
+			nop
+
+		.L00000001:
+			; IL: Call System.Int32 ConsoleDrv::Function1()
+			call System_Int32___ConsoleDrv_Function1____
+			push eax
+
+		.L00000006:
+			; IL: Stloc_0 
+			pop eax
+			mov [ebp - 04h],eax
+
+		.L00000007:
+			; IL: Ldc_I4_3 
+			pushd 03h
+
+		.L00000008:
+			; IL: Stloc_1 
+			pop eax
+			mov [ebp - 08h],eax
+
+		.L00000009:
+			; IL: Ldloc_1 
+			mov eax,[ebp - 08h]
+			push eax
+
+		.L0000000A:
+			; IL: Ldloc_0 
+			mov eax,[ebp - 04h]
+			push eax
+
+		.L0000000B:
+			; IL: Add 
+			pop eax
+			add eax,[esp]
+			add esp,4
+			pushd eax
+
+		.L0000000C:
+			; IL: Stloc_2 
+			pop eax
+			mov [ebp - 0Ch],eax
+
+		.L0000000D:
+			; IL: Br_S Mono.Cecil.Cil.Instruction
+			jmp .L0000000F
+
+		.L0000000F:
+			; IL: Ldloc_2 
+			mov eax,[ebp - 0Ch]
+			push eax
+
+		.L00000010:
+			; IL: Ret 
+			pop eax
+			add esp,4
+			add esp,4
+			add esp,4
+			pop ebp
+			ret 
+			;Method: System.Int32 ConsoleDrv::Function1()
+			;  Locals:
+			;    [0] V_0
+			;    [1] V_1
+			;  Args:
+
+	System_Int32___ConsoleDrv_Function1____:
+			push ebp
+			mov ebp,esp
+			pushd 0
+			pushd 0
+
+		.L00000000:
+			; IL: Nop 
+			nop
+
+		.L00000001:
+			; IL: Ldc_I4_2 
+			pushd 02h
 
 		.L00000002:
 			; IL: Stloc_0 
@@ -37,7 +144,28 @@ section '.code' code readable executable
 			mov [ebp - 04h],eax
 
 		.L00000003:
+			; IL: Ldloc_0 
+			mov eax,[ebp - 04h]
+			push eax
+
+		.L00000004:
+			; IL: Stloc_1 
+			pop eax
+			mov [ebp - 08h],eax
+
+		.L00000005:
+			; IL: Br_S Mono.Cecil.Cil.Instruction
+			jmp .L00000007
+
+		.L00000007:
+			; IL: Ldloc_1 
+			mov eax,[ebp - 08h]
+			push eax
+
+		.L00000008:
 			; IL: Ret 
+			pop eax
+			add esp,4
 			add esp,4
 			pop ebp
 			ret 

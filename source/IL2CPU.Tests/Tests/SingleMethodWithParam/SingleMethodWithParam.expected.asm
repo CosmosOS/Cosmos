@@ -13,6 +13,10 @@ section '.code' code readable executable
 			call System_Void___Program_Main____
 			pushd 0
 			call System_Void___Indy_IL2CPU_RuntimeEngine_FinalizeApplication___System_UInt32___
+			;Method: System.Void Indy.IL2CPU.RuntimeEngine::FinalizeApplication(System.UInt32)
+			;  Locals:
+			;  Args:
+			;    [1] aExitCode
 
 	System_Void___Indy_IL2CPU_RuntimeEngine_FinalizeApplication___System_UInt32___:
 			push ebp
@@ -47,6 +51,10 @@ section '.code' code readable executable
 			; IL: Ret 
 			pop ebp
 			ret 4
+			;Method: System.Void Indy.IL2CPU.PInvokes::Kernel32_ExitProcess(System.UInt32)
+			;  (No locals)
+			;  Args:
+			;    [1] uExitCode
 
 	System_Void___Indy_IL2CPU_PInvokes_Kernel32_ExitProcess___System_UInt32___:
 			push ebp
@@ -57,6 +65,9 @@ section '.code' code readable executable
 			pushd eax
 			pop ebp
 			ret 4
+			;Method: System.Void Indy.IL2CPU.RuntimeEngine::InitializeApplication()
+			;  Locals:
+			;  Args:
 
 	System_Void___Indy_IL2CPU_RuntimeEngine_InitializeApplication____:
 			push ebp
@@ -78,6 +89,9 @@ section '.code' code readable executable
 			; IL: Ret 
 			pop ebp
 			ret 
+			;Method: System.Void Indy.IL2CPU.RuntimeEngine::ShutdownHeap()
+			;  Locals:
+			;  Args:
 
 	System_Void___Indy_IL2CPU_RuntimeEngine_ShutdownHeap____:
 			push ebp
@@ -113,6 +127,10 @@ section '.code' code readable executable
 			; IL: Ret 
 			pop ebp
 			ret 
+			;Method: System.Boolean Indy.IL2CPU.PInvokes::Kernel32_HeapDestroy(System.IntPtr)
+			;  (No locals)
+			;  Args:
+			;    [1] aHeap
 
 	System_Boolean___Indy_IL2CPU_PInvokes_Kernel32_HeapDestroy___System_IntPtr___:
 			push ebp
@@ -124,6 +142,9 @@ section '.code' code readable executable
 			pop eax
 			pop ebp
 			ret 4
+			;Method: System.Void Indy.IL2CPU.RuntimeEngine::StartupHeap()
+			;  Locals:
+			;  Args:
 
 	System_Void___Indy_IL2CPU_RuntimeEngine_StartupHeap____:
 			push ebp
@@ -159,6 +180,12 @@ section '.code' code readable executable
 			; IL: Ret 
 			pop ebp
 			ret 
+			;Method: System.IntPtr Indy.IL2CPU.PInvokes::Kernel32_HeapCreate(System.UInt32,System.UInt32,System.UInt32)
+			;  (No locals)
+			;  Args:
+			;    [1] flOptions
+			;    [2] dwInitialSize
+			;    [3] dwMaximumSize
 
 	System_IntPtr___Indy_IL2CPU_PInvokes_Kernel32_HeapCreate___System_UInt32__System_UInt32__System_UInt32___:
 			push ebp
@@ -174,6 +201,9 @@ section '.code' code readable executable
 			pop eax
 			pop ebp
 			ret 12
+			;Method: System.Void Program::Main()
+			;  Locals:
+			;  Args:
 
 	System_Void___Program_Main____:
 			push ebp
@@ -199,6 +229,11 @@ section '.code' code readable executable
 			; IL: Ret 
 			pop ebp
 			ret 
+			;Method: System.Void Program::TheMethod(System.Int32)
+			;  Locals:
+			;    [0] V_0
+			;  Args:
+			;    [1] aParam
 
 	System_Void___Program_TheMethod___System_Int32___:
 			push ebp
@@ -217,7 +252,7 @@ section '.code' code readable executable
 		.L00000002:
 			; IL: Stloc_0 
 			pop eax
-			mov [ebp - 0Ch],eax
+			mov [ebp - 04h],eax
 
 		.L00000003:
 			; IL: Ret 
