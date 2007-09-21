@@ -33,11 +33,17 @@ namespace Indy.IL2CPU.IL.X86 {
 			Pushd("eax");
 //			Move(Assembler, "ecx", "eax");
 			Pushd("eax");
+			//Pushd("ecx");
 			for (int i = 0; i < CtorArgumentCount; i++) {
 				Pushd("[ebp - 08h]");
 			}
-			//Pushd("ecx");
 			Call(CtorName);
+			Pop("eax");
+			for (int i = 0; i < CtorArgumentCount; i++) {
+				Assembler.Add(new CPUx86.Add("esp", "4"));
+			}
+			Pushd("eax");
+
 			//Assembler.Add(new CPUx86.Add("esp", objSize.ToString()));
 		}
 	}

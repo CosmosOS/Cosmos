@@ -1,6 +1,6 @@
 ﻿// this file supports the VERBOSE_DEBUG define. this makes it emit a bunch of comments in the assembler output.
 // note that the tests are supposed to NOT include these comments
-// #define VERBOSE_DEBUG
+ #define VERBOSE_DEBUG
 using System;
 using System.Collections.Generic;
 using System.IO;

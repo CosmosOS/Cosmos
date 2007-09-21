@@ -4,9 +4,7 @@ using System.Runtime.InteropServices;
 namespace HelloWorld {
 	public class TestObject {
 		public uint theValue;
-		private readonly string TheMessage;
-		public TestObject(string aMessage) {
-			TheMessage = aMessage;
+		public TestObject() {
 		}
 
 		public void IncrementValue() {
@@ -17,26 +15,27 @@ namespace HelloWorld {
 			theValue = theValue + by;
 		}
 
-		public void DoWrite() {
-			IntPtr xHandle = GetStdHandle(-11);
-			uint xCharsWritten;
-			WriteConsole(xHandle, TheMessage, theValue, out xCharsWritten, IntPtr.Zero);
+		public uint Value {
+			get {
+				return theValue;
+			}
 		}
-		[DllImport("kernel32.dll")]
-		static extern IntPtr GetStdHandle(int nStdHandle);
-		[DllImport("kernel32.dll")]
-		static extern bool WriteConsole(IntPtr hConsoleOutput, string lpBuffer,
-		   uint nNumberOfCharsToWrite, out uint lpNumberOfCharsWritten,
-		   IntPtr lpReserved);
+//		[DllImport("kernel32.dll")]
+//		static extern IntPtr GetStdHandle(int nStdHandle);
+//		[DllImport("kernel32.dll")]
+//		static extern bool WriteConsole(IntPtr hConsoleOutput, string lpBuffer,
+//		   uint nNumberOfCharsToWrite, out uint lpNumberOfCharsWritten,
+//		   IntPtr lpReserved);
 	}
 	public class Program {
 		public static void UseTestObject() {
-			TestObject Hello = new TestObject("Hello, There!");
-			//TestObject World = new TestObject("World Control!");
+			TestObject Hello = new TestObject();
+			TestObject World = new TestObject();
 			Hello.IncrementValue(7);
-			Hello.DoWrite();
-//			Hello.IncrementValue(6);
-//			Hello.DoWrite();
+			World.IncrementValue(5);
+			uint theValue = Hello.Value + World.Value;
+			//World.IncrementValue(6);
+			//World.DoWrite();
 		}
 
 		public static void CallInteger() {
