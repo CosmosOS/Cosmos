@@ -158,7 +158,7 @@ namespace Indy.IL2CPU {
 					mCurrent.OnDebugLog("Error: Unhandled scope: " + aRef.Scope == null ? "**NULL**" : aRef.Scope.GetType().FullName);
 				}
 			}
-			throw new Exception("Could not find TypeDefinition!");
+			throw new Exception("Could not find TypeDefinition! (" + aRef.FullName + ")");
 		}
 
 		/// <summary>
@@ -253,11 +253,17 @@ namespace Indy.IL2CPU {
 				TypeInformation xTypeInfo = null;
 				{
 					if (!xCurrentMethod.IsStatic) {
+						if(xCurrentMethod.GetFullName() == "System.String..ctor(System.Char[],System.Int32,System.Int32)") {
+							Console.Beep();
+						}
 						SortedList<string, TypeInformation.Field> xTypeFields = new SortedList<string, TypeInformation.Field>();
 						uint xObjectStorageSize = ObjectImpl.FieldDataOffset;
 						TypeDefinition xCurrentInspectedType = GetDefinitionFromTypeReference(xCurrentMethod.DeclaringType);
 						do {
 							foreach (FieldDefinition xField in xCurrentInspectedType.Fields) {
+								if (xField.IsStatic) {
+									continue;
+								}
 								TypeDefinition xFieldType = GetDefinitionFromTypeReference(xField.FieldType);
 								uint xFieldSize;
 								if (xFieldType.IsClass) {
@@ -274,6 +280,10 @@ namespace Indy.IL2CPU {
 								break;
 							}
 						} while (true);
+						if(xCurrentInspectedType.FullName == "System.String") {
+							xTypeFields.Add("$$Storage$$", new TypeInformation.Field(xObjectStorageSize, 4));
+							xObjectStorageSize += 4;
+						}
 						xTypeInfo = new TypeInformation(xObjectStorageSize, xTypeFields);
 					}
 				}
@@ -607,7 +617,25 @@ namespace Indy.IL2CPU {
 				}
 				bool errorFound = false;
 				for (int i = 0; i < xMethod.Parameters.Count; i++) {
-					if (xMethod.Parameters[0].ToString() != aParamTypes[i]) {
+					if (xMethod.Parameters[i].ParameterType.FullName != aParamTypes[i]) {
+						errorFound = true;
+						break;
+					}
+				}
+				if (!errorFound) {
+					return xMethod;
+				}
+			}
+			foreach(MethodDefinition xMethod in aType.Constructors) {
+				if (xMethod.Name != aMethod) {
+					continue;
+				}
+				if (xMethod.Parameters.Count != aParamTypes.Length) {
+					continue;
+				}
+				bool errorFound = false;
+				for (int i = 0; i < xMethod.Parameters.Count; i++) {
+					if (xMethod.Parameters[i].ParameterType.FullName != aParamTypes[i]) {
 						errorFound = true;
 						break;
 					}

@@ -4,7 +4,6 @@ entry ___ENTRYPOINT___
 
 section '.data' data readable writeable
 
-	StringLiteral00000000 db 72,101,108,108,111,44,32,87,111,114,108,100,33,0
 	static_field__Indy_IL2CPU_RuntimeEngine_HeapHandle dd 0,0,0,0
 
 section '.code' code readable executable
@@ -206,15 +205,11 @@ section '.code' code readable executable
 			;  Locals:
 			;    [0] V_0
 			;    [1] V_1
-			;    [2] V_2
-			;    [3] V_3
 			;  Args:
 
 	System_Void___SimplePInvokeTest_Program_Main____:
 			push ebp
 			mov ebp,esp
-			pushd 0
-			pushd 0
 			pushd 0
 			pushd 0
 
@@ -223,52 +218,31 @@ section '.code' code readable executable
 			nop
 
 		.L00000001:
-			; IL: Ldc_I4_0 
-			pushd 00h
-
-		.L00000002:
-			; IL: Stloc_0 
-			pop eax
-			mov [ebp - 04h],eax
-
-		.L00000003:
-			; IL: Ldstr Hello, World!
-			mov eax,StringLiteral00000000
-			pushd eax
-
-		.L00000008:
-			; IL: Stloc_1 
-			pop eax
-			mov [ebp - 08h],eax
-
-		.L00000009:
 			; IL: Ldc_I4_M1 
 			pushd 0FFFFFFFFh
 
-		.L0000000A:
+		.L00000002:
 			; IL: Call System.Boolean SimplePInvokeTest.Program::MessageBeep(System.UInt32)
 			call System_Boolean___SimplePInvokeTest_Program_MessageBeep___System_UInt32___
 			push eax
 
-		.L0000000F:
-			; IL: Stloc_2 
+		.L00000007:
+			; IL: Stloc_0 
 			pop eax
-			mov [ebp - 0Ch],eax
+			mov [ebp - 04h],eax
 
-		.L00000010:
+		.L00000008:
 			; IL: Call System.UInt32 SimplePInvokeTest.Program::GetLastError()
 			call System_UInt32___SimplePInvokeTest_Program_GetLastError____
 			push eax
 
-		.L00000015:
-			; IL: Stloc_3 
+		.L0000000D:
+			; IL: Stloc_1 
 			pop eax
-			mov [ebp - 010h],eax
+			mov [ebp - 08h],eax
 
-		.L00000016:
+		.L0000000E:
 			; IL: Ret 
-			add esp,4
-			add esp,4
 			add esp,4
 			add esp,4
 			pop ebp

@@ -10,6 +10,16 @@ namespace Indy.IL2CPU.IL.X86 {
 	public class Call: Op {
 		public readonly string LabelName;
 		public readonly bool HasResult;
+		public Call(MethodReference aMethod)
+			: base(null, null) {
+			if (aMethod == null) {
+				throw new ArgumentNullException("aMethod");
+			}
+			HasResult = !aMethod.ReturnType.ReturnType.FullName.Contains("System.Void");
+			LabelName = new Asm.Label(aMethod).Name;
+			Engine.QueueMethodRef(aMethod);
+		}
+
 		public Call(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
 			HasResult = !((MethodReference)aInstruction.Operand).ReturnType.ReturnType.FullName.Contains("System.Void");

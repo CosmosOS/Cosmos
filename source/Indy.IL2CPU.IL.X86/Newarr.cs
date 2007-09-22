@@ -10,13 +10,21 @@ namespace Indy.IL2CPU.IL.X86 {
 		private uint mElementSize;
 		private string mCtorName;
 
+		public Newarr(TypeReference aTypeRef):base(null, null) {
+			Initialize(aTypeRef);
+		}
+
 		public Newarr(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
 			TypeReference xTypeRef = aInstruction.Operand as TypeReference;
 			if (xTypeRef == null) {
 				throw new Exception("No TypeRef found!");
 			}
-			mElementSize = Engine.GetFieldStorageSize(xTypeRef);
+			Initialize(xTypeRef);
+		}
+
+		private void Initialize(TypeReference aTypeRef) {
+			mElementSize = Engine.GetFieldStorageSize(aTypeRef);
 			TypeDefinition xArrayType = Engine.GetTypeDefinition("mscorlib", "System.Array");
 			MethodDefinition xCtor = xArrayType.Constructors[0];
 			mCtorName = new Assembler.Label(xCtor).Name;
