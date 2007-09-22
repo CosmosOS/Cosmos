@@ -133,6 +133,7 @@
     <Compile Include="Endfinally.cs" />
     <Compile Include="Initblk.cs" />
     <Compile Include="Initobj.cs" />
+    <Compile Include="X86CustomMethodImplementationProxyOp.cs" />
     <Compile Include="X86MethodFooterOp.cs" />
     <Compile Include="X86MethodHeaderOp.cs" />
     <Compile Include="Op.cs" />

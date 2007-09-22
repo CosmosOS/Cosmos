@@ -20,13 +20,16 @@ namespace Indy.IL2CPU.IL.X86 {
 				return typeof(X86OpCodeMap).Assembly;
 			}
 		}
+		protected override Type GetCustomMethodImplementationProxyOp() {
+			return typeof(X86CustomMethodImplementationProxyOp);
+		}
 
 		protected override Type GetPInvokeMethodBodyOp() {
-			return typeof (X86PInvokeMethodBodyOp);
+			return typeof(X86PInvokeMethodBodyOp);
 		}
 
 		protected override Type GetRuntimeHelpers_InitializeArrayOp() {
-			return typeof (X86RuntimeHelpers_InitializeArrayOp);
+			return typeof(X86RuntimeHelpers_InitializeArrayOp);
 		}
 	}
 }

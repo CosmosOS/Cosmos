@@ -11,6 +11,10 @@ namespace Indy.IL2CPU.IL.X86 {
 		protected void SetLocalIndex(int aIndex, MethodInformation aMethodInfo) {
 			mAddress = aMethodInfo.Locals[aIndex].VirtualAddress;
 		}
+		public Ldloc(MethodInformation aMethodInfo, int aIndex):base(null, aMethodInfo) {
+			SetLocalIndex(aIndex, aMethodInfo);
+		}
+
 		public Ldloc(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
 			int xLocalIndex;

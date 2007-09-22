@@ -81,7 +81,6 @@ namespace Indy.IL2CPU {
 					switch (aTargetPlatform) {
 						case TargetPlatformEnum.x86: {
 								mMap = (OpCodeMap)Activator.CreateInstance(Type.GetType("Indy.IL2CPU.IL.X86.X86OpCodeMap, Indy.IL2CPU.IL.X86", true));
-								//new X86OpCodeMap();
 								break;
 							}
 						default:
@@ -125,6 +124,19 @@ namespace Indy.IL2CPU {
 			} finally {
 				mCurrent = null;
 			}
+		}
+
+		public static MethodDefinition GetDefinitionFromMethodReference(MethodReference aRef) {
+			TypeDefinition xTypeDef = GetDefinitionFromTypeReference(aRef.DeclaringType);
+			MethodDefinition xMethod = xTypeDef.Methods.GetMethod(aRef.Name, aRef.Parameters);
+			if (xMethod != null) {
+				return xMethod;
+			}
+			xMethod = xTypeDef.Constructors.GetConstructor(aRef.Name == MethodDefinition.Cctor, aRef.Parameters);
+			if (xMethod != null) {
+				return xMethod;
+			}
+			throw new Exception("Couldn't find Method! ('" + aRef.GetFullName() + "'");
 		}
 
 		public static TypeDefinition GetDefinitionFromTypeReference(TypeReference aRef) {
@@ -172,6 +184,8 @@ namespace Indy.IL2CPU {
 				return 4;
 			}
 			switch (aType.FullName) {
+				case "System.Char":
+					return 2;
 				case "System.Byte":
 				case "System.SByte":
 					return 1;
@@ -253,7 +267,7 @@ namespace Indy.IL2CPU {
 				TypeInformation xTypeInfo = null;
 				{
 					if (!xCurrentMethod.IsStatic) {
-						if(xCurrentMethod.GetFullName() == "System.String..ctor(System.Char[],System.Int32,System.Int32)") {
+						if (xCurrentMethod.GetFullName() == "System.String..ctor(System.Char[],System.Int32,System.Int32)") {
 							Console.Beep();
 						}
 						SortedList<string, TypeInformation.Field> xTypeFields = new SortedList<string, TypeInformation.Field>();
@@ -280,7 +294,7 @@ namespace Indy.IL2CPU {
 								break;
 							}
 						} while (true);
-						if(xCurrentInspectedType.FullName == "System.String") {
+						if (xCurrentMethod.DeclaringType.FullName == "System.String") {
 							xTypeFields.Add("$$Storage$$", new TypeInformation.Field(xObjectStorageSize, 4));
 							xObjectStorageSize += 4;
 						}
@@ -306,17 +320,36 @@ namespace Indy.IL2CPU {
 						int xArgSize;
 						for (int i = xArgs.Length - 1; i > 0; i--) {
 							xArgSize = 4;
-							xArgs[i] = new MethodInformation.Argument(xArgSize, xCurOffset);
+							ParameterDefinition xParamDef = xCurrentMethod.Parameters[xArgs.Length - i - 1];
+							MethodInformation.Argument.KindEnum xKind = MethodInformation.Argument.KindEnum.In;
+							if (xParamDef.IsOut) {
+								if (xParamDef.IsIn) {
+									xKind = MethodInformation.Argument.KindEnum.ByRef;
+								} else {
+									xKind = MethodInformation.Argument.KindEnum.Out;
+								}
+							}
+							xArgs[i] = new MethodInformation.Argument(xArgSize, xCurOffset, xKind);
 							xCurOffset += xArgSize;
 						}
 						xArgSize = 4;
-						xArgs[0] = new MethodInformation.Argument(xArgSize, xCurOffset);
+						// this
+						xArgs[0] = new MethodInformation.Argument(xArgSize, xCurOffset, MethodInformation.Argument.KindEnum.In);
 					} else {
 						xArgs = new MethodInformation.Argument[xCurrentMethod.Parameters.Count];
 						xCurOffset = 0;
 						for (int i = xArgs.Length - 1; i >= 0; i--) {
 							int xArgSize = 4;
-							xArgs[i] = new MethodInformation.Argument(xArgSize, xCurOffset);
+							ParameterDefinition xParamDef = xCurrentMethod.Parameters[xArgs.Length - i - 1];
+							MethodInformation.Argument.KindEnum xKind = MethodInformation.Argument.KindEnum.In;
+							if (xParamDef.IsOut) {
+								if (xParamDef.IsIn) {
+									xKind = MethodInformation.Argument.KindEnum.ByRef;
+								} else {
+									xKind = MethodInformation.Argument.KindEnum.Out;
+								}
+							}
+							xArgs[i] = new MethodInformation.Argument(xArgSize, xCurOffset, xKind);
 							xCurOffset += xArgSize;
 						}
 					}
@@ -343,40 +376,55 @@ namespace Indy.IL2CPU {
 				}
 #endif
 				xOp.Assemble();
+				bool xIsCustomImplementation = false;
+				MethodDefinition xCustomImplementation = null;
 				if (mCustomMethodImplementation.ContainsKey(xCurrentMethod.GetFullName())) {
+					xIsCustomImplementation = true;
 					MethodInfo xReplacementMethod = mCustomMethodImplementation[xCurrentMethod.GetFullName()];
 					string[] xParamTypes = new string[xReplacementMethod.GetParameters().Length];
 					for (int i = 0; i < xReplacementMethod.GetParameters().Length; i++) {
 						xParamTypes[i] = xReplacementMethod.GetParameters()[i].ParameterType.FullName;
 					}
-					xCurrentMethod = GetMethodDefinition(GetTypeDefinition(xReplacementMethod.DeclaringType.Assembly.FullName, xReplacementMethod.DeclaringType.FullName), xReplacementMethod.Name, xParamTypes);
-					if (xCurrentMethod == null) {
+					xCustomImplementation = GetMethodDefinition(GetTypeDefinition(xReplacementMethod.DeclaringType.Assembly.FullName, xReplacementMethod.DeclaringType.FullName), xReplacementMethod.Name, xParamTypes);
+					if (xCustomImplementation == null) {
 						throw new Exception("CustomMethodImplementation not found!");
 					}
 				}
 				// what to do if a method doesn't have a body?
-				if (xCurrentMethod.HasBody) {
-					// todo: add support for types which need different stack size
-					foreach (Instruction xInstruction in xCurrentMethod.Body.Instructions) {
-						MethodReference xMethodReference = xInstruction.Operand as MethodReference;
-						if (xMethodReference != null) {
-							QueueMethodRef(xMethodReference);
-						}
-						xOp = GetOpFromType(mMap.GetOpForOpCode(xInstruction.OpCode.Code), xInstruction, xMethodInfo);
-						xOp.Assembler = mAssembler;
-						xOp.Assemble();
-					}
-				} else {
-					if (xCurrentMethod.IsPInvokeImpl) {
-						HandlePInvoke(xCurrentMethod, xMethodInfo);
-					} else {
-						if (xMethodName == "System_Void___System_Runtime_CompilerServices_RuntimeHelpers_InitializeArray___System_Array__System_RuntimeFieldHandle___") {
-							xOp = GetOpFromType(mMap.RuntimeHelpers_InitializeArrayOp, null, xMethodInfo);
+				bool xContentProduced = false;
+				if (xIsCustomImplementation) {
+					// this is for the support for having extra fields on types, and being able to use
+					// them in custom implementation methods
+					CustomMethodImplementationProxyOp xProxyOp = (CustomMethodImplementationProxyOp)GetOpFromType(mMap.CustomMethodImplementationProxyOp, null, xMethodInfo);
+					xProxyOp.Assembler = mAssembler;
+					xProxyOp.ProxiedMethod = xCustomImplementation;
+					xProxyOp.Assemble();
+					xContentProduced = true;
+				}
+				if (!xContentProduced) {
+					if (xCurrentMethod.HasBody) {
+						// todo: add support for types which need different stack size
+						foreach (Instruction xInstruction in xCurrentMethod.Body.Instructions) {
+							MethodReference xMethodReference = xInstruction.Operand as MethodReference;
+							if (xMethodReference != null) {
+								QueueMethodRef(xMethodReference);
+							}
+							xOp = GetOpFromType(mMap.GetOpForOpCode(xInstruction.OpCode.Code), xInstruction, xMethodInfo);
 							xOp.Assembler = mAssembler;
 							xOp.Assemble();
+						}
+					} else {
+						if (xCurrentMethod.IsPInvokeImpl) {
+							HandlePInvoke(xCurrentMethod, xMethodInfo);
 						} else {
-							Console.WriteLine("\t-- Method not handled!");
-							mAssembler.Add(new Literal("; Method not being generated yet, as it's handled by an iCall"));
+							if (xMethodName == "System_Void___System_Runtime_CompilerServices_RuntimeHelpers_InitializeArray___System_Array__System_RuntimeFieldHandle___") {
+								xOp = GetOpFromType(mMap.RuntimeHelpers_InitializeArrayOp, null, xMethodInfo);
+								xOp.Assembler = mAssembler;
+								xOp.Assemble();
+							} else {
+								Console.WriteLine("\t-- Method not handled!");
+								mAssembler.Add(new Literal("; Method not being generated yet, as it's handled by an iCall"));
+							}
 						}
 					}
 				}
@@ -474,14 +522,6 @@ namespace Indy.IL2CPU {
 				throw new Exception("ERROR: No Current Engine found!");
 			}
 			MethodDefinition xActualMethod = aMethod;
-			#region replace real methods with their IL2CPU implementations
-			string xMethodName = aMethod.GetFullName();
-			switch (xMethodName) {
-				case "System.Object..ctor()":
-					xActualMethod = ObjectImplRefs.Object_Ctor;
-					break;
-			}
-			#endregion
 			if (!mCurrent.mMethods.ContainsKey(xActualMethod)) {
 				mCurrent.mMethods.Add(xActualMethod, false);
 			}
@@ -626,7 +666,7 @@ namespace Indy.IL2CPU {
 					return xMethod;
 				}
 			}
-			foreach(MethodDefinition xMethod in aType.Constructors) {
+			foreach (MethodDefinition xMethod in aType.Constructors) {
 				if (xMethod.Name != aMethod) {
 					continue;
 				}

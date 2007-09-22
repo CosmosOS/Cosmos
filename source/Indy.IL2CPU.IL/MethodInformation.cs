@@ -18,15 +18,22 @@ namespace Indy.IL2CPU.IL {
 		}
 
 		public struct Argument {
-			public Argument(int aSize, int aOffset) {
+			public enum KindEnum {
+				In,
+				ByRef,
+				Out
+			}
+			public Argument(int aSize, int aOffset, KindEnum aKind) {
 				Size = aSize;
 				Offset = aOffset;
 				VirtualAddress = "ebp + 0" + (Offset + Size + 4).ToString("X") + "h";
+				Kind = aKind;
 			}
 
 			public readonly string VirtualAddress;
 			public readonly int Size;
 			public readonly int Offset;
+			public readonly KindEnum Kind;
 		}
 
 		public MethodInformation(string aLabelName, Variable[] aLocals, Argument[] aArguments, bool aHasReturnValue, bool aIsInstanceMethod, TypeInformation aTypeInfo) {

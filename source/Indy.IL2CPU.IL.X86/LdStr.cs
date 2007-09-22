@@ -8,7 +8,7 @@ using Asm = Indy.IL2CPU.Assembler.Assembler;
 using Instruction = Mono.Cecil.Cil.Instruction;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(Code.Ldstr, false)]
+	[OpCode(Code.Ldstr, true)]
 	public class LdStr: Op {
 		public readonly string LiteralStr;
 		public LdStr(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
@@ -20,7 +20,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			// Make sure the crawler finds string constructors
 			string xDataName = Assembler.GetIdentifier("StringLiteral");
 			var xDataByteArray = new StringBuilder();
-			foreach (byte x in Encoding.UTF32.GetBytes(LiteralStr)) {
+			foreach (byte x in Encoding.ASCII.GetBytes(LiteralStr)) {
 				xDataByteArray.Append(x.ToString());
 				xDataByteArray.Append(",");
 			}

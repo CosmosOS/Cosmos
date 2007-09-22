@@ -19,14 +19,20 @@ namespace Indy.IL2CPU.Assembler {
 		private StreamWriter mOutputWriter;
 		private List<string> mIncludes = new List<string>();
 		private List<ImportMember> mImportMembers = new List<ImportMember>();
+		private readonly bool mInMetalMode = false;
 
 		private uint mDataMemberCounter = 0;
 		public string GetIdentifier(string aPrefix) {
 			return aPrefix + mDataMemberCounter++.ToString("X8").ToUpper();
 		}
 
-		public Assembler(StreamWriter aOutputWriter) {
+		public Assembler(StreamWriter aOutputWriter)
+			: this(aOutputWriter, false) {
+		}
+
+		public Assembler(StreamWriter aOutputWriter, bool aInMetalMode) {
 			mOutputWriter = aOutputWriter;
+			mInMetalMode = aInMetalMode;
 		}
 
 		public OutputTypeEnum OutputType {
@@ -53,6 +59,12 @@ namespace Indy.IL2CPU.Assembler {
 		public List<ImportMember> ImportMembers {
 			get {
 				return mImportMembers;
+			}
+		}
+
+		public bool InMetalMode {
+			get {
+				return mInMetalMode;
 			}
 		}
 

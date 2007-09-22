@@ -8,22 +8,41 @@ using Asm = Indy.IL2CPU.Assembler;
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Call)]
 	public class Call: Op {
-		public readonly string LabelName;
-		public readonly bool HasResult;
+		private string LabelName;
+		private bool HasResult;
+		private int? TotalArgumentSize = null;
 		public Call(MethodReference aMethod)
 			: base(null, null) {
 			if (aMethod == null) {
 				throw new ArgumentNullException("aMethod");
 			}
+			Initialize(aMethod);
+		}
+
+		private void Initialize(MethodReference aMethod) {
 			HasResult = !aMethod.ReturnType.ReturnType.FullName.Contains("System.Void");
 			LabelName = new Asm.Label(aMethod).Name;
 			Engine.QueueMethodRef(aMethod);
+			bool needsCleanup = false;
+			foreach (ParameterDefinition xParam in aMethod.Parameters) {
+				if (xParam.IsOut) {
+					needsCleanup = true;
+					break;
+				}
+			}
+			if (needsCleanup) {
+				TotalArgumentSize = aMethod.Parameters.Count * 4;
+				if (Engine.GetDefinitionFromMethodReference(aMethod).IsStatic) {
+					TotalArgumentSize += 4;
+				}
+			}
+			// todo: add support for other argument sizes
 		}
 
-		public Call(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
+		public Call(Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
-			HasResult = !((MethodReference)aInstruction.Operand).ReturnType.ReturnType.FullName.Contains("System.Void");
-			LabelName = new Asm.Label((MethodReference)aInstruction.Operand).Name;
+			MethodReference xMethod = ((MethodReference)aInstruction.Operand);
+			Initialize(xMethod);
 		}
 		public void Assemble(string aMethod) {
 			Call(aMethod);

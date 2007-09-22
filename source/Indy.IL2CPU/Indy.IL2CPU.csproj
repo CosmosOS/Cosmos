@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="CustomImplementation\System\Runtime\CompilerServices\RuntimeHelpers.cs" />
     <Compile Include="Engine.cs" />
+    <Compile Include="FieldAccessAttribute.cs" />
     <Compile Include="MethodAliasAttribute.cs" />
     <Compile Include="MethodReferenceExtensions.cs" />
     <Compile Include="ObjectImpl.cs" />
@@ -73,6 +74,10 @@
       <Project>{5A39A8DF-D99E-4112-9676-BD3EED969A9C}</Project>
       <Name>Indy.IL2CPU.IL</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CustomImplementation\System\ArrayImpl.cs" />
+    <Compile Include="CustomImplementation\System\StringImpl.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
