@@ -8,13 +8,10 @@ namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Add)]
 	public class Add: Op {
 		public Add(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo, null) {
+			: base(aInstruction, aMethodInfo) {
 		}
 		public override void DoAssemble() {
-			Assembler.Add(new CPU.Pop("eax"));
-			Assembler.Add(new CPU.Add("eax", "[esp]"));
-			Assembler.Add(new CPU.Add("esp", "4"));
-			Pushd("eax");
+			Add();
 		}
 	}
 }

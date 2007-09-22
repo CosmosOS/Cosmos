@@ -13,16 +13,16 @@ namespace Indy.IL2CPU.IL.X86 {
 		public uint ObjectSize = 0;
 		public int CtorArgumentCount;
 		public Newobj()
-			: base(null, null, null) {
+			: base(null, null) {
 		}
 
 		public Newobj(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo, null) {
+			: base(aInstruction, aMethodInfo) {
 			MethodReference xCtor;
 			xCtor = (MethodReference)aInstruction.Operand;
 			CtorName = new Asm.Label((MethodReference)aInstruction.Operand).Name;
-			DoQueueMethodRef(xCtor);
-			DoQueueMethodRef(RuntimeEngineRefs.Heap_AllocNewObjectRef);
+			Engine.QueueMethodRef(xCtor);
+			DoQueueMethod(RuntimeEngineRefs.Heap_AllocNewObjectRef);
 			CtorArgumentCount = xCtor.Parameters.Count;
 			ObjectSize = ObjectUtilities.GetObjectStorageSize(Engine.GetDefinitionFromTypeReference(xCtor.DeclaringType));
 		}
@@ -31,8 +31,9 @@ namespace Indy.IL2CPU.IL.X86 {
 			Pushd("0" + ObjectSize.ToString("X").ToUpper() + "h");
 			Call(new CPU.Label(RuntimeEngineRefs.Heap_AllocNewObjectRef).Name);
 			Pushd("eax");
-//			Move(Assembler, "ecx", "eax");
+			//			Move(Assembler, "ecx", "eax");
 			Pushd("eax");
+			Move(Assembler, "dword [eax + 4]", "0" + InstanceTypeEnum.NormalObject.ToString("X") + "h");
 			//Pushd("ecx");
 			for (int i = 0; i < CtorArgumentCount; i++) {
 				Pushd("[ebp - 08h]");

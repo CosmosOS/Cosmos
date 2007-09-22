@@ -20,12 +20,6 @@ namespace HelloWorld {
 				return theValue;
 			}
 		}
-//		[DllImport("kernel32.dll")]
-//		static extern IntPtr GetStdHandle(int nStdHandle);
-//		[DllImport("kernel32.dll")]
-//		static extern bool WriteConsole(IntPtr hConsoleOutput, string lpBuffer,
-//		   uint nNumberOfCharsToWrite, out uint lpNumberOfCharsWritten,
-//		   IntPtr lpReserved);
 	}
 	public class Program {
 		public static void UseTestObject() {
@@ -73,7 +67,14 @@ namespace HelloWorld {
 			LiteralString();
 			NewObject();
 			UseTestObject();
+			UseArray();
 			DoWriteLines();
+		}
+
+		public static void UseArray() {
+			int[] values = new int[] { 1, 2, 3, 4 };
+			int total = values[0] + values[1] + values[2] + values[3];
+
 		}
 
 		public static void DoWriteLines() {

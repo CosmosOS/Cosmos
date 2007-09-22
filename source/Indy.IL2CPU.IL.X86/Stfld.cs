@@ -8,7 +8,7 @@ namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Stfld)]
 	public class Stfld: Op {
 		public Stfld(Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo, null) {
+			: base(aInstruction, aMethodInfo) {
 			FieldDefinition xField = aInstruction.Operand as FieldDefinition;
 			if (xField == null) {
 				throw new Exception("Field not found!");

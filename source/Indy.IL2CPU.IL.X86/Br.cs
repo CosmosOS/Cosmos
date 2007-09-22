@@ -9,7 +9,7 @@ namespace Indy.IL2CPU.IL.X86 {
 	public class Br: Op {
 		private readonly string mTargetInstructionName;
 		public Br(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo, null) {
+			: base(aInstruction, aMethodInfo) {
 			mTargetInstructionName = GetInstructionLabel((Instruction)aInstruction.Operand);
 		}
 		public override void DoAssemble() {

@@ -10,7 +10,7 @@ namespace Indy.IL2CPU.IL.X86 {
     [OpCode(Cil.Code.Nop)]
     public class Nop : Op {
 		public Nop(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo, null) {
+			: base(aInstruction, aMethodInfo) {
 		}
 		public override void DoAssemble() {
             // Assembler would be base type in IL

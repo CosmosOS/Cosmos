@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using Indy.IL2CPU;
 using Indy.IL2CPU.IL.X86;
 
@@ -13,17 +14,23 @@ namespace IL2CPU {
 					exeName = args[0];
 				}
 				string outputFileName = @"output.asm";
-				if(args.Length > 1) {
+				if (args.Length > 1) {
 					outputFileName = args[1];
 				}
 				Engine e = new Engine();
 				e.DebugLog += delegate(string aMessage) {
-					Console.WriteLine(aMessage);
-				};
+				              	Console.WriteLine(aMessage);
+				              };
 				using (FileStream fs = new FileStream(outputFileName, FileMode.Create)) {
 					using (StreamWriter br = new StreamWriter(fs)) {
 						e.Execute(exeName, TargetPlatformEnum.x86, br);
 					}
+				}
+			} catch(ReflectionTypeLoadException E) {
+				Console.WriteLine(E.ToString());
+				for(int i = 0; i <E.LoaderExceptions.Length;i++) {
+					Console.WriteLine("[{0}] {1}", i + 1, E.LoaderExceptions[i]);
+					Console.WriteLine();
 				}
 			} catch (Exception E) {
 				Console.WriteLine(E.ToString());

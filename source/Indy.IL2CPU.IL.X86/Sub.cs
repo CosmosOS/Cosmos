@@ -8,7 +8,7 @@ namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Sub)]
 	public class Sub: Op {
 		public Sub(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo, null) {
+			: base(aInstruction, aMethodInfo) {
 		}
 		public override void DoAssemble() {
 			Assembler.Add(new CPU.Pop("eax"));

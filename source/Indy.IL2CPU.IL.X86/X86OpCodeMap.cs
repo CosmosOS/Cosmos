@@ -24,5 +24,9 @@ namespace Indy.IL2CPU.IL.X86 {
 		protected override Type GetPInvokeMethodBodyOp() {
 			return typeof (X86PInvokeMethodBodyOp);
 		}
+
+		protected override Type GetRuntimeHelpers_InitializeArrayOp() {
+			return typeof (X86RuntimeHelpers_InitializeArrayOp);
+		}
 	}
 }

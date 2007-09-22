@@ -12,7 +12,7 @@ namespace Indy.IL2CPU.IL.X86 {
 	public class LdStr: Op {
 		public readonly string LiteralStr;
 		public LdStr(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo, null) {
+			: base(aInstruction, aMethodInfo) {
 			LiteralStr = (string)aInstruction.Operand;
 		}
 		

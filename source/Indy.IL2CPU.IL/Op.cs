@@ -17,9 +17,7 @@ namespace Indy.IL2CPU.IL {
 			return ".L" + aInstruction.Offset.ToString("X8");
 		}
 
-		public delegate void QueueMethodHandler(string aAssembly, string aType, string aMethod);
-
-		public delegate void QueueMethodRefHandler(MethodReference aMethod);
+		public delegate void QueueMethodHandler(MethodDefinition aMethod);
 
 		public delegate void QueueStaticFieldHandler(string aAssembly, string aType, string aField, out string aDataName);
 
@@ -58,18 +56,11 @@ namespace Indy.IL2CPU.IL {
 			}
 		}
 
-		protected void DoQueueMethod(string aAssembly, string aType, string aMethod) {
+		protected void DoQueueMethod(MethodDefinition aMethod) {
 			if (QueueMethod == null) {
-				throw new Exception("IL Op wants to queue a method, but no QueueMethod handler supplied!");
+				throw new Exception("IL Op wants to queue a method, but no QueueMethod handler suppplied!");
 			}
-			QueueMethod(aAssembly, aType, aMethod);
-		}
-
-		protected void DoQueueMethodRef(MethodReference aMethod) {
-			if (QueueMethodRef == null) {
-				throw new Exception("IL Op wants to queue a method reference, but no QueueMethodRef handler suppplied!");
-			}
-			QueueMethodRef(aMethod);
+			QueueMethod(aMethod);
 		}
 
 		protected void DoQueueStaticField(string aAssembly, string aType, string aField, out string aDataName) {
@@ -81,6 +72,5 @@ namespace Indy.IL2CPU.IL {
 
 		public static QueueMethodHandler QueueMethod;
 		public static QueueStaticFieldHandler QueueStaticField;
-		public static QueueMethodRefHandler QueueMethodRef;
 	}
 }

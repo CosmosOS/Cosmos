@@ -8,7 +8,7 @@ using Instruction=Mono.Cecil.Cil.Instruction;
 
 namespace Indy.IL2CPU.IL.X86 {
 	public abstract class Op: IL.Op {
-		public Op(Instruction aInstruction, MethodInformation aMethodInfo, TypeInformation aTypeInfo)
+		public Op(Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
 		}
 		protected void Call(string aAddress) {
@@ -89,6 +89,20 @@ namespace Indy.IL2CPU.IL.X86 {
 		public static void Ldarg(Assembler.Assembler aAssembler, string aAddress) {
 			Move(aAssembler, "eax", "[" + aAddress + "]");
 			Push(aAssembler, "eax");
+		}
+
+		public void Multiply() {
+			Assembler.Add(new CPU.Pop("eax"));
+			Assembler.Add(new CPU.Multiply("dword [esp]"));
+			Assembler.Add(new CPU.Add("esp", "4"));
+			Pushd("eax");
+		}
+
+		public void Add() {
+			Assembler.Add(new CPU.Pop("eax"));
+			Assembler.Add(new CPU.Add("eax", "[esp]"));
+			Assembler.Add(new CPU.Add("esp", "4"));
+			Pushd("eax");
 		}
 	}
 }

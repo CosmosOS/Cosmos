@@ -1,15 +1,15 @@
 ﻿// this file supports the VERBOSE_DEBUG define. this makes it emit a bunch of comments in the assembler output.
 // note that the tests are supposed to NOT include these comments
- #define VERBOSE_DEBUG
+#define VERBOSE_DEBUG
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using Indy.IL2CPU.Assembler;
 using Indy.IL2CPU.Assembler.X86;
 using Indy.IL2CPU.IL;
-//using Indy.IL2CPU.IL.X86;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Instruction = Mono.Cecil.Cil.Instruction;
@@ -18,34 +18,17 @@ namespace Indy.IL2CPU {
 	public class MethodDefinitionComparer: IComparer<MethodDefinition> {
 		#region IComparer<MethodDefinition> Members
 		public int Compare(MethodDefinition x, MethodDefinition y) {
-			return GenerateFullName(x).CompareTo(GenerateFullName(y));
+			return x.GetFullName().CompareTo(y.GetFullName());
 		}
 		#endregion
-
-		private static string GenerateFullName(MethodReference aDefinition) {
-			StringBuilder sb = new StringBuilder();
-			sb.Append(aDefinition.DeclaringType.FullName + "." + aDefinition.Name);
-			sb.Append("(");
-			foreach (ParameterDefinition param in aDefinition.Parameters) {
-				sb.Append(param.ParameterType.FullName);
-				sb.Append(",");
-			}
-			return sb.ToString().TrimEnd(',') + ")";
-		}
 	}
 
 	public class FieldDefinitionComparer: IComparer<FieldDefinition> {
 		#region IComparer<FieldDefinition> Members
 		public int Compare(FieldDefinition x, FieldDefinition y) {
-			return GenerateFullName(x).CompareTo(GenerateFullName(y));
+			return x.GetFullName().CompareTo(y.GetFullName());
 		}
 		#endregion
-
-		private static string GenerateFullName(FieldDefinition aDefinition) {
-			StringBuilder sb = new StringBuilder();
-			sb.Append(aDefinition.DeclaringType.FullName + "." + aDefinition.Name);
-			return sb.ToString().Trim();
-		}
 	}
 
 	public delegate void DebugLogHandler(string aMessage);
@@ -69,6 +52,11 @@ namespace Indy.IL2CPU {
 		/// Contains a list of all static fields. This includes static fields to be processed and already processed.
 		/// </summary>
 		protected SortedList<FieldDefinition, bool> mStaticFields = new SortedList<FieldDefinition, bool>(new FieldDefinitionComparer());
+
+		/// <summary>
+		/// Contains a list of custom method implementations. This is mainly used for iCalls
+		/// </summary>
+		protected SortedList<string, MethodInfo> mCustomMethodImplementation = new SortedList<string, MethodInfo>();
 
 
 		/// <summary>
@@ -101,9 +89,17 @@ namespace Indy.IL2CPU {
 					}
 					mAssembler.OutputType = Indy.IL2CPU.Assembler.Assembler.OutputTypeEnum.Console;
 					mMap.Initialize(mAssembler);
+					foreach (Type t in typeof(Engine).Assembly.GetTypes()) {
+						foreach (MethodInfo mi in t.GetMethods()) {
+							object[] xAttribs = mi.GetCustomAttributes(typeof(MethodAliasAttribute), true);
+							if (xAttribs != null && xAttribs.Length > 0) {
+								MethodAliasAttribute xMethodAlias = (MethodAliasAttribute)xAttribs[0];
+								mCustomMethodImplementation.Add(xMethodAlias.Name, mi);
+							}
+						}
+					}
 					IL.Op.QueueMethod += QueueMethod;
 					IL.Op.QueueStaticField += QueueStaticField;
-					IL.Op.QueueMethodRef += QueueMethodRef;
 					try {
 						mMethods.Add(RuntimeEngineRefs.InitializeApplicationRef, false);
 						mMethods.Add(RuntimeEngineRefs.FinalizeApplicationRef, false);
@@ -123,7 +119,6 @@ namespace Indy.IL2CPU {
 					} finally {
 						mAssembler.Flush();
 						IL.Op.QueueMethod -= QueueMethod;
-						IL.Op.QueueMethodRef -= QueueMethodRef;
 						IL.Op.QueueStaticField -= QueueStaticField;
 					}
 				}
@@ -166,7 +161,16 @@ namespace Indy.IL2CPU {
 			throw new Exception("Could not find TypeDefinition!");
 		}
 
-		public static uint GetValueTypeSize(TypeReference aType) {
+		/// <summary>
+		/// Gives the size to store an instance of the <paramref name="aType"/> for use in a field.
+		/// </summary>
+		/// <remarks>For classes, this is the pointer size.</remarks>
+		/// <param name="aType"></param>
+		/// <returns></returns>
+		public static uint GetFieldStorageSize(TypeReference aType) {
+			if (!aType.IsValueType) {
+				return 4;
+			}
 			switch (aType.FullName) {
 				case "System.Byte":
 				case "System.SByte":
@@ -193,27 +197,41 @@ namespace Indy.IL2CPU {
 			while ((xCurrentField = (from item in mStaticFields.Keys
 									 where !mStaticFields[item]
 									 select item).FirstOrDefault()) != null) {
-				string xFieldName = xCurrentField.DeclaringType.FullName + "." + xCurrentField.Name;
+				string xFieldName = xCurrentField.GetFullName();
 				OnDebugLog("Processing Static Field '{0}', Constant = '{1}'({2})", xFieldName, xCurrentField.Constant, xCurrentField.Constant == null ? "**NULL**" : xCurrentField.Constant.GetType().FullName);
-
 				xFieldName = DataMember.GetStaticFieldName(xCurrentField);
 				if (xCurrentField.HasConstant) {
 					// emit the constant, but first find out how we get it.
 					System.Diagnostics.Debugger.Break();
 				} else {
-					uint xTheSize;
-					if (xCurrentField.FieldType.IsValueType) {
-						xTheSize = GetValueTypeSize(xCurrentField.FieldType);
+					if (xCurrentField.InitialValue != null && xCurrentField.InitialValue.Length > 0) {
+						string xTheData = "";
+						foreach (byte x in BitConverter.GetBytes(xCurrentField.InitialValue.Length)) {
+							xTheData += x + ",";
+						}
+						foreach (byte x in xCurrentField.InitialValue) {
+							xTheData += x + ",";
+						}
+						xTheData = xTheData.TrimEnd(',');
+						mAssembler.DataMembers.Add(new DataMember(xFieldName, "db", xTheData));
 					} else {
-						xTheSize = 4;
+						uint xTheSize;
+						string theType = "db";
+						if (xCurrentField.FieldType.IsValueType) {
+							xTheSize = GetFieldStorageSize(xCurrentField.FieldType);
+						} else {
+							xTheSize = 4;
+						}
+						if (xTheSize == 4) {
+							theType = "dd";
+						}
+						string xTheData = "";
+						for (uint i = 0; i < xTheSize; i++) {
+							xTheData += "0,";
+						}
+						xTheData = xTheData.TrimEnd(',');
+						mAssembler.DataMembers.Add(new DataMember(xFieldName, theType, xTheData));
 					}
-					string xTheData = "";
-					for (uint i = 0; i < xTheSize; i++) {
-						xTheData += "0,";
-					}
-					xTheData = xTheData.TrimEnd(',');
-					mAssembler.DataMembers.Add(new DataMember(xFieldName, "dd", xTheData));
-
 				}
 				mStaticFields[xCurrentField] = true;
 			}
@@ -224,7 +242,7 @@ namespace Indy.IL2CPU {
 			while ((xCurrentMethod = (from item in mMethods.Keys
 									  where !mMethods[item]
 									  select item).FirstOrDefault()) != null) {
-				OnDebugLog("Processing method '{0}'", xCurrentMethod.DeclaringType.FullName + "." + xCurrentMethod.Name);
+				OnDebugLog("Processing method '{0}'", xCurrentMethod.GetFullName());
 				string xMethodName = new Label(xCurrentMethod).Name;
 				foreach (CustomAttribute xAttrib in xCurrentMethod.CustomAttributes) {
 					if (xAttrib.Constructor.DeclaringType.FullName == typeof(MethodAliasAttribute).FullName) {
@@ -245,7 +263,7 @@ namespace Indy.IL2CPU {
 								if (xFieldType.IsClass) {
 									xFieldSize = 4;
 								} else {
-									xFieldSize = GetValueTypeSize(xFieldType);
+									xFieldSize = GetFieldStorageSize(xFieldType);
 								}
 								xTypeFields.Add(xField.ToString(), new TypeInformation.Field(xObjectStorageSize, xFieldSize));
 								xObjectStorageSize += xFieldSize;
@@ -315,6 +333,17 @@ namespace Indy.IL2CPU {
 				}
 #endif
 				xOp.Assemble();
+				if (mCustomMethodImplementation.ContainsKey(xCurrentMethod.GetFullName())) {
+					MethodInfo xReplacementMethod = mCustomMethodImplementation[xCurrentMethod.GetFullName()];
+					string[] xParamTypes = new string[xReplacementMethod.GetParameters().Length];
+					for (int i = 0; i < xReplacementMethod.GetParameters().Length; i++) {
+						xParamTypes[i] = xReplacementMethod.GetParameters()[i].ParameterType.FullName;
+					}
+					xCurrentMethod = GetMethodDefinition(GetTypeDefinition(xReplacementMethod.DeclaringType.Assembly.FullName, xReplacementMethod.DeclaringType.FullName), xReplacementMethod.Name, xParamTypes);
+					if (xCurrentMethod == null) {
+						throw new Exception("CustomMethodImplementation not found!");
+					}
+				}
 				// what to do if a method doesn't have a body?
 				if (xCurrentMethod.HasBody) {
 					// todo: add support for types which need different stack size
@@ -331,7 +360,14 @@ namespace Indy.IL2CPU {
 					if (xCurrentMethod.IsPInvokeImpl) {
 						HandlePInvoke(xCurrentMethod, xMethodInfo);
 					} else {
-						mAssembler.Add(new Literal("; Method not being generated yet, as it's handled by an iCall"));
+						if (xMethodName == "System_Void___System_Runtime_CompilerServices_RuntimeHelpers_InitializeArray___System_Array__System_RuntimeFieldHandle___") {
+							xOp = GetOpFromType(mMap.RuntimeHelpers_InitializeArrayOp, null, xMethodInfo);
+							xOp.Assembler = mAssembler;
+							xOp.Assemble();
+						} else {
+							Console.WriteLine("\t-- Method not handled!");
+							mAssembler.Add(new Literal("; Method not being generated yet, as it's handled by an iCall"));
+						}
 					}
 				}
 				xOp = GetOpFromType(mMap.MethodFooterOp, null, xMethodInfo);
@@ -493,31 +529,13 @@ namespace Indy.IL2CPU {
 			throw new Exception("Method not found: '" + aMethod.ToString() + "'");
 		}
 
-		public static void QueueMethod(string aAssembly, string aType, string aMethod) {
+		public static void QueueMethod2(string aAssembly, string aType, string aMethod) {
 			MethodDefinition xMethodDef;
-			QueueMethod(aAssembly, aType, aMethod, out xMethodDef);
+			QueueMethod2(aAssembly, aType, aMethod, out xMethodDef);
 		}
 
-		public static void QueueMethod(string aAssembly, string aType, string aMethod, out MethodDefinition aMethodDef) {
-			if (mCurrent == null) {
-				throw new Exception("ERROR: No Current Engine found!");
-			}
-			AssemblyDefinition xAssemblyDef;
-			if (String.IsNullOrEmpty(aAssembly) || aAssembly == typeof(Engine).Assembly.GetName().FullName) {
-				xAssemblyDef = AssemblyFactory.GetAssembly(typeof(Engine).Assembly.Location);
-			} else {
-				xAssemblyDef = mCurrent.mCrawledAssembly.Resolver.Resolve(aAssembly);
-			}
-			TypeDefinition xTypeDef = null;
-			foreach (ModuleDefinition xModDef in xAssemblyDef.Modules) {
-				if (xModDef.Types.Contains(aType)) {
-					xTypeDef = xModDef.Types[aType];
-					break;
-				}
-			}
-			if (xTypeDef == null) {
-				throw new Exception("Type '" + aType + "' not found in assembly '" + aAssembly + "'!");
-			}
+		public static void QueueMethod2(string aAssembly, string aType, string aMethod, out MethodDefinition aMethodDef) {
+			TypeDefinition xTypeDef = GetTypeDefinition(aAssembly, aType);
 			// todo: find a way to specify one overload of a method
 			int xCount = 0;
 			aMethodDef = null;
@@ -554,6 +572,51 @@ namespace Indy.IL2CPU {
 			if (mDebugLog != null) {
 				mDebugLog(String.Format(aMessage, args));
 			}
+		}
+
+		public static TypeDefinition GetTypeDefinition(string aAssembly, string aType) {
+			if (mCurrent == null) {
+				throw new Exception("ERROR: No Current Engine found!");
+			}
+			AssemblyDefinition xAssemblyDef;
+			if (String.IsNullOrEmpty(aAssembly) || aAssembly == typeof(Engine).Assembly.GetName().FullName) {
+				xAssemblyDef = AssemblyFactory.GetAssembly(typeof(Engine).Assembly.Location);
+			} else {
+				xAssemblyDef = mCurrent.mCrawledAssembly.Resolver.Resolve(aAssembly);
+			}
+			TypeDefinition xTypeDef = null;
+			foreach (ModuleDefinition xModDef in xAssemblyDef.Modules) {
+				if (xModDef.Types.Contains(aType)) {
+					xTypeDef = xModDef.Types[aType];
+					break;
+				}
+			}
+			if (xTypeDef == null) {
+				throw new Exception("Type '" + aType + "' not found in assembly '" + aAssembly + "'!");
+			}
+			return xTypeDef;
+		}
+
+		public static MethodDefinition GetMethodDefinition(TypeDefinition aType, string aMethod, params string[] aParamTypes) {
+			foreach (MethodDefinition xMethod in aType.Methods) {
+				if (xMethod.Name != aMethod) {
+					continue;
+				}
+				if (xMethod.Parameters.Count != aParamTypes.Length) {
+					continue;
+				}
+				bool errorFound = false;
+				for (int i = 0; i < xMethod.Parameters.Count; i++) {
+					if (xMethod.Parameters[0].ToString() != aParamTypes[i]) {
+						errorFound = true;
+						break;
+					}
+				}
+				if (!errorFound) {
+					return xMethod;
+				}
+			}
+			throw new Exception("Method not found!");
 		}
 
 		private void HandlePInvoke(MethodDefinition aMethod, MethodInformation aMethodInfo) {

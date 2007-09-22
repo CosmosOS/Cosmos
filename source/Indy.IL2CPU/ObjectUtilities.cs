@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Mono.Cecil;
 
@@ -11,7 +11,7 @@ namespace Indy.IL2CPU {
 				if (xFieldType.IsClass) {
 					xResult += 4;
 				} else {
-					xResult+= Engine.GetValueTypeSize(xFieldType);
+					xResult+= Engine.GetFieldStorageSize(xFieldType);
 				}
 			}
 			return xResult;

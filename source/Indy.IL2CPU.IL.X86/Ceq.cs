@@ -10,7 +10,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		private readonly string NextInstructionLabel;
 		private readonly string CurInstructionLabel;
 		public Ceq(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo, null) {
+			: base(aInstruction, aMethodInfo) {
 			NextInstructionLabel = GetInstructionLabel(aInstruction.Next);
 			CurInstructionLabel = GetInstructionLabel(aInstruction);
 		}

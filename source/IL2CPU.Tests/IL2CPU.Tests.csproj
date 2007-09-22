@@ -45,6 +45,8 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="Tests\TestSimpleArrays\TestSimpleArrays.cs">
+    </None>
     <None Include="Tests\TwoMethodsWithLocals\TwoMethodsWithLocals.cs">
     </None>
     <None Include="Tests\ComplexerIfStatements\ComplexerIfStatements.cs">
@@ -172,7 +174,15 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Tests\TestSimpleArrays\TestSimpleArrays.expected.asm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Tests\TwoMethodsWithLocals\TwoMethodsWithLocals.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Tests\TestSimpleArrays\TestSimpleArrays.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

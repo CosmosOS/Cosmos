@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomImplementation\CompilerServices\RuntimeHelpers.cs" />
     <Compile Include="Engine.cs" />
     <Compile Include="MethodAliasAttribute.cs" />
     <Compile Include="MethodReferenceExtensions.cs" />

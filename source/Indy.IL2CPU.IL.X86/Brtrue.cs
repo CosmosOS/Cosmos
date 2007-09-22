@@ -9,7 +9,7 @@ namespace Indy.IL2CPU.IL.X86 {
 	public class Brtrue: Op {
 		public readonly string TargetLabel;
 		public Brtrue(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo, null) {
+			: base(aInstruction, aMethodInfo) {
 			TargetLabel = GetInstructionLabel((Instruction)aInstruction.Operand);
 		}
 		public override void DoAssemble() {
