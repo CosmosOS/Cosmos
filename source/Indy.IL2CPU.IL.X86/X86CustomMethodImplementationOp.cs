@@ -50,29 +50,31 @@ namespace Indy.IL2CPU.IL.X86 {
 		protected override void Assemble_System_Void___System_Runtime_CompilerServices_RuntimeHelpers_InitializeArray___System_Array__System_RuntimeFieldHandle___() {
 			// Arguments:
 			//    Array aArray, RuntimeFieldHandle aFieldHandle
-			Assembler.Add(new CPUx86.Pushd(MethodInfo.Arguments[0].VirtualAddress));
-			Assembler.Add(new CPUx86.Pushd(MethodInfo.Arguments[1].VirtualAddress));
-			Op x = new Call(Engine.GetMethodDefinition(Engine.GetTypeDefinition("", "Indy.IL2CPU.CustomImplementation.CompilerServices.RuntimeHelpers"), "InitializeArrayImpl", "System.Int32[]", "System.Int32[]"));
-			x.Assembler = Assembler;
-			x.Assemble();
-//			Assembler.Add(new CPUx86.Move("eax", "0"));
-//			Assembler.Add(new CPUx86.Move("edi", "[" + MethodInfo.Arguments[0].VirtualAddress + "]"));
-//			Assembler.Add(new CPUx86.Move("esi", "[" + MethodInfo.Arguments[1].VirtualAddress + "]"));
-//			Assembler.Add(new CPUx86.Move("ecx", "[esi]"));
-//			Assembler.Add(new CPUx86.Add("dword esi", "12"));
-//			Assembler.Add(new CPUx86.Add("dword edi", "12"));
-//
-//			Assembler.Add(new CPU.Label(".StartLoop"));
-//			Assembler.Add(new CPUx86.Move("edx", "[esi]"));
-//			Assembler.Add(new CPUx86.Move("[edi]", "edx"));
-//			Assembler.Add(new CPUx86.Add("eax", "4"));
-//			Assembler.Add(new CPUx86.Add("dword esi", "4"));
-//			Assembler.Add(new CPUx86.Add("dword edi", "4"));
-//			Assembler.Add(new CPUx86.Compare("eax", "ecx"));
-//			Assembler.Add(new CPUx86.JumpIfEquals(".EndLoop"));
-//			Assembler.Add(new CPUx86.JumpAlways(".StartLoop"));
-//
-//			Assembler.Add(new CPU.Label(".EndLoop"));
+//			Assembler.Add(new CPUx86.Pushd(MethodInfo.Arguments[0].VirtualAddress));
+//			Assembler.Add(new CPUx86.Pushd(MethodInfo.Arguments[1].VirtualAddress));
+//			Op x = new Call(Engine.GetMethodDefinition(Engine.GetTypeDefinition("", "Indy.IL2CPU.CustomImplementation.CompilerServices.RuntimeHelpers"), "InitializeArrayImpl", "System.Int32[]", "System.Int32[]"));
+//			x.Assembler = Assembler;
+//			x.Assemble();
+			Assembler.Add(new CPU.Literal(";In Pure ASM defined"));
+			Assembler.Add(new CPUx86.Move("eax", "0"));
+			Assembler.Add(new CPUx86.Move("edi", "[" + MethodInfo.Arguments[0].VirtualAddress + "]"));
+			Assembler.Add(new CPUx86.Move("esi", "[" + MethodInfo.Arguments[1].VirtualAddress + "]"));
+			Assembler.Add(new CPUx86.Add("dword esi", "8"));
+			Assembler.Add(new CPUx86.Move("ecx", "[esi]"));
+			Assembler.Add(new CPUx86.Add("dword esi", "4"));
+			Assembler.Add(new CPUx86.Add("dword edi", "12"));
+
+			Assembler.Add(new CPU.Label(".StartLoop"));
+			Assembler.Add(new CPUx86.Move("edx", "[esi]"));
+			Assembler.Add(new CPUx86.Move("[edi]", "edx"));
+			Assembler.Add(new CPUx86.Add("eax", "4"));
+			Assembler.Add(new CPUx86.Add("dword esi", "4"));
+			Assembler.Add(new CPUx86.Add("dword edi", "4"));
+			Assembler.Add(new CPUx86.Compare("eax", "ecx"));
+			Assembler.Add(new CPUx86.JumpIfEquals(".EndLoop"));
+			Assembler.Add(new CPUx86.JumpAlways(".StartLoop"));
+
+			Assembler.Add(new CPU.Label(".EndLoop"));
 		}
 	}
 }

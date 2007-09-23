@@ -74,7 +74,8 @@ namespace HelloWorld {
 		public static void UseArray() {
 			int[] values = new int[] { 1, 2, 3, 4 };
 			int total = values[0] + values[1] + values[2] + values[3];
-
+			values[0] = 10;
+			total = total + values[0] + values[1] + values[2] + values[3];
 		}
 
 		public static void DoWriteLines() {

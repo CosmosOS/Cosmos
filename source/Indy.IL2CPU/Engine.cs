@@ -142,6 +142,9 @@ namespace Indy.IL2CPU {
 			if (mCurrent == null) {
 				throw new Exception("No Current engine found!");
 			}
+			if(aRef.FullName.Contains("modreq")) {
+				aRef = aRef.GetOriginalType();
+			}
 			if (aRef.FullName.EndsWith("[]")) {
 				return GetTypeDefinition(aRef.Module.Assembly.Name.Name, aRef.FullName.Substring(0, aRef.FullName.Length - 2));
 			}
@@ -172,7 +175,7 @@ namespace Indy.IL2CPU {
 					mCurrent.OnDebugLog("Error: Unhandled scope: " + aRef.Scope == null ? "**NULL**" : aRef.Scope.GetType().FullName);
 				}
 			}
-			throw new Exception("Could not find TypeDefinition! (" + aRef.FullName + ")");
+			throw new Exception("Could not find TypeDefinition! (" + aRef.FullName + " in assembly " + aRef.Module.Assembly.Name.Name + ")");
 		}
 
 		/// <summary>
@@ -222,6 +225,9 @@ namespace Indy.IL2CPU {
 				} else {
 					if (xCurrentField.InitialValue != null && xCurrentField.InitialValue.Length > 0) {
 						string xTheData = "";
+						if(xCurrentField.InitialValue.Length>4) {
+							xTheData = "0,0,0,0,2,0,0,0,";
+						}
 						foreach (byte x in BitConverter.GetBytes(xCurrentField.InitialValue.Length)) {
 							xTheData += x + ",";
 						}

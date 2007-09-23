@@ -8,7 +8,7 @@ namespace Indy.IL2CPU.CustomImplementation.CompilerServices {
 		//[DllImport("test.dll")]
 		//public static extern void InitializeArray(Array aArray, RuntimeFieldHandle aFieldHandle);
 		public static void InitializeArrayImpl(int[] aArray, int[] aFieldHandle) {
-			for (int i = 0; i < aFieldHandle.Length; i++) {
+			for (int i = 0; i < aArray.Length; i++) {
 				aArray[i] = aFieldHandle[i];
 			}
 		}
