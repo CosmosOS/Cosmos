@@ -7,11 +7,14 @@ namespace Indy.IL2CPU {
 		public static uint GetObjectStorageSize(TypeDefinition aType) {
 			uint xResult = ObjectImpl.FieldDataOffset;
 			foreach (FieldDefinition xField in aType.Fields) {
+				if (xField.IsStatic) {
+					continue;
+				}
 				TypeDefinition xFieldType = Engine.GetDefinitionFromTypeReference(xField.FieldType);
 				if (xFieldType.IsClass) {
 					xResult += 4;
 				} else {
-					xResult+= Engine.GetFieldStorageSize(xFieldType);
+					xResult += Engine.GetFieldStorageSize(xFieldType);
 				}
 			}
 			return xResult;

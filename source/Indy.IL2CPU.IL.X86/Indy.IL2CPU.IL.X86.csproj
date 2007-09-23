@@ -272,7 +272,7 @@
     <Compile Include="Volatile.cs" />
     <Compile Include="X86OpCodeMap.cs" />
     <Compile Include="X86PInvokeMethodBodyOp.cs" />
-    <Compile Include="X86RuntimeHelpers_InitializeArrayOp.cs" />
+    <Compile Include="X86CustomMethodImplementationOp.cs" />
     <Compile Include="Xor.cs" />
   </ItemGroup>
   <ItemGroup>

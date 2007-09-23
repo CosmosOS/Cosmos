@@ -19,7 +19,7 @@ namespace Indy.IL2CPU.IL {
 			public Field(uint aOffset, uint aSize) {
 				Offset = aOffset;
 				Size = aSize;
-				RelativeAddress = "+ 0" + (/*4 + */Offset).ToString("X") + "h";
+				RelativeAddress = "+ 0" + (Offset).ToString("X") + "h";
 			}
 		}
 

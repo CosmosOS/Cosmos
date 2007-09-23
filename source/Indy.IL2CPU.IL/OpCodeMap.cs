@@ -14,8 +14,8 @@ namespace Indy.IL2CPU.IL {
 			MethodHeaderOp = GetMethodHeaderOp();
 			MethodFooterOp = GetMethodFooterOp();
 			PInvokeMethodBodyOp = GetPInvokeMethodBodyOp();
-			RuntimeHelpers_InitializeArrayOp = GetRuntimeHelpers_InitializeArrayOp();
 			CustomMethodImplementationProxyOp = GetCustomMethodImplementationProxyOp();
+			CustomMethodImplementationOp = GetCustomMethodImplementationOp();
 		}
 
 		protected abstract Assembly ImplementationAssembly {
@@ -25,8 +25,8 @@ namespace Indy.IL2CPU.IL {
 		protected abstract Type GetMethodHeaderOp();
 		protected abstract Type GetMethodFooterOp();
 		protected abstract Type GetPInvokeMethodBodyOp();
-		protected abstract Type GetRuntimeHelpers_InitializeArrayOp();
 		protected abstract Type GetCustomMethodImplementationProxyOp();
+		protected abstract Type GetCustomMethodImplementationOp();
 
 		public void Initialize(Assembler.Assembler aAssembler) {
 			foreach (Type t in (from item in ImplementationAssembly.GetTypes()
@@ -52,7 +52,7 @@ namespace Indy.IL2CPU.IL {
 		public readonly Type MethodHeaderOp;
 		public readonly Type MethodFooterOp;
 		public readonly Type PInvokeMethodBodyOp;
-		public readonly Type RuntimeHelpers_InitializeArrayOp;
 		public readonly Type CustomMethodImplementationProxyOp;
+		public readonly Type CustomMethodImplementationOp;
 	}
 }

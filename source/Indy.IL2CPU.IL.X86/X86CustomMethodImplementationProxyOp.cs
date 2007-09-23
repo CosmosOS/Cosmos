@@ -15,9 +15,8 @@ namespace Indy.IL2CPU.IL.X86 {
 			Op.Ldarg(Assembler, MethodInfo.Arguments[index].VirtualAddress);
 		}
 
-		protected override void Ldfld(TypeInformation.Field aField) {
-			Assembler.Add(new CPUx86.Pop("eax"));
-			Assembler.Add(new CPUx86.Pushd("[eax " + aField.RelativeAddress + "]"));
+		protected override void Ldflda(TypeInformation.Field aField) {
+			Op.Ldflda(Assembler, aField.RelativeAddress);
 		}
 
 		protected override void CallProxiedMethod() {

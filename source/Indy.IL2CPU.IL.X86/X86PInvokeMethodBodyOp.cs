@@ -43,7 +43,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			if (TheMethod.PInvokeInfo.IsCharSetNotSpec) {
 				foreach (ParameterDefinition xParam in TheMethod.Parameters) {
-					if (xParam.ParameterType.FullName.StartsWith("System.String")) {
+					if (xParam.ParameterType.FullName=="System.String") {
 						xMethodName += "A";
 						break;
 					}
@@ -56,6 +56,11 @@ namespace Indy.IL2CPU.IL.X86 {
 			for (int i = MethodInfo.Arguments.Length - 1; i >= 0; i--) {
 			//for(int i =0;i< MethodInfo.Arguments.Length;i++){
 				Op.Ldarg(Assembler, MethodInfo.Arguments[i].VirtualAddress);
+				if(TheMethod.Parameters[i].ParameterType.FullName=="System.String") {
+					new Call(Engine.GetMethodDefinition(Engine.GetTypeDefinition("", "Indy.IL2CPU.CustomImplementation.System.StringImpl"), "GetStorage", "System.UInt32")) {
+						Assembler = Assembler
+					}.Assemble();
+				}
 			}
 			Assembler.Add(new CPUx86.Call("[" + xMethodName + "]"));
 			Assembler.Add(new CPUx86.Pushd("eax"));

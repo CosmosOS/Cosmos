@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using Indy.IL2CPU.Assembler;
 using Indy.IL2CPU.Assembler.X86;
 using Indy.IL2CPU.IL;
@@ -143,6 +142,9 @@ namespace Indy.IL2CPU {
 			if (mCurrent == null) {
 				throw new Exception("No Current engine found!");
 			}
+			if (aRef.FullName.EndsWith("[]")) {
+				return GetTypeDefinition(aRef.Module.Assembly.Name.Name, aRef.FullName.Substring(0, aRef.FullName.Length - 2));
+			}
 			AssemblyNameReference xAssemblyNameReference = aRef.Scope as AssemblyNameReference;
 			if (xAssemblyNameReference != null) {
 				AssemblyDefinition xReferencedFieldAssembly;
@@ -260,7 +262,7 @@ namespace Indy.IL2CPU {
 				string xMethodName = new Label(xCurrentMethod).Name;
 				foreach (CustomAttribute xAttrib in xCurrentMethod.CustomAttributes) {
 					if (xAttrib.Constructor.DeclaringType.FullName == typeof(MethodAliasAttribute).FullName) {
-						xMethodName = (string)xAttrib.Fields["Name"];
+						//xMethodName = (string)xAttrib.Fields["Name"];
 						break;
 					}
 				}
@@ -270,34 +272,9 @@ namespace Indy.IL2CPU {
 						if (xCurrentMethod.GetFullName() == "System.String..ctor(System.Char[],System.Int32,System.Int32)") {
 							Console.Beep();
 						}
-						SortedList<string, TypeInformation.Field> xTypeFields = new SortedList<string, TypeInformation.Field>();
-						uint xObjectStorageSize = ObjectImpl.FieldDataOffset;
-						TypeDefinition xCurrentInspectedType = GetDefinitionFromTypeReference(xCurrentMethod.DeclaringType);
-						do {
-							foreach (FieldDefinition xField in xCurrentInspectedType.Fields) {
-								if (xField.IsStatic) {
-									continue;
-								}
-								TypeDefinition xFieldType = GetDefinitionFromTypeReference(xField.FieldType);
-								uint xFieldSize;
-								if (xFieldType.IsClass) {
-									xFieldSize = 4;
-								} else {
-									xFieldSize = GetFieldStorageSize(xFieldType);
-								}
-								xTypeFields.Add(xField.ToString(), new TypeInformation.Field(xObjectStorageSize, xFieldSize));
-								xObjectStorageSize += xFieldSize;
-							}
-							if (xCurrentInspectedType.FullName != "System.Object") {
-								xCurrentInspectedType = GetDefinitionFromTypeReference(xCurrentInspectedType.BaseType);
-							} else {
-								break;
-							}
-						} while (true);
-						if (xCurrentMethod.DeclaringType.FullName == "System.String") {
-							xTypeFields.Add("$$Storage$$", new TypeInformation.Field(xObjectStorageSize, 4));
-							xObjectStorageSize += 4;
-						}
+						uint xObjectStorageSize;
+						SortedList<string, TypeInformation.Field> xTypeFields = GetTypeFieldInfo(xCurrentMethod, out xObjectStorageSize);
+						
 						xTypeInfo = new TypeInformation(xObjectStorageSize, xTypeFields);
 					}
 				}
@@ -402,25 +379,26 @@ namespace Indy.IL2CPU {
 					xContentProduced = true;
 				}
 				if (!xContentProduced) {
-					if (xCurrentMethod.HasBody) {
-						// todo: add support for types which need different stack size
-						foreach (Instruction xInstruction in xCurrentMethod.Body.Instructions) {
-							MethodReference xMethodReference = xInstruction.Operand as MethodReference;
-							if (xMethodReference != null) {
-								QueueMethodRef(xMethodReference);
-							}
-							xOp = GetOpFromType(mMap.GetOpForOpCode(xInstruction.OpCode.Code), xInstruction, xMethodInfo);
-							xOp.Assembler = mAssembler;
-							xOp.Assemble();
-						}
+					if (Enum.GetNames(typeof(CustomMethodEnum)).Contains(xMethodName)) {
+						CustomMethodImplementationOp xCustomMethodImplOp = (CustomMethodImplementationOp)GetOpFromType(mMap.CustomMethodImplementationOp, null, xMethodInfo);
+						xCustomMethodImplOp.Assembler = mAssembler;
+						xCustomMethodImplOp.Method = (CustomMethodEnum)Enum.Parse(typeof(CustomMethodEnum), xMethodName);
+						xCustomMethodImplOp.Assemble();
 					} else {
-						if (xCurrentMethod.IsPInvokeImpl) {
-							HandlePInvoke(xCurrentMethod, xMethodInfo);
-						} else {
-							if (xMethodName == "System_Void___System_Runtime_CompilerServices_RuntimeHelpers_InitializeArray___System_Array__System_RuntimeFieldHandle___") {
-								xOp = GetOpFromType(mMap.RuntimeHelpers_InitializeArrayOp, null, xMethodInfo);
+						if (xCurrentMethod.HasBody) {
+							// todo: add support for types which need different stack size
+							foreach (Instruction xInstruction in xCurrentMethod.Body.Instructions) {
+								MethodReference xMethodReference = xInstruction.Operand as MethodReference;
+								if (xMethodReference != null) {
+									QueueMethodRef(xMethodReference);
+								}
+								xOp = GetOpFromType(mMap.GetOpForOpCode(xInstruction.OpCode.Code), xInstruction, xMethodInfo);
 								xOp.Assembler = mAssembler;
 								xOp.Assemble();
+							}
+						} else {
+							if (xCurrentMethod.IsPInvokeImpl) {
+								HandlePInvoke(xCurrentMethod, xMethodInfo);
 							} else {
 								Console.WriteLine("\t-- Method not handled!");
 								mAssembler.Add(new Literal("; Method not being generated yet, as it's handled by an iCall"));
@@ -433,6 +411,38 @@ namespace Indy.IL2CPU {
 				xOp.Assemble();
 				mMethods[xCurrentMethod] = true;
 			}
+		}
+
+		public static SortedList<string, TypeInformation.Field> GetTypeFieldInfo(MethodDefinition aCurrentMethod, out uint aObjectStorageSize) {
+			SortedList<string, TypeInformation.Field> xTypeFields = new SortedList<string, TypeInformation.Field>();
+			aObjectStorageSize = ObjectImpl.FieldDataOffset;
+			TypeDefinition xCurrentInspectedType = GetDefinitionFromTypeReference(aCurrentMethod.DeclaringType);
+			do {
+				foreach (FieldDefinition xField in xCurrentInspectedType.Fields) {
+					if (xField.IsStatic) {
+						continue;
+					}
+					TypeDefinition xFieldType = GetDefinitionFromTypeReference(xField.FieldType);
+					uint xFieldSize;
+					if (xFieldType.IsClass) {
+						xFieldSize = 4;
+					} else {
+						xFieldSize = GetFieldStorageSize(xFieldType);
+					}
+					xTypeFields.Add(xField.ToString(), new TypeInformation.Field(aObjectStorageSize, xFieldSize));
+					aObjectStorageSize += xFieldSize;
+				}
+				if (xCurrentInspectedType.FullName != "System.Object") {
+					xCurrentInspectedType = GetDefinitionFromTypeReference(xCurrentInspectedType.BaseType);
+				} else {
+					break;
+				}
+			} while (true);
+			if (aCurrentMethod.DeclaringType.FullName == "System.String") {
+				xTypeFields.Add("$$Storage$$", new TypeInformation.Field(aObjectStorageSize, 4));
+				aObjectStorageSize += 4;
+			}
+			return xTypeFields;
 		}
 
 		private static Op GetOpFromType(Type aType, Instruction aInstruction, MethodInformation aMethodInfo) {
@@ -629,7 +639,7 @@ namespace Indy.IL2CPU {
 				throw new Exception("ERROR: No Current Engine found!");
 			}
 			AssemblyDefinition xAssemblyDef;
-			if (String.IsNullOrEmpty(aAssembly) || aAssembly == typeof(Engine).Assembly.GetName().FullName) {
+			if (String.IsNullOrEmpty(aAssembly) || aAssembly == typeof(Engine).Assembly.GetName().Name || aAssembly == typeof(Engine).Assembly.GetName().FullName) {
 				xAssemblyDef = AssemblyFactory.GetAssembly(typeof(Engine).Assembly.Location);
 			} else {
 				xAssemblyDef = mCurrent.mCrawledAssembly.Resolver.Resolve(aAssembly);

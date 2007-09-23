@@ -2,10 +2,8 @@ using System;
 using System.Linq;
 using System.Text;
 using Indy.IL2CPU.Assembler;
-using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Asm = Indy.IL2CPU.Assembler.Assembler;
-using Instruction = Mono.Cecil.Cil.Instruction;
 
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Ldstr, true)]
@@ -20,26 +18,24 @@ namespace Indy.IL2CPU.IL.X86 {
 			// Make sure the crawler finds string constructors
 			string xDataName = Assembler.GetIdentifier("StringLiteral");
 			var xDataByteArray = new StringBuilder();
-			foreach (byte x in Encoding.ASCII.GetBytes(LiteralStr)) {
-				xDataByteArray.Append(x.ToString());
-				xDataByteArray.Append(",");
-			}
+			xDataByteArray.Append("0,0,0,0,");
+			xDataByteArray.Append(BitConverter.GetBytes((int)InstanceTypeEnum.Array).Aggregate("", (r, b) => r + b + ","));
+			xDataByteArray.Append(BitConverter.GetBytes(LiteralStr.Length).Aggregate("", (r, b) => r + b + ","));
+			xDataByteArray.Append(Encoding.ASCII.GetBytes(LiteralStr).Aggregate("", (r, b) => r + b + ","));
 			xDataByteArray.Append("0,");
 			Assembler.DataMembers.Add(new DataMember(xDataName, "db", xDataByteArray.ToString().TrimEnd(',')));
-			Pushd("0" + LiteralStr.Length + "d");
+			//Pushd("0" + LiteralStr.Length.ToString("X") + "d");
 			Func<Op, bool> AssembleOtherOp = delegate(Op aOp) {
 				aOp.Assembler = Assembler;
 				aOp.Assemble();
 				return true;
 			};
-			AssembleOtherOp(new Newarr(Engine.GetTypeDefinition("mscorlib", "System.Int32")));
-			AssembleOtherOp(new Dup(null, null));
 			Pushd(xDataName);
-			AssembleOtherOp(new Call(Engine.GetMethodDefinition(Engine.GetTypeDefinition("mscorlib", "System.Runtime.CompilerServices.RuntimeHelpers"), "InitializeArray", "System.Array", "System.RuntimeFieldHandle")));
-			AssembleOtherOp(new Dup(null, null));
-			Pushd("0");
-			Pushd("0" + LiteralStr.Length.ToString("X") + "h");
-			AssembleOtherOp(new Call(Engine.GetMethodDefinition(Engine.GetTypeDefinition("mscorlib", "System.String"), ".ctor", "System.Char[]", "System.Int32", "System.Int32")));
+			new Newobj() {
+				Assembler = Assembler,
+				CtorRef = Engine.GetMethodDefinition(Engine.GetTypeDefinition("mscorlib", "System.String"), ".ctor", "System.Char[]"),
+			}.Assemble();
+
 		}
 	}
 }

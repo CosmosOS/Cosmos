@@ -91,6 +91,12 @@ namespace Indy.IL2CPU.IL.X86 {
 			Push(aAssembler, "eax");
 		}
 
+		public static void Ldflda(Assembler.Assembler aAssembler, string aRelativeAddress) {
+			aAssembler.Add(new Popd("eax"));
+			aAssembler.Add(new CPU.Add("eax", aRelativeAddress.Trim().Substring(1)));
+			aAssembler.Add(new Pushd("eax"));
+		}
+
 		public void Multiply() {
 			Assembler.Add(new CPU.Pop("eax"));
 			Assembler.Add(new CPU.Multiply("dword [esp]"));
