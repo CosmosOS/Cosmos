@@ -58,6 +58,7 @@ namespace Indy.IL2CPU {
 		protected SortedList<string, MethodInfo> mCustomMethodImplementation = new SortedList<string, MethodInfo>();
 
 
+
 		/// <summary>
 		/// Compiles an assembly to CPU-specific code. The entrypoint of the assembly will be 
 		/// crawled to see what is neccessary, same goes for all dependencies.
@@ -423,8 +424,15 @@ namespace Indy.IL2CPU {
 			SortedList<string, TypeInformation.Field> xTypeFields = new SortedList<string, TypeInformation.Field>();
 			aObjectStorageSize = ObjectImpl.FieldDataOffset;
 			TypeDefinition xCurrentInspectedType = GetDefinitionFromTypeReference(aCurrentMethod.DeclaringType);
+			return GetTypeFieldInfo(xCurrentInspectedType, out aObjectStorageSize);
+		}
+
+		public static SortedList<string, TypeInformation.Field> GetTypeFieldInfo(TypeDefinition aType, out uint aObjectStorageSize) {
+			SortedList<string, TypeInformation.Field> xTypeFields = new SortedList<string,TypeInformation.Field>();
+			TypeDefinition xActualType = aType;
+			aObjectStorageSize = 0;
 			do {
-				foreach (FieldDefinition xField in xCurrentInspectedType.Fields) {
+				foreach (FieldDefinition xField in aType.Fields) {
 					if (xField.IsStatic) {
 						continue;
 					}
@@ -438,13 +446,13 @@ namespace Indy.IL2CPU {
 					xTypeFields.Add(xField.ToString(), new TypeInformation.Field(aObjectStorageSize, xFieldSize));
 					aObjectStorageSize += xFieldSize;
 				}
-				if (xCurrentInspectedType.FullName != "System.Object") {
-					xCurrentInspectedType = GetDefinitionFromTypeReference(xCurrentInspectedType.BaseType);
+				if (aType.FullName != "System.Object") {
+					aType = GetDefinitionFromTypeReference(aType.BaseType);
 				} else {
 					break;
 				}
 			} while (true);
-			if (aCurrentMethod.DeclaringType.FullName == "System.String") {
+			if (xActualType.FullName == "System.String") {
 				xTypeFields.Add("$$Storage$$", new TypeInformation.Field(aObjectStorageSize, 4));
 				aObjectStorageSize += 4;
 			}

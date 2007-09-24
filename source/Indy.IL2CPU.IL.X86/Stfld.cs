@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
@@ -9,12 +10,20 @@ namespace Indy.IL2CPU.IL.X86 {
 	public class Stfld: Op {
 		public Stfld(Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
+			if (aInstruction == null) {
+				throw new ArgumentNullException("aInstruction");
+			}
+			if (aMethodInfo == null) {
+				throw new ArgumentNullException("aMethodInfo");
+			}
 			FieldDefinition xField = aInstruction.Operand as FieldDefinition;
 			if (xField == null) {
 				throw new Exception("Field not found!");
 			}
 			string xFieldId = xField.ToString();
-			TypeInformation.Field xTheField = aMethodInfo.TypeInfo.Fields[xFieldId];
+			TypeInformation.Field xTheField;
+			uint xStorageSize;
+			xTheField = Engine.GetTypeFieldInfo(Engine.GetDefinitionFromTypeReference(xField.DeclaringType), out xStorageSize)[xFieldId];
 			RelativeAddress = xTheField.RelativeAddress;
 			FieldSize = xTheField.Size;
 			if (FieldSize != 4) {

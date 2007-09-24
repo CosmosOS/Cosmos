@@ -45,6 +45,8 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="Tests\SimpleByRefParam\SimpleByRefParam.cs">
+    </None>
     <None Include="Tests\TestSimpleArrays\TestSimpleArrays.cs">
     </None>
     <None Include="Tests\TwoMethodsWithLocals\TwoMethodsWithLocals.cs">
@@ -182,7 +184,15 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Tests\SimpleByRefParam\SimpleByRefParam.expected.asm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Tests\TestSimpleArrays\TestSimpleArrays.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Tests\SimpleByRefParam\SimpleByRefParam.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
