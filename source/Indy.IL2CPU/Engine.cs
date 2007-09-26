@@ -117,6 +117,7 @@ namespace Indy.IL2CPU {
 					IL.Op.QueueMethod += QueueMethod;
 					IL.Op.QueueStaticField += QueueStaticField;
 					try {
+						mTypes.Add(GetTypeDefinition("mscorlib", "System.Object"));
 						mMethods.Add(RuntimeEngineRefs.InitializeApplicationRef, false);
 						mMethods.Add(RuntimeEngineRefs.FinalizeApplicationRef, false);
 						mMethods.Add(mCrawledAssembly.EntryPoint, false);
@@ -131,7 +132,14 @@ namespace Indy.IL2CPU {
 						}
 						mAssembler.Add(new Assembler.X86.Call(new Label(RuntimeEngineRefs.FinalizeApplicationRef).Name));
 						ProcessAllMethods();
-						ScanForMethodToIncludeForVMT();
+						do {
+							int xOldCount = mMethods.Count;
+							ScanForMethodToIncludeForVMT();
+							ProcessAllMethods();
+							if (xOldCount == mMethods.Count) {
+								break;
+							}
+						} while (true);
 						ProcessAllStaticFields();
 					} finally {
 						mAssembler.Flush();
@@ -145,20 +153,40 @@ namespace Indy.IL2CPU {
 		}
 
 		private void ScanForMethodToIncludeForVMT() {
-			for (int i = mMethods.Count - 1; i >= 0; i--) {
-				MethodDefinition xCurrentInspectedMethod = mMethods.Keys[i];
-				TypeDefinition xCurrentType = GetDefinitionFromTypeReference(xCurrentInspectedMethod.DeclaringType);
+			List<TypeDefinition> xCheckedTypes = new List<TypeDefinition>();
+			foreach (MethodDefinition xMethod in mMethods.Keys) {
+				if (xMethod.IsStatic) {
+					continue;
+				}
+				TypeDefinition xCurrentType = GetDefinitionFromTypeReference(xMethod.DeclaringType);
+				if (!xCheckedTypes.Contains(xCurrentType, mTypesEqualityComparer)) {
+					xCheckedTypes.Add(xCurrentType);
+				}
+			}
+			foreach (TypeDefinition xType in mTypes) {
+				if (!xCheckedTypes.Contains(xType, mTypesEqualityComparer)) {
+					xCheckedTypes.Add(xType);
+				}
+			}
+			for (int i = 0; i < xCheckedTypes.Count; i++) {
+				TypeDefinition xCurrentType = xCheckedTypes[i];
 				while (xCurrentType != null) {
-					foreach (MethodDefinition xCurrentMethod in xCurrentType.Methods) {
-						if (xCurrentMethod.IsAbstract || xCurrentMethod.Overrides.Count > 0) {
-							QueueMethod(xCurrentMethod);
-							continue;
-						}
+					if (!xCheckedTypes.Contains(xCurrentType, mTypesEqualityComparer)) {
+						xCheckedTypes.Add(xCurrentType);
 					}
 					if (xCurrentType.FullName == "System.Object") {
 						break;
 					}
 					xCurrentType = GetDefinitionFromTypeReference(xCurrentType.BaseType);
+				}
+			}
+			foreach (TypeDefinition xTD in xCheckedTypes) {
+				foreach (MethodDefinition xMethod in xTD.Methods) {
+					if (!xMethod.IsStatic) {
+						if (xMethod.IsVirtual || xMethod.Overrides.Count > 0) {
+							QueueMethod(xMethod);
+						}
+					}
 				}
 			}
 		}
@@ -177,14 +205,18 @@ namespace Indy.IL2CPU {
 		}
 
 		public static TypeDefinition GetDefinitionFromTypeReference(TypeReference aRef) {
+			if (aRef == null) {
+				throw new ArgumentNullException("aRef");
+			}
 			if (mCurrent == null) {
 				throw new Exception("No Current engine found!");
 			}
+			TypeDefinition xTempResult = aRef as TypeDefinition;
+			if (xTempResult != null) {
+				return xTempResult;
+			}
 			if (aRef.FullName.Contains("modreq")) {
 				aRef = aRef.GetOriginalType();
-			}
-			if (aRef.FullName.EndsWith("[]")) {
-				return GetTypeDefinition(aRef.Module.Assembly.Name.Name, aRef.FullName.Substring(0, aRef.FullName.Length - 2));
 			}
 			AssemblyNameReference xAssemblyNameReference = aRef.Scope as AssemblyNameReference;
 			if (xAssemblyNameReference != null) {
@@ -200,6 +232,12 @@ namespace Indy.IL2CPU {
 						if (xReferencedType != null) {
 							return xReferencedType;
 						}
+						if (aRef.FullName.EndsWith("[]")) {
+							xReferencedType = xModule.Types[aRef.FullName.Substring(0, aRef.FullName.Length - 2)];
+							if (xReferencedType != null) {
+								return xReferencedType;
+							}
+						}
 					}
 				}
 			} else {
@@ -208,6 +246,12 @@ namespace Indy.IL2CPU {
 					var xReferencedType = xReferencedModule.Types[aRef.FullName];
 					if (xReferencedType != null) {
 						return xReferencedType;
+					}
+					if (aRef.FullName.EndsWith("[]")) {
+						xReferencedType = xReferencedModule.Types[aRef.FullName.Substring(0, aRef.FullName.Length - 2)];
+						if (xReferencedType != null) {
+							return xReferencedType;
+						}
 					}
 				} else {
 					mCurrent.OnDebugLog("Error: Unhandled scope: " + aRef.Scope == null ? "**NULL**" : aRef.Scope.GetType().FullName);
@@ -228,13 +272,13 @@ namespace Indy.IL2CPU {
 			}
 			switch (aType.FullName) {
 				case "System.Char":
-					return 2;
+					return 4;
 				case "System.Byte":
 				case "System.SByte":
-					return 1;
+					return 4;
 				case "System.UInt16":
 				case "System.Int16":
-					return 2;
+					return 4;
 				case "System.UInt32":
 				case "System.Int32":
 					return 4;
@@ -245,8 +289,20 @@ namespace Indy.IL2CPU {
 				case "System.UIntPtr":
 				case "System.IntPtr":
 					return 4;
+				case "System.Boolean":
+					return 4;
+				case "System.Single":
+					return 4;
+				case "System.Double":
+					return 8;
+				case "System.Decimal":
+					return 16;
+				case "System.Guid":
+					return 16;
+				case "System.DateTime":
+					return 8; // todo: check for correct size
 			}
-			throw new Exception("Unable to determine ValueType size!");
+			throw new Exception("Unable to determine ValueType size! (Type = " + aType.FullName + ")");
 		}
 
 		private void ProcessAllStaticFields() {
@@ -458,8 +514,6 @@ namespace Indy.IL2CPU {
 		}
 
 		public static SortedList<string, TypeInformation.Field> GetTypeFieldInfo(MethodDefinition aCurrentMethod, out uint aObjectStorageSize) {
-			SortedList<string, TypeInformation.Field> xTypeFields = new SortedList<string, TypeInformation.Field>();
-			aObjectStorageSize = ObjectImpl.FieldDataOffset;
 			TypeDefinition xCurrentInspectedType = GetDefinitionFromTypeReference(aCurrentMethod.DeclaringType);
 			return GetTypeFieldInfo(xCurrentInspectedType, out aObjectStorageSize);
 		}
@@ -483,7 +537,7 @@ namespace Indy.IL2CPU {
 					xTypeFields.Add(xField.ToString(), new TypeInformation.Field(aObjectStorageSize, xFieldSize));
 					aObjectStorageSize += xFieldSize;
 				}
-				if (aType.FullName != "System.Object") {
+				if (aType.FullName != "System.Object" && aType.BaseType != null) {
 					aType = GetDefinitionFromTypeReference(aType.BaseType);
 				} else {
 					break;
@@ -596,13 +650,16 @@ namespace Indy.IL2CPU {
 		/// <param name="aType"></param>
 		/// <returns></returns>
 		public static int RegisterType(TypeDefinition aType) {
+			if (aType == null) {
+				throw new ArgumentNullException("aType");
+			}
 			if (mCurrent == null) {
 				throw new Exception("ERROR: No Current Engine found!");
 			}
 			TypeDefinition xFoundItem = mCurrent.mTypes.FirstOrDefault(x => x.FullName.Equals(aType.FullName));
 			if (xFoundItem == null) {
 				mCurrent.mTypes.Add(aType);
-				if (aType.FullName != "System.Object") {
+				if (aType.FullName != "System.Object" && aType.BaseType != null) {
 					TypeDefinition xCurInspectedType = GetDefinitionFromTypeReference(aType.BaseType);
 					RegisterType(xCurInspectedType);
 				}

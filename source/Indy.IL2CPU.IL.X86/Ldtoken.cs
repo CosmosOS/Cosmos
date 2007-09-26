@@ -12,14 +12,20 @@ namespace Indy.IL2CPU.IL.X86 {
 		public Ldtoken(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
 			FieldDefinition xFieldDef = aInstruction.Operand as FieldDefinition;
-			if (xFieldDef == null) {
-				throw new Exception("Unsupported Token type!");
+			if (xFieldDef != null) {
+				if (!xFieldDef.IsStatic) {
+					throw new Exception("Nonstatic field-backed tokens not supported yet!");
+				}
+				Engine.QueueStaticField(xFieldDef);
+				mTokenAddress = DataMember.GetStaticFieldName(xFieldDef);
+				return;
 			}
-			if (!xFieldDef.IsStatic) {
-				throw new Exception("Nonstatic field-backed tokens not supported yet!");
+			TypeReference xTypeRef = aInstruction.Operand as TypeReference;
+			if(xTypeRef!=null) {
+				mTokenAddress = "0" + Engine.RegisterType(Engine.GetDefinitionFromTypeReference(xTypeRef)).ToString("X") + "h";
+				return;
 			}
-			Engine.QueueStaticField(xFieldDef);
-			mTokenAddress=DataMember.GetStaticFieldName(xFieldDef);
+			throw new Exception("Token type not supported yet!");
 		}
 
 		public override void DoAssemble() {

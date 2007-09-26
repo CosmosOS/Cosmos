@@ -45,9 +45,6 @@ namespace Indy.IL2CPU.IL {
 			}
 			CallProxiedMethod();
 			DoQueueMethod(ProxiedMethod);
-			if (MethodInfo.HasReturnValue) {
-				Ldloc(0);
-			}
 		}
 	}
 }

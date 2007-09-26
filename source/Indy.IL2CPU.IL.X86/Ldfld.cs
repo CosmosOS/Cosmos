@@ -15,8 +15,8 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			string xFieldId = xField.ToString();
 			TypeInformation.Field xTheField;
-				uint xStorageSize;
-				xTheField = Engine.GetTypeFieldInfo(Engine.GetDefinitionFromTypeReference(xField.DeclaringType), out xStorageSize)[xFieldId];
+			uint xStorageSize;
+			xTheField = Engine.GetTypeFieldInfo(Engine.GetDefinitionFromTypeReference(xField.DeclaringType), out xStorageSize)[xFieldId];
 			RelativeAddress = xTheField.RelativeAddress;
 			FieldSize = xTheField.Size;
 			if (FieldSize != 4) {

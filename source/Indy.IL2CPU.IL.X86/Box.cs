@@ -19,17 +19,21 @@ namespace Indy.IL2CPU.IL.X86 {
 				throw new Exception("Couldn't determine Type!");
 			}
 			mTheSize = Engine.GetFieldStorageSize(xTypeRef);
-			if (mTheSize != 4) {
-				throw new Exception("Storage size not supported yet!");
+			if(((mTheSize/4)*4) != mTheSize) {
+				throw new Exception("Incorrect Datasize. ( ((mTheSize / 4) * 4) === mTheSize should evaluate to true!");
 			}
 			Engine.RegisterType(Engine.GetDefinitionFromTypeReference(xTypeRef));
 		}
 
 		public override void DoAssemble() {
-			Pushd("0" + mTheSize.ToString("X").ToUpper() + "h");
+			Pushd("0" + (mTheSize + ObjectImpl.FieldDataOffset).ToString("X").ToUpper() + "h");
 			Call(new Label(RuntimeEngineRefs.Heap_AllocNewObjectRef).Name);
-			Pushd("eax");
 			Move(Assembler, "dword [eax + 4]", "0" + InstanceTypeEnum.NormalObject.ToString("X") + "h");
+			for (int i = 0; i < (mTheSize / 4); i++ ) {
+				Pop("edx");
+				Move(Assembler, "dword [eax + 0" + (ObjectImpl.FieldDataOffset + (i * 4)).ToString("X") + "h]", "edx");
+			}
+			Pushd("eax");
 		}
 	}
 }

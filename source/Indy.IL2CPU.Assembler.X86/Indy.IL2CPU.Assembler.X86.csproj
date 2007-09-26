@@ -64,6 +64,7 @@
     <Compile Include="JumpIfZero.cs" />
     <Compile Include="Move.cs" />
     <Compile Include="Multiply.cs" />
+    <Compile Include="Neg.cs" />
     <Compile Include="Noop.cs" />
     <Compile Include="Pop.cs" />
     <Compile Include="Popd.cs" />
