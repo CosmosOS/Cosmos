@@ -7,7 +7,6 @@ using Mono.Cecil;
 using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 
-
 namespace Indy.IL2CPU.IL.X86 {
 	public class X86PInvokeMethodBodyOp: PInvokeMethodBodyOp {
 		public X86PInvokeMethodBodyOp(MethodDefinition aTheMethod, MethodInformation aMethodInfo)
@@ -56,10 +55,13 @@ namespace Indy.IL2CPU.IL.X86 {
 			for (int i = MethodInfo.Arguments.Length - 1; i >= 0; i--) {
 			//for(int i =0;i< MethodInfo.Arguments.Length;i++){
 				Op.Ldarg(Assembler, MethodInfo.Arguments[i].VirtualAddress);
-				if(TheMethod.Parameters[i].ParameterType.FullName=="System.String") {
-					new Call(Engine.GetMethodDefinition(Engine.GetTypeDefinition("", "Indy.IL2CPU.CustomImplementation.System.StringImpl"), "GetStorage", "System.UInt32")) {
-						Assembler = Assembler
-					}.Assemble();
+				if (Assembler.InMetalMode) {
+					if (TheMethod.Parameters[i].ParameterType.FullName == "System.String") {
+						new Call(Engine.GetMethodDefinition(Engine.GetTypeDefinition("", "Indy.IL2CPU.CustomImplementation.System.StringImpl"), "GetStorage", "System.UInt32"))
+						{
+							Assembler = Assembler
+						}.Assemble();
+					}
 				}
 			}
 			Assembler.Add(new CPUx86.Call("[" + xMethodName + "]"));

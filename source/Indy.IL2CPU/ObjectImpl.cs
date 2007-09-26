@@ -6,7 +6,8 @@ using System.Text;
 namespace Indy.IL2CPU {
 	public enum InstanceTypeEnum {
 		NormalObject = 1,
-		Array = 2
+		Array = 2,
+		BoxedValueType = 3
 	}
 	public static class ObjectImpl {
 		/// <summary>

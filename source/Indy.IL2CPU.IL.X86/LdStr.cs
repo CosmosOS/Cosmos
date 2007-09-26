@@ -15,27 +15,34 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public override void DoAssemble() {
-			// Make sure the crawler finds string constructors
-			string xDataName = Assembler.GetIdentifier("StringLiteral");
-			var xDataByteArray = new StringBuilder();
-			xDataByteArray.Append("0,0,0,0,");
-			xDataByteArray.Append(BitConverter.GetBytes((int)InstanceTypeEnum.Array).Aggregate("", (r, b) => r + b + ","));
-			xDataByteArray.Append(BitConverter.GetBytes(LiteralStr.Length).Aggregate("", (r, b) => r + b + ","));
-			xDataByteArray.Append(Encoding.ASCII.GetBytes(LiteralStr).Aggregate("", (r, b) => r + b + ","));
-			xDataByteArray.Append("0,");
-			Assembler.DataMembers.Add(new DataMember(xDataName, "db", xDataByteArray.ToString().TrimEnd(',')));
-			//Pushd("0" + LiteralStr.Length.ToString("X") + "d");
-			Func<Op, bool> AssembleOtherOp = delegate(Op aOp) {
-				aOp.Assembler = Assembler;
-				aOp.Assemble();
-				return true;
-			};
-			Pushd(xDataName);
-			new Newobj() {
-				Assembler = Assembler,
-				CtorRef = Engine.GetMethodDefinition(Engine.GetTypeDefinition("mscorlib", "System.String"), ".ctor", "System.Char[]"),
-			}.Assemble();
-
+			if (Assembler.InMetalMode) {
+				// todo: see if we need to output trailing bytes 00 00 or 00 01 depending on whether there are bytes >7F
+				string xDataName = Assembler.GetIdentifier("StringLiteral");
+				var xDataByteArray = new StringBuilder();
+				xDataByteArray.Append(Encoding.ASCII.GetBytes(LiteralStr).Aggregate("", (r, b) => r + b + ","));
+				foreach (byte x in Encoding.ASCII.GetBytes(LiteralStr)) {
+					xDataByteArray.Append(x.ToString());
+					xDataByteArray.Append(",");
+				}
+				xDataByteArray.Append("0,");
+				Assembler.DataMembers.Add(new DataMember(xDataName, "db", xDataByteArray.ToString().TrimEnd(',')));
+				Move(Assembler, "eax", xDataName);
+				Pushd("eax");
+			} else {
+				string xDataName = Assembler.GetIdentifier("StringLiteral");
+				var xDataByteArray = new StringBuilder();
+				xDataByteArray.Append("0,0,0,0,");
+				xDataByteArray.Append(BitConverter.GetBytes((int)InstanceTypeEnum.Array).Aggregate("", (r, b) => r + b + ","));
+				xDataByteArray.Append(BitConverter.GetBytes(LiteralStr.Length).Aggregate("", (r, b) => r + b + ","));
+				xDataByteArray.Append(Encoding.ASCII.GetBytes(LiteralStr).Aggregate("", (r, b) => r + b + ","));
+				xDataByteArray.Append("0,");
+				Assembler.DataMembers.Add(new DataMember(xDataName, "db", xDataByteArray.ToString().TrimEnd(',')));
+				Pushd(xDataName);
+				new Newobj() {
+					Assembler = Assembler,
+					CtorRef = Engine.GetMethodDefinition(Engine.GetTypeDefinition("mscorlib", "System.String"), ".ctor", "System.Char[]"),
+				}.Assemble();
+			}
 		}
 	}
 }
