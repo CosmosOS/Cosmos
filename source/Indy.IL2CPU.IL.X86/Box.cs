@@ -18,11 +18,18 @@ namespace Indy.IL2CPU.IL.X86 {
 			if (xTypeRef == null) {
 				throw new Exception("Couldn't determine Type!");
 			}
-			mTheSize = Engine.GetFieldStorageSize(xTypeRef);
+			if (xTypeRef is GenericParameter) {
+				// todo: implement support for generics
+				mTheSize = 4;
+			} else {
+				mTheSize = Engine.GetFieldStorageSize(xTypeRef);
+			}
 			if(((mTheSize/4)*4) != mTheSize) {
 				throw new Exception("Incorrect Datasize. ( ((mTheSize / 4) * 4) === mTheSize should evaluate to true!");
 			}
-			Engine.RegisterType(Engine.GetDefinitionFromTypeReference(xTypeRef));
+			if (!(xTypeRef is GenericParameter)) {
+				Engine.RegisterType(Engine.GetDefinitionFromTypeReference(xTypeRef));
+			}
 		}
 
 		public override void DoAssemble() {

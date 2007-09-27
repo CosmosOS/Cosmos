@@ -9,7 +9,6 @@ namespace Indy.IL2CPU.IL.X86 {
 	public class Ldarg_S: Ldarg {
 		public Ldarg_S(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
-			Console.WriteLine();
 		}
 	}
 }

@@ -13,7 +13,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 		public static void Assemble(CPU.Assembler aAssembler) {
 			aAssembler.Add(new CPUx86.Pop("eax"));
-			aAssembler.Add(new CPUx86.Move("edx", "4"));
+			aAssembler.Add(new CPUx86.Move("edx", "2"));
 			aAssembler.Add(new CPUx86.Multiply("edx"));
 			aAssembler.Add(new CPUx86.Add("eax", "0" + (ObjectImpl.FieldDataOffset + 4).ToString("X") + "h"));
 			aAssembler.Add(new CPUx86.Pop("edx"));

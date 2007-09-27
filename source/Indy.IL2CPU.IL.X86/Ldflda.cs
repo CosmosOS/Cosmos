@@ -12,7 +12,12 @@ namespace Indy.IL2CPU.IL.X86 {
 			: base(aInstruction, aMethodInfo) {
 			FieldDefinition xField = aInstruction.Operand as FieldDefinition;
 			if (xField == null) {
-				throw new Exception("Field not found!");
+				FieldReference xFieldRef = aInstruction.Operand as FieldReference;
+				if (xFieldRef == null) {
+					string typeName = aInstruction.Operand == null ? "" : aInstruction.Operand.GetType().FullName;
+					throw new Exception("Field not found! (Operand = '" + (aInstruction.Operand ?? "**NULL**") + "'[" + typeName + "])");
+				}
+				xField = Engine.GetDefinitionFromFieldReference(xFieldRef);
 			}
 			string xFieldId = xField.ToString();
 			TypeInformation.Field xTheField;
