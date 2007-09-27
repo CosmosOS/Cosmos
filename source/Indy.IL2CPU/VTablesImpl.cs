@@ -6,7 +6,6 @@ using System.Text;
 namespace Indy.IL2CPU {
 	public static class VTablesImpl {
 		public struct VTable {
-			public int TypeIdentifier;
 			public int BaseTypeIdentifier;
 			public int[] MethodIndexes;
 			public int[] MethodAddresses;
@@ -25,6 +24,31 @@ namespace Indy.IL2CPU {
 				xCurrentType = mTypes[xCurrentType].BaseTypeIdentifier;
 			} while (xCurrentType != 0);
 			return false;
+		}
+
+		public static void LoadTypeTable(int aTypeCount) {
+			mTypes = new VTable[aTypeCount];
+		}
+
+		public static void SetTypeInfo(int aType, int aBaseType, int aMethodCount) {
+			mTypes[aType].BaseTypeIdentifier = aBaseType;
+			mTypes[aType].MethodIndexes = new int[aMethodCount];
+			mTypes[aType].MethodAddresses = new int[aMethodCount];
+		}
+
+		public static void SetMethodInfo(int aType, int aMethodIndex, int aMethodIdentifier, int aMethodAddress) {
+			mTypes[aType].MethodIndexes[aMethodIndex] = aMethodIdentifier;
+			mTypes[aType].MethodAddresses[aMethodIndex] = aMethodAddress;
+		}
+
+		public static int GetMethodAddressForType(int aType, int aMethodIndex) {
+			VTable xTable = mTypes[aType];
+			for(int i = 0; i <xTable.MethodIndexes.Length; i++) {
+				if(xTable.MethodIndexes[i] == aMethodIndex) {
+					return xTable.MethodAddresses[i];
+				}
+			}
+			return 0;
 		}
 	}
 }
