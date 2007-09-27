@@ -10,11 +10,10 @@ namespace Indy.IL2CPU {
 				if (xField.IsStatic) {
 					continue;
 				}
-				TypeDefinition xFieldType = Engine.GetDefinitionFromTypeReference(xField.FieldType);
-				if (xFieldType.IsClass) {
+				if (!xField.FieldType.IsValueType) {
 					xResult += 4;
 				} else {
-					xResult += Engine.GetFieldStorageSize(xFieldType);
+					xResult += Engine.GetFieldStorageSize(xField.FieldType);
 				}
 			}
 			return xResult;
