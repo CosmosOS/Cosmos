@@ -7,9 +7,7 @@ namespace Indy.IL2CPU {
 	public static partial class RuntimeEngine {
 		public static void InitializeApplication() {
 			// do initialization of all runtime services, like heap and GC..
-			//PInvokes.DebugBreak();
 			StartupHeap();
-			
 		}
 
 		public static void FinalizeApplication(uint aExitCode) {

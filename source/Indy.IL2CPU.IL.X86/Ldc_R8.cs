@@ -1,6 +1,5 @@
 using System;
-using System.IO;
-using Mono.Cecil;
+using System.Linq;
 using Mono.Cecil.Cil;
 using CPU = Indy.IL2CPU.Assembler.X86;
 
@@ -13,7 +12,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			mValue = Single.Parse(aInstruction.Operand.ToString());
 		}
 		public override void DoAssemble() {
-			Pushd("0" + mValue.ToString("X") + "h");
+			Pushd("0" + BitConverter.GetBytes(mValue).Aggregate("", (x, b) => x + b.ToString("X2")) + "h");
 		}
 	}
 }

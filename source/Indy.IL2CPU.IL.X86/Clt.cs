@@ -26,14 +26,10 @@ namespace Indy.IL2CPU.IL.X86 {
 			Assembler.Add(new CPU.Label(LabelTrue));
 			Assembler.Add(new CPUx86.Add("esp", "4"));
 			Assembler.Add(new CPUx86.Push("01h"));
-			//			Assembler.Add(new CPUx86.Pop("eax"));
-			//			Assembler.Add(new CPUx86.Move("[esp]", "eax"));
 			Assembler.Add(new CPUx86.JumpAlways(NextInstructionLabel));
 			Assembler.Add(new CPU.Label(LabelFalse));
 			Assembler.Add(new CPUx86.Add("esp", "4"));
 			Assembler.Add(new CPUx86.Push("00h"));
-			//			Assembler.Add(new CPUx86.Pop("eax"));
-			//			Assembler.Add(new CPUx86.Move("[esp]", "eax"));
 			Assembler.Add(new CPUx86.JumpAlways(NextInstructionLabel));
 		}
 	}

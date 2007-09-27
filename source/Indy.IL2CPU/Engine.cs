@@ -232,8 +232,22 @@ namespace Indy.IL2CPU {
 						if (xReferencedType != null) {
 							return xReferencedType;
 						}
-						if (aRef.FullName.EndsWith("[]")) {
-							xReferencedType = xModule.Types[aRef.FullName.Substring(0, aRef.FullName.Length - 2)];
+						{
+							string theName = aRef.FullName;
+							while (theName.EndsWith("[]")) {
+								theName = theName.Substring(0, theName.Length - 2);
+							}
+							xReferencedType = xModule.Types[theName];
+							if (xReferencedType != null) {
+								return xReferencedType;
+							}
+						}
+						{
+							string theName = aRef.FullName;
+							while (theName.EndsWith("*")) {
+								theName = theName.Substring(0, theName.Length - 1);
+							}
+							xReferencedType = xModule.Types[theName];
 							if (xReferencedType != null) {
 								return xReferencedType;
 							}
@@ -247,8 +261,22 @@ namespace Indy.IL2CPU {
 					if (xReferencedType != null) {
 						return xReferencedType;
 					}
-					if (aRef.FullName.EndsWith("[]")) {
-						xReferencedType = xReferencedModule.Types[aRef.FullName.Substring(0, aRef.FullName.Length - 2)];
+					{
+						string theName = aRef.FullName;
+						while (theName.EndsWith("[]")) {
+							theName = theName.Substring(0, theName.Length - 2);
+						}
+						xReferencedType = xReferencedModule.Types[theName];
+						if (xReferencedType != null) {
+							return xReferencedType;
+						}
+					}
+					{
+						string theName = aRef.FullName;
+						while (theName.EndsWith("*")) {
+							theName = theName.Substring(0, theName.Length - 1);
+						}
+						xReferencedType = xReferencedModule.Types[theName];
 						if (xReferencedType != null) {
 							return xReferencedType;
 						}
@@ -302,7 +330,14 @@ namespace Indy.IL2CPU {
 				case "System.DateTime":
 					return 8; // todo: check for correct size
 			}
-			throw new Exception("Unable to determine ValueType size! (Type = " + aType.FullName + ")");
+			TypeDefinition xTypeDef = GetDefinitionFromTypeReference(aType);
+			if (xTypeDef.IsEnum) {
+				//System.Diagnostics.Debugger.Break();
+				return GetFieldStorageSize(xTypeDef.Fields.GetField("value__").FieldType);
+			}
+			uint xResult;
+			GetTypeFieldInfo(xTypeDef, out xResult);
+			return xResult;
 		}
 
 		private void ProcessAllStaticFields() {
