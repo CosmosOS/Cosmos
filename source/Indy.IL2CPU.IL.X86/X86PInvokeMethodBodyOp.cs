@@ -40,14 +40,14 @@ namespace Indy.IL2CPU.IL.X86 {
 			if (String.IsNullOrEmpty(xMethodName)) {
 				xMethodName = TheMethod.Name;
 			}
-			if (TheMethod.PInvokeInfo.IsCharSetNotSpec) {
+			//if (TheMethod.PInvokeInfo.IsCharSetNotSpec) {
 				foreach (ParameterDefinition xParam in TheMethod.Parameters) {
 					if (xParam.ParameterType.FullName=="System.String") {
 						xMethodName += "A";
 						break;
 					}
 				}
-			}
+			//}
 			if (String.IsNullOrEmpty(xDllName)) {
 				throw new Exception("Unable to determine what dll to use!");
 			}

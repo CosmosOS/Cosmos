@@ -171,12 +171,12 @@ namespace Indy.IL2CPU {
 				TypeDefinition xType = mTypes[i];
 				List<MethodDefinition> xEmittedMethods = new List<MethodDefinition>();
 				foreach (MethodDefinition xMethod in xType.Methods) {
-					if (mMethods.ContainsKey(xMethod) && mMethods[xMethod]) {
+					if (mMethods.ContainsKey(xMethod) && mMethods[xMethod] && !xMethod.IsAbstract) {
 						xEmittedMethods.Add(xMethod);
 					}
 				}
 				foreach (MethodDefinition xCtor in xType.Constructors) {
-					if (mMethods.ContainsKey(xCtor) && mMethods[xCtor]) {
+					if (mMethods.ContainsKey(xCtor) && mMethods[xCtor] && !xCtor.IsAbstract) {
 						xEmittedMethods.Add(xCtor);
 					}
 				}
