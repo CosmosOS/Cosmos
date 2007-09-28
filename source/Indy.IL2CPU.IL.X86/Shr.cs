@@ -13,7 +13,9 @@ namespace Indy.IL2CPU.IL.X86 {
 		public override void DoAssemble() {
 			Pop("eax"); // shift amount
 			Pop("edx"); // value
-			Assembler.Add(new CPU.ShiftRight("edx", "0", "eax"));
+			Move(Assembler, "cl", "[eax]");
+			Move(Assembler, "ebx", "0");
+			Assembler.Add(new CPU.ShiftRight("edx", "ebx", "cl"));
 			Pushd("edx");
 		}
 	}

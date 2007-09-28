@@ -40,7 +40,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				Pushd(xDataName);
 				new Newobj() {
 					Assembler = Assembler,
-					CtorRef = Engine.GetMethodDefinition(Engine.GetTypeDefinition("mscorlib", "System.String"), ".ctor", "System.Char[]"),
+					CtorDef = Engine.GetMethodDefinition(Engine.GetTypeDefinition("mscorlib", "System.String"), ".ctor", "System.Char[]"),
 				}.Assemble();
 			}
 		}

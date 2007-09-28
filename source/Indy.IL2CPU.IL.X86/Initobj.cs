@@ -26,7 +26,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		public override void DoAssemble() {
 			Pop("eax");
 			for(int i = 0; i < (mObjSize/4);i++) {
-				Move(Assembler, "[eax + 0" + i.ToString("X") + "h]", "0");
+				Move(Assembler, "dword [eax + 0" + (i*4).ToString("X") + "h]", "0");
 			}
 		}
 	}

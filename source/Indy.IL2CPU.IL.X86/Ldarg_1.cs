@@ -8,7 +8,7 @@ namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Ldarg_1)]
 	public class Ldarg_1: Ldarg {
 		public Ldarg_1(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(null, aMethodInfo) {
+			: base(aInstruction, aMethodInfo) {
 			SetArgIndex(1, aMethodInfo);
 		}
 	}

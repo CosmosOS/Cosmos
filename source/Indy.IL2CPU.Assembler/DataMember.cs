@@ -7,8 +7,12 @@ using Mono.Cecil;
 namespace Indy.IL2CPU.Assembler {
 	public class DataMember {
 		public static string GetStaticFieldName(FieldDefinition aField) {
-			string xTempResult = "static_field__" + aField.DeclaringType.FullName + "_" + aField.Name;
-			foreach(char c in new char[] {'.', ',', '+', '$', '<', '>', '{', '}', '-'}) {
+			return FilterStringForIncorrectChars("static_field__" + aField.DeclaringType.FullName + "_" + aField.Name);
+		}
+
+		public static string FilterStringForIncorrectChars(string aName) {
+			string xTempResult = aName;
+			foreach (char c in new char[] { '.', ',', '+', '$', '<', '>', '{', '}', '-', '`', '\'', '/', '\\' }) {
 				xTempResult = xTempResult.Replace(c, '_');
 			}
 			return xTempResult;

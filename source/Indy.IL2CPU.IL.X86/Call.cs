@@ -21,18 +21,19 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		private void Initialize(MethodReference aMethod) {
 			HasResult = !aMethod.ReturnType.ReturnType.FullName.Contains("System.Void");
-			LabelName = new Asm.Label(aMethod).Name;
-			Engine.QueueMethodRef(aMethod);
+			MethodDefinition xMethodDef = Engine.GetDefinitionFromMethodReference(aMethod);
+			LabelName = new Asm.Label(xMethodDef).Name;
+			Engine.QueueMethodRef(xMethodDef);
 			bool needsCleanup = false;
-			foreach (ParameterDefinition xParam in aMethod.Parameters) {
+			foreach (ParameterDefinition xParam in xMethodDef.Parameters) {
 				if (xParam.IsOut) {
 					needsCleanup = true;
 					break;
 				}
 			}
 			if (needsCleanup) {
-				TotalArgumentSize = aMethod.Parameters.Count * 4;
-				if (Engine.GetDefinitionFromMethodReference(aMethod).IsStatic) {
+				TotalArgumentSize = xMethodDef.Parameters.Count * 4;
+				if (!xMethodDef.IsStatic) {
 					TotalArgumentSize += 4;
 				}
 			}

@@ -124,6 +124,10 @@ namespace Indy.IL2CPU {
 						mTypes.Add(GetTypeDefinition("mscorlib", "System.Object"));
 						mMethods.Add(RuntimeEngineRefs.InitializeApplicationRef, false);
 						mMethods.Add(RuntimeEngineRefs.FinalizeApplicationRef, false);
+						mMethods.Add(VTablesImplRefs.LoadTypeTableRef, false);
+						mMethods.Add(VTablesImplRefs.SetMethodInfoRef, false);
+						mMethods.Add(VTablesImplRefs.SetTypeInfoRef, false);
+						mMethods.Add(VTablesImplRefs.GetMethodAddressForTypeRef, false);
 						mMethods.Add(mCrawledAssembly.EntryPoint, false);
 						// initialize the runtime engine
 						mAssembler.Add(
@@ -167,12 +171,12 @@ namespace Indy.IL2CPU {
 				TypeDefinition xType = mTypes[i];
 				List<MethodDefinition> xEmittedMethods = new List<MethodDefinition>();
 				foreach (MethodDefinition xMethod in xType.Methods) {
-					if (mMethods.ContainsKey(xMethod)) {
+					if (mMethods.ContainsKey(xMethod) && mMethods[xMethod]) {
 						xEmittedMethods.Add(xMethod);
 					}
 				}
 				foreach (MethodDefinition xCtor in xType.Constructors) {
-					if (mMethods.ContainsKey(xCtor)) {
+					if (mMethods.ContainsKey(xCtor) && mMethods[xCtor]) {
 						xEmittedMethods.Add(xCtor);
 					}
 				}
@@ -301,7 +305,27 @@ namespace Indy.IL2CPU {
 				}
 			}
 			if (xMethod == null) {
-				xMethod = xTypeDef.Methods.GetMethod(aRef.Name, aRef.Parameters);
+				foreach (MethodDefinition xFoundMethod in xTypeDef.Methods) {
+					if (xFoundMethod.Name != aRef.Name) {
+						continue;
+					}
+					if (xFoundMethod.ReturnType.ReturnType.FullName != aRef.ReturnType.ReturnType.FullName) {
+						continue;
+					}
+					if (xFoundMethod.Parameters.Count != aRef.Parameters.Count) {
+						continue;
+					}
+					bool xMismatch = false;
+					for (int i = 0; i < xFoundMethod.Parameters.Count; i++) {
+						if (xFoundMethod.Parameters[i].ParameterType.FullName != aRef.Parameters[i].ParameterType.FullName) {
+							xMismatch = true;
+							break;
+						}
+					}
+					if (!xMismatch) {
+						xMethod = xFoundMethod;
+					}
+				}
 			}
 			if (xMethod != null) {
 				return xMethod;
@@ -520,6 +544,10 @@ namespace Indy.IL2CPU {
 				case "System.DateTime":
 					return 8; // todo: check for correct size
 			}
+			if (aType.FullName.EndsWith("*")) {
+				// pointer
+				return 4;
+			}
 			TypeDefinition xTypeDef = GetDefinitionFromTypeReference(aType);
 			if (xTypeDef.IsEnum) {
 				//System.Diagnostics.Debugger.Break();
@@ -555,6 +583,9 @@ namespace Indy.IL2CPU {
 							xTheData += x + ",";
 						}
 						xTheData = xTheData.TrimEnd(',');
+						if (xTheData.Length == 0) {
+							throw new Exception("Field '" + xCurrentField.ToString() + "' doesn't have a valid size!");
+						}
 						mAssembler.DataMembers.Add(new DataMember(xFieldName, "db", xTheData));
 					} else {
 						uint xTheSize;
@@ -570,6 +601,9 @@ namespace Indy.IL2CPU {
 						string xTheData = "";
 						for (uint i = 0; i < xTheSize; i++) {
 							xTheData += "0,";
+						}
+						if (xTheSize == 0) {
+							throw new Exception("Field '" + xCurrentField.ToString() + "' doesn't have a valid size!");
 						}
 						xTheData = xTheData.TrimEnd(',');
 						mAssembler.DataMembers.Add(new DataMember(xFieldName, theType, xTheData));
@@ -601,67 +635,10 @@ namespace Indy.IL2CPU {
 					if (!xCurrentMethod.IsStatic) {
 						uint xObjectStorageSize;
 						SortedList<string, TypeInformation.Field> xTypeFields = GetTypeFieldInfo(xCurrentMethod, out xObjectStorageSize);
-
 						xTypeInfo = new TypeInformation(xObjectStorageSize, xTypeFields);
 					}
 				}
-				MethodInformation xMethodInfo;
-				{
-					MethodInformation.Variable[] xVars = new MethodInformation.Variable[0];
-					int xCurOffset = 0;
-					if (xCurrentMethod.HasBody) {
-						xVars = new MethodInformation.Variable[xCurrentMethod.Body.Variables.Count];
-						foreach (VariableDefinition xVarDef in xCurrentMethod.Body.Variables) {
-							int xVarSize = 4;
-							xVars[xVarDef.Index] = new MethodInformation.Variable(xCurOffset, xVarSize);
-							if (!(xVarDef.VariableType is GenericParameter)) {
-								RegisterType(GetDefinitionFromTypeReference(xVarDef.VariableType));
-							}
-							xCurOffset += xVarSize;
-						}
-					}
-					MethodInformation.Argument[] xArgs;
-					if (!xCurrentMethod.IsStatic) {
-						xArgs = new MethodInformation.Argument[xCurrentMethod.Parameters.Count + 1];
-						xCurOffset = 0;
-						int xArgSize;
-						for (int i = xArgs.Length - 1; i > 0; i--) {
-							xArgSize = 4;
-							ParameterDefinition xParamDef = xCurrentMethod.Parameters[xArgs.Length - i - 1];
-							MethodInformation.Argument.KindEnum xKind = MethodInformation.Argument.KindEnum.In;
-							if (xParamDef.IsOut) {
-								if (xParamDef.IsIn) {
-									xKind = MethodInformation.Argument.KindEnum.ByRef;
-								} else {
-									xKind = MethodInformation.Argument.KindEnum.Out;
-								}
-							}
-							xArgs[i] = new MethodInformation.Argument(xArgSize, xCurOffset, xKind);
-							xCurOffset += xArgSize;
-						}
-						xArgSize = 4;
-						// this
-						xArgs[0] = new MethodInformation.Argument(xArgSize, xCurOffset, MethodInformation.Argument.KindEnum.In);
-					} else {
-						xArgs = new MethodInformation.Argument[xCurrentMethod.Parameters.Count];
-						xCurOffset = 0;
-						for (int i = xArgs.Length - 1; i >= 0; i--) {
-							int xArgSize = 4;
-							ParameterDefinition xParamDef = xCurrentMethod.Parameters[xArgs.Length - i - 1];
-							MethodInformation.Argument.KindEnum xKind = MethodInformation.Argument.KindEnum.In;
-							if (xParamDef.IsOut) {
-								if (xParamDef.IsIn) {
-									xKind = MethodInformation.Argument.KindEnum.ByRef;
-								} else {
-									xKind = MethodInformation.Argument.KindEnum.Out;
-								}
-							}
-							xArgs[i] = new MethodInformation.Argument(xArgSize, xCurOffset, xKind);
-							xCurOffset += xArgSize;
-						}
-					}
-					xMethodInfo = new MethodInformation(xMethodName, xVars, xArgs, !xCurrentMethod.ReturnType.ReturnType.FullName.Contains("System.Void"), !xCurrentMethod.IsStatic, xTypeInfo);
-				}
+				MethodInformation xMethodInfo = GetMethodInfo(xCurrentMethod, xMethodName, xTypeInfo);
 				IL.Op xOp = GetOpFromType(mMap.MethodHeaderOp, null, xMethodInfo);
 				xOp.Assembler = mAssembler;
 #if VERBOSE_DEBUG
@@ -743,6 +720,67 @@ namespace Indy.IL2CPU {
 			}
 		}
 
+		public static MethodInformation GetMethodInfo(MethodDefinition aCurrentMethod, string aMethodName, TypeInformation aTypeInfo) {
+			MethodInformation xMethodInfo;
+			{
+				MethodInformation.Variable[] xVars = new MethodInformation.Variable[0];
+				int xCurOffset = 0;
+				if (aCurrentMethod.HasBody) {
+					xVars = new MethodInformation.Variable[aCurrentMethod.Body.Variables.Count];
+					foreach (VariableDefinition xVarDef in aCurrentMethod.Body.Variables) {
+						int xVarSize = 4;
+						xVars[xVarDef.Index] = new MethodInformation.Variable(xCurOffset, xVarSize);
+						if (!(xVarDef.VariableType is GenericParameter)) {
+							RegisterType(GetDefinitionFromTypeReference(xVarDef.VariableType));
+						}
+						xCurOffset += xVarSize;
+					}
+				}
+				MethodInformation.Argument[] xArgs;
+				if (!aCurrentMethod.IsStatic) {
+					xArgs = new MethodInformation.Argument[aCurrentMethod.Parameters.Count + 1];
+					xCurOffset = 0;
+					int xArgSize;
+					for (int i = xArgs.Length - 1; i > 0; i--) {
+						xArgSize = 4;
+						ParameterDefinition xParamDef = aCurrentMethod.Parameters[xArgs.Length - i - 1];
+						MethodInformation.Argument.KindEnum xKind = MethodInformation.Argument.KindEnum.In;
+						if (xParamDef.IsOut) {
+							if (xParamDef.IsIn) {
+								xKind = MethodInformation.Argument.KindEnum.ByRef;
+							} else {
+								xKind = MethodInformation.Argument.KindEnum.Out;
+							}
+						}
+						xArgs[i] = new MethodInformation.Argument(xArgSize, xCurOffset, xKind);
+						xCurOffset += xArgSize;
+					}
+					xArgSize = 4;
+					// this
+					xArgs[0] = new MethodInformation.Argument(xArgSize, xCurOffset, MethodInformation.Argument.KindEnum.In);
+				} else {
+					xArgs = new MethodInformation.Argument[aCurrentMethod.Parameters.Count];
+					xCurOffset = 0;
+					for (int i = xArgs.Length - 1; i >= 0; i--) {
+						int xArgSize = 4;
+						ParameterDefinition xParamDef = aCurrentMethod.Parameters[xArgs.Length - i - 1];
+						MethodInformation.Argument.KindEnum xKind = MethodInformation.Argument.KindEnum.In;
+						if (xParamDef.IsOut) {
+							if (xParamDef.IsIn) {
+								xKind = MethodInformation.Argument.KindEnum.ByRef;
+							} else {
+								xKind = MethodInformation.Argument.KindEnum.Out;
+							}
+						}
+						xArgs[i] = new MethodInformation.Argument(xArgSize, xCurOffset, xKind);
+						xCurOffset += xArgSize;
+					}
+				}
+				xMethodInfo = new MethodInformation(aMethodName, xVars, xArgs, !aCurrentMethod.ReturnType.ReturnType.FullName.Contains("System.Void"), aCurrentMethod.HasThis, aTypeInfo);
+			}
+			return xMethodInfo;
+		}
+
 		public static SortedList<string, TypeInformation.Field> GetTypeFieldInfo(MethodDefinition aCurrentMethod, out uint aObjectStorageSize) {
 			TypeDefinition xCurrentInspectedType = GetDefinitionFromTypeReference(aCurrentMethod.DeclaringType);
 			return GetTypeFieldInfo(xCurrentInspectedType, out aObjectStorageSize);
@@ -813,44 +851,14 @@ namespace Indy.IL2CPU {
 			throw new Exception("Field not found!(" + String.Format("{0}/{1}/{2}", aAssembly, aType, aField));
 		}
 
-		public static void QueueStaticField(FieldReference aFieldRef) {
+		public static void QueueStaticField(FieldReference aFieldRef, out string aDataName) {
 			if (mCurrent == null) {
 				throw new Exception("ERROR: No Current Engine found!");
 			}
-			AssemblyNameReference xAssemblyNameReference = aFieldRef.DeclaringType.Scope as AssemblyNameReference;
-			if (xAssemblyNameReference != null) {
-				AssemblyDefinition xReferencedFieldAssembly;
-				if (xAssemblyNameReference.FullName == typeof(RuntimeEngine).Assembly.GetName().FullName) {
-					xReferencedFieldAssembly = RuntimeEngineRefs.RuntimeAssemblyDef;
-				} else {
-					xReferencedFieldAssembly = mCurrent.mCrawledAssembly.Resolver.Resolve(xAssemblyNameReference);
-				}
-				if (xReferencedFieldAssembly != null) {
-					foreach (ModuleDefinition xModule in xReferencedFieldAssembly.Modules) {
-						var xReferencedType = xModule.Types[aFieldRef.DeclaringType.FullName];
-						if (xReferencedType != null) {
-							var xFieldDef = xReferencedType.Fields.GetField(aFieldRef.Name);
-							if (xFieldDef != null) {
-								QueueStaticField(xFieldDef);
-							}
-							break;
-						}
-					}
-				}
-			} else {
-				ModuleDefinition xReferencedModule = aFieldRef.DeclaringType.Scope as ModuleDefinition;
-				if (xReferencedModule != null) {
-					var xReferencedType = xReferencedModule.Types[aFieldRef.DeclaringType.FullName];
-					if (xReferencedType != null) {
-						var xFieldDef = xReferencedType.Fields.GetField(aFieldRef.Name);
-						if (xFieldDef != null) {
-							QueueStaticField(xFieldDef);
-						}
-					}
-				} else {
-					mCurrent.OnDebugLog(LogSeverityEnum.Informational, "Error: Unhandled scope: " + aFieldRef.DeclaringType.Scope == null ? "**NULL**" : aFieldRef.DeclaringType.Scope.GetType().FullName);
-				}
-			}
+			aDataName = "";
+			FieldDefinition xFieldDef = GetDefinitionFromFieldReference(aFieldRef);
+			aDataName = DataMember.GetStaticFieldName(xFieldDef);
+			QueueStaticField(xFieldDef);
 		}
 
 		// MtW: 

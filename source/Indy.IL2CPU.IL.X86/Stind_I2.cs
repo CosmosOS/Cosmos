@@ -13,7 +13,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		public override void DoAssemble() {
 			Pop("eax");
 			Pop("edx");
-			Move(Assembler, "word [edx]", "eax");
+			Move(Assembler, "[edx]", "eax");
 		}
 	}
 }

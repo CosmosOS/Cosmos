@@ -7,7 +7,7 @@ using Mono.Cecil;
 namespace System {
 	public static class MethodReferenceExtensions {
 		public static string GetFullName(this MethodReference aSelf) {
-			StringBuilder sb = new StringBuilder(aSelf.DeclaringType.FullName + "." + aSelf.Name);
+			StringBuilder sb = new StringBuilder(aSelf.ReturnType.ReturnType.FullName + " " + aSelf.DeclaringType.FullName + "." + aSelf.Name);
 			sb.Append("(");
 			if (aSelf.Parameters.Count > 0) {
 

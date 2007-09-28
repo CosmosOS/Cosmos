@@ -14,18 +14,22 @@ namespace Indy.IL2CPU.IL.X86 {
 		private string mNormalAddress;
 		public Callvirt(Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
+			//System.Diagnostics.Debugger.Break();
 			MethodReference xMethod = aInstruction.Operand as MethodReference;
 			if (xMethod == null) {
 				throw new Exception("Unable to determine Method!");
 			}
-			if (!aMethodInfo.IsInstanceMethod) {
+			MethodDefinition xMethodDef = Engine.GetDefinitionFromMethodReference(xMethod);
+			if (xMethodDef.IsStatic) {
 				mNormalAddress = new CPU.Label(xMethod).Name;
 				mHasReturn = !xMethod.ReturnType.ReturnType.FullName.StartsWith("System.Void");
 				return;
 			}
-			mMethodIdentifier = Engine.GetMethodIdentifier(Engine.GetDefinitionFromMethodReference(xMethod));
-			mThisAddress = aMethodInfo.Arguments[0].VirtualAddress;
-			mHasReturn = !xMethod.ReturnType.ReturnType.FullName.StartsWith("System.Void");
+			mMethodIdentifier = Engine.GetMethodIdentifier(xMethodDef);
+			Engine.QueueMethodRef(VTablesImplRefs.GetMethodAddressForTypeRef);
+			MethodInformation xTheMethodInfo = Engine.GetMethodInfo(xMethodDef, new CPU.Label(xMethodDef).Name, null);
+			mThisAddress = xTheMethodInfo.Arguments[0].VirtualAddress;
+			mHasReturn = xTheMethodInfo.IsInstanceMethod;
 		}
 
 		public override void DoAssemble() {

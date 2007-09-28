@@ -15,7 +15,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
 			mCount = aCount;
 		}
 		public override string ToString() {
-			return "shl " + mDestination + ", " + mSource + ", " + mCount;
+			return "shld " + mDestination + ", " + mSource + ", " + mCount;
 		}
 	}
 }

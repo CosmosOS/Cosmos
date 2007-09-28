@@ -13,7 +13,9 @@ namespace Indy.IL2CPU.IL.X86 {
 			mValue = Int64.Parse(aInstruction.Operand.ToString());
 		}
 		public override void DoAssemble() {
-			Pushd("0" + mValue.ToString("X") + "h");
+			string theValue = mValue.ToString("X");
+			Pushd("0" + theValue.Substring(0, 8) + "h");
+			Pushd("0" + theValue.Substring(8) + "h");
 		}
 	}
 }

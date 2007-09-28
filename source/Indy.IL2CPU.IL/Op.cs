@@ -36,7 +36,11 @@ namespace Indy.IL2CPU.IL {
 		public Op(Instruction aInstruction, MethodInformation aMethodInfo) {
 			if (aInstruction != null) {
 				mCurrentInstructionLabel = GetInstructionLabel(aInstruction);
-				mILComment = "; IL: " + aInstruction.OpCode.Code + " " + aInstruction.Operand;
+				if (aInstruction.OpCode.Code.ToString() != "Ldstr") {
+					mILComment = "; IL: " + aInstruction.OpCode.Code + " " + aInstruction.Operand;
+				} else {
+					mILComment = "; IL: " + aInstruction.OpCode.Code;
+				}
 			}
 		}
 
