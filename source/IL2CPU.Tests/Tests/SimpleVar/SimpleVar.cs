@@ -4,8 +4,9 @@ using System.Text;
 
 namespace IL2CPU.Tests.Tests {
 	public class TestEmptyMethodApp {
-		public static void Main() {
+		public static int Main() {
 			int TempInt = 5;
+			return TempInt == 5 ? 0 : 1;
 		}
 	}
 }

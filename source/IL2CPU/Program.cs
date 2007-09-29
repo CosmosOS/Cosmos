@@ -8,7 +8,7 @@ using Indy.IL2CPU.IL.X86;
 namespace IL2CPU {
 	public class Program {
 		public static void Main(string[] args) {
-			System.Diagnostics.Debugger.Break();
+//			System.Diagnostics.Debugger.Break();
 			try {
 				string exeName = "HelloWorld.exe";
 				if (args.Length > 0) {

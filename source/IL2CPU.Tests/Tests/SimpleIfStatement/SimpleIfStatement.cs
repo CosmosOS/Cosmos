@@ -2,10 +2,11 @@ using System;
 
 class Program
 {
-	static void Main()
+	static int Main()
 	{
 		bool theParam = true;
 		int theValue = ConditionalFunction(theParam);
+		return theValue == 4 ? 0 : 1;
 	}
 	
 	public static int ConditionalFunction(bool aValue)

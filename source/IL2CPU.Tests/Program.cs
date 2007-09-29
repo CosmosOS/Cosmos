@@ -6,24 +6,28 @@ using System.IO;
 using System.Text;
 
 namespace IL2CPU.Tests {
+	public enum TestRunStateEnum {
+		TimeoutWhileRunningIL2CPU,
+		TimeoutWhileRunningFasm,
+		TimeoutWhileRunningTest,
+		WrongReturnCodeFromTest,
+		Passed
+	}
 	class Program {
 		public const int TestTimeout_Seconds = 10;
 		public const int TestTimeout_Milliseconds = TestTimeout_Seconds * 1000;
 		static void Main(string[] args) {
-			SortedList<string, bool?> xTests = new SortedList<string, bool?>();
+			SortedList<string, TestRunStateEnum?> xTests = new SortedList<string, TestRunStateEnum?>();
 			Console.WriteLine("IL2CPU Tester. Please be patient while all tests are executed");
 			Console.WriteLine();
 			string xBaseDir = Path.GetDirectoryName(typeof(Program).Assembly.Location);
 			string xBaseTestsDir = Path.Combine(xBaseDir, "Tests");
-			foreach (string s in Directory.GetFiles(xBaseTestsDir, "*.expected.asm", SearchOption.AllDirectories)) {
-				if (File.Exists(s.Replace(".expected.asm", ".exe"))) {
-					xTests.Add(s.Replace(".expected.asm", ".exe"), null);
-				}
+			foreach (string s in Directory.GetFiles(xBaseTestsDir, "*.exe", SearchOption.AllDirectories)) {
+				xTests.Add(s, null);
 			}
 			Console.WriteLine("Found {0} tests. Executing now:", xTests.Count);
 			for (int i = 0; i < xTests.Count; i++) {
 				string xTestExe = xTests.Keys[i];
-				string xExpectedResultFile = xTestExe.Substring(0, xTestExe.Length - ".exe".Length) + ".expected.asm";
 				string xActualOutputFile = Path.GetTempFileName();
 				try {
 					ProcessStartInfo xStartInfo = new ProcessStartInfo();
@@ -33,56 +37,78 @@ namespace IL2CPU.Tests {
 					xStartInfo.Arguments = "\"" + xTestExe + "\" \"" + xActualOutputFile + "\"";
 					xStartInfo.RedirectStandardError = true;
 					xStartInfo.RedirectStandardOutput = true;
-					Process xProc = Process.Start(xStartInfo);
-					if (!xProc.WaitForExit(TestTimeout_Milliseconds)) {
-						xTests[xTestExe] = null;
-						Console.Write("E");
+					using (Process xProc = Process.Start(xStartInfo)) {
+						if (!xProc.WaitForExit(TestTimeout_Milliseconds)) {
+							xTests[xTestExe] = TestRunStateEnum.TimeoutWhileRunningIL2CPU;
+							Console.Write("E");
+							continue;
+						}
 					}
-					if (String.Equals(File.ReadAllText(xExpectedResultFile), File.ReadAllText(xActualOutputFile))) {
-						xTests[xTestExe] = true;
-						Console.Write(".");
-					} else {
-						xTests[xTestExe] = false;
-						Console.Write("F");
+					xStartInfo = new ProcessStartInfo();
+					xStartInfo.CreateNoWindow = true;
+					xStartInfo.UseShellExecute = false;
+					xStartInfo.FileName = Path.Combine(xBaseDir, "fasm.exe");
+					xStartInfo.Arguments = "\"" + xActualOutputFile + "\" \"" + xTestExe + ".exe\"";
+					xStartInfo.RedirectStandardError = true;
+					xStartInfo.RedirectStandardOutput = true;
+					using (Process xProc = Process.Start(xStartInfo)) {
+						if (!xProc.WaitForExit(TestTimeout_Milliseconds)) {
+							xTests[xTestExe] = TestRunStateEnum.TimeoutWhileRunningFasm;
+							Console.Write("A");
+							continue;
+						}
 					}
+					xStartInfo = new ProcessStartInfo();
+					xStartInfo.CreateNoWindow = true;
+					xStartInfo.UseShellExecute = false;
+					xStartInfo.FileName = Path.Combine(xBaseDir, xTestExe + ".exe");
+					xStartInfo.RedirectStandardError = true;
+					xStartInfo.RedirectStandardOutput = true;
+					using (Process xProc = Process.Start(xStartInfo)) {
+						if (!xProc.WaitForExit(TestTimeout_Milliseconds)) {
+							xTests[xTestExe] = TestRunStateEnum.TimeoutWhileRunningTest;
+							Console.Write("T");
+							continue;
+						}
+						if (xProc.ExitCode != 0) {
+							xTests[xTestExe] = TestRunStateEnum.WrongReturnCodeFromTest;
+							Console.Write("R");
+							continue;
+						}
+					}
+					xTests[xTestExe] = TestRunStateEnum.Passed;
+					Console.Write(".");
 				} finally {
 					File.Delete(xActualOutputFile);
+					if (File.Exists(xTestExe + ".exe")) {
+						try {
+							File.Delete(xTestExe + ".exe");
+						} catch {
+						}
+					}
 				}
 			}
 			Console.WriteLine();
 			Console.WriteLine("Test execution done.");
-			if ((from item in xTests
-				 where item.Value == false
-				 select item.Key).Count() > 0) {
-				Console.WriteLine("Tests Failed:");
-				foreach (string s in (from item in xTests
-									  where item.Value == false
-									  select item.Key)) {
-					Console.WriteLine("\t" + s);
+			foreach (string s in Enum.GetNames(typeof(TestRunStateEnum))) {
+				if (s == TestRunStateEnum.Passed.ToString()) {
+					continue;
+				}
+				if ((from item in xTests
+					 where item.Value.Value.ToString() == s
+					 select item.Key).Count() > 0) {
+					Console.WriteLine("Tests with teststate '{0}':", s);
+					foreach (string x in (from item in xTests
+										  where item.Value.Value.ToString() == s
+										  select item.Key)) {
+						Console.WriteLine("\t" + x);
+					}
+
 				}
 			}
-			if ((from item in xTests
-				 where item.Value == null
-				 select item.Key).Count() > 0) {
-				Console.WriteLine("Tests Timed out:");
-				foreach (string s in (from item in xTests
-									  where item.Value == null
-									  select item.Key)) {
-					Console.WriteLine("\t" + s);
-				}
-			}
-			int xPassCount = (from item in xTests
-							  where item.Value == true
-							  select item).Count();
-			int xFailCount = (from item in xTests
-							  where item.Value == false
-							  select item).Count();
-			int xTimeoutCount = (from item in xTests
-								 where item.Value == null
-								 select item).Count();
-			Console.WriteLine("\tTests passed:    {0}/{1}", xPassCount, xTests.Count);
-			Console.WriteLine("\tTests failed:    {0}/{1}", xFailCount, xTests.Count);
-			Console.WriteLine("\tTests timed out: {0}/{1}", xTimeoutCount, xTests.Count);
+			Console.WriteLine("Tests passed:    {0}/{1}", (from item in xTests
+														   where item.Value.Value == TestRunStateEnum.Passed
+														   select 1).Count(), xTests.Count);
 		}
 	}
 }

@@ -45,6 +45,11 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="Tests\SimpleStructIndexing\SimpleStructIndexing.cs" />
+    <None Include="Tests\SimpleForWithIf\SimpleForWithIf.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Tests\SimpleStructTest\SimpleStructTest.cs" />
     <None Include="Tests\SimpleByRefParam\SimpleByRefParam.cs">
     </None>
     <None Include="Tests\TestSimpleArrays\TestSimpleArrays.cs">
@@ -60,7 +65,7 @@
     <None Include="Tests\SimpleSubtractFunction\SimpleSubtractFunction.cs">
     </None>
     <None Include="Tests\SimpleAddFunction\SimpleAddFunction.cs" />
-    <None Include="Tests\SimplePInvoke\SimplePInvokeTest.cs">
+    <None Include="Tests\SimplePInvokeTest\SimplePInvokeTest.cs">
     </None>
     <None Include="Tests\SimpleEchoFunction\SimpleEchoFunction.cs">
     </None>
@@ -68,10 +73,7 @@
     <None Include="Tests\SimpleMethodCall\SimpleMethodCall.cs" />
     <None Include="Tests\SingleMethodWithParam\SingleMethodWithParam.cs" />
     <None Include="Tests\SimpleVar\SimpleVar.cs" />
-    <None Include="Tests\EmptyMethod\TestEmptyMethodApp.cs" />
-    <None Include="Tests\EmptyMethod\TestEmptyMethodApp.expected.asm">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <None Include="Tests\TestEmptyMethodApp\TestEmptyMethodApp.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IL2CPU\IL2CPU.csproj">
@@ -84,28 +86,16 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Tests\EmptyMethod\TestEmptyMethodApp.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Tests\SimpleVar\SimpleVar.expected.asm">
+    <None Include="Tests\TestEmptyMethodApp\TestEmptyMethodApp.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Tests\SimpleMethodCall\SimpleMethodCall.expected.asm">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="Tests\SimpleVar\SimpleVar.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Tests\SingleMethodWithParam\SingleMethodWithParam.expected.asm">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Tests\SimpleFunctionCall\SimpleFunctionCall.expected.asm">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="Tests\SimpleMethodCall\SimpleMethodCall.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -114,9 +104,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Tests\SimpleEchoFunction\SimpleEchoFunction.expected.asm">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="Tests\SimpleFunctionCall\SimpleFunctionCall.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -125,15 +112,9 @@
     <None Include="Tests\SimpleEchoFunction\SimpleEchoFunction.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Tests\SimplePInvoke\SimplePInvokeTest.expected.asm">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Tests\SimpleAddFunction\SimpleAddFunction.expected.asm">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Tests\SimplePInvoke\SimplePInvokeTest.exe">
+    <None Include="Tests\SimplePInvokeTest\SimplePInvokeTest.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -141,26 +122,14 @@
     <None Include="Tests\SimpleAddFunction\SimpleAddFunction.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Tests\SimpleSubtractFunction\SimpleSubtractFunction.expected.asm">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Tests\SimpleIfStatement\SimpleIfStatement.expected.asm">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="Tests\SimpleSubtractFunction\SimpleSubtractFunction.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Tests\ComplexerIfStatements\ComplexerIfStatements.expected.asm">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="Tests\SimpleIfStatement\SimpleIfStatement.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Tests\TwoIfStatements\TwoIfStatements.expected.asm">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -171,28 +140,38 @@
     <None Include="Tests\TwoIfStatements\TwoIfStatements.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Tests\TwoMethodsWithLocals\TwoMethodsWithLocals.expected.asm">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Tests\TestSimpleArrays\TestSimpleArrays.expected.asm">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="Tests\TwoMethodsWithLocals\TwoMethodsWithLocals.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Tests\SimpleByRefParam\SimpleByRefParam.expected.asm">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="Tests\TestSimpleArrays\TestSimpleArrays.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="Tests\SimpleByRefParam\SimpleByRefParam.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="FASM.EXE">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Tests\buildalltests.bat" />
+    <None Include="Tests\SimpleStructTest\SimpleStructTest.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Tests\SimpleForWithIf\SimpleForWithIf.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="Tests\SimpleStructIndexing\SimpleStructIndexing.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
