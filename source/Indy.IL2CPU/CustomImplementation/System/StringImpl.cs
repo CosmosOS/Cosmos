@@ -18,7 +18,14 @@ namespace Indy.IL2CPU.CustomImplementation.System {
 			aStorage = aChars;
 		}
 
-		[DllImport("test.dll")]
-		public static extern uint GetStorage(uint aString);
+		public static uint GetStorageMetal(uint aStringPtr) {
+			return aStringPtr;
+		}
+
+		public static uint GetStorageNormal(uint aStringPtr) {
+			uint xResult = aStringPtr;
+			xResult = xResult + 12;
+			return xResult;
+		}
 	}
 }

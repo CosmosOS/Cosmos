@@ -9,24 +9,25 @@ namespace Indy.IL2CPU.IL.X86 {
 	public class Ldsfld: Op {
 		private bool IsIntPtrZero = false;
 		private string mDataName;
-		private bool mIsValueType;
+		private bool mIsReferenceType;
 
 		public Ldsfld(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
 			FieldReference xField = (FieldReference)aInstruction.Operand;
-			mIsValueType = xField.FieldType.IsValueType;
+			TypeDefinition xFieldTypeDef = Engine.GetDefinitionFromTypeReference(xField.FieldType);
+			mIsReferenceType = xFieldTypeDef.IsClass;
 			Engine.QueueStaticField(xField, out mDataName);
-			if(String.IsNullOrEmpty(mDataName)) {
+			if (String.IsNullOrEmpty(mDataName)) {
 				throw new Exception("No name generated for field '" + xField.GetFullName() + "'");
 			}
 			//DoQueueStaticField(xField.DeclaringType.Module.Assembly.Name.FullName, xField.DeclaringType.FullName, xField.Name, out mDataName);
 		}
 		public override void DoAssemble() {
-//			if (mIsValueType) {
-//				Pushd("[" + mDataName + "]");
-//			}else {
+			if (mIsReferenceType) {
+				Pushd("[" + mDataName + "]");
+			} else {
 				Pushd(mDataName);
-//			}
+			}
 		}
 	}
 }

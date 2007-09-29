@@ -5,14 +5,14 @@ using System.Text;
 
 namespace Indy.IL2CPU {
 	partial class RuntimeEngine {
-		public static IntPtr HeapHandle;
+		public static uint HeapHandle = 0;
 		public const uint InitialHeapSize = 1024;
-		public const uint MaximumHeapSize = 10 * InitialHeapSize;
+		public const uint MaximumHeapSize = 10 * 1024 * InitialHeapSize; // 10 megabytes
 		public static void StartupHeap() {
 			HeapHandle = PInvokes.Kernel32_HeapCreate(0, InitialHeapSize, MaximumHeapSize);
 		}
 
-		public static IntPtr Heap_AllocNewObject(uint aSize) {
+		public static uint Heap_AllocNewObject(uint aSize) {
 //			if (aSize == 0) {
 //				aSize = 1;
 //			}
@@ -21,7 +21,7 @@ namespace Indy.IL2CPU {
 
 		public static void ShutdownHeap() {
 			PInvokes.Kernel32_HeapDestroy(HeapHandle);
-			HeapHandle = IntPtr.Zero;
+			HeapHandle = 0;
 		}
 	}
 }

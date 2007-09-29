@@ -16,13 +16,13 @@ namespace Indy.IL2CPU {
 
 		#region Heap functions
 		[DllImport("kernel32.dll", EntryPoint = "HeapCreate")]
-		public static extern IntPtr Kernel32_HeapCreate(uint flOptions, uint dwInitialSize, uint dwMaximumSize);
+		public static extern uint Kernel32_HeapCreate(uint flOptions, uint dwInitialSize, uint dwMaximumSize);
 
 		[DllImport("kernel32.dll", EntryPoint = "HeapDestroy")]
-		public static extern bool Kernel32_HeapDestroy(IntPtr aHeap);
+		public static extern bool Kernel32_HeapDestroy(uint aHeap);
 
 		[DllImport("kernel32.dll", EntryPoint = "HeapAlloc")]
-		public static extern IntPtr Kernel32_HeapAlloc(IntPtr hHeap, uint dwFlags, uint dwBytes);
+		public static extern uint Kernel32_HeapAlloc(uint hHeap, uint dwFlags, uint dwBytes);
 		#endregion
 
 	}

@@ -28,6 +28,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			Pushd("eax");
 			//			Move(Assembler, "ecx", "eax");
 			Pushd("eax");
+			Move(Assembler, "dword [eax]", "0" + Engine.RegisterTypeRef(CtorDef.DeclaringType).ToString("X") + "h");
 			Move(Assembler, "dword [eax + 4]", "0" + InstanceTypeEnum.NormalObject.ToString("X") + "h");
 			//Pushd("ecx");
 			for (int i = 0; i < CtorDef.Parameters.Count; i++) {

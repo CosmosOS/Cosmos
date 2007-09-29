@@ -19,11 +19,13 @@ namespace Indy.IL2CPU.IL.X86 {
 			string BaseLabel = CurInstructionLabel + "__";
 			string LabelTrue = BaseLabel + "True";
 			string LabelFalse = BaseLabel + "False";
+			Assembler.Add(new CPUx86.Pop("ecx"));
 			Assembler.Add(new CPUx86.Pop("eax"));
+			Pushd("ecx");
 			Assembler.Add(new CPUx86.Compare("eax", "[esp]"));
 			Assembler.Add(new CPUx86.JumpIfLess(LabelTrue));
 			Assembler.Add(new CPUx86.JumpAlways(LabelFalse));
-			Assembler.Add(new CPU.Label(LabelTrue));
+			Assembler.Add(new CPU.Label(LabelTrue));				
 			Assembler.Add(new CPUx86.Add("esp", "4"));
 			Assembler.Add(new CPUx86.Push("01h"));
 			Assembler.Add(new CPUx86.JumpAlways(NextInstructionLabel));

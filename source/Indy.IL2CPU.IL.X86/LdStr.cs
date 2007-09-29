@@ -20,10 +20,6 @@ namespace Indy.IL2CPU.IL.X86 {
 				string xDataName = Assembler.GetIdentifier("StringLiteral");
 				var xDataByteArray = new StringBuilder();
 				xDataByteArray.Append(Encoding.ASCII.GetBytes(LiteralStr).Aggregate("", (r, b) => r + b + ","));
-				foreach (byte x in Encoding.ASCII.GetBytes(LiteralStr)) {
-					xDataByteArray.Append(x.ToString());
-					xDataByteArray.Append(",");
-				}
 				xDataByteArray.Append("0,");
 				Assembler.DataMembers.Add(new DataMember(xDataName, "db", xDataByteArray.ToString().TrimEnd(',')));
 				Move(Assembler, "eax", xDataName);
@@ -31,7 +27,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			} else {
 				string xDataName = Assembler.GetIdentifier("StringLiteral");
 				var xDataByteArray = new StringBuilder();
-				xDataByteArray.Append("0,0,0,0,");
+				xDataByteArray.Append(BitConverter.GetBytes(Engine.RegisterType(Engine.GetTypeDefinition("mscorlib", "System.String"))).Aggregate("", (r, b) => r + b + ","));
 				xDataByteArray.Append(BitConverter.GetBytes((int)InstanceTypeEnum.Array).Aggregate("", (r, b) => r + b + ","));
 				xDataByteArray.Append(BitConverter.GetBytes(LiteralStr.Length).Aggregate("", (r, b) => r + b + ","));
 				xDataByteArray.Append(Encoding.ASCII.GetBytes(LiteralStr).Aggregate("", (r, b) => r + b + ","));

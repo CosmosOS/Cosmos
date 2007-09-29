@@ -14,7 +14,9 @@ namespace Indy.IL2CPU.IL.X86 {
 		private string mNormalAddress;
 		public Callvirt(Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
-			//System.Diagnostics.Debugger.Break();
+			int xThisOffSet = (from item in aMethodInfo.Locals
+								select item.Offset + item.Size).LastOrDefault();
+			mThisAddress = "ebp - 0" + xThisOffSet.ToString("X") + "h";
 			MethodReference xMethod = aInstruction.Operand as MethodReference;
 			if (xMethod == null) {
 				throw new Exception("Unable to determine Method!");
@@ -28,7 +30,6 @@ namespace Indy.IL2CPU.IL.X86 {
 			mMethodIdentifier = Engine.GetMethodIdentifier(xMethodDef);
 			Engine.QueueMethodRef(VTablesImplRefs.GetMethodAddressForTypeRef);
 			MethodInformation xTheMethodInfo = Engine.GetMethodInfo(xMethodDef, new CPU.Label(xMethodDef).Name, null);
-			mThisAddress = xTheMethodInfo.Arguments[0].VirtualAddress;
 			mHasReturn = xTheMethodInfo.IsInstanceMethod;
 		}
 
@@ -36,9 +37,9 @@ namespace Indy.IL2CPU.IL.X86 {
 			if (!String.IsNullOrEmpty(mNormalAddress)) {
 				Call(mNormalAddress);
 			} else {
-				Ldarg(Assembler, mThisAddress);
-				Pop("eax");
+				Move(Assembler, "eax", "[" + mThisAddress + "]");
 				Pushd("[eax]");
+				Pushd("0" + mMethodIdentifier.ToString("X") + "h");
 				Call(new CPU.Label(VTablesImplRefs.GetMethodAddressForTypeRef).Name);
 				Call("eax");
 			}

@@ -40,36 +40,53 @@ namespace Indy.IL2CPU.IL.X86 {
 			if (String.IsNullOrEmpty(xMethodName)) {
 				xMethodName = TheMethod.Name;
 			}
-			//if (TheMethod.PInvokeInfo.IsCharSetNotSpec) {
-				foreach (ParameterDefinition xParam in TheMethod.Parameters) {
-					if (xParam.ParameterType.FullName=="System.String") {
-						xMethodName += "A";
-						break;
+			Assembler.Add(new Literal("; PInvokeAttributes = '" + TheMethod.PInvokeInfo.Attributes.ToString("G") + "'"));
+//			bool xNeedsExtras = false;
+//			foreach (ParameterDefinition xParam in TheMethod.Parameters) {
+//				if (xParam.ParameterType.FullName == "System.String") {
+//					xNeedsExtras = true;
+//					break;
+//				}
+//			}
+//			if (xNeedsExtras) {
+				if (!TheMethod.PInvokeInfo.IsNoMangle) {
+					if (TheMethod.PInvokeInfo.IsCharSetUnicode) {
+						xMethodName += "A";// for now, strings are ASCII
+					} else {
+						if (TheMethod.PInvokeInfo.IsCharSetAnsi) {
+							xMethodName += "A";
+						}	else {
+							if(TheMethod.PInvokeInfo.IsCharSetAuto) {
+								xMethodName += "A";// for now, strings are ASCII
+							}
+						}
 					}
 				}
-			//}
+//			}
 			if (String.IsNullOrEmpty(xDllName)) {
 				throw new Exception("Unable to determine what dll to use!");
 			}
 			MakeSureMethodIsRegistered(xDllName, xDllFileName, xMethodName);
 			for (int i = MethodInfo.Arguments.Length - 1; i >= 0; i--) {
-			//for(int i =0;i< MethodInfo.Arguments.Length;i++){
 				Op.Ldarg(Assembler, MethodInfo.Arguments[i].VirtualAddress);
-				if (Assembler.InMetalMode) {
-					if (TheMethod.Parameters[i].ParameterType.FullName == "System.String") {
-						new Call(Engine.GetMethodDefinition(Engine.GetTypeDefinition("", "Indy.IL2CPU.CustomImplementation.System.StringImpl"), "GetStorage", "System.UInt32"))
-						{
-							Assembler = Assembler
-						}.Assemble();
+				if (TheMethod.Parameters[i].ParameterType.FullName == "System.String") {
+					string xGetStorageMethodName = "GetStorage";
+					if (Assembler.InMetalMode) {
+						xGetStorageMethodName += "Metal";
+					} else {
+						xGetStorageMethodName += "Normal";
 					}
+					new Call(Engine.GetMethodDefinition(Engine.GetTypeDefinition("", "Indy.IL2CPU.CustomImplementation.System.StringImpl"), xGetStorageMethodName, "System.UInt32")) {
+						Assembler = Assembler
+					}.Assemble();
 				}
 			}
 			Assembler.Add(new CPUx86.Call("[" + xMethodName + "]"));
 			Assembler.Add(new CPUx86.Pushd("eax"));
-//			if (MethodInfo.HasReturnValue) {
-//				Assembler.Add(new CPUx86.Pushd("0"));
-//				Assembler.Add(new CPUx86.Pop("eax"));
-//			}
+			//			if (MethodInfo.HasReturnValue) {
+			//				Assembler.Add(new CPUx86.Pushd("0"));
+			//				Assembler.Add(new CPUx86.Pop("eax"));
+			//			}
 		}
 	}
 }
