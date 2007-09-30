@@ -13,6 +13,7 @@ namespace Indy.IL2CPU.IL {
 	public abstract class Op {
 		private readonly string mCurrentInstructionLabel;
 		private readonly string mILComment;
+		private readonly bool mSupportsMetalMode;
 		public static string GetInstructionLabel(Cil.Instruction aInstruction) {
 			return ".L" + aInstruction.Offset.ToString("X8");
 		}
@@ -42,6 +43,10 @@ namespace Indy.IL2CPU.IL {
 					mILComment = "; IL: " + aInstruction.OpCode.Code;
 				}
 			}
+			OpCodeAttribute xAttrib = GetType().GetCustomAttributes(typeof (OpCodeAttribute), true).Cast<OpCodeAttribute>().FirstOrDefault();
+			if(xAttrib!=null) {
+				mSupportsMetalMode = xAttrib.IsMetallic;
+			}
 		}
 
 		// This is a prop and not a constructor arg for two reasons. Ok, mostly for one
@@ -57,6 +62,12 @@ namespace Indy.IL2CPU.IL {
 			}
 			set {
 				mAssembler = value;
+			}
+		}
+
+		public bool SupportsMetalMode {
+			get {
+				return mSupportsMetalMode;
 			}
 		}
 

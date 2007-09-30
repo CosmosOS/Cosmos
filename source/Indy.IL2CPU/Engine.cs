@@ -137,22 +137,22 @@ namespace Indy.IL2CPU {
 							Processed = false,
 							Index = mMethods.Count
 						});
-						mMethods.Add(VTablesImplRefs.LoadTypeTableRef, new QueuedMethodInformation() {
-							Processed = false,
-							Index = mMethods.Count
-						});
-						mMethods.Add(VTablesImplRefs.SetMethodInfoRef, new QueuedMethodInformation() {
-							Processed = false,
-							Index = mMethods.Count
-						});
-						mMethods.Add(VTablesImplRefs.SetTypeInfoRef, new QueuedMethodInformation() {
-							Processed = false,
-							Index = mMethods.Count
-						});
-						mMethods.Add(VTablesImplRefs.GetMethodAddressForTypeRef, new QueuedMethodInformation() {
-							Processed = false,
-							Index = mMethods.Count
-						});
+//						mMethods.Add(VTablesImplRefs.LoadTypeTableRef, new QueuedMethodInformation() {
+//							Processed = false,
+//							Index = mMethods.Count
+//						});
+//						mMethods.Add(VTablesImplRefs.SetMethodInfoRef, new QueuedMethodInformation() {
+//							Processed = false,
+//							Index = mMethods.Count
+//						});
+//						mMethods.Add(VTablesImplRefs.SetTypeInfoRef, new QueuedMethodInformation() {
+//							Processed = false,
+//							Index = mMethods.Count
+//						});
+//						mMethods.Add(VTablesImplRefs.GetMethodAddressForTypeRef, new QueuedMethodInformation() {
+//							Processed = false,
+//							Index = mMethods.Count
+//						});
 						mMethods.Add(mCrawledAssembly.EntryPoint, new QueuedMethodInformation() {
 							Processed = false,
 							Index = mMethods.Count
@@ -160,7 +160,7 @@ namespace Indy.IL2CPU {
 						// initialize the runtime engine
 						mAssembler.Add(
 							new Assembler.X86.Call(new Label(RuntimeEngineRefs.InitializeApplicationRef).Name),
-							new Assembler.X86.Call("____INIT__VMT____"),
+							//new Assembler.X86.Call("____INIT__VMT____"),
 							new Assembler.X86.Call(new Label(mCrawledAssembly.EntryPoint).Name));
 						if (mCrawledAssembly.EntryPoint.ReturnType.ReturnType.FullName.StartsWith("System.Void", StringComparison.InvariantCultureIgnoreCase)) {
 							mAssembler.Add(new Pushd("0"));
@@ -169,20 +169,16 @@ namespace Indy.IL2CPU {
 						}
 						mAssembler.Add(new Assembler.X86.Call(new Label(RuntimeEngineRefs.FinalizeApplicationRef).Name));
 						ProcessAllMethods();
-						do {
-							int xOldCount = mMethods.Count;
-							ScanForMethodToIncludeForVMT();
-							ProcessAllMethods();
-							if (xOldCount == mMethods.Count) {
-								break;
-							}
-						} while (true);
-						GenerateVMT();
+//						do {
+//							int xOldCount = mMethods.Count;
+//							ScanForMethodToIncludeForVMT();
+//							ProcessAllMethods();
+//							if (xOldCount == mMethods.Count) {
+//								break;
+//							}
+//						} while (true);
+//						GenerateVMT();
 						ProcessAllStaticFields();
-						Console.WriteLine("All Custom Implementations:");
-						foreach (string name in mCustomMethodImplementation.Keys) {
-							Console.WriteLine("\t" + name);
-						}
 					} finally {
 						mAssembler.Flush();
 						IL.Op.QueueMethod -= QueueMethod;
@@ -755,6 +751,9 @@ namespace Indy.IL2CPU {
 									QueueMethodRef(xMethodReference);
 								}
 								xOp = GetOpFromType(mMap.GetOpForOpCode(xInstruction.OpCode.Code), xInstruction, xMethodInfo);
+								if((!xOp.SupportsMetalMode) && mAssembler.InMetalMode) {
+									throw new Exception("OpCode '" + xInstruction.OpCode.Code + "' not supported in Metal mode!");
+								}
 								xOp.Assembler = mAssembler;
 								xOp.Assemble();
 							}

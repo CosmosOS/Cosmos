@@ -9,12 +9,13 @@ namespace IL2CPU.Tests {
 	public enum TestRunStateEnum {
 		TimeoutWhileRunningIL2CPU,
 		TimeoutWhileRunningFasm,
+		CompileErrorFromFasm,
 		TimeoutWhileRunningTest,
 		WrongReturnCodeFromTest,
 		Passed
 	}
 	class Program {
-		public const int TestTimeout_Seconds = 10;
+		public const int TestTimeout_Seconds = 60;
 		public const int TestTimeout_Milliseconds = TestTimeout_Seconds * 1000;
 		static void Main(string[] args) {
 			SortedList<string, TestRunStateEnum?> xTests = new SortedList<string, TestRunStateEnum?>();
@@ -55,6 +56,21 @@ namespace IL2CPU.Tests {
 						if (!xProc.WaitForExit(TestTimeout_Milliseconds)) {
 							xTests[xTestExe] = TestRunStateEnum.TimeoutWhileRunningFasm;
 							Console.Write("A");
+							continue;
+						}
+						if(!File.Exists(xTestExe + ".exe")) {
+							System.Diagnostics.Debugger.Break();
+							Console.WriteLine("Result of '" + xTestExe.Substring(xBaseDir.Length + 1) + "':");
+							string[] lines = xProc.StandardOutput.ReadToEnd().Split(new string[] {"\r\n"}, StringSplitOptions.None);
+							foreach(string s in lines) {
+								Console.WriteLine("\t" + s);
+							}
+							lines = xProc.StandardError.ReadToEnd().Split(new string[] { "\r\n" }, StringSplitOptions.None);
+							foreach (string s in lines) {
+								Console.WriteLine("\t" + s);
+							}
+							xTests[xTestExe] = TestRunStateEnum.CompileErrorFromFasm;
+							Console.Write("C");
 							continue;
 						}
 					}
