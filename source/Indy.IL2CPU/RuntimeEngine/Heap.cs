@@ -8,20 +8,21 @@ namespace Indy.IL2CPU {
 		public static uint HeapHandle = 0;
 		public const uint InitialHeapSize = 1024;
 		public const uint MaximumHeapSize = 10 * 1024 * InitialHeapSize; // 10 megabytes
-		public static void StartupHeap() {
-			HeapHandle = PInvokes.Kernel32_HeapCreate(0, InitialHeapSize, MaximumHeapSize);
+		public static void Heap_Initialize() {
+			//HeapHandle = PInvokes.Kernel32_HeapCreate(0, InitialHeapSize, MaximumHeapSize);
 		}
 
 		public static uint Heap_AllocNewObject(uint aSize) {
 //			if (aSize == 0) {
 //				aSize = 1;
 //			}
-			return PInvokes.Kernel32_HeapAlloc(HeapHandle, 0x00000008, aSize);
+			//return PInvokes.Kernel32_HeapAlloc(HeapHandle, 0x00000008, aSize);
+			return 0;
 		}
 
-		public static void ShutdownHeap() {
-			PInvokes.Kernel32_HeapDestroy(HeapHandle);
-			HeapHandle = 0;
+		public static void Heap_Shutdown() {
+			//PInvokes.Kernel32_HeapDestroy(HeapHandle);
+			//HeapHandle = 0;
 		}
 	}
 }

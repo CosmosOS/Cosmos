@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.20706</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{E17BC1C6-3E4F-443F-804E-CB43A5610DDB}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{4C0EF614-A58F-4CAF-8AD2-FFE345EB9472}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>HelloWorldAssembler</RootNamespace>
-    <AssemblyName>HelloWorldAssembler</AssemblyName>
+    <RootNamespace>Indy.IL2CPU.Assembler.Win32</RootNamespace>
+    <AssemblyName>Indy.IL2CPU.Assembler.Win32</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
@@ -35,25 +35,16 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Mono.Cecil, Version=0.5.0.1, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Mono.Cecil.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DummyOp.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="Assembler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Indy.IL2CPU.Assembler.Win32\Indy.IL2CPU.Assembler.Win32.csproj">
-      <Project>{4C0EF614-A58F-4CAF-8AD2-FFE345EB9472}</Project>
-      <Name>Indy.IL2CPU.Assembler.Win32</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Indy.IL2CPU.Assembler.X86\Indy.IL2CPU.Assembler.X86.csproj">
       <Project>{7F32CE06-13F2-4EDA-B588-3FAAFD25178A}</Project>
       <Name>Indy.IL2CPU.Assembler.X86</Name>
@@ -61,14 +52,6 @@
     <ProjectReference Include="..\Indy.IL2CPU.Assembler\Indy.IL2CPU.Assembler.csproj">
       <Project>{8E8CAD9B-C092-4071-AD92-E7A4E7BA776F}</Project>
       <Name>Indy.IL2CPU.Assembler</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Indy.IL2CPU.IL.X86\Indy.IL2CPU.IL.X86.csproj">
-      <Project>{69C8D2C5-225C-4A00-BA55-AEF6719CBDBA}</Project>
-      <Name>Indy.IL2CPU.IL.X86</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Indy.IL2CPU.IL\Indy.IL2CPU.IL.csproj">
-      <Project>{5A39A8DF-D99E-4112-9676-BD3EED969A9C}</Project>
-      <Name>Indy.IL2CPU.IL</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

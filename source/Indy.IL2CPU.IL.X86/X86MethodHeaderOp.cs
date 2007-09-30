@@ -7,8 +7,8 @@ using CPUx86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
 	public class X86MethodHeaderOp: MethodHeaderOp {
-		public readonly int LocalsCount;
-		public readonly string LabelName;
+		public readonly int LocalsCount = 0;
+		public readonly string LabelName = "";
 		public X86MethodHeaderOp(Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
 			LabelName = aMethodInfo.LabelName;

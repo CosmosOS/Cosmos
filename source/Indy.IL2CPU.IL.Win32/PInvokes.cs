@@ -4,16 +4,8 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Indy.IL2CPU {
-	public static class PInvokes {
-		[DllImport("kernel32.dll", EntryPoint = "ExitProcess")]
-		public static extern void Kernel32_ExitProcess(uint uExitCode);
-		[DllImport("kernel32.dll", EntryPoint = "GetLastError")]
-		public static extern uint Kernel32_GetLastError();
-
-		[DllImport("kernel32.dll")]
-		public static extern void DebugBreak();
-
+namespace Indy.IL2CPU.IL.Win32 {
+	public static  class PInvokes {
 		#region Heap functions
 		[DllImport("kernel32.dll", EntryPoint = "HeapCreate")]
 		public static extern uint Kernel32_HeapCreate(uint flOptions, uint dwInitialSize, uint dwMaximumSize);
@@ -25,5 +17,7 @@ namespace Indy.IL2CPU {
 		public static extern uint Kernel32_HeapAlloc(uint hHeap, uint dwFlags, uint dwBytes);
 		#endregion
 
+		[DllImport("kernel32.dll", EntryPoint = "ExitProcess")]
+		public static extern void Kernel32_ExitProcess(int aExitCode);
 	}
 }

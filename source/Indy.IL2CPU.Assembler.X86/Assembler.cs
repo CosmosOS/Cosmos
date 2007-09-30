@@ -4,8 +4,13 @@ using System.IO;
 using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
-    public class Assembler : Indy.IL2CPU.Assembler.Assembler {
-        public Assembler(StreamWriter aOutputWriter) : base(aOutputWriter) {
-        }
-    }
+	public abstract class Assembler: Indy.IL2CPU.Assembler.Assembler {
+		public Assembler(StreamWriter aOutputWriter)
+			: base(aOutputWriter) {
+		}
+
+		public Assembler(StreamWriter aOutputWriter, bool aInMetalMode)
+			: base(aOutputWriter, aInMetalMode) {
+		}
+	}
 }

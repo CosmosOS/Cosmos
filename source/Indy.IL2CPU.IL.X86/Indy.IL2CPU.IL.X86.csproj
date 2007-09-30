@@ -133,7 +133,10 @@
     <Compile Include="Endfinally.cs" />
     <Compile Include="Initblk.cs" />
     <Compile Include="Initobj.cs" />
+    <Compile Include="X86CustomMethodImplementationOp.cs" />
     <Compile Include="X86CustomMethodImplementationProxyOp.cs" />
+    <Compile Include="X86InitVmtImplementationOp.cs" />
+    <Compile Include="X86MainEntryPointOp.cs" />
     <Compile Include="X86MethodFooterOp.cs" />
     <Compile Include="X86MethodHeaderOp.cs" />
     <Compile Include="Op.cs" />
@@ -272,7 +275,6 @@
     <Compile Include="Volatile.cs" />
     <Compile Include="X86OpCodeMap.cs" />
     <Compile Include="X86PInvokeMethodBodyOp.cs" />
-    <Compile Include="X86CustomMethodImplementationOp.cs" />
     <Compile Include="Xor.cs" />
   </ItemGroup>
   <ItemGroup>

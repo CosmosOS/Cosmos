@@ -12,13 +12,6 @@ namespace Indy.IL2CPU.CustomImplementation.System {
 			}
 		}
 
-		[MethodAlias(Name = "System.Int32 System.Array.get_Length()")]
-		public static unsafe int Length_Get(int aThis) {
-			int* xArray = &aThis;
-			xArray += 8;
-			return *xArray;
-		}
-
 //		public static void InitArrayWithReferenceTypes(, uint aSize) {
 //
 //			for(int i = 0; i < aArray.Length; i++) {

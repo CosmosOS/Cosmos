@@ -49,6 +49,8 @@
   <ItemGroup>
     <Compile Include="CustomMethodImplementationOp.cs" />
     <Compile Include="CustomMethodImplementationProxyOp.cs" />
+    <Compile Include="InitVmtImplementationOp.cs" />
+    <Compile Include="MainEntryPointOp.cs" />
     <Compile Include="MethodFooterOp.cs" />
     <Compile Include="MethodHeaderOp.cs" />
     <Compile Include="MethodInformation.cs" />

@@ -55,7 +55,7 @@ namespace Indy.IL2CPU {
 	public delegate void DebugLogHandler(LogSeverityEnum aSeverity, string aMessage);
 
 	public enum TargetPlatformEnum {
-		x86
+		Win32
 	}
 
 	public class QueuedMethodInformation {
@@ -68,7 +68,7 @@ namespace Indy.IL2CPU {
 		protected AssemblyDefinition mCrawledAssembly;
 		protected DebugLogHandler mDebugLog;
 		protected OpCodeMap mMap;
-		protected Assembler.Assembler mAssembler;
+		protected Assembler.Win32.Assembler mAssembler;
 
 		/// <summary>
 		/// Contains a list of all methods. This includes methods to be processed and already processed.
@@ -105,16 +105,16 @@ namespace Indy.IL2CPU {
 				if (mCrawledAssembly.EntryPoint == null) {
 					throw new NotSupportedException("Libraries are not supported!");
 				}
-				using (mAssembler = new Assembler.X86.Assembler(aOutput)) {
+				using (mAssembler = new Assembler.Win32.Assembler(aOutput)) {
 					switch (aTargetPlatform) {
-						case TargetPlatformEnum.x86: {
-								mMap = (OpCodeMap)Activator.CreateInstance(Type.GetType("Indy.IL2CPU.IL.X86.X86OpCodeMap, Indy.IL2CPU.IL.X86", true));
+						case TargetPlatformEnum.Win32: {
+								mMap = (OpCodeMap)Activator.CreateInstance(Type.GetType("Indy.IL2CPU.IL.Win32.Win32OpCodeMap, Indy.IL2CPU.IL.Win32", true));
 								break;
 							}
 						default:
 							throw new NotSupportedException("TargetPlatform '" + aTargetPlatform + "' not supported!");
 					}
-					mAssembler.OutputType = Indy.IL2CPU.Assembler.Assembler.OutputTypeEnum.Console;
+					mAssembler.OutputType = Assembler.Win32.Assembler.OutputTypeEnum.Console;
 					mMap.Initialize(mAssembler);
 					foreach (Type t in typeof(Engine).Assembly.GetTypes()) {
 						foreach (MethodInfo mi in t.GetMethods()) {
@@ -137,47 +137,46 @@ namespace Indy.IL2CPU {
 							Processed = false,
 							Index = mMethods.Count
 						});
-//						mMethods.Add(VTablesImplRefs.LoadTypeTableRef, new QueuedMethodInformation() {
-//							Processed = false,
-//							Index = mMethods.Count
-//						});
-//						mMethods.Add(VTablesImplRefs.SetMethodInfoRef, new QueuedMethodInformation() {
-//							Processed = false,
-//							Index = mMethods.Count
-//						});
-//						mMethods.Add(VTablesImplRefs.SetTypeInfoRef, new QueuedMethodInformation() {
-//							Processed = false,
-//							Index = mMethods.Count
-//						});
-//						mMethods.Add(VTablesImplRefs.GetMethodAddressForTypeRef, new QueuedMethodInformation() {
-//							Processed = false,
-//							Index = mMethods.Count
-//						});
+						//						mMethods.Add(VTablesImplRefs.LoadTypeTableRef, new QueuedMethodInformation() {
+						//							Processed = false,
+						//							Index = mMethods.Count
+						//						});
+						//						mMethods.Add(VTablesImplRefs.SetMethodInfoRef, new QueuedMethodInformation() {
+						//							Processed = false,
+						//							Index = mMethods.Count
+						//						});
+						//						mMethods.Add(VTablesImplRefs.SetTypeInfoRef, new QueuedMethodInformation() {
+						//							Processed = false,
+						//							Index = mMethods.Count
+						//						});
+						//						mMethods.Add(VTablesImplRefs.GetMethodAddressForTypeRef, new QueuedMethodInformation() {
+						//							Processed = false,
+						//							Index = mMethods.Count
+						//						});
 						mMethods.Add(mCrawledAssembly.EntryPoint, new QueuedMethodInformation() {
 							Processed = false,
 							Index = mMethods.Count
 						});
 						// initialize the runtime engine
-						mAssembler.Add(
-							new Assembler.X86.Call(new Label(RuntimeEngineRefs.InitializeApplicationRef).Name),
-							//new Assembler.X86.Call("____INIT__VMT____"),
-							new Assembler.X86.Call(new Label(mCrawledAssembly.EntryPoint).Name));
+						MainEntryPointOp xEntryPointOp = (MainEntryPointOp)GetOpFromType(mMap.MainEntryPointOp, null, null);
+						xEntryPointOp.Assembler = mAssembler;
+						xEntryPointOp.Call(RuntimeEngineRefs.InitializeApplicationRef);
+						//new Assembler.X86.Call("____INIT__VMT____");
+						xEntryPointOp.Call(mCrawledAssembly.EntryPoint);
 						if (mCrawledAssembly.EntryPoint.ReturnType.ReturnType.FullName.StartsWith("System.Void", StringComparison.InvariantCultureIgnoreCase)) {
-							mAssembler.Add(new Pushd("0"));
-						} else {
-							mAssembler.Add(new Pushd("eax"));
+							xEntryPointOp.Pushd("0");
 						}
-						mAssembler.Add(new Assembler.X86.Call(new Label(RuntimeEngineRefs.FinalizeApplicationRef).Name));
+						xEntryPointOp.Call(RuntimeEngineRefs.FinalizeApplicationRef);
 						ProcessAllMethods();
-//						do {
-//							int xOldCount = mMethods.Count;
-//							ScanForMethodToIncludeForVMT();
-//							ProcessAllMethods();
-//							if (xOldCount == mMethods.Count) {
-//								break;
-//							}
-//						} while (true);
-//						GenerateVMT();
+						//						do {
+						//							int xOldCount = mMethods.Count;
+						//							ScanForMethodToIncludeForVMT();
+						//							ProcessAllMethods();
+						//							if (xOldCount == mMethods.Count) {
+						//								break;
+						//							}
+						//						} while (true);
+						//						GenerateVMT();
 						ProcessAllStaticFields();
 					} finally {
 						mAssembler.Flush();
@@ -192,88 +191,34 @@ namespace Indy.IL2CPU {
 
 		private void GenerateVMT() {
 			// todo: abstract this code generation out to IL.* implementation
-			mAssembler.Add(new Label("____INIT__VMT____"));
-			mAssembler.Add(new Assembler.X86.Push("ebp"));
-			mAssembler.Add(new Assembler.X86.Move("ebp", "esp"));
-			mAssembler.Add(new Pushd("0" + mTypes.Count.ToString("X") + "h"));
-			mAssembler.Add(new Call(new Label(VTablesImplRefs.LoadTypeTableRef).Name));
-			using (XmlWriter xw = XmlWriter.Create(@"d:\\debug.xml")) {
-				xw.WriteStartDocument();
-				xw.WriteStartElement("vmt");
-				for (int i = 0; i < mTypes.Count; i++) {
-					TypeDefinition xType = mTypes[i];
-					List<MethodDefinition> xEmittedMethods = new List<MethodDefinition>();
-					foreach (MethodDefinition xMethod in xType.Methods) {
-						if (mMethods.ContainsKey(xMethod) && mMethods[xMethod].Processed && !xMethod.IsAbstract) {
-							xEmittedMethods.Add(xMethod);
-						}
-					}
-					foreach (MethodDefinition xCtor in xType.Constructors) {
-						if (mMethods.ContainsKey(xCtor) && mMethods[xCtor].Processed && !xCtor.IsAbstract) {
-							xEmittedMethods.Add(xCtor);
-						}
-					}
-					mAssembler.Add(new Pushd("0" + i.ToString("X") + "h"));
-					int? xBaseIndex = null;
-					if (xType.BaseType == null) {
-						for (int t = 0; t < mTypes.Count; t++) {
-							if (mTypes[t].BaseType == null && mTypes[t].FullName == xType.FullName) {
-								xBaseIndex = t;
-								break;
-							}
-						}
-					} else {
-						for (int t = 0; t < mTypes.Count; t++) {
-							if (mTypes[t].BaseType == null) {
-								continue;
-							}
-							if (mTypes[t].BaseType.FullName == xType.BaseType.FullName && mTypes[t].FullName == xType.FullName) {
-								xBaseIndex = t;
-								break;
-							}
-						}
-					}
-					if (xBaseIndex == null) {
-						throw new Exception("Base type not found!");
-					}
-					xw.WriteStartElement("type");
-					xw.WriteAttributeString("name", xType.FullName);
-					xw.WriteAttributeString("number", i.ToString("X"));
-					mAssembler.Add(new Pushd("0" + xBaseIndex.Value.ToString("X") + "h"));
-					mAssembler.Add(new Pushd("0" + xEmittedMethods.Count.ToString("X") + "h"));
-					string xDataValue = Encoding.ASCII.GetBytes(mTypes[i].FullName + ", " + mTypes[i].Module.Assembly.Name.FullName).Aggregate("", (b, x) => b + x + ",") + "0";
-					string xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(mTypes[i].FullName);
-					mAssembler.DataMembers.Add(new DataMember(xDataName, "db", xDataValue));
-					mAssembler.Add(new Pushd(xDataName));
-					mAssembler.Add(new Call(new Label(VTablesImplRefs.SetTypeInfoRef).Name));
-					for (int j = 0; j < xEmittedMethods.Count; j++) {
-						MethodDefinition xMethod = xEmittedMethods[j];
-						mAssembler.Add(new Pushd("0" + i.ToString("X") + "h"));
-						mAssembler.Add(new Pushd("0" + j.ToString("X") + "h"));
-						TypeReference[] xMethodParams = new TypeReference[xMethod.Parameters.Count];
-						for (int k = 0; k < xMethod.Parameters.Count; k++) {
-							xMethodParams[i] = xMethod.Parameters[i].ParameterType;
-						}
-						mAssembler.Add(new Pushd("0" + GetMethodIdentifier(GetUltimateBaseMethod(xMethod, xMethodParams, mTypes[i]) ?? xMethod).ToString("X") + "h"));
-						mAssembler.Add(new Pushd(new Label(xMethod).Name));
-						xw.WriteStartElement("method");
-						xw.WriteAttributeString("name", xMethod.ToString());
-						xw.WriteAttributeString("number", j.ToString("X"));
-						xw.WriteEndElement();
-						xDataValue = Encoding.ASCII.GetBytes(xMethod.GetFullName()).Aggregate("", (b, x) => b + x + ",") + "0";
-						xDataName = "____SYSTEM____METHOD___" + DataMember.FilterStringForIncorrectChars(xMethod.GetFullName());
-						mAssembler.DataMembers.Add(new DataMember(xDataName, "db", xDataValue));
-						mAssembler.Add(new Pushd(xDataName));
-						mAssembler.Add(new Call(new Label(VTablesImplRefs.SetMethodInfoRef).Name));
-					}
-					xw.WriteEndElement();
+			Op xOp = GetOpFromType(mMap.MethodHeaderOp, null, new MethodInformation("____INIT__VMT____", new MethodInformation.Variable[0], new MethodInformation.Argument[0], false, false, null));
+			xOp.Assembler = mAssembler;
+			xOp.Assemble();
+			InitVmtImplementationOp xInitVmtOp = (InitVmtImplementationOp)GetOpFromType(mMap.InitVmtImplementationOp, null, null);
+			xInitVmtOp.Assembler = mAssembler;
+			xInitVmtOp.Types = mTypes;
+			xInitVmtOp.SetTypeInfoRef = VTablesImplRefs.SetTypeInfoRef;
+			xInitVmtOp.SetMethodInfoRef = VTablesImplRefs.SetMethodInfoRef;
+			xInitVmtOp.LoadTypeTableRef = VTablesImplRefs.LoadTypeTableRef;
+			xInitVmtOp.Methods = mMethods.Keys;
+			xInitVmtOp.GetMethodIdentifier += delegate(MethodDefinition aMethod) {
+				TypeReference[] xParams = new TypeReference[aMethod.Parameters.Count];
+				for (int i = 0; i < aMethod.Parameters.Count; i++) {
+					xParams[i] = aMethod.Parameters[i].ParameterType;
 				}
-				mAssembler.Add(new Pop("ebp"));
-				mAssembler.Add(new Ret(""));
-				Console.WriteLine("VMT Summary: TypeCount = {0}", mTypes.Count);
-				xw.WriteEndDocument();
-			}
+				MethodDefinition xMethod = GetUltimateBaseMethod(aMethod, null, GetDefinitionFromTypeReference(aMethod.DeclaringType));
+				if (xMethod == null) {
+					xMethod = aMethod;
+				}
+				return GetMethodIdentifier(xMethod);
+			};
+			xInitVmtOp.Assemble();
+			xOp = GetOpFromType(mMap.MethodFooterOp, null, new MethodInformation("____INIT__VMT____", new MethodInformation.Variable[0], new MethodInformation.Argument[0], false, false, null));
+			xOp.Assembler = mAssembler;
+			xOp.Assemble();
 		}
+
+
 
 		private void ScanForMethodToIncludeForVMT() {
 			List<TypeDefinition> xCheckedTypes = new List<TypeDefinition>();
@@ -751,7 +696,7 @@ namespace Indy.IL2CPU {
 									QueueMethodRef(xMethodReference);
 								}
 								xOp = GetOpFromType(mMap.GetOpForOpCode(xInstruction.OpCode.Code), xInstruction, xMethodInfo);
-								if((!xOp.SupportsMetalMode) && mAssembler.InMetalMode) {
+								if ((!xOp.SupportsMetalMode) && mAssembler.InMetalMode) {
 									throw new Exception("OpCode '" + xInstruction.OpCode.Code + "' not supported in Metal mode!");
 								}
 								xOp.Assembler = mAssembler;
@@ -1037,8 +982,16 @@ namespace Indy.IL2CPU {
 				throw new Exception("ERROR: No Current Engine found!");
 			}
 			AssemblyDefinition xAssemblyDef;
-			if (String.IsNullOrEmpty(aAssembly) || aAssembly == typeof(Engine).Assembly.GetName().Name || aAssembly == typeof(Engine).Assembly.GetName().FullName) {
-				xAssemblyDef = AssemblyFactory.GetAssembly(typeof(Engine).Assembly.Location);
+			Assembly xAssembly = (from item in AppDomain.CurrentDomain.GetAssemblies()
+								  where item.FullName == aAssembly || item.GetName().Name == aAssembly
+								  select item).FirstOrDefault();
+			if (xAssembly == null) {
+				if (String.IsNullOrEmpty(aAssembly) || aAssembly == typeof(Engine).Assembly.GetName().Name || aAssembly == typeof(Engine).Assembly.GetName().FullName) {
+					xAssembly = typeof(Engine).Assembly;
+				}
+			}
+			if (xAssembly != null) {
+				xAssemblyDef = AssemblyFactory.GetAssembly(xAssembly.Location);
 			} else {
 				xAssemblyDef = mCurrent.mCrawledAssembly.Resolver.Resolve(aAssembly);
 			}

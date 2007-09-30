@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.20706</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{E17BC1C6-3E4F-443F-804E-CB43A5610DDB}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{4B6F38F2-A1E7-4D79-B47D-F2F4ED68C4A1}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>HelloWorldAssembler</RootNamespace>
-    <AssemblyName>HelloWorldAssembler</AssemblyName>
+    <RootNamespace>Indy.IL2CPU.IL.Win32</RootNamespace>
+    <AssemblyName>Indy.IL2CPU.IL.Win32</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
@@ -43,11 +43,16 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DummyOp.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="PInvokes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RuntimeEngineImpl.cs" />
+    <Compile Include="RuntimeEngineImplRefs.cs" />
+    <Compile Include="Win32OpCodeMap.cs" />
+    <Compile Include="Win32CustomMethodImplementationOp.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Indy.IL2CPU.Assembler.Win32\Indy.IL2CPU.Assembler.Win32.csproj">
@@ -69,6 +74,10 @@
     <ProjectReference Include="..\Indy.IL2CPU.IL\Indy.IL2CPU.IL.csproj">
       <Project>{5A39A8DF-D99E-4112-9676-BD3EED969A9C}</Project>
       <Name>Indy.IL2CPU.IL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Indy.IL2CPU\Indy.IL2CPU.csproj">
+      <Project>{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}</Project>
+      <Name>Indy.IL2CPU</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

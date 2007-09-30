@@ -5,18 +5,11 @@ using System.Linq;
 using System.Text;
 
 namespace Indy.IL2CPU.Assembler {
-	public class Assembler: IDisposable {
-		public enum OutputTypeEnum {
-			DLL,
-			Console,
-			GUI
-		}
-
+	public abstract class Assembler: IDisposable {
 		public const string EntryPointLabelName = "___ENTRYPOINT___";
 		private List<Instruction> mInstructions = new List<Instruction>();
 		private List<DataMember> mDataMembers = new List<DataMember>();
-		private OutputTypeEnum mOutputType = OutputTypeEnum.DLL;
-		private StreamWriter mOutputWriter;
+		protected StreamWriter mOutputWriter;
 		private List<string> mIncludes = new List<string>();
 		private List<ImportMember> mImportMembers = new List<ImportMember>();
 		private readonly bool mInMetalMode = false;
@@ -33,15 +26,6 @@ namespace Indy.IL2CPU.Assembler {
 		public Assembler(StreamWriter aOutputWriter, bool aInMetalMode) {
 			mOutputWriter = aOutputWriter;
 			mInMetalMode = aInMetalMode;
-		}
-
-		public OutputTypeEnum OutputType {
-			get {
-				return mOutputType;
-			}
-			set {
-				mOutputType = value;
-			}
 		}
 
 		public List<string> Includes {
@@ -80,22 +64,11 @@ namespace Indy.IL2CPU.Assembler {
 			}
 		}
 
-		public void Flush() {
+		protected abstract void EmitHeader();
+
+		public virtual void Flush() {
 			// write .asm header
-			switch (mOutputType) {
-				case OutputTypeEnum.Console:
-					mOutputWriter.WriteLine("format PE console");
-					break;
-				case OutputTypeEnum.GUI:
-					mOutputWriter.WriteLine("format PE GUI 4.0");
-					break;
-				default:
-					mOutputWriter.WriteLine("format PE dll");
-					break;
-			}
-			if (mOutputType != OutputTypeEnum.DLL) {
-				mOutputWriter.WriteLine("entry " + EntryPointLabelName);
-			}
+			EmitHeader();
 			mOutputWriter.WriteLine();
 			foreach (string xInclude in mIncludes) {
 				mOutputWriter.WriteLine("include '{0}'", xInclude);

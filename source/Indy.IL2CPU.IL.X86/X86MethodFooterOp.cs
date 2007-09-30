@@ -15,17 +15,19 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		public X86MethodFooterOp(Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
-			if (aMethodInfo.Arguments.Length > 0) {
-				TotalArgsSize += aMethodInfo.Arguments[0].Offset + aMethodInfo.Arguments[0].Size;
-			}
-			//			if (aMethodInfo.Locals.Length > 0) {
-			//				TotalLocalsSize += aMethodInfo.Locals[aMethodInfo.Locals.Length - 1].Offset + aMethodInfo.Locals[aMethodInfo.Locals.Length - 1].Size;
-			//			}
-			LocalsCount = aMethodInfo.Locals.Length;
-			if (aMethodInfo.HasReturnValue) {
-				//				TotalLocalsSize += 4;
-				//LocalsCount++;   
-				HasReturnValue = true;
+			if (aMethodInfo != null) {
+				if (aMethodInfo.Arguments.Length > 0) {
+					TotalArgsSize += aMethodInfo.Arguments[0].Offset + aMethodInfo.Arguments[0].Size;
+				}
+				//			if (aMethodInfo.Locals.Length > 0) {
+				//				TotalLocalsSize += aMethodInfo.Locals[aMethodInfo.Locals.Length - 1].Offset + aMethodInfo.Locals[aMethodInfo.Locals.Length - 1].Size;
+				//			}
+				LocalsCount = aMethodInfo.Locals.Length;
+				if (aMethodInfo.HasReturnValue) {
+					//				TotalLocalsSize += 4;
+					//LocalsCount++;   
+					HasReturnValue = true;
+				}
 			}
 		}
 

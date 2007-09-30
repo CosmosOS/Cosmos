@@ -16,6 +16,8 @@ namespace Indy.IL2CPU.IL {
 			PInvokeMethodBodyOp = GetPInvokeMethodBodyOp();
 			CustomMethodImplementationProxyOp = GetCustomMethodImplementationProxyOp();
 			CustomMethodImplementationOp = GetCustomMethodImplementationOp();
+			InitVmtImplementationOp = GetInitVmtImplementationOp();
+			MainEntryPointOp = GetMainEntryPointOp();
 		}
 
 		protected abstract Assembly ImplementationAssembly {
@@ -27,6 +29,8 @@ namespace Indy.IL2CPU.IL {
 		protected abstract Type GetPInvokeMethodBodyOp();
 		protected abstract Type GetCustomMethodImplementationProxyOp();
 		protected abstract Type GetCustomMethodImplementationOp();
+		protected abstract Type GetInitVmtImplementationOp();
+		protected abstract Type GetMainEntryPointOp();
 
 		public void Initialize(Assembler.Assembler aAssembler) {
 			foreach (Type t in (from item in ImplementationAssembly.GetTypes()
@@ -54,5 +58,7 @@ namespace Indy.IL2CPU.IL {
 		public readonly Type PInvokeMethodBodyOp;
 		public readonly Type CustomMethodImplementationProxyOp;
 		public readonly Type CustomMethodImplementationOp;
+		public readonly Type InitVmtImplementationOp;
+		public readonly Type MainEntryPointOp;
 	}
 }
