@@ -55,7 +55,8 @@ namespace Indy.IL2CPU {
 	public delegate void DebugLogHandler(LogSeverityEnum aSeverity, string aMessage);
 
 	public enum TargetPlatformEnum {
-		Win32
+		Win32,
+		NativeX86
 	}
 
 	public class QueuedMethodInformation {
@@ -68,7 +69,7 @@ namespace Indy.IL2CPU {
 		protected AssemblyDefinition mCrawledAssembly;
 		protected DebugLogHandler mDebugLog;
 		protected OpCodeMap mMap;
-		protected Assembler.Win32.Assembler mAssembler;
+		protected Assembler.NativeX86.Assembler mAssembler;
 
 		/// <summary>
 		/// Contains a list of all methods. This includes methods to be processed and already processed.
@@ -105,16 +106,20 @@ namespace Indy.IL2CPU {
 				if (mCrawledAssembly.EntryPoint == null) {
 					throw new NotSupportedException("Libraries are not supported!");
 				}
-				using (mAssembler = new Assembler.Win32.Assembler(aOutput)) {
+				using (mAssembler = new Assembler.NativeX86.Assembler(aOutput, true)) {
 					switch (aTargetPlatform) {
 						case TargetPlatformEnum.Win32: {
 								mMap = (OpCodeMap)Activator.CreateInstance(Type.GetType("Indy.IL2CPU.IL.Win32.Win32OpCodeMap, Indy.IL2CPU.IL.Win32", true));
 								break;
 							}
+						case TargetPlatformEnum.NativeX86: {
+								mMap = (OpCodeMap)Activator.CreateInstance(Type.GetType("Indy.IL2CPU.IL.NativeX86.NativeX86OpCodeMap, Indy.IL2CPU.IL.NativeX86", true));
+								break;
+							}
 						default:
 							throw new NotSupportedException("TargetPlatform '" + aTargetPlatform + "' not supported!");
 					}
-					mAssembler.OutputType = Assembler.Win32.Assembler.OutputTypeEnum.Console;
+					//mAssembler.OutputType = Assembler.Win32.Assembler.OutputTypeEnum.Console;
 					mMap.Initialize(mAssembler);
 					foreach (Type t in typeof(Engine).Assembly.GetTypes()) {
 						foreach (MethodInfo mi in t.GetMethods()) {
@@ -646,7 +651,7 @@ namespace Indy.IL2CPU {
 						xTypeInfo = new TypeInformation(xObjectStorageSize, xTypeFields);
 					}
 				}
-				MethodInformation xMethodInfo = GetMethodInfo(xCurrentMethod, xMethodName, xTypeInfo);
+				MethodInformation xMethodInfo = GetMethodInfo(xCurrentMethod, xCurrentMethod, xMethodName, xTypeInfo);
 				IL.Op xOp = GetOpFromType(mMap.MethodHeaderOp, null, xMethodInfo);
 				xOp.Assembler = mAssembler;
 #if VERBOSE_DEBUG
@@ -680,6 +685,17 @@ namespace Indy.IL2CPU {
 					xProxyOp.ProxiedMethod = xCustomImplementation;
 					xProxyOp.Assemble();
 					xContentProduced = true;
+				}
+				if (!xContentProduced) {
+					Type xOpType = mMap.GetOpForCustomMethodImplementation(xMethodName);
+					if (xOpType != null) {
+						Op xMethodOp = GetOpFromType(xOpType, null, xMethodInfo);
+						if (xMethodOp != null) {
+							xMethodOp.Assembler = mAssembler;
+							xMethodOp.Assemble();
+							xContentProduced = true;
+						}
+					}
 				}
 				if (!xContentProduced) {
 					if (Enum.GetNames(typeof(CustomMethodEnum)).Contains(xMethodName)) {
@@ -719,14 +735,14 @@ namespace Indy.IL2CPU {
 			}
 		}
 
-		public static MethodInformation GetMethodInfo(MethodDefinition aCurrentMethod, string aMethodName, TypeInformation aTypeInfo) {
+		public static MethodInformation GetMethodInfo(MethodDefinition aCurrentMethodForArguments, MethodDefinition aCurrentMethodForLocals, string aMethodName, TypeInformation aTypeInfo) {
 			MethodInformation xMethodInfo;
 			{
 				MethodInformation.Variable[] xVars = new MethodInformation.Variable[0];
 				int xCurOffset = 0;
-				if (aCurrentMethod.HasBody) {
-					xVars = new MethodInformation.Variable[aCurrentMethod.Body.Variables.Count];
-					foreach (VariableDefinition xVarDef in aCurrentMethod.Body.Variables) {
+				if (aCurrentMethodForLocals.HasBody) {
+					xVars = new MethodInformation.Variable[aCurrentMethodForLocals.Body.Variables.Count];
+					foreach (VariableDefinition xVarDef in aCurrentMethodForLocals.Body.Variables) {
 						int xVarSize = 4;
 						xVars[xVarDef.Index] = new MethodInformation.Variable(xCurOffset, xVarSize, GetDefinitionFromTypeReference(xVarDef.VariableType).IsClass);
 						if (!(xVarDef.VariableType is GenericParameter)) {
@@ -736,13 +752,13 @@ namespace Indy.IL2CPU {
 					}
 				}
 				MethodInformation.Argument[] xArgs;
-				if (!aCurrentMethod.IsStatic) {
-					xArgs = new MethodInformation.Argument[aCurrentMethod.Parameters.Count + 1];
+				if (!aCurrentMethodForArguments.IsStatic) {
+					xArgs = new MethodInformation.Argument[aCurrentMethodForArguments.Parameters.Count + 1];
 					xCurOffset = 0;
 					int xArgSize;
 					for (int i = xArgs.Length - 1; i > 0; i--) {
 						xArgSize = 4;
-						ParameterDefinition xParamDef = aCurrentMethod.Parameters[xArgs.Length - i - 1];
+						ParameterDefinition xParamDef = aCurrentMethodForArguments.Parameters[xArgs.Length - i - 1];
 						MethodInformation.Argument.KindEnum xKind = MethodInformation.Argument.KindEnum.In;
 						if (xParamDef.IsOut) {
 							if (xParamDef.IsIn) {
@@ -758,11 +774,11 @@ namespace Indy.IL2CPU {
 					// this
 					xArgs[0] = new MethodInformation.Argument(xArgSize, xCurOffset, MethodInformation.Argument.KindEnum.In);
 				} else {
-					xArgs = new MethodInformation.Argument[aCurrentMethod.Parameters.Count];
+					xArgs = new MethodInformation.Argument[aCurrentMethodForArguments.Parameters.Count];
 					xCurOffset = 0;
 					for (int i = xArgs.Length - 1; i >= 0; i--) {
 						int xArgSize = 4;
-						ParameterDefinition xParamDef = aCurrentMethod.Parameters[xArgs.Length - i - 1];
+						ParameterDefinition xParamDef = aCurrentMethodForArguments.Parameters[xArgs.Length - i - 1];
 						MethodInformation.Argument.KindEnum xKind = MethodInformation.Argument.KindEnum.In;
 						if (xParamDef.IsOut) {
 							if (xParamDef.IsIn) {
@@ -775,7 +791,7 @@ namespace Indy.IL2CPU {
 						xCurOffset += xArgSize;
 					}
 				}
-				xMethodInfo = new MethodInformation(aMethodName, xVars, xArgs, !aCurrentMethod.ReturnType.ReturnType.FullName.Contains("System.Void"), aCurrentMethod.HasThis, aTypeInfo);
+				xMethodInfo = new MethodInformation(aMethodName, xVars, xArgs, !aCurrentMethodForArguments.ReturnType.ReturnType.FullName.Contains("System.Void"), aCurrentMethodForArguments.HasThis, aTypeInfo);
 			}
 			return xMethodInfo;
 		}

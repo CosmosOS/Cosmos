@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.20706</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}</ProjectGuid>
+    <ProjectGuid>{6597AAC6-755D-47F9-ACF4-E13F65EC5418}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Indy.IL2CPU</RootNamespace>
-    <AssemblyName>Indy.IL2CPU</AssemblyName>
+    <RootNamespace>Indy.IL2CPU.Assembler.NativeX86</RootNamespace>
+    <AssemblyName>Indy.IL2CPU.Assembler.NativeX86</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
@@ -25,7 +25,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -36,40 +35,16 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Mono.Cecil, Version=0.5.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Mono.Cecil.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CustomImplementation\System\Runtime\CompilerServices\RuntimeHelpers.cs" />
-    <Compile Include="Engine.cs" />
-    <Compile Include="FieldAccessAttribute.cs" />
-    <Compile Include="MethodAliasAttribute.cs" />
-    <Compile Include="MethodReferenceExtensions.cs" />
-    <Compile Include="CustomImplementation\System\ObjectImpl.cs" />
-    <Compile Include="CustomImplementation\System\ObjectImplRefs.cs" />
-    <Compile Include="ObjectUtilities.cs" />
+    <Compile Include="Assembler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RuntimeEngineImpl.cs" />
-    <Compile Include="RuntimeEngineRefs.cs" />
-    <Compile Include="RuntimeEngine\Heap.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Indy.IL2CPU.Assembler.NativeX86\Indy.IL2CPU.Assembler.NativeX86.csproj">
-      <Project>{6597AAC6-755D-47F9-ACF4-E13F65EC5418}</Project>
-      <Name>Indy.IL2CPU.Assembler.NativeX86</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Indy.IL2CPU.Assembler.Win32\Indy.IL2CPU.Assembler.Win32.csproj">
-      <Project>{4C0EF614-A58F-4CAF-8AD2-FFE345EB9472}</Project>
-      <Name>Indy.IL2CPU.Assembler.Win32</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Indy.IL2CPU.Assembler.X86\Indy.IL2CPU.Assembler.X86.csproj">
       <Project>{7F32CE06-13F2-4EDA-B588-3FAAFD25178A}</Project>
       <Name>Indy.IL2CPU.Assembler.X86</Name>
@@ -78,20 +53,6 @@
       <Project>{8E8CAD9B-C092-4071-AD92-E7A4E7BA776F}</Project>
       <Name>Indy.IL2CPU.Assembler</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Indy.IL2CPU.IL\Indy.IL2CPU.IL.csproj">
-      <Project>{5A39A8DF-D99E-4112-9676-BD3EED969A9C}</Project>
-      <Name>Indy.IL2CPU.IL</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="CustomImplementation\System\ArrayImpl.cs" />
-    <Compile Include="CustomImplementation\System\ArrayImplRefs.cs" />
-    <Compile Include="CustomImplementation\System\EnvironmentImpl.cs" />
-    <Compile Include="CustomImplementation\System\RuntimeType.RuntimeTypeCache.cs" />
-    <Compile Include="CustomImplementation\System\StringImpl.cs" />
-    <Compile Include="CustomImplementation\System\RuntimeType.cs" />
-    <Compile Include="VTablesImpl.cs" />
-    <Compile Include="VTablesImplRefs.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -75,7 +75,7 @@ namespace Indy.IL2CPU.Assembler {
 			}
 			mOutputWriter.WriteLine();
 			if (mDataMembers.Count > 0) {
-				mOutputWriter.WriteLine("section '.data' data readable writeable");
+				EmitDataSectionHeader();
 				mOutputWriter.WriteLine();
 				foreach (DataMember xMember in mDataMembers) {
 					mOutputWriter.WriteLine("\t" + xMember);
@@ -83,7 +83,7 @@ namespace Indy.IL2CPU.Assembler {
 				mOutputWriter.WriteLine();
 			}
 			if (mInstructions.Count > 0) {
-				mOutputWriter.WriteLine("section '.code' code readable executable");
+				EmitCodeSectionHeader();
 				mOutputWriter.WriteLine();
 				mOutputWriter.WriteLine("\t" + EntryPointLabelName + ":");
 				foreach (Instruction x in mInstructions) {
@@ -101,7 +101,7 @@ namespace Indy.IL2CPU.Assembler {
 				mOutputWriter.WriteLine();
 			}
 			if (mImportMembers.Count > 0) {
-				mOutputWriter.WriteLine("section '.idata' import data readable writeable");
+				EmitIDataSectionHeader();
 				mOutputWriter.WriteLine();
 				foreach (ImportMember xImportMember in mImportMembers) {
 					mOutputWriter.WriteLine("\tdd 0,0,0,rva {0}_name,rva {0}_table", xImportMember.Name);
@@ -127,6 +127,22 @@ namespace Indy.IL2CPU.Assembler {
 					}
 				}
 			}
+			EmitFooter();
+		}
+
+		protected virtual void EmitIDataSectionHeader() {
+			mOutputWriter.WriteLine("section '.idata' import data readable writeable");
+		}
+
+		protected virtual void EmitCodeSectionHeader() {
+			mOutputWriter.WriteLine("section '.code' code readable executable");
+		}
+
+		protected virtual void EmitDataSectionHeader() {
+			mOutputWriter.WriteLine("section '.data' data readable writeable");
+		}
+
+		protected virtual void EmitFooter() {
 		}
 	}
 }

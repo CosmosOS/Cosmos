@@ -60,5 +60,10 @@ namespace Indy.IL2CPU.IL {
 		public readonly Type CustomMethodImplementationOp;
 		public readonly Type InitVmtImplementationOp;
 		public readonly Type MainEntryPointOp;
+
+		public virtual Type GetOpForCustomMethodImplementation(string aName) {
+			return null;
+			//
+		}
 	}
 }

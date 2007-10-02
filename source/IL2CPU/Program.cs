@@ -31,7 +31,7 @@ namespace IL2CPU {
 				};
 				using (FileStream fs = new FileStream(outputFileName, FileMode.Create)) {
 					using (StreamWriter br = new StreamWriter(fs)) {
-						e.Execute(exeName, TargetPlatformEnum.Win32, br);
+						e.Execute(exeName, TargetPlatformEnum.NativeX86, br);
 					}
 				}
 			} catch (ReflectionTypeLoadException E) {

@@ -27,9 +27,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU.IL.Win32", "Ind
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU.Assembler.Win32", "Indy.IL2CPU.Assembler.Win32\Indy.IL2CPU.Assembler.Win32.csproj", "{4C0EF614-A58F-4CAF-8AD2-FFE345EB9472}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU.IL.NativeX86", "Indy.IL2CPU.IL.NativeX86\Indy.IL2CPU.IL.NativeX86.csproj", "{8D84CDE5-77A3-4E1F-B022-753E9E077926}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU.Assembler.NativeX86", "Indy.IL2CPU.Assembler.NativeX86\Indy.IL2CPU.Assembler.NativeX86.csproj", "{6597AAC6-755D-47F9-ACF4-E13F65EC5418}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 14
+		SccNumberOfProjects = 16
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -72,6 +76,12 @@ Global
 		SccProjectUniqueName13 = Indy.IL2CPU.Assembler.Win32\\Indy.IL2CPU.Assembler.Win32.csproj
 		SccProjectName13 = Indy.IL2CPU.Assembler.Win32
 		SccLocalPath13 = Indy.IL2CPU.Assembler.Win32
+		SccProjectUniqueName14 = Indy.IL2CPU.IL.NativeX86\\Indy.IL2CPU.IL.NativeX86.csproj
+		SccProjectName14 = Indy.IL2CPU.IL.NativeX86
+		SccLocalPath14 = Indy.IL2CPU.IL.NativeX86
+		SccProjectUniqueName15 = Indy.IL2CPU.Assembler.NativeX86\\Indy.IL2CPU.Assembler.NativeX86.csproj
+		SccProjectName15 = Indy.IL2CPU.Assembler.NativeX86
+		SccLocalPath15 = Indy.IL2CPU.Assembler.NativeX86
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -130,6 +140,14 @@ Global
 		{4C0EF614-A58F-4CAF-8AD2-FFE345EB9472}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4C0EF614-A58F-4CAF-8AD2-FFE345EB9472}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4C0EF614-A58F-4CAF-8AD2-FFE345EB9472}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D84CDE5-77A3-4E1F-B022-753E9E077926}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D84CDE5-77A3-4E1F-B022-753E9E077926}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D84CDE5-77A3-4E1F-B022-753E9E077926}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D84CDE5-77A3-4E1F-B022-753E9E077926}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6597AAC6-755D-47F9-ACF4-E13F65EC5418}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6597AAC6-755D-47F9-ACF4-E13F65EC5418}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6597AAC6-755D-47F9-ACF4-E13F65EC5418}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6597AAC6-755D-47F9-ACF4-E13F65EC5418}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

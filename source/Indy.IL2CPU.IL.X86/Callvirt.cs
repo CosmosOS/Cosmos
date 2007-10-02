@@ -29,7 +29,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			mMethodIdentifier = Engine.GetMethodIdentifier(xMethodDef);
 			Engine.QueueMethodRef(VTablesImplRefs.GetMethodAddressForTypeRef);
-			MethodInformation xTheMethodInfo = Engine.GetMethodInfo(xMethodDef, new CPU.Label(xMethodDef).Name, null);
+			MethodInformation xTheMethodInfo = Engine.GetMethodInfo(xMethodDef, xMethodDef, new CPU.Label(xMethodDef).Name, null);
 			mHasReturn = xTheMethodInfo.IsInstanceMethod;
 		}
 
