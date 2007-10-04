@@ -25,6 +25,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -126,6 +127,8 @@
     <Compile Include="Conv_U8.cs" />
     <Compile Include="Cpblk.cs" />
     <Compile Include="Cpobj.cs" />
+    <Compile Include="CustomImplementations\System\StringImplRefs.cs" />
+    <Compile Include="CustomImplementations\System\StringImpl.cs" />
     <Compile Include="Div.cs" />
     <Compile Include="Div_Un.cs" />
     <Compile Include="Dup.cs" />

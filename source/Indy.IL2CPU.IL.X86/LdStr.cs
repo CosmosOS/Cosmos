@@ -16,17 +16,18 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		public override void DoAssemble() {
 			if (Assembler.InMetalMode) {
-				// todo: see if we need to output trailing bytes 00 00 or 00 01 depending on whether there are bytes >7F
 				string xDataName = Assembler.GetIdentifier("StringLiteral");
 				var xDataByteArray = new StringBuilder();
+				xDataByteArray.Append(BitConverter.GetBytes(LiteralStr.Length).Aggregate("", (r, b) => r + b + ","));
 				xDataByteArray.Append(Encoding.ASCII.GetBytes(LiteralStr).Aggregate("", (r, b) => r + b + ","));
-				xDataByteArray.Append("0,");
+				//xDataByteArray.Append("0,");
 				Assembler.DataMembers.Add(new DataMember(xDataName, "db", xDataByteArray.ToString().TrimEnd(',')));
 				Move(Assembler, "eax", xDataName);
 				Pushd("eax");
 			} else {
 				string xDataName = Assembler.GetIdentifier("StringLiteral");
 				var xDataByteArray = new StringBuilder();
+				// todo: see if we need to output trailing bytes 00 00 or 00 01 depending on whether there are bytes >7F
 				xDataByteArray.Append(BitConverter.GetBytes(Engine.RegisterType(Engine.GetTypeDefinition("mscorlib", "System.String"))).Aggregate("", (r, b) => r + b + ","));
 				xDataByteArray.Append(BitConverter.GetBytes((int)InstanceTypeEnum.Array).Aggregate("", (r, b) => r + b + ","));
 				xDataByteArray.Append(BitConverter.GetBytes(LiteralStr.Length).Aggregate("", (r, b) => r + b + ","));

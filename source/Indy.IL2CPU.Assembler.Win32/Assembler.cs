@@ -11,7 +11,7 @@ namespace Indy.IL2CPU.Assembler.Win32 {
 			Console,
 			GUI
 		}
-		private OutputTypeEnum mOutputType = OutputTypeEnum.DLL;
+		private OutputTypeEnum mOutputType = OutputTypeEnum.Console;
 		public Assembler(StreamWriter aOutputWriter)
 			: base(aOutputWriter) {
 		}
@@ -31,14 +31,14 @@ namespace Indy.IL2CPU.Assembler.Win32 {
 
 		protected override void EmitHeader() {
 			switch (mOutputType) {
-				case OutputTypeEnum.Console:
-					mOutputWriter.WriteLine("format PE console");
-					break;
 				case OutputTypeEnum.GUI:
 					mOutputWriter.WriteLine("format PE GUI 4.0");
 					break;
-				default:
+				case OutputTypeEnum.DLL:
 					mOutputWriter.WriteLine("format PE dll");
+					break;
+				default:
+					mOutputWriter.WriteLine("format PE console");
 					break;
 			}
 			if (mOutputType != OutputTypeEnum.DLL) {

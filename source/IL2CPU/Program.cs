@@ -20,9 +20,6 @@ namespace IL2CPU {
 				}
 				Engine e = new Engine();
 				e.DebugLog += delegate(LogSeverityEnum aSeverity, string aMessage) {
-					if (aSeverity == LogSeverityEnum.Informational) {
-						return;
-					}
 					if (aSeverity == LogSeverityEnum.Warning) {
 						Console.ForegroundColor = ConsoleColor.Yellow;
 					}

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Indy.IL2CPU.IL;
+using Mono.Cecil;
 using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL {
@@ -63,7 +64,17 @@ namespace Indy.IL2CPU.IL {
 
 		public virtual Type GetOpForCustomMethodImplementation(string aName) {
 			return null;
-			//
+		}
+
+		public virtual MethodReference GetCustomMethodImplementation(string aOrigMethodName, bool aInMetalMode) {
+			return null;
+		}
+
+		public virtual bool HasCustomAssembleImplementation(string aMethodName, bool aInMetalMode) {
+			return false;
+		}
+
+		public virtual void DoCustomAssembleImplementation(string aMethodName, bool aInMetalMode, Assembler.Assembler aAssembler, MethodInformation aMethodInfo) {
 		}
 	}
 }

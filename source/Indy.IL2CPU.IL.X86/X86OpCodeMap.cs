@@ -35,5 +35,24 @@ namespace Indy.IL2CPU.IL.X86 {
 		protected override Type GetCustomMethodImplementationProxyOp() {
 			return typeof(X86CustomMethodImplementationProxyOp);
 		}
+
+		public override Mono.Cecil.MethodReference GetCustomMethodImplementation(string aOrigMethodName, bool aInMetalMode) {
+			switch(aOrigMethodName) {
+				case "System_Int32___System_String_get_Length____": {
+					if(aInMetalMode) {
+						return CustomImplementations.System.StringImplRefs.get_Length_MetalRef;
+					}
+					goto default;
+				}
+				case "System_Char___System_String_get_Chars___System_Int32___": {
+					if(aInMetalMode) {
+						return CustomImplementations.System.StringImplRefs.get_Chars_MetalRef;
+					}
+					goto default;
+				}
+				default:
+					return base.GetCustomMethodImplementation(aOrigMethodName, aInMetalMode);
+			}
+		}
 	}
 }

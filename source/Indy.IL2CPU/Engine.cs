@@ -69,7 +69,7 @@ namespace Indy.IL2CPU {
 		protected AssemblyDefinition mCrawledAssembly;
 		protected DebugLogHandler mDebugLog;
 		protected OpCodeMap mMap;
-		protected Assembler.NativeX86.Assembler mAssembler;
+		protected Assembler.Assembler mAssembler;
 
 		/// <summary>
 		/// Contains a list of all methods. This includes methods to be processed and already processed.
@@ -87,6 +87,8 @@ namespace Indy.IL2CPU {
 
 		protected List<TypeDefinition> mTypes = new List<TypeDefinition>();
 		protected TypeDefinitionEqualityComparer mTypesEqualityComparer = new TypeDefinitionEqualityComparer();
+
+		public const string EntryPointName = "__ENGINE_ENTRYPOINT__";
 
 		/// <summary>
 		/// Compiles an assembly to CPU-specific code. The entrypoint of the assembly will be 
@@ -106,19 +108,22 @@ namespace Indy.IL2CPU {
 				if (mCrawledAssembly.EntryPoint == null) {
 					throw new NotSupportedException("Libraries are not supported!");
 				}
-				using (mAssembler = new Assembler.NativeX86.Assembler(aOutput, true)) {
-					switch (aTargetPlatform) {
-						case TargetPlatformEnum.Win32: {
-								mMap = (OpCodeMap)Activator.CreateInstance(Type.GetType("Indy.IL2CPU.IL.Win32.Win32OpCodeMap, Indy.IL2CPU.IL.Win32", true));
-								break;
-							}
-						case TargetPlatformEnum.NativeX86: {
-								mMap = (OpCodeMap)Activator.CreateInstance(Type.GetType("Indy.IL2CPU.IL.NativeX86.NativeX86OpCodeMap, Indy.IL2CPU.IL.NativeX86", true));
-								break;
-							}
-						default:
-							throw new NotSupportedException("TargetPlatform '" + aTargetPlatform + "' not supported!");
-					}
+				switch (aTargetPlatform) {
+					case TargetPlatformEnum.Win32: {
+							mMap = (OpCodeMap)Activator.CreateInstance(Type.GetType("Indy.IL2CPU.IL.Win32.Win32OpCodeMap, Indy.IL2CPU.IL.Win32", true));
+							mAssembler = new Assembler.Win32.Assembler(aOutput, true);
+							break;
+						}
+					case TargetPlatformEnum.NativeX86: {
+							mMap = (OpCodeMap)Activator.CreateInstance(Type.GetType("Indy.IL2CPU.IL.NativeX86.NativeX86OpCodeMap, Indy.IL2CPU.IL.NativeX86", true));
+							mAssembler = new Assembler.NativeX86.Assembler(aOutput, true);
+							break;
+						}
+					default:
+						throw new NotSupportedException("TargetPlatform '" + aTargetPlatform + "' not supported!");
+				}
+				using (mAssembler) {
+
 					//mAssembler.OutputType = Assembler.Win32.Assembler.OutputTypeEnum.Console;
 					mMap.Initialize(mAssembler);
 					foreach (Type t in typeof(Engine).Assembly.GetTypes()) {
@@ -165,6 +170,7 @@ namespace Indy.IL2CPU {
 						// initialize the runtime engine
 						MainEntryPointOp xEntryPointOp = (MainEntryPointOp)GetOpFromType(mMap.MainEntryPointOp, null, null);
 						xEntryPointOp.Assembler = mAssembler;
+						xEntryPointOp.Enter(Assembler.Assembler.EngineEntryPointLabelName);
 						xEntryPointOp.Call(RuntimeEngineRefs.InitializeApplicationRef);
 						//new Assembler.X86.Call("____INIT__VMT____");
 						xEntryPointOp.Call(mCrawledAssembly.EntryPoint);
@@ -172,6 +178,7 @@ namespace Indy.IL2CPU {
 							xEntryPointOp.Pushd("0");
 						}
 						xEntryPointOp.Call(RuntimeEngineRefs.FinalizeApplicationRef);
+						xEntryPointOp.Exit();
 						ProcessAllMethods();
 						//						do {
 						//							int xOldCount = mMethods.Count;
@@ -395,10 +402,18 @@ namespace Indy.IL2CPU {
 			AssemblyNameReference xAssemblyNameReference = aRef.Scope as AssemblyNameReference;
 			if (xAssemblyNameReference != null) {
 				AssemblyDefinition xReferencedFieldAssembly;
-				if (xAssemblyNameReference.FullName == typeof(RuntimeEngine).Assembly.GetName().FullName) {
-					xReferencedFieldAssembly = RuntimeEngineRefs.RuntimeAssemblyDef;
-				} else {
+				try {
 					xReferencedFieldAssembly = mCurrent.mCrawledAssembly.Resolver.Resolve(xAssemblyNameReference);
+				} catch {
+					xReferencedFieldAssembly = null;
+				}
+				if (xReferencedFieldAssembly == null) {
+					Assembly xAssembly = (from item in AppDomain.CurrentDomain.GetAssemblies()
+										  where item.GetName().Name == xAssemblyNameReference.Name
+										  select item).FirstOrDefault();
+					if (xAssembly != null) {
+						xReferencedFieldAssembly = AssemblyFactory.GetAssembly(xAssembly.Location);
+					}
 				}
 				if (xReferencedFieldAssembly != null) {
 					foreach (ModuleDefinition xModule in xReferencedFieldAssembly.Modules) {
@@ -675,6 +690,13 @@ namespace Indy.IL2CPU {
 						throw new Exception("CustomMethodImplementation not found!");
 					}
 				}
+				if (xCustomImplementation == null) {
+					MethodReference xReplacement = mMap.GetCustomMethodImplementation(xMethodName, mAssembler.InMetalMode);
+					if (xReplacement != null) {
+						xCustomImplementation = GetDefinitionFromMethodReference(xReplacement);
+						xIsCustomImplementation = true;
+					}
+				}
 				// what to do if a method doesn't have a body?
 				bool xContentProduced = false;
 				if (xIsCustomImplementation) {
@@ -698,32 +720,36 @@ namespace Indy.IL2CPU {
 					}
 				}
 				if (!xContentProduced) {
-					if (Enum.GetNames(typeof(CustomMethodEnum)).Contains(xMethodName)) {
-						CustomMethodImplementationOp xCustomMethodImplOp = (CustomMethodImplementationOp)GetOpFromType(mMap.CustomMethodImplementationOp, null, xMethodInfo);
-						xCustomMethodImplOp.Assembler = mAssembler;
-						xCustomMethodImplOp.Method = (CustomMethodEnum)Enum.Parse(typeof(CustomMethodEnum), xMethodName);
-						xCustomMethodImplOp.Assemble();
+					if (mMap.HasCustomAssembleImplementation(xMethodName, mAssembler.InMetalMode)) {
+						mMap.DoCustomAssembleImplementation(xMethodName, mAssembler.InMetalMode, mAssembler, xMethodInfo);
 					} else {
-						if (xCurrentMethod.HasBody) {
-							// todo: add support for types which need different stack size
-							foreach (Instruction xInstruction in xCurrentMethod.Body.Instructions) {
-								MethodReference xMethodReference = xInstruction.Operand as MethodReference;
-								if (xMethodReference != null) {
-									QueueMethodRef(xMethodReference);
-								}
-								xOp = GetOpFromType(mMap.GetOpForOpCode(xInstruction.OpCode.Code), xInstruction, xMethodInfo);
-								if ((!xOp.SupportsMetalMode) && mAssembler.InMetalMode) {
-									throw new Exception("OpCode '" + xInstruction.OpCode.Code + "' not supported in Metal mode!");
-								}
-								xOp.Assembler = mAssembler;
-								xOp.Assemble();
-							}
+						if (Enum.GetNames(typeof(CustomMethodEnum)).Contains(xMethodName)) {
+							CustomMethodImplementationOp xCustomMethodImplOp = (CustomMethodImplementationOp)GetOpFromType(mMap.CustomMethodImplementationOp, null, xMethodInfo);
+							xCustomMethodImplOp.Assembler = mAssembler;
+							xCustomMethodImplOp.Method = (CustomMethodEnum)Enum.Parse(typeof(CustomMethodEnum), xMethodName);
+							xCustomMethodImplOp.Assemble();
 						} else {
-							if (xCurrentMethod.IsPInvokeImpl) {
-								HandlePInvoke(xCurrentMethod, xMethodInfo);
+							if (xCurrentMethod.HasBody) {
+								// todo: add support for types which need different stack size
+								foreach (Instruction xInstruction in xCurrentMethod.Body.Instructions) {
+									MethodReference xMethodReference = xInstruction.Operand as MethodReference;
+									if (xMethodReference != null) {
+										QueueMethodRef(xMethodReference);
+									}
+									xOp = GetOpFromType(mMap.GetOpForOpCode(xInstruction.OpCode.Code), xInstruction, xMethodInfo);
+									if ((!xOp.SupportsMetalMode) && mAssembler.InMetalMode) {
+										throw new Exception("OpCode '" + xInstruction.OpCode.Code + "' not supported in Metal mode!");
+									}
+									xOp.Assembler = mAssembler;
+									xOp.Assemble();
+								}
 							} else {
-								OnDebugLog(LogSeverityEnum.Warning, "Method '{0}' not generated!", xCurrentMethod.GetFullName());
-								mAssembler.Add(new Literal("; Method not being generated yet, as it's handled by an iCall"));
+								if (xCurrentMethod.IsPInvokeImpl) {
+									HandlePInvoke(xCurrentMethod, xMethodInfo);
+								} else {
+									OnDebugLog(LogSeverityEnum.Warning, "Method '{0}' not generated!", xCurrentMethod.GetFullName());
+									mAssembler.Add(new Literal("; Method not being generated yet, as it's handled by an iCall"));
+								}
 							}
 						}
 					}

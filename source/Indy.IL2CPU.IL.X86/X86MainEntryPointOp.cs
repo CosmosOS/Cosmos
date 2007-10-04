@@ -23,5 +23,13 @@ namespace Indy.IL2CPU.IL.X86 {
 				Assembler.Add(new CPUx86.Pushd("eax"));
 			}
 		}
+
+		public override void Enter(string aName) {
+			X86MethodHeaderOp.AssembleHeader(Assembler, aName, 0);
+		}
+
+		public override void Exit() {
+			X86MethodFooterOp.AssembleFooter(false, Assembler, 0, 0);
+		}
 	}
 }

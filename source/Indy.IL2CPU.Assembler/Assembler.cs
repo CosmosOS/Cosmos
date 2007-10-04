@@ -7,7 +7,8 @@ using System.Text;
 namespace Indy.IL2CPU.Assembler {
 	public abstract class Assembler: IDisposable {
 		public const string EntryPointLabelName = "___ENTRYPOINT___";
-		private List<Instruction> mInstructions = new List<Instruction>();
+		public const string EngineEntryPointLabelName = "___ENGINE__ENTRYPOINT___";
+		protected List<Instruction> mInstructions = new List<Instruction>();
 		private List<DataMember> mDataMembers = new List<DataMember>();
 		protected StreamWriter mOutputWriter;
 		private List<string> mIncludes = new List<string>();
@@ -86,6 +87,7 @@ namespace Indy.IL2CPU.Assembler {
 				EmitCodeSectionHeader();
 				mOutputWriter.WriteLine();
 				mOutputWriter.WriteLine("\t" + EntryPointLabelName + ":");
+				mOutputWriter.WriteLine("\t\tcall " + EngineEntryPointLabelName);
 				foreach (Instruction x in mInstructions) {
 					string prefix = "\t\t\t";
 					if (x is Label) {

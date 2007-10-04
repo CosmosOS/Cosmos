@@ -17,11 +17,15 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		public override void DoAssemble() {
 			// TODO: add support for variables with a diff datasize, other than 32bit
-			Assembler.Add(new CPU.Label(LabelName));
-			Assembler.Add(new CPUx86.Push("ebp"));
-			Assembler.Add(new CPUx86.Move("ebp", "esp"));
-			for (int i = 0; i < LocalsCount; i++) {
-				Assembler.Add(new CPUx86.Pushd("0"));
+			AssembleHeader(Assembler, LabelName, LocalsCount);
+		}
+
+		public static void AssembleHeader(Assembler.Assembler aAssembler, string aLabelName, int aLocalsCount) {
+			aAssembler.Add(new CPU.Label(aLabelName));
+			aAssembler.Add(new CPUx86.Push("ebp"));
+			aAssembler.Add(new CPUx86.Move("ebp", "esp"));
+			for (int i = 0; i < aLocalsCount; i++) {
+				aAssembler.Add(new CPUx86.Pushd("0"));
 			}
 		}
 	}

@@ -11,6 +11,8 @@ namespace Indy.IL2CPU.IL {
 			: base(aInstruction, aMethodInfo) {
 		}
 
+		public abstract void Enter(string aName);
+		public abstract void Exit();
 		public abstract void Pushd(string aValue);
 		public abstract void Call(MethodDefinition aMethod);
 
