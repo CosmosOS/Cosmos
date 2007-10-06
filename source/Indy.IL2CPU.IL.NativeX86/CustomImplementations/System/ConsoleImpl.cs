@@ -25,7 +25,8 @@ namespace Indy.IL2CPU.IL.NativeX86.CustomImplementations.System {
 		}
 
 		private unsafe static void PutChar(int aLine, int aPos, byte aChar) {
-			byte* xScreenPtr = (byte*)((0xB8000) + (aPos + aLine * 80) * 2);
+			int xScreenOffset = ((aPos + aLine * 80) * 2);
+			byte* xScreenPtr = (byte*)((0xB8000) + xScreenOffset);
 			byte xVal = (byte)((aChar + 1) & 0xFF);
 			*xScreenPtr = xVal;
 			xScreenPtr += 1;
