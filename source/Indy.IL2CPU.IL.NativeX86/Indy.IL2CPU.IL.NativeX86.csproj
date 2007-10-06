@@ -40,6 +40,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Mono.Cecil.dll</HintPath>
     </Reference>
+    <Reference Include="PostSharp.Core, Version=1.0.7.261, Culture=neutral, PublicKeyToken=b13fd38b8f9c99d7, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -55,6 +56,7 @@
     <Compile Include="CustomImplementations\System\ConsoleImpl.cs" />
     <Compile Include="CustomImplementations\System\ConsoleImplRefs.cs" />
     <Compile Include="CustomImplementations\System\Diagnostics\DebugImpl.cs" />
+    <Compile Include="DebugHelper.cs" />
     <Compile Include="NativeX86CustomMethodImplementationOp.cs" />
     <Compile Include="NativeX86OpCodeMap.cs" />
     <Compile Include="NativeX86PutCharOp.cs" />

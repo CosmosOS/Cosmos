@@ -11,7 +11,10 @@ namespace Indy.IL2CPU.IL.X86 {
 			: base(aInstruction, aMethodInfo) {
 		}
 		public override void DoAssemble() {
-			// todo: implement correct truncating
+			Pop("ecx");
+			Move(Assembler, "eax", "0");
+			Move(Assembler, "ax", "cx");
+			Pushd("eax");
 		}
 	}
 }

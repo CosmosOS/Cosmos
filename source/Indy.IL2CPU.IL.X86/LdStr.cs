@@ -14,14 +14,23 @@ namespace Indy.IL2CPU.IL.X86 {
 			LiteralStr = (string)aInstruction.Operand;
 		}
 
+		public LdStr(string aLiteralStr):base(null, null) {
+			LiteralStr = aLiteralStr;
+		}
+
 		public override void DoAssemble() {
 			if (Assembler.InMetalMode) {
-				string xDataName = Assembler.GetIdentifier("StringLiteral");
 				var xDataByteArray = new StringBuilder();
 				xDataByteArray.Append(BitConverter.GetBytes(LiteralStr.Length).Aggregate("", (r, b) => r + b + ","));
 				xDataByteArray.Append(Encoding.ASCII.GetBytes(LiteralStr).Aggregate("", (r, b) => r + b + ","));
-				//xDataByteArray.Append("0,");
-				Assembler.DataMembers.Add(new DataMember(xDataName, "db", xDataByteArray.ToString().TrimEnd(',')));
+				string xDataVal = xDataByteArray.ToString().TrimEnd(',');
+				string xDataName = (from item in Assembler.DataMembers
+									where item.DefaultValue == xDataVal
+									select item.Name).FirstOrDefault();
+				if (String.IsNullOrEmpty(xDataName)) {
+					xDataName = Assembler.GetIdentifier("StringLiteral");
+					Assembler.DataMembers.Add(new DataMember(xDataName, "db", xDataVal));
+				}
 				Move(Assembler, "eax", xDataName);
 				Pushd("eax");
 			} else {

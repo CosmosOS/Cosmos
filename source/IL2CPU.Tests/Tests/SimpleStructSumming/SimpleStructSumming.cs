@@ -14,7 +14,6 @@ class ConsoleDrv
 	public static int Main()
 	{
 		mTypes = new VTable[1];
-		mTypes[0] = new VTable();
 		mTypes[0].MethodIndexes = new int[2];
 		mTypes[0].MethodAddresses = new int[2];
 		mTypes[0].MethodIndexes[0] = 14;

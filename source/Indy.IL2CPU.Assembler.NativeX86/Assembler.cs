@@ -32,7 +32,7 @@ namespace Indy.IL2CPU.Assembler.NativeX86 {
 			mOutputWriter.WriteLine("mb_info multiboot_info ; just a dummy  ");
 			mOutputWriter.WriteLine("");
 			mOutputWriter.WriteLine("");
-			mOutputWriter.WriteLine("rb 32768        ; our own stack ");
+			mOutputWriter.WriteLine("rb 50000        ; our own stack ");
 			mOutputWriter.WriteLine("Kernel_Stack: ");
 			mOutputWriter.WriteLine("");
 			mOutputWriter.WriteLine("");

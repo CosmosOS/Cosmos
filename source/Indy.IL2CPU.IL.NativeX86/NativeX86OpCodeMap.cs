@@ -15,6 +15,10 @@ namespace Indy.IL2CPU.IL.NativeX86 {
 			return typeof(NativeX86CustomMethodImplementationOp);
 		}
 
+		protected override Type GetMethodFooterOp() {
+			return typeof(NativeX86MethodFooterOp);
+		}
+
 		protected override Type GetMethodHeaderOp() {
 			return typeof(NativeX86MethodHeaderOp);
 		}
@@ -99,7 +103,8 @@ namespace Indy.IL2CPU.IL.NativeX86 {
 						return;
 					}
 				case "System_Void___Cosmos_Kernel_ConsoleDrv_TestIDT____": {
-						//aAssembler.Add(new Literal("int 0x80"));
+						aAssembler.Add(new Literal("xchg bx, bx"));
+						aAssembler.Add(new Literal("int 3"));
 						break;
 					}
 				case "System_Void___Indy_IL2CPU_IL_NativeX86_RuntimeEngineImpl_IO_WriteToPort___System_UInt16__System_Byte__": {
@@ -173,8 +178,8 @@ namespace Indy.IL2CPU.IL.NativeX86 {
 			int[] xInterruptsWithParam = new int[] { 8, 10, 11, 12, 13, 14 };
 			for (int i = 0; i < 256; i++) {
 				aAssembler.Add(new CPU.Push("0x" + i.ToString("X")));
-				if (i == 0) {
-					//aAssembler.Add(new Literal("xchg bx, bx"));
+				if (i == 3) {
+					aAssembler.Add(new Literal("xchg bx, bx"));
 				}
 				aAssembler.Add(new CPU.Push("____INTERRUPT_HANDLER___" + i));
 				aAssembler.Add(new CPU.Push("0x08"));

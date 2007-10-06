@@ -39,19 +39,20 @@ namespace Indy.IL2CPU.IL.NativeX86 {
 		private static void IDT_SetHandler(byte aInterruptNumber, uint aBase, ushort aSel, IDTEntryStruct.FlagsEnum aFlags) {
 			mIDTEntries[aInterruptNumber].AlwaysZero = 0;
 			mIDTEntries[aInterruptNumber].Sel = 8;
-			mIDTEntries[aInterruptNumber].BaseLow = (ushort)(aBase & 0xFFFF);
-			mIDTEntries[aInterruptNumber].BaseHi = (ushort)((aBase >> 16) & 0xFFFF);
+			mIDTEntries[aInterruptNumber].BaseLow = (ushort)(aBase);
+			mIDTEntries[aInterruptNumber].BaseHi = (ushort)(aBase >> 16);
 			mIDTEntries[aInterruptNumber].Flags = 128 /*Present*/| 0 /*Ring0*/| 8 /*32-bit*/| 0xF /*interrupt gate*/;
 		}																					  // was E
 
 		private static void InterruptHandler(byte aInterrupt, uint aParam) {
-			if(aInterrupt >= 40 && aInterrupt <= 47) {
+			Debug.WriteLine("Interrupt received");
+			System.Diagnostics.Debugger.Break();
+			if (aInterrupt >= 40 && aInterrupt <= 47) {
 				WriteToPort(0xA0, 0x20);
 			}
 			if (aInterrupt >= 32 && aInterrupt <= 47) {
 				WriteToPort(0x20, 0x20);
 			}
-			//Debug.WriteLine("Interrupt received");
 		}
 
 		private static void SetupInterruptDescriptorTable() {

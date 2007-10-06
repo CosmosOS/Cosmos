@@ -633,6 +633,9 @@ namespace Indy.IL2CPU {
 							} else {
 								xTheSize = 4;
 							}
+							if(xTheSize<4) {
+								xTheSize = 4;
+							}
 							if (xTheSize == 4) {
 								theType = "dd";
 								xTheSize = 1;
