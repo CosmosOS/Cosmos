@@ -1,11 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Indy.IL2CPU.IL.NativeX86 {
 	public partial class RuntimeEngineImpl {
+		[StructLayout(LayoutKind.Sequential)]
+		public struct DTPointerStruct {
+			public ushort Limit;
+			public uint Base;
+		}
 		[StructLayout(LayoutKind.Sequential)]
 		public struct IDTEntryStruct {
 			public enum FlagsEnum: byte {
@@ -17,11 +23,6 @@ namespace Indy.IL2CPU.IL.NativeX86 {
 			public byte AlwaysZero;
 			public byte Flags;
 			public ushort BaseHi;
-		}
-		[StructLayout(LayoutKind.Sequential)]
-		public struct DTPointerStruct {
-			public ushort Limit;
-			public uint Base;
 		}
 
 		// Do not rename, it is being referenced by name string
@@ -36,30 +37,34 @@ namespace Indy.IL2CPU.IL.NativeX86 {
 		}
 
 		private static void IDT_SetHandler(byte aInterruptNumber, uint aBase, ushort aSel, IDTEntryStruct.FlagsEnum aFlags) {
-			ushort xBaseLow = (ushort)(aBase & 0xFFFF);
-			ushort xBaseHigh = (ushort)((aBase >> 16) & 0xFFFF);
 			mIDTEntries[aInterruptNumber].AlwaysZero = 0;
-			mIDTEntries[aInterruptNumber].Sel = GDT_CodeSelector;
-			mIDTEntries[aInterruptNumber].BaseLow = xBaseLow;
-			mIDTEntries[aInterruptNumber].BaseHi = xBaseHigh;
-			mIDTEntries[aInterruptNumber].Flags = 0x80 /*present*/| 0x8 /*32-bit*/| 0x6 /*interrupt gate*/;
-		}
+			mIDTEntries[aInterruptNumber].Sel = 8;
+			mIDTEntries[aInterruptNumber].BaseLow = (ushort)(aBase & 0xFFFF);
+			mIDTEntries[aInterruptNumber].BaseHi = (ushort)((aBase >> 16) & 0xFFFF);
+			mIDTEntries[aInterruptNumber].Flags = 128 /*Present*/| 0 /*Ring0*/| 8 /*32-bit*/| 0xF /*interrupt gate*/;
+		}																					  // was E
 
-		#region interrupt handlers
-
-		[InterruptServiceRoutine(0)]
-		private static void Interrupt_0() {
-			Console.WriteLine("Interrupt 0 occurred!");
+		private static void InterruptHandler(byte aInterrupt, uint aParam) {
+			if(aInterrupt >= 40 && aInterrupt <= 47) {
+				WriteToPort(0xA0, 0x20);
+			}
+			if (aInterrupt >= 32 && aInterrupt <= 47) {
+				WriteToPort(0x20, 0x20);
+			}
+			//Debug.WriteLine("Interrupt received");
 		}
-		#endregion
 
 		private static void SetupInterruptDescriptorTable() {
+			Debug.WriteLine("Start setting up Interrupt Descriptor Table");
 			bool aFalse = false;
 			if (aFalse) {
-				Interrupt_0();
+				// code is never executed, but neccessary for IL2CPU to detect the methods
+				InterruptHandler(0, 0);
 				int theLen = mIDTEntries.Length;
 			}
+			Debug.WriteLine("Load the array");
 			IDT_LoadArray();
+			Debug.WriteLine("Register the IDT");
 			IDT_RegisterIDT();
 		}
 	}

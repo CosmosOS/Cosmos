@@ -27,6 +27,15 @@ namespace Indy.IL2CPU.IL.NativeX86 {
 				case "System_Void___System_Console_WriteLine___System_String___": {
 						return ConsoleImplRefs.WriteLineRef;
 					}
+				case "System_Void___System_Console_Write___System_String___": {
+						return ConsoleImplRefs.WriteRef;
+					}
+				case "System_Void___System_Diagnostics_Debug_WriteLine___System_String___": {
+						return DebugImplRefs.WriteLineRef;
+					}
+				case "System_Void___System_Diagnostics_Debug_WriteLineIf___System_Boolean__System_String___": {
+						return DebugImplRefs.WriteLineIfRef;
+					}
 				case "System_Void___Indy_IL2CPU_RuntimeEngine_InitializeEngine____": {
 						return RuntimeEngineImplRefs.InitializeEngineRef;
 					}
@@ -52,13 +61,16 @@ namespace Indy.IL2CPU.IL.NativeX86 {
 				case "System_Void___Indy_IL2CPU_IL_NativeX86_RuntimeEngineImpl_IDT_RegisterIDT____": {
 						return true;
 					}
-				case "System_Void___Indy_IL2CPU_IL_NativeX86_RuntimeEngineImpl_GDT_LoadArray____": {
-						return true;
-					}
-				case "System_Void___Indy_IL2CPU_IL_NativeX86_RuntimeEngineImpl_GDT_RegisterGDT____": {
-						return true;
-					}
 				case "System_Void___System_Diagnostics_Debugger_Break____": {
+						return true;
+					}
+				case "System_Void___Indy_IL2CPU_IL_NativeX86_RuntimeEngineImpl_IO_WriteToPort___System_UInt16__System_Byte__": {
+						return true;
+					}
+				case "System_Byte___Indy_IL2CPU_IL_NativeX86_RuntimeEngineImpl_IO_ReadFromPort___System_UInt16__": {
+						return true;
+					}
+				case "System_Void___Cosmos_Kernel_ConsoleDrv_TestIDT____": {
 						return true;
 					}
 			}
@@ -82,17 +94,28 @@ namespace Indy.IL2CPU.IL.NativeX86 {
 						DoAssemble_IDT_RegisterIDT(aAssembler, aMethodInfo);
 						return;
 					}
-				case "System_Void___Indy_IL2CPU_IL_NativeX86_RuntimeEngineImpl_GDT_LoadArray____": {
-						DoAssemble_GDT_LoadArray(aAssembler, aMethodInfo);
-						return;
-					}
-				case "System_Void___Indy_IL2CPU_IL_NativeX86_RuntimeEngineImpl_GDT_RegisterGDT____": {
-						DoAssemble_GDT_RegisterGDT(aAssembler, aMethodInfo);
-						return;
-					}
 				case "System_Void___System_Diagnostics_Debugger_Break____": {
-						aAssembler.Add(new Literal("xchg bx, bx"));
+						//aAssembler.Add(new Literal("xchg bx, bx"));
 						return;
+					}
+				case "System_Void___Cosmos_Kernel_ConsoleDrv_TestIDT____": {
+						//aAssembler.Add(new Literal("int 0x80"));
+						break;
+					}
+				case "System_Void___Indy_IL2CPU_IL_NativeX86_RuntimeEngineImpl_IO_WriteToPort___System_UInt16__System_Byte__": {
+						IL.X86.Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0].VirtualAddress);
+						aAssembler.Add(new CPU.Pop("eax"));
+						IL.X86.Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[1].VirtualAddress);
+						aAssembler.Add(new CPU.Pop("ecx"));
+						aAssembler.Add(new CPUNative.Out("ax", "cl"));
+						break;
+					}
+				case "System_Byte___Indy_IL2CPU_IL_NativeX86_RuntimeEngineImpl_IO_ReadFromPort___System_UInt16__": {
+						IL.X86.Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0].VirtualAddress);
+						aAssembler.Add(new CPU.Pop("ecx"));
+						aAssembler.Add(new CPU.Move("eax", "0"));
+						aAssembler.Add(new CPUNative.In("ecx", "al"));
+						break;
 					}
 			}
 			base.DoCustomAssembleImplementation(aMethodName, aInMetalMode, aAssembler, aMethodInfo);
@@ -108,7 +131,10 @@ namespace Indy.IL2CPU.IL.NativeX86 {
 			mIDTSetHandlerMethodName = new Label(xTheMethod).Name;
 			aAssembler.Add(new CPU.Call("___________REGISTER___ISRS_____"));
 			aAssembler.Add(new CPU.Move("eax", xPointerFieldName));
+			//aAssembler.Add(new Literal("XCHG BX, BX "));
+			aAssembler.Add(new CPUNative.Cli());
 			aAssembler.Add(new CPUNative.Lidt("eax"));
+			aAssembler.Add(new CPUNative.Sti());
 		}
 
 		private string mIDTSetHandlerMethodName;
@@ -118,7 +144,7 @@ namespace Indy.IL2CPU.IL.NativeX86 {
 			TypeDefinition xRuntimeEngineTypeDef = Engine.GetTypeDefinition(typeof(RuntimeEngineImpl).Assembly.GetName().Name, typeof(RuntimeEngineImpl).FullName);
 			FieldDefinition xFieldDef = xRuntimeEngineTypeDef.Fields.GetField("mIDTEntries");
 			string xFieldName = Assembler.DataMember.GetStaticFieldName(xFieldDef);
-			string xFieldData = "0,0,0,0,2,0,0,0,0,0,0,0";
+			string xFieldData = "0,0,0,0,2,0,0,0,1,0,0,0";
 			for (int i = 0; i < 256; i++) {
 				xFieldData += ",0,0,0,0,0,0,0,0";
 			}
@@ -130,8 +156,10 @@ namespace Indy.IL2CPU.IL.NativeX86 {
 			string xPointerFieldName;
 			Engine.QueueStaticField(xFieldDef, out xPointerFieldName);
 			aAssembler.Add(new CPU.Move("eax", xPointerFieldName));
-			aAssembler.Add(new CPU.Move("word [eax]", "0x" + ((8 * 1) - 1).ToString("X")));
-			aAssembler.Add(new CPU.Move("dword [eax + 2]", xFieldName));
+			aAssembler.Add(new CPU.Move("word [eax]", "0x" + ((8 * 256) - 1).ToString("X")));
+			aAssembler.Add(new CPU.Move("ecx", xFieldName));
+			aAssembler.Add(new CPU.Add("ecx", "0xC"));
+			aAssembler.Add(new CPU.Move("dword [eax + 2]", "ecx"));
 		}
 
 		private static void DoAssemble_String_GetByteFromChar(Assembler.Assembler aAssembler, MethodInformation aMethodInfo) {
@@ -141,76 +169,45 @@ namespace Indy.IL2CPU.IL.NativeX86 {
 		public override void PostProcess(Indy.IL2CPU.Assembler.Assembler aAssembler) {
 			base.PostProcess(aAssembler);
 			X86.X86MethodHeaderOp.AssembleHeader(aAssembler, "___________REGISTER___ISRS_____", 0);
-			for (int i = 0; i < aAssembler.Instructions.Count; i++) {
-				Label xLbl = aAssembler.Instructions[i] as Label;
-				if (xLbl == null) {
-					continue;
+			string xInterruptHandlerLabel = new Label(Engine.GetMethodDefinition(Engine.GetTypeDefinition("Indy.IL2CPU.IL.NativeX86", "Indy.IL2CPU.IL.NativeX86.RuntimeEngineImpl"), "InterruptHandler", "System.Byte", "System.UInt32")).Name;
+			int[] xInterruptsWithParam = new int[] { 8, 10, 11, 12, 13, 14 };
+			for (int i = 0; i < 256; i++) {
+				aAssembler.Add(new CPU.Push("0x" + i.ToString("X")));
+				if (i == 0) {
+					//aAssembler.Add(new Literal("xchg bx, bx"));
 				}
-				if (!xLbl.Name.EndsWith(NativeX86MethodHeaderOp.ISR_Suffix)) {
-					continue;
-				}
-				Literal xLiteral = aAssembler.Instructions[i + 1] as Literal;
-				if (xLiteral == null)
-					continue;
-				byte theNum;
-				if (!Byte.TryParse(xLiteral.Data.Substring(1), out theNum)) {
-					continue;
-				}
-				aAssembler.Add(new CPU.Push("0x" + theNum.ToString("X")));
-				aAssembler.Add(new CPU.Push(xLbl.Name));
+				aAssembler.Add(new CPU.Push("____INTERRUPT_HANDLER___" + i));
 				aAssembler.Add(new CPU.Push("0x08"));
 				aAssembler.Add(new CPU.Push("0x8E"));
 				aAssembler.Add(new CPU.Call(mIDTSetHandlerMethodName));
 			}
 			X86.X86MethodFooterOp.AssembleFooter(false, aAssembler, 0, 0);
-		}
-
-		private void DoAssemble_GDT_RegisterGDT(Assembler.Assembler aAssembler, MethodInformation aInfo) {
-			TypeDefinition xRuntimeEngineTypeDef = Engine.GetTypeDefinition(typeof(RuntimeEngineImpl).Assembly.GetName().Name, typeof(RuntimeEngineImpl).FullName);
-			FieldDefinition xFieldDef = xRuntimeEngineTypeDef.Fields.GetField("mGDTPointer");
-			string xPointerFieldName;
-			Engine.QueueStaticField(xFieldDef, out xPointerFieldName);
-			//aAssembler.Add(new Literal("XCHG BX, BX "));
-			aAssembler.Add(new CPU.Move("eax", xPointerFieldName));
-			aAssembler.Add(new CPUNative.Lgdt("eax"));
-			aAssembler.Add(new CPU.Move("ax", "0x10"));
+			for (int j = 0; j < 256; j++) {
+				aAssembler.Add(new Label("____INTERRUPT_HANDLER___" + j));
+				aAssembler.Add(new CPUNative.Cli());
+				aAssembler.Add(new CPU.Push(j.ToString()));
+				if (!xInterruptsWithParam.Contains(j)) {
+					aAssembler.Add(new CPU.Push("0"));
+				}
+				aAssembler.Add(new CPU.JumpAlways("____INTERRUPT_HANDLER___GENERIC"));
+			}
+			aAssembler.Add(new Label("____INTERRUPT_HANDLER___GENERIC"));
+			aAssembler.Add(new CPUNative.Pushad());
+			aAssembler.Add(new CPU.Move("ax", "ds"));
+			aAssembler.Add(new CPU.Push("eax"));
 			aAssembler.Add(new CPU.Move("ds", "ax"));
 			aAssembler.Add(new CPU.Move("es", "ax"));
 			aAssembler.Add(new CPU.Move("fs", "ax"));
 			aAssembler.Add(new CPU.Move("gs", "ax"));
-			aAssembler.Add(new CPU.Move("ss", "ax"));
-			aAssembler.Add(new CPU.JumpAlways("0x8:___GDT_REGISTERGDT____FLUSH2"));
-			aAssembler.Add(new Label("___GDT_REGISTERGDT____FLUSH2"));
-
-		}
-
-		private void DoAssemble_GDT_LoadArray(Indy.IL2CPU.Assembler.Assembler aAssembler, MethodInformation aMethodInfo) {
-			TypeDefinition xRuntimeEngineTypeDef = Engine.GetTypeDefinition(typeof(RuntimeEngineImpl).Assembly.GetName().Name, typeof(RuntimeEngineImpl).FullName);
-			string xFieldName = "_______GDT____ENTRIES____";
-			string xFieldData = "0,0,2,0,";
-			// system segment
-			xFieldData += "0,0,0,0,";
-			//  code
-			xFieldData += "1111111111111111b,";
-			xFieldData += "0000000000000000b,";
-			xFieldData += "0000000010011010b,";
-			xFieldData += "1100111100000000b,";
-			// data
-			xFieldData += "1111111111111111b,";
-			xFieldData += "0000000000000000b,";
-			xFieldData += "0000000010010010b,";
-			xFieldData += "1100111100000000b";
-			aAssembler.DataMembers.RemoveAll(delegate(DataMember aItem) {
-				return aItem.Name == xFieldName;
-			});
-			aAssembler.DataMembers.Add(new DataMember(xFieldName, "dw", xFieldData));
-			FieldDefinition xFieldDef = xRuntimeEngineTypeDef.Fields.GetField("mGDTPointer");
-			string xPointerFieldName;
-			Engine.QueueStaticField(xFieldDef, out xPointerFieldName);
-			aAssembler.Add(new CPU.Move("eax", xPointerFieldName));
-			//aAssembler.Add(new Literal("XCHG BX, BX "));
-			aAssembler.Add(new CPU.Move("word [eax]", "0x" + ((8 * 3) - 1).ToString("X")));
-			aAssembler.Add(new CPU.Move("dword [eax + 2]", xFieldName));
+			aAssembler.Add(new CPU.Call(xInterruptHandlerLabel));
+			aAssembler.Add(new CPU.Pop("ebx"));
+			aAssembler.Add(new CPU.Move("ds", "bx"));
+			aAssembler.Add(new CPU.Move("es", "bx"));
+			aAssembler.Add(new CPU.Move("fs", "bx"));
+			aAssembler.Add(new CPU.Move("gs", "bx"));
+			aAssembler.Add(new CPUNative.Popad());
+			aAssembler.Add(new CPUNative.Sti());
+			aAssembler.Add(new CPUNative.IRet());
 		}
 	}
 }

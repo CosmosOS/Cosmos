@@ -11,6 +11,7 @@ namespace Indy.IL2CPU.IL.NativeX86.CustomImplementations.System {
 		public static readonly AssemblyDefinition RuntimeAssemblyDef;
 		public static readonly MethodDefinition ClearRef;
 		public static readonly MethodDefinition WriteLineRef;
+		public static readonly MethodDefinition WriteRef;
 
 		static ConsoleImplRefs() {
 			RuntimeAssemblyDef = AssemblyFactory.GetAssembly(typeof(ConsoleImpl).Assembly.Location);

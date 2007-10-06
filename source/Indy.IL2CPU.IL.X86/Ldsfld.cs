@@ -7,7 +7,6 @@ using CPU = Indy.IL2CPU.Assembler.X86;
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Ldsfld)]
 	public class Ldsfld: Op {
-		private bool IsIntPtrZero = false;
 		private string mDataName;
 		private bool mIsReferenceTypeOrStruct;
 

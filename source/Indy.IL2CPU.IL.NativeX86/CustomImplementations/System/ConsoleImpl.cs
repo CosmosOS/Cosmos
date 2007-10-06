@@ -33,18 +33,31 @@ namespace Indy.IL2CPU.IL.NativeX86.CustomImplementations.System {
 			*xScreenPtr = 7;
 		}
 
-		private static void OutputLine(string aLine) {
-			for (int i = 0; i < aLine.Length; i++) {
-				PutChar(mCurrentLine, i, StringImpl.GetByteFromChar(aLine[i]));
+		private static void OutputString(string aText) {
+			for (int i = 0; i < aText.Length; i++) {
+				PutChar(mCurrentLine, mCurrentChar, StringImpl.GetByteFromChar(aText[i]));
+				mCurrentChar += 1;
+				if(mCurrentChar == Columns) {
+					mCurrentChar = 0;
+					mCurrentLine += 1;
+					if(mCurrentLine == Lines) {
+						Clear();
+					}
+				}
 			}
 		}
 
+		public static void Write(string aText) {
+			OutputString(aText);
+		}
+
 		public static void WriteLine(string aLine) {
+			OutputString(aLine);
+			mCurrentLine += 1;
+			mCurrentChar = 0;
 			if (mCurrentLine == Lines) {
 				Clear();
 			}
-			OutputLine(aLine);
-			mCurrentLine += 1;
 		}
 	}
 }

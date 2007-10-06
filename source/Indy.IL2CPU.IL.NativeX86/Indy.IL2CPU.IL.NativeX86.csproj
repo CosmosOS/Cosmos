@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\InterruptServiceRoutineAttribute.cs" />
+    <Compile Include="CustomImplementations\System\Diagnostics\DebugImplRefs.cs" />
     <Compile Include="CustomImplementations\System\Diagnostics\DebuggerImpl.cs" />
     <Compile Include="CustomImplementations\System\Diagnostics\DebuggerImplRefs.cs" />
     <Compile Include="CustomImplementations\System\ConsoleImpl.cs" />
@@ -60,10 +61,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RuntimeEngineImpl.cs" />
     <Compile Include="RuntimeEngineImplRefs.cs" />
-    <Compile Include="RuntimeEngineImpl\GDT.cs" />
     <Compile Include="RuntimeEngineImpl\IDT.cs" />
     <Compile Include="NativeX86MethodFooterOp.cs" />
     <Compile Include="NativeX86MethodHeaderOp.cs" />
+    <Compile Include="RuntimeEngineImpl\PIC.cs" />
+    <Compile Include="RuntimeEngineImpl\IO.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Indy.IL2CPU.Assembler.NativeX86\Indy.IL2CPU.Assembler.NativeX86.csproj">
