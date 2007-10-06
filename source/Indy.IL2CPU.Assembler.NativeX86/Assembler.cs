@@ -69,7 +69,7 @@ namespace Indy.IL2CPU.Assembler.NativeX86 {
 			//				mOutputWriter.WriteLine("\t\t{0},'{1}', \\", xTheLabels[i].Replace("@@", "."), xTheLabels[i]);
 					}
 					// public entry as 'entry'
-					mOutputWriter.WriteLine("\tpublic {0} as '{0}'", xTheLabels[i].Replace("@@", "."), xTheLabels[i]);
+					//mOutputWriter.WriteLine("\tpublic {0} as '{0}'", xTheLabels[i].Replace("@@", "."), xTheLabels[i]);
 				}
 			}
 			//mOutputWriter.WriteLine("section '.code' code readable executable");

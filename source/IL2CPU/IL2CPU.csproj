@@ -39,16 +39,16 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
-    <Reference Include="System.Xml.Linq">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Cosmos.Kernel\Cosmos.Kernel.csproj">
+      <Project>{EF5F012A-4AA4-4B4D-A318-6D228C1F30D8}</Project>
+      <Name>Cosmos.Kernel</Name>
+    </ProjectReference>
     <ProjectReference Include="..\HelloWorldMetal\HelloWorldMetal.csproj">
       <Project>{B57BEF6D-48D6-49DD-B4C5-893537E0EBB8}</Project>
       <Name>HelloWorldMetal</Name>
@@ -56,6 +56,14 @@
     <ProjectReference Include="..\HelloWorld\HelloWorld.csproj">
       <Project>{0267F1AE-CA81-4EBD-86CA-C8E22BE9A6F1}</Project>
       <Name>HelloWorld</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Indy.IL2CPU.IL.NativeX86\Indy.IL2CPU.IL.NativeX86.csproj">
+      <Project>{8D84CDE5-77A3-4E1F-B022-753E9E077926}</Project>
+      <Name>Indy.IL2CPU.IL.NativeX86</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Indy.IL2CPU.IL.Win32\Indy.IL2CPU.IL.Win32.csproj">
+      <Project>{4B6F38F2-A1E7-4D79-B47D-F2F4ED68C4A1}</Project>
+      <Name>Indy.IL2CPU.IL.Win32</Name>
     </ProjectReference>
     <ProjectReference Include="..\Indy.IL2CPU.IL.X86\Indy.IL2CPU.IL.X86.csproj">
       <Project>{69C8D2C5-225C-4A00-BA55-AEF6719CBDBA}</Project>

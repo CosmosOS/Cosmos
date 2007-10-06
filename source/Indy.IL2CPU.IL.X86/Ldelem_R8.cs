@@ -5,7 +5,7 @@ using Mono.Cecil.Cil;
 using CPU = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(Code.Ldelem_R8, false)]
+	[OpCode(Code.Ldelem_R8, true)]
 	public class Ldelem_R8: Op {
 		public Ldelem_R8(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {

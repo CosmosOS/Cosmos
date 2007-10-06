@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Mono.Cecil;
 
 namespace Indy.IL2CPU.IL {
 	// TODO: abstract this one out to a X86 specific one
@@ -38,15 +39,17 @@ namespace Indy.IL2CPU.IL {
 			public readonly KindEnum Kind;
 		}
 
-		public MethodInformation(string aLabelName, Variable[] aLocals, Argument[] aArguments, bool aHasReturnValue, bool aIsInstanceMethod, TypeInformation aTypeInfo) {
+		public MethodInformation(string aLabelName, Variable[] aLocals, Argument[] aArguments, bool aHasReturnValue, bool aIsInstanceMethod, TypeInformation aTypeInfo, MethodDefinition aMethodDef) {
 			Locals = aLocals;
 			LabelName = aLabelName;
 			Arguments = aArguments;
 			HasReturnValue = aHasReturnValue;
 			IsInstanceMethod = aIsInstanceMethod;
 			TypeInfo = aTypeInfo;
+			MethodDefinition = aMethodDef;
 		}
 
+		public readonly MethodDefinition MethodDefinition;
 		public readonly string LabelName;
 		public readonly Variable[] Locals;
 		public readonly Argument[] Arguments;

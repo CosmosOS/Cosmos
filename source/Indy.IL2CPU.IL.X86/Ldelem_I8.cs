@@ -6,7 +6,7 @@ using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(Code.Ldelem_I8, false)]
+	[OpCode(Code.Ldelem_I8, true)]
 	public class Ldelem_I8: Op {
 		public Ldelem_I8(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {

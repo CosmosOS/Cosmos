@@ -6,7 +6,7 @@ using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(Code.Ldelema, false)]
+	[OpCode(Code.Ldelema, true)]
 	public class Ldelema: Op {
 		private uint mElementSize;
 		public Ldelema(Instruction aInstruction, MethodInformation aMethodInfo)

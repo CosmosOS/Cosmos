@@ -10,9 +10,11 @@ namespace IL2CPU {
 		public static void Main(string[] args) {
 			//System.Diagnostics.Debugger.Break();
 			try {
-				string exeName = "HelloWorld.exe";
+				string exeName = "Cosmos.Kernel.exe";
 				if (args.Length > 0) {
 					exeName = args[0];
+				}else {
+					Environment.CurrentDirectory = Path.GetDirectoryName(typeof (Program).Assembly.Location);
 				}
 				string outputFileName = @"output.asm";
 				if (args.Length > 1) {

@@ -76,5 +76,7 @@ namespace Indy.IL2CPU.IL {
 
 		public virtual void DoCustomAssembleImplementation(string aMethodName, bool aInMetalMode, Assembler.Assembler aAssembler, MethodInformation aMethodInfo) {
 		}
+		public virtual void PostProcess(Assembler.Assembler aAssembler) {
+		}
 	}
 }

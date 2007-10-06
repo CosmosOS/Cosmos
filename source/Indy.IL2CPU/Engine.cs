@@ -105,6 +105,7 @@ namespace Indy.IL2CPU {
 					throw new ArgumentNullException("aOutput");
 				}
 				mCrawledAssembly = AssemblyFactory.GetAssembly(aAssembly);
+				((DefaultAssemblyResolver)mCrawledAssembly.Resolver).AddSearchDirectory(Environment.CurrentDirectory);
 				if (mCrawledAssembly.EntryPoint == null) {
 					throw new NotSupportedException("Libraries are not supported!");
 				}
@@ -123,7 +124,6 @@ namespace Indy.IL2CPU {
 						throw new NotSupportedException("TargetPlatform '" + aTargetPlatform + "' not supported!");
 				}
 				using (mAssembler) {
-
 					//mAssembler.OutputType = Assembler.Win32.Assembler.OutputTypeEnum.Console;
 					mMap.Initialize(mAssembler);
 					foreach (Type t in typeof(Engine).Assembly.GetTypes()) {
@@ -189,6 +189,7 @@ namespace Indy.IL2CPU {
 						//							}
 						//						} while (true);
 						//						GenerateVMT();
+						mMap.PostProcess(mAssembler);
 						ProcessAllStaticFields();
 					} finally {
 						mAssembler.Flush();
@@ -203,7 +204,7 @@ namespace Indy.IL2CPU {
 
 		private void GenerateVMT() {
 			// todo: abstract this code generation out to IL.* implementation
-			Op xOp = GetOpFromType(mMap.MethodHeaderOp, null, new MethodInformation("____INIT__VMT____", new MethodInformation.Variable[0], new MethodInformation.Argument[0], false, false, null));
+			Op xOp = GetOpFromType(mMap.MethodHeaderOp, null, new MethodInformation("____INIT__VMT____", new MethodInformation.Variable[0], new MethodInformation.Argument[0], false, false, null, null));
 			xOp.Assembler = mAssembler;
 			xOp.Assemble();
 			InitVmtImplementationOp xInitVmtOp = (InitVmtImplementationOp)GetOpFromType(mMap.InitVmtImplementationOp, null, null);
@@ -225,7 +226,7 @@ namespace Indy.IL2CPU {
 				return GetMethodIdentifier(xMethod);
 			};
 			xInitVmtOp.Assemble();
-			xOp = GetOpFromType(mMap.MethodFooterOp, null, new MethodInformation("____INIT__VMT____", new MethodInformation.Variable[0], new MethodInformation.Argument[0], false, false, null));
+			xOp = GetOpFromType(mMap.MethodFooterOp, null, new MethodInformation("____INIT__VMT____", new MethodInformation.Variable[0], new MethodInformation.Argument[0], false, false, null, null));
 			xOp.Assembler = mAssembler;
 			xOp.Assemble();
 		}
@@ -413,6 +414,14 @@ namespace Indy.IL2CPU {
 										  select item).FirstOrDefault();
 					if (xAssembly != null) {
 						xReferencedFieldAssembly = AssemblyFactory.GetAssembly(xAssembly.Location);
+					} else {
+						try {
+							Assembly a = Assembly.Load(xAssemblyNameReference.Name);
+							if (a != null) {
+								xReferencedFieldAssembly = AssemblyFactory.GetAssembly(a.Location);
+							}
+						} catch {
+						}
 					}
 				}
 				if (xReferencedFieldAssembly != null) {
@@ -544,10 +553,10 @@ namespace Indy.IL2CPU {
 					return 4;
 				case "System.Byte":
 				case "System.SByte":
-					return 4;
+					return 1;
 				case "System.UInt16":
 				case "System.Int16":
-					return 4;
+					return 2;
 				case "System.UInt32":
 				case "System.Int32":
 					return 4;
@@ -559,7 +568,7 @@ namespace Indy.IL2CPU {
 				case "System.IntPtr":
 					return 4;
 				case "System.Boolean":
-					return 4;
+					return 1;
 				case "System.Single":
 					return 4;
 				case "System.Double":
@@ -592,49 +601,52 @@ namespace Indy.IL2CPU {
 				string xFieldName = xCurrentField.GetFullName();
 				OnDebugLog(LogSeverityEnum.Informational, "Processing Static Field '{0}', Constant = '{1}'({2})", xFieldName, xCurrentField.Constant, xCurrentField.Constant == null ? "**NULL**" : xCurrentField.Constant.GetType().FullName);
 				xFieldName = DataMember.GetStaticFieldName(xCurrentField);
-				RegisterType(GetDefinitionFromTypeReference(xCurrentField.FieldType));
-				if (xCurrentField.HasConstant) {
-					// emit the constant, but first find out how we get it.
-				} else {
-					if (xCurrentField.InitialValue != null && xCurrentField.InitialValue.Length > 0) {
-						string xTheData = "";
-						uint xStorageSize = GetFieldStorageSize(xCurrentField.FieldType);
-
-						if (xCurrentField.InitialValue.Length > 4) {
-							xTheData = "0,0,0,0,2,0,0,0,";
-						}
-						foreach (byte x in BitConverter.GetBytes(xCurrentField.InitialValue.Length)) {
-							xTheData += x + ",";
-						}
-						foreach (byte x in xCurrentField.InitialValue) {
-							xTheData += x + ",";
-						}
-						xTheData = xTheData.TrimEnd(',');
-						if (xTheData.Length == 0) {
-							throw new Exception("Field '" + xCurrentField.ToString() + "' doesn't have a valid size!");
-						}
-						mAssembler.DataMembers.Add(new DataMember(xFieldName, "db", xTheData));
+				if (mAssembler.DataMembers.Count(x => x.Name == xFieldName) == 0) {
+					RegisterType(GetDefinitionFromTypeReference(xCurrentField.FieldType));
+					if (xCurrentField.HasConstant) {
+						// emit the constant, but first find out how we get it.
 					} else {
-						uint xTheSize;
-						string theType = "db";
-						if (!GetDefinitionFromTypeReference(xCurrentField.FieldType).IsClass) {
-							xTheSize = GetFieldStorageSize(xCurrentField.FieldType);
+						if (xCurrentField.InitialValue != null && xCurrentField.InitialValue.Length > 0) {
+							string xTheData = "";
+							uint xStorageSize = GetFieldStorageSize(xCurrentField.FieldType);
+
+							if (xCurrentField.InitialValue.Length > 4) {
+								xTheData = "0,0,0,0,2,0,0,0,";
+							}
+							foreach (byte x in BitConverter.GetBytes(xCurrentField.InitialValue.Length)) {
+								xTheData += x + ",";
+							}
+							foreach (byte x in xCurrentField.InitialValue) {
+								xTheData += x + ",";
+							}
+							xTheData = xTheData.TrimEnd(',');
+							if (xTheData.Length == 0) {
+								throw new Exception("Field '" + xCurrentField.ToString() + "' doesn't have a valid size!");
+							}
+							mAssembler.DataMembers.Add(new DataMember(xFieldName, "db", xTheData));
 						} else {
-							xTheSize = 4;
+							uint xTheSize;
+							string theType = "db";
+							TypeDefinition xFieldTypeDef = GetDefinitionFromTypeReference(xCurrentField.FieldType);
+							if (!xFieldTypeDef.IsClass || xFieldTypeDef.IsValueType) {
+								xTheSize = GetFieldStorageSize(xCurrentField.FieldType);
+							} else {
+								xTheSize = 4;
+							}
+							if (xTheSize == 4) {
+								theType = "dd";
+								xTheSize = 1;
+							}
+							string xTheData = "";
+							for (uint i = 0; i < xTheSize; i++) {
+								xTheData += "0,";
+							}
+							if (xTheSize == 0) {
+								throw new Exception("Field '" + xCurrentField.ToString() + "' doesn't have a valid size!");
+							}
+							xTheData = xTheData.TrimEnd(',');
+							mAssembler.DataMembers.Add(new DataMember(xFieldName, theType, xTheData));
 						}
-						if (xTheSize == 4) {
-							theType = "dd";
-							xTheSize = 1;
-						}
-						string xTheData = "";
-						for (uint i = 0; i < xTheSize; i++) {
-							xTheData += "0,";
-						}
-						if (xTheSize == 0) {
-							throw new Exception("Field '" + xCurrentField.ToString() + "' doesn't have a valid size!");
-						}
-						xTheData = xTheData.TrimEnd(',');
-						mAssembler.DataMembers.Add(new DataMember(xFieldName, theType, xTheData));
 					}
 				}
 				mStaticFields[xCurrentField] = true;
@@ -817,7 +829,7 @@ namespace Indy.IL2CPU {
 						xCurOffset += xArgSize;
 					}
 				}
-				xMethodInfo = new MethodInformation(aMethodName, xVars, xArgs, !aCurrentMethodForArguments.ReturnType.ReturnType.FullName.Contains("System.Void"), aCurrentMethodForArguments.HasThis, aTypeInfo);
+				xMethodInfo = new MethodInformation(aMethodName, xVars, xArgs, !aCurrentMethodForArguments.ReturnType.ReturnType.FullName.Contains("System.Void"), aCurrentMethodForArguments.HasThis, aTypeInfo, aCurrentMethodForArguments);
 			}
 			return xMethodInfo;
 		}
@@ -843,10 +855,10 @@ namespace Indy.IL2CPU {
 						RegisterTypeRef(xTypeSpec.ElementType);
 					} else {
 						TypeDefinition xFieldType = GetDefinitionFromTypeReference(xField.FieldType);
-						if (xFieldType.IsClass) {
+						if (xFieldType.IsClass&& !xFieldType.IsValueType) {
 							xFieldSize = 4;
 						} else {
-							xFieldSize = GetFieldStorageSize(xField.FieldType);
+							xFieldSize = GetFieldStorageSize(xFieldType);
 						}
 					}
 					xTypeFields.Add(xField.ToString(), new TypeInformation.Field(aObjectStorageSize, xFieldSize));

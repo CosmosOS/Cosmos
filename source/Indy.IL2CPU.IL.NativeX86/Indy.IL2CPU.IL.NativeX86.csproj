@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\InterruptServiceRoutineAttribute.cs" />
     <Compile Include="CustomImplementations\System\Diagnostics\DebuggerImpl.cs" />
     <Compile Include="CustomImplementations\System\Diagnostics\DebuggerImplRefs.cs" />
     <Compile Include="CustomImplementations\System\ConsoleImpl.cs" />
@@ -56,6 +57,12 @@
     <Compile Include="NativeX86OpCodeMap.cs" />
     <Compile Include="NativeX86PutCharOp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RuntimeEngineImpl.cs" />
+    <Compile Include="RuntimeEngineImplRefs.cs" />
+    <Compile Include="RuntimeEngineImpl\GDT.cs" />
+    <Compile Include="RuntimeEngineImpl\IDT.cs" />
+    <Compile Include="NativeX86MethodFooterOp.cs" />
+    <Compile Include="NativeX86MethodHeaderOp.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Indy.IL2CPU.Assembler.NativeX86\Indy.IL2CPU.Assembler.NativeX86.csproj">
@@ -77,6 +84,10 @@
     <ProjectReference Include="..\Indy.IL2CPU.IL\Indy.IL2CPU.IL.csproj">
       <Project>{5A39A8DF-D99E-4112-9676-BD3EED969A9C}</Project>
       <Name>Indy.IL2CPU.IL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Indy.IL2CPU\Indy.IL2CPU.csproj">
+      <Project>{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}</Project>
+      <Name>Indy.IL2CPU</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

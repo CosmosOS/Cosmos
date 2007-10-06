@@ -41,7 +41,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			xTheField = xFieldInfo[xFieldId];
 			RelativeAddress = xTheField.RelativeAddress;
 			FieldSize = xTheField.Size;
-			if (FieldSize == 1 || FieldSize == 2 || FieldSize == 4 || FieldSize == 8)
+			if (FieldSize == 1 || FieldSize == 2 || FieldSize == 4)
 				return;
 			System.Diagnostics.Debugger.Break();
 			throw new NotSupportedException("FieldSizes other than 1, 2, 4 and 8 are not supported yet! (" + FieldSize + ")");
@@ -54,21 +54,22 @@ namespace Indy.IL2CPU.IL.X86 {
 			Pop("eax"); // new value
 			Pop("ecx"); // instance
 			string xMovePrefix = "";
+			string xRegister = "";
 			switch (FieldSize) {
 				case 1:
 					xMovePrefix = "byte";
+					xRegister = "al";
 					break;
 				case 2:
 					xMovePrefix = "word";
+					xRegister = "ax";
 					break;
 				case 4:
 					xMovePrefix = "dword";
-					break;
-				case 8:
-					xMovePrefix = "qword";
+					xRegister = "eax";
 					break;
 			}
-			Move(Assembler, xMovePrefix + " [ecx " + RelativeAddress + "]", "eax");
+			Move(Assembler, xMovePrefix + " [ecx " + RelativeAddress + "]", xRegister);
 		}
 	}
 }

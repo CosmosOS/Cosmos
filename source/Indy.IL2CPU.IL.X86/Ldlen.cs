@@ -5,7 +5,7 @@ using Mono.Cecil.Cil;
 using CPU = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(Code.Ldlen, false)]
+	[OpCode(Code.Ldlen, true)]
 	public class Ldlen: Op {
 		public Ldlen(Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {

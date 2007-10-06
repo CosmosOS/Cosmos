@@ -146,5 +146,11 @@ namespace Indy.IL2CPU.Assembler {
 
 		protected virtual void EmitFooter() {
 		}
+
+		public List<Instruction> Instructions {
+			get {
+				return mInstructions;
+			}
+		}
 	}
 }

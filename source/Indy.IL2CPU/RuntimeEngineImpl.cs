@@ -7,12 +7,22 @@ namespace Indy.IL2CPU {
 	public static partial class RuntimeEngine {
 		public static void InitializeApplication() {
 			// do initialization of all runtime services, like heap and GC..
+			InitializeEngine();
 			Heap_Initialize();
+		}
+
+		public static void InitializeEngine() {
+			// for replacement by the architecture
+		}
+
+		public static void FinalizeEngine() {
+			// for replacement by the architecture
 		}
 
 		public static void FinalizeApplication(int aExitCode) {
 			// finalize all runtime services, like heap and gc
 			Heap_Shutdown();
+			FinalizeEngine();
 			ExitProcess(aExitCode);			
 		}
 

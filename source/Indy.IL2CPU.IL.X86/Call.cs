@@ -11,6 +11,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		private string LabelName;
 		private bool HasResult;
 		private int? TotalArgumentSize = null;
+		private bool mIsDebugger_Break = false;
 		public Call(MethodReference aMethod)
 			: base(null, null) {
 			if (aMethod == null) {
@@ -20,6 +21,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		private void Initialize(MethodReference aMethod) {
+			mIsDebugger_Break = aMethod.GetFullName() == "System.Void System.Diagnostics.Debugger.Break()";
 			HasResult = !aMethod.ReturnType.ReturnType.FullName.Contains("System.Void");
 			MethodDefinition xMethodDef = Engine.GetDefinitionFromMethodReference(aMethod);
 			LabelName = new Asm.Label(xMethodDef).Name;
@@ -53,7 +55,11 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public override void DoAssemble() {
-			Assemble(LabelName);
+			if (mIsDebugger_Break) {
+				mAssembler.Add(new Asm.Literal("xchg bx, bx"));
+			} else {
+				Assemble(LabelName);
+			}
 		}
 	}
 }

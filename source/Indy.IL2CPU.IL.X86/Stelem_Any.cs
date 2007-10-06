@@ -6,7 +6,7 @@ using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(Code.Stelem_Any, false)]
+	[OpCode(Code.Stelem_Any, true)]
 	public class Stelem_Any: Op {
 		private uint mElementSize;
 		public Stelem_Any(Instruction aInstruction, MethodInformation aMethodInfo)

@@ -39,10 +39,18 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assembler.cs" />
+    <Compile Include="Cli.cs" />
+    <Compile Include="IRet.cs" />
+    <Compile Include="Lgdt.cs" />
+    <Compile Include="Lidt.cs" />
+    <Compile Include="Popad.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Pushad.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Indy.IL2CPU.Assembler.X86\Indy.IL2CPU.Assembler.X86.csproj">
