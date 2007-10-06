@@ -53,6 +53,7 @@
     <Compile Include="CustomImplementations\System\Diagnostics\DebuggerImplRefs.cs" />
     <Compile Include="CustomImplementations\System\ConsoleImpl.cs" />
     <Compile Include="CustomImplementations\System\ConsoleImplRefs.cs" />
+    <Compile Include="CustomImplementations\System\Diagnostics\DebugImpl.cs" />
     <Compile Include="NativeX86CustomMethodImplementationOp.cs" />
     <Compile Include="NativeX86OpCodeMap.cs" />
     <Compile Include="NativeX86PutCharOp.cs" />

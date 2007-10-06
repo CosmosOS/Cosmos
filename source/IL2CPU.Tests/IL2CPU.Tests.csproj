@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="Tests\SimpleStaticField\SimpleStaticField.cs" />
     <None Include="Tests\SimpleStructSumming\SimpleStructSumming.cs" />
     <None Include="Tests\SimpleStructIndexing\SimpleStructIndexing.cs" />
     <None Include="Tests\SimpleForWithIf\SimpleForWithIf.cs">
@@ -172,6 +173,9 @@
     <Content Include="Tests\SimpleForWithIf\SimpleForWithIf.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Tests\SimpleStaticField\SimpleStaticField.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Tests\SimpleStructSumming\SimpleStructSumming.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -45,10 +45,6 @@ namespace Indy.IL2CPU.IL.X86 {
 		public Ldsfld(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
 			FieldReference xField = (FieldReference)aInstruction.Operand;
-			Console.WriteLine("Procesing ldsfld '" + xField.GetFullName() + "'");
-			if (xField.GetFullName() == "Indy.IL2CPU.IL.Win32.RuntimeEngineImpl.HeapHandle") {
-				System.Diagnostics.Debugger.Break();
-			}
 			TypeDefinition xFieldTypeDef = Engine.GetDefinitionFromTypeReference(xField.FieldType);
 			mIsReferenceTypeOrStruct = (xFieldTypeDef.IsClass || xFieldTypeDef.IsValueType || IsArray(xFieldTypeDef)) && !IsPrimitive(xFieldTypeDef);
 			Engine.QueueStaticField(xField, out mDataName);

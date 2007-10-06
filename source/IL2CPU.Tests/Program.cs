@@ -59,7 +59,6 @@ namespace IL2CPU.Tests {
 							continue;
 						}
 						if(!File.Exists(xTestExe + ".exe")) {
-							System.Diagnostics.Debugger.Break();
 							Console.WriteLine("Result of '" + xTestExe.Substring(xBaseDir.Length + 1) + "':");
 							string[] lines = xProc.StandardOutput.ReadToEnd().Split(new string[] {"\r\n"}, StringSplitOptions.None);
 							foreach(string s in lines) {

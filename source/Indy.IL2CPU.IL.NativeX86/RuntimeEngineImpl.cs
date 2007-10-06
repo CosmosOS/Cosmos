@@ -6,9 +6,10 @@ using System.Text;
 namespace Indy.IL2CPU.IL.NativeX86 {
 	public static partial class RuntimeEngineImpl {
 		public static void InitializeEngine() {
-			//Console.WriteLine("Loading IDT");
+			Console.Clear();
+			Console.WriteLine("Loading IDT");
 			//SetupInterruptDescriptorTable();
-			//Console.WriteLine("Kernel Booted!");
+			Console.WriteLine("Kernel Booted!");
 		}
 
 		public static void FinalizeEngine() {
