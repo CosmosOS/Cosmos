@@ -65,6 +65,7 @@ namespace Indy.IL2CPU.IL.NativeX86 {
 			Debug.WriteLine("Load the array");
 			IDT_LoadArray();
 			Debug.WriteLine("Register the IDT");
+			System.Diagnostics.Debugger.Break();
 			IDT_RegisterIDT();
 		}
 	}

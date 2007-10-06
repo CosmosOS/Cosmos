@@ -8,6 +8,8 @@ namespace Indy.IL2CPU.IL.NativeX86 {
 	public static partial class RuntimeEngineImpl {
 		public static void InitializeEngine() {
 			Console.Clear();
+			Debug.WriteLine("Slowing down PIT");
+			PIT_SetSlowest();
 			Debug.WriteLine("Loading IDT");
 			SetupInterruptDescriptorTable();
 			Debug.WriteLine("Loading PICs");

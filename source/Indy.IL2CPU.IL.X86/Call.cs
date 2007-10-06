@@ -56,7 +56,7 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		public override void DoAssemble() {
 			if (mIsDebugger_Break) {
-				//mAssembler.Add(new Asm.Literal("xchg bx, bx"));
+				mAssembler.Add(new Asm.Literal("xchg bx, bx"));
 			} else {
 				Assemble(LabelName);
 			}

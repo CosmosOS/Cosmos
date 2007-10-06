@@ -66,6 +66,7 @@
     <Compile Include="NativeX86MethodHeaderOp.cs" />
     <Compile Include="RuntimeEngineImpl\PIC.cs" />
     <Compile Include="RuntimeEngineImpl\IO.cs" />
+    <Compile Include="RuntimeEngineImpl\PIT.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Indy.IL2CPU.Assembler.NativeX86\Indy.IL2CPU.Assembler.NativeX86.csproj">
