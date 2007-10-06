@@ -174,7 +174,7 @@ namespace Indy.IL2CPU.IL.NativeX86 {
 		public override void PostProcess(Indy.IL2CPU.Assembler.Assembler aAssembler) {
 			base.PostProcess(aAssembler);
 			X86.X86MethodHeaderOp.AssembleHeader(aAssembler, "___________REGISTER___ISRS_____", 0);
-			string xInterruptHandlerLabel = new Label(Engine.GetMethodDefinition(Engine.GetTypeDefinition("Indy.IL2CPU.IL.NativeX86", "Indy.IL2CPU.IL.NativeX86.RuntimeEngineImpl"), "InterruptHandler", "System.Byte", "System.UInt32")).Name;
+			string xInterruptHandlerLabel = new Label(Engine.GetMethodDefinition(Engine.GetTypeDefinition("Indy.IL2CPU.IL.NativeX86", "Indy.IL2CPU.IL.NativeX86.RuntimeEngineImpl"), "InterruptHandler", "System.Byte", "System.Byte")).Name;
 			int[] xInterruptsWithParam = new int[] { 8, 10, 11, 12, 13, 14 };
 			for (int i = 0; i < 256; i++) {
 				aAssembler.Add(new CPU.Push("0x" + i.ToString("X")));

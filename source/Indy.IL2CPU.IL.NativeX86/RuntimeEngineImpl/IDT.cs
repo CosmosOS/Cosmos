@@ -44,15 +44,21 @@ namespace Indy.IL2CPU.IL.NativeX86 {
 			mIDTEntries[aInterruptNumber].Flags = 128 /*Present*/| 0 /*Ring0*/| 8 /*32-bit*/| 0xF /*interrupt gate*/;
 		}																					  // was E
 
-		private static void InterruptHandler(byte aInterrupt, uint aParam) {
-			Debug.WriteLine("Interrupt received");
+		private static void InterruptHandler(byte aInterrupt, byte aParam) {
 			System.Diagnostics.Debugger.Break();
+			Debug.WriteLine("Interrupt received:");
+			CustomImplementations.System.ConsoleImpl.Write("    ");
+			CustomImplementations.System.ConsoleImpl.OutputByteValue(aInterrupt);
+			CustomImplementations.System.ConsoleImpl.WriteLine("");
+			CustomImplementations.System.ConsoleImpl.Write("    ");
+			CustomImplementations.System.ConsoleImpl.OutputByteValue(aParam);
 			if (aInterrupt >= 40 && aInterrupt <= 47) {
 				WriteToPort(0xA0, 0x20);
 			}
 			if (aInterrupt >= 32 && aInterrupt <= 47) {
 				WriteToPort(0x20, 0x20);
 			}
+			CustomImplementations.System.ConsoleImpl.WriteLine("");
 		}
 
 		private static void SetupInterruptDescriptorTable() {
