@@ -10,6 +10,7 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System {
 		public static readonly AssemblyDefinition RuntimeAssemblyDef;
 		public static readonly MethodDefinition get_Length_MetalRef;
 		public static readonly MethodDefinition get_Chars_MetalRef;
+		public static readonly MethodDefinition get_Length_NormalRef;
 
 		static StringImplRefs() {
 			RuntimeAssemblyDef = AssemblyFactory.GetAssembly(typeof(StringImpl).Assembly.Location);

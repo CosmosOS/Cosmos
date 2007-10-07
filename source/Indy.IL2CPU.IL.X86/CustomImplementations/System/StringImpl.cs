@@ -5,6 +5,12 @@ using System.Text;
 
 namespace Indy.IL2CPU.IL.X86.CustomImplementations.System {
 	public static class StringImpl {
+		public static unsafe int get_Length_Normal(int* aThis) {
+			int xArrayPtrNumber = *(aThis + 3);
+			int* xArrayPtr = (int*)xArrayPtrNumber;
+			return *(xArrayPtr + 2);
+		}
+
 		public static unsafe int get_Length_Metal(int* aThis) {
 			return *aThis;
 		}

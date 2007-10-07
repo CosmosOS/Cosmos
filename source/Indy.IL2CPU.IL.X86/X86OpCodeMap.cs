@@ -37,19 +37,20 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public override Mono.Cecil.MethodReference GetCustomMethodImplementation(string aOrigMethodName, bool aInMetalMode) {
-			switch(aOrigMethodName) {
+			switch (aOrigMethodName) {
 				case "System_Int32___System_String_get_Length____": {
-					if(aInMetalMode) {
-						return CustomImplementations.System.StringImplRefs.get_Length_MetalRef;
+						if (aInMetalMode) {
+							return CustomImplementations.System.StringImplRefs.get_Length_MetalRef;
+						}else {
+							return CustomImplementations.System.StringImplRefs.get_Length_NormalRef;
+						}
 					}
-					goto default;
-				}
 				case "System_Char___System_String_get_Chars___System_Int32___": {
-					if(aInMetalMode) {
-						return CustomImplementations.System.StringImplRefs.get_Chars_MetalRef;
+						if (aInMetalMode) {
+							return CustomImplementations.System.StringImplRefs.get_Chars_MetalRef;
+						}
+						goto default;
 					}
-					goto default;
-				}
 				default:
 					return base.GetCustomMethodImplementation(aOrigMethodName, aInMetalMode);
 			}

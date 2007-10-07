@@ -35,13 +35,26 @@ namespace IL2CPU.Tests {
 					xStartInfo.CreateNoWindow = true;
 					xStartInfo.UseShellExecute = false;
 					xStartInfo.FileName = Path.Combine(xBaseDir, "IL2CPU.exe");
-					xStartInfo.Arguments = "\"" + xTestExe + "\" \"" + xActualOutputFile + "\"";
+					xStartInfo.Arguments = "-in:\"" + xTestExe + "\" -out:\"" + xActualOutputFile + "\"";
 					xStartInfo.RedirectStandardError = true;
 					xStartInfo.RedirectStandardOutput = true;
 					using (Process xProc = Process.Start(xStartInfo)) {
 						if (!xProc.WaitForExit(TestTimeout_Milliseconds)) {
 							xTests[xTestExe] = TestRunStateEnum.TimeoutWhileRunningIL2CPU;
 							Console.Write("E");
+							continue;
+						}
+						if(xProc.ExitCode != 0) {
+							Console.Write("E");
+							Console.WriteLine("Result of running IL2CPU on '" + xTestExe.Substring(xBaseDir.Length + 1) + ":");
+							string[] lines = xProc.StandardOutput.ReadToEnd().Split(new string[] { "\r\n" }, StringSplitOptions.None);
+							foreach (string s in lines) {
+								Console.WriteLine("\t" + s);
+							}
+							lines = xProc.StandardError.ReadToEnd().Split(new string[] { "\r\n" }, StringSplitOptions.None);
+							foreach (string s in lines) {
+								Console.WriteLine("\t" + s);
+							}
 							continue;
 						}
 					}
@@ -93,6 +106,10 @@ namespace IL2CPU.Tests {
 					}
 					xTests[xTestExe] = TestRunStateEnum.Passed;
 					Console.Write(".");
+				} catch(Exception E) {
+					Console.WriteLine("Error while running test '" + xTestExe + "':");
+					Console.WriteLine(E.ToString());
+
 				} finally {
 					File.Delete(xActualOutputFile);
 					if (File.Exists(xTestExe + ".exe")) {
