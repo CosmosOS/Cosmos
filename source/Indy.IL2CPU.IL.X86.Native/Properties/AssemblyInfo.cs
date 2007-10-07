@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Indy.IL2CPU.X86.Native.Utilities")]
+[assembly: AssemblyTitle("Indy.IL2CPU.IL.X86.Native")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Indy.IL2CPU.X86.Native.Utilities")]
+[assembly: AssemblyProduct("Indy.IL2CPU.IL.X86.Native")]
 [assembly: AssemblyCopyright("Copyright ©  2007")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("95db1419-6894-426f-98e0-dcaffc24ac11")]
+[assembly: Guid("1d37b713-9466-4c92-a099-65a43b75a4fc")]
 
 // Version information for an assembly consists of the following four values:
 //

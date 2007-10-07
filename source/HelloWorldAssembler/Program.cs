@@ -2,7 +2,7 @@
 using System.IO;
 using System.Linq;
 using Indy.IL2CPU.Assembler;
-using Assembler=Indy.IL2CPU.Assembler.Win32.Assembler;
+using Assembler=Indy.IL2CPU.Assembler.X86.Win32.Assembler;
 
 namespace HelloWorldAssembler {
 	public class Program {

@@ -23,13 +23,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelloWorldMetal", "HelloWor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IL2CPU.Tests", "IL2CPU.Tests\IL2CPU.Tests.csproj", "{3A0BAC46-1D4E-4E21-89CA-72903B9FCEB1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU.IL.Win32", "Indy.IL2CPU.IL.Win32\Indy.IL2CPU.IL.Win32.csproj", "{4B6F38F2-A1E7-4D79-B47D-F2F4ED68C4A1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU.Assembler.X86.Win32", "Indy.IL2CPU.Assembler.X86.Win32\Indy.IL2CPU.Assembler.X86.Win32.csproj", "{4C0EF614-A58F-4CAF-8AD2-FFE345EB9472}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU.Assembler.Win32", "Indy.IL2CPU.Assembler.Win32\Indy.IL2CPU.Assembler.Win32.csproj", "{4C0EF614-A58F-4CAF-8AD2-FFE345EB9472}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU.IL.X86.Native", "Indy.IL2CPU.IL.X86.Native\Indy.IL2CPU.IL.X86.Native.csproj", "{8D84CDE5-77A3-4E1F-B022-753E9E077926}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU.IL.NativeX86", "Indy.IL2CPU.IL.NativeX86\Indy.IL2CPU.IL.NativeX86.csproj", "{8D84CDE5-77A3-4E1F-B022-753E9E077926}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU.Assembler.NativeX86", "Indy.IL2CPU.Assembler.NativeX86\Indy.IL2CPU.Assembler.NativeX86.csproj", "{6597AAC6-755D-47F9-ACF4-E13F65EC5418}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU.Assembler.X86.Native", "Indy.IL2CPU.Assembler.X86.Native\Indy.IL2CPU.Assembler.X86.Native.csproj", "{6597AAC6-755D-47F9-ACF4-E13F65EC5418}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU.NativeX86.Utilities", "Indy.IL2CPU.NativeX86.Utilities\Indy.IL2CPU.NativeX86.Utilities.csproj", "{BB58FFC3-A532-45BA-AAB2-28EB0451C2A1}"
 EndProject
@@ -37,7 +35,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel", "Cosmos.Ker
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 18
+		SccNumberOfProjects = 17
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -74,24 +72,21 @@ Global
 		SccProjectUniqueName11 = IL2CPU.Tests\\IL2CPU.Tests.csproj
 		SccProjectName11 = IL2CPU.Tests
 		SccLocalPath11 = IL2CPU.Tests
-		SccProjectUniqueName12 = Indy.IL2CPU.IL.Win32\\Indy.IL2CPU.IL.Win32.csproj
-		SccProjectName12 = Indy.IL2CPU.IL.Win32
-		SccLocalPath12 = Indy.IL2CPU.IL.Win32
-		SccProjectUniqueName13 = Indy.IL2CPU.Assembler.Win32\\Indy.IL2CPU.Assembler.Win32.csproj
-		SccProjectName13 = Indy.IL2CPU.Assembler.Win32
-		SccLocalPath13 = Indy.IL2CPU.Assembler.Win32
-		SccProjectUniqueName14 = Indy.IL2CPU.IL.NativeX86\\Indy.IL2CPU.IL.NativeX86.csproj
-		SccProjectName14 = Indy.IL2CPU.IL.NativeX86
-		SccLocalPath14 = Indy.IL2CPU.IL.NativeX86
-		SccProjectUniqueName15 = Indy.IL2CPU.Assembler.NativeX86\\Indy.IL2CPU.Assembler.NativeX86.csproj
-		SccProjectName15 = Indy.IL2CPU.Assembler.NativeX86
-		SccLocalPath15 = Indy.IL2CPU.Assembler.NativeX86
-		SccProjectUniqueName16 = Indy.IL2CPU.NativeX86.Utilities\\Indy.IL2CPU.NativeX86.Utilities.csproj
-		SccProjectName16 = Indy.IL2CPU.NativeX86.Utilities
-		SccLocalPath16 = Indy.IL2CPU.NativeX86.Utilities
-		SccProjectUniqueName17 = Cosmos.Kernel\\Cosmos.Kernel.csproj
-		SccProjectName17 = Cosmos.Kernel
-		SccLocalPath17 = Cosmos.Kernel
+		SccProjectUniqueName12 = Indy.IL2CPU.NativeX86.Utilities\\Indy.IL2CPU.NativeX86.Utilities.csproj
+		SccProjectName12 = Indy.IL2CPU.NativeX86.Utilities
+		SccLocalPath12 = Indy.IL2CPU.NativeX86.Utilities
+		SccProjectUniqueName13 = Cosmos.Kernel\\Cosmos.Kernel.csproj
+		SccProjectName13 = Cosmos.Kernel
+		SccLocalPath13 = Cosmos.Kernel
+		SccProjectUniqueName14 = Indy.IL2CPU.IL.X86.Native\\Indy.IL2CPU.IL.X86.Native.csproj
+		SccProjectName14 = Indy.IL2CPU.IL.X86.Native
+		SccLocalPath14 = Indy.IL2CPU.IL.X86.Native
+		SccProjectUniqueName15 = Indy.IL2CPU.Assembler.X86.Win32\\Indy.IL2CPU.Assembler.X86.Win32.csproj
+		SccProjectName15 = Indy.IL2CPU.Assembler.X86.Win32
+		SccLocalPath15 = Indy.IL2CPU.Assembler.X86.Win32
+		SccProjectUniqueName16 = Indy.IL2CPU.Assembler.X86.Native\\Indy.IL2CPU.Assembler.X86.Native.csproj
+		SccProjectName16 = Indy.IL2CPU.Assembler.X86.Native
+		SccLocalPath16 = Indy.IL2CPU.Assembler.X86.Native
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -142,10 +137,6 @@ Global
 		{3A0BAC46-1D4E-4E21-89CA-72903B9FCEB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3A0BAC46-1D4E-4E21-89CA-72903B9FCEB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3A0BAC46-1D4E-4E21-89CA-72903B9FCEB1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4B6F38F2-A1E7-4D79-B47D-F2F4ED68C4A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4B6F38F2-A1E7-4D79-B47D-F2F4ED68C4A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4B6F38F2-A1E7-4D79-B47D-F2F4ED68C4A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4B6F38F2-A1E7-4D79-B47D-F2F4ED68C4A1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4C0EF614-A58F-4CAF-8AD2-FFE345EB9472}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4C0EF614-A58F-4CAF-8AD2-FFE345EB9472}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4C0EF614-A58F-4CAF-8AD2-FFE345EB9472}.Release|Any CPU.ActiveCfg = Release|Any CPU

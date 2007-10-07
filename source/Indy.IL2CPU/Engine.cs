@@ -111,13 +111,13 @@ namespace Indy.IL2CPU {
 				}
 				switch (aTargetPlatform) {
 					case TargetPlatformEnum.Win32: {
-							mMap = (OpCodeMap)Activator.CreateInstance(Type.GetType("Indy.IL2CPU.IL.Win32.Win32OpCodeMap, Indy.IL2CPU.IL.Win32", true));
-							mAssembler = new Assembler.Win32.Assembler(aOutput, true);
+							mMap = (OpCodeMap)Activator.CreateInstance(Type.GetType("Indy.IL2CPU.IL.X86.Win32.Win32OpCodeMap, Indy.IL2CPU.IL.X86.Win32", true));
+							mAssembler = new Indy.IL2CPU.Assembler.X86.Win32.Assembler(aOutput, true);
 							break;
 						}
 					case TargetPlatformEnum.NativeX86: {
-							mMap = (OpCodeMap)Activator.CreateInstance(Type.GetType("Indy.IL2CPU.IL.NativeX86.NativeX86OpCodeMap, Indy.IL2CPU.IL.NativeX86", true));
-							mAssembler = new Assembler.NativeX86.Assembler(aOutput, true);
+							mMap = (OpCodeMap)Activator.CreateInstance(Type.GetType("Indy.IL2CPU.IL.X86.Native.NativepCodeMap, Indy.IL2CPU.IL.X86.Native", true));
+							mAssembler = new Indy.IL2CPU.Assembler.X86.Native.Assembler(aOutput, true);
 							break;
 						}
 					default:
