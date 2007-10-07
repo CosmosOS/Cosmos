@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using Mono.Cecil;
 
-namespace Indy.IL2CPU.IL.Win32 {
+namespace Indy.IL2CPU.IL.X86.Win32 {
 	public static class RuntimeEngineImplRefs {
 		public static readonly AssemblyDefinition RuntimeAssemblyDef;
 		public static readonly MethodDefinition Heap_InitializeRef;

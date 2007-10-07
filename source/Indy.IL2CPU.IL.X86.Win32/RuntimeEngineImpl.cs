@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace Indy.IL2CPU.IL.Win32 {
+namespace Indy.IL2CPU.IL.X86.Win32 {
 	public static class RuntimeEngineImpl {
 		public static uint HeapHandle = 0;
 

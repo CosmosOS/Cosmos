@@ -8,8 +8,8 @@
     <ProjectGuid>{4B6F38F2-A1E7-4D79-B47D-F2F4ED68C4A1}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Indy.IL2CPU.IL.Win32</RootNamespace>
-    <AssemblyName>Indy.IL2CPU.IL.Win32</AssemblyName>
+    <RootNamespace>Indy.IL2CPU.IL.X86.Win32</RootNamespace>
+    <AssemblyName>Indy.IL2CPU.IL.X86.Win32</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>

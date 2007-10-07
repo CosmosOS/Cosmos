@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Indy.IL2CPU.IL.Win32 {
+namespace Indy.IL2CPU.IL.X86.Win32 {
 	public static  class PInvokes {
 		#region Heap functions
 		[DllImport("kernel32.dll", EntryPoint = "HeapCreate")]

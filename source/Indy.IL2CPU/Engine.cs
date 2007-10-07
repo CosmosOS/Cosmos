@@ -98,7 +98,8 @@ namespace Indy.IL2CPU {
 		/// <param name="aAssembly">The assembly of which to crawl the entry-point method.</param>
 		/// <param name="aTargetPlatform">The platform to target when assembling the code.</param>
 		/// <param name="aOutput"></param>
-		public void Execute(string aAssembly, TargetPlatformEnum aTargetPlatform, StreamWriter aOutput) {
+		/// <param name="aInMetalMode">Whether or not the output is metalmode only.</param>
+		public void Execute(string aAssembly, TargetPlatformEnum aTargetPlatform, StreamWriter aOutput, bool aInMetalMode) {
 			mCurrent = this;
 			try {
 				if (aOutput == null) {
