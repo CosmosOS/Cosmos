@@ -1,6 +1,5 @@
 using System;
-using System.IO;
-using Mono.Cecil;
+using System.Linq;
 using Mono.Cecil.Cil;
 using CPU = Indy.IL2CPU.Assembler.X86;
 
@@ -10,14 +9,13 @@ namespace Indy.IL2CPU.IL.X86 {
 		private string mAddress;
 		private bool mIsReferenceTypeField;
 		protected void SetLocalIndex(int aIndex, MethodInformation aMethodInfo) {
-			mAddress = aMethodInfo.Locals[aIndex].VirtualAddress;
+			mAddress = aMethodInfo.Locals[aIndex].VirtualAddresses.LastOrDefault();
 		}
 		public Ldloca(Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
 			int xLocalIndex;
 			if (Int32.TryParse((aInstruction.Operand ?? "").ToString(), out xLocalIndex)) {
 				SetLocalIndex(xLocalIndex, aMethodInfo);
-				//
 				return;
 			}
 			VariableDefinition xVarDef = aInstruction.Operand as VariableDefinition;
@@ -42,6 +40,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				Move(Assembler, "edx", "ebp");
 				Assembler.Add(new CPU.Sub("edx", xAddressParts[1]));
 				Push(Assembler, "edx");
+			Assembler.StackSizes.Push(4);
 			//}
 		}
 	}

@@ -22,7 +22,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		public override void DoAssemble() {
 			Engine.QueueMethodRef(CtorDef);
 			DoQueueMethod(RuntimeEngineRefs.Heap_AllocNewObjectRef);
-			uint xObjectSize = ObjectUtilities.GetObjectStorageSize(Engine.GetDefinitionFromTypeReference(CtorDef.DeclaringType));
+			int xObjectSize = ObjectUtilities.GetObjectStorageSize(Engine.GetDefinitionFromTypeReference(CtorDef.DeclaringType));
 			Pushd("0" + xObjectSize.ToString("X").ToUpper() + "h");
 			Call(new CPU.Label(RuntimeEngineRefs.Heap_AllocNewObjectRef).Name);
 			Pushd("eax");
@@ -38,9 +38,11 @@ namespace Indy.IL2CPU.IL.X86 {
 			Pop("eax");
 			for (int i = 0; i < CtorDef.Parameters.Count; i++) {
 				Assembler.Add(new CPUx86.Add("esp", "4"));
+				Assembler.StackSizes.Pop();
 			}
 			Pushd("eax");
 			//Assembler.Add(new CPUx86.Add("esp", objSize.ToString()));
+			Assembler.StackSizes.Push(4);
 		}
 	}
 }

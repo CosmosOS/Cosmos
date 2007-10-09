@@ -19,7 +19,7 @@ namespace Indy.IL2CPU.IL.X86.Win32 {
 			AssembleOp(new Ldarg(MethodInfo, 0));
 			Assembler.Add(new CPUx86.Pop("eax"));
 			if (!mAssembler.InMetalMode) {
-				uint xStorageSize;
+				int xStorageSize;
 				SortedList<string, TypeInformation.Field> xFields = Engine.GetTypeFieldInfo(Engine.GetMethodDefinition(Engine.GetTypeDefinition("mscorlib", "System.String"), ".ctor", "System.Char[]"), out xStorageSize);
 				Assembler.Add(new CPUx86.Add("eax", "0" + xFields["$$Storage$$"].Offset.ToString("X") + "h"));
 				Assembler.Add(new CPUx86.Move("eax", "[eax]"));
@@ -49,7 +49,7 @@ namespace Indy.IL2CPU.IL.X86.Win32 {
 			AssembleOp(new Ldarg(MethodInfo, 0));
 			AssembleOp(new Ldarg(MethodInfo, 2));
 			AssembleOp(new Ldarg(MethodInfo, 1));
-			Stelem_I4.Assemble(Assembler);
+			Stelem_Any.Assemble(Assembler, 4);
 		}
 
 		protected override void Assemble_System_Void___System_Runtime_CompilerServices_RuntimeHelpers_InitializeArray___System_Array__System_RuntimeFieldHandle___() {
@@ -62,8 +62,8 @@ namespace Indy.IL2CPU.IL.X86.Win32 {
 			//			x.Assemble();
 			Assembler.Add(new CPU.Literal(";In Pure ASM defined"));
 			Assembler.Add(new CPUx86.Move("eax", "0"));
-			Assembler.Add(new CPUx86.Move("edi", "[" + MethodInfo.Arguments[0].VirtualAddress + "]"));
-			Assembler.Add(new CPUx86.Move("esi", "[" + MethodInfo.Arguments[1].VirtualAddress + "]"));
+			Assembler.Add(new CPUx86.Move("edi", "[" + MethodInfo.Arguments[0].VirtualAddresses[0] + "]"));
+			Assembler.Add(new CPUx86.Move("esi", "[" + MethodInfo.Arguments[1].VirtualAddresses[0] + "]"));
 			Assembler.Add(new CPUx86.Add("dword esi", "8"));
 			Assembler.Add(new CPUx86.Move("ecx", "[esi]"));
 			Assembler.Add(new CPUx86.Add("dword esi", "4"));

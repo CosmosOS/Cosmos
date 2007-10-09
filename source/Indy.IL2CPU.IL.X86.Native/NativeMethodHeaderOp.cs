@@ -35,7 +35,7 @@ namespace Indy.IL2CPU.IL.X86.Native {
 				Assembler.Add(new CPUNative.IRet());
 			}
 			// TODO: add support for variables with a diff datasize, other than 32bit
-			AssembleHeader(Assembler, LabelName, LocalsCount);
+			AssembleHeader(Assembler, LabelName, Locals);
 		}
 	}
 }

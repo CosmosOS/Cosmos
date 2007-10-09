@@ -20,7 +20,7 @@ namespace Indy.IL2CPU {
 		///			are the <see cref="InstanceTypeEnum"/> value. For arrays, there are 4 following bytes containing the element count.
 		///		</para>
 		/// </summary>
-		public const uint FieldDataOffset = 8;
+		public const int FieldDataOffset = 8;
 		//[MethodAlias(Name = "System_Void___System_Object__ctor____")]
 		public static void Ctor(IntPtr aThis) {
 		}

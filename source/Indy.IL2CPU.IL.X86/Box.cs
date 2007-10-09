@@ -10,7 +10,7 @@ using Instruction = Mono.Cecil.Cil.Instruction;
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Box, false)]
 	public class Box: Op {
-		private uint mTheSize;
+		private int mTheSize;
 		private int mTypeId;
 
 		public Box(Instruction aInstruction, MethodInformation aMethodInfo)
@@ -25,11 +25,11 @@ namespace Indy.IL2CPU.IL.X86 {
 			} else {
 				mTheSize = Engine.GetFieldStorageSize(xTypeRef);
 			}
-			if(((mTheSize/4)*4) != mTheSize) {
+			if (((mTheSize / 4) * 4) != mTheSize) {
 				throw new Exception("Incorrect Datasize. ( ((mTheSize / 4) * 4) === mTheSize should evaluate to true!");
 			}
 			//if (!(xTypeRef is GenericParameter)) {
-				mTypeId = Engine.RegisterType(Engine.GetDefinitionFromTypeReference(xTypeRef));
+			mTypeId = Engine.RegisterType(Engine.GetDefinitionFromTypeReference(xTypeRef));
 			//}
 		}
 
@@ -38,11 +38,13 @@ namespace Indy.IL2CPU.IL.X86 {
 			Call(new Label(RuntimeEngineRefs.Heap_AllocNewObjectRef).Name);
 			Move(Assembler, "dword [eax]", "0" + mTypeId.ToString("X") + "h");
 			Move(Assembler, "dword [eax + 4]", "0" + InstanceTypeEnum.BoxedValueType.ToString("X") + "h");
-			for (int i = 0; i < (mTheSize / 4); i++ ) {
+			for (int i = 0; i < (mTheSize / 4); i++) {
 				Pop("edx");
 				Move(Assembler, "dword [eax + 0" + (ObjectImpl.FieldDataOffset + (i * 4)).ToString("X") + "h]", "edx");
 			}
 			Pushd("eax");
+			Assembler.StackSizes.Pop();
+			Assembler.StackSizes.Push(4);
 		}
 	}
 }

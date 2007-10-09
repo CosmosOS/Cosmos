@@ -1,5 +1,5 @@
 using System;
-using System.IO;
+using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using CPU = Indy.IL2CPU.Assembler.X86;
@@ -9,7 +9,7 @@ namespace Indy.IL2CPU.IL.X86 {
 	public class Ldarga: Op {
 		private string mAddress;
 		protected void SetArgIndex(int aIndex, MethodInformation aMethodInfo) {
-			mAddress = aMethodInfo.Arguments[aIndex].VirtualAddress;
+			mAddress = aMethodInfo.Arguments[aIndex].VirtualAddresses.First();
 		}
 		public Ldarga(MethodInformation aMethodInfo, int aIndex):base(null, aMethodInfo) {
 			SetArgIndex(aIndex, aMethodInfo);
@@ -29,7 +29,11 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 		}
 		public override void DoAssemble() {
-			Pushd(mAddress);
+			string[] mAddressParts = mAddress.Split('+');
+			Pushd(mAddressParts);
+			Assembler.StackSizes.Push(4);
+			Assembler.StackSizes.Push(4);
+			Add();
 		}
 	}
 }

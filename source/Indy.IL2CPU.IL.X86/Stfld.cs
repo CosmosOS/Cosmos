@@ -28,7 +28,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			string xFieldId = xField.ToString();
 			TypeInformation.Field xTheField;
-			uint xStorageSize;
+			int xStorageSize;
 			SortedList<String, TypeInformation.Field> xFieldInfo = Engine.GetTypeFieldInfo(Engine.GetDefinitionFromTypeReference(xField.DeclaringType), out xStorageSize);
 			if(!xFieldInfo.ContainsKey(xFieldId)) {
 				Console.WriteLine("Field not Found: '{0}'", xFieldId);
@@ -43,12 +43,11 @@ namespace Indy.IL2CPU.IL.X86 {
 			FieldSize = xTheField.Size;
 			if (FieldSize == 1 || FieldSize == 2 || FieldSize == 4)
 				return;
-			System.Diagnostics.Debugger.Break();
-			throw new NotSupportedException("FieldSizes other than 1, 2, 4 and 8 are not supported yet! (" + FieldSize + ")");
+			throw new NotSupportedException("FieldSizes other than 1, 2 and 4 are not supported yet! (" + FieldSize + ")");
 		}
 
 		public readonly string RelativeAddress;
-		public readonly uint FieldSize;
+		public readonly int FieldSize;
 
 		public override void DoAssemble() {
 			Pop("eax"); // new value
@@ -70,6 +69,8 @@ namespace Indy.IL2CPU.IL.X86 {
 					break;
 			}
 			Move(Assembler, xMovePrefix + " [ecx " + RelativeAddress + "]", xRegister);
+			Assembler.StackSizes.Pop();
+			Assembler.StackSizes.Pop();
 		}
 	}
 }

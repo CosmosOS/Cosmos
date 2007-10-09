@@ -7,10 +7,12 @@ using CPU = Indy.IL2CPU.Assembler.X86;
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Stloc)]
 	public class Stloc: Op {
-		private string mAddress;
-		private bool mNeedsPop = true;
+		private string[] mAddresses;
+		private int mSize;
+
 		protected void SetLocalIndex(int aIndex, MethodInformation aMethodInfo) {
-			mAddress = aMethodInfo.Locals[aIndex].VirtualAddress;
+			mAddresses = aMethodInfo.Locals[aIndex].VirtualAddresses;
+			mSize = aMethodInfo.Locals[aIndex].Size;
 		}
 		public Stloc(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
@@ -22,34 +24,20 @@ namespace Indy.IL2CPU.IL.X86 {
 			if (xVarDef != null) {
 				SetLocalIndex(xVarDef.Index, aMethodInfo);
 			}
-
-			if(aInstruction.Previous != null &&
-				(aInstruction.Previous.OpCode.Code == Code.Call ||
-				aInstruction.Previous.OpCode.Code == Code.Calli ||
-				aInstruction.Previous.OpCode.Code == Code.Callvirt)) {
-				//mNeedsPop = false;
-			}
 		}
 
-		public string Address {
+		public string[] Addresses {
 			get {
-				return mAddress;
-			}
-		}
-		public bool NeedsPop {
-			get {
-				return mNeedsPop;
+				return mAddresses;
 			}
 		}
 
 		public sealed override void DoAssemble() {
-			if(String.IsNullOrEmpty(mAddress)) {
-				throw new Exception("No address specified!");
-			}
-			if (mNeedsPop) {
+			foreach (string s in mAddresses) {
 				Pop("eax");
+				Move(Assembler, "[" + s + "]", "eax");
 			}
-			Move(Assembler, "[" + mAddress + "]", "eax");
+			Assembler.StackSizes.Pop();
 		}
 	}
 }

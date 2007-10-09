@@ -7,7 +7,7 @@ using CPU = Indy.IL2CPU.Assembler.X86;
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Newarr, false)]
 	public class Newarr: Op {
-		private uint mElementSize;
+		private int mElementSize;
 		private string mCtorName;
 		private bool mIsReference;
 		private string mBaseLabelName;
@@ -58,6 +58,8 @@ namespace Indy.IL2CPU.IL.X86 {
 			Call(mCtorName);
 			//Pop("eax");
 			//Pushd("eax");
+			//Assembler.StackSizes.Pop();
+			Assembler.StackSizes.Push(4);
 		}
 	}
 }

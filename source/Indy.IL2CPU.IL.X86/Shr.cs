@@ -17,6 +17,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			Move(Assembler, "ebx", "0");
 			Assembler.Add(new CPU.ShiftRight("edx", "ebx", "cl"));
 			Pushd("edx");
+			Assembler.StackSizes.Pop();
 		}
 	}
 }

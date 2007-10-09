@@ -14,6 +14,8 @@ namespace Indy.IL2CPU.IL.X86 {
 			Pop("eax");
 			Pushd("[eax + 4]");
 			Pushd("[eax]");
+			Assembler.StackSizes.Pop();
+			Assembler.StackSizes.Push(8);
 		}
 	}
 }

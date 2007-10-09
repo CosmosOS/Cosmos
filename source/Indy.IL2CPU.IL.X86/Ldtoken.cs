@@ -30,6 +30,7 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		public override void DoAssemble() {
 			Pushd(mTokenAddress);
+			Assembler.StackSizes.Push(4);
 		}
 	}
 }

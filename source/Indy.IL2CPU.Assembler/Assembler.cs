@@ -14,6 +14,7 @@ namespace Indy.IL2CPU.Assembler {
 		private List<string> mIncludes = new List<string>();
 		private List<ImportMember> mImportMembers = new List<ImportMember>();
 		private readonly bool mInMetalMode = false;
+		public readonly Stack<int> StackSizes = new Stack<int>();
 
 		private uint mDataMemberCounter = 0;
 		public string GetIdentifier(string aPrefix) {

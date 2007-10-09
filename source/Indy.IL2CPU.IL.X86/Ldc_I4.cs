@@ -30,6 +30,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 		public override sealed void DoAssemble() {
 			Pushd("0" + mValue.ToString("X") + "h");
+			Assembler.StackSizes.Push(4);
 		}
 	}
 }

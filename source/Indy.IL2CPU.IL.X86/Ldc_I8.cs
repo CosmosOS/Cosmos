@@ -16,6 +16,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			string theValue = mValue.ToString("X");
 			Pushd("0" + theValue.Substring(0, 8) + "h");
 			Pushd("0" + theValue.Substring(8) + "h");
+			Assembler.StackSizes.Push(8);
 		}
 	}
 }

@@ -23,6 +23,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				Compare("eax", "0" + i.ToString("X") + "h");
 				JumpIfEquals(mLabels[i]);
 			}
+			Assembler.StackSizes.Pop();
 		}
 	}
 }

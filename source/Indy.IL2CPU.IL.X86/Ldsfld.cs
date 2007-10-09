@@ -9,6 +9,7 @@ namespace Indy.IL2CPU.IL.X86 {
 	public class Ldsfld: Op {
 		private string mDataName;
 		private bool mIsReferenceTypeOrStruct;
+		private int mSize;
 
 		private static bool IsPrimitive(TypeDefinition aType) {
 			switch (aType.FullName) {
@@ -47,6 +48,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			TypeDefinition xFieldTypeDef = Engine.GetDefinitionFromTypeReference(xField.FieldType);
 			mIsReferenceTypeOrStruct = (xFieldTypeDef.IsClass || xFieldTypeDef.IsValueType || IsArray(xFieldTypeDef)) && !IsPrimitive(xFieldTypeDef);
 			Engine.QueueStaticField(xField, out mDataName);
+			mSize = Engine.GetFieldStorageSize(xFieldTypeDef);
 			if (String.IsNullOrEmpty(mDataName)) {
 				throw new Exception("No name generated for field '" + xField.GetFullName() + "'");
 			}
@@ -58,6 +60,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			} else {
 				Pushd(mDataName);
 			}
+			Assembler.StackSizes.Push(mSize);
 		}
 	}
 }

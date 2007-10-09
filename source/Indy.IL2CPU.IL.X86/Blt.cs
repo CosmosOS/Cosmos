@@ -28,6 +28,8 @@ namespace Indy.IL2CPU.IL.X86 {
 			Assembler.Add(new CPUx86.JumpAlways(TargetLabel));
 			Assembler.Add(new CPU.Label(LabelFalse));
 			Assembler.Add(new CPUx86.Add("esp", "4"));
+			Assembler.StackSizes.Pop();
+			Assembler.StackSizes.Pop();
 		}
 	}
 }

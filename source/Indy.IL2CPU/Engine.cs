@@ -107,6 +107,7 @@ namespace Indy.IL2CPU {
 				}
 				mCrawledAssembly = AssemblyFactory.GetAssembly(aAssembly);
 				((DefaultAssemblyResolver)mCrawledAssembly.Resolver).AddSearchDirectory(Environment.CurrentDirectory);
+				((DefaultAssemblyResolver)mCrawledAssembly.Resolver).AddSearchDirectory(Path.GetDirectoryName(aAssembly));
 				if (mCrawledAssembly.EntryPoint == null) {
 					throw new NotSupportedException("Libraries are not supported!");
 				}
@@ -205,7 +206,7 @@ namespace Indy.IL2CPU {
 
 		private void GenerateVMT() {
 			// todo: abstract this code generation out to IL.* implementation
-			Op xOp = GetOpFromType(mMap.MethodHeaderOp, null, new MethodInformation("____INIT__VMT____", new MethodInformation.Variable[0], new MethodInformation.Argument[0], false, false, null, null));
+			Op xOp = GetOpFromType(mMap.MethodHeaderOp, null, new MethodInformation("____INIT__VMT____", new MethodInformation.Variable[0], new MethodInformation.Argument[0], 0, false, null, null));
 			xOp.Assembler = mAssembler;
 			xOp.Assemble();
 			InitVmtImplementationOp xInitVmtOp = (InitVmtImplementationOp)GetOpFromType(mMap.InitVmtImplementationOp, null, null);
@@ -227,7 +228,7 @@ namespace Indy.IL2CPU {
 				return GetMethodIdentifier(xMethod);
 			};
 			xInitVmtOp.Assemble();
-			xOp = GetOpFromType(mMap.MethodFooterOp, null, new MethodInformation("____INIT__VMT____", new MethodInformation.Variable[0], new MethodInformation.Argument[0], false, false, null, null));
+			xOp = GetOpFromType(mMap.MethodFooterOp, null, new MethodInformation("____INIT__VMT____", new MethodInformation.Variable[0], new MethodInformation.Argument[0], 0, false, null, null));
 			xOp.Assembler = mAssembler;
 			xOp.Assemble();
 		}
@@ -545,7 +546,10 @@ namespace Indy.IL2CPU {
 		/// <remarks>For classes, this is the pointer size.</remarks>
 		/// <param name="aType"></param>
 		/// <returns></returns>
-		public static uint GetFieldStorageSize(TypeReference aType) {
+		public static int GetFieldStorageSize(TypeReference aType) {
+			if (aType.FullName == "System.Void") {
+				return 0;
+			}
 			if (!aType.IsValueType) {
 				return 4;
 			}
@@ -589,7 +593,7 @@ namespace Indy.IL2CPU {
 			if (xTypeDef.IsEnum) {
 				return GetFieldStorageSize(xTypeDef.Fields.GetField("value__").FieldType);
 			}
-			uint xResult;
+			int xResult;
 			GetTypeFieldInfo(xTypeDef, out xResult);
 			return xResult;
 		}
@@ -609,8 +613,7 @@ namespace Indy.IL2CPU {
 					} else {
 						if (xCurrentField.InitialValue != null && xCurrentField.InitialValue.Length > 0) {
 							string xTheData = "";
-							uint xStorageSize = GetFieldStorageSize(xCurrentField.FieldType);
-
+							int xStorageSize = GetFieldStorageSize(xCurrentField.FieldType);
 							if (xCurrentField.InitialValue.Length > 4) {
 								xTheData = "0,0,0,0,2,0,0,0,";
 							}
@@ -626,7 +629,7 @@ namespace Indy.IL2CPU {
 							}
 							mAssembler.DataMembers.Add(new DataMember(xFieldName, "db", xTheData));
 						} else {
-							uint xTheSize;
+							int xTheSize;
 							string theType = "db";
 							TypeDefinition xFieldTypeDef = GetDefinitionFromTypeReference(xCurrentField.FieldType);
 							if (!xFieldTypeDef.IsClass || xFieldTypeDef.IsValueType) {
@@ -634,7 +637,7 @@ namespace Indy.IL2CPU {
 							} else {
 								xTheSize = 4;
 							}
-							if(xTheSize<4) {
+							if (xTheSize < 4) {
 								xTheSize = 4;
 							}
 							if (xTheSize == 4) {
@@ -677,7 +680,7 @@ namespace Indy.IL2CPU {
 				TypeInformation xTypeInfo = null;
 				{
 					if (!xCurrentMethod.IsStatic) {
-						uint xObjectStorageSize;
+						int xObjectStorageSize;
 						SortedList<string, TypeInformation.Field> xTypeFields = GetTypeFieldInfo(xCurrentMethod, out xObjectStorageSize);
 						xTypeInfo = new TypeInformation(xObjectStorageSize, xTypeFields);
 					}
@@ -748,6 +751,7 @@ namespace Indy.IL2CPU {
 							if (xCurrentMethod.HasBody) {
 								// todo: add support for types which need different stack size
 								foreach (Instruction xInstruction in xCurrentMethod.Body.Instructions) {
+									mAssembler.Add(new Literal("; StackItemCount = " + mAssembler.StackSizes.Count));
 									MethodReference xMethodReference = xInstruction.Operand as MethodReference;
 									if (xMethodReference != null) {
 										QueueMethodRef(xMethodReference);
@@ -773,6 +777,7 @@ namespace Indy.IL2CPU {
 				xOp = GetOpFromType(mMap.MethodFooterOp, null, xMethodInfo);
 				xOp.Assembler = mAssembler;
 				xOp.Assemble();
+				mAssembler.StackSizes.Clear();
 				mMethods[xCurrentMethod].Processed = true;
 			}
 		}
@@ -785,7 +790,10 @@ namespace Indy.IL2CPU {
 				if (aCurrentMethodForLocals.HasBody) {
 					xVars = new MethodInformation.Variable[aCurrentMethodForLocals.Body.Variables.Count];
 					foreach (VariableDefinition xVarDef in aCurrentMethodForLocals.Body.Variables) {
-						int xVarSize = 4;
+						int xVarSize = GetFieldStorageSize(xVarDef.VariableType);
+						if ((xVarSize % 4) != 0) {
+							xVarSize += 4 - (xVarSize % 4);
+						}
 						xVars[xVarDef.Index] = new MethodInformation.Variable(xCurOffset, xVarSize, GetDefinitionFromTypeReference(xVarDef.VariableType).IsClass);
 						if (!(xVarDef.VariableType is GenericParameter)) {
 							RegisterType(GetDefinitionFromTypeReference(xVarDef.VariableType));
@@ -799,8 +807,11 @@ namespace Indy.IL2CPU {
 					xCurOffset = 0;
 					int xArgSize;
 					for (int i = xArgs.Length - 1; i > 0; i--) {
-						xArgSize = 4;
 						ParameterDefinition xParamDef = aCurrentMethodForArguments.Parameters[xArgs.Length - i - 1];
+						xArgSize = GetFieldStorageSize(xParamDef.ParameterType);
+						if ((xArgSize % 4) != 0) {
+							xArgSize += 4 - (xArgSize % 4);
+						}
 						MethodInformation.Argument.KindEnum xKind = MethodInformation.Argument.KindEnum.In;
 						if (xParamDef.IsOut) {
 							if (xParamDef.IsIn) {
@@ -819,8 +830,11 @@ namespace Indy.IL2CPU {
 					xArgs = new MethodInformation.Argument[aCurrentMethodForArguments.Parameters.Count];
 					xCurOffset = 0;
 					for (int i = xArgs.Length - 1; i >= 0; i--) {
-						int xArgSize = 4;
 						ParameterDefinition xParamDef = aCurrentMethodForArguments.Parameters[xArgs.Length - i - 1];
+						int xArgSize = GetFieldStorageSize(xParamDef.ParameterType);
+						if ((xArgSize % 4) != 0) {
+							xArgSize += 4 - (xArgSize % 4);
+						}
 						MethodInformation.Argument.KindEnum xKind = MethodInformation.Argument.KindEnum.In;
 						if (xParamDef.IsOut) {
 							if (xParamDef.IsIn) {
@@ -833,17 +847,18 @@ namespace Indy.IL2CPU {
 						xCurOffset += xArgSize;
 					}
 				}
-				xMethodInfo = new MethodInformation(aMethodName, xVars, xArgs, !aCurrentMethodForArguments.ReturnType.ReturnType.FullName.Contains("System.Void"), aCurrentMethodForArguments.HasThis, aTypeInfo, aCurrentMethodForArguments);
+				int xResultSize = GetFieldStorageSize(aCurrentMethodForArguments.ReturnType.ReturnType);
+				xMethodInfo = new MethodInformation(aMethodName, xVars, xArgs, xResultSize, aCurrentMethodForArguments.HasThis, aTypeInfo, aCurrentMethodForArguments);
 			}
 			return xMethodInfo;
 		}
 
-		public static SortedList<string, TypeInformation.Field> GetTypeFieldInfo(MethodDefinition aCurrentMethod, out uint aObjectStorageSize) {
+		public static SortedList<string, TypeInformation.Field> GetTypeFieldInfo(MethodDefinition aCurrentMethod, out int aObjectStorageSize) {
 			TypeDefinition xCurrentInspectedType = GetDefinitionFromTypeReference(aCurrentMethod.DeclaringType);
 			return GetTypeFieldInfo(xCurrentInspectedType, out aObjectStorageSize);
 		}
 
-		public static SortedList<string, TypeInformation.Field> GetTypeFieldInfo(TypeDefinition aType, out uint aObjectStorageSize) {
+		public static SortedList<string, TypeInformation.Field> GetTypeFieldInfo(TypeDefinition aType, out int aObjectStorageSize) {
 			SortedList<string, TypeInformation.Field> xTypeFields = new SortedList<string, TypeInformation.Field>();
 			TypeDefinition xActualType = aType;
 			aObjectStorageSize = 0;
@@ -852,14 +867,14 @@ namespace Indy.IL2CPU {
 					if (xField.IsStatic) {
 						continue;
 					}
-					uint xFieldSize;
+					int xFieldSize;
 					TypeSpecification xTypeSpec = xField.FieldType as TypeSpecification;
 					if (xTypeSpec != null) {
 						xFieldSize = 4;
 						RegisterTypeRef(xTypeSpec.ElementType);
 					} else {
 						TypeDefinition xFieldType = GetDefinitionFromTypeReference(xField.FieldType);
-						if (xFieldType.IsClass&& !xFieldType.IsValueType) {
+						if (xFieldType.IsClass && !xFieldType.IsValueType) {
 							xFieldSize = 4;
 						} else {
 							xFieldSize = GetFieldStorageSize(xFieldType);

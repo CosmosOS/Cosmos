@@ -49,6 +49,7 @@ namespace Indy.IL2CPU.IL.X86 {
 					CtorDef = Engine.GetMethodDefinition(Engine.GetTypeDefinition("mscorlib", "System.String"), ".ctor", "System.Char[]"),
 				}.Assemble();
 			}
+			Assembler.StackSizes.Push(4);
 		}
 	}
 }

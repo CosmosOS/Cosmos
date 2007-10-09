@@ -4,8 +4,8 @@ using Mono.Cecil;
 
 namespace Indy.IL2CPU {
 	public static class ObjectUtilities {
-		public static uint GetObjectStorageSize(TypeDefinition aType) {
-			uint xResult = ObjectImpl.FieldDataOffset;
+		public static int GetObjectStorageSize(TypeDefinition aType) {
+			int xResult = ObjectImpl.FieldDataOffset;
 			foreach (FieldDefinition xField in aType.Fields) {
 				if (xField.IsStatic) {
 					continue;

@@ -11,7 +11,23 @@ namespace Indy.IL2CPU.IL.X86 {
 			: base(aInstruction, aMethodInfo) {
 		}
 		public override void DoAssemble() {
-			// todo: WARNING: not implemented correctly!
+			int xSource = Assembler.StackSizes.Pop();
+			switch(xSource) {
+				case 1:
+				case 2:
+				case 4: {
+					Pop("eax");
+					Pushd("0");
+					Pushd("eax");
+					Assembler.StackSizes.Push(8);
+					break;
+				}
+				case 8: {
+					break;
+				}
+				default:
+					throw new Exception("SourceSize " + xSource + " not supported!");
+			}
 		}
 	}
 }

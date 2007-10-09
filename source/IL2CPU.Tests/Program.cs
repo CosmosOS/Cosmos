@@ -7,6 +7,7 @@ using System.Text;
 
 namespace IL2CPU.Tests {
 	public enum TestRunStateEnum {
+		NotRan,
 		TimeoutWhileRunningIL2CPU,
 		TimeoutWhileRunningFasm,
 		CompileErrorFromFasm,
@@ -18,13 +19,13 @@ namespace IL2CPU.Tests {
 		public const int TestTimeout_Seconds = 60;
 		public const int TestTimeout_Milliseconds = TestTimeout_Seconds * 1000;
 		static void Main(string[] args) {
-			SortedList<string, TestRunStateEnum?> xTests = new SortedList<string, TestRunStateEnum?>();
+			SortedList<string, TestRunStateEnum> xTests = new SortedList<string, TestRunStateEnum>();
 			Console.WriteLine("IL2CPU Tester. Please be patient while all tests are executed");
 			Console.WriteLine();
 			string xBaseDir = Path.GetDirectoryName(typeof(Program).Assembly.Location);
 			string xBaseTestsDir = Path.Combine(xBaseDir, "Tests");
 			foreach (string s in Directory.GetFiles(xBaseTestsDir, "*.exe", SearchOption.AllDirectories)) {
-				xTests.Add(s, null);
+				xTests.Add(s, TestRunStateEnum.NotRan);
 			}
 			Console.WriteLine("Found {0} tests. Executing now:", xTests.Count);
 			for (int i = 0; i < xTests.Count; i++) {
@@ -127,19 +128,19 @@ namespace IL2CPU.Tests {
 					continue;
 				}
 				if ((from item in xTests
-					 where item.Value.Value.ToString() == s
+					 where item.Value.ToString() == s
 					 select item.Key).Count() > 0) {
 					Console.WriteLine("Tests with teststate '{0}':", s);
 					foreach (string x in (from item in xTests
-										  where item.Value.Value.ToString() == s
+										  where item.Value.ToString() == s
 										  select item.Key)) {
-						Console.WriteLine("\t" + x);
+						Console.WriteLine("\t" + x.Substring(xBaseTestsDir.Length+1));
 					}
 
 				}
 			}
 			Console.WriteLine("Tests passed:    {0}/{1}", (from item in xTests
-														   where item.Value.Value == TestRunStateEnum.Passed
+														   where item.Value == TestRunStateEnum.Passed
 														   select 1).Count(), xTests.Count);
 		}
 	}

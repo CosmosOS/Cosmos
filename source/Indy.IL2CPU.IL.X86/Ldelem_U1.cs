@@ -11,19 +11,9 @@ namespace Indy.IL2CPU.IL.X86 {
 		public Ldelem_U1(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
 		}
-		public static void Assemble(CPU.Assembler aAssembler) {
-			aAssembler.Add(new CPUx86.Pop("eax"));
-			aAssembler.Add(new CPUx86.Move("edx", "1"));
-			aAssembler.Add(new CPUx86.Multiply("edx"));
-			aAssembler.Add(new CPUx86.Add("eax", "0" + (ObjectImpl.FieldDataOffset + 4).ToString("X") + "h"));
-			aAssembler.Add(new CPUx86.Pop("edx"));
-			aAssembler.Add(new CPUx86.Add("edx", "eax"));
-			aAssembler.Add(new CPUx86.Move("eax", "[edx]"));
-			aAssembler.Add(new CPUx86.Pushd("eax"));
-		}
-
+		
 		public override void DoAssemble() {
-			Assemble(Assembler);
+			Ldelem_Any.Assemble(Assembler, 1);
 		}
 	}
 }

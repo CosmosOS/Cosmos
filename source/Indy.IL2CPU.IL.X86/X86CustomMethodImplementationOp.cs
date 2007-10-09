@@ -17,13 +17,12 @@ namespace Indy.IL2CPU.IL.X86 {
 		/// <param name="aMethod"></param>
 		protected void PassCall(MethodReference aMethod) {
 			for (int i = 0; i < aMethod.Parameters.Count; i++) {
-				Ldarg.Ldarg(Assembler, MethodInfo.Arguments[i].VirtualAddress);
+				Ldarg.Ldarg(Assembler, MethodInfo.Arguments[i].VirtualAddresses, MethodInfo.Arguments[i].Size);
 			}
 			Engine.QueueMethodRef(aMethod);
-			Assembler.Add(new Indy.IL2CPU.Assembler.X86.Call(new Assembler.Label(aMethod).Name));
-			if (!aMethod.ReturnType.ReturnType.FullName.StartsWith("System.Void")) {
-				Assembler.Add(new Indy.IL2CPU.Assembler.X86.Pushd("eax"));
-			}
+			Op xOp = new Call(aMethod);
+			xOp.Assembler = Assembler;
+			xOp.Assemble();
 		}
 	}
 }

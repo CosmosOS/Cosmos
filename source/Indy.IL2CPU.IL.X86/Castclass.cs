@@ -26,18 +26,24 @@ namespace Indy.IL2CPU.IL.X86 {
 			// todo: throw an exception when the class does not support the cast!
 			string mReturnNullLabel = mThisLabel + "_ReturnNull";
 			Pop("eax");
+			Assembler.StackSizes.Pop();
 			Compare("eax", "0");
 			JumpIfZero(mReturnNullLabel);
 			Pushd("[eax]", "0" + mTypeId + "h");
 			MethodDefinition xMethodIsInstance = Engine.GetMethodDefinition(Engine.GetTypeDefinition("", "Indy.IL2CPU.VTablesImpl"), "IsInstance", "System.Int32", "System.Int32");
 			Engine.QueueMethod(xMethodIsInstance);
-			Call(new CPU.Label(xMethodIsInstance).Name);
+			Op xOp = new Call(xMethodIsInstance);
+			xOp.Assembler = Assembler;
+			xOp.Assemble();
+			Pop("eax");
+			Assembler.StackSizes.Pop();
 			Compare("eax", "0");
 			JumpIfEquals(mReturnNullLabel);
 			Pushd("eax");
 			JumpAlways(mNextOpLabel);
 			Label(mReturnNullLabel);
 			Pushd("0");
+			Assembler.StackSizes.Push(4);
 		}
 	}
 }

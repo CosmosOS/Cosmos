@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Mono.Cecil.Cil;
+using Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using Instruction=Mono.Cecil.Cil.Instruction;
 
 namespace Indy.IL2CPU.IL.X86 {
 	public class X86CustomMethodImplementationProxyOp: CustomMethodImplementationProxyOp {
@@ -12,7 +13,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		protected override void Ldarg(int index) {
-			Op.Ldarg(Assembler, MethodInfo.Arguments[index].VirtualAddress);
+			Op.Ldarg(Assembler, MethodInfo.Arguments[index].VirtualAddresses, MethodInfo.Arguments[index].Size);
 		}
 
 		protected override void Ldflda(TypeInformation.Field aField) {

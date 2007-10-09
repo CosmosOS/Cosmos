@@ -4,7 +4,7 @@ using Indy.IL2CPU.Assembler;
 using Indy.IL2CPU.Assembler.X86;
 using Mono.Cecil;
 using CPU = Indy.IL2CPU.Assembler.X86;
-using Instruction=Mono.Cecil.Cil.Instruction;
+using Instruction = Mono.Cecil.Cil.Instruction;
 
 namespace Indy.IL2CPU.IL.X86 {
 	public abstract class Op: IL.Op {
@@ -75,40 +75,44 @@ namespace Indy.IL2CPU.IL.X86 {
 			Assembler.Add(new Assembler.X86.Ret(""));
 		}
 
-		protected void Invoke(string aProcedureName, params object[] aParams) {
-			string xResult = "invoke " + aProcedureName;
-			foreach (object o in aParams) {
-				xResult += ",";
-				if (o != null) {
-					xResult += o;
-				}
+		public static void Ldarg(Assembler.Assembler aAssembler, string[] aAddresses, int aSize) {
+			foreach (string xAddress in aAddresses) {
+				Move(aAssembler, "eax", "[" + xAddress + "]");
+				Push(aAssembler, "eax");
 			}
-			Literal(xResult);
-		}
-
-		public static void Ldarg(Assembler.Assembler aAssembler, string aAddress) {
-			Move(aAssembler, "eax", "[" + aAddress + "]");
-			Push(aAssembler, "eax");
+			aAssembler.StackSizes.Push(aSize);
 		}
 
 		public static void Ldflda(Assembler.Assembler aAssembler, string aRelativeAddress) {
 			aAssembler.Add(new Popd("eax"));
 			aAssembler.Add(new CPU.Add("eax", aRelativeAddress.Trim().Substring(1)));
 			aAssembler.Add(new Pushd("eax"));
+			aAssembler.StackSizes.Push(4);
+			
+		}
+
+		public static void Multiply(Assembler.Assembler aAssembler) {
+			aAssembler.StackSizes.Pop();
+			aAssembler.Add(new CPU.Pop("eax"));
+			aAssembler.Add(new CPU.Multiply("dword [esp]"));
+			aAssembler.Add(new CPU.Add("esp", "4"));
+			aAssembler.Add(new Pushd("eax"));
 		}
 
 		public void Multiply() {
-			Assembler.Add(new CPU.Pop("eax"));
-			Assembler.Add(new CPU.Multiply("dword [esp]"));
-			Assembler.Add(new CPU.Add("esp", "4"));
-			Pushd("eax");
+			Multiply(Assembler);
+		}
+
+		public static void Add(Assembler.Assembler aAssembler) {
+			aAssembler.StackSizes.Pop();
+			aAssembler.Add(new CPU.Pop("eax"));
+			aAssembler.Add(new CPU.Add("eax", "[esp]"));
+			aAssembler.Add(new CPU.Add("esp", "4"));
+			aAssembler.Add(new Pushd("eax"));
 		}
 
 		public void Add() {
-			Assembler.Add(new CPU.Pop("eax"));
-			Assembler.Add(new CPU.Add("eax", "[esp]"));
-			Assembler.Add(new CPU.Add("esp", "4"));
-			Pushd("eax");
+			Add(Assembler);
 		}
 	}
 }

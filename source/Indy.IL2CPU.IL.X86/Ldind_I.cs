@@ -13,6 +13,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		public override void DoAssemble() {
 			Pop("eax");
 			Pushd("[eax]");
+			// stack stays same, 4 in, 4 out
 		}
 	}
 }

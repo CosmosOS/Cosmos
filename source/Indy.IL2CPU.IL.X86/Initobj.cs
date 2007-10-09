@@ -7,7 +7,7 @@ using CPU = Indy.IL2CPU.Assembler.X86;
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Initobj)]
 	public class Initobj: Op {
-		private uint mObjSize;
+		private int mObjSize;
 		public Initobj(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
 			TypeReference xTypeRef = aInstruction.Operand as TypeReference;
@@ -24,6 +24,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public override void DoAssemble() {
+			Assembler.StackSizes.Pop();
 			Pop("eax");
 			for(int i = 0; i < (mObjSize/4);i++) {
 				Move(Assembler, "dword [eax + 0" + (i*4).ToString("X") + "h]", "0");

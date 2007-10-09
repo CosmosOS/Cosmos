@@ -26,8 +26,12 @@ namespace Indy.IL2CPU.IL.X86.Native {
 		}
 
 		// Do not rename, it is being referenced by name string
+#pragma warning disable 649
 		private static IDTEntryStruct[] mIDTEntries;
+#pragma warning restore 649
+#pragma warning disable 169
 		private static DTPointerStruct mIDTPointer;
+#pragma warning restore 169
 		private static void IDT_LoadArray() {
 			// implemented using bare assembly
 		}

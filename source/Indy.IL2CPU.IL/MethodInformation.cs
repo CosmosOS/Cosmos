@@ -11,13 +11,19 @@ namespace Indy.IL2CPU.IL {
 			public Variable(int aOffset, int aSize, bool aIsReferenceTypeField) {
 				Offset = aOffset;
 				Size = aSize;
-				VirtualAddress = "ebp - 0" + (Offset + Size + 0).ToString("X") + "h";
+				VirtualAddresses = new string[Size / 4];
+				for (int i = 0; i < (Size / 4); i++) {
+					VirtualAddresses[i] = "ebp - 0" + (Offset + ((i + 1) * 4) + 0).ToString("X") + "h";
+				}
 				IsReferenceTypeField = aIsReferenceTypeField;
 			}
 			public readonly int Offset;
 			public readonly int Size;
-			public readonly string VirtualAddress;
 			public readonly bool IsReferenceTypeField;
+			/// <summary>
+			/// Gives the list of addresses to access this variable. This field contains multiple entries if the <see cref="Size"/> is larger than 4.
+			/// </summary>
+			public readonly string[] VirtualAddresses;
 		}
 
 		public struct Argument {
@@ -30,20 +36,26 @@ namespace Indy.IL2CPU.IL {
 				Size = aSize;
 				Offset = aOffset;
 				VirtualAddress = "ebp + 0" + (Offset + Size + 4).ToString("X") + "h";
+				VirtualAddresses = new string[Size / 4];
+				for (int i = 0; i < (Size / 4); i++) {
+					VirtualAddresses[i] = "ebp + 0" + (Offset + ((i + 1) * 4) + 4).ToString("X") + "h";
+				}
 				Kind = aKind;
 			}
 
+			[Obsolete("Start using VirtualAddresses")]
 			public readonly string VirtualAddress;
+			public readonly string[] VirtualAddresses;
 			public readonly int Size;
 			public readonly int Offset;
 			public readonly KindEnum Kind;
 		}
 
-		public MethodInformation(string aLabelName, Variable[] aLocals, Argument[] aArguments, bool aHasReturnValue, bool aIsInstanceMethod, TypeInformation aTypeInfo, MethodDefinition aMethodDef) {
+		public MethodInformation(string aLabelName, Variable[] aLocals, Argument[] aArguments, int aReturnSize, bool aIsInstanceMethod, TypeInformation aTypeInfo, MethodDefinition aMethodDef) {
 			Locals = aLocals;
 			LabelName = aLabelName;
 			Arguments = aArguments;
-			HasReturnValue = aHasReturnValue;
+			ReturnSize = aReturnSize;
 			IsInstanceMethod = aIsInstanceMethod;
 			TypeInfo = aTypeInfo;
 			MethodDefinition = aMethodDef;
@@ -53,7 +65,7 @@ namespace Indy.IL2CPU.IL {
 		public readonly string LabelName;
 		public readonly Variable[] Locals;
 		public readonly Argument[] Arguments;
-		public readonly bool HasReturnValue;
+		public readonly int ReturnSize;
 		public readonly bool IsInstanceMethod;
 		public readonly TypeInformation TypeInfo;
 		public override string ToString() {
@@ -64,8 +76,11 @@ namespace Indy.IL2CPU.IL {
 				xSB.AppendLine("\t(none)");
 			}
 			int xCurIndex = 0;
-			foreach(Variable xVar in Locals) {
-				xSB.AppendLine(String.Format("\t({0}) {1}\t{2}\t{3}\r\n", xCurIndex++, xVar.Offset, xVar.Size, xVar.VirtualAddress));
+			foreach (Variable xVar in Locals) {
+				xSB.AppendFormat("\t({0}) {1}\t{2}\t{3}\r\n\r\n", xCurIndex++, xVar.Offset, xVar.Size, xVar.VirtualAddresses.FirstOrDefault());
+				for (int i = 1; i < xVar.VirtualAddresses.Length; i++) {
+					xSB.AppendFormat("\t\t\t{0}\r\n\r\n", xVar.VirtualAddresses[i]);
+				}
 			}
 			xSB.AppendLine("Arguments:");
 			if (Arguments.Length == 0) {
@@ -75,6 +90,7 @@ namespace Indy.IL2CPU.IL {
 			foreach (Argument xArg in Arguments) {
 				xSB.AppendLine(String.Format("\t({0}) {1}\t{2}\t{3}\r\n", xCurIndex++, xArg.Offset, xArg.Size, xArg.VirtualAddress));
 			}
+			xSB.AppendLine("\tReturnSize: " + ReturnSize);
 			return xSB.ToString();
 		}
 	}

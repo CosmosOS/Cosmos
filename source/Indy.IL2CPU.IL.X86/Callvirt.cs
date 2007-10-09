@@ -12,7 +12,6 @@ namespace Indy.IL2CPU.IL.X86 {
 		private string mThisAddress;
 		private bool mHasReturn;
 		private string mNormalAddress;
-		private bool mIsVirtual = false;
 		private string mMethodDescription;
 		public Callvirt(Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
@@ -33,7 +32,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			mMethodIdentifier = Engine.GetMethodIdentifier(xMethodDef);
 			Engine.QueueMethodRef(VTablesImplRefs.GetMethodAddressForTypeRef);
 			MethodInformation xTheMethodInfo = Engine.GetMethodInfo(xMethodDef, xMethodDef, mMethodDescription, null);
-			mHasReturn = xTheMethodInfo.IsInstanceMethod;
+			mHasReturn = xTheMethodInfo.ReturnSize != 0;
 		}
 
 		public override void DoAssemble() {
@@ -51,6 +50,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			if (mHasReturn) {
 				Pushd("eax");
+				Assembler.StackSizes.Push(4);
 			}
 		}
 	}

@@ -12,8 +12,10 @@ namespace Indy.IL2CPU.IL.X86 {
 			: base(aInstruction, aMethodInfo) {
 		}
 		public override void DoAssemble() {
-			Call(new CPU.Label(RuntimeEngineRefs.Heap_AllocNewObjectRef).Name);
-			Pushd("eax");
+			//Call(new CPU.Label(RuntimeEngineRefs.Heap_AllocNewObjectRef).Name);
+			//Pushd("eax");
+			throw new NotImplementedException();
+
 		}
 	}
 }

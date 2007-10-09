@@ -29,7 +29,7 @@ namespace Indy.IL2CPU.IL.X86.Native {
 
 		protected void PassCall(MethodDefinition aMethod) {
 			for (int i = 0; i < aMethod.Parameters.Count; i++) {
-				Ldarg(Assembler, MethodInformation.Arguments[i].VirtualAddress);
+				Ldarg(Assembler, MethodInformation.Arguments[i].VirtualAddresses, MethodInformation.Arguments[i].Size);
 			}
 			DoQueueMethod(aMethod);
 			Assembler.Add(new Indy.IL2CPU.Assembler.X86.Call(new Assembler.Label(aMethod).Name));

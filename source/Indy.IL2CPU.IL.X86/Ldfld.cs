@@ -20,20 +20,19 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			string xFieldId = xField.ToString();
 			TypeInformation.Field xTheField;
-			uint xStorageSize;
+			int xStorageSize;
 			xTheField = Engine.GetTypeFieldInfo(Engine.GetDefinitionFromTypeReference(xField.DeclaringType), out xStorageSize)[xFieldId];
 			RelativeAddress = xTheField.RelativeAddress;
 			FieldSize = xTheField.Size;
 			if (FieldSize == 1 || FieldSize == 2 || FieldSize == 4)
 				return;
-			System.Diagnostics.Debugger.Break();
 			throw new NotSupportedException("FieldSizes other than 1, 2, 4 are not supported yet! (" + FieldSize + ")");
 		}
 
 		// todo: implement correct support for different field sizes
 
 		public readonly string RelativeAddress;
-		public readonly uint FieldSize;
+		public readonly int FieldSize;
 		public override void DoAssemble() {
 			Pop("ecx");
 			string xPushPrefix = "";
@@ -52,6 +51,8 @@ namespace Indy.IL2CPU.IL.X86 {
 					xRegister = "eax";
 					break;
 			}
+			Assembler.StackSizes.Pop();
+			Assembler.StackSizes.Push(FieldSize);
 			Move(Assembler, "eax", "0");
 			Move(Assembler, xPushPrefix + " " + xRegister, "[ecx " + RelativeAddress + "]");
 			Push(Assembler, "eax");

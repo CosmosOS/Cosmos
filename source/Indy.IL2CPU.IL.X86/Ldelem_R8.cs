@@ -11,7 +11,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			: base(aInstruction, aMethodInfo) {
 		}
 		public override void DoAssemble() {
-			Ldelem_Any.Assemble(Assembler, 4);
+			Ldelem_Any.Assemble(Assembler, 8);
 		}
 	}
 }

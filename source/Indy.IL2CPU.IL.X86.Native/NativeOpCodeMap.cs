@@ -5,8 +5,6 @@ using System.Text;
 using Indy.IL2CPU.Assembler;
 using Indy.IL2CPU.IL.X86.Native.CustomImplementations.System;
 using Indy.IL2CPU.IL.X86.Native.CustomImplementations.System.Diagnostics;
-using Indy.IL2CPU.IL.X86.Native.CustomImplementations.System;
-using Indy.IL2CPU.IL.X86.Native.CustomImplementations.System.Diagnostics;
 using Mono.Cecil;
 using CPU = Indy.IL2CPU.Assembler.X86;
 using CPUNative = Indy.IL2CPU.Assembler.X86.Native;
@@ -110,15 +108,15 @@ namespace Indy.IL2CPU.IL.X86.Native {
 						break;
 					}
 				case "System_Void___Indy_IL2CPU_IL_NativeX86_RuntimeEngineImpl_IO_WriteToPort___System_UInt16__System_Byte__": {
-						IL.X86.Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0].VirtualAddress);
+						IL.X86.Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0].VirtualAddresses, aMethodInfo.Arguments[0].Size);
 						aAssembler.Add(new CPU.Pop("eax"));
-						IL.X86.Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[1].VirtualAddress);
+						IL.X86.Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[1].VirtualAddresses, aMethodInfo.Arguments[1].Size);
 						aAssembler.Add(new CPU.Pop("ecx"));
 						aAssembler.Add(new CPUNative.Out("ax", "cl"));
 						break;
 					}
 				case "System_Byte___Indy_IL2CPU_IL_NativeX86_RuntimeEngineImpl_IO_ReadFromPort___System_UInt16__": {
-						IL.X86.Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0].VirtualAddress);
+						IL.X86.Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0].VirtualAddresses, aMethodInfo.Arguments[0].Size);
 						aAssembler.Add(new CPU.Pop("ecx"));
 						aAssembler.Add(new CPU.Move("eax", "0"));
 						aAssembler.Add(new CPUNative.In("ecx", "al"));
@@ -170,12 +168,12 @@ namespace Indy.IL2CPU.IL.X86.Native {
 		}
 
 		private static void DoAssemble_String_GetByteFromChar(Assembler.Assembler aAssembler, MethodInformation aMethodInfo) {
-			X86.Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0].VirtualAddress);
+			X86.Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0].VirtualAddresses, aMethodInfo.Arguments[0].Size);
 		}
 
 		public override void PostProcess(Indy.IL2CPU.Assembler.Assembler aAssembler) {
 			base.PostProcess(aAssembler);
-			X86.X86MethodHeaderOp.AssembleHeader(aAssembler, "___________REGISTER___ISRS_____", 0);
+			X86.X86MethodHeaderOp.AssembleHeader(aAssembler, "___________REGISTER___ISRS_____", new int[0]);
 			string xInterruptHandlerLabel = new Label(Engine.GetMethodDefinition(Engine.GetTypeDefinition("Indy.IL2CPU.IL.NativeX86", "Indy.IL2CPU.IL.NativeX86.RuntimeEngineImpl"), "InterruptHandler", "System.Byte", "System.Byte")).Name;
 			int[] xInterruptsWithParam = new int[] { 8, 10, 11, 12, 13, 14 };
 			for (int i = 0; i < 256; i++) {
@@ -188,7 +186,7 @@ namespace Indy.IL2CPU.IL.X86.Native {
 				aAssembler.Add(new CPU.Push("0x8E"));
 				aAssembler.Add(new CPU.Call(mIDTSetHandlerMethodName));
 			}
-			X86.X86MethodFooterOp.AssembleFooter(false, aAssembler, 0, 0);
+			X86.X86MethodFooterOp.AssembleFooter(0, aAssembler, new int[0], 0);
 			for (int j = 0; j < 256; j++) {
 				aAssembler.Add(new Label("____INTERRUPT_HANDLER___" + j));
 				aAssembler.Add(new CPUNative.Cli());

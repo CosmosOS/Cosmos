@@ -11,7 +11,29 @@ namespace Indy.IL2CPU.IL.X86 {
 			: base(aInstruction, aMethodInfo) {
 		}
 		public override void DoAssemble() {
-			// todo: implement correct truncating
+			int xSource = Assembler.StackSizes.Pop();
+			switch (xSource) {
+				case 2:
+				case 4: {
+						Pop("eax");
+						Pushd("eax");
+						Assembler.StackSizes.Push(1);
+						break;
+					}
+				case 8: {
+						Pop("eax");
+						Pop("ecx");
+						Pushd("eax");
+						Assembler.StackSizes.Push(1);
+						break;
+					}
+				case 1: {
+					Assembler.StackSizes.Push(1);
+					break;
+				}
+				default:
+					throw new Exception("SourceSize " + xSource + " not supported!");
+			}
 		}
 	}
 }
