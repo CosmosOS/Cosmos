@@ -589,6 +589,10 @@ namespace Indy.IL2CPU {
 				// pointer
 				return 4;
 			}
+			TypeSpecification xTypeSpec = aType as TypeSpecification;
+			if(xTypeSpec != null) {
+				return 4;
+			}
 			TypeDefinition xTypeDef = GetDefinitionFromTypeReference(aType);
 			if (xTypeDef.IsEnum) {
 				return GetFieldStorageSize(xTypeDef.Fields.GetField("value__").FieldType);
@@ -632,8 +636,13 @@ namespace Indy.IL2CPU {
 							int xTheSize;
 							string theType = "db";
 							TypeDefinition xFieldTypeDef = GetDefinitionFromTypeReference(xCurrentField.FieldType);
-							if (!xFieldTypeDef.IsClass || xFieldTypeDef.IsValueType) {
-								xTheSize = GetFieldStorageSize(xCurrentField.FieldType);
+							TypeSpecification xTypeSpec = xCurrentField.FieldType as TypeSpecification;
+							if(xTypeSpec == null) {
+								if (!xFieldTypeDef.IsClass || xFieldTypeDef.IsValueType) {
+									xTheSize = GetFieldStorageSize(xCurrentField.FieldType);
+								} else {
+									xTheSize = 4;
+								}
 							} else {
 								xTheSize = 4;
 							}

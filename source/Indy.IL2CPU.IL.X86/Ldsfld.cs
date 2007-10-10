@@ -49,16 +49,21 @@ namespace Indy.IL2CPU.IL.X86 {
 			mIsReferenceTypeOrStruct = (xFieldTypeDef.IsClass || xFieldTypeDef.IsValueType || IsArray(xFieldTypeDef)) && !IsPrimitive(xFieldTypeDef);
 			Engine.QueueStaticField(xField, out mDataName);
 			mSize = Engine.GetFieldStorageSize(xFieldTypeDef);
+			TypeSpecification xTypeSpec = xField.FieldType as TypeSpecification;
+			if(xTypeSpec != null) {
+				mIsReferenceTypeOrStruct = true;
+			}
 			if (String.IsNullOrEmpty(mDataName)) {
 				throw new Exception("No name generated for field '" + xField.GetFullName() + "'");
 			}
 			//DoQueueStaticField(xField.DeclaringType.Module.Assembly.Name.FullName, xField.DeclaringType.FullName, xField.Name, out mDataName);
 		}
 		public override void DoAssemble() {
+			Literal("; Is ReferenceTypeOrStruct = " + mIsReferenceTypeOrStruct.ToString());
 			if (!mIsReferenceTypeOrStruct) {
 				Pushd("[" + mDataName + "]");
 			} else {
-				Pushd(mDataName);
+				Pushd("[" + mDataName + "]");
 			}
 			Assembler.StackSizes.Push(mSize);
 		}

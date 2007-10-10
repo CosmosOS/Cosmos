@@ -12,7 +12,12 @@ namespace Indy.IL2CPU.IL.X86 {
 		public Ldelema(Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
 			TypeReference xTypeRef = aInstruction.Operand as TypeReference;
-			mElementSize = Engine.GetFieldStorageSize(xTypeRef);
+			TypeSpecification xTypeSpec = xTypeRef as TypeSpecification;
+			if(xTypeSpec != null) {
+				mElementSize = Engine.GetFieldStorageSize(xTypeRef);
+			} else {
+				mElementSize = 4;
+			}
 		}
 
 		public static void Assemble(CPU.Assembler aAssembler, int aElementSize) {

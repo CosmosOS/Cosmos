@@ -51,10 +51,12 @@ namespace Indy.IL2CPU.IL.X86 {
 			// the total array size is now on the stack.
 			Call(new Assembler.Label(RuntimeEngineRefs.Heap_AllocNewObjectRef).Name);
 			Pushd("eax");
-			Move(Assembler, "dword [eax]", "0" + Engine.RegisterType(Engine.GetTypeDefinition("mscorlib", "System.Array")).ToString("X") + "h");
-			Move(Assembler, "dword [eax + 4]", "0" + InstanceTypeEnum.Array.ToString("X") + "h");
-			Move(Assembler, "dword [eax + 8]", "edi");
 			Pushd("eax");
+			Move(Assembler, "dword [eax]", "0" + Engine.RegisterType(Engine.GetTypeDefinition("mscorlib", "System.Array")).ToString("X") + "h");
+			Assembler.Add(new CPU.Add("eax", "4"));
+			Move(Assembler, "dword [eax]", "0" + InstanceTypeEnum.Array.ToString("X") + "h");
+			Assembler.Add(new CPU.Add("eax", "4"));
+			Move(Assembler, "dword [eax]", "edi");
 			Call(mCtorName);
 			//Pop("eax");
 			//Pushd("eax");

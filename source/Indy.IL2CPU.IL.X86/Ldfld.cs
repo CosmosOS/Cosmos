@@ -23,7 +23,8 @@ namespace Indy.IL2CPU.IL.X86 {
 			int xStorageSize;
 			xTheField = Engine.GetTypeFieldInfo(Engine.GetDefinitionFromTypeReference(xField.DeclaringType), out xStorageSize)[xFieldId];
 			RelativeAddress = xTheField.RelativeAddress;
-			FieldSize = xTheField.Size;
+			FieldSize = Engine.GetFieldStorageSize(xField.FieldType);
+			
 			if (FieldSize == 1 || FieldSize == 2 || FieldSize == 4)
 				return;
 			throw new NotSupportedException("FieldSizes other than 1, 2, 4 are not supported yet! (" + FieldSize + ")");
