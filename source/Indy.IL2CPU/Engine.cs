@@ -882,6 +882,9 @@ namespace Indy.IL2CPU {
 					if (xField.IsStatic) {
 						continue;
 					}
+					if(xField.HasConstant) {
+						Console.WriteLine("Field is constant: " + xField.GetFullName());
+					}
 					int xFieldSize;
 					TypeSpecification xTypeSpec = xField.FieldType as TypeSpecification;
 					if (xTypeSpec != null) {

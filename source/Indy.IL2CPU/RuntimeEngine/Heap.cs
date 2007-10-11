@@ -6,7 +6,7 @@ using System.Text;
 namespace Indy.IL2CPU {
 	partial class RuntimeEngine {
 		public static uint HeapHandle = 0;
-		public const uint InitialHeapSize = 1024;
+		public const uint InitialHeapSize = 4096;
 		public const uint MaximumHeapSize = 10 * 1024 * InitialHeapSize; // 10 megabytes
 		public static void Heap_Initialize() {
 			//HeapHandle = PInvokes.Kernel32_HeapCreate(0, InitialHeapSize, MaximumHeapSize);

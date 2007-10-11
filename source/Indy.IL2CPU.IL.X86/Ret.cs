@@ -11,6 +11,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			: base(aInstruction, aMethodInfo) {
 		}
 		public override void DoAssemble() {
+			JumpAlways(".END__OF__METHOD");
 		}
 	}
 }

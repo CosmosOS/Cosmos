@@ -49,15 +49,19 @@ namespace Indy.IL2CPU.IL.X86 {
 			//				}
 			//			}
 			//			if (xNeedsExtras) {
+			string xStringMethodSuffix = "W";
+			if(Assembler.InMetalMode) {
+				xStringMethodSuffix = "A";
+			}
 			if (!TheMethod.PInvokeInfo.IsNoMangle) {
 				if (TheMethod.PInvokeInfo.IsCharSetUnicode) {
-					xMethodName += "A";// for now, strings are ASCII
+					xMethodName += xStringMethodSuffix;
 				} else {
 					if (TheMethod.PInvokeInfo.IsCharSetAnsi) {
-						xMethodName += "A";
+						xMethodName += xStringMethodSuffix;
 					} else {
 						if (TheMethod.PInvokeInfo.IsCharSetAuto) {
-							xMethodName += "A";// for now, strings are ASCII
+							xMethodName += xStringMethodSuffix;
 						}
 					}
 				}

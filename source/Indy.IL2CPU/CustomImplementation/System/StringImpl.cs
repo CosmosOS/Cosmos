@@ -18,13 +18,21 @@ namespace Indy.IL2CPU.CustomImplementation.System {
 			aStorage = aChars;
 		}
 
-		public static uint GetStorageMetal(uint aStringPtr) {
+		[MethodAlias(Name = "System.String System.String.FastAllocateString(System.Int32)")]
+		public static String FastAllocateString(int aLength) {
+			Char[] xItems = new Char[aLength];
+			return new String(xItems);
+		}
+
+		public static unsafe uint* GetStorageMetal(uint* aStringPtr) {
 			return aStringPtr;
 		}
 
-		public static uint GetStorageNormal(uint aStringPtr) {
-			uint xResult = aStringPtr;
-			xResult = xResult + 12;
+		public static unsafe uint* GetStorageNormal(uint* aStringPtr) {
+			uint* xResult = aStringPtr;
+			xResult = xResult + 3;
+			xResult = (uint*)(*xResult);
+			xResult += 3;
 			return xResult;
 		}
 	}

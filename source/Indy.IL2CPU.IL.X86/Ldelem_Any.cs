@@ -19,9 +19,6 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		// todo: refactor all Ldelem variants to use this method for emitting
 		public static void Assemble(CPU.Assembler aAssembler, int aElementSize) {
-			if(aElementSize % 4 != 0) {
-				throw new ArgumentException("ElementSize should be divisible by 4", "aElementSize");
-			}
 			aAssembler.Add(new CPUx86.Pop("eax"));
 			aAssembler.Add(new CPUx86.Move("edx", "0" + aElementSize.ToString("X") + "h"));
 			aAssembler.Add(new CPUx86.Multiply("edx"));
@@ -29,11 +26,26 @@ namespace Indy.IL2CPU.IL.X86 {
 			aAssembler.Add(new CPUx86.Pop("edx"));
 			aAssembler.Add(new CPUx86.Add("edx", "eax"));
 			aAssembler.Add(new CPUx86.Move("eax", "edx"));
-			for (int i = 0; i < (aElementSize / 4); i++) {
-				aAssembler.Add(new CPUx86.Pushd("[eax]"));
-				if (i != 0) {
+			int xSizeLeft = aElementSize;
+			while(xSizeLeft > 0) {
+				if(xSizeLeft >= 4) {
+					aAssembler.Add(new CPUx86.Push("dword [eax]"));
 					aAssembler.Add(new CPUx86.Add("eax", "4"));
-					aAssembler.Add(new CPUx86.Pushd("eax"));
+					xSizeLeft -= 4;
+				}else {
+					if(xSizeLeft >= 2) {
+						aAssembler.Add(new CPUx86.Push("word [eax]"));
+						aAssembler.Add(new CPUx86.Add("eax", "2"));
+						xSizeLeft -= 2;
+					}else {
+						if(xSizeLeft >= 1) {
+							aAssembler.Add(new CPUx86.Push("byte [eax]"));
+							aAssembler.Add(new CPUx86.Add("eax", "1"));
+							xSizeLeft -= 1;
+						}else {
+							throw new Exception("Size left: " + xSizeLeft);
+						}
+					}
 				}
 			}
 			aAssembler.StackSizes.Pop();

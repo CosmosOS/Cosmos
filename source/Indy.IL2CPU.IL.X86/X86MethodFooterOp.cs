@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Mono.Cecil.Cil;
+using Indy.IL2CPU.Assembler;
 using CPU = Indy.IL2CPU.Assembler.X86;
+using Instruction=Mono.Cecil.Cil.Instruction;
 
 namespace Indy.IL2CPU.IL.X86 {
 	public class X86MethodFooterOp: MethodFooterOp {
@@ -45,16 +46,15 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public static void AssembleFooter(int aReturnSize, Assembler.Assembler aAssembler, int[] aLocalsSizes, int aTotalArgsSize) {
+			aAssembler.Add(new Label(".END__OF__METHOD"));
 			if (aReturnSize > 0) {
 				if (aReturnSize > 4) {
 					throw new Exception("ReturnValue sizes larger than 4 not supported yet");
 				}
 				aAssembler.Add(new Assembler.X86.Pop("eax"));
-				aAssembler.StackSizes.Pop();
 			}
 			for (int j = (aLocalsSizes.Length - 1); j >= 0; j--) {
 				int xLocalSize = aLocalsSizes[j];
-				aAssembler.StackSizes.Pop();
 				aAssembler.Add(new CPU.Add("esp", "0x" + xLocalSize.ToString("X")));
 			}
 			aAssembler.Add(new CPU.Pop("ebp"));

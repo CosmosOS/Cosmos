@@ -33,7 +33,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			Move(Assembler, "dword [eax + 4]", "0" + InstanceTypeEnum.NormalObject.ToString("X") + "h");
 			//Pushd("ecx");
 			for (int i = 0; i < CtorDef.Parameters.Count; i++) {
-				Assembler.Add(new CPUx86.Pushd("[ebp - 010h]"));
+				Assembler.Add(new CPUx86.Pushd("[esp + 0x8]"));
 			}
 			Call(new CPU.Label(CtorDef).Name);
 			Pop("eax");
