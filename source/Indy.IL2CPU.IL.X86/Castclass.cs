@@ -3,6 +3,7 @@ using System.IO;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using CPU = Indy.IL2CPU.Assembler;
+using CPUx86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Castclass, false)]
@@ -29,7 +30,8 @@ namespace Indy.IL2CPU.IL.X86 {
 			Assembler.StackSizes.Pop();
 			Compare("eax", "0");
 			JumpIfZero(mReturnNullLabel);
-			Pushd("[eax]", "0" + mTypeId + "h");
+			Pushd(4, "[eax]");
+			Pushd(4, "0" + mTypeId + "h");
 			MethodDefinition xMethodIsInstance = Engine.GetMethodDefinition(Engine.GetTypeDefinition("", "Indy.IL2CPU.VTablesImpl"), "IsInstance", "System.Int32", "System.Int32");
 			Engine.QueueMethod(xMethodIsInstance);
 			Op xOp = new Call(xMethodIsInstance);
@@ -39,10 +41,10 @@ namespace Indy.IL2CPU.IL.X86 {
 			Assembler.StackSizes.Pop();
 			Compare("eax", "0");
 			JumpIfEquals(mReturnNullLabel);
-			Pushd("eax");
+			Assembler.Add(new CPUx86.Pushd("eax"));
 			JumpAlways(mNextOpLabel);
 			Label(mReturnNullLabel);
-			Pushd("0");
+			Assembler.Add(new CPUx86.Pushd("0"));
 			Assembler.StackSizes.Push(4);
 		}
 	}

@@ -56,7 +56,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			Assembler.StackSizes.Push(FieldSize);
 			Move(Assembler, "eax", "0");
 			Move(Assembler, xPushPrefix + " " + xRegister, "[ecx " + RelativeAddress + "]");
-			Push(Assembler, "eax");
+			Push(Assembler, FieldSize, "eax");
 		}
 	}
 }

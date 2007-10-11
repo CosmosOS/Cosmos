@@ -41,27 +41,25 @@ namespace Indy.IL2CPU.IL.X86 {
 		public override void DoAssemble() {
 			Literal("; Element Size = " + mElementSize);
 			// element count is on the stack
+			int xElementCountSize = Assembler.StackSizes.Peek();
 			Pop("edi");
-			Pushd("edi");
-			Pushd("0" + mElementSize.ToString("X") + "h");
+			Pushd(xElementCountSize, "edi");
+			Pushd(4, "0" + mElementSize.ToString("X") + "h");
 			Multiply();
 			// the total items size is now on the stack
-			Pushd("0" + (ObjectImpl.FieldDataOffset + 4).ToString("X") + "h");
+			Pushd(4, "0" + (ObjectImpl.FieldDataOffset + 4).ToString("X") + "h");
 			Add();
 			// the total array size is now on the stack.
 			Call(new Assembler.Label(RuntimeEngineRefs.Heap_AllocNewObjectRef).Name);
-			Pushd("eax");
-			Pushd("eax");
+			Assembler.StackSizes.Pop();
+			Pushd(4, "eax");
+			Pushd(4, "eax");
 			Move(Assembler, "dword [eax]", "0" + Engine.RegisterType(Engine.GetTypeDefinition("mscorlib", "System.Array")).ToString("X") + "h");
 			Assembler.Add(new CPU.Add("eax", "4"));
 			Move(Assembler, "dword [eax]", "0" + InstanceTypeEnum.Array.ToString("X") + "h");
 			Assembler.Add(new CPU.Add("eax", "4"));
 			Move(Assembler, "dword [eax]", "edi");
 			Call(mCtorName);
-			//Pop("eax");
-			//Pushd("eax");
-			//Assembler.StackSizes.Pop();
-			Assembler.StackSizes.Push(4);
 		}
 	}
 }

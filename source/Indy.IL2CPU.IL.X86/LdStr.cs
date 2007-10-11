@@ -32,7 +32,7 @@ namespace Indy.IL2CPU.IL.X86 {
 					Assembler.DataMembers.Add(new DataMember(xDataName, "db", xDataVal));
 				}
 				Move(Assembler, "eax", xDataName);
-				Pushd("eax");
+				Pushd(4, "eax");
 			} else {
 				string xDataName = Assembler.GetIdentifier("StringLiteral");
 				var xDataByteArray = new StringBuilder();
@@ -43,13 +43,12 @@ namespace Indy.IL2CPU.IL.X86 {
 				xDataByteArray.Append(Encoding.ASCII.GetBytes(LiteralStr).Aggregate("", (r, b) => r + b + ","));
 				xDataByteArray.Append("0,");
 				Assembler.DataMembers.Add(new DataMember(xDataName, "db", xDataByteArray.ToString().TrimEnd(',')));
-				Pushd(xDataName);
+				Pushd(4, xDataName);
 				new Newobj() {
 					Assembler = Assembler,
 					CtorDef = Engine.GetMethodDefinition(Engine.GetTypeDefinition("mscorlib", "System.String"), ".ctor", "System.Char[]"),
 				}.Assemble();
 			}
-			Assembler.StackSizes.Push(4);
 		}
 	}
 }

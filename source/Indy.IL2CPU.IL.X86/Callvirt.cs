@@ -9,7 +9,6 @@ namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Callvirt, true)]
 	public class Callvirt: Op {
 		private int mMethodIdentifier;
-		private string mThisAddress;
 		private bool mHasReturn;
 		private string mNormalAddress;
 		private string mMethodDescription;
@@ -17,7 +16,6 @@ namespace Indy.IL2CPU.IL.X86 {
 			: base(aInstruction, aMethodInfo) {
 			int xThisOffSet = (from item in aMethodInfo.Locals
 							   select item.Offset + item.Size).LastOrDefault();
-			mThisAddress = "ebp - 0" + xThisOffSet.ToString("X") + "h";
 			MethodReference xMethod = aInstruction.Operand as MethodReference;
 			if (xMethod == null) {
 				throw new Exception("Unable to determine Method!");
@@ -42,15 +40,15 @@ namespace Indy.IL2CPU.IL.X86 {
 				if (Assembler.InMetalMode) {
 					throw new Exception("Virtual methods not supported in Metal mode! (Called method = '" + mMethodDescription + "')");
 				}
-				Move(Assembler, "eax", "[" + mThisAddress + "]");
-				Pushd("[eax]");
-				Pushd("0" + mMethodIdentifier.ToString("X") + "h");
+				Assembler.Add(new CPUx86.Pop("eax"));
+				Assembler.Add(new CPUx86.Pushd("eax"));
+				Assembler.Add(new CPUx86.Pushd("[eax]"));
+				Assembler.Add(new CPUx86.Pushd("0" + mMethodIdentifier.ToString("X") + "h"));
 				Call(new CPU.Label(VTablesImplRefs.GetMethodAddressForTypeRef).Name);
 				Call("eax");
 			}
 			if (mHasReturn) {
-				Pushd("eax");
-				Assembler.StackSizes.Push(4);
+				Pushd(4, "eax");
 			}
 		}
 	}

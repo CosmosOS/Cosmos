@@ -23,7 +23,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			string LabelFalse = BaseLabel + "False";
 			Assembler.Add(new CPUx86.Pop("ecx"));
 			Assembler.Add(new CPUx86.Pop("eax"));
-			Pushd("ecx");
+			Assembler.Add(new CPUx86.Pushd("ecx"));
 			Assembler.Add(new CPUx86.Compare("eax", "[esp]"));
 			Assembler.Add(new CPUx86.JumpIfLess(LabelTrue));
 			Assembler.Add(new CPUx86.JumpAlways(LabelFalse));

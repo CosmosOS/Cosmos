@@ -23,26 +23,27 @@ namespace Indy.IL2CPU.IL.X86 {
 			Engine.QueueMethodRef(CtorDef);
 			DoQueueMethod(RuntimeEngineRefs.Heap_AllocNewObjectRef);
 			int xObjectSize = ObjectUtilities.GetObjectStorageSize(Engine.GetDefinitionFromTypeReference(CtorDef.DeclaringType));
-			Pushd("0" + xObjectSize.ToString("X").ToUpper() + "h");
+			Pushd(4, "0" + xObjectSize.ToString("X").ToUpper() + "h");
 			Call(new CPU.Label(RuntimeEngineRefs.Heap_AllocNewObjectRef).Name);
-			Pushd("eax");
+			Assembler.StackSizes.Pop();
+			Pushd(4, "eax");
 			//			Move(Assembler, "ecx", "eax");
-			Pushd("eax");
+			Pushd(4, "eax");
 			Move(Assembler, "dword [eax]", "0" + Engine.RegisterTypeRef(CtorDef.DeclaringType).ToString("X") + "h");
 			Move(Assembler, "dword [eax + 4]", "0" + InstanceTypeEnum.NormalObject.ToString("X") + "h");
 			//Pushd("ecx");
 			for (int i = 0; i < CtorDef.Parameters.Count; i++) {
-				Pushd("[ebp - 010h]");
+				Assembler.Add(new CPUx86.Pushd("[ebp - 010h]"));
 			}
 			Call(new CPU.Label(CtorDef).Name);
 			Pop("eax");
+			Assembler.StackSizes.Pop();
 			for (int i = 0; i < CtorDef.Parameters.Count; i++) {
 				Assembler.Add(new CPUx86.Add("esp", "4"));
 				Assembler.StackSizes.Pop();
 			}
-			Pushd("eax");
+			Pushd(4, "eax");
 			//Assembler.Add(new CPUx86.Add("esp", objSize.ToString()));
-			Assembler.StackSizes.Push(4);
 		}
 	}
 }

@@ -61,11 +61,10 @@ namespace Indy.IL2CPU.IL.X86 {
 		public override void DoAssemble() {
 			Literal("; Is ReferenceTypeOrStruct = " + mIsReferenceTypeOrStruct.ToString());
 			if (!mIsReferenceTypeOrStruct) {
-				Pushd("[" + mDataName + "]");
+				Pushd(mSize, "[" + mDataName + "]");
 			} else {
-				Pushd("[" + mDataName + "]");
+				Pushd(mSize, "[" + mDataName + "]");
 			}
-			Assembler.StackSizes.Push(mSize);
 		}
 	}
 }

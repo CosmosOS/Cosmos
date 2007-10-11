@@ -13,7 +13,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		public override void DoAssemble() {
 			Pop("eax");
 			Assembler.Add(new CPU.Add("eax", "8"));
-			Pushd("[eax]");
+			Pushd(4, "[eax]");
 		}
 	}
 }

@@ -7,7 +7,7 @@ namespace Indy.IL2CPU {
 	public static class VTablesImpl {
 		public struct VTable {
 			public int BaseTypeIdentifier;
-			public char[] Name;
+			public int Name;
 			public int[] MethodIndexes;
 			public int[] MethodAddresses;
 		}
@@ -31,7 +31,7 @@ namespace Indy.IL2CPU {
 			mTypes = new VTable[aTypeCount];
 		}
 
-		public static void SetTypeInfo(int aType, int aBaseType, int aMethodCount, char[] aName) {
+		public static void SetTypeInfo(int aType, int aBaseType, int aMethodCount, int aName) {
 			mTypes[aType] = new VTable();
 			mTypes[aType].BaseTypeIdentifier = aBaseType;
 			mTypes[aType].MethodIndexes = new int[aMethodCount];

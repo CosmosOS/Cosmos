@@ -32,16 +32,10 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public sealed override void DoAssemble() {
-			//if (mIsReferenceTypeField) {
-			//	Move(Assembler, "eax", "[" + mAddress + "]");
-			//	Push(Assembler, "eax");
-			//} else {
 			string[] xAddressParts = mAddress.Split('-');
 			Move(Assembler, "edx", "ebp");
 			Assembler.Add(new CPU.Sub("edx", xAddressParts[1]));
-			Push(Assembler, "edx");
-			Assembler.StackSizes.Push(4);
-			//}
+			Push(Assembler, 4, "edx");
 		}
 	}
 }

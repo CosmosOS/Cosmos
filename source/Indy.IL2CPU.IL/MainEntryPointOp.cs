@@ -15,6 +15,7 @@ namespace Indy.IL2CPU.IL {
 		public abstract void Exit();
 		public abstract void Pushd(string aValue);
 		public abstract void Call(MethodDefinition aMethod);
+		public abstract void Call(string aLabelName);
 
 		public override void DoAssemble() {
 			throw new NotImplementedException();

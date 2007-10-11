@@ -13,7 +13,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			: base(aInstruction, aMethodInfo) {
 			TypeReference xTypeRef = aInstruction.Operand as TypeReference;
 			TypeSpecification xTypeSpec = xTypeRef as TypeSpecification;
-			if(xTypeSpec != null) {
+			if(xTypeSpec == null) {
 				mElementSize = Engine.GetFieldStorageSize(xTypeRef);
 			} else {
 				mElementSize = 4;

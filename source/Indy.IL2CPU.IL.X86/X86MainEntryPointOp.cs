@@ -24,6 +24,10 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 		}
 
+		public override void Call(string aLabelName) {
+			Assembler.Add(new CPUx86.Call(aLabelName));
+		}
+
 		public override void Enter(string aName) {
 			X86MethodHeaderOp.AssembleHeader(Assembler, aName, new int[0]);
 		}

@@ -11,8 +11,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			: base(aInstruction, aMethodInfo) {
 		}
 		public override void DoAssemble() {
-			Pushd("0");
-			Assembler.StackSizes.Push(4);
+			Pushd(4, "0");
 		}
 	}
 }

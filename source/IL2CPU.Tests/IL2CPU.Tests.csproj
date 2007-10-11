@@ -45,6 +45,9 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="Tests\ComplexerStructIndexing\ComplexerStructIndexing.cs" />
+    <None Include="Tests\SimpleVCallTest\SimpleVCallTest.cs" />
+    <None Include="Tests\SimpleNewObject\SimpleNewObject.cs" />
     <None Include="Tests\SimpleStructParamSum\SimpleStructParamSum.cs" />
     <None Include="Tests\SimpleStaticField\SimpleStaticField.cs" />
     <None Include="Tests\SimpleStructSumming\SimpleStructSumming.cs" />
@@ -171,9 +174,18 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Tests\ComplexerStructIndexing\ComplexerStructIndexing.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <Content Include="Tests\SimpleForWithIf\SimpleForWithIf.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Tests\SimpleVCallTest\SimpleVCallTest.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Tests\SimpleNewObject\SimpleNewObject.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Tests\SimpleStructParamSum\SimpleStructParamSum.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

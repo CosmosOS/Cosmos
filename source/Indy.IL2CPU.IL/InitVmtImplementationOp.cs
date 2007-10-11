@@ -96,7 +96,7 @@ namespace Indy.IL2CPU.IL {
 					Pushd("0" + j.ToString("X") + "h");
 					TypeReference[] xMethodParams = new TypeReference[xMethod.Parameters.Count];
 					for (int k = 0; k < xMethod.Parameters.Count; k++) {
-						xMethodParams[i] = xMethod.Parameters[i].ParameterType;
+						xMethodParams[k] = xMethod.Parameters[k].ParameterType;
 					}
 					Pushd("0" + GetMethodIdentifier(xMethod).ToString("X") + "h");
 					Pushd(new Label(xMethod).Name);

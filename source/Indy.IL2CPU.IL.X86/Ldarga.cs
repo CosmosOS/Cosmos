@@ -30,9 +30,8 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 		public override void DoAssemble() {
 			string[] mAddressParts = mAddress.Split('+');
-			Pushd(mAddressParts);
-			Assembler.StackSizes.Push(4);
-			Assembler.StackSizes.Push(4);
+			Pushd(4, mAddressParts[0]);
+			Pushd(4, mAddressParts[1]);
 			Add();
 		}
 	}

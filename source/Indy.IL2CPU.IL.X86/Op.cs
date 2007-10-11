@@ -55,12 +55,14 @@ namespace Indy.IL2CPU.IL.X86 {
 			Assembler.Add(new Literal(aData));
 		}
 
-		public static void Push(Assembler.Assembler aAssembler, params string[] aArguments) {
+		public static void Push(Assembler.Assembler aAssembler, int aSize, params string[] aArguments) {
 			aAssembler.Add(new Push(aArguments));
+			aAssembler.StackSizes.Push(aSize);
 		}
 
-		protected void Pushd(params string[] aArguments) {
+		protected void Pushd(int aSize, params string[] aArguments) {
 			Assembler.Add(new Pushd(aArguments));
+			Assembler.StackSizes.Push(aSize);
 		}
 
 		protected void Xor(string aArgument1, string aArgument2) {
@@ -78,7 +80,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		public static void Ldarg(Assembler.Assembler aAssembler, string[] aAddresses, int aSize) {
 			foreach (string xAddress in aAddresses) {
 				Move(aAssembler, "eax", "[" + xAddress + "]");
-				Push(aAssembler, "eax");
+				aAssembler.Add(new Push("eax"));
 			}
 			aAssembler.StackSizes.Push(aSize);
 		}

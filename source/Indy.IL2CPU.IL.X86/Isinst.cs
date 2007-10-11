@@ -28,8 +28,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			Assembler.StackSizes.Pop();
 			Compare("eax", "0");
 			JumpIfZero(mReturnNullLabel);
-			Pushd("[eax]", "0" + mTypeId + "h");
-			Assembler.StackSizes.Push(4);
+			Pushd(4, "[eax]", "0" + mTypeId + "h");
 			MethodDefinition xMethodIsInstance = Engine.GetMethodDefinition(Engine.GetTypeDefinition("", "Indy.IL2CPU.VTablesImpl"), "IsInstance", "System.Int32", "System.Int32");
 			Engine.QueueMethod(xMethodIsInstance);
 			Op xOp = new Call(xMethodIsInstance);
@@ -39,12 +38,10 @@ namespace Indy.IL2CPU.IL.X86 {
 			Assembler.StackSizes.Pop();
 			Compare("eax", "0");
 			JumpIfEquals(mReturnNullLabel);
-			Pushd("eax");
-			Assembler.StackSizes.Push(1);
+			Pushd(1, "eax");
 			JumpAlways(mNextOpLabel);
 			Label(mReturnNullLabel);
-			Pushd("0");
-			Assembler.StackSizes.Push(1);
+			Pushd(1, "0");
 		}
 	}
 }

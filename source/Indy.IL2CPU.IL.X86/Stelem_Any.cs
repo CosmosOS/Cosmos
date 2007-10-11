@@ -30,13 +30,10 @@ namespace Indy.IL2CPU.IL.X86 {
 			aAssembler.Add(new CPUx86.Move("ebx", "[esp + " + aElementSize + "]")); // the index
 			aAssembler.Add(new CPUx86.Move("ecx", "[esp + " + (aElementSize + 4) + "]")); // the array
 			aAssembler.Add(new CPUx86.Add("ecx", "12"));
-			Push(aAssembler, "0x"+aElementSize.ToString("X"));
-			aAssembler.StackSizes.Push(4);
-			Push(aAssembler, "ebx");
-			aAssembler.StackSizes.Push(4);
+			Push(aAssembler, 4, "0x" + aElementSize.ToString("X"));
+			Push(aAssembler, 4, "ebx");
 			Multiply(aAssembler);
-			Push(aAssembler, "ecx");
-			aAssembler.StackSizes.Push(4);
+			Push(aAssembler, 4, "ecx");
 			Add(aAssembler);
 			aAssembler.Add(new CPUx86.Pop("ecx"));
 			aAssembler.StackSizes.Pop();

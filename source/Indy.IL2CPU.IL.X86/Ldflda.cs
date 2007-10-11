@@ -33,7 +33,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		public override void DoAssemble() {
 			Pop("eax");
 			Assembler.Add(new CPU.Add("eax", mRelativeAddress.Trim().Substring(1)));
-			Pushd("eax");
+			Pushd(4, "eax");
 		}
 	}
 }

@@ -27,27 +27,22 @@ namespace Indy.IL2CPU.IL.X86 {
 		public override void DoAssemble() {
 			string mReturnNullLabel = mThisLabel + "_ReturnNull";
 			Pop("eax");
-			Assembler.StackSizes.Pop();
 			Compare("eax", "0");
 			JumpIfZero(mReturnNullLabel);
-			Pushd("[eax]", "0" + mTypeId + "h");
-			Assembler.StackSizes.Push(4);
-			Assembler.StackSizes.Push(4);
+			Pushd(4, "[eax]");
+			Pushd(4, "0" + mTypeId + "h");
 			MethodDefinition xMethodIsInstance = Engine.GetMethodDefinition(Engine.GetTypeDefinition("", "Indy.IL2CPU.VTablesImpl"), "IsInstance", "System.Int32", "System.Int32");
 			Engine.QueueMethod(xMethodIsInstance);
 			Op xOp = new Call(xMethodIsInstance);
 			xOp.Assembler = Assembler;
 			xOp.Assemble();
 			Pop("eax");
-			Assembler.StackSizes.Pop();
 			Compare("eax", "0");
 			JumpIfEquals(mReturnNullLabel);
-			Pushd("eax");
-			Assembler.StackSizes.Push(mTypeSize);
+			Pushd(mTypeSize, "eax");
 			JumpAlways(mNextOpLabel);
 			Label(mReturnNullLabel);
-			Pushd("0");
-			Assembler.StackSizes.Push(4);
+			Pushd(4, "0");
 		}
 	}
 }

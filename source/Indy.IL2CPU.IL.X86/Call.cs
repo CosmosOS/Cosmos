@@ -34,10 +34,10 @@ namespace Indy.IL2CPU.IL.X86 {
 			Engine.QueueMethodRef(xMethodDef);
 			bool needsCleanup = false;
 			List<int> xArgumentSizes = new List<int>();
-			foreach(ParameterDefinition xParam in xMethodDef.Parameters) {
+			foreach (ParameterDefinition xParam in xMethodDef.Parameters) {
 				xArgumentSizes.Add(Engine.GetFieldStorageSize(xParam.ParameterType));
 			}
-			if(!xMethodDef.IsStatic) {
+			if (!xMethodDef.IsStatic) {
 				xArgumentSizes.Insert(0, 4);
 			}
 			ArgumentSizes = xArgumentSizes.ToArray();
@@ -67,8 +67,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				Assembler.StackSizes.Pop();
 			}
 			if (HasResult) {
-				Push(Assembler, "eax");
-				Assembler.StackSizes.Push(4);
+				Push(Assembler, 4, "eax");
 			}
 		}
 

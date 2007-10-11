@@ -11,24 +11,21 @@ namespace Indy.IL2CPU.IL.X86 {
 			: base(aInstruction, aMethodInfo) {
 		}
 		public override void DoAssemble() {
-			int xSource = Assembler.StackSizes.Pop();
+			int xSource = Assembler.StackSizes.Peek();
 			switch (xSource) {
 				case 1:
 				case 4: {
 						Pop("eax");
-						Pushd("eax");
-						Assembler.StackSizes.Push(2);
+						Pushd(2, "eax");
 						break;
 					}
 				case 8: {
 						Pop("eax");
 						Pop("ecx");
-						Pushd("eax");
-						Assembler.StackSizes.Push(2);
+						Pushd(2, "eax");
 						break;
 					}
 				case 2: {
-						Assembler.StackSizes.Push(2);
 						break;
 					}
 				default:
