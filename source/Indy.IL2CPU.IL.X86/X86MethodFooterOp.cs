@@ -40,8 +40,6 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public override void DoAssemble() {
-			// MtW: after trial and a huge amount of errors, this line doesn't seem to be needed
-			//Assembler.Add(new CPU.Add("esp", TotalLocalsSize.ToString()));
 			AssembleFooter(ReturnSize, Assembler, Locals, Args.Sum());
 		}
 
@@ -50,8 +48,9 @@ namespace Indy.IL2CPU.IL.X86 {
 			if (aReturnSize > 0) {
 				if (aReturnSize > 4) {
 					throw new Exception("ReturnValue sizes larger than 4 not supported yet");
+				} else {
+					aAssembler.Add(new Assembler.X86.Pop("eax"));
 				}
-				aAssembler.Add(new Assembler.X86.Pop("eax"));
 			}
 			for (int j = (aLocalsSizes.Length - 1); j >= 0; j--) {
 				int xLocalSize = aLocalsSizes[j];

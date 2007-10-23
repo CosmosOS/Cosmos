@@ -6,6 +6,7 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86.Win32 {
 	public class Assembler: IL2CPU.Assembler.X86.Assembler {
+		public int StackSize = 64 * 1024;
 		public enum OutputTypeEnum {
 			DLL,
 			Console,
@@ -44,6 +45,7 @@ namespace Indy.IL2CPU.Assembler.X86.Win32 {
 			if (mOutputType != OutputTypeEnum.DLL) {
 				mOutputWriter.WriteLine("entry " + EntryPointLabelName);
 			}
+			mOutputWriter.WriteLine("stack 0x{0}", StackSize.ToString("X"));
 		}
 	}
 }
