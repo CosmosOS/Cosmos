@@ -86,7 +86,9 @@
   <ItemGroup>
     <Compile Include="CustomImplementation\System\ArrayImpl.cs" />
     <Compile Include="CustomImplementation\System\ArrayImplRefs.cs" />
+    <Compile Include="CustomImplementation\System\DelegateImpl.cs" />
     <Compile Include="CustomImplementation\System\EnvironmentImpl.cs" />
+    <Compile Include="CustomImplementation\System\MulticastDelegateImpl.cs" />
     <Compile Include="CustomImplementation\System\RuntimeType.RuntimeTypeCache.cs" />
     <Compile Include="CustomImplementation\System\StringImpl.cs" />
     <Compile Include="CustomImplementation\System\RuntimeType.cs" />

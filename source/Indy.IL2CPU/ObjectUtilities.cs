@@ -4,8 +4,21 @@ using Mono.Cecil;
 
 namespace Indy.IL2CPU {
 	public static class ObjectUtilities {
+		private static bool IsDelegate(TypeDefinition aType) {
+			if(aType.BaseType.FullName == "System.Delegate") {
+				return true;
+			}
+			if (aType.BaseType.FullName == "System.Object") {
+				return false;
+			}
+			return IsDelegate(Engine.GetDefinitionFromTypeReference(aType.BaseType));
+		}
+
 		public static int GetObjectStorageSize(TypeDefinition aType) {
 			int xResult = ObjectImpl.FieldDataOffset;
+			if (IsDelegate(aType)) {
+				xResult += 8;
+			}
 			foreach (FieldDefinition xField in aType.Fields) {
 				if (xField.IsStatic) {
 					continue;

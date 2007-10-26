@@ -12,6 +12,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		private bool mHasReturn;
 		private string mNormalAddress;
 		private string mMethodDescription;
+		private string[] mThisAddresses;
 		public Callvirt(Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
 			int xThisOffSet = (from item in aMethodInfo.Locals
@@ -31,6 +32,11 @@ namespace Indy.IL2CPU.IL.X86 {
 			Engine.QueueMethodRef(VTablesImplRefs.GetMethodAddressForTypeRef);
 			MethodInformation xTheMethodInfo = Engine.GetMethodInfo(xMethodDef, xMethodDef, mMethodDescription, null);
 			mHasReturn = xTheMethodInfo.ReturnSize != 0;
+			Console.WriteLine("Debug: " + xTheMethodInfo.ToString());
+			mThisAddresses = xTheMethodInfo.Arguments[0].VirtualAddresses;
+			if (mThisAddresses.Length > 1) {
+				throw new Exception("In x86, object addresses are 4 bytes. Found different size!");
+			}
 		}
 
 		public override void DoAssemble() {
@@ -40,8 +46,18 @@ namespace Indy.IL2CPU.IL.X86 {
 				if (Assembler.InMetalMode) {
 					throw new Exception("Virtual methods not supported in Metal mode! (Called method = '" + mMethodDescription + "')");
 				}
-				Assembler.Add(new CPUx86.Pop("eax"));
-				Assembler.Add(new CPUx86.Pushd("eax"));
+				string[] xAddrParts = mThisAddresses[0].Split('+');
+				Pushd(4, xAddrParts[0].Trim());
+				Pushd(4, xAddrParts[1].Trim());
+				Pushd(4, "8");
+				new Sub(null, null) {
+					Assembler = this.Assembler
+				}.Assemble();
+				new Sub(null, null) {
+					Assembler = this.Assembler
+				}.Assemble();
+				Pop("ecx");
+				Move(Assembler, "eax", "[ecx]");
 				Assembler.Add(new CPUx86.Pushd("[eax]"));
 				Assembler.Add(new CPUx86.Pushd("0" + mMethodIdentifier.ToString("X") + "h"));
 				Call(new CPU.Label(VTablesImplRefs.GetMethodAddressForTypeRef).Name);

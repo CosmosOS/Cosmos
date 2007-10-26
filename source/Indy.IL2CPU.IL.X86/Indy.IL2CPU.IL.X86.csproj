@@ -127,6 +127,10 @@
     <Compile Include="Conv_U8.cs" />
     <Compile Include="Cpblk.cs" />
     <Compile Include="Cpobj.cs" />
+    <Compile Include="CustomImplementations\System\MulticastDelegateImpl.cs" />
+    <Compile Include="CustomImplementations\System\MulticastDelegateImplRefs.cs" />
+    <Compile Include="CustomImplementations\System\EventHandlerImpl.cs" />
+    <Compile Include="CustomImplementations\System\EventHandlerImplRefs.cs" />
     <Compile Include="CustomImplementations\System\ObjectImpl.cs" />
     <Compile Include="CustomImplementations\System\ObjectImplRefs.cs" />
     <Compile Include="CustomImplementations\System\StringImplRefs.cs" />

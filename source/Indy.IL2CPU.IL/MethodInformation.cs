@@ -35,7 +35,6 @@ namespace Indy.IL2CPU.IL {
 			public Argument(int aSize, int aOffset, KindEnum aKind) {
 				Size = aSize;
 				Offset = aOffset;
-				VirtualAddress = "ebp + 0" + (Offset + Size + 4).ToString("X") + "h";
 				VirtualAddresses = new string[Size / 4];
 				for (int i = 0; i < (Size / 4); i++) {
 					VirtualAddresses[i] = "ebp + 0" + (Offset + ((i + 1) * 4) + 4).ToString("X") + "h";
@@ -43,8 +42,6 @@ namespace Indy.IL2CPU.IL {
 				Kind = aKind;
 			}
 
-			[Obsolete("Start using VirtualAddresses")]
-			public readonly string VirtualAddress;
 			public readonly string[] VirtualAddresses;
 			public readonly int Size;
 			public readonly int Offset;
@@ -88,7 +85,7 @@ namespace Indy.IL2CPU.IL {
 			}
 			xCurIndex = 0;
 			foreach (Argument xArg in Arguments) {
-				xSB.AppendLine(String.Format("\t({0}) {1}\t{2}\t{3}\r\n", xCurIndex++, xArg.Offset, xArg.Size, xArg.VirtualAddress));
+				xSB.AppendLine(String.Format("\t({0}) {1}\t{2}\t{3}\r\n", xCurIndex++, xArg.Offset, xArg.Size, xArg.VirtualAddresses.FirstOrDefault()));
 			}
 			xSB.AppendLine("\tReturnSize: " + ReturnSize);
 			return xSB.ToString();
