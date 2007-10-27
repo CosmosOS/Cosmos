@@ -5,6 +5,9 @@ using Mono.Cecil;
 namespace Indy.IL2CPU {
 	public static class ObjectUtilities {
 		private static bool IsDelegate(TypeDefinition aType) {
+			if (aType.FullName == "System.Object") {
+				return false;
+			}
 			if(aType.BaseType.FullName == "System.Delegate") {
 				return true;
 			}
@@ -15,6 +18,9 @@ namespace Indy.IL2CPU {
 		}
 
 		public static int GetObjectStorageSize(TypeDefinition aType) {
+			if (aType == null) {
+				throw new ArgumentNullException("aType");
+			}
 			int xResult = ObjectImpl.FieldDataOffset;
 			if (IsDelegate(aType)) {
 				xResult += 8;

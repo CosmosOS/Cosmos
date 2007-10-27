@@ -13,12 +13,30 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 		public static void Assemble(Assembler.Assembler aAssembler, int aSize) {
 			aAssembler.Add(new CPU.Literal("; address at: [esp + " + aSize + "]"));
-			aAssembler.Add(new CPUx86.Move("ebx", "[esp + " + aSize + "]"));
+			int xStorageSize = aSize;
+			if (xStorageSize < 4) {
+				xStorageSize = 4;
+			}
+			aAssembler.Add(new CPUx86.Move("ebx", "[esp + " + xStorageSize + "]"));
 			for (int i = 0; i < (aSize / 4); i++) {
 				Move(aAssembler, "eax", "[esp + " + (i * 4) + "]");
 				Move(aAssembler, "[ebx + " + (i * 4) + "]", "eax");
 			}
-			aAssembler.Add(new CPUx86.Add("esp", "0x" + (aSize + 4).ToString("X")));
+			switch (aSize % 4) {
+				case 1: {
+					Move(aAssembler, "eax", "[esp + " + ((aSize / 4) * 4) + "]");
+					Move(aAssembler, "[ebx + " + ((aSize / 4) * 4) + "]", "al");
+					break;
+				}
+				case 2: {
+					Move(aAssembler, "eax", "[esp + " + ((aSize / 4) * 4) + "]");
+					Move(aAssembler, "[ebx + " + ((aSize / 4) * 4) + "]", "ax");
+					break;
+				}
+				default:
+					throw new Exception("Error, shouldn't occur");
+			}
+			aAssembler.Add(new CPUx86.Add("esp", "0x" + (xStorageSize + 4).ToString("X")));
 			aAssembler.StackSizes.Pop();
 			aAssembler.StackSizes.Pop();
 		}

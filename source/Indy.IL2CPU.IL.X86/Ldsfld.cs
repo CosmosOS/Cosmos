@@ -8,63 +8,47 @@ namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Ldsfld)]
 	public class Ldsfld: Op {
 		private string mDataName;
-		private bool mIsReferenceTypeOrStruct;
 		private int mSize;
-
-		private static bool IsPrimitive(TypeDefinition aType) {
-			switch (aType.FullName) {
-				case "System.SByte":
-				case "System.Int16":
-				case "System.Int32":
-				case "System.Int64":
-				case "System.Byte":
-				case "System.UInt16":
-				case "System.UInt32":
-				case "System.UInt64":
-				case "System.Boolean":
-				case "System.Single":
-				case "System.Decimal":
-				case "System.Double":
-					return true;
-				default:
-					return false;
-			}
-		}
-
-		private static bool IsArray(TypeReference aType) {
-			TypeReference xCurType = aType;
-			do {
-				if (xCurType.FullName == "System.Array") {
-					return true;
-				}
-				xCurType = Engine.GetDefinitionFromTypeReference(xCurType).BaseType;
-			} while (xCurType != null);
-			return false;
-		}
+		private bool mIsReference = false;
 
 		public Ldsfld(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
 			FieldReference xField = (FieldReference)aInstruction.Operand;
-			TypeDefinition xFieldTypeDef = Engine.GetDefinitionFromTypeReference(xField.FieldType);
-			mIsReferenceTypeOrStruct = (xFieldTypeDef.IsClass || xFieldTypeDef.IsValueType || IsArray(xFieldTypeDef)) && !IsPrimitive(xFieldTypeDef);
-			Engine.QueueStaticField(xField, out mDataName);
-			mSize = Engine.GetFieldStorageSize(xFieldTypeDef);
-			TypeSpecification xTypeSpec = xField.FieldType as TypeSpecification;
-			if(xTypeSpec != null) {
-				mIsReferenceTypeOrStruct = true;
+			mSize = Engine.GetFieldStorageSize(xField.FieldType);
+			if(aInstruction.ToString() == "Ldsfld System.Int32 Indy.IL2CPU.IL.X86.Native.CustomImplementations.System.ConsoleImpl::mCurrentLine") {
+				System.Diagnostics.Debugger.Break();
 			}
-			if (String.IsNullOrEmpty(mDataName)) {
-				throw new Exception("No name generated for field '" + xField.GetFullName() + "'");
-			}
-			//DoQueueStaticField(xField.DeclaringType.Module.Assembly.Name.FullName, xField.DeclaringType.FullName, xField.Name, out mDataName);
+			mIsReference = Engine.GetDefinitionFromTypeReference(xField.FieldType).IsClass;
+			DoQueueStaticField(xField.DeclaringType.Module.Assembly.Name.FullName, xField.DeclaringType.FullName, xField.Name, out mDataName);
 		}
 		public override void DoAssemble() {
-			Literal("; Is ReferenceTypeOrStruct = " + mIsReferenceTypeOrStruct.ToString());
-			if (!mIsReferenceTypeOrStruct) {
-				Pushd(mSize, "[" + mDataName + "]");
-			} else {
-				Pushd(mSize, "[" + mDataName + "]");
+//			if(mIsReference && Assembler.InMetalMode) {
+//				Pushd(4, mDataName);
+//				return;
+//			}
+			Literal("; Size = " + mSize + ", IsReference = " + mIsReference);
+			for (int i = 0; i < (mSize / 4); i++) {
+			//	Pop("eax");
+			//	Move(Assembler, "dword [" + mDataName + " + 0x" + (i * 4).ToString("X") + "]", "eax");
+				Assembler.Add(new CPU.Pushd("[" + mDataName + " + 0x" + (i * 4).ToString("X") + "]"));
 			}
+			switch (mSize % 4) {
+				case 1: {
+						Assembler.Add(new CPU.Push("byte [" + mDataName + " + 0x" + (mSize - 1).ToString("X") + "]"));
+						break;
+					}
+				case 2: {
+						Assembler.Add(new CPU.Push("word [" + mDataName + " + 0x" + (mSize - 2).ToString("X") + "]"));
+						break;
+					}
+				case 0: {
+						break;
+					}
+				default:
+					throw new Exception("Remainder size " + (mSize % 4) + " not supported!");
+
+			}
+			Assembler.StackSizes.Push(mSize);
 		}
 	}
 }

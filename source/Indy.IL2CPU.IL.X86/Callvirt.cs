@@ -46,18 +46,8 @@ namespace Indy.IL2CPU.IL.X86 {
 				if (Assembler.InMetalMode) {
 					throw new Exception("Virtual methods not supported in Metal mode! (Called method = '" + mMethodDescription + "')");
 				}
-				string[] xAddrParts = mThisAddresses[0].Split('+');
-				Pushd(4, xAddrParts[0].Trim());
-				Pushd(4, xAddrParts[1].Trim());
-				Pushd(4, "8");
-				new Sub(null, null) {
-					Assembler = this.Assembler
-				}.Assemble();
-				new Sub(null, null) {
-					Assembler = this.Assembler
-				}.Assemble();
-				Pop("ecx");
-				Move(Assembler, "eax", "[ecx]");
+				Assembler.Add(new CPUx86.Pop("eax"));
+				Assembler.Add(new CPUx86.Pushd("eax"));
 				Assembler.Add(new CPUx86.Pushd("[eax]"));
 				Assembler.Add(new CPUx86.Pushd("0" + mMethodIdentifier.ToString("X") + "h"));
 				Call(new CPU.Label(VTablesImplRefs.GetMethodAddressForTypeRef).Name);

@@ -118,7 +118,7 @@ namespace Indy.IL2CPU {
 							break;
 						}
 					case TargetPlatformEnum.NativeX86: {
-							mMap = (OpCodeMap)Activator.CreateInstance(Type.GetType("Indy.IL2CPU.IL.X86.Native.NativepCodeMap, Indy.IL2CPU.IL.X86.Native", true));
+							mMap = (OpCodeMap)Activator.CreateInstance(Type.GetType("Indy.IL2CPU.IL.X86.Native.NativeOpCodeMap, Indy.IL2CPU.IL.X86.Native", true));
 							mAssembler = new Assembler.X86.Native.Assembler(aOutput, aInMetalMode);
 							break;
 						}
@@ -595,6 +595,7 @@ namespace Indy.IL2CPU {
 				// pointer
 				return 4;
 			}
+			// array
 			TypeSpecification xTypeSpec = aType as TypeSpecification;
 			if (xTypeSpec != null) {
 				return 4;
