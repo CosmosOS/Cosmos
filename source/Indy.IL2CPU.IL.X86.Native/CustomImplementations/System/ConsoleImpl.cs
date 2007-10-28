@@ -14,6 +14,21 @@ namespace Indy.IL2CPU.IL.X86.Native.CustomImplementations.System {
 		private static int mCurrentLine = 0;
 		private static int mCurrentChar = 0;
 
+		private static unsafe void MoveLinesUp() {
+			for (int i = 0; i < Columns * (Lines - 1); i++) {
+				byte* xScreenPtr = (byte*)(VideoAddr + (i* 2));
+				*xScreenPtr = *(xScreenPtr + (Columns * 2));
+				xScreenPtr += 1;
+				*xScreenPtr = *(xScreenPtr + (Columns * 2));
+			}
+			for(int i = 0; i < Columns;i++) {
+				byte* xScreenPtr = (byte*)(VideoAddr + (i + Lines * Columns) * 2);
+				*xScreenPtr = 0;
+				xScreenPtr += 1;
+				*xScreenPtr = 0;
+			}
+		}
+
 		public static unsafe void Clear() {
 			for (int i = 0; i < Columns * Lines * 2; i++) {
 				byte* xScreenPtr = (byte*)VideoAddr;
@@ -28,7 +43,6 @@ namespace Indy.IL2CPU.IL.X86.Native.CustomImplementations.System {
 			int xScreenOffset = ((aPos + aLine * 80) * 2);
 			byte* xScreenPtr = (byte*)((0xB8000) + xScreenOffset);
 			byte xVal = aChar;
-			global::System.Diagnostics.Debugger.Break();
 			*xScreenPtr = xVal;
 			xScreenPtr += 1;
 			*xScreenPtr = 7;
@@ -840,7 +854,9 @@ namespace Indy.IL2CPU.IL.X86.Native.CustomImplementations.System {
 			mCurrentLine += 1;
 			mCurrentChar = 0;
 			if (mCurrentLine == Lines) {
-				Clear();
+				MoveLinesUp();
+				mCurrentLine -= 1;
+				mCurrentChar = 0;
 			}
 		}
 	}

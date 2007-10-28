@@ -159,7 +159,8 @@ namespace Indy.IL2CPU.IL.X86.Native {
 			aAssembler.DataMembers.RemoveAll(delegate(DataMember aItem) {
 				return aItem.Name == xFieldName;
 			});
-			aAssembler.DataMembers.Add(new DataMember(xFieldName, "db", xFieldData));
+			aAssembler.DataMembers.Add(new DataMember(xFieldName, "dd", xFieldName));
+			aAssembler.DataMembers.Add(new DataMember(xFieldName + "___Contents", "db", xFieldData));
 			xFieldDef = xRuntimeEngineTypeDef.Fields.GetField("mIDTPointer");
 			string xPointerFieldName;
 			Engine.QueueStaticField(xFieldDef, out xPointerFieldName);
@@ -176,50 +177,50 @@ namespace Indy.IL2CPU.IL.X86.Native {
 
 		public override void PostProcess(Indy.IL2CPU.Assembler.Assembler aAssembler) {
 			base.PostProcess(aAssembler);
-//			TypeDefinition xRuntimeEngineTypeDef = Engine.GetTypeDefinition(typeof(RuntimeEngineImpl).Assembly.GetName().Name, typeof(RuntimeEngineImpl).FullName);
-//			MethodDefinition xTheMethod = Engine.GetMethodDefinition(xRuntimeEngineTypeDef, "IDT_SetHandler", "System.Byte", "System.UInt32", "System.UInt16", xRuntimeEngineTypeDef.FullName + "/IDTEntryStruct/FlagsEnum");
-//			Engine.QueueMethod(xTheMethod);
-//			mIDTSetHandlerMethodName = new Label(xTheMethod).Name;
-//			X86.X86MethodHeaderOp.AssembleHeader(aAssembler, "___________REGISTER___ISRS_____", new int[0]);
-//			string xInterruptHandlerLabel = new Label(Engine.GetMethodDefinition(Engine.GetTypeDefinition("Indy.IL2CPU.IL.X86.Native", "Indy.IL2CPU.IL.X86.Native.RuntimeEngineImpl"), "InterruptHandler", "System.Byte", "System.Byte")).Name;
-//			int[] xInterruptsWithParam = new int[] { 8, 10, 11, 12, 13, 14 };
-//			for (int i = 0; i < 256; i++) {
-//				aAssembler.Add(new CPU.Push("0x" + i.ToString("X")));
-//				//if (i == 3) {
-//				//	aAssembler.Add(new Literal("xchg bx, bx"));
-//				//}
-//				aAssembler.Add(new CPU.Push("____INTERRUPT_HANDLER___" + i));
-//				aAssembler.Add(new CPU.Push("0x08"));
-//				aAssembler.Add(new CPU.Push("0x8E"));
-//				aAssembler.Add(new CPU.Call(mIDTSetHandlerMethodName));
-//			}
-//			X86.X86MethodFooterOp.AssembleFooter(0, aAssembler, new int[0], 0);
-//			for (int j = 0; j < 256; j++) {
-//				aAssembler.Add(new Label("____INTERRUPT_HANDLER___" + j));
-//				aAssembler.Add(new CPUNative.Cli());
-//				aAssembler.Add(new CPU.Push(j.ToString()));
-//				if (!xInterruptsWithParam.Contains(j)) {
-//					aAssembler.Add(new CPU.Push("0"));
-//				}
-//				aAssembler.Add(new CPU.JumpAlways("____INTERRUPT_HANDLER___GENERIC"));
-//			}
-//			aAssembler.Add(new Label("____INTERRUPT_HANDLER___GENERIC"));
-//			aAssembler.Add(new CPUNative.Pushad());
-//			aAssembler.Add(new CPU.Move("ax", "ds"));
-//			aAssembler.Add(new CPU.Push("eax"));
-//			aAssembler.Add(new CPU.Move("ds", "ax"));
-//			aAssembler.Add(new CPU.Move("es", "ax"));
-//			aAssembler.Add(new CPU.Move("fs", "ax"));
-//			aAssembler.Add(new CPU.Move("gs", "ax"));
-//			aAssembler.Add(new CPU.Call(xInterruptHandlerLabel));
-//			aAssembler.Add(new CPU.Pop("ebx"));
-//			aAssembler.Add(new CPU.Move("ds", "bx"));
-//			aAssembler.Add(new CPU.Move("es", "bx"));
-//			aAssembler.Add(new CPU.Move("fs", "bx"));
-//			aAssembler.Add(new CPU.Move("gs", "bx"));
-//			aAssembler.Add(new CPUNative.Popad());
-//			aAssembler.Add(new CPUNative.Sti());
-//			aAssembler.Add(new CPUNative.IRet());
+			TypeDefinition xRuntimeEngineTypeDef = Engine.GetTypeDefinition(typeof(RuntimeEngineImpl).Assembly.GetName().Name, typeof(RuntimeEngineImpl).FullName);
+			MethodDefinition xTheMethod = Engine.GetMethodDefinition(xRuntimeEngineTypeDef, "IDT_SetHandler", "System.Byte", "System.UInt32", "System.UInt16", xRuntimeEngineTypeDef.FullName + "/IDTEntryStruct/FlagsEnum");
+			Engine.QueueMethod(xTheMethod);
+			mIDTSetHandlerMethodName = new Label(xTheMethod).Name;
+			X86.X86MethodHeaderOp.AssembleHeader(aAssembler, "___________REGISTER___ISRS_____", new int[0]);
+			string xInterruptHandlerLabel = new Label(Engine.GetMethodDefinition(Engine.GetTypeDefinition("Indy.IL2CPU.IL.X86.Native", "Indy.IL2CPU.IL.X86.Native.RuntimeEngineImpl"), "InterruptHandler", "System.Byte", "System.Byte")).Name;
+			int[] xInterruptsWithParam = new int[] { 8, 10, 11, 12, 13, 14 };
+			for (int i = 0; i < 256; i++) {
+				aAssembler.Add(new CPU.Push("0x" + i.ToString("X")));
+				//if (i == 3) {
+				//	aAssembler.Add(new Literal("xchg bx, bx"));
+				//}
+				aAssembler.Add(new CPU.Push("____INTERRUPT_HANDLER___" + i));
+				aAssembler.Add(new CPU.Push("0x08"));
+				aAssembler.Add(new CPU.Push("0x8E"));
+				aAssembler.Add(new CPU.Call(mIDTSetHandlerMethodName));
+			}
+			X86.X86MethodFooterOp.AssembleFooter(0, aAssembler, new int[0], 0);
+			for (int j = 0; j < 256; j++) {
+				aAssembler.Add(new Label("____INTERRUPT_HANDLER___" + j));
+				aAssembler.Add(new CPUNative.Cli());
+				aAssembler.Add(new CPU.Push(j.ToString()));
+				if (!xInterruptsWithParam.Contains(j)) {
+					aAssembler.Add(new CPU.Push("0"));
+				}
+				aAssembler.Add(new CPU.JumpAlways("____INTERRUPT_HANDLER___GENERIC"));
+			}
+			aAssembler.Add(new Label("____INTERRUPT_HANDLER___GENERIC"));
+			aAssembler.Add(new CPUNative.Pushad());
+			aAssembler.Add(new CPU.Move("ax", "ds"));
+			aAssembler.Add(new CPU.Push("eax"));
+			aAssembler.Add(new CPU.Move("ds", "ax"));
+			aAssembler.Add(new CPU.Move("es", "ax"));
+			aAssembler.Add(new CPU.Move("fs", "ax"));
+			aAssembler.Add(new CPU.Move("gs", "ax"));
+			aAssembler.Add(new CPU.Call(xInterruptHandlerLabel));
+			aAssembler.Add(new CPU.Pop("ebx"));
+			aAssembler.Add(new CPU.Move("ds", "bx"));
+			aAssembler.Add(new CPU.Move("es", "bx"));
+			aAssembler.Add(new CPU.Move("fs", "bx"));
+			aAssembler.Add(new CPU.Move("gs", "bx"));
+			aAssembler.Add(new CPUNative.Popad());
+			aAssembler.Add(new CPUNative.Sti());
+			aAssembler.Add(new CPUNative.IRet());
 		}
 	}
 }
