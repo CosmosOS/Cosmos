@@ -27,7 +27,8 @@ namespace Indy.IL2CPU.IL.X86.Native.CustomImplementations.System {
 		private unsafe static void PutChar(int aLine, int aPos, byte aChar) {
 			int xScreenOffset = ((aPos + aLine * 80) * 2);
 			byte* xScreenPtr = (byte*)((0xB8000) + xScreenOffset);
-			byte xVal = (byte)((aChar/* + 1*/) & 0xFF);
+			byte xVal = aChar;
+			global::System.Diagnostics.Debugger.Break();
 			*xScreenPtr = xVal;
 			xScreenPtr += 1;
 			*xScreenPtr = 7;

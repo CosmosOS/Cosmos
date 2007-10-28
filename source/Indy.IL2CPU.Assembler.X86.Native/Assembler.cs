@@ -152,6 +152,7 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
 			mOutputWriter.WriteLine("; some more startups todo");
 			mOutputWriter.WriteLine("				 call " + EngineEntryPointLabelName);
 			mOutputWriter.WriteLine("			.loop:");
+			mOutputWriter.WriteLine("				 xchg bx, bx");
 			mOutputWriter.WriteLine("				 hlt");
 			mOutputWriter.WriteLine("				 jmp .loop");
 			mOutputWriter.WriteLine("                 ");
