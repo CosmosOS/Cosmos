@@ -31,13 +31,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU.IL.X86.Win32", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU.Assembler.X86.Native", "Indy.IL2CPU.Assembler.X86.Native\Indy.IL2CPU.Assembler.X86.Native.csproj", "{6597AAC6-755D-47F9-ACF4-E13F65EC5418}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU.NativeX86.Utilities", "Indy.IL2CPU.NativeX86.Utilities\Indy.IL2CPU.NativeX86.Utilities.csproj", "{BB58FFC3-A532-45BA-AAB2-28EB0451C2A1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel.Boot", "Cosmos.Kernel.Boot\Cosmos.Kernel.Boot.csproj", "{BB58FFC3-A532-45BA-AAB2-28EB0451C2A1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel", "Cosmos.Kernel\Cosmos.Kernel.csproj", "{EF5F012A-4AA4-4B4D-A318-6D228C1F30D8}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 18
+		SccNumberOfProjects = 17
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -83,15 +83,12 @@ Global
 		SccProjectUniqueName14 = Indy.IL2CPU.Assembler.X86.Native\\Indy.IL2CPU.Assembler.X86.Native.csproj
 		SccProjectName14 = Indy.IL2CPU.Assembler.X86.Native
 		SccLocalPath14 = Indy.IL2CPU.Assembler.X86.Native
-		SccProjectUniqueName15 = Indy.IL2CPU.NativeX86.Utilities\\Indy.IL2CPU.NativeX86.Utilities.csproj
-		SccProjectName15 = Indy.IL2CPU.NativeX86.Utilities
-		SccLocalPath15 = Indy.IL2CPU.NativeX86.Utilities
-		SccProjectUniqueName16 = Cosmos.Kernel\\Cosmos.Kernel.csproj
-		SccProjectName16 = Cosmos.Kernel
-		SccLocalPath16 = Cosmos.Kernel
-		SccProjectUniqueName17 = Indy.IL2CPU.IL.X86.Win32\\Indy.IL2CPU.IL.X86.Win32.csproj
-		SccProjectName17 = Indy.IL2CPU.IL.X86.Win32
-		SccLocalPath17 = Indy.IL2CPU.IL.X86.Win32
+		SccProjectUniqueName15 = Cosmos.Kernel\\Cosmos.Kernel.csproj
+		SccProjectName15 = Cosmos.Kernel
+		SccLocalPath15 = Cosmos.Kernel
+		SccProjectUniqueName16 = Indy.IL2CPU.IL.X86.Win32\\Indy.IL2CPU.IL.X86.Win32.csproj
+		SccProjectName16 = Indy.IL2CPU.IL.X86.Win32
+		SccLocalPath16 = Indy.IL2CPU.IL.X86.Win32
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

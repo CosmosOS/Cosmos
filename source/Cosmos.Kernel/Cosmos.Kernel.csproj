@@ -55,9 +55,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Indy.IL2CPU.NativeX86.Utilities\Indy.IL2CPU.NativeX86.Utilities.csproj">
+    <ProjectReference Include="..\Indy.IL2CPU.NativeX86.Utilities\Cosmos.Kernel.Boot.csproj">
       <Project>{BB58FFC3-A532-45BA-AAB2-28EB0451C2A1}</Project>
-      <Name>Indy.IL2CPU.NativeX86.Utilities</Name>
+      <Name>Cosmos.Kernel.Boot</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
