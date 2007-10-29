@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cosmos.Kernel.Boot.Glue;
 using Indy.IL2CPU.Assembler;
 using Indy.IL2CPU.IL.X86.Native.CustomImplementations.System;
 using Indy.IL2CPU.IL.X86.Native.CustomImplementations.System.Diagnostics;
@@ -11,6 +12,19 @@ using CPUNative = Indy.IL2CPU.Assembler.X86.Native;
 
 namespace Indy.IL2CPU.IL.X86.Native {
 	public class NativeOpCodeMap: X86.X86OpCodeMap {
+		internal static NativeOpCodeMap Instance;
+		public NativeOpCodeMap() {
+			Instance = this;
+		}
+
+		public MethodDefinition GetGlueMethod(GlueMethodTypeEnum aMethodType) {
+			CheckGlueMethod();
+			if (!mGlueMethods.ContainsKey(aMethodType)) {
+				throw new Exception("GlueMethod '" + aMethodType.ToString() + "' not implemented!");
+			}
+			return mGlueMethods[aMethodType];
+		}
+
 		protected override Type GetCustomMethodImplementationOp() {
 			return typeof(NativeCustomMethodImplementationOp);
 		}
@@ -19,8 +33,40 @@ namespace Indy.IL2CPU.IL.X86.Native {
 			return typeof(NativeMethodFooterOp);
 		}
 
+		protected override Type GetMainEntryPointOp() {
+			return typeof(NativeMainEntryMethodOp);
+		}
+
 		protected override Type GetMethodHeaderOp() {
 			return typeof(NativeMethodHeaderOp);
+		}
+
+		private SortedList<GlueMethodTypeEnum, MethodDefinition> mGlueMethods;
+
+		private void CheckGlueMethod() {
+			if (mGlueMethods != null) {
+				return;
+			}
+			mGlueMethods = new SortedList<GlueMethodTypeEnum, MethodDefinition>();
+			AssemblyDefinition xCrawledAsm = Engine.GetCrawledAssembly();
+			foreach (ModuleDefinition xModule in xCrawledAsm.Modules) {
+				foreach (TypeDefinition xType in xModule.Types) {
+					foreach (MethodDefinition xMethod in xType.Methods) {
+						CustomAttribute xAttrib = (from item in xMethod.CustomAttributes.Cast<CustomAttribute>()
+												   where item.Constructor.DeclaringType.FullName == typeof(GlueMethodAttribute).FullName
+												   select item).FirstOrDefault();
+						if (xAttrib == null) {
+							continue;
+						}
+						if (!xAttrib.Resolved) {
+							if (!xAttrib.Resolve()) {
+								throw new Exception("Couldn't resolve attribute on method '" + xMethod.GetFullName());
+							}
+						}
+						mGlueMethods.Add((GlueMethodTypeEnum)xAttrib.Properties["MethodType"], xMethod);
+					}
+				}
+			}
 		}
 
 		public override MethodReference GetCustomMethodImplementation(string aOrigMethodName, bool aInMetalMode) {
@@ -71,7 +117,9 @@ namespace Indy.IL2CPU.IL.X86.Native {
 				case "System_Void___Indy_IL2CPU_IL_X86_Native_RuntimeEngineImpl_GDT_RegisterGDT____": {
 						return true;
 					}
-
+				case "System_Void___Indy_IL2CPU_RuntimeEngine_Heap_Initialize____": {
+						return true;
+					}
 				case "System_Void___System_Diagnostics_Debugger_Break____": {
 						return true;
 					}
@@ -99,6 +147,9 @@ namespace Indy.IL2CPU.IL.X86.Native {
 					}
 				case "System_Void___Indy_IL2CPU_IL_X86_Native_RuntimeEngineImpl_IDT_LoadArray____": {
 						DoAssemble_IDT_LoadArray(aAssembler, aMethodInfo);
+						return;
+					}
+				case "System_Void___Indy_IL2CPU_RuntimeEngine_Heap_Initialize____": {
 						return;
 					}
 				case "System_Void___Indy_IL2CPU_IL_X86_Native_RuntimeEngineImpl_IDT_RegisterIDT____": {

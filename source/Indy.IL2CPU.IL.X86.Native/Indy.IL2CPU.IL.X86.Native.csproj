@@ -58,8 +58,8 @@
     <Compile Include="CustomImplementations\System\Diagnostics\DebugImpl.cs" />
     <Compile Include="CustomImplementations\System\ByteImpl.cs" />
     <Compile Include="DebugHelper.cs" />
-    <Compile Include="MultiBootInfoStruct.cs" />
     <Compile Include="NativeCustomMethodImplementationOp.cs" />
+    <Compile Include="NativeMainEntryMethodOp.cs" />
     <Compile Include="NativeOpCodeMap.cs" />
     <Compile Include="NativePutCharOp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -74,6 +74,10 @@
     <Compile Include="RuntimeEngineImpl\PIT.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Cosmos.Kernel.Boot.Glue\Cosmos.Kernel.Boot.Glue.csproj">
+      <Project>{28584689-B678-4863-B404-0AD46B2F2B63}</Project>
+      <Name>Cosmos.Kernel.Boot.Glue</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Indy.IL2CPU.Assembler.X86.Native\Indy.IL2CPU.Assembler.X86.Native.csproj">
       <Project>{6597AAC6-755D-47F9-ACF4-E13F65EC5418}</Project>
       <Name>Indy.IL2CPU.Assembler.X86.Native</Name>

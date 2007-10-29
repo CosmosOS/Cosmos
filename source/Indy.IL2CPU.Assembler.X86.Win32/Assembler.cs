@@ -43,7 +43,7 @@ namespace Indy.IL2CPU.Assembler.X86.Win32 {
 					break;
 			}
 			if (mOutputType != OutputTypeEnum.DLL) {
-				mOutputWriter.WriteLine("entry " + EntryPointLabelName);
+				mOutputWriter.WriteLine("entry " + EntryPointName);
 			}
 			mOutputWriter.WriteLine("stack 0x{0}", StackSize.ToString("X"));
 		}

@@ -35,9 +35,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel.Boot", "Cosmo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel", "Cosmos.Kernel\Cosmos.Kernel.csproj", "{EF5F012A-4AA4-4B4D-A318-6D228C1F30D8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cosmos", "Cosmos", "{F09F8827-415C-4A53-BE25-3ED4B963AC77}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel.Boot.Glue", "Cosmos.Kernel.Boot.Glue\Cosmos.Kernel.Boot.Glue.csproj", "{28584689-B678-4863-B404-0AD46B2F2B63}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 17
+		SccNumberOfProjects = 19
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -84,11 +88,20 @@ Global
 		SccProjectName14 = Indy.IL2CPU.Assembler.X86.Native
 		SccLocalPath14 = Indy.IL2CPU.Assembler.X86.Native
 		SccProjectUniqueName15 = Cosmos.Kernel\\Cosmos.Kernel.csproj
+		SccProjectTopLevelParentUniqueName15 = IL2CPU.sln
 		SccProjectName15 = Cosmos.Kernel
 		SccLocalPath15 = Cosmos.Kernel
 		SccProjectUniqueName16 = Indy.IL2CPU.IL.X86.Win32\\Indy.IL2CPU.IL.X86.Win32.csproj
 		SccProjectName16 = Indy.IL2CPU.IL.X86.Win32
 		SccLocalPath16 = Indy.IL2CPU.IL.X86.Win32
+		SccProjectUniqueName17 = Cosmos.Kernel.Boot\\Cosmos.Kernel.Boot.csproj
+		SccProjectTopLevelParentUniqueName17 = IL2CPU.sln
+		SccProjectName17 = Cosmos.Kernel.Boot
+		SccLocalPath17 = Cosmos.Kernel.Boot
+		SccProjectUniqueName18 = Cosmos.Kernel.Boot.Glue\\Cosmos.Kernel.Boot.Glue.csproj
+		SccProjectTopLevelParentUniqueName18 = IL2CPU.sln
+		SccProjectName18 = Cosmos.Kernel.Boot.Glue
+		SccLocalPath18 = Cosmos.Kernel.Boot.Glue
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -162,8 +175,17 @@ Global
 		{EF5F012A-4AA4-4B4D-A318-6D228C1F30D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EF5F012A-4AA4-4B4D-A318-6D228C1F30D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EF5F012A-4AA4-4B4D-A318-6D228C1F30D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28584689-B678-4863-B404-0AD46B2F2B63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28584689-B678-4863-B404-0AD46B2F2B63}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28584689-B678-4863-B404-0AD46B2F2B63}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28584689-B678-4863-B404-0AD46B2F2B63}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{EF5F012A-4AA4-4B4D-A318-6D228C1F30D8} = {F09F8827-415C-4A53-BE25-3ED4B963AC77}
+		{BB58FFC3-A532-45BA-AAB2-28EB0451C2A1} = {F09F8827-415C-4A53-BE25-3ED4B963AC77}
+		{28584689-B678-4863-B404-0AD46B2F2B63} = {F09F8827-415C-4A53-BE25-3ED4B963AC77}
 	EndGlobalSection
 EndGlobal

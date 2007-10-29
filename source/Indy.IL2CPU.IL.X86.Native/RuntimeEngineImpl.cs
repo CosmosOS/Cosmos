@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using Cosmos.Kernel.Boot.Glue;
 
 namespace Indy.IL2CPU.IL.X86.Native {
 	public static partial class RuntimeEngineImpl {
-		public static MultiBootInfoStruct mMultibootInfo;
+		private static void LoadBootInformation(ref BootInformationStruct aBootInfo) {
+			// implemented using Gluemethods
+		}
+
 		public static void InitializeEngine() {
-			Console.Clear();
+			//Console.Clear();
 //			Debug.WriteLine("Loading GDT");
 //			SetupGDT();
 //			Debug.WriteLine("Slowing down PIT");

@@ -6,6 +6,7 @@ using System.Text;
 namespace Indy.IL2CPU {
 	public static partial class RuntimeEngine {
 		public static void InitializeApplication() {
+			//Console.WriteLine("Initial Setup");
 			// do initialization of all runtime services, like heap and GC..
 			InitializeEngine();
 			Heap_Initialize();

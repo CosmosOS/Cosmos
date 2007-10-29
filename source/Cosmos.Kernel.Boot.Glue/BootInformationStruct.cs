@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace Multiboot
-{
-	public struct BootInformationStruct
-	{
+namespace Cosmos.Kernel.Boot.Glue {
+	public struct BootInformationStruct {
 		public uint Flags;
 		public uint MemLower;
 		public uint MemUpper;

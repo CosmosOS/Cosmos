@@ -18,6 +18,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public override void Call(MethodDefinition aMethod) {
+			Engine.QueueMethod(aMethod);
 			Assembler.Add(new CPUx86.Call(new CPU.Label(aMethod).Name));
 			if(!aMethod.ReturnType.ReturnType.FullName.StartsWith("System.Void")) {
 				Assembler.Add(new CPUx86.Pushd("eax"));

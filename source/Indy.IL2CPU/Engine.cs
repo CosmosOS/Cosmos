@@ -86,8 +86,6 @@ namespace Indy.IL2CPU {
 		protected List<TypeDefinition> mTypes = new List<TypeDefinition>();
 		protected TypeDefinitionEqualityComparer mTypesEqualityComparer = new TypeDefinitionEqualityComparer();
 
-		public const string EntryPointName = "__ENGINE_ENTRYPOINT__";
-
 		/// <summary>
 		/// Compiles an assembly to CPU-specific code. The entrypoint of the assembly will be 
 		/// crawled to see what is neccessary, same goes for all dependencies.
@@ -172,7 +170,7 @@ namespace Indy.IL2CPU {
 						// initialize the runtime engine
 						MainEntryPointOp xEntryPointOp = (MainEntryPointOp)GetOpFromType(mMap.MainEntryPointOp, null, null);
 						xEntryPointOp.Assembler = mAssembler;
-						xEntryPointOp.Enter(Assembler.Assembler.EngineEntryPointLabelName);
+						xEntryPointOp.Enter(Assembler.Assembler.EntryPointName);
 						xEntryPointOp.Call(RuntimeEngineRefs.InitializeApplicationRef);
 						if (!aInMetalMode) {
 							xEntryPointOp.Call("____INIT__VMT____");
@@ -663,7 +661,7 @@ namespace Indy.IL2CPU {
 								xTheSize = 4;
 							}
 							if (xTheSize < 4) {
-								xTheSize = 4;
+//								xTheSize = 4;
 							}
 							if (xTheSize == 4) {
 								theType = "dd";
@@ -1024,6 +1022,13 @@ namespace Indy.IL2CPU {
 			} else {
 				return mCurrent.mTypes.IndexOf(xFoundItem);
 			}
+		}
+
+		public static AssemblyDefinition GetCrawledAssembly() {
+			if (mCurrent == null) {
+				throw new Exception("ERROR: No Current Engine found!");
+			}
+			return mCurrent.mCrawledAssembly;
 		}
 
 		public static void QueueMethodRef(MethodReference aMethod) {
