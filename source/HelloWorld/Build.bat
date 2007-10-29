@@ -1,5 +1,4 @@
 cd bin\debug
-..\..\..\IL2CPU\bin\debug\IL2CPU.exe -in:HelloWorld.exe -out:output.asm
-@REM FASM must be in the path
-fasm.exe output.asm
+..\..\..\IL2CPU\bin\debug\IL2CPU -in:HelloWorld.exe -out:output.asm
+..\..\..\..\tools\fasm\fasm output.asm
 @pause
