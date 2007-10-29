@@ -23,16 +23,26 @@ namespace Indy.IL2CPU.IL.X86 {
 				Move(aAssembler, "[ebx + " + (i * 4) + "]", "eax");
 			}
 			switch (aSize % 4) {
+				case 0: {
+						break;
+					}
 				case 1: {
-					Move(aAssembler, "eax", "[esp + " + ((aSize / 4) * 4) + "]");
-					Move(aAssembler, "[ebx + " + ((aSize / 4) * 4) + "]", "al");
-					break;
-				}
+						Move(aAssembler, "eax", "[esp + " + ((aSize / 4) * 4) + "]");
+						Move(aAssembler, "[ebx + " + ((aSize / 4) * 4) + "]", "al");
+						break;
+					}
 				case 2: {
-					Move(aAssembler, "eax", "[esp + " + ((aSize / 4) * 4) + "]");
-					Move(aAssembler, "[ebx + " + ((aSize / 4) * 4) + "]", "ax");
-					break;
-				}
+						Move(aAssembler, "eax", "[esp + " + ((aSize / 4) * 4) + "]");
+						Move(aAssembler, "[ebx + " + ((aSize / 4) * 4) + "]", "ax");
+						break;
+					}
+				case 3: {
+						Move(aAssembler, "eax", "[esp + " + ((aSize / 4) * 4) + "]");
+						Move(aAssembler, "[ebx + " + ((aSize / 4) * 4) + "]", "ax");
+						Move(aAssembler, "eax", "[esp + " + (((aSize / 4) * 4) + 2) + "]");
+						Move(aAssembler, "[ebx + " + (((aSize / 4) * 4) + 2) + "]", "al");
+						break;
+					}
 				default:
 					throw new Exception("Error, shouldn't occur");
 			}
