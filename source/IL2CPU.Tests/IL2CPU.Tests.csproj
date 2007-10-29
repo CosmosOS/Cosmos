@@ -163,11 +163,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="FASM.EXE">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Tests\buildalltests.bat" />
     <None Include="Tests\SimpleStructTest\SimpleStructTest.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using Indy.IL2CPU;
-using Indy.IL2CPU.IL.X86;
 using Indy.IL2CPU.IL.X86.Win32;
 using Indy.IL2CPU.IL.X86.Native;
 
@@ -12,11 +12,12 @@ namespace IL2CPU {
 	public class Program {
 		public static string InputFile;
 		public static string OutputFile;
+		public static string AsmFile;
 		public static bool MetalMode;
 		public static TargetPlatformEnum TargetPlatform = TargetPlatformEnum.Win32;
 
-		private Type win32Type = typeof (Win32OpCodeMap);
-		private Type nativeType = typeof (NativeOpCodeMap);
+		private Type win32Type = typeof(Win32OpCodeMap);
+		private Type nativeType = typeof(NativeOpCodeMap);
 
 		private static bool ParseArguments(IEnumerable<string> aArgs) {
 			Console.WriteLine("Indy IL2CPU");
@@ -47,6 +48,10 @@ namespace IL2CPU {
 							if (OutputFile.StartsWith("\"") && OutputFile.EndsWith("\"")) {
 								OutputFile = OutputFile.Substring(1, OutputFile.Length - 2);
 							}
+							break;
+						}
+					case "asm": {
+							AsmFile = xArgParts[1];
 							break;
 						}
 					case "metal":
@@ -92,6 +97,12 @@ namespace IL2CPU {
 			return true;
 		}
 
+		private static string FasmFileName {
+			get {
+				return Path.Combine(Path.Combine(Path.Combine(Directory.GetParent(typeof(Program).Assembly.Location).Parent.Parent.Parent.Parent.FullName, "Tools"), "fasm"), "fasm.exe");
+			}
+		}
+
 		public static int Main(string[] args) {
 			//System.Diagnostics.Debugger.Break();
 			try {
@@ -104,10 +115,29 @@ namespace IL2CPU {
 						Console.WriteLine(aMessage);
 						Console.ResetColor();
 					};
-					using (FileStream fs = new FileStream(OutputFile, FileMode.Create)) {
+					bool xCleanupAsm = String.IsNullOrEmpty(AsmFile);
+					if(xCleanupAsm) {
+						AsmFile = Path.GetTempFileName();
+					}
+					using (FileStream fs = new FileStream(AsmFile, FileMode.Create)) {
 						using (StreamWriter br = new StreamWriter(fs)) {
 							e.Execute(InputFile, TargetPlatform, br, MetalMode);
 						}
+					}
+					ProcessStartInfo xFasmStartInfo = new ProcessStartInfo();
+					xFasmStartInfo.FileName = FasmFileName;
+					xFasmStartInfo.Arguments = String.Format("\"{0}\" \"{1}\"", AsmFile, OutputFile);
+					xFasmStartInfo.UseShellExecute = false;
+					xFasmStartInfo.RedirectStandardError = true;
+					xFasmStartInfo.RedirectStandardOutput = true;
+					Console.WriteLine("fasm = '{0}'", FasmFileName);
+					Process xFasm = Process.Start(xFasmStartInfo);
+					xFasm.Start();
+					if (!xFasm.WaitForExit(60 * 1000) || xFasm.ExitCode != 0) {
+						Console.WriteLine("Error while running FASM!");
+						Console.Write(xFasm.StandardOutput.ReadToEnd());
+						Console.Write(xFasm.StandardError.ReadToEnd());
+						return 3;
 					}
 				} else {
 					return 1;

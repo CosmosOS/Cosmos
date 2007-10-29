@@ -9,15 +9,19 @@ namespace IL2CPU.Tests {
 	public enum TestRunStateEnum {
 		NotRan,
 		TimeoutWhileRunningIL2CPU,
-		TimeoutWhileRunningFasm,
-		CompileErrorFromFasm,
 		TimeoutWhileRunningTest,
 		WrongReturnCodeFromTest,
 		Passed
 	}
+
 	class Program {
 		public const int TestTimeout_Seconds = 60;
 		public const int TestTimeout_Milliseconds = TestTimeout_Seconds * 1000;
+		private static string IL2CPUFileName {
+			get {
+				return Path.Combine(Path.Combine(Directory.GetParent(typeof (Program).Assembly.Location).Parent.Parent.Parent.FullName, "Tools"), "IL2CPU.exe");
+			}
+		}
 		static void Main(string[] args) {
 			SortedList<string, TestRunStateEnum> xTests = new SortedList<string, TestRunStateEnum>();
 			Console.WriteLine("IL2CPU Tester. Please be patient while all tests are executed");
@@ -30,13 +34,12 @@ namespace IL2CPU.Tests {
 			Console.WriteLine("Found {0} tests. Executing now:", xTests.Count);
 			for (int i = 0; i < xTests.Count; i++) {
 				string xTestExe = xTests.Keys[i];
-				string xActualOutputFile = Path.GetTempFileName();
 				try {
 					ProcessStartInfo xStartInfo = new ProcessStartInfo();
 					xStartInfo.CreateNoWindow = true;
 					xStartInfo.UseShellExecute = false;
-					xStartInfo.FileName = Path.Combine(xBaseDir, "IL2CPU.exe");
-					xStartInfo.Arguments = "-in:\"" + xTestExe + "\" -out:\"" + xActualOutputFile + "\"";
+					xStartInfo.FileName = IL2CPUFileName;
+					xStartInfo.Arguments = "-in:\"" + xTestExe + "\" -out:\"" + xTestExe + ".exe\"";
 					xStartInfo.RedirectStandardError = true;
 					xStartInfo.RedirectStandardOutput = true;
 					using (Process xProc = Process.Start(xStartInfo)) {
@@ -56,34 +59,6 @@ namespace IL2CPU.Tests {
 							foreach (string s in lines) {
 								Console.WriteLine("\t" + s);
 							}
-							continue;
-						}
-					}
-					xStartInfo = new ProcessStartInfo();
-					xStartInfo.CreateNoWindow = true;
-					xStartInfo.UseShellExecute = false;
-					xStartInfo.FileName = Path.Combine(xBaseDir, "fasm.exe");
-					xStartInfo.Arguments = "\"" + xActualOutputFile + "\" \"" + xTestExe + ".exe\"";
-					xStartInfo.RedirectStandardError = true;
-					xStartInfo.RedirectStandardOutput = true;
-					using (Process xProc = Process.Start(xStartInfo)) {
-						if (!xProc.WaitForExit(TestTimeout_Milliseconds)) {
-							xTests[xTestExe] = TestRunStateEnum.TimeoutWhileRunningFasm;
-							Console.Write("A");
-							continue;
-						}
-						if(!File.Exists(xTestExe + ".exe")) {
-							Console.WriteLine("Result of '" + xTestExe.Substring(xBaseDir.Length + 1) + "':");
-							string[] lines = xProc.StandardOutput.ReadToEnd().Split(new string[] {"\r\n"}, StringSplitOptions.None);
-							foreach(string s in lines) {
-								Console.WriteLine("\t" + s);
-							}
-							lines = xProc.StandardError.ReadToEnd().Split(new string[] { "\r\n" }, StringSplitOptions.None);
-							foreach (string s in lines) {
-								Console.WriteLine("\t" + s);
-							}
-							xTests[xTestExe] = TestRunStateEnum.CompileErrorFromFasm;
-							Console.Write("C");
 							continue;
 						}
 					}
@@ -112,7 +87,6 @@ namespace IL2CPU.Tests {
 					Console.WriteLine(E.ToString());
 
 				} finally {
-					File.Delete(xActualOutputFile);
 					if (File.Exists(xTestExe + ".exe")) {
 						try {
 							File.Delete(xTestExe + ".exe");
