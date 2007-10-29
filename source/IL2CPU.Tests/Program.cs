@@ -19,7 +19,7 @@ namespace IL2CPU.Tests {
 		public const int TestTimeout_Milliseconds = TestTimeout_Seconds * 1000;
 		private static string IL2CPUFileName {
 			get {
-				return Path.Combine(Path.Combine(Directory.GetParent(typeof (Program).Assembly.Location).Parent.Parent.Parent.FullName, "Tools"), "IL2CPU.exe");
+				return Path.Combine(Path.GetDirectoryName(typeof(Program).Assembly.Location), "IL2CPU.exe");
 			}
 		}
 		static void Main(string[] args) {
@@ -48,7 +48,7 @@ namespace IL2CPU.Tests {
 							Console.Write("E");
 							continue;
 						}
-						if(xProc.ExitCode != 0) {
+						if (xProc.ExitCode != 0) {
 							Console.Write("E");
 							Console.WriteLine("Result of running IL2CPU on '" + xTestExe.Substring(xBaseDir.Length + 1) + ":");
 							string[] lines = xProc.StandardOutput.ReadToEnd().Split(new string[] { "\r\n" }, StringSplitOptions.None);
@@ -82,7 +82,7 @@ namespace IL2CPU.Tests {
 					}
 					xTests[xTestExe] = TestRunStateEnum.Passed;
 					Console.Write(".");
-				} catch(Exception E) {
+				} catch (Exception E) {
 					Console.WriteLine("Error while running test '" + xTestExe + "':");
 					Console.WriteLine(E.ToString());
 
@@ -108,7 +108,7 @@ namespace IL2CPU.Tests {
 					foreach (string x in (from item in xTests
 										  where item.Value.ToString() == s
 										  select item.Key)) {
-						Console.WriteLine("\t" + x.Substring(xBaseTestsDir.Length+1));
+						Console.WriteLine("\t" + x.Substring(xBaseTestsDir.Length + 1));
 					}
 
 				}

@@ -1,4 +1,4 @@
 cd bin\debug
-..\..\..\IL2CPU\bin\debug\IL2CPU -in:HelloWorld.exe -out:output.asm
-..\..\..\..\tools\fasm\fasm output.asm
+..\..\..\IL2CPU\bin\debug\IL2CPU -in:HelloWorld.exe -out:output.exe
+cd ..\..\
 @pause
