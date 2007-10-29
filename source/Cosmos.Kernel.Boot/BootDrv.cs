@@ -14,7 +14,8 @@ namespace Cosmos.Kernel.Boot {
 
 		public static void Main() {
 			Console.WriteLine("This is CosmOS Booting...");
-//			if (!BootInfoSet) {
+			Console.WriteLine("This is CosmOS Booting...");
+			//			if (!BootInfoSet) {
 //				Console.WriteLine("No boot info available, terminating!");
 //				return;
 //			}

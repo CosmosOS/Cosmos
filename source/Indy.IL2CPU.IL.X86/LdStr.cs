@@ -31,8 +31,10 @@ namespace Indy.IL2CPU.IL.X86 {
 					xDataName = Assembler.GetIdentifier("StringLiteral");
 					Assembler.DataMembers.Add(new DataMember(xDataName, "dd", xDataName + "__Contents"));
 					Assembler.DataMembers.Add(new DataMember(xDataName + "__Contents", "db", xDataVal));
+				} else {
+					xDataName = xDataName.Substring(0, xDataName.Length - "__Contents".Length);
 				}
-				Move(Assembler, "eax", xDataName);
+				Move(Assembler, "eax", "[" + xDataName + "]");
 				Pushd(4, "eax");
 			} else {
 				var xDataByteArray = new StringBuilder();

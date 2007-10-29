@@ -99,9 +99,8 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
 			mOutputWriter.WriteLine("                mov esp,Kernel_Stack ");
 			mOutputWriter.WriteLine("");
 			mOutputWriter.WriteLine("; some more startups todo");
-			//mOutputWriter.WriteLine("				 push ebx");
 			mOutputWriter.WriteLine("				 cli");
-			mOutputWriter.WriteLine("				 xchg bx, bx");
+			mOutputWriter.WriteLine("				 push ebx");
 			mOutputWriter.WriteLine("				 call " + EntryPointName);
 			mOutputWriter.WriteLine("			.loop:");
 			mOutputWriter.WriteLine("				 xchg bx, bx");
