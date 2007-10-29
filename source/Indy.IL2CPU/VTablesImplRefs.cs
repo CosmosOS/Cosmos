@@ -8,6 +8,7 @@ using Mono.Cecil;
 namespace Indy.IL2CPU {
 	public static class VTablesImplRefs {
 		public static readonly AssemblyDefinition RuntimeAssemblyDef;
+		public static readonly TypeDefinition VTablesImplDef;
 		public static readonly MethodDefinition LoadTypeTableRef;
 		public static readonly MethodDefinition SetTypeInfoRef;
 		public static readonly MethodDefinition SetMethodInfoRef;
@@ -15,19 +16,19 @@ namespace Indy.IL2CPU {
 
 		static VTablesImplRefs() {
 			RuntimeAssemblyDef = AssemblyFactory.GetAssembly(typeof(VTablesImpl).Assembly.Location);
-			TypeDefinition xType = null;
+			VTablesImplDef = null;
 			foreach (ModuleDefinition xMod in RuntimeAssemblyDef.Modules) {
 				if (xMod.Types.Contains(typeof(VTablesImpl).FullName)) {
-					xType = xMod.Types[typeof(VTablesImpl).FullName];
+					VTablesImplDef = xMod.Types[typeof(VTablesImpl).FullName];
 					break;
 				}
 			}
-			if (xType == null) {
+			if (VTablesImplDef == null) {
 				throw new Exception("RuntimeEngine type not found!");
 			}
 			foreach (FieldInfo xField in typeof(VTablesImplRefs).GetFields()) {
 				if (xField.Name.EndsWith("Ref")) {
-					MethodDefinition xTempMethod = xType.Methods.GetMethod(xField.Name.Substring(0, xField.Name.Length - "Ref".Length)).FirstOrDefault();
+					MethodDefinition xTempMethod = VTablesImplDef.Methods.GetMethod(xField.Name.Substring(0, xField.Name.Length - "Ref".Length)).FirstOrDefault();
 					if (xTempMethod == null) {
 						throw new Exception("Method '" + xField.Name.Substring(0, xField.Name.Length - "Ref".Length) + "' not found on RuntimeEngine!");
 					}

@@ -65,6 +65,13 @@ namespace Indy.IL2CPU.IL.X86.Native {
 				case "System_Void___Indy_IL2CPU_IL_X86_Native_RuntimeEngineImpl_IDT_RegisterIDT____": {
 						return true;
 					}
+				case "System_Void___Indy_IL2CPU_IL_X86_Native_RuntimeEngineImpl_GDT_LoadArray____": {
+						return true;
+					}
+				case "System_Void___Indy_IL2CPU_IL_X86_Native_RuntimeEngineImpl_GDT_RegisterGDT____": {
+						return true;
+					}
+
 				case "System_Void___System_Diagnostics_Debugger_Break____": {
 						return true;
 					}
@@ -96,6 +103,14 @@ namespace Indy.IL2CPU.IL.X86.Native {
 					}
 				case "System_Void___Indy_IL2CPU_IL_X86_Native_RuntimeEngineImpl_IDT_RegisterIDT____": {
 						DoAssemble_IDT_RegisterIDT(aAssembler, aMethodInfo);
+						return;
+					}
+				case "System_Void___Indy_IL2CPU_IL_X86_Native_RuntimeEngineImpl_GDT_LoadArray____": {
+						DoAssemble_GDT_LoadArray(aAssembler, aMethodInfo);
+						return;
+					}
+				case "System_Void___Indy_IL2CPU_IL_X86_Native_RuntimeEngineImpl_GDT_RegisterGDT____": {
+						DoAssemble_GDT_RegisterGDT(aAssembler, aMethodInfo);
 						return;
 					}
 				case "System_Void___System_Diagnostics_Debugger_Break____": {
@@ -142,7 +157,51 @@ namespace Indy.IL2CPU.IL.X86.Native {
 			aAssembler.Add(new CPUNative.Sti());
 		}
 
+		private void DoAssemble_GDT_RegisterGDT(Assembler.Assembler aAssembler, MethodInformation aInfo) {
+			TypeDefinition xRuntimeEngineTypeDef = Engine.GetTypeDefinition(typeof(RuntimeEngineImpl).Assembly.GetName().Name, typeof(RuntimeEngineImpl).FullName);
+			FieldDefinition xFieldDef = xRuntimeEngineTypeDef.Fields.GetField("mGDTPointer");
+			string xPointerFieldName;
+			Engine.QueueStaticField(xFieldDef, out xPointerFieldName);
+			aAssembler.Add(new CPU.Move("eax", xPointerFieldName));
+			//aAssembler.Add(new Literal("XCHG BX, BX "));
+			aAssembler.Add(new CPUNative.Cli());
+			aAssembler.Add(new CPUNative.Lgdt("eax"));
+			aAssembler.Add(new CPU.Move("eax", "0x8"));
+			//aAssembler.Add(new CPU.Move("ds", "ax"));
+			//aAssembler.Add(new CPU.Move("es", "ax"));
+			//aAssembler.Add(new CPU.Move("fs", "ax"));
+			//aAssembler.Add(new CPU.Move("gs", "ax"));
+			//aAssembler.Add(new CPU.Move("ss", "ax"));
+			aAssembler.Add(new CPU.JumpAlways("0x0008:flush____gdt______table"));
+			aAssembler.Add(new Label("flush____gdt______table"));
+			//aAssembler.Add(new CPUNative.Sti());
+		}
+
+
 		private string mIDTSetHandlerMethodName;
+
+		private void DoAssemble_GDT_LoadArray(Assembler.Assembler aAssembler, MethodInformation aMethodInfo) {
+			TypeDefinition xRuntimeEngineTypeDef = Engine.GetTypeDefinition(typeof(RuntimeEngineImpl).Assembly.GetName().Name, typeof(RuntimeEngineImpl).FullName);
+			FieldDefinition xFieldDef = xRuntimeEngineTypeDef.Fields.GetField("mGDTEntries");
+			string xFieldName = Assembler.DataMember.GetStaticFieldName(xFieldDef);
+			string xFieldData = "0,0,0,0,2,0,0,0,1,0,0,0";
+			for (int i = 0; i < 3; i++) {
+				xFieldData += ",0,0,0,0,0,0,0,0";
+			}
+			aAssembler.DataMembers.RemoveAll(delegate(DataMember aItem) {
+				return aItem.Name == xFieldName;
+			});
+			aAssembler.DataMembers.Add(new DataMember(xFieldName, "dd", xFieldName));
+			aAssembler.DataMembers.Add(new DataMember(xFieldName + "___Contents", "db", xFieldData));
+			xFieldDef = xRuntimeEngineTypeDef.Fields.GetField("mGDTPointer");
+			string xPointerFieldName;
+			Engine.QueueStaticField(xFieldDef, out xPointerFieldName);
+			aAssembler.Add(new CPU.Move("eax", xPointerFieldName));
+			aAssembler.Add(new CPU.Move("word [eax]", "0x" + ((8 * 3) - 1).ToString("X")));
+			aAssembler.Add(new CPU.Move("ecx", xFieldName));
+			aAssembler.Add(new CPU.Add("ecx", "0xC"));
+			aAssembler.Add(new CPU.Move("dword [eax + 2]", "ecx"));
+		}
 
 		private void DoAssemble_IDT_LoadArray(Indy.IL2CPU.Assembler.Assembler aAssembler, MethodInformation aMethodInfo) {
 			//aAssembler.Add(new Literal("XCHG BX, BX "));
@@ -159,7 +218,7 @@ namespace Indy.IL2CPU.IL.X86.Native {
 			aAssembler.DataMembers.RemoveAll(delegate(DataMember aItem) {
 				return aItem.Name == xFieldName;
 			});
-			aAssembler.DataMembers.Add(new DataMember(xFieldName, "dd", xFieldName));
+			aAssembler.DataMembers.Add(new DataMember(xFieldName, "dd", xFieldName + "___Contents"));
 			aAssembler.DataMembers.Add(new DataMember(xFieldName + "___Contents", "db", xFieldData));
 			xFieldDef = xRuntimeEngineTypeDef.Fields.GetField("mIDTPointer");
 			string xPointerFieldName;
@@ -177,6 +236,7 @@ namespace Indy.IL2CPU.IL.X86.Native {
 
 		public override void PostProcess(Indy.IL2CPU.Assembler.Assembler aAssembler) {
 			base.PostProcess(aAssembler);
+			return;
 			TypeDefinition xRuntimeEngineTypeDef = Engine.GetTypeDefinition(typeof(RuntimeEngineImpl).Assembly.GetName().Name, typeof(RuntimeEngineImpl).FullName);
 			MethodDefinition xTheMethod = Engine.GetMethodDefinition(xRuntimeEngineTypeDef, "IDT_SetHandler", "System.Byte", "System.UInt32", "System.UInt16", xRuntimeEngineTypeDef.FullName + "/IDTEntryStruct/FlagsEnum");
 			Engine.QueueMethod(xTheMethod);

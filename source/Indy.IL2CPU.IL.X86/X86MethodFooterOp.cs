@@ -56,7 +56,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				int xLocalSize = aLocalsSizes[j];
 				aAssembler.Add(new CPU.Add("esp", "0x" + xLocalSize.ToString("X")));
 			}
-			aAssembler.Add(new CPU.Pop("ebp"));
+			aAssembler.Add(new CPU.Popd("ebp"));
 			aAssembler.Add(new CPU.Ret(aTotalArgsSize == 0 ? "" : aTotalArgsSize.ToString()));
 		}
 	}

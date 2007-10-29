@@ -1,6 +1,4 @@
-﻿// this file supports the VERBOSE_DEBUG define. this makes it emit a bunch of comments in the assembler output.
-// note that the tests are supposed to NOT include these comments
-#define VERBOSE_DEBUG
+﻿#define VERBOSE_DEBUG
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -198,6 +196,19 @@ namespace Indy.IL2CPU {
 							GenerateVMT();
 						}
 						mMap.PostProcess(mAssembler);
+//						if(!aInMetalMode) {
+//							FieldDefinition xFieldDef = VTablesImplRefs.VTablesImplDef.Fields.GetField("mIDTEntries");
+//							string xFieldName = Assembler.DataMember.GetStaticFieldName(xFieldDef);
+//							string xFieldData = "0,0,0,0,2,0,0,0,1,0,0,0";
+//							for (int i = 0; i < 256; i++) {
+//								xFieldData += ",0,0,0,0,0,0,0,0";
+//							}
+//							mAssembler.DataMembers.RemoveAll(delegate(DataMember aItem) {
+//								return aItem.Name == xFieldName;
+//							});
+//							mAssembler.DataMembers.Add(new DataMember(xFieldName, "dd", xFieldName + "___Contents"));
+//							mAssembler.DataMembers.Add(new DataMember(xFieldName + "___Contents", "db", xFieldData));
+//						}
 						ProcessAllStaticFields();
 					} finally {
 						mAssembler.Flush();
@@ -235,8 +246,6 @@ namespace Indy.IL2CPU {
 			xOp.Assembler = mAssembler;
 			xOp.Assemble();
 		}
-
-
 
 		private void ScanForMethodToIncludeForVMT() {
 			List<TypeDefinition> xCheckedTypes = new List<TypeDefinition>();
