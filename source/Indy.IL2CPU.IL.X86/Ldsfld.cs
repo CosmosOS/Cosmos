@@ -16,14 +16,14 @@ namespace Indy.IL2CPU.IL.X86 {
 			FieldReference xField = (FieldReference)aInstruction.Operand;
 			mSize = Engine.GetFieldStorageSize(xField.FieldType);
 			mIsReference = Engine.GetDefinitionFromTypeReference(xField.FieldType).IsClass;
-			Engine.QueueStaticField(Engine.GetDefinitionFromFieldReference( xField));
+			Engine.QueueStaticField(Engine.GetDefinitionFromFieldReference(xField), out mDataName);
 		}
 		public override void DoAssemble() {
 			//			if(mIsReference && Assembler.InMetalMode) {
 			//				Pushd(4, mDataName);
 			//				return;
 			//			}
-			if (mSize > 4) {
+			//if (mSize > 4) {
 				for (int i = 0; i < (mSize / 4); i++) {
 					//	Pop("eax");
 					//	Move(Assembler, "dword [" + mDataName + " + 0x" + (i * 4).ToString("X") + "]", "eax");
@@ -48,29 +48,29 @@ namespace Indy.IL2CPU.IL.X86 {
 					default:
 						throw new Exception("Remainder size " + (mSize % 4) + " not supported!");
 				}
-			} else {
-				switch (mSize % 4) {
-					//					case 1: {
-					//							Assembler.Add(new CPU.Push("byte " + mDataName));
-					//							break;
-					//						}
-					//					case 2: {
-					//							Assembler.Add(new CPU.Push("word " + mDataName));
-					//							break;
-					//						}
-					case 1:
-					case 2:
-					case 4: {
-							Assembler.Add(new CPU.Push(mDataName));
-							break;
-						}
-					case 0: {
-							break;
-						}
-					default:
-						throw new Exception("Remainder size " + (mSize % 4) + " not supported!");
-				}
-			}
+//			} else {
+//				switch (mSize) {
+//					//					case 1: {
+//					//							Assembler.Add(new CPU.Push("byte " + mDataName));
+//					//							break;
+//					//						}
+//					//					case 2: {
+//					//							Assembler.Add(new CPU.Push("word " + mDataName));
+//					//							break;
+//					//						}
+//					case 1:
+//					case 2:
+//					case 4: {
+//							Assembler.Add(new CPU.Push(mDataName));
+//							break;
+//						}
+//					case 0: {
+//							break;
+//						}
+//					default:
+//						throw new Exception("Remainder size " + (mSize % 4) + " not supported!");
+//				}
+//			}
 			Assembler.StackSizes.Push(mSize);
 		}
 	}

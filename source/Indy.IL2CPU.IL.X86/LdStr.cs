@@ -29,7 +29,8 @@ namespace Indy.IL2CPU.IL.X86 {
 									select item.Name).FirstOrDefault();
 				if (String.IsNullOrEmpty(xDataName)) {
 					xDataName = Assembler.GetIdentifier("StringLiteral");
-					Assembler.DataMembers.Add(new DataMember(xDataName, "db", xDataVal));
+					Assembler.DataMembers.Add(new DataMember(xDataName, "dd", xDataName + "__Contents"));
+					Assembler.DataMembers.Add(new DataMember(xDataName + "__Contents", "db", xDataVal));
 				}
 				Move(Assembler, "eax", xDataName);
 				Pushd(4, "eax");
@@ -47,7 +48,8 @@ namespace Indy.IL2CPU.IL.X86 {
 									select item.Name).FirstOrDefault();
 				if (String.IsNullOrEmpty(xDataName)) {
 					xDataName = Assembler.GetIdentifier("StringLiteral");
-					Assembler.DataMembers.Add(new DataMember(xDataName, "db", xDataByteArray.ToString().TrimEnd(',')));
+					//Assembler.DataMembers.Add(new DataMember(xDataName, "dd", xDataName + "__Contents"));
+					Assembler.DataMembers.Add(new DataMember(xDataName, "db", xDataVal));
 				}
 				Pushd(4, xDataName);
 				new Newobj() {
