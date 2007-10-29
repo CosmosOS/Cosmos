@@ -31,13 +31,13 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			switch (mSize % 4) {
 				case 1: {
-						Pop("al");
+						Pop("eax");
 						Move(Assembler, "byte [" + mDataName + " + 0x" + (mSize - 1).ToString("X") + "]", "al");
 						break;
 					}
 				case 2: {
-						Pop("ax");
-						Move(Assembler, "word [" + mDataName + " + 0x" + (mSize - 2).ToString("X") + "]", "al");
+						Pop("eax");
+						Move(Assembler, "word [" + mDataName + " + 0x" + (mSize - 2).ToString("X") + "]", "ax");
 						break;
 					}
 				case 0: {
