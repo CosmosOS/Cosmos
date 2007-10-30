@@ -19,9 +19,27 @@ namespace Cosmos.Kernel.Boot {
 				return;
 			}
 			Console.WriteLine("Boot information available.");
-			Console.Write("    ");
-			WriteInt(566933);
-			//			uint theMem = MultiBootInfo.MemLower;
+			Console.WriteLine("");
+			Console.Write("Flags:   ");
+			WriteIntHex(MultiBootInfo.Flags);
+			Console.WriteLine("");
+			Console.Write("MemLow:  ");
+			WriteIntHex(MultiBootInfo.MemLower);
+			Console.WriteLine("");
+			Console.Write("MemHigh: ");
+			WriteIntHex(MultiBootInfo.MemUpper);
+			Console.WriteLine("");
+			Console.WriteLine("Maybe it's this:");
+			Console.Write("Flags:   ");
+			WriteIntHex(MultiBootInfo.VbeIntfOff_Len);
+			Console.WriteLine("");
+			Console.Write("MemLow:  ");
+			WriteIntHex(MultiBootInfo.VbeMode_IntfSeg);
+			Console.WriteLine("");
+			Console.Write("MemHigh: ");
+			WriteIntHex(MultiBootInfo.VbeModeInfo);
+			Console.WriteLine("");
+//			uint theMem = MultiBootInfo.MemLower;
 			//			System.Diagnostics.Debugger.Break();
 			//			theMem = MultiBootInfo.MemUpper;
 			//			System.Diagnostics.Debugger.Break();
@@ -31,80 +49,107 @@ namespace Cosmos.Kernel.Boot {
 		}
 
 		private static void WriteInt(uint aValue) {
-			uint xValue = aValue;
-			while (xValue > 0) {
-				switch (xValue % 16) {
+			WriteNumber(aValue, 10);
+			Console.Write(" (Reverse number)");
+		}
+
+		private static void WriteIntHex(uint aValue) {
+			WriteNumber(aValue, 16);
+			Console.Write("x0 (Reverse hex)");
+		}
+
+		private static void WriteNumber(uint aValue, byte aBase) {
+			uint theValue = aValue;
+			int xReturnedChars = 0; 
+			while (theValue > 0) {
+				switch (theValue % aBase) {
 					case 0: {
-							Console.WriteLine("0");
+							Console.Write("0");
+						xReturnedChars++;
 							break;
 						}
 					case 1: {
-							Console.WriteLine("1");
+							Console.Write("1");
+							xReturnedChars++;
 							break;
 						}
 					case 2: {
-							Console.WriteLine("2");
+							Console.Write("2");
+							xReturnedChars++;
 							break;
 						}
 					case 3: {
-							Console.WriteLine("3");
+							Console.Write("3");
+							xReturnedChars++;
 							break;
 						}
 					case 4: {
-							Console.WriteLine("4");
+							Console.Write("4");
+							xReturnedChars++;
 							break;
 						}
 					case 5: {
-							Console.WriteLine("5");
+							Console.Write("5");
+							xReturnedChars++;
 							break;
 						}
 					case 6: {
-							Console.WriteLine("6");
+							Console.Write("6");
+							xReturnedChars++;
 							break;
 						}
 					case 7: {
-							Console.WriteLine("7");
+							Console.Write("7");
+							xReturnedChars++;
 							break;
 						}
 					case 8: {
-							Console.WriteLine("8");
+							Console.Write("8");
+							xReturnedChars++;
 							break;
 						}
 					case 9: {
-							Console.WriteLine("9");
+							Console.Write("9");
+							xReturnedChars++;
 							break;
 						}
 					case 10: {
-							Console.WriteLine("A");
+							Console.Write("A");
+							xReturnedChars++;
 							break;
 						}
 					case 11: {
-							Console.WriteLine("B");
+							xReturnedChars++;
+							Console.Write("B");
 							break;
 						}
 					case 12: {
-							Console.WriteLine("C");
+							Console.Write("C");
+							xReturnedChars++;
 							break;
 						}
 					case 13: {
-							Console.WriteLine("D");
+							Console.Write("D");
+							xReturnedChars++;
 							break;
 						}
 					case 14: {
-							Console.WriteLine("E");
+							Console.Write("E");
+							xReturnedChars++;
 							break;
 						}
 					case 15: {
-							Console.WriteLine("F");
+							Console.Write("F");
+							xReturnedChars++;
 							break;
 						}
-					default:
-						Console.WriteLine("T");
-						break;
 				}
-				xValue = xValue >> 4;
+				theValue = theValue / aBase;
 			}
-			Console.WriteLine("x0 (Reverse hex)");
+			while(xReturnedChars < 8) {
+				Console.Write("0");
+				xReturnedChars++;
+			}
 		}
 	}
 }

@@ -11,7 +11,6 @@ namespace Indy.IL2CPU.IL.X86.Win32 {
 		}
 
 		public override Mono.Cecil.MethodReference GetCustomMethodImplementation(string aOrigMethodName, bool aInMetalMode) {
-			Console.WriteLine("Getting custom methodImplementation '{0}', Metal = {1}", aOrigMethodName, aInMetalMode);
 			switch (aOrigMethodName) {
 				case "System_Void___System_Console_Write___System_String___": {
 						return CustomImplementations.System.ConsoleImplRefs.WriteRef;

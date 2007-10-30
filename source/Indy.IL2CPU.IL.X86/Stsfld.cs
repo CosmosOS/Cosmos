@@ -25,19 +25,19 @@ namespace Indy.IL2CPU.IL.X86 {
 			//	Pushd(4, "[" mDataName);
 			//	return;
 			//}
-			for (int i = 0; i < (mSize / 4); i++) {
+			for (int i = 1; i <= (mSize / 4); i++) {
 				Pop("eax");
-				Move(Assembler, "dword [" + mDataName + " + 0x" + (i * 4).ToString("X") + "]", "eax");
+				Move(Assembler, "dword [" + mDataName + " + 0x" + (mSize - (i * 4)).ToString("X") + "]", "eax");
 			}
 			switch (mSize % 4) {
 				case 1: {
 						Pop("eax");
-						Move(Assembler, "byte [" + mDataName + " + 0x" + (mSize - 1).ToString("X") + "]", "al");
+						Move(Assembler, "byte [" + mDataName + "]", "al");
 						break;
 					}
 				case 2: {
 						Pop("eax");
-						Move(Assembler, "word [" + mDataName + " + 0x" + (mSize - 2).ToString("X") + "]", "ax");
+						Move(Assembler, "word [" + mDataName + "]", "ax");
 						break;
 					}
 				case 0: {

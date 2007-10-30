@@ -10,9 +10,10 @@ namespace Cosmos.Kernel.Boot.Glue {
 		public uint CmdLine;
 		public uint ModsCount;
 		public uint ModsAddr;
-		public uint Syms_1;
-		public uint Syms_2;
-		public uint Syms_3;
+		public uint Syms_Num;
+		public uint Syms_Size;
+		public uint Syms_Addr;
+		public uint Syms_Shndx;
 		public uint MMapLength;
 		public uint MMapAddr;
 		public uint DrivesLength;
@@ -22,9 +23,11 @@ namespace Cosmos.Kernel.Boot.Glue {
 		public uint ApmTable;
 		public uint VbeControlInfo;
 		public uint VbeModeInfo;
-		public ushort VbeMode;
-		public ushort VbeInterfaceSeg;
-		public ushort VbeInterfaceOff;
-		public ushort VbeInterfaceLen;
+//		public ushort VbeMode;
+//		public ushort VbeInterfaceSeg;
+//		public ushort VbeInterfaceOff;
+//		public ushort VbeInterfaceLen;
+		public uint VbeMode_IntfSeg;
+		public uint VbeIntfOff_Len;
 	}
 }
