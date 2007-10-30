@@ -1,6 +1,7 @@
 ﻿using System;
 
 namespace Cosmos.Kernel.Boot.Glue {
+	[System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
 	public struct BootInformationStruct {
 		public uint Flags;
 		public uint MemLower;
@@ -25,6 +26,5 @@ namespace Cosmos.Kernel.Boot.Glue {
 		public ushort VbeInterfaceSeg;
 		public ushort VbeInterfaceOff;
 		public ushort VbeInterfaceLen;
-		public static BootInformationStruct Instance;
 	}
 }

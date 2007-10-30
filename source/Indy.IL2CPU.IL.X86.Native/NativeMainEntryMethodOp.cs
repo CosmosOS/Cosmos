@@ -11,8 +11,8 @@ namespace Indy.IL2CPU.IL.X86.Native {
 
 		public override void Enter(string aName) {
 			base.Enter(aName);
-			//Pushd("[ebp + 4]");
-			//Call(NativeOpCodeMap.Instance.GetGlueMethod(Cosmos.Kernel.Boot.Glue.GlueMethodTypeEnum.SaveBootInfoStruct));
+			Pushd("[ebp + 4]");
+			Call(NativeOpCodeMap.Instance.GetGlueMethod(Cosmos.Kernel.Boot.Glue.GlueMethodTypeEnum.SaveBootInfoStruct));
 		}
 
 		public override void Exit() {

@@ -78,7 +78,10 @@ namespace Indy.IL2CPU.IL.X86.Native {
 						return ConsoleImplRefs.WriteLineRef;
 					}
 				case "System_Void___System_Console_Write___System_String___": {
-						return ConsoleImplRefs.WriteRef;
+						return ConsoleImplRefs.Write_string_Ref;
+					}
+				case "System_Void___System_Console_Write___System_Char___": {
+						return ConsoleImplRefs.Write_char_Ref;
 					}
 				case "System_Void___System_Diagnostics_Debug_WriteLine___System_String___": {
 						return DebugImplRefs.WriteLineRef;

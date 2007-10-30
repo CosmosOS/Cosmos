@@ -15,7 +15,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			Pop("eax"); // shift amount
 			Pop("edx"); // value
 			Move(Assembler, "ebx", "0");
-			Move(Assembler, "cl", "[eax]");
+			Move(Assembler, "cl", "al");
 			Assembler.Add(new CPU.ShiftLeft("edx", "ebx", "cl"));
 			Pushd(xSize, "edx");
 		}

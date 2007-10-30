@@ -12,7 +12,7 @@ namespace Indy.IL2CPU.IL.X86.Native {
 		}
 
 		public static void InitializeEngine() {
-			//Console.Clear();
+			Console.Clear();
 //			Debug.WriteLine("Loading GDT");
 //			SetupGDT();
 //			Debug.WriteLine("Slowing down PIT");

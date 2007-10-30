@@ -40,12 +40,20 @@ namespace Indy.IL2CPU.IL.X86 {
 		public override Mono.Cecil.MethodReference GetCustomMethodImplementation(string aOrigMethodName, bool aInMetalMode) {
 			switch (aOrigMethodName) {
 				case "System_Int32___System_String_get_Length____": {
+					Console.WriteLine("Getting Custom Method Impl for get_Length. IsMetal = {0}", aInMetalMode);
 						if (aInMetalMode) {
 							return CustomImplementations.System.StringImplRefs.get_Length_MetalRef;
 						} else {
 							return CustomImplementations.System.StringImplRefs.get_Length_NormalRef;
 						}
 					}
+				case "System_UInt32____Indy_IL2CPU_CustomImplementation_System_StringImpl_GetStorage___System_String___": {
+						if (aInMetalMode) {
+							return CustomImplementation.System.StringImplRefs.GetStorageMetalRef;
+						} else {
+							return CustomImplementation.System.StringImplRefs.GetStorageNormalRef;
+						}
+				}
 				case "System_Char___System_String_get_Chars___System_Int32___": {
 						if (aInMetalMode) {
 							return CustomImplementations.System.StringImplRefs.get_Chars_MetalRef;

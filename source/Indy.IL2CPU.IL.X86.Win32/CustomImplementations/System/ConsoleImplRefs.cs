@@ -6,6 +6,7 @@ using Mono.Cecil;
 namespace Indy.IL2CPU.IL.X86.Win32.CustomImplementations.System {
 	public static class ConsoleImplRefs {
 		public static readonly MethodDefinition WriteRef;
+		public static readonly MethodDefinition WriteLine_string_Ref;
 		public static readonly MethodDefinition WriteLineRef;
 		public static readonly AssemblyDefinition RuntimeAssemblyDef;
 

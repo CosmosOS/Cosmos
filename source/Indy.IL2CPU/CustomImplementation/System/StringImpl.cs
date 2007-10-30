@@ -25,7 +25,11 @@ namespace Indy.IL2CPU.CustomImplementation.System {
 		}
 
 		public static unsafe uint* GetStorageMetal(uint* aStringPtr) {
-			return aStringPtr;
+			return aStringPtr + 1;
+		}
+
+		public static unsafe uint* GetStorage(string aStringPtr) {
+			return (uint*)0;
 		}
 
 		public static unsafe uint* GetStorageNormal(uint* aStringPtr) {

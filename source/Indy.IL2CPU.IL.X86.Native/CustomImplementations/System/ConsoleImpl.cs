@@ -841,11 +841,15 @@ namespace Indy.IL2CPU.IL.X86.Native.CustomImplementations.System {
 
 		private static void OutputString(string aText) {
 			for (int i = 0; i < aText.Length; i++) {
-				OutputByte(StringImpl.GetByteFromChar(aText[i]));
+				Write_char_(aText[i]);
 			}
 		}
 
-		public static void Write(string aText) {
+		public static void Write_char_(char aChar) {
+			OutputByte(StringImpl.GetByteFromChar(aChar));
+		}
+
+		public static void Write_string_(string aText) {
 			OutputString(aText);
 		}
 

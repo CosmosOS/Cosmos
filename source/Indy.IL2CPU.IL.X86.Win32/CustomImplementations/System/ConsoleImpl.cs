@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Indy.IL2CPU.IL.X86.Win32.CustomImplementations.System {
 	public static class ConsoleImpl {
-		[DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
+		[DllImport("kernel32.dll", CharSet = CharSet.Auto)]
 		static extern unsafe bool WriteConsole(IntPtr hConsoleOutput, uint* lpBuffer,
 		   uint nNumberOfCharsToWrite, out uint lpNumberOfCharsWritten,
 		   IntPtr lpReserved);
@@ -27,15 +27,19 @@ namespace Indy.IL2CPU.IL.X86.Win32.CustomImplementations.System {
 			}
 		}
 
-		public unsafe static void Write(uint* aData) {
+		public unsafe static void Write(string aData) {
 			DoInitialize();
 			uint xCharsWritten;
-			uint xCharsToWrite = (uint)X86.CustomImplementations.System.StringImpl.get_Length_Normal(aData);
-			WriteConsole(mConsoleOutHandler, CustomImplementation.System.StringImpl.GetStorageNormal(aData), xCharsToWrite, out xCharsWritten, IntPtr.Zero);
+			uint xCharsToWrite = (uint)aData.Length;
+			WriteConsole(mConsoleOutHandler, CustomImplementation.System.StringImpl.GetStorage(aData), xCharsToWrite, out xCharsWritten, IntPtr.Zero);
 		}
 
-		public static void WriteLine(string aData) {
+		public static void WriteLine_string_(string aData) {
 			Console.Write(aData);
+			WriteLine();
+		}
+
+		public static void WriteLine() {
 			Console.Write(Environment.NewLine);
 		}
 	}
