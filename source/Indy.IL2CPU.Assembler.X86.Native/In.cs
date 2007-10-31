@@ -8,7 +8,7 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
 	public class In: IL2CPU.Assembler.Instruction {
 		public readonly string Port;
 		public readonly string Data;
-		public In(string aPort, string aData) {
+		public In(string aData, string aPort) {
 			Port = aPort;
 			Data = aData;
 		}

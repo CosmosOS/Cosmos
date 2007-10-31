@@ -217,7 +217,6 @@ namespace Indy.IL2CPU.IL.X86.Native {
 						return (from item in mGluePlaceholderMethods.Keys
 								where new Label(mGluePlaceholderMethods[item]).Name == aMethodName
 								select item).Count() > 0;
-						break;
 					}
 			}
 			return base.HasCustomAssembleImplementation(aMethodName, aInMetalMode);
@@ -244,21 +243,6 @@ namespace Indy.IL2CPU.IL.X86.Native {
 						aAssembler.Add(new Literal("int 3"));
 						break;
 					}
-				case "System_Void___Indy_IL2CPU_IL_X86_Native_RuntimeEngineImpl_IO_WriteToPort___System_UInt16__System_Byte__": {
-						IL.X86.Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0].VirtualAddresses, aMethodInfo.Arguments[0].Size);
-						aAssembler.Add(new CPU.Pop("eax"));
-						IL.X86.Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[1].VirtualAddresses, aMethodInfo.Arguments[1].Size);
-						aAssembler.Add(new CPU.Pop("ecx"));
-						aAssembler.Add(new CPUNative.Out("ax", "cl"));
-						break;
-					}
-				case "System_Byte___Indy_IL2CPU_IL_X86_Native_RuntimeEngineImpl_IO_ReadFromPort___System_UInt16__": {
-						IL.X86.Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0].VirtualAddresses, aMethodInfo.Arguments[0].Size);
-						aAssembler.Add(new CPU.Pop("ecx"));
-						aAssembler.Add(new CPU.Move("eax", "0"));
-						aAssembler.Add(new CPUNative.In("ecx", "al"));
-						break;
-					}
 				default: {
 						CheckGluePlaceholderMethod();
 						GluePlaceholderMethodTypeEnum? xMethodType = null;
@@ -278,7 +262,7 @@ namespace Indy.IL2CPU.IL.X86.Native {
 			base.DoCustomAssembleImplementation(aMethodName, aInMetalMode, aAssembler, aMethodInfo);
 		}
 
-		private void AssembleGluePlaceholderMethod(GluePlaceholderMethodTypeEnum aMethodType, Assembler.Assembler aAssembler, MethodInformation aInfo) {
+		private void AssembleGluePlaceholderMethod(GluePlaceholderMethodTypeEnum aMethodType, Assembler.Assembler aAssembler, MethodInformation aMethodInfo) {
 			switch (aMethodType) {
 				case GluePlaceholderMethodTypeEnum.GDT_LoadArray: {
 						FieldDefinition xFieldDef = GetGlueField(GlueFieldTypeEnum.GDT_Array);
@@ -357,10 +341,28 @@ namespace Indy.IL2CPU.IL.X86.Native {
 						mIDTSetHandlerMethodName = new Label(xTheMethod).Name;
 						aAssembler.Add(new CPU.Call("___________REGISTER___ISRS_____"));
 						aAssembler.Add(new CPU.Move("eax", xPointerFieldName));
-						//aAssembler.Add(new Literal("XCHG BX, BX "));
+						aAssembler.Add(new Literal("XCHG BX, BX "));
 						aAssembler.Add(new CPUNative.Cli());
 						aAssembler.Add(new CPUNative.Lidt("eax"));
 						aAssembler.Add(new CPUNative.Sti());
+						GetGlueMethod(GlueMethodTypeEnum.IDT_InterruptHandler);
+						break;
+					}
+				case GluePlaceholderMethodTypeEnum.IO_ReadByte: {
+						aAssembler.Add(new CPU.Xor("eax", "eax"));
+						IL.X86.Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0].VirtualAddresses, aMethodInfo.Arguments[0].Size);
+						aAssembler.Add(new CPU.Pop("edx"));
+						aAssembler.Add(new CPU.Move("eax", "0"));
+						aAssembler.Add(new CPUNative.In("al", "dx"));
+					aAssembler.Add(new CPU.Push("eax"));
+						break;
+					}
+				case GluePlaceholderMethodTypeEnum.IO_WriteByte: {
+						Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0].VirtualAddresses, aMethodInfo.Arguments[0].Size);
+						aAssembler.Add(new CPU.Pop("edx"));
+						Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[1].VirtualAddresses, aMethodInfo.Arguments[1].Size);
+						aAssembler.Add(new CPU.Pop("eax"));
+						aAssembler.Add(new CPUNative.Out("dx", "al"));
 						break;
 					}
 				default:
@@ -376,12 +378,13 @@ namespace Indy.IL2CPU.IL.X86.Native {
 
 		public override void PostProcess(Indy.IL2CPU.Assembler.Assembler aAssembler) {
 			base.PostProcess(aAssembler);
+			return;
 			TypeDefinition xRuntimeEngineTypeDef = Engine.GetTypeDefinition(typeof(RuntimeEngineImpl).Assembly.GetName().Name, typeof(RuntimeEngineImpl).FullName);
-			MethodDefinition xTheMethod = Engine.GetMethodDefinition(xRuntimeEngineTypeDef, "IDT_SetHandler", "System.Byte", "System.UInt32", "System.UInt16", xRuntimeEngineTypeDef.FullName + "/IDTEntryStruct/FlagsEnum");
+			MethodDefinition xTheMethod = GetGlueMethod(GlueMethodTypeEnum.IDT_SetHandler);
 			Engine.QueueMethod(xTheMethod);
 			mIDTSetHandlerMethodName = new Label(xTheMethod).Name;
 			X86.X86MethodHeaderOp.AssembleHeader(aAssembler, "___________REGISTER___ISRS_____", new int[0]);
-			string xInterruptHandlerLabel = new Label(Engine.GetMethodDefinition(Engine.GetTypeDefinition("Indy.IL2CPU.IL.X86.Native", "Indy.IL2CPU.IL.X86.Native.RuntimeEngineImpl"), "InterruptHandler", "System.Byte", "System.Byte")).Name;
+			string xInterruptHandlerLabel = new Label(GetGlueMethod(GlueMethodTypeEnum.IDT_InterruptHandler)).Name;
 			int[] xInterruptsWithParam = new int[] { 8, 10, 11, 12, 13, 14 };
 			for (int i = 0; i < 256; i++) {
 				aAssembler.Add(new CPU.Push("0x" + i.ToString("X")));

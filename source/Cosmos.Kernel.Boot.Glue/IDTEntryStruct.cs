@@ -6,7 +6,7 @@ namespace Cosmos.Kernel.Boot.Glue {
 	public struct IDTEntryStruct {
 		public enum FlagsEnum: byte {
 			NotPresent = 0xE,
-			Present = 0x4E
+			Present = 0x5E
 		}
 		public ushort BaseLow;
 		public ushort Sel;

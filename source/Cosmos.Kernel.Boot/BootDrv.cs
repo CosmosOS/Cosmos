@@ -10,6 +10,9 @@ namespace Cosmos.Kernel.Boot {
 		public static void SetMultiBootInfo(ref BootInformationStruct aBootInfo) {
 			MultiBootInfo = aBootInfo;
 			BootInfoSet = true;
+			IO.InitIO();
+			IO.InitSerial(0);
+			IO.WriteSerialString(0, "BootInfo retrieved");
 		}
 
 		public static void Main() {
@@ -23,10 +26,15 @@ namespace Cosmos.Kernel.Boot {
 			Console.Write("Available Memory: ");
 			WriteIntHex(((MultiBootInfo.MemUpper + 1024) / 1024) + 1);
 			Console.WriteLine("");
+			Console.Write("Initializing COM1...");
+			System.Diagnostics.Debugger.Break();
+			IO.InitIO();
+			IO.InitSerial(0);
+			IO.WriteSerialString(0, "Hello, World");
 			Console.WriteLine("Skipping GDT for now");
-			Console.Write("Loading IDT...");
-			IDT.SetupInterruptDescriptorTable();
-			Console.WriteLine("Done.");
+			//Console.Write("Loading IDT...");
+			//IDT.SetupInterruptDescriptorTable();
+			//Console.WriteLine("Done.");
 		}
 
 		private static void WriteInt(uint aValue) {

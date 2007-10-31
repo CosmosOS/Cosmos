@@ -23,12 +23,13 @@ namespace Cosmos.Kernel.Boot {
 		[GlueMethod(MethodType = GlueMethodTypeEnum.IDT_SetHandler)]
 		private static void IDT_SetHandler(byte aInterruptNumber, uint aBase, ushort aSel, IDTEntryStruct.FlagsEnum aFlags) {
 			mIDTEntries[aInterruptNumber].AlwaysZero = 0;
-			mIDTEntries[aInterruptNumber].Sel = 8;
+			mIDTEntries[aInterruptNumber].Sel = 0;
 			mIDTEntries[aInterruptNumber].BaseLow = (ushort)(aBase);
 			mIDTEntries[aInterruptNumber].BaseHi = (ushort)(aBase >> 16);
 			mIDTEntries[aInterruptNumber].Flags = 128 /*Present*/| 0 /*Ring0*/| 8 /*32-bit*/| 0xF /*interrupt gate*/;
 		}	
-
+						   
+		[GlueMethod(MethodType = GlueMethodTypeEnum.IDT_InterruptHandler)]
 		private static void InterruptHandler(byte aInterrupt, byte aParam) {
 			//System.Diagnostics.Debugger.Break();
 			Debug.WriteLine("Interrupt received:");
@@ -44,17 +45,10 @@ namespace Cosmos.Kernel.Boot {
 			//	WriteToPort(0x20, 0x20);
 			//}
 			//CustomImplementations.System.ConsoleImpl.WriteLine("");
-			System.Diagnostics.Debugger.Break();
 		}
 
 		public static void SetupInterruptDescriptorTable() {
 			Debug.WriteLine("Start setting up Interrupt Descriptor Table");
-			bool aFalse = false;
-			if (aFalse) {
-				// code is never executed, but neccessary for IL2CPU to detect the methods
-				InterruptHandler(0, 0);
-				int theLen = mIDTEntries.Length;
-			}
 			Debug.WriteLine("Load the array");
 			IDT_LoadArray();
 			Debug.WriteLine("Register the IDT");

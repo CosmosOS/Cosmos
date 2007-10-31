@@ -47,8 +47,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BootDrv.cs" />
+    <Compile Include="DebugUtil.cs" />
     <Compile Include="GDT.cs" />
     <Compile Include="IDT.cs" />
+    <Compile Include="IO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -23,7 +23,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			//				Pushd(4, mDataName);
 			//				return;
 			//			}
-			//if (mSize > 4) {
+			if (mSize >= 4) {
 				for (int i = 0; i < (mSize / 4); i++) {
 					//	Pop("eax");
 					//	Move(Assembler, "dword [" + mDataName + " + 0x" + (i * 4).ToString("X") + "]", "eax");
@@ -38,7 +38,7 @@ namespace Indy.IL2CPU.IL.X86 {
 						}
 					case 2: {
 							Assembler.Add(new CPU.Move("eax", "0"));
-							Assembler.Add(new CPU.Move("ax", "[" + mDataName + " + 0x" + (mSize - 1).ToString("X") + "]"));
+							Assembler.Add(new CPU.Move("ax", "[" + mDataName + " + 0x" + (mSize - 2).ToString("X") + "]"));
 							Assembler.Add(new CPU.Push("eax"));
 							break;
 						}
@@ -48,29 +48,27 @@ namespace Indy.IL2CPU.IL.X86 {
 					default:
 						throw new Exception("Remainder size " + (mSize % 4) + " not supported!");
 				}
-//			} else {
-//				switch (mSize) {
-//					//					case 1: {
-//					//							Assembler.Add(new CPU.Push("byte " + mDataName));
-//					//							break;
-//					//						}
-//					//					case 2: {
-//					//							Assembler.Add(new CPU.Push("word " + mDataName));
-//					//							break;
-//					//						}
-//					case 1:
-//					case 2:
-//					case 4: {
-//							Assembler.Add(new CPU.Push(mDataName));
-//							break;
-//						}
-//					case 0: {
-//							break;
-//						}
-//					default:
-//						throw new Exception("Remainder size " + (mSize % 4) + " not supported!");
-//				}
-//			}
+			} else {
+				switch (mSize) {
+					case 1: {
+							Assembler.Add(new CPU.Move("eax", "0"));
+							Assembler.Add(new CPU.Move("al", "[" + mDataName + "]"));
+							Assembler.Add(new CPU.Push("eax"));
+							break;
+						}
+					case 2: {
+							Assembler.Add(new CPU.Move("eax", "0"));
+							Assembler.Add(new CPU.Move("ax", "[" + mDataName + "]"));
+							Assembler.Add(new CPU.Push("eax"));
+							break;
+						}
+					case 0: {
+							break;
+						}
+					default:
+						throw new Exception("Remainder size " + (mSize) + " not supported!");
+				}
+			}
 			Assembler.StackSizes.Push(mSize);
 		}
 	}

@@ -194,19 +194,19 @@ namespace Indy.IL2CPU {
 							GenerateVMT();
 						}
 						mMap.PostProcess(mAssembler);
-//						if(!aInMetalMode) {
-//							FieldDefinition xFieldDef = VTablesImplRefs.VTablesImplDef.Fields.GetField("mIDTEntries");
-//							string xFieldName = Assembler.DataMember.GetStaticFieldName(xFieldDef);
-//							string xFieldData = "0,0,0,0,2,0,0,0,1,0,0,0";
-//							for (int i = 0; i < 256; i++) {
-//								xFieldData += ",0,0,0,0,0,0,0,0";
-//							}
-//							mAssembler.DataMembers.RemoveAll(delegate(DataMember aItem) {
-//								return aItem.Name == xFieldName;
-//							});
-//							mAssembler.DataMembers.Add(new DataMember(xFieldName, "dd", xFieldName + "___Contents"));
-//							mAssembler.DataMembers.Add(new DataMember(xFieldName + "___Contents", "db", xFieldData));
-//						}
+						//						if(!aInMetalMode) {
+						//							FieldDefinition xFieldDef = VTablesImplRefs.VTablesImplDef.Fields.GetField("mIDTEntries");
+						//							string xFieldName = Assembler.DataMember.GetStaticFieldName(xFieldDef);
+						//							string xFieldData = "0,0,0,0,2,0,0,0,1,0,0,0";
+						//							for (int i = 0; i < 256; i++) {
+						//								xFieldData += ",0,0,0,0,0,0,0,0";
+						//							}
+						//							mAssembler.DataMembers.RemoveAll(delegate(DataMember aItem) {
+						//								return aItem.Name == xFieldName;
+						//							});
+						//							mAssembler.DataMembers.Add(new DataMember(xFieldName, "dd", xFieldName + "___Contents"));
+						//							mAssembler.DataMembers.Add(new DataMember(xFieldName + "___Contents", "db", xFieldData));
+						//						}
 						ProcessAllStaticFields();
 					} finally {
 						mAssembler.Flush();
@@ -661,11 +661,16 @@ namespace Indy.IL2CPU {
 								xTheSize = 4;
 							}
 							if (xTheSize < 4) {
-//								xTheSize = 4;
+								//								xTheSize = 4;
 							}
 							if (xTheSize == 4) {
 								theType = "dd";
 								xTheSize = 1;
+							} else {
+								if (xTheSize == 2) {
+									theType = "dw";
+									xTheSize = 1;
+								}
 							}
 							string xTheData = "";
 							for (uint i = 0; i < xTheSize; i++) {
@@ -890,7 +895,7 @@ namespace Indy.IL2CPU {
 					if (xField.IsStatic) {
 						continue;
 					}
-					if(xField.HasConstant) {
+					if (xField.HasConstant) {
 						Console.WriteLine("Field is constant: " + xField.GetFullName());
 					}
 					int xFieldSize;
