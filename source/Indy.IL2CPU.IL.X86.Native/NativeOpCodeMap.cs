@@ -160,7 +160,10 @@ namespace Indy.IL2CPU.IL.X86.Native {
 						return ConsoleImplRefs.Write_char_Ref;
 					}
 				case "System_Void___System_Diagnostics_Debug_WriteLine___System_String___": {
-						return DebugImplRefs.WriteLineRef;
+						return GetGlueMethod(GlueMethodTypeEnum.Debug_WriteLine);
+					}
+				case "System_Void___System_Diagnostics_Debug_Write___System_String___": {
+						return GetGlueMethod(GlueMethodTypeEnum.Debug_Write);
 					}
 				case "System_Void___System_Diagnostics_Debug_WriteLineIf___System_Boolean__System_String___": {
 						return DebugImplRefs.WriteLineIfRef;
@@ -354,7 +357,7 @@ namespace Indy.IL2CPU.IL.X86.Native {
 						aAssembler.Add(new CPU.Pop("edx"));
 						aAssembler.Add(new CPU.Move("eax", "0"));
 						aAssembler.Add(new CPUNative.In("al", "dx"));
-					aAssembler.Add(new CPU.Push("eax"));
+						aAssembler.Add(new CPU.Push("eax"));
 						break;
 					}
 				case GluePlaceholderMethodTypeEnum.IO_WriteByte: {

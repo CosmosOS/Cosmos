@@ -32,7 +32,7 @@ namespace Cosmos.Kernel.Boot {
 		[GlueMethod(MethodType = GlueMethodTypeEnum.IDT_InterruptHandler)]
 		private static void InterruptHandler(byte aInterrupt, byte aParam) {
 			//System.Diagnostics.Debugger.Break();
-			Debug.WriteLine("Interrupt received:");
+			Console.WriteLine("Interrupt received:");
 			//CustomImplementations.System.ConsoleImpl.Write("    ");
 			//CustomImplementations.System.ConsoleImpl.OutputByteValue(aInterrupt);
 			//CustomImplementations.System.ConsoleImpl.WriteLine("");
@@ -48,10 +48,10 @@ namespace Cosmos.Kernel.Boot {
 		}
 
 		public static void SetupInterruptDescriptorTable() {
-			Debug.WriteLine("Start setting up Interrupt Descriptor Table");
-			Debug.WriteLine("Load the array");
+			Console.WriteLine("Start setting up Interrupt Descriptor Table");
+			Console.WriteLine("Load the array");
 			IDT_LoadArray();
-			Debug.WriteLine("Register the IDT");
+			Console.WriteLine("Register the IDT");
 			//System.Diagnostics.Debugger.Break();
 			IDT_RegisterIDT();
 		}

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Cosmos.Kernel.Boot.Glue;
 
 namespace Cosmos.Kernel.Boot {
@@ -10,9 +11,7 @@ namespace Cosmos.Kernel.Boot {
 		public static void SetMultiBootInfo(ref BootInformationStruct aBootInfo) {
 			MultiBootInfo = aBootInfo;
 			BootInfoSet = true;
-			IO.InitIO();
-			IO.InitSerial(0);
-			IO.WriteSerialString(0, "BootInfo retrieved");
+			Debug.WriteLine("BootInfo retrieved");
 		}
 
 		public static void Main() {
@@ -26,10 +25,6 @@ namespace Cosmos.Kernel.Boot {
 			Console.Write("Available Memory: ");
 			WriteIntHex(((MultiBootInfo.MemUpper + 1024) / 1024) + 1);
 			Console.WriteLine("");
-			Console.Write("Initializing COM1...");
-			System.Diagnostics.Debugger.Break();
-			IO.InitIO();
-			IO.InitSerial(0);
 			IO.WriteSerialString(0, "Hello, World");
 			Console.WriteLine("Skipping GDT for now");
 			//Console.Write("Loading IDT...");
@@ -49,12 +44,12 @@ namespace Cosmos.Kernel.Boot {
 
 		private static void WriteNumber(uint aValue, byte aBase) {
 			uint theValue = aValue;
-			int xReturnedChars = 0; 
+			int xReturnedChars = 0;
 			while (theValue > 0) {
 				switch (theValue % aBase) {
 					case 0: {
 							Console.Write("0");
-						xReturnedChars++;
+							xReturnedChars++;
 							break;
 						}
 					case 1: {
@@ -135,7 +130,7 @@ namespace Cosmos.Kernel.Boot {
 				}
 				theValue = theValue / aBase;
 			}
-			while(xReturnedChars < 8) {
+			while (xReturnedChars < 8) {
 				Console.Write("0");
 				xReturnedChars++;
 			}
