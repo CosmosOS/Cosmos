@@ -20,32 +20,13 @@ namespace Cosmos.Kernel.Boot {
 			}
 			Console.WriteLine("Boot information available.");
 			Console.WriteLine("");
-			Console.Write("Flags:   ");
-			WriteIntHex(MultiBootInfo.Flags);
+			Console.Write("Available Memory: ");
+			WriteIntHex(((MultiBootInfo.MemUpper + 1024) / 1024) + 1);
 			Console.WriteLine("");
-			Console.Write("MemLow:  ");
-			WriteIntHex(MultiBootInfo.MemLower);
-			Console.WriteLine("");
-			Console.Write("MemHigh: ");
-			WriteIntHex(MultiBootInfo.MemUpper);
-			Console.WriteLine("");
-			Console.WriteLine("Maybe it's this:");
-			Console.Write("Flags:   ");
-			WriteIntHex(MultiBootInfo.VbeIntfOff_Len);
-			Console.WriteLine("");
-			Console.Write("MemLow:  ");
-			WriteIntHex(MultiBootInfo.VbeMode_IntfSeg);
-			Console.WriteLine("");
-			Console.Write("MemHigh: ");
-			WriteIntHex(MultiBootInfo.VbeModeInfo);
-			Console.WriteLine("");
-//			uint theMem = MultiBootInfo.MemLower;
-			//			System.Diagnostics.Debugger.Break();
-			//			theMem = MultiBootInfo.MemUpper;
-			//			System.Diagnostics.Debugger.Break();
-			//Console.WriteLine(" MB");
-			//				//(((mbinfo^.mem_upper + 1000) div 1024) +1);
-
+			Console.WriteLine("Skipping GDT for now");
+			Console.Write("Loading IDT...");
+			IDT.SetupInterruptDescriptorTable();
+			Console.WriteLine("Done.");
 		}
 
 		private static void WriteInt(uint aValue) {

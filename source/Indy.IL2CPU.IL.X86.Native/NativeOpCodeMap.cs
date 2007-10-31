@@ -22,7 +22,25 @@ namespace Indy.IL2CPU.IL.X86.Native {
 			if (!mGlueMethods.ContainsKey(aMethodType)) {
 				throw new Exception("GlueMethod '" + aMethodType.ToString() + "' not implemented!");
 			}
-			return mGlueMethods[aMethodType];
+			MethodDefinition xResult = mGlueMethods[aMethodType];
+			Engine.QueueMethod(xResult);
+			return xResult;
+		}
+
+		public MethodDefinition GetGluePlaceholderMethod(GluePlaceholderMethodTypeEnum aMethodType) {
+			CheckGluePlaceholderMethod();
+			if (!mGluePlaceholderMethods.ContainsKey(aMethodType)) {
+				throw new Exception("GluePlaceholderMethod '" + aMethodType.ToString() + "' not implemented!");
+			}
+			return mGluePlaceholderMethods[aMethodType];
+		}
+
+		public FieldDefinition GetGlueField(GlueFieldTypeEnum aFieldType) {
+			CheckGlueField();
+			if (!mGlueFields.ContainsKey(aFieldType)) {
+				throw new Exception("GlueField '" + aFieldType.ToString() + "' not found!");
+			}
+			return mGlueFields[aFieldType];
 		}
 
 		protected override Type GetCustomMethodImplementationOp() {
@@ -42,6 +60,8 @@ namespace Indy.IL2CPU.IL.X86.Native {
 		}
 
 		private SortedList<GlueMethodTypeEnum, MethodDefinition> mGlueMethods;
+		private SortedList<GluePlaceholderMethodTypeEnum, MethodDefinition> mGluePlaceholderMethods;
+		private SortedList<GlueFieldTypeEnum, FieldDefinition> mGlueFields;
 
 		private void CheckGlueMethod() {
 			if (mGlueMethods != null) {
@@ -64,6 +84,62 @@ namespace Indy.IL2CPU.IL.X86.Native {
 							}
 						}
 						mGlueMethods.Add((GlueMethodTypeEnum)xAttrib.Properties["MethodType"], xMethod);
+					}
+				}
+			}
+		}
+
+		private void CheckGluePlaceholderMethod() {
+			if (mGluePlaceholderMethods != null) {
+				return;
+			}
+			mGluePlaceholderMethods = new SortedList<GluePlaceholderMethodTypeEnum, MethodDefinition>();
+			AssemblyDefinition xCrawledAsm = Engine.GetCrawledAssembly();
+			foreach (ModuleDefinition xModule in xCrawledAsm.Modules) {
+				foreach (TypeDefinition xType in xModule.Types) {
+					foreach (MethodDefinition xMethod in xType.Methods) {
+						CustomAttribute xAttrib = (from item in xMethod.CustomAttributes.Cast<CustomAttribute>()
+												   where item.Constructor.DeclaringType.FullName == typeof(GluePlaceholderMethodAttribute).FullName
+												   select item).FirstOrDefault();
+						if (xAttrib == null) {
+							continue;
+						}
+						if (!xAttrib.Resolved) {
+							if (!xAttrib.Resolve()) {
+								throw new Exception("Couldn't resolve attribute on method '" + xMethod.GetFullName());
+							}
+						}
+						mGluePlaceholderMethods.Add((GluePlaceholderMethodTypeEnum)xAttrib.Properties["MethodType"], xMethod);
+					}
+				}
+			}
+		}
+
+		private void CheckGlueField() {
+			if (mGlueFields != null) {
+				return;
+			}
+			mGlueFields = new SortedList<GlueFieldTypeEnum, FieldDefinition>();
+			AssemblyDefinition xCrawledAsm = Engine.GetCrawledAssembly();
+			foreach (ModuleDefinition xModule in xCrawledAsm.Modules) {
+				foreach (TypeDefinition xType in xModule.Types) {
+					foreach (FieldDefinition xFieldDefinition in xType.Fields) {
+						CustomAttribute xAttrib = (from item in xFieldDefinition.CustomAttributes.Cast<CustomAttribute>()
+												   where item.Constructor.DeclaringType.FullName == typeof(GlueFieldAttribute).FullName
+												   select item).FirstOrDefault();
+						if (xAttrib == null) {
+							continue;
+						}
+						if (!xAttrib.Resolved) {
+							if (!xAttrib.Resolve()) {
+								throw new Exception("Couldn't resolve attribute on method '" + xFieldDefinition.GetFullName());
+							}
+						}
+						if (mGlueFields.ContainsKey((GlueFieldTypeEnum)xAttrib.Properties["FieldType"])) {
+							System.Diagnostics.Debugger.Break();
+							throw new Exception("GlueField of type '" + ((GlueFieldTypeEnum)xAttrib.Properties["FieldType"]).ToString() + "' already found!");
+						}
+						mGlueFields.Add((GlueFieldTypeEnum)xAttrib.Properties["FieldType"], xFieldDefinition);
 					}
 				}
 			}
@@ -135,6 +211,14 @@ namespace Indy.IL2CPU.IL.X86.Native {
 				case "System_Void___Cosmos_Kernel_ConsoleDrv_TestIDT____": {
 						return true;
 					}
+				default: {
+						CheckGluePlaceholderMethod();
+						GluePlaceholderMethodTypeEnum? xMethodType = null;
+						return (from item in mGluePlaceholderMethods.Keys
+								where new Label(mGluePlaceholderMethods[item]).Name == aMethodName
+								select item).Count() > 0;
+						break;
+					}
 			}
 			return base.HasCustomAssembleImplementation(aMethodName, aInMetalMode);
 		}
@@ -148,23 +232,7 @@ namespace Indy.IL2CPU.IL.X86.Native {
 						}
 						break;
 					}
-				case "System_Void___Indy_IL2CPU_IL_X86_Native_RuntimeEngineImpl_IDT_LoadArray____": {
-						DoAssemble_IDT_LoadArray(aAssembler, aMethodInfo);
-						return;
-					}
 				case "System_Void___Indy_IL2CPU_RuntimeEngine_Heap_Initialize____": {
-						return;
-					}
-				case "System_Void___Indy_IL2CPU_IL_X86_Native_RuntimeEngineImpl_IDT_RegisterIDT____": {
-						DoAssemble_IDT_RegisterIDT(aAssembler, aMethodInfo);
-						return;
-					}
-				case "System_Void___Indy_IL2CPU_IL_X86_Native_RuntimeEngineImpl_GDT_LoadArray____": {
-						DoAssemble_GDT_LoadArray(aAssembler, aMethodInfo);
-						return;
-					}
-				case "System_Void___Indy_IL2CPU_IL_X86_Native_RuntimeEngineImpl_GDT_RegisterGDT____": {
-						DoAssemble_GDT_RegisterGDT(aAssembler, aMethodInfo);
 						return;
 					}
 				case "System_Void___System_Diagnostics_Debugger_Break____": {
@@ -191,98 +259,116 @@ namespace Indy.IL2CPU.IL.X86.Native {
 						aAssembler.Add(new CPUNative.In("ecx", "al"));
 						break;
 					}
+				default: {
+						CheckGluePlaceholderMethod();
+						GluePlaceholderMethodTypeEnum? xMethodType = null;
+
+						foreach (GluePlaceholderMethodTypeEnum xTheMethodType in mGluePlaceholderMethods.Keys) {
+							if (new Label(mGluePlaceholderMethods[xTheMethodType]).Name == aMethodName) {
+								xMethodType = xTheMethodType;
+								break;
+							}
+						}
+						if (xMethodType != null) {
+							AssembleGluePlaceholderMethod(xMethodType.Value, aAssembler, aMethodInfo);
+						}
+						break;
+					}
 			}
 			base.DoCustomAssembleImplementation(aMethodName, aInMetalMode, aAssembler, aMethodInfo);
 		}
 
-		private void DoAssemble_IDT_RegisterIDT(Assembler.Assembler aAssembler, MethodInformation aInfo) {
-			TypeDefinition xRuntimeEngineTypeDef = Engine.GetTypeDefinition(typeof(RuntimeEngineImpl).Assembly.GetName().Name, typeof(RuntimeEngineImpl).FullName);
-			FieldDefinition xFieldDef = xRuntimeEngineTypeDef.Fields.GetField("mIDTPointer");
-			string xPointerFieldName;
-			Engine.QueueStaticField(xFieldDef, out xPointerFieldName);
-			MethodDefinition xTheMethod = Engine.GetMethodDefinition(xRuntimeEngineTypeDef, "IDT_SetHandler", "System.Byte", "System.UInt32", "System.UInt16", xRuntimeEngineTypeDef.FullName + "/IDTEntryStruct/FlagsEnum");
-			Engine.QueueMethod(xTheMethod);
-			mIDTSetHandlerMethodName = new Label(xTheMethod).Name;
-			aAssembler.Add(new CPU.Call("___________REGISTER___ISRS_____"));
-			aAssembler.Add(new CPU.Move("eax", xPointerFieldName));
-			//aAssembler.Add(new Literal("XCHG BX, BX "));
-			aAssembler.Add(new CPUNative.Cli());
-			aAssembler.Add(new CPUNative.Lidt("eax"));
-			aAssembler.Add(new CPUNative.Sti());
+		private void AssembleGluePlaceholderMethod(GluePlaceholderMethodTypeEnum aMethodType, Assembler.Assembler aAssembler, MethodInformation aInfo) {
+			switch (aMethodType) {
+				case GluePlaceholderMethodTypeEnum.GDT_LoadArray: {
+						FieldDefinition xFieldDef = GetGlueField(GlueFieldTypeEnum.GDT_Array);
+						string xFieldName = Assembler.DataMember.GetStaticFieldName(xFieldDef);
+						string xFieldData = "0,0,0,0,2,0,0,0,1,0,0,0";
+						for (int i = 0; i < 1; i++) {
+							xFieldData += ",0,0,0,0,0,0,0,0";
+						}
+						aAssembler.DataMembers.RemoveAll(delegate(DataMember aItem) {
+							return aItem.Name == xFieldName;
+						});
+						aAssembler.DataMembers.Add(new DataMember(xFieldName, "dd", xFieldName));
+						aAssembler.DataMembers.Add(new DataMember(xFieldName + "___Contents", "db", xFieldData));
+						xFieldDef = GetGlueField(GlueFieldTypeEnum.GDT_Pointer);
+						string xPointerFieldName;
+						Engine.QueueStaticField(xFieldDef, out xPointerFieldName);
+						aAssembler.Add(new CPU.Move("eax", xPointerFieldName));
+						aAssembler.Add(new CPU.Move("word [eax]", "0x" + ((8 * 1) - 1).ToString("X")));
+						aAssembler.Add(new CPU.Move("ecx", xFieldName));
+						aAssembler.Add(new CPU.Add("ecx", "0xC"));
+						aAssembler.Add(new CPU.Move("dword [eax + 2]", "ecx"));
+						break;
+					}
+				case GluePlaceholderMethodTypeEnum.GDT_Register: {
+						FieldDefinition xFieldDef = GetGlueField(GlueFieldTypeEnum.GDT_Pointer);
+						string xPointerFieldName;
+						Engine.QueueStaticField(xFieldDef, out xPointerFieldName);
+						aAssembler.Add(new CPU.Move("eax", xPointerFieldName));
+						aAssembler.Add(new CPUNative.Cli());
+						aAssembler.Add(new Literal("XCHG BX, BX "));
+						aAssembler.Add(new CPUNative.Lgdt("eax"));
+						aAssembler.Add(new Literal("use32"));
+						aAssembler.Add(new CPU.JumpAlways("flush____gdt______table__part1"));
+						aAssembler.Add(new Label("flush____gdt______table__part1"));
+						aAssembler.Add(new CPU.Move("eax", "0x0"));
+						aAssembler.Add(new CPU.Move("ds", "ax"));
+						aAssembler.Add(new CPU.Move("es", "ax"));
+						aAssembler.Add(new CPU.Move("fs", "ax"));
+						aAssembler.Add(new CPU.Move("gs", "ax"));
+						aAssembler.Add(new CPU.Move("ss", "ax"));
+						aAssembler.Add(new CPU.JumpAlways("flush____gdt______table__part2"));
+						aAssembler.Add(new Label("flush____gdt______table__part2"));
+						break;
+					}
+				case GluePlaceholderMethodTypeEnum.IDT_LoadArray: {
+						MethodDefinition xTheMethod = GetGlueMethod(GlueMethodTypeEnum.IDT_SetHandler);
+						Engine.QueueMethod(xTheMethod);
+						mIDTSetHandlerMethodName = new Label(xTheMethod).Name;
+						FieldDefinition xFieldDef = GetGlueField(GlueFieldTypeEnum.IDT_Array);
+						string xFieldName = Assembler.DataMember.GetStaticFieldName(xFieldDef);
+						string xFieldData = "0,0,0,0,2,0,0,0,1,0,0,0";
+						for (int i = 0; i < 256; i++) {
+							xFieldData += ",0,0,0,0,0,0,0,0";
+						}
+						aAssembler.DataMembers.RemoveAll(delegate(DataMember aItem) {
+							return aItem.Name == xFieldName;
+						});
+						aAssembler.DataMembers.Add(new DataMember(xFieldName, "dd", xFieldName + "___Contents"));
+						aAssembler.DataMembers.Add(new DataMember(xFieldName + "___Contents", "db", xFieldData));
+						xFieldDef = GetGlueField(GlueFieldTypeEnum.IDT_Pointer);
+						string xPointerFieldName;
+						Engine.QueueStaticField(xFieldDef, out xPointerFieldName);
+						aAssembler.Add(new CPU.Move("eax", xPointerFieldName));
+						aAssembler.Add(new CPU.Move("word [eax]", "0x" + ((8 * 256) - 1).ToString("X")));
+						aAssembler.Add(new CPU.Move("ecx", xFieldName));
+						aAssembler.Add(new CPU.Add("ecx", "0xC"));
+						aAssembler.Add(new CPU.Move("dword [eax + 2]", "ecx"));
+						break;
+					}
+				case GluePlaceholderMethodTypeEnum.IDT_Register: {
+						FieldDefinition xFieldDef = GetGlueField(GlueFieldTypeEnum.IDT_Pointer);
+						string xPointerFieldName;
+						Engine.QueueStaticField(xFieldDef, out xPointerFieldName);
+						MethodDefinition xTheMethod = GetGlueMethod(GlueMethodTypeEnum.IDT_SetHandler);
+						Engine.QueueMethod(xTheMethod);
+						mIDTSetHandlerMethodName = new Label(xTheMethod).Name;
+						aAssembler.Add(new CPU.Call("___________REGISTER___ISRS_____"));
+						aAssembler.Add(new CPU.Move("eax", xPointerFieldName));
+						//aAssembler.Add(new Literal("XCHG BX, BX "));
+						aAssembler.Add(new CPUNative.Cli());
+						aAssembler.Add(new CPUNative.Lidt("eax"));
+						aAssembler.Add(new CPUNative.Sti());
+						break;
+					}
+				default:
+					throw new NotImplementedException("GluePlaceholderMethod '" + aMethodType.ToString() + "' not implemented!");
+			}
 		}
-
-		private void DoAssemble_GDT_RegisterGDT(Assembler.Assembler aAssembler, MethodInformation aInfo) {
-			TypeDefinition xRuntimeEngineTypeDef = Engine.GetTypeDefinition(typeof(RuntimeEngineImpl).Assembly.GetName().Name, typeof(RuntimeEngineImpl).FullName);
-			FieldDefinition xFieldDef = xRuntimeEngineTypeDef.Fields.GetField("mGDTPointer");
-			string xPointerFieldName;
-			Engine.QueueStaticField(xFieldDef, out xPointerFieldName);
-			aAssembler.Add(new CPU.Move("eax", xPointerFieldName));
-			//aAssembler.Add(new Literal("XCHG BX, BX "));
-			aAssembler.Add(new CPUNative.Cli());
-			aAssembler.Add(new CPUNative.Lgdt("eax"));
-			aAssembler.Add(new CPU.Move("eax", "0x8"));
-			//aAssembler.Add(new CPU.Move("ds", "ax"));
-			//aAssembler.Add(new CPU.Move("es", "ax"));
-			//aAssembler.Add(new CPU.Move("fs", "ax"));
-			//aAssembler.Add(new CPU.Move("gs", "ax"));
-			//aAssembler.Add(new CPU.Move("ss", "ax"));
-			aAssembler.Add(new CPU.JumpAlways("0x0008:flush____gdt______table"));
-			aAssembler.Add(new Label("flush____gdt______table"));
-			//aAssembler.Add(new CPUNative.Sti());
-		}
-
 
 		private string mIDTSetHandlerMethodName;
-
-		private void DoAssemble_GDT_LoadArray(Assembler.Assembler aAssembler, MethodInformation aMethodInfo) {
-			TypeDefinition xRuntimeEngineTypeDef = Engine.GetTypeDefinition(typeof(RuntimeEngineImpl).Assembly.GetName().Name, typeof(RuntimeEngineImpl).FullName);
-			FieldDefinition xFieldDef = xRuntimeEngineTypeDef.Fields.GetField("mGDTEntries");
-			string xFieldName = Assembler.DataMember.GetStaticFieldName(xFieldDef);
-			string xFieldData = "0,0,0,0,2,0,0,0,1,0,0,0";
-			for (int i = 0; i < 3; i++) {
-				xFieldData += ",0,0,0,0,0,0,0,0";
-			}
-			aAssembler.DataMembers.RemoveAll(delegate(DataMember aItem) {
-				return aItem.Name == xFieldName;
-			});
-			aAssembler.DataMembers.Add(new DataMember(xFieldName, "dd", xFieldName));
-			aAssembler.DataMembers.Add(new DataMember(xFieldName + "___Contents", "db", xFieldData));
-			xFieldDef = xRuntimeEngineTypeDef.Fields.GetField("mGDTPointer");
-			string xPointerFieldName;
-			Engine.QueueStaticField(xFieldDef, out xPointerFieldName);
-			aAssembler.Add(new CPU.Move("eax", xPointerFieldName));
-			aAssembler.Add(new CPU.Move("word [eax]", "0x" + ((8 * 3) - 1).ToString("X")));
-			aAssembler.Add(new CPU.Move("ecx", xFieldName));
-			aAssembler.Add(new CPU.Add("ecx", "0xC"));
-			aAssembler.Add(new CPU.Move("dword [eax + 2]", "ecx"));
-		}
-
-		private void DoAssemble_IDT_LoadArray(Indy.IL2CPU.Assembler.Assembler aAssembler, MethodInformation aMethodInfo) {
-			//aAssembler.Add(new Literal("XCHG BX, BX "));
-			TypeDefinition xRuntimeEngineTypeDef = Engine.GetTypeDefinition(typeof(RuntimeEngineImpl).Assembly.GetName().Name, typeof(RuntimeEngineImpl).FullName);
-			MethodDefinition xTheMethod = Engine.GetMethodDefinition(xRuntimeEngineTypeDef, "IDT_SetHandler", "System.Byte", "System.UInt32", "System.UInt16", xRuntimeEngineTypeDef.FullName + "/IDTEntryStruct/FlagsEnum");
-			Engine.QueueMethod(xTheMethod);
-			mIDTSetHandlerMethodName = new Label(xTheMethod).Name;
-			FieldDefinition xFieldDef = xRuntimeEngineTypeDef.Fields.GetField("mIDTEntries");
-			string xFieldName = Assembler.DataMember.GetStaticFieldName(xFieldDef);
-			string xFieldData = "0,0,0,0,2,0,0,0,1,0,0,0";
-			for (int i = 0; i < 256; i++) {
-				xFieldData += ",0,0,0,0,0,0,0,0";
-			}
-			aAssembler.DataMembers.RemoveAll(delegate(DataMember aItem) {
-				return aItem.Name == xFieldName;
-			});
-			aAssembler.DataMembers.Add(new DataMember(xFieldName, "dd", xFieldName + "___Contents"));
-			aAssembler.DataMembers.Add(new DataMember(xFieldName + "___Contents", "db", xFieldData));
-			xFieldDef = xRuntimeEngineTypeDef.Fields.GetField("mIDTPointer");
-			string xPointerFieldName;
-			Engine.QueueStaticField(xFieldDef, out xPointerFieldName);
-			aAssembler.Add(new CPU.Move("eax", xPointerFieldName));
-			aAssembler.Add(new CPU.Move("word [eax]", "0x" + ((8 * 256) - 1).ToString("X")));
-			aAssembler.Add(new CPU.Move("ecx", xFieldName));
-			aAssembler.Add(new CPU.Add("ecx", "0xC"));
-			aAssembler.Add(new CPU.Move("dword [eax + 2]", "ecx"));
-		}
 
 		private static void DoAssemble_String_GetByteFromChar(Assembler.Assembler aAssembler, MethodInformation aMethodInfo) {
 			X86.Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0].VirtualAddresses, aMethodInfo.Arguments[0].Size);
@@ -290,7 +376,6 @@ namespace Indy.IL2CPU.IL.X86.Native {
 
 		public override void PostProcess(Indy.IL2CPU.Assembler.Assembler aAssembler) {
 			base.PostProcess(aAssembler);
-			return;
 			TypeDefinition xRuntimeEngineTypeDef = Engine.GetTypeDefinition(typeof(RuntimeEngineImpl).Assembly.GetName().Name, typeof(RuntimeEngineImpl).FullName);
 			MethodDefinition xTheMethod = Engine.GetMethodDefinition(xRuntimeEngineTypeDef, "IDT_SetHandler", "System.Byte", "System.UInt32", "System.UInt16", xRuntimeEngineTypeDef.FullName + "/IDTEntryStruct/FlagsEnum");
 			Engine.QueueMethod(xTheMethod);

@@ -46,8 +46,14 @@
   -->
   <ItemGroup>
     <Compile Include="BootInformationStruct.cs" />
+    <Compile Include="GluePlaceholderMethodAttribute.cs" />
+    <Compile Include="GluePlaceholderMethodTypeEnum.cs" />
+    <Compile Include="DT.cs" />
+    <Compile Include="GlueFieldTypeEnum.cs" />
+    <Compile Include="GlueFieldAttribute.cs" />
     <Compile Include="GlueMethodAttribute.cs" />
     <Compile Include="GlueMethodTypeEnum.cs" />
+    <Compile Include="IDTEntryStruct.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
