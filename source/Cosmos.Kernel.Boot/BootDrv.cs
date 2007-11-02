@@ -8,10 +8,74 @@ namespace Cosmos.Kernel.Boot {
 		private static BootInformationStruct MultiBootInfo;
 		private static bool BootInfoSet = false;
 		[GlueMethod(MethodType = GlueMethodTypeEnum.SaveBootInfoStruct)]
-		public static void SetMultiBootInfo(ref BootInformationStruct aBootInfo) {
+		public unsafe static void SetMultiBootInfo(ref BootInformationStruct aBootInfo) {
 			MultiBootInfo = aBootInfo;
 			BootInfoSet = true;
 			Debug.WriteLine("BootInfo retrieved");
+			Debug.Write("\tMMap length = ");
+			IO.WriteSerialHexNumber(0, MultiBootInfo.MMapLength);
+			Debug.WriteLine("");
+			Debug.WriteLine("MMap:");
+			BootInformationStruct.MMapEntry* xMMapPtr = (BootInformationStruct.MMapEntry*)MultiBootInfo.MMapAddr;
+			uint i = 0;
+			do {
+				DebugUtil.Write("Start Iteration ");
+				IO.WriteSerialHexNumber(0, i);
+				DebugUtil.WriteLine("");
+
+				i++;
+				if(i >=6) {
+					break;
+				}
+				DebugUtil.WriteLine("End Iteration");
+			} while (true);
+			DebugUtil.WriteLine("Done Iterating");
+
+			//for (uint i = 0; i < 144; i += 24) {
+				//Debug.WriteLine("Iteration");
+				//				IO.WriteSerialHexNumber(0, i);
+				//				Debug.WriteLine("");
+				//				Debug.Write("    Addr:   ");
+				//				IO.WriteSerialHexNumber(0, xMMapPtr->AddrLow);
+				//				Debug.Write(" <-> ");
+				//				
+				//				IO.WriteSerialHexNumber(0, xMMapPtr->AddrHigh);
+				//				Debug.WriteLine("");
+				//				Debug.Write("    Length: ");
+				//				IO.WriteSerialHexNumber(0, xMMapPtr->LengthLow);
+				//				Debug.Write(" <-> ");
+				//				IO.WriteSerialHexNumber(0, xMMapPtr->LengthHigh);
+				//				Debug.WriteLine("");
+				//				Debug.Write("    Type:   ");
+				//				IO.WriteSerialHexNumber(0, xMMapPtr->@Type);
+				//				Debug.WriteLine("");
+				//				xMMapPtr += 1;
+			//}
+			//Debug.WriteLine("After Iterations");
+			//			Debug.Write("[0] ");
+			//			IO.WriteSerialHexNumber(0, *xMMapPtr);
+			//			xMMapPtr += 1;
+			//			Debug.WriteLine("");
+			//			Debug.Write("    ");
+			//			IO.WriteSerialHexNumber(0, *xMMapPtr);
+			//			xMMapPtr += 1;
+			//			Debug.WriteLine("");
+			//			Debug.Write("    ");
+			//			IO.WriteSerialHexNumber(0, *xMMapPtr);
+			//			xMMapPtr += 1;
+			//			Debug.WriteLine("");
+			//			Debug.Write("    ");
+			//			IO.WriteSerialHexNumber(0, *xMMapPtr);
+			//			xMMapPtr += 1;
+			//			Debug.WriteLine("");
+			//			Debug.Write("    ");
+			//			IO.WriteSerialHexNumber(0, *xMMapPtr);
+			//			xMMapPtr += 1;
+			//			Debug.WriteLine("");
+			//			Debug.Write("    ");
+			//			IO.WriteSerialHexNumber(0, *xMMapPtr);
+			//			Debug.WriteLine("");
+			//			xMMapPtr += 1;
 		}
 
 		public static void Main() {

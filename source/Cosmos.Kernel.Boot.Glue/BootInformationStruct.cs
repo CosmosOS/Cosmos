@@ -3,6 +3,14 @@
 namespace Cosmos.Kernel.Boot.Glue {
 	[System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
 	public struct BootInformationStruct {
+		public struct MMapEntry {
+			public uint Size;
+			public uint AddrLow;
+			public uint AddrHigh;
+			public uint LengthLow;
+			public uint LengthHigh;
+			public uint Type;
+		}
 		public uint Flags;
 		public uint MemLower;
 		public uint MemUpper;

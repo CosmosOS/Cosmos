@@ -5,14 +5,8 @@ using System.Text;
 
 namespace Indy.IL2CPU.IL.X86.CustomImplementations.System {
 	public static class StringImpl {
-		public static unsafe int get_Length_Normal(uint* aThis) {
-			int xArrayPtrNumber = (int)*(aThis + 3);
-			int* xArrayPtr = (int*)xArrayPtrNumber;
-			return *(xArrayPtr + 2);
-		}
-
-		public static unsafe int get_Length_Metal(uint* aThis) {
-			return (int)*aThis;
+		public static unsafe int get_Length(int* aThis) {
+			return *(aThis + 2);
 		}
 
 		public static byte GetByteFromChar(char aChar) {

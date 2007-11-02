@@ -6,18 +6,6 @@ using System.Text;
 
 namespace Indy.IL2CPU.CustomImplementation.System {
 	public static class StringImpl {
-		[MethodAlias(Name = "System.Void System.String..ctor(System.Char[],System.Int32,System.Int32)")]
-		public static void Ctor(String aThis, [FieldAccess(Name = "$$Storage$$")]ref Char[] aStorage, Char[] aChars, int aStartIndex, int aLength) {
-			Char[] newChars = new Char[aLength];
-			Array.Copy(aChars, aStartIndex, newChars, 0, aLength);
-			aStorage = newChars;
-		}
-
-		[MethodAlias(Name = "System.Void System.String..ctor(System.Char[])")]
-		public static void Ctor(String aThis, [FieldAccess(Name = "$$Storage$$")] ref Char[] aStorage, Char[] aChars) {
-			aStorage = aChars;
-		}
-
 		[MethodAlias(Name = "System.String System.String.FastAllocateString(System.Int32)")]
 		public static String FastAllocateString(int aLength) {
 			Char[] xItems = new Char[aLength];
@@ -28,8 +16,8 @@ namespace Indy.IL2CPU.CustomImplementation.System {
 			return aStringPtr + 1;
 		}
 
-		public static unsafe uint* GetStorage(string aStringPtr) {
-			return (uint*)0;
+		public static unsafe uint GetStorage(uint aStringPtr) {
+			return aStringPtr += 12;
 		}
 
 		public static unsafe uint* GetStorageNormal(uint* aStringPtr) {

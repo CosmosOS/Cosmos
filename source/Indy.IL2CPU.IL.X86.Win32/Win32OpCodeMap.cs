@@ -19,7 +19,7 @@ namespace Indy.IL2CPU.IL.X86.Win32 {
 						return CustomImplementations.System.ConsoleImplRefs.WriteLineRef;
 					}
 				case "System_Void___System_Console_WriteLine___System_String___": {
-						return CustomImplementations.System.ConsoleImplRefs.WriteLineRef;
+						return CustomImplementations.System.ConsoleImplRefs.WriteLine_string_Ref;
 					}
 				default:
 					return base.GetCustomMethodImplementation(aOrigMethodName, aInMetalMode);

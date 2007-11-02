@@ -31,9 +31,7 @@ namespace Cosmos.Kernel.Boot {
 		/// </summary>
 		/// <param name="aSerialIdx">The zero-based index of the serial port to use</param>
 		public static void InitSerial(byte aSerialIdx) {
-			// todo: implement other com ports
 			ushort xComAddr = GetSerialAddr(aSerialIdx);
-			System.Diagnostics.Debugger.Break();
 			WriteToPort((ushort)(xComAddr + 1), 0x00);    // Disable all interrupts
 			WriteToPort((ushort)(xComAddr + 3), 0x80);    // Enable DLAB (set baud rate divisor)
 			WriteToPort((ushort)(xComAddr + 0), 0x03);    // Set divisor to 3 (lo byte) 38400 baud
@@ -58,6 +56,105 @@ namespace Cosmos.Kernel.Boot {
 		public static void WriteSerialString(byte aSerialIdx, string aData) {
 			for (int i = 0; i < aData.Length; i++) {
 				WriteSerial(aSerialIdx, (byte)aData[i]);
+			}
+		}
+
+		public static void WriteSerialHexNumber(byte aSerialIdx, uint aNumber) {
+			WriteNumber(aSerialIdx, aNumber, 16);
+			WriteSerialString(aSerialIdx, "x0 (Reverse hex)");
+		}
+
+		private static void WriteNumber(byte aSerialIdx, uint aValue, byte aBase) {
+			uint theValue = aValue;
+			int xReturnedChars = 0;
+			while (theValue > 0) {
+				switch (theValue % aBase) {
+					case 0: {
+							WriteSerialString(aSerialIdx, "0");
+							xReturnedChars++;
+							break;
+						}
+					case 1: {
+							WriteSerialString(aSerialIdx, "1");
+							xReturnedChars++;
+							break;
+						}
+					case 2: {
+							WriteSerialString(aSerialIdx, "2");
+							xReturnedChars++;
+							break;
+						}
+					case 3: {
+							WriteSerialString(aSerialIdx, "3");
+							xReturnedChars++;
+							break;
+						}
+					case 4: {
+							WriteSerialString(aSerialIdx, "4");
+							xReturnedChars++;
+							break;
+						}
+					case 5: {
+							WriteSerialString(aSerialIdx, "5");
+							xReturnedChars++;
+							break;
+						}
+					case 6: {
+							WriteSerialString(aSerialIdx, "6");
+							xReturnedChars++;
+							break;
+						}
+					case 7: {
+							WriteSerialString(aSerialIdx, "7");
+							xReturnedChars++;
+							break;
+						}
+					case 8: {
+							WriteSerialString(aSerialIdx, "8");
+							xReturnedChars++;
+							break;
+						}
+					case 9: {
+							WriteSerialString(aSerialIdx, "9");
+							xReturnedChars++;
+							break;
+						}
+					case 10: {
+							WriteSerialString(aSerialIdx, "A");
+							xReturnedChars++;
+							break;
+						}
+					case 11: {
+							xReturnedChars++;
+							WriteSerialString(aSerialIdx, "B");
+							break;
+						}
+					case 12: {
+							WriteSerialString(aSerialIdx, "C");
+							xReturnedChars++;
+							break;
+						}
+					case 13: {
+							WriteSerialString(aSerialIdx, "D");
+							xReturnedChars++;
+							break;
+						}
+					case 14: {
+							WriteSerialString(aSerialIdx, "E");
+							xReturnedChars++;
+							break;
+						}
+					case 15: {
+							WriteSerialString(aSerialIdx, "F");
+							xReturnedChars++;
+							break;
+						}
+				}
+				theValue = theValue / aBase;
+			}
+			while (xReturnedChars < 8) {
+				WriteSerialString(aSerialIdx, "0");
+				xReturnedChars++;
 			}
 		}
 	}
