@@ -6,7 +6,11 @@ using System.Text;
 namespace Indy.IL2CPU.IL.X86.CustomImplementations.System {
 	public static class StringImpl {
 		public static unsafe int get_Length(int* aThis) {
-			return *(aThis + 2);
+			int* xThis = aThis;
+			xThis += 3;
+			xThis = (int*)*xThis;
+			xThis += 2;
+			return *xThis;
 		}
 
 		public static byte GetByteFromChar(char aChar) {

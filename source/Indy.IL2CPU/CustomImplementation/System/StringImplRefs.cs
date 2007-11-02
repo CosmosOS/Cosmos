@@ -29,7 +29,8 @@ namespace Indy.IL2CPU.CustomImplementation.System {
 			}
 		}
 
-		public static readonly MethodDefinition GetStorageMetalRef;
-		public static readonly MethodDefinition GetStorageNormalRef;
+		//public static readonly MethodDefinition GetStorageMetalRef;
+		//public static readonly MethodDefinition GetStorageNormalRef;
+		public static readonly MethodDefinition GetStorage_ImplRef;
 	}
 }

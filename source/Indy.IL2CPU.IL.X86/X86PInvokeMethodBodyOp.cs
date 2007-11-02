@@ -75,11 +75,11 @@ namespace Indy.IL2CPU.IL.X86 {
 				Op.Ldarg(Assembler, MethodInfo.Arguments[i].VirtualAddresses, MethodInfo.Arguments[i].Size);
 				if (TheMethod.Parameters[i].ParameterType.FullName == "System.String") {
 					string xGetStorageMethodName = "GetStorage";
-					if (Assembler.InMetalMode) {
-						xGetStorageMethodName += "Metal";
-					} else {
-						xGetStorageMethodName += "Normal";
-					}
+//					if (Assembler.InMetalMode) {
+//						xGetStorageMethodName += "Metal";
+//					} else {
+//						xGetStorageMethodName += "Normal";
+//					}
 					new Call(Engine.GetMethodDefinition(Engine.GetTypeDefinition("", "Indy.IL2CPU.CustomImplementation.System.StringImpl"), xGetStorageMethodName, "System.UInt32")) {
 						Assembler = Assembler
 					}.Assemble();
