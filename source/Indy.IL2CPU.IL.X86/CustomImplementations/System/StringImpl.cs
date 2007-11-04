@@ -7,7 +7,7 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System {
 	public static class StringImpl {
 		public static unsafe int get_Length(int* aThis) {
 			int* xThis = aThis;
-			xThis += 3;
+			xThis += 2;
 			xThis = (int*)*xThis;
 			xThis += 2;
 			return *xThis;
@@ -17,11 +17,24 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System {
 			return 0;
 		}
 
-		public static unsafe byte get_Chars_Metal(byte* aThis, int aIndex) {
-			byte* xThis = aThis;
-			xThis += 4;
-			xThis += aIndex;
-			return *xThis;
+		public static unsafe byte get_Chars_Metal(uint* aThis, int aIndex) {
+			uint* xThis = aThis;
+			xThis += 3;
+			xThis = (uint*)*xThis;
+			xThis += 3;
+			byte* aBytes = (byte*)xThis;
+			aBytes += aIndex;
+			return *aBytes;
+		}
+
+		public static unsafe ushort get_Chars_Normal(uint* aThis, int aIndex) {
+			uint* xThis = aThis;
+			xThis += 3;
+			xThis = (uint*)*xThis;
+			xThis += 3;
+			ushort* aBytes = (ushort*)xThis;
+			aBytes += aIndex;
+			return *aBytes;
 		}
 	}
 }

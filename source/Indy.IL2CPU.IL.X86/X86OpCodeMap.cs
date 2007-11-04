@@ -44,17 +44,18 @@ namespace Indy.IL2CPU.IL.X86 {
 					}
 				case "System_UInt32____Indy_IL2CPU_CustomImplementation_System_StringImpl_GetStorage___System_String___": {
 						//if (aInMetalMode) {
-							//return CustomImplementation.System.StringImplRefs.GetStorageMetalRef;
+						//return CustomImplementation.System.StringImplRefs.GetStorageMetalRef;
 						//} else {
-							//return CustomImplementation.System.StringImplRefs.GetStorageNormalRef;
+						//return CustomImplementation.System.StringImplRefs.GetStorageNormalRef;
 						//}
-					return CustomImplementation.System.StringImplRefs.GetStorage_ImplRef;
+						return CustomImplementation.System.StringImplRefs.GetStorage_ImplRef;
 					}
 				case "System_Char___System_String_get_Chars___System_Int32___": {
 						if (aInMetalMode) {
 							return CustomImplementations.System.StringImplRefs.get_Chars_MetalRef;
+						} else {
+							return CustomImplementations.System.StringImplRefs.get_Chars_NormalRef;
 						}
-						goto default;
 					}
 				case "System_Void___System_EventHandler__ctor___System_Object__System_IntPtr___": {
 						return CustomImplementations.System.EventHandlerImplRefs.CtorRef;

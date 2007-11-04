@@ -840,6 +840,8 @@ namespace Indy.IL2CPU.IL.X86.Native.CustomImplementations.System {
 		}
 
 		private static void OutputString(string aText) {
+			int theLength = aText.Length;
+			global::System.Diagnostics.Debugger.Break();
 			for (int i = 0; i < aText.Length; i++) {
 				Write_char_(aText[i]);
 			}

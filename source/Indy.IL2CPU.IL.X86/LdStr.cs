@@ -34,8 +34,8 @@ namespace Indy.IL2CPU.IL.X86 {
 				if (String.IsNullOrEmpty(xDataName)) {
 					xDataName = Assembler.GetIdentifier("StringLiteral");
 					StringBuilder xRefByteArray = new StringBuilder();
-					xRefByteArray.Append(BitConverter.GetBytes(Engine.RegisterType(Engine.GetTypeDefinition("mscorlib", "System.String"))).Aggregate("", (r, b) => r + b + ","));
-					xRefByteArray.Append(BitConverter.GetBytes((int)InstanceTypeEnum.NormalObject).Aggregate("", (r, b) => r + b + ","));
+					xRefByteArray.Append("0x" + ((uint)Engine.RegisterType(Engine.GetTypeDefinition("mscorlib", "System.String"))).ToString("X"));
+					xRefByteArray.Append(",0x" + ((int)InstanceTypeEnum.NormalObject).ToString("X") + ",0,");
 					xRefByteArray.Append(xDataName + "__Contents,");
 					xRefByteArray.Append("0,0,0");
 					Assembler.DataMembers.Add(new DataMember(xDataName, "dd", xRefByteArray.ToString()));
@@ -43,7 +43,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				} else {
 					xDataName = xDataName.Substring(0, xDataName.Length - "__Contents".Length);
 				}
-				Move(Assembler, "eax", "[" + xDataName + "]");
+				Move(Assembler, "eax", xDataName);
 				Pushd(4, "eax");
 			} else {
 				var xDataByteArray = new StringBuilder();
