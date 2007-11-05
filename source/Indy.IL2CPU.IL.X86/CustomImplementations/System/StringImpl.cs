@@ -7,7 +7,7 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System {
 	public static class StringImpl {
 		public static unsafe int get_Length(int* aThis) {
 			int* xThis = aThis;
-			xThis += 2;
+			xThis += 3;
 			xThis = (int*)*xThis;
 			xThis += 2;
 			return *xThis;

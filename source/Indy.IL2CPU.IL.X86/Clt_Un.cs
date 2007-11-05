@@ -16,10 +16,14 @@ namespace Indy.IL2CPU.IL.X86 {
 			CurInstructionLabel = GetInstructionLabel(aInstruction);
 		}
 		public override void DoAssemble() {
+			Assembler.StackSizes.Pop();
+			Assembler.StackSizes.Push(4);
 			string BaseLabel = CurInstructionLabel + "__";
 			string LabelTrue = BaseLabel + "True";
 			string LabelFalse = BaseLabel + "False";
+			Assembler.Add(new CPUx86.Pop("ecx"));
 			Assembler.Add(new CPUx86.Pop("eax"));
+			Assembler.Add(new CPUx86.Pushd("ecx"));
 			Assembler.Add(new CPUx86.Compare("eax", "[esp]"));
 			Assembler.Add(new CPUx86.JumpIfLess(LabelTrue));
 			Assembler.Add(new CPUx86.JumpAlways(LabelFalse));
