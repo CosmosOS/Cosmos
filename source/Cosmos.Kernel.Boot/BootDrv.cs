@@ -16,39 +16,28 @@ namespace Cosmos.Kernel.Boot {
 			IO.WriteSerialHexNumber(0, MultiBootInfo.MMapLength);
 			Debug.WriteLine("");
 			Debug.WriteLine("MMap:");
-			for (uint i = 0; i < 6; i++) {
-				uint* thePtr = (uint*)MultiBootInfo.MMapAddr;
-				thePtr += 24 * i;
-				thePtr -= 4;
-
-				Debug.Write("MMapEntry ");
-				IO.WriteSerialHexNumber(0, i);
-				Debug.WriteLine("");	
-
+			BootInformationStruct.MMapEntry* xMMap = (BootInformationStruct.MMapEntry*)MultiBootInfo.MMapAddr;
+			while ((uint)xMMap < (MultiBootInfo.MMapAddr + MultiBootInfo.MMapLength)) {
+				Debug.WriteLine("MMapEntry");
 				Debug.Write("\tSize ");
-				IO.WriteSerialHexNumber(0, *thePtr);
-				thePtr += 1;
-				Debug.WriteLine("");	
+				IO.WriteSerialHexNumber(0, xMMap->Size);
+				Debug.WriteLine("");
 				Debug.Write("\tAddrLow ");
-				IO.WriteSerialHexNumber(0, *thePtr);
-				thePtr += 1;
-				Debug.WriteLine("");	
+				IO.WriteSerialHexNumber(0, xMMap->AddrLow);
+				Debug.WriteLine("");
 				Debug.Write("\tAddrHigh ");
-				IO.WriteSerialHexNumber(0, *thePtr);
-				thePtr += 1;
-				Debug.WriteLine("");	
+				IO.WriteSerialHexNumber(0, xMMap->AddrHigh);
+				Debug.WriteLine("");
 				Debug.Write("\tLengthLow ");
-				IO.WriteSerialHexNumber(0, *thePtr);
-				thePtr += 1;
-				Debug.WriteLine("");	
+				IO.WriteSerialHexNumber(0, xMMap->LengthLow);
+				Debug.WriteLine("");
 				Debug.Write("\tLengthHigh ");
-				IO.WriteSerialHexNumber(0, *thePtr);
-				thePtr += 1;
-				Debug.WriteLine("");	
+				IO.WriteSerialHexNumber(0, xMMap->LengthHigh);
+				Debug.WriteLine("");
 				Debug.Write("\tType ");
-				IO.WriteSerialHexNumber(0, *thePtr);
-				thePtr += 1;
-				Debug.WriteLine("");	
+				IO.WriteSerialHexNumber(0, xMMap->@Type);
+				Debug.WriteLine("");
+				xMMap = (BootInformationStruct.MMapEntry*)((uint)xMMap + xMMap->Size + 4);
 			}
 			DebugUtil.WriteLine("Done Iterating");
 		}
@@ -64,11 +53,37 @@ namespace Cosmos.Kernel.Boot {
 			Console.Write("Available Memory: ");
 			WriteIntHex(((MultiBootInfo.MemUpper + 1024) / 1024) + 1);
 			Console.WriteLine("");
-			IO.WriteSerialString(0, "Hello, World");
-			Console.WriteLine("Skipping GDT for now");
+			DetermineMemChunkInfo();
 			//Console.Write("Loading IDT...");
 			//IDT.SetupInterruptDescriptorTable();
 			//Console.WriteLine("Done.");
+		}
+
+		private static uint MemChunkStartAddr;
+		private static uint MemChunkLength;
+
+		private static unsafe void DetermineMemChunkInfo() {
+			Console.WriteLine("Determining MemoryChunk Information");
+			Debug.WriteLine("Determining MemoryChunk Information");
+			MemChunkLength = 0;
+			MemChunkStartAddr = 0;
+			BootInformationStruct.MMapEntry* xMMap = (BootInformationStruct.MMapEntry*)MultiBootInfo.MMapAddr;
+			while ((uint)xMMap < (MultiBootInfo.MMapAddr + MultiBootInfo.MMapLength)) {
+				if (xMMap->@Type == 1) {
+					if (xMMap->LengthLow > MemChunkLength) {
+						MemChunkLength = xMMap->LengthLow;
+						MemChunkStartAddr = xMMap->AddrLow;
+					}
+				}
+				xMMap = (BootInformationStruct.MMapEntry*)((uint)xMMap + xMMap->Size + 4);
+			}
+			Console.WriteLine("\tFound");
+			Debug.Write("\tStart Address ");
+			IO.WriteSerialHexNumber(0, MemChunkStartAddr);
+			Debug.WriteLine("");
+			Debug.Write("\tLength ");
+			IO.WriteSerialHexNumber(0, MemChunkLength);
+			Debug.WriteLine("");
 		}
 
 		private static void WriteInt(uint aValue) {
