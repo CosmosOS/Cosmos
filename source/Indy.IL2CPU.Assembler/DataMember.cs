@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using i4o;
 using Mono.Cecil;
 
 namespace Indy.IL2CPU.Assembler {
@@ -24,9 +25,19 @@ namespace Indy.IL2CPU.Assembler {
 			DefaultValue = aDefaultValue;
 		}
 
-		public readonly string Name;
+		[Indexable]
+		public string Name {
+			get;
+			private set;
+		}
+		
 		public readonly string DataType;
-		public readonly string DefaultValue;
+		
+		[Indexable]
+		public string DefaultValue {
+			get;
+			private set;
+		}
 		public override string ToString() {
 			return Name + " " + DataType + " " + DefaultValue;
 		}

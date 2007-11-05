@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using i4o;
 
 namespace Indy.IL2CPU.Assembler {
 	public abstract class Assembler: IDisposable {
@@ -10,10 +11,10 @@ namespace Indy.IL2CPU.Assembler {
 		//public const string EntryPointLabelName = "___ENTRYPOINT___";
 		//public const string EngineEntryPointLabelName = "___ENGINE__ENTRYPOINT___";
 		protected List<Instruction> mInstructions = new List<Instruction>();
-		private List<DataMember> mDataMembers = new List<DataMember>();
+		private IndexableCollection<DataMember> mDataMembers = new IndexableCollection<DataMember>();
 		protected StreamWriter mOutputWriter;
 		private List<string> mIncludes = new List<string>();
-		private List<ImportMember> mImportMembers = new List<ImportMember>();
+		private IndexableCollection<ImportMember> mImportMembers = new IndexableCollection<ImportMember>();
 		private readonly bool mInMetalMode = false;
 		public readonly Stack<int> StackSizes = new Stack<int>();
 
@@ -37,13 +38,13 @@ namespace Indy.IL2CPU.Assembler {
 			}
 		}
 
-		public List<DataMember> DataMembers {
+		public IndexableCollection<DataMember> DataMembers {
 			get {
 				return mDataMembers;
 			}
 		}
 
-		public List<ImportMember> ImportMembers {
+		public IndexableCollection<ImportMember> ImportMembers {
 			get {
 				return mImportMembers;
 			}

@@ -274,9 +274,10 @@ namespace Indy.IL2CPU.IL.X86.Native {
 						for (int i = 0; i < 1; i++) {
 							xFieldData += ",0,0,0,0,0,0,0,0";
 						}
-						aAssembler.DataMembers.RemoveAll(delegate(DataMember aItem) {
-							return aItem.Name == xFieldName;
-						});
+						DataMember xDataItem = (from item in aAssembler.DataMembers
+												where item.Name == xFieldName
+												select item).FirstOrDefault();
+						aAssembler.DataMembers.Remove(xDataItem);
 						aAssembler.DataMembers.Add(new DataMember(xFieldName, "dd", xFieldName));
 						aAssembler.DataMembers.Add(new DataMember(xFieldName + "___Contents", "db", xFieldData));
 						xFieldDef = GetGlueField(GlueFieldTypeEnum.GDT_Pointer);
@@ -320,9 +321,10 @@ namespace Indy.IL2CPU.IL.X86.Native {
 						for (int i = 0; i < 256; i++) {
 							xFieldData += ",0,0,0,0,0,0,0,0";
 						}
-						aAssembler.DataMembers.RemoveAll(delegate(DataMember aItem) {
-							return aItem.Name == xFieldName;
-						});
+						DataMember xDataItem = (from item in aAssembler.DataMembers
+												where item.Name == xFieldName
+												select item).FirstOrDefault();
+						aAssembler.DataMembers.Remove(xDataItem);
 						aAssembler.DataMembers.Add(new DataMember(xFieldName, "dd", xFieldName + "___Contents"));
 						aAssembler.DataMembers.Add(new DataMember(xFieldName + "___Contents", "db", xFieldData));
 						xFieldDef = GetGlueField(GlueFieldTypeEnum.IDT_Pointer);
