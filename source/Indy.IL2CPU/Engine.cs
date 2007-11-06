@@ -230,7 +230,9 @@ namespace Indy.IL2CPU {
 			xInitVmtOp.SetTypeInfoRef = VTablesImplRefs.SetTypeInfoRef;
 			xInitVmtOp.SetMethodInfoRef = VTablesImplRefs.SetMethodInfoRef;
 			xInitVmtOp.LoadTypeTableRef = VTablesImplRefs.LoadTypeTableRef;
+			xInitVmtOp.TypesFieldRef = VTablesImplRefs.VTablesImplDef.Fields.GetField("mTypes");
 			xInitVmtOp.Methods = mMethods.Keys;
+			xInitVmtOp.VTableEntrySize = GetFieldStorageSize(GetTypeDefinition("", typeof(VTable).FullName.Replace('+', '.')));
 			xInitVmtOp.GetMethodIdentifier += delegate(MethodDefinition aMethod) {
 				TypeReference[] xParams = new TypeReference[aMethod.Parameters.Count];
 				for (int i = 0; i < aMethod.Parameters.Count; i++) {

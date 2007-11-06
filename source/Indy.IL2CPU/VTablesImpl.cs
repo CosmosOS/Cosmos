@@ -5,13 +5,6 @@ using System.Text;
 
 namespace Indy.IL2CPU {
 	public static class VTablesImpl {
-		public struct VTable {
-			public int BaseTypeIdentifier;
-			public int Name;
-			public int[] MethodIndexes;
-			public int[] MethodAddresses;
-		}
-
 		private static VTable[] mTypes;
 		public static bool IsInstance(int aObjectType, int aDesiredObjectType) {
 			int xCurrentType = aObjectType;
@@ -28,14 +21,14 @@ namespace Indy.IL2CPU {
 		}
 
 		public static void LoadTypeTable(int aTypeCount) {
-			mTypes = new VTable[aTypeCount];
+			//mTypes = new VTable[aTypeCount];
 		}
 
-		public static void SetTypeInfo(int aType, int aBaseType, int aMethodCount, int aName) {
+		public static void SetTypeInfo(int aType, int aBaseType, ref int[] aMethodIndexes, ref int[] aMethodAddresses, int aName) {
 			mTypes[aType] = new VTable();
 			mTypes[aType].BaseTypeIdentifier = aBaseType;
-			mTypes[aType].MethodIndexes = new int[aMethodCount];
-			mTypes[aType].MethodAddresses = new int[aMethodCount];
+			mTypes[aType].MethodIndexes = aMethodIndexes;
+			mTypes[aType].MethodAddresses = aMethodAddresses;
 			mTypes[aType].Name = aName;
 		}
 
@@ -53,5 +46,12 @@ namespace Indy.IL2CPU {
 			}
 			return 0x00000000;
 		}
+	}
+
+	public struct VTable {
+		public int BaseTypeIdentifier;
+		public int Name;
+		public int[] MethodIndexes;
+		public int[] MethodAddresses;
 	}
 }

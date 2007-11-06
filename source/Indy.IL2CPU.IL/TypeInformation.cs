@@ -21,6 +21,10 @@ namespace Indy.IL2CPU.IL {
 				Size = aSize;
 				RelativeAddress = "+ 0" + (Offset).ToString("X") + "h";
 			}
+
+			public override string ToString() {
+				return String.Format("{0}\t{1}\t{2}", Offset, Size, RelativeAddress);
+			}
 		}
 
 		public readonly SortedList<string, Field> Fields;

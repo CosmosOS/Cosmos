@@ -174,6 +174,9 @@ namespace Indy.IL2CPU.IL.X86.Native {
 				case "System_Void___Indy_IL2CPU_RuntimeEngine_FinalizeEngine____": {
 						return RuntimeEngineImplRefs.FinalizeEngineRef;
 					}
+				case "System_UInt32___Indy_IL2CPU_RuntimeEngine_Heap_AllocNewObject___System_UInt32___": {
+						return GetGlueMethod(GlueMethodTypeEnum.Heap_MemAlloc);
+					}
 				default:
 					return base.GetCustomMethodImplementation(aOrigMethodName, aInMetalMode);
 			}

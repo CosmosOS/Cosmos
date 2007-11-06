@@ -14,6 +14,11 @@ namespace Indy.IL2CPU.IL.X86.Native {
 		private byte mInterruptValue;
 		public NativeMethodHeaderOp(Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
+			if (aMethodInfo == null) {
+				throw new ArgumentNullException("aMethodInfo");
+			}
+			if (aMethodInfo.MethodDefinition == null)
+				return;
 			foreach (CustomAttribute xAttrib in aMethodInfo.MethodDefinition.CustomAttributes) {
 				if (xAttrib.Constructor.DeclaringType.FullName == typeof(InterruptServiceRoutineAttribute).FullName) {
 					mIsInterruptHandler = true;

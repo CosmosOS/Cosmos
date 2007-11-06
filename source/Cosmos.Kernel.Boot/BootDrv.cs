@@ -40,6 +40,8 @@ namespace Cosmos.Kernel.Boot {
 				xMMap = (BootInformationStruct.MMapEntry*)((uint)xMMap + xMMap->Size + 4);
 			}
 			DebugUtil.WriteLine("Done Iterating");
+			DetermineMemChunkInfo();
+			MemoryManager.Initialize(MemChunkStartAddr, MemChunkLength);
 		}
 
 		public static void Main() {
@@ -53,10 +55,13 @@ namespace Cosmos.Kernel.Boot {
 			Console.Write("Available Memory: ");
 			WriteIntHex(((MultiBootInfo.MemUpper + 1024) / 1024) + 1);
 			Console.WriteLine("");
-			DetermineMemChunkInfo();
-			//Console.Write("Loading IDT...");
-			//IDT.SetupInterruptDescriptorTable();
-			//Console.WriteLine("Done.");
+			Debug.WriteLine("Trying to create object:");
+			object o = new Object();
+			if (o == null) {
+				Debug.WriteLine("Object is null!");
+			} else {
+				Debug.WriteLine("Object is not null. :-)");
+			}
 		}
 
 		private static uint MemChunkStartAddr;
@@ -77,7 +82,7 @@ namespace Cosmos.Kernel.Boot {
 				}
 				xMMap = (BootInformationStruct.MMapEntry*)((uint)xMMap + xMMap->Size + 4);
 			}
-			Console.WriteLine("\tFound");
+			Console.WriteLine("    Found");
 			Debug.Write("\tStart Address ");
 			IO.WriteSerialHexNumber(0, MemChunkStartAddr);
 			Debug.WriteLine("");

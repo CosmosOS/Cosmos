@@ -51,6 +51,7 @@
     <Compile Include="GDT.cs" />
     <Compile Include="IDT.cs" />
     <Compile Include="IO.cs" />
+    <Compile Include="MemoryManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

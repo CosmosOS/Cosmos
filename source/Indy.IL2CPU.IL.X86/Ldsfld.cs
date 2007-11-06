@@ -9,13 +9,11 @@ namespace Indy.IL2CPU.IL.X86 {
 	public class Ldsfld: Op {
 		private string mDataName;
 		private int mSize;
-		private bool mIsReference = false;
 
 		public Ldsfld(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
 			FieldReference xField = (FieldReference)aInstruction.Operand;
 			mSize = Engine.GetFieldStorageSize(xField.FieldType);
-			mIsReference = Engine.GetDefinitionFromTypeReference(xField.FieldType).IsClass;
 			Engine.QueueStaticField(Engine.GetDefinitionFromFieldReference(xField), out mDataName);
 		}
 		public override void DoAssemble() {
