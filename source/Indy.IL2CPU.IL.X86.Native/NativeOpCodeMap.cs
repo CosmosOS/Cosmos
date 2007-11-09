@@ -287,7 +287,7 @@ namespace Indy.IL2CPU.IL.X86.Native {
 						string xPointerFieldName;
 						Engine.QueueStaticField(xFieldDef, out xPointerFieldName);
 						aAssembler.Add(new CPU.Move("eax", xPointerFieldName));
-						aAssembler.Add(new CPU.Move("word [eax]", "0x" + ((8 * 1) - 1).ToString("X")));
+						aAssembler.Add(new CPU.Move("word [eax]", "0x" + ((8 * 3) - 1).ToString("X")));
 						aAssembler.Add(new CPU.Move("ecx", xFieldName));
 						aAssembler.Add(new CPU.Add("ecx", "0xC"));
 						aAssembler.Add(new CPU.Move("dword [eax + 2]", "ecx"));
@@ -297,21 +297,19 @@ namespace Indy.IL2CPU.IL.X86.Native {
 						FieldDefinition xFieldDef = GetGlueField(GlueFieldTypeEnum.GDT_Pointer);
 						string xPointerFieldName;
 						Engine.QueueStaticField(xFieldDef, out xPointerFieldName);
-						aAssembler.Add(new CPU.Move("eax", xPointerFieldName));
 						aAssembler.Add(new CPUNative.Cli());
+						aAssembler.Add(new CPU.Move("eax", xPointerFieldName));
 						aAssembler.Add(new Literal("XCHG BX, BX "));
-						aAssembler.Add(new CPUNative.Lgdt("eax"));
+						aAssembler.Add(new CPUNative.Lgdt("[eax]"));
 						aAssembler.Add(new Literal("use32"));
-						aAssembler.Add(new CPU.JumpAlways("flush____gdt______table__part1"));
-						aAssembler.Add(new Label("flush____gdt______table__part1"));
-						aAssembler.Add(new CPU.Move("eax", "0x0"));
+						aAssembler.Add(new CPU.Move("eax", "0x10"));
 						aAssembler.Add(new CPU.Move("ds", "ax"));
 						aAssembler.Add(new CPU.Move("es", "ax"));
 						aAssembler.Add(new CPU.Move("fs", "ax"));
 						aAssembler.Add(new CPU.Move("gs", "ax"));
 						aAssembler.Add(new CPU.Move("ss", "ax"));
-						aAssembler.Add(new CPU.JumpAlways("flush____gdt______table__part2"));
-						aAssembler.Add(new Label("flush____gdt______table__part2"));
+						aAssembler.Add(new CPU.JumpAlways("0x8:flush____gdt______table__part1"));
+						aAssembler.Add(new Label("flush____gdt______table__part1"));
 						break;
 					}
 				case GluePlaceholderMethodTypeEnum.IDT_LoadArray: {
@@ -386,7 +384,6 @@ namespace Indy.IL2CPU.IL.X86.Native {
 
 		public override void PostProcess(Indy.IL2CPU.Assembler.Assembler aAssembler) {
 			base.PostProcess(aAssembler);
-			return;
 			TypeDefinition xRuntimeEngineTypeDef = Engine.GetTypeDefinition(typeof(RuntimeEngineImpl).Assembly.GetName().Name, typeof(RuntimeEngineImpl).FullName);
 			MethodDefinition xTheMethod = GetGlueMethod(GlueMethodTypeEnum.IDT_SetHandler);
 			Engine.QueueMethod(xTheMethod);

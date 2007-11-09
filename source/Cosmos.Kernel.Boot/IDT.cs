@@ -26,7 +26,7 @@ namespace Cosmos.Kernel.Boot {
 			mIDTEntries[aInterruptNumber].Sel = 0;
 			mIDTEntries[aInterruptNumber].BaseLow = (ushort)(aBase);
 			mIDTEntries[aInterruptNumber].BaseHi = (ushort)(aBase >> 16);
-			mIDTEntries[aInterruptNumber].Flags = 128 /*Present*/| 0 /*Ring0*/| 8 /*32-bit*/| 0xF /*interrupt gate*/;
+			mIDTEntries[aInterruptNumber].Flags = 0x8E;//128 /*Present*/| 0 /*Ring0*/| 8 /*32-bit*/| 0xF /*interrupt gate*/;
 		}	
 						   
 		[GlueMethod(MethodType = GlueMethodTypeEnum.IDT_InterruptHandler)]
@@ -47,7 +47,7 @@ namespace Cosmos.Kernel.Boot {
 			//CustomImplementations.System.ConsoleImpl.WriteLine("");
 		}
 
-		public static void SetupInterruptDescriptorTable() {
+		public static void Setup() {
 			Console.WriteLine("Start setting up Interrupt Descriptor Table");
 			Console.WriteLine("Load the array");
 			IDT_LoadArray();

@@ -12,7 +12,7 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
 		}
 
 		public override string ToString() {
-			return "lgdt [" + Operand + "]";
+			return "lgdt " + Operand;
 		}
 	}
 }

@@ -419,76 +419,7 @@ namespace Indy.IL2CPU {
 			}
 			AssemblyNameReference xAssemblyNameReference = aRef.Scope as AssemblyNameReference;
 			if (xAssemblyNameReference != null) {
-				AssemblyDefinition xReferencedFieldAssembly;
-				try {
-					xReferencedFieldAssembly = mCurrent.mCrawledAssembly.Resolver.Resolve(xAssemblyNameReference);
-				} catch {
-					xReferencedFieldAssembly = null;
-				}
-				if (xReferencedFieldAssembly == null) {
-					Assembly xAssembly = (from item in AppDomain.CurrentDomain.GetAssemblies()
-										  where item.GetName().Name == xAssemblyNameReference.Name
-										  select item).FirstOrDefault();
-					if (xAssembly != null) {
-						xReferencedFieldAssembly = AssemblyFactory.GetAssembly(xAssembly.Location);
-					} else {
-						try {
-							Assembly a = Assembly.Load(xAssemblyNameReference.Name);
-							if (a != null) {
-								xReferencedFieldAssembly = AssemblyFactory.GetAssembly(a.Location);
-							}
-						} catch {
-						}
-					}
-				}
-				if (xReferencedFieldAssembly != null) {
-					foreach (ModuleDefinition xModule in xReferencedFieldAssembly.Modules) {
-						var xReferencedType = xModule.Types[aRef.FullName];
-						if (xReferencedType != null) {
-							return xReferencedType;
-						}
-						{
-							string theName = aRef.FullName;
-							while (theName.EndsWith("[]")) {
-								theName = theName.Substring(0, theName.Length - 2);
-							}
-							xReferencedType = xModule.Types[theName];
-							if (xReferencedType != null) {
-								return xReferencedType;
-							}
-						}
-						{
-							string theName = aRef.FullName;
-							while (theName.EndsWith("*")) {
-								theName = theName.Substring(0, theName.Length - 1);
-							}
-							xReferencedType = xModule.Types[theName];
-							if (xReferencedType != null) {
-								return xReferencedType;
-							}
-						}
-						{
-							string theName = aRef.FullName;
-							while (theName.EndsWith("&")) {
-								theName = theName.Substring(0, theName.Length - 1);
-							}
-							xReferencedType = xModule.Types[theName];
-							if (xReferencedType != null) {
-								return xReferencedType;
-							}
-						}
-						{
-							string theName = aRef.FullName;
-							if (theName.Contains("<") && theName.Contains(">")) {
-								theName = theName.Substring(0, theName.IndexOf("<"));
-							}
-							xReferencedType = xModule.Types[theName];
-							if (xReferencedType != null) {
-								return xReferencedType;
-							}
-						}
-					}
-				}
+				return GetTypeDefinition(xAssemblyNameReference.Name, aRef.FullName);
 			} else {
 				ModuleDefinition xReferencedModule = aRef.Scope as ModuleDefinition;
 				if (xReferencedModule != null) {
@@ -1090,23 +1021,30 @@ namespace Indy.IL2CPU {
 			}
 		}
 
+		private SortedList<string, AssemblyDefinition> mAssemblyDefCache = new SortedList<string, AssemblyDefinition>();
+
 		public static TypeDefinition GetTypeDefinition(string aAssembly, string aType) {
 			if (mCurrent == null) {
 				throw new Exception("ERROR: No Current Engine found!");
 			}
 			AssemblyDefinition xAssemblyDef;
-			Assembly xAssembly = (from item in AppDomain.CurrentDomain.GetAssemblies()
-								  where item.FullName == aAssembly || item.GetName().Name == aAssembly
-								  select item).FirstOrDefault();
-			if (xAssembly == null) {
-				if (String.IsNullOrEmpty(aAssembly) || aAssembly == typeof(Engine).Assembly.GetName().Name || aAssembly == typeof(Engine).Assembly.GetName().FullName) {
-					xAssembly = typeof(Engine).Assembly;
-				}
-			}
-			if (xAssembly != null) {
-				xAssemblyDef = AssemblyFactory.GetAssembly(xAssembly.Location);
+			if (mCurrent.mAssemblyDefCache.ContainsKey(aAssembly)) {
+				xAssemblyDef = mCurrent.mAssemblyDefCache[aAssembly];
 			} else {
-				xAssemblyDef = mCurrent.mCrawledAssembly.Resolver.Resolve(aAssembly);
+				Assembly xAssembly = (from item in AppDomain.CurrentDomain.GetAssemblies()
+									  where item.FullName == aAssembly || item.GetName().Name == aAssembly
+									  select item).FirstOrDefault();
+				if (xAssembly == null) {
+					if (String.IsNullOrEmpty(aAssembly) || aAssembly == typeof(Engine).Assembly.GetName().Name || aAssembly == typeof(Engine).Assembly.GetName().FullName) {
+						xAssembly = typeof(Engine).Assembly;
+					}
+				}
+				if (xAssembly != null) {
+					xAssemblyDef = AssemblyFactory.GetAssembly(xAssembly.Location);
+				} else {
+					xAssemblyDef = mCurrent.mCrawledAssembly.Resolver.Resolve(aAssembly);
+				}
+				mCurrent.mAssemblyDefCache.Add(aAssembly, xAssemblyDef);
 			}
 			TypeDefinition xTypeDef = null;
 			string xActualTypeName = aType;

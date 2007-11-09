@@ -55,13 +55,10 @@ namespace Cosmos.Kernel.Boot {
 			Console.Write("Available Memory: ");
 			WriteIntHex(((MultiBootInfo.MemUpper + 1024) / 1024) + 1);
 			Console.WriteLine("");
-			Debug.WriteLine("Trying to create object:");
-			object o = new Object();
-			if (o == null) {
-				Debug.WriteLine("Object is null!");
-			} else {
-				Debug.WriteLine("Object is not null. :-)");
-			}
+			Console.WriteLine("Setting up GDT");
+			GDT.Setup();
+			Console.WriteLine("Setting up IDT");
+			IDT.Setup();
 		}
 
 		private static uint MemChunkStartAddr;

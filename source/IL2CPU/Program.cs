@@ -116,7 +116,7 @@ namespace IL2CPU {
 						Console.ResetColor();
 					};
 					bool xCleanupAsm = String.IsNullOrEmpty(AsmFile);
-					if(xCleanupAsm) {
+					if (xCleanupAsm) {
 						AsmFile = Path.GetTempFileName();
 					}
 					using (FileStream fs = new FileStream(AsmFile, FileMode.Create)) {
