@@ -21,18 +21,37 @@ namespace Cosmos.Kernel.Boot {
 		}
 
 		[GlueMethod(MethodType = GlueMethodTypeEnum.IDT_SetHandler)]
-		private static void IDT_SetHandler(byte aInterruptNumber, uint aBase, ushort aSel, IDTEntryStruct.FlagsEnum aFlags) {
+		private static void IDT_SetHandler(byte aInterruptNumber, uint aBase, ushort aSel, IDTFlagsEnum aFlags) {
 			mIDTEntries[aInterruptNumber].AlwaysZero = 0;
-			mIDTEntries[aInterruptNumber].Sel = 0;
-			mIDTEntries[aInterruptNumber].BaseLow = (ushort)(aBase);
-			mIDTEntries[aInterruptNumber].BaseHi = (ushort)(aBase >> 16);
+			mIDTEntries[aInterruptNumber].Sel = 0x8;
+			mIDTEntries[aInterruptNumber].BaseLow = (ushort)(aBase & 0xFFFF);
+			mIDTEntries[aInterruptNumber].BaseHi = (ushort)((aBase >> 16) & 0xFFFF);
 			mIDTEntries[aInterruptNumber].Flags = 0x8E;//128 /*Present*/| 0 /*Ring0*/| 8 /*32-bit*/| 0xF /*interrupt gate*/;
+			Debug.Write("Registering Interrupt ");
+			IO.WriteSerialHexNumber(0, aInterruptNumber, 2);
+			Debug.WriteLine("");
+			Debug.Write("    BaseLow = ");
+			IO.WriteSerialHexNumber(0, mIDTEntries[aInterruptNumber].BaseLow, 4);
+			Debug.WriteLine("");
+			Debug.Write("    BaseHigh = ");
+			IO.WriteSerialHexNumber(0, mIDTEntries[aInterruptNumber].BaseHi, 4);
+			Debug.WriteLine("");
+			Debug.Write("    Base = ");
+			IO.WriteSerialHexNumber(0, aBase);
+			Debug.WriteLine("");
 		}	
 						   
 		[GlueMethod(MethodType = GlueMethodTypeEnum.IDT_InterruptHandler)]
-		private static void InterruptHandler(byte aInterrupt, byte aParam) {
+		private static void InterruptHandler(byte aInterrupt, uint aParam) {
+			Debug.WriteLine("Interrupt Received");
+			Debug.Write("    Interrupt Number = ");
+			IO.WriteSerialHexNumber(0, aInterrupt, 2);
+			Debug.WriteLine("");
+			Debug.Write("    Interrupt Params = ");
+			IO.WriteSerialHexNumber(0, aParam, 8);
+			Debug.WriteLine("");
 			//System.Diagnostics.Debugger.Break();
-			Console.WriteLine("Interrupt received:");
+			//Console.WriteLine("Interrupt received:");
 			//CustomImplementations.System.ConsoleImpl.Write("    ");
 			//CustomImplementations.System.ConsoleImpl.OutputByteValue(aInterrupt);
 			//CustomImplementations.System.ConsoleImpl.WriteLine("");

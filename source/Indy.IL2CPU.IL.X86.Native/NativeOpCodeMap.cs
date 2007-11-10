@@ -299,7 +299,6 @@ namespace Indy.IL2CPU.IL.X86.Native {
 						Engine.QueueStaticField(xFieldDef, out xPointerFieldName);
 						aAssembler.Add(new CPUNative.Cli());
 						aAssembler.Add(new CPU.Move("eax", xPointerFieldName));
-						aAssembler.Add(new Literal("XCHG BX, BX "));
 						aAssembler.Add(new CPUNative.Lgdt("[eax]"));
 						aAssembler.Add(new Literal("use32"));
 						aAssembler.Add(new CPU.Move("eax", "0x10"));
@@ -333,7 +332,7 @@ namespace Indy.IL2CPU.IL.X86.Native {
 						Engine.QueueStaticField(xFieldDef, out xPointerFieldName);
 						aAssembler.Add(new CPU.Move("eax", xPointerFieldName));
 						aAssembler.Add(new CPU.Move("word [eax]", "0x" + ((8 * 256) - 1).ToString("X")));
-						aAssembler.Add(new CPU.Move("ecx", xFieldName));
+						aAssembler.Add(new CPU.Move("ecx", xFieldName + "___Contents"));
 						aAssembler.Add(new CPU.Add("ecx", "0xC"));
 						aAssembler.Add(new CPU.Move("dword [eax + 2]", "ecx"));
 						break;
@@ -388,44 +387,36 @@ namespace Indy.IL2CPU.IL.X86.Native {
 			MethodDefinition xTheMethod = GetGlueMethod(GlueMethodTypeEnum.IDT_SetHandler);
 			Engine.QueueMethod(xTheMethod);
 			mIDTSetHandlerMethodName = new Label(xTheMethod).Name;
+			Console.WriteLine("IDTEntry size = {0}", Engine.GetFieldStorageSize(Engine.GetTypeDefinition(typeof (Cosmos.Kernel.Boot.Glue.IDTEntryStruct).Assembly.GetName().Name, typeof (Cosmos.Kernel.Boot.Glue.IDTEntryStruct).FullName)));
 			X86.X86MethodHeaderOp.AssembleHeader(aAssembler, "___________REGISTER___ISRS_____", new int[0]);
 			string xInterruptHandlerLabel = new Label(GetGlueMethod(GlueMethodTypeEnum.IDT_InterruptHandler)).Name;
 			int[] xInterruptsWithParam = new int[] { 8, 10, 11, 12, 13, 14 };
 			for (int i = 0; i < 256; i++) {
-				aAssembler.Add(new CPU.Push("0x" + i.ToString("X")));
-				//if (i == 3) {
-				//	aAssembler.Add(new Literal("xchg bx, bx"));
-				//}
-				aAssembler.Add(new CPU.Push("____INTERRUPT_HANDLER___" + i));
-				aAssembler.Add(new CPU.Push("0x08"));
-				aAssembler.Add(new CPU.Push("0x8E"));
+				aAssembler.Add(new CPU.Pushd("0x" + i.ToString("X")));
+				aAssembler.Add(new CPU.Pushd("____INTERRUPT_HANDLER___" + i));
+				aAssembler.Add(new CPU.Pushd("0x08"));
+				aAssembler.Add(new CPU.Pushd("0x8E"));
 				aAssembler.Add(new CPU.Call(mIDTSetHandlerMethodName));
 			}
 			X86.X86MethodFooterOp.AssembleFooter(0, aAssembler, new int[0], 0);
 			for (int j = 0; j < 256; j++) {
 				aAssembler.Add(new Label("____INTERRUPT_HANDLER___" + j));
 				aAssembler.Add(new CPUNative.Cli());
-				aAssembler.Add(new CPU.Push(j.ToString()));
+				aAssembler.Add(new Literal("xchg bx, bx"));
+				aAssembler.Add(new CPU.Pushd(j.ToString()));
 				if (!xInterruptsWithParam.Contains(j)) {
-					aAssembler.Add(new CPU.Push("0"));
+					aAssembler.Add(new CPU.Pushd("0"));
 				}
 				aAssembler.Add(new CPU.JumpAlways("____INTERRUPT_HANDLER___GENERIC"));
 			}
 			aAssembler.Add(new Label("____INTERRUPT_HANDLER___GENERIC"));
+			aAssembler.Add(new Literal("clts"));
+			aAssembler.Add(new Literal("xchg bx, bx"));
 			aAssembler.Add(new CPUNative.Pushad());
-			aAssembler.Add(new CPU.Move("ax", "ds"));
-			aAssembler.Add(new CPU.Push("eax"));
-			aAssembler.Add(new CPU.Move("ds", "ax"));
-			aAssembler.Add(new CPU.Move("es", "ax"));
-			aAssembler.Add(new CPU.Move("fs", "ax"));
-			aAssembler.Add(new CPU.Move("gs", "ax"));
 			aAssembler.Add(new CPU.Call(xInterruptHandlerLabel));
-			aAssembler.Add(new CPU.Pop("ebx"));
-			aAssembler.Add(new CPU.Move("ds", "bx"));
-			aAssembler.Add(new CPU.Move("es", "bx"));
-			aAssembler.Add(new CPU.Move("fs", "bx"));
-			aAssembler.Add(new CPU.Move("gs", "bx"));
 			aAssembler.Add(new CPUNative.Popad());
+			aAssembler.Add(new CPU.Add("esp", "0x8"));
+			aAssembler.Add(new Literal("xchg bx, bx"));
 			aAssembler.Add(new CPUNative.Sti());
 			aAssembler.Add(new CPUNative.IRet());
 		}

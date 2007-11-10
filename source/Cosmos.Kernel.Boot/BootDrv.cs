@@ -55,10 +55,15 @@ namespace Cosmos.Kernel.Boot {
 			Console.Write("Available Memory: ");
 			WriteIntHex(((MultiBootInfo.MemUpper + 1024) / 1024) + 1);
 			Console.WriteLine("");
+			Console.WriteLine("Initializing PIC");
+			PIC.Initialize();
+			Console.WriteLine("Slowing down PIT");
+			PIT.PIT_SetSlowest();
 			Console.WriteLine("Setting up GDT");
 			GDT.Setup();
 			Console.WriteLine("Setting up IDT");
 			IDT.Setup();
+			Console.WriteLine("Kernel booted!");
 		}
 
 		private static uint MemChunkStartAddr;

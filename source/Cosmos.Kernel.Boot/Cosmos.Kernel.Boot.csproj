@@ -52,6 +52,8 @@
     <Compile Include="IDT.cs" />
     <Compile Include="IO.cs" />
     <Compile Include="MemoryManager.cs" />
+    <Compile Include="PIC.cs" />
+    <Compile Include="PIT.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

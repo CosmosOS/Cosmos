@@ -48,8 +48,8 @@ namespace Cosmos.Kernel.Boot {
 		public static void Setup() {
 			LoadArray();
 			GDT_InitEntry(ref mGDTEntries[0], 0, 0, 0);
-			GDT_InitEntry(ref mGDTEntries[CodeSelector >> 3], 0, 0xFFFFFFFF, 0x9A);
-			GDT_InitEntry(ref mGDTEntries[DataSelector >> 3], 0, 0xFFFFFFFF, 0x92);
+			GDT_InitEntry(ref mGDTEntries[CodeSelector >> 3], 0, 0xFFFFFFFF, 0xC99);
+			GDT_InitEntry(ref mGDTEntries[DataSelector >> 3], 0, 0xFFFFFFFF, 0xC93);
 			RegisterGDT();
 		}
 	}

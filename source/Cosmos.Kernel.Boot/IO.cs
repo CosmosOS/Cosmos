@@ -60,13 +60,17 @@ namespace Cosmos.Kernel.Boot {
 		}
 
 		public static void WriteSerialHexNumber(byte aSerialIdx, uint aNumber) {
-			WriteNumber(aSerialIdx, aNumber, 16);
+			WriteSerialHexNumber(aSerialIdx, aNumber, 8);
+		}
+
+		public static void WriteSerialHexNumber(byte aSerialIdx, uint aNumber, uint aCharCount) {
+			WriteNumber(aSerialIdx, aNumber, 16, aCharCount);
 			WriteSerialString(aSerialIdx, "x0 (Reverse hex)");
 		}
 
-		private static void WriteNumber(byte aSerialIdx, uint aValue, byte aBase) {
+		private static void WriteNumber(byte aSerialIdx, uint aValue, byte aBase, uint aCharCount) {
 			uint theValue = aValue;
-			int xReturnedChars = 0;
+			uint xReturnedChars = 0;
 			while (theValue > 0) {
 				switch (theValue % aBase) {
 					case 0: {
@@ -152,7 +156,7 @@ namespace Cosmos.Kernel.Boot {
 				}
 				theValue = theValue / aBase;
 			}
-			while (xReturnedChars < 8) {
+			while (xReturnedChars < aCharCount) {
 				WriteSerialString(aSerialIdx, "0");
 				xReturnedChars++;
 			}
