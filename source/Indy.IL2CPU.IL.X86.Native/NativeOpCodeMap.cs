@@ -273,8 +273,8 @@ namespace Indy.IL2CPU.IL.X86.Native {
 				case GluePlaceholderMethodTypeEnum.GDT_LoadArray: {
 						FieldDefinition xFieldDef = GetGlueField(GlueFieldTypeEnum.GDT_Array);
 						string xFieldName = Assembler.DataMember.GetStaticFieldName(xFieldDef);
-						string xFieldData = "0,0,0,0,2,0,0,0,1,0,0,0";
-						for (int i = 0; i < 1; i++) {
+						string xFieldData = "0,0,0,0,2,0,0,0,4,0,0,0";
+						for (int i = 0; i < 3; i++) {
 							xFieldData += ",0,0,0,0,0,0,0,0";
 						}
 						DataMember xDataItem = (from item in aAssembler.DataMembers
@@ -297,7 +297,6 @@ namespace Indy.IL2CPU.IL.X86.Native {
 						FieldDefinition xFieldDef = GetGlueField(GlueFieldTypeEnum.GDT_Pointer);
 						string xPointerFieldName;
 						Engine.QueueStaticField(xFieldDef, out xPointerFieldName);
-						aAssembler.Add(new CPUNative.Cli());
 						aAssembler.Add(new CPU.Move("eax", xPointerFieldName));
 						aAssembler.Add(new CPUNative.Lgdt("[eax]"));
 						aAssembler.Add(new Literal("use32"));
@@ -347,9 +346,7 @@ namespace Indy.IL2CPU.IL.X86.Native {
 						aAssembler.Add(new CPU.Call("___________REGISTER___ISRS_____"));
 						aAssembler.Add(new CPU.Move("eax", xPointerFieldName));
 						aAssembler.Add(new Literal("XCHG BX, BX "));
-						aAssembler.Add(new CPUNative.Cli());
 						aAssembler.Add(new CPUNative.Lidt("eax"));
-						aAssembler.Add(new CPUNative.Sti());
 						GetGlueMethod(GlueMethodTypeEnum.IDT_InterruptHandler);
 						break;
 					}
@@ -370,6 +367,11 @@ namespace Indy.IL2CPU.IL.X86.Native {
 						aAssembler.Add(new CPUNative.Out("dx", "al"));
 						break;
 					}
+				case GluePlaceholderMethodTypeEnum.IDT_EnableInterrupts: {
+						aAssembler.Add(new Literal("xchg bx, bx"));
+						aAssembler.Add(new CPUNative.Sti());
+						break;
+					}
 				default:
 					throw new NotImplementedException("GluePlaceholderMethod '" + aMethodType.ToString() + "' not implemented!");
 			}
@@ -387,7 +389,7 @@ namespace Indy.IL2CPU.IL.X86.Native {
 			MethodDefinition xTheMethod = GetGlueMethod(GlueMethodTypeEnum.IDT_SetHandler);
 			Engine.QueueMethod(xTheMethod);
 			mIDTSetHandlerMethodName = new Label(xTheMethod).Name;
-			Console.WriteLine("IDTEntry size = {0}", Engine.GetFieldStorageSize(Engine.GetTypeDefinition(typeof (Cosmos.Kernel.Boot.Glue.IDTEntryStruct).Assembly.GetName().Name, typeof (Cosmos.Kernel.Boot.Glue.IDTEntryStruct).FullName)));
+			Console.WriteLine("IDTEntry size = {0}", Engine.GetFieldStorageSize(Engine.GetTypeDefinition(typeof(Cosmos.Kernel.Boot.Glue.IDTEntryStruct).Assembly.GetName().Name, typeof(Cosmos.Kernel.Boot.Glue.IDTEntryStruct).FullName)));
 			X86.X86MethodHeaderOp.AssembleHeader(aAssembler, "___________REGISTER___ISRS_____", new int[0]);
 			string xInterruptHandlerLabel = new Label(GetGlueMethod(GlueMethodTypeEnum.IDT_InterruptHandler)).Name;
 			int[] xInterruptsWithParam = new int[] { 8, 10, 11, 12, 13, 14 };
@@ -403,22 +405,17 @@ namespace Indy.IL2CPU.IL.X86.Native {
 				aAssembler.Add(new Label("____INTERRUPT_HANDLER___" + j));
 				aAssembler.Add(new CPUNative.Cli());
 				aAssembler.Add(new Literal("xchg bx, bx"));
+				aAssembler.Add(new CPUNative.Pushad());
 				aAssembler.Add(new CPU.Pushd(j.ToString()));
-				if (!xInterruptsWithParam.Contains(j)) {
+				if (!xInterruptsWithParam.Contains(j)/* && !(j >= 0x20 && j <= 0x2F)*/) {
 					aAssembler.Add(new CPU.Pushd("0"));
 				}
-				aAssembler.Add(new CPU.JumpAlways("____INTERRUPT_HANDLER___GENERIC"));
+				aAssembler.Add(new CPU.Call(xInterruptHandlerLabel));
+				aAssembler.Add(new CPUNative.Popad());
+				aAssembler.Add(new Literal("xchg bx, bx"));
+				aAssembler.Add(new CPUNative.Sti());
+				aAssembler.Add(new CPUNative.IRet());
 			}
-			aAssembler.Add(new Label("____INTERRUPT_HANDLER___GENERIC"));
-			aAssembler.Add(new Literal("clts"));
-			aAssembler.Add(new Literal("xchg bx, bx"));
-			aAssembler.Add(new CPUNative.Pushad());
-			aAssembler.Add(new CPU.Call(xInterruptHandlerLabel));
-			aAssembler.Add(new CPUNative.Popad());
-			aAssembler.Add(new CPU.Add("esp", "0x8"));
-			aAssembler.Add(new Literal("xchg bx, bx"));
-			aAssembler.Add(new CPUNative.Sti());
-			aAssembler.Add(new CPUNative.IRet());
 		}
 	}
 }

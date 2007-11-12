@@ -19,6 +19,7 @@ namespace Cosmos.Kernel.Boot.Glue {
 		/// </summary>
 		IDT_LoadArray,
 		IO_WriteByte,
-		IO_ReadByte
+		IO_ReadByte,
+		IDT_EnableInterrupts
 	}
 }

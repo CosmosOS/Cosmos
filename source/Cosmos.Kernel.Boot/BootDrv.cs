@@ -63,6 +63,7 @@ namespace Cosmos.Kernel.Boot {
 			GDT.Setup();
 			Console.WriteLine("Setting up IDT");
 			IDT.Setup();
+			IDT.IDT_EnableInterrupts();
 			Console.WriteLine("Kernel booted!");
 		}
 

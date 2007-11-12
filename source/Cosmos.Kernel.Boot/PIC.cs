@@ -10,8 +10,11 @@ namespace Cosmos.Kernel.Boot {
 		}
 
 		/// <summary>
-		/// This method remaps IRQ0-IRQ16 to ISR32-ISR47
+		/// This method remaps IRQ0-IRQ16 to ISR32-ISR47 (0x20 - 0x2F)
 		/// </summary>
+		/// <remarks>
+		/// When changing the range to which it's mapped, also change NativeOpCodeMap!!
+		/// </remarks>
 		private static void RemapIRQs() {
 			IO.WriteToPort(0x20, 0x11);
 			IO.WriteToPort(0xA0, 0x11);

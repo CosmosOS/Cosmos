@@ -15,6 +15,10 @@ namespace Cosmos.Kernel.Boot {
 			// implemented using bare assembly
 		}
 
+		[GluePlaceholderMethod(MethodType = GluePlaceholderMethodTypeEnum.IDT_EnableInterrupts)]
+		public static void IDT_EnableInterrupts() {
+		}
+
 		[GluePlaceholderMethod(MethodType = GluePlaceholderMethodTypeEnum.IDT_Register)]
 		private static void IDT_RegisterIDT() {
 			// implemented using bare assembly
@@ -42,10 +46,10 @@ namespace Cosmos.Kernel.Boot {
 		}	
 						   
 		[GlueMethod(MethodType = GlueMethodTypeEnum.IDT_InterruptHandler)]
-		private static void InterruptHandler(byte aInterrupt, uint aParam) {
+		private static void InterruptHandler(uint aInterrupt, uint aParam) {
 			Debug.WriteLine("Interrupt Received");
 			Debug.Write("    Interrupt Number = ");
-			IO.WriteSerialHexNumber(0, aInterrupt, 2);
+			IO.WriteSerialHexNumber(0, aInterrupt, 8);
 			Debug.WriteLine("");
 			Debug.Write("    Interrupt Params = ");
 			IO.WriteSerialHexNumber(0, aParam, 8);
@@ -57,12 +61,12 @@ namespace Cosmos.Kernel.Boot {
 			//CustomImplementations.System.ConsoleImpl.WriteLine("");
 			//CustomImplementations.System.ConsoleImpl.Write("    ");
 			//CustomImplementations.System.ConsoleImpl.OutputByteValue(aParam);
-			//if (aInterrupt >= 40 && aInterrupt <= 47) {
-			//	WriteToPort(0xA0, 0x20);
-			//}
-			//if (aInterrupt >= 32 && aInterrupt <= 47) {
-			//	WriteToPort(0x20, 0x20);
-			//}
+			if (aInterrupt >= 40 && aInterrupt <= 47) {
+				IO.WriteToPort(0xA0, 0x20);
+			}
+			if (aInterrupt >= 32 && aInterrupt <= 47) {
+				IO.WriteToPort(0x20, 0x20);
+			}
 			//CustomImplementations.System.ConsoleImpl.WriteLine("");
 		}
 
