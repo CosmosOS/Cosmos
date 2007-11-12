@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="Assembler.cs" />
     <Compile Include="Cli.cs" />
+    <Compile Include="Break.cs" />
     <Compile Include="In.cs" />
     <Compile Include="Out.cs" />
     <Compile Include="Sti.cs" />

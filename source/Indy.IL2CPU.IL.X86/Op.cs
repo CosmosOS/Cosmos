@@ -51,8 +51,13 @@ namespace Indy.IL2CPU.IL.X86 {
 			Assembler.Add(new JumpAlways(aAddress));
 		}
 
+		[Obsolete("Try using specialized opcodes")]
 		protected void Literal(string aData) {
 			Assembler.Add(new Literal(aData));
+		}
+
+		protected void Comment(string aText) {
+			Assembler.Add(new Comment(aText));
 		}
 
 		public static void Push(Assembler.Assembler aAssembler, int aSize, params string[] aArguments) {

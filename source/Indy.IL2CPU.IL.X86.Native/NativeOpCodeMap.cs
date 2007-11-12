@@ -7,12 +7,18 @@ using Indy.IL2CPU.Assembler;
 using Indy.IL2CPU.IL.X86.Native.CustomImplementations.System;
 using Indy.IL2CPU.IL.X86.Native.CustomImplementations.System.Diagnostics;
 using Mono.Cecil;
+using Mono.Cecil.Cil;
 using CPU = Indy.IL2CPU.Assembler.X86;
 using CPUNative = Indy.IL2CPU.Assembler.X86.Native;
 
 namespace Indy.IL2CPU.IL.X86.Native {
 	public class NativeOpCodeMap: X86.X86OpCodeMap {
 		internal static NativeOpCodeMap Instance;
+
+		public override void Initialize(Indy.IL2CPU.Assembler.Assembler aAssembler) {
+			base.Initialize(aAssembler);
+			base.mMap[Code.Call] = typeof(Call);
+		}
 		public NativeOpCodeMap() {
 			Instance = this;
 		}
@@ -244,11 +250,6 @@ namespace Indy.IL2CPU.IL.X86.Native {
 						//aAssembler.Add(new Literal("xchg bx, bx"));
 						return;
 					}
-				case "System_Void___Cosmos_Kernel_ConsoleDrv_TestIDT____": {
-						aAssembler.Add(new Literal("xchg bx, bx"));
-						aAssembler.Add(new Literal("int 3"));
-						break;
-					}
 				default: {
 						CheckGluePlaceholderMethod();
 						GluePlaceholderMethodTypeEnum? xMethodType = null;
@@ -345,7 +346,7 @@ namespace Indy.IL2CPU.IL.X86.Native {
 						mIDTSetHandlerMethodName = new Label(xTheMethod).Name;
 						aAssembler.Add(new CPU.Call("___________REGISTER___ISRS_____"));
 						aAssembler.Add(new CPU.Move("eax", xPointerFieldName));
-						aAssembler.Add(new Literal("XCHG BX, BX "));
+						aAssembler.Add(new CPUNative.Break());
 						aAssembler.Add(new CPUNative.Lidt("eax"));
 						GetGlueMethod(GlueMethodTypeEnum.IDT_InterruptHandler);
 						break;
@@ -368,7 +369,7 @@ namespace Indy.IL2CPU.IL.X86.Native {
 						break;
 					}
 				case GluePlaceholderMethodTypeEnum.IDT_EnableInterrupts: {
-						aAssembler.Add(new Literal("xchg bx, bx"));
+						aAssembler.Add(new CPUNative.Break());
 						aAssembler.Add(new CPUNative.Sti());
 						break;
 					}
@@ -404,7 +405,7 @@ namespace Indy.IL2CPU.IL.X86.Native {
 			for (int j = 0; j < 256; j++) {
 				aAssembler.Add(new Label("____INTERRUPT_HANDLER___" + j));
 				aAssembler.Add(new CPUNative.Cli());
-				aAssembler.Add(new Literal("xchg bx, bx"));
+				aAssembler.Add(new CPUNative.Break());
 				aAssembler.Add(new CPUNative.Pushad());
 				aAssembler.Add(new CPU.Pushd(j.ToString()));
 				if (!xInterruptsWithParam.Contains(j)/* && !(j >= 0x20 && j <= 0x2F)*/) {
@@ -412,7 +413,7 @@ namespace Indy.IL2CPU.IL.X86.Native {
 				}
 				aAssembler.Add(new CPU.Call(xInterruptHandlerLabel));
 				aAssembler.Add(new CPUNative.Popad());
-				aAssembler.Add(new Literal("xchg bx, bx"));
+				aAssembler.Add(new CPUNative.Break());
 				aAssembler.Add(new CPUNative.Sti());
 				aAssembler.Add(new CPUNative.IRet());
 			}

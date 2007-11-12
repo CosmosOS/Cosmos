@@ -9,7 +9,7 @@ using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL {
 	public abstract class OpCodeMap {
-		private readonly SortedList<Code, Type> mMap = new SortedList<Code, Type>();
+		protected readonly SortedList<Code, Type> mMap = new SortedList<Code, Type>();
 
 		protected OpCodeMap() {
 			MethodHeaderOp = GetMethodHeaderOp();
@@ -33,7 +33,7 @@ namespace Indy.IL2CPU.IL {
 		protected abstract Type GetInitVmtImplementationOp();
 		protected abstract Type GetMainEntryPointOp();
 
-		public void Initialize(Assembler.Assembler aAssembler) {
+		public virtual void Initialize(Assembler.Assembler aAssembler) {
 			foreach (Type t in (from item in ImplementationAssembly.GetTypes()
 								where item.IsSubclassOf(typeof(Op)) && item.GetCustomAttributes(typeof(OpCodeAttribute), true).Length > 0
 								select item)) {

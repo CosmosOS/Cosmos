@@ -25,8 +25,8 @@ namespace Indy.IL2CPU.IL.X86 {
 			// stack - 3 == the array
 			// stack - 2 == the index
 			// stack - 1 == the new value
-			aAssembler.Add(new CPU.Literal("; Index at: [esp + " + aElementSize + "]"));
-			aAssembler.Add(new CPU.Literal("; Array at: [esp + " + (aElementSize + 4) + "]"));
+			aAssembler.Add(new CPU.Comment("; Index at: [esp + " + aElementSize + "]"));
+			aAssembler.Add(new CPU.Comment("; Array at: [esp + " + (aElementSize + 4) + "]"));
 			aAssembler.Add(new CPUx86.Move("ebx", "[esp + " + aElementSize + "]")); // the index
 			aAssembler.Add(new CPUx86.Move("ecx", "[esp + " + (aElementSize + 4) + "]")); // the array
 			aAssembler.Add(new CPUx86.Add("ecx", "12"));
@@ -38,7 +38,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			aAssembler.Add(new CPUx86.Pop("ecx"));
 			aAssembler.StackSizes.Pop();
 			for (int i = (aElementSize / 4) - 1; i >= 0; i -= 1) {
-				aAssembler.Add(new CPU.Literal("; start 1 dword"));
+				aAssembler.Add(new CPU.Comment("; start 1 dword"));
 				aAssembler.Add(new CPUx86.Pop("ebx"));
 				aAssembler.Add(new CPUx86.Move("[ecx]", "ebx"));
 				aAssembler.Add(new CPUx86.Add("ecx", "4"));

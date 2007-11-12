@@ -71,9 +71,13 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 		}
 
+		protected virtual void HandleDebuggerBreak() {
+			//
+		}
+
 		public override void DoAssemble() {
 			if (mIsDebugger_Break) {
-				mAssembler.Add(new Asm.Literal("xchg bx, bx"));
+				HandleDebuggerBreak();
 			} else {
 				Assemble(LabelName, ArgumentSizes.Length);
 			}

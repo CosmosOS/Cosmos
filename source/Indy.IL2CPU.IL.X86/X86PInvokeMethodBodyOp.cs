@@ -40,7 +40,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			if (String.IsNullOrEmpty(xMethodName)) {
 				xMethodName = TheMethod.Name;
 			}
-			Assembler.Add(new Literal("; PInvokeAttributes = '" + TheMethod.PInvokeInfo.Attributes.ToString("G") + "'"));
+			Assembler.Add(new Comment("; PInvokeAttributes = '" + TheMethod.PInvokeInfo.Attributes.ToString("G") + "'"));
 			//			bool xNeedsExtras = false;
 			//			foreach (ParameterDefinition xParam in TheMethod.Parameters) {
 			//				if (xParam.ParameterType.FullName == "System.String") {
@@ -97,7 +97,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			//				Assembler.Add(new CPUx86.Pushd("0"));
 			//				Assembler.Add(new CPUx86.Pop("eax"));
 			//			}
-			Assembler.Add(new Literal("; StackItemCount = " + Assembler.StackSizes.Count));
+			Assembler.Add(new Comment("; StackItemCount = " + Assembler.StackSizes.Count));
 		}
 	}
 }

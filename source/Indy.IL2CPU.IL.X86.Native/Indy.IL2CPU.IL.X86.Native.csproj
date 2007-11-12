@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\InterruptServiceRoutineAttribute.cs" />
+    <Compile Include="Call.cs" />
     <Compile Include="CustomImplementations\System\ByteImplRefs.cs" />
     <Compile Include="CustomImplementations\System\Diagnostics\DebugImplRefs.cs" />
     <Compile Include="CustomImplementations\System\Diagnostics\DebuggerImpl.cs" />

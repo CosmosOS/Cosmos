@@ -27,7 +27,7 @@ namespace Indy.IL2CPU.IL {
 				Assembler.Add(new Label(mCurrentInstructionLabel));
 			}
 			if (!String.IsNullOrEmpty(mILComment)) {
-				Assembler.Add(new Literal(mILComment));
+				Assembler.Add(new Comment(mILComment));
 			}
 			DoAssemble();
 		}

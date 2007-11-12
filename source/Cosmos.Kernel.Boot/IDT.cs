@@ -46,10 +46,116 @@ namespace Cosmos.Kernel.Boot {
 		}	
 						   
 		[GlueMethod(MethodType = GlueMethodTypeEnum.IDT_InterruptHandler)]
-		private static void InterruptHandler(uint aInterrupt, uint aParam) {
-			Debug.WriteLine("Interrupt Received");
+		private static void InterruptHandler(ushort aInterrupt, uint aParam) {
+			Debug.Write("Interrupt Received [");
+			bool xNameWritten = false;
+			#region InterruptName determining
+			if (aInterrupt < 19) {
+				switch(aInterrupt) {
+					case 0: {
+							Debug.Write("Division By Zero Exception");
+							xNameWritten = true;
+							break;
+						}
+					case 1: {
+							Debug.Write("Debug Exception");
+							xNameWritten = true;
+							break;
+						}
+					case 2: {
+							Debug.Write("Non Maskable Interrupt Exception");
+							xNameWritten = true;
+							break;
+						}
+					case 3: {
+							Debug.Write("Breakpoint Exception");
+							xNameWritten = true;
+							break;
+						}
+					case 4: {
+							Debug.Write("Into Detected Overflow Exception");
+							xNameWritten = true;
+							break;
+						}
+					case 5: {
+							Debug.Write("Out of Bounds Exception");
+							xNameWritten = true;
+							break;
+						}
+					case 6: {
+							Debug.Write("Invalid Opcode Exception");
+							xNameWritten = true;
+							break;
+						}
+					case 7: {
+							Debug.Write("No Coprocessor Exception");
+							xNameWritten = true;
+							break;
+						}
+					case 8: {
+							Debug.Write("Double Fault Exception");
+							xNameWritten = true;
+							break;
+						}
+					case 9: {
+							Debug.Write("Coprocessor Segment Overrun Exception");
+							xNameWritten = true;
+							break;
+						}
+					case 10: {
+							Debug.Write("Bad TSS Exception");
+							xNameWritten = true;
+							break;
+						}
+					case 11: {
+							Debug.Write("Segment Not Present Exception");
+							xNameWritten = true;
+							break;
+						}
+					case 12: {
+							Debug.Write("Stack Fault Exception");
+							xNameWritten = true;
+							break;
+						}
+					case 13: {
+							Debug.Write("General Protection Fault Exception");
+							xNameWritten = true;
+							break;
+						}
+					case 14: {
+							Debug.Write("Page Fault Exception");
+							xNameWritten = true;
+							break;
+						}
+					case 15: {
+							Debug.Write("Unknown Interrupt Exception");
+							xNameWritten = true;
+							break;
+						}
+					case 16: {
+							Debug.Write("Coprocessor Fault Exception");
+							xNameWritten = true;
+							break;
+						}
+					case 17: {
+							Debug.Write("Alignment Check Exception (486+)");
+							xNameWritten = true;
+							break;
+						}
+					case 18: {
+							Debug.Write("Machine Check Exception (Pentium/586+)");
+							xNameWritten = true;
+							break;
+						}
+				}
+			}
+			if(!xNameWritten) {
+				Debug.Write("**Unknown**");
+			}
+			#endregion
+			Debug.WriteLine("]");
 			Debug.Write("    Interrupt Number = ");
-			IO.WriteSerialHexNumber(0, aInterrupt, 8);
+			IO.WriteSerialHexNumber(0, aInterrupt, 4);
 			Debug.WriteLine("");
 			Debug.Write("    Interrupt Params = ");
 			IO.WriteSerialHexNumber(0, aParam, 8);

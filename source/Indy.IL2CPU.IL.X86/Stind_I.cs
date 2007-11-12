@@ -12,7 +12,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			: base(aInstruction, aMethodInfo) {
 		}
 		public static void Assemble(Assembler.Assembler aAssembler, int aSize) {
-			aAssembler.Add(new CPU.Literal("; address at: [esp + " + aSize + "]"));
+			aAssembler.Add(new CPU.Comment("; address at: [esp + " + aSize + "]"));
 			int xStorageSize = aSize;
 			if (xStorageSize < 4) {
 				xStorageSize = 4;

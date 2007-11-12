@@ -103,7 +103,6 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
 			mOutputWriter.WriteLine("				 push ebx");
 			mOutputWriter.WriteLine("				 call " + EntryPointName);
 			mOutputWriter.WriteLine("			.loop:");
-			mOutputWriter.WriteLine("				 xchg bx, bx");
 			mOutputWriter.WriteLine("				 hlt");
 			mOutputWriter.WriteLine("				 jmp .loop");
 			mOutputWriter.WriteLine("                 ");

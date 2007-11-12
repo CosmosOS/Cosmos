@@ -32,7 +32,7 @@ namespace Indy.IL2CPU.IL.X86.Native {
 			if (mIsInterruptHandler) {
 				string xWrapperName = LabelName + ISR_Suffix;
 				Assembler.Add(new CPU.Label(xWrapperName));
-				Assembler.Add(new CPU.Literal(";" + mInterruptValue));
+				Assembler.Add(new CPU.Comment(";" + mInterruptValue));
 				Assembler.Add(new CPUNative.Pushad());
 				Assembler.Add(new CPUNative.Cli());
 				Assembler.Add(new CPUx86.Call(LabelName));

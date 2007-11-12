@@ -58,6 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assembler.cs" />
+    <Compile Include="Comment.cs" />
     <Compile Include="DataMember.cs" />
     <Compile Include="ImportMember.cs" />
     <Compile Include="ImportMethodMember.cs" />
