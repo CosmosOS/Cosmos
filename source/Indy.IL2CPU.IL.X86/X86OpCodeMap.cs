@@ -79,6 +79,12 @@ namespace Indy.IL2CPU.IL.X86 {
 				case "System_Void___System_EventHandler_Invoke___System_Object__System_EventArgs___": {
 						return true;
 					}
+				case "System_IntPtr___System_Delegate_GetInvokeMethod____": {
+						return true;
+					}
+				case "System_Object___System_Delegate_DynamicInvoke___System_Object_____": {
+						return true;
+					}
 				default:
 					return base.HasCustomAssembleImplementation(aMethodName, aInMetalMode);
 			}
@@ -96,6 +102,15 @@ namespace Indy.IL2CPU.IL.X86 {
 					}
 				case "System_Void___System_EventHandler_Invoke___System_Object__System_EventArgs___": {
 						Assemble_System_EventHandler_Invoke___System_Object__System_EventArgs___(aAssembler, aMethodInfo);
+						break;
+					}
+				case "System_IntPtr___System_Delegate_GetInvokeMethod____": {
+						new Ldfld(null, aMethodInfo) {
+							Assembler = aAssembler
+						}.Assemble();
+						break;
+					}
+				case "System_Object___System_Delegate_DynamicInvoke___System_Object_____": {
 						break;
 					}
 				default:

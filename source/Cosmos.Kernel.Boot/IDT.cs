@@ -3,6 +3,8 @@ using System.Diagnostics;
 using Cosmos.Kernel.Boot.Glue;
 
 namespace Cosmos.Kernel.Boot {
+	public delegate void HandleInterrupt(ushort aInterrupt, uint aParam);
+
 	public static class IDT {
 		// Do not rename, it is being referenced by name string
 		[GlueField(FieldType=GlueFieldTypeEnum.IDT_Array)]
@@ -44,6 +46,12 @@ namespace Cosmos.Kernel.Boot {
 			//CustomImplementations.System.ConsoleImpl.WriteLine("");
 			//CustomImplementations.System.ConsoleImpl.Write("    ");
 			//CustomImplementations.System.ConsoleImpl.OutputByteValue(aParam);
+//			Delegate xHandler = mInterruptHandlers[aInterrupt];
+//			if (xHandler == null) {
+//				DebugUtil.SendWarning("IDT", "Interrupt Unhandled!");
+//			} else {
+//				xHandler.DynamicInvoke(aParam, null);
+//			}
 			if (aInterrupt >= 40 && aInterrupt <= 47) {
 				IO.WriteToPort(0xA0, 0x20);
 			}
@@ -60,6 +68,9 @@ namespace Cosmos.Kernel.Boot {
 			Console.WriteLine("Register the IDT");
 			//System.Diagnostics.Debugger.Break();
 			IDT_RegisterIDT();
+			//mInterruptHandlers = new EventHandler[256];
 		}
+
+		private static EventHandler[] mInterruptHandlers;
 	}
 }

@@ -9,6 +9,7 @@ using CPU = Indy.IL2CPU.Assembler.X86;
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Stfld)]
 	public class Stfld: Op {
+		private readonly TypeInformation.Field mField;
 		public Stfld(Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
 			if (aInstruction == null) {
@@ -27,7 +28,6 @@ namespace Indy.IL2CPU.IL.X86 {
 				xField = Engine.GetDefinitionFromFieldReference(xFieldRef);
 			}
 			string xFieldId = xField.ToString();
-			TypeInformation.Field xTheField;
 			int xStorageSize;
 			SortedList<String, TypeInformation.Field> xFieldInfo = Engine.GetTypeFieldInfo(Engine.GetDefinitionFromTypeReference(xField.DeclaringType), out xStorageSize);
 			if(!xFieldInfo.ContainsKey(xFieldId)) {
@@ -38,39 +38,11 @@ namespace Indy.IL2CPU.IL.X86 {
 					Console.WriteLine("\t" + s);
 				}
 			}
-			xTheField = xFieldInfo[xFieldId];
-			RelativeAddress = xTheField.RelativeAddress;
-			FieldSize = xTheField.Size;
-			if (FieldSize == 1 || FieldSize == 2 || FieldSize == 4)
-				return;
-			throw new NotSupportedException("FieldSizes other than 1, 2 and 4 are not supported yet! (" + FieldSize + ")");
+			mField = xFieldInfo[xFieldId];
 		}
 
-		public readonly string RelativeAddress;
-		public readonly int FieldSize;
-
 		public override void DoAssemble() {
-			Pop("eax"); // new value
-			Pop("ecx"); // instance
-			string xMovePrefix = "";
-			string xRegister = "";
-			switch (FieldSize) {
-				case 1:
-					xMovePrefix = "byte";
-					xRegister = "al";
-					break;
-				case 2:
-					xMovePrefix = "word";
-					xRegister = "ax";
-					break;
-				case 4:
-					xMovePrefix = "dword";
-					xRegister = "eax";
-					break;
-			}
-			Move(Assembler, xMovePrefix + " [ecx " + RelativeAddress + "]", xRegister);
-			Assembler.StackSizes.Pop();
-			Assembler.StackSizes.Pop();
+			Stfld(Assembler, mField);
 		}
 	}
 }

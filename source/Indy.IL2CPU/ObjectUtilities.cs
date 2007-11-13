@@ -4,7 +4,7 @@ using Mono.Cecil;
 
 namespace Indy.IL2CPU {
 	public static class ObjectUtilities {
-		private static bool IsDelegate(TypeDefinition aType) {
+		public static bool IsDelegate(TypeDefinition aType) {
 			if (aType.FullName == "System.Object") {
 				return false;
 			}

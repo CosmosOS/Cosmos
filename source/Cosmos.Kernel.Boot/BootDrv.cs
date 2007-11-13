@@ -41,6 +41,8 @@ namespace Cosmos.Kernel.Boot {
 			GDT.Setup();
 			Console.WriteLine("Setting up IDT");
 			IDT.Setup();
+			Console.WriteLine("Setting up Keyboard");
+			Keyboard.Initialize();
 			IDT.IDT_EnableInterrupts();
 			Console.WriteLine("Kernel booted!");
 		}

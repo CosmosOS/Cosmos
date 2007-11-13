@@ -37,7 +37,6 @@ namespace Cosmos.Kernel.Boot {
 		[GlueField(FieldType = GlueFieldTypeEnum.GDT_Pointer)]
 		private static DTPointerStruct mGDTPointer;
 
-
 		[GluePlaceholderMethod(MethodType = GluePlaceholderMethodTypeEnum.GDT_Register)]
 		private static void RegisterGDT() {
 		}
@@ -50,15 +49,8 @@ namespace Cosmos.Kernel.Boot {
 			LoadArray();
 			GDT_InitEntry(ref mGDTEntries[0], 0, 0, 0);
 			GDT_InitEntry(ref mGDTEntries[CodeSelector >> 3], 0, 0xFFFFFFFF, 0xC99);
+			System.Diagnostics.Debugger.Break();
 			GDT_InitEntry(ref mGDTEntries[DataSelector >> 3], 0, 0xFFFFFFFF, 0xC93);
-//			TSS.SetupCPU0Entry();
-//			uint xTSSAddr = (uint)&TSS.CPU0;
-//			mGDTEntries[CPU0TSS >> 3].BaseLow = (ushort)xTSSAddr & 0xFFFF;
-//			mGDTEntries[CPU0TSS >> 3].BaseMiddle = (byte)xTSSAddr & 0xFF0000;
-//			mGDTEntries[CPU0TSS >> 3].BaseHigh = (byte)xTSSAddr & 0xFF000000;
-//			mGDTEntries[CPU0TSS >> 3].LimitLow = sizeof (TSS.TSSEntry);
-//			mGDTEntries[CPU0TSS >> 3].Access = 0x89;
-//			GDT_InitEntry(ref mGDTEntries[CPU0TSS >> 3], xTSSAddr, 0x68, 0x89);
 			RegisterGDT();
 		}
 	}

@@ -857,6 +857,12 @@ namespace Indy.IL2CPU {
 				xTypeFields.Add("$$Storage$$", new TypeInformation.Field(aObjectStorageSize, 4));
 				aObjectStorageSize += 4;
 			}
+			if(ObjectUtilities.IsDelegate(xActualType)) {
+				xTypeFields.Add("$$Obj$$", new TypeInformation.Field(aObjectStorageSize, 4));
+				aObjectStorageSize += 4;
+				xTypeFields.Add("$$Method$$", new TypeInformation.Field(aObjectStorageSize, 4));
+				aObjectStorageSize += 4;
+			}
 			return xTypeFields;
 		}
 

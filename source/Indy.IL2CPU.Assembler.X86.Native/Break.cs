@@ -1,4 +1,4 @@
-﻿//#define Bochs_Magic_Breakpoint
+﻿#define Bochs_Magic_Breakpoint
 
 using System;
 using System.Collections.Generic;

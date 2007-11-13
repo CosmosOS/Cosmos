@@ -51,6 +51,7 @@
     <Compile Include="GDT.cs" />
     <Compile Include="IDT.cs" />
     <Compile Include="IO.cs" />
+    <Compile Include="Keyboard.cs" />
     <Compile Include="MemoryManager.cs" />
     <Compile Include="PIC.cs" />
     <Compile Include="PIT.cs" />

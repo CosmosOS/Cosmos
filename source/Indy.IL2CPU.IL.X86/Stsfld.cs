@@ -20,7 +20,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public override void DoAssemble() {
-			Literal("; Size = " + mSize + ", IsReference = " + mIsReference);
+			Comment("; Size = " + mSize + ", IsReference = " + mIsReference);
 			//if (mIsReference && Assembler.InMetalMode) {
 			//	Pushd(4, "[" mDataName);
 			//	return;

@@ -19,6 +19,7 @@ namespace Indy.IL2CPU.IL.X86.Native {
 			base.Initialize(aAssembler);
 			base.mMap[Code.Call] = typeof(Call);
 		}
+
 		public NativeOpCodeMap() {
 			Instance = this;
 		}
@@ -79,8 +80,8 @@ namespace Indy.IL2CPU.IL.X86.Native {
 				foreach (TypeDefinition xType in xModule.Types) {
 					foreach (MethodDefinition xMethod in xType.Methods) {
 						IEnumerable<CustomAttribute> xAttribs = (from item in xMethod.CustomAttributes.Cast<CustomAttribute>()
-												   where item.Constructor.DeclaringType.FullName == typeof(GlueMethodAttribute).FullName
-												   select item);
+																 where item.Constructor.DeclaringType.FullName == typeof(GlueMethodAttribute).FullName
+																 select item);
 						if (xAttribs == null || xAttribs.Count() == 0) {
 							continue;
 						}
@@ -276,7 +277,7 @@ namespace Indy.IL2CPU.IL.X86.Native {
 				case GluePlaceholderMethodTypeEnum.GDT_LoadArray: {
 						FieldDefinition xFieldDef = GetGlueField(GlueFieldTypeEnum.GDT_Array);
 						string xFieldName = Assembler.DataMember.GetStaticFieldName(xFieldDef);
-						string xFieldData = "0,0,0,0,2,0,0,0,4,0,0,0";
+						string xFieldData = "0,0,0,0,2,0,0,0,3,0,0,0";
 						for (int i = 0; i < 3; i++) {
 							xFieldData += ",0,0,0,0,0,0,0,0";
 						}
@@ -291,7 +292,7 @@ namespace Indy.IL2CPU.IL.X86.Native {
 						Engine.QueueStaticField(xFieldDef, out xPointerFieldName);
 						aAssembler.Add(new CPU.Move("eax", xPointerFieldName));
 						aAssembler.Add(new CPU.Move("word [eax]", "0x" + ((8 * 3) - 1).ToString("X")));
-						aAssembler.Add(new CPU.Move("ecx", xFieldName));
+						aAssembler.Add(new CPU.Move("ecx", "["+xFieldName+"]"));
 						aAssembler.Add(new CPU.Add("ecx", "0xC"));
 						aAssembler.Add(new CPU.Move("dword [eax + 2]", "ecx"));
 						break;
@@ -301,8 +302,9 @@ namespace Indy.IL2CPU.IL.X86.Native {
 						string xPointerFieldName;
 						Engine.QueueStaticField(xFieldDef, out xPointerFieldName);
 						aAssembler.Add(new CPU.Move("eax", xPointerFieldName));
+						aAssembler.Add(new CPUNative.Break());
 						aAssembler.Add(new CPUNative.Lgdt("[eax]"));
-						aAssembler.Add(new Literal("use32"));
+						//aAssembler.Add(new Literal("use32"));
 						aAssembler.Add(new CPU.Move("eax", "0x10"));
 						aAssembler.Add(new CPU.Move("ds", "ax"));
 						aAssembler.Add(new CPU.Move("es", "ax"));
