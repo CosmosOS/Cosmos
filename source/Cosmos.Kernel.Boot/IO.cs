@@ -59,107 +59,13 @@ namespace Cosmos.Kernel.Boot {
 			}
 		}
 
-		public static void WriteSerialHexNumber(byte aSerialIdx, uint aNumber) {
-			WriteSerialHexNumber(aSerialIdx, aNumber, 8);
-		}
-
-		public static void WriteSerialHexNumber(byte aSerialIdx, uint aNumber, uint aCharCount) {
-			WriteNumber(aSerialIdx, aNumber, 16, aCharCount);
-			WriteSerialString(aSerialIdx, "x0 (Reverse hex)");
-		}
-
-		private static void WriteNumber(byte aSerialIdx, uint aValue, byte aBase, uint aCharCount) {
-			uint theValue = aValue;
-			uint xReturnedChars = 0;
-			while (theValue > 0) {
-				switch (theValue % aBase) {
-					case 0: {
-							WriteSerialString(aSerialIdx, "0");
-							xReturnedChars++;
-							break;
-						}
-					case 1: {
-							WriteSerialString(aSerialIdx, "1");
-							xReturnedChars++;
-							break;
-						}
-					case 2: {
-							WriteSerialString(aSerialIdx, "2");
-							xReturnedChars++;
-							break;
-						}
-					case 3: {
-							WriteSerialString(aSerialIdx, "3");
-							xReturnedChars++;
-							break;
-						}
-					case 4: {
-							WriteSerialString(aSerialIdx, "4");
-							xReturnedChars++;
-							break;
-						}
-					case 5: {
-							WriteSerialString(aSerialIdx, "5");
-							xReturnedChars++;
-							break;
-						}
-					case 6: {
-							WriteSerialString(aSerialIdx, "6");
-							xReturnedChars++;
-							break;
-						}
-					case 7: {
-							WriteSerialString(aSerialIdx, "7");
-							xReturnedChars++;
-							break;
-						}
-					case 8: {
-							WriteSerialString(aSerialIdx, "8");
-							xReturnedChars++;
-							break;
-						}
-					case 9: {
-							WriteSerialString(aSerialIdx, "9");
-							xReturnedChars++;
-							break;
-						}
-					case 10: {
-							WriteSerialString(aSerialIdx, "A");
-							xReturnedChars++;
-							break;
-						}
-					case 11: {
-							xReturnedChars++;
-							WriteSerialString(aSerialIdx, "B");
-							break;
-						}
-					case 12: {
-							WriteSerialString(aSerialIdx, "C");
-							xReturnedChars++;
-							break;
-						}
-					case 13: {
-							WriteSerialString(aSerialIdx, "D");
-							xReturnedChars++;
-							break;
-						}
-					case 14: {
-							WriteSerialString(aSerialIdx, "E");
-							xReturnedChars++;
-							break;
-						}
-					case 15: {
-							WriteSerialString(aSerialIdx, "F");
-							xReturnedChars++;
-							break;
-						}
-				}
-				theValue = theValue / aBase;
-			}
-			while (xReturnedChars < aCharCount) {
-				WriteSerialString(aSerialIdx, "0");
-				xReturnedChars++;
-			}
-		}
+//		public static void WriteSerialHexNumber(byte aSerialIdx, uint aNumber) {
+//			WriteSerialHexNumber(aSerialIdx, aNumber, 8);
+//		}
+//
+//		public static void WriteSerialHexNumber(byte aSerialIdx, uint aNumber, uint aCharCount) {
+//			WriteNumber(aSerialIdx, aNumber, 16, aCharCount);
+//			WriteSerialString(aSerialIdx, "x0 (Reverse hex)");
+//		}
 	}
 }

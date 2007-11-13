@@ -11,35 +11,13 @@ namespace Cosmos.Kernel.Boot {
 		public unsafe static void SetMultiBootInfo(ref BootInformationStruct aBootInfo) {
 			MultiBootInfo = aBootInfo;
 			BootInfoSet = true;
-			Debug.WriteLine("BootInfo retrieved");
-			Debug.Write("\tMMap length = ");
-			IO.WriteSerialHexNumber(0, MultiBootInfo.MMapLength);
-			Debug.WriteLine("");
-			Debug.WriteLine("MMap:");
+			DebugUtil.SendMessage("MultiBoot", "BootInfo retrieved");
 			BootInformationStruct.MMapEntry* xMMap = (BootInformationStruct.MMapEntry*)MultiBootInfo.MMapAddr;
 			while ((uint)xMMap < (MultiBootInfo.MMapAddr + MultiBootInfo.MMapLength)) {
-				Debug.WriteLine("MMapEntry");
-				Debug.Write("\tSize ");
-				IO.WriteSerialHexNumber(0, xMMap->Size);
-				Debug.WriteLine("");
-				Debug.Write("\tAddrLow ");
-				IO.WriteSerialHexNumber(0, xMMap->AddrLow);
-				Debug.WriteLine("");
-				Debug.Write("\tAddrHigh ");
-				IO.WriteSerialHexNumber(0, xMMap->AddrHigh);
-				Debug.WriteLine("");
-				Debug.Write("\tLengthLow ");
-				IO.WriteSerialHexNumber(0, xMMap->LengthLow);
-				Debug.WriteLine("");
-				Debug.Write("\tLengthHigh ");
-				IO.WriteSerialHexNumber(0, xMMap->LengthHigh);
-				Debug.WriteLine("");
-				Debug.Write("\tType ");
-				IO.WriteSerialHexNumber(0, xMMap->@Type);
-				Debug.WriteLine("");
+				DebugUtil.SendMultiBoot_MMap(*xMMap);
 				xMMap = (BootInformationStruct.MMapEntry*)((uint)xMMap + xMMap->Size + 4);
 			}
-			DebugUtil.WriteLine("Done Iterating");
+			DebugUtil.SendMessage("MultiBoot", "Done Iterating MMaps");
 			DetermineMemChunkInfo();
 			MemoryManager.Initialize(MemChunkStartAddr, MemChunkLength);
 		}
@@ -53,7 +31,7 @@ namespace Cosmos.Kernel.Boot {
 			Console.WriteLine("Boot information available.");
 			Console.WriteLine("");
 			Console.Write("Available Memory: ");
-			WriteIntHex(((MultiBootInfo.MemUpper + 1024) / 1024) + 1);
+			WriteNumber(((MultiBootInfo.MemUpper + 1024) / 1024) + 1, true);
 			Console.WriteLine("");
 			Console.WriteLine("Initializing PIC");
 			PIC.Initialize();
@@ -71,8 +49,6 @@ namespace Cosmos.Kernel.Boot {
 		private static uint MemChunkLength;
 
 		private static unsafe void DetermineMemChunkInfo() {
-			Console.WriteLine("Determining MemoryChunk Information");
-			Debug.WriteLine("Determining MemoryChunk Information");
 			MemChunkLength = 0;
 			MemChunkStartAddr = 0;
 			BootInformationStruct.MMapEntry* xMMap = (BootInformationStruct.MMapEntry*)MultiBootInfo.MMapAddr;
@@ -85,116 +61,176 @@ namespace Cosmos.Kernel.Boot {
 				}
 				xMMap = (BootInformationStruct.MMapEntry*)((uint)xMMap + xMMap->Size + 4);
 			}
-			Console.WriteLine("    Found");
-			Debug.Write("\tStart Address ");
-			IO.WriteSerialHexNumber(0, MemChunkStartAddr);
-			Debug.WriteLine("");
-			Debug.Write("\tLength ");
-			IO.WriteSerialHexNumber(0, MemChunkLength);
-			Debug.WriteLine("");
+			DebugUtil.SendMM_MemChunkFound(MemChunkStartAddr, MemChunkLength);
 		}
 
-		private static void WriteInt(uint aValue) {
-			WriteNumber(aValue, 10);
-			Console.Write(" (Reverse number)");
-		}
 
-		private static void WriteIntHex(uint aValue) {
-			WriteNumber(aValue, 16);
-			Console.Write("x0 (Reverse hex)");
-		}
+		//		private static void WriteNumber(uint aValue, byte aBase) {
+		//			uint theValue = aValue;
+		//			int xReturnedChars = 0;
+		//			while (theValue > 0) {
+		//				switch (theValue % aBase) {
+		//					case 0: {
+		//							Console.Write("0");
+		//							xReturnedChars++;
+		//							break;
+		//						}
+		//					case 1: {
+		//							Console.Write("1");
+		//							xReturnedChars++;
+		//							break;
+		//						}
+		//					case 2: {
+		//							Console.Write("2");
+		//							xReturnedChars++;
+		//							break;
+		//						}
+		//					case 3: {
+		//							Console.Write("3");
+		//							xReturnedChars++;
+		//							break;
+		//						}
+		//					case 4: {
+		//							Console.Write("4");
+		//							xReturnedChars++;
+		//							break;
+		//						}
+		//					case 5: {
+		//							Console.Write("5");
+		//							xReturnedChars++;
+		//							break;
+		//						}
+		//					case 6: {
+		//							Console.Write("6");
+		//							xReturnedChars++;
+		//							break;
+		//						}
+		//					case 7: {
+		//							Console.Write("7");
+		//							xReturnedChars++;
+		//							break;
+		//						}
+		//					case 8: {
+		//							Console.Write("8");
+		//							xReturnedChars++;
+		//							break;
+		//						}
+		//					case 9: {
+		//							Console.Write("9");
+		//							xReturnedChars++;
+		//							break;
+		//						}
+		//					case 10: {
+		//							Console.Write("A");
+		//							xReturnedChars++;
+		//							break;
+		//						}
+		//					case 11: {
+		//							xReturnedChars++;
+		//							Console.Write("B");
+		//							break;
+		//						}
+		//					case 12: {
+		//							Console.Write("C");
+		//							xReturnedChars++;
+		//							break;
+		//						}
+		//					case 13: {
+		//							Console.Write("D");
+		//							xReturnedChars++;
+		//							break;
+		//						}
+		//					case 14: {
+		//							Console.Write("E");
+		//							xReturnedChars++;
+		//							break;
+		//						}
+		//					case 15: {
+		//							Console.Write("F");
+		//							xReturnedChars++;
+		//							break;
+		//						}
+		//				}
+		//				theValue = theValue / aBase;
+		//			}
+		//			while (xReturnedChars < 8) {
+		//				Console.Write("0");
+		//				xReturnedChars++;
+		//			}
+		//		}
 
-		private static void WriteNumber(uint aValue, byte aBase) {
-			uint theValue = aValue;
-			int xReturnedChars = 0;
-			while (theValue > 0) {
-				switch (theValue % aBase) {
-					case 0: {
-							Console.Write("0");
-							xReturnedChars++;
-							break;
+
+		private static void WriteNumber(uint aValue, bool aZeroFill) {
+			uint xValue = aValue;
+			byte xCurrentBits = 32;
+			byte xCharsWritten = 0;
+			bool xSignificantDigitWritten = aZeroFill;
+			Console.Write("0x");
+			while (xCurrentBits >= 4) {
+				xCurrentBits -= 4;
+				byte xCurrentDigit = (byte)((xValue >> xCurrentBits) & 0xF);
+				string xDigitString = null;
+				switch (xCurrentDigit) {
+					case 0:
+						if (xSignificantDigitWritten) {
+							xDigitString = "0";
+							goto default;
 						}
-					case 1: {
-							Console.Write("1");
-							xReturnedChars++;
-							break;
+						break;
+					case 1:
+						xDigitString = "1";
+						goto default;
+					case 2:
+						xDigitString = "2";
+						goto default;
+					case 3:
+						xDigitString = "3";
+						goto default;
+					case 4:
+						xDigitString = "4";
+						goto default;
+					case 5:
+						xDigitString = "5";
+						goto default;
+					case 6:
+						xDigitString = "6";
+						goto default;
+					case 7:
+						xDigitString = "7";
+						goto default;
+					case 8:
+						xDigitString = "8";
+						goto default;
+					case 9:
+						xDigitString = "9";
+						goto default;
+					case 10:
+						xDigitString = "A";
+						goto default;
+					case 11:
+						xDigitString = "B";
+						goto default;
+					case 12:
+						xDigitString = "C";
+						goto default;
+					case 13:
+						xDigitString = "D";
+						goto default;
+					case 14:
+						xDigitString = "E";
+						goto default;
+					case 15:
+						xDigitString = "F";
+						goto default;
+					default:
+						if(xDigitString == null) {
+							Console.Write("NoDigitSet");
 						}
-					case 2: {
-							Console.Write("2");
-							xReturnedChars++;
-							break;
-						}
-					case 3: {
-							Console.Write("3");
-							xReturnedChars++;
-							break;
-						}
-					case 4: {
-							Console.Write("4");
-							xReturnedChars++;
-							break;
-						}
-					case 5: {
-							Console.Write("5");
-							xReturnedChars++;
-							break;
-						}
-					case 6: {
-							Console.Write("6");
-							xReturnedChars++;
-							break;
-						}
-					case 7: {
-							Console.Write("7");
-							xReturnedChars++;
-							break;
-						}
-					case 8: {
-							Console.Write("8");
-							xReturnedChars++;
-							break;
-						}
-					case 9: {
-							Console.Write("9");
-							xReturnedChars++;
-							break;
-						}
-					case 10: {
-							Console.Write("A");
-							xReturnedChars++;
-							break;
-						}
-					case 11: {
-							xReturnedChars++;
-							Console.Write("B");
-							break;
-						}
-					case 12: {
-							Console.Write("C");
-							xReturnedChars++;
-							break;
-						}
-					case 13: {
-							Console.Write("D");
-							xReturnedChars++;
-							break;
-						}
-					case 14: {
-							Console.Write("E");
-							xReturnedChars++;
-							break;
-						}
-					case 15: {
-							Console.Write("F");
-							xReturnedChars++;
-							break;
-						}
+						xSignificantDigitWritten = true;
+						xCharsWritten += 1;
+						Console.Write(xDigitString);
+						break;
 				}
-				theValue = theValue / aBase;
-			}
-			while (xReturnedChars < 8) {
-				Console.Write("0");
-				xReturnedChars++;
 			}
 		}
 	}

@@ -78,18 +78,20 @@ namespace Indy.IL2CPU.IL.X86.Native {
 			foreach (ModuleDefinition xModule in xCrawledAsm.Modules) {
 				foreach (TypeDefinition xType in xModule.Types) {
 					foreach (MethodDefinition xMethod in xType.Methods) {
-						CustomAttribute xAttrib = (from item in xMethod.CustomAttributes.Cast<CustomAttribute>()
+						IEnumerable<CustomAttribute> xAttribs = (from item in xMethod.CustomAttributes.Cast<CustomAttribute>()
 												   where item.Constructor.DeclaringType.FullName == typeof(GlueMethodAttribute).FullName
-												   select item).FirstOrDefault();
-						if (xAttrib == null) {
+												   select item);
+						if (xAttribs == null || xAttribs.Count() == 0) {
 							continue;
 						}
-						if (!xAttrib.Resolved) {
-							if (!xAttrib.Resolve()) {
-								throw new Exception("Couldn't resolve attribute on method '" + xMethod.GetFullName());
+						foreach (CustomAttribute xAttrib in xAttribs) {
+							if (!xAttrib.Resolved) {
+								if (!xAttrib.Resolve()) {
+									throw new Exception("Couldn't resolve attribute on method '" + xMethod.GetFullName());
+								}
 							}
+							mGlueMethods.Add((GlueMethodTypeEnum)xAttrib.Properties["MethodType"], xMethod);
 						}
-						mGlueMethods.Add((GlueMethodTypeEnum)xAttrib.Properties["MethodType"], xMethod);
 					}
 				}
 			}
