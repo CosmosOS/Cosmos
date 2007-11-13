@@ -56,7 +56,6 @@
     <Compile Include="PIC.cs" />
     <Compile Include="PIT.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TSS.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cosmos.Kernel.Boot.Glue\Cosmos.Kernel.Boot.Glue.csproj">
