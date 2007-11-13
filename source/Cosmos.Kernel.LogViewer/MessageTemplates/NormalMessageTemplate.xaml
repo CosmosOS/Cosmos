@@ -1,0 +1,13 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<DataTemplate x:Key="Everything_NormalMessage">
+		<ListViewItem>
+			<StackPanel Orientation="Horizontal">
+				<TextBlock>Module: </TextBlock>
+				<TextBlock Text="{Binding Path=@Module}"/>
+				<Separator/>
+				<TextBlock Text="{Binding Path=/.}"/>
+			</StackPanel>
+		</ListViewItem>
+	</DataTemplate>
+</ResourceDictionary>
