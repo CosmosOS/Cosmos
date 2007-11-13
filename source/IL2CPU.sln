@@ -39,9 +39,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cosmos", "Cosmos", "{F09F88
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel.Boot.Glue", "Cosmos.Kernel.Boot.Glue\Cosmos.Kernel.Boot.Glue.csproj", "{28584689-B678-4863-B404-0AD46B2F2B63}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel.LogViewer", "Cosmos.Kernel.LogViewer\Cosmos.Kernel.LogViewer.csproj", "{7ABE17D9-06A5-44BE-B675-E649F2CD573D}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 19
+		SccNumberOfProjects = 20
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -102,6 +104,10 @@ Global
 		SccProjectTopLevelParentUniqueName18 = IL2CPU.sln
 		SccProjectName18 = Cosmos.Kernel.Boot.Glue
 		SccLocalPath18 = Cosmos.Kernel.Boot.Glue
+		SccProjectUniqueName19 = Cosmos.Kernel.LogViewer\\Cosmos.Kernel.LogViewer.csproj
+		SccProjectTopLevelParentUniqueName19 = IL2CPU.sln
+		SccProjectName19 = Cosmos.Kernel.LogViewer
+		SccLocalPath19 = Cosmos.Kernel.LogViewer
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -179,6 +185,10 @@ Global
 		{28584689-B678-4863-B404-0AD46B2F2B63}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{28584689-B678-4863-B404-0AD46B2F2B63}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{28584689-B678-4863-B404-0AD46B2F2B63}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7ABE17D9-06A5-44BE-B675-E649F2CD573D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7ABE17D9-06A5-44BE-B675-E649F2CD573D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7ABE17D9-06A5-44BE-B675-E649F2CD573D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7ABE17D9-06A5-44BE-B675-E649F2CD573D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -187,5 +197,6 @@ Global
 		{EF5F012A-4AA4-4B4D-A318-6D228C1F30D8} = {F09F8827-415C-4A53-BE25-3ED4B963AC77}
 		{BB58FFC3-A532-45BA-AAB2-28EB0451C2A1} = {F09F8827-415C-4A53-BE25-3ED4B963AC77}
 		{28584689-B678-4863-B404-0AD46B2F2B63} = {F09F8827-415C-4A53-BE25-3ED4B963AC77}
+		{7ABE17D9-06A5-44BE-B675-E649F2CD573D} = {F09F8827-415C-4A53-BE25-3ED4B963AC77}
 	EndGlobalSection
 EndGlobal
