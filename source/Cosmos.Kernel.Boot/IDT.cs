@@ -46,12 +46,9 @@ namespace Cosmos.Kernel.Boot {
 			//CustomImplementations.System.ConsoleImpl.WriteLine("");
 			//CustomImplementations.System.ConsoleImpl.Write("    ");
 			//CustomImplementations.System.ConsoleImpl.OutputByteValue(aParam);
-//			Delegate xHandler = mInterruptHandlers[aInterrupt];
-//			if (xHandler == null) {
-//				DebugUtil.SendWarning("IDT", "Interrupt Unhandled!");
-//			} else {
-//				xHandler.DynamicInvoke(aParam, null);
-//			}
+			if(aInterrupt >= 32 && aInterrupt <= 47) {
+				PIC.HandleIRQ((byte)(aInterrupt - 32), aParam);
+			}
 			if (aInterrupt >= 40 && aInterrupt <= 47) {
 				IO.WriteToPort(0xA0, 0x20);
 			}
@@ -59,6 +56,10 @@ namespace Cosmos.Kernel.Boot {
 				IO.WriteToPort(0x20, 0x20);
 			}
 			//CustomImplementations.System.ConsoleImpl.WriteLine("");
+		}
+
+		private static void HandleIRQ() {
+
 		}
 
 		public static void Setup() {
@@ -70,7 +71,5 @@ namespace Cosmos.Kernel.Boot {
 			IDT_RegisterIDT();
 			//mInterruptHandlers = new EventHandler[256];
 		}
-
-		private static EventHandler[] mInterruptHandlers;
 	}
 }

@@ -81,8 +81,8 @@ namespace Indy.IL2CPU.IL.X86 {
 					}
 				case "System_IntPtr___System_Delegate_GetInvokeMethod____": {
 						return true;
-					}
-				case "System_Object___System_Delegate_DynamicInvoke___System_Object_____": {
+					} 
+				case "System_Object___System_Delegate_DynamicInvokeImpl___System_Object_____": {
 						return true;
 					}
 				default:
@@ -109,8 +109,8 @@ namespace Indy.IL2CPU.IL.X86 {
 							Assembler = aAssembler
 						}.Assemble();
 						break;
-					}
-				case "System_Object___System_Delegate_DynamicInvoke___System_Object_____": {
+					} 
+				case "System_Object___System_Delegate_DynamicInvokeImpl___System_Object_____": {
 						break;
 					}
 				default:

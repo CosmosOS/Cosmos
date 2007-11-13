@@ -9,6 +9,10 @@ namespace Cosmos.Kernel.Boot {
 			RemapIRQs();
 		}
 
+		public static void HandleIRQ(byte aIRQ, uint aParam) {
+//			
+		}
+
 		/// <summary>
 		/// This method remaps IRQ0-IRQ16 to ISR32-ISR47 (0x20 - 0x2F)
 		/// </summary>
