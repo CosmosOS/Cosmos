@@ -1,13 +1,13 @@
 <Log>
-	<Message Module="Debug">Comport initialized!</Message>
-	<Message Module="MultiBoot">BootInfo retrieved</Message>
+	<Message Type="Info" Module="Debug" String="Comport initialized!"/>
+	<Message Type="Info" Module="MultiBoot" String="BootInfo retrieved"/>
 	<BootInfo_MMap AddrLow="0x00000000" AddrHigh="0x0009FC00" LengthLow="0x00000000" LengthHigh="0x00000000" Type="0x00000014"/>
 	<BootInfo_MMap AddrLow="0x00000000" AddrHigh="0x00000400" LengthLow="0x00000000" LengthHigh="0x0009FC00" Type="0x00000014"/>
 	<BootInfo_MMap AddrLow="0x00000000" AddrHigh="0x00018000" LengthLow="0x00000000" LengthHigh="0x000E8000" Type="0x00000014"/>
 	<BootInfo_MMap AddrLow="0x00000000" AddrHigh="0x07EF0000" LengthLow="0x00000000" LengthHigh="0x00100000" Type="0x00000014"/>
 	<BootInfo_MMap AddrLow="0x00000000" AddrHigh="0x00010000" LengthLow="0x00000000" LengthHigh="0x07FF0000" Type="0x00000014"/>
 	<BootInfo_MMap AddrLow="0x00000000" AddrHigh="0x00040000" LengthLow="0x00000000" LengthHigh="0xFFFC0000" Type="0x00000014"/>
-	<Message Module="MultiBoot">Done Iterating MMaps</Message>
+	<Message Type="Info" Module="MultiBoot" String="Done Iterating MMaps"/>
 	<MM_MemChunkFound Start="0x00100000" Length="0x07EF0000"/>
 	<MM_Init Start="0x00100000" Length="0x07EF0000"/>
 	<IDT_RegisterInterrupt Interrupt="0x00000000"/>
@@ -268,6 +268,58 @@
 	<IDT_RegisterInterrupt Interrupt="0x000000FF"/>
 	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
 	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
 	<IDT_InterruptOccurred Interrupt="0x00000021" Param="0x00000000"/>
 	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
 	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
@@ -294,59 +346,7 @@
 	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
 	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
 	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
-	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
+	00020" Param="0x00000000"/>
 	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
 	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>
 	<IDT_InterruptOccurred Interrupt="0x00000020" Param="0x00000000"/>

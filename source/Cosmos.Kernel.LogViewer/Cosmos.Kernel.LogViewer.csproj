@@ -78,6 +78,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Overview\MessagesDisplay.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Overview\Multiboot_MMapDisplay.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Window1.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -93,6 +101,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MessageTemplates\MessageTemplateSelector.cs" />
+    <Compile Include="Overview\MessagesDisplay.xaml.cs">
+      <DependentUpon>MessagesDisplay.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Overview\Multiboot_MMapDisplay.xaml.cs">
+      <DependentUpon>Multiboot_MMapDisplay.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Overview\OverviewItem.cs" />
+    <Compile Include="Overview\OverviewItemCollection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

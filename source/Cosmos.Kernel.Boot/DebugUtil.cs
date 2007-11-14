@@ -21,29 +21,29 @@ namespace Cosmos.Kernel.Boot {
 		[GlueMethod(MethodType = GlueMethodTypeEnum.Debug_WriteLine)]
 		public static void SendMessage(string aModule, string aData) {
 			CheckInitialized();
-			IO.WriteSerialString(0, "<Message Module=\"");
+			IO.WriteSerialString(0, "<Message Type=\"Info\" Module=\"");
 			IO.WriteSerialString(0, aModule);
-			IO.WriteSerialString(0, "\">");
+			IO.WriteSerialString(0, "\" String=\"");
 			IO.WriteSerialString(0, aData);
-			IO.WriteSerialString(0, "</Message>\r\n");
+			IO.WriteSerialString(0, "\"/>\r\n");
 		}
 
 		public static void SendError(string aModule, string aData) {
 			CheckInitialized();
-			IO.WriteSerialString(0, "<Error Module=\"");
+			IO.WriteSerialString(0, "<Message Type=\"Error\" Module=\"");
 			IO.WriteSerialString(0, aModule);
-			IO.WriteSerialString(0, "\">");
+			IO.WriteSerialString(0, "\" String=\"");
 			IO.WriteSerialString(0, aData);
-			IO.WriteSerialString(0, "</Error>\r\n");
+			IO.WriteSerialString(0, "\"/>\r\n");
 		}
 
 		public static void SendWarning(string aModule, string aData) {
 			CheckInitialized();
-			IO.WriteSerialString(0, "<Warning Module=\"");
+			IO.WriteSerialString(0, "<Message Type=\"Warning\" Module=\"");
 			IO.WriteSerialString(0, aModule);
-			IO.WriteSerialString(0, "\">");
+			IO.WriteSerialString(0, "\" String=\"");
 			IO.WriteSerialString(0, aData);
-			IO.WriteSerialString(0, "</Warning>\r\n");
+			IO.WriteSerialString(0, "\"/>\r\n");
 		}
 
 		public static void SendIDT_RegisterInterrupt(ushort aInterrupt) {

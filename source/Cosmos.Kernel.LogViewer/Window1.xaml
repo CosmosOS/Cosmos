@@ -2,20 +2,35 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:local="clr-namespace:Cosmos.Kernel.LogViewer.MessageTemplates"
+	xmlns:Overview="clr-namespace:Cosmos.Kernel.LogViewer.Overview"
     Title="Window1" Height="362" Width="559">
 	<Window.Resources>
-		<local:MessageTemplateSelector x:Key="OverviewTemplateSelector"/>
+		<local:MessageTemplateSelector x:Key="EverythingTemplateSelector"/>
+		<Overview:OverviewItemCollection x:Key="OverviewContents"/>
 	</Window.Resources>
 	<DockPanel LastChildFill="True">
-		<Menu DockPanel.Dock="Top">
-			<MenuItem Header="_File"/>
-		</Menu>
 		<TabControl>
 			<TabItem Header="Overview">
-			</TabItem>
-			<TabItem Selector.IsSelected="True" Header="Everything">
-				<ListView ItemsSource="{Binding Source={StaticResource LogFile}}" ItemTemplateSelector="{StaticResource OverviewTemplateSelector}">
+				<ListView ItemsSource="{Binding Source={StaticResource OverviewContents}}">
+					<ListView.ItemTemplate>
+						<DataTemplate DataType="{x:Type Overview:OverviewItem}">
+							<Border BorderBrush="Black" BorderThickness="1">
+								<Expander Header="{Binding Path=DisplayName}" ToolTip="{Binding Path=Description}">
+									<ContentPresenter Content="{Binding Path=DisplayControl}"/>
+								</Expander>
+							</Border>
+						</DataTemplate>
+					</ListView.ItemTemplate>
 				</ListView>
+			</TabItem>
+			<TabItem Header="Everything">
+				<TreeView ItemsSource="{Binding Source={StaticResource LogFile}, XPath=/Log}">
+					<TreeView.ItemTemplate>
+						<HierarchicalDataTemplate ItemsSource="{Binding Path=ChildNodes}">
+							<TreeViewItem Header="{Binding Path=Name}"/>
+						</HierarchicalDataTemplate>
+					</TreeView.ItemTemplate>
+				</TreeView>
 			</TabItem>
 		</TabControl>
 	</DockPanel>
