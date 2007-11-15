@@ -10,7 +10,7 @@ namespace Indy.IL2CPU.Assembler {
 		}
 
 		public override string ToString() {
-			return Text;
+			return "; " + Text;
 		}
 	}
 }

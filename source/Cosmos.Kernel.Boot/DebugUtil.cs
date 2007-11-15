@@ -28,6 +28,13 @@ namespace Cosmos.Kernel.Boot {
 			IO.WriteSerialString(0, "\"/>\r\n");
 		}
 
+		public static void SendHandleIrq(byte aIRQ) {
+			CheckInitialized();
+			IO.WriteSerialString(0, "<HandleIRQ IRQ=\"");
+			WriteNumber(aIRQ, 4);
+			IO.WriteSerialString(0, "\"/>\r\n");
+		}
+
 		public static void SendError(string aModule, string aData) {
 			CheckInitialized();
 			IO.WriteSerialString(0, "<Message Type=\"Error\" Module=\"");
@@ -81,14 +88,12 @@ namespace Cosmos.Kernel.Boot {
 		}
 
 		private static void WriteNumber(uint aValue) {
-			WriteNumber(aValue, true);
+			WriteNumber(aValue, 32);
 		}
 
-		private static void WriteNumber(uint aValue, bool aZeroFill) {
+		private static void WriteNumber(uint aValue, byte aBitCount) {
 			uint xValue = aValue;
-			byte xCurrentBits = 32;
-			byte xCharsWritten = 0;
-			bool xSignificantDigitWritten = aZeroFill;
+			byte xCurrentBits = aBitCount;
 			IO.WriteSerialString(0, "0x");
 			while (xCurrentBits >= 4) {
 				xCurrentBits -= 4;
@@ -96,11 +101,8 @@ namespace Cosmos.Kernel.Boot {
 				string xDigitString = null;
 				switch (xCurrentDigit) {
 					case 0:
-						if (xSignificantDigitWritten) {
-							xDigitString = "0";
-							goto default;
-						}
-						break;
+						xDigitString = "0";
+						goto default;
 					case 1:
 						xDigitString = "1";
 						goto default;
@@ -147,8 +149,6 @@ namespace Cosmos.Kernel.Boot {
 						xDigitString = "F";
 						goto default;
 					default:
-						xSignificantDigitWritten = true;
-						xCharsWritten += 1;
 						IO.WriteSerialString(0, xDigitString);
 						break;
 				}

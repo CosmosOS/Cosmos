@@ -48,6 +48,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			} else {
 				xDataName = xDataName.Substring(0, xDataName.Length - "__Contents".Length);
 			}
+			Comment("String Value: " + LiteralStr);
 			Move(Assembler, "eax", xDataName);
 			Pushd(4, "eax");
 		}

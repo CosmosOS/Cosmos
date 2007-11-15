@@ -49,7 +49,6 @@ namespace Cosmos.Kernel.Boot {
 			LoadArray();
 			GDT_InitEntry(ref mGDTEntries[0], 0, 0, 0);
 			GDT_InitEntry(ref mGDTEntries[CodeSelector >> 3], 0, 0xFFFFFFFF, 0xC99);
-			System.Diagnostics.Debugger.Break();
 			GDT_InitEntry(ref mGDTEntries[DataSelector >> 3], 0, 0xFFFFFFFF, 0xC93);
 			RegisterGDT();
 		}

@@ -46,6 +46,16 @@ namespace Indy.IL2CPU {
 		}
 	}
 
+	public class AssemblyDefinitionEqualityComparer: IEqualityComparer<AssemblyDefinition> {
+		public bool Equals(AssemblyDefinition x, AssemblyDefinition y) {
+			return x.Name.FullName.Equals(y.Name.FullName);
+		}
+
+		public int GetHashCode(AssemblyDefinition obj) {
+			return obj.Name.FullName.GetHashCode();
+		}
+	}
+
 	public enum LogSeverityEnum {
 		Informational,
 		Warning
@@ -857,7 +867,7 @@ namespace Indy.IL2CPU {
 				xTypeFields.Add("$$Storage$$", new TypeInformation.Field(aObjectStorageSize, 4));
 				aObjectStorageSize += 4;
 			}
-			if(ObjectUtilities.IsDelegate(xActualType)) {
+			if (ObjectUtilities.IsDelegate(xActualType)) {
 				xTypeFields.Add("$$Obj$$", new TypeInformation.Field(aObjectStorageSize, 4));
 				aObjectStorageSize += 4;
 				xTypeFields.Add("$$Method$$", new TypeInformation.Field(aObjectStorageSize, 4));
@@ -1113,6 +1123,11 @@ namespace Indy.IL2CPU {
 			IL.Op xPInvokeMethodBodyOp = (IL.Op)Activator.CreateInstance(mMap.PInvokeMethodBodyOp, aMethod, aMethodInfo);
 			xPInvokeMethodBodyOp.Assembler = mAssembler;
 			xPInvokeMethodBodyOp.Assemble();
+		}
+
+		public static IEnumerable<AssemblyDefinition> GetAllAssemblies() {
+			return (from item in mCurrent.mMethods.Keys
+					select item.DeclaringType.Module.Assembly).Distinct(new AssemblyDefinitionEqualityComparer());
 		}
 	}
 }

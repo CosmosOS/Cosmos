@@ -54,6 +54,7 @@
     <Compile Include="GlueMethodAttribute.cs" />
     <Compile Include="GlueMethodTypeEnum.cs" />
     <Compile Include="IDTEntryStruct.cs" />
+    <Compile Include="KernelResourceAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

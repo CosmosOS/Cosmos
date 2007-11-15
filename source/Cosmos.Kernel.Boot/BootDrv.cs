@@ -22,6 +22,11 @@ namespace Cosmos.Kernel.Boot {
 			MemoryManager.Initialize(MemChunkStartAddr, MemChunkLength);
 		}
 
+		[GluePlaceholderMethod(MethodType = GluePlaceholderMethodTypeEnum.GetKernelResource)]
+		public static unsafe byte[] GetBinaryResource(int aIndex) {
+			return null;
+		}
+
 		public static void Main() {
 			Console.WriteLine("This is CosmOS Booting..."); // 25 chars
 			if (!BootInfoSet) {
@@ -41,10 +46,11 @@ namespace Cosmos.Kernel.Boot {
 			GDT.Setup();
 			Console.WriteLine("Setting up IDT");
 			IDT.Setup();
+			IDT.IDT_EnableInterrupts();
 			Console.WriteLine("Setting up Keyboard");
 			Keyboard.Initialize();
-			IDT.IDT_EnableInterrupts();
 			Console.WriteLine("Kernel booted!");
+			Console.WriteLine("Bladibladidddfsdfsdfdfdfsdfbla");
 		}
 
 		private static uint MemChunkStartAddr;
@@ -225,7 +231,7 @@ namespace Cosmos.Kernel.Boot {
 						xDigitString = "F";
 						goto default;
 					default:
-						if(xDigitString == null) {
+						if (xDigitString == null) {
 							Console.Write("NoDigitSet");
 						}
 						xSignificantDigitWritten = true;

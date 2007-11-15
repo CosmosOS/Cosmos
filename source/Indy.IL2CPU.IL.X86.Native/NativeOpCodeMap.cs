@@ -145,7 +145,6 @@ namespace Indy.IL2CPU.IL.X86.Native {
 							}
 						}
 						if (mGlueFields.ContainsKey((GlueFieldTypeEnum)xAttrib.Properties["FieldType"])) {
-							System.Diagnostics.Debugger.Break();
 							throw new Exception("GlueField of type '" + ((GlueFieldTypeEnum)xAttrib.Properties["FieldType"]).ToString() + "' already found!");
 						}
 						mGlueFields.Add((GlueFieldTypeEnum)xAttrib.Properties["FieldType"], xFieldDefinition);
@@ -292,7 +291,7 @@ namespace Indy.IL2CPU.IL.X86.Native {
 						Engine.QueueStaticField(xFieldDef, out xPointerFieldName);
 						aAssembler.Add(new CPU.Move("eax", xPointerFieldName));
 						aAssembler.Add(new CPU.Move("word [eax]", "0x" + ((8 * 3) - 1).ToString("X")));
-						aAssembler.Add(new CPU.Move("ecx", "["+xFieldName+"]"));
+						aAssembler.Add(new CPU.Move("ecx", "[" + xFieldName + "]"));
 						aAssembler.Add(new CPU.Add("ecx", "0xC"));
 						aAssembler.Add(new CPU.Move("dword [eax + 2]", "ecx"));
 						break;
@@ -302,7 +301,6 @@ namespace Indy.IL2CPU.IL.X86.Native {
 						string xPointerFieldName;
 						Engine.QueueStaticField(xFieldDef, out xPointerFieldName);
 						aAssembler.Add(new CPU.Move("eax", xPointerFieldName));
-						aAssembler.Add(new CPUNative.Break());
 						aAssembler.Add(new CPUNative.Lgdt("[eax]"));
 						//aAssembler.Add(new Literal("use32"));
 						aAssembler.Add(new CPU.Move("eax", "0x10"));
@@ -350,7 +348,6 @@ namespace Indy.IL2CPU.IL.X86.Native {
 						mIDTSetHandlerMethodName = new Label(xTheMethod).Name;
 						aAssembler.Add(new CPU.Call("___________REGISTER___ISRS_____"));
 						aAssembler.Add(new CPU.Move("eax", xPointerFieldName));
-						aAssembler.Add(new CPUNative.Break());
 						aAssembler.Add(new CPUNative.Lidt("eax"));
 						GetGlueMethod(GlueMethodTypeEnum.IDT_InterruptHandler);
 						break;
@@ -373,8 +370,11 @@ namespace Indy.IL2CPU.IL.X86.Native {
 						break;
 					}
 				case GluePlaceholderMethodTypeEnum.IDT_EnableInterrupts: {
-						aAssembler.Add(new CPUNative.Break());
 						aAssembler.Add(new CPUNative.Sti());
+						break;
+					}
+				case GluePlaceholderMethodTypeEnum.GetKernelResource: {
+						aAssembler.Add(new CPUNative.Break());
 						break;
 					}
 				default:
@@ -421,6 +421,63 @@ namespace Indy.IL2CPU.IL.X86.Native {
 				aAssembler.Add(new CPUNative.Sti());
 				aAssembler.Add(new CPUNative.IRet());
 			}
+			IEnumerable<AssemblyDefinition> xAssemblies = Engine.GetAllAssemblies();
+			SortedList<int, byte[]> xResources = new SortedList<int, byte[]>();
+			foreach (AssemblyDefinition xAssembly in xAssemblies) {
+				foreach (CustomAttribute xAttrib in xAssembly.CustomAttributes) {
+					if (!xAttrib.Resolved) {
+						xAttrib.Resolve();
+					}
+				}
+				IEnumerable<KeyValuePair<int, string>> xWantedResources = (from item in xAssembly.CustomAttributes.Cast<CustomAttribute>()
+																		   where item.Constructor.DeclaringType.FullName == typeof(KernelResourceAttribute).FullName
+																		   select new KeyValuePair<int, string>((int)item.ConstructorParameters[1],
+																			   (string)item.ConstructorParameters[0]));
+				foreach (KeyValuePair<int, string> xWantedResource in xWantedResources) {
+					foreach (ModuleDefinition xModule in xAssembly.Modules) {
+						foreach (Resource xResource in xModule.Resources) {
+							if (xResource.Name == xWantedResource.Value) {
+								EmbeddedResource xEmbedded = xResource as EmbeddedResource;
+								if (xEmbedded == null) {
+									throw new Exception("Resource found but was not an embedded resource (Resource Name = '" + xWantedResource.Value + "')");
+								}
+								xResources.Add(xWantedResource.Key, xEmbedded.Data);
+							}
+						}
+					}
+				}
+			}
+			StringBuilder xValue = new StringBuilder();
+			DataMember xDataMember;
+			for (int i = 0; i < xResources.Count; i++) {
+				xValue.Remove(0, xValue.Length);
+				xValue.Append("0,0,0,0,2,0,0,0,");
+				xValue.Append(BitConverter.GetBytes(xResources.Values[i].Length).Aggregate("", (r, v) => r + v + ","));
+				xValue.Append(xResources.Values[i].Aggregate("", (r, v) => r + v + ","));
+				xDataMember = new DataMember("embedded_resource_" + xResources.Keys[i] + "_contents", "db", xValue.ToString().TrimEnd(','));
+				aAssembler.DataMembers.Add(xDataMember);
+			}
+			MethodDefinition xGetResourceMethod = GetGluePlaceholderMethod(GluePlaceholderMethodTypeEnum.GetKernelResource);
+			MethodInformation xGetResourceMethodInfo = Engine.GetMethodInfo(xGetResourceMethod, xGetResourceMethod, xGetResourceMethod.Name, null);
+			string xGetResourceLabelName = new Label(xGetResourceMethod).Name;
+			for (int i = 0; i < aAssembler.Instructions.Count; i++) {
+				if ((aAssembler.Instructions[i] is Label) && ((Label)aAssembler.Instructions[i]).Name == xGetResourceLabelName) {
+					aAssembler.Instructions.RemoveRange(i, 10);
+					break;
+				}
+			}
+			NativeMethodHeaderOp.AssembleHeader(aAssembler, xGetResourceLabelName, new int[0]);
+			Op.Ldarg(aAssembler, xGetResourceMethodInfo.Arguments[0].VirtualAddresses, xGetResourceMethodInfo.Arguments[0].Size);
+			aAssembler.Add(new CPU.Pop("eax"));
+			foreach (int xId in xResources.Keys) {
+				aAssembler.Add(new CPU.Move("ecx", "0x" + xId.ToString("X")));
+				aAssembler.Add(new CPU.Compare("eax", "ecx"));
+				aAssembler.Add(new CPU.JumpIfNotEquals(".__after__" + xId));
+				aAssembler.Add(new CPU.Push("embedded_resource_" + xId + "_contents"));
+				aAssembler.Add(new CPU.JumpAlways(".END__OF__METHOD"));
+				aAssembler.Add(new Label(".__after__" + xId));
+			}
+			NativeMethodFooterOp.AssembleFooter(4, aAssembler, new int[0], 4);
 		}
 	}
 }
