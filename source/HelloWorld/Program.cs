@@ -80,8 +80,8 @@ namespace HelloWorld {
 
 		public static void DoWriteLines() {
 			string s = "Test";
-			//Console.WriteLine("Hello world!");
-			//Console.ReadLine();
+			Console.WriteLine("Hello world!");
+            //Console.ReadLine();
 		}
 	}
 }

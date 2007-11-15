@@ -41,6 +41,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel.Boot.Glue", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel.LogViewer", "Cosmos.Kernel.LogViewer\Cosmos.Kernel.LogViewer.csproj", "{7ABE17D9-06A5-44BE-B675-E649F2CD573D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{AF6B9223-77E8-42BB-8B56-C2E5F6B866C2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Performance", "Tests\Performance\Performance.csproj", "{506A31B6-40B0-4EB2-930A-9B4A6DC23AB4}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
 		SccNumberOfProjects = 20
@@ -189,6 +193,10 @@ Global
 		{7ABE17D9-06A5-44BE-B675-E649F2CD573D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7ABE17D9-06A5-44BE-B675-E649F2CD573D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7ABE17D9-06A5-44BE-B675-E649F2CD573D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{506A31B6-40B0-4EB2-930A-9B4A6DC23AB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{506A31B6-40B0-4EB2-930A-9B4A6DC23AB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{506A31B6-40B0-4EB2-930A-9B4A6DC23AB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{506A31B6-40B0-4EB2-930A-9B4A6DC23AB4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -198,5 +206,6 @@ Global
 		{BB58FFC3-A532-45BA-AAB2-28EB0451C2A1} = {F09F8827-415C-4A53-BE25-3ED4B963AC77}
 		{28584689-B678-4863-B404-0AD46B2F2B63} = {F09F8827-415C-4A53-BE25-3ED4B963AC77}
 		{7ABE17D9-06A5-44BE-B675-E649F2CD573D} = {F09F8827-415C-4A53-BE25-3ED4B963AC77}
+		{506A31B6-40B0-4EB2-930A-9B4A6DC23AB4} = {AF6B9223-77E8-42BB-8B56-C2E5F6B866C2}
 	EndGlobalSection
 EndGlobal
