@@ -9,18 +9,15 @@ namespace Indy.IL2CPU.IL.X86 {
 	public class Stsfld: Op {
 		private string mDataName;
 		private int mSize;
-		private bool mIsReference = false;
 
 		public Stsfld(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
 			FieldReference xField = (FieldReference)aInstruction.Operand;
 			mSize = Engine.GetFieldStorageSize(xField.FieldType);
-			DoQueueStaticField(xField.DeclaringType.Module.Assembly.Name.FullName, xField.DeclaringType.FullName, xField.Name, out mDataName);
-			mIsReference = Engine.GetDefinitionFromTypeReference(xField.FieldType).IsClass;
+			Engine.QueueStaticField(xField, out mDataName);
 		}
 
 		public override void DoAssemble() {
-			Comment("; Size = " + mSize + ", IsReference = " + mIsReference);
 			//if (mIsReference && Assembler.InMetalMode) {
 			//	Pushd(4, "[" mDataName);
 			//	return;

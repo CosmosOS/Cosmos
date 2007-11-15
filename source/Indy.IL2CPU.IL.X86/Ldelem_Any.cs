@@ -34,12 +34,16 @@ namespace Indy.IL2CPU.IL.X86 {
 					xSizeLeft -= 4;
 				}else {
 					if(xSizeLeft >= 2) {
-						aAssembler.Add(new CPUx86.Push("word [eax]"));
+						aAssembler.Add(new CPUx86.Move("ecx", "0"));
+						aAssembler.Add(new CPUx86.Move("word ecx", "[eax]"));
+						aAssembler.Add(new CPUx86.Push("ecx"));
 						aAssembler.Add(new CPUx86.Add("eax", "2"));
 						xSizeLeft -= 2;
 					}else {
 						if(xSizeLeft >= 1) {
-							aAssembler.Add(new CPUx86.Push("byte [eax]"));
+							aAssembler.Add(new CPUx86.Move("ecx", "0"));
+							aAssembler.Add(new CPUx86.Move("byte cl", "[eax]"));
+							aAssembler.Add(new CPUx86.Push("ecx"));
 							aAssembler.Add(new CPUx86.Add("eax", "1"));
 							xSizeLeft -= 1;
 						}else {

@@ -11,7 +11,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		public Ldsflda(Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
 			FieldReference xField = (FieldReference)aInstruction.Operand;
-			DoQueueStaticField(xField.DeclaringType.Module.Assembly.Name.Name, xField.DeclaringType.FullName, xField.Name, out mDataName);
+			Engine.QueueStaticField(xField, out mDataName);
 		}
 
 		public override void DoAssemble() {

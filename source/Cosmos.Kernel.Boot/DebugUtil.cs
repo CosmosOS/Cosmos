@@ -35,6 +35,26 @@ namespace Cosmos.Kernel.Boot {
 			IO.WriteSerialString(0, "\"/>\r\n");
 		}
 
+		public static void SendKeyboardScanCodeReceived(uint aChar) {
+			CheckInitialized();
+			IO.WriteSerialString(0, "<Keyboard_ScanCodeReceived Char=\"");
+			WriteNumber(aChar, 32);
+			IO.WriteSerialString(0, "\"/>");
+		}
+
+		public static void SendKeyboardCharReceived(KeyboardKeys aChar, bool aReleased) {
+			CheckInitialized();
+			IO.WriteSerialString(0, "<Keyboard_CharReceived Char=\"");
+			WriteNumber((uint)aChar, 32);
+			IO.WriteSerialString(0, "\" Released=\"");
+			if (aReleased) {
+				IO.WriteSerialString(0, "true");
+			} else {
+				IO.WriteSerialString(0, "false");
+			}
+			IO.WriteSerialString(0, "\"/>");
+		}
+
 		public static void SendError(string aModule, string aData) {
 			CheckInitialized();
 			IO.WriteSerialString(0, "<Message Type=\"Error\" Module=\"");

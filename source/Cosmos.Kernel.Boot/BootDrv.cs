@@ -46,11 +46,12 @@ namespace Cosmos.Kernel.Boot {
 			GDT.Setup();
 			Console.WriteLine("Setting up IDT");
 			IDT.Setup();
-			IDT.IDT_EnableInterrupts();
 			Console.WriteLine("Setting up Keyboard");
 			Keyboard.Initialize();
 			Console.WriteLine("Kernel booted!");
 			Console.WriteLine("Bladibladidddfsdfsdfdfdfsdfbla");
+			IDT.IDT_EnableInterrupts();
+			DebugUtil.SendWarning("test", "inited");
 		}
 
 		private static uint MemChunkStartAddr;
@@ -71,101 +72,6 @@ namespace Cosmos.Kernel.Boot {
 			}
 			DebugUtil.SendMM_MemChunkFound(MemChunkStartAddr, MemChunkLength);
 		}
-
-
-		//		private static void WriteNumber(uint aValue, byte aBase) {
-		//			uint theValue = aValue;
-		//			int xReturnedChars = 0;
-		//			while (theValue > 0) {
-		//				switch (theValue % aBase) {
-		//					case 0: {
-		//							Console.Write("0");
-		//							xReturnedChars++;
-		//							break;
-		//						}
-		//					case 1: {
-		//							Console.Write("1");
-		//							xReturnedChars++;
-		//							break;
-		//						}
-		//					case 2: {
-		//							Console.Write("2");
-		//							xReturnedChars++;
-		//							break;
-		//						}
-		//					case 3: {
-		//							Console.Write("3");
-		//							xReturnedChars++;
-		//							break;
-		//						}
-		//					case 4: {
-		//							Console.Write("4");
-		//							xReturnedChars++;
-		//							break;
-		//						}
-		//					case 5: {
-		//							Console.Write("5");
-		//							xReturnedChars++;
-		//							break;
-		//						}
-		//					case 6: {
-		//							Console.Write("6");
-		//							xReturnedChars++;
-		//							break;
-		//						}
-		//					case 7: {
-		//							Console.Write("7");
-		//							xReturnedChars++;
-		//							break;
-		//						}
-		//					case 8: {
-		//							Console.Write("8");
-		//							xReturnedChars++;
-		//							break;
-		//						}
-		//					case 9: {
-		//							Console.Write("9");
-		//							xReturnedChars++;
-		//							break;
-		//						}
-		//					case 10: {
-		//							Console.Write("A");
-		//							xReturnedChars++;
-		//							break;
-		//						}
-		//					case 11: {
-		//							xReturnedChars++;
-		//							Console.Write("B");
-		//							break;
-		//						}
-		//					case 12: {
-		//							Console.Write("C");
-		//							xReturnedChars++;
-		//							break;
-		//						}
-		//					case 13: {
-		//							Console.Write("D");
-		//							xReturnedChars++;
-		//							break;
-		//						}
-		//					case 14: {
-		//							Console.Write("E");
-		//							xReturnedChars++;
-		//							break;
-		//						}
-		//					case 15: {
-		//							Console.Write("F");
-		//							xReturnedChars++;
-		//							break;
-		//						}
-		//				}
-		//				theValue = theValue / aBase;
-		//			}
-		//			while (xReturnedChars < 8) {
-		//				Console.Write("0");
-		//				xReturnedChars++;
-		//			}
-		//		}
 
 
 		private static void WriteNumber(uint aValue, bool aZeroFill) {

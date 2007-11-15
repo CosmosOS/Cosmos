@@ -900,6 +900,7 @@ namespace Indy.IL2CPU {
 				aFieldName = DataMember.GetStaticFieldName(xFieldDef);
 				return;
 			}
+			System.Diagnostics.Debugger.Break();
 			throw new Exception("Field not found!(" + String.Format("{0}/{1}/{2}", aAssembly, aType, aField));
 		}
 
@@ -907,7 +908,6 @@ namespace Indy.IL2CPU {
 			if (mCurrent == null) {
 				throw new Exception("ERROR: No Current Engine found!");
 			}
-			aDataName = "";
 			FieldDefinition xFieldDef = GetDefinitionFromFieldReference(aFieldRef);
 			aDataName = DataMember.GetStaticFieldName(xFieldDef);
 			QueueStaticField(xFieldDef);
