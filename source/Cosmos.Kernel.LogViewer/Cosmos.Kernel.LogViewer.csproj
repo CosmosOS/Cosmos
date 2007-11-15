@@ -78,6 +78,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Overview\HeapUsageDisplay.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Overview\MessagesDisplay.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -101,6 +105,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MessageTemplates\MessageTemplateSelector.cs" />
+    <Compile Include="Overview\HeapUsageDisplay.xaml.cs">
+      <DependentUpon>HeapUsageDisplay.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Overview\LoggedHexNumberToUInt32Converter.cs" />
+    <Compile Include="Overview\MathUtils.cs" />
     <Compile Include="Overview\MessagesDisplay.xaml.cs">
       <DependentUpon>MessagesDisplay.xaml</DependentUpon>
     </Compile>
