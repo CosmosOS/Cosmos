@@ -1,0 +1,7 @@
+Base
+-Memory and heap, including GC
+-FAT just floppy to start
+-Console
+-Keyboard
+-Serial
+-Functioning against Mono on Cosmos
