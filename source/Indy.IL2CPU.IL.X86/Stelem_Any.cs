@@ -42,12 +42,32 @@ namespace Indy.IL2CPU.IL.X86 {
 			aAssembler.Add(new CPUx86.Pop("ecx"));
 			aAssembler.StackSizes.Pop();
 			for (int i = (aElementSize / 4) - 1; i >= 0; i -= 1) {
-				aAssembler.Add(new CPU.Comment("; start 1 dword"));
+				aAssembler.Add(new CPU.Comment("Start 1 dword"));
 				aAssembler.Add(new CPUx86.Pop("ebx"));
 				aAssembler.Add(new CPUx86.Move("[ecx]", "ebx"));
 				aAssembler.Add(new CPUx86.Add("ecx", "4"));
 			}
-			aAssembler.Add(new CPUx86.Add("esp", "8"));
+			switch (aElementSize % 4) {
+				case 1: {
+						aAssembler.Add(new CPU.Comment("Start 1 byte"));
+						aAssembler.Add(new CPUx86.Pop("ebx"));
+						Move(aAssembler, "byte [ecx]", "bl");
+						break;
+					}
+				case 2: {
+						aAssembler.Add(new CPU.Comment("Start 1 word"));
+						aAssembler.Add(new CPUx86.Pop("ebx"));
+						Move(aAssembler, "word [ecx]", "bx");
+						break;
+					}
+				case 0: {
+						break;
+					}
+				default:
+					throw new Exception("Remainder size " + (aElementSize % 4) + " not supported!");
+
+			}
+			aAssembler.Add(new CPUx86.Add("esp", "0x8"));
 			//
 			//			aAssembler.Add(new CPUx86.Move("[edx]", "ecx"));
 			//

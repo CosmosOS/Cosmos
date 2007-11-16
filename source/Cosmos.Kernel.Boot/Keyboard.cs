@@ -105,6 +105,11 @@ namespace Cosmos.Kernel.Boot {
 								DebugUtil.SendWarning("Keyboard", "Shifted not yet supported!");
 							} else {
 								DebugUtil.SendKeyboardCharReceived(mUnshifted[xScanCode], false);
+								KeyboardKeys xKey = mUnshifted[xScanCode];
+								if (xKey >= KeyboardKeys.A && xKey <= KeyboardKeys.Z) {
+									byte xKeyByte = (byte)(97 + (xKey - KeyboardKeys.A));
+									Console.Write(new String(new char[] { (char)xKeyByte }));
+								}
 							}
 						}
 					//						} else {
