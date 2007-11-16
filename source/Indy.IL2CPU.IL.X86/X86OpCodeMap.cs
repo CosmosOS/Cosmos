@@ -57,16 +57,13 @@ namespace Indy.IL2CPU.IL.X86 {
 							return CustomImplementations.System.StringImplRefs.get_Chars_NormalRef;
 						}
 					}
-				case "System_Void___System_EventHandler__ctor___System_Object__System_IntPtr___": {
-						return CustomImplementations.System.EventHandlerImplRefs.CtorRef;
-					}
 				default:
 					return base.GetCustomMethodImplementation(aOrigMethodName, aInMetalMode);
 			}
 		}
 
-		public override bool HasCustomAssembleImplementation(string aMethodName, bool aInMetalMode) {
-			switch (aMethodName) {
+		public override bool HasCustomAssembleImplementation(MethodInformation aMethodInfo, bool aInMetalMode) {
+			switch (aMethodInfo.LabelName) {
 				case "System_Object___System_Threading_Interlocked_CompareExchange___System_Object___System_Object__System_Object___": {
 						return true;
 					}
@@ -80,18 +77,26 @@ namespace Indy.IL2CPU.IL.X86 {
 						return true;
 					}
 				case "System_IntPtr___System_Delegate_GetInvokeMethod____": {
-						return true;
-					} 
-				case "System_Object___System_Delegate_DynamicInvokeImpl___System_Object_____": {
-						return true;
+						return false;
 					}
-				default:
-					return base.HasCustomAssembleImplementation(aMethodName, aInMetalMode);
+				case "System_Object___System_Delegate_DynamicInvokeImpl___System_Object_____": {
+						return false;
+					}
+				default: {
+						// we need special treatment for delegate constructors, which have an Object,IntPtr param list
+						if (ObjectUtilities.IsDelegate(aMethodInfo.MethodDefinition.DeclaringType)) {
+							if (aMethodInfo.LabelName.EndsWith("__ctor___System_Object__System_IntPtr___")) {
+								return true;
+							}
+						}
+
+						return base.HasCustomAssembleImplementation(aMethodInfo, aInMetalMode);
+					}
 			}
 		}
 
-		public override void DoCustomAssembleImplementation(string aMethodName, bool aInMetalMode, Indy.IL2CPU.Assembler.Assembler aAssembler, MethodInformation aMethodInfo) {
-			switch (aMethodName) {
+		public override void DoCustomAssembleImplementation(bool aInMetalMode, Indy.IL2CPU.Assembler.Assembler aAssembler, MethodInformation aMethodInfo) {
+			switch (aMethodInfo.LabelName) {
 				case "System_Object___System_Threading_Interlocked_CompareExchange___System_Object___System_Object__System_Object___": {
 						Assemble_System_Threading_Interlocked_CompareExchange__Object(aAssembler, aMethodInfo);
 						break;
@@ -109,12 +114,17 @@ namespace Indy.IL2CPU.IL.X86 {
 							Assembler = aAssembler
 						}.Assemble();
 						break;
-					} 
-				case "System_Object___System_Delegate_DynamicInvokeImpl___System_Object_____": {
+					}
+				case "System_Void___System_EventHandler__ctor___System_Object__System_IntPtr___": {
+						Op.Ldarg(aAssembler, aMethodInfo.Arguments[0].VirtualAddresses, aMethodInfo.Arguments[0].Size);
+						Op.Ldarg(aAssembler, aMethodInfo.Arguments[1].VirtualAddresses, aMethodInfo.Arguments[1].Size);
+						new Call(CustomImplementations.System.EventHandlerImplRefs.CtorRef) {
+							Assembler = aAssembler
+						}.Assemble();
 						break;
 					}
 				default:
-					base.DoCustomAssembleImplementation(aMethodName, aInMetalMode, aAssembler, aMethodInfo);
+					base.DoCustomAssembleImplementation(aInMetalMode, aAssembler, aMethodInfo);
 					break;
 			}
 		}

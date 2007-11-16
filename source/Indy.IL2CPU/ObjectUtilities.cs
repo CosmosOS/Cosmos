@@ -4,17 +4,18 @@ using Mono.Cecil;
 
 namespace Indy.IL2CPU {
 	public static class ObjectUtilities {
-		public static bool IsDelegate(TypeDefinition aType) {
-			if (aType.FullName == "System.Object") {
+		public static bool IsDelegate(TypeReference aType) {
+			TypeDefinition xType = Engine.GetDefinitionFromTypeReference(aType);
+			if (xType.FullName == "System.Object") {
 				return false;
 			}
-			if(aType.BaseType.FullName == "System.Delegate") {
+			if (xType.BaseType.FullName == "System.Delegate") {
 				return true;
 			}
-			if (aType.BaseType.FullName == "System.Object") {
+			if (xType.BaseType.FullName == "System.Object") {
 				return false;
 			}
-			return IsDelegate(Engine.GetDefinitionFromTypeReference(aType.BaseType));
+			return IsDelegate(xType.BaseType);
 		}
 
 		public static int GetObjectStorageSize(TypeDefinition aType) {

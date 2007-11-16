@@ -653,7 +653,7 @@ namespace Indy.IL2CPU {
 					if (!xCurrentMethod.IsStatic) {
 						int xObjectStorageSize;
 						SortedList<string, TypeInformation.Field> xTypeFields = GetTypeFieldInfo(xCurrentMethod, out xObjectStorageSize);
-						xTypeInfo = new TypeInformation(xObjectStorageSize, xTypeFields);
+						xTypeInfo = new TypeInformation(xObjectStorageSize, xTypeFields, GetDefinitionFromTypeReference(xCurrentMethod.DeclaringType));
 					}
 				}
 				MethodInformation xMethodInfo = GetMethodInfo(xCurrentMethod, xCurrentMethod, xMethodName, xTypeInfo);
@@ -710,8 +710,8 @@ namespace Indy.IL2CPU {
 					}
 				}
 				if (!xContentProduced) {
-					if (mMap.HasCustomAssembleImplementation(xMethodName, mAssembler.InMetalMode)) {
-						mMap.DoCustomAssembleImplementation(xMethodName, mAssembler.InMetalMode, mAssembler, xMethodInfo);
+					if (mMap.HasCustomAssembleImplementation(xMethodInfo, mAssembler.InMetalMode)) {
+						mMap.DoCustomAssembleImplementation(mAssembler.InMetalMode, mAssembler, xMethodInfo);
 					} else {
 						if (Enum.GetNames(typeof(CustomMethodEnum)).Contains(xMethodName)) {
 							CustomMethodImplementationOp xCustomMethodImplOp = (CustomMethodImplementationOp)GetOpFromType(mMap.CustomMethodImplementationOp, null, xMethodInfo);

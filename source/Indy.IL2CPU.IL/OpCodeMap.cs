@@ -70,12 +70,13 @@ namespace Indy.IL2CPU.IL {
 			return null;
 		}
 
-		public virtual bool HasCustomAssembleImplementation(string aMethodName, bool aInMetalMode) {
+		public virtual bool HasCustomAssembleImplementation(MethodInformation aMethod, bool aInMetalMode) {
 			return false;
 		}
 
-		public virtual void DoCustomAssembleImplementation(string aMethodName, bool aInMetalMode, Assembler.Assembler aAssembler, MethodInformation aMethodInfo) {
+		public virtual void DoCustomAssembleImplementation(bool aInMetalMode, Assembler.Assembler aAssembler, MethodInformation aMethodInfo) {
 		}
+
 		public virtual void PostProcess(Assembler.Assembler aAssembler) {
 		}
 	}

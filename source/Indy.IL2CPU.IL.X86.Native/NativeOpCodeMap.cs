@@ -190,8 +190,8 @@ namespace Indy.IL2CPU.IL.X86.Native {
 			}
 		}
 
-		public override bool HasCustomAssembleImplementation(string aMethodName, bool aInMetalMode) {
-			switch (aMethodName) {
+		public override bool HasCustomAssembleImplementation(MethodInformation aMethodInfo, bool aInMetalMode) {
+			switch (aMethodInfo.LabelName) {
 				case "System_Byte___Indy_IL2CPU_IL_X86_CustomImplementations_System_StringImpl_GetByteFromChar___System_Char___": {
 						if (aInMetalMode) {
 							return true;
@@ -229,15 +229,15 @@ namespace Indy.IL2CPU.IL.X86.Native {
 						CheckGluePlaceholderMethod();
 						GluePlaceholderMethodTypeEnum? xMethodType = null;
 						return (from item in mGluePlaceholderMethods.Keys
-								where new Label(mGluePlaceholderMethods[item]).Name == aMethodName
+								where new Label(mGluePlaceholderMethods[item]).Name == aMethodInfo.LabelName
 								select item).Count() > 0;
 					}
 			}
-			return base.HasCustomAssembleImplementation(aMethodName, aInMetalMode);
+			return base.HasCustomAssembleImplementation(aMethodInfo, aInMetalMode);
 		}
 
-		public override void DoCustomAssembleImplementation(string aMethodName, bool aInMetalMode, Assembler.Assembler aAssembler, MethodInformation aMethodInfo) {
-			switch (aMethodName) {
+		public override void DoCustomAssembleImplementation(bool aInMetalMode, Assembler.Assembler aAssembler, MethodInformation aMethodInfo) {
+			switch (aMethodInfo.LabelName) {
 				case "System_Byte___Indy_IL2CPU_IL_X86_CustomImplementations_System_StringImpl_GetByteFromChar___System_Char___": {
 						if (aInMetalMode) {
 							DoAssemble_String_GetByteFromChar(aAssembler, aMethodInfo);
@@ -257,7 +257,7 @@ namespace Indy.IL2CPU.IL.X86.Native {
 						GluePlaceholderMethodTypeEnum? xMethodType = null;
 
 						foreach (GluePlaceholderMethodTypeEnum xTheMethodType in mGluePlaceholderMethods.Keys) {
-							if (new Label(mGluePlaceholderMethods[xTheMethodType]).Name == aMethodName) {
+							if (new Label(mGluePlaceholderMethods[xTheMethodType]).Name == aMethodInfo.LabelName) {
 								xMethodType = xTheMethodType;
 								break;
 							}
@@ -268,7 +268,7 @@ namespace Indy.IL2CPU.IL.X86.Native {
 						break;
 					}
 			}
-			base.DoCustomAssembleImplementation(aMethodName, aInMetalMode, aAssembler, aMethodInfo);
+			base.DoCustomAssembleImplementation(aInMetalMode, aAssembler, aMethodInfo);
 		}
 
 		private void AssembleGluePlaceholderMethod(GluePlaceholderMethodTypeEnum aMethodType, Assembler.Assembler aAssembler, MethodInformation aMethodInfo) {

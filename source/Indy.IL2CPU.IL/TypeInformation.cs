@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Mono.Cecil;
 
 namespace Indy.IL2CPU.IL {
 	// TODO: abstract this one out to a X86 specific one
@@ -29,9 +30,11 @@ namespace Indy.IL2CPU.IL {
 
 		public readonly SortedList<string, Field> Fields;
 		public readonly int StorageSize;
-		public TypeInformation(int aStorageSize, SortedList<string, Field> aFields) {
+		public readonly TypeDefinition TypeDef;
+		public TypeInformation(int aStorageSize, SortedList<string, Field> aFields, TypeDefinition aTypeDef) {
 			Fields = aFields;
 			StorageSize = aStorageSize;
+			TypeDef = aTypeDef;
 		}
 	}
 }
