@@ -34,7 +34,6 @@ namespace IL2CPU {
 					xArgParts[1] = xArg.Substring(xArg.IndexOfAny(new char[] { '=', ':' }) + 1);
 				}
 				switch (xArgParts[0].ToLower()) {
-					case "input":
 					case "in": {
 							InputFile = xArgParts[1];
 							if (InputFile.StartsWith("\"") && InputFile.EndsWith("\"")) {
@@ -42,7 +41,6 @@ namespace IL2CPU {
 							}
 							break;
 						}
-					case "output":
 					case "out": {
 							OutputFile = xArgParts[1];
 							if (OutputFile.StartsWith("\"") && OutputFile.EndsWith("\"")) {
@@ -54,8 +52,7 @@ namespace IL2CPU {
 							AsmFile = xArgParts[1];
 							break;
 						}
-					case "metal":
-					case "metalmode": {
+					case "metal": {
 							if (String.IsNullOrEmpty(xArgParts[1])) {
 								MetalMode = true;
 							} else {
@@ -66,7 +63,6 @@ namespace IL2CPU {
 							}
 							break;
 						}
-					case "targetplatform":
 					case "platform": {
 							try {
 								TargetPlatform = (TargetPlatformEnum)Enum.Parse(typeof(TargetPlatformEnum), xArgParts[1], true);

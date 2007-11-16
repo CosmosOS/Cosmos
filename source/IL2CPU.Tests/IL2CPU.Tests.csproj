@@ -45,6 +45,8 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="Tests\Events\CustomDelegate\CustomDelegate.cs" />
+    <None Include="Tests\Events\SimpleCreateDelegate\SimpleCreateDelegate.cs" />
     <None Include="Tests\ComplexerStructIndexing\ComplexerStructIndexing.cs" />
     <None Include="Tests\SimpleVCallTest\SimpleVCallTest.cs" />
     <None Include="Tests\SimpleNewObject\SimpleNewObject.cs" />
@@ -170,6 +172,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Tests\ComplexerStructIndexing\ComplexerStructIndexing.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Tests\Events\SimpleCreateDelegate\SimpleCreateDelegate.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <Content Include="Tests\SimpleForWithIf\SimpleForWithIf.exe">
