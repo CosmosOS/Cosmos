@@ -18,10 +18,10 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public override void DoAssemble() {
-			Pop("eax");
+			new CPU.Pop("eax");
 			for(int i = 0; i < mLabels.Length; i++){
-				Compare("eax", "0" + i.ToString("X") + "h");
-				JumpIfEquals(mLabels[i]);
+				new CPU.Compare("eax", "0" + i.ToString("X") + "h");
+				new CPU.JumpIfEquals(mLabels[i]);
 			}
 			Assembler.StackSizes.Pop();
 		}

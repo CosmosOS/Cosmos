@@ -11,18 +11,18 @@ namespace Indy.IL2CPU.IL.X86 {
 			: base(aInstruction, aMethodInfo) {
 		}
 		public override void DoAssemble() {
-			int xSource = Assembler.StackSizes.Peek();
+			int xSource = Assembler.StackSizes.Pop();
 			switch (xSource) {
 				case 2:
 				case 4: {
-						Pop("eax");
-						Pushd(1, "eax");
+						new CPU.Pop("eax");
+						new CPU.Pushd("eax");
 						break;
 					}
 				case 8: {
-						Pop("eax");
-						Pop("ecx");
-						Pushd(1, "eax");
+						new CPU.Pop("eax");
+						new CPU.Pop("ecx");
+						new CPU.Pushd("eax");
 						break;
 					}
 				case 1: {
@@ -31,6 +31,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				default:
 					throw new Exception("SourceSize " + xSource + " not supported!");
 			}
+			Assembler.StackSizes.Push(1);
 		}
 	}
 }

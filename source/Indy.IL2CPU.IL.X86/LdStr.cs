@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using Indy.IL2CPU.Assembler;
 using Mono.Cecil.Cil;
+using CPU = Indy.IL2CPU.Assembler.X86;
 using Asm = Indy.IL2CPU.Assembler.Assembler;
 
 namespace Indy.IL2CPU.IL.X86 {
@@ -48,9 +49,10 @@ namespace Indy.IL2CPU.IL.X86 {
 			} else {
 				xDataName = xDataName.Substring(0, xDataName.Length - "__Contents".Length);
 			}
-			Comment("String Value: " + LiteralStr);
-			Move(Assembler, "eax", xDataName);
-			Pushd(4, "eax");
+			new Comment("String Value: " + LiteralStr);
+			new CPU.Move("eax", xDataName);
+			new CPU.Pushd("eax");
+			Assembler.StackSizes.Push(4);
 		}
 	}
 }

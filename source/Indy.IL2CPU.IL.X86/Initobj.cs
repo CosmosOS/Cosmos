@@ -18,16 +18,28 @@ namespace Indy.IL2CPU.IL.X86 {
 			if (xTypeRef.IsValueType) {
 				Engine.GetTypeFieldInfo(Engine.GetDefinitionFromTypeReference(xTypeRef), out mObjSize);
 			}
-			if(((mObjSize/4)*4) != mObjSize) {
-				throw new Exception("For now, value type size must be a multiplicative of 4!");
-			}
 		}
 
 		public override void DoAssemble() {
 			Assembler.StackSizes.Pop();
-			Pop("eax");
-			for(int i = 0; i < (mObjSize/4);i++) {
-				Move(Assembler, "dword [eax + 0" + (i*4).ToString("X") + "h]", "0");
+			new CPU.Pop("eax");
+			for (int i = 0; i < (mObjSize / 4); i++) {
+				new CPU.Move("dword [eax + 0" + (i * 4).ToString("X") + "h]", "0");
+			}
+			switch (mObjSize % 4) {
+				case 1: {
+						new CPU.Move("byte [eax + 0" + ((mObjSize / 4) * 4).ToString("X") + "h]", "0");
+						break;
+					}
+				case 2: {
+						new CPU.Move("word [eax + 0" + ((mObjSize / 4) * 4).ToString("X") + "h]", "0");
+						break;
+					}
+				case 0:
+					break;
+				default: {
+						throw new Exception("Remainder size " + mObjSize % 4 + " not supported yet!");
+					}
 			}
 		}
 	}

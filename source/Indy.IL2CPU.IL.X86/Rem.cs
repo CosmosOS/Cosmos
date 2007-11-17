@@ -11,22 +11,13 @@ namespace Indy.IL2CPU.IL.X86 {
 			: base(aInstruction, aMethodInfo) {
 		}
 		public override void DoAssemble() {
-			int xSize = Assembler.StackSizes.Peek();
-			Pop("ecx");
-			Pop("eax"); // gets devised by ecx
-			Xor("edx", "edx");
-			Assembler.Add(new CPU.Divide("ecx"));
-			Pushd(xSize, "edx");
-
-	
-//			this.MovRegisterOperand(R32.EAX, first);
-//			this.MovRegisterOperand(R32.ECX, second);
-//			this.assembly.XOR(R32.EDX, R32.EDX);
-//
-//			assembly.DIV(R32.ECX);
-//
-//			assembly.MOV(register, R32.EDX);
-
+			int xSize = Math.Max(Assembler.StackSizes.Pop(), Assembler.StackSizes.Pop());
+			new CPU.Pop("ecx");
+			new CPU.Pop("eax"); // gets devised by ecx
+			new CPU.Xor("edx", "edx");
+			new CPU.Divide("ecx");
+			new CPU.Pushd("edx");
+			Assembler.StackSizes.Push(xSize);
 		}
 	}
 }

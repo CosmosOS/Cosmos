@@ -11,13 +11,14 @@ namespace Indy.IL2CPU.IL.X86 {
 			: base(aInstruction, aMethodInfo) {
 		}
 		public override void DoAssemble() {
-			int xSize = Assembler.StackSizes.Peek();
-			Pop("eax"); // shift amount
-			Pop("edx"); // value
-			Move(Assembler, "ebx", "0");
-			Move(Assembler, "cl", "al");
-			Assembler.Add(new CPU.ShiftLeft("edx", "ebx", "cl"));
-			Pushd(xSize, "edx");
+			int xSize = Math.Max(Assembler.StackSizes.Pop(), Assembler.StackSizes.Pop());
+			new CPU.Pop("eax"); // shift amount
+			new CPU.Pop("edx"); // value
+			new CPU.Move("ebx", "0");
+			new CPU.Move("cl", "al");
+			new CPU.ShiftLeft("edx", "ebx", "cl");
+			new CPU.Pushd("edx");
+			Assembler.StackSizes.Push(xSize);
 		}
 	}
 }

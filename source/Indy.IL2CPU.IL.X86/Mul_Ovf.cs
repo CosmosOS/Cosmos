@@ -6,12 +6,9 @@ using CPU = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Mul_Ovf)]
-	public class Mul_Ovf: Op {
+	public class Mul_Ovf: Mul {
 		public Mul_Ovf(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
-		}
-		public override void DoAssemble() {
-			Multiply();
 		}
 	}
 }

@@ -12,7 +12,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 		public override void DoAssemble() {
 			// TODO: unimplemented
-			Assembler.Add(new CPU.Add("esp", "4"));
+			new CPU.Add("esp", "4");
 			Assembler.StackSizes.Pop();
 		}
 	}

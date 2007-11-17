@@ -1,9 +1,9 @@
 using System;
-using System.IO;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using Instruction=Mono.Cecil.Cil.Instruction;
 
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Stelem_Any, true)]
@@ -29,35 +29,36 @@ namespace Indy.IL2CPU.IL.X86 {
 			if(xStackSize % 4 != 0) {
 				xStackSize += 4 - xStackSize % 4;
 			}
-			aAssembler.Add(new CPU.Comment("; Index at: [esp + " + xStackSize + "]"));
-			aAssembler.Add(new CPU.Comment("; Array at: [esp + " + (xStackSize + 4) + "]"));
-			aAssembler.Add(new CPUx86.Move("ebx", "[esp + " + xStackSize + "]")); // the index
-			aAssembler.Add(new CPUx86.Move("ecx", "[esp + " + (xStackSize + 4) + "]")); // the array
-			aAssembler.Add(new CPUx86.Add("ecx", "12"));
-			Push(aAssembler, 4, "0x" + aElementSize.ToString("X"));
-			Push(aAssembler, 4, "ebx");
+			new CPUx86.Move("ebx", "[esp + " + xStackSize + "]"); // the index
+			new CPUx86.Move("ecx", "[esp + " + (xStackSize + 4) + "]"); // the array
+			new CPUx86.Add("ecx", "12");
+			new CPUx86.Push("0x" + aElementSize.ToString("X"));
+			aAssembler.StackSizes.Push(4);
+			new CPUx86.Push("ebx");
+			aAssembler.StackSizes.Push(4);
 			Multiply(aAssembler);
-			Push(aAssembler, 4, "ecx");
+			new CPUx86.Push("ecx");
+			aAssembler.StackSizes.Push(4);
 			Add(aAssembler);
-			aAssembler.Add(new CPUx86.Pop("ecx"));
+			new CPUx86.Pop("ecx");
 			aAssembler.StackSizes.Pop();
 			for (int i = (aElementSize / 4) - 1; i >= 0; i -= 1) {
-				aAssembler.Add(new CPU.Comment("Start 1 dword"));
-				aAssembler.Add(new CPUx86.Pop("ebx"));
-				aAssembler.Add(new CPUx86.Move("[ecx]", "ebx"));
-				aAssembler.Add(new CPUx86.Add("ecx", "4"));
+				new CPU.Comment("Start 1 dword");
+				new CPUx86.Pop("ebx");
+				new CPUx86.Move("[ecx]", "ebx");
+				new CPUx86.Add("ecx", "4");
 			}
 			switch (aElementSize % 4) {
 				case 1: {
-						aAssembler.Add(new CPU.Comment("Start 1 byte"));
-						aAssembler.Add(new CPUx86.Pop("ebx"));
-						Move(aAssembler, "byte [ecx]", "bl");
+						new CPU.Comment("Start 1 byte");
+						new CPUx86.Pop("ebx");
+						new CPUx86.Move("byte [ecx]", "bl");
 						break;
 					}
 				case 2: {
-						aAssembler.Add(new CPU.Comment("Start 1 word"));
-						aAssembler.Add(new CPUx86.Pop("ebx"));
-						Move(aAssembler, "word [ecx]", "bx");
+						new CPU.Comment("Start 1 word");
+						new CPUx86.Pop("ebx");
+						new CPUx86.Move("word [ecx]", "bx");
 						break;
 					}
 				case 0: {
@@ -67,17 +68,7 @@ namespace Indy.IL2CPU.IL.X86 {
 					throw new Exception("Remainder size " + (aElementSize % 4) + " not supported!");
 
 			}
-			aAssembler.Add(new CPUx86.Add("esp", "0x8"));
-			//
-			//			aAssembler.Add(new CPUx86.Move("[edx]", "ecx"));
-			//
-			//			for (int i = 0; i < (aElementSize % 4); i++) {
-			//				aAssembler.Add(new CPUx86.Pushd("eax"));
-			//				if (i != 0) {
-			//					aAssembler.Add(new CPUx86.Add("eax", "4"));
-			//					aAssembler.Add(new CPUx86.Pushd("eax"));
-			//				}
-			//			}
+			new CPUx86.Add("esp", "0x8");
 			aAssembler.StackSizes.Pop();
 			aAssembler.StackSizes.Pop();
 			aAssembler.StackSizes.Pop();

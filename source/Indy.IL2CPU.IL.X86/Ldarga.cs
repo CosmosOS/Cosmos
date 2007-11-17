@@ -11,7 +11,8 @@ namespace Indy.IL2CPU.IL.X86 {
 		protected void SetArgIndex(int aIndex, MethodInformation aMethodInfo) {
 			mAddress = aMethodInfo.Arguments[aIndex].VirtualAddresses.First();
 		}
-		public Ldarga(MethodInformation aMethodInfo, int aIndex):base(null, aMethodInfo) {
+		public Ldarga(MethodInformation aMethodInfo, int aIndex)
+			: base(null, aMethodInfo) {
 			SetArgIndex(aIndex, aMethodInfo);
 		}
 
@@ -23,16 +24,18 @@ namespace Indy.IL2CPU.IL.X86 {
 					SetArgIndex(xArgIndex, aMethodInfo);
 				}
 				ParameterDefinition xParam = aInstruction.Operand as ParameterDefinition;
-				if(xParam!=null) {
-					SetArgIndex(xParam.Sequence-1, aMethodInfo);
+				if (xParam != null) {
+					SetArgIndex(xParam.Sequence - 1, aMethodInfo);
 				}
 			}
 		}
 		public override void DoAssemble() {
 			string[] mAddressParts = mAddress.Split('+');
-			Pushd(4, mAddressParts[0]);
-			Pushd(4, mAddressParts[1]);
-			Add();
+			new CPU.Pushd(mAddressParts[0]);
+			Assembler.StackSizes.Push(4);
+			new CPU.Pushd(mAddressParts[1]);
+			Assembler.StackSizes.Push(4);
+			Add(Assembler);
 		}
 	}
 }
