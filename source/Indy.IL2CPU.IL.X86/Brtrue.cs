@@ -13,9 +13,9 @@ namespace Indy.IL2CPU.IL.X86 {
 			TargetLabel = GetInstructionLabel((Instruction)aInstruction.Operand);
 		}
 		public override void DoAssemble() {
-			Assembler.Add(new CPU.Popd("eax"));
-			Assembler.Add(new CPU.Compare("eax", "01h"));
-			Assembler.Add(new CPU.JumpIfEquals(TargetLabel));
+			new CPU.Popd("eax");
+			new CPU.Compare("eax", "01h");
+			new CPU.JumpIfEquals(TargetLabel);
 			Assembler.StackSizes.Pop();
 		}
 	}

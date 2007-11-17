@@ -19,12 +19,18 @@ namespace Indy.IL2CPU.Assembler {
 			return Mnemonic;
 		}
 
-		public Instruction() {
-			var xAttribs = GetType().GetCustomAttributes(typeof(OpCodeAttribute), false);
+		public Instruction():this(true) {
+		}
+
+		public Instruction(bool aAddToAssembler) {
+			var xAttribs = GetType().GetCustomAttributes(typeof (OpCodeAttribute), false);
 			if (xAttribs != null && xAttribs.Length > 0) {
 				var xAttrib = (OpCodeAttribute)xAttribs[0];
 				mOpCode = xAttrib.OpCode;
 				mMnemonic = xAttrib.Mnemonic;
+			}
+			if(aAddToAssembler) {
+				Assembler.CurrentInstance.Add(this);
 			}
 		}
 	}

@@ -24,8 +24,8 @@ namespace Indy.IL2CPU.IL.X86 {
 				throw new Exception("No Address Specified!");
 			}
 			for (int i = (mAddresses.Length - 1); i >= 0; i -= 1) {
-				Pop("eax");
-				Move(Assembler, "[" + mAddresses[i] + "]", "eax");
+				new CPU.Pop("eax");
+				new CPU.Move("[" + mAddresses[i] + "]", "eax");
 			}
 			Assembler.StackSizes.Pop();
 		}

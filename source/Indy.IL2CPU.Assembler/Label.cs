@@ -16,7 +16,7 @@ namespace Indy.IL2CPU.Assembler {
 		}
 
 		public Label(string aName) {
-			SetName(aName);
+			mName = aName;
 		}
 
 		public override string ToString() {
@@ -24,41 +24,31 @@ namespace Indy.IL2CPU.Assembler {
 		}
 
 		public Label(string aType, params string[] aParamTypes) {
-			SetName(Init(aType, typeof(void).FullName, ".ctor", aParamTypes));
-
+			mName = Init(aType, typeof(void).FullName, ".ctor", aParamTypes);
 		}
 
-		private void SetName(string aName) {
-			if (aName.StartsWith(".")) {
-				aName = "." + DataMember.FilterStringForIncorrectChars(aName.Substring(1));
-			} else {
-				aName = DataMember.FilterStringForIncorrectChars(aName);
-			}
-			if (aName.Length > 245) {
-				mName = mHash.ComputeHash(Encoding.Default.GetBytes(aName)).Aggregate("_", (r, x) => r + x.ToString("X2"));
-			} else {
-				mName = aName;
-			}
-		}
-
-		public Label(MethodReference aMethod) {
+		public static string GenerateLabelName(MethodReference aMethod) {
 			var xParams = new List<string>(aMethod.Parameters.Count);
 			foreach (ParameterDefinition xParam in aMethod.Parameters) {
 				//TODO: Is fullname just the name, or type too? IF just name, overloads could exist wtih same names but diff types...
 				xParams.Add(xParam.ParameterType.FullName);
 			}
-			SetName(Init(aMethod.DeclaringType.FullName, aMethod.ReturnType.ReturnType.FullName, aMethod.Name, xParams.ToArray()));
+			return Init(aMethod.DeclaringType.FullName, aMethod.ReturnType.ReturnType.FullName, aMethod.Name, xParams.ToArray());
+		}
+
+		public Label(MethodReference aMethod) {
+			mName = GenerateLabelName(aMethod);
 		}
 
 		public Label(string aType, string aMethodName, params string[] aParamTypes) {
-			SetName(Init(aType, typeof(void).FullName, aMethodName, aParamTypes));
+			mName = Init(aType, typeof(void).FullName, aMethodName, aParamTypes);
 		}
 
 		public Label(string aType, string aReturnType, string aMethodName, params string[] aParamTypes) {
-			SetName(Init(aType, aReturnType, aMethodName, aParamTypes));
+			mName = Init(aType, aReturnType, aMethodName, aParamTypes);
 		}
 
-		protected string Init(string aType, string aReturnType, string aMethodName, params string[] aParamTypes) {
+		protected static string Init(string aType, string aReturnType, string aMethodName, params string[] aParamTypes) {
 			StringBuilder xSB = new StringBuilder();
 			xSB.Append(aReturnType);
 			xSB.Append("___");
@@ -72,7 +62,16 @@ namespace Indy.IL2CPU.Assembler {
 				xSB.Append("_");
 			}
 			xSB.Append("__");
-			return xSB.ToString().Replace('.', '_').Replace('+', '_').Replace('*', '_').Replace('[', '_').Replace(']', '_').Replace('&', '_');
+			string xResult = xSB.ToString().Replace('.', '_').Replace('+', '_').Replace('*', '_').Replace('[', '_').Replace(']', '_').Replace('&', '_');
+			if (xResult.StartsWith(".")) {
+				xResult = "." + DataMember.FilterStringForIncorrectChars(xResult.Substring(1));
+			} else {
+				xResult = DataMember.FilterStringForIncorrectChars(xResult);
+			}
+			if (xResult.Length > 245) {
+				xResult = mHash.ComputeHash(Encoding.Default.GetBytes(xResult)).Aggregate("_", (r, x) => r + x.ToString("X2"));
+			}
+			return xResult;
 		}
 	}
 }

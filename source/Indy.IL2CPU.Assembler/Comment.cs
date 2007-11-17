@@ -6,6 +6,9 @@ namespace Indy.IL2CPU.Assembler {
 		public readonly string Text;
 
 		public Comment(string aText) {
+			if(aText.StartsWith(";")) {
+				aText = aText.TrimStart(';').TrimStart();
+			}
 			Text = aText;
 		}
 

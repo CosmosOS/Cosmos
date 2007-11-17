@@ -5,6 +5,6 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86.Native {
 	[OpCode(0xFFFFFFFF, "cli")]
-	public class Cli: IL2CPU.Assembler.Instruction {
+	public class Cli: X86.Instruction {
 	}
 }

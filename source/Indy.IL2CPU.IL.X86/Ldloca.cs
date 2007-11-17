@@ -33,9 +33,10 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		public sealed override void DoAssemble() {
 			string[] xAddressParts = mAddress.Split('-');
-			Move(Assembler, "edx", "ebp");
-			Assembler.Add(new CPU.Sub("edx", xAddressParts[1]));
-			Push(Assembler, 4, "edx");
+			new CPU.Move("edx", "ebp");
+			new CPU.Sub("edx", xAddressParts[1]);
+			new CPU.Push("edx");
+			Assembler.StackSizes.Push(4);
 		}
 	}
 }

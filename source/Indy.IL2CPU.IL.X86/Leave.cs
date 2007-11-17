@@ -12,7 +12,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			TargetLabel = GetInstructionLabel((Instruction)aInstruction.Operand);
 		}
 		public override void DoAssemble() {
-			JumpAlways(TargetLabel);
+			new CPU.JumpAlways(TargetLabel);
 		}
 	}
 }

@@ -1,6 +1,4 @@
 using System;
-using System.IO;
-using Mono.Cecil;
 using Mono.Cecil.Cil;
 using CPU = Indy.IL2CPU.Assembler.X86;
 
@@ -15,18 +13,21 @@ namespace Indy.IL2CPU.IL.X86 {
 			switch (xSource) {
 				case 1:
 				case 2: {
-						Pop("eax");
-						Pushd(4, "eax");
+						new CPU.Pop("eax");
+						new CPU.Pushd("eax");
+					Assembler.StackSizes.Pop();
+					Assembler.StackSizes.Push(4);
 						break;
 					}
 				case 8: {
-						Pop("eax");
-						Pop("ecx");
-						Pushd(4, "eax");
+						new CPU.Pop("eax");
+						new CPU.Pop("ecx");
+						new CPU.Pushd("eax");
+						Assembler.StackSizes.Pop();
+						Assembler.StackSizes.Push(4);
 						break;
 					}
 				case 4: {
-						Assembler.StackSizes.Push(4);
 						break;
 					}
 				default:

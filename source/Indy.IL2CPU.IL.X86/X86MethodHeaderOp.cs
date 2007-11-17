@@ -28,13 +28,13 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public static void AssembleHeader(Assembler.Assembler aAssembler, string aLabelName, int[] aLocals) {
-			aAssembler.Add(new CPU.Label(aLabelName));
-			aAssembler.Add(new CPUx86.Push("ebp"));
-			aAssembler.Add(new CPUx86.Move("ebp", "esp"));
+			new CPU.Label(aLabelName);
+			new CPUx86.Push("ebp");
+			new CPUx86.Move("ebp", "esp");
 			foreach (int xLocalSize in aLocals) {
 				aAssembler.StackSizes.Push(xLocalSize);
 				for (int i = 0; i < (xLocalSize / 4); i++) {
-					aAssembler.Add(new CPUx86.Pushd("0"));
+					new CPUx86.Pushd("0");
 				}
 			}
 		}

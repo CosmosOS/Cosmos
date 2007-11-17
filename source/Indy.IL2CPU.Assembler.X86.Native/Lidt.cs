@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86.Native {
 	[OpCode(0xFFFFFFFF, "lidt")]
-	public class Lidt: IL2CPU.Assembler.Instruction{
+	public class Lidt: X86.Instruction {
 		public readonly string Operand;
 		public Lidt(string aOperand) {
 			Operand = aOperand;

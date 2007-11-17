@@ -12,8 +12,8 @@ namespace Indy.IL2CPU.IL.X86 {
 		private readonly bool mHasReturn;
 		private readonly string mNormalAddress;
 		private readonly string mMethodDescription;
-		private readonly string[] mThisAddresses;
 		private readonly int mThisOffset;
+		private readonly int mArgumentCount;
 		public Callvirt(Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
 			int xThisOffSet = (from item in aMethodInfo.Locals
@@ -23,36 +23,41 @@ namespace Indy.IL2CPU.IL.X86 {
 				throw new Exception("Unable to determine Method!");
 			}
 			MethodDefinition xMethodDef = Engine.GetDefinitionFromMethodReference(xMethod);
-			mMethodDescription = new CPU.Label(xMethodDef).Name;
+			mMethodDescription = CPU.Label.GenerateLabelName(xMethodDef);
 			if (xMethodDef.IsStatic || !xMethodDef.IsVirtual) {
-				mNormalAddress = new CPU.Label(xMethod).Name;
+				mNormalAddress = CPU.Label.GenerateLabelName(xMethod);
 				mHasReturn = !xMethod.ReturnType.ReturnType.FullName.StartsWith("System.Void");
 				return;
 			}
 			mMethodIdentifier = Engine.GetMethodIdentifier(xMethodDef);
 			Engine.QueueMethodRef(VTablesImplRefs.GetMethodAddressForTypeRef);
 			MethodInformation xTheMethodInfo = Engine.GetMethodInfo(xMethodDef, xMethodDef, mMethodDescription, null);
+			mArgumentCount = xTheMethodInfo.Arguments.Length;
 			mHasReturn = xTheMethodInfo.ReturnSize != 0;
 			mThisOffset = xTheMethodInfo.Arguments[0].Offset;
 		}
 
 		public override void DoAssemble() {
 			if (!String.IsNullOrEmpty(mNormalAddress)) {
-				Call(mNormalAddress);
+				new CPUx86.Call(mNormalAddress);
 			} else {
 				if (Assembler.InMetalMode) {
 					throw new Exception("Virtual methods not supported in Metal mode! (Called method = '" + mMethodDescription + "')");
 				}
 				//Assembler.Add(new CPUx86.Pop("eax"));
 				//Assembler.Add(new CPUx86.Pushd("eax"));
-				Assembler.Add(new CPUx86.Move("eax", "[esp + 0x" + mThisOffset.ToString("X") + "]"));
-				Assembler.Add(new CPUx86.Pushd("[eax]"));
-				Assembler.Add(new CPUx86.Pushd("0" + mMethodIdentifier.ToString("X") + "h"));
-				Call(new CPU.Label(VTablesImplRefs.GetMethodAddressForTypeRef).Name);
-				Call("eax");
+				new CPUx86.Move("eax", "[esp + 0x" + mThisOffset.ToString("X") + "]");
+				new CPUx86.Pushd("[eax]");
+				new CPUx86.Pushd("0" + mMethodIdentifier.ToString("X") + "h");
+				new CPUx86.Call(CPU.Label.GenerateLabelName(VTablesImplRefs.GetMethodAddressForTypeRef));
+				new CPUx86.Call("eax");
+			}
+			for(int i = 0; i < mArgumentCount;i++) {
+				Assembler.StackSizes.Pop();
 			}
 			if (mHasReturn) {
-				Pushd(4, "eax");
+				new CPUx86.Pushd("eax");
+				Assembler.StackSizes.Push(4);
 			}
 		}
 	}

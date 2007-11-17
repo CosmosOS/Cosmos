@@ -5,6 +5,6 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86.Native {
 	[OpCode(0xFFFFFFFF, "iret")]
-	public class IRet: IL2CPU.Assembler.Instruction {
+	public class IRet: X86.Instruction {
 	}
 }

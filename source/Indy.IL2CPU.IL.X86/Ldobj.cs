@@ -19,19 +19,19 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		private int mSize;
 		public override void DoAssemble() {
-			Pop("eax");
+			new CPU.Pop("eax");
 			for (int i = 0; i < (mSize / 4); i++) {
-				Assembler.Add(new CPU.Pushd("[eax]"));
-				Assembler.Add(new CPU.Add("eax", "4"));
+				new CPU.Pushd("[eax]");
+				new CPU.Add("eax", "4");
 			}
 			switch (mSize % 4) {
 				case 1: {
-						Assembler.Add(new CPU.Push("byte [eax]"));
-					break;
+						new CPU.Push("byte [eax]");
+						break;
 					}
 				case 2: {
-					Assembler.Add(new CPU.Push("word [eax]"));
-					break;
+						new CPU.Push("word [eax]");
+						break;
 					}
 				case 0: {
 						break;
@@ -40,6 +40,7 @@ namespace Indy.IL2CPU.IL.X86 {
 						throw new Exception("Remainder not supported!");
 					}
 			}
+			Assembler.StackSizes.Pop();
 			Assembler.StackSizes.Push(mSize);
 		}
 	}

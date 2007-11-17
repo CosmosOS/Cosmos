@@ -15,6 +15,10 @@ namespace Indy.IL2CPU.Assembler {
 		private IndexableCollection<ImportMember> mImportMembers = new IndexableCollection<ImportMember>();
 		private readonly bool mInMetalMode = false;
 		public readonly Stack<int> StackSizes = new Stack<int>();
+		public static Assembler CurrentInstance {
+			get;
+			private set;
+		}
 
 		private uint mDataMemberCounter = 0;
 		public string GetIdentifier(string aPrefix) {
@@ -28,6 +32,7 @@ namespace Indy.IL2CPU.Assembler {
 		public Assembler(StreamWriter aOutputWriter, bool aInMetalMode) {
 			mOutputWriter = aOutputWriter;
 			mInMetalMode = aInMetalMode;
+			CurrentInstance = this;
 		}
 
 		public List<string> Includes {
@@ -56,8 +61,10 @@ namespace Indy.IL2CPU.Assembler {
 
 		public void Dispose() {
 			// MtW: I know, IDisposable usage for this isn't really nice, but for now this should be fine.
+			//		Anyhow, we need a way to clear the CurrentInstance property
 			mInstructions.Clear();
 			mDataMembers.Clear();
+			CurrentInstance = null;
 		}
 
 		public void Add(params Instruction[] aInstructions) {

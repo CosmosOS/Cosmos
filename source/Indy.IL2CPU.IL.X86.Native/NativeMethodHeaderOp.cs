@@ -31,13 +31,13 @@ namespace Indy.IL2CPU.IL.X86.Native {
 		public override void DoAssemble() {
 			if (mIsInterruptHandler) {
 				string xWrapperName = LabelName + ISR_Suffix;
-				Assembler.Add(new CPU.Label(xWrapperName));
-				Assembler.Add(new CPU.Comment(";" + mInterruptValue));
-				Assembler.Add(new CPUNative.Pushad());
-				Assembler.Add(new CPUNative.Cli());
-				Assembler.Add(new CPUx86.Call(LabelName));
-				Assembler.Add(new CPUNative.Popad());
-				Assembler.Add(new CPUNative.IRet());
+				new CPU.Label(xWrapperName);
+				new CPU.Comment(mInterruptValue.ToString());
+				new CPUNative.Pushad();
+				new CPUNative.Cli();
+				new CPUx86.Call(LabelName);
+				new CPUNative.Popad();
+				new CPUNative.IRet();
 			}
 			// TODO: add support for variables with a diff datasize, other than 32bit
 			AssembleHeader(Assembler, LabelName, Locals);

@@ -14,19 +14,19 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public override void Pushd(string aValue) {
-			Assembler.Add(new CPUx86.Pushd(aValue));
+			new CPUx86.Pushd(aValue);
 		}
 
 		public override void Call(MethodDefinition aMethod) {
 			Engine.QueueMethod(aMethod);
-			Assembler.Add(new CPUx86.Call(new CPU.Label(aMethod).Name));
+			new CPUx86.Call(CPU.Label.GenerateLabelName(aMethod));
 			if(!aMethod.ReturnType.ReturnType.FullName.StartsWith("System.Void")) {
-				Assembler.Add(new CPUx86.Pushd("eax"));
+				new CPUx86.Pushd("eax");
 			}
 		}
 
 		public override void Call(string aLabelName) {
-			Assembler.Add(new CPUx86.Call(aLabelName));
+			new CPUx86.Call(aLabelName);
 		}
 
 		public override void Enter(string aName) {

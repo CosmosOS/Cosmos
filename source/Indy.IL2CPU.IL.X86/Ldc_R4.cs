@@ -12,7 +12,8 @@ namespace Indy.IL2CPU.IL.X86 {
 			mValue = (Single)aInstruction.Operand;
 		}
 		public override void DoAssemble() {
-			Pushd(4, "0" + BitConverter.GetBytes(mValue).Aggregate("", (x, b) => x + b.ToString("X2")) + "h");
+			new CPU.Pushd("0x" + BitConverter.GetBytes(mValue).Aggregate("", (x, b) => x + b.ToString("X2")));
+			Assembler.StackSizes.Push(4);
 		}
 	}
 }

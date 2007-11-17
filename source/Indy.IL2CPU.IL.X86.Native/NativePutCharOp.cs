@@ -32,9 +32,9 @@ namespace Indy.IL2CPU.IL.X86.Native {
 				Ldarg(Assembler, MethodInformation.Arguments[i].VirtualAddresses, MethodInformation.Arguments[i].Size);
 			}
 			DoQueueMethod(aMethod);
-			Assembler.Add(new Indy.IL2CPU.Assembler.X86.Call(new Assembler.Label(aMethod).Name));
+			new Indy.IL2CPU.Assembler.X86.Call(CPU.Label.GenerateLabelName(aMethod));
 			if (!aMethod.ReturnType.ReturnType.FullName.StartsWith("System.Void")) {
-				Assembler.Add(new Indy.IL2CPU.Assembler.X86.Pushd("eax"));
+				new Indy.IL2CPU.Assembler.X86.Pushd("eax");
 			}
 		}
 		public override void DoAssemble() {

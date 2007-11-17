@@ -11,9 +11,9 @@ namespace Indy.IL2CPU.IL.X86 {
 			: base(aInstruction, aMethodInfo) {
 		}
 		public override void DoAssemble() {
-			Pop("eax");
-			Assembler.Add(new CPU.Neg("eax"));
-			Pushd(4, "eax");
+			new CPU.Pop("eax");
+			new CPU.Neg("eax");
+			new CPU.Pushd("eax");
 		}
 	}
 }

@@ -25,19 +25,19 @@ namespace Indy.IL2CPU.IL.X86 {
 				for (int i = 0; i < (mSize / 4); i++) {
 					//	Pop("eax");
 					//	Move(Assembler, "dword [" + mDataName + " + 0x" + (i * 4).ToString("X") + "]", "eax");
-					Assembler.Add(new CPU.Pushd("[" + mDataName + " + 0x" + (i * 4).ToString("X") + "]"));
+					new CPU.Pushd("[" + mDataName + " + 0x" + (i * 4).ToString("X") + "]");
 				}
 				switch (mSize % 4) {
 					case 1: {
-							Assembler.Add(new CPU.Move("eax", "0"));
-							Assembler.Add(new CPU.Move("al", "[" + mDataName + " + 0x" + (mSize - 1).ToString("X") + "]"));
-							Assembler.Add(new CPU.Push("eax"));
+							new CPU.Move("eax", "0");
+							new CPU.Move("al", "[" + mDataName + " + 0x" + (mSize - 1).ToString("X") + "]");
+							new CPU.Push("eax");
 							break;
 						}
 					case 2: {
-							Assembler.Add(new CPU.Move("eax", "0"));
-							Assembler.Add(new CPU.Move("ax", "[" + mDataName + " + 0x" + (mSize - 2).ToString("X") + "]"));
-							Assembler.Add(new CPU.Push("eax"));
+							new CPU.Move("eax", "0");
+							new CPU.Move("ax", "[" + mDataName + " + 0x" + (mSize - 2).ToString("X") + "]");
+							new CPU.Push("eax");
 							break;
 						}
 					case 0: {
@@ -49,15 +49,15 @@ namespace Indy.IL2CPU.IL.X86 {
 			} else {
 				switch (mSize) {
 					case 1: {
-							Assembler.Add(new CPU.Move("eax", "0"));
-							Assembler.Add(new CPU.Move("al", "[" + mDataName + "]"));
-							Assembler.Add(new CPU.Push("eax"));
+							new CPU.Move("eax", "0");
+							new CPU.Move("al", "[" + mDataName + "]");
+							new CPU.Push("eax");
 							break;
 						}
 					case 2: {
-							Assembler.Add(new CPU.Move("eax", "0"));
-							Assembler.Add(new CPU.Move("ax", "[" + mDataName + "]"));
-							Assembler.Add(new CPU.Push("eax"));
+							new CPU.Move("eax", "0");
+							new CPU.Move("ax", "[" + mDataName + "]");
+							new CPU.Push("eax");
 							break;
 						}
 					case 0: {

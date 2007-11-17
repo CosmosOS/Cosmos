@@ -3,6 +3,7 @@ using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using CPU = Indy.IL2CPU.Assembler;
+using CPUx86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Ldftn)]
@@ -15,11 +16,12 @@ namespace Indy.IL2CPU.IL.X86 {
 			if (xMethodRef == null) {
 				throw new Exception("Unable to determine Method!");
 			}
-			mFunctionLabel = new CPU.Label(xMethodRef).Name;
+			mFunctionLabel = CPU.Label.GenerateLabelName(xMethodRef);
 		}
 
 		public override void DoAssemble() {
-			Pushd(4, mFunctionLabel);
+			new CPUx86.Pushd(mFunctionLabel);
+			Assembler.StackSizes.Push(4);
 		}
 	}
 }

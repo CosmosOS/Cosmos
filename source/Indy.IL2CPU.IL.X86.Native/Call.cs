@@ -10,7 +10,7 @@ namespace Indy.IL2CPU.IL.X86.Native {
 		}
 
 		protected override void HandleDebuggerBreak() {
-			Assembler.Add(new IL2CPU.Assembler.X86.Native.Break());
+			new IL2CPU.Assembler.X86.Native.Break();
 		}
 	}
 }

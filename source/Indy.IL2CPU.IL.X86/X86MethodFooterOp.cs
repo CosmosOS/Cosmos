@@ -44,20 +44,20 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public static void AssembleFooter(int aReturnSize, Assembler.Assembler aAssembler, int[] aLocalsSizes, int aTotalArgsSize) {
-			aAssembler.Add(new Label(".END__OF__METHOD"));
+			new Label(".END__OF__METHOD");
 			if (aReturnSize > 0) {
 				if (aReturnSize > 4) {
 					throw new Exception("ReturnValue sizes larger than 4 not supported yet");
 				} else {
-					aAssembler.Add(new Assembler.X86.Pop("eax"));
+					new Assembler.X86.Pop("eax");
 				}
 			}
 			for (int j = (aLocalsSizes.Length - 1); j >= 0; j--) {
 				int xLocalSize = aLocalsSizes[j];
-				aAssembler.Add(new CPU.Add("esp", "0x" + xLocalSize.ToString("X")));
+				new CPU.Add("esp", "0x" + xLocalSize.ToString("X"));
 			}
-			aAssembler.Add(new CPU.Popd("ebp"));
-			aAssembler.Add(new CPU.Ret(aTotalArgsSize == 0 ? "" : aTotalArgsSize.ToString()));
+			new CPU.Popd("ebp");
+			new CPU.Ret(aTotalArgsSize == 0 ? "" : aTotalArgsSize.ToString());
 		}
 	}
 }

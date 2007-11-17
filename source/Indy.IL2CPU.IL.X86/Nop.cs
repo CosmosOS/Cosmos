@@ -19,7 +19,7 @@ namespace Indy.IL2CPU.IL.X86 {
             // This would solve the threading issue
             // and later allow for operator overloads etc.
             // x.Noop();
-			Assembler.Add(new CPU.Noop());
+			new CPU.Noop();
 		}
 	}
 }

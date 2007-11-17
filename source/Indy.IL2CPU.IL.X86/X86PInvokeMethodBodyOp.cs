@@ -40,15 +40,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			if (String.IsNullOrEmpty(xMethodName)) {
 				xMethodName = TheMethod.Name;
 			}
-			Assembler.Add(new Comment("; PInvokeAttributes = '" + TheMethod.PInvokeInfo.Attributes.ToString("G") + "'"));
-			//			bool xNeedsExtras = false;
-			//			foreach (ParameterDefinition xParam in TheMethod.Parameters) {
-			//				if (xParam.ParameterType.FullName == "System.String") {
-			//					xNeedsExtras = true;
-			//					break;
-			//				}
-			//			}
-			//			if (xNeedsExtras) {
+			new Comment("PInvokeAttributes = '" + TheMethod.PInvokeInfo.Attributes.ToString("G") + "'");
 			string xStringMethodSuffix = "W";
 			if(Assembler.InMetalMode) {
 				xStringMethodSuffix = "A";
@@ -85,19 +77,14 @@ namespace Indy.IL2CPU.IL.X86 {
 					}.Assemble();
 				}
 			}
-			Assembler.Add(new CPUx86.Call("[" + xMethodName + "]"));
+			new CPUx86.Call("[" + xMethodName + "]");
 			foreach(object xItem in MethodInfo.Arguments) {
 				Assembler.StackSizes.Pop();
 			}
 			if (MethodInfo.ReturnSize > 0) {
-				Assembler.Add(new CPUx86.Pushd("eax"));
+				new CPUx86.Pushd("eax");
 				Assembler.StackSizes.Push(MethodInfo.ReturnSize);
 			}
-			//			if (MethodInfo.HasReturnValue) {
-			//				Assembler.Add(new CPUx86.Pushd("0"));
-			//				Assembler.Add(new CPUx86.Pop("eax"));
-			//			}
-			Assembler.Add(new Comment("; StackItemCount = " + Assembler.StackSizes.Count));
 		}
 	}
 }

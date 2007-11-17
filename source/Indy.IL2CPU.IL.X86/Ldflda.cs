@@ -31,9 +31,10 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public override void DoAssemble() {
-			Pop("eax");
-			Assembler.Add(new CPU.Add("eax", mRelativeAddress.Trim().Substring(1)));
-			Pushd(4, "eax");
+			new CPU.Pop("eax");
+			new CPU.Add("eax", mRelativeAddress.Trim().Substring(1));
+			new CPU.Pushd("eax");
+			Assembler.StackSizes.Push(4);
 		}
 	}
 }

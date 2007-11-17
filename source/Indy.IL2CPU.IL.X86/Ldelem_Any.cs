@@ -19,32 +19,32 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		// todo: refactor all Ldelem variants to use this method for emitting
 		public static void Assemble(CPU.Assembler aAssembler, int aElementSize) {
-			aAssembler.Add(new CPUx86.Pop("eax"));
-			aAssembler.Add(new CPUx86.Move("edx", "0" + aElementSize.ToString("X") + "h"));
-			aAssembler.Add(new CPUx86.Multiply("edx"));
-			aAssembler.Add(new CPUx86.Add("eax", "0" + (ObjectImpl.FieldDataOffset + 4).ToString("X") + "h"));
-			aAssembler.Add(new CPUx86.Pop("edx"));
-			aAssembler.Add(new CPUx86.Add("edx", "eax"));
-			aAssembler.Add(new CPUx86.Move("eax", "edx"));
+			new CPUx86.Pop("eax");
+			new CPUx86.Move("edx", "0" + aElementSize.ToString("X") + "h");
+			new CPUx86.Multiply("edx");
+			new CPUx86.Add("eax", "0" + (ObjectImpl.FieldDataOffset + 4).ToString("X") + "h");
+			new CPUx86.Pop("edx");
+			new CPUx86.Add("edx", "eax");
+			new CPUx86.Move("eax", "edx");
 			int xSizeLeft = aElementSize;
 			while(xSizeLeft > 0) {
 				if(xSizeLeft >= 4) {
-					aAssembler.Add(new CPUx86.Push("dword [eax]"));
-					aAssembler.Add(new CPUx86.Add("eax", "4"));
+					new CPUx86.Push("dword [eax]");
+					new CPUx86.Add("eax", "4");
 					xSizeLeft -= 4;
 				}else {
 					if(xSizeLeft >= 2) {
-						aAssembler.Add(new CPUx86.Move("ecx", "0"));
-						aAssembler.Add(new CPUx86.Move("word ecx", "[eax]"));
-						aAssembler.Add(new CPUx86.Push("ecx"));
-						aAssembler.Add(new CPUx86.Add("eax", "2"));
+						new CPUx86.Move("ecx", "0");
+						new CPUx86.Move("word ecx", "[eax]");
+						new CPUx86.Push("ecx");
+						new CPUx86.Add("eax", "2");
 						xSizeLeft -= 2;
 					}else {
 						if(xSizeLeft >= 1) {
-							aAssembler.Add(new CPUx86.Move("ecx", "0"));
-							aAssembler.Add(new CPUx86.Move("byte cl", "[eax]"));
-							aAssembler.Add(new CPUx86.Push("ecx"));
-							aAssembler.Add(new CPUx86.Add("eax", "1"));
+							new CPUx86.Move("ecx", "0");
+							new CPUx86.Move("byte cl", "[eax]");
+							new CPUx86.Push("ecx");
+							new CPUx86.Add("eax", "1");
 							xSizeLeft -= 1;
 						}else {
 							throw new Exception("Size left: " + xSizeLeft);

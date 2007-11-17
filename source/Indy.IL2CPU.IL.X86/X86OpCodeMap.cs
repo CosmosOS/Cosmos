@@ -109,17 +109,12 @@ namespace Indy.IL2CPU.IL.X86 {
 						Assemble_System_Threading_Interlocked_CompareExchange__Object(aAssembler, aMethodInfo);
 						break;
 					}
-				case "System_Void___System_EventHandler_Invoke___System_Object__System_EventArgs___": {
-						Assemble_System_EventHandler_Invoke___System_Object__System_EventArgs___(aAssembler, aMethodInfo);
-						break;
-					}
 				case "System_IntPtr___System_Delegate_GetMulticastInvoke____": {
 						Engine.QueueMethodRef(CustomImplementations.System.EventHandlerImplRefs.MulticastInvokeRef);
-						aAssembler.Add(new CPUx86.Push(new CPU.Label(CustomImplementations.System.EventHandlerImplRefs.MulticastInvokeRef).Name));
+						new CPUx86.Push(CPU.Label.GenerateLabelName(CustomImplementations.System.EventHandlerImplRefs.MulticastInvokeRef));
 						break;
 					}
 				case "System_MulticastDelegate___System_Delegate_InternalAllocLike___System_Delegate___": {
-
 						break;
 					}
 				default:
@@ -138,21 +133,23 @@ namespace Indy.IL2CPU.IL.X86 {
 							// param 1 is sender
 							// param 2 is eventargs
 							Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0].VirtualAddresses, aMethodInfo.Arguments[0].Size);
-							Ldarg.Push(aAssembler, 4, "0x" + (ObjectImpl.FieldDataOffset + 4).ToString("X"));
+							new CPUx86.Push("0x" + (ObjectImpl.FieldDataOffset + 4).ToString("X"));
+							aAssembler.StackSizes.Push(4);
 							Ldarg.Add(aAssembler);
-							aAssembler.Add(new CPUx86.Pop("eax"));
-							aAssembler.Add(new CPUx86.Pushd("[eax]"));
+							new CPUx86.Pop("eax");
+							new CPUx86.Pushd("[eax]");
 							for (int i = 1; i < aMethodInfo.Arguments.Length; i++) {
 								Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[i].VirtualAddresses, aMethodInfo.Arguments[i].Size);
 							}
 							Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0].VirtualAddresses, aMethodInfo.Arguments[0].Size);
-							Ldarg.Push(aAssembler, 4, "0x" + ObjectImpl.FieldDataOffset.ToString("X"));
+							new CPUx86.Push("0x" + ObjectImpl.FieldDataOffset.ToString("X"));
+							aAssembler.StackSizes.Push(4);
 							Ldarg.Add(aAssembler);
-							aAssembler.Add(new CPUx86.Pop("eax"));
-							aAssembler.Add(new CPUx86.Pushd("[eax]"));
-							aAssembler.Add(new CPUx86.Pop("eax"));
-							aAssembler.Add(new CPUx86.Call("eax"));
-							aAssembler.Add(new CPUx86.Pop("eax"));
+							new CPUx86.Pop("eax");
+							new CPUx86.Pushd("[eax]");
+							new CPUx86.Pop("eax");
+							new CPUx86.Call("eax");
+							new CPUx86.Pop("eax");
 							break;
 						}
 					}
@@ -167,18 +164,18 @@ namespace Indy.IL2CPU.IL.X86 {
 			//   1: value
 			//   2: comparand
 			Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[2].VirtualAddresses, aMethodInfo.Arguments[2].Size);
-			aAssembler.Add(new CPUx86.Pop("eax"));
+			new CPUx86.Pop("eax");
 			Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[1].VirtualAddresses, aMethodInfo.Arguments[1].Size);
-			aAssembler.Add(new CPUx86.Pop("edx"));
+			new CPUx86.Pop("edx");
 			Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0].VirtualAddresses, aMethodInfo.Arguments[0].Size);
-			aAssembler.Add(new CPUx86.Pop("ecx"));
-			aAssembler.Add(new CPUx86.Pushd("[ecx]"));
-			aAssembler.Add(new CPUx86.Pop("ecx"));
-			aAssembler.Add(new CPUx86.CmpXchg("ecx", "edx"));
+			new CPUx86.Pop("ecx");
+			new CPUx86.Pushd("[ecx]");
+			new CPUx86.Pop("ecx");
+			new CPUx86.CmpXchg("ecx", "edx");
 			Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0].VirtualAddresses, aMethodInfo.Arguments[0].Size);
-			aAssembler.Add(new CPUx86.Pop("eax"));
-			aAssembler.Add(new CPUx86.Move("[eax]", "ecx"));
-			aAssembler.Add(new CPUx86.Pushd("eax"));
+			new CPUx86.Pop("eax");
+			new CPUx86.Move("[eax]", "ecx");
+			new CPUx86.Pushd("eax");
 		}
 	}
 }

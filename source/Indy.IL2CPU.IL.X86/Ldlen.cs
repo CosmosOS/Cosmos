@@ -11,9 +11,11 @@ namespace Indy.IL2CPU.IL.X86 {
 			: base(aInstruction, aMethodInfo) {
 		}
 		public override void DoAssemble() {
-			Pop("eax");
-			Assembler.Add(new CPU.Add("eax", "8"));
-			Pushd(4, "[eax]");
+			Assembler.StackSizes.Pop();
+			new CPU.Pop("eax");
+			new CPU.Add("eax", "8");
+			new CPU.Pushd("[eax]");
+			Assembler.StackSizes.Push(4);
 		}
 	}
 }

@@ -16,7 +16,8 @@ namespace Indy.IL2CPU.IL.X86 {
 			Engine.GetTypeFieldInfo(Engine.GetDefinitionFromTypeReference(xTypeRef), out mTheSize);
 		}
 		public override void DoAssemble() {
-			Pushd(4, "0" + mTheSize.ToString("X") + "h");
+			new CPU.Pushd("0" + mTheSize.ToString("X") + "h");
+			Assembler.StackSizes.Push(4);
 		}
 	}
 }

@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86.Native {
 	[OpCode(0xFFFFFFFF, "lgdt")]
-	public class Break: IL2CPU.Assembler.Instruction {
+	public class Break: X86.Instruction {
 		public Break() {
 		}
 

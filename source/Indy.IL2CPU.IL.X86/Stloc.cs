@@ -34,8 +34,8 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		public sealed override void DoAssemble() {
 			foreach (string s in mAddresses) {
-				Pop("eax");
-				Move(Assembler, "[" + s + "]", "eax");
+				new CPU.Pop("eax");
+				new CPU.Move("[" + s + "]", "eax");
 			}
 			Assembler.StackSizes.Pop();
 		}

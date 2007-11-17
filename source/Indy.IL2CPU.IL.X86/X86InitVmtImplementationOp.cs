@@ -14,11 +14,11 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		protected override void Pushd(string aValue) {
-			Assembler.Add(new CPUx86.Pushd(aValue));
+			new CPUx86.Pushd(aValue);
 		}
 
 		protected override void Call(MethodDefinition aMethod) {
-			Assembler.Add(new CPUx86.Call(new CPU.Label(aMethod).Name));
+			new CPUx86.Call(CPU.Label.GenerateLabelName(aMethod));
 		}
 	}
 }

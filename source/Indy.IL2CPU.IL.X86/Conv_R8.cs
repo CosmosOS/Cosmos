@@ -16,9 +16,10 @@ namespace Indy.IL2CPU.IL.X86 {
 				case 1:
 				case 2:
 				case 4: {
-						Pop("eax");
-						Assembler.Add(new CPU.Pushd("0"));
-						Assembler.Add(new CPU.Pushd("eax"));
+						new CPU.Pop("eax");
+						new CPU.Pushd("0");
+						new CPU.Pushd("eax");
+						Assembler.StackSizes.Pop();
 						Assembler.StackSizes.Push(8);
 						break;
 					}

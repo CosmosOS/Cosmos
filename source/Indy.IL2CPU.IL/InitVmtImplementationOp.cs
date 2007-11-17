@@ -134,7 +134,7 @@ namespace Indy.IL2CPU.IL {
 						xMethodParams[k] = xMethod.Parameters[k].ParameterType;
 					}
 					Pushd("0" + GetMethodIdentifier(xMethod).ToString("X") + "h");
-					Pushd(new Label(xMethod).Name);
+					Pushd(Label.GenerateLabelName(xMethod));
 					xDataValue = Encoding.ASCII.GetBytes(GetFullName(xMethod)).Aggregate("", (b, x) => b + x + ",") + "0";
 					xDataName = "____SYSTEM____METHOD___" + DataMember.FilterStringForIncorrectChars(GetFullName(xMethod));
 					mAssembler.DataMembers.Add(new DataMember(xDataName, "db", xDataValue));

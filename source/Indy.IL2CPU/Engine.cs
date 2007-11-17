@@ -641,7 +641,7 @@ namespace Indy.IL2CPU {
 					mMethods[xCurrentMethod].Processed = true;
 					continue;
 				}
-				string xMethodName = new Label(xCurrentMethod).Name;
+				string xMethodName = Label.GenerateLabelName(xCurrentMethod);
 				foreach (CustomAttribute xAttrib in xCurrentMethod.CustomAttributes) {
 					if (xAttrib.Constructor.DeclaringType.FullName == typeof(MethodAliasAttribute).FullName) {
 						//xMethodName = (string)xAttrib.Fields["Name"];
@@ -662,7 +662,7 @@ namespace Indy.IL2CPU {
 #if VERBOSE_DEBUG
 				string comment = xMethodInfo.ToString();
 				foreach (string s in comment.Trim().Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries)) {
-					mAssembler.Add(new Comment(";" + s));
+					new Comment(s);
 				}
 #endif
 				xOp.Assemble();
@@ -722,7 +722,7 @@ namespace Indy.IL2CPU {
 							if (xCurrentMethod.HasBody) {
 								// todo: add support for types which need different stack size
 								foreach (Instruction xInstruction in xCurrentMethod.Body.Instructions) {
-									mAssembler.Add(new Comment("; StackItemCount = " + mAssembler.StackSizes.Count));
+									new Comment("StackItemCount = " + mAssembler.StackSizes.Count);
 									MethodReference xMethodReference = xInstruction.Operand as MethodReference;
 									if (xMethodReference != null) {
 										QueueMethodRef(xMethodReference);
@@ -739,7 +739,7 @@ namespace Indy.IL2CPU {
 									HandlePInvoke(xCurrentMethod, xMethodInfo);
 								} else {
 									OnDebugLog(LogSeverityEnum.Warning, "Method '{0}' not generated!", xCurrentMethod.GetFullName());
-									mAssembler.Add(new Comment("; Method not being generated yet, as it's handled by an iCall"));
+									new Comment("Method not being generated yet, as it's handled by an iCall");
 								}
 							}
 						}

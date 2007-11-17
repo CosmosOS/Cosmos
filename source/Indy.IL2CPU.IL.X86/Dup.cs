@@ -13,8 +13,8 @@ namespace Indy.IL2CPU.IL.X86 {
 		public override void DoAssemble() {
 			int xTheSize = Assembler.StackSizes.Peek();
 			for (int i = 0; i < (xTheSize / 4); i++) {
-				Move(Assembler, "eax", "[esp + " + (i * 4) + "]");
-				Assembler.Add(new CPU.Pushd("eax"));
+				new CPU.Move("eax", "[esp + " + (i * 4) + "]");
+				new CPU.Pushd("eax");
 			}
 			Assembler.StackSizes.Push(xTheSize);
 		}

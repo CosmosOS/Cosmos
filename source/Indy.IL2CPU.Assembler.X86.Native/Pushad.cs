@@ -5,6 +5,6 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86.Native {
 	[OpCode(0xFFFFFFFF, "pushad")]
-	public class Pushad: IL2CPU.Assembler.Instruction {
+	public class Pushad: X86.Instruction {
 	}
 }

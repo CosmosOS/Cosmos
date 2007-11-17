@@ -24,10 +24,10 @@ namespace Indy.IL2CPU.IL {
 
 		public void Assemble() {
 			if (!String.IsNullOrEmpty(mCurrentInstructionLabel)) {
-				Assembler.Add(new Label(mCurrentInstructionLabel));
+				new Label(mCurrentInstructionLabel);
 			}
 			if (!String.IsNullOrEmpty(mILComment)) {
-				Assembler.Add(new Comment(mILComment));
+				new Comment(mILComment);
 			}
 			DoAssemble();
 		}
