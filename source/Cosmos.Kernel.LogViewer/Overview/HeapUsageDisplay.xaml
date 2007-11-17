@@ -23,7 +23,7 @@
 		<Label Grid.Row="1" Grid.ColumnSpan="2" Margin="0,0,69,0">Used Memory:</Label>
 		<DockPanel Grid.Column="1" Grid.Row="1" LastChildFill="True">
 			<Label DockPanel.Dock="Right" Content="MB"/>
-			<Label DockPanel.Dock="Right" Content="{Binding Source={StaticResource LogFile}, XPath=//MM_Alloc/@Length, Converter={StaticResource NumberConverter}, ConverterParameter=1048576}" FlowDirection="RightToLeft" />
+			<Label DockPanel.Dock="Right" Content="{Binding RelativeSource={RelativeSource Self}, Path=TotalHeapUsage, Converter={StaticResource NumberConverter}, ConverterParameter=1048576}" FlowDirection="RightToLeft" />
 		</DockPanel>
 
 	</Grid>
