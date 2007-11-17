@@ -43,12 +43,10 @@ namespace Indy.IL2CPU.IL.X86 {
 						return CustomImplementations.System.StringImplRefs.get_LengthRef;
 					}
 				case "System_UInt32____Indy_IL2CPU_CustomImplementation_System_StringImpl_GetStorage___System_String___": {
-						//if (aInMetalMode) {
-						//return CustomImplementation.System.StringImplRefs.GetStorageMetalRef;
-						//} else {
-						//return CustomImplementation.System.StringImplRefs.GetStorageNormalRef;
-						//}
 						return CustomImplementation.System.StringImplRefs.GetStorage_ImplRef;
+					}
+				case "System_IntPtr___System_Delegate_GetInvokeMethod____": {
+						return CustomImplementations.System.EventHandlerImplRefs.GetInvokeMethodRef;
 					}
 				case "System_Char___System_String_get_Chars___System_Int32___": {
 						if (aInMetalMode) {
@@ -77,15 +75,21 @@ namespace Indy.IL2CPU.IL.X86 {
 						return true;
 					}
 				case "System_IntPtr___System_Delegate_GetInvokeMethod____": {
-						return false;
+						return true;
 					}
-				case "System_Object___System_Delegate_DynamicInvokeImpl___System_Object_____": {
-						return false;
+				case "System_IntPtr___System_Delegate_GetMulticastInvoke____": {
+						return true;
+					}
+				case "System_MulticastDelegate___System_Delegate_InternalAllocLike___System_Delegate___": {
+						return true;
 					}
 				default: {
 						// we need special treatment for delegate constructors, which have an Object,IntPtr param list
 						if (ObjectUtilities.IsDelegate(aMethodInfo.MethodDefinition.DeclaringType)) {
 							if (aMethodInfo.LabelName.EndsWith("__ctor___System_Object__System_IntPtr___")) {
+								return true;
+							}
+							if (aMethodInfo.MethodDefinition.Name == "Invoke") {
 								return true;
 							}
 						}
@@ -109,21 +113,49 @@ namespace Indy.IL2CPU.IL.X86 {
 						Assemble_System_EventHandler_Invoke___System_Object__System_EventArgs___(aAssembler, aMethodInfo);
 						break;
 					}
-				case "System_IntPtr___System_Delegate_GetInvokeMethod____": {
-						new Ldfld(null, aMethodInfo) {
-							Assembler = aAssembler
-						}.Assemble();
+				case "System_IntPtr___System_Delegate_GetMulticastInvoke____": {
+						Engine.QueueMethodRef(CustomImplementations.System.EventHandlerImplRefs.MulticastInvokeRef);
+						aAssembler.Add(new CPUx86.Push(new CPU.Label(CustomImplementations.System.EventHandlerImplRefs.MulticastInvokeRef).Name));
 						break;
 					}
-				case "System_Void___System_EventHandler__ctor___System_Object__System_IntPtr___": {
-						Op.Ldarg(aAssembler, aMethodInfo.Arguments[0].VirtualAddresses, aMethodInfo.Arguments[0].Size);
-						Op.Ldarg(aAssembler, aMethodInfo.Arguments[1].VirtualAddresses, aMethodInfo.Arguments[1].Size);
-						new Call(CustomImplementations.System.EventHandlerImplRefs.CtorRef) {
-							Assembler = aAssembler
-						}.Assemble();
+				case "System_MulticastDelegate___System_Delegate_InternalAllocLike___System_Delegate___": {
+
 						break;
 					}
 				default:
+					if (ObjectUtilities.IsDelegate(aMethodInfo.MethodDefinition.DeclaringType)) {
+						if (aMethodInfo.LabelName.EndsWith("__ctor___System_Object__System_IntPtr___")) {
+							for (int i = 0; i < aMethodInfo.Arguments.Length; i++) {
+								Op.Ldarg(aAssembler, aMethodInfo.Arguments[i].VirtualAddresses, aMethodInfo.Arguments[i].Size);
+							}
+							new Call(CustomImplementations.System.EventHandlerImplRefs.CtorRef) {
+								Assembler = aAssembler
+							}.Assemble();
+							break;
+						}
+						if (aMethodInfo.MethodDefinition.Name == "Invoke") {
+							// param 0 is instance of eventhandler
+							// param 1 is sender
+							// param 2 is eventargs
+							Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0].VirtualAddresses, aMethodInfo.Arguments[0].Size);
+							Ldarg.Push(aAssembler, 4, "0x" + (ObjectImpl.FieldDataOffset + 4).ToString("X"));
+							Ldarg.Add(aAssembler);
+							aAssembler.Add(new CPUx86.Pop("eax"));
+							aAssembler.Add(new CPUx86.Pushd("[eax]"));
+							for (int i = 1; i < aMethodInfo.Arguments.Length; i++) {
+								Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[i].VirtualAddresses, aMethodInfo.Arguments[i].Size);
+							}
+							Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0].VirtualAddresses, aMethodInfo.Arguments[0].Size);
+							Ldarg.Push(aAssembler, 4, "0x" + ObjectImpl.FieldDataOffset.ToString("X"));
+							Ldarg.Add(aAssembler);
+							aAssembler.Add(new CPUx86.Pop("eax"));
+							aAssembler.Add(new CPUx86.Pushd("[eax]"));
+							aAssembler.Add(new CPUx86.Pop("eax"));
+							aAssembler.Add(new CPUx86.Call("eax"));
+							aAssembler.Add(new CPUx86.Pop("eax"));
+							break;
+						}
+					}
 					base.DoCustomAssembleImplementation(aInMetalMode, aAssembler, aMethodInfo);
 					break;
 			}
@@ -147,27 +179,6 @@ namespace Indy.IL2CPU.IL.X86 {
 			aAssembler.Add(new CPUx86.Pop("eax"));
 			aAssembler.Add(new CPUx86.Move("[eax]", "ecx"));
 			aAssembler.Add(new CPUx86.Pushd("eax"));
-		}
-
-		private static void Assemble_System_EventHandler_Invoke___System_Object__System_EventArgs___(Assembler.Assembler aAssembler, MethodInformation aMethodInfo) {
-			// param 0 is instance of eventhandler
-			// param 1 is sender
-			// param 2 is eventargs
-			Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0].VirtualAddresses, aMethodInfo.Arguments[0].Size);
-			Ldarg.Push(aAssembler, 4, "0x" + (ObjectImpl.FieldDataOffset + 4).ToString("X"));
-			Ldarg.Add(aAssembler);
-			aAssembler.Add(new CPUx86.Pop("eax"));
-			aAssembler.Add(new CPUx86.Pushd("[eax]"));
-			Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[1].VirtualAddresses, aMethodInfo.Arguments[1].Size);
-			Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[2].VirtualAddresses, aMethodInfo.Arguments[2].Size);
-			Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0].VirtualAddresses, aMethodInfo.Arguments[0].Size);
-			Ldarg.Push(aAssembler, 4, "0x" + ObjectImpl.FieldDataOffset.ToString("X"));
-			Ldarg.Add(aAssembler);
-			aAssembler.Add(new CPUx86.Pop("eax"));
-			aAssembler.Add(new CPUx86.Pushd("[eax]"));
-			aAssembler.Add(new CPUx86.Pop("eax"));
-			aAssembler.Add(new CPUx86.Call("eax"));
-			aAssembler.Add(new CPUx86.Pop("eax"));
 		}
 	}
 }

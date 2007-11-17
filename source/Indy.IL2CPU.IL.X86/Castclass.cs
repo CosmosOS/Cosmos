@@ -14,7 +14,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		public Castclass(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
 			TypeReference xType = aInstruction.Operand as TypeReference;
-			if(xType==null) {
+			if (xType == null) {
 				throw new Exception("Unable to determine Type!");
 			}
 			TypeDefinition xTypeDef = Engine.GetDefinitionFromTypeReference(xType);
@@ -26,11 +26,11 @@ namespace Indy.IL2CPU.IL.X86 {
 		public override void DoAssemble() {
 			// todo: throw an exception when the class does not support the cast!
 			string mReturnNullLabel = mThisLabel + "_ReturnNull";
-			Pop("eax");
+			Pop("ecx");
 			Assembler.StackSizes.Pop();
-			Compare("eax", "0");
+			Compare("ecx", "0");
 			JumpIfZero(mReturnNullLabel);
-			Pushd(4, "[eax]");
+			Pushd(4, "[ecx]");
 			Pushd(4, "0" + mTypeId + "h");
 			MethodDefinition xMethodIsInstance = Engine.GetMethodDefinition(Engine.GetTypeDefinition("", "Indy.IL2CPU.VTablesImpl"), "IsInstance", "System.Int32", "System.Int32");
 			Engine.QueueMethod(xMethodIsInstance);
@@ -41,11 +41,12 @@ namespace Indy.IL2CPU.IL.X86 {
 			Assembler.StackSizes.Pop();
 			Compare("eax", "0");
 			JumpIfEquals(mReturnNullLabel);
-			Assembler.Add(new CPUx86.Pushd("eax"));
+			Assembler.Add(new CPUx86.Pushd("ecx"));
 			JumpAlways(mNextOpLabel);
 			Label(mReturnNullLabel);
 			Assembler.Add(new CPUx86.Pushd("0"));
 			Assembler.StackSizes.Push(4);
+			
 		}
 	}
 }

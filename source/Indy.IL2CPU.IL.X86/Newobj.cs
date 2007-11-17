@@ -20,30 +20,37 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public override void DoAssemble() {
-			Engine.QueueMethodRef(CtorDef);
-			DoQueueMethod(RuntimeEngineRefs.Heap_AllocNewObjectRef);
-			int xObjectSize = ObjectUtilities.GetObjectStorageSize(Engine.GetDefinitionFromTypeReference(CtorDef.DeclaringType));
-			Pushd(4, "0" + xObjectSize.ToString("X").ToUpper() + "h");
-			Call(new CPU.Label(RuntimeEngineRefs.Heap_AllocNewObjectRef).Name);
-			Assembler.StackSizes.Pop();
-			Pushd(4, "eax");
-			//			Move(Assembler, "ecx", "eax");
-			Pushd(4, "eax");
-			Move(Assembler, "dword [eax]", "0" + Engine.RegisterTypeRef(CtorDef.DeclaringType).ToString("X") + "h");
-			Move(Assembler, "dword [eax + 4]", "0" + InstanceTypeEnum.NormalObject.ToString("X") + "h");
-			//Pushd("ecx");
-			for (int i = 0; i < CtorDef.Parameters.Count; i++) {
-				Assembler.Add(new CPUx86.Pushd("[esp + 0x8]"));
-			}
-			Call(new CPU.Label(CtorDef).Name);
-			Pop("eax");
-			Assembler.StackSizes.Pop();
-			for (int i = 0; i < CtorDef.Parameters.Count; i++) {
-				Assembler.Add(new CPUx86.Add("esp", "4"));
-				Assembler.StackSizes.Pop();
-			}
-			Pushd(4, "eax");
+			Assemble(Assembler, ObjectUtilities.GetObjectStorageSize(Engine.GetDefinitionFromTypeReference(CtorDef.DeclaringType)), CtorDef, Engine.RegisterTypeRef(CtorDef.DeclaringType));
 			//Assembler.Add(new CPUx86.Add("esp", objSize.ToString()));
+		}
+
+		public static void Assemble(Assembler.Assembler aAssembler, int aObjectSize, MethodDefinition aCtorDef, int aTypeId) {
+			if (aCtorDef != null) {
+				Engine.QueueMethodRef(aCtorDef);
+			}
+			Engine.QueueMethodRef(RuntimeEngineRefs.Heap_AllocNewObjectRef);
+			aAssembler.Add(new CPUx86.Pushd("0" + aObjectSize.ToString("X").ToUpper() + "h"));
+			aAssembler.Add(new CPUx86.Call(new CPU.Label(RuntimeEngineRefs.Heap_AllocNewObjectRef).Name));
+			aAssembler.Add(new CPUx86.Pushd("eax"));
+			aAssembler.Add(new CPUx86.Pushd("eax"));
+			aAssembler.StackSizes.Push(4);
+			aAssembler.StackSizes.Push(4);
+			Move(aAssembler, "dword [eax]", "0" + aTypeId.ToString("X") + "h");
+			Move(aAssembler, "dword [eax + 4]", "0" + InstanceTypeEnum.NormalObject.ToString("X") + "h");
+			if (aCtorDef != null) {
+				for (int i = 0; i < aCtorDef.Parameters.Count; i++) {
+					aAssembler.Add(new CPUx86.Pushd("[esp + 0x8]"));
+				}
+				aAssembler.Add(new CPUx86.Call(new CPU.Label(aCtorDef).Name));
+				aAssembler.Add(new CPUx86.Pop("eax"));
+				aAssembler.StackSizes.Pop();
+				for (int i = 0; i < aCtorDef.Parameters.Count; i++) {
+					aAssembler.Add(new CPUx86.Add("esp", "4"));
+					aAssembler.StackSizes.Pop();
+				}
+			}
+			aAssembler.Add(new CPUx86.Push("eax"));
+			aAssembler.StackSizes.Push(4);
 		}
 	}
 }

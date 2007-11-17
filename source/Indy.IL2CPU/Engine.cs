@@ -294,7 +294,7 @@ namespace Indy.IL2CPU {
 						if (xTD.BaseType == null) {
 							continue;
 						}
-						if (xMethod.IsVirtual) {
+						if (xMethod.IsVirtual && !xMethod.IsConstructor) {
 							TypeDefinition xCurrentInspectedType = GetDefinitionFromTypeReference(xTD.BaseType);
 							TypeReference[] xMethodParams = new TypeReference[xMethod.Parameters.Count];
 							for (int i = 0; i < xMethod.Parameters.Count; i++) {

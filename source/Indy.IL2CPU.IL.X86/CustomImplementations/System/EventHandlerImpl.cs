@@ -13,5 +13,15 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System {
 			aThis += 1;
 			*aThis = aMethod;
 		}
+
+		public static void MulticastInvoke() {
+			// do nothing
+			uint* x = (uint*)0;
+			uint y = *x;
+		}
+
+		public static uint GetInvokeMethod(uint* aThis) {
+			return *(aThis + 2);
+		}
 	}
 }

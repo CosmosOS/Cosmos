@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="Tests\Events\SimpleMulticastDelegate\SimpleMulticastDelegate.cs" />
     <None Include="Tests\Events\CustomDelegate\CustomDelegate.cs" />
     <None Include="Tests\Events\SimpleCreateDelegate\SimpleCreateDelegate.cs" />
     <None Include="Tests\ComplexerStructIndexing\ComplexerStructIndexing.cs" />

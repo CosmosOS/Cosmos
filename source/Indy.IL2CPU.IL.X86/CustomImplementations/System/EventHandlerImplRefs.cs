@@ -9,6 +9,8 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System {
 	public static class EventHandlerImplRefs {
 		public static readonly AssemblyDefinition RuntimeAssemblyDef;
 		public static readonly MethodDefinition CtorRef;
+		public static readonly MethodDefinition GetInvokeMethodRef;
+		public static readonly MethodDefinition MulticastInvokeRef;
 
 		static EventHandlerImplRefs() {
 			RuntimeAssemblyDef = AssemblyFactory.GetAssembly(typeof(EventHandlerImpl).Assembly.Location);

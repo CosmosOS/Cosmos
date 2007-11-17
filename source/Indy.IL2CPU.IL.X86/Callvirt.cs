@@ -24,9 +24,6 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			MethodDefinition xMethodDef = Engine.GetDefinitionFromMethodReference(xMethod);
 			mMethodDescription = new CPU.Label(xMethodDef).Name;
-			if (mMethodDescription == "System_Void___System_EventHandler_Invoke___System_Object__System_EventArgs___") {
-				System.Diagnostics.Debugger.Break();
-			}
 			if (xMethodDef.IsStatic || !xMethodDef.IsVirtual) {
 				mNormalAddress = new CPU.Label(xMethod).Name;
 				mHasReturn = !xMethod.ReturnType.ReturnType.FullName.StartsWith("System.Void");
@@ -36,12 +33,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			Engine.QueueMethodRef(VTablesImplRefs.GetMethodAddressForTypeRef);
 			MethodInformation xTheMethodInfo = Engine.GetMethodInfo(xMethodDef, xMethodDef, mMethodDescription, null);
 			mHasReturn = xTheMethodInfo.ReturnSize != 0;
-			Console.WriteLine("Debug: " + xTheMethodInfo.ToString());
-//			mThisAddresses = xTheMethodInfo.Arguments[0].VirtualAddresses;
 			mThisOffset = xTheMethodInfo.Arguments[0].Offset;
-//			if (mThisAddresses.Length > 1) {
-//				throw new Exception("In x86, object addresses are 4 bytes. Found different size!");
-//			}
 		}
 
 		public override void DoAssemble() {
