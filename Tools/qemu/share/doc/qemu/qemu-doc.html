@@ -1,0 +1,2846 @@
+<HTML>
+<HEAD>
+<!-- Created by texi2html 1.56k from qemu-doc.texi on 5 February 2007 -->
+
+<TITLE>QEMU Emulator User Documentation</TITLE>
+</HEAD>
+<BODY>
+<H1>QEMU Emulator User Documentation</H1>
+<P>
+<P><HR><P>
+<H1>Table of Contents</H1>
+<UL>
+<LI><A NAME="TOC1" HREF="qemu-doc.html#SEC1">1. Introduction</A>
+<UL>
+<LI><A NAME="TOC2" HREF="qemu-doc.html#SEC2">1.1 Features</A>
+</UL>
+<LI><A NAME="TOC3" HREF="qemu-doc.html#SEC3">2. Installation</A>
+<UL>
+<LI><A NAME="TOC4" HREF="qemu-doc.html#SEC4">2.1 Linux</A>
+<LI><A NAME="TOC5" HREF="qemu-doc.html#SEC5">2.2 Windows</A>
+<LI><A NAME="TOC6" HREF="qemu-doc.html#SEC6">2.3 Mac OS X</A>
+</UL>
+<LI><A NAME="TOC7" HREF="qemu-doc.html#SEC7">3. QEMU PC System emulator</A>
+<UL>
+<LI><A NAME="TOC8" HREF="qemu-doc.html#SEC8">3.1 Introduction</A>
+<LI><A NAME="TOC9" HREF="qemu-doc.html#SEC9">3.2 Quick Start</A>
+<LI><A NAME="TOC10" HREF="qemu-doc.html#SEC10">3.3 Invocation</A>
+<LI><A NAME="TOC11" HREF="qemu-doc.html#SEC11">3.4 Keys</A>
+<LI><A NAME="TOC12" HREF="qemu-doc.html#SEC12">3.5 QEMU Monitor</A>
+<UL>
+<LI><A NAME="TOC13" HREF="qemu-doc.html#SEC13">3.5.1 Commands</A>
+<LI><A NAME="TOC14" HREF="qemu-doc.html#SEC14">3.5.2 Integer expressions</A>
+</UL>
+<LI><A NAME="TOC15" HREF="qemu-doc.html#SEC15">3.6 Disk Images</A>
+<UL>
+<LI><A NAME="TOC16" HREF="qemu-doc.html#SEC16">3.6.1 Quick start for disk image creation</A>
+<LI><A NAME="TOC17" HREF="qemu-doc.html#SEC17">3.6.2 Snapshot mode</A>
+<LI><A NAME="TOC18" HREF="qemu-doc.html#SEC18">3.6.3 VM snapshots</A>
+<LI><A NAME="TOC19" HREF="qemu-doc.html#SEC19">3.6.4 <CODE>qemu-img</CODE> Invocation</A>
+<LI><A NAME="TOC20" HREF="qemu-doc.html#SEC20">3.6.5 Using host drives</A>
+<UL>
+<LI><A NAME="TOC21" HREF="qemu-doc.html#SEC21">3.6.5.1 Linux</A>
+<LI><A NAME="TOC22" HREF="qemu-doc.html#SEC22">3.6.5.2 Windows</A>
+<LI><A NAME="TOC23" HREF="qemu-doc.html#SEC23">3.6.5.3 Mac OS X</A>
+</UL>
+<LI><A NAME="TOC24" HREF="qemu-doc.html#SEC24">3.6.6 Virtual FAT disk images</A>
+</UL>
+<LI><A NAME="TOC25" HREF="qemu-doc.html#SEC25">3.7 Network emulation</A>
+<UL>
+<LI><A NAME="TOC26" HREF="qemu-doc.html#SEC26">3.7.1 VLANs</A>
+<LI><A NAME="TOC27" HREF="qemu-doc.html#SEC27">3.7.2 Using TAP network interfaces</A>
+<UL>
+<LI><A NAME="TOC28" HREF="qemu-doc.html#SEC28">3.7.2.1 Linux host</A>
+<LI><A NAME="TOC29" HREF="qemu-doc.html#SEC29">3.7.2.2 Windows host</A>
+</UL>
+<LI><A NAME="TOC30" HREF="qemu-doc.html#SEC30">3.7.3 Using the user mode network stack</A>
+<LI><A NAME="TOC31" HREF="qemu-doc.html#SEC31">3.7.4 Connecting VLANs between QEMU instances</A>
+</UL>
+<LI><A NAME="TOC32" HREF="qemu-doc.html#SEC32">3.8 Direct Linux Boot</A>
+<LI><A NAME="TOC33" HREF="qemu-doc.html#SEC33">3.9 USB emulation</A>
+<UL>
+<LI><A NAME="TOC34" HREF="qemu-doc.html#SEC34">3.9.1 Connecting USB devices</A>
+<LI><A NAME="TOC35" HREF="qemu-doc.html#SEC35">3.9.2 Using host USB devices on a Linux host</A>
+</UL>
+<LI><A NAME="TOC36" HREF="qemu-doc.html#SEC36">3.10 GDB usage</A>
+<LI><A NAME="TOC37" HREF="qemu-doc.html#SEC37">3.11 Target OS specific information</A>
+<UL>
+<LI><A NAME="TOC38" HREF="qemu-doc.html#SEC38">3.11.1 Linux</A>
+<LI><A NAME="TOC39" HREF="qemu-doc.html#SEC39">3.11.2 Windows</A>
+<UL>
+<LI><A NAME="TOC40" HREF="qemu-doc.html#SEC40">3.11.2.1 SVGA graphic modes support</A>
+<LI><A NAME="TOC41" HREF="qemu-doc.html#SEC41">3.11.2.2 CPU usage reduction</A>
+<LI><A NAME="TOC42" HREF="qemu-doc.html#SEC42">3.11.2.3 Windows 2000 disk full problem</A>
+<LI><A NAME="TOC43" HREF="qemu-doc.html#SEC43">3.11.2.4 Windows 2000 shutdown</A>
+<LI><A NAME="TOC44" HREF="qemu-doc.html#SEC44">3.11.2.5 Share a directory between Unix and Windows</A>
+<LI><A NAME="TOC45" HREF="qemu-doc.html#SEC45">3.11.2.6 Windows XP security problem</A>
+</UL>
+<LI><A NAME="TOC46" HREF="qemu-doc.html#SEC46">3.11.3 MS-DOS and FreeDOS</A>
+<UL>
+<LI><A NAME="TOC47" HREF="qemu-doc.html#SEC47">3.11.3.1 CPU usage reduction</A>
+</UL>
+</UL>
+</UL>
+<LI><A NAME="TOC48" HREF="qemu-doc.html#SEC48">4. QEMU System emulator for non PC targets</A>
+<UL>
+<LI><A NAME="TOC49" HREF="qemu-doc.html#SEC49">4.1 QEMU PowerPC System emulator</A>
+<LI><A NAME="TOC50" HREF="qemu-doc.html#SEC50">4.2 Sparc32 System emulator invocation</A>
+<LI><A NAME="TOC51" HREF="qemu-doc.html#SEC51">4.3 Sparc64 System emulator invocation</A>
+<LI><A NAME="TOC52" HREF="qemu-doc.html#SEC52">4.4 MIPS System emulator invocation</A>
+<LI><A NAME="TOC53" HREF="qemu-doc.html#SEC53">4.5 ARM System emulator invocation</A>
+</UL>
+<LI><A NAME="TOC54" HREF="qemu-doc.html#SEC54">5. QEMU User space emulator</A>
+<UL>
+<LI><A NAME="TOC55" HREF="qemu-doc.html#SEC55">5.1 Supported Operating Systems</A>
+<LI><A NAME="TOC56" HREF="qemu-doc.html#SEC56">5.2 Linux User space emulator</A>
+<UL>
+<LI><A NAME="TOC57" HREF="qemu-doc.html#SEC57">5.2.1 Quick Start</A>
+<LI><A NAME="TOC58" HREF="qemu-doc.html#SEC58">5.2.2 Wine launch</A>
+<LI><A NAME="TOC59" HREF="qemu-doc.html#SEC59">5.2.3 Command line options</A>
+<LI><A NAME="TOC60" HREF="qemu-doc.html#SEC60">5.2.4 Other binaries</A>
+</UL>
+<LI><A NAME="TOC61" HREF="qemu-doc.html#SEC61">5.3 Mac OS X/Darwin User space emulator</A>
+<UL>
+<LI><A NAME="TOC62" HREF="qemu-doc.html#SEC62">5.3.1 Mac OS X/Darwin Status</A>
+<LI><A NAME="TOC63" HREF="qemu-doc.html#SEC63">5.3.2 Quick Start</A>
+<LI><A NAME="TOC64" HREF="qemu-doc.html#SEC64">5.3.3 Command line options</A>
+</UL>
+</UL>
+<LI><A NAME="TOC65" HREF="qemu-doc.html#SEC65">6. Compilation from the sources</A>
+<UL>
+<LI><A NAME="TOC66" HREF="qemu-doc.html#SEC66">6.1 Linux/Unix</A>
+<UL>
+<LI><A NAME="TOC67" HREF="qemu-doc.html#SEC67">6.1.1 Compilation</A>
+<LI><A NAME="TOC68" HREF="qemu-doc.html#SEC68">6.1.2 GCC version</A>
+</UL>
+<LI><A NAME="TOC69" HREF="qemu-doc.html#SEC69">6.2 Windows</A>
+<LI><A NAME="TOC70" HREF="qemu-doc.html#SEC70">6.3 Cross compilation for Windows with Linux</A>
+<LI><A NAME="TOC71" HREF="qemu-doc.html#SEC71">6.4 Mac OS X</A>
+</UL>
+<LI><A NAME="TOC72" HREF="qemu-doc.html#SEC72">7. Index</A>
+</UL>
+<P><HR><P>
+
+
+<H1><A NAME="SEC1" HREF="qemu-doc.html#TOC1">1. Introduction</A></H1>
+
+
+
+<H2><A NAME="SEC2" HREF="qemu-doc.html#TOC2">1.1 Features</A></H2>
+
+<P>
+QEMU is a FAST! processor emulator using dynamic translation to
+achieve good emulation speed.
+
+
+<P>
+QEMU has two operating modes:
+
+
+
+<UL>
+
+<LI>
+
+Full system emulation. In this mode, QEMU emulates a full system (for
+example a PC), including one or several processors and various
+peripherals. It can be used to launch different Operating Systems
+without rebooting the PC or to debug system code.
+
+<LI>
+
+User mode emulation. In this mode, QEMU can launch
+processes compiled for one CPU on another CPU. It can be used to
+launch the Wine Windows API emulator (<A HREF="http://www.winehq.org">http://www.winehq.org</A>) or
+to ease cross-compilation and cross-debugging.
+
+</UL>
+
+<P>
+QEMU can run without an host kernel driver and yet gives acceptable
+performance. 
+
+
+<P>
+For system emulation, the following hardware targets are supported:
+
+<UL>
+<LI>PC (x86 or x86_64 processor)
+
+<LI>ISA PC (old style PC without PCI bus)
+
+<LI>PREP (PowerPC processor)
+
+<LI>G3 BW PowerMac (PowerPC processor)
+
+<LI>Mac99 PowerMac (PowerPC processor, in progress)
+
+<LI>Sun4m (32-bit Sparc processor)
+
+<LI>Sun4u (64-bit Sparc processor, in progress)
+
+<LI>Malta board (32-bit MIPS processor)
+
+<LI>ARM Integrator/CP (ARM926E or 1026E processor)
+
+<LI>ARM Versatile baseboard (ARM926E)
+
+</UL>
+
+<P>
+For user emulation, x86, PowerPC, ARM, MIPS, Sparc32/64 and ColdFire(m68k) CPUs are supported.
+
+
+
+
+<H1><A NAME="SEC3" HREF="qemu-doc.html#TOC3">2. Installation</A></H1>
+
+<P>
+If you want to compile QEMU yourself, see section <A HREF="qemu-doc.html#SEC65">6. Compilation from the sources</A>.
+
+
+
+
+<H2><A NAME="SEC4" HREF="qemu-doc.html#TOC4">2.1 Linux</A></H2>
+
+<P>
+If a precompiled package is available for your distribution - you just
+have to install it. Otherwise, see section <A HREF="qemu-doc.html#SEC65">6. Compilation from the sources</A>.
+
+
+
+
+<H2><A NAME="SEC5" HREF="qemu-doc.html#TOC5">2.2 Windows</A></H2>
+
+<P>
+Download the experimental binary installer at
+<A HREF="http://www.free.oszoo.org/@/download.html">http://www.free.oszoo.org/@/download.html</A>.
+
+
+
+
+<H2><A NAME="SEC6" HREF="qemu-doc.html#TOC6">2.3 Mac OS X</A></H2>
+
+<P>
+Download the experimental binary installer at
+<A HREF="http://www.free.oszoo.org/@/download.html">http://www.free.oszoo.org/@/download.html</A>.
+
+
+
+
+<H1><A NAME="SEC7" HREF="qemu-doc.html#TOC7">3. QEMU PC System emulator</A></H1>
+
+
+
+<H2><A NAME="SEC8" HREF="qemu-doc.html#TOC8">3.1 Introduction</A></H2>
+
+<P>
+The QEMU PC System emulator simulates the
+following peripherals:
+
+
+
+<UL>
+<LI>
+
+i440FX host PCI bridge and PIIX3 PCI to ISA bridge
+<LI>
+
+Cirrus CLGD 5446 PCI VGA card or dummy VGA card with Bochs VESA
+extensions (hardware level, including all non standard modes).
+<LI>
+
+PS/2 mouse and keyboard
+<LI>
+
+2 PCI IDE interfaces with hard disk and CD-ROM support
+<LI>
+
+Floppy disk
+<LI>
+
+NE2000 PCI network adapters
+<LI>
+
+Serial ports
+<LI>
+
+Creative SoundBlaster 16 sound card
+<LI>
+
+ENSONIQ AudioPCI ES1370 sound card
+<LI>
+
+Adlib(OPL2) - Yamaha YM3812 compatible chip
+<LI>
+
+PCI UHCI USB controller and a virtual USB hub.
+</UL>
+
+<P>
+SMP is supported with up to 255 CPUs.
+
+
+<P>
+Note that adlib is only available when QEMU was configured with
+-enable-adlib
+
+
+<P>
+QEMU uses the PC BIOS from the Bochs project and the Plex86/Bochs LGPL
+VGA BIOS.
+
+
+<P>
+QEMU uses YM3812 emulation by Tatsuyuki Satoh.
+
+
+
+
+<H2><A NAME="SEC9" HREF="qemu-doc.html#TOC9">3.2 Quick Start</A></H2>
+
+<P>
+Download and uncompress the linux image (<TT>`linux.img'</TT>) and type:
+
+
+
+<PRE>
+qemu linux.img
+</PRE>
+
+<P>
+Linux should boot and give you a prompt.
+
+
+
+
+<H2><A NAME="SEC10" HREF="qemu-doc.html#TOC10">3.3 Invocation</A></H2>
+
+
+<PRE>
+usage: qemu [options] [disk_image]
+</PRE>
+
+<P>
+<VAR>disk_image</VAR> is a raw hard disk image for IDE hard disk 0.
+
+
+<P>
+General options:
+<DL COMPACT>
+
+<DT><SAMP>`-M machine'</SAMP>
+<DD>
+Select the emulated machine (<CODE>-M ?</CODE> for list)
+
+<DT><SAMP>`-fda file'</SAMP>
+<DD>
+<DT><SAMP>`-fdb file'</SAMP>
+<DD>
+Use <VAR>file</VAR> as floppy disk 0/1 image (see section <A HREF="qemu-doc.html#SEC15">3.6 Disk Images</A>). You can
+use the host floppy by using <TT>`/dev/fd0'</TT> as filename (see section <A HREF="qemu-doc.html#SEC20">3.6.5 Using host drives</A>).
+
+<DT><SAMP>`-hda file'</SAMP>
+<DD>
+<DT><SAMP>`-hdb file'</SAMP>
+<DD>
+<DT><SAMP>`-hdc file'</SAMP>
+<DD>
+<DT><SAMP>`-hdd file'</SAMP>
+<DD>
+Use <VAR>file</VAR> as hard disk 0, 1, 2 or 3 image (see section <A HREF="qemu-doc.html#SEC15">3.6 Disk Images</A>).
+
+<DT><SAMP>`-cdrom file'</SAMP>
+<DD>
+Use <VAR>file</VAR> as CD-ROM image (you cannot use <SAMP>`-hdc'</SAMP> and and
+<SAMP>`-cdrom'</SAMP> at the same time). You can use the host CD-ROM by
+using <TT>`/dev/cdrom'</TT> as filename (see section <A HREF="qemu-doc.html#SEC20">3.6.5 Using host drives</A>).
+
+<DT><SAMP>`-boot [a|c|d|n]'</SAMP>
+<DD>
+Boot on floppy (a), hard disk (c), CD-ROM (d), or Etherboot (n). Hard disk boot
+is the default.
+
+<DT><SAMP>`-snapshot'</SAMP>
+<DD>
+Write to temporary files instead of disk image files. In this case,
+the raw disk image you use is not written back. You can however force
+the write back by pressing <KBD>C-a s</KBD> (see section <A HREF="qemu-doc.html#SEC15">3.6 Disk Images</A>).
+
+<DT><SAMP>`-no-fd-bootchk'</SAMP>
+<DD>
+Disable boot signature checking for floppy disks in Bochs BIOS. It may
+be needed to boot from old floppy disks.
+
+<DT><SAMP>`-m megs'</SAMP>
+<DD>
+Set virtual RAM size to <VAR>megs</VAR> megabytes. Default is 128 MB.
+
+<DT><SAMP>`-smp n'</SAMP>
+<DD>
+Simulate an SMP system with <VAR>n</VAR> CPUs. On the PC target, up to 255
+CPUs are supported.
+
+<DT><SAMP>`-nographic'</SAMP>
+<DD>
+Normally, QEMU uses SDL to display the VGA output. With this option,
+you can totally disable graphical output so that QEMU is a simple
+command line application. The emulated serial port is redirected on
+the console. Therefore, you can still use QEMU to debug a Linux kernel
+with a serial console.
+
+<DT><SAMP>`-vnc display'</SAMP>
+<DD>
+Normally, QEMU uses SDL to display the VGA output.  With this option,
+you can have QEMU listen on VNC display <VAR>display</VAR> and redirect the VGA
+display over the VNC session.  It is very useful to enable the usb
+tablet device when using this option (option <SAMP>`-usbdevice
+tablet'</SAMP>). When using the VNC display, you must use the <SAMP>`-k'</SAMP>
+option to set the keyboard layout if you are not using en-us.
+
+<VAR>display</VAR> may be in the form <VAR>interface:d</VAR>, in which case connections
+will only be allowed from <VAR>interface</VAR> on display <VAR>d</VAR>. Optionally,
+<VAR>interface</VAR> can be omitted.  <VAR>display</VAR> can also be in the form
+<VAR>unix:path</VAR> where <VAR>path</VAR> is the location of a unix socket to listen for
+connections on.
+
+<DT><SAMP>`-k language'</SAMP>
+<DD>
+Use keyboard layout <VAR>language</VAR> (for example <CODE>fr</CODE> for
+French). This option is only needed where it is not easy to get raw PC
+keycodes (e.g. on Macs, with some X11 servers or with a VNC
+display). You don't normally need to use it on PC/Linux or PC/Windows
+hosts.
+
+The available layouts are:
+
+<PRE>
+ar  de-ch  es  fo     fr-ca  hu  ja  mk     no  pt-br  sv
+da  en-gb  et  fr     fr-ch  is  lt  nl     pl  ru     th
+de  en-us  fi  fr-be  hr     it  lv  nl-be  pt  sl     tr
+</PRE>
+
+The default is <CODE>en-us</CODE>.
+
+<DT><SAMP>`-audio-help'</SAMP>
+<DD>
+Will show the audio subsystem help: list of drivers, tunable
+parameters.
+
+<DT><SAMP>`-soundhw card1,card2,... or -soundhw all'</SAMP>
+<DD>
+Enable audio and selected sound hardware. Use ? to print all
+available sound hardware.
+
+
+<PRE>
+qemu -soundhw sb16,adlib hda
+qemu -soundhw es1370 hda
+qemu -soundhw all hda
+qemu -soundhw ?
+</PRE>
+
+<DT><SAMP>`-localtime'</SAMP>
+<DD>
+Set the real time clock to local time (the default is to UTC
+time). This option is needed to have correct date in MS-DOS or
+Windows.
+
+<DT><SAMP>`-full-screen'</SAMP>
+<DD>
+Start in full screen.
+
+<DT><SAMP>`-pidfile file'</SAMP>
+<DD>
+Store the QEMU process PID in <VAR>file</VAR>. It is useful if you launch QEMU
+from a script.
+
+<DT><SAMP>`-daemonize'</SAMP>
+<DD>
+Daemonize the QEMU process after initialization.  QEMU will not detach from
+standard IO until it is ready to receive connections on any of its devices.
+This option is a useful way for external programs to launch QEMU without having
+to cope with initialization race conditions.
+
+<DT><SAMP>`-win2k-hack'</SAMP>
+<DD>
+Use it when installing Windows 2000 to avoid a disk full bug. After
+Windows 2000 is installed, you no longer need this option (this option
+slows down the IDE transfers).
+
+<DT><SAMP>`-option-rom file'</SAMP>
+<DD>
+Load the contents of file as an option ROM.  This option is useful to load
+things like EtherBoot.
+
+</DL>
+
+<P>
+USB options:
+<DL COMPACT>
+
+<DT><SAMP>`-usb'</SAMP>
+<DD>
+Enable the USB driver (will be the default soon)
+
+<DT><SAMP>`-usbdevice devname'</SAMP>
+<DD>
+Add the USB device <VAR>devname</VAR>. See section <A HREF="qemu-doc.html#SEC34">3.9.1 Connecting USB devices</A>.
+</DL>
+
+<P>
+Network options:
+
+
+<DL COMPACT>
+
+<DT><SAMP>`-net nic[,vlan=n][,macaddr=addr][,model=type]'</SAMP>
+<DD>
+Create a new Network Interface Card and connect it to VLAN <VAR>n</VAR> (<VAR>n</VAR>
+= 0 is the default). The NIC is currently an NE2000 on the PC
+target. Optionally, the MAC address can be changed. If no
+<SAMP>`-net'</SAMP> option is specified, a single NIC is created.
+Qemu can emulate several different models of network card.  Valid values for
+<VAR>type</VAR> are <CODE>ne2k_pci</CODE>, <CODE>ne2k_isa</CODE>, <CODE>rtl8139</CODE>,
+<CODE>smc91c111</CODE> and <CODE>lance</CODE>.  Not all devices are supported on all
+targets.
+
+<DT><SAMP>`-net user[,vlan=n][,hostname=name]'</SAMP>
+<DD>
+Use the user mode network stack which requires no administrator
+priviledge to run.  <SAMP>`hostname=name'</SAMP> can be used to specify the client
+hostname reported by the builtin DHCP server.
+
+<DT><SAMP>`-net tap[,vlan=n][,fd=h][,ifname=name][,script=file]'</SAMP>
+<DD>
+Connect the host TAP network interface <VAR>name</VAR> to VLAN <VAR>n</VAR> and
+use the network script <VAR>file</VAR> to configure it. The default
+network script is <TT>`/etc/qemu-ifup'</TT>. Use <SAMP>`script=no'</SAMP> to
+disable script execution. If <VAR>name</VAR> is not
+provided, the OS automatically provides one.  <SAMP>`fd=h'</SAMP> can be
+used to specify the handle of an already opened host TAP interface. Example:
+
+
+<PRE>
+qemu linux.img -net nic -net tap
+</PRE>
+
+More complicated example (two NICs, each one connected to a TAP device)
+
+<PRE>
+qemu linux.img -net nic,vlan=0 -net tap,vlan=0,ifname=tap0 \
+               -net nic,vlan=1 -net tap,vlan=1,ifname=tap1
+</PRE>
+
+<DT><SAMP>`-net socket[,vlan=n][,fd=h][,listen=[host]:port][,connect=host:port]'</SAMP>
+<DD>
+Connect the VLAN <VAR>n</VAR> to a remote VLAN in another QEMU virtual
+machine using a TCP socket connection. If <SAMP>`listen'</SAMP> is
+specified, QEMU waits for incoming connections on <VAR>port</VAR>
+(<VAR>host</VAR> is optional). <SAMP>`connect'</SAMP> is used to connect to
+another QEMU instance using the <SAMP>`listen'</SAMP> option. <SAMP>`fd=h'</SAMP>
+specifies an already opened TCP socket.
+
+Example:
+
+<PRE>
+# launch a first QEMU instance
+qemu linux.img -net nic,macaddr=52:54:00:12:34:56 \
+               -net socket,listen=:1234
+# connect the VLAN 0 of this instance to the VLAN 0
+# of the first instance
+qemu linux.img -net nic,macaddr=52:54:00:12:34:57 \
+               -net socket,connect=127.0.0.1:1234
+</PRE>
+
+<DT><SAMP>`-net socket[,vlan=n][,fd=h][,mcast=maddr:port]'</SAMP>
+<DD>
+Create a VLAN <VAR>n</VAR> shared with another QEMU virtual
+machines using a UDP multicast socket, effectively making a bus for 
+every QEMU with same multicast address <VAR>maddr</VAR> and <VAR>port</VAR>.
+NOTES:
+
+<OL>
+<LI>
+
+Several QEMU can be running on different hosts and share same bus (assuming 
+correct multicast setup for these hosts).
+<LI>
+
+mcast support is compatible with User Mode Linux (argument <SAMP>`eth<VAR>N</VAR>=mcast'</SAMP>), see
+<A HREF="http://user-mode-linux.sf.net">http://user-mode-linux.sf.net</A>.
+<LI>Use <SAMP>`fd=h'</SAMP> to specify an already opened UDP multicast socket.
+
+</OL>
+
+Example:
+
+<PRE>
+# launch one QEMU instance
+qemu linux.img -net nic,macaddr=52:54:00:12:34:56 \
+               -net socket,mcast=230.0.0.1:1234
+# launch another QEMU instance on same "bus"
+qemu linux.img -net nic,macaddr=52:54:00:12:34:57 \
+               -net socket,mcast=230.0.0.1:1234
+# launch yet another QEMU instance on same "bus"
+qemu linux.img -net nic,macaddr=52:54:00:12:34:58 \
+               -net socket,mcast=230.0.0.1:1234
+</PRE>
+
+Example (User Mode Linux compat.):
+
+<PRE>
+# launch QEMU instance (note mcast address selected
+# is UML's default)
+qemu linux.img -net nic,macaddr=52:54:00:12:34:56 \
+               -net socket,mcast=239.192.168.1:1102
+# launch UML
+/path/to/linux ubd0=/path/to/root_fs eth0=mcast
+</PRE>
+
+<DT><SAMP>`-net none'</SAMP>
+<DD>
+Indicate that no network devices should be configured. It is used to
+override the default configuration (<SAMP>`-net nic -net user'</SAMP>) which
+is activated if no <SAMP>`-net'</SAMP> options are provided.
+
+<DT><SAMP>`-tftp prefix'</SAMP>
+<DD>
+When using the user mode network stack, activate a built-in TFTP
+server. All filenames beginning with <VAR>prefix</VAR> can be downloaded
+from the host to the guest using a TFTP client. The TFTP client on the
+guest must be configured in binary mode (use the command <CODE>bin</CODE> of
+the Unix TFTP client). The host IP address on the guest is as usual
+10.0.2.2.
+
+<DT><SAMP>`-smb dir'</SAMP>
+<DD>
+When using the user mode network stack, activate a built-in SMB
+server so that Windows OSes can access to the host files in <TT>`dir'</TT>
+transparently.
+
+In the guest Windows OS, the line:
+
+<PRE>
+10.0.2.4 smbserver
+</PRE>
+
+must be added in the file <TT>`C:\WINDOWS\LMHOSTS'</TT> (for windows 9x/Me)
+or <TT>`C:\WINNT\SYSTEM32\DRIVERS\ETC\LMHOSTS'</TT> (Windows NT/2000).
+
+Then <TT>`dir'</TT> can be accessed in <TT>`\\smbserver\qemu'</TT>.
+
+Note that a SAMBA server must be installed on the host OS in
+<TT>`/usr/sbin/smbd'</TT>. QEMU was tested successfully with smbd version
+2.2.7a from the Red Hat 9 and version 3.0.10-1.fc3 from Fedora Core 3.
+
+<DT><SAMP>`-redir [tcp|udp]:host-port:[guest-host]:guest-port'</SAMP>
+<DD>
+When using the user mode network stack, redirect incoming TCP or UDP
+connections to the host port <VAR>host-port</VAR> to the guest
+<VAR>guest-host</VAR> on guest port <VAR>guest-port</VAR>. If <VAR>guest-host</VAR>
+is not specified, its value is 10.0.2.15 (default address given by the
+built-in DHCP server).
+
+For example, to redirect host X11 connection from screen 1 to guest
+screen 0, use the following:
+
+
+<PRE>
+# on the host
+qemu -redir tcp:6001::6000 [...]
+# this host xterm should open in the guest X11 server
+xterm -display :1
+</PRE>
+
+To redirect telnet connections from host port 5555 to telnet port on
+the guest, use the following:
+
+
+<PRE>
+# on the host
+qemu -redir tcp:5555::23 [...]
+telnet localhost 5555
+</PRE>
+
+Then when you use on the host <CODE>telnet localhost 5555</CODE>, you
+connect to the guest telnet server.
+
+</DL>
+
+<P>
+Linux boot specific: When using these options, you can use a given
+Linux kernel without installing it in the disk image. It can be useful
+for easier testing of various kernels.
+
+
+<DL COMPACT>
+
+<DT><SAMP>`-kernel bzImage'</SAMP>
+<DD>
+Use <VAR>bzImage</VAR> as kernel image.
+
+<DT><SAMP>`-append cmdline'</SAMP>
+<DD>
+Use <VAR>cmdline</VAR> as kernel command line
+
+<DT><SAMP>`-initrd file'</SAMP>
+<DD>
+Use <VAR>file</VAR> as initial ram disk.
+
+</DL>
+
+<P>
+Debug/Expert options:
+<DL COMPACT>
+
+<DT><SAMP>`-serial dev'</SAMP>
+<DD>
+Redirect the virtual serial port to host character device
+<VAR>dev</VAR>. The default device is <CODE>vc</CODE> in graphical mode and
+<CODE>stdio</CODE> in non graphical mode.
+
+This option can be used several times to simulate up to 4 serials
+ports.
+
+Use <CODE>-serial none</CODE> to disable all serial ports.
+
+Available character devices are:
+<DL COMPACT>
+
+<DT><CODE>vc</CODE>
+<DD>
+Virtual console
+<DT><CODE>pty</CODE>
+<DD>
+[Linux only] Pseudo TTY (a new PTY is automatically allocated)
+<DT><CODE>none</CODE>
+<DD>
+No device is allocated.
+<DT><CODE>null</CODE>
+<DD>
+void device
+<DT><CODE>/dev/XXX</CODE>
+<DD>
+[Linux only] Use host tty, e.g. <TT>`/dev/ttyS0'</TT>. The host serial port
+parameters are set according to the emulated ones.
+<DT><CODE>/dev/parportN</CODE>
+<DD>
+[Linux only, parallel port only] Use host parallel port
+<VAR>N</VAR>. Currently only SPP parallel port features can be used.
+<DT><CODE>file:filename</CODE>
+<DD>
+Write output to filename. No character can be read.
+<DT><CODE>stdio</CODE>
+<DD>
+[Unix only] standard input/output
+<DT><CODE>pipe:filename</CODE>
+<DD>
+name pipe <VAR>filename</VAR>
+<DT><CODE>COMn</CODE>
+<DD>
+[Windows only] Use host serial port <VAR>n</VAR>
+<DT><CODE>udp:[remote_host]:remote_port[@[src_ip]:src_port]</CODE>
+<DD>
+This implements UDP Net Console.  When <VAR>remote_host</VAR> or <VAR>src_ip</VAR> are not specified they default to <CODE>0.0.0.0</CODE>.  When not using a specifed <VAR>src_port</VAR> a random port is automatically chosen.
+
+If you just want a simple readonly console you can use <CODE>netcat</CODE> or
+<CODE>nc</CODE>, by starting qemu with: <CODE>-serial udp::4555</CODE> and nc as:
+<CODE>nc -u -l -p 4555</CODE>. Any time qemu writes something to that port it
+will appear in the netconsole session.
+
+If you plan to send characters back via netconsole or you want to stop
+and start qemu a lot of times, you should have qemu use the same
+source port each time by using something like <CODE>-serial
+udp::4555@:4556</CODE> to qemu. Another approach is to use a patched
+version of netcat which can listen to a TCP port and send and receive
+characters via udp.  If you have a patched version of netcat which
+activates telnet remote echo and single char transfer, then you can
+use the following options to step up a netcat redirector to allow
+telnet on port 5555 to access the qemu port.
+<DL COMPACT>
+
+<DT><CODE>Qemu Options:</CODE>
+<DD>
+-serial udp::4555@:4556
+<DT><CODE>netcat options:</CODE>
+<DD>
+-u -P 4555 -L 0.0.0.0:4556 -t -p 5555 -I -T
+<DT><CODE>telnet options:</CODE>
+<DD>
+localhost 5555
+</DL>
+
+<DT><CODE>tcp:[host]:port[,server][,nowait][,nodelay]</CODE>
+<DD>
+The TCP Net Console has two modes of operation.  It can send the serial
+I/O to a location or wait for a connection from a location.  By default
+the TCP Net Console is sent to <VAR>host</VAR> at the <VAR>port</VAR>.  If you use
+the <VAR>server</VAR> option QEMU will wait for a client socket application
+to connect to the port before continuing, unless the <CODE>nowait</CODE>
+option was specified.  The <CODE>nodelay</CODE> option disables the Nagle buffering
+algoritm.  If <VAR>host</VAR> is omitted, 0.0.0.0 is assumed. Only
+one TCP connection at a time is accepted. You can use <CODE>telnet</CODE> to
+connect to the corresponding character device.
+<DL COMPACT>
+
+<DT><CODE>Example to send tcp console to 192.168.0.2 port 4444</CODE>
+<DD>
+-serial tcp:192.168.0.2:4444
+<DT><CODE>Example to listen and wait on port 4444 for connection</CODE>
+<DD>
+-serial tcp::4444,server
+<DT><CODE>Example to not wait and listen on ip 192.168.0.100 port 4444</CODE>
+<DD>
+-serial tcp:192.168.0.100:4444,server,nowait
+</DL>
+
+<DT><CODE>telnet:host:port[,server][,nowait][,nodelay]</CODE>
+<DD>
+The telnet protocol is used instead of raw tcp sockets.  The options
+work the same as if you had specified <CODE>-serial tcp</CODE>.  The
+difference is that the port acts like a telnet server or client using
+telnet option negotiation.  This will also allow you to send the
+MAGIC_SYSRQ sequence if you use a telnet that supports sending the break
+sequence.  Typically in unix telnet you do it with Control-] and then
+type "send break" followed by pressing the enter key.
+
+<DT><CODE>unix:path[,server][,nowait]</CODE>
+<DD>
+A unix domain socket is used instead of a tcp socket.  The option works the
+same as if you had specified <CODE>-serial tcp</CODE> except the unix domain socket
+<VAR>path</VAR> is used for connections.
+
+</DL>
+
+<DT><SAMP>`-parallel dev'</SAMP>
+<DD>
+Redirect the virtual parallel port to host device <VAR>dev</VAR> (same
+devices as the serial port). On Linux hosts, <TT>`/dev/parportN'</TT> can
+be used to use hardware devices connected on the corresponding host
+parallel port.
+
+This option can be used several times to simulate up to 3 parallel
+ports.
+
+Use <CODE>-parallel none</CODE> to disable all parallel ports.
+
+<DT><SAMP>`-monitor dev'</SAMP>
+<DD>
+Redirect the monitor to host device <VAR>dev</VAR> (same devices as the
+serial port).
+The default device is <CODE>vc</CODE> in graphical mode and <CODE>stdio</CODE> in
+non graphical mode.
+
+<DT><SAMP>`-s'</SAMP>
+<DD>
+Wait gdb connection to port 1234 (see section <A HREF="qemu-doc.html#SEC36">3.10 GDB usage</A>). 
+<DT><SAMP>`-p port'</SAMP>
+<DD>
+Change gdb connection port.  <VAR>port</VAR> can be either a decimal number
+to specify a TCP port, or a host device (same devices as the serial port).
+<DT><SAMP>`-S'</SAMP>
+<DD>
+Do not start CPU at startup (you must type 'c' in the monitor).
+<DT><SAMP>`-d'</SAMP>
+<DD>
+Output log in /tmp/qemu.log
+<DT><SAMP>`-hdachs c,h,s,[,t]'</SAMP>
+<DD>
+Force hard disk 0 physical geometry (1 &#60;= <VAR>c</VAR> &#60;= 16383, 1 &#60;=
+<VAR>h</VAR> &#60;= 16, 1 &#60;= <VAR>s</VAR> &#60;= 63) and optionally force the BIOS
+translation mode (<VAR>t</VAR>=none, lba or auto). Usually QEMU can guess
+all thoses parameters. This option is useful for old MS-DOS disk
+images.
+
+<DT><SAMP>`-L path'</SAMP>
+<DD>
+Set the directory for the BIOS, VGA BIOS and keymaps.
+
+<DT><SAMP>`-std-vga'</SAMP>
+<DD>
+Simulate a standard VGA card with Bochs VBE extensions (default is
+Cirrus Logic GD5446 PCI VGA). If your guest OS supports the VESA 2.0
+VBE extensions (e.g. Windows XP) and if you want to use high
+resolution modes (&#62;= 1280x1024x16) then you should use this option.
+
+<DT><SAMP>`-no-acpi'</SAMP>
+<DD>
+Disable ACPI (Advanced Configuration and Power Interface) support. Use
+it if your guest OS complains about ACPI problems (PC target machine
+only).
+
+<DT><SAMP>`-no-reboot'</SAMP>
+<DD>
+Exit instead of rebooting.
+
+<DT><SAMP>`-loadvm file'</SAMP>
+<DD>
+Start right away with a saved state (<CODE>loadvm</CODE> in monitor)
+
+<DT><SAMP>`-semihosting'</SAMP>
+<DD>
+Enable "Angel" semihosting interface (ARM target machines only).
+Note that this allows guest direct access to the host filesystem,
+so should only be used with trusted guest OS.
+</DL>
+
+
+
+<H2><A NAME="SEC11" HREF="qemu-doc.html#TOC11">3.4 Keys</A></H2>
+
+<P>
+During the graphical emulation, you can use the following keys:
+<DL COMPACT>
+
+<DT><KBD>Ctrl-Alt-f</KBD>
+<DD>
+Toggle full screen
+
+<DT><KBD>Ctrl-Alt-n</KBD>
+<DD>
+Switch to virtual console 'n'. Standard console mappings are:
+<DL COMPACT>
+
+<DT><EM>1</EM>
+<DD>
+Target system display
+<DT><EM>2</EM>
+<DD>
+Monitor
+<DT><EM>3</EM>
+<DD>
+Serial port
+</DL>
+
+<DT><KBD>Ctrl-Alt</KBD>
+<DD>
+Toggle mouse and keyboard grab.
+</DL>
+
+<P>
+In the virtual consoles, you can use <KBD>Ctrl-Up</KBD>, <KBD>Ctrl-Down</KBD>,
+<KBD>Ctrl-PageUp</KBD> and <KBD>Ctrl-PageDown</KBD> to move in the back log.
+
+
+<P>
+During emulation, if you are using the <SAMP>`-nographic'</SAMP> option, use
+<KBD>Ctrl-a h</KBD> to get terminal commands:
+
+
+<DL COMPACT>
+
+<DT><KBD>Ctrl-a h</KBD>
+<DD>
+Print this help
+<DT><KBD>Ctrl-a x</KBD>
+<DD>
+Exit emulator
+<DT><KBD>Ctrl-a s</KBD>
+<DD>
+Save disk data back to file (if -snapshot)
+<DT><KBD>Ctrl-a b</KBD>
+<DD>
+Send break (magic sysrq in Linux)
+<DT><KBD>Ctrl-a c</KBD>
+<DD>
+Switch between console and monitor
+<DT><KBD>Ctrl-a Ctrl-a</KBD>
+<DD>
+Send Ctrl-a
+</DL>
+
+
+
+<H2><A NAME="SEC12" HREF="qemu-doc.html#TOC12">3.5 QEMU Monitor</A></H2>
+
+<P>
+The QEMU monitor is used to give complex commands to the QEMU
+emulator. You can use it to:
+
+
+
+<UL>
+
+<LI>
+
+Remove or insert removable medias images
+(such as CD-ROM or floppies)
+
+<LI>
+
+Freeze/unfreeze the Virtual Machine (VM) and save or restore its state
+from a disk file.
+
+<LI>Inspect the VM state without an external debugger.
+
+</UL>
+
+
+
+<H3><A NAME="SEC13" HREF="qemu-doc.html#TOC13">3.5.1 Commands</A></H3>
+
+<P>
+The following commands are available:
+
+
+<DL COMPACT>
+
+<DT><SAMP>`help or ? [cmd]'</SAMP>
+<DD>
+Show the help for all commands or just for command <VAR>cmd</VAR>.
+
+<DT><SAMP>`commit'</SAMP>
+<DD>
+Commit changes to the disk images (if -snapshot is used)
+
+<DT><SAMP>`info subcommand'</SAMP>
+<DD>
+show various information about the system state
+
+<DL COMPACT>
+
+<DT><SAMP>`info network'</SAMP>
+<DD>
+show the various VLANs and the associated devices
+<DT><SAMP>`info block'</SAMP>
+<DD>
+show the block devices
+<DT><SAMP>`info registers'</SAMP>
+<DD>
+show the cpu registers
+<DT><SAMP>`info history'</SAMP>
+<DD>
+show the command line history
+<DT><SAMP>`info pci'</SAMP>
+<DD>
+show emulated PCI device
+<DT><SAMP>`info usb'</SAMP>
+<DD>
+show USB devices plugged on the virtual USB hub
+<DT><SAMP>`info usbhost'</SAMP>
+<DD>
+show all USB host devices
+<DT><SAMP>`info capture'</SAMP>
+<DD>
+show information about active capturing
+<DT><SAMP>`info snapshots'</SAMP>
+<DD>
+show list of VM snapshots
+<DT><SAMP>`info mice'</SAMP>
+<DD>
+show which guest mouse is receiving events
+</DL>
+
+<DT><SAMP>`q or quit'</SAMP>
+<DD>
+Quit the emulator.
+
+<DT><SAMP>`eject [-f] device'</SAMP>
+<DD>
+Eject a removable media (use -f to force it).
+
+<DT><SAMP>`change device filename'</SAMP>
+<DD>
+Change a removable media.
+
+<DT><SAMP>`screendump filename'</SAMP>
+<DD>
+Save screen into PPM image <VAR>filename</VAR>.
+
+<DT><SAMP>`mouse_move dx dy [dz]'</SAMP>
+<DD>
+Move the active mouse to the specified coordinates <VAR>dx</VAR> <VAR>dy</VAR>
+with optional scroll axis <VAR>dz</VAR>.
+
+<DT><SAMP>`mouse_button val'</SAMP>
+<DD>
+Change the active mouse button state <VAR>val</VAR> (1=L, 2=M, 4=R).
+
+<DT><SAMP>`mouse_set index'</SAMP>
+<DD>
+Set which mouse device receives events at given <VAR>index</VAR>, index
+can be obtained with
+
+<PRE>
+info mice
+</PRE>
+
+<DT><SAMP>`wavcapture filename [frequency [bits [channels]]]'</SAMP>
+<DD>
+Capture audio into <VAR>filename</VAR>. Using sample rate <VAR>frequency</VAR>
+bits per sample <VAR>bits</VAR> and number of channels <VAR>channels</VAR>.
+
+Defaults:
+
+<UL>
+<LI>Sample rate = 44100 Hz - CD quality
+
+<LI>Bits = 16
+
+<LI>Number of channels = 2 - Stereo
+
+</UL>
+
+<DT><SAMP>`stopcapture index'</SAMP>
+<DD>
+Stop capture with a given <VAR>index</VAR>, index can be obtained with
+
+<PRE>
+info capture
+</PRE>
+
+<DT><SAMP>`log item1[,...]'</SAMP>
+<DD>
+Activate logging of the specified items to <TT>`/tmp/qemu.log'</TT>.
+
+<DT><SAMP>`savevm [tag|id]'</SAMP>
+<DD>
+Create a snapshot of the whole virtual machine. If <VAR>tag</VAR> is
+provided, it is used as human readable identifier. If there is already
+a snapshot with the same tag or ID, it is replaced. More info at
+section <A HREF="qemu-doc.html#SEC18">3.6.3 VM snapshots</A>.
+
+<DT><SAMP>`loadvm tag|id'</SAMP>
+<DD>
+Set the whole virtual machine to the snapshot identified by the tag
+<VAR>tag</VAR> or the unique snapshot ID <VAR>id</VAR>.
+
+<DT><SAMP>`delvm tag|id'</SAMP>
+<DD>
+Delete the snapshot identified by <VAR>tag</VAR> or <VAR>id</VAR>.
+
+<DT><SAMP>`stop'</SAMP>
+<DD>
+Stop emulation.
+
+<DT><SAMP>`c or cont'</SAMP>
+<DD>
+Resume emulation.
+
+<DT><SAMP>`gdbserver [port]'</SAMP>
+<DD>
+Start gdbserver session (default port=1234)
+
+<DT><SAMP>`x/fmt addr'</SAMP>
+<DD>
+Virtual memory dump starting at <VAR>addr</VAR>.
+
+<DT><SAMP>`xp /fmt addr'</SAMP>
+<DD>
+Physical memory dump starting at <VAR>addr</VAR>.
+
+<VAR>fmt</VAR> is a format which tells the command how to format the
+data. Its syntax is: <SAMP>`/{count}{format}{size}'</SAMP>
+
+<DL COMPACT>
+
+<DT><VAR>count</VAR>
+<DD>
+is the number of items to be dumped.
+
+<DT><VAR>format</VAR>
+<DD>
+can be x (hexa), d (signed decimal), u (unsigned decimal), o (octal),
+c (char) or i (asm instruction).
+
+<DT><VAR>size</VAR>
+<DD>
+can be b (8 bits), h (16 bits), w (32 bits) or g (64 bits). On x86,
+<CODE>h</CODE> or <CODE>w</CODE> can be specified with the <CODE>i</CODE> format to
+respectively select 16 or 32 bit code instruction size.
+
+</DL>
+
+Examples: 
+
+<UL>
+<LI>
+
+Dump 10 instructions at the current instruction pointer:
+
+<PRE>
+(qemu) x/10i $eip
+0x90107063:  ret
+0x90107064:  sti
+0x90107065:  lea    0x0(%esi,1),%esi
+0x90107069:  lea    0x0(%edi,1),%edi
+0x90107070:  ret
+0x90107071:  jmp    0x90107080
+0x90107073:  nop
+0x90107074:  nop
+0x90107075:  nop
+0x90107076:  nop
+</PRE>
+
+<LI>
+
+Dump 80 16 bit values at the start of the video memory.
+
+<PRE>
+(qemu) xp/80hx 0xb8000
+0x000b8000: 0x0b50 0x0b6c 0x0b65 0x0b78 0x0b38 0x0b36 0x0b2f 0x0b42
+0x000b8010: 0x0b6f 0x0b63 0x0b68 0x0b73 0x0b20 0x0b56 0x0b47 0x0b41
+0x000b8020: 0x0b42 0x0b69 0x0b6f 0x0b73 0x0b20 0x0b63 0x0b75 0x0b72
+0x000b8030: 0x0b72 0x0b65 0x0b6e 0x0b74 0x0b2d 0x0b63 0x0b76 0x0b73
+0x000b8040: 0x0b20 0x0b30 0x0b35 0x0b20 0x0b4e 0x0b6f 0x0b76 0x0b20
+0x000b8050: 0x0b32 0x0b30 0x0b30 0x0b33 0x0720 0x0720 0x0720 0x0720
+0x000b8060: 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720
+0x000b8070: 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720
+0x000b8080: 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720
+0x000b8090: 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720
+</PRE>
+
+</UL>
+
+<DT><SAMP>`p or print/fmt expr'</SAMP>
+<DD>
+Print expression value. Only the <VAR>format</VAR> part of <VAR>fmt</VAR> is
+used.
+
+<DT><SAMP>`sendkey keys'</SAMP>
+<DD>
+Send <VAR>keys</VAR> to the emulator. Use <CODE>-</CODE> to press several keys
+simultaneously. Example:
+
+<PRE>
+sendkey ctrl-alt-f1
+</PRE>
+
+This command is useful to send keys that your graphical user interface
+intercepts at low level, such as <CODE>ctrl-alt-f1</CODE> in X Window.
+
+<DT><SAMP>`system_reset'</SAMP>
+<DD>
+Reset the system.
+
+<DT><SAMP>`usb_add devname'</SAMP>
+<DD>
+Add the USB device <VAR>devname</VAR>.  For details of available devices see
+section <A HREF="qemu-doc.html#SEC34">3.9.1 Connecting USB devices</A>
+
+<DT><SAMP>`usb_del devname'</SAMP>
+<DD>
+Remove the USB device <VAR>devname</VAR> from the QEMU virtual USB
+hub. <VAR>devname</VAR> has the syntax <CODE>bus.addr</CODE>. Use the monitor
+command <CODE>info usb</CODE> to see the devices you can remove.
+
+</DL>
+
+
+
+<H3><A NAME="SEC14" HREF="qemu-doc.html#TOC14">3.5.2 Integer expressions</A></H3>
+
+<P>
+The monitor understands integers expressions for every integer
+argument. You can use register names to get the value of specifics
+CPU registers by prefixing them with <EM>$</EM>.
+
+
+
+
+<H2><A NAME="SEC15" HREF="qemu-doc.html#TOC15">3.6 Disk Images</A></H2>
+
+<P>
+Since version 0.6.1, QEMU supports many disk image formats, including
+growable disk images (their size increase as non empty sectors are
+written), compressed and encrypted disk images. Version 0.8.3 added
+the new qcow2 disk image format which is essential to support VM
+snapshots.
+
+
+
+
+<H3><A NAME="SEC16" HREF="qemu-doc.html#TOC16">3.6.1 Quick start for disk image creation</A></H3>
+
+<P>
+You can create a disk image with the command:
+
+<PRE>
+qemu-img create myimage.img mysize
+</PRE>
+
+<P>
+where <VAR>myimage.img</VAR> is the disk image filename and <VAR>mysize</VAR> is its
+size in kilobytes. You can add an <CODE>M</CODE> suffix to give the size in
+megabytes and a <CODE>G</CODE> suffix for gigabytes.
+
+
+<P>
+See section <A HREF="qemu-doc.html#SEC19">3.6.4 <CODE>qemu-img</CODE> Invocation</A> for more information.
+
+
+
+
+<H3><A NAME="SEC17" HREF="qemu-doc.html#TOC17">3.6.2 Snapshot mode</A></H3>
+
+<P>
+If you use the option <SAMP>`-snapshot'</SAMP>, all disk images are
+considered as read only. When sectors in written, they are written in
+a temporary file created in <TT>`/tmp'</TT>. You can however force the
+write back to the raw disk images by using the <CODE>commit</CODE> monitor
+command (or <KBD>C-a s</KBD> in the serial console).
+
+
+
+
+<H3><A NAME="SEC18" HREF="qemu-doc.html#TOC18">3.6.3 VM snapshots</A></H3>
+
+<P>
+VM snapshots are snapshots of the complete virtual machine including
+CPU state, RAM, device state and the content of all the writable
+disks. In order to use VM snapshots, you must have at least one non
+removable and writable block device using the <CODE>qcow2</CODE> disk image
+format. Normally this device is the first virtual hard drive.
+
+
+<P>
+Use the monitor command <CODE>savevm</CODE> to create a new VM snapshot or
+replace an existing one. A human readable name can be assigned to each
+snapshot in addition to its numerical ID.
+
+
+<P>
+Use <CODE>loadvm</CODE> to restore a VM snapshot and <CODE>delvm</CODE> to remove
+a VM snapshot. <CODE>info snapshots</CODE> lists the available snapshots
+with their associated information:
+
+
+
+<PRE>
+(qemu) info snapshots
+Snapshot devices: hda
+Snapshot list (from hda):
+ID        TAG                 VM SIZE                DATE       VM CLOCK
+1         start                   41M 2006-08-06 12:38:02   00:00:14.954
+2                                 40M 2006-08-06 12:43:29   00:00:18.633
+3         msys                    40M 2006-08-06 12:44:04   00:00:23.514
+</PRE>
+
+<P>
+A VM snapshot is made of a VM state info (its size is shown in
+<CODE>info snapshots</CODE>) and a snapshot of every writable disk image.
+The VM state info is stored in the first <CODE>qcow2</CODE> non removable
+and writable block device. The disk image snapshots are stored in
+every disk image. The size of a snapshot in a disk image is difficult
+to evaluate and is not shown by <CODE>info snapshots</CODE> because the
+associated disk sectors are shared among all the snapshots to save
+disk space (otherwise each snapshot would need a full copy of all the
+disk images).
+
+
+<P>
+When using the (unrelated) <CODE>-snapshot</CODE> option
+(section <A HREF="qemu-doc.html#SEC17">3.6.2 Snapshot mode</A>), you can always make VM snapshots,
+but they are deleted as soon as you exit QEMU.
+
+
+<P>
+VM snapshots currently have the following known limitations:
+
+<UL>
+<LI>
+
+They cannot cope with removable devices if they are removed or
+inserted after a snapshot is done.
+<LI>
+
+A few device drivers still have incomplete snapshot support so their
+state is not saved or restored properly (in particular USB).
+</UL>
+
+
+
+<H3><A NAME="SEC19" HREF="qemu-doc.html#TOC19">3.6.4 <CODE>qemu-img</CODE> Invocation</A></H3>
+
+
+<PRE>
+usage: qemu-img command [command options]
+</PRE>
+
+<P>
+The following commands are supported:
+<DL COMPACT>
+
+<DT><SAMP>`create [-e] [-b <VAR>base_image</VAR>] [-f <VAR>fmt</VAR>] <VAR>filename</VAR> [<VAR>size</VAR>]'</SAMP>
+<DD>
+<DT><SAMP>`commit [-f <VAR>fmt</VAR>] <VAR>filename</VAR>'</SAMP>
+<DD>
+<DT><SAMP>`convert [-c] [-e] [-f <VAR>fmt</VAR>] <VAR>filename</VAR> [-O <VAR>output_fmt</VAR>] <VAR>output_filename</VAR>'</SAMP>
+<DD>
+<DT><SAMP>`info [-f <VAR>fmt</VAR>] <VAR>filename</VAR>'</SAMP>
+<DD>
+</DL>
+
+<P>
+Command parameters:
+<DL COMPACT>
+
+<DT><VAR>filename</VAR>
+<DD>
+ is a disk image filename
+<DT><VAR>base_image</VAR>
+<DD>
+is the read-only disk image which is used as base for a copy on
+    write image; the copy on write image only stores the modified data
+
+<DT><VAR>fmt</VAR>
+<DD>
+is the disk image format. It is guessed automatically in most cases. The following formats are supported:
+
+<DL COMPACT>
+
+<DT><CODE>raw</CODE>
+<DD>
+Raw disk image format (default). This format has the advantage of
+being simple and easily exportable to all other emulators. If your
+file system supports <EM>holes</EM> (for example in ext2 or ext3 on
+Linux or NTFS on Windows), then only the written sectors will reserve
+space. Use <CODE>qemu-img info</CODE> to know the real size used by the
+image or <CODE>ls -ls</CODE> on Unix/Linux.
+
+<DT><CODE>qcow2</CODE>
+<DD>
+QEMU image format, the most versatile format. Use it to have smaller
+images (useful if your filesystem does not supports holes, for example
+on Windows), optional AES encryption, zlib based compression and
+support of multiple VM snapshots.
+<DT><CODE>qcow</CODE>
+<DD>
+Old QEMU image format. Left for compatibility.
+<DT><CODE>cow</CODE>
+<DD>
+User Mode Linux Copy On Write image format. Used to be the only growable
+image format in QEMU. It is supported only for compatibility with
+previous versions. It does not work on win32.
+<DT><CODE>vmdk</CODE>
+<DD>
+VMware 3 and 4 compatible image format.
+<DT><CODE>cloop</CODE>
+<DD>
+Linux Compressed Loop image, useful only to reuse directly compressed
+CD-ROM images present for example in the Knoppix CD-ROMs.
+</DL>
+
+<DT><VAR>size</VAR>
+<DD>
+is the disk image size in kilobytes. Optional suffixes <CODE>M</CODE>
+(megabyte) and <CODE>G</CODE> (gigabyte) are supported 
+
+<DT><VAR>output_filename</VAR>
+<DD>
+is the destination disk image filename 
+
+<DT><VAR>output_fmt</VAR>
+<DD>
+ is the destination format
+
+<DT><VAR>-c</VAR>
+<DD>
+indicates that target image must be compressed (qcow format only)
+<DT><VAR>-e</VAR>
+<DD>
+indicates that the target image must be encrypted (qcow format only)
+</DL>
+
+<P>
+Command description:
+
+
+<DL COMPACT>
+
+<DT><SAMP>`create [-e] [-b <VAR>base_image</VAR>] [-f <VAR>fmt</VAR>] <VAR>filename</VAR> [<VAR>size</VAR>]'</SAMP>
+<DD>
+Create the new disk image <VAR>filename</VAR> of size <VAR>size</VAR> and format
+<VAR>fmt</VAR>. 
+
+If <VAR>base_image</VAR> is specified, then the image will record only the
+differences from <VAR>base_image</VAR>. No size needs to be specified in
+this case. <VAR>base_image</VAR> will never be modified unless you use the
+<CODE>commit</CODE> monitor command.
+
+<DT><SAMP>`commit [-f <VAR>fmt</VAR>] <VAR>filename</VAR>'</SAMP>
+<DD>
+Commit the changes recorded in <VAR>filename</VAR> in its base image.
+
+<DT><SAMP>`convert [-c] [-e] [-f <VAR>fmt</VAR>] <VAR>filename</VAR> [-O <VAR>output_fmt</VAR>] <VAR>output_filename</VAR>'</SAMP>
+<DD>
+Convert the disk image <VAR>filename</VAR> to disk image <VAR>output_filename</VAR>
+using format <VAR>output_fmt</VAR>. It can be optionnaly encrypted
+(<CODE>-e</CODE> option) or compressed (<CODE>-c</CODE> option).
+
+Only the format <CODE>qcow</CODE> supports encryption or compression. The
+compression is read-only. It means that if a compressed sector is
+rewritten, then it is rewritten as uncompressed data.
+
+Encryption uses the AES format which is very secure (128 bit keys). Use
+a long password (16 characters) to get maximum protection.
+
+Image conversion is also useful to get smaller image when using a
+growable format such as <CODE>qcow</CODE> or <CODE>cow</CODE>: the empty sectors
+are detected and suppressed from the destination image.
+
+<DT><SAMP>`info [-f <VAR>fmt</VAR>] <VAR>filename</VAR>'</SAMP>
+<DD>
+Give information about the disk image <VAR>filename</VAR>. Use it in
+particular to know the size reserved on disk which can be different
+from the displayed size. If VM snapshots are stored in the disk image,
+they are displayed too.
+</DL>
+
+
+
+<H3><A NAME="SEC20" HREF="qemu-doc.html#TOC20">3.6.5 Using host drives</A></H3>
+
+<P>
+In addition to disk image files, QEMU can directly access host
+devices. We describe here the usage for QEMU version &#62;= 0.8.3.
+
+
+
+
+<H4><A NAME="SEC21" HREF="qemu-doc.html#TOC21">3.6.5.1 Linux</A></H4>
+
+<P>
+On Linux, you can directly use the host device filename instead of a
+disk image filename provided you have enough proviledge to access
+it. For example, use <TT>`/dev/cdrom'</TT> to access to the CDROM or
+<TT>`/dev/fd0'</TT> for the floppy.
+
+
+<DL COMPACT>
+
+<DT><CODE>CD</CODE>
+<DD>
+You can specify a CDROM device even if no CDROM is loaded. QEMU has
+specific code to detect CDROM insertion or removal. CDROM ejection by
+the guest OS is supported. Currently only data CDs are supported.
+<DT><CODE>Floppy</CODE>
+<DD>
+You can specify a floppy device even if no floppy is loaded. Floppy
+removal is currently not detected accurately (if you change floppy
+without doing floppy access while the floppy is not loaded, the guest
+OS will think that the same floppy is loaded).
+<DT><CODE>Hard disks</CODE>
+<DD>
+Hard disks can be used. Normally you must specify the whole disk
+(<TT>`/dev/hdb'</TT> instead of <TT>`/dev/hdb1'</TT>) so that the guest OS can
+see it as a partitioned disk. WARNING: unless you know what you do, it
+is better to only make READ-ONLY accesses to the hard disk otherwise
+you may corrupt your host data (use the <SAMP>`-snapshot'</SAMP> command
+line option or modify the device permissions accordingly).
+</DL>
+
+
+
+<H4><A NAME="SEC22" HREF="qemu-doc.html#TOC22">3.6.5.2 Windows</A></H4>
+
+<DL COMPACT>
+
+<DT><CODE>CD</CODE>
+<DD>
+The prefered syntax is the drive letter (e.g. <TT>`d:'</TT>). The
+alternate syntax <TT>`\\.\d:'</TT> is supported. <TT>`/dev/cdrom'</TT> is
+supported as an alias to the first CDROM drive.
+
+Currently there is no specific code to handle removable medias, so it
+is better to use the <CODE>change</CODE> or <CODE>eject</CODE> monitor commands to
+change or eject media.
+<DT><CODE>Hard disks</CODE>
+<DD>
+Hard disks can be used with the syntax: <TT>`\\.\PhysicalDriveN'</TT>
+where <VAR>N</VAR> is the drive number (0 is the first hard disk).
+
+WARNING: unless you know what you do, it is better to only make
+READ-ONLY accesses to the hard disk otherwise you may corrupt your
+host data (use the <SAMP>`-snapshot'</SAMP> command line so that the
+modifications are written in a temporary file).
+</DL>
+
+
+
+<H4><A NAME="SEC23" HREF="qemu-doc.html#TOC23">3.6.5.3 Mac OS X</A></H4>
+
+<P>
+<TT>`/dev/cdrom'</TT> is an alias to the first CDROM. 
+
+
+<P>
+Currently there is no specific code to handle removable medias, so it
+is better to use the <CODE>change</CODE> or <CODE>eject</CODE> monitor commands to
+change or eject media.
+
+
+
+
+<H3><A NAME="SEC24" HREF="qemu-doc.html#TOC24">3.6.6 Virtual FAT disk images</A></H3>
+
+<P>
+QEMU can automatically create a virtual FAT disk image from a
+directory tree. In order to use it, just type:
+
+
+
+<PRE>
+qemu linux.img -hdb fat:/my_directory
+</PRE>
+
+<P>
+Then you access access to all the files in the <TT>`/my_directory'</TT>
+directory without having to copy them in a disk image or to export
+them via SAMBA or NFS. The default access is <EM>read-only</EM>.
+
+
+<P>
+Floppies can be emulated with the <CODE>:floppy:</CODE> option:
+
+
+
+<PRE>
+qemu linux.img -fda fat:floppy:/my_directory
+</PRE>
+
+<P>
+A read/write support is available for testing (beta stage) with the
+<CODE>:rw:</CODE> option:
+
+
+
+<PRE>
+qemu linux.img -fda fat:floppy:rw:/my_directory
+</PRE>
+
+<P>
+What you should <EM>never</EM> do:
+
+<UL>
+<LI>use non-ASCII filenames ;
+
+<LI>use "-snapshot" together with ":rw:" ;
+
+<LI>expect it to work when loadvm'ing ;
+
+<LI>write to the FAT directory on the host system while accessing it with the guest system.
+
+</UL>
+
+
+
+<H2><A NAME="SEC25" HREF="qemu-doc.html#TOC25">3.7 Network emulation</A></H2>
+
+<P>
+QEMU can simulate several networks cards (NE2000 boards on the PC
+target) and can connect them to an arbitrary number of Virtual Local
+Area Networks (VLANs). Host TAP devices can be connected to any QEMU
+VLAN. VLAN can be connected between separate instances of QEMU to
+simulate large networks. For simpler usage, a non priviledged user mode
+network stack can replace the TAP device to have a basic network
+connection.
+
+
+
+
+<H3><A NAME="SEC26" HREF="qemu-doc.html#TOC26">3.7.1 VLANs</A></H3>
+
+<P>
+QEMU simulates several VLANs. A VLAN can be symbolised as a virtual
+connection between several network devices. These devices can be for
+example QEMU virtual Ethernet cards or virtual Host ethernet devices
+(TAP devices).
+
+
+
+
+<H3><A NAME="SEC27" HREF="qemu-doc.html#TOC27">3.7.2 Using TAP network interfaces</A></H3>
+
+<P>
+This is the standard way to connect QEMU to a real network. QEMU adds
+a virtual network device on your host (called <CODE>tapN</CODE>), and you
+can then configure it as if it was a real ethernet card.
+
+
+
+
+<H4><A NAME="SEC28" HREF="qemu-doc.html#TOC28">3.7.2.1 Linux host</A></H4>
+
+<P>
+As an example, you can download the <TT>`linux-test-xxx.tar.gz'</TT>
+archive and copy the script <TT>`qemu-ifup'</TT> in <TT>`/etc'</TT> and
+configure properly <CODE>sudo</CODE> so that the command <CODE>ifconfig</CODE>
+contained in <TT>`qemu-ifup'</TT> can be executed as root. You must verify
+that your host kernel supports the TAP network interfaces: the
+device <TT>`/dev/net/tun'</TT> must be present.
+
+
+<P>
+See section <A HREF="qemu-doc.html#SEC10">3.3 Invocation</A> to have examples of command lines using the
+TAP network interfaces.
+
+
+
+
+<H4><A NAME="SEC29" HREF="qemu-doc.html#TOC29">3.7.2.2 Windows host</A></H4>
+
+<P>
+There is a virtual ethernet driver for Windows 2000/XP systems, called
+TAP-Win32. But it is not included in standard QEMU for Windows,
+so you will need to get it separately. It is part of OpenVPN package,
+so download OpenVPN from : <A HREF="http://openvpn.net/">http://openvpn.net/</A>.
+
+
+
+
+<H3><A NAME="SEC30" HREF="qemu-doc.html#TOC30">3.7.3 Using the user mode network stack</A></H3>
+
+<P>
+By using the option <SAMP>`-net user'</SAMP> (default configuration if no
+<SAMP>`-net'</SAMP> option is specified), QEMU uses a completely user mode
+network stack (you don't need root priviledge to use the virtual
+network). The virtual network configuration is the following:
+
+
+
+<PRE>
+
+         QEMU VLAN      &#60;------&#62;  Firewall/DHCP server &#60;-----&#62; Internet
+                           |          (10.0.2.2)
+                           |
+                           ----&#62;  DNS server (10.0.2.3)
+                           |     
+                           ----&#62;  SMB server (10.0.2.4)
+</PRE>
+
+<P>
+The QEMU VM behaves as if it was behind a firewall which blocks all
+incoming connections. You can use a DHCP client to automatically
+configure the network in the QEMU VM. The DHCP server assign addresses
+to the hosts starting from 10.0.2.15.
+
+
+<P>
+In order to check that the user mode network is working, you can ping
+the address 10.0.2.2 and verify that you got an address in the range
+10.0.2.x from the QEMU virtual DHCP server.
+
+
+<P>
+Note that <CODE>ping</CODE> is not supported reliably to the internet as it
+would require root priviledges. It means you can only ping the local
+router (10.0.2.2).
+
+
+<P>
+When using the built-in TFTP server, the router is also the TFTP
+server.
+
+
+<P>
+When using the <SAMP>`-redir'</SAMP> option, TCP or UDP connections can be
+redirected from the host to the guest. It allows for example to
+redirect X11, telnet or SSH connections.
+
+
+
+
+<H3><A NAME="SEC31" HREF="qemu-doc.html#TOC31">3.7.4 Connecting VLANs between QEMU instances</A></H3>
+
+<P>
+Using the <SAMP>`-net socket'</SAMP> option, it is possible to make VLANs
+that span several QEMU instances. See section <A HREF="qemu-doc.html#SEC10">3.3 Invocation</A> to have a
+basic example.
+
+
+
+
+<H2><A NAME="SEC32" HREF="qemu-doc.html#TOC32">3.8 Direct Linux Boot</A></H2>
+
+<P>
+This section explains how to launch a Linux kernel inside QEMU without
+having to make a full bootable image. It is very useful for fast Linux
+kernel testing.
+
+
+<P>
+The syntax is:
+
+<PRE>
+qemu -kernel arch/i386/boot/bzImage -hda root-2.4.20.img -append "root=/dev/hda"
+</PRE>
+
+<P>
+Use <SAMP>`-kernel'</SAMP> to provide the Linux kernel image and
+<SAMP>`-append'</SAMP> to give the kernel command line arguments. The
+<SAMP>`-initrd'</SAMP> option can be used to provide an INITRD image.
+
+
+<P>
+When using the direct Linux boot, a disk image for the first hard disk
+<TT>`hda'</TT> is required because its boot sector is used to launch the
+Linux kernel.
+
+
+<P>
+If you do not need graphical output, you can disable it and redirect
+the virtual serial port and the QEMU monitor to the console with the
+<SAMP>`-nographic'</SAMP> option. The typical command line is:
+
+<PRE>
+qemu -kernel arch/i386/boot/bzImage -hda root-2.4.20.img \
+     -append "root=/dev/hda console=ttyS0" -nographic
+</PRE>
+
+<P>
+Use <KBD>Ctrl-a c</KBD> to switch between the serial console and the
+monitor (see section <A HREF="qemu-doc.html#SEC11">3.4 Keys</A>).
+
+
+
+
+<H2><A NAME="SEC33" HREF="qemu-doc.html#TOC33">3.9 USB emulation</A></H2>
+
+<P>
+QEMU emulates a PCI UHCI USB controller. You can virtually plug
+virtual USB devices or real host USB devices (experimental, works only
+on Linux hosts).  Qemu will automatically create and connect virtual USB hubs
+as necessary to connect multiple USB devices.
+
+
+
+
+<H3><A NAME="SEC34" HREF="qemu-doc.html#TOC34">3.9.1 Connecting USB devices</A></H3>
+
+<P>
+USB devices can be connected with the <SAMP>`-usbdevice'</SAMP> commandline option
+or the <CODE>usb_add</CODE> monitor command.  Available devices are:
+
+
+<DL COMPACT>
+
+<DT><VAR><CODE>mouse</CODE></VAR>
+<DD>
+Virtual Mouse.  This will override the PS/2 mouse emulation when activated.
+<DT><VAR><CODE>tablet</CODE></VAR>
+<DD>
+Pointer device that uses absolute coordinates (like a touchscreen).
+This means qemu is able to report the mouse position without having
+to grab the mouse.  Also overrides the PS/2 mouse emulation when activated.
+<DT><VAR><CODE>disk:file</CODE></VAR>
+<DD>
+Mass storage device based on <VAR>file</VAR> (see section <A HREF="qemu-doc.html#SEC15">3.6 Disk Images</A>)
+<DT><VAR><CODE>host:bus.addr</CODE></VAR>
+<DD>
+Pass through the host device identified by <VAR>bus.addr</VAR>
+(Linux only)
+<DT><VAR><CODE>host:vendor_id:product_id</CODE></VAR>
+<DD>
+Pass through the host device identified by <VAR>vendor_id:product_id</VAR>
+(Linux only)
+</DL>
+
+
+
+<H3><A NAME="SEC35" HREF="qemu-doc.html#TOC35">3.9.2 Using host USB devices on a Linux host</A></H3>
+
+<P>
+WARNING: this is an experimental feature. QEMU will slow down when
+using it. USB devices requiring real time streaming (i.e. USB Video
+Cameras) are not supported yet.
+
+
+
+<OL>
+<LI>If you use an early Linux 2.4 kernel, verify that no Linux driver
+
+is actually using the USB device. A simple way to do that is simply to
+disable the corresponding kernel module by renaming it from <TT>`mydriver.o'</TT>
+to <TT>`mydriver.o.disabled'</TT>.
+
+<LI>Verify that <TT>`/proc/bus/usb'</TT> is working (most Linux distributions should enable it by default). You should see something like that:
+
+
+<PRE>
+ls /proc/bus/usb
+001  devices  drivers
+</PRE>
+
+<LI>Since only root can access to the USB devices directly, you can either launch QEMU as root or change the permissions of the USB devices you want to use. For testing, the following suffices:
+
+
+<PRE>
+chown -R myuid /proc/bus/usb
+</PRE>
+
+<LI>Launch QEMU and do in the monitor:
+
+
+<PRE>
+info usbhost
+  Device 1.2, speed 480 Mb/s
+    Class 00: USB device 1234:5678, USB DISK
+</PRE>
+
+You should see the list of the devices you can use (Never try to use
+hubs, it won't work).
+
+<LI>Add the device in QEMU by using:
+
+
+<PRE>
+usb_add host:1234:5678
+</PRE>
+
+Normally the guest OS should report that a new USB device is
+plugged. You can use the option <SAMP>`-usbdevice'</SAMP> to do the same.
+
+<LI>Now you can try to use the host USB device in QEMU.
+
+</OL>
+
+<P>
+When relaunching QEMU, you may have to unplug and plug again the USB
+device to make it work again (this is a bug).
+
+
+
+
+<H2><A NAME="SEC36" HREF="qemu-doc.html#TOC36">3.10 GDB usage</A></H2>
+
+<P>
+QEMU has a primitive support to work with gdb, so that you can do
+'Ctrl-C' while the virtual machine is running and inspect its state.
+
+
+<P>
+In order to use gdb, launch qemu with the '-s' option. It will wait for a
+gdb connection:
+
+<PRE>
+&#62; qemu -s -kernel arch/i386/boot/bzImage -hda root-2.4.20.img \
+       -append "root=/dev/hda"
+Connected to host network interface: tun0
+Waiting gdb connection on port 1234
+</PRE>
+
+<P>
+Then launch gdb on the 'vmlinux' executable:
+
+<PRE>
+&#62; gdb vmlinux
+</PRE>
+
+<P>
+In gdb, connect to QEMU:
+
+<PRE>
+(gdb) target remote localhost:1234
+</PRE>
+
+<P>
+Then you can use gdb normally. For example, type 'c' to launch the kernel:
+
+<PRE>
+(gdb) c
+</PRE>
+
+<P>
+Here are some useful tips in order to use gdb on system code:
+
+
+
+<OL>
+<LI>
+
+Use <CODE>info reg</CODE> to display all the CPU registers.
+<LI>
+
+Use <CODE>x/10i $eip</CODE> to display the code at the PC position.
+<LI>
+
+Use <CODE>set architecture i8086</CODE> to dump 16 bit code. Then use
+<CODE>x/10i $cs*16+$eip</CODE> to dump the code at the PC position.
+</OL>
+
+
+
+<H2><A NAME="SEC37" HREF="qemu-doc.html#TOC37">3.11 Target OS specific information</A></H2>
+
+
+
+<H3><A NAME="SEC38" HREF="qemu-doc.html#TOC38">3.11.1 Linux</A></H3>
+
+<P>
+To have access to SVGA graphic modes under X11, use the <CODE>vesa</CODE> or
+the <CODE>cirrus</CODE> X11 driver. For optimal performances, use 16 bit
+color depth in the guest and the host OS.
+
+
+<P>
+When using a 2.6 guest Linux kernel, you should add the option
+<CODE>clock=pit</CODE> on the kernel command line because the 2.6 Linux
+kernels make very strict real time clock checks by default that QEMU
+cannot simulate exactly.
+
+
+<P>
+When using a 2.6 guest Linux kernel, verify that the 4G/4G patch is
+not activated because QEMU is slower with this patch. The QEMU
+Accelerator Module is also much slower in this case. Earlier Fedora
+Core 3 Linux kernel (&#60; 2.6.9-1.724_FC3) were known to incorporte this
+patch by default. Newer kernels don't have it.
+
+
+
+
+<H3><A NAME="SEC39" HREF="qemu-doc.html#TOC39">3.11.2 Windows</A></H3>
+
+<P>
+If you have a slow host, using Windows 95 is better as it gives the
+best speed. Windows 2000 is also a good choice.
+
+
+
+
+<H4><A NAME="SEC40" HREF="qemu-doc.html#TOC40">3.11.2.1 SVGA graphic modes support</A></H4>
+
+<P>
+QEMU emulates a Cirrus Logic GD5446 Video
+card. All Windows versions starting from Windows 95 should recognize
+and use this graphic card. For optimal performances, use 16 bit color
+depth in the guest and the host OS.
+
+
+<P>
+If you are using Windows XP as guest OS and if you want to use high
+resolution modes which the Cirrus Logic BIOS does not support (i.e. &#62;=
+1280x1024x16), then you should use the VESA VBE virtual graphic card
+(option <SAMP>`-std-vga'</SAMP>).
+
+
+
+
+<H4><A NAME="SEC41" HREF="qemu-doc.html#TOC41">3.11.2.2 CPU usage reduction</A></H4>
+
+<P>
+Windows 9x does not correctly use the CPU HLT
+instruction. The result is that it takes host CPU cycles even when
+idle. You can install the utility from
+<A HREF="http://www.user.cityline.ru/~maxamn/amnhltm.zip">http://www.user.cityline.ru/~maxamn/amnhltm.zip</A> to solve this
+problem. Note that no such tool is needed for NT, 2000 or XP.
+
+
+
+
+<H4><A NAME="SEC42" HREF="qemu-doc.html#TOC42">3.11.2.3 Windows 2000 disk full problem</A></H4>
+
+<P>
+Windows 2000 has a bug which gives a disk full problem during its
+installation. When installing it, use the <SAMP>`-win2k-hack'</SAMP> QEMU
+option to enable a specific workaround. After Windows 2000 is
+installed, you no longer need this option (this option slows down the
+IDE transfers).
+
+
+
+
+<H4><A NAME="SEC43" HREF="qemu-doc.html#TOC43">3.11.2.4 Windows 2000 shutdown</A></H4>
+
+<P>
+Windows 2000 cannot automatically shutdown in QEMU although Windows 98
+can. It comes from the fact that Windows 2000 does not automatically
+use the APM driver provided by the BIOS.
+
+
+<P>
+In order to correct that, do the following (thanks to Struan
+Bartlett): go to the Control Panel =&#62; Add/Remove Hardware &#38; Next =&#62;
+Add/Troubleshoot a device =&#62; Add a new device &#38; Next =&#62; No, select the
+hardware from a list &#38; Next =&#62; NT Apm/Legacy Support &#38; Next =&#62; Next
+(again) a few times. Now the driver is installed and Windows 2000 now
+correctly instructs QEMU to shutdown at the appropriate moment. 
+
+
+
+
+<H4><A NAME="SEC44" HREF="qemu-doc.html#TOC44">3.11.2.5 Share a directory between Unix and Windows</A></H4>
+
+<P>
+See section <A HREF="qemu-doc.html#SEC10">3.3 Invocation</A> about the help of the option <SAMP>`-smb'</SAMP>.
+
+
+
+
+<H4><A NAME="SEC45" HREF="qemu-doc.html#TOC45">3.11.2.6 Windows XP security problem</A></H4>
+
+<P>
+Some releases of Windows XP install correctly but give a security
+error when booting:
+
+<PRE>
+A problem is preventing Windows from accurately checking the
+license for this computer. Error code: 0x800703e6.
+</PRE>
+
+<P>
+The workaround is to install a service pack for XP after a boot in safe
+mode. Then reboot, and the problem should go away. Since there is no
+network while in safe mode, its recommended to download the full
+installation of SP1 or SP2 and transfer that via an ISO or using the
+vvfat block device ("-hdb fat:directory_which_holds_the_SP").
+
+
+
+
+<H3><A NAME="SEC46" HREF="qemu-doc.html#TOC46">3.11.3 MS-DOS and FreeDOS</A></H3>
+
+
+
+<H4><A NAME="SEC47" HREF="qemu-doc.html#TOC47">3.11.3.1 CPU usage reduction</A></H4>
+
+<P>
+DOS does not correctly use the CPU HLT instruction. The result is that
+it takes host CPU cycles even when idle. You can install the utility
+from <A HREF="http://www.vmware.com/software/dosidle210.zip">http://www.vmware.com/software/dosidle210.zip</A> to solve this
+problem.
+
+
+
+
+<H1><A NAME="SEC48" HREF="qemu-doc.html#TOC48">4. QEMU System emulator for non PC targets</A></H1>
+
+<P>
+QEMU is a generic emulator and it emulates many non PC
+machines. Most of the options are similar to the PC emulator. The
+differences are mentionned in the following sections.
+
+
+
+
+<H2><A NAME="SEC49" HREF="qemu-doc.html#TOC49">4.1 QEMU PowerPC System emulator</A></H2>
+
+<P>
+Use the executable <TT>`qemu-system-ppc'</TT> to simulate a complete PREP
+or PowerMac PowerPC system.
+
+
+<P>
+QEMU emulates the following PowerMac peripherals:
+
+
+
+<UL>
+<LI>
+
+UniNorth PCI Bridge 
+<LI>
+
+PCI VGA compatible card with VESA Bochs Extensions
+<LI>
+
+2 PMAC IDE interfaces with hard disk and CD-ROM support
+<LI>
+
+NE2000 PCI adapters
+<LI>
+
+Non Volatile RAM
+<LI>
+
+VIA-CUDA with ADB keyboard and mouse.
+</UL>
+
+<P>
+QEMU emulates the following PREP peripherals:
+
+
+
+<UL>
+<LI>
+
+PCI Bridge
+<LI>
+
+PCI VGA compatible card with VESA Bochs Extensions
+<LI>
+
+2 IDE interfaces with hard disk and CD-ROM support
+<LI>
+
+Floppy disk
+<LI>
+
+NE2000 network adapters
+<LI>
+
+Serial port
+<LI>
+
+PREP Non Volatile RAM
+<LI>
+
+PC compatible keyboard and mouse.
+</UL>
+
+<P>
+QEMU uses the Open Hack'Ware Open Firmware Compatible BIOS available at
+<A HREF="http://perso.magic.fr/l_indien/OpenHackWare/index.htm">http://perso.magic.fr/l_indien/OpenHackWare/index.htm</A>.
+
+
+<P>
+The following options are specific to the PowerPC emulation:
+
+
+<DL COMPACT>
+
+<DT><SAMP>`-g WxH[xDEPTH]'</SAMP>
+<DD>
+Set the initial VGA graphic mode. The default is 800x600x15.
+
+</DL>
+
+<P>
+More information is available at
+<A HREF="http://perso.magic.fr/l_indien/qemu-ppc/">http://perso.magic.fr/l_indien/qemu-ppc/</A>.
+
+
+
+
+<H2><A NAME="SEC50" HREF="qemu-doc.html#TOC50">4.2 Sparc32 System emulator invocation</A></H2>
+
+<P>
+Use the executable <TT>`qemu-system-sparc'</TT> to simulate a SparcStation 5
+(sun4m architecture). The emulation is somewhat complete.
+
+
+<P>
+QEMU emulates the following sun4m peripherals:
+
+
+
+<UL>
+<LI>
+
+IOMMU
+<LI>
+
+TCX Frame buffer
+<LI>
+
+Lance (Am7990) Ethernet
+<LI>
+
+Non Volatile RAM M48T08
+<LI>
+
+Slave I/O: timers, interrupt controllers, Zilog serial ports, keyboard
+and power/reset logic
+<LI>
+
+ESP SCSI controller with hard disk and CD-ROM support
+<LI>
+
+Floppy drive
+</UL>
+
+<P>
+The number of peripherals is fixed in the architecture.
+
+
+<P>
+Since version 0.8.2, QEMU uses OpenBIOS
+<A HREF="http://www.openbios.org/">http://www.openbios.org/</A>. OpenBIOS is a free (GPL v2) portable
+firmware implementation. The goal is to implement a 100% IEEE
+1275-1994 (referred to as Open Firmware) compliant firmware.
+
+
+<P>
+A sample Linux 2.6 series kernel and ram disk image are available on
+the QEMU web site. Please note that currently NetBSD, OpenBSD or
+Solaris kernels don't work.
+
+
+<P>
+The following options are specific to the Sparc emulation:
+
+
+<DL COMPACT>
+
+<DT><SAMP>`-g WxH'</SAMP>
+<DD>
+Set the initial TCX graphic mode. The default is 1024x768.
+
+</DL>
+
+
+
+<H2><A NAME="SEC51" HREF="qemu-doc.html#TOC51">4.3 Sparc64 System emulator invocation</A></H2>
+
+<P>
+Use the executable <TT>`qemu-system-sparc64'</TT> to simulate a Sun4u machine.
+The emulator is not usable for anything yet.
+
+
+<P>
+QEMU emulates the following sun4u peripherals:
+
+
+
+<UL>
+<LI>
+
+UltraSparc IIi APB PCI Bridge 
+<LI>
+
+PCI VGA compatible card with VESA Bochs Extensions
+<LI>
+
+Non Volatile RAM M48T59
+<LI>
+
+PC-compatible serial ports
+</UL>
+
+
+
+<H2><A NAME="SEC52" HREF="qemu-doc.html#TOC52">4.4 MIPS System emulator invocation</A></H2>
+
+<P>
+Use the executable <TT>`qemu-system-mips'</TT> to simulate a MIPS machine.
+The emulator is able to boot a Linux kernel and to run a Linux Debian
+installation from NFS. The following devices are emulated:
+
+
+
+<UL>
+<LI>
+
+MIPS R4K CPU
+<LI>
+
+PC style serial port
+<LI>
+
+NE2000 network card
+</UL>
+
+<P>
+More information is available in the QEMU mailing-list archive.
+
+
+
+
+<H2><A NAME="SEC53" HREF="qemu-doc.html#TOC53">4.5 ARM System emulator invocation</A></H2>
+
+<P>
+Use the executable <TT>`qemu-system-arm'</TT> to simulate a ARM
+machine. The ARM Integrator/CP board is emulated with the following
+devices:
+
+
+
+<UL>
+<LI>
+
+ARM926E or ARM1026E CPU
+<LI>
+
+Two PL011 UARTs
+<LI>
+
+SMC 91c111 Ethernet adapter
+<LI>
+
+PL110 LCD controller
+<LI>
+
+PL050 KMI with PS/2 keyboard and mouse.
+</UL>
+
+<P>
+The ARM Versatile baseboard is emulated with the following devices:
+
+
+
+<UL>
+<LI>
+
+ARM926E CPU
+<LI>
+
+PL190 Vectored Interrupt Controller
+<LI>
+
+Four PL011 UARTs
+<LI>
+
+SMC 91c111 Ethernet adapter
+<LI>
+
+PL110 LCD controller
+<LI>
+
+PL050 KMI with PS/2 keyboard and mouse.
+<LI>
+
+PCI host bridge.  Note the emulated PCI bridge only provides access to
+PCI memory space.  It does not provide access to PCI IO space.
+This means some devices (eg. ne2k_pci NIC) are not useable, and others
+(eg. rtl8139 NIC) are only useable when the guest drivers use the memory
+mapped control registers.
+<LI>
+
+PCI OHCI USB controller.
+<LI>
+
+LSI53C895A PCI SCSI Host Bus Adapter with hard disk and CD-ROM devices.
+</UL>
+
+<P>
+A Linux 2.6 test image is available on the QEMU web site. More
+information is available in the QEMU mailing-list archive.
+
+
+
+
+<H1><A NAME="SEC54" HREF="qemu-doc.html#TOC54">5. QEMU User space emulator</A></H1>
+
+
+
+<H2><A NAME="SEC55" HREF="qemu-doc.html#TOC55">5.1 Supported Operating Systems</A></H2>
+
+<P>
+The following OS are supported in user space emulation:
+
+
+
+<UL>
+<LI>
+
+Linux (refered as qemu-linux-user)
+<LI>
+
+Mac OS X/Darwin (refered as qemu-darwin-user)
+</UL>
+
+
+
+<H2><A NAME="SEC56" HREF="qemu-doc.html#TOC56">5.2 Linux User space emulator</A></H2>
+
+
+
+<H3><A NAME="SEC57" HREF="qemu-doc.html#TOC57">5.2.1 Quick Start</A></H3>
+
+<P>
+In order to launch a Linux process, QEMU needs the process executable
+itself and all the target (x86) dynamic libraries used by it. 
+
+
+
+<UL>
+
+<LI>On x86, you can just try to launch any process by using the native
+
+libraries:
+
+
+<PRE>
+qemu-i386 -L / /bin/ls
+</PRE>
+
+<CODE>-L /</CODE> tells that the x86 dynamic linker must be searched with a
+<TT>`/'</TT> prefix.
+
+<LI>Since QEMU is also a linux process, you can launch qemu with qemu (NOTE: you can only do that if you compiled QEMU from the sources):
+
+
+<PRE>
+qemu-i386 -L / qemu-i386 -L / /bin/ls
+</PRE>
+
+<LI>On non x86 CPUs, you need first to download at least an x86 glibc
+
+(<TT>`qemu-runtime-i386-XXX-.tar.gz'</TT> on the QEMU web page). Ensure that
+<CODE>LD_LIBRARY_PATH</CODE> is not set:
+
+
+<PRE>
+unset LD_LIBRARY_PATH 
+</PRE>
+
+Then you can launch the precompiled <TT>`ls'</TT> x86 executable:
+
+
+<PRE>
+qemu-i386 tests/i386/ls
+</PRE>
+
+You can look at <TT>`qemu-binfmt-conf.sh'</TT> so that
+QEMU is automatically launched by the Linux kernel when you try to
+launch x86 executables. It requires the <CODE>binfmt_misc</CODE> module in the
+Linux kernel.
+
+<LI>The x86 version of QEMU is also included. You can try weird things such as:
+
+
+<PRE>
+qemu-i386 /usr/local/qemu-i386/bin/qemu-i386 \
+          /usr/local/qemu-i386/bin/ls-i386
+</PRE>
+
+</UL>
+
+
+
+<H3><A NAME="SEC58" HREF="qemu-doc.html#TOC58">5.2.2 Wine launch</A></H3>
+
+
+<UL>
+
+<LI>Ensure that you have a working QEMU with the x86 glibc
+
+distribution (see previous section). In order to verify it, you must be
+able to do:
+
+
+<PRE>
+qemu-i386 /usr/local/qemu-i386/bin/ls-i386
+</PRE>
+
+<LI>Download the binary x86 Wine install
+
+(<TT>`qemu-XXX-i386-wine.tar.gz'</TT> on the QEMU web page). 
+
+<LI>Configure Wine on your account. Look at the provided script
+
+<TT>`/usr/local/qemu-i386/@/bin/wine-conf.sh'</TT>. Your previous
+<CODE>${HOME}/.wine</CODE> directory is saved to <CODE>${HOME}/.wine.org</CODE>.
+
+<LI>Then you can try the example <TT>`putty.exe'</TT>:
+
+
+<PRE>
+qemu-i386 /usr/local/qemu-i386/wine/bin/wine \
+          /usr/local/qemu-i386/wine/c/Program\ Files/putty.exe
+</PRE>
+
+</UL>
+
+
+
+<H3><A NAME="SEC59" HREF="qemu-doc.html#TOC59">5.2.3 Command line options</A></H3>
+
+
+<PRE>
+usage: qemu-i386 [-h] [-d] [-L path] [-s size] program [arguments...]
+</PRE>
+
+<DL COMPACT>
+
+<DT><SAMP>`-h'</SAMP>
+<DD>
+Print the help
+<DT><SAMP>`-L path'</SAMP>
+<DD>
+Set the x86 elf interpreter prefix (default=/usr/local/qemu-i386)
+<DT><SAMP>`-s size'</SAMP>
+<DD>
+Set the x86 stack size in bytes (default=524288)
+</DL>
+
+<P>
+Debug options:
+
+
+<DL COMPACT>
+
+<DT><SAMP>`-d'</SAMP>
+<DD>
+Activate log (logfile=/tmp/qemu.log)
+<DT><SAMP>`-p pagesize'</SAMP>
+<DD>
+Act as if the host page size was 'pagesize' bytes
+</DL>
+
+
+
+<H3><A NAME="SEC60" HREF="qemu-doc.html#TOC60">5.2.4 Other binaries</A></H3>
+
+<P>
+<CODE>qemu-arm</CODE> is also capable of running ARM "Angel" semihosted ELF
+binaries (as implemented by the arm-elf and arm-eabi Newlib/GDB
+configurations), and arm-uclinux bFLT format binaries.
+
+
+<P>
+<CODE>qemu-m68k</CODE> is capable of running semihosted binaries using the BDM
+(m5xxx-ram-hosted.ld) or m68k-sim (sim.ld) syscall interfaces, and
+coldfire uClinux bFLT format binaries.
+
+
+<P>
+The binary format is detected automatically.
+
+
+
+
+<H2><A NAME="SEC61" HREF="qemu-doc.html#TOC61">5.3 Mac OS X/Darwin User space emulator</A></H2>
+
+
+
+<H3><A NAME="SEC62" HREF="qemu-doc.html#TOC62">5.3.1 Mac OS X/Darwin Status</A></H3>
+
+
+<UL>
+<LI>
+
+target x86 on x86: Most apps (Cocoa and Carbon too) works. [1]
+<LI>
+
+target PowerPC on x86: Not working as the ppc commpage can't be mapped (yet!)
+<LI>
+
+target x86 on x86: Most apps (Cocoa and Carbon too) works. [1]
+<LI>
+
+target x86 on PowerPC: most utilities work. Cocoa and Carbon apps are not yet supported.
+</UL>
+
+<P>
+[1] If you're host commpage can be executed by qemu.
+
+
+
+
+<H3><A NAME="SEC63" HREF="qemu-doc.html#TOC63">5.3.2 Quick Start</A></H3>
+
+<P>
+In order to launch a Mac OS X/Darwin process, QEMU needs the process executable
+itself and all the target dynamic libraries used by it. If you don't have the FAT
+libraries (you're running Mac OS X/ppc) you'll need to obtain it from a Mac OS X
+CD or compile them by hand.
+
+
+
+<UL>
+
+<LI>On x86, you can just try to launch any process by using the native
+
+libraries:
+
+
+<PRE>
+qemu-darwin-i386 /bin/ls
+</PRE>
+
+or to run the ppc version of the executable:
+
+
+<PRE>
+qemu-darwin-ppc /bin/ls
+</PRE>
+
+<LI>On ppc, you'll have to tell qemu where your x86 libraries (and dynamic linker)
+
+are installed:
+
+
+<PRE>
+qemu-darwin-i386 -L /opt/x86_root/ /bin/ls
+</PRE>
+
+<CODE>-L /opt/x86_root/</CODE> tells that the dynamic linker (dyld) path is in
+<TT>`/opt/x86_root/usr/bin/dyld'</TT>.
+
+</UL>
+
+
+
+<H3><A NAME="SEC64" HREF="qemu-doc.html#TOC64">5.3.3 Command line options</A></H3>
+
+
+<PRE>
+usage: qemu-darwin-i386 [-h] [-d] [-L path] [-s size] program [arguments...]
+</PRE>
+
+<DL COMPACT>
+
+<DT><SAMP>`-h'</SAMP>
+<DD>
+Print the help
+<DT><SAMP>`-L path'</SAMP>
+<DD>
+Set the library root path (default=/)
+<DT><SAMP>`-s size'</SAMP>
+<DD>
+Set the stack size in bytes (default=524288)
+</DL>
+
+<P>
+Debug options:
+
+
+<DL COMPACT>
+
+<DT><SAMP>`-d'</SAMP>
+<DD>
+Activate log (logfile=/tmp/qemu.log)
+<DT><SAMP>`-p pagesize'</SAMP>
+<DD>
+Act as if the host page size was 'pagesize' bytes
+</DL>
+
+
+
+<H1><A NAME="SEC65" HREF="qemu-doc.html#TOC65">6. Compilation from the sources</A></H1>
+
+
+
+<H2><A NAME="SEC66" HREF="qemu-doc.html#TOC66">6.1 Linux/Unix</A></H2>
+
+
+
+<H3><A NAME="SEC67" HREF="qemu-doc.html#TOC67">6.1.1 Compilation</A></H3>
+
+<P>
+First you must decompress the sources:
+
+<PRE>
+cd /tmp
+tar zxvf qemu-x.y.z.tar.gz
+cd qemu-x.y.z
+</PRE>
+
+<P>
+Then you configure QEMU and build it (usually no options are needed):
+
+<PRE>
+./configure
+make
+</PRE>
+
+<P>
+Then type as root user:
+
+<PRE>
+make install
+</PRE>
+
+<P>
+to install QEMU in <TT>`/usr/local'</TT>.
+
+
+
+
+<H3><A NAME="SEC68" HREF="qemu-doc.html#TOC68">6.1.2 GCC version</A></H3>
+
+<P>
+In order to compile QEMU successfully, it is very important that you
+have the right tools. The most important one is gcc. On most hosts and
+in particular on x86 ones, <EM>gcc 4.x is not supported</EM>. If your
+Linux distribution includes a gcc 4.x compiler, you can usually
+install an older version (it is invoked by <CODE>gcc32</CODE> or
+<CODE>gcc34</CODE>). The QEMU configure script automatically probes for
+these older versions so that usally you don't have to do anything.
+
+
+
+
+<H2><A NAME="SEC69" HREF="qemu-doc.html#TOC69">6.2 Windows</A></H2>
+
+
+<UL>
+<LI>Install the current versions of MSYS and MinGW from
+
+<A HREF="http://www.mingw.org/">http://www.mingw.org/</A>. You can find detailed installation
+instructions in the download section and the FAQ.
+
+<LI>Download
+
+the MinGW development library of SDL 1.2.x
+(<TT>`SDL-devel-1.2.x-@/mingw32.tar.gz'</TT>) from
+<A HREF="http://www.libsdl.org">http://www.libsdl.org</A>. Unpack it in a temporary place, and
+unpack the archive <TT>`i386-mingw32msvc.tar.gz'</TT> in the MinGW tool
+directory. Edit the <TT>`sdl-config'</TT> script so that it gives the
+correct SDL directory when invoked.
+
+<LI>Extract the current version of QEMU.
+
+ 
+<LI>Start the MSYS shell (file <TT>`msys.bat'</TT>).
+
+<LI>Change to the QEMU directory. Launch <TT>`./configure'</TT> and
+
+<TT>`make'</TT>.  If you have problems using SDL, verify that
+<TT>`sdl-config'</TT> can be launched from the MSYS command line.
+
+<LI>You can install QEMU in <TT>`Program Files/Qemu'</TT> by typing
+
+<TT>`make install'</TT>. Don't forget to copy <TT>`SDL.dll'</TT> in
+<TT>`Program Files/Qemu'</TT>.
+
+</UL>
+
+
+
+<H2><A NAME="SEC70" HREF="qemu-doc.html#TOC70">6.3 Cross compilation for Windows with Linux</A></H2>
+
+
+<UL>
+<LI>
+
+Install the MinGW cross compilation tools available at
+<A HREF="http://www.mingw.org/">http://www.mingw.org/</A>.
+
+<LI>
+
+Install the Win32 version of SDL (<A HREF="http://www.libsdl.org">http://www.libsdl.org</A>) by
+unpacking <TT>`i386-mingw32msvc.tar.gz'</TT>. Set up the PATH environment
+variable so that <TT>`i386-mingw32msvc-sdl-config'</TT> can be launched by
+the QEMU configuration script.
+
+<LI>
+
+Configure QEMU for Windows cross compilation:
+
+<PRE>
+./configure --enable-mingw32
+</PRE>
+
+If necessary, you can change the cross-prefix according to the prefix
+choosen for the MinGW tools with --cross-prefix. You can also use
+--prefix to set the Win32 install path.
+
+<LI>You can install QEMU in the installation directory by typing
+
+<TT>`make install'</TT>. Don't forget to copy <TT>`SDL.dll'</TT> in the
+installation directory. 
+
+</UL>
+
+<P>
+Note: Currently, Wine does not seem able to launch
+QEMU for Win32.
+
+
+
+
+<H2><A NAME="SEC71" HREF="qemu-doc.html#TOC71">6.4 Mac OS X</A></H2>
+
+<P>
+The Mac OS X patches are not fully merged in QEMU, so you should look
+at the QEMU mailing list archive to have all the necessary
+information.
+
+
+
+
+<H1><A NAME="SEC72" HREF="qemu-doc.html#TOC72">7. Index</A></H1>
+<P>
+Jump to:
+<P>
+
+
+<P><HR><P>
+This document was generated on 5 February 2007 using
+<A HREF="http://wwwinfo.cern.ch/dis/texi2html/">texi2html</A>&nbsp;1.56k.
+</BODY>
+</HTML>
