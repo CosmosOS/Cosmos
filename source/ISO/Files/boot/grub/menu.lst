@@ -1,0 +1,5 @@
+default 0
+timeout 0
+# Cosmos
+title Cosmos
+kernel /output.obj
