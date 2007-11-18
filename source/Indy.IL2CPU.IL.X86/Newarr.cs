@@ -36,7 +36,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			mCtorName = CPU.Label.GenerateLabelName(xCtor);
 			mIsReference = xTypeDef.IsClass;
 			Engine.QueueMethod(xCtor);
-			DoQueueMethod(RuntimeEngineRefs.Heap_AllocNewObjectRef);
+			DoQueueMethod(GCImplementationRefs.AllocNewObjectRef);
 		}
 
 		public override void DoAssemble() {
@@ -54,11 +54,19 @@ namespace Indy.IL2CPU.IL.X86 {
 			Assembler.StackSizes.Push(4);
 			Add(Assembler);
 			// the total array size is now on the stack.
-			new CPUx86.Call(CPU.Label.GenerateLabelName(RuntimeEngineRefs.Heap_AllocNewObjectRef));
+			Engine.QueueMethodRef(GCImplementationRefs.AllocNewObjectRef);
+			new CPUx86.Call(CPU.Label.GenerateLabelName(GCImplementationRefs.AllocNewObjectRef));
 			Assembler.StackSizes.Pop();
 			new CPUx86.Pushd("eax");
-			Assembler.StackSizes.Push(4);
 			new CPUx86.Pushd("eax");
+			new CPUx86.Pushd("eax");
+			new CPUx86.Pushd("eax");
+			new CPUx86.Pushd("eax");
+			Engine.QueueMethodRef(GCImplementationRefs.IncRefCountRef);
+			new CPUx86.Call(CPU.Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef));
+			new CPUx86.Call(CPU.Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef));			
+			Assembler.StackSizes.Push(4);
+			new CPUx86.Pop("eax");
 			Assembler.StackSizes.Push(4);
 			new CPUx86.Move("dword [eax]", "0x" + Engine.RegisterType(Engine.GetTypeDefinition("mscorlib", "System.Array")).ToString("X"));
 			new CPUx86.Add("eax", "4");

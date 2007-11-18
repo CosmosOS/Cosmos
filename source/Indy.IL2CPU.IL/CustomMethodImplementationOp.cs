@@ -13,6 +13,7 @@ namespace Indy.IL2CPU.IL {
 		System_Void___Indy_IL2CPU_RuntimeEngine_Heap_Initialize____,
 		System_Void___Indy_IL2CPU_RuntimeEngine_Heap_Shutdown____,
 		System_UInt32___Indy_IL2CPU_RuntimeEngine_Heap_AllocNewObject___System_UInt32___,
+		System_Void___Indy_IL2CPU_RuntimeEngine_Heap_Free___System_UInt32___,
 		System_Void___Indy_IL2CPU_RuntimeEngine_ExitProcess___System_Int32___,
 		System_Int32_System_Array_get_Length____
 	}
@@ -61,6 +62,10 @@ namespace Indy.IL2CPU.IL {
 				case CustomMethodEnum.System_Int32_System_Array_get_Length____:
 					Assemble_System_Int32_System_Array_get_Length____();
 					break;
+				case CustomMethodEnum.System_Void___Indy_IL2CPU_RuntimeEngine_Heap_Free___System_UInt32___: {
+					Assemble_System_Void___Indy_IL2CPU_RuntimeEngine_Heap_Free___System_UInt32___();
+					break;
+				}
 				default:
 					throw new Exception("Method not handled: '" + Method + "'!");
 			}
@@ -71,5 +76,6 @@ namespace Indy.IL2CPU.IL {
 		protected abstract void Assemble_System_Void___Indy_IL2CPU_RuntimeEngine_Heap_Initialize____();
 		protected abstract void Assemble_System_Void___Indy_IL2CPU_RuntimeEngine_ExitProcess___System_Int32___();
 		protected abstract void Assemble_System_Int32_System_Array_get_Length____();
+		protected abstract void Assemble_System_Void___Indy_IL2CPU_RuntimeEngine_Heap_Free___System_UInt32___();
 	}
 }

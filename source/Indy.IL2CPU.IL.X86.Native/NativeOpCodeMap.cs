@@ -276,7 +276,9 @@ namespace Indy.IL2CPU.IL.X86.Native {
 				case GluePlaceholderMethodTypeEnum.GDT_LoadArray: {
 						FieldDefinition xFieldDef = GetGlueField(GlueFieldTypeEnum.GDT_Array);
 						string xFieldName = Assembler.DataMember.GetStaticFieldName(xFieldDef);
-						string xFieldData = "0,0,0,0,2,0,0,0,3,0,0,0";
+						string xFieldData = "0,0,0,0,";
+						xFieldData += BitConverter.GetBytes((uint)InstanceTypeEnum.StaticEmbeddedArray).Aggregate("", (b, r) => r + b + ",");
+						xFieldData += "3,0,0,0,";
 						for (int i = 0; i < 3; i++) {
 							xFieldData += ",0,0,0,0,0,0,0,0";
 						}
@@ -318,7 +320,9 @@ namespace Indy.IL2CPU.IL.X86.Native {
 						mIDTSetHandlerMethodName = Label.GenerateLabelName(xTheMethod);
 						FieldDefinition xFieldDef = GetGlueField(GlueFieldTypeEnum.IDT_Array);
 						string xFieldName = Assembler.DataMember.GetStaticFieldName(xFieldDef);
-						string xFieldData = "0,0,0,0,2,0,0,0,1,0,0,0";
+						string xFieldData = "0,0,0,0,";
+						xFieldData += BitConverter.GetBytes((uint)InstanceTypeEnum.StaticEmbeddedArray).Aggregate("", (b, r) => r + b + ",");
+						xFieldData += "1,0,0,0";
 						for (int i = 0; i < 256; i++) {
 							xFieldData += ",0,0,0,0,0,0,0,0";
 						}
@@ -353,7 +357,7 @@ namespace Indy.IL2CPU.IL.X86.Native {
 					}
 				case GluePlaceholderMethodTypeEnum.IO_ReadByte: {
 						new CPU.Xor("eax", "eax");
-						IL.X86.Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0].VirtualAddresses, aMethodInfo.Arguments[0].Size);
+						IL.X86.Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
 						new CPU.Pop("edx");
 						new CPU.Move("eax", "0");
 						new CPUNative.In("al", "dx");
@@ -361,9 +365,9 @@ namespace Indy.IL2CPU.IL.X86.Native {
 						break;
 					}
 				case GluePlaceholderMethodTypeEnum.IO_WriteByte: {
-						Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0].VirtualAddresses, aMethodInfo.Arguments[0].Size);
+						Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
 						new CPU.Pop("edx");
-						Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[1].VirtualAddresses, aMethodInfo.Arguments[1].Size);
+						Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[1]);
 						new CPU.Pop("eax");
 						new CPUNative.Out("dx", "al");
 						break;
@@ -384,7 +388,7 @@ namespace Indy.IL2CPU.IL.X86.Native {
 		private string mIDTSetHandlerMethodName;
 
 		private static void DoAssemble_String_GetByteFromChar(Assembler.Assembler aAssembler, MethodInformation aMethodInfo) {
-			X86.Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0].VirtualAddresses, aMethodInfo.Arguments[0].Size);
+			X86.Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
 		}
 
 		public override void PostProcess(Indy.IL2CPU.Assembler.Assembler aAssembler) {
@@ -394,7 +398,7 @@ namespace Indy.IL2CPU.IL.X86.Native {
 			Engine.QueueMethod(xTheMethod);
 			mIDTSetHandlerMethodName = Label.GenerateLabelName(xTheMethod);
 			Console.WriteLine("IDTEntry size = {0}", Engine.GetFieldStorageSize(Engine.GetTypeDefinition(typeof(Cosmos.Kernel.Boot.Glue.IDTEntryStruct).Assembly.GetName().Name, typeof(Cosmos.Kernel.Boot.Glue.IDTEntryStruct).FullName)));
-			X86.X86MethodHeaderOp.AssembleHeader(aAssembler, "___________REGISTER___ISRS_____", new int[0]);
+			X86.X86MethodHeaderOp.AssembleHeader(aAssembler, "___________REGISTER___ISRS_____", new int[0], new MethodInformation.Argument[0]);
 			string xInterruptHandlerLabel = Label.GenerateLabelName(GetGlueMethod(GlueMethodTypeEnum.IDT_InterruptHandler));
 			int[] xInterruptsWithParam = new int[] { 8, 10, 11, 12, 13, 14 };
 			for (int i = 0; i < 256; i++) {
@@ -404,7 +408,7 @@ namespace Indy.IL2CPU.IL.X86.Native {
 				new CPU.Pushd("0x8E");
 				new CPU.Call(mIDTSetHandlerMethodName);
 			}
-			X86.X86MethodFooterOp.AssembleFooter(0, aAssembler, new int[0], 0);
+			X86.X86MethodFooterOp.AssembleFooter(0, aAssembler, new MethodInformation.Variable[0], new MethodInformation.Argument[0], 0);
 			for (int j = 0; j < 256; j++) {
 				new Label("____INTERRUPT_HANDLER___" + j);
 				new CPUNative.Cli();
@@ -465,8 +469,8 @@ namespace Indy.IL2CPU.IL.X86.Native {
 					break;
 				}
 			}
-			NativeMethodHeaderOp.AssembleHeader(aAssembler, xGetResourceLabelName, new int[0]);
-			Op.Ldarg(aAssembler, xGetResourceMethodInfo.Arguments[0].VirtualAddresses, xGetResourceMethodInfo.Arguments[0].Size);
+			NativeMethodHeaderOp.AssembleHeader(aAssembler, xGetResourceLabelName, new int[0], new MethodInformation.Argument[0]);
+			Op.Ldarg(aAssembler, xGetResourceMethodInfo.Arguments[0]);
 			new CPU.Pop("eax");
 			foreach (int xId in xResources.Keys) {
 				new CPU.Move("ecx", "0x" + xId.ToString("X"));
@@ -476,7 +480,7 @@ namespace Indy.IL2CPU.IL.X86.Native {
 				new CPU.JumpAlways(".END__OF__METHOD");
 				new Label(".__after__" + xId);
 			}
-			NativeMethodFooterOp.AssembleFooter(4, aAssembler, new int[0], 4);
+			NativeMethodFooterOp.AssembleFooter(4, aAssembler, new MethodInformation.Variable[0], new MethodInformation.Argument[0], 4);
 		}
 	}
 }

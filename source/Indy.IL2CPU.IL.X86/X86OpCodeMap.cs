@@ -121,7 +121,7 @@ namespace Indy.IL2CPU.IL.X86 {
 					if (ObjectUtilities.IsDelegate(aMethodInfo.MethodDefinition.DeclaringType)) {
 						if (aMethodInfo.LabelName.EndsWith("__ctor___System_Object__System_IntPtr___")) {
 							for (int i = 0; i < aMethodInfo.Arguments.Length; i++) {
-								Op.Ldarg(aAssembler, aMethodInfo.Arguments[i].VirtualAddresses, aMethodInfo.Arguments[i].Size);
+								Op.Ldarg(aAssembler, aMethodInfo.Arguments[i]);
 							}
 							new Call(CustomImplementations.System.EventHandlerImplRefs.CtorRef) {
 								Assembler = aAssembler
@@ -132,16 +132,16 @@ namespace Indy.IL2CPU.IL.X86 {
 							// param 0 is instance of eventhandler
 							// param 1 is sender
 							// param 2 is eventargs
-							Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0].VirtualAddresses, aMethodInfo.Arguments[0].Size);
+							Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
 							new CPUx86.Push("0x" + (ObjectImpl.FieldDataOffset + 4).ToString("X"));
 							aAssembler.StackSizes.Push(4);
 							Ldarg.Add(aAssembler);
 							new CPUx86.Pop("eax");
 							new CPUx86.Pushd("[eax]");
 							for (int i = 1; i < aMethodInfo.Arguments.Length; i++) {
-								Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[i].VirtualAddresses, aMethodInfo.Arguments[i].Size);
+								Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[i]);
 							}
-							Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0].VirtualAddresses, aMethodInfo.Arguments[0].Size);
+							Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
 							new CPUx86.Push("0x" + ObjectImpl.FieldDataOffset.ToString("X"));
 							aAssembler.StackSizes.Push(4);
 							Ldarg.Add(aAssembler);
@@ -163,16 +163,16 @@ namespace Indy.IL2CPU.IL.X86 {
 			//   0: location
 			//   1: value
 			//   2: comparand
-			Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[2].VirtualAddresses, aMethodInfo.Arguments[2].Size);
+			Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[2]);
 			new CPUx86.Pop("eax");
-			Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[1].VirtualAddresses, aMethodInfo.Arguments[1].Size);
+			Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[1]);
 			new CPUx86.Pop("edx");
-			Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0].VirtualAddresses, aMethodInfo.Arguments[0].Size);
+			Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
 			new CPUx86.Pop("ecx");
 			new CPUx86.Pushd("[ecx]");
 			new CPUx86.Pop("ecx");
 			new CPUx86.CmpXchg("ecx", "edx");
-			Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0].VirtualAddresses, aMethodInfo.Arguments[0].Size);
+			Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
 			new CPUx86.Pop("eax");
 			new CPUx86.Move("[eax]", "ecx");
 			new CPUx86.Pushd("eax");

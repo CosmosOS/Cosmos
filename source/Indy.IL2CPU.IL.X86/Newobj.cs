@@ -22,20 +22,26 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		public override void DoAssemble() {
 			Assemble(Assembler, ObjectUtilities.GetObjectStorageSize(Engine.GetDefinitionFromTypeReference(CtorDef.DeclaringType)), CtorDef, Engine.RegisterTypeRef(CtorDef.DeclaringType));
-			//Assembler.Add(new CPUx86.Add("esp", objSize.ToString()));
 		}
 
 		public static void Assemble(Assembler.Assembler aAssembler, int aObjectSize, MethodDefinition aCtorDef, int aTypeId) {
 			if (aCtorDef != null) {
 				Engine.QueueMethodRef(aCtorDef);
 			}
-			Engine.QueueMethodRef(RuntimeEngineRefs.Heap_AllocNewObjectRef);
+			Engine.QueueMethodRef(GCImplementationRefs.AllocNewObjectRef);
+			Engine.QueueMethodRef(GCImplementationRefs.IncRefCountRef);
 			new CPUx86.Pushd("0" + aObjectSize.ToString("X").ToUpper() + "h");
-			new CPUx86.Call(CPU.Label.GenerateLabelName(RuntimeEngineRefs.Heap_AllocNewObjectRef));
+			new CPUx86.Call(CPU.Label.GenerateLabelName(GCImplementationRefs.AllocNewObjectRef));
 			new CPUx86.Pushd("eax");
 			new CPUx86.Pushd("eax");
+			new CPUx86.Pushd("eax");
+			new CPUx86.Pushd("eax");
+			new CPUx86.Pushd("eax");
+			new CPUx86.Call(CPU.Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef));
+			new CPUx86.Call(CPU.Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef));
 			aAssembler.StackSizes.Push(4);
 			aAssembler.StackSizes.Push(4);
+			new CPUx86.Pop("eax");
 			new Move("dword [eax]", "0" + aTypeId.ToString("X") + "h");
 			new Move("dword [eax + 4]", "0" + InstanceTypeEnum.NormalObject.ToString("X") + "h");
 			if (aCtorDef != null) {

@@ -15,7 +15,7 @@ namespace Indy.IL2CPU.IL {
 
 		public MethodDefinition ProxiedMethod;
 
-		protected abstract void Ldarg(int index);
+		protected abstract void Ldarg(int aIndex);
 		protected abstract void Ldflda(TypeInformation.Field aField);
 		protected abstract void CallProxiedMethod();
 		protected abstract void Ldloc(int index);

@@ -18,6 +18,20 @@ namespace Indy.IL2CPU {
 			return IsDelegate(xType.BaseType);
 		}
 
+		public static bool IsArray(TypeReference aType) {
+			TypeDefinition xType = Engine.GetDefinitionFromTypeReference(aType);
+			if (xType.FullName == "System.Object") {
+				return false;
+			}
+			if (xType.BaseType.FullName == "System.Array") {
+				return true;
+			}
+			if (xType.BaseType.FullName == "System.Object") {
+				return false;
+			}
+			return IsArray(xType.BaseType);
+		}
+
 		public static int GetObjectStorageSize(TypeDefinition aType) {
 			if (aType == null) {
 				throw new ArgumentNullException("aType");

@@ -11,7 +11,6 @@ namespace Indy.IL2CPU.IL.X86.Native {
 		}
 
 		protected override void Assemble_System_UInt32___Indy_IL2CPU_RuntimeEngine_Heap_AllocNewObject___System_UInt32___() {
-			throw new NotImplementedException();
 		}
 
 		protected override void Assemble_System_Void___Indy_IL2CPU_RuntimeEngine_Heap_Shutdown____() {
@@ -24,7 +23,9 @@ namespace Indy.IL2CPU.IL.X86.Native {
 		}
 
 		protected override void Assemble_System_Int32_System_Array_get_Length____() {
-			throw new NotImplementedException();
+		}
+
+		protected override void Assemble_System_Void___Indy_IL2CPU_RuntimeEngine_Heap_Free___System_UInt32___() {
 		}
 	}
 }

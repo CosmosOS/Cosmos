@@ -20,6 +20,10 @@ namespace Indy.IL2CPU {
 			return 0;
 		}
 
+		public static void Heap_Free(uint aObject) {
+			//
+		}
+
 		public static void Heap_Shutdown() {
 			//PInvokes.Kernel32_HeapDestroy(HeapHandle);
 			//HeapHandle = 0;

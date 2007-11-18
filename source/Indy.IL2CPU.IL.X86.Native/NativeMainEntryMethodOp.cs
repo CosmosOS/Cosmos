@@ -16,7 +16,7 @@ namespace Indy.IL2CPU.IL.X86.Native {
 		}
 
 		public override void Exit() {
-			NativeMethodFooterOp.AssembleFooter(0, mAssembler, new int[0], 0);
+			NativeMethodFooterOp.AssembleFooter(0, mAssembler, new MethodInformation.Variable[0], new MethodInformation.Argument[0], 0);
 		}
 	}
 }

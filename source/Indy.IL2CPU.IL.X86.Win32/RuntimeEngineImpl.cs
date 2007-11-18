@@ -13,6 +13,10 @@ namespace Indy.IL2CPU.IL.X86.Win32 {
 			return PInvokes.Kernel32_HeapAlloc(HeapHandle, 0x00000008, aSize);
 		}
 
+		public static void Heap_Free(uint aObject) {
+			PInvokes.Kernel32_HeapFree(HeapHandle, 0, aObject);
+		}
+
 		public static void Heap_Shutdown() {
 			PInvokes.Kernel32_HeapDestroy(HeapHandle);
 			HeapHandle = 0;

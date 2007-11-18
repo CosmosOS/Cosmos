@@ -15,6 +15,10 @@ namespace Indy.IL2CPU.Assembler {
 		private IndexableCollection<ImportMember> mImportMembers = new IndexableCollection<ImportMember>();
 		private readonly bool mInMetalMode = false;
 		public readonly Stack<int> StackSizes = new Stack<int>();
+		public bool DebugMode {
+			get;
+			set;		 
+		}
 		public static Assembler CurrentInstance {
 			get;
 			private set;

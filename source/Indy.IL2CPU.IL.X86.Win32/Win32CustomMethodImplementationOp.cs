@@ -26,6 +26,10 @@ namespace Indy.IL2CPU.IL.X86.Win32 {
 			PassCall(RuntimeEngineImplRefs.Heap_InitializeRef);
 		}
 
+		protected override void Assemble_System_Void___Indy_IL2CPU_RuntimeEngine_Heap_Free___System_UInt32___() {
+			PassCall(RuntimeEngineImplRefs.Heap_FreeRef);
+		}
+
 		protected override void Assemble_System_Void___Indy_IL2CPU_RuntimeEngine_ExitProcess___System_Int32___() {
 			PassCall(RuntimeEngineImplRefs.ExitProcessRef);
 		}

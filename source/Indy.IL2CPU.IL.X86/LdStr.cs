@@ -29,7 +29,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			var xDataByteArray = new StringBuilder();
 			xDataByteArray.Append(BitConverter.GetBytes(Engine.RegisterType(Engine.GetTypeDefinition("mscorlib", "System.Array"))).Aggregate("", (r, b) => r + b + ","));
-			xDataByteArray.Append(BitConverter.GetBytes((int)InstanceTypeEnum.Array).Aggregate("", (r, b) => r + b + ","));
+			xDataByteArray.Append(BitConverter.GetBytes((uint)InstanceTypeEnum.StaticEmbeddedArray).Aggregate("", (r, b) => r + b + ","));
 			xDataByteArray.Append(BitConverter.GetBytes(LiteralStr.Length).Aggregate("", (r, b) => r + b + ","));
 			xDataByteArray.Append(xEncoding.GetBytes(LiteralStr).Aggregate("", (r, b) => r + b + ","));
 			xDataByteArray.Append("0,");
@@ -41,7 +41,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				xDataName = Assembler.GetIdentifier("StringLiteral");
 				StringBuilder xRefByteArray = new StringBuilder();
 				xRefByteArray.Append("0x" + ((uint)Engine.RegisterType(Engine.GetTypeDefinition("mscorlib", "System.String"))).ToString("X"));
-				xRefByteArray.Append(",0x" + ((int)InstanceTypeEnum.NormalObject).ToString("X") + ",0,");
+				xRefByteArray.Append(",0x" + ((uint)InstanceTypeEnum.StaticEmbeddedObject).ToString("X") + ",0,");
 				xRefByteArray.Append(xDataName + "__Contents,");
 				xRefByteArray.Append("0,0,0");
 				Assembler.DataMembers.Add(new DataMember(xDataName, "dd", xRefByteArray.ToString()));

@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 
 namespace Indy.IL2CPU {
-	public enum InstanceTypeEnum {
+	public enum InstanceTypeEnum: uint {
 		NormalObject = 1,
 		Array = 2,
-		BoxedValueType = 3
+		BoxedValueType = 3,
+		StaticEmbeddedObject = 0x80000001,
+		StaticEmbeddedArray = 0x80000002
 	}
 	public static class ObjectImpl {
 		/// <summary>

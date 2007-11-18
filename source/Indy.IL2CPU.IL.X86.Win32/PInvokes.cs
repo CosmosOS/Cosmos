@@ -15,6 +15,9 @@ namespace Indy.IL2CPU.IL.X86.Win32 {
 
 		[DllImport("kernel32.dll", EntryPoint = "HeapAlloc")]
 		public static extern uint Kernel32_HeapAlloc(uint hHeap, uint dwFlags, uint dwBytes);
+
+		[DllImport("kernel32.dll", EntryPoint="HeapFree")]
+		public static extern bool Kernel32_HeapFree(uint hHeap, uint dwFlags, uint lpMem);
 		#endregion
 
 		[DllImport("kernel32.dll", EntryPoint = "ExitProcess")]

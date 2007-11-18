@@ -14,6 +14,7 @@ namespace IL2CPU {
 		public static string OutputFile;
 		public static string AsmFile;
 		public static bool MetalMode;
+		public static bool DebugMode=true;
 		public static TargetPlatformEnum TargetPlatform = TargetPlatformEnum.Win32;
 
 		private Type win32Type = typeof(Win32OpCodeMap);
@@ -72,6 +73,17 @@ namespace IL2CPU {
 							}
 							break;
 						}
+					case "debug": {
+							if (String.IsNullOrEmpty(xArgParts[1])) {
+								DebugMode = true;
+							} else {
+								if (!Boolean.TryParse(xArgParts[1], out DebugMode)) {
+									Console.WriteLine("Error parsing Debug argument. Invalid value. Valid values are '" + Boolean.TrueString + "' and '" + Boolean.FalseString + "', or use -metal/-metalmode, which is equal to -metal:true");
+									return false;
+								}
+							}
+							break;
+					}
 					default: {
 							Console.WriteLine("Error parsing arguments. Arguments not recognized ('{0}')", xArgParts[0]);
 							return false;
@@ -117,7 +129,7 @@ namespace IL2CPU {
 					}
 					using (FileStream fs = new FileStream(AsmFile, FileMode.Create)) {
 						using (StreamWriter br = new StreamWriter(fs)) {
-							e.Execute(InputFile, TargetPlatform, br, MetalMode);
+							e.Execute(InputFile, TargetPlatform, br, MetalMode, DebugMode);
 						}
 					}
 					ProcessStartInfo xFasmStartInfo = new ProcessStartInfo();

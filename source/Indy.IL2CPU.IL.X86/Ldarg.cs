@@ -7,13 +7,12 @@ using CPU = Indy.IL2CPU.Assembler.X86;
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Ldarg)]
 	public class Ldarg: Op {
-		private string[] mAddresses;
-		private int mSize;
+		private MethodInformation.Argument mArgument;
 		protected void SetArgIndex(int aIndex, MethodInformation aMethodInfo) {
-			mAddresses = aMethodInfo.Arguments[aIndex].VirtualAddresses;
-			mSize = aMethodInfo.Arguments[aIndex].Size;
+			mArgument=aMethodInfo.Arguments[aIndex];
 		}
-		public Ldarg(MethodInformation aMethodInfo, int aIndex):base(null, aMethodInfo) {
+		public Ldarg(MethodInformation aMethodInfo, int aIndex)
+			: base(null, aMethodInfo) {
 			SetArgIndex(aIndex, aMethodInfo);
 		}
 
@@ -25,19 +24,14 @@ namespace Indy.IL2CPU.IL.X86 {
 					SetArgIndex(xArgIndex, aMethodInfo);
 				}
 				ParameterDefinition xParam = aInstruction.Operand as ParameterDefinition;
-				if(xParam!=null) {
-					SetArgIndex(xParam.Sequence-1, aMethodInfo);
+				if (xParam != null) {
+					SetArgIndex(xParam.Sequence - 1, aMethodInfo);
 				}
-			}
-		}
-		public string[] Addresses {
-			get {
-				return mAddresses;
 			}
 		}
 
 		public override void DoAssemble() {
-			Ldarg(Assembler, mAddresses, mSize);
+			Ldarg(Assembler, mArgument);
 		}
 	}
 }

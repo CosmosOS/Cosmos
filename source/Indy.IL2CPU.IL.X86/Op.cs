@@ -12,12 +12,21 @@ namespace Indy.IL2CPU.IL.X86 {
 			: base(aInstruction, aMethodInfo) {
 		}
 
-		public static void Ldarg(Assembler.Assembler aAssembler, string[] aAddresses, int aSize) {
-			foreach (string xAddress in aAddresses) {
+		public static void Ldarg(Assembler.Assembler aAssembler, MethodInformation.Argument aArg) {
+			Ldarg(aAssembler, aArg, true);
+		}
+
+		public static void Ldarg(Assembler.Assembler aAssembler, MethodInformation.Argument aArg, bool aAddGCCode) {
+			foreach (string xAddress in aArg.VirtualAddresses) {
 				new Move("eax", "[" + xAddress + "]");
 				new Push("eax");
 			}
-			aAssembler.StackSizes.Push(aSize);
+			aAssembler.StackSizes.Push(aArg.Size);
+			if (aAddGCCode && aArg.IsReferenceType && aArg.ArgumentType.FullName != "System.String") {
+				new CPU.Push("eax");
+				Engine.QueueMethodRef(GCImplementationRefs.IncRefCountRef);
+				new CPU.Call(Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef));
+			}
 		}
 
 		public static void Ldflda(Assembler.Assembler aAssembler, string aRelativeAddress) {
@@ -127,6 +136,23 @@ namespace Indy.IL2CPU.IL.X86 {
 			new CPU.Add("eax", "[esp]");
 			new CPU.Add("esp", "4");
 			new Pushd("eax");
+		}
+
+		public static void Ldloc(Assembler.Assembler aAssembler, MethodInformation.Variable aLocal) {
+			Ldloc(aAssembler, aLocal, true);
+		}
+
+		public static void Ldloc(Assembler.Assembler aAssembler, MethodInformation.Variable aLocal, bool aAddGCCode) {
+			foreach (string s in aLocal.VirtualAddresses) {
+				new CPU.Move("eax", "[" + s + "]");
+				new CPU.Push("eax");
+			}
+			aAssembler.StackSizes.Push(aLocal.Size);
+			if (aAddGCCode && aLocal.IsReferenceType && aLocal.VariableType.FullName != "System.String") {
+				new CPU.Push("eax");
+				Engine.QueueMethodRef(GCImplementationRefs.IncRefCountRef);
+				new CPU.Call(Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef));
+			}
 		}
 	}
 }

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Indy.IL2CPU.Assembler;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using CPU = Indy.IL2CPU.Assembler.X86;
@@ -7,13 +8,12 @@ using CPU = Indy.IL2CPU.Assembler.X86;
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Ldloc)]
 	public class Ldloc: Op {
-		private string[] mAddresses;
-		private int mSize;
+		private MethodInformation.Variable mLocal;
 		protected void SetLocalIndex(int aIndex, MethodInformation aMethodInfo) {
-			mAddresses = aMethodInfo.Locals[aIndex].VirtualAddresses;
-			mSize = aMethodInfo.Locals[aIndex].Size;
+			mLocal = aMethodInfo.Locals[aIndex];
 		}
-		public Ldloc(MethodInformation aMethodInfo, int aIndex):base(null, aMethodInfo) {
+		public Ldloc(MethodInformation aMethodInfo, int aIndex)
+			: base(null, aMethodInfo) {
 			SetLocalIndex(aIndex, aMethodInfo);
 		}
 
@@ -29,18 +29,8 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 		}
 
-		public string[] Addresses {
-			get {
-				return mAddresses;
-			}
-		}
-
 		public sealed override void DoAssemble() {
-			foreach (string s in mAddresses) {
-				new CPU.Move("eax", "[" + s + "]");
-				new CPU.Push("eax");
-			}
-			Assembler.StackSizes.Push(mSize);
+			Ldloc(Assembler, mLocal);
 		}
 	}
 }

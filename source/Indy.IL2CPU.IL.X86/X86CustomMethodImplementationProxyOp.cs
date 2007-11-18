@@ -12,8 +12,8 @@ namespace Indy.IL2CPU.IL.X86 {
 			: base(aInstruction, aMethodInfo) {
 		}
 
-		protected override void Ldarg(int index) {
-			Op.Ldarg(Assembler, MethodInfo.Arguments[index].VirtualAddresses, MethodInfo.Arguments[index].Size);
+		protected override void Ldarg(int aIndex) {
+			Op.Ldarg(Assembler, MethodInfo.Arguments[aIndex]);
 		}
 
 		protected override void Ldflda(TypeInformation.Field aField) {

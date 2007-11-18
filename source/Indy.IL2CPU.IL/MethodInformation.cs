@@ -8,18 +8,20 @@ namespace Indy.IL2CPU.IL {
 	// TODO: abstract this one out to a X86 specific one
 	public class MethodInformation {
 		public struct Variable {
-			public Variable(int aOffset, int aSize, bool aIsReferenceTypeField) {
+			public Variable(int aOffset, int aSize, bool aIsReferenceTypeField, TypeReference aVariableType) {
 				Offset = aOffset;
 				Size = aSize;
 				VirtualAddresses = new string[Size / 4];
 				for (int i = 0; i < (Size / 4); i++) {
 					VirtualAddresses[i] = "ebp - 0" + (Offset + ((i + 1) * 4) + 0).ToString("X") + "h";
 				}
-				IsReferenceTypeField = aIsReferenceTypeField;
+				IsReferenceType = aIsReferenceTypeField;
+				VariableType = aVariableType;
 			}
 			public readonly int Offset;
 			public readonly int Size;
-			public readonly bool IsReferenceTypeField;
+			public readonly bool IsReferenceType;
+			public readonly TypeReference VariableType;
 			/// <summary>
 			/// Gives the list of addresses to access this variable. This field contains multiple entries if the <see cref="Size"/> is larger than 4.
 			/// </summary>
@@ -32,7 +34,7 @@ namespace Indy.IL2CPU.IL {
 				ByRef,
 				Out
 			}
-			public Argument(int aSize, int aOffset, KindEnum aKind) {
+			public Argument(int aSize, int aOffset, KindEnum aKind, bool mIsReferenceType, TypeReference aArgumentType) {
 				Size = aSize;
 				Offset = aOffset;
 				VirtualAddresses = new string[Size / 4];
@@ -40,12 +42,16 @@ namespace Indy.IL2CPU.IL {
 					VirtualAddresses[i] = "ebp + 0" + (Offset + ((i + 1) * 4) + 4).ToString("X") + "h";
 				}
 				Kind = aKind;
+				ArgumentType = aArgumentType;
+				IsReferenceType = mIsReferenceType;
 			}
 
 			public readonly string[] VirtualAddresses;
 			public readonly int Size;
+			public readonly bool IsReferenceType;
 			public readonly int Offset;
 			public readonly KindEnum Kind;
+			public readonly TypeReference ArgumentType;
 		}
 
 		public MethodInformation(string aLabelName, Variable[] aLocals, Argument[] aArguments, int aReturnSize, bool aIsInstanceMethod, TypeInformation aTypeInfo, MethodDefinition aMethodDef) {

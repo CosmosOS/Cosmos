@@ -17,7 +17,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		/// <param name="aMethod"></param>
 		protected void PassCall(MethodReference aMethod) {
 			for (int i = 0; i < aMethod.Parameters.Count; i++) {
-				Ldarg.Ldarg(Assembler, MethodInfo.Arguments[i].VirtualAddresses, MethodInfo.Arguments[i].Size);
+				Ldarg.Ldarg(Assembler, MethodInfo.Arguments[i]);
 			}
 			Engine.QueueMethodRef(aMethod);
 			Op xOp = new Call(aMethod);
@@ -28,23 +28,23 @@ namespace Indy.IL2CPU.IL.X86 {
 		protected override void Assemble_System_Void___System_Runtime_CompilerServices_RuntimeHelpers_InitializeArray___System_Array__System_RuntimeFieldHandle___() {
 			// Arguments:
 			//    Array aArray, RuntimeFieldHandle aFieldHandle
-			new Indy.IL2CPU.Assembler.X86.Move("eax", "0");
-			new Indy.IL2CPU.Assembler.X86.Move("edi", "[" + MethodInfo.Arguments[0].VirtualAddresses[0] + "]");
-			new Indy.IL2CPU.Assembler.X86.Move("esi", "[" + MethodInfo.Arguments[1].VirtualAddresses[0] + "]");
-			new Indy.IL2CPU.Assembler.X86.Add("dword esi", "8");
-			new Indy.IL2CPU.Assembler.X86.Move("ecx", "[esi]");
-			new Indy.IL2CPU.Assembler.X86.Add("dword esi", "4");
-			new Indy.IL2CPU.Assembler.X86.Add("dword edi", "12");
+			new Assembler.X86.Move("eax", "0");
+			new Assembler.X86.Move("edi", "[" + MethodInfo.Arguments[0].VirtualAddresses[0] + "]");
+			new Assembler.X86.Move("esi", "[" + MethodInfo.Arguments[1].VirtualAddresses[0] + "]");
+			new Assembler.X86.Add("dword esi", "8");
+			new Assembler.X86.Move("ecx", "[esi]");
+			new Assembler.X86.Add("dword esi", "4");
+			new Assembler.X86.Add("dword edi", "12");
 
 			new Assembler.Label(".StartLoop");
-			new Indy.IL2CPU.Assembler.X86.Move("edx", "[esi]");
-			new Indy.IL2CPU.Assembler.X86.Move("[edi]", "edx");
-			new Indy.IL2CPU.Assembler.X86.Add("eax", "4");
-			new Indy.IL2CPU.Assembler.X86.Add("dword esi", "4");
-			new Indy.IL2CPU.Assembler.X86.Add("dword edi", "4");
-			new Indy.IL2CPU.Assembler.X86.Compare("eax", "ecx");
-			new Indy.IL2CPU.Assembler.X86.JumpIfEquals(".EndLoop");
-			new Indy.IL2CPU.Assembler.X86.JumpAlways(".StartLoop");
+			new Assembler.X86.Move("edx", "[esi]");
+			new Assembler.X86.Move("[edi]", "edx");
+			new Assembler.X86.Add("eax", "4");
+			new Assembler.X86.Add("dword esi", "4");
+			new Assembler.X86.Add("dword edi", "4");
+			new Assembler.X86.Compare("eax", "ecx");
+			new Assembler.X86.JumpIfEquals(".EndLoop");
+			new Assembler.X86.JumpAlways(".StartLoop");
 
 			new Assembler.Label(".EndLoop");
 		}

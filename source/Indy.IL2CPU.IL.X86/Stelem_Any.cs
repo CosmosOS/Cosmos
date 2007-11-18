@@ -1,9 +1,10 @@
 using System;
+using Indy.IL2CPU.Assembler;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
-using Instruction=Mono.Cecil.Cil.Instruction;
+using Instruction = Mono.Cecil.Cil.Instruction;
 
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Stelem_Any, true)]
@@ -28,6 +29,11 @@ namespace Indy.IL2CPU.IL.X86 {
 			int xStackSize = aElementSize;
 			if(xStackSize % 4 != 0) {
 				xStackSize += 4 - xStackSize % 4;
+			}
+			if(!aAssembler.InMetalMode) {
+				new CPUx86.Pushd("[esp + " + (xStackSize + 4) + "]");
+				Engine.QueueMethodRef(GCImplementationRefs.DecRefCountRef);
+				new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef));
 			}
 			new CPUx86.Move("ebx", "[esp + " + xStackSize + "]"); // the index
 			new CPUx86.Move("ecx", "[esp + " + (xStackSize + 4) + "]"); // the array

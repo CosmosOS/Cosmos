@@ -12,6 +12,7 @@ namespace Indy.IL2CPU.IL.X86.Win32 {
 		public static readonly MethodDefinition Heap_AllocNewObjectRef;
 		public static readonly MethodDefinition Heap_ShutdownRef;
 		public static readonly MethodDefinition ExitProcessRef;
+		public static readonly MethodDefinition Heap_FreeRef;
 
 		static RuntimeEngineImplRefs() {
 			RuntimeAssemblyDef = AssemblyFactory.GetAssembly(typeof(RuntimeEngineImpl).Assembly.Location);

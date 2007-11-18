@@ -105,7 +105,7 @@ namespace Indy.IL2CPU {
 		/// <param name="aTargetPlatform">The platform to target when assembling the code.</param>
 		/// <param name="aOutput"></param>
 		/// <param name="aInMetalMode">Whether or not the output is metalmode only.</param>
-		public void Execute(string aAssembly, TargetPlatformEnum aTargetPlatform, StreamWriter aOutput, bool aInMetalMode) {
+		public void Execute(string aAssembly, TargetPlatformEnum aTargetPlatform, StreamWriter aOutput, bool aInMetalMode, bool aDebugMode) {
 			mCurrent = this;
 			try {
 				if (aOutput == null) {
@@ -134,6 +134,7 @@ namespace Indy.IL2CPU {
 				using (mAssembler) {
 					//mAssembler.OutputType = Assembler.Win32.Assembler.OutputTypeEnum.Console;
 					mMap.Initialize(mAssembler);
+					mAssembler.DebugMode = aDebugMode;
 					foreach (Type t in typeof(Engine).Assembly.GetTypes()) {
 						foreach (MethodInfo mi in t.GetMethods()) {
 							object[] xAttribs = mi.GetCustomAttributes(typeof(MethodAliasAttribute), true);
@@ -576,14 +577,11 @@ namespace Indy.IL2CPU {
 							string xTheData = "";
 							int xStorageSize = GetFieldStorageSize(xCurrentField.FieldType);
 							if (xCurrentField.InitialValue.Length > 4) {
-								xTheData = "0,0,0,0,2,0,0,0,";
+								xTheData = "0,0,0,0,";
+								xTheData += BitConverter.GetBytes(0x80000002).Aggregate("", (r, b) => r + b + "");
 							}
-							foreach (byte x in BitConverter.GetBytes(xCurrentField.InitialValue.Length)) {
-								xTheData += x + ",";
-							}
-							foreach (byte x in xCurrentField.InitialValue) {
-								xTheData += x + ",";
-							}
+							xTheData += BitConverter.GetBytes(xCurrentField.InitialValue.Length).Aggregate("", (r, b) => r + b + "");
+							xTheData += xCurrentField.InitialValue.Aggregate("", (r, b) => r + b + "");
 							xTheData = xTheData.TrimEnd(',');
 							if (xTheData.Length == 0) {
 								throw new Exception("Field '" + xCurrentField.ToString() + "' doesn't have a valid size!");
@@ -602,9 +600,6 @@ namespace Indy.IL2CPU {
 								}
 							} else {
 								xTheSize = 4;
-							}
-							if (xTheSize < 4) {
-								//								xTheSize = 4;
 							}
 							if (xTheSize == 4) {
 								theType = "dd";
@@ -765,7 +760,7 @@ namespace Indy.IL2CPU {
 						if ((xVarSize % 4) != 0) {
 							xVarSize += 4 - (xVarSize % 4);
 						}
-						xVars[xVarDef.Index] = new MethodInformation.Variable(xCurOffset, xVarSize, GetDefinitionFromTypeReference(xVarDef.VariableType).IsClass);
+						xVars[xVarDef.Index] = new MethodInformation.Variable(xCurOffset, xVarSize, !GetDefinitionFromTypeReference(xVarDef.VariableType).IsValueType, xVarDef.VariableType);
 						if (!(xVarDef.VariableType is GenericParameter)) {
 							RegisterType(GetDefinitionFromTypeReference(xVarDef.VariableType));
 						}
@@ -791,12 +786,12 @@ namespace Indy.IL2CPU {
 								xKind = MethodInformation.Argument.KindEnum.Out;
 							}
 						}
-						xArgs[i] = new MethodInformation.Argument(xArgSize, xCurOffset, xKind);
+						xArgs[i] = new MethodInformation.Argument(xArgSize, xCurOffset, xKind, !GetDefinitionFromTypeReference(xParamDef.ParameterType).IsValueType, xParamDef.ParameterType);
 						xCurOffset += xArgSize;
 					}
 					xArgSize = 4;
 					// this
-					xArgs[0] = new MethodInformation.Argument(xArgSize, xCurOffset, MethodInformation.Argument.KindEnum.In);
+					xArgs[0] = new MethodInformation.Argument(xArgSize, xCurOffset, MethodInformation.Argument.KindEnum.In, !GetDefinitionFromTypeReference(aCurrentMethodForArguments.DeclaringType).IsValueType, aCurrentMethodForArguments.DeclaringType);
 				} else {
 					xArgs = new MethodInformation.Argument[aCurrentMethodForArguments.Parameters.Count];
 					xCurOffset = 0;
@@ -814,7 +809,7 @@ namespace Indy.IL2CPU {
 								xKind = MethodInformation.Argument.KindEnum.Out;
 							}
 						}
-						xArgs[i] = new MethodInformation.Argument(xArgSize, xCurOffset, xKind);
+						xArgs[i] = new MethodInformation.Argument(xArgSize, xCurOffset, xKind, !GetDefinitionFromTypeReference(xParamDef.ParameterType).IsValueType, xParamDef.ParameterType);
 						xCurOffset += xArgSize;
 					}
 				}
