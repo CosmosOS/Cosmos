@@ -1,0 +1,9 @@
+devdump 2.01-bootcd.ru (i386-pc-mingw32)
+devdump: Usage: devdump [options] [image]
+Options:
+	-help, -h	Print this help
+	-version	Print version info and exit
+	-i filename	Filename to read ISO-9660 image from
+	dev=target	SCSI target to use as CD/DVD-Recorder
+
+If neither -i nor dev= are speficied, <image> is needed.

@@ -1,0 +1,13 @@
+scgckeck 2.01-bootcd.ru (i386-pc-mingw32) Copyright (C) 1998-2002 Jörg Schilling
+Usage:	scgcheck [options]
+Options:
+	-version	print version information and exit
+	dev=target	SCSI target to use
+	timeout=#	set the default SCSI command timeout to #.
+	debug=#,-d	Set to # or increment misc debug level
+	kdebug=#,kd=#	do Kernel debugging
+	-verbose,-v	increment general verbose level by one
+	-Verbose,-V	increment SCSI command transport verbose level by one
+	-silent,-s	do not print status of failed SCSI commands
+	f=filename	Name of file to write log data to.
+
