@@ -36,14 +36,14 @@ namespace Indy.IL2CPU.IL.X86 {
 		public override void DoAssemble() {
 			new CPUx86.Pushd("0x" + (mTheSize + ObjectImpl.FieldDataOffset).ToString("X").ToUpper());
 			new CPUx86.Call(CPU.Label.GenerateLabelName(RuntimeEngineRefs.Heap_AllocNewObjectRef));
-			new CPUx86.Move("dword [eax]", "0x" + mTypeId.ToString("X"));
-			new CPUx86.Move("dword [eax + 4]", "0x" + InstanceTypeEnum.BoxedValueType.ToString("X"));
+			new CPUx86.Move("dword", CPUx86.Registers.AtEAX, "0x" + mTypeId.ToString("X"));
+			new CPUx86.Move("dword", "[eax + 4]", "0x" + InstanceTypeEnum.BoxedValueType.ToString("X"));
 			for (int i = 0; i < (mTheSize / 4); i++) {
-				new CPUx86.Pop("edx");
-				new CPUx86.Move("dword [eax + 0x" + (ObjectImpl.FieldDataOffset + (i * 4)).ToString("X") + "]", "edx");
+				new CPUx86.Pop(CPUx86.Registers.EDX);
+				new CPUx86.Move("dword", "[eax + 0x" + (ObjectImpl.FieldDataOffset + (i * 4)).ToString("X") + "]", "edx");
 			}
 			Assembler.StackSizes.Pop();
-			new CPUx86.Pushd("eax");
+			new CPUx86.Pushd(CPUx86.Registers.EAX);
 			Assembler.StackSizes.Push(4);
 		}
 	}

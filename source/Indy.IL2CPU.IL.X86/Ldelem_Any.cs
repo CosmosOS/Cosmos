@@ -17,34 +17,33 @@ namespace Indy.IL2CPU.IL.X86 {
 			mElementSize = Engine.GetFieldStorageSize(xType);
 		}
 
-		// todo: refactor all Ldelem variants to use this method for emitting
 		public static void Assemble(CPU.Assembler aAssembler, int aElementSize) {
-			new CPUx86.Pop("eax");
-			new CPUx86.Move("edx", "0" + aElementSize.ToString("X") + "h");
-			new CPUx86.Multiply("edx");
-			new CPUx86.Add("eax", "0" + (ObjectImpl.FieldDataOffset + 4).ToString("X") + "h");
-			new CPUx86.Pop("edx");
-			new CPUx86.Add("edx", "eax");
-			new CPUx86.Move("eax", "edx");
+			new CPUx86.Pop(CPUx86.Registers.EAX);
+			new CPUx86.Move(CPUx86.Registers.EDX, "0" + aElementSize.ToString("X") + "h");
+			new CPUx86.Multiply(CPUx86.Registers.EDX);
+			new CPUx86.Add(CPUx86.Registers.EAX, "0" + (ObjectImpl.FieldDataOffset + 4).ToString("X") + "h");
+			new CPUx86.Pop(CPUx86.Registers.EDX);
+			new CPUx86.Add(CPUx86.Registers.EDX, CPUx86.Registers.EAX);
+			new CPUx86.Move(CPUx86.Registers.EAX, CPUx86.Registers.EDX);
 			int xSizeLeft = aElementSize;
 			while(xSizeLeft > 0) {
 				if(xSizeLeft >= 4) {
-					new CPUx86.Push("dword [eax]");
-					new CPUx86.Add("eax", "4");
+					new CPUx86.Push("dword", CPUx86.Registers.AtEAX);
+					new CPUx86.Add(CPUx86.Registers.EAX, "4");
 					xSizeLeft -= 4;
 				}else {
 					if(xSizeLeft >= 2) {
-						new CPUx86.Move("ecx", "0");
-						new CPUx86.Move("word ecx", "[eax]");
-						new CPUx86.Push("ecx");
-						new CPUx86.Add("eax", "2");
+						new CPUx86.Move(CPUx86.Registers.ECX, "0");
+						new CPUx86.Move("word", CPUx86.Registers.ECX, CPUx86.Registers.AtEAX);
+						new CPUx86.Push(CPUx86.Registers.ECX);
+						new CPUx86.Add(CPUx86.Registers.EAX, "2");
 						xSizeLeft -= 2;
 					}else {
 						if(xSizeLeft >= 1) {
-							new CPUx86.Move("ecx", "0");
-							new CPUx86.Move("byte cl", "[eax]");
-							new CPUx86.Push("ecx");
-							new CPUx86.Add("eax", "1");
+							new CPUx86.Move(CPUx86.Registers.ECX, "0");
+							new CPUx86.Move("byte", CPUx86.Registers.CL, CPUx86.Registers.AtEAX);
+							new CPUx86.Push(CPUx86.Registers.ECX);
+							new CPUx86.Add(CPUx86.Registers.EAX, "1");
 							xSizeLeft -= 1;
 						}else {
 							throw new Exception("Size left: " + xSizeLeft);

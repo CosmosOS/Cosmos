@@ -4,8 +4,8 @@ using System.IO;
 using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using Asm = Indy.IL2CPU.Assembler;
-using CPU = Indy.IL2CPU.Assembler.X86;
+using CPU = Indy.IL2CPU.Assembler;
+using CPUx86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Call)]
@@ -31,7 +31,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				throw new Exception("ReturnValues of sizes larger than 4 bytes not supported yet (" + xResultSize + ")");
 			}
 			MethodDefinition xMethodDef = Engine.GetDefinitionFromMethodReference(aMethod);
-			LabelName = Asm.Label.GenerateLabelName(xMethodDef);
+			LabelName = CPU.Label.GenerateLabelName(xMethodDef);
 			Engine.QueueMethodRef(xMethodDef);
 			bool needsCleanup = false;
 			List<int> xArgumentSizes = new List<int>();
@@ -63,12 +63,12 @@ namespace Indy.IL2CPU.IL.X86 {
 			Initialize(xMethod);
 		}
 		public void Assemble(string aMethod, int aArgumentCount) {
-			new CPU.Call(aMethod);
+			new CPUx86.Call(aMethod);
 			for (int i = 0; i < aArgumentCount; i++) {
 				Assembler.StackSizes.Pop();
 			}
 			if (HasResult) {
-				new CPU.Push("eax");
+				new CPUx86.Push(CPUx86.Registers.EAX);
 				Assembler.StackSizes.Push(4);
 			}
 		}

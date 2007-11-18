@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using Mono.Cecil.Cil;
-using CPU = Indy.IL2CPU.Assembler.X86;
+using CPUx86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Ldloca)]
@@ -33,9 +33,9 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		public sealed override void DoAssemble() {
 			string[] xAddressParts = mAddress.Split('-');
-			new CPU.Move("edx", "ebp");
-			new CPU.Sub("edx", xAddressParts[1]);
-			new CPU.Push("edx");
+			new CPUx86.Move(CPUx86.Registers.EDX, CPUx86.Registers.EBP);
+			new CPUx86.Sub(CPUx86.Registers.EDX, xAddressParts[1]);
+			new CPUx86.Push(CPUx86.Registers.EDX);
 			Assembler.StackSizes.Push(4);
 		}
 	}

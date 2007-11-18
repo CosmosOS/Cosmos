@@ -32,8 +32,8 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		public static void AssembleHeader(Assembler.Assembler aAssembler, string aLabelName, int[] aLocals, MethodInformation.Argument[] aArguments) {
 			new CPU.Label(aLabelName);
-			new CPUx86.Push("ebp");
-			new CPUx86.Move("ebp", "esp");
+			new CPUx86.Push(CPUx86.Registers.EBP);
+			new CPUx86.Move(CPUx86.Registers.EBP, CPUx86.Registers.ESP);
 			foreach (int xLocalSize in aLocals) {
 				aAssembler.StackSizes.Push(xLocalSize);
 				for (int i = 0; i < (xLocalSize / 4); i++) {
@@ -44,7 +44,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				Assembler = aAssembler
 			}.
 			Assemble();
-			new CPUx86.Add("esp", "4");
+			new CPUx86.Add(CPUx86.Registers.ESP, "4");
 		}
 	}
 }

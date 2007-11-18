@@ -1,6 +1,6 @@
 using System;
 using Mono.Cecil.Cil;
-using CPU = Indy.IL2CPU.Assembler.X86;
+using CPUx86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Conv_U)]
@@ -13,16 +13,16 @@ namespace Indy.IL2CPU.IL.X86 {
 			switch (xSource) {
 				case 1:
 				case 2: {
-						new CPU.Pop("eax");
-						new CPU.Pushd("eax");
-					Assembler.StackSizes.Pop();
-					Assembler.StackSizes.Push(4);
+						new CPUx86.Pop(CPUx86.Registers.EAX);
+						new CPUx86.Pushd(CPUx86.Registers.EAX);
+						Assembler.StackSizes.Pop();
+						Assembler.StackSizes.Push(4);
 						break;
 					}
 				case 8: {
-						new CPU.Pop("eax");
-						new CPU.Pop("ecx");
-						new CPU.Pushd("eax");
+						new CPUx86.Pop(CPUx86.Registers.EAX);
+						new CPUx86.Pop(CPUx86.Registers.ECX);
+						new CPUx86.Pushd(CPUx86.Registers.EAX);
 						Assembler.StackSizes.Pop();
 						Assembler.StackSizes.Push(4);
 						break;

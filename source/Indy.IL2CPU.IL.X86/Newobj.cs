@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Indy.IL2CPU.Assembler.X86;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
@@ -32,31 +31,31 @@ namespace Indy.IL2CPU.IL.X86 {
 			Engine.QueueMethodRef(GCImplementationRefs.IncRefCountRef);
 			new CPUx86.Pushd("0" + aObjectSize.ToString("X").ToUpper() + "h");
 			new CPUx86.Call(CPU.Label.GenerateLabelName(GCImplementationRefs.AllocNewObjectRef));
-			new CPUx86.Pushd("eax");
-			new CPUx86.Pushd("eax");
-			new CPUx86.Pushd("eax");
-			new CPUx86.Pushd("eax");
-			new CPUx86.Pushd("eax");
+			new CPUx86.Pushd(CPUx86.Registers.EAX);
+			new CPUx86.Pushd(CPUx86.Registers.EAX);
+			new CPUx86.Pushd(CPUx86.Registers.EAX);
+			new CPUx86.Pushd(CPUx86.Registers.EAX);
+			new CPUx86.Pushd(CPUx86.Registers.EAX);
 			new CPUx86.Call(CPU.Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef));
 			new CPUx86.Call(CPU.Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef));
 			aAssembler.StackSizes.Push(4);
 			aAssembler.StackSizes.Push(4);
-			new CPUx86.Pop("eax");
-			new Move("dword [eax]", "0" + aTypeId.ToString("X") + "h");
-			new Move("dword [eax + 4]", "0" + InstanceTypeEnum.NormalObject.ToString("X") + "h");
+			new CPUx86.Pop(CPUx86.Registers.EAX);
+			new Move("dword", CPUx86.Registers.AtEAX, "0" + aTypeId.ToString("X") + "h");
+			new Move("dword", "[eax + 4]", "0" + InstanceTypeEnum.NormalObject.ToString("X") + "h");
 			if (aCtorDef != null) {
 				for (int i = 0; i < aCtorDef.Parameters.Count; i++) {
 					new CPUx86.Pushd("[esp + 0x8]");
 				}
 				new CPUx86.Call(CPU.Label.GenerateLabelName(aCtorDef));
-				new CPUx86.Pop("eax");
+				new CPUx86.Pop(CPUx86.Registers.EAX);
 				aAssembler.StackSizes.Pop();
 				for (int i = 0; i < aCtorDef.Parameters.Count; i++) {
-					new CPUx86.Add("esp", "4");
+					new CPUx86.Add(CPUx86.Registers.ESP, "4");
 					aAssembler.StackSizes.Pop();
 				}
 			}
-			new CPUx86.Push("eax");
+			new CPUx86.Push(CPUx86.Registers.EAX);
 			aAssembler.StackSizes.Push(4);
 		}
 	}

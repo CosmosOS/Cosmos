@@ -21,7 +21,6 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 		}
 
-		// todo: refactor other Stelem variants to use this method
 		public static void Assemble(CPU.Assembler aAssembler, int aElementSize) {
 			// stack - 3 == the array
 			// stack - 2 == the index
@@ -35,36 +34,36 @@ namespace Indy.IL2CPU.IL.X86 {
 				Engine.QueueMethodRef(GCImplementationRefs.DecRefCountRef);
 				new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef));
 			}
-			new CPUx86.Move("ebx", "[esp + " + xStackSize + "]"); // the index
-			new CPUx86.Move("ecx", "[esp + " + (xStackSize + 4) + "]"); // the array
-			new CPUx86.Add("ecx", "12");
+			new CPUx86.Move(CPUx86.Registers.EBX, "[esp + " + xStackSize + "]"); // the index
+			new CPUx86.Move(CPUx86.Registers.ECX, "[esp + " + (xStackSize + 4) + "]"); // the array
+			new CPUx86.Add(CPUx86.Registers.ECX, "12");
 			new CPUx86.Push("0x" + aElementSize.ToString("X"));
 			aAssembler.StackSizes.Push(4);
-			new CPUx86.Push("ebx");
+			new CPUx86.Push(CPUx86.Registers.EBX);
 			aAssembler.StackSizes.Push(4);
 			Multiply(aAssembler);
-			new CPUx86.Push("ecx");
+			new CPUx86.Push(CPUx86.Registers.ECX);
 			aAssembler.StackSizes.Push(4);
 			Add(aAssembler);
-			new CPUx86.Pop("ecx");
+			new CPUx86.Pop(CPUx86.Registers.ECX);
 			aAssembler.StackSizes.Pop();
 			for (int i = (aElementSize / 4) - 1; i >= 0; i -= 1) {
 				new CPU.Comment("Start 1 dword");
-				new CPUx86.Pop("ebx");
-				new CPUx86.Move("[ecx]", "ebx");
-				new CPUx86.Add("ecx", "4");
+				new CPUx86.Pop(CPUx86.Registers.EBX);
+				new CPUx86.Move(CPUx86.Registers.AtECX, CPUx86.Registers.EBX);
+				new CPUx86.Add(CPUx86.Registers.ECX, "4");
 			}
 			switch (aElementSize % 4) {
 				case 1: {
 						new CPU.Comment("Start 1 byte");
-						new CPUx86.Pop("ebx");
-						new CPUx86.Move("byte [ecx]", "bl");
+						new CPUx86.Pop(CPUx86.Registers.EBX);
+						new CPUx86.Move(CPUx86.Registers.AtECX, CPUx86.Registers.BL);
 						break;
 					}
 				case 2: {
 						new CPU.Comment("Start 1 word");
-						new CPUx86.Pop("ebx");
-						new CPUx86.Move("word [ecx]", "bx");
+						new CPUx86.Pop(CPUx86.Registers.EBX);
+						new CPUx86.Move(CPUx86.Registers.AtECX, CPUx86.Registers.BX);
 						break;
 					}
 				case 0: {
@@ -74,7 +73,7 @@ namespace Indy.IL2CPU.IL.X86 {
 					throw new Exception("Remainder size " + (aElementSize % 4) + " not supported!");
 
 			}
-			new CPUx86.Add("esp", "0x8");
+			new CPUx86.Add(CPUx86.Registers.ESP, "0x8");
 			aAssembler.StackSizes.Pop();
 			aAssembler.StackSizes.Pop();
 			aAssembler.StackSizes.Pop();

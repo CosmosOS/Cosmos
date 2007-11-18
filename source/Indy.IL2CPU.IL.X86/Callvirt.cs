@@ -46,17 +46,17 @@ namespace Indy.IL2CPU.IL.X86 {
 				}
 				//Assembler.Add(new CPUx86.Pop("eax"));
 				//Assembler.Add(new CPUx86.Pushd("eax"));
-				new CPUx86.Move("eax", "[esp + 0x" + mThisOffset.ToString("X") + "]");
-				new CPUx86.Pushd("[eax]");
+				new CPUx86.Move(CPUx86.Registers.EAX, "[esp + 0x" + mThisOffset.ToString("X") + "]");
+				new CPUx86.Pushd(CPUx86.Registers.AtEAX);
 				new CPUx86.Pushd("0" + mMethodIdentifier.ToString("X") + "h");
 				new CPUx86.Call(CPU.Label.GenerateLabelName(VTablesImplRefs.GetMethodAddressForTypeRef));
-				new CPUx86.Call("eax");
+				new CPUx86.Call(CPUx86.Registers.EAX);
 			}
 			for(int i = 0; i < mArgumentCount;i++) {
 				Assembler.StackSizes.Pop();
 			}
 			if (mHasReturn) {
-				new CPUx86.Pushd("eax");
+				new CPUx86.Pushd(CPUx86.Registers.EAX);
 				Assembler.StackSizes.Push(4);
 			}
 		}

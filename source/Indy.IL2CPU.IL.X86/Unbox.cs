@@ -26,10 +26,10 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 		public override void DoAssemble() {
 			string mReturnNullLabel = mThisLabel + "_ReturnNull";
-			new CPUx86.Pop("eax");
-			new CPUx86.Compare("eax", "0");
+			new CPUx86.Pop(CPUx86.Registers.EAX);
+			new CPUx86.Compare(CPUx86.Registers.EAX, "0");
 			new CPUx86.JumpIfZero(mReturnNullLabel);
-			new CPUx86.Pushd("[eax]");
+			new CPUx86.Pushd(CPUx86.Registers.AtEAX);
 			Assembler.StackSizes.Push(4);
 			new CPUx86.Pushd("0" + mTypeId + "h");
 			Assembler.StackSizes.Push(4);
@@ -38,11 +38,11 @@ namespace Indy.IL2CPU.IL.X86 {
 			Op xOp = new Call(xMethodIsInstance);
 			xOp.Assembler = Assembler;
 			xOp.Assemble();
-			new CPUx86.Pop("eax");
+			new CPUx86.Pop(CPUx86.Registers.EAX);
 			Assembler.StackSizes.Pop();
-			new CPUx86.Compare("eax", "0");
+			new CPUx86.Compare(CPUx86.Registers.EAX, "0");
 			new CPUx86.JumpIfEquals(mReturnNullLabel);
-			new CPUx86.Pushd("eax");
+			new CPUx86.Pushd(CPUx86.Registers.EAX);
 			Assembler.StackSizes.Push(mTypeSize);
 			new CPUx86.JumpAlways(mNextOpLabel);
 			new CPU.Label(mReturnNullLabel);

@@ -1,8 +1,7 @@
 using System;
-using System.IO;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using CPU = Indy.IL2CPU.Assembler.X86;
+using CPUx86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Starg)]
@@ -24,8 +23,8 @@ namespace Indy.IL2CPU.IL.X86 {
 				throw new Exception("No Address Specified!");
 			}
 			for (int i = (mAddresses.Length - 1); i >= 0; i -= 1) {
-				new CPU.Pop("eax");
-				new CPU.Move("[" + mAddresses[i] + "]", "eax");
+				new CPUx86.Pop(CPUx86.Registers.EAX);
+				new CPUx86.Move("[" + mAddresses[i] + "]", CPUx86.Registers.EAX);
 			}
 			Assembler.StackSizes.Pop();
 		}

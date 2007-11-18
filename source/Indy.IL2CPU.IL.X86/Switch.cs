@@ -1,8 +1,6 @@
 using System;
-using System.IO;
-using Mono.Cecil;
 using Mono.Cecil.Cil;
-using CPU = Indy.IL2CPU.Assembler.X86;
+using CPUx86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Switch)]
@@ -18,10 +16,10 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public override void DoAssemble() {
-			new CPU.Pop("eax");
+			new CPUx86.Pop(CPUx86.Registers.EAX);
 			for(int i = 0; i < mLabels.Length; i++){
-				new CPU.Compare("eax", "0" + i.ToString("X") + "h");
-				new CPU.JumpIfEquals(mLabels[i]);
+				new CPUx86.Compare(CPUx86.Registers.EAX, "0" + i.ToString("X") + "h");
+				new CPUx86.JumpIfEquals(mLabels[i]);
 			}
 			Assembler.StackSizes.Pop();
 		}

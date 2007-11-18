@@ -12,10 +12,10 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 		public override void DoAssemble() {
 			int xSize = Math.Max(Assembler.StackSizes.Pop(), Assembler.StackSizes.Pop());
-			new CPU.Pop("eax");
-			new CPU.Pop("edx");
-			new CPU.And("eax", "edx");
-			new CPU.Pushd("eax");
+			new CPU.Pop(CPU.Registers.EAX);
+			new CPU.Pop(CPU.Registers.EDX);
+			new CPU.And(CPU.Registers.EAX, CPU.Registers.EDX);
+			new CPU.Pushd(CPU.Registers.EAX);
 			Assembler.StackSizes.Push(xSize);
 		}
 	}

@@ -1,8 +1,7 @@
 using System;
-using System.IO;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using CPU = Indy.IL2CPU.Assembler.X86;
+using CPUx86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Ldsfld)]
@@ -25,19 +24,19 @@ namespace Indy.IL2CPU.IL.X86 {
 				for (int i = 0; i < (mSize / 4); i++) {
 					//	Pop("eax");
 					//	Move(Assembler, "dword [" + mDataName + " + 0x" + (i * 4).ToString("X") + "]", "eax");
-					new CPU.Pushd("[" + mDataName + " + 0x" + (i * 4).ToString("X") + "]");
+					new CPUx86.Pushd("[" + mDataName + " + 0x" + (i * 4).ToString("X") + "]");
 				}
 				switch (mSize % 4) {
 					case 1: {
-							new CPU.Move("eax", "0");
-							new CPU.Move("al", "[" + mDataName + " + 0x" + (mSize - 1).ToString("X") + "]");
-							new CPU.Push("eax");
+							new CPUx86.Move(CPUx86.Registers.EAX, "0");
+							new CPUx86.Move(CPUx86.Registers.AL, "[" + mDataName + " + 0x" + (mSize - 1).ToString("X") + "]");
+							new CPUx86.Push(CPUx86.Registers.EAX);
 							break;
 						}
 					case 2: {
-							new CPU.Move("eax", "0");
-							new CPU.Move("ax", "[" + mDataName + " + 0x" + (mSize - 2).ToString("X") + "]");
-							new CPU.Push("eax");
+							new CPUx86.Move(CPUx86.Registers.EAX, "0");
+							new CPUx86.Move(CPUx86.Registers.AX, "[" + mDataName + " + 0x" + (mSize - 2).ToString("X") + "]");
+							new CPUx86.Push(CPUx86.Registers.EAX);
 							break;
 						}
 					case 0: {
@@ -49,15 +48,15 @@ namespace Indy.IL2CPU.IL.X86 {
 			} else {
 				switch (mSize) {
 					case 1: {
-							new CPU.Move("eax", "0");
-							new CPU.Move("al", "[" + mDataName + "]");
-							new CPU.Push("eax");
+							new CPUx86.Move(CPUx86.Registers.EAX, "0");
+							new CPUx86.Move(CPUx86.Registers.AL, "[" + mDataName + "]");
+							new CPUx86.Push(CPUx86.Registers.EAX);
 							break;
 						}
 					case 2: {
-							new CPU.Move("eax", "0");
-							new CPU.Move("ax", "[" + mDataName + "]");
-							new CPU.Push("eax");
+							new CPUx86.Move(CPUx86.Registers.EAX, "0");
+							new CPUx86.Move(CPUx86.Registers.AX, "[" + mDataName + "]");
+							new CPUx86.Push(CPUx86.Registers.EAX);
 							break;
 						}
 					case 0: {

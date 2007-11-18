@@ -1,10 +1,7 @@
 using System;
-using System.IO;
 using Indy.IL2CPU.Assembler;
-using Mono.Cecil;
 using Mono.Cecil.Cil;
-using CPU = Indy.IL2CPU.Assembler.X86;
-using GCImplementationRefs = Indy.IL2CPU.GCImplementationRefs;
+using CPUx86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Stloc)]
@@ -40,13 +37,13 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		public sealed override void DoAssemble() {
 			if (mNeedsGC) {
-				new CPU.Pushd("[" + mAddresses[0] + "]");
+				new CPUx86.Pushd("[" + mAddresses[0] + "]");
 				Engine.QueueMethodRef(GCImplementationRefs.DecRefCountRef);
-				new CPU.Call(Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef));
+				new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef));
 			}
 			foreach (string s in mAddresses) {
-				new CPU.Pop("eax");
-				new CPU.Move("[" + s + "]", "eax");
+				new CPUx86.Pop(CPUx86.Registers.EAX);
+				new CPUx86.Move("[" + s + "]", "eax");
 			}
 			// no need to inc again, items on the transient stack are also counted
 			Assembler.StackSizes.Pop();

@@ -17,9 +17,9 @@ namespace Indy.IL2CPU.IL.X86 {
 			if (xStorageSize < 4) {
 				xStorageSize = 4;
 			}
-			new CPUx86.Move("ebx", "[esp + " + xStorageSize + "]");
+			new CPUx86.Move(CPUx86.Registers.EBX, "[esp + " + xStorageSize + "]");
 			for (int i = 0; i < (aSize / 4); i++) {
-				new CPUx86.Move("eax", "[esp + " + (i * 4) + "]");
+				new CPUx86.Move(CPUx86.Registers.EAX, "[esp + " + (i * 4) + "]");
 				new CPUx86.Move("[ebx + " + (i * 4) + "]", "eax");
 			}
 			switch (aSize % 4) {
@@ -27,19 +27,19 @@ namespace Indy.IL2CPU.IL.X86 {
 						break;
 					}
 				case 1: {
-						new CPUx86.Move("eax", "[esp + " + ((aSize / 4) * 4) + "]");
+						new CPUx86.Move(CPUx86.Registers.EAX, "[esp + " + ((aSize / 4) * 4) + "]");
 						new CPUx86.Move("[ebx + " + ((aSize / 4) * 4) + "]", "al");
 						break;
 					}
 				case 2: {
-						new CPUx86.Move("eax", "[esp + " + ((aSize / 4) * 4) + "]");
+						new CPUx86.Move(CPUx86.Registers.EAX, "[esp + " + ((aSize / 4) * 4) + "]");
 						new CPUx86.Move("[ebx + " + ((aSize / 4) * 4) + "]", "ax");
 						break;
 					}
 				case 3: {
-						new CPUx86.Move("eax", "[esp + " + ((aSize / 4) * 4) + "]");
+						new CPUx86.Move(CPUx86.Registers.EAX, "[esp + " + ((aSize / 4) * 4) + "]");
 						new CPUx86.Move("[ebx + " + ((aSize / 4) * 4) + "]", "ax");
-						new CPUx86.Move("eax", "[esp + " + (((aSize / 4) * 4) + 2) + "]");
+						new CPUx86.Move(CPUx86.Registers.EAX, "[esp + " + (((aSize / 4) * 4) + 2) + "]");
 						new CPUx86.Move("[ebx + " + (((aSize / 4) * 4) + 2) + "]", "al");
 						break;
 					}

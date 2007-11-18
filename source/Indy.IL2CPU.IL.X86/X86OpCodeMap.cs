@@ -136,8 +136,8 @@ namespace Indy.IL2CPU.IL.X86 {
 							new CPUx86.Push("0x" + (ObjectImpl.FieldDataOffset + 4).ToString("X"));
 							aAssembler.StackSizes.Push(4);
 							Ldarg.Add(aAssembler);
-							new CPUx86.Pop("eax");
-							new CPUx86.Pushd("[eax]");
+							new CPUx86.Pop(CPUx86.Registers.EAX);
+							new CPUx86.Pushd(CPUx86.Registers.AtEAX);
 							for (int i = 1; i < aMethodInfo.Arguments.Length; i++) {
 								Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[i]);
 							}
@@ -145,11 +145,11 @@ namespace Indy.IL2CPU.IL.X86 {
 							new CPUx86.Push("0x" + ObjectImpl.FieldDataOffset.ToString("X"));
 							aAssembler.StackSizes.Push(4);
 							Ldarg.Add(aAssembler);
-							new CPUx86.Pop("eax");
-							new CPUx86.Pushd("[eax]");
-							new CPUx86.Pop("eax");
-							new CPUx86.Call("eax");
-							new CPUx86.Pop("eax");
+							new CPUx86.Pop(CPUx86.Registers.EAX);
+							new CPUx86.Pushd(CPUx86.Registers.AtEAX);
+							new CPUx86.Pop(CPUx86.Registers.EAX);
+							new CPUx86.Call(CPUx86.Registers.EAX);
+							new CPUx86.Pop(CPUx86.Registers.EAX);
 							break;
 						}
 					}
@@ -164,18 +164,18 @@ namespace Indy.IL2CPU.IL.X86 {
 			//   1: value
 			//   2: comparand
 			Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[2]);
-			new CPUx86.Pop("eax");
+			new CPUx86.Pop(CPUx86.Registers.EAX);
 			Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[1]);
-			new CPUx86.Pop("edx");
+			new CPUx86.Pop(CPUx86.Registers.EDX);
 			Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
-			new CPUx86.Pop("ecx");
-			new CPUx86.Pushd("[ecx]");
-			new CPUx86.Pop("ecx");
-			new CPUx86.CmpXchg("ecx", "edx");
+			new CPUx86.Pop(CPUx86.Registers.ECX);
+			new CPUx86.Pushd(CPUx86.Registers.AtECX);
+			new CPUx86.Pop(CPUx86.Registers.ECX);
+			new CPUx86.CmpXchg(CPUx86.Registers.ECX, CPUx86.Registers.EDX);
 			Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
-			new CPUx86.Pop("eax");
-			new CPUx86.Move("[eax]", "ecx");
-			new CPUx86.Pushd("eax");
+			new CPUx86.Pop(CPUx86.Registers.EAX);
+			new CPUx86.Move(CPUx86.Registers.EAX,CPUx86.Registers.ECX);
+			new CPUx86.Pushd(CPUx86.Registers.EAX);
 		}
 	}
 }

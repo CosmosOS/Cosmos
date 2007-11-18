@@ -1,8 +1,7 @@
 using System;
-using System.IO;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using CPU = Indy.IL2CPU.Assembler.X86;
+using CPUx86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Ldobj)]
@@ -19,18 +18,18 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		private int mSize;
 		public override void DoAssemble() {
-			new CPU.Pop("eax");
+			new CPUx86.Pop(CPUx86.Registers.EAX);
 			for (int i = 0; i < (mSize / 4); i++) {
-				new CPU.Pushd("[eax]");
-				new CPU.Add("eax", "4");
+				new CPUx86.Pushd(CPUx86.Registers.AtEAX);
+				new CPUx86.Add(CPUx86.Registers.EAX, "4");
 			}
 			switch (mSize % 4) {
 				case 1: {
-						new CPU.Push("byte [eax]");
+						new CPUx86.Push("byte", CPUx86.Registers.AtEAX);
 						break;
 					}
 				case 2: {
-						new CPU.Push("word [eax]");
+						new CPUx86.Push("word", CPUx86.Registers.AtEAX);
 						break;
 					}
 				case 0: {

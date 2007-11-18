@@ -21,7 +21,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			Engine.QueueMethod(aMethod);
 			new CPUx86.Call(CPU.Label.GenerateLabelName(aMethod));
 			if(!aMethod.ReturnType.ReturnType.FullName.StartsWith("System.Void")) {
-				new CPUx86.Pushd("eax");
+				new CPUx86.Pushd(CPUx86.Registers.EAX);
 			}
 		}
 

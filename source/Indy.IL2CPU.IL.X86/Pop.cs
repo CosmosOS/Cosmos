@@ -1,8 +1,6 @@
 using System;
-using System.IO;
-using Mono.Cecil;
 using Mono.Cecil.Cil;
-using CPU = Indy.IL2CPU.Assembler.X86;
+using CPUx86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Pop)]
@@ -12,7 +10,7 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		}
 		public override void DoAssemble() {
-			new CPU.Pop("eax");
+			new CPUx86.Pop(CPUx86.Registers.EAX);
 			Assembler.StackSizes.Pop();
 		}
 	}

@@ -1,8 +1,7 @@
 using System;
-using System.IO;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using CPU = Indy.IL2CPU.Assembler.X86;
+using CPUx86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Initobj)]
@@ -22,17 +21,17 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		public override void DoAssemble() {
 			Assembler.StackSizes.Pop();
-			new CPU.Pop("eax");
+			new CPUx86.Pop(CPUx86.Registers.EAX);
 			for (int i = 0; i < (mObjSize / 4); i++) {
-				new CPU.Move("dword [eax + 0" + (i * 4).ToString("X") + "h]", "0");
+				new CPUx86.Move("dword [eax + 0" + (i * 4).ToString("X") + "h]", "0");
 			}
 			switch (mObjSize % 4) {
 				case 1: {
-						new CPU.Move("byte [eax + 0" + ((mObjSize / 4) * 4).ToString("X") + "h]", "0");
+						new CPUx86.Move("byte [eax + 0" + ((mObjSize / 4) * 4).ToString("X") + "h]", "0");
 						break;
 					}
 				case 2: {
-						new CPU.Move("word [eax + 0" + ((mObjSize / 4) * 4).ToString("X") + "h]", "0");
+						new CPUx86.Move("word [eax + 0" + ((mObjSize / 4) * 4).ToString("X") + "h]", "0");
 						break;
 					}
 				case 0:

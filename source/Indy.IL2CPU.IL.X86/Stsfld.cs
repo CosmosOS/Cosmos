@@ -1,8 +1,7 @@
 using System;
-using System.IO;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using CPU = Indy.IL2CPU.Assembler.X86;
+using CPUx86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Stsfld)]
@@ -18,23 +17,19 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public override void DoAssemble() {
-			//if (mIsReference && Assembler.InMetalMode) {
-			//	Pushd(4, "[" mDataName);
-			//	return;
-			//}
 			for (int i = 1; i <= (mSize / 4); i++) {
-				new CPU.Pop("eax");
-				new CPU.Move("dword [" + mDataName + " + 0x" + (mSize - (i * 4)).ToString("X") + "]", "eax");
+				new CPUx86.Pop(CPUx86.Registers.EAX);
+				new CPUx86.Move("dword [" + mDataName + " + 0x" + (mSize - (i * 4)).ToString("X") + "]", "eax");
 			}
 			switch (mSize % 4) {
 				case 1: {
-						new CPU.Pop("eax");
-						new CPU.Move("byte [" + mDataName + "]", "al");
+						new CPUx86.Pop(CPUx86.Registers.EAX);
+						new CPUx86.Move("byte [" + mDataName + "]", "al");
 						break;
 					}
 				case 2: {
-						new CPU.Pop("eax");
-						new CPU.Move("word [" + mDataName + "]", "ax");
+						new CPUx86.Pop(CPUx86.Registers.EAX);
+						new CPUx86.Move("word [" + mDataName + "]", "ax");
 						break;
 					}
 				case 0: {

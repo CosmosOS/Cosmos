@@ -1,8 +1,6 @@
 using System;
-using System.IO;
-using Mono.Cecil;
 using Mono.Cecil.Cil;
-using CPU = Indy.IL2CPU.Assembler.X86;
+using CPUx86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Conv_U8)]
@@ -17,9 +15,9 @@ namespace Indy.IL2CPU.IL.X86 {
 				case 2:
 				case 4: {
 						Assembler.StackSizes.Pop();
-						new CPU.Pop("eax");
-						new CPU.Pushd("0");
-						new CPU.Pushd("eax");
+						new CPUx86.Pop(CPUx86.Registers.EAX);
+						new CPUx86.Pushd("0");
+						new CPUx86.Pushd(CPUx86.Registers.EAX);
 						Assembler.StackSizes.Push(8);
 						break;
 					}

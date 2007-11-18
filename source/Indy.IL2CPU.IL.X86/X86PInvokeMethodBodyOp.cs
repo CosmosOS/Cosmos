@@ -42,9 +42,6 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			new Comment("PInvokeAttributes = '" + TheMethod.PInvokeInfo.Attributes.ToString("G") + "'");
 			string xStringMethodSuffix = "W";
-			if(Assembler.InMetalMode) {
-				xStringMethodSuffix = "A";
-			}
 			if (!TheMethod.PInvokeInfo.IsNoMangle) {
 				if (TheMethod.PInvokeInfo.IsCharSetUnicode) {
 					xMethodName += xStringMethodSuffix;
@@ -77,7 +74,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				Assembler.StackSizes.Pop();
 			}
 			if (MethodInfo.ReturnSize > 0) {
-				new CPUx86.Pushd("eax");
+				new CPUx86.Pushd(CPUx86.Registers.EAX);
 				Assembler.StackSizes.Push(MethodInfo.ReturnSize);
 			}
 		}

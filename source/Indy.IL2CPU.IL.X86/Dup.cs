@@ -1,8 +1,6 @@
 using System;
-using System.IO;
-using Mono.Cecil;
 using Mono.Cecil.Cil;
-using CPU = Indy.IL2CPU.Assembler.X86;
+using CPUx86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Dup)]
@@ -13,8 +11,8 @@ namespace Indy.IL2CPU.IL.X86 {
 		public override void DoAssemble() {
 			int xTheSize = Assembler.StackSizes.Peek();
 			for (int i = 0; i < (xTheSize / 4); i++) {
-				new CPU.Move("eax", "[esp + " + (i * 4) + "]");
-				new CPU.Pushd("eax");
+				new CPUx86.Move(CPUx86.Registers.EAX, "[esp + " + (i * 4) + "]");
+				new CPUx86.Pushd(CPUx86.Registers.EAX);
 			}
 			Assembler.StackSizes.Push(xTheSize);
 		}

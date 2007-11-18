@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using CPU = Indy.IL2CPU.Assembler.X86;
+using CPUx86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Brfalse)]
@@ -13,9 +13,9 @@ namespace Indy.IL2CPU.IL.X86 {
 			TargetLabel = GetInstructionLabel((Instruction)aInstruction.Operand);
 		}
 		public override void DoAssemble() {
-			new CPU.Popd("eax");
-			new CPU.Compare("eax", "00h");
-			new CPU.JumpIfEquals(TargetLabel);
+			new CPUx86.Popd(CPUx86.Registers.EAX);
+			new CPUx86.Compare(CPUx86.Registers.EAX, "0");
+			new CPUx86.JumpIfEquals(TargetLabel);
 			Assembler.StackSizes.Pop();
 		}
 	}

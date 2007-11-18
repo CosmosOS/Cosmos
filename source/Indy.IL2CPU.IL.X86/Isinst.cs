@@ -24,22 +24,22 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 		public override void DoAssemble() {
 			string mReturnNullLabel = mThisLabel + "_ReturnNull";
-			new CPUx86.Pop("eax");
+			new CPUx86.Pop(CPUx86.Registers.EAX);
 			Assembler.StackSizes.Pop();
-			new CPUx86.Compare("eax", "0");
+			new CPUx86.Compare(CPUx86.Registers.EAX, "0");
 			new CPUx86.JumpIfZero(mReturnNullLabel);
-			new CPUx86.Pushd("[eax]", "0" + mTypeId + "h");
+			new CPUx86.Pushd(CPUx86.Registers.AtEAX, "0" + mTypeId + "h");
 			Assembler.StackSizes.Push(4);
 			MethodDefinition xMethodIsInstance = Engine.GetMethodDefinition(Engine.GetTypeDefinition("", "Indy.IL2CPU.VTablesImpl"), "IsInstance", "System.Int32", "System.Int32");
 			Engine.QueueMethod(xMethodIsInstance);
 			Op xOp = new Call(xMethodIsInstance);
 			xOp.Assembler = Assembler;
 			xOp.Assemble();
-			new CPUx86.Pop("eax");
+			new CPUx86.Pop(CPUx86.Registers.EAX);
 			Assembler.StackSizes.Pop();
-			new CPUx86.Compare("eax", "0");
+			new CPUx86.Compare(CPUx86.Registers.EAX, "0");
 			new CPUx86.JumpIfEquals(mReturnNullLabel);
-			new CPUx86.Pushd("eax");
+			new CPUx86.Pushd(CPUx86.Registers.EAX);
 			new CPUx86.JumpAlways(mNextOpLabel);
 			new CPU.Label(mReturnNullLabel);
 			Assembler.StackSizes.Push(1);
