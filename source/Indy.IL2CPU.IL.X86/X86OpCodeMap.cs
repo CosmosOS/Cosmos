@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Mono.Cecil;
 using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 
@@ -37,11 +38,14 @@ namespace Indy.IL2CPU.IL.X86 {
 			return typeof(X86CustomMethodImplementationProxyOp);
 		}
 
-		public override Mono.Cecil.MethodReference GetCustomMethodImplementation(string aOrigMethodName, bool aInMetalMode) {
+		protected override IList<AssemblyDefinition> GetPlugAssemblies() {
+			IList<AssemblyDefinition> xResult = base.GetPlugAssemblies();
+			xResult.Add(AssemblyFactory.GetAssembly(typeof(X86OpCodeMap).Assembly.Location));
+			return xResult;
+		}
+
+		public override MethodReference GetCustomMethodImplementation_Old(string aOrigMethodName, bool aInMetalMode) {
 			switch (aOrigMethodName) {
-				case "System_Int32___System_String_get_Length____": {
-						return CustomImplementations.System.StringImplRefs.get_LengthRef;
-					}
 				case "System_UInt32____Indy_IL2CPU_CustomImplementation_System_StringImpl_GetStorage___System_String___": {
 						return CustomImplementation.System.StringImplRefs.GetStorage_ImplRef;
 					}
@@ -56,7 +60,7 @@ namespace Indy.IL2CPU.IL.X86 {
 						}
 					}
 				default:
-					return base.GetCustomMethodImplementation(aOrigMethodName, aInMetalMode);
+					return base.GetCustomMethodImplementation_Old(aOrigMethodName, aInMetalMode);
 			}
 		}
 
@@ -174,7 +178,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			new CPUx86.CmpXchg(CPUx86.Registers.ECX, CPUx86.Registers.EDX);
 			Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
 			new CPUx86.Pop(CPUx86.Registers.EAX);
-			new CPUx86.Move(CPUx86.Registers.EAX,CPUx86.Registers.ECX);
+			new CPUx86.Move(CPUx86.Registers.EAX, CPUx86.Registers.ECX);
 			new CPUx86.Pushd(CPUx86.Registers.EAX);
 		}
 	}

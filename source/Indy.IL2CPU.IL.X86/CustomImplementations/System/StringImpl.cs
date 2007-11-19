@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 
 namespace Indy.IL2CPU.IL.X86.CustomImplementations.System {
+	[Plug(Target = typeof(String))]
 	public static class StringImpl {
+		[PlugMethod(Signature = "System_Int32___System_String_get_Length____")]
 		public static unsafe int get_Length(int* aThis) {
 			int* xThis = aThis;
 			xThis += 3;
@@ -12,6 +14,8 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System {
 			xThis += 2;
 			return *xThis;
 		}
+
+
 
 		public static byte GetByteFromChar(char aChar) {
 			return 0;

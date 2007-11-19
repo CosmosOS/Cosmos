@@ -15,8 +15,8 @@ namespace Indy.IL2CPU.IL.X86.Native {
 	public class NativeOpCodeMap: X86.X86OpCodeMap {
 		internal static NativeOpCodeMap Instance;
 
-		public override void Initialize(Indy.IL2CPU.Assembler.Assembler aAssembler) {
-			base.Initialize(aAssembler);
+		public override void Initialize(Indy.IL2CPU.Assembler.Assembler aAssembler, Func<TypeReference, TypeDefinition> aTypeResolver) {
+			base.Initialize(aAssembler, aTypeResolver);
 			base.mMap[Code.Call] = typeof(Call);
 		}
 
@@ -153,7 +153,7 @@ namespace Indy.IL2CPU.IL.X86.Native {
 			}
 		}
 
-		public override MethodReference GetCustomMethodImplementation(string aOrigMethodName, bool aInMetalMode) {
+		public override MethodReference GetCustomMethodImplementation_Old(string aOrigMethodName, bool aInMetalMode) {
 			switch (aOrigMethodName) {
 				case "System_Void___System_Console_Clear____": {
 						return ConsoleImplRefs.ClearRef;
@@ -186,7 +186,7 @@ namespace Indy.IL2CPU.IL.X86.Native {
 						return GetGlueMethod(GlueMethodTypeEnum.Heap_MemAlloc);
 					}
 				default:
-					return base.GetCustomMethodImplementation(aOrigMethodName, aInMetalMode);
+					return base.GetCustomMethodImplementation_Old(aOrigMethodName, aInMetalMode);
 			}
 		}
 

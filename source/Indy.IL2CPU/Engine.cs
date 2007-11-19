@@ -133,7 +133,7 @@ namespace Indy.IL2CPU {
 				}
 				using (mAssembler) {
 					//mAssembler.OutputType = Assembler.Win32.Assembler.OutputTypeEnum.Console;
-					mMap.Initialize(mAssembler);
+					mMap.Initialize(mAssembler, t => GetDefinitionFromTypeReference(t));
 					mAssembler.DebugMode = aDebugMode;
 					foreach (Type t in typeof(Engine).Assembly.GetTypes()) {
 						foreach (MethodInfo mi in t.GetMethods()) {
@@ -1123,6 +1123,13 @@ namespace Indy.IL2CPU {
 		public static IEnumerable<AssemblyDefinition> GetAllAssemblies() {
 			return (from item in mCurrent.mMethods.Keys
 					select item.DeclaringType.Module.Assembly).Distinct(new AssemblyDefinitionEqualityComparer());
+		}
+
+		public static TypeDefinition GetTypeDefinitionFromReflectionType(Type aType) {
+			if (Engine.mCurrent == null) {
+				throw new Exception("No Current Engine yet!");
+			}
+			return Engine.GetTypeDefinition(aType.Assembly.FullName, aType.FullName);
 		}
 	}
 }

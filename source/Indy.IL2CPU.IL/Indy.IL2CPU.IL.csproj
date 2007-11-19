@@ -51,6 +51,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\Enums.cs" />
+    <Compile Include="Attributes\PlugAttribute.cs" />
+    <Compile Include="Attributes\PlugMethodAttribute.cs" />
     <Compile Include="CustomMethodImplementationOp.cs" />
     <Compile Include="CustomMethodImplementationProxyOp.cs" />
     <Compile Include="InitVmtImplementationOp.cs" />
