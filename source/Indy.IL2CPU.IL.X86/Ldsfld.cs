@@ -1,4 +1,5 @@
 using System;
+using Indy.IL2CPU.Assembler;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
@@ -8,18 +9,16 @@ namespace Indy.IL2CPU.IL.X86 {
 	public class Ldsfld: Op {
 		private string mDataName;
 		private int mSize;
+		private bool mNeedsGC;
 
 		public Ldsfld(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
 			FieldReference xField = (FieldReference)aInstruction.Operand;
 			mSize = Engine.GetFieldStorageSize(xField.FieldType);
 			Engine.QueueStaticField(Engine.GetDefinitionFromFieldReference(xField), out mDataName);
+			mNeedsGC = !Engine.GetDefinitionFromTypeReference(xField.FieldType).IsValueType && xField.FieldType.FullName != "System.String";
 		}
 		public override void DoAssemble() {
-			//			if(mIsReference && Assembler.InMetalMode) {
-			//				Pushd(4, mDataName);
-			//				return;
-			//			}
 			if (mSize >= 4) {
 				for (int i = 0; i < (mSize / 4); i++) {
 					//	Pop("eax");
@@ -67,6 +66,11 @@ namespace Indy.IL2CPU.IL.X86 {
 				}
 			}
 			Assembler.StackSizes.Push(mSize);
+			if (mNeedsGC) {
+				new CPUx86.Push("[" + mDataName + "]");
+				Engine.QueueMethodRef(GCImplementationRefs.IncRefCountRef);
+				new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef));
+			}
 		}
 	}
 }

@@ -13,6 +13,13 @@ class Test
 		Console.WriteLine("-----Start Array test");
 		ArrayTest();
 		Console.WriteLine("-----End Array test");		
+		Console.WriteLine("-----Start Static field test");
+		StaticFieldTest();
+		Console.WriteLine("-----End Static field test");
+		Console.WriteLine("-----Start Static field array");
+		StaticArrayTest();
+		Console.WriteLine("-----End Static field array");
+				
 	}
 	static void LocalsAndParamsTest()
 	{
@@ -41,6 +48,31 @@ class Test
 		object[] MyArray = new object[2];
 		MyArray[0] = new object();
 		MyArray[1] = new object();
+		MyArray = new object[2];
+		MyArray[0] = new object();
+		MyArray[1] = new object();
 		Console.WriteLine("End of method");
+	}
+	
+	private static object mTheObject;
+	public static void StaticFieldTest()
+	{
+		mTheObject = null;
+		mTheObject = new Object();
+		mTheObject = null;
+		mTheObject = new Object();
+		mTheObject = new Object();
+	}
+	
+	private static object[] mTheArray;
+	public static void StaticArrayTest()
+	{
+		mTheArray = new object[2];
+		mTheArray[0] = new object();
+		mTheArray[1] = new object();
+		mTheArray = new object[2];
+		mTheArray[0] = new object();
+		mTheArray[1] = new object();
+		mTheArray = null;
 	}
 }
