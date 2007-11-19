@@ -8,7 +8,7 @@ namespace Indy.IL2CPU.IL.X86.Win32.CustomImplementations.System {
 	[Plug(Target = typeof(Console))]
 	public static class ConsoleImpl {
 		[DllImport("kernel32.dll", CharSet = CharSet.Auto)]
-		static extern unsafe bool WriteConsole(IntPtr hConsoleOutput, uint* lpBuffer,
+		static extern unsafe bool WriteConsole(IntPtr hConsoleOutput, uint lpBuffer,
 		   uint nNumberOfCharsToWrite, out uint lpNumberOfCharsWritten,
 		   IntPtr lpReserved);
 		[DllImport("kernel32.dll")]

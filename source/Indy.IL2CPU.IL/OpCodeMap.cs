@@ -79,7 +79,7 @@ namespace Indy.IL2CPU.IL {
 		}
 
 		private void InitializePlugMethodsList(Assembler.Assembler aAssembler, Func<TypeReference, TypeDefinition> aTypeResolver) {
-			System.Diagnostics.Debugger.Break();
+			//System.Diagnostics.Debugger.Break();
 			if (mPlugMethods != null) {
 				throw new Exception("PlugMethods list already initialized!");
 			}
@@ -93,23 +93,23 @@ namespace Indy.IL2CPU.IL {
 			foreach (AssemblyDefinition xAssemblyDef in GetPlugAssemblies()) {
 				foreach (ModuleDefinition xModuleDef in xAssemblyDef.Modules) {
 					foreach (TypeDefinition xType in (from item in xModuleDef.Types.Cast<TypeDefinition>()
-													  where item.CustomAttributes.Cast<CustomAttribute>().Count(x => x.Constructor.DeclaringType.FullName == typeof(PlugAttribute).FullName && (x.Fields["Scope"] == null || (PlugScopeEnum)x.Fields["Scope"] == xNotWantedScope)) != 0
+													  where item.CustomAttributes.Cast<CustomAttribute>().Count(x => x.Constructor.DeclaringType.FullName == typeof(PlugAttribute).FullName && (x.Fields[PlugAttribute.ScopePropertyName] == null || (PlugScopeEnum)x.Fields[PlugAttribute.ScopePropertyName] == xNotWantedScope)) != 0
 													  select item)) {
 						CustomAttribute xPlugAttrib = (from item in xType.CustomAttributes.Cast<CustomAttribute>()
 													   where item.Constructor.DeclaringType.FullName == typeof(PlugAttribute).FullName
 													   select item).First();
-						TypeReference xTypeRef = xModuleDef.TypeReferences.Cast<TypeReference>().First(x => (x.FullName + ", " + x.Scope.ToString()) == (string)xPlugAttrib.Fields["Target"]);
+						TypeReference xTypeRef = xModuleDef.TypeReferences.Cast<TypeReference>().FirstOrDefault(x => (x.FullName + ", " + x.Scope.ToString()) == (string)xPlugAttrib.Fields[PlugAttribute.TargetPropertyName]);
 						if (xTypeRef == null) {
-							throw new Exception("TypeRef for '" + (string)xPlugAttrib.Fields["ReplaceType"] + "' not found!");
+							throw new Exception("TypeRef for '" + (string)xPlugAttrib.Fields[PlugAttribute.TargetPropertyName] + "' not found! (" + xType.FullName + ")");
 						}
 						TypeDefinition xReplaceTypeDef = aTypeResolver(xTypeRef);
 						foreach (MethodDefinition xMethod in (from item in xType.Methods.Cast<MethodDefinition>()
-															  where item.CustomAttributes.Cast<CustomAttribute>().Count(x => x.Constructor.DeclaringType.FullName == typeof(PlugMethodAttribute).FullName && (x.Fields["Scope"] == null || (PlugScopeEnum)x.Fields["Scope"] != xNotWantedScope)) != 0
+															  where item.CustomAttributes.Cast<CustomAttribute>().Count(x => x.Constructor.DeclaringType.FullName == typeof(PlugMethodAttribute).FullName && (x.Fields[PlugMethodAttribute.ScopePropertyName] == null || (PlugScopeEnum)x.Fields[PlugMethodAttribute.ScopePropertyName] != xNotWantedScope)) != 0
 															  select item)) {
 							CustomAttribute xPlugMethodAttrib = (from item in xMethod.CustomAttributes.Cast<CustomAttribute>()
 																 where item.Constructor.DeclaringType.FullName == typeof(PlugMethodAttribute).FullName
 																 select item).First();
-							string xSignature = (string)xPlugMethodAttrib.Fields["Signature"];
+							string xSignature = (string)xPlugMethodAttrib.Fields[PlugMethodAttribute.SignaturePropertyName];
 							if (!String.IsNullOrEmpty(xSignature)) {
 								mPlugMethods.Add(xSignature, xMethod);
 								continue;
@@ -140,6 +140,7 @@ namespace Indy.IL2CPU.IL {
 		protected virtual IList<AssemblyDefinition> GetPlugAssemblies() {
 			List<AssemblyDefinition> xResult = new List<AssemblyDefinition>();
 			xResult.Add(AssemblyFactory.GetAssembly(typeof(OpCodeMap).Assembly.Location));
+			xResult.Add(AssemblyFactory.GetAssembly(Assembly.Load("Indy.IL2CPU").Location));
 			return xResult;
 		}
 

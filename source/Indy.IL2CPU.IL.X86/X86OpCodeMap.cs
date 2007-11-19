@@ -44,26 +44,6 @@ namespace Indy.IL2CPU.IL.X86 {
 			return xResult;
 		}
 
-		public override MethodReference GetCustomMethodImplementation_Old(string aOrigMethodName, bool aInMetalMode) {
-			switch (aOrigMethodName) {
-				case "System_UInt32____Indy_IL2CPU_CustomImplementation_System_StringImpl_GetStorage___System_String___": {
-						return CustomImplementation.System.StringImplRefs.GetStorage_ImplRef;
-					}
-				case "System_IntPtr___System_Delegate_GetInvokeMethod____": {
-						return CustomImplementations.System.EventHandlerImplRefs.GetInvokeMethodRef;
-					}
-				case "System_Char___System_String_get_Chars___System_Int32___": {
-						if (aInMetalMode) {
-							return CustomImplementations.System.StringImplRefs.get_Chars_MetalRef;
-						} else {
-							return CustomImplementations.System.StringImplRefs.get_Chars_NormalRef;
-						}
-					}
-				default:
-					return base.GetCustomMethodImplementation_Old(aOrigMethodName, aInMetalMode);
-			}
-		}
-
 		public override bool HasCustomAssembleImplementation(MethodInformation aMethodInfo, bool aInMetalMode) {
 			switch (aMethodInfo.LabelName) {
 				case "System_Object___System_Threading_Interlocked_CompareExchange___System_Object___System_Object__System_Object___": {

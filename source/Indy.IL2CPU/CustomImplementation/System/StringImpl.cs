@@ -24,32 +24,8 @@ namespace Indy.IL2CPU.CustomImplementation.System {
 			aStorage = aChars;
 		}
 
-		public static unsafe uint* GetStorageMetal(uint* aStringPtr) {
-			return aStringPtr + 1;
+		public static uint GetStorage(string aString) {
+			return 0;
 		}
-
-		public static unsafe uint* GetStorage(string aStringPtr) {
-//			uint* thePtr = &aStringPtr;
-//			thePtr += 3;
-//			//return aStringPtr += 12;
-//			return (uint)thePtr;
-			return (uint*)0;
-		}
-
-		public static unsafe uint GetStorage_Impl(uint* aStringPtr) {
-			uint* xThis = aStringPtr;
-			xThis += 3;
-			xThis = (uint*)*xThis;
-			xThis += 3;
-			return (uint)xThis;
-		}
-
-//		public static unsafe uint* GetStorageNormal(uint* aStringPtr) {
-//			uint* xResult = aStringPtr;
-//			xResult = xResult + 3;
-//			xResult = (uint*)(*xResult);
-//			xResult += 3;
-//			return xResult;
-//		}
 	}
 }

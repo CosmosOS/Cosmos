@@ -8,5 +8,8 @@ namespace Indy.IL2CPU.IL {
 	public sealed class PlugAttribute: Attribute {
 		public Type Target;
 		public PlugScopeEnum Scope = PlugScopeEnum.All;
+
+		public const string ScopePropertyName = "Scope";
+		public const string TargetPropertyName = "Target";
 	}
 }
