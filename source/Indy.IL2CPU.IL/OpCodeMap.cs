@@ -34,7 +34,7 @@ namespace Indy.IL2CPU.IL {
 		protected abstract Type GetInitVmtImplementationOp();
 		protected abstract Type GetMainEntryPointOp();
 
-		public virtual void Initialize(Assembler.Assembler aAssembler, Func<TypeReference, TypeDefinition> aTypeResolver) {
+		public virtual void Initialize(Assembler.Assembler aAssembler, IEnumerable<AssemblyDefinition> aProjectAssemblies, Func<TypeReference, TypeDefinition> aTypeResolver) {
 			foreach (Type t in (from item in ImplementationAssembly.GetTypes()
 								where item.IsSubclassOf(typeof(Op)) && item.GetCustomAttributes(typeof(OpCodeAttribute), true).Length > 0
 								select item)) {
@@ -46,7 +46,7 @@ namespace Indy.IL2CPU.IL {
 					throw;
 				}
 			}
-			InitializePlugMethodsList(aAssembler, aTypeResolver);
+			InitializePlugMethodsList(aAssembler, aProjectAssemblies, aTypeResolver);
 		}
 
 		public Type GetOpForOpCode(Code code) {
@@ -78,8 +78,7 @@ namespace Indy.IL2CPU.IL {
 			return sb.ToString().TrimEnd(',') + ")";
 		}
 
-		private void InitializePlugMethodsList(Assembler.Assembler aAssembler, Func<TypeReference, TypeDefinition> aTypeResolver) {
-			//System.Diagnostics.Debugger.Break();
+		private void InitializePlugMethodsList(Assembler.Assembler aAssembler, IEnumerable<AssemblyDefinition> aProjectAssemblies, Func<TypeReference, TypeDefinition> aTypeResolver) {
 			if (mPlugMethods != null) {
 				throw new Exception("PlugMethods list already initialized!");
 			}
@@ -90,7 +89,7 @@ namespace Indy.IL2CPU.IL {
 			} else {
 				xNotWantedScope = PlugScopeEnum.MetalOnly;
 			}
-			foreach (AssemblyDefinition xAssemblyDef in GetPlugAssemblies()) {
+			foreach (AssemblyDefinition xAssemblyDef in GetPlugAssemblies().Union(aProjectAssemblies)) {
 				foreach (ModuleDefinition xModuleDef in xAssemblyDef.Modules) {
 					foreach (TypeDefinition xType in (from item in xModuleDef.Types.Cast<TypeDefinition>()
 													  where item.CustomAttributes.Cast<CustomAttribute>().Count(x => x.Constructor.DeclaringType.FullName == typeof(PlugAttribute).FullName && (x.Fields[PlugAttribute.ScopePropertyName] == null || (PlugScopeEnum)x.Fields[PlugAttribute.ScopePropertyName] == xNotWantedScope)) != 0

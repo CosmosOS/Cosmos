@@ -121,7 +121,6 @@ namespace Indy.IL2CPU {
 				((IndyAssemblyResolver)mCrawledAssembly.Resolver).AddSearchDirectory(Environment.CurrentDirectory);
 				((IndyAssemblyResolver)mCrawledAssembly.Resolver).AddSearchDirectory(Path.GetDirectoryName(aAssembly));
 				((IndyAssemblyResolver)mCrawledAssembly.Resolver).AddSearchDirectory(Path.GetDirectoryName(typeof(Engine).Assembly.Location));
-
 				if (mCrawledAssembly.EntryPoint == null) {
 					throw new NotSupportedException("Libraries are not supported!");
 				}
@@ -141,7 +140,20 @@ namespace Indy.IL2CPU {
 				}
 				using (mAssembler) {
 					//mAssembler.OutputType = Assembler.Win32.Assembler.OutputTypeEnum.Console;
-					mMap.Initialize(mAssembler, t => GetDefinitionFromTypeReference(t));
+					List<AssemblyDefinition> xAssemblyList = new List<AssemblyDefinition>();
+					xAssemblyList.Add(mCrawledAssembly);
+					for(int i = 0; i < xAssemblyList.Count;i++) {
+						AssemblyDefinition xCurDef = xAssemblyList[i];
+						foreach(ModuleDefinition xModDef in xCurDef.Modules) {
+							foreach(AssemblyNameReference xAssemblyRef in xModDef.AssemblyReferences) {
+								AssemblyDefinition xReffedAssembly = mCrawledAssembly.Resolver.Resolve(xAssemblyRef);
+								if(!xAssemblyList.Contains(xReffedAssembly)) {
+									xAssemblyList.Add(xReffedAssembly);
+								}
+							}
+						}
+					}
+					mMap.Initialize(mAssembler, xAssemblyList, t => GetDefinitionFromTypeReference(t));
 					mAssembler.DebugMode = aDebugMode;
 					foreach (Type t in typeof(Engine).Assembly.GetTypes()) {
 						foreach (MethodInfo mi in t.GetMethods()) {
