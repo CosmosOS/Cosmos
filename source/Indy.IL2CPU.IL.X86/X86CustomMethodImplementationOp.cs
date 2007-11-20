@@ -31,17 +31,17 @@ namespace Indy.IL2CPU.IL.X86 {
 			new Assembler.X86.Move(CPUx86.Registers.EAX, "0");
 			new Assembler.X86.Move(CPUx86.Registers.EDI, "[" + MethodInfo.Arguments[0].VirtualAddresses[0] + "]");
 			new Assembler.X86.Move(CPUx86.Registers.ESI, "[" + MethodInfo.Arguments[1].VirtualAddresses[0] + "]");
-			new Assembler.X86.Add(CPUx86.Registers.ESI, "8");
-			new Assembler.X86.Move(CPUx86.Registers.ECX, CPUx86.Registers.AtESI);
-			new Assembler.X86.Add(CPUx86.Registers.ESI, "4");
-			new Assembler.X86.Add(CPUx86.Registers.EDI, "12");
+			new Assembler.X86.Add(CPUx86.Registers.EDI, "8");
+			new Assembler.X86.Move(CPUx86.Registers.ECX, CPUx86.Registers.AtEDI);
+			new Assembler.X86.Add(CPUx86.Registers.EDI, "4");
+			new Assembler.X86.Add(CPUx86.Registers.ESI, "12");
 
 			new Assembler.Label(".StartLoop");
-			new Assembler.X86.Move(CPUx86.Registers.EDX, CPUx86.Registers.AtESI);
-			new Assembler.X86.Move(CPUx86.Registers.AtEDI, CPUx86.Registers.EDX);
-			new Assembler.X86.Add(CPUx86.Registers.EAX, "4");
-			new Assembler.X86.Add(CPUx86.Registers.ESI, "4");
-			new Assembler.X86.Add(CPUx86.Registers.EDI, "4");
+			new Assembler.X86.Move("byte", CPUx86.Registers.DL, CPUx86.Registers.AtESI);
+			new Assembler.X86.Move("byte", CPUx86.Registers.AtEDI, CPUx86.Registers.DL);
+			new Assembler.X86.Add(CPUx86.Registers.EAX, "1");
+			new Assembler.X86.Add(CPUx86.Registers.ESI, "1");
+			new Assembler.X86.Add(CPUx86.Registers.EDI, "1");
 			new Assembler.X86.Compare(CPUx86.Registers.EAX, CPUx86.Registers.ECX);
 			new Assembler.X86.JumpIfEquals(".EndLoop");
 			new Assembler.X86.JumpAlways(".StartLoop");

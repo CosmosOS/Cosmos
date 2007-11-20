@@ -207,11 +207,12 @@ namespace Indy.IL2CPU {
 						xEntryPointOp.Call(RuntimeEngineRefs.InitializeApplicationRef);
 						if (!aInMetalMode) {
 							xEntryPointOp.Call("____INIT__VMT____");
-						}
-						foreach (TypeDefinition xType in mTypes) {
-							foreach (MethodDefinition xMethod in xType.Constructors) {
-								if (xMethod.IsStatic) {
-									xEntryPointOp.Call(xMethod);
+
+							foreach (TypeDefinition xType in mTypes) {
+								foreach (MethodDefinition xMethod in xType.Constructors) {
+									if (xMethod.IsStatic) {
+										xEntryPointOp.Call(xMethod);
+									}
 								}
 							}
 						}

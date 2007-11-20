@@ -30,6 +30,9 @@ namespace Indy.IL2CPU {
 			uint* xTheObject = (uint*)aObject;
 			xTheObject -= 1;
 			if ((*xTheObject & 0x80000000) != 0) {
+				return;
+			}
+			if ((*xTheObject & 0x88888888) != 0) {
 				Console.Write("StaleObject: ");
 				WriteNumber(aObject, false);
 				Console.WriteLine();

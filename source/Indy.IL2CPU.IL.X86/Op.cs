@@ -21,7 +21,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				new Push(CPUx86.Registers.EAX);
 			}
 			aAssembler.StackSizes.Push(aArg.Size);
-			if (aAddGCCode && aArg.IsReferenceType && aArg.ArgumentType.FullName != "System.String") {
+			if (aAddGCCode && aArg.IsReferenceType) {
 				new CPUx86.Push(CPUx86.Registers.EAX);
 				Engine.QueueMethodRef(GCImplementationRefs.IncRefCountRef);
 				new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef));
@@ -147,7 +147,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				new CPUx86.Push("eax");
 			}
 			aAssembler.StackSizes.Push(aLocal.Size);
-			if (aAddGCCode && aLocal.IsReferenceType && aLocal.VariableType.FullName != "System.String") {
+			if (aAddGCCode && aLocal.IsReferenceType) {
 				new CPUx86.Push("eax");
 				Engine.QueueMethodRef(GCImplementationRefs.IncRefCountRef);
 				new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef));

@@ -34,12 +34,12 @@ namespace Indy.IL2CPU.IL.X86 {
 			if (!aAssembler.InMetalMode) {
 				Engine.QueueMethodRef(GCImplementationRefs.DecRefCountRef);
 				foreach (MethodInformation.Variable xLocal in aLocals) {
-					if (xLocal.IsReferenceType && xLocal.VariableType.FullName != "System.String") {
+					if (xLocal.IsReferenceType) {
 					//	System.Diagnostics.Debugger.Break();
 						TypeSpecification xTypeSpec = xLocal.VariableType as TypeSpecification;
 						if (xTypeSpec != null) {
 							TypeDefinition xElementDef = Engine.GetDefinitionFromTypeReference(xTypeSpec.ElementType);
-							if ((!xElementDef.IsValueType) && xElementDef.FullName != "System.String") {
+							if (!xElementDef.IsValueType) {
 								Op.Ldloc(aAssembler, xLocal, false);
 								new CPUx86.Push("8");
 								Op.Add(aAssembler);
@@ -74,7 +74,7 @@ namespace Indy.IL2CPU.IL.X86 {
 					}
 				}
 				foreach (MethodInformation.Argument xArg in aArgs) {
-					if (xArg.IsReferenceType && xArg.ArgumentType.FullName != "System.String") {
+					if (xArg.IsReferenceType) {
 						Op.Ldarg(aAssembler, xArg, false);
 						new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef));
 					}

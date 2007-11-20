@@ -93,7 +93,6 @@ namespace Indy.IL2CPU.IL {
 			} else {
 				xNotWantedScope = PlugScopeEnum.MetalOnly;
 			}
-			System.Diagnostics.Debugger.Break();
 			foreach (AssemblyDefinition xAssemblyDef in GetPlugAssemblies().Union(aPlugs)) {
 				foreach (ModuleDefinition xModuleDef in xAssemblyDef.Modules) {
 					foreach (TypeDefinition xType in (from item in xModuleDef.Types.Cast<TypeDefinition>()
@@ -120,8 +119,8 @@ namespace Indy.IL2CPU.IL {
 						}
 						TypeDefinition xReplaceTypeDef = aTypeResolver(xTypeRef);
 						foreach (MethodDefinition xMethod in (from item in xType.Methods.Cast<MethodDefinition>()
-															  where item.IsPublic
-															  select item)) {
+															  select item).Union((from item in xType.Constructors.Cast<MethodDefinition>()
+																					  select item))) {
 							CustomAttribute xPlugMethodAttrib = (from item in xMethod.CustomAttributes.Cast<CustomAttribute>()
 																 where item.Constructor.DeclaringType.FullName == typeof(PlugMethodAttribute).FullName
 																 select item).FirstOrDefault();
