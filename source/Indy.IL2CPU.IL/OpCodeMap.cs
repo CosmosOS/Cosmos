@@ -37,9 +37,8 @@ namespace Indy.IL2CPU.IL {
 
 		public virtual void Initialize(Assembler.Assembler aAssembler, IEnumerable<AssemblyDefinition> aPlugs, Func<TypeReference, TypeDefinition> aTypeResolver, Func<string, AssemblyDefinition> aAssemblyResolver) {
 			foreach (var xItem in (from item in ImplementationAssembly.GetTypes()
-								   let xAttribs = item.GetCustomAttributes(typeof(OpCodeAttribute), true)
-								   let xAttrib = xAttribs.FirstOrDefault() as OpCodeAttribute
-								   where item.IsSubclassOf(typeof(Op)) && xAttribs.Length > 0 && xAttrib != null
+								   let xAttrib = item.GetCustomAttributes(typeof(OpCodeAttribute), true).FirstOrDefault() as OpCodeAttribute
+								   where item.IsSubclassOf(typeof(Op)) && xAttrib != null
 								   select new {
 									   OpCode = xAttrib.OpCode,
 									   Type = item
@@ -94,6 +93,7 @@ namespace Indy.IL2CPU.IL {
 			} else {
 				xNotWantedScope = PlugScopeEnum.MetalOnly;
 			}
+			System.Diagnostics.Debugger.Break();
 			foreach (AssemblyDefinition xAssemblyDef in GetPlugAssemblies().Union(aPlugs)) {
 				foreach (ModuleDefinition xModuleDef in xAssemblyDef.Modules) {
 					foreach (TypeDefinition xType in (from item in xModuleDef.Types.Cast<TypeDefinition>()
@@ -104,7 +104,6 @@ namespace Indy.IL2CPU.IL {
 													   select item).First();
 						TypeReference xTypeRef = xModuleDef.TypeReferences.Cast<TypeReference>().FirstOrDefault(x => (x.FullName + ", " + x.Scope.ToString()) == (string)xPlugAttrib.Fields[PlugAttribute.TargetPropertyName]);
 						if (xTypeRef == null) {
-							System.Diagnostics.Debugger.Break();
 							string xTypeFullyQualedName = (string)xPlugAttrib.Fields[PlugAttribute.TargetPropertyName];
 							string xAsmName = xTypeFullyQualedName.Substring(xTypeFullyQualedName.IndexOf(",") + 1).TrimStart();
 							string xTypeName = xTypeFullyQualedName.Substring(0, xTypeFullyQualedName.IndexOf(","));
@@ -128,6 +127,7 @@ namespace Indy.IL2CPU.IL {
 																 select item).FirstOrDefault();
 							string xSignature = String.Empty;
 							if (xPlugMethodAttrib != null) {
+								xSignature = xPlugMethodAttrib.Fields[PlugMethodAttribute.SignaturePropertyName] as string;
 								if (!String.IsNullOrEmpty(xPlugMethodAttrib.Fields[PlugMethodAttribute.EnabledPropertyName] as String)) {
 									if (!Boolean.Parse((string)xPlugMethodAttrib.Fields[PlugMethodAttribute.EnabledPropertyName]) || (xPlugMethodAttrib.Fields[PlugMethodAttribute.ScopePropertyName] == null || (PlugScopeEnum)xPlugMethodAttrib.Fields[PlugMethodAttribute.ScopePropertyName] != xNotWantedScope)) {
 										continue;

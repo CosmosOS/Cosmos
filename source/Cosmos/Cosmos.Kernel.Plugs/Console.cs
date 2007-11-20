@@ -4,8 +4,8 @@ using System.Text;
 using Indy.IL2CPU.Plugs;
 
 namespace Cosmos.Kernel.Plugs {
-    [Plug(Target=typeof(System.Console))]
-    class Console {
+	[Plug(Target = typeof(System.Console))]
+	class Console {
 		public const int Columns = 80;
 		public const int Lines = 24;
 		public const int Attribute = 7;
@@ -84,5 +84,9 @@ namespace Cosmos.Kernel.Plugs {
 				mCurrentChar = 0;
 			}
 		}
-    }
+
+		public static void WriteLine() {
+			WriteLine("");
+		}
+	}
 }
