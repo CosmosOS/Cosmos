@@ -45,9 +45,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{AF6B9223
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Performance", "Tests\Performance\Performance.csproj", "{506A31B6-40B0-4EB2-930A-9B4A6DC23AB4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Shell.Console", "Cosmos\Cosmos.Shell.Console\Cosmos.Shell.Console.csproj", "{E4A9F8F0-D0DC-465A-A64A-FE56504D397E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel", "Cosmos\Cosmos.Kernel\Cosmos.Kernel.csproj", "{A1F83D9F-2D44-4264-A08B-416797123018}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Hardware", "Cosmos\Cosmos.Hardware\Cosmos.Hardware.csproj", "{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 20
+		SccNumberOfProjects = 23
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -112,6 +118,15 @@ Global
 		SccProjectTopLevelParentUniqueName19 = IL2CPU.sln
 		SccProjectName19 = Cosmos.Kernel.LogViewer
 		SccLocalPath19 = Cosmos.Kernel.LogViewer
+		SccProjectUniqueName20 = Cosmos\\Cosmos.Shell.Console\\Cosmos.Shell.Console.csproj
+		SccProjectName20 = Cosmos/Cosmos.Shell.Console
+		SccLocalPath20 = Cosmos\\Cosmos.Shell.Console
+		SccProjectUniqueName21 = Cosmos\\Cosmos.Kernel\\Cosmos.Kernel.csproj
+		SccProjectName21 = Cosmos/Cosmos.Kernel
+		SccLocalPath21 = Cosmos\\Cosmos.Kernel
+		SccProjectUniqueName22 = Cosmos\\Cosmos.Hardware\\Cosmos.Hardware.csproj
+		SccProjectName22 = Cosmos/Cosmos.Hardware
+		SccLocalPath22 = Cosmos\\Cosmos.Hardware
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -197,6 +212,18 @@ Global
 		{506A31B6-40B0-4EB2-930A-9B4A6DC23AB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{506A31B6-40B0-4EB2-930A-9B4A6DC23AB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{506A31B6-40B0-4EB2-930A-9B4A6DC23AB4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E4A9F8F0-D0DC-465A-A64A-FE56504D397E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4A9F8F0-D0DC-465A-A64A-FE56504D397E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4A9F8F0-D0DC-465A-A64A-FE56504D397E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4A9F8F0-D0DC-465A-A64A-FE56504D397E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1F83D9F-2D44-4264-A08B-416797123018}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1F83D9F-2D44-4264-A08B-416797123018}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1F83D9F-2D44-4264-A08B-416797123018}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1F83D9F-2D44-4264-A08B-416797123018}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
