@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Cosmos.Kernel
+namespace Cosmos.Kernel.Plugs
 {
     class Console
     {
