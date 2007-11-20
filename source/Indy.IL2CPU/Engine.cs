@@ -105,15 +105,23 @@ namespace Indy.IL2CPU {
 		/// <param name="aTargetPlatform">The platform to target when assembling the code.</param>
 		/// <param name="aOutput"></param>
 		/// <param name="aInMetalMode">Whether or not the output is metalmode only.</param>
-		public void Execute(string aAssembly, TargetPlatformEnum aTargetPlatform, StreamWriter aOutput, bool aInMetalMode, bool aDebugMode) {
+		public void Execute(string aAssembly, TargetPlatformEnum aTargetPlatform, StreamWriter aOutput, bool aInMetalMode, bool aDebugMode, string aAssemblyDir) {
 			mCurrent = this;
 			try {
 				if (aOutput == null) {
 					throw new ArgumentNullException("aOutput");
 				}
 				mCrawledAssembly = AssemblyFactory.GetAssembly(aAssembly);
-				((DefaultAssemblyResolver)mCrawledAssembly.Resolver).AddSearchDirectory(Environment.CurrentDirectory);
-				((DefaultAssemblyResolver)mCrawledAssembly.Resolver).AddSearchDirectory(Path.GetDirectoryName(aAssembly));
+				mCrawledAssembly.Resolver = new IndyAssemblyResolver();
+				if (!String.IsNullOrEmpty(aAssemblyDir)) {
+					foreach (string s in Directory.GetFiles(aAssemblyDir, "*.dll")) {
+						((IndyAssemblyResolver)mCrawledAssembly.Resolver).RegisterAssembly(s);
+					}
+				}
+				((IndyAssemblyResolver)mCrawledAssembly.Resolver).AddSearchDirectory(Environment.CurrentDirectory);
+				((IndyAssemblyResolver)mCrawledAssembly.Resolver).AddSearchDirectory(Path.GetDirectoryName(aAssembly));
+				((IndyAssemblyResolver)mCrawledAssembly.Resolver).AddSearchDirectory(Path.GetDirectoryName(typeof(Engine).Assembly.Location));
+
 				if (mCrawledAssembly.EntryPoint == null) {
 					throw new NotSupportedException("Libraries are not supported!");
 				}
@@ -147,7 +155,7 @@ namespace Indy.IL2CPU {
 					IL.Op.QueueMethod += QueueMethod;
 					IL.Op.QueueStaticField += QueueStaticField;
 					try {
-						mTypes.Add(GetTypeDefinition("mscorlib", "System.Object"));
+						mTypes.Add(GetTypeDefinitionFromReflectionType(typeof(object)));
 						mMethods.Add(RuntimeEngineRefs.InitializeApplicationRef, new QueuedMethodInformation() {
 							Processed = false,
 							Index = mMethods.Count
@@ -178,6 +186,17 @@ namespace Indy.IL2CPU {
 							Processed = false,
 							Index = mMethods.Count
 						});
+						ProcessAllMethods();
+						if (!aInMetalMode) {
+							do {
+								int xOldCount = mMethods.Count;
+								ScanForMethodToIncludeForVMT();
+								ProcessAllMethods();
+								if (xOldCount == mMethods.Count) {
+									break;
+								}
+							} while (true);
+						}
 						// initialize the runtime engine
 						MainEntryPointOp xEntryPointOp = (MainEntryPointOp)GetOpFromType(mMap.MainEntryPointOp, null, null);
 						xEntryPointOp.Assembler = mAssembler;
@@ -185,6 +204,13 @@ namespace Indy.IL2CPU {
 						xEntryPointOp.Call(RuntimeEngineRefs.InitializeApplicationRef);
 						if (!aInMetalMode) {
 							xEntryPointOp.Call("____INIT__VMT____");
+						}
+						foreach (TypeDefinition xType in mTypes) {
+							foreach (MethodDefinition xMethod in xType.Constructors) {
+								if (xMethod.IsStatic) {
+									xEntryPointOp.Call(xMethod);
+								}
+							}
 						}
 						xEntryPointOp.Call(mCrawledAssembly.EntryPoint);
 						if (mCrawledAssembly.EntryPoint.ReturnType.ReturnType.FullName.StartsWith("System.Void", StringComparison.InvariantCultureIgnoreCase)) {
@@ -339,7 +365,7 @@ namespace Indy.IL2CPU {
 			TypeDefinition xTypeDef;
 			bool xIsArray = false;
 			if (aRef.DeclaringType.FullName.Contains("[]") || aRef.DeclaringType.FullName.Contains("[,]") || aRef.DeclaringType.FullName.Contains("[,,]")) {
-				xTypeDef = GetTypeDefinition("mscorlib", "System.Array");
+				xTypeDef = GetTypeDefinitionFromReflectionType(typeof(Array));
 				xIsArray = true;
 			} else {
 				xTypeDef = GetDefinitionFromTypeReference(aRef.DeclaringType);
@@ -430,7 +456,7 @@ namespace Indy.IL2CPU {
 			}
 			AssemblyNameReference xAssemblyNameReference = aRef.Scope as AssemblyNameReference;
 			if (xAssemblyNameReference != null) {
-				return GetTypeDefinition(xAssemblyNameReference.Name, aRef.FullName);
+				return GetTypeDefinition(mCurrent.mCrawledAssembly.Resolver.Resolve(xAssemblyNameReference), aRef.FullName);
 			} else {
 				ModuleDefinition xReferencedModule = aRef.Scope as ModuleDefinition;
 				if (xReferencedModule != null) {
@@ -578,10 +604,10 @@ namespace Indy.IL2CPU {
 							int xStorageSize = GetFieldStorageSize(xCurrentField.FieldType);
 							if (xCurrentField.InitialValue.Length > 4) {
 								xTheData = "0,0,0,0,";
-								xTheData += BitConverter.GetBytes(0x80000002).Aggregate("", (r, b) => r + b + "");
+								xTheData += BitConverter.GetBytes(0x80000002).Aggregate("", (r, b) => r + b + ",");
 							}
-							xTheData += BitConverter.GetBytes(xCurrentField.InitialValue.Length).Aggregate("", (r, b) => r + b + "");
-							xTheData += xCurrentField.InitialValue.Aggregate("", (r, b) => r + b + "");
+							xTheData += BitConverter.GetBytes(xCurrentField.InitialValue.Length).Aggregate("", (r, b) => r + b + ",");
+							xTheData += xCurrentField.InitialValue.Aggregate("", (r, b) => r + b + ",");
 							xTheData = xTheData.TrimEnd(',');
 							if (xTheData.Length == 0) {
 								throw new Exception("Field '" + xCurrentField.ToString() + "' doesn't have a valid size!");
@@ -1035,43 +1061,52 @@ namespace Indy.IL2CPU {
 		private SortedList<string, AssemblyDefinition> mAssemblyDefCache = new SortedList<string, AssemblyDefinition>();
 
 		public static TypeDefinition GetTypeDefinition(string aAssembly, string aType) {
-			if (mCurrent == null) {
-				throw new Exception("ERROR: No Current Engine found!");
-			}
 			AssemblyDefinition xAssemblyDef;
 			if (mCurrent.mAssemblyDefCache.ContainsKey(aAssembly)) {
 				xAssemblyDef = mCurrent.mAssemblyDefCache[aAssembly];
 			} else {
-				Assembly xAssembly = (from item in AppDomain.CurrentDomain.GetAssemblies()
-									  where item.FullName == aAssembly || item.GetName().Name == aAssembly
-									  select item).FirstOrDefault();
-				if (xAssembly == null) {
-					if (String.IsNullOrEmpty(aAssembly) || aAssembly == typeof(Engine).Assembly.GetName().Name || aAssembly == typeof(Engine).Assembly.GetName().FullName) {
-						xAssembly = typeof(Engine).Assembly;
-					}
+				//
+				//				Assembly xAssembly = (from item in AppDomain.CurrentDomain.GetAssemblies()
+				//									  where item.FullName == aAssembly || item.GetName().Name == aAssembly
+				//									  select item).FirstOrDefault();
+				//				if (xAssembly == null) {
+				//					if (String.IsNullOrEmpty(aAssembly) || aAssembly == typeof(Engine).Assembly.GetName().Name || aAssembly == typeof(Engine).Assembly.GetName().FullName) {
+				//						xAssembly = typeof(Engine).Assembly;
+				//					}
+				//				}
+				//				if (xAssembly != null) {
+				//					if (aAssembly.StartsWith("mscorlib"))
+				//						throw new Exception("Shouldn't be used!");
+				//					Console.WriteLine("Using AssemblyFactory for '{0}'", aAssembly);
+				//					xAssemblyDef = AssemblyFactory.GetAssembly(xAssembly.Location);
+				//				} else {
+				//					xAssemblyDef = mCurrent.mCrawledAssembly.Resolver.Resolve(aAssembly);
+				//				}
+				//				mCurrent.mAssemblyDefCache.Add(aAssembly, xAssemblyDef);
+				if (String.IsNullOrEmpty(aAssembly) || aAssembly == typeof(Engine).Assembly.GetName().Name || aAssembly == typeof(Engine).Assembly.GetName().FullName) {
+					aAssembly = typeof(Engine).Assembly.FullName;
 				}
-				if (xAssembly != null) {
-					xAssemblyDef = AssemblyFactory.GetAssembly(xAssembly.Location);
-				} else {
-					xAssemblyDef = mCurrent.mCrawledAssembly.Resolver.Resolve(aAssembly);
-				}
-				mCurrent.mAssemblyDefCache.Add(aAssembly, xAssemblyDef);
+				xAssemblyDef = mCurrent.mCrawledAssembly.Resolver.Resolve(aAssembly);
 			}
+			return GetTypeDefinition(xAssemblyDef, aType);
+		}
+
+		public static TypeDefinition GetTypeDefinition(AssemblyDefinition aAssembly, string aType) {
+			if (mCurrent == null) {
+				throw new Exception("ERROR: No Current Engine found!");
+			}
+
 			TypeDefinition xTypeDef = null;
 			string xActualTypeName = aType;
 			if (xActualTypeName.Contains("<") && xActualTypeName.Contains(">")) {
 				xActualTypeName = xActualTypeName.Substring(0, xActualTypeName.IndexOf("<"));
 			}
-			foreach (ModuleDefinition xModDef in xAssemblyDef.Modules) {
+			foreach (ModuleDefinition xModDef in aAssembly.Modules) {
 				if (xModDef.Types.Contains(xActualTypeName)) {
-					xTypeDef = xModDef.Types[xActualTypeName];
-					break;
+					return xModDef.Types[xActualTypeName];
 				}
 			}
-			if (xTypeDef == null) {
-				throw new Exception("Type '" + aType + "' not found in assembly '" + aAssembly + "'!");
-			}
-			return xTypeDef;
+			throw new Exception("Type '" + aType + "' not found in assembly '" + aAssembly + "'!");
 		}
 
 		public static MethodDefinition GetMethodDefinition(TypeDefinition aType, string aMethod, params string[] aParamTypes) {
@@ -1129,7 +1164,7 @@ namespace Indy.IL2CPU {
 			if (Engine.mCurrent == null) {
 				throw new Exception("No Current Engine yet!");
 			}
-			return Engine.GetTypeDefinition(aType.Assembly.FullName, aType.FullName);
+			return Engine.GetTypeDefinition(mCurrent.mCrawledAssembly.Resolver.Resolve(aType.Assembly.FullName), aType.FullName);
 		}
 	}
 }

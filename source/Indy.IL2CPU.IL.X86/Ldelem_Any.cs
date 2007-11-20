@@ -34,7 +34,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				}else {
 					if(xSizeLeft >= 2) {
 						new CPUx86.Move(CPUx86.Registers.ECX, "0");
-						new CPUx86.Move("word", CPUx86.Registers.ECX, CPUx86.Registers.AtEAX);
+						new CPUx86.Move("word", CPUx86.Registers.CX, CPUx86.Registers.AtEAX);
 						new CPUx86.Push(CPUx86.Registers.ECX);
 						new CPUx86.Add(CPUx86.Registers.EAX, "2");
 						xSizeLeft -= 2;

@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Indy.IL2CPU.IL.X86.Win32.CustomImplementations.System {
-	[Plug(Target = typeof(Console))]
+	//[Plug(Target = typeof(Console))]
 	public static class ConsoleImpl {
 		[DllImport("kernel32.dll", CharSet = CharSet.Auto)]
 		static extern unsafe bool WriteConsole(IntPtr hConsoleOutput, uint lpBuffer,

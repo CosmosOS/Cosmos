@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="CustomImplementations\System\ConsoleImpl.cs" />
     <Compile Include="CustomImplementations\System\ConsoleImplRefs.cs" />
+    <Compile Include="CustomImplementations\System\EnvironmentImpl.cs" />
     <Compile Include="PInvokes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RuntimeEngineImpl.cs" />

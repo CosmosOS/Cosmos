@@ -99,6 +99,7 @@
     <Compile Include="CustomImplementation\System\StringImplRefs.cs" />
     <Compile Include="GCImplementationRefs.cs" />
     <Compile Include="GCImplementation.cs" />
+    <Compile Include="IndyAssemblyResolver.cs" />
     <Compile Include="VTablesImpl.cs" />
     <Compile Include="VTablesImplRefs.cs" />
   </ItemGroup>

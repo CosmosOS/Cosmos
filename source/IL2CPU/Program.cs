@@ -13,8 +13,9 @@ namespace IL2CPU {
 		public static string InputFile;
 		public static string OutputFile;
 		public static string AsmFile;
+		public static string BCLDir;
 		public static bool MetalMode;
-		public static bool DebugMode=true;
+		public static bool DebugMode = true;
 		public static TargetPlatformEnum TargetPlatform = TargetPlatformEnum.Win32;
 
 		private Type win32Type = typeof(Win32OpCodeMap);
@@ -83,7 +84,14 @@ namespace IL2CPU {
 								}
 							}
 							break;
-					}
+						}
+					case "bcldir": {
+							if (String.IsNullOrEmpty(xArgParts[1])) {
+								throw new Exception("When using the bcldir switch, you need to specify a valid path!");
+							}
+							BCLDir = xArgParts[1];
+							break;
+						}
 					default: {
 							Console.WriteLine("Error parsing arguments. Arguments not recognized ('{0}')", xArgParts[0]);
 							return false;
@@ -129,7 +137,7 @@ namespace IL2CPU {
 					}
 					using (FileStream fs = new FileStream(AsmFile, FileMode.Create)) {
 						using (StreamWriter br = new StreamWriter(fs)) {
-							e.Execute(InputFile, TargetPlatform, br, MetalMode, DebugMode);
+							e.Execute(InputFile, TargetPlatform, br, MetalMode, DebugMode, BCLDir);
 						}
 					}
 					ProcessStartInfo xFasmStartInfo = new ProcessStartInfo();
