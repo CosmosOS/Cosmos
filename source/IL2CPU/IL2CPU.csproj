@@ -48,7 +48,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Cosmos.Kernel\Cosmos.Kernel.csproj">
       <Project>{EF5F012A-4AA4-4B4D-A318-6D228C1F30D8}</Project>
-      <Name>Cosmos.Kernel</Name>
+      <Name>Cosmos.Kernel %28Cosmos-old\Cosmos.Kernel%29</Name>
     </ProjectReference>
     <ProjectReference Include="..\HelloWorldMetal\HelloWorldMetal.csproj">
       <Project>{B57BEF6D-48D6-49DD-B4C5-893537E0EBB8}</Project>
