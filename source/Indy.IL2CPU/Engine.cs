@@ -105,7 +105,7 @@ namespace Indy.IL2CPU {
 		/// <param name="aTargetPlatform">The platform to target when assembling the code.</param>
 		/// <param name="aOutput"></param>
 		/// <param name="aInMetalMode">Whether or not the output is metalmode only.</param>
-		public void Execute(string aAssembly, TargetPlatformEnum aTargetPlatform, StreamWriter aOutput, bool aInMetalMode, bool aDebugMode, string aAssemblyDir) {
+		public void Execute(string aAssembly, TargetPlatformEnum aTargetPlatform, StreamWriter aOutput, bool aInMetalMode, bool aDebugMode, string aAssemblyDir, IEnumerable<string> aPlugs) {
 			mCurrent = this;
 			try {
 				if (aOutput == null) {
@@ -140,20 +140,11 @@ namespace Indy.IL2CPU {
 				}
 				using (mAssembler) {
 					//mAssembler.OutputType = Assembler.Win32.Assembler.OutputTypeEnum.Console;
-					List<AssemblyDefinition> xAssemblyList = new List<AssemblyDefinition>();
-					xAssemblyList.Add(mCrawledAssembly);
-					for(int i = 0; i < xAssemblyList.Count;i++) {
-						AssemblyDefinition xCurDef = xAssemblyList[i];
-						foreach(ModuleDefinition xModDef in xCurDef.Modules) {
-							foreach(AssemblyNameReference xAssemblyRef in xModDef.AssemblyReferences) {
-								AssemblyDefinition xReffedAssembly = mCrawledAssembly.Resolver.Resolve(xAssemblyRef);
-								if(!xAssemblyList.Contains(xReffedAssembly)) {
-									xAssemblyList.Add(xReffedAssembly);
-								}
-							}
-						}
+					List<AssemblyDefinition> xPlugDefs = new List<AssemblyDefinition>();
+					foreach (string xPlug in aPlugs) {
+						xPlugDefs.Add(AssemblyFactory.GetAssembly(xPlug));
 					}
-					mMap.Initialize(mAssembler, xAssemblyList, t => GetDefinitionFromTypeReference(t));
+					mMap.Initialize(mAssembler, xPlugDefs, t => GetDefinitionFromTypeReference(t), a => mCrawledAssembly.Resolver.Resolve(a));
 					mAssembler.DebugMode = aDebugMode;
 					foreach (Type t in typeof(Engine).Assembly.GetTypes()) {
 						foreach (MethodInfo mi in t.GetMethods()) {

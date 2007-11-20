@@ -51,9 +51,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Attributes\Enums.cs" />
-    <Compile Include="Attributes\PlugAttribute.cs" />
-    <Compile Include="Attributes\PlugMethodAttribute.cs" />
     <Compile Include="CustomMethodImplementationOp.cs" />
     <Compile Include="CustomMethodImplementationProxyOp.cs" />
     <Compile Include="InitVmtImplementationOp.cs" />
@@ -73,6 +70,10 @@
     <ProjectReference Include="..\Indy.IL2CPU.Assembler\Indy.IL2CPU.Assembler.csproj">
       <Project>{8E8CAD9B-C092-4071-AD92-E7A4E7BA776F}</Project>
       <Name>Indy.IL2CPU.Assembler</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Indy.IL2CPU.Plugs\Indy.IL2CPU.Plugs.csproj">
+      <Project>{E9B2E8CC-E264-42F9-9113-16B0A0431198}</Project>
+      <Name>Indy.IL2CPU.Plugs</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

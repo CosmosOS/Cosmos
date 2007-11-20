@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.20706</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{E4A9F8F0-D0DC-465A-A64A-FE56504D397E}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{E9B2E8CC-E264-42F9-9113-16B0A0431198}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Cosmos.Shell.Console</RootNamespace>
-    <AssemblyName>Cosmos.Shell.Console</AssemblyName>
+    <RootNamespace>Indy.IL2CPU.Plugs</RootNamespace>
+    <AssemblyName>Indy.IL2CPU.Plugs</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
@@ -25,7 +25,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -36,19 +35,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
+    <Compile Include="Enums.cs" />
+    <Compile Include="PlugAttribute.cs" />
+    <Compile Include="PlugMethodAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Folder Include="Properties\" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Cosmos.Kernel\Cosmos.Kernel.csproj">
-      <Project>{A1F83D9F-2D44-4264-A08B-416797123018}</Project>
-      <Name>Cosmos.Kernel %28Cosmos\Cosmos.Kernel%29</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

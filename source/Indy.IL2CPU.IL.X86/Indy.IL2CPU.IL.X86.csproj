@@ -304,6 +304,10 @@
       <Project>{5A39A8DF-D99E-4112-9676-BD3EED969A9C}</Project>
       <Name>Indy.IL2CPU.IL</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Indy.IL2CPU.Plugs\Indy.IL2CPU.Plugs.csproj">
+      <Project>{E9B2E8CC-E264-42F9-9113-16B0A0431198}</Project>
+      <Name>Indy.IL2CPU.Plugs</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Indy.IL2CPU\Indy.IL2CPU.csproj">
       <Project>{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}</Project>
       <Name>Indy.IL2CPU</Name>

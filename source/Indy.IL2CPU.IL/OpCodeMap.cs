@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using Indy.IL2CPU.Assembler;
 using Indy.IL2CPU.IL;
+using Indy.IL2CPU.Plugs;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
@@ -34,19 +35,23 @@ namespace Indy.IL2CPU.IL {
 		protected abstract Type GetInitVmtImplementationOp();
 		protected abstract Type GetMainEntryPointOp();
 
-		public virtual void Initialize(Assembler.Assembler aAssembler, IEnumerable<AssemblyDefinition> aProjectAssemblies, Func<TypeReference, TypeDefinition> aTypeResolver) {
-			foreach (Type t in (from item in ImplementationAssembly.GetTypes()
-								where item.IsSubclassOf(typeof(Op)) && item.GetCustomAttributes(typeof(OpCodeAttribute), true).Length > 0
-								select item)) {
-				object[] xAttribs = t.GetCustomAttributes(typeof(OpCodeAttribute), true);
+		public virtual void Initialize(Assembler.Assembler aAssembler, IEnumerable<AssemblyDefinition> aPlugs, Func<TypeReference, TypeDefinition> aTypeResolver, Func<string, AssemblyDefinition> aAssemblyResolver) {
+			foreach (var xItem in (from item in ImplementationAssembly.GetTypes()
+								   let xAttribs = item.GetCustomAttributes(typeof(OpCodeAttribute), true)
+								   let xAttrib = xAttribs.FirstOrDefault() as OpCodeAttribute
+								   where item.IsSubclassOf(typeof(Op)) && xAttribs.Length > 0 && xAttrib != null
+								   select new {
+									   OpCode = xAttrib.OpCode,
+									   Type = item
+								   })) {
 				try {
-					mMap.Add(((OpCodeAttribute)xAttribs[0]).OpCode, t);
+					mMap.Add(xItem.OpCode, xItem.Type);
 				} catch {
-					Console.WriteLine("Was adding op " + ((OpCodeAttribute)xAttribs[0]).OpCode);
+					Console.WriteLine("Was adding op " + xItem.OpCode);
 					throw;
 				}
 			}
-			InitializePlugMethodsList(aAssembler, aProjectAssemblies, aTypeResolver);
+			InitializePlugMethodsList(aAssembler, aPlugs, aTypeResolver, aAssemblyResolver);
 		}
 
 		public Type GetOpForOpCode(Code code) {
@@ -78,7 +83,7 @@ namespace Indy.IL2CPU.IL {
 			return sb.ToString().TrimEnd(',') + ")";
 		}
 
-		private void InitializePlugMethodsList(Assembler.Assembler aAssembler, IEnumerable<AssemblyDefinition> aProjectAssemblies, Func<TypeReference, TypeDefinition> aTypeResolver) {
+		private void InitializePlugMethodsList(Assembler.Assembler aAssembler, IEnumerable<AssemblyDefinition> aPlugs, Func<TypeReference, TypeDefinition> aTypeResolver, Func<string, AssemblyDefinition> aAssemblyResolver) {
 			if (mPlugMethods != null) {
 				throw new Exception("PlugMethods list already initialized!");
 			}
@@ -89,7 +94,7 @@ namespace Indy.IL2CPU.IL {
 			} else {
 				xNotWantedScope = PlugScopeEnum.MetalOnly;
 			}
-			foreach (AssemblyDefinition xAssemblyDef in GetPlugAssemblies().Union(aProjectAssemblies)) {
+			foreach (AssemblyDefinition xAssemblyDef in GetPlugAssemblies().Union(aPlugs)) {
 				foreach (ModuleDefinition xModuleDef in xAssemblyDef.Modules) {
 					foreach (TypeDefinition xType in (from item in xModuleDef.Types.Cast<TypeDefinition>()
 													  where item.CustomAttributes.Cast<CustomAttribute>().Count(x => x.Constructor.DeclaringType.FullName == typeof(PlugAttribute).FullName && (x.Fields[PlugAttribute.ScopePropertyName] == null || (PlugScopeEnum)x.Fields[PlugAttribute.ScopePropertyName] == xNotWantedScope)) != 0
@@ -99,19 +104,39 @@ namespace Indy.IL2CPU.IL {
 													   select item).First();
 						TypeReference xTypeRef = xModuleDef.TypeReferences.Cast<TypeReference>().FirstOrDefault(x => (x.FullName + ", " + x.Scope.ToString()) == (string)xPlugAttrib.Fields[PlugAttribute.TargetPropertyName]);
 						if (xTypeRef == null) {
-							throw new Exception("TypeRef for '" + (string)xPlugAttrib.Fields[PlugAttribute.TargetPropertyName] + "' not found! (" + xType.FullName + ")");
+							System.Diagnostics.Debugger.Break();
+							string xTypeFullyQualedName = (string)xPlugAttrib.Fields[PlugAttribute.TargetPropertyName];
+							string xAsmName = xTypeFullyQualedName.Substring(xTypeFullyQualedName.IndexOf(",") + 1).TrimStart();
+							string xTypeName = xTypeFullyQualedName.Substring(0, xTypeFullyQualedName.IndexOf(","));
+							AssemblyDefinition xAsmDef = aAssemblyResolver(xAsmName);
+							foreach (ModuleDefinition xModDef in xAsmDef.Modules) {
+								if (xModDef.Types.Contains(xTypeName)) {
+									xTypeRef = xModDef.Types[xTypeName];
+									break;
+								}
+							}
+							if (xTypeRef == null) {
+								throw new Exception("TypeRef for '" + (string)xPlugAttrib.Fields[PlugAttribute.TargetPropertyName] + "' not found! (" + xType.FullName + ")");
+							}
 						}
 						TypeDefinition xReplaceTypeDef = aTypeResolver(xTypeRef);
 						foreach (MethodDefinition xMethod in (from item in xType.Methods.Cast<MethodDefinition>()
-															  where item.CustomAttributes.Cast<CustomAttribute>().Count(x => x.Constructor.DeclaringType.FullName == typeof(PlugMethodAttribute).FullName && (x.Fields[PlugMethodAttribute.ScopePropertyName] == null || (PlugScopeEnum)x.Fields[PlugMethodAttribute.ScopePropertyName] != xNotWantedScope)) != 0
+															  where item.IsPublic
 															  select item)) {
 							CustomAttribute xPlugMethodAttrib = (from item in xMethod.CustomAttributes.Cast<CustomAttribute>()
 																 where item.Constructor.DeclaringType.FullName == typeof(PlugMethodAttribute).FullName
-																 select item).First();
-							string xSignature = (string)xPlugMethodAttrib.Fields[PlugMethodAttribute.SignaturePropertyName];
-							if (!String.IsNullOrEmpty(xSignature)) {
-								mPlugMethods.Add(xSignature, xMethod);
-								continue;
+																 select item).FirstOrDefault();
+							string xSignature = String.Empty;
+							if (xPlugMethodAttrib != null) {
+								if (!String.IsNullOrEmpty(xPlugMethodAttrib.Fields[PlugMethodAttribute.EnabledPropertyName] as String)) {
+									if (!Boolean.Parse((string)xPlugMethodAttrib.Fields[PlugMethodAttribute.EnabledPropertyName]) || (xPlugMethodAttrib.Fields[PlugMethodAttribute.ScopePropertyName] == null || (PlugScopeEnum)xPlugMethodAttrib.Fields[PlugMethodAttribute.ScopePropertyName] != xNotWantedScope)) {
+										continue;
+									}
+								}
+								if (!String.IsNullOrEmpty(xSignature)) {
+									mPlugMethods.Add(xSignature, xMethod);
+									continue;
+								}
 							}
 							string xStrippedSignature = GetMethodDefinitionFullName(xMethod).Replace(xType.FullName, "");
 							foreach (MethodDefinition xOrigMethodDef in xReplaceTypeDef.Methods) {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using Indy.IL2CPU.Plugs;
 
 namespace Indy.IL2CPU.IL.X86.Win32.CustomImplementations.System {
 	//[Plug(Target = typeof(Console))]
@@ -29,7 +30,7 @@ namespace Indy.IL2CPU.IL.X86.Win32.CustomImplementations.System {
 		}
 
 		[PlugMethod]
-		public unsafe static void Write(string aData) {
+		public static void Write(string aData) {
 			DoInitialize();
 			uint xCharsWritten;
 			uint xCharsToWrite = (uint)aData.Length;

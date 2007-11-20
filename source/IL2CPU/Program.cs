@@ -14,6 +14,7 @@ namespace IL2CPU {
 		public static string OutputFile;
 		public static string AsmFile;
 		public static string BCLDir;
+		public static List<string> Plugs = new List<string>();
 		public static bool MetalMode;
 		public static bool DebugMode = true;
 		public static TargetPlatformEnum TargetPlatform = TargetPlatformEnum.Win32;
@@ -54,6 +55,14 @@ namespace IL2CPU {
 							AsmFile = xArgParts[1];
 							break;
 						}
+					case "plug": {
+						if(!File.Exists(xArgParts[1])) {
+							Console.WriteLine("Plug assembly '{0}' not found!", xArgParts[1]);
+							return false;
+						}
+						Plugs.Add(xArgParts[1]);
+						break;
+					}
 					case "metal": {
 							if (String.IsNullOrEmpty(xArgParts[1])) {
 								MetalMode = true;
@@ -137,7 +146,7 @@ namespace IL2CPU {
 					}
 					using (FileStream fs = new FileStream(AsmFile, FileMode.Create)) {
 						using (StreamWriter br = new StreamWriter(fs)) {
-							e.Execute(InputFile, TargetPlatform, br, MetalMode, DebugMode, BCLDir);
+							e.Execute(InputFile, TargetPlatform, br, MetalMode, DebugMode, BCLDir, Plugs);
 						}
 					}
 					ProcessStartInfo xFasmStartInfo = new ProcessStartInfo();
