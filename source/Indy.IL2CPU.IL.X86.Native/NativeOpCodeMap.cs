@@ -15,8 +15,8 @@ namespace Indy.IL2CPU.IL.X86.Native {
 	public class NativeOpCodeMap: X86.X86OpCodeMap {
 		internal static NativeOpCodeMap Instance;
 
-		public override void Initialize(Indy.IL2CPU.Assembler.Assembler aAssembler, IEnumerable<AssemblyDefinition> aProjectAssemblies, Func<TypeReference, TypeDefinition> aTypeResolver) {
-			base.Initialize(aAssembler, aProjectAssemblies,aTypeResolver);
+		public override void Initialize(Indy.IL2CPU.Assembler.Assembler aAssembler, IEnumerable<AssemblyDefinition> aProjectAssemblies, Func<TypeReference, TypeDefinition> aTypeResolver, Func<string, AssemblyDefinition> aAssemblyResolver) {
+			base.Initialize(aAssembler, aProjectAssemblies, aTypeResolver, aAssemblyResolver);
 			base.mMap[Code.Call] = typeof(Call);
 		}
 
