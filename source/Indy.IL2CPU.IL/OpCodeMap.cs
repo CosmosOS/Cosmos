@@ -148,7 +148,7 @@ namespace Indy.IL2CPU.IL {
 			if (mPlugMethods.ContainsKey(aOrigMethodName)) {
 				return mPlugMethods[aOrigMethodName];
 			}
-			return null;
+			return GetCustomMethodImplementation_Old(aOrigMethodName, aInMetalMode);
 		}
 
 		[Obsolete("Try to use the GetPlugAssemblies infrastructure!")]

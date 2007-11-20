@@ -59,7 +59,6 @@
     <Compile Include="CustomImplementations\System\Diagnostics\DebuggerImpl.cs" />
     <Compile Include="CustomImplementations\System\Diagnostics\DebuggerImplRefs.cs" />
     <Compile Include="CustomImplementations\System\ConsoleImpl.cs" />
-    <Compile Include="CustomImplementations\System\ConsoleImplRefs.cs" />
     <Compile Include="CustomImplementations\System\Diagnostics\DebugImpl.cs" />
     <Compile Include="CustomImplementations\System\ByteImpl.cs" />
     <Compile Include="DebugHelper.cs" />

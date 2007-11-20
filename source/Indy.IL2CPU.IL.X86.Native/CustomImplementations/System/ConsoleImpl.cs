@@ -5,6 +5,7 @@ using System.Text;
 using Indy.IL2CPU.IL.X86.CustomImplementations.System;
 
 namespace Indy.IL2CPU.IL.X86.Native.CustomImplementations.System {
+	[Plug(Target=typeof(Console))]
 	public static class ConsoleImpl {
 		public const int Columns = 80;
 		public const int Lines = 24;
@@ -29,6 +30,7 @@ namespace Indy.IL2CPU.IL.X86.Native.CustomImplementations.System {
 			}
 		}
 
+		[PlugMethod]
 		public static unsafe void Clear() {
 			for (int i = 0; i < Columns * Lines * 2; i++) {
 				byte* xScreenPtr = (byte*)VideoAddr;
@@ -62,18 +64,21 @@ namespace Indy.IL2CPU.IL.X86.Native.CustomImplementations.System {
 
 		private static void OutputString(string aText) {
 			for (int i = 0; i < aText.Length; i++) {
-				Write_char_(aText[i]);
+				Write(aText[i]);
 			}
 		}
 
-		public static void Write_char_(char aChar) {
+		[PlugMethod]
+		public static void Write(char aChar) {
 			OutputChar(aChar);
 		}
 
-		public static void Write_string_(string aText) {
+		[PlugMethod]
+		public static void Write(string aText) {
 			OutputString(aText);
 		}
 
+		[PlugMethod]
 		public static void WriteLine(string aLine) {
 			OutputString(aLine);
 			mCurrentLine += 1;
