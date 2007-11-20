@@ -1,6 +1,15 @@
+@rem call msbuild3_5 d:\dotnet\il2asm\repos\source\IL2CPU.sln
+
+@REM ----------- Compile with IL2CPU
+..\..\..\source\il2cpu\bin\debug\il2cpu.exe -in:..\..\..\source\Cosmos\Cosmos.Shell.Console\bin\debug\Cosmos.Shell.Console.exe -plug:..\..\..\source\Cosmos\Cosmos.Kernel.Plugs\bin\debug\Cosmos.Kernel.Plugs.dll -out:Files\output.obj -platform:nativex86 -asm:output.asm
+pause
+
+@REM ----------- Build ISO
 del cosmos.iso
 attrib files\boot\grub\stage2_eltorito -r
-..\..\Tools\mkisofs\mkisofs -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -boot-info-table -o Cosmos.iso files
+..\..\..\Tools\mkisofs\mkisofs -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -boot-info-table -o Cosmos.iso files
 pause
-..\..\tools\qemu\qemu.exe -L ..\..\tools\qemu -cdrom Cosmos.iso -boot d
+
+@REM ----------- Start QEMU
+..\..\..\tools\qemu\qemu.exe -L ..\..\tools\qemu -cdrom Cosmos.iso -boot d
 pause
