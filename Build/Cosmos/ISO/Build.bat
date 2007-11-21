@@ -2,7 +2,7 @@
 
 @REM ----------- Compile with IL2CPU
 del output.asm
-..\..\..\source\il2cpu\bin\debug\il2cpu.exe -metal -in:..\..\..\source\Cosmos\Cosmos.Shell.Console\bin\debug\Cosmos.Shell.Console.exe -plug:..\..\..\source\Cosmos\Cosmos.Kernel.Plugs\bin\debug\Cosmos.Kernel.Plugs.dll -out:Files\output.obj -platform:nativex86 -asm:output.asm
+..\..\..\source\il2cpu\bin\debug\il2cpu -metal -in:..\..\..\source\Cosmos\Cosmos.Shell.Console\bin\debug\Cosmos.Shell.Console.exe -plug:..\..\..\source\Cosmos\Cosmos.Kernel.Plugs\bin\debug\Cosmos.Kernel.Plugs.dll -out:Files\output.obj -platform:nativex86 -asm:output.asm
 pause
 
 @REM ----------- Build ISO
