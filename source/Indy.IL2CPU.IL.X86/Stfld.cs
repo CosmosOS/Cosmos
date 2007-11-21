@@ -30,7 +30,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			string xFieldId = xField.ToString();
 			int xStorageSize;
 			SortedList<String, TypeInformation.Field> xFieldInfo = Engine.GetTypeFieldInfo(Engine.GetDefinitionFromTypeReference(xField.DeclaringType), out xStorageSize);
-			if(!xFieldInfo.ContainsKey(xFieldId)) {
+			if (!xFieldInfo.ContainsKey(xFieldId)) {
 				throw new Exception("Field not found!");
 			}
 			mField = xFieldInfo[xFieldId];

@@ -17,8 +17,13 @@ namespace Indy.IL2CPU.IL {
 
 			public readonly int Size;
 
-			public Field(int aOffset, int aSize) {
+			public readonly bool NeedsGC;
+			public readonly TypeReference FieldType;
+
+			public Field(int aOffset, int aSize, bool aNeedsGC, TypeReference aFieldType) {
 				Offset = aOffset;
+				NeedsGC = aNeedsGC;
+				FieldType = aFieldType;
 				Size = aSize;
 				RelativeAddress = "+ 0" + (Offset).ToString("X") + "h";
 			}

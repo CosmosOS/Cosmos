@@ -19,7 +19,9 @@ class Test
 		Console.WriteLine("-----Start Static field array");
 		StaticArrayTest();
 		Console.WriteLine("-----End Static field array");
-				
+		Console.WriteLine("-----Start Instance field test");
+		SimpleInstanceTest();
+		Console.WriteLine("-----End Instance field test");
 	}
 	static void LocalsAndParamsTest()
 	{
@@ -62,6 +64,7 @@ class Test
 		mTheObject = null;
 		mTheObject = new Object();
 		mTheObject = new Object();
+		mTheObject = null;
 	}
 	
 	private static object[] mTheArray;
@@ -74,5 +77,19 @@ class Test
 		mTheArray[0] = new object();
 		mTheArray[1] = new object();
 		mTheArray = null;
+	}
+	
+	private class TheData
+	{
+		public object InternalData;
+	}
+	
+	public static void SimpleInstanceTest()
+	{
+		TheData x = new TheData();
+		x = null;
+		x = new TheData();
+		x.InternalData = new Object();
+		x = null;
 	}
 }

@@ -842,8 +842,7 @@ namespace Indy.IL2CPU {
 			return GetTypeFieldInfo(xCurrentInspectedType, out aObjectStorageSize);
 		}
 
-		public static SortedList<string, TypeInformation.Field> GetTypeFieldInfo(TypeDefinition aType, out int aObjectStorageSize) {
-			SortedList<string, TypeInformation.Field> xTypeFields = new SortedList<string, TypeInformation.Field>();
+		private static void GetTypeFieldInfoImpl(SortedList<string, TypeInformation.Field> aTypeFields, TypeDefinition aType, ref int aObjectStorageSize, bool aGCObjects) {
 			TypeDefinition xActualType = aType;
 			aObjectStorageSize = 0;
 			do {
@@ -853,6 +852,9 @@ namespace Indy.IL2CPU {
 					}
 					if (xField.HasConstant) {
 						Console.WriteLine("Field is constant: " + xField.GetFullName());
+					}
+					if (xField.FieldType.IsValueType && aGCObjects) {
+						continue;
 					}
 					int xFieldSize;
 					TypeSpecification xTypeSpec = xField.FieldType as TypeSpecification;
@@ -867,7 +869,10 @@ namespace Indy.IL2CPU {
 							xFieldSize = GetFieldStorageSize(xFieldType);
 						}
 					}
-					xTypeFields.Add(xField.ToString(), new TypeInformation.Field(aObjectStorageSize, xFieldSize));
+					if (aTypeFields.ContainsKey(xField.ToString())) {
+						continue;
+					}
+					aTypeFields.Add(xField.ToString(), new TypeInformation.Field(aObjectStorageSize, xFieldSize, aGCObjects, xField.FieldType));
 					aObjectStorageSize += xFieldSize;
 				}
 				if (aType.FullName != "System.Object" && aType.BaseType != null) {
@@ -876,17 +881,26 @@ namespace Indy.IL2CPU {
 					break;
 				}
 			} while (true);
-			if (xActualType.FullName == "System.String") {
-				xTypeFields.Add("$$Storage$$", new TypeInformation.Field(aObjectStorageSize, 4));
-				Console.WriteLine("$$Storage$$ Offset = {0}", xTypeFields.Last().Value.Offset);
+			if (xActualType.FullName == "System.String" && aGCObjects) {
+				aTypeFields.Add("$$Storage$$", new TypeInformation.Field(aObjectStorageSize, 4, true, GetTypeDefinitionFromReflectionType(typeof(Array))));
 				aObjectStorageSize += 4;
 			}
 			if (ObjectUtilities.IsDelegate(xActualType)) {
-				xTypeFields.Add("$$Obj$$", new TypeInformation.Field(aObjectStorageSize, 4));
-				aObjectStorageSize += 4;
-				xTypeFields.Add("$$Method$$", new TypeInformation.Field(aObjectStorageSize, 4));
-				aObjectStorageSize += 4;
+				if (aGCObjects) {
+					aTypeFields.Add("$$Obj$$", new TypeInformation.Field(aObjectStorageSize, 4, true, GetTypeDefinitionFromReflectionType(typeof(object))));
+					aObjectStorageSize += 4;
+				} else {
+					aTypeFields.Add("$$Method$$", new TypeInformation.Field(aObjectStorageSize, 4, false, GetTypeDefinitionFromReflectionType(typeof(uint))));
+					aObjectStorageSize += 4;
+				}
 			}
+		}
+
+		public static SortedList<string, TypeInformation.Field> GetTypeFieldInfo(TypeDefinition aType, out int aObjectStorageSize) {
+			SortedList<string, TypeInformation.Field> xTypeFields = new SortedList<string, TypeInformation.Field>();
+			aObjectStorageSize = 0;
+			GetTypeFieldInfoImpl(xTypeFields, aType, ref aObjectStorageSize, true);
+			GetTypeFieldInfoImpl(xTypeFields, aType, ref aObjectStorageSize, false);
 			return xTypeFields;
 		}
 

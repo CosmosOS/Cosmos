@@ -39,7 +39,7 @@ namespace Indy.IL2CPU.IL {
 				Offset = aOffset;
 				VirtualAddresses = new string[Size / 4];
 				for (int i = 0; i < (Size / 4); i++) {
-					VirtualAddresses[i] = "ebp + 0" + (Offset + ((i + 1) * 4) + 4).ToString("X") + "h";
+					VirtualAddresses[i] = "ebp + 0" + (Offset + ((i + 1) * 4) + 8).ToString("X") + "h";
 				}
 				Kind = aKind;
 				ArgumentType = aArgumentType;

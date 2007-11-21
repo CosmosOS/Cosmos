@@ -28,10 +28,11 @@ namespace Indy.IL2CPU {
 				return;
 			}
 			uint* xTheObject = (uint*)aObject;
-			xTheObject -= 1;
+			xTheObject += 1;
 			if ((*xTheObject & 0x80000000) != 0) {
 				return;
 			}
+			xTheObject -= 2;
 			if ((*xTheObject & 0x88888888) != 0) {
 				Console.Write("StaleObject: ");
 				WriteNumber(aObject, false);
@@ -86,15 +87,25 @@ namespace Indy.IL2CPU {
 #endif
 			xCount = *xTheObject = xCount - 1;
 			if (xCount == 0) {
-#if !GC_DEBUG
-				RuntimeEngine.Heap_Free(aObject - 4);
-#endif
 #if GC_DEBUG
 				Console.Write("ObjectReclaimed, Object = ");
 				WriteNumber(aObject, false);
 				Console.WriteLine();
 				xTheObject = (uint*)(aObject - 4);
 				*xTheObject = 0x80000000;
+				xTheObject = (uint*)(aObject + 4);
+//				uint xObjectType = *xTheObject;
+//				if (xObjectType == 1) {
+//					xTheObject = (uint*)aObject + 8;
+//					uint xFieldCount = *xTheObject;
+//					for (uint i = 0; i < xFieldCount; i++) {
+//						xTheObject += 4;
+//						DecRefCount(*xTheObject);
+//					}
+//				}
+#if !GC_DEBUG
+				RuntimeEngine.Heap_Free(aObject - 4);
+#endif
 			} else {
 				Console.Write("ObjectDecRefCount, Object = ");
 				WriteNumber(aObject, false);
