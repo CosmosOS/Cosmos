@@ -14,6 +14,7 @@ namespace Cosmos.Debug.Client.CLI {
 			xProcessInfo.CreateNoWindow = true;
 			xProcessInfo.WorkingDirectory = xBasePath;
 			Process.Start(xProcessInfo).WaitForExit();
+			Console.ReadLine();
 		}
 	}
 }
