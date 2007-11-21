@@ -9,6 +9,7 @@ using System.Xml;
 using Indy.IL2CPU.Assembler;
 using Indy.IL2CPU.Assembler.X86;
 using Indy.IL2CPU.IL;
+using Indy.IL2CPU.Plugs;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Instruction = Mono.Cecil.Cil.Instruction;
@@ -112,7 +113,7 @@ namespace Indy.IL2CPU {
 					throw new ArgumentNullException("aOutput");
 				}
 				mCrawledAssembly = AssemblyFactory.GetAssembly(aAssembly);
-				mCrawledAssembly.Resolver = new IndyAssemblyResolver();
+				mCrawledAssembly.Resolver = new IndyAssemblyResolver(mCrawledAssembly);
 				if (!String.IsNullOrEmpty(aAssemblyDir)) {
 					foreach (string s in Directory.GetFiles(aAssemblyDir, "*.dll")) {
 						((IndyAssemblyResolver)mCrawledAssembly.Resolver).RegisterAssembly(s);
@@ -121,6 +122,7 @@ namespace Indy.IL2CPU {
 				((IndyAssemblyResolver)mCrawledAssembly.Resolver).AddSearchDirectory(Environment.CurrentDirectory);
 				((IndyAssemblyResolver)mCrawledAssembly.Resolver).AddSearchDirectory(Path.GetDirectoryName(aAssembly));
 				((IndyAssemblyResolver)mCrawledAssembly.Resolver).AddSearchDirectory(Path.GetDirectoryName(typeof(Engine).Assembly.Location));
+				((IndyAssemblyResolver)mCrawledAssembly.Resolver).RegisterAssembly(typeof(PlugMethodAttribute).Assembly.Location);
 				if (mCrawledAssembly.EntryPoint == null) {
 					throw new NotSupportedException("Libraries are not supported!");
 				}
@@ -207,12 +209,11 @@ namespace Indy.IL2CPU {
 						xEntryPointOp.Call(RuntimeEngineRefs.InitializeApplicationRef);
 						if (!aInMetalMode) {
 							xEntryPointOp.Call("____INIT__VMT____");
-
-							foreach (TypeDefinition xType in mTypes) {
-								foreach (MethodDefinition xMethod in xType.Constructors) {
-									if (xMethod.IsStatic) {
-										xEntryPointOp.Call(xMethod);
-									}
+						}
+						foreach (TypeDefinition xType in mTypes) {
+							foreach (MethodDefinition xMethod in xType.Constructors) {
+								if (xMethod.IsStatic) {
+									xEntryPointOp.Call(xMethod);
 								}
 							}
 						}
@@ -235,19 +236,6 @@ namespace Indy.IL2CPU {
 							GenerateVMT();
 						}
 						mMap.PostProcess(mAssembler);
-						//						if(!aInMetalMode) {
-						//							FieldDefinition xFieldDef = VTablesImplRefs.VTablesImplDef.Fields.GetField("mIDTEntries");
-						//							string xFieldName = Assembler.DataMember.GetStaticFieldName(xFieldDef);
-						//							string xFieldData = "0,0,0,0,2,0,0,0,1,0,0,0";
-						//							for (int i = 0; i < 256; i++) {
-						//								xFieldData += ",0,0,0,0,0,0,0,0";
-						//							}
-						//							mAssembler.DataMembers.RemoveAll(delegate(DataMember aItem) {
-						//								return aItem.Name == xFieldName;
-						//							});
-						//							mAssembler.DataMembers.Add(new DataMember(xFieldName, "dd", xFieldName + "___Contents"));
-						//							mAssembler.DataMembers.Add(new DataMember(xFieldName + "___Contents", "db", xFieldData));
-						//						}
 						ProcessAllStaticFields();
 					} finally {
 						mAssembler.Flush();
@@ -890,6 +878,7 @@ namespace Indy.IL2CPU {
 			} while (true);
 			if (xActualType.FullName == "System.String") {
 				xTypeFields.Add("$$Storage$$", new TypeInformation.Field(aObjectStorageSize, 4));
+				Console.WriteLine("$$Storage$$ Offset = {0}", xTypeFields.Last().Value.Offset);
 				aObjectStorageSize += 4;
 			}
 			if (ObjectUtilities.IsDelegate(xActualType)) {

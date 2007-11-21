@@ -22,11 +22,7 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		public override void DoAssemble() {
 			Encoding xEncoding;
-			if (Assembler.InMetalMode) {
-				xEncoding = Encoding.ASCII;
-			} else {
-				xEncoding = Encoding.Unicode;
-			}
+			xEncoding = Encoding.Unicode;
 			var xDataByteArray = new StringBuilder();
 			xDataByteArray.Append(BitConverter.GetBytes(Engine.RegisterType(Engine.GetTypeDefinition("mscorlib", "System.Array"))).Aggregate("", (r, b) => r + b + ","));
 			xDataByteArray.Append(BitConverter.GetBytes((uint)InstanceTypeEnum.StaticEmbeddedArray).Aggregate("", (r, b) => r + b + ","));

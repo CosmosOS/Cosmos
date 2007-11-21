@@ -25,8 +25,8 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System {
 			return *aBytes;
 		}
 
-		[PlugMethod(Signature = "System_Void___System_String__cctor____", Scope = PlugScopeEnum.NonMetalOnly)]
-		public static void CCtor() {
+		[PlugMethod(Signature = "System_Void___System_String__cctor____", InNormalMode=false)]
+		public static void cctor() {
 		}
 	}
 

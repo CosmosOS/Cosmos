@@ -87,16 +87,10 @@ namespace Indy.IL2CPU.IL {
 				throw new Exception("PlugMethods list already initialized!");
 			}
 			mPlugMethods = new SortedList<string, MethodDefinition>();
-			PlugScopeEnum xNotWantedScope;
-			if (aAssembler.InMetalMode) {
-				xNotWantedScope = PlugScopeEnum.NonMetalOnly;
-			} else {
-				xNotWantedScope = PlugScopeEnum.MetalOnly;
-			}
 			foreach (AssemblyDefinition xAssemblyDef in GetPlugAssemblies().Union(aPlugs)) {
 				foreach (ModuleDefinition xModuleDef in xAssemblyDef.Modules) {
 					foreach (TypeDefinition xType in (from item in xModuleDef.Types.Cast<TypeDefinition>()
-													  where item.CustomAttributes.Cast<CustomAttribute>().Count(x => x.Constructor.DeclaringType.FullName == typeof(PlugAttribute).FullName && (x.Fields[PlugAttribute.ScopePropertyName] == null || (PlugScopeEnum)x.Fields[PlugAttribute.ScopePropertyName] == xNotWantedScope)) != 0
+													  where item.CustomAttributes.Cast<CustomAttribute>().Count(x => x.Constructor.DeclaringType.FullName == typeof(PlugAttribute).FullName) != 0
 													  select item)) {
 						CustomAttribute xPlugAttrib = (from item in xType.CustomAttributes.Cast<CustomAttribute>()
 													   where item.Constructor.DeclaringType.FullName == typeof(PlugAttribute).FullName
@@ -119,16 +113,29 @@ namespace Indy.IL2CPU.IL {
 						}
 						TypeDefinition xReplaceTypeDef = aTypeResolver(xTypeRef);
 						foreach (MethodDefinition xMethod in (from item in xType.Methods.Cast<MethodDefinition>()
-															  select item).Union((from item in xType.Constructors.Cast<MethodDefinition>()
-																					  select item))) {
+															  select item)) {
 							CustomAttribute xPlugMethodAttrib = (from item in xMethod.CustomAttributes.Cast<CustomAttribute>()
 																 where item.Constructor.DeclaringType.FullName == typeof(PlugMethodAttribute).FullName
 																 select item).FirstOrDefault();
+							//System.Diagnostics.Debugger.Break();
 							string xSignature = String.Empty;
 							if (xPlugMethodAttrib != null) {
+								if (!xPlugMethodAttrib.Resolved) {
+									xPlugMethodAttrib.Resolve();
+								}
 								xSignature = xPlugMethodAttrib.Fields[PlugMethodAttribute.SignaturePropertyName] as string;
 								if (!String.IsNullOrEmpty(xPlugMethodAttrib.Fields[PlugMethodAttribute.EnabledPropertyName] as String)) {
-									if (!Boolean.Parse((string)xPlugMethodAttrib.Fields[PlugMethodAttribute.EnabledPropertyName]) || (xPlugMethodAttrib.Fields[PlugMethodAttribute.ScopePropertyName] == null || (PlugScopeEnum)xPlugMethodAttrib.Fields[PlugMethodAttribute.ScopePropertyName] != xNotWantedScope)) {
+									if (!Boolean.Parse((string)xPlugMethodAttrib.Fields[PlugMethodAttribute.EnabledPropertyName])) {
+										continue;
+									}
+								}
+								//System.Diagnostics.Debugger.Break();
+								if (aAssembler.InMetalMode) {
+									if (xPlugMethodAttrib.Fields[PlugMethodAttribute.InMetalModePropertyName] != null && !((bool)xPlugMethodAttrib.Fields[PlugMethodAttribute.InMetalModePropertyName])) {
+										continue;
+									}
+								} else {
+									if (xPlugMethodAttrib.Fields[PlugMethodAttribute.InNormalModePropertyName] != null && !((bool)xPlugMethodAttrib.Fields[PlugMethodAttribute.InNormalModePropertyName])) {
 										continue;
 									}
 								}
@@ -139,6 +146,12 @@ namespace Indy.IL2CPU.IL {
 							}
 							string xStrippedSignature = GetMethodDefinitionFullName(xMethod).Replace(xType.FullName, "");
 							foreach (MethodDefinition xOrigMethodDef in xReplaceTypeDef.Methods) {
+								string xOrigStrippedSignature = GetMethodDefinitionFullName(xOrigMethodDef).Replace(xReplaceTypeDef.FullName, "");
+								if (xOrigStrippedSignature == xStrippedSignature) {
+									mPlugMethods.Add(Label.GenerateLabelName(xOrigMethodDef), xMethod);
+								}
+							}
+							foreach (MethodDefinition xOrigMethodDef in xReplaceTypeDef.Constructors) {
 								string xOrigStrippedSignature = GetMethodDefinitionFullName(xOrigMethodDef).Replace(xReplaceTypeDef.FullName, "");
 								if (xOrigStrippedSignature == xStrippedSignature) {
 									mPlugMethods.Add(Label.GenerateLabelName(xOrigMethodDef), xMethod);
