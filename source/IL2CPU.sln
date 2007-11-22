@@ -81,7 +81,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.Client.CLI", "
 		{8D84CDE5-77A3-4E1F-B022-753E9E077926} = {8D84CDE5-77A3-4E1F-B022-753E9E077926}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Hardware.BIOS", "Cosmos\Cosmos.Hardware.BIOS\Cosmos.Hardware.BIOS.csproj", "{EBF7D4C6-81E0-4DD7-8ED0-891BE0A2D05E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel.Hardware.Processor", "Cosmos\Cosmos.Kernel.Hardware.Processor\Cosmos.Kernel.Hardware.Processor.csproj", "{C8ACA347-0A10-499D-B688-90D10719BFB0}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
@@ -173,10 +173,10 @@ Global
 		SccProjectTopLevelParentUniqueName25 = IL2CPU.sln
 		SccProjectName25 = Cosmos.Debug.Client.CLI
 		SccLocalPath25 = Cosmos.Debug.Client.CLI
-		SccProjectUniqueName26 = Cosmos\\Cosmos.Hardware.BIOS\\Cosmos.Hardware.BIOS.csproj
+		SccProjectUniqueName26 = Cosmos\\Cosmos.Kernel.Hardware.Processor\\Cosmos.Kernel.Hardware.Processor.csproj
 		SccProjectTopLevelParentUniqueName26 = IL2CPU.sln
-		SccProjectName26 = Cosmos/Cosmos.Hardware.BIOS
-		SccLocalPath26 = Cosmos\\Cosmos.Hardware.BIOS
+		SccProjectName26 = Cosmos/Cosmos.Kernel.Hardware.Processor
+		SccLocalPath26 = Cosmos\\Cosmos.Kernel.Hardware.Processor
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -286,10 +286,10 @@ Global
 		{930DDE98-229B-4EBF-B41B-ACABDF48EEFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{930DDE98-229B-4EBF-B41B-ACABDF48EEFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{930DDE98-229B-4EBF-B41B-ACABDF48EEFB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EBF7D4C6-81E0-4DD7-8ED0-891BE0A2D05E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EBF7D4C6-81E0-4DD7-8ED0-891BE0A2D05E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EBF7D4C6-81E0-4DD7-8ED0-891BE0A2D05E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EBF7D4C6-81E0-4DD7-8ED0-891BE0A2D05E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C8ACA347-0A10-499D-B688-90D10719BFB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8ACA347-0A10-499D-B688-90D10719BFB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8ACA347-0A10-499D-B688-90D10719BFB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8ACA347-0A10-499D-B688-90D10719BFB0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -305,6 +305,6 @@ Global
 		{E4A9F8F0-D0DC-465A-A64A-FE56504D397E} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
 		{B168BEDD-C6A6-4E7C-B9A5-0144286E9E42} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
 		{930DDE98-229B-4EBF-B41B-ACABDF48EEFB} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
-		{EBF7D4C6-81E0-4DD7-8ED0-891BE0A2D05E} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
+		{C8ACA347-0A10-499D-B688-90D10719BFB0} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
 	EndGlobalSection
 EndGlobal
