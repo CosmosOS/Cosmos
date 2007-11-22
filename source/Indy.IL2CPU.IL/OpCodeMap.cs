@@ -193,10 +193,42 @@ namespace Indy.IL2CPU.IL {
 		}
 
 		public virtual bool HasCustomAssembleImplementation(MethodInformation aMethod, bool aInMetalMode) {
-			return false;
+			CustomAttribute xAttrib = (from item in aMethod.MethodDefinition.CustomAttributes.Cast<CustomAttribute>()
+									   where item.Constructor.DeclaringType.FullName == typeof(PlugMethodAttribute).FullName
+									   && item.Fields.Contains(PlugMethodAttribute.MethodAssemblerPropertyName)
+									   select item).FirstOrDefault();
+			return xAttrib != null;
 		}
 
 		public virtual void DoCustomAssembleImplementation(bool aInMetalMode, Assembler.Assembler aAssembler, MethodInformation aMethodInfo) {
+			CustomAttribute xAttrib = (from item in aMethodInfo.MethodDefinition.CustomAttributes.Cast<CustomAttribute>()
+									   where item.Constructor.DeclaringType.FullName == typeof(PlugMethodAttribute).FullName
+									   && item.Fields.Contains(PlugMethodAttribute.MethodAssemblerPropertyName)
+									   select item).FirstOrDefault();
+			System.Diagnostics.Debugger.Break();
+			if (xAttrib != null) {
+				string xAssemblerTypeName = (string)xAttrib.Fields[PlugMethodAttribute.MethodAssemblerPropertyName];
+				TypeDefinition xTypeDef = GetTypeDefinition(aMethodInfo.MethodDefinition.DeclaringType.Module.Assembly, xAssemblerTypeName);
+				if (xTypeDef != null) {
+					Type xAssemblerType = Type.GetType(xAssemblerTypeName + ", " + xTypeDef.Module.Assembly.Name.FullName, true);
+					BaseMethodAssembler xAssembler = (BaseMethodAssembler)Activator.CreateInstance(xAssemblerType);
+					xAssembler.Assemble(aAssembler);
+				}
+			}
+		}
+
+		private static TypeDefinition GetTypeDefinition(AssemblyDefinition aAssembly, string aType) {
+			TypeDefinition xTypeDef = null;
+			string xActualTypeName = aType;
+			if (xActualTypeName.Contains("<") && xActualTypeName.Contains(">")) {
+				xActualTypeName = xActualTypeName.Substring(0, xActualTypeName.IndexOf("<"));
+			}
+			foreach (ModuleDefinition xModDef in aAssembly.Modules) {
+				if (xModDef.Types.Contains(xActualTypeName)) {
+					return xModDef.Types[xActualTypeName];
+				}
+			}
+			throw new Exception("Type '" + aType + "' not found in assembly '" + aAssembly + "'!");
 		}
 
 		public virtual void PostProcess(Assembler.Assembler aAssembler) {

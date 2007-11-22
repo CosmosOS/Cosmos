@@ -154,8 +154,8 @@ namespace Indy.IL2CPU.IL.X86.Native {
 		}
 
 		protected override IList<AssemblyDefinition> GetPlugAssemblies() {
-			IList<AssemblyDefinition> xResult =  base.GetPlugAssemblies();
-			xResult.Add(AssemblyFactory.GetAssembly(typeof (NativeOpCodeMap).Assembly.Location));
+			IList<AssemblyDefinition> xResult = base.GetPlugAssemblies();
+			xResult.Add(AssemblyFactory.GetAssembly(typeof(NativeOpCodeMap).Assembly.Location));
 			return xResult;
 		}
 
@@ -222,9 +222,14 @@ namespace Indy.IL2CPU.IL.X86.Native {
 				default: {
 						CheckGluePlaceholderMethod();
 						GluePlaceholderMethodTypeEnum? xMethodType = null;
-						return (from item in mGluePlaceholderMethods.Keys
-								where Label.GenerateLabelName(mGluePlaceholderMethods[item]) == aMethodInfo.LabelName
-								select item).Count() > 0;
+						int xResult = (from item in mGluePlaceholderMethods.Keys
+									   where Label.GenerateLabelName(mGluePlaceholderMethods[item]) == aMethodInfo.LabelName
+									   select item).Count();
+						if (xResult > 0) {
+							return true;
+						} else {
+							break;
+						}
 					}
 			}
 			return base.HasCustomAssembleImplementation(aMethodInfo, aInMetalMode);
@@ -387,94 +392,94 @@ namespace Indy.IL2CPU.IL.X86.Native {
 
 		public override void PostProcess(Indy.IL2CPU.Assembler.Assembler aAssembler) {
 			base.PostProcess(aAssembler);
-//			TypeDefinition xRuntimeEngineTypeDef = Engine.GetTypeDefinition(typeof(RuntimeEngineImpl).Assembly.GetName().Name, typeof(RuntimeEngineImpl).FullName);
-//			MethodDefinition xTheMethod = GetGlueMethod(GlueMethodTypeEnum.IDT_SetHandler);
-//			Engine.QueueMethod(xTheMethod);
-//			mIDTSetHandlerMethodName = Label.GenerateLabelName(xTheMethod);
-//			Console.WriteLine("IDTEntry size = {0}", Engine.GetFieldStorageSize(Engine.GetTypeDefinition(typeof(Cosmos.Kernel.Boot.Glue.IDTEntryStruct).Assembly.GetName().Name, typeof(Cosmos.Kernel.Boot.Glue.IDTEntryStruct).FullName)));
-//			X86.X86MethodHeaderOp.AssembleHeader(aAssembler, "___________REGISTER___ISRS_____", new int[0], new MethodInformation.Argument[0]);
-//			string xInterruptHandlerLabel = Label.GenerateLabelName(GetGlueMethod(GlueMethodTypeEnum.IDT_InterruptHandler));
-//			int[] xInterruptsWithParam = new int[] { 8, 10, 11, 12, 13, 14 };
-//			for (int i = 0; i < 256; i++) {
-//				new CPU.Pushd("0x" + i.ToString("X"));
-//				new CPU.Pushd("____INTERRUPT_HANDLER___" + i);
-//				new CPU.Pushd("0x08");
-//				new CPU.Pushd("0x8E");
-//				new CPU.Call(mIDTSetHandlerMethodName);
-//			}
-//			X86.X86MethodFooterOp.AssembleFooter(0, aAssembler, new MethodInformation.Variable[0], new MethodInformation.Argument[0], 0);
-//			for (int j = 0; j < 256; j++) {
-//				new Label("____INTERRUPT_HANDLER___" + j);
-//				new CPUNative.Cli();
-//				new CPUNative.Break();
-//				new CPUNative.Pushad();
-//				new CPU.Pushd(j.ToString());
-//				if (!xInterruptsWithParam.Contains(j)/* && !(j >= 0x20 && j <= 0x2F)*/) {
-//					new CPU.Pushd("0");
-//				}
-//				new CPU.Call(xInterruptHandlerLabel);
-//				new CPUNative.Popad();
-//				new CPUNative.Break();
-//				new CPUNative.Sti();
-//				new CPUNative.IRet();
-//			}
-//			IEnumerable<AssemblyDefinition> xAssemblies = Engine.GetAllAssemblies();
-//			SortedList<int, byte[]> xResources = new SortedList<int, byte[]>();
-//			foreach (AssemblyDefinition xAssembly in xAssemblies) {
-//				foreach (CustomAttribute xAttrib in xAssembly.CustomAttributes) {
-//					if (!xAttrib.Resolved) {
-//						xAttrib.Resolve();
-//					}
-//				}
-//				IEnumerable<KeyValuePair<int, string>> xWantedResources = (from item in xAssembly.CustomAttributes.Cast<CustomAttribute>()
-//																		   where item.Constructor.DeclaringType.FullName == typeof(KernelResourceAttribute).FullName
-//																		   select new KeyValuePair<int, string>((int)item.ConstructorParameters[1],
-//																			   (string)item.ConstructorParameters[0]));
-//				foreach (KeyValuePair<int, string> xWantedResource in xWantedResources) {
-//					foreach (ModuleDefinition xModule in xAssembly.Modules) {
-//						foreach (Resource xResource in xModule.Resources) {
-//							if (xResource.Name == xWantedResource.Value) {
-//								EmbeddedResource xEmbedded = xResource as EmbeddedResource;
-//								if (xEmbedded == null) {
-//									throw new Exception("Resource found but was not an embedded resource (Resource Name = '" + xWantedResource.Value + "')");
-//								}
-//								xResources.Add(xWantedResource.Key, xEmbedded.Data);
-//							}
-//						}
-//					}
-//				}
-//			}
-//			StringBuilder xValue = new StringBuilder();
-//			DataMember xDataMember;
-//			for (int i = 0; i < xResources.Count; i++) {
-//				xValue.Remove(0, xValue.Length);
-//				xValue.Append("0,0,0,0,2,0,0,0,");
-//				xValue.Append(BitConverter.GetBytes(xResources.Values[i].Length).Aggregate("", (r, v) => r + v + ","));
-//				xValue.Append(xResources.Values[i].Aggregate("", (r, v) => r + v + ","));
-//				xDataMember = new DataMember("embedded_resource_" + xResources.Keys[i] + "_contents", "db", xValue.ToString().TrimEnd(','));
-//				aAssembler.DataMembers.Add(xDataMember);
-//			}
-//			MethodDefinition xGetResourceMethod = GetGluePlaceholderMethod(GluePlaceholderMethodTypeEnum.GetKernelResource);
-//			MethodInformation xGetResourceMethodInfo = Engine.GetMethodInfo(xGetResourceMethod, xGetResourceMethod, xGetResourceMethod.Name, null);
-//			string xGetResourceLabelName = Label.GenerateLabelName(xGetResourceMethod);
-//			for (int i = 0; i < aAssembler.Instructions.Count; i++) {
-//				if ((aAssembler.Instructions[i] is Label) && ((Label)aAssembler.Instructions[i]).Name == xGetResourceLabelName) {
-//					aAssembler.Instructions.RemoveRange(i, 10);
-//					break;
-//				}
-//			}
-//			NativeMethodHeaderOp.AssembleHeader(aAssembler, xGetResourceLabelName, new int[0], new MethodInformation.Argument[0]);
-//			Op.Ldarg(aAssembler, xGetResourceMethodInfo.Arguments[0]);
-//			new CPU.Pop("eax");
-//			foreach (int xId in xResources.Keys) {
-//				new CPU.Move("ecx", "0x" + xId.ToString("X"));
-//				new CPU.Compare("eax", "ecx");
-//				new CPU.JumpIfNotEquals(".__after__" + xId);
-//				new CPU.Push("embedded_resource_" + xId + "_contents");
-//				new CPU.JumpAlways(".END__OF__METHOD");
-//				new Label(".__after__" + xId);
-//			}
-//			NativeMethodFooterOp.AssembleFooter(4, aAssembler, new MethodInformation.Variable[0], new MethodInformation.Argument[0], 4);
+			//			TypeDefinition xRuntimeEngineTypeDef = Engine.GetTypeDefinition(typeof(RuntimeEngineImpl).Assembly.GetName().Name, typeof(RuntimeEngineImpl).FullName);
+			//			MethodDefinition xTheMethod = GetGlueMethod(GlueMethodTypeEnum.IDT_SetHandler);
+			//			Engine.QueueMethod(xTheMethod);
+			//			mIDTSetHandlerMethodName = Label.GenerateLabelName(xTheMethod);
+			//			Console.WriteLine("IDTEntry size = {0}", Engine.GetFieldStorageSize(Engine.GetTypeDefinition(typeof(Cosmos.Kernel.Boot.Glue.IDTEntryStruct).Assembly.GetName().Name, typeof(Cosmos.Kernel.Boot.Glue.IDTEntryStruct).FullName)));
+			//			X86.X86MethodHeaderOp.AssembleHeader(aAssembler, "___________REGISTER___ISRS_____", new int[0], new MethodInformation.Argument[0]);
+			//			string xInterruptHandlerLabel = Label.GenerateLabelName(GetGlueMethod(GlueMethodTypeEnum.IDT_InterruptHandler));
+			//			int[] xInterruptsWithParam = new int[] { 8, 10, 11, 12, 13, 14 };
+			//			for (int i = 0; i < 256; i++) {
+			//				new CPU.Pushd("0x" + i.ToString("X"));
+			//				new CPU.Pushd("____INTERRUPT_HANDLER___" + i);
+			//				new CPU.Pushd("0x08");
+			//				new CPU.Pushd("0x8E");
+			//				new CPU.Call(mIDTSetHandlerMethodName);
+			//			}
+			//			X86.X86MethodFooterOp.AssembleFooter(0, aAssembler, new MethodInformation.Variable[0], new MethodInformation.Argument[0], 0);
+			//			for (int j = 0; j < 256; j++) {
+			//				new Label("____INTERRUPT_HANDLER___" + j);
+			//				new CPUNative.Cli();
+			//				new CPUNative.Break();
+			//				new CPUNative.Pushad();
+			//				new CPU.Pushd(j.ToString());
+			//				if (!xInterruptsWithParam.Contains(j)/* && !(j >= 0x20 && j <= 0x2F)*/) {
+			//					new CPU.Pushd("0");
+			//				}
+			//				new CPU.Call(xInterruptHandlerLabel);
+			//				new CPUNative.Popad();
+			//				new CPUNative.Break();
+			//				new CPUNative.Sti();
+			//				new CPUNative.IRet();
+			//			}
+			//			IEnumerable<AssemblyDefinition> xAssemblies = Engine.GetAllAssemblies();
+			//			SortedList<int, byte[]> xResources = new SortedList<int, byte[]>();
+			//			foreach (AssemblyDefinition xAssembly in xAssemblies) {
+			//				foreach (CustomAttribute xAttrib in xAssembly.CustomAttributes) {
+			//					if (!xAttrib.Resolved) {
+			//						xAttrib.Resolve();
+			//					}
+			//				}
+			//				IEnumerable<KeyValuePair<int, string>> xWantedResources = (from item in xAssembly.CustomAttributes.Cast<CustomAttribute>()
+			//																		   where item.Constructor.DeclaringType.FullName == typeof(KernelResourceAttribute).FullName
+			//																		   select new KeyValuePair<int, string>((int)item.ConstructorParameters[1],
+			//																			   (string)item.ConstructorParameters[0]));
+			//				foreach (KeyValuePair<int, string> xWantedResource in xWantedResources) {
+			//					foreach (ModuleDefinition xModule in xAssembly.Modules) {
+			//						foreach (Resource xResource in xModule.Resources) {
+			//							if (xResource.Name == xWantedResource.Value) {
+			//								EmbeddedResource xEmbedded = xResource as EmbeddedResource;
+			//								if (xEmbedded == null) {
+			//									throw new Exception("Resource found but was not an embedded resource (Resource Name = '" + xWantedResource.Value + "')");
+			//								}
+			//								xResources.Add(xWantedResource.Key, xEmbedded.Data);
+			//							}
+			//						}
+			//					}
+			//				}
+			//			}
+			//			StringBuilder xValue = new StringBuilder();
+			//			DataMember xDataMember;
+			//			for (int i = 0; i < xResources.Count; i++) {
+			//				xValue.Remove(0, xValue.Length);
+			//				xValue.Append("0,0,0,0,2,0,0,0,");
+			//				xValue.Append(BitConverter.GetBytes(xResources.Values[i].Length).Aggregate("", (r, v) => r + v + ","));
+			//				xValue.Append(xResources.Values[i].Aggregate("", (r, v) => r + v + ","));
+			//				xDataMember = new DataMember("embedded_resource_" + xResources.Keys[i] + "_contents", "db", xValue.ToString().TrimEnd(','));
+			//				aAssembler.DataMembers.Add(xDataMember);
+			//			}
+			//			MethodDefinition xGetResourceMethod = GetGluePlaceholderMethod(GluePlaceholderMethodTypeEnum.GetKernelResource);
+			//			MethodInformation xGetResourceMethodInfo = Engine.GetMethodInfo(xGetResourceMethod, xGetResourceMethod, xGetResourceMethod.Name, null);
+			//			string xGetResourceLabelName = Label.GenerateLabelName(xGetResourceMethod);
+			//			for (int i = 0; i < aAssembler.Instructions.Count; i++) {
+			//				if ((aAssembler.Instructions[i] is Label) && ((Label)aAssembler.Instructions[i]).Name == xGetResourceLabelName) {
+			//					aAssembler.Instructions.RemoveRange(i, 10);
+			//					break;
+			//				}
+			//			}
+			//			NativeMethodHeaderOp.AssembleHeader(aAssembler, xGetResourceLabelName, new int[0], new MethodInformation.Argument[0]);
+			//			Op.Ldarg(aAssembler, xGetResourceMethodInfo.Arguments[0]);
+			//			new CPU.Pop("eax");
+			//			foreach (int xId in xResources.Keys) {
+			//				new CPU.Move("ecx", "0x" + xId.ToString("X"));
+			//				new CPU.Compare("eax", "ecx");
+			//				new CPU.JumpIfNotEquals(".__after__" + xId);
+			//				new CPU.Push("embedded_resource_" + xId + "_contents");
+			//				new CPU.JumpAlways(".END__OF__METHOD");
+			//				new Label(".__after__" + xId);
+			//			}
+			//			NativeMethodFooterOp.AssembleFooter(4, aAssembler, new MethodInformation.Variable[0], new MethodInformation.Argument[0], 4);
 		}
 	}
 }

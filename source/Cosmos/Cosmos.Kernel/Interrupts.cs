@@ -8,5 +8,9 @@ namespace Cosmos.Kernel {
         //[X86.Int(0x15, 0x00)]
         public void ReadChar() {
         }
+
+		public static void DoTest() {
+			Hardware.CPU.WriteByteToPort(21, 12);
+		}
     }
 }

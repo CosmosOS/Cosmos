@@ -113,7 +113,10 @@ namespace Indy.IL2CPU {
 					throw new ArgumentNullException("aOutput");
 				}
 				mCrawledAssembly = AssemblyFactory.GetAssembly(aAssembly);
-				mCrawledAssembly.Resolver = new IndyAssemblyResolver(mCrawledAssembly);
+				List<string> xSearchDirs = new List<string>(new string[] { Path.GetDirectoryName(aAssembly), aAssemblyDir });
+				xSearchDirs.AddRange((from item in aPlugs
+									  select Path.GetDirectoryName(item)).Distinct());
+				mCrawledAssembly.Resolver = new IndyAssemblyResolver(mCrawledAssembly, xSearchDirs.ToArray());
 				if (!String.IsNullOrEmpty(aAssemblyDir)) {
 					foreach (string s in Directory.GetFiles(aAssemblyDir, "*.dll")) {
 						((IndyAssemblyResolver)mCrawledAssembly.Resolver).RegisterAssembly(s);
