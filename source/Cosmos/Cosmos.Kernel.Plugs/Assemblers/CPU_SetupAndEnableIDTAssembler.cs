@@ -59,31 +59,19 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 			for (int j = 0; j < 256; j++) {
 				new Label("__ISR_Handler_" + j.ToString("X2"));
 				new CPUNative.Cli();
-//				new CPUNative.Break();
-//				new CPUNative.Pushad();
-//				if (Array.IndexOf(xInterruptsWithParam, j) == -1) {
-//					new CPUx86.Pushd("0");
-//				}
-//				MethodDefinition xHandler = GetInterruptHandler((byte)j);
-//				if (xHandler == null) {
-//					xHandler = GetMethodDef(typeof(Hardware.Interrupts).Assembly, typeof(Hardware.Interrupts).FullName, "HandleInterrupt_Default", true);
-//
-//				}
-//				new CPUx86.Pushd("0x" + j.ToString("X"));
-//				new CPUx86.Call(Label.GenerateLabelName(xHandler));
-//				if (j >= 0x20 && j <= 0x2F) {
-//					if (j >= 0x28) {
-//						new CPUx86.Move(Registers.EDX, "0xA0");
-//						new CPUx86.Move(Registers.EAX, "0x20");
-//						new CPUNative.Out(Registers.DX, Registers.AL);
-//					}
-//					new CPUx86.Move(Registers.EDX, "0x20");
-//					new CPUx86.Move(Registers.EAX, "0x20");
-//					new CPUNative.Out(Registers.DX, Registers.AL);
-//				}
-//				new CPUx86.Add("esp", "4");
-//				new CPUNative.Popad();
-//				new CPUNative.Break();
+				new CPUNative.Break();
+				new CPUNative.Pushad();
+				if (Array.IndexOf(xInterruptsWithParam, j) == -1) {
+					new CPUx86.Pushd("0");
+				}
+				MethodDefinition xHandler = GetInterruptHandler((byte)j);
+				if (xHandler == null) {
+					xHandler = GetMethodDef(typeof(Hardware.Interrupts).Assembly, typeof(Hardware.Interrupts).FullName, "HandleInterrupt_Default", true);
+					new CPUx86.Pushd("0x" + j.ToString("X"));
+				}
+				new CPUx86.Call(Label.GenerateLabelName(xHandler));
+				new CPUNative.Popad();
+				new CPUNative.Break();
 				new CPUNative.Sti();
 				new CPUNative.IRet();
 			}

@@ -13,6 +13,7 @@ namespace Cosmos.Kernel {
 			Hardware.CPU.EnableSimpleGDT();
 			Hardware.PIC.Remap();
 			Hardware.CPU.SetupAndEnableIDT();
+			Hardware.Interrupts.IncludeAllHandlers();
 			bool xTheval = false;
 			if(xTheval) {
 				Hardware.Interrupts.HandleInterrupt_Default(0, 0);
