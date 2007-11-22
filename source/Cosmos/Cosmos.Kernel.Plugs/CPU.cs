@@ -8,12 +8,16 @@ namespace Cosmos.Kernel.Plugs {
 	public static class CPU {
 		[PlugMethod(MethodAssembler = typeof(Assemblers.CPU_WriteByteToPortAssembler))]
 		public static void WriteByteToPort(ushort aPort, byte aData) {
-			Assemblers.CPU_WriteByteToPortAssembler x = new Cosmos.Kernel.Plugs.Assemblers.CPU_WriteByteToPortAssembler();
-			FakeMethod(x);
+			//			Assemblers.CPU_WriteByteToPortAssembler x = new Cosmos.Kernel.Plugs.Assemblers.CPU_WriteByteToPortAssembler();
+			//			FakeMethod(x);
 		}
 
-		public static void FakeMethod(Assemblers.CPU_WriteByteToPortAssembler aAssembler) {
-			aAssembler.Assemble(null);
+		[PlugMethod(MethodAssembler=typeof(Assemblers.CPU_EnableSimpleGDTAssembler))]
+		public static void EnableSimpleGDT() {
 		}
+
+		//		public static void FakeMethod(Assemblers.CPU_WriteByteToPortAssembler aAssembler) {
+		//			aAssembler.Assemble(null);
+		//		}
 	}
 }

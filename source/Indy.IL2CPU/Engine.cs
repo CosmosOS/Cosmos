@@ -116,6 +116,9 @@ namespace Indy.IL2CPU {
 				List<string> xSearchDirs = new List<string>(new string[] { Path.GetDirectoryName(aAssembly), aAssemblyDir });
 				xSearchDirs.AddRange((from item in aPlugs
 									  select Path.GetDirectoryName(item)).Distinct());
+				foreach(string xPlugAsm in aPlugs) {
+					Assembly.LoadFile(new FileInfo(xPlugAsm).FullName).GetTypes();
+				}
 				mCrawledAssembly.Resolver = new IndyAssemblyResolver(mCrawledAssembly, xSearchDirs.ToArray());
 				if (!String.IsNullOrEmpty(aAssemblyDir)) {
 					foreach (string s in Directory.GetFiles(aAssemblyDir, "*.dll")) {

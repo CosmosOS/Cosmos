@@ -205,12 +205,12 @@ namespace Indy.IL2CPU.IL {
 									   where item.Constructor.DeclaringType.FullName == typeof(PlugMethodAttribute).FullName
 									   && item.Fields.Contains(PlugMethodAttribute.MethodAssemblerPropertyName)
 									   select item).FirstOrDefault();
-			System.Diagnostics.Debugger.Break();
 			if (xAttrib != null) {
 				string xAssemblerTypeName = (string)xAttrib.Fields[PlugMethodAttribute.MethodAssemblerPropertyName];
 				TypeDefinition xTypeDef = GetTypeDefinition(aMethodInfo.MethodDefinition.DeclaringType.Module.Assembly, xAssemblerTypeName);
 				if (xTypeDef != null) {
-					Type xAssemblerType = Type.GetType(xAssemblerTypeName + ", " + xTypeDef.Module.Assembly.Name.FullName, true);
+					Assembly xAsm = Assembly.LoadWithPartialName(xTypeDef.Module.Assembly.Name.FullName);
+					Type xAssemblerType = xAsm.GetType(xAssemblerTypeName);
 					BaseMethodAssembler xAssembler = (BaseMethodAssembler)Activator.CreateInstance(xAssemblerType);
 					xAssembler.Assemble(aAssembler);
 				}
@@ -222,7 +222,7 @@ namespace Indy.IL2CPU.IL {
 			string xActualTypeName = aType;
 			if (xActualTypeName.Contains("<") && xActualTypeName.Contains(">")) {
 				xActualTypeName = xActualTypeName.Substring(0, xActualTypeName.IndexOf("<"));
-			}
+			}					  
 			foreach (ModuleDefinition xModDef in aAssembly.Modules) {
 				if (xModDef.Types.Contains(xActualTypeName)) {
 					return xModDef.Types[xActualTypeName];

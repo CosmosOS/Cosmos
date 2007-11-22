@@ -10,7 +10,8 @@ namespace Cosmos.Kernel {
         }
 
 		public static void DoTest() {
-			Hardware.CPU.WriteByteToPort(21, 12);
+			Hardware.CPU.EnableSimpleGDT();
+			Hardware.PIC.Remap();
 		}
     }
 }
