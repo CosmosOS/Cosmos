@@ -29,7 +29,7 @@ namespace Cosmos.Kernel {
                 CurrentChar = 0;
                 CurrentLine += 1;
                 if (CurrentLine == HW.Text.Lines) {
-                    HW.Text.Clear();
+                	HW.Text.ScrollUp();
                     CurrentLine = 0;
                     CurrentChar = 0;
                 }

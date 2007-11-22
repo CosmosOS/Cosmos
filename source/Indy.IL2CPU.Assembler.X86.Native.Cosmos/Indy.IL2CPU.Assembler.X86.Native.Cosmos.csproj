@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.20706</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{6597AAC6-755D-47F9-ACF4-E13F65EC5418}</ProjectGuid>
+    <ProjectGuid>{3CB186B2-1473-4613-9A1A-9399AC06F946}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Indy.IL2CPU.Assembler.X86.Native</RootNamespace>
-    <AssemblyName>Indy.IL2CPU.Assembler.X86.Native</AssemblyName>
+    <RootNamespace>Indy.IL2CPU.Assembler.X86.Native.Cosmos</RootNamespace>
+    <AssemblyName>Indy.IL2CPU.Assembler.X86.Native.Cosmos</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
@@ -39,35 +39,27 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assembler.cs" />
-    <Compile Include="Cli.cs" />
-    <Compile Include="Break.cs" />
-    <Compile Include="In.cs" />
-    <Compile Include="Out.cs" />
-    <Compile Include="Sti.cs" />
-    <Compile Include="IRet.cs" />
-    <Compile Include="Lgdt.cs" />
-    <Compile Include="Lidt.cs" />
-    <Compile Include="Popad.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Pushad.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cosmos\Cosmos.Kernel.Hardware.Processor\Cosmos.Kernel.Hardware.Processor.csproj">
       <Project>{C8ACA347-0A10-499D-B688-90D10719BFB0}</Project>
       <Name>Cosmos.Kernel.Hardware.Processor</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Indy.IL2CPU.Assembler.X86\Indy.IL2CPU.Assembler.X86.csproj">
-      <Project>{7F32CE06-13F2-4EDA-B588-3FAAFD25178A}</Project>
-      <Name>Indy.IL2CPU.Assembler.X86</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Indy.IL2CPU.Assembler\Indy.IL2CPU.Assembler.csproj">
-      <Project>{8E8CAD9B-C092-4071-AD92-E7A4E7BA776F}</Project>
-      <Name>Indy.IL2CPU.Assembler</Name>
+    <ProjectReference Include="..\Indy.IL2CPU.Assembler.X86.Native\Indy.IL2CPU.Assembler.X86.Native.csproj">
+      <Project>{6597AAC6-755D-47F9-ACF4-E13F65EC5418}</Project>
+      <Name>Indy.IL2CPU.Assembler.X86.Native</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
