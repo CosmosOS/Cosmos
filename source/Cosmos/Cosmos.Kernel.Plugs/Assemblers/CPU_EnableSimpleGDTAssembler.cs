@@ -21,6 +21,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 			aAssembler.DataMembers.Add(new DataMember(xFieldName, "dw", xFieldData));
 			new CPUx86.Move(Registers.EAX, "_NATIVE_GDT_Pointer");
 			new CPUNative.Lgdt(Registers.AtEAX);
+			new CPUNative.Break();
 			new CPUx86.Move(Registers.AX, "0x10");
 			new CPUx86.Move("ds", "ax");
 			new CPUx86.Move("es", "ax");

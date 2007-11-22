@@ -9,5 +9,8 @@ namespace Cosmos.Hardware {
 
 		public static void EnableSimpleGDT() {
 		}
+
+		public static void SetupAndEnableIDT() {
+		}
 	}
 }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Cosmos.Kernel.Hardware.Processor;
 
 namespace Indy.IL2CPU.Assembler.X86.Native {
 	public class Assembler: X86.Assembler {
@@ -105,15 +104,12 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
 			mOutputWriter.WriteLine("");
 			mOutputWriter.WriteLine("; some more startups todo");
 			mOutputWriter.WriteLine("				 cli");
-			GeneralProcessor.InitializeEntryPoint(mOutputWriter);
 			mOutputWriter.WriteLine("				 push ebx");
 			mOutputWriter.WriteLine("				 call " + EntryPointName);
 			mOutputWriter.WriteLine("			.loop:");
 			mOutputWriter.WriteLine("				 hlt");
 			mOutputWriter.WriteLine("				 jmp .loop");
 			mOutputWriter.WriteLine("                 ");
-			GeneralProcessor.InitializeFields(mOutputWriter);
-			GeneralProcessor.EmitHelperCode(mOutputWriter);
 		}
 	}
 }

@@ -16,6 +16,10 @@ namespace Cosmos.Kernel.Plugs {
 		public static void EnableSimpleGDT() {
 		}
 
+		[PlugMethod(MethodAssembler=typeof(Assemblers.CPU_SetupAndEnableIDTAssembler))]
+		public static void SetupAndEnableIDT() {
+		}
+
 		//		public static void FakeMethod(Assemblers.CPU_WriteByteToPortAssembler aAssembler) {
 		//			aAssembler.Assemble(null);
 		//		}

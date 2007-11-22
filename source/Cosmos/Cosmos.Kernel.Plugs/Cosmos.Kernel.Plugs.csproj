@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assemblers\CPU_EnableSimpleGDTAssembler.cs" />
+    <Compile Include="Assemblers\CPU_SetupAndEnableIDTAssembler.cs" />
     <Compile Include="Assemblers\CPU_WriteByteToPortAssembler.cs" />
     <Compile Include="Console.cs" />
     <Compile Include="CPU.cs" />

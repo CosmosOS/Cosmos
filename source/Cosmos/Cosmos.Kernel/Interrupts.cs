@@ -12,6 +12,11 @@ namespace Cosmos.Kernel {
 		public static void DoTest() {
 			Hardware.CPU.EnableSimpleGDT();
 			Hardware.PIC.Remap();
+			Hardware.CPU.SetupAndEnableIDT();
+			bool xTheval = false;
+			if(xTheval) {
+				Hardware.Interrupts.HandleInterrupt_Default(0, 0);
+			}
 		}
     }
 }

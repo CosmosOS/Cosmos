@@ -5,11 +5,17 @@ using System.Text;
 namespace Cosmos.Hardware {
 	public static class Interrupts {
 		public static void HandleInterrupt_Default(uint aInterrupt, uint aParam) {
-			Console.Write("Interrupt occurred. Interrupt = ");
-			WriteNumber(aInterrupt, 32);
-			Console.Write(", Param = ");
-			WriteNumber(aParam, 32);
-			Console.WriteLine("");
+//			Console.Write("Interrupt occurred. Interrupt = ");
+//			WriteNumber(aInterrupt, 32);
+//			Console.Write(", Param = ");
+//			WriteNumber(aParam, 32);
+//			Console.WriteLine("");
+//			if (aInterrupt >= 0x20 && aInterrupt <= 0x2F) {
+//				if (aInterrupt >= 0x28) {
+//					CPU.WriteByteToPort(0xA0, 0x20);
+//				}
+//				CPU.WriteByteToPort(0x20, 0x20);
+//			}
 		}
 
 		private static void WriteNumber(uint aValue, byte aBitCount) {

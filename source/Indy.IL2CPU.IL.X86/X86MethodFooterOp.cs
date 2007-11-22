@@ -30,7 +30,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public static void AssembleFooter(int aReturnSize, Assembler.Assembler aAssembler, MethodInformation.Variable[] aLocals, MethodInformation.Argument[] aArgs, int aTotalArgsSize) {
-			new Label(".END__OF__METHOD");
+			new Label(EndOfMethodLabelName);
 			if (!aAssembler.InMetalMode) {
 				Engine.QueueMethodRef(GCImplementationRefs.DecRefCountRef);
 				foreach (MethodInformation.Variable xLocal in aLocals) {
