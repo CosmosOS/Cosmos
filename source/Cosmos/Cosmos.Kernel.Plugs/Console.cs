@@ -7,6 +7,7 @@ using Indy.IL2CPU.Plugs;
 namespace Cosmos.Kernel.Plugs {
 	[Plug(Target = typeof(System.Console))]
 	class Console {
+        //TODO: Console uses TextWriter - intercept and plug it instead
         public static void Clear() {
             TextScreen.Clear();
         }

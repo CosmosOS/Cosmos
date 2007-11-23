@@ -4,13 +4,7 @@ using System.Text;
 
 namespace Cosmos.Hardware {
 	public static class CPU {
-		public static void WriteByteToPort(ushort aPort, byte aData) {
-		}
-
-		public static void EnableSimpleGDT() {
-		}
-
-		public static void SetupAndEnableIDT() {
-		}
+		public static void CreateGDT() { }
+		public static void CreateIDT() { }
 	}
 }

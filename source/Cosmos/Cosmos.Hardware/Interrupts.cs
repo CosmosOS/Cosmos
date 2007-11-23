@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace Cosmos.Hardware {
-	public static class Interrupts {
+	public class Interrupts : Hardware {
 		public static void HandleInterrupt_Default(uint aParam, uint aInterrupt) {
 			Console.Write("Interrupt occurred. Interrupt = ");
 			WriteNumber(aInterrupt, 32);
@@ -12,24 +12,44 @@ namespace Cosmos.Hardware {
 			Console.WriteLine("");
 			if (aInterrupt >= 0x20 && aInterrupt <= 0x2F) {
 				if (aInterrupt >= 0x28) {
-					CPU.WriteByteToPort(0xA0, 0x20);
+					IOWrite(0xA0, 0x20);
 				}
-				CPU.WriteByteToPort(0x20, 0x20);
+                IOWrite(0x20, 0x20);
 			}
 		}
 
-		public static void HandleInterrupt_20(uint aParam) {
-			Console.WriteLine("PIT IRQ occurred");
-			CPU.WriteByteToPort(0x20, 0x20);
-		}
+        //IRQ 1 - Keyboard. Reserved for the system. Cannot be altered even if no keyboard is present or needed.
+        //IRQ 2 - Cascaded signals from IRQs 8-15. A device configured to use IRQ 2 will actually be using IRQ 9
+        //IRQ 3 - COM2 (Default) and COM4 (User) serial ports
+        //IRQ 4 - COM1 (Default) and COM3 (User) serial ports
+        //IRQ 5 - LPT2 Parallel Port 2 or sound card
+        //IRQ 6 - Floppy disk controller
+        //IRQ 7 - LPT1 Parallel Port 1 or sound card (8-bit Sound Blaster and compatibles)
 
-		public static void IncludeAllHandlers() {
-			bool xTest = false;
-			if(xTest) {
-				HandleInterrupt_Default(0, 0);
-				HandleInterrupt_20(0);
-			}
-		}
+        //IRQ 8 - Real time clock
+        //IRQ 9 - Free / Open interrupt / Available / SCSI. Any devices configured to use IRQ 2 will actually be using IRQ 9.
+        //IRQ 10 - Free / Open interrupt / Available / SCSI
+        //IRQ 11 - Free / Open interrupt / Available / SCSI
+        //IRQ 12 - PS/2 connector Mouse. If no PS/2 connector mouse is used, this can be used for other peripherals
+        //IRQ 13 - ISA / Math Co-Processor
+        //IRQ 14 - Primary IDE. If no Primary IDE this can be changed
+        //IRQ 15 - Secondary IDE
+
+        //IRQ 0 - System timer. Reserved for the system. Cannot be changed by a user.
+        public static void HandleInterrupt_20(uint aParam) {
+        //    Console.WriteLine("PIT IRQ occurred");
+            IOWrite(0x20, 0x20);
+        }
+
+        // This is to trick IL2CPU to compile it in
+        //TODO: Make a new attribute that IL2CPU sees when scanning to force inclusion so we dont have to do this
+        public static void IncludeAllHandlers() {
+            bool xTest = false;
+            if (xTest) {
+                HandleInterrupt_Default(0, 0);
+                HandleInterrupt_20(0);
+            }
+        }
 
 		private static void WriteNumber(uint aValue, byte aBitCount) {
 			uint xValue = aValue;

@@ -4,15 +4,9 @@ using System.Text;
 
 namespace Cosmos.Kernel {
     public class Interrupts {
-        // Interrupt 15, AH=0
-        //[X86.Int(0x15, 0x00)]
-        public void ReadChar() {
-        }
 
+        //TODO: Remove
 		public static void DoTest() {
-			Hardware.CPU.EnableSimpleGDT();
-			Hardware.PIC.Remap();
-			Hardware.CPU.SetupAndEnableIDT();
 			Hardware.Interrupts.IncludeAllHandlers();
 			bool xTheval = false;
 			if(xTheval) {

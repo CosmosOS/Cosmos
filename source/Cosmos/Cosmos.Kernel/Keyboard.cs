@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Cosmos.Hardware {
-    public class Keyboard : Hardware {
+namespace Cosmos.Kernel {
+    public class Keyboard {
     }
 }

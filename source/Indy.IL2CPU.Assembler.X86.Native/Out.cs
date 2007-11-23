@@ -8,6 +8,7 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
 	public class Out: X86.Instruction {
 		public readonly string Port;
 		public readonly string Data;
+
 		public Out(string aPort, string aData) {
 			Port = aPort;
 			Data = aData;

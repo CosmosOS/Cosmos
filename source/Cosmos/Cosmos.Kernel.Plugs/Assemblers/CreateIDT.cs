@@ -7,9 +7,10 @@ using Mono.Cecil;
 using Assembler = Indy.IL2CPU.Assembler.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using CPUNative = Indy.IL2CPU.Assembler.X86.Native;
+using HW = Cosmos.Hardware;
 
 namespace Cosmos.Kernel.Plugs.Assemblers {
-	public class CPU_SetupAndEnableIDTAssembler: BaseMethodAssembler {
+	public class CreateIDT: AssemblerMethod {
 		private static MethodDefinition GetMethodDef(Assembly aAssembly, string aType, string aMethodName, bool aErrorWhenNotFound) {
 			AssemblyDefinition xAssembly = AssemblyFactory.GetAssembly(aAssembly.Location);
 			foreach (ModuleDefinition xMod in xAssembly.Modules) {
@@ -29,7 +30,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 		}
 
 		private static MethodDefinition GetInterruptHandler(byte aInterrupt) {
-			return GetMethodDef(typeof(Hardware.Interrupts).Assembly, typeof(Hardware.Interrupts).FullName, "HandleInterrupt_" + aInterrupt.ToString("X2"), false);
+			return GetMethodDef(typeof(HW.Interrupts).Assembly, typeof(HW.Interrupts).FullName, "HandleInterrupt_" + aInterrupt.ToString("X2"), false);
 		}
 
 		public override void Assemble(Assembler aAssembler) {
@@ -66,7 +67,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 				}
 				MethodDefinition xHandler = GetInterruptHandler((byte)j);
 				if (xHandler == null) {
-					xHandler = GetMethodDef(typeof(Hardware.Interrupts).Assembly, typeof(Hardware.Interrupts).FullName, "HandleInterrupt_Default", true);
+                    xHandler = GetMethodDef(typeof(HW.Interrupts).Assembly, typeof(HW.Interrupts).FullName, "HandleInterrupt_Default", true);
 					new CPUx86.Pushd("0x" + j.ToString("X"));
 				}
 				new CPUx86.Call(Label.GenerateLabelName(xHandler));

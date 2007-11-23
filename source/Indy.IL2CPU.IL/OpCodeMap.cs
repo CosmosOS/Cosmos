@@ -211,7 +211,7 @@ namespace Indy.IL2CPU.IL {
 				if (xTypeDef != null) {
 					Assembly xAsm = Assembly.LoadWithPartialName(xTypeDef.Module.Assembly.Name.FullName);
 					Type xAssemblerType = xAsm.GetType(xAssemblerTypeName);
-					BaseMethodAssembler xAssembler = (BaseMethodAssembler)Activator.CreateInstance(xAssemblerType);
+					AssemblerMethod xAssembler = (AssemblerMethod)Activator.CreateInstance(xAssemblerType);
 					xAssembler.Assemble(aAssembler);
 				}
 			}

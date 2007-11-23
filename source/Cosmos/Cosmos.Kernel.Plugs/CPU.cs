@@ -2,26 +2,15 @@
 using System.Collections.Generic;
 using System.Text;
 using Indy.IL2CPU.Plugs;
+using HW = Cosmos.Hardware;
 
 namespace Cosmos.Kernel.Plugs {
-	[Plug(Target = typeof(Hardware.CPU))]
+	[Plug(Target = typeof(HW.CPU))]
 	public static class CPU {
-		[PlugMethod(MethodAssembler = typeof(Assemblers.CPU_WriteByteToPortAssembler))]
-		public static void WriteByteToPort(ushort aPort, byte aData) {
-			//			Assemblers.CPU_WriteByteToPortAssembler x = new Cosmos.Kernel.Plugs.Assemblers.CPU_WriteByteToPortAssembler();
-			//			FakeMethod(x);
-		}
+		[PlugMethod(MethodAssembler=typeof(Assemblers.CreateGDT))]
+		public static void CreateGDT() { }
 
-		[PlugMethod(MethodAssembler=typeof(Assemblers.CPU_EnableSimpleGDTAssembler))]
-		public static void EnableSimpleGDT() {
-		}
-
-		[PlugMethod(MethodAssembler=typeof(Assemblers.CPU_SetupAndEnableIDTAssembler))]
-		public static void SetupAndEnableIDT() {
-		}
-
-		//		public static void FakeMethod(Assemblers.CPU_WriteByteToPortAssembler aAssembler) {
-		//			aAssembler.Assemble(null);
-		//		}
+        [PlugMethod(MethodAssembler = typeof(Assemblers.CreateIDT))]
+        public static void CreateIDT() { }
 	}
 }
