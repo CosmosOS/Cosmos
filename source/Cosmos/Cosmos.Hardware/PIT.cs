@@ -12,7 +12,6 @@ namespace Cosmos.Hardware {
 
 		public static void SetSlowest() {
 			SetDivisor(UInt16.MaxValue);
-			Serial.DebugWriteLine("PIT reconfigured to slowest mode");
 		}
 
 		public static void SetInterval(ushort hz) {

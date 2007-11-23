@@ -8,6 +8,8 @@ namespace Cosmos.Kernel {
 			Hardware.CPU.CreateGDT();
 			Hardware.PIC.Init();
         	Hardware.Serial.InitSerial(0);
+        	Hardware.DebugUtil.Initialize();
+        	Hardware.DebugUtil.SendMessage("Logging", "Initialized!");
         	Hardware.PIT.SetSlowest();
 			Hardware.CPU.CreateIDT();
         }

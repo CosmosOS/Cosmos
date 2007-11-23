@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CPU.cs" />
+    <Compile Include="DebugUtil.cs" />
     <Compile Include="Hardware.cs" />
     <Compile Include="Interrupts.cs" />
     <Compile Include="Keyboard.cs" />

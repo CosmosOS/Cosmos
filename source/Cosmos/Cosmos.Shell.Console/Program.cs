@@ -8,6 +8,10 @@ namespace Cosmos.Shell.Console {
             Kernel.CPU.Init();
             System.Console.WriteLine("Cosmos creation complete");
         	Kernel.Interrupts.DoTest();
+        	int xItem = 0;
+        	int xItem2 = 5;
+			int xItem3 = xItem2 / xItem;
+        	System.Console.WriteLine("Line after divide by zero");
         }
     }
 }
