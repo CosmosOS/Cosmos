@@ -14,6 +14,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		private FieldDefinition mTokenField;
 		private FieldDefinition mStaticField;
 		private int mCount;
+		private int mElementSize;
 		protected void SetValue(int aValue) {
 			mValue = aValue;
 		}
@@ -55,11 +56,13 @@ namespace Indy.IL2CPU.IL.X86 {
 								MethodReference xMethodRef = xCall.Operand as MethodReference;
 								FieldReference xFieldRef = xStsfld.Operand as FieldReference;
 								FieldReference xFieldContentsRef = xLdtoken.Operand as FieldReference;
-								if (xFieldRef != null && xMethodRef != null) {
+								TypeSpecification xFieldElementType = (xFieldRef != null ? xFieldRef.FieldType as TypeSpecification : null);
+								if (xFieldRef != null && xMethodRef != null && xFieldContentsRef != null && xFieldElementType != null) {
 									MethodDefinition xMethodDef = Engine.GetDefinitionFromMethodReference(xMethodRef);
 									FieldDefinition xFieldDef = Engine.GetDefinitionFromFieldReference(xFieldRef);
 									FieldDefinition xFieldContentsDef = Engine.GetDefinitionFromFieldReference(xFieldContentsRef);
 									if (xFieldDef.IsInitOnly && xMethodDef.ToString() == "System.Void System.Runtime.CompilerServices.RuntimeHelpers::InitializeArray(System.Array,System.RuntimeFieldHandle)") {
+										mElementSize = ObjectUtilities.GetObjectStorageSize(Engine.GetDefinitionFromTypeReference(xFieldElementType.ElementType));
 										mTokenField = xFieldContentsDef;
 										mStaticField = xFieldDef;
 										mOptimizedArrayFieldCode = true;
@@ -97,6 +100,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				string xTheData = BitConverter.GetBytes(Engine.RegisterTypeRef(mStaticField.FieldType)).Aggregate("", (r, b) => r + b + ",");
 				xTheData += BitConverter.GetBytes(0x80000002).Aggregate("", (r, b) => r + b + ",");
 				xTheData += BitConverter.GetBytes(mCount).Aggregate("", (r, b) => r + b + ",");
+				xTheData += BitConverter.GetBytes(mElementSize).Aggregate("", (r, b) => r + b + ",");
 				xTheData += mTokenField.InitialValue.Aggregate("", (r, b) => r + b + ",");
 				xTheData = xTheData.TrimEnd(',');
 				Assembler.DataMembers.Add(new DataMember(xDataMemberName, "db", xTheData));

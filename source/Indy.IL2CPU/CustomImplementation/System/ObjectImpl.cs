@@ -20,6 +20,7 @@ namespace Indy.IL2CPU {
 		///		<para>
 		///			The first 4 bytes are the reference to the type information of the instance, the second 4 bytes 
 		///			are the <see cref="InstanceTypeEnum"/> value. For arrays, there are 4 following bytes containing the element count.
+		/// and 4 bytes containing the element size.
 		///		</para>
 		/// </summary>
 		public const int FieldDataOffset = 8;

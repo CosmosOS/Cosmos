@@ -45,7 +45,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			Assembler.StackSizes.Push(4);
 			Multiply(Assembler);
 			// the total items size is now on the stack
-			new CPUx86.Pushd("0x" + (ObjectImpl.FieldDataOffset + 4).ToString("X"));
+			new CPUx86.Pushd("0x" + (ObjectImpl.FieldDataOffset + 8).ToString("X"));
 			Assembler.StackSizes.Push(4);
 			Add(Assembler);
 			// the total array size is now on the stack.
@@ -68,6 +68,8 @@ namespace Indy.IL2CPU.IL.X86 {
 			new CPUx86.Move("dword", CPUx86.Registers.AtEAX, "0x" + InstanceTypeEnum.Array.ToString("X"));
 			new CPUx86.Add(CPUx86.Registers.EAX, "4");
 			new CPUx86.Move("dword", CPUx86.Registers.AtEAX, CPUx86.Registers.EDI);
+			new CPUx86.Add(CPUx86.Registers.EAX, "4");
+			new CPUx86.Move("dword", CPUx86.Registers.AtEAX, "0x" + mElementSize.ToString("X"));
 			new CPUx86.Call(mCtorName);
 		}
 	}

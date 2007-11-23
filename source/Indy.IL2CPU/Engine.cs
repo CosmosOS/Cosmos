@@ -406,6 +406,9 @@ namespace Indy.IL2CPU {
 					bool xMismatch = false;
 					for (int i = 0; i < xFoundMethod.Parameters.Count; i++) {
 						if (xFoundMethod.Parameters[i].ParameterType.FullName != aRef.Parameters[i].ParameterType.FullName) {
+							if(xFoundMethod.Parameters[i].ParameterType is GenericParameter && aRef.Parameters[i].ParameterType is GenericParameter) {
+								continue;
+							}
 							xMismatch = true;
 							break;
 						}
@@ -618,6 +621,7 @@ namespace Indy.IL2CPU {
 							if (xCurrentField.InitialValue.Length > 4) {
 								xTheData = "0,0,0,0,";
 								xTheData += BitConverter.GetBytes(0x80000002).Aggregate("", (r, b) => r + b + ",");
+								xTheData += "1,0,0,0,";
 							}
 							xTheData += BitConverter.GetBytes(xCurrentField.InitialValue.Length).Aggregate("", (r, b) => r + b + ",");
 							xTheData += xCurrentField.InitialValue.Aggregate("", (r, b) => r + b + ",");

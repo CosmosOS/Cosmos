@@ -54,13 +54,10 @@
   <ItemGroup>
     <Compile Include="Attributes\InterruptServiceRoutineAttribute.cs" />
     <Compile Include="Call.cs" />
-    <Compile Include="CustomImplementations\System\ByteImplRefs.cs" />
     <Compile Include="CustomImplementations\System\Diagnostics\DebugImplRefs.cs" />
     <Compile Include="CustomImplementations\System\Diagnostics\DebuggerImpl.cs" />
     <Compile Include="CustomImplementations\System\Diagnostics\DebuggerImplRefs.cs" />
-    <Compile Include="CustomImplementations\System\ConsoleImpl.cs" />
     <Compile Include="CustomImplementations\System\Diagnostics\DebugImpl.cs" />
-    <Compile Include="CustomImplementations\System\ByteImpl.cs" />
     <Compile Include="NativeCustomMethodImplementationOp.cs" />
     <Compile Include="NativeMainEntryMethodOp.cs" />
     <Compile Include="NativeOpCodeMap.cs" />

@@ -131,6 +131,7 @@
     <Compile Include="Conv_U8.cs" />
     <Compile Include="Cpblk.cs" />
     <Compile Include="Cpobj.cs" />
+    <Compile Include="CustomImplementations\System\ArrayImpl.cs" />
     <Compile Include="CustomImplementations\System\DelegateImpl.cs" />
     <Compile Include="CustomImplementations\System\MulticastDelegateImpl.cs" />
     <Compile Include="CustomImplementations\System\MulticastDelegateImplRefs.cs" />
