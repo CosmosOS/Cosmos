@@ -14,7 +14,9 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
             //TODO: Also make an attribute that forces normal inlining fo a method
             new CPUx86.Move(Registers.EDX, "[ebp + 0x0C]");
             //TODO: Do we need to clear rest of EAX first?
+			//    MTW: technically not, as in other places, it _should_ be working with AL too..
             new CPUNative.In(Registers.AL, Registers.DX);
+        	new CPUx86.Push(Registers.EAX);
         }
     }
 }

@@ -14,10 +14,13 @@ namespace Cosmos.Hardware {
         const ushort DataPort2 = 0xA1;
 
         public static void SignalPrimary() {
+        	System.Diagnostics.Debugger.Break();
             IOWrite(CmdPort1, 0x20);
+			Serial.DebugWriteLine("Primary PIC signaled");
         }
 
         public static void SignalSecondary() {
+        	Serial.DebugWriteLine("Primary and Secondary PIC signaled");
             IOWrite(CmdPort2, 0x20);
             IOWrite(CmdPort1, 0x20);
         }
@@ -36,7 +39,8 @@ namespace Cosmos.Hardware {
             IOWrite(DataPort1, 0x01);
             IOWrite(DataPort2, 0x01);
             // Masks - 0 = receive all IRQ's
-            IOWrite(DataPort1, 0x00);
+			// MTW, disabling PIT
+            IOWrite(DataPort1, 0x01);
             IOWrite(DataPort2, 0x00);
 		}
 	}

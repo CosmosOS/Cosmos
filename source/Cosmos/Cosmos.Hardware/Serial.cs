@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Cosmos.Hardware {
 	public class Serial: Hardware {
-		private static ushort COM1 = 0x3F8;
+		private const ushort COM1 = 0x3F8;
 
 		private static ushort GetSerialAddr(byte aSerialIdx) {
 			return COM1;

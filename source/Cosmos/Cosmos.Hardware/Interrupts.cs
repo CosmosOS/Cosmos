@@ -27,72 +27,75 @@ namespace Cosmos.Hardware {
 			public uint EFlags;
 			public uint UserESP;
 		}
+
 		public unsafe static void HandleInterrupt_Default(InterruptContext* aContext) {
 			Console.Write("Interrupt ");
 			WriteNumber(aContext->Interrupt, 32);
 			Console.WriteLine("");
-			Console.Write("    SS = ");
+			Serial.DebugWrite("Interrupt ");
+			WriteNumber(aContext->Interrupt, 32);
+			Serial.DebugWriteLine("");
+			Serial.DebugWrite("    SS = ");
 			WriteNumber(aContext->SS, 32);
-			Console.WriteLine("");
-			Console.Write("    GS = ");
+			Serial.DebugWriteLine("");
+			Serial.DebugWrite("    GS = ");
 			WriteNumber(aContext->GS, 32);
-			Console.WriteLine("");
-			Console.Write("    FS = ");
+			Serial.DebugWriteLine("");
+			Serial.DebugWrite("    FS = ");
 			WriteNumber(aContext->FS, 32);
-			Console.WriteLine("");
-			Console.Write("    ES = ");
+			Serial.DebugWriteLine("");
+			Serial.DebugWrite("    ES = ");
 			WriteNumber(aContext->ES, 32);
-			Console.WriteLine("");
-			Console.Write("    DS = ");
+			Serial.DebugWriteLine("");
+			Serial.DebugWrite("    DS = ");
 			WriteNumber(aContext->DS, 32);
-			Console.WriteLine("");
-			Console.Write("    EDI = ");
+			Serial.DebugWriteLine("");
+			Serial.DebugWrite("    EDI = ");
 			WriteNumber(aContext->EDI, 32);
-			Console.WriteLine("");
-			Console.Write("    ESI = ");
+			Serial.DebugWriteLine("");
+			Serial.DebugWrite("    ESI = ");
 			WriteNumber(aContext->ESI, 32);
-			Console.WriteLine("");
-			Console.Write("    EBP = ");
+			Serial.DebugWriteLine("");
+			Serial.DebugWrite("    EBP = ");
 			WriteNumber(aContext->EBP, 32);
-			Console.WriteLine("");
-			Console.Write("    ESP = ");
+			Serial.DebugWriteLine("");
+			Serial.DebugWrite("    ESP = ");
 			WriteNumber(aContext->ESP, 32);
-			Console.WriteLine("");
-			Console.Write("    EBX = ");
+			Serial.DebugWriteLine("");
+			Serial.DebugWrite("    EBX = ");
 			WriteNumber(aContext->EBX, 32);
-			Console.WriteLine("");
-			Console.Write("    EDX = ");
+			Serial.DebugWriteLine("");
+			Serial.DebugWrite("    EDX = ");
 			WriteNumber(aContext->EDX, 32);
-			Console.WriteLine("");
-			Console.Write("    ECX = ");
+			Serial.DebugWriteLine("");
+			Serial.DebugWrite("    ECX = ");
 			WriteNumber(aContext->ECX, 32);
-			Console.WriteLine("");
-			Console.Write("    EAX = ");
+			Serial.DebugWriteLine("");
+			Serial.DebugWrite("    EAX = ");
 			WriteNumber(aContext->EAX, 32);
-			Console.WriteLine("");
-			Console.Write("    Param = ");
+			Serial.DebugWriteLine("");
+			Serial.DebugWrite("    Param = ");
 			WriteNumber(aContext->Param, 32);
-			Console.WriteLine("");
-			Console.Write("    EIP = ");
+			Serial.DebugWriteLine("");
+			Serial.DebugWrite("    EIP = ");
 			WriteNumber(aContext->EIP, 32);
-			Console.WriteLine("");
-			Console.Write("    CS = ");
+			Serial.DebugWriteLine("");
+			Serial.DebugWrite("    CS = ");
 			WriteNumber(aContext->CS, 32);
-			Console.WriteLine("");
-			Console.Write("    EFlags = ");
+			Serial.DebugWriteLine("");
+			Serial.DebugWrite("    EFlags = ");
 			WriteNumber(aContext->EFlags, 32);
-			Console.WriteLine("");
-			Console.Write("    UserESP = ");
+			Serial.DebugWriteLine("");
+			Serial.DebugWrite("    UserESP = ");
 			WriteNumber(aContext->UserESP, 32);
-			Console.WriteLine("");
-
-			//			if (aContext.Interrupt >= 0x20 && aContext.Interrupt <= 0x2F) {
-			//				if (aContext.Interrupt >= 0x28) {
-			//                    PIC.SignalSecondary();
-			//                } else {
-			//                    PIC.SignalPrimary();
-			//				}
-			//			}
+			Serial.DebugWriteLine("");
+			if (aContext->Interrupt >= 0x20 && aContext->Interrupt <= 0x2F) {
+				if (aContext->Interrupt >= 0x28) {
+					PIC.SignalSecondary();
+				} else {
+					PIC.SignalPrimary();
+				}
+			}
 		}
 
 		//IRQ 2 - Cascaded signals from IRQs 8-15. A device configured to use IRQ 2 will actually be using IRQ 9
@@ -120,16 +123,17 @@ namespace Cosmos.Hardware {
 		//IRQ 1 - Keyboard. Reserved for the system. Cannot be altered even if no keyboard is present or needed.
 		public static unsafe void HandleInterrupt_21(InterruptContext* aContext) {
 			byte xScanCode = IORead(0x60);
+			Serial.DebugWrite("Keyboard Interrupt, ScanCode = ");
 			WriteNumber(xScanCode, 8);
+			Serial.DebugWriteLine("");
 			PIC.SignalPrimary();
 		}
 
 		// This is to trick IL2CPU to compile it in
-		//TODO: Make a new attribute that IL2CPU sees when scanning to force inclusion so we dont have to do this
+		//TODO: Make a new attribute that IL2CPU sees when scanning to force inclusion so we dont have to do this.
 		public static void IncludeAllHandlers() {
 			bool xTest = false;
 			if (xTest) {
-				InterruptContext xCtx = new InterruptContext();
 				unsafe {
 					HandleInterrupt_Default(null);
 					HandleInterrupt_20(null);
@@ -141,7 +145,7 @@ namespace Cosmos.Hardware {
 		private static void WriteNumber(uint aValue, byte aBitCount) {
 			uint xValue = aValue;
 			byte xCurrentBits = aBitCount;
-			Console.Write("0x");
+			Serial.DebugWrite("0x");
 			while (xCurrentBits >= 4) {
 				xCurrentBits -= 4;
 				byte xCurrentDigit = (byte)((xValue >> xCurrentBits) & 0xF);
@@ -196,7 +200,7 @@ namespace Cosmos.Hardware {
 						xDigitString = "F";
 						goto default;
 					default:
-						Console.Write(xDigitString);
+						Serial.DebugWrite(xDigitString);
 						break;
 				}
 			}
