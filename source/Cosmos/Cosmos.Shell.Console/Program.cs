@@ -6,12 +6,16 @@ namespace Cosmos.Shell.Console {
     class Program {
         static void Main(string[] args) {
             Kernel.CPU.Init();
-            System.Console.WriteLine("Cosmos creation complete");
+            //System.Console.WriteLine("Cosmos creation complete");
         	Kernel.Interrupts.DoTest();
-        	int xItem = 0;
-        	int xItem2 = 5;
-			int xItem3 = xItem2 / xItem;
-        	System.Console.WriteLine("Line after divide by zero");
+        	object o = new object();
+        	System.Console.WriteLine("Object Created");
+			if (o == null) {
+				System.Console.WriteLine("Object == null");
+			} else {
+				System.Console.WriteLine("Object != null");
+			}
+			o = null;
         }
     }
 }

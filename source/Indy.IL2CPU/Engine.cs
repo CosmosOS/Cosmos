@@ -116,7 +116,7 @@ namespace Indy.IL2CPU {
 				List<string> xSearchDirs = new List<string>(new string[] { Path.GetDirectoryName(aAssembly), aAssemblyDir });
 				xSearchDirs.AddRange((from item in aPlugs
 									  select Path.GetDirectoryName(item)).Distinct());
-				foreach(string xPlugAsm in aPlugs) {
+				foreach (string xPlugAsm in aPlugs) {
 					Assembly.LoadFile(new FileInfo(xPlugAsm).FullName).GetTypes();
 				}
 				mCrawledAssembly.Resolver = new IndyAssemblyResolver(mCrawledAssembly, xSearchDirs.ToArray());
@@ -152,7 +152,22 @@ namespace Indy.IL2CPU {
 					foreach (string xPlug in aPlugs) {
 						xPlugDefs.Add(AssemblyFactory.GetAssembly(xPlug));
 					}
-					mMap.Initialize(mAssembler, xPlugDefs, t => GetDefinitionFromTypeReference(t), a => mCrawledAssembly.Resolver.Resolve(a));
+					List<AssemblyDefinition> xAppDefs = new List<AssemblyDefinition>();
+					xAppDefs.Add(mCrawledAssembly);
+					for (int i = 0; i < xAppDefs.Count; i++) {
+						AssemblyDefinition xCurDef = xAppDefs[i];
+						foreach (ModuleDefinition xModDef in xCurDef.Modules) {
+							foreach (AssemblyNameReference xAssemblyNameRef in xModDef.AssemblyReferences) {
+								AssemblyDefinition xReffedAssemblyDef = mCrawledAssembly.Resolver.Resolve(xAssemblyNameRef);
+								if (xReffedAssemblyDef != null) {
+									if (!xAppDefs.Contains(xReffedAssemblyDef, new AssemblyDefinitionEqualityComparer())) {
+										xAppDefs.Add(xReffedAssemblyDef);
+									}
+								}
+							}
+						}
+					}
+					mMap.Initialize(mAssembler, xAppDefs, xPlugDefs, t => GetDefinitionFromTypeReference(t), a => mCrawledAssembly.Resolver.Resolve(a));
 					mAssembler.DebugMode = aDebugMode;
 					foreach (Type t in typeof(Engine).Assembly.GetTypes()) {
 						foreach (MethodInfo mi in t.GetMethods()) {
@@ -656,6 +671,7 @@ namespace Indy.IL2CPU {
 									  where !mMethods[item].Processed
 									  select item).FirstOrDefault()) != null) {
 				OnDebugLog(LogSeverityEnum.Informational, "Processing method '{0}'", xCurrentMethod.GetFullName());
+				RegisterTypeRef(xCurrentMethod.DeclaringType);
 				if (xCurrentMethod.IsAbstract) {
 					mMethods[xCurrentMethod].Processed = true;
 					continue;

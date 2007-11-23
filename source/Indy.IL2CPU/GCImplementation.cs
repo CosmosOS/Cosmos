@@ -6,9 +6,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 
 namespace Indy.IL2CPU {
 	public static class GCImplementation {
+		private static int mLock = 0;
+		private static void AcquireLock() {
+			do {
+			} while (Interlocked.CompareExchange(ref mLock, 1, 0) != 0);
+		}
+
+		private static void ReleaseLock() {
+			do {
+			} while (Interlocked.CompareExchange(ref mLock, 0, 1) != 1);
+		}
+
 		public static uint AllocNewObject(uint aSize) {
 			uint xNewObject = RuntimeEngine.Heap_AllocNewObject(aSize + 4);
 #if GC_DEBUG
@@ -94,15 +106,15 @@ namespace Indy.IL2CPU {
 				xTheObject = (uint*)(aObject - 4);
 				*xTheObject = 0x80000000;
 				xTheObject = (uint*)(aObject + 4);
-//				uint xObjectType = *xTheObject;
-//				if (xObjectType == 1) {
-//					xTheObject = (uint*)aObject + 8;
-//					uint xFieldCount = *xTheObject;
-//					for (uint i = 0; i < xFieldCount; i++) {
-//						xTheObject += 4;
-//						DecRefCount(*xTheObject);
-//					}
-//				}
+				//				uint xObjectType = *xTheObject;
+				//				if (xObjectType == 1) {
+				//					xTheObject = (uint*)aObject + 8;
+				//					uint xFieldCount = *xTheObject;
+				//					for (uint i = 0; i < xFieldCount; i++) {
+				//						xTheObject += 4;
+				//						DecRefCount(*xTheObject);
+				//					}
+				//				}
 #if !GC_DEBUG
 				RuntimeEngine.Heap_Free(aObject - 4);
 #endif

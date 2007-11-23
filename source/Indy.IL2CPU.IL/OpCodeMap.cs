@@ -35,7 +35,7 @@ namespace Indy.IL2CPU.IL {
 		protected abstract Type GetInitVmtImplementationOp();
 		protected abstract Type GetMainEntryPointOp();
 
-		public virtual void Initialize(Assembler.Assembler aAssembler, IEnumerable<AssemblyDefinition> aPlugs, Func<TypeReference, TypeDefinition> aTypeResolver, Func<string, AssemblyDefinition> aAssemblyResolver) {
+		public virtual void Initialize(Assembler.Assembler aAssembler, IEnumerable<AssemblyDefinition> aApplicationAssemblies, IEnumerable<AssemblyDefinition> aPlugs, Func<TypeReference, TypeDefinition> aTypeResolver, Func<string, AssemblyDefinition> aAssemblyResolver) {
 			foreach (var xItem in (from item in ImplementationAssembly.GetTypes()
 								   let xAttrib = item.GetCustomAttributes(typeof(OpCodeAttribute), true).FirstOrDefault() as OpCodeAttribute
 								   where item.IsSubclassOf(typeof(Op)) && xAttrib != null
@@ -51,6 +51,31 @@ namespace Indy.IL2CPU.IL {
 				}
 			}
 			InitializePlugMethodsList(aAssembler, aPlugs, aTypeResolver, aAssemblyResolver);
+			InitializeGlueMethodList(aApplicationAssemblies);
+		}
+
+		private SortedList<int, MethodDefinition> mGlueMethods;
+		private void InitializeGlueMethodList(IEnumerable<AssemblyDefinition> aAssemblies) {
+			mGlueMethods = new SortedList<int, MethodDefinition>();
+			foreach (AssemblyDefinition xAssembly in aAssemblies) {
+				foreach (ModuleDefinition xModule in xAssembly.Modules) {
+					foreach (TypeDefinition xType in xModule.Types) {
+						foreach (MethodDefinition xMethod in xType.Methods) {
+							CustomAttribute xAttribute = (from item in xMethod.CustomAttributes.Cast<CustomAttribute>()
+														  where item.Constructor.DeclaringType.FullName == typeof(GlueMethodAttribute).FullName && item.Fields.Contains(GlueMethodAttribute.TypePropertyName)
+														  select item).FirstOrDefault();
+							if (xAttribute != null) {
+								int xMethodType = (int)xAttribute.Fields[GlueMethodAttribute.TypePropertyName];
+								mGlueMethods.Add(xMethodType, xMethod);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		protected MethodDefinition GetGlueMethod(int aType) {
+			return mGlueMethods[aType];
 		}
 
 		public Type GetOpForOpCode(Code code) {
@@ -222,7 +247,7 @@ namespace Indy.IL2CPU.IL {
 			string xActualTypeName = aType;
 			if (xActualTypeName.Contains("<") && xActualTypeName.Contains(">")) {
 				xActualTypeName = xActualTypeName.Substring(0, xActualTypeName.IndexOf("<"));
-			}					  
+			}
 			foreach (ModuleDefinition xModDef in aAssembly.Modules) {
 				if (xModDef.Types.Contains(xActualTypeName)) {
 					return xModDef.Types[xActualTypeName];

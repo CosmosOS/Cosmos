@@ -13,7 +13,7 @@ namespace Indy.IL2CPU.Assembler {
 
 		public static string FilterStringForIncorrectChars(string aName) {
 			string xTempResult = aName;
-			foreach (char c in new char[] { '.', ',', '+', '$', '<', '>', '{', '}', '-', '`', '\'', '/', '\\', ' ', '(', ')', '[', ']', '*' }) {
+			foreach (char c in new char[] { '&', '.', ',', '+', '$', '<', '>', '{', '}', '-', '`', '\'', '/', '\\', ' ', '(', ')', '[', ']', '*' }) {
 				xTempResult = xTempResult.Replace(c, '_');
 			}
 			return xTempResult;
@@ -30,9 +30,9 @@ namespace Indy.IL2CPU.Assembler {
 			get;
 			private set;
 		}
-		
+
 		public readonly string DataType;
-		
+
 		[Indexable]
 		public string DefaultValue {
 			get;
