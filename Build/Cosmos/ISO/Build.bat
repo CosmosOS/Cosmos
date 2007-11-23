@@ -12,6 +12,7 @@ attrib files\boot\grub\stage2_eltorito -r
 pause
 
 @REM ----------- Start QEMU
+del serial-debug.txt
 cd ..\..\..\tools\qemu\
-qemu.exe -L . -cdrom ..\..\build\Cosmos\ISO\Cosmos.iso -boot d
+qemu.exe -L . -cdrom ..\..\build\Cosmos\ISO\Cosmos.iso -boot d -serial file:..\..\build\Cosmos\ISO\serial-debug.txt
 pause

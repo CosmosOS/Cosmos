@@ -61,17 +61,33 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 				new Label("__ISR_Handler_" + j.ToString("X2"));
 				new CPUNative.Cli();
 				new CPUNative.Break();
-				new CPUNative.Pushad();
 				if (Array.IndexOf(xInterruptsWithParam, j) == -1) {
 					new CPUx86.Pushd("0");
 				}
-				MethodDefinition xHandler = GetInterruptHandler((byte)j);
+				new CPUx86.Pushd("0x" + j.ToString("X"));
+				new CPUNative.Pushad();
+				new CPUx86.Pushd("ds");
+				new CPUx86.Pushd("es");
+				new CPUx86.Pushd("fs");
+				new CPUx86.Pushd("gs");
+				new CPUx86.Pushd("ss");
+				new CPUx86.Pushd("esp");
+				//new CPUx86.Add("dword [esp]", "72");
+				MethodDefinition xHandler = null;
+				//GetInterruptHandler((byte)j);
 				if (xHandler == null) {
                     xHandler = GetMethodDef(typeof(HW.Interrupts).Assembly, typeof(HW.Interrupts).FullName, "HandleInterrupt_Default", true);
-					new CPUx86.Pushd("0x" + j.ToString("X"));
 				}
 				new CPUx86.Call(Label.GenerateLabelName(xHandler));
+				//new CPUx86.Add("esp", "4");
+				new CPUx86.Popd("ss");
+				new CPUx86.Popd("gs");
+				new CPUx86.Popd("fs");
+				new CPUx86.Popd("es");
+				new CPUx86.Popd("ds");
+				//19
 				new CPUNative.Popad();
+				new CPUx86.Add("esp", "8");
 				new CPUNative.Break();
 				new CPUNative.Sti();
 				new CPUNative.IRet();

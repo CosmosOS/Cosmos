@@ -38,11 +38,6 @@ namespace Cosmos.Hardware.Screen {
 			*xScreenPtr = xVal;
 			xScreenPtr += 1;
 			*xScreenPtr = 7;
-			//todo: method scanning should somehow include Interrupts.HandleInterrupt
-			bool theVal = false;
-			if (theVal) {
-				Interrupts.HandleInterrupt_Default(0,0);
-			}
 		}
 	}
 }

@@ -8,10 +8,6 @@ namespace Cosmos.Kernel {
         //TODO: Remove
 		public static void DoTest() {
 			Hardware.Interrupts.IncludeAllHandlers();
-			bool xTheval = false;
-			if(xTheval) {
-				Hardware.Interrupts.HandleInterrupt_Default(0, 0);
-			}
 		}
     }
 }

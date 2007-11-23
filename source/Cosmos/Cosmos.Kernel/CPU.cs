@@ -7,6 +7,7 @@ namespace Cosmos.Kernel {
         public static void Init() {
 			Hardware.CPU.CreateGDT();
 			Hardware.PIC.Init();
+        	Hardware.Serial.InitSerial(0);
 			Hardware.CPU.CreateIDT();
         }
     }

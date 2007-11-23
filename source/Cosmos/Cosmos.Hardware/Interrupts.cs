@@ -1,63 +1,142 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Cosmos.Hardware {
-	public class Interrupts : Hardware {
-		public static void HandleInterrupt_Default(uint aParam, uint aInterrupt) {
+	public class Interrupts: Hardware {
+		[StructLayout(LayoutKind.Sequential)]
+		public struct InterruptContext {
+			public uint SS;
+			public uint GS;
+			public uint FS;
+			public uint ES;
+			public uint DS;
+			public uint EDI;
+			public uint ESI;
+			public uint EBP;
+			public uint ESP;
+			public uint EBX;
+			public uint EDX;
+			public uint ECX;
+			public uint EAX;
+			public byte Interrupt;
+			public uint Param;
+			public uint EIP;
+			public uint CS;
+			public uint EFlags;
+			public uint UserESP;
+		}
+		public unsafe static void HandleInterrupt_Default(InterruptContext* aContext) {
 			Console.Write("Interrupt ");
-			WriteNumber(aInterrupt, 32);
-			Console.Write(", Param = ");
-			WriteNumber(aParam, 32);
+			WriteNumber(aContext->Interrupt, 32);
 			Console.WriteLine("");
-			if (aInterrupt >= 0x20 && aInterrupt <= 0x2F) {
-				if (aInterrupt >= 0x28) {
-                    PIC.SignalSecondary();
-                } else {
-                    PIC.SignalPrimary();
+			Console.Write("    SS = ");
+			WriteNumber(aContext->SS, 32);
+			Console.WriteLine("");
+			Console.Write("    GS = ");
+			WriteNumber(aContext->GS, 32);
+			Console.WriteLine("");
+			Console.Write("    FS = ");
+			WriteNumber(aContext->FS, 32);
+			Console.WriteLine("");
+			Console.Write("    ES = ");
+			WriteNumber(aContext->ES, 32);
+			Console.WriteLine("");
+			Console.Write("    DS = ");
+			WriteNumber(aContext->DS, 32);
+			Console.WriteLine("");
+			Console.Write("    EDI = ");
+			WriteNumber(aContext->EDI, 32);
+			Console.WriteLine("");
+			Console.Write("    ESI = ");
+			WriteNumber(aContext->ESI, 32);
+			Console.WriteLine("");
+			Console.Write("    EBP = ");
+			WriteNumber(aContext->EBP, 32);
+			Console.WriteLine("");
+			Console.Write("    ESP = ");
+			WriteNumber(aContext->ESP, 32);
+			Console.WriteLine("");
+			Console.Write("    EBX = ");
+			WriteNumber(aContext->EBX, 32);
+			Console.WriteLine("");
+			Console.Write("    EDX = ");
+			WriteNumber(aContext->EDX, 32);
+			Console.WriteLine("");
+			Console.Write("    ECX = ");
+			WriteNumber(aContext->ECX, 32);
+			Console.WriteLine("");
+			Console.Write("    EAX = ");
+			WriteNumber(aContext->EAX, 32);
+			Console.WriteLine("");
+			Console.Write("    Param = ");
+			WriteNumber(aContext->Param, 32);
+			Console.WriteLine("");
+			Console.Write("    EIP = ");
+			WriteNumber(aContext->EIP, 32);
+			Console.WriteLine("");
+			Console.Write("    CS = ");
+			WriteNumber(aContext->CS, 32);
+			Console.WriteLine("");
+			Console.Write("    EFlags = ");
+			WriteNumber(aContext->EFlags, 32);
+			Console.WriteLine("");
+			Console.Write("    UserESP = ");
+			WriteNumber(aContext->UserESP, 32);
+			Console.WriteLine("");
+
+			//			if (aContext.Interrupt >= 0x20 && aContext.Interrupt <= 0x2F) {
+			//				if (aContext.Interrupt >= 0x28) {
+			//                    PIC.SignalSecondary();
+			//                } else {
+			//                    PIC.SignalPrimary();
+			//				}
+			//			}
+		}
+
+		//IRQ 2 - Cascaded signals from IRQs 8-15. A device configured to use IRQ 2 will actually be using IRQ 9
+		//IRQ 3 - COM2 (Default) and COM4 (User) serial ports
+		//IRQ 4 - COM1 (Default) and COM3 (User) serial ports
+		//IRQ 5 - LPT2 Parallel Port 2 or sound card
+		//IRQ 6 - Floppy disk controller
+		//IRQ 7 - LPT1 Parallel Port 1 or sound card (8-bit Sound Blaster and compatibles)
+
+		//IRQ 8 - Real time clock
+		//IRQ 9 - Free / Open interrupt / Available / SCSI. Any devices configured to use IRQ 2 will actually be using IRQ 9.
+		//IRQ 10 - Free / Open interrupt / Available / SCSI
+		//IRQ 11 - Free / Open interrupt / Available / SCSI
+		//IRQ 12 - PS/2 connector Mouse. If no PS/2 connector mouse is used, this can be used for other peripherals
+		//IRQ 13 - ISA / Math Co-Processor
+		//IRQ 14 - Primary IDE. If no Primary IDE this can be changed
+		//IRQ 15 - Secondary IDE
+
+		//IRQ 0 - System timer. Reserved for the system. Cannot be changed by a user.
+		public static unsafe void HandleInterrupt_20(InterruptContext* aContext) {
+			Console.WriteLine("PIT IRQ occurred");
+			PIC.SignalPrimary();
+		}
+
+		//IRQ 1 - Keyboard. Reserved for the system. Cannot be altered even if no keyboard is present or needed.
+		public static unsafe void HandleInterrupt_21(InterruptContext* aContext) {
+			byte xScanCode = IORead(0x60);
+			WriteNumber(xScanCode, 8);
+			PIC.SignalPrimary();
+		}
+
+		// This is to trick IL2CPU to compile it in
+		//TODO: Make a new attribute that IL2CPU sees when scanning to force inclusion so we dont have to do this
+		public static void IncludeAllHandlers() {
+			bool xTest = false;
+			if (xTest) {
+				InterruptContext xCtx = new InterruptContext();
+				unsafe {
+					HandleInterrupt_Default(null);
+					HandleInterrupt_20(null);
+					HandleInterrupt_21(null);
 				}
 			}
 		}
-
-        //IRQ 2 - Cascaded signals from IRQs 8-15. A device configured to use IRQ 2 will actually be using IRQ 9
-        //IRQ 3 - COM2 (Default) and COM4 (User) serial ports
-        //IRQ 4 - COM1 (Default) and COM3 (User) serial ports
-        //IRQ 5 - LPT2 Parallel Port 2 or sound card
-        //IRQ 6 - Floppy disk controller
-        //IRQ 7 - LPT1 Parallel Port 1 or sound card (8-bit Sound Blaster and compatibles)
-
-        //IRQ 8 - Real time clock
-        //IRQ 9 - Free / Open interrupt / Available / SCSI. Any devices configured to use IRQ 2 will actually be using IRQ 9.
-        //IRQ 10 - Free / Open interrupt / Available / SCSI
-        //IRQ 11 - Free / Open interrupt / Available / SCSI
-        //IRQ 12 - PS/2 connector Mouse. If no PS/2 connector mouse is used, this can be used for other peripherals
-        //IRQ 13 - ISA / Math Co-Processor
-        //IRQ 14 - Primary IDE. If no Primary IDE this can be changed
-        //IRQ 15 - Secondary IDE
-
-        //IRQ 0 - System timer. Reserved for the system. Cannot be changed by a user.
-        public static void HandleInterrupt_20(uint aParam) {
-            Console.WriteLine("PIT IRQ occurred");
-            PIC.SignalPrimary();
-        }
-
-        //IRQ 1 - Keyboard. Reserved for the system. Cannot be altered even if no keyboard is present or needed.
-        public static void HandleInterrupt_21(uint aParam) {
-            byte xScanCode = IORead(0x60);
-            WriteNumber(xScanCode, 8);
-            PIC.SignalPrimary();
-        }
-
-        // This is to trick IL2CPU to compile it in
-        //TODO: Make a new attribute that IL2CPU sees when scanning to force inclusion so we dont have to do this
-        public static void IncludeAllHandlers() {
-            bool xTest = false;
-            if (xTest) {
-                HandleInterrupt_Default(0, 0);
-                HandleInterrupt_20(0);
-                HandleInterrupt_21(0);
-            }
-        }
 
 		private static void WriteNumber(uint aValue, byte aBitCount) {
 			uint xValue = aValue;
