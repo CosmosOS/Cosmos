@@ -36,7 +36,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			new CPUx86.Move(CPUx86.Registers.EBX, "[esp + " + xStackSize + "]"); // the index
 			new CPUx86.Move(CPUx86.Registers.ECX, "[esp + " + (xStackSize + 4) + "]"); // the array
-			new CPUx86.Add(CPUx86.Registers.ECX, "12");
+			new CPUx86.Add(CPUx86.Registers.ECX, "16");
 			new CPUx86.Push("0x" + aElementSize.ToString("X"));
 			aAssembler.StackSizes.Push(4);
 			new CPUx86.Push(CPUx86.Registers.EBX);

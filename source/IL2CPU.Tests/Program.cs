@@ -40,8 +40,8 @@ namespace IL2CPU.Tests {
 					xStartInfo.UseShellExecute = false;
 					xStartInfo.FileName = IL2CPUFileName;
 					xStartInfo.Arguments = "-in:\"" + xTestExe + "\" -out:\"" + xTestExe + ".exe\"";
-					xStartInfo.RedirectStandardError = true;
-					xStartInfo.RedirectStandardOutput = true;
+					xStartInfo.RedirectStandardError = false;
+					xStartInfo.RedirectStandardOutput = false;
 					using (Process xProc = Process.Start(xStartInfo)) {
 						if (!xProc.WaitForExit(TestTimeout_Milliseconds)) {
 							xTests[xTestExe] = TestRunStateEnum.TimeoutWhileRunningIL2CPU;

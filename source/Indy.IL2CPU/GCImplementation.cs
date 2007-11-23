@@ -36,26 +36,26 @@ namespace Indy.IL2CPU {
 		/// </summary>
 		/// <param name="aObject"></param>
 		public static unsafe void IncRefCount(uint aObject) {
-			if (aObject == 0) {
-				return;
-			}
-			uint* xTheObject = (uint*)aObject;
-			xTheObject += 1;
-			if ((*xTheObject & 0x80000000) != 0) {
-				return;
-			}
-			xTheObject -= 2;
-			if ((*xTheObject & 0x88888888) != 0) {
+//			if (aObject == 0) {
+//				return;
+//			}
+//			uint* xTheObject = (uint*)aObject;
+//			xTheObject += 1;
+//			if ((*xTheObject & 0x80000000) != 0) {
+//				return;
+//			}
+//			xTheObject -= 2;
+//			if ((*xTheObject & 0x88888888) != 0) {
 //				Console.Write("StaleObject: ");
 //				WriteNumber(aObject, false);
 //				Console.WriteLine();
-				return;
-			}
+//				return;
+//			}
 			//xTheObject -= 2;
 #if GC_DEBUG
 			uint xCount =
 #endif
- *xTheObject = *xTheObject + 1;
+// *xTheObject = *xTheObject + 1;
 #if GC_DEBUG
 			if (xCount == 0x80000000) {
 				Console.WriteLine("GC: RefCount Maximum Exceeded!");
@@ -74,21 +74,21 @@ namespace Indy.IL2CPU {
 		/// </summary>
 		/// <param name="aObject"></param>
 		public static unsafe void DecRefCount(uint aObject) {
-			if (aObject == 0) {
-				return;
-			}
-			uint* xTheObject = (uint*)aObject;
-			xTheObject += 1;
+//			if (aObject == 0) {
+//				return;
+//			}
+//			uint* xTheObject = (uint*)aObject;
+//			xTheObject += 1;
 			// check for staticly embedded arrays/objects. these are embedded as values in the binary target, and should
 			// therefore not be collected.
-			if ((*xTheObject & 0x80000000) == 0x80000000) {
-				return;
-			}
-			xTheObject -= 2;
-			uint xCount = *xTheObject;
-			if (xCount == 0) {
-				return;
-			}
+//			if ((*xTheObject & 0x80000000) == 0x80000000) {
+//				return;
+//			}
+//			xTheObject -= 2;
+//			uint xCount = *xTheObject;
+//			if (xCount == 0) {
+//				return;
+//			}
 #if GC_DEBUG
 			if ((xCount & 0x80000000) == 0x80000000) {
 				Console.Write("StaleObject: ");
@@ -97,8 +97,8 @@ namespace Indy.IL2CPU {
 				return;
 			}
 #endif
-			xCount = *xTheObject = xCount - 1;
-			if (xCount == 0) {
+//			xCount = *xTheObject = xCount - 1;
+//			if (xCount == 0) {
 #if GC_DEBUG
 				Console.Write("ObjectReclaimed, Object = ");
 				WriteNumber(aObject, false);
@@ -127,7 +127,7 @@ namespace Indy.IL2CPU {
 				WriteNumber(xCount, false);
 				Console.WriteLine();
 #endif
-			}
+//			}
 		}
 
 #if GC_DEBUG

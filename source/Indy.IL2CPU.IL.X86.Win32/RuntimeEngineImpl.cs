@@ -6,10 +6,13 @@ namespace Indy.IL2CPU.IL.X86.Win32 {
 		public static uint HeapHandle = 0;
 
 		public static void Heap_Initialize() {
-			HeapHandle = PInvokes.Kernel32_HeapCreate(0, RuntimeEngine.InitialHeapSize, RuntimeEngine.MaximumHeapSize);
+			
 		}
 
 		public static uint Heap_AllocNewObject(uint aSize) {
+			if(HeapHandle == 0) {
+				HeapHandle = PInvokes.Kernel32_HeapCreate(0, RuntimeEngine.InitialHeapSize, RuntimeEngine.MaximumHeapSize);
+			}
 			return PInvokes.Kernel32_HeapAlloc(HeapHandle, 0x00000008, aSize);
 		}
 

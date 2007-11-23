@@ -186,12 +186,12 @@ namespace Indy.IL2CPU.IL {
 					}
 				}
 			}
-			Console.Write(new String('-', Console.WindowWidth));
+			//Console.Write(new String('-', Console.WindowWidth));
 			Console.WriteLine("Recognized Plug methods:");
 			foreach (string s in mPlugMethods.Keys) {
 				Console.WriteLine(s);
 			}
-			Console.Write(new String('-', Console.WindowWidth));
+			//Console.Write(new String('-', Console.WindowWidth));
 		}
 
 		public virtual Type GetOpForCustomMethodImplementation(string aName) {

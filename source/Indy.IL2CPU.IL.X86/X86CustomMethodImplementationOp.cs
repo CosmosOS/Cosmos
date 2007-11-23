@@ -28,13 +28,18 @@ namespace Indy.IL2CPU.IL.X86 {
 		protected override void Assemble_System_Void___System_Runtime_CompilerServices_RuntimeHelpers_InitializeArray___System_Array__System_RuntimeFieldHandle___() {
 			// Arguments:
 			//    Array aArray, RuntimeFieldHandle aFieldHandle
-			new Assembler.X86.Move(CPUx86.Registers.EAX, "0");
 			new Assembler.X86.Move(CPUx86.Registers.EDI, "[" + MethodInfo.Arguments[0].VirtualAddresses[0] + "]");
 			new Assembler.X86.Move(CPUx86.Registers.ESI, "[" + MethodInfo.Arguments[1].VirtualAddresses[0] + "]");
 			new Assembler.X86.Add(CPUx86.Registers.EDI, "8");
-			new Assembler.X86.Move(CPUx86.Registers.ECX, CPUx86.Registers.AtEDI);
+			new Assembler.X86.Push("dword [edi]");
 			new Assembler.X86.Add(CPUx86.Registers.EDI, "4");
-			new Assembler.X86.Add(CPUx86.Registers.ESI, "12");
+			new CPUx86.Move("eax", "[edi]");
+			new CPUx86.Multiply("dword [esp]");
+			new CPUx86.Pop("ecx");
+			new CPUx86.Move("ecx", "eax");
+			new Assembler.X86.Move(CPUx86.Registers.EAX, "0");
+			new Assembler.X86.Add(CPUx86.Registers.EDI, "4");
+			new Assembler.X86.Add(CPUx86.Registers.ESI, "16");
 
 			new Assembler.Label(".StartLoop");
 			new Assembler.X86.Move("byte", CPUx86.Registers.DL, CPUx86.Registers.AtESI);
