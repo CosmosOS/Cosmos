@@ -29,11 +29,11 @@ namespace Cosmos.Kernel {
 		[GlueMethod(Type = GlueMethodType.Heap_Alloc)]
 		public static uint MemAlloc(uint aLength) {
 			CheckInit();
-			//DebugUtil.SendMM_Alloc(mCurrentAddress, aLength);
+			DebugUtil.SendMM_Alloc(mCurrentAddress, aLength);
 			uint xResult = mCurrentAddress;
 			mCurrentAddress += aLength;
 			if (mCurrentAddress >= (mStartAddress + mLength)) {
-				//DebugUtil.SendError("MM", "Reached maximum memory");
+				DebugUtil.SendError("MM", "Reached maximum memory");
 			}
 			return xResult;
 		}

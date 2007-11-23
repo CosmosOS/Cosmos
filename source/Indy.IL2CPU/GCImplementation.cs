@@ -1,5 +1,5 @@
 ﻿#if DEBUG
-#define GC_DEBUG
+//#define GC_DEBUG
 #endif
 using System;
 using System.Collections.Generic;
@@ -46,9 +46,9 @@ namespace Indy.IL2CPU {
 			}
 			xTheObject -= 2;
 			if ((*xTheObject & 0x88888888) != 0) {
-				Console.Write("StaleObject: ");
-				WriteNumber(aObject, false);
-				Console.WriteLine();
+//				Console.Write("StaleObject: ");
+//				WriteNumber(aObject, false);
+//				Console.WriteLine();
 				return;
 			}
 			//xTheObject -= 2;
@@ -115,9 +115,11 @@ namespace Indy.IL2CPU {
 				//						DecRefCount(*xTheObject);
 				//					}
 				//				}
-#if !GC_DEBUG
-				RuntimeEngine.Heap_Free(aObject - 4);
 #endif
+#if !GC_DEBUG
+//				RuntimeEngine.Heap_Free(aObject - 4);
+#endif
+#if GC_DEBUG
 			} else {
 				Console.Write("ObjectDecRefCount, Object = ");
 				WriteNumber(aObject, false);

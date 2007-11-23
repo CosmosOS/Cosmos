@@ -22,9 +22,10 @@ namespace Cosmos.Hardware {
 			WriteSerialString("\" String=\"");
 			WriteSerialString(aData);
 			WriteSerialString("\"/>\r\n");
+			EndLogging();
 		}
 
-		private static void WriteNumber(uint aNumber, byte aBits) {
+		public static void WriteNumber(uint aNumber, byte aBits) {
 			uint xValue = aNumber;
 			byte xCurrentBits = aBits;
 			WriteSerialString("0x");

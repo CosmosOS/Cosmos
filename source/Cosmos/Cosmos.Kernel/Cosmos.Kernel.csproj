@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CPU.cs" />
+    <Compile Include="DebugUtil.cs" />
     <Compile Include="Heap.cs" />
     <Compile Include="Interrupts.cs" />
     <Compile Include="Keyboard.cs" />

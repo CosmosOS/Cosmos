@@ -14,13 +14,5 @@ namespace Cosmos.Kernel {
 			Write(aSerialIndex, aText);
 			Write(aSerialIndex, "\r\n");
 		}
-
-		public static void DebugWrite(string aData) {
-			Write(0, aData);
-		}
-
-		public static void DebugWriteLine(string aText) {
-			WriteLine(0, aText);
-		}
 	}
 }
