@@ -756,8 +756,12 @@ namespace Indy.IL2CPU {
 						} else {
 							if (xCurrentMethod.HasBody) {
 								// todo: add support for types which need different stack size
+								mInstructionsToSkip = 0;
 								foreach (Instruction xInstruction in xCurrentMethod.Body.Instructions) {
-									new Comment("StackItemCount = " + mAssembler.StackSizes.Count);
+									if(mInstructionsToSkip > 0) {
+										mInstructionsToSkip--;
+										continue;
+									}
 									MethodReference xMethodReference = xInstruction.Operand as MethodReference;
 									if (xMethodReference != null) {
 										QueueMethodRef(xMethodReference);
@@ -1194,6 +1198,15 @@ namespace Indy.IL2CPU {
 				throw new Exception("No Current Engine yet!");
 			}
 			return Engine.GetTypeDefinition(mCurrent.mCrawledAssembly.Resolver.Resolve(aType.Assembly.FullName), aType.FullName);
+		}
+
+		// todo: once Cecil implements IAnnotationsProvider on Instruction, remove this, and annotate the instructions to skip
+		private int mInstructionsToSkip = 0;
+		public static void SetInstructionsToSkip(int aCount) {
+			if (mCurrent == null) {
+				throw new Exception("No Current Engine!");
+			}
+			mCurrent.mInstructionsToSkip = aCount;
 		}
 	}
 }
