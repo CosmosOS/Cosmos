@@ -9,5 +9,7 @@ namespace Cosmos.Kernel.Plugs {
     public static class Hardware {
         [PlugMethod(MethodAssembler = typeof(Assemblers.IOWrite))]
         public static void IOWrite(ushort aPort, byte aData) { }
+        [PlugMethod(MethodAssembler = typeof(Assemblers.IORead))]
+        public static byte IORead(ushort aPort) { return 0; }
     }
 }

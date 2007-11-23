@@ -5,20 +5,20 @@ using System.Text;
 namespace Cosmos.Hardware {
 	public class Interrupts : Hardware {
 		public static void HandleInterrupt_Default(uint aParam, uint aInterrupt) {
-			Console.Write("Interrupt occurred. Interrupt = ");
+			Console.Write("Interrupt ");
 			WriteNumber(aInterrupt, 32);
 			Console.Write(", Param = ");
 			WriteNumber(aParam, 32);
 			Console.WriteLine("");
 			if (aInterrupt >= 0x20 && aInterrupt <= 0x2F) {
 				if (aInterrupt >= 0x28) {
-					IOWrite(0xA0, 0x20);
+                    PIC.SignalSecondary();
+                } else {
+                    PIC.SignalPrimary();
 				}
-                IOWrite(0x20, 0x20);
 			}
 		}
 
-        //IRQ 1 - Keyboard. Reserved for the system. Cannot be altered even if no keyboard is present or needed.
         //IRQ 2 - Cascaded signals from IRQs 8-15. A device configured to use IRQ 2 will actually be using IRQ 9
         //IRQ 3 - COM2 (Default) and COM4 (User) serial ports
         //IRQ 4 - COM1 (Default) and COM3 (User) serial ports
@@ -37,8 +37,15 @@ namespace Cosmos.Hardware {
 
         //IRQ 0 - System timer. Reserved for the system. Cannot be changed by a user.
         public static void HandleInterrupt_20(uint aParam) {
-        //    Console.WriteLine("PIT IRQ occurred");
-            IOWrite(0x20, 0x20);
+            Console.WriteLine("PIT IRQ occurred");
+            PIC.SignalPrimary();
+        }
+
+        //IRQ 1 - Keyboard. Reserved for the system. Cannot be altered even if no keyboard is present or needed.
+        public static void HandleInterrupt_21(uint aParam) {
+            byte xScanCode = IORead(0x60);
+            WriteNumber(xScanCode, 8);
+            PIC.SignalPrimary();
         }
 
         // This is to trick IL2CPU to compile it in
@@ -48,6 +55,7 @@ namespace Cosmos.Hardware {
             if (xTest) {
                 HandleInterrupt_Default(0, 0);
                 HandleInterrupt_20(0);
+                HandleInterrupt_21(0);
             }
         }
 
