@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="Tests\Generics\SimpleList\SimpleList.cs" />
     <None Include="Tests\Events\SimpleMulticastDelegate\SimpleMulticastDelegate.cs" />
     <None Include="Tests\Events\CustomDelegate\CustomDelegate.cs" />
     <None Include="Tests\Events\SimpleCreateDelegate\SimpleCreateDelegate.cs" />
@@ -176,6 +177,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Tests\Events\SimpleCreateDelegate\SimpleCreateDelegate.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Tests\Generics\SimpleList\SimpleList.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <Content Include="Tests\SimpleForWithIf\SimpleForWithIf.exe">
