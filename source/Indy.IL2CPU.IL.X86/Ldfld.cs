@@ -8,7 +8,9 @@ namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Ldfld)]
 	public class Ldfld: Op {
 		private readonly TypeInformation.Field mField;
-		public Ldfld(TypeInformation.Field aField):base(null, null) {
+		private readonly TypeInformation mType;
+		public Ldfld(TypeInformation.Field aField)
+			: base(null, null) {
 			mField = aField;
 		}
 		public Ldfld(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
@@ -23,12 +25,12 @@ namespace Indy.IL2CPU.IL.X86 {
 				xField = Engine.GetDefinitionFromFieldReference(xFieldRef);
 			}
 			string xFieldId = xField.ToString();
-			int xStorageSize;
-			mField = Engine.GetTypeFieldInfo(Engine.GetDefinitionFromTypeReference(xField.DeclaringType), out xStorageSize)[xFieldId];
+			mType = Engine.GetTypeInfo(Engine.GetDefinitionFromTypeReference(xField.DeclaringType));
+			mField = mType.Fields[xFieldId];
 		}
 
 		public override void DoAssemble() {
-			Ldfld(Assembler, mField);
+			Ldfld(Assembler, mType, mField);
 		}
 	}
 }

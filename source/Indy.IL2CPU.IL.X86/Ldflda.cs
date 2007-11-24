@@ -7,7 +7,9 @@ using CPUx86 = Indy.IL2CPU.Assembler.X86;
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Ldflda)]
 	public class Ldflda: Op {
-		private readonly string mRelativeAddress;
+		private TypeInformation mType;
+		private TypeInformation.Field mField;
+
 		public Ldflda(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
 			FieldDefinition xField = aInstruction.Operand as FieldDefinition;
@@ -20,21 +22,13 @@ namespace Indy.IL2CPU.IL.X86 {
 				xField = Engine.GetDefinitionFromFieldReference(xFieldRef);
 			}
 			string xFieldId = xField.ToString();
-			TypeInformation.Field xTheField;
 			int xStorageSize;
-			xTheField = Engine.GetTypeFieldInfo(Engine.GetDefinitionFromTypeReference(xField.DeclaringType), out xStorageSize)[xFieldId];
-			mRelativeAddress = xTheField.RelativeAddress;
-		}
-
-		public Ldflda(string aRelativeAddress):base(null, null) {
-			mRelativeAddress = aRelativeAddress;
+			mType = Engine.GetTypeInfo(Engine.GetDefinitionFromTypeReference(xField.DeclaringType));
+			mField = mType.Fields[xFieldId];
 		}
 
 		public override void DoAssemble() {
-			new CPUx86.Pop(CPUx86.Registers.EAX);
-			new CPUx86.Add(CPUx86.Registers.EAX, mRelativeAddress.Trim().Substring(1));
-			new CPUx86.Pushd(CPUx86.Registers.EAX);
-			Assembler.StackSizes.Push(4);
+			Ldflda(Assembler, mType, mField);
 		}
 	}
 }

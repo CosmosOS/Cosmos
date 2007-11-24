@@ -10,6 +10,7 @@ namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Stfld)]
 	public class Stfld: Op {
 		private readonly TypeInformation.Field mField;
+		private readonly TypeInformation mType;
 		public Stfld(Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
 			if (aInstruction == null) {
@@ -28,16 +29,12 @@ namespace Indy.IL2CPU.IL.X86 {
 				xField = Engine.GetDefinitionFromFieldReference(xFieldRef);
 			}
 			string xFieldId = xField.ToString();
-			int xStorageSize;
-			SortedList<String, TypeInformation.Field> xFieldInfo = Engine.GetTypeFieldInfo(Engine.GetDefinitionFromTypeReference(xField.DeclaringType), out xStorageSize);
-			if (!xFieldInfo.ContainsKey(xFieldId)) {
-				throw new Exception("Field not found!");
-			}
-			mField = xFieldInfo[xFieldId];
+			mType = Engine.GetTypeInfo(Engine.GetDefinitionFromTypeReference(xField.DeclaringType));
+			mField = mType.Fields[xFieldId];
 		}
 
 		public override void DoAssemble() {
-			Stfld(Assembler, mField);
+			Stfld(Assembler, mType, mField);
 		}
 	}
 }

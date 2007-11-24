@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
-using Instruction=Mono.Cecil.Cil.Instruction;
+using Instruction = Mono.Cecil.Cil.Instruction;
 
 namespace Indy.IL2CPU.IL.X86 {
 	public class X86CustomMethodImplementationProxyOp: CustomMethodImplementationProxyOp {
@@ -16,8 +16,8 @@ namespace Indy.IL2CPU.IL.X86 {
 			Op.Ldarg(Assembler, MethodInfo.Arguments[aIndex]);
 		}
 
-		protected override void Ldflda(TypeInformation.Field aField) {
-			Op.Ldflda(Assembler, aField);
+		protected override void Ldflda(TypeInformation aType, TypeInformation.Field aField) {
+			Op.Ldflda(Assembler, aType, aField);
 		}
 
 		protected override void CallProxiedMethod() {

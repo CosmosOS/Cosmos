@@ -28,9 +28,9 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 		}
 
-		public static void Ldflda(Assembler.Assembler aAssembler, TypeInformation.Field aField) {
+		public static void Ldflda(Assembler.Assembler aAssembler, TypeInformation aType, TypeInformation.Field aField) {
 			int aExtraOffset = 0;
-			if (aField.NeedsGC && !aAssembler.InMetalMode) {
+			if (aType.NeedsGC && !aAssembler.InMetalMode) {
 				aExtraOffset = 12;
 			}
 			new Popd(CPUx86.Registers.EAX);
@@ -47,14 +47,14 @@ namespace Indy.IL2CPU.IL.X86 {
 			new Pushd("eax");
 		}
 
-		public static void Ldfld(Assembler.Assembler aAssembler, TypeInformation.Field aField) {
-			Ldfld(aAssembler, aField, true);
+		public static void Ldfld(Assembler.Assembler aAssembler, TypeInformation aType, TypeInformation.Field aField) {
+			Ldfld(aAssembler, aType, aField, true);
 		}
 
-		public static void Ldfld(Assembler.Assembler aAssembler, TypeInformation.Field aField, bool aAddGCCode) {
+		public static void Ldfld(Assembler.Assembler aAssembler, TypeInformation aType, TypeInformation.Field aField, bool aAddGCCode) {
 			aAssembler.StackSizes.Pop();
 			int aExtraOffset = 0;
-			if (aField.NeedsGC && !aAssembler.InMetalMode) {
+			if (aType.NeedsGC && !aAssembler.InMetalMode) {
 				aExtraOffset = 12;
 			}
 			new CPUx86.Pop("ecx");
@@ -112,17 +112,17 @@ namespace Indy.IL2CPU.IL.X86 {
 			aAssembler.StackSizes.Push(aField.Size);
 		}
 
-		public static void Stfld(Assembler.Assembler aAssembler, TypeInformation.Field aField) {
+		public static void Stfld(Assembler.Assembler aAssembler, TypeInformation aType, TypeInformation.Field aField) {
 			aAssembler.StackSizes.Pop();
 			int xRoundedSize = aField.Size;
 			if (xRoundedSize % 4 != 0) {
 				xRoundedSize += 4 - (xRoundedSize % 4);
 			}
 			int aExtraOffset = 0;
-			if (aField.NeedsGC && !aAssembler.InMetalMode) {
+			if (aType.NeedsGC && !aAssembler.InMetalMode) {
 				aExtraOffset = 12;
 				new CPUx86.Pushd("[esp + 4]");
-				Ldfld(aAssembler, aField, false);
+				Ldfld(aAssembler, aType, aField, false);
 				Engine.QueueMethod(GCImplementationRefs.DecRefCountRef);
 				new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef));
 			}

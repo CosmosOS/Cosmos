@@ -16,7 +16,7 @@ namespace Indy.IL2CPU.IL {
 		public MethodDefinition ProxiedMethod;
 
 		protected abstract void Ldarg(int aIndex);
-		protected abstract void Ldflda(TypeInformation.Field aField);
+		protected abstract void Ldflda(TypeInformation aType, TypeInformation.Field aField);
 		protected abstract void CallProxiedMethod();
 		protected abstract void Ldloc(int index);
 
@@ -37,7 +37,7 @@ namespace Indy.IL2CPU.IL {
 					}
 					if (xFieldName != null) {
 						Ldarg(0);
-						Ldflda(MethodInfo.TypeInfo.Fields[xFieldName]);
+						Ldflda(MethodInfo.TypeInfo, MethodInfo.TypeInfo.Fields[xFieldName]);
 					} else {
 						Ldarg(curIndex++);
 					}

@@ -398,7 +398,9 @@ namespace Indy.IL2CPU {
 						continue;
 					}
 					if (xFoundMethod.ReturnType.ReturnType.FullName != aRef.ReturnType.ReturnType.FullName) {
-						continue;
+						if (!(xFoundMethod.ReturnType.ReturnType is GenericParameter && aRef.ReturnType.ReturnType is GenericParameter)) {
+							continue;
+						}
 					}
 					if (xFoundMethod.Parameters.Count != aRef.Parameters.Count) {
 						continue;
@@ -406,7 +408,7 @@ namespace Indy.IL2CPU {
 					bool xMismatch = false;
 					for (int i = 0; i < xFoundMethod.Parameters.Count; i++) {
 						if (xFoundMethod.Parameters[i].ParameterType.FullName != aRef.Parameters[i].ParameterType.FullName) {
-							if(xFoundMethod.Parameters[i].ParameterType is GenericParameter && aRef.Parameters[i].ParameterType is GenericParameter) {
+							if (xFoundMethod.Parameters[i].ParameterType is GenericParameter && aRef.Parameters[i].ParameterType is GenericParameter) {
 								continue;
 							}
 							xMismatch = true;
@@ -681,18 +683,10 @@ namespace Indy.IL2CPU {
 					continue;
 				}
 				string xMethodName = Label.GenerateLabelName(xCurrentMethod);
-				foreach (CustomAttribute xAttrib in xCurrentMethod.CustomAttributes) {
-					if (xAttrib.Constructor.DeclaringType.FullName == typeof(MethodAliasAttribute).FullName) {
-						//xMethodName = (string)xAttrib.Fields["Name"];
-						break;
-					}
-				}
 				TypeInformation xTypeInfo = null;
 				{
 					if (!xCurrentMethod.IsStatic) {
-						int xObjectStorageSize;
-						SortedList<string, TypeInformation.Field> xTypeFields = GetTypeFieldInfo(xCurrentMethod, out xObjectStorageSize);
-						xTypeInfo = new TypeInformation(xObjectStorageSize, xTypeFields, GetDefinitionFromTypeReference(xCurrentMethod.DeclaringType));
+						xTypeInfo = GetTypeInfo(Engine.GetDefinitionFromTypeReference(xCurrentMethod.DeclaringType));
 					}
 				}
 				MethodInformation xMethodInfo = GetMethodInfo(xCurrentMethod, xCurrentMethod, xMethodName, xTypeInfo);
@@ -762,7 +756,7 @@ namespace Indy.IL2CPU {
 								// todo: add support for types which need different stack size
 								mInstructionsToSkip = 0;
 								foreach (Instruction xInstruction in xCurrentMethod.Body.Instructions) {
-									if(mInstructionsToSkip > 0) {
+									if (mInstructionsToSkip > 0) {
 										mInstructionsToSkip--;
 										continue;
 									}
@@ -794,6 +788,14 @@ namespace Indy.IL2CPU {
 				mAssembler.StackSizes.Clear();
 				mMethods[xCurrentMethod].Processed = true;
 			}
+		}
+
+		public static TypeInformation GetTypeInfo(TypeDefinition aType) {
+			TypeInformation xTypeInfo;
+			int xObjectStorageSize;
+			SortedList<string, TypeInformation.Field> xTypeFields = GetTypeFieldInfo(aType, out xObjectStorageSize);
+			xTypeInfo = new TypeInformation(xObjectStorageSize, xTypeFields, aType, !aType.IsValueType);
+			return xTypeInfo;
 		}
 
 		public static MethodInformation GetMethodInfo(MethodDefinition aCurrentMethodForArguments, MethodDefinition aCurrentMethodForLocals, string aMethodName, TypeInformation aTypeInfo) {
@@ -874,7 +876,6 @@ namespace Indy.IL2CPU {
 
 		private static void GetTypeFieldInfoImpl(SortedList<string, TypeInformation.Field> aTypeFields, TypeDefinition aType, ref int aObjectStorageSize, bool aGCObjects) {
 			TypeDefinition xActualType = aType;
-			aObjectStorageSize = 0;
 			do {
 				foreach (FieldDefinition xField in aType.Fields) {
 					if (xField.IsStatic) {
@@ -882,6 +883,9 @@ namespace Indy.IL2CPU {
 					}
 					if (xField.HasConstant) {
 						Console.WriteLine("Field is constant: " + xField.GetFullName());
+					}
+					if (xField.DeclaringType.FullName.StartsWith("System.Collections.Generic") && aGCObjects) {
+						//System.Diagnostics.Debugger.Break();
 					}
 					if (xField.FieldType.IsValueType && aGCObjects) {
 						continue;

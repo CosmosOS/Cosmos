@@ -19,7 +19,9 @@ namespace Indy.IL2CPU.IL.X86 {
 			string BaseLabel = CurInstructionLabel + "__";
 			string LabelTrue = BaseLabel + "True";
 			string LabelFalse = BaseLabel + "False";
+			new CPUx86.Pop(CPUx86.Registers.ECX);
 			new CPUx86.Pop(CPUx86.Registers.EAX);
+			new CPUx86.Pushd(CPUx86.Registers.ECX);
 			new CPUx86.Compare(CPUx86.Registers.EAX, CPUx86.Registers.AtESP);
 			new CPUx86.JumpIfLess(LabelTrue);
 			new CPUx86.JumpAlways(LabelFalse);

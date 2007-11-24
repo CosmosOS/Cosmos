@@ -62,12 +62,7 @@ namespace Indy.IL2CPU.Assembler {
 				xSB.Append("_");
 			}
 			xSB.Append("__");
-			string xResult = xSB.ToString().Replace('.', '_').Replace('+', '_').Replace('*', '_').Replace('[', '_').Replace(']', '_').Replace('&', '_');
-			if (xResult.StartsWith(".")) {
-				xResult = "." + DataMember.FilterStringForIncorrectChars(xResult.Substring(1));
-			} else {
-				xResult = DataMember.FilterStringForIncorrectChars(xResult);
-			}
+			string xResult = DataMember.FilterStringForIncorrectChars(xSB.ToString());
 			if (xResult.Length > 245) {
 				xResult = mHash.ComputeHash(Encoding.Default.GetBytes(xResult)).Aggregate("_", (r, x) => r + x.ToString("X2"));
 			}

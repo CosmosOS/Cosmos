@@ -36,10 +36,12 @@ namespace Indy.IL2CPU.IL {
 		public readonly SortedList<string, Field> Fields;
 		public readonly int StorageSize;
 		public readonly TypeDefinition TypeDef;
-		public TypeInformation(int aStorageSize, SortedList<string, Field> aFields, TypeDefinition aTypeDef) {
+		public readonly bool NeedsGC;
+		public TypeInformation(int aStorageSize, SortedList<string, Field> aFields, TypeDefinition aTypeDef, bool aNeedsGC) {
 			Fields = aFields;
 			StorageSize = aStorageSize;
 			TypeDef = aTypeDef;
+			NeedsGC = aNeedsGC;
 		}
 	}
 }
