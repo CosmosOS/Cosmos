@@ -59,6 +59,7 @@ namespace Indy.IL2CPU.IL {
 			xDataByteArray.Append(BitConverter.GetBytes(ArrayTypeId).Aggregate("", (r, b) => r + b + ","));
 			xDataByteArray.Append(BitConverter.GetBytes((uint)0x80000002).Aggregate("", (r, b) => r + b + ","));
 			xDataByteArray.Append(BitConverter.GetBytes(mTypes.Count).Aggregate("", (r, b) => r + b + ","));
+			xDataByteArray.Append(BitConverter.GetBytes(VTableEntrySize).Aggregate("", (r, b) => r + b + ","));
 			for(uint i = 0; i < mTypes.Count;i++) {
 				for(int j = 0; j < VTableEntrySize; j++) {
 					xDataByteArray.Append("0,");
@@ -110,6 +111,7 @@ namespace Indy.IL2CPU.IL {
 				xDataByteArray.Append(BitConverter.GetBytes(ArrayTypeId).Aggregate("", (r, b) => r + b + ","));
 				xDataByteArray.Append(BitConverter.GetBytes(0x80000002 /* EmbeddedArray */).Aggregate("", (r, b) => r + b + ","));
 				xDataByteArray.Append(BitConverter.GetBytes(xEmittedMethods.Count).Aggregate("", (r, b) => r + b + ","));
+				xDataByteArray.Append("0,0,0,0,");
 				for (uint j = 0; j< xEmittedMethods.Count; j++) {
 					xDataByteArray.Append("0,0,0,0,");	
 				}

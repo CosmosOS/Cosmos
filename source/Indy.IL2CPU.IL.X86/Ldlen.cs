@@ -12,7 +12,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			Assembler.StackSizes.Pop();
 			new CPUx86.Pop(CPUx86.Registers.EAX);
 			new CPUx86.Add(CPUx86.Registers.EAX, "8");
-			new CPUx86.Pushd(CPUx86.Registers.EAX);
+			new CPUx86.Pushd(CPUx86.Registers.AtEAX);
 			Assembler.StackSizes.Push(4);
 		}
 	}

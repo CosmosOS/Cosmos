@@ -53,7 +53,7 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		public static void Ldfld(Assembler.Assembler aAssembler, TypeInformation.Field aField, bool aAddGCCode) {
 			aAssembler.StackSizes.Pop();
-			int aExtraOffset = 8;
+			int aExtraOffset = 0;
 			if (aField.NeedsGC && !aAssembler.InMetalMode) {
 				aExtraOffset = 12;
 			}
@@ -118,7 +118,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			if (xRoundedSize % 4 != 0) {
 				xRoundedSize += 4 - (xRoundedSize % 4);
 			}
-			int aExtraOffset = 8;
+			int aExtraOffset = 0;
 			if (aField.NeedsGC && !aAssembler.InMetalMode) {
 				aExtraOffset = 12;
 				new CPUx86.Pushd("[esp + 4]");

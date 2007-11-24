@@ -23,6 +23,7 @@ namespace IL2CPU.Tests {
 			}
 		}
 		static void Main(string[] args) {
+			// todo: get output echoing to work again
 			SortedList<string, TestRunStateEnum> xTests = new SortedList<string, TestRunStateEnum>();
 			Console.WriteLine("IL2CPU Tester. Please be patient while all tests are executed");
 			Console.WriteLine();
@@ -36,19 +37,19 @@ namespace IL2CPU.Tests {
 				string xTestExe = xTests.Keys[i];
 				try {
 					ProcessStartInfo xStartInfo = new ProcessStartInfo();
-					xStartInfo.CreateNoWindow = true;
+					xStartInfo.CreateNoWindow = false;
 					xStartInfo.UseShellExecute = false;
 					xStartInfo.FileName = IL2CPUFileName;
 					xStartInfo.Arguments = "-in:\"" + xTestExe + "\" -out:\"" + xTestExe + ".exe\"";
 					xStartInfo.RedirectStandardError = false;
 					xStartInfo.RedirectStandardOutput = false;
+					xStartInfo.ErrorDialog = false;
 					using (Process xProc = Process.Start(xStartInfo)) {
-						if (!xProc.WaitForExit(TestTimeout_Milliseconds)) {
-							xTests[xTestExe] = TestRunStateEnum.TimeoutWhileRunningIL2CPU;
-							Console.Write("E");
-							continue;
-						}
-						if (xProc.ExitCode != 0) {
+						if (!xProc.WaitForExit(TestTimeout_Milliseconds) || xProc.ExitCode != 0) {
+							if (!xProc.HasExited) {
+								xProc.Kill();
+								xTests[xTestExe] = TestRunStateEnum.TimeoutWhileRunningIL2CPU;
+							}
 							Console.Write("E");
 							Console.WriteLine("Result of running IL2CPU on '" + xTestExe.Substring(xBaseDir.Length + 1) + ":");
 							string[] lines = xProc.StandardOutput.ReadToEnd().Split(new string[] { "\r\n" }, StringSplitOptions.None);
