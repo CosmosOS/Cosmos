@@ -13,7 +13,8 @@ namespace Indy.IL2CPU.IL.X86 {
 			new CPUx86.Pop(CPUx86.Registers.ECX);
 			new CPUx86.Pop(CPUx86.Registers.EAX); // gets devised by ecx
 			new CPUx86.Xor(CPUx86.Registers.EDX, CPUx86.Registers.EDX);
-			new CPUx86.Divide(CPUx86.Registers.ECX);
+
+			new CPUx86.Divide(CPUx86.Registers.ECX); // => EAX / ECX 
 			new CPUx86.Pushd(CPUx86.Registers.EDX);
 			Assembler.StackSizes.Push(xSize);
 		}

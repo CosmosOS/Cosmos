@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomImplementations\System\SRImpl.cs" />
     <Compile Include="CustomMethodImplementationOp.cs" />
     <Compile Include="CustomMethodImplementationProxyOp.cs" />
     <Compile Include="InitVmtImplementationOp.cs" />

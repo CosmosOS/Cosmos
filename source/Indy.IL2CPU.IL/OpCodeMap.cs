@@ -120,9 +120,9 @@ namespace Indy.IL2CPU.IL {
 						CustomAttribute xPlugAttrib = (from item in xType.CustomAttributes.Cast<CustomAttribute>()
 													   where item.Constructor.DeclaringType.FullName == typeof(PlugAttribute).FullName
 													   select item).First();
-						TypeReference xTypeRef = xModuleDef.TypeReferences.Cast<TypeReference>().FirstOrDefault(x => (x.FullName + ", " + x.Scope.ToString()) == (string)xPlugAttrib.Fields[PlugAttribute.TargetPropertyName]);
+						TypeReference xTypeRef = xModuleDef.TypeReferences.Cast<TypeReference>().FirstOrDefault(x => (x.FullName + ", " + x.Scope.ToString()) == (string)xPlugAttrib.Fields[PlugAttribute.TargetPropertyName] || (x.FullName + ", " + x.Scope.ToString()) == (string)xPlugAttrib.Fields[PlugAttribute.TargetNamePropertyName]);
 						if (xTypeRef == null) {
-							string xTypeFullyQualedName = (string)xPlugAttrib.Fields[PlugAttribute.TargetPropertyName];
+							string xTypeFullyQualedName = (string)(xPlugAttrib.Fields[PlugAttribute.TargetPropertyName] ?? xPlugAttrib.Fields[PlugAttribute.TargetNamePropertyName]);
 							string xAsmName = xTypeFullyQualedName.Substring(xTypeFullyQualedName.IndexOf(",") + 1).TrimStart();
 							string xTypeName = xTypeFullyQualedName.Substring(0, xTypeFullyQualedName.IndexOf(","));
 							AssemblyDefinition xAsmDef = aAssemblyResolver(xAsmName);
