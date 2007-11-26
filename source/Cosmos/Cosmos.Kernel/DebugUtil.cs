@@ -26,6 +26,20 @@ namespace Cosmos.Kernel {
 			EndLogging();
 		}
 
+		public static void SendKeyboardEvent(byte aScanCode, bool aReleased) {
+			StartLogging();
+			Serial.Write(0, "<KeyboardEvent ScanCode=\"");
+			Hardware.DebugUtil.WriteNumber(aScanCode, 8);
+			Serial.Write(0, "\" Released=\"");
+			if (aReleased) {
+				Serial.Write(0, "true");
+			} else {
+				Serial.Write(0, "false");
+			}
+			Serial.Write(0, "\"/>\r\n");
+			EndLogging();
+		}
+
 		public static void SendError(string aModule, string aData) {
 			StartLogging();
 			Serial.Write(0, "<Message Type=\"Error\" Module=\"");

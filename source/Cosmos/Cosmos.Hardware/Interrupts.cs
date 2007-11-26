@@ -67,7 +67,7 @@ namespace Cosmos.Hardware {
 
 		//IRQ 1 - Keyboard. Reserved for the system. Cannot be altered even if no keyboard is present or needed.
 		public static unsafe void HandleInterrupt_21(InterruptContext* aContext) {
-			byte xScanCode = IORead(0x60);
+			Keyboard.HandleKeyboardInterrupt();
 			PIC.SignalPrimary();
 		}
 
