@@ -25,6 +25,9 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		private void Initialize(MethodReference aMethod) {
 			mIsDebugger_Break = aMethod.GetFullName() == "System.Void System.Diagnostics.Debugger.Break()";
+			if (mIsDebugger_Break) {
+				return;
+			}
 			HasResult = !aMethod.ReturnType.ReturnType.FullName.Contains("System.Void");
 			int xResultSize = Engine.GetFieldStorageSize(aMethod.ReturnType.ReturnType);
 			if (xResultSize > 4 && HasResult) {

@@ -20,7 +20,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			string LabelTrue = BaseLabel + "True";
 			string LabelFalse = BaseLabel + "False";
 			new CPUx86.Pop(CPUx86.Registers.EAX);
-			new CPUx86.Compare(CPUx86.Registers.EAX, CPUx86.Registers.ESP);
+			new CPUx86.Compare(CPUx86.Registers.EAX, CPUx86.Registers.AtESP);
 			new CPUx86.JumpIfEquals(LabelTrue);
 			new CPUx86.JumpAlways(LabelFalse);
 			new CPU.Label(LabelFalse);

@@ -760,10 +760,6 @@ namespace Indy.IL2CPU {
 										mInstructionsToSkip--;
 										continue;
 									}
-									MethodReference xMethodReference = xInstruction.Operand as MethodReference;
-									if (xMethodReference != null) {
-										QueueMethodRef(xMethodReference);
-									}
 									xOp = GetOpFromType(mMap.GetOpForOpCode(xInstruction.OpCode.Code), xInstruction, xMethodInfo);
 									if ((!xOp.SupportsMetalMode) && mAssembler.InMetalMode) {
 										throw new Exception("OpCode '" + xInstruction.OpCode.Code + "' not supported in Metal mode!");

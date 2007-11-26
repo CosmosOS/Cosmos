@@ -10,11 +10,21 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 		public override void DoAssemble() {
 			int xSize = Assembler.StackSizes.Pop();
-			new CPUx86.Pop(CPUx86.Registers.ECX);
-			new CPUx86.Pop(CPUx86.Registers.EAX);
-			new CPUx86.Divide(CPUx86.Registers.ECX);
-			new CPUx86.Pushd(CPUx86.Registers.EAX);
-			Assembler.StackSizes.Pop();
+			if (xSize == 8) {
+				//TODO: implement proper div support for 8byte values!
+				new CPUx86.Pop(CPUx86.Registers.ECX);
+				new CPUx86.Add("esp", "4");
+				new CPUx86.Pop(CPUx86.Registers.EAX);
+				new CPUx86.Divide(CPUx86.Registers.ECX);
+				//new CPUx86.Push("0");
+				new CPUx86.Pushd(CPUx86.Registers.EAX);
+
+			} else {
+				new CPUx86.Pop(CPUx86.Registers.ECX);
+				new CPUx86.Pop(CPUx86.Registers.EAX);
+				new CPUx86.Divide(CPUx86.Registers.ECX);
+				new CPUx86.Pushd(CPUx86.Registers.EAX);
+			}
 		}
 	}
 }

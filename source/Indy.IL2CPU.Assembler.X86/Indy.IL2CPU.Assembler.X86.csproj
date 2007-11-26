@@ -55,7 +55,9 @@
     <Compile Include="Call.cs" />
     <Compile Include="CmpXchg.cs" />
     <Compile Include="Compare.cs" />
+    <Compile Include="Interrupt.cs" />
     <Compile Include="Not.cs" />
+    <Compile Include="Pushfd.cs" />
     <Compile Include="Registers.cs" />
     <Compile Include="ShiftLeft.cs" />
     <Compile Include="Divide.cs" />

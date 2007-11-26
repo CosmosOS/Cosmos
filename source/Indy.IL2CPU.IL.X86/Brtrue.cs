@@ -14,8 +14,8 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 		public override void DoAssemble() {
 			new CPUx86.Popd(CPUx86.Registers.EAX);
-			new CPUx86.Compare(CPUx86.Registers.EAX, "1");
-			new CPUx86.JumpIfEquals(TargetLabel);
+			new CPUx86.Compare(CPUx86.Registers.EAX, "0");
+			new CPUx86.JumpIfNotEquals(TargetLabel);
 			Assembler.StackSizes.Pop();
 		}
 	}

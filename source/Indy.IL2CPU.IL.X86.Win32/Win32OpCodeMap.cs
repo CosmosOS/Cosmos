@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Indy.IL2CPU.IL.X86;
 using Mono.Cecil;
+using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL.X86.Win32 {
 	public class Win32OpCodeMap: X86OpCodeMap {
@@ -12,6 +13,11 @@ namespace Indy.IL2CPU.IL.X86.Win32 {
 			return typeof(Win32CustomMethodImplementationOp);
 		}
 
+		public override void Initialize(Indy.IL2CPU.Assembler.Assembler aAssembler, IEnumerable<AssemblyDefinition> aProjectAssemblies, IEnumerable<AssemblyDefinition> aPlugs, Func<TypeReference, TypeDefinition> aTypeResolver, Func<string, AssemblyDefinition> aAssemblyResolver) {
+			base.Initialize(aAssembler, aProjectAssemblies, aPlugs, aTypeResolver, aAssemblyResolver);
+			base.mMap[Code.Call] = typeof(Call);
+		}
+		
 		protected override IList<AssemblyDefinition> GetPlugAssemblies() {
 			IList<AssemblyDefinition> xResult = base.GetPlugAssemblies();
 			xResult.Add(AssemblyFactory.GetAssembly(typeof (Win32OpCodeMap).Assembly.Location));
