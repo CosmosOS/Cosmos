@@ -23,16 +23,13 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
 		protected override void EmitIDataSectionHeader() {
 		}
 
-		public override void Flush() {
-			base.Flush();
-		}
-
 		protected override void EmitFooter() {
 			mOutputWriter.WriteLine("_end_data:      ; -- end of CODE+DATA ");
 			mOutputWriter.WriteLine("");
 			mOutputWriter.WriteLine(";--- bss --- place r*, d* ? directives here, so that you'll have a BSS. ");
 			mOutputWriter.WriteLine("");
 			mOutputWriter.WriteLine("");
+			mOutputWriter.WriteLine("org 0xA00000");
 			mOutputWriter.WriteLine("rb 50000        ; our own stack ");
 			mOutputWriter.WriteLine("Kernel_Stack: ");
 			mOutputWriter.WriteLine("");
@@ -105,6 +102,7 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
 			mOutputWriter.WriteLine("; some more startups todo");
 			mOutputWriter.WriteLine("				 cli");
 			mOutputWriter.WriteLine("				 push ebx");
+			mOutputWriter.WriteLine("				 xchg bx, bx");
 			mOutputWriter.WriteLine("				 call " + EntryPointName);
 			mOutputWriter.WriteLine("			.loop:");
 			mOutputWriter.WriteLine("				 hlt");

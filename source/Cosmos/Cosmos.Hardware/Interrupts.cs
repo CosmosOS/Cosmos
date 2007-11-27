@@ -7,7 +7,6 @@ namespace Cosmos.Hardware {
 	public class Interrupts: Hardware {
 		[StructLayout(LayoutKind.Sequential)]
 		public struct InterruptContext {
-			public uint SS;
 			public uint GS;
 			public uint FS;
 			public uint ES;
@@ -20,12 +19,13 @@ namespace Cosmos.Hardware {
 			public uint EDX;
 			public uint ECX;
 			public uint EAX;
-			public byte Interrupt;
+			public uint Interrupt;
 			public uint Param;
-			public uint EIP;
+			public uint UserESP;
 			public uint CS;
 			public uint EFlags;
-			public uint UserESP;
+			public uint SS;
+			public uint EIP;			
 		}
 
 		public unsafe static void HandleInterrupt_Default(InterruptContext* aContext) {

@@ -14,7 +14,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
 			Address = aAddress;
 		}
 		public override string ToString() {
-			return "je " + Address;
+			return "je near " + Address;
 		}
 	}
 }

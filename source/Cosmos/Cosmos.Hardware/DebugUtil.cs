@@ -92,7 +92,7 @@ namespace Cosmos.Hardware {
 		public static unsafe void LogInterruptOccurred(Interrupts.InterruptContext* aContext) {
 			StartLogging();
 			WriteSerialString("<InterruptOccurred Interrupt=\"");
-			WriteNumber(aContext->Interrupt, 8);
+			WriteNumber(aContext->Interrupt, 32);
 			WriteSerialString("\" SS=\"");
 			WriteNumber(aContext->SS, 32);
 			WriteSerialString("\" GS=\"");
@@ -103,6 +103,8 @@ namespace Cosmos.Hardware {
 			WriteNumber(aContext->ES, 32);
 			WriteSerialString("\" DS=\"");
 			WriteNumber(aContext->DS, 32);
+			WriteSerialString("\" CS=\"");
+			WriteNumber(aContext->CS, 32);
 			WriteSerialString("\" ESI=\"");
 			WriteNumber(aContext->ESI, 32);
 			WriteSerialString("\" EBP=\"");
@@ -121,8 +123,6 @@ namespace Cosmos.Hardware {
 			WriteNumber(aContext->Param, 32);
 			WriteSerialString("\" EIP=\"");
 			WriteNumber(aContext->EIP, 32);
-			WriteSerialString("\" CS=\"");
-			WriteNumber(aContext->CS, 32);
 			WriteSerialString("\" EFlags=\"");
 			WriteNumber(aContext->EFlags, 32);
 			WriteSerialString("\" UserESP=\"");

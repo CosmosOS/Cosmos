@@ -59,7 +59,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 			int[] xInterruptsWithParam = new int[] { 8, 10, 11, 12, 13, 14 };
 			for (int j = 0; j < 256; j++) {
 				new Label("__ISR_Handler_" + j.ToString("X2"));
-				if (j < 0x20 || j > 0x2F) {
+				if (j < 0x20 || j > 0x2F || true) {
 					new CPUNative.Cli();
 				}
 				new CPUNative.Break();
@@ -72,14 +72,13 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 				new CPUx86.Pushd("es");
 				new CPUx86.Pushd("fs");
 				new CPUx86.Pushd("gs");
-				new CPUx86.Pushd("ss");
-				new CPUx86.Pushd("esp");
+				new CPUx86.Move("eax", "esp");
+				new CPUx86.Pushd("eax");
 				MethodDefinition xHandler = GetInterruptHandler((byte)j);
 				if (xHandler == null) {
 					xHandler = GetMethodDef(typeof(HW.Interrupts).Assembly, typeof(HW.Interrupts).FullName, "HandleInterrupt_Default", true);
 				}
 				new CPUx86.Call(Label.GenerateLabelName(xHandler));
-				new CPUx86.Popd("ss");
 				new CPUx86.Popd("gs");
 				new CPUx86.Popd("fs");
 				new CPUx86.Popd("es");
@@ -93,7 +92,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 				new CPUNative.IRet();
 			}
 			new Label("__AFTER__ALL__ISR__HANDLER__STUBS__");
-			new CPUNative.Sti();
+			//new CPUNative.Sti();
 		}
 	}
 }
