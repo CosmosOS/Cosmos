@@ -1,0 +1,132 @@
+
+
+
+DF(1)                          FSF                          DF(1)
+
+
+NNAAMMEE
+       df - report filesystem disk space usage
+
+SSYYNNOOPPSSIISS
+       ddff [_O_P_T_I_O_N]... [_F_I_L_E]...
+
+DDEESSCCRRIIPPTTIIOONN
+       This manual page documents the GNU version of ddff.  ddff dis-
+       plays the amount of disk space available on the filesystem
+       containing  each  file  name argument.  If no file name is
+       given,  the  space  available  on  all  currently  mounted
+       filesystems is shown.  Disk space is shown in 1K blocks by
+       default, unless the environment  variable  POSIXLY_CORRECT
+       is set, in which case 512-byte blocks are used.
+
+       If  an argument is the absolute file name of a disk device
+       node containing a mounted filesystem, ddff shows  the  space
+       available on that filesystem rather than on the filesystem
+       containing the device  node  (which  is  always  the  root
+       filesystem).   This  version  of  ddff cannot show the space
+       available on unmounted filesystems, because on most  kinds
+       of  systems  doing  so  requires very nonportable intimate
+       knowledge of filesystem structures.
+
+OOPPTTIIOONNSS
+       Show information about the filesystem on which  each  FILE
+       resides, or all filesystems by default.
+
+       --aa, ----aallll
+              include filesystems having 0 blocks
+
+       ----bblloocckk--ssiizzee=_S_I_Z_E use SIZE-byte blocks
+
+       --hh, ----hhuummaann--rreeaaddaabbllee
+              print sizes in human readable format (e.g., 1K 234M
+              2G)
+
+       --HH, ----ssii
+              likewise, but use powers of 1000 not 1024
+
+       --ii, ----iinnooddeess
+              list inode information instead of block usage
+
+       --kk, ----kkiilloobbyytteess
+              like ----bblloocckk--ssiizzee=_1_0_2_4
+
+       --ll, ----llooccaall
+              limit listing to local filesystems
+
+       --mm, ----mmeeggaabbyytteess
+              like ----bblloocckk--ssiizzee=_1_0_4_8_5_7_6
+
+       ----nnoo--ssyynncc
+              do  not  invoke  sync  before  getting  usage  info
+
+
+
+df (fileutils) 4.1          April 2002                          1
+
+
+
+
+
+DF(1)                          FSF                          DF(1)
+
+
+              (default)
+
+       --PP, ----ppoorrttaabbiilliittyy
+              use the POSIX output format
+
+       ----ssyynncc invoke sync before getting usage info
+
+       --tt, ----ttyyppee=_T_Y_P_E
+              limit listing to filesystems of type TYPE
+
+       --TT, ----pprriinntt--ttyyppee
+              print filesystem type
+
+       --xx, ----eexxcclluuddee--ttyyppee=_T_Y_P_E
+              limit listing to filesystems not of type TYPE
+
+       --vv     (ignored)
+
+       ----hheellpp display this help and exit
+
+       ----vveerrssiioonn
+              output version information and exit
+
+AAUUTTHHOORR
+       Written  by  Torbjorn  Granlund,  David  MacKenzie,  Larry
+       McVoy, and Paul Eggert.
+
+RREEPPOORRTTIINNGG BBUUGGSS
+       Report bugs to <bug-fileutils@gnu.org>.
+
+CCOOPPYYRRIIGGHHTT
+       Copyright (C) 2001 Free Software Foundation, Inc.
+       This is free software; see the source for  copying  condi-
+       tions.  There is NO warranty; not even for MERCHANTABILITY
+       or FITNESS FOR A PARTICULAR PURPOSE.
+
+SSEEEE AALLSSOO
+       The full documentation for ddff is maintained as  a  Texinfo
+       manual.    If  the  iinnffoo  and  ddff  programs  are  properly
+       installed at your site, the command
+
+              iinnffoo ddff
+
+       should give you access to the complete manual.
+
+
+
+
+
+
+
+
+
+
+
+
+
+df (fileutils) 4.1          April 2002                          2
+
+

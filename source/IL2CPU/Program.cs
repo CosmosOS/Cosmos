@@ -56,13 +56,13 @@ namespace IL2CPU {
 							break;
 						}
 					case "plug": {
-						if(!File.Exists(xArgParts[1])) {
-							Console.WriteLine("Plug assembly '{0}' not found!", xArgParts[1]);
-							return false;
+							if (!File.Exists(xArgParts[1])) {
+								Console.WriteLine("Plug assembly '{0}' not found!", xArgParts[1]);
+								return false;
+							}
+							Plugs.Add(xArgParts[1]);
+							break;
 						}
-						Plugs.Add(xArgParts[1]);
-						break;
-					}
 					case "metal": {
 							if (String.IsNullOrEmpty(xArgParts[1])) {
 								MetalMode = true;
@@ -122,9 +122,18 @@ namespace IL2CPU {
 			return true;
 		}
 
-		private static string FasmFileName {
+		private static string NasmFileName {
 			get {
-				return Path.Combine(Path.Combine(Path.Combine(Directory.GetParent(typeof(Program).Assembly.Location).Parent.Parent.Parent.Parent.FullName, "Tools"), "fasm"), "fasm.exe");
+				return Path.Combine(Path.Combine(ToolsDir, "nasm"), "nasm.exe");
+			}
+		}
+
+		private static string DJGPPDir { get { return Path.Combine(ToolsDir, "DJGPP"); } }
+		private static string LDFileName { get { return Path.Combine(Path.Combine(DJGPPDir, "bin"), "ld.exe"); } }
+
+		private static string ToolsDir {
+			get {
+				return Path.Combine(Directory.GetParent(typeof(Program).Assembly.Location).Parent.Parent.Parent.Parent.FullName, "Tools");
 			}
 		}
 
@@ -141,6 +150,7 @@ namespace IL2CPU {
 						Console.ResetColor();
 					};
 					bool xCleanupAsm = String.IsNullOrEmpty(AsmFile);
+					string xTestOutput = Path.GetTempFileName();
 					if (xCleanupAsm) {
 						AsmFile = Path.GetTempFileName();
 					}
@@ -150,19 +160,30 @@ namespace IL2CPU {
 						}
 					}
 					ProcessStartInfo xFasmStartInfo = new ProcessStartInfo();
-					xFasmStartInfo.FileName = FasmFileName;
-					xFasmStartInfo.Arguments = String.Format("\"{0}\" \"{1}\"", AsmFile, OutputFile);
+					xFasmStartInfo.FileName = NasmFileName;
+					xFasmStartInfo.Arguments = String.Format("-g -f elf -F stabs -o \"{0}\" \"{1}\"", xTestOutput, AsmFile);
 					xFasmStartInfo.UseShellExecute = false;
-					xFasmStartInfo.RedirectStandardError = true;
-					xFasmStartInfo.RedirectStandardOutput = true;
-					Console.WriteLine("fasm = '{0}'", FasmFileName);
+					xFasmStartInfo.RedirectStandardError = false;
+					xFasmStartInfo.RedirectStandardOutput = false;
 					Process xFasm = Process.Start(xFasmStartInfo);
-					xFasm.Start();
 					if (!xFasm.WaitForExit(60 * 1000) || xFasm.ExitCode != 0) {
 						Console.WriteLine("Error while running FASM!");
 						Console.Write(xFasm.StandardOutput.ReadToEnd());
 						Console.Write(xFasm.StandardError.ReadToEnd());
 						return 3;
+					}
+					ProcessStartInfo xLDStartInfo = new ProcessStartInfo();
+					xLDStartInfo.FileName = LDFileName;
+					xLDStartInfo.Arguments = String.Format("-Ttext 0x220000 -e Kernel_Start -o \"{0}\" \"{1}\"", OutputFile, xTestOutput);
+					xLDStartInfo.UseShellExecute = false;
+					xLDStartInfo.RedirectStandardError = false;
+					xLDStartInfo.RedirectStandardOutput = false;
+					Process xLD = Process.Start(xLDStartInfo);
+					if (!xLD.WaitForExit(60 * 1000) || xLD.ExitCode != 0) {
+						Console.WriteLine("Error while running LD!");
+						Console.Write(xLD.StandardOutput.ReadToEnd());
+						Console.Write(xLD.StandardError.ReadToEnd());
+						return 4;
 					}
 				} else {
 					return 1;

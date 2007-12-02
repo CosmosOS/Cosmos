@@ -1,0 +1,47 @@
+#
+# DSM for fileutils 4.1 binaries
+# Written by Richard Dawe <rich@phekda.freeserve.co.uk> 2002-04-04
+#
+
+dsm-file-version: 1.6
+dsm-name: fil41b
+dsm-version: 0.6.0
+
+dsm-author: Richard Dawe
+dsm-author-email: rich@phekda.freeserve.co.uk
+
+name: fileutils
+version: 4.1 release 7
+type: binaries
+manifest: fil41b
+sources-dsm: fil41s
+documentation-dsm: fil41d
+short-description: GNU Fileutils
+
+porter: Richard Dawe
+porter-email: rich@phekda.freeserve.co.uk
+
+web-site: http://www.gnu.org/
+web-site: http://www.gnu.org/software/fileutils/doc/faq/
+ftp-site: ftp://ftp.gnu.org/
+
+mailing-list: bug-fileutils@gnu.org
+
+license: GNU General Public License
+
+simtelnet-path: v2gnu/
+zip: fil41b.zip
+
+pre-install-readme: gnu/filutil4.1/djgpp/readme.dos
+changelog: gnu/filutil4.1/news
+
+replaces: fileutils < 4.1 release 7
+requires: DPMI
+# For using 'ginstall' with COFF images
+depends-on: djdev
+# For using 'ginstall -s'
+depends-on: binutils
+# For reading docs
+depends-on: info-reader
+# For reading manual pages
+depends-on: man

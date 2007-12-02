@@ -61,7 +61,7 @@ namespace Indy.IL2CPU {
 			return null;
 		}
 
-		public void RegisterAssembly(AssemblyDefinition aAssembly) {
+		public new void RegisterAssembly(AssemblyDefinition aAssembly) {
 			base.RegisterAssembly(aAssembly);
 		}
 

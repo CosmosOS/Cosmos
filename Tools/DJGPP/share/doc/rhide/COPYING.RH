@@ -1,0 +1,50 @@
+RHIDE is copyright (C) 1996-2001 by Robert H”hne. It is distributed under
+the terms of the GPL which is written in the file COPYING.
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+  
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+Additional permission:
+
+ As a special additional permission, the library librhuti which is
+ in the source tree of the RHIDE sources in the librhuti/
+ subdirectory can be distributed alone freely without any
+ restrictions.  It is not limited to use under the terms of the GPL
+ or LGPL.  For more information see the file COPYING.RHU in that
+ subdirectory.
+
+
+Non-binding request
+===================
+
+If you distribute RHIDE together with other products it would be nice,
+if you could give me a note about it so I'll be informed. Of course
+you can send me a copy of the distribution medium but this is not
+required.
+
+
+For contacting the author send electronic mail to
+
+robert.hoehne@gmx.net
+
+or paper mail to
+
+Robert Hoehne
+Am Berg 3
+D - 09573 Dittmannsdorf
+Germany
+
+
+
+

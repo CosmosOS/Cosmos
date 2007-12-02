@@ -1,0 +1,264 @@
+
+
+
+LS(1)                          FSF                          LS(1)
+
+
+NNAAMMEE
+       ls - list directory contents
+
+SSYYNNOOPPSSIISS
+       llss [_O_P_T_I_O_N]... [_F_I_L_E]...
+
+DDEESSCCRRIIPPTTIIOONN
+       List information about the FILEs (the current directory by
+       default).  Sort entries alphabetically if none of --ccffttuuSSUUXX
+       nor ----ssoorrtt.
+
+       --aa, ----aallll
+              do not hide entries starting with .
+
+       --AA, ----aallmmoosstt--aallll
+              do not list implied . and ..
+
+       --bb, ----eessccaappee
+              print octal escapes for nongraphic characters
+
+       ----bblloocckk--ssiizzee=_S_I_Z_E
+              use SIZE-byte blocks
+
+       --BB, ----iiggnnoorree--bbaacckkuuppss
+              do not list implied entries ending with ~
+
+       --cc     with  --lltt:  sort  by, and show, ctime (time of last
+              modification of file status information)  with  --ll:
+              show  ctime  and  sort  by  name otherwise: sort by
+              ctime
+
+       --CC     list entries by columns
+
+       ----ccoolloorr[=_W_H_E_N]
+              control whether color is used to  distinguish  file
+              types.  WHEN may be `never', `always', or `auto'
+
+       --dd, ----ddiirreeccttoorryy
+              list directory entries instead of contents
+
+       --DD, ----ddiirreedd
+              generate output designed for Emacs' dired mode
+
+       --ff     do not sort, enable --aaUU, disable --llsstt
+
+       --FF, ----ccllaassssiiffyy
+              append indicator (one of */=@|) to entries
+
+       ----ffoorrmmaatt=_W_O_R_D
+              across  --xx, commas --mm, horizontal --xx, long --ll, sin-
+              gle-column --11, verbose --ll, vertical --CC
+
+       ----ffuullll--ttiimmee
+              list both full date and full time
+
+
+
+ls (fileutils) 4.1          April 2002                          1
+
+
+
+
+
+LS(1)                          FSF                          LS(1)
+
+
+       --gg     (ignored)
+
+       --GG, ----nnoo--ggrroouupp
+              inhibit display of group information
+
+       --hh, ----hhuummaann--rreeaaddaabbllee
+              print sizes in human readable format (e.g., 1K 234M
+              2G)
+
+       ----ssii   likewise, but use powers of 1000 not 1024
+
+       --HH     same  as  `--si' for now; soon to change to conform
+              to POSIX
+
+       ----iinnddiiccaattoorr--ssttyyllee=_W_O_R_D append indicator with style WORD to
+              entry names:
+              none (default), classify (-F), file-type (-p)
+
+       --ii, ----iinnooddee
+              print index number of each file
+
+       --II, ----iiggnnoorree=_P_A_T_T_E_R_N
+              do not list implied entries matching shell PATTERN
+
+       --kk, ----kkiilloobbyytteess
+              like ----bblloocckk--ssiizzee=_1_0_2_4
+
+       --ll     use a long listing format
+
+       --LL, ----ddeerreeffeerreennccee
+              list entries pointed to by symbolic links
+
+       --mm     fill width with a comma separated list of entries
+
+       --nn, ----nnuummeerriicc--uuiidd--ggiidd
+              list numeric UIDs and GIDs instead of names
+
+       --NN, ----lliitteerraall
+              print raw entry names  (don't  treat  e.g.  control
+              characters specially)
+
+       --oo     use long listing format without group info
+
+       --pp, ----ffiillee--ttyyppee
+              append indicator (one of /=@|) to entries
+
+       --qq, ----hhiiddee--ccoonnttrrooll--cchhaarrss
+              print ? instead of non graphic characters
+
+       ----sshhooww--ccoonnttrrooll--cchhaarrss
+              show  non  graphic characters as-is (default unless
+              program is `ls' and output is a terminal)
+
+
+
+
+
+ls (fileutils) 4.1          April 2002                          2
+
+
+
+
+
+LS(1)                          FSF                          LS(1)
+
+
+       --QQ, ----qquuoottee--nnaammee
+              enclose entry names in double quotes
+
+       ----qquuoottiinngg--ssttyyllee=_W_O_R_D
+              use quoting style WORD for  entry  names:  literal,
+              locale, shell, shell-always, c, escape
+
+       --rr, ----rreevveerrssee
+              reverse order while sorting
+
+       --RR, ----rreeccuurrssiivvee
+              list subdirectories recursively
+
+       --ss, ----ssiizzee
+              print size of each file, in blocks
+
+       --SS     sort by file size
+
+       ----ssoorrtt=_W_O_R_D
+              extension --XX, none --UU, size --SS, time --tt, version --vv
+
+              status --cc, time --tt, atime --uu, access --uu, use --uu
+
+       ----ttiimmee=_W_O_R_D
+              show time as WORD  instead  of  modification  time:
+              atime,  access, use, ctime or status; use specified
+              time as sort key if ----ssoorrtt=_t_i_m_e
+
+       --tt     sort by modification time
+
+       --TT, ----ttaabbssiizzee=_C_O_L_S
+              assume tab stops at each COLS instead of 8
+
+       --uu     with --lltt: sort by, and show, access time  with  --ll:
+              show  access  time and sort by name otherwise: sort
+              by access time
+
+       --UU     do not sort; list entries in directory order
+
+       --vv     sort by version
+
+       --ww, ----wwiiddtthh=_C_O_L_S
+              assume screen width instead of current value
+
+       --xx     list entries by lines instead of by columns
+
+       --XX     sort alphabetically by entry extension
+
+       --11     list one file per line
+
+       ----hheellpp display this help and exit
+
+       ----vveerrssiioonn
+              output version information and exit
+
+
+
+ls (fileutils) 4.1          April 2002                          3
+
+
+
+
+
+LS(1)                          FSF                          LS(1)
+
+
+       By default, color is not  used  to  distinguish  types  of
+       files.   That  is equivalent to using ----ccoolloorr=_n_o_n_e.  Using
+       the ----ccoolloorr option without the optional WHEN  argument  is
+       equivalent  to  using  ----ccoolloorr=_a_l_w_a_y_s.  With ----ccoolloorr=_a_u_t_o,
+       color codes are output only if  standard  output  is  con-
+       nected to a terminal (tty).
+
+AAUUTTHHOORR
+       Written by Richard Stallman and David MacKenzie.
+
+RREEPPOORRTTIINNGG BBUUGGSS
+       Report bugs to <bug-fileutils@gnu.org>.
+
+CCOOPPYYRRIIGGHHTT
+       Copyright (C) 2001 Free Software Foundation, Inc.
+       This  is  free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABILITY
+       or FITNESS FOR A PARTICULAR PURPOSE.
+
+SSEEEE AALLSSOO
+       The  full  documentation for llss is maintained as a Texinfo
+       manual.   If  the  iinnffoo  and  llss  programs  are   properly
+       installed at your site, the command
+
+              iinnffoo llss
+
+       should give you access to the complete manual.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ls (fileutils) 4.1          April 2002                          4
+
+

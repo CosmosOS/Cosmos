@@ -93,10 +93,11 @@ namespace Indy.IL2CPU.Assembler {
 				foreach (DataMember xMember in mDataMembers) {
 					mOutputWriter.WriteLine("\t" + xMember);
 				}
+				EmitDataSectionFooter();
 				mOutputWriter.WriteLine();
 			}
 			if (mInstructions.Count > 0) {
-				EmitCodeSectionHeader();
+				EmitCodeSectionHeader();							 
 				mOutputWriter.WriteLine();
 				foreach (Instruction x in mInstructions) {
 					string prefix = "\t\t\t";
@@ -110,6 +111,7 @@ namespace Indy.IL2CPU.Assembler {
 					}
 					mOutputWriter.WriteLine(prefix + x);
 				}
+				EmitCodeSectionFooter();
 				mOutputWriter.WriteLine();
 			}
 			if (mImportMembers.Count > 0) {
@@ -138,6 +140,7 @@ namespace Indy.IL2CPU.Assembler {
 						mOutputWriter.WriteLine("\tdb '{0}',0", xImportMethod.Name);
 					}
 				}
+				EmitIDataSectionFooter();
 			}
 			EmitFooter();
 		}
@@ -146,14 +149,24 @@ namespace Indy.IL2CPU.Assembler {
 			mOutputWriter.WriteLine("section '.idata' import data readable writeable");
 		}
 
+		protected virtual void EmitIDataSectionFooter() {
+		}
+
 		protected virtual void EmitCodeSectionHeader() {
 			mOutputWriter.WriteLine("section '.code' code readable executable");
+		}
+
+		protected virtual void EmitCodeSectionFooter() {
 		}
 
 		protected virtual void EmitDataSectionHeader() {
 			mOutputWriter.WriteLine("section '.data' data readable writeable");
 		}
+		
+		protected virtual void EmitDataSectionFooter() {
+		}
 
+		
 		protected virtual void EmitFooter() {
 		}
 

@@ -1,0 +1,132 @@
+Changelog for the DJGPP Port of GNU Fileutils 4.1, release 7
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Bugs fixed in Release 7 - 2003-08-30
+------------------------------------
+
+* Work-around for problems with the inode check in rm and Windows 2000
+  and XP. Disable the inode check for now.
+
+* Update my e-mail address in the sources.
+
+* Update readme.dos with details of newer packages.
+
+* Don't include the automake 1.5 diff anymore. Assume that the user
+  has automake 1.5 release 2 or a later version of automake.
+
+* Don't include my porting notes anymore. They're not relevant.
+
+Bugs fixed in Release 6 - 2003-03-27
+------------------------------------
+
+* 'ln -s' supports generating a stub, when symlinking to a program.
+  Previously 'ln -s' may have generated a stub, when the source was not
+  a program.
+
+  E.g.:
+
+    touch foo
+    ln -s foo bar
+
+  previously created a stub 'bar.exe'. This was incorrect, because
+  foo was not a program.
+
+  This bug was due to a bug in DJGPP 2.03's libc. A fixed version
+  of the source file, symlink.c, is included in the source distribution.
+
+Bugs fixed in Release 5 - 2003-01-13
+------------------------------------
+
+* djgpp/readme.dos: Add a note about the problems people are having
+  when trying to use scroll back to view ls's colourised output
+  under Windows 2000 and XP.
+
+* src/djstart.c: When building against DJGPP CVS (what will become
+  DJGPP 2.04), enable /dev/zero and /dev/full.
+
+* src/ls.c: Fix a bug in the handling of symlinks with drive-qualified
+  absolute or relative DOS paths, when 'ls' was built with DJGPP CVS
+  (what will become DJGPP 2.04).
+
+  NB: This bug did not affect Fileutils 4.1 distributed
+  via the DJGPP archive on Simtel.NET.
+
+* src/remove.c: Fix a bug that occasionally caused 'rm' to crash.
+
+Bugs fixed in Release 4 - 2002-12-04
+------------------------------------
+
+* lib/dirname.c: The variable 'append_dot' was not properly uninitialised,
+  which could cause programs such as mkdir to segfault (a crash),
+  presumably due to memory corruption. This has been fixed.
+
+* src/remove.c: When fileutils 4.1 release 3 was built with DJGPP CVS,
+  'rm' would segfault (a crash), due to a failed assertion. This has
+  been fixed.
+
+  NB: This bug did not affect Fileutils 4.1 distributed
+  via the DJGPP archive on Simtel.NET.
+
+Bugs fixed in Release 3 - 2002-10-11
+------------------------------------
+
+* djgpp/readme.dos: Volume labels are only displayed when both '-a'
+  and '-g' are displayed. Fixed the description of '-g'.
+
+* src/ls.c: Always set the stat and opendir bits. This fixes the bug
+  where 'ls' run with no arguments showed hidden files.
+
+* src/ls-msdos.c: When setting the default stat and opendir bits, clear
+  __OPENDIR_FIND_HIDDEN as well as setting __OPENDIR_NO_HIDDEN.
+
+Bugs fixed in Release 2 - 2002-09-15
+------------------------------------
+
+* src/ln.c: Pretend that we support symlinks, so that 'ln -s' works
+  as it did in previous versions of the port. 'ln -s' will create
+  an executable stub which runs the target of the symlink. This kind
+  of symlink is fine for links to executables, but otherwise useless.
+
+Bugs fixed in Release 1 - 2002-06-11
+------------------------------------
+
+* src/djstart.c: Strip off the path from the program name.
+  This behaviour is more Unixy and should allow much of the test suite
+  to pass without hacking the test scripts to cope with full paths.
+
+* src/djutils.c: <sys/types.h> needed to be included for the case
+  where HAVE_LSTAT was defined, but HAVE_FCHOWN was not.
+
+* Include a 'changelog' directive in the DSMs.
+
+* A bug was found in the DJGPP port of automake 1.5, which meant
+  that the install sections in doc/Makefile were running commands
+  that failed, because of syntax errors (the "CDPATH" bug).
+  A patch for automake is now included in the port.
+
+* lib/getdate.y: Add missing semi-colons in rules. These errors were
+  caught by Bison 1.35.
+
+* tests/dd/Makefile: This should now try to run skpseek2 rather than
+  (the incorrectly named) skp-seek2. The Makefile had not been
+  properly generated in the previous version.
+
+* tests/cp/backup-is-src, tests/cp/into-self, tests/cp/same-file,
+  tests/mv/backup-is-src, tests/mv/diag, tests/mv/force,
+  tests/mv/i-2, tests/mv/to-self, tests/mv/to-self3: Revert changes
+  to test scripts, where we strip off the path from the program name
+  in messages. The program name is now stripped off by
+  the Fileutils-special start-up code in djstart.c.
+
+* djgpp/config.bat, djgpp/mkconfig.sh: Make it work properly in
+  short-filename (SFN) environments. Try to make it work properly in
+  mixed environments like Windows NT 4 without an long-filename (LFN) TSR,
+  where the shell supports LFNs, but DJGPP programs don't.
+
+* tests/cp/same-file, tests/mv/part-symlink: Redirect to the file _err
+  rather than .err, since .err is not a valid short filename.
+
+* tests/mv/to-self, tests/mv/force, tests/touch/no-rights: Reduce
+  the length of the test filenames, so they fight uniquely into the SFNs.
+
+Richard Dawe <rich@phekda.freeserve.co.uk> 2003-08-30

@@ -1,0 +1,102 @@
+RHIDE is Copyright (C) 1996-2001 by Robert H”hne, see COPYING.RH for details
+
+REQUIREMENTS for RHIDE
+======================
+
+You need DJGPP version 2.01 (or later) to use RHIDE without any
+problems with long command lines. This comes from the fact, that
+DJGPP 2.01 uses an other technique to pass long command lines
+to spawned programs. That means, if you have installed still
+DJGPP 2.0 command lines, which are longer then 126 characters will
+be trunced when RHIDE calls any compiler with that line.
+
+RHIDE runs on raw MS-DOS, in a Window 3.1(x) DOS-box, in a 
+Windows 95 DOS-box or under Windows NT in a DOS-box. For running
+under NT you MUST add the '-M' commandline switch to RHIDE, otherwis
+you will get RHIDE crashing already at startup.
+This (or any other commandline switch) can be stored also in the
+environment variable RHIDEOPT.
+
+This is the binary distribution of RHIDE. Normaly the files should be
+installed in the DJGPP root directoy. To install RHIDE, copy the archive
+rhide??b.zip (?? stands for the version of RHIDE, e.g. 12 for version 1.2)
+to this directory and unpack it with
+
+unzip rhide??b.zip
+
+or when using PKUNZIP
+
+pkunzip -d rhide??b.zip
+
+
+===========================================================================
+WARNING:            Because RHIDE uses the gettext library for
+supporting multiple languages and RHIDE can run also under Windows 95
+with long filname support you should take of some special things. If
+you want to run RHIDE only in one environment (LFN=y or LFN=n) you have to
+unzip the archive in that environment whith an unzip program, which handles
+correct the filenames. This is needed, because the gettext library searches
+the translated texts in a directory called 'LC_MESSAGES' and this will
+course problems, if you have created this directory as 'LC_MESSA' and now
+want to use RHIDE with LFN=y.
+If you want to use RHIDE with and without long filenames, you have to unzip
+the archive with long filenames enabled AND the registry of Windows 95
+must be modified (if not already done) like stated in the DJGPP FAQ
+section 8.2.
+===========================================================================
+
+
+If it was successful, you can now read the documentation for RHIDE in the
+format you prefer. In the directory INFO you can find the INFO-file
+
+rhide.info
+
+and in the directory DOC you can find
+
+rhide.html  - the HTML version
+rhide.txt   - the ASCII text version
+
+If yout want to get an other format, you need the source archive of RHIDE,
+because they are not part of the binary archive. The other possible formats
+are:
+
+RHIDE.DVI  - the DVI version produced by TeX
+RHIDE.PS   - the postscript version, generated from RHIDE.DVI with dvips
+
+
+To add the documentation about RHIDE to your main INFO directory
+(that's the menu which is shown, when you call info.exe without
+any argument), change to the info directory (normaly %DJDIR%/info)
+look at the beginning of the file 'rhide.inf' and copy the text
+between the two lines
+START-INFO-DIR-ENTRY
+  and
+END-INFO-DIR-ENTRY
+
+to the file 'dir.txi'. (common usage is to place such an entry in
+alphabetical order) and then run simply
+
+makeinfo dir.txi
+
+Now you can read the RHIDE doc also by running info.exe like
+
+info rhide
+
+
+Whats new since Version 1.1?
+============================
+
+- Many bugs have been fixed. Please consult the 'rhide_ch.log' file
+  for more detailed information about the fixed bugs.
+
+- Improved helpsystem.
+
+- Runs now on NT (but only with the '-M' switch)
+
+- Added support for G77
+
+             Have fun with RHIDE
+
+             Robert H”hne <robert.hoehne@gmx.net>
+
+

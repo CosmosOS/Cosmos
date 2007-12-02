@@ -1,0 +1,132 @@
+
+
+
+DU(1)                          FSF                          DU(1)
+
+
+NNAAMMEE
+       du - estimate file space usage
+
+SSYYNNOOPPSSIISS
+       dduu [_O_P_T_I_O_N]... [_F_I_L_E]...
+
+DDEESSCCRRIIPPTTIIOONN
+       Summarize  disk usage of each FILE, recursively for direc-
+       tories.
+
+       --aa, ----aallll
+              write counts for all files, not just directories
+
+       ----bblloocckk--ssiizzee=_S_I_Z_E use SIZE-byte blocks
+
+       --bb, ----bbyytteess
+              print size in bytes
+
+       --cc, ----ttoottaall
+              produce a grand total
+
+       --DD, ----ddeerreeffeerreennccee--aarrggss
+              dereference PATHs when symbolic link
+
+       --hh, ----hhuummaann--rreeaaddaabbllee
+              print sizes in human readable format (e.g., 1K 234M
+              2G)
+
+       --HH, ----ssii
+              likewise, but use powers of 1000 not 1024
+
+       --kk, ----kkiilloobbyytteess
+              like ----bblloocckk--ssiizzee=_1_0_2_4
+
+       --ll, ----ccoouunntt--lliinnkkss
+              count sizes many times if hard linked
+
+       --LL, ----ddeerreeffeerreennccee
+              dereference all symbolic links
+
+       --mm, ----mmeeggaabbyytteess
+              like ----bblloocckk--ssiizzee=_1_0_4_8_5_7_6
+
+       --SS, ----sseeppaarraattee--ddiirrss
+              do not include size of subdirectories
+
+       --ss, ----ssuummmmaarriizzee
+              display only a total for each argument
+
+       --xx, ----oonnee--ffiillee--ssyysstteemm
+              skip directories on different filesystems
+
+       --XX FILE, ----eexxcclluuddee--ffrroomm=_F_I_L_E
+              Exclude files that match any pattern in FILE.
+
+
+
+du (fileutils) 4.1          April 2002                          1
+
+
+
+
+
+DU(1)                          FSF                          DU(1)
+
+
+       ----eexxcclluuddee=_P_A_T
+              Exclude files that match PAT.
+
+       ----mmaaxx--ddeepptthh=_N
+              print  the  total  for  a  directory (or file, with
+              ----aallll) only if it is N or fewer  levels  below  the
+              command  line  argument;  ----mmaaxx--ddeepptthh=_0 is the same
+              as ----ssuummmmaarriizzee
+
+       ----hheellpp display this help and exit
+
+       ----vveerrssiioonn
+              output version information and exit
+
+AAUUTTHHOORR
+       Written  by  Torbjorn  Granlund,  David  MacKenzie,  Larry
+       McVoy, and Paul Eggert.
+
+RREEPPOORRTTIINNGG BBUUGGSS
+       Report bugs to <bug-fileutils@gnu.org>.
+
+CCOOPPYYRRIIGGHHTT
+       Copyright (C) 2001 Free Software Foundation, Inc.
+       This  is  free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABILITY
+       or FITNESS FOR A PARTICULAR PURPOSE.
+
+SSEEEE AALLSSOO
+       The  full  documentation for dduu is maintained as a Texinfo
+       manual.   If  the  iinnffoo  and  dduu  programs  are   properly
+       installed at your site, the command
+
+              iinnffoo dduu
+
+       should give you access to the complete manual.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+du (fileutils) 4.1          April 2002                          2
+
+

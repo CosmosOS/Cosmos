@@ -1,0 +1,102 @@
+CWSPARAM                provided by Charles W Sandmann (sandmann@clio.rice.edu)
+                                    1206 Braelinn, Sugar Land, TX 77479
+CWSPARAM OVERVIEW
+
+There are certain parameters built into the CWSDPMI.EXE, CWSDPR0.EXE, and
+CWSDSTUB.EXE images which might need to be modified for distributing some
+programs for better performance.  The modified image could be renamed, and
+then the DPMI server name in a DJGPP V2 image may be stubedited to use the
+new name.  CWSPARAM can also be run directly on images created by appending
+COFF images to CWSDSTUB.EXE.  The parameters which can be modified are
+discussed below:
+
+Full name of paging file ("" to disable) ? [c:\cwsdpmi.swp]
+
+ This is where the file which provides virtual memory should be located.  It
+ may be desirable to change the default to a faster disk or one with more
+ free space.  To disable paging, enter two double quotes.  The file name
+ MUST contain the disk, full path, and file name.  Anything less may cause
+ unpredictable behavior.  The maximum length of the name is 48 characters,
+ and it must be a DOS 8.3 style name.  Press return to keep the current value.
+
+Number of page tables to initially allocate (0=auto) ? [0]
+
+ Page tables are stored in the DOS memory area and consume this precious
+ resource.  The default value of 0 chooses automatic allocation of enough
+ page tables to hold all of the physical memory without paging (with the
+ minimum enough to hold 20Mb without paging and a maximum to hold 128Mb).
+ If your program is a fixed size (and does not spawn any other DPMI images)
+ you can specify one page table for each 4Mb of your program's size.  If
+ your program is small, this can save a small amount of DOS memory, which
+ might be needed for other purposes.  If your program is large (typically
+ larger than the physical memory) specifying a number will consume more DOS
+ memory but improve performance since the page tables themselves will not
+ page.  CWSDPMI will attempt to dynamically allocate additional page tables
+ at run time to prevent paging, but if all of the DOS memory is free,
+ performance would be degraded.  Remember to add an extra page table if
+ mapping physical devices.  As of r5, you must also allocate additional
+ space for the bitmaps for physical and virtual memory (one bit for each
+ 4K page).  Add one page for each 128Mb of total address space
+ (physical+virtual).  Be generous, since someone may run the image on a
+ 512Mb machine (or larger) and require 4 pages for the physical bitmap
+ even if you disable virtual memory.
+
+Minimum application memory desired before 640K paging ? [512Kb]
+
+ Typically, CWSDPMI only uses extended memory to return as DPMI memory, and
+ saves the DOS memory area for DOS requests.  On small memory machines with
+ applications not needing much DOS memory (or poorly tuned memory management)
+ there may be very little extended memory left available, with up to 600K of
+ DOS memory unused.  This parameter determines the threshold which CWSDPMI
+ should start using DOS memory as DPMI memory.  If an application is known to
+ not need much DOS memory, this value could be set to the size of the memory
+ required for the image, which provides roughly 0.5Mb additional memory before
+ paging happens.  This parameter is one I would expect might be adjusted when
+ distributing an application for maximum performance on a wide variety of
+ machines.
+
+Paragraphs of DOS memory to reserve when 640K paging ? [3840]
+
+ If the image needs to page in the DOS memory area (triggered by the parameter
+ value above), this parameter tells how much DOS memory to save for DOS
+ allocation requests.  The value is in paragraphs (16 byte increments), so the
+ default is 60Kbytes.  You will actually end up with a bit more probably, since
+ the page tables are allocated on 4Kbyte rounded boundaries.  Some amount of
+ DOS memory needs to be saved for potentially expanding the file table, the
+ sbrk() algorithm, DMA buffers, etc.  This amount can be tuned on an image
+ by image basis, and may be as little as 0.
+
+Paragraphs of memory for extra CWSDPMI internal heap ? [256]
+
+ CWSDPMI is built with an internal 4K heap.  Each nested task consumes around
+ 300 bytes, each memory zone takes 12 bytes, and each HW interrupt (nested)
+ takes around 850 bytes.  If extra DOS memory is available, the additional
+ paragraphs specified here are added to the heap at execution time by DOS.
+ The 8K default should be good for up to 40Mb in small requests.  If you
+ compile very large C++ programs or allocate lots of memory in small pieces,
+ you might need to bump this parameter.  If you are very tight on memory,
+ you could decrease it to zero and pick up another 4K of DOS memory.  Each
+ paragraph allows a little more than one more memory zone (or in the worse
+ case around 85Kb of DPMI memory).
+
+Maximum size of swap file ? [128Mb]
+
+ CWSDPMI dynamically allocates memory at run time for up to 2044Mb of swap file
+ space.  The bitmap for the swap usage requires 32 bytes of memory per 1Mb of
+ swap usage.  The default will provide up to 128Mb of swap space with a run
+ time memory requirement of 4Kb DOS memory.  The dynamic allocation is limited
+ by the free space on the drive, so if you don't have much space on your hard
+ drive, you don't need to worry about this.  If you run small programs and want
+ to save memory (maybe to stuff the allocation in a UMB) you can decrease this
+ value.  If you want to run monster programs needing 2Gb of address space you
+ can increase this value (but this would increase the DOS memory usage).  This
+ value is ignored by CWSDPR0.
+
+Value of run option flags ? [0]
+
+ There are a few run-time options in CWSDPMI which should not be needed by most
+ users which can be activated by this field of bit flags:
+   Bit 0 (1):  Disable allocation of run time page tables in UMBs (low only)
+   Bit 1 (2):  Pre-allocate page table memory (in DPMI memory request)
+   Bit 2 (4):  Disable DPMI 1.0 extensions (Null page protection, mapping)
+ Other values should be zero for future compatibility but are currently ignored.

@@ -1,0 +1,379 @@
+This is Info file dir, produced by Makeinfo version 1.68 from the input
+file dir.txi.
+
+
+File: dir,  Node: Top,  Next: (dir),  Prev: (dir),  Up: (dir)
+
+   Welcome to the GNU standalone Info program.  The documentation
+presented here is part of the djgpp development package.
+
+   To view a topic, use the arrow keys to position the cursor on one of
+the lines beginning with a '*' and press 'm' and then 'Enter'.
+
+   This (the Directory node) gives a menu of major topics.  Typing "d"
+returns here, "q" exits, "?" lists all INFO commands, "h" gives a primer
+for first-timers, "mTexinfo<Return>" visits Texinfo topic, etc.  To edit
+this dir-file, edit 'dir.txi', and pass it through 'makeinfo'.
+
+   -- PLEASE ADD DOCUMENTATION TO THIS TREE. (See INFO topic first.) --
+
+* Menu:
+
+
+From djdevNNN.zip
+
+* Knowledge Base: (kb).
+	The DJGPP Knowledge Base
+
+* libc.a: (libc).
+	The Standard C Library Reference
+* libm.a: (libm).
+	The Math Library Reference
+
+* Utilities: (utils).	Miscellaneous utilities that come with DJGPP.
+* bin2h: (utils)bin2h.	Convert binary data files to C include files.
+* djtar: (utils)djtar.	Extract or list files from (possibly compressed)
+				tar archives, with DOS filename conversion.
+* dtou: (utils)dtou.	Convert text files from dos to unix.
+* utod: (utils)utod.	Convert text files from unix to dos.
+* djecho: (utils)djecho.	Echo long command lines to files.
+* gxx: (utils)gxx.		Build and link C++ programs
+* redir: (utils)redir.	Manage I/O Redirection.
+* djsplit: (utils)djsplit.	Split large files into multiple files.
+* djmerge: (utils)djmerge.	Merge multiple files into one file.
+* texi2ps: (utils)texi2ps.	Convert texinfo files to Postscript.
+* update: (utils)update.	Conditionally copy one file to another.
+
+
+
+From faqNNNb.zip
+
+* FAQ: (djgppfaq).
+	The DJGPP FAQ list
+
+
+From gccNNNb.zip
+
+* CPP: (cpp).
+	The GNU C-Preprocessor
+
+* GCC: (gcc).
+	The GNU C, C++, and Objective-C Compiler
+
+
+From bnuNNNb.zip
+
+* as: (as).			The GNU assembler
+* Binutils: (binutils).		The GNU binary utilities.
+* ar: (binutils)ar.		Create, modify, and extract from archives
+* nm: (binutils)nm.		List symbols from object files
+* objcopy: (binutils)objcopy.	Copy and translate object files
+* objdump: (binutils)objdump.	Display information from object files
+* ranlib: (binutils)ranlib.	Generate index to archive contents
+* size: (binutils)size.		List section sizes and total size
+* strings: (binutils)strings.	List printable strings from files
+* strip: (binutils)strip.	Discard symbols
+* c++filt: (binutils)c++filt.	Filter to demangle encoded C++ symbols
+* cxxfilt: (binutils)c++filt.	Filter to demangle encoded C++ symbols
+* addr2line: (binutils)addr2line.	Convert addresses to file and line
+* nlmconv: (binutils)nlmconv.	Converts object code into an NLM
+
+
+* gasp: (gasp).
+	The GNU Assembler Preprocessor
+
+* gprof: (gprof).
+	The GNU profiler
+
+* ld: (ld).
+	The GNU linker
+
+
+From lgpNNNb.zip
+
+* iostream: (iostream).
+	The C++ input/output facility (in libstdcxx.a or libiostream.a).
+
+* libgpp: (libgpp).
+	The g++ class library.
+
+
+From txiNNNb.zip
+
+* Info: (info).
+	Documentation browsing system.	This topic teaches you about
+	how to use the online help information.
+
+* Info-Standalone: (info-stnd).
+	This topic helps you use the standalone Info-Program (info.exe)
+
+* Makeinfo: (texinfo)makeinfo options.
+	Convert a .texinfo file (.txi) to an info file suitable	for the
+	info reader or Emacs, into plain ASCII, or into HTML.
+
+* Texinfo: (texinfo).
+	With one source file, make either a printed manual (through TeX)
+        or an Info file (through makeinfo).  This topic includes a full
+        description of the Texinfo language and related facilities,
+        including Emacs commands to work with Texinfo files.
+
+* install-info: (texinfo)Invoking install-info.
+	How to update info/dir entries when installing GNU packages.
+
+* texi2dvi: (texinfo)Format with texi2dvi.
+	Printing Texinfo documentation with TeX.
+
+* texindex: (texinfo)Format with tex/texindex.
+	Sorting Texinfo index files automatically.
+
+From gdbNNNb.zip
+
+* Bfd: (bfd).                   The Binary File Descriptor library.
+* Gdb: (gdb).                   The GNU debugger.
+* Gdb-Internals: (gdbint).	The GNU debugger's internals.
+* Stabs: (stabs).               The "stabs" debugging information format.
+* Standards: (standards).       GNU coding standards.
+
+Miscellaneous GNU utilities
+
+
+* Autoconf: (autoconf).
+	GNU Autoconf, a tool to generate shell scripts which
+        automatically configure a package for a given computer.
+
+* Bison: (bison).
+	The GNU yacc-like parser generator
+
+* cpio: (cpio).
+	A program to manage tape or disk archives, or to copy
+        entire directory trees.
+
+* Diffutils: (diff).		GNU difference utilities.
+* cmp: (diff)Invoking cmp.	Find first difference.
+* diff: (diff)Invoking diff.	Compare two files.
+* diff3: (diff)Invoking diff3.	Compare three files.
+* patch: (diff)Invoking patch.	Update source files given output of diff.
+* sdiff: (diff)Invoking sdiff.	Compare files side by side and merge them.
+
+
+* Ed: (ed).
+	GNU Ed, a simple but powerful text editor.
+
+* File utilities: (fileutils).		GNU file utilities.
+Directory listing
+* ls: (fileutils)ls invocation.			List directory contents.
+* dir: (fileutils)dir invocation.		List directories briefly.
+* vdir: (fileutils)vdir invocation.		List directories verbosely.
+* dircolors: (fileutils)dircolors invocation.	Color setup for ls.
+Basic operations
+* cp: (fileutils)cp invocation.			Copy files.
+* dd: (fileutils)dd invocation.			Copy and convert a file.
+* install: (fileutils)install invocation.	Copy and change attributes.
+* mv: (fileutils)mv invocation.			Rename files.
+* rm: (fileutils)rm invocation.			Remove files.
+Special file types
+* ln: (fileutils)ln invocation.		Make links between files.
+* mkdir: (fileutils)mkdir invocation.	Create directories.
+* mkfifo: (fileutils)mkfifo invocation.	Create FIFOs: (named pipes).
+* mknod: (fileutils)mknod invocation.	Create special files.
+* rmdir: (fileutils)rmdir invocation.	Remove empty directories.
+Changing file attributes
+* chown: (fileutils)chown invocation.	Change file owners/groups.
+* chgrp: (fileutils)chgrp invocation.	Change file groups.
+* chmod: (fileutils)chmod invocation.	Change file permissions.
+* touch: (fileutils)touch invocation.	Change file timestamps.
+Disk usage
+* df: (fileutils)df invocation.		Report filesystem disk usage.
+* du: (fileutils)du invocation.		Report on disk usage.
+* sync: (fileutils)sync invocation.	Synchronize memory and disk.
+
+
+* Findutils: (find).	Find files on your hard drive
+* find: (find)Invoking find.		Search for files.
+* locate: (find)Invoking locate.	Search database.
+* updatedb: (find)Invoking updatedb.	Update database.
+* xargs: (find)Invoking xargs.		Combine arguments for command.
+
+
+* Flex: (flex).
+	A fast scanner generator.
+
+* Gawk: (gawk).
+	GNU Awk, an interpreted batch language for processing text files.
+
+* Grep: (grep).
+	Print lines matching patterns.
+
+* Gzip: (gzip).
+	The GNU file compressor.
+
+* Id-utils: (id-utils).		GNU Identifier database utilities.
+* mkid: (id-utils)mkid invocation.	Creating an ID database.
+* lid: (id-utils)lid invocation.	Matching words and patterns.
+* fid: (id-utils)fid invocation.	Listing a file's tokens.
+* fnid: (id-utils)fnid invocation.	Looking up file names.
+* xtokid: (id-utils)xtokid invocation.	Testing mkid scanners.
+
+* Indent: (indent).
+	C/C++ code formatter.
+
+* m4: (m4).
+	A powerful macro processor.
+
+* Make: (make).
+	Automatically build programs from Makefiles.
+
+* Sed: (sed).
+	A Stream EDitor.
+
+* Shell utilities: (sh-utils).	GNU shell utilities.
+Printing text
+* echo: (sh-utils)echo invocation.	Print a line of text.
+* printf: (sh-utils)printf invocation.	Format and print data.
+* yes: (sh-utils)yes invocation.	Print a string indefinitely.
+Conditions
+* false: (sh-utils)false invocation.	Do nothing, unsuccessfully.
+* true: (sh-utils)true invocation.	Do nothing, successfully.
+* test: (sh-utils)test invocation.	File/string tests.
+* expr: (sh-utils)expr invocation.	Evaluate expressions.
+Redirection
+* tee: (sh-utils)tee invocation.	Redirect to multiple files.
+File name manipulation
+* basename: (sh-utils)basename invocation.	Strip directory and suffix.
+* dirname: (sh-utils)dirname invocation.	Strip non-directory suffix.
+* pathchk: (sh-utils)pathchk invocation.	Check file name portability.
+Working context information
+* pwd: (sh-utils)pwd invocation.		Print working directory.
+* stty: (sh-utils)stty invocation.		Print/change terminal settings.
+* printenv: (sh-utils)printenv invocation.	Print environment variables.
+* tty: (sh-utils)tty invocation.		Print terminal name.
+User information
+* id: (sh-utils)id invocation.			Print real/effective uid/gid.
+* logname: (sh-utils)logname invocation.	Print current login name.
+* whoami: (sh-utils)whoami invocation.		Print effective user id.
+* groups: (sh-utils)groups invocation.		Print group names a user is in.
+* users: (sh-utils)users invocation.		Print current user names.
+* who: (sh-utils)who invocation.		Print who is logged in.
+System context
+* date: (sh-utils)date invocation.		Print/set system date and time.
+* uname: (sh-utils)uname invocation.		Print system information.
+* hostname: (sh-utils)hostname invocation.	Print or set system name.
+Modified command invocation
+* env: (sh-utils)env invocation.	Modify the environment.
+* nice: (sh-utils)nice invocation.	Modify scheduling priority.
+* nohup: (sh-utils)nohup invocation.	Immunize to hangups.
+* su: (sh-utils)su invocation.		Modify user and group id.
+Delaying
+* sleep: (sh-utils)sleep invocation.	Delay for a specified time.
+
+
+* Tar: (tar).
+	GNU Tar, a program for handling archives of files.
+
+* Text utilities: (textutils).		GNU text utilities.
+Output of entire files
+* cat: (textutils)cat invocation.	Concatenate and write files.
+* tac: (textutils)tac invocation.	Reverse line order in files.
+* nl: (textutils)nl invocation.		Number lines and write files.
+* od: (textutils)od invocation.		Dump files in octal, etc.
+Formatting file contents
+* fmt: (textutils)fmt invocation.	Reformat paragraph text.
+* pr: (textutils)pr invocation.		Paginate or columnate files.
+* fold: (textutils)fold invocation.	Wrap long input lines.
+Output of parts of files
+* head: (textutils)head invocation.	Output the first part of files.
+* tail: (textutils)tail invocation.	Output the last part of files.
+* split: (textutils)split invocation.	Split into fixed-size pieces.
+* csplit: (textutils)csplit invocation.	Split by context.
+Summarizing files
+* wc: (textutils)wc invocation.		Byte, word, and line counts.
+* sum: (textutils)sum invocation.	Print traditional checksum.
+* cksum: (textutils)cksum invocation.	Print POSIX CRC checksum.
+* md5sum: (textutils)md5sum invocation.	Print or check message-digests.
+Operating on sorted files
+* sort: (textutils)sort invocation.	Sort text files.
+* tsort: (textutils)tsort invocation.	Topologically sort text files.
+* uniq: (textutils)uniq invocation.	Uniqify files.
+* comm: (textutils)comm invocation.	Compare sorted files by line.
+* ptx: (textutils)ptx invocation.	Produce permuted indexes.
+Operating on fields within a line
+* cut: (textutils)cut invocation.	Print selected parts of lines.
+* paste: (textutils)paste invocation.	Merge lines of files.
+* join: (textutils)join invocation.	Join lines on a common field.
+Operating on characters
+* tr: (textutils)tr invocation.			Translate characters.
+* expand: (textutils)expand invocation.		Convert tabs to spaces.
+* unexpand: (textutils)unexpand invocation.	Convert spaces to tabs.
+
+
+
+TeX
+
+* Web2c: (web2c).	TeX, Metafont, and companion programs.
+TeX: Typesetting
+* tex: (web2c)tex invocation.		Typesetting.
+* initex: (web2c)initex invocation.	Initial TeX.
+* virtex: (web2c)virtex invocation.	Virgin TeX.
+* mltex: (web2c)MLTeX.			Multi-lingual TeX.
+* patgen: (web2c)patgen invocation.	Creating hyphenation patterns.
+Metafont: Creating typeface families
+* mf: (web2c)mf invocation.		Creating typeface families.
+* inimf: (web2c)inimf invocation.	Initial Metafont.
+* virmf: (web2c)virmf invocation.	Virgin Metafont.
+* gftodvi: (web2c)gftodvi invocation.	Generic font proofsheets.
+* mft: (web2c)mft invocation.		Prettyprinting Metafont source.
+MetaPost: Creating technical illustrations
+* mpost: (web2c)mpost invocation.	Creating technical diagrams.
+* inimpost: (web2c)inimpost invocation.	Initial MetaPost.
+* virmpost: (web2c)virmpost invocation.	Virgin MetaPost.
+* makempx: (web2c)makempx invocation.	MetaPost label typesetting.
+* dvitomp: (web2c)dvitomp invocation.	DVI to MPX (MetaPost pictures).
+* dmp: (web2c)dmp invocation.		Troff to MPX (MetaPost pictures).
+* mpto: (web2c)mpto invocation.		MetaPost label extraction.
+* newer: (web2c)newer invocation.	Compare modification times.
+BibTeX: Bibliographies
+* bibtex: (web2c)bibtex invocation.	Maintaining bibliographies.
+WEB: Literate programming
+* tangle: (web2c)tangle invocation.	WEB to Pascal.
+* weave: (web2c)weave invocation.	WEB to TeX.
+* pooltype: (web2c)pooltype invocation.	Display WEB pool files.
+DVI utilities
+* dvicopy: (web2c)dvicopy invocation.	Virtual font expansion
+* dvitype: (web2c)dvitype invocation.	DVI to human-readable text.
+Font utilities
+* gftopk: (web2c)gftopk invocation.	Generic to packed fonts.
+* pktogf: (web2c)pktogf invocation.	Packed to generic fonts.
+* pktype: (web2c)pktype invocation.	PK to human-readable text.
+* gftype: (web2c)gftype invocation.	GF to human-readable text.
+* tftopl: (web2c)tftopl invocation.	TFM -> property list.
+* pltotf: (web2c)pltotf invocation.	Property list to TFM.
+* vftovp: (web2c)vftovp invocation.	Virtual font -> virtual pl.
+* vptovf: (web2c)vptovf invocation.	Virtual pl -> virtual font.
+
+
+* DVI-to-Postscript: (dvips).	Translating TeX DVI files to PostScript.
+* afm2tfm: (dvips)Invoking afm2tfm.	Making Type 1 fonts available to TeX.
+* dvips: (dvips)Invoking Dvips.		DVI-to-PostScript translator.
+
+
+* Kpathsea: (kpathsea).	File lookup along search paths.
+* kpsewhich: (kpathsea)Invoking kpsewhich.	TeX file searching.
+* mktexmf: (kpathsea)mktex scripts.		MF source generation.
+* mktexpk: (kpathsea)mktex scripts.		PK bitmap generation.
+* mktextex: (kpathsea)mktex scripts.          TeX source generation.
+* mktextfm: (kpathsea)mktex scripts.            TeX font metric generation.
+* mktexlsr: (kpathsea)Filename database.	Update ls-R database.
+
+
+RHIDE
+
+* SET's Editor: (editor).	AN EDITOR FOR PROGRAMMERS.
+* InfView: (infview).		InfView Documentation.
+* RHIDE: (rhide).		RHIDE, an IDE for DJGPP or Linux.
+
+
+
+Tag Table:
+Node: Top87
+
+End Tag Table

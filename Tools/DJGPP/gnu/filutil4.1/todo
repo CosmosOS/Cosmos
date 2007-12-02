@@ -1,0 +1,117 @@
+Tasks for GNU fileutils:
+
+  Update to use the latest official versions of autoconf and automake.
+
+  Update to use the latest version of gettext.  This includes updating
+  po/Makefile.in.in and most of the files in intl/.
+
+  Apply a few minor patches to ls.
+
+  ------------------
+  Something that I would really appreciate is if someone would run the
+  Open Group's VSC-lite test suite against the fileutils and textutils
+  and report the failures.
+
+    http://www.opengroup.org/testing/downloads/vsclite.html
+
+  I've been meaning to do it myself for months, but haven't found the time.
+  There's a bit of set-up required, some of which requires root access, e.g.,
+  to create a few test user accounts and some test groups.
+  ------------------
+
+  remove support for `touch DATE FILE' once POSIX 1003.1-200x becomes official,
+    (see Paul's 2001-03-17 doc change)
+
+  ls: don't truncate owner/group user names to 8 characters
+
+  ls: fix ls and then tweak the last two tests here: tests/ls-2/tests
+    (I already have patches for both of them)
+
+  m4/inttypes_h.m4 (jm_AC_HEADER_INTTYPES_H): Don't define HAVE_INTTYPES_H.
+    That conflicts with the symbol you'd get from AC_CHECK_HEADERS(inttypes.h)
+
+  Currently `ls -Fd ./' prints this: .//
+  It should probably print this instead: ./    (reported by François Pinard)
+
+  ls: detect infinite loops
+
+  ls: honor -g option: same as -l, except that the owner shall not be written.
+
+  Consider making `chmod MODE DIR' and `mkdir -m MODE DIR' work the
+  same way those programs work on on non-GNU systems when the containing
+  directory has the set-GID bit set.  Currently, GNU chmod and mkdir set
+  the mode of DIR to MODE.  At least Solaris and AIX versions of those
+  programs set the mode to MODE,g+s.  The only exception seems to be that
+  `chmod g-s DIR' removes the setgid attribute.  POSIX allows both
+  implementations.  See tests/chmod/setgid for a little more info.
+  In any case, document the behavior.
+
+  integrate patches for Linux ACL support
+
+  libitize
+  update copyright dates
+
+  ============================
+  From Stallman:
+
+  THE DIRECTORY TREE.
+  -------------------
+  In DOS the command `tree' displays the directory tree. This is very
+  helpful in grasping the morphology of the directory tree. I would be
+  most desirable to have this in G-L console mode too. In the first
+  PC-s the directory tree was so small that it could be displayed on
+  one screen. Now it is necessary to pipe a full tree into a file to
+  see it by scrolling it up and down. A G-L tree must be piped to be
+  displayed and scroll-able.
+  ============================
+
+  ls: test suite to exercize -l and -l --full-time with various LANG settings
+
+  ls: recognize --format="%a %b..." strftime formats
+  ls: add new % formats to get the 10 bytes of the permissions string
+    (both individually and as groups)
+
+  chmod, chown (maybe others): Don't strip slashes unless configure
+      detects that e.g. lstat can't deal with them.
+
+  From: colin@nyx.net (Colin Plumb)
+  | A very nice feature I just wanted, and I assumed a GNU tool would have,
+  | is the mv analogue to cp -s, that is, move the file, but leave a symlink
+  | to the new home.
+  |
+  | E.g. mv -s very_big_file /dir/in/fs/with/lots/of/space
+  |
+  | (Okay, I should make the change and submit a patch.  I just wish I
+  | didn't have to deal with that bizarre brace style when doing it.)
+
+These are mainly notes to myself.
+If something piques your interest and you want to contribute,
+let me know and I can send you details.
+
+  chown, cp, etc: don't use chown on symlinks
+
+  new option: failure of `cp -p' to restore perm bits causes failure;
+     POSIX says default should be no.  Stallman +u.cp
+
+  cp-hash.c: Make this a wrapper around hash.[ch]?
+
+  du.c: Use hash.c(hash_insert), not private copy of the cp-hash.c(hash_insert)
+
+  cp, mv, install: factor out duplicated hash_init cruft -- put it in copy.c?
+
+  cp.c: remove clone of make_path:  see FIXME
+
+  copy.c (is_ancestor): See FIXME comment.
+
+  cp -f (and install, etc.) fail when the destination is a dangling symlink
+
+  make ls's size field wider, so files of size > 9,999,999 don't cause
+    misalignment
+
+  From Noel L Yap:
+    Add a new option (or extend --preserve) to allow preserving some
+    subset of a file's attributed.  E.g.,
+       cp --preserve=timestamp,owner,group,mode
+    where any of "timestamp", "owner", "group", or "mode" may or may not
+    be specified.  The default behaviour of "cp --preserve" would be the
+    way it is now (ie preserve everything that can be).

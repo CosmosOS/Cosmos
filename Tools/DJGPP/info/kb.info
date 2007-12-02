@@ -1,0 +1,2191 @@
+This is ../../../info/kb.info, produced by makeinfo version 4.0 from
+kb.txi.
+
+
+File: kb.info,  Node: Top,  Prev: (dir),  Up: (dir)
+
+The DJGPP Knowledge Base
+
+This document is a place to store random bits of information about
+DJGPP and how to use it efficiently.
+
+Copyright (c) 1995,1996,1997,1998,1999 DJ Delorie
+
+* Menu:
+
+* Introduction::
+
+* What Changed::        List of changes made to each release.
+
+* Known Bugs::		List of things that we know are broken,
+			but either we haven't fixed them yet
+			or we haven't come up with a suitable
+			solution.
+
+* Known Anti-Bugs::	Things that some people might think are
+			bugs, but are done that way on purpose.
+
+* Hidden Features::	Things that are in djgpp but aren't
+			intended for the casual user.
+
+* Index::
+
+
+File: kb.info,  Node: Introduction,  Next: What Changed,  Up: Top
+
+Introduction
+************
+
+This is the intro.
+
+
+File: kb.info,  Node: What Changed,  Next: Known Bugs,  Prev: Introduction,  Up: Top
+
+What Changed
+************
+
+* Menu:
+
+
+* Changes in 2.01::		DJGPP 2.01
+* Changes in 2.02::		DJGPP 2.02
+* Changes in 2.03::		DJGPP 2.03
+
+
+File: kb.info,  Node: Changes in 2.01,  Next: Changes in 2.02,  Up: What Changed
+
+Changes in 2.01
+===============
+
+Here is a list of changes from DJGPP V2.00 to V2.01
+
+`dxeload()' now checks for `malloc' returning NULL.
+
+`gxx' by default also links `libstdc++.a'.
+
+`info/dir.txi' now has full file names for binutils, bison, and find.
+
+`include/dir.h' now packs `struct ffblk' in such a way that g++ 2.7.2
+works correctly.  Note that gcc 2.7.2.1 does not require this change.
+
+`SIGINT' is now in the ANSI section of `signal.h'
+
+`glob()' returns GLOB_NOSPACE when `malloc' fails.
+
+`echo' now accepts `-s' to put one argument per line, instead of all on
+one line.
+
+`_dos_ds' now has a limit of 4Gb instead of 16Mb.
+
+`_is_exec' (and thus `access') check suffixes independent of case, so
+`.com' and `.bat' files are executable.
+
+Documentation for `getopt' has been added.
+
+`doscan' returns -1 when it should (and other doscan fixes).
+
+`sigaction' works correctly.
+
+`stat' works correctly when _STAT_EXEC_MAGIC is set but _STAT_EXE_EXT
+is not.
+
+The example in the `movedata' documention correctly lists `_my_ds()'
+now.
+
+`fsbd' and `edebug' shouldn't crash on long C++ symbols.
+
+`stat' returns the correct number of links to a directory.
+
+`fsdb' doesn't crash with multiple directories of source files.
+
+Command line arguments are not wildcard-expanded if they were passed
+through `spawn*()' or `exec*()'
+
+`stdprn' and `stdaux' work correctly now.
+
+Documentation for `dosmemput' fixed.
+
+`popen' and `system' no longer leak file descriptors.
+
+`bdosptr' macro in `dos.h' is now protected better.
+
+`system' now flushes stdout and stderr (output used to get mixed up).
+
+`inp', `inpw', `outp', `outpw' added to `pc.h'.
+
+`_go32_dpmi_free_real_mode_callback' frees the right stack.
+
+Anything in `libm.a' that used `scalbn' won't leak stack (like `ldexp').
+
+Most `stdio.h' routines rewritten for better text file handling.
+
+`exit' won't recurse if a destructor calls `exit'.
+
+`fcntl' supports `sys/fsext.h'.  `open' passes all flags to extensions.
+
+`system' supports redirection and pipes directly.
+
+`stat' bugfixes.
+
+`mntent' supports JAM compressed drives; CDROM bug fixed.
+
+Many fixes to LFN support.
+
+`printf' supports long longs; new support functions in libc also.
+
+`go32-v2' works in more cases.
+
+`djasm' supports more opcodes and modes.
+
+`stubify' doesn't crash as often; runs faster.
+
+`ScreenGetChar' added to `pc.h'
+
+`va_start' works if the last argument is not int-sized.
+
+New function `_fargetsel()'.
+
+`echo.exe' handles invalid options correctly now.
+
+Some `fsdb' bugs fixed
+
+`glob' handles `...' better now.
+
+`ioctl' and `sys/ioctl.h' added (no unix functionality yet)
+
+`termios.h' functionality added.
+
+`write' no longer mallocs a buffer; it writes to the transfer buffer
+directly.
+
+`getrusage' added.
+
+`readdir' will return "." and ".." even for root directories.
+
+
+File: kb.info,  Node: Changes in 2.02,  Next: Changes in 2.03,  Prev: Changes in 2.01,  Up: What Changed
+
+Changes in 2.02
+===============
+
+Here is a list of changes from DJGPP V2.01 to V2.02
+
+`tests/libclink' no longer looks for DJGPP V1.
+
+`emu387.dxe' has been rebuilt to reflect fpatan fixes.
+
+`mcount.c' no longer writes to the mono monitor.  This had caused seg
+faults when profiling.
+
+You can now "symlink" to files with 8 character base names (like
+12345678.exe).  Previously, `stub.asm' assumed al was zero when it
+wasn't always that way.
+
+`rawclock()' now actually returns the number of ticks since midnight,
+not since program start.
+
+`libc.tex' now uses "Master Index" instead of "Index" due to conflicts
+with the node for `index'.
+
+`srand()' is now documented.
+
+`memchr()' is now 8-bit clean.
+
+Documentation for `delay()' includes the header file.
+
+`__dpmi_simulate_real_mode_procedure_iret()' is now properly documented
+as DPMI call 0x0302.
+
+`edebug' now unassembles `scasb' correctly.
+
+Documentation for `qsort()' has correct prototypes in the examples.
+
+`info/dir.txi' includes an entry for the FAQ.
+
+Functions in `conio.h' now support DOS/V's virtual screens.
+
+`edebug' and other debuggers using the common debugging framework will
+properly close files when they terminate the debuggee.  This allows to
+restart the debuggee without losing handles.
+
+`fnsplit()' now handles files like .emacs properly.
+
+`glob()' now handles files like .emacs properly.  This will fix
+wildcard expansion on new programs.
+
+`go32-v2.exe' properly reverts the interrupt table before running the
+child process.
+
+`_lfn_gen_short_name' no longer crashes in rare cases.
+
+`s[f]_ceil' and `s[f]_floor' functions in `libm.a' no longer crash when
+emulated.
+
+`_fixpath' and `readdir' support multibyte file names.
+
+You may now `set 387=y' to avoid the auto-detection.
+
+`opendir("/")' works.
+
+`rename("x", "x/y")' will now fail when "x" is a directory.
+
+`sigprocmask' and `sigpending' actually do something now.  All of the
+POSIX signal functions are now documented.
+
+`_truename' didn't use `putpath' and therefore didn't support the
+`/dev/' style of standard devices.  `stat' also failed on devices in
+some cases.  We think this is the cause of `bash' failing on
+redirection to `/dev/null'.
+
+Documentation for FSEXT-enabled functions now mentions that they are
+FSEXT-enabled, and how to avoid that.
+
+Documentation for `bioscom' now documents (and uses) the `port'
+parameter.
+
+`ffs()' returns the correct value.
+
+Various fixes and optimizations to `_use_lfn()'.
+
+Return codes of `lock()' and `unlock()' are correct.
+
+Added `memicmp()'
+
+`tmpfile()' always opens the temp file in binary mode.
+
+New `statfs' returns the actual size of a CD-ROM instead of the default
+returned by MSCDEX.
+
+`gxx' won't try to link extra libraries if you specify `-c' or `-S' on
+the command line.
+
+`_dos_findfirst()' takes a `const char *' instead of `char *'.
+
+`rename()' handles extra error codes some network redirectors return.
+
+`ctime' handles dumped emacs and DOS-style `$TZDIR'.
+
+`pathconf()' returns actual values for NAME_MAX and PATH_MAX, rather
+than defaults.  Therefore, it can be used to detect whether a given disk
+supports long file names.
+
+The return values for `_go32_dpmi_lock_data' and `_go32_dpmi_lock_code'
+are now documented.
+
+The initial stack is aligned to an 8-byte boundary.
+
+`getkey' and `getxkey' allow you to do `ALT-keypad-224'.
+
+`popen' selects temporary files correctly now.
+
+`pclose' returns the status of the program it read from.
+
+`stubedit' won't let you set a transfer buffer bigger than 63k.  If the
+stub detects a zero there, it assumes 63k.
+
+The stub now returns error codes in the 100..110 range when it has a
+startup failure.
+
+`system' works if `$COMSPEC' isn't set.
+
+`struct lconv' includes `mon_thousands_sep'.
+
+`scanf' works with long double formats like `%LG'.
+
+`_osmajor' and `_osminor' are now set at startup.
+
+`write()' now calls FSEXT for "text" files.
+
+`assert.h' causes no more warnings with some gcc options.
+
+`access()' now thinks devices are read/write, instead of read-only,
+regardless of what the device actually supports.
+
+New function `stackavail()' in `stdlib.h'
+
+`echo', `split' and `merge' are now called `djecho', `djsplit' and
+`djmerge' to avoid clashes with GNU's `echo', `split' and `merge'
+programs.
+
+`tzname[]' bug fixed; `tzname' no longer a function stub (!)
+
+More `djasm' improvements.
+
+Added `_v2_prog_type' to `sys/system.h' and extended `symlink' with it.
+
+`fread' and `fwrite' are documented as returning less than the
+requested size, rather than -1 on error, since they never return
+negative values.  `fread' `fwrite'
+
+`stub' forcefully closes file descriptors 18 and 19, so that the stub
+and the DPMI server have enough handles to open the swap file and read
+the COFF information of the DJGPP executable.
+
+Minor fixes to `popen''s list of pending commands.
+
+`tempnam' returns allocated memory, not a pointer to static space, and
+does not ignore its arguments TMPDIR and PREFIX anymore.
+
+`difftime' can return negative numbers now.
+
+`gethostname' removes trailing spaces now.
+
+`insque' works with empty lists now.
+
+`sync' also calls `_flush_disk_cache()'.
+
+`printf' flushes stdout every time, unless it is redirected to a file,
+to reduce programmer confusion.  Note that `fprintf' and `vprintf'
+don't do this.
+
+`exit' calls destructors *before* it closes all open files.
+
+The code that reads blocks of data for FILE* streams has a new "slow
+start" algorithm that's designed to adjust the read size for both
+programs that seek a lot reading small amounts of data, and programs
+that don't seek but read lots of data.
+
+`mktime' handles the DST change hour gracefully
+
+`enable' and `disable' don't use DPMI (sti/cli are less buggy!)
+
+The command line parser can handle response files generated by `find
+-print0'.
+
+`malloc' and `free' have been replaced by a more efficient (and not
+BSD) algorithm.  The source archive still contains `bsdmallo.c' and a
+new even faster (but more wasteful) version in `fmalloc.c'.
+
+`getmntent' better supports Windows NT and doesn't cause DOS to return
+stale data when the disk is changed.  Removable media such as JAZ
+drives are no longer reported when the drive is empty.  Disks written by
+Windows 9X are no longer reported with bogus names taken from LFN
+directory entries (which have their volume label attribute bit set).
+
+File names which begin with `/dev/' or `x:/dev/' (where `x:' is any
+drive letter) are treated specially by all file-oriented library
+functions.  `/dev/tty' is converted to `con' and `/dev/null' is
+converted to `nul', to make porting of Unix programs easier.  Other
+names get the drive letter and the `/dev/' prefix removed, so e.g.
+`d:/dev/lpt1' is converted to `lpt1'.  This is because DOS handles
+device names inconsistently unless they are devoid of the `x:/dev/'
+prefix.  File names of the form `/dev/x/foo' are converted to `x:/foo';
+this allows to use Unix-style path names which always begin with a
+forward slash.
+
+The startup code now masks *all* numeric exceptions when a
+floating-point hardware is present.  This means that illegal operations
+like `sqrt(-1)' will now return `NaN' (Not-a-number) rather than raise
+the `SIGFPE' signal.
+
+`fstat' is now more reliable when called from programs under a
+debugger, does not report bogus results on NT, reports files on the A:
+drive correctly, and correctly reports the write access bit on
+Windows9X.
+
+`stat' is now more reliable on NT and with character devices.
+
+`djgpp.env' is read before command line arguments are expanded, so that
+they'll honor the `LFN' setting in `djgpp.env'.
+
+The `sys_siglist[]' array is now available with the names of all the
+signals, and the function `psignal' can be used to print messages which
+include the signal names.
+
+The new functions `basename' and `dirname' can be used to extract
+directory and basename parts from file names.
+
+`_my_ds', `_my_cs' and `_my_ss' work for selectors with the high bit
+set.
+
+The new function `_creatnew' creates a file only if it didn't already
+exist.
+
+`tmpfile' makes sure it opens a file which is not and will not be used
+by any other program.  It does so by repeatedly calling `tmpnam' until
+`_creatnew' succeeds to create a file which didn't exist before.  The
+temporary file is opened in DENY_ALL mode, so that no other process can
+neither read from nor write to it.  In case of a failure, `tmpfile'
+does not leak memory anymore.
+
+Previously, there was a small probability that a call to `open' with
+the `O_CREAT' and `O_EXCL' bits set would succeed even though the named
+file already existed (created by another process).  This window is now
+closed.
+
+`mkstemp' now makes sure the file it creates is unique even if other
+processes can create files in the same directory, and opens the file in
+DENY_ALL mode.
+
+`__FSEXT_alloc_fd' now duplicates the initial file handle instead of
+reopening the NUL device on each call.  Thus, it is no longer limited
+by the value of the `FILES=' parameter on your `CONFIG.SYS', but can
+allocate up to 254 handles (which is the maximum number allowed by DOS).
+
+`rename' will properly fail if the file doesn't exist.
+
+`system' is now compliant with ANSI C Standard when its argument is a
+NULL pointer.
+
+Previously, at program startup `errno' would retain whatever value it
+was assigned by the DJGPP startup code.  ANSI C Standard requires
+`errno' to be zero at the beginning of `main', so it is now reset to
+zero before calling `main'.
+
+The stack dump printed when a program is aborted or crashes was
+improved.  First, it is no longer limited to 10 stack frames.  When the
+standard error stream is connected to the console, the maximum number of
+frames is computed so that the stack dump will use all the available
+screen area, without scrolling off the visible part.  For example, at
+50-line display, you can have as much as 36 stack frames printed and
+still see the registers and selectors dump, and the exception mnemonic
+that preceed it.
+
+When stderr is not the console, the number of printed stack frames is
+only limited by the stack size of the running program.
+
+In addition, the top and bottom of both the application code stack and
+the locked stack used for processing exceptions, are printed.  This
+makes detection of stack overflows and other stack-related atrocities
+much easier.
+
+The `_doserrno' global variable is now provided.  Whenever a DOS call
+fails, this variable gets assigned the value of the error code returned
+by the failed DOS function.
+
+The header `sys/dxe.h' now works with C++.
+
+`fflush' now conforms to ANSI C standard when called with a `NULL'
+argument.
+
+`__dpmi_yield' doesn't wedge the DOS box on some versions of Windows 9X
+anymore.
+
+`outports*' takes a const buffer
+
+`glob' will initalize `*pglob' when appropriate.
+
+The conversion functions `ecvtbuf', `ecvt', `fcvtbuf', `fcvt', and
+`gcvt' are now provided.
+
+The startup code now recognizes an additional flag
+_CRT0_FLAG_KEEP_QUOTES, which forces it to retain quote characters in
+command-line arguments.
+
+`redir' invokes the subsidiary program in a way that preserves the
+command-line expansion.  Thus, you can now use `redir' to invoke
+programs whose command lines include quote characters and file name
+wildcards, and they will work as expected.
+
+Also, `redir' no longer crashes if the subsidiary program was
+interrupted or crashed, and reports the run time with millisecond
+resolution.
+
+The exit code now makes sure the timer interrupt is left pointing to its
+original handler, even if the program is aborted, or exits without
+disabling timers.  `__djgpp_exception_toggle' now toggles the timer
+interrupt handler as well, if it was hooked by SIGALRM/SIGPROF handler
+or by `setitimer'.  Thus, timers, periodic alarms, and profiling will
+be disabled inside blocks that call `__djgpp_exception_toggle'.
+
+The functions of the `printf' family now always print a negative sign
+for a negative floating-point argument, even when the conversion
+generated no significant digits (i.e. only zeros are printed), if the
+format specifier requests an explicit sign, like in "%+f".  A special
+NaN value will also be printed with a sign in these cases (e.g. try
+printing `-nanf()').
+
+`select' now correctly zeroes out all the bits in the `fd_set'
+arguments when it returns due to expired timeout.
+
+`readdir' now includes hidden files and directories in the search by
+default.  The `__OPENDIR_FIND_HIDDEN' bit of the `__opendir_flags'
+variable has no effect, and a new `__OPENDIR_NO_HIDDEN' bit is provided
+to exclude hidden files/directories from the search.
+
+`getmntent' better supports Windows NT and doesn't cause DOS to return
+stale data when the disk is changed.  Removable media such as JAZ
+drives are no longer reported when the drive is empty.  Disks written by
+Windows 9X are no longer reported with bogus names taken from LFN
+directory entries (which have their volume label attribute bit set).
+
+`opendir', `closedir' and `rewinddir' don't lose search handles anymore
+when long file names are supported.  `rewinddir' and `seekdir' will not
+miss the (possibly faked) `.' and `..' entries in root directories.
+
+Asynchronous signals (`SIGINT', `SIGQUIT', `SIGALRM' and `SIGPROF') no
+longer crash programs running on Windows when the signal happens inside
+the `__dpmi_int' function (`__dpmi_int' is called by every library
+function that requires DOS or BIOS services).  We believe this problem
+caused crashes in multi-threading packages that used timers and
+`SIGALRM' to switch threads.
+
+
+File: kb.info,  Node: Changes in 2.03,  Prev: Changes in 2.02,  Up: What Changed
+
+Changes in 2.03 update
+======================
+
+Here is a list of changes in DJGPP V2.03 update (since V2.03).
+
+`__dpmi_simulate_real_mode_procedure_retf_stack' no longer corrupts the
+caller's stack.
+
+Calling the `setitimer' function with both `it_interval.tv_sec' and
+`it_interval.tv_usec' members of `struct itimerval' set to zero no
+longer causes the timer to behave as if `it_interval.tv_usec' were set
+to the system clock granularity (55msec by default).
+
+A subtle bug was corrected in function `process_coff' used by
+`syms_init' from `libdbg.a' to read and sort the symbols from a COFF
+image.  As a result, the `symify' utility should no longer crash in
+rare cases, especially when invoked on large programs.
+
+The functions `rename' and `_rename' can now be used to change the
+letter case of a file name, like in this snippet:
+
+      rename ("makefile", "Makefile");
+
+(This only works when the LFN support is available, of course.)
+
+Functions `rename' and `_rename' work on Windows 2000 when the file
+under the new name already exists.  This solves the problems with
+linking DJGPP programs and with running the `stubify' utility on that
+OS.
+
+`djasm' writes a 2 digit year into the executable header instead of a 3
+digit year after Y2K.
+
+The functions `_rename' (and `rename' which calls it) and `mkdir' no
+longer fail on Windows ME when long file names support is disabled.
+This solves the problem with failures to link programs if the `LFN'
+variable is set to `n' because `stubify.exe' failed to rename the
+produced executable and reported `EINVAL'.
+
+`.com' programs are now invoked by the `spawn*' family of functions
+directly, thus making their exit status available to the parent DJGPP
+program.  Previously, when long file names were supported, `.com'
+programs were invoked through `COMMAND.COM', which would lose the exit
+status.
+
+Nested DJGPP programs which are run by other DJGPP programs on Windows
+should no longer crash (and take the DOS box with them) due to the fact
+that Windows leaks selectors.  These crashes were caused by a failure to
+allocate a selector for conventional memory, and subsequent use of the
+invalid selector by the startup code itself.  This problem was typical
+for Make, Bash, and any other program which can launch lots of child
+programs without ever exiting to DOS.  To avoid this, the startup code
+was fixed to print an error message and exit to DOS with an exit status
+that indicates a failure, when a selector for DOS memory could not be
+allocated by the DPMI host.
+
+The functions `system' and `spawn*' have also been changed to free DPMI
+selectors leaked by many DPMI hosts.  This fixes the problem with large
+makefiles failing before completion under Windows.
+
+There's now a work-around for the bug in NTVDM, the DOS emulator, which
+ships with Windows 2000: nested DJGPP programs no longer cause NTVDM to
+crash.  This allows to use GCC, Make, RHIDE, Bash, and other programs
+which routinely invoke child programs.
+
+The function `utime' now works on Windows 2000 and Windows XP.
+Previously, it would fail with `errno' set to `EIO'; this affected
+programs like `touch', `dtou', and `recode', which set time stamps of
+files.  In addition, `utime' now allows to set the time stamp of
+directories, but only on Windows 2000 or XP (other versions of Windows
+do not allow to change time stamps of directories).
+
+A fix has been applied to the memory allocation routines in `sbrk' to
+prevent use of memory which would require address wrap when the host
+DPMI provider does not allow 4Gb address limits.
+
+Change the round up size for memory block allocations in `sbrk' to
+increase with the number of handles allocated.  This helps keep the
+number of handles to the 256 allocated and reduce problems exhausting
+DPMI handle resources.
+
+The functions `dup' and `dup2' now copy to the new handle any
+Filesystem Extensions which hooked the original handle.  Thus, the
+duplicate handle now behaves exactly like the original one, in that it
+is also hooked by the extension.
+
+The function `fstat' now work arounds incompatibilities in DOS IOCTL
+interface on Windows 2000 and Windows XP, and as a result returns
+correct read/write permissions in `st_mode' and correct device code in
+`st_dev' members of `struct stat'.  This was known to fail functions
+like `link' and programs like GNU `cp' which tested files for being on
+the same filesystem by calling `fstat'.
+
+The long file name support in Windows 2000 and XP have bugs which cause
+handles returned with long name opens to give incorrect information in
+many library routines.  Routines which open files now open using short
+name calls under Windows NT, 2K and XP if long file names are enabled.
+
+The set break DPMI call under Windows 2000 and XP do not return the
+break point handle, which prevented debuggers using break points from
+working properly.  The handle is now guessed for this platforms which
+allows the debuggers to work with hardware break points.
+
+If the short name equivalent of the current path is greater than 64
+characters, Windows 2000 and XP do not return the correct long path
+name - they return the root directory instead without any failure code.
+Since this can be disastrous in deep directories doing an rm -rf, we
+check for this bug and fix the path.  Long directories can also cause
+`_fixpath' to fail on Windows 9x if LFN=n and this is now handled by
+returning a relative path instead of root.  Many uses of `_fixpath'
+assume absolute directories so this change may break code in rare cases
+(such as saving the value and changing directories).
+
+`freopen' was modified to always use the same handle even if it is not
+the first one available.
+
+Corrected problem with negative gmt offsets with z format in `strftime'.
+
+Changes in 2.03
+===============
+
+Here is a list of changes from DJGPP V2.02 to V2.03
+
+Bugs in the `itimer' functions are fixed.  In particular:
+
+   - profiling (which was broken in v2.02) now works;
+
+   - the timers are now more accurate for small (100ms or less)
+     intervals;
+
+   - large values of the `tv_usec' member in `itimerval' structure
+     don't cause internal calculations in `setitimer' to overflow;
+
+   - `getitimer' now returns correct info in the `tv_usec' member;
+
+   - the timers and the `alarm' function work correctly when the calling
+     program invokes the `uclock' library function before setting a
+     timer.
+
+`localtime', `ctime' and `mktime' now notice changes in the value of
+the `TZ' environment variable during the program run, and adjust their
+computation accordingly.  They also don't fail for the first date after
+the epoch.  `mktime' now avoids looping for preposterously long time
+when passed very large values in the members of `struct tm'.
+
+When passed an empty string as the file name, `stat' now fails and sets
+`errno' to `ENOENT', instead of returning information about the current
+directory.  Also, `stat' no longer reports invalid time stamps for root
+directories of floppy disks that were written on Windows 9X or Windows
+NT.
+
+The startup code now correctly sets up the keys that generate `SIGINT'
+and `SIGQUIT' signals on PC98 machines.
+
+`putc' and `fputc' no longer return -1 when they write the value
+`(signed char)0xff' to a file.
+
+The header `wctype.h' from v2.02 caused pre-processor errors, and could
+not be included _before_ `ctype.h'.  This is now fixed.
+
+Functions of the `printf' family no longer cause the calling program to
+crash when passed `long double' variables with invalid bit patterns
+(the so-called "unnormal" numbers).  Such arguments are now printed as
+`Unnormal'.
+
+`srand' now documented as returning a void.
+
+`rand48' and friends are now in libc.
+
+Many fixes to calls to `tolower'/`toupper' with signed chars.
+
+The rmcb stub doesn't restore the flags so that you can return
+different ones.
+
+Doc fixes for ansi/posix portability.
+
+Handle error conditions in `bin2h'.
+
+`tests/libclink/check.cc' - remove duplicates.
+
+Remove unneeded includes from `rand.c'.
+
+Call `system' properly in termios (Ctrl-Z).
+
+Work around a gcc 2.8.1 bug in emu387.
+
+Linking with -lemu should obviate the need for emu387.dxe.
+
+The "Hidden Features" chapter of the Knowledge Base now actually
+describes most of the special features provided by DJGPP.
+
+`redir' no longer fails to run programs when the program name is a
+substring of the redirected I/O file(s).
+
+`glob' correctly converts the letter-case of the file names when the
+pattern include mixed upper- and lower-case letters.  In particular,
+the letter-case of the command-line arguments expanded by the startup
+code in the `argv[]' array is now correct in these cases.
+
+`textcolor' and `textbackground' now support the 16 background colors
+mode (e.g., after a call to `intensevideo').  Previously,
+`textbackground' would ignore the high intensity color bit in its
+argument, and `textcolor' would clobber that bit sometimes.
+
+A call to `lowvideo' doesn't clobber the background color anymore.
+
+The global variable `ScreenAttrib' now always matches the value of the
+`attribute' member of the `text_info' struct returned by `gettexinfo'.
+
+If the last character of a response file is `^Z', it is now ignored.
+Previous versions would pass it to the `main' function.  Use two `^Z'
+characters in a row if you actually need to pass such a character as
+part of the last element of the `argv[]' array.
+
+`fputs' now returns `EOF' when called on an unbuffered stream, and
+there's some error (such as `ENOSPC') in writing to that stream.
+
+If both arguments of `_rename' and `rename' refer to the same file,
+they no longer remove that file.
+
+Functions of the `scanf' family no longer crash or work incorrectly
+when passed format specifiers with upper-case letters, such as `%lX' or
+`%E'.  Non-ANSI extensions to the format specifiers and qualifiers,
+such as `%lld' and `%U', are now documented and their portability
+information included in the library docs.
+
+The function `__crt0_load_environment_file' called by the startup code
+now strips trailing blanks and TABs from the `[program]' lines of the
+`DJGPP.ENV' file which define sections for individual programs.  This
+is so editing `DJGPP.ENV' with some losing editors that don't strip
+trailing whitespace when saving the file doesn't prevent the startup
+code from recognizing section names.
+
+`dtou' and `utod' no longer overwrite the stack when invoked on file
+names longer than 80 characters.
+
+`system' works when its argument uses redirection to/from quoted file
+names (e.g., when the file name includes embedded whitespace).
+
+Buffered stdio functions, such as `getc', `putc', `fread', `printf',
+and all their relatives pay attention to `termios' settings of the
+terminal device and behave accordingly.  For example, you can get
+single-character, no-echo input with the following snippet:
+
+      struct termios charmode;
+     
+      tcgetattr (0, &charmode);
+      charmode.c_lflag &= ~(ECHO | ICANON | ISIG);
+      tcsetattr (0, &charmode);
+
+If you reset the `ISIG' or `BRKINT' flags in the `termios' structure,
+or set the `IGNBRK' flag, `tcsetattr' now disables `SIGINT' generation
+by a `Ctrl-<C>' or `Ctrl-<BREAK>' keypress, and generation of `SIGQUIT'
+by pressing `Ctrl-<\>'.
+
+A call like `tcflush (0, TCIFLUSH);' now empties the BIOS keyboard
+buffer in addition to the internal buffer maintained by the `termios'
+input processing.  This is compatible with the Unix specification that
+`tcflush' should "discard all data received but not read".
+
+Library function `system' no longer crashes when given invalid command
+lines which involve pipe symbols `|'.  Typically, such command lines
+should have been run by a Unix-style shell, like Bash.  However,
+sometimes, due to some system configuration snafu, the `SHELL' variable
+in the environment didn't point to such a shell, and `system' would try
+to execute the command line using its internal emulator of
+`COMMAND.COM'; it would then crash due to a bug.  This is now solved:
+`system' prints appropriate error message(s) and exits with an error
+code of -1.  We believe that some of the rarely-reported and
+hard-to-reproduce crashes of the Make utility were due to this bug.
+
+Previously, when attempt was made to open a file, and all the available
+file handles were exhausted, `open' would sometimes truncate an
+existing file on Windows 9X.  This is now fixed.
+
+All DJGPP programs now clear the FPU exceptions when they exit.  This
+prevents the next DJGPP program that is run in the same DOS box on
+Windows 9X from crashing during startup code.
+
+When the `387' environment variable overrides the FPU auto-detect code,
+the value of the global variable `_8087' is now set by the startup code
+according to the environment override: 3 if `387' is set to `y', 0
+otherwise.
+
+You can use the special `/dev/env/foo/' construct in file names to
+expand it into the value of the environment variable `foo' at run time.
+`/dev/env/foo~bar~' will expand to `bar' if `foo' is undefined, or if
+its value is empty.
+
+Calling `getch' and `getche' flushes the `stdout' and `stderr' streams,
+if they are connected to the console and have any pending buffered
+characters.
+
+A bug in the library caused programs like Emacs, which dump their data
+and then restart, to use stale `FILE' objects created before they were
+dumped.  This caused warning messages to be issued by GDB near the end
+of debugging session.  This bug is now fixed.
+
+Due to a peculiarity of the timer device virtualization, the values
+returned by `uclock' on Windows during the first 54.9msec after the
+first call (which reprograms the timer chip) were erratic, some of them
+negative, some positive.  To work around this, the first call to
+`uclock' on Windows now waits until the next timer tick before
+returning, to ensure that all the values returned hence are
+monotonously increasing.
+
+The termios emulation now uses raw input/output only if the file handle
+referring to a device is put into binary mode, and the device itself is
+in raw mode.
+
+The termios input routines no longer generate the `SIGINT' and
+`SIGQUIT' signals twice when `Ctrl-<C>' or `Ctrl-<\>' are pressed.
+
+A call to `__djgpp_set_ctrl_c' with a negative argument returns the
+current state of `SIGINT' and `SIGQUIT' generation without altering it.
+
+The `termios' cooked-mode output now expands TABs into the appropriate
+number of spaces when writing to the console device.
+
+The `setmode' function now switches character devices to raw/cooked
+mode even when `termios' functions are used.
+
+`freopen' now correctly sets the read/write access flags when `+' is
+the last (third) character of the MODE string, like in `wt+' or `ab+'.
+
+Previously, `searchpath' would always return its argument unchanged and
+signal a success, when the argument included slashes or a drive letter,
+even if the file didn't actually exist.  This is now fixed:
+non-existent files always cause `searchpath' to return a `NULL' pointer.
+
+The DJGPP debug support functions in `libdbg.a' now have the capability
+to debug programs that catch signals such as `SIGINT'.  The signal
+interrupts the debuggee and is reported by the debugger, instead of
+aborting the debuggee.  You can also deliver signals to the debuggee,
+even if they didn't actually happen.  Most of the work that made this
+possible was done by Pierre Muller <muller@cerbere.u-strasbg.fr> and
+Andris Pavenis <pavenis@lanet.lv>.
+
+The debugging support functions in `libdbg.a' now correctly handle the
+`SIGQUIT' signal that happens while the debuggee runs.  Previously, a
+debugger would crash or report `SIGINT' in such cases.
+
+The DJGPP functions in `libdbg.a' support FP code much better now,
+especially when FP exceptions happen in the debugged program.  The full
+state of the numeric processor is saved and restored when the execution
+thread jumps from the debugger to the debuggee and back.
+
+It is now possible to debug programs that redirect their standard
+handles, without the debugger losing those handles at the same time.
+Debuggers which want to use this feature need to call the new `redir_*'
+functions before and after jumping to the debuggee's code.  *Note
+Redirection in the debugger: (libc)redir_debug_init.
+
+The documentation for the debug support functions in `libdbg.a' is now
+part of the library reference.
+
+When a raw COFF image (i.e., without a stub) is debugged, its stack
+length and the size of transfer buffer are now taken from the values
+used by the debugger.  This means that you can have predictable results
+by stubediting the debugger's executable.
+
+`__dpmi_simulate_real_mode_procedure_retf_stack' no longer fills part
+of the real-mode stack with garbage.  The parameters specification was
+changed so that the second argument is now the number of 16-bit words
+to copy to the real-mode stack, like the DPMI spec requires.
+
+The floating-point emulator software had a bug in emulation of
+subtraction, addition, and comparison instructions, whereby the results
+produced for some rare pairs of numbers with the same exponent but
+different mantissa were grossly incorrect.  This is now fixed.  This
+bug was known to cause all kinds of weird failures, like incorrect
+values produced by functions `sin' and `cos', programs being trapped
+inside infinite loops when they called `acos', etc.
+
+The FP emulation library `libemu.a' omitted the specially-compiled FPU
+setup module `npxsetup.o' which arranges for floating-point
+instructions to call functions from `libemu.a'.  This caused programs
+linked with `-lemu' to require the dynamically-loaded emulator,
+`emu387.dxe', even though the emulation code was linked into the
+program.  This bug is now fixed.
+
+`rename' now sets `errno' to `EACCES' when an attempt is made to rename
+an open file.  Previously, `errno' was set to `ENOENT' in these cases.
+
+Library functions that process strings and file names, such as
+`strupr', `stricmp', `strtol', `fnmatch', and the functions from
+`printf' and `scanf' families, handle 8-bit characters correctly when
+they call `ctype' character-classification functions internally.
+
+New versions of mathematical functions, written by Eric Rudd
+<rudd@cyberoptics.com>, are now included in the standard C library,
+`libc.a'.  The new versions are ANSI-compatible (they set `errno' in
+case of FP errors), yet very fast and accurate.  Programs that require
+accurate floating-point computations can now be linked without `-lm',
+unless they need the `matherr' call-back or compliance to standards
+like X/Open or SVID.
+
+New math functions are provided: `powi', `cbrt', `expm1', `exp2',
+`exp10', and `sincos'.
+
+If the format specifier for a floating-point number includes the `+'
+flag (meaning that the sign should be printed even if the number is
+positive), the functions of the `printf' family will now print the
+negative zero, `-0.0', with an explicit negative sign.
+
+`access' no longer loses a `FileFind' handle on LFN platforms when
+called on a root directory or a character device.
+
+`_check_v2_prog' no longer leaks file descriptors when called on a
+corrupt executable by name.
+
+`setitimer' no longer crashes when its second argument is a `NULL'
+pointer, it simply returns after setting the third argument to the
+value of the last timer set with a previous call to `setitimer'.
+
+`setitimer' now rounds up timer values smaller than the system clock
+granularity to that granularity, before it uses the values.  Therefore,
+`setitimer' and `getitimer' will return rounded up values for such
+small timers.  The global variable `__djgpp_clock_tick_interval' is
+provided for changing the granularity used by `setitimer', in case an
+application reprograms the timer chip to run with a non-standard
+frequency.
+
+`ftruncate' now leaves the file pointer at the same byte position as it
+were before the function was called.
+
+Functions of the `scanf' family now correctly stop the scan when they
+encounter a digit larger than 7, and either the format specifies octal
+conversion, like in `%o', or the format is `%i' and the leading digit
+is `0', which implies octal conversion.
+
+Functions of the `scanf' family now use 16 as the base for converting
+pointer values read with the `%p' format.  Thus, reading back a pointer
+written with the `%p' format now yields the original value.
+
+`kill' now sets `errno' to `ENOSYS' when called with a PID argument
+that isn't the caller's PID, since DOS doesn't allow sending signals to
+other processes.
+
+The startup code and the linker script file `djgpp.djl' include support
+for long section names.  Long section names are required by the latest
+versions of GNU Binutils to support automatic template instantiation in
+C++ programs.
+
+The `tcgetpgrp' and `tcsetpgrp' are now provided in the library.
+
+`realloc' no longer crashes when the available virtual memory is not
+enough to satisfy the reallocation request.
+
+Previously, the `symlink' function would sometimes think that the
+source and the target of the link were in the same directory, when in
+fact they weren't.  This bug is now fixed.
+
+`djtar' now creates the file `tarchange.lst' only if it actually needs
+to rename some of the files during unpacking.  In particular, simply
+listing the contents of an archive, as in `djtar foo.tgz', will not
+produce an empty `tarchange.lst' file anymore.
+
+The function `memicmp' was omitted from the library in version 2.02.
+This is fixed now.
+
+Previously, `fsdb' could not step over function calls when 4 or more
+breakpoints were set: it would display an error message saying that
+`Exception 3 occurred'.  This is now fixed.  In addition, `fsdb' now
+supports the `SIGQUIT' signal, if the program being debugged generates
+it.
+
+The floating-point emulation now works on Windows.  Previously, a bug in
+the emulation of the WAIT/FWAIT instructions caused the emulator to get
+stuck in an endless loop on Windows.  (On MS-DOS, these two instructions
+don't generate an FP exception, and so don't get into the emulator.)
+
+`redir' no longer crashes when floating-point instructions are emulated.
+
+The emulator setup in the startup code now correctly masks all FP
+exceptions in the emulated control word, like the hardware FPU setup
+does.  If some numeric exception is unmasked by an application and is
+triggered by some abnormal condition in the emulator (e.g., if an
+application attempts to compute a square root of a negative number), the
+emulation simulates exception 16, the Coprocessor Error exception.
+(Previously, the exception number in the DJGPP exception structure was
+not set by the emulation, and was left at its old value set by the
+Coprocessor Not Present exception generated by the emulated
+instruction.  This caused incorrect message to be printed when the
+program crashed, and defeated user-defined handlers for `SIGFPE'.)
+
+The emulator now correctly sets the condition code bits `C0', `C1',
+`C2', and `C3' when an exceptional condition is raised, and as result
+of emulating the `FPREM' and `FPREM1' instructions.
+
+The floating-point emulator software had a bug in emulation of the
+`FSQRT' instruction, which could cause the calling program to hang.
+This was due to incorrect optimization by the version of GCC used to
+produce `djdev202.zip'.  The new version of the emulator works around
+this bug by preventing the compiler from performing these incorrect
+optimizations.
+
+`fsetpos' no longer returns zero when it fails to move the file
+position pointer.
+
+`djtar' now converts `.info-' into `.i' only if the character following
+`.info-' is a digit.  `.tar.gz' is converted to `.tgz' only at the end
+of a file name.  `++' is converted to `xx' (instead of `plus' in
+previous versions), and this conversion is performed for all
+occurrences of `++' in a file name (previous versions only converted
+the first occurrence).
+
+The `gxx' compiler driver no longer reports an error if the optional
+GNU C++ class library `libgpp.a' is not installed.  If `libgpp.a'
+cannot be found where `gcc' would look for it, `gxx' does not pass the
+`-lgpp' option to the linker.  Also, if the standard C++ library,
+`libstdcxx.a', cannot be found, `gxx' now tries `libstdcx.a' and
+`libstd~1.a', in case the user has some LFN-related installation
+_snafu_.
+
+The FP emulation behaves closer to a real FPU when an FP instruction
+produces abnormal results, such as `Inf' or `NaN'.  In particular:
+
+   * Overflow and underflow are now correctly detected in addition,
+     subtraction, multiplication and division, and instructions that
+     perform these operations internally.  Overflow causes an `Inf' to
+     be stored in the results, while underflow usually results in a
+     denormal or a zero.
+
+   * Undefined operations, such as division of zero by zero or of `Inf'
+     by an `Inf', produce a `NaN'.
+
+   * Emulation of `FST' and `FSTP' instructions avoids overflowing of
+     the exponent when it is too large for the destination format; it
+     stores an `Inf' or a maximum finite number instead.  Operands that
+     are too small for the destination format cause either a denormal
+     or a zero to be stored.
+
+   * The emulation of `FXCH' stores a `NaN' when one or both of its
+     operands is a `NaN'.
+
+   * The emulation of `FYL2X' always pops the operands from the FPU
+     stack, even if one of the operands is invalid (`Inf' or `NaN'), or
+     if the operand on top of the stack is negative.  This affects
+     functions `acosh' and `asinh'.
+
+   * The emulation of the `FPREM' and `FPREM1' instructions no longer
+     hangs the program when the difference of the exponents of the
+     operands is larger than 64.  Instead, it correctly implements the
+     "partial remainder" algorithm defined by the Intel manuals.  Also,
+     the sign of the result of these instructions is now in accordance
+     with the Intel manuals (this affects the `ceil' function for small
+     negative arguments).
+
+   * The emulation of `FPTAN' now correctly handles the case where its
+     operand is out of range.
+
+   * `FPATAN' emulation now uses a better approximation which is
+     accurate to 63 bits, even when its argument is near 1.
+     (Previously, it would suffer a catastrophic accuracy loss of up to
+     13 significant digits for arguments near 1.)  This affects
+     functions `atan', `atan2', `asin', and `acos'.
+
+   * The emulation of `FSQRT' behaves correctly for infinite arguments.
+
+   * `FRNDINT' emulation returns a negative zero for negative
+     arguments.  This affects the `fmod' function for negative
+     arguments.
+
+   * The emulation of `FSCALE' handles overflow correctly.
+
+   * The emulations of `FSINCOS', `FSIN' and `FCOS' return a `NaN' for
+     an argument that is a `NaN', and raise an Invalid Operation
+     exception for an `Inf' argument; this is what the Intel manuals
+     require.  This affects functions `sin', `cos', `sincos', and `tan'.
+
+   * The emulation of instructions `FST' and `FSTP' that store FP
+     registers into `float' or `double' variables, now correctly round
+     the stored value according to the current rounding mode.
+     Previously, the stored value was always chopped (truncated) at the
+     last stored bit of the mantissa.
+
+The `wchar_t' data type is changed so that DJGPP now supports 16-bit
+wide characters.  This is required for RSXNTDJ programs to be
+compatible with Windows implementation of Unicode.
+
+The long file-name (LFN) support is no longer disabled after `_use_lfn'
+(or some other library functions that call it) were called with a file
+name which refers to an invalid drive or a drive whose media has been
+removed (e.g. an empty floppy drive).  `_get_volume_info' now returns
+`_FILESYS_UNKNOWN' for such drives.
+
+`symify' no longer crashes when the name of the function or source file
+are too long to fit on a single screen line.  It also doesn't overwrite
+the address on the next screen line.  Instead, `symify' truncates the
+long names to fit on a single screen line.
+
+`tmpfile' no longer gets stuck in an endless loop when all the
+available file handles are exhausted.
+
+
+File: kb.info,  Node: Known Bugs,  Next: Known Anti-Bugs,  Prev: What Changed,  Up: Top
+
+Known Bugs
+**********
+
+
+File: kb.info,  Node: Known Anti-Bugs,  Next: Hidden Features,  Prev: Known Bugs,  Up: Top
+
+Known Anti-Bugs
+***************
+
+
+File: kb.info,  Node: Hidden Features,  Prev: Known Anti-Bugs,  Up: Top
+
+Hidden Features
+***************
+
+DJGPP has numerous features hidden in it.  Most of these are described
+elsewhere in the existing documentation, but they are usually hard to
+find "amidst the fine print", and their combined impact is hard to
+appreciate without seeing them all together.  This chapter describes
+some of the more important features and their interconnections.
+
+* Menu:
+
+* Features::    The features provided by DJGPP.
+* DJGPP.ENV::   All about the format of the `djgpp.env' file
+
+
+File: kb.info,  Node: Features,  Next: DJGPP.ENV,  Up: Hidden Features
+
+Features provided by DJGPP
+==========================
+
+This section describes some advanced features provided by DJGPP.  Most
+of these features are built into the C library, but some are provided
+by the basic development utilities which are part of the DJGPP
+development environment.  Since DJGPP is a Posix-compliant environment,
+many of these features are motivated by Unix compatibility.
+
+   * Compatible headers and libraries.
+
+     The DJGPP header files and library functions are highly compatible
+     with other popular environments.  In addition to full ANSI and
+     Posix compliance, DJGPP also offers compatibility to many PC and
+     Unix libraries.  For example, DJGPP provides library functions
+     that are usually absent from other DOS- and Windows-based
+     libraries, like `popen', `glob', `statfs', `getmntent',
+     `getpwnam', `select', and `ftw'.  Other functions, although they
+     exist in DOS/Windows libraries, are incompatible with Posix in
+     subtle ways.  For example, the ANSI-standard function `rename'
+     typically fails in DOS/Windows implementations if the target file
+     already exists (because the underlying OS call fails).  DJGPP
+     makes a point of sticking to Posix or Unix behavior in such cases,
+     even if it means more processing (like removing the target file in
+     the case of `rename').
+
+     A case in point is library functions `stat' and `fstat'.  Unix
+     programs make extensive use of the inode number and the mode bits
+     returned by these functions.  For example, GNU `diff' examines the
+     inode numbers of the files it is about to compare, and if they are
+     equal, exits immediately on the assumption that both file names
+     point to the same file.  However, DOS and Windows don't support
+     inodes, and most other DOS/Windows implementations return zero in
+     the `st_inode' member of `struct stat', which of course breaks
+     `diff'.  Also, the mode bits returned by `fstat' are usually
+     incorrect.  In contrast, the DJGPP implementation of these
+     functions goes out of its way to provide compatible
+     implementations for these functions, and in particular returns
+     meaningful inode numbers, even though it takes quite a lot of code
+     (for example, `stat' code compiled totals about 17KB, together
+     with other library functions it calls).
+
+     Such high compatibility makes porting programs very easy.
+
+   * Long command lines.
+
+     When DOS invokes programs, it limits the length of the command
+     line to 126 characters (excluding the program's name).  This is a
+     ridiculously small limit; it doesn't even allow to compile GCC,
+     since many commands in GCC `Makefile's are much longer.
+
+     Therefore, DJGPP provides a mechanism to pass long command lines to
+     child programs.  The actual command is stored in the transfer
+     buffer, and a pointer to that buffer is passed to the child
+     program instead of the command line itself.  The startup code of
+     the child program then retrieves the actual command-line arguments
+     and puts them into the `argv[]' array passed to `main'.
+
+     DJGPP also supports the so-called "response file" method of
+     passing long command lines, whereby the command line is stored on
+     a disk file, and the name of that file is passed as
+     `@response-file'.  For example:
+
+           ar cq libmylib.a @files-list
+
+   * Unix-style file-name globbing.
+
+     All Unix programs assume that any file-name wildcards on their
+     command line were already expanded by the shell, to yield normal
+     file names.  But DOS shells don't provide this functionality, so
+     the wildcards would wind up verbatim in the `argv[]' array.  To
+     avoid the need to have special code in every ported program that
+     expands the wildcards, the DJGPP startup code expands the
+     wildcards automatically.  The expansion follows the Unix
+     conventions, so `*' expands to all file names, unlike the DOS
+     conventions where it excludes file names with extensions.
+
+     The globbing code supports Unix-style quoting with the `'' and `"'
+     characters (most other DOS/Windows compilers and shells only
+     support `"').  Escaping special characters with `\' is limited to
+     the quote characters themselves, since `\' serves as a directory
+     separator in DOS/Windows file names.
+
+     DJGPP also provides a special extension: the `...' wildcard
+     expands recursively to all the subdirectories.  Thus, the following
+     command would search all files in all the subdirectories,
+     recursively:
+
+           grep foo .../*
+
+     (This was hard to achieve even on Unix, until the recent release
+     of the GNU Grep package introduced the `--recursive' option.)
+
+   * Extending the shell via the `system' function.
+
+     Traditionally, the `system' library function calls the shell to
+     process its argument.  However, stock DOS shell `COMMAND.COM' is
+     too dumb to be useful in many cases.  For example, it doesn't
+     support long command lines, even though DJGPP programs do; it
+     doesn't understand forward slashes in file names; and it doesn't
+     return the exit code of the child program to the parent.
+
+     Therefore, the DJGPP version of `system' usually doesn't call
+     `COMMAND.COM' at all.  Instead, it internally emulates its
+     functionality, including redirection and pipes, and invokes the
+     programs directly.  This allows to provide the following important
+     features:
+
+        - Long command lines.
+
+          This is described under "Long command lines" above, but here
+          it means that shell commands can have arbitrary length, even
+          though the shell itself doesn't support that!
+
+        - Unix-style file names.
+
+          File names which are targets of redirection can be given in
+          the Unix `/foo/bar' style.  Unix devices, such as
+          `/dev/null', are also supported (see "Transparent conversion
+          of special file names", below).
+
+        - Multiple commands in a single command line.
+
+          The emulation code supports the `foo ; bar' feature of several
+          commands separated by a semi-colon.
+
+        - Improved emulation of internal shell commands.
+
+          The emulation of the shell command `cd' allows Unix-style
+          forward slashes in its argument, and also changes the drive
+          if the argument includes the drive letter.
+
+        - Support for Unix-style shells.
+
+          If the environment variable `SHELL' points to a name like `sh'
+          or `bash', `system' invokes the shell to do everything, since
+          the internal shell emulation is not sophisticated enough to
+          cover Unix shell functionality.
+
+        - Direct invocation of Unix shell scripts.
+
+          Shell scripts can be invoked even if the `SHELL' environment
+          variable doesn't point to a Unix-style shell, provided that
+          the interpreter whose name appears on the first script line
+          after the `#!' signature can be found somewhere along the
+          `PATH'.
+
+        - Exit code of the child program is returned to the caller.
+
+     `COMMAND.COM' is only invoked by `system' to run batch files or
+     commands internal to the shell.  However, `system' always looks
+     for external programs first, so if you have e.g. a port of the GNU
+     `echo' program installed, `system' will call it even though
+     `COMMAND.COM' has an internal (and very much inferior) command by
+     that name.
+
+     These features come in especially handy in the DJGPP port of GNU
+     `make'.  Where the original Unix code of `make' invokes the shell,
+     the DJGPP port simply calls `system' to execute the commands in
+     rules, and automatically gets support for long command lines and
+     Unix-style shells required to run many `Makefile's of Unix origin.
+
+     The above extended functionality also means that whenever a Unix
+     program calls `system', in most cases the same call will work
+     without any changes when compiled with DJGPP.  The result is not
+     only ease of porting, but also less probability to leave subtle
+     bugs in the ported program due to an overlooked fragment which
+     assumes a Unix shell.
+
+   * Transparent conversion of special file names.
+
+     All DJGPP library functions pass file names to DOS via a single
+     low-level function.  This allows to remap some special file names
+     to their DOS equivalents.  For example, Unix-standard device names
+     `/dev/null' and `/dev/tty' are converted to their DOS equivalents
+     `NUL' and `CON', respectively.  File names which begin with
+     `/dev/X/', where X is a drive letter, are converted to the DOS
+     `X:/' form; this is required for running some Unix shell scripts
+     which take apart the `PATH' variable where colons separate
+     directories.
+
+     In addition, file names which begin with `/dev/env/' are expanded
+     using the environment variables.  For example, `/dev/env/DJDIR'
+     expands into the full path name of the top DJGPP installation
+     directory, since the environment variable `DJDIR' has that
+     directory as its value.
+
+   * Filesystem extensions.
+
+     This feature is built into the low-level file-oriented library
+     functions.  It allows the application to install a handler for
+     certain filesystem calls, like `open', `read', `fstat', `dup',
+     `close', etc.  If installed, such a handler is called just before
+     the appropriate primitive is invoked to pass the call to DOS.  If
+     the handler returns a non-zero value, it is assumed to have
+     handled the call, and the usual primitive call is bypassed.
+     Otherwise, the library proceeds with calling DOS as usual.
+
+     This facility provides an easy way of handling special files and
+     devices which DOS and Windows don't support directly.  For
+     example, a program can install a handler for special file names
+     like `/dev/ptyp0' and emulate these non-existent devices via an
+     async communications library.
+
+     Another way of putting filesystem extensions to a good use is when
+     there's a need to emulate functionality that DOS file I/O doesn't
+     support, even though the associated devices do exist.  For example,
+     suppose you need to port code which sends special commands to the
+     terminal device via `termcap' functions.  DOS supports a terminal
+     device, but doesn't support `termcap'.  However, it is possible to
+     achieve the same effects if direct screen writes are used instead
+     of file I/O.  By installing a filesystem extension handler for the
+     standard output handle, you could redirect all terminal I/O to
+     direct screen writes and implement all the necessary `termcap'
+     functionality, without any changes to the program's source code.
+     This is how the DJGPP port of GNU `ls' supports the `--color'
+     option without forcing users to install `ANSI.SYS', which is a
+     special terminal driver that interprets ANSI escape sequences (and
+     also has several nasty side-effects).
+
+   * Support for long file names.
+
+     DOS system calls are limited to file names in the so-called "8+3
+     format": maximum 8 characters for the basename and maximum 3
+     characters for the extension.  Therefore, it is impossible to
+     access the long file names, offered by Windows 9X and Windows NT,
+     via the DOS system calls.  However, Windows 9X provides a special
+     API (a bunch of special functions of software interrupt 21h) that
+     allows DOS programs to access long file names.  This API is widely
+     known as the "LFN API", where "LFN" is an acronym for "Long File
+     Names".  For each file-oriented DOS system call, the LFN API
+     includes a replacement that supports long file names.  For
+     example, there are functions to open files, list the files in a
+     directory, create a directory, etc. using long names.  The LFN API
+     also adds several functions to access extended functionality
+     supported by the Windows filesystems.  For example, it is possible
+     to get and set 3 times for each file, like on Unix, instead of
+     only one time supported by DOS.
+
+     The DJGPP library features transparent and automatic support for
+     long file names on Windows 9X(1).  The DJGPP startup code queries
+     the system for the availability of the LFN API, and if it's
+     available, all low-level file-oriented primitives are
+     automatically switched to using the special LFN-aware functions.
+     This run-time detection of the LFN support means that the same
+     executable will run on DOS and on Windows, and will automatically
+     support long file names when it runs on Windows 9X.
+
+   * Emulation of links.
+
+     DOS doesn't support hard and symbolic links.  However, DJGPP
+     emulates them to some extent.  The `link' library function
+     simulates hard links by copying.  The `symlink' library function
+     simulates a symbolic link for executable programs only, by
+     creating a 2KB stub which is set up to run the COFF image from the
+     target of the link.  Thus, `ln -s grep fgrep' does what you'd
+     expect.
+
+   * Emacs compatibility.
+
+     Emacs is special because when it dumps itself during the build
+     process, static and global variables are frozen in the dumped
+     image with the last value they had at the time the program was
+     dumped.  DJGPP has a special facility in the library through which
+     library functions can detect that the program was dumped and
+     restarted.  All library functions that need static variables, use
+     this facility to reinitialize them.  This allows Emacs to be built
+     with DJGPP without the need to analyze whether each library
+     function called by Emacs is dump-safe.
+
+   * Special-purpose utilities.
+
+     In addition to relying on GNU development tool-chain, DJGPP
+     introduces several utilities written specifically for the project.
+     These utilities are meant to assist the developer in solving
+     specific tasks common for the DJGPP environment.  Some of these
+     utilities are listed below:
+
+        - djtar
+
+          `djtar' is a program that unpacks archives (but cannot create
+          them).  It was originally written to unpack files created by
+          `tar', because DOS and Windows lack standard programs for
+          that.  Since the original release, `djtar' functionality was
+          significantly extended, and now it can unpack `.tar.gz' and
+          `.zip' files as well.  It also can unpack archives from
+          floppy disks written as raw `/dev/rfd0a' devices on Unix
+          systems, and it uncompresses and untars `.tar.gz' files on
+          the fly, by feeding the untar code with output of the unzip
+          code.  The latter feature is very important when unpacking
+          large distributions, such as `emacs-XX.YY.tar.gz', because
+          pipes are implemented as temporary disk files on DOS/Windows,
+          and so on-the-fly decompression avoids creating huge
+          temporary disk files.
+
+          The ability to unzip `.zip' archives makes `djtar' the only
+          free program which does that, since it turns out that
+          InfoZip's `UnZip' license does not comply with FSF's
+          definition of free software (according to Richard Stallman).
+
+          In addition, `djtar' offers several features designed to
+          prevent problems due to DOS/Windows file-name restrictions,
+          see "DOS file names handling", below.
+
+        - djsplit and djmerge
+
+          These two programs come in handy when you need to carry a
+          large file (usually, a compressed archive of a large
+          distribution) on floppies.  `djsplit' splits a file into
+          smaller chunks whose size is user-defined, and `djmerge'
+          splices the chunks back together.
+
+        - dtou and utod
+
+          These programs are close cousins of `dos2unix' and `unix2dos',
+          respectively, but they have several clever tricks up their
+          sleeves.  First, they take file names from the command-line
+          arguments and rewrite each file, instead of reading `stdin'
+          and writing `stdout'; thus, they can convert many files in a
+          single run.  And second, they preserve the time stamps of the
+          converted files, to keep utilities like `make' happy.  With
+          these programs, you can convert the entire directory tree of
+          C source files to the DOS CR-LF format with a single command:
+
+                utod .../*.[ch]
+
+          This uses the DJGPP wildcard expansion and the special `...'
+          wildcard mentioned above.
+
+        - update
+
+          This is a replacement for the well-known `move-if-changed'
+          shell script.  It is very handy in `Makefile's which should
+          run on systems that don't have Bash installed.  Since it
+          understands Unix-style forward slashes (like all DJGPP
+          programs do), it is also widely used in `Makefile's for
+          copying files, instead of the shell's internal `COPY'
+          command, since `make' doesn't live well with backslashes in
+          file names.
+
+        - redir
+
+          As its name implies, `redir' redirects standard handles.  It
+          was originally written to allow redirection of `stderr',
+          which stock DOS shell `COMMAND.COM' cannot do.  You need this
+          redirection, e.g., when GCC spits out a long list of error
+          messages which scroll off the screen.  `redir' can also
+          append redirected handled (a-la `>>') and redirect `stderr'
+          to the same place as `stdout' or vice versa, like what `>&'
+          does in Unix shells.
+
+          In addition, `redir' reports the exit status of the program it
+          runs, and print the elapsed time used by the child.  These
+          features are provided because, unlike on Unix, there are no
+          standard utilities to do that.
+
+        - symify
+
+          DJGPP debugging support doesn't include Unix-style core files
+          which allow post-mortem debugging of a crashed program.  To
+          compensate for this deficiency, when a program crashes, a
+          special library module prints the values stored in the CPU
+          registers and the traceback of the function calls that led to
+          the crash, as stored in the call frames pushed onto the stack.
+
+          However, the stack traceback, as printed, is hard to
+          interpret, because it only includes numeric addresses of the
+          functions.  The `symify' program solves this problem.  It
+          reads the traceback directly from the video memory, and uses
+          the debug info recorded in the program's executable file to
+          convert the addresses into file names and line numbers of the
+          source files.  It then adds the file names and line numbers
+          information near the corresponding addresses, thus making the
+          traceback easy to comprehend.
+
+   * DJGPP-specific extensions to GNU utilities.
+
+     Besides the library functions and DJGPP-specific programs, a lot of
+     special code went into the utilities ported to DJGPP, so that these
+     utilities could work together smoothly and have the effect a user
+     would expect.  Some of these extensions are listed below:
+
+        - Bash supports Unix-style `PATH' format.  Unix uses `:' to
+          separate directory names in the value of environment
+          variables such as `PATH'.  Many shell scripts rely on this
+          feature to look for programs along the `PATH'.  For example,
+          the GNU-standard `configure' scripts do that to find `gcc',
+          `ranlib' and other programs, as part of the auto-configuration
+          process.
+
+          However, DOS and Windows use `;' to separate directories in
+          `PATH' (because absolute file names include a drive letter,
+          like in `d:/foo/bar').  This breaks shell scripts which
+          search along the `PATH'.
+
+          To allow these scripts to run without changes, the DJGPP port
+          of Bash introduces a special variable `PATH_SEPARATOR'.  If
+          this variable is set to `:', Bash converts the value of
+          `PATH' to pseudo-Unix form.  For example, if the original
+          value of `PATH' is like this:
+
+                PATH=c:\djgpp\bin;d:\gnu\emacs\bin
+
+          then setting `PATH_SEPARATOR=:' converts it to this:
+
+                PATH=/dev/c/djgpp/bin:/dev/d/gnu/emacs/bin
+
+          This lets Unix shell scripts run unaltered.  However, to
+          prevent the external commands from breaking (because they
+          don't know anything about `PATH_SEPARATOR'), Bash converts
+          the value of `PATH' back to its usual DOS style in the
+          environment it passes to child programs.
+
+          The DJGPP library supports the special `/dev/x/' file names by
+          converting them to the usual DOS `x:/' format, before it
+          issues DOS calls, so all DJGPP-compiled utilities can be
+          safely run by a script when `PATH_SEPARATOR' is set to `:'.
+
+        - `test -x foo' looks for `foo.exe', `foo.com', `foo.bat', etc.
+          This is important e.g. in GNU `configure' scripts which look
+          for programs along the `PATH'.
+
+        - `install foo /bin/foo' actually installs `foo.exe' in the
+          target directory.  Similarly, `gcc -o foo' creates both `foo'
+          and `foo.exe'; the first causes `make' to be happy when Unix
+          `Makefile' is in use (since the target names are usually
+          extension-less on Unix), while the second can be run from the
+          DOS command prompt, since stock DOS shell refuses to run a
+          program without one of the executable extensions (`.exe',
+          `.com' or `.bat') it knows about.  Both of these features are
+          intended for using Unix `Makefile's without changes.
+
+        - Shell specifications such as `/bin/sh' cause the shell to be
+          looked for along the `PATH' as well, so that users won't need
+          to have a `/bin' directory.
+
+        - Programs which should pipe text to `lpr', write to the local
+          printer device instead, if `lpr' could not be located.  Emacs
+          and `dvips' are two examples of programs that offer this
+          feature.
+
+        - DOS file names handling: programs which unpack file archives
+          rename files whose names are invalid on DOS/Windows.  The
+          DJGPP ports of GNU `tar' and `cpio' programs, and the `djtar'
+          utility supplied with the DJGPP development kit are examples
+          of such programs.  They replace characters which aren't
+          allowed in file names, like `+' on MS-DOS or `"' on
+          MS-Windows, and rename files whose names are reserved on
+          DOS/Windows by character devices (and therefore writing to
+          them could have unexpected results).
+
+          Another potential problems in unpacking file archives is that
+          several different file names can map to the same name after
+          truncation to the DOS 8+3 limits or as result of the
+          automatic renaming I just described.  For this reason,
+          `djtar' refuses to overwrite existing files, and requires the
+          user to type in another name under which the file will be
+          extracted.  If the user presses <RET>, the file is skipped.
+
+          This interactive, one-by-one renaming might be tedious and
+          error-prone, when there's a lot of files to rename.  A case
+          in point is the test suite in the GNU Textutils distribution
+          with a lot of names like `n+4b2l10f-0FF', `njml17f-lmlmlo',
+          etc.  For these cases, `djtar' has a command-line option
+          which can be used to submit a file with a mapping between
+          original and DOS names; `djtar' will automatically rename
+          every file mentioned there and will leave all other file
+          names intact.  An example of putting this feature to use can
+          be seen in the latest versions of Textutils (look for the file
+          `djgpp/fnchange.lst' and the instructions to use it in
+          `djgpp/README').
+
+The features mentioned above are mostly small niceties.  But can you
+imagine the amount of hacking needed to get Unix Makefiles and shell
+scripts to work on DOS and Windows machines, if these tidbits didn't
+exist?
+
+---------- Footnotes ----------
+
+(1) Windows NT does not include this API, therefore DJGPP programs
+cannot access long file names on NT systems.  However, a beta version
+of a free LFN driver for NT is available.
+
+
+File: kb.info,  Node: DJGPP.ENV,  Prev: Features,  Up: Hidden Features
+
+DJGPP.ENV
+=========
+
+If you set the DJGPP environment variable to point to a file, that file
+will be used to load the environment.  There is a djgpp.env file
+distributed with djgpp that provides most of the values you need.  The
+format of the file is like this:
+
+     VAR=value
+     VAR=value
+     [program]
+     VAR=value
+     [prog2]
+     VAR=value
+
+Note that all whitespace is preserved, so be careful about trailing
+spaces and spaces around the `='.  Variables in the first section
+(before any [program] lines) apply to all programs.  Variables in
+program-specific sections are loaded only when running that program.
+For example, a [gcc] section would have variables that gcc.exe needs.
+Values may refer to other variables using the DOS convention, like
+%DJGPP%.  In addition, the first characters after the `%' can be used
+to process the value before using it.  These syntaxes are allowed:
+
+     %variable%     Take the value as is
+     %:variable%    Take the directory portion only
+     %;variable%    Append with a semicolon if variable is defined
+     %/variable%    Replace all `\' with `/'
+     %\variable%    Replace all `/' with `\'
+     %<variable%    Convert to upper case
+     %>variable%    Convert to lower case
+
+You may list multiple characters after the %, but they must be before
+the variable name, like %:/>DJGPP%.  Variable names are case sensitive.
+The DOS environment variable names are usually upper case.  Variables
+set through this file override any set in the DOS environment, unless
+the first character of the variable name is `+', in which case the DOS
+environment overrides the file (the `+' is removed from the name), as
+in `+USER=dosuser'.
+
+If you need a literal `%', write two percent signs in a row, like so:
+
+     LESSBINFMT=*k<%%X>
+
+This will produce a value of `*k<%X>' for the variable `LESSBINFMT'.
+
+
+File: kb.info,  Node: Index,  Up: Top
+
+Index
+*****
+
+* Menu:
+
+* 387, and the value of _8087:           Changes in 2.03.
+* 387, set to Y:                         Changes in 2.02.
+* 8-bit characters, and string-related functions: Changes in 2.03.
+* ^Z character, at end of a response file: Changes in 2.03.
+* _8087:                                 Changes in 2.03.
+* __crt0_load_environment_file:          Changes in 2.03.
+* __djgpp_clock_tick_interval, introduced: Changes in 2.03.
+* __djgpp_exception_toggle:              Changes in 2.02.
+* __djgpp_set_ctrl_c, non-destructive query: Changes in 2.03.
+* __dpmi_int, and signals on Windows:    Changes in 2.02.
+* __dpmi_simulate_real_mode_procedure_iret(): Changes in 2.02.
+* __dpmi_simulate_real_mode_procedure_retf_stack: Changes in 2.03.
+* __dpmi_simulate_real_mode_procedure_retf_stack, stack corruption: Changes in 2.03.
+* __dpmi_yield:                          Changes in 2.02.
+* __FSEXT_alloc_fd:                      Changes in 2.02.
+* _check_v2_prog, leaks file descriptor: Changes in 2.03.
+* _close:                                Changes in 2.02.
+* _creat:                                Changes in 2.02.
+* _creat, and Windows 2000/XP:           Changes in 2.03.
+* _creatnew:                             Changes in 2.02.
+* _creatnew, and Windows 2000/XP:        Changes in 2.03.
+* _crt0_startup_flags, the _CRT0_FLAG_KEEP_QUOTES flag: Changes in 2.02.
+* _doprnt:                               Changes in 2.02.
+* _dos_ds:                               Changes in 2.01.
+* _dos_findfirst:                        Changes in 2.02.
+* _doserrno:                             Changes in 2.02.
+* _fargetsel:                            Changes in 2.01.
+* _filbuf:                               Changes in 2.03.
+* _fixpath:                              Changes in 2.02.
+* _fixpath, and long named directories:  Changes in 2.03.
+* _flsbuf:                               Changes in 2.03.
+* _flush_disk_cache:                     Changes in 2.02.
+* _get_volume_info, and invalid drives:  Changes in 2.03.
+* _go32_dpmi_allocate_real_mode_callback_iret: Changes in 2.03.
+* _go32_dpmi_free_real_mode_callback:    Changes in 2.01.
+* _go32_dpmi_lock_code:                  Changes in 2.02.
+* _go32_dpmi_lock_data:                  Changes in 2.02.
+* _is_exec:                              Changes in 2.01.
+* _lfn_gen_short_name:                   Changes in 2.02.
+* _open:                                 Changes in 2.02.
+* _open, and Windows 2000/XP:            Changes in 2.03.
+* _osmajor:                              Changes in 2.02.
+* _osminor:                              Changes in 2.02.
+* _put_path:                             Changes in 2.03.
+* _put_path2:                            Changes in 2.03.
+* _read:                                 Changes in 2.02.
+* _rename:                               Changes in 2.03.
+* _rename, and Windows 2000:             Changes in 2.03.
+* _rename, change letter-case of a file name: Changes in 2.03.
+* _rename, on Windows ME:                Changes in 2.03.
+* _set_break_DPMI, and Windows 2000/XP breakpoints: Changes in 2.03.
+* _sys_siglist:                          Changes in 2.02.
+* _truename:                             Changes in 2.02.
+* _use_lfn:                              Changes in 2.02.
+* _use_lfn, and invalid drives:          Changes in 2.03.
+* _USE_LFN, and invalid drives:          Changes in 2.03.
+* _v2_prog_type:                         Changes in 2.02.
+* _write:                                Changes in 2.02.
+* access <1>:                            Changes in 2.01.
+* access:                                Changes in 2.02.
+* access, loss of FileFind handle:       Changes in 2.03.
+* acos:                                  Changes in 2.03.
+* acos, accuracy of emulation:           Changes in 2.03.
+* acosh, Inf orNaN operands in emulator: Changes in 2.03.
+* address wrap crashes on Windows NT, 2000, XP: Changes in 2.03.
+* alarm:                                 Changes in 2.03.
+* asin, accuracy of emulation:           Changes in 2.03.
+* asinh, Inf orNaN operands in emulator: Changes in 2.03.
+* assert:                                Changes in 2.02.
+* atan, accuracy of emulation:           Changes in 2.03.
+* atan2, accuracy of emulation:          Changes in 2.03.
+* basename:                              Changes in 2.02.
+* bash:                                  Changes in 2.02.
+* Bash:                                  Changes in 2.03.
+* bdosptr:                               Changes in 2.01.
+* bin2h:                                 Changes in 2.03.
+* bioscom:                               Changes in 2.02.
+* cbrt:                                  Changes in 2.03.
+* ceil, for negative arguments, emulation: Changes in 2.03.
+* closedir, does not lose search handles: Changes in 2.02.
+* Command lines, longer than 126 characters: Features.
+* command-line arguments, globbing:      Changes in 2.03.
+* Condition codes and FP emulation:      Changes in 2.03.
+* conio.h:                               Changes in 2.02.
+* Converting text files:                 Features.
+* Core dumps:                            Features.
+* cos, emulation for large arguments:    Changes in 2.03.
+* cp, and Windows 2000/XP:               Changes in 2.03.
+* Crashes due to SIGFPE, on Windows 9X:  Changes in 2.03.
+* crt0.h, added new flag to control wrap: Changes in 2.03.
+* crt0.S, and long section names:        Changes in 2.03.
+* ctime <1>:                             Changes in 2.02.
+* ctime:                                 Changes in 2.03.
+* dbgcom.c:                              Changes in 2.02.
+* debug support, and file redirection:   Changes in 2.03.
+* debug support, and floating-point code: Changes in 2.03.
+* debug support, and signals:            Changes in 2.03.
+* debug support, documentation:          Changes in 2.03.
+* debuggers, and SIGQUIT:                Changes in 2.03.
+* debuggers, and the stack length:       Changes in 2.03.
+* debuggers, and the transfer buffer size: Changes in 2.03.
+* Debugging, post-mortem:                Features.
+* delay:                                 Changes in 2.02.
+* Device I/O, emulation:                 Features.
+* Device names, Unix:                    Features.
+* difftime:                              Changes in 2.02.
+* dir.h:                                 Changes in 2.01.
+* dirname:                               Changes in 2.02.
+* disable:                               Changes in 2.02.
+* djasm <1>:                             Changes in 2.02.
+* djasm:                                 Changes in 2.01.
+* djasm, Y2K fix:                        Changes in 2.03.
+* DJGPP utilities:                       Features.
+* djgpp.djl, and long section names:     Changes in 2.03.
+* DJGPP.ENV:                             DJGPP.ENV.
+* djgpp.env:                             Changes in 2.02.
+* djtar, and the tarchange.lst file:     Changes in 2.03.
+* djtar, file-name conversions:          Changes in 2.03.
+* doprnt:                                Changes in 2.03.
+* dos.h:                                 Changes in 2.01.
+* doscan:                                Changes in 2.01.
+* dosmemput:                             Changes in 2.01.
+* DPMI memory block allocation sizes dynamic: Changes in 2.03.
+* dtou:                                  Changes in 2.03.
+* dtou, on Windows 2000 and XP:          Changes in 2.03.
+* dup, duplicates FSEXT hooks:           Changes in 2.03.
+* dup2, duplicates FSEXT hooks:          Changes in 2.03.
+* dxeload:                               Changes in 2.01.
+* echo <1>:                              Changes in 2.02.
+* echo:                                  Changes in 2.01.
+* ecvt:                                  Changes in 2.02.
+* ecvtbuf:                               Changes in 2.02.
+* edebug <1>:                            Changes in 2.02.
+* edebug <2>:                            Changes in 2.01.
+* edebug:                                Changes in 2.02.
+* edebug32, and Windows 2000/XP hardware breakpoints: Changes in 2.03.
+* Emacs dumping, and library functions:  Features.
+* Emacs, warnings from GDB:              Changes in 2.03.
+* emu387:                                Changes in 2.02.
+* emu387.dxe:                            Changes in 2.03.
+* emu387.dxe, and FSQRT instruction:     Changes in 2.03.
+* emu387.dxe, comparison, addition and subtraction: Changes in 2.03.
+* emu387.dxe, on Windows:                Changes in 2.03.
+* enable:                                Changes in 2.02.
+* Environment Variables:                 DJGPP.ENV.
+* environment variables, in file names:  Changes in 2.03.
+* errno:                                 Changes in 2.02.
+* errno, set by math functions in libc.a: Changes in 2.03.
+* exit <1>:                              Changes in 2.02.
+* exit:                                  Changes in 2.01.
+* Exit status reporting:                 Features.
+* exp10:                                 Changes in 2.03.
+* exp2:                                  Changes in 2.03.
+* expm1:                                 Changes in 2.03.
+* fcntl:                                 Changes in 2.01.
+* FCOS instruction, emulation for large arguments: Changes in 2.03.
+* fcvt:                                  Changes in 2.02.
+* fcvtbuf:                               Changes in 2.02.
+* fflush:                                Changes in 2.02.
+* ffs:                                   Changes in 2.02.
+* FILE objects, allocation:              Changes in 2.03.
+* Filesystem extensions facility:        Features.
+* findfirst:                             Changes in 2.01.
+* flushing buffered output:              Changes in 2.03.
+* fmod, emulation for negative arguments: Changes in 2.03.
+* fnsplit:                               Changes in 2.02.
+* FP emulation, abnormal results:        Changes in 2.03.
+* FP emulation, and Cn condition codes:  Changes in 2.03.
+* FP emulation, and SIGFPE:              Changes in 2.03.
+* FP emulation, on Windows:              Changes in 2.03.
+* FP emulator, and FSQRT instruction:    Changes in 2.03.
+* FP emulator, comparison, addition and subtraction: Changes in 2.03.
+* FPATAN instruction, emulation, accuracy: Changes in 2.03.
+* FPREM/FPREM1 instruction, emulation for large arguments: Changes in 2.03.
+* fprintf <1>:                           Changes in 2.03.
+* fprintf:                               Changes in 2.02.
+* fprintf, and negative zero:            Changes in 2.03.
+* FPTAN instruction, emulation, argument out of range: Changes in 2.03.
+* fputc:                                 Changes in 2.03.
+* fputs:                                 Changes in 2.03.
+* fread:                                 Changes in 2.03.
+* free:                                  Changes in 2.02.
+* freopen, and reusage of same handle:   Changes in 2.03.
+* freopen, read/write access to files:   Changes in 2.03.
+* FRNDINT instruction, emulation for negative arguments: Changes in 2.03.
+* FSCALE instruction, emulation, handles overflow: Changes in 2.03.
+* fscanf:                                Changes in 2.03.
+* fscanf, and octal conversions:         Changes in 2.03.
+* fscanf, pointer conversions:           Changes in 2.03.
+* fsdb:                                  Changes in 2.01.
+* fsdb, and Windows 2000/XP hardware breakpoints: Changes in 2.03.
+* fsdb, Step Over bug:                   Changes in 2.03.
+* fsdb, support for SIGQUIT:             Changes in 2.03.
+* fsetpos, return value:                 Changes in 2.03.
+* FSIN instruction, emulation for large arguments: Changes in 2.03.
+* FSINCOS instruction, emulation for large arguments: Changes in 2.03.
+* FSQRT instruction, emulation for infinite arguments: Changes in 2.03.
+* FST/FSTP instructions, emulation of, over/underflow: Changes in 2.03.
+* FST/FSTP instructions, emulation of, rounding: Changes in 2.03.
+* fstat:                                 Changes in 2.02.
+* fstat, and Windows 2000/XP:            Changes in 2.03.
+* ftruncate, and file pointer position:  Changes in 2.03.
+* fwrite:                                Changes in 2.03.
+* FXCH instruction, emulation, abnormal operands: Changes in 2.03.
+* FYL2X instruction, emulation pops the stack: Changes in 2.03.
+* gcvt:                                  Changes in 2.02.
+* GDB, debugging Emacs:                  Changes in 2.03.
+* getc:                                  Changes in 2.03.
+* getch:                                 Changes in 2.03.
+* getche:                                Changes in 2.03.
+* getcwd, and Windows 2000/XP long named directories: Changes in 2.03.
+* gethostname:                           Changes in 2.02.
+* getitimer:                             Changes in 2.03.
+* getitimer, and system clock granularity: Changes in 2.03.
+* getkey:                                Changes in 2.02.
+* getmntent:                             Changes in 2.02.
+* getopt:                                Changes in 2.01.
+* getrusage:                             Changes in 2.01.
+* gettexinfo:                            Changes in 2.03.
+* getxkey:                               Changes in 2.02.
+* glob <1>:                              Changes in 2.01.
+* glob <2>:                              Changes in 2.02.
+* glob <3>:                              Changes in 2.01.
+* glob:                                  Changes in 2.02.
+* glob, and mixed-case letters in file names: Changes in 2.03.
+* Globbing:                              Features.
+* go32-v2 <1>:                           Changes in 2.02.
+* go32-v2:                               Changes in 2.01.
+* gxx <1>:                               Changes in 2.02.
+* gxx:                                   Changes in 2.01.
+* gxx, and missing libgpp.a:             Changes in 2.03.
+* Header files, compatibility:           Features.
+* hidden features, documentation:        Changes in 2.03.
+* info/dir.txi:                          Changes in 2.02.
+* inp:                                   Changes in 2.01.
+* inpw:                                  Changes in 2.01.
+* insque:                                Changes in 2.02.
+* interval timers and uclock:            Changes in 2.03.
+* interval timers, small intervals:      Changes in 2.03.
+* ioctl:                                 Changes in 2.01.
+* ioctl, emulation:                      Features.
+* kill, signals to other programs:       Changes in 2.03.
+* lconv:                                 Changes in 2.02.
+* ldexp:                                 Changes in 2.01.
+* lfn:                                   Changes in 2.01.
+* LFN API:                               Features.
+* LFN support and invalid drives:        Changes in 2.03.
+* libc.tex:                              Changes in 2.02.
+* libemu.a, and FSQRT instruction:       Changes in 2.03.
+* libemu.a, comparison, addition and subtraction: Changes in 2.03.
+* libemu.a, missing npxsetup.o:          Changes in 2.03.
+* libemu.a, on Windows:                  Changes in 2.03.
+* libm.a:                                Changes in 2.01.
+* Library, compatibility:                Features.
+* libstdcxx.a, and gxx:                  Changes in 2.03.
+* link, and Windows 2000/XP:             Changes in 2.03.
+* linking programs on Windows 2000:      Changes in 2.03.
+* Links, emulation:                      Features.
+* localtime:                             Changes in 2.03.
+* lock:                                  Changes in 2.02.
+* Long command lines:                    Features.
+* Long file name support:                Features.
+* lowvideo:                              Changes in 2.03.
+* Make, crashes:                         Changes in 2.03.
+* make, no longer fails on large jobs due to selector leaks: Changes in 2.03.
+* make, support for Unix features:       Features.
+* malloc:                                Changes in 2.02.
+* math functions, improved versions:     Changes in 2.03.
+* mcount.c:                              Changes in 2.02.
+* memchr:                                Changes in 2.02.
+* memicmp:                               Changes in 2.02.
+* memicmp, included in the library:      Changes in 2.03.
+* merge:                                 Changes in 2.02.
+* mkdir, on Windows ME:                  Changes in 2.03.
+* mkstemp:                               Changes in 2.02.
+* mktime <1>:                            Changes in 2.02.
+* mktime:                                Changes in 2.03.
+* mntent:                                Changes in 2.01.
+* multibyte:                             Changes in 2.02.
+* nanf:                                  Changes in 2.02.
+* negative zero, printing:               Changes in 2.03.
+* nested DJGPP program on Windows 2000:  Changes in 2.03.
+* Numeric exceptions, masked:            Changes in 2.02.
+* open:                                  Changes in 2.01.
+* open, and Windows 2000/XP:             Changes in 2.03.
+* open, race conditions:                 Changes in 2.02.
+* open, when there are no more file handles: Changes in 2.03.
+* opendir:                               Changes in 2.02.
+* opendir, does not lose search handles: Changes in 2.02.
+* outp:                                  Changes in 2.01.
+* outportsb:                             Changes in 2.02.
+* outportsl:                             Changes in 2.02.
+* outportsw:                             Changes in 2.02.
+* outpw:                                 Changes in 2.01.
+* Overflow in emulation of arithmetic FP instructions: Changes in 2.03.
+* PATH separator, Unix-style:            Features.
+* pathconf:                              Changes in 2.02.
+* pc.h:                                  Changes in 2.01.
+* PC98, SIGINT and SIGQUIT:              Changes in 2.03.
+* pclose:                                Changes in 2.02.
+* popen <1>:                             Changes in 2.02.
+* popen <2>:                             Changes in 2.01.
+* popen:                                 Changes in 2.02.
+* Post-mortem debugging:                 Features.
+* powi:                                  Changes in 2.03.
+* printf <1>:                            Changes in 2.02.
+* printf <2>:                            Changes in 2.01.
+* printf <3>:                            Changes in 2.02.
+* printf:                                Changes in 2.03.
+* printf, and negative zero:             Changes in 2.03.
+* profiling <1>:                         Changes in 2.03.
+* profiling:                             Changes in 2.02.
+* psignal:                               Changes in 2.02.
+* putc:                                  Changes in 2.03.
+* putpath:                               Changes in 2.02.
+* qsort:                                 Changes in 2.02.
+* rand48:                                Changes in 2.03.
+* rawclock:                              Changes in 2.02.
+* readdir <1>:                           Changes in 2.02.
+* readdir:                               Changes in 2.01.
+* realloc, crashes when memory is exhausted: Changes in 2.03.
+* recode, on Windows 2000 and XP:        Changes in 2.03.
+* redir <1>:                             Changes in 2.02.
+* redir:                                 Changes in 2.03.
+* redir, and FP emulation:               Changes in 2.03.
+* Redirecting stderr:                    Features.
+* rename <1>:                            Changes in 2.03.
+* rename:                                Changes in 2.02.
+* rename, and Windows 2000:              Changes in 2.03.
+* rename, change letter-case of a file name: Changes in 2.03.
+* rename, errno value when the file is open: Changes in 2.03.
+* rename, on Windows ME:                 Changes in 2.03.
+* response file, ^Z at the end:          Changes in 2.03.
+* rewinddir, and . and .. entries:       Changes in 2.02.
+* rewinddir, does not lose search handles: Changes in 2.02.
+* s_ceil:                                Changes in 2.02.
+* s_floor:                               Changes in 2.02.
+* sbrk, changed allocation size algorithm: Changes in 2.03.
+* sbrk, fixed address wrap where illegal: Changes in 2.03.
+* scalbn:                                Changes in 2.01.
+* scanf <1>:                             Changes in 2.02.
+* scanf:                                 Changes in 2.03.
+* scanf, and octal conversions:          Changes in 2.03.
+* scanf, pointer conversions:            Changes in 2.03.
+* ScreenAttrib:                          Changes in 2.03.
+* ScreenGetChar:                         Changes in 2.01.
+* searchpath, and file names with slashes: Changes in 2.03.
+* seekdir, and . and .. entries:         Changes in 2.02.
+* select:                                Changes in 2.02.
+* setitimer <1>:                         Changes in 2.02.
+* setitimer:                             Changes in 2.03.
+* setitimer, and system clock granularity: Changes in 2.03.
+* setitimer, and zero it_interval.tv_usec: Changes in 2.03.
+* setitimer, when called with NULL argument: Changes in 2.03.
+* setmode, and termios:                  Changes in 2.03.
+* sf_ceil:                               Changes in 2.02.
+* sf_floor:                              Changes in 2.02.
+* sigaction:                             Changes in 2.01.
+* sigaddset:                             Changes in 2.02.
+* SIGALRM:                               Changes in 2.02.
+* sigdelset:                             Changes in 2.02.
+* sigemptyset:                           Changes in 2.02.
+* sigfillset:                            Changes in 2.02.
+* SIGFPE and FP emulation:               Changes in 2.03.
+* SIGFPE, on Windows 9X:                 Changes in 2.03.
+* SIGINT:                                Changes in 2.01.
+* SIGINT and SIGQUIT, PC98:              Changes in 2.03.
+* sigismember:                           Changes in 2.02.
+* sigpending:                            Changes in 2.02.
+* sigprocmask:                           Changes in 2.02.
+* SIGPROF:                               Changes in 2.02.
+* sin, emulation for large arguments:    Changes in 2.03.
+* sincos:                                Changes in 2.03.
+* sincos, emulation for large arguments: Changes in 2.03.
+* spawn*, invoking .com programs:        Changes in 2.03.
+* spawn*, no longer leak selectors on Windows and DOSEmu: Changes in 2.03.
+* split:                                 Changes in 2.02.
+* Splitting large files:                 Features.
+* sprintf <1>:                           Changes in 2.02.
+* sprintf:                               Changes in 2.03.
+* sprintf, and negative zero:            Changes in 2.03.
+* sqrt, emulation for infinite arguments: Changes in 2.03.
+* srand <1>:                             Changes in 2.02.
+* srand:                                 Changes in 2.03.
+* srand48:                               Changes in 2.03.
+* sscanf:                                Changes in 2.03.
+* sscanf, and octal conversions:         Changes in 2.03.
+* sscanf, pointer conversions:           Changes in 2.03.
+* stack dump, when aborted or crashed:   Changes in 2.02.
+* stackavail:                            Changes in 2.02.
+* startup code, and crashes on Windows:  Changes in 2.03.
+* stat <1>:                              Changes in 2.01.
+* stat <2>:                              Changes in 2.02.
+* stat <3>:                              Changes in 2.01.
+* stat:                                  Changes in 2.03.
+* statfs:                                Changes in 2.02.
+* stdaux:                                Changes in 2.01.
+* stdprn:                                Changes in 2.01.
+* strftime, and z format:                Changes in 2.03.
+* stub:                                  Changes in 2.02.
+* stub.asm:                              Changes in 2.02.
+* stubedit:                              Changes in 2.02.
+* stubify:                               Changes in 2.01.
+* stubify, and Windows 2000:             Changes in 2.03.
+* stubify, on Windows ME:                Changes in 2.03.
+* symify, and long file/function names:  Changes in 2.03.
+* symify, crashes for large programs:    Changes in 2.03.
+* symlink:                               Changes in 2.02.
+* symlink, source and target in different directories: Changes in 2.03.
+* Symlinks, emulation:                   Features.
+* syms_init, crashes for large programs: Changes in 2.03.
+* sync:                                  Changes in 2.02.
+* system <1>:                            Changes in 2.02.
+* system <2>:                            Changes in 2.01.
+* system <3>:                            Changes in 2.02.
+* system:                                Changes in 2.01.
+* system function, extended functionality: Features.
+* system, and Ctrl-Z in termios:         Changes in 2.03.
+* system, and pipe symbols:              Changes in 2.03.
+* system, and redirection:               Changes in 2.03.
+* system, no longer leaks selectors on Windows and DOSEmu: Changes in 2.03.
+* tan, emulation for large arguments:    Changes in 2.03.
+* tan, emulation, argument out of range: Changes in 2.03.
+* tcflush:                               Changes in 2.03.
+* tcgetpgrp, added:                      Changes in 2.03.
+* tcsetattr:                             Changes in 2.03.
+* tcsetpgrp, added:                      Changes in 2.03.
+* template instantiation, improved support: Changes in 2.03.
+* tempnam:                               Changes in 2.02.
+* termios:                               Changes in 2.03.
+* termios, and binary I/O:               Changes in 2.03.
+* termios, and buffered stdio:           Changes in 2.03.
+* termios, and TAB expansion:            Changes in 2.03.
+* termios, input and SIGINT and SIGQUIT: Changes in 2.03.
+* textbackground:                        Changes in 2.03.
+* textcolor:                             Changes in 2.03.
+* time stamp of directories, changing:   Changes in 2.03.
+* timer tick frequency, and setitimer function: Changes in 2.03.
+* Timing programs:                       Features.
+* tmpfile:                               Changes in 2.02.
+* tmpfile, race conditions:              Changes in 2.02.
+* tmpfile, when file handles are exhausted: Changes in 2.03.
+* tolower:                               Changes in 2.03.
+* touch, on Windows 2000 and XP:         Changes in 2.03.
+* toupper:                               Changes in 2.03.
+* TZ:                                    Changes in 2.03.
+* tzname:                                Changes in 2.02.
+* uclock:                                Changes in 2.03.
+* uclock, on Windows:                    Changes in 2.03.
+* Underflow in emulation of arithmetic FP instructions: Changes in 2.03.
+* Unix compatibility:                    Features.
+* Unix device names <1>:                 Features.
+* Unix device names:                     Changes in 2.02.
+* unlock:                                Changes in 2.02.
+* unnormal numbers, printing:            Changes in 2.03.
+* Unpacking compressed archives:         Features.
+* Updating files:                        Features.
+* utilities, DJGPP-specific:             Features.
+* utime, on Windows 2000 and XP:         Changes in 2.03.
+* utod:                                  Changes in 2.03.
+* utod, on Windows 2000 and XP:          Changes in 2.03.
+* va_start:                              Changes in 2.01.
+* vfprintf:                              Changes in 2.03.
+* vfscanf:                               Changes in 2.03.
+* vfscanf, and octal conversions:        Changes in 2.03.
+* vfscanf, pointer conversions:          Changes in 2.03.
+* vprintf:                               Changes in 2.03.
+* vscanf:                                Changes in 2.03.
+* vscanf, and octal conversions:         Changes in 2.03.
+* vscanf, pointer conversions:           Changes in 2.03.
+* vsprintf:                              Changes in 2.03.
+* vsscanf:                               Changes in 2.03.
+* vsscanf, and octal conversions:        Changes in 2.03.
+* vsscanf, pointer conversions:          Changes in 2.03.
+* wchar_t type, and Windows programs:    Changes in 2.03.
+* wctype.h, pre-processor and compilation errors: Changes in 2.03.
+* Wildcards:                             Features.
+* wildcards:                             Changes in 2.01.
+* write <1>:                             Changes in 2.02.
+* write:                                 Changes in 2.01.
+
+
+
+Tag Table:
+Node: Top78
+Node: Introduction761
+Node: What Changed877
+Node: Changes in 2.011099
+Node: Changes in 2.023968
+Node: Changes in 2.0317478
+Node: Known Bugs45361
+Node: Known Anti-Bugs45475
+Node: Hidden Features45602
+Node: Features46171
+Ref: Features-Footnote-170664
+Node: DJGPP.ENV70844
+Node: Index72759
+
+End Tag Table

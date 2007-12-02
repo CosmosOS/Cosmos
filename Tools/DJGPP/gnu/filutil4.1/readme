@@ -1,0 +1,75 @@
+These are the GNU file management utilities.  Most of these programs
+have significant advantages over their Unix counterparts, such as
+greater speed, additional options, and fewer arbitrary limits.
+
+The programs that can be built with this package are: chgrp, chmod,
+chown, cp, dd, df, dir, dircolors, du, install, ln, ls, mkdir, mkfifo,
+mknod, mv, rm, rmdir, shred, sync, touch, and vdir.
+
+See the file NEWS for a list of major changes in the current release.
+
+See the file INSTALL for compilation and installation instructions.
+
+The fileutils are intended to be POSIX.2 compliant (with BSD and other
+extensions), like the rest of the GNU system.  They are almost there,
+but a few incompatibilities remain.
+
+The ls, dir, and vdir commands are all separate executables instead of
+one program that checks argv[0] because people often rename these
+programs to things like gls, gnuls, l, etc.  Renaming a program
+file shouldn't affect how it operates, so that people can get the
+behavior they want with whatever name they want.
+
+Special thanks to Paul Eggert, Brian Matthews, Bruce Evans, Karl Berry,
+Kaveh Ghazi, and François Pinard for help with debugging and porting
+these programs.  Many thanks to all of the people who have taken the
+time to submit problem reports and fixes.  All contributed changes are
+attributed in the ChangeLog file.
+
+And thanks to the following people who have provided accounts for
+portability testing on many different types of systems: Bob Proulx,
+Christian Robert, François Pinard, Greg McGary, Harlan Stenn,
+Joel N. Weber, Mark D. Roth, Matt Schalit, Nelson H. F. Beebe,
+Réjean Payette, Sam Tardieu.
+
+Note that each man page is now automatically generated from a template
+and from the corresponding --help usage message.  Patches to the template
+files (man/*.x) are welcome.  However, the authoritative documentation
+is in texinfo form in the doc directory.
+
+If you run the tests on a SunOS4.1.4 system, expect the ctime-part of
+the ls `time-1' test to fail.  I believe that is due to a bug in the
+way Sun implemented link(2) and chmod(2).
+
+There are pretty many tests, but nowhere near as many as we need.
+Additions and corrections are very welcome.
+
+If you see a problem that you've already reported, feel free to
+re-report it -- it won't bother me to get a reminder.  Besides, the
+more messages I get regarding a particular problem the sooner it'll
+be fixed -- usually.  If you sent a complete patch and I didn't apply
+it or get back to you, please let me know.
+
+WARNING:  If you modify files like configure.in, m4/*.m4, aclocal.m4,
+or any Makefile.am, then don't be surprised if what gets regenerated no
+longer works.  To make things work, you'll have to be using appropriate
+versions of automake and autoconf.
+
+As for what versions are `appropriate', I regret that I have been unable
+to use unmodified versions of autoconf and automake in generating
+build/configure-related files.  For automake, I used the development
+sources (from cvs) as of 2001-03-11.  For autoconf, I used autoconf-2.49e
+with the two patches described in recent fileutils ChangeLog entries.
+Note however, that in principle at least, the next release of each of
+those packages should work well.
+
+These programs all recognize the `--version' option.  When reporting
+bugs, please include in the subject line both the package name/version
+and the name of the program for which you found a problem.
+
+For general documentation on the coding and usage standards
+this distribution follows, see the GNU Coding Standards,
+http://www.gnu.org/prep/standards_toc.html.
+
+Mail suggestions and bug reports for these programs to
+bug-fileutils@gnu.org

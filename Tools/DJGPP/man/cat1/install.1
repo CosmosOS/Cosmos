@@ -1,0 +1,132 @@
+
+
+
+INSTALL(1)                     FSF                     INSTALL(1)
+
+
+NNAAMMEE
+       install - copy files and set attributes
+
+SSYYNNOOPPSSIISS
+       iinnssttaallll [_O_P_T_I_O_N]... _S_O_U_R_C_E _D_E_S_T           _(_1_s_t _f_o_r_m_a_t_)
+       iinnssttaallll [_O_P_T_I_O_N]... _S_O_U_R_C_E... _D_I_R_E_C_T_O_R_Y   _(_2_n_d _f_o_r_m_a_t_)
+       iinnssttaallll _-_d [_O_P_T_I_O_N]... _D_I_R_E_C_T_O_R_Y...       _(_3_r_d _f_o_r_m_a_t_)
+
+DDEESSCCRRIIPPTTIIOONN
+       In  the first two formats, copy SOURCE to DEST or multiple
+       SOURCE(s) to the existing DIRECTORY, while setting permis-
+       sion  modes  and owner/group.  In the third format, create
+       all components of the given DIRECTORY(ies).
+
+       ----bbaacckkuupp[=_C_O_N_T_R_O_L] make a backup of each existing destina-
+              tion file
+
+       --bb     like ----bbaacckkuupp but does not accept an argument
+
+       --cc     (ignored)
+
+       --dd, ----ddiirreeccttoorryy
+              treat  all arguments as directory names; create all
+              components of the specified directories
+
+       --DD     create all leading components of  DEST  except  the
+              last,  then copy SOURCE to DEST;  useful in the 1st
+              format
+
+       --gg, ----ggrroouupp=_G_R_O_U_P
+              set group ownership, instead  of  process'  current
+              group
+
+       --mm, ----mmooddee=_M_O_D_E
+              set permission mode (as in chmod), instead of rwxr-
+              xr-x
+
+       --oo, ----oowwnneerr=_O_W_N_E_R
+              set ownership (super-user only)
+
+       --pp, ----pprreesseerrvvee--ttiimmeessttaammppss
+              apply access/modification times of SOURCE files  to
+              corresponding destination files
+
+       --ss, ----ssttrriipp
+              strip symbol tables, only for 1st and 2nd formats
+
+       --SS, ----ssuuffffiixx=_S_U_F_F_I_X override the usual backup suffix
+
+       --vv, ----vveerrbboossee
+              print the name of each directory as it is created
+
+       ----hheellpp display this help and exit
+
+
+
+
+install (fileutils) 4.1     April 2002                          1
+
+
+
+
+
+INSTALL(1)                     FSF                     INSTALL(1)
+
+
+       ----vveerrssiioonn
+              output version information and exit
+
+       The backup suffix is `~', unless set with ----ssuuffffiixx or SIM-
+       PLE_BACKUP_SUFFIX.  The  version  control  method  may  be
+       selected  via  the  ----bbaacckkuupp  option  or  through the VER-
+       SION_CONTROL environment variable.  Here are the values:
+
+       none, off
+              never make backups (even if ----bbaacckkuupp is given)
+
+       numbered, t
+              make numbered backups
+
+       existing, nil
+              numbered if numbered backups exist,  simple  other-
+              wise
+
+       simple, never
+              always make simple backups
+
+AAUUTTHHOORR
+       Written by David MacKenzie.
+
+RREEPPOORRTTIINNGG BBUUGGSS
+       Report bugs to <bug-fileutils@gnu.org>.
+
+CCOOPPYYRRIIGGHHTT
+       Copyright (C) 2001 Free Software Foundation, Inc.
+       This  is  free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABILITY
+       or FITNESS FOR A PARTICULAR PURPOSE.
+
+SSEEEE AALLSSOO
+       The full documentation for iinnssttaallll is maintained as a Tex-
+       info manual.  If the iinnffoo and iinnssttaallll programs  are  prop-
+       erly installed at your site, the command
+
+              iinnffoo iinnssttaallll
+
+       should give you access to the complete manual.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+install (fileutils) 4.1     April 2002                          2
+
+

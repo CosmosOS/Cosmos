@@ -1,0 +1,132 @@
+
+
+
+CHOWN(1)                       FSF                       CHOWN(1)
+
+
+NNAAMMEE
+       chown - change file owner and group
+
+SSYYNNOOPPSSIISS
+       cchhoowwnn [_O_P_T_I_O_N]... _O_W_N_E_R[_:[_G_R_O_U_P]] _F_I_L_E...
+       cchhoowwnn [_O_P_T_I_O_N]... _:_G_R_O_U_P _F_I_L_E...
+       cchhoowwnn [_O_P_T_I_O_N]... _-_-_r_e_f_e_r_e_n_c_e_=_R_F_I_L_E _F_I_L_E...
+
+DDEESSCCRRIIPPTTIIOONN
+       This  manual  page  documents  the  GNU  version of cchhoowwnn.
+       cchhoowwnn changes the user  and/or  group  ownership  of  each
+       given  file,  according  to its first non-option argument,
+       which is interpreted as follows.  If only a user name  (or
+       numeric  user ID) is given, that user is made the owner of
+       each given file, and the files' group is not changed.   If
+       the  user  name  is followed by a colon or dot and a group
+       name (or numeric group ID), with no spaces  between  them,
+       the group ownership of the files is changed as well.  If a
+       colon or dot but no group name follows the user name, that
+       user  is  made the owner of the files and the group of the
+       files is changed to that user's login group.  If the colon
+       or  dot and group are given, but the user name is omitted,
+       only the group of the files  is  changed;  in  this  case,
+       cchhoowwnn performs the same function as cchhggrrpp.
+
+       Change the owner and/or group of each FILE to OWNER and/or
+       GROUP.
+
+       --cc, ----cchhaannggeess
+              like verbose but report only when a change is made
+
+       ----ddeerreeffeerreennccee
+              affect the referent of each symbolic  link,  rather
+              than the symbolic link itself
+
+       --hh, ----nnoo--ddeerreeffeerreennccee
+              affect  symbolic  links  instead  of any referenced
+              file (available only on systems that can change the
+              ownership of a symlink)
+
+       ----ffrroomm=_C_U_R_R_E_N_T___O_W_N_E_R:CURRENT_GROUP
+              change  the owner and/or group of each file only if
+              its current owner and/or group match  those  speci-
+              fied  here.  Either may be omitted, in which case a
+              match is not required for the omitted attribute.
+
+       --ff, ----ssiilleenntt, ----qquuiieett
+              suppress most error messages
+
+       ----rreeffeerreennccee=_R_F_I_L_E
+              use RFILE's owner and group rather than the  speci-
+              fied OWNER:GROUP values
+
+
+
+
+
+chown (fileutils) 4.1       April 2002                          1
+
+
+
+
+
+CHOWN(1)                       FSF                       CHOWN(1)
+
+
+       --RR, ----rreeccuurrssiivvee
+              operate on files and directories recursively
+
+       --vv, ----vveerrbboossee
+              output a diagnostic for every file processed
+
+       ----hheellpp display this help and exit
+
+       ----vveerrssiioonn
+              output version information and exit
+
+       Owner  is  unchanged  if  missing.   Group is unchanged if
+       missing, but changed to login group if implied by  a  `:'.
+       OWNER and GROUP may be numeric as well as symbolic.
+
+AAUUTTHHOORR
+       Written by David MacKenzie.
+
+RREEPPOORRTTIINNGG BBUUGGSS
+       Report bugs to <bug-fileutils@gnu.org>.
+
+CCOOPPYYRRIIGGHHTT
+       Copyright (C) 2001 Free Software Foundation, Inc.
+       This  is  free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABILITY
+       or FITNESS FOR A PARTICULAR PURPOSE.
+
+SSEEEE AALLSSOO
+       The  full  documentation for cchhoowwnn is maintained as a Tex-
+       info manual.  If the iinnffoo and cchhoowwnn programs are  properly
+       installed at your site, the command
+
+              iinnffoo cchhoowwnn
+
+       should give you access to the complete manual.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+chown (fileutils) 4.1       April 2002                          2
+
+

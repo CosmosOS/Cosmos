@@ -1,0 +1,37 @@
+# DSM for djdev 2.03 binaries
+# Written by Richard Dawe <richdawe@bigfoot.com>
+
+dsm-file-version: 1.2
+dsm-version: 0.5.1
+dsm-name: djdev203
+
+dsm-author: Richard Dawe
+dsm-author-email: richdawe@bigfoot.com
+dsm-author-web-site: http://www.bigfoot.com/~richdawe/
+
+name: djdev
+version: 2.03 patchlevel 2
+type: binaries
+sources-dsm: djlsr203
+manifest: djdev203
+
+short-description: DJGPP Development Kit and Runtime (6/2002 refresh)
+author: DJ Delorie
+author-email: dj@delorie.com
+web-site: http://www.delorie.com/djgpp/
+newsgroup: comp.os.msdos.djgpp
+newsgroup-email-gateway: djgpp@delorie.com
+
+simtelnet-path: v2/
+zip: djdev203.zip
+
+#builtin-post-install-script: echo Welcome to the world of DJGPP!
+
+replaces: djdev < 2.03 patchlevel 2
+requires: DPMI
+
+# For reading docs
+depends-on: info-reader
+
+# Provides
+provides: djgpp-dev-env

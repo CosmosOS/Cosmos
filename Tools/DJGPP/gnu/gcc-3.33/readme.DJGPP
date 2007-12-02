@@ -1,0 +1,333 @@
+This is the port of gcc-3.3.3 for DJGPP.
+
+Please read this file up to end (maybe skipping sections You don't need,
+for example You don't need to read how to build gcc-3.3.3 from sources
+if You only intend to use binary archives). Also consult DJGPP documentation
+and FAQ where needed.
+
+
+Requirements to use this binary release:
+    DJGPP-2.03 patchlevel 2 or above. Please make sure that You have 
+	    latest update of djdev203.zip unless You're using a 
+	    newer version (of course when such will be released).
+    binutils-2.13 or above. It is perhaps possible to use 
+            also versions not older than 2.11 but it's not tested 
+	    and not recommended	
+
+Requirements to build gcc-3.3.3 from sources:
+    Long filename support. I built it in DOS session under Win98SE.
+        Win95 and (I hope) WinME should be Ok. I myself haven't tested
+	whether it can be build under Win2k or WinXP.
+    at least 128Mb of RAM for building under Win9X (Amount of available
+        DPMI memory for DOS session should be set to auto). 
+    at least DJGPP-2.03 required (Please make sure that You have latest update of
+        djdev203.zip unless You're using a newer version)
+    binutils-2.14 or above is recommended
+    other GNU utilities (see below)
+
+
+Source archives
+===============
+
+Archive gcc333s2.zip contains script which modifies original gcc-3.3.3
+and sources for DJGPP. You don't need it unless You want to recreate
+GCC source archive for DJGPP. If You are using this archive and original 
+sources of gcc-3.3.3.tar.gz, then You don't need gcc333s.zip.
+    
+The source archive gcc333s.zip contains all the sources to build
+all compilers (C, C++, Objective C, GNU Fortran) and also C++
+and Fortran libraries (libstdcxx.a, libgpp.a and libg2c.a). 
+libg++ is no more supported.
+
+Most users don't need source archives at all.
+
+Binary archives
+================
+
+Binary archives are split into 5 parts:
+
+  gcc333b.zip   : The gcc.exe driver program and the C compiler.
+                 It also contains the documentation.
+
+  gpp333b.zip   : The C++ compiler and libstdcxx.a together 
+                 with needed header files. Please note that one must
+		 recompile all C++ sources built with any earlier GCC version
+
+  objc333b.zip  : The Objective C compiler and libobjc.a and the needed
+                 header files.
+
+  g77333b.zip   : GNU Fortran compiler and libg2c.a and g2f.h. 
+
+  ada333b.zip   : Ada compiler (untested)
+
+
+The archive gcc333b.zip is required by all other binary packages
+
+Binary packages includes following documentation files:
+  
+  Archive gcc333b.zip:  
+	info/gcc.i* - the use and the internals of the GNU compiler
+	info/cpp.i* - documentation of the GNU C preprocessor.
+	info/cppinternals.i*  - internals of the GNU C Preprocessor.
+		(NEW: use install-info to add it to info/dir)
+  Archive gpp333b.zip:
+        gnu/gcc-3.3/libstdcxx/* - some documentation of libstdc++-v3
+		(HTML and text formats)
+  Archive g77333b.zip:
+	info/g77.i* - documentation of the GNU Fortran compiler
+
+
+Before you install gcc-3.3.3 binaries
+======================================
+
+You should remove previous installation of gcc or egcs completely
+(unless You really know what You are doing).
+
+Make sure You don't have following files from earlier versions
+(relative paths againt to DJGPP directory are given):
+	bin/cc1.exe		(from gcc272b.zip or gcc2721b.zip)
+	bin/cc1plus.exe		(from gpp272b.zip or gpp2721b.zip)
+	bin/f771.exe		(from g7705XXb.zip, XX are 2 digits)
+	lib/libgcc.a		(from gcc272b.zip or gcc2721b.zip)
+	lib/libobjc.a		
+	lib/specs		(from djdev201.zip or djdev202.zip) 
+	lib/libstdcxx.a		
+	lib/libgpp.a		
+
+Following packages are required for binaries:
+	binutils-2.13 or above. (Versions before 2.11 will not work)
+
+	DJGPP-2.03 (djdev203.zip - timestamp from August 2002 or newer) 
+             or above
+
+
+Installing binaries of gcc-3.3.3
+=================================
+
+Needed archives for different programing languages
+	C 			: gcc333b.zip
+
+	C++			: gcc333b.zip, gpp333b.zip
+
+	Fortran	                : gcc333b.zip, g77333b.zip
+
+	Objective C		: gcc333b.zip, objc333b.zip
+
+	Ada			: gcc333b.zip, ada333b.zip
+
+Of course for ALL languages You also need at least binutils (bnu2131b.zip
+or newer) and djdev203.zip (or newer when it will be released)
+
+Unzip all the zip files from that directory, preserving the
+directory structure.  For example:
+
+	pkunzip -d djdev203
+or
+	unzip386 djdev203
+
+
+NOTE:   For debugging GDB version 5.3 or above is recommended. It's possible 
+        to use also gdb-5.2.1. Earlier GDB versions does not support DWARF2
+	debugging info which is now the default. needed. Newer updates
+	of RHIDE from http://rhide.sourceforge.net/snapshots (and also
+        rhide-1.5) is built with GDB-5.2 or better, so could be used 
+	to debug applications built with GCC-3.3.3.
+
+NOTE:   DWARF2 debugging info is now the default. As result one will get 
+        DWARF2 debugging info when option -g will be specified. One still 
+	can get COFF debugging info by using option -gcoff instead of -g. 
+	Similary one can use -gstabs or -gstabs+ to get stabs debugging
+	info. Note that symify.exe from djdev20X.zip works with COFF debugging 
+	info only. One can use bfdsymify.exe (see gdb-5.3 binary archive)
+	with DWARF2 or stabs debugging info 
+
+NOTE:   Object files generated from C sources by gcc-3.3.3 will be compatible  
+	with ones from earlier version, except gcc-3.2.2 where I unfortunatelly
+	introduced a bug, which breaked compatibility. Note that binary archive 
+	of DJGPP v2.04 Alpha 1 is built using gcc-3.2.2, so it's needed to 
+	rebuild it from sources, if You are going to use this version
+        (not needed with DJGPP v2.03 pachlevel 2, older versions are not
+	supported). Object files generated from C++ sources should be 
+	compatible with ones from gcc-3.2, gcc-3.2.1, gcc-3.2.3. However I
+	would recommend to still use the same compilerm for all sources.
+
+1. Only long filenames
+----------------------
+
+Unzip the binaries with an unzip program, which can restore the long filenames
+stored in the zip archive.
+
+2. Only short filenames
+-----------------------
+
+Unzip the binaries with an unzip program which doesn't know about long
+filenames, or if your unzipper knows about them, please follow first
+the steps described in the DJGPP FAQ in the section 
+about setting the NameNumericTail to 0 __BEFORE__!!! unzipping the archives.
+
+3. Long and short filenames at the same time
+--------------------------------------------
+
+Use an unzip program which can restore the long filenames and follow
+the instructions under 2. when the unzipper knows about long filenames.
+
+
+Note for users of C++ IO classes fstream, ifstream, ofstream
+============================================================
+
+There is a regression against earlier versions of GCC (gcc-2.95.3 and
+earlier): Member functions tellp(), tellg(), seekp() and seekg()
+are broken when stream is opened not in binary mode. If You are going
+to use any similar functions You should open stream in binary mode.
+
+Don't ask me when it will be fixed as I don't know that. I'm also 
+not sure I'll spend much time trying to fix that.
+
+
+Rebuilding gcc-3.3.3 from the sources
+======================================
+
+Requirememts
+------------
+
+-  Long filename support is required. It means You should build gcc-3.3.3
+   under Win95 or Win98. I myself have not tested building under Win2k 
+   and WinXP
+
+-  Much of free disk space (500Mb or more, especially if
+   You are using FAT16). 
+
+-  128Mb RAM (or more) to build gcc-3.3.3 under Win9X. DPMI memory amount 
+   for DOS session should be set to "Auto" as genattrtab requires more 
+   than 64Mb to run.	
+
+-  Many GNU packges. Please check whether You really have them:
+	bsh204b.zip 	GNU BASH 2.0.4 or above. 
+	dif272b.zip
+	fil316b.zip or newer
+	find41b.zip
+	grep24b.zip
+	gwk306b.zip or newer
+	mak3791b.zip
+	sed302b.zip or newer
+	shl112b.zip
+	txt122b.zip or newer
+	txi42b.zip or above (You will not get info files with older versions)
+	tar112b.zip
+	bnu214b.zip     binutils-2.14 or above
+	working GNU C compiler (perhaps not earlier than gcc-2.8). 
+
+   If You modify some source files You may also need
+	acnf213b.zip (autoconf-2.5X and newer should not be used)
+	amak14b.zip or amak15b.zip (Newer versions do not work)
+	
+   You need autoconf and automake also if You are using gcc333s2.zip.
+   However it's normally not needed for most users who builds gcc-3.3 from
+   contents of gcc333s.zip.
+
+   Usually newer versions of these packages should also work unless
+   otherwise stated above
+
+-  INFO-ZIP binary (compiled with DJGPP v2!!!) is needed for using build.sh 
+   to create binary distrubution archives. There is no problems to compile 
+   it. See http://www.info-zip.org for additional informtion
+   about INFO-ZIP. You can find DJGPP compiled binary there. 
+
+-  Working DJGPP installation of course:
+	DJGPP-2.03 and above (I applied Win2k related patches for
+		DJGPP v2.03 from http://clio.rice.edu/djgpp/win2k/main.htm);
+   	binutils-2.11.2 or above, 
+	working gcc installation (perhaps gcc-2.95 or above)
+
+-  You should have sh.exe in DJGPP bin directory as symbolic link to  
+   bash.exe (type 'ln -s bash.exe sh.exe' in that directory)
+
+
+Extracting the sources
+----------------------
+
+At first you should unzip the archive gcc333s.zip. The sources are _NOT_
+the complete sources like the original gcc-3.3.3 distribution. I have
+removed many files to save disk space which are not needed for the DJGPP
+port. However I left configuration of other machines in to make archives
+usable to build cross-to-DJGPP compilers
+
+
+Compiling gcc
+-------------
+
+Directory gnu/gcc-3.33 contains all sources of gcc-3.3.3
+
+Sources are NOT configured. 
+	
+Change to directory gnu/build.gcc and configure sources
+by running script djconfig.sh. 
+
+	sh djconfig.sh
+
+When this is done You can build gcc-3.3.3 by running script djmake.sh
+Under Win9X You'll have to restart it some times when it will crash 
+due to Win9X DPMI descriptor leaks. You may use redir to get output in file.
+
+	sh djmake.sh bootstrap
+
+After that build Ada tools and libraries (if Ada support is being built):
+
+	sh djmake.sh -C gcc gnatlib_and_tools
+
+When this sucessfully ends run script djinsttmp.sh which installs
+all into directory gnu/install.gcc
+
+After that change to this directory and run script makepkg.sh
+to create binary distribution packages
+	
+
+Installing newly compiled gcc
+-----------------------------
+
+It's recommended to install binary packages which are generated 
+by makepkg.sh
+
+
+
+Available resources
+===================
+
+See following URL for additional information:
+gcc:		  http://gcc.gnu.org
+		  http://gcc.gnu.org/gcc-3.3/
+
+
+Reporting bugs
+==============
+
+If you found a bug in gcc-3.3.3 (gcc, g77, libstdc++, etc) please report it to 
+the GCC bug adresses and _NOT_ (or at least not only) in the DJGPP news group. 
+
+But if you think you found a bug in the DJGPP related things, then please 
+report it in comp.os.msdos.djgpp (the news group) or mail it to 
+djgpp@delorie.com, which is the gateway to the news group.
+
+Some possible situations:
+  - gcc says 'Internal compiler error' (or something similar)
+       more likely it is error of gcc if it is reproducible. It would 
+       be nice to test on some other system (e.g. Linux) and also with 
+       different version of compiler if possible and submit report to 
+       gcc bug address. 
+  - gcc crashes or freezes. 
+       In this situation it's hard to guess where is the problem. It may be
+       problem with gcc itself but it may be also DJGPP specific one.
+
+Please email me directly only in rare cases, if you think it is only of
+interest to me, since I'll see the reports in DJGPP mailing list.
+
+
+Thanks to
+=========
+
+To all who have contributed new features, test results, bugfixes to GCC
+(see http://gcc.gnu.org/thanks.html)
+
+Have fun with gcc
+
+Andris Pavenis <pavenis@latnet.lv>

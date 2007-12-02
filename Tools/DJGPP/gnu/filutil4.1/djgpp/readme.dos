@@ -1,0 +1,412 @@
+DJGPP Port of GNU Fileutile 4.1, release 7
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Introduction
+------------
+
+This is the Readme file for the DJGPP port of Fileutils 4.1. Please see the
+file 'NEWS' for a full list of user-visible changes. Please see
+'changelog.dos' for a list of bugs fixed in each release of the port.
+
+To use the Fileutils programs, you only need to download the binary
+distribution. You may also want to download the documentation distribution,
+to get the documentation in HTML, PostScript and DVI formats. If you want
+to examine or rebuild the Fileutils sources, you need to download
+the source distribution.
+
+The Fileutils port is available here:
+
+    ftp://ftp.delorie.com/pub/djgpp/current/v2gnu/fil41b.zip (binaries)
+    ftp://ftp.delorie.com/pub/djgpp/current/v2gnu/fil41d.zip (docs)
+    ftp://ftp.delorie.com/pub/djgpp/current/v2gnu/fil41s.zip (sources)
+
+Please read the sections below for the distributions you have downloaded,
+before installing Fileutils. Please also read the "Known Issues" section,
+which contains important information about the DJGPP port.
+
+Installing the Binary Distribution of Fileutils
+-----------------------------------------------
+
+Unzip the distribution preserving the directory structure (use -d
+switch if you do that with PKUNZIP) from the top DJGPP installation
+directory.  Since the entries for Fileutils manual already exist in
+the file info/dir, you don't need to do anything else.
+
+You should install a DPMI server such as CWSDPMI (v2misc/csdpmi5b.zip).
+Windows provides a DPMI server, so you do not need CWSDPMI, to use Fileutils
+under Windows.
+
+To use 'ginstall', you should also install the following packages
+(or later versions):
+
+. DJGPP development environment 2.03 (v2/djdev203.zip);
+. GNU binutils (e.g. v2gnu/bnu214b.zip).
+
+'ginstall' may use 'stubify' from DJGPP and 'strip' from binutils.
+
+Installing the Documentation Distribution of Fileutils
+------------------------------------------------------
+
+If you want the Fileutils documentation in a format other than info format,
+then you need the documentation distribution. This contains documentation in
+texinfo source, HTML, DVI (TeX) and PostScript. This documentation will be
+installed in gnudocs\filutil4.1.
+
+Rebuilding Fileutils using the Source Distribution
+--------------------------------------------------
+
+To build the DJGPP port of Fileutils from sources, I used the following
+packages:
+
+. DJGPP development environment 2.03 (v2/djdev203.zip);
+. DJGPP library sources 2.03 (v2/djlsr203.zip);
+. GNU C compiler 3.2.3 (v2gnu/gcc323b.zip);
+. GNU binutils 2.14 (v2gnu/bnu214b.zip);
+. GNU make 3.80 test release (?) - 3.79.x should be fine;
+. GNU bash 2.04 (v2gnu/bsh204b.zip);
+. GNU sed 3.02.80 (v2gnu/sed3028b.zip);
+. GNU fileutils 4.1, release 6 (v2gnu/fil41b.zip);
+. GNU sh-utils 2.0.11 (v2gnu/shl2011b.zip);
+. GNU textutils 2.0 (v2gnu/txt20b.zip);
+. GNU grep 2.4 (v2gnu/grep24b.zip);
+. GNU bison 1.35 (v2gnu/bsn135b.zip);
+. GNU texinfo 4.6 (v2gnu/txi46b.zip);
+. Perl 5.6.1, release 3 (v2gnu/perl561b.zip).
+
+I also used the following packages - you will not need these, unless you
+edit the configure script or Makefile.am files.
+
+. GNU autoconf 2.57 (v2gnu/acnf257b.zip);
+. GNU automake 1.7.6 (v2gnu/amake176b.zip).
+
+Fileutils 4.1 can probably be built using later versions of these packages,
+where available.
+
+If you using Fileutils 3.16, please make sure that you are using
+the latest version of the port - older versions were compiled against
+DJGPP 2.02. The latest version was compiled against DJGPP 2.03 and
+supports features needed for installation of Fileutils 4.1
+(see 'make install' below).
+
+Firstly, change into the top-level directory of the Fileutils sources
+(i.e. gnu\filutil4.1) and configure the package:
+
+    djgpp\config.bat
+
+This configures the package to be built without support for
+internationalisation (i.e. only English is supported). It also patches
+some of the test Makefiles, because some of the test files have been
+renamed from the normal Fileutils distribution to fit into
+the 8+3 DOS filename limitation (see djgpp\fnchange.lst).
+
+If you want to install Fileutils somewhere other than the DJGPP directory,
+modify djgpp\config.bat to use configure's '--prefix' option
+(use 'bash configure --help' for more information).
+
+Then build the package:
+
+    make
+
+If you are using DJGPP 2.03, you may want to build a patched version of
+'src\libc\posix\dirent\opendir.c' from libc. The patched version fixes
+a problem that can cause closedir() to fail on empty root directories.
+This problem causes strange error messages with 'ls' and other utilities.
+The script djgpp\patchexe.sh will rebuild the Fileutils appropriately.
+It must be run from the djgpp directory:
+
+   cd djgpp
+   bash patchexe.sh
+   cd ..
+
+Once the Fileutils are built, install the package:
+
+    bash -c 'make install'
+
+"make install" must be run from bash, so that the install script
+'install-sh' can be found.
+
+Fileutils does come with a test-suite, but this makes assumptions that are
+not valid on DOS, so many of the tests will fail. The correct operation
+of the programs has been checked as part of the port, so there's no need
+to worry about this. To run the test-suite, use:
+
+    make check
+
+You may want to use 'make -k check' to continue when tests fail.
+
+If you are interested in the test suite, please see the section entitled
+'Expected test suite results' below.
+
+Changes made to the Fileutils 4.1 Sources
+-----------------------------------------
+
+The file 'gnu\filutil4.1\djgpp\diffs' contains all the changes made
+to the sources, to support DJGPP.
+
+Here are the steps necessary to get from a Fileutils 4.1 tarball
+(fileutils-4.1.tar.gz) to a patched copy of the sources for DJGPP:
+
+1. Extract the sources using the 'fnchange.lst' file: You will need
+   the 'fnchange.lst' from the source distribution of Fileutils 4.1
+   for DJGPP. Extract the Fileutils tarball using djtar:
+
+    djtar -n /path/to/fnchange.lst -x /path/to/fileutils-4.1.tar.gz
+
+2. Apply the DJGPP patch: You will need the file 'diffs' from
+   the source distribution. Change into the Fileutils 4.1
+   source directory and apply the patch:
+
+    patch -Z -p7 -i /path/to/diffs
+
+3. Copy the 'djgpp' directory from the source distribution
+   into the Fileutils source directory. You can now build as directed
+   in the section 'Rebuilding Fileutils using the Source Distribution'
+   above.
+
+You will not need autoconf and automake to be installed, to build from
+patched sources, since the 'diffs' file includes changes to
+the configure script, Makefiles, etc.
+
+NB: The source distribution of the DJGPP port comes with all patches applied
+and will build "out of the box" with and without Long Filenames.
+
+You should also rerun djgpp\config.bat, to regenerate all
+the Makefiles, etc., before rebuilding. The generated Makefiles
+can regenerate themselves, but the build will fail, because some magic
+things need to be done by djgpp\config.bat.
+
+Features
+--------
+
+(This section is based on the section of the same name from Fileutils 3.16's
+ readme file by Eli Zaretskii.)
+
+This port has the following DOS-specific features:
+
+- All the programs fully support long filenames. This is because DJGPP
+  uses the improved file handling APIs available to DOS programs under
+  Windows '95 and later. These APIs are also available under DOS, when
+  an LFN driver is installed (see the DJGPP FAQ for more information).
+  For instance, you get numbered backup file names as you'd see on Unix;
+  'touch' can change both access and modification times, etc.
+
+- Numbered backups work even on native DOS, although the numbered
+  suffix eats last characters of the filenames on FAT filesystems.
+
+- 'chgrp' and 'chown' are no-ops on MSDOS; however, they always return
+  a successful status and describe the change as if it were actually
+  happening. This allows Unix-born Makefiles to run unaltered.
+
+- 'chmod' also behaves as above if invoked to do anything except
+  making a file read-only (which is actually supported by MSDOS).
+  Since the execute and other bits only exist in the program's
+  imagination, they don't really change, although 'chmod' acts as
+  if they did.
+
+- 'ls' has a DOS-specific '-g' switch, which makes the long format print
+  DOS attribute bits (r,h,s,v,d,m) instead of the Unix-style mode bits.
+  When called with -a switch, 'ls' will display files with hidden
+  and system attributes. When called with the -a and -g switches,
+  'ls' will display volume labels too (if present).
+
+- 'ginstall' will stubify a COFF executable on the fly. When given
+  the -s option, 'ginstall' will strip the executable, either COFF
+  or .exe program (you will need 'strip' from binutils to be able
+  to strip .exe programs).
+
+- 'ln -s' supports DJGPP-style executable "symlinks": you can say
+  "ln -s grep fgrep" and get 'fgrep.exe' which, when run, will actually
+  call 'grep.exe'. 'ln' without -s just copies.
+
+- 'sync' attempts to cause the disk cache, if installed, to flush
+  its buffers.
+
+Known Issues
+------------
+
+Please also see 'changelog.dos' for a list of bugs fixed in each release
+of the port.
+
+- 'df' does not work correctly with disk partitions greater than 2GB.
+  The other fileutils do not support files greater than 2GB. Windows's
+  FAT32 filesystem supports partitions and files larger than 2GB.
+  DJGPP 2.04, which is currently in development, has support for FAT32.
+  Fileutils 4.1 should be recompiled with DJGPP 2.04, when it is released.
+
+- 'ls c:/djgpp/../..' displays the root directory. This may seem confusing
+  at first, but it is consistent with filesystems on Linux and Unix.
+
+- If you use 'ls --color' and the screen scrolls, a directory entry with
+  a long name may cause background leakage, so that the background fills
+  an entire line, rather than just the part with the filename.
+
+- If you use 'ls --color', you will not be able to scroll back to view
+  some of its output, if the screen scrolls. (Windows 2000 and later
+  support scrolling back in the command prompt.) This is because
+  the DJGPP port of 'ls' uses the conio routines to write directly
+  to the screen, in order to highlight using colour.
+
+- 'ginstall -s' will generate a warning on programs that use
+  a non-standard stub (e.g. PMODE/DJ, CWSDSTUB), because 'strip'
+  will not be able to find the COFF header. Because it cannot find
+  the COFF header, it cannot remove debugging information. 'ginstall' will
+  still install the program, as requested.
+
+  To avoid this problem, strip the program before applying the stub.
+
+  Here is an example of the warning, split over two lines for clarity:
+
+  ginstall: foo.exe: Executable may have a non-standard stub, e.g. PMODE/DJ,
+  CWSDSTUB
+
+- 'ln' behaves inconsistently, but with good reason. Hardlinks are simulated
+  by copying; symlinks to programs are simulated by creating a stub
+  to invoke the program.
+
+    Hardlink: 'ln a.exe b'    creates 'b'
+    Symlink:  'ln -s a.exe b' creates 'b.exe'
+
+  Note that 'ln -s' will fail, unless the source is a program.
+
+Expected test suite results
+---------------------------
+
+Key: + = pass, - = fail, * = skip
+
+Run the test suite like so:
+
+    redir -eo make -k \
+        FETISH_GROUPS='foo bar users' \
+        IGNORE_SETGID_CHECK=1 CANDIDATE_TMP_DIRS=a:/ \
+        VERBOSE=yes DEBUG=1 \
+        check > tests.log
+    egrep '(Entering.*/tests/|PASS:|SKIP:|FAIL:)' tests.log > tests.summ
+
+chgrp: (Used make FETISH_GROUPS='foo bar users' check.)
+       -basic (OK - fails because we can't change group permanently -
+               'chgrp' seems to work)
+       -recurse (OK, we don't support symlinks)
+       *deref (OK, we don't support symlinks)
+
+chmod: -equal-x (Thinks we have setgid directory? Ignore setgid test
+                 -> fails because we can't set directory permissions
+                 to all-execute.)
+       +c-option
+       +setgid
+
+cp: +backup-1 (This may fail with SFN, due to the maximum path length
+               being exceeded.)
+    -nderefl1 (OK, we don't support symlinks)
+    -nderefl2 (OK, we don't support symlinks)
+    -nderefl3 (OK, we don't support symlinks)
+    +backup-is-src
+    -same-file (OK, fails because we don't support hardlinks properly
+                or symlinks at all)
+    +cp-mv-backup (This may fail with SFN, due to the maximum path length
+                   being exceeded.)
+    -symlink-slash (OK, we don't support symlinks)
+    -slink-2-slink (OK, we don't support symlinks)
+    -fail-perm (meaningless on DOS, since we don't have user, group,
+                other bits)
+    *perm (meaningless on DOS, since we don't have user, group, other bits)
+    +dir-slash
+    -cp-HL (OK, we don't support symlinks)
+    *special-bits (meaningless on DOS, since we don't have set{uid,gid} bits)
+    -link (OK, hardlink part works & then we don't support symlinks)
+    +dir-rm-dest
+    +cp-parents
+    -deref-slink ('ln -s' does not support symlinks)
+    +dir-vs-file
+    +into-self
+
+dd: +misc
+    +not-rewound
+    +skip-seek
+    +skip-seek2
+
+du: +two-args
+
+dircolors: +simple
+
+install: +basic-1
+         +create-leading (This may fail with SFN, due to the maximum
+                          path length being exceeded.)
+
+ln: -sf-1 (no symlinks in 2.03)
+    -misc (no symlinks in 2.03)
+    +backup-1
+
+ls: +rt-1
+    -time-1 (some problem with atime, ctime & mtime) TODO: FIXME
+    -symlink-slash (no symlinks in 2.03)
+    +follow-slink (bogus, since 'ln -s foo foo' does not create
+                   a circular symlink)
+    -no-arg (no symlinks in 2.03)
+
+ls-2: -tests (quoting tests, which use a character that is invalid in
+      DOS filenames)
+
+mkdir: -special-1 (tries to set the 'store text of swap device' bit (t)
+                   on the directory, which DJGPP ignores)
+       +p-1
+       +p-2
+       +perm
+       +parents
+       +t-slash
+
+mv: +i-2 (hacked - accept MS-DOS permissions as well as expected)
+    +mv-special-1 (hacked - use ordinary file instead of FIFO)
+    +to-self
+    +to-self2
+    +to-self3
+    -to-self4 (no symlinks in 2.03)
+    +backup-is-src
+    +i-1
+    -hard-link-1 (our link function just copies files => inode numbers differ)
+    +force
+    +partition-perm
+    +to-symlink
+    +dir-file
+    +diag
+    -part-symlink (no symlinks in 2.03)
+    +part-rename
+    +trailing-slash
+
+rm: +r-1
+    +r-2
+    +r-3
+    +i-1
+    +ir-1
+    +f-1
+    +sunos-1
+    -deep-1 (path exceeds maximum length)
+    *hash (skipped because expensive, but path would exceed maximum length)
+    *isatty (no /dev/stdin)
+
+rmdir: +ignore
+
+shred: +remove
+       +exact
+
+touch: -dir-1 (can't use utime() on a directory)
+       -dangling-symlink (no symlinks in 2.03)
+       +empty-file
+       *fifo (no FIFOs in 2.03)
+       +no-rights
+       +obsolescent
+       +help-version
+
+Finally
+-------
+
+Thanks to Eli Zaretskii and Juan Manuel Guerrero, whose work on other
+ports helped a lot with this port. Thanks also to Jim Meyering
+and the djgpp-workers.
+
+If you encounter any problems with this port, please feel free to contact me
+by e-mail (address below). I also try to read the DJGPP newsgroup,
+comp.os.msdos.djgpp, on a regular basis.
+
+Thanks, bye,
+
+Richard Dawe <rich@phekda.freeserve.co.uk> 2003-08-30

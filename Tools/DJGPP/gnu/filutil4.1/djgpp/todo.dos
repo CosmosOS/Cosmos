@@ -1,0 +1,18 @@
+To-dos for the DJGPP Port of GNU Fileutils 4.1, release 7
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- ls: Fails to resolve links when the drive is not the same as the symlink.
+
+  touch a:/loc_reg
+  ln -s a:/loc_reg c:/tmp/part-symlink/rem_sl
+  cd a:/
+  ls -l c:/tmp/part-symlink/rem_sl <= shows link as broken!
+  cd c:/
+  ls -l c:/tmp/part-symlink/rem_sl
++++DONE under c:/djgpp.204
+
+- Get tests/ls/time-1 to work.
+
+- Don't mangle UNC filenames.
+
+Richard Dawe <rich@phekda.freeserve.co.uk> 2003-08-30

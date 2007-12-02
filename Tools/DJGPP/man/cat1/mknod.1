@@ -1,0 +1,66 @@
+
+
+
+MKNOD(1)                       FSF                       MKNOD(1)
+
+
+NNAAMMEE
+       mknod - make block or character special files
+
+SSYYNNOOPPSSIISS
+       mmkknnoodd [_O_P_T_I_O_N]... _N_A_M_E _T_Y_P_E [_M_A_J_O_R _M_I_N_O_R]
+
+DDEESSCCRRIIPPTTIIOONN
+       Create the special file NAME of the given TYPE.
+
+       --mm, ----mmooddee=_M_O_D_E
+              set permission mode (as in chmod), not a=rw - umask
+
+       ----hheellpp display this help and exit
+
+       ----vveerrssiioonn
+              output version information and exit
+
+       MAJOR MINOR are forbidden for TYPE p, mandatory otherwise.
+       TYPE may be:
+
+       b      create a block (buffered) special file
+
+       c, u   create a character (unbuffered) special file
+
+       p      create a FIFO
+
+AAUUTTHHOORR
+       Written by David MacKenzie.
+
+RREEPPOORRTTIINNGG BBUUGGSS
+       Report bugs to <bug-fileutils@gnu.org>.
+
+CCOOPPYYRRIIGGHHTT
+       Copyright (C) 2001 Free Software Foundation, Inc.
+       This  is  free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABILITY
+       or FITNESS FOR A PARTICULAR PURPOSE.
+
+SSEEEE AALLSSOO
+       The  full  documentation for mmkknnoodd is maintained as a Tex-
+       info manual.  If the iinnffoo and mmkknnoodd programs are  properly
+       installed at your site, the command
+
+              iinnffoo mmkknnoodd
+
+       should give you access to the complete manual.
+
+
+
+
+
+
+
+
+
+
+
+mknod (fileutils) 4.1       April 2002                          1
+
+

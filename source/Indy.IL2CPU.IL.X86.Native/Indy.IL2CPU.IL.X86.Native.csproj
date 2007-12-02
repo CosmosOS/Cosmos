@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.20706</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{8D84CDE5-77A3-4E1F-B022-753E9E077926}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -34,6 +34,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="i4o, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -69,10 +70,6 @@
     <Compile Include="NativeMethodHeaderOp.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Cosmos.Kernel.Boot.Glue\Cosmos.Kernel.Boot.Glue.csproj">
-      <Project>{28584689-B678-4863-B404-0AD46B2F2B63}</Project>
-      <Name>Cosmos.Kernel.Boot.Glue</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Indy.IL2CPU.Assembler.X86.Native\Indy.IL2CPU.Assembler.X86.Native.csproj">
       <Project>{6597AAC6-755D-47F9-ACF4-E13F65EC5418}</Project>
       <Name>Indy.IL2CPU.Assembler.X86.Native</Name>

@@ -1,0 +1,498 @@
+This is Info file ../../info/utils.info, produced by Makeinfo version
+1.68 from the input file utils.tex.
+
+This is the reference manual for DJGPP V2's miscellaneous utilities
+
+Copyright (c) 1995 DJ Delorie
+
+
+File: utils.info,  Node: Top,  Up: (dir)
+
+This is the reference manual for the miscellaneous utility programs that
+come with DJGPP.
+
+* Menu:
+
+
+* bin2h::       Convert binary data files to C include files.
+
+* djecho::      Echo long command lines to files.
+
+* djtar::       Extract or list files from (possibly compressed)
+		tar archives, with DOS filename conversion.
+
+* dtou::        Convert text files from dos to unix.
+* utod::        Convert text files from unix to dos.
+
+* gxx::         Build and link C++ programs
+
+* redir::       Manage I/O Redirection.
+
+* djsplit::     split large files into multiple files.
+* djmerge::     Merge multiple files into one file.
+
+* texi2ps::     Convert texinfo files to Postscript.
+
+* update::      conditionally copy one file to another.
+
+
+File: utils.info,  Node: bin2h,  Next: djecho,  Up: Top
+
+bin2h
+*****
+
+`bin2h' allows a developer to embed a binary file into a source file,
+by converting the binary data to an array of integer values.
+
+Usage: `bin2h' `datafile' SYMBOL `headerfile'
+
+The resulting header file has a format like this:
+
+     unsigned char symbol[] = {
+       ... data ...
+     };
+
+
+File: utils.info,  Node: djecho,  Next: djtar,  Prev: bin2h,  Up: Top
+
+djecho
+******
+
+This program simply echos whatever is given to it on the command line.
+
+Usage: `djecho' [`-n'] [`-o' FILE] stuff . . .
+
+`-n'
+     Do not emit the trailing newline after printing the text.
+
+`-o FILE'
+     Send output to a FILE.
+
+The purpose of this program is to be able to interact directly with
+`make''s ability to pass long command lines to programs.  If you use
+redirection, you aren't always able to handle long command lines
+(especially since echo is normally in `command.com').  With `djecho',
+you can, and you can use the `-o' option to redirect output to a file
+(and use the file later as a response file) without using dos's
+redirection.
+
+
+File: utils.info,  Node: djtar,  Next: dtou,  Prev: djecho,  Up: Top
+
+djtar
+*****
+
+Usage: `djtar' [`-n' `changeFile'] [`-o' `dir'] [`-t'|`-x'] [`-i']
+[`-v'] [`-p'] [`-.'|`-!.'] [`-d'|`-u'|`-b'] `tarfile'
+
+`djtar' is a program that is designed to ease the problems related to
+extracting Unix tar files on a DOS machine.  The long file names and
+illegal characters make regular tar programs useless.  What `djtar'
+does is make some obvious name conversions automatically and give you an
+opportunity to provide alternate names for more difficult cases, where
+several filenames map to the same name in the restricted 8+3 DOS
+filename space.
+
+`djtar' can read compressed tar files and decompress them on the fly.
+(This can be also achieved by piping the output of `gzip' to `djtar',
+but for very large archives you can run out of free disk space, because
+DOS implements pipes as temporary disk files.)  `djtar' knows about all
+the compression methods supported by `gzip', namely, deflation (by
+`gzip'), LZW compression (by `compress'), LZH compression (as with
+`compress -H' available with some versions of `compress'), or Huffman
+compression (by `pack').
+
+`djtar' can also decompress files compressed with `zip' or `pkzip', but
+only if the `.zip' file contains only files compressed with either the
+`deflation' or `stored' (i.e., uncompressed, like with `pkzip -e0')
+methods.
+
+`djtar' can also read tar archives (compressed or otherwise) written on
+a Unix machine to a diskette as a raw device (i.e., without DOS
+filesystem).  To use `djtar' with such archives, specify a name of the
+drive (like `A:') as a tarfile argument.
+
+When extracting files from compressed archives, `djtar' will validate
+them with whatever reduntant checks are available with the compression
+format, and print diagnostic messages whenever these checks fail.  The
+checks and the diagnostics are generally identical to those performed
+by `gzip'.  Some of the diagnostics are only printed under the verbose
+operation switched on by the `-v' switch.  Unless you use the `-i'
+switch, `djtar' will refuse to create files and directories beyond the
+first tar directory entry which fails the checksum test; this usually
+means the file is either corrupted or not in a valid tar format.
+
+An additional bonus of using `djtar' is that it can convert Unix-style
+text files to DOS-style text files, and vice versa.  By default, it
+will write all files exactly as found in the archive, but the `-u' and
+`-d' options can change that.
+
+`djtar' performs a number of file name conversions in an attempt to
+make the files fit into MS-DOS's restricted file names.  Any file
+ending in `.info-N', where N is a number, becomes `.iN'.  Any file
+ending in `.tar.gz' becomes `.tgz'.  Any `++' string within a file name
+becomes `xx'.  Any leading dots are changed to underscores (but current
+and parent directories, `./' and `../' are left alone).  Any remaining
+multiple dots are changed to dashes, unless the part before the dot is
+shorter than 3 characters and there are more than 1 dot in the filename,
+in which case the dot also becomes an underscore.  As a result, e.g.,
+`.foo.a.b' becomes `_foo.a-b', and `sh.lex.c' becomes `sh_lex.c'.
+
+While `djtar' is running, if it cannot successfully perform an
+exclusive open of the given file (it will refuse to overwrite an
+existing file), it will prompt you for a new name.  You may type in
+either a complete path, a replacement file name (no directory part), or
+just hit return (the file is skipped).
+
+If `djtar' is called as `djtart', it behaves as if it were called with
+the `-t' switch; when called as `djtarx', it behaves like `djtar -x'.
+Thus you can create 2 links to `djtar.exe' which will save you some
+typing.
+
+By default, `djtar' just lists the contents of the archive(s) given as
+its arguments.  If you want to extract files, you must use the `-x'
+option.
+
+*Options:*
+
+`-x'
+     By default, `djtar' just lists the contents of the archive(s)
+     given as its arguments.  If you want to extract files, you must use
+     this option, or call `djtar' via a link named `djtarx'.
+
+`-t'
+     This option causes `djtar' to only print the contents of the tar
+     file, without actually creating any files.  All the decompression,
+     CRC checks etc. are still performed; thus, this option can also be
+     used to test archive integrity.  This is the default behavior of
+     `djtar', unless you call it via a link named `djtarx'.
+
+`-v'
+     This option modifies the output format slightly to aid in
+     debugging tar file problems.  It also causes `djtar' to emit more
+     verbose warning messages and print the compression method for
+     compressed archives.
+
+`-.'
+     Enable the automatic conversion of dots to underscores and dashes.
+     This is the default.
+
+`-!.'
+     Disable the conversion of dots.  You get the control of file
+     renaming when names of several files clash.
+
+`-n `changeFile''
+     This option allows you to specify a list of filename conversions
+     ahead of time.  Thus, you can use `djtart' or `djtar -t' to list
+     the files, figure out the new names with your favorite editor, and
+     supply that file to `djtar'.  This way, you have the fullest
+     possible control on how the extracted files will be named on your
+     system.
+
+     The format of the `changeFile' file is like this:
+
+          dir/dir/dir/old.name.here  dir/dir/dir/newname.hre
+          dir/dir/dir/old2.name.here  dir/dir/dir/newname2.hre
+
+     The directories must be complete, not relative.  The "old"
+     directories must match the complete path in the tar file, and the
+     "new" directories indicate where the file goes on the DOS disk.
+
+`-d'
+     Convert all text files to DOS text format on output.  This won't
+     usually affect binary files, but as `djtar' detects the file type
+     by looking at its first 512 bytes, a small possibility of a binary
+     file rendered useless by this conversion still exists, so you're
+     advised to only use this option with archives of text files.
+
+     By default, `djtar' writes all files exactly as it finds them.
+
+`-u'
+     Convert all text files to UNIX text format on output.  This won't
+     usually affect binary files, but as `djtar' detects the file type
+     by looking at its first 512 bytes, a small possibility of a binary
+     file rendered useless by this conversion still exists, so you're
+     advised to only use this option with archives of text files.
+
+     By default, `djtar' writes all files exactly as it finds them.
+
+`-b'
+     Write all files exactly as found in the archive, with no
+     conversions of text files.  This is the default.  Files written to
+     the console (when `-p' is in effect) are always written in text
+     mode, so this option doesn't have any effect when used with `-p',
+     unless the output of `djtar' is redirected to a file or a pipe.
+
+`-o STRING'
+     Only extract files whose full path names begin with STRING.  This
+     option can be used to extract portions of archive.  Files which
+     aren't extracted will still be shown, but with a string `[ skipped
+     ]' appended to their names.  When given the `-o' option, `djtar'
+     actually checks if STRING is the initial substring of each
+     filename, so you can specify incomplete file names, thus using
+     `-o' as a poor man's wildcard facility.
+
+`-i'
+     Attempt to unpack damaged archives.  By default, `djtar' will
+     refuse to create files whose directory entries in the tar archive
+     fail the checksum test, and any files beyond that point.  This
+     option tells `djtar' to ignore the checksum test and proceed
+     anyway.  Checksum failure usually means that the tar file is
+     either corrupted or not in valid tar format, so this option is
+     meant to be used either with the `-t' option, or in the rare cases
+     when you *know* for sure the tar file is valid (like if you had to
+     edit it to change the filenames).
+
+`-p'
+     When given this switch, `djtar' will write the files to its
+     standard output, which can be piped into another program (like a
+     pager) or redirected to a file.  This option is designed to allow
+     you to view or extract individual files (e.g., the `README' files)
+     without having to open the entire archive, and should be used with
+     an appropriate `-o filename' option.
+
+     When this option is used, diagnostic messages will be directed to
+     the standard error stream (as opposed to standard output in normal
+     operation), so that they won't get mixed with the files' data.
+
+
+File: utils.info,  Node: dtou,  Next: utod,  Prev: djtar,  Up: Top
+
+dtou
+****
+
+Each file specified on the command line is converted from dos's CR/LF
+text file mode to unix's NL text file mode.
+
+All djgpp wildcards are supported.  Timestamps of the files are
+preserved.
+
+
+File: utils.info,  Node: utod,  Next: gxx,  Prev: dtou,  Up: Top
+
+utod
+****
+
+Each file specified on the command line is converted from unix's NL text
+file mode to dos's CR/LF text file mode.
+
+All djgpp wildcards are supported.  Timestamps of the files are
+preserved.
+
+
+File: utils.info,  Node: gxx,  Next: redir,  Prev: utod,  Up: Top
+
+gxx
+***
+
+This program is exactly like `gcc' (in fact, it calls gcc), except that
+it provides the extra libraries required to link most C++ programs,
+including the iostreams, stdc, and libg++ libraries.
+
+
+File: utils.info,  Node: redir,  Next: djsplit,  Prev: gxx,  Up: Top
+
+redir
+*****
+
+DOS, in its many flavors and versions, lacks a decent I/O redirection
+mechanism.  Sure, it's got < and > and >>, but what about error
+messages?  Lots of people ask, "How do you send those error messages to
+a file?"  Well, you use a program like `redir'.
+
+`redir' is basically a program that manipulates the standard file
+descriptors by copying them, closing and opening them, etc.  Once it
+has the file descriptors where it wants them, it runs your program,
+which inherits the changed descriptors.  Thus, `redir' has nearly
+complete control over the input and output of your program.
+
+It also allows you to view the exit code of the program, and the
+elapsed time of the program, by supplying the appropriate options on
+the command line.
+
+Note that `redir' is built with command-line expansion and response
+files disabled, so as to allow the application to control that
+themselves.  This means that you can't use those features to provide
+`redir''s options or the command name, but if you use them for the
+command's options, the command will do the expansion if it wants to.
+
+The exit code of `redir' is 1 if it exits on its own accord, else it
+returns the same error code as the program it runs.
+
+Usage: `redir' [`-i' FILE] [`-o' FILE] [`-oa' FILE] [`-e' FILE] [`-ea'
+FILE] [`-eo'] [`-oe'] [`-x'] [`-t'] COMMAND [ARGS . . .]
+
+`-i FILE'
+     Redirect stdandard input from file
+
+`-o FILE'
+     Redirect standard output to file
+
+`-oa FILE'
+     Append standard output to file
+
+`-e FILE'
+     Redirect standard error to file
+
+`-ea FILE'
+     Append standard error to file
+
+`-eo'
+     Redirect standard error to standard output
+
+`-oe'
+     Redirect standard output to standard error
+
+`-x'
+     Print the exit code of the command after it exits.  If the exit
+     code is 0..255, it is printed as is.  If it is not, the low byte
+     (0..255) is printed in decimal and the whole value is also printed
+     in hex.
+
+`-t'
+     Print elapsed time, either in seconds (for short runs) or
+     hours:minutes:seconds.
+
+Options are processed in the order they are encountered.  Thus, "-o foo
+-eo" means "redirect output to foo, then redirect errors there also",
+whereas "-eo -o foo" means "send errors to where output was going, then
+move output to foo".
+
+Examples:
+
+To redirect errors to a file:
+
+     redir -e errors.lst command ...
+
+To redirect output to a file, and errors through a pipe:
+
+     redir -eo -o prog.out command ... | pipe
+
+
+File: utils.info,  Node: djsplit,  Next: djmerge,  Prev: redir,  Up: Top
+
+djsplit
+*******
+
+The `djsplit' and `djmerge' programs are designed to assist in
+transporting files across unreliable channels or small media (like
+floppies).  `djsplit' takes a big file and splits it into up to 1000
+smaller files.  `djmerge' puts them back together again.
+
+Usage: `djsplit' INPUTFILE CHUNKSIZE OUTPUTBASE
+
+Each output file is made from appending a sequence number to
+OUTPUTBASE.  For example:
+
+     djsplit foo.tgz 1300k footgz
+
+would result in `footgz.000', `footgz.001', etc.
+
+The `chunksize' parameter can be expressed as bytes (NNN),
+kilobytes(NNNk) or megabytes (NNNm).  The number NNN *must* be an
+integer; for example, `1.1m' will *not* work.
+
+
+File: utils.info,  Node: djmerge,  Next: texi2ps,  Prev: djsplit,  Up: Top
+
+djmerge
+*******
+
+The `djsplit' and `djmerge' programs are designed to assist in
+transporting files across unreliable channels or small media (like
+floppies).  `djsplit' takes a big file and splits it into up to 1000
+smaller files.  `djmerge' puts them back together again.
+
+Usage: `djmerge' INPUTBASE OUTPUTFILE
+
+Each input file is made from appending a sequence number to INPUTBASE.
+For example, given `footgz.000', `footgz.001', etc,
+
+     djmerge footgz foo.tgz
+
+would result in `foo.tgz' being created.
+
+
+File: utils.info,  Node: texi2ps,  Next: update,  Prev: djmerge,  Up: Top
+
+texi2ps
+*******
+
+`texi2ps' is a modified version of `makeinfo' that quickly turns
+texinfo files (such as info files are generated from) into crude
+Postscript files, ready for printing.  The program is designed to
+produce a crude page, so please don't complain if the printed copy looks
+ugly.  If you want clean pages, get and install TeX and print it with
+that.  It will produce a much cleaner print.  I'm also pretty sure that
+texi2ps won't support 100% of the texinfo documents out there.  Again,
+if you want it right use TeX.
+
+Note that the input files are texinfo files, not TeX or LaTeX or info
+files.  In normal djgpp distributions, the texinfo files are part of
+the source distributions, and the info files are in the binary
+distributions.
+
+The default settings produce a pretty densely packed page - small font,
+small margins.  You can set the margins and font even smaller to save on
+paper, or make them bigger for more conventional manuals.
+
+Usage: `texi2ps' [`-f' SIZE] [`-I' DIR] [`-I'DIR] [`-v'] [`-m' PTS] FILE
+
+`-f SIZE'
+     The font size, in points.  The default is 10 points.
+
+`-I PATH'
+     Specifies an additional path to search for include files.
+
+`-v'
+     Print verbose messages about files read, nodes encountered, and
+     pages generated.
+
+`-m PTS'
+     Set the margin size in points.  The default is 54 points, or 3/4
+     inches (72 points = 1 inch).
+
+Note that the Postscript file is sent to standard output, so you must
+redirect the output to a file or a printer.
+
+
+File: utils.info,  Node: update,  Prev: texi2ps,  Up: Top
+
+update
+******
+
+`update' is a fancy copy-if-needed program.  Basically, it compares the
+two files you give it, and if they differ, copies one to the other.
+This is useful in makefiles where a file is generated often, but its
+contents changes rarely, and other files depend on it.  For example,
+`bison' emits a header file each time it parses the grammar.  The
+header rarely changes, but the grammar changes often.  So, you use
+`update' to copy the header to its real name only when it changes, and
+everything else won't need to be recompiled each time.
+
+Usage: `update' NEW_FILE COPIED_TO
+
+Example:
+
+     foo.c foo.h : foo.y
+             bison foo.y
+             update y_tab.h foo.h
+             update y_tab.c foo.c
+
+
+
+Tag Table:
+Node: Top207
+Node: bin2h990
+Node: djecho1353
+Node: djtar2089
+Node: dtou10622
+Node: utod10894
+Node: gxx11164
+Node: redir11436
+Node: djsplit13948
+Node: djmerge14692
+Node: texi2ps15278
+Node: update16850
+
+End Tag Table

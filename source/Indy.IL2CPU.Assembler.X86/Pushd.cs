@@ -12,7 +12,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
 		}
 
 		public override string ToString() {
-			string xResult = "pushd";
+			string xResult = "push dword";
 			foreach (string A in Arguments) {
 				xResult += " " + A;
 			}

@@ -1,0 +1,95 @@
+This is configure.info, produced by makeinfo version 4.3 from
+./configure.texi.
+
+INFO-DIR-SECTION GNU admin
+START-INFO-DIR-ENTRY
+* configure: (configure).	The GNU configure and build system
+END-INFO-DIR-ENTRY
+
+   This file documents the GNU configure and build system.
+
+   Copyright (C) 1998 Cygnus Solutions.
+
+   Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+   Permission is granted to copy and distribute modified versions of
+this manual under the conditions for verbatim copying, provided that
+the entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+   Permission is granted to copy and distribute translations of this
+manual into another language, under the above conditions for modified
+versions, except that this permission notice may be stated in a
+translation approved by the Foundation.
+
+
+Indirect:
+configure.info-1: 971
+configure.info-2: 48782
+configure.info-3: 98073
+
+Tag Table:
+(Indirect)
+Node: Top971
+Node: Introduction1502
+Node: Goals2583
+Node: Tools3302
+Node: History4291
+Node: Building7284
+Node: Getting Started10374
+Node: Write configure.in10886
+Node: Write Makefile.am18132
+Node: Write acconfig.h21290
+Node: Generate files22827
+Node: Getting Started Example24788
+Node: Getting Started Example 125538
+Node: Getting Started Example 227475
+Node: Getting Started Example 330591
+Node: Generate Files in Example32961
+Node: Files34042
+Node: Developer Files34653
+Node: Developer Files Picture35028
+Node: Written Developer Files36320
+Node: Generated Developer Files38863
+Node: Build Files41998
+Node: Build Files Picture42654
+Node: Build Files Description43409
+Node: Support Files45406
+Node: Configuration Names48283
+Node: Configuration Name Definition48782
+Node: Using Configuration Names51100
+Node: Cross Compilation Tools53067
+Node: Cross Compilation Concepts53757
+Node: Host and Target54719
+Node: Using the Host Type56215
+Node: Specifying the Target57559
+Node: Using the Target Type58343
+Node: Cross Tools in the Cygnus Tree61769
+Node: Host and Target Libraries62821
+Node: Target Library Configure Scripts66561
+Node: Make Targets in Cygnus Tree69644
+Node: Target libiberty70983
+Node: Canadian Cross72361
+Node: Canadian Cross Example73201
+Node: Canadian Cross Concepts74315
+Node: Build Cross Host Tools75822
+Node: Build and Host Options76769
+Node: CCross not in Cygnus Tree78550
+Node: CCross in Cygnus Tree79523
+Node: Standard Cygnus CCross79939
+Node: Cross Cygnus CCross81294
+Node: Supporting Canadian Cross84085
+Node: CCross in Configure84695
+Node: CCross in Make87852
+Node: Cygnus Configure89446
+Node: Cygnus Configure Basics90280
+Node: Cygnus Configure in C++ Libraries94954
+Node: Multilibs95956
+Node: Multilibs in gcc97000
+Node: Multilibs in Target Libraries98073
+Node: FAQ102257
+Node: Index106353
+
+End Tag Table

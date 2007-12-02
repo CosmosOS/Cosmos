@@ -1,0 +1,121 @@
+*asm:
+--traditional-format 
+
+*asm_debug:
+%{gstabs*:--gstabs}%{!gstabs*:%{g*:--gdwarf2}}
+
+*asm_final:
+
+
+*asm_options:
+%a %Y %{c:%W{o*}%{!o*:-o %w%b%O}}%{!c:-o %d%w%u%O}
+
+*invoke_as:
+%{!S:-o %{|!pipe:%g.s} |
+ as %(asm_options) %{!pipe:%g.s} %A }
+
+*cpp:
+-remap %{posix:-D_POSIX_SOURCE}   %{!nostdinc:-imacros %sdjgpp.ver}
+
+*cpp_options:
+%(cpp_unique_options) %1 %{m*} %{std*} %{ansi} %{W*&pedantic*} %{w} %{f*} %{O*} %{undef}
+
+*cpp_debug_options:
+%{d*}
+
+*cpp_unique_options:
+%{C:%{!E:%eGNU C does not support -C without using -E}} %{CC:%{!E:%eGNU C does not support -CC without using -E}} %{!Q:-quiet} %{nostdinc*} %{C} %{CC} %{v} %{I*} %{P} %I %{MD:-MD %{!o:%b.d}%{o*:%.d%*}} %{MMD:-MMD %{!o:%b.d}%{o*:%.d%*}} %{M} %{MM} %{MF*} %{MG} %{MP} %{MQ*} %{MT*} %{!E:%{!M:%{!MM:%{MD|MMD:%{o*:-MQ %*}}}}} %{!no-gcc:-D__GNUC__=%v1 -D__GNUC_MINOR__=%v2 -D__GNUC_PATCHLEVEL__=%v3} %{!undef:%{!ansi:%{!std=*:%p}%{std=gnu*:%p}} %P} %{trigraphs} %{remap} %{g3:-dD} %{H} %C %{D*&U*&A*} %{i*} %Z %i %{E|M|MM:%W{o*}}
+
+*trad_capable_cpp:
+cc1 -E %{traditional|ftraditional|traditional-cpp:-traditional-cpp}
+
+*cc1:
+%(cc1_cpu) 
+
+*cc1_options:
+%{pg:%{fomit-frame-pointer:%e-pg and -fomit-frame-pointer are incompatible}} %1 %{!Q:-quiet} -dumpbase %B %{d*} %{m*} %{a*} -auxbase%{c|S:%{o*:-strip %*}%{!o*: %b}}%{!c:%{!S: %b}} %{g*} %{O*} %{W*&pedantic*} %{w} %{std*} %{ansi} %{v:-version} %{pg:-p} %{p} %{f*} %{undef} %{Qn:-fno-ident} %{--help:--help} %{--target-help:--target-help} %{!fsyntax-only:%{S:%W{o*}%{!o*:-o %b.s}}} %{fsyntax-only:-o %j} %{-param*}
+
+*cc1plus:
+
+
+*link_gcc_c_sequence:
+%G %L %G
+
+*endfile:
+
+
+*link:
+
+
+*lib:
+-lc
+
+*libgcc:
+-lgcc
+
+*startfile:
+%{pg:gcrt0.o%s}%{!pg:crt0.o%s}
+
+*switches_need_spaces:
+
+
+*predefines:
+
+
+*cross_compile:
+0
+
+*version:
+3.3.3
+
+*multilib:
+. ;
+
+*multilib_defaults:
+
+
+*multilib_extra:
+
+
+*multilib_matches:
+
+
+*multilib_exclusions:
+
+
+*multilib_options:
+
+
+*linker:
+collect2
+
+*link_libgcc:
+%D
+
+*md_exec_prefix:
+/dev/env/DJDIR/bin/
+
+*md_startfile_prefix:
+/dev/env/DJDIR/lib/
+
+*md_startfile_prefix_1:
+
+
+*startfile_prefix_spec:
+
+
+*cc1_cpu:
+%{!mcpu*: %{m386:-mcpu=i386 %n`-m386' is deprecated. Use `-march=i386' or `-mcpu=i386' instead.
+} %{m486:-mcpu=i486 %n`-m486' is deprecated. Use `-march=i486' or `-mcpu=i486' instead.
+} %{mpentium:-mcpu=pentium %n`-mpentium' is deprecated. Use `-march=pentium' or `-mcpu=pentium' instead.
+} %{mpentiumpro:-mcpu=pentiumpro %n`-mpentiumpro' is deprecated. Use `-march=pentiumpro' or `-mcpu=pentiumpro' instead.
+}} %{mpni:-msse3 %n`-mpni' is deprecated. Use `-msse3' instead.
+} %{mno-pni:-mno-sse3 %n`-mno-pni' is deprecated. Use `-mno-sse3' instead.
+} %{mintel-syntax:-masm=intel %n`-mintel-syntax' is deprecated. Use `-masm=intel' instead.
+} %{mno-intel-syntax:-masm=att %n`-mno-intel-syntax' is deprecated. Use `-masm=att' instead.
+}
+
+*link_command:
+%{!fsyntax-only:%{!c:%{!M:%{!MM:%{!E:%{!S:    %(linker) %l %X %{o*} %{A} %{d} %{e*} %{m} %{N} %{n} %{r} %{s} %{t}    %{u*} %{x} %{z} %{Z} %{!A:%{!nostdlib:%{!nostartfiles:%S}}}    %{static:} %{L*} %(link_libgcc) %o %{!nostdlib:%{!nodefaultlibs:%(link_gcc_c_sequence)}}    %{!A:%{!nostdlib:%{!nostartfiles:%E}}}    %{!T*:-Tdjgpp-x.djl} %{T*} }}}}}}
+%{!c:%{!M:%{!MM:%{!E:%{!S:stubify %{v} %{o*:%*} %{!o*:a.out} }}}}}
+

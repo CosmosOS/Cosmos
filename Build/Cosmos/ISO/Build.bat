@@ -2,7 +2,8 @@
 
 @REM ----------- Compile with IL2CPU
 del output.asm
-..\..\..\source\il2cpu\bin\debug\il2cpu -in:..\..\..\source\Cosmos\Cosmos.Shell.Console\bin\debug\Cosmos.Shell.Console.exe -plug:..\..\..\source\Cosmos\Cosmos.Kernel.Plugs\bin\debug\Cosmos.Kernel.Plugs.dll -out:Files\output.obj -platform:nativex86 -asm:output.asm
+..\..\..\source\il2cpu\bin\release\il2cpu -metal -in:..\..\..\source\Cosmos\Cosmos.Shell.Console\bin\release\Cosmos.Shell.Console.exe -plug:..\..\..\source\Cosmos\Cosmos.Kernel.Plugs\bin\release\Cosmos.Kernel.Plugs.dll -out:output.obj -platform:nativex86 -asm:output.asm
+copy /Y output.obj files\output.obj
 pause
 
 @REM ----------- Build ISO
@@ -11,7 +12,7 @@ attrib files\boot\grub\stage2_eltorito -r
 ..\..\..\Tools\mkisofs\mkisofs -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -boot-info-table -o Cosmos.iso files
 pause
 
-@REM ----------- Start QEMU
+REM ----------- Start QEMU
 del serial-debug.txt
 cd ..\..\..\tools\qemu\
 qemu.exe -L . -cdrom ..\..\build\Cosmos\ISO\Cosmos.iso -boot d -serial file:..\..\build\Cosmos\ISO\serial-debug.txt

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Cosmos.Kernel.Boot.Glue;
+//using Cosmos.Kernel.Boot.Glue;
 using Indy.IL2CPU.Assembler;
 using Indy.IL2CPU.IL.X86.Native.CustomImplementations.System;
 using Indy.IL2CPU.IL.X86.Native.CustomImplementations.System.Diagnostics;

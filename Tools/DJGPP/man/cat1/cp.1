@@ -1,0 +1,198 @@
+
+
+
+CP(1)                          FSF                          CP(1)
+
+
+NNAAMMEE
+       cp - copy files and directories
+
+SSYYNNOOPPSSIISS
+       ccpp [_O_P_T_I_O_N]... _S_O_U_R_C_E _D_E_S_T
+       ccpp [_O_P_T_I_O_N]... _S_O_U_R_C_E... _D_I_R_E_C_T_O_R_Y
+       ccpp [_O_P_T_I_O_N]... _-_-_t_a_r_g_e_t_-_d_i_r_e_c_t_o_r_y_=_D_I_R_E_C_T_O_R_Y _S_O_U_R_C_E...
+
+DDEESSCCRRIIPPTTIIOONN
+       Copy SOURCE to DEST, or multiple SOURCE(s) to DIRECTORY.
+
+       --aa, ----aarrcchhiivvee
+              same as --ddppRR
+
+       ----bbaacckkuupp[=_C_O_N_T_R_O_L]
+              make a backup of each existing destination file
+
+       --bb     like ----bbaacckkuupp but does not accept an argument
+
+       --dd, ----nnoo--ddeerreeffeerreennccee
+              never follow symbolic links
+
+       --ff, ----ffoorrccee
+              if  an  existing destination file cannot be opened,
+              remove it and try again
+
+       --ii, ----iinntteerraaccttiivvee
+              prompt before overwrite
+
+       --HH     follow command-line symbolic links
+
+       --ll, ----lliinnkk
+              link files instead of copying
+
+       --LL, ----ddeerreeffeerreennccee
+              always follow symbolic links
+
+       --pp, ----pprreesseerrvvee
+              preserve file attributes if possible
+
+       ----ppaarreennttss
+              append source path to DIRECTORY
+
+       --PP     same as `--parents' for  now;  soon  to  change  to
+              `--no-dereference' to conform to POSIX
+
+       --rr     copy recursively, non-directories as files WARNING:
+              use --RR instead when you might  copy  special  files
+              like FIFOs or /dev/zero
+
+       ----rreemmoovvee--ddeessttiinnaattiioonn
+              remove   each   existing  destination  file  before
+              attempting to open it (contrast with ----ffoorrccee)
+
+
+
+
+cp (fileutils) 4.1          April 2002                          1
+
+
+
+
+
+CP(1)                          FSF                          CP(1)
+
+
+       ----ssppaarrssee=_W_H_E_N
+              control creation of sparse files
+
+       --RR, ----rreeccuurrssiivvee
+              copy directories recursively
+
+       ----ssttrriipp--ttrraaiilliinngg--ssllaasshheess remove any trailing  slashes
+              from  each SOURCE
+              argument
+
+       --ss, ----ssyymmbboolliicc--lliinnkk
+              make symbolic links instead of copying
+
+       --SS, ----ssuuffffiixx=_S_U_F_F_I_X
+              override the usual backup suffix
+
+       ----ttaarrggeett--ddiirreeccttoorryy=_D_I_R_E_C_T_O_R_Y
+              move all SOURCE arguments into DIRECTORY
+
+       --uu, ----uuppddaattee
+              copy only when the SOURCE file is  newer  than  the
+              destination  file  or  when the destination file is
+              missing
+
+       --vv, ----vveerrbboossee
+              explain what is being done
+
+       --xx, ----oonnee--ffiillee--ssyysstteemm
+              stay on this file system
+
+       ----hheellpp display this help and exit
+
+       ----vveerrssiioonn
+              output version information and exit
+
+       By default, sparse SOURCE files are detected  by  a  crude
+       heuristic  and  the corresponding DEST file is made sparse
+       as well.  That is the behavior selected by  ----ssppaarrssee=_a_u_t_o.
+       Specify ----ssppaarrssee=_a_l_w_a_y_s to create a sparse DEST file when-
+       ever the SOURCE file contains a long  enough  sequence  of
+       zero  bytes.   Use  ----ssppaarrssee=_n_e_v_e_r  to inhibit creation of
+       sparse files.
+
+       The backup suffix is `~', unless set with ----ssuuffffiixx or SIM-
+       PLE_BACKUP_SUFFIX.   The  version  control  method  may be
+       selected via the  ----bbaacckkuupp  option  or  through  the  VER-
+       SION_CONTROL environment variable.  Here are the values:
+
+       none, off
+              never make backups (even if ----bbaacckkuupp is given)
+
+       numbered, t
+              make numbered backups
+
+
+
+
+cp (fileutils) 4.1          April 2002                          2
+
+
+
+
+
+CP(1)                          FSF                          CP(1)
+
+
+       existing, nil
+              numbered  if  numbered backups exist, simple other-
+              wise
+
+       simple, never
+              always make simple backups
+
+       As a special case, cp makes a backup of  SOURCE  when  the
+       force and backup options are given and SOURCE and DEST are
+       the same name for an existing, regular file.
+
+AAUUTTHHOORR
+       Written by Torbjorn Granlund,  David  MacKenzie,  and  Jim
+       Meyering.
+
+RREEPPOORRTTIINNGG BBUUGGSS
+       Report bugs to <bug-fileutils@gnu.org>.
+
+CCOOPPYYRRIIGGHHTT
+       Copyright (C) 2001 Free Software Foundation, Inc.
+       This  is  free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABILITY
+       or FITNESS FOR A PARTICULAR PURPOSE.
+
+SSEEEE AALLSSOO
+       The  full  documentation for ccpp is maintained as a Texinfo
+       manual.   If  the  iinnffoo  and  ccpp  programs  are   properly
+       installed at your site, the command
+
+              iinnffoo ccpp
+
+       should give you access to the complete manual.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+cp (fileutils) 4.1          April 2002                          3
+
+

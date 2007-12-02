@@ -1,0 +1,179 @@
+; Copyright (C) 1996,1997,1998,1999,2000 by Salvador E. Tropea (SET),
+; see copyrigh file for details
+;
+; The following macros are designed for the Autoindent+Unindent mode.
+; \n is new line.
+; \b is backspace.
+; @0 is the position where the cursor is positioned after the insertion
+; @1 is memorized in ^Q7 (or Alt7)
+; @2 is memorized in ^Q8 (or Alt8)
+; @3 is memorized in ^Q9 (or Alt9)
+; Don't put only @ at the end of the string :-).
+;
+;   The Mode keyword indicates the mode of the editor when the macro is
+; triggered, each mode can be 0 or 1:
+; Overwrite, Autoindent, Use Tabs, Persistent blocks, Inteligent C indent,
+; Column cursor, Row cursor, Show match pair, idem on the fly, idem inmediatly,
+; Transparent selection, Optimal fill, Wrap lines, Visible tabs, Don't move
+; inside tabs, Tab key indents, Use indent size, Don't purge spaces and
+; Backspace key unindents.
+; For example: Mode: 0,1,0,1,0
+; Indicates: No overwrite, autoindent, don't use real tabs, the blocks are
+; persistent and don't be smart when indenting.
+;   The Mode keyword can't be omitted.
+
+Trigger: "f("
+Mode: 0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1
+Name: For cycle
+ "for (@0; ; )\n"
+ "   {\n"
+    " @1\n"
+    "}"
+
+Trigger: "d("
+Mode: 0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1
+Name: Do {} while
+ "do\n"
+ "  {\n"
+   " @1\n"
+   "}\n"
+ "\bwhile (@0);"
+
+Trigger: "w("
+Mode: 0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1
+Name: While cycle
+ "while (@0)\n"
+ "  {\n"
+   " @1\n"
+   "}"
+
+Trigger: "i("
+Mode: 0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1
+Name: if plus else
+ "if (@0)\n"
+ "  {\n"
+   " @1\n"
+   "}\n"
+ "\belse\n"
+ "  {\n"
+   " @2\n"
+   "}"
+
+Trigger: "I("
+Mode: 0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1
+Name: if, no else
+ "if (@0)\n"
+ "  {\n"
+   " @1\n"
+   "}"
+
+Trigger: "s("
+Mode: 0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1
+Name: Switch
+ "switch (@0)\n"
+ "  {\n"
+   " case @1:\n"
+    "     break;\n"
+    "\bdefault:@2\n"
+   "\b}"
+
+Trigger: "c:"
+Mode: 0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1
+Name: Case
+ "case @0:\n"
+ "     break;"
+
+Trigger: "un"
+Mode: 0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1
+Name: Unsigned
+ "unsigned @0"
+
+Trigger: "ex"
+Mode: 0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1
+Name: Extern
+ "extern @0"
+
+Trigger: "pr"
+Mode: 0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1
+Name: Printf
+ "printf(\"@0\");"
+
+Trigger: "#i"
+Mode: 0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1
+Name: Include <>
+ "#include <@0.h>"
+
+Trigger: "#I"
+Mode: 0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1
+Name: Include ""
+ "#include \"@0.h\""
+
+Trigger: "#d"
+Mode: 0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1
+Name: Define
+ "#define @0"
+
+Trigger: "si"
+Mode: 0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1
+Name: Sizeof
+ "sizeof(@0)"
+
+Trigger: "re"
+Mode: 0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1
+Name: Return
+ "return @0;"
+
+Trigger: "/*"
+Mode: 0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1
+Name: Function comment
+"/*****************************************************************************\n"
+"\n"
+"    Function: @0\n"
+"\n"
+    "Description: @1\n"
+    "Parameters: @2\n"
+    "Return: @3\n"
+"\n"
+"\b*****************************************************************************/\n"
+"\n"
+
+Trigger: "ma"
+Mode: 0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1
+Name: Main
+"int main(int argc, char *argv[])\n"
+"{\n"
+" @0\n"
+" return 0;\n"
+"\b}"
+
+Trigger: "/t"
+Mode: 0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1
+Name: SDG Comment long
+"/**[txh]********************************************************************\n"
+"\n"
+" Function: @0\n"
+ "Class:\n"
+ "Include:\n"
+ "Module:\n"
+ "Prototype: @1\n"
+ "Description:\n"
+ "@2\n"
+ "Return: @3\n"
+ "Example:\n"
+"\n"
+"\b***************************************************************************/\n"
+
+Trigger: "/d"
+Mode: 0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1
+Name: SDG Comment short
+"/**[txh]********************************************************************\n"
+"\n"
+"  Description: @0\n"
+ "@1\n"
+ "Return: @2\n"
+ "Example: @3\n"
+"\n"
+"\b***************************************************************************/\n"
+
+
+

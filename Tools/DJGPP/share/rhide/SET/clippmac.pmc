@@ -1,0 +1,151 @@
+; Copyright (C) 1996,1997,1998,1999,2000 by Salvador E. Tropea (SET),
+; see copyrigh file for details
+;
+; The following macros are designed for the Autoindent+Unindent mode.
+; \n is new line.
+; \b is backspace.
+; @0 is the position where the cursor is positioned after the insertion
+; @1 is memorized in ^Q7 (or Alt7)
+; @2 is memorized in ^Q8 (or Alt8)
+; @3 is memorized in ^Q9 (or Alt9)
+; Don't put only @ at the end of the string :-).
+;
+;   The Mode keyword indicates the mode of the editor when the macro is
+; triggered, each mode can be 0 or 1:
+; Overwrite, Autoindent, Use Tabs, Persistent blocks, Inteligent C indent
+; For example: Mode: 0,1,0,1,0
+; Indicates: No overwrite, autoindent, don't use real tabs, the blocks are
+; persistent and don't be smart when indenting.
+;   The Mode keyword can't be omitted.
+
+Trigger: "f("
+Mode: 0,1,0,1,0
+Name: For/Next
+ "For @0:=@1 To @2\n"
+ "Next"
+
+Trigger: "d("
+Mode: 0,1,0,1,0
+Name: Do/While/EndDo
+ "Do While @0\n"
+ "EndDo"
+
+Trigger: "w("
+Mode: 0,1,0,1,0
+Name: Do/While/EndDo 2
+ "Do While @0\n"
+ "EndDo"
+
+Trigger: "i("
+Mode: 0,1,0,1,0
+Name: If/Else/EndIf
+ "If @0\n"
+ "Else\n"
+ "EndIf"
+
+Trigger: "I("
+Mode: 0,1,0,1,0
+Name: If/EndIf
+ "If @0\n"
+ "EndIf"
+
+Trigger: "s("
+Mode: 0,1,0,1,0
+Name: Do/Case/OtherWise/EndCase
+ "Do Case\n"
+ "   Case @0\n"
+    "OtherWise\n"
+"\bEndCase\n"
+
+Trigger: "c:"
+Mode: 0,1,0,1,0
+Name: Case
+ "Case @0"
+
+Trigger: "pr"
+Mode: 0,1,0,1,0
+Name: Print
+ "? @0"
+
+Trigger: "#i"
+Mode: 0,1,0,1,0
+Name: Include .ch
+ "#include \"@0.ch\""
+
+Trigger: "#I"
+Mode: 0,1,0,1,0
+Name: Include .h
+ "#include \"@0.h\""
+
+Trigger: "#d"
+Mode: 0,1,0,1,0
+Name: Define
+ "#define @0"
+
+Trigger: "re"
+Mode: 0,1,0,1,0
+Name: Return
+ "Return @0"
+
+Trigger: "/*"
+Mode: 0,1,0,1,0
+Name: Comment
+"/*****************************************************************************\n"
+"\n"
+"    Function: @0\n"
+"\n"
+    "Description:@1\n"
+    "Parameters:@2\n"
+    "Return:@3\n"
+"\n"
+"\b*****************************************************************************/\n"
+"\n"
+
+Trigger: "ma"
+Mode: 0,1,0,1,0
+Name: Main procedure
+"Procedure Main\n"
+"\n"
+"@0\n"
+"Return"
+
+Trigger: "/t"
+Mode: 0,1,0,1,0
+Name: SDG comment long
+"/**[txh]********************************************************************\n"
+"\n"
+" Function:@0\n"
+ "Class:\n"
+ "Include:\n"
+ "Module:\n"
+ "Prototype:@1\n"
+ "Description:\n"
+ "@2\n"
+ "Return:@3\n"
+ "Example:\n"
+"\n"
+"\b***************************************************************************/\n"
+
+Trigger: "/d"
+Mode: 0,1,0,1,0
+Name: SDG comment short
+"/**[txh]********************************************************************\n"
+"\n"
+"  Description: @0\n"
+ "@1\n"
+ "Return:@2\n"
+ "Example:@3\n"
+"\n"
+"\b***************************************************************************/\n"
+
+Trigger: "fu"
+Mode: 0,1,0,1,0
+  "Function @0()\n"
+  "Return@1"
+
+Trigger: "po"
+Mode: 0,1,0,1,0
+  "Procedure @0()\n"
+  "Return"
+
+

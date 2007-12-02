@@ -1,0 +1,38 @@
+OUTPUT_FORMAT("coff-go32")
+ENTRY(start)
+SECTIONS
+{
+  .text  0x1000+SIZEOF_HEADERS : {
+    *(.text)
+    *(.gnu.linkonce.t*)
+    *(.gnu.linkonce.r*)
+    etext  =  . ; _etext = .;
+    . = ALIGN(0x200);
+  }
+  .data  ALIGN(0x200) : {
+    djgpp_first_ctor = . ;
+    *(.ctor)
+    djgpp_last_ctor = . ;
+    djgpp_first_dtor = . ;
+    *(.dtor)
+    djgpp_last_dtor = . ;
+    *(.data)
+    *(.gnu.linkonce.d*)
+    *(.gcc_exc*)
+    ___EH_FRAME_BEGIN__ = . ;
+    *(.eh_fram*)
+    ___EH_FRAME_END__ = . ;
+    LONG(0)
+     edata  =  . ; _edata = .;
+     . = ALIGN(0x200);
+  }
+  .bss  SIZEOF(.data) + ADDR(.data) :
+  { 					
+    _object.2 = . ;
+    . += 24 ;
+    *(.bss)
+    *(COMMON)
+     end = . ; _end = .;
+     . = ALIGN(0x200);
+  }
+}

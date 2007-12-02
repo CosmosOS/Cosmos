@@ -1,0 +1,89 @@
+; Copyright (C) 1996-2001 by Salvador E. Tropea (SET),
+; see copyrigh file for details
+;
+;
+; Perl macros. As you can see some of these macros are for C users my idea is
+; to make the pseudo macros a tool to handle various languages just
+; remmembering the C shortcuts.
+;
+
+Trigger: "re"
+Mode: 0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0
+Name: Return
+ "return @0;"
+
+Trigger: "i("
+Mode: 0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0
+Name: if plus else
+ "if (@0)\n"
+ "  {\n"
+   " @1\n"
+   "}\n"
+ "\belse\n"
+ "  {\n"
+   " @2\n"
+   "}"
+
+Trigger: "I("
+Mode: 0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0
+Name: if, no else
+ "if (@0)\n"
+ "  {\n"
+   " @1\n"
+   "}"
+
+Trigger: "f("
+Mode: 0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0
+Name: For cycle
+ "for (@0; ; )\n"
+ "   {\n"
+    " @1\n"
+    "}"
+
+Trigger: "d("
+Mode: 0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0
+Name: Do {} while
+ "do\n"
+ "  {\n"
+   " @1\n"
+   "}\n"
+ "\bwhile (@0);"
+
+Trigger: "w("
+Mode: 0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0
+Name: While cycle
+ "while (@0)\n"
+ "  {\n"
+   " @1\n"
+   "}"
+
+Trigger: "pr"
+Mode: 0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0
+Name: Print
+ "print @0;"
+
+Trigger: "#i"
+Mode: 0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0
+Name: Require (include)
+ "require \"@0\";"
+
+Trigger: "#d"
+Mode: 0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0
+Name: Define
+ "#define @0"
+
+Trigger: "/d"
+Mode: 0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0
+Name: SDG comment short
+"###[txh]####################################################################\n"
+"#\n"
+"# Prototype:\n"
+"# Description: @0\n"
+"# @1\n"
+"# Return: @2\n"
+"# Example:\n"
+"#\n"
+"####################################################################[txi]###\n"
+
+
+

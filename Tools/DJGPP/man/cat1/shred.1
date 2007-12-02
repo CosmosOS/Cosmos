@@ -1,0 +1,132 @@
+
+
+
+SHRED(1)                       FSF                       SHRED(1)
+
+
+NNAAMMEE
+       shred  -  delete  a file securely, first overwriting it to
+       hide its contents
+
+SSYYNNOOPPSSIISS
+       sshhrreedd [_O_P_T_I_O_N_S] _F_I_L_E [...]
+
+DDEESSCCRRIIPPTTIIOONN
+       Overwrite the specified FILE(s) repeatedly,  in  order  to
+       make it harder for even very expensive hardware probing to
+       recover the data.
+
+       --ff, ----ffoorrccee
+              change permissions to allow writing if necessary
+
+       --nn, ----iitteerraattiioonnss=_N
+              Overwrite N times instead of the default (25)
+
+       --ss, ----ssiizzee=_N
+              shred this  many  bytes  (suffixes  like  k,  M,  G
+              accepted)
+
+       --uu, ----rreemmoovvee
+              truncate and remove file after overwriting
+
+       --vv, ----vveerrbboossee
+              show progress
+
+       --xx, ----eexxaacctt
+              do not round file sizes up to the next full block
+
+       --zz, ----zzeerroo
+              add a final overwrite with zeros to hide shredding
+
+       -      shred standard output
+
+       ----hheellpp display this help and exit
+
+       ----vveerrssiioonn
+              print version information and exit
+
+       Delete FILE(s) if ----rreemmoovvee (-u) is specified.  The default
+       is not to remove the files because it is common to operate
+       on  device  files  like  /dev/hda, and those files usually
+       should not be removed.  When operating on  regular  files,
+       most people use the ----rreemmoovvee option.
+
+       CAUTION:  Note  that  shred  relies  on  a  very important
+       assumption: that the filesystem overwrites data in  place.
+       This  is the traditional way to do things, but many modern
+       filesystem designs do not satisfy  this  assumption.   The
+       following  are  examples  of filesystems on which shred is
+       not effective:
+
+
+
+
+shred (fileutils) 4.1       April 2002                          1
+
+
+
+
+
+SHRED(1)                       FSF                       SHRED(1)
+
+
+       * log-structured or journaled filesystems, such  as  those
+       supplied with
+
+              AIX and Solaris (and JFS, ReiserFS, XFS, etc.)
+
+       *  filesystems that write redundant data and carry on even
+       if some writes
+
+              fail, such as RAID-based filesystems
+
+       * filesystems that make snapshots, such as Network  Appli-
+       ance's NFS server
+
+       *  filesystems  that cache in temporary locations, such as
+       NFS
+
+              version 3 clients
+
+       * compressed filesystems
+
+AAUUTTHHOORR
+       Written by Colin Plumb.
+
+RREEPPOORRTTIINNGG BBUUGGSS
+       Report bugs to <bug-fileutils@gnu.org>.
+
+CCOOPPYYRRIIGGHHTT
+       Copyright (C) 2001 Free Software Foundation, Inc.
+       This is free software; see the source for  copying  condi-
+       tions.  There is NO warranty; not even for MERCHANTABILITY
+       or FITNESS FOR A PARTICULAR PURPOSE.
+
+SSEEEE AALLSSOO
+       The full documentation for sshhrreedd is maintained as  a  Tex-
+       info  manual.  If the iinnffoo and sshhrreedd programs are properly
+       installed at your site, the command
+
+              iinnffoo sshhrreedd
+
+       should give you access to the complete manual.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+shred (fileutils) 4.1       April 2002                          2
+
+
