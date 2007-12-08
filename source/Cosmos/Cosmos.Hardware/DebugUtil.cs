@@ -90,6 +90,7 @@ namespace Cosmos.Hardware {
 		}
 
 		public static unsafe void LogInterruptOccurred(Interrupts.InterruptContext* aContext) {
+			uint aInterrupt = aContext->Interrupt;
 			StartLogging();
 			WriteSerialString("<InterruptOccurred Interrupt=\"");
 			WriteNumber(aContext->Interrupt, 32);

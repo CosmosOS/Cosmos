@@ -21,15 +21,16 @@ namespace Cosmos.Hardware {
 			public uint EAX;
 			public uint Interrupt;
 			public uint Param;
-			public uint UserESP;
+			public uint EIP;
 			public uint CS;
 			public uint EFlags;
+			public uint UserESP;
 			public uint SS;
-			public uint EIP;			
 		}
 
 		public unsafe static void HandleInterrupt_Default(InterruptContext* aContext) {
 			Console.Write("Interrupt ");
+			System.Diagnostics.Debugger.Break();
 			WriteNumber(aContext->Interrupt, 32);
 			Console.WriteLine("");
 			DebugUtil.LogInterruptOccurred(aContext);

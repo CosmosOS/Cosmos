@@ -26,11 +26,11 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
 			mOutputWriter.WriteLine("                ;- copy mb info - some stuff for you  ");
 			//mOutputWriter.WriteLine("								mov mb_info, ebx");
 			mOutputWriter.WriteLine("");
-			mOutputWriter.WriteLine("                mov esp,Kernel_Stack ");
+			mOutputWriter.WriteLine("                mov esp,Kernel_Stack ");			 
 			mOutputWriter.WriteLine("");
 			mOutputWriter.WriteLine("; some more startups todo");
 			mOutputWriter.WriteLine("				 cli");
-			mOutputWriter.WriteLine("				 push ebx");
+			//mOutputWriter.WriteLine("				 push ebx");
 			mOutputWriter.WriteLine("				 xchg bx, bx");
 			mOutputWriter.WriteLine("				 call " + EntryPointName);
 			mOutputWriter.WriteLine("			.loop:");

@@ -6,7 +6,7 @@ namespace Cosmos.Hardware.Screen {
 	public class Text {
 		public const int Columns = 80;
 		public const int Lines = 24;
-		public const int VideoAddr = 0xB8000;
+		public const uint VideoAddr = 0xB8000;
 
 		public static unsafe void Clear() {
 			for (int i = 0; i < Columns * Lines * 2; i++) {

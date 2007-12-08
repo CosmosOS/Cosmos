@@ -74,19 +74,27 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 			int[] xInterruptsWithParam = new int[] { 8, 10, 11, 12, 13, 14 };
 			for (int j = 0; j < 256; j++) {
 				new Label("__ISR_Handler_" + j.ToString("X2"));
-				if (j < 0x20 || j > 0x2F || true) {
+//				if (j < 0x20 || j > 0x2F || true) {
 					new CPUNative.Cli();
-				}
+//				}
 				new CPUNative.Break();
 				if (Array.IndexOf(xInterruptsWithParam, j) == -1) {
 					new CPUx86.Pushd("0");
 				}
 				new CPUx86.Pushd("0x" + j.ToString("X"));
 				new CPUNative.Pushad();
-				new CPUx86.Push("ds");
-				new CPUx86.Push("es");
-				new CPUx86.Push("fs");
-				new CPUx86.Push("gs");
+				new CPUx86.Move("eax", "0");
+				new CPUx86.Move("ax", "ds");
+				new CPUx86.Push("eax");
+				new CPUx86.Move("eax", "0");
+				new CPUx86.Move("ax", "es");
+				new CPUx86.Push("eax");
+				new CPUx86.Move("eax", "0");
+				new CPUx86.Move("ax", "fs");
+				new CPUx86.Push("eax");
+				new CPUx86.Move("eax", "0");
+				new CPUx86.Move("ax", "gs");
+				new CPUx86.Push("eax");
 				new CPUx86.Move("eax", "esp");
 				new CPUx86.Push("eax");
 				MethodDefinition xHandler = GetInterruptHandler((byte)j);
@@ -94,15 +102,19 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 					xHandler = GetMethodDef(typeof(HW.Interrupts).Assembly, typeof(HW.Interrupts).FullName, "HandleInterrupt_Default", true);
 				}
 				new CPUx86.Call(Label.GenerateLabelName(xHandler));
-				new CPUx86.Pop("gs");
-				new CPUx86.Pop("fs");
-				new CPUx86.Pop("es");
-				new CPUx86.Pop("ds");
+				new CPUx86.Pop("eax");
+				new CPUx86.Move("gs", "ax");
+				new CPUx86.Pop("eax");
+				new CPUx86.Move("gs", "ax");
+				new CPUx86.Pop("eax");
+				new CPUx86.Move("es", "ax");
+				new CPUx86.Pop("eax");
+				new CPUx86.Move("ds", "ax");
 				new CPUNative.Popad();
 				new CPUx86.Add("esp", "8");
 				new CPUNative.Break();
 				if (j < 0x20 || j > 0x2F) {
-					new CPUNative.Cli();
+				//	new CPUNative.Cli();
 				}
 				new CPUNative.IRet();
 			}
