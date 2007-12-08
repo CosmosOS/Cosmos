@@ -8,10 +8,9 @@ namespace Indy.IL2CPU.Assembler.X86 {
 	/// Represents the JLE opcode
 	/// </summary>
 	[OpCode(0xFFFFFFFF, "jle")]
-	public class JumpIfLessOrEqual: Instruction {
-		public readonly string Address;
-		public JumpIfLessOrEqual(string aAddress) {
-			Address = aAddress;
+	public class JumpIfLessOrEqual: JumpBase {
+		public JumpIfLessOrEqual(string aAddress)
+			: base(aAddress) {
 		}
 		public override string ToString() {
 			return "jle " + Address;

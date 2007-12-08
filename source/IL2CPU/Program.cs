@@ -18,6 +18,10 @@ namespace IL2CPU {
 		public static bool MetalMode;
 		public static bool DebugMode = true;
 		public static TargetPlatformEnum TargetPlatform = TargetPlatformEnum.Win32;
+		public const string LDParamsTemplate_NativeX86 = "-Ttext 0x250000 -Tdata 0x200000 -e Kernel_Start -o \"{0}\" \"{1}\"";
+		public const string NAsmParamsTemplate_NativeX86 = "-g -f elf -F stabs -o \"{0}\" \"{1}\"";
+		public const string LDParamsTemplate_Win32 = "-e Kernel_Start -o \"{0}\" \"{1}\"";
+		public const string NAsmParamsTemplate_Win32 = "-g -f elf -F stabs -o \"{0}\" \"{1}\"";
 
 		private Type win32Type = typeof(Win32OpCodeMap);
 		private Type nativeType = typeof(NativeOpCodeMap);
@@ -128,8 +132,22 @@ namespace IL2CPU {
 			}
 		}
 
-		private static string DJGPPDir { get { return Path.Combine(ToolsDir, "DJGPP"); } }
-		private static string LDFileName { get { return Path.Combine(Path.Combine(DJGPPDir, "bin"), "ld.exe"); } }
+		private static string DJGPPDir {
+			get {
+				return Path.Combine(ToolsDir, "DJGPP");
+			}
+		}
+		private static string ElfLDFileName {
+			get {
+				return Path.Combine(Path.Combine(DJGPPDir, "bin"), "ld.exe");
+			}
+		}
+
+		private static string PELDFileName {
+			get {
+				return Path.Combine(Path.Combine(ToolsDir, "Binutils"), "ld.exe");
+			}
+		}
 
 		private static string ToolsDir {
 			get {
@@ -161,7 +179,11 @@ namespace IL2CPU {
 					}
 					ProcessStartInfo xFasmStartInfo = new ProcessStartInfo();
 					xFasmStartInfo.FileName = NasmFileName;
-					xFasmStartInfo.Arguments = String.Format("-g -f elf -F stabs -o \"{0}\" \"{1}\"", xTestOutput, AsmFile);
+					if (TargetPlatform == TargetPlatformEnum.NativeX86) {
+						xFasmStartInfo.Arguments = String.Format(NAsmParamsTemplate_NativeX86, xTestOutput, AsmFile);
+					} else {
+						xFasmStartInfo.Arguments = String.Format(NAsmParamsTemplate_Win32, xTestOutput, AsmFile);
+					}
 					xFasmStartInfo.UseShellExecute = false;
 					xFasmStartInfo.RedirectStandardError = false;
 					xFasmStartInfo.RedirectStandardOutput = false;
@@ -173,8 +195,13 @@ namespace IL2CPU {
 						return 3;
 					}
 					ProcessStartInfo xLDStartInfo = new ProcessStartInfo();
-					xLDStartInfo.FileName = LDFileName;
-					xLDStartInfo.Arguments = String.Format("-Ttext 0x220000 -e Kernel_Start -o \"{0}\" \"{1}\"", OutputFile, xTestOutput);
+					if (TargetPlatform == TargetPlatformEnum.NativeX86) {
+						xLDStartInfo.FileName = ElfLDFileName;
+						xLDStartInfo.Arguments = String.Format(LDParamsTemplate_NativeX86, OutputFile, xTestOutput);
+					} else {
+						xLDStartInfo.FileName = PELDFileName;
+						xLDStartInfo.Arguments = String.Format(LDParamsTemplate_Win32, OutputFile, xTestOutput);
+					}
 					xLDStartInfo.UseShellExecute = false;
 					xLDStartInfo.RedirectStandardError = false;
 					xLDStartInfo.RedirectStandardOutput = false;

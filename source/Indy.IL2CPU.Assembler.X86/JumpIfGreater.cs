@@ -8,10 +8,9 @@ namespace Indy.IL2CPU.Assembler.X86 {
 	/// Represents the JG opcode
 	/// </summary>
 	[OpCode(0xFFFFFFFF, "jg")]
-	public class JumpIfGreater: Instruction {
-		public readonly string Address;
-		public JumpIfGreater(string aAddress) {
-			Address = aAddress;
+	public class JumpIfGreater: JumpBase {
+		public JumpIfGreater(string aAddress)
+			: base(aAddress) {
 		}
 		public override string ToString() {
 			return "jb " + Address;

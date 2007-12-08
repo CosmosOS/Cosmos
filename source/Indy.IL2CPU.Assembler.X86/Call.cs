@@ -5,13 +5,10 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
 	[OpCode(0xFFFFFFFF, "call")]
-	public class Call: Instruction {
-		public readonly string Address;
-
-		public Call(string aAddress) {
-			Address = aAddress;
+	public class Call: JumpBase {
+		public Call(string aAddress)
+			: base(aAddress) {
 		}
-
 		public override string ToString() {
 			return "call " + Address;
 		}

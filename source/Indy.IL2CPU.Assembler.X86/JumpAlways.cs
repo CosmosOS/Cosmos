@@ -8,10 +8,9 @@ namespace Indy.IL2CPU.Assembler.X86 {
 	/// Represents the JMP opcode
 	/// </summary>
 	[OpCode(0xFFFFFFFF, "jmp")]
-	public class JumpAlways: Instruction {
-		public readonly string Address;
-		public JumpAlways(string aAddress) {
-			Address = aAddress;
+	public class JumpAlways: JumpBase {
+		public JumpAlways(string aAddress)
+			: base(aAddress) {
 		}
 		public override string ToString() {
 			return "jmp " + Address;

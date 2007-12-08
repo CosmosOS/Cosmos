@@ -19,9 +19,11 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 			    + ", 0xFF,0xFF,0,0,0,0x93,0xCF,0";
 			aAssembler.DataMembers.Add(new DataMember(xFieldName, "db", xFieldData));
 			xFieldName = "_NATIVE_GDT_Pointer";
-			xFieldData = "0x17, (_NATIVE_GDT_Contents and 0xFFFF), (_NATIVE_GDT_Contents shr 16)";
-			aAssembler.DataMembers.Add(new DataMember(xFieldName, "dw", xFieldData));
+			//xFieldData = "0x17, (_NATIVE_GDT_Contents and 0xFFFF), (_NATIVE_GDT_Contents shr 16)";
+			aAssembler.DataMembers.Add(new DataMember(xFieldName, "dw", "0x17,0,0"));
 			new CPUx86.Move(Registers.EAX, "_NATIVE_GDT_Pointer");
+			new CPUx86.Move("dword [_NATIVE_GDT_Pointer + 2]", "_NATIVE_GDT_Contents");
+			new Label(".RegisterGDT");
 			new CPUNative.Lgdt(Registers.AtEAX);
 			new CPUx86.Move(Registers.AX, "0x10");
 			new CPUx86.Move("ds", Registers.AX);

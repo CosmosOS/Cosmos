@@ -33,17 +33,17 @@ namespace Indy.IL2CPU.Assembler.X86.Win32 {
 		protected override void EmitHeader() {
 			switch (mOutputType) {
 				case OutputTypeEnum.GUI:
-					mOutputWriter.WriteLine("format PE GUI 4.0");
+//					mOutputWriter.WriteLine("format PE GUI 4.0");
 					break;
 				case OutputTypeEnum.DLL:
-					mOutputWriter.WriteLine("format PE dll");
+//					mOutputWriter.WriteLine("format PE dll");
 					break;
 				default:
-					mOutputWriter.WriteLine("format PE console");
+//					mOutputWriter.WriteLine("format PE console");
 					break;
 			}
 			if (mOutputType != OutputTypeEnum.DLL) {
-				mOutputWriter.WriteLine("entry " + EntryPointName);
+//				mOutputWriter.WriteLine("entry " + EntryPointName);
 			}
 			mOutputWriter.WriteLine("stack 0x{0}", StackSize.ToString("X"));
 		}

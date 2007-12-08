@@ -5,9 +5,9 @@ using System.Text;
 namespace Cosmos.Shell.Console {
     class Program {
         static void Main() {
-            //Kernel.CPU.Init();
+            Kernel.CPU.Init();
             System.Console.WriteLine("Cosmos creation complete");
-        	//Kernel.Interrupts.DoTest();
+        	Kernel.Interrupts.DoTest();
         }
     }
 }

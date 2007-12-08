@@ -38,21 +38,36 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 			string xFieldData = "";
 			string xFieldName = "_NATIVE_IDT_Contents";
 			for (int i = 0; i < 256; i++) {
-				xFieldData += "(__ISR_Handler_" + i.ToString("X2") + " and 0xFF),";
-				xFieldData += "((__ISR_Handler_" + i.ToString("X2") + " shr 8) and 0xFF),";
-				xFieldData += "0x8,0,";
-				xFieldData += "0,";
-				xFieldData += "0x8E,";
-				xFieldData += "((__ISR_Handler_" + i.ToString("X2") + " shr 16) and 0xFF),";
-				xFieldData += "((__ISR_Handler_" + i.ToString("X2") + " shr 24) and 0xFF),";
+				//xFieldData += "(__ISR_Handler_" + i.ToString("X2") + " and 0xFF),";
+				//xFieldData += "((__ISR_Handler_" + i.ToString("X2") + " shr 8) and 0xFF),";
+				//xFieldData += "0x8,0,";
+				//xFieldData += "0,";
+				//xFieldData += "0x8E,";
+				//xFieldData += "((__ISR_Handler_" + i.ToString("X2") + " shr 16) and 0xFF),";
+				//xFieldData += "((__ISR_Handler_" + i.ToString("X2") + " shr 24) and 0xFF),";
+				xFieldData += "0,0,0,0,0,0,0,0,";
 			}
 			aAssembler.DataMembers.Add(new DataMember(xFieldName, "db", xFieldData.TrimEnd(',')));
+			for (int i = 0; i < 256; i++) {
+				new CPUx86.Move(Registers.EAX, "__ISR_Handler_" + i.ToString("X2"));
+				new CPUx86.Move("[_NATIVE_IDT_Contents + " + ((i * 8) + 0) + "]", Registers.AL);
+				new CPUx86.Move("[_NATIVE_IDT_Contents + " + ((i * 8) + 1) + "]", Registers.AH);
+				new CPUx86.Move("byte [_NATIVE_IDT_Contents + " + ((i * 8) + 2) + "]", "0x8");
+				//new CPUx86.Move("[_NATIVE_IDT_Contents + " + ((i * 8) + 3) + "]", "0");
+				//new CPUx86.Move("[_NATIVE_IDT_Contents + " + ((i * 8) + 4) + "]", 0);
+				new CPUx86.Move("byte [_NATIVE_IDT_Contents + " + ((i * 8) + 5) + "]", "0x8E");
+				new CPUx86.ShiftRight("eax", "eax", "16");
+				new CPUx86.Move("[_NATIVE_IDT_Contents + " + ((i * 8) + 6) + "]", Registers.AL);
+				new CPUx86.Move("[_NATIVE_IDT_Contents + " + ((i * 8) + 7) + "]", Registers.AH);
+			}
 			xFieldName = "_NATIVE_IDT_Pointer";
-			xFieldData = "0x07FF,(_NATIVE_IDT_Contents and 0xFFFF),(_NATIVE_IDT_Contents shr 16)";
+			xFieldData = "0x07FF,0,0";//(_NATIVE_IDT_Contents and 0xFFFF),(_NATIVE_IDT_Contents shr 16)";
 			aAssembler.DataMembers.Add(new DataMember(xFieldName, "dw", xFieldData));
+			new CPUx86.Move("dword [_NATIVE_IDT_Pointer + 2]", "_NATIVE_IDT_Contents");
 			#endregion
 
 			new CPUx86.Move(Registers.EAX, "_NATIVE_IDT_Pointer");
+			new Label(".RegisterIDT");
 			new CPUNative.Lidt(Registers.AtEAX);
 			new CPUNative.Break();
 			new CPUx86.JumpAlways("__AFTER__ALL__ISR__HANDLER__STUBS__");
@@ -68,21 +83,21 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 				}
 				new CPUx86.Pushd("0x" + j.ToString("X"));
 				new CPUNative.Pushad();
-				new CPUx86.Pushd("ds");
-				new CPUx86.Pushd("es");
-				new CPUx86.Pushd("fs");
-				new CPUx86.Pushd("gs");
+				new CPUx86.Push("ds");
+				new CPUx86.Push("es");
+				new CPUx86.Push("fs");
+				new CPUx86.Push("gs");
 				new CPUx86.Move("eax", "esp");
-				new CPUx86.Pushd("eax");
+				new CPUx86.Push("eax");
 				MethodDefinition xHandler = GetInterruptHandler((byte)j);
 				if (xHandler == null) {
 					xHandler = GetMethodDef(typeof(HW.Interrupts).Assembly, typeof(HW.Interrupts).FullName, "HandleInterrupt_Default", true);
 				}
 				new CPUx86.Call(Label.GenerateLabelName(xHandler));
-				new CPUx86.Popd("gs");
-				new CPUx86.Popd("fs");
-				new CPUx86.Popd("es");
-				new CPUx86.Popd("ds");
+				new CPUx86.Pop("gs");
+				new CPUx86.Pop("fs");
+				new CPUx86.Pop("es");
+				new CPUx86.Pop("ds");
 				new CPUNative.Popad();
 				new CPUx86.Add("esp", "8");
 				new CPUNative.Break();

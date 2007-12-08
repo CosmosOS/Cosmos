@@ -17,7 +17,7 @@ namespace Indy.IL2CPU.Assembler {
 		public readonly Stack<int> StackSizes = new Stack<int>();
 		public bool DebugMode {
 			get;
-			set;		 
+			set;
 		}
 		public static Assembler CurrentInstance {
 			get;
@@ -92,25 +92,45 @@ namespace Indy.IL2CPU.Assembler {
 				mOutputWriter.WriteLine();
 				foreach (DataMember xMember in mDataMembers) {
 					mOutputWriter.WriteLine("\t" + xMember);
+					//mOutputWriter.WriteLine("\tglobal " + xMember.Name + ":data");
 				}
 				EmitDataSectionFooter();
 				mOutputWriter.WriteLine();
 			}
+			List<string> xLabels = new List<string>();
 			if (mInstructions.Count > 0) {
-				EmitCodeSectionHeader();							 
+				EmitCodeSectionHeader();
 				mOutputWriter.WriteLine();
+				string xMainLabel = "";
 				foreach (Instruction x in mInstructions) {
 					string prefix = "\t\t\t";
-					if (x is Label) {
+					Label xLabel = x as Label;
+					if (xLabel != null) {
+						string xFullName;
+						if (xLabel.Name[0] != '.') {
+							xMainLabel = xLabel.Name;
+							xFullName = xMainLabel;
+						} else {
+							xFullName = xMainLabel + xLabel.Name;
+							xLabels.Add(xFullName);
+						}
 						mOutputWriter.WriteLine();
 						if (x.ToString()[0] == '.') {
 							prefix = "\t\t";
 						} else {
 							prefix = "\t";
 						}
+						//mOutputWriter.WriteLine(prefix + "global " + xFullName + ":function");
+						//if (xLabel.Name[0] == '.') {
+						mOutputWriter.WriteLine(prefix + xFullName.Replace(".", "__DOT__") + ":");
+						continue;
+						//}
 					}
 					mOutputWriter.WriteLine(prefix + x);
 				}
+				//foreach (string xLabel in xLabels) {
+				//    mOutputWriter.WriteLine(xLabel.Replace(".", "__DOT__") + ": " + xLabel);
+				//}
 				EmitCodeSectionFooter();
 				mOutputWriter.WriteLine();
 			}
@@ -162,11 +182,11 @@ namespace Indy.IL2CPU.Assembler {
 		protected virtual void EmitDataSectionHeader() {
 			mOutputWriter.WriteLine("section '.data' data readable writeable");
 		}
-		
+
 		protected virtual void EmitDataSectionFooter() {
 		}
 
-		
+
 		protected virtual void EmitFooter() {
 		}
 

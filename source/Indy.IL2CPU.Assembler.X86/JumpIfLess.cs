@@ -8,10 +8,9 @@ namespace Indy.IL2CPU.Assembler.X86 {
 	/// Represents the JL opcode
 	/// </summary>
 	[OpCode(0xFFFFFFFF, "jl")]
-	public class JumpIfLess: Instruction {
-		public readonly string Address;
-		public JumpIfLess(string aAddress) {
-			Address = aAddress;
+	public class JumpIfLess: JumpBase {
+		public JumpIfLess(string aAddress)
+			: base(aAddress) {
 		}
 		public override string ToString() {
 			return "jl " + Address;
