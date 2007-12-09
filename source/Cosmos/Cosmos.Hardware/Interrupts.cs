@@ -82,10 +82,22 @@ namespace Cosmos.Hardware {
 		}
 
 		public static unsafe void HandleInterrupt_00(InterruptContext* aContext) {
-			//Console.WriteLine("EDivideByZero");
-			Console.Write("Divide by zero at ");
-			WriteNumber(aContext->EIP, 32);
-			DebugUtil.SendMessage("Exceptions", "EDivideByZero");
+			HandleException(aContext->EIP, "Divide by zero", "EDivideByZero");
+		}
+
+		public static unsafe void HandleInterrupt_06(InterruptContext* aContext) {
+			HandleException(aContext->EIP, "Invalid Opcode", "EInvalidOpcode");
+		}
+
+		public static unsafe void HandleInterrupt_0D(InterruptContext* aContext) {
+			HandleException(aContext->EIP, "General Protection Fault", "GPF");
+		}
+
+		private static void HandleException(uint aEIP, string aDescription, string aName) {
+			Console.Write(aDescription);
+			Console.Write(" at ");
+			WriteNumber(aEIP, 32);
+			DebugUtil.SendMessage("Exceptions", aName);
 			Console.WriteLine();
 			Console.WriteLine("--System Halted!");
 			while (true)
@@ -100,6 +112,8 @@ namespace Cosmos.Hardware {
 				unsafe {
 					HandleInterrupt_Default(null);
 					HandleInterrupt_00(null);
+					HandleInterrupt_06(null);
+					HandleInterrupt_0D(null);
 					HandleInterrupt_20(null);
 					HandleInterrupt_21(null);
 				}

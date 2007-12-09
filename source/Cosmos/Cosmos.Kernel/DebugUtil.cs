@@ -16,6 +16,18 @@ namespace Cosmos.Kernel {
 			Hardware.DebugUtil.EndLogging();
 		}
 
+		public static void SendNumber(string aModule, string aDescription, uint aNumber, byte aBits) {
+			StartLogging();
+			Serial.Write(0, "<Number Module=\"");
+			Serial.Write(0, aModule);
+			Serial.Write(0, "\" Description=\"");
+			Serial.Write(0, aDescription);
+			Serial.Write(0, "\" Number=\"");
+			Hardware.DebugUtil.WriteNumber(aNumber, aBits);
+			Serial.Write(0, "\"/>\r\n");
+			EndLogging();
+		}
+
 		public static void SendMessage(string aModule, string aData) {
 			StartLogging();
 			Serial.Write(0, "<Message Type=\"Info\" Module=\"");
@@ -26,10 +38,10 @@ namespace Cosmos.Kernel {
 			EndLogging();
 		}
 
-		public static void SendKeyboardEvent(byte aScanCode, bool aReleased) {
+		public static void SendKeyboardEvent(uint aScanCode, bool aReleased) {
 			StartLogging();
 			Serial.Write(0, "<KeyboardEvent ScanCode=\"");
-			Hardware.DebugUtil.WriteNumber(aScanCode, 8);
+			Hardware.DebugUtil.WriteNumber(aScanCode, 32);
 			Serial.Write(0, "\" Released=\"");
 			if (aReleased) {
 				Serial.Write(0, "true");

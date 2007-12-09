@@ -27,6 +27,9 @@ namespace Cosmos.Kernel {
 			Console.Write("Creating IDT...");
 			Hardware.CPU.CreateIDT();
 			Console.WriteLine("Done");
+			Console.Write("Initializing Keyboard...");
+			Keyboard.Initialize();
+			Console.WriteLine("Done");
 		}
     }
 }

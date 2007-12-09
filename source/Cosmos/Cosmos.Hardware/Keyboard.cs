@@ -12,9 +12,12 @@ namespace Cosmos.Hardware {
 
 		internal static void HandleKeyboardInterrupt() {
 			if (mHandleKeyboardKey != null) {
-				//mHandleKeyboardKey(
 				byte xScanCode = IORead(0x60);
-				mHandleKeyboardKey(xScanCode, (xScanCode & 0x80) == 0x80);
+				bool xReleased = (xScanCode & 0x80) == 0x80;
+				if (xReleased) {
+					xScanCode = (byte)(xScanCode ^ 0x80);
+				}
+				mHandleKeyboardKey(xScanCode, xReleased);
 			}
 		}
 	}

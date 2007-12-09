@@ -178,8 +178,11 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public static void Add(Assembler.Assembler aAssembler) {
-			aAssembler.StackSizes.Pop();
+			int xSize =aAssembler.StackSizes.Pop();
 			new CPUx86.Pop("eax");
+			if (xSize == 8) {
+				new CPUx86.Add("esp", "4");
+			}
 			new CPUx86.Add("eax", "[esp]");
 			new CPUx86.Add("esp", "4");
 			new Pushd("eax");

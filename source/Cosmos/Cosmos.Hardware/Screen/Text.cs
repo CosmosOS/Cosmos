@@ -17,7 +17,7 @@ namespace Cosmos.Hardware.Screen {
 		}
 
 		public static unsafe void ScrollUp() {
-			for (int i = 0; i < Columns * (Lines - 1); i++) {
+			for (int i = 0; i < Columns * (Lines); i++) {
 				byte* xScreenPtr = (byte*)(VideoAddr + (i * 2));
 				*xScreenPtr = *(xScreenPtr + (Columns * 2));
 				xScreenPtr += 1;

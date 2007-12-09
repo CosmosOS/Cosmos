@@ -11,7 +11,7 @@ namespace Cosmos.Kernel {
         public static void NewLine() {
             CurrentLine += 1;
 			CurrentChar = 0;
-			if (CurrentLine == HW.Text.Lines) {
+			if (CurrentLine > (HW.Text.Lines)) {
                 HW.Text.ScrollUp();
 				CurrentLine -= 1;
 				CurrentChar = 0;
@@ -28,13 +28,12 @@ namespace Cosmos.Kernel {
             if (CurrentChar == HW.Text.Columns) {
                 CurrentChar = 0;
                 CurrentLine += 1;
-                if (CurrentLine == HW.Text.Lines) {
+                if (CurrentLine > (HW.Text.Lines)) {
                 	HW.Text.ScrollUp();
-                    CurrentLine = 0;
+                    CurrentLine -= 1;
                     CurrentChar = 0;
                 }
             }
         }
-
     }
 }
