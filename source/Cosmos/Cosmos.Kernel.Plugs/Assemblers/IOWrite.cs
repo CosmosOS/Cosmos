@@ -11,8 +11,8 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 	public sealed class IOWrite: AssemblerMethod {
 		public override void Assemble(Assembler aAssembler) {
             //TODO: This is a lot of work to write to a single port. We need to have some kind of inline ASM option that can emit a single out instruction
-			new CPUx86.Move(Registers.EDX, "[ebp + 0x10]");
-			new CPUx86.Move(Registers.EAX, "[ebp + 0x0C]");
+			new CPUx86.Move(Registers.EDX, "[ebp + 0xC]");
+			new CPUx86.Move(Registers.EAX, "[ebp + 0x8]");
 			new CPUNative.Out(Registers.DX, Registers.AL);
 		}
 	}

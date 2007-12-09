@@ -32,7 +32,7 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		public static void AssembleHeader(Assembler.Assembler aAssembler, string aLabelName, int[] aLocals, MethodInformation.Argument[] aArguments) {
 			new CPU.Label(aLabelName);
-			new CPUx86.Push(CPUx86.Registers.EBP);
+			new CPUx86.Pushd(CPUx86.Registers.EBP);
 			//new CPUx86.Move("eax", LdStr.GetContentsArrayName(aAssembler, aLabelName) + "__Contents");
 			//new CPUx86.Add("eax", "12");
 			//new CPUx86.Push("eax");

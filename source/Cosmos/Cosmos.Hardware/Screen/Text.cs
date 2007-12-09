@@ -35,7 +35,7 @@ namespace Cosmos.Hardware.Screen {
 			int xScreenOffset = ((aPos + (aLine * 80)) * 2);
 			byte* xScreenPtr = (byte*)((0xB8000) + xScreenOffset);
 			byte xVal = (byte)aChar;
-			*xScreenPtr = xVal;
+			*xScreenPtr = (byte)(xVal & 0xFF);
 			xScreenPtr += 1;
 			*xScreenPtr = 7;
 		}

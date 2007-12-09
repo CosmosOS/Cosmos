@@ -14,6 +14,9 @@ namespace Cosmos.Hardware {
 			public uint EDI;
 			public uint ESI;
 			public uint EBP;
+			/// <summary>
+			/// Doesn't work yet
+			/// </summary>
 			public uint ESP;
 			public uint EBX;
 			public uint EDX;
@@ -24,7 +27,13 @@ namespace Cosmos.Hardware {
 			public uint EIP;
 			public uint CS;
 			public uint EFlags;
+			/// <summary>
+			/// Doesn't work yet
+			/// </summary>
 			public uint UserESP;
+			/// <summary>
+			/// Doesn't work yet
+			/// </summary>
 			public uint SS;
 		}
 
@@ -72,6 +81,17 @@ namespace Cosmos.Hardware {
 			PIC.SignalPrimary();
 		}
 
+		public static unsafe void HandleInterrupt_00(InterruptContext* aContext) {
+			//Console.WriteLine("EDivideByZero");
+			Console.Write("Divide by zero at ");
+			WriteNumber(aContext->EIP, 32);
+			DebugUtil.SendMessage("Exceptions", "EDivideByZero");
+			Console.WriteLine();
+			Console.WriteLine("--System Halted!");
+			while (true)
+				;
+		}
+
 		// This is to trick IL2CPU to compile it in
 		//TODO: Make a new attribute that IL2CPU sees when scanning to force inclusion so we dont have to do this.
 		public static void IncludeAllHandlers() {
@@ -79,6 +99,7 @@ namespace Cosmos.Hardware {
 			if (xTest) {
 				unsafe {
 					HandleInterrupt_Default(null);
+					HandleInterrupt_00(null);
 					HandleInterrupt_20(null);
 					HandleInterrupt_21(null);
 				}

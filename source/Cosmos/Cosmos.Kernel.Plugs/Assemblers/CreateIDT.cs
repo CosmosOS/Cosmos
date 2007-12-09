@@ -53,8 +53,6 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 				new CPUx86.Move("[_NATIVE_IDT_Contents + " + ((i * 8) + 0) + "]", Registers.AL);
 				new CPUx86.Move("[_NATIVE_IDT_Contents + " + ((i * 8) + 1) + "]", Registers.AH);
 				new CPUx86.Move("byte [_NATIVE_IDT_Contents + " + ((i * 8) + 2) + "]", "0x8");
-				//new CPUx86.Move("[_NATIVE_IDT_Contents + " + ((i * 8) + 3) + "]", "0");
-				//new CPUx86.Move("[_NATIVE_IDT_Contents + " + ((i * 8) + 4) + "]", 0);
 				new CPUx86.Move("byte [_NATIVE_IDT_Contents + " + ((i * 8) + 5) + "]", "0x8E");
 				new CPUx86.ShiftRight("eax", "eax", "16");
 				new CPUx86.Move("[_NATIVE_IDT_Contents + " + ((i * 8) + 6) + "]", Registers.AL);
@@ -74,9 +72,9 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 			int[] xInterruptsWithParam = new int[] { 8, 10, 11, 12, 13, 14 };
 			for (int j = 0; j < 256; j++) {
 				new Label("__ISR_Handler_" + j.ToString("X2"));
-//				if (j < 0x20 || j > 0x2F || true) {
+				//if (j < 0x20 || j > 0x2F || true) {
 					new CPUNative.Cli();
-//				}
+				//}
 				new CPUNative.Break();
 				if (Array.IndexOf(xInterruptsWithParam, j) == -1) {
 					new CPUx86.Pushd("0");
@@ -113,13 +111,13 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 				new CPUNative.Popad();
 				new CPUx86.Add("esp", "8");
 				new CPUNative.Break();
-				if (j < 0x20 || j > 0x2F) {
-				//	new CPUNative.Cli();
-				}
+				//if (j < 0x20 || j > 0x2F) {
+					new CPUNative.Sti();
+				//}
 				new CPUNative.IRet();
 			}
 			new Label("__AFTER__ALL__ISR__HANDLER__STUBS__");
-			//new CPUNative.Sti();
+			new CPUNative.Sti();
 		}
 	}
 }

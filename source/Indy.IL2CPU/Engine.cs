@@ -231,10 +231,11 @@ namespace Indy.IL2CPU {
 						if (!aInMetalMode) {
 							xEntryPointOp.Call("____INIT__VMT____");
 						}
+						//System.Diagnostics.Debugger.Break();
 						foreach (TypeDefinition xType in mTypes) {
 							foreach (MethodDefinition xMethod in xType.Constructors) {
 								if (xMethod.IsStatic) {
-									//xEntryPointOp.Call(xMethod);
+									xEntryPointOp.Call(xMethod);
 								}
 							}
 						}

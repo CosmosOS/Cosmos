@@ -63,19 +63,23 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
 		protected override void EmitIDataSectionHeader() {
 		}
 
-		protected override void EmitFooter() {
-			
-			mOutputWriter.WriteLine("_end_data:      ; -- end of CODE+DATA ");
-			mOutputWriter.WriteLine("section .bss nobits alloc noexec write align=4");
+		protected override void EmitDataSectionFooter() {
+			base.EmitDataSectionFooter();
+			//mOutputWriter.WriteLine("section .bss nobits alloc noexec write align=4");
 			mOutputWriter.WriteLine("");
 			mOutputWriter.WriteLine(";--- bss --- place r*, d* ? directives here, so that you'll have a BSS. ");
 			mOutputWriter.WriteLine("");
-			mOutputWriter.WriteLine("");
-			mOutputWriter.WriteLine("times 50000 resb 0        ; our own stack ");
+			mOutputWriter.WriteLine("Before_Kernel_Stack:");
+			//mOutputWriter.WriteLine("times 50000 resb 0        ; our own stack ");
+			mOutputWriter.WriteLine("TIMES 50000 db 0");
 			mOutputWriter.WriteLine("Kernel_Stack: ");
 			mOutputWriter.WriteLine("");
 			mOutputWriter.WriteLine("");
 			mOutputWriter.WriteLine("_end:   ; end of BSS - here's the virtual and logical end.");
+		}
+
+		protected override void EmitFooter() {
+			mOutputWriter.WriteLine("_end_data:      ; -- end of CODE+DATA ");
 		}
 
 		protected override void EmitHeader() {
