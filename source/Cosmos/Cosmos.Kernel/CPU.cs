@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace Cosmos.Kernel {
-    public class CPU {
-        public static void Init() {
+	public class CPU {
+		public static void Init() {
 			Console.Write("Creating GDT...");
 			Hardware.CPU.CreateGDT();
 			Console.WriteLine("Done");
@@ -21,7 +21,7 @@ namespace Cosmos.Kernel {
 			//System.Diagnostics.Debugger.Break();
 			Console.WriteLine("Done");
 			Console.Write("Configuring PIT...");
-			Hardware.PIT.SetSlowest();
+			Hardware.PIT.Initialize(Tick);
 			Console.WriteLine("Done");
 			//System.Diagnostics.Debugger.Break();
 			Console.Write("Creating IDT...");
@@ -30,6 +30,16 @@ namespace Cosmos.Kernel {
 			Console.Write("Initializing Keyboard...");
 			Keyboard.Initialize();
 			Console.WriteLine("Done");
+			//Console.WriteLine("Initializing IDE Controllers:");
+			//Hardware.Storage.LBA.Initialize();
 		}
-    }
+
+		public static uint TickCount {
+			get;
+			private set;
+		}
+		private static void Tick(object aSender, EventArgs aEventArgs) {
+			TickCount += 1;
+		}
+	}
 }

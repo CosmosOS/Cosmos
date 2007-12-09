@@ -51,8 +51,8 @@
   <ItemGroup>
     <Compile Include="Assemblers\CreateGDT.cs" />
     <Compile Include="Assemblers\CreateIDT.cs" />
-    <Compile Include="Assemblers\IORead.cs" />
-    <Compile Include="Assemblers\IOWrite.cs" />
+    <Compile Include="Assemblers\IOReadByte.cs" />
+    <Compile Include="Assemblers\IOWriteByte.cs" />
     <Compile Include="Console.cs" />
     <Compile Include="CPU.cs" />
     <Compile Include="Hardware.cs" />

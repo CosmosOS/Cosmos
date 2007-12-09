@@ -70,8 +70,8 @@ namespace Cosmos.Hardware {
 
 		//IRQ 0 - System timer. Reserved for the system. Cannot be changed by a user.
 		public static unsafe void HandleInterrupt_20(InterruptContext* aContext) {
-			Console.WriteLine("PIT IRQ occurred");
 			DebugUtil.SendMessage("PIT", "IRQ Occurred");
+			PIT.HandleInterrupt();
 			PIC.SignalPrimary();
 		}
 

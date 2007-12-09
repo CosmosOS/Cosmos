@@ -14,31 +14,31 @@ namespace Cosmos.Hardware {
         const ushort DataPort2 = 0xA1;
 
         public static void SignalPrimary() {
-            IOWrite(CmdPort1, 0x20);
+			IOWriteByte(CmdPort1, 0x20);
         }
 
         public static void SignalSecondary() {
-            IOWrite(CmdPort2, 0x20);
-            IOWrite(CmdPort1, 0x20);
+			IOWriteByte(CmdPort2, 0x20);
+			IOWriteByte(CmdPort1, 0x20);
         }
 
         public static void Init() {
             // Init
-            IOWrite(CmdPort1, 0x11);
-            IOWrite(CmdPort2, 0x11);
+			IOWriteByte(CmdPort1, 0x11);
+			IOWriteByte(CmdPort2, 0x11);
             // Offsets
-            IOWrite(DataPort1, 0x20);
-            IOWrite(DataPort2, 0x28);
+			IOWriteByte(DataPort1, 0x20);
+			IOWriteByte(DataPort2, 0x28);
             // More Init
-            IOWrite(DataPort1, 0x04);
-            IOWrite(DataPort2, 0x02);
+			IOWriteByte(DataPort1, 0x04);
+			IOWriteByte(DataPort2, 0x02);
             // 8086 mode
-            IOWrite(DataPort1, 0x01);
-            IOWrite(DataPort2, 0x01);
+			IOWriteByte(DataPort1, 0x01);
+			IOWriteByte(DataPort2, 0x01);
             // Masks - 0 = receive all IRQ's
-			// MTW, disabling PIT
-            IOWrite(DataPort1, 0x01);
-            IOWrite(DataPort2, 0x00);
+			// MTW, to disable PIT, send 0x1 to DataPort1
+			IOWriteByte(DataPort1, 0x00); 
+			IOWriteByte(DataPort2, 0x00);
 		}
 	}
 }

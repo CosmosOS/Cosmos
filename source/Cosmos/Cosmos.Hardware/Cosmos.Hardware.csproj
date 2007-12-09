@@ -53,6 +53,7 @@
     <Compile Include="Screen\Text.cs" />
     <Compile Include="Serial.cs" />
     <Compile Include="Storage\ATA.cs" />
+    <Compile Include="Storage\LBA.cs" />
     <Compile Include="Storage\Storage.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

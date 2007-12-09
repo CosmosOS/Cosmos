@@ -8,26 +8,6 @@ namespace Cosmos.Kernel {
         //TODO: Remove
 		public static void DoTest() {
 			Hardware.Interrupts.IncludeAllHandlers();
-			Console.WriteLine("Blaat");
-			Console.WriteLine("Blaat");
-			Console.WriteLine("Blaat");
-			Console.WriteLine("Blaat");
-			Console.WriteLine("Blaat");
-			Console.WriteLine("Blaat");
-			Console.WriteLine("Blaat");
-			Console.WriteLine("Blaat");
-			Console.WriteLine("Blaat");
-			Console.WriteLine("Blaat");
-			Console.WriteLine("Blaat");
-			Console.WriteLine("Blaat");
-			Console.WriteLine("Blaat");
-			Console.WriteLine("Blaat");
-			Console.WriteLine("Blaat");
-			Console.WriteLine("Blaat");
-			Console.WriteLine("Blaat");
-			Console.WriteLine("Blaat");
-			Console.WriteLine("Blaat");
-			Console.WriteLine("Blaat");
 			do {
 				Console.Write("Please press a key: ");
 				char c = Keyboard.ReadChar();
@@ -40,6 +20,7 @@ namespace Cosmos.Kernel {
 				} else {
 					Console.WriteLine("Good Boy, you pressed lowercase a");
 				}
+				DebugUtil.SendNumber("Kernel", "TickCount", Kernel.CPU.TickCount, 32);
 			} while (true);
 		}
     }
