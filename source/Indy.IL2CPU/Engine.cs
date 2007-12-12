@@ -766,6 +766,7 @@ namespace Indy.IL2CPU {
 										throw new Exception("OpCode '" + xInstruction.OpCode.Code + "' not supported in Metal mode!");
 									}
 									xOp.Assembler = mAssembler;
+									new Comment("StackItems = " + mAssembler.StackSizes.Count);
 									xOp.Assemble();
 								}
 							} else {

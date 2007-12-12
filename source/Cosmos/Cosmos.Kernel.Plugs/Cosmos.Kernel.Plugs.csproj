@@ -49,6 +49,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assemblers\IOReadWord.cs" />
+    <Compile Include="Assemblers\IOWriteWord.cs" />
     <Compile Include="Assemblers\CreateGDT.cs" />
     <Compile Include="Assemblers\CreateIDT.cs" />
     <Compile Include="Assemblers\IOReadByte.cs" />

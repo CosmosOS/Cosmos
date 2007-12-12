@@ -65,12 +65,9 @@ namespace Cosmos.Hardware {
 		//IRQ 11 - Free / Open interrupt / Available / SCSI
 		//IRQ 12 - PS/2 connector Mouse. If no PS/2 connector mouse is used, this can be used for other peripherals
 		//IRQ 13 - ISA / Math Co-Processor
-		//IRQ 14 - Primary IDE. If no Primary IDE this can be changed
-		//IRQ 15 - Secondary IDE
-
+		
 		//IRQ 0 - System timer. Reserved for the system. Cannot be changed by a user.
 		public static unsafe void HandleInterrupt_20(InterruptContext* aContext) {
-			DebugUtil.SendMessage("PIT", "IRQ Occurred");
 			PIT.HandleInterrupt();
 			PIC.SignalPrimary();
 		}
@@ -79,6 +76,18 @@ namespace Cosmos.Hardware {
 		public static unsafe void HandleInterrupt_21(InterruptContext* aContext) {
 			Keyboard.HandleKeyboardInterrupt();
 			PIC.SignalPrimary();
+		}
+
+		//IRQ 14 - Primary IDE. If no Primary IDE this can be changed
+		public static unsafe void HandleInterrupt_2E(InterruptContext* aContext) {
+			Storage.ATA.HandleInterruptPrimary();
+			PIC.SignalSecondary();
+		}
+
+		//IRQ 15 - Secondary IDE
+		public static unsafe void HandleInterrupt_2F(InterruptContext* aContext) {
+			Storage.ATA.HandleInterruptSecondary();
+			PIC.SignalSecondary();
 		}
 
 		public static unsafe void HandleInterrupt_00(InterruptContext* aContext) {
@@ -116,6 +125,8 @@ namespace Cosmos.Hardware {
 					HandleInterrupt_0D(null);
 					HandleInterrupt_20(null);
 					HandleInterrupt_21(null);
+					HandleInterrupt_2E(null);
+					HandleInterrupt_2F(null);
 				}
 			}
 		}

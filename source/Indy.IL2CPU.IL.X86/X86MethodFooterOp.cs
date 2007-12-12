@@ -35,40 +35,6 @@ namespace Indy.IL2CPU.IL.X86 {
 				Engine.QueueMethodRef(GCImplementationRefs.DecRefCountRef);
 				foreach (MethodInformation.Variable xLocal in aLocals) {
 					if (xLocal.IsReferenceType) {
-					//	System.Diagnostics.Debugger.Break();
-						TypeSpecification xTypeSpec = xLocal.VariableType as TypeSpecification;
-						if (xTypeSpec != null) {
-							TypeDefinition xElementDef = Engine.GetDefinitionFromTypeReference(xTypeSpec.ElementType);
-							if (!xElementDef.IsValueType) {
-								Op.Ldloc(aAssembler, xLocal, false);
-								new CPUx86.Push("8");
-								Op.Add(aAssembler);
-								new CPUx86.Pop(CPUx86.Registers.EDX); // total item count	address
-								new CPUx86.Move(CPUx86.Registers.EBX, CPUx86.Registers.AtEDX);
-								new CPUx86.Add(CPUx86.Registers.EDX, "4");
-								new CPUx86.Move(CPUx86.Registers.ECX, "0"); // counter
-								new Label(".GC_LOCAL_CLEANUP_ENTRY_VAR_" + xLocal.Offset);
-								new CPUx86.Compare(CPUx86.Registers.EBX, CPUx86.Registers.ECX);
-								new CPUx86.JumpIfEquals(".GC_LOCAL_CLEANUP_ENTRY_VAR_" + xLocal.Offset + "_END");
-								new CPUx86.Push(CPUx86.Registers.EDX);
-								new CPUx86.Push(CPUx86.Registers.ECX);
-								new CPUx86.Push(CPUx86.Registers.EBX);
-								new CPUx86.Push("dword", CPUx86.Registers.AtEDX);
-								new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef));
-								new CPUx86.Pop(CPUx86.Registers.EBX);
-								new CPUx86.Pop(CPUx86.Registers.ECX);
-								new CPUx86.Pop(CPUx86.Registers.EDX);
-								new CPUx86.Add(CPUx86.Registers.EDX, "4");
-								new CPUx86.Add(CPUx86.Registers.ECX, "1");
-								new CPUx86.JumpAlways(".GC_LOCAL_CLEANUP_ENTRY_VAR_" + xLocal.Offset);
-								new Label(".GC_LOCAL_CLEANUP_ENTRY_VAR_" + xLocal.Offset + "_END");
-								// label
-								// item pushen
-								// ecx ophogen
-								// ecx en eax vergelijken
-								// als ecx kleiner is, naar label
-							}
-						}
 						Op.Ldloc(aAssembler, xLocal, false);
 						new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef));
 					}

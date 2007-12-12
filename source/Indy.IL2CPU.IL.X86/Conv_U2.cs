@@ -15,14 +15,12 @@ namespace Indy.IL2CPU.IL.X86 {
 				case 4: {
 						new CPUx86.Pop(CPUx86.Registers.EAX);
 						new CPUx86.Pushd(CPUx86.Registers.EAX);
-						Assembler.StackSizes.Push(2);
 						break;
 					}
 				case 8: {
 						new CPUx86.Pop(CPUx86.Registers.EAX);
 						new CPUx86.Pop(CPUx86.Registers.ECX);
 						new CPUx86.Pushd(CPUx86.Registers.EAX);
-						Assembler.StackSizes.Push(2);
 						break;
 					}
 				case 2: {
@@ -31,6 +29,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				default:
 					throw new Exception("SourceSize " + xSource + " not supported!");
 			}
+			Assembler.StackSizes.Push(2);
 		}
 	}
 }

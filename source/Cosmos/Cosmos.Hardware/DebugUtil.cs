@@ -26,9 +26,14 @@ namespace Cosmos.Hardware {
 		}
 
 		public static void WriteNumber(uint aNumber, byte aBits) {
+			WriteNumber(aNumber, aBits, true);
+		}
+		public static void WriteNumber(uint aNumber, byte aBits, bool aWritePrefix) {
 			uint xValue = aNumber;
 			byte xCurrentBits = aBits;
-			WriteSerialString("0x");
+			if (aWritePrefix) {
+				WriteSerialString("0x");
+			}
 			while (xCurrentBits >= 4) {
 				xCurrentBits -= 4;
 				byte xCurrentDigit = (byte)((xValue >> xCurrentBits) & 0xF);
@@ -130,6 +135,21 @@ namespace Cosmos.Hardware {
 			WriteNumber(aContext->UserESP, 32);
 			WriteSerialString("\"/>\r\n");
 			EndLogging();
+		}
+
+		public static void WriteBinary(string aModule, string aMessage, uint aBlock, byte[] aValue) {
+			StartLogging();
+			WriteSerialString("<Binary Module=\"");
+			WriteSerialString(aModule);
+			WriteSerialString("\" Message=\"");
+			WriteSerialString(aMessage);
+			WriteSerialString("\" Block=\"0x");
+			WriteNumber(aBlock, 24);
+			WriteSerialString("\" Value=\"");
+			for (int i = 0; i < aValue.Length; i++) {
+				WriteNumber(aValue[i],8, false);
+			}
+			WriteSerialString("\"/>\r\n");
 		}
 
 		private static void WriteSerialString(string aData) {

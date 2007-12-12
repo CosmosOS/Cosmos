@@ -71,7 +71,7 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
 			mOutputWriter.WriteLine("");
 			mOutputWriter.WriteLine("Before_Kernel_Stack:");
 			//mOutputWriter.WriteLine("times 50000 resb 0        ; our own stack ");
-			mOutputWriter.WriteLine("TIMES 50000 db 0");
+			mOutputWriter.WriteLine("TIMES 0x50000 db 0");
 			mOutputWriter.WriteLine("Kernel_Stack: ");
 			mOutputWriter.WriteLine("");
 			mOutputWriter.WriteLine("");

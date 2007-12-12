@@ -11,5 +11,12 @@ namespace Cosmos.Kernel.Plugs {
         public static void IOWriteByte(ushort aPort, byte aData) { }
         [PlugMethod(MethodAssembler = typeof(Assemblers.IOReadByte))]
         public static byte IOReadByte(ushort aPort) { return 0; }
+		[PlugMethod(MethodAssembler = typeof(Assemblers.IOWriteWord))]
+		public static void IOWriteWord(ushort aPort, ushort aData) {
+		}
+		[PlugMethod(MethodAssembler = typeof(Assemblers.IOReadWord))]
+		public static ushort IOReadWord(ushort aPort) {
+			return 0;
+		}
     }
 }
