@@ -25,6 +25,22 @@ namespace Cosmos.Hardware {
 			EndLogging();
 		}
 
+		public static void SendATA_BlockPartReceived(byte aController, byte aDrive, uint aBlock, byte aPart, ushort aValue) {
+			StartLogging();
+			WriteSerialString("<ATA_BlockPartReceived Controller=\"");
+			WriteNumber(aController, 8);
+			WriteSerialString("\" Drive=\"");
+			WriteNumber(aDrive, 8);
+			WriteSerialString("\" Block=\"");
+			WriteNumber(aBlock, 24);
+			WriteSerialString("\" Part=\"");
+			WriteNumber(aPart, 8);
+			WriteSerialString("\" Value=\"");
+			WriteNumber(aValue, 16);
+			WriteSerialString("\"/>");
+			EndLogging();
+		}
+
 		public static void WriteNumber(uint aNumber, byte aBits) {
 			WriteNumber(aNumber, aBits, true);
 		}

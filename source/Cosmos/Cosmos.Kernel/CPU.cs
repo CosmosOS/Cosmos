@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Cosmos.Kernel {
 	public class CPU {
-		public static void Init() {
+		public static unsafe void Init() {
 			Console.Write("Creating GDT...");
 			Hardware.CPU.CreateGDT();
 			Console.WriteLine("Done");
@@ -30,30 +30,30 @@ namespace Cosmos.Kernel {
 			Console.Write("Initializing Keyboard...");
 			Keyboard.Initialize();
 			Console.WriteLine("Done");
-			Console.WriteLine("Initializing ATA");
+			Console.Write("Initializing ATA...");
 			Hardware.Storage.ATA.Initialize(Sleep);
 			Console.WriteLine("Done");
-			byte[] xTempBytes = new byte[512];
-			byte xCurrentValue = 0;
+			byte[] xBytes = new byte[512];
+			byte xValue = 0;
 			for (int i = 0; i < 512; i++) {
-				xTempBytes[i] = xCurrentValue;
-				if (xCurrentValue == 255) {
-					xCurrentValue = 0;
+				xBytes[i] = xValue;
+				if (xValue == 255) {
+					xValue = 0;
 				} else {
-					xCurrentValue++;
+					xValue += 1;
 				}
 			}
-			Console.Write("Writing Diagnostics to Primary Master device...");
-			if (Hardware.Storage.ATA.WriteBlock(0, 0, 1, xTempBytes)) {
-				Console.WriteLine("Done");
+			// C-drive is at 0 - 0
+			Console.WriteLine("Trying to read file...");
+			if (FileSystem.Ext2.ReadFileContents(0, 0, new string[] { "test.txt" }) == null) {
+				Console.WriteLine("Failed or not fully implemented!");
 			} else {
-				Console.WriteLine("Failed");
+				Console.WriteLine("Done");
 			}
-			//Console.Write("Flushing caches...");
-			//if (Hardware.Storage.ATA.FlushCaches(0, 0)) {
-			//    Console.WriteLine("Done");
+			//if (FileSystem.Ext2.ReadFileContents(1, 0, new string[] { "test.txt" }) == null) {
+			//    Console.WriteLine("Failed or not fully implemented!");
 			//} else {
-			//    Console.WriteLine("Failed");
+			//    Console.WriteLine("Done");
 			//}
 		}
 

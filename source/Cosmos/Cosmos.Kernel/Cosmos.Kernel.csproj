@@ -25,6 +25,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -43,6 +44,7 @@
     <Compile Include="CPU.cs" />
     <Compile Include="DebugUtil.cs" />
     <Compile Include="FileSystem\Ext2.cs" />
+    <Compile Include="FileSystem\Ext2.Structs.cs" />
     <Compile Include="FileSystem\FileSystem.cs" />
     <Compile Include="FileSystem\ISO9660.cs" />
     <Compile Include="Heap.cs" />

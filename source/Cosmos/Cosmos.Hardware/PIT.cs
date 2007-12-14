@@ -17,7 +17,7 @@ namespace Cosmos.Hardware {
 
 		public static void Initialize(EventHandler aTick) {
 			mTick = aTick;
-			SetInterval(1193);
+			//SetInterval(1193);
 		}
 
 		private static EventHandler mTick;
