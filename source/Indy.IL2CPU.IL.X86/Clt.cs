@@ -17,13 +17,19 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 		public override void DoAssemble() {
 			Assembler.StackSizes.Pop();
-			Assembler.StackSizes.Pop();
+			int xSize = Assembler.StackSizes.Pop();
 			Assembler.StackSizes.Push(4);
 			string BaseLabel = CurInstructionLabel + "__";
 			string LabelTrue = BaseLabel + "True";
 			string LabelFalse = BaseLabel + "False";
 			new CPUx86.Pop(CPUx86.Registers.ECX);
+			if (xSize > 4) {
+				new CPUx86.Add("esp", "4");
+			}
 			new CPUx86.Pop(CPUx86.Registers.EAX);
+			if (xSize > 4) {
+				new CPUx86.Add("esp", "4");
+			}
 			new CPUx86.Pushd(CPUx86.Registers.ECX);
 			new CPUx86.Compare(CPUx86.Registers.EAX, CPUx86.Registers.AtESP);
 			new CPUx86.JumpIfLess(LabelTrue);
