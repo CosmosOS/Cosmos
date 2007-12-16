@@ -14,7 +14,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			//new CPUx86.Move(CPUx86.Registers.AtEAX, CPUx86.Registers.EDX);
 			int xFieldSize = Assembler.StackSizes.Pop();
 			Assembler.StackSizes.Pop();
-			new CPUx86.Pop("ecx");
+			new CPUx86.Move("ecx", "[esp + " + xFieldSize + "]");
 			for (int i = 0; i < (xFieldSize / 4); i++) {
 				new CPUx86.Pop("eax");
 				new CPUx86.Move("dword [ecx + 0x" + (xFieldSize - (i * 4)).ToString("X") + "]", "eax");
@@ -35,8 +35,8 @@ namespace Indy.IL2CPU.IL.X86 {
 					}
 				default:
 					throw new Exception("Remainder size " + (xFieldSize % 4) + " not supported!");
-
 			}
+			new CPUx86.Add("esp", "4");
 		}
 	}
 }
