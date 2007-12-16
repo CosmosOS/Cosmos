@@ -1,8 +1,6 @@
 using System;
-using System.IO;
-using Mono.Cecil;
 using Mono.Cecil.Cil;
-using CPU = Indy.IL2CPU.Assembler.X86;
+using CPUx86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Conv_I)]
@@ -11,7 +9,24 @@ namespace Indy.IL2CPU.IL.X86 {
 			: base(aInstruction, aMethodInfo) {
 		}
 		public override void DoAssemble() {
-			// todo: implement correct conversion
+			int xSource = Assembler.StackSizes.Pop();
+			switch (xSource) {
+				case 1:
+				case 2:
+				case 4: {
+						break;
+					}
+				case 8: {
+						new CPUx86.Pop(CPUx86.Registers.EAX);
+						new CPUx86.Add("esp", "4");
+						new CPUx86.Pushd(CPUx86.Registers.EAX);
+						break;
+
+					}
+				default:
+					throw new Exception("SourceSize " + xSource + " not supported!");
+			}
+			Assembler.StackSizes.Push(4);
 		}
 	}
 }
