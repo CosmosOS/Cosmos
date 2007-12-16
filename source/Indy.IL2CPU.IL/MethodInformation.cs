@@ -80,10 +80,7 @@ namespace Indy.IL2CPU.IL {
 			}
 			int xCurIndex = 0;
 			foreach (Variable xVar in Locals) {
-				xSB.AppendFormat("\t({0}) {1}\t{2}\t{3}\r\n\r\n", xCurIndex++, xVar.Offset, xVar.Size, xVar.VirtualAddresses.FirstOrDefault());
-				for (int i = 1; i < xVar.VirtualAddresses.Length; i++) {
-					xSB.AppendFormat("\t\t\t{0}\r\n\r\n", xVar.VirtualAddresses[i]);
-				}
+				xSB.AppendFormat("\t({0}) {1}\t{2}\t{3} (Type = {4})\r\n\r\n", xCurIndex++, xVar.Offset, xVar.Size, xVar.VirtualAddresses.FirstOrDefault(), xVar.VariableType.FullName);
 			}
 			xSB.AppendLine("Arguments:");
 			if (Arguments.Length == 0) {
@@ -91,7 +88,7 @@ namespace Indy.IL2CPU.IL {
 			}
 			xCurIndex = 0;
 			foreach (Argument xArg in Arguments) {
-				xSB.AppendLine(String.Format("\t({0}) {1}\t{2}\t{3}\r\n", xCurIndex++, xArg.Offset, xArg.Size, xArg.VirtualAddresses.FirstOrDefault()));
+				xSB.AppendLine(String.Format("\t({0}) {1}\t{2}\t{3} (Type = {4})\r\n", xCurIndex++, xArg.Offset, xArg.Size, xArg.VirtualAddresses.FirstOrDefault(), xArg.ArgumentType.FullName));
 			}
 			xSB.AppendLine("\tReturnSize: " + ReturnSize);
 			return xSB.ToString();

@@ -7,13 +7,45 @@ namespace Cosmos.Kernel.FileSystem {
 	partial class Ext2 {
 		[StructLayout(LayoutKind.Sequential)]
 		internal struct SuperBlock {
+			/// <summary>
+			/// Indicates the total number of INodes, both used and free, in the filesystem.
+			/// </summary>
 			public uint INodesCount;
+			/// <summary>
+			/// Indicates the total number of blocks, both used and free, in the filesystem.
+			/// </summary>
 			public uint BlockCount;
+			/// <summary>
+			/// Indicates the total number of blocks reserved for the usage of the super user. this is most useful
+			/// if for some reason a user, malicious or not, fills the file system to capacity; the super user will 
+			/// have this specified amount of free blocks at his disposal so he can edit and save configuration files.
+			/// </summary>
 			public uint RBlocksCount;
+			/// <summary>
+			/// Indicates the total number of free blocks, including the number of reserved blocks (<see cref="RBlocksCount"/>).
+			/// This is a sum of all free blocks of all the block groups.
+			/// </summary>
 			public uint FreeBlocksCount;
+			/// <summary>
+			/// Indicates the total number of free INodes. This is a sum of all free nodes of all the block groups.
+			/// </summary>
 			public uint FreeINodesCount;
+			/// <summary>
+			/// Identifies the first data block, in other words the id of the block containing the superblock
+			/// structure.
+			/// Note that this value is always 0 for filesystems with a block size larger than 1KB,
+			/// and always 1 for filesystem with a blocksize of 1KB. The superblock is always starting at the
+			/// 1024th byte of the disk, which normally happens to be the first byte of the 3rd sector.
+			/// </summary>
 			public uint FirstDataBlock;
-			public uint LogBlockSize;
+			/// <summary>
+			/// The block size is computed using this value as the number of bits to shift left the value 1024.
+			/// This value may only be positive.
+			/// <code>
+			///		int xBlockSize = 1024 &lt;&lt; LogBlockSize;
+			/// </code>
+			/// </summary>
+			public int LogBlockSize;
 			public uint LogFragSize;
 			public uint BlocksPerGroup;
 			public uint FragsPerGroup;
@@ -141,6 +173,34 @@ namespace Cosmos.Kernel.FileSystem {
 			public uint Padding105;
 			public uint Padding106;
 			public uint Padding107;
+		}
+
+		/// <summary>
+		/// For each group in the filesystem, a <see cref="GroupDescriptor"/> is created.
+		/// Each represents a single "block group" within the filesystem and the information
+		/// within any on of them is pertinent only to the group it is describing.
+		/// </summary>
+		[StructLayout(LayoutKind.Sequential)]
+		internal struct GroupDescriptor {
+			/// <summary>
+			/// Block id of the first block of the "block bitmap" for the group represented.
+			/// </summary>
+			public uint BlockBitmap;
+			/// <summary>
+			/// Block id of the first block of the "INode bitmap" for the group represented.
+			/// </summary>
+			public uint INodeBitmap;
+			/// <summary>
+			/// Block id of the first block of the "Inode table" for the group represented.
+			/// </summary>
+			public uint INodeTable;
+			public ushort FreeBlocksCount;
+			public ushort FreeINodesCount;
+			public ushort UsedDirsCount;
+			public ushort Pad;
+			public uint Padding1;
+			public uint Padding2;
+			public uint Padding3;
 		}
 	}
 }

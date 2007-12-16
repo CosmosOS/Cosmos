@@ -103,7 +103,6 @@ namespace Cosmos.Hardware.Storage {
 
 		internal static void HandleInterruptPrimary() {
 			DebugUtil.SendMessage("ATA", "Primary Controller Ready");
-			Console.WriteLine("Primary Controller Ready");
 			IOWriteByte((ushort)(ATAControllerInfo[0] + IDE_PORT_ERROR), 0);
 			PrimaryControllerInterruptOccurred = true;
 		}
@@ -113,7 +112,6 @@ namespace Cosmos.Hardware.Storage {
 
 		internal static void HandleInterruptSecondary() {
 			DebugUtil.SendMessage("ATA", "Secondary Controller Ready");
-			Console.WriteLine("Secondary Controller Ready");
 			IOWriteByte((ushort)(ATAControllerInfo[1] + IDE_PORT_ERROR), 0);
 			SecondaryControllerInterruptOccurred = true;
 		}
@@ -341,7 +339,6 @@ namespace Cosmos.Hardware.Storage {
 			//14) Read one sector from the IDE Controller 16-bits at a time using the IN or the INSW instructions. 
 			for (uint i = 0; i < 256; i++) {
 				ushort xValue = IOReadWord(xControllerAddr);
-				DebugUtil.SendATA_BlockPartReceived(aController, aDrive, aBlock, (byte)i, xValue);
 				aBuffer[i] = xValue;
 			}
 			// 15) See if you have to read one more sector. If yes, repeat from step 11 again. 

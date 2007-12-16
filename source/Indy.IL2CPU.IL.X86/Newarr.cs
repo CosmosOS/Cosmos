@@ -37,10 +37,10 @@ namespace Indy.IL2CPU.IL.X86 {
 		public override void DoAssemble() {
 			new CPU.Comment("Element Size = " + mElementSize);
 			// element count is on the stack
-			int xElementCountSize = Assembler.StackSizes.Peek();
+			int xElementCountSize = Assembler.StackSizes.Pop();
 			new CPUx86.Pop(CPUx86.Registers.EDI);
 			new CPUx86.Pushd(CPUx86.Registers.EDI);
-			Assembler.StackSizes.Push(xElementCountSize);
+			//Assembler.StackSizes.Push(xElementCountSize);
 			new CPUx86.Pushd("0x" + mElementSize.ToString("X"));
 			Assembler.StackSizes.Push(4);
 			Multiply(Assembler);
@@ -51,7 +51,6 @@ namespace Indy.IL2CPU.IL.X86 {
 			// the total array size is now on the stack.
 			Engine.QueueMethodRef(GCImplementationRefs.AllocNewObjectRef);
 			new CPUx86.Call(CPU.Label.GenerateLabelName(GCImplementationRefs.AllocNewObjectRef));
-			Assembler.StackSizes.Pop();
 			new CPUx86.Pushd(CPUx86.Registers.EAX);
 			new CPUx86.Pushd(CPUx86.Registers.EAX);
 			new CPUx86.Pushd(CPUx86.Registers.EAX);
@@ -62,7 +61,6 @@ namespace Indy.IL2CPU.IL.X86 {
 			new CPUx86.Call(CPU.Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef));			
 			Assembler.StackSizes.Push(4);
 			new CPUx86.Pop(CPUx86.Registers.EAX);
-			Assembler.StackSizes.Push(4);
 			new CPUx86.Move("dword", CPUx86.Registers.AtEAX, "0x" + Engine.RegisterType(Engine.GetTypeDefinition("mscorlib", "System.Array")).ToString("X"));
 			new CPUx86.Add(CPUx86.Registers.EAX, "4");
 			new CPUx86.Move("dword", CPUx86.Registers.AtEAX, "0x" + InstanceTypeEnum.Array.ToString("X"));

@@ -19,7 +19,6 @@ namespace Indy.IL2CPU.IL.X86 {
 						break;
 					}
 				case 8: {
-						Assembler.StackSizes.Peek();
 						new CPUx86.Pop(CPUx86.Registers.EAX);
 						new CPUx86.Add("esp", "4");
 						new CPUx86.Pushd(CPUx86.Registers.EAX);

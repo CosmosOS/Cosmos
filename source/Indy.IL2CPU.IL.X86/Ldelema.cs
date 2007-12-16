@@ -21,6 +21,9 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public static void Assemble(CPU.Assembler aAssembler, int aElementSize) {
+			aAssembler.StackSizes.Pop();
+			aAssembler.StackSizes.Pop();
+			aAssembler.StackSizes.Push(4);
 			new CPUx86.Pop(CPUx86.Registers.EAX);
 			new CPUx86.Move(CPUx86.Registers.EDX, "0" + aElementSize.ToString("X") + "h");
 			new CPUx86.Multiply(CPUx86.Registers.EDX);

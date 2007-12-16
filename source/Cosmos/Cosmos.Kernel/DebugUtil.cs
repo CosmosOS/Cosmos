@@ -99,7 +99,7 @@ namespace Cosmos.Kernel {
 			Serial.Write(0, "\" FirstDataBlock=\"");
 			Hardware.DebugUtil.WriteNumber(aSuperBlock->FirstDataBlock, 32);
 			Serial.Write(0, "\" LogBlockSize=\"");
-			Hardware.DebugUtil.WriteNumber(aSuperBlock->LogBlockSize, 32);
+			Hardware.DebugUtil.WriteNumber((uint)aSuperBlock->LogBlockSize, 32);
 			Serial.Write(0, "\" LogFragSize=\"");
 			Hardware.DebugUtil.WriteNumber(aSuperBlock->LogFragSize, 32);
 			Serial.Write(0, "\" BlocksPerGroup=\"");

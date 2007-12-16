@@ -27,36 +27,6 @@ namespace Indy.IL2CPU.IL.X86 {
 		public override void DoAssemble() {
 			if (mNeedsGC) {
 				new CPUx86.Pushd("[" + mDataName + "]");
-				TypeSpecification xTypeSpec = mDataType as TypeSpecification;
-				if (xTypeSpec != null) {
-					TypeDefinition xElementDef = Engine.GetDefinitionFromTypeReference(xTypeSpec.ElementType);
-					if ((!xElementDef.IsValueType) && xElementDef.FullName != "System.String") {
-						new CPUx86.Compare("dword " + CPUx86.Registers.AtESP, "0");
-						new CPUx86.JumpIfEquals(mBaseLabel + "_GC_LOCAL_CLEANUP_ENTRY_VAR_END");
-						new CPUx86.Pushd("[" + mDataName + "]");
-						new CPUx86.Push("8");
-						Op.Add(Assembler);
-						new CPUx86.Pop(CPUx86.Registers.EDX); // total item count	address
-						new CPUx86.Move(CPUx86.Registers.EBX, CPUx86.Registers.AtEDX);
-						new CPUx86.Add(CPUx86.Registers.EDX, "4");
-						new CPUx86.Move(CPUx86.Registers.ECX, "0"); // counter
-						new Label(mBaseLabel + "_GC_LOCAL_CLEANUP_ENTRY_VAR");
-						new CPUx86.Compare(CPUx86.Registers.EBX, CPUx86.Registers.ECX);
-						new CPUx86.JumpIfEquals(mBaseLabel + "_GC_LOCAL_CLEANUP_ENTRY_VAR_END");
-						new CPUx86.Push(CPUx86.Registers.EDX);
-						new CPUx86.Push(CPUx86.Registers.ECX);
-						new CPUx86.Push(CPUx86.Registers.EBX);
-						new CPUx86.Push("dword", CPUx86.Registers.AtEDX);
-						new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef));
-						new CPUx86.Pop(CPUx86.Registers.EBX);
-						new CPUx86.Pop(CPUx86.Registers.ECX);
-						new CPUx86.Pop(CPUx86.Registers.EDX);
-						new CPUx86.Add(CPUx86.Registers.EDX, "4");
-						new CPUx86.Add(CPUx86.Registers.ECX, "1");
-						new CPUx86.JumpAlways(mBaseLabel + "_GC_LOCAL_CLEANUP_ENTRY_VAR");
-						new Label(mBaseLabel + "_GC_LOCAL_CLEANUP_ENTRY_VAR_END");
-					}
-				}
 				Engine.QueueMethodRef(GCImplementationRefs.DecRefCountRef);
 				new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef));
 			}

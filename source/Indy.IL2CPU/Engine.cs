@@ -756,6 +756,7 @@ namespace Indy.IL2CPU {
 							if (xCurrentMethod.HasBody) {
 								// todo: add support for types which need different stack size
 								mInstructionsToSkip = 0;
+								mAssembler.StackSizes.Clear();
 								foreach (Instruction xInstruction in xCurrentMethod.Body.Instructions) {
 									if (mInstructionsToSkip > 0) {
 										mInstructionsToSkip--;
@@ -766,7 +767,7 @@ namespace Indy.IL2CPU {
 										throw new Exception("OpCode '" + xInstruction.OpCode.Code + "' not supported in Metal mode!");
 									}
 									xOp.Assembler = mAssembler;
-									new Comment("StackItems = " + mAssembler.StackSizes.Count);
+									new Comment("StackItems = " + mAssembler.StackSizes.Count + ", Top item = " + (mAssembler.StackSizes.Count > 0 ? mAssembler.StackSizes.Peek().ToString() : "(empty)"));
 									xOp.Assemble();
 								}
 							} else {
@@ -821,7 +822,7 @@ namespace Indy.IL2CPU {
 					xCurOffset = 0;
 					int xArgSize;
 					for (int i = xArgs.Length - 1; i > 0; i--) {
-						ParameterDefinition xParamDef = aCurrentMethodForArguments.Parameters[xArgs.Length - i - 1];
+						ParameterDefinition xParamDef = aCurrentMethodForArguments.Parameters[i - 1];
 						xArgSize = GetFieldStorageSize(xParamDef.ParameterType);
 						if ((xArgSize % 4) != 0) {
 							xArgSize += 4 - (xArgSize % 4);
@@ -844,7 +845,7 @@ namespace Indy.IL2CPU {
 					xArgs = new MethodInformation.Argument[aCurrentMethodForArguments.Parameters.Count];
 					xCurOffset = 0;
 					for (int i = xArgs.Length - 1; i >= 0; i--) {
-						ParameterDefinition xParamDef = aCurrentMethodForArguments.Parameters[xArgs.Length - i - 1];
+						ParameterDefinition xParamDef = aCurrentMethodForArguments.Parameters[i];//xArgs.Length - i - 1];
 						int xArgSize = GetFieldStorageSize(xParamDef.ParameterType);
 						if ((xArgSize % 4) != 0) {
 							xArgSize += 4 - (xArgSize % 4);

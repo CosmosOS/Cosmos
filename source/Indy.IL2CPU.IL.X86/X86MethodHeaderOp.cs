@@ -15,14 +15,8 @@ namespace Indy.IL2CPU.IL.X86 {
 			: base(aInstruction, aMethodInfo) {
 			LabelName = aMethodInfo.LabelName;
 			Args = aMethodInfo.Arguments.ToArray();
-			Locals = new int[aMethodInfo.Locals.Length];
-			for (int i = 0; i < aMethodInfo.Locals.Length; i++) {
-				var xVar = aMethodInfo.Locals[i];
-				Locals[i] = xVar.Size;
-				if (xVar.Size % 4 != 0) {
-					throw new Exception("Local Variable size is not a a multiple of 4");
-				}
-			}
+			Locals = (from local in aMethodInfo.Locals
+					  select local.Size).ToArray();
 		}
 
 		public override void DoAssemble() {

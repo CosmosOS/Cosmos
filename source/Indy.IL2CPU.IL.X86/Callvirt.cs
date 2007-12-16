@@ -22,9 +22,6 @@ namespace Indy.IL2CPU.IL.X86 {
 			if (xMethod == null) {
 				throw new Exception("Unable to determine Method!");
 			}
-			if(xMethod.ToString() == "!0 System.Collections.Generic.List`1<System.Int32>::get_Item(System.Int32)") {
-				System.Diagnostics.Debugger.Break();
-			}
 			MethodDefinition xMethodDef = Engine.GetDefinitionFromMethodReference(xMethod);
 			mMethodDescription = CPU.Label.GenerateLabelName(xMethodDef);
 			if (xMethodDef.IsStatic || !xMethodDef.IsVirtual) {

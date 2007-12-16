@@ -43,19 +43,10 @@ namespace Indy.IL2CPU.IL.X86 {
 			int xSize = aAssembler.StackSizes.Pop();
 			if (xSize > 4) {
 				new CPUx86.Pop("eax");
+				new CPUx86.Add("esp", "4");
 				new CPUx86.Multiply("dword [esp]");
 				new CPUx86.Add("esp", "4");
 				new Pushd("eax");
-
-				new Pushfd();
-				new CPUx86.And("dword [esp]", "0x400");
-				new CPUx86.Move(Registers.CL, "10");
-				new CPUx86.Pop("edx");
-				new CPUx86.ShiftRight("eax", "edx", Registers.CL);
-				new CPUx86.Add("[esp]", "eax");
-				new CPUx86.Pop("eax");
-				new CPUx86.Multiply("dword [esp+4]");
-				new CPUx86.Move("[esp + 4]", "eax");
 			} else {
 				new CPUx86.Pop("eax");
 				new CPUx86.Multiply("dword [esp]");

@@ -17,6 +17,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 		public override void DoAssemble() {
 			Assembler.StackSizes.Pop();
+			Assembler.StackSizes.Pop();
 			Assembler.StackSizes.Push(4);
 			string BaseLabel = CurInstructionLabel + "__";
 			string LabelTrue = BaseLabel + "True";
