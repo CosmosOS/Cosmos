@@ -191,7 +191,7 @@ namespace Cosmos.Kernel.FileSystem {
 			/// </summary>
 			public uint INodeBitmap;
 			/// <summary>
-			/// Block id of the first block of the "Inode table" for the group represented.
+			/// Block id of the first block of the "INode table" for the group represented.
 			/// </summary>
 			public uint INodeTable;
 			public ushort FreeBlocksCount;
@@ -201,6 +201,71 @@ namespace Cosmos.Kernel.FileSystem {
 			public uint Padding1;
 			public uint Padding2;
 			public uint Padding3;
+		}
+
+		[StructLayout(LayoutKind.Sequential)]
+		internal struct INodeTable {
+			public INodeModeEnum Mode;
+			public ushort UID;
+			public uint Size;
+			public uint ATime;
+			public uint CTime;
+			public uint MTime;
+			public uint DTime;
+			public ushort GID;
+			public ushort LinksCount;
+			public uint Blocks;
+			public uint Flags;
+			public uint OSD1;
+			public uint Block1;
+			public uint Block2;
+			public uint Block3;
+			public uint Block4;
+			public uint Block5;
+			public uint Block6;
+			public uint Block7;
+			public uint Block8;
+			public uint Block9;
+			public uint Block10;
+			public uint Block11;
+			public uint Block12;
+			public uint Block13;
+			public uint Block14;
+			public uint Block15;
+			public uint Generation;
+			public uint FileACL;
+			public uint DirACL;
+			public uint FAddr;
+			public uint OSD2_1;
+			public uint OSD2_2;
+			public uint OSD2_3;
+		}
+
+		[Flags]
+		public enum INodeModeEnum: ushort {
+			FormatMask = 0xF000,
+			Socket = 0xC000,
+			SymbolicLink = 0xA000,
+			RegularFile = 0x8000,
+			BlockDevice = 0x6000,
+			Directory = 0x4000,
+			CharacterDevice = 0x2000,
+			Fifo = 0x1000,
+			SUID = 0x0800,
+			SGID = 0x0400,
+			StickyBit = 0x0200,
+			UserAccessRightsMask = 0x01C0,
+			UserAccessRightsRead = 0x0100,
+			UserAccessRightsWrite = 0x0080,
+			UserAccessRightsExecute = 0x0040,
+			GroupAccessRightsMask = 0x0038,
+			GroupAccessRightsRead = 0x0020,
+			GroupAccessRightsWrite = 0x0010,
+			GroupAccessRightsExecute = 0x0008,
+			OthersAccessRightsMask = 0x0007,
+			OthersAccessRightsRead = 0x0004,
+			OthersAccessRightsWrite = 0x0002,
+			OthersAccessRightsExecute = 0x0001
 		}
 	}
 }

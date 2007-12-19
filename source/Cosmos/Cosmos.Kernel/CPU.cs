@@ -33,23 +33,9 @@ namespace Cosmos.Kernel {
 			Console.Write("Initializing ATA...");
 			Hardware.Storage.ATA.Initialize(Sleep);
 			Console.WriteLine("Done");
-			byte[] xBytes = new byte[512];
-			byte xValue = 0;
-			for (int i = 0; i < 512; i++) {
-				xBytes[i] = xValue;
-				if (xValue == 255) {
-					xValue = 0;
-				} else {
-					xValue += 1;
-				}
-			}
-			// C-drive is at 0 - 0
-			Console.WriteLine("Trying to read file...");
-			if (FileSystem.Ext2.ReadFileContents(0, 0, new string[] { "test.txt" }) == null) {
-				Console.WriteLine("Failed or not fully implemented!");
-			} else {
-				Console.WriteLine("Done");
-			}
+			Console.Write("Getting Partition info...");
+			FileSystem.Ext2.PrintAllFilesAndDirectories(0, 0);
+			Console.WriteLine("Done");
 			//if (FileSystem.Ext2.ReadFileContents(1, 0, new string[] { "test.txt" }) == null) {
 			//    Console.WriteLine("Failed or not fully implemented!");
 			//} else {

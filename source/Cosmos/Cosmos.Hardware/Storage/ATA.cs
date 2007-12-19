@@ -102,7 +102,7 @@ namespace Cosmos.Hardware.Storage {
 		private static Action<uint> mSleep;
 
 		internal static void HandleInterruptPrimary() {
-			DebugUtil.SendMessage("ATA", "Primary Controller Ready");
+			//DebugUtil.SendMessage("ATA", "Primary Controller Ready");
 			IOWriteByte((ushort)(ATAControllerInfo[0] + IDE_PORT_ERROR), 0);
 			PrimaryControllerInterruptOccurred = true;
 		}
@@ -273,7 +273,7 @@ namespace Cosmos.Hardware.Storage {
 			byte xError = IOReadByte((ushort)(aController + IDE_PORT_ERROR));
 		}
 
-		public static unsafe bool ReadDataNew(byte aController, byte aDrive, uint aBlock, ushort* aBuffer) {
+		public static unsafe bool ReadDataNew(byte aController, byte aDrive, int aBlock, ushort* aBuffer) {
 			ushort xControllerAddr = ATAControllerInfo[aController];
 			// 1) Read the status register of the primary or the secondary IDE controller. 
 			// 2) The BSY and DRQ bits must be zero if the controller is ready. 

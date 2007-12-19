@@ -45,7 +45,8 @@ namespace Indy.IL2CPU.IL.X86 {
 				new CPUx86.Pop("eax");
 				new CPUx86.Add("esp", "4");
 				new CPUx86.Multiply("dword [esp]");
-				new CPUx86.Add("esp", "4");
+				new CPUx86.Add("esp", "8");
+				new Pushd("0");
 				new Pushd("eax");
 			} else {
 				new CPUx86.Pop("eax");

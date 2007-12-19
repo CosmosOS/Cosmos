@@ -28,6 +28,20 @@ namespace Cosmos.Kernel {
 			EndLogging();
 		}
 
+		public static void SendDoubleNumber(string aModule, string aDescription, uint aNumber, byte aBits, uint aNumber2, byte aBits2) {
+			StartLogging();
+			Serial.Write(0, "<Number Module=\"");
+			Serial.Write(0, aModule);
+			Serial.Write(0, "\" Description=\"");
+			Serial.Write(0, aDescription);
+			Serial.Write(0, "\" Number1=\"");
+			Hardware.DebugUtil.WriteNumber(aNumber, aBits);
+			Serial.Write(0, "\" Number2=\"");
+			Hardware.DebugUtil.WriteNumber(aNumber2, aBits2);
+			Serial.Write(0, "\"/>\r\n");
+			EndLogging();
+		}
+
 		public static void SendMessage(string aModule, string aData) {
 			StartLogging();
 			Serial.Write(0, "<Message Type=\"Info\" Module=\"");
@@ -82,9 +96,39 @@ namespace Cosmos.Kernel {
 			EndLogging();
 		}
 
+		internal static unsafe void SendExt2_GroupDescriptor(string aDescription, int aBlock, int aIndex, FileSystem.Ext2.GroupDescriptor* aDescriptor) {
+			StartLogging();
+			Serial.Write(0, "<Ext2_GroupDescriptor Description=\"");
+			Serial.Write(0, aDescription);
+			uint xAddress = (uint)aDescriptor;
+			Serial.Write(0, "\" Address=\"");
+			Hardware.DebugUtil.WriteNumber(xAddress, 32);
+			Serial.Write(0, "\" Block=\"");
+			Hardware.DebugUtil.WriteNumber((uint)aBlock, 32);
+			Serial.Write(0, "\" Index=\"");
+			Hardware.DebugUtil.WriteNumber((uint)aIndex, 32);
+			Serial.Write(0, "\" BlockBitmap=\"");
+			Hardware.DebugUtil.WriteNumber(aDescriptor->BlockBitmap, 32);
+			Serial.Write(0, "\" INodeBitmap=\"");
+			Hardware.DebugUtil.WriteNumber(aDescriptor->INodeBitmap, 32);
+			Serial.Write(0, "\" INodeTable=\"");
+			Hardware.DebugUtil.WriteNumber(aDescriptor->INodeTable, 32);
+			Serial.Write(0, "\" FreeBlocksCount=\"");
+			Hardware.DebugUtil.WriteNumber(aDescriptor->FreeBlocksCount, 32);
+			Serial.Write(0, "\" FreeINodesCount=\"");
+			Hardware.DebugUtil.WriteNumber(aDescriptor->FreeINodesCount, 32);
+			Serial.Write(0, "\" UsedDirsCount=\"");
+			Hardware.DebugUtil.WriteNumber(aDescriptor->UsedDirsCount, 32);
+			Serial.Write(0, "\" Pad=\"");
+			Hardware.DebugUtil.WriteNumber(aDescriptor->Pad, 32);
+			Serial.WriteLine(0, "\"/>");
+			EndLogging();
+		}
+
 		internal static unsafe void SendExt2_SuperBlock(string aDescription, FileSystem.Ext2.SuperBlock* aSuperBlock) {
 			StartLogging();
-			Serial.Write(0, "<Ext_SuperBlock Description=\"");
+			int xTest = sizeof(FileSystem.Ext2.SuperBlock);
+			Serial.Write(0, "<Ext2_SuperBlock1 Description=\"");
 			Serial.Write(0, aDescription);
 			Serial.Write(0, "\" INodesCount=\"");
 			Hardware.DebugUtil.WriteNumber(aSuperBlock->INodesCount, 32);
