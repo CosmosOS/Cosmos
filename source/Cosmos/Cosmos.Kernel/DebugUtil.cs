@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 namespace Cosmos.Kernel {
 	public static class DebugUtil {
 		public static void Initialize() {
@@ -126,7 +123,6 @@ namespace Cosmos.Kernel {
 
 		internal static unsafe void SendExt2_SuperBlock(string aDescription, FileSystem.Ext2.SuperBlock* aSuperBlock) {
 			StartLogging();
-			int xTest = sizeof(FileSystem.Ext2.SuperBlock);
 			Serial.Write(0, "<Ext2_SuperBlock1 Description=\"");
 			Serial.Write(0, aDescription);
 			Serial.Write(0, "\" INodesCount=\"");
@@ -394,6 +390,82 @@ namespace Cosmos.Kernel {
 			Serial.Write(0, "\" Padding107=\"");
 			Hardware.DebugUtil.WriteNumber(aSuperBlock->Padding107, 32);
 			Serial.Write(0, "\"/>");
+			EndLogging();
+		}
+
+		internal static void SendExt2_INode(uint aBlockGroup, FileSystem.Ext2.INode aINode) {
+			StartLogging();
+			Serial.Write(0, "<Ext2_INode BlockGroup=\"");
+			Hardware.DebugUtil.WriteNumber(aBlockGroup, 32);
+			Serial.Write(0, "\" Mode=\"");
+			Hardware.DebugUtil.WriteNumber((ushort)aINode.Mode, 16);
+			Serial.Write(0, "\" UID=\"");
+			Hardware.DebugUtil.WriteNumber(aINode.UID, 16);
+			Serial.Write(0, "\" Size=\"");
+			Hardware.DebugUtil.WriteNumber(aINode.Size, 32);
+			Serial.Write(0, "\" ATime=\"");
+			Hardware.DebugUtil.WriteNumber(aINode.ATime, 32);
+			Serial.Write(0, "\" CTime=\"");
+			Hardware.DebugUtil.WriteNumber(aINode.CTime, 32);
+			Serial.Write(0, "\" MTime=\"");
+			Hardware.DebugUtil.WriteNumber(aINode.MTime, 32);
+			Serial.Write(0, "\" DTime=\"");
+			Hardware.DebugUtil.WriteNumber(aINode.DTime, 32);
+			Serial.Write(0, "\" GID=\"");
+			Hardware.DebugUtil.WriteNumber(aINode.GID, 16);
+			Serial.Write(0, "\" LinksCount=\"");
+			Hardware.DebugUtil.WriteNumber(aINode.LinksCount, 16);
+			Serial.Write(0, "\" Blocks=\"");
+			Hardware.DebugUtil.WriteNumber(aINode.Blocks, 32);
+			Serial.Write(0, "\" Flags=\"");
+			Hardware.DebugUtil.WriteNumber(aINode.Flags, 32);
+			Serial.Write(0, "\" OSD1=\"");
+			Hardware.DebugUtil.WriteNumber(aINode.OSD1, 32);
+			Serial.Write(0, "\" Block1=\"");
+			Hardware.DebugUtil.WriteNumber(aINode.Block1, 32);
+			Serial.Write(0, "\" Block2=\"");
+			Hardware.DebugUtil.WriteNumber(aINode.Block2, 32);
+			Serial.Write(0, "\" Block3=\"");
+			Hardware.DebugUtil.WriteNumber(aINode.Block3, 32);
+			Serial.Write(0, "\" Block4=\"");
+			Hardware.DebugUtil.WriteNumber(aINode.Block4, 32);
+			Serial.Write(0, "\" Block5=\"");
+			Hardware.DebugUtil.WriteNumber(aINode.Block5, 32);
+			Serial.Write(0, "\" Block6=\"");
+			Hardware.DebugUtil.WriteNumber(aINode.Block6, 32);
+			Serial.Write(0, "\" Block7=\"");
+			Hardware.DebugUtil.WriteNumber(aINode.Block7, 32);
+			Serial.Write(0, "\" Block8=\"");
+			Hardware.DebugUtil.WriteNumber(aINode.Block8, 32);
+			Serial.Write(0, "\" Block9=\"");
+			Hardware.DebugUtil.WriteNumber(aINode.Block9, 32);
+			Serial.Write(0, "\" Block10=\"");
+			Hardware.DebugUtil.WriteNumber(aINode.Block10, 32);
+			Serial.Write(0, "\" Block11=\"");
+			Hardware.DebugUtil.WriteNumber(aINode.Block11, 32);
+			Serial.Write(0, "\" Block12=\"");
+			Hardware.DebugUtil.WriteNumber(aINode.Block12, 32);
+			Serial.Write(0, "\" Block13=\"");
+			Hardware.DebugUtil.WriteNumber(aINode.Block13, 32);
+			Serial.Write(0, "\" Block14=\"");
+			Hardware.DebugUtil.WriteNumber(aINode.Block14, 32);
+			Serial.Write(0, "\" Block15=\"");
+			Hardware.DebugUtil.WriteNumber(aINode.Block15, 32);
+			Serial.Write(0, "\" Generation=\"");
+			Hardware.DebugUtil.WriteNumber(aINode.Generation, 32);
+			Serial.Write(0, "\" FileACL=\"");
+			Hardware.DebugUtil.WriteNumber(aINode.FileACL, 32);
+			Serial.Write(0, "\" DirACL=\"");
+			Hardware.DebugUtil.WriteNumber(aINode.DirACL, 32);
+			Serial.Write(0, "\" FAddr=\"");
+			Hardware.DebugUtil.WriteNumber(aINode.FAddr, 32);
+			Serial.Write(0, "\" OSD2_1=\"");
+			Hardware.DebugUtil.WriteNumber(aINode.OSD2_1, 32);
+			Serial.Write(0, "\" OSD2_2=\"");
+			Hardware.DebugUtil.WriteNumber(aINode.OSD2_2, 32);
+			Serial.Write(0, "\" OSD2_3=\"");
+			Hardware.DebugUtil.WriteNumber(aINode.OSD2_3, 32);
+			Serial.Write(0, "\"/>\r\n");
 			EndLogging();
 		}
 	}

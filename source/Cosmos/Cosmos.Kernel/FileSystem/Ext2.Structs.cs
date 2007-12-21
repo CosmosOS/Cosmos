@@ -204,7 +204,7 @@ namespace Cosmos.Kernel.FileSystem {
 		}
 
 		[StructLayout(LayoutKind.Sequential)]
-		internal struct INodeTable {
+		internal struct INode {
 			public INodeModeEnum Mode;
 			public ushort UID;
 			public uint Size;

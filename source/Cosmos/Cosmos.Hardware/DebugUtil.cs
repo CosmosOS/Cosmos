@@ -28,7 +28,7 @@ namespace Cosmos.Hardware {
 		public static unsafe void SendATA_BlockReceived(byte aController, byte aDrive, uint aBlock, ushort* aValue) {
 			StartLogging();
 			byte* xValueBytes = (byte*)aValue;
-			for (int i = 0; i < 8; i++) {
+			for (int i = 0; i < 4; i++) {
 				WriteSerialString("<ATA_BlockPartReceived");
 				WriteNumber((uint)i, 8, false);
 				WriteSerialString(" Controller=\"");
@@ -38,8 +38,8 @@ namespace Cosmos.Hardware {
 				WriteSerialString("\" Block=\"");
 				WriteNumber(aBlock, 24);
 				WriteSerialString("\" Contents=\"0x");
-				for (int j = 0; j < 64; j++) {
-					WriteNumber(xValueBytes[i + j], 8, false);
+				for (int j = 0; j < 128; j++) {
+					WriteNumber(xValueBytes[(i * 128) + j], 8, false);
 				}
 				WriteSerialString("\"/>\r\n");
 			}

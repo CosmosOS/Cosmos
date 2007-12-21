@@ -60,22 +60,44 @@ namespace Cosmos.Kernel.FileSystem {
 			if (xGroupDescriptors == null) {
 				return;
 			}
-			uint xTempInt = 0;
-			for (int i = 0; i < xGroupDescriptors.Length; i++) {
-				GroupDescriptor xGroupDescriptor = xGroupDescriptors[i];
-				xTempInt += xGroupDescriptors[i].FreeINodesCount;
+			bool[] xUsedINodes = new bool[32];
+			uint xCount = 0;
+			INode* xINodeTable = (INode*)xBuffer;
+			for (uint g = 0; g < xGroupDescriptors.Length; g++) {
+				GroupDescriptor xGroupDescriptor = xGroupDescriptors[g];
+				if (!Hardware.Storage.ATA.ReadDataNew(aController, aDrive, (int)((xGroupDescriptor.INodeBitmap) * 8), xBuffer)) {
+					return;
+				}
+				if (!ConvertBitmapToBoolArray((uint*)xBuffer, xUsedINodes)) {
+					return;
+				}
+				for (int i = 0; i < 32; i++) {
+					if ((i % 4) == 0) {
+						uint index = (uint)((i % xSuperBlock.INodesPerGroup) * sizeof(INode));
+						uint offset = index % (uint)(1024 << xSuperBlock.LogBlockSize);
+						if (!Hardware.Storage.ATA.ReadDataNew(aController, aDrive, (int)((xGroupDescriptor.INodeTable+(index/(uint)(1024 << xSuperBlock.LogBlockSize)))*8), xBuffer)) {
+							Console.WriteLine("[Ext2] Error reading INode table entries");
+							return;
+						}
+					}					
+					if (xUsedINodes[i]) {
+						DebugUtil.SendExt2_INode(g, xINodeTable[i % 4]);
+						xCount++;
+					}
+				}
 			}
-			DebugUtil.SendNumber("Ext2", "Sum of FreeINodesCount", xTempInt, 32);
+			DebugUtil.SendNumber("Ext2", "Used INode count", xCount, 32);
 		}
 
-		private static bool ConvertBitmapToBoolArray(uint aBitmap, bool[] aArray) {
+		private static unsafe bool ConvertBitmapToBoolArray(uint* aBitmap, bool[] aArray) {
 			if (aArray == null || aArray.Length != 32) {
 				Console.WriteLine("[ConvertBitmapToBoolArray] Incorrect Array");
 				return false;
 			}
+			uint xValue = *aBitmap;
 			for (byte b = 0; b < 32; b++) {
 				uint xCheckBit = (uint)(1 << b);
-				aArray[b] = (aBitmap & xCheckBit) != 0;
+				aArray[b] = (xValue & xCheckBit) != 0;
 			}
 			return true;
 		}
