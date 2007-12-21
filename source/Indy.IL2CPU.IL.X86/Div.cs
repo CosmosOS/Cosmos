@@ -12,6 +12,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			int xSize = Assembler.StackSizes.Pop();
 			if (xSize == 8) {
 				//TODO: implement proper div support for 8byte values!
+				new CPUx86.Xor(CPUx86.Registers.EDX, CPUx86.Registers.EDX);
 				new CPUx86.Pop(CPUx86.Registers.ECX);
 				new CPUx86.Add("esp", "4");
 				new CPUx86.Pop(CPUx86.Registers.EAX);
@@ -20,7 +21,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				new CPUx86.Pushd(CPUx86.Registers.EAX);
 
 			} else {
-				new CPUx86.Move("edx", "0");
+				new CPUx86.Xor(CPUx86.Registers.EDX, CPUx86.Registers.EDX);
 				new CPUx86.Pop(CPUx86.Registers.ECX);
 				new CPUx86.Pop(CPUx86.Registers.EAX);
 				new CPUx86.Divide(CPUx86.Registers.ECX);

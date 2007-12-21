@@ -25,6 +25,39 @@ namespace Cosmos.Hardware {
 			EndLogging();
 		}
 
+		public static unsafe void SendATA_BlockReceived(byte aController, byte aDrive, uint aBlock, ushort* aValue) {
+			StartLogging();
+			byte* xValueBytes = (byte*)aValue;
+			for (int i = 0; i < 8; i++) {
+				WriteSerialString("<ATA_BlockPartReceived");
+				WriteNumber((uint)i, 8, false);
+				WriteSerialString(" Controller=\"");
+				WriteNumber(aController, 8);
+				WriteSerialString("\" Drive=\"");
+				WriteNumber(aDrive, 8);
+				WriteSerialString("\" Block=\"");
+				WriteNumber(aBlock, 24);
+				WriteSerialString("\" Contents=\"0x");
+				for (int j = 0; j < 64; j++) {
+					WriteNumber(xValueBytes[i + j], 8, false);
+				}
+				WriteSerialString("\"/>\r\n");
+			}
+			EndLogging();
+		}
+
+		public static void SendNumber(string aModule, string aDescription, uint aNumber, byte aBits) {
+			StartLogging();
+			WriteSerialString("<Number Module=\"");
+			WriteSerialString(aModule);
+			WriteSerialString("\" Description=\"");
+			WriteSerialString(aDescription);
+			WriteSerialString("\" Number=\"");
+			DebugUtil.WriteNumber(aNumber, aBits);
+			WriteSerialString("\"/>\r\n");
+			EndLogging();
+		}
+
 		public static void SendATA_BlockPartReceived(byte aController, byte aDrive, uint aBlock, byte aPart, ushort aValue) {
 			StartLogging();
 			WriteSerialString("<ATA_BlockPartReceived Controller=\"");
@@ -163,7 +196,7 @@ namespace Cosmos.Hardware {
 			WriteNumber(aBlock, 24);
 			WriteSerialString("\" Value=\"");
 			for (int i = 0; i < aValue.Length; i++) {
-				WriteNumber(aValue[i],8, false);
+				WriteNumber(aValue[i], 8, false);
 			}
 			WriteSerialString("\"/>\r\n");
 		}

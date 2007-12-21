@@ -26,31 +26,24 @@ namespace Cosmos.Kernel.FileSystem {
 		//    return null;
 		//}
 
-		private static unsafe GroupDescriptor[] ReadGroupDescriptorsOfBlock(byte aController, byte aDrive, uint aBlock, SuperBlock aSuperBlock, ushort* aBuffer) {
+		private static unsafe GroupDescriptor[] ReadGroupDescriptorsOfBlock(byte aController, byte aDrive, uint aBlockGroup, SuperBlock aSuperBlock, ushort* aBuffer) {
 			uint xGroupDescriptorCount = aSuperBlock.INodesCount / aSuperBlock.INodesPerGroup;
-			//int xBlockSize = (int)(1024 << (byte)(xSuperBlock.LogBlockSize));
-			//uint xGroupDescriptorsPerBlock = (uint)(xBlockSize / sizeof(GroupDescriptor));
 			GroupDescriptor[] xResult = new GroupDescriptor[xGroupDescriptorCount];
+			uint xCount = 0;
+			GroupDescriptor* xDescriptorPtr = (GroupDescriptor*)aBuffer;
 			for (int i = 0; i < xGroupDescriptorCount; i++) {
-				DebugUtil.SendNumber("Ext2", "i", (uint)i, 8);
-				DebugUtil.SendNumber("Ext2", "Buffer address", (uint)aBuffer, 32);
+				int xATABlock = (int)((8));
+				xATABlock += (i / 16);
 				if ((i % 16) == 0) {
-					DebugUtil.SendMessage("Ext2", "Reading Block");
-					if (!Hardware.Storage.ATA.ReadDataNew(aController, aDrive, (int)(aBlock + (byte)(i / 16)), aBuffer)) {
+					if (!Hardware.Storage.ATA.ReadDataNew(aController, aDrive, xATABlock, aBuffer)) {
 						Console.WriteLine("[Ext2|GroupDescriptors] Error while reading GroupDescriptor data");
 						return null;
 					}
+					Hardware.DebugUtil.SendATA_BlockReceived(aController, aDrive, (uint)(xATABlock + (byte)(i / 16)), aBuffer);
 				}
-				GroupDescriptor* xDescriptorPtr = (GroupDescriptor*)(aBuffer + ((int)(i - (byte)(i / 16)) * 32));
-				DebugUtil.SendNumber("Ext2", "Offset", (uint)xDescriptorPtr, 32);
-				xResult[i] = xDescriptorPtr[0];
-				DebugUtil.SendExt2_GroupDescriptor("ReadGroupDescriptorsOfBlock", (int)(aBlock + (byte)(i / 16)), i, xDescriptorPtr);
+				xResult[i] = xDescriptorPtr[i % 16];
+				DebugUtil.SendExt2_GroupDescriptor("ReadGroupDescriptorsOfBlock", xATABlock, i, 0, &xDescriptorPtr[i % 16]);
 			}
-			//GroupDescriptor* xDescriptorPtr = (GroupDescriptor*)aBuffer;
-			//for (uint i = 0; i < xGroupDescriptorCount; i++) {
-			//    xResult[i] = xDescriptorPtr[i];
-			//    DebugUtil.SendExt2_GroupDescriptor("ReadGroupDescriptorsOfBlock", aSuperBlock.FirstDataBlock + 1, i, &xDescriptorPtr[i]);
-			//}
 			return xResult;
 		}
 
@@ -73,9 +66,10 @@ namespace Cosmos.Kernel.FileSystem {
 			DebugUtil.SendNumber("Ext2", "GroupDescriptor Count", (uint)xGroupDescriptors.Length, 32);
 			//bool[] xBitmap = new bool[32];
 			uint xTempInt = 0;
-			for (uint i = 0; i < xGroupDescriptors.Length; i++) {
+			for (int i = 0; i < xGroupDescriptors.Length; i++) {
 				GroupDescriptor xGroupDescriptor = xGroupDescriptors[i];
-				xTempInt = xTempInt + xGroupDescriptor.FreeINodesCount;
+				DebugUtil.SendExt2_GroupDescriptor("Second try", 0, i, 0, &xGroupDescriptor);
+				xTempInt += xGroupDescriptors[i].FreeINodesCount;
 			}
 			DebugUtil.SendNumber("Ext2", "Sum of FreeINodesCount", xTempInt, 32);
 		}

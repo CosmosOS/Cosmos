@@ -16,7 +16,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public static void Ldarg(Assembler.Assembler aAssembler, MethodInformation.Argument aArg, bool aAddGCCode) {
-			foreach (string xAddress in aArg.VirtualAddresses) {
+			foreach (string xAddress in aArg.VirtualAddresses.Reverse()) {
 				new Move(CPUx86.Registers.EAX, "[" + xAddress + "]");
 				new Push(CPUx86.Registers.EAX);
 			}
@@ -41,6 +41,7 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		public static void Multiply(Assembler.Assembler aAssembler) {
 			int xSize = aAssembler.StackSizes.Pop();
+			new CPUx86.Xor("edx", "edx");
 			if (xSize > 4) {
 				new CPUx86.Pop("eax");
 				new CPUx86.Add("esp", "4");

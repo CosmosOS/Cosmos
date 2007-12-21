@@ -96,17 +96,16 @@ namespace Cosmos.Kernel {
 			EndLogging();
 		}
 
-		internal static unsafe void SendExt2_GroupDescriptor(string aDescription, int aBlock, int aIndex, FileSystem.Ext2.GroupDescriptor* aDescriptor) {
+		internal static unsafe void SendExt2_GroupDescriptor(string aDescription, int aBlock, int aIndex, uint aAddresss, FileSystem.Ext2.GroupDescriptor* aDescriptor) {
 			StartLogging();
 			Serial.Write(0, "<Ext2_GroupDescriptor Description=\"");
 			Serial.Write(0, aDescription);
-			uint xAddress = (uint)aDescriptor;
-			Serial.Write(0, "\" Address=\"");
-			Hardware.DebugUtil.WriteNumber(xAddress, 32);
 			Serial.Write(0, "\" Block=\"");
 			Hardware.DebugUtil.WriteNumber((uint)aBlock, 32);
 			Serial.Write(0, "\" Index=\"");
 			Hardware.DebugUtil.WriteNumber((uint)aIndex, 32);
+			Serial.Write(0, "\" Address=\"");
+			Hardware.DebugUtil.WriteNumber(aAddresss, 32);
 			Serial.Write(0, "\" BlockBitmap=\"");
 			Hardware.DebugUtil.WriteNumber(aDescriptor->BlockBitmap, 32);
 			Serial.Write(0, "\" INodeBitmap=\"");
