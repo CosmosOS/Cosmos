@@ -74,18 +74,47 @@ namespace Cosmos.Kernel.FileSystem {
 				for (int i = 0; i < 32; i++) {
 					if ((i % 4) == 0) {
 						uint index = (uint)((i % xSuperBlock.INodesPerGroup) * sizeof(INode));
-						uint offset = index % (uint)(1024 << xSuperBlock.LogBlockSize);
-						if (!Hardware.Storage.ATA.ReadDataNew(aController, aDrive, (int)((xGroupDescriptor.INodeTable+(index/(uint)(1024 << xSuperBlock.LogBlockSize)))*8), xBuffer)) {
+						uint offset = index / 512;
+						if (!Hardware.Storage.ATA.ReadDataNew(aController, aDrive, (int)((xGroupDescriptor.INodeTable * 8) + offset), xBuffer)) {
 							Console.WriteLine("[Ext2] Error reading INode table entries");
 							return;
 						}
-					}					
+					}
+					uint xINodeIdentifier = (uint)((g * xSuperBlock.INodesPerGroup) + i + 1);
+					if (xINodeIdentifier == 0xB) {
+						continue;
+					}
 					if (xUsedINodes[i]) {
-						DebugUtil.SendExt2_INode(g, xINodeTable[i % 4]);
+						INode xINode = xINodeTable[i % 4];
+						//DebugUtil.SendExt2_INode((uint)((g * xSuperBlock.INodesPerGroup) + i), g, &xINodeTable[i % 4]);
+						if ((xINode.Mode & INodeModeEnum.Directory) != 0) {
+							//DebugUtil.SendNumber("Ext2", "Directory found", (uint)((g * xSuperBlock.INodesPerGroup) + i + 1), 32);
+							DebugUtil.SendExt2_INode(xINodeIdentifier, g, &xINodeTable[i % 4]);
+							DebugUtil.SendExt2_INodeMode(xINodeIdentifier, (ushort)xINode.Mode);
+							if (!Hardware.Storage.ATA.ReadDataNew(aController, aDrive, (int)(xINode.Block1 * 8), xBuffer)) {
+								Console.WriteLine("[Ext2] Error reading INode entries");
+								return;
+							}
+							DirectoryEntry* xEntryPtr = (DirectoryEntry*)xBuffer;
+							uint xTotalSize = xINode.Size;
+							while (xTotalSize != 0/* && xEntryPtr->@INode != 0*/) {
+								DebugUtil.SendExt2_DirectoryEntry(xEntryPtr);
+								uint xPtrAddress = (uint)xEntryPtr;
+								xPtrAddress += xEntryPtr->RecordLength;
+								DebugUtil.SendNumber("Ext2", "xEntryPtr.RecordLength", xEntryPtr->RecordLength, 16);
+								DebugUtil.SendNumber("Ext2", "xTotalSize", xTotalSize, 32);
+								xTotalSize -= xEntryPtr->RecordLength;
+								DebugUtil.SendNumber("Ext2", "xEntryPtr.RecordLength", xEntryPtr->RecordLength, 16);
+								DebugUtil.SendNumber("Ext2", "xTotalSize", xTotalSize, 32);
+								xEntryPtr = (DirectoryEntry*)xPtrAddress;
+							}
+							//								DebugUtil.SendNumber("Ext2", "Directory Entries", xEntryCount, 32);
+						}
 						xCount++;
 					}
 				}
 			}
+
 			DebugUtil.SendNumber("Ext2", "Used INode count", xCount, 32);
 		}
 

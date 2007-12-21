@@ -9,8 +9,10 @@ namespace Indy.IL2CPU.IL.X86 {
 			: base(aInstruction, aMethodInfo) {
 		}
 		public override void DoAssemble() {
+			new CPUx86.Pop(CPUx86.Registers.ECX);
 			new CPUx86.Pop(CPUx86.Registers.EAX);
-			new CPUx86.Sub(CPUx86.Registers.AtESP, CPUx86.Registers.EAX);
+			new CPUx86.Sub(CPUx86.Registers.EAX, CPUx86.Registers.ECX);
+			new CPUx86.Push(CPUx86.Registers.EAX);
 			Assembler.StackSizes.Pop();
 		}
 	}

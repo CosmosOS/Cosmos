@@ -267,5 +267,17 @@ namespace Cosmos.Kernel.FileSystem {
 			OthersAccessRightsWrite = 0x0002,
 			OthersAccessRightsExecute = 0x0001
 		}
+
+		[StructLayout(LayoutKind.Sequential)]
+		internal struct DirectoryEntry {
+			/// <summary>
+			/// INode number of the entry. A value of <c>0</c> indicates that the entry is not used.
+			/// </summary>
+			public uint INode;
+			public ushort RecordLength;
+			public byte NameLength;
+			public byte FileType;
+			public byte FirstNameChar;
+		}
 	}
 }

@@ -393,78 +393,296 @@ namespace Cosmos.Kernel {
 			EndLogging();
 		}
 
-		internal static void SendExt2_INode(uint aBlockGroup, FileSystem.Ext2.INode aINode) {
+		internal static void SendExt2_INodeMode(uint aIdentifier, ushort aMode) {
+			StartLogging();
+			Serial.Write(0, "<Ext2_INodeMode Identifier=\"");
+			Hardware.DebugUtil.WriteNumber(aIdentifier, 32);
+			Serial.Write(0, "\" Mode=\"");
+			bool xAlreadySentContent = false;
+			if ((aMode & 0x1) != 0) {
+				if (!xAlreadySentContent) {
+					xAlreadySentContent = true;
+				} else {
+					Serial.Write(0, ", ");
+				}
+				Serial.Write(0, "OthersAccessRightsExecute");
+			}
+			if ((aMode & 0x2) != 0) {
+				if (!xAlreadySentContent) {
+					xAlreadySentContent = true;
+				} else {
+					Serial.Write(0, ", ");
+				}
+				Serial.Write(0, "OthersAccessRightsWrite");
+			}
+			if ((aMode & 0x4) != 0) {
+				if (!xAlreadySentContent) {
+					xAlreadySentContent = true;
+				} else {
+					Serial.Write(0, ", ");
+				}
+				Serial.Write(0, "OthersAccessRightsRead");
+			}
+			if ((aMode & 0x7) != 0) {
+				if (!xAlreadySentContent) {
+					xAlreadySentContent = true;
+				} else {
+					Serial.Write(0, ", ");
+				}
+				Serial.Write(0, "OthersAccessRightsMask");
+			}
+			if ((aMode & 0x8) != 0) {
+				if (!xAlreadySentContent) {
+					xAlreadySentContent = true;
+				} else {
+					Serial.Write(0, ", ");
+				}
+				Serial.Write(0, "GroupAccessRightsExecute");
+			}
+			if ((aMode & 0x10) != 0) {
+				if (!xAlreadySentContent) {
+					xAlreadySentContent = true;
+				} else {
+					Serial.Write(0, ", ");
+				}
+				Serial.Write(0, "GroupAccessRightsWrite");
+			}
+			if ((aMode & 0x20) != 0) {
+				if (!xAlreadySentContent) {
+					xAlreadySentContent = true;
+				} else {
+					Serial.Write(0, ", ");
+				}
+				Serial.Write(0, "GroupAccessRightsRead");
+			}
+			if ((aMode & 0x38) != 0) {
+				if (!xAlreadySentContent) {
+					xAlreadySentContent = true;
+				} else {
+					Serial.Write(0, ", ");
+				}
+				Serial.Write(0, "GroupAccessRightsMask");
+			}
+			if ((aMode & 0x40) != 0) {
+				if (!xAlreadySentContent) {
+					xAlreadySentContent = true;
+				} else {
+					Serial.Write(0, ", ");
+				}
+				Serial.Write(0, "UserAccessRightsExecute");
+			}
+			if ((aMode & 0x80) != 0) {
+				if (!xAlreadySentContent) {
+					xAlreadySentContent = true;
+				} else {
+					Serial.Write(0, ", ");
+				}
+				Serial.Write(0, "UserAccessRightsWrite");
+			}
+			if ((aMode & 0x100) != 0) {
+				if (!xAlreadySentContent) {
+					xAlreadySentContent = true;
+				} else {
+					Serial.Write(0, ", ");
+				}
+				Serial.Write(0, "UserAccessRightsRead");
+			}
+			if ((aMode & 0x1C0) != 0) {
+				if (!xAlreadySentContent) {
+					xAlreadySentContent = true;
+				} else {
+					Serial.Write(0, ", ");
+				}
+				Serial.Write(0, "UserAccessRightsMask");
+			}
+			if ((aMode & 0x200) != 0) {
+				if (!xAlreadySentContent) {
+					xAlreadySentContent = true;
+				} else {
+					Serial.Write(0, ", ");
+				}
+				Serial.Write(0, "StickyBit");
+			}
+			if ((aMode & 0x400) != 0) {
+				if (!xAlreadySentContent) {
+					xAlreadySentContent = true;
+				} else {
+					Serial.Write(0, ", ");
+				}
+				Serial.Write(0, "SGID");
+			}
+			if ((aMode & 0x800) != 0) {
+				if (!xAlreadySentContent) {
+					xAlreadySentContent = true;
+				} else {
+					Serial.Write(0, ", ");
+				}
+				Serial.Write(0, "SUID");
+			}
+			if ((aMode & 0x1000) != 0) {
+				if (!xAlreadySentContent) {
+					xAlreadySentContent = true;
+				} else {
+					Serial.Write(0, ", ");
+				}
+				Serial.Write(0, "Fifo");
+			}
+			if ((aMode & 0x2000) != 0) {
+				if (!xAlreadySentContent) {
+					xAlreadySentContent = true;
+				} else {
+					Serial.Write(0, ", ");
+				}
+				Serial.Write(0, "CharacterDevice");
+			}
+			if ((aMode & 0x4000) != 0) {
+				if (!xAlreadySentContent) {
+					xAlreadySentContent = true;
+				} else {
+					Serial.Write(0, ", ");
+				}
+				Serial.Write(0, "Directory");
+			}
+			if ((aMode & 0x6000) != 0) {
+				if (!xAlreadySentContent) {
+					xAlreadySentContent = true;
+				} else {
+					Serial.Write(0, ", ");
+				}
+				Serial.Write(0, "BlockDevice");
+			}
+			if ((aMode & 0x8000) != 0) {
+				if (!xAlreadySentContent) {
+					xAlreadySentContent = true;
+				} else {
+					Serial.Write(0, ", ");
+				}
+				Serial.Write(0, "RegularFile");
+			}
+			if ((aMode & 0xA000) != 0) {
+				if (!xAlreadySentContent) {
+					xAlreadySentContent = true;
+				} else {
+					Serial.Write(0, ", ");
+				}
+				Serial.Write(0, "SymbolicLink");
+			}
+			if ((aMode & 0xC000) != 0) {
+				if (!xAlreadySentContent) {
+					xAlreadySentContent = true;
+				} else {
+					Serial.Write(0, ", ");
+				}
+				Serial.Write(0, "Socket");
+			}
+			if ((aMode & 0xF000) != 0) {
+				if (!xAlreadySentContent) {
+					xAlreadySentContent = true;
+				} else {
+					Serial.Write(0, ", ");
+				}
+				Serial.Write(0, "FormatMask");
+			}
+			if (!xAlreadySentContent) {
+				Serial.Write(0, "(None)");
+			}
+			Serial.Write(0, "\"/>\r\n");
+			EndLogging();
+		}
+
+		internal static unsafe void SendExt2_INode(uint aIdentifier, uint aBlockGroup, FileSystem.Ext2.INode* aINode) {
 			StartLogging();
 			Serial.Write(0, "<Ext2_INode BlockGroup=\"");
 			Hardware.DebugUtil.WriteNumber(aBlockGroup, 32);
+			Serial.Write(0, "\" Identifier=\"");
+			Hardware.DebugUtil.WriteNumber(aIdentifier, 32);
 			Serial.Write(0, "\" Mode=\"");
-			Hardware.DebugUtil.WriteNumber((ushort)aINode.Mode, 16);
+			Hardware.DebugUtil.WriteNumber((ushort)aINode->Mode, 16);
 			Serial.Write(0, "\" UID=\"");
-			Hardware.DebugUtil.WriteNumber(aINode.UID, 16);
+			Hardware.DebugUtil.WriteNumber(aINode->UID, 16);
 			Serial.Write(0, "\" Size=\"");
-			Hardware.DebugUtil.WriteNumber(aINode.Size, 32);
+			Hardware.DebugUtil.WriteNumber(aINode->Size, 32);
 			Serial.Write(0, "\" ATime=\"");
-			Hardware.DebugUtil.WriteNumber(aINode.ATime, 32);
+			Hardware.DebugUtil.WriteNumber(aINode->ATime, 32);
 			Serial.Write(0, "\" CTime=\"");
-			Hardware.DebugUtil.WriteNumber(aINode.CTime, 32);
+			Hardware.DebugUtil.WriteNumber(aINode->CTime, 32);
 			Serial.Write(0, "\" MTime=\"");
-			Hardware.DebugUtil.WriteNumber(aINode.MTime, 32);
+			Hardware.DebugUtil.WriteNumber(aINode->MTime, 32);
 			Serial.Write(0, "\" DTime=\"");
-			Hardware.DebugUtil.WriteNumber(aINode.DTime, 32);
+			Hardware.DebugUtil.WriteNumber(aINode->DTime, 32);
 			Serial.Write(0, "\" GID=\"");
-			Hardware.DebugUtil.WriteNumber(aINode.GID, 16);
+			Hardware.DebugUtil.WriteNumber(aINode->GID, 16);
 			Serial.Write(0, "\" LinksCount=\"");
-			Hardware.DebugUtil.WriteNumber(aINode.LinksCount, 16);
+			Hardware.DebugUtil.WriteNumber(aINode->LinksCount, 16);
 			Serial.Write(0, "\" Blocks=\"");
-			Hardware.DebugUtil.WriteNumber(aINode.Blocks, 32);
+			Hardware.DebugUtil.WriteNumber(aINode->Blocks, 32);
 			Serial.Write(0, "\" Flags=\"");
-			Hardware.DebugUtil.WriteNumber(aINode.Flags, 32);
+			Hardware.DebugUtil.WriteNumber(aINode->Flags, 32);
 			Serial.Write(0, "\" OSD1=\"");
-			Hardware.DebugUtil.WriteNumber(aINode.OSD1, 32);
+			Hardware.DebugUtil.WriteNumber(aINode->OSD1, 32);
 			Serial.Write(0, "\" Block1=\"");
-			Hardware.DebugUtil.WriteNumber(aINode.Block1, 32);
+			Hardware.DebugUtil.WriteNumber(aINode->Block1, 32);
 			Serial.Write(0, "\" Block2=\"");
-			Hardware.DebugUtil.WriteNumber(aINode.Block2, 32);
+			Hardware.DebugUtil.WriteNumber(aINode->Block2, 32);
 			Serial.Write(0, "\" Block3=\"");
-			Hardware.DebugUtil.WriteNumber(aINode.Block3, 32);
+			Hardware.DebugUtil.WriteNumber(aINode->Block3, 32);
 			Serial.Write(0, "\" Block4=\"");
-			Hardware.DebugUtil.WriteNumber(aINode.Block4, 32);
+			Hardware.DebugUtil.WriteNumber(aINode->Block4, 32);
 			Serial.Write(0, "\" Block5=\"");
-			Hardware.DebugUtil.WriteNumber(aINode.Block5, 32);
+			Hardware.DebugUtil.WriteNumber(aINode->Block5, 32);
 			Serial.Write(0, "\" Block6=\"");
-			Hardware.DebugUtil.WriteNumber(aINode.Block6, 32);
+			Hardware.DebugUtil.WriteNumber(aINode->Block6, 32);
 			Serial.Write(0, "\" Block7=\"");
-			Hardware.DebugUtil.WriteNumber(aINode.Block7, 32);
+			Hardware.DebugUtil.WriteNumber(aINode->Block7, 32);
 			Serial.Write(0, "\" Block8=\"");
-			Hardware.DebugUtil.WriteNumber(aINode.Block8, 32);
+			Hardware.DebugUtil.WriteNumber(aINode->Block8, 32);
 			Serial.Write(0, "\" Block9=\"");
-			Hardware.DebugUtil.WriteNumber(aINode.Block9, 32);
+			Hardware.DebugUtil.WriteNumber(aINode->Block9, 32);
 			Serial.Write(0, "\" Block10=\"");
-			Hardware.DebugUtil.WriteNumber(aINode.Block10, 32);
+			Hardware.DebugUtil.WriteNumber(aINode->Block10, 32);
 			Serial.Write(0, "\" Block11=\"");
-			Hardware.DebugUtil.WriteNumber(aINode.Block11, 32);
+			Hardware.DebugUtil.WriteNumber(aINode->Block11, 32);
 			Serial.Write(0, "\" Block12=\"");
-			Hardware.DebugUtil.WriteNumber(aINode.Block12, 32);
+			Hardware.DebugUtil.WriteNumber(aINode->Block12, 32);
 			Serial.Write(0, "\" Block13=\"");
-			Hardware.DebugUtil.WriteNumber(aINode.Block13, 32);
+			Hardware.DebugUtil.WriteNumber(aINode->Block13, 32);
 			Serial.Write(0, "\" Block14=\"");
-			Hardware.DebugUtil.WriteNumber(aINode.Block14, 32);
+			Hardware.DebugUtil.WriteNumber(aINode->Block14, 32);
 			Serial.Write(0, "\" Block15=\"");
-			Hardware.DebugUtil.WriteNumber(aINode.Block15, 32);
+			Hardware.DebugUtil.WriteNumber(aINode->Block15, 32);
 			Serial.Write(0, "\" Generation=\"");
-			Hardware.DebugUtil.WriteNumber(aINode.Generation, 32);
+			Hardware.DebugUtil.WriteNumber(aINode->Generation, 32);
 			Serial.Write(0, "\" FileACL=\"");
-			Hardware.DebugUtil.WriteNumber(aINode.FileACL, 32);
+			Hardware.DebugUtil.WriteNumber(aINode->FileACL, 32);
 			Serial.Write(0, "\" DirACL=\"");
-			Hardware.DebugUtil.WriteNumber(aINode.DirACL, 32);
+			Hardware.DebugUtil.WriteNumber(aINode->DirACL, 32);
 			Serial.Write(0, "\" FAddr=\"");
-			Hardware.DebugUtil.WriteNumber(aINode.FAddr, 32);
+			Hardware.DebugUtil.WriteNumber(aINode->FAddr, 32);
 			Serial.Write(0, "\" OSD2_1=\"");
-			Hardware.DebugUtil.WriteNumber(aINode.OSD2_1, 32);
+			Hardware.DebugUtil.WriteNumber(aINode->OSD2_1, 32);
 			Serial.Write(0, "\" OSD2_2=\"");
-			Hardware.DebugUtil.WriteNumber(aINode.OSD2_2, 32);
+			Hardware.DebugUtil.WriteNumber(aINode->OSD2_2, 32);
 			Serial.Write(0, "\" OSD2_3=\"");
-			Hardware.DebugUtil.WriteNumber(aINode.OSD2_3, 32);
+			Hardware.DebugUtil.WriteNumber(aINode->OSD2_3, 32);
+			Serial.Write(0, "\"/>\r\n");
+			EndLogging();
+		}
+
+		internal static unsafe void SendExt2_DirectoryEntry(FileSystem.Ext2.DirectoryEntry* aEntryPtr) {
+			StartLogging();
+			Serial.Write(0, "<Ext2_DirectoryEntry INode=\"");
+			Hardware.DebugUtil.WriteNumber(aEntryPtr->@INode, 32);
+			Serial.Write(0, "\" RecordLength=\"");
+			Hardware.DebugUtil.WriteNumber(aEntryPtr->RecordLength, 16);
+			Serial.Write(0, "\" NameLength=\"");
+			Hardware.DebugUtil.WriteNumber(aEntryPtr->NameLength, 8);
+			Serial.Write(0, "\" FileType=\"");
+			Hardware.DebugUtil.WriteNumber(aEntryPtr->FileType, 8);
+			Serial.Write(0, "\" Name=\"0x");
+			byte* xNameByte = &aEntryPtr->FirstNameChar;
+			for (int i = 0; i < aEntryPtr->NameLength; i++) {
+				Hardware.DebugUtil.WriteNumber(xNameByte[i], 8, false);
+			}
 			Serial.Write(0, "\"/>\r\n");
 			EndLogging();
 		}

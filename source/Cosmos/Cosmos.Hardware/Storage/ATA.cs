@@ -350,7 +350,7 @@ namespace Cosmos.Hardware.Storage {
 			//    the INTRQ and you will not have pending IRQs waiting to be detected. This is a MUST to read 
 			//    the status register when you are done reading from IDE ports. 
 			IOReadByte((ushort)(xControllerAddr + IDE_PORT_STATUS));
-			DebugUtil.SendATA_BlockReceived(aController, aDrive, (uint)aBlock, aBuffer);
+			//DebugUtil.SendATA_BlockReceived(aController, aDrive, (uint)aBlock, aBuffer);
 			return true;
 		}
 
