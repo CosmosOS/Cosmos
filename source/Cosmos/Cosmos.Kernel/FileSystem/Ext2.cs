@@ -29,7 +29,6 @@ namespace Cosmos.Kernel.FileSystem {
 		private static unsafe GroupDescriptor[] ReadGroupDescriptorsOfBlock(byte aController, byte aDrive, uint aBlockGroup, SuperBlock aSuperBlock, ushort* aBuffer) {
 			uint xGroupDescriptorCount = aSuperBlock.INodesCount / aSuperBlock.INodesPerGroup;
 			GroupDescriptor[] xResult = new GroupDescriptor[xGroupDescriptorCount];
-			uint xCount = 0;
 			GroupDescriptor* xDescriptorPtr = (GroupDescriptor*)aBuffer;
 			for (int i = 0; i < xGroupDescriptorCount; i++) {
 				int xATABlock = (int)((8));
@@ -39,7 +38,6 @@ namespace Cosmos.Kernel.FileSystem {
 						Console.WriteLine("[Ext2|GroupDescriptors] Error while reading GroupDescriptor data");
 						return null;
 					}
-					Hardware.DebugUtil.SendATA_BlockReceived(aController, aDrive, (uint)(xATABlock + (byte)(i / 16)), aBuffer);
 				}
 				xResult[i] = xDescriptorPtr[i % 16];
 				DebugUtil.SendExt2_GroupDescriptor("ReadGroupDescriptorsOfBlock", xATABlock, i, 0, &xDescriptorPtr[i % 16]);
@@ -57,18 +55,14 @@ namespace Cosmos.Kernel.FileSystem {
 			DebugUtil.SendExt2_SuperBlock("ReadFileContents", &xSuperBlock);
 			int xBlockSize = (int)(1024 << (byte)(xSuperBlock.LogBlockSize));
 			uint xGroupsCount = xSuperBlock.INodesCount / xSuperBlock.INodesPerGroup;
-			DebugUtil.SendNumber("Ext2", "GroupsCount", xGroupsCount, 32);
 			uint xGroupDescriptorsPerBlock = (uint)(xBlockSize / sizeof(GroupDescriptor));
 			GroupDescriptor[] xGroupDescriptors = ReadGroupDescriptorsOfBlock(aController, aDrive, xSuperBlock.FirstDataBlock + 1, xSuperBlock, xBuffer);
 			if (xGroupDescriptors == null) {
 				return;
 			}
-			DebugUtil.SendNumber("Ext2", "GroupDescriptor Count", (uint)xGroupDescriptors.Length, 32);
-			//bool[] xBitmap = new bool[32];
 			uint xTempInt = 0;
 			for (int i = 0; i < xGroupDescriptors.Length; i++) {
 				GroupDescriptor xGroupDescriptor = xGroupDescriptors[i];
-				DebugUtil.SendExt2_GroupDescriptor("Second try", 0, i, 0, &xGroupDescriptor);
 				xTempInt += xGroupDescriptors[i].FreeINodesCount;
 			}
 			DebugUtil.SendNumber("Ext2", "Sum of FreeINodesCount", xTempInt, 32);
