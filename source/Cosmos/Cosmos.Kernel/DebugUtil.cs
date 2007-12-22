@@ -389,7 +389,7 @@ namespace Cosmos.Kernel {
 			Hardware.DebugUtil.WriteNumber(aSuperBlock->Padding106, 32);
 			Serial.Write(0, "\" Padding107=\"");
 			Hardware.DebugUtil.WriteNumber(aSuperBlock->Padding107, 32);
-			Serial.Write(0, "\"/>");
+			Serial.Write(0, "\"/>\r\n");
 			EndLogging();
 		}
 
@@ -685,6 +685,19 @@ namespace Cosmos.Kernel {
 			}
 			Serial.Write(0, "\"/>\r\n");
 			EndLogging();
+		}
+
+		internal static void SendByteStream(string aModule, string aDescription, byte[] aContents) {
+			StartLogging();
+			Serial.Write(0, "<ByteStream Module=\"");
+			Serial.Write(0, aModule);
+			Serial.Write(0, "\" Description=\"");
+			Serial.Write(0, aDescription);
+			Serial.Write(0, "\" Contents=\"0x");
+			for (int i = 0; i < aContents.Length; i++) {
+				Hardware.DebugUtil.WriteNumber(aContents[i], 8, false);
+			}
+			Serial.Write(0, "\"/>\r\n");
 		}
 	}
 }

@@ -19,7 +19,7 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System {
 			uint* xThis = aThis;
 			xThis += 3;
 			xThis = (uint*)*xThis;
-			xThis += 3;
+			xThis += 4;
 			ushort* aBytes = (ushort*)xThis;
 			aBytes += aIndex;
 			return *aBytes;

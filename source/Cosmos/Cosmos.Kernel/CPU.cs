@@ -36,11 +36,15 @@ namespace Cosmos.Kernel {
 			Console.Write("Getting Partition info...");
 			FileSystem.Ext2.PrintAllFilesAndDirectories(0, 0);
 			Console.WriteLine("Done");
-			//if (FileSystem.Ext2.ReadFileContents(1, 0, new string[] { "test.txt" }) == null) {
-			//    Console.WriteLine("Failed or not fully implemented!");
-			//} else {
-			//    Console.WriteLine("Done");
-			//}
+			Console.Write("Reading file...");
+			byte[] xContents = FileSystem.Ext2.ReadFile(0, 0, new string[] { "readme.txt" });
+			if (xContents == null) {
+				Console.WriteLine("Failed or not fully implemented!");
+			} else {
+				DebugUtil.SendByteStream("Kernel", "readme contents", xContents);
+				Console.WriteLine("Done");
+			}
+
 		}
 
 		public static uint TickCount {

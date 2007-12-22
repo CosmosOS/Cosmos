@@ -557,7 +557,7 @@ namespace Indy.IL2CPU {
 			}
 			switch (aType.FullName) {
 				case "System.Char":
-					return 4;
+					return 2;
 				case "System.Byte":
 				case "System.SByte":
 					return 1;

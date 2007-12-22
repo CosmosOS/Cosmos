@@ -26,6 +26,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			xDataByteArray.Append(BitConverter.GetBytes(Engine.RegisterType(Engine.GetTypeDefinition("mscorlib", "System.Array"))).Aggregate("", (r, b) => r + b + ","));
 			xDataByteArray.Append(BitConverter.GetBytes((uint)InstanceTypeEnum.StaticEmbeddedArray).Aggregate("", (r, b) => r + b + ","));
 			xDataByteArray.Append(BitConverter.GetBytes(aLiteral.Length).Aggregate("", (r, b) => r + b + ","));
+			xDataByteArray.Append(BitConverter.GetBytes((int)2).Aggregate("", (r, b) => r + b + ","));
 			xDataByteArray.Append(xEncoding.GetBytes(aLiteral).Aggregate("", (r, b) => r + b + ","));
 			xDataByteArray.Append("0,");
 			string xDataVal = xDataByteArray.ToString().TrimEnd(',');

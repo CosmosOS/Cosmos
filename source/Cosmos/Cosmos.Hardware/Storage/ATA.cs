@@ -274,7 +274,7 @@ namespace Cosmos.Hardware.Storage {
 		}
 
 		public static unsafe bool ReadDataNew(byte aController, byte aDrive, int aBlock, ushort* aBuffer) {
-			DebugUtil.SendNumber("ATA", "ReadData, block", (uint)aBlock, 32);
+			//DebugUtil.SendNumber("ATA", "ReadData, block", (uint)aBlock, 32);
 			ushort xControllerAddr = ATAControllerInfo[aController];
 			// 1) Read the status register of the primary or the secondary IDE controller. 
 			// 2) The BSY and DRQ bits must be zero if the controller is ready. 
