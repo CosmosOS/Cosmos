@@ -12,5 +12,12 @@ namespace Cosmos.Hardware {
 		protected static ushort IOReadWord(ushort aPort) {
 			return 0;
 		}
+		/// <summary>
+		/// Gets the amount of RAM in MB's.
+		/// </summary>
+		/// <returns></returns>
+		protected static uint GetAmountOfRAM() {
+			return 0;
+		}
     }
 }

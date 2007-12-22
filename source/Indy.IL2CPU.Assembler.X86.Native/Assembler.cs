@@ -25,6 +25,12 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
 			mOutputWriter.WriteLine("");
 			mOutputWriter.WriteLine("                ;- copy mb info - some stuff for you  ");
 			//mOutputWriter.WriteLine("								mov mb_info, ebx");
+			mOutputWriter.WriteLine("				add ebx, 4");
+			mOutputWriter.WriteLine("				mov dword eax, [ebx]");
+			mOutputWriter.WriteLine("				mov dword [MultiBootInfo_Memory_Low], eax");
+			mOutputWriter.WriteLine("				add ebx, 4");
+			mOutputWriter.WriteLine("				mov dword eax, [ebx]");
+			mOutputWriter.WriteLine("				mov dword [MultiBootInfo_Memory_High], eax");
 			mOutputWriter.WriteLine("");
 			mOutputWriter.WriteLine("                mov esp,Kernel_Stack ");			 
 			mOutputWriter.WriteLine("");
@@ -57,6 +63,8 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
 			//mOutputWriter.WriteLine("        dd Kernel_Start ; entry ");
 			mOutputWriter.WriteLine("; end of header ");
 			//mOutputWriter.WriteLine("mb_info multiboot_info");
+			mOutputWriter.WriteLine("MultiBootInfo_Memory_High dd 0");
+			mOutputWriter.WriteLine("MultiBootInfo_Memory_Low dd 0");
 
 		}
 

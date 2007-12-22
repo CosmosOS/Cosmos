@@ -18,5 +18,10 @@ namespace Cosmos.Kernel.Plugs {
 		public static ushort IOReadWord(ushort aPort) {
 			return 0;
 		}
+
+		[PlugMethod(MethodAssembler=typeof(Assemblers.GetAmountOfRAM))]
+		public static uint GetAmountOfRAM() {
+			return 0;
+		}
     }
 }
