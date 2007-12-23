@@ -5,6 +5,7 @@ using System.Text;
 namespace Cosmos.Kernel {
 	public class CPU {
 		public static unsafe void Init() {
+			Heap.CheckInit();
 			Console.Write("Creating GDT...");
 			Hardware.CPU.CreateGDT();
 			Console.WriteLine("Done");
@@ -27,19 +28,20 @@ namespace Cosmos.Kernel {
 			Console.Write("Creating IDT...");
 			Hardware.CPU.CreateIDT();
 			Console.WriteLine("Done");
-			Console.Write("Available memory: ");
-			Hardware.Storage.ATA.WriteNumber(Hardware.CPU.AmountOfMemory, 32);
-			Console.WriteLine("");
 			Console.WriteLine("Starting MM tests...");
 			Console.Write(" + Allocing 64 bytes, address = ");
-			uint xPointer = Heap.MemAlloc(64);
-			Hardware.Storage.ATA.WriteNumber(xPointer, 32);
+			uint* xPointer = (uint*)Heap.MemAlloc(64);
+			xPointer[1] = 0xFFFFFFFF;
+			Hardware.Storage.ATA.WriteNumber((uint)xPointer, 32);
 			Console.WriteLine("");
 			Console.WriteLine(" + Freeing pointer");
-			Heap.MemFree(xPointer);
+			Heap.MemFree((uint)xPointer);
 			Console.Write(" + Allocing 64 bytes, address = ");
-			xPointer = Heap.MemAlloc(64);
-			Hardware.Storage.ATA.WriteNumber(xPointer, 32);
+			xPointer = (uint*)Heap.MemAlloc(64);
+			Hardware.Storage.ATA.WriteNumber((uint)xPointer, 32);
+			Console.WriteLine("");
+			Console.Write("Value = ");
+			Hardware.Storage.ATA.WriteNumber(xPointer[1], 32);
 			Console.WriteLine("");
 			//Console.Write("Initializing Keyboard...");
 			//Keyboard.Initialize();

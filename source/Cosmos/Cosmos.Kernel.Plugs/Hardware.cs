@@ -5,12 +5,15 @@ using Indy.IL2CPU.Plugs;
 using HW = Cosmos.Hardware;
 
 namespace Cosmos.Kernel.Plugs {
-    [Plug(Target = typeof(HW.Hardware))]
-    public static class Hardware {
-        [PlugMethod(MethodAssembler = typeof(Assemblers.IOWriteByte))]
-        public static void IOWriteByte(ushort aPort, byte aData) { }
-        [PlugMethod(MethodAssembler = typeof(Assemblers.IOReadByte))]
-        public static byte IOReadByte(ushort aPort) { return 0; }
+	[Plug(Target = typeof(HW.Hardware))]
+	public static class Hardware {
+		[PlugMethod(MethodAssembler = typeof(Assemblers.IOWriteByte))]
+		public static void IOWriteByte(ushort aPort, byte aData) {
+		}
+		[PlugMethod(MethodAssembler = typeof(Assemblers.IOReadByte))]
+		public static byte IOReadByte(ushort aPort) {
+			return 0;
+		}
 		[PlugMethod(MethodAssembler = typeof(Assemblers.IOWriteWord))]
 		public static void IOWriteWord(ushort aPort, ushort aData) {
 		}
@@ -19,9 +22,14 @@ namespace Cosmos.Kernel.Plugs {
 			return 0;
 		}
 
-		[PlugMethod(MethodAssembler=typeof(Assemblers.GetAmountOfRAM))]
+		[PlugMethod(MethodAssembler = typeof(Assemblers.GetAmountOfRAM))]
 		public static uint GetAmountOfRAM() {
 			return 0;
 		}
-    }
+
+		[PlugMethod(MethodAssembler = typeof(Assemblers.GetEndOfKernel))]
+		public static uint GetEndOfKernel() {
+			return 0;
+		}
+	}
 }

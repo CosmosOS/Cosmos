@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assemblers\GetAmountOfRAM.cs" />
+    <Compile Include="Assemblers\GetEndOfKernel.cs" />
     <Compile Include="Assemblers\IOReadWord.cs" />
     <Compile Include="Assemblers\IOWriteWord.cs" />
     <Compile Include="Assemblers\CreateGDT.cs" />

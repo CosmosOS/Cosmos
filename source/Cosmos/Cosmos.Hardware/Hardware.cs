@@ -19,5 +19,9 @@ namespace Cosmos.Hardware {
 		protected static uint GetAmountOfRAM() {
 			return 0;
 		}
+
+		protected static uint GetEndOfKernel() {
+			return 0;
+		}
     }
 }
