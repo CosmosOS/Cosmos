@@ -7,10 +7,16 @@ using HW = Cosmos.Hardware;
 namespace Cosmos.Kernel.Plugs {
 	[Plug(Target = typeof(HW.CPU))]
 	public static class CPU {
-		[PlugMethod(MethodAssembler=typeof(Assemblers.CreateGDT))]
-		public static void CreateGDT() { }
+		[PlugMethod(MethodAssembler = typeof(Assemblers.CreateGDT))]
+		public static void CreateGDT() {
+		}
 
-        [PlugMethod(MethodAssembler = typeof(Assemblers.CreateIDT))]
-        public static void CreateIDT() { }
+		[PlugMethod(MethodAssembler = typeof(Assemblers.CreateIDT))]
+		public static void CreateIDT() {
+		}
+
+		[PlugMethod(MethodAssembler = typeof(Assemblers.ZeroFill))]
+		public static void ZeroFill(uint aStartAddress, uint aLength) {
+		}
 	}
 }

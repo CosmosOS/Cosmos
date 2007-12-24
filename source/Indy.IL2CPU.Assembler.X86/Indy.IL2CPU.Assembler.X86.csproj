@@ -60,6 +60,7 @@
     <Compile Include="Not.cs" />
     <Compile Include="Pushfd.cs" />
     <Compile Include="Registers.cs" />
+    <Compile Include="RepeatStos.cs" />
     <Compile Include="ShiftLeft.cs" />
     <Compile Include="Divide.cs" />
     <Compile Include="Instruction.cs" />

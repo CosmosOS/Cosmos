@@ -57,6 +57,7 @@
     <Compile Include="Assemblers\CreateIDT.cs" />
     <Compile Include="Assemblers\IOReadByte.cs" />
     <Compile Include="Assemblers\IOWriteByte.cs" />
+    <Compile Include="Assemblers\ZeroFill.cs" />
     <Compile Include="Console.cs" />
     <Compile Include="CPU.cs" />
     <Compile Include="Hardware.cs" />

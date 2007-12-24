@@ -43,6 +43,9 @@ namespace Cosmos.Kernel {
 			Console.Write("Value = ");
 			Hardware.Storage.ATA.WriteNumber(xPointer[1], 32);
 			Console.WriteLine("");
+			xPointer = (uint*)Heap.MemAlloc(64);
+			Hardware.Storage.ATA.WriteNumber((uint)xPointer, 32);
+			Console.WriteLine("");
 			//Console.Write("Initializing Keyboard...");
 			//Keyboard.Initialize();
 			//Console.WriteLine("Done");

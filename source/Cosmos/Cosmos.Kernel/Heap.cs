@@ -24,38 +24,36 @@ namespace Cosmos.Kernel {
 		//private const uint DefaultMaxMemory = 32 * 1024 * 1024;
 
 		private static void ClearMemory(uint aStartAddress, uint aLength) {
+			DebugUtil.SendDoubleNumber("MM", "Clearing memory", aStartAddress, 32, aLength, 32);
 			Console.Write("[MM] Clearing ");
 			Hardware.Storage.ATA.WriteNumber(aLength, 32);
 			Console.Write(" bytes at ");
 			Hardware.Storage.ATA.WriteNumber(aStartAddress, 32);
 			Console.WriteLine("");
+			Hardware.CPU.ZeroFill(aStartAddress, aLength);
+			//uint* xPtrLong = (uint*)aStartAddress;
+			//{
+			//    for (int i = 0; i < (aLength / 4); i++) {
+			//        xPtrLong[i] = 0;
+			//    }
+			//}
+			//byte* xPtr = (byte*)(aStartAddress + aLength - (aLength % 4));
+			//{
+			//    for (int i = 0; i < aLength%4; i++) {
+			//        xPtr[i] = 0;
+			//    }
+			//}
 
-			uint* xPtrLong = (uint*)aStartAddress;
-			{
-				for (int i = 0; i < (aLength / 4); i++) {
-					xPtrLong[i] = 0;
-				}
-			}
-			byte* xPtr = (byte*)(aStartAddress + aLength - (aLength % 4));
-			{
-				for (int i = 0; i < aLength%4; i++) {
-					xPtr[i] = 0;
-				}
-			}
 		}
 
 		private static void Initialize(uint aStartAddress, uint aLength) {
 			mStartAddress = aStartAddress;
-			//			mCurrentAddress = aStartAddress;
 			mLength = aLength;
-			Console.Write("Initializing memory...");
 			ClearMemory(aStartAddress, aLength);
-			Console.WriteLine("Done");
 			mFirstBlock = (MemoryBlock*)aStartAddress;
 			mFirstBlock->State = MemoryBlockState.Free;
 			mFirstBlock->Next = (MemoryBlock*)(aStartAddress + aLength);
 			mFirstBlock->Next->State = MemoryBlockState.EndOfMemory;
-			//DebugUtil.SendMM_Init(aStartAddress, aLength);
 		}
 
 		public static void CheckInit() {
@@ -111,10 +109,12 @@ namespace Cosmos.Kernel {
 
 		[GlueMethod(Type = GlueMethodType.Heap_Free)]
 		public static void MemFree(uint aPointer) {
+			DebugUtil.SendNumber("MM", "Free pointer", aPointer, 32);
 			MemoryBlock* xBlock = (MemoryBlock*)(aPointer - 5);
 			xBlock->State = MemoryBlockState.Free;
-			uint aLength;
-			ClearMemory((uint)xBlock, (((uint)xBlock->Next) - ((uint)xBlock) - 5));
+			uint xLength = ((uint)xBlock->Next) - aPointer;
+			DebugUtil.SendNumber("MM", "Pointer length", xLength, 32);
+			ClearMemory(aPointer, xLength);
 		}
 	}
 }

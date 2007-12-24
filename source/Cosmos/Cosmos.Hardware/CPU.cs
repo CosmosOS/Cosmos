@@ -17,5 +17,8 @@ namespace Cosmos.Hardware {
 				return GetEndOfKernel();
 			}
 		}
+
+		public static void ZeroFill(uint aStartAddress, uint aLength) {
+		}
 	}
 }
