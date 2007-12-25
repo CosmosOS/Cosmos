@@ -73,6 +73,12 @@ namespace Cosmos.Kernel.FileSystem {
 			return true;
 		}
 
+		private static void CopyPointers(byte* aSource, byte* aDest, uint aLength) {
+			for (int i = 0; i < aLength; i++) {
+				aDest[i] = aSource[i];
+			}
+		}
+
 		public unsafe byte[] ReadFile(string[] xPath) {
 			ushort* xBuffer = (ushort*)Heap.MemAlloc(mBackend.BlockSize);
 			byte* xByteBuffer = (byte*)xBuffer;
@@ -83,6 +89,7 @@ namespace Cosmos.Kernel.FileSystem {
 			uint xCurrentINode = 2;
 			int xIterations = 0;
 			uint xResultSize = 0;
+			DebugUtil.SendNumber("Ext2", "GroupDescriptors.Length", (uint)mGroupDescriptors.Length, 32);
 			while (xPathPointer != (xPath.Length + 1)) {
 				if (xIterations == 5) {
 					Console.WriteLine("DEBUG: Stopping iteration");
@@ -114,82 +121,9 @@ namespace Cosmos.Kernel.FileSystem {
 							continue;
 						}
 						if (xUsedINodes[i]) {
-							INode xINode = xINodeTable[i % (mBackend.BlockSize / sizeof(INode))];
 							if (xPathPointer == xPath.Length) {
-								#region temporary checks
-								if (xINode.Block2 != 0) {
-									Console.WriteLine("Multiblock files not supported yet!");
-									Heap.MemFree((uint)xBuffer);
-									return null;
-								}
-								if (xINode.Block3 != 0) {
-									Console.WriteLine("Multiblock files not supported yet!");
-									Heap.MemFree((uint)xBuffer);
-									return null;
-								}
-								if (xINode.Block4 != 0) {
-									Console.WriteLine("Multiblock files not supported yet!");
-									Heap.MemFree((uint)xBuffer);
-									return null;
-								}
-								if (xINode.Block5 != 0) {
-									Console.WriteLine("Multiblock files not supported yet!");
-									Heap.MemFree((uint)xBuffer);
-									return null;
-								}
-								if (xINode.Block6 != 0) {
-									Console.WriteLine("Multiblock files not supported yet!");
-									Heap.MemFree((uint)xBuffer);
-									return null;
-								}
-								if (xINode.Block7 != 0) {
-									Console.WriteLine("Multiblock files not supported yet!");
-									Heap.MemFree((uint)xBuffer);
-									return null;
-								}
-								if (xINode.Block8 != 0) {
-									Console.WriteLine("Multiblock files not supported yet!");
-									Heap.MemFree((uint)xBuffer);
-									return null;
-								}
-								if (xINode.Block9 != 0) {
-									Console.WriteLine("Multiblock files not supported yet!");
-									Heap.MemFree((uint)xBuffer);
-									return null;
-								}
-								if (xINode.Block10 != 0) {
-									Console.WriteLine("Multiblock files not supported yet!");
-									Heap.MemFree((uint)xBuffer);
-									return null;
-								}
-								if (xINode.Block11 != 0) {
-									Console.WriteLine("Multiblock files not supported yet!");
-									Heap.MemFree((uint)xBuffer);
-									return null;
-								}
-								if (xINode.Block12 != 0) {
-									Console.WriteLine("Multiblock files not supported yet!");
-									Heap.MemFree((uint)xBuffer);
-									return null;
-								}
-								if (xINode.Block13 != 0) {
-									Console.WriteLine("Multiblock files not supported yet!");
-									Heap.MemFree((uint)xBuffer);
-									return null;
-								}
-								if (xINode.Block14 != 0) {
-									Console.WriteLine("Multiblock files not supported yet!");
-									Heap.MemFree((uint)xBuffer);
-									return null;
-								}
-								if (xINode.Block15 != 0) {
-									Console.WriteLine("Multiblock files not supported yet!");
-									Heap.MemFree((uint)xBuffer);
-									return null;
-								}
-								#endregion
 								DebugUtil.SendExt2_INode((uint)((g * mSuperBlock->INodesPerGroup) + i), g, &xINodeTable[i % (mBackend.BlockSize / sizeof(INode))]);
-								if (!mBackend.ReadBlock((uint)(xINode.Block1 * (mBlockSize / mBackend.BlockSize)), xByteBuffer)) {
+								if (!mBackend.ReadBlock((uint)(xINodeTable[i % (mBackend.BlockSize / sizeof(INode))].Block1 * (mBlockSize / mBackend.BlockSize)), xByteBuffer)) {
 									Console.WriteLine("[Ext2] Error reading INode entries");
 									Heap.MemFree((uint)xBuffer);
 									return null;
@@ -201,14 +135,14 @@ namespace Cosmos.Kernel.FileSystem {
 								Heap.MemFree((uint)xBuffer);
 								return xResult;
 							} else {
-								if ((xINode.Mode & INodeModeEnum.Directory) != 0) {
-									if (!mBackend.ReadBlock((uint)(xINode.Block1 * (mBlockSize / mBackend.BlockSize)), xByteBuffer)) {
+								if ((xINodeTable[i % (mBackend.BlockSize / sizeof(INode))].Mode & INodeModeEnum.Directory) != 0) {
+									if (!mBackend.ReadBlock((uint)(xINodeTable[i % (mBackend.BlockSize / sizeof(INode))].Block1 * (mBlockSize / mBackend.BlockSize)), xByteBuffer)) {
 										Console.WriteLine("[Ext2] Error reading INode entries");
 										Heap.MemFree((uint)xBuffer);
 										return null;
 									}
 									DirectoryEntry* xEntryPtr = (DirectoryEntry*)xBuffer;
-									uint xTotalSize = xINode.Size;
+									uint xTotalSize = xINodeTable[i % (mBackend.BlockSize / sizeof(INode))].Size;
 									while (xTotalSize != 0) {
 										uint xPtrAddress = (uint)xEntryPtr;
 										char[] xName = new char[xEntryPtr->NameLength];
@@ -220,7 +154,7 @@ namespace Cosmos.Kernel.FileSystem {
 											xPathPointer++;
 											xCurrentINode = xEntryPtr->@INode;
 											if (xPathPointer == xPath.Length) {
-												xResultSize = xINode.Size;
+												xResultSize = xINodeTable[i % (mBackend.BlockSize / sizeof(INode))].Size;
 											}
 											continue;
 										}

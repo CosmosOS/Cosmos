@@ -30,8 +30,8 @@ namespace Cosmos.Hardware.Storage {
 		private const byte IDE_STATUSREG_DRDY = 0x00000040;
 		private const byte IDE_STATUSREG_BSY = 0x00000080;
 		private const byte IDE_ERRORREG_ABRT = 0x00000004;
-		private const uint Timeout = 1000;
-		
+		private const uint Timeout = 5000;
+
 		private readonly ushort mControllerAddress;
 		private readonly byte mDrive;
 		private static readonly ushort[] ATAControllerInfo = new ushort[] { 0x1F0, 0x170 };
@@ -51,7 +51,7 @@ namespace Cosmos.Hardware.Storage {
 		}
 
 		public override unsafe bool ReadBlock(uint aBlock, byte* aBuffer) {
-			//DebugUtil.SendNumber("ATA", "ReadData, block", (uint)aBlock, 32);
+			DebugUtil.SendNumber("ATA", "ReadData, block", aBlock, 32);
 			// 1) Read the status register of the primary or the secondary IDE controller. 
 			// 2) The BSY and DRQ bits must be zero if the controller is ready. 
 			uint xSleepCount = Timeout;

@@ -65,11 +65,9 @@ namespace Cosmos.Kernel {
 		[GlueMethod(Type = GlueMethodType.Heap_Alloc)]
 		public static uint MemAlloc(uint aLength) {
 			CheckInit();
-			//DebugUtil.SendMM_Alloc(0, aLength);
 			MemoryBlock* xCurrentBlock = mFirstBlock;
 			bool xFound = false;
 			while (!xFound) {
-				//DebugUtil.SendNumber("MM", "Checking Block", (uint)xCurrentBlock, 32);
 				if (xCurrentBlock->State == MemoryBlockState.EndOfMemory) {
 					DebugUtil.SendError("MM", "Reached maximum memory");
 					return 0;
@@ -85,24 +83,12 @@ namespace Cosmos.Kernel {
 				xCurrentBlock = xCurrentBlock->Next;
 			}
 			uint xFoundBlockSize = (((uint)xCurrentBlock->Next) - ((uint)xCurrentBlock));
-			//Console.Write("[MM] Found block starts at ");
-			//Hardware.Storage.ATA.WriteNumber((uint)xCurrentBlock, 32);
-			//Console.WriteLine("");
-			// only make a new block when there's significant room left
 			if (xFoundBlockSize > (aLength + 37)) {
 				MemoryBlock* xOldNextBlock = xCurrentBlock->Next;
 				xCurrentBlock->Next = (MemoryBlock*)(((uint)xCurrentBlock) + aLength + 5);
-				//Console.Write("[MM] Making new block at ");
-				//Hardware.Storage.ATA.WriteNumber((uint)xCurrentBlock->Next, 32);
-				//Console.WriteLine("");
 				xCurrentBlock->Next->Next = xOldNextBlock;
 				xCurrentBlock->Next->State = MemoryBlockState.Free;
 			}
-			//Console.Write("[MM] Allocating ");
-			//Hardware.Storage.ATA.WriteNumber(aLength, 32);
-			//Console.Write(" at ");
-			//Hardware.Storage.ATA.WriteNumber(((uint)xCurrentBlock), 32);
-			//Console.WriteLine("");
 			xCurrentBlock->State = MemoryBlockState.Used;
 			return ((uint)xCurrentBlock) + 5;
 		}
