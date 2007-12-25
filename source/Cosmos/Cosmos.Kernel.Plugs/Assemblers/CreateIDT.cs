@@ -112,8 +112,9 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 				new CPUx86.Add("esp", "8");
 				new CPUNative.Break();
 				//if (j < 0x20 || j > 0x2F) {
-					new CPUNative.Sti();
+				new CPUNative.Sti();
 				//}
+				new Label("__ISR_Handler_" + j.ToString("X2") + "_END");
 				new CPUNative.IRet();
 			}
 			new Label("__AFTER__ALL__ISR__HANDLER__STUBS__");

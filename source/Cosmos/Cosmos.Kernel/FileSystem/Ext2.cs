@@ -4,7 +4,7 @@ using Cosmos.Hardware.Storage;
 namespace Cosmos.Kernel.FileSystem {
 	public unsafe partial class Ext2 {
 		private Storage mBackend;
-		private SuperBlock mSuperBlock;
+		private SuperBlock* mSuperBlock;
 		private uint mBlockSize;
 		private uint mGroupsCount;
 		private uint mGroupDescriptorsPerBlock;
@@ -20,12 +20,18 @@ namespace Cosmos.Kernel.FileSystem {
 				Console.WriteLine("[Ext2|SuperBlock] Error while reading SuperBlock data");
 				return false;
 			}
-			mSuperBlock = *(SuperBlock*)xBuffer;
-			DebugUtil.SendExt2_SuperBlock("", (SuperBlock*)xBuffer);
-			mBlockSize = (uint)(1024 << (byte)(mSuperBlock.LogBlockSize));
-			mGroupsCount = mSuperBlock.INodesCount / mSuperBlock.INodesPerGroup;
+			byte* xByteBuff = (byte*)xBuffer;
+			mSuperBlock = (SuperBlock*)Heap.MemAlloc((uint)sizeof(SuperBlock));
+			byte* xSuperBlockByteBuff = (byte*)mSuperBlock;
+			for (int i = 0; i < sizeof(SuperBlock); i++) {
+				xSuperBlockByteBuff[i] = xByteBuff[i];
+			}
+			DebugUtil.SendExt2_SuperBlock("", mSuperBlock);
+			mBlockSize = (uint)(1024 << (byte)(mSuperBlock->LogBlockSize));
+			DebugUtil.SendDoubleNumber("Numbers", "", mSuperBlock->INodesCount, 32, mSuperBlock->INodesPerGroup, 32);
+			mGroupsCount = mSuperBlock->INodesCount / mSuperBlock->INodesPerGroup;
 			mGroupDescriptorsPerBlock = (uint)(mBlockSize / sizeof(GroupDescriptor));
-			if (!ReadGroupDescriptorsOfBlock(mSuperBlock.FirstDataBlock + 1, xBuffer)) {
+			if (!ReadGroupDescriptorsOfBlock(mSuperBlock->FirstDataBlock + 1, xBuffer)) {
 				return false;
 			}
 			Heap.MemFree((uint)xBuffer);
@@ -94,8 +100,8 @@ namespace Cosmos.Kernel.FileSystem {
 						return null;
 					}
 					for (int i = 0; i < 32; i++) {
-						if ((i % (mBackend.BlockSize/ sizeof(INode))) == 0) {
-							uint index = (uint)((i % mSuperBlock.INodesPerGroup) * sizeof(INode));
+						if ((i % (mBackend.BlockSize / sizeof(INode))) == 0) {
+							uint index = (uint)((i % mSuperBlock->INodesPerGroup) * sizeof(INode));
 							uint offset = index / mBackend.BlockSize;
 							if (!mBackend.ReadBlock((uint)((xGroupDescriptor.INodeTable * (mBlockSize / mBackend.BlockSize)) + offset), xByteBuffer)) {
 								Console.WriteLine("[Ext2] Error reading INode table entries");
@@ -103,7 +109,7 @@ namespace Cosmos.Kernel.FileSystem {
 								return null;
 							}
 						}
-						uint xINodeIdentifier = (uint)((g * mSuperBlock.INodesPerGroup) + i + 1);
+						uint xINodeIdentifier = (uint)((g * mSuperBlock->INodesPerGroup) + i + 1);
 						if (xINodeIdentifier != xCurrentINode) {
 							continue;
 						}
@@ -182,7 +188,7 @@ namespace Cosmos.Kernel.FileSystem {
 									return null;
 								}
 								#endregion
-								DebugUtil.SendExt2_INode((uint)((g * mSuperBlock.INodesPerGroup) + i), g, &xINodeTable[i % (mBackend.BlockSize / sizeof(INode))]);
+								DebugUtil.SendExt2_INode((uint)((g * mSuperBlock->INodesPerGroup) + i), g, &xINodeTable[i % (mBackend.BlockSize / sizeof(INode))]);
 								if (!mBackend.ReadBlock((uint)(xINode.Block1 * (mBlockSize / mBackend.BlockSize)), xByteBuffer)) {
 									Console.WriteLine("[Ext2] Error reading INode entries");
 									Heap.MemFree((uint)xBuffer);

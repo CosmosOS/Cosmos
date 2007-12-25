@@ -16,8 +16,9 @@ namespace Indy.IL2CPU.IL.X86 {
 				new CPUx86.Pop(CPUx86.Registers.ECX);
 				new CPUx86.Add("esp", "4");
 				new CPUx86.Pop(CPUx86.Registers.EAX);
+				new CPUx86.Add("esp", "4");
 				new CPUx86.Divide(CPUx86.Registers.ECX);
-				//new CPUx86.Push("0");
+				new CPUx86.Push("0");
 				new CPUx86.Pushd(CPUx86.Registers.EAX);
 
 			} else {

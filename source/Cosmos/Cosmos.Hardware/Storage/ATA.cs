@@ -105,7 +105,7 @@ namespace Cosmos.Hardware.Storage {
 			//    in the status register will be set to 0 and DRQ to 1 so you might want to wait until 
 			//    those bits are set to the mentioned values before attempting to read from the drive. 
 			xSleepCount = Timeout;
-			while (((IOReadByte((ushort)(mControllerAddress + IDE_PORT_STATUS)) & (IDE_STATUSREG_BSY | IDE_STATUSREG_DRQ)) != IDE_STATUSREG_DRQ) && xSleepCount > 0) {
+			while (((IOReadByte((ushort)(mControllerAddress + IDE_PORT_STATUS)) & (IDE_STATUSREG_BSY | IDE_STATUSREG_DRQ)) != IDE_STATUSREG_DRQ) && xSleepCount != 0) {
 				xSleepCount--;
 				mSleep(1);
 			}
