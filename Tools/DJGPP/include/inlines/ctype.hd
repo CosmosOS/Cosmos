@@ -1,7 +1,0 @@
-#ifndef __dj_include_inline_ctype_hd_
-#define __dj_include_inline_ctype_hd_
-
-#define isascii(c) (!((c)&(~0x7f)))
-#define toascii(c) ((c)&0x7f)
-
-#endif

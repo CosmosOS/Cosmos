@@ -132,14 +132,9 @@ namespace IL2CPU {
 			}
 		}
 
-		private static string DJGPPDir {
-			get {
-				return Path.Combine(ToolsDir, "DJGPP");
-			}
-		}
 		private static string ElfLDFileName {
 			get {
-				return Path.Combine(Path.Combine(DJGPPDir, "bin"), "ld.exe");
+				return Path.Combine(Path.Combine(ToolsDir, "Binutils"), "ld.exe");
 			}
 		}
 
