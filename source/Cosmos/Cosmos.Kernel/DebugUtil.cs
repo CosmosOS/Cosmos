@@ -93,7 +93,7 @@ namespace Cosmos.Kernel {
 			EndLogging();
 		}
 
-		internal static unsafe void SendExt2_GroupDescriptor(string aDescription, int aBlock, int aIndex, uint aAddresss, FileSystem.Ext2.GroupDescriptor* aDescriptor) {
+		internal static unsafe void SendExt2_GroupDescriptor(string aDescription, uint aBlock, int aIndex, uint aAddresss, FileSystem.Ext2.GroupDescriptor* aDescriptor) {
 			StartLogging();
 			Serial.Write(0, "<Ext2_GroupDescriptor Description=\"");
 			Serial.Write(0, aDescription);
@@ -668,7 +668,7 @@ namespace Cosmos.Kernel {
 			EndLogging();
 		}
 
-		internal static unsafe void SendExt2_DirectoryEntry(FileSystem.Ext2.DirectoryEntry* aEntryPtr) {
+		internal static unsafe void SendExt2_DirectoryEntry(FileSystem.Ext2Old.DirectoryEntry* aEntryPtr) {
 			StartLogging();
 			Serial.Write(0, "<Ext2_DirectoryEntry INode=\"");
 			Hardware.DebugUtil.WriteNumber(aEntryPtr->@INode, 32);

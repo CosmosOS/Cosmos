@@ -80,13 +80,13 @@ namespace Cosmos.Hardware {
 
 		//IRQ 14 - Primary IDE. If no Primary IDE this can be changed
 		public static unsafe void HandleInterrupt_2E(InterruptContext* aContext) {
-			Storage.ATA.HandleInterruptPrimary();
+			Storage.ATAOld.HandleInterruptPrimary();
 			PIC.SignalSecondary();
 		}
 
 		//IRQ 15 - Secondary IDE
 		public static unsafe void HandleInterrupt_2F(InterruptContext* aContext) {
-			Storage.ATA.HandleInterruptSecondary();
+			Storage.ATAOld.HandleInterruptSecondary();
 			PIC.SignalSecondary();
 		}
 

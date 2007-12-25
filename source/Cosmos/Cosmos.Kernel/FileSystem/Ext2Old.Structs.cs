@@ -4,7 +4,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 
 namespace Cosmos.Kernel.FileSystem {
-	partial class Ext2 {
+	partial class Ext2Old {
 		[StructLayout(LayoutKind.Sequential)]
 		internal struct SuperBlock {
 			/// <summary>

@@ -26,9 +26,9 @@ namespace Cosmos.Kernel {
 		private static void ClearMemory(uint aStartAddress, uint aLength) {
 			DebugUtil.SendDoubleNumber("MM", "Clearing memory", aStartAddress, 32, aLength, 32);
 			Console.Write("[MM] Clearing ");
-			Hardware.Storage.ATA.WriteNumber(aLength, 32);
+			Hardware.Storage.ATAOld.WriteNumber(aLength, 32);
 			Console.Write(" bytes at ");
-			Hardware.Storage.ATA.WriteNumber(aStartAddress, 32);
+			Hardware.Storage.ATAOld.WriteNumber(aStartAddress, 32);
 			Console.WriteLine("");
 			Hardware.CPU.ZeroFill(aStartAddress, aLength);
 			//uint* xPtrLong = (uint*)aStartAddress;

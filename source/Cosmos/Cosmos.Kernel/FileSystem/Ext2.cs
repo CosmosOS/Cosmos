@@ -1,302 +1,57 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using Cosmos.Hardware.Storage;
 
 namespace Cosmos.Kernel.FileSystem {
-	public partial class Ext2: FileSystem {
+	public unsafe partial class Ext2 {
+		private Storage mBackend;
+		private SuperBlock mSuperBlock;
+		private uint mBlockSize;
+		private uint mGroupsCount;
+		private uint mGroupDescriptorsPerBlock;
+		private GroupDescriptor[] mGroupDescriptors;
 
-		private static unsafe GroupDescriptor[] ReadGroupDescriptorsOfBlock(byte aController, byte aDrive, uint aBlockGroup, SuperBlock aSuperBlock, ushort* aBuffer) {
-			uint xGroupDescriptorCount = aSuperBlock.INodesCount / aSuperBlock.INodesPerGroup;
-			GroupDescriptor[] xResult = new GroupDescriptor[xGroupDescriptorCount];
+		public Ext2(Storage aBackend) {
+			mBackend = aBackend;
+		}
+
+		private bool ReadSuperBlock() {
+			ushort* xBuffer = (ushort*)Heap.MemAlloc(mBackend.BlockSize);
+			if (!mBackend.ReadBlock(2, (byte*)xBuffer)) {
+				Console.WriteLine("[Ext2|SuperBlock] Error while reading SuperBlock data");
+				return false;
+			}
+			mSuperBlock = *(SuperBlock*)xBuffer;
+			DebugUtil.SendExt2_SuperBlock("", (SuperBlock*)xBuffer);
+			mBlockSize = (uint)(1024 << (byte)(mSuperBlock.LogBlockSize));
+			mGroupsCount = mSuperBlock.INodesCount / mSuperBlock.INodesPerGroup;
+			mGroupDescriptorsPerBlock = (uint)(mBlockSize / sizeof(GroupDescriptor));
+			if (!ReadGroupDescriptorsOfBlock(mSuperBlock.FirstDataBlock + 1, xBuffer)) {
+				return false;
+			}
+			Heap.MemFree((uint)xBuffer);
+			return true;
+		}
+
+		private unsafe bool ReadGroupDescriptorsOfBlock(uint aBlockGroup, ushort* aBuffer) {
+			mGroupDescriptors = new GroupDescriptor[mGroupsCount];
 			GroupDescriptor* xDescriptorPtr = (GroupDescriptor*)aBuffer;
-			for (int i = 0; i < xGroupDescriptorCount; i++) {
-				int xATABlock = (int)((8));
-				xATABlock += (i / 16);
+			for (int i = 0; i < mGroupsCount; i++) {
+				uint xATABlock = (uint)(mBlockSize / mBackend.BlockSize);
+				xATABlock += (uint)(i / mGroupDescriptorsPerBlock);
 				if ((i % 16) == 0) {
-					if (!Hardware.Storage.ATA.ReadDataNew(aController, aDrive, xATABlock, aBuffer)) {
+					if (!mBackend.ReadBlock(xATABlock, (byte*)aBuffer)) {
 						Console.WriteLine("[Ext2|GroupDescriptors] Error while reading GroupDescriptor data");
-						return null;
+						return false;
 					}
 				}
-				xResult[i] = xDescriptorPtr[i % 16];
-				DebugUtil.SendExt2_GroupDescriptor("ReadGroupDescriptorsOfBlock", xATABlock, i, 0, &xDescriptorPtr[i % 16]);
+				mGroupDescriptors[i] = xDescriptorPtr[i % mGroupDescriptorsPerBlock];
+				DebugUtil.SendExt2_GroupDescriptor("ReadGroupDescriptorsOfBlock", xATABlock, i, 0, &xDescriptorPtr[i % mGroupDescriptorsPerBlock]);
 			}
-			return xResult;
+			return true;
 		}
 
-		public static unsafe void PrintAllFilesAndDirectories(byte aController, byte aDrive) {
-			ushort* xBuffer = (ushort*)Heap.MemAlloc(512);
-			if (!Hardware.Storage.ATA.ReadDataNew(aController, aDrive, 2, xBuffer)) {
-				Console.WriteLine("[Ext2|SuperBlock] Error while reading SuperBlock data");
-				return;
-			}
-			SuperBlock xSuperBlock = *(SuperBlock*)xBuffer;
-			DebugUtil.SendExt2_SuperBlock("ReadFileContents", &xSuperBlock);
-			int xBlockSize = (int)(1024 << (byte)(xSuperBlock.LogBlockSize));
-			uint xGroupsCount = xSuperBlock.INodesCount / xSuperBlock.INodesPerGroup;
-			uint xGroupDescriptorsPerBlock = (uint)(xBlockSize / sizeof(GroupDescriptor));
-			GroupDescriptor[] xGroupDescriptors = ReadGroupDescriptorsOfBlock(aController, aDrive, xSuperBlock.FirstDataBlock + 1, xSuperBlock, xBuffer);
-			if (xGroupDescriptors == null) {
-				return;
-			}
-			bool[] xUsedINodes = new bool[32];
-			uint xCount = 0;
-			INode* xINodeTable = (INode*)xBuffer;
-			for (uint g = 0; g < xGroupDescriptors.Length; g++) {
-				GroupDescriptor xGroupDescriptor = xGroupDescriptors[g];
-				if (!Hardware.Storage.ATA.ReadDataNew(aController, aDrive, (int)((xGroupDescriptor.INodeBitmap) * 8), xBuffer)) {
-					return;
-				}
-				if (!ConvertBitmapToBoolArray((uint*)xBuffer, xUsedINodes)) {
-					return;
-				}
-				for (int i = 0; i < 32; i++) {
-					if ((i % 4) == 0) {
-						uint index = (uint)((i % xSuperBlock.INodesPerGroup) * sizeof(INode));
-						uint offset = index / 512;
-						if (!Hardware.Storage.ATA.ReadDataNew(aController, aDrive, (int)((xGroupDescriptor.INodeTable * 8) + offset), xBuffer)) {
-							Console.WriteLine("[Ext2] Error reading INode table entries");
-							return;
-						}
-					}
-					uint xINodeIdentifier = (uint)((g * xSuperBlock.INodesPerGroup) + i + 1);
-					if (xINodeIdentifier == 0xB) {
-						continue;
-					}
-					if (xUsedINodes[i]) {
-						INode xINode = xINodeTable[i % 4];
-						//DebugUtil.SendExt2_INode((uint)((g * xSuperBlock.INodesPerGroup) + i), g, &xINodeTable[i % 4]);
-						if ((xINode.Mode & INodeModeEnum.Directory) != 0) {
-							//DebugUtil.SendNumber("Ext2", "Directory found", (uint)((g * xSuperBlock.INodesPerGroup) + i + 1), 32);
-							DebugUtil.SendExt2_INode(xINodeIdentifier, g, &xINodeTable[i % 4]);
-							DebugUtil.SendExt2_INodeMode(xINodeIdentifier, (ushort)xINode.Mode);
-							if (!Hardware.Storage.ATA.ReadDataNew(aController, aDrive, (int)(xINode.Block1 * 8), xBuffer)) {
-								Console.WriteLine("[Ext2] Error reading INode entries");
-								return;
-							}
-							DirectoryEntry* xEntryPtr = (DirectoryEntry*)xBuffer;
-							uint xTotalSize = xINode.Size;
-							while (xTotalSize != 0/* && xEntryPtr->@INode != 0*/) {
-								DebugUtil.SendExt2_DirectoryEntry(xEntryPtr);
-								uint xPtrAddress = (uint)xEntryPtr;
-								//if (xEntryPtr->@INode == 0xC) {
-								char[] xName = new char[xEntryPtr->NameLength];
-								byte* xNamePtr = &xEntryPtr->FirstNameChar;
-								for (int c = 0; c < xName.Length; c++) {
-									xName[c] = (char)xNamePtr[c];
-								}
-								string s = new String(xName);
-								DebugUtil.SendMessage("Ext2, DirectoryEntryName", s);
-								//}
-								xPtrAddress += xEntryPtr->RecordLength;
-								xTotalSize -= xEntryPtr->RecordLength;
-								xEntryPtr = (DirectoryEntry*)xPtrAddress;
-							}
-						}
-						xCount++;
-					}
-				}
-			}
-
-			DebugUtil.SendNumber("Ext2", "Used INode count", xCount, 32);
-		}
-
-		public static unsafe byte[] ReadFile(byte aController, byte aDrive, string[] xPath) {
-			ushort* xBuffer = (ushort*)Heap.MemAlloc(512);
-			if (!Hardware.Storage.ATA.ReadDataNew(aController, aDrive, 2, xBuffer)) {
-				Console.WriteLine("[Ext2|SuperBlock] Error while reading SuperBlock data");
-				return null;
-			}
-			SuperBlock xSuperBlock = *(SuperBlock*)xBuffer;
-			DebugUtil.SendExt2_SuperBlock("ReadFileContents", &xSuperBlock);
-			int xBlockSize = (int)(1024 << (byte)(xSuperBlock.LogBlockSize));
-			uint xGroupsCount = xSuperBlock.INodesCount / xSuperBlock.INodesPerGroup;
-			uint xGroupDescriptorsPerBlock = (uint)(xBlockSize / sizeof(GroupDescriptor));
-			GroupDescriptor[] xGroupDescriptors = ReadGroupDescriptorsOfBlock(aController, aDrive, xSuperBlock.FirstDataBlock + 1, xSuperBlock, xBuffer);
-			if (xGroupDescriptors == null) {
-				return null;
-			}
-			bool[] xUsedINodes = new bool[32];
-			uint xCount = 0;
-			INode* xINodeTable = (INode*)xBuffer;
-			uint xPathPointer = 0;
-			uint xCurrentINode = 2;
-			Console.WriteLine("Looking up directories");
-			Console.Write("    xPath.Length = ");
-			Hardware.Storage.ATA.WriteNumber((uint)xPath.Length, 16);
-			Console.WriteLine("");
-			int xIterations = 0;
-			while (xPathPointer != (xPath.Length + 1)) {
-				if (xIterations == 5) {
-					Console.WriteLine("DEBUG: Stopping iteration");
-					break;
-				}
-				Console.WriteLine("Searching items");
-				Console.Write("    xPathPointer = ");
-				Hardware.Storage.ATA.WriteNumber(xPathPointer, 16);
-				Console.WriteLine("");
-				Console.Write("    xCurrentINode = ");
-				Hardware.Storage.ATA.WriteNumber(xCurrentINode, 32);
-				Console.WriteLine("");
-
-				DebugUtil.SendNumber("Ext2", "Current INode", xCurrentINode, 32);
-				for (uint g = 0; g < xGroupDescriptors.Length; g++) {
-					GroupDescriptor xGroupDescriptor = xGroupDescriptors[g];
-					if (!Hardware.Storage.ATA.ReadDataNew(aController, aDrive, (int)((xGroupDescriptor.INodeBitmap) * 8), xBuffer)) {
-						return null;
-					}
-					if (!ConvertBitmapToBoolArray((uint*)xBuffer, xUsedINodes)) {
-						return null;
-					}
-					for (int i = 0; i < 32; i++) {
-						if ((i % 4) == 0) {
-							uint index = (uint)((i % xSuperBlock.INodesPerGroup) * sizeof(INode));
-							uint offset = index / 512;
-							if (!Hardware.Storage.ATA.ReadDataNew(aController, aDrive, (int)((xGroupDescriptor.INodeTable * 8) + offset), xBuffer)) {
-								Console.WriteLine("[Ext2] Error reading INode table entries");
-								return null;
-							}
-						}
-						uint xINodeIdentifier = (uint)((g * xSuperBlock.INodesPerGroup) + i + 1);
-						//DebugUtil.SendNumber("Ext2", "Checking INode", xINodeIdentifier, 32);
-						if (xINodeIdentifier != xCurrentINode) {
-							continue;
-						}
-						if (xUsedINodes[i]) {
-							INode xINode = xINodeTable[i % 4];
-							//DebugUtil.SendExt2_INode((uint)((g * xSuperBlock.INodesPerGroup) + i), g, &xINodeTable[i % 4]);
-							if (xPathPointer == xPath.Length) {
-								#region temporary checks
-								if (xINode.Block2 != 0) {
-									Console.WriteLine("Multiblock files not supported yet!");
-									return null;
-								}
-								if (xINode.Block3 != 0) {
-									Console.WriteLine("Multiblock files not supported yet!");
-									return null;
-								}
-								if (xINode.Block4 != 0) {
-									Console.WriteLine("Multiblock files not supported yet!");
-									return null;
-								}
-								if (xINode.Block5 != 0) {
-									Console.WriteLine("Multiblock files not supported yet!");
-									return null;
-								}
-								if (xINode.Block6 != 0) {
-									Console.WriteLine("Multiblock files not supported yet!");
-									return null;
-								}
-								if (xINode.Block7 != 0) {
-									Console.WriteLine("Multiblock files not supported yet!");
-									return null;
-								}
-								if (xINode.Block8 != 0) {
-									Console.WriteLine("Multiblock files not supported yet!");
-									return null;
-								}
-								if (xINode.Block9 != 0) {
-									Console.WriteLine("Multiblock files not supported yet!");
-									return null;
-								}
-								if (xINode.Block10 != 0) {
-									Console.WriteLine("Multiblock files not supported yet!");
-									return null;
-								}
-								if (xINode.Block11 != 0) {
-									Console.WriteLine("Multiblock files not supported yet!");
-									return null;
-								}
-								if (xINode.Block12 != 0) {
-									Console.WriteLine("Multiblock files not supported yet!");
-									return null;
-								}
-								if (xINode.Block13 != 0) {
-									Console.WriteLine("Multiblock files not supported yet!");
-									return null;
-								}
-								if (xINode.Block14 != 0) {
-									Console.WriteLine("Multiblock files not supported yet!");
-									return null;
-								}
-								if (xINode.Block15 != 0) {
-									Console.WriteLine("Multiblock files not supported yet!");
-									return null;
-								}
-								#endregion
-								Console.WriteLine("Get file contents now");
-								DebugUtil.SendExt2_INode((uint)((g * xSuperBlock.INodesPerGroup) + i), g, &xINodeTable[i % 4]);
-								if (!Hardware.Storage.ATA.ReadDataNew(aController, aDrive, (int)(xINode.Block1 * 8), xBuffer)) {
-									Console.WriteLine("[Ext2] Error reading INode entries");
-									return null;
-								}
-								byte[] xResult = new byte[512];
-								byte* xByteBuff = (byte*)xBuffer;
-								for (int b = 0; b < 512; b++) {
-									xResult[b] = xByteBuff[b];
-								}
-								return xResult;
-							} else {
-								if ((xINode.Mode & INodeModeEnum.Directory) != 0) {
-									//DebugUtil.SendNumber("Ext2", "Directory found", (uint)((g * xSuperBlock.INodesPerGroup) + i + 1), 32);
-									//DebugUtil.SendExt2_INode(xINodeIdentifier, g, &xINodeTable[i % 4]);
-									//DebugUtil.SendExt2_INodeMode(xINodeIdentifier, (ushort)xINode.Mode);
-									if (!Hardware.Storage.ATA.ReadDataNew(aController, aDrive, (int)(xINode.Block1 * 8), xBuffer)) {
-										Console.WriteLine("[Ext2] Error reading INode entries");
-										return null;
-									}
-									DirectoryEntry* xEntryPtr = (DirectoryEntry*)xBuffer;
-									uint xTotalSize = xINode.Size;
-									while (xTotalSize != 0/* && xEntryPtr->@INode != 0*/) {
-										//DebugUtil.SendExt2_DirectoryEntry(xEntryPtr);
-										uint xPtrAddress = (uint)xEntryPtr;
-										char[] xName = new char[xEntryPtr->NameLength];
-										byte* xNamePtr = &xEntryPtr->FirstNameChar;
-										for (int c = 0; c < xName.Length; c++) {
-											xName[c] = (char)xNamePtr[c];
-										}
-										if (EqualsName(xPath[xPathPointer], xName)) {
-											xPathPointer++;
-											xCurrentINode = xEntryPtr->@INode;
-											continue;
-										}
-										xPtrAddress += xEntryPtr->RecordLength;
-										xTotalSize -= xEntryPtr->RecordLength;
-										xEntryPtr = (DirectoryEntry*)xPtrAddress;
-									}
-								}
-							}
-							xCount++;
-						}
-					}
-				}
-			}
-			//DebugUtil.SendMessage("Ext2", "Lookup file now");
-			//DebugUtil.SendExt2_SuperBlock("Looking up file", &xSuperBlock);
-			//Console.WriteLine("Lookup file now:");
-			//DebugUtil.SendNumber("Ext2", "CurrentINode", xCurrentINode, 32);
-			//uint xGroup = xCurrentINode / xSuperBlock.INodesPerGroup;
-			//uint xGroupINodeBase = xGroup * xSuperBlock.INodesPerGroup;
-			//for (int i = 0; i < 32; i++) {
-			//    if ((i % 4) == 0) {
-			//        uint index = (uint)((i % xSuperBlock.INodesPerGroup) * sizeof(INode));
-			//        uint offset = index / 512;
-			//        if (!Hardware.Storage.ATA.ReadDataNew(aController, aDrive, (int)((xGroupDescriptors[xGroup].INodeTable * 8) + offset), xBuffer)) {
-			//            Console.WriteLine("[Ext2] Error reading INode entries");
-			//            return null;
-			//        }
-			//    }
-			//    INode xItem = xINodeTable[i % 4];
-			//    if (((xGroupINodeBase + i) == xCurrentINode) && ((xItem.Mode & INodeModeEnum.RegularFile) != 0)) {
-			//        DebugUtil.SendExt2_INode(xCurrentINode, xGroup, &xItem);
-			//        Console.WriteLine("File found :-)");
-			//        //return null;
-			//    }
-			//}
-			//Console.WriteLine("Directory found");
-			//DebugUtil.SendNumber("Ext2", "Used INode count", xCount, 32);
-			Console.WriteLine("TODO: Lookup File now");
-			return null;
+		public bool Initialize() {
+			return ReadSuperBlock();
 		}
 
 		private static unsafe bool ConvertBitmapToBoolArray(uint* aBitmap, bool[] aArray) {
@@ -310,6 +65,172 @@ namespace Cosmos.Kernel.FileSystem {
 				aArray[b] = (xValue & xCheckBit) != 0;
 			}
 			return true;
+		}
+
+		public unsafe byte[] ReadFile(string[] xPath) {
+			ushort* xBuffer = (ushort*)Heap.MemAlloc(mBackend.BlockSize);
+			byte* xByteBuffer = (byte*)xBuffer;
+			bool[] xUsedINodes = new bool[32];
+			uint xCount = 0;
+			INode* xINodeTable = (INode*)xBuffer;
+			uint xPathPointer = 0;
+			uint xCurrentINode = 2;
+			int xIterations = 0;
+			uint xResultSize = 0;
+			while (xPathPointer != (xPath.Length + 1)) {
+				if (xIterations == 5) {
+					Console.WriteLine("DEBUG: Stopping iteration");
+					break;
+				}
+				DebugUtil.SendNumber("Ext2", "Current INode", xCurrentINode, 32);
+				for (uint g = 0; g < mGroupDescriptors.Length; g++) {
+					GroupDescriptor xGroupDescriptor = mGroupDescriptors[g];
+					if (!mBackend.ReadBlock((uint)((xGroupDescriptor.INodeBitmap) * (mBlockSize / mBackend.BlockSize)), xByteBuffer)) {
+						Heap.MemFree((uint)xBuffer);
+						return null;
+					}
+					if (!ConvertBitmapToBoolArray((uint*)xBuffer, xUsedINodes)) {
+						Heap.MemFree((uint)xBuffer);
+						return null;
+					}
+					for (int i = 0; i < 32; i++) {
+						if ((i % (mBackend.BlockSize/ sizeof(INode))) == 0) {
+							uint index = (uint)((i % mSuperBlock.INodesPerGroup) * sizeof(INode));
+							uint offset = index / mBackend.BlockSize;
+							if (!mBackend.ReadBlock((uint)((xGroupDescriptor.INodeTable * (mBlockSize / mBackend.BlockSize)) + offset), xByteBuffer)) {
+								Console.WriteLine("[Ext2] Error reading INode table entries");
+								Heap.MemFree((uint)xBuffer);
+								return null;
+							}
+						}
+						uint xINodeIdentifier = (uint)((g * mSuperBlock.INodesPerGroup) + i + 1);
+						if (xINodeIdentifier != xCurrentINode) {
+							continue;
+						}
+						if (xUsedINodes[i]) {
+							INode xINode = xINodeTable[i % (mBackend.BlockSize / sizeof(INode))];
+							if (xPathPointer == xPath.Length) {
+								#region temporary checks
+								if (xINode.Block2 != 0) {
+									Console.WriteLine("Multiblock files not supported yet!");
+									Heap.MemFree((uint)xBuffer);
+									return null;
+								}
+								if (xINode.Block3 != 0) {
+									Console.WriteLine("Multiblock files not supported yet!");
+									Heap.MemFree((uint)xBuffer);
+									return null;
+								}
+								if (xINode.Block4 != 0) {
+									Console.WriteLine("Multiblock files not supported yet!");
+									Heap.MemFree((uint)xBuffer);
+									return null;
+								}
+								if (xINode.Block5 != 0) {
+									Console.WriteLine("Multiblock files not supported yet!");
+									Heap.MemFree((uint)xBuffer);
+									return null;
+								}
+								if (xINode.Block6 != 0) {
+									Console.WriteLine("Multiblock files not supported yet!");
+									Heap.MemFree((uint)xBuffer);
+									return null;
+								}
+								if (xINode.Block7 != 0) {
+									Console.WriteLine("Multiblock files not supported yet!");
+									Heap.MemFree((uint)xBuffer);
+									return null;
+								}
+								if (xINode.Block8 != 0) {
+									Console.WriteLine("Multiblock files not supported yet!");
+									Heap.MemFree((uint)xBuffer);
+									return null;
+								}
+								if (xINode.Block9 != 0) {
+									Console.WriteLine("Multiblock files not supported yet!");
+									Heap.MemFree((uint)xBuffer);
+									return null;
+								}
+								if (xINode.Block10 != 0) {
+									Console.WriteLine("Multiblock files not supported yet!");
+									Heap.MemFree((uint)xBuffer);
+									return null;
+								}
+								if (xINode.Block11 != 0) {
+									Console.WriteLine("Multiblock files not supported yet!");
+									Heap.MemFree((uint)xBuffer);
+									return null;
+								}
+								if (xINode.Block12 != 0) {
+									Console.WriteLine("Multiblock files not supported yet!");
+									Heap.MemFree((uint)xBuffer);
+									return null;
+								}
+								if (xINode.Block13 != 0) {
+									Console.WriteLine("Multiblock files not supported yet!");
+									Heap.MemFree((uint)xBuffer);
+									return null;
+								}
+								if (xINode.Block14 != 0) {
+									Console.WriteLine("Multiblock files not supported yet!");
+									Heap.MemFree((uint)xBuffer);
+									return null;
+								}
+								if (xINode.Block15 != 0) {
+									Console.WriteLine("Multiblock files not supported yet!");
+									Heap.MemFree((uint)xBuffer);
+									return null;
+								}
+								#endregion
+								DebugUtil.SendExt2_INode((uint)((g * mSuperBlock.INodesPerGroup) + i), g, &xINodeTable[i % (mBackend.BlockSize / sizeof(INode))]);
+								if (!mBackend.ReadBlock((uint)(xINode.Block1 * (mBlockSize / mBackend.BlockSize)), xByteBuffer)) {
+									Console.WriteLine("[Ext2] Error reading INode entries");
+									Heap.MemFree((uint)xBuffer);
+									return null;
+								}
+								byte[] xResult = new byte[xResultSize];
+								for (int b = 0; b < xResultSize; b++) {
+									xResult[b] = xByteBuffer[b];
+								}
+								Heap.MemFree((uint)xBuffer);
+								return xResult;
+							} else {
+								if ((xINode.Mode & INodeModeEnum.Directory) != 0) {
+									if (!mBackend.ReadBlock((uint)(xINode.Block1 * (mBlockSize / mBackend.BlockSize)), xByteBuffer)) {
+										Console.WriteLine("[Ext2] Error reading INode entries");
+										Heap.MemFree((uint)xBuffer);
+										return null;
+									}
+									DirectoryEntry* xEntryPtr = (DirectoryEntry*)xBuffer;
+									uint xTotalSize = xINode.Size;
+									while (xTotalSize != 0) {
+										uint xPtrAddress = (uint)xEntryPtr;
+										char[] xName = new char[xEntryPtr->NameLength];
+										byte* xNamePtr = &xEntryPtr->FirstNameChar;
+										for (int c = 0; c < xName.Length; c++) {
+											xName[c] = (char)xNamePtr[c];
+										}
+										if (EqualsName(xPath[xPathPointer], xName)) {
+											xPathPointer++;
+											xCurrentINode = xEntryPtr->@INode;
+											if (xPathPointer == xPath.Length) {
+												xResultSize = xINode.Size;
+											}
+											continue;
+										}
+										xPtrAddress += xEntryPtr->RecordLength;
+										xTotalSize -= xEntryPtr->RecordLength;
+										xEntryPtr = (DirectoryEntry*)xPtrAddress;
+									}
+								}
+							}
+							xCount++;
+						}
+					}
+				}
+			}
+			Heap.MemFree((uint)xBuffer);
+			return null;
 		}
 
 		private static bool EqualsName(string a1, char[] a2) {

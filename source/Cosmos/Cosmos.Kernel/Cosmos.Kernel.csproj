@@ -44,7 +44,8 @@
     <Compile Include="CPU.cs" />
     <Compile Include="DebugUtil.cs" />
     <Compile Include="FileSystem\Ext2.cs" />
-    <Compile Include="FileSystem\Ext2.Structs.cs" />
+    <Compile Include="FileSystem\Ext2Old.cs" />
+    <Compile Include="FileSystem\Ext2Old.Structs.cs" />
     <Compile Include="FileSystem\FileSystem.cs" />
     <Compile Include="FileSystem\ISO9660.cs" />
     <Compile Include="Heap.cs" />
@@ -63,6 +64,9 @@
       <Project>{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}</Project>
       <Name>Cosmos.Hardware</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="FileSystem\Ext2.Structs.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
