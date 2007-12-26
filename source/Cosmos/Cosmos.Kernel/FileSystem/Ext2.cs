@@ -8,7 +8,7 @@ namespace Cosmos.Kernel.FileSystem {
 		private uint mBlockSize;
 		private uint mGroupsCount;
 		private uint mGroupDescriptorsPerBlock;
-		private GroupDescriptor[] mGroupDescriptors;
+		private GroupDescriptor*[] mGroupDescriptors;
 
 		public Ext2(Storage aBackend) {
 			mBackend = aBackend;
@@ -39,7 +39,7 @@ namespace Cosmos.Kernel.FileSystem {
 		}
 
 		private unsafe bool ReadGroupDescriptorsOfBlock(uint aBlockGroup, ushort* aBuffer) {
-			mGroupDescriptors = new GroupDescriptor[mGroupsCount];
+			mGroupDescriptors = new GroupDescriptor*[mGroupsCount];
 			GroupDescriptor* xDescriptorPtr = (GroupDescriptor*)aBuffer;
 			for (int i = 0; i < mGroupsCount; i++) {
 				uint xATABlock = (uint)(mBlockSize / mBackend.BlockSize);
@@ -50,7 +50,9 @@ namespace Cosmos.Kernel.FileSystem {
 						return false;
 					}
 				}
-				mGroupDescriptors[i] = xDescriptorPtr[i % mGroupDescriptorsPerBlock];
+				GroupDescriptor* xItem = (GroupDescriptor*)Heap.MemAlloc((uint)sizeof(GroupDescriptor));
+				CopyPointers((byte*)&xDescriptorPtr[i % mGroupDescriptorsPerBlock], (byte*)xItem, (uint)sizeof(GroupDescriptor));
+				mGroupDescriptors[i] = xItem;
 				DebugUtil.SendExt2_GroupDescriptor("ReadGroupDescriptorsOfBlock", xATABlock, i, 0, &xDescriptorPtr[i % mGroupDescriptorsPerBlock]);
 			}
 			return true;
@@ -96,9 +98,10 @@ namespace Cosmos.Kernel.FileSystem {
 					break;
 				}
 				DebugUtil.SendNumber("Ext2", "Current INode", xCurrentINode, 32);
-				for (uint g = 0; g < mGroupDescriptors.Length; g++) {
-					GroupDescriptor xGroupDescriptor = mGroupDescriptors[g];
-					if (!mBackend.ReadBlock((uint)((xGroupDescriptor.INodeBitmap) * (mBlockSize / mBackend.BlockSize)), xByteBuffer)) {
+				for (uint g = 0; g != (mGroupDescriptors.Length - 1); g++) {
+					
+					GroupDescriptor* xGroupDescriptor = mGroupDescriptors[g];
+					if (!mBackend.ReadBlock((uint)((xGroupDescriptor->INodeBitmap) * (mBlockSize / mBackend.BlockSize)), xByteBuffer)) {
 						Heap.MemFree((uint)xBuffer);
 						return null;
 					}
@@ -106,11 +109,11 @@ namespace Cosmos.Kernel.FileSystem {
 						Heap.MemFree((uint)xBuffer);
 						return null;
 					}
-					for (int i = 0; i < 32; i++) {
+					for (int i = 0; i != 31; i++) {
 						if ((i % (mBackend.BlockSize / sizeof(INode))) == 0) {
 							uint index = (uint)((i % mSuperBlock->INodesPerGroup) * sizeof(INode));
 							uint offset = index / mBackend.BlockSize;
-							if (!mBackend.ReadBlock((uint)((xGroupDescriptor.INodeTable * (mBlockSize / mBackend.BlockSize)) + offset), xByteBuffer)) {
+							if (!mBackend.ReadBlock((uint)((xGroupDescriptor->INodeTable * (mBlockSize / mBackend.BlockSize)) + offset), xByteBuffer)) {
 								Console.WriteLine("[Ext2] Error reading INode table entries");
 								Heap.MemFree((uint)xBuffer);
 								return null;

@@ -28,23 +28,20 @@ namespace Indy.IL2CPU.IL.X86 {
 			if (aCtorDef != null) {
 				Engine.QueueMethodRef(aCtorDef);
 			}
+			Engine.QueueMethodRef(GCImplementationRefs.AllocNewObjectRef);
+			Engine.QueueMethodRef(GCImplementationRefs.IncRefCountRef);
 			int xExtraSize = 0;
 			if (!aAssembler.InMetalMode) {
 				xExtraSize = 4;
 			}
-			Engine.QueueMethodRef(GCImplementationRefs.AllocNewObjectRef);
-			Engine.QueueMethodRef(GCImplementationRefs.IncRefCountRef);
 			new CPUx86.Pushd("0" + (aObjectSize + xExtraSize).ToString("X").ToUpper() + "h");
 			new CPUx86.Call(CPU.Label.GenerateLabelName(GCImplementationRefs.AllocNewObjectRef));
 			new CPUx86.Pushd(CPUx86.Registers.EAX);
 			new CPUx86.Pushd(CPUx86.Registers.EAX);
 			new CPUx86.Pushd(CPUx86.Registers.EAX);
 			new CPUx86.Pushd(CPUx86.Registers.EAX);
-			new CPUx86.Pushd(CPUx86.Registers.EAX);
 			new CPUx86.Call(CPU.Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef));
 			new CPUx86.Call(CPU.Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef));
-			aAssembler.StackSizes.Push(4);
-			aAssembler.StackSizes.Push(4);
 			int xObjSize = 0;
 			int xGCFieldCount = (from item in Engine.GetTypeFieldInfo(aCtorDef, out xObjSize).Values
 								 where item.NeedsGC
@@ -58,8 +55,8 @@ namespace Indy.IL2CPU.IL.X86 {
 					new CPUx86.Pushd("[esp + 0x8]");
 				}
 				new CPUx86.Call(CPU.Label.GenerateLabelName(aCtorDef));
-				new CPUx86.Pop(CPUx86.Registers.EAX);
-				aAssembler.StackSizes.Pop();
+				//new CPUx86.Pop(CPUx86.Registers.EAX);
+//				aAssembler.StackSizes.Pop();
 				for (int i = 0; i < aCtorDef.Parameters.Count; i++) {
 					new CPUx86.Add(CPUx86.Registers.ESP, "4");
 					aAssembler.StackSizes.Pop();

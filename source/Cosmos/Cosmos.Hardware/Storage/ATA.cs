@@ -51,7 +51,7 @@ namespace Cosmos.Hardware.Storage {
 		}
 
 		public override unsafe bool ReadBlock(uint aBlock, byte* aBuffer) {
-			DebugUtil.SendNumber("ATA", "ReadData, block", aBlock, 32);
+			DebugUtil.ATA_ReadBlock(1, mControllerAddress, mDrive, aBlock);
 			// 1) Read the status register of the primary or the secondary IDE controller. 
 			// 2) The BSY and DRQ bits must be zero if the controller is ready. 
 			uint xSleepCount = Timeout;
@@ -63,9 +63,11 @@ namespace Cosmos.Hardware.Storage {
 				Console.WriteLine("[ATA#2] Read failed");
 				return false;
 			}
+			DebugUtil.ATA_ReadBlock(3, mControllerAddress, mDrive, aBlock);
 			//3) Set the DEV bit to 0 for Drive0 and to 1 for Drive1 on the selected IDE controller using 
 			//   the Device/Head register and wait for approximately 400 nanoseconds using some NOP perhaps. 
 			IOWriteByte((ushort)(mControllerAddress + IDE_PORT_DRIVEHEAD), (byte)(mDrive << 4));
+			DebugUtil.ATA_ReadBlock(4, mControllerAddress, mDrive, aBlock);
 			//4) Read the status register again. 
 			//5) The BSY and DRQ bits must be 0 again for you to know that the IDE controller and the selected IDE drive are ready. 
 			xSleepCount = Timeout;
@@ -77,30 +79,38 @@ namespace Cosmos.Hardware.Storage {
 				Console.WriteLine("[ATA#5] Read failed");
 				return false;
 			}
+			DebugUtil.ATA_ReadBlock(6, mControllerAddress, mDrive, aBlock);
 			// 6) Write the LBA28 address to the designated IDE registers. 
 			IOWriteByte((ushort)(mControllerAddress + IDE_PORT_LBABITS0TO7), (byte)aBlock);
 			IOWriteByte((ushort)(mControllerAddress + IDE_PORT_LBABITS8TO15), (byte)(aBlock >> 8));
 			IOWriteByte((ushort)(mControllerAddress + IDE_PORT_LBABITS16TO23), (byte)(aBlock >> 16));
 			IOWriteByte((ushort)(mControllerAddress + IDE_PORT_LBABITS24TO27), (byte)(0xE0 | (mDrive << 4) | ((byte)((aBlock >> 24) & 0x0F))));
+			DebugUtil.ATA_ReadBlock(7, mControllerAddress, mDrive, aBlock);
 			// 7) Set the Sector count using the Sector Count register. 
 			IOWriteByte((ushort)(mControllerAddress + IDE_PORT_SECTORCOUNT), 1);
+			DebugUtil.ATA_ReadBlock(8, mControllerAddress, mDrive, aBlock);
 			//8) Issue the Read Sector(s) command. 
 			IOWriteByte((ushort)(mControllerAddress + IDE_PORT_COMMAND), 0x20);
+			DebugUtil.ATA_ReadBlock(9, mControllerAddress, mDrive, aBlock);
 			// 9) Read the Error register. If the ABRT bit is set then the Read Sector(s) command 
 			//    is not supported for that IDE drive. If the ABRT bit is not set, continue to the next step. 
 			if ((IOReadByte((ushort)(mControllerAddress + IDE_PORT_ERROR)) & IDE_ERRORREG_ABRT) == IDE_ERRORREG_ABRT) {
 				Console.WriteLine("[ATA#9] Read failed");
 				return false;
 			}
+			DebugUtil.ATA_ReadBlock(10, mControllerAddress, mDrive, aBlock);
 			// 10) If you want to receive interrupts after reading each sector, clear the nIEN bit in the 
 			//     Device Control register. If you do not clear this bit then interrupts will not be generated 
 			//     after the reading of each sector which might cause an infinite loop if you are waiting for them. 
 			//     The Primary IDE Controller will generate IRQ14 and the secondary IDE controller generates IRQ 15. 
 			IOWriteByte(IDE_PORT_DEVICECONTROL, 0); // receive interrupts...
+			DebugUtil.ATA_ReadBlock(11, mControllerAddress, mDrive, aBlock);
 			// 11) Read the Alternate Status Register (you may even ignore the value that is read) 
 			IOReadByte(IDE_PORT_ALTERNATESTATUS);
+			DebugUtil.ATA_ReadBlock(12, mControllerAddress, mDrive, aBlock);
 			// 12) Read the Status register for the selected IDE Controller. 
 			IOReadByte((ushort)(mControllerAddress + IDE_PORT_STATUS));
+			DebugUtil.ATA_ReadBlock(13, mControllerAddress, mDrive, aBlock);
 			//13) Whenever a sector of data is ready to be read from the Data Register, the BSY bit 
 			//    in the status register will be set to 0 and DRQ to 1 so you might want to wait until 
 			//    those bits are set to the mentioned values before attempting to read from the drive. 
@@ -113,6 +123,7 @@ namespace Cosmos.Hardware.Storage {
 				Console.WriteLine("[ATA#13] Read failed");
 				return false;
 			}
+			DebugUtil.ATA_ReadBlock(14, mControllerAddress, mDrive, aBlock);
 			//14) Read one sector from the IDE Controller 16-bits at a time using the IN or the INSW instructions. 
 			ushort* xBuffer = (ushort*)aBuffer;
 			for (uint i = 0; i < 256; i++) {
@@ -120,14 +131,16 @@ namespace Cosmos.Hardware.Storage {
 				xBuffer[i] = xValue;
 			}
 			// 15) See if you have to read one more sector. If yes, repeat from step 11 again. 
-
+			DebugUtil.ATA_ReadBlock(16, mControllerAddress, mDrive, aBlock);
 			//16) If you don't need to read any more sectors, read the Alternate Status Register and ignore the byte that you read. 
 			IOReadByte(IDE_PORT_ALTERNATESTATUS);
+			DebugUtil.ATA_ReadBlock(17, mControllerAddress, mDrive, aBlock);
 			//17) Read the status register. When the status register is read, the IDE Controller will negate 
 			//    the INTRQ and you will not have pending IRQs waiting to be detected. This is a MUST to read 
 			//    the status register when you are done reading from IDE ports. 
 			IOReadByte((ushort)(mControllerAddress + IDE_PORT_STATUS));
 			//DebugUtil.SendATA_BlockReceived(aController, aDrive, (uint)aBlock, aBuffer);
+			DebugUtil.ATA_ReadBlock(255, mControllerAddress, mDrive, aBlock);
 			return true;
 		}
 

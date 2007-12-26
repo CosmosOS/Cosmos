@@ -46,6 +46,20 @@ namespace Cosmos.Hardware {
 			EndLogging();
 		}
 
+		public static void ATA_ReadBlock(byte aStep, ushort aControllerAddres, byte aDrive, uint aBlock) {
+			StartLogging();
+			WriteSerialString("<ATA_ReadBlock");
+			WriteNumber(aStep, 8);
+			WriteSerialString(" ControllerAddress=\"");
+			DebugUtil.WriteNumber(aControllerAddres, 16);
+			WriteSerialString("\" Drive=\"");
+			DebugUtil.WriteNumber(aDrive, 8);
+			WriteSerialString("\" Block=\"");
+			DebugUtil.WriteNumber(aBlock, 32);
+			WriteSerialString("\"/>\r\n");
+			EndLogging();
+		}
+
 		public static void SendNumber(string aModule, string aDescription, uint aNumber, byte aBits) {
 			StartLogging();
 			WriteSerialString("<Number Module=\"");
