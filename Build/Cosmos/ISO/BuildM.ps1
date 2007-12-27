@@ -26,6 +26,13 @@ pause
 # ----------- Start QEMU
 remove-item serial-debug.txt -ea SilentlyContinue
 cd ..\..\..\tools\qemu\
-.\qemu -L . -cdrom ..\..\build\Cosmos\ISO\Cosmos.iso -boot d -hda ..\..\build\Cosmos\ISO\C-drive.img -serial "file:..\..\build\Cosmos\ISO\serial-debug.txt" -S -s
+#.\qemu -L . -cdrom ..\..\build\Cosmos\ISO\Cosmos.iso -boot d -hda ..\..\build\Cosmos\ISO\C-drive.img -serial "file:..\..\build\Cosmos\ISO\serial-debug.txt" -S -s
+#pause
+$qemu = resolve-path qemu.exe
+$qemuparms = '-L . -cdrom ..\..\build\Cosmos\ISO\Cosmos.iso -boot d -hda ..\..\build\Cosmos\ISO\C-drive.img -serial "file:..\..\build\Cosmos\ISO\serial-debug.txt" -S -s'
+# Still failing - because its a command line exe? run under cmd.exe?
+[System.Diagnostics.Process]::Start($qemu, $qemuparms)
 
-
+#http://www.vistax64.com/powershell/114718-how-can-i-execute-wmi-method-asynchronously.html
+#http://blogs.technet.com/industry_insiders/pages/executing-a-command-line-utility-from-powershell-and-waiting-for-it-to-finish.aspx
+#invoke-item
