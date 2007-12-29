@@ -136,10 +136,11 @@ namespace Indy.IL2CPU.Assembler {
 			}
 			if (mImportMembers.Count > 0) {
 				EmitIDataSectionHeader();
-				foreach (ImportMethodMember xMethod in (from item in mImportMembers
-														select item.Methods).Aggregate(new ImportMethodMember[0], (x, r) => new List<ImportMethodMember>(x.Union(r)).ToArray())) {
-					mOutputWriter.WriteLine("extern " + xMethod.Name);
-				}
+				EmitImportMembers();
+				//foreach (ImportMethodMember xMethod in (from item in mImportMembers
+				//                                        select item.Methods).Aggregate(new ImportMethodMember[0], (x, r) => new List<ImportMethodMember>(x.Union(r)).ToArray())) {
+				//    mOutputWriter.WriteLine("extern " + xMethod.Name);
+				//}
 				//mOutputWriter.WriteLine();
 				//foreach (ImportMember xImportMember in mImportMembers) {
 				//    mOutputWriter.WriteLine("\tdd 0,0,0,rva {0}_name,rva {0}_table", xImportMember.Name);
@@ -169,22 +170,21 @@ namespace Indy.IL2CPU.Assembler {
 			EmitFooter();
 		}
 
+		protected abstract void EmitImportMembers();
+
 		protected virtual void EmitIDataSectionHeader() {
-			mOutputWriter.WriteLine("section '.idata' import data readable writeable");
 		}
 
 		protected virtual void EmitIDataSectionFooter() {
 		}
 
 		protected virtual void EmitCodeSectionHeader() {
-			mOutputWriter.WriteLine("section '.code' code readable executable");
 		}
 
 		protected virtual void EmitCodeSectionFooter() {
 		}
 
 		protected virtual void EmitDataSectionHeader() {
-			mOutputWriter.WriteLine("section '.data' data readable writeable");
 		}
 
 		protected virtual void EmitDataSectionFooter() {

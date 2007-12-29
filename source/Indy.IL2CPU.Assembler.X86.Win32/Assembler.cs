@@ -30,22 +30,70 @@ namespace Indy.IL2CPU.Assembler.X86.Win32 {
 			}
 		}
 
+		protected override void EmitCodeSectionHeader() {
+			base.EmitCodeSectionHeader();
+			mOutputWriter.WriteLine("section '.text' code readable executable");
+		}
+
+		protected override void EmitDataSectionHeader() {
+			base.EmitDataSectionHeader();
+			mOutputWriter.WriteLine("section '.text' code readable executable");
+		}
+
+		protected override void EmitIDataSectionHeader() {
+		}
+
+		protected override void EmitDataSectionFooter() {
+			base.EmitDataSectionFooter();
+			//
+		}
+
+		protected override void EmitFooter() {
+		}
+
+		protected override void EmitImportMembers() {
+			mOutputWriter.WriteLine();
+			foreach (ImportMember xImportMember in ImportMembers) {
+				mOutputWriter.WriteLine("\tdd 0,0,0,rva {0}_name,rva {0}_table", xImportMember.Name);
+			}
+			mOutputWriter.WriteLine("\tdd 0,0,0,0,0");
+			mOutputWriter.WriteLine();
+			foreach (ImportMember xImportMember in ImportMembers) {
+				mOutputWriter.WriteLine("\t{0}_table:", xImportMember.Name);
+				foreach (ImportMethodMember xImportMethod in xImportMember.Methods) {
+					mOutputWriter.WriteLine("\t\t{0} dd rva _{0}", xImportMethod.Name);
+				}
+				mOutputWriter.WriteLine("\t\tdd 0");
+				mOutputWriter.WriteLine();
+			}
+			foreach (ImportMember xImportMember in ImportMembers) {
+				mOutputWriter.WriteLine("\t{0}_name db '{1}',0", xImportMember.Name, xImportMember.FileName);
+			}
+			mOutputWriter.WriteLine();
+			foreach (ImportMember xImportMember in ImportMembers) {
+				foreach (ImportMethodMember xImportMethod in xImportMember.Methods) {
+					mOutputWriter.WriteLine("\t_{0} dw 0", xImportMethod.Name);
+					mOutputWriter.WriteLine("\tdb '{0}',0", xImportMethod.Name);
+				}
+			}
+		}
+
 		protected override void EmitHeader() {
 			switch (mOutputType) {
 				case OutputTypeEnum.GUI:
-//					mOutputWriter.WriteLine("format PE GUI 4.0");
+					mOutputWriter.WriteLine("format PE GUI 4.0");
 					break;
 				case OutputTypeEnum.DLL:
-//					mOutputWriter.WriteLine("format PE dll");
+					mOutputWriter.WriteLine("format PE dll");
 					break;
 				default:
-//					mOutputWriter.WriteLine("format PE console");
+					mOutputWriter.WriteLine("format PE console");
 					break;
 			}
 			if (mOutputType != OutputTypeEnum.DLL) {
-//				mOutputWriter.WriteLine("entry " + EntryPointName);
+				mOutputWriter.WriteLine("entry " + EntryPointName);
 			}
-			//mOutputWriter.WriteLine("stack 0x{0}", StackSize.ToString("X"));
+			mOutputWriter.WriteLine("stack 0x{0}", StackSize.ToString("X"));
 		}
 	}
 }

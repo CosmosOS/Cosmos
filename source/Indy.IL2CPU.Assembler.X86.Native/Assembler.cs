@@ -15,7 +15,8 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
 		}
 
 		protected override void EmitCodeSectionHeader() {
-			mOutputWriter.WriteLine("section .text progbits alloc exec nowrite align=16");
+			base.EmitCodeSectionHeader();
+			mOutputWriter.WriteLine("section .text");
 			mOutputWriter.WriteLine("global Kernel_Start");
 			mOutputWriter.WriteLine("Kernel_Start: ");
 			mOutputWriter.WriteLine("");
@@ -46,7 +47,8 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
 		}
 
 		protected override void EmitDataSectionHeader() {
-			mOutputWriter.WriteLine("section .data progbits alloc noexec write align=4");
+			base.EmitDataSectionHeader();
+			mOutputWriter.WriteLine("section .data");
 			mOutputWriter.WriteLine("_start:  ");
 			mOutputWriter.WriteLine("; multiboot header ");
 			mOutputWriter.WriteLine("MBFLAGS equ 0x03 ; 4KB aligned modules etc., full memory info,  ");
@@ -73,7 +75,6 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
 
 		protected override void EmitDataSectionFooter() {
 			base.EmitDataSectionFooter();
-			//mOutputWriter.WriteLine("section .bss nobits alloc noexec write align=4");
 			mOutputWriter.WriteLine("");
 			mOutputWriter.WriteLine(";--- bss --- place r*, d* ? directives here, so that you'll have a BSS. ");
 			mOutputWriter.WriteLine("");
@@ -91,6 +92,7 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
 		}
 
 		protected override void EmitHeader() {
+			base.EmitHeader();
 			//mOutputWriter.WriteLine("format ms coff  ");
 			//mOutputWriter.WriteLine("org 0220000h    ; the best place to load our kernel to. ");
 			mOutputWriter.WriteLine("use32           ; the kernel will be run in 32-bit protected mode, ");
@@ -125,6 +127,12 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
 //			}
 			//mOutputWriter.WriteLine("section '.code' code readable executable");
 			mOutputWriter.WriteLine("");
+		}
+
+		protected override void EmitImportMembers() {
+			if (ImportMembers.Count > 0) {
+				throw new Exception("You can't use external libraries in OS kernels");
+			}
 		}
 	}
 }

@@ -20,8 +20,8 @@ namespace IL2CPU {
 		public static TargetPlatformEnum TargetPlatform = TargetPlatformEnum.Win32;
 		public const string LDParamsTemplate_NativeX86 = "-Ttext 0x2000000 -Tdata 0x200000 -e Kernel_Start -o \"{0}\" \"{1}\"";
 		public const string NAsmParamsTemplate_NativeX86 = "-g -f elf -F stabs -o \"{0}\" \"{1}\"";
-		public const string LDParamsTemplate_Win32 = "-e Kernel_Start -o \"{0}\" \"{1}\"";
-		public const string NAsmParamsTemplate_Win32 = "-g -f elf -F stabs -o \"{0}\" \"{1}\"";
+		public const string FAsmParamsTemplate_Win32 = "\"{1}\" \"{0}\"";
+		
 
 		private Type win32Type = typeof(Win32OpCodeMap);
 		private Type nativeType = typeof(NativeOpCodeMap);
@@ -138,10 +138,9 @@ namespace IL2CPU {
 			}
 		}
 
-		private static string PELDFileName {
+		private static string FAsmFileName {
 			get {
-				throw new NotImplementedException();
-				return Path.Combine(Path.Combine(ToolsDir, "Binutils"), "ld.exe");
+				return Path.Combine(Path.Combine(ToolsDir, "fasm"), "fasm.exe");
 			}
 		}
 
@@ -168,17 +167,21 @@ namespace IL2CPU {
 					if (xCleanupAsm) {
 						AsmFile = Path.GetTempFileName();
 					}
+					if (TargetPlatform == TargetPlatformEnum.Win32) {
+						xTestOutput = OutputFile;
+					}
 					using (FileStream fs = new FileStream(AsmFile, FileMode.Create)) {
 						using (StreamWriter br = new StreamWriter(fs)) {
 							e.Execute(InputFile, TargetPlatform, br, MetalMode, DebugMode, BCLDir, Plugs);
 						}
 					}
 					ProcessStartInfo xFasmStartInfo = new ProcessStartInfo();
-					xFasmStartInfo.FileName = NasmFileName;
 					if (TargetPlatform == TargetPlatformEnum.NativeX86) {
+						xFasmStartInfo.FileName = NasmFileName;
 						xFasmStartInfo.Arguments = String.Format(NAsmParamsTemplate_NativeX86, xTestOutput, AsmFile);
 					} else {
-						xFasmStartInfo.Arguments = String.Format(NAsmParamsTemplate_Win32, xTestOutput, AsmFile);
+						xFasmStartInfo.FileName = FAsmFileName;
+						xFasmStartInfo.Arguments = String.Format(FAsmParamsTemplate_Win32, xTestOutput, AsmFile);
 					}
 					xFasmStartInfo.UseShellExecute = false;
 					xFasmStartInfo.RedirectStandardError = false;
@@ -190,23 +193,22 @@ namespace IL2CPU {
 						Console.Write(xFasm.StandardError.ReadToEnd());
 						return 3;
 					}
-					ProcessStartInfo xLDStartInfo = new ProcessStartInfo();
-					if (TargetPlatform == TargetPlatformEnum.NativeX86) {
-						xLDStartInfo.FileName = ElfLDFileName;
-						xLDStartInfo.Arguments = String.Format(LDParamsTemplate_NativeX86, OutputFile, xTestOutput);
-					} else {
-						xLDStartInfo.FileName = PELDFileName;
-						xLDStartInfo.Arguments = String.Format(LDParamsTemplate_Win32, OutputFile, xTestOutput);
-					}
-					xLDStartInfo.UseShellExecute = false;
-					xLDStartInfo.RedirectStandardError = false;
-					xLDStartInfo.RedirectStandardOutput = false;
-					Process xLD = Process.Start(xLDStartInfo);
-					if (!xLD.WaitForExit(60 * 1000) || xLD.ExitCode != 0) {
-						Console.WriteLine("Error while running LD!");
-						Console.Write(xLD.StandardOutput.ReadToEnd());
-						Console.Write(xLD.StandardError.ReadToEnd());
-						return 4;
+					if (TargetPlatform != TargetPlatformEnum.Win32) {
+						ProcessStartInfo xLDStartInfo = new ProcessStartInfo();
+						if (TargetPlatform == TargetPlatformEnum.NativeX86) {
+							xLDStartInfo.FileName = ElfLDFileName;
+							xLDStartInfo.Arguments = String.Format(LDParamsTemplate_NativeX86, OutputFile, xTestOutput);
+						}
+						xLDStartInfo.UseShellExecute = false;
+						xLDStartInfo.RedirectStandardError = false;
+						xLDStartInfo.RedirectStandardOutput = false;
+						Process xLD = Process.Start(xLDStartInfo);
+						if (!xLD.WaitForExit(60 * 1000) || xLD.ExitCode != 0) {
+							Console.WriteLine("Error while running LD!");
+							Console.Write(xLD.StandardOutput.ReadToEnd());
+							Console.Write(xLD.StandardError.ReadToEnd());
+							return 4;
+						}
 					}
 				} else {
 					return 1;
