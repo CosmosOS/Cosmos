@@ -17,27 +17,27 @@ namespace Indy.IL2CPU.IL.X86.Win32 {
 			base.Initialize(aAssembler, aProjectAssemblies, aPlugs, aTypeResolver, aAssemblyResolver);
 			base.mMap[Code.Call] = typeof(Call);
 		}
-		
+
 		protected override IList<AssemblyDefinition> GetPlugAssemblies() {
 			IList<AssemblyDefinition> xResult = base.GetPlugAssemblies();
-			xResult.Add(AssemblyFactory.GetAssembly(typeof (Win32OpCodeMap).Assembly.Location));
+			xResult.Add(AssemblyFactory.GetAssembly(typeof(Win32OpCodeMap).Assembly.Location));
 			return xResult;
 		}
 
-//		public override MethodReference GetCustomMethodImplementation_Old(string aOrigMethodName, bool aInMetalMode) {
-//			switch (aOrigMethodName) {
-//				case "System_Void___System_Console_Write___System_String___": {
-//						return CustomImplementations.System.ConsoleImplRefs.WriteRef;
-//					}
-//				case "System_Void___System_Console_WriteLine____": {
-//						return CustomImplementations.System.ConsoleImplRefs.WriteLineRef;
-//					}
-//				case "System_Void___System_Console_WriteLine___System_String___": {
-//						return CustomImplementations.System.ConsoleImplRefs.WriteLine_string_Ref;
-//					}
-//				default:
-//					return base.GetCustomMethodImplementation_Old(aOrigMethodName, aInMetalMode);
-//			}
-//		}
+		//		public override MethodReference GetCustomMethodImplementation_Old(string aOrigMethodName, bool aInMetalMode) {
+		//			switch (aOrigMethodName) {
+		//				case "System_Void___System_Console_Write___System_String___": {
+		//						return CustomImplementations.System.ConsoleImplRefs.WriteRef;
+		//					}
+		//				case "System_Void___System_Console_WriteLine____": {
+		//						return CustomImplementations.System.ConsoleImplRefs.WriteLineRef;
+		//					}
+		//				case "System_Void___System_Console_WriteLine___System_String___": {
+		//						return CustomImplementations.System.ConsoleImplRefs.WriteLine_string_Ref;
+		//					}
+		//				default:
+		//					return base.GetCustomMethodImplementation_Old(aOrigMethodName, aInMetalMode);
+		//			}
+		//		}
 	}
 }

@@ -22,7 +22,7 @@ namespace Indy.IL2CPU {
 
 		public static void FinalizeApplication(int aExitCode) {
 			// finalize all runtime services, like heap and gc
-			Heap_Shutdown();
+			//Heap_Shutdown();
 			FinalizeEngine();
 			ExitProcess(aExitCode);			
 		}

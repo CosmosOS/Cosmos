@@ -37,10 +37,11 @@ namespace Indy.IL2CPU.Assembler.X86.Win32 {
 
 		protected override void EmitDataSectionHeader() {
 			base.EmitDataSectionHeader();
-			mOutputWriter.WriteLine("section '.text' code readable executable");
+			mOutputWriter.WriteLine("section '.data' data writeable");
 		}
 
 		protected override void EmitIDataSectionHeader() {
+			mOutputWriter.WriteLine("section '.idata' data readable import");
 		}
 
 		protected override void EmitDataSectionFooter() {

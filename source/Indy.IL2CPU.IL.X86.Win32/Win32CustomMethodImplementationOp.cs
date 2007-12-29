@@ -19,6 +19,8 @@ namespace Indy.IL2CPU.IL.X86.Win32 {
 		}
 
 		protected override void Assemble_System_Void___Indy_IL2CPU_RuntimeEngine_Heap_Shutdown____() {
+			if (Assembler.InMetalMode)
+				throw new NotImplementedException();
 			PassCall(RuntimeEngineImplRefs.Heap_ShutdownRef);
 		}
 
