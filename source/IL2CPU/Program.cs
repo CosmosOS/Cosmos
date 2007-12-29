@@ -134,12 +134,13 @@ namespace IL2CPU {
 
 		private static string ElfLDFileName {
 			get {
-				return Path.Combine(Path.Combine(ToolsDir, "Binutils"), "ld.exe");
+				return Path.Combine(Path.Combine(ToolsDir, "Binutils-NativeX86"), "ld.exe");
 			}
 		}
 
 		private static string PELDFileName {
 			get {
+				throw new NotImplementedException();
 				return Path.Combine(Path.Combine(ToolsDir, "Binutils"), "ld.exe");
 			}
 		}
