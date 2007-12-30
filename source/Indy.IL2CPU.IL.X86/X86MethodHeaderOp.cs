@@ -1,3 +1,4 @@
+#define EXT_DEBUG
 using System;
 using System.Linq;
 using Indy.IL2CPU.Assembler;
@@ -27,9 +28,10 @@ namespace Indy.IL2CPU.IL.X86 {
 		public static void AssembleHeader(Assembler.Assembler aAssembler, string aLabelName, int[] aLocals, MethodInformation.Argument[] aArguments) {
 			new CPU.Label(aLabelName);
 			new CPUx86.Pushd(CPUx86.Registers.EBP);
-			//new CPUx86.Move("eax", LdStr.GetContentsArrayName(aAssembler, aLabelName) + "__Contents");
-			//new CPUx86.Add("eax", "12");
-			//new CPUx86.Push("eax");
+#if EXT_DEBUG
+				new CPUx86.Move("edi", LdStr.GetContentsArrayName(aAssembler, aLabelName) + "__Contents");
+				new CPUx86.Add("edi", "0x10");
+#endif
 			new CPUx86.Move(CPUx86.Registers.EBP, CPUx86.Registers.ESP);
 			foreach (int xLocalSize in aLocals) {
 				aAssembler.StackSizes.Push(xLocalSize);
@@ -37,11 +39,6 @@ namespace Indy.IL2CPU.IL.X86 {
 					new CPUx86.Pushd("0");
 				}
 			}
-			//new LdStr(aLabelName) {
-			//	Assembler = aAssembler
-			//}.
-			//Assemble();
-			//new CPUx86.Add(CPUx86.Registers.ESP, "4");
 		}
 	}
 }
