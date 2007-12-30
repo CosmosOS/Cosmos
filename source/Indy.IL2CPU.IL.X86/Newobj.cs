@@ -40,6 +40,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			new CPUx86.Pushd(CPUx86.Registers.EAX);
 			new CPUx86.Pushd(CPUx86.Registers.EAX);
 			new CPUx86.Pushd(CPUx86.Registers.EAX);
+			new CPUx86.Pushd(CPUx86.Registers.EAX);
 			new CPUx86.Call(CPU.Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef));
 			new CPUx86.Call(CPU.Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef));
 			int xObjSize = 0;
@@ -55,7 +56,7 @@ namespace Indy.IL2CPU.IL.X86 {
 					new CPUx86.Pushd("[esp + 0x8]");
 				}
 				new CPUx86.Call(CPU.Label.GenerateLabelName(aCtorDef));
-				//new CPUx86.Pop(CPUx86.Registers.EAX);
+				new CPUx86.Pop(CPUx86.Registers.EAX);
 //				aAssembler.StackSizes.Pop();
 				for (int i = 0; i < aCtorDef.Parameters.Count; i++) {
 					new CPUx86.Add(CPUx86.Registers.ESP, "4");
