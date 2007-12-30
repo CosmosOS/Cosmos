@@ -28,8 +28,8 @@ namespace Indy.IL2CPU.IL.X86 {
 		protected override void Assemble_System_Void___System_Runtime_CompilerServices_RuntimeHelpers_InitializeArray___System_Array__System_RuntimeFieldHandle___() {
 			// Arguments:
 			//    Array aArray, RuntimeFieldHandle aFieldHandle
-			new Assembler.X86.Move(CPUx86.Registers.EDI, "[" + MethodInfo.Arguments[0].VirtualAddresses[0] + "]");
-			new Assembler.X86.Move(CPUx86.Registers.ESI, "[" + MethodInfo.Arguments[1].VirtualAddresses[0] + "]");
+			new Assembler.X86.Move(CPUx86.Registers.EDI, "[" + MethodInfo.Arguments[0].VirtualAddresses[0] + "]"); // aArray
+			new Assembler.X86.Move(CPUx86.Registers.ESI, "[" + MethodInfo.Arguments[1].VirtualAddresses[0] + "]"); // aFieldHandle
 			new Assembler.X86.Add(CPUx86.Registers.EDI, "8");
 			new Assembler.X86.Push("dword [edi]");
 			new Assembler.X86.Add(CPUx86.Registers.EDI, "4");
