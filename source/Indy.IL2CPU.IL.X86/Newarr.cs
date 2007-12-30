@@ -45,7 +45,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			Assembler.StackSizes.Push(4);
 			Multiply(Assembler);
 			// the total items size is now on the stack
-			new CPUx86.Pushd("0x" + (ObjectImpl.FieldDataOffset + 8).ToString("X"));
+			new CPUx86.Pushd("0x" + (ObjectImpl.FieldDataOffset + 4).ToString("X"));
 			Assembler.StackSizes.Push(4);
 			Add(Assembler);
 			// the total array size is now on the stack.

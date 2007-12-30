@@ -6,6 +6,7 @@ using Mono.Cecil.Cil;
 using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using Asm = Indy.IL2CPU.Assembler;
+using Indy.IL2CPU.Assembler;
 
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Newobj, false)]
@@ -52,12 +53,15 @@ namespace Indy.IL2CPU.IL.X86 {
 			new Move("dword", "[eax + 4]", "0" + InstanceTypeEnum.NormalObject.ToString("X") + "h");
 			new Move("dword", "[eax + 8]", "0x" + xGCFieldCount.ToString("X"));
 			if (aCtorDef != null) {
+				MethodInformation xCtorInfo = Engine.GetMethodInfo(aCtorDef, aCtorDef, Label.GenerateLabelName(aCtorDef), Engine.GetTypeInfo(Engine.GetDefinitionFromTypeReference(aCtorDef.DeclaringType)));
+				int xSize = (from item in xCtorInfo.Arguments
+							 select item.Size + (item.Size % 4 == 0 ? 0 : (4 - (item.Size % 4)))).Take(xCtorInfo.Arguments.Length - 1).Sum();
 				for (int i = 0; i < aCtorDef.Parameters.Count; i++) {
-					new CPUx86.Pushd("[esp + 0x8]");
+					new CPUx86.Pushd("[esp + 0x" + (xSize + 4).ToString("X") + "]");
 				}
 				new CPUx86.Call(CPU.Label.GenerateLabelName(aCtorDef));
 				new CPUx86.Pop(CPUx86.Registers.EAX);
-//				aAssembler.StackSizes.Pop();
+				//				aAssembler.StackSizes.Pop();
 				for (int i = 0; i < aCtorDef.Parameters.Count; i++) {
 					new CPUx86.Add(CPUx86.Registers.ESP, "4");
 					aAssembler.StackSizes.Pop();

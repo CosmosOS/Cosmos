@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Diagnostics;
 
 namespace Cosmos.Kernel {
 	public class CPU {
 		public static unsafe void Init() {
-			System.Diagnostics.Debugger.Break();
 			Heap.CheckInit();
 			Console.Write("Creating GDT...");
 			Hardware.CPU.CreateGDT();
@@ -84,6 +84,7 @@ namespace Cosmos.Kernel {
 
 		static unsafe void TestATA() {
 			Hardware.Storage.ATA.Initialize(Sleep);
+			Debugger.Break();
 			Hardware.Storage.ATA xDrive = new Cosmos.Hardware.Storage.ATA(0, 0);
 			byte* xBuffer = (byte*)Heap.MemAlloc(512);
 			if (xDrive.ReadBlock(1, xBuffer)) {
@@ -95,16 +96,16 @@ namespace Cosmos.Kernel {
 			if (xExt2.Initialize()) {
 			    Console.WriteLine("Ext2 Initialized");
 			} else {
-			    Console.WriteLine("Ext2 Initialization failed!");
+				Console.WriteLine("Ext2 Initialization failed!");
 			}
 			byte[] xItem = xExt2.ReadFile(new string[] { "readme.txt" });
-			//if (xItem == null) {
-			//    Console.WriteLine("Couldn't read file!");
-			//    return;
-			//}
-			//Console.Write("File length = ");
-			//Hardware.Storage.ATAOld.WriteNumber((uint)xItem.Length, 32);
-			//Console.WriteLine(" bytes");
+			if (xItem == null) {
+				Console.WriteLine("Couldn't read file!");
+				return;
+			}
+			Console.Write("File length = ");
+			Hardware.Storage.ATAOld.WriteNumber((uint)xItem.Length, 32);
+			Console.WriteLine(" bytes");
 		}
 	}
 }
