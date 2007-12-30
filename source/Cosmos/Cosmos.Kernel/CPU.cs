@@ -5,6 +5,7 @@ using System.Text;
 namespace Cosmos.Kernel {
 	public class CPU {
 		public static unsafe void Init() {
+			System.Diagnostics.Debugger.Break();
 			Heap.CheckInit();
 			Console.Write("Creating GDT...");
 			Hardware.CPU.CreateGDT();

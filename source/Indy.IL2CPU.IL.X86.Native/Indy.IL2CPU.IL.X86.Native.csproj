@@ -55,9 +55,9 @@
   <ItemGroup>
     <Compile Include="Attributes\InterruptServiceRoutineAttribute.cs" />
     <Compile Include="Call.cs" />
+    <Compile Include="CustomImplementations\System\Diagnostics\BreakAssembler.cs" />
     <Compile Include="CustomImplementations\System\Diagnostics\DebugImplRefs.cs" />
     <Compile Include="CustomImplementations\System\Diagnostics\DebuggerImpl.cs" />
-    <Compile Include="CustomImplementations\System\Diagnostics\DebuggerImplRefs.cs" />
     <Compile Include="CustomImplementations\System\Diagnostics\DebugImpl.cs" />
     <Compile Include="NativeCustomMethodImplementationOp.cs" />
     <Compile Include="NativeMainEntryMethodOp.cs" />
