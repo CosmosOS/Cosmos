@@ -25,11 +25,11 @@ namespace Cosmos.Kernel {
 
 		private static void ClearMemory(uint aStartAddress, uint aLength) {
 			DebugUtil.SendDoubleNumber("MM", "Clearing memory", aStartAddress, 32, aLength, 32);
-			Console.Write("[MM] Clearing ");
-			Hardware.Storage.ATAOld.WriteNumber(aLength, 32);
-			Console.Write(" bytes at ");
-			Hardware.Storage.ATAOld.WriteNumber(aStartAddress, 32);
-			Console.WriteLine("");
+			//Console.Write("[MM] Clearing ");
+			//Hardware.Storage.ATAOld.WriteNumber(aLength, 32);
+			//Console.Write(" bytes at ");
+			//Hardware.Storage.ATAOld.WriteNumber(aStartAddress, 32);
+			//Console.WriteLine("");
 			Hardware.CPU.ZeroFill(aStartAddress, aLength);
 			//uint* xPtrLong = (uint*)aStartAddress;
 			//{
@@ -95,11 +95,11 @@ namespace Cosmos.Kernel {
 
 		[GlueMethod(Type = GlueMethodType.Heap_Free)]
 		public static void MemFree(uint aPointer) {
-			DebugUtil.SendNumber("MM", "Free pointer", aPointer, 32);
+			//DebugUtil.SendNumber("MM", "Free pointer", aPointer, 32);
 			MemoryBlock* xBlock = (MemoryBlock*)(aPointer - 5);
 			xBlock->State = MemoryBlockState.Free;
 			uint xLength = ((uint)xBlock->Next) - aPointer;
-			DebugUtil.SendNumber("MM", "Pointer length", xLength, 32);
+			//DebugUtil.SendNumber("MM", "Pointer length", xLength, 32);
 			ClearMemory(aPointer, xLength);
 		}
 	}

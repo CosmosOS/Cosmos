@@ -29,7 +29,7 @@ cd ..\..\..\tools\qemu\
 #.\qemu -L . -cdrom ..\..\build\Cosmos\ISO\Cosmos.iso -boot d -hda ..\..\build\Cosmos\ISO\C-drive.img -serial "file:..\..\build\Cosmos\ISO\serial-debug.txt" -S -s
 #pause
 $qemu = resolve-path qemu.exe
-$qemuparms = '-L . -cdrom ..\..\build\Cosmos\ISO\Cosmos.iso -boot d -hda ..\..\build\Cosmos\ISO\C-drive.img -serial "file:..\..\build\Cosmos\ISO\serial-debug.txt" -S -s'
+$qemuparms = '-L . -cdrom ..\..\build\Cosmos\ISO\Cosmos.iso -boot d -hda ..\..\build\Cosmos\ISO\C-drive.img -serial "file:..\..\build\Cosmos\ISO\serial-debug.txt" -kernel-kqemu -S -s'
 # Still failing - because its a command line exe? run under cmd.exe?
 $processInfo = new-object System.Diagnostics.ProcessStartInfo
 $processInfo.FileName = $qemu

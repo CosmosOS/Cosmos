@@ -73,7 +73,7 @@ namespace Cosmos.Kernel.FileSystem {
 							DirectoryEntry* xEntryPtr = (DirectoryEntry*)xBuffer;
 							uint xTotalSize = xINode.Size;
 							while (xTotalSize != 0/* && xEntryPtr->@INode != 0*/) {
-								DebugUtil.SendExt2_DirectoryEntry(xEntryPtr);
+								//DebugUtil.SendExt2_DirectoryEntry(xEntryPtr);
 								uint xPtrAddress = (uint)xEntryPtr;
 								//if (xEntryPtr->@INode == 0xC) {
 								char[] xName = new char[xEntryPtr->NameLength];

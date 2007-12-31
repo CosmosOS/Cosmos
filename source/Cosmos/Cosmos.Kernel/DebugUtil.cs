@@ -175,6 +175,8 @@ namespace Cosmos.Kernel {
 			Hardware.DebugUtil.WriteNumber(aSuperBlock->RefResUID, 16);
 			Serial.Write(0, "\" DefResGID=\"");
 			Hardware.DebugUtil.WriteNumber(aSuperBlock->DefResGID, 16);
+			Serial.Write(0, "\" FirstINode=\"");
+			Hardware.DebugUtil.WriteNumber(aSuperBlock->FirstINode, 32);
 			Serial.Write(0, "\" Padding1=\"");
 			Hardware.DebugUtil.WriteNumber(aSuperBlock->Padding1, 32);
 			Serial.Write(0, "\" Padding2=\"");
@@ -590,11 +592,9 @@ namespace Cosmos.Kernel {
 			EndLogging();
 		}
 
-		internal static unsafe void SendExt2_INode(uint aIdentifier, uint aBlockGroup, FileSystem.Ext2.INode* aINode) {
+		internal static unsafe void SendExt2_INode(uint aIdentifier, FileSystem.Ext2.INode* aINode) {
 			StartLogging();
-			Serial.Write(0, "<Ext2_INode BlockGroup=\"");
-			Hardware.DebugUtil.WriteNumber(aBlockGroup, 32);
-			Serial.Write(0, "\" Identifier=\"");
+			Serial.Write(0, "<Ext2_INode Identifier=\"");
 			Hardware.DebugUtil.WriteNumber(aIdentifier, 32);
 			Serial.Write(0, "\" Mode=\"");
 			Hardware.DebugUtil.WriteNumber((ushort)aINode->Mode, 16);
@@ -668,10 +668,10 @@ namespace Cosmos.Kernel {
 			EndLogging();
 		}
 
-		internal static unsafe void SendExt2_DirectoryEntry(FileSystem.Ext2Old.DirectoryEntry* aEntryPtr) {
+		internal static unsafe void SendExt2_DirectoryEntry(FileSystem.Ext2.DirectoryEntry* aEntryPtr) {
 			StartLogging();
 			Serial.Write(0, "<Ext2_DirectoryEntry INode=\"");
-			Hardware.DebugUtil.WriteNumber(aEntryPtr->@INode, 32);
+			Hardware.DebugUtil.WriteNumber(aEntryPtr->INodeNumber, 32);
 			Serial.Write(0, "\" RecordLength=\"");
 			Hardware.DebugUtil.WriteNumber(aEntryPtr->RecordLength, 16);
 			Serial.Write(0, "\" NameLength=\"");
@@ -695,6 +695,19 @@ namespace Cosmos.Kernel {
 			Serial.Write(0, aDescription);
 			Serial.Write(0, "\" Contents=\"0x");
 			for (int i = 0; i < aContents.Length; i++) {
+				Hardware.DebugUtil.WriteNumber(aContents[i], 8, false);
+			}
+			Serial.Write(0, "\"/>\r\n");
+		}
+
+		internal static unsafe void SendBytes(string aModule, string aDescription, byte* aContents, uint aIndex, uint aCount) {
+			StartLogging();
+			Serial.Write(0, "<ByteStream Module=\"");
+			Serial.Write(0, aModule);
+			Serial.Write(0, "\" Description=\"");
+			Serial.Write(0, aDescription);
+			Serial.Write(0, "\" Contents=\"0x");
+			for (uint i = aIndex; i < aCount; i++) {
 				Hardware.DebugUtil.WriteNumber(aContents[i], 8, false);
 			}
 			Serial.Write(0, "\"/>\r\n");

@@ -65,6 +65,8 @@ namespace Cosmos.Kernel.FileSystem {
 			public ushort RefResUID;
 			// up to byte 84 (includes 83..)
 			public ushort DefResGID;
+			public uint FirstINode;
+
 
 			public uint Padding1;
 			public uint Padding2;
@@ -273,7 +275,7 @@ namespace Cosmos.Kernel.FileSystem {
 			/// <summary>
 			/// INode number of the entry. A value of <c>0</c> indicates that the entry is not used.
 			/// </summary>
-			public uint INode;
+			public uint INodeNumber;
 			public ushort RecordLength;
 			public byte NameLength;
 			public byte FileType;

@@ -5,6 +5,13 @@ using System.Diagnostics;
 
 namespace Cosmos.Kernel {
 	public class CPU {
+		private static void WriteBool(bool aValue) {
+			if (aValue) {
+				Console.WriteLine("true");
+			} else {
+				Console.WriteLine("false");
+			}
+		}
 		public static unsafe void Init() {
 			Heap.CheckInit();
 			Console.Write("Creating GDT...");
@@ -77,8 +84,8 @@ namespace Cosmos.Kernel {
 		}
 
 		public static void Sleep(uint aMSec) {
-			uint xStart = TickCount;
-			while (TickCount < (xStart + aMSec))
+			uint xEnd = TickCount + aMSec;
+			while (TickCount < xEnd)
 				;
 		}
 
@@ -106,6 +113,7 @@ namespace Cosmos.Kernel {
 			Console.Write("File length = ");
 			Hardware.Storage.ATAOld.WriteNumber((uint)xItem.Length, 32);
 			Console.WriteLine(" bytes");
+			DebugUtil.SendByteStream("CPU", "Readme.txt contents", xItem);
 		}
 	}
 }

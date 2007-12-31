@@ -4,8 +4,9 @@ using System.Text;
 
 namespace Cosmos.Hardware {
 	public class PIT: Hardware {
+		public const int TicksPerSecond = 1000;
 		public static void SetDivisor(ushort aDivisor) {
-			IOWriteByte(0x43, 0x36);
+			IOWriteByte(0x43, 0x30);
 			IOWriteByte(0x40, (byte)(aDivisor & 0xFF));
 			IOWriteByte(0x40, (byte)(aDivisor >> 8));
 		}
