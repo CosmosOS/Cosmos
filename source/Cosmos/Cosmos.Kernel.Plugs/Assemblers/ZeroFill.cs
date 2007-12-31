@@ -13,7 +13,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 			new CPUx86.Move("edi", "[ebp + 0xC]"); // address
 			new CPUx86.Move("ecx", "[ebp + 8]");
 			new CPUx86.Move("eax", "0");
-			new CPUx86.RepeatStos();						
+			new CPUx86.RepeatStosb();						
 		}
 	}
 }

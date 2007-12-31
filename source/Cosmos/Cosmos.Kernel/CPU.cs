@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
+using System.IO;
 
 namespace Cosmos.Kernel {
 	public class CPU {
@@ -37,42 +38,17 @@ namespace Cosmos.Kernel {
 			Hardware.CPU.CreateIDT();
 			Console.WriteLine("Done");
 			TestATA();
-			//Console.WriteLine("Starting MM tests...");
-			//Console.Write(" + Allocing 64 bytes, address = ");
-			//uint* xPointer = (uint*)Heap.MemAlloc(64);
-			//xPointer[1] = 0xFFFFFFFF;
-			//Hardware.Storage.ATAOld.WriteNumber((uint)xPointer, 32);
-			//Console.WriteLine("");
-			//Console.WriteLine(" + Freeing pointer");
-			//Heap.MemFree((uint)xPointer);
-			//Console.Write(" + Allocing 64 bytes, address = ");
-			//xPointer = (uint*)Heap.MemAlloc(64);
-			//Hardware.Storage.ATAOld.WriteNumber((uint)xPointer, 32);
-			//Console.WriteLine("");
-			//Console.Write("Value = ");
-			//Hardware.Storage.ATAOld.WriteNumber(xPointer[1], 32);
-			//Console.WriteLine("");
-			//xPointer = (uint*)Heap.MemAlloc(64);
-			//Hardware.Storage.ATAOld.WriteNumber((uint)xPointer, 32);
-			//Console.WriteLine("");
-			//Console.Write("Initializing Keyboard...");
-			//Keyboard.Initialize();
-			//Console.WriteLine("Done");
-			//Console.Write("Initializing ATA...");
-			//Hardware.Storage.ATA.Initialize(Sleep);
-			//Console.WriteLine("Done");
-			//Console.Write("Getting Partition info...");
-			//FileSystem.Ext2.PrintAllFilesAndDirectories(0, 0);
-			//Console.WriteLine("Done");
-			//Console.Write("Reading file...");
-			//byte[] xContents = FileSystem.Ext2.ReadFile(0, 0, new string[] { "readme.txt" });
-			//if (xContents == null) {
-			//    Console.WriteLine("Failed or not fully implemented!");
+			MemoryStream xMS = new MemoryStream();
+			xMS.WriteByte(1);
+			xMS.WriteByte(2);
+			xMS.WriteByte(3);
+			//xMS.Position = 1;
+			//int xResult = xMS.ReadByte();
+			//if (xResult == 2) {
+			//    Console.WriteLine("MemoryStream works");
 			//} else {
-			//    DebugUtil.SendByteStream("Kernel", "readme contents", xContents);
-			//    Console.WriteLine("Done");
+			//    Console.WriteLine("MemoryStream does not work!");
 			//}
-
 		}
 
 		public static uint TickCount {
@@ -101,7 +77,7 @@ namespace Cosmos.Kernel {
 			}
 			FileSystem.Ext2 xExt2 = new Cosmos.Kernel.FileSystem.Ext2(xDrive);
 			if (xExt2.Initialize()) {
-			    Console.WriteLine("Ext2 Initialized");
+				Console.WriteLine("Ext2 Initialized");
 			} else {
 				Console.WriteLine("Ext2 Initialization failed!");
 			}
@@ -114,7 +90,7 @@ namespace Cosmos.Kernel {
 			Hardware.Storage.ATAOld.WriteNumber((uint)xItem.Length, 32);
 			Console.WriteLine(" bytes");
 			DebugUtil.SendByteStream("CPU", "Readme.txt contents", xItem);
-			char[] xChars = new char[xItem.Length-1];
+			char[] xChars = new char[xItem.Length - 1];
 			for (int i = 0; i < xChars.Length; i++) {
 				xChars[i] = (char)xItem[i];
 			}

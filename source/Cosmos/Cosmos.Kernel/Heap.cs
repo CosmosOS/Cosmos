@@ -49,10 +49,11 @@ namespace Cosmos.Kernel {
 		private static void Initialize(uint aStartAddress, uint aLength) {
 			mStartAddress = aStartAddress;
 			mLength = aLength;
-			ClearMemory(aStartAddress, aLength);
+			mLength = (mLength / 4) * 4;
+			ClearMemory(aStartAddress, mLength);
 			mFirstBlock = (MemoryBlock*)aStartAddress;
 			mFirstBlock->State = MemoryBlockState.Free;
-			mFirstBlock->Next = (MemoryBlock*)(aStartAddress + aLength);
+			mFirstBlock->Next = (MemoryBlock*)(aStartAddress + mLength);
 			mFirstBlock->Next->State = MemoryBlockState.EndOfMemory;
 		}
 

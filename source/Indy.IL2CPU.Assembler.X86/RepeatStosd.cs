@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
-	[OpCode(0xFFFFFFFF, "rep stosb")]
-	public class RepeatStos: Instruction {
+	[OpCode(0xFFFFFFFF, "rep stosd")]
+	public class RepeatStosd: Instruction {
 		//public readonly string Destination;
-		public RepeatStos() {
+		public RepeatStosd() {
 			//	Destination = aDestination;
 		}
 		//public override string ToString() {

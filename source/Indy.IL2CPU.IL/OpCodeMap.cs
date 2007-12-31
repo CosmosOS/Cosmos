@@ -123,6 +123,9 @@ namespace Indy.IL2CPU.IL {
 						TypeReference xTypeRef = xModuleDef.TypeReferences.Cast<TypeReference>().FirstOrDefault(x => (x.FullName + ", " + x.Scope.ToString()) == (string)xPlugAttrib.Fields[PlugAttribute.TargetPropertyName] || (x.FullName + ", " + x.Scope.ToString()) == (string)xPlugAttrib.Fields[PlugAttribute.TargetNamePropertyName]);
 						if (xTypeRef == null) {
 							string xTypeFullyQualedName = (string)(xPlugAttrib.Fields[PlugAttribute.TargetPropertyName] ?? xPlugAttrib.Fields[PlugAttribute.TargetNamePropertyName]);
+							if (!xTypeFullyQualedName.Contains(",")) {
+								throw new Exception("Wrong name '" + xTypeFullyQualedName + "'");
+							}
 							string xAsmName = xTypeFullyQualedName.Substring(xTypeFullyQualedName.IndexOf(",") + 1).TrimStart();
 							string xTypeName = xTypeFullyQualedName.Substring(0, xTypeFullyQualedName.IndexOf(","));
 							AssemblyDefinition xAsmDef = aAssemblyResolver(xAsmName);
