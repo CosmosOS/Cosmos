@@ -31,9 +31,9 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			Engine.QueueMethodRef(GCImplementationRefs.AllocNewObjectRef);
 			Engine.QueueMethodRef(GCImplementationRefs.IncRefCountRef);
-			int xExtraSize = 0;
+			int xExtraSize = 16;
 			if (!aAssembler.InMetalMode) {
-				xExtraSize = 4;
+				xExtraSize += 4;
 			}
 			new CPUx86.Pushd("0" + (aObjectSize + xExtraSize).ToString("X").ToUpper() + "h");
 			new CPUx86.Call(CPU.Label.GenerateLabelName(GCImplementationRefs.AllocNewObjectRef));

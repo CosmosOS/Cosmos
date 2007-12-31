@@ -8,9 +8,9 @@ namespace Cosmos.Kernel {
 	public class CPU {
 		private static void WriteBool(bool aValue) {
 			if (aValue) {
-				Console.WriteLine("true");
+				Console.Write("true");
 			} else {
-				Console.WriteLine("false");
+				Console.Write("false");
 			}
 		}
 		public static unsafe void Init() {
@@ -42,7 +42,7 @@ namespace Cosmos.Kernel {
 			xMS.WriteByte(1);
 			xMS.WriteByte(2);
 			xMS.WriteByte(3);
-			//xMS.Position = 1;
+			xMS.Position = 1;
 			//int xResult = xMS.ReadByte();
 			//if (xResult == 2) {
 			//    Console.WriteLine("MemoryStream works");

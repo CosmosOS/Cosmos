@@ -37,7 +37,7 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System {
 			uint* xThis = aStringPtr;
 			xThis += 3;
 			xThis = (uint*)*xThis;
-			xThis += 3;
+			xThis += 4;
 			return (uint)xThis;
 		}
 

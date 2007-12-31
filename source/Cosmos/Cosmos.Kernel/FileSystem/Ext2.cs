@@ -111,16 +111,7 @@ namespace Cosmos.Kernel.FileSystem {
 				}
 				DirectoryEntry* xEntryPtr = (DirectoryEntry*)xExt2BlockBuffer;
 				uint xTotalSize = mBlockSize;
-				byte xIteration = 0;
 				while (xTotalSize != 0) {
-					DebugUtil.SendNumber("Ext2", "ReadFile, while iteration, totalsize value", xTotalSize, 32);
-					if (xIteration > 8) {
-						Console.WriteLine("ReadFile, while loop terminated after 9 iterations");
-						Heap.MemFree((uint)xBuffer);
-						Heap.MemFree((uint)xExt2BlockBuffer);
-						return null;
-					}
-					xIteration++;
 					DebugUtil.SendExt2_DirectoryEntry(xEntryPtr);
 					uint xPtrAddress = (uint)xEntryPtr;
 					char[] xName = new char[xEntryPtr->NameLength];
@@ -179,10 +170,6 @@ namespace Cosmos.Kernel.FileSystem {
 			uint xStorageBlock = (uint)((mGroupDescriptors[xGroup]->INodeTable * (1024 << mSuperBlock->LogBlockSize)) / mBackend.BlockSize);
 			xStorageBlock += xByteIndexInGroup / mBackend.BlockSize;
 			uint xByteIndexInBackendBlock = xByteIndexInGroup / mBackend.BlockSize;
-			DebugUtil.SendNumber("Ext2", "ReadINode, INodeNumber", aINodeNumber, 32);
-			DebugUtil.SendNumber("Ext2", "ReadINode, xGroup", xGroup, 32);
-			DebugUtil.SendNumber("Ext2", "ReadINode, xIndex", xIndex, 32);
-			DebugUtil.SendNumber("Ext2", "ReadINode, xStorageBlock", xStorageBlock, 32);
 			ushort* xBuffer = (ushort*)Heap.MemAlloc(mBackend.BlockSize);
 			aINode = default(INode);
 			if (!mBackend.ReadBlock(xStorageBlock, (byte*)xBuffer)) {
@@ -192,7 +179,6 @@ namespace Cosmos.Kernel.FileSystem {
 			}
 			//byte* xINodeBuff = (byte*)((uint)xBuffer) + xByteIndexInBackendBlock;
 			INode* xINodePtr = (INode*)xBuffer;
-			DebugUtil.SendBytes("Ext2", "ReadINode, INode data", (byte*)xBuffer, 0, 512);
 			DebugUtil.SendNumber("Ext2", "ReadINode, INodePointer index", ((aINodeNumber - 1) % (mBackend.BlockSize / ((byte)sizeof(INode)))), 8);
 			xINodePtr = &xINodePtr[((aINodeNumber-1) % (byte)(mBackend.BlockSize / ((byte)sizeof(INode))))];
 			aINode = *xINodePtr;
@@ -212,16 +198,6 @@ namespace Cosmos.Kernel.FileSystem {
 				Console.WriteLine("Ext2|ReadINodeContents, reading ahead of first block not yet supported!");
 				return false;
 			}
-			//uint xGroup = xBlock / mSuperBlock->BlocksPerGroup;
-			//uint xBlocksForINodeTable = ((uint)(mSuperBlock->INodesPerGroup * sizeof(INode))) / mBlockSize;
-			//if (((uint)(mSuperBlock->INodesPerGroup * sizeof(INode))) % mBlockSize > 0) {
-			//    xBlocksForINodeTable += 1;
-			//}
-			//DebugUtil.SendNumber("Ext2", "ReadINodeContents", aBlock, 32);
-			//uint xBase = ((xBlock + mGroupDescriptors[xGroup]->INodeTable + xBlocksForINodeTable) * mBlockSize) / mBackend.BlockSize;
-			//DebugUtil.SendNumber("Ext2", "ReadINodeContents, xBase", xBase, 32);
-			//DebugUtil.SendNumber("Ext2", "ReadINodeContents, xGroup", xGroup, 32);
-			//DebugUtil.SendNumber("Ext2", "ReadINodeContents, xBlocksForINodeTable", xBlocksForINodeTable, 32);
 			uint xBase = xBlock * (mBlockSize / mBackend.BlockSize);
 			for (int i = 0; i < (mBlockSize / mBackend.BlockSize); i++) {
 				byte* xTempBuffer = (byte*)(((uint)aBuffer) + (i * mBackend.BlockSize));
@@ -230,7 +206,6 @@ namespace Cosmos.Kernel.FileSystem {
 					return false;
 				}
 			}
-			DebugUtil.SendBytes("Ext2", "ReadINodeContents, result", aBuffer, 0, mBlockSize);
 			return true;
 		}
 

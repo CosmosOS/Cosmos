@@ -16,20 +16,28 @@ namespace Indy.IL2CPU.IL.X86 {
 			CurInstructionLabel = GetInstructionLabel(aInstruction);
 		}
 		public override void DoAssemble() {
+			int xSize = Math.Max(Assembler.StackSizes.Pop(), Assembler.StackSizes.Pop());
 			string BaseLabel = CurInstructionLabel + "__";
 			string LabelTrue = BaseLabel + "True";
 			string LabelFalse = BaseLabel + "False";
 			new CPUx86.Pop(CPUx86.Registers.EAX);
+			if (xSize > 4) {
+				new CPUx86.Add(CPUx86.Registers.ESP, "4");
+			}
 			new CPUx86.Compare(CPUx86.Registers.EAX, CPUx86.Registers.AtESP);
-			new CPUx86.JumpIfLessOrEqual(LabelTrue);
-			new CPUx86.JumpAlways(LabelFalse);
+			new CPUx86.JumpIfLessOrEqual(LabelFalse);
+			new CPUx86.JumpAlways(LabelTrue);
 			new CPU.Label(LabelTrue);
+			if (xSize > 4) {
+				new CPUx86.Add(CPUx86.Registers.ESP, "4");
+			}
 			new CPUx86.Add(CPUx86.Registers.ESP, "4");
 			new CPUx86.JumpAlways(TargetLabel);
 			new CPU.Label(LabelFalse);
+			if (xSize > 4) {
+				new CPUx86.Add(CPUx86.Registers.ESP, "4");
+			}
 			new CPUx86.Add(CPUx86.Registers.ESP, "4");
-			Assembler.StackSizes.Pop();
-			Assembler.StackSizes.Pop();
 		}
 	}
 }
