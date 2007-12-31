@@ -114,6 +114,14 @@ namespace Cosmos.Kernel {
 			Hardware.Storage.ATAOld.WriteNumber((uint)xItem.Length, 32);
 			Console.WriteLine(" bytes");
 			DebugUtil.SendByteStream("CPU", "Readme.txt contents", xItem);
+			char[] xChars = new char[xItem.Length-1];
+			for (int i = 0; i < xChars.Length; i++) {
+				xChars[i] = (char)xItem[i];
+			}
+			String s = new String(xChars);
+			Console.Write("Contents: '");
+			Console.Write(s);
+			Console.WriteLine("'");
 		}
 	}
 }
