@@ -27,8 +27,28 @@ namespace Cosmos.Kernel.Plugs {
             TextScreen.NewLine();
 		}
 
+		public static void Write(char[] buffer) {
+			for (int i = 0; i < buffer.Length; i++)
+				Write (buffer[i]);
+		}
+
+		public static void WriteLine(char[] buffer) {
+			Write (buffer);
+			WriteLine ();
+		}
+
 		public static void WriteLine() {
             TextScreen.NewLine();
         }
+
+		public static string ReadLine() {
+			char current;
+			string result = "";
+			while ((current = Keyboard.ReadChar ()) != 'a') {
+				result += new string (new char[] { current });
+				Write (current);
+			}
+			return result;
+		}
 	}
 }

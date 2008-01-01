@@ -34,6 +34,7 @@ namespace Cosmos.Kernel {
 			Console.Write("Creating IDT...");
 			Hardware.CPU.CreateIDT();
 			Console.WriteLine("Done");
+			Keyboard.Initialize ();
 			TestATA();
 		}
 

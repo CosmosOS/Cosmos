@@ -14,7 +14,14 @@ namespace Cosmos.Shell.Console {
 			}
 		}
 
+		private List<Commands.ICommand> _commands;
+
 		public override void Initialize() {
+
+
+			string a = "Hi";
+			a = System.Console.ReadLine ();
+			System.Console.WriteLine (a);
 		}
 
 		public override void Teardown() {

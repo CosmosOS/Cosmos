@@ -13,7 +13,7 @@ namespace Cosmos.Kernel.Staging.Stages {
                 }
 
 				public override void Initialize() {
-					CPU.TestATA ();
+					//CPU.TestATA ();
                 }
 
                 public override void Teardown() {
