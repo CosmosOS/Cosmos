@@ -60,7 +60,6 @@ namespace Cosmos.Kernel.Staging.Stages {
 				Console.Write (" [");
 				Hardware.Storage.ATAOld.WriteNumber ((uint) xItems[i][0], 16);
 				Console.Write ("] (Length = ");
-				System.Diagnostics.Debugger.Break ();
 				Hardware.Storage.ATAOld.WriteNumber ((uint) xItems[i].Length, 8);
 				Console.WriteLine (")");
 			}
