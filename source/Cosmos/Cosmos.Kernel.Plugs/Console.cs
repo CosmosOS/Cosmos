@@ -42,13 +42,14 @@ namespace Cosmos.Kernel.Plugs {
         }
 
 		public static string ReadLine() {
+			List<char> chars = new List<char> ();
 			char current;
-			string result = "";
-			while ((current = Keyboard.ReadChar ()) != 'a') {
-				result += new string (new char[] { current });
+			while ((current = Keyboard.ReadChar ()) != '\n') {
+				chars.Add (current);
 				Write (current);
 			}
-			return result;
+			WriteLine ();
+			return new string(new char[] { 'q', 'w', 'a' });
 		}
 	}
 }

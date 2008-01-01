@@ -19,8 +19,7 @@ namespace Cosmos.Shell.Console {
 		public override void Initialize() {
 
 
-			string a = "Hi";
-			a = System.Console.ReadLine ();
+			string a = System.Console.ReadLine ();
 			System.Console.WriteLine (a);
 		}
 

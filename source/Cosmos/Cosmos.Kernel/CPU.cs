@@ -35,7 +35,7 @@ namespace Cosmos.Kernel {
 			Hardware.CPU.CreateIDT();
 			Console.WriteLine("Done");
 			Keyboard.Initialize ();
-			TestATA();
+			//TestATA();
 		}
 
 		public static uint TickCount {

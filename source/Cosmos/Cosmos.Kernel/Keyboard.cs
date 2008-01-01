@@ -63,6 +63,15 @@ namespace Cosmos.Kernel {
 				case 0x1E0000:
 					aValue = 'A';
 					return true;
+				case 0x10:
+					aValue = 'q';
+					return true;
+				case 0x11:
+					aValue = 'w';
+					return true;
+				case 0x1c:
+					aValue = '\n';
+					return true;
 				default:
 					aValue = '\0';
 					return false;
