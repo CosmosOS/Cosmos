@@ -7,7 +7,7 @@ namespace Cosmos.Shell.Console {
 		static void Main() {
 			Kernel.CPU.Init();
 			System.Console.WriteLine("Cosmos creation complete");
-			Kernel.Interrupts.DoTest();		
+			Kernel.Interrupts.DoTest();
 		}
 	}
 }
