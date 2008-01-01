@@ -9,8 +9,8 @@ namespace Cosmos.Kernel {
                 public static void Initialize() {
                         CPU.Init ();
 
-                        queue = new Cosmos.Kernel.Staging.DefaultStageQueue ();
-                        queue.Run ();
+                        //queue = new Cosmos.Kernel.Staging.DefaultStageQueue ();
+                        //queue.Run ();
                 }
 
                 public static void Teardown() {

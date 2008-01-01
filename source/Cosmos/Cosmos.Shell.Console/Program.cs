@@ -5,13 +5,12 @@ using System.Text;
 namespace Cosmos.Shell.Console {
 	class Program {
 		static void Main() {
-                        Kernel.Stages.Initialize ();
+			Kernel.CPU.Init ();
 
-			System.Console.WriteLine("Cosmos creation complete");
+			System.Console.WriteLine ("Cosmos creation complete");
+			Kernel.Interrupts.DoTest ();
 
-			Kernel.Interrupts.DoTest();
-
-                        Kernel.Stages.Teardown ();
+			//Kernel.Stages.Teardown ();
 		}
 	}
 }
