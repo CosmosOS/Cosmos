@@ -49,7 +49,7 @@ namespace Cosmos.Kernel.Plugs {
 				Write (current);
 			}
 			WriteLine ();
-			return new string(new char[] { 'q', 'w', 'a' });
+			return new string(chars.ToArray());
 		}
 	}
 }
