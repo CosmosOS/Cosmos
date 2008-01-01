@@ -42,6 +42,7 @@ namespace Cosmos.Kernel.Staging {
                         while (_initialize.Count != 0) {
                                 _current = _initialize.Dequeue ();
                                 _current.Initialize ();
+                                Console.WriteLine ("Entered stage {0}.", _current.Name);
                                 _teardown.Enqueue (_current);
                         }
                 }
@@ -53,6 +54,7 @@ namespace Cosmos.Kernel.Staging {
                         while (_teardown.Count != 0) {
                                 _current = _teardown.Dequeue ();
                                 _current.Teardown ();
+                                Console.WriteLine ("Left stage {0}.", _current.Name);
                         }
                 }
         }
