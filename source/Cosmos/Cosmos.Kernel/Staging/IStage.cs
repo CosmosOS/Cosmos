@@ -6,7 +6,7 @@ namespace Cosmos.Kernel.Staging {
         /// <summary>
         /// Represents a kernel stage.
         /// </summary>
-        public abstract class IStage {
+        public abstract class StageBase {
                 /// <summary>
                 /// Gets the name of the stage.
                 /// </summary>

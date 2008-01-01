@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace Cosmos.Kernel.Staging.Stages {
-        public class TestStage : IStage {
+        public class TestStage : StageBase {
                 #region IStage Members
 
                 public override string Name {

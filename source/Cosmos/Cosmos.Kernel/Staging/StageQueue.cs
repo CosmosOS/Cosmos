@@ -10,18 +10,18 @@ namespace Cosmos.Kernel.Staging {
 		/// <summary>
 		/// The list of initialize stages.
 		/// </summary>
-		private Queue<IStage> _initialize = new Queue<IStage> ();
+		private Queue<StageBase> _initialize = new Queue<StageBase> ();
 
 		/// <summary>
 		/// The list of teardown stages.
 		/// </summary>
-		private Stack<IStage> _teardown = new Stack<IStage> ();
+		private Stack<StageBase> _teardown = new Stack<StageBase> ();
 
-		private IStage _current;
+		private StageBase _current;
 		/// <summary>
 		/// Gets the current kernel stage.
 		/// </summary>
-		public IStage Current {
+		public StageBase Current {
 			get {
 				return _current;
 			}
@@ -31,7 +31,7 @@ namespace Cosmos.Kernel.Staging {
 		/// Enqueues a stage.
 		/// </summary>
 		/// <param name="stage"></param>
-		public void Enqueue(IStage stage) {
+		public void Enqueue(StageBase stage) {
 			_initialize.Enqueue (stage);
 		}
 

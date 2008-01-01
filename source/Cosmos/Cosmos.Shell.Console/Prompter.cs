@@ -7,14 +7,14 @@ namespace Cosmos.Shell.Console {
 	/// <summary>
 	/// The demonstration prompter.
 	/// </summary>
-	public class Prompter : IStage {
+	public class Prompter : StageBase {
 		public override string Name {
 			get {
 				return "Console";
 			}
 		}
 
-		private List<Commands.ICommand> _commands;
+		private List<Commands.CommandBase> _commands;
 
 		public override void Initialize() {
 

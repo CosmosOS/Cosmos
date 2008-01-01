@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace Cosmos.Kernel.Staging.Stages {
-	class MatthijsStage : IStage {
+	class MatthijsStage : StageBase {
 		public override string Name {
 			get {
 				return "Matthijs";

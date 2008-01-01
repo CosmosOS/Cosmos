@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace Cosmos.Shell.Console.Commands {
-	public class FSTestCommand : ICommand {
+	public class FSTestCommand : CommandBase {
 		public override string Name {
 			get {
 				return "fstest";

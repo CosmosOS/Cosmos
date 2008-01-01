@@ -6,7 +6,7 @@ namespace Cosmos.Shell.Console.Commands {
 	/// <summary>
 	/// Represents a command.
 	/// </summary>
-	public abstract class ICommand {
+	public abstract class CommandBase {
 		/// <summary>
 		/// Gets the name of the command (must be lowercase).
 		/// </summary>
