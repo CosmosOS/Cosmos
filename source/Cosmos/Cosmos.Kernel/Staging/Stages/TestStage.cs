@@ -12,7 +12,8 @@ namespace Cosmos.Kernel.Staging.Stages {
                         }
                 }
 
-                public void Initialize() {
+				public void Initialize() {
+					CPU.TestATA ();
 
                 }
 

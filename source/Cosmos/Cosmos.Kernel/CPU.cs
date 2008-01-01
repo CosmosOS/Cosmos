@@ -34,7 +34,6 @@ namespace Cosmos.Kernel {
 			Console.Write("Creating IDT...");
 			Hardware.CPU.CreateIDT();
 			Console.WriteLine("Done");
-			TestATA();
 		}
 
 		public static uint TickCount {
@@ -51,7 +50,7 @@ namespace Cosmos.Kernel {
 				;
 		}
 
-		static unsafe void TestATA() {
+		public static unsafe void TestATA() {
 			Hardware.Storage.ATA.Initialize(Sleep);
 			Hardware.Storage.ATA xDrive = new Cosmos.Hardware.Storage.ATA(0, 0);
 			byte* xBuffer = (byte*)Heap.MemAlloc(512);
