@@ -49,7 +49,13 @@ namespace Cosmos.Kernel.Plugs {
 				Write (current);
 			}
 			WriteLine ();
-			return new string(chars.ToArray());
+
+			// HACK: Should use .ToArray here.
+			char[] final = new char[chars.Count];
+			for (int i = 0; i < final.Length; i++)
+				final[i] = chars[i];
+
+			return new string(final);
 		}
 	}
 }
