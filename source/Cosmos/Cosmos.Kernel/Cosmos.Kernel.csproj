@@ -70,6 +70,7 @@
     <Compile Include="Staging\DefaultStageQueue.cs" />
     <Compile Include="Staging\IStage.cs" />
     <Compile Include="Staging\StageQueue.cs" />
+    <Compile Include="Staging\Stages\MatthijsStage.cs" />
     <Compile Include="Staging\Stages\TestStage.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

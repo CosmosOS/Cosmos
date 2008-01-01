@@ -18,9 +18,10 @@ namespace Cosmos.Shell.Console {
 
 		public override void Initialize() {
 
-
-			string a = System.Console.ReadLine ();
-			System.Console.WriteLine (a);
+			while (true) {
+				string a = System.Console.ReadLine ();
+				System.Console.WriteLine (a);
+			}
 		}
 
 		public override void Teardown() {
