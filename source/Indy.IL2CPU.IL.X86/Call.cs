@@ -62,9 +62,6 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		public Call(Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
-			if (aInstruction.ToString() == "Callvirt !0[] System.Collections.Generic.List`1<System.String>::ToArray()") {
-				System.Diagnostics.Debugger.Break();
-			}
 			MethodReference xMethod = ((MethodReference)aInstruction.Operand);
 			Initialize(xMethod);
 		}

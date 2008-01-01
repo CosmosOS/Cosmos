@@ -16,9 +16,6 @@ namespace Indy.IL2CPU.IL.X86 {
 		private readonly int mArgumentCount;
 		public Callvirt(Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
-			if (aInstruction.Operand.ToString() == "!0[] System.Collections.Generic.List`1<System.String>::ToArray()") {
-				System.Diagnostics.Debugger.Break();
-			}
 			int xThisOffSet = (from item in aMethodInfo.Locals
 							   select item.Offset + item.Size).LastOrDefault();
 			MethodReference xMethod = aInstruction.Operand as MethodReference;
