@@ -10,7 +10,7 @@ namespace Cosmos.Shell.Console {
 			System.Console.WriteLine ("Cosmos creation complete");
 			Kernel.Interrupts.DoTest ();
 
-			Kernel.Stages.Teardown ();
+			//Kernel.Stages.Teardown ();
 		}
 	}
 }

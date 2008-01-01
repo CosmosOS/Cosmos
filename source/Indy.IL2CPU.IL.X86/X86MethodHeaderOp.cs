@@ -1,4 +1,4 @@
-#define EXT_DEBUG
+//#define EXT_DEBUG
 using System;
 using System.Linq;
 using Indy.IL2CPU.Assembler;

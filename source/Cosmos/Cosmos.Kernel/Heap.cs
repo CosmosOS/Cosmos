@@ -91,6 +91,7 @@ namespace Cosmos.Kernel {
 				xCurrentBlock->Next->State = MemoryBlockState.Free;
 			}
 			xCurrentBlock->State = MemoryBlockState.Used;
+			DebugUtil.SendMM_Alloc((uint)xCurrentBlock, aLength);
 			return ((uint)xCurrentBlock) + 5;
 		}
 

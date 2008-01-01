@@ -6,7 +6,8 @@ using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL.X86.Win32 {
 	public class Call: X86.Call {
-		public Call(Instruction aInstruction, MethodInformation aMethodInfo): base(aInstruction, aMethodInfo) {
+		public Call(Instruction aInstruction, MethodInformation aMethodInfo)
+			: base(aInstruction, aMethodInfo) {
 		}
 
 		protected override void HandleDebuggerBreak() {
