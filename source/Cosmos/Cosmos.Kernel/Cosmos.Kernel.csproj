@@ -67,9 +67,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FileSystem\Ext2.Structs.cs" />
+    <Compile Include="Stages.cs" />
     <Compile Include="Staging\DefaultStageQueue.cs" />
     <Compile Include="Staging\IStage.cs" />
     <Compile Include="Staging\StageQueue.cs" />
+    <Compile Include="Staging\Stages\Init.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
