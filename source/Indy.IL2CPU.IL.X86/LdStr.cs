@@ -37,7 +37,8 @@ namespace Indy.IL2CPU.IL.X86 {
 				xDataName = aAssembler.GetIdentifier("StringLiteral");
 				StringBuilder xRefByteArray = new StringBuilder();
 				xRefByteArray.Append("0x" + ((uint)Engine.RegisterType(Engine.GetTypeDefinition("mscorlib", "System.String"))).ToString("X"));
-				xRefByteArray.Append(",0x" + ((uint)InstanceTypeEnum.StaticEmbeddedObject).ToString("X") + ",0,");
+				xRefByteArray.Append(",0x" + ((uint)InstanceTypeEnum.StaticEmbeddedObject).ToString("X") + ",");
+				xRefByteArray.Append("0x" + (1).ToString("X") + ",");
 				xRefByteArray.Append(xDataName + "__Contents,");
 				xRefByteArray.Append("0,0,0");
 				aAssembler.DataMembers.Add(new DataMember(xDataName, "dd", xRefByteArray.ToString()));

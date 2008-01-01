@@ -26,29 +26,15 @@ namespace Cosmos.Kernel {
 			Console.WriteLine("Done");
 			Console.Write("Initializing Debug Utility...");
 			Hardware.DebugUtil.Initialize();
-			//System.Diagnostics.Debugger.Break();
 			Hardware.DebugUtil.SendMessage("Logging", "Initialized!");
-			//System.Diagnostics.Debugger.Break();
 			Console.WriteLine("Done");
 			Console.Write("Configuring PIT...");
 			Hardware.PIT.Initialize(Tick);
 			Console.WriteLine("Done");
-			//System.Diagnostics.Debugger.Break();
 			Console.Write("Creating IDT...");
 			Hardware.CPU.CreateIDT();
 			Console.WriteLine("Done");
 			TestATA();
-			MemoryStream xMS = new MemoryStream();
-			xMS.WriteByte(1);
-			xMS.WriteByte(2);
-			xMS.WriteByte(3);
-			xMS.Position = 1;
-			//int xResult = xMS.ReadByte();
-			//if (xResult == 2) {
-			//    Console.WriteLine("MemoryStream works");
-			//} else {
-			//    Console.WriteLine("MemoryStream does not work!");
-			//}
 		}
 
 		public static uint TickCount {
@@ -67,7 +53,6 @@ namespace Cosmos.Kernel {
 
 		static unsafe void TestATA() {
 			Hardware.Storage.ATA.Initialize(Sleep);
-			Debugger.Break();
 			Hardware.Storage.ATA xDrive = new Cosmos.Hardware.Storage.ATA(0, 0);
 			byte* xBuffer = (byte*)Heap.MemAlloc(512);
 			if (xDrive.ReadBlock(1, xBuffer)) {
@@ -98,6 +83,23 @@ namespace Cosmos.Kernel {
 			Console.Write("Contents: '");
 			Console.Write(s);
 			Console.WriteLine("'");
+			Console.Write("Contents of root (");
+			string[] xItems = xExt2.GetDirectoryEntries(new string[0]);
+			Hardware.Storage.ATAOld.WriteNumber((uint)xItems.Length, 8);
+			Console.WriteLine(" items):");
+			if (xItems == null) {
+				Console.WriteLine("    Result array is null!");
+			}
+			for (int i = 0; i < xItems.Length; i++) {
+				Console.Write("   - ");
+				Console.Write(xItems[i]);
+				Console.Write(" [");
+				Hardware.Storage.ATAOld.WriteNumber((uint)xItems[i][0], 16);
+				Console.Write("] (Length = ");
+				System.Diagnostics.Debugger.Break();
+				Hardware.Storage.ATAOld.WriteNumber((uint)xItems[i].Length, 8);
+				Console.WriteLine(")");
+			}
 		}
 	}
 }
