@@ -18,6 +18,8 @@ namespace Cosmos.Hardware {
 					xScanCode = (byte)(xScanCode ^ 0x80);
 				}
 				mHandleKeyboardKey(xScanCode, xReleased);
+			} else {
+				DebugUtil.SendError("Keyboard", "No Keyboard Handler found!");
 			}
 		}
 	}

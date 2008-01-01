@@ -25,6 +25,16 @@ namespace Cosmos.Hardware {
 			EndLogging();
 		}
 
+		public static void SendError(string aModule, string aData) {
+			StartLogging();
+			WriteSerialString("<Error Type=\"Info\" Module=\"");
+			WriteSerialString(aModule);
+			WriteSerialString("\" String=\"");
+			WriteSerialString(aData);
+			WriteSerialString("\"/>\r\n");
+			EndLogging();
+		}
+
 		public static unsafe void SendATA_BlockReceived(byte aController, byte aDrive, uint aBlock, ushort* aValue) {
 			StartLogging();
 			byte* xValueBytes = (byte*)aValue;
