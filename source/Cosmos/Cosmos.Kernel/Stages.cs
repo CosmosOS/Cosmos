@@ -3,19 +3,18 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace Cosmos.Kernel {
-        public class Stages {
-                private static Staging.DefaultStageQueue queue;
+	public class Stages {
+		private static Staging.DefaultStageQueue queue;
 
-                public static void Initialize() {
-						CPU.Init ();
+		public static void Initialize() {
+			CPU.Init ();
 
-						//queue = new Cosmos.Kernel.Staging.DefaultStageQueue ();
-						//queue.Run ();
-					Console.WriteLine("Do Stages.Initialize now");
-                }
+			queue = new Cosmos.Kernel.Staging.DefaultStageQueue ();
+			queue.Run ();
+		}
 
-                public static void Teardown() {
-                        queue.Teardown ();
-                }
-        }
+		public static void Teardown() {
+			queue.Teardown ();
+		}
+	}
 }

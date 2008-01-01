@@ -6,18 +6,17 @@ namespace Cosmos.Kernel.Staging.Stages {
         public class TestStage : IStage {
                 #region IStage Members
 
-                public string Name {
+                public override string Name {
                         get {
                                 return "Tests";
                         }
                 }
 
-				public void Initialize() {
+				public override void Initialize() {
 					CPU.TestATA ();
-
                 }
 
-                public void Teardown() {
+                public override void Teardown() {
                 }
 
                 #endregion

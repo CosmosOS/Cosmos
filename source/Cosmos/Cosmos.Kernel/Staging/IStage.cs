@@ -6,22 +6,22 @@ namespace Cosmos.Kernel.Staging {
         /// <summary>
         /// Represents a kernel stage.
         /// </summary>
-        public interface IStage {
+        public abstract class IStage {
                 /// <summary>
                 /// Gets the name of the stage.
                 /// </summary>
-                string Name {
+                public abstract string Name {
                         get;
                 }
 
                 /// <summary>
                 /// Initializes the stage.
                 /// </summary>
-                void Initialize();
+                public abstract void Initialize();
 
                 /// <summary>
                 /// Tears the stage down.
                 /// </summary>
-                void Teardown();
+                public abstract void Teardown();
         }
 }
