@@ -400,7 +400,20 @@ namespace Indy.IL2CPU {
 					}
 					if (xFoundMethod.ReturnType.ReturnType.FullName != aRef.ReturnType.ReturnType.FullName) {
 						if (!(xFoundMethod.ReturnType.ReturnType is GenericParameter && aRef.ReturnType.ReturnType is GenericParameter)) {
-							continue;
+							ArrayType xFoundArray = xFoundMethod.ReturnType.ReturnType as ArrayType;
+							ArrayType xArray = aRef.ReturnType.ReturnType as ArrayType;
+							if (xArray != null && xFoundArray != null) {
+								if (xArray.Dimensions.Count != xFoundArray.Dimensions.Count) {
+									continue;
+								}
+								GenericParameter xGenericParam = xArray.ElementType as GenericParameter;
+								GenericParameter xFoundGenericParam = xFoundArray.ElementType as GenericParameter;
+								if (xGenericParam != null && xFoundGenericParam != null) {
+									if (xGenericParam.Position != xFoundGenericParam.Position) {
+										continue;
+									}
+								}
+							}
 						}
 					}
 					if (xFoundMethod.Parameters.Count != aRef.Parameters.Count) {
@@ -425,7 +438,7 @@ namespace Indy.IL2CPU {
 				return xMethod;
 			}
 			xMethod = xTypeDef.Constructors.GetConstructor(aRef.Name == MethodDefinition.Cctor, aRef.Parameters);
-			if (xMethod != null && (aRef.Name == MethodDefinition.Cctor ||aRef.Name == MethodDefinition.Ctor)) {
+			if (xMethod != null && (aRef.Name == MethodDefinition.Cctor || aRef.Name == MethodDefinition.Ctor)) {
 				return xMethod;
 			}
 			throw new Exception("Couldn't find Method! ('" + aRef.GetFullName() + "'");
