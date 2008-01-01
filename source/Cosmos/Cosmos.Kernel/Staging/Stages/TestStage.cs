@@ -3,21 +3,20 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace Cosmos.Kernel.Staging.Stages {
-        public class Init : IStage {
+        public class TestStage : IStage {
                 #region IStage Members
 
                 public string Name {
                         get {
-                                return "Init";
+                                return "Tests";
                         }
                 }
 
                 public void Initialize() {
-                        CPU.Init ();
+
                 }
 
                 public void Teardown() {
-
                 }
 
                 #endregion

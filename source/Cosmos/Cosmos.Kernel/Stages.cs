@@ -4,9 +4,12 @@ using System.Text;
 
 namespace Cosmos.Kernel {
         public class Stages {
-                private static Staging.DefaultStageQueue queue = new Cosmos.Kernel.Staging.DefaultStageQueue ();
+                private static Staging.DefaultStageQueue queue;
 
                 public static void Initialize() {
+                        CPU.Init ();
+
+                        queue = new Cosmos.Kernel.Staging.DefaultStageQueue ();
                         queue.Run ();
                 }
 
