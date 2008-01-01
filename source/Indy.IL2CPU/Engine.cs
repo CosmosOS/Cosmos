@@ -425,7 +425,7 @@ namespace Indy.IL2CPU {
 				return xMethod;
 			}
 			xMethod = xTypeDef.Constructors.GetConstructor(aRef.Name == MethodDefinition.Cctor, aRef.Parameters);
-			if (xMethod != null) {
+			if (xMethod != null && (aRef.Name == MethodDefinition.Cctor ||aRef.Name == MethodDefinition.Ctor)) {
 				return xMethod;
 			}
 			throw new Exception("Couldn't find Method! ('" + aRef.GetFullName() + "'");
