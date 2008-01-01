@@ -34,7 +34,7 @@ namespace Cosmos.Kernel {
 			Console.Write("Creating IDT...");
 			Hardware.CPU.CreateIDT();
 			Console.WriteLine("Done");
-			//TestATA();
+			TestATA();
 		}
 
 		public static uint TickCount {
@@ -87,6 +87,7 @@ namespace Cosmos.Kernel {
 			string[] xItems = xExt2.GetDirectoryEntries(new string[0]);
 			Hardware.Storage.ATAOld.WriteNumber((uint)xItems.Length, 8);
 			Console.WriteLine(" items):");
+			DebugUtil.SendNumber("CPU", "Dir items count", (uint)xItems.Length, 32);
 			if (xItems == null) {
 				Console.WriteLine("    Result array is null!");
 			}

@@ -134,6 +134,7 @@
     <Compile Include="Cpobj.cs" />
     <Compile Include="CustomImplementations\System.Runtime.CompilerServices\RuntimeHelpersImpl.cs" />
     <Compile Include="CustomImplementations\System\ArrayImpl.cs" />
+    <Compile Include="CustomImplementations\System\Assemblers\Array_InternalCopy.cs" />
     <Compile Include="CustomImplementations\System\Assemblers\Buffer_BlockCopy.cs" />
     <Compile Include="CustomImplementations\System\Buffer.cs" />
     <Compile Include="CustomImplementations\System\DelegateImpl.cs" />

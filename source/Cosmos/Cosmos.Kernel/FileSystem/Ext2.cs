@@ -405,6 +405,7 @@ namespace Cosmos.Kernel.FileSystem {
 			}
 			Heap.MemFree((uint)xBuffer);
 			Heap.MemFree((uint)xExt2BlockBuffer);
+
 			return xResult.ToArray();
 		}
 
