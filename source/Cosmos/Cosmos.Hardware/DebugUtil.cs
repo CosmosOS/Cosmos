@@ -225,10 +225,10 @@ namespace Cosmos.Hardware {
 			WriteSerialString("\"/>\r\n");
 		}
 
-		private static void WriteSerialString(string aData) {
-			for (int i = 0; i < aData.Length; i++) {
-				Serial.WriteSerial(0, (byte)aData[i]);
-			}
+		public static void WriteSerialString(string aData) {
+			//for (int i = 0; i < aData.Length; i++) {
+			//    Serial.WriteSerial(0, (byte)aData[i]);
+			//}
 		}
 	}
 }
