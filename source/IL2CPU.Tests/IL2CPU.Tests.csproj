@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.20706</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{3A0BAC46-1D4E-4E21-89CA-72903B9FCEB1}</ProjectGuid>
     <OutputType>Exe</OutputType>
@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="Tests\TestInt64Result\TestInt64Result.cs" />
     <None Include="Tests\Generics\SimpleList\SimpleList.cs" />
     <None Include="Tests\Events\SimpleMulticastDelegate\SimpleMulticastDelegate.cs" />
     <None Include="Tests\Events\CustomDelegate\CustomDelegate.cs" />
@@ -185,6 +186,9 @@
     <Content Include="Tests\SimpleForWithIf\SimpleForWithIf.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Tests\TestInt64Result\TestInt64Result.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Tests\SimpleVCallTest\SimpleVCallTest.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
