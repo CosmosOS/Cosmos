@@ -5,6 +5,7 @@ using System.Text;
 namespace Cosmos.Hardware {
 	public class Serial: Hardware {
 		private const ushort COM1 = 0x3F8;
+        private static bool _serialInited = false;
 
 		private static ushort GetSerialAddr(byte aSerialIdx) {
 			return COM1;
@@ -19,13 +20,19 @@ namespace Cosmos.Hardware {
 			IOWriteByte((ushort)(xComAddr + 3), 0x03);    // 8 bits, no parity, one stop bit
 			IOWriteByte((ushort)(xComAddr + 2), 0xC7);    // Enable FIFO, clear them, with 14-byte threshold
 			IOWriteByte((ushort)(xComAddr + 4), 0x0B);    // IRQs enabled, RTS/DSR set
+            _serialInited = true;
 		}
 
 		private static int IsSerialTransmitEmpty(ushort aSerialAddr) {
+            if (!_serialInited)
+                return 0;
 			return (IOReadByte((ushort)(aSerialAddr + 5)) & 0x20);
 		}
 
 		public static void WriteSerial(byte aSerialIdx, byte aData) {
+            if (!_serialInited)
+                return;
+
 			ushort xSerialAddr = GetSerialAddr(aSerialIdx);
 			while (IsSerialTransmitEmpty(xSerialAddr) == 0) {
 				;
