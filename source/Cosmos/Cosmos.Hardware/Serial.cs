@@ -25,7 +25,7 @@ namespace Cosmos.Hardware {
 
 		private static int IsSerialTransmitEmpty(ushort aSerialAddr) {
             if (!_serialInited)
-                return 0;
+                return 1;
 			return (IOReadByte((ushort)(aSerialAddr + 5)) & 0x20);
 		}
 
