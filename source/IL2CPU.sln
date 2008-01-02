@@ -53,7 +53,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel.Boot.Glue", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel", "Cosmos\Cosmos.Kernel\Cosmos.Kernel.csproj", "{A1F83D9F-2D44-4264-A08B-416797123018}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel.LogTail", "Cosmos.Kernel.LogTail\Cosmos.Kernel.LogTail.csproj", "{7BAB58BF-E8A1-4623-B6BF-4B90A0505226}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel.LogTail", "Cosmos\Cosmos.Kernel.LogTail\Cosmos.Kernel.LogTail.csproj", "{7BAB58BF-E8A1-4623-B6BF-4B90A0505226}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
@@ -140,10 +140,10 @@ Global
 		SccProjectTopLevelParentUniqueName24 = IL2CPU.sln
 		SccProjectName24 = Cosmos.Debug.Client.CLI
 		SccLocalPath24 = Cosmos.Debug.Client.CLI
-		SccProjectUniqueName25 = Cosmos.Kernel.LogTail\\Cosmos.Kernel.LogTail.csproj
+		SccProjectUniqueName25 = Cosmos\\Cosmos.Kernel.LogTail\\Cosmos.Kernel.LogTail.csproj
 		SccProjectTopLevelParentUniqueName25 = IL2CPU.sln
-		SccProjectName25 = Cosmos.Kernel.LogTail
-		SccLocalPath25 = Cosmos.Kernel.LogTail
+		SccProjectName25 = Cosmos/Cosmos.Kernel.LogTail
+		SccLocalPath25 = Cosmos\\Cosmos.Kernel.LogTail
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
