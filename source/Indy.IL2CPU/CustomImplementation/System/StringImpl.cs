@@ -38,7 +38,43 @@ namespace Indy.IL2CPU.CustomImplementation.System {
 			return -1;
 		}
 
-		[PlugMethod(Enabled = false)]
+        public static string Substring(string aThis, int startpos)
+        {
+            char[] cs = new char[aThis.Length - startpos];
+
+            int j = 0;
+            for (int i = startpos; i < aThis.Length; i++)
+                cs[j++] = aThis[i];
+
+            return new string(cs);
+        }
+
+        public static string Substring(string aThis, int startpos, int length)
+        {
+            if (startpos + length > aThis.Length)
+                length = aThis.Length - startpos;
+
+            char[] cs = new char[length];
+
+            int j = 0;
+            for (int i = startpos; i < startpos + length; i++)
+                cs[j++] = aThis[i];
+
+            return new string(cs);
+        }
+
+        // HACK: We need to redo this once char support is complete (only returns 0, -1).
+        public static int CompareTo(string aThis, string other)
+        {
+            if (aThis.Length != other.Length)
+                return -1;
+            for (int i = 0; i < aThis.Length; i++)
+                if (aThis[i] != other[i])
+                    return -1;
+            return 0;
+        }
+
+        [PlugMethod(Enabled = false)]
 		public static uint GetStorage(string aString) {
 			return 0;
 		}

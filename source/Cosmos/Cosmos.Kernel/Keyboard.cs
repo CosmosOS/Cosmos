@@ -115,6 +115,11 @@ namespace Cosmos.Kernel {
             AddKey(0x39, ' ');
             AddKey(0x390000, ' ');
             #endregion
+
+            #region Punctuation
+            AddKey(0x34, '.');
+            AddKey(0x340000, '>');
+            #endregion
         }
 
         private static void AddKey(uint p, char p_2)

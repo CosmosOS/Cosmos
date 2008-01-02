@@ -14,6 +14,6 @@ namespace Cosmos.Shell.Console.Commands {
 			get;
 		}
 
-		public abstract void Execute();
+		public abstract void Execute(string param);
 	}
 }
