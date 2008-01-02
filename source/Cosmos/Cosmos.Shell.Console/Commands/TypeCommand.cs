@@ -4,7 +4,7 @@ using System.Text;
 using Cosmos.Kernel;
 
 namespace Cosmos.Shell.Console.Commands {
-	public class FSTestCommand : CommandBase {
+	public class TypeCommand : CommandBase {
 		public override string Name {
 			get {
 				return "type";
