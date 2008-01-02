@@ -44,9 +44,14 @@ namespace Cosmos.Kernel.Plugs {
 		public static string ReadLine() {
 			List<char> chars = new List<char>(32);
 			char current;
-			while ((current = Keyboard.ReadChar()) != '\n') {
-				//System.Diagnostics.Debugger.Break();
+			while (true) {
+				current = Keyboard.ReadChar();
 				DebugUtil.SendNumber("Console", "ReadLine, new char", current, 16);
+				if (current == '\n') {
+					break;
+				}
+				//System.Diagnostics.Debugger.Break();
+				DebugUtil.SendNumber("Console", "ReadLine, new char2", current, 16);
 				chars.Add(current);
 				Write(current);
 				DebugUtil.SendNumber("Console", "ReadLine, Char count", (uint)chars.Count, 32);
