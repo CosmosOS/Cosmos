@@ -26,6 +26,12 @@ namespace Cosmos.Kernel.LogTail.Handlers
 
         public override void Clear()
         {
+            if (InvokeRequired)
+            {
+                this.BeginInvoke(new Action(Clear));
+                return;
+            }
+
             listView.Items.Clear();
         }
 

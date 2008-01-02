@@ -64,6 +64,8 @@ namespace Cosmos.Kernel.LogTail
         {
             _watching = false;
             _fs.Close();
+            foreach (LogHandler handler in this._handlers)
+                handler.Clear();
         }
 
         void _watcher_Created(object sender, FileSystemEventArgs e)
