@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ErrorStrippingFileStream.cs" />
     <Compile Include="Handlers\LogHandler.cs">
       <SubType>UserControl</SubType>
     </Compile>

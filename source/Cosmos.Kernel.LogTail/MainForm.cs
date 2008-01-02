@@ -45,8 +45,8 @@ namespace Cosmos.Kernel.LogTail
 
         private void CreateReader()
         {
-            
-            _fs = new FileStream(_file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+
+            _fs = new ErrorStrippingFileStream(_file);
 
             _watching = true;
             _watcher_Changed(this, new FileSystemEventArgs(WatcherChangeTypes.All, "", ""));
@@ -78,8 +78,16 @@ namespace Cosmos.Kernel.LogTail
             if (_watching)
             {
                 XmlReader _reader = CreateXmlReader();
-                while (_reader.Read())
+                bool reading = true;
+                while (reading)
                 {
+                    try
+                    {
+                        reading = true;
+                        reading = _reader.Read();
+                    }
+                    catch { }
+
                     LogMessage message = new LogMessage(_reader.Name);
                     for (int i = 0; i < _reader.AttributeCount; i++)
                     {
