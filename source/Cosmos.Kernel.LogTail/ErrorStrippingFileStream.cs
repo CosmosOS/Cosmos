@@ -9,7 +9,7 @@ namespace Cosmos.Kernel.LogTail
     public class ErrorStrippingFileStream : FileStream
     {
         public ErrorStrippingFileStream(string file)
-            : base(file, FileMode.Open, FileAccess.ReadWrite, FileShare.Delete | FileShare.ReadWrite)
+            : base(file, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite)
         {
 
         }
