@@ -1,9 +1,91 @@
 ﻿using System;
 using Cosmos.Hardware.Storage;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Cosmos.Kernel.FileSystem {
 	public unsafe partial class Ext2 {
+		private class FileStream: Stream {
+			private uint mINodeNumber;
+			private Ext2 mFilesystem;
+			private uint mPosition = 0;
+			public FileStream(uint aINodeNumber, Ext2 aFilesystem) {
+				DebugUtil.SendNumber("Ext2", "FileStream..ctor(aINodeNumber)", aINodeNumber, 32);
+				mINodeNumber = aINodeNumber;
+				mFilesystem = aFilesystem;
+			}
+
+			public override bool CanRead {
+				get {
+					return true;
+				}
+			}
+
+			public override bool CanSeek {
+				get {
+					return true;
+				}
+			}
+
+			public override bool CanWrite {
+				get {
+					return false;
+				}
+			}
+
+			public override void Flush() {
+			}
+
+			public override long Length {
+				get {
+					INode xINode;
+					DebugUtil.SendNumber("Ext2", "FileStream, Length, INodeNumber", mINodeNumber, 32);
+					mFilesystem.ReadINode(mINodeNumber, out xINode);
+					return xINode.Size;
+				}
+			}
+
+			public override long Position {
+				get {
+					return mPosition;
+				}
+				set {
+					mPosition = (uint)value;
+				}
+			}
+
+			public override int Read(byte[] buffer, int offset, int count) {
+				uint xBlock = (mPosition / mFilesystem.mBlockSize);
+				if (xBlock != 0) {
+					return 0;
+				}
+				INode xINode;
+				if (!mFilesystem.ReadINode(mINodeNumber, out xINode)) {
+					return -1;
+				}
+				byte* xBuffer = (byte*)Heap.MemAlloc(mFilesystem.mBlockSize);
+				if (!mFilesystem.ReadINodeContents(&xINode, xBlock, xBuffer)) {
+					return -2;
+				}
+				uint xBufferOffset = mPosition % mFilesystem.mBlockSize;
+				for (int i = 0; i < count; i++) {
+					buffer[offset + i] = xBuffer[xBufferOffset + i];
+				}
+				return count;
+			}
+
+			public override long Seek(long offset, SeekOrigin origin) {
+				throw new NotImplementedException();
+			}
+
+			public override void SetLength(long value) {
+				throw new NotImplementedException();
+			}
+
+			public override void Write(byte[] buffer, int offset, int count) {
+				throw new NotImplementedException();
+			}
+		}
 		private Storage mBackend;
 		private SuperBlock* mSuperBlock;
 		private uint mBlockSize;
@@ -82,6 +164,76 @@ namespace Cosmos.Kernel.FileSystem {
 			for (int i = 0; i < aLength; i++) {
 				aDest[i] = aSource[i];
 			}
+		}
+
+		public Stream OpenFile(string[] xPath) {
+			ushort* xBuffer = (ushort*)Heap.MemAlloc(mBackend.BlockSize);
+			byte* xExt2BlockBuffer = (byte*)Heap.MemAlloc(mBlockSize);
+			INode xCurrentINode;
+			if (!ReadINode(EXT2_ROOT_INO, out xCurrentINode)) {
+				Heap.MemFree((uint)xBuffer);
+				Heap.MemFree((uint)xExt2BlockBuffer);
+				return null;
+			}
+			bool xCurrentINodeChanged = true;
+			uint xInspectedINodeCount = 0;
+			uint xINodeNumber = EXT2_ROOT_INO;
+			for (int i = 0; i < xPath.Length; i++) {
+				Console.Write("ReadFile, Iteration ");
+				ATAOld.WriteNumber((uint)i, 8);
+				Console.WriteLine("");
+				if (!xCurrentINodeChanged) {
+					Console.WriteLine("Terminating for loop, CurrentINode didn't change");
+					Heap.MemFree((uint)xBuffer);
+					Heap.MemFree((uint)xExt2BlockBuffer);
+					return null;
+				}
+				xCurrentINodeChanged = false;
+				if (!ReadINodeContents(&xCurrentINode, 0, xExt2BlockBuffer)) {
+					Heap.MemFree((uint)xBuffer);
+					Heap.MemFree((uint)xExt2BlockBuffer);
+					return null;
+				}
+				DirectoryEntry* xEntryPtr = (DirectoryEntry*)xExt2BlockBuffer;
+				uint xTotalSize = mBlockSize;
+				while (xTotalSize != 0) {
+					DebugUtil.SendExt2_DirectoryEntry(xEntryPtr);
+					uint xPtrAddress = (uint)xEntryPtr;
+					char[] xName = new char[xEntryPtr->NameLength];
+					byte* xNamePtr = &xEntryPtr->FirstNameChar;
+					for (int c = 0; c < xName.Length; c++) {
+						xName[c] = (char)xNamePtr[c];
+					}
+					xInspectedINodeCount++;
+					if (EqualsName(xPath[i], xName)) {
+						if (!ReadINode(xEntryPtr->INodeNumber, out xCurrentINode)) {
+							Heap.MemFree((uint)xBuffer);
+							Heap.MemFree((uint)xExt2BlockBuffer);
+							return null;
+						}
+						xCurrentINodeChanged = true;
+						xINodeNumber = xEntryPtr->INodeNumber;
+						xTotalSize = 0;
+						continue;
+					}
+					xPtrAddress += xEntryPtr->RecordLength;
+					xTotalSize -= xEntryPtr->RecordLength;
+					xEntryPtr = (DirectoryEntry*)xPtrAddress;
+				}
+			}
+			if (xCurrentINodeChanged) {
+				DebugUtil.SendMessage("Ext2", "ReadFile, for loop exited with an inode change");
+			} else {
+				DebugUtil.SendMessage("Ext2", "ReadFile, for loop exited without an inode change");
+			}
+			if ((xCurrentINode.Mode & INodeModeEnum.RegularFile) == 0) {
+				Console.WriteLine("No file after for loop");
+				return null;
+			}
+			Stream xResult = new FileStream(xINodeNumber, this);
+			Heap.MemFree((uint)xBuffer);
+			Heap.MemFree((uint)xExt2BlockBuffer);
+			return xResult;
 		}
 
 		public unsafe byte[] ReadFile(string[] xPath) {
@@ -182,7 +334,7 @@ namespace Cosmos.Kernel.FileSystem {
 			//byte* xINodeBuff = (byte*)((uint)xBuffer) + xByteIndexInBackendBlock;
 			INode* xINodePtr = (INode*)xBuffer;
 			DebugUtil.SendNumber("Ext2", "ReadINode, INodePointer index", ((aINodeNumber - 1) % (mBackend.BlockSize / ((byte)sizeof(INode)))), 8);
-			xINodePtr = &xINodePtr[((aINodeNumber-1) % (byte)(mBackend.BlockSize / ((byte)sizeof(INode))))];
+			xINodePtr = &xINodePtr[((aINodeNumber - 1) % (byte)(mBackend.BlockSize / ((byte)sizeof(INode))))];
 			aINode = *xINodePtr;
 			DebugUtil.SendExt2_INode(aINodeNumber, xINodePtr);
 			Heap.MemFree((uint)xBuffer);

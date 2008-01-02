@@ -73,6 +73,18 @@ namespace Cosmos.Kernel {
 			EndLogging();
 		}
 
+		public static void SendError(string aModule, string aDescription, uint aData, byte aBits) {
+			StartLogging();
+			Serial.Write(0, "<Message Type=\"Error\" Module=\"");
+			Serial.Write(0, aModule);
+			Serial.Write(0, "\" Message=\"");
+			Serial.Write(0, aDescription);
+			Serial.Write(0, "\" Data=\"");
+			Hardware.DebugUtil.WriteNumber(aData, aBits);
+			Serial.Write(0, "\"/>\r\n");
+			EndLogging();
+		}
+
 		public static void SendWarning(string aModule, string aData) {
 			StartLogging();
 			Serial.Write(0, "<Message Type=\"Warning\" Module=\"");
@@ -86,6 +98,16 @@ namespace Cosmos.Kernel {
 		public static void SendMM_Alloc(uint aStartAddr, uint aLength) {
 			StartLogging();
 			Serial.Write(0, "<MM_Alloc StartAddr=\"");
+			Hardware.DebugUtil.WriteNumber(aStartAddr, 32);
+			Serial.Write(0, "\" Length=\"");
+			Hardware.DebugUtil.WriteNumber(aLength, 32);
+			Serial.Write(0, "\"/>\r\n");
+			EndLogging();
+		}
+
+		public static void SendMM_Free(uint aStartAddr, uint aLength) {
+			StartLogging();
+			Serial.Write(0, "<MM_Free StartAddr=\"");
 			Hardware.DebugUtil.WriteNumber(aStartAddr, 32);
 			Serial.Write(0, "\" Length=\"");
 			Hardware.DebugUtil.WriteNumber(aLength, 32);

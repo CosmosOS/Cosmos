@@ -69,6 +69,8 @@ namespace Cosmos.Kernel.Plugs {
 		public static string ReadLine() {
 			List<char> chars = new List<char>(32);
 			char current;
+			// HACK: convert this to "while ((current = Keyboard.ReadChar()) != '\n') {" 
+			//   MTW: SOmehow an invalid opcode exception is occurring.
 			while (true) {
 				current = Keyboard.ReadChar();
 				if (current == '\n') {
