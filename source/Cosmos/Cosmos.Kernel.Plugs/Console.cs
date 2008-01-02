@@ -32,6 +32,16 @@ namespace Cosmos.Kernel.Plugs {
             TextScreen.SetColors(_foreground, _background);
         }
 
+        public static int get_CursorLeft()
+        {
+            return TextScreen.CurrentChar;
+        }
+
+        public static void set_CursorLeft(int x)
+        {
+            TextScreen.CurrentChar = x;
+        }
+
 		//TODO: Console uses TextWriter - intercept and plug it instead
 		public static void Clear() {
 			TextScreen.Clear();
@@ -67,7 +77,7 @@ namespace Cosmos.Kernel.Plugs {
 		}
 
 		public static string ReadLine() {
-			List<char> chars = new List<char>(32);
+			List<char> chars = new List<char>();
 			char current;
 			// HACK: convert this to "while ((current = Keyboard.ReadChar()) != '\n') {" 
 			//   MTW: SOmehow an invalid opcode exception is occurring.
@@ -76,6 +86,17 @@ namespace Cosmos.Kernel.Plugs {
 				if (current == '\n') {
 					break;
 				}
+                if (current == '\u0968') // Backspace
+                {
+                    if (chars.Count != 0)
+                    {
+                        chars.RemoveAt(chars.Count);
+                        TextScreen.CurrentChar--;
+                        TextScreen.WriteChar(' ');
+                        TextScreen.CurrentChar--;
+                    }
+                    continue;
+                }
 				chars.Add(current);
 				Write(current);
 			}

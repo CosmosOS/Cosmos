@@ -39,6 +39,14 @@ namespace Cosmos.Kernel.FileSystem
             // TODO: FAT32
             #endregion
 
+            #region Util
+            public uint _rootDirSectors;
+            public uint _realFatSize;
+            public uint _firstDataSector;
+            public uint _realTotalSectors;
+            public uint _dataSectors;
+            #endregion
+
             /// <summary>
             /// Reads the header from a byte source.
             /// </summary>
@@ -75,6 +83,22 @@ namespace Cosmos.Kernel.FileSystem
 
                 #region FAT 32
                 #endregion
+
+                #region Util
+                /*_rootDirSectors = ((_rootEntryCount * 32) + (_bytesPerSector - 1)) / _bytesPerSector;
+                _fatSize = _fatSize;
+                _firstDataSector = _reservedSectorCount + (_allocationTables * _realFatSize) + _rootDirSectors;
+                if (_totalSectors == 0)
+                    _realTotalSectors = _totalSectors32;
+                else
+                    _realTotalSectors = _totalSectors;
+                _dataSectors = _realTotalSectors - (_reservedSectorCount + (_allocationTables * _realFatSize) + _rootDirSectors);*/
+                #endregion
+            }
+
+            public uint FirstSectorOfCluster(uint cluster)
+            {
+                return ((cluster - 2) * _sectorPerCluster) + _firstDataSector;
             }
 
             private ushort ReadShort(byte[] source, int pos, ushort mask)
@@ -120,6 +144,7 @@ namespace Cosmos.Kernel.FileSystem
         }
 
         private ATA _ata;
+        private Header _header;
 
         public Fat16(ATA ata)
         {
@@ -131,7 +156,9 @@ namespace Cosmos.Kernel.FileSystem
 
         public override void Open()
         {
-
+            _header = new Header();
+            
+            // TODO: Read the header.
         }
 
         public override void Dispose()

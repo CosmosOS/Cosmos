@@ -126,6 +126,8 @@ namespace Cosmos.Kernel {
 			AddKey(0x1C0000, '\n');
 			AddKey(0x39, ' ');
 			AddKey(0x390000, ' ');
+            AddKey(0x0E, '\u0968');
+            AddKey(0x0E0000, '\u0968');
 			#endregion
 
 			#region Punctuation
