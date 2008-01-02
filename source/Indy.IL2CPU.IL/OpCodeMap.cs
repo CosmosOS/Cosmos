@@ -107,6 +107,27 @@ namespace Indy.IL2CPU.IL {
 			return sb.ToString().TrimEnd(',') + ")";
 		}
 
+		/// <summary>
+		/// Gets the full name of a method, without the defining type included
+		/// </summary>
+		/// <param name="aSelf"></param>
+		/// <returns></returns>
+		private static string GetStrippedMethodDefinitionFullName(MethodReference aSelf) {
+			StringBuilder sb = new StringBuilder(aSelf.ReturnType.ReturnType.FullName + " " + aSelf.Name);
+			sb.Append("(");
+			if (aSelf.HasThis) {
+				sb.Append(aSelf.DeclaringType.FullName);
+				sb.Append(",");				
+			}
+			if (aSelf.Parameters.Count > 0) {
+				foreach (ParameterDefinition xParam in aSelf.Parameters) {
+					sb.Append(xParam.ParameterType.FullName);
+					sb.Append(",");
+				}
+			}
+			return sb.ToString().TrimEnd(',') + ")";
+		}
+
 		private void InitializePlugMethodsList(Assembler.Assembler aAssembler, IEnumerable<AssemblyDefinition> aPlugs, Func<TypeReference, TypeDefinition> aTypeResolver, Func<string, AssemblyDefinition> aAssemblyResolver) {
 			if (mPlugMethods != null) {
 				throw new Exception("PlugMethods list already initialized!");
@@ -145,7 +166,6 @@ namespace Indy.IL2CPU.IL {
 							CustomAttribute xPlugMethodAttrib = (from item in xMethod.CustomAttributes.Cast<CustomAttribute>()
 																 where item.Constructor.DeclaringType.FullName == typeof(PlugMethodAttribute).FullName
 																 select item).FirstOrDefault();
-							//System.Diagnostics.Debugger.Break();
 							string xSignature = String.Empty;
 							if (xPlugMethodAttrib != null) {
 								if (!xPlugMethodAttrib.Resolved) {
@@ -172,15 +192,15 @@ namespace Indy.IL2CPU.IL {
 									continue;
 								}
 							}
-							string xStrippedSignature = GetMethodDefinitionFullName(xMethod).Replace(xType.FullName, "");
+							string xStrippedSignature = GetStrippedMethodDefinitionFullName(xMethod);
 							foreach (MethodDefinition xOrigMethodDef in xReplaceTypeDef.Methods) {
-								string xOrigStrippedSignature = GetMethodDefinitionFullName(xOrigMethodDef).Replace(xReplaceTypeDef.FullName, "");
+								string xOrigStrippedSignature = GetStrippedMethodDefinitionFullName(xOrigMethodDef);
 								if (xOrigStrippedSignature == xStrippedSignature) {
 									mPlugMethods.Add(Label.GenerateLabelName(xOrigMethodDef), xMethod);
 								}
 							}
 							foreach (MethodDefinition xOrigMethodDef in xReplaceTypeDef.Constructors) {
-								string xOrigStrippedSignature = GetMethodDefinitionFullName(xOrigMethodDef).Replace(xReplaceTypeDef.FullName, "");
+								string xOrigStrippedSignature = GetStrippedMethodDefinitionFullName(xOrigMethodDef);
 								if (xOrigStrippedSignature == xStrippedSignature) {
 									mPlugMethods.Add(Label.GenerateLabelName(xOrigMethodDef), xMethod);
 								}
