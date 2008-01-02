@@ -30,6 +30,11 @@ namespace Cosmos.Kernel.LogTail.Handlers
             throw new NotImplementedException();
         }
 
+        public virtual void Clear()
+        {
+            throw new NotImplementedException();
+        }
+
         public static LogHandler[] GetHandlers()
         {
             List<LogHandler> handlers = new List<LogHandler>();

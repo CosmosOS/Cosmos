@@ -31,9 +31,9 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MessageLogHandler));
             this.listView = new System.Windows.Forms.ListView();
-            this.imageList = new System.Windows.Forms.ImageList(this.components);
             this.sourceColumnHeader = new System.Windows.Forms.ColumnHeader();
             this.messageColumnHeader = new System.Windows.Forms.ColumnHeader();
+            this.imageList = new System.Windows.Forms.ImageList(this.components);
             this.SuspendLayout();
             // 
             // listView
@@ -53,13 +53,6 @@
             this.listView.UseCompatibleStateImageBehavior = false;
             this.listView.View = System.Windows.Forms.View.Details;
             // 
-            // imageList
-            // 
-            this.imageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList.ImageStream")));
-            this.imageList.TransparentColor = System.Drawing.Color.Transparent;
-            this.imageList.Images.SetKeyName(0, "error");
-            this.imageList.Images.SetKeyName(1, "warning");
-            // 
             // sourceColumnHeader
             // 
             this.sourceColumnHeader.Text = "Source";
@@ -69,6 +62,14 @@
             // 
             this.messageColumnHeader.Text = "Message";
             this.messageColumnHeader.Width = 500;
+            // 
+            // imageList
+            // 
+            this.imageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList.ImageStream")));
+            this.imageList.TransparentColor = System.Drawing.Color.Transparent;
+            this.imageList.Images.SetKeyName(0, "error");
+            this.imageList.Images.SetKeyName(1, "message");
+            this.imageList.Images.SetKeyName(2, "warning");
             // 
             // MessageLogHandler
             // 

@@ -24,10 +24,23 @@ namespace Cosmos.Kernel.LogTail.Handlers
             InitializeComponent();
         }
 
+        public override void Clear()
+        {
+            listView.Items.Clear();
+        }
+
+        private delegate void Handler(LogMessage message);
+
         public override void HandleMessage(LogMessage message)
         {
+            if (InvokeRequired)
+            {
+                this.BeginInvoke(new Handler(HandleMessage), message);
+                return;
+            }
+
             // We only handle these.
-            if (message.Name != "Warning" && message.Name != "Error")
+            if (message.Name != "Warning" && message.Name != "Error" && message.Name != "Message")
                 return;
 
             // Create the item.
