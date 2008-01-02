@@ -7,6 +7,31 @@ using Indy.IL2CPU.Plugs;
 namespace Cosmos.Kernel.Plugs {
 	[Plug(Target = typeof(System.Console))]
 	class Console {
+        private static ConsoleColor _background = ConsoleColor.Black;
+        private static ConsoleColor _foreground = ConsoleColor.White;
+
+        public static ConsoleColor get_ForegroundColor()
+        {
+            return _foreground;
+        }
+
+        public static void set_ForegroundColor(ConsoleColor value)
+        {
+            _foreground = value;
+            TextScreen.SetColors(_foreground, _background);
+        }
+
+        public static ConsoleColor get_BackgroundColor()
+        {
+            return _background;
+        }
+
+        public static void set_BackgroundColor(ConsoleColor value)
+        {
+            _background = value;
+            TextScreen.SetColors(_foreground, _background);
+        }
+
 		//TODO: Console uses TextWriter - intercept and plug it instead
 		public static void Clear() {
 			TextScreen.Clear();
@@ -46,15 +71,11 @@ namespace Cosmos.Kernel.Plugs {
 			char current;
 			while (true) {
 				current = Keyboard.ReadChar();
-				DebugUtil.SendNumber("Console", "ReadLine, new char", current, 16);
 				if (current == '\n') {
 					break;
 				}
-				//System.Diagnostics.Debugger.Break();
-				DebugUtil.SendNumber("Console", "ReadLine, new char2", current, 16);
 				chars.Add(current);
 				Write(current);
-				DebugUtil.SendNumber("Console", "ReadLine, Char count", (uint)chars.Count, 32);
 			}
 			WriteLine();
 

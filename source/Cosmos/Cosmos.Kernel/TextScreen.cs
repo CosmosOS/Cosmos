@@ -8,6 +8,16 @@ namespace Cosmos.Kernel {
         public static int CurrentLine = 0;
         public static int CurrentChar = 0;
 
+        /// <summary>
+        /// Sets the console colors.
+        /// </summary>
+        /// <param name="foreground"></param>
+        /// <param name="background"></param>
+        public static void SetColors(ConsoleColor foreground, ConsoleColor background)
+        {
+            HW.Text.SetColors(foreground, background);
+        }
+
         public static void NewLine() {
             CurrentLine += 1;
 			CurrentChar = 0;
