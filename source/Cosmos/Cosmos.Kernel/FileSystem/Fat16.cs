@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Cosmos.Hardware.Storage;
 
 namespace Cosmos.Kernel.FileSystem
 {
@@ -8,7 +9,7 @@ namespace Cosmos.Kernel.FileSystem
     {
         private struct Header
         {
-            // Both FAT 16 and FAT 32
+            #region Common
             public ushort _jumpBoot; // 3
             public byte[] _oemName; // 8
             public ushort _bytesPerSector; // 2
@@ -23,6 +24,7 @@ namespace Cosmos.Kernel.FileSystem
             public ushort _numberOfHeads; // 2
             public ushort _hiddenSectors; // 4
             public ushort _totalSectors32; // 4
+            #endregion
 
             #region FAT 16
             public byte _driveNumber; // 1
@@ -33,7 +35,9 @@ namespace Cosmos.Kernel.FileSystem
             public byte[] _fileSystemType; // 8
             #endregion
 
+            #region FAT 32
             // TODO: FAT32
+            #endregion
 
             /// <summary>
             /// Reads the header from a byte source.
@@ -43,8 +47,34 @@ namespace Cosmos.Kernel.FileSystem
             {
                 int pos = 0;
 
-                _jumpBoot = ReadShort(source, pos, 0xFFF);
-                _oemName = ReadByte(source, pos, 8);
+                #region Common
+                _jumpBoot = ReadShort(source, pos, 0xFFF); pos += 3;
+                _oemName = ReadByte(source, pos, 8); pos += 8;
+                _bytesPerSector = ReadShort(source, pos, 0xFF); pos += 2;
+                _sectorPerCluster = source[pos]; pos += 1;
+                _reservedSectorCount = ReadShort(source, pos, 0xFF); pos += 2;
+                _allocationTables = source[pos]; pos += 1;
+                _rootEntryCount = ReadShort(source, pos, 0xFF); pos += 2;
+                _totalSectors = ReadShort(source, pos, 0xFF); pos += 2;
+                _media = source[pos]; pos += 1;
+                _fatSize = ReadShort(source, pos, 0xFF); pos += 2;
+                _sectorsPerTrack = ReadShort(source, pos, 0xFF); pos += 2;
+                _numberOfHeads = ReadShort(source, pos, 0xFF); pos += 2;
+                _hiddenSectors = ReadShort(source, pos, 0xFFFF); pos += 4;
+                _totalSectors32 = ReadShort(source, pos, 0xFFFF); pos += 4;
+                #endregion
+
+                #region FAT 16
+                _driveNumber = source[pos]; pos++;
+                _reserved = source[pos]; pos++;
+                _bootSig = source[pos]; pos++;
+                _volumeId = ReadShort(source, pos, 0xFFFF); pos += 4;
+                _volumeLabel = ReadByte(source, pos, 11); pos += 4;
+                _fileSystemType = ReadByte(source, pos, 8); pos += 8;
+                #endregion
+
+                #region FAT 32
+                #endregion
             }
 
             private ushort ReadShort(byte[] source, int pos, ushort mask)
@@ -89,12 +119,19 @@ namespace Cosmos.Kernel.FileSystem
             }
         }
 
+        private ATA _ata;
+
+        public Fat16(ATA ata)
+        {
+        }
+
         private void WriteLabel()
         {
         }
 
         public override void Open()
         {
+
         }
 
         public override void Dispose()
