@@ -1,9 +1,0 @@
-D:\Cosmos\IL2CPU\source\Cosmos.Kernel.LogTail\obj\Debug\ResolveAssemblyReference.cache
-D:\Cosmos\IL2CPU\source\Cosmos.Kernel.LogTail\obj\Debug\Cosmos.Kernel.LogTail.MainForm.resources
-D:\Cosmos\IL2CPU\source\Cosmos.Kernel.LogTail\obj\Debug\Cosmos.Kernel.LogTail.Properties.Resources.resources
-D:\Cosmos\IL2CPU\source\Cosmos.Kernel.LogTail\obj\Debug\Cosmos.Kernel.LogTail.csproj.GenerateResource.Cache
-D:\Cosmos\IL2CPU\source\Cosmos.Kernel.LogTail\bin\Debug\Cosmos.Kernel.LogTail.exe
-D:\Cosmos\IL2CPU\source\Cosmos.Kernel.LogTail\bin\Debug\Cosmos.Kernel.LogTail.pdb
-D:\Cosmos\IL2CPU\source\Cosmos.Kernel.LogTail\obj\Debug\Cosmos.Kernel.LogTail.exe
-D:\Cosmos\IL2CPU\source\Cosmos.Kernel.LogTail\obj\Debug\Cosmos.Kernel.LogTail.pdb
-D:\Cosmos\IL2CPU\source\Cosmos.Kernel.LogTail\obj\Debug\Cosmos.Kernel.LogTail.Handlers.MessageLogHandler.resources
