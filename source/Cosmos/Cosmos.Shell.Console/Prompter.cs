@@ -25,7 +25,13 @@ namespace Cosmos.Shell.Console {
 
 		public override void Initialize() {
             _commands = new List<Cosmos.Shell.Console.Commands.CommandBase>();
+            _commands.Add(new Commands.ClsCommand());
+            _commands.Add(new Commands.DirCommand());
+            _commands.Add(new Commands.EchoCommand());
+            _commands.Add(new Commands.ExitCommand(Stop));
+            _commands.Add(new Commands.HelpCommand(_commands));
             _commands.Add(new Commands.TypeCommand());
+            
 
             while (running)
             {
@@ -45,16 +51,26 @@ namespace Cosmos.Shell.Console {
                     param = line.Substring(index + 1);
                 }
 
+                bool found = false;
                 for (int i = 0; i < _commands.Count; i++)
                 {
-
                     if (_commands[i].Name.CompareTo(command) == 0)
                     {
+                        found = true;
                         _commands[i].Execute(param);
                         break;
                     }
                 }
-                
+
+                if (!found)
+                {
+                    System.Console.ForegroundColor = ConsoleColor.Red;
+                    System.Console.Write("The command ");
+                    System.Console.Write(command);
+                    System.Console.WriteLine(" is not supported. Please type help for more information.");
+                    System.Console.ForegroundColor = ConsoleColor.White;
+                    System.Console.WriteLine();
+                }
             }
 		}
 

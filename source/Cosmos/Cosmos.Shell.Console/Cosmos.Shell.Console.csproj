@@ -42,6 +42,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\ClsCommand.cs" />
+    <Compile Include="Commands\DirCommand.cs" />
+    <Compile Include="Commands\EchoCommand.cs" />
+    <Compile Include="Commands\ExitCommand.cs" />
+    <Compile Include="Commands\HelpCommand.cs" />
     <Compile Include="Commands\TypeCommand.cs" />
     <Compile Include="Commands\BaseCommand.cs" />
     <Compile Include="Program.cs" />

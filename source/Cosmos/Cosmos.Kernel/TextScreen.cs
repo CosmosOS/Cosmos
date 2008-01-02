@@ -30,6 +30,8 @@ namespace Cosmos.Kernel {
 
         public static void Clear() {
             HW.Text.Clear();
+            CurrentChar = 0;
+            CurrentLine = 0;
         }
 
         public static void WriteChar(char aChar) {

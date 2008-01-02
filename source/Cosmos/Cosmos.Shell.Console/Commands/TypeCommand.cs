@@ -40,5 +40,17 @@ namespace Cosmos.Shell.Console.Commands {
             String s = new String(xChars);
             System.Console.WriteLine(s);
 		}
-	}
+
+        public override void Help()
+        {
+            System.Console.WriteLine("type [filename]");
+            System.Console.WriteLine("  Types the specified file out to the console window.");
+            System.Console.WriteLine("  [filename]: The name of the file.");
+        }
+
+        public override string Summary
+        {
+            get { return "Types the specified file out to the console window."; }
+        }
+    }
 }
