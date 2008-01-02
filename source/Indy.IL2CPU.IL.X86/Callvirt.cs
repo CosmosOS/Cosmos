@@ -9,11 +9,11 @@ namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Callvirt, true)]
 	public class Callvirt: Op {
 		private readonly int mMethodIdentifier;
-		private readonly bool mHasReturn;
 		private readonly string mNormalAddress;
 		private readonly string mMethodDescription;
 		private readonly int mThisOffset;
 		private readonly int mArgumentCount;
+		private readonly int mReturnSize;
 		public Callvirt(Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
 			int xThisOffSet = (from item in aMethodInfo.Locals
@@ -24,17 +24,17 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			MethodDefinition xMethodDef = Engine.GetDefinitionFromMethodReference(xMethod);
 			mMethodDescription = CPU.Label.GenerateLabelName(xMethodDef);
+			MethodInformation xTheMethodInfo = Engine.GetMethodInfo(xMethodDef, xMethodDef, mMethodDescription, null);
 			if (xMethodDef.IsStatic || !xMethodDef.IsVirtual) {
 				Engine.QueueMethod(xMethodDef);
 				mNormalAddress = CPU.Label.GenerateLabelName(xMethodDef);
-				mHasReturn = !xMethod.ReturnType.ReturnType.FullName.StartsWith("System.Void");
+				mReturnSize = xTheMethodInfo.ReturnSize;
 				return;
 			}
 			mMethodIdentifier = Engine.GetMethodIdentifier(xMethodDef);
 			Engine.QueueMethodRef(VTablesImplRefs.GetMethodAddressForTypeRef);
-			MethodInformation xTheMethodInfo = Engine.GetMethodInfo(xMethodDef, xMethodDef, mMethodDescription, null);
 			mArgumentCount = xTheMethodInfo.Arguments.Length;
-			mHasReturn = xTheMethodInfo.ReturnSize != 0;
+			mReturnSize = xTheMethodInfo.ReturnSize;
 			mThisOffset = xTheMethodInfo.Arguments[0].Offset;
 		}
 
@@ -53,12 +53,22 @@ namespace Indy.IL2CPU.IL.X86 {
 				new CPUx86.Call(CPU.Label.GenerateLabelName(VTablesImplRefs.GetMethodAddressForTypeRef));
 				new CPUx86.Call(CPUx86.Registers.EAX);
 			}
-			for(int i = 0; i < mArgumentCount;i++) {
+			for (int i = 0; i < mArgumentCount; i++) {
 				Assembler.StackSizes.Pop();
 			}
-			if (mHasReturn) {
+			if (mReturnSize == 0) {
+				return;
+			}
+			if (mReturnSize <= 4) {
 				new CPUx86.Pushd(CPUx86.Registers.EAX);
-				Assembler.StackSizes.Push(4);
+				Assembler.StackSizes.Push(mReturnSize);
+				return;
+			}
+			if (mReturnSize <= 8) {
+				new CPUx86.Pushd(CPUx86.Registers.EBX);
+				new CPUx86.Pushd(CPUx86.Registers.EAX);
+				Assembler.StackSizes.Push(mReturnSize);
+				return;
 			}
 		}
 	}

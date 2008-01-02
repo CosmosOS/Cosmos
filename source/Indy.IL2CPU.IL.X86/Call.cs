@@ -11,7 +11,7 @@ namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Call)]
 	public class Call: Op {
 		private string LabelName;
-		private bool HasResult;
+		private int mResultSize;
 		private int? TotalArgumentSize = null;
 		private bool mIsDebugger_Break = false;
 		private int[] ArgumentSizes = new int[0];
@@ -28,10 +28,9 @@ namespace Indy.IL2CPU.IL.X86 {
 			if (mIsDebugger_Break) {
 				return;
 			}
-			HasResult = !aMethod.ReturnType.ReturnType.FullName.Contains("System.Void");
-			int xResultSize = Engine.GetFieldStorageSize(aMethod.ReturnType.ReturnType);
-			if (xResultSize > 4 && HasResult) {
-				throw new Exception("ReturnValues of sizes larger than 4 bytes not supported yet (" + xResultSize + ")");
+			mResultSize = Engine.GetFieldStorageSize(aMethod.ReturnType.ReturnType);
+			if (mResultSize > 8) {
+				throw new Exception("ReturnValues of sizes larger than 8 bytes not supported yet (" + mResultSize + ")");
 			}
 			MethodDefinition xMethodDef = Engine.GetDefinitionFromMethodReference(aMethod);
 			LabelName = CPU.Label.GenerateLabelName(xMethodDef);
@@ -70,9 +69,19 @@ namespace Indy.IL2CPU.IL.X86 {
 			for (int i = 0; i < aArgumentCount; i++) {
 				Assembler.StackSizes.Pop();
 			}
-			if (HasResult) {
+			if (mResultSize == 0) {
+				return;
+			}
+			if (mResultSize <= 4) {
 				new CPUx86.Push(CPUx86.Registers.EAX);
-				Assembler.StackSizes.Push(4);
+				Assembler.StackSizes.Push(mResultSize);
+				return;
+			}
+			if (mResultSize <= 8) {
+				new CPUx86.Push(CPUx86.Registers.EBX);
+				new CPUx86.Push(CPUx86.Registers.EAX);
+				Assembler.StackSizes.Push(mResultSize);
+				return;
 			}
 		}
 

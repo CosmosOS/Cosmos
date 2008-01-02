@@ -47,10 +47,15 @@ namespace Indy.IL2CPU.IL.X86 {
 				}
 			}
 			if (aReturnSize > 0) {
-				if (aReturnSize > 4) {
-					throw new Exception("ReturnValue sizes larger than 4 not supported yet");
+				if (aReturnSize > 8) {
+					throw new Exception("ReturnValue sizes larger than 8 not supported yet");
 				} else {
-					new Assembler.X86.Pop(CPUx86.Registers.EAX);
+					if (aReturnSize <= 4) {
+						new Assembler.X86.Pop(CPUx86.Registers.EAX);
+					} else {
+						new Assembler.X86.Pop(CPUx86.Registers.EAX);
+						new Assembler.X86.Pop(CPUx86.Registers.EBX);
+					}
 				}
 			}
 			for (int j = aLocals.Length - 1; j >= 0; j--) {
