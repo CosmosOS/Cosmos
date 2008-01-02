@@ -67,6 +67,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FileSystem\Ext2.Structs.cs" />
+    <Compile Include="FileSystem\Fat16.cs" />
+    <Compile Include="FileSystem\File.cs" />
+    <Compile Include="FileSystem\FileSystem2.cs" />
+    <Compile Include="FileSystem\Path.cs" />
     <Compile Include="Staging\DefaultStageQueue.cs" />
     <Compile Include="Staging\IStage.cs" />
     <Compile Include="Staging\StageQueue.cs" />
