@@ -22,8 +22,8 @@ namespace Cosmos.Kernel {
 			Hardware.PIC.Init();
 			Console.WriteLine("Done");
 			Console.Write("Initializing Serial 0...");
-			Hardware.Serial.InitSerial(0);
-			Console.WriteLine("Done");
+			//Hardware.Serial.InitSerial(0);
+			Console.WriteLine("Serial Bypassed.");
 			Console.Write("Initializing Debug Utility...");
 			Hardware.DebugUtil.Initialize();
 			Hardware.DebugUtil.SendMessage("Logging", "Initialized!");
