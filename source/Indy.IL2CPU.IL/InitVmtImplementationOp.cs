@@ -122,10 +122,11 @@ namespace Indy.IL2CPU.IL {
 				xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(mTypes[i].FullName) + "__MethodAddressesArray";
 				Assembler.DataMembers.Add(new DataMember(xDataName, "db", xDataValue.TrimEnd(',')));
 				Pushd(xDataName);
-				xDataValue = Encoding.ASCII.GetBytes(mTypes[i].FullName + ", " + mTypes[i].Module.Assembly.Name.FullName).Aggregate("", (b, x) => b + x + ",") + "0";
-				xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(mTypes[i].FullName);
-				mAssembler.DataMembers.Add(new DataMember(xDataName, "db", xDataValue));
-				Pushd(xDataName);
+				//xDataValue = Encoding.ASCII.GetBytes(mTypes[i].FullName + ", " + mTypes[i].Module.Assembly.Name.FullName).Aggregate("", (b, x) => b + x + ",") + "0";
+				//xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(mTypes[i].FullName);
+				//mAssembler.DataMembers.Add(new DataMember(xDataName, "db", xDataValue));
+				//Pushd(xDataName);
+				Pushd("0");
 				Call(SetTypeInfoRef);
 				for (int j = 0; j < xEmittedMethods.Count; j++) {
 					MethodDefinition xMethod = xEmittedMethods[j];
@@ -137,10 +138,11 @@ namespace Indy.IL2CPU.IL {
 					}
 					Pushd("0" + GetMethodIdentifier(xMethod).ToString("X") + "h");
 					Pushd(Label.GenerateLabelName(xMethod));
-					xDataValue = Encoding.ASCII.GetBytes(GetFullName(xMethod)).Aggregate("", (b, x) => b + x + ",") + "0";
-					xDataName = "____SYSTEM____METHOD___" + DataMember.FilterStringForIncorrectChars(GetFullName(xMethod));
-					mAssembler.DataMembers.Add(new DataMember(xDataName, "db", xDataValue));
-					Pushd(xDataName);
+					//xDataValue = Encoding.ASCII.GetBytes(GetFullName(xMethod)).Aggregate("", (b, x) => b + x + ",") + "0";
+					//xDataName = "____SYSTEM____METHOD___" + DataMember.FilterStringForIncorrectChars(GetFullName(xMethod));
+					//mAssembler.DataMembers.Add(new DataMember(xDataName, "db", xDataValue));
+					//Pushd(xDataName);
+					Pushd("0");
 					Call(SetMethodInfoRef);
 				}
 			}

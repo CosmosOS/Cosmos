@@ -7,48 +7,51 @@ using Indy.IL2CPU.Plugs;
 namespace Cosmos.Kernel.Plugs {
 	[Plug(Target = typeof(System.Console))]
 	class Console {
-        //TODO: Console uses TextWriter - intercept and plug it instead
-        public static void Clear() {
-            TextScreen.Clear();
-        }
+		//TODO: Console uses TextWriter - intercept and plug it instead
+		public static void Clear() {
+			TextScreen.Clear();
+		}
 
-        public static void Write(char aChar) {
-            TextScreen.WriteChar(aChar);
+		public static void Write(char aChar) {
+			TextScreen.WriteChar(aChar);
 		}
 
 		public static void Write(string aText) {
-            for (int i = 0; i < aText.Length; i++) {
-                TextScreen.WriteChar(aText[i]);
-            }
-        }
+			for (int i = 0; i < aText.Length; i++) {
+				TextScreen.WriteChar(aText[i]);
+			}
+		}
 
 		public static void WriteLine(string aLine) {
 			Write(aLine);
-            TextScreen.NewLine();
+			TextScreen.NewLine();
 		}
 
 		public static void Write(char[] buffer) {
 			for (int i = 0; i < buffer.Length; i++)
-				Write (buffer[i]);
+				Write(buffer[i]);
 		}
 
 		public static void WriteLine(char[] buffer) {
-			Write (buffer);
-			WriteLine ();
+			Write(buffer);
+			WriteLine();
 		}
 
 		public static void WriteLine() {
-            TextScreen.NewLine();
-        }
+			TextScreen.NewLine();
+		}
 
 		public static string ReadLine() {
-			List<char> chars = new List<char> ();
+			List<char> chars = new List<char>(32);
 			char current;
-			while ((current = Keyboard.ReadChar ()) != '\n') {
-				chars.Add (current);
-				Write (current);
+			while ((current = Keyboard.ReadChar()) != '\n') {
+				//System.Diagnostics.Debugger.Break();
+				DebugUtil.SendNumber("Console", "ReadLine, new char", current, 16);
+				chars.Add(current);
+				Write(current);
+				DebugUtil.SendNumber("Console", "ReadLine, Char count", (uint)chars.Count, 32);
 			}
-			WriteLine ();
+			WriteLine();
 
 			// HACK: Should use .ToArray here.
 			char[] final = new char[chars.Count];
