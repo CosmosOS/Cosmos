@@ -7,31 +7,32 @@ namespace Cosmos.Shell.Console {
 		static void Main() {
 			Kernel.CPU.Init();
 
-			Kernel.Staging.DefaultStageQueue stages = new Cosmos.Kernel.Staging.DefaultStageQueue();
-			//stages.Enqueue(new Prompter());
+			//Kernel.Staging.DefaultStageQueue stages = new Cosmos.Kernel.Staging.DefaultStageQueue();
+			////stages.Enqueue(new Prompter());
 
-			//System.Console.Clear();
-			System.Console.BackgroundColor = ConsoleColor.Black;
-			System.Console.ForegroundColor = ConsoleColor.Red;
+			////System.Console.Clear();
+			//System.Console.BackgroundColor = ConsoleColor.Black;
+			//System.Console.ForegroundColor = ConsoleColor.Red;
+			System.Console.CursorTop = 20;
 			System.Console.WriteLine("Cosmos Kernel. Copyright 2008 The Cosmos Project.");
-			System.Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-			System.Console.ForegroundColor = ConsoleColor.Green;
-			System.Console.WriteLine("Now Booting...");
+			//System.Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+			//System.Console.ForegroundColor = ConsoleColor.Green;
+			//System.Console.WriteLine("Now Booting...");
 
-			System.Console.ForegroundColor = ConsoleColor.White;
-			stages.Run();
-			System.Console.WriteLine("Success.");
-			Kernel.CPU.PrintTime();
-			System.Console.Write("Testing Prompter now:" );
-			Prompter p = new Prompter();
+			//System.Console.ForegroundColor = ConsoleColor.White;
+			//stages.Run();
+			//System.Console.WriteLine("Success.");
+			//Kernel.CPU.PrintTime();
+			//System.Console.Write("Testing Prompter now:" );
+			//Prompter p = new Prompter();
 
-			System.Console.WriteLine("Done");
+			//System.Console.WriteLine("Done");
 
-			while (true)
-				;
+			//while (true)
+			//    ;
 
 
-			stages.Teardown();
+			//stages.Teardown();
 		}
 	}
 }

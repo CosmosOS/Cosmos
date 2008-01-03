@@ -18,7 +18,7 @@ namespace IL2CPU {
 		public static bool MetalMode;
 		public static bool DebugMode = true;
 		public static TargetPlatformEnum TargetPlatform = TargetPlatformEnum.Win32;
-		public const string LDParamsTemplate_NativeX86 = "-Ttext 0x800000 -Tdata 0x200000 -e Kernel_Start -o \"{0}\" \"{1}\"";
+		public const string LDParamsTemplate_NativeX86 = "-Ttext 0x400000 -Tdata 0x200000 -e Kernel_Start -o \"{0}\" \"{1}\"";
 		public const string NAsmParamsTemplate_NativeX86 = "-g -f elf -F stabs -o \"{0}\" \"{1}\"";
 		public const string FAsmParamsTemplate_Win32 = "\"{1}\" \"{0}\"";
 		

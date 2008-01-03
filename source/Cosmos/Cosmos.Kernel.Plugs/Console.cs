@@ -42,6 +42,14 @@ namespace Cosmos.Kernel.Plugs {
             TextScreen.CurrentChar = x;
         }
 
+		public static int get_CursorTop(int y) {
+			return TextScreen.CurrentLine;
+		}
+
+		public static void set_CursorTop(int y) {
+			TextScreen.CurrentLine = y;
+		}
+
 		//TODO: Console uses TextWriter - intercept and plug it instead
 		public static void Clear() {
 			TextScreen.Clear();
