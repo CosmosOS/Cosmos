@@ -26,15 +26,12 @@ namespace Cosmos.Kernel {
 		private static void ClearMemory(uint aStartAddress, uint aLength) {
 			Hardware.CPU.ZeroFill(aStartAddress, aLength);
 		}
-
+										 
 		private static void Initialize(uint aStartAddress, uint aLength) {
 			mStartAddress = aStartAddress + (4 - (aStartAddress % 4));
 			mLength = aLength;
 			mLength = (mLength / 4) * 4;
-			if ((mLength / (1024 * 1024)) > 100) {
-				mLength = 64 * 1024 * 1024;
-			}
-			Console.WriteLine("Initializing Memory");
+			mLength -= 1024 * 1024;
 			ClearMemory(aStartAddress, mLength);
 			mFirstBlock = (MemoryBlock*)aStartAddress;
 			mFirstBlock->State = MemoryBlockState.Free;
