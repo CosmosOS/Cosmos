@@ -1,4 +1,5 @@
 @rem call msbuild3_5 d:\dotnet\il2asm\repos\source\IL2CPU.sln
+cd iso
 
 @REM ----------- Compile with IL2CPU
 del output.asm
