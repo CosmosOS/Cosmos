@@ -15,26 +15,26 @@ namespace Cosmos.Kernel {
 		}
 		public static unsafe void Init() {
 			Heap.CheckInit();
-			Console.Write("Creating GDT...");
-			Hardware.CPU.CreateGDT();
-			Console.WriteLine("Done");
-			Console.Write("Initializing PIC...");
-			Hardware.PIC.Init();
-			Console.WriteLine("Done");
-			Console.Write("Initializing Serial 0...");
-			Hardware.Serial.InitSerial(0);
-			Console.WriteLine("Done");
-			Console.Write("Initializing Debug Utility...");
-			Hardware.DebugUtil.Initialize();
-			Hardware.DebugUtil.SendMessage("Logging", "Initialized!");
-			Console.WriteLine("Done");
-			Console.Write("Configuring PIT...");
-			Hardware.PIT.Initialize(Tick);
-			Console.WriteLine("Done");
-			Console.Write("Creating IDT...");
-			Kernel.Interrupts.DoTest();
-			Hardware.CPU.CreateIDT();
-			Console.WriteLine("Done");
+			//Console.Write("Creating GDT...");
+			//Hardware.CPU.CreateGDT();
+			//Console.WriteLine("Done");
+			//Console.Write("Initializing PIC...");
+			//Hardware.PIC.Init();
+			//Console.WriteLine("Done");
+			//Console.Write("Initializing Serial 0...");
+			//Hardware.Serial.InitSerial(0);
+			//Console.WriteLine("Done");
+			//Console.Write("Initializing Debug Utility...");
+			//Hardware.DebugUtil.Initialize();
+			//Hardware.DebugUtil.SendMessage("Logging", "Initialized!");
+			//Console.WriteLine("Done");
+			//Console.Write("Configuring PIT...");
+			//Hardware.PIT.Initialize(Tick);
+			//Console.WriteLine("Done");
+			//Console.Write("Creating IDT...");
+			//Kernel.Interrupts.DoTest();
+			//Hardware.CPU.CreateIDT();
+			//Console.WriteLine("Done");
 			//Keyboard.Initialize();
 			//TestATA();
 		}

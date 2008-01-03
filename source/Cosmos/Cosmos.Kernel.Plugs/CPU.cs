@@ -15,7 +15,7 @@ namespace Cosmos.Kernel.Plugs {
 		public static void CreateIDT() {
 		}
 
-		//[PlugMethod(MethodAssembler = typeof(Assemblers.ZeroFill))]
+		[PlugMethod(MethodAssembler = typeof(Assemblers.ZeroFill))]
 		// TODO: implement this using REP STOSB and REPO STOSD
 		public static unsafe void ZeroFill(uint aStartAddress, uint aLength) {
 			Console.Write("Clearing ");
@@ -23,8 +23,6 @@ namespace Cosmos.Kernel.Plugs {
 			Console.Write(" bytes at ");
 			Cosmos.Hardware.Storage.ATAOld.WriteNumber(aStartAddress, 32);
 			Console.WriteLine("");
-			System.Diagnostics.Debugger.Break();
-			//Hardware.CPU.ZeroFill(aStartAddress, aLength);
 			uint* xPtr = (uint*)aStartAddress;
 			for (uint i = 0; i < (aLength / 4); i++) {
 				xPtr[i] = 0;

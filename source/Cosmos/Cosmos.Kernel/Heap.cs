@@ -24,7 +24,13 @@ namespace Cosmos.Kernel {
 		//private const uint DefaultMaxMemory = 32 * 1024 * 1024;
 
 		private static void ClearMemory(uint aStartAddress, uint aLength) {
+			int xStart = (RTC.GetMinutes() * 60) + RTC.GetSeconds();
 			Hardware.CPU.ZeroFill(aStartAddress, aLength);
+			int xEnd = (RTC.GetMinutes() * 60) + RTC.GetSeconds();
+			int xDiff = xEnd - xStart;
+			Console.Write("Time to clear ");
+			Hardware.Storage.ATAOld.WriteNumber(xDiff, 32);
+			Console.WriteLine("");
 		}
 										 
 		private static void Initialize(uint aStartAddress, uint aLength) {
