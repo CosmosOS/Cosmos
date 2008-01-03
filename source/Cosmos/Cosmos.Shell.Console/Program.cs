@@ -19,8 +19,9 @@ namespace Cosmos.Shell.Console {
 			System.Console.WriteLine("Now Booting...");
 
 			System.Console.ForegroundColor = ConsoleColor.White;
-			stages.Run();
+			stages.Run();								  
 			System.Console.WriteLine("Success.");
+			Kernel.CPU.PrintTime();
 			System.Console.Write("Testing Prompter now:");
 			new Prompter();
 

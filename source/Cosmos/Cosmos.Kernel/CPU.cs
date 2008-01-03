@@ -35,9 +35,19 @@ namespace Cosmos.Kernel {
 			Kernel.Interrupts.DoTest();
 			Hardware.CPU.CreateIDT();
 			Console.WriteLine("Done");
-			Keyboard.Initialize ();
-			Heap.MemAlloc(1024 * 1024 * 32);
+			Keyboard.Initialize();
+
 			//TestATA();
+		}
+
+		public static void PrintTime() {
+			Console.Write("Time: ");
+			Hardware.Storage.ATAOld.WriteNumber(Hardware.RTC.GetHours(), 8);
+			Console.Write(":");
+			Hardware.Storage.ATAOld.WriteNumber(Hardware.RTC.GetMinutes(), 8);
+			Console.Write(":");
+			Hardware.Storage.ATAOld.WriteNumber(Hardware.RTC.GetSeconds(), 8);
+			Console.WriteLine("");
 		}
 
 		public static uint TickCount {
@@ -54,6 +64,6 @@ namespace Cosmos.Kernel {
 				;
 		}
 
-		
+
 	}
 }

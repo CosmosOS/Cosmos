@@ -50,6 +50,7 @@
     <Compile Include="PIC.cs" />
     <Compile Include="PIT.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RTC.cs" />
     <Compile Include="Screen\Text.cs" />
     <Compile Include="Serial.cs" />
     <Compile Include="Storage\ATA.cs" />
