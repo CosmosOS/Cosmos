@@ -31,6 +31,7 @@ namespace Cosmos.Kernel {
 			mStartAddress = aStartAddress;
 			mLength = aLength;
 			mLength = (mLength / 4) * 4;
+			Console.WriteLine("Initializing Memory");
 			ClearMemory(aStartAddress, mLength);
 			mFirstBlock = (MemoryBlock*)aStartAddress;
 			mFirstBlock->State = MemoryBlockState.Free;
