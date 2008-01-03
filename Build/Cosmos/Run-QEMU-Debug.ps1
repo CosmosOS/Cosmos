@@ -1,31 +1,16 @@
-function Pause ($Message="Press any key to continue...") {
-	Write-Host -NoNewLine $Message
-	$null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
-	Write-Host ""
-}
-
 # call msbuild3_5 d:\dotnet\il2asm\repos\source\IL2CPU.sln
 
+.\sub-compile
+.\sub-pause
+
+.\sub-MakeISO
+.\sub-pause
+
 cd iso
-
-# ----------- Compile with IL2CPU
-remove-item output.asm -ea SilentlyContinue
-..\..\..\source\il2cpu\bin\Debug\il2cpu "-in:..\..\..\source\Cosmos\Cosmos.Shell.Console\bin\Debug\Cosmos.Shell.Console.exe" "-plug:..\..\..\source\Cosmos\Cosmos.Kernel.Plugs\bin\Debug\Cosmos.Kernel.Plugs.dll" "-out:output.obj" "-platform:nativex86" "-asm:output.asm"
-remove-item files\output.obj -ea SilentlyContinue
-copy-item output.obj files\output.obj
-pause
-
-# ----------- Build ISO
-remove-item cosmos.iso -ea SilentlyContinue
-attrib files\syslinux\isolinux.bin -r
-..\..\..\Tools\mkisofs\mkisofs -R -b syslinux/isolinux.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o Cosmos.iso files
-pause
-
 # ----------- Start QEMU
 remove-item serial-debug.txt -ea SilentlyContinue
 cd ..\..\..\tools\qemu\
 #.\qemu -L . -cdrom ..\..\build\Cosmos\ISO\Cosmos.iso -boot d -hda ..\..\build\Cosmos\ISO\C-drive.img -serial "file:..\..\build\Cosmos\ISO\serial-debug.txt" -S -s
-#pause
 $qemu = resolve-path qemu.exe
 $qemuparms = '-L . -cdrom ..\..\build\Cosmos\ISO\Cosmos.iso -boot d -hda ..\..\build\Cosmos\ISO\C-drive.img -serial "file:..\..\build\Cosmos\ISO\serial-debug.txt" -no-kqemu -S -s'
 # Still failing - because its a command line exe? run under cmd.exe?
@@ -49,7 +34,8 @@ $gdbparms = '..\..\..\Build\Cosmos\ISO\output.obj --eval-command="target remote:
 $process2 = [System.Diagnostics.Process]::Start($gdb, $gdbparms);
 $process2.WaitForExit()
 
-pause
+..\sub-pause
+
 #http://www.vistax64.com/powershell/114718-how-can-i-execute-wmi-method-asynchronously.html
 #http://blogs.technet.com/industry_insiders/pages/executing-a-command-line-utility-from-powershell-and-waiting-for-it-to-finish.aspx
 #invoke-item
@@ -59,3 +45,9 @@ if(!$process2.HasExited) {
 if(!$process.HasExited) {
 	$process.Kill()
 }
+
+#PXE
+remove-item PXE\Boot\output.obj -ea SilentlyContinue
+move-item output.obj PXE\Boot\output.obj
+
+
