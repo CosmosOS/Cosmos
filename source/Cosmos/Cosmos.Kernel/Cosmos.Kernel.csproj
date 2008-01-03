@@ -71,10 +71,10 @@
     <Compile Include="FileSystem\File.cs" />
     <Compile Include="FileSystem\FileSystem2.cs" />
     <Compile Include="FileSystem\Path.cs" />
+    <Compile Include="FileSystem\TestsMatthijs.cs" />
     <Compile Include="Staging\DefaultStageQueue.cs" />
     <Compile Include="Staging\IStage.cs" />
     <Compile Include="Staging\StageQueue.cs" />
-    <Compile Include="Staging\Stages\MatthijsStage.cs" />
     <Compile Include="Staging\Stages\TestStage.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

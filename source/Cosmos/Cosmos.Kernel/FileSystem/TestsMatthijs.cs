@@ -3,23 +3,15 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
-namespace Cosmos.Kernel.Staging.Stages {
-	class MatthijsStage: StageBase {
-		public override string Name {
-			get {
-				return "Matthijs";
-			}
-		}
-
-		public override void Initialize() {
-			//TestNewATA();
-
+namespace Cosmos.Kernel.FileSystem {
+	public static class TestsMatthijs {
+		public static void DoTests() {
 		}
 
 		public static unsafe void TestNewATA() {
 			Hardware.Storage.ATA.Initialize(CPU.Sleep);
 			Hardware.Storage.ATA xDrive = new Cosmos.Hardware.Storage.ATA(0, 0);
-			FileSystem.Ext2 xExt2 = new Cosmos.Kernel.FileSystem.Ext2(xDrive);
+			Ext2 xExt2 = new Ext2(xDrive);
 			if (xExt2.Initialize()) {
 				Console.WriteLine("Ext2 Initialized");
 			} else {
@@ -73,7 +65,7 @@ namespace Cosmos.Kernel.Staging.Stages {
 			} else {
 				Console.WriteLine("Error reading");
 			}
-			FileSystem.Ext2 xExt2 = new Cosmos.Kernel.FileSystem.Ext2(xDrive);
+			Ext2 xExt2 = new Cosmos.Kernel.FileSystem.Ext2(xDrive);
 			if (xExt2.Initialize()) {
 				Console.WriteLine("Ext2 Initialized");
 			} else {
@@ -113,9 +105,6 @@ namespace Cosmos.Kernel.Staging.Stages {
 				Hardware.Storage.ATAOld.WriteNumber((uint)xItems[i].Length, 8);
 				Console.WriteLine(")");
 			}
-		}
-
-		public override void Teardown() {
 		}
 	}
 }

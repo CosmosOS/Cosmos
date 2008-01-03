@@ -8,7 +8,6 @@ namespace Cosmos.Kernel.Staging {
 		public DefaultStageQueue()
 			: base () {
 			Enqueue (new Cosmos.Kernel.Staging.Stages.TestStage ());
-			Enqueue (new MatthijsStage ());
 		}
 	}
 }

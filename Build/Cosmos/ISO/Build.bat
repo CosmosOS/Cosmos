@@ -8,7 +8,7 @@ pause
 
 @REM ----------- Build ISO
 del cosmos.iso
-attrib files\boot\grub\stage2_eltorito -r
+attrib files\syslinux\isolinux.bin -r
 ..\..\..\Tools\mkisofs\mkisofs -R -b syslinux/isolinux.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o Cosmos.iso files
 pause
 

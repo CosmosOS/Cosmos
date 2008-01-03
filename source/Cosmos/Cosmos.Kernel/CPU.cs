@@ -32,6 +32,7 @@ namespace Cosmos.Kernel {
 			Hardware.PIT.Initialize(Tick);
 			Console.WriteLine("Done");
 			Console.Write("Creating IDT...");
+			Kernel.Interrupts.DoTest();
 			Hardware.CPU.CreateIDT();
 			Console.WriteLine("Done");
 			Keyboard.Initialize ();
