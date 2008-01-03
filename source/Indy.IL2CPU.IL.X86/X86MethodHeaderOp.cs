@@ -33,6 +33,13 @@ namespace Indy.IL2CPU.IL.X86 {
 				new CPUx86.Add("edi", "0x10");
 #endif
 			new CPUx86.Move(CPUx86.Registers.EBP, CPUx86.Registers.ESP);
+			//new CPUx86.Push("0");
+			//if (!(aLabelName.Contains("Cosmos.Kernel.Serial") || aLabelName.Contains("Cosmos.Kernel.Heap"))) {
+			//    new CPUx86.Push(LdStr.GetContentsArrayName(aAssembler, aLabelName));
+			//    MethodDefinition xTempMethod = Engine.GetMethodDefinition(Engine.GetTypeDefinition("Cosmos.Kernel", "Cosmos.Kernel.Serial"), "Write", "System.Byte", "System.String");
+			//    new CPUx86.Call(Label.GenerateLabelName(xTempMethod));
+			//    Engine.QueueMethod(xTempMethod);
+			//}
 			foreach (int xLocalSize in aLocals) {
 				aAssembler.StackSizes.Push(xLocalSize);
 				for (int i = 0; i < (xLocalSize / 4); i++) {

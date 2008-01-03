@@ -24,11 +24,26 @@ namespace Cosmos.Kernel {
 		//private const uint DefaultMaxMemory = 32 * 1024 * 1024;
 
 		private static void ClearMemory(uint aStartAddress, uint aLength) {
-			Hardware.CPU.ZeroFill(aStartAddress, aLength);
+			Console.Write("Clearing ");
+			Hardware.Storage.ATAOld.WriteNumber(aLength, 32);
+			Console.Write(" bytes at ");
+			Hardware.Storage.ATAOld.WriteNumber(aStartAddress, 32);
+			Console.WriteLine("");
+			System.Diagnostics.Debugger.Break();
+			//Hardware.CPU.ZeroFill(aStartAddress, aLength);
+			uint* xPtr = (uint*)aStartAddress;
+			for (uint i = 0; i < (aLength / 4); i++) {
+				xPtr[i] = 0;
+				if (i % (256*1024) == 0) {
+					Console.Write("Cleared Megabyte ");
+					Hardware.Storage.ATAOld.WriteNumber(i / (256*1024), 16);
+					Console.WriteLine();
+				}
+			}
 		}
 
 		private static void Initialize(uint aStartAddress, uint aLength) {
-			mStartAddress = aStartAddress;
+			mStartAddress = aStartAddress + (4 - (aStartAddress % 4));
 			mLength = aLength;
 			mLength = (mLength / 4) * 4;
 			Console.WriteLine("Initializing Memory");

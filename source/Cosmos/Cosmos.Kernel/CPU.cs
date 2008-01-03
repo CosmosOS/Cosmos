@@ -28,14 +28,14 @@ namespace Cosmos.Kernel {
 			Hardware.DebugUtil.Initialize();
 			Hardware.DebugUtil.SendMessage("Logging", "Initialized!");
 			Console.WriteLine("Done");
-			Console.Write("Configuring PIT...");
-			Hardware.PIT.Initialize(Tick);
-			Console.WriteLine("Done");
-			Console.Write("Creating IDT...");
-			Kernel.Interrupts.DoTest();
-			Hardware.CPU.CreateIDT();
-			Console.WriteLine("Done");
-			Keyboard.Initialize();
+			//Console.Write("Configuring PIT...");
+			//Hardware.PIT.Initialize(Tick);
+			//Console.WriteLine("Done");
+			//Console.Write("Creating IDT...");
+			//Kernel.Interrupts.DoTest();
+			//Hardware.CPU.CreateIDT();
+			//Console.WriteLine("Done");
+			//Keyboard.Initialize();
 			//TestATA();
 		}
 

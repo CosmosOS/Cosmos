@@ -10,12 +10,11 @@ namespace Cosmos.Shell.Console {
 			//Kernel.Staging.DefaultStageQueue stages = new Cosmos.Kernel.Staging.DefaultStageQueue();
 			////stages.Enqueue(new Prompter());
 
-			////System.Console.Clear();
-			//System.Console.BackgroundColor = ConsoleColor.Black;
-			//System.Console.ForegroundColor = ConsoleColor.Red;
-			System.Console.CursorTop = 20;
+			//System.Console.Clear();
+			System.Console.BackgroundColor = ConsoleColor.Black;
+			System.Console.ForegroundColor = ConsoleColor.Red;
 			System.Console.WriteLine("Cosmos Kernel. Copyright 2008 The Cosmos Project.");
-			//System.Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+			System.Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 			//System.Console.ForegroundColor = ConsoleColor.Green;
 			//System.Console.WriteLine("Now Booting...");
 

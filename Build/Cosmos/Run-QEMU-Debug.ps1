@@ -29,8 +29,9 @@ $process = [System.Diagnostics.Process]::Start($processInfo)
 #}
 [System.Threading.Thread]::Sleep(1000)
 cd ..\gdb\bin\
+$blaat = resolve-path ..\..\..\Build\Cosmos\ISO\files\output.obj
 $gdb = resolve-path gdb.exe
-$gdbparms = '..\..\..\Build\Cosmos\ISO\output.obj --eval-command="target remote:1234" --eval-command="b _CODE_REQUESTED_BREAK_" --eval-command="c"'
+$gdbparms =  [System.String]::Concat($blaat, ' --eval-command="target remote:1234" --eval-command="b _CODE_REQUESTED_BREAK_" --eval-command="c"');
 $process2 = [System.Diagnostics.Process]::Start($gdb, $gdbparms);
 $process2.WaitForExit()
 
@@ -47,7 +48,7 @@ if(!$process.HasExited) {
 }
 
 #PXE
-remove-item PXE\Boot\output.obj -ea SilentlyContinue
-move-item output.obj PXE\Boot\output.obj
+#remove-item PXE\Boot\output.obj -ea SilentlyContinue
+#move-item output.obj PXE\Boot\output.obj
 
 
