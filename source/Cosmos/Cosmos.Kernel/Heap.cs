@@ -31,7 +31,9 @@ namespace Cosmos.Kernel {
 			mStartAddress = aStartAddress + (4 - (aStartAddress % 4));
 			mLength = aLength;
 			mLength = (mLength / 4) * 4;
-			mLength -= (1024 * 1024 * 16);
+			if ((mLength / (1024 * 1024)) > 100) {
+				mLength = 64 * 1024 * 1024;
+			}
 			Console.WriteLine("Initializing Memory");
 			ClearMemory(aStartAddress, mLength);
 			mFirstBlock = (MemoryBlock*)aStartAddress;
