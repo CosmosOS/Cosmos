@@ -36,6 +36,7 @@ namespace Cosmos.Kernel {
 			mFirstBlock->State = MemoryBlockState.Free;
 			mFirstBlock->Next = (MemoryBlock*)(aStartAddress + mLength);
 			mFirstBlock->Next->State = MemoryBlockState.EndOfMemory;
+			DebugUtil.SendMM_Init(mStartAddress, mLength);
 		}
 
 		public static void CheckInit() {

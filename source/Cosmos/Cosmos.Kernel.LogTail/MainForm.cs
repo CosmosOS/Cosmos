@@ -29,7 +29,7 @@ namespace Cosmos.Kernel.LogTail
 
         public MainForm(string file) : this()
         {
-            _file = file;
+			_file = Path.GetFullPath(file);
             string dir = Path.GetDirectoryName(_file);
             string pattern = Path.GetFileName(_file);
 

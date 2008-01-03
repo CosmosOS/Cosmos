@@ -5,7 +5,7 @@ using System.Text;
 namespace Cosmos.Hardware {
 	public class Serial: Hardware {
 		private const ushort COM1 = 0x3F8;
-        private static bool _serialInited = false;
+        private static bool _serialInited = true;
 
 		private static ushort GetSerialAddr(byte aSerialIdx) {
 			return COM1;
@@ -30,8 +30,8 @@ namespace Cosmos.Hardware {
 		}
 
 		public static void WriteSerial(byte aSerialIdx, byte aData) {
-            if (!_serialInited)
-                return;
+//            if (!_serialInited)
+//                return;
 
 			ushort xSerialAddr = GetSerialAddr(aSerialIdx);
 			while (IsSerialTransmitEmpty(xSerialAddr) == 0) {

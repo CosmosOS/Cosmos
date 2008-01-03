@@ -53,6 +53,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ErrorStrippingFileStream.cs" />
+    <Compile Include="Handlers\HeapLogHandler.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Handlers\HeapLogHandler.Designer.cs">
+      <DependentUpon>HeapLogHandler.cs</DependentUpon>
+    </Compile>
     <Compile Include="Handlers\LogHandler.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -74,6 +80,10 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Handlers\HeapLogHandler.resx">
+      <DependentUpon>HeapLogHandler.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Handlers\MessageLogHandler.resx">
       <DependentUpon>MessageLogHandler.cs</DependentUpon>
       <SubType>Designer</SubType>

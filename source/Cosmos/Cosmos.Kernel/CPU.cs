@@ -36,6 +36,7 @@ namespace Cosmos.Kernel {
 			Hardware.CPU.CreateIDT();
 			Console.WriteLine("Done");
 			Keyboard.Initialize ();
+			Heap.MemAlloc(1024 * 1024 * 32);
 			//TestATA();
 		}
 

@@ -105,6 +105,16 @@ namespace Cosmos.Kernel {
 			EndLogging();
 		}
 
+		public static void SendMM_Init(uint aStartAddr, uint aLength) {
+			StartLogging();
+			Hardware.DebugUtil.WriteSerialString("<MM_Init StartAddr=\"");
+			Hardware.DebugUtil.WriteNumber(aStartAddr, 32);
+			Hardware.DebugUtil.WriteSerialString("\" Length=\"");
+			Hardware.DebugUtil.WriteNumber(aLength, 32);
+			Hardware.DebugUtil.WriteSerialString("\"/>\r\n");
+			EndLogging();
+		}
+
 		public static void SendMM_Free(uint aStartAddr, uint aLength) {
 			StartLogging();
 			Hardware.DebugUtil.WriteSerialString("<MM_Free StartAddr=\"");
