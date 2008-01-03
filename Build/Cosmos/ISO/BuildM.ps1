@@ -20,7 +20,7 @@ pause
 # ----------- Build ISO
 remove-item cosmos.iso -ea SilentlyContinue
 attrib files\boot\grub\stage2_eltorito -r
-..\..\..\Tools\mkisofs\mkisofs -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -boot-info-table -o Cosmos.iso files
+..\..\..\Tools\mkisofs\mkisofs -R -b syslinux/isolinux.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o Cosmos.iso files
 pause
 
 # ----------- Start QEMU
