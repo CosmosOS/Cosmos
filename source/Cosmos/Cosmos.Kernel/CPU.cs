@@ -22,7 +22,7 @@ namespace Cosmos.Kernel {
 			Hardware.PIC.Init();
 			Console.WriteLine("Done");
 			Console.Write("Initializing Serial 0...");
-			//Hardware.Serial.InitSerial(0);
+			Hardware.Serial.InitSerial(0);
 			Console.WriteLine("Done");
 			Console.Write("Initializing Debug Utility...");
 			Hardware.DebugUtil.Initialize();
@@ -34,7 +34,7 @@ namespace Cosmos.Kernel {
 			Console.Write("Creating IDT...");
 			Hardware.CPU.CreateIDT();
 			Console.WriteLine("Done");
-			//Keyboard.Initialize ();
+			Keyboard.Initialize ();
 			//TestATA();
 		}
 
