@@ -65,7 +65,7 @@ namespace Cosmos.Kernel {
 
 		public static void SendError(string aModule, string aData) {
 			StartLogging();
-			Hardware.DebugUtil.WriteSerialString("<Message Type=\"Error\" Module=\"");
+			Hardware.DebugUtil.WriteSerialString("<Error Module=\"");
 			Hardware.DebugUtil.WriteSerialString(aModule);
 			Hardware.DebugUtil.WriteSerialString("\" String=\"");
 			Hardware.DebugUtil.WriteSerialString(aData);
@@ -75,9 +75,9 @@ namespace Cosmos.Kernel {
 
 		public static void SendError(string aModule, string aDescription, uint aData, byte aBits) {
 			StartLogging();
-			Hardware.DebugUtil.WriteSerialString("<Message Type=\"Error\" Module=\"");
+			Hardware.DebugUtil.WriteSerialString("<Error Module=\"");
 			Hardware.DebugUtil.WriteSerialString(aModule);
-			Hardware.DebugUtil.WriteSerialString("\" Message=\"");
+			Hardware.DebugUtil.WriteSerialString("\" String=\"");
 			Hardware.DebugUtil.WriteSerialString(aDescription);
 			Hardware.DebugUtil.WriteSerialString("\" Data=\"");
 			Hardware.DebugUtil.WriteNumber(aData, aBits);
@@ -87,7 +87,7 @@ namespace Cosmos.Kernel {
 
 		public static void SendWarning(string aModule, string aData) {
 			StartLogging();
-			Hardware.DebugUtil.WriteSerialString("<Message Type=\"Warning\" Module=\"");
+			Hardware.DebugUtil.WriteSerialString("<Warning Module=\"");
 			Hardware.DebugUtil.WriteSerialString(aModule);
 			Hardware.DebugUtil.WriteSerialString("\" String=\"");
 			Hardware.DebugUtil.WriteSerialString(aData);

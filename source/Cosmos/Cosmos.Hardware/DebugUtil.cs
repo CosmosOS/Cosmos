@@ -17,7 +17,7 @@ namespace Cosmos.Hardware {
 
 		public static void SendMessage(string aModule, string aData) {
 			StartLogging();
-			WriteSerialString("<Message Type=\"Info\" Module=\"");
+			WriteSerialString("<Message Module=\"");
 			WriteSerialString(aModule);
 			WriteSerialString("\" String=\"");
 			WriteSerialString(aData);
@@ -27,7 +27,7 @@ namespace Cosmos.Hardware {
 
 		public static void SendError(string aModule, string aData) {
 			StartLogging();
-			WriteSerialString("<Error Type=\"Info\" Module=\"");
+			WriteSerialString("<Error Module=\"");
 			WriteSerialString(aModule);
 			WriteSerialString("\" String=\"");
 			WriteSerialString(aData);
