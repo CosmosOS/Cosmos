@@ -4,11 +4,9 @@ function Pause ($Message="Press any key to continue...") {
 	Write-Host ""
 }
 
-
-"You must first run Set-ExecutionPolicy remotesigned"
-"You may also have to unblock this file using file, properties in explorer"
-
 # call msbuild3_5 d:\dotnet\il2asm\repos\source\IL2CPU.sln
+
+cd iso
 
 # ----------- Compile with IL2CPU
 remove-item output.asm -ea SilentlyContinue
