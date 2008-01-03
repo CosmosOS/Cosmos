@@ -226,10 +226,10 @@ namespace Cosmos.Hardware {
 		}
 
 		public static void WriteSerialString(string aData) {
-			//for (int i = 0; i < aData.Length; i++) {
-			//    Serial.WriteSerial(0, (byte)aData[i]);
-			//}
-			Console.Write(aData);
+			for (int i = 0; i < aData.Length; i++) {
+				Serial.WriteSerial(0, (byte)aData[i]);
+			}
+			//Console.Write(aData);
 		}
 	}
 }

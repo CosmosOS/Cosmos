@@ -29,7 +29,7 @@ namespace Cosmos.Kernel {
 			int xEnd = (RTC.GetMinutes() * 60) + RTC.GetSeconds();
 			int xDiff = xEnd - xStart;
 			Console.Write("Time to clear ");
-			Hardware.Storage.ATAOld.WriteNumber(xDiff, 32);
+			Hardware.Storage.ATAOld.WriteNumber((uint)xDiff, 32);
 			Console.WriteLine("");
 		}
 										 
