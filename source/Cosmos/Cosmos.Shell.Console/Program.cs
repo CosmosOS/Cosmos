@@ -21,9 +21,10 @@ namespace Cosmos.Shell.Console {
 			System.Console.ForegroundColor = ConsoleColor.White;
 			stages.Run();
 			System.Console.WriteLine("Success.");
+			System.Console.Write("Testing Prompter now:");
+			new Prompter();
 
-			System.Console.WriteLine("Hello World!!!");
-			//while (true) ;
+			while (true) ;
 
 
 			stages.Teardown();
