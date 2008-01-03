@@ -26,10 +26,10 @@ namespace Cosmos.Kernel.Staging.Stages {
 				Console.WriteLine("Ext2 Initialization failed!");
 			}
 			Stream xFileStream = xExt2.OpenFile(new string[] { "readme.txt" });
-			//if (xFileStream == null) {
-			//    Console.WriteLine("Couldn't read file!");
-			//    return;
-			//}
+			if (xFileStream == null) {
+				Console.WriteLine("Couldn't read file!");
+				return;
+			}
 			//Console.Write("File length = ");
 			//Hardware.Storage.ATAOld.WriteNumber((uint)xFileStream.Length, 32);
 			//Console.WriteLine(" bytes");

@@ -31,6 +31,7 @@ namespace Cosmos.Shell.Console {
             //_commands.Add(new Commands.ExitCommand(Stop)); // TODO: Fix this.
             _commands.Add(new Commands.HelpCommand(_commands));
             _commands.Add(new Commands.TypeCommand());
+			_commands.Add(new Commands.MatthijsCommand());
             
 
             while (running)
