@@ -15,7 +15,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 			new CPUx86.Xor(CPUx86.Registers.EDX, CPUx86.Registers.EDX);
 			new CPUx86.Move("ecx", "1024");
 			new CPUx86.Divide("ecx");
-			new CPUx86.Add("eax", "2");
+			new CPUx86.Add("eax", "1");
 			new CPUx86.Pushd(CPUx86.Registers.EAX);
 		}
 	}

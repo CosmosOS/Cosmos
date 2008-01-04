@@ -11,7 +11,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
 			//	Destination = aDestination;
 		}
 		//public override string ToString() {
-		//    return "rep stos " + Destinati;
+		//    return "rep stosddword ";
 		//}
 	}
 }

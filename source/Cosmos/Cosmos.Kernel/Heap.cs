@@ -24,21 +24,34 @@ namespace Cosmos.Kernel {
 		//private const uint DefaultMaxMemory = 32 * 1024 * 1024;
 
 		private static void ClearMemory(uint aStartAddress, uint aLength) {
-			int xStart = (RTC.GetMinutes() * 60) + RTC.GetSeconds();
+			//int xStart = (RTC.GetMinutes() * 60) + RTC.GetSeconds();
 			Hardware.CPU.ZeroFill(aStartAddress, aLength);
-			int xEnd = (RTC.GetMinutes() * 60) + RTC.GetSeconds();
-			int xDiff = xEnd - xStart;
-			Console.Write("Time to clear ");
-			Hardware.Storage.ATAOld.WriteNumber((uint)xDiff, 32);
-			Console.WriteLine("");
+			//int xEnd = (RTC.GetMinutes() * 60) + RTC.GetSeconds();
+			//int xDiff = xEnd - xStart;
+			//Console.Write("Time to clear ");
+			//Hardware.Storage.ATAOld.WriteNumber((uint)xDiff, 32);
+			//Console.WriteLine("");
 		}
-										 
-		private static void Initialize(uint aStartAddress, uint aLength) {
+
+		private static void Initialize(uint aStartAddress, uint aEndOfRam) {
 			mStartAddress = aStartAddress + (4 - (aStartAddress % 4));
-			mLength = aLength;
+			mLength = aEndOfRam - aStartAddress;
 			mLength = (mLength / 4) * 4;
-			mLength -= 1024 * 1024;
+			mStartAddress += 1024;
+			mStartAddress = (mStartAddress / 4) * 4;
+			mLength -= 1024;
+			Console.Write("Clearing Memory at ");
+			int xCursorLeft = Console.CursorLeft;
+			// hack: try to get this working with the full chunk or chunks of 1MB
+			//const int xBlockSize = 1024*1024;
+			//for (uint i = 0; i < (mLength / xBlockSize); i++) {
+			//    Console.CursorLeft = xCursorLeft;
+			//    Hardware.Storage.ATAOld.WriteNumber(mStartAddress + (i * xBlockSize), 32);
+			//    ClearMemory(mStartAddress + (i * xBlockSize), xBlockSize);
+			//}
+			Console.Write("Clearing Memory....");
 			ClearMemory(aStartAddress, mLength);
+			Console.WriteLine("Done");
 			mFirstBlock = (MemoryBlock*)aStartAddress;
 			mFirstBlock->State = MemoryBlockState.Free;
 			mFirstBlock->Next = (MemoryBlock*)(aStartAddress + mLength);
@@ -48,7 +61,8 @@ namespace Cosmos.Kernel {
 
 		public static void CheckInit() {
 			if (mFirstBlock == null) {
-				Initialize(Hardware.CPU.EndOfKernel + 4, (Hardware.CPU.AmountOfMemory * 1024 * 1024) - (Hardware.CPU.EndOfKernel + 4));
+				//Initialize(Hardware.CPU.EndOfKernel, (Hardware.CPU.AmountOfMemory * 1024 * 1024) - (Hardware.CPU.EndOfKernel + 4));
+				Initialize(Hardware.CPU.EndOfKernel, (Hardware.CPU.AmountOfMemory * 1024 * 1024) - 1024);
 			}
 		}
 
