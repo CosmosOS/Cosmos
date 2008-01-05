@@ -63,13 +63,18 @@ namespace Cosmos.Kernel.FileSystem {
 				if (!mFilesystem.ReadINode(mINodeNumber, out xINode)) {
 					return -1;
 				}
+				int xBytesToRead = count;
 				byte* xBuffer = (byte*)Heap.MemAlloc(mFilesystem.mBlockSize);
-				if (!mFilesystem.ReadINodeContents(&xINode, xBlock, xBuffer)) {
-					return -2;
-				}
-				uint xBufferOffset = mPosition % mFilesystem.mBlockSize;
-				for (int i = 0; i < count; i++) {
-					buffer[offset + i] = xBuffer[xBufferOffset + i];
+				while (xBytesToRead > 0) {
+					if (!mFilesystem.ReadINodeContents(&xINode, xBlock, xBuffer)) {
+						return -2;
+					}
+					uint xBufferOffset = mPosition % mFilesystem.mBlockSize;
+					for (int i = 0; i < count; i++) {
+						buffer[offset + i] = xBuffer[xBufferOffset + i];
+					}
+					xBytesToRead -= (int)(mFilesystem.mBlockSize - (mPosition % mFilesystem.mBlockSize));
+					xBlock++;
 				}
 				return count;
 			}
@@ -346,11 +351,47 @@ namespace Cosmos.Kernel.FileSystem {
 		/// </summary>
 		private bool ReadINodeContents(INode* aINode, uint aBlock, byte* aBuffer) {
 			uint xBlock;
-			if (aBlock == 0) {
-				xBlock = aINode->Block1;
-			} else {
-				Console.WriteLine("Ext2|ReadINodeContents, reading ahead of first block not yet supported!");
-				return false;
+
+			switch (aBlock) {
+				case 0:
+					xBlock = aINode->Block1;
+					break;
+				case 1:
+					xBlock = aINode->Block2;
+					break;
+				case 2:
+					xBlock = aINode->Block3;
+					break;
+				case 3:
+					xBlock = aINode->Block4;
+					break;
+				case 4:
+					xBlock = aINode->Block5;
+					break;
+				case 5:
+					xBlock = aINode->Block6;
+					break;
+				case 6:
+					xBlock = aINode->Block7;
+					break;
+				case 7:
+					xBlock = aINode->Block8;
+					break;
+				case 8:
+					xBlock = aINode->Block9;
+					break;
+				case 9:
+					xBlock = aINode->Block10;
+					break;
+				case 10:
+					xBlock = aINode->Block11;
+					break;
+				case 11:
+					xBlock = aINode->Block12;
+					break;
+				default:
+					Console.WriteLine("Ext2|ReadINodeContents, Only reading of direct blocks supported (12 logical blocks)");
+					return false;
 			}
 			uint xBase = xBlock * (mBlockSize / mBackend.BlockSize);
 			for (int i = 0; i < (mBlockSize / mBackend.BlockSize); i++) {
