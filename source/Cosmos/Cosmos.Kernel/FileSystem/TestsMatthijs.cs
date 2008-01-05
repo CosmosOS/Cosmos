@@ -22,21 +22,21 @@ namespace Cosmos.Kernel.FileSystem {
 				Console.WriteLine("Couldn't read file!");
 				return;
 			}
-			//Console.Write("File length = ");
-			//Hardware.Storage.ATAOld.WriteNumber((uint)xFileStream.Length, 32);
-			//Console.WriteLine(" bytes");
-			//byte[] xBytes = new byte[(int)xFileStream.Length];
-			//int xBytesRead = xFileStream.Read(xBytes, 0, (int)xFileStream.Length);
-			//DebugUtil.SendNumber("MatthijsStage", "Bytes Read", (uint)xBytesRead, 32);
-			//DebugUtil.SendByteStream("CPU", "Readme.txt contents", xBytes);
-			//char[] xChars = new char[xBytes.Length - 1];
-			//for (int i = 0; i < xChars.Length; i++) {
-			//    xChars[i] = (char)xBytes[i];
-			//}
-			//String s = new String(xChars);
-			//Console.Write("Contents: '");
-			//Console.Write(s);
-			//Console.WriteLine("'");
+			Console.Write("File length = ");
+			Hardware.Storage.ATAOld.WriteNumber((uint)xFileStream.Length, 32);
+			Console.WriteLine(" bytes");
+			byte[] xBytes = new byte[(int)xFileStream.Length];
+			int xBytesRead = xFileStream.Read(xBytes, 0, (int)xFileStream.Length);
+			DebugUtil.SendNumber("MatthijsStage", "Bytes Read", (uint)xBytesRead, 32);
+			DebugUtil.SendByteStream("CPU", "Readme.txt contents", xBytes);
+			char[] xChars = new char[xBytes.Length - 1];
+			for (int i = 0; i < xChars.Length; i++) {
+				xChars[i] = (char)xBytes[i];
+			}
+			String s = new String(xChars);
+			Console.Write("Contents: '");
+			Console.Write(s);
+			Console.WriteLine("'");
 			//Console.Write("Contents of root (");
 			//string[] xItems = xExt2.GetDirectoryEntries(new string[0]);
 			//Hardware.Storage.ATAOld.WriteNumber((uint)xItems.Length, 8);

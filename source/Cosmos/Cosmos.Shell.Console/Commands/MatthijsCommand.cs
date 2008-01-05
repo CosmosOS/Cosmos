@@ -17,7 +17,7 @@ namespace Cosmos.Shell.Console.Commands {
 		}
 
 		public override void Execute(string param) {
-			System.Console.WriteLine("Execute Matthijs now!");
+			Kernel.FileSystem.TestsMatthijs.TestNewATA();
 		}
 
 		public override void Help() {

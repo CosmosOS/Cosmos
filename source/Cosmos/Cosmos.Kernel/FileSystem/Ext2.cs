@@ -41,7 +41,9 @@ namespace Cosmos.Kernel.FileSystem {
 					INode xINode;
 					DebugUtil.SendNumber("Ext2", "FileStream, Length, INodeNumber", mINodeNumber, 32);
 					mFilesystem.ReadINode(mINodeNumber, out xINode);
-					return xINode.Size;
+					long xSize = xINode.Size;
+					DebugUtil.SendNumber("Ext2", "FileStream, Length, ", (uint)xSize, 32);
+					return xSize;
 				}
 			}
 
