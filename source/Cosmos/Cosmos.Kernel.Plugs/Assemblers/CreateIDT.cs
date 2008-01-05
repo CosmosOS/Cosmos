@@ -8,6 +8,7 @@ using Assembler = Indy.IL2CPU.Assembler.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using CPUNative = Indy.IL2CPU.Assembler.X86.Native;
 using HW = Cosmos.Hardware;
+using System.Collections.Generic;
 
 namespace Cosmos.Kernel.Plugs.Assemblers {
 	public class CreateIDT: AssemblerMethod {
@@ -47,7 +48,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 				//xFieldData += "((__ISR_Handler_" + i.ToString("X2") + " shr 24) and 0xFF),";
 				xFieldData += "0,0,0,0,0,0,0,0,";
 			}
-			aAssembler.DataMembers.Add(new DataMember(xFieldName, "db", xFieldData.TrimEnd(',')));
+			aAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>(aAssembler.CurrentGroup, new DataMember(xFieldName, "db", xFieldData.TrimEnd(','))));
 			for (int i = 0; i < 256; i++) {
 				new CPUx86.Move(Registers.EAX, "__ISR_Handler_" + i.ToString("X2"));
 				new CPUx86.Move("[_NATIVE_IDT_Contents + " + ((i * 8) + 0) + "]", Registers.AL);
@@ -60,7 +61,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 			}
 			xFieldName = "_NATIVE_IDT_Pointer";
 			xFieldData = "0x07FF,0,0";//(_NATIVE_IDT_Contents and 0xFFFF),(_NATIVE_IDT_Contents shr 16)";
-			aAssembler.DataMembers.Add(new DataMember(xFieldName, "dw", xFieldData));
+			aAssembler.DataMembers.Add(new KeyValuePair<string, DataMember> (aAssembler.CurrentGroup,new DataMember(xFieldName, "dw", xFieldData)));
 			new CPUx86.Move("dword [_NATIVE_IDT_Pointer + 2]", "_NATIVE_IDT_Contents");
 			#endregion
 

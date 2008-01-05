@@ -1,53 +1,44 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
 	public abstract class Assembler: Indy.IL2CPU.Assembler.Assembler {
-		public Assembler(StreamWriter aOutputWriter, bool aInMetalMode)
-			: base(aOutputWriter, aInMetalMode) {
+		public Assembler(Func<string, string> aGetFileNameForGroup, bool aInMetalMode)
+			: base(aGetFileNameForGroup, aInMetalMode) {
 		}
 
-		public Assembler(StreamWriter aOutputWriter)
-			: base(aOutputWriter) {
+		public Assembler(Func<string, string> aGetFileNameForGroup)
+			: base(aGetFileNameForGroup) {
 		}
 
-		protected override void EmitHeader() {
+		private static string GetValidGroupName(string aGroup) {
+			return aGroup;
+		}
+
+		protected override void EmitHeader(string aGroup, StreamWriter aOutputWriter) {
 			//mOutputWriter.WriteLine("format ms coff  ");
 			//mOutputWriter.WriteLine("org 0220000h    ; the best place to load our kernel to. ");
-			mOutputWriter.WriteLine("use32           ; the kernel will be run in 32-bit protected mode, ");
-			mOutputWriter.WriteLine("");
-			//			List<string> xTheLabels = new List<string>();
-			//			string mLastRealLabel = "";
-			//			foreach (IL2CPU.Assembler.Instruction x in mInstructions) {
-			//				Label xLabel = x as Label;
-			//				if (xLabel != null) {
-			//					if (!xLabel.Name.StartsWith(".")) {
-			//						mLastRealLabel = xLabel.Name;
-			//						xTheLabels.Add(xLabel.Name);
-			//					} else {
-			//						xTheLabels.Add(mLastRealLabel + "@@" + xLabel.Name.Substring(1));
-			//					}
-			//				}
-			//			}
-			//			if (xTheLabels.Count > 0) {
-			//	mOutputWriter.WriteLine("include 'export.inc'");
-			//	mOutputWriter.WriteLine("section '.edata' export data readable");
-			//	mOutputWriter.WriteLine("");
-			//	mOutputWriter.WriteLine("\texport 'OUTPUT.dll', \\");
-			//				for (int i = 0; i < xTheLabels.Count; i++) {
-			//					if (i == (xTheLabels.Count - 1)) {
-			//			mOutputWriter.WriteLine("\t\t {0},'{1}'", xTheLabels[i].Replace("@@", "."), xTheLabels[i]);
-			//					} else {
-			//				mOutputWriter.WriteLine("\t\t{0},'{1}', \\", xTheLabels[i].Replace("@@", "."), xTheLabels[i]);
-			//					}
-			// public entry as 'entry'
-			//mOutputWriter.WriteLine("\tpublic {0} as '{0}'", xTheLabels[i].Replace("@@", "."), xTheLabels[i]);
-			//				}
-			//			}
-			//mOutputWriter.WriteLine("section '.code' code readable executable");
-			mOutputWriter.WriteLine("");
+			aOutputWriter.WriteLine("use32           ; the kernel will be run in 32-bit protected mode, ");
+			aOutputWriter.WriteLine("");
+			aOutputWriter.WriteLine("%ifdef {0}", GetValidGroupName(aGroup));
+			aOutputWriter.WriteLine("%else");
+			aOutputWriter.WriteLine("  %define {0} 1", GetValidGroupName(aGroup));
+			aOutputWriter.WriteLine("");
+		}
+
+		protected override void EmitIncludes(string aGroup, StreamWriter aOutputWriter) {
+			foreach (string xInclude in (from item in Includes
+										 where String.Equals(item.Key, aGroup, StringComparison.InvariantCultureIgnoreCase)
+										 select item.Value).Distinct(StringComparer.InvariantCultureIgnoreCase)) {
+				aOutputWriter.WriteLine("%include '{0}'", xInclude);
+			}
+		}
+
+		protected override void EmitFooter(string aGroup, StreamWriter aOutputWriter) {
+			aOutputWriter.WriteLine("%endif");
 		}
 	}
 }

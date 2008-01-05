@@ -5,6 +5,7 @@ using Indy.IL2CPU.Plugs;
 using Assembler=Indy.IL2CPU.Assembler.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using CPUNative = Indy.IL2CPU.Assembler.X86.Native;
+using System.Collections.Generic;
 
 namespace Cosmos.Kernel.Plugs.Assemblers {
 	public class CreateGDT : AssemblerMethod {
@@ -17,10 +18,10 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 			    + ", 0xFF, 0xFF, 0, 0, 0, 0x99, 0xCF, 0"
 			    // Data Segment
 			    + ", 0xFF,0xFF,0,0,0,0x93,0xCF,0";
-			aAssembler.DataMembers.Add(new DataMember(xFieldName, "db", xFieldData));
+			aAssembler.DataMembers.Add(new KeyValuePair<string, DataMember> (aAssembler.CurrentGroup,new DataMember(xFieldName, "db", xFieldData)));
 			xFieldName = "_NATIVE_GDT_Pointer";
 			//xFieldData = "0x17, (_NATIVE_GDT_Contents and 0xFFFF), (_NATIVE_GDT_Contents shr 16)";
-			aAssembler.DataMembers.Add(new DataMember(xFieldName, "dw", "0x17,0,0"));
+			aAssembler.DataMembers.Add(new KeyValuePair<string, DataMember> (aAssembler.CurrentGroup,new DataMember(xFieldName, "dw", "0x17,0,0")));
 			new CPUx86.Move(Registers.EAX, "_NATIVE_GDT_Pointer");
 			new CPUx86.Move("dword [_NATIVE_GDT_Pointer + 2]", "_NATIVE_GDT_Contents");
 			new Label(".RegisterGDT");

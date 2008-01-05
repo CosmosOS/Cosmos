@@ -5,6 +5,7 @@ using Indy.IL2CPU.Assembler;
 using Mono.Cecil.Cil;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using Asm = Indy.IL2CPU.Assembler.Assembler;
+using System.Collections.Generic;
 
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Ldstr, true)]
@@ -31,8 +32,8 @@ namespace Indy.IL2CPU.IL.X86 {
 			xDataByteArray.Append("0,");
 			string xDataVal = xDataByteArray.ToString().TrimEnd(',');
 			string xDataName = (from item in aAssembler.DataMembers
-								where item.DefaultValue == xDataVal
-								select item.Name).FirstOrDefault();
+								where item.Value.DefaultValue == xDataVal
+								select item.Value.Name).FirstOrDefault();
 			if (String.IsNullOrEmpty(xDataName)) {
 				xDataName = aAssembler.GetIdentifier("StringLiteral");
 				StringBuilder xRefByteArray = new StringBuilder();
@@ -41,8 +42,8 @@ namespace Indy.IL2CPU.IL.X86 {
 				xRefByteArray.Append("0x" + (1).ToString("X") + ",");
 				xRefByteArray.Append(xDataName + "__Contents,");
 				xRefByteArray.Append("0,0,0");
-				aAssembler.DataMembers.Add(new DataMember(xDataName, "dd", xRefByteArray.ToString()));
-				aAssembler.DataMembers.Add(new DataMember(xDataName + "__Contents", "db", xDataVal));
+				aAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>(aAssembler.CurrentGroup, new DataMember(xDataName, "dd", xRefByteArray.ToString())));
+				aAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>(aAssembler.CurrentGroup,new DataMember(xDataName + "__Contents", "db", xDataVal)));
 			} else {
 				xDataName = xDataName.Substring(0, xDataName.Length - "__Contents".Length);
 			}
@@ -50,7 +51,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public override void DoAssemble() {
-			string xDataName = GetContentsArrayName(Assembler,LiteralStr);
+			string xDataName = GetContentsArrayName(Assembler, LiteralStr);
 			new Comment("String Value: " + LiteralStr);
 			new CPUx86.Move(CPUx86.Registers.EAX, xDataName);
 			new CPUx86.Pushd(CPUx86.Registers.EAX);

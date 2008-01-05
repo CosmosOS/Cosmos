@@ -21,7 +21,7 @@ namespace IL2CPU {
 		public const string LDParamsTemplate_NativeX86 = "-Ttext 0x500000 -Tdata 0x200000 -e Kernel_Start -o \"{0}\" \"{1}\"";
 		public const string NAsmParamsTemplate_NativeX86 = "-g -f elf -F stabs -o \"{0}\" \"{1}\"";
 		public const string FAsmParamsTemplate_Win32 = "\"{1}\" \"{0}\"";
-		
+
 
 		private Type win32Type = typeof(Win32OpCodeMap);
 		private Type nativeType = typeof(NativeOpCodeMap);
@@ -124,6 +124,10 @@ namespace IL2CPU {
 				Console.WriteLine("Error: No OutputFile specified!");
 				return false;
 			}
+			if (String.IsNullOrEmpty(AsmFile)) {
+				Console.WriteLine("Error: No assembler output directory specified");
+				return false;
+			}
 			return true;
 		}
 
@@ -163,26 +167,19 @@ namespace IL2CPU {
 						Console.WriteLine(aMessage);
 						Console.ResetColor();
 					};
-					bool xCleanupAsm = String.IsNullOrEmpty(AsmFile);
 					string xTestOutput = Path.GetTempFileName();
-					if (xCleanupAsm) {
-						AsmFile = Path.GetTempFileName();
-					}
 					if (TargetPlatform == TargetPlatformEnum.Win32) {
 						xTestOutput = OutputFile;
 					}
-					using (FileStream fs = new FileStream(AsmFile, FileMode.Create)) {
-						using (StreamWriter br = new StreamWriter(fs)) {
-							e.Execute(InputFile, TargetPlatform, br, MetalMode, DebugMode, BCLDir, Plugs);
-						}
-					}
+					Func<string, string> xGetFileNameForGroup = xGroup => Path.Combine(AsmFile, xGroup + ".asm");
+					e.Execute(InputFile, TargetPlatform, xGetFileNameForGroup, MetalMode, DebugMode, BCLDir, Plugs);
 					ProcessStartInfo xFasmStartInfo = new ProcessStartInfo();
 					if (TargetPlatform == TargetPlatformEnum.NativeX86) {
 						xFasmStartInfo.FileName = NasmFileName;
-						xFasmStartInfo.Arguments = String.Format(NAsmParamsTemplate_NativeX86, xTestOutput, AsmFile);
+						xFasmStartInfo.Arguments = String.Format(NAsmParamsTemplate_NativeX86, xTestOutput, xGetFileNameForGroup("main"));
 					} else {
 						xFasmStartInfo.FileName = FAsmFileName;
-						xFasmStartInfo.Arguments = String.Format(FAsmParamsTemplate_Win32, xTestOutput, AsmFile);
+						xFasmStartInfo.Arguments = String.Format(FAsmParamsTemplate_Win32, xTestOutput, xGetFileNameForGroup("main"));
 					}
 					xFasmStartInfo.UseShellExecute = false;
 					xFasmStartInfo.RedirectStandardError = false;

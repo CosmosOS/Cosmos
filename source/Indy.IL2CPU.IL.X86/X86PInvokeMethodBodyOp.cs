@@ -15,7 +15,8 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		private void MakeSureMethodIsRegistered(string aDllName, string aDllFileName, string aMethodName) {
 			ImportMember xTheMember = null;
-			foreach (ImportMember xMember in Assembler.ImportMembers) {
+			foreach (ImportMember xMember in (from item in Assembler.ImportMembers
+												  select item.Value)) {
 				if (xMember.Name == aDllName && xMember.FileName == aDllFileName) {
 					xTheMember = xMember;
 					foreach (ImportMethodMember xMethod in xMember.Methods) {
@@ -28,7 +29,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			if (xTheMember == null) {
 				xTheMember = new ImportMember(aDllName, aDllFileName);
-				Assembler.ImportMembers.Add(xTheMember);
+				Assembler.ImportMembers.Add(new KeyValuePair<string, ImportMember>(Assembler.CurrentGroup, xTheMember));
 			}
 			xTheMember.Methods.Add(new ImportMethodMember(aMethodName));
 		}

@@ -106,11 +106,11 @@ namespace Indy.IL2CPU {
 		/// <param name="aTargetPlatform">The platform to target when assembling the code.</param>
 		/// <param name="aOutput"></param>
 		/// <param name="aInMetalMode">Whether or not the output is metalmode only.</param>
-		public void Execute(string aAssembly, TargetPlatformEnum aTargetPlatform, StreamWriter aOutput, bool aInMetalMode, bool aDebugMode, string aAssemblyDir, IEnumerable<string> aPlugs) {
+		public void Execute(string aAssembly, TargetPlatformEnum aTargetPlatform, Func<string, string> aGetFileNameForGroup, bool aInMetalMode, bool aDebugMode, string aAssemblyDir, IEnumerable<string> aPlugs) {
 			mCurrent = this;
 			try {
-				if (aOutput == null) {
-					throw new ArgumentNullException("aOutput");
+				if (aGetFileNameForGroup == null) {
+					throw new ArgumentNullException("aGetFileNameForGroup");
 				}
 				mCrawledAssembly = AssemblyFactory.GetAssembly(aAssembly);
 				List<string> xSearchDirs = new List<string>(new string[] { Path.GetDirectoryName(aAssembly), aAssemblyDir });
@@ -135,12 +135,12 @@ namespace Indy.IL2CPU {
 				switch (aTargetPlatform) {
 					case TargetPlatformEnum.Win32: {
 							mMap = (OpCodeMap)Activator.CreateInstance(Type.GetType("Indy.IL2CPU.IL.X86.Win32.Win32OpCodeMap, Indy.IL2CPU.IL.X86.Win32", true));
-							mAssembler = new Assembler.X86.Win32.Assembler(aOutput, aInMetalMode);
+							mAssembler = new Assembler.X86.Win32.Assembler(aGetFileNameForGroup, aInMetalMode);
 							break;
 						}
 					case TargetPlatformEnum.NativeX86: {
 							mMap = (OpCodeMap)Activator.CreateInstance(Type.GetType("Indy.IL2CPU.IL.X86.Native.NativeOpCodeMap, Indy.IL2CPU.IL.X86.Native", true));
-							mAssembler = new Assembler.X86.Native.Assembler(aOutput, aInMetalMode);
+							mAssembler = new Assembler.X86.Native.Assembler(aGetFileNameForGroup, aInMetalMode);
 							break;
 						}
 					default:
@@ -154,6 +154,8 @@ namespace Indy.IL2CPU {
 					}
 					List<AssemblyDefinition> xAppDefs = new List<AssemblyDefinition>();
 					xAppDefs.Add(mCrawledAssembly);
+					mAssembler.MainGroup = "main";
+					mAssembler.CurrentGroup = "main";
 					for (int i = 0; i < xAppDefs.Count; i++) {
 						AssemblyDefinition xCurDef = xAppDefs[i];
 						foreach (ModuleDefinition xModDef in xCurDef.Modules) {
@@ -224,6 +226,7 @@ namespace Indy.IL2CPU {
 							} while (true);
 						}
 						// initialize the runtime engine
+						mAssembler.CurrentGroup = "main";
 						MainEntryPointOp xEntryPointOp = (MainEntryPointOp)GetOpFromType(mMap.MainEntryPointOp, null, null);
 						xEntryPointOp.Assembler = mAssembler;
 						xEntryPointOp.Enter(Assembler.Assembler.EntryPointName);
@@ -255,6 +258,7 @@ namespace Indy.IL2CPU {
 									break;
 								}
 							} while (true);
+							mAssembler.CurrentGroup = "main";
 							GenerateVMT();
 						}
 						mMap.PostProcess(mAssembler);
@@ -618,15 +622,20 @@ namespace Indy.IL2CPU {
 			return xResult;
 		}
 
+		private static string GetGroupForType(TypeReference aType) {
+			return aType.Module.Assembly.Name.Name;
+		}
+
 		private void ProcessAllStaticFields() {
 			FieldDefinition xCurrentField;
 			while ((xCurrentField = (from item in mStaticFields.Keys
 									 where !mStaticFields[item]
 									 select item).FirstOrDefault()) != null) {
+				mAssembler.CurrentGroup = GetGroupForType(xCurrentField.DeclaringType);
 				string xFieldName = xCurrentField.GetFullName();
 				OnDebugLog(LogSeverityEnum.Informational, "Processing Static Field '{0}', Constant = '{1}'({2})", xFieldName, xCurrentField.Constant, xCurrentField.Constant == null ? "**NULL**" : xCurrentField.Constant.GetType().FullName);
 				xFieldName = DataMember.GetStaticFieldName(xCurrentField);
-				if (mAssembler.DataMembers.Count(x => x.Name == xFieldName) == 0) {
+				if (mAssembler.DataMembers.Count(x => x.Value.Name == xFieldName) == 0) {
 					RegisterType(GetDefinitionFromTypeReference(xCurrentField.FieldType));
 					if (xCurrentField.HasConstant) {
 						// emit the constant, but first find out how we get it.
@@ -645,7 +654,7 @@ namespace Indy.IL2CPU {
 							if (xTheData.Length == 0) {
 								throw new Exception("Field '" + xCurrentField.ToString() + "' doesn't have a valid size!");
 							}
-							mAssembler.DataMembers.Add(new DataMember(xFieldName, "db", xTheData));
+							mAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>(mAssembler.CurrentGroup, new DataMember(xFieldName, "db", xTheData)));
 						} else {
 							int xTheSize;
 							string theType = "db";
@@ -677,7 +686,7 @@ namespace Indy.IL2CPU {
 								throw new Exception("Field '" + xCurrentField.ToString() + "' doesn't have a valid size!");
 							}
 							xTheData = xTheData.TrimEnd(',');
-							mAssembler.DataMembers.Add(new DataMember(xFieldName, theType, xTheData));
+							mAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>(mAssembler.CurrentGroup, new DataMember(xFieldName, theType, xTheData)));
 						}
 					}
 				}
@@ -690,6 +699,7 @@ namespace Indy.IL2CPU {
 			while ((xCurrentMethod = (from item in mMethods.Keys
 									  where !mMethods[item].Processed
 									  select item).FirstOrDefault()) != null) {
+				mAssembler.CurrentGroup = GetGroupForType(xCurrentMethod.DeclaringType);
 				OnDebugLog(LogSeverityEnum.Informational, "Processing method '{0}'", xCurrentMethod.GetFullName());
 				RegisterTypeRef(xCurrentMethod.DeclaringType);
 				if (xCurrentMethod.IsAbstract) {

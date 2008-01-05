@@ -5,6 +5,7 @@ using Mono.Cecil;
 using Mono.Cecil.Cil;
 using CPU = Indy.IL2CPU.Assembler.X86;
 using Instruction = Mono.Cecil.Cil.Instruction;
+using System.Collections.Generic;
 
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Ldc_I4)]
@@ -92,18 +93,17 @@ namespace Indy.IL2CPU.IL.X86 {
 			if (mOptimizedArrayFieldCode) {
 				new Comment("Optimization:");
 				string xDataMemberName = DataMember.GetStaticFieldName(mStaticField);
-				DataMember xFieldDataMember = (from item in Assembler.DataMembers
-											   where item.Name == xDataMemberName
-											   select item).FirstOrDefault();
+				var xFieldDataMember = (from item in Assembler.DataMembers
+										where item.Value.Name == xDataMemberName
+										select item).FirstOrDefault();
 				Assembler.DataMembers.Remove(xFieldDataMember);
-				xFieldDataMember = null;
 				string xTheData = BitConverter.GetBytes(Engine.RegisterTypeRef(mStaticField.FieldType)).Aggregate("", (r, b) => r + b + ",");
 				xTheData += BitConverter.GetBytes(0x80000002).Aggregate("", (r, b) => r + b + ",");
 				xTheData += BitConverter.GetBytes(mCount).Aggregate("", (r, b) => r + b + ",");
 				xTheData += BitConverter.GetBytes(mElementSize).Aggregate("", (r, b) => r + b + ",");
 				xTheData += mTokenField.InitialValue.Aggregate("", (r, b) => r + b + ",");
 				xTheData = xTheData.TrimEnd(',');
-				Assembler.DataMembers.Add(new DataMember(xDataMemberName, "db", xTheData));
+				Assembler.DataMembers.Add(new KeyValuePair<string, DataMember>(Assembler.CurrentGroup, new DataMember(xDataMemberName, "db", xTheData)));
 
 			} else {
 				new CPU.Pushd("0" + mValue.ToString("X") + "h");
