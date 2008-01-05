@@ -37,7 +37,7 @@ namespace Cosmos.Hardware {
 			IOWriteByte(DataPort2, 0x01);
             // Masks - 0 = receive all IRQ's
 			// MTW, to disable PIT, send 0x1 to DataPort1
-			IOWriteByte(DataPort1, 0x01); 
+			IOWriteByte(DataPort1, 0x00); 
 			IOWriteByte(DataPort2, 0x00);
 		}
 	}
