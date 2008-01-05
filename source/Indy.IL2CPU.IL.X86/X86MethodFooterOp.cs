@@ -30,7 +30,10 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public static void AssembleFooter(int aReturnSize, Assembler.Assembler aAssembler, MethodInformation.Variable[] aLocals, MethodInformation.Argument[] aArgs, int aTotalArgsSize) {
-			new Label(EndOfMethodLabelName);
+			new Label(EndOfMethodLabelNameNormal);
+			new CPUx86.Move("ecx", "0");
+			//new CPUx86.JumpAlways("._GENERIC_Footer");
+			new Label(EndOfMethodLabelNameException);
 			if (!aAssembler.InMetalMode) {
 				Engine.QueueMethodRef(GCImplementationRefs.DecRefCountRef);
 				foreach (MethodInformation.Variable xLocal in aLocals) {
