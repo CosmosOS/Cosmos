@@ -61,6 +61,13 @@ namespace Cosmos.Kernel.Plugs {
 
 		public static void Write(string aText) {
 			for (int i = 0; i < aText.Length; i++) {
+				if (aText[i] == '\n') {
+					TextScreen.NewLine();
+					continue;
+				}
+				if (aText[i] == '\r') {
+					continue;
+				}
 				TextScreen.WriteChar(aText[i]);
 			}
 		}

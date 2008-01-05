@@ -121,6 +121,32 @@ namespace Cosmos.Kernel {
 			AddKey(0x320000, 'M');
 			#endregion
 
+			#region digits
+			AddKey(0x1, '`');
+			AddKey(0x10000, '~');
+			AddKey(0x2, '1');
+			AddKey(0x20000, '!');
+			AddKey(0x3, '2');
+			AddKey(0x30000, '@');
+			AddKey(0x4, '3');
+			AddKey(0x40000, '#');
+			AddKey(0x5, '4');
+			AddKey(0x50000, '$');
+			AddKey(0x6, '5');
+			AddKey(0x60000, '%');
+			AddKey(0x7, '6');
+			AddKey(0x70000, '^');
+			AddKey(0x8, '7');
+			AddKey(0x80000, '&');
+			AddKey(0x9, '8');
+			AddKey(0x90000, '*');
+			AddKey(0xA, '9');
+			AddKey(0xA0000, '(');
+			AddKey(0xB, '0');
+			AddKey(0xB0000, ')');
+			
+			#endregion
+
 			#region Special
 			AddKey(0x1C, '\n');
 			AddKey(0x1C0000, '\n');

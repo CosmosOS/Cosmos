@@ -17,7 +17,7 @@ namespace Cosmos.Kernel.FileSystem {
 			} else {
 				Console.WriteLine("Ext2 Initialization failed!");
 			}
-			Stream xFileStream = xExt2.OpenFile(new string[] { "readme.txt" });
+			Stream xFileStream = xExt2.OpenFile(new string[] { "readme2.txt" });
 			if (xFileStream == null) {
 				Console.WriteLine("Couldn't read file!");
 				return;
@@ -28,7 +28,7 @@ namespace Cosmos.Kernel.FileSystem {
 			byte[] xBytes = new byte[(int)xFileStream.Length];
 			int xBytesRead = xFileStream.Read(xBytes, 0, (int)xFileStream.Length);
 			DebugUtil.SendNumber("MatthijsStage", "Bytes Read", (uint)xBytesRead, 32);
-			DebugUtil.SendByteStream("CPU", "Readme.txt contents", xBytes);
+			DebugUtil.SendByteStream("CPU", "Readme.txt2 contents", xBytes);
 			char[] xChars = new char[xBytes.Length - 1];
 			for (int i = 0; i < xChars.Length; i++) {
 				xChars[i] = (char)xBytes[i];

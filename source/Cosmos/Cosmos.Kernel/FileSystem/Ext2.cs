@@ -10,7 +10,6 @@ namespace Cosmos.Kernel.FileSystem {
 			private Ext2 mFilesystem;
 			private uint mPosition = 0;
 			public FileStream(uint aINodeNumber, Ext2 aFilesystem) {
-				DebugUtil.SendNumber("Ext2", "FileStream..ctor(aINodeNumber)", aINodeNumber, 32);
 				mINodeNumber = aINodeNumber;
 				mFilesystem = aFilesystem;
 			}
@@ -39,10 +38,8 @@ namespace Cosmos.Kernel.FileSystem {
 			public override long Length {
 				get {
 					INode xINode;
-					DebugUtil.SendNumber("Ext2", "FileStream, Length, INodeNumber", mINodeNumber, 32);
 					mFilesystem.ReadINode(mINodeNumber, out xINode);
 					long xSize = xINode.Size;
-					DebugUtil.SendNumber("Ext2", "FileStream, Length, ", (uint)xSize, 32);
 					return xSize;
 				}
 			}
@@ -56,6 +53,7 @@ namespace Cosmos.Kernel.FileSystem {
 				}
 			}
 
+			// todo: add support for reading one chunk of data which spans multiple logical blocks
 			public override int Read(byte[] buffer, int offset, int count) {
 				uint xBlock = (mPosition / mFilesystem.mBlockSize);
 				if (xBlock != 0) {

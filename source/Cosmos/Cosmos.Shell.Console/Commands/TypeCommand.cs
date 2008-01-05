@@ -26,7 +26,7 @@ namespace Cosmos.Shell.Console.Commands {
             {
                 System.Console.WriteLine("Ext2 Initialization failed!");
             }
-            byte[] xItem = xExt2.ReadFile(new string[] { param });
+			byte[] xItem = xExt2.ReadFile(new string[] { param });
             if (xItem == null)
             {
                 System.Console.WriteLine("Couldn't read file!");
