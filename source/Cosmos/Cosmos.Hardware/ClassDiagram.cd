@@ -7,8 +7,8 @@
       <FileName>CPU.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Cosmos.Hardware.DebugUtil" Collapsed="true">
-    <Position X="21" Y="0.5" Width="1.5" />
+  <Class Name="Cosmos.Hardware.DebugUtil">
+    <Position X="24.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAIAAAARQAAACAAAAACBAgAAAAAAAAFAAAACEA=</HashCode>
       <FileName>DebugUtil.cs</FileName>
@@ -70,7 +70,7 @@
       <FileName>Serial.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Cosmos.Hardware.Screen.Text" Collapsed="true">
+  <Class Name="Cosmos.Hardware.Screen.Text">
     <Position X="22.75" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAACAAAAAAAABAAAAAAAAACAAgEgAhAAAA=</HashCode>
@@ -98,8 +98,8 @@
       <FileName>Storage\Storage.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Delegate Name="Cosmos.Hardware.HandleKeyboardDelegate" Collapsed="true">
-    <Position X="21" Y="1.75" Width="1.5" />
+  <Delegate Name="Cosmos.Hardware.HandleKeyboardDelegate">
+    <Position X="21" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAA=</HashCode>
       <FileName>Keyboard.cs</FileName>
