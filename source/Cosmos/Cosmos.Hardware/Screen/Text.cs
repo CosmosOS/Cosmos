@@ -7,13 +7,15 @@ namespace Cosmos.Hardware.Screen {
 		public const int Columns = 80;
 		public const int Lines = 24;
 		public const uint VideoAddr = 0xB8000;
-        private static uint Color = 7;
+		private static byte Color = 7;
 
 		public static unsafe void Clear() {
-			for (int i = 0; i < Columns * Lines * 2; i++) {
+			for (int i = 0; i < Columns * Lines; i++) {
 				byte* xScreenPtr = (byte*)VideoAddr;
-				xScreenPtr += i;
+				xScreenPtr += i*2;
 				*xScreenPtr = 0;
+				xScreenPtr += 1;
+				*xScreenPtr = Color;
 			}
 		}
 
@@ -28,7 +30,7 @@ namespace Cosmos.Hardware.Screen {
 				byte* xScreenPtr = (byte*)(VideoAddr + (i + Lines * Columns) * 2);
 				*xScreenPtr = 0;
 				xScreenPtr += 1;
-				*xScreenPtr = 0;
+				*xScreenPtr = Color;
 			}
 		}
 
@@ -38,12 +40,11 @@ namespace Cosmos.Hardware.Screen {
 			byte xVal = (byte)aChar;
 			*xScreenPtr = (byte)(xVal & 0xFF);
 			xScreenPtr += 1;
-			*xScreenPtr = (byte)Color;
+			*xScreenPtr = Color;
 		}
 
-        public static void SetColors(ConsoleColor foreground, ConsoleColor background)
-        {
-            Color = (uint)((byte)foreground | ((byte)background << 4));
-        }
-    }
+		public static void SetColors(ConsoleColor foreground, ConsoleColor background) {
+			Color = (byte)((byte)foreground | ((byte)background << 4));
+		}
+	}
 }

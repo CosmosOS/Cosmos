@@ -46,7 +46,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			ArgumentSizes = xArgumentSizes.ToArray();
 			foreach (ParameterDefinition xParam in xMethodDef.Parameters) {
 				if (xParam.IsOut) {
-					needsCleanup = true;
+					needsCleanup = true;															   
 					break;
 				}
 			}
@@ -66,6 +66,10 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 		public void Assemble(string aMethod, int aArgumentCount) {
 			new CPUx86.Call(aMethod);
+			if (!Assembler.InMetalMode) {
+				new CPUx86.Test("ecx", "2");
+				new CPUx86.JumpIfNotEquals(MethodFooterOp.EndOfMethodLabelNameException);
+			}
 			for (int i = 0; i < aArgumentCount; i++) {
 				Assembler.StackSizes.Pop();
 			}

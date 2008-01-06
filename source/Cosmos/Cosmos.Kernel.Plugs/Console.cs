@@ -46,6 +46,14 @@ namespace Cosmos.Kernel.Plugs {
 			return TextScreen.CurrentLine;
 		}
 
+		public static int get_WindowHeight() {
+			return TextScreen.WindowHeight;
+		}
+
+		public static int get_WindowWidth() {
+			return TextScreen.WindowWidth;
+		}
+					   
 		public static void set_CursorTop(int y) {
 			TextScreen.CurrentLine = y;
 		}

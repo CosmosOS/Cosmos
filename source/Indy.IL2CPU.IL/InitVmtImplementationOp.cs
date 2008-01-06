@@ -54,8 +54,8 @@ namespace Indy.IL2CPU.IL {
 									  select item.Value).FirstOrDefault();
 			if (xDataMember != null) {
 				Assembler.DataMembers.Remove((from item in Assembler.DataMembers
-											 where item.Value == xDataMember
-											 select item).First());
+											  where item.Value == xDataMember
+											  select item).First());
 			}
 			StringBuilder xDataByteArray = new StringBuilder();
 			xDataByteArray.Append(BitConverter.GetBytes(ArrayTypeId).Aggregate("", (r, b) => r + b + ","));
@@ -67,8 +67,8 @@ namespace Indy.IL2CPU.IL {
 					xDataByteArray.Append("0,");
 				}
 			}
-			Assembler.DataMembers.Add(new KeyValuePair<string,DataMember>(Assembler.CurrentGroup, new DataMember(xTheName + "__Contents", "db", xDataByteArray.ToString().TrimEnd(','))));
-			Assembler.DataMembers.Add(new KeyValuePair<string,DataMember>(Assembler.CurrentGroup, new DataMember(xTheName, "dd", xTheName + "__Contents")));
+			Assembler.DataMembers.Add(new KeyValuePair<string, DataMember>(Assembler.CurrentGroup, new DataMember(xTheName + "__Contents", "db", xDataByteArray.ToString().TrimEnd(','))));
+			Assembler.DataMembers.Add(new KeyValuePair<string, DataMember>(Assembler.CurrentGroup, new DataMember(xTheName, "dd", xTheName + "__Contents")));
 			Pushd("0" + mTypes.Count.ToString("X") + "h");
 			Call(LoadTypeTableRef);
 			for (int i = 0; i < mTypes.Count; i++) {
@@ -119,16 +119,21 @@ namespace Indy.IL2CPU.IL {
 				}
 				string xDataValue = xDataByteArray.ToString();
 				string xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(mTypes[i].FullName) + "__MethodIndexesArray";
-				Assembler.DataMembers.Add(new KeyValuePair<string,DataMember>(Assembler.CurrentGroup, new DataMember(xDataName, "db", xDataValue.TrimEnd(','))));
+				Assembler.DataMembers.Add(new KeyValuePair<string, DataMember>(Assembler.CurrentGroup, new DataMember(xDataName, "db", xDataValue.TrimEnd(','))));
 				Pushd(xDataName);
 				xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(mTypes[i].FullName) + "__MethodAddressesArray";
-				Assembler.DataMembers.Add(new KeyValuePair<string,DataMember>(Assembler.CurrentGroup, new DataMember(xDataName, "db", xDataValue.TrimEnd(','))));
+				Assembler.DataMembers.Add(new KeyValuePair<string, DataMember>(Assembler.CurrentGroup, new DataMember(xDataName, "db", xDataValue.TrimEnd(','))));
 				Pushd(xDataName);
-				//xDataValue = Encoding.ASCII.GetBytes(mTypes[i].FullName + ", " + mTypes[i].Module.Assembly.Name.FullName).Aggregate("", (b, x) => b + x + ",") + "0";
-				//xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(mTypes[i].FullName);
-				//mAssembler.DataMembers.Add(new DataMember(xDataName, "db", xDataValue));
-				//Pushd(xDataName);
-				Pushd("0");
+				xDataByteArray.Remove(0, xDataByteArray.Length);
+				xDataByteArray.Append(BitConverter.GetBytes(ArrayTypeId).Aggregate("", (r, b) => r + b + ","));
+				xDataByteArray.Append(BitConverter.GetBytes(0x80000002 /* EmbeddedArray */).Aggregate("", (r, b) => r + b + ","));
+				xDataByteArray.Append(BitConverter.GetBytes((mTypes[i].FullName + ", " + mTypes[i].Module.Assembly.Name.FullName).Length).Aggregate("", (r, b) => r + b + ","));
+				xDataByteArray.Append(BitConverter.GetBytes((uint)2).Aggregate("", (r, b) => r + b + ","));
+				xDataByteArray.Append(Encoding.Unicode.GetBytes(mTypes[i].FullName + ", " + mTypes[i].Module.Assembly.Name.FullName).Aggregate("", (b, x) => b + x + ",") + "0");
+				xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(mTypes[i].FullName);
+				mAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>(Assembler.CurrentGroup, new DataMember(xDataName, "db", xDataByteArray.ToString())));
+				Pushd(xDataName);
+				//Pushd("0");
 				Call(SetTypeInfoRef);
 				for (int j = 0; j < xEmittedMethods.Count; j++) {
 					MethodDefinition xMethod = xEmittedMethods[j];

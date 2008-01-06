@@ -18,9 +18,20 @@ namespace Indy.IL2CPU.IL.X86 {
 			new CPUx86.Pushd(aValue);
 		}
 
+		private int xLabelId = 0;
+
 		public override void Call(MethodDefinition aMethod) {
 			Engine.QueueMethod(aMethod);
 			Call(CPU.Label.GenerateLabelName(aMethod));
+			if (!Assembler.InMetalMode) {
+				new CPUx86.Test("ecx", "2");
+				string xLabel = ".Call_Part2_" + xLabelId++.ToString();
+				new CPUx86.JumpIfEquals(xLabel);
+				new CPUx86.Call("_CODE_REQUESTED_BREAK_");
+				Engine.QueueMethod(Engine.GetMethodDefinition(Engine.GetTypeDefinitionFromReflectionType(typeof(Assembler.Assembler)), "PrintException"));
+				new CPUx86.Call(CPU.Label.GenerateLabelName(Engine.GetMethodDefinition(Engine.GetTypeDefinitionFromReflectionType(typeof(Assembler.Assembler)), "PrintException")));
+				new CPU.Label(xLabel);
+			}
 			if(!aMethod.ReturnType.ReturnType.FullName.StartsWith("System.Void")) {
 				new CPUx86.Pushd(CPUx86.Registers.EAX);
 			}

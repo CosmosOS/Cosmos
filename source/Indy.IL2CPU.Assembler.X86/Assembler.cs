@@ -15,7 +15,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
 		}
 
 		private static string GetValidGroupName(string aGroup) {
-			return aGroup;
+			return aGroup.Replace('-','_').Replace('.', '_');
 		}
 
 		protected override void EmitHeader(string aGroup, StreamWriter aOutputWriter) {

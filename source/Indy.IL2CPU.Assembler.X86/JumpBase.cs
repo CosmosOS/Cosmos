@@ -10,10 +10,10 @@ namespace Indy.IL2CPU.Assembler.X86 {
 		protected JumpBase(string aAddress) {
 			Address = aAddress;
 			if (Address.StartsWith(".")) {
-				string xPrefix = (from item in Assembler.CurrentInstance.Instructions
-								  let xTheLabel = item.Value as Label
-								  where xTheLabel != null && !xTheLabel.Name.StartsWith(".")
-								  select xTheLabel.Name).Last();
+				//string xPrefix = (from item in Assembler.CurrentInstance.Instructions
+				//                  where !Label.GetLabel(item).StartsWith(".")
+				//                  select Label.GetLabel(item)).Last();
+				string xPrefix = Label.LastFullLabel;
 				Address = xPrefix + "__DOT__" + Address.Substring(1);
 			}
 		}

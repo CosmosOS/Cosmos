@@ -24,12 +24,16 @@ namespace Indy.IL2CPU {
 			//mTypes = new VTable[aTypeCount];
 		}
 
-		public static void SetTypeInfo(int aType, int aBaseType, ref int[] aMethodIndexes, ref int[] aMethodAddresses, int aName) {
+		public static void SetTypeInfo(int aType, int aBaseType, ref int[] aMethodIndexes, ref int[] aMethodAddresses, char[] aName) {
 			mTypes[aType] = new VTable();
 			mTypes[aType].BaseTypeIdentifier = aBaseType;
 			mTypes[aType].MethodIndexes = aMethodIndexes;
 			mTypes[aType].MethodAddresses = aMethodAddresses;
 			mTypes[aType].Name = aName;
+		}
+
+		public static string GetTypeName(int aType) {
+			return new String(mTypes[aType].Name);
 		}
 
 		public static void SetMethodInfo(int aType, int aMethodIndex, int aMethodIdentifier, int aMethodAddress, char[] aName) {
@@ -50,7 +54,7 @@ namespace Indy.IL2CPU {
 
 	public struct VTable {
 		public int BaseTypeIdentifier;
-		public int Name;
+		public char[] Name;
 		public int[] MethodIndexes;
 		public int[] MethodAddresses;
 	}

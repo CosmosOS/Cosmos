@@ -139,6 +139,7 @@
     <Compile Include="CustomImplementations\System\Buffer.cs" />
     <Compile Include="CustomImplementations\System\DelegateImpl.cs" />
     <Compile Include="CustomImplementations\System\EnumImpl.cs" />
+    <Compile Include="CustomImplementations\System\ExceptionImpl.cs" />
     <Compile Include="CustomImplementations\System\MulticastDelegateImpl.cs" />
     <Compile Include="CustomImplementations\System\MulticastDelegateImplRefs.cs" />
     <Compile Include="CustomImplementations\System\EventHandlerImpl.cs" />

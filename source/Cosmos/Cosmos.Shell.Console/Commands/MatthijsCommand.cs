@@ -17,7 +17,9 @@ namespace Cosmos.Shell.Console.Commands {
 		}
 
 		public override void Execute(string param) {
-			Kernel.FileSystem.TestsMatthijs.TestNewATA();
+			//Kernel.FileSystem.TestsMatthijs.TestNewATA();
+			//System.Diagnostics.Debugger.Break();
+			throw new Exception("Hello, Error!");
 		}
 
 		public override void Help() {

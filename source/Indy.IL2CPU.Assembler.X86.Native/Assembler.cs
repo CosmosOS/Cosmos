@@ -13,8 +13,6 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
 		public Assembler(Func<string, string> aGetStreamForGroup)
 			: base(aGetStreamForGroup) {
 		}
-		
-
 
 		protected override void EmitCodeSectionHeader(string aGroup, StreamWriter aOutputWriter) {
 			base.EmitCodeSectionHeader(aGroup, aOutputWriter);

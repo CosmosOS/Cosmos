@@ -14,8 +14,10 @@ namespace Indy.IL2CPU.IL.X86 {
 		private readonly int mThisOffset;
 		private readonly int mArgumentCount;
 		private readonly int mReturnSize;
+		private readonly string mLabelName;
 		public Callvirt(Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
+			mLabelName = GetInstructionLabel(aInstruction);
 			int xThisOffSet = (from item in aMethodInfo.Locals
 							   select item.Offset + item.Size).LastOrDefault();
 			MethodReference xMethod = aInstruction.Operand as MethodReference;
@@ -52,6 +54,10 @@ namespace Indy.IL2CPU.IL.X86 {
 				new CPUx86.Pushd("0" + mMethodIdentifier.ToString("X") + "h");
 				new CPUx86.Call(CPU.Label.GenerateLabelName(VTablesImplRefs.GetMethodAddressForTypeRef));
 				new CPUx86.Call(CPUx86.Registers.EAX);
+			}
+			if (!Assembler.InMetalMode) {
+				new CPUx86.Test("ecx", "2");
+				new CPUx86.JumpIfNotEquals(MethodFooterOp.EndOfMethodLabelNameException);
 			}
 			for (int i = 0; i < mArgumentCount; i++) {
 				Assembler.StackSizes.Pop();

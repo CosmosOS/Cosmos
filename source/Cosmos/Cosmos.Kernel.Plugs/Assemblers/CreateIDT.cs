@@ -25,7 +25,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 				}
 			}
 			if (aErrorWhenNotFound) {
-				throw new Exception("Method '" + aType + "::" + aMethodName + "' not found!");
+				throw new System.Exception("Method '" + aType + "::" + aMethodName + "' not found!");
 			}
 			return null;
 		}

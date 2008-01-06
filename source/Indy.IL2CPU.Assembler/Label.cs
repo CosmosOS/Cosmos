@@ -15,16 +15,31 @@ namespace Indy.IL2CPU.Assembler {
 			}
 		}
 
+		public static string GetLabel(object aObject) {
+			Label xLabel = aObject as Label;
+			if (xLabel == null)
+				return "";
+			return xLabel.Name;
+		}
+
+		public static string LastFullLabel {
+			get;
+			private set;
+		}
+
 		public Label(string aName) {
 			mName = aName;
+			if (!aName.StartsWith(".")) {
+				LastFullLabel = aName;
+			}
 		}
 
 		public override string ToString() {
 			return Name + ":";
 		}
 
-		public Label(string aType, params string[] aParamTypes) {
-			mName = Init(aType, typeof(void).FullName, ".ctor", aParamTypes);
+		public Label(string aType, params string[] aParamTypes)
+			: this(Init(aType, typeof(void).FullName, ".ctor", aParamTypes)) {
 		}
 
 		public static string GenerateLabelName(MethodReference aMethod) {
@@ -36,16 +51,16 @@ namespace Indy.IL2CPU.Assembler {
 			return Init(aMethod.DeclaringType.FullName, aMethod.ReturnType.ReturnType.FullName, aMethod.Name, xParams.ToArray());
 		}
 
-		public Label(MethodReference aMethod) {
-			mName = GenerateLabelName(aMethod);
+		public Label(MethodReference aMethod)
+			: this(GenerateLabelName(aMethod)) {
 		}
 
-		public Label(string aType, string aMethodName, params string[] aParamTypes) {
-			mName = Init(aType, typeof(void).FullName, aMethodName, aParamTypes);
+		public Label(string aType, string aMethodName, params string[] aParamTypes)
+			: this(Init(aType, typeof(void).FullName, aMethodName, aParamTypes)) {
 		}
 
-		public Label(string aType, string aReturnType, string aMethodName, params string[] aParamTypes) {
-			mName = Init(aType, aReturnType, aMethodName, aParamTypes);
+		public Label(string aType, string aReturnType, string aMethodName, params string[] aParamTypes)
+			: this(Init(aType, aReturnType, aMethodName, aParamTypes)) {
 		}
 
 		protected static string Init(string aType, string aReturnType, string aMethodName, params string[] aParamTypes) {

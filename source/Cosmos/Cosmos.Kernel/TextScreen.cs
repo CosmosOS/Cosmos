@@ -8,6 +8,18 @@ namespace Cosmos.Kernel {
         public static int CurrentLine = 0;
         public static int CurrentChar = 0;
 
+		public static int WindowHeight {
+			get {
+				return HW.Text.Lines;
+			}
+		}
+		
+		public static int WindowWidth {
+			get {
+				return HW.Text.Columns;
+			}
+		}
+
         /// <summary>
         /// Sets the console colors.
         /// </summary>

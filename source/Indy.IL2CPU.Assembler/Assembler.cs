@@ -4,11 +4,65 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using i4o;
+using Mono.Cecil;
 
 namespace Indy.IL2CPU.Assembler {
 	public abstract class Assembler: IDisposable {
+		// TODO: When threading is being worked on, fix this to work multithreaded!
+		//public const string CurrentExceptionDataMember = "__CURRENT_EXCEPTION__";
+		public static Exception CurrentException;
+		public static void PrintException() {
+			Console.BackgroundColor = ConsoleColor.Blue;
+			Console.ForegroundColor = ConsoleColor.White;
+			string xClearLine = new String(' ', Console.WindowWidth);
+			for (int i = 0; i < Console.WindowHeight; i++) {
+				Console.Write("                                                                                ");
+			}
+			//Console.Clear();
+			System.Console.WriteLine("Cosmos Kernel. Copyright 2008 The Cosmos Project.");
+			System.Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+			Console.WriteLine("");
+			Console.WriteLine("");
+			Console.WriteLine("");
+			Console.WriteLine("");
+			Console.WriteLine("");
+			Console.WriteLine("");
+			Console.WriteLine("BSOD's Rule!");
+			Console.WriteLine("");
+			Console.Write("Unhandled error occurred: ");
+			Console.WriteLine(CurrentException.ToString());
+			Console.WriteLine("");
+			Console.WriteLine("");
+			Console.WriteLine("");
+			Console.WriteLine("");
+			Console.WriteLine("");
+			Console.WriteLine("");
+			Console.WriteLine("");
+			Console.WriteLine("");
+			Console.WriteLine("");
+			Console.WriteLine("");
+			Console.WriteLine("");
+		}
+		private static FieldDefinition mCurrentExceptionRef;
+		public static FieldDefinition CurrentExceptionRef {
+			get {
+				if (mCurrentExceptionRef == null) {
+					AssemblyDefinition xAsm = AssemblyFactory.GetAssembly(typeof(Assembler).Assembly.Location);
+					foreach (ModuleDefinition xMod in xAsm.Modules) {
+						if (xMod.Types.Contains(typeof(Assembler).FullName)) {
+							mCurrentExceptionRef = xMod.Types[typeof(Assembler).FullName].Fields.GetField("CurrentException");
+							break;
+						}
+					}
+					if (mCurrentExceptionRef == null) {
+						throw new Exception("Couldn't find CurrentException field!");
+					}
+				}
+				return mCurrentExceptionRef;
+			}
+		}
 		public const string EntryPointName = "__ENGINE_ENTRYPOINT__";
-		protected List<KeyValuePair<string, Instruction>> mInstructions = new List<KeyValuePair<string, Instruction>>();
+		protected IndexableCollection<KeyValuePair<string, Instruction>> mInstructions = new IndexableCollection<KeyValuePair<string, Instruction>>();
 		private IndexableCollection<KeyValuePair<string, DataMember>> mDataMembers = new IndexableCollection<KeyValuePair<string, DataMember>>();
 		private List<KeyValuePair<string, string>> mIncludes = new List<KeyValuePair<string, string>>();
 		private IndexableCollection<KeyValuePair<string, ImportMember>> mImportMembers = new IndexableCollection<KeyValuePair<string, ImportMember>>();
@@ -37,9 +91,10 @@ namespace Indy.IL2CPU.Assembler {
 			mGetFileNameForGroup = aGetFileNameForGroup;
 			mInMetalMode = aInMetalMode;
 			CurrentInstance = this;
+			//mInstructions.AddComplexIndexDefinition(
 		}
 
-		public List<KeyValuePair<string, Instruction>> Instructions {
+		public IndexableCollection<KeyValuePair<string, Instruction>> Instructions {
 			get {
 				return mInstructions;
 			}

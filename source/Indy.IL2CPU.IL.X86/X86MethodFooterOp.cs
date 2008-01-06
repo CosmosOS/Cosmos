@@ -35,6 +35,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			//new CPUx86.JumpAlways("._GENERIC_Footer");
 			new Label(EndOfMethodLabelNameException);
 			if (!aAssembler.InMetalMode) {
+				new CPUx86.Push("ecx");
 				Engine.QueueMethodRef(GCImplementationRefs.DecRefCountRef);
 				foreach (MethodInformation.Variable xLocal in aLocals) {
 					if (xLocal.IsReferenceType) {
@@ -48,6 +49,7 @@ namespace Indy.IL2CPU.IL.X86 {
 						new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef));
 					}
 				}
+				new CPUx86.Pop("ecx");
 			}
 			if (aReturnSize > 0) {
 				if (aReturnSize > 8) {
