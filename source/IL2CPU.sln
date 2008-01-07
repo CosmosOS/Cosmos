@@ -53,6 +53,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel.LogTail", "Co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Tools.SkypeBot", "Cosmos\Cosmos.Tools.SkypeBot\Cosmos.Tools.SkypeBot.csproj", "{B0BBD2A2-4FAA-4730-9770-ACE6D9532132}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IL2CPU", "IL2CPU", "{4070490F-A3FD-4E97-A89D-A1C96EF7BD37}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
 		SccNumberOfProjects = 27
@@ -60,6 +62,7 @@ Global
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
 		SccProjectUniqueName1 = IL2CPU\\IL2CPU.csproj
+		SccProjectTopLevelParentUniqueName1 = IL2CPU.sln
 		SccProjectName1 = IL2CPU
 		SccLocalPath1 = IL2CPU
 		SccProjectUniqueName2 = Indy.IL2CPU.IL\\Indy.IL2CPU.IL.csproj
@@ -265,5 +268,6 @@ Global
 		{7BAB58BF-E8A1-4623-B6BF-4B90A0505226} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
 		{B0BBD2A2-4FAA-4730-9770-ACE6D9532132} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
 		{28584689-B678-4863-B404-0AD46B2F2B63} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
+		{B7E87073-CFFB-4972-BA0B-DCF0C3A0C930} = {4070490F-A3FD-4E97-A89D-A1C96EF7BD37}
 	EndGlobalSection
 EndGlobal
