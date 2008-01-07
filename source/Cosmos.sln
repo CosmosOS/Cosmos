@@ -57,6 +57,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IL2CPU", "IL2CPU", "{407049
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{E16DB75B-0F1D-4813-9103-F8FB6E7BAE2A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Boots", "Boots", "{21E68B7D-F1DC-46E2-9CFA-0A7C6D77D42E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Old", "Old", "{86BD557B-49D1-4833-B1F7-D38BF21A87EA}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
 		SccNumberOfProjects = 25
@@ -71,6 +75,7 @@ Global
 		SccProjectName1 = Indy.IL2CPU.IL
 		SccLocalPath1 = Indy.IL2CPU.IL
 		SccProjectUniqueName2 = HelloWorld\\HelloWorld.csproj
+		SccProjectTopLevelParentUniqueName2 = Cosmos.sln
 		SccProjectName2 = HelloWorld
 		SccLocalPath2 = HelloWorld
 		SccProjectUniqueName3 = IL2CPUGUI\\IL2CPUGUI.csproj
@@ -94,9 +99,11 @@ Global
 		SccProjectName7 = Indy.IL2CPU.IL.X86
 		SccLocalPath7 = Indy.IL2CPU.IL.X86
 		SccProjectUniqueName8 = HelloWorldAssembler\\HelloWorldAssembler.csproj
+		SccProjectTopLevelParentUniqueName8 = Cosmos.sln
 		SccProjectName8 = HelloWorldAssembler
 		SccLocalPath8 = HelloWorldAssembler
 		SccProjectUniqueName9 = HelloWorldMetal\\HelloWorldMetal.csproj
+		SccProjectTopLevelParentUniqueName9 = Cosmos.sln
 		SccProjectName9 = HelloWorldMetal
 		SccLocalPath9 = HelloWorldMetal
 		SccProjectUniqueName10 = IL2CPU.Tests\\IL2CPU.Tests.csproj
@@ -124,6 +131,7 @@ Global
 		SccProjectName15 = Cosmos.Kernel.Boot.Glue
 		SccLocalPath15 = Cosmos.Kernel.Boot.Glue
 		SccProjectUniqueName16 = Cosmos\\Cosmos.Shell.Console\\Cosmos.Shell.Console.csproj
+		SccProjectTopLevelParentUniqueName16 = Cosmos.sln
 		SccProjectName16 = Cosmos/Cosmos.Shell.Console
 		SccLocalPath16 = Cosmos\\Cosmos.Shell.Console
 		SccProjectUniqueName17 = Cosmos\\Cosmos.Kernel\\Cosmos.Kernel.csproj
@@ -285,5 +293,10 @@ Global
 		{8D84CDE5-77A3-4E1F-B022-753E9E077926} = {4070490F-A3FD-4E97-A89D-A1C96EF7BD37}
 		{4B6F38F2-A1E7-4D79-B47D-F2F4ED68C4A1} = {4070490F-A3FD-4E97-A89D-A1C96EF7BD37}
 		{B0BBD2A2-4FAA-4730-9770-ACE6D9532132} = {E16DB75B-0F1D-4813-9103-F8FB6E7BAE2A}
+		{E4A9F8F0-D0DC-465A-A64A-FE56504D397E} = {21E68B7D-F1DC-46E2-9CFA-0A7C6D77D42E}
+		{506A31B6-40B0-4EB2-930A-9B4A6DC23AB4} = {86BD557B-49D1-4833-B1F7-D38BF21A87EA}
+		{0267F1AE-CA81-4EBD-86CA-C8E22BE9A6F1} = {86BD557B-49D1-4833-B1F7-D38BF21A87EA}
+		{E17BC1C6-3E4F-443F-804E-CB43A5610DDB} = {86BD557B-49D1-4833-B1F7-D38BF21A87EA}
+		{B57BEF6D-48D6-49DD-B4C5-893537E0EBB8} = {86BD557B-49D1-4833-B1F7-D38BF21A87EA}
 	EndGlobalSection
 EndGlobal
