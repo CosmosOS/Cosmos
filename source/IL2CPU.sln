@@ -31,10 +31,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU.IL.X86.Win32", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU.Assembler.X86.Native", "Indy.IL2CPU.Assembler.X86.Native\Indy.IL2CPU.Assembler.X86.Native.csproj", "{6597AAC6-755D-47F9-ACF4-E13F65EC5418}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cosmos-old", "Cosmos-old", "{F09F8827-415C-4A53-BE25-3ED4B963AC77}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{AF6B9223-77E8-42BB-8B56-C2E5F6B866C2}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Performance", "Tests\Performance\Performance.csproj", "{506A31B6-40B0-4EB2-930A-9B4A6DC23AB4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Shell.Console", "Cosmos\Cosmos.Shell.Console\Cosmos.Shell.Console.csproj", "{E4A9F8F0-D0DC-465A-A64A-FE56504D397E}"
@@ -117,6 +113,7 @@ Global
 		SccProjectName17 = Cosmos.Kernel.Boot
 		SccLocalPath17 = Cosmos.Kernel.Boot
 		SccProjectUniqueName18 = Cosmos.Kernel.Boot.Glue\\Cosmos.Kernel.Boot.Glue.csproj
+		SccProjectTopLevelParentUniqueName18 = IL2CPU.sln
 		SccProjectName18 = Cosmos.Kernel.Boot.Glue
 		SccLocalPath18 = Cosmos.Kernel.Boot.Glue
 		SccProjectUniqueName19 = Cosmos\\Cosmos.Shell.Console\\Cosmos.Shell.Console.csproj
@@ -267,5 +264,6 @@ Global
 		{A1F83D9F-2D44-4264-A08B-416797123018} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
 		{7BAB58BF-E8A1-4623-B6BF-4B90A0505226} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
 		{B0BBD2A2-4FAA-4730-9770-ACE6D9532132} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
+		{28584689-B678-4863-B404-0AD46B2F2B63} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
 	EndGlobalSection
 EndGlobal
