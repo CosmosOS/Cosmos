@@ -31,7 +31,7 @@ namespace Cosmos.Kernel.LinkedFormats
         /// <returns>Whether or not the code was loaded.</returns>
         public bool Load(Stream reader, long position)
         {
-            return -1;
+            return false;
         }
     }
 }
