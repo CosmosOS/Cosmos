@@ -72,6 +72,7 @@
     <Compile Include="FileSystem\FileSystem2.cs" />
     <Compile Include="FileSystem\Path.cs" />
     <Compile Include="FileSystem\TestsMatthijs.cs" />
+    <Compile Include="LinkedFormats\ELF.cs" />
     <Compile Include="Staging\DefaultStageQueue.cs" />
     <Compile Include="Staging\IStage.cs" />
     <Compile Include="Staging\StageQueue.cs" />
