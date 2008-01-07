@@ -212,18 +212,24 @@ namespace IL2CPU {
 					return 1;
 				}
 			} catch (ReflectionTypeLoadException E) {
+                Console.ForegroundColor = ConsoleColor.Red;
 				Console.WriteLine(E.ToString());
 				for (int i = 0; i < E.LoaderExceptions.Length; i++) {
 					Console.WriteLine("[{0}] {1}", i + 1, E.LoaderExceptions[i]);
 					Console.WriteLine();
 				}
+                Console.ResetColor();
 				return 2;
 			} catch (Exception E) {
+                Console.ForegroundColor = ConsoleColor.Red;
 				Console.WriteLine(E.ToString());
+                Console.ResetColor();
 				return 2;
 			}
 			Console.WriteLine("");
+            Console.ForegroundColor = ConsoleColor.Green;
 			Console.WriteLine("Completed");
+            Console.ResetColor();
 			return 0;
 		}
 	}
