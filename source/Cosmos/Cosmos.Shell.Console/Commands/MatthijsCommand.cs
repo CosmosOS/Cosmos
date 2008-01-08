@@ -20,7 +20,11 @@ namespace Cosmos.Shell.Console.Commands {
 			//Kernel.FileSystem.TestsMatthijs.TestNewATA();
 			//System.Diagnostics.Debugger.Break();
 			try {
-				throw new Exception("Hello, Error!");
+				try {
+					throw new Exception("Hello, Error!");
+				} finally {
+					System.Console.WriteLine("Finally Clause Called!");
+				}
 			} catch (Exception E){
 				System.Console.WriteLine("Error Occurred while executing Command!");
 				System.Console.Write("Details: ");

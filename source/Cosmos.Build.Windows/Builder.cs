@@ -72,7 +72,7 @@ namespace Cosmos.Build.Windows {
 
             RemoveFile(@"ISO\serial-debug.txt");
             //cd ..\..\tools\qemu\
-            Call(mCosmosPath + @"tools\qemu\qemu.exe", @"", @"-L . -cdrom ..\..\build\Cosmos\ISO\Cosmos.iso -boot d -hda ..\..\build\Cosmos\ISO\C-drive.img -serial " + "\"" + @"file:..\..\build\Cosmos\ISO\serial-debug.txt" + "\"" + " -S -s", false);
+			Call(mCosmosPath + @"tools\qemu\qemu.exe", @"-L . -cdrom ..\..\build\Cosmos\ISO\Cosmos.iso -boot d -hda ..\..\build\Cosmos\ISO\C-drive.img -serial " + "\"" + @"file:..\..\build\Cosmos\ISO\serial-debug.txt" + "\"" + " -S -s", Path.Combine(Directory.GetParent(mCosmosPath).FullName, @"tools\qemu\"), false);
 
             //# Still failing - because its a command line exe? run under cmd.exe?
             //$processInfo = new-object System.Diagnostics.ProcessStartInfo
