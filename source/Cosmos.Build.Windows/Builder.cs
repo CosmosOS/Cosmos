@@ -24,22 +24,23 @@ namespace Cosmos.Build.Windows {
             }
         }
 
-        protected void Call(string aEXEPathname, string aArgLine) {
+        protected void Call(string aEXEPathname, string aArgLine, string aWorkDir, bool aWait) {
             var xStartInfo = new ProcessStartInfo();
             xStartInfo.FileName = aEXEPathname;
             xStartInfo.Arguments = aArgLine;
-            
+            xStartInfo.WorkingDirectory = aWorkDir;
             xStartInfo.UseShellExecute = false;
             xStartInfo.RedirectStandardError = false;
             xStartInfo.RedirectStandardOutput = false;
             var xProcess = Process.Start(xStartInfo);
-			var xFasm = xProcess;
-            if (!xProcess.WaitForExit(60 * 1000) || xFasm.ExitCode != 0) {
-                //TODO: Fix
-                throw new Exception("Call failed");
-                //Console.WriteLine("Error while running FASM!");
-                //Console.Write(xProcess.StandardOutput.ReadToEnd());
-                //Console.Write(xProcess.StandardError.ReadToEnd());
+            if (aWait) {
+                if (!xProcess.WaitForExit(60 * 1000) || xProcess.ExitCode != 0) {
+                    //TODO: Fix
+                    throw new Exception("Call failed");
+                    //Console.WriteLine("Error while running FASM!");
+                    //Console.Write(xProcess.StandardOutput.ReadToEnd());
+                    //Console.Write(xProcess.StandardError.ReadToEnd());
+                }
             }
         }
 
@@ -50,30 +51,22 @@ namespace Cosmos.Build.Windows {
             RemoveFile(@"ISO\cosmos.iso");
             File.SetAttributes(mBuildPath + @"ISO\files\syslinux\isolinux.bin", FileAttributes.Normal);
 
-            
-            //cd iso
-            //..\..\..\Tools\mkisofs\mkisofs -R -b syslinux/isolinux.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o Cosmos.iso files
-            //cd ..
+            Call(mCosmosPath + @"Tools\mkisofs\mkisofs.exe", "-R -b syslinux/isolinux.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o Cosmos.iso files", mBuildPath + @"ISO\", true);
         }
 
         public void CompileIL() {
-            RemoveFile("output.asm");
-            //TODO - why call EXE? Lets call the asm directly!
-            //..\..\source\il2cpu\bin\Debug\il2cpu "-in:..\..\source\Cosmos\Cosmos.Shell.Console\bin\Debug\Cosmos.Shell.Console.exe" "-plug:..\..\source\Cosmos\Cosmos.Kernel.Plugs\bin\Debug\Cosmos.Kernel.Plugs.dll" "-out:output.obj" "-platform:nativex86" "-asm:.\asm"
+            IL2CPU.Program.Main(new string[] {@"-in:" + mCosmosPath + @"source\Cosmos\Cosmos.Shell.Console\bin\Debug\Cosmos.Shell.Console.exe"
+                , @"-plug:" + mCosmosPath + @"source\Cosmos\Cosmos.Kernel.Plugs\bin\Debug\Cosmos.Kernel.Plugs.dll"
+                , @"-out:" + mBuildPath + @"ISO\output.obj", "-platform:nativex86", @"-asm:" + mBuildPath + @"asm"});
         }
 
-        public static void Build() {
-            var xBuilder = new Builder();
-            xBuilder.CompileIL();
-            xBuilder.MakeISO();
+        public void Build() {
+            CompileIL();
+            MakeISO();
 
-            //cd iso
-            //# ----------- Start QEMU
-            //remove-item serial-debug.txt -ea SilentlyContinue
-            //cd ..\..\..\tools\qemu\
-            //#.\qemu -L . -cdrom ..\..\build\Cosmos\ISO\Cosmos.iso -boot d -hda ..\..\build\Cosmos\ISO\C-drive.img -serial "file:..\..\build\Cosmos\ISO\serial-debug.txt" -S -s
-            //$qemu = resolve-path qemu.exe
-            //$qemuparms = '-L . -cdrom ..\..\build\Cosmos\ISO\Cosmos.iso -boot d -hda ..\..\build\Cosmos\ISO\C-drive.img -serial "file:..\..\build\Cosmos\ISO\serial-debug.txt" -no-kqemu -S -s'
+            RemoveFile(@"ISO\serial-debug.txt");
+            //cd ..\..\tools\qemu\
+            Call(mCosmosPath + @"tools\qemu\qemu.exe", @"", @"-L . -cdrom ..\..\build\Cosmos\ISO\Cosmos.iso -boot d -hda ..\..\build\Cosmos\ISO\C-drive.img -serial " + "\"" + @"file:..\..\build\Cosmos\ISO\serial-debug.txt" + "\"" + " -S -s", false);
 
             //# Still failing - because its a command line exe? run under cmd.exe?
             //$processInfo = new-object System.Diagnostics.ProcessStartInfo
@@ -91,13 +84,6 @@ namespace Cosmos.Build.Windows {
             //$gdbparms =  [System.String]::Concat($blaat, ' --eval-command="target remote:1234" --eval-command="b _CODE_REQUESTED_BREAK_" --eval-command="c"');
             //$process2 = [System.Diagnostics.Process]::Start($gdb, $gdbparms);
             //$process2.WaitForExit()
-
-            //if(!$process2.HasExited) {
-            //    $process2.Kill()
-            //}
-            //if(!$process.HasExited) {
-            //    $process.Kill()
-            //}
         }
     }
 }
