@@ -7,7 +7,7 @@ namespace Cosmos.Shell.Console {
 	public class Program {
         public static void Main() {
 			var xBuilder = new Builder();
-			xBuilder.Build();
+			xBuilder.Build(Builder.Target.QEMU_GDB);
         }
         
         public static void Init() {
