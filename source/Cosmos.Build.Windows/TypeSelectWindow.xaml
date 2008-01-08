@@ -1,0 +1,8 @@
+﻿<Window x:Class="Cosmos.Build.Windows.TypeSelectWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="TypeSelectWindow" Height="300" Width="300">
+    <Grid>
+        <ListBox Margin="10,10,66,15" Name="listBox1" />
+    </Grid>
+</Window>

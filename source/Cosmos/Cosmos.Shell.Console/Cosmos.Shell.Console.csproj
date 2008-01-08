@@ -58,6 +58,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Cosmos.Build.Windows\Cosmos.Build.Windows.csproj">
+      <Project>{EF1F8912-AE8D-40B3-9857-5A2852986710}</Project>
+      <Name>Cosmos.Build.Windows</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Cosmos.Hardware\Cosmos.Hardware.csproj">
       <Project>{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}</Project>
       <Name>Cosmos.Hardware</Name>
