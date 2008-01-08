@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Cosmos.Build.Windows;
 
 namespace Cosmos.Shell.Console {
-	class Program {
-		static void Main() {
-			Kernel.CPU.Init();
+	public class Program {
+        public static void Main() {
+            Builder.Build();
+        }
+        
+        public static void Init() {
+            Kernel.CPU.Init();
 
 			Kernel.Staging.DefaultStageQueue stages = new Cosmos.Kernel.Staging.DefaultStageQueue();
 			stages.Enqueue(new Prompter());
@@ -13,7 +18,7 @@ namespace Cosmos.Shell.Console {
 			System.Console.Clear();
 			System.Console.BackgroundColor = ConsoleColor.Black;
 			System.Console.ForegroundColor = ConsoleColor.Red;
-			System.Console.WriteLine("Cosmos Kernel. Copyright 2008 The Cosmos Project.");
+			System.Console.WriteLine("Cosmos Kernel. Copyright 2007-2008 The Cosmos Project.");
 			System.Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 			System.Console.ForegroundColor = ConsoleColor.Green;
 			System.Console.WriteLine("Now Booting...");
