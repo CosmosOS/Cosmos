@@ -6,12 +6,12 @@ using Cosmos.Build.Windows;
 namespace Cosmos.Shell.Console {
 	public class Program {
         public static void Main() {
-            var xBuilder = new Builder();
-            xBuilder.Build();
+			//var xBuilder = new Builder();
+			//xBuilder.Build();
         }
         
         public static void Init() {
-            Kernel.CPU.Init();
+			Kernel.CPU.Init();
 
 			Kernel.Staging.DefaultStageQueue stages = new Cosmos.Kernel.Staging.DefaultStageQueue();
 			stages.Enqueue(new Prompter());
