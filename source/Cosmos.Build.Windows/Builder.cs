@@ -33,6 +33,7 @@ namespace Cosmos.Build.Windows {
             xStartInfo.RedirectStandardError = false;
             xStartInfo.RedirectStandardOutput = false;
             var xProcess = Process.Start(xStartInfo);
+			var xFasm = xProcess;
             if (!xProcess.WaitForExit(60 * 1000) || xFasm.ExitCode != 0) {
                 //TODO: Fix
                 throw new Exception("Call failed");

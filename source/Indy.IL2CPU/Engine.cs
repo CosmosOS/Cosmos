@@ -101,7 +101,7 @@ namespace Indy.IL2CPU {
 		/// Compiles an assembly to CPU-specific code. The entrypoint of the assembly will be 
 		/// crawled to see what is neccessary, same goes for all dependencies.
 		/// </summary>
-		/// <remarks>For now, only entrypoints without params and return code are supported!</remarks>
+		/// <remarks>For now, only entrypoints without params are supported!</remarks>
 		/// <param name="aAssembly">The assembly of which to crawl the entry-point method.</param>
 		/// <param name="aTargetPlatform">The platform to target when assembling the code.</param>
 		/// <param name="aOutput"></param>
@@ -113,6 +113,12 @@ namespace Indy.IL2CPU {
 					throw new ArgumentNullException("aGetFileNameForGroup");
 				}
 				mCrawledAssembly = AssemblyFactory.GetAssembly(aAssembly);
+				MethodDefinition xEntryPoint = mCrawledAssembly.EntryPoint;
+				TypeDefinition xEntryPointType = GetDefinitionFromTypeReference(xEntryPoint.DeclaringType);
+				xEntryPoint = xEntryPointType.Methods.GetMethod("Init", new Type[0]);
+				if (xEntryPoint == null) {
+					xEntryPoint = mCrawledAssembly.EntryPoint;
+				}
 				List<string> xSearchDirs = new List<string>(new string[] { Path.GetDirectoryName(aAssembly), aAssemblyDir });
 				xSearchDirs.AddRange((from item in aPlugs
 									  select Path.GetDirectoryName(item)).Distinct());
@@ -129,8 +135,8 @@ namespace Indy.IL2CPU {
 				((IndyAssemblyResolver)mCrawledAssembly.Resolver).AddSearchDirectory(Path.GetDirectoryName(aAssembly));
 				((IndyAssemblyResolver)mCrawledAssembly.Resolver).AddSearchDirectory(Path.GetDirectoryName(typeof(Engine).Assembly.Location));
 				((IndyAssemblyResolver)mCrawledAssembly.Resolver).RegisterAssembly(typeof(PlugMethodAttribute).Assembly.Location);
-				if (mCrawledAssembly.EntryPoint == null) {
-					throw new NotSupportedException("Libraries are not supported!");
+				if (xEntryPoint == null) {
+					throw new NotSupportedException("No EntryPoint found!");
 				}
 				switch (aTargetPlatform) {
 					case TargetPlatformEnum.Win32: {
@@ -210,7 +216,7 @@ namespace Indy.IL2CPU {
 								Index = mMethods.Count
 							});
 						}
-						mMethods.Add(mCrawledAssembly.EntryPoint, new QueuedMethodInformation() {
+						mMethods.Add(xEntryPoint, new QueuedMethodInformation() {
 							Processed = false,
 							Index = mMethods.Count
 						});
@@ -242,8 +248,8 @@ namespace Indy.IL2CPU {
 								}
 							}
 						}
-						xEntryPointOp.Call(mCrawledAssembly.EntryPoint);
-						if (mCrawledAssembly.EntryPoint.ReturnType.ReturnType.FullName.StartsWith("System.Void", StringComparison.InvariantCultureIgnoreCase)) {
+						xEntryPointOp.Call(xEntryPoint);
+						if (xEntryPoint.ReturnType.ReturnType.FullName.StartsWith("System.Void", StringComparison.InvariantCultureIgnoreCase)) {
 							xEntryPointOp.Pushd("0");
 						}
 						xEntryPointOp.Call(RuntimeEngineRefs.FinalizeApplicationRef);
