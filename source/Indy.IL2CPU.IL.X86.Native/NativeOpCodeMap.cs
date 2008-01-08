@@ -158,28 +158,6 @@ namespace Indy.IL2CPU.IL.X86.Native {
 			return xResult;
 		}
 
-		public override MethodReference GetCustomMethodImplementation_Old(string aOrigMethodName, bool aInMetalMode) {
-			switch (aOrigMethodName) {
-				case "System_Void___System_Diagnostics_Debug_WriteLineIf___System_Boolean__System_String___": {
-						return DebugImplRefs.WriteLineIfRef;
-					}
-				case "System_Void___Indy_IL2CPU_RuntimeEngine_InitializeEngine____": {
-						return RuntimeEngineImplRefs.InitializeEngineRef;
-					}
-				case "System_Void___Indy_IL2CPU_RuntimeEngine_FinalizeEngine____": {
-						return RuntimeEngineImplRefs.FinalizeEngineRef;
-					}
-				case "System_UInt32___Indy_IL2CPU_RuntimeEngine_Heap_AllocNewObject___System_UInt32___": {
-						return GetGlueMethod(Plugs.GlueMethodType.Heap_Alloc);
-					}
-				case "System_Void___Indy_IL2CPU_RuntimeEngine_Heap_Heap_Free___System_UInt32___": {
-						return GetGlueMethod(Indy.IL2CPU.Plugs.GlueMethodType.Heap_Free);
-					}
-				default:
-					return base.GetCustomMethodImplementation_Old(aOrigMethodName, aInMetalMode);
-			}
-		}
-
 		public override bool HasCustomAssembleImplementation(MethodInformation aMethodInfo, bool aInMetalMode) {
 			switch (aMethodInfo.LabelName) {
 				case "System_Byte___Indy_IL2CPU_IL_X86_CustomImplementations_System_StringImpl_GetByteFromChar___System_Char___": {

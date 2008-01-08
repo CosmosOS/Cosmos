@@ -162,19 +162,26 @@ namespace Indy.IL2CPU {
 					xAppDefs.Add(mCrawledAssembly);
 					mAssembler.MainGroup = "main";
 					mAssembler.CurrentGroup = "main";
-					for (int i = 0; i < xAppDefs.Count; i++) {
-						AssemblyDefinition xCurDef = xAppDefs[i];
-						foreach (ModuleDefinition xModDef in xCurDef.Modules) {
-							foreach (AssemblyNameReference xAssemblyNameRef in xModDef.AssemblyReferences) {
-								AssemblyDefinition xReffedAssemblyDef = mCrawledAssembly.Resolver.Resolve(xAssemblyNameRef);
-								if (xReffedAssemblyDef != null) {
-									if (!xAppDefs.Contains(xReffedAssemblyDef, new AssemblyDefinitionEqualityComparer())) {
-										xAppDefs.Add(xReffedAssemblyDef);
-									}
-								}
-							}
+					AssemblyDefinitionEqualityComparer xComparer = new AssemblyDefinitionEqualityComparer();
+					foreach (Assembly xAsm in AppDomain.CurrentDomain.GetAssemblies()) {
+						AssemblyDefinition xAssemblyDef = AssemblyFactory.GetAssembly(xAsm.Location);
+						if (!xAppDefs.Contains(xAssemblyDef)) {
+							xAppDefs.Add(xAssemblyDef);
 						}
 					}
+					//for (int i = 0; i < xAppDefs.Count; i++) {
+					//    AssemblyDefinition xCurDef = xAppDefs[i];
+					//    foreach (ModuleDefinition xModDef in xCurDef.Modules) {
+					//        foreach (AssemblyNameReference xAssemblyNameRef in xModDef.AssemblyReferences) {
+					//            AssemblyDefinition xReffedAssemblyDef = mCrawledAssembly.Resolver.Resolve(xAssemblyNameRef);
+					//            if (xReffedAssemblyDef != null) {
+					//                if (!xAppDefs.Contains(xReffedAssemblyDef, new AssemblyDefinitionEqualityComparer())) {
+					//                    xAppDefs.Add(xReffedAssemblyDef);
+					//                }
+					//            }
+					//        }
+					//    }
+					//}
 					mMap.Initialize(mAssembler, xAppDefs, xPlugDefs, t => GetDefinitionFromTypeReference(t), a => mCrawledAssembly.Resolver.Resolve(a));
 					mAssembler.DebugMode = aDebugMode;
 					foreach (Type t in typeof(Engine).Assembly.GetTypes()) {

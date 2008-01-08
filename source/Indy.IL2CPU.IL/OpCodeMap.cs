@@ -75,6 +75,9 @@ namespace Indy.IL2CPU.IL {
 		}
 
 		protected MethodDefinition GetGlueMethod(int aType) {
+			if (!mGlueMethods.ContainsKey(aType)) {
+				throw new Exception("GlueMethod " + aType + " not found!");
+			}
 			return mGlueMethods[aType];
 		}
 
