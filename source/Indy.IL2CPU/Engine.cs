@@ -791,6 +791,50 @@ namespace Indy.IL2CPU {
 										mInstructionsToSkip--;
 										continue;
 									}
+									ExceptionHandler xCurrentHandler = null;
+									foreach (ExceptionHandler xHandler in xCurrentMethod.Body.ExceptionHandlers) {
+
+										if (xHandler.TryStart != null && xHandler.TryEnd != null) {
+											if (xHandler.TryStart.Offset <= xInstruction.Offset && xHandler.TryEnd.Offset > xInstruction.Offset) {
+												if (xCurrentHandler == null) {
+													xCurrentHandler = xHandler;
+													continue;
+												}
+												if (xHandler.TryStart.Offset > xCurrentHandler.TryStart.Offset && xHandler.TryEnd.Offset < xCurrentHandler.TryEnd.Offset) {
+													// only replace if the current found handler is narrower
+													xCurrentHandler = xHandler;
+													continue;
+												}
+											}
+										}
+										if (xHandler.HandlerStart != null && xHandler.HandlerEnd != null) {
+											if (xHandler.HandlerStart.Offset <= xInstruction.Offset && xHandler.HandlerEnd.Offset > xInstruction.Offset) {
+												if (xCurrentHandler == null) {
+													xCurrentHandler = xHandler;
+													continue;
+												}
+												if (xHandler.HandlerStart.Offset > xCurrentHandler.HandlerStart.Offset && xHandler.HandlerEnd.Offset < xCurrentHandler.HandlerEnd.Offset) {
+													// only replace if the current found handler is narrower
+													xCurrentHandler = xHandler;
+													continue;
+												}
+											}
+										}
+										if (xHandler.FilterStart != null && xHandler.FilterEnd != null) {
+											if (xHandler.FilterStart.Offset <= xInstruction.Offset && xHandler.FilterEnd.Offset > xInstruction.Offset) {
+												if (xCurrentHandler == null) {
+													xCurrentHandler = xHandler;
+													continue;
+												}
+												if (xHandler.FilterStart.Offset > xCurrentHandler.FilterStart.Offset && xHandler.FilterEnd.Offset < xCurrentHandler.FilterEnd.Offset) {
+													// only replace if the current found handler is narrower
+													xCurrentHandler = xHandler;
+													continue;
+												}
+											}
+										}
+									}
+									xMethodInfo.CurrentHandler = xCurrentHandler;
 									xOp = GetOpFromType(mMap.GetOpForOpCode(xInstruction.OpCode.Code), xInstruction, xMethodInfo);
 									if ((!xOp.SupportsMetalMode) && mAssembler.InMetalMode) {
 										throw new Exception("OpCode '" + xInstruction.OpCode.Code + "' not supported in Metal mode!");

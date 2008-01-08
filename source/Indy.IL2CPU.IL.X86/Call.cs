@@ -15,6 +15,8 @@ namespace Indy.IL2CPU.IL.X86 {
 		private int? TotalArgumentSize = null;
 		private bool mIsDebugger_Break = false;
 		private int[] ArgumentSizes = new int[0];
+		private MethodInformation mMethodInfo;
+		private string mNextLabelName;
 		public Call(MethodReference aMethod)
 			: base(null, null) {
 			if (aMethod == null) {
@@ -22,6 +24,39 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			Initialize(aMethod);
 		}
+
+		public static void EmitExceptionLogic(Assembler.Assembler aAssembler, MethodInformation aMethodInfo, string aNextLabel, bool aDoTest) {
+			//if (!aAssembler.InMetalMode) {
+			if (aMethodInfo != null && aMethodInfo.LabelName == "System_Void___Cosmos_Shell_Console_Commands_MatthijsCommand_Execute___System_String___") {
+				//System.Diagnostics.Debugger.Break();
+			}
+			string xJumpTo = MethodFooterOp.EndOfMethodLabelNameException;
+			if (aMethodInfo != null && aMethodInfo.CurrentHandler != null) {
+				switch (aMethodInfo.CurrentHandler.Type) {
+					case ExceptionHandlerType.Catch: {
+							xJumpTo = Op.GetInstructionLabel(aMethodInfo.CurrentHandler.HandlerStart);
+							break;
+						}
+					case ExceptionHandlerType.Finally: {
+							xJumpTo = Op.GetInstructionLabel(aMethodInfo.CurrentHandler.HandlerStart);
+							break;
+						}
+					default: {
+							throw new Exception("ExceptionHandlerType '" + aMethodInfo.CurrentHandler.Type.ToString() + "' not supported yet!");
+						}
+				}
+			}
+			if (!aDoTest) {
+				new CPUx86.JumpAlways(xJumpTo);
+			} else {
+				new CPUx86.Test("ecx", "2");
+				new CPUx86.JumpIfNotEquals(xJumpTo);
+			}
+			//    }
+			//    new CPUx86.JumpAlways(xJumpTo);
+			//}
+		}
+
 
 		private void Initialize(MethodReference aMethod) {
 			mIsDebugger_Break = aMethod.GetFullName() == "System.Void System.Diagnostics.Debugger.Break()";
@@ -46,7 +81,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			ArgumentSizes = xArgumentSizes.ToArray();
 			foreach (ParameterDefinition xParam in xMethodDef.Parameters) {
 				if (xParam.IsOut) {
-					needsCleanup = true;															   
+					needsCleanup = true;
 					break;
 				}
 			}
@@ -62,14 +97,15 @@ namespace Indy.IL2CPU.IL.X86 {
 		public Call(Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
 			MethodReference xMethod = ((MethodReference)aInstruction.Operand);
+			mMethodInfo = aMethodInfo;
+			if (aInstruction != null && aInstruction.Next != null) {
+				mNextLabelName = GetInstructionLabel(aInstruction.Next);
+			}
 			Initialize(xMethod);
 		}
 		public void Assemble(string aMethod, int aArgumentCount) {
 			new CPUx86.Call(aMethod);
-			if (!Assembler.InMetalMode) {
-				new CPUx86.Test("ecx", "2");
-				new CPUx86.JumpIfNotEquals(MethodFooterOp.EndOfMethodLabelNameException);
-			}
+			EmitExceptionLogic(Assembler, mMethodInfo, mNextLabelName, true);
 			for (int i = 0; i < aArgumentCount; i++) {
 				Assembler.StackSizes.Pop();
 			}

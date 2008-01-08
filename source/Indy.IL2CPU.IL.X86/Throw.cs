@@ -9,8 +9,10 @@ using CPUx86 = Indy.IL2CPU.Assembler.X86;
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Throw, false)]
 	public class Throw: Op {
+		private MethodInformation mMethodInfo;
 		public Throw(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
+			mMethodInfo = aMethodInfo;
 		}
 		public override void DoAssemble() {
 			//if ((from item in Assembler.DataMembers
@@ -21,7 +23,9 @@ namespace Indy.IL2CPU.IL.X86 {
 			new CPUx86.Pop("eax");
 			new CPUx86.Move("[" + CPU.DataMember.GetStaticFieldName(CPU.Assembler.CurrentExceptionRef) + "]", "eax");
 			new CPUx86.Move("ecx", "3");
-			new CPUx86.JumpAlways(MethodFooterOp.EndOfMethodLabelNameException);
+			Call.EmitExceptionLogic(Assembler, mMethodInfo, null, false);
+			/*
+			*/
 			Assembler.StackSizes.Pop();
 		}
 	}

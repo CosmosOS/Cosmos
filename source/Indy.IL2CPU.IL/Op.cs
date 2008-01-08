@@ -29,7 +29,11 @@ namespace Indy.IL2CPU.IL {
 			if (!String.IsNullOrEmpty(mILComment)) {
 				new Comment(mILComment);
 			}
+			AssembleHeader();
 			DoAssemble();
+		}
+
+		protected virtual void AssembleHeader() {
 		}
 
 		public abstract void DoAssemble();

@@ -19,7 +19,13 @@ namespace Cosmos.Shell.Console.Commands {
 		public override void Execute(string param) {
 			//Kernel.FileSystem.TestsMatthijs.TestNewATA();
 			//System.Diagnostics.Debugger.Break();
-			throw new Exception("Hello, Error!");
+			try {
+				throw new Exception("Hello, Error!");
+			} catch (Exception E){
+				System.Console.WriteLine("Error Occurred while executing Command!");
+				System.Console.Write("Details: ");
+				System.Console.Write(E.Message);
+			}
 		}
 
 		public override void Help() {

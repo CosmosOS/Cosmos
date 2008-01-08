@@ -7,8 +7,16 @@ using Instruction = Mono.Cecil.Cil.Instruction;
 
 namespace Indy.IL2CPU.IL.X86 {
 	public abstract class Op: IL.Op {
+		private bool mNeedsExceptionPush;
 		public Op(Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
+			//if (aMethodInfo != null && aMethodInfo.LabelName == "System_Void___Cosmos_Shell_Console_Commands_MatthijsCommand_Execute___System_String___") {
+			//    System.Diagnostics.Debugger.Break();
+			//}
+			mNeedsExceptionPush = aMethodInfo != null && aMethodInfo.CurrentHandler != null;
+			if (mNeedsExceptionPush) {
+				mNeedsExceptionPush &= (aMethodInfo.CurrentHandler.HandlerStart != null && aMethodInfo.CurrentHandler.HandlerStart.Offset == aInstruction.Offset) || (aMethodInfo.CurrentHandler.FilterStart != null && aMethodInfo.CurrentHandler.FilterStart.Offset == aInstruction.Offset);
+			}
 		}
 
 		public static void Ldarg(Assembler.Assembler aAssembler, MethodInformation.Argument aArg) {
@@ -171,7 +179,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public static void Add(Assembler.Assembler aAssembler) {
-			int xSize =aAssembler.StackSizes.Pop();
+			int xSize = aAssembler.StackSizes.Pop();
 			new CPUx86.Pop("eax");
 			if (xSize == 8) {
 				new CPUx86.Add("esp", "4");
@@ -195,6 +203,14 @@ namespace Indy.IL2CPU.IL.X86 {
 				new CPUx86.Push("eax");
 				Engine.QueueMethodRef(GCImplementationRefs.IncRefCountRef);
 				new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef));
+			}
+		}
+
+		protected override void AssembleHeader() {
+			base.AssembleHeader();
+			if (mNeedsExceptionPush) {
+				new CPUx86.Push(DataMember.GetStaticFieldName(IL2CPU.Assembler.Assembler.CurrentExceptionRef));
+				Assembler.StackSizes.Push(4);
 			}
 		}
 	}

@@ -42,6 +42,7 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
 				aOutputWriter.WriteLine("				 xchg bx, bx");
 				aOutputWriter.WriteLine("				 call " + EntryPointName);
 				aOutputWriter.WriteLine("			.loop:");
+				aOutputWriter.WriteLine("				 cli");
 				aOutputWriter.WriteLine("				 hlt");
 				aOutputWriter.WriteLine("				 jmp .loop");
 				aOutputWriter.WriteLine("                 ");

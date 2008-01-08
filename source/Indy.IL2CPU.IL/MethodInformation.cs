@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Mono.Cecil;
+using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL {
 	// TODO: abstract this one out to a X86 specific one
@@ -64,6 +65,10 @@ namespace Indy.IL2CPU.IL {
 			MethodDefinition = aMethodDef;
 		}
 
+		/// <summary>
+		/// This variable is only updated when the MethodInformation instance is supplied by the Engine.ProcessAllMethods method
+		/// </summary>
+		public ExceptionHandler CurrentHandler;
 		public readonly MethodDefinition MethodDefinition;
 		public readonly string LabelName;
 		public readonly Variable[] Locals;
