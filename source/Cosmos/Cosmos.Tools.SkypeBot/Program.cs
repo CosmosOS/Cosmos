@@ -15,7 +15,7 @@ namespace Cosmos.Tools.SkypeBot
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            SkypeBot b = new SkypeBot();
+            SkypeBot b = new ScribeSkypeBot(SkypeBot.Cosmos_Dev);
             Application.Run(new MainForm());
         }
     }
