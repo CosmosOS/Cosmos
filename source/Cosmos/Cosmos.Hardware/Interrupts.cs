@@ -39,7 +39,6 @@ namespace Cosmos.Hardware {
 
 		public unsafe static void HandleInterrupt_Default(InterruptContext* aContext) {
 			Console.Write("Interrupt ");
-			System.Diagnostics.Debugger.Break();
 			WriteNumber(aContext->Interrupt, 32);
 			Console.WriteLine("");
 			DebugUtil.LogInterruptOccurred(aContext);

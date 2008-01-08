@@ -24,6 +24,8 @@ namespace Cosmos.Shell.Console.Commands {
 			} catch (Exception E){
 				System.Console.WriteLine("Error Occurred while executing Command!");
 				System.Console.Write("Details: ");
+				System.Diagnostics.Debugger.Break();
+				string xMessage = E.Message;
 				System.Console.Write(E.Message);
 			}
 		}

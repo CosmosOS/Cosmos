@@ -6,8 +6,8 @@ using Cosmos.Build.Windows;
 namespace Cosmos.Shell.Console {
 	public class Program {
         public static void Main() {
-			//var xBuilder = new Builder();
-			//xBuilder.Build();
+			var xBuilder = new Builder();
+			xBuilder.Build();
         }
         
         public static void Init() {

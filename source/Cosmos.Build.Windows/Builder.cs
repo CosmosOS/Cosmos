@@ -10,7 +10,7 @@ namespace Cosmos.Build.Windows {
     //[IL2CPU.Ignore]
     public class Builder {
         //TODO: Fix this - config file? Package format?
-        protected const string mCosmosPath = @"S:\Source\IL2CPU\";
+		protected const string mCosmosPath = @"D:\dotnet\IL2ASM\repos";
         protected string mBuildPath;
 
         public Builder() {

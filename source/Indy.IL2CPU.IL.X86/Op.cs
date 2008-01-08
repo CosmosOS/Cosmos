@@ -209,7 +209,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		protected override void AssembleHeader() {
 			base.AssembleHeader();
 			if (mNeedsExceptionPush) {
-				new CPUx86.Push(DataMember.GetStaticFieldName(IL2CPU.Assembler.Assembler.CurrentExceptionRef));
+				new CPUx86.Push("dword [" + DataMember.GetStaticFieldName(IL2CPU.Assembler.Assembler.CurrentExceptionRef) + "]");
 				Assembler.StackSizes.Push(4);
 			}
 		}
