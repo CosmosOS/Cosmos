@@ -10,7 +10,7 @@ namespace Cosmos.Build.Windows {
     //[IL2CPU.Ignore]
     public class Builder {
         //TODO: Fix this - config file? Package format?
-		protected const string mCosmosPath = @"D:\dotnet\IL2ASM\repos\";
+		protected const string mCosmosPath = @"s:\source\il2cpu\";
         protected string mBuildPath;
 
         public Builder() {
@@ -54,42 +54,28 @@ namespace Cosmos.Build.Windows {
             Call(mCosmosPath + @"Tools\mkisofs\mkisofs.exe", "-R -b syslinux/isolinux.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o Cosmos.iso files", mBuildPath + @"ISO\", true);
         }
 
-        public void CompileIL() {
+        public void Compile() {
             IL2CPU.Program.Main(new string[] {@"-in:" + mCosmosPath + @"source\Cosmos\Cosmos.Shell.Console\bin\Debug\Cosmos.Shell.Console.exe"
                 , @"-plug:" + mCosmosPath + @"source\Cosmos\Cosmos.Kernel.Plugs\bin\Debug\Cosmos.Kernel.Plugs.dll"
                 , @"-out:" + mBuildPath + @"ISO\output.obj", "-platform:nativex86", @"-asm:" + mBuildPath + @"asm"});
+            Call(mCosmosPath + @"Tools\nasm\nasm.exe", String.Format("-g -f elf -F stabs -o \"{0}\" \"{1}\"", mBuildPath + @"ISO\output.obj-tmp", mBuildPath + @"asm\main.asm"), mBuildPath, true);
+            Call(mCosmosPath + @"Tools\BinUtils-NativeX86\ld.exe", String.Format("-Ttext 0x500000 -Tdata 0x200000 -e Kernel_Start -o \"{0}\" \"{1}\"", mBuildPath + @"ISO\output.obj", mBuildPath + @"ISO\output.obj-tmp"), mBuildPath, true);
         }
 
 		public void BuildKernel() {
-			Call(mCosmosPath + @"Tools\nasm\nasm.exe", String.Format("-g -f elf -F stabs -o \"{0}\" \"{1}\"", mBuildPath + @"ISO\output.obj-tmp", mBuildPath + @"asm\main.asm"), mBuildPath, true);
-			Call(mCosmosPath + @"Tools\BinUtils-NativeX86\ld.exe", String.Format("-Ttext 0x500000 -Tdata 0x200000 -e Kernel_Start -o \"{0}\" \"{1}\"", mBuildPath + @"ISO\output.obj", mBuildPath + @"ISO\output.obj-tmp"), mBuildPath, true);
 		}
 
         public void Build() {
-            CompileIL();
-			BuildKernel();
+            Compile();
             MakeISO();
 
             RemoveFile(@"ISO\serial-debug.txt");
-            //cd ..\..\tools\qemu\
-			Call(mCosmosPath + @"tools\qemu\qemu.exe", @"-L . -cdrom ..\..\build\Cosmos\ISO\Cosmos.iso -boot d -hda ..\..\build\Cosmos\ISO\C-drive.img -serial " + "\"" + @"file:..\..\build\Cosmos\ISO\serial-debug.txt" + "\"" + " -S -s", Path.Combine(Directory.GetParent(mCosmosPath).FullName, @"tools\qemu\"), false);
+            //Call(mCosmosPath + @"tools\qemu\qemu.exe", @"-L . -cdrom ..\..\build\Cosmos\ISO\Cosmos.iso -boot d -hda ..\..\build\Cosmos\ISO\C-drive.img -serial " + "\"" + @"file:..\..\build\Cosmos\ISO\serial-debug.txt" + "\"" + " -S -s", Path.Combine(Directory.GetParent(mCosmosPath).FullName, @"tools\qemu\"), false);
+            Call(mCosmosPath + @"tools\qemu\qemu.exe", @"-L . -cdrom ..\..\build\Cosmos\ISO\Cosmos.iso -boot d -hda ..\..\build\Cosmos\ISO\C-drive.img -serial " + "\"" + @"file:..\..\build\Cosmos\ISO\serial-debug.txt" + "\"" + " -S -s", mCosmosPath + @"tools\qemu\", false);
 
-            //# Still failing - because its a command line exe? run under cmd.exe?
-            //$processInfo = new-object System.Diagnostics.ProcessStartInfo
-            //$processInfo.FileName = $qemu
-            //$processInfo.WorkingDirectory = [System.IO.Path]::GetDirectoryName($qemu);
-            //$processInfo.Arguments = $qemuparms;
-            //$processInfo.UseShellExecute = $False
-            //$processInfo.RedirectStandardOutput = $False
-            //$processInfo.RedirectStandardError = $False
-            //$process = [System.Diagnostics.Process]::Start($processInfo)
-            //[System.Threading.Thread]::Sleep(1000)
-            //cd ..\gdb\bin\
-            //$blaat = resolve-path ..\..\..\Build\Cosmos\ISO\files\output.obj
-            //$gdb = resolve-path gdb.exe
-            //$gdbparms =  [System.String]::Concat($blaat, ' --eval-command="target remote:1234" --eval-command="b _CODE_REQUESTED_BREAK_" --eval-command="c"');
-            //$process2 = [System.Diagnostics.Process]::Start($gdb, $gdbparms);
-            //$process2.WaitForExit()
+            Call(mCosmosPath + @"tools\gdb\bin\gdb.exe"
+                , mBuildPath + @"ISO\files\output.obj" + " --eval-command=\"target remote:1234\" --eval-command=\"b _CODE_REQUESTED_BREAK_\" --eval-command=\"c\""
+                , mCosmosPath + @"tools\qemu\", true);
         }
     }
 }
