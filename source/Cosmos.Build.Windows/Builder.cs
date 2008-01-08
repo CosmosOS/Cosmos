@@ -10,7 +10,7 @@ namespace Cosmos.Build.Windows {
     //[IL2CPU.Ignore]
     public class Builder {
         //TODO: Fix this - config file? Package format?
-		protected const string mCosmosPath = @"D:\dotnet\IL2ASM\repos";
+		protected const string mCosmosPath = @"D:\dotnet\IL2ASM\repos\";
         protected string mBuildPath;
 
         public Builder() {
@@ -46,7 +46,7 @@ namespace Cosmos.Build.Windows {
 
         protected void MakeISO() {
             RemoveFile(@"ISO\files\output.obj");
-            File.Move(mBuildPath + @"output.obj", mBuildPath + @"ISO\files\");
+            File.Move(mBuildPath + @"ISO\output.obj", mBuildPath + @"ISO\files\output.obj");
 
             RemoveFile(@"ISO\cosmos.iso");
             File.SetAttributes(mBuildPath + @"ISO\files\syslinux\isolinux.bin", FileAttributes.Normal);
@@ -60,8 +60,14 @@ namespace Cosmos.Build.Windows {
                 , @"-out:" + mBuildPath + @"ISO\output.obj", "-platform:nativex86", @"-asm:" + mBuildPath + @"asm"});
         }
 
+		public void BuildKernel() {
+			Call(mCosmosPath + @"Tools\nasm\nasm.exe", String.Format("-g -f elf -F stabs -o \"{0}\" \"{1}\"", mBuildPath + @"ISO\output.obj-tmp", mBuildPath + @"asm\main.asm"), mBuildPath, true);
+			Call(mCosmosPath + @"Tools\BinUtils-NativeX86\ld.exe", String.Format("-Ttext 0x500000 -Tdata 0x200000 -e Kernel_Start -o \"{0}\" \"{1}\"", mBuildPath + @"ISO\output.obj", mBuildPath + @"ISO\output.obj-tmp"), mBuildPath, true);
+		}
+
         public void Build() {
             CompileIL();
+			BuildKernel();
             MakeISO();
 
             RemoveFile(@"ISO\serial-debug.txt");
