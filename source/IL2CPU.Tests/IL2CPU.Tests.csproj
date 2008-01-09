@@ -16,6 +16,8 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>Cosmos.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -174,6 +176,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Cosmos.snk" />
     <None Include="Tests\ComplexerStructIndexing\ComplexerStructIndexing.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
