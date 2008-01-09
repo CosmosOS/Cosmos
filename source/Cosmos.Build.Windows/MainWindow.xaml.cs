@@ -20,5 +20,13 @@ namespace Cosmos.Build.Windows {
         public Window1() {
             InitializeComponent();
         }
+
+        //open key as read only
+        //
+        //HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\.NETFramework
+        //sdkInstallRootv2.0
+        //C:\Program Files\Microsoft.NET\SDK\v2.0 64bit\
+        //
+        //HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Microsoft SDKs\.NETFramework\v2.0
     }
 }
