@@ -20,7 +20,7 @@ namespace Cosmos.Shell.Console {
 			System.Console.BackgroundColor = ConsoleColor.Black;
 			System.Console.ForegroundColor = ConsoleColor.Red;
 			System.Console.WriteLine("Cosmos Kernel. Copyright 2007-2008 The Cosmos Project.");
-			System.Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+			System.Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 			System.Console.ForegroundColor = ConsoleColor.Green;
 			System.Console.WriteLine("Now Booting...");
 

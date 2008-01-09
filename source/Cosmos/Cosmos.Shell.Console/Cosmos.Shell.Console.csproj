@@ -52,7 +52,8 @@
     <Compile Include="Commands\HelpCommand.cs" />
     <Compile Include="Commands\MatthijsCommand.cs" />
     <Compile Include="Commands\TypeCommand.cs" />
-    <Compile Include="Commands\BaseCommand.cs" />
+    <Compile Include="Commands\CommandBase.cs" />
+    <Compile Include="Commands\VersionCommand.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Prompter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
