@@ -47,7 +47,7 @@ namespace Cosmos.Build.Windows {
             xStartInfo.Arguments = aArgLine;
             xStartInfo.WorkingDirectory = aWorkDir;
             xStartInfo.CreateNoWindow = false;
-            xStartInfo.UseShellExecute = false;
+            xStartInfo.UseShellExecute = !aCapture;
             xStartInfo.RedirectStandardError = aCapture;
             xStartInfo.RedirectStandardOutput = aCapture;
             var xProcess = Process.Start(xStartInfo);
