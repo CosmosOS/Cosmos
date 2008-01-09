@@ -20,6 +20,7 @@ namespace Cosmos.Build.Windows {
             InitializeComponent();
 
             KeyDown += new KeyEventHandler(BuildOptionsWindow_KeyDown);
+            Loaded += new RoutedEventHandler(BuildOptionsWindow_Loaded);
             
             textBuildPath.Text = Builder.GetBuildPath();
             textBuildPath.IsEnabled = false;
@@ -29,15 +30,22 @@ namespace Cosmos.Build.Windows {
             }
         }
 
+        void BuildOptionsWindow_Loaded(object sender, RoutedEventArgs e) {
+            //Stupid window always shows up behind console, bring it up.
+            this.Activate();
+        }
+
         void BuildOptionsWindow_KeyDown(object sender, KeyEventArgs e) {
-            char xChar = e.Key.ToString()[0];
+            var xConverter = new KeyConverter();
+            char xChar = xConverter.ConvertToString(e.Key)[0];
             if (Char.IsDigit(xChar)) {
                 int xValue = int.Parse(xChar.ToString());
                 if (xValue > 0) {
                     if (xValue <= lboxTargets.Items.Count) {
                         string xType = (string)(lboxTargets.Items[xValue - 1]);
+                        Hide();
                         var xBuilder = new Builder();
-                        xBuilder.Build((Builder.Target)Enum.Parse(typeof(Builder.Target), xType));
+                        xBuilder.Build((Builder.Target)Enum.Parse(typeof(Builder.Target), xType.Remove(0, 3)));
                     }
                 }
                 e.Handled = true;

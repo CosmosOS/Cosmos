@@ -5,7 +5,8 @@
     <Grid>
         <Label Height="28" HorizontalAlignment="Left" Margin="16,14,0,0" Name="label1" VerticalAlignment="Top" Width="120">Build Path:</Label>
         <TextBox Height="23" Margin="16,37,12,0" Name="textBuildPath" VerticalAlignment="Top" />
-        <ListBox Margin="16,100,99,14" Name="lboxTargets" />
+        <ListBox Margin="16,107,12,14" Name="lboxTargets" />
         <Label Height="28" HorizontalAlignment="Left" Margin="16,73,0,0" Name="label2" VerticalAlignment="Top" Width="120">Build Type:</Label>
+        <Label Height="28" Margin="16,85,111,0" Name="label3" VerticalAlignment="Top">(Press number on main keyboard)</Label>
     </Grid>
 </Window>

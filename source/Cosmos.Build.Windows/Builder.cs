@@ -46,6 +46,7 @@ namespace Cosmos.Build.Windows {
             xStartInfo.FileName = aEXEPathname;
             xStartInfo.Arguments = aArgLine;
             xStartInfo.WorkingDirectory = aWorkDir;
+            xStartInfo.CreateNoWindow = false;
             xStartInfo.UseShellExecute = false;
             xStartInfo.RedirectStandardError = aCapture;
             xStartInfo.RedirectStandardOutput = aCapture;

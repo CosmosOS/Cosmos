@@ -8,7 +8,7 @@ namespace Cosmos.Shell.Console {
         [STAThread]
         public static void Main() {
 			var xBuilder = new Builder();
-			xBuilder.Build(Builder.Target.QEMU_GDB);
+			xBuilder.Build();
         }
         
         public static void Init() {
