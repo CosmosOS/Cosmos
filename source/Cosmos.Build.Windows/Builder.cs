@@ -11,13 +11,19 @@ namespace Cosmos.Build.Windows {
         protected string mBuildPath;
         protected string mToolsPath;
         protected string mISOPath;
+        protected string mPXEPath;
         protected string mAsmPath;
 
         public Builder() {
             var xKey = Registry.CurrentUser.OpenSubKey(@"Software\Cosmos");
             mBuildPath = (string)xKey.GetValue("Build Path");
+            if (!mBuildPath.EndsWith(@"\")) {
+                mBuildPath = mBuildPath + @"\";
+            }
+
             mToolsPath = mBuildPath + @"Tools\";
             mISOPath = mBuildPath + @"ISO\";
+            mPXEPath = mBuildPath + @"PXE\";
             mAsmPath = mToolsPath + @"asm\";
         }
 
@@ -51,10 +57,8 @@ namespace Cosmos.Build.Windows {
             RemoveFile(mBuildPath + "cosmos.iso");
             RemoveFile(mISOPath + "output.bin");
             File.Copy(mBuildPath + "output.bin", mISOPath + "output.bin");
-            // From TFS its read only, and one of the utils doesnt like that
+            // From TFS its read only, mkisofs doesnt like that
             File.SetAttributes(mISOPath + "isolinux.bin", FileAttributes.Normal);
-
-            // Call(mToolsPath + @"mkisofs.exe", "-R -b syslinux/isolinux.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o Cosmos.iso files", mISOPath, true);
             Call(mToolsPath + @"mkisofs.exe", @"-R -b isolinux.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o ..\Cosmos.iso .", mISOPath, true);
         }
 
@@ -79,7 +83,7 @@ namespace Cosmos.Build.Windows {
         public void BuildKernel() {
         }
 
-        public enum Target { ISO, PXE, QEMU, QEMU_GDB, VMWare, VMWarePXE, VirtualPC, VirtualPCPXE };
+        public enum Target { ISO, PXE, QEMU, QEMU_GDB };
         public void Build(Target aType) {
             Compile();
 
@@ -89,10 +93,10 @@ namespace Cosmos.Build.Windows {
                     break;
 
                 case Target.PXE:
-                    RemoveFile(Path.Combine(mBuildPath, @"PXE\Boot\output.obj"));
-                    File.Move(mBuildPath + @"output.obj", mBuildPath + @"PXE\Boot\output.obj");
+                    RemoveFile(mPXEPath + @"Boot\output.bin");
+                    File.Move(mBuildPath + "output.bin", mPXEPath + @"Boot\output.bin");
                     // *Must* set working dir so tftpd32 will set itself to proper dir
-                    Call(mBuildPath + @"tftpd32.exe", "", mBuildPath + @"pxe\", false);
+                    Call(mPXEPath + "tftpd32.exe", "", mPXEPath, false);
                     break;
 
                 case Target.QEMU:
@@ -107,18 +111,6 @@ namespace Cosmos.Build.Windows {
                             , mBuildPath + @"output.bin" + " --eval-command=\"target remote:1234\" --eval-command=\"b _CODE_REQUESTED_BREAK_\" --eval-command=\"c\""
                             , mToolsPath + @"qemu\", true);
                     }
-                    break;
-
-                case Target.VMWare:
-                    break;
-
-                case Target.VMWarePXE:
-                    break;
-
-                case Target.VirtualPC:
-                    break;
-
-                case Target.VirtualPCPXE:
                     break;
 
             }

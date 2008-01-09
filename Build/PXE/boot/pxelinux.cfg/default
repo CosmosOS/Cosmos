@@ -2,4 +2,4 @@ DEFAULT Cosmos
 
 LABEL Cosmos
   KERNEL mboot.c32
-  APPEND output.obj
+  APPEND output.bin
