@@ -21,6 +21,9 @@ namespace Cosmos.Build.Windows {
             InitializeComponent();
         }
 
+        //http://aspzone.com/blogs/john/articles/152.aspx
+        //http://technet.microsoft.com/en-us/library/ex0ss12c(VS.80).aspx
+
         //open key as read only
         //
         //HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\.NETFramework
