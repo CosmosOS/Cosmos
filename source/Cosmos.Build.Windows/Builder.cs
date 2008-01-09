@@ -84,6 +84,12 @@ namespace Cosmos.Build.Windows {
         }
 
         public enum Target { ISO, PXE, QEMU, QEMU_GDB };
+
+        public void Build() {
+            var xOptions = new BuildOptionsWindow();
+            xOptions.ShowDialog();
+        }
+
         public void Build(Target aType) {
             Compile();
 

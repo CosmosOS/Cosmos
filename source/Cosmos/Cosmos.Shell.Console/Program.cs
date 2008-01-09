@@ -5,6 +5,7 @@ using Cosmos.Build.Windows;
 
 namespace Cosmos.Shell.Console {
 	public class Program {
+        [STAThread]
         public static void Main() {
 			var xBuilder = new Builder();
 			xBuilder.Build(Builder.Target.QEMU_GDB);
