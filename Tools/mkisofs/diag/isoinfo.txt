@@ -1,0 +1,19 @@
+isoinfo 2.01-bootcd.ru (i386-pc-mingw32)
+isoinfo: Usage: isoinfo [options] -i filename
+Options:
+	-help,-h	Print this help
+	-version	Print version info and exit
+	-debug		Print additional debug info
+	-d		Print information from the primary volume descriptor
+	-f		Generate output similar to 'find .  -print'
+	-J		Print information from Joliet extensions
+	-j charset	Use charset to display Joliet file names
+	-l		Generate output similar to 'ls -lR'
+	-p		Print Path Table
+	-R		Print information from Rock Ridge extensions
+	-s		Print file size infos in multiples of sector size (2048 bytes).
+	-N sector	Sector number where ISO image should start on CD
+	-T sector	Sector number where actual session starts on CD
+	-i filename	Filename to read ISO-9660 image from
+	dev=target	SCSI target to use as CD/DVD-Recorder
+	-x pathname	Extract specified file to stdout

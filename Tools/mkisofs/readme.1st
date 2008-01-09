@@ -1,0 +1,63 @@
+
+Win32/Mingw32 version of cdrtools (cdrecord, mkisofs, readcd, cdda2wav)
+by Joerg Schilling
+with storage optimization (mkisofs)
+and without cygwin1.dll
+
+NOTE:
+This version of cdrtools is an inofficial (modified) release of cdrtools
+and thus may have bugs that are not present in the original version.
+Please send bug reports and support requests to cdrtools@bootcd.ru.
+The original author should not be bothered with problems of this version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+Differences with original Win32/Cygwin32 version:
+
+all tools:
+
+- cygwin1.dll is not required
+
+- In addition to the configuration file /etc/default/cdrecord
+  the configuration file cdrecord.ini (in cdrtools directory) can be used
+  
+- More readable messages, e.g.:
+
+  cdrecord: I/O error.
+
+  instead of:
+
+  /cygdrive/c/cdrtools-2.01/cdrecord/OBJ/i686-mingw32_nt-gcc/cdrecord: I/O error.
+
+mkisofs:
+
+- New option:
+
+  -duplicates-once	Optimize storage by encoding duplicate files once
+
+- New option:
+
+  -force-uppercase	Do not allow lower case characters
+
+  Hint: Use 'mkisofs -iso-level 4 -force-uppercase' to create BartPE (WinPE) ISOs
+
+- Option -cache-inodes is ignored (Windows has no inodes)
+
+- Option -follow-links is ignored (Windows has no symlinks)
+
+- Option -rock have same effect as option -rational-rock
+
+- The current ANSI codepage will be used as -input-charset by default.
+  In a case if the current ANSI codepage is not supported by cdrtools,
+  iso8859-1 (is similar to cp1252) will be used
+
+- The current OEM codepage will be used as -output-charset by default.
+  In a case if the current OEM codepage is not supported by cdrtools,
+  cp437 will be used
+
+cdda2wav:
+
+- Option -echo now works
