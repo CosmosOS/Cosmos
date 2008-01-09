@@ -1,0 +1,3292 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html401/loose.dtd">
+<html>
+<!-- Created on February, 7 2007 by texi2html 1.76 -->
+<!--
+Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
+            Karl Berry  <karl@freefriends.org>
+            Olaf Bachmann <obachman@mathematik.uni-kl.de>
+            and many others.
+Maintained by: Many creative people <dev@texi2html.cvshome.org>
+Send bugs and suggestions to <users@texi2html.cvshome.org>
+
+-->
+<head>
+<title>QEMU Emulator User Documentation: </title>
+
+<meta name="description" content="QEMU Emulator User Documentation: ">
+<meta name="keywords" content="QEMU Emulator User Documentation: ">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="texi2html 1.76">
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+pre.display {font-family: serif}
+pre.format {font-family: serif}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+pre.smalldisplay {font-family: serif; font-size: smaller}
+pre.smallexample {font-size: smaller}
+pre.smallformat {font-family: serif; font-size: smaller}
+pre.smalllisp {font-size: smaller}
+span.sansserif {font-family:sans-serif; font-weight:normal;}
+ul.toc {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
+
+<a name="Top"></a>
+<a name="SEC_Top"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h1 class="settitle">QEMU Emulator User Documentation
+</h1>
+
+
+
+<h2> Table of Contents</h2>
+<div class="contents">
+
+<ul class="toc">
+  <li><a name="TOC1" href="#SEC1">1. Introduction</a>
+  <ul class="toc">
+    <li><a name="TOC2" href="#SEC2">1.1 Features</a></li>
+  </ul></li>
+  <li><a name="TOC3" href="#SEC3">2. Installation</a>
+  <ul class="toc">
+    <li><a name="TOC4" href="#SEC4">2.1 Linux</a></li>
+    <li><a name="TOC5" href="#SEC5">2.2 Windows</a></li>
+    <li><a name="TOC6" href="#SEC6">2.3 Mac OS X</a></li>
+  </ul></li>
+  <li><a name="TOC7" href="#SEC7">3. QEMU PC System emulator</a>
+  <ul class="toc">
+    <li><a name="TOC8" href="#SEC8">3.1 Introduction</a></li>
+    <li><a name="TOC9" href="#SEC9">3.2 Quick Start</a></li>
+    <li><a name="TOC10" href="#SEC10">3.3 Invocation</a></li>
+    <li><a name="TOC11" href="#SEC11">3.4 Keys</a></li>
+    <li><a name="TOC12" href="#SEC12">3.5 QEMU Monitor</a>
+    <ul class="toc">
+      <li><a name="TOC13" href="#SEC13">3.5.1 Commands</a></li>
+      <li><a name="TOC14" href="#SEC14">3.5.2 Integer expressions</a></li>
+    </ul></li>
+    <li><a name="TOC15" href="#SEC15">3.6 Disk Images</a>
+    <ul class="toc">
+      <li><a name="TOC16" href="#SEC16">3.6.1 Quick start for disk image creation</a></li>
+      <li><a name="TOC17" href="#SEC17">3.6.2 Snapshot mode</a></li>
+      <li><a name="TOC18" href="#SEC18">3.6.3 VM snapshots</a></li>
+      <li><a name="TOC19" href="#SEC19">3.6.4 <code>qemu-img</code> Invocation</a></li>
+      <li><a name="TOC20" href="#SEC20">3.6.5 Using host drives</a>
+      <ul class="toc">
+        <li><a name="TOC21" href="#SEC21">3.6.5.1 Linux</a></li>
+        <li><a name="TOC22" href="#SEC22">3.6.5.2 Windows</a></li>
+        <li><a name="TOC23" href="#SEC23">3.6.5.3 Mac OS X</a></li>
+      </ul></li>
+      <li><a name="TOC24" href="#SEC24">3.6.6 Virtual FAT disk images</a></li>
+    </ul></li>
+    <li><a name="TOC25" href="#SEC25">3.7 Network emulation</a>
+    <ul class="toc">
+      <li><a name="TOC26" href="#SEC26">3.7.1 VLANs</a></li>
+      <li><a name="TOC27" href="#SEC27">3.7.2 Using TAP network interfaces</a>
+      <ul class="toc">
+        <li><a name="TOC28" href="#SEC28">3.7.2.1 Linux host</a></li>
+        <li><a name="TOC29" href="#SEC29">3.7.2.2 Windows host</a></li>
+      </ul></li>
+      <li><a name="TOC30" href="#SEC30">3.7.3 Using the user mode network stack</a></li>
+      <li><a name="TOC31" href="#SEC31">3.7.4 Connecting VLANs between QEMU instances</a></li>
+    </ul></li>
+    <li><a name="TOC32" href="#SEC32">3.8 Direct Linux Boot</a></li>
+    <li><a name="TOC33" href="#SEC33">3.9 USB emulation</a>
+    <ul class="toc">
+      <li><a name="TOC34" href="#SEC34">3.9.1 Connecting USB devices</a></li>
+      <li><a name="TOC35" href="#SEC35">3.9.2 Using host USB devices on a Linux host</a></li>
+    </ul></li>
+    <li><a name="TOC36" href="#SEC36">3.10 GDB usage</a></li>
+    <li><a name="TOC37" href="#SEC37">3.11 Target OS specific information</a>
+    <ul class="toc">
+      <li><a name="TOC38" href="#SEC38">3.11.1 Linux</a></li>
+      <li><a name="TOC39" href="#SEC39">3.11.2 Windows</a>
+      <ul class="toc">
+        <li><a name="TOC40" href="#SEC40">3.11.2.1 SVGA graphic modes support</a></li>
+        <li><a name="TOC41" href="#SEC41">3.11.2.2 CPU usage reduction</a></li>
+        <li><a name="TOC42" href="#SEC42">3.11.2.3 Windows 2000 disk full problem</a></li>
+        <li><a name="TOC43" href="#SEC43">3.11.2.4 Windows 2000 shutdown</a></li>
+        <li><a name="TOC44" href="#SEC44">3.11.2.5 Share a directory between Unix and Windows</a></li>
+        <li><a name="TOC45" href="#SEC45">3.11.2.6 Windows XP security problem</a></li>
+      </ul></li>
+      <li><a name="TOC46" href="#SEC46">3.11.3 MS-DOS and FreeDOS</a>
+      <ul class="toc">
+        <li><a name="TOC47" href="#SEC47">3.11.3.1 CPU usage reduction</a></li>
+      </ul>
+</li>
+    </ul>
+</li>
+  </ul></li>
+  <li><a name="TOC48" href="#SEC48">4. QEMU System emulator for non PC targets</a>
+  <ul class="toc">
+    <li><a name="TOC49" href="#SEC49">4.1 QEMU PowerPC System emulator</a></li>
+    <li><a name="TOC50" href="#SEC50">4.2 Sparc32 System emulator invocation</a></li>
+    <li><a name="TOC51" href="#SEC51">4.3 Sparc64 System emulator invocation</a></li>
+    <li><a name="TOC52" href="#SEC52">4.4 MIPS System emulator invocation</a></li>
+    <li><a name="TOC53" href="#SEC53">4.5 ARM System emulator invocation</a></li>
+  </ul></li>
+  <li><a name="TOC54" href="#SEC54">5. QEMU User space emulator</a>
+  <ul class="toc">
+    <li><a name="TOC55" href="#SEC55">5.1 Supported Operating Systems</a></li>
+    <li><a name="TOC56" href="#SEC56">5.2 Linux User space emulator</a>
+    <ul class="toc">
+      <li><a name="TOC57" href="#SEC57">5.2.1 Quick Start</a></li>
+      <li><a name="TOC58" href="#SEC58">5.2.2 Wine launch</a></li>
+      <li><a name="TOC59" href="#SEC59">5.2.3 Command line options</a></li>
+      <li><a name="TOC60" href="#SEC60">5.2.4 Other binaries</a></li>
+    </ul></li>
+    <li><a name="TOC61" href="#SEC61">5.3 Mac OS X/Darwin User space emulator</a>
+    <ul class="toc">
+      <li><a name="TOC62" href="#SEC62">5.3.1 Mac OS X/Darwin Status</a></li>
+      <li><a name="TOC63" href="#SEC63">5.3.2 Quick Start</a></li>
+      <li><a name="TOC64" href="#SEC64">5.3.3 Command line options</a></li>
+    </ul>
+</li>
+  </ul></li>
+  <li><a name="TOC65" href="#SEC65">6. Compilation from the sources</a>
+  <ul class="toc">
+    <li><a name="TOC66" href="#SEC66">6.1 Linux/Unix</a>
+    <ul class="toc">
+      <li><a name="TOC67" href="#SEC67">6.1.1 Compilation</a></li>
+      <li><a name="TOC68" href="#SEC68">6.1.2 GCC version</a></li>
+    </ul></li>
+    <li><a name="TOC69" href="#SEC69">6.2 Windows</a></li>
+    <li><a name="TOC70" href="#SEC70">6.3 Cross compilation for Windows with Linux</a></li>
+    <li><a name="TOC71" href="#SEC71">6.4 Mac OS X</a></li>
+  </ul></li>
+  <li><a name="TOC72" href="#SEC72">7. Index</a></li>
+</ul>
+</div>
+<hr size="1">
+<a name="Introduction"></a>
+<a name="SEC1"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC_Top" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC2" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h1 class="chapter"> 1. Introduction </h1>
+<ul>
+<a href="#SEC2">1.1 Features</a> <br>
+</ul>
+
+
+<hr size="2">
+<a name="intro_005ffeatures"></a>
+<a name="SEC2"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC1" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC3" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 1.1 Features </h2>
+
+<p>QEMU is a FAST! processor emulator using dynamic translation to
+achieve good emulation speed.
+</p>
+<p>QEMU has two operating modes:
+</p>
+<ul class="toc">
+<li>- 
+Full system emulation. In this mode, QEMU emulates a full system (for
+example a PC), including one or several processors and various
+peripherals. It can be used to launch different Operating Systems
+without rebooting the PC or to debug system code.
+
+</li><li>- 
+User mode emulation. In this mode, QEMU can launch
+processes compiled for one CPU on another CPU. It can be used to
+launch the Wine Windows API emulator (<a href="http://www.winehq.org">http://www.winehq.org</a>) or
+to ease cross-compilation and cross-debugging.
+
+</li></ul>
+
+<p>QEMU can run without an host kernel driver and yet gives acceptable
+performance. 
+</p>
+<p>For system emulation, the following hardware targets are supported:
+</p><ul class="toc">
+<li> PC (x86 or x86_64 processor)
+</li><li> ISA PC (old style PC without PCI bus)
+</li><li> PREP (PowerPC processor)
+</li><li> G3 BW PowerMac (PowerPC processor)
+</li><li> Mac99 PowerMac (PowerPC processor, in progress)
+</li><li> Sun4m (32-bit Sparc processor)
+</li><li> Sun4u (64-bit Sparc processor, in progress)
+</li><li> Malta board (32-bit MIPS processor)
+</li><li> ARM Integrator/CP (ARM926E or 1026E processor)
+</li><li> ARM Versatile baseboard (ARM926E)
+</li></ul>
+
+<p>For user emulation, x86, PowerPC, ARM, MIPS, Sparc32/64 and ColdFire(m68k) CPUs are supported.
+</p>
+<hr size="2">
+<a name="Installation"></a>
+<a name="SEC3"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC2" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC4" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h1 class="chapter"> 2. Installation </h1>
+<ul>
+<a href="#SEC4">2.1 Linux</a> <br>
+<a href="#SEC5">2.2 Windows</a> <br>
+<a href="#SEC6">2.3 Mac OS X</a> <br>
+</ul>
+
+<p>If you want to compile QEMU yourself, see <a href="#SEC65">Compilation from the sources</a>.
+</p>
+
+<hr size="2">
+<a name="install_005flinux"></a>
+<a name="SEC4"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC3" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC5" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 2.1 Linux </h2>
+
+<p>If a precompiled package is available for your distribution - you just
+have to install it. Otherwise, see <a href="#SEC65">Compilation from the sources</a>.
+</p>
+<hr size="2">
+<a name="install_005fwindows"></a>
+<a name="SEC5"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC4" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC6" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 2.2 Windows </h2>
+
+<p>Download the experimental binary installer at
+<a href="http://www.free.oszoo.org/download.html">http://www.free.oszoo.org/download.html</a>.
+</p>
+<hr size="2">
+<a name="install_005fmac"></a>
+<a name="SEC6"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC5" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC7" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 2.3 Mac OS X </h2>
+
+<p>Download the experimental binary installer at
+<a href="http://www.free.oszoo.org/download.html">http://www.free.oszoo.org/download.html</a>.
+</p>
+<hr size="2">
+<a name="QEMU-PC-System-emulator"></a>
+<a name="SEC7"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC6" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC8" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h1 class="chapter"> 3. QEMU PC System emulator </h1>
+<ul>
+<a href="#SEC8">3.1 Introduction</a> <br>
+<a href="#SEC9">3.2 Quick Start</a> <br>
+<a href="#SEC10">3.3 Invocation</a> <br>
+<a href="#SEC11">3.4 Keys</a> <br>
+<a href="#SEC12">3.5 QEMU Monitor</a> <br>
+<ul>
+<a href="#SEC13">3.5.1 Commands</a> <br>
+<a href="#SEC14">3.5.2 Integer expressions</a> <br>
+</ul>
+<a href="#SEC15">3.6 Disk Images</a> <br>
+<ul>
+<a href="#SEC16">3.6.1 Quick start for disk image creation</a> <br>
+<a href="#SEC17">3.6.2 Snapshot mode</a> <br>
+<a href="#SEC18">3.6.3 VM snapshots</a> <br>
+<a href="#SEC19">3.6.4 <code>qemu-img</code> Invocation</a> <br>
+<a href="#SEC20">3.6.5 Using host drives</a> <br>
+<ul>
+<a href="#SEC21">3.6.5.1 Linux</a> <br>
+<a href="#SEC22">3.6.5.2 Windows</a> <br>
+<a href="#SEC23">3.6.5.3 Mac OS X</a> <br>
+</ul>
+<a href="#SEC24">3.6.6 Virtual FAT disk images</a> <br>
+</ul>
+<a href="#SEC25">3.7 Network emulation</a> <br>
+<ul>
+<a href="#SEC26">3.7.1 VLANs</a> <br>
+<a href="#SEC27">3.7.2 Using TAP network interfaces</a> <br>
+<ul>
+<a href="#SEC28">3.7.2.1 Linux host</a> <br>
+<a href="#SEC29">3.7.2.2 Windows host</a> <br>
+</ul>
+<a href="#SEC30">3.7.3 Using the user mode network stack</a> <br>
+<a href="#SEC31">3.7.4 Connecting VLANs between QEMU instances</a> <br>
+</ul>
+<a href="#SEC32">3.8 Direct Linux Boot</a> <br>
+<a href="#SEC33">3.9 USB emulation</a> <br>
+<ul>
+<a href="#SEC34">3.9.1 Connecting USB devices</a> <br>
+<a href="#SEC35">3.9.2 Using host USB devices on a Linux host</a> <br>
+</ul>
+<a href="#SEC36">3.10 GDB usage</a> <br>
+<a href="#SEC37">3.11 Target OS specific information</a> <br>
+<ul>
+<a href="#SEC38">3.11.1 Linux</a> <br>
+<a href="#SEC39">3.11.2 Windows</a> <br>
+<ul>
+<a href="#SEC40">3.11.2.1 SVGA graphic modes support</a> <br>
+<a href="#SEC41">3.11.2.2 CPU usage reduction</a> <br>
+<a href="#SEC42">3.11.2.3 Windows 2000 disk full problem</a> <br>
+<a href="#SEC43">3.11.2.4 Windows 2000 shutdown</a> <br>
+<a href="#SEC44">3.11.2.5 Share a directory between Unix and Windows</a> <br>
+<a href="#SEC45">3.11.2.6 Windows XP security problem</a> <br>
+</ul>
+<a href="#SEC46">3.11.3 MS-DOS and FreeDOS</a> <br>
+<ul>
+<a href="#SEC47">3.11.3.1 CPU usage reduction</a> <br>
+</ul>
+</ul>
+</ul>
+
+
+<hr size="2">
+<a name="pcsys_005fintroduction"></a>
+<a name="SEC8"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC7" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC9" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 3.1 Introduction </h2>
+
+
+<p>The QEMU PC System emulator simulates the
+following peripherals:
+</p>
+<ul class="toc">
+<li>- 
+i440FX host PCI bridge and PIIX3 PCI to ISA bridge
+</li><li>-
+Cirrus CLGD 5446 PCI VGA card or dummy VGA card with Bochs VESA
+extensions (hardware level, including all non standard modes).
+</li><li>-
+PS/2 mouse and keyboard
+</li><li>- 
+2 PCI IDE interfaces with hard disk and CD-ROM support
+</li><li>-
+Floppy disk
+</li><li>- 
+NE2000 PCI network adapters
+</li><li>-
+Serial ports
+</li><li>-
+Creative SoundBlaster 16 sound card
+</li><li>-
+ENSONIQ AudioPCI ES1370 sound card
+</li><li>-
+Adlib(OPL2) - Yamaha YM3812 compatible chip
+</li><li>-
+PCI UHCI USB controller and a virtual USB hub.
+</li></ul>
+
+<p>SMP is supported with up to 255 CPUs.
+</p>
+<p>Note that adlib is only available when QEMU was configured with
+-enable-adlib
+</p>
+<p>QEMU uses the PC BIOS from the Bochs project and the Plex86/Bochs LGPL
+VGA BIOS.
+</p>
+<p>QEMU uses YM3812 emulation by Tatsuyuki Satoh.
+</p>
+
+<hr size="2">
+<a name="pcsys_005fquickstart"></a>
+<a name="SEC9"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC8" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC10" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 3.2 Quick Start </h2>
+
+<p>Download and uncompress the linux image (<tt>`linux.img'</tt>) and type:
+</p>
+<table><tr><td>&nbsp;</td><td><pre class="example">qemu linux.img
+</pre></td></tr></table>
+<p>Linux should boot and give you a prompt.
+</p>
+<hr size="2">
+<a name="sec_005finvocation"></a>
+<a name="SEC10"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC9" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC11" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 3.3 Invocation </h2>
+
+<table><tr><td>&nbsp;</td><td><pre class="example">usage: qemu [options] [disk_image]
+</pre></td></tr></table>
+<p><var>disk_image</var> is a raw hard disk image for IDE hard disk 0.
+</p>
+<p>General options:
+</p><dl compact="compact">
+<dt> <samp>`-M machine'</samp></dt>
+<dd><p>Select the emulated machine (<code>-M ?</code> for list)
+</p>
+</dd>
+<dt> <samp>`-fda file'</samp></dt>
+<dt> <samp>`-fdb file'</samp></dt>
+<dd><p>Use <var>file</var> as floppy disk 0/1 image (see section <a href="#SEC15">Disk Images</a>). You can
+use the host floppy by using <tt>`/dev/fd0'</tt> as filename (see section <a href="#SEC20">Using host drives</a>).
+</p>
+</dd>
+<dt> <samp>`-hda file'</samp></dt>
+<dt> <samp>`-hdb file'</samp></dt>
+<dt> <samp>`-hdc file'</samp></dt>
+<dt> <samp>`-hdd file'</samp></dt>
+<dd><p>Use <var>file</var> as hard disk 0, 1, 2 or 3 image (see section <a href="#SEC15">Disk Images</a>).
+</p>
+</dd>
+<dt> <samp>`-cdrom file'</samp></dt>
+<dd><p>Use <var>file</var> as CD-ROM image (you cannot use <samp>`-hdc'</samp> and and
+<samp>`-cdrom'</samp> at the same time). You can use the host CD-ROM by
+using <tt>`/dev/cdrom'</tt> as filename (see section <a href="#SEC20">Using host drives</a>).
+</p>
+</dd>
+<dt> <samp>`-boot [a|c|d|n]'</samp></dt>
+<dd><p>Boot on floppy (a), hard disk (c), CD-ROM (d), or Etherboot (n). Hard disk boot
+is the default.
+</p>
+</dd>
+<dt> <samp>`-snapshot'</samp></dt>
+<dd><p>Write to temporary files instead of disk image files. In this case,
+the raw disk image you use is not written back. You can however force
+the write back by pressing <kbd>C-a s</kbd> (see section <a href="#SEC15">Disk Images</a>).
+</p>
+</dd>
+<dt> <samp>`-no-fd-bootchk'</samp></dt>
+<dd><p>Disable boot signature checking for floppy disks in Bochs BIOS. It may
+be needed to boot from old floppy disks.
+</p>
+</dd>
+<dt> <samp>`-m megs'</samp></dt>
+<dd><p>Set virtual RAM size to <var>megs</var> megabytes. Default is 128 MB.
+</p>
+</dd>
+<dt> <samp>`-smp n'</samp></dt>
+<dd><p>Simulate an SMP system with <var>n</var> CPUs. On the PC target, up to 255
+CPUs are supported.
+</p>
+</dd>
+<dt> <samp>`-nographic'</samp></dt>
+<dd>
+<p>Normally, QEMU uses SDL to display the VGA output. With this option,
+you can totally disable graphical output so that QEMU is a simple
+command line application. The emulated serial port is redirected on
+the console. Therefore, you can still use QEMU to debug a Linux kernel
+with a serial console.
+</p>
+</dd>
+<dt> <samp>`-vnc display'</samp></dt>
+<dd>
+<p>Normally, QEMU uses SDL to display the VGA output.  With this option,
+you can have QEMU listen on VNC display <var>display</var> and redirect the VGA
+display over the VNC session.  It is very useful to enable the usb
+tablet device when using this option (option <samp>`-usbdevice
+tablet'</samp>). When using the VNC display, you must use the <samp>`-k'</samp>
+option to set the keyboard layout if you are not using en-us.
+</p>
+<p><var>display</var> may be in the form <var>interface:d</var>, in which case connections
+will only be allowed from <var>interface</var> on display <var>d</var>. Optionally,
+<var>interface</var> can be omitted.  <var>display</var> can also be in the form
+<var>unix:path</var> where <var>path</var> is the location of a unix socket to listen for
+connections on.
+</p>
+
+</dd>
+<dt> <samp>`-k language'</samp></dt>
+<dd>
+<p>Use keyboard layout <var>language</var> (for example <code>fr</code> for
+French). This option is only needed where it is not easy to get raw PC
+keycodes (e.g. on Macs, with some X11 servers or with a VNC
+display). You don't normally need to use it on PC/Linux or PC/Windows
+hosts.
+</p>
+<p>The available layouts are:
+</p><table><tr><td>&nbsp;</td><td><pre class="example">ar  de-ch  es  fo     fr-ca  hu  ja  mk     no  pt-br  sv
+da  en-gb  et  fr     fr-ch  is  lt  nl     pl  ru     th
+de  en-us  fi  fr-be  hr     it  lv  nl-be  pt  sl     tr
+</pre></td></tr></table>
+<p>The default is <code>en-us</code>.
+</p>
+</dd>
+<dt> <samp>`-audio-help'</samp></dt>
+<dd>
+<p>Will show the audio subsystem help: list of drivers, tunable
+parameters.
+</p>
+</dd>
+<dt> <samp>`-soundhw card1,card2,... or -soundhw all'</samp></dt>
+<dd>
+<p>Enable audio and selected sound hardware. Use ? to print all
+available sound hardware.
+</p>
+<table><tr><td>&nbsp;</td><td><pre class="example">qemu -soundhw sb16,adlib hda
+qemu -soundhw es1370 hda
+qemu -soundhw all hda
+qemu -soundhw ?
+</pre></td></tr></table>
+</dd>
+<dt> <samp>`-localtime'</samp></dt>
+<dd><p>Set the real time clock to local time (the default is to UTC
+time). This option is needed to have correct date in MS-DOS or
+Windows.
+</p>
+</dd>
+<dt> <samp>`-full-screen'</samp></dt>
+<dd><p>Start in full screen.
+</p>
+</dd>
+<dt> <samp>`-pidfile file'</samp></dt>
+<dd><p>Store the QEMU process PID in <var>file</var>. It is useful if you launch QEMU
+from a script.
+</p>
+</dd>
+<dt> <samp>`-daemonize'</samp></dt>
+<dd><p>Daemonize the QEMU process after initialization.  QEMU will not detach from
+standard IO until it is ready to receive connections on any of its devices.
+This option is a useful way for external programs to launch QEMU without having
+to cope with initialization race conditions.
+</p>
+</dd>
+<dt> <samp>`-win2k-hack'</samp></dt>
+<dd><p>Use it when installing Windows 2000 to avoid a disk full bug. After
+Windows 2000 is installed, you no longer need this option (this option
+slows down the IDE transfers).
+</p>
+</dd>
+<dt> <samp>`-option-rom file'</samp></dt>
+<dd><p>Load the contents of file as an option ROM.  This option is useful to load
+things like EtherBoot.
+</p>
+</dd>
+</dl>
+
+<p>USB options:
+</p><dl compact="compact">
+<dt> <samp>`-usb'</samp></dt>
+<dd><p>Enable the USB driver (will be the default soon)
+</p>
+</dd>
+<dt> <samp>`-usbdevice devname'</samp></dt>
+<dd><p>Add the USB device <var>devname</var>. See section <a href="#SEC34">Connecting USB devices</a>.
+</p></dd>
+</dl>
+
+<p>Network options:
+</p>
+<dl compact="compact">
+<dt> <samp>`-net nic[,vlan=n][,macaddr=addr][,model=type]'</samp></dt>
+<dd><p>Create a new Network Interface Card and connect it to VLAN <var>n</var> (<var>n</var>
+= 0 is the default). The NIC is currently an NE2000 on the PC
+target. Optionally, the MAC address can be changed. If no
+<samp>`-net'</samp> option is specified, a single NIC is created.
+Qemu can emulate several different models of network card.  Valid values for
+<var>type</var> are <code>ne2k_pci</code>, <code>ne2k_isa</code>, <code>rtl8139</code>,
+<code>smc91c111</code> and <code>lance</code>.  Not all devices are supported on all
+targets.
+</p>
+</dd>
+<dt> <samp>`-net user[,vlan=n][,hostname=name]'</samp></dt>
+<dd><p>Use the user mode network stack which requires no administrator
+priviledge to run.  <samp>`hostname=name'</samp> can be used to specify the client
+hostname reported by the builtin DHCP server.
+</p>
+</dd>
+<dt> <samp>`-net tap[,vlan=n][,fd=h][,ifname=name][,script=file]'</samp></dt>
+<dd><p>Connect the host TAP network interface <var>name</var> to VLAN <var>n</var> and
+use the network script <var>file</var> to configure it. The default
+network script is <tt>`/etc/qemu-ifup'</tt>. Use <samp>`script=no'</samp> to
+disable script execution. If <var>name</var> is not
+provided, the OS automatically provides one.  <samp>`fd=h'</samp> can be
+used to specify the handle of an already opened host TAP interface. Example:
+</p>
+<table><tr><td>&nbsp;</td><td><pre class="example">qemu linux.img -net nic -net tap
+</pre></td></tr></table>
+<p>More complicated example (two NICs, each one connected to a TAP device)
+</p><table><tr><td>&nbsp;</td><td><pre class="example">qemu linux.img -net nic,vlan=0 -net tap,vlan=0,ifname=tap0 \
+               -net nic,vlan=1 -net tap,vlan=1,ifname=tap1
+</pre></td></tr></table>
+
+</dd>
+<dt> <samp>`-net socket[,vlan=n][,fd=h][,listen=[host]:port][,connect=host:port]'</samp></dt>
+<dd>
+<p>Connect the VLAN <var>n</var> to a remote VLAN in another QEMU virtual
+machine using a TCP socket connection. If <samp>`listen'</samp> is
+specified, QEMU waits for incoming connections on <var>port</var>
+(<var>host</var> is optional). <samp>`connect'</samp> is used to connect to
+another QEMU instance using the <samp>`listen'</samp> option. <samp>`fd=h'</samp>
+specifies an already opened TCP socket.
+</p>
+<p>Example:
+</p><table><tr><td>&nbsp;</td><td><pre class="example"># launch a first QEMU instance
+qemu linux.img -net nic,macaddr=52:54:00:12:34:56 \
+               -net socket,listen=:1234
+# connect the VLAN 0 of this instance to the VLAN 0
+# of the first instance
+qemu linux.img -net nic,macaddr=52:54:00:12:34:57 \
+               -net socket,connect=127.0.0.1:1234
+</pre></td></tr></table>
+</dd>
+<dt> <samp>`-net socket[,vlan=n][,fd=h][,mcast=maddr:port]'</samp></dt>
+<dd>
+<p>Create a VLAN <var>n</var> shared with another QEMU virtual
+machines using a UDP multicast socket, effectively making a bus for 
+every QEMU with same multicast address <var>maddr</var> and <var>port</var>.
+NOTES:
+</p><ol>
+<li> 
+Several QEMU can be running on different hosts and share same bus (assuming 
+correct multicast setup for these hosts).
+</li><li>
+mcast support is compatible with User Mode Linux (argument <samp>`eth<var>N</var>=mcast'</samp>), see
+<a href="http://user-mode-linux.sf.net">http://user-mode-linux.sf.net</a>.
+</li><li> Use <samp>`fd=h'</samp> to specify an already opened UDP multicast socket.
+</li></ol>
+
+<p>Example:
+</p><table><tr><td>&nbsp;</td><td><pre class="example"># launch one QEMU instance
+qemu linux.img -net nic,macaddr=52:54:00:12:34:56 \
+               -net socket,mcast=230.0.0.1:1234
+# launch another QEMU instance on same &quot;bus&quot;
+qemu linux.img -net nic,macaddr=52:54:00:12:34:57 \
+               -net socket,mcast=230.0.0.1:1234
+# launch yet another QEMU instance on same &quot;bus&quot;
+qemu linux.img -net nic,macaddr=52:54:00:12:34:58 \
+               -net socket,mcast=230.0.0.1:1234
+</pre></td></tr></table>
+<p>Example (User Mode Linux compat.):
+</p><table><tr><td>&nbsp;</td><td><pre class="example"># launch QEMU instance (note mcast address selected
+# is UML's default)
+qemu linux.img -net nic,macaddr=52:54:00:12:34:56 \
+               -net socket,mcast=239.192.168.1:1102
+# launch UML
+/path/to/linux ubd0=/path/to/root_fs eth0=mcast
+</pre></td></tr></table>
+</dd>
+<dt> <samp>`-net none'</samp></dt>
+<dd><p>Indicate that no network devices should be configured. It is used to
+override the default configuration (<samp>`-net nic -net user'</samp>) which
+is activated if no <samp>`-net'</samp> options are provided.
+</p>
+</dd>
+<dt> <samp>`-tftp prefix'</samp></dt>
+<dd><p>When using the user mode network stack, activate a built-in TFTP
+server. All filenames beginning with <var>prefix</var> can be downloaded
+from the host to the guest using a TFTP client. The TFTP client on the
+guest must be configured in binary mode (use the command <code>bin</code> of
+the Unix TFTP client). The host IP address on the guest is as usual
+10.0.2.2.
+</p>
+</dd>
+<dt> <samp>`-smb dir'</samp></dt>
+<dd><p>When using the user mode network stack, activate a built-in SMB
+server so that Windows OSes can access to the host files in <tt>`dir'</tt>
+transparently.
+</p>
+<p>In the guest Windows OS, the line:
+</p><table><tr><td>&nbsp;</td><td><pre class="example">10.0.2.4 smbserver
+</pre></td></tr></table><p>must be added in the file <tt>`C:\WINDOWS\LMHOSTS'</tt> (for windows 9x/Me)
+or <tt>`C:\WINNT\SYSTEM32\DRIVERS\ETC\LMHOSTS'</tt> (Windows NT/2000).
+</p>
+<p>Then <tt>`dir'</tt> can be accessed in <tt>`\\smbserver\qemu'</tt>.
+</p>
+<p>Note that a SAMBA server must be installed on the host OS in
+<tt>`/usr/sbin/smbd'</tt>. QEMU was tested successfully with smbd version
+2.2.7a from the Red Hat 9 and version 3.0.10-1.fc3 from Fedora Core 3.
+</p>
+</dd>
+<dt> <samp>`-redir [tcp|udp]:host-port:[guest-host]:guest-port'</samp></dt>
+<dd>
+<p>When using the user mode network stack, redirect incoming TCP or UDP
+connections to the host port <var>host-port</var> to the guest
+<var>guest-host</var> on guest port <var>guest-port</var>. If <var>guest-host</var>
+is not specified, its value is 10.0.2.15 (default address given by the
+built-in DHCP server).
+</p>
+<p>For example, to redirect host X11 connection from screen 1 to guest
+screen 0, use the following:
+</p>
+<table><tr><td>&nbsp;</td><td><pre class="example"># on the host
+qemu -redir tcp:6001::6000 [...]
+# this host xterm should open in the guest X11 server
+xterm -display :1
+</pre></td></tr></table>
+<p>To redirect telnet connections from host port 5555 to telnet port on
+the guest, use the following:
+</p>
+<table><tr><td>&nbsp;</td><td><pre class="example"># on the host
+qemu -redir tcp:5555::23 [...]
+telnet localhost 5555
+</pre></td></tr></table>
+<p>Then when you use on the host <code>telnet localhost 5555</code>, you
+connect to the guest telnet server.
+</p>
+</dd>
+</dl>
+
+<p>Linux boot specific: When using these options, you can use a given
+Linux kernel without installing it in the disk image. It can be useful
+for easier testing of various kernels.
+</p>
+<dl compact="compact">
+<dt> <samp>`-kernel bzImage'</samp> </dt>
+<dd><p>Use <var>bzImage</var> as kernel image.
+</p>
+</dd>
+<dt> <samp>`-append cmdline'</samp> </dt>
+<dd><p>Use <var>cmdline</var> as kernel command line
+</p>
+</dd>
+<dt> <samp>`-initrd file'</samp></dt>
+<dd><p>Use <var>file</var> as initial ram disk.
+</p>
+</dd>
+</dl>
+
+<p>Debug/Expert options:
+</p><dl compact="compact">
+<dt> <samp>`-serial dev'</samp></dt>
+<dd><p>Redirect the virtual serial port to host character device
+<var>dev</var>. The default device is <code>vc</code> in graphical mode and
+<code>stdio</code> in non graphical mode.
+</p>
+<p>This option can be used several times to simulate up to 4 serials
+ports.
+</p>
+<p>Use <code>-serial none</code> to disable all serial ports.
+</p>
+<p>Available character devices are:
+</p><dl compact="compact">
+<dt> <code>vc</code></dt>
+<dd><p>Virtual console
+</p></dd>
+<dt> <code>pty</code></dt>
+<dd><p>[Linux only] Pseudo TTY (a new PTY is automatically allocated)
+</p></dd>
+<dt> <code>none</code></dt>
+<dd><p>No device is allocated.
+</p></dd>
+<dt> <code>null</code></dt>
+<dd><p>void device
+</p></dd>
+<dt> <code>/dev/XXX</code></dt>
+<dd><p>[Linux only] Use host tty, e.g. <tt>`/dev/ttyS0'</tt>. The host serial port
+parameters are set according to the emulated ones.
+</p></dd>
+<dt> <code>/dev/parportN</code></dt>
+<dd><p>[Linux only, parallel port only] Use host parallel port
+<var>N</var>. Currently only SPP parallel port features can be used.
+</p></dd>
+<dt> <code>file:filename</code></dt>
+<dd><p>Write output to filename. No character can be read.
+</p></dd>
+<dt> <code>stdio</code></dt>
+<dd><p>[Unix only] standard input/output
+</p></dd>
+<dt> <code>pipe:filename</code></dt>
+<dd><p>name pipe <var>filename</var>
+</p></dd>
+<dt> <code>COMn</code></dt>
+<dd><p>[Windows only] Use host serial port <var>n</var>
+</p></dd>
+<dt> <code>udp:[remote_host]:remote_port[@[src_ip]:src_port]</code></dt>
+<dd><p>This implements UDP Net Console.  When <var>remote_host</var> or <var>src_ip</var> are not specified they default to <code>0.0.0.0</code>.  When not using a specifed <var>src_port</var> a random port is automatically chosen.
+</p>
+<p>If you just want a simple readonly console you can use <code>netcat</code> or
+<code>nc</code>, by starting qemu with: <code>-serial udp::4555</code> and nc as:
+<code>nc -u -l -p 4555</code>. Any time qemu writes something to that port it
+will appear in the netconsole session.
+</p>
+<p>If you plan to send characters back via netconsole or you want to stop
+and start qemu a lot of times, you should have qemu use the same
+source port each time by using something like <code>-serial
+udp::4555@:4556</code> to qemu. Another approach is to use a patched
+version of netcat which can listen to a TCP port and send and receive
+characters via udp.  If you have a patched version of netcat which
+activates telnet remote echo and single char transfer, then you can
+use the following options to step up a netcat redirector to allow
+telnet on port 5555 to access the qemu port.
+</p><dl compact="compact">
+<dt> <code>Qemu Options:</code></dt>
+<dd><p>-serial udp::4555@:4556
+</p></dd>
+<dt> <code>netcat options:</code></dt>
+<dd><p>-u -P 4555 -L 0.0.0.0:4556 -t -p 5555 -I -T
+</p></dd>
+<dt> <code>telnet options:</code></dt>
+<dd><p>localhost 5555
+</p></dd>
+</dl>
+
+
+</dd>
+<dt> <code>tcp:[host]:port[,server][,nowait][,nodelay]</code></dt>
+<dd><p>The TCP Net Console has two modes of operation.  It can send the serial
+I/O to a location or wait for a connection from a location.  By default
+the TCP Net Console is sent to <var>host</var> at the <var>port</var>.  If you use
+the <var>server</var> option QEMU will wait for a client socket application
+to connect to the port before continuing, unless the <code>nowait</code>
+option was specified.  The <code>nodelay</code> option disables the Nagle buffering
+algoritm.  If <var>host</var> is omitted, 0.0.0.0 is assumed. Only
+one TCP connection at a time is accepted. You can use <code>telnet</code> to
+connect to the corresponding character device.
+</p><dl compact="compact">
+<dt> <code>Example to send tcp console to 192.168.0.2 port 4444</code></dt>
+<dd><p>-serial tcp:192.168.0.2:4444
+</p></dd>
+<dt> <code>Example to listen and wait on port 4444 for connection</code></dt>
+<dd><p>-serial tcp::4444,server
+</p></dd>
+<dt> <code>Example to not wait and listen on ip 192.168.0.100 port 4444</code></dt>
+<dd><p>-serial tcp:192.168.0.100:4444,server,nowait
+</p></dd>
+</dl>
+
+</dd>
+<dt> <code>telnet:host:port[,server][,nowait][,nodelay]</code></dt>
+<dd><p>The telnet protocol is used instead of raw tcp sockets.  The options
+work the same as if you had specified <code>-serial tcp</code>.  The
+difference is that the port acts like a telnet server or client using
+telnet option negotiation.  This will also allow you to send the
+MAGIC_SYSRQ sequence if you use a telnet that supports sending the break
+sequence.  Typically in unix telnet you do it with Control-] and then
+type &quot;send break&quot; followed by pressing the enter key.
+</p>
+</dd>
+<dt> <code>unix:path[,server][,nowait]</code></dt>
+<dd><p>A unix domain socket is used instead of a tcp socket.  The option works the
+same as if you had specified <code>-serial tcp</code> except the unix domain socket
+<var>path</var> is used for connections.
+</p>
+</dd>
+</dl>
+
+</dd>
+<dt> <samp>`-parallel dev'</samp></dt>
+<dd><p>Redirect the virtual parallel port to host device <var>dev</var> (same
+devices as the serial port). On Linux hosts, <tt>`/dev/parportN'</tt> can
+be used to use hardware devices connected on the corresponding host
+parallel port.
+</p>
+<p>This option can be used several times to simulate up to 3 parallel
+ports.
+</p>
+<p>Use <code>-parallel none</code> to disable all parallel ports.
+</p>
+</dd>
+<dt> <samp>`-monitor dev'</samp></dt>
+<dd><p>Redirect the monitor to host device <var>dev</var> (same devices as the
+serial port).
+The default device is <code>vc</code> in graphical mode and <code>stdio</code> in
+non graphical mode.
+</p>
+</dd>
+<dt> <samp>`-s'</samp></dt>
+<dd><p>Wait gdb connection to port 1234 (see section <a href="#SEC36">GDB usage</a>). 
+</p></dd>
+<dt> <samp>`-p port'</samp></dt>
+<dd><p>Change gdb connection port.  <var>port</var> can be either a decimal number
+to specify a TCP port, or a host device (same devices as the serial port).
+</p></dd>
+<dt> <samp>`-S'</samp></dt>
+<dd><p>Do not start CPU at startup (you must type 'c' in the monitor).
+</p></dd>
+<dt> <samp>`-d'</samp>             </dt>
+<dd><p>Output log in /tmp/qemu.log
+</p></dd>
+<dt> <samp>`-hdachs c,h,s,[,t]'</samp></dt>
+<dd><p>Force hard disk 0 physical geometry (1 &lt;= <var>c</var> &lt;= 16383, 1 &lt;=
+<var>h</var> &lt;= 16, 1 &lt;= <var>s</var> &lt;= 63) and optionally force the BIOS
+translation mode (<var>t</var>=none, lba or auto). Usually QEMU can guess
+all thoses parameters. This option is useful for old MS-DOS disk
+images.
+</p>
+</dd>
+<dt> <samp>`-L path'</samp></dt>
+<dd><p>Set the directory for the BIOS, VGA BIOS and keymaps.
+</p>
+</dd>
+<dt> <samp>`-std-vga'</samp></dt>
+<dd><p>Simulate a standard VGA card with Bochs VBE extensions (default is
+Cirrus Logic GD5446 PCI VGA). If your guest OS supports the VESA 2.0
+VBE extensions (e.g. Windows XP) and if you want to use high
+resolution modes (&gt;= 1280x1024x16) then you should use this option.
+</p>
+</dd>
+<dt> <samp>`-no-acpi'</samp></dt>
+<dd><p>Disable ACPI (Advanced Configuration and Power Interface) support. Use
+it if your guest OS complains about ACPI problems (PC target machine
+only).
+</p>
+</dd>
+<dt> <samp>`-no-reboot'</samp></dt>
+<dd><p>Exit instead of rebooting.
+</p>
+</dd>
+<dt> <samp>`-loadvm file'</samp></dt>
+<dd><p>Start right away with a saved state (<code>loadvm</code> in monitor)
+</p>
+</dd>
+<dt> <samp>`-semihosting'</samp></dt>
+<dd><p>Enable &quot;Angel&quot; semihosting interface (ARM target machines only).
+Note that this allows guest direct access to the host filesystem,
+so should only be used with trusted guest OS.
+</p></dd>
+</dl>
+
+
+<hr size="2">
+<a name="pcsys_005fkeys"></a>
+<a name="SEC11"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC10" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC12" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 3.4 Keys </h2>
+
+
+<p>During the graphical emulation, you can use the following keys:
+</p><dl compact="compact">
+<dt> <kbd>Ctrl-Alt-f</kbd></dt>
+<dd><p>Toggle full screen
+</p>
+</dd>
+<dt> <kbd>Ctrl-Alt-n</kbd></dt>
+<dd><p>Switch to virtual console 'n'. Standard console mappings are:
+</p><dl compact="compact">
+<dt> <em>1</em></dt>
+<dd><p>Target system display
+</p></dd>
+<dt> <em>2</em></dt>
+<dd><p>Monitor
+</p></dd>
+<dt> <em>3</em></dt>
+<dd><p>Serial port
+</p></dd>
+</dl>
+
+</dd>
+<dt> <kbd>Ctrl-Alt</kbd></dt>
+<dd><p>Toggle mouse and keyboard grab.
+</p></dd>
+</dl>
+
+<p>In the virtual consoles, you can use <kbd>Ctrl-Up</kbd>, <kbd>Ctrl-Down</kbd>,
+<kbd>Ctrl-PageUp</kbd> and <kbd>Ctrl-PageDown</kbd> to move in the back log.
+</p>
+<p>During emulation, if you are using the <samp>`-nographic'</samp> option, use
+<kbd>Ctrl-a h</kbd> to get terminal commands:
+</p>
+<dl compact="compact">
+<dt> <kbd>Ctrl-a h</kbd></dt>
+<dd><p>Print this help
+</p></dd>
+<dt> <kbd>Ctrl-a x</kbd>    </dt>
+<dd><p>Exit emulator
+</p></dd>
+<dt> <kbd>Ctrl-a s</kbd>    </dt>
+<dd><p>Save disk data back to file (if -snapshot)
+</p></dd>
+<dt> <kbd>Ctrl-a b</kbd></dt>
+<dd><p>Send break (magic sysrq in Linux)
+</p></dd>
+<dt> <kbd>Ctrl-a c</kbd></dt>
+<dd><p>Switch between console and monitor
+</p></dd>
+<dt> <kbd>Ctrl-a Ctrl-a</kbd></dt>
+<dd><p>Send Ctrl-a
+</p></dd>
+</dl>
+
+
+<hr size="2">
+<a name="pcsys_005fmonitor"></a>
+<a name="SEC12"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC11" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC13" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 3.5 QEMU Monitor </h2>
+<ul>
+<a href="#SEC13">3.5.1 Commands</a> <br>
+<a href="#SEC14">3.5.2 Integer expressions</a> <br>
+</ul>
+
+<p>The QEMU monitor is used to give complex commands to the QEMU
+emulator. You can use it to:
+</p>
+<ul class="toc">
+<li>-
+Remove or insert removable medias images
+(such as CD-ROM or floppies)
+
+</li><li>- 
+Freeze/unfreeze the Virtual Machine (VM) and save or restore its state
+from a disk file.
+
+</li><li>- Inspect the VM state without an external debugger.
+
+</li></ul>
+
+<hr size="2">
+<a name="SEC13"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC12" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC14" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h3 class="subsection"> 3.5.1 Commands </h3>
+
+<p>The following commands are available:
+</p>
+<dl compact="compact">
+<dt> <samp>`help or ? [cmd]'</samp></dt>
+<dd><p>Show the help for all commands or just for command <var>cmd</var>.
+</p>
+</dd>
+<dt> <samp>`commit'</samp>  </dt>
+<dd><p>Commit changes to the disk images (if -snapshot is used)
+</p>
+</dd>
+<dt> <samp>`info subcommand'</samp> </dt>
+<dd><p>show various information about the system state
+</p>
+<dl compact="compact">
+<dt> <samp>`info network'</samp></dt>
+<dd><p>show the various VLANs and the associated devices
+</p></dd>
+<dt> <samp>`info block'</samp></dt>
+<dd><p>show the block devices
+</p></dd>
+<dt> <samp>`info registers'</samp></dt>
+<dd><p>show the cpu registers
+</p></dd>
+<dt> <samp>`info history'</samp></dt>
+<dd><p>show the command line history
+</p></dd>
+<dt> <samp>`info pci'</samp></dt>
+<dd><p>show emulated PCI device
+</p></dd>
+<dt> <samp>`info usb'</samp></dt>
+<dd><p>show USB devices plugged on the virtual USB hub
+</p></dd>
+<dt> <samp>`info usbhost'</samp></dt>
+<dd><p>show all USB host devices
+</p></dd>
+<dt> <samp>`info capture'</samp></dt>
+<dd><p>show information about active capturing
+</p></dd>
+<dt> <samp>`info snapshots'</samp></dt>
+<dd><p>show list of VM snapshots
+</p></dd>
+<dt> <samp>`info mice'</samp></dt>
+<dd><p>show which guest mouse is receiving events
+</p></dd>
+</dl>
+
+</dd>
+<dt> <samp>`q or quit'</samp></dt>
+<dd><p>Quit the emulator.
+</p>
+</dd>
+<dt> <samp>`eject [-f] device'</samp></dt>
+<dd><p>Eject a removable media (use -f to force it).
+</p>
+</dd>
+<dt> <samp>`change device filename'</samp></dt>
+<dd><p>Change a removable media.
+</p>
+</dd>
+<dt> <samp>`screendump filename'</samp></dt>
+<dd><p>Save screen into PPM image <var>filename</var>.
+</p>
+</dd>
+<dt> <samp>`mouse_move dx dy [dz]'</samp></dt>
+<dd><p>Move the active mouse to the specified coordinates <var>dx</var> <var>dy</var>
+with optional scroll axis <var>dz</var>.
+</p>
+</dd>
+<dt> <samp>`mouse_button val'</samp></dt>
+<dd><p>Change the active mouse button state <var>val</var> (1=L, 2=M, 4=R).
+</p>
+</dd>
+<dt> <samp>`mouse_set index'</samp></dt>
+<dd><p>Set which mouse device receives events at given <var>index</var>, index
+can be obtained with
+</p><table><tr><td>&nbsp;</td><td><pre class="example">info mice
+</pre></td></tr></table>
+</dd>
+<dt> <samp>`wavcapture filename [frequency [bits [channels]]]'</samp></dt>
+<dd><p>Capture audio into <var>filename</var>. Using sample rate <var>frequency</var>
+bits per sample <var>bits</var> and number of channels <var>channels</var>.
+</p>
+<p>Defaults:
+</p><ul class="toc">
+<li>- Sample rate = 44100 Hz - CD quality
+</li><li>- Bits = 16
+</li><li>- Number of channels = 2 - Stereo
+</li></ul>
+
+</dd>
+<dt> <samp>`stopcapture index'</samp></dt>
+<dd><p>Stop capture with a given <var>index</var>, index can be obtained with
+</p><table><tr><td>&nbsp;</td><td><pre class="example">info capture
+</pre></td></tr></table>
+</dd>
+<dt> <samp>`log item1[,...]'</samp></dt>
+<dd><p>Activate logging of the specified items to <tt>`/tmp/qemu.log'</tt>.
+</p>
+</dd>
+<dt> <samp>`savevm [tag|id]'</samp></dt>
+<dd><p>Create a snapshot of the whole virtual machine. If <var>tag</var> is
+provided, it is used as human readable identifier. If there is already
+a snapshot with the same tag or ID, it is replaced. More info at
+<a href="#SEC18">VM snapshots</a>.
+</p>
+</dd>
+<dt> <samp>`loadvm tag|id'</samp></dt>
+<dd><p>Set the whole virtual machine to the snapshot identified by the tag
+<var>tag</var> or the unique snapshot ID <var>id</var>.
+</p>
+</dd>
+<dt> <samp>`delvm tag|id'</samp></dt>
+<dd><p>Delete the snapshot identified by <var>tag</var> or <var>id</var>.
+</p>
+</dd>
+<dt> <samp>`stop'</samp></dt>
+<dd><p>Stop emulation.
+</p>
+</dd>
+<dt> <samp>`c or cont'</samp></dt>
+<dd><p>Resume emulation.
+</p>
+</dd>
+<dt> <samp>`gdbserver [port]'</samp></dt>
+<dd><p>Start gdbserver session (default port=1234)
+</p>
+</dd>
+<dt> <samp>`x/fmt addr'</samp></dt>
+<dd><p>Virtual memory dump starting at <var>addr</var>.
+</p>
+</dd>
+<dt> <samp>`xp /fmt addr'</samp></dt>
+<dd><p>Physical memory dump starting at <var>addr</var>.
+</p>
+<p><var>fmt</var> is a format which tells the command how to format the
+data. Its syntax is: <samp>`/{count}{format}{size}'</samp>
+</p>
+<dl compact="compact">
+<dt> <var>count</var> </dt>
+<dd><p>is the number of items to be dumped.
+</p>
+</dd>
+<dt> <var>format</var></dt>
+<dd><p>can be x (hexa), d (signed decimal), u (unsigned decimal), o (octal),
+c (char) or i (asm instruction).
+</p>
+</dd>
+<dt> <var>size</var></dt>
+<dd><p>can be b (8 bits), h (16 bits), w (32 bits) or g (64 bits). On x86,
+<code>h</code> or <code>w</code> can be specified with the <code>i</code> format to
+respectively select 16 or 32 bit code instruction size.
+</p>
+</dd>
+</dl>
+
+<p>Examples: 
+</p><ul class="toc">
+<li>
+Dump 10 instructions at the current instruction pointer:
+<table><tr><td>&nbsp;</td><td><pre class="example">(qemu) x/10i $eip
+0x90107063:  ret
+0x90107064:  sti
+0x90107065:  lea    0x0(%esi,1),%esi
+0x90107069:  lea    0x0(%edi,1),%edi
+0x90107070:  ret
+0x90107071:  jmp    0x90107080
+0x90107073:  nop
+0x90107074:  nop
+0x90107075:  nop
+0x90107076:  nop
+</pre></td></tr></table>
+</li><li>
+Dump 80 16 bit values at the start of the video memory.
+<table><tr><td>&nbsp;</td><td><pre class="smallexample">(qemu) xp/80hx 0xb8000
+0x000b8000: 0x0b50 0x0b6c 0x0b65 0x0b78 0x0b38 0x0b36 0x0b2f 0x0b42
+0x000b8010: 0x0b6f 0x0b63 0x0b68 0x0b73 0x0b20 0x0b56 0x0b47 0x0b41
+0x000b8020: 0x0b42 0x0b69 0x0b6f 0x0b73 0x0b20 0x0b63 0x0b75 0x0b72
+0x000b8030: 0x0b72 0x0b65 0x0b6e 0x0b74 0x0b2d 0x0b63 0x0b76 0x0b73
+0x000b8040: 0x0b20 0x0b30 0x0b35 0x0b20 0x0b4e 0x0b6f 0x0b76 0x0b20
+0x000b8050: 0x0b32 0x0b30 0x0b30 0x0b33 0x0720 0x0720 0x0720 0x0720
+0x000b8060: 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720
+0x000b8070: 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720
+0x000b8080: 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720
+0x000b8090: 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720
+</pre></td></tr></table></li></ul>
+
+</dd>
+<dt> <samp>`p or print/fmt expr'</samp></dt>
+<dd>
+<p>Print expression value. Only the <var>format</var> part of <var>fmt</var> is
+used.
+</p>
+</dd>
+<dt> <samp>`sendkey keys'</samp></dt>
+<dd>
+<p>Send <var>keys</var> to the emulator. Use <code>-</code> to press several keys
+simultaneously. Example:
+</p><table><tr><td>&nbsp;</td><td><pre class="example">sendkey ctrl-alt-f1
+</pre></td></tr></table>
+<p>This command is useful to send keys that your graphical user interface
+intercepts at low level, such as <code>ctrl-alt-f1</code> in X Window.
+</p>
+</dd>
+<dt> <samp>`system_reset'</samp></dt>
+<dd>
+<p>Reset the system.
+</p>
+</dd>
+<dt> <samp>`usb_add devname'</samp></dt>
+<dd>
+<p>Add the USB device <var>devname</var>.  For details of available devices see
+<a href="#SEC34">Connecting USB devices</a>
+</p>
+</dd>
+<dt> <samp>`usb_del devname'</samp></dt>
+<dd>
+<p>Remove the USB device <var>devname</var> from the QEMU virtual USB
+hub. <var>devname</var> has the syntax <code>bus.addr</code>. Use the monitor
+command <code>info usb</code> to see the devices you can remove.
+</p>
+</dd>
+</dl>
+
+<hr size="2">
+<a name="SEC14"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC13" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC15" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h3 class="subsection"> 3.5.2 Integer expressions </h3>
+
+<p>The monitor understands integers expressions for every integer
+argument. You can use register names to get the value of specifics
+CPU registers by prefixing them with <em>$</em>.
+</p>
+<hr size="2">
+<a name="disk_005fimages"></a>
+<a name="SEC15"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC14" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC16" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 3.6 Disk Images </h2>
+<ul>
+<a href="#SEC16">3.6.1 Quick start for disk image creation</a> <br>
+<a href="#SEC17">3.6.2 Snapshot mode</a> <br>
+<a href="#SEC18">3.6.3 VM snapshots</a> <br>
+<a href="#SEC19">3.6.4 <code>qemu-img</code> Invocation</a> <br>
+<a href="#SEC20">3.6.5 Using host drives</a> <br>
+<ul>
+<a href="#SEC21">3.6.5.1 Linux</a> <br>
+<a href="#SEC22">3.6.5.2 Windows</a> <br>
+<a href="#SEC23">3.6.5.3 Mac OS X</a> <br>
+</ul>
+<a href="#SEC24">3.6.6 Virtual FAT disk images</a> <br>
+</ul>
+
+<p>Since version 0.6.1, QEMU supports many disk image formats, including
+growable disk images (their size increase as non empty sectors are
+written), compressed and encrypted disk images. Version 0.8.3 added
+the new qcow2 disk image format which is essential to support VM
+snapshots.
+</p>
+
+<hr size="2">
+<a name="disk_005fimages_005fquickstart"></a>
+<a name="SEC16"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC15" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC17" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h3 class="subsection"> 3.6.1 Quick start for disk image creation </h3>
+
+<p>You can create a disk image with the command:
+</p><table><tr><td>&nbsp;</td><td><pre class="example">qemu-img create myimage.img mysize
+</pre></td></tr></table><p>where <var>myimage.img</var> is the disk image filename and <var>mysize</var> is its
+size in kilobytes. You can add an <code>M</code> suffix to give the size in
+megabytes and a <code>G</code> suffix for gigabytes.
+</p>
+<p>See <a href="#SEC19"><code>qemu-img</code> Invocation</a> for more information.
+</p>
+<hr size="2">
+<a name="disk_005fimages_005fsnapshot_005fmode"></a>
+<a name="SEC17"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC16" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC18" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h3 class="subsection"> 3.6.2 Snapshot mode </h3>
+
+<p>If you use the option <samp>`-snapshot'</samp>, all disk images are
+considered as read only. When sectors in written, they are written in
+a temporary file created in <tt>`/tmp'</tt>. You can however force the
+write back to the raw disk images by using the <code>commit</code> monitor
+command (or <kbd>C-a s</kbd> in the serial console).
+</p>
+<hr size="2">
+<a name="vm_005fsnapshots"></a>
+<a name="SEC18"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC17" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC19" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h3 class="subsection"> 3.6.3 VM snapshots </h3>
+
+<p>VM snapshots are snapshots of the complete virtual machine including
+CPU state, RAM, device state and the content of all the writable
+disks. In order to use VM snapshots, you must have at least one non
+removable and writable block device using the <code>qcow2</code> disk image
+format. Normally this device is the first virtual hard drive.
+</p>
+<p>Use the monitor command <code>savevm</code> to create a new VM snapshot or
+replace an existing one. A human readable name can be assigned to each
+snapshot in addition to its numerical ID.
+</p>
+<p>Use <code>loadvm</code> to restore a VM snapshot and <code>delvm</code> to remove
+a VM snapshot. <code>info snapshots</code> lists the available snapshots
+with their associated information:
+</p>
+<table><tr><td>&nbsp;</td><td><pre class="example">(qemu) info snapshots
+Snapshot devices: hda
+Snapshot list (from hda):
+ID        TAG                 VM SIZE                DATE       VM CLOCK
+1         start                   41M 2006-08-06 12:38:02   00:00:14.954
+2                                 40M 2006-08-06 12:43:29   00:00:18.633
+3         msys                    40M 2006-08-06 12:44:04   00:00:23.514
+</pre></td></tr></table>
+<p>A VM snapshot is made of a VM state info (its size is shown in
+<code>info snapshots</code>) and a snapshot of every writable disk image.
+The VM state info is stored in the first <code>qcow2</code> non removable
+and writable block device. The disk image snapshots are stored in
+every disk image. The size of a snapshot in a disk image is difficult
+to evaluate and is not shown by <code>info snapshots</code> because the
+associated disk sectors are shared among all the snapshots to save
+disk space (otherwise each snapshot would need a full copy of all the
+disk images).
+</p>
+<p>When using the (unrelated) <code>-snapshot</code> option
+(<a href="#SEC17">Snapshot mode</a>), you can always make VM snapshots,
+but they are deleted as soon as you exit QEMU.
+</p>
+<p>VM snapshots currently have the following known limitations:
+</p><ul class="toc">
+<li> 
+They cannot cope with removable devices if they are removed or
+inserted after a snapshot is done.
+</li><li> 
+A few device drivers still have incomplete snapshot support so their
+state is not saved or restored properly (in particular USB).
+</li></ul>
+
+<hr size="2">
+<a name="qemu_005fimg_005finvocation"></a>
+<a name="SEC19"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC18" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC20" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h3 class="subsection"> 3.6.4 <code>qemu-img</code> Invocation </h3>
+
+
+<table><tr><td>&nbsp;</td><td><pre class="example">usage: qemu-img command [command options]
+</pre></td></tr></table>
+
+<p>The following commands are supported:
+</p><dl compact="compact">
+<dt> <samp>`create [-e] [-b <var>base_image</var>] [-f <var>fmt</var>] <var>filename</var> [<var>size</var>]'</samp></dt>
+<dt> <samp>`commit [-f <var>fmt</var>] <var>filename</var>'</samp></dt>
+<dt> <samp>`convert [-c] [-e] [-f <var>fmt</var>] <var>filename</var> [-O <var>output_fmt</var>] <var>output_filename</var>'</samp></dt>
+<dt> <samp>`info [-f <var>fmt</var>] <var>filename</var>'</samp></dt>
+</dl>
+
+<p>Command parameters:
+</p><dl compact="compact">
+<dt> <var>filename</var></dt>
+<dd><p> is a disk image filename
+</p></dd>
+<dt> <var>base_image</var> </dt>
+<dd><p>is the read-only disk image which is used as base for a copy on
+    write image; the copy on write image only stores the modified data
+</p>
+</dd>
+<dt> <var>fmt</var> </dt>
+<dd><p>is the disk image format. It is guessed automatically in most cases. The following formats are supported:
+</p>
+<dl compact="compact">
+<dt> <code>raw</code></dt>
+<dd>
+<p>Raw disk image format (default). This format has the advantage of
+being simple and easily exportable to all other emulators. If your
+file system supports <em>holes</em> (for example in ext2 or ext3 on
+Linux or NTFS on Windows), then only the written sectors will reserve
+space. Use <code>qemu-img info</code> to know the real size used by the
+image or <code>ls -ls</code> on Unix/Linux.
+</p>
+</dd>
+<dt> <code>qcow2</code></dt>
+<dd><p>QEMU image format, the most versatile format. Use it to have smaller
+images (useful if your filesystem does not supports holes, for example
+on Windows), optional AES encryption, zlib based compression and
+support of multiple VM snapshots.
+</p></dd>
+<dt> <code>qcow</code></dt>
+<dd><p>Old QEMU image format. Left for compatibility.
+</p></dd>
+<dt> <code>cow</code></dt>
+<dd><p>User Mode Linux Copy On Write image format. Used to be the only growable
+image format in QEMU. It is supported only for compatibility with
+previous versions. It does not work on win32.
+</p></dd>
+<dt> <code>vmdk</code></dt>
+<dd><p>VMware 3 and 4 compatible image format.
+</p></dd>
+<dt> <code>cloop</code></dt>
+<dd><p>Linux Compressed Loop image, useful only to reuse directly compressed
+CD-ROM images present for example in the Knoppix CD-ROMs.
+</p></dd>
+</dl>
+
+</dd>
+<dt> <var>size</var> </dt>
+<dd><p>is the disk image size in kilobytes. Optional suffixes <code>M</code>
+(megabyte) and <code>G</code> (gigabyte) are supported 
+</p>
+</dd>
+<dt> <var>output_filename</var></dt>
+<dd><p>is the destination disk image filename 
+</p>
+</dd>
+<dt> <var>output_fmt</var></dt>
+<dd><p> is the destination format
+</p>
+</dd>
+<dt> <var>-c</var></dt>
+<dd><p>indicates that target image must be compressed (qcow format only)
+</p></dd>
+<dt> <var>-e</var> </dt>
+<dd><p>indicates that the target image must be encrypted (qcow format only)
+</p></dd>
+</dl>
+
+<p>Command description:
+</p>
+<dl compact="compact">
+<dt> <samp>`create [-e] [-b <var>base_image</var>] [-f <var>fmt</var>] <var>filename</var> [<var>size</var>]'</samp></dt>
+<dd>
+<p>Create the new disk image <var>filename</var> of size <var>size</var> and format
+<var>fmt</var>. 
+</p>
+<p>If <var>base_image</var> is specified, then the image will record only the
+differences from <var>base_image</var>. No size needs to be specified in
+this case. <var>base_image</var> will never be modified unless you use the
+<code>commit</code> monitor command.
+</p>
+</dd>
+<dt> <samp>`commit [-f <var>fmt</var>] <var>filename</var>'</samp></dt>
+<dd>
+<p>Commit the changes recorded in <var>filename</var> in its base image.
+</p>
+</dd>
+<dt> <samp>`convert [-c] [-e] [-f <var>fmt</var>] <var>filename</var> [-O <var>output_fmt</var>] <var>output_filename</var>'</samp></dt>
+<dd>
+<p>Convert the disk image <var>filename</var> to disk image <var>output_filename</var>
+using format <var>output_fmt</var>. It can be optionnaly encrypted
+(<code>-e</code> option) or compressed (<code>-c</code> option).
+</p>
+<p>Only the format <code>qcow</code> supports encryption or compression. The
+compression is read-only. It means that if a compressed sector is
+rewritten, then it is rewritten as uncompressed data.
+</p>
+<p>Encryption uses the AES format which is very secure (128 bit keys). Use
+a long password (16 characters) to get maximum protection.
+</p>
+<p>Image conversion is also useful to get smaller image when using a
+growable format such as <code>qcow</code> or <code>cow</code>: the empty sectors
+are detected and suppressed from the destination image.
+</p>
+</dd>
+<dt> <samp>`info [-f <var>fmt</var>] <var>filename</var>'</samp></dt>
+<dd>
+<p>Give information about the disk image <var>filename</var>. Use it in
+particular to know the size reserved on disk which can be different
+from the displayed size. If VM snapshots are stored in the disk image,
+they are displayed too.
+</p></dd>
+</dl>
+
+
+
+<hr size="2">
+<a name="host_005fdrives"></a>
+<a name="SEC20"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC19" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC21" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h3 class="subsection"> 3.6.5 Using host drives </h3>
+<ul>
+<a href="#SEC21">3.6.5.1 Linux</a> <br>
+<a href="#SEC22">3.6.5.2 Windows</a> <br>
+<a href="#SEC23">3.6.5.3 Mac OS X</a> <br>
+</ul>
+
+<p>In addition to disk image files, QEMU can directly access host
+devices. We describe here the usage for QEMU version &gt;= 0.8.3.
+</p>
+<hr size="2">
+<a name="SEC21"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC20" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC22" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h4 class="subsubsection"> 3.6.5.1 Linux </h4>
+
+<p>On Linux, you can directly use the host device filename instead of a
+disk image filename provided you have enough proviledge to access
+it. For example, use <tt>`/dev/cdrom'</tt> to access to the CDROM or
+<tt>`/dev/fd0'</tt> for the floppy.
+</p>
+<dl compact="compact">
+<dt> <code>CD</code></dt>
+<dd><p>You can specify a CDROM device even if no CDROM is loaded. QEMU has
+specific code to detect CDROM insertion or removal. CDROM ejection by
+the guest OS is supported. Currently only data CDs are supported.
+</p></dd>
+<dt> <code>Floppy</code></dt>
+<dd><p>You can specify a floppy device even if no floppy is loaded. Floppy
+removal is currently not detected accurately (if you change floppy
+without doing floppy access while the floppy is not loaded, the guest
+OS will think that the same floppy is loaded).
+</p></dd>
+<dt> <code>Hard disks</code></dt>
+<dd><p>Hard disks can be used. Normally you must specify the whole disk
+(<tt>`/dev/hdb'</tt> instead of <tt>`/dev/hdb1'</tt>) so that the guest OS can
+see it as a partitioned disk. WARNING: unless you know what you do, it
+is better to only make READ-ONLY accesses to the hard disk otherwise
+you may corrupt your host data (use the <samp>`-snapshot'</samp> command
+line option or modify the device permissions accordingly).
+</p></dd>
+</dl>
+
+<hr size="2">
+<a name="SEC22"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC21" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC23" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h4 class="subsubsection"> 3.6.5.2 Windows </h4>
+
+<dl compact="compact">
+<dt> <code>CD</code></dt>
+<dd><p>The prefered syntax is the drive letter (e.g. <tt>`d:'</tt>). The
+alternate syntax <tt>`\\.\d:'</tt> is supported. <tt>`/dev/cdrom'</tt> is
+supported as an alias to the first CDROM drive.
+</p>
+<p>Currently there is no specific code to handle removable medias, so it
+is better to use the <code>change</code> or <code>eject</code> monitor commands to
+change or eject media.
+</p></dd>
+<dt> <code>Hard disks</code></dt>
+<dd><p>Hard disks can be used with the syntax: <tt>`\\.\PhysicalDriveN'</tt>
+where <var>N</var> is the drive number (0 is the first hard disk).
+</p>
+<p>WARNING: unless you know what you do, it is better to only make
+READ-ONLY accesses to the hard disk otherwise you may corrupt your
+host data (use the <samp>`-snapshot'</samp> command line so that the
+modifications are written in a temporary file).
+</p></dd>
+</dl>
+
+
+<hr size="2">
+<a name="SEC23"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC22" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC24" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h4 class="subsubsection"> 3.6.5.3 Mac OS X </h4>
+
+<p><tt>`/dev/cdrom'</tt> is an alias to the first CDROM. 
+</p>
+<p>Currently there is no specific code to handle removable medias, so it
+is better to use the <code>change</code> or <code>eject</code> monitor commands to
+change or eject media.
+</p>
+<hr size="2">
+<a name="disk_005fimages_005ffat_005fimages"></a>
+<a name="SEC24"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC23" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC25" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h3 class="subsection"> 3.6.6 Virtual FAT disk images </h3>
+
+<p>QEMU can automatically create a virtual FAT disk image from a
+directory tree. In order to use it, just type:
+</p>
+<table><tr><td>&nbsp;</td><td><pre class="example">qemu linux.img -hdb fat:/my_directory
+</pre></td></tr></table>
+<p>Then you access access to all the files in the <tt>`/my_directory'</tt>
+directory without having to copy them in a disk image or to export
+them via SAMBA or NFS. The default access is <em>read-only</em>.
+</p>
+<p>Floppies can be emulated with the <code>:floppy:</code> option:
+</p>
+<table><tr><td>&nbsp;</td><td><pre class="example">qemu linux.img -fda fat:floppy:/my_directory
+</pre></td></tr></table>
+<p>A read/write support is available for testing (beta stage) with the
+<code>:rw:</code> option:
+</p>
+<table><tr><td>&nbsp;</td><td><pre class="example">qemu linux.img -fda fat:floppy:rw:/my_directory
+</pre></td></tr></table>
+<p>What you should <em>never</em> do:
+</p><ul class="toc">
+<li> use non-ASCII filenames ;
+</li><li> use &quot;-snapshot&quot; together with &quot;:rw:&quot; ;
+</li><li> expect it to work when loadvm'ing ;
+</li><li> write to the FAT directory on the host system while accessing it with the guest system.
+</li></ul>
+
+<hr size="2">
+<a name="pcsys_005fnetwork"></a>
+<a name="SEC25"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC24" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC26" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 3.7 Network emulation </h2>
+<ul>
+<a href="#SEC26">3.7.1 VLANs</a> <br>
+<a href="#SEC27">3.7.2 Using TAP network interfaces</a> <br>
+<ul>
+<a href="#SEC28">3.7.2.1 Linux host</a> <br>
+<a href="#SEC29">3.7.2.2 Windows host</a> <br>
+</ul>
+<a href="#SEC30">3.7.3 Using the user mode network stack</a> <br>
+<a href="#SEC31">3.7.4 Connecting VLANs between QEMU instances</a> <br>
+</ul>
+
+<p>QEMU can simulate several networks cards (NE2000 boards on the PC
+target) and can connect them to an arbitrary number of Virtual Local
+Area Networks (VLANs). Host TAP devices can be connected to any QEMU
+VLAN. VLAN can be connected between separate instances of QEMU to
+simulate large networks. For simpler usage, a non priviledged user mode
+network stack can replace the TAP device to have a basic network
+connection.
+</p>
+<hr size="2">
+<a name="SEC26"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC25" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC27" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h3 class="subsection"> 3.7.1 VLANs </h3>
+
+<p>QEMU simulates several VLANs. A VLAN can be symbolised as a virtual
+connection between several network devices. These devices can be for
+example QEMU virtual Ethernet cards or virtual Host ethernet devices
+(TAP devices).
+</p>
+<hr size="2">
+<a name="SEC27"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC26" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC28" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h3 class="subsection"> 3.7.2 Using TAP network interfaces </h3>
+<ul>
+<a href="#SEC28">3.7.2.1 Linux host</a> <br>
+<a href="#SEC29">3.7.2.2 Windows host</a> <br>
+</ul>
+
+<p>This is the standard way to connect QEMU to a real network. QEMU adds
+a virtual network device on your host (called <code>tapN</code>), and you
+can then configure it as if it was a real ethernet card.
+</p>
+<hr size="2">
+<a name="SEC28"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC27" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC29" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h4 class="subsubsection"> 3.7.2.1 Linux host </h4>
+
+<p>As an example, you can download the <tt>`linux-test-xxx.tar.gz'</tt>
+archive and copy the script <tt>`qemu-ifup'</tt> in <tt>`/etc'</tt> and
+configure properly <code>sudo</code> so that the command <code>ifconfig</code>
+contained in <tt>`qemu-ifup'</tt> can be executed as root. You must verify
+that your host kernel supports the TAP network interfaces: the
+device <tt>`/dev/net/tun'</tt> must be present.
+</p>
+<p>See <a href="#SEC10">Invocation</a> to have examples of command lines using the
+TAP network interfaces.
+</p>
+<hr size="2">
+<a name="SEC29"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC28" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC30" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h4 class="subsubsection"> 3.7.2.2 Windows host </h4>
+
+<p>There is a virtual ethernet driver for Windows 2000/XP systems, called
+TAP-Win32. But it is not included in standard QEMU for Windows,
+so you will need to get it separately. It is part of OpenVPN package,
+so download OpenVPN from : <a href="http://openvpn.net/">http://openvpn.net/</a>.
+</p>
+<hr size="2">
+<a name="SEC30"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC29" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC31" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h3 class="subsection"> 3.7.3 Using the user mode network stack </h3>
+
+<p>By using the option <samp>`-net user'</samp> (default configuration if no
+<samp>`-net'</samp> option is specified), QEMU uses a completely user mode
+network stack (you don't need root priviledge to use the virtual
+network). The virtual network configuration is the following:
+</p>
+<table><tr><td>&nbsp;</td><td><pre class="example">
+         QEMU VLAN      &lt;------&gt;  Firewall/DHCP server &lt;-----&gt; Internet
+                           |          (10.0.2.2)
+                           |
+                           ----&gt;  DNS server (10.0.2.3)
+                           |     
+                           ----&gt;  SMB server (10.0.2.4)
+</pre></td></tr></table>
+<p>The QEMU VM behaves as if it was behind a firewall which blocks all
+incoming connections. You can use a DHCP client to automatically
+configure the network in the QEMU VM. The DHCP server assign addresses
+to the hosts starting from 10.0.2.15.
+</p>
+<p>In order to check that the user mode network is working, you can ping
+the address 10.0.2.2 and verify that you got an address in the range
+10.0.2.x from the QEMU virtual DHCP server.
+</p>
+<p>Note that <code>ping</code> is not supported reliably to the internet as it
+would require root priviledges. It means you can only ping the local
+router (10.0.2.2).
+</p>
+<p>When using the built-in TFTP server, the router is also the TFTP
+server.
+</p>
+<p>When using the <samp>`-redir'</samp> option, TCP or UDP connections can be
+redirected from the host to the guest. It allows for example to
+redirect X11, telnet or SSH connections.
+</p>
+<hr size="2">
+<a name="SEC31"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC30" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC32" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h3 class="subsection"> 3.7.4 Connecting VLANs between QEMU instances </h3>
+
+<p>Using the <samp>`-net socket'</samp> option, it is possible to make VLANs
+that span several QEMU instances. See <a href="#SEC10">Invocation</a> to have a
+basic example.
+</p>
+<hr size="2">
+<a name="direct_005flinux_005fboot"></a>
+<a name="SEC32"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC31" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC33" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 3.8 Direct Linux Boot </h2>
+
+<p>This section explains how to launch a Linux kernel inside QEMU without
+having to make a full bootable image. It is very useful for fast Linux
+kernel testing.
+</p>
+<p>The syntax is:
+</p><table><tr><td>&nbsp;</td><td><pre class="example">qemu -kernel arch/i386/boot/bzImage -hda root-2.4.20.img -append &quot;root=/dev/hda&quot;
+</pre></td></tr></table>
+<p>Use <samp>`-kernel'</samp> to provide the Linux kernel image and
+<samp>`-append'</samp> to give the kernel command line arguments. The
+<samp>`-initrd'</samp> option can be used to provide an INITRD image.
+</p>
+<p>When using the direct Linux boot, a disk image for the first hard disk
+<tt>`hda'</tt> is required because its boot sector is used to launch the
+Linux kernel.
+</p>
+<p>If you do not need graphical output, you can disable it and redirect
+the virtual serial port and the QEMU monitor to the console with the
+<samp>`-nographic'</samp> option. The typical command line is:
+</p><table><tr><td>&nbsp;</td><td><pre class="example">qemu -kernel arch/i386/boot/bzImage -hda root-2.4.20.img \
+     -append &quot;root=/dev/hda console=ttyS0&quot; -nographic
+</pre></td></tr></table>
+<p>Use <kbd>Ctrl-a c</kbd> to switch between the serial console and the
+monitor (see section <a href="#SEC11">Keys</a>).
+</p>
+<hr size="2">
+<a name="pcsys_005fusb"></a>
+<a name="SEC33"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC32" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC34" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 3.9 USB emulation </h2>
+<ul>
+<a href="#SEC34">3.9.1 Connecting USB devices</a> <br>
+<a href="#SEC35">3.9.2 Using host USB devices on a Linux host</a> <br>
+</ul>
+
+<p>QEMU emulates a PCI UHCI USB controller. You can virtually plug
+virtual USB devices or real host USB devices (experimental, works only
+on Linux hosts).  Qemu will automatically create and connect virtual USB hubs
+as necessary to connect multiple USB devices.
+</p>
+<hr size="2">
+<a name="usb_005fdevices"></a>
+<a name="SEC34"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC33" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC35" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h3 class="subsection"> 3.9.1 Connecting USB devices </h3>
+
+<p>USB devices can be connected with the <samp>`-usbdevice'</samp> commandline option
+or the <code>usb_add</code> monitor command.  Available devices are:
+</p>
+<dl compact="compact">
+<dt> <var><code>mouse</code></var></dt>
+<dd><p>Virtual Mouse.  This will override the PS/2 mouse emulation when activated.
+</p></dd>
+<dt> <var><code>tablet</code></var></dt>
+<dd><p>Pointer device that uses absolute coordinates (like a touchscreen).
+This means qemu is able to report the mouse position without having
+to grab the mouse.  Also overrides the PS/2 mouse emulation when activated.
+</p></dd>
+<dt> <var><code>disk:file</code></var></dt>
+<dd><p>Mass storage device based on <var>file</var> (see section <a href="#SEC15">Disk Images</a>)
+</p></dd>
+<dt> <var><code>host:bus.addr</code></var></dt>
+<dd><p>Pass through the host device identified by <var>bus.addr</var>
+(Linux only)
+</p></dd>
+<dt> <var><code>host:vendor_id:product_id</code></var></dt>
+<dd><p>Pass through the host device identified by <var>vendor_id:product_id</var>
+(Linux only)
+</p></dd>
+</dl>
+
+<hr size="2">
+<a name="host_005fusb_005fdevices"></a>
+<a name="SEC35"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC34" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC36" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h3 class="subsection"> 3.9.2 Using host USB devices on a Linux host </h3>
+
+<p>WARNING: this is an experimental feature. QEMU will slow down when
+using it. USB devices requiring real time streaming (i.e. USB Video
+Cameras) are not supported yet.
+</p>
+<ol>
+<li> If you use an early Linux 2.4 kernel, verify that no Linux driver 
+is actually using the USB device. A simple way to do that is simply to
+disable the corresponding kernel module by renaming it from <tt>`mydriver.o'</tt>
+to <tt>`mydriver.o.disabled'</tt>.
+
+</li><li> Verify that <tt>`/proc/bus/usb'</tt> is working (most Linux distributions should enable it by default). You should see something like that:
+<table><tr><td>&nbsp;</td><td><pre class="example">ls /proc/bus/usb
+001  devices  drivers
+</pre></td></tr></table>
+</li><li> Since only root can access to the USB devices directly, you can either launch QEMU as root or change the permissions of the USB devices you want to use. For testing, the following suffices:
+<table><tr><td>&nbsp;</td><td><pre class="example">chown -R myuid /proc/bus/usb
+</pre></td></tr></table>
+</li><li> Launch QEMU and do in the monitor:
+<table><tr><td>&nbsp;</td><td><pre class="example">info usbhost
+  Device 1.2, speed 480 Mb/s
+    Class 00: USB device 1234:5678, USB DISK
+</pre></td></tr></table><p>You should see the list of the devices you can use (Never try to use
+hubs, it won't work).
+</p>
+</li><li> Add the device in QEMU by using:
+<table><tr><td>&nbsp;</td><td><pre class="example">usb_add host:1234:5678
+</pre></td></tr></table>
+<p>Normally the guest OS should report that a new USB device is
+plugged. You can use the option <samp>`-usbdevice'</samp> to do the same.
+</p>
+</li><li> Now you can try to use the host USB device in QEMU.
+
+</li></ol>
+
+<p>When relaunching QEMU, you may have to unplug and plug again the USB
+device to make it work again (this is a bug).
+</p>
+<hr size="2">
+<a name="gdb_005fusage"></a>
+<a name="SEC36"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC35" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC37" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 3.10 GDB usage </h2>
+
+<p>QEMU has a primitive support to work with gdb, so that you can do
+'Ctrl-C' while the virtual machine is running and inspect its state.
+</p>
+<p>In order to use gdb, launch qemu with the '-s' option. It will wait for a
+gdb connection:
+</p><table><tr><td>&nbsp;</td><td><pre class="example">&gt; qemu -s -kernel arch/i386/boot/bzImage -hda root-2.4.20.img \
+       -append &quot;root=/dev/hda&quot;
+Connected to host network interface: tun0
+Waiting gdb connection on port 1234
+</pre></td></tr></table>
+<p>Then launch gdb on the 'vmlinux' executable:
+</p><table><tr><td>&nbsp;</td><td><pre class="example">&gt; gdb vmlinux
+</pre></td></tr></table>
+<p>In gdb, connect to QEMU:
+</p><table><tr><td>&nbsp;</td><td><pre class="example">(gdb) target remote localhost:1234
+</pre></td></tr></table>
+<p>Then you can use gdb normally. For example, type 'c' to launch the kernel:
+</p><table><tr><td>&nbsp;</td><td><pre class="example">(gdb) c
+</pre></td></tr></table>
+<p>Here are some useful tips in order to use gdb on system code:
+</p>
+<ol>
+<li>
+Use <code>info reg</code> to display all the CPU registers.
+</li><li>
+Use <code>x/10i $eip</code> to display the code at the PC position.
+</li><li>
+Use <code>set architecture i8086</code> to dump 16 bit code. Then use
+<code>x/10i $cs*16+$eip</code> to dump the code at the PC position.
+</li></ol>
+
+<hr size="2">
+<a name="pcsys_005fos_005fspecific"></a>
+<a name="SEC37"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC36" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC38" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 3.11 Target OS specific information </h2>
+<ul>
+<a href="#SEC38">3.11.1 Linux</a> <br>
+<a href="#SEC39">3.11.2 Windows</a> <br>
+<ul>
+<a href="#SEC40">3.11.2.1 SVGA graphic modes support</a> <br>
+<a href="#SEC41">3.11.2.2 CPU usage reduction</a> <br>
+<a href="#SEC42">3.11.2.3 Windows 2000 disk full problem</a> <br>
+<a href="#SEC43">3.11.2.4 Windows 2000 shutdown</a> <br>
+<a href="#SEC44">3.11.2.5 Share a directory between Unix and Windows</a> <br>
+<a href="#SEC45">3.11.2.6 Windows XP security problem</a> <br>
+</ul>
+<a href="#SEC46">3.11.3 MS-DOS and FreeDOS</a> <br>
+<ul>
+<a href="#SEC47">3.11.3.1 CPU usage reduction</a> <br>
+</ul>
+</ul>
+
+<hr size="2">
+<a name="SEC38"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC37" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC39" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h3 class="subsection"> 3.11.1 Linux </h3>
+
+<p>To have access to SVGA graphic modes under X11, use the <code>vesa</code> or
+the <code>cirrus</code> X11 driver. For optimal performances, use 16 bit
+color depth in the guest and the host OS.
+</p>
+<p>When using a 2.6 guest Linux kernel, you should add the option
+<code>clock=pit</code> on the kernel command line because the 2.6 Linux
+kernels make very strict real time clock checks by default that QEMU
+cannot simulate exactly.
+</p>
+<p>When using a 2.6 guest Linux kernel, verify that the 4G/4G patch is
+not activated because QEMU is slower with this patch. The QEMU
+Accelerator Module is also much slower in this case. Earlier Fedora
+Core 3 Linux kernel (&lt; 2.6.9-1.724_FC3) were known to incorporte this
+patch by default. Newer kernels don't have it.
+</p>
+<hr size="2">
+<a name="SEC39"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC38" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC40" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h3 class="subsection"> 3.11.2 Windows </h3>
+<ul>
+<a href="#SEC40">3.11.2.1 SVGA graphic modes support</a> <br>
+<a href="#SEC41">3.11.2.2 CPU usage reduction</a> <br>
+<a href="#SEC42">3.11.2.3 Windows 2000 disk full problem</a> <br>
+<a href="#SEC43">3.11.2.4 Windows 2000 shutdown</a> <br>
+<a href="#SEC44">3.11.2.5 Share a directory between Unix and Windows</a> <br>
+<a href="#SEC45">3.11.2.6 Windows XP security problem</a> <br>
+</ul>
+
+<p>If you have a slow host, using Windows 95 is better as it gives the
+best speed. Windows 2000 is also a good choice.
+</p>
+<hr size="2">
+<a name="SEC40"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC39" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC41" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h4 class="subsubsection"> 3.11.2.1 SVGA graphic modes support </h4>
+
+<p>QEMU emulates a Cirrus Logic GD5446 Video
+card. All Windows versions starting from Windows 95 should recognize
+and use this graphic card. For optimal performances, use 16 bit color
+depth in the guest and the host OS.
+</p>
+<p>If you are using Windows XP as guest OS and if you want to use high
+resolution modes which the Cirrus Logic BIOS does not support (i.e. &gt;=
+1280x1024x16), then you should use the VESA VBE virtual graphic card
+(option <samp>`-std-vga'</samp>).
+</p>
+<hr size="2">
+<a name="SEC41"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC40" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC42" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h4 class="subsubsection"> 3.11.2.2 CPU usage reduction </h4>
+
+<p>Windows 9x does not correctly use the CPU HLT
+instruction. The result is that it takes host CPU cycles even when
+idle. You can install the utility from
+<a href="http://www.user.cityline.ru/~maxamn/amnhltm.zip">http://www.user.cityline.ru/~maxamn/amnhltm.zip</a> to solve this
+problem. Note that no such tool is needed for NT, 2000 or XP.
+</p>
+<hr size="2">
+<a name="SEC42"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC41" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC43" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h4 class="subsubsection"> 3.11.2.3 Windows 2000 disk full problem </h4>
+
+<p>Windows 2000 has a bug which gives a disk full problem during its
+installation. When installing it, use the <samp>`-win2k-hack'</samp> QEMU
+option to enable a specific workaround. After Windows 2000 is
+installed, you no longer need this option (this option slows down the
+IDE transfers).
+</p>
+<hr size="2">
+<a name="SEC43"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC42" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC44" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h4 class="subsubsection"> 3.11.2.4 Windows 2000 shutdown </h4>
+
+<p>Windows 2000 cannot automatically shutdown in QEMU although Windows 98
+can. It comes from the fact that Windows 2000 does not automatically
+use the APM driver provided by the BIOS.
+</p>
+<p>In order to correct that, do the following (thanks to Struan
+Bartlett): go to the Control Panel =&gt; Add/Remove Hardware &amp; Next =&gt;
+Add/Troubleshoot a device =&gt; Add a new device &amp; Next =&gt; No, select the
+hardware from a list &amp; Next =&gt; NT Apm/Legacy Support &amp; Next =&gt; Next
+(again) a few times. Now the driver is installed and Windows 2000 now
+correctly instructs QEMU to shutdown at the appropriate moment. 
+</p>
+<hr size="2">
+<a name="SEC44"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC43" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC45" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h4 class="subsubsection"> 3.11.2.5 Share a directory between Unix and Windows </h4>
+
+<p>See <a href="#SEC10">Invocation</a> about the help of the option <samp>`-smb'</samp>.
+</p>
+<hr size="2">
+<a name="SEC45"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC44" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC46" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h4 class="subsubsection"> 3.11.2.6 Windows XP security problem </h4>
+
+<p>Some releases of Windows XP install correctly but give a security
+error when booting:
+</p><table><tr><td>&nbsp;</td><td><pre class="example">A problem is preventing Windows from accurately checking the
+license for this computer. Error code: 0x800703e6.
+</pre></td></tr></table>
+<p>The workaround is to install a service pack for XP after a boot in safe
+mode. Then reboot, and the problem should go away. Since there is no
+network while in safe mode, its recommended to download the full
+installation of SP1 or SP2 and transfer that via an ISO or using the
+vvfat block device (&quot;-hdb fat:directory_which_holds_the_SP&quot;).
+</p>
+<hr size="2">
+<a name="SEC46"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC45" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC47" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h3 class="subsection"> 3.11.3 MS-DOS and FreeDOS </h3>
+<ul>
+<a href="#SEC47">3.11.3.1 CPU usage reduction</a> <br>
+</ul>
+
+<hr size="2">
+<a name="SEC47"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC46" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC48" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h4 class="subsubsection"> 3.11.3.1 CPU usage reduction </h4>
+
+<p>DOS does not correctly use the CPU HLT instruction. The result is that
+it takes host CPU cycles even when idle. You can install the utility
+from <a href="http://www.vmware.com/software/dosidle210.zip">http://www.vmware.com/software/dosidle210.zip</a> to solve this
+problem.
+</p>
+<hr size="2">
+<a name="QEMU-System-emulator-for-non-PC-targets"></a>
+<a name="SEC48"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC47" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC49" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h1 class="chapter"> 4. QEMU System emulator for non PC targets </h1>
+<ul>
+<a href="#SEC49">4.1 QEMU PowerPC System emulator</a> <br>
+<a href="#SEC50">4.2 Sparc32 System emulator invocation</a> <br>
+<a href="#SEC51">4.3 Sparc64 System emulator invocation</a> <br>
+<a href="#SEC52">4.4 MIPS System emulator invocation</a> <br>
+<a href="#SEC53">4.5 ARM System emulator invocation</a> <br>
+</ul>
+
+<p>QEMU is a generic emulator and it emulates many non PC
+machines. Most of the options are similar to the PC emulator. The
+differences are mentionned in the following sections.
+</p>
+
+<hr size="2">
+<a name="QEMU-PowerPC-System-emulator"></a>
+<a name="SEC49"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC48" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC50" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 4.1 QEMU PowerPC System emulator </h2>
+
+<p>Use the executable <tt>`qemu-system-ppc'</tt> to simulate a complete PREP
+or PowerMac PowerPC system.
+</p>
+<p>QEMU emulates the following PowerMac peripherals:
+</p>
+<ul class="toc">
+<li>- 
+UniNorth PCI Bridge 
+</li><li>-
+PCI VGA compatible card with VESA Bochs Extensions
+</li><li>- 
+2 PMAC IDE interfaces with hard disk and CD-ROM support
+</li><li>- 
+NE2000 PCI adapters
+</li><li>-
+Non Volatile RAM
+</li><li>-
+VIA-CUDA with ADB keyboard and mouse.
+</li></ul>
+
+<p>QEMU emulates the following PREP peripherals:
+</p>
+<ul class="toc">
+<li>- 
+PCI Bridge
+</li><li>-
+PCI VGA compatible card with VESA Bochs Extensions
+</li><li>- 
+2 IDE interfaces with hard disk and CD-ROM support
+</li><li>-
+Floppy disk
+</li><li>- 
+NE2000 network adapters
+</li><li>-
+Serial port
+</li><li>-
+PREP Non Volatile RAM
+</li><li>-
+PC compatible keyboard and mouse.
+</li></ul>
+
+<p>QEMU uses the Open Hack'Ware Open Firmware Compatible BIOS available at
+<a href="http://perso.magic.fr/l_indien/OpenHackWare/index.htm">http://perso.magic.fr/l_indien/OpenHackWare/index.htm</a>.
+</p>
+
+<p>The following options are specific to the PowerPC emulation:
+</p>
+<dl compact="compact">
+<dt> <samp>`-g WxH[xDEPTH]'</samp>  </dt>
+<dd>
+<p>Set the initial VGA graphic mode. The default is 800x600x15.
+</p>
+</dd>
+</dl>
+
+
+
+<p>More information is available at
+<a href="http://perso.magic.fr/l_indien/qemu-ppc/">http://perso.magic.fr/l_indien/qemu-ppc/</a>.
+</p>
+<hr size="2">
+<a name="Sparc32-System-emulator-invocation"></a>
+<a name="SEC50"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC49" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC51" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 4.2 Sparc32 System emulator invocation </h2>
+
+<p>Use the executable <tt>`qemu-system-sparc'</tt> to simulate a SparcStation 5
+(sun4m architecture). The emulation is somewhat complete.
+</p>
+<p>QEMU emulates the following sun4m peripherals:
+</p>
+<ul class="toc">
+<li>-
+IOMMU
+</li><li>-
+TCX Frame buffer
+</li><li>- 
+Lance (Am7990) Ethernet
+</li><li>-
+Non Volatile RAM M48T08
+</li><li>-
+Slave I/O: timers, interrupt controllers, Zilog serial ports, keyboard
+and power/reset logic
+</li><li>-
+ESP SCSI controller with hard disk and CD-ROM support
+</li><li>-
+Floppy drive
+</li></ul>
+
+<p>The number of peripherals is fixed in the architecture.
+</p>
+<p>Since version 0.8.2, QEMU uses OpenBIOS
+<a href="http://www.openbios.org/">http://www.openbios.org/</a>. OpenBIOS is a free (GPL v2) portable
+firmware implementation. The goal is to implement a 100% IEEE
+1275-1994 (referred to as Open Firmware) compliant firmware.
+</p>
+<p>A sample Linux 2.6 series kernel and ram disk image are available on
+the QEMU web site. Please note that currently NetBSD, OpenBSD or
+Solaris kernels don't work.
+</p>
+
+<p>The following options are specific to the Sparc emulation:
+</p>
+<dl compact="compact">
+<dt> <samp>`-g WxH'</samp></dt>
+<dd>
+<p>Set the initial TCX graphic mode. The default is 1024x768.
+</p>
+</dd>
+</dl>
+
+
+<hr size="2">
+<a name="Sparc64-System-emulator-invocation"></a>
+<a name="SEC51"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC50" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC52" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 4.3 Sparc64 System emulator invocation </h2>
+
+<p>Use the executable <tt>`qemu-system-sparc64'</tt> to simulate a Sun4u machine.
+The emulator is not usable for anything yet.
+</p>
+<p>QEMU emulates the following sun4u peripherals:
+</p>
+<ul class="toc">
+<li>-
+UltraSparc IIi APB PCI Bridge 
+</li><li>-
+PCI VGA compatible card with VESA Bochs Extensions
+</li><li>-
+Non Volatile RAM M48T59
+</li><li>-
+PC-compatible serial ports
+</li></ul>
+
+<hr size="2">
+<a name="MIPS-System-emulator-invocation"></a>
+<a name="SEC52"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC51" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC53" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 4.4 MIPS System emulator invocation </h2>
+
+<p>Use the executable <tt>`qemu-system-mips'</tt> to simulate a MIPS machine.
+The emulator is able to boot a Linux kernel and to run a Linux Debian
+installation from NFS. The following devices are emulated:
+</p>
+<ul class="toc">
+<li>- 
+MIPS R4K CPU
+</li><li>-
+PC style serial port
+</li><li>-
+NE2000 network card
+</li></ul>
+
+<p>More information is available in the QEMU mailing-list archive.
+</p>
+<hr size="2">
+<a name="ARM-System-emulator-invocation"></a>
+<a name="SEC53"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC52" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC54" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 4.5 ARM System emulator invocation </h2>
+
+<p>Use the executable <tt>`qemu-system-arm'</tt> to simulate a ARM
+machine. The ARM Integrator/CP board is emulated with the following
+devices:
+</p>
+<ul class="toc">
+<li>-
+ARM926E or ARM1026E CPU
+</li><li>-
+Two PL011 UARTs
+</li><li>- 
+SMC 91c111 Ethernet adapter
+</li><li>-
+PL110 LCD controller
+</li><li>-
+PL050 KMI with PS/2 keyboard and mouse.
+</li></ul>
+
+<p>The ARM Versatile baseboard is emulated with the following devices:
+</p>
+<ul class="toc">
+<li>-
+ARM926E CPU
+</li><li>-
+PL190 Vectored Interrupt Controller
+</li><li>-
+Four PL011 UARTs
+</li><li>- 
+SMC 91c111 Ethernet adapter
+</li><li>-
+PL110 LCD controller
+</li><li>-
+PL050 KMI with PS/2 keyboard and mouse.
+</li><li>-
+PCI host bridge.  Note the emulated PCI bridge only provides access to
+PCI memory space.  It does not provide access to PCI IO space.
+This means some devices (eg. ne2k_pci NIC) are not useable, and others
+(eg. rtl8139 NIC) are only useable when the guest drivers use the memory
+mapped control registers.
+</li><li>-
+PCI OHCI USB controller.
+</li><li>-
+LSI53C895A PCI SCSI Host Bus Adapter with hard disk and CD-ROM devices.
+</li></ul>
+
+<p>A Linux 2.6 test image is available on the QEMU web site. More
+information is available in the QEMU mailing-list archive.
+</p>
+<hr size="2">
+<a name="QEMU-User-space-emulator"></a>
+<a name="SEC54"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC53" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC55" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h1 class="chapter"> 5. QEMU User space emulator </h1>
+<ul>
+<a href="#SEC55">5.1 Supported Operating Systems</a> <br>
+<a href="#SEC56">5.2 Linux User space emulator</a> <br>
+<ul>
+<a href="#SEC57">5.2.1 Quick Start</a> <br>
+<a href="#SEC58">5.2.2 Wine launch</a> <br>
+<a href="#SEC59">5.2.3 Command line options</a> <br>
+<a href="#SEC60">5.2.4 Other binaries</a> <br>
+</ul>
+<a href="#SEC61">5.3 Mac OS X/Darwin User space emulator</a> <br>
+<ul>
+<a href="#SEC62">5.3.1 Mac OS X/Darwin Status</a> <br>
+<a href="#SEC63">5.3.2 Quick Start</a> <br>
+<a href="#SEC64">5.3.3 Command line options</a> <br>
+</ul>
+</ul>
+
+
+<hr size="2">
+<a name="Supported-Operating-Systems"></a>
+<a name="SEC55"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC54" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC56" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 5.1 Supported Operating Systems </h2>
+
+<p>The following OS are supported in user space emulation:
+</p>
+<ul class="toc">
+<li>-
+Linux (refered as qemu-linux-user)
+</li><li>-
+Mac OS X/Darwin (refered as qemu-darwin-user)
+</li></ul>
+
+<hr size="2">
+<a name="Linux-User-space-emulator"></a>
+<a name="SEC56"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC55" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC57" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 5.2 Linux User space emulator </h2>
+<ul>
+<a href="#SEC57">5.2.1 Quick Start</a> <br>
+<a href="#SEC58">5.2.2 Wine launch</a> <br>
+<a href="#SEC59">5.2.3 Command line options</a> <br>
+<a href="#SEC60">5.2.4 Other binaries</a> <br>
+</ul>
+
+
+<hr size="2">
+<a name="Quick-Start"></a>
+<a name="SEC57"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC56" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC58" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h3 class="subsection"> 5.2.1 Quick Start </h3>
+
+<p>In order to launch a Linux process, QEMU needs the process executable
+itself and all the target (x86) dynamic libraries used by it. 
+</p>
+<ul class="toc">
+<li> On x86, you can just try to launch any process by using the native
+libraries:
+
+<table><tr><td>&nbsp;</td><td><pre class="example">qemu-i386 -L / /bin/ls
+</pre></td></tr></table>
+<p><code>-L /</code> tells that the x86 dynamic linker must be searched with a
+<tt>`/'</tt> prefix.
+</p>
+</li><li> Since QEMU is also a linux process, you can launch qemu with qemu (NOTE: you can only do that if you compiled QEMU from the sources):
+
+<table><tr><td>&nbsp;</td><td><pre class="example">qemu-i386 -L / qemu-i386 -L / /bin/ls
+</pre></td></tr></table>
+</li><li> On non x86 CPUs, you need first to download at least an x86 glibc
+(<tt>`qemu-runtime-i386-XXX-.tar.gz'</tt> on the QEMU web page). Ensure that
+<code>LD_LIBRARY_PATH</code> is not set:
+
+<table><tr><td>&nbsp;</td><td><pre class="example">unset LD_LIBRARY_PATH 
+</pre></td></tr></table>
+<p>Then you can launch the precompiled <tt>`ls'</tt> x86 executable:
+</p>
+<table><tr><td>&nbsp;</td><td><pre class="example">qemu-i386 tests/i386/ls
+</pre></td></tr></table><p>You can look at <tt>`qemu-binfmt-conf.sh'</tt> so that
+QEMU is automatically launched by the Linux kernel when you try to
+launch x86 executables. It requires the <code>binfmt_misc</code> module in the
+Linux kernel.
+</p>
+</li><li> The x86 version of QEMU is also included. You can try weird things such as:
+<table><tr><td>&nbsp;</td><td><pre class="example">qemu-i386 /usr/local/qemu-i386/bin/qemu-i386 \
+          /usr/local/qemu-i386/bin/ls-i386
+</pre></td></tr></table>
+</li></ul>
+
+<hr size="2">
+<a name="Wine-launch"></a>
+<a name="SEC58"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC57" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC59" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h3 class="subsection"> 5.2.2 Wine launch </h3>
+
+<ul class="toc">
+<li> Ensure that you have a working QEMU with the x86 glibc
+distribution (see previous section). In order to verify it, you must be
+able to do:
+
+<table><tr><td>&nbsp;</td><td><pre class="example">qemu-i386 /usr/local/qemu-i386/bin/ls-i386
+</pre></td></tr></table>
+</li><li> Download the binary x86 Wine install
+(<tt>`qemu-XXX-i386-wine.tar.gz'</tt> on the QEMU web page). 
+
+</li><li> Configure Wine on your account. Look at the provided script
+<tt>`/usr/local/qemu-i386/bin/wine-conf.sh'</tt>. Your previous
+<code>${HOME}/.wine</code> directory is saved to <code>${HOME}/.wine.org</code>.
+
+</li><li> Then you can try the example <tt>`putty.exe'</tt>:
+
+<table><tr><td>&nbsp;</td><td><pre class="example">qemu-i386 /usr/local/qemu-i386/wine/bin/wine \
+          /usr/local/qemu-i386/wine/c/Program\ Files/putty.exe
+</pre></td></tr></table>
+</li></ul>
+
+<hr size="2">
+<a name="Command-line-options"></a>
+<a name="SEC59"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC58" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC60" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h3 class="subsection"> 5.2.3 Command line options </h3>
+
+<table><tr><td>&nbsp;</td><td><pre class="example">usage: qemu-i386 [-h] [-d] [-L path] [-s size] program [arguments...]
+</pre></td></tr></table>
+<dl compact="compact">
+<dt> <samp>`-h'</samp></dt>
+<dd><p>Print the help
+</p></dd>
+<dt> <samp>`-L path'</samp>   </dt>
+<dd><p>Set the x86 elf interpreter prefix (default=/usr/local/qemu-i386)
+</p></dd>
+<dt> <samp>`-s size'</samp></dt>
+<dd><p>Set the x86 stack size in bytes (default=524288)
+</p></dd>
+</dl>
+
+<p>Debug options:
+</p>
+<dl compact="compact">
+<dt> <samp>`-d'</samp></dt>
+<dd><p>Activate log (logfile=/tmp/qemu.log)
+</p></dd>
+<dt> <samp>`-p pagesize'</samp></dt>
+<dd><p>Act as if the host page size was 'pagesize' bytes
+</p></dd>
+</dl>
+
+<hr size="2">
+<a name="Other-binaries"></a>
+<a name="SEC60"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC59" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC61" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h3 class="subsection"> 5.2.4 Other binaries </h3>
+
+<p><code>qemu-arm</code> is also capable of running ARM &quot;Angel&quot; semihosted ELF
+binaries (as implemented by the arm-elf and arm-eabi Newlib/GDB
+configurations), and arm-uclinux bFLT format binaries.
+</p>
+<p><code>qemu-m68k</code> is capable of running semihosted binaries using the BDM
+(m5xxx-ram-hosted.ld) or m68k-sim (sim.ld) syscall interfaces, and
+coldfire uClinux bFLT format binaries.
+</p>
+<p>The binary format is detected automatically.
+</p>
+<hr size="2">
+<a name="Mac-OS-X_002fDarwin-User-space-emulator"></a>
+<a name="SEC61"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC60" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC62" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 5.3 Mac OS X/Darwin User space emulator </h2>
+<ul>
+<a href="#SEC62">5.3.1 Mac OS X/Darwin Status</a> <br>
+<a href="#SEC63">5.3.2 Quick Start</a> <br>
+<a href="#SEC64">5.3.3 Command line options</a> <br>
+</ul>
+
+
+<hr size="2">
+<a name="Mac-OS-X_002fDarwin-Status"></a>
+<a name="SEC62"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC61" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC63" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h3 class="subsection"> 5.3.1 Mac OS X/Darwin Status </h3>
+
+<ul class="toc">
+<li>-
+target x86 on x86: Most apps (Cocoa and Carbon too) works. [1]
+</li><li>-
+target PowerPC on x86: Not working as the ppc commpage can't be mapped (yet!)
+</li><li>-
+target x86 on x86: Most apps (Cocoa and Carbon too) works. [1]
+</li><li>-
+target x86 on PowerPC: most utilities work. Cocoa and Carbon apps are not yet supported.
+</li></ul>
+
+<p>[1] If you're host commpage can be executed by qemu.
+</p>
+<hr size="2">
+<a name="Mac-OS-X_002fDarwin-Quick-Start"></a>
+<a name="SEC63"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC62" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC64" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h3 class="subsection"> 5.3.2 Quick Start </h3>
+
+<p>In order to launch a Mac OS X/Darwin process, QEMU needs the process executable
+itself and all the target dynamic libraries used by it. If you don't have the FAT
+libraries (you're running Mac OS X/ppc) you'll need to obtain it from a Mac OS X
+CD or compile them by hand.
+</p>
+<ul class="toc">
+<li> On x86, you can just try to launch any process by using the native
+libraries:
+
+<table><tr><td>&nbsp;</td><td><pre class="example">qemu-darwin-i386 /bin/ls
+</pre></td></tr></table>
+<p>or to run the ppc version of the executable:
+</p>
+<table><tr><td>&nbsp;</td><td><pre class="example">qemu-darwin-ppc /bin/ls
+</pre></td></tr></table>
+</li><li> On ppc, you'll have to tell qemu where your x86 libraries (and dynamic linker)
+are installed:
+
+<table><tr><td>&nbsp;</td><td><pre class="example">qemu-darwin-i386 -L /opt/x86_root/ /bin/ls
+</pre></td></tr></table>
+<p><code>-L /opt/x86_root/</code> tells that the dynamic linker (dyld) path is in
+<tt>`/opt/x86_root/usr/bin/dyld'</tt>.
+</p>
+</li></ul>
+
+<hr size="2">
+<a name="Mac-OS-X_002fDarwin-Command-line-options"></a>
+<a name="SEC64"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC63" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC65" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h3 class="subsection"> 5.3.3 Command line options </h3>
+
+<table><tr><td>&nbsp;</td><td><pre class="example">usage: qemu-darwin-i386 [-h] [-d] [-L path] [-s size] program [arguments...]
+</pre></td></tr></table>
+<dl compact="compact">
+<dt> <samp>`-h'</samp></dt>
+<dd><p>Print the help
+</p></dd>
+<dt> <samp>`-L path'</samp>   </dt>
+<dd><p>Set the library root path (default=/)
+</p></dd>
+<dt> <samp>`-s size'</samp></dt>
+<dd><p>Set the stack size in bytes (default=524288)
+</p></dd>
+</dl>
+
+<p>Debug options:
+</p>
+<dl compact="compact">
+<dt> <samp>`-d'</samp></dt>
+<dd><p>Activate log (logfile=/tmp/qemu.log)
+</p></dd>
+<dt> <samp>`-p pagesize'</samp></dt>
+<dd><p>Act as if the host page size was 'pagesize' bytes
+</p></dd>
+</dl>
+
+<hr size="2">
+<a name="compilation"></a>
+<a name="SEC65"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC64" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC66" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h1 class="chapter"> 6. Compilation from the sources </h1>
+<ul>
+<a href="#SEC66">6.1 Linux/Unix</a> <br>
+<ul>
+<a href="#SEC67">6.1.1 Compilation</a> <br>
+<a href="#SEC68">6.1.2 GCC version</a> <br>
+</ul>
+<a href="#SEC69">6.2 Windows</a> <br>
+<a href="#SEC70">6.3 Cross compilation for Windows with Linux</a> <br>
+<a href="#SEC71">6.4 Mac OS X</a> <br>
+</ul>
+
+
+<hr size="2">
+<a name="Linux_002fUnix"></a>
+<a name="SEC66"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC65" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC67" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 6.1 Linux/Unix </h2>
+<ul>
+<a href="#SEC67">6.1.1 Compilation</a> <br>
+<a href="#SEC68">6.1.2 GCC version</a> <br>
+</ul>
+
+<hr size="2">
+<a name="SEC67"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC66" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC68" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h3 class="subsection"> 6.1.1 Compilation </h3>
+
+<p>First you must decompress the sources:
+</p><table><tr><td>&nbsp;</td><td><pre class="example">cd /tmp
+tar zxvf qemu-x.y.z.tar.gz
+cd qemu-x.y.z
+</pre></td></tr></table>
+<p>Then you configure QEMU and build it (usually no options are needed):
+</p><table><tr><td>&nbsp;</td><td><pre class="example">./configure
+make
+</pre></td></tr></table>
+<p>Then type as root user:
+</p><table><tr><td>&nbsp;</td><td><pre class="example">make install
+</pre></td></tr></table><p>to install QEMU in <tt>`/usr/local'</tt>.
+</p>
+<hr size="2">
+<a name="SEC68"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC67" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC69" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h3 class="subsection"> 6.1.2 GCC version </h3>
+
+<p>In order to compile QEMU successfully, it is very important that you
+have the right tools. The most important one is gcc. On most hosts and
+in particular on x86 ones, <em>gcc 4.x is not supported</em>. If your
+Linux distribution includes a gcc 4.x compiler, you can usually
+install an older version (it is invoked by <code>gcc32</code> or
+<code>gcc34</code>). The QEMU configure script automatically probes for
+these older versions so that usally you don't have to do anything.
+</p>
+<hr size="2">
+<a name="Windows"></a>
+<a name="SEC69"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC68" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC70" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 6.2 Windows </h2>
+
+<ul class="toc">
+<li> Install the current versions of MSYS and MinGW from
+<a href="http://www.mingw.org/">http://www.mingw.org/</a>. You can find detailed installation
+instructions in the download section and the FAQ.
+
+</li><li> Download 
+the MinGW development library of SDL 1.2.x
+(<tt>`SDL-devel-1.2.x-mingw32.tar.gz'</tt>) from
+<a href="http://www.libsdl.org">http://www.libsdl.org</a>. Unpack it in a temporary place, and
+unpack the archive <tt>`i386-mingw32msvc.tar.gz'</tt> in the MinGW tool
+directory. Edit the <tt>`sdl-config'</tt> script so that it gives the
+correct SDL directory when invoked.
+
+</li><li> Extract the current version of QEMU.
+ 
+</li><li> Start the MSYS shell (file <tt>`msys.bat'</tt>).
+
+</li><li> Change to the QEMU directory. Launch <tt>`./configure'</tt> and 
+<tt>`make'</tt>.  If you have problems using SDL, verify that
+<tt>`sdl-config'</tt> can be launched from the MSYS command line.
+
+</li><li> You can install QEMU in <tt>`Program Files/Qemu'</tt> by typing 
+<tt>`make install'</tt>. Don't forget to copy <tt>`SDL.dll'</tt> in
+<tt>`Program Files/Qemu'</tt>.
+
+</li></ul>
+
+<hr size="2">
+<a name="Cross-compilation-for-Windows-with-Linux"></a>
+<a name="SEC70"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC69" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC71" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 6.3 Cross compilation for Windows with Linux </h2>
+
+<ul class="toc">
+<li>
+Install the MinGW cross compilation tools available at
+<a href="http://www.mingw.org/">http://www.mingw.org/</a>.
+
+</li><li> 
+Install the Win32 version of SDL (<a href="http://www.libsdl.org">http://www.libsdl.org</a>) by
+unpacking <tt>`i386-mingw32msvc.tar.gz'</tt>. Set up the PATH environment
+variable so that <tt>`i386-mingw32msvc-sdl-config'</tt> can be launched by
+the QEMU configuration script.
+
+</li><li> 
+Configure QEMU for Windows cross compilation:
+<table><tr><td>&nbsp;</td><td><pre class="example">./configure --enable-mingw32
+</pre></td></tr></table><p>If necessary, you can change the cross-prefix according to the prefix
+choosen for the MinGW tools with -cross-prefix. You can also use
+-prefix to set the Win32 install path.
+</p>
+</li><li> You can install QEMU in the installation directory by typing 
+<tt>`make install'</tt>. Don't forget to copy <tt>`SDL.dll'</tt> in the
+installation directory. 
+
+</li></ul>
+
+<p>Note: Currently, Wine does not seem able to launch
+QEMU for Win32.
+</p>
+<hr size="2">
+<a name="Mac-OS-X"></a>
+<a name="SEC71"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC70" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 6.4 Mac OS X </h2>
+
+<p>The Mac OS X patches are not fully merged in QEMU, so you should look
+at the QEMU mailing list archive to have all the necessary
+information.
+</p>
+<hr size="2">
+<a name="Index"></a>
+<a name="SEC72"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="#SEC71" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[ &gt; ]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC72" title="Index">Index</a>]</td>
+<td valign="middle" align="left">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h1 class="chapter"> 7. Index </h1>
+
+<hr size="2">
+<h2> Table of Contents</h2>
+<div class="contents">
+
+<ul class="toc">
+  <li><a name="TOC1" href="#SEC1">1. Introduction</a>
+  <ul class="toc">
+    <li><a name="TOC2" href="#SEC2">1.1 Features</a></li>
+  </ul></li>
+  <li><a name="TOC3" href="#SEC3">2. Installation</a>
+  <ul class="toc">
+    <li><a name="TOC4" href="#SEC4">2.1 Linux</a></li>
+    <li><a name="TOC5" href="#SEC5">2.2 Windows</a></li>
+    <li><a name="TOC6" href="#SEC6">2.3 Mac OS X</a></li>
+  </ul></li>
+  <li><a name="TOC7" href="#SEC7">3. QEMU PC System emulator</a>
+  <ul class="toc">
+    <li><a name="TOC8" href="#SEC8">3.1 Introduction</a></li>
+    <li><a name="TOC9" href="#SEC9">3.2 Quick Start</a></li>
+    <li><a name="TOC10" href="#SEC10">3.3 Invocation</a></li>
+    <li><a name="TOC11" href="#SEC11">3.4 Keys</a></li>
+    <li><a name="TOC12" href="#SEC12">3.5 QEMU Monitor</a>
+    <ul class="toc">
+      <li><a name="TOC13" href="#SEC13">3.5.1 Commands</a></li>
+      <li><a name="TOC14" href="#SEC14">3.5.2 Integer expressions</a></li>
+    </ul></li>
+    <li><a name="TOC15" href="#SEC15">3.6 Disk Images</a>
+    <ul class="toc">
+      <li><a name="TOC16" href="#SEC16">3.6.1 Quick start for disk image creation</a></li>
+      <li><a name="TOC17" href="#SEC17">3.6.2 Snapshot mode</a></li>
+      <li><a name="TOC18" href="#SEC18">3.6.3 VM snapshots</a></li>
+      <li><a name="TOC19" href="#SEC19">3.6.4 <code>qemu-img</code> Invocation</a></li>
+      <li><a name="TOC20" href="#SEC20">3.6.5 Using host drives</a>
+      <ul class="toc">
+        <li><a name="TOC21" href="#SEC21">3.6.5.1 Linux</a></li>
+        <li><a name="TOC22" href="#SEC22">3.6.5.2 Windows</a></li>
+        <li><a name="TOC23" href="#SEC23">3.6.5.3 Mac OS X</a></li>
+      </ul></li>
+      <li><a name="TOC24" href="#SEC24">3.6.6 Virtual FAT disk images</a></li>
+    </ul></li>
+    <li><a name="TOC25" href="#SEC25">3.7 Network emulation</a>
+    <ul class="toc">
+      <li><a name="TOC26" href="#SEC26">3.7.1 VLANs</a></li>
+      <li><a name="TOC27" href="#SEC27">3.7.2 Using TAP network interfaces</a>
+      <ul class="toc">
+        <li><a name="TOC28" href="#SEC28">3.7.2.1 Linux host</a></li>
+        <li><a name="TOC29" href="#SEC29">3.7.2.2 Windows host</a></li>
+      </ul></li>
+      <li><a name="TOC30" href="#SEC30">3.7.3 Using the user mode network stack</a></li>
+      <li><a name="TOC31" href="#SEC31">3.7.4 Connecting VLANs between QEMU instances</a></li>
+    </ul></li>
+    <li><a name="TOC32" href="#SEC32">3.8 Direct Linux Boot</a></li>
+    <li><a name="TOC33" href="#SEC33">3.9 USB emulation</a>
+    <ul class="toc">
+      <li><a name="TOC34" href="#SEC34">3.9.1 Connecting USB devices</a></li>
+      <li><a name="TOC35" href="#SEC35">3.9.2 Using host USB devices on a Linux host</a></li>
+    </ul></li>
+    <li><a name="TOC36" href="#SEC36">3.10 GDB usage</a></li>
+    <li><a name="TOC37" href="#SEC37">3.11 Target OS specific information</a>
+    <ul class="toc">
+      <li><a name="TOC38" href="#SEC38">3.11.1 Linux</a></li>
+      <li><a name="TOC39" href="#SEC39">3.11.2 Windows</a>
+      <ul class="toc">
+        <li><a name="TOC40" href="#SEC40">3.11.2.1 SVGA graphic modes support</a></li>
+        <li><a name="TOC41" href="#SEC41">3.11.2.2 CPU usage reduction</a></li>
+        <li><a name="TOC42" href="#SEC42">3.11.2.3 Windows 2000 disk full problem</a></li>
+        <li><a name="TOC43" href="#SEC43">3.11.2.4 Windows 2000 shutdown</a></li>
+        <li><a name="TOC44" href="#SEC44">3.11.2.5 Share a directory between Unix and Windows</a></li>
+        <li><a name="TOC45" href="#SEC45">3.11.2.6 Windows XP security problem</a></li>
+      </ul></li>
+      <li><a name="TOC46" href="#SEC46">3.11.3 MS-DOS and FreeDOS</a>
+      <ul class="toc">
+        <li><a name="TOC47" href="#SEC47">3.11.3.1 CPU usage reduction</a></li>
+      </ul>
+</li>
+    </ul>
+</li>
+  </ul></li>
+  <li><a name="TOC48" href="#SEC48">4. QEMU System emulator for non PC targets</a>
+  <ul class="toc">
+    <li><a name="TOC49" href="#SEC49">4.1 QEMU PowerPC System emulator</a></li>
+    <li><a name="TOC50" href="#SEC50">4.2 Sparc32 System emulator invocation</a></li>
+    <li><a name="TOC51" href="#SEC51">4.3 Sparc64 System emulator invocation</a></li>
+    <li><a name="TOC52" href="#SEC52">4.4 MIPS System emulator invocation</a></li>
+    <li><a name="TOC53" href="#SEC53">4.5 ARM System emulator invocation</a></li>
+  </ul></li>
+  <li><a name="TOC54" href="#SEC54">5. QEMU User space emulator</a>
+  <ul class="toc">
+    <li><a name="TOC55" href="#SEC55">5.1 Supported Operating Systems</a></li>
+    <li><a name="TOC56" href="#SEC56">5.2 Linux User space emulator</a>
+    <ul class="toc">
+      <li><a name="TOC57" href="#SEC57">5.2.1 Quick Start</a></li>
+      <li><a name="TOC58" href="#SEC58">5.2.2 Wine launch</a></li>
+      <li><a name="TOC59" href="#SEC59">5.2.3 Command line options</a></li>
+      <li><a name="TOC60" href="#SEC60">5.2.4 Other binaries</a></li>
+    </ul></li>
+    <li><a name="TOC61" href="#SEC61">5.3 Mac OS X/Darwin User space emulator</a>
+    <ul class="toc">
+      <li><a name="TOC62" href="#SEC62">5.3.1 Mac OS X/Darwin Status</a></li>
+      <li><a name="TOC63" href="#SEC63">5.3.2 Quick Start</a></li>
+      <li><a name="TOC64" href="#SEC64">5.3.3 Command line options</a></li>
+    </ul>
+</li>
+  </ul></li>
+  <li><a name="TOC65" href="#SEC65">6. Compilation from the sources</a>
+  <ul class="toc">
+    <li><a name="TOC66" href="#SEC66">6.1 Linux/Unix</a>
+    <ul class="toc">
+      <li><a name="TOC67" href="#SEC67">6.1.1 Compilation</a></li>
+      <li><a name="TOC68" href="#SEC68">6.1.2 GCC version</a></li>
+    </ul></li>
+    <li><a name="TOC69" href="#SEC69">6.2 Windows</a></li>
+    <li><a name="TOC70" href="#SEC70">6.3 Cross compilation for Windows with Linux</a></li>
+    <li><a name="TOC71" href="#SEC71">6.4 Mac OS X</a></li>
+  </ul></li>
+  <li><a name="TOC72" href="#SEC72">7. Index</a></li>
+</ul>
+</div>
+<hr size="1">
+<p>
+ <font size="-1">
+  This document was generated on <i>February, 7 2007</i> using <a href="http://texi2html.cvshome.org/"><i>texi2html 1.76</i></a>.
+ </font>
+ <br>
+
+</p>
+</body>
+</html>

@@ -47,10 +47,13 @@ namespace Cosmos.Build.Windows {
 
         protected void MakeISO() {
             RemoveFile(mBuildPath + "cosmos.iso");
+            RemoveFile(mISOPath + "output.bin");
+            File.Move(mBuildPath + "output.bin", mISOPath + "output.bin");
             // From TFS its read only, and one of the utils doesnt like that
             File.SetAttributes(mISOPath + "isolinux.bin", FileAttributes.Normal);
 
-            Call(mToolsPath + @"Tools\mkisofs\mkisofs.exe", "-R -b syslinux/isolinux.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o Cosmos.iso files", mBuildPath + @"ISO\", true);
+            // Call(mToolsPath + @"mkisofs.exe", "-R -b syslinux/isolinux.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o Cosmos.iso files", mISOPath, true);
+            Call(mToolsPath + @"mkisofs.exe", @"-R -b isolinux.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o ..\Cosmos.iso .", mISOPath, true);
         }
 
         public void Compile() {
@@ -93,7 +96,7 @@ namespace Cosmos.Build.Windows {
                 case Target.QEMU:
                 case Target.QEMU_GDB:
                     MakeISO();
-                    RemoveFile(@"ISO\serial-debug.txt");
+                    RemoveFile(mISOPath + "serial-debug.txt");
                     //Call(mCosmosPath + @"tools\qemu\qemu.exe", @"-L . -cdrom ..\..\build\Cosmos\ISO\Cosmos.iso -boot d -hda ..\..\build\Cosmos\ISO\C-drive.img -serial " + "\"" + @"file:..\..\build\Cosmos\ISO\serial-debug.txt" + "\"" + " -S -s", mCosmosPath + @"tools\qemu\", aType == Target.QEMU);
 
                     if (aType == Target.QEMU_GDB) {
