@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using i4o;
 using Mono.Cecil;
 
 namespace Indy.IL2CPU.Assembler {
