@@ -7,6 +7,5 @@
         <TextBox Height="23" Margin="16,37,12,0" Name="textBuildPath" VerticalAlignment="Top" />
         <ListBox Margin="16,100,99,14" Name="lboxTargets" />
         <Label Height="28" HorizontalAlignment="Left" Margin="16,73,0,0" Name="label2" VerticalAlignment="Top" Width="120">Build Type:</Label>
-        <Button Height="23" HorizontalAlignment="Right" Margin="0,100,12,0" Name="butnBuild" VerticalAlignment="Top" Width="75">Button</Button>
     </Grid>
 </Window>

@@ -14,13 +14,17 @@ namespace Cosmos.Build.Windows {
         protected string mPXEPath;
         protected string mAsmPath;
 
-        public Builder() {
+        public static string GetBuildPath() {
             var xKey = Registry.CurrentUser.OpenSubKey(@"Software\Cosmos");
-            mBuildPath = (string)xKey.GetValue("Build Path");
-            if (!mBuildPath.EndsWith(@"\")) {
-                mBuildPath = mBuildPath + @"\";
+            var xResult = (string)xKey.GetValue("Build Path");
+            if (!xResult.EndsWith(@"\")) {
+                xResult = xResult + @"\";
             }
+            return xResult;
+        }
 
+        public Builder() {
+            mBuildPath = GetBuildPath();
             mToolsPath = mBuildPath + @"Tools\";
             mISOPath = mBuildPath + @"ISO\";
             mPXEPath = mBuildPath + @"PXE\";
@@ -33,22 +37,29 @@ namespace Cosmos.Build.Windows {
             }
         }
 
-        protected void Call(string aEXEPathname, string aArgLine, string aWorkDir, bool aWait) {
+        protected void Call(string aEXEPathname, string aArgLine, string aWorkDir) {
+            Call(aEXEPathname, aArgLine, aWorkDir, true, true);
+        }
+
+        protected void Call(string aEXEPathname, string aArgLine, string aWorkDir, bool aWait, bool aCapture) {
             var xStartInfo = new ProcessStartInfo();
             xStartInfo.FileName = aEXEPathname;
             xStartInfo.Arguments = aArgLine;
             xStartInfo.WorkingDirectory = aWorkDir;
             xStartInfo.UseShellExecute = false;
-            xStartInfo.RedirectStandardError = true;
-            xStartInfo.RedirectStandardOutput = true;
+            xStartInfo.RedirectStandardError = aCapture;
+            xStartInfo.RedirectStandardOutput = aCapture;
             var xProcess = Process.Start(xStartInfo);
             if (aWait) {
                 if (!xProcess.WaitForExit(60 * 1000) || xProcess.ExitCode != 0) {
                     //TODO: Fix
-                    //throw new Exception("Call failed");
-                    Console.WriteLine("Error during call");
-                    Console.Write(xProcess.StandardOutput.ReadToEnd());
-                    Console.Write(xProcess.StandardError.ReadToEnd());
+                    if (aCapture) {
+                        Console.WriteLine("Error during call");
+                        Console.Write(xProcess.StandardOutput.ReadToEnd());
+                        Console.Write(xProcess.StandardError.ReadToEnd());
+                    } else {
+                        throw new Exception("Call failed");
+                    }
                 }
             }
         }
@@ -59,7 +70,7 @@ namespace Cosmos.Build.Windows {
             File.Copy(mBuildPath + "output.bin", mISOPath + "output.bin");
             // From TFS its read only, mkisofs doesnt like that
             File.SetAttributes(mISOPath + "isolinux.bin", FileAttributes.Normal);
-            Call(mToolsPath + @"mkisofs.exe", @"-R -b isolinux.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o ..\Cosmos.iso .", mISOPath, true);
+            Call(mToolsPath + @"mkisofs.exe", @"-R -b isolinux.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o ..\Cosmos.iso .", mISOPath);
         }
 
         public void Compile() {
@@ -73,10 +84,10 @@ namespace Cosmos.Build.Windows {
                 );
 
             RemoveFile(mBuildPath + "output.obj");
-            Call(mToolsPath + @"nasm\nasm.exe", String.Format("-g -f elf -F stabs -o \"{0}\" \"{1}\"", mBuildPath + "output.obj", mAsmPath + "main.asm"), mBuildPath, true);
+            Call(mToolsPath + @"nasm\nasm.exe", String.Format("-g -f elf -F stabs -o \"{0}\" \"{1}\"", mBuildPath + "output.obj", mAsmPath + "main.asm"), mBuildPath);
 
             RemoveFile(mBuildPath + "output.bin");
-            Call(mToolsPath + @"cygwin\ld.exe", String.Format("-Ttext 0x500000 -Tdata 0x200000 -e Kernel_Start -o \"{0}\" \"{1}\"", "output.bin", "output.obj"), mBuildPath, true);
+            Call(mToolsPath + @"cygwin\ld.exe", String.Format("-Ttext 0x500000 -Tdata 0x200000 -e Kernel_Start -o \"{0}\" \"{1}\"", "output.bin", "output.obj"), mBuildPath);
             RemoveFile(mBuildPath + "output.obj");
         }
 
@@ -102,7 +113,7 @@ namespace Cosmos.Build.Windows {
                     RemoveFile(mPXEPath + @"Boot\output.bin");
                     File.Move(mBuildPath + "output.bin", mPXEPath + @"Boot\output.bin");
                     // *Must* set working dir so tftpd32 will set itself to proper dir
-                    Call(mPXEPath + "tftpd32.exe", "", mPXEPath, false);
+                    Call(mPXEPath + "tftpd32.exe", "", mPXEPath, false, false);
                     break;
 
                 case Target.QEMU:
@@ -110,12 +121,12 @@ namespace Cosmos.Build.Windows {
                     MakeISO();
                     RemoveFile(mBuildPath + "serial-debug.txt");
                     Call(mToolsPath + @"qemu\qemu.exe"
-                        , "-L . -cdrom \"" + mBuildPath + "Cosmos.iso\" -boot d -serial \"file:" + mBuildPath + "serial-debug.txt" + "\" -S -s", mToolsPath + @"qemu\", aType == Target.QEMU);
+                        , "-L . -cdrom \"" + mBuildPath + "Cosmos.iso\" -boot d -serial \"file:" + mBuildPath + "serial-debug.txt" + "\" -S -s", mToolsPath + @"qemu\", aType == Target.QEMU, false);
 
                     if (aType == Target.QEMU_GDB) {
                         Call(mToolsPath + "gdb.exe"
                             , mBuildPath + @"output.bin" + " --eval-command=\"target remote:1234\" --eval-command=\"b _CODE_REQUESTED_BREAK_\" --eval-command=\"c\""
-                            , mToolsPath + @"qemu\", true);
+                            , mToolsPath + @"qemu\", true, false);
                     }
                     break;
 
