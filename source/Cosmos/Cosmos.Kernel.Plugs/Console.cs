@@ -113,7 +113,7 @@ namespace Cosmos.Kernel.Plugs {
                 {
                     if (chars.Count != 0)
                     {
-                        chars.RemoveAt(chars.Count);
+                        chars.RemoveAt(chars.Count - 1);
                         TextScreen.CurrentChar--;
                         TextScreen.WriteChar(' ');
                         TextScreen.CurrentChar--;
