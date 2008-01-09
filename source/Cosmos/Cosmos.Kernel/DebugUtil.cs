@@ -25,6 +25,31 @@ namespace Cosmos.Kernel {
 			EndLogging();
 		}
 
+        public static void SendTestCase(string testcase)
+        {
+            StartLogging();
+            Hardware.DebugUtil.WriteSerialString("<TestCase_Started Name=\"");
+            Hardware.DebugUtil.WriteSerialString(testcase);
+            Hardware.DebugUtil.WriteSerialString("\"/>\r\n");
+            EndLogging();
+        }
+
+        public static void SendTestAssert(bool condition, string message)
+        {
+            StartLogging();
+            Hardware.DebugUtil.WriteSerialString("<TestCase Message=\"");
+            Hardware.DebugUtil.WriteSerialString(message);
+            Hardware.DebugUtil.WriteSerialString("\" Success=\"");
+            
+            if (condition)
+                Hardware.DebugUtil.WriteSerialString("yes");
+            else
+                Hardware.DebugUtil.WriteSerialString("no");
+
+            Hardware.DebugUtil.WriteSerialString("\"/>\r\n");
+            EndLogging();
+        }
+
 		public static void SendDoubleNumber(string aModule, string aDescription, uint aNumber, byte aBits, uint aNumber2, byte aBits2) {
 			StartLogging();
 			Hardware.DebugUtil.WriteSerialString("<Number Module=\"");
