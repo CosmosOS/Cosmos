@@ -4,6 +4,7 @@ using Indy.IL2CPU.Assembler;
 using Indy.IL2CPU.Assembler.X86;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using Instruction = Mono.Cecil.Cil.Instruction;
+using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL.X86 {
 	public abstract class Op: IL.Op {
@@ -15,7 +16,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			//    System.Diagnostics.Debugger.Break();
 			//}
 			if (aMethodInfo != null && aMethodInfo.CurrentHandler != null) {
-				mNeedsExceptionPush = (aMethodInfo.CurrentHandler.HandlerStart != null && aMethodInfo.CurrentHandler.HandlerStart.Offset == aInstruction.Offset) || (aMethodInfo.CurrentHandler.FilterStart != null && aMethodInfo.CurrentHandler.FilterStart.Offset == aInstruction.Offset);
+				mNeedsExceptionPush = ((aMethodInfo.CurrentHandler.HandlerStart != null && aMethodInfo.CurrentHandler.HandlerStart.Offset == aInstruction.Offset) || (aMethodInfo.CurrentHandler.FilterStart != null && aMethodInfo.CurrentHandler.FilterStart.Offset == aInstruction.Offset)) && (aMethodInfo.CurrentHandler.Type == ExceptionHandlerType.Catch);
 				mNeedsExceptionClear = (aMethodInfo.CurrentHandler.HandlerEnd != null && aMethodInfo.CurrentHandler.HandlerEnd.Offset == (aInstruction.Offset + 1)) || (aMethodInfo.CurrentHandler.FilterEnd != null && aMethodInfo.CurrentHandler.FilterEnd.Offset == (aInstruction.Offset + 1));
 			}
 		}
