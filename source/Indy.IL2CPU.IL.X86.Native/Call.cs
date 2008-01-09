@@ -11,11 +11,11 @@ namespace Indy.IL2CPU.IL.X86.Native {
 		}
 
 		protected override void HandleDebuggerBreak() {
-			var xMethod = Engine.GetMethodDefinition(Engine.GetTypeDefinition("mscorlib", "System.Diagnostics.Debugger"), "Break", new string[0]);
-			Engine.QueueMethod(xMethod);
+			//var xMethod = Engine.GetMethodDefinition(Engine.GetTypeDefinition("mscorlib", "System.Diagnostics.Debugger"), "Break", new string[0]);
+			//Engine.QueueMethod(xMethod);
 			//new Assembler.X86.Call(Indy.IL2CPU.Assembler.Label.GenerateLabelName(xMethod));
 			//new Assembler.X86.Native.Cli();
-			new Assembler.X86.Call(DebuggerImpl.BreakMethodName);
+			new Assembler.X86.Call(Indy.IL2CPU.Assembler.X86.Native.Assembler.BreakMethodName);
 
 			//new IL2CPU.Assembler.X86.Native.Break();
 		}

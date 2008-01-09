@@ -6,6 +6,7 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86.Native {
 	public class Assembler: X86.Assembler {
+		public const string BreakMethodName = "_CODE_REQUESTED_BREAK_";
 		public Assembler(Func<string, string> aGetStreamForGroup, bool aInMetalMode)
 			: base(aGetStreamForGroup, aInMetalMode) {
 		}
@@ -45,6 +46,9 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
 				aOutputWriter.WriteLine("				 cli");
 				aOutputWriter.WriteLine("				 hlt");
 				aOutputWriter.WriteLine("				 jmp .loop");
+				aOutputWriter.WriteLine("                 ");
+				aOutputWriter.WriteLine("         " + BreakMethodName + ":");
+				aOutputWriter.WriteLine("              ret");
 				aOutputWriter.WriteLine("                 ");
 			}
 		}
