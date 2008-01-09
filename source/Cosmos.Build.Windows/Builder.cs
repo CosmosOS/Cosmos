@@ -48,7 +48,7 @@ namespace Cosmos.Build.Windows {
         protected void MakeISO() {
             RemoveFile(mBuildPath + "cosmos.iso");
             RemoveFile(mISOPath + "output.bin");
-            File.Move(mBuildPath + "output.bin", mISOPath + "output.bin");
+            File.Copy(mBuildPath + "output.bin", mISOPath + "output.bin");
             // From TFS its read only, and one of the utils doesnt like that
             File.SetAttributes(mISOPath + "isolinux.bin", FileAttributes.Normal);
 
@@ -96,13 +96,14 @@ namespace Cosmos.Build.Windows {
                 case Target.QEMU:
                 case Target.QEMU_GDB:
                     MakeISO();
-                    RemoveFile(mISOPath + "serial-debug.txt");
-                    //Call(mCosmosPath + @"tools\qemu\qemu.exe", @"-L . -cdrom ..\..\build\Cosmos\ISO\Cosmos.iso -boot d -hda ..\..\build\Cosmos\ISO\C-drive.img -serial " + "\"" + @"file:..\..\build\Cosmos\ISO\serial-debug.txt" + "\"" + " -S -s", mCosmosPath + @"tools\qemu\", aType == Target.QEMU);
+                    RemoveFile(mBuildPath + "serial-debug.txt");
+                    Call(mToolsPath + @"qemu\qemu.exe"
+                        , "-L . -cdrom \"" + mBuildPath + "Cosmos.iso\" -boot d -serial \"file:" + mBuildPath + "serial-debug.txt" + "\" -S -s", mToolsPath + @"qemu\", aType == Target.QEMU);
 
                     if (aType == Target.QEMU_GDB) {
-                      //  Call(mCosmosPath + @"tools\gdb\bin\gdb.exe"
-                      //      , mBuildPath + @"ISO\files\output.obj" + " --eval-command=\"target remote:1234\" --eval-command=\"b _CODE_REQUESTED_BREAK_\" --eval-command=\"c\""
-                      //      , mCosmosPath + @"tools\qemu\", true);
+                        Call(mToolsPath + "gdb.exe"
+                            , mBuildPath + @"output.bin" + " --eval-command=\"target remote:1234\" --eval-command=\"b _CODE_REQUESTED_BREAK_\" --eval-command=\"c\""
+                            , mToolsPath + @"qemu\", true);
                     }
                     break;
 
