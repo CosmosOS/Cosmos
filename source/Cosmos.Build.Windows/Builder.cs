@@ -10,10 +10,12 @@ namespace Cosmos.Build.Windows {
         //TODO: Fix this - config file? Package format?
         protected const string mBuildPath = @"s:\source\il2cpu\Build\";
         protected string mToolsPath;
+        protected string mISOPath;
         protected string mAsmPath;
 
         public Builder() {
             mToolsPath = mBuildPath + @"Tools\";
+            mISOPath = mBuildPath + @"ISO\";
             mAsmPath = mToolsPath + @"asm\";
         }
 
@@ -44,13 +46,11 @@ namespace Cosmos.Build.Windows {
         }
 
         protected void MakeISO() {
-            RemoveFile(Path.Combine(mBuildPath, @"ISO\files\output.obj"));
-            File.Move(mBuildPath + @"ISO\output.obj", mBuildPath + @"ISO\files\output.obj");
+            RemoveFile(mBuildPath + "cosmos.iso");
+            // From TFS its read only, and one of the utils doesnt like that
+            File.SetAttributes(mISOPath + "isolinux.bin", FileAttributes.Normal);
 
-            RemoveFile(Path.Combine(mBuildPath, @"ISO\cosmos.iso"));
-            File.SetAttributes(mBuildPath + @"ISO\files\syslinux\isolinux.bin", FileAttributes.Normal);
-
-            //Call(mCosmosPath + @"Tools\mkisofs\mkisofs.exe", "-R -b syslinux/isolinux.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o Cosmos.iso files", mBuildPath + @"ISO\", true);
+            Call(mToolsPath + @"Tools\mkisofs\mkisofs.exe", "-R -b syslinux/isolinux.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o Cosmos.iso files", mBuildPath + @"ISO\", true);
         }
 
         public void Compile() {
