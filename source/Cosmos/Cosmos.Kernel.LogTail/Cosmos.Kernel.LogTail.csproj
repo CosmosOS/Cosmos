@@ -72,6 +72,12 @@
     <Compile Include="Handlers\MessageLogHandler.Designer.cs">
       <DependentUpon>MessageLogHandler.cs</DependentUpon>
     </Compile>
+    <Compile Include="Handlers\TestLogHandler.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Handlers\TestLogHandler.Designer.cs">
+      <DependentUpon>TestLogHandler.cs</DependentUpon>
+    </Compile>
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -86,6 +92,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Handlers\MessageLogHandler.resx">
       <DependentUpon>MessageLogHandler.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Handlers\TestLogHandler.resx">
+      <DependentUpon>TestLogHandler.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
