@@ -93,7 +93,7 @@ namespace Cosmos.Build.Windows {
                     MakeISO();
                     RemoveFile(mBuildPath + "serial-debug.txt");
                     Global.Call(mToolsPath + @"qemu\qemu.exe"
-                        , "-L . -cdrom \"" + mBuildPath + "Cosmos.iso\" -boot d -serial \"file:" + mBuildPath + "serial-debug.txt" + "\"", mToolsPath + @"qemu\", true, false);
+                        , "-L . -cdrom \"" + mBuildPath + "Cosmos.iso\" -boot d -serial \"file:" + mBuildPath + "serial-debug.txt" + "\" -kernel-kqemu", mToolsPath + @"qemu\", true, false);
                     break;
 
                 case Target.QEMU_GDB:

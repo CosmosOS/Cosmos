@@ -61,10 +61,10 @@ namespace Indy.IL2CPU.Assembler {
 			}
 		}
 		public const string EntryPointName = "__ENGINE_ENTRYPOINT__";
-		protected IndexableCollection<KeyValuePair<string, Instruction>> mInstructions = new IndexableCollection<KeyValuePair<string, Instruction>>();
-		private IndexableCollection<KeyValuePair<string, DataMember>> mDataMembers = new IndexableCollection<KeyValuePair<string, DataMember>>();
+		protected List<KeyValuePair<string, Instruction>> mInstructions = new List<KeyValuePair<string, Instruction>>();
+		private List<KeyValuePair<string, DataMember>> mDataMembers = new List<KeyValuePair<string, DataMember>>();
 		private List<KeyValuePair<string, string>> mIncludes = new List<KeyValuePair<string, string>>();
-		private IndexableCollection<KeyValuePair<string, ImportMember>> mImportMembers = new IndexableCollection<KeyValuePair<string, ImportMember>>();
+		private List<KeyValuePair<string, ImportMember>> mImportMembers = new List<KeyValuePair<string, ImportMember>>();
 		private readonly bool mInMetalMode = false;
 		public readonly Stack<int> StackSizes = new Stack<int>();
 		public bool DebugMode {
@@ -93,19 +93,19 @@ namespace Indy.IL2CPU.Assembler {
 			//mInstructions.AddComplexIndexDefinition(
 		}
 
-		public IndexableCollection<KeyValuePair<string, Instruction>> Instructions {
+		public List<KeyValuePair<string, Instruction>> Instructions {
 			get {
 				return mInstructions;
 			}
 		}
 
-		public IndexableCollection<KeyValuePair<string, DataMember>> DataMembers {
+		public List<KeyValuePair<string, DataMember>> DataMembers {
 			get {
 				return mDataMembers;
 			}
 		}
 
-		public IndexableCollection<KeyValuePair<string, ImportMember>> ImportMembers {
+		public List<KeyValuePair<string, ImportMember>> ImportMembers {
 			get {
 				return mImportMembers;
 			}

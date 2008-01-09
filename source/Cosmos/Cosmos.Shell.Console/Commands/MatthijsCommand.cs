@@ -21,11 +21,20 @@ namespace Cosmos.Shell.Console.Commands {
 			//System.Diagnostics.Debugger.Break();
 			try {
 				try {
-					throw new Exception("Hello, Error!");
+					if (param != null && param.Length == 0) {
+						throw new ArgumentException("ArgumentError!", "paramname");
+					} else {
+						throw new Exception("Generic Error!");
+					}
 				} finally {
 					System.Console.WriteLine("Finally Clause Called!");
 				}
-			} catch (Exception E){
+			} catch (ArgumentException AE) {
+				System.Console.WriteLine("Argument Exception Occurred:");
+				System.Console.Write("  Param Name: ");
+				System.Diagnostics.Debugger.Break();
+				System.Console.WriteLine(AE.ParamName);
+			} catch (Exception E) {
 				System.Console.WriteLine("Error Occurred while executing Command!");
 				System.Console.Write("Details: ");
 				System.Console.WriteLine(E.Message);

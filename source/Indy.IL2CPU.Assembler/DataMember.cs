@@ -25,7 +25,6 @@ namespace Indy.IL2CPU.Assembler {
 			DefaultValue = aDefaultValue;
 		}
 
-		[Indexable]
 		public string Name {
 			get;
 			private set;
@@ -33,11 +32,11 @@ namespace Indy.IL2CPU.Assembler {
 
 		public readonly string DataType;
 
-		[Indexable]
 		public string DefaultValue {
 			get;
 			private set;
 		}
+
 		public override string ToString() {
 			return Name + " " + DataType + " " + DefaultValue;
 		}

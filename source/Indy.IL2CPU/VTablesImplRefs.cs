@@ -13,6 +13,7 @@ namespace Indy.IL2CPU {
 		public static readonly MethodDefinition SetTypeInfoRef;
 		public static readonly MethodDefinition SetMethodInfoRef;
 		public static readonly MethodDefinition GetMethodAddressForTypeRef;
+		public static readonly MethodDefinition IsInstanceRef;
 
 		static VTablesImplRefs() {
 			RuntimeAssemblyDef = AssemblyFactory.GetAssembly(typeof(VTablesImpl).Assembly.Location);

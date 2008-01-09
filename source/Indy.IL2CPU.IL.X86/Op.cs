@@ -5,19 +5,45 @@ using Indy.IL2CPU.Assembler.X86;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using Instruction = Mono.Cecil.Cil.Instruction;
 using Mono.Cecil.Cil;
+using Mono.Cecil;
 
 namespace Indy.IL2CPU.IL.X86 {
 	public abstract class Op: IL.Op {
 		private bool mNeedsExceptionPush;
 		private bool mNeedsExceptionClear;
+		private TypeDefinition mCatchType;
+		private string mNextInstructionLabel;
+		private bool mNeedsTypeCheck = false;
 		public Op(Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
-			//if (aMethodInfo != null && aMethodInfo.LabelName == "System_Void___Cosmos_Shell_Console_Commands_MatthijsCommand_Execute___System_String___") {
-			//    System.Diagnostics.Debugger.Break();
-			//}
+			if (aInstruction != null && aMethodInfo != null && GetInstructionLabel(aInstruction) == ".L00000044" && aMethodInfo.LabelName == "System_Void___Cosmos_Shell_Console_Commands_MatthijsCommand_Execute___System_String___") {
+				System.Diagnostics.Debugger.Break();
+			}
 			if (aMethodInfo != null && aMethodInfo.CurrentHandler != null) {
 				mNeedsExceptionPush = ((aMethodInfo.CurrentHandler.HandlerStart != null && aMethodInfo.CurrentHandler.HandlerStart.Offset == aInstruction.Offset) || (aMethodInfo.CurrentHandler.FilterStart != null && aMethodInfo.CurrentHandler.FilterStart.Offset == aInstruction.Offset)) && (aMethodInfo.CurrentHandler.Type == ExceptionHandlerType.Catch);
 				mNeedsExceptionClear = (aMethodInfo.CurrentHandler.HandlerEnd != null && aMethodInfo.CurrentHandler.HandlerEnd.Offset == (aInstruction.Offset + 1)) || (aMethodInfo.CurrentHandler.FilterEnd != null && aMethodInfo.CurrentHandler.FilterEnd.Offset == (aInstruction.Offset + 1));
+				if (aMethodInfo.CurrentHandler.CatchType != null) {
+					mCatchType = Engine.GetDefinitionFromTypeReference(aMethodInfo.CurrentHandler.CatchType);
+				}
+			}
+			if (mCatchType != null && mCatchType.FullName != "System.Exception") {
+				var xHandler = (from item in aMethodInfo.MethodDefinition.Body.ExceptionHandlers.Cast<ExceptionHandler>()
+								where item.TryStart.Offset == aMethodInfo.CurrentHandler.TryStart.Offset
+								&& item.TryEnd.Offset == aMethodInfo.CurrentHandler.TryEnd.Offset
+								&& item.HandlerStart.Offset == aMethodInfo.CurrentHandler.HandlerEnd.Offset
+								&& item.Type == ExceptionHandlerType.Catch
+								select item).FirstOrDefault();
+				if (xHandler != null) {
+					mNextInstructionLabel = GetInstructionLabel(xHandler.HandlerStart);
+				} else {
+					// Here we need to detect where to leave to when this catch clause doesnt' handle a specific exception, and is the last one
+					throw new NotImplementedException("TODO: Implement exiting here!");
+				}
+			} else {
+				mCatchType = null;
+			}
+			if (mCatchType != null && aMethodInfo != null && aMethodInfo.CurrentHandler != null && aMethodInfo.CurrentHandler.HandlerStart != null) {
+				mNeedsTypeCheck = aMethodInfo.CurrentHandler.HandlerStart.Offset == aInstruction.Offset;
 			}
 		}
 
@@ -210,8 +236,19 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		protected override void AssembleHeader() {
 			base.AssembleHeader();
+			new Comment("Next Instruction = " + mNextInstructionLabel);
+			string xCurExceptionFieldName = DataMember.GetStaticFieldName(IL2CPU.Assembler.Assembler.CurrentExceptionRef);
+			if (mNeedsTypeCheck) {
+				// call VTablesImpl.IsInstance to see the actual instance name..
+				new CPUx86.Move("eax", "[" + xCurExceptionFieldName + "]");
+				new CPUx86.Pushd(Registers.AtEAX);
+				new CPUx86.Pushd(Engine.RegisterType(mCatchType).ToString());
+				new CPUx86.Call(Label.GenerateLabelName(VTablesImplRefs.IsInstanceRef));
+				new CPUx86.Compare(Registers.EAX, "0");
+				new CPUx86.JumpIfEquals(mNextInstructionLabel);
+			}
 			if (mNeedsExceptionPush) {
-				new CPUx86.Push("dword [" + DataMember.GetStaticFieldName(IL2CPU.Assembler.Assembler.CurrentExceptionRef) + "]");
+				new CPUx86.Push("dword [" + xCurExceptionFieldName + "]");
 				Assembler.StackSizes.Push(4);
 			}
 		}

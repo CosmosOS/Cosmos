@@ -15,6 +15,9 @@ namespace Indy.IL2CPU {
 				if (xCurrentType == aDesiredObjectType) {
 					return true;
 				}
+				if (xCurrentType == mTypes[xCurrentType].BaseTypeIdentifier) {
+					return false;
+				}
 				xCurrentType = mTypes[xCurrentType].BaseTypeIdentifier;
 			} while (xCurrentType != 0);
 			return false;
