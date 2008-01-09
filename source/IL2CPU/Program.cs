@@ -118,10 +118,6 @@ namespace IL2CPU {
 				Console.WriteLine("Error: InputFile '" + InputFile + "' not found!");
 				return false;
 			}
-			if (String.IsNullOrEmpty(OutputFile)) {
-				Console.WriteLine("Error: No OutputFile specified!");
-				return false;
-			}
 			if (String.IsNullOrEmpty(AsmFile)) {
 				Console.WriteLine("Error: No assembler output directory specified");
 				return false;

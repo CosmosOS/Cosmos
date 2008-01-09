@@ -8,11 +8,13 @@ using System.Text;
 namespace Cosmos.Build.Windows {
     public class Builder {
         //TODO: Fix this - config file? Package format?
-        protected const string mCosmosPath = @"s:\source\il2cpu\";
-        protected string mBuildPath;
+        protected const string mBuildPath = @"s:\source\il2cpu\Build\";
+        protected string mToolsPath;
+        protected string mAsmPath;
 
         public Builder() {
-            mBuildPath = mCosmosPath + @"Build\Cosmos\";
+            mToolsPath = mBuildPath + @"Tools\";
+            mAsmPath = mToolsPath + @"asm\";
         }
 
         protected void RemoveFile(string aPathname) {
@@ -27,16 +29,16 @@ namespace Cosmos.Build.Windows {
             xStartInfo.Arguments = aArgLine;
             xStartInfo.WorkingDirectory = aWorkDir;
             xStartInfo.UseShellExecute = false;
-            xStartInfo.RedirectStandardError = false;
-            xStartInfo.RedirectStandardOutput = false;
+            xStartInfo.RedirectStandardError = true;
+            xStartInfo.RedirectStandardOutput = true;
             var xProcess = Process.Start(xStartInfo);
             if (aWait) {
                 if (!xProcess.WaitForExit(60 * 1000) || xProcess.ExitCode != 0) {
                     //TODO: Fix
-                    throw new Exception("Call failed");
-                    //Console.WriteLine("Error while running FASM!");
-                    //Console.Write(xProcess.StandardOutput.ReadToEnd());
-                    //Console.Write(xProcess.StandardError.ReadToEnd());
+                    //throw new Exception("Call failed");
+                    Console.WriteLine("Error during call");
+                    Console.Write(xProcess.StandardOutput.ReadToEnd());
+                    Console.Write(xProcess.StandardError.ReadToEnd());
                 }
             }
         }
@@ -48,15 +50,25 @@ namespace Cosmos.Build.Windows {
             RemoveFile(Path.Combine(mBuildPath, @"ISO\cosmos.iso"));
             File.SetAttributes(mBuildPath + @"ISO\files\syslinux\isolinux.bin", FileAttributes.Normal);
 
-            Call(mCosmosPath + @"Tools\mkisofs\mkisofs.exe", "-R -b syslinux/isolinux.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o Cosmos.iso files", mBuildPath + @"ISO\", true);
+            //Call(mCosmosPath + @"Tools\mkisofs\mkisofs.exe", "-R -b syslinux/isolinux.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o Cosmos.iso files", mBuildPath + @"ISO\", true);
         }
 
         public void Compile() {
-            IL2CPU.Program.Main(new string[] {@"-in:" + mCosmosPath + @"source\Cosmos\Cosmos.Shell.Console\bin\Debug\Cosmos.Shell.Console.exe"
-            , @"-plug:" + mCosmosPath + @"source\Cosmos\Cosmos.Kernel.Plugs\bin\Debug\Cosmos.Kernel.Plugs.dll"
-            , @"-out:" + mBuildPath + @"ISO\output.obj", "-platform:nativex86", @"-asm:" + mBuildPath + @"asm"});
-            Call(mCosmosPath + @"Tools\nasm\nasm.exe", String.Format("-g -f elf -F stabs -o \"{0}\" \"{1}\"", mBuildPath + @"ISO\output.obj-tmp", mBuildPath + @"asm\main.asm"), mBuildPath, true);
-            Call(mCosmosPath + @"Tools\BinUtils-NativeX86\ld.exe", String.Format("-Ttext 0x500000 -Tdata 0x200000 -e Kernel_Start -o \"{0}\" \"{1}\"", mBuildPath + @"ISO\output.obj", mBuildPath + @"ISO\output.obj-tmp"), mBuildPath, true);
+            if (!Directory.Exists(mAsmPath)) {
+                Directory.CreateDirectory(mAsmPath);
+            }
+            var xTarget = System.Reflection.Assembly.GetEntryAssembly();
+            IL2CPU.Program.Main(new string[] {@"-in:" + xTarget.Location
+                , "-plug:" + mToolsPath + @"Cosmos.Kernel.Plugs\Cosmos.Kernel.Plugs.dll"
+                , "-platform:nativex86", "-asm:" + mAsmPath}
+                );
+
+            RemoveFile(mBuildPath + "output.obj");
+            Call(mToolsPath + @"nasm\nasm.exe", String.Format("-g -f elf -F stabs -o \"{0}\" \"{1}\"", mBuildPath + "output.obj", mAsmPath + "main.asm"), mBuildPath, true);
+
+            RemoveFile(mBuildPath + "output.bin");
+            Call(mToolsPath + @"cygwin\ld.exe", String.Format("-Ttext 0x500000 -Tdata 0x200000 -e Kernel_Start -o \"{0}\" \"{1}\"", "output.bin", "output.obj"), mBuildPath, true);
+            RemoveFile(mBuildPath + "output.obj");
         }
 
         public void BuildKernel() {
@@ -65,6 +77,7 @@ namespace Cosmos.Build.Windows {
         public enum Target { ISO, PXE, QEMU, QEMU_GDB, VMWare, VMWarePXE, VirtualPC, VirtualPCPXE };
         public void Build(Target aType) {
             Compile();
+
             switch (aType) {
                 case Target.ISO:
                     MakeISO();
@@ -81,12 +94,12 @@ namespace Cosmos.Build.Windows {
                 case Target.QEMU_GDB:
                     MakeISO();
                     RemoveFile(@"ISO\serial-debug.txt");
-                    Call(mCosmosPath + @"tools\qemu\qemu.exe", @"-L . -cdrom ..\..\build\Cosmos\ISO\Cosmos.iso -boot d -hda ..\..\build\Cosmos\ISO\C-drive.img -serial " + "\"" + @"file:..\..\build\Cosmos\ISO\serial-debug.txt" + "\"" + " -S -s", mCosmosPath + @"tools\qemu\", aType == Target.QEMU);
+                    //Call(mCosmosPath + @"tools\qemu\qemu.exe", @"-L . -cdrom ..\..\build\Cosmos\ISO\Cosmos.iso -boot d -hda ..\..\build\Cosmos\ISO\C-drive.img -serial " + "\"" + @"file:..\..\build\Cosmos\ISO\serial-debug.txt" + "\"" + " -S -s", mCosmosPath + @"tools\qemu\", aType == Target.QEMU);
 
                     if (aType == Target.QEMU_GDB) {
-                        Call(mCosmosPath + @"tools\gdb\bin\gdb.exe"
-                            , mBuildPath + @"ISO\files\output.obj" + " --eval-command=\"target remote:1234\" --eval-command=\"b _CODE_REQUESTED_BREAK_\" --eval-command=\"c\""
-                            , mCosmosPath + @"tools\qemu\", true);
+                      //  Call(mCosmosPath + @"tools\gdb\bin\gdb.exe"
+                      //      , mBuildPath + @"ISO\files\output.obj" + " --eval-command=\"target remote:1234\" --eval-command=\"b _CODE_REQUESTED_BREAK_\" --eval-command=\"c\""
+                      //      , mCosmosPath + @"tools\qemu\", true);
                     }
                     break;
 
