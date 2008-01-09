@@ -1,15 +1,14 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 
 namespace Cosmos.Build.Windows {
     public class Builder {
         //TODO: Fix this - config file? Package format?
-        //protected const string mCosmosPath = @"s:\source\il2cpu\";
-		protected const string mCosmosPath = @"D:\dotnet\IL2ASM\repos\";
+        protected const string mCosmosPath = @"s:\source\il2cpu\";
         protected string mBuildPath;
 
         public Builder() {

@@ -61,9 +61,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Boots", "Boots", "{21E68B7D
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Old", "Old", "{86BD557B-49D1-4833-B1F7-D38BF21A87EA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Build.Windows", "Cosmos.Build.Windows\Cosmos.Build.Windows.csproj", "{1F0EDE86-F6D4-4355-9A97-10E90457770C}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 25
+		SccNumberOfProjects = 26
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -163,6 +165,10 @@ Global
 		SccProjectTopLevelParentUniqueName24 = Cosmos.sln
 		SccProjectName24 = Cosmos/Cosmos.Tools.SkypeBot
 		SccLocalPath24 = Cosmos\\Cosmos.Tools.SkypeBot
+		SccProjectUniqueName25 = Cosmos.Build.Windows\\Cosmos.Build.Windows.csproj
+		SccProjectTopLevelParentUniqueName25 = Cosmos.sln
+		SccProjectName25 = Cosmos.Build.Windows
+		SccLocalPath25 = Cosmos.Build.Windows
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -267,6 +273,10 @@ Global
 		{B0BBD2A2-4FAA-4730-9770-ACE6D9532132}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B0BBD2A2-4FAA-4730-9770-ACE6D9532132}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B0BBD2A2-4FAA-4730-9770-ACE6D9532132}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F0EDE86-F6D4-4355-9A97-10E90457770C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F0EDE86-F6D4-4355-9A97-10E90457770C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F0EDE86-F6D4-4355-9A97-10E90457770C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F0EDE86-F6D4-4355-9A97-10E90457770C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -296,6 +306,7 @@ Global
 		{28584689-B678-4863-B404-0AD46B2F2B63} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
 		{A1F83D9F-2D44-4264-A08B-416797123018} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
 		{7BAB58BF-E8A1-4623-B6BF-4B90A0505226} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
+		{1F0EDE86-F6D4-4355-9A97-10E90457770C} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
 		{B0BBD2A2-4FAA-4730-9770-ACE6D9532132} = {E16DB75B-0F1D-4813-9103-F8FB6E7BAE2A}
 	EndGlobalSection
 EndGlobal
