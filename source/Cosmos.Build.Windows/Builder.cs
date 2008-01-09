@@ -4,16 +4,18 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Microsoft.Win32;
 
 namespace Cosmos.Build.Windows {
     public class Builder {
-        //TODO: Fix this - config file? Package format?
-        protected const string mBuildPath = @"s:\source\il2cpu\Build\";
+        protected string mBuildPath;
         protected string mToolsPath;
         protected string mISOPath;
         protected string mAsmPath;
 
         public Builder() {
+            var xKey = Registry.CurrentUser.OpenSubKey(@"Software\Cosmos");
+            mBuildPath = (string)xKey.GetValue("Build Path");
             mToolsPath = mBuildPath + @"Tools\";
             mISOPath = mBuildPath + @"ISO\";
             mAsmPath = mToolsPath + @"asm\";
