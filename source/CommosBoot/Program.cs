@@ -18,23 +18,12 @@ namespace CommosBoot {
         // Here is where your Cosmos code goes. This is the code that will be executed during Cosmos boot.
         // Write your code, and run. Cosmos build console will appear, select your target, and thats it!
         public static void Init() {
-            Kernel.CPU.Init();
-
-            Kernel.Staging.DefaultStageQueue stages = new Cosmos.Kernel.Staging.DefaultStageQueue();
-            stages.Enqueue(new Prompter());
-
-            System.Console.Clear();
-            System.Console.BackgroundColor = ConsoleColor.Black;
-            System.Console.ForegroundColor = ConsoleColor.White;
-            System.Console.WriteLine("Hello World");
-
-            stages.Run();
-            System.Console.WriteLine("Done");
+            Cosmos.Kernel.CPU.Init();
+           
+            System.Console.WriteLine("Kernel Booted!");
 
             while (true)
                 ;
-
-            stages.Teardown();
         }
     }
 }

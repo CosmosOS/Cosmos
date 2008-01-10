@@ -10,6 +10,7 @@ using System.Collections.Generic;
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Ldstr, true)]
 	public class LdStr: Op {
+		private static Dictionary<string, DataMember> mDataMemberMap = new Dictionary<string, DataMember>();
 		public readonly string LiteralStr;
 		public LdStr(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
@@ -31,11 +32,9 @@ namespace Indy.IL2CPU.IL.X86 {
 			xDataByteArray.Append(xEncoding.GetBytes(aLiteral).Aggregate("", (r, b) => r + b + ","));
 			xDataByteArray.Append("0,");
 			string xDataVal = xDataByteArray.ToString().TrimEnd(',');
-			string xDataName = (from item in aAssembler.DataMembers
-								where item.Value.DefaultValue == xDataVal
-								select item.Value.Name).FirstOrDefault();
-			if (String.IsNullOrEmpty(xDataName)) {
-				xDataName = aAssembler.GetIdentifier("StringLiteral");
+			DataMember xDataMember = null;
+			if (!mDataMemberMap.TryGetValue(xDataVal, out xDataMember)) {
+				string xDataName = aAssembler.GetIdentifier("StringLiteral");
 				StringBuilder xRefByteArray = new StringBuilder();
 				xRefByteArray.Append("0x" + ((uint)Engine.RegisterType(Engine.GetTypeDefinition("mscorlib", "System.String"))).ToString("X"));
 				xRefByteArray.Append(",0x" + ((uint)InstanceTypeEnum.StaticEmbeddedObject).ToString("X") + ",");
@@ -43,11 +42,12 @@ namespace Indy.IL2CPU.IL.X86 {
 				xRefByteArray.Append(xDataName + "__Contents,");
 				xRefByteArray.Append("0,0,0");
 				aAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>(aAssembler.CurrentGroup, new DataMember(xDataName, "dd", xRefByteArray.ToString())));
-				aAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>(aAssembler.CurrentGroup,new DataMember(xDataName + "__Contents", "db", xDataVal)));
+				aAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>(aAssembler.CurrentGroup, xDataMember=new DataMember(xDataName + "__Contents", "db", xDataVal)));
+				mDataMemberMap.Add(xDataVal, xDataMember);
+				return xDataName;
 			} else {
-				xDataName = xDataName.Substring(0, xDataName.Length - "__Contents".Length);
+				return xDataMember.Name.Substring(0, xDataMember.Name.Length - "__Contents".Length);
 			}
-			return xDataName;
 		}
 
 		public override void DoAssemble() {

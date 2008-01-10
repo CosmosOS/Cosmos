@@ -43,6 +43,7 @@ namespace Cosmos.Build.Windows.Config.Tasks
                     task.Status += new EventHandler<TaskStatusEventArgs>(task_Status);
                     task.Execute();
                 }
+				OnStatus(100, "Done");
             }
         }
 

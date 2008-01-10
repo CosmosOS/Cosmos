@@ -3,7 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Title="Cosmos Configure" Height="286" Width="327">
     <Grid>
-        <Image Name="image1" Stretch="Fill" Source="/Cosmos.Build.Windows.Config;component/Logo-1.png" Margin="0,0,0,146" />
+        <Image Name="image1" Stretch="Uniform" Source="/Logo-1.png" Margin="0,0,0,146" />
         <ProgressBar Margin="0,0,0,28" Name="progressBar" Height="27" VerticalAlignment="Bottom" />
         <Button HorizontalAlignment="Right" Margin="0,0,0,-1" Name="beginButton" Width="75" Height="23" VerticalAlignment="Bottom" Click="beginButton_Click">Begin</Button>
         <Label Height="28" Margin="0,0,0,112" Name="taskLabel" VerticalAlignment="Bottom">

@@ -42,6 +42,7 @@ namespace Cosmos.Build.Windows.Config {
             Tasks.TaskQueue q = new Cosmos.Build.Windows.Config.Tasks.TaskQueue();
             q.Add(new Tasks.CleanGacTask());
             q.Add(new Tasks.InstallGacTask());
+			q.Add(new Tasks.InstallTemplateTask());
             q.Status += new EventHandler<Cosmos.Build.Windows.Config.Tasks.TaskStatusEventArgs>(q_Status);
             q.BeginExecute();
         }

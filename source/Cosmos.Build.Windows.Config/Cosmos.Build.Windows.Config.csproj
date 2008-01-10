@@ -9,7 +9,7 @@
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Cosmos.Build.Windows.Config</RootNamespace>
-    <AssemblyName>Cosmos.Build.Windows.Config</AssemblyName>
+    <AssemblyName>setup</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -23,10 +23,11 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\Build\Config\</OutputPath>
+    <OutputPath>..\..\Build\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -88,6 +89,7 @@
     </Compile>
     <Compile Include="Tasks\CleanGacTask.cs" />
     <Compile Include="Tasks\InstallGacTask.cs" />
+    <Compile Include="Tasks\InstallTemplateTask.cs" />
     <Compile Include="Tasks\ITask.cs" />
     <Compile Include="Tasks\TaskException.cs" />
     <Compile Include="Tasks\TaskQueue.cs" />

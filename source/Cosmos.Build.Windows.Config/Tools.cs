@@ -13,7 +13,6 @@ namespace Cosmos.Build.Windows.Config
         static Tools()
         {
             Path = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            Path = Dir("..");
         }
 
         public static string Dir(params string[] path)
