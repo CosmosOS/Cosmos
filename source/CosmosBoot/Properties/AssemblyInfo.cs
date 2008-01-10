@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("CommosBoot")]
+[assembly: AssemblyTitle("CosmosBoot")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("CommosBoot")]
+[assembly: AssemblyProduct("CosmosBoot")]
 [assembly: AssemblyCopyright("Copyright ©  2008")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("4ea4d928-86f7-4187-89ce-1ee050777a5f")]
+[assembly: Guid("c18ed28a-23cc-4374-832d-87aeaa37c267")]
 
 // Version information for an assembly consists of the following four values:
 //
