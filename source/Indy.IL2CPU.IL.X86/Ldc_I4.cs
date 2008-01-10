@@ -11,11 +11,6 @@ namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Ldc_I4)]
 	public class Ldc_I4: Op {
 		private int mValue;
-		private bool mOptimizedArrayFieldCode = false;
-		private FieldDefinition mTokenField;
-		private FieldDefinition mStaticField;
-		private int mCount;
-		private int mElementSize;
 		protected void SetValue(int aValue) {
 			mValue = aValue;
 		}

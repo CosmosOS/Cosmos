@@ -1215,8 +1215,6 @@ namespace Indy.IL2CPU {
 			if (mCurrent == null) {
 				throw new Exception("ERROR: No Current Engine found!");
 			}
-
-			TypeDefinition xTypeDef = null;
 			string xActualTypeName = aType;
 			if (xActualTypeName.Contains("<") && xActualTypeName.Contains(">")) {
 				xActualTypeName = xActualTypeName.Substring(0, xActualTypeName.IndexOf("<"));

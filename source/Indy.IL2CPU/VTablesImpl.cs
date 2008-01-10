@@ -5,6 +5,7 @@ using System.Text;
 
 namespace Indy.IL2CPU {
 	public static class VTablesImpl {
+		// this field seems to be always empty, but the VTablesImpl class is embedded in the final exe.
 		private static VTable[] mTypes;
 		public static bool IsInstance(int aObjectType, int aDesiredObjectType) {
 			int xCurrentType = aObjectType;

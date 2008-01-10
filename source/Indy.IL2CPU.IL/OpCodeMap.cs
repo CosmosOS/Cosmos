@@ -51,34 +51,6 @@ namespace Indy.IL2CPU.IL {
 				}
 			}
 			InitializePlugMethodsList(aAssembler, aPlugs, aTypeResolver, aAssemblyResolver);
-			InitializeGlueMethodList(aApplicationAssemblies);
-		}
-
-		private SortedList<int, MethodDefinition> mGlueMethods;
-		private void InitializeGlueMethodList(IEnumerable<AssemblyDefinition> aAssemblies) {
-			mGlueMethods = new SortedList<int, MethodDefinition>();
-			foreach (AssemblyDefinition xAssembly in aAssemblies) {
-				foreach (ModuleDefinition xModule in xAssembly.Modules) {
-					foreach (TypeDefinition xType in xModule.Types) {
-						foreach (MethodDefinition xMethod in xType.Methods) {
-							CustomAttribute xAttribute = (from item in xMethod.CustomAttributes.Cast<CustomAttribute>()
-														  where item.Constructor.DeclaringType.FullName == typeof(GlueMethodAttribute).FullName && item.Fields.Contains(GlueMethodAttribute.TypePropertyName)
-														  select item).FirstOrDefault();
-							if (xAttribute != null) {
-								int xMethodType = (int)xAttribute.Fields[GlueMethodAttribute.TypePropertyName];
-								mGlueMethods.Add(xMethodType, xMethod);
-							}
-						}
-					}
-				}
-			}
-		}
-
-		protected MethodDefinition GetGlueMethod(int aType) {
-			if (!mGlueMethods.ContainsKey(aType)) {
-				throw new Exception("GlueMethod " + aType + " not found!");
-			}
-			return mGlueMethods[aType];
 		}
 
 		public Type GetOpForOpCode(Code code) {
@@ -120,7 +92,7 @@ namespace Indy.IL2CPU.IL {
 			sb.Append("(");
 			if (aSelf.HasThis) {
 				sb.Append(aSelf.DeclaringType.FullName);
-				sb.Append(",");				
+				sb.Append(",");
 			}
 			if (aSelf.Parameters.Count > 0) {
 				foreach (ParameterDefinition xParam in aSelf.Parameters) {
@@ -235,11 +207,6 @@ namespace Indy.IL2CPU.IL {
 			if (mPlugMethods.ContainsKey(aOrigMethodName)) {
 				return mPlugMethods[aOrigMethodName];
 			}
-			return GetCustomMethodImplementation_Old(aOrigMethodName, aInMetalMode);
-		}
-
-		[Obsolete("Try to use the GetPlugAssemblies infrastructure!")]
-		public virtual MethodReference GetCustomMethodImplementation_Old(string aOrigMethodName, bool aInMetalMode) {
 			return null;
 		}
 
@@ -269,7 +236,6 @@ namespace Indy.IL2CPU.IL {
 		}
 
 		private static TypeDefinition GetTypeDefinition(AssemblyDefinition aAssembly, string aType) {
-			TypeDefinition xTypeDef = null;
 			string xActualTypeName = aType;
 			if (xActualTypeName.Contains("<") && xActualTypeName.Contains(">")) {
 				xActualTypeName = xActualTypeName.Substring(0, xActualTypeName.IndexOf("<"));

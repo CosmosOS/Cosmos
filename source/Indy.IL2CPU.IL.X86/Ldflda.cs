@@ -22,7 +22,6 @@ namespace Indy.IL2CPU.IL.X86 {
 				xField = Engine.GetDefinitionFromFieldReference(xFieldRef);
 			}
 			string xFieldId = xField.ToString();
-			int xStorageSize;
 			mType = Engine.GetTypeInfo(Engine.GetDefinitionFromTypeReference(xField.DeclaringType));
 			mField = mType.Fields[xFieldId];
 		}

@@ -7,7 +7,6 @@ namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(Code.Starg)]
 	public class Starg: Op {
 		private string[] mAddresses;
-		private int mSize;
 		protected void SetArgIndex(int aIndex, MethodInformation aMethodInfo) {
 			mAddresses = aMethodInfo.Arguments[aIndex].VirtualAddresses;
 		}

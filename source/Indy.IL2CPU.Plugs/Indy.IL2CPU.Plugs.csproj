@@ -38,8 +38,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="AssemblerMethod.cs" />
-    <Compile Include="GlueMethodAttribute.cs" />
-    <Compile Include="GlueMethodType.cs" />
     <Compile Include="PlugAttribute.cs" />
     <Compile Include="PlugMethodAttribute.cs" />
   </ItemGroup>

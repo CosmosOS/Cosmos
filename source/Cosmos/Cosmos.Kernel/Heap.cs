@@ -66,7 +66,6 @@ namespace Cosmos.Kernel {
 			}
 		}
 
-		[GlueMethod(Type = GlueMethodType.Heap_Alloc)]
 		public static uint MemAlloc(uint aLength) {
 			CheckInit();
 			MemoryBlock* xCurrentBlock = mFirstBlock;
@@ -98,7 +97,6 @@ namespace Cosmos.Kernel {
 			return ((uint)xCurrentBlock) + 5;
 		}
 
-		[GlueMethod(Type = GlueMethodType.Heap_Free)]
 		public static void MemFree(uint aPointer) {
 			MemoryBlock* xBlock = (MemoryBlock*)(aPointer - 5);
 			DebugUtil.SendMM_Free(aPointer - 5, (((uint)xBlock->Next) - ((uint)xBlock)));
