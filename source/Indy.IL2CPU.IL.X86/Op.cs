@@ -17,7 +17,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		public Op(Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
 			if (aInstruction != null && aMethodInfo != null && GetInstructionLabel(aInstruction) == ".L00000044" && aMethodInfo.LabelName == "System_Void___Cosmos_Shell_Console_Commands_MatthijsCommand_Execute___System_String___") {
-				System.Diagnostics.Debugger.Break();
+				//System.Diagnostics.Debugger.Break();
 			}
 			if (aMethodInfo != null && aMethodInfo.CurrentHandler != null) {
 				mNeedsExceptionPush = ((aMethodInfo.CurrentHandler.HandlerStart != null && aMethodInfo.CurrentHandler.HandlerStart.Offset == aInstruction.Offset) || (aMethodInfo.CurrentHandler.FilterStart != null && aMethodInfo.CurrentHandler.FilterStart.Offset == aInstruction.Offset)) && (aMethodInfo.CurrentHandler.Type == ExceptionHandlerType.Catch);
