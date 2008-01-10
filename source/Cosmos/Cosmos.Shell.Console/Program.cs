@@ -37,10 +37,6 @@ namespace Cosmos.Shell.Console {
 			stages.Run();
 			System.Console.WriteLine("Done");
 
-			while (true)
-			    ;
-
-
 			stages.Teardown();
 		}
 	}
