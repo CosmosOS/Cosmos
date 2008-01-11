@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.Win32;
+using System.Threading;
 
 namespace Cosmos.Build.Windows {
     public class Builder {
@@ -70,8 +71,8 @@ namespace Cosmos.Build.Windows {
         public enum Target { ISO, PXE, QEMU, QEMU_GDB };
 
         public void Build() {
-            var xOptions = new BuildOptionsWindow();
-            xOptions.ShowDialog();
+			var xOptions = new BuildOptionsWindow();
+			xOptions.ShowDialog();
         }
 
         public void Build(Target aType) {

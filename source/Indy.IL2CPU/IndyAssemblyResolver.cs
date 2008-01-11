@@ -32,6 +32,9 @@ namespace Indy.IL2CPU {
 			for (int i = 0; i < xDefs.Count; i++) {
 				foreach (ModuleDefinition xModDef in xDefs[i].Modules) {
 					foreach (AssemblyNameReference xAssemblyRef in xModDef.AssemblyReferences) {
+						if (xAssemblyRef.Name.StartsWith("Cosmos.Build")) {
+							continue;
+						}
 						AssemblyDefinition xFoundAsm = mCrawledAssembly.Resolver.Resolve(xAssemblyRef);
 						if (xFoundAsm != null && !xDefs.Contains(xFoundAsm)) {
 							xDefs.Add(xFoundAsm);

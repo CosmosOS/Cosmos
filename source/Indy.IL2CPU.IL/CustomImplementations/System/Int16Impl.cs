@@ -27,7 +27,7 @@ namespace Indy.IL2CPU.IL.CustomImplementations.System {
             for (int i = 0; i < s.Length; i++)
             {
                 Int16 ind = (Int16)digits.IndexOf(digits[i]);
-                result = (result * 10) + ind;
+				result = (short)((result * 10) + ind);
             }
 
             return result;

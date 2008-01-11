@@ -32,18 +32,21 @@ namespace Cosmos.Build.Windows.Config.Tasks
         {
             lock (_tasks)
             {
-                _lastCount = _tasks.Count;
-                while (true)
-                {
-                    if (_tasks.Count == 0)
-                        break;
-                    Task task = _tasks.Dequeue();
-                    _count = _tasks.Count;
+				try {
+					_lastCount = _tasks.Count;
+					while (true) {
+						if (_tasks.Count == 0)
+							break;
+						Task task = _tasks.Dequeue();
+						_count = _tasks.Count;
 
-                    task.Status += new EventHandler<TaskStatusEventArgs>(task_Status);
-                    task.Execute();
-                }
-				OnStatus(100, "Done");
+						task.Status += new EventHandler<TaskStatusEventArgs>(task_Status);
+						task.Execute();
+					}
+					OnStatus(100, "Done");
+				} catch (Exception E) {
+					OnStatus(100, "Error: " + E.Message);
+				}
             }
         }
 

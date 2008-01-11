@@ -39,9 +39,8 @@ namespace Cosmos.Build.Windows.Config {
         private void beginButton_Click(object sender, RoutedEventArgs e)
         {
             beginButton.Visibility = Visibility.Hidden;
-            Tasks.TaskQueue q = new Cosmos.Build.Windows.Config.Tasks.TaskQueue();
-            q.Add(new Tasks.CleanGacTask());
-            q.Add(new Tasks.InstallGacTask());
+			Tasks.TaskQueue q = new Cosmos.Build.Windows.Config.Tasks.TaskQueue();
+            q.Add(new Tasks.InstallAssembliesTask());
 			q.Add(new Tasks.InstallTemplateTask());
             q.Status += new EventHandler<Cosmos.Build.Windows.Config.Tasks.TaskStatusEventArgs>(q_Status);
             q.BeginExecute();
