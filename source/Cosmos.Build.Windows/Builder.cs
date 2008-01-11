@@ -16,12 +16,19 @@ namespace Cosmos.Build.Windows {
         protected string mAsmPath;
 
         public static string GetBuildPath() {
-            var xKey = Registry.CurrentUser.OpenSubKey(@"Software\Cosmos");
-            var xResult = (string)xKey.GetValue("Build Path");
-            if (!xResult.EndsWith(@"\")) {
-                xResult = xResult + @"\";
-            }
-            return xResult;
+			try {
+				var xKey = Registry.CurrentUser.OpenSubKey(@"Software\Cosmos");
+				var xResult = (string)xKey.GetValue("Build Path");
+				if (String.IsNullOrEmpty(xResult)) {
+					throw new Exception();
+				}
+				if (!xResult.EndsWith(@"\")) {
+					xResult = xResult + @"\";
+				}
+				return xResult;
+			} catch (Exception E) {
+				throw new Exception("Error while getting Cosmos Build Path!", E);
+			}
         }
 
         public Builder() {

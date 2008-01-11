@@ -25,7 +25,7 @@ namespace IL2CPU {
 		private Type nativeType = typeof(NativeOpCodeMap);
 
 		private static bool ParseArguments(IEnumerable<string> aArgs) {
-			Console.WriteLine("Indy IL2CPU");
+			Console.WriteLine("Initializing IL2CPU... This may take a minute so please wait for further status...");
 			Console.WriteLine();
 			foreach (string x in aArgs) {
 				// MtW: Slash added for powershell compatibility

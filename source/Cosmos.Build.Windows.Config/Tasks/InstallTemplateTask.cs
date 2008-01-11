@@ -21,7 +21,7 @@ namespace Cosmos.Build.Windows.Config.Tasks {
 				xVSTemplateFolder = (string)xKey.GetValue("UserProjectTemplatesLocation");
 				xVSTemplateFolder = Path.Combine(xVSTemplateFolder, "Visual C#");
 			}
-			File.Copy(xTemplateFile, Path.Combine(xVSTemplateFolder, "CosmosBoot.zip"));
+			File.Copy(xTemplateFile, Path.Combine(xVSTemplateFolder, "CosmosBoot.zip"), true);
 			this.OnStatus(100, "Installing Template");
 		}
 	}

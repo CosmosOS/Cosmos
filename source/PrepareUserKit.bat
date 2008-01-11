@@ -11,5 +11,10 @@ del /Q "..\Build\setup.pdb"
 del /Q "..\Build\ISO\output.bin"
 del /Q "..\Build\Tools\asm\*.*"
 del /Q "..\Build\Tools\Cosmos.Kernel.Plugs\*.pdb"
-"..\Tools\7zip\7z.exe" a -tzip Test.zip "..\Build\*.*" -r
+rmdir /S /Q "..\Pack"
+mkdir "..\Pack"
+mkdir "..\Pack\Cosmos"
+xcopy /S "..\Build\*.*" "..\Pack\Cosmos"
+"..\Tools\7zip\7z.exe" a -tzip Test.zip "..\Pack\*.*" -r
+rmdir /S /Q "..\Pack"
 pause

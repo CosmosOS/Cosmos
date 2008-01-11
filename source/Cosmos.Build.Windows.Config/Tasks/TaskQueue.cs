@@ -22,12 +22,6 @@ namespace Cosmos.Build.Windows.Config.Tasks
             get { return _name; }
         }
 
-        public void BeginExecute()
-        {
-            ThreadStart start = new ThreadStart(Execute);
-            start.BeginInvoke(null, null);
-        }
-
         public override void Execute()
         {
             lock (_tasks)
@@ -45,6 +39,7 @@ namespace Cosmos.Build.Windows.Config.Tasks
 					}
 					OnStatus(100, "Done");
 				} catch (Exception E) {
+					System.Windows.Clipboard.SetText(E.ToString());
 					OnStatus(100, "Error: " + E.Message);
 				}
             }
