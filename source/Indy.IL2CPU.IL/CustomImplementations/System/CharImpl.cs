@@ -8,8 +8,9 @@ namespace Indy.IL2CPU.IL.CustomImplementations.System {
 	[Plug(Target = typeof(char))]
 	public static class CharImpl {
 		public static string ToString(char aThis) {
-			ushort xValue = aThis;
-			return UInt16Impl.ToString(xValue);
+            char[] xResult = new char[1];
+            xResult[0] = aThis;
+            return new String(xResult);
 		}
 	}
 }
