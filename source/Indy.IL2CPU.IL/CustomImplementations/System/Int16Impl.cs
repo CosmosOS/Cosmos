@@ -24,11 +24,31 @@ namespace Indy.IL2CPU.IL.CustomImplementations.System {
             const string digits = "0123456789";
             Int16 result = 0;
 
-            for (int i = 0; i < s.Length; i++)
+            int z = 0;
+            bool neg = false;
+
+            if (s.Length >= 1)
+            {
+                if (s[0] == '+')
+                    z++;
+                if (s[0] == '-')
+                {
+                    z++;
+                    neg = true;
+                }
+            }
+
+            for (int i = z; i < s.Length; i++)
             {
                 Int16 ind = (Int16)digits.IndexOf(digits[i]);
-				result = (short)((result * 10) + ind);
+                global::System.Console.WriteLine(ind.ToString());
+                if (ind == -1)
+                    throw new FormatException();
+                result = (short)((result * 10) + ind);
             }
+
+            if (neg)
+                z *= -1;
 
             return result;
         }
