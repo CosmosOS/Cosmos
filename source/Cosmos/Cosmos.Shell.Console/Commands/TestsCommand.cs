@@ -13,6 +13,8 @@ namespace Cosmos.Shell.Console.Commands
         public TestsCommand()
         {
             _tests.Add(new Tests.MathTest());
+            _tests.Add(new Tests.StringTest());
+            _tests.Add(new Tests.ParseTest());
         }
 
         public override string Name

@@ -60,6 +60,8 @@
     <Compile Include="Prompter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tests\MathTest.cs" />
+    <Compile Include="Tests\ParseTest.cs" />
+    <Compile Include="Tests\StringTest.cs" />
     <Compile Include="Tests\TestBase.cs" />
   </ItemGroup>
   <ItemGroup>
