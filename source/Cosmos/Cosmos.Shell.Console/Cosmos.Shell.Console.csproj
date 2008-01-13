@@ -49,6 +49,7 @@
     <Compile Include="Commands\DirCommand.cs" />
     <Compile Include="Commands\EchoCommand.cs" />
     <Compile Include="Commands\ExitCommand.cs" />
+    <Compile Include="Commands\GuessCommand.cs" />
     <Compile Include="Commands\HelpCommand.cs" />
     <Compile Include="Commands\MatthijsCommand.cs" />
     <Compile Include="Commands\TestsCommand.cs" />
