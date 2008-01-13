@@ -25,6 +25,8 @@ namespace Cosmos.Shell.Console.Tests
         public override void Test()
         {
             Assert(short.Parse("5") == 5, "short.Parse(\"5\") == 5");
+            Assert(short.Parse("500") == 500, "short.Parse(\"500\") == 500");
+            Assert(short.Parse("-500") == -500, "short.Parse(\"-500\") == -500");
         }
     }
 }

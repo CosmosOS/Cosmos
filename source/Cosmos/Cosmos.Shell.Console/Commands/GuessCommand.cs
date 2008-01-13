@@ -19,19 +19,19 @@ namespace Cosmos.Shell.Console.Commands
 
         public override void Execute(string param)
         {
-            short num = 5; // TODO: Random Number Generator
+            short num = 5;
             short guess = short.Parse(System.Console.ReadLine());
 
             while (guess != num)
             {
                 if (guess > num)
-                    System.Console.WriteLine("Too High.");
+                    System.Console.WriteLine("Too high.");
                 else
-                    System.Console.WriteLine("Too Low.");
+                    System.Console.WriteLine("Too low.");
                 guess = short.Parse(System.Console.ReadLine());
             }
 
-            System.Console.WriteLine("You Got It!!!!");
+            System.Console.WriteLine("You got it!!!!");
         }
 
         public override void Help()

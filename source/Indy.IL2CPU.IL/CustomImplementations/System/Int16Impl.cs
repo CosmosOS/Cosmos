@@ -30,25 +30,24 @@ namespace Indy.IL2CPU.IL.CustomImplementations.System {
             if (s.Length >= 1)
             {
                 if (s[0] == '+')
-                    z++;
+                    z = 1;
                 if (s[0] == '-')
                 {
-                    z++;
+                    z = 1;
                     neg = true;
                 }
             }
 
             for (int i = z; i < s.Length; i++)
             {
-                Int16 ind = (Int16)digits.IndexOf(digits[i]);
-                global::System.Console.WriteLine(ind.ToString());
+                Int16 ind = (Int16)digits.IndexOf(s[i]);
                 if (ind == -1)
                     throw new FormatException();
                 result = (short)((result * 10) + ind);
             }
 
             if (neg)
-                z *= -1;
+                result *= -1;
 
             return result;
         }
