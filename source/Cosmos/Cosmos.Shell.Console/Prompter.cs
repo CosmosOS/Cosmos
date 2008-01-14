@@ -27,7 +27,7 @@ namespace Cosmos.Shell.Console {
 			_commands.Add(new Commands.ClsCommand());
 			_commands.Add(new Commands.DirCommand());
 			_commands.Add(new Commands.EchoCommand());
-			//_commands.Add(new Commands.ExitCommand(Stop)); // TODO: Fix this.
+			_commands.Add(new Commands.ExitCommand(Stop)); // TODO: Fix this.
             _commands.Add(new Commands.GuessCommand());
 			_commands.Add(new Commands.HelpCommand(_commands));
             _commands.Add(new Commands.TestsCommand());

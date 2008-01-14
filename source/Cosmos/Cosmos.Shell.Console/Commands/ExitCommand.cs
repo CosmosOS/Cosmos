@@ -27,7 +27,8 @@ namespace Cosmos.Shell.Console.Commands
 
         public override void Execute(string param)
         {
-            _exit();
+            throw new NotSupportedException();
+            //_exit();
         }
 
         public override void Help()
