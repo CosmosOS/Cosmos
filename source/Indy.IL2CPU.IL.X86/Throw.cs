@@ -14,19 +14,17 @@ namespace Indy.IL2CPU.IL.X86 {
 			: base(aInstruction, aMethodInfo) {
 			mMethodInfo = aMethodInfo;
 		}
-		public override void DoAssemble() {
-			//if ((from item in Assembler.DataMembers
-			//     where item.Value.Name == CPU.Assembler.CurrentExceptionDataMember
-			//     select item).Count() == 0) {
-			//    Assembler.DataMembers.Add(new System.Collections.Generic.KeyValuePair<string, Indy.IL2CPU.Assembler.DataMember>("il2cpu-system", new Indy.IL2CPU.Assembler.DataMember(CPU.Assembler.CurrentExceptionDataMember, "dd", "0")));
-			//}
+
+		public static void Assemble(Assembler.Assembler aAssembler, MethodInformation aMethodInfo) {
 			new CPUx86.Pop("eax");
 			new CPUx86.Move("[" + CPU.DataMember.GetStaticFieldName(CPU.Assembler.CurrentExceptionRef) + "]", "eax");
 			new CPUx86.Move("ecx", "3");
-			Call.EmitExceptionLogic(Assembler, mMethodInfo, null, false);
-			/*
-			*/
-			Assembler.StackSizes.Pop();
+			Call.EmitExceptionLogic(aAssembler, aMethodInfo, null, false);
+			aAssembler.StackSizes.Pop();
+		}
+	
+		public override void DoAssemble() {
+			Assemble(Assembler, mMethodInfo);
 		}
 	}
 }

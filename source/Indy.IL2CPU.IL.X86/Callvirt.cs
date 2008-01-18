@@ -15,9 +15,11 @@ namespace Indy.IL2CPU.IL.X86 {
 		private readonly int mArgumentCount;
 		private readonly int mReturnSize;
 		private readonly string mLabelName;
+		private readonly MethodInformation mMethodInfo;
 		public Callvirt(Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
 			mLabelName = GetInstructionLabel(aInstruction);
+			mMethodInfo = aMethodInfo;
 			int xThisOffSet = (from item in aMethodInfo.Locals
 							   select item.Offset + item.Size).LastOrDefault();
 			MethodReference xMethod = aInstruction.Operand as MethodReference;
@@ -41,6 +43,11 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public override void DoAssemble() {
+			Action xEmitCleanup = delegate() {
+				foreach (MethodInformation.Argument xArg in mMethodInfo.Arguments) {
+					new CPUx86.Add("esp", xArg.Size.ToString());
+				}
+			};
 			if (!String.IsNullOrEmpty(mNormalAddress)) {
 				new CPUx86.Call(mNormalAddress);
 			} else {
@@ -49,6 +56,8 @@ namespace Indy.IL2CPU.IL.X86 {
 				}
 				//Assembler.Add(new CPUx86.Pop("eax"));
 				//Assembler.Add(new CPUx86.Pushd("eax"));
+				EmitCompareWithNull(Assembler, mMethodInfo, "[esp + 0x" + mThisOffset.ToString("X") + "]", mLabelName+ "_AfterNullRefCheck", xEmitCleanup);
+				new CPU.Label(mLabelName + "_AfterNullRefCheck");
 				new CPUx86.Move(CPUx86.Registers.EAX, "[esp + 0x" + mThisOffset.ToString("X") + "]");
 				new CPUx86.Pushd(CPUx86.Registers.AtEAX);
 				new CPUx86.Pushd("0" + mMethodIdentifier.ToString("X") + "h");

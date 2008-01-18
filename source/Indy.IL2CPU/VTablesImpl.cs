@@ -52,7 +52,7 @@ namespace Indy.IL2CPU {
 					return xTable.MethodAddresses[i];
 				}
 			}
-			return 0x00000000;
+			throw new Exception("Cannot find virtual method!");
 		}
 	}
 

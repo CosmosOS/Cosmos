@@ -20,7 +20,7 @@ namespace Cosmos.Shell.Console.Commands
         {
             Hardware.Storage.ATA xDrive = new Cosmos.Hardware.Storage.ATA(0, 0);
 			Cosmos.Kernel.FileSystem.Ext2 xExt2 = new Cosmos.Kernel.FileSystem.Ext2 (xDrive);
-            xExt2.Initialize();
+			xExt2.Initialize();
 
             string[] files = xExt2.GetDirectoryEntries(new string[0]);
             for (int i = 0; i < files.Length; i++)

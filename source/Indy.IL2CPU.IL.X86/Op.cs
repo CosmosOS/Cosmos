@@ -14,11 +14,23 @@ namespace Indy.IL2CPU.IL.X86 {
 		private TypeDefinition mCatchType;
 		private string mNextInstructionLabel;
 		private bool mNeedsTypeCheck = false;
+
+		/// <summary>
+		/// Emits code for checking a given address for null, and emits a "throw new NullRefException();" if so.
+		/// </summary>
+		/// <param name="aAssembler"></param>
+		/// <param name="aAddress"></param>
+		public static void EmitCompareWithNull(Assembler.Assembler aAssembler, MethodInformation aMethodInfo, string aAddress, string aNextLabel, Action aEmitCleanupMethod) {
+			new CPUx86.Compare("dword " + aAddress, "0");
+			new CPUx86.JumpIfNotEquals(aNextLabel);
+			TypeDefinition xNullRefExcType = Engine.GetTypeDefinitionFromReflectionType(typeof(NullReferenceException));
+			Newobj.Assemble(aAssembler, Engine.GetTypeInfo(xNullRefExcType).StorageSize, xNullRefExcType.Constructors.GetConstructor(false, new Type[0]), Engine.RegisterType(xNullRefExcType));
+			aEmitCleanupMethod();
+			Call.EmitExceptionLogic(aAssembler, aMethodInfo, aNextLabel, false);
+		}
+
 		public Op(Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
-			if (aInstruction != null && aMethodInfo != null && GetInstructionLabel(aInstruction) == ".L00000044" && aMethodInfo.LabelName == "System_Void___Cosmos_Shell_Console_Commands_MatthijsCommand_Execute___System_String___") {
-				//System.Diagnostics.Debugger.Break();
-			}
 			if (aMethodInfo != null && aMethodInfo.CurrentHandler != null) {
 				mNeedsExceptionPush = ((aMethodInfo.CurrentHandler.HandlerStart != null && aMethodInfo.CurrentHandler.HandlerStart.Offset == aInstruction.Offset) || (aMethodInfo.CurrentHandler.FilterStart != null && aMethodInfo.CurrentHandler.FilterStart.Offset == aInstruction.Offset)) && (aMethodInfo.CurrentHandler.Type == ExceptionHandlerType.Catch);
 				mNeedsExceptionClear = (aMethodInfo.CurrentHandler.HandlerEnd != null && aMethodInfo.CurrentHandler.HandlerEnd.Offset == (aInstruction.Offset + 1)) || (aMethodInfo.CurrentHandler.FilterEnd != null && aMethodInfo.CurrentHandler.FilterEnd.Offset == (aInstruction.Offset + 1));
