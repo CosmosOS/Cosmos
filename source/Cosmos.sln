@@ -65,9 +65,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Build.Windows.Config
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CosmosBoot", "CosmosBoot\CosmosBoot.csproj", "{E2C54C80-75F3-4249-93B4-0003A4AF705F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Userkit", "Userkit", "{4D313383-181E-4657-9A04-E9FEC9571962}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Unity", "Cosmos\Cosmos.Unity\Cosmos.Unity.csproj", "{1BD459F8-E894-4694-BBEC-65EB1D98E445}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Drivers", "Cosmos\Cosmos.Drivers\Cosmos.Drivers\Cosmos.Drivers.csproj", "{E7863305-209C-46ED-9C58-7D0F67DB3B48}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Shell.Guess", "Cosmos.Shell.Guess\Cosmos.Shell.Guess.csproj", "{C97DE890-58D2-41A1-86D0-A2E919E6DD80}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 26
+		SccNumberOfProjects = 29
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -171,6 +179,18 @@ Global
 		SccProjectTopLevelParentUniqueName25 = Cosmos.sln
 		SccProjectName25 = CosmosBoot
 		SccLocalPath25 = CosmosBoot
+		SccProjectUniqueName26 = Cosmos\\Cosmos.Unity\\Cosmos.Unity.csproj
+		SccProjectTopLevelParentUniqueName26 = Cosmos.sln
+		SccProjectName26 = Cosmos/Cosmos.Unity
+		SccLocalPath26 = Cosmos\\Cosmos.Unity
+		SccProjectUniqueName27 = Cosmos\\Cosmos.Drivers\\Cosmos.Drivers\\Cosmos.Drivers.csproj
+		SccProjectTopLevelParentUniqueName27 = Cosmos.sln
+		SccProjectName27 = Cosmos/Cosmos.Drivers/Cosmos.Drivers
+		SccLocalPath27 = Cosmos\\Cosmos.Drivers\\Cosmos.Drivers
+		SccProjectUniqueName28 = Cosmos.Shell.Guess\\Cosmos.Shell.Guess.csproj
+		SccProjectTopLevelParentUniqueName28 = Cosmos.sln
+		SccProjectName28 = Cosmos.Shell.Guess
+		SccLocalPath28 = Cosmos.Shell.Guess
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -279,6 +299,18 @@ Global
 		{E2C54C80-75F3-4249-93B4-0003A4AF705F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E2C54C80-75F3-4249-93B4-0003A4AF705F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E2C54C80-75F3-4249-93B4-0003A4AF705F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1BD459F8-E894-4694-BBEC-65EB1D98E445}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1BD459F8-E894-4694-BBEC-65EB1D98E445}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1BD459F8-E894-4694-BBEC-65EB1D98E445}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1BD459F8-E894-4694-BBEC-65EB1D98E445}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7863305-209C-46ED-9C58-7D0F67DB3B48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7863305-209C-46ED-9C58-7D0F67DB3B48}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7863305-209C-46ED-9C58-7D0F67DB3B48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7863305-209C-46ED-9C58-7D0F67DB3B48}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C97DE890-58D2-41A1-86D0-A2E919E6DD80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C97DE890-58D2-41A1-86D0-A2E919E6DD80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C97DE890-58D2-41A1-86D0-A2E919E6DD80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C97DE890-58D2-41A1-86D0-A2E919E6DD80}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -302,14 +334,18 @@ Global
 		{0267F1AE-CA81-4EBD-86CA-C8E22BE9A6F1} = {86BD557B-49D1-4833-B1F7-D38BF21A87EA}
 		{E4A9F8F0-D0DC-465A-A64A-FE56504D397E} = {21E68B7D-F1DC-46E2-9CFA-0A7C6D77D42E}
 		{E2C54C80-75F3-4249-93B4-0003A4AF705F} = {21E68B7D-F1DC-46E2-9CFA-0A7C6D77D42E}
+		{C97DE890-58D2-41A1-86D0-A2E919E6DD80} = {21E68B7D-F1DC-46E2-9CFA-0A7C6D77D42E}
 		{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
 		{B168BEDD-C6A6-4E7C-B9A5-0144286E9E42} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
 		{930DDE98-229B-4EBF-B41B-ACABDF48EEFB} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
 		{A1F83D9F-2D44-4264-A08B-416797123018} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
 		{7BAB58BF-E8A1-4623-B6BF-4B90A0505226} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
 		{2DE75CE4-7A3B-4659-84FC-16F5EC0AEDE4} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
+		{4D313383-181E-4657-9A04-E9FEC9571962} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
+		{E7863305-209C-46ED-9C58-7D0F67DB3B48} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
 		{B0BBD2A2-4FAA-4730-9770-ACE6D9532132} = {E16DB75B-0F1D-4813-9103-F8FB6E7BAE2A}
 		{1F0EDE86-F6D4-4355-9A97-10E90457770C} = {2DE75CE4-7A3B-4659-84FC-16F5EC0AEDE4}
 		{228941A5-080D-4057-9491-160950105A8E} = {2DE75CE4-7A3B-4659-84FC-16F5EC0AEDE4}
+		{1BD459F8-E894-4694-BBEC-65EB1D98E445} = {4D313383-181E-4657-9A04-E9FEC9571962}
 	EndGlobalSection
 EndGlobal
