@@ -1,0 +1,23 @@
+﻿<Window
+	x:Class="Cosmos.Build.Windows.Config.ChooseVSWindow"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	Title="ChooseVSWindow"
+	SizeToContent="WidthAndHeight">
+	<StackPanel>
+		<TextBlock
+			TextWrapping="Wrap"
+			Width="272">Multiple Visual Studio installations are detected. in which installation(s) do you want to install the Cosmos Userkit?</TextBlock>
+		<CheckBox
+			HorizontalAlignment="Left"
+			Name="cbxVisualStudio">Visual Studio</CheckBox>
+		<CheckBox
+			HorizontalAlignment="Left"
+			Name="cbxVCSExpress">Visual C# Express</CheckBox>
+		<StackPanel VerticalAlignment="Bottom" Orientation="Horizontal" Margin="4 4 4 4">
+			<Button
+				IsDefault="True"
+				Click="Button_Click">Install</Button>
+		</StackPanel>
+	</StackPanel>
+</Window>
