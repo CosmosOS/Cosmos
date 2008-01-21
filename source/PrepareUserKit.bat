@@ -15,6 +15,6 @@ rmdir /S /Q "..\Pack"
 mkdir "..\Pack"
 mkdir "..\Pack\Cosmos"
 xcopy /S "..\Build\*.*" "..\Pack\Cosmos"
-"..\Tools\7zip\7z.exe" a -tzip Test.zip "..\Pack\*.*" -r
+"..\Tools\7zip\7z.exe" a -tzip Cosmos.zip "..\Pack\*.*" -r
 rmdir /S /Q "..\Pack"
 pause

@@ -19,9 +19,15 @@ namespace Cosmos.Build.Windows {
         public static string GetBuildPath() {
 			try {
 				RegistryKey xKey = Registry.CurrentUser.OpenSubKey(@"Software\Cosmos");
-				string xResult = (string)xKey.GetValue("Build Path");
+			    string xResult;
+                if (xKey == null) {
+                    xResult = Directory.GetCurrentDirectory();
+                    xResult = xResult.Substring(0, xResult.IndexOf("source"));
+                    xResult += @"Build\";
+                }
+                else { xResult = (string)xKey.GetValue("Build Path"); }
 				if (String.IsNullOrEmpty(xResult)) {
-					throw new Exception();
+					throw new Exception("Cannot find Cosmos build path in registry");
 				}
 				if (!xResult.EndsWith(@"\")) {
 					xResult = xResult + @"\";

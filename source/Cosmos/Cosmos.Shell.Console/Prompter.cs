@@ -38,6 +38,7 @@ namespace Cosmos.Shell.Console {
 			while (running) {
 				System.Console.Write("/> ");
 				string line = System.Console.ReadLine();
+                if (string.IsNullOrEmpty(line)) { continue; }
 				int index = line.IndexOf(' ');
 				string command;
 				string param;
