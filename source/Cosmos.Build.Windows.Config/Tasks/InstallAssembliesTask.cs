@@ -16,8 +16,14 @@ namespace Cosmos.Build.Windows.Config.Tasks {
 		public override void Execute() {
 			string xBaseDir = Tools.Dir("GAC");
 			string xTargetDir;
+		    RegistryKey xKey;
 			OnStatus(0, "Installing Cosmos Assemblies");
-			var xKey = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\VisualStudio\9.0", false);
+			xKey = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\VisualStudio\9.0", false);
+            if (xKey == null)
+            {
+                // SB: Check for Visual C# Express install
+                xKey = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\VCSExpress\9.0", false);
+            }
 			xTargetDir = (string)xKey.GetValue("InstallDir");
 			xTargetDir = Path.Combine(xTargetDir, "PublicAssemblies");
 			string[] xItems = Directory.GetFiles(xBaseDir);

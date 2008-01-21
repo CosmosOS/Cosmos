@@ -1,7 +1,0 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:MessageTemplates="clr-namespace:Cosmos.Kernel.LogViewer.MessageTemplates;assembly=">
-	<MessageTemplates:MessageTemplateSelector x:Key="OverviewTemplateSelector"/>
-	<HierarchicalDataTemplate x:Key="Everything_Container" ItemTemplateSelector="{StaticResource OverviewTemplateSelector}" ItemsSource="{Binding Path=ChildNodes}">
-	</HierarchicalDataTemplate>
-</ResourceDictionary>

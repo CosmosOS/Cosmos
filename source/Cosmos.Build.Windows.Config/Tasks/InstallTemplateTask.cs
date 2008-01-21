@@ -17,10 +17,15 @@ namespace Cosmos.Build.Windows.Config.Tasks {
 			this.OnStatus(0, "Installing Template");
 			string xTemplateFile = Tools.Dir("CosmosBoot.zip");
 			string xVSTemplateFolder;
-			using (var xKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\VisualStudio\9.0")) {
-				xVSTemplateFolder = (string)xKey.GetValue("UserProjectTemplatesLocation");
-				xVSTemplateFolder = Path.Combine(xVSTemplateFolder, "Visual C#");
-			}
+		    RegistryKey xKey;
+		    xKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\VisualStudio\9.0", false);
+            if (xKey == null)
+            {
+                // SB: Check for Visual C# Express install
+                xKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\VCSExpress\9.0", false);
+            }
+			xVSTemplateFolder = (string)xKey.GetValue("UserProjectTemplatesLocation");
+			xVSTemplateFolder = Path.Combine(xVSTemplateFolder, "Visual C#");
 			File.Copy(xTemplateFile, Path.Combine(xVSTemplateFolder, "CosmosBoot.zip"), true);
 			this.OnStatus(100, "Installing Template");
 		}

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using Microsoft.Win32;
 using System.Threading;
@@ -17,8 +18,8 @@ namespace Cosmos.Build.Windows {
 
         public static string GetBuildPath() {
 			try {
-				var xKey = Registry.CurrentUser.OpenSubKey(@"Software\Cosmos");
-				var xResult = (string)xKey.GetValue("Build Path");
+				RegistryKey xKey = Registry.CurrentUser.OpenSubKey(@"Software\Cosmos");
+				string xResult = (string)xKey.GetValue("Build Path");
 				if (String.IsNullOrEmpty(xResult)) {
 					throw new Exception();
 				}
@@ -58,7 +59,7 @@ namespace Cosmos.Build.Windows {
             if (!Directory.Exists(mAsmPath)) {
                 Directory.CreateDirectory(mAsmPath);
             }
-            var xTarget = System.Reflection.Assembly.GetEntryAssembly();
+            Assembly xTarget = System.Reflection.Assembly.GetEntryAssembly();
             IL2CPU.Program.Main(new string[] {@"-in:" + xTarget.Location
                 , "-plug:" + mToolsPath + @"Cosmos.Kernel.Plugs\Cosmos.Kernel.Plugs.dll"
                 , "-platform:nativex86", "-asm:" + mAsmPath}
@@ -78,7 +79,7 @@ namespace Cosmos.Build.Windows {
         public enum Target { ISO, PXE, QEMU, QEMU_GDB };
 
         public void Build() {
-			var xOptions = new BuildOptionsWindow();
+			BuildOptionsWindow xOptions = new BuildOptionsWindow();
 			xOptions.ShowDialog();
         }
 
