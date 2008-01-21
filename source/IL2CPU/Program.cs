@@ -150,7 +150,6 @@ namespace IL2CPU {
 		}
 
 		public static int Main(string[] args) {
-			//System.Diagnostics.Debugger.Break();
 			try {
 				if (ParseArguments(args)) {
 					Engine e = new Engine();

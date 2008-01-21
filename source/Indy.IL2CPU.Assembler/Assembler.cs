@@ -29,6 +29,7 @@ namespace Indy.IL2CPU.Assembler {
 			Console.WriteLine("BSOD's Rule!");
 			Console.WriteLine("");
 			Console.Write("Unhandled error occurred: ");
+			System.Diagnostics.Debugger.Break();
 			Console.WriteLine(CurrentException.ToString());
 			Console.WriteLine("");
 			Console.WriteLine("");
@@ -42,6 +43,7 @@ namespace Indy.IL2CPU.Assembler {
 			Console.WriteLine("");
 			Console.WriteLine("");
 		}
+
 		private static FieldDefinition mCurrentExceptionRef;
 		public static FieldDefinition CurrentExceptionRef {
 			get {

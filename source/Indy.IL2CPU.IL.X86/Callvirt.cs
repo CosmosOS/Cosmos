@@ -68,6 +68,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				new CPUx86.Test("ecx", "2");
 				new CPUx86.JumpIfNotEquals(MethodFooterOp.EndOfMethodLabelNameException);
 			}
+			new CPU.Comment("Argument Count = " + mArgumentCount.ToString());
 			for (int i = 0; i < mArgumentCount; i++) {
 				Assembler.StackSizes.Pop();
 			}

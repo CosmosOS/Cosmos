@@ -26,10 +26,6 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public static void EmitExceptionLogic(Assembler.Assembler aAssembler, MethodInformation aMethodInfo, string aNextLabel, bool aDoTest) {
-			//if (!aAssembler.InMetalMode) {
-			if (aMethodInfo != null && aMethodInfo.LabelName == "System_Void___Cosmos_Shell_Console_Commands_MatthijsCommand_Execute___System_String___") {
-				//System.Diagnostics.Debugger.Break();
-			}
 			string xJumpTo = MethodFooterOp.EndOfMethodLabelNameException;
 			if (aMethodInfo != null && aMethodInfo.CurrentHandler != null) {
 				switch (aMethodInfo.CurrentHandler.Type) {
@@ -47,6 +43,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				}
 			}
 			if (!aDoTest) {
+				new CPUx86.Call("_CODE_REQUESTED_BREAK_");
 				new CPUx86.JumpAlways(xJumpTo);
 			} else {
 				new CPUx86.Test("ecx", "2");

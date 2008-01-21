@@ -181,8 +181,6 @@ namespace Cosmos.Kernel {
 			char xResult = '\0';
 			while (mBuffer.Count == 0 || !GetCharValue(mBuffer.Dequeue(), out xResult))
 				;
-			//DebugUtil.SendNumber("Keyboard", "ReadChar", xResult, 32);
-			//System.Diagnostics.Debugger.Break();
 			return xResult;
 		}
 	}

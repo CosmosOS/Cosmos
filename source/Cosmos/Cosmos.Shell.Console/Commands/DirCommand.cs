@@ -22,6 +22,7 @@ namespace Cosmos.Shell.Console.Commands
 			Cosmos.Kernel.FileSystem.Ext2 xExt2 = new Cosmos.Kernel.FileSystem.Ext2 (xDrive);
 			xExt2.Initialize();
 
+
             string[] files = xExt2.GetDirectoryEntries(new string[0]);
             for (int i = 0; i < files.Length; i++)
                 System.Console.WriteLine(files[i]);

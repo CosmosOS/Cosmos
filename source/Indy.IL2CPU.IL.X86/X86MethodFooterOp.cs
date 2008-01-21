@@ -32,9 +32,27 @@ namespace Indy.IL2CPU.IL.X86 {
 		public static void AssembleFooter(int aReturnSize, Assembler.Assembler aAssembler, MethodInformation.Variable[] aLocals, MethodInformation.Argument[] aArgs, int aTotalArgsSize) {
 			new Label(EndOfMethodLabelNameNormal);
 			new CPUx86.Move("ecx", "0");
-			//new CPUx86.JumpAlways("._GENERIC_Footer");
+			if (aReturnSize > 0) {
+				if (aReturnSize > 8) {
+					throw new Exception("ReturnValue sizes larger than 8 not supported yet");
+				} else {
+					if (aReturnSize <= 4) {
+						new Assembler.X86.Pop(CPUx86.Registers.EAX);
+					} else {
+						new Assembler.X86.Pop(CPUx86.Registers.EAX);
+						new Assembler.X86.Pop(CPUx86.Registers.EBX);
+					}
+				}
+			}
+			new CPUx86.JumpAlways(EndOfMethodLabelNameException);
 			new Label(EndOfMethodLabelNameException);
 			if (!aAssembler.InMetalMode) {
+				if (aReturnSize > 0) {
+					new CPUx86.Push("eax");
+					if (aReturnSize > 4) {
+						new CPUx86.Push("ebx");
+					}
+				}
 				new CPUx86.Push("ecx");
 				Engine.QueueMethodRef(GCImplementationRefs.DecRefCountRef);
 				foreach (MethodInformation.Variable xLocal in aLocals) {
@@ -50,17 +68,11 @@ namespace Indy.IL2CPU.IL.X86 {
 					}
 				}
 				new CPUx86.Pop("ecx");
-			}
-			if (aReturnSize > 0) {
-				if (aReturnSize > 8) {
-					throw new Exception("ReturnValue sizes larger than 8 not supported yet");
-				} else {
-					if (aReturnSize <= 4) {
-						new Assembler.X86.Pop(CPUx86.Registers.EAX);
-					} else {
-						new Assembler.X86.Pop(CPUx86.Registers.EAX);
-						new Assembler.X86.Pop(CPUx86.Registers.EBX);
+				if (aReturnSize > 0) {
+					if (aReturnSize > 4) {
+						new CPUx86.Pop("ebx");
 					}
+					new CPUx86.Pop("eax");
 				}
 			}
 			for (int j = aLocals.Length - 1; j >= 0; j--) {

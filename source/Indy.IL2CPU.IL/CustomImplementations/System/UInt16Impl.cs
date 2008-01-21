@@ -7,7 +7,8 @@ using Indy.IL2CPU.Plugs;
 namespace Indy.IL2CPU.IL.CustomImplementations.System {
 	[Plug(Target=typeof(ushort))]
 	public static class UInt16Impl {
-		public static string ToString(ushort aThis) {
+		[PlugMethod(Signature = "System_String___System_UInt16_ToString____")]
+		public static string ToString(ref ushort aThis) {
 			string xDigits = "0123456789ABCDEF";
 			char[] xResult = new char[6];
 			xResult[0] = '0';

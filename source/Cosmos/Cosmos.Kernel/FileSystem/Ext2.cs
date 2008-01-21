@@ -105,6 +105,7 @@ namespace Cosmos.Kernel.FileSystem {
 		}
 
 		private bool ReadSuperBlock() {
+			//System.Diagnostics.Debugger.Break();
 			ushort* xBuffer = (ushort*)Heap.MemAlloc(mBackend.BlockSize);
 			if (!mBackend.ReadBlock(2, (byte*)xBuffer)) {
 				Console.WriteLine("[Ext2|SuperBlock] Error while reading SuperBlock data");
@@ -253,11 +254,7 @@ namespace Cosmos.Kernel.FileSystem {
 			bool xCurrentINodeChanged = true;
 			uint xInspectedINodeCount = 0;
 			for (int i = 0; i < xPath.Length; i++) {
-				Console.Write("ReadFile, Iteration ");
-				ATAOld.WriteNumber((uint)i, 8);
-				Console.WriteLine("");
 				if (!xCurrentINodeChanged) {
-					Console.WriteLine("Terminating for loop, CurrentINode didn't change");
 					Heap.MemFree((uint)xBuffer);
 					Heap.MemFree((uint)xExt2BlockBuffer);
 					return null;
@@ -294,13 +291,8 @@ namespace Cosmos.Kernel.FileSystem {
 					xEntryPtr = (DirectoryEntry*)xPtrAddress;
 				}
 			}
-			if (xCurrentINodeChanged) {
-				DebugUtil.SendMessage("Ext2", "ReadFile, for loop exited with an inode change");
-			} else {
-				DebugUtil.SendMessage("Ext2", "ReadFile, for loop exited without an inode change");
-			}
 			if ((xCurrentINode.Mode & INodeModeEnum.RegularFile) == 0) {
-				Console.WriteLine("No file after for loop");
+			//	Console.WriteLine("No file after for loop");
 				return null;
 			}
 			byte[] xResult;//= new byte[mBlockSize];
@@ -516,6 +508,7 @@ namespace Cosmos.Kernel.FileSystem {
 			ushort* xBuffer = (ushort*)Heap.MemAlloc(mBackend.BlockSize);
 			byte* xExt2BlockBuffer = (byte*)Heap.MemAlloc(mBlockSize);
 			INode xCurrentINode;
+			System.Diagnostics.Debugger.Break();
 			if (!ReadINode(EXT2_ROOT_INO, out xCurrentINode)) {
 				Heap.MemFree((uint)xBuffer);
 				Heap.MemFree((uint)xExt2BlockBuffer);

@@ -247,7 +247,6 @@ namespace Indy.IL2CPU {
 						if (!aInMetalMode) {
 							xEntryPointOp.Call("____INIT__VMT____");
 						}
-						//System.Diagnostics.Debugger.Break();
 						foreach (TypeDefinition xType in mTypes) {
 							foreach (MethodDefinition xMethod in xType.Constructors) {
 								if (xMethod.IsStatic) {
@@ -963,9 +962,6 @@ namespace Indy.IL2CPU {
 					if (xField.HasConstant) {
 						Console.WriteLine("Field is constant: " + xField.GetFullName());
 					}
-					if (xField.DeclaringType.FullName.StartsWith("System.Collections.Generic") && aGCObjects) {
-						//System.Diagnostics.Debugger.Break();
-					}
 					if (xField.FieldType.IsValueType && aGCObjects) {
 						continue;
 					}
@@ -1041,7 +1037,6 @@ namespace Indy.IL2CPU {
 				aFieldName = DataMember.GetStaticFieldName(xFieldDef);
 				return;
 			}
-			System.Diagnostics.Debugger.Break();
 			throw new Exception("Field not found!(" + String.Format("{0}/{1}/{2}", aAssembly, aType, aField));
 		}
 

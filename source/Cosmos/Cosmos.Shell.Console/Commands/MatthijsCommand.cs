@@ -32,7 +32,6 @@ namespace Cosmos.Shell.Console.Commands {
 			} catch (ArgumentException AE) {
 				System.Console.WriteLine("Argument Exception Occurred:");
 				System.Console.Write("  Param Name: ");
-				System.Diagnostics.Debugger.Break();
 				System.Console.WriteLine(AE.ParamName);
 			} catch (Exception E) {
 				System.Console.WriteLine("Error Occurred while executing Command!");

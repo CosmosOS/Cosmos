@@ -152,7 +152,6 @@ namespace Indy.IL2CPU.IL {
 										continue;
 									}
 								}
-								//System.Diagnostics.Debugger.Break();
 								if (aAssembler.InMetalMode) {
 									if (xPlugMethodAttrib.Fields[PlugMethodAttribute.InMetalModePropertyName] != null && !((bool)xPlugMethodAttrib.Fields[PlugMethodAttribute.InMetalModePropertyName])) {
 										continue;

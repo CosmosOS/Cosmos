@@ -46,11 +46,25 @@ namespace Indy.IL2CPU {
 		}
 
 		public static int GetMethodAddressForType(int aType, int aMethodIndex) {
-			VTable xTable = mTypes[aType];
-			for (int i = 0; i < xTable.MethodIndexes.Length; i++) {
-				if (xTable.MethodIndexes[i] == aMethodIndex) {
-					return xTable.MethodAddresses[i];
+			VTable xTable;
+			if (aType == 0) {
+				xTable = mTypes[0];
+				for (int i = 0; i < xTable.MethodIndexes.Length; i++) {
+					if (xTable.MethodIndexes[i] == aMethodIndex) {
+						return xTable.MethodAddresses[i];
+					}
 				}
+
+			} else {
+				do {
+					xTable = mTypes[aType];
+					for (int i = 0; i < xTable.MethodIndexes.Length; i++) {
+						if (xTable.MethodIndexes[i] == aMethodIndex) {
+							return xTable.MethodAddresses[i];
+						}
+					}
+					aType = xTable.BaseTypeIdentifier;
+				} while (aType != 0);
 			}
 			throw new Exception("Cannot find virtual method!");
 		}

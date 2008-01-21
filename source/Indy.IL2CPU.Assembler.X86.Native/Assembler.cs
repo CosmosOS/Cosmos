@@ -145,7 +145,7 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
 
 		protected override void EmitImportMembers(string aGroup, StreamWriter aOutputWriter) {
 			if (ImportMembers.Count > 0) {
-				throw new Exception("You can't use external libraries in OS kernels");
+				throw new Exception("You can't use P/Invoke in OS kernels");
 			}
 		}
 	}

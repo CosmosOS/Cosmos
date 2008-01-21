@@ -43,7 +43,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public override void Enter(string aName) {
-			X86MethodHeaderOp.AssembleHeader(Assembler, aName, new int[0], new MethodInformation.Argument[0]);
+			X86MethodHeaderOp.AssembleHeader(Assembler, aName, new MethodInformation.Variable[0], new MethodInformation.Argument[0]);
 			mMethodName = aName;
 		}
 

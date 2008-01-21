@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Indy.IL2CPU.Assembler;
 using Indy.IL2CPU.Assembler.X86;
+using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using Instruction = Mono.Cecil.Cil.Instruction;
 using Mono.Cecil.Cil;
@@ -25,6 +26,9 @@ namespace Indy.IL2CPU.IL.X86 {
 			new CPUx86.JumpIfNotEquals(aNextLabel);
 			TypeDefinition xNullRefExcType = Engine.GetTypeDefinitionFromReflectionType(typeof(NullReferenceException));
 			Newobj.Assemble(aAssembler, Engine.GetTypeInfo(xNullRefExcType).StorageSize, xNullRefExcType.Constructors.GetConstructor(false, new Type[0]), Engine.RegisterType(xNullRefExcType));
+			aAssembler.StackSizes.Pop();
+			new CPUx86.Move("[" + DataMember.GetStaticFieldName(CPU.Assembler.CurrentExceptionRef) + "]", "eax");
+			new CPUx86.Move("ecx", "3");
 			aEmitCleanupMethod();
 			Call.EmitExceptionLogic(aAssembler, aMethodInfo, aNextLabel, false);
 		}

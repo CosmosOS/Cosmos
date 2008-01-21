@@ -7,7 +7,8 @@ using Indy.IL2CPU.Plugs;
 namespace Indy.IL2CPU.IL.CustomImplementations.System {
 	[Plug(Target=typeof(short))]
 	public static class Int16Impl {
-		public static string ToString(short aThis) {
+		[PlugMethod(Signature = "System_String___System_Int16_ToString____")]
+		public static string ToString(ref short aThis) {
 			string xDigits = "0123456789ABCDEF";
 			char[] xResult = new char[6];
 			xResult[0] = '0';

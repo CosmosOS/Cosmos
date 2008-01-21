@@ -33,6 +33,7 @@ namespace Cosmos.Kernel {
 			Console.WriteLine("Done");
 			Console.Write("Creating IDT...");
 			Kernel.Interrupts.DoTest();
+			Hardware.Storage.ATA.Initialize(Sleep);
 			Hardware.CPU.CreateIDT();
 			Console.WriteLine("Done");
 			Keyboard.Initialize();
@@ -58,11 +59,11 @@ namespace Cosmos.Kernel {
 		}
 
 		public static void Sleep(uint aMSec) {
-			uint xEnd = TickCount + aMSec;
-			while (TickCount < xEnd)
+			uint xStart = TickCount;
+			uint xEnd = xStart + aMSec;
+			while (TickCount < xEnd) {
 				;
+			}
 		}
-
-
 	}
 }

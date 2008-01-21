@@ -9,15 +9,14 @@ using Instruction = Mono.Cecil.Cil.Instruction;
 
 namespace Indy.IL2CPU.IL.X86 {
 	public class X86MethodHeaderOp: MethodHeaderOp {
-		public readonly int[] Locals;
+		public readonly MethodInformation.Variable[] Locals;
 		public readonly string LabelName = "";
 		public readonly MethodInformation.Argument[] Args;
 		public X86MethodHeaderOp(Instruction aInstruction, MethodInformation aMethodInfo)
 			: base(aInstruction, aMethodInfo) {
 			LabelName = aMethodInfo.LabelName;
 			Args = aMethodInfo.Arguments.ToArray();
-			Locals = (from local in aMethodInfo.Locals
-					  select local.Size).ToArray();
+			Locals = aMethodInfo.Locals.ToArray();
 		}
 
 		public override void DoAssemble() {
@@ -25,7 +24,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			AssembleHeader(Assembler, LabelName, Locals, Args);
 		}
 
-		public static void AssembleHeader(Assembler.Assembler aAssembler, string aLabelName, int[] aLocals, MethodInformation.Argument[] aArguments) {
+		public static void AssembleHeader(Assembler.Assembler aAssembler, string aLabelName, MethodInformation.Variable[] aLocals, MethodInformation.Argument[] aArguments) {
 			new CPU.Label(aLabelName);
 			new CPUx86.Pushd(CPUx86.Registers.EBP);
 #if EXT_DEBUG
@@ -40,9 +39,9 @@ namespace Indy.IL2CPU.IL.X86 {
 			//    new CPUx86.Call(Label.GenerateLabelName(xTempMethod));
 			//    Engine.QueueMethod(xTempMethod);
 			//}
-			foreach (int xLocalSize in aLocals) {
-				aAssembler.StackSizes.Push(xLocalSize);
-				for (int i = 0; i < (xLocalSize / 4); i++) {
+			foreach (var xLocal in aLocals) {
+				aAssembler.StackSizes.Push(xLocal.Size);
+				for (int i = 0; i < (xLocal.Size / 4); i++) {
 					new CPUx86.Pushd("0");
 				}
 			}

@@ -37,13 +37,17 @@ namespace Cosmos.Kernel.Plugs {
             return TextScreen.CurrentChar;
         }
 
+		public static int get_CursorTop() {
+			return TextScreen.CurrentLine;
+		}
+
         public static void set_CursorLeft(int x)
         {
             TextScreen.CurrentChar = x;
         }
 
-		public static int get_CursorTop(int y) {
-			return TextScreen.CurrentLine;
+		public static void set_CursorTop(int y) {
+			TextScreen.CurrentLine = y;
 		}
 
 		public static int get_WindowHeight() {
@@ -54,10 +58,6 @@ namespace Cosmos.Kernel.Plugs {
 			return TextScreen.WindowWidth;
 		}
 					   
-		public static void set_CursorTop(int y) {
-			TextScreen.CurrentLine = y;
-		}
-
 		//TODO: Console uses TextWriter - intercept and plug it instead
 		public static void Clear() {
 			TextScreen.Clear();
