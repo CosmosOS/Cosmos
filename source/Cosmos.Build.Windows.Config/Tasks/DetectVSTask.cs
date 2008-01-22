@@ -16,9 +16,14 @@ namespace Cosmos.Build.Windows.Config.Tasks {
 
 		public override void Execute() {
 			var xKey = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\VisualStudio\9.0", false);
-			bool xFullVSInstalled = xKey != null;
+			var xVSPath = xKey.GetValue("InstallDir") as string;
+			xKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\VisualStudio\9.0", false);
+			var xVSTemplatePath = String.IsNullOrEmpty(xKey.GetValue("UserProjectTemplatesLocation") as string) ? String.Empty : Path.Combine((string)xKey.GetValue("UserProjectTemplatesLocation"), "Visual C#");
+			bool xFullVSInstalled = !(String.IsNullOrEmpty(xVSPath) && string.IsNullOrEmpty(xVSTemplatePath));
 			xKey = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\VCSExpress\9.0", false);
-			bool xVCSExpressInstalled = xKey != null;
+			var xVCSPath = (string)xKey.GetValue("InstallDir");
+			var xVCSTemplatePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), @"Visual Studio 2008\Templates\ProjectTemplates\Visual C#");
+			bool xVCSExpressInstalled = !(String.IsNullOrEmpty(xVCSPath) && string.IsNullOrEmpty(xVCSTemplatePath));
 			if (xFullVSInstalled && xVCSExpressInstalled) {
 				ChooseVSWindow xChoose = new ChooseVSWindow();
 				bool? xResult = xChoose.ShowDialog();
@@ -28,22 +33,18 @@ namespace Cosmos.Build.Windows.Config.Tasks {
 				xFullVSInstalled = xChoose.cbxVisualStudio.IsChecked.HasValue ? xChoose.cbxVisualStudio.IsChecked.Value : false;
 				xVCSExpressInstalled = xChoose.cbxVCSExpress.IsChecked.HasValue ? xChoose.cbxVCSExpress.IsChecked.Value : false;
 			}
-			if(!(xFullVSInstalled || xVCSExpressInstalled)) {
+			if (!(xFullVSInstalled || xVCSExpressInstalled)) {
 				throw new Exception("No Visual Studio Installation found!");
 			}
 			if (xVCSExpressInstalled) {
-				Tools.VCSPath = (string)xKey.GetValue("InstallDir");
-				Tools.VCSTemplatePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), @"Visual Studio 2008\Templates\ProjectTemplates\Visual C#");
+				Tools.VCSPath = xVCSPath;
+				Tools.VCSTemplatePath = xVCSTemplatePath;
 			}
 			if (xFullVSInstalled) {
-				xKey = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\VisualStudio\9.0", false);
-				Tools.VSPath = xKey.GetValue("InstallDir") as string;
-				xKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\VisualStudio\9.0", false);
-				Tools.VSTemplatePath = Path.Combine((string)xKey.GetValue("UserProjectTemplatesLocation"), "Visual C#");
+				Tools.VSPath = xVSPath;
+				Tools.VSTemplatePath = xVSTemplatePath;
 			}
-			System.Windows.MessageBox.Show("VCS path = '" + Tools.VCSPath + "'");
-			System.Windows.MessageBox.Show("VS path = '" + Tools.VSPath + "'");
-				
+
 		}
 	}
 }
