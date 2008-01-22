@@ -26,7 +26,7 @@ namespace Cosmos.Build.Windows {
             textBuildPath.IsEnabled = false;
 
             foreach (var xTarget in Enum.GetNames(typeof(Builder.Target))) {
-                lboxTargets.Items.Add((lboxTargets.Items.Count + 1).ToString() + ": " + xTarget);
+                lboxTargets.Items.Add((lboxTargets.Items.Count + 1).ToString() + ": " + xTarget.Replace('_', ' '));
             }
         }
 
@@ -45,7 +45,7 @@ namespace Cosmos.Build.Windows {
                         string xType = (string)(lboxTargets.Items[xValue - 1]);
                         Hide();
                         var xBuilder = new Builder();
-                        xBuilder.Build((Builder.Target)Enum.Parse(typeof(Builder.Target), xType.Remove(0, 3)));
+                        xBuilder.Build((Builder.Target)Enum.Parse(typeof(Builder.Target), xType.Remove(0, 3).Replace(' ', '_')));
                     }
                 }
                 e.Handled = true;

@@ -82,7 +82,7 @@ namespace Cosmos.Build.Windows {
         public void BuildKernel() {
         }
 
-        public enum Target { ISO, PXE, QEMU, QEMU_GDB };
+        public enum Target { ISO, PXE, QEMU, QEMU_With_Hard_Disk_Image, QEMU_GDB, QEMU_GDB_With_Hard_Disk_Image };
 
         public void Build() {
 			BuildOptionsWindow xOptions = new BuildOptionsWindow();
@@ -112,11 +112,32 @@ namespace Cosmos.Build.Windows {
                         , false, true);
                     break;
 
+                case Target.QEMU_With_Hard_Disk_Image:
+                    MakeISO();
+                    RemoveFile(mBuildPath + "serial-debug.txt");
+                    Global.Call(mToolsPath + @"qemu\qemu.exe"
+                        , "-hda \"" + mBuildPath + "hda.img\" -L . -cdrom \"" + mBuildPath + "Cosmos.iso\" -boot d -serial \"file:" + mBuildPath + "serial-debug.txt" + "\" -kernel-kqemu", mToolsPath + @"qemu\"
+                        , false, true);
+                    break;
+
                 case Target.QEMU_GDB:
                     MakeISO();
                     RemoveFile(mBuildPath + "serial-debug.txt");
                     Global.Call(mToolsPath + @"qemu\qemu.exe"
                         , "-L . -cdrom \"" + mBuildPath + "Cosmos.iso\" -boot d -serial \"file:" + mBuildPath + "serial-debug.txt" + "\" -S -s", mToolsPath + @"qemu\"
+                        , false, true);
+                    //TODO: If the host is really busy, sometimes GDB can run before QEMU finishes loading.
+                    //in this case, GDB says "program not running". Not sure how to fix this properly.
+                    Global.Call(mToolsPath + "gdb.exe"
+                        , mBuildPath + @"output.bin" + " --eval-command=\"target remote:1234\" --eval-command=\"b _CODE_REQUESTED_BREAK_\" --eval-command=\"c\""
+                        , mToolsPath + @"qemu\", false, false);
+                    break;
+
+                case Target.QEMU_GDB_With_Hard_Disk_Image:
+                    MakeISO();
+                    RemoveFile(mBuildPath + "serial-debug.txt");
+                    Global.Call(mToolsPath + @"qemu\qemu.exe"
+                        , "-hda \"" + mBuildPath + "hda.img\" -L . -cdrom \"" + mBuildPath + "Cosmos.iso\" -boot d -serial \"file:" + mBuildPath + "serial-debug.txt" + "\" -S -s", mToolsPath + @"qemu\"
                         , false, true);
                     //TODO: If the host is really busy, sometimes GDB can run before QEMU finishes loading.
                     //in this case, GDB says "program not running". Not sure how to fix this properly.
