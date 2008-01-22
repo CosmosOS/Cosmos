@@ -16,12 +16,12 @@ namespace Cosmos.Build.Windows.Config.Tasks {
 
 		public override void Execute() {
 			var xKey = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\VisualStudio\9.0", false);
-			var xVSPath = xKey.GetValue("InstallDir") as string;
+			var xVSPath = xKey == null ? "" : xKey.GetValue("InstallDir") as string;
 			xKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\VisualStudio\9.0", false);
-			var xVSTemplatePath = String.IsNullOrEmpty(xKey.GetValue("UserProjectTemplatesLocation") as string) ? String.Empty : Path.Combine((string)xKey.GetValue("UserProjectTemplatesLocation"), "Visual C#");
+			var xVSTemplatePath = xKey == null ? "" : String.IsNullOrEmpty(xKey.GetValue("UserProjectTemplatesLocation") as string) ? String.Empty : Path.Combine((string)xKey.GetValue("UserProjectTemplatesLocation"), "Visual C#");
 			bool xFullVSInstalled = !(String.IsNullOrEmpty(xVSPath) && string.IsNullOrEmpty(xVSTemplatePath));
 			xKey = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\VCSExpress\9.0", false);
-			var xVCSPath = (string)xKey.GetValue("InstallDir");
+			var xVCSPath = xKey == null ? "" : (string)xKey.GetValue("InstallDir");
 			var xVCSTemplatePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), @"Visual Studio 2008\Templates\ProjectTemplates\Visual C#");
 			bool xVCSExpressInstalled = !(String.IsNullOrEmpty(xVCSPath) && string.IsNullOrEmpty(xVCSTemplatePath));
 			if (xFullVSInstalled && xVCSExpressInstalled) {
