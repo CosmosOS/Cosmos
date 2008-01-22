@@ -12,9 +12,6 @@ namespace Cosmos.Shell.Console.Commands {
 		}
 
 		public override void Execute(string param) {
-            System.Console.Write("Contents of ");
-            System.Console.Write(param);
-            System.Console.WriteLine(":");
 
             Hardware.Storage.ATA xDrive = new Cosmos.Hardware.Storage.ATA(0, 0);
             Cosmos.Kernel.FileSystem.Ext2 xExt2 = new Cosmos.Kernel.FileSystem.Ext2(xDrive);
