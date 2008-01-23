@@ -10,9 +10,11 @@
 			Width="272">Multiple Visual Studio installations are detected. in which installation(s) do you want to install the Cosmos Userkit?</TextBlock>
 		<CheckBox
 			HorizontalAlignment="Left"
+			IsChecked="True"
 			Name="cbxVisualStudio">Visual Studio</CheckBox>
 		<CheckBox
 			HorizontalAlignment="Left"
+			IsChecked="True"
 			Name="cbxVCSExpress">Visual C# Express</CheckBox>
 		<StackPanel VerticalAlignment="Bottom" Orientation="Horizontal" Margin="4 4 4 4">
 			<Button
