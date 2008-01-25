@@ -1,13 +1,13 @@
 ﻿<Window x:Class="Cosmos.Build.Windows.BuildOptionsWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Title="BuildOptionsWindow" Height="404" Width="410">
-    <Grid>
-        <Label Height="28" HorizontalAlignment="Left" Margin="16,14,0,0" Name="label1" VerticalAlignment="Top" Width="120">Build Path:</Label>
-        <TextBox Height="23" Margin="16,37,12,0" Name="textBuildPath" VerticalAlignment="Top" />
-        <ListBox Margin="16,107,12,200" Name="lboxTargets" />
-        <Label Height="28" HorizontalAlignment="Left" Margin="16,73,0,0" Name="label2" VerticalAlignment="Top" Width="120">Build Type:</Label>
-        <Label Height="28" Margin="16,85,111,0" Name="label3" VerticalAlignment="Top">(Press number on main keyboard)</Label>
-        <Image Margin="16,0,12,10" Name="image1" Stretch="Fill" Source="/Cosmos.Build.Windows;component/Logo-1.png" Height="178" VerticalAlignment="Bottom" />
+    Title="BuildOptionsWindow" Height="345" Width="390">
+    <Grid Height="Auto" Width="Auto">
+        <Label Height="28" HorizontalAlignment="Left" Margin="16,2,0,0" Name="label1" VerticalAlignment="Top" Width="120">Build Path:</Label>
+        <TextBox Height="23" Margin="16,25,12,0" Name="textBuildPath" VerticalAlignment="Top" />
+        <ListBox Margin="16,73,12,84" Name="lboxTargets" />
+        <Label Height="28" HorizontalAlignment="Left" Margin="16,50,0,0" Name="label2" VerticalAlignment="Top" Width="120">Build Type:</Label>
+        <Label Height="28" Margin="80,50,47,0" Name="label3" VerticalAlignment="Top">(Press number on main keyboard)</Label>
+        <Image Margin="101,0,86,0" Name="image1" Stretch="Fill" Source="/Cosmos.Build.Windows;component/Logo-1.png" Height="76" VerticalAlignment="Bottom" />
     </Grid>
 </Window>
