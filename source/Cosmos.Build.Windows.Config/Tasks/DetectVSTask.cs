@@ -20,6 +20,13 @@ namespace Cosmos.Build.Windows.Config.Tasks {
 			xKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\VisualStudio\9.0", false);
 			var xVSTemplatePath = xKey == null ? "" : String.IsNullOrEmpty(xKey.GetValue("UserProjectTemplatesLocation") as string) ? String.Empty : Path.Combine((string)xKey.GetValue("UserProjectTemplatesLocation"), "Visual C#");
 			bool xFullVSInstalled = !(String.IsNullOrEmpty(xVSPath) || string.IsNullOrEmpty(xVSTemplatePath));
+			if (!xFullVSInstalled) {
+				xKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Wow6432Node\Microsoft\VisualStudio\9.0", false);
+				xVSPath = xKey == null ? "" : xKey.GetValue("InstallDir") as string;
+				xKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\VisualStudio\9.0", false);
+				xVSTemplatePath = xKey == null ? "" : String.IsNullOrEmpty(xKey.GetValue("UserProjectTemplatesLocation") as string) ? String.Empty : Path.Combine((string)xKey.GetValue("UserProjectTemplatesLocation"), "Visual C#");
+				xFullVSInstalled = !(String.IsNullOrEmpty(xVSPath) || string.IsNullOrEmpty(xVSTemplatePath));
+			}
 			if (xFullVSInstalled) {
 				xFullVSInstalled &= File.Exists(Path.Combine(xVSPath, "devenv.exe"));
 			}
@@ -27,6 +34,12 @@ namespace Cosmos.Build.Windows.Config.Tasks {
 			var xVCSPath = xKey == null ? "" : (string)xKey.GetValue("InstallDir");
 			var xVCSTemplatePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), @"Visual Studio 2008\Templates\ProjectTemplates\Visual C#");
 			bool xVCSExpressInstalled = !(String.IsNullOrEmpty(xVCSPath) || string.IsNullOrEmpty(xVCSTemplatePath));
+			if (!xVCSExpressInstalled) {
+				xKey = Registry.LocalMachine.OpenSubKey(@"Software\Wow6432Node\Microsoft\VCSExpress\9.0", false);
+				xVCSPath = xKey == null ? "" : (string)xKey.GetValue("InstallDir");
+				xVCSTemplatePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), @"Visual Studio 2008\Templates\ProjectTemplates\Visual C#");
+				xVCSExpressInstalled = !(String.IsNullOrEmpty(xVCSPath) || string.IsNullOrEmpty(xVCSTemplatePath));
+			}
 			if (xVCSExpressInstalled) {
 				xVCSExpressInstalled = File.Exists(Path.Combine(xVCSPath, "vcsexpress.exe"));
 			}
