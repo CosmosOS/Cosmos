@@ -36,20 +36,21 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Cosmos.Build.Windows, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <ExecutableExtension>.exe</ExecutableExtension>
-      <HintPath>..\Cosmos.Build.Windows\bin\Debug\Cosmos.Build.Windows.dll</HintPath>
-    </Reference>
-    <Reference Include="Cosmos.Kernel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Cosmos\Cosmos.Kernel\bin\Debug\Cosmos.Kernel.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Cosmos.Build.Windows\Cosmos.Build.Windows.csproj">
+      <Project>{1F0EDE86-F6D4-4355-9A97-10E90457770C}</Project>
+      <Name>Cosmos.Build.Windows</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Cosmos\Cosmos.Kernel\Cosmos.Kernel.csproj">
+      <Project>{A1F83D9F-2D44-4264-A08B-416797123018}</Project>
+      <Name>Cosmos.Kernel</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
