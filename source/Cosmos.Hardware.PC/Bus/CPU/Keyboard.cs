@@ -8,5 +8,10 @@ namespace Cosmos.Hardware.PC.Bus.CPU {
         public Keyboard() {
             mType = DeviceType.Keyboard;
         }
+
+        public void InterruptReceived() {
+            byte xByte = PC.Bus.CPUBus.ReadByte(0x60);
+            ByteReceived(xByte);
+        }
     }
 }

@@ -5,9 +5,12 @@ using System.Text;
 
 namespace Cosmos.Hardware.PC.Bus {
     public class CPUBus : Cosmos.Hardware.Bus.CPUBus {
-        protected static void WriteByte(ushort aPort, byte aData) { }
-        protected static void WriteWord(ushort aPort, ushort aData) { }
-        protected static byte ReadByte(ushort aPort) { return 0; }
-        protected static ushort ReadWord(ushort aPort) { return 0; }
+        // These are public. Would prefer internal, but will cause issues
+        // in future as we add devices from other assemblies.
+        // What else can we do to restrict access to them?
+        public static void WriteByte(ushort aPort, byte aData) { }
+        public static void WriteWord(ushort aPort, ushort aData) { }
+        public static byte ReadByte(ushort aPort) { return 0; }
+        public static ushort ReadWord(ushort aPort) { return 0; }
     }
 }

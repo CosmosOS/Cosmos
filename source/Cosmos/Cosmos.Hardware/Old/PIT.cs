@@ -24,7 +24,7 @@ namespace Cosmos.Hardware {
 
 		private static EventHandler mTick;
 
-		internal static void HandleInterrupt() {
+		public static void HandleInterrupt() {
 			mTick(null, null);
 		}
 	}

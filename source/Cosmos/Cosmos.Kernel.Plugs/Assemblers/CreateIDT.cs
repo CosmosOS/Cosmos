@@ -31,7 +31,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 		}
 
 		private static MethodDefinition GetInterruptHandler(byte aInterrupt) {
-			return GetMethodDef(typeof(HW.Interrupts).Assembly, typeof(HW.Interrupts).FullName, "HandleInterrupt_" + aInterrupt.ToString("X2"), false);
+            return GetMethodDef(typeof(Cosmos.Hardware.PC.Interrupts).Assembly, typeof(Cosmos.Hardware.PC.Interrupts).FullName, "HandleInterrupt_" + aInterrupt.ToString("X2"), false);
 		}
 
 		public override void Assemble(Assembler aAssembler) {
@@ -98,7 +98,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 				new CPUx86.Push("eax");
 				MethodDefinition xHandler = GetInterruptHandler((byte)j);
 				if (xHandler == null) {
-					xHandler = GetMethodDef(typeof(HW.Interrupts).Assembly, typeof(HW.Interrupts).FullName, "HandleInterrupt_Default", true);
+                    xHandler = GetMethodDef(typeof(Cosmos.Hardware.PC.Interrupts).Assembly, typeof(Cosmos.Hardware.PC.Interrupts).FullName, "HandleInterrupt_Default", true);
 				}
 				new CPUx86.Call(Label.GenerateLabelName(xHandler));
 				new CPUx86.Pop("eax");

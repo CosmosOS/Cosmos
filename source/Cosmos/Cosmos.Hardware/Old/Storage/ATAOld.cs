@@ -101,7 +101,7 @@ namespace Cosmos.Hardware.Storage {
 
 		private static Action<uint> mSleep;
 
-		internal static void HandleInterruptPrimary() {
+		public static void HandleInterruptPrimary() {
 			//DebugUtil.SendMessage("ATA", "Primary Controller Ready");
 			IOWriteByte((ushort)(ATAControllerInfo[0] + IDE_PORT_ERROR), 0);
 			PrimaryControllerInterruptOccurred = true;
@@ -110,7 +110,7 @@ namespace Cosmos.Hardware.Storage {
 		private static bool PrimaryControllerInterruptOccurred;
 		private static bool SecondaryControllerInterruptOccurred;
 
-		internal static void HandleInterruptSecondary() {
+		public static void HandleInterruptSecondary() {
 			DebugUtil.SendMessage("ATA", "Secondary Controller Ready");
 			IOWriteByte((ushort)(ATAControllerInfo[1] + IDE_PORT_ERROR), 0);
 			SecondaryControllerInterruptOccurred = true;

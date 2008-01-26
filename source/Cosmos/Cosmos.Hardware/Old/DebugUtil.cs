@@ -167,63 +167,63 @@ namespace Cosmos.Hardware {
 			}
 		}
 
-		public static unsafe void LogInterruptOccurred(Interrupts.InterruptContext* aContext) {
-			uint aInterrupt = aContext->Interrupt;
-			StartLogging();
-			WriteSerialString("<InterruptOccurred Interrupt=\"");
-			WriteNumber(aContext->Interrupt, 32);
-			WriteSerialString("\" SS=\"");
-			WriteNumber(aContext->SS, 32);
-			WriteSerialString("\" GS=\"");
-			WriteNumber(aContext->GS, 32);
-			WriteSerialString("\" FS=\"");
-			WriteNumber(aContext->FS, 32);
-			WriteSerialString("\" ES=\"");
-			WriteNumber(aContext->ES, 32);
-			WriteSerialString("\" DS=\"");
-			WriteNumber(aContext->DS, 32);
-			WriteSerialString("\" CS=\"");
-			WriteNumber(aContext->CS, 32);
-			WriteSerialString("\" ESI=\"");
-			WriteNumber(aContext->ESI, 32);
-			WriteSerialString("\" EBP=\"");
-			WriteNumber(aContext->EBP, 32);
-			WriteSerialString("\" ESP=\"");
-			WriteNumber(aContext->ESP, 32);
-			WriteSerialString("\" EBX=\"");
-			WriteNumber(aContext->EBX, 32);
-			WriteSerialString("\" EDX=\"");
-			WriteNumber(aContext->EDX, 32);
-			WriteSerialString("\" ECX=\"");
-			WriteNumber(aContext->ECX, 32);
-			WriteSerialString("\" EAX=\"");
-			WriteNumber(aContext->EAX, 32);
-			WriteSerialString("\" Param=\"");
-			WriteNumber(aContext->Param, 32);
-			WriteSerialString("\" EIP=\"");
-			WriteNumber(aContext->EIP, 32);
-			WriteSerialString("\" EFlags=\"");
-			WriteNumber(aContext->EFlags, 32);
-			WriteSerialString("\" UserESP=\"");
-			WriteNumber(aContext->UserESP, 32);
-			WriteSerialString("\"/>\r\n");
-			EndLogging();
-		}
+        //public static unsafe void LogInterruptOccurred(Interrupts.InterruptContext* aContext) {
+        //    uint aInterrupt = aContext->Interrupt;
+        //    StartLogging();
+        //    WriteSerialString("<InterruptOccurred Interrupt=\"");
+        //    WriteNumber(aContext->Interrupt, 32);
+        //    WriteSerialString("\" SS=\"");
+        //    WriteNumber(aContext->SS, 32);
+        //    WriteSerialString("\" GS=\"");
+        //    WriteNumber(aContext->GS, 32);
+        //    WriteSerialString("\" FS=\"");
+        //    WriteNumber(aContext->FS, 32);
+        //    WriteSerialString("\" ES=\"");
+        //    WriteNumber(aContext->ES, 32);
+        //    WriteSerialString("\" DS=\"");
+        //    WriteNumber(aContext->DS, 32);
+        //    WriteSerialString("\" CS=\"");
+        //    WriteNumber(aContext->CS, 32);
+        //    WriteSerialString("\" ESI=\"");
+        //    WriteNumber(aContext->ESI, 32);
+        //    WriteSerialString("\" EBP=\"");
+        //    WriteNumber(aContext->EBP, 32);
+        //    WriteSerialString("\" ESP=\"");
+        //    WriteNumber(aContext->ESP, 32);
+        //    WriteSerialString("\" EBX=\"");
+        //    WriteNumber(aContext->EBX, 32);
+        //    WriteSerialString("\" EDX=\"");
+        //    WriteNumber(aContext->EDX, 32);
+        //    WriteSerialString("\" ECX=\"");
+        //    WriteNumber(aContext->ECX, 32);
+        //    WriteSerialString("\" EAX=\"");
+        //    WriteNumber(aContext->EAX, 32);
+        //    WriteSerialString("\" Param=\"");
+        //    WriteNumber(aContext->Param, 32);
+        //    WriteSerialString("\" EIP=\"");
+        //    WriteNumber(aContext->EIP, 32);
+        //    WriteSerialString("\" EFlags=\"");
+        //    WriteNumber(aContext->EFlags, 32);
+        //    WriteSerialString("\" UserESP=\"");
+        //    WriteNumber(aContext->UserESP, 32);
+        //    WriteSerialString("\"/>\r\n");
+        //    EndLogging();
+        //}
 
-		public static void WriteBinary(string aModule, string aMessage, uint aBlock, byte[] aValue) {
-			StartLogging();
-			WriteSerialString("<Binary Module=\"");
-			WriteSerialString(aModule);
-			WriteSerialString("\" Message=\"");
-			WriteSerialString(aMessage);
-			WriteSerialString("\" Block=\"0x");
-			WriteNumber(aBlock, 24);
-			WriteSerialString("\" Value=\"");
-			for (int i = 0; i < aValue.Length; i++) {
-				WriteNumber(aValue[i], 8, false);
-			}
-			WriteSerialString("\"/>\r\n");
-		}
+        //public static void WriteBinary(string aModule, string aMessage, uint aBlock, byte[] aValue) {
+        //    StartLogging();
+        //    WriteSerialString("<Binary Module=\"");
+        //    WriteSerialString(aModule);
+        //    WriteSerialString("\" Message=\"");
+        //    WriteSerialString(aMessage);
+        //    WriteSerialString("\" Block=\"0x");
+        //    WriteNumber(aBlock, 24);
+        //    WriteSerialString("\" Value=\"");
+        //    for (int i = 0; i < aValue.Length; i++) {
+        //        WriteNumber(aValue[i], 8, false);
+        //    }
+        //    WriteSerialString("\"/>\r\n");
+        //}
 
 		public static void WriteSerialString(string aData) {
 			for (int i = 0; i < aData.Length; i++) {

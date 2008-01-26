@@ -10,14 +10,14 @@ namespace Cosmos.Hardware.PC {
             mProcessor = new Processor();
             Cosmos.Hardware.Global.Devices.Add(new Bus.CPU.Keyboard());
             //All old.. need to port
-            HW.PIC.Init();
+            Bus.CPU.PIC.Init();
             HW.Serial.InitSerial(0);
             HW.DebugUtil.Initialize();
             HW.DebugUtil.SendMessage("Logging", "Initialized!");
             HW.PIT.Initialize(Tick);
 
             //HW.Interrupts.IRQ01 += new Interrupts.InterruptDelegate(Cosmos.Hardware.Keyboard.HandleKeyboardInterrupt);
-            HW.Interrupts.IncludeAllHandlers();
+            Interrupts.IncludeAllHandlers();
             
             HW.Storage.ATA.Initialize(Sleep);
             HW.CPU.CreateIDT();

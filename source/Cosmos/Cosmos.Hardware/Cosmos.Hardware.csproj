@@ -52,9 +52,7 @@
     <Compile Include="Old\CPU.cs" />
     <Compile Include="Old\DebugUtil.cs" />
     <Compile Include="Old\Hardware.cs" />
-    <Compile Include="Old\Interrupts.cs" />
     <Compile Include="Old\Keyboard.cs" />
-    <Compile Include="Old\PIC.cs" />
     <Compile Include="Old\PIT.cs" />
     <Compile Include="Bus\PCIBus.cs" />
     <Compile Include="Processor.cs" />
