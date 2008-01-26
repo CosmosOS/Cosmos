@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace Cosmos.Hardware {
-	public class CPU: Hardware {
+	public class CPUOld: Hardware {
+        // Plugged
 		public static void CreateGDT() { }
-		public static void CreateIDT() { }
+        // Plugged
+        public static void CreateIDT() { }
+
 		public static uint AmountOfMemory {
 			get {
 				return GetAmountOfRAM();

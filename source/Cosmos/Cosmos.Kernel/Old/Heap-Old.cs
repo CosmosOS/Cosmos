@@ -25,7 +25,7 @@ namespace Cosmos.Kernel {
 
 		private static void ClearMemory(uint aStartAddress, uint aLength) {
 			//int xStart = (RTC.GetMinutes() * 60) + RTC.GetSeconds();
-			Hardware.CPU.ZeroFill(aStartAddress, aLength);
+			Hardware.CPUOld.ZeroFill(aStartAddress, aLength);
 			//int xEnd = (RTC.GetMinutes() * 60) + RTC.GetSeconds();
 			//int xDiff = xEnd - xStart;
 			//Console.Write("Time to clear ");
@@ -62,7 +62,7 @@ namespace Cosmos.Kernel {
 		public static void CheckInit() {
 			if (mFirstBlock == null) {
 				//Initialize(Hardware.CPU.EndOfKernel, (Hardware.CPU.AmountOfMemory * 1024 * 1024) - (Hardware.CPU.EndOfKernel + 4));
-				Initialize(Hardware.CPU.EndOfKernel, (Hardware.CPU.AmountOfMemory * 1024 * 1024) - 1024);
+                Initialize(Hardware.CPUOld.EndOfKernel, (Hardware.CPUOld.AmountOfMemory * 1024 * 1024) - 1024);
 			}
 		}
 

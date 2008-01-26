@@ -17,7 +17,7 @@
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>Old\Cosmos.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>Cosmos.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -48,6 +48,7 @@
     <Compile Include="Bus\Bus.cs" />
     <Compile Include="Bus\CPUBus.cs" />
     <Compile Include="Device.cs" />
+    <Compile Include="Global.cs" />
     <Compile Include="Old\CPU.cs" />
     <Compile Include="Old\DebugUtil.cs" />
     <Compile Include="Old\Hardware.cs" />
@@ -56,6 +57,7 @@
     <Compile Include="Old\PIC.cs" />
     <Compile Include="Old\PIT.cs" />
     <Compile Include="Bus\PCIBus.cs" />
+    <Compile Include="Processor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Old\RTC.cs" />
     <Compile Include="Old\Screen\Text.cs" />
@@ -68,7 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Old\ClassDiagram.cd" />
-    <None Include="Old\Cosmos.snk" />
+    <None Include="Cosmos.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

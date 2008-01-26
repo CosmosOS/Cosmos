@@ -58,6 +58,10 @@
     <Compile Include="Old\TextScreen-Old.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Cosmos.Hardware.PC\Cosmos.Hardware.PC.csproj">
+      <Project>{B024FADF-EF04-4602-A0F4-49016D68B2AF}</Project>
+      <Name>Cosmos.Hardware.PC</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Indy.IL2CPU.Plugs\Indy.IL2CPU.Plugs.csproj">
       <Project>{E9B2E8CC-E264-42F9-9113-16B0A0431198}</Project>
       <Name>Indy.IL2CPU.Plugs</Name>

@@ -16,7 +16,7 @@ namespace Cosmos.Kernel {
 		public static unsafe void Init() {
 			Heap.CheckInit();
 			Console.Write("Creating GDT...");
-			Hardware.CPU.CreateGDT();
+            Hardware.CPUOld.CreateGDT();
 			Console.WriteLine("Done");
 			Console.Write("Initializing PIC...");
 			Hardware.PIC.Init();
@@ -34,7 +34,7 @@ namespace Cosmos.Kernel {
 			Console.Write("Creating IDT...");
 			Kernel.Interrupts.DoTest();
 			Hardware.Storage.ATA.Initialize(Sleep);
-			Hardware.CPU.CreateIDT();
+            Hardware.CPUOld.CreateIDT();
 			Console.WriteLine("Done");
 			Keyboard.Initialize();
 			//TestATA();
