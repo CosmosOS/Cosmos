@@ -43,7 +43,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Old\CPU.cs" />
     <Compile Include="Old\DebugUtil-Old.cs" />
     <Compile Include="Old\FileSystem\Ext2.cs" />
     <Compile Include="Old\FileSystem\Ext2Old.cs" />
@@ -72,6 +71,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Boot.cs" />
+    <Compile Include="Global.cs" />
     <Compile Include="Old\FileSystem\Ext2.Structs.cs" />
     <Compile Include="Old\FileSystem\Fat16.cs" />
     <Compile Include="Old\FileSystem\File.cs" />
@@ -83,6 +83,7 @@
     <Compile Include="Old\Staging\IStage.cs" />
     <Compile Include="Old\Staging\StageQueue.cs" />
     <Compile Include="Old\Staging\Stages\TestStage.cs" />
+    <Compile Include="StringFuncs.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Cosmos.snk" />

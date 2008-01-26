@@ -57,6 +57,7 @@
     <Compile Include="Assemblers\IOWriteByte.cs" />
     <Compile Include="Assemblers\ZeroFill.cs" />
     <Compile Include="CultureInfo.cs" />
+    <Compile Include="Hardware\PC\Bus\CPUBus.cs" />
     <Compile Include="Hardware\PC\Processor.cs" />
     <Compile Include="HeapImpl.cs" />
     <Compile Include="String.cs" />

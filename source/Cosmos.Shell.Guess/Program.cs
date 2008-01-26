@@ -31,8 +31,7 @@ namespace Cosmos.Shell.Guess {
 
             System.Console.ForegroundColor = ConsoleColor.White;
             System.Console.WriteLine("Success.");
-            Kernel.CPU.PrintTime();
-
+            System.Console.WriteLine(Kernel.StringFuncs.TimeString());
 
             stages.Run();
 

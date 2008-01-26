@@ -33,7 +33,7 @@ namespace Cosmos.Shell.Console {
 
 			System.Console.ForegroundColor = ConsoleColor.White;
 			System.Console.WriteLine("Success.");
-			Kernel.CPU.PrintTime();
+			System.Console.WriteLine(Kernel.StringFuncs.TimeString());
 			stages.Run();
 			System.Console.WriteLine("Done");
 

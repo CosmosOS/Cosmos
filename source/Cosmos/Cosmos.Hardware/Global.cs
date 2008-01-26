@@ -8,5 +8,6 @@ namespace Cosmos.Hardware {
         public static Processor Processor {
             get { return mProcessor; }
         }
+
     }
 }
