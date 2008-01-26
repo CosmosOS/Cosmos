@@ -14,7 +14,7 @@ namespace CosmosBoot {
 
 		// Main entry point of the kernel
 		public static void Init() {
-			Cosmos.Kernel.CPU.Init();
+            Cosmos.Kernel.Boot.Default();
 			Console.WriteLine("Done booting");
 			while (true)
 				;

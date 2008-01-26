@@ -18,7 +18,7 @@ namespace Cosmos.Shell.Console {
         // Here is where your Cosmos code goes. This is the code that will be executed during Cosmos boot.
         // Write your code, and run. Cosmos build console will appear, select your target, and thats it!
         public static void Init() {
-			Kernel.CPU.Init();
+            Cosmos.Kernel.Boot.Default();
 
 			Kernel.Staging.DefaultStageQueue stages = new Cosmos.Kernel.Staging.DefaultStageQueue();
 			stages.Enqueue(new Prompter());

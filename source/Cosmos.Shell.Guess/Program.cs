@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using Cosmos.Build.Windows;
 
-namespace Cosmos.Shell.Guess
-{
-    public class Program
-    {
+namespace Cosmos.Shell.Guess {
+    public class Program {
 
         #region Build Console
         // This contains code to launch the build console. Most users should not chagne this.
@@ -18,11 +16,8 @@ namespace Cosmos.Shell.Guess
         }
         #endregion
 
-        // Here is where your Cosmos code goes. This is the code that will be executed during Cosmos boot.
-        // Write your code, and run. Cosmos build console will appear, select your target, and thats it!
-        public static void Init()
-        {
-            Kernel.CPU.Init();
+        public static void Init() {
+            Kernel.Boot.Default();
 
             Kernel.Staging.DefaultStageQueue stages = new Cosmos.Kernel.Staging.DefaultStageQueue();
             

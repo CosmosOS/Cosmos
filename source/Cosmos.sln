@@ -33,8 +33,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel.Plugs", "Cosm
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU.Plugs", "Indy.IL2CPU.Plugs\Indy.IL2CPU.Plugs.csproj", "{E9B2E8CC-E264-42F9-9113-16B0A0431198}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.Client.CLI", "Cosmos.Debug.Client.CLI\Cosmos.Debug.Client.CLI.csproj", "{930DDE98-229B-4EBF-B41B-ACABDF48EEFB}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel", "Cosmos\Cosmos.Kernel\Cosmos.Kernel.csproj", "{A1F83D9F-2D44-4264-A08B-416797123018}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel.LogTail", "Cosmos\Cosmos.Kernel.LogTail\Cosmos.Kernel.LogTail.csproj", "{7BAB58BF-E8A1-4623-B6BF-4B90A0505226}"
@@ -61,7 +59,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Shell.Guess", "Cosmo
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 25
+		SccNumberOfProjects = 24
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -129,38 +127,34 @@ Global
 		SccProjectTopLevelParentUniqueName16 = Cosmos.sln
 		SccProjectName16 = Indy.IL2CPU.Plugs
 		SccLocalPath16 = Indy.IL2CPU.Plugs
-		SccProjectUniqueName17 = Cosmos.Debug.Client.CLI\\Cosmos.Debug.Client.CLI.csproj
+		SccProjectUniqueName17 = Cosmos\\Cosmos.Kernel.LogTail\\Cosmos.Kernel.LogTail.csproj
 		SccProjectTopLevelParentUniqueName17 = Cosmos.sln
-		SccProjectName17 = Cosmos.Debug.Client.CLI
-		SccLocalPath17 = Cosmos.Debug.Client.CLI
-		SccProjectUniqueName18 = Cosmos\\Cosmos.Kernel.LogTail\\Cosmos.Kernel.LogTail.csproj
+		SccProjectName17 = Cosmos/Cosmos.Kernel.LogTail
+		SccLocalPath17 = Cosmos\\Cosmos.Kernel.LogTail
+		SccProjectUniqueName18 = Cosmos\\Cosmos.Tools.SkypeBot\\Cosmos.Tools.SkypeBot.csproj
 		SccProjectTopLevelParentUniqueName18 = Cosmos.sln
-		SccProjectName18 = Cosmos/Cosmos.Kernel.LogTail
-		SccLocalPath18 = Cosmos\\Cosmos.Kernel.LogTail
-		SccProjectUniqueName19 = Cosmos\\Cosmos.Tools.SkypeBot\\Cosmos.Tools.SkypeBot.csproj
+		SccProjectName18 = Cosmos/Cosmos.Tools.SkypeBot
+		SccLocalPath18 = Cosmos\\Cosmos.Tools.SkypeBot
+		SccProjectUniqueName19 = Cosmos.Build.Windows\\Cosmos.Build.Windows.csproj
 		SccProjectTopLevelParentUniqueName19 = Cosmos.sln
-		SccProjectName19 = Cosmos/Cosmos.Tools.SkypeBot
-		SccLocalPath19 = Cosmos\\Cosmos.Tools.SkypeBot
-		SccProjectUniqueName20 = Cosmos.Build.Windows\\Cosmos.Build.Windows.csproj
+		SccProjectName19 = Cosmos.Build.Windows
+		SccLocalPath19 = Cosmos.Build.Windows
+		SccProjectUniqueName20 = Cosmos.Build.Windows.Config\\Cosmos.Build.Windows.Config.csproj
 		SccProjectTopLevelParentUniqueName20 = Cosmos.sln
-		SccProjectName20 = Cosmos.Build.Windows
-		SccLocalPath20 = Cosmos.Build.Windows
-		SccProjectUniqueName21 = Cosmos.Build.Windows.Config\\Cosmos.Build.Windows.Config.csproj
+		SccProjectName20 = Cosmos.Build.Windows.Config
+		SccLocalPath20 = Cosmos.Build.Windows.Config
+		SccProjectUniqueName21 = CosmosBoot\\CosmosBoot.csproj
 		SccProjectTopLevelParentUniqueName21 = Cosmos.sln
-		SccProjectName21 = Cosmos.Build.Windows.Config
-		SccLocalPath21 = Cosmos.Build.Windows.Config
-		SccProjectUniqueName22 = CosmosBoot\\CosmosBoot.csproj
+		SccProjectName21 = CosmosBoot
+		SccLocalPath21 = CosmosBoot
+		SccProjectUniqueName22 = Cosmos\\Cosmos.Unity\\Cosmos.Unity.csproj
 		SccProjectTopLevelParentUniqueName22 = Cosmos.sln
-		SccProjectName22 = CosmosBoot
-		SccLocalPath22 = CosmosBoot
-		SccProjectUniqueName23 = Cosmos\\Cosmos.Unity\\Cosmos.Unity.csproj
+		SccProjectName22 = Cosmos/Cosmos.Unity
+		SccLocalPath22 = Cosmos\\Cosmos.Unity
+		SccProjectUniqueName23 = Cosmos.Shell.Guess\\Cosmos.Shell.Guess.csproj
 		SccProjectTopLevelParentUniqueName23 = Cosmos.sln
-		SccProjectName23 = Cosmos/Cosmos.Unity
-		SccLocalPath23 = Cosmos\\Cosmos.Unity
-		SccProjectUniqueName24 = Cosmos.Shell.Guess\\Cosmos.Shell.Guess.csproj
-		SccProjectTopLevelParentUniqueName24 = Cosmos.sln
-		SccProjectName24 = Cosmos.Shell.Guess
-		SccLocalPath24 = Cosmos.Shell.Guess
+		SccProjectName23 = Cosmos.Shell.Guess
+		SccLocalPath23 = Cosmos.Shell.Guess
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -226,10 +220,6 @@ Global
 		{E9B2E8CC-E264-42F9-9113-16B0A0431198}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E9B2E8CC-E264-42F9-9113-16B0A0431198}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E9B2E8CC-E264-42F9-9113-16B0A0431198}.Release|Any CPU.Build.0 = Release|Any CPU
-		{930DDE98-229B-4EBF-B41B-ACABDF48EEFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{930DDE98-229B-4EBF-B41B-ACABDF48EEFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{930DDE98-229B-4EBF-B41B-ACABDF48EEFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{930DDE98-229B-4EBF-B41B-ACABDF48EEFB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A1F83D9F-2D44-4264-A08B-416797123018}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A1F83D9F-2D44-4264-A08B-416797123018}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A1F83D9F-2D44-4264-A08B-416797123018}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -283,10 +273,9 @@ Global
 		{C97DE890-58D2-41A1-86D0-A2E919E6DD80} = {21E68B7D-F1DC-46E2-9CFA-0A7C6D77D42E}
 		{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
 		{B168BEDD-C6A6-4E7C-B9A5-0144286E9E42} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
-		{930DDE98-229B-4EBF-B41B-ACABDF48EEFB} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
 		{A1F83D9F-2D44-4264-A08B-416797123018} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
-		{7BAB58BF-E8A1-4623-B6BF-4B90A0505226} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
 		{B0BBD2A2-4FAA-4730-9770-ACE6D9532132} = {E16DB75B-0F1D-4813-9103-F8FB6E7BAE2A}
+		{7BAB58BF-E8A1-4623-B6BF-4B90A0505226} = {E16DB75B-0F1D-4813-9103-F8FB6E7BAE2A}
 		{1F0EDE86-F6D4-4355-9A97-10E90457770C} = {2DE75CE4-7A3B-4659-84FC-16F5EC0AEDE4}
 		{228941A5-080D-4057-9491-160950105A8E} = {2DE75CE4-7A3B-4659-84FC-16F5EC0AEDE4}
 		{1BD459F8-E894-4694-BBEC-65EB1D98E445} = {2DE75CE4-7A3B-4659-84FC-16F5EC0AEDE4}
