@@ -51,6 +51,8 @@ namespace Cosmos.Hardware {
 			}
 		}
 
+        public delegate void InterruptDelegate();
+
 		//IRQ 2 - Cascaded signals from IRQs 8-15. A device configured to use IRQ 2 will actually be using IRQ 9
 		//IRQ 3 - COM2 (Default) and COM4 (User) serial ports
 		//IRQ 4 - COM1 (Default) and COM3 (User) serial ports
@@ -71,9 +73,11 @@ namespace Cosmos.Hardware {
 			PIC.SignalPrimary();
 		}
 
+        static public InterruptDelegate IRQ01;
 		//IRQ 1 - Keyboard. Reserved for the system. Cannot be altered even if no keyboard is present or needed.
 		public static unsafe void HandleInterrupt_21(InterruptContext* aContext) {
-			Keyboard.HandleKeyboardInterrupt();
+            //IRQ01();
+            Cosmos.Hardware.Keyboard.HandleKeyboardInterrupt();
 			PIC.SignalPrimary();
 		}
 

@@ -5,5 +5,8 @@ using System.Text;
 
 namespace Cosmos.Hardware.PC.Bus.CPU {
     public class Keyboard : Cosmos.Hardware.SerialDevice {
+        public Keyboard() {
+            mType = DeviceType.Keyboard;
+        }
     }
 }

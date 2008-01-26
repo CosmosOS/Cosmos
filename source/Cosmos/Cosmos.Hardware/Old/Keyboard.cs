@@ -10,7 +10,7 @@ namespace Cosmos.Hardware {
 			mHandleKeyboardKey = aHandleKeyboardKeyDelegate;
 		}
 
-		internal static void HandleKeyboardInterrupt() {
+		public static void HandleKeyboardInterrupt() {
 			if (mHandleKeyboardKey != null) {
 				byte xScanCode = IOReadByte(0x60);
 				bool xReleased = (xScanCode & 0x80) == 0x80;

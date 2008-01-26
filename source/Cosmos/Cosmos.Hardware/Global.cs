@@ -9,5 +9,10 @@ namespace Cosmos.Hardware {
             get { return mProcessor; }
         }
 
+        protected static List<Device> mDevices = new List<Device>();
+        public static List<Device> Devices {
+            get { return mDevices; }
+        }
+
     }
 }
