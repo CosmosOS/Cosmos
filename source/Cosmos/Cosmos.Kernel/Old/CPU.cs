@@ -14,30 +14,15 @@ namespace Cosmos.Kernel {
 			}
 		}
 		public static unsafe void Init() {
-			Heap.CheckInit();
-			Console.Write("Creating GDT...");
-            Hardware.CPUOld.CreateGDT();
-			Console.WriteLine("Done");
-			Console.Write("Initializing PIC...");
 			Hardware.PIC.Init();
-			Console.WriteLine("Done");
-			Console.Write("Initializing Serial 0...");
 			Hardware.Serial.InitSerial(0);
-			Console.WriteLine("Done");
-			Console.Write("Initializing Debug Utility...");
 			Hardware.DebugUtil.Initialize();
 			Hardware.DebugUtil.SendMessage("Logging", "Initialized!");
-			Console.WriteLine("Done");
-			Console.Write("Configuring PIT...");
 			Hardware.PIT.Initialize(Tick);
-			Console.WriteLine("Done");
-			Console.Write("Creating IDT...");
 			Kernel.Interrupts.DoTest();
 			Hardware.Storage.ATA.Initialize(Sleep);
-            Hardware.CPUOld.CreateIDT();
-			Console.WriteLine("Done");
+            Hardware.CPU.CreateIDT();
 			Keyboard.Initialize();
-			//TestATA();
 		}
 
 		public static void PrintTime() {

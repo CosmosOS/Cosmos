@@ -4,7 +4,7 @@ using System.Text;
 using Indy.IL2CPU.Plugs;
 using HW = Cosmos.Hardware;
 
-namespace Cosmos.Kernel.Plugs {
+namespace Cosmos.Kernel.Plugs.Other {
 	[Plug(Target = typeof(HW.Hardware))]
 	public static class Hardware {
 		[PlugMethod(MethodAssembler = typeof(Assemblers.IOWriteByte))]

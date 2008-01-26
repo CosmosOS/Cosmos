@@ -69,7 +69,6 @@
     <Compile Include="SerialDevice.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Old\ClassDiagram.cd" />
     <None Include="Cosmos.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

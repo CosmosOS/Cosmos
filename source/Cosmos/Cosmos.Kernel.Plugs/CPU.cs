@@ -5,12 +5,8 @@ using Indy.IL2CPU.Plugs;
 using HW = Cosmos.Hardware;
 
 namespace Cosmos.Kernel.Plugs {
-    [Plug(Target = typeof(HW.CPUOld))]
-    public static class CPUOld {
-		[PlugMethod(MethodAssembler = typeof(Assemblers.CreateGDT))]
-		public static void CreateGDT() {
-		}
-
+    [Plug(Target = typeof(HW.CPU))]
+    public static class CPU {
 		[PlugMethod(MethodAssembler = typeof(Assemblers.CreateIDT))]
 		public static void CreateIDT() {
 		}

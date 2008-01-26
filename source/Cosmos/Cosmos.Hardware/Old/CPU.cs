@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace Cosmos.Hardware {
-	public class CPUOld: Hardware {
-        // Plugged
-		public static void CreateGDT() { }
+	public class CPU: Hardware {
         // Plugged
         public static void CreateIDT() { }
 

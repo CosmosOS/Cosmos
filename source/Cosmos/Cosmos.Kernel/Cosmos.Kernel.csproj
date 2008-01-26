@@ -50,7 +50,7 @@
     <Compile Include="Old\FileSystem\Ext2Old.Structs.cs" />
     <Compile Include="Old\FileSystem\FileSystem.cs" />
     <Compile Include="Old\FileSystem\ISO9660.cs" />
-    <Compile Include="Old\Heap-Old.cs" />
+    <Compile Include="Heap.cs" />
     <Compile Include="Old\Interrupts-Old.cs" />
     <Compile Include="Old\Keyboard-Old.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
