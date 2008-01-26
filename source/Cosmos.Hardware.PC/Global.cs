@@ -8,7 +8,7 @@ namespace Cosmos.Hardware.PC {
     public class Global : Cosmos.Hardware.Global {
         public static void Init() {
             mProcessor = new Processor();
-            Cosmos.Hardware.Global.Devices.Add(new Bus.CPU.Keyboard());
+            HW.Device.Add(new Bus.CPU.Keyboard());
             //All old.. need to port
             Bus.CPU.PIC.Init();
             HW.Serial.InitSerial(0);

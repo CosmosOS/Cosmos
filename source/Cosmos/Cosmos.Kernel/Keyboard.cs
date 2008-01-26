@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using HW = Cosmos.Hardware;
 
 namespace Cosmos.Kernel {
 	public class Keyboard {
@@ -27,7 +28,7 @@ namespace Cosmos.Kernel {
 		private static List<KeyMapping> mKeys;
 		private static bool mShiftState;
 
-		private static void HandleScancode(byte aScancode, bool aReleased) {
+		protected static void HandleScancode(byte aScancode, bool aReleased) {
 			uint xTheScancode = aScancode;
 			if (mEscaped) {
 				xTheScancode = (ushort)(xTheScancode << 8);
@@ -59,9 +60,27 @@ namespace Cosmos.Kernel {
 			DebugUtil.SendKeyboardEvent(xTheScancode, aReleased);
 		}
 
+        // Can merge HandleScancode after we remove old code
+        // Remove the static.. Make it a real class
+        protected static void ByteReceived(byte aValue) {
+            bool xReleased = (aValue & 0x80) == 0x80;
+            if (xReleased) {
+                aValue = (byte)(aValue ^ 0x80);
+            }
+            HandleScancode(aValue, xReleased);
+        }
+
 		public static void Initialize() {
 			mBuffer = new Queue<uint>(BufferSize);
+
+            // Old
 			Hardware.Keyboard.Initialize(HandleScancode);
+            // New
+            // TODO: Need to add support for mult keyboards. ie one in PS2 and one in USB, or even more
+            //var xKeyboard = (HW.SerialDevice)(HW.Device.Find(HW.Device.DeviceType.Keyboard)[0]);
+            //xKeyboard.ByteReceived += new HW.SerialDevice.ByteReceivedDelegate(ByteReceived);
+            // End
+
 			mKeys = new List<KeyMapping>(128);
 
 			#region Letters
