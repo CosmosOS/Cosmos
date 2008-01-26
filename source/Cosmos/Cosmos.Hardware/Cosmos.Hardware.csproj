@@ -44,6 +44,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BlockDevice.cs" />
+    <Compile Include="Bus\Bus.cs" />
+    <Compile Include="Bus\CPUBus.cs" />
     <Compile Include="Device.cs" />
     <Compile Include="Old\CPU.cs" />
     <Compile Include="Old\DebugUtil.cs" />
@@ -52,6 +55,7 @@
     <Compile Include="Old\Keyboard.cs" />
     <Compile Include="Old\PIC.cs" />
     <Compile Include="Old\PIT.cs" />
+    <Compile Include="Bus\PCIBus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Old\RTC.cs" />
     <Compile Include="Old\Screen\Text.cs" />
@@ -59,6 +63,8 @@
     <Compile Include="Old\Storage\ATA.cs" />
     <Compile Include="Old\Storage\ATAOld.cs" />
     <Compile Include="Old\Storage\Storage.cs" />
+    <Compile Include="Bus\USBBus.cs" />
+    <Compile Include="SerialDevice.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Old\ClassDiagram.cd" />
