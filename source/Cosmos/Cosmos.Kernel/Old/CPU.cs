@@ -13,17 +13,6 @@ namespace Cosmos.Kernel {
 				Console.Write("false");
 			}
 		}
-		public static unsafe void Init() {
-			Hardware.PIC.Init();
-			Hardware.Serial.InitSerial(0);
-			Hardware.DebugUtil.Initialize();
-			Hardware.DebugUtil.SendMessage("Logging", "Initialized!");
-			Hardware.PIT.Initialize(Tick);
-			Kernel.Interrupts.DoTest();
-			Hardware.Storage.ATA.Initialize(Sleep);
-            Hardware.CPU.CreateIDT();
-			Keyboard.Initialize();
-		}
 
 		public static void PrintTime() {
 			Console.Write("Time: ");
@@ -35,20 +24,6 @@ namespace Cosmos.Kernel {
 			Console.WriteLine("");
 		}
 
-		public static uint TickCount {
-			get;
-			private set;
-		}
-		private static void Tick(object aSender, EventArgs aEventArgs) {
-			TickCount += 1;
-		}
 
-		public static void Sleep(uint aMSec) {
-			uint xStart = TickCount;
-			uint xEnd = xStart + aMSec;
-			while (TickCount < xEnd) {
-				;
-			}
-		}
 	}
 }

@@ -9,7 +9,8 @@ namespace Cosmos.Kernel.FileSystem {
 		}
 
 		public static unsafe void TestNewATA() {
-			Hardware.Storage.ATA.Initialize(CPU.Sleep);
+            throw new Exception("M - Probably move this.. .Sleep is now in  Hardware...");
+			//Hardware.Storage.ATA.Initialize(CPU.Sleep);
 			Hardware.Storage.ATA xDrive = new Cosmos.Hardware.Storage.ATA(0, 0);
 			Ext2 xExt2 = new Ext2(xDrive);
 			if (xExt2.Initialize()) {
@@ -57,7 +58,8 @@ namespace Cosmos.Kernel.FileSystem {
 		}
 
 		public static unsafe void TestATA() {
-			Hardware.Storage.ATA.Initialize(CPU.Sleep);
+            throw new Exception("M - Probably move this.. .Sleep is now in  Hardware...");
+            //Hardware.Storage.ATA.Initialize(CPU.Sleep);
 			Hardware.Storage.ATA xDrive = new Cosmos.Hardware.Storage.ATA(0, 0);
 			byte* xBuffer = (byte*)Heap.MemAlloc(512);
 			if (xDrive.ReadBlock(1, xBuffer)) {
