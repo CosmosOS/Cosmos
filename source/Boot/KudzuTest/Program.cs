@@ -29,11 +29,14 @@ namespace KudzuTest {
             Cosmos.Kernel.Boot.Default();
             Console.WriteLine("Boot complete");
 
-            Console.WriteLine("String test");
-            Console.WriteLine(StringTest());
+            // Matthijs - uncomment these tests to show the errors
+            // I described to you.
+            //Console.WriteLine("String test");
+            //Console.WriteLine(StringTest());
+            //Console.WriteLine("StringBuilder test");
+            //Console.WriteLine(StringBuilderTest());
 
-            Console.WriteLine("StringBuilder test");
-            Console.WriteLine(StringBuilderTest());
+            Cosmos.Kernel.Temp.Kudzu.PCI.Test();
 
             Console.WriteLine("Shell complete");
             while (true)
