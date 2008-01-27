@@ -9,6 +9,7 @@ namespace Cosmos.Hardware.PC.Bus {
         protected const ushort ConfigData = 0xCFC;
 
         static public void Init() {
+            UInt32 xValue = Read32(0, 0, 0, 0);
         }
 
         static public UInt32 Read32(byte aBus, byte aSlot

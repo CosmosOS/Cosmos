@@ -49,12 +49,14 @@
   <ItemGroup>
     <Compile Include="Assemblers\GetAmountOfRAM.cs" />
     <Compile Include="Assemblers\GetEndOfKernel.cs" />
-    <Compile Include="Assemblers\IOReadWord.cs" />
-    <Compile Include="Assemblers\IOWriteWord.cs" />
+    <Compile Include="Assemblers\IORead16.cs" />
+    <Compile Include="Assemblers\IORead32.cs" />
+    <Compile Include="Assemblers\IOWrite16.cs" />
     <Compile Include="Assemblers\CreateGDT.cs" />
     <Compile Include="Assemblers\CreateIDT.cs" />
-    <Compile Include="Assemblers\IOReadByte.cs" />
-    <Compile Include="Assemblers\IOWriteByte.cs" />
+    <Compile Include="Assemblers\IORead8.cs" />
+    <Compile Include="Assemblers\IOWrite32.cs" />
+    <Compile Include="Assemblers\IOWrite8.cs" />
     <Compile Include="Assemblers\ZeroFill.cs" />
     <Compile Include="CultureInfo.cs" />
     <Compile Include="Hardware\PC\Bus\CPUBus.cs" />

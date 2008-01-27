@@ -49,6 +49,7 @@
     <Compile Include="Cli.cs" />
     <Compile Include="Break.cs" />
     <Compile Include="InByte.cs" />
+    <Compile Include="InDWord.cs" />
     <Compile Include="InWord.cs" />
     <Compile Include="Out.cs" />
     <Compile Include="Sti.cs" />
