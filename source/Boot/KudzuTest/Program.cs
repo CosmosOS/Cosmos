@@ -16,6 +16,9 @@ namespace CosmosBoot {
 		public static void Init() {
             Cosmos.Kernel.Boot.Default();
             Console.WriteLine("Boot complete");
+
+
+
             Console.WriteLine("Shell complete");
             while (true)
 				;

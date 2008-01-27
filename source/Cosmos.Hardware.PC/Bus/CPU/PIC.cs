@@ -16,31 +16,31 @@ namespace Cosmos.Hardware.PC.Bus.CPU {
         const ushort DataPort2 = 0xA1;
 
         public static void SignalPrimary() {
-			PC.Bus.CPUBus.WriteByte(CmdPort1, 0x20);
+			PC.Bus.CPUBus.Write8(CmdPort1, 0x20);
         }
 
         public static void SignalSecondary() {
-            PC.Bus.CPUBus.WriteByte(CmdPort2, 0x20);
-            PC.Bus.CPUBus.WriteByte(CmdPort1, 0x20);
+            PC.Bus.CPUBus.Write8(CmdPort2, 0x20);
+            PC.Bus.CPUBus.Write8(CmdPort1, 0x20);
         }
 
         public static void Init() {
             // Init
-            PC.Bus.CPUBus.WriteByte(CmdPort1, 0x11);
-            PC.Bus.CPUBus.WriteByte(CmdPort2, 0x11);
+            PC.Bus.CPUBus.Write8(CmdPort1, 0x11);
+            PC.Bus.CPUBus.Write8(CmdPort2, 0x11);
             // Offsets
-            PC.Bus.CPUBus.WriteByte(DataPort1, 0x20);
-            PC.Bus.CPUBus.WriteByte(DataPort2, 0x28);
+            PC.Bus.CPUBus.Write8(DataPort1, 0x20);
+            PC.Bus.CPUBus.Write8(DataPort2, 0x28);
             // More Init
-            PC.Bus.CPUBus.WriteByte(DataPort1, 0x04);
-            PC.Bus.CPUBus.WriteByte(DataPort2, 0x02);
+            PC.Bus.CPUBus.Write8(DataPort1, 0x04);
+            PC.Bus.CPUBus.Write8(DataPort2, 0x02);
             // 8086 mode
-            PC.Bus.CPUBus.WriteByte(DataPort1, 0x01);
-            PC.Bus.CPUBus.WriteByte(DataPort2, 0x01);
+            PC.Bus.CPUBus.Write8(DataPort1, 0x01);
+            PC.Bus.CPUBus.Write8(DataPort2, 0x01);
             // Masks - 0 = receive all IRQ's
 			// MTW, to disable PIT, send 0x1 to DataPort1
-            PC.Bus.CPUBus.WriteByte(DataPort1, 0x00);
-            PC.Bus.CPUBus.WriteByte(DataPort2, 0x00);
+            PC.Bus.CPUBus.Write8(DataPort1, 0x00);
+            PC.Bus.CPUBus.Write8(DataPort2, 0x00);
 		}
     }
 }

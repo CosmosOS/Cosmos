@@ -132,7 +132,7 @@ namespace Cosmos.Hardware.PC {
 
         // This is to trick IL2CPU to compile it in
         //TODO: Make a new attribute that IL2CPU sees when scanning to force inclusion so we dont have to do this.
-        public static void IncludeAllHandlers() {
+        public static void Init() {
             bool xTest = false;
             if (xTest) {
                 unsafe {

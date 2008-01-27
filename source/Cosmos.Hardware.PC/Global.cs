@@ -8,20 +8,24 @@ namespace Cosmos.Hardware.PC {
     public class Global : Cosmos.Hardware.Global {
         public static void Init() {
             mProcessor = new Processor();
-            HW.Device.Add(new Bus.CPU.Keyboard());
-            //All old.. need to port
-            Bus.CPU.PIC.Init();
+            Bus.CPU.PIC.Init(); 
+
+            //All old.. need to port ----------------
             HW.Serial.InitSerial(0);
             HW.DebugUtil.Initialize();
             HW.DebugUtil.SendMessage("Logging", "Initialized!");
             HW.PIT.Initialize(Tick);
 
+            // Partially new
             //HW.Interrupts.IRQ01 += new Interrupts.InterruptDelegate(Cosmos.Hardware.Keyboard.HandleKeyboardInterrupt);
-            Interrupts.IncludeAllHandlers();
+            Interrupts.Init();
+            // end partially new
             
             HW.Storage.ATA.Initialize(Sleep);
             HW.CPU.CreateIDT();
-            // end old
+            // end old -----------------
+
+            HW.Device.Add(new Bus.CPU.Keyboard());
         }
 
         public static uint TickCount {

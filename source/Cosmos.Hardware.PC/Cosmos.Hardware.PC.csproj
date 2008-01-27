@@ -55,6 +55,7 @@
     <Compile Include="Bus\CPUBus.cs" />
     <Compile Include="Bus\CPU\Keyboard.cs" />
     <Compile Include="Bus\CPU\PIC.cs" />
+    <Compile Include="Bus\PCIBus.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Interrupts.cs" />
     <Compile Include="Processor.cs" />
