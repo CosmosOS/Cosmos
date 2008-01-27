@@ -1,7 +1,7 @@
 ﻿using System;
 using Cosmos.Build.Windows;
 
-namespace CosmosBoot {
+namespace KudzuTest {
 	class Program {
 		#region Cosmos Builder logic
 		// Most users wont touch this. This will call the Cosmos Build tool
@@ -12,12 +12,28 @@ namespace CosmosBoot {
 		}
 		#endregion
 
+        static protected string StringTest() {
+            string x = "Hello";
+            x = x + " world.";
+            return x;
+        }
+
+        static protected string StringBuilderTest() {
+            var xSB = new System.Text.StringBuilder("Hello");
+            xSB.Append(" world.");
+            return xSB.ToString();
+        }
+
 		// Main entry point of the kernel
 		public static void Init() {
             Cosmos.Kernel.Boot.Default();
             Console.WriteLine("Boot complete");
 
+            Console.WriteLine("String test");
+            Console.WriteLine(StringTest());
 
+            Console.WriteLine("StringBuilder test");
+            Console.WriteLine(StringBuilderTest());
 
             Console.WriteLine("Shell complete");
             while (true)
