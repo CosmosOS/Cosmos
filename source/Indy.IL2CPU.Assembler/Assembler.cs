@@ -11,37 +11,18 @@ namespace Indy.IL2CPU.Assembler {
 		//public const string CurrentExceptionDataMember = "__CURRENT_EXCEPTION__";
 		public static Exception CurrentException;
 		public static void PrintException() {
-			Console.BackgroundColor = ConsoleColor.Blue;
-			Console.ForegroundColor = ConsoleColor.White;
-			string xClearLine = new String(' ', Console.WindowWidth);
-			for (int i = 0; i < Console.WindowHeight; i++) {
-				Console.Write("                                                                                ");
-			}
-			//Console.Clear();
-			System.Console.WriteLine("Cosmos Kernel. Copyright 2008 The Cosmos Project.");
-			System.Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+			Console.BackgroundColor = ConsoleColor.DarkRed;
+			Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.Clear();
+
+			Console.WriteLine("Cosmos Kernel. Copyright 2008 The Cosmos Project.");
+			Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 			Console.WriteLine("");
+			Console.WriteLine("An unhandled kernel exception occurred.");
 			Console.WriteLine("");
+            Console.WriteLine(CurrentException.ToString());
 			Console.WriteLine("");
-			Console.WriteLine("");
-			Console.WriteLine("");
-			Console.WriteLine("");
-			Console.WriteLine("BSOD's Rule!");
-			Console.WriteLine("");
-			Console.Write("Unhandled error occurred: ");
-			System.Diagnostics.Debugger.Break();
-			Console.WriteLine(CurrentException.ToString());
-			Console.WriteLine("");
-			Console.WriteLine("");
-			Console.WriteLine("");
-			Console.WriteLine("");
-			Console.WriteLine("");
-			Console.WriteLine("");
-			Console.WriteLine("");
-			Console.WriteLine("");
-			Console.WriteLine("");
-			Console.WriteLine("");
-			Console.WriteLine("");
+			Console.WriteLine("The Cosmos Project would appreciate your feedback about this issue.");
 		}
 
 		private static FieldDefinition mCurrentExceptionRef;

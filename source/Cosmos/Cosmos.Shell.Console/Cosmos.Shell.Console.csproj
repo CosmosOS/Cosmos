@@ -49,6 +49,7 @@
     <Compile Include="Commands\DirCommand.cs" />
     <Compile Include="Commands\EchoCommand.cs" />
     <Compile Include="Commands\ExitCommand.cs" />
+    <Compile Include="Commands\FailCommand.cs" />
     <Compile Include="Commands\GuessCommand.cs" />
     <Compile Include="Commands\HelpCommand.cs" />
     <Compile Include="Commands\MatthijsCommand.cs" />
@@ -69,6 +70,10 @@
     <ProjectReference Include="..\..\Cosmos.Build.Windows\Cosmos.Build.Windows.csproj">
       <Project>{EF1F8912-AE8D-40B3-9857-5A2852986710}</Project>
       <Name>Cosmos.Build.Windows</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Cosmos.Hardware.PC\Cosmos.Hardware.PC.csproj">
+      <Project>{B024FADF-EF04-4602-A0F4-49016D68B2AF}</Project>
+      <Name>Cosmos.Hardware.PC</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos.Hardware\Cosmos.Hardware.csproj">
       <Project>{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}</Project>

@@ -82,7 +82,7 @@
     <Compile Include="Old\Staging\DefaultStageQueue.cs" />
     <Compile Include="Old\Staging\IStage.cs" />
     <Compile Include="Old\Staging\StageQueue.cs" />
-    <Compile Include="Old\Staging\Stages\TestStage.cs" />
+    <Compile Include="Old\Staging\Stages\KernelStage.cs" />
     <Compile Include="StringFuncs.cs" />
     <Compile Include="Temp\Kudzu\PCI.cs" />
   </ItemGroup>

@@ -10,7 +10,7 @@ namespace Cosmos.Hardware.Screen {
 		private static byte Color = 7;
 
 		public static unsafe void Clear() {
-			for (int i = 0; i < Columns * Lines; i++) {
+			for (int i = 0; i < Columns * (Lines + 1); i++) {
 				byte* xScreenPtr = (byte*)VideoAddr;
 				xScreenPtr += i*2;
 				*xScreenPtr = 0;
