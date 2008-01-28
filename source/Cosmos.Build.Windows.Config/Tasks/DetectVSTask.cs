@@ -15,24 +15,33 @@ namespace Cosmos.Build.Windows.Config.Tasks {
 		}
 
 		public override void Execute() {
-
-            bool bit64 = IntPtr.Size == 8;
-            string concat = bit64 ? "\\Wow6432Node" : "";
-
-			var xKey = Registry.LocalMachine.OpenSubKey(@"Software" + concat + @"\Microsoft\VisualStudio\9.0", false);
+			var xKey = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\VisualStudio\9.0", false);
 			var xVSPath = xKey == null ? "" : xKey.GetValue("InstallDir") as string;
-            xKey = Registry.CurrentUser.OpenSubKey(@"Software" + concat + @"\Microsoft\VisualStudio\9.0", false);
+			xKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\VisualStudio\9.0", false);
 			var xVSTemplatePath = xKey == null ? "" : String.IsNullOrEmpty(xKey.GetValue("UserProjectTemplatesLocation") as string) ? String.Empty : Path.Combine((string)xKey.GetValue("UserProjectTemplatesLocation"), "Visual C#");
 			bool xFullVSInstalled = !(String.IsNullOrEmpty(xVSPath) || string.IsNullOrEmpty(xVSTemplatePath));
+			if (!xFullVSInstalled) {
+				xKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Wow6432Node\Microsoft\VisualStudio\9.0", false);
+				xVSPath = xKey == null ? "" : xKey.GetValue("InstallDir") as string;
+				xKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\VisualStudio\9.0", false);
+				xVSTemplatePath = xKey == null ? "" : String.IsNullOrEmpty(xKey.GetValue("UserProjectTemplatesLocation") as string) ? String.Empty : Path.Combine((string)xKey.GetValue("UserProjectTemplatesLocation"), "Visual C#");
+				xFullVSInstalled = !(String.IsNullOrEmpty(xVSPath) || string.IsNullOrEmpty(xVSTemplatePath));
+			}
 			if (xFullVSInstalled) {
 				xFullVSInstalled &= File.Exists(Path.Combine(xVSPath, "devenv.exe"));
 			}
-
-            xKey = Registry.LocalMachine.OpenSubKey(@"Software" + concat + @"\Microsoft\VCSExpress\9.0", false);
+			xKey = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\VCSExpress\9.0", false);
 			var xVCSPath = xKey == null ? "" : (string)xKey.GetValue("InstallDir");
-			var xVCSTemplatePath = xKey == null ? "" : String.IsNullOrEmpty(xKey.GetValue("UserProjectTemplatesLocation") as string) ? String.Empty : Path.Combine((string)xKey.GetValue("UserProjectTemplatesLocation"), "Visual C#");
-
+            var xVCSTemplatePath = xKey == null ? "" : String.IsNullOrEmpty(xKey.GetValue("UserProjectTemplatesLocation") as string) ? String.Empty : Path.Combine((string)xKey.GetValue("UserProjectTemplatesLocation"), "Visual C#");
 			bool xVCSExpressInstalled = !(String.IsNullOrEmpty(xVCSPath) || string.IsNullOrEmpty(xVCSTemplatePath));
+
+			if (!xVCSExpressInstalled) {
+				xKey = Registry.LocalMachine.OpenSubKey(@"Software\Wow6432Node\Microsoft\VCSExpress\9.0", false);
+				xVCSPath = xKey == null ? "" : (string)xKey.GetValue("InstallDir");
+                xKey = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\VCSExpress\9.0", false);
+                xVCSTemplatePath = xKey == null ? "" : String.IsNullOrEmpty(xKey.GetValue("UserProjectTemplatesLocation") as string) ? String.Empty : Path.Combine((string)xKey.GetValue("UserProjectTemplatesLocation"), "Visual C#");
+				xVCSExpressInstalled = !(String.IsNullOrEmpty(xVCSPath) || string.IsNullOrEmpty(xVCSTemplatePath));
+			}
 			if (xVCSExpressInstalled) {
 				xVCSExpressInstalled = File.Exists(Path.Combine(xVCSPath, "vcsexpress.exe"));
 			}
