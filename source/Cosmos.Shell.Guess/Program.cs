@@ -24,9 +24,9 @@ namespace Cosmos.Shell.Guess {
             stages.Run();
 
             Random mt = new Random();
-            short num = mt.Next();
+            int num = mt.Next();
 
-            System.Console.WriteLine("I am thinking of a number between 0 and 255. What is it?");
+            System.Console.WriteLine("I am thinking of a number between 0 and 100. What is it?");
             System.Console.ForegroundColor = ConsoleColor.Blue;
             System.Console.Write("Take a guess: ");
             System.Console.ForegroundColor = ConsoleColor.White;
