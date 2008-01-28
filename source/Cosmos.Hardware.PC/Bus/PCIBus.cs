@@ -15,7 +15,8 @@ namespace Cosmos.Hardware.PC.Bus {
                         UInt32 xValue = Read32(xBus, xSlot, xFunction, 0);
                         UInt32 xVendorID = xValue & 0xFFFF;
                         if (xVendorID != 0xFFFF) {
-                            Console.WriteLine("PCI Device found");
+                            Console.Write("PCI: Vendor ");
+                            Console.WriteLine(xVendorID.ToString());
                         }
                     }
                 }
