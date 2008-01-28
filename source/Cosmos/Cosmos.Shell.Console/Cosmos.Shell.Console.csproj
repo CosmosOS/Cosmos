@@ -51,6 +51,7 @@
     <Compile Include="Commands\ExitCommand.cs" />
     <Compile Include="Commands\FailCommand.cs" />
     <Compile Include="Commands\HelpCommand.cs" />
+    <Compile Include="Commands\KudzuCommand.cs" />
     <Compile Include="Commands\MatthijsCommand.cs" />
     <Compile Include="Commands\TestsCommand.cs" />
     <Compile Include="Commands\TypeCommand.cs" />

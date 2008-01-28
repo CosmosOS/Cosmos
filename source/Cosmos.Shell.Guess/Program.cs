@@ -21,18 +21,6 @@ namespace Cosmos.Shell.Guess {
 
             Kernel.Staging.DefaultStageQueue stages = new Cosmos.Kernel.Staging.DefaultStageQueue();
             
-            System.Console.Clear();
-            System.Console.BackgroundColor = ConsoleColor.Black;
-            System.Console.ForegroundColor = ConsoleColor.Red;
-            System.Console.WriteLine("Cosmos Kernel. Copyright 2007-2008 The Cosmos Project.");
-            System.Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-            System.Console.ForegroundColor = ConsoleColor.Green;
-            System.Console.WriteLine("Now Booting...");
-
-            System.Console.ForegroundColor = ConsoleColor.White;
-            System.Console.WriteLine("Success.");
-            System.Console.WriteLine(Kernel.StringFuncs.TimeString());
-
             stages.Run();
 
             Random mt = new Random();
@@ -59,9 +47,6 @@ namespace Cosmos.Shell.Guess {
             }
 
             System.Console.WriteLine("You got it!!!!");
-
-
-            System.Console.WriteLine("Done");
 
             stages.Teardown();
         }

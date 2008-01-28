@@ -12,7 +12,7 @@ namespace Cosmos.Shell.Console.Commands {
 
 		public override string Summary {
 			get {
-				return "Executes tests Matthijs is working on. DO NOT EXECUTE WITHOUT INVESTIGATING WHAT IT DOES!!";
+				return "Executes tests Matthijs is working on.";
 			}
 		}
 
