@@ -106,26 +106,38 @@ namespace Cosmos.Hardware.PC {
         }
 
         public static unsafe void HandleInterrupt_00(InterruptContext* aContext) {
-            HandleException(aContext->EIP, "Divide by zero", "EDivideByZero", aContext->EBP);
+            HandleException(aContext->EIP, "Divide by zero", "EDivideByZero", aContext);
         }
 
         public static unsafe void HandleInterrupt_06(InterruptContext* aContext) {
-            HandleException(aContext->EIP, "Invalid Opcode", "EInvalidOpcode", aContext->EBP);
+            HandleException(aContext->EIP, "Invalid Opcode", "EInvalidOpcode", aContext);
         }
 
         public static unsafe void HandleInterrupt_0D(InterruptContext* aContext) {
-            HandleException(aContext->EIP, "General Protection Fault", "GPF", aContext->EBP);
+            HandleException(aContext->EIP, "General Protection Fault", "GPF", aContext);
         }
 
-        private static void HandleException(uint aEIP, string aDescription, string aName, uint aEBP) {
+        private static unsafe void HandleException(uint aEIP, string aDescription, string aName, InterruptContext* ctx) {
+            const string SysFault = "System Fault";
+
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.BackgroundColor = ConsoleColor.DarkRed;
+            Console.Write(SysFault);
+            for (int i = 0; i < Console.WindowWidth - SysFault.Length; i++)
+                Console.Write(" ");
+
+            Console.BackgroundColor = ConsoleColor.Black;
+
             Console.Write(aDescription);
             Console.Write(" at ");
             WriteNumber(aEIP, 32);
-            Console.Write(" (EBP = ");
-            Console.Write(aEBP.ToString());
+
+            Console.WriteLine();
+            Console.WriteLine("Register States:");
+            // TODO: Register states
+
             DebugUtil.SendMessage("Exceptions", aName);
             Console.WriteLine();
-            Console.WriteLine("--System Halted!");
             while (true)
                 ;
         }
