@@ -50,14 +50,12 @@
     <Compile Include="Commands\EchoCommand.cs" />
     <Compile Include="Commands\ExitCommand.cs" />
     <Compile Include="Commands\FailCommand.cs" />
-    <Compile Include="Commands\GuessCommand.cs" />
     <Compile Include="Commands\HelpCommand.cs" />
     <Compile Include="Commands\MatthijsCommand.cs" />
     <Compile Include="Commands\TestsCommand.cs" />
     <Compile Include="Commands\TypeCommand.cs" />
     <Compile Include="Commands\CommandBase.cs" />
     <Compile Include="Commands\VersionCommand.cs" />
-    <Compile Include="MT.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Prompter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
