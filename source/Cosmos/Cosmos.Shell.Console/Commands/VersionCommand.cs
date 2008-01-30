@@ -42,6 +42,7 @@ namespace Cosmos.Shell.Console.Commands
             System.Console.WriteLine("Chad Z. Hower");
             System.Console.WriteLine("Matthijs ter Woord");
             System.Console.WriteLine("Jonathan Dickinson");
+            System.Console.WriteLine("Scott Balmos");
             System.Console.WriteLine();
         }
 
