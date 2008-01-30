@@ -11,10 +11,10 @@ namespace GdpClientTester
         static void Main(string[] args)
         {
             GdbConnection connection = new GdbConnection();
-            GdbController controller = new GdbController(connection);
+            GdbController.Instance = new GdbController(connection);
             try
             {
-                controller.Extended();
+                GdbController.Instance.Extended();
             }
             catch
             {
@@ -26,7 +26,9 @@ namespace GdpClientTester
             Console.WriteLine("Running, press a key to break.");
             Console.ReadLine();
             new BreakCommand().Send();
-            new GetRegistersCommand().Send();
+            Console.WriteLine(new GetRegistersCommand().Send());
+            new ReadMemoryCommand(100, 1025).Send();
+
             Console.WriteLine("Done");
             Console.ReadLine();
         }
