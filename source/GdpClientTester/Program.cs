@@ -13,12 +13,12 @@ namespace GdpClientTester
             GdbController controller = new GdbController(connection);
             try
             {
-                connection.Open();
+                controller.Extended();
             }
             catch
             {
-                Console.WriteLine("GDB is not running");
-                Console.ReadLine();
+                System.Diagnostics.Debug.WriteLine("GDB not running");
+                return;
             }
 
             string s = "";

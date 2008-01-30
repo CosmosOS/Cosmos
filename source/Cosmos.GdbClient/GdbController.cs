@@ -83,6 +83,7 @@ namespace Cosmos.GdbClient
                             _currentPacket.Append(_parserQueue.Dequeue());
                         }
 
+                        // I don't get this.
                         if (_currentPacket.ToString() == "#")
                             _currentPacket = new StringBuilder();
 
@@ -174,6 +175,23 @@ namespace Cosmos.GdbClient
                 if (_sendQueue.Count == 1)
                     SendPacket();
             }
+        }
+
+        /// <summary>
+        /// Opens up extended commands.
+        /// </summary>
+        public void Extended()
+        {
+            Normal();
+            _connection.Send("!");
+        }
+
+        /// <summary>
+        /// Opens up normal commands.
+        /// </summary>
+        public void Normal()
+        {
+            _connection.Open();
         }
     }
 }

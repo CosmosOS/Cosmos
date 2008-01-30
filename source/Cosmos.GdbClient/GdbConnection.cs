@@ -95,9 +95,7 @@ namespace Cosmos.GdbClient
 
         protected void OnDataReceived(char[] data)
         {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(data);
-            Console.ForegroundColor = ConsoleColor.Gray;
+            System.Diagnostics.Debug.WriteLine("<- " + new string(data));
 
             if (DataReceived != null)
                 DataReceived(this, new DataReceivedEventArgs(data));
@@ -107,10 +105,8 @@ namespace Cosmos.GdbClient
         #region Send
         public void Send(string data)
         {
+
             byte[] bytes = Encoding.ASCII.GetBytes(data);
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine(data);
-            Console.ForegroundColor = ConsoleColor.Gray;
 
             lock (_sendBuffer)
                 _sendBuffer.Enqueue(bytes);
@@ -124,6 +120,9 @@ namespace Cosmos.GdbClient
                 if (_sendBuffer.Count == 0)
                     return;
                 byte[] buffer = _sendBuffer.Dequeue();
+
+                System.Diagnostics.Debug.WriteLine("-> " + Encoding.ASCII.GetString(buffer));
+
                 _stream.BeginWrite(buffer, 0, buffer.Length, new AsyncCallback(EndSend), null);
             }
         }
