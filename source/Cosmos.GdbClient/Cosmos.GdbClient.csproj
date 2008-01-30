@@ -47,12 +47,15 @@
     <Compile Include="BasicCommands\BreakpointCommand.cs" />
     <Compile Include="BasicCommands\CommandBase.cs" />
     <Compile Include="BasicCommands\ContinueCommand.cs" />
+    <Compile Include="BasicCommands\GetRegisterCommand.cs" />
     <Compile Include="BasicCommands\GetRegistersCommand.cs" />
     <Compile Include="BasicCommands\ReadMemoryCommand.cs" />
     <Compile Include="GdbConnection.cs" />
     <Compile Include="GdbPacket.cs" />
     <Compile Include="GdbController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StringExt.cs" />
+    <Compile Include="Tools\X86Registers.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

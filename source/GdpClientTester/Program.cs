@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Cosmos.GdbClient;
 using Cosmos.GdbClient.BasicCommands;
+using Cosmos.GdbClient.Tools;
 
 namespace GdpClientTester
 {
@@ -26,8 +27,9 @@ namespace GdpClientTester
             Console.WriteLine("Running, press a key to break.");
             Console.ReadLine();
             new BreakCommand().Send();
-            Console.WriteLine(new GetRegistersCommand().Send());
-            Console.WriteLine(Convert.ToBase64String(new ReadMemoryCommand(100, 20).Send()));
+            X86Registers regs = X86Registers.FromString(new GetRegistersCommand().Send());
+
+            //Console.WriteLine(Convert.ToBase64String(new ReadMemoryCommand(100, 20).Send()));
 
             Console.WriteLine("Done");
             Console.ReadLine();

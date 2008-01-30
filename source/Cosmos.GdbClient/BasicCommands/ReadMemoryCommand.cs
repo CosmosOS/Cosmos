@@ -26,7 +26,7 @@ namespace Cosmos.GdbClient.BasicCommands
 
         void Controller_PacketReceived(object sender, GdbPacketEventArgs e)
         {
-            Controller.PacketReceived += new EventHandler<GdbPacketEventArgs>(Controller_PacketReceived);
+            Controller.PacketReceived -= new EventHandler<GdbPacketEventArgs>(Controller_PacketReceived);
 
             string data = e.Packet.PacketData;
             List<byte> result = new List<byte>();
