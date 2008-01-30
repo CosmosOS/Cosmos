@@ -25,10 +25,7 @@ namespace GdpClientTester
             while (s != "!q")
             {
                 s = Console.ReadLine();
-                if (s.StartsWith("!"))
-                    connection.Send(s.Substring(1));
-                else
-                    controller.Enqueue(new GdbPacket(s));
+                controller.Enqueue(new GdbPacket(s));
             }
         }
     }

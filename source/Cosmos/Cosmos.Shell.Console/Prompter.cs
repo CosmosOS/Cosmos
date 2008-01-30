@@ -24,6 +24,7 @@ namespace Cosmos.Shell.Console {
 
 		public override void Initialize() {
 			_commands = new List<Cosmos.Shell.Console.Commands.CommandBase>();
+            _commands.Add(new Commands.BreakCommand());
 			_commands.Add(new Commands.ClsCommand());
 			_commands.Add(new Commands.DirCommand());
 			_commands.Add(new Commands.EchoCommand());

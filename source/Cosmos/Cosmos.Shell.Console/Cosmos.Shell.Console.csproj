@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\BreakCommand.cs" />
     <Compile Include="Commands\ClsCommand.cs" />
     <Compile Include="Commands\DirCommand.cs" />
     <Compile Include="Commands\EchoCommand.cs" />
