@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Cosmos.GdbClient.BasicCommands
 {
-    public class GetRegistersCommand : CommandBase<string[]>
+    public class GetRegistersCommand : CommandBase<string>
     {
         public GetRegistersCommand() : base(GdbController.Instance) { }
 
@@ -17,7 +17,7 @@ namespace Cosmos.GdbClient.BasicCommands
         void Controller_PacketReceived(object sender, GdbPacketEventArgs e)
         {
             Controller.PacketReceived -= new EventHandler<GdbPacketEventArgs>(Controller_PacketReceived);
-            Done(null);
+            Done(e.Packet.PacketData);
         }
     }
 }

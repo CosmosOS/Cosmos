@@ -15,8 +15,8 @@ namespace Cosmos.GdbClient
         /// </summary>
         public static GdbController Instance
         {
-            get { return GdbConnection._instance; }
-            set { GdbConnection._instance = value; }
+            get { return _instance; }
+            set { _instance = value; }
         }
 
         private GdbConnection _connection;
