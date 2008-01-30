@@ -13,9 +13,11 @@ namespace Cosmos.GdbClient
         private int _port;
 
         private byte[] _receiveBuffer;
-        private Queue<byte[]> _sendBuffer;
+        private Queue<byte[]> _sendBuffer = new Queue<byte[]>();
 
         private Decoder _decoder = Encoding.ASCII.GetDecoder();
+
+        public event EventHandler<DataReceivedEventArgs> DataReceived;
 
         #region Ctor
 
@@ -61,11 +63,11 @@ namespace Cosmos.GdbClient
 
             _client = null;
             _stream = null;
+            _sendBuffer.Clear();
         }
         #endregion
 
         #region Read
-
         private void BeginRead()
         {
             _stream.BeginRead(_receiveBuffer, 0, _receiveBuffer.Length, new AsyncCallback(EndRead), null);
@@ -74,6 +76,8 @@ namespace Cosmos.GdbClient
         private void EndRead(IAsyncResult result)
         {
             int count = _stream.EndRead(result);
+
+            OnDataReceived(GetChars(count));
 
             BeginRead();
         }
@@ -89,12 +93,25 @@ namespace Cosmos.GdbClient
             }
         }
 
+        protected void OnDataReceived(char[] data)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(data);
+            Console.ForegroundColor = ConsoleColor.Gray;
+
+            if (DataReceived != null)
+                DataReceived(this, new DataReceivedEventArgs(data));
+        }
         #endregion
 
         #region Send
         public void Send(string data)
         {
             byte[] bytes = Encoding.ASCII.GetBytes(data);
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine(data);
+            Console.ForegroundColor = ConsoleColor.Gray;
+
             lock (_sendBuffer)
                 _sendBuffer.Enqueue(bytes);
             BeginSend();
@@ -117,5 +134,21 @@ namespace Cosmos.GdbClient
             BeginSend();
         }
         #endregion
+    }
+
+    public class DataReceivedEventArgs : EventArgs
+    {
+        private char[] _data;
+
+        public char[] Data
+        {
+            get { return _data; }
+            set { _data = value; }
+        }
+
+        public DataReceivedEventArgs(char[] data)
+        {
+            _data = data;
+        }
     }
 }

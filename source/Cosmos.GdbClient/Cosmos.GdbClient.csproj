@@ -42,7 +42,7 @@
   <ItemGroup>
     <Compile Include="GdbConnection.cs" />
     <Compile Include="GdbPacket.cs" />
-    <Compile Include="GdpController.cs" />
+    <Compile Include="GdbController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

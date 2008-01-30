@@ -98,13 +98,13 @@ namespace Cosmos.GdbClient
         }
     }
 
-    public class GdpPacketEventArgs : EventArgs
+    public class GdbPacketEventArgs : EventArgs
     {
         public GdbPacket Packet { get; set; }
 
-        public GdpPacketEventArgs() { }
+        public GdbPacketEventArgs() { }
 
-        public GdpPacketEventArgs(GdbPacket packet)
+        public GdbPacketEventArgs(GdbPacket packet)
         {
             Packet = packet;
         }
