@@ -27,7 +27,7 @@ namespace GdpClientTester
             Console.ReadLine();
             new BreakCommand().Send();
             Console.WriteLine(new GetRegistersCommand().Send());
-            new ReadMemoryCommand(100, 1025).Send();
+            Console.WriteLine(Convert.ToBase64String(new ReadMemoryCommand(100, 20).Send()));
 
             Console.WriteLine("Done");
             Console.ReadLine();

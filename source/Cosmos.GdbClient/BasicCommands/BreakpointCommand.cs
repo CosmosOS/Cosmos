@@ -23,7 +23,7 @@ namespace Cosmos.GdbClient.BasicCommands
 
             string cmd = "B";
             cmd += Address.ToString("x");
-            cmd += "," + Set ? "S" : "C";
+            cmd += "," + (Set ? "S" : "C");
         }
 
         void Controller_AcknowledgementReceived(object sender, EventArgs e)
