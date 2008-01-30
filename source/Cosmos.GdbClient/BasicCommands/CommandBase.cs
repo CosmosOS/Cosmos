@@ -29,7 +29,7 @@ namespace Cosmos.GdbClient.BasicCommands
 
         }
 
-        public T BeginSync()
+        public T Send()
         {
             _done.Reset();
             Execute();

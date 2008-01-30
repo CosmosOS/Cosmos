@@ -23,7 +23,7 @@ namespace GdpClientTester
             }
 
             ContinueCommand cmd = new ContinueCommand(controller);
-            cmd.BeginSync();
+            cmd.Send();
             Console.WriteLine("Done");
         }
     }
