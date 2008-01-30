@@ -39,6 +39,11 @@ namespace Cosmos.GdbClient
         public event EventHandler<GdbPacketEventArgs> PacketReceived;
 
         /// <summary>
+        /// When an acknowledgement is received.
+        /// </summary>
+        public event EventHandler AcknowledgementReceived;
+
+        /// <summary>
         /// Creates a new instance of the <see cref="GdbController"/> class.
         /// </summary>
         /// <param name="connection"></param>
@@ -129,6 +134,12 @@ namespace Cosmos.GdbClient
                 PacketReceived(this, new GdbPacketEventArgs(packet));
         }
 
+        private void OnAcknowledgementReceived()
+        {
+            if (this.AcknowledgementReceived != null)
+                AcknowledgementReceived(this, EventArgs.Empty);
+        }
+
         private void SendFail()
         {
             _connection.Send("-");
@@ -144,6 +155,7 @@ namespace Cosmos.GdbClient
         /// </summary>
         private void GotAcknowledge()
         {
+            OnAcknowledgementReceived();
             lock (_sendQueue)
             {
                 if (_sendQueue.Count != 0)

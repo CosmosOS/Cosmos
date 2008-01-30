@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Cosmos.GdbClient;
+using Cosmos.GdbClient.BasicCommands;
 
 namespace GdpClientTester
 {
@@ -21,12 +22,9 @@ namespace GdpClientTester
                 return;
             }
 
-            string s = "";
-            while (s != "!q")
-            {
-                s = Console.ReadLine();
-                controller.Enqueue(new GdbPacket(s));
-            }
+            ContinueCommand cmd = new ContinueCommand(controller);
+            cmd.BeginSync();
+            Console.WriteLine("Done");
         }
     }
 }
