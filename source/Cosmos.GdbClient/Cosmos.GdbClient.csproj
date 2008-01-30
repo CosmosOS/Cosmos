@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Cosmos.GdbClient</RootNamespace>
     <AssemblyName>Cosmos.GdbClient</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
@@ -36,6 +36,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -44,6 +47,7 @@
     <Compile Include="BasicCommands\CommandBase.cs" />
     <Compile Include="BasicCommands\ContinueCommand.cs" />
     <Compile Include="BasicCommands\GetRegistersCommand.cs" />
+    <Compile Include="BasicCommands\ReadMemoryCommand.cs" />
     <Compile Include="GdbConnection.cs" />
     <Compile Include="GdbPacket.cs" />
     <Compile Include="GdbController.cs" />
