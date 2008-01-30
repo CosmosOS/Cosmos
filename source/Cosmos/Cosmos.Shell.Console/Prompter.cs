@@ -32,7 +32,7 @@ namespace Cosmos.Shell.Console {
             _commands.Add(new Commands.FailCommand());
 			_commands.Add(new Commands.HelpCommand(_commands));
             //_commands.Add(new Commands.KudzuCommand());
-			_commands.Add(new Commands.TestsCommand());
+			//_commands.Add(new Commands.TestsCommand());
 			_commands.Add(new Commands.TypeCommand());
 			_commands.Add(new Commands.VersionCommand());
 			//_commands.Add(new Commands.MatthijsCommand());
