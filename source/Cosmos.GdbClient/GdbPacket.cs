@@ -59,7 +59,7 @@ namespace Cosmos.GdbClient
             }
 
             int modulo1 = ModuloChecksum(parts1[0]);
-            int modulo2 = int.Parse(parts1[2], System.Globalization.NumberStyles.HexNumber);
+            //int modulo2 = int.Parse(parts1[2], System.Globalization.NumberStyles.HexNumber);
 
             //TODO: Don't know if I got this right.
             //if (modulo1 != modulo2)
