@@ -40,8 +40,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BasicCommands\BreakCommand.cs" />
     <Compile Include="BasicCommands\CommandBase.cs" />
     <Compile Include="BasicCommands\ContinueCommand.cs" />
+    <Compile Include="BasicCommands\GetRegistersCommand.cs" />
     <Compile Include="GdbConnection.cs" />
     <Compile Include="GdbPacket.cs" />
     <Compile Include="GdbController.cs" />

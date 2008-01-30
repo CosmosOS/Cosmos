@@ -52,11 +52,11 @@ namespace Cosmos.GdbClient
             GdbPacket result = new GdbPacket();
             result.PacketData = parts1[0];
 
-            if (parts2.Length != 1)
+            /*if (parts2.Length != 1)
             {
-                result.SequenceId = parts2[0];
+                //result.SequenceId = parts2[0];
                 result.PacketData = parts2[1];
-            }
+            }*/
 
             int modulo1 = ModuloChecksum(parts1[0]);
             int modulo2 = int.Parse(parts1[1], System.Globalization.NumberStyles.HexNumber);

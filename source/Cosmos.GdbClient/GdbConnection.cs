@@ -7,6 +7,7 @@ namespace Cosmos.GdbClient
 {
     public class GdbConnection
     {
+
         private TcpClient _client;
         private NetworkStream _stream;
         private string _host;

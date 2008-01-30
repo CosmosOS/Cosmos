@@ -22,9 +22,13 @@ namespace GdpClientTester
                 return;
             }
 
-            ContinueCommand cmd = new ContinueCommand(controller);
-            cmd.Send();
+            new ContinueCommand().Send();
+            Console.WriteLine("Running, press a key to break.");
+            Console.ReadLine();
+            new BreakCommand().Send();
+            new GetRegistersCommand().Send();
             Console.WriteLine("Done");
+            Console.ReadLine();
         }
     }
 }

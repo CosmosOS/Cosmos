@@ -9,14 +9,17 @@ namespace Cosmos.GdbClient
     /// </summary>
     public class GdbController
     {
-        private GdbConnection _connection;
+        private static GdbController _instance;
         /// <summary>
-        /// Gets the connection.
+        /// Gets or sets the default GdbConnection instance.
         /// </summary>
-        public GdbConnection Connection
+        public static GdbController Instance
         {
-            get { return _connection; }
+            get { return GdbConnection._instance; }
+            set { GdbConnection._instance = value; }
         }
+
+        private GdbConnection _connection;
 
         /// <summary>
         /// The parser queue.
@@ -155,13 +158,13 @@ namespace Cosmos.GdbClient
         /// </summary>
         private void GotAcknowledge()
         {
-            OnAcknowledgementReceived();
             lock (_sendQueue)
             {
                 if (_sendQueue.Count != 0)
                     _sendQueue.Dequeue();
                 SendPacket();
             }
+            OnAcknowledgementReceived();
         }
 
         /// <summary>
@@ -204,6 +207,11 @@ namespace Cosmos.GdbClient
         public void Normal()
         {
             _connection.Open();
+        }
+
+        public void Close()
+        {
+            _connection.Close();
         }
     }
 }
