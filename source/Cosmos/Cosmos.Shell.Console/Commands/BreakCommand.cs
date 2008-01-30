@@ -24,7 +24,7 @@ namespace Cosmos.Shell.Console.Commands
 
         public override void Help()
         {
-            System.Console.WriteLine(Name):
+            System.Console.WriteLine(Name);
             System.Console.Write(" "); System.Console.WriteLine(Summary);
         }
     }
