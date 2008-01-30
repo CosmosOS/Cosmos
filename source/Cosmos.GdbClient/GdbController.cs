@@ -133,6 +133,9 @@ namespace Cosmos.GdbClient
 
         private void OnPacketReceived(GdbPacket packet)
         {
+            if (packet.PacketData.StartsWith("S"))
+                return;
+
             if (this.PacketReceived != null)
                 PacketReceived(this, new GdbPacketEventArgs(packet));
         }

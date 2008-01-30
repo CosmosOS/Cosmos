@@ -96,7 +96,7 @@ namespace Cosmos.GdbClient
 
         protected void OnDataReceived(char[] data)
         {
-            System.Diagnostics.Debug.WriteLine("<- " + new string(data));
+            //System.Diagnostics.Debug.WriteLine("<- " + new string(data));
 
             if (DataReceived != null)
                 DataReceived(this, new DataReceivedEventArgs(data));
@@ -122,7 +122,7 @@ namespace Cosmos.GdbClient
                     return;
                 byte[] buffer = _sendBuffer.Dequeue();
 
-                System.Diagnostics.Debug.WriteLine("-> " + Encoding.ASCII.GetString(buffer));
+                //System.Diagnostics.Debug.WriteLine("-> " + Encoding.ASCII.GetString(buffer));
 
                 _stream.BeginWrite(buffer, 0, buffer.Length, new AsyncCallback(EndSend), null);
             }

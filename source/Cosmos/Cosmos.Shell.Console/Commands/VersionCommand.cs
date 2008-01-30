@@ -20,14 +20,16 @@ namespace Cosmos.Shell.Console.Commands
 
         public override void Execute(string param)
         {
-            if (param == "" || param == "ver")
+            if (param.CompareTo("") == 0 || param.CompareTo("ver") == 0)
             {
                 DisplayVersion();
             }
-            else if (param == "dev")
+            else if (param.CompareTo("dev") == 0)
             {
                 DisplayDevelopers();
             }
+            else
+                Help();
         }
 
         private void DisplayDevelopers()

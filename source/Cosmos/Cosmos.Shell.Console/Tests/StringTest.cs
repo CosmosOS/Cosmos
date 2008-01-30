@@ -29,6 +29,7 @@ namespace Cosmos.Shell.Console.Tests
             Assert("0123456789"[5] == '5', "\"0123456789\"[5] == '5'");
             Assert("a" != "b", "\"a\" != \"b\"");
             Assert('a'.ToString() == "a", "'a'.ToString() == \"a\"");
+            Assert("abc" == "abc", "\"abc\" == \"abc\"");
 
             Assert(("a" + "b") == "ab", "\"a\" + \"b\" == \"a\" + \"b\"");
             StringBuilder builder = new StringBuilder("a");
