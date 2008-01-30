@@ -58,7 +58,12 @@ namespace Cosmos.GdbClient
                 result.PacketData = parts2[1];
             }
 
-            // Todo: Checksum
+            int modulo1 = ModuloChecksum(parts1[0]);
+            int modulo2 = int.Parse(parts1[2], System.Globalization.NumberStyles.HexNumber);
+
+            //TODO: Don't know if I got this right.
+            //if (modulo1 != modulo2)
+            //    throw new InvalidCastException();
 
             return result;
         }
