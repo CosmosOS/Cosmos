@@ -20,7 +20,7 @@ namespace Cosmos.GdbClient.Tools
 
         public static X86Registers FromString(string hex)
         {
-            string[] registers = SplitCount(hex, 64);
+            string[] registers = hex.SplitCount(16, 16, 16, 16, 16, 16, 16, 16, 16, 16);
 
             X86Registers result = new X86Registers();
             result._registers = new byte[registers.Length][];
@@ -31,14 +31,6 @@ namespace Cosmos.GdbClient.Tools
             }
 
             return result;
-        }
-
-        private static string[] SplitCount(string source, int count)
-        {
-            List<string> result = new List<string>();
-            for (int i = 0; i < source.Length; i += count)
-                result.Add(source.Substring(i, count));
-            return result.ToArray();
         }
     }
 }

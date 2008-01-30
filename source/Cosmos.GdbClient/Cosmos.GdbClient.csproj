@@ -50,6 +50,7 @@
     <Compile Include="BasicCommands\GetRegisterCommand.cs" />
     <Compile Include="BasicCommands\GetRegistersCommand.cs" />
     <Compile Include="BasicCommands\ReadMemoryCommand.cs" />
+    <Compile Include="BasicCommands\StepCommand.cs" />
     <Compile Include="GdbConnection.cs" />
     <Compile Include="GdbPacket.cs" />
     <Compile Include="GdbController.cs" />

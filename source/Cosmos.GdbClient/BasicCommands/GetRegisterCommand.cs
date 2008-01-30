@@ -7,9 +7,9 @@ namespace Cosmos.GdbClient.BasicCommands
 {
     public class GetRegisterCommand : CommandBase<string>
     {
-        public int Index { get; set; }
+        public byte Index { get; set; }
 
-        public GetRegisterCommand(int index)
+        public GetRegisterCommand(byte index)
             : base(GdbController.Instance)
         {
             Index = index;
@@ -18,7 +18,7 @@ namespace Cosmos.GdbClient.BasicCommands
         protected override void Execute()
         {
             Controller.PacketReceived += new EventHandler<GdbPacketEventArgs>(Controller_PacketReceived);
-            Controller.Enqueue(new GdbPacket("p" + Index.ToString("x")));
+            Controller.Enqueue(new GdbPacket("p0" + Index.ToString("x")));
         }
 
         void Controller_PacketReceived(object sender, GdbPacketEventArgs e)

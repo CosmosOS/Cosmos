@@ -24,12 +24,14 @@ namespace GdpClientTester
             }
 
             new ContinueCommand().Send();
-            Console.WriteLine("Running, press a key to break.");
+            Console.WriteLine("Running, press a key to trace.");
             Console.ReadLine();
             new BreakCommand().Send();
-            X86Registers regs = X86Registers.FromString(new GetRegistersCommand().Send());
 
-            //Console.WriteLine(Convert.ToBase64String(new ReadMemoryCommand(100, 20).Send()));
+            while (true)
+            {
+                
+            }
 
             Console.WriteLine("Done");
             Console.ReadLine();
