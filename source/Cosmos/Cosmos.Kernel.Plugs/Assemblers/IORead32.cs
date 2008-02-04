@@ -13,9 +13,6 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
             //TODO: This is a lot of work to read a port. We need to have some kind of inline ASM option that can emit a single out instruction
             //TODO: Also make an attribute that forces normal inlining fo a method
             new CPUx86.Move(Registers.EDX, "[ebp + 0x08]");
-            //TODO: Do we need to clear rest of EAX first?
-            //    MTW: technically not, as in other places, it _should_ be working with AL too..
-            new CPUx86.Move("eax", "0");
             new CPUNative.InDWord(Registers.EAX, Registers.DX);
             new CPUx86.Push(Registers.EAX);
         }
