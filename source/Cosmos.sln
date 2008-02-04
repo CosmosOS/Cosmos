@@ -73,9 +73,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test Kernels", "Test Kernel
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Demo Kernels", "Demo Kernels", "{6F91B8C3-1A78-49D7-B915-F13EDFDAFDB3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatthijsTest", "MatthijsTest\MatthijsTest.csproj", "{605F8D53-66FA-4BEC-844E-F63209B855C9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoitoiusTest", "MoitoiusTest\MoitoiusTest.csproj", "{B69B89D4-54FC-41DF-B5D7-EE674CF60343}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JoelBTest", "JoelBTest\JoelBTest.csproj", "{AEC28E7E-1ABB-4ABC-8CE1-B74D9DC9B80E}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 29
+		SccNumberOfProjects = 32
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -191,6 +197,18 @@ Global
 		SccProjectTopLevelParentUniqueName28 = Cosmos.sln
 		SccProjectName28 = GdpClientTester
 		SccLocalPath28 = GdpClientTester
+		SccProjectUniqueName29 = MatthijsTest\\MatthijsTest.csproj
+		SccProjectTopLevelParentUniqueName29 = Cosmos.sln
+		SccProjectName29 = MatthijsTest
+		SccLocalPath29 = MatthijsTest
+		SccProjectUniqueName30 = MoitoiusTest\\MoitoiusTest.csproj
+		SccProjectTopLevelParentUniqueName30 = Cosmos.sln
+		SccProjectName30 = MoitoiusTest
+		SccLocalPath30 = MoitoiusTest
+		SccProjectUniqueName31 = JoelBTest\\JoelBTest.csproj
+		SccProjectTopLevelParentUniqueName31 = Cosmos.sln
+		SccProjectName31 = JoelBTest
+		SccLocalPath31 = JoelBTest
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -311,6 +329,18 @@ Global
 		{8BF33FB0-243F-47E3-AE52-2C0E01B73200}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8BF33FB0-243F-47E3-AE52-2C0E01B73200}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8BF33FB0-243F-47E3-AE52-2C0E01B73200}.Release|Any CPU.Build.0 = Release|Any CPU
+		{605F8D53-66FA-4BEC-844E-F63209B855C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{605F8D53-66FA-4BEC-844E-F63209B855C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{605F8D53-66FA-4BEC-844E-F63209B855C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{605F8D53-66FA-4BEC-844E-F63209B855C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B69B89D4-54FC-41DF-B5D7-EE674CF60343}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B69B89D4-54FC-41DF-B5D7-EE674CF60343}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B69B89D4-54FC-41DF-B5D7-EE674CF60343}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B69B89D4-54FC-41DF-B5D7-EE674CF60343}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AEC28E7E-1ABB-4ABC-8CE1-B74D9DC9B80E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AEC28E7E-1ABB-4ABC-8CE1-B74D9DC9B80E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AEC28E7E-1ABB-4ABC-8CE1-B74D9DC9B80E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AEC28E7E-1ABB-4ABC-8CE1-B74D9DC9B80E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -345,6 +375,9 @@ Global
 		{1BD459F8-E894-4694-BBEC-65EB1D98E445} = {2DE75CE4-7A3B-4659-84FC-16F5EC0AEDE4}
 		{8BF33FB0-243F-47E3-AE52-2C0E01B73200} = {2DE75CE4-7A3B-4659-84FC-16F5EC0AEDE4}
 		{30057B5B-8BEE-4712-8243-9A42DF8A0C76} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
+		{605F8D53-66FA-4BEC-844E-F63209B855C9} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
+		{B69B89D4-54FC-41DF-B5D7-EE674CF60343} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
+		{AEC28E7E-1ABB-4ABC-8CE1-B74D9DC9B80E} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
 		{E4A9F8F0-D0DC-465A-A64A-FE56504D397E} = {6F91B8C3-1A78-49D7-B915-F13EDFDAFDB3}
 		{C97DE890-58D2-41A1-86D0-A2E919E6DD80} = {6F91B8C3-1A78-49D7-B915-F13EDFDAFDB3}
 	EndGlobalSection
