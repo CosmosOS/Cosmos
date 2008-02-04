@@ -2,19 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Mono.Cecil;
-using Mono.Cecil.Cil;
+using System.Reflection;
 
 namespace Indy.IL2CPU.IL {
 	public abstract class MainEntryPointOp: Op {
-		protected MainEntryPointOp(Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
+		protected MainEntryPointOp(ILReader aReader, MethodInformation aMethodInfo)
+			: base(aReader, aMethodInfo) {
 		}
 
 		public abstract void Enter(string aName);
 		public abstract void Exit();
 		public abstract void Pushd(string aValue);
-		public abstract void Call(MethodDefinition aMethod);
+		public abstract void Call(MethodBase aMethod);
 		public abstract void Call(string aLabelName);
 
 		public override void DoAssemble() {

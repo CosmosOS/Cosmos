@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Mono.Cecil;
+using System.Reflection;
 
 namespace Indy.IL2CPU.IL {
 	public class Utilities {
-		public static string GetUniqueConstName(FieldDefinition aField) {
+		public static string GetUniqueConstName(FieldInfo aField) {
 			StringBuilder xSB = new StringBuilder();
 			xSB.Append("const ");
 			xSB.Append(aField.FieldType.FullName);

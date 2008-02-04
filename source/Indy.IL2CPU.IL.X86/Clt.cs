@@ -1,23 +1,30 @@
 using System;
 using System.IO;
-using Mono.Cecil;
-using Mono.Cecil.Cil;
+
+
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using CPU = Indy.IL2CPU.Assembler;
+using Indy.IL2CPU.Assembler;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(Code.Clt)]
+	[OpCode(OpCodeEnum.Clt)]
 	public class Clt: Op {
 		private readonly string NextInstructionLabel;
 		private readonly string CurInstructionLabel;
-		public Clt(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
-			NextInstructionLabel = GetInstructionLabel(aInstruction.Next);
-			CurInstructionLabel = GetInstructionLabel(aInstruction);
+		public Clt(ILReader aReader, MethodInformation aMethodInfo)
+			: base(aReader, aMethodInfo) {
+			NextInstructionLabel = GetInstructionLabel(aReader.Position);
+			CurInstructionLabel = GetInstructionLabel(aReader);
 		}
 		public override void DoAssemble() {
-			int xSize = Math.Max(Assembler.StackSizes.Pop(), Assembler.StackSizes.Pop());
-			Assembler.StackSizes.Push(4);
+			if (Assembler.StackContents.Peek().IsFloat) {
+				throw new Exception("Floats not yet supported!");
+			}
+			int xSize = Math.Max(Assembler.StackContents.Pop().Size, Assembler.StackContents.Pop().Size);
+			if (xSize > 8) {
+				throw new Exception("StackSizes>8 not supported");
+			}
+			Assembler.StackContents.Push(new StackContent(1, typeof(bool)));
 			string BaseLabel = CurInstructionLabel + "__";
 			string LabelTrue = BaseLabel + "True";
 			string LabelFalse = BaseLabel + "False";
@@ -33,7 +40,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			new CPUx86.Compare(CPUx86.Registers.EAX, CPUx86.Registers.AtESP);
 			new CPUx86.JumpIfLess(LabelTrue);
 			new CPUx86.JumpAlways(LabelFalse);
-			new CPU.Label(LabelTrue);				
+			new CPU.Label(LabelTrue);
 			new CPUx86.Add(CPUx86.Registers.ESP, "4");
 			new CPUx86.Push("01h");
 			new CPUx86.JumpAlways(NextInstructionLabel);

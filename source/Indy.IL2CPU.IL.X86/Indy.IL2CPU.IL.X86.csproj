@@ -39,10 +39,6 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Mono.Cecil, Version=0.5.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Mono.Cecil.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -57,33 +53,20 @@
     <Compile Include="And.cs" />
     <Compile Include="Arglist.cs" />
     <Compile Include="Beq.cs" />
-    <Compile Include="Beq_S.cs" />
     <Compile Include="Bge.cs" />
-    <Compile Include="Bge_S.cs" />
     <Compile Include="Bge_Un.cs" />
-    <Compile Include="Bge_Un_S.cs" />
     <Compile Include="Bgt.cs" />
-    <Compile Include="Bgt_S.cs" />
     <Compile Include="Bgt_Un.cs" />
-    <Compile Include="Bgt_Un_S.cs" />
     <Compile Include="Ble.cs" />
-    <Compile Include="Ble_S.cs" />
     <Compile Include="Ble_Un.cs" />
-    <Compile Include="Ble_Un_S.cs" />
     <Compile Include="Blt.cs" />
-    <Compile Include="Blt_S.cs" />
     <Compile Include="Blt_Un.cs" />
-    <Compile Include="Blt_Un_S.cs" />
     <Compile Include="Bne_Un.cs" />
-    <Compile Include="Bne_Un_S.cs" />
     <Compile Include="Box.cs" />
     <Compile Include="Br.cs" />
     <Compile Include="Break.cs" />
     <Compile Include="Brfalse.cs" />
-    <Compile Include="Brfalse_S.cs" />
     <Compile Include="Brtrue.cs" />
-    <Compile Include="Brtrue_S.cs" />
-    <Compile Include="Br_S.cs" />
     <Compile Include="Call.cs" />
     <Compile Include="Calli.cs" />
     <Compile Include="Callvirt.cs" />
@@ -153,6 +136,8 @@
     <Compile Include="Endfinally.cs" />
     <Compile Include="Initblk.cs" />
     <Compile Include="Initobj.cs" />
+    <Compile Include="Ldelem.cs" />
+    <Compile Include="Stelem.cs" />
     <Compile Include="X86CustomMethodImplementationOp.cs" />
     <Compile Include="X86CustomMethodImplementationProxyOp.cs" />
     <Compile Include="X86InitVmtImplementationOp.cs" />
@@ -164,29 +149,11 @@
     <Compile Include="Jmp.cs" />
     <Compile Include="Ldarg.cs" />
     <Compile Include="Ldarga.cs" />
-    <Compile Include="Ldarga_S.cs" />
-    <Compile Include="Ldarg_0.cs" />
-    <Compile Include="Ldarg_1.cs" />
-    <Compile Include="Ldarg_2.cs" />
-    <Compile Include="Ldarg_3.cs" />
-    <Compile Include="Ldarg_S.cs" />
     <Compile Include="Ldc_I4.cs" />
-    <Compile Include="Ldc_I4_0.cs" />
-    <Compile Include="Ldc_I4_1.cs" />
-    <Compile Include="Ldc_I4_2.cs" />
-    <Compile Include="Ldc_I4_3.cs" />
-    <Compile Include="Ldc_I4_4.cs" />
-    <Compile Include="Ldc_I4_5.cs" />
-    <Compile Include="Ldc_I4_6.cs" />
-    <Compile Include="Ldc_I4_7.cs" />
-    <Compile Include="Ldc_I4_8.cs" />
-    <Compile Include="Ldc_I4_M1.cs" />
-    <Compile Include="Ldc_I4_S.cs" />
     <Compile Include="Ldc_I8.cs" />
     <Compile Include="Ldc_R4.cs" />
     <Compile Include="Ldc_R8.cs" />
     <Compile Include="Ldelema.cs" />
-    <Compile Include="Ldelem_Any.cs" />
     <Compile Include="Ldelem_I.cs" />
     <Compile Include="Ldelem_I1.cs" />
     <Compile Include="Ldelem_I2.cs" />
@@ -215,12 +182,6 @@
     <Compile Include="Ldlen.cs" />
     <Compile Include="Ldloc.cs" />
     <Compile Include="Ldloca.cs" />
-    <Compile Include="Ldloca_S.cs" />
-    <Compile Include="Ldloc_0.cs" />
-    <Compile Include="Ldloc_1.cs" />
-    <Compile Include="Ldloc_2.cs" />
-    <Compile Include="Ldloc_3.cs" />
-    <Compile Include="Ldloc_S.cs" />
     <Compile Include="Ldnull.cs" />
     <Compile Include="Ldobj.cs" />
     <Compile Include="Ldsfld.cs" />
@@ -229,7 +190,6 @@
     <Compile Include="Ldtoken.cs" />
     <Compile Include="Ldvirtftn.cs" />
     <Compile Include="Leave.cs" />
-    <Compile Include="Leave_S.cs" />
     <Compile Include="Localloc.cs" />
     <Compile Include="Mkrefany.cs" />
     <Compile Include="Mul.cs" />
@@ -238,7 +198,6 @@
     <Compile Include="Neg.cs" />
     <Compile Include="Newarr.cs" />
     <Compile Include="Newobj.cs" />
-    <Compile Include="No.cs" />
     <Compile Include="Nop.cs" />
     <Compile Include="Not.cs" />
     <Compile Include="Or.cs" />
@@ -256,8 +215,6 @@
     <Compile Include="Shr_Un.cs" />
     <Compile Include="Sizeof.cs" />
     <Compile Include="Starg.cs" />
-    <Compile Include="Starg_S.cs" />
-    <Compile Include="Stelem_Any.cs" />
     <Compile Include="Stelem_I.cs" />
     <Compile Include="Stelem_I1.cs" />
     <Compile Include="Stelem_I2.cs" />
@@ -276,18 +233,12 @@
     <Compile Include="Stind_R8.cs" />
     <Compile Include="Stind_Ref.cs" />
     <Compile Include="Stloc.cs" />
-    <Compile Include="Stloc_0.cs" />
-    <Compile Include="Stloc_1.cs" />
-    <Compile Include="Stloc_2.cs" />
-    <Compile Include="Stloc_3.cs" />
-    <Compile Include="Stloc_S.cs" />
     <Compile Include="Stobj.cs" />
     <Compile Include="Stsfld.cs" />
     <Compile Include="Sub.cs" />
     <Compile Include="Sub_Ovf.cs" />
     <Compile Include="Sub_Ovf_Un.cs" />
     <Compile Include="Switch.cs" />
-    <Compile Include="Tail.cs" />
     <Compile Include="Throw.cs" />
     <Compile Include="Unaligned.cs" />
     <Compile Include="Unbox.cs" />

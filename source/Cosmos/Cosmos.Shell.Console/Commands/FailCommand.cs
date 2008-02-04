@@ -19,7 +19,8 @@ namespace Cosmos.Shell.Console.Commands
 
         public override void Execute(string param)
         {
-            throw new Exception("This is a test.");
+
+            throw new Exception("This is a kernel-level Exception!");
         }
 
         public override void Help()

@@ -1,19 +1,57 @@
 using System;
 using System.IO;
-using Mono.Cecil;
-using Mono.Cecil.Cil;
 using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using Indy.IL2CPU.Assembler;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(Code.Ldelem_Ref, true)]
+	[OpCode(OpCodeEnum.Ldelem_Ref, true)]
 	public class Ldelem_Ref: Op {
-		public Ldelem_Ref(Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
+		public Ldelem_Ref(ILReader aReader, MethodInformation aMethodInfo)
+			: base(aReader, aMethodInfo) {
+		}
+
+		public static void Assemble(CPU.Assembler aAssembler, int aElementSize) {
+			new CPUx86.Pop(CPUx86.Registers.EAX);
+			new CPUx86.Move(CPUx86.Registers.EDX, "0" + aElementSize.ToString("X") + "h");
+			new CPUx86.Multiply(CPUx86.Registers.EDX);
+			new CPUx86.Add(CPUx86.Registers.EAX, "0" + (ObjectImpl.FieldDataOffset + 4).ToString("X") + "h");
+			new CPUx86.Pop(CPUx86.Registers.EDX);
+			new CPUx86.Add(CPUx86.Registers.EDX, CPUx86.Registers.EAX);
+			new CPUx86.Move(CPUx86.Registers.EAX, CPUx86.Registers.EDX);
+			int xSizeLeft = aElementSize;
+			while (xSizeLeft > 0) {
+				if (xSizeLeft >= 4) {
+					new CPUx86.Push("dword", CPUx86.Registers.AtEAX);
+					new CPUx86.Add(CPUx86.Registers.EAX, "4");
+					xSizeLeft -= 4;
+				} else {
+					if (xSizeLeft >= 2) {
+						new CPUx86.Move(CPUx86.Registers.ECX, "0");
+						new CPUx86.Move("word", CPUx86.Registers.CX, CPUx86.Registers.AtEAX);
+						new CPUx86.Push(CPUx86.Registers.ECX);
+						new CPUx86.Add(CPUx86.Registers.EAX, "2");
+						xSizeLeft -= 2;
+					} else {
+						if (xSizeLeft >= 1) {
+							new CPUx86.Move(CPUx86.Registers.ECX, "0");
+							new CPUx86.Move("byte", CPUx86.Registers.CL, CPUx86.Registers.AtEAX);
+							new CPUx86.Push(CPUx86.Registers.ECX);
+							new CPUx86.Add(CPUx86.Registers.EAX, "1");
+							xSizeLeft -= 1;
+						} else {
+							throw new Exception("Size left: " + xSizeLeft);
+						}
+					}
+				}
+			}
+			aAssembler.StackContents.Pop();
+			aAssembler.StackContents.Pop();
+			aAssembler.StackContents.Push(new StackContent(aElementSize, true, false, false));
 		}
 
 		public override void DoAssemble() {
-			Ldelem_Any.Assemble(Assembler, 4);
+			Assemble(Assembler, 4);
 		}
 	}
 }

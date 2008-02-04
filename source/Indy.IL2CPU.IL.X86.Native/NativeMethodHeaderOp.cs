@@ -1,8 +1,8 @@
 using System;
 using System.Linq;
 using Indy.IL2CPU.IL.X86;
-using Mono.Cecil;
-using Mono.Cecil.Cil;
+
+
 using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using CPUNative = Indy.IL2CPU.Assembler.X86.Native;
@@ -12,20 +12,13 @@ namespace Indy.IL2CPU.IL.X86.Native {
 		public const string ISR_Suffix = "______ISR____WRAPPER";
 		private bool mIsInterruptHandler = false;
 		private byte mInterruptValue;
-		public NativeMethodHeaderOp(Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
+		public NativeMethodHeaderOp(ILReader aReader, MethodInformation aMethodInfo)
+			: base(aReader, aMethodInfo) {
 			if (aMethodInfo == null) {
 				throw new ArgumentNullException("aMethodInfo");
 			}
-			if (aMethodInfo.MethodDefinition == null)
+			if (aMethodInfo.Method == null)
 				return;
-			foreach (CustomAttribute xAttrib in aMethodInfo.MethodDefinition.CustomAttributes) {
-				if (xAttrib.Constructor.DeclaringType.FullName == typeof(InterruptServiceRoutineAttribute).FullName) {
-					mIsInterruptHandler = true;
-					mInterruptValue = (byte)xAttrib.ConstructorParameters[0];
-					break;
-				}
-			}
 		}
 
 		public override void DoAssemble() {

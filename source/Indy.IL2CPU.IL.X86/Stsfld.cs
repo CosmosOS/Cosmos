@@ -1,33 +1,34 @@
 using System;
 using Indy.IL2CPU.Assembler;
-using Mono.Cecil;
-using Mono.Cecil.Cil;
+
+
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using System.Reflection;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(Code.Stsfld)]
+	[OpCode(OpCodeEnum.Stsfld)]
 	public class Stsfld: Op {
 		private string mDataName;
 		private int mSize;
-		private TypeReference mDataType;
+		private Type mDataType;
 		private bool mNeedsGC;
 		private string mBaseLabel;
 
 
-		public Stsfld(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
-			FieldReference xField = (FieldReference)aInstruction.Operand;
+		public Stsfld(ILReader aReader, MethodInformation aMethodInfo)
+			: base(aReader, aMethodInfo) {
+			FieldInfo xField = aReader.OperandValueField;
 			mSize = Engine.GetFieldStorageSize(xField.FieldType);
 			Engine.QueueStaticField(xField, out mDataName);
 			mNeedsGC = !xField.FieldType.IsValueType && xField.FieldType.FullName != "System.String";
 			mDataType = xField.FieldType;
-			mBaseLabel = GetInstructionLabel(aInstruction);
+			mBaseLabel = GetInstructionLabel(aReader);
 		}
 
 		public override void DoAssemble() {
 			if (mNeedsGC) {
 				new CPUx86.Pushd("[" + mDataName + "]");
-				Engine.QueueMethodRef(GCImplementationRefs.DecRefCountRef);
+				Engine.QueueMethod(GCImplementationRefs.DecRefCountRef);
 				new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef));
 			}
 			for (int i = 1; i <= (mSize / 4); i++) {
@@ -52,7 +53,7 @@ namespace Indy.IL2CPU.IL.X86 {
 					throw new Exception("Remainder size " + (mSize % 4) + " not supported!");
 
 			}
-			Assembler.StackSizes.Pop();
+			Assembler.StackContents.Pop();
 		}
 	}
 }

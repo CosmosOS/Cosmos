@@ -6,12 +6,10 @@ using System.Text;
 using Indy.IL2CPU.Assembler;
 using Indy.IL2CPU.IL;
 using Indy.IL2CPU.Plugs;
-using Mono.Cecil;
-using Mono.Cecil.Cil;
 
 namespace Indy.IL2CPU.IL {
 	public abstract class OpCodeMap {
-		protected readonly SortedList<Code, Type> mMap = new SortedList<Code, Type>();
+		protected readonly SortedList<OpCodeEnum, Type> mMap = new SortedList<OpCodeEnum, Type>();
 
 		protected OpCodeMap() {
 			MethodHeaderOp = GetMethodHeaderOp();
@@ -35,7 +33,7 @@ namespace Indy.IL2CPU.IL {
 		protected abstract Type GetInitVmtImplementationOp();
 		protected abstract Type GetMainEntryPointOp();
 
-		public virtual void Initialize(Assembler.Assembler aAssembler, IEnumerable<AssemblyDefinition> aApplicationAssemblies, IEnumerable<AssemblyDefinition> aPlugs, Func<TypeReference, TypeDefinition> aTypeResolver, Func<string, AssemblyDefinition> aAssemblyResolver) {
+		public virtual void Initialize(Assembler.Assembler aAssembler, IEnumerable<Assembly> aApplicationAssemblies, IEnumerable<Assembly> aPlugs) {
 			foreach (var xItem in (from item in ImplementationAssembly.GetTypes()
 								   let xAttrib = item.GetCustomAttributes(typeof(OpCodeAttribute), true).FirstOrDefault() as OpCodeAttribute
 								   where item.IsSubclassOf(typeof(Op)) && xAttrib != null
@@ -50,10 +48,10 @@ namespace Indy.IL2CPU.IL {
 					throw;
 				}
 			}
-			InitializePlugMethodsList(aAssembler, aPlugs, aTypeResolver, aAssemblyResolver);
+			InitializePlugMethodsList(aAssembler, aPlugs);
 		}
 
-		public Type GetOpForOpCode(Code code) {
+		public Type GetOpForOpCode(OpCodeEnum code) {
 			if (!mMap.ContainsKey(code)) {
 				throw new NotSupportedException("OpCode '" + code + "' not supported!");
 			}
@@ -67,117 +65,94 @@ namespace Indy.IL2CPU.IL {
 		public readonly Type CustomMethodImplementationOp;
 		public readonly Type InitVmtImplementationOp;
 		public readonly Type MainEntryPointOp;
-		private SortedList<string, MethodDefinition> mPlugMethods;
-
-		private static string GetMethodDefinitionFullName(MethodReference aSelf) {
-			StringBuilder sb = new StringBuilder(aSelf.ReturnType.ReturnType.FullName + " " + aSelf.DeclaringType.FullName + "." + aSelf.Name);
-			sb.Append("(");
-			if (aSelf.Parameters.Count > 0) {
-
-				foreach (ParameterDefinition xParam in aSelf.Parameters) {
-					sb.Append(xParam.ParameterType.FullName);
-					sb.Append(",");
-				}
-			}
-			return sb.ToString().TrimEnd(',') + ")";
-		}
+		private SortedList<string, MethodBase> mPlugMethods;
 
 		/// <summary>
 		/// Gets the full name of a method, without the defining type included
 		/// </summary>
 		/// <param name="aSelf"></param>
 		/// <returns></returns>
-		private static string GetStrippedMethodDefinitionFullName(MethodReference aSelf) {
-			StringBuilder sb = new StringBuilder(aSelf.ReturnType.ReturnType.FullName + " " + aSelf.Name);
-			sb.Append("(");
-			if (aSelf.HasThis) {
-				sb.Append(aSelf.DeclaringType.FullName);
-				sb.Append(",");
-			}
-			if (aSelf.Parameters.Count > 0) {
-				foreach (ParameterDefinition xParam in aSelf.Parameters) {
-					sb.Append(xParam.ParameterType.FullName);
-					sb.Append(",");
+		private static string GetStrippedMethodBaseFullName(MethodBase aMethod) {
+			StringBuilder xBuilder = new StringBuilder();
+			string[] xParts = aMethod.ToString().Split(' ');
+			string[] xParts2 = xParts.Skip(1).ToArray();
+			MethodInfo xMethodInfo = aMethod as MethodInfo;
+			if (xMethodInfo != null) {
+				xBuilder.Append(xMethodInfo.ReturnType.FullName);
+			} else {
+				if (aMethod is ConstructorInfo) {
+					xBuilder.Append(typeof(void).FullName);
+				} else {
+					xBuilder.Append(xParts[0]);
 				}
 			}
-			return sb.ToString().TrimEnd(',') + ")";
+			xBuilder.Append("  ");
+			xBuilder.Append(".");
+			xBuilder.Append(aMethod.Name);
+			xBuilder.Append("(");
+			ParameterInfo[] xParams = aMethod.GetParameters();
+			for (int i = 0; i < xParams.Length; i++) {
+				if (xParams[i].Name == "aThis" && i == 0) {
+					continue;
+				}
+				if (xParams[i].IsDefined(typeof(FieldAccessAttribute), true)) {
+					continue;
+				}
+				xBuilder.Append(xParams[i].ParameterType.FullName);
+				if (i < (xParams.Length - 1)) {
+					xBuilder.Append(", ");
+				}
+			}
+			xBuilder.Append(")");
+			return xBuilder.ToString();
 		}
 
-		private void InitializePlugMethodsList(Assembler.Assembler aAssembler, IEnumerable<AssemblyDefinition> aPlugs, Func<TypeReference, TypeDefinition> aTypeResolver, Func<string, AssemblyDefinition> aAssemblyResolver) {
+		private void InitializePlugMethodsList(Assembler.Assembler aAssembler, IEnumerable<Assembly> aPlugs) {
 			if (mPlugMethods != null) {
 				throw new Exception("PlugMethods list already initialized!");
 			}
-			mPlugMethods = new SortedList<string, MethodDefinition>();
-			foreach (AssemblyDefinition xAssemblyDef in GetPlugAssemblies().Union(aPlugs)) {
-				foreach (ModuleDefinition xModuleDef in xAssemblyDef.Modules) {
-					foreach (TypeDefinition xType in (from item in xModuleDef.Types.Cast<TypeDefinition>()
-													  where item.CustomAttributes.Cast<CustomAttribute>().Count(x => x.Constructor.DeclaringType.FullName == typeof(PlugAttribute).FullName) != 0
-													  select item)) {
-						CustomAttribute xPlugAttrib = (from item in xType.CustomAttributes.Cast<CustomAttribute>()
-													   where item.Constructor.DeclaringType.FullName == typeof(PlugAttribute).FullName
-													   select item).First();
-						TypeReference xTypeRef = xModuleDef.TypeReferences.Cast<TypeReference>().FirstOrDefault(x => (x.FullName + ", " + x.Scope.ToString()) == (string)xPlugAttrib.Fields[PlugAttribute.TargetPropertyName] || (x.FullName + ", " + x.Scope.ToString()) == (string)xPlugAttrib.Fields[PlugAttribute.TargetNamePropertyName]);
-						if (xTypeRef == null) {
-							string xTypeFullyQualedName = (string)(xPlugAttrib.Fields[PlugAttribute.TargetPropertyName] ?? xPlugAttrib.Fields[PlugAttribute.TargetNamePropertyName]);
-							if (!xTypeFullyQualedName.Contains(",")) {
-								throw new Exception("Wrong name '" + xTypeFullyQualedName + "'");
+			mPlugMethods = new SortedList<string, MethodBase>();
+			foreach (Assembly xAssemblyDef in GetPlugAssemblies().Union(aPlugs)) {
+				foreach (var xType in (from item in xAssemblyDef.GetTypes()
+									   let xCustomAttribs = item.GetCustomAttributes(typeof(PlugAttribute), false)
+									   where xCustomAttribs != null && xCustomAttribs.Length > 0
+									   select new KeyValuePair<Type, PlugAttribute>(item, (PlugAttribute)xCustomAttribs[0]))) {
+					PlugAttribute xPlugAttrib = xType.Value;
+					Type xTypeRef = xPlugAttrib.Target;
+					if (xTypeRef == null) {
+						xTypeRef = Type.GetType(xPlugAttrib.TargetName, true);
+					}
+					foreach (MethodBase xMethod in xType.Key.GetMethods(BindingFlags.Public | BindingFlags.Static)) {
+						PlugMethodAttribute xPlugMethodAttrib = xMethod.GetCustomAttributes(typeof(PlugMethodAttribute), true).Cast<PlugMethodAttribute>().FirstOrDefault();
+						string xSignature = String.Empty;
+						if (xPlugMethodAttrib != null) {
+							xSignature = xPlugMethodAttrib.Signature;
+							if (!xPlugMethodAttrib.Enabled) {
+								continue;
 							}
-							string xAsmName = xTypeFullyQualedName.Substring(xTypeFullyQualedName.IndexOf(",") + 1).TrimStart();
-							string xTypeName = xTypeFullyQualedName.Substring(0, xTypeFullyQualedName.IndexOf(","));
-							AssemblyDefinition xAsmDef = aAssemblyResolver(xAsmName);
-							foreach (ModuleDefinition xModDef in xAsmDef.Modules) {
-								if (xModDef.Types.Contains(xTypeName)) {
-									xTypeRef = xModDef.Types[xTypeName];
-									break;
-								}
-							}
-							if (xTypeRef == null) {
-								throw new Exception("TypeRef for '" + (string)xPlugAttrib.Fields[PlugAttribute.TargetPropertyName] + "' not found! (" + xType.FullName + ")");
-							}
-						}
-						TypeDefinition xReplaceTypeDef = aTypeResolver(xTypeRef);
-						foreach (MethodDefinition xMethod in (from item in xType.Methods.Cast<MethodDefinition>()
-															  select item)) {
-							CustomAttribute xPlugMethodAttrib = (from item in xMethod.CustomAttributes.Cast<CustomAttribute>()
-																 where item.Constructor.DeclaringType.FullName == typeof(PlugMethodAttribute).FullName
-																 select item).FirstOrDefault();
-							string xSignature = String.Empty;
-							if (xPlugMethodAttrib != null) {
-								if (!xPlugMethodAttrib.Resolved) {
-									xPlugMethodAttrib.Resolve();
-								}
-								xSignature = xPlugMethodAttrib.Fields[PlugMethodAttribute.SignaturePropertyName] as string;
-								if (!String.IsNullOrEmpty(xPlugMethodAttrib.Fields[PlugMethodAttribute.EnabledPropertyName] as String)) {
-									if (!Boolean.Parse((string)xPlugMethodAttrib.Fields[PlugMethodAttribute.EnabledPropertyName])) {
-										continue;
-									}
-								}
-								if (aAssembler.InMetalMode) {
-									if (xPlugMethodAttrib.Fields[PlugMethodAttribute.InMetalModePropertyName] != null && !((bool)xPlugMethodAttrib.Fields[PlugMethodAttribute.InMetalModePropertyName])) {
-										continue;
-									}
-								} else {
-									if (xPlugMethodAttrib.Fields[PlugMethodAttribute.InNormalModePropertyName] != null && !((bool)xPlugMethodAttrib.Fields[PlugMethodAttribute.InNormalModePropertyName])) {
-										continue;
-									}
-								}
-								if (!String.IsNullOrEmpty(xSignature)) {
-									mPlugMethods.Add(xSignature, xMethod);
+							if (aAssembler.InMetalMode && !xPlugMethodAttrib.InMetalMode) {
+								continue;
+							} else {
+								if (!xPlugMethodAttrib.InNormalMode) {
 									continue;
 								}
 							}
-							string xStrippedSignature = GetStrippedMethodDefinitionFullName(xMethod);
-							foreach (MethodDefinition xOrigMethodDef in xReplaceTypeDef.Methods) {
-								string xOrigStrippedSignature = GetStrippedMethodDefinitionFullName(xOrigMethodDef);
-								if (xOrigStrippedSignature == xStrippedSignature) {
-									mPlugMethods.Add(Label.GenerateLabelName(xOrigMethodDef), xMethod);
-								}
+							if (!String.IsNullOrEmpty(xSignature)) {
+								mPlugMethods.Add(xSignature, xMethod);
+								continue;
 							}
-							foreach (MethodDefinition xOrigMethodDef in xReplaceTypeDef.Constructors) {
-								string xOrigStrippedSignature = GetStrippedMethodDefinitionFullName(xOrigMethodDef);
-								if (xOrigStrippedSignature == xStrippedSignature) {
-									mPlugMethods.Add(Label.GenerateLabelName(xOrigMethodDef), xMethod);
-								}
+						}
+						string xStrippedSignature = GetStrippedMethodBaseFullName(xMethod);
+						foreach (MethodBase xOrigMethodDef in xTypeRef.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.NonPublic)) {
+							string xOrigStrippedSignature = GetStrippedMethodBaseFullName(xOrigMethodDef);
+							if (xOrigStrippedSignature == xStrippedSignature) {
+								mPlugMethods.Add(Label.GenerateLabelName(xOrigMethodDef), xMethod);
+							}
+						}
+						foreach (MethodBase xOrigMethodDef in xTypeRef.GetConstructors(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.NonPublic)) {
+							string xOrigStrippedSignature = GetStrippedMethodBaseFullName(xOrigMethodDef);
+							if (xOrigStrippedSignature == xStrippedSignature) {
+								mPlugMethods.Add(Label.GenerateLabelName(xOrigMethodDef), xMethod);
 							}
 						}
 					}
@@ -195,14 +170,14 @@ namespace Indy.IL2CPU.IL {
 			return null;
 		}
 
-		protected virtual IList<AssemblyDefinition> GetPlugAssemblies() {
-			List<AssemblyDefinition> xResult = new List<AssemblyDefinition>();
-			xResult.Add(AssemblyFactory.GetAssembly(typeof(OpCodeMap).Assembly.Location));
-			xResult.Add(AssemblyFactory.GetAssembly(Assembly.Load("Indy.IL2CPU").Location));
+		protected virtual IList<Assembly> GetPlugAssemblies() {
+			List<Assembly> xResult = new List<Assembly>();
+			xResult.Add(typeof(OpCodeMap).Assembly);
+			xResult.Add(Assembly.Load("Indy.IL2CPU"));
 			return xResult;
 		}
 
-		public MethodReference GetCustomMethodImplementation(string aOrigMethodName, bool aInMetalMode) {
+		public MethodBase GetCustomMethodImplementation(string aOrigMethodName, bool aInMetalMode) {
 			if (mPlugMethods.ContainsKey(aOrigMethodName)) {
 				return mPlugMethods[aOrigMethodName];
 			}
@@ -210,39 +185,32 @@ namespace Indy.IL2CPU.IL {
 		}
 
 		public virtual bool HasCustomAssembleImplementation(MethodInformation aMethod, bool aInMetalMode) {
-			CustomAttribute xAttrib = (from item in aMethod.MethodDefinition.CustomAttributes.Cast<CustomAttribute>()
-									   where item.Constructor.DeclaringType.FullName == typeof(PlugMethodAttribute).FullName
-									   && item.Fields.Contains(PlugMethodAttribute.MethodAssemblerPropertyName)
-									   select item).FirstOrDefault();
-			return xAttrib != null;
+			PlugMethodAttribute xResult = ((PlugMethodAttribute[])aMethod.Method.GetCustomAttributes(typeof(PlugMethodAttribute), true)).FirstOrDefault();
+			if (xResult != null) {
+				return xResult.MethodAssembler != null;
+			}
+			return false;
 		}
 
 		public virtual void DoCustomAssembleImplementation(bool aInMetalMode, Assembler.Assembler aAssembler, MethodInformation aMethodInfo) {
-			CustomAttribute xAttrib = (from item in aMethodInfo.MethodDefinition.CustomAttributes.Cast<CustomAttribute>()
-									   where item.Constructor.DeclaringType.FullName == typeof(PlugMethodAttribute).FullName
-									   && item.Fields.Contains(PlugMethodAttribute.MethodAssemblerPropertyName)
-									   select item).FirstOrDefault();
+			PlugMethodAttribute xAttrib = (PlugMethodAttribute)aMethodInfo.Method.GetCustomAttributes(typeof(PlugMethodAttribute), true).Cast<PlugMethodAttribute>().FirstOrDefault();
 			if (xAttrib != null) {
-				string xAssemblerTypeName = (string)xAttrib.Fields[PlugMethodAttribute.MethodAssemblerPropertyName];
-				TypeDefinition xTypeDef = GetTypeDefinition(aMethodInfo.MethodDefinition.DeclaringType.Module.Assembly, xAssemblerTypeName);
-				if (xTypeDef != null) {
-					Assembly xAsm = Assembly.LoadWithPartialName(xTypeDef.Module.Assembly.Name.FullName);
-					Type xAssemblerType = xAsm.GetType(xAssemblerTypeName);
+				Type xAssemblerType = xAttrib.MethodAssembler;
+				if (xAssemblerType != null) {
 					AssemblerMethod xAssembler = (AssemblerMethod)Activator.CreateInstance(xAssemblerType);
 					xAssembler.Assemble(aAssembler);
 				}
 			}
 		}
 
-		private static TypeDefinition GetTypeDefinition(AssemblyDefinition aAssembly, string aType) {
+		private static Type GetType(Assembly aAssembly, string aType) {
 			string xActualTypeName = aType;
 			if (xActualTypeName.Contains("<") && xActualTypeName.Contains(">")) {
 				xActualTypeName = xActualTypeName.Substring(0, xActualTypeName.IndexOf("<"));
 			}
-			foreach (ModuleDefinition xModDef in aAssembly.Modules) {
-				if (xModDef.Types.Contains(xActualTypeName)) {
-					return xModDef.Types[xActualTypeName];
-				}
+			Type xResult = aAssembly.GetType(aType, false);
+			if (xResult != null) {
+				return xResult;
 			}
 			throw new Exception("Type '" + aType + "' not found in assembly '" + aAssembly + "'!");
 		}

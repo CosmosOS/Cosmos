@@ -1,11 +1,12 @@
 using System;
 using System.IO;
-using Mono.Cecil;
-using Mono.Cecil.Cil;
-using CPU = Indy.IL2CPU.Assembler.X86;
+
+
+using CPU = Indy.IL2CPU.Assembler;
+using System.Reflection;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(Code.Ldfld)]
+	[OpCode(OpCodeEnum.Ldfld)]
 	public class Ldfld: Op {
 		private readonly TypeInformation.Field mField;
 		private readonly TypeInformation mType;
@@ -13,23 +14,21 @@ namespace Indy.IL2CPU.IL.X86 {
 			: base(null, null) {
 			mField = aField;
 		}
-		public Ldfld(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
-			FieldDefinition xField = aInstruction.Operand as FieldDefinition;
+		public Ldfld(ILReader aReader, MethodInformation aMethodInfo)
+			: base(aReader, aMethodInfo) {
+			FieldInfo xField = aReader.OperandValueField;
 			if (xField == null) {
-				FieldReference xFieldRef = aInstruction.Operand as FieldReference;
-				if (xFieldRef == null) {
-					string typeName = aInstruction.Operand == null ? "" : aInstruction.Operand.GetType().FullName;
-					throw new Exception("Field not found! (Operand = '" + (aInstruction.Operand ?? "**NULL**") + "'[" + typeName + "])");
-				}
-				xField = Engine.GetDefinitionFromFieldReference(xFieldRef);
+					throw new Exception("Field not found!");
 			}
 			string xFieldId = xField.ToString();
-			mType = Engine.GetTypeInfo(Engine.GetDefinitionFromTypeReference(xField.DeclaringType));
+			mType = Engine.GetTypeInfo(xField.DeclaringType);
 			mField = mType.Fields[xFieldId];
 		}
 
 		public override void DoAssemble() {
+			foreach (var xField in mType.Fields) {
+				new CPU.Comment(String.Format("{0} -- {1}", xField.Key, xField.Value.ToString()));
+			}
 			Ldfld(Assembler, mType, mField);
 		}
 	}

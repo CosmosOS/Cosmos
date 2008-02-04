@@ -1,28 +1,30 @@
 using System;
 using System.Linq;
-using Mono.Cecil;
-using Mono.Cecil.Cil;
+
+
 using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using System.Reflection;
+using Indy.IL2CPU.Assembler;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(Code.Ldftn)]
+	[OpCode(OpCodeEnum.Ldftn)]
 	public class Ldftn: Op {
 		private string mFunctionLabel;
 
-		public Ldftn(Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
-			MethodReference xMethodRef = aInstruction.Operand as MethodReference;
+		public Ldftn(ILReader aReader, MethodInformation aMethodInfo)
+			: base(aReader, aMethodInfo) {
+			MethodBase xMethodRef = aReader.OperandValueMethod;
 			if (xMethodRef == null) {
 				throw new Exception("Unable to determine Method!");
 			}
 			mFunctionLabel = CPU.Label.GenerateLabelName(xMethodRef);
-			Engine.QueueMethodRef(xMethodRef);
+			Engine.QueueMethod(xMethodRef);
 		}
 
 		public override void DoAssemble() {
 			new CPUx86.Pushd(mFunctionLabel);
-			Assembler.StackSizes.Push(4);
+			Assembler.StackContents.Push(new StackContent(4, true, false, false));
 		}
 	}
 }

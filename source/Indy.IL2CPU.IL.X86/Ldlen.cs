@@ -1,19 +1,20 @@
 using System;
-using Mono.Cecil.Cil;
+
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using Indy.IL2CPU.Assembler;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(Code.Ldlen, true)]
+	[OpCode(OpCodeEnum.Ldlen, true)]
 	public class Ldlen: Op {
-		public Ldlen(Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
+		public Ldlen(ILReader aReader, MethodInformation aMethodInfo)
+			: base(aReader, aMethodInfo) {
 		}
 		public override void DoAssemble() {
-			Assembler.StackSizes.Pop();
+			Assembler.StackContents.Pop();
 			new CPUx86.Pop(CPUx86.Registers.EAX);
 			new CPUx86.Add(CPUx86.Registers.EAX, "8");
 			new CPUx86.Pushd(CPUx86.Registers.AtEAX);
-			Assembler.StackSizes.Push(4);
+			Assembler.StackContents.Push(new StackContent(4, typeof(uint)));
 		}
 	}
 }

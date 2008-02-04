@@ -25,7 +25,7 @@ namespace Cosmos.Hardware {
 		private static EventHandler mTick;
 
 		public static void HandleInterrupt() {
-			mTick(null, null);
+			//mTick(null, null);
 		}
 	}
 }

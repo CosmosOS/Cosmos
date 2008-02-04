@@ -1,14 +1,14 @@
 using System;
 using System.IO;
-using Mono.Cecil;
-using Mono.Cecil.Cil;
+
+
 using CPU = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(Code.Constrained)]
+	[OpCode(OpCodeEnum.Constrained)]
 	public class Constrained: Op {
-		public Constrained(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
+		public Constrained(ILReader aReader, MethodInformation aMethodInfo)
+			: base(aReader, aMethodInfo) {
 		}
 		public override void DoAssemble() {
 			// todo: Implement correct Constrained support

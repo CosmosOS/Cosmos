@@ -1,16 +1,17 @@
 using System;
 using System.IO;
-using Mono.Cecil;
-using Mono.Cecil.Cil;
+
+
 using CPU = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(Code.Conv_I1)]
+	[OpCode(OpCodeEnum.Conv_I1)]
 	public class Conv_I1: Op {
-		public Conv_I1(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
+		public Conv_I1(ILReader aReader, MethodInformation aMethodInfo)
+			: base(aReader, aMethodInfo) {
 		}
 		public override void DoAssemble() {
+			throw new Exception("Not supported!");
 			// todo: implement correct truncating
 		}
 	}

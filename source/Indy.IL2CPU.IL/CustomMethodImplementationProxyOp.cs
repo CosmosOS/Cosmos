@@ -2,18 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Mono.Cecil;
-using Mono.Cecil.Cil;
+using System.Reflection;
 
 namespace Indy.IL2CPU.IL {
 	public abstract class CustomMethodImplementationProxyOp: Op {
 		public readonly MethodInformation MethodInfo;
-		public CustomMethodImplementationProxyOp(Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
+		public CustomMethodImplementationProxyOp(ILReader aReader, MethodInformation aMethodInfo)
+			: base(aReader, aMethodInfo) {
 			MethodInfo = aMethodInfo;
 		}
 
-		public MethodDefinition ProxiedMethod;
+		public MethodBase ProxiedMethod;
 
 		protected abstract void Ldarg(int aIndex);
 		protected abstract void Ldflda(TypeInformation aType, TypeInformation.Field aField);
@@ -23,21 +22,16 @@ namespace Indy.IL2CPU.IL {
 		public sealed override void DoAssemble() {
 			bool isFirst = true;
 			int curIndex = 0;
-			foreach (ParameterDefinition xParam in ProxiedMethod.Parameters) {
+			ParameterInfo[] xParams = ProxiedMethod.GetParameters();
+			foreach (var xParam in xParams) {
 				if (isFirst && (!ProxiedMethod.IsStatic)) {
 					isFirst = false;
 					Ldarg(curIndex++);
 				} else {
-					string xFieldName = null;
-					foreach (CustomAttribute xAttrib in xParam.CustomAttributes) {
-						if (xAttrib.Constructor.DeclaringType.FullName == "Indy.IL2CPU.FieldAccessAttribute") {
-							xFieldName = (string)xAttrib.Fields["Name"];
-							break;
-						}
-					}
-					if (xFieldName != null) {
+					FieldAccessAttribute xFieldAccess = (FieldAccessAttribute)xParam.GetCustomAttributes(typeof(FieldAccessAttribute), true).FirstOrDefault();
+					if (xFieldAccess != null) {
 						Ldarg(0);
-						Ldflda(MethodInfo.TypeInfo, MethodInfo.TypeInfo.Fields[xFieldName]);
+						Ldflda(MethodInfo.TypeInfo, MethodInfo.TypeInfo.Fields[xFieldAccess.Name]);
 					} else {
 						Ldarg(curIndex++);
 					}

@@ -6,44 +6,54 @@ using System.Runtime.InteropServices;
 
 namespace Cosmos.Hardware.PC {
     public class Interrupts {
-        [StructLayout(LayoutKind.Sequential)]
+        [StructLayout(LayoutKind.Explicit, Size=76)]
         public struct InterruptContext {
-            public uint GS;
-            public uint FS;
-            public uint ES;
-            public uint DS;
-            public uint EDI;
-            public uint ESI;
-            public uint EBP;
-            /// <summary>
-            /// Doesn't work yet
-            /// </summary>
-            public uint ESP;
-            public uint EBX;
-            public uint EDX;
-            public uint ECX;
-            public uint EAX;
-            public uint Interrupt;
-            public uint Param;
-            public uint EIP;
-            public uint CS;
-            public uint EFlags;
-            /// <summary>
-            /// Doesn't work yet
-            /// </summary>
-            public uint UserESP;
-            /// <summary>
-            /// Doesn't work yet
-            /// </summary>
-            public uint SS;
+			[FieldOffset(0)]
+			public uint SS;
+			[FieldOffset(4)]
+			public uint GS;
+			[FieldOffset(8)]
+			public uint FS;
+			[FieldOffset(12)]
+			public uint ES;
+			[FieldOffset(16)]
+			public uint DS;
+			[FieldOffset(20)]
+			public uint EDI;
+			[FieldOffset(24)]
+			public uint ESI;
+			[FieldOffset(28)]
+			public uint EBP;
+			[FieldOffset(32)]
+			public uint ESP;
+			[FieldOffset(36)]
+			public uint EBX;
+			[FieldOffset(40)]
+			public uint EDX;
+			[FieldOffset(44)]
+			public uint ECX;
+			[FieldOffset(48)]
+			public uint EAX;
+			[FieldOffset(52)]
+			public uint Interrupt;
+			[FieldOffset(56)]
+			public uint Param;
+			[FieldOffset(60)]
+			public uint EIP;
+			[FieldOffset(64)]
+			public uint CS;
+			[FieldOffset(68)]
+			public uint EFlags;
+			[FieldOffset(72)]
+			public uint UserESP;
         }
 
         public unsafe static void HandleInterrupt_Default(InterruptContext* aContext) {
-            Console.Write("Interrupt ");
-            WriteNumber(aContext->Interrupt, 32);
-            Console.WriteLine("");
-            //DebugUtil.LogInterruptOccurred(aContext);
-            if (aContext->Interrupt >= 0x20 && aContext->Interrupt <= 0x2F) {
+			//Console.Write("Interrupt ");
+			//WriteNumber(aContext->Interrupt, 32);
+			//Console.WriteLine("");
+			DebugUtil.LogInterruptOccurred(aContext);
+			if (aContext->Interrupt >= 0x20 && aContext->Interrupt <= 0x2F) {
                 if (aContext->Interrupt >= 0x28) {
                     Bus.CPU.PIC.SignalSecondary();
                 } else {
@@ -70,14 +80,14 @@ namespace Cosmos.Hardware.PC {
 
         //IRQ 0 - System timer. Reserved for the system. Cannot be changed by a user.
         public static unsafe void HandleInterrupt_20(InterruptContext* aContext) {
-            PIT.HandleInterrupt();
+			PIT.HandleInterrupt();
             Bus.CPU.PIC.SignalPrimary();
         }
 
         static public InterruptDelegate IRQ01;
         //IRQ 1 - Keyboard. Reserved for the system. Cannot be altered even if no keyboard is present or needed.
         public static unsafe void HandleInterrupt_21(InterruptContext* aContext) {
-            //Change area
+			//Change area
             //
             // Triggers IL2CPU error
             //IRQ01(); 
@@ -95,9 +105,18 @@ namespace Cosmos.Hardware.PC {
 
         //IRQ 14 - Primary IDE. If no Primary IDE this can be changed
         public static unsafe void HandleInterrupt_2E(InterruptContext* aContext) {
-            Storage.ATAOld.HandleInterruptPrimary();
+			Storage.ATAOld.HandleInterruptPrimary();
             Bus.CPU.PIC.SignalSecondary();
         }
+
+		public static unsafe void HandleInterrupt_35(InterruptContext* aContext) {
+			Cosmos.Hardware.DebugUtil.SendMessage("Interrupts", "Interrupt 35 handler");
+			Cosmos.Hardware.DebugUtil.SendNumber("Interrupts", "Context address", (uint)aContext, 32);
+			DebugUtil.LogInterruptOccurred(aContext);
+			Console.WriteLine("Halting");
+			while (true)
+				;
+		}
 
         //IRQ 15 - Secondary IDE
         public static unsafe void HandleInterrupt_2F(InterruptContext* aContext) {
@@ -106,37 +125,37 @@ namespace Cosmos.Hardware.PC {
         }
 
         public static unsafe void HandleInterrupt_00(InterruptContext* aContext) {
-            HandleException(aContext->EIP, "Divide by zero", "EDivideByZero", aContext);
+			HandleException(aContext->EIP, "Divide by zero", "EDivideByZero", aContext);
         }
 
         public static unsafe void HandleInterrupt_06(InterruptContext* aContext) {
-            HandleException(aContext->EIP, "Invalid Opcode", "EInvalidOpcode", aContext);
+			HandleException(aContext->EIP, "Invalid Opcode", "EInvalidOpcode", aContext);
         }
 
         public static unsafe void HandleInterrupt_0D(InterruptContext* aContext) {
-            HandleException(aContext->EIP, "General Protection Fault", "GPF", aContext);
+			HandleException(aContext->EIP, "General Protection Fault", "GPF", aContext);
         }
 
         private static unsafe void HandleException(uint aEIP, string aDescription, string aName, InterruptContext* ctx) {
             const string SysFault = "System Fault";
 
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.BackgroundColor = ConsoleColor.DarkRed;
+            //Console.ForegroundColor = ConsoleColor.White;
+            //Console.BackgroundColor = ConsoleColor.DarkRed;
             Console.Write(SysFault);
-            for (int i = 0; i < Console.WindowWidth - SysFault.Length; i++)
-                Console.Write(" ");
+			//for (int i = 0; i < Console.WindowWidth - SysFault.Length; i++)
+			//    Console.Write(" ");
 
-            Console.BackgroundColor = ConsoleColor.Black;
+            //Console.BackgroundColor = ConsoleColor.Black;
 
             Console.Write(aDescription);
             Console.Write(" at ");
             WriteNumber(aEIP, 32);
 
             Console.WriteLine();
-            Console.WriteLine("Register States:");
+//            Console.WriteLine("Register States:");
             // TODO: Register states
 
-            DebugUtil.SendMessage("Exceptions", aName);
+            Cosmos.Hardware.DebugUtil.SendMessage("Exceptions", aName);
             Console.WriteLine();
             while (true)
                 ;
@@ -156,6 +175,7 @@ namespace Cosmos.Hardware.PC {
                     HandleInterrupt_21(null);
                     HandleInterrupt_2E(null);
                     HandleInterrupt_2F(null);
+					HandleInterrupt_35(null);
                 }
             }
         }

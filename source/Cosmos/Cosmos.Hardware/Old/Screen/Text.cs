@@ -6,13 +6,23 @@ namespace Cosmos.Hardware.Screen {
 	public class Text {
 		public const int Columns = 80;
 		public const int Lines = 24;
-		public const uint VideoAddr = 0xB8000;
-		private static byte Color = 7;
+		public const int VideoAddr = 0xB8000;
+		private const byte DefaultColor = 7;
+		private static bool mInitialized = false;
+		private static byte Color;
+
+		private static void CheckInit() {
+			if (!mInitialized) {
+				Color = DefaultColor;
+				mInitialized = true;
+			}
+		}
 
 		public static unsafe void Clear() {
+			CheckInit();
 			for (int i = 0; i < Columns * (Lines + 1); i++) {
 				byte* xScreenPtr = (byte*)VideoAddr;
-				xScreenPtr += i*2;
+				xScreenPtr += i * 2;
 				*xScreenPtr = 0;
 				xScreenPtr += 1;
 				*xScreenPtr = Color;
@@ -20,6 +30,8 @@ namespace Cosmos.Hardware.Screen {
 		}
 
 		public static unsafe void ScrollUp() {
+			CheckInit();
+			System.Diagnostics.Debugger.Break();
 			for (int i = 0; i < Columns * (Lines); i++) {
 				byte* xScreenPtr = (byte*)(VideoAddr + (i * 2));
 				*xScreenPtr = *(xScreenPtr + (Columns * 2));
@@ -32,9 +44,11 @@ namespace Cosmos.Hardware.Screen {
 				xScreenPtr += 1;
 				*xScreenPtr = Color;
 			}
+			System.Diagnostics.Debugger.Break();
 		}
 
 		public unsafe static void PutChar(int aLine, int aPos, char aChar) {
+			CheckInit();
 			int xScreenOffset = ((aPos + (aLine * 80)) * 2);
 			byte* xScreenPtr = (byte*)((0xB8000) + xScreenOffset);
 			byte xVal = (byte)aChar;
@@ -44,6 +58,7 @@ namespace Cosmos.Hardware.Screen {
 		}
 
 		public static void SetColors(ConsoleColor foreground, ConsoleColor background) {
+			CheckInit();
 			Color = (byte)((byte)foreground | ((byte)background << 4));
 		}
 	}

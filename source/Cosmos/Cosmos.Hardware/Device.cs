@@ -18,7 +18,7 @@ namespace Cosmos.Hardware {
         }
 
         static public void Add(Device aDevice) {
-            mDevices.Add(aDevice);
+			mDevices.Add(aDevice);
         }
 
         static public List<Device> Find(DeviceType aType) {

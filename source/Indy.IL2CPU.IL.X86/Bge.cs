@@ -1,22 +1,31 @@
 using System;
 using System.IO;
-using Mono.Cecil;
-using Mono.Cecil.Cil;
+
+
 using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using Indy.IL2CPU.Assembler;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(Code.Bge)]
+	[OpCode(OpCodeEnum.Bge)]
 	public class Bge: Op {
 		public readonly string TargetLabel;
 		public readonly string CurInstructionLabel;
-		public Bge(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
-			TargetLabel = GetInstructionLabel((Instruction)aInstruction.Operand);
-			CurInstructionLabel = GetInstructionLabel(aInstruction);
+		public Bge(ILReader aReader, MethodInformation aMethodInfo)
+			: base(aReader, aMethodInfo) {
+			TargetLabel = GetInstructionLabel(aReader.OperandValueBranchPosition);
+			CurInstructionLabel = GetInstructionLabel(aReader);
 		}
 		public override void DoAssemble() {
-			int xSize = Math.Max(Assembler.StackSizes.Pop(), Assembler.StackSizes.Pop());
+			StackContent xItem1 = Assembler.StackContents.Pop();
+			StackContent xItem2 = Assembler.StackContents.Pop();
+			int xSize = Math.Max(xItem1.Size, xItem2.Size);
+			var xIsFloat = xItem1.IsFloat || xItem2.IsFloat;
+			if (xIsFloat) {
+				throw new Exception("Floats not yet supported!");
+			}
+			if (xSize > 8)
+				throw new Exception("StackSize>8 not supported");
 			string BaseLabel = CurInstructionLabel + "__";
 			string LabelTrue = BaseLabel + "True";
 			string LabelFalse = BaseLabel + "False";

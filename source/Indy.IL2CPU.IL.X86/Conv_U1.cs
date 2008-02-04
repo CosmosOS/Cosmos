@@ -1,15 +1,19 @@
 using System;
-using Mono.Cecil.Cil;
+
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using Indy.IL2CPU.Assembler;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(Code.Conv_U1)]
+	[OpCode(OpCodeEnum.Conv_U1)]
 	public class Conv_U1: Op {
-		public Conv_U1(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
+		public Conv_U1(ILReader aReader, MethodInformation aMethodInfo)
+			: base(aReader, aMethodInfo) {
 		}
 		public override void DoAssemble() {
-			int xSource = Assembler.StackSizes.Pop();
+			if (Assembler.StackContents.Peek().IsFloat) {
+				throw new Exception("Floats not supported yet!");
+			}
+			int xSource = Assembler.StackContents.Pop().Size;
 			switch (xSource) {
 				case 2:
 				case 4: {
@@ -29,7 +33,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				default:
 					throw new Exception("SourceSize " + xSource + " not supported!");
 			}
-			Assembler.StackSizes.Push(1);
+			Assembler.StackContents.Push(new StackContent(1, typeof(byte)));
 		}
 	}
 }

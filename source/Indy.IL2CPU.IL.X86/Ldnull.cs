@@ -1,18 +1,19 @@
 using System;
 using System.IO;
-using Mono.Cecil;
-using Mono.Cecil.Cil;
+
+
 using CPU = Indy.IL2CPU.Assembler.X86;
+using Indy.IL2CPU.Assembler;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(Code.Ldnull)]
+	[OpCode(OpCodeEnum.Ldnull)]
 	public class Ldnull: Op {
-		public Ldnull(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
+		public Ldnull(ILReader aReader, MethodInformation aMethodInfo)
+			: base(aReader, aMethodInfo) {
 		}
 		public override void DoAssemble() {
 			new CPU.Pushd("0");
-			Assembler.StackSizes.Push(4);
+			Assembler.StackContents.Push(new StackContent(4, typeof(uint)));
 		}
 	}
 }

@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Mono.Cecil.Cil;
+
 
 namespace Indy.IL2CPU.IL.X86.Native {
 	public class NativeMainEntryMethodOp: X86MainEntryPointOp {
-		public NativeMainEntryMethodOp(Instruction aInstruction, MethodInformation aMethodInfo): base(aInstruction, aMethodInfo) {
+		public NativeMainEntryMethodOp(ILReader aReader, MethodInformation aMethodInfo)
+			: base(aReader, aMethodInfo) {
 		}
 
 		public override void Enter(string aName) {

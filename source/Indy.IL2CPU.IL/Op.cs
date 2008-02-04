@@ -3,24 +3,24 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Mono.Cecil;
-using Mono.Cecil.Cil;
 using Indy.IL2CPU.Assembler;
-using Cil = Mono.Cecil.Cil;
-using Instruction=Mono.Cecil.Cil.Instruction;
+using System.Reflection;
 
 namespace Indy.IL2CPU.IL {
 	public abstract class Op {
 		private readonly string mCurrentInstructionLabel;
 		private readonly string mILComment;
 		private readonly bool mSupportsMetalMode;
-		public static string GetInstructionLabel(Cil.Instruction aInstruction) {
-			return ".L" + aInstruction.Offset.ToString("X8");
+		public static string GetInstructionLabel(ILReader aReader) {
+			return GetInstructionLabel(aReader.OldPosition);
+		}
+		public static string GetInstructionLabel(long aPosition) {
+			return ".L" + aPosition.ToString("X8");
 		}
 
-		public delegate void QueueMethodHandler(MethodDefinition aMethod);
+		public delegate void QueueMethodHandler(MethodBase aMethod);
 
-		public delegate void QueueStaticFieldHandler(string aAssembly, string aType, string aField, out string aDataName);
+		public delegate void QueueStaticFieldHandler(FieldInfo aField);
 
 		public void Assemble() {
 			if (!String.IsNullOrEmpty(mCurrentInstructionLabel)) {
@@ -38,17 +38,14 @@ namespace Indy.IL2CPU.IL {
 
 		public abstract void DoAssemble();
 
-		public Op(Instruction aInstruction, MethodInformation aMethodInfo) {
-			if (aInstruction != null) {
-				mCurrentInstructionLabel = GetInstructionLabel(aInstruction);
-				if (aInstruction.OpCode.Code.ToString() != "Ldstr") {
-					mILComment = "; IL: " + aInstruction.OpCode.Code + " " + aInstruction.Operand;
-				} else {
-					mILComment = "; IL: " + aInstruction.OpCode.Code;
-				}
+		public Op(ILReader aReader, MethodInformation aMethodInfo) {
+			if (aReader != null) {
+				mCurrentInstructionLabel = GetInstructionLabel(aReader);
+				// todo: need to add the real operand here?
+				mILComment = "; IL: " + aReader.OpCode + " " + aReader.Operand;
 			}
-			OpCodeAttribute xAttrib = GetType().GetCustomAttributes(typeof (OpCodeAttribute), true).Cast<OpCodeAttribute>().FirstOrDefault();
-			if(xAttrib!=null) {
+			OpCodeAttribute xAttrib = GetType().GetCustomAttributes(typeof(OpCodeAttribute), true).Cast<OpCodeAttribute>().FirstOrDefault();
+			if (xAttrib != null) {
 				mSupportsMetalMode = xAttrib.IsMetallic;
 			}
 		}
@@ -75,18 +72,21 @@ namespace Indy.IL2CPU.IL {
 			}
 		}
 
-		protected void DoQueueMethod(MethodDefinition aMethod) {
+		protected void DoQueueMethod(MethodBase aMethod) {
 			if (QueueMethod == null) {
 				throw new Exception("IL Op wants to queue a method, but no QueueMethod handler suppplied!");
 			}
 			QueueMethod(aMethod);
 		}
 
-		protected void DoQueueStaticField(string aAssembly, string aType, string aField, out string aDataName) {
+		protected void DoQueueStaticField(FieldInfo aField) {
 			if (QueueStaticField == null) {
 				throw new Exception("IL Op wants to queue a static field, but no QueueStaticField handler supplied!");
 			}
-			QueueStaticField(aAssembly, aType, aField, out aDataName);
+			if (!aField.IsStatic) {
+				throw new Exception("Cannot add instance fields to the StaticField queue!");
+			}
+			QueueStaticField(aField);
 		}
 
 		public static QueueMethodHandler QueueMethod;

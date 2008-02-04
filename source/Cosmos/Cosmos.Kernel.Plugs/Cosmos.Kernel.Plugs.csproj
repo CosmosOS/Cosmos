@@ -47,8 +47,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assemblers\DoTest.cs" />
     <Compile Include="Assemblers\GetAmountOfRAM.cs" />
+    <Compile Include="Assemblers\GetCurrentESP.cs" />
     <Compile Include="Assemblers\GetEndOfKernel.cs" />
+    <Compile Include="Assemblers\GetEndOfStack.cs" />
     <Compile Include="Assemblers\IORead16.cs" />
     <Compile Include="Assemblers\IORead32.cs" />
     <Compile Include="Assemblers\IOWrite16.cs" />
@@ -67,6 +70,7 @@
     <Compile Include="CPU.cs" />
     <Compile Include="Hardware.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ThreadImpl.cs" />
     <Compile Include="Type.cs" />
   </ItemGroup>
   <ItemGroup>

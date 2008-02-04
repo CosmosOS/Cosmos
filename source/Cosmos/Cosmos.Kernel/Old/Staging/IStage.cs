@@ -23,5 +23,9 @@ namespace Cosmos.Kernel.Staging {
                 /// Tears the stage down.
                 /// </summary>
                 public abstract void Teardown();
+
+				public override string ToString() {
+					return Name;
+				}
         }
 }

@@ -40,7 +40,7 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
 				aOutputWriter.WriteLine("; some more startups todo");
 				aOutputWriter.WriteLine("				 cli");
 				//aOutputWriter.WriteLine("				 push ebx");
-				aOutputWriter.WriteLine("				 xchg bx, bx");
+				aOutputWriter.WriteLine("				 call " + BreakMethodName);
 				aOutputWriter.WriteLine("				 call " + EntryPointName);
 				aOutputWriter.WriteLine("			.loop:");
 				aOutputWriter.WriteLine("				 cli");

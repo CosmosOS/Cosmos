@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Mono.Cecil;
-using Mono.Cecil.Cil;
+using System.Reflection;
 
 namespace Indy.IL2CPU.IL {
 	// TODO: abstract this one out to a X86 specific one
 	public class MethodInformation {
 		public struct Variable {
-			public Variable(int aOffset, int aSize, bool aIsReferenceTypeField, TypeReference aVariableType) {
+			public Variable(int aOffset, int aSize, bool aIsReferenceTypeField, Type aVariableType) {
 				Offset = aOffset;
 				Size = aSize;
 				VirtualAddresses = new string[Size / 4];
@@ -22,7 +21,7 @@ namespace Indy.IL2CPU.IL {
 			public readonly int Offset;
 			public readonly int Size;
 			public readonly bool IsReferenceType;
-			public readonly TypeReference VariableType;
+			public readonly Type VariableType;
 			/// <summary>
 			/// Gives the list of addresses to access this variable. This field contains multiple entries if the <see cref="Size"/> is larger than 4.
 			/// </summary>
@@ -35,7 +34,7 @@ namespace Indy.IL2CPU.IL {
 				ByRef,
 				Out
 			}
-			public Argument(int aSize, int aOffset, KindEnum aKind, bool mIsReferenceType, TypeReference aArgumentType) {
+			public Argument(int aSize, int aOffset, KindEnum aKind, bool mIsReferenceType, Type aArgumentType) {
 				Size = aSize;
 				Offset = aOffset;
 				VirtualAddresses = new string[Size / 4];
@@ -52,28 +51,30 @@ namespace Indy.IL2CPU.IL {
 			public readonly bool IsReferenceType;
 			public readonly int Offset;
 			public readonly KindEnum Kind;
-			public readonly TypeReference ArgumentType;
+			public readonly Type ArgumentType;
 		}
 
-		public MethodInformation(string aLabelName, Variable[] aLocals, Argument[] aArguments, int aReturnSize, bool aIsInstanceMethod, TypeInformation aTypeInfo, MethodDefinition aMethodDef) {
+		public MethodInformation(string aLabelName, Variable[] aLocals, Argument[] aArguments, int aReturnSize, bool aIsInstanceMethod, TypeInformation aTypeInfo, MethodBase aMethod, Type aReturnType) {
 			Locals = aLocals;
 			LabelName = aLabelName;
 			Arguments = aArguments;
 			ReturnSize = aReturnSize;
 			IsInstanceMethod = aIsInstanceMethod;
 			TypeInfo = aTypeInfo;
-			MethodDefinition = aMethodDef;
+			Method = aMethod;
+			ReturnType = aReturnType;
 		}
 
 		/// <summary>
 		/// This variable is only updated when the MethodInformation instance is supplied by the Engine.ProcessAllMethods method
 		/// </summary>
-		public ExceptionHandler CurrentHandler;
-		public readonly MethodDefinition MethodDefinition;
+		public ExceptionHandlingClause CurrentHandler;
+		public readonly MethodBase Method;
 		public readonly string LabelName;
 		public readonly Variable[] Locals;
 		public readonly Argument[] Arguments;
 		public readonly int ReturnSize;
+		public readonly Type ReturnType;
 		public readonly bool IsInstanceMethod;
 		public readonly TypeInformation TypeInfo;
 		public override string ToString() {

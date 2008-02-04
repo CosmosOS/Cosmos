@@ -1,19 +1,20 @@
 using System;
 using System.Linq;
-using Mono.Cecil.Cil;
+
 using CPU = Indy.IL2CPU.Assembler.X86;
+using Indy.IL2CPU.Assembler;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(Code.Ldc_R4)]
+	[OpCode(OpCodeEnum.Ldc_R4)]
 	public class Ldc_R4: Op {
 		private Single mValue;
-		public Ldc_R4(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
-			mValue = (Single)aInstruction.Operand;
+		public Ldc_R4(ILReader aReader, MethodInformation aMethodInfo)
+			: base(aReader, aMethodInfo) {
+			mValue = aReader.OperandValueSingle;
 		}
 		public override void DoAssemble() {
 			new CPU.Pushd("0x" + BitConverter.GetBytes(mValue).Aggregate("", (x, b) => x + b.ToString("X2")));
-			Assembler.StackSizes.Push(4);
+			Assembler.StackContents.Push(new StackContent(4, typeof(Single)));
 		}
 	}
 }

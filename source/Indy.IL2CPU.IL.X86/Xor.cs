@@ -1,20 +1,24 @@
 using System;
-using Mono.Cecil.Cil;
+
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using Indy.IL2CPU.Assembler;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(Code.Xor)]
+	[OpCode(OpCodeEnum.Xor)]
 	public class Xor: Op {
-		public Xor(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
+		public Xor(ILReader aReader, MethodInformation aMethodInfo)
+			: base(aReader, aMethodInfo) {
 		}
 		public override void DoAssemble() {
-			int xSize = Math.Max(Assembler.StackSizes.Pop(), Assembler.StackSizes.Pop());
+			if (Assembler.StackContents.Peek().IsFloat) {
+				throw new Exception("Floats not supported");
+			}
+			int xSize = Math.Max(Assembler.StackContents.Pop().Size, Assembler.StackContents.Pop().Size);
 			new CPUx86.Pop(CPUx86.Registers.EAX);
 			new CPUx86.Pop(CPUx86.Registers.EDX);
 			new CPUx86.Xor(CPUx86.Registers.EAX, CPUx86.Registers.EDX);
 			new CPUx86.Pushd(CPUx86.Registers.EAX);
-			Assembler.StackSizes.Push(xSize);
+			Assembler.StackContents.Push(new StackContent(xSize));
 		}
 	}
 }

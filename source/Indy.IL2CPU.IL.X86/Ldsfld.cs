@@ -1,22 +1,24 @@
 using System;
 using Indy.IL2CPU.Assembler;
-using Mono.Cecil;
-using Mono.Cecil.Cil;
+
+
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using System.Reflection;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(Code.Ldsfld)]
+	[OpCode(OpCodeEnum.Ldsfld)]
 	public class Ldsfld: Op {
 		private string mDataName;
 		private int mSize;
 		private bool mNeedsGC;
+		private Type mDataType;
 
-		public Ldsfld(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
-			FieldReference xField = (FieldReference)aInstruction.Operand;
+		public Ldsfld(ILReader aReader, MethodInformation aMethodInfo)
+			: base(aReader, aMethodInfo) {
+			FieldInfo xField = aReader.OperandValueField;
 			mSize = Engine.GetFieldStorageSize(xField.FieldType);
-			Engine.QueueStaticField(Engine.GetDefinitionFromFieldReference(xField), out mDataName);
-			mNeedsGC = !Engine.GetDefinitionFromTypeReference(xField.FieldType).IsValueType && xField.FieldType.FullName != "System.String";
+			Engine.QueueStaticField(xField, out mDataName);
+			mNeedsGC = !xField.FieldType.IsValueType && xField.FieldType.FullName != "System.String";
 		}
 		public override void DoAssemble() {
 			if (mSize >= 4) {
@@ -65,15 +67,15 @@ namespace Indy.IL2CPU.IL.X86 {
 						throw new Exception("Remainder size " + (mSize) + " not supported!");
 				}
 			}
-			Assembler.StackSizes.Push(mSize);
+			Assembler.StackContents.Push(new StackContent(mSize, mDataType));
 			if (mNeedsGC) {
 				new Dup(null, null) {
 					Assembler = this.Assembler
 				}.
 				Assemble();
-				Engine.QueueMethodRef(GCImplementationRefs.IncRefCountRef);
+				Engine.QueueMethod(GCImplementationRefs.IncRefCountRef);
 				new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef));
-				Assembler.StackSizes.Pop();
+				Assembler.StackContents.Pop();
 			}
 		}
 	}

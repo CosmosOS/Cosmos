@@ -29,5 +29,19 @@ namespace Cosmos.Kernel.Plugs {
 				}
 			}
 		}
+
+		[PlugMethod(MethodAssembler = typeof(Assemblers.GetEndOfStack))]
+		public static uint GetEndOfStack() {
+			return 0;
+		}
+
+		[PlugMethod(MethodAssembler = typeof(Assemblers.GetCurrentESP))]
+		public static uint GetCurrentESP() {
+			return 0;
+		}
+
+		[PlugMethod(MethodAssembler=typeof(Assemblers.DoTest))]
+		public static void DoTest() {
+		}
 	}
 }

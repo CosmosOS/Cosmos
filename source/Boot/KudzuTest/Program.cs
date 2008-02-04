@@ -19,14 +19,16 @@ namespace KudzuTest {
         }
 
         static protected string StringBuilderTest() {
-            var xSB = new System.Text.StringBuilder("Hello");
-            xSB.Append(" world.");
-            return xSB.ToString();
+			//var xSB = new System.Text.StringBuilder("Hello");
+			//xSB.Append(" world.");
+			//return xSB.ToString();
+			return "";
         }
 
 		// Main entry point of the kernel
 		public static void Init() {
             Cosmos.Kernel.Boot.Default();
+//			System.Diagnostics.Debugger.Break();
             Console.WriteLine("Boot complete");
 
             // Matthijs - uncomment these tests to show the errors
@@ -36,7 +38,7 @@ namespace KudzuTest {
             //Console.WriteLine("StringBuilder test");
             //Console.WriteLine(StringBuilderTest());
 
-            Cosmos.Kernel.Temp.Kudzu.PCI.Test();
+            //Cosmos.Kernel.Temp.Kudzu.PCI.Test();
 
             Console.WriteLine("Shell complete");
             while (true)

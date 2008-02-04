@@ -66,10 +66,14 @@ namespace Cosmos.Build.Windows {
                 Directory.CreateDirectory(mAsmPath);
             }
             Assembly xTarget = System.Reflection.Assembly.GetEntryAssembly();
+			Stopwatch xSW = new Stopwatch();
+			xSW.Start();
             IL2CPU.Program.Main(new string[] {@"-in:" + xTarget.Location
                 , "-plug:" + mToolsPath + @"Cosmos.Kernel.Plugs\Cosmos.Kernel.Plugs.dll"
                 , "-platform:nativex86", "-asm:" + mAsmPath}
                 );
+			xSW.Stop();
+			Console.WriteLine("IL2CPU Run took " + xSW.Elapsed.ToString());
 
             RemoveFile(mBuildPath + "output.obj");
             Global.Call(mToolsPath + @"nasm\nasm.exe", String.Format("-g -f elf -F stabs -o \"{0}\" \"{1}\"", mBuildPath + "output.obj", mAsmPath + "main.asm"), mBuildPath);

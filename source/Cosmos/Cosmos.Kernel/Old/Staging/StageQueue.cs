@@ -10,12 +10,12 @@ namespace Cosmos.Kernel.Staging {
 		/// <summary>
 		/// The list of initialize stages.
 		/// </summary>
-		private Queue<StageBase> _initialize = new Queue<StageBase> ();
+		private Queue<StageBase> _initialize = new Queue<StageBase>(16);
 
 		/// <summary>
 		/// The list of teardown stages.
 		/// </summary>
-		private Stack<StageBase> _teardown = new Stack<StageBase> ();
+		private Stack<StageBase> _teardown = new Stack<StageBase>(16);
 
 		private StageBase _current;
 		/// <summary>
@@ -32,7 +32,7 @@ namespace Cosmos.Kernel.Staging {
 		/// </summary>
 		/// <param name="stage"></param>
 		public void Enqueue(StageBase stage) {
-			_initialize.Enqueue (stage);
+			_initialize.Enqueue(stage);
 		}
 
 		/// <summary>
@@ -40,14 +40,14 @@ namespace Cosmos.Kernel.Staging {
 		/// </summary>
 		public void Run() {
 			while (_initialize.Count != 0) {
-				_current = _initialize.Dequeue ();
+				_current = (StageBase)_initialize.Dequeue();
 
-				Console.Write ("Entering stage ");
-				Console.Write (Current.Name);
-				Console.WriteLine (".");
+				Console.Write("Entering stage ");
+				Console.Write(Current.Name);
+				Console.WriteLine(".");
 
-				_current.Initialize ();
-				_teardown.Push (Current);
+				_current.Initialize();
+				_teardown.Push(Current);
 			}
 		}
 
@@ -56,13 +56,13 @@ namespace Cosmos.Kernel.Staging {
 		/// </summary>
 		public void Teardown() {
 			while (_teardown.Count != 0) {
-				_current = _teardown.Pop ();
-				
-				Console.Write ("Leaving stage ");
-				Console.Write (Current.Name);
-				Console.WriteLine (".");
+				_current = (StageBase)_teardown.Pop();
 
-				_current.Teardown ();
+				Console.Write("Leaving stage ");
+				Console.Write(Current.Name);
+				Console.WriteLine(".");
+
+				_current.Teardown();
 			}
 		}
 	}

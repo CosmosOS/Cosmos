@@ -1,22 +1,28 @@
 using System;
 using System.IO;
-using Mono.Cecil;
-using Mono.Cecil.Cil;
+
+
 using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(Code.Ble)]
+	[OpCode(OpCodeEnum.Ble)]
 	public class Ble: Op {
 		public readonly string TargetLabel;
 		public readonly string CurInstructionLabel;
-		public Ble(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
-			TargetLabel = GetInstructionLabel((Instruction)aInstruction.Operand);
-			CurInstructionLabel = GetInstructionLabel(aInstruction);
+		public Ble(ILReader aReader, MethodInformation aMethodInfo)
+			: base(aReader, aMethodInfo) {
+			TargetLabel = GetInstructionLabel(aReader.OperandValueBranchPosition);
+			CurInstructionLabel = GetInstructionLabel(aReader);
 		}
 		public override void DoAssemble() {
-			int xSize = Math.Max(Assembler.StackSizes.Pop(), Assembler.StackSizes.Pop());
+			if (Assembler.StackContents.Peek().IsFloat) {
+				throw new Exception("Floats not yet supported!");
+			}
+			int xSize = Math.Max(Assembler.StackContents.Pop().Size, Assembler.StackContents.Pop().Size);
+			if (xSize > 8) {
+				throw new Exception("StackSize>8 not supported");
+			}
 			string BaseLabel = CurInstructionLabel + "__";
 			string LabelTrue = BaseLabel + "True";
 			string LabelFalse = BaseLabel + "False";

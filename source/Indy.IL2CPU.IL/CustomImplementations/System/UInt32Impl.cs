@@ -7,7 +7,7 @@ using Indy.IL2CPU.Plugs;
 namespace Indy.IL2CPU.IL.CustomImplementations.System {
 	[Plug(Target=typeof(UInt32))]
 	public static class UInt32Impl {
-		[PlugMethod(Signature = "System_String___System_UInt32_ToString____")]
+		//[PlugMethod(Signature = "System_String_System_UInt32_ToString__System_String__")]
 		public static string ToString(ref uint aThis) {
 			string xDigits = "0123456789ABCDEF";
 			char[] xResult = new char[10];

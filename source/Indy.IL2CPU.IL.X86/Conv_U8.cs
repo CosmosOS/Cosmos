@@ -1,24 +1,28 @@
 using System;
-using Mono.Cecil.Cil;
+
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using Indy.IL2CPU.Assembler;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(Code.Conv_U8)]
+	[OpCode(OpCodeEnum.Conv_U8)]
 	public class Conv_U8: Op {
-		public Conv_U8(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
+		public Conv_U8(ILReader aReader, MethodInformation aMethodInfo)
+			: base(aReader, aMethodInfo) {
 		}
 		public override void DoAssemble() {
-			int xSource = Assembler.StackSizes.Peek();
+			if (Assembler.StackContents.Peek().IsFloat) {
+				throw new Exception("Floats are not yet supported");
+			}
+			int xSource = Assembler.StackContents.Peek().Size;
 			switch (xSource) {
 				case 1:
 				case 2:
 				case 4: {
-						Assembler.StackSizes.Pop();
+						Assembler.StackContents.Pop();
 						new CPUx86.Pop(CPUx86.Registers.EAX);
 						new CPUx86.Pushd("0");
 						new CPUx86.Pushd(CPUx86.Registers.EAX);
-						Assembler.StackSizes.Push(8);
+						Assembler.StackContents.Push(new StackContent(8, typeof(ulong)));
 						break;
 					}
 				case 8: {

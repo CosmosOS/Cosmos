@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Mono.Cecil;
+using System.Reflection;
 
 namespace Indy.IL2CPU.Assembler {
-	public class DataMember {
-		public const string IllegalIdentifierChars = "&.,+$<>{}-`\'/\\ ()[]*!";
-		public static string GetStaticFieldName(FieldDefinition aField) {
-			return FilterStringForIncorrectChars("static_field__" + aField.DeclaringType.FullName + "_" + aField.Name);
+	public class DataMember: IComparable<DataMember> {
+		public const string IllegalIdentifierChars = "&.,+$<>{}-`\'/\\ ()[]*!=";
+		public static string GetStaticFieldName(FieldInfo aField) {
+			return FilterStringForIncorrectChars("static_field__" + aField.DeclaringType.FullName + "." + aField.Name);
 		}
 
 		public static string FilterStringForIncorrectChars(string aName) {
@@ -39,6 +39,10 @@ namespace Indy.IL2CPU.Assembler {
 
 		public override string ToString() {
 			return Name + " " + DataType + " " + DefaultValue;
+		}
+
+		public int CompareTo(DataMember other) {
+			return String.Compare(Name, other.Name);
 		}
 	}
 }

@@ -6,7 +6,7 @@ using Indy.IL2CPU.Plugs;
 namespace Cosmos.Kernel.Plugs {
 	[Plug(Target=typeof(System.Type))]
 	public static class Type {
-		[PlugMethod(Signature="System_Void___System_Type__cctor____")]
+		[PlugMethod(Signature="System_Void__System_Type__cctor__")]
 		public static void CCtor() {
 		}
 	}

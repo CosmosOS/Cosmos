@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Indy.IL2CPU.Plugs;
 
 namespace Indy.IL2CPU {
 	public enum InstanceTypeEnum: uint {
@@ -11,6 +12,8 @@ namespace Indy.IL2CPU {
 		StaticEmbeddedObject = 0x80000001,
 		StaticEmbeddedArray = 0x80000002
 	}
+
+	[Plug(Target=typeof(Object))]
 	public static class ObjectImpl {
 		/// <summary>
 		///		<para>
@@ -26,6 +29,10 @@ namespace Indy.IL2CPU {
 		public const int FieldDataOffset = 12;
 		//[MethodAlias(Name = "System_Void___System_Object__ctor____")]
 		public static void Ctor(IntPtr aThis) {
+		}
+
+		public static Type GetType(object aThis) {
+			return null;
 		}
 	}
 }

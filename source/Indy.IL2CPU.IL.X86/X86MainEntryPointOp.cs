@@ -2,16 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Mono.Cecil;
+
 using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
-using Mono.Cecil.Cil;
+
+using System.Reflection;
 
 namespace Indy.IL2CPU.IL.X86 {
 	public class X86MainEntryPointOp: MainEntryPointOp {
 		private string mMethodName;
-		public X86MainEntryPointOp(Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
+		public X86MainEntryPointOp(ILReader aReader, MethodInformation aMethodInfo)
+			: base(aReader, aMethodInfo) {
 		}
 
 		public override void Pushd(string aValue) {
@@ -20,7 +21,7 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		private int xLabelId = 0;
 
-		public override void Call(MethodDefinition aMethod) {
+		public override void Call(MethodBase aMethod) {
 			Engine.QueueMethod(aMethod);
 			Call(CPU.Label.GenerateLabelName(aMethod));
 			if (!Assembler.InMetalMode) {
@@ -28,12 +29,15 @@ namespace Indy.IL2CPU.IL.X86 {
 				string xLabel = ".Call_Part2_" + xLabelId++.ToString();
 				new CPUx86.JumpIfEquals(xLabel);
 				//new CPUx86.Call("_CODE_REQUESTED_BREAK_");
-				Engine.QueueMethod(Engine.GetMethodDefinition(Engine.GetTypeDefinitionFromReflectionType(typeof(Assembler.Assembler)), "PrintException"));
-				new CPUx86.Call(CPU.Label.GenerateLabelName(Engine.GetMethodDefinition(Engine.GetTypeDefinitionFromReflectionType(typeof(Assembler.Assembler)), "PrintException")));
+				Engine.QueueMethod(Engine.GetMethodBase(typeof(Assembler.Assembler), "PrintException"));
+				new CPUx86.Call(CPU.Label.GenerateLabelName(Engine.GetMethodBase(typeof(Assembler.Assembler), "PrintException")));
 				new CPU.Label(xLabel);
 			}
-			if(!aMethod.ReturnType.ReturnType.FullName.StartsWith("System.Void")) {
-				new CPUx86.Pushd(CPUx86.Registers.EAX);
+			MethodInfo xMethodInfo = aMethod as MethodInfo;
+			if (xMethodInfo != null) {
+				if (!xMethodInfo.ReturnType.FullName.StartsWith("System.Void")) {
+					new CPUx86.Pushd(CPUx86.Registers.EAX);
+				}
 			}
 		}
 

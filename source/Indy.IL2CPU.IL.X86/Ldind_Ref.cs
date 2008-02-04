@@ -1,18 +1,18 @@
 using System;
 using System.IO;
-using Mono.Cecil;
-using Mono.Cecil.Cil;
+
+
 using CPU = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(Code.Ldind_Ref)]
+	[OpCode(OpCodeEnum.Ldind_Ref)]
 	public class Ldind_Ref: Op {
-		public Ldind_Ref(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
+		public Ldind_Ref(ILReader aReader, MethodInformation aMethodInfo)
+			: base(aReader, aMethodInfo) {
 		}
 		public override void DoAssemble() {
-			//new CPU.Pop("eax");
-			//new CPU.Pushd("[eax]");
+			new CPU.Pop("eax");
+			new CPU.Pushd("[eax]");
 		}
 	}
 }

@@ -7,7 +7,12 @@ using Indy.IL2CPU.Plugs;
 namespace Indy.IL2CPU.IL.CustomImplementations.System {
 	[Plug(Target = typeof(Enum))]
 	public static class EnumImpl {
-		[PlugMethod(Signature = "System_String___System_Enum_ToString____")]
+		[PlugMethod(Signature = "System_Void__System_Enum__cctor__")]
+		public static void Cctor() {
+			//
+		}
+
+		//[PlugMethod(Signature = "System_String___System_Enum_ToString____")]
 		public static string ToString(ref uint aThis) {
 			return UInt32Impl.ToString(ref aThis);
 		}

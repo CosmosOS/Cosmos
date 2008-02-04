@@ -21,5 +21,16 @@ namespace Cosmos.Hardware {
 
 		public static void ZeroFill(uint aStartAddress, uint aLength) {
 		}
+
+		public static uint GetCurrentESP() {
+			return 0;
+		}
+
+		public static uint GetEndOfStack() {
+			return 0;
+		}
+
+		public static void DoTest() {
+		}
 	}
 }

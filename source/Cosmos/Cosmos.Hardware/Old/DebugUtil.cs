@@ -15,6 +15,7 @@ namespace Cosmos.Hardware {
 			// placeholder, later on, we will need some kind of locking
 		}
 
+
 		public static void SendMessage(string aModule, string aData) {
 			StartLogging();
 			WriteSerialString("<Message Module=\"");

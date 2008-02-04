@@ -32,9 +32,9 @@ namespace Cosmos.Shell.Console.Tests
             Assert("abc" == "abc", "\"abc\" == \"abc\"");
 
             Assert(("a" + "b") == "ab", "\"a\" + \"b\" == \"a\" + \"b\"");
-            StringBuilder builder = new StringBuilder("a");
-            builder.Append("b");
-            Assert(builder.ToString() == "ab", "(stringbuilder)");
+			//StringBuilder builder = new StringBuilder("a");
+			//builder.Append("b");
+			//Assert(builder.ToString() == "ab", "(stringbuilder)");
         }
     }
 }

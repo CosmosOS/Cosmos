@@ -16,10 +16,9 @@ namespace IL2CPU {
 		public static string BCLDir;
 		public static List<string> Plugs = new List<string>();
 		public static bool MetalMode;
-		public static bool DebugMode = true;
+		public static bool DebugMode = false;
 		public static TargetPlatformEnum TargetPlatform = TargetPlatformEnum.Win32;
 		public const string FAsmParamsTemplate_Win32 = "\"{1}\" \"{0}\"";
-
 
 		private Type win32Type = typeof(Win32OpCodeMap);
 		private Type nativeType = typeof(NativeOpCodeMap);
@@ -154,8 +153,21 @@ namespace IL2CPU {
 				if (ParseArguments(args)) {
 					Engine e = new Engine();
 					e.DebugLog += delegate(LogSeverityEnum aSeverity, string aMessage) {
-						if (aSeverity == LogSeverityEnum.Warning) {
-							Console.ForegroundColor = ConsoleColor.Yellow;
+						switch (aSeverity) {
+							case LogSeverityEnum.Informational: {
+									if (!DebugMode) {
+										return;
+									}
+									break;
+								}
+							case LogSeverityEnum.Warning: {
+									Console.ForegroundColor = ConsoleColor.Yellow;
+									break;
+								}
+							case LogSeverityEnum.Error: {
+									Console.ForegroundColor = ConsoleColor.Red;
+									break;
+								}
 						}
 						Console.WriteLine(aMessage);
 						Console.ResetColor();
@@ -185,24 +197,24 @@ namespace IL2CPU {
 					return 1;
 				}
 			} catch (ReflectionTypeLoadException E) {
-                Console.ForegroundColor = ConsoleColor.Red;
+				Console.ForegroundColor = ConsoleColor.Red;
 				Console.WriteLine(E.ToString());
 				for (int i = 0; i < E.LoaderExceptions.Length; i++) {
 					Console.WriteLine("[{0}] {1}", i + 1, E.LoaderExceptions[i]);
 					Console.WriteLine();
 				}
-                Console.ResetColor();
+				Console.ResetColor();
 				return 2;
 			} catch (Exception E) {
-                Console.ForegroundColor = ConsoleColor.Red;
+				Console.ForegroundColor = ConsoleColor.Red;
 				Console.WriteLine(E.ToString());
-                Console.ResetColor();
+				Console.ResetColor();
 				return 2;
 			}
 			Console.WriteLine("");
-            Console.ForegroundColor = ConsoleColor.Green;
+			Console.ForegroundColor = ConsoleColor.Green;
 			Console.WriteLine("Completed");
-            Console.ResetColor();
+			Console.ResetColor();
 			return 0;
 		}
 	}

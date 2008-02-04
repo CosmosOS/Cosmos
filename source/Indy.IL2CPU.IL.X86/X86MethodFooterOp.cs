@@ -1,9 +1,7 @@
 using System;
 using System.Linq;
 using Indy.IL2CPU.Assembler;
-using Mono.Cecil;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
-using Instruction = Mono.Cecil.Cil.Instruction;
 
 namespace Indy.IL2CPU.IL.X86 {
 	public class X86MethodFooterOp: MethodFooterOp {
@@ -12,8 +10,8 @@ namespace Indy.IL2CPU.IL.X86 {
 		public readonly MethodInformation.Variable[] Locals;
 		public readonly MethodInformation.Argument[] Args;
 
-		public X86MethodFooterOp(Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
+		public X86MethodFooterOp(ILReader aReader, MethodInformation aMethodInfo)
+			: base(aReader, aMethodInfo) {
 			if (aMethodInfo != null) {
 				//			if (aMethodInfo.Locals.Length > 0) {
 				//				TotalLocalsSize += aMethodInfo.Locals[aMethodInfo.Locals.Length - 1].Offset + aMethodInfo.Locals[aMethodInfo.Locals.Length - 1].Size;
@@ -54,7 +52,7 @@ namespace Indy.IL2CPU.IL.X86 {
 					}
 				}
 				new CPUx86.Push("ecx");
-				Engine.QueueMethodRef(GCImplementationRefs.DecRefCountRef);
+				Engine.QueueMethod(GCImplementationRefs.DecRefCountRef);
 				foreach (MethodInformation.Variable xLocal in aLocals) {
 					if (xLocal.IsReferenceType) {
 						Op.Ldloc(aAssembler, xLocal, false);

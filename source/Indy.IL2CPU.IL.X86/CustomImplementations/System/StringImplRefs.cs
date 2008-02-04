@@ -3,30 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Mono.Cecil;
+
 
 namespace Indy.IL2CPU.IL.X86.CustomImplementations.System {
 	public static class StringImplRefs {
-		public static readonly AssemblyDefinition RuntimeAssemblyDef;
-		public static readonly MethodDefinition get_LengthRef;
-		public static readonly MethodDefinition get_Chars_MetalRef;
-		public static readonly MethodDefinition get_Chars_NormalRef;
+		public static readonly Assembly RuntimeAssemblyDef;
+		public static readonly MethodBase get_LengthRef;
+		public static readonly MethodBase get_Chars_MetalRef;
+		public static readonly MethodBase get_Chars_NormalRef;
 		
 		static StringImplRefs() {
-			RuntimeAssemblyDef = AssemblyFactory.GetAssembly(typeof(StringImpl).Assembly.Location);
-			TypeDefinition xType = null;
-			foreach (ModuleDefinition xMod in RuntimeAssemblyDef.Modules) {
-				if (xMod.Types.Contains(typeof(StringImpl).FullName)) {
-					xType = xMod.Types[typeof(StringImpl).FullName];
-					break;
-				}
-			}
-			if (xType == null) {
-				throw new Exception("StringImpl type not found!");
-			}
+			Type xType = typeof(StringImpl);
 			foreach (FieldInfo xField in typeof(StringImplRefs).GetFields()) {
 				if (xField.Name.EndsWith("Ref")) {
-					MethodDefinition xTempMethod = xType.Methods.GetMethod(xField.Name.Substring(0, xField.Name.Length - "Ref".Length)).FirstOrDefault();
+					MethodBase xTempMethod = xType.GetMethod(xField.Name.Substring(0, xField.Name.Length - "Ref".Length));
 					if (xTempMethod == null) {
 						throw new Exception("Method '" + xField.Name.Substring(0, xField.Name.Length - "Ref".Length) + "' not found on RuntimeEngine!");
 					}

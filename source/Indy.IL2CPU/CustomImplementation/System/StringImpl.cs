@@ -9,27 +9,30 @@ namespace Indy.IL2CPU.CustomImplementation.System {
 	[Plug(Target = typeof(String))]
 	public static class StringImpl {
 		[MethodAlias(Name = "System.String System.String.FastAllocateString(System.Int32)")]
-		[PlugMethod(Enabled = false)]
+		[PlugMethod()]
 		public static String FastAllocateString(int aLength) {
 			Char[] xItems = new Char[aLength];
 			return new String(xItems);
 		}
 
 		[MethodAlias(Name = "System.Void System.String..ctor(System.Char[],System.Int32,System.Int32)")]
-		[PlugMethod(Enabled = false)]
+		[PlugMethod()]
 		public static void Ctor(String aThis, [FieldAccess(Name = "$$Storage$$")]ref Char[] aStorage, Char[] aChars, int aStartIndex, int aLength) {
 			Char[] newChars = new Char[aLength];
 			Array.Copy(aChars, aStartIndex, newChars, 0, aLength);
 			aStorage = newChars;
 		}
 
-		[MethodAlias(Name = "System.Void System.String..ctor(System.Char[])")]
-		[PlugMethod(Enabled = false)]
+		[PlugMethod(Signature = "System_Void__System_String__ctor_System_Char___")]
 		public static void Ctor(String aThis, [FieldAccess(Name = "$$Storage$$")] ref Char[] aStorage, Char[] aChars) {
 			aStorage = aChars;
 		}
 
-		public static string Format(object aFormatProvider, string aFormat, object[] aArgs) {
+		public static string Format(IFormatProvider aFormatProvider, string aFormat, object aArg) {
+			return "Format not implemented";
+		}
+
+		public static string Format(IFormatProvider aFormatProvider, string aFormat, object[] aArgs) {
 			string[] xStrings = new string[1 + 2 + (aArgs.Length * 7) - 1];
 			xStrings[0] = aFormat;
 			xStrings[1] = "(";

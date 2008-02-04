@@ -21,7 +21,7 @@ namespace Cosmos.Hardware.PC {
             Interrupts.Init();
             // end partially new
             
-            HW.Storage.ATA.Initialize(Sleep);
+            //HW.Storage.ATA.Initialize(Sleep);
             HW.CPU.CreateIDT();
             // end old -----------------
 

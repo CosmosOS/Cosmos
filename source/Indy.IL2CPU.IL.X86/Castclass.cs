@@ -1,53 +1,56 @@
 using System;
 using System.IO;
-using Mono.Cecil;
-using Mono.Cecil.Cil;
+
+
 using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using System.Reflection;
+using Indy.IL2CPU.Assembler;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(Code.Castclass, false)]
+	[OpCode(OpCodeEnum.Castclass, false)]
 	public class Castclass: Op {
 		private int mTypeId;
 		private string mThisLabel;
 		private string mNextOpLabel;
-		public Castclass(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
-			TypeReference xType = aInstruction.Operand as TypeReference;
+		private Type mCastAsType;
+		public Castclass(ILReader aReader, MethodInformation aMethodInfo)
+			: base(aReader, aMethodInfo) {
+			Type xType = aReader.OperandValueType;
 			if (xType == null) {
 				throw new Exception("Unable to determine Type!");
 			}
-			TypeDefinition xTypeDef = Engine.GetDefinitionFromTypeReference(xType);
-			mTypeId = Engine.RegisterType(xTypeDef);
-			mThisLabel = GetInstructionLabel(aInstruction);
-			mNextOpLabel = GetInstructionLabel(aInstruction.Next);
+			mCastAsType = xType;
+			mTypeId = Engine.RegisterType(mCastAsType);
+			mThisLabel = GetInstructionLabel(aReader);
+			mNextOpLabel = GetInstructionLabel(aReader.Position);
 		}
 
 		public override void DoAssemble() {
 			// todo: throw an exception when the class does not support the cast!
 			string mReturnNullLabel = mThisLabel + "_ReturnNull";
 			new CPUx86.Pop(CPUx86.Registers.ECX);
-			Assembler.StackSizes.Pop();
+			Assembler.StackContents.Pop();
 			new CPUx86.Compare(CPUx86.Registers.ECX, "0");
 			new CPUx86.JumpIfZero(mReturnNullLabel);
 			new CPUx86.Pushd(CPUx86.Registers.AtECX);
-			Assembler.StackSizes.Push(4);
+			Assembler.StackContents.Push(new StackContent(4, true, false, false));
 			new CPUx86.Pushd("0" + mTypeId + "h");
-			Assembler.StackSizes.Push(4);
-			MethodDefinition xMethodIsInstance = Engine.GetMethodDefinition(Engine.GetTypeDefinition("", "Indy.IL2CPU.VTablesImpl"), "IsInstance", "System.Int32", "System.Int32");
+			Assembler.StackContents.Push(new StackContent(4, true, false, false));
+			MethodBase xMethodIsInstance = Engine.GetMethodBase(Engine.GetType("", "Indy.IL2CPU.VTablesImpl"), "IsInstance", "System.Int32", "System.Int32");
 			Engine.QueueMethod(xMethodIsInstance);
 			Op xOp = new Call(xMethodIsInstance);
 			xOp.Assembler = Assembler;
 			xOp.Assemble();
 			new CPUx86.Pop(CPUx86.Registers.EAX);
-			Assembler.StackSizes.Pop();
+			Assembler.StackContents.Pop();
 			new CPUx86.Compare(CPUx86.Registers.EAX, "0");
 			new CPUx86.JumpIfEquals(mReturnNullLabel);
 			new CPUx86.Pushd(CPUx86.Registers.ECX);
 			new CPUx86.JumpAlways(mNextOpLabel);
 			new CPU.Label(mReturnNullLabel);
 			new CPUx86.Pushd("0");
-			Assembler.StackSizes.Push(4);
+			Assembler.StackContents.Push(new StackContent(4, mCastAsType));
 		}
 	}
 }

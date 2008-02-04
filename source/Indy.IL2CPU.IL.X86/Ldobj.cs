@@ -1,19 +1,18 @@
 using System;
-using Mono.Cecil;
-using Mono.Cecil.Cil;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using Indy.IL2CPU.Assembler;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(Code.Ldobj)]
+	[OpCode(OpCodeEnum.Ldobj)]
 	public class Ldobj: Op {
-		public Ldobj(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
-			TypeReference xTypeRef = aInstruction.Operand as TypeReference;
-			if (xTypeRef == null) {
+		private Type xType;
+		public Ldobj(ILReader aReader, MethodInformation aMethodInfo)
+			: base(aReader, aMethodInfo) {
+			xType = aReader.OperandValueType;
+			if (xType == null) {
 				throw new Exception("Type specification not found!");
 			}
-			TypeDefinition xTypeDef = Engine.GetDefinitionFromTypeReference(xTypeRef);
-			mSize = Engine.GetFieldStorageSize(xTypeDef);
+			mSize = Engine.GetFieldStorageSize(xType);
 		}
 
 		private int mSize;
@@ -39,8 +38,8 @@ namespace Indy.IL2CPU.IL.X86 {
 						throw new Exception("Remainder not supported!");
 					}
 			}
-			Assembler.StackSizes.Pop();
-			Assembler.StackSizes.Push(mSize);
+			Assembler.StackContents.Pop();
+			Assembler.StackContents.Push(new StackContent(mSize, xType));
 		}
 	}
 }

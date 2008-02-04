@@ -1,35 +1,36 @@
 using System;
 using System.IO;
-using Mono.Cecil;
-using Mono.Cecil.Cil;
+
+
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(Code.Conv_R4)]
+	[OpCode(OpCodeEnum.Conv_R4)]
 	public class Conv_R4: Op {
-		public Conv_R4(Mono.Cecil.Cil.Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
+		public Conv_R4(ILReader aReader, MethodInformation aMethodInfo)
+			: base(aReader, aMethodInfo) {
 		}
 		public override void DoAssemble() {
-			int xSource = Assembler.StackSizes.Pop();
-			switch (xSource) {
-				case 1:
-				case 2: {
-						break;
-					}
-				case 8: {
-						new CPUx86.Pop(CPUx86.Registers.EAX);
-						new CPUx86.Pop(CPUx86.Registers.ECX);
-						new CPUx86.Pushd(CPUx86.Registers.EAX);
-						Assembler.StackSizes.Push(4);
-						break;
-					}
-				case 4: {
-						break;
-					}
-				default:
-					throw new Exception("SourceSize " + xSource + " not supported!");
-			}
+			throw new Exception("Floats not yet supported!");
+			//int xSource = Assembler.StackContents.Pop();
+			//switch (xSource) {
+			//    case 1:
+			//    case 2: {
+			//            break;
+			//        }
+			//    case 8: {
+			//            new CPUx86.Pop(CPUx86.Registers.EAX);
+			//            new CPUx86.Pop(CPUx86.Registers.ECX);
+			//            new CPUx86.Pushd(CPUx86.Registers.EAX);
+			//            Assembler.StackContents.Push(4);
+			//            break;
+			//        }
+			//    case 4: {
+			//            break;
+			//        }
+			//    default:
+			//        throw new Exception("SourceSize " + xSource + " not supported!");
+			//}
 		}
 	}
 }

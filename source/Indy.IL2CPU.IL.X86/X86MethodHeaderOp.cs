@@ -2,18 +2,16 @@
 using System;
 using System.Linq;
 using Indy.IL2CPU.Assembler;
-using Mono.Cecil;
 using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
-using Instruction = Mono.Cecil.Cil.Instruction;
 
 namespace Indy.IL2CPU.IL.X86 {
 	public class X86MethodHeaderOp: MethodHeaderOp {
 		public readonly MethodInformation.Variable[] Locals;
 		public readonly string LabelName = "";
 		public readonly MethodInformation.Argument[] Args;
-		public X86MethodHeaderOp(Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
+		public X86MethodHeaderOp(ILReader aReader, MethodInformation aMethodInfo)
+			: base(aReader, aMethodInfo) {
 			LabelName = aMethodInfo.LabelName;
 			Args = aMethodInfo.Arguments.ToArray();
 			Locals = aMethodInfo.Locals.ToArray();
@@ -35,12 +33,12 @@ namespace Indy.IL2CPU.IL.X86 {
 			//new CPUx86.Push("0");
 			//if (!(aLabelName.Contains("Cosmos.Kernel.Serial") || aLabelName.Contains("Cosmos.Kernel.Heap"))) {
 			//    new CPUx86.Push(LdStr.GetContentsArrayName(aAssembler, aLabelName));
-			//    MethodDefinition xTempMethod = Engine.GetMethodDefinition(Engine.GetTypeDefinition("Cosmos.Kernel", "Cosmos.Kernel.Serial"), "Write", "System.Byte", "System.String");
+			//    MethodBase xTempMethod = Engine.GetMethodBase(Engine.GetType("Cosmos.Kernel", "Cosmos.Kernel.Serial"), "Write", "System.Byte", "System.String");
 			//    new CPUx86.Call(Label.GenerateLabelName(xTempMethod));
 			//    Engine.QueueMethod(xTempMethod);
 			//}
 			foreach (var xLocal in aLocals) {
-				aAssembler.StackSizes.Push(xLocal.Size);
+				aAssembler.StackContents.Push(new StackContent(xLocal.Size, xLocal.VariableType));
 				for (int i = 0; i < (xLocal.Size / 4); i++) {
 					new CPUx86.Pushd("0");
 				}

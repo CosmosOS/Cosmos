@@ -39,10 +39,6 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Mono.Cecil, Version=0.5.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Mono.Cecil.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -53,9 +49,7 @@
   <ItemGroup>
     <Compile Include="CustomImplementation\System\Runtime\CompilerServices\RuntimeHelpers.cs" />
     <Compile Include="Engine.cs" />
-    <Compile Include="FieldAccessAttribute.cs" />
     <Compile Include="MethodAliasAttribute.cs" />
-    <Compile Include="MethodReferenceExtensions.cs" />
     <Compile Include="CustomImplementation\System\ObjectImpl.cs" />
     <Compile Include="CustomImplementation\System\ObjectImplRefs.cs" />
     <Compile Include="ObjectUtilities.cs" />
@@ -103,7 +97,7 @@
     <Compile Include="CustomImplementation\System\StringImplRefs.cs" />
     <Compile Include="GCImplementationRefs.cs" />
     <Compile Include="GCImplementation.cs" />
-    <Compile Include="IndyAssemblyResolver.cs" />
+    <Compile Include="Utilities.cs" />
     <Compile Include="VTablesImpl.cs" />
     <Compile Include="VTablesImplRefs.cs" />
   </ItemGroup>

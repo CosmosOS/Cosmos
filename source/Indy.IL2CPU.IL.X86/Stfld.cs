@@ -2,34 +2,30 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Mono.Cecil;
-using Mono.Cecil.Cil;
+
+
 using CPU = Indy.IL2CPU.Assembler.X86;
+using System.Reflection;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(Code.Stfld)]
+	[OpCode(OpCodeEnum.Stfld)]
 	public class Stfld: Op {
 		private readonly TypeInformation.Field mField;
 		private readonly TypeInformation mType;
-		public Stfld(Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
-			if (aInstruction == null) {
-				throw new ArgumentNullException("aInstruction");
+		public Stfld(ILReader aReader, MethodInformation aMethodInfo)
+			: base(aReader, aMethodInfo) {
+			if (aReader == null) {
+				throw new ArgumentNullException("aReader");
 			}
 			if (aMethodInfo == null) {
 				throw new ArgumentNullException("aMethodInfo");
 			}
-			FieldDefinition xField = aInstruction.Operand as FieldDefinition;
+			FieldInfo xField = aReader.OperandValueField;
 			if (xField == null) {
-				FieldReference xFieldRef = aInstruction.Operand as FieldReference;
-				if (xFieldRef == null) {
-					string typeName = aInstruction.Operand == null ? "" : aInstruction.Operand.GetType().FullName;
-					throw new Exception("Field not found! (Operand = '" + (aInstruction.Operand ?? "**NULL**") + "'[" + typeName + "])");
-				}
-				xField = Engine.GetDefinitionFromFieldReference(xFieldRef);
+				throw new Exception("Field not found!");
 			}
 			string xFieldId = xField.ToString();
-			mType = Engine.GetTypeInfo(Engine.GetDefinitionFromTypeReference(xField.DeclaringType));
+			mType = Engine.GetTypeInfo(xField.DeclaringType);
 			mField = mType.Fields[xFieldId];
 		}
 

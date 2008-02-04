@@ -2,16 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Mono.Cecil;
-using Mono.Cecil.Cil;
+
+
 using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using System.Reflection;
 
 namespace Indy.IL2CPU.IL.X86.Native {
 	public class NativePutCharOp: IL.X86.Op {
 		public MethodInformation MethodInformation;
-		public NativePutCharOp(Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
+		public NativePutCharOp(ILReader aReader, MethodInformation aMethodInfo)
+			: base(aReader, aMethodInfo) {
 			MethodInformation = aMethodInfo;
 		}
 
@@ -27,29 +28,22 @@ namespace Indy.IL2CPU.IL.X86.Native {
 			*xScreenPtr = 7;
 		}
 
-		protected void PassCall(MethodDefinition aMethod) {
-			for (int i = 0; i < aMethod.Parameters.Count; i++) {
+		protected void PassCall(MethodBase aMethod) {
+			for (int i = 0; i < MethodInformation.Arguments.Length; i++) {
 				Ldarg(Assembler, MethodInformation.Arguments[i]);
 			}
 			DoQueueMethod(aMethod);
 			new Indy.IL2CPU.Assembler.X86.Call(CPU.Label.GenerateLabelName(aMethod));
-			if (!aMethod.ReturnType.ReturnType.FullName.StartsWith("System.Void")) {
-				new Indy.IL2CPU.Assembler.X86.Pushd("eax");
+			MethodInfo xMethodInfo = aMethod as MethodInfo;
+			if (xMethodInfo != null) {
+				if (!xMethodInfo.ReturnType.FullName.StartsWith("System.Void")) {
+					new Indy.IL2CPU.Assembler.X86.Pushd("eax");
+				}
 			}
 		}
 		public override void DoAssemble() {
-			TypeDefinition xType = null;
-			AssemblyDefinition xAsm = AssemblyFactory.GetAssembly(typeof(NativePutCharOp).Assembly.Location);
-			foreach (ModuleDefinition xMod in xAsm.Modules) {
-				if (xMod.Types.Contains(typeof(NativePutCharOp).FullName)) {
-					xType = xMod.Types[typeof(NativePutCharOp).FullName];
-					break;
-				}
-			}
-			if (xType == null) {
-				throw new Exception("ArrayImpl type not found!");
-			}
-			PassCall(xType.Methods.GetMethod("DoPutChar")[0]);
+			Type xType = typeof(NativePutCharOp);
+			PassCall(xType.GetMethod("DoPutChar"));
 			//(int aLine, int aPos, char aChar)
 			//			Ldarg(mAssembler, MethodInformation.Arguments[0].VirtualAddress);
 			//			Pushd("80");

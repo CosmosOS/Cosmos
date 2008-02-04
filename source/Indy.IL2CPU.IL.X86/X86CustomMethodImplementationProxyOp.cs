@@ -4,12 +4,11 @@ using System.Linq;
 using System.Text;
 using Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
-using Instruction = Mono.Cecil.Cil.Instruction;
 
 namespace Indy.IL2CPU.IL.X86 {
 	public class X86CustomMethodImplementationProxyOp: CustomMethodImplementationProxyOp {
-		public X86CustomMethodImplementationProxyOp(Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
+		public X86CustomMethodImplementationProxyOp(ILReader aReader, MethodInformation aMethodInfo)
+			: base(aReader, aMethodInfo) {
 		}
 
 		protected override void Ldarg(int aIndex) {

@@ -106,47 +106,49 @@ namespace Cosmos.Kernel.FileSystem {
 
 		private bool ReadSuperBlock() {
 			//System.Diagnostics.Debugger.Break();
-			ushort* xBuffer = (ushort*)Heap.MemAlloc(mBackend.BlockSize);
-			if (!mBackend.ReadBlock(2, (byte*)xBuffer)) {
-				Console.WriteLine("[Ext2|SuperBlock] Error while reading SuperBlock data");
-				return false;
-			}
-			byte* xByteBuff = (byte*)xBuffer;
-			mSuperBlock = (SuperBlock*)Heap.MemAlloc((uint)sizeof(SuperBlock));
-			byte* xSuperBlockByteBuff = (byte*)mSuperBlock;
-			for (int i = 0; i < sizeof(SuperBlock); i++) {
-				xSuperBlockByteBuff[i] = xByteBuff[i];
-			}
-			DebugUtil.SendExt2_SuperBlock("", mSuperBlock);
-			mBlockSize = (uint)(1024 << (byte)(mSuperBlock->LogBlockSize));
-			DebugUtil.SendDoubleNumber("Numbers", "", mSuperBlock->INodesCount, 32, mSuperBlock->INodesPerGroup, 32);
-			mGroupsCount = mSuperBlock->INodesCount / mSuperBlock->INodesPerGroup;
-			mGroupDescriptorsPerBlock = (uint)(mBlockSize / sizeof(GroupDescriptor));
-			if (!ReadGroupDescriptorsOfBlock(mSuperBlock->FirstDataBlock + 1, xBuffer)) {
-				return false;
-			}
-			Heap.MemFree((uint)xBuffer);
-			return true;
+			//ushort* xBuffer = (ushort*)Heap.MemAlloc(mBackend.BlockSize);
+			//if (!mBackend.ReadBlock(2, (byte*)xBuffer)) {
+			//    Console.WriteLine("[Ext2|SuperBlock] Error while reading SuperBlock data");
+			//    return false;
+			//}
+			//byte* xByteBuff = (byte*)xBuffer;
+			//mSuperBlock = (SuperBlock*)Heap.MemAlloc((uint)sizeof(SuperBlock));
+			//byte* xSuperBlockByteBuff = (byte*)mSuperBlock;
+			//for (int i = 0; i < sizeof(SuperBlock); i++) {
+			//    xSuperBlockByteBuff[i] = xByteBuff[i];
+			//}
+			//DebugUtil.SendExt2_SuperBlock("", mSuperBlock);
+			//mBlockSize = (uint)(1024 << (byte)(mSuperBlock->LogBlockSize));
+			//DebugUtil.SendDoubleNumber("Numbers", "", mSuperBlock->INodesCount, 32, mSuperBlock->INodesPerGroup, 32);
+			//mGroupsCount = mSuperBlock->INodesCount / mSuperBlock->INodesPerGroup;
+			//mGroupDescriptorsPerBlock = (uint)(mBlockSize / sizeof(GroupDescriptor));
+			//if (!ReadGroupDescriptorsOfBlock(mSuperBlock->FirstDataBlock + 1, xBuffer)) {
+			//    return false;
+			//}
+			//Heap.MemFree((uint)xBuffer);
+			//return true;
+			throw new Exception("Ext2 not supported");
 		}
 
 		private unsafe bool ReadGroupDescriptorsOfBlock(uint aBlockGroup, ushort* aBuffer) {
-			mGroupDescriptors = new GroupDescriptor*[mGroupsCount];
-			GroupDescriptor* xDescriptorPtr = (GroupDescriptor*)aBuffer;
-			for (int i = 0; i < mGroupsCount; i++) {
-				uint xATABlock = (uint)(mBlockSize / mBackend.BlockSize);
-				xATABlock += (uint)(i / mGroupDescriptorsPerBlock);
-				if ((i % 16) == 0) {
-					if (!mBackend.ReadBlock(xATABlock, (byte*)aBuffer)) {
-						Console.WriteLine("[Ext2|GroupDescriptors] Error while reading GroupDescriptor data");
-						return false;
-					}
-				}
-				GroupDescriptor* xItem = (GroupDescriptor*)Heap.MemAlloc((uint)sizeof(GroupDescriptor));
-				CopyPointers((byte*)&xDescriptorPtr[i % mGroupDescriptorsPerBlock], (byte*)xItem, (uint)sizeof(GroupDescriptor));
-				mGroupDescriptors[i] = xItem;
-				DebugUtil.SendExt2_GroupDescriptor("ReadGroupDescriptorsOfBlock", xATABlock, i, 0, &xDescriptorPtr[i % mGroupDescriptorsPerBlock]);
-			}
-			return true;
+			//mGroupDescriptors = new GroupDescriptor*[mGroupsCount];
+			//GroupDescriptor* xDescriptorPtr = (GroupDescriptor*)aBuffer;
+			//for (int i = 0; i < mGroupsCount; i++) {
+			//    uint xATABlock = (uint)(mBlockSize / mBackend.BlockSize);
+			//    xATABlock += (uint)(i / mGroupDescriptorsPerBlock);
+			//    if ((i % 16) == 0) {
+			//        if (!mBackend.ReadBlock(xATABlock, (byte*)aBuffer)) {
+			//            Console.WriteLine("[Ext2|GroupDescriptors] Error while reading GroupDescriptor data");
+			//            return false;
+			//        }
+			//    }
+			//    GroupDescriptor* xItem = (GroupDescriptor*)Heap.MemAlloc((uint)sizeof(GroupDescriptor));
+			//    CopyPointers((byte*)&xDescriptorPtr[i % mGroupDescriptorsPerBlock], (byte*)xItem, (uint)sizeof(GroupDescriptor));
+			//    mGroupDescriptors[i] = xItem;
+			//    DebugUtil.SendExt2_GroupDescriptor("ReadGroupDescriptorsOfBlock", xATABlock, i, 0, &xDescriptorPtr[i % mGroupDescriptorsPerBlock]);
+			//}
+			//return true;
+			throw new Exception("Ext2 not supported");
 		}
 
 		public bool Initialize() {
@@ -173,169 +175,172 @@ namespace Cosmos.Kernel.FileSystem {
 		}
 
 		public Stream OpenFile(string[] xPath) {
-			ushort* xBuffer = (ushort*)Heap.MemAlloc(mBackend.BlockSize);
-			byte* xExt2BlockBuffer = (byte*)Heap.MemAlloc(mBlockSize);
-			INode xCurrentINode;
-			if (!ReadINode(EXT2_ROOT_INO, out xCurrentINode)) {
-				Heap.MemFree((uint)xBuffer);
-				Heap.MemFree((uint)xExt2BlockBuffer);
-				return null;
-			}
-			bool xCurrentINodeChanged = true;
-			uint xInspectedINodeCount = 0;
-			uint xINodeNumber = EXT2_ROOT_INO;
-			for (int i = 0; i < xPath.Length; i++) {
-				Console.Write("ReadFile, Iteration ");
-				ATAOld.WriteNumber((uint)i, 8);
-				Console.WriteLine("");
-				if (!xCurrentINodeChanged) {
-					Console.WriteLine("Terminating for loop, CurrentINode didn't change");
-					Heap.MemFree((uint)xBuffer);
-					Heap.MemFree((uint)xExt2BlockBuffer);
-					return null;
-				}
-				xCurrentINodeChanged = false;
-				if (!ReadINodeContents(&xCurrentINode, 0, xExt2BlockBuffer)) {
-					Heap.MemFree((uint)xBuffer);
-					Heap.MemFree((uint)xExt2BlockBuffer);
-					return null;
-				}
-				DirectoryEntry* xEntryPtr = (DirectoryEntry*)xExt2BlockBuffer;
-				uint xTotalSize = mBlockSize;
-				while (xTotalSize != 0) {
-					DebugUtil.SendExt2_DirectoryEntry(xEntryPtr);
-					uint xPtrAddress = (uint)xEntryPtr;
-					char[] xName = new char[xEntryPtr->NameLength];
-					byte* xNamePtr = &xEntryPtr->FirstNameChar;
-					for (int c = 0; c < xName.Length; c++) {
-						xName[c] = (char)xNamePtr[c];
-					}
-					xInspectedINodeCount++;
-					if (EqualsName(xPath[i], xName)) {
-						if (!ReadINode(xEntryPtr->INodeNumber, out xCurrentINode)) {
-							Heap.MemFree((uint)xBuffer);
-							Heap.MemFree((uint)xExt2BlockBuffer);
-							return null;
-						}
-						xCurrentINodeChanged = true;
-						xINodeNumber = xEntryPtr->INodeNumber;
-						xTotalSize = 0;
-						continue;
-					}
-					xPtrAddress += xEntryPtr->RecordLength;
-					xTotalSize -= xEntryPtr->RecordLength;
-					xEntryPtr = (DirectoryEntry*)xPtrAddress;
-				}
-			}
-			if (xCurrentINodeChanged) {
-				DebugUtil.SendMessage("Ext2", "ReadFile, for loop exited with an inode change");
-			} else {
-				DebugUtil.SendMessage("Ext2", "ReadFile, for loop exited without an inode change");
-			}
-			if ((xCurrentINode.Mode & INodeModeEnum.RegularFile) == 0) {
-				Console.WriteLine("No file after for loop");
-				return null;
-			}
-			Stream xResult = new FileStream(xINodeNumber, this);
-			Heap.MemFree((uint)xBuffer);
-			Heap.MemFree((uint)xExt2BlockBuffer);
-			return xResult;
+			//ushort* xBuffer = (ushort*)Heap.MemAlloc(mBackend.BlockSize);
+			//byte* xExt2BlockBuffer = (byte*)Heap.MemAlloc(mBlockSize);
+			//INode xCurrentINode;
+			//if (!ReadINode(EXT2_ROOT_INO, out xCurrentINode)) {
+			//    Heap.MemFree((uint)xBuffer);
+			//    Heap.MemFree((uint)xExt2BlockBuffer);
+			//    return null;
+			//}
+			//bool xCurrentINodeChanged = true;
+			//uint xInspectedINodeCount = 0;
+			//uint xINodeNumber = EXT2_ROOT_INO;
+			//for (int i = 0; i < xPath.Length; i++) {
+			//    Console.Write("ReadFile, Iteration ");
+			//    ATAOld.WriteNumber((uint)i, 8);
+			//    Console.WriteLine("");
+			//    if (!xCurrentINodeChanged) {
+			//        Console.WriteLine("Terminating for loop, CurrentINode didn't change");
+			//        Heap.MemFree((uint)xBuffer);
+			//        Heap.MemFree((uint)xExt2BlockBuffer);
+			//        return null;
+			//    }
+			//    xCurrentINodeChanged = false;
+			//    if (!ReadINodeContents(&xCurrentINode, 0, xExt2BlockBuffer)) {
+			//        Heap.MemFree((uint)xBuffer);
+			//        Heap.MemFree((uint)xExt2BlockBuffer);
+			//        return null;
+			//    }
+			//    DirectoryEntry* xEntryPtr = (DirectoryEntry*)xExt2BlockBuffer;
+			//    uint xTotalSize = mBlockSize;
+			//    while (xTotalSize != 0) {
+			//        DebugUtil.SendExt2_DirectoryEntry(xEntryPtr);
+			//        uint xPtrAddress = (uint)xEntryPtr;
+			//        char[] xName = new char[xEntryPtr->NameLength];
+			//        byte* xNamePtr = &xEntryPtr->FirstNameChar;
+			//        for (int c = 0; c < xName.Length; c++) {
+			//            xName[c] = (char)xNamePtr[c];
+			//        }
+			//        xInspectedINodeCount++;
+			//        if (EqualsName(xPath[i], xName)) {
+			//            if (!ReadINode(xEntryPtr->INodeNumber, out xCurrentINode)) {
+			//                Heap.MemFree((uint)xBuffer);
+			//                Heap.MemFree((uint)xExt2BlockBuffer);
+			//                return null;
+			//            }
+			//            xCurrentINodeChanged = true;
+			//            xINodeNumber = xEntryPtr->INodeNumber;
+			//            xTotalSize = 0;
+			//            continue;
+			//        }
+			//        xPtrAddress += xEntryPtr->RecordLength;
+			//        xTotalSize -= xEntryPtr->RecordLength;
+			//        xEntryPtr = (DirectoryEntry*)xPtrAddress;
+			//    }
+			//}
+			//if (xCurrentINodeChanged) {
+			//    DebugUtil.SendMessage("Ext2", "ReadFile, for loop exited with an inode change");
+			//} else {
+			//    DebugUtil.SendMessage("Ext2", "ReadFile, for loop exited without an inode change");
+			//}
+			//if ((xCurrentINode.Mode & INodeModeEnum.RegularFile) == 0) {
+			//    Console.WriteLine("No file after for loop");
+			//    return null;
+			//}
+			//Stream xResult = new FileStream(xINodeNumber, this);
+			//Heap.MemFree((uint)xBuffer);
+			//Heap.MemFree((uint)xExt2BlockBuffer);
+			//return xResult;
+			throw new Exception("Ext2 not supported");
 		}
 
 		public unsafe byte[] ReadFile(string[] xPath) {
-			ushort* xBuffer = (ushort*)Heap.MemAlloc(mBackend.BlockSize);
-			byte* xExt2BlockBuffer = (byte*)Heap.MemAlloc(mBlockSize);
-			INode xCurrentINode;
-			if (!ReadINode(EXT2_ROOT_INO, out xCurrentINode)) {
-				Heap.MemFree((uint)xBuffer);
-				Heap.MemFree((uint)xExt2BlockBuffer);
-				return null;
-			}
-			bool xCurrentINodeChanged = true;
-			uint xInspectedINodeCount = 0;
-			for (int i = 0; i < xPath.Length; i++) {
-				if (!xCurrentINodeChanged) {
-					Heap.MemFree((uint)xBuffer);
-					Heap.MemFree((uint)xExt2BlockBuffer);
-					return null;
-				}
-				xCurrentINodeChanged = false;
-				if (!ReadINodeContents(&xCurrentINode, 0, xExt2BlockBuffer)) {
-					Heap.MemFree((uint)xBuffer);
-					Heap.MemFree((uint)xExt2BlockBuffer);
-					return null;
-				}
-				DirectoryEntry* xEntryPtr = (DirectoryEntry*)xExt2BlockBuffer;
-				uint xTotalSize = mBlockSize;
-				while (xTotalSize != 0) {
-					DebugUtil.SendExt2_DirectoryEntry(xEntryPtr);
-					uint xPtrAddress = (uint)xEntryPtr;
-					char[] xName = new char[xEntryPtr->NameLength];
-					byte* xNamePtr = &xEntryPtr->FirstNameChar;
-					for (int c = 0; c < xName.Length; c++) {
-						xName[c] = (char)xNamePtr[c];
-					}
-					xInspectedINodeCount++;
-					if (EqualsName(xPath[i], xName)) {
-						if (!ReadINode(xEntryPtr->INodeNumber, out xCurrentINode)) {
-							Heap.MemFree((uint)xBuffer);
-							Heap.MemFree((uint)xExt2BlockBuffer);
-							return null;
-						}
-						xCurrentINodeChanged = true;
-						xTotalSize = 0;
-						continue;
-					}
-					xPtrAddress += xEntryPtr->RecordLength;
-					xTotalSize -= xEntryPtr->RecordLength;
-					xEntryPtr = (DirectoryEntry*)xPtrAddress;
-				}
-			}
-			if ((xCurrentINode.Mode & INodeModeEnum.RegularFile) == 0) {
-			//	Console.WriteLine("No file after for loop");
-				return null;
-			}
-			byte[] xResult;//= new byte[mBlockSize];
-			if (xCurrentINode.Size < mBlockSize) {
-				xResult = new byte[xCurrentINode.Size];
-			} else {
-				xResult = new byte[mBlockSize];
-			}
-			ReadINodeContents(&xCurrentINode, 0, xExt2BlockBuffer);
-			for (int i = 0; i < xResult.Length; i++) {
-				xResult[i] = xExt2BlockBuffer[i];
-			}
-			//Console.WriteLine("ReadFile, not completely implemented yet");
-			//Console.Write("    Found file size = ");
-			//ATAOld.WriteNumber(xCurrentINode.Size, 32);
-			//Console.WriteLine("");
-			Heap.MemFree((uint)xBuffer);
-			Heap.MemFree((uint)xExt2BlockBuffer);
-			return xResult;
+			//ushort* xBuffer = (ushort*)Heap.MemAlloc(mBackend.BlockSize);
+			//byte* xExt2BlockBuffer = (byte*)Heap.MemAlloc(mBlockSize);
+			//INode xCurrentINode;
+			//if (!ReadINode(EXT2_ROOT_INO, out xCurrentINode)) {
+			//    Heap.MemFree((uint)xBuffer);
+			//    Heap.MemFree((uint)xExt2BlockBuffer);
+			//    return null;
+			//}
+			//bool xCurrentINodeChanged = true;
+			//uint xInspectedINodeCount = 0;
+			//for (int i = 0; i < xPath.Length; i++) {
+			//    if (!xCurrentINodeChanged) {
+			//        Heap.MemFree((uint)xBuffer);
+			//        Heap.MemFree((uint)xExt2BlockBuffer);
+			//        return null;
+			//    }
+			//    xCurrentINodeChanged = false;
+			//    if (!ReadINodeContents(&xCurrentINode, 0, xExt2BlockBuffer)) {
+			//        Heap.MemFree((uint)xBuffer);
+			//        Heap.MemFree((uint)xExt2BlockBuffer);
+			//        return null;
+			//    }
+			//    DirectoryEntry* xEntryPtr = (DirectoryEntry*)xExt2BlockBuffer;
+			//    uint xTotalSize = mBlockSize;
+			//    while (xTotalSize != 0) {
+			//        DebugUtil.SendExt2_DirectoryEntry(xEntryPtr);
+			//        uint xPtrAddress = (uint)xEntryPtr;
+			//        char[] xName = new char[xEntryPtr->NameLength];
+			//        byte* xNamePtr = &xEntryPtr->FirstNameChar;
+			//        for (int c = 0; c < xName.Length; c++) {
+			//            xName[c] = (char)xNamePtr[c];
+			//        }
+			//        xInspectedINodeCount++;
+			//        if (EqualsName(xPath[i], xName)) {
+			//            if (!ReadINode(xEntryPtr->INodeNumber, out xCurrentINode)) {
+			//                Heap.MemFree((uint)xBuffer);
+			//                Heap.MemFree((uint)xExt2BlockBuffer);
+			//                return null;
+			//            }
+			//            xCurrentINodeChanged = true;
+			//            xTotalSize = 0;
+			//            continue;
+			//        }
+			//        xPtrAddress += xEntryPtr->RecordLength;
+			//        xTotalSize -= xEntryPtr->RecordLength;
+			//        xEntryPtr = (DirectoryEntry*)xPtrAddress;
+			//    }
+			//}
+			//if ((xCurrentINode.Mode & INodeModeEnum.RegularFile) == 0) {
+			////	Console.WriteLine("No file after for loop");
+			//    return null;
+			//}
+			//byte[] xResult;//= new byte[mBlockSize];
+			//if (xCurrentINode.Size < mBlockSize) {
+			//    xResult = new byte[xCurrentINode.Size];
+			//} else {
+			//    xResult = new byte[mBlockSize];
+			//}
+			//ReadINodeContents(&xCurrentINode, 0, xExt2BlockBuffer);
+			//for (int i = 0; i < xResult.Length; i++) {
+			//    xResult[i] = xExt2BlockBuffer[i];
+			//}
+			////Console.WriteLine("ReadFile, not completely implemented yet");
+			////Console.Write("    Found file size = ");
+			////ATAOld.WriteNumber(xCurrentINode.Size, 32);
+			////Console.WriteLine("");
+			//Heap.MemFree((uint)xBuffer);
+			//Heap.MemFree((uint)xExt2BlockBuffer);
+			//return xResult;
+			throw new Exception("Ext2 not supported");
 		}
 
 		private unsafe bool ReadINode(uint aINodeNumber, out INode aINode) {
-			uint xGroup = (aINodeNumber - 1) / mSuperBlock->INodesPerGroup;
-			uint xIndex = (aINodeNumber - 1) % mSuperBlock->INodesPerGroup;
-			uint xByteIndexInGroup = (xIndex * ((byte)sizeof(INode)));
-			uint xStorageBlock = (uint)((mGroupDescriptors[xGroup]->INodeTable * (1024 << mSuperBlock->LogBlockSize)) / mBackend.BlockSize);
-			xStorageBlock += xByteIndexInGroup / mBackend.BlockSize;
-			uint xByteIndexInBackendBlock = xByteIndexInGroup / mBackend.BlockSize;
-			ushort* xBuffer = (ushort*)Heap.MemAlloc(mBackend.BlockSize);
-			aINode = default(INode);
-			if (!mBackend.ReadBlock(xStorageBlock, (byte*)xBuffer)) {
-				Heap.MemFree((uint)xBuffer);
-				Console.WriteLine("ReadINode, Reading storage block failed");
-				return false;
-			}
-			//byte* xINodeBuff = (byte*)((uint)xBuffer) + xByteIndexInBackendBlock;
-			INode* xINodePtr = (INode*)xBuffer;
-			DebugUtil.SendNumber("Ext2", "ReadINode, INodePointer index", ((aINodeNumber - 1) % (mBackend.BlockSize / ((byte)sizeof(INode)))), 8);
-			xINodePtr = &xINodePtr[((aINodeNumber - 1) % (byte)(mBackend.BlockSize / ((byte)sizeof(INode))))];
-			aINode = *xINodePtr;
-			DebugUtil.SendExt2_INode(aINodeNumber, xINodePtr);
-			Heap.MemFree((uint)xBuffer);
-			return true;
+			//uint xGroup = (aINodeNumber - 1) / mSuperBlock->INodesPerGroup;
+			//uint xIndex = (aINodeNumber - 1) % mSuperBlock->INodesPerGroup;
+			//uint xByteIndexInGroup = (xIndex * ((byte)sizeof(INode)));
+			//uint xStorageBlock = (uint)((mGroupDescriptors[xGroup]->INodeTable * (1024 << mSuperBlock->LogBlockSize)) / mBackend.BlockSize);
+			//xStorageBlock += xByteIndexInGroup / mBackend.BlockSize;
+			//uint xByteIndexInBackendBlock = xByteIndexInGroup / mBackend.BlockSize;
+			//ushort* xBuffer = (ushort*)Heap.MemAlloc(mBackend.BlockSize);
+			//aINode = default(INode);
+			//if (!mBackend.ReadBlock(xStorageBlock, (byte*)xBuffer)) {
+			//    Heap.MemFree((uint)xBuffer);
+			//    Console.WriteLine("ReadINode, Reading storage block failed");
+			//    return false;
+			//}
+			////byte* xINodeBuff = (byte*)((uint)xBuffer) + xByteIndexInBackendBlock;
+			//INode* xINodePtr = (INode*)xBuffer;
+			//DebugUtil.SendNumber("Ext2", "ReadINode, INodePointer index", ((aINodeNumber - 1) % (mBackend.BlockSize / ((byte)sizeof(INode)))), 8);
+			//xINodePtr = &xINodePtr[((aINodeNumber - 1) % (byte)(mBackend.BlockSize / ((byte)sizeof(INode))))];
+			//aINode = *xINodePtr;
+			//DebugUtil.SendExt2_INode(aINodeNumber, xINodePtr);
+			//Heap.MemFree((uint)xBuffer);
+			//return true;
+			throw new Exception("Ext2 not supported");
 		}
 
 		/// <summary>
@@ -504,95 +509,95 @@ namespace Cosmos.Kernel.FileSystem {
 		}
 
 		public string[] GetDirectoryEntries(string[] aPath) {
-			List<string> xResult = new List<string>(32);
-			ushort* xBuffer = (ushort*)Heap.MemAlloc(mBackend.BlockSize);
-			byte* xExt2BlockBuffer = (byte*)Heap.MemAlloc(mBlockSize);
-			INode xCurrentINode;
-			System.Diagnostics.Debugger.Break();
-			if (!ReadINode(EXT2_ROOT_INO, out xCurrentINode)) {
-				Heap.MemFree((uint)xBuffer);
-				Heap.MemFree((uint)xExt2BlockBuffer);
-				return null;
-			}
-			bool xCurrentINodeChanged = true;
-			uint xInspectedINodeCount = 0;
-			for (int i = 0; i < aPath.Length; i++) {
-				Console.Write("ReadFile, Iteration ");
-				ATAOld.WriteNumber((uint)i, 8);
-				Console.WriteLine("");
-				if (!xCurrentINodeChanged) {
-					Console.WriteLine("Terminating for loop, CurrentINode didn't change");
-					Heap.MemFree((uint)xBuffer);
-					Heap.MemFree((uint)xExt2BlockBuffer);
-					return null;
-				}
-				xCurrentINodeChanged = false;
-				if (!ReadINodeContents(&xCurrentINode, 0, xExt2BlockBuffer)) {
-					Heap.MemFree((uint)xBuffer);
-					Heap.MemFree((uint)xExt2BlockBuffer);
-					return null;
-				}
-				DirectoryEntry* xEntryPtr = (DirectoryEntry*)xExt2BlockBuffer;
-				uint xTotalSize = mBlockSize;
-				while (xTotalSize != 0) {
-					DebugUtil.SendExt2_DirectoryEntry(xEntryPtr);
-					uint xPtrAddress = (uint)xEntryPtr;
-					char[] xName = new char[xEntryPtr->NameLength];
-					byte* xNamePtr = &xEntryPtr->FirstNameChar;
-					for (int c = 0; c < xName.Length; c++) {
-						xName[c] = (char)xNamePtr[c];
-					}
-					xInspectedINodeCount++;
-					if (EqualsName(aPath[i], xName)) {
-						if (!ReadINode(xEntryPtr->INodeNumber, out xCurrentINode)) {
-							Heap.MemFree((uint)xBuffer);
-							Heap.MemFree((uint)xExt2BlockBuffer);
-							return null;
-						}
-						xCurrentINodeChanged = true;
-						xTotalSize = 0;
-						continue;
-					}
-					xPtrAddress += xEntryPtr->RecordLength;
-					xTotalSize -= xEntryPtr->RecordLength;
-					xEntryPtr = (DirectoryEntry*)xPtrAddress;
-				}
-			}
-			if (xCurrentINodeChanged) {
-				DebugUtil.SendMessage("Ext2", "ReadFile, for loop exited with an inode change");
-			} else {
-				DebugUtil.SendMessage("Ext2", "ReadFile, for loop exited without an inode change");
-			}
-			if ((xCurrentINode.Mode & INodeModeEnum.Directory) == 0) {
-				Console.WriteLine("Ext2|GetDirectoryEntries, No directory after for loop");
-				return null;
-			}
-			if (!ReadINodeContents(&xCurrentINode, 0, xExt2BlockBuffer)) {
-				Heap.MemFree((uint)xBuffer);
-				Heap.MemFree((uint)xExt2BlockBuffer);
-				return null;
-			}
-			DirectoryEntry* xEntry = (DirectoryEntry*)xExt2BlockBuffer;
-			uint xSize = mBlockSize;
-			DebugUtil.SendMessage("Ext2", "GetDirectoryEntries");
-			while (xSize != 0) {
-				DebugUtil.SendExt2_DirectoryEntry(xEntry);
-				uint xPtrAddress = (uint)xEntry;
-				char[] xName = new char[xEntry->NameLength];
-				byte* xNamePtr = &xEntry->FirstNameChar;
-				for (int c = 0; c < xName.Length; c++) {
-					byte b= xNamePtr[c];
-					xName[c] = (char)b;
-				}
-				xResult.Add(new String(xName));
-				xPtrAddress += xEntry->RecordLength;
-				xSize -= xEntry->RecordLength;
-				xEntry = (DirectoryEntry*)xPtrAddress;
-			}
-			Heap.MemFree((uint)xBuffer);
-			Heap.MemFree((uint)xExt2BlockBuffer);
+			//List<string> xResult = new List<string>(32);
+			//ushort* xBuffer = (ushort*)Heap.MemAlloc(mBackend.BlockSize);
+			//byte* xExt2BlockBuffer = (byte*)Heap.MemAlloc(mBlockSize);
+			//INode xCurrentINode;
+			//if (!ReadINode(EXT2_ROOT_INO, out xCurrentINode)) {
+			//    Heap.MemFree((uint)xBuffer);
+			//    Heap.MemFree((uint)xExt2BlockBuffer);
+			//    return null;
+			//}
+			//bool xCurrentINodeChanged = true;
+			//uint xInspectedINodeCount = 0;
+			//for (int i = 0; i < aPath.Length; i++) {
+			//    Console.Write("ReadFile, Iteration ");
+			//    ATAOld.WriteNumber((uint)i, 8);
+			//    Console.WriteLine("");
+			//    if (!xCurrentINodeChanged) {
+			//        Console.WriteLine("Terminating for loop, CurrentINode didn't change");
+			//        Heap.MemFree((uint)xBuffer);
+			//        Heap.MemFree((uint)xExt2BlockBuffer);
+			//        return null;
+			//    }
+			//    xCurrentINodeChanged = false;
+			//    if (!ReadINodeContents(&xCurrentINode, 0, xExt2BlockBuffer)) {
+			//        Heap.MemFree((uint)xBuffer);
+			//        Heap.MemFree((uint)xExt2BlockBuffer);
+			//        return null;
+			//    }
+			//    DirectoryEntry* xEntryPtr = (DirectoryEntry*)xExt2BlockBuffer;
+			//    uint xTotalSize = mBlockSize;
+			//    while (xTotalSize != 0) {
+			//        DebugUtil.SendExt2_DirectoryEntry(xEntryPtr);
+			//        uint xPtrAddress = (uint)xEntryPtr;
+			//        char[] xName = new char[xEntryPtr->NameLength];
+			//        byte* xNamePtr = &xEntryPtr->FirstNameChar;
+			//        for (int c = 0; c < xName.Length; c++) {
+			//            xName[c] = (char)xNamePtr[c];
+			//        }
+			//        xInspectedINodeCount++;
+			//        if (EqualsName(aPath[i], xName)) {
+			//            if (!ReadINode(xEntryPtr->INodeNumber, out xCurrentINode)) {
+			//                Heap.MemFree((uint)xBuffer);
+			//                Heap.MemFree((uint)xExt2BlockBuffer);
+			//                return null;
+			//            }
+			//            xCurrentINodeChanged = true;
+			//            xTotalSize = 0;
+			//            continue;
+			//        }
+			//        xPtrAddress += xEntryPtr->RecordLength;
+			//        xTotalSize -= xEntryPtr->RecordLength;
+			//        xEntryPtr = (DirectoryEntry*)xPtrAddress;
+			//    }
+			//}
+			//if (xCurrentINodeChanged) {
+			//    DebugUtil.SendMessage("Ext2", "ReadFile, for loop exited with an inode change");
+			//} else {
+			//    DebugUtil.SendMessage("Ext2", "ReadFile, for loop exited without an inode change");
+			//}
+			//if ((xCurrentINode.Mode & INodeModeEnum.Directory) == 0) {
+			//    Console.WriteLine("Ext2|GetDirectoryEntries, No directory after for loop");
+			//    return null;
+			//}
+			//if (!ReadINodeContents(&xCurrentINode, 0, xExt2BlockBuffer)) {
+			//    Heap.MemFree((uint)xBuffer);
+			//    Heap.MemFree((uint)xExt2BlockBuffer);
+			//    return null;
+			//}
+			//DirectoryEntry* xEntry = (DirectoryEntry*)xExt2BlockBuffer;
+			//uint xSize = mBlockSize;
+			//DebugUtil.SendMessage("Ext2", "GetDirectoryEntries");
+			//while (xSize != 0) {
+			//    DebugUtil.SendExt2_DirectoryEntry(xEntry);
+			//    uint xPtrAddress = (uint)xEntry;
+			//    char[] xName = new char[xEntry->NameLength];
+			//    byte* xNamePtr = &xEntry->FirstNameChar;
+			//    for (int c = 0; c < xName.Length; c++) {
+			//        byte b= xNamePtr[c];
+			//        xName[c] = (char)b;
+			//    }
+			//    xResult.Add(new String(xName));
+			//    xPtrAddress += xEntry->RecordLength;
+			//    xSize -= xEntry->RecordLength;
+			//    xEntry = (DirectoryEntry*)xPtrAddress;
+			//}
+			//Heap.MemFree((uint)xBuffer);
+			//Heap.MemFree((uint)xExt2BlockBuffer);
 
-			return xResult.ToArray();
+			//return xResult.ToArray();
+			throw new NotImplementedException("This functionality has been disabled");
 		}
 
 		private static bool EqualsName(string a1, char[] a2) {

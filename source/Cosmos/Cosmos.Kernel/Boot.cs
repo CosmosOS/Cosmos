@@ -9,7 +9,7 @@ namespace Cosmos.Kernel {
     public class Boot {
         public static void Default() {
             //Init Heap first - Hardware loads devices and they need heap
-            Heap.CheckInit();
+			Heap.CheckInit();
             
             // This should be the ONLY reference to the specific assembly
             // Later I would like to make this auto loading, but .NET's

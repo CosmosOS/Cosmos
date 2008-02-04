@@ -1,38 +1,36 @@
 using System;
 using System.Linq;
-using Mono.Cecil;
+using System.Reflection;
 
 namespace Indy.IL2CPU {
 	public static class ObjectUtilities {
-		public static bool IsDelegate(TypeReference aType) {
-			TypeDefinition xType = Engine.GetDefinitionFromTypeReference(aType);
-			if (xType.FullName == "System.Object") {
+		public static bool IsDelegate(Type aType) {
+			if (aType.FullName == "System.Object") {
 				return false;
 			}
-			if (xType.BaseType.FullName == "System.Delegate") {
+			if (aType.BaseType.FullName == "System.Delegate") {
 				return true;
 			}
-			if (xType.BaseType.FullName == "System.Object") {
+			if (aType.BaseType.FullName == "System.Object") {
 				return false;
 			}
-			return IsDelegate(xType.BaseType);
+			return IsDelegate(aType.BaseType);
 		}
 
-		public static bool IsArray(TypeReference aType) {
-			TypeDefinition xType = Engine.GetDefinitionFromTypeReference(aType);
-			if (xType.FullName == "System.Object") {
+		public static bool IsArray(Type aType) {
+			if (aType.FullName == "System.Object") {
 				return false;
 			}
-			if (xType.BaseType.FullName == "System.Array") {
+			if (aType.BaseType.FullName == "System.Array") {
 				return true;
 			}
-			if (xType.BaseType.FullName == "System.Object") {
+			if (aType.BaseType.FullName == "System.Object") {
 				return false;
 			}
-			return IsArray(xType.BaseType);
+			return IsArray(aType.BaseType);
 		}
 
-		public static int GetObjectStorageSize(TypeDefinition aType) {
+		public static int GetObjectStorageSize(Type aType) {
 			if (aType == null) {
 				throw new ArgumentNullException("aType");
 			}
@@ -40,7 +38,7 @@ namespace Indy.IL2CPU {
 			if (IsDelegate(aType)) {
 				xResult += 8;
 			}
-			foreach (FieldDefinition xField in aType.Fields) {
+			foreach (FieldInfo xField in aType.GetFields(BindingFlags.NonPublic | BindingFlags.Public)) {
 				if (xField.IsStatic) {
 					continue;
 				}

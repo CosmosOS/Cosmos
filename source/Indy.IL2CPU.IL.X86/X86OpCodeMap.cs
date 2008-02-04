@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Mono.Cecil;
+
 using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using Indy.IL2CPU.Assembler;
 
 namespace Indy.IL2CPU.IL.X86 {
 	public abstract class X86OpCodeMap: OpCodeMap {
@@ -38,9 +39,9 @@ namespace Indy.IL2CPU.IL.X86 {
 			return typeof(X86CustomMethodImplementationProxyOp);
 		}
 
-		protected override IList<AssemblyDefinition> GetPlugAssemblies() {
-			IList<AssemblyDefinition> xResult = base.GetPlugAssemblies();
-			xResult.Add(AssemblyFactory.GetAssembly(typeof(X86OpCodeMap).Assembly.Location));
+		protected override IList<Assembly> GetPlugAssemblies() {
+			IList<Assembly> xResult = base.GetPlugAssemblies();
+			xResult.Add(typeof(X86OpCodeMap).Assembly);
 			return xResult;
 		}
 
@@ -69,11 +70,11 @@ namespace Indy.IL2CPU.IL.X86 {
 					}
 				default: {
 						// we need special treatment for delegate constructors, which have an Object,IntPtr param list
-						if (ObjectUtilities.IsDelegate(aMethodInfo.MethodDefinition.DeclaringType)) {
-							if (aMethodInfo.LabelName.EndsWith("__ctor___System_Object__System_IntPtr___")) {
+						if (ObjectUtilities.IsDelegate(aMethodInfo.Method.DeclaringType)) {
+							if (aMethodInfo.LabelName.EndsWith("__ctor_System_Object__System_IntPtr_")) {
 								return true;
 							}
-							if (aMethodInfo.MethodDefinition.Name == "Invoke") {
+							if (aMethodInfo.Method.Name == "Invoke") {
 								return true;
 							}
 						}
@@ -94,7 +95,7 @@ namespace Indy.IL2CPU.IL.X86 {
 						break;
 					}
 				case "System_IntPtr___System_Delegate_GetMulticastInvoke____": {
-						Engine.QueueMethodRef(CustomImplementations.System.EventHandlerImplRefs.MulticastInvokeRef);
+						Engine.QueueMethod(CustomImplementations.System.EventHandlerImplRefs.MulticastInvokeRef);
 						new CPUx86.Push(CPU.Label.GenerateLabelName(CustomImplementations.System.EventHandlerImplRefs.MulticastInvokeRef));
 						break;
 					}
@@ -102,8 +103,8 @@ namespace Indy.IL2CPU.IL.X86 {
 						break;
 					}
 				default:
-					if (ObjectUtilities.IsDelegate(aMethodInfo.MethodDefinition.DeclaringType)) {
-						if (aMethodInfo.LabelName.EndsWith("__ctor___System_Object__System_IntPtr___")) {
+					if (ObjectUtilities.IsDelegate(aMethodInfo.Method.DeclaringType)) {
+						if (aMethodInfo.LabelName.EndsWith("__ctor_System_Object__System_IntPtr_")) {
 							for (int i = 0; i < aMethodInfo.Arguments.Length; i++) {
 								Op.Ldarg(aAssembler, aMethodInfo.Arguments[i]);
 							}
@@ -112,13 +113,13 @@ namespace Indy.IL2CPU.IL.X86 {
 							}.Assemble();
 							break;
 						}
-						if (aMethodInfo.MethodDefinition.Name == "Invoke") {
+						if (aMethodInfo.Method.Name == "Invoke") {
 							// param 0 is instance of eventhandler
 							// param 1 is sender
 							// param 2 is eventargs
 							Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
 							new CPUx86.Push("0x" + (ObjectImpl.FieldDataOffset + 4).ToString("X"));
-							aAssembler.StackSizes.Push(4);
+							aAssembler.StackContents.Push(new StackContent(4, typeof(uint)));
 							Ldarg.Add(aAssembler);
 							new CPUx86.Pop(CPUx86.Registers.EAX);
 							new CPUx86.Pushd(CPUx86.Registers.AtEAX);
@@ -127,7 +128,7 @@ namespace Indy.IL2CPU.IL.X86 {
 							}
 							Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
 							new CPUx86.Push("0x" + ObjectImpl.FieldDataOffset.ToString("X"));
-							aAssembler.StackSizes.Push(4);
+							aAssembler.StackContents.Push(new StackContent(4, typeof(uint)));
 							Ldarg.Add(aAssembler);
 							new CPUx86.Pop(CPUx86.Registers.EAX);
 							new CPUx86.Pushd(CPUx86.Registers.AtEAX);

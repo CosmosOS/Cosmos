@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Mono.Cecil;
+using System.Reflection;
 
 namespace Indy.IL2CPU.Assembler {
 	public abstract class Assembler: IDisposable {
@@ -25,17 +25,12 @@ namespace Indy.IL2CPU.Assembler {
 			Console.WriteLine("The Cosmos Project would appreciate your feedback about this issue.");
 		}
 
-		private static FieldDefinition mCurrentExceptionRef;
-		public static FieldDefinition CurrentExceptionRef {
+		private static FieldInfo mCurrentExceptionRef;
+		public static FieldInfo CurrentExceptionRef {
 			get {
 				if (mCurrentExceptionRef == null) {
-					AssemblyDefinition xAsm = AssemblyFactory.GetAssembly(typeof(Assembler).Assembly.Location);
-					foreach (ModuleDefinition xMod in xAsm.Modules) {
-						if (xMod.Types.Contains(typeof(Assembler).FullName)) {
-							mCurrentExceptionRef = xMod.Types[typeof(Assembler).FullName].Fields.GetField("CurrentException");
-							break;
-						}
-					}
+					var xThisType = typeof(Assembler);
+					mCurrentExceptionRef = xThisType.GetField("CurrentException");
 					if (mCurrentExceptionRef == null) {
 						throw new Exception("Couldn't find CurrentException field!");
 					}
@@ -43,13 +38,33 @@ namespace Indy.IL2CPU.Assembler {
 				return mCurrentExceptionRef;
 			}
 		}
+
+		private static MethodInfo mCurrentExceptionOccurredRef;
+		public static MethodInfo CurrentExceptionOccurredRef {
+			get {
+				if (mCurrentExceptionOccurredRef == null) {
+					var xThisType = typeof(Assembler);
+					mCurrentExceptionOccurredRef = xThisType.GetMethod("ExceptionOccurred");
+					if (mCurrentExceptionOccurredRef == null) {
+						throw new Exception("Couldn't find ExceptionOccurred method!");
+					}
+				}
+				return mCurrentExceptionOccurredRef;
+			}
+		}
+
+		public static void ExceptionOccurred() {
+			Console.WriteLine("Exception Occurred!");
+			System.Diagnostics.Debugger.Break();
+		}
+
 		public const string EntryPointName = "__ENGINE_ENTRYPOINT__";
 		protected List<KeyValuePair<string, Instruction>> mInstructions = new List<KeyValuePair<string, Instruction>>();
 		private List<KeyValuePair<string, DataMember>> mDataMembers = new List<KeyValuePair<string, DataMember>>();
 		private List<KeyValuePair<string, string>> mIncludes = new List<KeyValuePair<string, string>>();
 		private List<KeyValuePair<string, ImportMember>> mImportMembers = new List<KeyValuePair<string, ImportMember>>();
 		private readonly bool mInMetalMode = false;
-		public readonly Stack<int> StackSizes = new Stack<int>();
+		public readonly Stack<StackContent> StackContents = new Stack<StackContent>();
 		public bool DebugMode {
 			get;
 			set;
@@ -114,8 +129,8 @@ namespace Indy.IL2CPU.Assembler {
 			CurrentInstance = null;
 		}
 
-		public void Add(params Instruction[] aInstructions) {
-			foreach (Instruction xInstruction in aInstructions) {
+		public void Add(params Instruction[] aReaders) {
+			foreach (Instruction xInstruction in aReaders) {
 				mInstructions.Add(new KeyValuePair<string, Instruction>(CurrentGroup, xInstruction));
 			}
 		}

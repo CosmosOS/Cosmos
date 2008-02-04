@@ -1,42 +1,30 @@
-﻿using System;
+﻿#define MTW_DEBUG
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Indy.IL2CPU.Assembler;
-using Mono.Cecil;
-using Instruction = Mono.Cecil.Cil.Instruction;
 using System.Xml;
+using System.Reflection;
 
 namespace Indy.IL2CPU.IL {
 	public abstract class InitVmtImplementationOp: Op {
-		public delegate int GetMethodIdentifierEventHandler(MethodDefinition aMethod);
-		public InitVmtImplementationOp(Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
+		public delegate int GetMethodIdentifierEventHandler(MethodBase aMethod);
+		public InitVmtImplementationOp(ILReader aReader, MethodInformation aMethodInfo)
+			: base(aReader, aMethodInfo) {
 		}
 
-		public static string GetFullName(MethodReference aSelf) {
-			StringBuilder sb = new StringBuilder(aSelf.ReturnType.ReturnType.FullName + " " + aSelf.DeclaringType.FullName + "." + aSelf.Name);
-			sb.Append("(");
-			if (aSelf.Parameters.Count > 0) {
-				foreach (ParameterDefinition xParam in aSelf.Parameters) {
-					sb.Append(xParam.ParameterType.FullName);
-					sb.Append(",");
-				}
-			}
-			return sb.ToString().TrimEnd(',') + ")";
-		}
-
-		private List<TypeDefinition> mTypes;
-		public MethodDefinition LoadTypeTableRef;
-		public MethodDefinition SetTypeInfoRef;
-		public MethodDefinition SetMethodInfoRef;
-		public FieldDefinition TypesFieldRef;
+		private List<Type> mTypes;
+		public MethodBase LoadTypeTableRef;
+		public MethodBase SetTypeInfoRef;
+		public MethodBase SetMethodInfoRef;
+		public FieldInfo TypesFieldRef;
 		public int VTableEntrySize;
 		public uint ArrayTypeId;
-		public IList<MethodDefinition> Methods;
+		public IList<MethodBase> Methods;
 		public event GetMethodIdentifierEventHandler GetMethodIdentifier;
 
-		public List<TypeDefinition> Types {
+		public List<Type> Types {
 			get {
 				return mTypes;
 			}
@@ -46,7 +34,7 @@ namespace Indy.IL2CPU.IL {
 		}
 
 		protected abstract void Pushd(string aValue);
-		protected abstract void Call(MethodDefinition aMethod);
+		protected abstract void Call(MethodBase aMethod);
 
 		public override void DoAssemble() {
 #if MTW_DEBUG
@@ -54,10 +42,11 @@ namespace Indy.IL2CPU.IL {
 				xDebug.WriteStartDocument();
 				xDebug.WriteStartElement("VTables");
 				xDebug.WriteStartElement("AllMethods");
-				foreach (MethodDefinition xTheMethod in Methods) {
+				for(int i = 0; i < Methods.Count; i++){
+					MethodBase xTheMethod = Methods[i];
 					xDebug.WriteStartElement("Method");
 					xDebug.WriteAttributeString("Id", GetMethodIdentifier(xTheMethod).ToString("X"));
-					xDebug.WriteAttributeString("Name", xTheMethod.ToString());
+					xDebug.WriteAttributeString("Name", xTheMethod.GetFullName());
 					xDebug.WriteEndElement();
 				}
 				xDebug.WriteEndElement();
@@ -90,14 +79,14 @@ namespace Indy.IL2CPU.IL {
 					xDebug.WriteStartElement("Type");
 					xDebug.WriteAttributeString("Id", i.ToString("X"));
 #endif
-				TypeDefinition xType = mTypes[i];
-				List<MethodDefinition> xEmittedMethods = new List<MethodDefinition>();
-				foreach (MethodDefinition xMethod in xType.Methods) {
+				Type xType = mTypes[i];
+				List<MethodBase> xEmittedMethods = new List<MethodBase>();
+				foreach (MethodBase xMethod in xType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)) {
 					if (Methods.Contains(xMethod) && !xMethod.IsAbstract) {
 						xEmittedMethods.Add(xMethod);
 					}
 				}
-				foreach (MethodDefinition xCtor in xType.Constructors) {
+				foreach (MethodBase xCtor in xType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)) {
 					if (Methods.Contains(xCtor) && !xCtor.IsAbstract) {
 						xEmittedMethods.Add(xCtor);
 					}
@@ -141,27 +130,28 @@ namespace Indy.IL2CPU.IL {
 				xDataByteArray.Remove(0, xDataByteArray.Length);
 				xDataByteArray.Append(BitConverter.GetBytes(ArrayTypeId).Aggregate("", (r, b) => r + b + ","));
 				xDataByteArray.Append(BitConverter.GetBytes(0x80000002 /* EmbeddedArray */).Aggregate("", (r, b) => r + b + ","));
-				xDataByteArray.Append(BitConverter.GetBytes((mTypes[i].FullName + ", " + mTypes[i].Module.Assembly.Name.FullName).Length).Aggregate("", (r, b) => r + b + ","));
+				xDataByteArray.Append(BitConverter.GetBytes((mTypes[i].FullName + ", " + mTypes[i].Module.Assembly.GetName().FullName).Length).Aggregate("", (r, b) => r + b + ","));
 				xDataByteArray.Append(BitConverter.GetBytes((uint)2).Aggregate("", (r, b) => r + b + ","));
-				xDataByteArray.Append(Encoding.Unicode.GetBytes(mTypes[i].FullName + ", " + mTypes[i].Module.Assembly.Name.FullName).Aggregate("", (b, x) => b + x + ",") + "0");
+				xDataByteArray.Append(Encoding.Unicode.GetBytes(mTypes[i].FullName + ", " + mTypes[i].Module.Assembly.GetName().FullName).Aggregate("", (b, x) => b + x + ",") + "0");
 				xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(mTypes[i].FullName);
 				mAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>(Assembler.CurrentGroup, new DataMember(xDataName, "db", xDataByteArray.ToString())));
 				Pushd(xDataName);
 				//Pushd("0");
 				Call(SetTypeInfoRef);
 				for (int j = 0; j < xEmittedMethods.Count; j++) {
-					MethodDefinition xMethod = xEmittedMethods[j];
+					MethodBase xMethod = xEmittedMethods[j];
 #if MTW_DEBUG
 						xDebug.WriteStartElement("Method");
 						xDebug.WriteAttributeString("Id", GetMethodIdentifier(xMethod).ToString("X"));
-						xDebug.WriteAttributeString("Name", xMethod.ToString());
+						xDebug.WriteAttributeString("Name", xMethod.GetFullName());
 						xDebug.WriteEndElement();
 #endif
 					Pushd("0" + i.ToString("X") + "h");
 					Pushd("0" + j.ToString("X") + "h");
-					TypeReference[] xMethodParams = new TypeReference[xMethod.Parameters.Count];
-					for (int k = 0; k < xMethod.Parameters.Count; k++) {
-						xMethodParams[k] = xMethod.Parameters[k].ParameterType;
+					ParameterInfo[] xParams = xMethod.GetParameters();
+					Type[] xMethodParams = new Type[xParams.Length];
+					for (int k = 0; k < xParams.Length; k++) {
+						xMethodParams[k] = xParams[k].ParameterType;
 					}
 					Pushd("0" + GetMethodIdentifier(xMethod).ToString("X") + "h");
 					Pushd(Label.GenerateLabelName(xMethod));

@@ -11,6 +11,10 @@ namespace Indy.IL2CPU.CustomImplementation.System {
 			return aResource;
 		}
 
+		public static string GetResourceString(string key, params object[] values) {
+			return key;
+		}
+
 		public static string GetResourceString(string aResource) {
 			return aResource;
 		}

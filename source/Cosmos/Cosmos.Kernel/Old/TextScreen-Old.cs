@@ -34,7 +34,7 @@ namespace Cosmos.Kernel {
             CurrentLine += 1;
 			CurrentChar = 0;
 			if (CurrentLine > (HW.Text.Lines)) {
-                HW.Text.ScrollUp();
+				HW.Text.ScrollUp();
 				CurrentLine -= 1;
 				CurrentChar = 0;
 			}
@@ -50,13 +50,7 @@ namespace Cosmos.Kernel {
             HW.Text.PutChar(CurrentLine, CurrentChar, aChar);
             CurrentChar += 1;
             if (CurrentChar == HW.Text.Columns) {
-                CurrentChar = 0;
-                CurrentLine += 1;
-                if (CurrentLine > (HW.Text.Lines)) {
-                	HW.Text.ScrollUp();
-                    CurrentLine -= 1;
-                    CurrentChar = 0;
-                }
+				NewLine();
             }
         }
     }

@@ -1,18 +1,16 @@
 using System;
 using System.Linq;
+using System.Reflection;
 using Indy.IL2CPU.Assembler;
 using Indy.IL2CPU.Assembler.X86;
 using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
-using Instruction = Mono.Cecil.Cil.Instruction;
-using Mono.Cecil.Cil;
-using Mono.Cecil;
 
 namespace Indy.IL2CPU.IL.X86 {
 	public abstract class Op: IL.Op {
 		private bool mNeedsExceptionPush;
 		private bool mNeedsExceptionClear;
-		private TypeDefinition mCatchType;
+		private Type mCatchType;
 		private string mNextInstructionLabel;
 		private bool mNeedsTypeCheck = false;
 
@@ -21,36 +19,44 @@ namespace Indy.IL2CPU.IL.X86 {
 		/// </summary>
 		/// <param name="aAssembler"></param>
 		/// <param name="aAddress"></param>
-		public static void EmitCompareWithNull(Assembler.Assembler aAssembler, MethodInformation aMethodInfo, string aAddress, string aNextLabel, Action aEmitCleanupMethod) {
+		public static void EmitCompareWithNull(Assembler.Assembler aAssembler, MethodInformation aMethodInfo, string aAddress, string aCurrentLabel, string aNextLabel, Action aEmitCleanupMethod) {
 			new CPUx86.Compare("dword " + aAddress, "0");
 			new CPUx86.JumpIfNotEquals(aNextLabel);
-			TypeDefinition xNullRefExcType = Engine.GetTypeDefinitionFromReflectionType(typeof(NullReferenceException));
-			Newobj.Assemble(aAssembler, Engine.GetTypeInfo(xNullRefExcType).StorageSize, xNullRefExcType.Constructors.GetConstructor(false, new Type[0]), Engine.RegisterType(xNullRefExcType));
-			aAssembler.StackSizes.Pop();
+			Type xNullRefExcType = typeof(NullReferenceException);
+			Newobj.Assemble(aAssembler, Engine.GetTypeInfo(xNullRefExcType).StorageSize, xNullRefExcType.GetConstructor(new Type[0]), Engine.RegisterType(xNullRefExcType), aCurrentLabel, aMethodInfo);
+			aAssembler.StackContents.Pop();
 			new CPUx86.Move("[" + DataMember.GetStaticFieldName(CPU.Assembler.CurrentExceptionRef) + "]", "eax");
+			Engine.QueueMethod(CPU.Assembler.CurrentExceptionOccurredRef);
+			new CPUx86.Call(Label.GenerateLabelName(CPU.Assembler.CurrentExceptionOccurredRef));
 			new CPUx86.Move("ecx", "3");
 			aEmitCleanupMethod();
 			Call.EmitExceptionLogic(aAssembler, aMethodInfo, aNextLabel, false);
 		}
 
-		public Op(Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
+		public Op(ILReader aReader, MethodInformation aMethodInfo)
+			: base(aReader, aMethodInfo) {
 			if (aMethodInfo != null && aMethodInfo.CurrentHandler != null) {
-				mNeedsExceptionPush = ((aMethodInfo.CurrentHandler.HandlerStart != null && aMethodInfo.CurrentHandler.HandlerStart.Offset == aInstruction.Offset) || (aMethodInfo.CurrentHandler.FilterStart != null && aMethodInfo.CurrentHandler.FilterStart.Offset == aInstruction.Offset)) && (aMethodInfo.CurrentHandler.Type == ExceptionHandlerType.Catch);
-				mNeedsExceptionClear = (aMethodInfo.CurrentHandler.HandlerEnd != null && aMethodInfo.CurrentHandler.HandlerEnd.Offset == (aInstruction.Offset + 1)) || (aMethodInfo.CurrentHandler.FilterEnd != null && aMethodInfo.CurrentHandler.FilterEnd.Offset == (aInstruction.Offset + 1));
-				if (aMethodInfo.CurrentHandler.CatchType != null) {
-					mCatchType = Engine.GetDefinitionFromTypeReference(aMethodInfo.CurrentHandler.CatchType);
+				mNeedsExceptionPush =
+					((aMethodInfo.CurrentHandler.HandlerOffset > 0 && aMethodInfo.CurrentHandler.HandlerOffset == aReader.Position) ||
+					((aMethodInfo.CurrentHandler.Flags & ExceptionHandlingClauseOptions.Filter) > 0 && aMethodInfo.CurrentHandler.FilterOffset > 0 && aMethodInfo.CurrentHandler.FilterOffset == aReader.Position))
+					&& (aMethodInfo.CurrentHandler.Flags == ExceptionHandlingClauseOptions.Clause);
+				// todo: add support for exception clear again
+				bool mNeedsExceptionClear = false;
+				//mNeedsExceptionClear = ((aMethodInfo.CurrentHandler.HandlerOffset + aMethodInfo.CurrentHandler.HandlerLength) == (aReader.Offset + 1)) || 
+				//    ((aMethodInfo.CurrentHandler.FilterOffset+aMethodInfo.CurrentHandler.Filterle == (aReader.Offset + 1));
+				if (mNeedsExceptionPush && aMethodInfo.CurrentHandler.CatchType != null) {
+					mCatchType = aMethodInfo.CurrentHandler.CatchType;
 				}
 			}
 			if (mCatchType != null && mCatchType.FullName != "System.Exception") {
-				var xHandler = (from item in aMethodInfo.MethodDefinition.Body.ExceptionHandlers.Cast<ExceptionHandler>()
-								where item.TryStart.Offset == aMethodInfo.CurrentHandler.TryStart.Offset
-								&& item.TryEnd.Offset == aMethodInfo.CurrentHandler.TryEnd.Offset
-								&& item.HandlerStart.Offset == aMethodInfo.CurrentHandler.HandlerEnd.Offset
-								&& item.Type == ExceptionHandlerType.Catch
+				var xHandler = (from item in aMethodInfo.Method.GetMethodBody().ExceptionHandlingClauses
+								where item.TryOffset == aMethodInfo.CurrentHandler.TryOffset
+								&& item.TryLength == aMethodInfo.CurrentHandler.TryLength
+								&& item.HandlerOffset == aMethodInfo.CurrentHandler.HandlerOffset
+								&& item.Flags == ExceptionHandlingClauseOptions.Clause
 								select item).FirstOrDefault();
 				if (xHandler != null) {
-					mNextInstructionLabel = GetInstructionLabel(xHandler.HandlerStart);
+					mNextInstructionLabel = GetInstructionLabel(xHandler.HandlerOffset);
 				} else {
 					// Here we need to detect where to leave to when this catch clause doesnt' handle a specific exception, and is the last one
 					throw new NotImplementedException("TODO: Implement exiting here!");
@@ -58,8 +64,8 @@ namespace Indy.IL2CPU.IL.X86 {
 			} else {
 				mCatchType = null;
 			}
-			if (mCatchType != null && aMethodInfo != null && aMethodInfo.CurrentHandler != null && aMethodInfo.CurrentHandler.HandlerStart != null) {
-				mNeedsTypeCheck = aMethodInfo.CurrentHandler.HandlerStart.Offset == aInstruction.Offset;
+			if (mCatchType != null && aMethodInfo != null && aMethodInfo.CurrentHandler != null && aMethodInfo.CurrentHandler.HandlerOffset > 0) {
+				mNeedsTypeCheck = aMethodInfo.CurrentHandler.HandlerOffset == aReader.Position;
 			}
 		}
 
@@ -72,10 +78,10 @@ namespace Indy.IL2CPU.IL.X86 {
 				new Move(CPUx86.Registers.EAX, "[" + xAddress + "]");
 				new Push(CPUx86.Registers.EAX);
 			}
-			aAssembler.StackSizes.Push(aArg.Size);
+			aAssembler.StackContents.Push(new StackContent(aArg.Size, aArg.ArgumentType));
 			if (!aAssembler.InMetalMode && aAddGCCode && aArg.IsReferenceType) {
 				new CPUx86.Push(CPUx86.Registers.EAX);
-				Engine.QueueMethodRef(GCImplementationRefs.IncRefCountRef);
+				Engine.QueueMethod(GCImplementationRefs.IncRefCountRef);
 				new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef));
 			}
 		}
@@ -88,24 +94,28 @@ namespace Indy.IL2CPU.IL.X86 {
 			new Popd(CPUx86.Registers.EAX);
 			new CPUx86.Add(CPUx86.Registers.EAX, "0x" + (aField.Offset + aExtraOffset).ToString("X"));
 			new Pushd(CPUx86.Registers.EAX);
-			aAssembler.StackSizes.Push(4);
+			aAssembler.StackContents.Push(new StackContent(4, aField.FieldType));
 		}
 
 		public static void Multiply(Assembler.Assembler aAssembler) {
-			int xSize = aAssembler.StackSizes.Pop();
+			StackContent xStackContent = aAssembler.StackContents.Pop();
 			new CPUx86.Xor("edx", "edx");
-			if (xSize > 4) {
-				new CPUx86.Pop("eax");
-				new CPUx86.Add("esp", "4");
-				new CPUx86.Multiply("dword [esp]");
-				new CPUx86.Add("esp", "8");
-				new Pushd("0");
-				new Pushd("eax");
+			if (xStackContent.IsFloat) {
+				throw new Exception("Float support not yet supported!");
 			} else {
-				new CPUx86.Pop("eax");
-				new CPUx86.Multiply("dword [esp]");
-				new CPUx86.Add("esp", "4");
-				new Pushd("eax");
+				if (xStackContent.Size > 4) {
+					new CPUx86.Pop("eax");
+					new CPUx86.Add("esp", "4");
+					new CPUx86.Multiply("dword [esp]");
+					new CPUx86.Add("esp", "8");
+					new Pushd("0");
+					new Pushd("eax");
+				} else {
+					new CPUx86.Pop("eax");
+					new CPUx86.Multiply("dword [esp]");
+					new CPUx86.Add("esp", "4");
+					new Pushd("eax");
+				}
 			}
 		}
 
@@ -114,7 +124,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public static void Ldfld(Assembler.Assembler aAssembler, TypeInformation aType, TypeInformation.Field aField, bool aAddGCCode) {
-			aAssembler.StackSizes.Pop();
+			aAssembler.StackContents.Pop();
 			int aExtraOffset = 0;
 			if (aType.NeedsGC && !aAssembler.InMetalMode) {
 				aExtraOffset = 12;
@@ -168,14 +178,14 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			if (aAddGCCode && aField.NeedsGC && !aAssembler.InMetalMode) {
 				new CPUx86.Pushd(Registers.AtESP);
-				Engine.QueueMethodRef(GCImplementationRefs.IncRefCountRef);
+				Engine.QueueMethod(GCImplementationRefs.IncRefCountRef);
 				new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef));
 			}
-			aAssembler.StackSizes.Push(aField.Size);
+			aAssembler.StackContents.Push(new StackContent(aField.Size, aField.FieldType));
 		}
 
 		public static void Stfld(Assembler.Assembler aAssembler, TypeInformation aType, TypeInformation.Field aField) {
-			aAssembler.StackSizes.Pop();
+			aAssembler.StackContents.Pop();
 			int xRoundedSize = aField.Size;
 			if (xRoundedSize % 4 != 0) {
 				xRoundedSize += 4 - (xRoundedSize % 4);
@@ -219,18 +229,24 @@ namespace Indy.IL2CPU.IL.X86 {
 				new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef));
 			}
 			new CPUx86.Add("esp", "4");
-			aAssembler.StackSizes.Pop();
+			aAssembler.StackContents.Pop();
 		}
 
 		public static void Add(Assembler.Assembler aAssembler) {
-			int xSize = aAssembler.StackSizes.Pop();
+			StackContent xSize = aAssembler.StackContents.Pop();
 			new CPUx86.Pop("eax");
-			if (xSize == 8) {
+			if (xSize.IsFloat) {
+				throw new Exception("Float support not yet implemented!");
+			}
+			if (xSize.Size == 8) {
 				new CPUx86.Add("esp", "4");
 			}
 			new CPUx86.Add("eax", "[esp]");
 			new CPUx86.Add("esp", "4");
 			new Pushd("eax");
+			if (xSize.Size == 8) {
+				new CPUx86.Push("0");
+			}
 		}
 
 		public static void Ldloc(Assembler.Assembler aAssembler, MethodInformation.Variable aLocal) {
@@ -242,10 +258,10 @@ namespace Indy.IL2CPU.IL.X86 {
 				new CPUx86.Move("eax", "[" + s + "]");
 				new CPUx86.Push("eax");
 			}
-			aAssembler.StackSizes.Push(aLocal.Size);
+			aAssembler.StackContents.Push(new StackContent(aLocal.Size, aLocal.VariableType));
 			if (!aAssembler.InMetalMode && aAddGCCode && aLocal.IsReferenceType) {
 				new CPUx86.Push("eax");
-				Engine.QueueMethodRef(GCImplementationRefs.IncRefCountRef);
+				Engine.QueueMethod(GCImplementationRefs.IncRefCountRef);
 				new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef));
 			}
 		}
@@ -265,7 +281,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			if (mNeedsExceptionPush) {
 				new CPUx86.Push("dword [" + xCurExceptionFieldName + "]");
-				Assembler.StackSizes.Push(4);
+				Assembler.StackContents.Push(new StackContent(4, typeof(Exception)));
 			}
 		}
 	}

@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Mono.Cecil.Cil;
+
 
 namespace Indy.IL2CPU.IL.X86.Native {
 	public class NativeCustomMethodImplementationOp: X86.X86CustomMethodImplementationOp {
-		public NativeCustomMethodImplementationOp(Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
+		public NativeCustomMethodImplementationOp(ILReader aReader, MethodInformation aMethodInfo)
+			: base(aReader, aMethodInfo) {
 		}
 
 		protected override void Assemble_System_UInt32___Indy_IL2CPU_RuntimeEngine_Heap_AllocNewObject___System_UInt32___() {

@@ -1,22 +1,24 @@
 using System;
-using Mono.Cecil;
-using Mono.Cecil.Cil;
+
+
 using CPU = Indy.IL2CPU.Assembler.X86;
+using System.Reflection;
+using Indy.IL2CPU.Assembler;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(Code.Ldsflda)]
+	[OpCode(OpCodeEnum.Ldsflda)]
 	public class Ldsflda: Op {
 		private readonly string mDataName;
 
-		public Ldsflda(Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
-			FieldReference xField = (FieldReference)aInstruction.Operand;
+		public Ldsflda(ILReader aReader, MethodInformation aMethodInfo)
+			: base(aReader, aMethodInfo) {
+			FieldInfo xField = aReader.OperandValueField;
 			Engine.QueueStaticField(xField, out mDataName);
 		}
 
 		public override void DoAssemble() {
 			new CPU.Pushd(mDataName);
-			Assembler.StackSizes.Push(4);
+			Assembler.StackContents.Push(new StackContent(4, true, false, false));
 		}
 	}
 }

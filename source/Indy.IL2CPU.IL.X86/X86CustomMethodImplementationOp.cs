@@ -1,57 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Mono.Cecil;
-using Mono.Cecil.Cil;
+
+
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using System.Reflection;
 
 namespace Indy.IL2CPU.IL.X86 {
 	public abstract class X86CustomMethodImplementationOp: CustomMethodImplementationOp {
-		public X86CustomMethodImplementationOp(Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
+		public X86CustomMethodImplementationOp(ILReader aReader, MethodInformation aMethodInfo)
+			: base(aReader, aMethodInfo) {
 		}
 
 		/// <summary>
 		/// Passes the call directly to an equal method. 
 		/// </summary>
 		/// <param name="aMethod"></param>
-		protected void PassCall(MethodReference aMethod) {
-			for (int i = 0; i < aMethod.Parameters.Count; i++) {
+		protected void PassCall(MethodBase aMethod) {
+			for (int i = 0; i < MethodInfo.Arguments.Length; i++) {
 				Ldarg.Ldarg(Assembler, MethodInfo.Arguments[i]);
 			}
-			Engine.QueueMethodRef(aMethod);
+			Engine.QueueMethod(aMethod);
 			Op xOp = new Call(aMethod);
 			xOp.Assembler = Assembler;
 			xOp.Assemble();
-		}
-
-		protected override void Assemble_System_Void___System_Runtime_CompilerServices_RuntimeHelpers_InitializeArray___System_Array__System_RuntimeFieldHandle___() {
-			// Arguments:
-			//    Array aArray, RuntimeFieldHandle aFieldHandle
-			new Assembler.X86.Move(CPUx86.Registers.EDI, "[" + MethodInfo.Arguments[0].VirtualAddresses[0] + "]"); // aArray
-			new Assembler.X86.Move(CPUx86.Registers.ESI, "[" + MethodInfo.Arguments[1].VirtualAddresses[0] + "]"); // aFieldHandle
-			new Assembler.X86.Add(CPUx86.Registers.EDI, "8");
-			new Assembler.X86.Push("dword [edi]");
-			new Assembler.X86.Add(CPUx86.Registers.EDI, "4");
-			new CPUx86.Move("eax", "[edi]");
-			new CPUx86.Multiply("dword [esp]");
-			new CPUx86.Pop("ecx");
-			new CPUx86.Move("ecx", "eax");
-			new Assembler.X86.Move(CPUx86.Registers.EAX, "0");
-			new Assembler.X86.Add(CPUx86.Registers.EDI, "4");
-			new Assembler.X86.Add(CPUx86.Registers.ESI, "16");
-
-			new Assembler.Label(".StartLoop");
-			new Assembler.X86.Move("byte", CPUx86.Registers.DL, CPUx86.Registers.AtESI);
-			new Assembler.X86.Move("byte", CPUx86.Registers.AtEDI, CPUx86.Registers.DL);
-			new Assembler.X86.Add(CPUx86.Registers.EAX, "1");
-			new Assembler.X86.Add(CPUx86.Registers.ESI, "1");
-			new Assembler.X86.Add(CPUx86.Registers.EDI, "1");
-			new Assembler.X86.Compare(CPUx86.Registers.EAX, CPUx86.Registers.ECX);
-			new Assembler.X86.JumpIfEquals(".EndLoop");
-			new Assembler.X86.JumpAlways(".StartLoop");
-
-			new Assembler.Label(".EndLoop");
 		}
 
 		protected override void Assemble_System_UInt32___Indy_IL2CPU_CustomImplementation_System_StringImpl_GetStorage___System_UInt32___() {
@@ -60,7 +32,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			new Indy.IL2CPU.Assembler.X86.Pop(CPUx86.Registers.EAX);
 			if (!mAssembler.InMetalMode) {
 				int xStorageSize;
-				SortedList<string, TypeInformation.Field> xFields = Engine.GetTypeFieldInfo(Engine.GetMethodDefinition(Engine.GetTypeDefinition("mscorlib", "System.String"), ".ctor", "System.Char[]"), out xStorageSize);
+				SortedList<string, TypeInformation.Field> xFields = Engine.GetTypeFieldInfo(Engine.GetMethodBase(Engine.GetType("mscorlib", "System.String"), ".ctor", "System.Char[]"), out xStorageSize);
 				new Indy.IL2CPU.Assembler.X86.Add(CPUx86.Registers.EAX, "0" + xFields["$$Storage$$"].Offset.ToString("X") + "h");
 				new Indy.IL2CPU.Assembler.X86.Move(CPUx86.Registers.EAX, CPUx86.Registers.AtEAX);
 				new Indy.IL2CPU.Assembler.X86.Add(CPUx86.Registers.EAX, "12");
@@ -89,7 +61,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			AssembleOp(new Ldarg(MethodInfo, 0));
 			AssembleOp(new Ldarg(MethodInfo, 2));
 			AssembleOp(new Ldarg(MethodInfo, 1));
-			Stelem_Any.Assemble(Assembler, 4);
+			Stelem_Ref.Assemble(Assembler, 4);
 		}
 
 		protected override void Assemble_System_Int32_System_Array_get_Length____() {

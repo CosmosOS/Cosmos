@@ -3,7 +3,7 @@ using System.Reflection;
 using Indy.IL2CPU.Assembler;
 using Indy.IL2CPU.Assembler.X86;
 using Indy.IL2CPU.Plugs;
-using Mono.Cecil;
+
 using Assembler = Indy.IL2CPU.Assembler.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using CPUNative = Indy.IL2CPU.Assembler.X86.Native;
@@ -12,16 +12,12 @@ using System.Collections.Generic;
 
 namespace Cosmos.Kernel.Plugs.Assemblers {
 	public class CreateIDT: AssemblerMethod {
-		private static MethodDefinition GetMethodDef(Assembly aAssembly, string aType, string aMethodName, bool aErrorWhenNotFound) {
-			AssemblyDefinition xAssembly = AssemblyFactory.GetAssembly(aAssembly.Location);
-			foreach (ModuleDefinition xMod in xAssembly.Modules) {
-				if (xMod.Types.Contains(aType)) {
-					TypeDefinition xType = xMod.Types[aType];
-					foreach (MethodDefinition xMethod in xType.Methods) {
-						if (xMethod.Name == aMethodName) {
-							return xMethod;
-						}
-					}
+		private static MethodBase GetMethodDef(Assembly aAssembly, string aType, string aMethodName, bool aErrorWhenNotFound) {
+			System.Type xType = aAssembly.GetType(aType, false);
+			if (xType != null) {
+				MethodBase xMethod = xType.GetMethod(aMethodName);
+				if (xMethod != null) {
+					return xMethod;
 				}
 			}
 			if (aErrorWhenNotFound) {
@@ -30,7 +26,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 			return null;
 		}
 
-		private static MethodDefinition GetInterruptHandler(byte aInterrupt) {
+		private static MethodBase GetInterruptHandler(byte aInterrupt) {
             return GetMethodDef(typeof(Cosmos.Hardware.PC.Interrupts).Assembly, typeof(Cosmos.Hardware.PC.Interrupts).FullName, "HandleInterrupt_" + aInterrupt.ToString("X2"), false);
 		}
 
@@ -94,13 +90,25 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 				new CPUx86.Move("eax", "0");
 				new CPUx86.Move("ax", "gs");
 				new CPUx86.Push("eax");
+				new CPUx86.Move("ax", "ss");
+				new CPUx86.Push("eax");
 				new CPUx86.Move("eax", "esp");
 				new CPUx86.Push("eax");
-				MethodDefinition xHandler = GetInterruptHandler((byte)j);
+				new CPUx86.Move("eax", "0x10");
+				new CPUx86.Move("ds", Registers.AX);
+				new CPUx86.Move("es", Registers.AX);
+				new CPUx86.Move("fs", Registers.AX);
+				new CPUx86.Move("gs", Registers.AX);
+				new CPUx86.Move("ss", Registers.AX);
+				new CPUx86.JumpAlways("0x8:__ISR_Handler_" + j.ToString("X2") + "_SetCS");
+				new Label("__ISR_Handler_" + j.ToString("X2") + "_SetCS");
+				MethodBase xHandler = GetInterruptHandler((byte)j);
 				if (xHandler == null) {
                     xHandler = GetMethodDef(typeof(Cosmos.Hardware.PC.Interrupts).Assembly, typeof(Cosmos.Hardware.PC.Interrupts).FullName, "HandleInterrupt_Default", true);
 				}
 				new CPUx86.Call(Label.GenerateLabelName(xHandler));
+				new CPUx86.Pop("eax");
+				new CPUx86.Move("ss", "ax");
 				new CPUx86.Pop("eax");
 				new CPUx86.Move("gs", "ax");
 				new CPUx86.Pop("eax");
@@ -112,13 +120,14 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 				new CPUNative.Popad();
 				new CPUx86.Add("esp", "8");
 				new CPUNative.Break();
+				new Label("__ISR_Handler_" + j.ToString("X2") + "_END");
 				//if (j < 0x20 || j > 0x2F) {
 				new CPUNative.Sti();
 				//}
-				new Label("__ISR_Handler_" + j.ToString("X2") + "_END");
 				new CPUNative.IRet();
 			}
 			new Label("__AFTER__ALL__ISR__HANDLER__STUBS__");
+			new CPUx86.Noop();
 			new CPUNative.Sti();
 		}
 	}

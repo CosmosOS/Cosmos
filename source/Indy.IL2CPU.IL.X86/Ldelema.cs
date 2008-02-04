@@ -1,29 +1,25 @@
 using System;
 using System.IO;
-using Mono.Cecil;
-using Mono.Cecil.Cil;
+
+
 using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using Indy.IL2CPU.Assembler;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(Code.Ldelema, true)]
+	[OpCode(OpCodeEnum.Ldelema, true)]
 	public class Ldelema: Op {
 		private int mElementSize;
-		public Ldelema(Instruction aInstruction, MethodInformation aMethodInfo)
-			: base(aInstruction, aMethodInfo) {
-			TypeReference xTypeRef = aInstruction.Operand as TypeReference;
-			TypeSpecification xTypeSpec = xTypeRef as TypeSpecification;
-			if(xTypeSpec == null) {
-				mElementSize = Engine.GetFieldStorageSize(xTypeRef);
-			} else {
-				mElementSize = 4;
-			}
+		public Ldelema(ILReader aReader, MethodInformation aMethodInfo)
+			: base(aReader, aMethodInfo) {
+			Type xTypeRef = aReader.OperandValueType;
+			mElementSize = Engine.GetFieldStorageSize(xTypeRef);
 		}
 
 		public static void Assemble(CPU.Assembler aAssembler, int aElementSize) {
-			aAssembler.StackSizes.Pop();
-			aAssembler.StackSizes.Pop();
-			aAssembler.StackSizes.Push(4);
+			aAssembler.StackContents.Pop();
+			aAssembler.StackContents.Pop();
+			aAssembler.StackContents.Push(new StackContent(4, typeof(uint)));
 			new CPUx86.Pop(CPUx86.Registers.EAX);
 			new CPUx86.Move(CPUx86.Registers.EDX, "0" + aElementSize.ToString("X") + "h");
 			new CPUx86.Multiply(CPUx86.Registers.EDX);

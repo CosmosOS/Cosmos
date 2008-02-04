@@ -7,19 +7,11 @@ using HW = Cosmos.Hardware;
 namespace Cosmos.Kernel {
 	public class Keyboard {
 		private class KeyMapping {
-			public uint Scancode {
-				get;
-				private set;
-			}
-
-			public char Value {
-				get;
-				private set;
-			}
-
-			public KeyMapping(uint scanCode, char value) {
-				Scancode = scanCode;
-				Value = value;
+			public uint Scancode;
+			public char Value;
+			public KeyMapping(uint aScanCode, char aValue) {
+				Scancode = aScanCode;
+				Value = aValue;
 			}
 		}
 		private static Queue<uint> mBuffer;
@@ -60,26 +52,26 @@ namespace Cosmos.Kernel {
 			DebugUtil.SendKeyboardEvent(xTheScancode, aReleased);
 		}
 
-        // Can merge HandleScancode after we remove old code
-        // Remove the static.. Make it a real class
-        protected static void ByteReceived(byte aValue) {
-            bool xReleased = (aValue & 0x80) == 0x80;
-            if (xReleased) {
-                aValue = (byte)(aValue ^ 0x80);
-            }
-            HandleScancode(aValue, xReleased);
-        }
+		// Can merge HandleScancode after we remove old code
+		// Remove the static.. Make it a real class
+		protected static void ByteReceived(byte aValue) {
+			bool xReleased = (aValue & 0x80) == 0x80;
+			if (xReleased) {
+				aValue = (byte)(aValue ^ 0x80);
+			}
+			HandleScancode(aValue, xReleased);
+		}
 
 		public static void Initialize() {
 			mBuffer = new Queue<uint>(BufferSize);
 
-            // Old
+			// Old
 			Hardware.Keyboard.Initialize(HandleScancode);
-            // New
-            // TODO: Need to add support for mult keyboards. ie one in PS2 and one in USB, or even more
-            //var xKeyboard = (HW.SerialDevice)(HW.Device.Find(HW.Device.DeviceType.Keyboard)[0]);
-            //xKeyboard.ByteReceived += new HW.SerialDevice.ByteReceivedDelegate(ByteReceived);
-            // End
+			// New
+			// TODO: Need to add support for mult keyboards. ie one in PS2 and one in USB, or even more
+			//var xKeyboard = (HW.SerialDevice)(HW.Device.Find(HW.Device.DeviceType.Keyboard)[0]);
+			//xKeyboard.ByteReceived += new HW.SerialDevice.ByteReceivedDelegate(ByteReceived);
+			// End
 
 			mKeys = new List<KeyMapping>(128);
 
@@ -163,7 +155,7 @@ namespace Cosmos.Kernel {
 			AddKey(0xA0000, '(');
 			AddKey(0xB, '0');
 			AddKey(0xB0000, ')');
-			
+
 			#endregion
 
 			#region Special
@@ -171,8 +163,8 @@ namespace Cosmos.Kernel {
 			AddKey(0x1C0000, '\n');
 			AddKey(0x39, ' ');
 			AddKey(0x390000, ' ');
-            AddKey(0x0E, '\u0968');
-            AddKey(0x0E0000, '\u0968');
+			AddKey(0x0E, '\u0968');
+			AddKey(0x0E0000, '\u0968');
 			#endregion
 
 			#region Punctuation
