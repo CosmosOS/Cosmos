@@ -59,5 +59,14 @@ namespace Cosmos.Build.Tasks.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown Exception {0} occurred. Refer to the output window..
+        /// </summary>
+        internal static string UnknownExceptionMessage {
+            get {
+                return ResourceManager.GetString("UnknownExceptionMessage", resourceCulture);
+            }
+        }
     }
 }
