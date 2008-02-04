@@ -15,9 +15,13 @@ namespace TestSuite {
 		// Main entry point of the kernel
 		public static void Init() {
             Cosmos.Kernel.Boot.Default();
-            Console.WriteLine("Boot complete");
 
-            Console.WriteLine("Tests complete");
+            Cosmos.Kernel.Staging.DefaultStageQueue stages = new Cosmos.Kernel.Staging.DefaultStageQueue();
+            stages.Enqueue(new TestsStage());
+
+            stages.Run();
+            stages.Teardown();
+
             while (true)
 				;
 		}

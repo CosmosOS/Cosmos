@@ -1,33 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Cosmos.Kernel;
+using Cosmos.Kernel.Staging;
 
-namespace Cosmos.Shell.Console.Commands
+namespace TestSuite
 {
-    public class TestsCommand : CommandBase
+    public class TestsStage : StageBase
     {
-        private List<Tests.TestBase> _tests = new List<Cosmos.Shell.Console.Tests.TestBase>();
+        private List<TestBase> _tests = new List<TestBase>();
 
-        public TestsCommand()
+        public override string Name
+        {
+            get
+            {
+                return "Tests";
+            }
+        }
+
+        public override void Initialize()
         {
             _tests.Add(new Tests.MathTest());
             _tests.Add(new Tests.StringTest());
             _tests.Add(new Tests.ParseTest());
+            Execute();
         }
 
-        public override string Name
+        public override void Teardown()
         {
-            get { return "tests"; }
+            //_tests.Clear();
         }
 
-        public override string Summary
-        {
-            get { return "Runs the kernel test cases."; }
-        }
-
-        public override void Execute(string param)
+        public void Execute()
         {
             for (int i = 0; i < _tests.Count; i++)
             {
@@ -45,12 +49,6 @@ namespace Cosmos.Shell.Console.Commands
                 _tests[i].Test();
                 _tests[i].Teardown();
             }
-        }
-
-        public override void Help()
-        {
-            System.Console.WriteLine(Name);
-            System.Console.Write("  "); System.Console.WriteLine(Summary);
         }
     }
 }

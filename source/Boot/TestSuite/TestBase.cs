@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Cosmos.Kernel;
 
-namespace Cosmos.Shell.Console.Tests
+namespace TestSuite
 {
     /// <summary>
     /// Represents a simple test case for the kernel/il2cpu.
