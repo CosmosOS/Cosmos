@@ -8,7 +8,7 @@ namespace TestSuite.Tests
     {
         public override string Name
         {
-            get { return "Add"; }
+            get { return "Math"; }
         }
 
         public override void Initialize()
@@ -27,6 +27,8 @@ namespace TestSuite.Tests
             Assert(2 * 2 == 4, "2 * 2 == 4");
             Assert(6 / 2 == 3, "6 / 2 == 3");
             Assert(5 - 2 == 3, "5 - 2 == 3");
+            Assert(2 + 5 * 2 == 12, "2 + 5 * 2 == 12");
+            Assert((2 + 5) * 2 == 14, "(2 + 5) * 2 == 14");
         }
     }
 }
