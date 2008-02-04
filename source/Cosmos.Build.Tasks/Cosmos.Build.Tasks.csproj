@@ -48,6 +48,36 @@
   <ItemGroup>
     <Compile Include="IL2CPU.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="VSCompliantLogger.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Indy.IL2CPU.IL.X86.Native\Indy.IL2CPU.IL.X86.Native.csproj">
+      <Project>{8D84CDE5-77A3-4E1F-B022-753E9E077926}</Project>
+      <Name>Indy.IL2CPU.IL.X86.Native</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Indy.IL2CPU.IL.X86\Indy.IL2CPU.IL.X86.csproj">
+      <Project>{69C8D2C5-225C-4A00-BA55-AEF6719CBDBA}</Project>
+      <Name>Indy.IL2CPU.IL.X86</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Indy.IL2CPU.IL\Indy.IL2CPU.IL.csproj">
+      <Project>{5A39A8DF-D99E-4112-9676-BD3EED969A9C}</Project>
+      <Name>Indy.IL2CPU.IL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Indy.IL2CPU\Indy.IL2CPU.csproj">
+      <Project>{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}</Project>
+      <Name>Indy.IL2CPU</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

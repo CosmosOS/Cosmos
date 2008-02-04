@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.Build.Utilities;
+using Indy.IL2CPU;
 
 namespace Cosmos.Build.Tasks
 {
@@ -19,7 +20,10 @@ namespace Cosmos.Build.Tasks
 
         public override bool Execute()
         {
+            Engine e = new Engine();
 
+
+            return true;
         }
     }
 }
