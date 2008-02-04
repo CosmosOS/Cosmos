@@ -196,18 +196,9 @@ namespace Cosmos.GdbClient
         }
 
         /// <summary>
-        /// Opens up extended commands.
-        /// </summary>
-        public void Extended()
-        {
-            Normal();
-            _connection.Send("!");
-        }
-
-        /// <summary>
         /// Opens up normal commands.
         /// </summary>
-        public void Normal()
+        public void Open()
         {
             _connection.Open();
         }

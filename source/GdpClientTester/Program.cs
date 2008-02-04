@@ -18,7 +18,7 @@ namespace GdpClientTester
             GdbController.Instance = new GdbController(connection);
             try
             {
-                GdbController.Instance.Extended();
+                GdbController.Instance.Open();
             }
             catch
             {

@@ -67,6 +67,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.GdbClient", "Cosmos.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GdpClientTester", "GdpClientTester\GdpClientTester.csproj", "{26E45503-4490-4E38-A8C5-14159B25D6D1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Build.Tasks", "Cosmos.Build.Tasks\Cosmos.Build.Tasks.csproj", "{8BF33FB0-243F-47E3-AE52-2C0E01B73200}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
 		SccNumberOfProjects = 29
@@ -301,6 +303,10 @@ Global
 		{26E45503-4490-4E38-A8C5-14159B25D6D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{26E45503-4490-4E38-A8C5-14159B25D6D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{26E45503-4490-4E38-A8C5-14159B25D6D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8BF33FB0-243F-47E3-AE52-2C0E01B73200}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8BF33FB0-243F-47E3-AE52-2C0E01B73200}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8BF33FB0-243F-47E3-AE52-2C0E01B73200}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8BF33FB0-243F-47E3-AE52-2C0E01B73200}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -334,5 +340,6 @@ Global
 		{1F0EDE86-F6D4-4355-9A97-10E90457770C} = {2DE75CE4-7A3B-4659-84FC-16F5EC0AEDE4}
 		{228941A5-080D-4057-9491-160950105A8E} = {2DE75CE4-7A3B-4659-84FC-16F5EC0AEDE4}
 		{1BD459F8-E894-4694-BBEC-65EB1D98E445} = {2DE75CE4-7A3B-4659-84FC-16F5EC0AEDE4}
+		{8BF33FB0-243F-47E3-AE52-2C0E01B73200} = {2DE75CE4-7A3B-4659-84FC-16F5EC0AEDE4}
 	EndGlobalSection
 EndGlobal
