@@ -92,6 +92,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				aExtraOffset = 12;
 			}
 			new Popd(CPUx86.Registers.EAX);
+
 			new CPUx86.Add(CPUx86.Registers.EAX, "0x" + (aField.Offset + aExtraOffset).ToString("X"));
 			new Pushd(CPUx86.Registers.EAX);
 			aAssembler.StackContents.Push(new StackContent(4, aField.FieldType));
@@ -117,6 +118,10 @@ namespace Indy.IL2CPU.IL.X86 {
 					new Pushd("eax");
 				}
 			}
+		}
+
+		public static void Ldfld(Assembler.Assembler aAssembler, TypeInformation aType, string aFieldName) {
+			Ldfld(aAssembler, aType, aType.Fields[aFieldName]);
 		}
 
 		public static void Ldfld(Assembler.Assembler aAssembler, TypeInformation aType, TypeInformation.Field aField) {

@@ -136,6 +136,55 @@ namespace Cosmos.Hardware.PC {
 			HandleException(aContext->EIP, "General Protection Fault", "GPF", aContext);
         }
 
+		public static unsafe void HandleInterrupt_01(InterruptContext* aContext) {
+			HandleException(aContext->EIP, "Debug Exception", "Debug Exception", aContext);
+		}
+		public static unsafe void HandleInterrupt_02(InterruptContext* aContext) {
+			HandleException(aContext->EIP, "Non Maskable Interrupt Exception", "Non Maskable Interrupt Exception", aContext);
+		}
+		public static unsafe void HandleInterrupt_03(InterruptContext* aContext) {
+			HandleException(aContext->EIP, "Breakpoint Exception", "Breakpoint Exception", aContext);
+		}
+		public static unsafe void HandleInterrupt_04(InterruptContext* aContext) {
+			HandleException(aContext->EIP, "Into Detected Overflow Exception", "Into Detected Overflow Exception", aContext);
+		}
+		public static unsafe void HandleInterrupt_05(InterruptContext* aContext) {
+			HandleException(aContext->EIP, "Out of Bounds Exception", "Out of Bounds Exception", aContext);
+		}
+		public static unsafe void HandleInterrupt_07(InterruptContext* aContext) {
+			HandleException(aContext->EIP, "No Coprocessor Exception", "No Coprocessor Exception", aContext);
+		}
+		public static unsafe void HandleInterrupt_08(InterruptContext* aContext) {
+			HandleException(aContext->EIP, "Double Fault Exception", "Double Fault Exception", aContext);
+		}
+		public static unsafe void HandleInterrupt_09(InterruptContext* aContext) {
+			HandleException(aContext->EIP, "Coprocessor Segment Overrun Exception", "Coprocessor Segment Overrun Exception", aContext);
+		}
+		public static unsafe void HandleInterrupt_0A(InterruptContext* aContext) {
+			HandleException(aContext->EIP, "Bad TSS Exception", "Bad TSS Exception", aContext);
+		}
+		public static unsafe void HandleInterrupt_0B(InterruptContext* aContext) {
+			HandleException(aContext->EIP, "Segment Not Present", "Segment Not Present", aContext);
+		}
+		public static unsafe void HandleInterrupt_0C(InterruptContext* aContext) {
+			HandleException(aContext->EIP, "Stack Fault Exception", "Stack Fault Exception", aContext);
+		}
+		public static unsafe void HandleInterrupt_0E(InterruptContext* aContext) {
+			HandleException(aContext->EIP, "Page Fault Exception", "Page Fault Exception", aContext);
+		}
+		public static unsafe void HandleInterrupt_0F(InterruptContext* aContext) {
+			HandleException(aContext->EIP, "Unknown Interrupt Exception", "Unknown Interrupt Exception", aContext);
+		}
+		public static unsafe void HandleInterrupt_10(InterruptContext* aContext) {
+			HandleException(aContext->EIP, "Coprocessor Fault Exception", "Coprocessor Fault Exception", aContext);
+		}
+		public static unsafe void HandleInterrupt_11(InterruptContext* aContext) {
+			HandleException(aContext->EIP, "Alignment Exception", "Alignment Exception", aContext);
+		}
+		public static unsafe void HandleInterrupt_12(InterruptContext* aContext) {
+			HandleException(aContext->EIP, "Machine Check Exception", "Machine Check Exception", aContext);
+		}
+
         private static unsafe void HandleException(uint aEIP, string aDescription, string aName, InterruptContext* ctx) {
             const string SysFault = "System Fault";
 
@@ -168,9 +217,25 @@ namespace Cosmos.Hardware.PC {
             if (xTest) {
                 unsafe {
                     HandleInterrupt_Default(null);
-                    HandleInterrupt_00(null);
-                    HandleInterrupt_06(null);
-                    HandleInterrupt_0D(null);
+					HandleInterrupt_00(null);
+					HandleInterrupt_01(null);
+					HandleInterrupt_02(null);
+					HandleInterrupt_03(null);
+					HandleInterrupt_04(null);
+					HandleInterrupt_05(null);
+					HandleInterrupt_06(null);
+					HandleInterrupt_07(null);
+					HandleInterrupt_08(null);
+					HandleInterrupt_09(null);
+					HandleInterrupt_0A(null);
+					HandleInterrupt_0B(null);
+					HandleInterrupt_0C(null);
+					HandleInterrupt_0D(null);
+					HandleInterrupt_0E(null);
+					HandleInterrupt_0F(null);
+					HandleInterrupt_10(null);
+					HandleInterrupt_11(null);
+					HandleInterrupt_12(null);
                     HandleInterrupt_20(null);
                     HandleInterrupt_21(null);
                     HandleInterrupt_2E(null);

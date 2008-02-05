@@ -62,9 +62,9 @@ namespace Indy.IL2CPU.IL.X86 {
 				case "System_IntPtr___System_Delegate_GetInvokeMethod____": {
 						return true;
 					}
-				case "System_IntPtr___System_Delegate_GetMulticastInvoke____": {
-						return true;
-					}
+				//case "System_IntPtr___System_Delegate_GetMulticastInvoke____": {
+				//        return true;
+				//    }
 				case "System_MulticastDelegate___System_Delegate_InternalAllocLike___System_Delegate___": {
 						return true;
 					}
@@ -78,7 +78,6 @@ namespace Indy.IL2CPU.IL.X86 {
 								return true;
 							}
 						}
-
 						return base.HasCustomAssembleImplementation(aMethodInfo, aInMetalMode);
 					}
 			}
@@ -94,23 +93,27 @@ namespace Indy.IL2CPU.IL.X86 {
 						Assemble_System_Threading_Interlocked_CompareExchange__Object(aAssembler, aMethodInfo);
 						break;
 					}
-				case "System_IntPtr___System_Delegate_GetMulticastInvoke____": {
-						Engine.QueueMethod(CustomImplementations.System.EventHandlerImplRefs.MulticastInvokeRef);
-						new CPUx86.Push(CPU.Label.GenerateLabelName(CustomImplementations.System.EventHandlerImplRefs.MulticastInvokeRef));
-						break;
-					}
+				//case "System_IntPtr___System_Delegate_GetMulticastInvoke____": {
+				//        Engine.QueueMethod(CustomImplementations.System.EventHandlerImplRefs.MulticastInvokeRef);
+				//        new CPUx86.Push(CPU.Label.GenerateLabelName(CustomImplementations.System.EventHandlerImplRefs.MulticastInvokeRef));
+				//        break;
+				//    }
 				case "System_MulticastDelegate___System_Delegate_InternalAllocLike___System_Delegate___": {
 						break;
 					}
 				default:
 					if (ObjectUtilities.IsDelegate(aMethodInfo.Method.DeclaringType)) {
 						if (aMethodInfo.LabelName.EndsWith("__ctor_System_Object__System_IntPtr_")) {
-							for (int i = 0; i < aMethodInfo.Arguments.Length; i++) {
-								Op.Ldarg(aAssembler, aMethodInfo.Arguments[i]);
-							}
-							new Call(CustomImplementations.System.EventHandlerImplRefs.CtorRef) {
-								Assembler = aAssembler
-							}.Assemble();
+							//for (int i = 0; i < aMethodInfo.Arguments.Length; i++) {
+							//    Op.Ldarg(aAssembler, aMethodInfo.Arguments[i]);
+							//}
+							//new Call(CustomImplementations.System.EventHandlerImplRefs.CtorRef) {
+							//    Assembler = aAssembler
+							//}.Assemble();
+							var xOp = new X86CustomMethodImplementationProxyOp(null, aMethodInfo);
+							xOp.Assembler = aAssembler;
+							xOp.ProxiedMethod = CustomImplementations.System.EventHandlerImplRefs.CtorRef;
+							xOp.Assemble();
 							break;
 						}
 						if (aMethodInfo.Method.Name == "Invoke") {
@@ -118,23 +121,16 @@ namespace Indy.IL2CPU.IL.X86 {
 							// param 1 is sender
 							// param 2 is eventargs
 							Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
-							new CPUx86.Push("0x" + (ObjectImpl.FieldDataOffset + 4).ToString("X"));
-							aAssembler.StackContents.Push(new StackContent(4, typeof(uint)));
-							Ldarg.Add(aAssembler);
-							new CPUx86.Pop(CPUx86.Registers.EAX);
-							new CPUx86.Pushd(CPUx86.Registers.AtEAX);
+							Ldarg.Ldfld(aAssembler, aMethodInfo.TypeInfo, "System.Object _target");
 							for (int i = 1; i < aMethodInfo.Arguments.Length; i++) {
 								Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[i]);
 							}
 							Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
-							new CPUx86.Push("0x" + ObjectImpl.FieldDataOffset.ToString("X"));
-							aAssembler.StackContents.Push(new StackContent(4, typeof(uint)));
-							Ldarg.Add(aAssembler);
-							new CPUx86.Pop(CPUx86.Registers.EAX);
-							new CPUx86.Pushd(CPUx86.Registers.AtEAX);
-							new CPUx86.Pop(CPUx86.Registers.EAX);
+							Ldarg.Ldfld(aAssembler, aMethodInfo.TypeInfo, "IntPtr _methodPtr");
+							new CPUx86.Pop("eax");
 							new CPUx86.Call(CPUx86.Registers.EAX);
-							new CPUx86.Pop(CPUx86.Registers.EAX);
+							//							new CPUx86.Pop(CPUx86.Registers.EAX);
+							new CPUx86.Move("esp", "ebp");
 							break;
 						}
 					}

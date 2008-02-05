@@ -715,6 +715,9 @@ namespace Indy.IL2CPU {
 						continue;
 					}
 					string xMethodName = Label.GenerateLabelName(xCurrentMethod);
+					if (xMethodName == "System_Void__Indy_IL2CPU_IL_X86_CustomImplementations_System_EventHandlerImpl_Ctor_System_UInt32__System_UInt32_") {
+						System.Diagnostics.Debugger.Break();
+					}
 					TypeInformation xTypeInfo = null;
 					{
 						if (!xCurrentMethod.IsStatic) {

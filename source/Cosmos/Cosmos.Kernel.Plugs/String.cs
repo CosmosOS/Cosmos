@@ -5,7 +5,7 @@ using Indy.IL2CPU.Plugs;
 
 namespace Cosmos.Kernel.Plugs
 {
-    [Plug(Target=typeof(System.String))]
+    [Plug(Target=typeof(string))]
     public class String
     {
         /*public int IndexOf(char c)
@@ -19,5 +19,9 @@ namespace Cosmos.Kernel.Plugs
             //}
             return -1;
         }*/
-    }
+
+		public static bool EqualsHelper(string aStrA, string aStrB) {
+			return aStrA.CompareTo(aStrB) == 0;
+		}
+	}
 }

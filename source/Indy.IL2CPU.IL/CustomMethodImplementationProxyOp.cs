@@ -24,13 +24,16 @@ namespace Indy.IL2CPU.IL {
 			int curIndex = 0;
 			ParameterInfo[] xParams = ProxiedMethod.GetParameters();
 			foreach (var xParam in xParams) {
-				if (isFirst && (!ProxiedMethod.IsStatic)) {
+				if (isFirst && (!MethodInfo.Method.IsStatic)) {
 					isFirst = false;
 					Ldarg(curIndex++);
 				} else {
 					FieldAccessAttribute xFieldAccess = (FieldAccessAttribute)xParam.GetCustomAttributes(typeof(FieldAccessAttribute), true).FirstOrDefault();
 					if (xFieldAccess != null) {
 						Ldarg(0);
+						if (!MethodInfo.TypeInfo.Fields.ContainsKey(xFieldAccess.Name)) {
+							throw new Exception("Field '" + xFieldAccess.Name + "' not found!");
+						}
 						Ldflda(MethodInfo.TypeInfo, MethodInfo.TypeInfo.Fields[xFieldAccess.Name]);
 					} else {
 						Ldarg(curIndex++);

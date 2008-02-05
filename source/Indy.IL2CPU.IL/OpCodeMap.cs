@@ -91,6 +91,7 @@ namespace Indy.IL2CPU.IL {
 			xBuilder.Append(aMethod.Name);
 			xBuilder.Append("(");
 			ParameterInfo[] xParams = aMethod.GetParameters();
+			bool xParamAdded = false;
 			for (int i = 0; i < xParams.Length; i++) {
 				if (xParams[i].Name == "aThis" && i == 0) {
 					continue;
@@ -98,10 +99,11 @@ namespace Indy.IL2CPU.IL {
 				if (xParams[i].IsDefined(typeof(FieldAccessAttribute), true)) {
 					continue;
 				}
-				xBuilder.Append(xParams[i].ParameterType.FullName);
-				if (i < (xParams.Length - 1)) {
+				if (xParamAdded) {
 					xBuilder.Append(", ");
 				}
+				xBuilder.Append(xParams[i].ParameterType.FullName);
+				xParamAdded = true;
 			}
 			xBuilder.Append(")");
 			return xBuilder.ToString();

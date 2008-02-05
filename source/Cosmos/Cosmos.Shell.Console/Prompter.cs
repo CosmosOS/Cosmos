@@ -19,7 +19,11 @@ namespace Cosmos.Shell.Console {
 		private bool running = true;
 
 		public void Stop() {
+			System.Console.WriteLine("Stopping");
 			running = false;
+			System.Console.Write("   Set running to ");
+			System.Diagnostics.Debugger.Break();
+			System.Console.WriteLine(running.ToString());
 		}
 
 		public override void Initialize() {
@@ -35,6 +39,9 @@ namespace Cosmos.Shell.Console {
 			_commands.Add(new Commands.VersionCommand());
 
 			while (running) {
+				System.Console.Write("Running = ");
+				System.Console.Write(running.ToString());
+				System.Console.Write(" ");
 				System.Console.Write("/> ");
 				string line = System.Console.ReadLine();
                 if (string.IsNullOrEmpty(line)) { continue; }
@@ -51,7 +58,7 @@ namespace Cosmos.Shell.Console {
 
 				bool found = false;
 				for (int i = 0; i < _commands.Count; i++) {
-					if (_commands[i].Name.CompareTo(command) == 0) {
+					if (_commands[i].Name == command) {
 						found = true;
 						_commands[i].Execute(param);
 						break;

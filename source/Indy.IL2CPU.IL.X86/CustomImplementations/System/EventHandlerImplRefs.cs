@@ -9,8 +9,8 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System {
 	public static class EventHandlerImplRefs {
 		public static readonly Assembly RuntimeAssemblyDef;
 		public static readonly MethodBase CtorRef;
-		public static readonly MethodBase GetInvokeMethodRef;
-		public static readonly MethodBase MulticastInvokeRef;
+		//public static readonly MethodBase GetInvokeMethodRef;
+		//public static readonly MethodBase MulticastInvokeRef;
 
 		static EventHandlerImplRefs() {
 			Type xType = typeof(EventHandlerImpl);
