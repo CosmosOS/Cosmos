@@ -20,6 +20,17 @@ namespace Cosmos.Kernel.Plugs
             return -1;
         }*/
 
+		public static string Concat(string aStrA, string aStrB) {
+			char[] xChars = new char[aStrA.Length + aStrB.Length];
+			for (int i = 0; i < aStrA.Length; i++) {
+				xChars[i] = aStrA[i];
+			}
+			for (int i = 0; i < aStrB.Length; i++) {
+				xChars[i + aStrA.Length] = aStrB[i];
+			}
+			return new global::System.String(xChars);
+		}
+
 		public static bool EqualsHelper(string aStrA, string aStrB) {
 			return aStrA.CompareTo(aStrB) == 0;
 		}
