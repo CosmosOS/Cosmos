@@ -19,9 +19,9 @@ namespace KudzuTest {
         }
 
         static protected string StringBuilderTest() {
-			//var xSB = new System.Text.StringBuilder("Hello");
-			//xSB.Append(" world.");
-			//return xSB.ToString();
+			var xSB = new System.Text.StringBuilder("Hello");
+			xSB.Append(" world.");
+			return xSB.ToString();
 			return "";
         }
 
@@ -33,10 +33,10 @@ namespace KudzuTest {
 
             // Matthijs - uncomment these tests to show the errors
             // I described to you.
-            //Console.WriteLine("String test");
-            //Console.WriteLine(StringTest());
-            //Console.WriteLine("StringBuilder test");
-            //Console.WriteLine(StringBuilderTest());
+            Console.WriteLine("String test");
+            Console.WriteLine(StringTest());
+            Console.WriteLine("StringBuilder test");
+            Console.WriteLine(StringBuilderTest());
 
             //Cosmos.Kernel.Temp.Kudzu.PCI.Test();
 
