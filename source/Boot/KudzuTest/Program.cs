@@ -18,14 +18,7 @@ namespace KudzuTest {
 //			System.Diagnostics.Debugger.Break();
             Console.WriteLine("Boot complete");
 
-            //Tests.Do("String Concatenation", Tests.StringConcat);
-            Console.WriteLine("String test");
-            Console.WriteLine("  " + Tests.StringConcat());
-            Console.WriteLine();
-
-            Console.WriteLine("StringBuilder test");
-            //Console.WriteLine("  " + Tests.StringBuilder());
-            Console.WriteLine();
+            Tests.DoAll();
 
             //Cosmos.Kernel.Temp.Kudzu.PCI.Test();
 
