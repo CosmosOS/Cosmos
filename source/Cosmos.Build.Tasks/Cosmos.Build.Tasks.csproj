@@ -37,6 +37,22 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Indy.IL2CPU, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Cosmos.Build.Windows\bin\Debug\Indy.IL2CPU.dll</HintPath>
+    </Reference>
+    <Reference Include="Indy.IL2CPU.IL, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Cosmos.Build.Windows\bin\Debug\Indy.IL2CPU.IL.dll</HintPath>
+    </Reference>
+    <Reference Include="Indy.IL2CPU.IL.X86, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Cosmos.Build.Windows\bin\Debug\Indy.IL2CPU.IL.X86.dll</HintPath>
+    </Reference>
+    <Reference Include="Indy.IL2CPU.IL.X86.Native, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Cosmos.Build.Windows\bin\Debug\Indy.IL2CPU.IL.X86.Native.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Microsoft.Build.Tasks" />
     <Reference Include="Microsoft.Build.Utilities" />
@@ -58,24 +74,6 @@
     <Compile Include="VSCompliantLogger.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Indy.IL2CPU.IL.X86.Native\Indy.IL2CPU.IL.X86.Native.csproj">
-      <Project>{8D84CDE5-77A3-4E1F-B022-753E9E077926}</Project>
-      <Name>Indy.IL2CPU.IL.X86.Native</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Indy.IL2CPU.IL.X86\Indy.IL2CPU.IL.X86.csproj">
-      <Project>{69C8D2C5-225C-4A00-BA55-AEF6719CBDBA}</Project>
-      <Name>Indy.IL2CPU.IL.X86</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Indy.IL2CPU.IL\Indy.IL2CPU.IL.csproj">
-      <Project>{5A39A8DF-D99E-4112-9676-BD3EED969A9C}</Project>
-      <Name>Indy.IL2CPU.IL</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Indy.IL2CPU\Indy.IL2CPU.csproj">
-      <Project>{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}</Project>
-      <Name>Indy.IL2CPU</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -92,4 +90,8 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
 </Project>

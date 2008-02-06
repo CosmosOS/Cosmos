@@ -61,6 +61,15 @@ namespace Cosmos.Build.Tasks.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to load the type {0}..
+        /// </summary>
+        internal static string TypeLoadFailureMessage {
+            get {
+                return ResourceManager.GetString("TypeLoadFailureMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unknown Exception {0} occurred. Refer to the output window..
         /// </summary>
         internal static string UnknownExceptionMessage {

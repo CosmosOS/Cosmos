@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="TypeLoadFailureMessage" xml:space="preserve">
+    <value>Failed to load the type {0}.</value>
+  </data>
   <data name="UnknownExceptionMessage" xml:space="preserve">
     <value>Unknown Exception {0} occurred. Refer to the output window.</value>
   </data>
