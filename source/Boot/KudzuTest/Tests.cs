@@ -34,6 +34,32 @@ namespace KudzuTest {
             Console.WriteLine("Dictionary test");
             //Console.WriteLine("  " + Tests.Dictionary());
             Console.WriteLine();
+
+            Console.WriteLine("Concat conversion test");
+            Console.WriteLine("  " + Tests.ConcatConversion());
+            //Console.WriteLine("  " + Tests.ConcatConversion2());
+            //Console.WriteLine("  " + Tests.ConcatConversion3());
+            Console.WriteLine();
+        }
+
+        //Fail - Returns in hex, and also wrong value
+        static public object ConcatConversion() {
+            int x = 1000;
+            return x + " Euros, but should be 1000. Not even correct by value";
+        }
+
+        //Fail - Crashes
+        static public object ConcatConversion2() {
+            UInt32 y = 100;
+            UInt32 z = 100;
+            return y + "-" + z;
+        }
+
+        //Fail - crashes...
+        static public object ConcatConversion3() {
+            UInt32 y = 100;
+            UInt32 z = 100;
+            return y.ToString() + "-" + z.ToString();
         }
 
         //Fail - IL2CPU error on compile

@@ -33,6 +33,8 @@ namespace Cosmos.Hardware.Bus {
 
             public DeviceIDs() {
                 mVendors.Add(0x8086, "Intel");
+                mVendors.Add(0x1013, "Cirrus Logic");
+                mVendors.Add(0x10EC, "Realtek Semiconductor Co., Ltd.");
             }
 
             public string FindVendor(UInt32 aVendorID) {

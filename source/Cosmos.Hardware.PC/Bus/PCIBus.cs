@@ -23,34 +23,20 @@ namespace Cosmos.Hardware.PC.Bus {
                         UInt32 xDeviceID = xUInt32 >> 16;
                         if (xVendorID != 0xFFFF) {
                             string xVendor = xDeviceIDs.FindVendor(xVendorID);
-                            //string xVendorName = null;
                             if (xVendor == null) {
-                            //    xVendorName = xVendorID.ToString();
+                                xVendor = xVendorID.ToString();
                             }
-                            //Console.Write("Location: ");
                             Console.Write(xBus.ToString());
                             Console.Write("-");
                             Console.Write(xSlot.ToString());
                             Console.Write("-");
                             Console.Write(xFunction.ToString());
-                            if(xVendor != null)
-                            {
-                                Console.Write("(");
-                                Console.Write(xVendor);
-                                Console.Write(")");
-                            }
                             Console.Write(" ");
+                            Console.Write(xVendor);
+                            Console.Write(": ");
+                            Console.Write(xDeviceID.ToString());
 
-                            Console.Write("UInt32: ");
-                            Console.WriteLine(xUInt32.ToString());
-
-                            //Console.Write("Vendor: ");
-                            //Console.WriteLine(xVendorName);
-
-                            //Console.Write("Device: ");
-                            //Console.WriteLine(xDeviceID.ToString());
-
-                            //Console.WriteLine();
+                            Console.WriteLine();
                         }
                     }
                 }
