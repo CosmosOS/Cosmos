@@ -88,6 +88,5 @@
   <Target Name="BeforeBuild">
   </Target>
   <Target Name="AfterBuild">
-	<IL2CPU Plugs="D:\Cosmos\IL2CPU\source\Indy.IL2CPU.Plugs\bin\Debug\Indy.IL2CPU.Plugs.dll" SourceFile="D:\Cosmos\IL2CPU\source\Cosmos\Cosmos.Shell.Console\bin\Debug\Cosmos.Shell.Console.exe"/>
   </Target>
 </Project>
