@@ -15,6 +15,21 @@ namespace Cosmos.Build.Windows {
         protected string mISOPath;
         protected string mPXEPath;
         protected string mAsmPath;
+        protected IBuildConfiguration config;
+
+        public Builder()
+        {
+            mBuildPath = GetBuildPath();
+            mToolsPath = mBuildPath + @"Tools\";
+            mISOPath = mBuildPath + @"ISO\";
+            mPXEPath = mBuildPath + @"PXE\";
+            mAsmPath = mToolsPath + @"asm\";
+        }
+
+        public Builder(IBuildConfiguration config) : this()
+        {
+            this.config = config;
+        }
 
         public static string GetBuildPath() {
 			try {
@@ -36,14 +51,6 @@ namespace Cosmos.Build.Windows {
 			} catch (Exception E) {
 				throw new Exception("Error while getting Cosmos Build Path!", E);
 			}
-        }
-
-        public Builder() {
-            mBuildPath = GetBuildPath();
-            mToolsPath = mBuildPath + @"Tools\";
-            mISOPath = mBuildPath + @"ISO\";
-            mPXEPath = mBuildPath + @"PXE\";
-            mAsmPath = mToolsPath + @"asm\";
         }
 
         protected void RemoveFile(string aPathname) {
@@ -89,14 +96,17 @@ namespace Cosmos.Build.Windows {
         public enum Target { ISO, PXE, QEMU, QEMU_With_Hard_Disk_Image, QEMU_GDB, QEMU_GDB_With_Hard_Disk_Image };
 
         public void Build() {
-			BuildOptionsWindow xOptions = new BuildOptionsWindow();
-			xOptions.ShowDialog();
-        }
+            if (config == null)
+            {
+                BuildOptionsWindow xOptions = new BuildOptionsWindow();
+                xOptions.ShowDialog();
+                config = xOptions;
+            }
 
-        public void Build(Target aType) {
-            Compile();
+            if(config.Compile)
+                Compile();
 
-            switch (aType) {
+            switch (config.Target) {
                 case Target.ISO:
                     MakeISO();
                     break;

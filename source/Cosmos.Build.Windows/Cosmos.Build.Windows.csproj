@@ -87,6 +87,7 @@
       <DependentUpon>BuildOptionsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Global.cs" />
+    <Compile Include="IBuildConfiguration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
