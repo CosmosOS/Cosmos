@@ -53,10 +53,6 @@ namespace Cosmos.Hardware.PC.Bus {
         {
             for (int i = 0; i < mVendors.Count; i++)
             {
-                Console.Write("C ");
-                Console.Write(mVendors[i].Key.ToString());
-                Console.Write(" ");
-                Console.WriteLine(aVendorID.ToString());
 
                 if (mVendors[i].Key == aVendorID)
                     return mVendors[i].Value;
