@@ -5,15 +5,63 @@ using System.Text;
 
 namespace Cosmos.Hardware.PC.Bus {
     //TODO: Move to Cosmos.Hardware
-    public class DeviceIDs {
-        static protected Dictionary<UInt16, string> mVendors = new Dictionary<UInt16, string>();
+    public class DeviceID
+    {
+        UInt32 key;
+
+        public UInt32 Key
+        {
+            get { return key; }
+            set { key = value; }
+        }
+
+        String value;
+
+        public String Value
+        {
+            get { return value; }
+            set { this.value = value; }
+        }
+
+        public DeviceID(UInt32 pkey, String pvalue)
+        {
+            key = pkey;
+            value = pvalue;
+        }
+    }
+
+    public class DeviceIDs
+    {
+        /*static protected Dictionary mVendors = new Dictionary();
 
         static DeviceIDs() {
             mVendors.Add(0x8086, "Intel");
         }
 
-        static public string FindVendor(UInt16 aVendorID) {
+        static public string FindVendor(UInt32 aVendorID) {
             return mVendors[aVendorID];
+        }*/
+
+        static protected List<DeviceID> mVendors = new List<DeviceID>();
+
+        static DeviceIDs()
+        {
+            mVendors.Add(new DeviceID(0x8086, "Intel"));
+        }
+
+        static public string FindVendor(UInt32 aVendorID)
+        {
+            for (int i = 0; i < mVendors.Count; i++)
+            {
+                Console.Write("C ");
+                Console.Write(mVendors[i].Key.ToString());
+                Console.Write(" ");
+                Console.WriteLine(aVendorID.ToString());
+
+                if (mVendors[i].Key == aVendorID)
+                    return mVendors[i].Value;
+            }
+            return null;
         }
     }
 
@@ -27,27 +75,33 @@ namespace Cosmos.Hardware.PC.Bus {
             for (byte xBus = 0; xBus <= 255; xBus++) {
                 for (byte xSlot = 0; xSlot <= 31; xSlot++) {
                     for (byte xFunction = 0; xFunction <= 7; xFunction++) {
-                        UInt32 xValue = Read32(xBus, xSlot, xFunction, 0);
-                        //UInt16 xVendorID = (UInt16)(xValue & 0xFFFF);
-                        //UInt16 xDeviceID = (UInt16)(xValue >> 16); 
-                        UInt32 xVendorID = xValue & 0xFFFF;
-                        UInt32 xDeviceID = xValue >> 16;
+                        UInt32 xUInt32 = Read32(xBus, xSlot, xFunction, 0);
+                        //UInt16 xVendorID = (UInt16)(xUInt32 & 0xFFFF);
+                        //UInt16 xDeviceID = (UInt16)(xUInt32 >> 16); 
+                        UInt32 xVendorID = xUInt32 & 0xFFFF;
+                        UInt32 xDeviceID = xUInt32 >> 16;
                         if (xVendorID != 0xFFFF) {
-                            //string xVendorName = DeviceIDs.FindVendor(xVendorID);
-                            string xVendorName = null;
-                            if (xVendorName == null) {
-                                xVendorName = xVendorID.ToString();
-                            }
+                            string xVendorName = DeviceIDs.FindVendor(xVendorID);
+                            //string xVendorName = null;
+                            //if (xVendorName == null) {
+                            //    xVendorName = xVendorID.ToString();
+                            //}
                             //Console.Write("Location: ");
                             Console.Write(xBus.ToString());
                             Console.Write("-");
                             Console.Write(xSlot.ToString());
                             Console.Write("-");
                             Console.Write(xFunction.ToString());
+                            if(xVendorName != null)
+                            {
+                                Console.Write("(");
+                                Console.Write(xVendorName);
+                                Console.Write(")");
+                            }
                             Console.Write(" ");
 
-                            Console.Write("Value: ");
-                            Console.WriteLine(xValue.ToString());
+                            Console.Write("UInt32: ");
+                            Console.WriteLine(xUInt32.ToString());
 
                             //Console.Write("Vendor: ");
                             //Console.WriteLine(xVendorName);
