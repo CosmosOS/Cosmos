@@ -48,6 +48,7 @@
     <Compile Include="CustomImplementations\System\BooleanImpl.cs" />
     <Compile Include="CustomImplementations\System\ByteImpl.cs" />
     <Compile Include="CustomImplementations\System\CharImpl.cs" />
+    <Compile Include="CustomImplementations\System\Int64Impl.cs" />
     <Compile Include="CustomImplementations\System\IntPtrImpl.cs" />
     <Compile Include="CustomImplementations\System\UInt32Impl.cs" />
     <Compile Include="CustomImplementations\System\Int32Impl.cs" />
@@ -56,6 +57,7 @@
     <Compile Include="CustomImplementations\System\Int16Impl.cs" />
     <Compile Include="CustomImplementations\System\ObjectImpl.cs" />
     <Compile Include="CustomImplementations\System\SRImpl.cs" />
+    <Compile Include="CustomImplementations\System\UInt64Impl.cs" />
     <Compile Include="CustomMethodImplementationOp.cs" />
     <Compile Include="CustomMethodImplementationProxyOp.cs" />
     <Compile Include="Enums.cs" />
