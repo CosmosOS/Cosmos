@@ -12,21 +12,17 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 namespace Cosmos.Build.Windows {
-    /// <summary>
-    /// Interaction logic for BuildOptionsWindow.xaml
-    /// </summary>
     public partial class BuildOptionsWindow : Window, IBuildConfiguration {
-
 
         public BuildOptionsWindow() {
             InitializeComponent();
 
             KeyDown += new KeyEventHandler(BuildOptionsWindow_KeyDown);
             Loaded += new RoutedEventHandler(BuildOptionsWindow_Loaded);
-            
-            textBuildPath.Text = Builder.GetBuildPath();
-            textBuildPath.IsEnabled = false;
 
+            spanBuildPath.Inlines.Add(Builder.GetBuildPath());
+
+            // { ISO, PXE, QEMU, QEMU_With_Hard_Disk_Image, QEMU_GDB, QEMU_GDB_With_Hard_Disk_Image };
             foreach (var xTarget in Enum.GetNames(typeof(Builder.Target))) {
                 lboxTargets.Items.Add((lboxTargets.Items.Count + 1).ToString() + ": " + xTarget.Replace('_', ' '));
             }
@@ -47,7 +43,7 @@ namespace Cosmos.Build.Windows {
                         string xType = (string)(lboxTargets.Items[xValue - 1]);
                         Hide();
                         var xBuilder = new Builder();
-                        target = (Builder.Target)Enum.Parse(typeof(Builder.Target), xType.Remove(0, 3).Replace(' ', '_'));
+                        mTarget = (Builder.Target)Enum.Parse(typeof(Builder.Target), xType.Remove(0, 3).Replace(' ', '_'));
                         Close();
                     }
                 }
@@ -57,27 +53,21 @@ namespace Cosmos.Build.Windows {
 
         #region IBuildConfiguration Members
 
-        private Builder.Target target;
-        public Builder.Target Target
-        {
-            get
-            {
-                return target;
+        private Builder.Target mTarget;
+        public Builder.Target Target {
+            get {
+                return mTarget;
             }
-            set
-            {
+            set {
 
             }
         }
 
-        public bool Compile
-        {
-            get
-            {
+        public bool Compile {
+            get {
                 return buildCheckBox.IsChecked.Value;
             }
-            set
-            {
+            set {
                 buildCheckBox.IsChecked = value;
             }
         }
