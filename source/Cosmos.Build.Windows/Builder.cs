@@ -15,10 +15,9 @@ namespace Cosmos.Build.Windows {
         protected string mISOPath;
         protected string mPXEPath;
         protected string mAsmPath;
-        protected IBuildConfiguration config;
+        protected IBuildConfiguration mConfig;
 
-        public Builder()
-        {
+        public Builder() {
             mBuildPath = GetBuildPath();
             mToolsPath = mBuildPath + @"Tools\";
             mISOPath = mBuildPath + @"ISO\";
@@ -26,31 +25,30 @@ namespace Cosmos.Build.Windows {
             mAsmPath = mToolsPath + @"asm\";
         }
 
-        public Builder(IBuildConfiguration config) : this()
-        {
-            this.config = config;
+        public Builder(IBuildConfiguration aConfig)
+            : this() {
+            mConfig = aConfig;
         }
 
         public static string GetBuildPath() {
-			try {
-				RegistryKey xKey = Registry.CurrentUser.OpenSubKey(@"Software\Cosmos");
-			    string xResult;
+            try {
+                RegistryKey xKey = Registry.CurrentUser.OpenSubKey(@"Software\Cosmos");
+                string xResult;
                 if (xKey == null) {
                     xResult = Directory.GetCurrentDirectory();
                     xResult = xResult.Substring(0, xResult.IndexOf("source"));
                     xResult += @"Build\";
+                } else { xResult = (string)xKey.GetValue("Build Path"); }
+                if (String.IsNullOrEmpty(xResult)) {
+                    throw new Exception("Cannot find Cosmos build path in registry");
                 }
-                else { xResult = (string)xKey.GetValue("Build Path"); }
-				if (String.IsNullOrEmpty(xResult)) {
-					throw new Exception("Cannot find Cosmos build path in registry");
-				}
-				if (!xResult.EndsWith(@"\")) {
-					xResult = xResult + @"\";
-				}
-				return xResult;
-			} catch (Exception E) {
-				throw new Exception("Error while getting Cosmos Build Path!", E);
-			}
+                if (!xResult.EndsWith(@"\")) {
+                    xResult = xResult + @"\";
+                }
+                return xResult;
+            } catch (Exception E) {
+                throw new Exception("Error while getting Cosmos Build Path!", E);
+            }
         }
 
         protected void RemoveFile(string aPathname) {
@@ -73,14 +71,14 @@ namespace Cosmos.Build.Windows {
                 Directory.CreateDirectory(mAsmPath);
             }
             Assembly xTarget = System.Reflection.Assembly.GetEntryAssembly();
-			Stopwatch xSW = new Stopwatch();
-			xSW.Start();
+            Stopwatch xSW = new Stopwatch();
+            xSW.Start();
             IL2CPU.Program.Main(new string[] {@"-in:" + xTarget.Location
                 , "-plug:" + mToolsPath + @"Cosmos.Kernel.Plugs\Cosmos.Kernel.Plugs.dll"
                 , "-platform:nativex86", "-asm:" + mAsmPath}
                 );
-			xSW.Stop();
-			Console.WriteLine("IL2CPU Run took " + xSW.Elapsed.ToString());
+            xSW.Stop();
+            Console.WriteLine("IL2CPU Run took " + xSW.Elapsed.ToString());
 
             RemoveFile(mBuildPath + "output.obj");
             Global.Call(mToolsPath + @"nasm\nasm.exe", String.Format("-g -f elf -F stabs -o \"{0}\" \"{1}\"", mBuildPath + "output.obj", mAsmPath + "main.asm"), mBuildPath);
@@ -90,23 +88,22 @@ namespace Cosmos.Build.Windows {
             RemoveFile(mBuildPath + "output.obj");
         }
 
-        public void BuildKernel() {
-        }
+        public void BuildKernel() { }
 
         public enum Target { ISO, PXE, QEMU, QEMU_With_Hard_Disk_Image, QEMU_GDB, QEMU_GDB_With_Hard_Disk_Image };
 
         public void Build() {
-            if (config == null)
-            {
+            if (mConfig == null) {
                 BuildOptionsWindow xOptions = new BuildOptionsWindow();
                 xOptions.ShowDialog();
-                config = xOptions;
+                mConfig = xOptions;
             }
 
-            if(config.Compile)
+            if (mConfig.Compile) {
                 Compile();
+            }
 
-            switch (config.Target) {
+            switch (mConfig.Target) {
                 case Target.ISO:
                     MakeISO();
                     break;
@@ -122,7 +119,10 @@ namespace Cosmos.Build.Windows {
                     MakeISO();
                     RemoveFile(mBuildPath + "serial-debug.txt");
                     Global.Call(mToolsPath + @"qemu\qemu.exe"
-                        , "-L . -cdrom \"" + mBuildPath + "Cosmos.iso\" -boot d -serial \"file:" + mBuildPath + "serial-debug.txt" + "\" -kernel-kqemu", mToolsPath + @"qemu\"
+                        , "-L . -cdrom \"" + mBuildPath + "Cosmos.iso\" -boot d -serial"
+                        + " \"file:" + mBuildPath + "serial-debug.txt" + "\" -kernel-kqemu"
+                        + " -net nic,model=rtl8139"
+                        , mToolsPath + @"qemu\"
                         , false, true);
                     break;
 
@@ -130,7 +130,9 @@ namespace Cosmos.Build.Windows {
                     MakeISO();
                     RemoveFile(mBuildPath + "serial-debug.txt");
                     Global.Call(mToolsPath + @"qemu\qemu.exe"
-                        , "-hda \"" + mBuildPath + "hda.img\" -L . -cdrom \"" + mBuildPath + "Cosmos.iso\" -boot d -serial \"file:" + mBuildPath + "serial-debug.txt" + "\" -kernel-kqemu", mToolsPath + @"qemu\"
+                        , "-hda \"" + mBuildPath + "hda.img\" -L . -cdrom \"" + mBuildPath + "Cosmos.iso\" -boot d -serial \"file:" + mBuildPath + "serial-debug.txt" + "\" -kernel-kqemu"
+                        + " -net nic,model=rtl8139"
+                        , mToolsPath + @"qemu\"
                         , false, true);
                     break;
 
@@ -138,7 +140,9 @@ namespace Cosmos.Build.Windows {
                     MakeISO();
                     RemoveFile(mBuildPath + "serial-debug.txt");
                     Global.Call(mToolsPath + @"qemu\qemu.exe"
-                        , "-L . -cdrom \"" + mBuildPath + "Cosmos.iso\" -boot d -serial \"file:" + mBuildPath + "serial-debug.txt" + "\" -S -s", mToolsPath + @"qemu\"
+                        , "-L . -cdrom \"" + mBuildPath + "Cosmos.iso\" -boot d -serial \"file:" + mBuildPath + "serial-debug.txt" + "\" -S -s"
+                        + " -net nic,model=rtl8139"
+                        , mToolsPath + @"qemu\"
                         , false, true);
                     //TODO: If the host is really busy, sometimes GDB can run before QEMU finishes loading.
                     //in this case, GDB says "program not running". Not sure how to fix this properly.
@@ -151,7 +155,9 @@ namespace Cosmos.Build.Windows {
                     MakeISO();
                     RemoveFile(mBuildPath + "serial-debug.txt");
                     Global.Call(mToolsPath + @"qemu\qemu.exe"
-                        , "-hda \"" + mBuildPath + "hda.img\" -L . -cdrom \"" + mBuildPath + "Cosmos.iso\" -boot d -serial \"file:" + mBuildPath + "serial-debug.txt" + "\" -S -s", mToolsPath + @"qemu\"
+                        , "-hda \"" + mBuildPath + "hda.img\" -L . -cdrom \"" + mBuildPath + "Cosmos.iso\" -boot d -serial \"file:" + mBuildPath + "serial-debug.txt" + "\" -S -s"
+                        + " -net nic,model=rtl8139"
+                        , mToolsPath + @"qemu\"
                         , false, true);
                     //TODO: If the host is really busy, sometimes GDB can run before QEMU finishes loading.
                     //in this case, GDB says "program not running". Not sure how to fix this properly.
