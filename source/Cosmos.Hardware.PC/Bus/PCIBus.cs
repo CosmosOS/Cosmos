@@ -4,69 +4,13 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.Hardware.PC.Bus {
-    //TODO: Move to Cosmos.Hardware
-    public class DeviceID
-    {
-        UInt32 key;
-
-        public UInt32 Key
-        {
-            get { return key; }
-            set { key = value; }
-        }
-
-        String value;
-
-        public String Value
-        {
-            get { return value; }
-            set { this.value = value; }
-        }
-
-        public DeviceID(UInt32 pkey, String pvalue)
-        {
-            key = pkey;
-            value = pvalue;
-        }
-    }
-
-    public class DeviceIDs
-    {
-        protected Dictionary<String> mVendors = new Dictionary<String>();
-
-        public DeviceIDs() {
-            mVendors.Add(0x8086, "Intel");
-        }
-
-        public string FindVendor(UInt32 aVendorID) {
-            return mVendors[aVendorID];
-        }
-
-        /*protected List<DeviceID> mVendors = new List<DeviceID>();
-
-        public DeviceIDs()
-        {
-            mVendors.Add(new DeviceID(0x8086, "Intel"));
-        }
-
-        public string FindVendor(UInt32 aVendorID)
-        {
-            for (int i = 0; i < mVendors.Count; i++)
-            {
-
-                if (mVendors[i].Key == aVendorID)
-                    return mVendors[i].Value;
-            }
-            return null;
-        }*/
-    }
 
     public class PCIBus : Cosmos.Hardware.Bus.PCIBus {
         protected const ushort ConfigAddr = 0xCF8;
         protected const ushort ConfigData = 0xCFC;
 
         static public void Init() {
-            DeviceIDs deviceIDs = new DeviceIDs();
+            var xDeviceIDs = new DeviceIDs();
             Console.WriteLine("PCI Devices");
             Console.WriteLine();
             for (byte xBus = 0; xBus <= 255; xBus++) {
@@ -78,21 +22,21 @@ namespace Cosmos.Hardware.PC.Bus {
                         UInt32 xVendorID = xUInt32 & 0xFFFF;
                         UInt32 xDeviceID = xUInt32 >> 16;
                         if (xVendorID != 0xFFFF) {
-                            string xVendorName = deviceIDs.FindVendor(xVendorID);
+                            string xVendor = xDeviceIDs.FindVendor(xVendorID);
                             //string xVendorName = null;
-                            //if (xVendorName == null) {
+                            if (xVendor == null) {
                             //    xVendorName = xVendorID.ToString();
-                            //}
+                            }
                             //Console.Write("Location: ");
                             Console.Write(xBus.ToString());
                             Console.Write("-");
                             Console.Write(xSlot.ToString());
                             Console.Write("-");
                             Console.Write(xFunction.ToString());
-                            if(xVendorName != null)
+                            if(xVendor != null)
                             {
                                 Console.Write("(");
-                                Console.Write(xVendorName);
+                                Console.Write(xVendor);
                                 Console.Write(")");
                             }
                             Console.Write(" ");

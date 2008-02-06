@@ -48,6 +48,7 @@
     <Compile Include="Bus\Bus.cs" />
     <Compile Include="Bus\CPUBus.cs" />
     <Compile Include="Device.cs" />
+    <Compile Include="TempDictionary.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Old\CPU.cs" />
     <Compile Include="Old\DebugUtil.cs" />

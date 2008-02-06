@@ -20,7 +20,7 @@ namespace KudzuTest {
 
             Tests.DoAll();
 
-            //Cosmos.Kernel.Temp.Kudzu.PCI.Test();
+            Cosmos.Kernel.Temp.Kudzu.PCI.Test();
 
             Console.WriteLine("Shell complete");
             while (true)

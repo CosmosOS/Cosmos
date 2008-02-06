@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
-namespace Cosmos.Hardware.PC
+namespace Cosmos.Hardware
 {
-    public class Dictionary<Value>
+    public class TempDictionary<Value>
     {
         private List<DictionaryItem> items = new List<DictionaryItem>();
 
@@ -50,7 +49,7 @@ namespace Cosmos.Hardware.PC
 
         public void Add(UInt32 key, Value value)
         {
-            items.Add(new Dictionary<Value>.DictionaryItem(key, value));
+            items.Add(new TempDictionary<Value>.DictionaryItem(key, value));
         }
 
         public bool TryGetValue(UInt32 key, out Value value)
