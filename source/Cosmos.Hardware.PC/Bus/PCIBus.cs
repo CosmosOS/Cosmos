@@ -32,17 +32,17 @@ namespace Cosmos.Hardware.PC.Bus {
 
     public class DeviceIDs
     {
-        /*static protected Dictionary mVendors = new Dictionary();
+        protected Dictionary<String> mVendors = new Dictionary<String>();
 
-        static DeviceIDs() {
+        public DeviceIDs() {
             mVendors.Add(0x8086, "Intel");
         }
 
-        static public string FindVendor(UInt32 aVendorID) {
+        public string FindVendor(UInt32 aVendorID) {
             return mVendors[aVendorID];
-        }*/
+        }
 
-        protected List<DeviceID> mVendors = new List<DeviceID>();
+        /*protected List<DeviceID> mVendors = new List<DeviceID>();
 
         public DeviceIDs()
         {
@@ -58,7 +58,7 @@ namespace Cosmos.Hardware.PC.Bus {
                     return mVendors[i].Value;
             }
             return null;
-        }
+        }*/
     }
 
     public class PCIBus : Cosmos.Hardware.Bus.PCIBus {

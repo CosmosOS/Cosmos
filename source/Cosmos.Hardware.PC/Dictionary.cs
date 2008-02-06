@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Hardware.PC
 {
-    public class Dictionary
+    public class Dictionary<Value>
     {
         private List<DictionaryItem> items = new List<DictionaryItem>();
 
@@ -19,26 +19,26 @@ namespace Cosmos.Hardware.PC
                 set { key = value; }
             }
 
-            String value;
+            Value value;
 
-            public String Value
+            public Value Value
             {
                 get { return value; }
                 set { value = this.value; }
             }
 
-            public DictionaryItem(UInt32 key, String value)
+            public DictionaryItem(UInt32 key, Value value)
             {
                 this.key = key;
                 this.value = value;
             }
         }
 
-        public String this[UInt32 key]
+        public Value this[UInt32 key]
         {
             get
             {
-                String res;
+                Value res;
                 TryGetValue(key, out res);
                 return res;
             }
@@ -48,12 +48,12 @@ namespace Cosmos.Hardware.PC
             }
         }
 
-        public void Add(UInt32 key, String value)
+        public void Add(UInt32 key, Value value)
         {
-            items.Add(new Dictionary.DictionaryItem(key, value));
+            items.Add(new Dictionary<Value>.DictionaryItem(key, value));
         }
 
-        public bool TryGetValue(UInt32 key, out String value)
+        public bool TryGetValue(UInt32 key, out Value value)
         {
             for (int i = 0; i < items.Count; i++)
             {
@@ -63,11 +63,11 @@ namespace Cosmos.Hardware.PC
                     return true;
                 }
             }
-            value = null;
+            value = default(Value);
             return false;
         }
 
-        public bool TrySetValue(UInt32 key, String value)
+        public bool TrySetValue(UInt32 key, Value value)
         {
             for (int i = 0; i < items.Count; i++)
             {

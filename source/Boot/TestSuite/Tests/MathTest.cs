@@ -29,6 +29,12 @@ namespace TestSuite.Tests
             Assert(5 - 2 == 3, "5 - 2 == 3");
             Assert(2 + 5 * 2 == 12, "2 + 5 * 2 == 12");
             Assert((2 + 5) * 2 == 14, "(2 + 5) * 2 == 14");
+
+            UInt32 a = 5;
+            UInt32 b = 5;
+            Assert(a == b, "UInt32 Equality");
+            b = 10;
+            Assert(a != b, "UInt32 Inequality");
         }
     }
 }
