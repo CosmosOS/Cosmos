@@ -42,14 +42,14 @@ namespace Cosmos.Hardware.PC.Bus {
             return mVendors[aVendorID];
         }*/
 
-        static protected List<DeviceID> mVendors = new List<DeviceID>();
+        protected List<DeviceID> mVendors = new List<DeviceID>();
 
-        static DeviceIDs()
+        public DeviceIDs()
         {
             mVendors.Add(new DeviceID(0x8086, "Intel"));
         }
 
-        static public string FindVendor(UInt32 aVendorID)
+        public string FindVendor(UInt32 aVendorID)
         {
             for (int i = 0; i < mVendors.Count; i++)
             {
@@ -70,6 +70,7 @@ namespace Cosmos.Hardware.PC.Bus {
         protected const ushort ConfigData = 0xCFC;
 
         static public void Init() {
+            DeviceIDs deviceIDs = new DeviceIDs();
             Console.WriteLine("PCI Devices");
             Console.WriteLine();
             for (byte xBus = 0; xBus <= 255; xBus++) {
@@ -81,7 +82,7 @@ namespace Cosmos.Hardware.PC.Bus {
                         UInt32 xVendorID = xUInt32 & 0xFFFF;
                         UInt32 xDeviceID = xUInt32 >> 16;
                         if (xVendorID != 0xFFFF) {
-                            string xVendorName = DeviceIDs.FindVendor(xVendorID);
+                            string xVendorName = deviceIDs.FindVendor(xVendorID);
                             //string xVendorName = null;
                             //if (xVendorName == null) {
                             //    xVendorName = xVendorID.ToString();
