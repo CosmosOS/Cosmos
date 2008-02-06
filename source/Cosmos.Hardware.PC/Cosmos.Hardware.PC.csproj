@@ -57,6 +57,7 @@
     <Compile Include="Bus\CPU\PIC.cs" />
     <Compile Include="Bus\PCIBus.cs" />
     <Compile Include="DebugUtil.cs" />
+    <Compile Include="Dictionary.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Interrupts.cs" />
     <Compile Include="Processor.cs" />
