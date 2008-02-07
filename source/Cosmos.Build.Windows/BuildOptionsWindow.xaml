@@ -49,7 +49,7 @@
         </Paragraph>
         <Paragraph Name="paraISOOptions">
                 <Bold>ISO Options</Bold>
-                <LineBreak/>ISO file will be output in:
+                <LineBreak/>ISO file will be output as:
                 <LineBreak/>
                 <Span Name="spanISOPath"></Span>
         </Paragraph>

@@ -38,7 +38,7 @@ namespace Cosmos.Build.Windows {
             rdioPXE.Unchecked += new RoutedEventHandler(rdioPXE_Unchecked);
 
             spanBuildPath.Inlines.Add(mBuilder.BuildPath);
-            spanISOPath.Inlines.Add(mBuilder.ISOPath);
+            spanISOPath.Inlines.Add(mBuilder.BuildPath + "Cosmos.iso");
 
             mOptionsBlockPrefix = paraQEMUOptions.PreviousBlock;
             RootDoc.Blocks.Remove(paraQEMUOptions);
