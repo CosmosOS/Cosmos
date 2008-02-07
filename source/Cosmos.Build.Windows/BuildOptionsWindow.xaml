@@ -42,10 +42,8 @@
             </InlineUIContainer>
         </Paragraph>
         <Paragraph Name="paraVMWareOptions">
-                <Bold>VMWare Options</Bold> - Coming soon!
         </Paragraph>
         <Paragraph Name="paraVPCOptions">
-            <Bold>VPC Options</Bold> - Coming soon!
         </Paragraph>
         <Paragraph Name="paraISOOptions">
                 <Bold>ISO Options</Bold>
@@ -54,7 +52,8 @@
                 <Span Name="spanISOPath"></Span>
         </Paragraph>
         <Paragraph Name="paraPXEOptions">
-            <Bold>PXE Options</Bold> - Coming soon!
+            <Bold>PXE Options</Bold>
+                <LineBreak/>After building, start up another PC with network boot enabled and Cosmos will boot on to it automatically.
         </Paragraph>
         <Paragraph>
             Uncheck 

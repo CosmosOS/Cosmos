@@ -17,6 +17,7 @@ namespace Cosmos.Build.Windows {
         public readonly string PXEPath;
         public readonly string AsmPath;
         public readonly string VMWarePath;
+        public readonly string VPCPath;
         protected IBuildConfiguration mConfig;
 
         public Builder() {
@@ -26,6 +27,7 @@ namespace Cosmos.Build.Windows {
             PXEPath = BuildPath + @"PXE\";
             AsmPath = ToolsPath + @"asm\";
             VMWarePath = BuildPath + @"VMWare\";
+            VPCPath = BuildPath + @"VPC\";
         }
 
         public Builder(IBuildConfiguration aConfig) : this() {
@@ -188,6 +190,9 @@ namespace Cosmos.Build.Windows {
 
                 case Target.VPC:
                     MakeISO();
+                    RemoveReadOnly(VPCPath + "Cosmos.vmc");
+                    RemoveReadOnly(VPCPath + "hda.vhd");
+                    Process.Start(VPCPath + "Cosmos.vmc");
                     break;
 
             }
