@@ -1,6 +1,6 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
+using System.Collections.Generic;		 
 using System.Linq;
 
 
@@ -24,7 +24,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			if (xField == null) {
 				throw new Exception("Field not found!");
 			}
-			string xFieldId = xField.ToString();
+			string xFieldId = xField.GetFullName();
 			mType = Engine.GetTypeInfo(xField.DeclaringType);
 			mField = mType.Fields[xFieldId];
 		}

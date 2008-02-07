@@ -2,7 +2,7 @@ using System;
 using System.IO;
 
 
-using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using CPUx86 = Indy.IL2CPU.Assembler.X86;	    
 using System.Reflection;
 
 namespace Indy.IL2CPU.IL.X86 {
@@ -17,7 +17,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			if (xField == null) {
 					throw new Exception("Field not found!");
 			}
-			string xFieldId = xField.ToString();
+			string xFieldId = xField.GetFullName();
 			mType = Engine.GetTypeInfo(xField.DeclaringType);
 			mField = mType.Fields[xFieldId];
 		}

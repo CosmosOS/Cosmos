@@ -16,7 +16,7 @@ namespace KudzuTest {
             Console.WriteLine();
 
             Console.WriteLine("StringBuilder test");
-            Console.WriteLine("  " + Tests.StringBuilder());
+            Console.WriteLine(Tests.StringBuilder());
             Console.WriteLine();
 
             //Console.WriteLine("IntToStr 16 test");

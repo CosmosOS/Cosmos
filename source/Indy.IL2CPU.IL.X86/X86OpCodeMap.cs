@@ -121,12 +121,12 @@ namespace Indy.IL2CPU.IL.X86 {
 							// param 1 is sender
 							// param 2 is eventargs
 							Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
-							Ldarg.Ldfld(aAssembler, aMethodInfo.TypeInfo, "System.Object _target");
+							Ldarg.Ldfld(aAssembler, aMethodInfo.TypeInfo, "System.Object System.Delegate._target");
 							for (int i = 1; i < aMethodInfo.Arguments.Length; i++) {
 								Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[i]);
 							}
 							Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
-							Ldarg.Ldfld(aAssembler, aMethodInfo.TypeInfo, "IntPtr _methodPtr");
+							Ldarg.Ldfld(aAssembler, aMethodInfo.TypeInfo, "System.IntPtr System.Delegate._methodPtr");
 							new CPUx86.Pop("eax");
 							new CPUx86.Call(CPUx86.Registers.EAX);
 							//							new CPUx86.Pop(CPUx86.Registers.EAX);
