@@ -21,6 +21,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			LiteralStr = aLiteralStr;
 		}
 
+
 		public static string GetContentsArrayName(Assembler.Assembler aAssembler, string aLiteral) {
 			Encoding xEncoding = Encoding.Unicode;
 			var xDataByteArray = new StringBuilder();
@@ -37,8 +38,12 @@ namespace Indy.IL2CPU.IL.X86 {
 				xRefByteArray.Append("0x" + ((uint)Engine.RegisterType(Engine.GetType("mscorlib", "System.String"))).ToString("X"));
 				xRefByteArray.Append(",0x" + ((uint)InstanceTypeEnum.StaticEmbeddedObject).ToString("X") + ",");
 				xRefByteArray.Append("0x" + (1).ToString("X") + ",");
-				xRefByteArray.Append(xDataName + "__Contents,");
-				xRefByteArray.Append("0,0,0");
+				xRefByteArray.Append(aLiteral.Length);
+				xRefByteArray.Append(",");
+				xRefByteArray.Append(aLiteral.Length);
+				xRefByteArray.Append(",");
+				xRefByteArray.Append(xDataName + "__Contents + 16,");
+				xRefByteArray.Append(xDataName + "__Contents");
 				aAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>(aAssembler.CurrentGroup, new DataMember(xDataName, "dd", xRefByteArray.ToString())));
 				aAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>(aAssembler.CurrentGroup, xDataMember=new DataMember(xDataName + "__Contents", "db", xDataVal)));
 				mDataMemberMap.Add(xDataVal, xDataMember);

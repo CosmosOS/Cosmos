@@ -12,12 +12,12 @@ namespace Indy.IL2CPU.IL.X86.Win32 {
 			return typeof(Win32CustomMethodImplementationOp);
 		}
 
-		public override void Initialize(Indy.IL2CPU.Assembler.Assembler aAssembler, IEnumerable<Assembly> aProjectAssemblies, IEnumerable<Assembly> aPlugs) {
-			base.Initialize(aAssembler, aProjectAssemblies, aPlugs);
+		public override void Initialize(Indy.IL2CPU.Assembler.Assembler aAssembler, IEnumerable<Assembly> aProjectAssemblies) {
+			base.Initialize(aAssembler, aProjectAssemblies);
 			base.mMap[OpCodeEnum.Call] = typeof(Call);
 		}
 
-		protected override IList<Assembly> GetPlugAssemblies() {
+		public override IList<Assembly> GetPlugAssemblies() {
 			IList<Assembly> xResult = base.GetPlugAssemblies();
 			xResult.Add(typeof(Win32OpCodeMap).Assembly);
 			return xResult;

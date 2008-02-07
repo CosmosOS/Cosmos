@@ -16,7 +16,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		protected override void Ldflda(TypeInformation aType, TypeInformation.Field aField) {
-			Op.Ldflda(Assembler, aType, aField);
+			Op.Ldflda(Assembler, aType, aField, false);
 		}
 
 		protected override void CallProxiedMethod() {

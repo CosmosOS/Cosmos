@@ -7,7 +7,7 @@ using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using Indy.IL2CPU.Assembler;
 
-namespace Indy.IL2CPU.IL.X86 {
+namespace Indy.IL2CPU.IL.X86 {								  
 	public abstract class X86OpCodeMap: OpCodeMap {
 		protected override Type GetMethodHeaderOp() {
 			return typeof(X86MethodHeaderOp);
@@ -39,7 +39,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			return typeof(X86CustomMethodImplementationProxyOp);
 		}
 
-		protected override IList<Assembly> GetPlugAssemblies() {
+		public override IList<Assembly> GetPlugAssemblies() {
 			IList<Assembly> xResult = base.GetPlugAssemblies();
 			xResult.Add(typeof(X86OpCodeMap).Assembly);
 			return xResult;
@@ -120,6 +120,7 @@ namespace Indy.IL2CPU.IL.X86 {
 							// param 0 is instance of eventhandler
 							// param 1 is sender
 							// param 2 is eventargs
+							new CPUx86.Call("_CODE_REQUESTED_BREAK_");
 							Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
 							Ldarg.Ldfld(aAssembler, aMethodInfo.TypeInfo, "System.Object System.Delegate._target");
 							for (int i = 1; i < aMethodInfo.Arguments.Length; i++) {

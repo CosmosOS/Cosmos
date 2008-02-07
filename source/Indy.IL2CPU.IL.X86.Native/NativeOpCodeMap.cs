@@ -15,8 +15,8 @@ namespace Indy.IL2CPU.IL.X86.Native {
 	public class NativeOpCodeMap: X86.X86OpCodeMap {
 		internal static NativeOpCodeMap Instance;
 
-		public override void Initialize(Indy.IL2CPU.Assembler.Assembler aAssembler, IEnumerable<Assembly> aProjectAssemblies, IEnumerable<Assembly> aPlugs) {
-			base.Initialize(aAssembler, aProjectAssemblies, aPlugs);
+		public override void Initialize(Indy.IL2CPU.Assembler.Assembler aAssembler, IEnumerable<Assembly> aProjectAssemblies) {
+			base.Initialize(aAssembler, aProjectAssemblies);
 			base.mMap[OpCodeEnum.Call] = typeof(Call);
 		}
 
@@ -24,32 +24,7 @@ namespace Indy.IL2CPU.IL.X86.Native {
 			Instance = this;
 		}
 
-		//		public MethodBase GetGlueMethod(GlueMethodTypeEnum aMethodType) {
-		//			CheckGlueMethod();
-		//			if (!mGlueMethods.ContainsKey(aMethodType)) {
-		//				throw new Exception("GlueMethod '" + aMethodType.ToString() + "' not implemented!");
-		//			}
-		//			MethodBase xResult = mGlueMethods[aMethodType];
-		//			Engine.QueueMethod(xResult);
-		//			return xResult;
-		//		}
-		//
-		//		public MethodBase GetGluePlaceholderMethod(GluePlaceholderMethodTypeEnum aMethodType) {
-		//			CheckGluePlaceholderMethod();
-		//			if (!mGluePlaceholderMethods.ContainsKey(aMethodType)) {
-		//				throw new Exception("GluePlaceholderMethod '" + aMethodType.ToString() + "' not implemented!");
-		//			}
-		//			return mGluePlaceholderMethods[aMethodType];
-		//		}
-		//
-		//		public FieldInfo GetGlueField(GlueFieldTypeEnum aFieldType) {
-		//			CheckGlueField();
-		//			if (!mGlueFields.ContainsKey(aFieldType)) {
-		//				throw new Exception("GlueField '" + aFieldType.ToString() + "' not found!");
-		//			}
-		//			return mGlueFields[aFieldType];
-		//		}
-
+	
 		protected override Type GetCustomMethodImplementationOp() {
 			return typeof(NativeCustomMethodImplementationOp);
 		}
@@ -153,7 +128,7 @@ namespace Indy.IL2CPU.IL.X86.Native {
 		//			}
 		//		}
 
-		protected override IList<Assembly> GetPlugAssemblies() {
+		public override IList<Assembly> GetPlugAssemblies() {
 			IList<Assembly> xResult = base.GetPlugAssemblies();
 			xResult.Add(typeof(NativeOpCodeMap).Assembly);
 			return xResult;

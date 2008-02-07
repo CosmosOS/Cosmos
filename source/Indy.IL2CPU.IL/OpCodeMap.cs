@@ -12,7 +12,7 @@ namespace Indy.IL2CPU.IL {
 		protected readonly SortedList<OpCodeEnum, Type> mMap = new SortedList<OpCodeEnum, Type>();
 
 		protected OpCodeMap() {
-			MethodHeaderOp = GetMethodHeaderOp();
+			MethodHeaderOp = GetMethodHeaderOp();								   
 			MethodFooterOp = GetMethodFooterOp();
 			PInvokeMethodBodyOp = GetPInvokeMethodBodyOp();
 			CustomMethodImplementationProxyOp = GetCustomMethodImplementationProxyOp();
@@ -33,7 +33,7 @@ namespace Indy.IL2CPU.IL {
 		protected abstract Type GetInitVmtImplementationOp();
 		protected abstract Type GetMainEntryPointOp();
 
-		public virtual void Initialize(Assembler.Assembler aAssembler, IEnumerable<Assembly> aApplicationAssemblies, IEnumerable<Assembly> aPlugs) {
+		public virtual void Initialize(Assembler.Assembler aAssembler, IEnumerable<Assembly> aApplicationAssemblies) {
 			foreach (var xItem in (from item in ImplementationAssembly.GetTypes()
 								   let xAttrib = item.GetCustomAttributes(typeof(OpCodeAttribute), true).FirstOrDefault() as OpCodeAttribute
 								   where item.IsSubclassOf(typeof(Op)) && xAttrib != null
@@ -48,7 +48,6 @@ namespace Indy.IL2CPU.IL {
 					throw;
 				}
 			}
-			InitializePlugMethodsList(aAssembler, aPlugs);
 		}
 
 		public Type GetOpForOpCode(OpCodeEnum code) {
@@ -65,114 +64,12 @@ namespace Indy.IL2CPU.IL {
 		public readonly Type CustomMethodImplementationOp;
 		public readonly Type InitVmtImplementationOp;
 		public readonly Type MainEntryPointOp;
-		private SortedList<string, MethodBase> mPlugMethods;
-
-		/// <summary>
-		/// Gets the full name of a method, without the defining type included
-		/// </summary>
-		/// <param name="aSelf"></param>
-		/// <returns></returns>
-		private static string GetStrippedMethodBaseFullName(MethodBase aMethod) {
-			StringBuilder xBuilder = new StringBuilder();
-			string[] xParts = aMethod.ToString().Split(' ');
-			string[] xParts2 = xParts.Skip(1).ToArray();
-			MethodInfo xMethodInfo = aMethod as MethodInfo;
-			if (xMethodInfo != null) {
-				xBuilder.Append(xMethodInfo.ReturnType.FullName);
-			} else {
-				if (aMethod is ConstructorInfo) {
-					xBuilder.Append(typeof(void).FullName);
-				} else {
-					xBuilder.Append(xParts[0]);
-				}
-			}
-			xBuilder.Append("  ");
-			xBuilder.Append(".");
-			xBuilder.Append(aMethod.Name);
-			xBuilder.Append("(");
-			ParameterInfo[] xParams = aMethod.GetParameters();
-			bool xParamAdded = false;
-			for (int i = 0; i < xParams.Length; i++) {
-				if (xParams[i].Name == "aThis" && i == 0) {
-					continue;
-				}
-				if (xParams[i].IsDefined(typeof(FieldAccessAttribute), true)) {
-					continue;
-				}
-				if (xParamAdded) {
-					xBuilder.Append(", ");
-				}
-				xBuilder.Append(xParams[i].ParameterType.FullName);
-				xParamAdded = true;
-			}
-			xBuilder.Append(")");
-			return xBuilder.ToString();
-		}
-
-		private void InitializePlugMethodsList(Assembler.Assembler aAssembler, IEnumerable<Assembly> aPlugs) {
-			if (mPlugMethods != null) {
-				throw new Exception("PlugMethods list already initialized!");
-			}
-			mPlugMethods = new SortedList<string, MethodBase>();
-			foreach (Assembly xAssemblyDef in GetPlugAssemblies().Union(aPlugs)) {
-				foreach (var xType in (from item in xAssemblyDef.GetTypes()
-									   let xCustomAttribs = item.GetCustomAttributes(typeof(PlugAttribute), false)
-									   where xCustomAttribs != null && xCustomAttribs.Length > 0
-									   select new KeyValuePair<Type, PlugAttribute>(item, (PlugAttribute)xCustomAttribs[0]))) {
-					PlugAttribute xPlugAttrib = xType.Value;
-					Type xTypeRef = xPlugAttrib.Target;
-					if (xTypeRef == null) {
-						xTypeRef = Type.GetType(xPlugAttrib.TargetName, true);
-					}
-					foreach (MethodBase xMethod in xType.Key.GetMethods(BindingFlags.Public | BindingFlags.Static)) {
-						PlugMethodAttribute xPlugMethodAttrib = xMethod.GetCustomAttributes(typeof(PlugMethodAttribute), true).Cast<PlugMethodAttribute>().FirstOrDefault();
-						string xSignature = String.Empty;
-						if (xPlugMethodAttrib != null) {
-							xSignature = xPlugMethodAttrib.Signature;
-							if (!xPlugMethodAttrib.Enabled) {
-								continue;
-							}
-							if (aAssembler.InMetalMode && !xPlugMethodAttrib.InMetalMode) {
-								continue;
-							} else {
-								if (!xPlugMethodAttrib.InNormalMode) {
-									continue;
-								}
-							}
-							if (!String.IsNullOrEmpty(xSignature)) {
-								mPlugMethods.Add(xSignature, xMethod);
-								continue;
-							}
-						}
-						string xStrippedSignature = GetStrippedMethodBaseFullName(xMethod);
-						foreach (MethodBase xOrigMethodDef in xTypeRef.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.NonPublic)) {
-							string xOrigStrippedSignature = GetStrippedMethodBaseFullName(xOrigMethodDef);
-							if (xOrigStrippedSignature == xStrippedSignature) {
-								mPlugMethods.Add(Label.GenerateLabelName(xOrigMethodDef), xMethod);
-							}
-						}
-						foreach (MethodBase xOrigMethodDef in xTypeRef.GetConstructors(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.NonPublic)) {
-							string xOrigStrippedSignature = GetStrippedMethodBaseFullName(xOrigMethodDef);
-							if (xOrigStrippedSignature == xStrippedSignature) {
-								mPlugMethods.Add(Label.GenerateLabelName(xOrigMethodDef), xMethod);
-							}
-						}
-					}
-				}
-			}
-			//Console.Write(new String('-', Console.WindowWidth));
-			Console.WriteLine("Recognized Plug methods:");
-			foreach (string s in mPlugMethods.Keys) {
-				Console.WriteLine(s);
-			}
-			//Console.Write(new String('-', Console.WindowWidth));
-		}
-
+		
 		public virtual Type GetOpForCustomMethodImplementation(string aName) {
 			return null;
 		}
 
-		protected virtual IList<Assembly> GetPlugAssemblies() {
+		public virtual IList<Assembly> GetPlugAssemblies() {
 			List<Assembly> xResult = new List<Assembly>();
 			xResult.Add(typeof(OpCodeMap).Assembly);
 			xResult.Add(Assembly.Load("Indy.IL2CPU"));
@@ -180,9 +77,6 @@ namespace Indy.IL2CPU.IL {
 		}
 
 		public MethodBase GetCustomMethodImplementation(string aOrigMethodName, bool aInMetalMode) {
-			if (mPlugMethods.ContainsKey(aOrigMethodName)) {
-				return mPlugMethods[aOrigMethodName];
-			}
 			return null;
 		}
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
+using Indy.IL2CPU.Plugs;
 
 namespace Indy.IL2CPU.IL {
 	public abstract class CustomMethodImplementationProxyOp: Op {

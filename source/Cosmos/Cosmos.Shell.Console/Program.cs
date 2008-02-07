@@ -39,6 +39,7 @@ namespace Cosmos.Shell.Console {
 				System.Console.WriteLine(E.Message);
 			}
 
+			System.Diagnostics.Debugger.Break();
 			System.Console.WriteLine("Halting system now..");
 			
 			// Halt system.

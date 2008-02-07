@@ -8,12 +8,6 @@ using Indy.IL2CPU.Plugs;
 namespace Indy.IL2CPU.CustomImplementation.System {
 	[Plug(Target = typeof(String))]
 	public static class StringImpl {
-		[MethodAlias(Name = "System.String System.String.FastAllocateString(System.Int32)")]
-		[PlugMethod()]
-		public static String FastAllocateString(int aLength) {
-			Char[] xItems = new Char[aLength];
-			return new String(xItems);
-		}
 
 		public static string Format(IFormatProvider aFormatProvider, string aFormat, object aArg) {
 			return "Format not implemented";
@@ -49,7 +43,6 @@ namespace Indy.IL2CPU.CustomImplementation.System {
 
 		public static string Substring(string aThis, int startpos) {
 			char[] cs = new char[aThis.Length - startpos];
-
 			int j = 0;
 			for (int i = startpos; i < aThis.Length; i++)
 				cs[j++] = aThis[i];

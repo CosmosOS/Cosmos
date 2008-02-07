@@ -13,11 +13,13 @@ namespace Indy.IL2CPU.IL {
 
 			public readonly bool NeedsGC;
 			public readonly Type FieldType;
+			public readonly bool IsExternalField;
 
-			public Field(int aOffset, int aSize, bool aNeedsGC, Type aFieldType) {
+			public Field(int aOffset, int aSize, bool aNeedsGC, Type aFieldType, bool aIsExternalField) {
 				Offset = aOffset;
 				NeedsGC = aNeedsGC;
 				FieldType = aFieldType;
+				IsExternalField = aIsExternalField;
 				Size = aSize;
 			}
 

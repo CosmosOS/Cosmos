@@ -40,6 +40,7 @@
     <Compile Include="AssemblerMethod.cs" />
     <Compile Include="FieldAccessAttribute.cs" />
     <Compile Include="PlugAttribute.cs" />
+    <Compile Include="PlugFieldAttribute.cs" />
     <Compile Include="PlugMethodAttribute.cs" />
   </ItemGroup>
   <ItemGroup>

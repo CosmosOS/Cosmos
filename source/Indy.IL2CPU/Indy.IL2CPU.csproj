@@ -49,7 +49,6 @@
   <ItemGroup>
     <Compile Include="CustomImplementation\System\Runtime\CompilerServices\RuntimeHelpers.cs" />
     <Compile Include="Engine.cs" />
-    <Compile Include="MethodAliasAttribute.cs" />
     <Compile Include="CustomImplementation\System\ObjectImpl.cs" />
     <Compile Include="CustomImplementation\System\ObjectImplRefs.cs" />
     <Compile Include="ObjectUtilities.cs" />

@@ -87,6 +87,9 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public static void Ldflda(Assembler.Assembler aAssembler, TypeInformation aType, TypeInformation.Field aField) {
+			Ldflda(aAssembler, aType, aField, true);
+		}
+		public static void Ldflda(Assembler.Assembler aAssembler, TypeInformation aType, TypeInformation.Field aField, bool aDerefExternalAddress) {
 			int aExtraOffset = 0;
 			if (aType.NeedsGC && !aAssembler.InMetalMode) {
 				aExtraOffset = 12;
@@ -94,8 +97,12 @@ namespace Indy.IL2CPU.IL.X86 {
 			new Popd(CPUx86.Registers.EAX);
 
 			new CPUx86.Add(CPUx86.Registers.EAX, "0x" + (aField.Offset + aExtraOffset).ToString("X"));
-			new Pushd(CPUx86.Registers.EAX);
 			aAssembler.StackContents.Push(new StackContent(4, aField.FieldType));
+			if (aDerefExternalAddress && aField.IsExternalField) {
+				new Pushd(CPUx86.Registers.AtEAX);
+			} else {
+				new Pushd(CPUx86.Registers.EAX);
+			}
 		}
 
 		public static void Multiply(Assembler.Assembler aAssembler) {
@@ -129,6 +136,10 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public static void Ldfld(Assembler.Assembler aAssembler, TypeInformation aType, TypeInformation.Field aField, bool aAddGCCode) {
+			Ldfld(aAssembler, aType, aField, aAddGCCode, true);
+		}
+
+		public static void Ldfld(Assembler.Assembler aAssembler, TypeInformation aType, TypeInformation.Field aField, bool aAddGCCode, bool aDerefExternalField) {
 			aAssembler.StackContents.Pop();
 			int aExtraOffset = 0;
 			if (aType.NeedsGC && !aAssembler.InMetalMode) {
@@ -136,6 +147,9 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			new CPUx86.Pop("ecx");
 			new CPUx86.Add("ecx", "0x" + (aField.Offset + aExtraOffset).ToString("X"));
+			if (aField.IsExternalField && aDerefExternalField) {
+				new CPUx86.Move("ecx", "[ecx]");
+			}
 			if (aField.Size >= 4) {
 				for (int i = 0; i < (aField.Size / 4); i++) {
 					new CPUx86.Move("eax", "[ecx + 0x" + (i * 4).ToString("X") + "]");

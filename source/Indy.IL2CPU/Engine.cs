@@ -31,7 +31,7 @@ namespace Indy.IL2CPU {
 
 	public class TypeComparer: IComparer<Type> {
 		public int Compare(Type x, Type y) {
-			return x.FullName.CompareTo(y.FullName);
+			return x.AssemblyQualifiedName.CompareTo(y.AssemblyQualifiedName);
 		}
 	}
 
@@ -79,6 +79,9 @@ namespace Indy.IL2CPU {
 		protected OpCodeMap mMap;
 		protected Assembler.Assembler mAssembler;
 
+		private SortedList<string, MethodBase> mPlugMethods;
+		private SortedList<Type, Dictionary<string, PlugFieldAttribute>> mPlugFields;
+
 		/// <summary>
 		/// Contains a list of all methods. This includes methods to be processed and already processed.
 		/// </summary>
@@ -87,11 +90,6 @@ namespace Indy.IL2CPU {
 		/// Contains a list of all static fields. This includes static fields to be processed and already processed.
 		/// </summary>
 		protected SortedList<FieldInfo, bool> mStaticFields = new SortedList<FieldInfo, bool>(new FieldInfoComparer());
-
-		/// <summary>
-		/// Contains a list of custom method implementations. This is mainly used for iCalls
-		/// </summary>
-		protected SortedList<string, MethodInfo> mCustomMethodImplementation = new SortedList<string, MethodInfo>();
 
 		protected List<Type> mTypes = new List<Type>();
 		protected TypeEqualityComparer mTypesEqualityComparer = new TypeEqualityComparer();
@@ -118,12 +116,9 @@ namespace Indy.IL2CPU {
 				if (xEntryPoint == null) {
 					xEntryPoint = mCrawledAssembly.EntryPoint;
 				}
-				List<string> xSearchDirs = new List<string>(new string[] { Path.GetDirectoryName(aAssembly), aAssemblyDir });
-				xSearchDirs.AddRange((from item in aPlugs
-									  select Path.GetDirectoryName(item)).Distinct());
-				foreach (string xPlugAsm in aPlugs) {
-					Assembly.LoadFile(new FileInfo(xPlugAsm).FullName).GetTypes();
-				}
+				//List<string> xSearchDirs = new List<string>(new string[] { Path.GetDirectoryName(aAssembly), aAssemblyDir });
+				//xSearchDirs.AddRange((from item in aPlugs
+				//                      select Path.GetDirectoryName(item)).Distinct());
 				if (xEntryPoint == null) {
 					throw new NotSupportedException("No EntryPoint found!");
 				}
@@ -141,12 +136,11 @@ namespace Indy.IL2CPU {
 					default:
 						throw new NotSupportedException("TargetPlatform '" + aTargetPlatform + "' not supported!");
 				}
+				InitializePlugs(aPlugs);
 				using (mAssembler) {
 					//mAssembler.OutputType = Assembler.Win32.Assembler.OutputTypeEnum.Console;
-					List<Assembly> xPlugDefs = new List<Assembly>();
-					foreach (string xPlug in aPlugs) {
-						xPlugDefs.Add(Assembly.LoadFrom(xPlug));
-					}
+					//foreach (string xPlug in aPlugs) {
+					//this.I
 					List<Assembly> xAppDefs = new List<Assembly>();
 					xAppDefs.Add(mCrawledAssembly);
 					mAssembler.MainGroup = "main";
@@ -171,17 +165,8 @@ namespace Indy.IL2CPU {
 					//        }
 					//    }
 					//}
-					mMap.Initialize(mAssembler, xAppDefs, xPlugDefs);
+					mMap.Initialize(mAssembler, xAppDefs);
 					mAssembler.DebugMode = aDebugMode;
-					foreach (Type t in typeof(Engine).Assembly.GetTypes()) {
-						foreach (MethodInfo mi in t.GetMethods()) {
-							object[] xAttribs = mi.GetCustomAttributes(typeof(MethodAliasAttribute), true);
-							if (xAttribs != null && xAttribs.Length > 0) {
-								MethodAliasAttribute xMethodAlias = (MethodAliasAttribute)xAttribs[0];
-								mCustomMethodImplementation.Add(xMethodAlias.Name, mi);
-							}
-						}
-					}
 					IL.Op.QueueMethod += QueueMethod;
 					IL.Op.QueueStaticField += QueueStaticField;
 					try {
@@ -715,9 +700,6 @@ namespace Indy.IL2CPU {
 						continue;
 					}
 					string xMethodName = Label.GenerateLabelName(xCurrentMethod);
-					if (xMethodName == "System_Void__Indy_IL2CPU_IL_X86_CustomImplementations_System_EventHandlerImpl_Ctor_System_UInt32__System_UInt32_") {
-						System.Diagnostics.Debugger.Break();
-					}
 					TypeInformation xTypeInfo = null;
 					{
 						if (!xCurrentMethod.IsStatic) {
@@ -744,25 +726,9 @@ namespace Indy.IL2CPU {
 #endif
 					xOp.Assemble();
 					bool xIsCustomImplementation = false;
-					MethodBase xCustomImplementation = null;
-					if (mCustomMethodImplementation.ContainsKey(xCurrentMethod.GetFullName())) {
+					MethodBase xCustomImplementation = GetCustomMethodImplementation(xMethodName);
+					if (xCustomImplementation != null) {
 						xIsCustomImplementation = true;
-						MethodInfo xReplacementMethod = mCustomMethodImplementation[xCurrentMethod.GetFullName()];
-						string[] xParamTypes = new string[xReplacementMethod.GetParameters().Length];
-						for (int i = 0; i < xReplacementMethod.GetParameters().Length; i++) {
-							xParamTypes[i] = xReplacementMethod.GetParameters()[i].ParameterType.FullName;
-						}
-						xCustomImplementation = GetMethodBase(GetType(xReplacementMethod.DeclaringType.Assembly.FullName, xReplacementMethod.DeclaringType.FullName), xReplacementMethod.Name, xParamTypes);
-						if (xCustomImplementation == null) {
-							throw new Exception("CustomMethodImplementation not found!");
-						}
-					}
-					if (xCustomImplementation == null) {
-						MethodBase xReplacement = mMap.GetCustomMethodImplementation(xMethodName, mAssembler.InMetalMode);
-						if (xReplacement != null) {
-							xCustomImplementation = xReplacement;
-							xIsCustomImplementation = true;
-						}
 					}
 					// what to do if a method doesn't have a body?
 					bool xContentProduced = false;
@@ -890,6 +856,156 @@ namespace Indy.IL2CPU {
 			}
 		}
 
+		private IList<Assembly> GetPlugAssemblies() {
+			var xResult = this.mMap.GetPlugAssemblies();
+			xResult.Add(typeof(Engine).Assembly);
+			return xResult;
+		}
+
+		/// <summary>
+		/// Gets the full name of a method, without the defining type included
+		/// </summary>
+		/// <param name="aSelf"></param>
+		/// <returns></returns>
+		private static string GetStrippedMethodBaseFullName(MethodBase aMethod) {
+			StringBuilder xBuilder = new StringBuilder();
+			string[] xParts = aMethod.ToString().Split(' ');
+			string[] xParts2 = xParts.Skip(1).ToArray();
+			MethodInfo xMethodInfo = aMethod as MethodInfo;
+			if (xMethodInfo != null) {
+				xBuilder.Append(xMethodInfo.ReturnType.FullName);
+			} else {
+				if (aMethod is ConstructorInfo) {
+					xBuilder.Append(typeof(void).FullName);
+				} else {
+					xBuilder.Append(xParts[0]);
+				}
+			}
+			xBuilder.Append("  ");
+			xBuilder.Append(".");
+			xBuilder.Append(aMethod.Name);
+			xBuilder.Append("(");
+			ParameterInfo[] xParams = aMethod.GetParameters();
+			bool xParamAdded = false;
+			for (int i = 0; i < xParams.Length; i++) {
+				if (xParams[i].Name == "aThis" && i == 0) {
+					continue;
+				}
+				if (xParams[i].IsDefined(typeof(FieldAccessAttribute), true)) {
+					continue;
+				}
+				if (xParamAdded) {
+					xBuilder.Append(", ");
+				}
+				xBuilder.Append(xParams[i].ParameterType.FullName);
+				xParamAdded = true;
+			}
+			xBuilder.Append(")");
+			return xBuilder.ToString();
+		}
+
+		private void InitializePlugs(IEnumerable<string> aPlugs) {
+			if (mPlugMethods != null) {
+				throw new Exception("PlugMethods list already initialized!");
+			}
+			if (mPlugFields != null) {
+				throw new Exception("PlugFields list already initialized!");
+			}
+			mPlugMethods = new SortedList<string, MethodBase>();
+			mPlugFields = new SortedList<Type, Dictionary<string, PlugFieldAttribute>>(new TypeComparer());
+			List<Assembly> xPlugs = new List<Assembly>();
+			var xComparer = new AssemblyEqualityComparer();
+			foreach (string s in aPlugs) {
+				Assembly a = Assembly.LoadFrom(s);
+				a.GetTypes();
+				if (!xPlugs.Contains(a, xComparer)) {
+					xPlugs.Add(a);
+				}
+			}
+			foreach (var item in GetPlugAssemblies()) {
+				if (!xPlugs.Contains(item, xComparer)) {
+					xPlugs.Add(item);
+				}
+			}
+			foreach (Assembly xAssemblyDef in xPlugs) {
+				foreach (var xType in (from item in xAssemblyDef.GetTypes()
+									   let xCustomAttribs = item.GetCustomAttributes(typeof(PlugAttribute), false)
+									   where xCustomAttribs != null && xCustomAttribs.Length > 0
+									   select new KeyValuePair<Type, PlugAttribute>(item, (PlugAttribute)xCustomAttribs[0]))) {
+					PlugAttribute xPlugAttrib = xType.Value;
+					Type xTypeRef = xPlugAttrib.Target;
+					if (xTypeRef == null) {
+						xTypeRef = Type.GetType(xPlugAttrib.TargetName, true);
+					}
+					PlugFieldAttribute[] xTypePlugFields = xType.Key.GetCustomAttributes(typeof(PlugFieldAttribute), false) as PlugFieldAttribute[];
+					if (xTypePlugFields != null && xTypePlugFields.Length > 0) {
+						Dictionary<string, PlugFieldAttribute> xPlugFields;
+						if (mPlugFields.ContainsKey(xTypeRef)) {
+							xPlugFields = mPlugFields[xTypeRef];
+						} else {
+							mPlugFields.Add(xTypeRef, xPlugFields = new Dictionary<string, PlugFieldAttribute>());
+						}
+						foreach (var xPlugField in xTypePlugFields) {
+							if (xPlugFields.ContainsKey(xPlugField.FieldId)) {
+								throw new Exception("PlugField already defined!");
+							}
+							xPlugFields.Add(xPlugField.FieldId, xPlugField);
+						}
+					}
+					foreach (MethodBase xMethod in xType.Key.GetMethods(BindingFlags.Public | BindingFlags.Static)) {
+						PlugMethodAttribute xPlugMethodAttrib = xMethod.GetCustomAttributes(typeof(PlugMethodAttribute), true).Cast<PlugMethodAttribute>().FirstOrDefault();
+						string xSignature = String.Empty;
+						if (xPlugMethodAttrib != null) {
+							xSignature = xPlugMethodAttrib.Signature;
+							if (!xPlugMethodAttrib.Enabled) {
+								continue;
+							}
+							if (mAssembler.InMetalMode && !xPlugMethodAttrib.InMetalMode) {
+								continue;
+							} else {
+								if (!xPlugMethodAttrib.InNormalMode) {
+									continue;
+								}
+							}
+							if (!String.IsNullOrEmpty(xSignature)) {
+								if (mPlugMethods.ContainsKey(xSignature)) {
+									System.Diagnostics.Debugger.Break();
+								}
+								mPlugMethods.Add(xSignature, xMethod);
+								continue;
+							}
+						}
+						string xStrippedSignature = GetStrippedMethodBaseFullName(xMethod);
+						foreach (MethodBase xOrigMethodDef in xTypeRef.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.NonPublic)) {
+							string xOrigStrippedSignature = GetStrippedMethodBaseFullName(xOrigMethodDef);
+							if (xOrigStrippedSignature == xStrippedSignature) {
+								mPlugMethods.Add(Label.GenerateLabelName(xOrigMethodDef), xMethod);
+							}
+						}
+						foreach (MethodBase xOrigMethodDef in xTypeRef.GetConstructors(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.NonPublic)) {
+							string xOrigStrippedSignature = GetStrippedMethodBaseFullName(xOrigMethodDef);
+							if (xOrigStrippedSignature == xStrippedSignature) {
+								mPlugMethods.Add(Label.GenerateLabelName(xOrigMethodDef), xMethod);
+							}
+						}
+					}
+				}
+			}
+			//Console.Write(new String('-', Console.WindowWidth));
+			Console.WriteLine("Recognized Plug methods:");
+			foreach (string s in mPlugMethods.Keys) {
+				Console.WriteLine(s);
+			}
+			//Console.Write(new String('-', Console.WindowWidth));
+		}
+
+		private MethodBase GetCustomMethodImplementation(string aMethodName) {
+			if (mPlugMethods.ContainsKey(aMethodName)) {
+				return mPlugMethods[aMethodName];
+			}
+			return null;
+		}
+
 		public static TypeInformation GetTypeInfo(Type aType) {
 			TypeInformation xTypeInfo;
 			int xObjectStorageSize;
@@ -989,7 +1105,14 @@ namespace Indy.IL2CPU {
 
 		private static void GetTypeFieldInfoImpl(SortedList<string, TypeInformation.Field> aTypeFields, Type aType, ref int aObjectStorageSize, bool aGCObjects) {
 			Type xActualType = aType;
+			Dictionary<string, PlugFieldAttribute> xCurrentPlugFieldList = new Dictionary<string, PlugFieldAttribute>();
 			do {
+				if (mCurrent.mPlugFields.ContainsKey(aType)) {
+					var xOrigList = mCurrent.mPlugFields[aType];
+					foreach (var item in xOrigList) {
+						xCurrentPlugFieldList.Add(item.Key, item.Value);
+					}
+				}
 				foreach (FieldInfo xField in aType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)) {
 					if (xField.IsStatic) {
 						continue;
@@ -998,24 +1121,33 @@ namespace Indy.IL2CPU {
 					//    Console.WriteLine("Field is constant: " + xField.GetFullName());
 					//}
 					// todo: add support for constants?
-					if (xField.FieldType.IsValueType && aGCObjects) {
+					PlugFieldAttribute xPlugFieldAttr = null;
+					if (xCurrentPlugFieldList.ContainsKey(xField.GetFullName())) {
+						xPlugFieldAttr = xCurrentPlugFieldList[xField.GetFullName()];
+						xCurrentPlugFieldList.Remove(xField.GetFullName());
+					}
+					Type xFieldType = null;
+					int xFieldSize;
+					string xFieldId;
+					if (xPlugFieldAttr != null) {
+						xFieldType = xPlugFieldAttr.FieldType;
+						xFieldId = xPlugFieldAttr.FieldId;
+					} else {
+						xFieldId = xField.GetFullName();
+					}
+					if (xFieldType == null) {
+						xFieldType = xField.FieldType;
+					}
+					if ((!xFieldType.IsValueType && aGCObjects) || (xPlugFieldAttr != null && xPlugFieldAttr.IsExternalValue && aGCObjects)) {
 						continue;
 					}
-					int xFieldSize;
-					// todo: add better support for arrays/pointers/etc
-					//TypeSpecification xTypeSpec = xField.FieldType as TypeSpecification;
-					//if (xTypeSpec != null) {
-					//    xFieldSize = 4;
-					//    RegisterTypeRef(xTypeSpec.ElementType);
-					//} else {
-					Type xFieldType = xField.FieldType;
-					if (xFieldType.IsClass && !xFieldType.IsValueType) {
+					if ((xFieldType.IsClass && !xFieldType.IsValueType) || (xPlugFieldAttr != null && xPlugFieldAttr.IsExternalValue)) {
 						xFieldSize = 4;
 					} else {
 						xFieldSize = GetFieldStorageSize(xFieldType);
 					}
 					//}
-					if (aTypeFields.ContainsKey(xField.GetFullName())) {
+					if (aTypeFields.ContainsKey(xFieldId)) {
 						continue;
 					}
 					int xOffset = aObjectStorageSize;
@@ -1025,10 +1157,28 @@ namespace Indy.IL2CPU {
 					} else {
 						aObjectStorageSize += xFieldSize;
 					}
-					if (aTypeFields.ContainsKey(xField.GetFullName())) {
-						System.Diagnostics.Debugger.Break();
+					aTypeFields.Add(xField.GetFullName(), new TypeInformation.Field(xOffset, xFieldSize, aGCObjects, xFieldType, (xPlugFieldAttr != null && xPlugFieldAttr.IsExternalValue)));
+				}
+				while (xCurrentPlugFieldList.Count > 0) {
+					var xItem = xCurrentPlugFieldList.Values.First();
+					xCurrentPlugFieldList.Remove(xItem.FieldId);
+					Type xFieldType = xItem.FieldType;
+					int xFieldSize;
+					string xFieldId = xItem.FieldId;
+					if (xFieldType == null) {
+						xFieldType = xItem.FieldType;
 					}
-					aTypeFields.Add(xField.GetFullName(), new TypeInformation.Field(xOffset, xFieldSize, aGCObjects, xField.FieldType));
+					if ((!xFieldType.IsValueType || xItem.IsExternalValue) && aGCObjects) {
+						continue;
+					}
+					if ((xFieldType.IsClass && !xFieldType.IsValueType) || xItem.IsExternalValue) {
+						xFieldSize = 4;
+					} else {
+						xFieldSize = GetFieldStorageSize(xFieldType);
+					}
+					int xOffset = aObjectStorageSize;
+					aObjectStorageSize += xFieldSize;
+					aTypeFields.Add(xItem.FieldId, new TypeInformation.Field(xOffset, xFieldSize, aGCObjects, xFieldType, xItem.IsExternalValue));
 				}
 				if (aType.FullName != "System.Object" && aType.BaseType != null) {
 					aType = aType.BaseType;
@@ -1036,19 +1186,19 @@ namespace Indy.IL2CPU {
 					break;
 				}
 			} while (true);
-			if (xActualType.FullName == "System.String" && aGCObjects) {
-				aTypeFields.Add("$$Storage$$", new TypeInformation.Field(aObjectStorageSize, 4, true, typeof(Array)));
-				aObjectStorageSize += 4;
-			}
-			if (ObjectUtilities.IsDelegate(xActualType)) {
-				if (aGCObjects) {
-					aTypeFields.Add("$$Obj$$", new TypeInformation.Field(aObjectStorageSize, 4, true, typeof(object)));
-					aObjectStorageSize += 4;
-				} else {
-					aTypeFields.Add("$$Method$$", new TypeInformation.Field(aObjectStorageSize, 4, false, typeof(uint)));
-					aObjectStorageSize += 4;
-				}
-			}
+			//if (xActualType.FullName == "System.String" && aGCObjects) {
+			//    aTypeFields.Add("$$Storage$$", new TypeInformation.Field(aObjectStorageSize, 4, true, typeof(Array), false));
+			//    aObjectStorageSize += 4;
+			//}
+			//if (ObjectUtilities.IsDelegate(xActualType)) {
+			//    if (aGCObjects) {
+			//        aTypeFields.Add("$$Obj$$", new TypeInformation.Field(aObjectStorageSize, 4, true, typeof(object)));
+			//        aObjectStorageSize += 4;
+			//    } else {
+			//        aTypeFields.Add("$$Method$$", new TypeInformation.Field(aObjectStorageSize, 4, false, typeof(uint)));
+			//        aObjectStorageSize += 4;
+			//    }
+			//}
 		}
 
 		public static SortedList<string, TypeInformation.Field> GetTypeFieldInfo(Type aType, out int aObjectStorageSize) {
