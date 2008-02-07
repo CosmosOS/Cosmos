@@ -169,6 +169,7 @@ namespace Cosmos.Build.Windows {
                     MakeISO();
                 // VMware [-x] [-X] [-q] [-s <variablename>=<value>]
                 //[-m] [-v] [/<path_to_config>/<config>.virtual machinex ]
+                    break;
 
             }
             Console.WriteLine("Press enter to continue.");
