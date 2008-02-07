@@ -99,9 +99,9 @@ namespace Cosmos.Build.Windows {
                     }
                 }
             } else if (rdioVMWare.IsChecked.Value) {
-                mTarget = Builder.Target.ISO;
+                mTarget = Builder.Target.VMWare;
             } else if (rdioVPC.IsChecked.Value) {
-                mTarget = Builder.Target.ISO;
+                mTarget = Builder.Target.VPC;
             } else if (rdioISO.IsChecked.Value) {
                 mTarget = Builder.Target.ISO;
             } else if (rdioPXE.IsChecked.Value) {

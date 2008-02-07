@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Win32;
 using System.Threading;
@@ -15,6 +16,7 @@ namespace Cosmos.Build.Windows {
         public readonly string ISOPath;
         public readonly string PXEPath;
         public readonly string AsmPath;
+        public readonly string VMWarePath;
         protected IBuildConfiguration mConfig;
 
         public Builder() {
@@ -23,6 +25,7 @@ namespace Cosmos.Build.Windows {
             ISOPath = BuildPath + @"ISO\";
             PXEPath = BuildPath + @"PXE\";
             AsmPath = ToolsPath + @"asm\";
+            VMWarePath = BuildPath + @"VMWare\";
         }
 
         public Builder(IBuildConfiguration aConfig) : this() {
@@ -56,12 +59,20 @@ namespace Cosmos.Build.Windows {
             }
         }
 
+        protected void RemoveReadOnly(string aPathname) {
+            var xAttribs = File.GetAttributes(aPathname);
+            if ((xAttribs & FileAttributes.ReadOnly) > 0) {
+                // This works because we only do this if Read only is already set
+                File.SetAttributes(aPathname, xAttribs ^ FileAttributes.ReadOnly);
+            }
+        }
+
         protected void MakeISO() {
             RemoveFile(BuildPath + "cosmos.iso");
             RemoveFile(ISOPath + "output.bin");
             File.Copy(BuildPath + "output.bin", ISOPath + "output.bin");
             // From TFS its read only, mkisofs doesnt like that
-            File.SetAttributes(ISOPath + "isolinux.bin", FileAttributes.Normal);
+            RemoveReadOnly(ISOPath + "isolinux.bin");
             Global.Call(ToolsPath + @"mkisofs.exe", @"-R -b isolinux.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o ..\Cosmos.iso .", ISOPath);
         }
 
@@ -167,8 +178,16 @@ namespace Cosmos.Build.Windows {
 
                 case Target.VMWare:
                     MakeISO();
-                // VMware [-x] [-X] [-q] [-s <variablename>=<value>]
-                //[-m] [-v] [/<path_to_config>/<config>.virtual machinex ]
+                    RemoveReadOnly(VMWarePath + "Cosmos.nvram");
+                    RemoveReadOnly(VMWarePath + "Cosmos.vmsd");
+                    RemoveReadOnly(VMWarePath + "Cosmos.vmx");
+                    RemoveReadOnly(VMWarePath + "Cosmos.vmxf");
+                    RemoveReadOnly(VMWarePath + "hda.vmdk");
+                    Process.Start(VMWarePath + "Cosmos.vmx");
+                    break;
+
+                case Target.VPC:
+                    MakeISO();
                     break;
 
             }
