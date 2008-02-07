@@ -16,6 +16,38 @@ namespace Indy.IL2CPU.IL.X86 {
 			TargetLabel = GetInstructionLabel(aReader.OperandValueBranchPosition);
 			CurInstructionLabel = GetInstructionLabel(aReader);
 		}
+
+		private void DoAssemble32Bit() {
+			string BaseLabel = CurInstructionLabel + "__";
+			string LabelTrue = BaseLabel + "True";
+			string LabelFalse = BaseLabel + "False";
+			new CPUx86.Pop(CPUx86.Registers.EAX);
+			new CPUx86.Compare(CPUx86.Registers.EAX, CPUx86.Registers.AtESP);
+			new CPUx86.JumpIfGreaterOrEquals(LabelTrue);
+			new CPUx86.JumpAlways(LabelTrue);
+			new CPU.Label(LabelTrue);
+			new CPUx86.Add(CPUx86.Registers.ESP, "4");
+			new CPUx86.JumpAlways(TargetLabel);
+			new CPU.Label(LabelFalse);
+			new CPUx86.Add(CPUx86.Registers.ESP, "4");
+		}
+
+		private void DoAssemble64Bit() {
+			throw new Exception("Not implemented");
+			string BaseLabel = CurInstructionLabel + "__";
+			string LabelTrue = BaseLabel + "True";
+			string LabelFalse = BaseLabel + "False";
+			new CPUx86.Pop(CPUx86.Registers.EAX);
+			new CPUx86.Compare(CPUx86.Registers.EAX, "[esp + 4]");
+			new CPUx86.JumpIfGreaterOrEquals(LabelFalse);
+			new CPUx86.JumpAlways(LabelTrue);
+			new CPU.Label(LabelTrue);
+			new CPUx86.Add(CPUx86.Registers.ESP, "4");
+			new CPUx86.JumpAlways(TargetLabel);
+			new CPU.Label(LabelFalse);
+			new CPUx86.Add(CPUx86.Registers.ESP, "4");
+		}
+
 		public override void DoAssemble() {
 			StackContent xItem1 = Assembler.StackContents.Pop();
 			StackContent xItem2 = Assembler.StackContents.Pop();
@@ -24,29 +56,14 @@ namespace Indy.IL2CPU.IL.X86 {
 			if (xIsFloat) {
 				throw new Exception("Floats not yet supported!");
 			}
-			if (xSize > 8)
+			if (xSize > 8) {
 				throw new Exception("StackSize>8 not supported");
-			string BaseLabel = CurInstructionLabel + "__";
-			string LabelTrue = BaseLabel + "True";
-			string LabelFalse = BaseLabel + "False";
-			new CPUx86.Pop(CPUx86.Registers.EAX);
-			if (xSize > 4) {
-				new CPUx86.Add("esp", "4");
 			}
-			new CPUx86.Compare(CPUx86.Registers.EAX, CPUx86.Registers.AtESP);
-			new CPUx86.JumpIfGreaterOrEquals(LabelFalse);
-			new CPUx86.JumpAlways(LabelTrue);
-			new CPU.Label(LabelTrue);
 			if (xSize > 4) {
-				new CPUx86.Add("esp", "4");
+				DoAssemble64Bit();
+			} else {
+				DoAssemble32Bit();
 			}
-			new CPUx86.Add(CPUx86.Registers.ESP, "4");
-			new CPUx86.JumpAlways(TargetLabel);
-			new CPU.Label(LabelFalse);
-			if (xSize > 4) {
-				new CPUx86.Add("esp", "4");
-			}
-			new CPUx86.Add(CPUx86.Registers.ESP, "4");
 		}
 	}
 }

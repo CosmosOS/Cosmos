@@ -1015,7 +1015,7 @@ namespace Indy.IL2CPU {
 						xFieldSize = GetFieldStorageSize(xFieldType);
 					}
 					//}
-					if (aTypeFields.ContainsKey(xField.ToString())) {
+					if (aTypeFields.ContainsKey(xField.GetFullName())) {
 						continue;
 					}
 					int xOffset = aObjectStorageSize;
@@ -1025,7 +1025,10 @@ namespace Indy.IL2CPU {
 					} else {
 						aObjectStorageSize += xFieldSize;
 					}
-					aTypeFields.Add(xField.ToString(), new TypeInformation.Field(xOffset, xFieldSize, aGCObjects, xField.FieldType));
+					if (aTypeFields.ContainsKey(xField.GetFullName())) {
+						System.Diagnostics.Debugger.Break();
+					}
+					aTypeFields.Add(xField.GetFullName(), new TypeInformation.Field(xOffset, xFieldSize, aGCObjects, xField.FieldType));
 				}
 				if (aType.FullName != "System.Object" && aType.BaseType != null) {
 					aType = aType.BaseType;

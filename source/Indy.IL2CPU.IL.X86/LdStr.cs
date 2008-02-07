@@ -32,7 +32,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			string xDataVal = xDataByteArray.ToString().TrimEnd(',');
 			DataMember xDataMember = null;
 			if (!mDataMemberMap.TryGetValue(xDataVal, out xDataMember)) {
-				string xDataName = aAssembler.GetIdentifier("StringLiteral");
+				string xDataName = aAssembler.GetIdentifier("StringLiteral");					  
 				StringBuilder xRefByteArray = new StringBuilder();
 				xRefByteArray.Append("0x" + ((uint)Engine.RegisterType(Engine.GetType("mscorlib", "System.String"))).ToString("X"));
 				xRefByteArray.Append(",0x" + ((uint)InstanceTypeEnum.StaticEmbeddedObject).ToString("X") + ",");

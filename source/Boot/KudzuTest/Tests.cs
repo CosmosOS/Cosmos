@@ -12,31 +12,31 @@ namespace KudzuTest {
         static public void DoAll() {
             //Tests.Do("String Concatenation", Tests.StringConcat);
             Console.WriteLine("String test");
-            Console.WriteLine("  " + Tests.StringConcat());
+            //Console.WriteLine("  " + Tests.StringConcat());
             Console.WriteLine();
 
             Console.WriteLine("StringBuilder test");
-            //Console.WriteLine("  " + Tests.StringBuilder());
+            Console.WriteLine("  " + Tests.StringBuilder());
             Console.WriteLine();
 
-            Console.WriteLine("IntToStr 16 test");
-            Console.WriteLine("  " + Tests.IntToStr16());
-            Console.WriteLine();
+            //Console.WriteLine("IntToStr 16 test");
+            //Console.WriteLine("  " + Tests.IntToStr16());
+            //Console.WriteLine();
 
-            Console.WriteLine("IntToStr 32 test");
-            Console.WriteLine("  " + Tests.IntToStr32());
-            Console.WriteLine();
+            //Console.WriteLine("IntToStr 32 test");
+            //Console.WriteLine("  " + Tests.IntToStr32());
+            //Console.WriteLine();
 
-            Console.WriteLine("WriteLnUInt32 test");
+            //Console.WriteLine("WriteLnUInt32 test");
             //Console.WriteLine("  " + Tests.WriteLnUInt32());
-            Console.WriteLine();
+            //Console.WriteLine();
 
-            Console.WriteLine("Dictionary test");
+            //Console.WriteLine("Dictionary test");
             //Console.WriteLine("  " + Tests.Dictionary());
-            Console.WriteLine();
+            //Console.WriteLine();
 
-            Console.WriteLine("Concat conversion test");
-            Console.WriteLine("  " + Tests.ConcatConversion());
+            //Console.WriteLine("Concat conversion test");
+            //Console.WriteLine("  " + Tests.ConcatConversion());
             //Console.WriteLine("  " + Tests.ConcatConversion2());
             //Console.WriteLine("  " + Tests.ConcatConversion3());
             Console.WriteLine();
@@ -107,9 +107,17 @@ namespace KudzuTest {
 
         //Fail - Important
         static public string StringBuilder() {
-            var xSB = new System.Text.StringBuilder("Hello");
-            xSB.Append(" world.");
-            return xSB.ToString();
+			System.Console.WriteLine("Step 0");
+			System.Diagnostics.Debugger.Break();
+			var xSB = new System.Text.StringBuilder("Hello");
+			System.Diagnostics.Debugger.Break();
+			Console.WriteLine("SB step one succeeded");
+			System.Diagnostics.Debugger.Break();
+			xSB.Append(" world.");
+			System.Diagnostics.Debugger.Break();
+			Console.WriteLine("SB step two succeeded");
+			System.Diagnostics.Debugger.Break();
+			return xSB.ToString();
         }
     }
 }

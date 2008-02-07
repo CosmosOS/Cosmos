@@ -15,19 +15,6 @@ namespace Indy.IL2CPU.CustomImplementation.System {
 			return new String(xItems);
 		}
 
-		[MethodAlias(Name = "System.Void System.String..ctor(System.Char[],System.Int32,System.Int32)")]
-		[PlugMethod()]
-		public static void Ctor(String aThis, [FieldAccess(Name = "$$Storage$$")]ref Char[] aStorage, Char[] aChars, int aStartIndex, int aLength) {
-			Char[] newChars = new Char[aLength];
-			Array.Copy(aChars, aStartIndex, newChars, 0, aLength);
-			aStorage = newChars;
-		}
-
-		[PlugMethod(Signature = "System_Void__System_String__ctor_System_Char___")]
-		public static void Ctor(String aThis, [FieldAccess(Name = "$$Storage$$")] ref Char[] aStorage, Char[] aChars) {
-			aStorage = aChars;
-		}
-
 		public static string Format(IFormatProvider aFormatProvider, string aFormat, object aArg) {
 			return "Format not implemented";
 		}
@@ -37,10 +24,10 @@ namespace Indy.IL2CPU.CustomImplementation.System {
 			xStrings[0] = aFormat;
 			xStrings[1] = "(";
 			for (int i = 0; i < aArgs.Length; i++) {
-				xStrings[2 + (i *7)] = "Param";
-				xStrings[3 + (i *7)] = i.ToString();
-				xStrings[4 + (i *7)] = "=";
-				xStrings[5 + (i *7)] = "\"";
+				xStrings[2 + (i * 7)] = "Param";
+				xStrings[3 + (i * 7)] = i.ToString();
+				xStrings[4 + (i * 7)] = "=";
+				xStrings[5 + (i * 7)] = "\"";
 				xStrings[6 + (i * 7)] = aArgs[i].ToString();
 				xStrings[7 + (i * 7)] = "\"";
 				if (i < (aArgs.Length - 1)) {
@@ -96,6 +83,11 @@ namespace Indy.IL2CPU.CustomImplementation.System {
 		[PlugMethod(Enabled = false)]
 		public static uint GetStorage(string aString) {
 			return 0;
+		}
+
+		[PlugMethod(Enabled = false)]
+		public static char[] GetStorageArray(string aString) {
+			return null;
 		}
 	}
 }

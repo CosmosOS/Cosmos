@@ -41,7 +41,7 @@ namespace System {
 		}
 
 		public static string GetFullName(this FieldInfo aField) {
-			return aField.DeclaringType.FullName + "." + aField.Name;
+			return aField.FieldType.FullName + " " + aField.DeclaringType.FullName + "." + aField.Name;
 		}
 	}
 }

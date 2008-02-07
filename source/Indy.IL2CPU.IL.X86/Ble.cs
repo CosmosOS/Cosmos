@@ -31,7 +31,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				new CPUx86.Add(CPUx86.Registers.ESP, "4");
 			}
 			new CPUx86.Compare(CPUx86.Registers.EAX, CPUx86.Registers.AtESP);
-			new CPUx86.JumpIfLessOrEqual(LabelFalse);
+			new CPUx86.JumpIfGreater(LabelFalse);
 			new CPUx86.JumpAlways(LabelTrue);
 			new CPU.Label(LabelTrue);
 			if (xSize > 4) {

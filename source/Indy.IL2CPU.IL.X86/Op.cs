@@ -239,18 +239,25 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		public static void Add(Assembler.Assembler aAssembler) {
 			StackContent xSize = aAssembler.StackContents.Pop();
-			new CPUx86.Pop("eax");
 			if (xSize.IsFloat) {
-				throw new Exception("Float support not yet implemented!");
+				throw new Exception("Floats not yet supported!");
 			}
-			if (xSize.Size == 8) {
+			if (xSize.Size > 8) {
+				throw new Exception("Size '" + xSize.Size + "' not supported");
+			}
+			if (xSize.Size > 4) {
+				new CPUx86.Pop("eax");
 				new CPUx86.Add("esp", "4");
-			}
-			new CPUx86.Add("eax", "[esp]");
-			new CPUx86.Add("esp", "4");
-			new Pushd("eax");
-			if (xSize.Size == 8) {
-				new CPUx86.Push("0");
+				new CPUx86.Add("eax", "[esp]");
+				new CPUx86.Add("esp", "4");
+				new CPUx86.Add("esp", "4");
+				new CPUx86.Pushd("0");
+				new Pushd("eax");
+			} else {
+				new CPUx86.Pop("eax");
+				new CPUx86.Add("eax", "[esp]");
+				new CPUx86.Add("esp", "4");
+				new Pushd("eax");
 			}
 		}
 
