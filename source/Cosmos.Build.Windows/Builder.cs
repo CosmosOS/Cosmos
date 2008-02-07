@@ -10,27 +10,26 @@ using System.Threading;
 
 namespace Cosmos.Build.Windows {
     public class Builder {
-        protected string mBuildPath;
-        protected string mToolsPath;
-        protected string mISOPath;
-        protected string mPXEPath;
-        protected string mAsmPath;
+        public readonly string BuildPath;
+        public readonly string ToolsPath;
+        public readonly string ISOPath;
+        public readonly string PXEPath;
+        public readonly string AsmPath;
         protected IBuildConfiguration mConfig;
 
         public Builder() {
-            mBuildPath = GetBuildPath();
-            mToolsPath = mBuildPath + @"Tools\";
-            mISOPath = mBuildPath + @"ISO\";
-            mPXEPath = mBuildPath + @"PXE\";
-            mAsmPath = mToolsPath + @"asm\";
+            BuildPath = GetBuildPath();
+            ToolsPath = BuildPath + @"Tools\";
+            ISOPath = BuildPath + @"ISO\";
+            PXEPath = BuildPath + @"PXE\";
+            AsmPath = ToolsPath + @"asm\";
         }
 
-        public Builder(IBuildConfiguration aConfig)
-            : this() {
+        public Builder(IBuildConfiguration aConfig) : this() {
             mConfig = aConfig;
         }
 
-        public static string GetBuildPath() {
+        protected static string GetBuildPath() {
             try {
                 RegistryKey xKey = Registry.CurrentUser.OpenSubKey(@"Software\Cosmos");
                 string xResult;
@@ -58,43 +57,43 @@ namespace Cosmos.Build.Windows {
         }
 
         protected void MakeISO() {
-            RemoveFile(mBuildPath + "cosmos.iso");
-            RemoveFile(mISOPath + "output.bin");
-            File.Copy(mBuildPath + "output.bin", mISOPath + "output.bin");
+            RemoveFile(BuildPath + "cosmos.iso");
+            RemoveFile(ISOPath + "output.bin");
+            File.Copy(BuildPath + "output.bin", ISOPath + "output.bin");
             // From TFS its read only, mkisofs doesnt like that
-            File.SetAttributes(mISOPath + "isolinux.bin", FileAttributes.Normal);
-            Global.Call(mToolsPath + @"mkisofs.exe", @"-R -b isolinux.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o ..\Cosmos.iso .", mISOPath);
+            File.SetAttributes(ISOPath + "isolinux.bin", FileAttributes.Normal);
+            Global.Call(ToolsPath + @"mkisofs.exe", @"-R -b isolinux.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o ..\Cosmos.iso .", ISOPath);
         }
 
         public void Compile() {
-            if (!Directory.Exists(mAsmPath)) {
-                Directory.CreateDirectory(mAsmPath);
+            if (!Directory.Exists(AsmPath)) {
+                Directory.CreateDirectory(AsmPath);
             }
             Assembly xTarget = System.Reflection.Assembly.GetEntryAssembly();
             Stopwatch xSW = new Stopwatch();
             xSW.Start();
             IL2CPU.Program.Main(new string[] {@"-in:" + xTarget.Location
-                , "-plug:" + mToolsPath + @"Cosmos.Kernel.Plugs\Cosmos.Kernel.Plugs.dll"
-                , "-platform:nativex86", "-asm:" + mAsmPath}
+                , "-plug:" + ToolsPath + @"Cosmos.Kernel.Plugs\Cosmos.Kernel.Plugs.dll"
+                , "-platform:nativex86", "-asm:" + AsmPath}
                 );
             xSW.Stop();
             Console.WriteLine("IL2CPU Run took " + xSW.Elapsed.ToString());
 
-            RemoveFile(mBuildPath + "output.obj");
-            Global.Call(mToolsPath + @"nasm\nasm.exe", String.Format("-g -f elf -F stabs -o \"{0}\" \"{1}\"", mBuildPath + "output.obj", mAsmPath + "main.asm"), mBuildPath);
+            RemoveFile(BuildPath + "output.obj");
+            Global.Call(ToolsPath + @"nasm\nasm.exe", String.Format("-g -f elf -F stabs -o \"{0}\" \"{1}\"", BuildPath + "output.obj", AsmPath + "main.asm"), BuildPath);
 
-            RemoveFile(mBuildPath + "output.bin");
-            Global.Call(mToolsPath + @"cygwin\ld.exe", String.Format("-Ttext 0x500000 -Tdata 0x200000 -e Kernel_Start -o \"{0}\" \"{1}\"", "output.bin", "output.obj"), mBuildPath);
-            RemoveFile(mBuildPath + "output.obj");
+            RemoveFile(BuildPath + "output.bin");
+            Global.Call(ToolsPath + @"cygwin\ld.exe", String.Format("-Ttext 0x500000 -Tdata 0x200000 -e Kernel_Start -o \"{0}\" \"{1}\"", "output.bin", "output.obj"), BuildPath);
+            RemoveFile(BuildPath + "output.obj");
         }
 
         public void BuildKernel() { }
 
-        public enum Target { ISO, PXE, QEMU, QEMU_With_Hard_Disk_Image, QEMU_GDB, QEMU_GDB_With_Hard_Disk_Image };
+        public enum Target { ISO, PXE, QEMU, QEMU_HardDisk, QEMU_GDB, QEMU_GDB_HardDisk, VMWare, VPC };
 
         public void Build() {
             if (mConfig == null) {
-                BuildOptionsWindow xOptions = new BuildOptionsWindow();
+                BuildOptionsWindow xOptions = new BuildOptionsWindow(this);
                 xOptions.ShowDialog();
                 mConfig = xOptions;
             }
@@ -109,62 +108,67 @@ namespace Cosmos.Build.Windows {
                     break;
 
                 case Target.PXE:
-                    RemoveFile(mPXEPath + @"Boot\output.bin");
-                    File.Move(mBuildPath + "output.bin", mPXEPath + @"Boot\output.bin");
+                    RemoveFile(PXEPath + @"Boot\output.bin");
+                    File.Move(BuildPath + "output.bin", PXEPath + @"Boot\output.bin");
                     // *Must* set working dir so tftpd32 will set itself to proper dir
-                    Global.Call(mPXEPath + "tftpd32.exe", "", mPXEPath, false, false);
+                    Global.Call(PXEPath + "tftpd32.exe", "", PXEPath, false, false);
                     break;
 
                 case Target.QEMU:
                     MakeISO();
-                    RemoveFile(mBuildPath + "serial-debug.txt");
-                    Global.Call(mToolsPath + @"qemu\qemu.exe"
-                        , "-L . -cdrom \"" + mBuildPath + "Cosmos.iso\" -boot d -serial"
-                        + " \"file:" + mBuildPath + "serial-debug.txt" + "\" -kernel-kqemu"
+                    RemoveFile(BuildPath + "serial-debug.txt");
+                    Global.Call(ToolsPath + @"qemu\qemu.exe"
+                        , "-L . -cdrom \"" + BuildPath + "Cosmos.iso\" -boot d -serial"
+                        + " \"file:" + BuildPath + "serial-debug.txt" + "\" -kernel-kqemu"
                         + " -net nic,model=rtl8139"
-                        , mToolsPath + @"qemu\"
+                        , ToolsPath + @"qemu\"
                         , false, true);
                     break;
 
-                case Target.QEMU_With_Hard_Disk_Image:
+                case Target.QEMU_HardDisk:
                     MakeISO();
-                    RemoveFile(mBuildPath + "serial-debug.txt");
-                    Global.Call(mToolsPath + @"qemu\qemu.exe"
-                        , "-hda \"" + mBuildPath + "hda.img\" -L . -cdrom \"" + mBuildPath + "Cosmos.iso\" -boot d -serial \"file:" + mBuildPath + "serial-debug.txt" + "\" -kernel-kqemu"
+                    RemoveFile(BuildPath + "serial-debug.txt");
+                    Global.Call(ToolsPath + @"qemu\qemu.exe"
+                        , "-hda \"" + BuildPath + "hda.img\" -L . -cdrom \"" + BuildPath + "Cosmos.iso\" -boot d -serial \"file:" + BuildPath + "serial-debug.txt" + "\" -kernel-kqemu"
                         + " -net nic,model=rtl8139"
-                        , mToolsPath + @"qemu\"
+                        , ToolsPath + @"qemu\"
                         , false, true);
                     break;
 
                 case Target.QEMU_GDB:
                     MakeISO();
-                    RemoveFile(mBuildPath + "serial-debug.txt");
-                    Global.Call(mToolsPath + @"qemu\qemu.exe"
-                        , "-L . -cdrom \"" + mBuildPath + "Cosmos.iso\" -boot d -serial \"file:" + mBuildPath + "serial-debug.txt" + "\" -S -s"
+                    RemoveFile(BuildPath + "serial-debug.txt");
+                    Global.Call(ToolsPath + @"qemu\qemu.exe"
+                        , "-L . -cdrom \"" + BuildPath + "Cosmos.iso\" -boot d -serial \"file:" + BuildPath + "serial-debug.txt" + "\" -S -s"
                         + " -net nic,model=rtl8139"
-                        , mToolsPath + @"qemu\"
+                        , ToolsPath + @"qemu\"
                         , false, true);
                     //TODO: If the host is really busy, sometimes GDB can run before QEMU finishes loading.
                     //in this case, GDB says "program not running". Not sure how to fix this properly.
-                    Global.Call(mToolsPath + "gdb.exe"
-                        , mBuildPath + @"output.bin" + " --eval-command=\"target remote:1234\" --eval-command=\"b _CODE_REQUESTED_BREAK_\" --eval-command=\"c\""
-                        , mToolsPath + @"qemu\", false, false);
+                    Global.Call(ToolsPath + "gdb.exe"
+                        , BuildPath + @"output.bin" + " --eval-command=\"target remote:1234\" --eval-command=\"b _CODE_REQUESTED_BREAK_\" --eval-command=\"c\""
+                        , ToolsPath + @"qemu\", false, false);
                     break;
 
-                case Target.QEMU_GDB_With_Hard_Disk_Image:
+                case Target.QEMU_GDB_HardDisk:
                     MakeISO();
-                    RemoveFile(mBuildPath + "serial-debug.txt");
-                    Global.Call(mToolsPath + @"qemu\qemu.exe"
-                        , "-hda \"" + mBuildPath + "hda.img\" -L . -cdrom \"" + mBuildPath + "Cosmos.iso\" -boot d -serial \"file:" + mBuildPath + "serial-debug.txt" + "\" -S -s"
+                    RemoveFile(BuildPath + "serial-debug.txt");
+                    Global.Call(ToolsPath + @"qemu\qemu.exe"
+                        , "-hda \"" + BuildPath + "hda.img\" -L . -cdrom \"" + BuildPath + "Cosmos.iso\" -boot d -serial \"file:" + BuildPath + "serial-debug.txt" + "\" -S -s"
                         + " -net nic,model=rtl8139"
-                        , mToolsPath + @"qemu\"
+                        , ToolsPath + @"qemu\"
                         , false, true);
                     //TODO: If the host is really busy, sometimes GDB can run before QEMU finishes loading.
                     //in this case, GDB says "program not running". Not sure how to fix this properly.
-                    Global.Call(mToolsPath + "gdb.exe"
-                        , mBuildPath + @"output.bin" + " --eval-command=\"target remote:1234\" --eval-command=\"b _CODE_REQUESTED_BREAK_\" --eval-command=\"c\""
-                        , mToolsPath + @"qemu\", false, false);
+                    Global.Call(ToolsPath + "gdb.exe"
+                        , BuildPath + @"output.bin" + " --eval-command=\"target remote:1234\" --eval-command=\"b _CODE_REQUESTED_BREAK_\" --eval-command=\"c\""
+                        , ToolsPath + @"qemu\", false, false);
                     break;
+
+                case Target.VMWare:
+                    MakeISO();
+                // VMware [-x] [-X] [-q] [-s <variablename>=<value>]
+                //[-m] [-v] [/<path_to_config>/<config>.virtual machinex ]
 
             }
             Console.WriteLine("Press enter to continue.");

@@ -15,8 +15,11 @@ namespace Cosmos.Build.Windows {
     public partial class BuildOptionsWindow : Window, IBuildConfiguration {
 
         protected Block mOptionsBlockPrefix;
-        public BuildOptionsWindow() {
+        protected Builder mBuilder;
+
+        public BuildOptionsWindow(Builder aBuilder) {
             InitializeComponent();
+            mBuilder = aBuilder;
 
             Loaded += delegate(object sender, RoutedEventArgs e) {
                 this.Activate();
@@ -25,43 +28,72 @@ namespace Cosmos.Build.Windows {
 
             rdioQEMU.Checked += new RoutedEventHandler(rdioTarget_Checked);
             rdioQEMU.Unchecked += new RoutedEventHandler(rdioTarget_Unchecked);
+            rdioVMWare.Checked += new RoutedEventHandler(rdioVMWare_Checked);
+            rdioVMWare.Unchecked += new RoutedEventHandler(rdioVMWare_Unchecked);
+            rdioVPC.Checked += new RoutedEventHandler(rdioVPC_Checked);
+            rdioVPC.Unchecked += new RoutedEventHandler(rdioVPC_Unchecked);
+            rdioISO.Checked += new RoutedEventHandler(rdioISO_Checked);
+            rdioISO.Unchecked += new RoutedEventHandler(rdioISO_Unchecked);
             rdioPXE.Checked += new RoutedEventHandler(rdioPXE_Checked);
             rdioPXE.Unchecked += new RoutedEventHandler(rdioPXE_Unchecked);
 
-            spanBuildPath.Inlines.Add(Builder.GetBuildPath());
+            spanBuildPath.Inlines.Add(mBuilder.BuildPath);
+            spanISOPath.Inlines.Add(mBuilder.ISOPath);
 
             mOptionsBlockPrefix = paraQEMUOptions.PreviousBlock;
             RootDoc.Blocks.Remove(paraQEMUOptions);
+            RootDoc.Blocks.Remove(paraVMWareOptions);
+            RootDoc.Blocks.Remove(paraVPCOptions);
+            RootDoc.Blocks.Remove(paraISOOptions);
             RootDoc.Blocks.Remove(paraPXEOptions);
         }
 
-        void rdioPXE_Unchecked(object sender, RoutedEventArgs e) {
-            RootDoc.Blocks.Remove(paraPXEOptions);
+        void rdioISO_Checked(object sender, RoutedEventArgs e) {
+            RootDoc.Blocks.InsertAfter(mOptionsBlockPrefix, paraISOOptions);
+        }
+        void rdioISO_Unchecked(object sender, RoutedEventArgs e) {
+            RootDoc.Blocks.Remove(paraISOOptions);
+        }
+
+        void rdioVPC_Checked(object sender, RoutedEventArgs e) {
+            RootDoc.Blocks.InsertAfter(mOptionsBlockPrefix, paraVPCOptions);
+        }
+        void rdioVPC_Unchecked(object sender, RoutedEventArgs e) {
+            RootDoc.Blocks.Remove(paraVPCOptions);
+        }
+
+        void rdioVMWare_Checked(object sender, RoutedEventArgs e) {
+            RootDoc.Blocks.InsertAfter(mOptionsBlockPrefix, paraVMWareOptions);
+        }
+        void rdioVMWare_Unchecked(object sender, RoutedEventArgs e) {
+            RootDoc.Blocks.Remove(paraVMWareOptions);
         }
 
         void rdioPXE_Checked(object sender, RoutedEventArgs e) {
             RootDoc.Blocks.InsertAfter(mOptionsBlockPrefix, paraPXEOptions);
         }
-
-        void rdioTarget_Unchecked(object sender, RoutedEventArgs e) {
-            RootDoc.Blocks.Remove(paraQEMUOptions);
+        void rdioPXE_Unchecked(object sender, RoutedEventArgs e) {
+            RootDoc.Blocks.Remove(paraPXEOptions);
         }
 
         void rdioTarget_Checked(object sender, RoutedEventArgs e) {
             RootDoc.Blocks.InsertAfter(mOptionsBlockPrefix, paraQEMUOptions);
+        }
+        void rdioTarget_Unchecked(object sender, RoutedEventArgs e) {
+            RootDoc.Blocks.Remove(paraQEMUOptions);
         }
 
         void butnBuild_Click(object sender, RoutedEventArgs e) {
             if (rdioQEMU.IsChecked.Value) {
                 if (chckQEMUUseGDB.IsChecked.Value) {
                     if (chckQEMUUseHD.IsChecked.Value) {
-                        mTarget = Builder.Target.QEMU_GDB_With_Hard_Disk_Image;
+                        mTarget = Builder.Target.QEMU_GDB_HardDisk;
                     } else {
                         mTarget = Builder.Target.QEMU_GDB;
                     }
                 } else {
                     if (chckQEMUUseHD.IsChecked.Value) {
-                        mTarget = Builder.Target.QEMU_With_Hard_Disk_Image;
+                        mTarget = Builder.Target.QEMU_HardDisk;
                     } else {
                         mTarget = Builder.Target.QEMU;
                     }

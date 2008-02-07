@@ -4,8 +4,6 @@
     Title="BuildOptionsWindow">
     <FlowDocumentScrollViewer>
     <FlowDocument Name="RootDoc">
-        <Paragraph>Current build path is <Span Name="spanBuildPath"></Span>
-        </Paragraph>
         <BlockUIContainer>
             <Image Source="/Cosmos.Build.Windows;component/Logo-1.png" Width="229" />
         </BlockUIContainer>
@@ -29,8 +27,12 @@
                 </WrapPanel>
             </InlineUIContainer>
         </Paragraph>
-        <Paragraph Name="paraQEMUOptions">
-            QEMU Options
+            <Paragraph>Current build path is:
+                <LineBreak/>                
+                <Span Name="spanBuildPath"></Span>
+            </Paragraph>
+            <Paragraph Name="paraQEMUOptions">
+                <Bold>QEMU Options</Bold>
             <LineBreak/>
             <InlineUIContainer>
                 <StackPanel>
@@ -39,8 +41,20 @@
                 </StackPanel>
             </InlineUIContainer>
         </Paragraph>
+        <Paragraph Name="paraVMWareOptions">
+                <Bold>VMWare Options</Bold> - Coming soon!
+        </Paragraph>
+        <Paragraph Name="paraVPCOptions">
+            <Bold>VPC Options</Bold> - Coming soon!
+        </Paragraph>
+        <Paragraph Name="paraISOOptions">
+                <Bold>ISO Options</Bold>
+                <LineBreak/>ISO file will be output in:
+                <LineBreak/>
+                <Span Name="spanISOPath"></Span>
+        </Paragraph>
         <Paragraph Name="paraPXEOptions">
-            PXE Options - Coming soon!
+            <Bold>PXE Options</Bold> - Coming soon!
         </Paragraph>
         <Paragraph>
             Uncheck 
