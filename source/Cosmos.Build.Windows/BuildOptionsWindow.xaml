@@ -3,20 +3,54 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Title="BuildOptionsWindow">
     <FlowDocumentScrollViewer>
-    <FlowDocument>
+    <FlowDocument Name="RootDoc">
         <Paragraph>Current build path is <Span Name="spanBuildPath"></Span>
         </Paragraph>
+        <BlockUIContainer>
+            <Image Source="/Cosmos.Build.Windows;component/Logo-1.png" Width="229" />
+        </BlockUIContainer>
         <Paragraph>
-        Please select a build type by pressing a number on the <Bold>main keyboard</Bold>. Please do not use the numbers on the num pad, they will not work.
+            Please select a build type:
+            <LineBreak/>
+            <InlineUIContainer>
+                <WrapPanel Margin="30, 0">
+                    <Label>Emulator: </Label>
+                    <RadioButton Name="rdioQEMU" GroupName="Target">_QEMU</RadioButton>
+                    <RadioButton Name="rdioVMWare" GroupName="Target" Margin="15, 0">VM_Ware</RadioButton>
+                    <RadioButton Name="rdioVPC" GroupName="Target" Margin="15, 0">Virtual _PC</RadioButton>
+                </WrapPanel>
+            </InlineUIContainer>
+            <LineBreak/>
+            <InlineUIContainer>
+                <WrapPanel Margin="30, 0">
+                    <Label>Hardware:</Label>
+                    <RadioButton GroupName="Target" Name="rdioISO">_ISO</RadioButton>
+                    <RadioButton GroupName="Target" Name="rdioPXE" Margin="15, 0">_Network Boot</RadioButton>
+                </WrapPanel>
+            </InlineUIContainer>
         </Paragraph>
-        <BlockUIContainer>
-        <ListBox Name="lboxTargets" />
-            </BlockUIContainer>
-        <BlockUIContainer>
-            <Image Source="/Cosmos.Build.Windows;component/Logo-1.png" Height="106" Width="229" />
-        </BlockUIContainer>
-        <BlockUIContainer>
-            <CheckBox Name="buildCheckBox" IsChecked="True">Build</CheckBox>
-        </BlockUIContainer>
+        <Paragraph Name="paraQEMUOptions">
+            QEMU Options
+            <LineBreak/>
+            <InlineUIContainer>
+                <StackPanel>
+                <CheckBox Name="chckQEMUUseGDB" IsChecked="True">Use GDB Debugger</CheckBox>
+                <CheckBox Name="chckQEMUUseHD">Create hard disk image</CheckBox>
+                </StackPanel>
+            </InlineUIContainer>
+        </Paragraph>
+        <Paragraph Name="paraPXEOptions">
+            PXE Options - Coming soon!
+        </Paragraph>
+        <Paragraph>
+            Uncheck 
+            <InlineUIContainer><CheckBox Name="buildCheckBox" IsChecked="True"/></InlineUIContainer>
+            if you want to skip IL compilation.
+        </Paragraph>
+        <Paragraph TextAlignment="Right">
+            <InlineUIContainer>
+                <Button Name="butnBuild">_Build</Button>
+            </InlineUIContainer>
+        </Paragraph>
     </FlowDocument>
 </FlowDocumentScrollViewer></Window>

@@ -14,41 +14,68 @@ using System.Windows.Shapes;
 namespace Cosmos.Build.Windows {
     public partial class BuildOptionsWindow : Window, IBuildConfiguration {
 
+        protected Block mOptionsBlockPrefix;
         public BuildOptionsWindow() {
             InitializeComponent();
 
-            KeyDown += new KeyEventHandler(BuildOptionsWindow_KeyDown);
-            Loaded += new RoutedEventHandler(BuildOptionsWindow_Loaded);
+            Loaded += delegate(object sender, RoutedEventArgs e) {
+                this.Activate();
+            };
+            butnBuild.Click += new RoutedEventHandler(butnBuild_Click);
+
+            rdioQEMU.Checked += new RoutedEventHandler(rdioTarget_Checked);
+            rdioQEMU.Unchecked += new RoutedEventHandler(rdioTarget_Unchecked);
+            rdioPXE.Checked += new RoutedEventHandler(rdioPXE_Checked);
+            rdioPXE.Unchecked += new RoutedEventHandler(rdioPXE_Unchecked);
 
             spanBuildPath.Inlines.Add(Builder.GetBuildPath());
 
-            // { ISO, PXE, QEMU, QEMU_With_Hard_Disk_Image, QEMU_GDB, QEMU_GDB_With_Hard_Disk_Image };
-            foreach (var xTarget in Enum.GetNames(typeof(Builder.Target))) {
-                lboxTargets.Items.Add((lboxTargets.Items.Count + 1).ToString() + ": " + xTarget.Replace('_', ' '));
-            }
+            mOptionsBlockPrefix = paraQEMUOptions.PreviousBlock;
+            RootDoc.Blocks.Remove(paraQEMUOptions);
+            RootDoc.Blocks.Remove(paraPXEOptions);
         }
 
-        void BuildOptionsWindow_Loaded(object sender, RoutedEventArgs e) {
-            //Stupid window always shows up behind console, bring it up.
-            this.Activate();
+        void rdioPXE_Unchecked(object sender, RoutedEventArgs e) {
+            RootDoc.Blocks.Remove(paraPXEOptions);
         }
 
-        void BuildOptionsWindow_KeyDown(object sender, KeyEventArgs e) {
-            var xConverter = new KeyConverter();
-            char xChar = xConverter.ConvertToString(e.Key)[0];
-            if (Char.IsDigit(xChar)) {
-                int xValue = int.Parse(xChar.ToString());
-                if (xValue > 0) {
-                    if (xValue <= lboxTargets.Items.Count) {
-                        string xType = (string)(lboxTargets.Items[xValue - 1]);
-                        Hide();
-                        var xBuilder = new Builder();
-                        mTarget = (Builder.Target)Enum.Parse(typeof(Builder.Target), xType.Remove(0, 3).Replace(' ', '_'));
-                        Close();
+        void rdioPXE_Checked(object sender, RoutedEventArgs e) {
+            RootDoc.Blocks.InsertAfter(mOptionsBlockPrefix, paraPXEOptions);
+        }
+
+        void rdioTarget_Unchecked(object sender, RoutedEventArgs e) {
+            RootDoc.Blocks.Remove(paraQEMUOptions);
+        }
+
+        void rdioTarget_Checked(object sender, RoutedEventArgs e) {
+            RootDoc.Blocks.InsertAfter(mOptionsBlockPrefix, paraQEMUOptions);
+        }
+
+        void butnBuild_Click(object sender, RoutedEventArgs e) {
+            if (rdioQEMU.IsChecked.Value) {
+                if (chckQEMUUseGDB.IsChecked.Value) {
+                    if (chckQEMUUseHD.IsChecked.Value) {
+                        mTarget = Builder.Target.QEMU_GDB_With_Hard_Disk_Image;
+                    } else {
+                        mTarget = Builder.Target.QEMU_GDB;
+                    }
+                } else {
+                    if (chckQEMUUseHD.IsChecked.Value) {
+                        mTarget = Builder.Target.QEMU_With_Hard_Disk_Image;
+                    } else {
+                        mTarget = Builder.Target.QEMU;
                     }
                 }
-                e.Handled = true;
+            } else if (rdioVMWare.IsChecked.Value) {
+                mTarget = Builder.Target.ISO;
+            } else if (rdioVPC.IsChecked.Value) {
+                mTarget = Builder.Target.ISO;
+            } else if (rdioISO.IsChecked.Value) {
+                mTarget = Builder.Target.ISO;
+            } else if (rdioPXE.IsChecked.Value) {
+                mTarget = Builder.Target.PXE;
             }
+            Close();
         }
 
         #region IBuildConfiguration Members
@@ -59,7 +86,6 @@ namespace Cosmos.Build.Windows {
                 return mTarget;
             }
             set {
-
             }
         }
 
