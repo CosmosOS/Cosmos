@@ -28,6 +28,7 @@ namespace Indy.IL2CPU.Assembler {
 				|| aType == typeof(long)
 				|| aType == typeof(Single)
 				|| aType == typeof(Double));
+			ContentType = aType;
 		}
 
 		public StackContent(int aSize, bool aIsNumber, bool aIsFloat, bool aIsSigned)
@@ -40,5 +41,7 @@ namespace Indy.IL2CPU.Assembler {
 		public readonly bool IsNumber = false;
 		public readonly bool IsFloat = false;
 		public readonly bool IsSigned = false;
+		public readonly Type ContentType = null;
+		public readonly bool IsBox = false;
 	}
 }

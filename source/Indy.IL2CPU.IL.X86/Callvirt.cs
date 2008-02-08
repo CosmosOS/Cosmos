@@ -17,11 +17,12 @@ namespace Indy.IL2CPU.IL.X86 {
 		private readonly int mArgumentCount;
 		private readonly int mReturnSize;
 		private readonly string mLabelName;
-		private readonly MethodInformation mMethodInfo;
+		private readonly MethodInformation mCurrentMethodInfo;
+		private readonly MethodInformation mTargetMethodInfo;
 		public Callvirt(ILReader aReader, MethodInformation aMethodInfo)
 			: base(aReader, aMethodInfo) {
 			mLabelName = GetInstructionLabel(aReader);
-			mMethodInfo = aMethodInfo;
+			mCurrentMethodInfo = aMethodInfo;
 			int xThisOffSet = (from item in aMethodInfo.Locals
 							   select item.Offset + item.Size).LastOrDefault();
 			MethodBase xMethod = aReader.OperandValueMethod;
@@ -30,23 +31,23 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			MethodBase xMethodDef = xMethod;
 			mMethodDescription = CPU.Label.GenerateLabelName(xMethodDef);
-			MethodInformation xTheMethodInfo = Engine.GetMethodInfo(xMethodDef, xMethodDef, mMethodDescription, null);
+			mTargetMethodInfo = Engine.GetMethodInfo(xMethodDef, xMethodDef, mMethodDescription, null);
 			if (xMethodDef.IsStatic || !xMethodDef.IsVirtual) {
 				Engine.QueueMethod(xMethodDef);
 				mNormalAddress = CPU.Label.GenerateLabelName(xMethodDef);
-				mReturnSize = xTheMethodInfo.ReturnSize;
+				mReturnSize = mTargetMethodInfo.ReturnSize;
 				return;
 			}
 			mMethodIdentifier = Engine.GetMethodIdentifier(xMethodDef);
 			Engine.QueueMethod(VTablesImplRefs.GetMethodAddressForTypeRef);
-			mArgumentCount = xTheMethodInfo.Arguments.Length;
-			mReturnSize = xTheMethodInfo.ReturnSize;
-			mThisOffset = xTheMethodInfo.Arguments[0].Offset;
+			mArgumentCount = mTargetMethodInfo.Arguments.Length;
+			mReturnSize = mTargetMethodInfo.ReturnSize;
+			mThisOffset = mTargetMethodInfo.Arguments[0].Offset;
 		}
 
 		public override void DoAssemble() {
 			Action xEmitCleanup = delegate() {
-				foreach (MethodInformation.Argument xArg in mMethodInfo.Arguments) {
+				foreach (MethodInformation.Argument xArg in mTargetMethodInfo.Arguments) {
 					new CPUx86.Add("esp", xArg.Size.ToString());
 				}
 			};
@@ -58,15 +59,41 @@ namespace Indy.IL2CPU.IL.X86 {
 				}
 				//Assembler.Add(new CPUx86.Pop("eax"));
 				//Assembler.Add(new CPUx86.Pushd("eax"));
-				EmitCompareWithNull(Assembler, mMethodInfo, "[esp + 0x" + mThisOffset.ToString("X") + "]", mLabelName, mLabelName + "_AfterNullRefCheck", xEmitCleanup);
+				EmitCompareWithNull(Assembler, mCurrentMethodInfo, "[esp + 0x" + mThisOffset.ToString("X") + "]", mLabelName, mLabelName + "_AfterNullRefCheck", xEmitCleanup);
 				new CPU.Label(mLabelName + "_AfterNullRefCheck");
 				new CPUx86.Move(CPUx86.Registers.EAX, "[esp + 0x" + mThisOffset.ToString("X") + "]");
 				new CPUx86.Pushd(CPUx86.Registers.AtEAX);
 				new CPUx86.Pushd("0" + mMethodIdentifier.ToString("X") + "h");
 				new CPUx86.Call(CPU.Label.GenerateLabelName(VTablesImplRefs.GetMethodAddressForTypeRef));
-				Call.EmitExceptionLogic(Assembler, mMethodInfo, mLabelName + "_AfterAddressCheck", true);
+				Call.EmitExceptionLogic(Assembler, mCurrentMethodInfo, mLabelName + "_AfterAddressCheck", true);
 				new CPU.Label(mLabelName + "_AfterAddressCheck");
-				new CPUx86.Call(CPUx86.Registers.EAX);
+				if (mTargetMethodInfo.Arguments[0].ArgumentType == typeof(object)) {
+					new CPUx86.Push("eax");
+					new CPUx86.Move("eax", "[esp + " + (mThisOffset + 4) + "]");
+					new CPUx86.Compare("dword [eax + 4]", ((int)InstanceTypeEnum.BoxedValueType).ToString());
+					new CPUx86.Pop("eax");
+					new CPUx86.JumpIfNotEquals(mLabelName + "_NOT_BOXED_THIS");
+					new CPUx86.Push("eax");
+					new CPUx86.Move("eax", "[esp + " + (mThisOffset + 4) + "]");
+					new CPUx86.Add("eax", ObjectImpl.FieldDataOffset.ToString());
+					new CPUx86.Pushd("[eax]");
+					for (int i = mThisOffset; i > 0; i -= 4) {
+						new CPUx86.Push("[esp + " + mThisOffset + "]");
+					}
+					new CPUx86.Move("eax", "esp");
+					new CPUx86.Add("eax", (mThisOffset).ToString());
+					new CPUx86.Pushd(CPUx86.Registers.EAX);
+					new CPUx86.Move("eax", "[esp + " + (mThisOffset + 8) + "]");
+					new CPUx86.Call(CPUx86.Registers.EAX);
+					new CPUx86.Add("esp", "8");
+					for (int i = mThisOffset; i >= 0; i -= 4) {
+						new CPUx86.Add("esp", "4");
+					}
+					new CPUx86.JumpAlways(mLabelName + "__AFTER_NOT_BOXED_THIS");
+				}
+				new CPU.Label(mLabelName + "_NOT_BOXED_THIS");
+				new CPUx86.Call("eax");
+				new CPU.Label(mLabelName + "__AFTER_NOT_BOXED_THIS");
 			}
 			if (!Assembler.InMetalMode) {
 				new CPUx86.Test("ecx", "2");
@@ -81,13 +108,13 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			if (mReturnSize <= 4) {
 				new CPUx86.Pushd(CPUx86.Registers.EAX);
-				Assembler.StackContents.Push(new StackContent(mReturnSize, mMethodInfo.ReturnType));
+				Assembler.StackContents.Push(new StackContent(mReturnSize, mCurrentMethodInfo.ReturnType));
 				return;
 			}
 			if (mReturnSize <= 8) {
 				new CPUx86.Pushd(CPUx86.Registers.EBX);
 				new CPUx86.Pushd(CPUx86.Registers.EAX);
-				Assembler.StackContents.Push(new StackContent(mReturnSize, mMethodInfo.ReturnType));
+				Assembler.StackContents.Push(new StackContent(mReturnSize, mCurrentMethodInfo.ReturnType));
 				return;
 			}
 		}
