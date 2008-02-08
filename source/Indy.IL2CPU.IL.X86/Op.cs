@@ -151,20 +151,20 @@ namespace Indy.IL2CPU.IL.X86 {
 				new CPUx86.Move("ecx", "[ecx]");
 			}
 			if (aField.Size >= 4) {
-				for (int i = 0; i < (aField.Size / 4); i++) {
-					new CPUx86.Move("eax", "[ecx + 0x" + (i * 4).ToString("X") + "]");
+				for (int i = 1; i <= (aField.Size / 4); i++) {
+					new CPUx86.Move("eax", "[ecx + 0x" + (aField.Size - (i * 4)).ToString("X") + "]");
 					new CPUx86.Pushd("eax");
 				}
 				switch (aField.Size % 4) {
 					case 1: {
 							new CPUx86.Move("eax", "0");
-							new CPUx86.Move("al", "[ecx + 0x" + (aField.Size - 1).ToString("X") + "]");
+							new CPUx86.Move("al", "[ecx]");
 							new CPUx86.Push("eax");
 							break;
 						}
 					case 2: {
 							new CPUx86.Move("eax", "0");
-							new CPUx86.Move("ax", "[ecx + 0x" + (aField.Size - 2).ToString("X") + "]");
+							new CPUx86.Move("ax", "[ecx + 0x]");
 							new CPUx86.Push("eax");
 							break;
 						}
@@ -213,25 +213,27 @@ namespace Indy.IL2CPU.IL.X86 {
 			if (aType.NeedsGC && !aAssembler.InMetalMode) {
 				aExtraOffset = 12;
 				new CPUx86.Pushd("[esp + 4]");
-				Ldfld(aAssembler, aType, aField, false);
+				//Ldfld(aAssembler, aType, aField, false);
+				new CPUx86.Pop("eax");
+				new CPUx86.Pushd("[eax + " + (aField.Offset + aExtraOffset) + "]");
 				Engine.QueueMethod(GCImplementationRefs.DecRefCountRef);
 				new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef));
 			}
 			new CPUx86.Move("ecx", "[esp + 0x" + xRoundedSize.ToString("X") + "]");
 			new CPUx86.Add("ecx", "0x" + (aField.Offset + aExtraOffset).ToString("X"));
-			for (int i = 1; i <= (aField.Size / 4); i++) {
+			for (int i = 0; i < (aField.Size / 4); i++) {
 				new CPUx86.Pop("eax");
-				new Move("dword [ecx + 0x" + (aField.Size - (i * 4)).ToString("X") + "]", "eax");
+				new Move("dword [ecx + 0x" + (i * 4).ToString("X") + "]", "eax");
 			}
 			switch (aField.Size % 4) {
 				case 1: {
 						new CPUx86.Pop("eax");
-						new Move("byte [ecx]", "al");
+						new Move("byte [ecx + " + ((aField.Size / 4) * 4) + "]", "al");
 						break;
 					}
 				case 2: {
 						new CPUx86.Pop("eax");
-						new Move("word [ecx]", "ax");
+						new Move("word [ecx + " + ((aField.Size / 4) * 4) + "]", "ax");
 						break;
 					}
 				case 0: {

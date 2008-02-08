@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Indy.IL2CPU.Assembler;
 
 
@@ -35,7 +36,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				Engine.QueueMethod(GCImplementationRefs.DecRefCountRef);
 				new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef));
 			}
-			foreach (string s in mLocal.VirtualAddresses) {
+			foreach (string s in mLocal.VirtualAddresses.Reverse()) {
 				new CPUx86.Pop(CPUx86.Registers.EAX);
 				new CPUx86.Move("[" + s + "]", "eax");
 			}

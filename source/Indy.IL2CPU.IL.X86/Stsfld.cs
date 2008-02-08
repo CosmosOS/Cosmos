@@ -31,19 +31,19 @@ namespace Indy.IL2CPU.IL.X86 {
 				Engine.QueueMethod(GCImplementationRefs.DecRefCountRef);
 				new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef));
 			}
-			for (int i = 1; i <= (mSize / 4); i++) {
+			for (int i = 0; i < (mSize / 4); i++) {
 				new CPUx86.Pop(CPUx86.Registers.EAX);
-				new CPUx86.Move("dword [" + mDataName + " + 0x" + (mSize - (i * 4)).ToString("X") + "]", "eax");
+				new CPUx86.Move("dword [" + mDataName + " + 0x" + ((i * 4)).ToString("X") + "]", "eax");
 			}
 			switch (mSize % 4) {
 				case 1: {
 						new CPUx86.Pop(CPUx86.Registers.EAX);
-						new CPUx86.Move("byte [" + mDataName + "]", "al");
+						new CPUx86.Move("byte [" + mDataName + " + " + ((mSize/4)*4)  + "]", "al");
 						break;
 					}
 				case 2: {
 						new CPUx86.Pop(CPUx86.Registers.EAX);
-						new CPUx86.Move("word [" + mDataName + "]", "ax");
+						new CPUx86.Move("word [" + mDataName + " + " + ((mSize / 4) * 4) + "]", "ax");
 						break;
 					}
 				case 0: {

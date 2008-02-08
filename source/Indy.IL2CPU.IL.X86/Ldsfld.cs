@@ -22,21 +22,21 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 		public override void DoAssemble() {
 			if (mSize >= 4) {
-				for (int i = 0; i < (mSize / 4); i++) {
+				for (int i = 1; i <= (mSize / 4); i++) {
 					//	Pop("eax");
 					//	Move(Assembler, "dword [" + mDataName + " + 0x" + (i * 4).ToString("X") + "]", "eax");
-					new CPUx86.Pushd("[" + mDataName + " + 0x" + (i * 4).ToString("X") + "]");
+					new CPUx86.Pushd("[" + mDataName + " + 0x" + (mSize - (i * 4)).ToString("X") + "]");
 				}
 				switch (mSize % 4) {
 					case 1: {
-							new CPUx86.Move(CPUx86.Registers.EAX, "0");
-							new CPUx86.Move(CPUx86.Registers.AL, "[" + mDataName + " + 0x" + (mSize - 1).ToString("X") + "]");
+							new CPUx86.Move(CPUx86.Registers.EAX, "0");						//mSize - 1
+							new CPUx86.Move(CPUx86.Registers.AL, "[" + mDataName + " + 0x" + (0).ToString("X") + "]");
 							new CPUx86.Push(CPUx86.Registers.EAX);
 							break;
 						}
 					case 2: {
 							new CPUx86.Move(CPUx86.Registers.EAX, "0");
-							new CPUx86.Move(CPUx86.Registers.AX, "[" + mDataName + " + 0x" + (mSize - 2).ToString("X") + "]");
+							new CPUx86.Move(CPUx86.Registers.AX, "[" + mDataName + " + 0x" + (0).ToString("X") + "]");
 							new CPUx86.Push(CPUx86.Registers.EAX);
 							break;
 						}

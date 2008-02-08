@@ -767,11 +767,11 @@ namespace Indy.IL2CPU {
 								// todo: add better detection of implementation state
 								if (xBody != null) {
 									// todo: add support for types which need different stack size
-									foreach (LocalVariableInfo xLocal in xBody.LocalVariables) {
-										if (xLocal.LocalType.IsValueType && !xLocal.LocalType.IsPrimitive && !xLocal.LocalType.IsEnum && !xLocal.LocalType.IsPointer) {
-											throw new Exception("Structs as locals not yet supported!");
-										}
-									}
+									//foreach (LocalVariableInfo xLocal in xBody.LocalVariables) {
+									//    if (xLocal.LocalType.IsValueType && !xLocal.LocalType.IsPrimitive && !xLocal.LocalType.IsEnum && !xLocal.LocalType.IsPointer) {
+									//        throw new Exception("Structs as locals not yet supported!");
+									//    }
+									//}
 									mInstructionsToSkip = 0;
 									mAssembler.StackContents.Clear();
 									ILReader xReader = new ILReader(xCurrentMethod);
@@ -1010,7 +1010,7 @@ namespace Indy.IL2CPU {
 			TypeInformation xTypeInfo;
 			int xObjectStorageSize;
 			SortedList<string, TypeInformation.Field> xTypeFields = GetTypeFieldInfo(aType, out xObjectStorageSize);
-			xTypeInfo = new TypeInformation(xObjectStorageSize, xTypeFields, aType, !aType.IsValueType);
+			xTypeInfo = new TypeInformation(xObjectStorageSize, xTypeFields, aType, (!aType.IsValueType) && aType.IsClass);
 			return xTypeInfo;
 		}
 
@@ -1138,7 +1138,7 @@ namespace Indy.IL2CPU {
 					if (xFieldType == null) {
 						xFieldType = xField.FieldType;
 					}
-					if ((!xFieldType.IsValueType && aGCObjects) || (xPlugFieldAttr != null && xPlugFieldAttr.IsExternalValue && aGCObjects)) {
+					if ((!xFieldType.IsValueType && aGCObjects && xFieldType.IsClass) || (xPlugFieldAttr != null && xPlugFieldAttr.IsExternalValue && aGCObjects)) {
 						continue;
 					}
 					if ((xFieldType.IsClass && !xFieldType.IsValueType) || (xPlugFieldAttr != null && xPlugFieldAttr.IsExternalValue)) {

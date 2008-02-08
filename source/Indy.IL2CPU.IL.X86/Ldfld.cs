@@ -26,9 +26,6 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public override void DoAssemble() {
-			foreach (var xField in mType.Fields) {
-				new CPU.Comment(String.Format("{0} -- {1}", xField.Key, xField.Value.ToString()));
-			}
 			Ldfld(Assembler, mType, mField);
 		}
 	}

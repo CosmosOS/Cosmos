@@ -12,6 +12,13 @@ namespace Indy.IL2CPU.IL.CustomImplementations.System {
 		}
 
 		public static string GetNumberString(uint aValue, bool aIsNegative) {
+			if (aValue == 0) {
+				if (aIsNegative) {
+					return "-0";
+				} else {
+					return "0";
+				}
+			}
 			const string xDigits = "0123456789";
 			char[] xResultChars = new char[11];
 			int xCurrentPos = 10;
