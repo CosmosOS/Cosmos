@@ -7,7 +7,7 @@ using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using Indy.IL2CPU.Assembler;
 
-namespace Indy.IL2CPU.IL.X86 {								  
+namespace Indy.IL2CPU.IL.X86 {
 	public abstract class X86OpCodeMap: OpCodeMap {
 		protected override Type GetMethodHeaderOp() {
 			return typeof(X86MethodHeaderOp);
@@ -132,6 +132,12 @@ namespace Indy.IL2CPU.IL.X86 {
 							new CPUx86.Call(CPUx86.Registers.EAX);
 							//							new CPUx86.Pop(CPUx86.Registers.EAX);
 							new CPUx86.Move("esp", "ebp");
+							if (aMethodInfo.ReturnType != null && aMethodInfo.ReturnType != typeof(void)) {
+								if (aMethodInfo.ReturnSize > 4) {
+									new CPUx86.Push(CPUx86.Registers.EBX);
+								}
+								new CPUx86.Push(CPUx86.Registers.EAX);
+							}
 							break;
 						}
 					}

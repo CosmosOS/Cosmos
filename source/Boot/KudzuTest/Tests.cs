@@ -10,7 +10,7 @@ namespace KudzuTest {
         public delegate object TestDelegate();
 
         static public void DoAll() {
-            //Tests.Do("String Concatenation", Tests.StringConcat);
+            Tests.Do("String Concatenation", Tests.StringConcat);
             Console.WriteLine("String test");
             Console.WriteLine("  " + Tests.StringConcat());
             Console.WriteLine();
@@ -36,7 +36,7 @@ namespace KudzuTest {
 			//Console.WriteLine();
 
 			Console.WriteLine("Concat conversion test");
-			//Console.WriteLine("  " + Tests.ConcatConversion());
+			Console.WriteLine("  " + Tests.ConcatConversion());
             Console.WriteLine("  " + Tests.ConcatConversion2());
             Console.WriteLine("  " + Tests.ConcatConversion3());
             Console.WriteLine();
