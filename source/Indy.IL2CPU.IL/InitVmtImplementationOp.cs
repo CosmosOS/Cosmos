@@ -16,7 +16,7 @@ namespace Indy.IL2CPU.IL {
 
 		private List<Type> mTypes;
 		public MethodBase LoadTypeTableRef;
-		public MethodBase SetTypeInfoRef;
+		public MethodBase SetTypeInfoRef;				   
 		public MethodBase SetMethodInfoRef;
 		public FieldInfo TypesFieldRef;
 		public int VTableEntrySize;

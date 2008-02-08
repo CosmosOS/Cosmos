@@ -87,6 +87,10 @@ namespace Cosmos.Kernel.Plugs {
 			TextScreen.NewLine();
 		}
 
+		public static void WriteLine(uint aValue) {
+			WriteLine(aValue.ToString());
+		}
+
 		public static void Write(char[] buffer) {
 			for (int i = 0; i < buffer.Length; i++)
 				Write(buffer[i]);
