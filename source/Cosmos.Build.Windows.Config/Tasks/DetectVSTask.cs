@@ -30,10 +30,21 @@ namespace Cosmos.Build.Windows.Config.Tasks {
 			if (xFullVSInstalled) {
 				xFullVSInstalled &= File.Exists(Path.Combine(xVSPath, "devenv.exe"));
 			}
+            
 			xKey = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\VCSExpress\9.0", false);
 			var xVCSPath = xKey == null ? "" : (string)xKey.GetValue("InstallDir");
+            //xKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\VCSExpress\9.0", false);  
             var xVCSTemplatePath = xKey == null ? "" : String.IsNullOrEmpty(xKey.GetValue("UserProjectTemplatesLocation") as string) ? String.Empty : Path.Combine((string)xKey.GetValue("UserProjectTemplatesLocation"), "Visual C#");
 			bool xVCSExpressInstalled = !(String.IsNullOrEmpty(xVCSPath) || string.IsNullOrEmpty(xVCSTemplatePath));
+
+            // If not found, look for the "UserProjectTemplatesLocation" registry key in CurrentUser instead of LocalMachine.
+            if (!xVCSExpressInstalled)
+            {
+                // notes: it's probably a bug to check LocalMachine (above) in the first place. Once verified, uncomment //xkey... line above and remove this code section
+                xKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\VCSExpress\9.0", false);
+                xVCSTemplatePath = xKey == null ? "" : String.IsNullOrEmpty(xKey.GetValue("UserProjectTemplatesLocation") as string) ? String.Empty : Path.Combine((string)xKey.GetValue("UserProjectTemplatesLocation"), "Visual C#");
+                xVCSExpressInstalled = !(String.IsNullOrEmpty(xVCSPath) || string.IsNullOrEmpty(xVCSTemplatePath));
+            }
 
 			if (!xVCSExpressInstalled) {
 				xKey = Registry.LocalMachine.OpenSubKey(@"Software\Wow6432Node\Microsoft\VCSExpress\9.0", false);
