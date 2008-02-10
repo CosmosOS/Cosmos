@@ -64,7 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Cosmos.Build.Windows\Cosmos.Build.Windows.csproj">
-      <Project>{EF1F8912-AE8D-40B3-9857-5A2852986710}</Project>
+      <Project>{1F0EDE86-F6D4-4355-9A97-10E90457770C}</Project>
       <Name>Cosmos.Build.Windows</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Cosmos.Hardware.PC\Cosmos.Hardware.PC.csproj">
