@@ -19,11 +19,7 @@ namespace Cosmos.Shell.Console {
 		private bool running = true;
 
 		public void Stop() {
-			System.Console.WriteLine("Stopping");
 			running = false;
-			System.Console.Write("   Set running to ");
-			System.Diagnostics.Debugger.Break();
-			System.Console.WriteLine(running.ToString());
 		}
 
 		public override void Initialize() {

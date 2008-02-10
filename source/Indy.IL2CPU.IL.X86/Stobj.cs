@@ -9,9 +9,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			: base(aReader, aMethodInfo) {
 		}
 		public override void DoAssemble() {
-			//new CPUx86.Pop(CPUx86.Registers.EDX);
-			//new CPUx86.Pop(CPUx86.Registers.EAX);
-			//new CPUx86.Move(CPUx86.Registers.AtEAX, CPUx86.Registers.EDX);
+			new CPUx86.Call("_CODE_REQUESTED_BREAK_");
 			int xFieldSize = Assembler.StackContents.Pop().Size;
 			Assembler.StackContents.Pop();
 			new CPUx86.Move("ecx", "[esp + " + xFieldSize + "]");

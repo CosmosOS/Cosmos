@@ -55,6 +55,7 @@ namespace Cosmos.Hardware.Storage {
 		public override unsafe bool ReadBlock(uint aBlock, byte* aBuffer) {
 			// 1) Read the status register of the primary or the secondary IDE controller. 
 			// 2) The BSY and DRQ bits must be zero if the controller is ready. 
+			DebugUtil.SendNumber("ATA", "ReadBlock", aBlock, 32);
 			uint xSleepCount = Timeout;
 			while (((IOReadByte((ushort)(mControllerAddress + IDE_PORT_STATUS)) & (IDE_STATUSREG_BSY | IDE_STATUSREG_DRQ)) != 0) && xSleepCount > 0) {
 				mSleep(1);

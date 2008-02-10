@@ -552,7 +552,7 @@ namespace Indy.IL2CPU {
 			if (aType.FullName == "System.Void") {
 				return 0;
 			}
-			if (!aType.IsValueType) {
+			if (!aType.IsValueType && aType.IsClass) {
 				return 4;
 			}
 			switch (aType.FullName) {
@@ -830,7 +830,10 @@ namespace Indy.IL2CPU {
 											throw new Exception("OpCode '" + xReader.OpCode + "' not supported in Metal mode!");
 										}
 										xOp.Assembler = mAssembler;
-										new Comment("StackItems = " + mAssembler.StackContents.Count + ", Top item = " + (mAssembler.StackContents.Count > 0 ? mAssembler.StackContents.Peek().ToString() : "(empty)"));
+										new Comment("StackItems = " + mAssembler.StackContents.Count);
+										foreach (var xStackContent in mAssembler.StackContents) {
+											new Comment("    " + xStackContent.Size);
+										}
 										xOp.Assemble();
 									}
 								} else {
@@ -1209,9 +1212,13 @@ namespace Indy.IL2CPU {
 			if (aType.IsExplicitLayout) {
 				var xStructLayout = aType.StructLayoutAttribute;
 				if (xStructLayout.Size == 0) {
-					throw new Exception("Struct '" + aType + "' is set to Explicit Layout, but no explicit Size specified!");
+					aObjectStorageSize = (from item in xTypeFields.Values
+										  let xSize = item.Offset + item.Size
+										  orderby xSize
+										  select xSize).FirstOrDefault();
+				} else {
+					aObjectStorageSize = xStructLayout.Size;
 				}
-				aObjectStorageSize = xStructLayout.Size;
 			}
 			return xTypeFields;
 		}

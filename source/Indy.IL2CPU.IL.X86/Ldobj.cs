@@ -17,10 +17,10 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		private int mSize;
 		public override void DoAssemble() {
+			new CPUx86.Call("_CODE_REQUESTED_BREAK_");
 			new CPUx86.Pop(CPUx86.Registers.EAX);
-			for (int i = 0; i < (mSize / 4); i++) {
-				new CPUx86.Pushd(CPUx86.Registers.AtEAX);
-				new CPUx86.Add(CPUx86.Registers.EAX, "4");
+			for (int i = 1; i <= (mSize / 4); i++) {
+				new CPUx86.Pushd("[eax + " + (mSize - (i * 4)) + "]");
 			}
 			switch (mSize % 4) {
 				case 1: {

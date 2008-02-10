@@ -111,11 +111,11 @@ namespace Cosmos.Kernel {
 		}
 
 		public static void MemFree(uint aPointer) {
-			MemoryBlock* xBlock = (MemoryBlock*)(aPointer - 5);
-			DebugUtil.SendMM_Free(aPointer - 5, (((uint)xBlock->Next) - ((uint)xBlock)));
-			xBlock->State = MemoryBlockState.Free;
-			uint xLength = ((uint)xBlock->Next) - aPointer;
-			ClearMemory(aPointer, xLength);
+			//MemoryBlock* xBlock = (MemoryBlock*)(aPointer - 5);
+			//DebugUtil.SendMM_Free(aPointer - 5, (((uint)xBlock->Next) - ((uint)xBlock)));
+			//xBlock->State = MemoryBlockState.Free;
+			//uint xLength = ((uint)xBlock->Next) - aPointer;
+			//ClearMemory(aPointer, xLength);
 		}
 	}
 }

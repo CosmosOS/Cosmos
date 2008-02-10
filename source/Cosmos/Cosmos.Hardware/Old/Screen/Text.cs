@@ -31,7 +31,6 @@ namespace Cosmos.Hardware.Screen {
 
 		public static unsafe void ScrollUp() {
 			CheckInit();
-			System.Diagnostics.Debugger.Break();
 			for (int i = 0; i < Columns * (Lines); i++) {
 				byte* xScreenPtr = (byte*)(VideoAddr + (i * 2));
 				*xScreenPtr = *(xScreenPtr + (Columns * 2));
@@ -44,7 +43,6 @@ namespace Cosmos.Hardware.Screen {
 				xScreenPtr += 1;
 				*xScreenPtr = Color;
 			}
-			System.Diagnostics.Debugger.Break();
 		}
 
 		public unsafe static void PutChar(int aLine, int aPos, char aChar) {

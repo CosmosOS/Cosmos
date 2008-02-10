@@ -34,20 +34,9 @@ namespace Indy.IL2CPU {
 			if (aType == null) {
 				throw new ArgumentNullException("aType");
 			}
-			int xResult = ObjectImpl.FieldDataOffset;
-			if (IsDelegate(aType)) {
-				xResult += 8;
-			}
-			foreach (FieldInfo xField in aType.GetFields(BindingFlags.NonPublic | BindingFlags.Public)) {
-				if (xField.IsStatic) {
-					continue;
-				}
-				if (!xField.FieldType.IsValueType) {
-					xResult += 4;
-				} else {
-					xResult += Engine.GetFieldStorageSize(xField.FieldType);
-				}
-			}
+			int xResult;
+			Engine.GetTypeFieldInfo(aType, out xResult);
+			xResult += ObjectImpl.FieldDataOffset;
 			return xResult;
 		}
 	}

@@ -120,7 +120,6 @@ namespace Indy.IL2CPU.IL.X86 {
 							// param 0 is instance of eventhandler
 							// param 1 is sender
 							// param 2 is eventargs
-							new CPUx86.Call("_CODE_REQUESTED_BREAK_");
 							Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
 							Ldarg.Ldfld(aAssembler, aMethodInfo.TypeInfo, "System.Object System.Delegate._target");
 							for (int i = 1; i < aMethodInfo.Arguments.Length; i++) {

@@ -97,6 +97,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			new Popd(CPUx86.Registers.EAX);
 
 			new CPUx86.Add(CPUx86.Registers.EAX, "0x" + (aField.Offset + aExtraOffset).ToString("X"));
+			aAssembler.StackContents.Pop();
 			aAssembler.StackContents.Push(new StackContent(4, aField.FieldType));
 			if (aDerefExternalAddress && aField.IsExternalField) {
 				new Pushd(CPUx86.Registers.AtEAX);
