@@ -39,19 +39,19 @@
   <ItemGroup>
     <Reference Include="Indy.IL2CPU, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Cosmos.Build.Windows\bin\Debug\Indy.IL2CPU.dll</HintPath>
+      <HintPath>..\Indy.IL2CPU\bin\Release\Indy.IL2CPU.dll</HintPath>
     </Reference>
     <Reference Include="Indy.IL2CPU.IL, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Cosmos.Build.Windows\bin\Debug\Indy.IL2CPU.IL.dll</HintPath>
+      <HintPath>..\Indy.IL2CPU.IL\bin\Release\Indy.IL2CPU.IL.dll</HintPath>
     </Reference>
     <Reference Include="Indy.IL2CPU.IL.X86, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Cosmos.Build.Windows\bin\Debug\Indy.IL2CPU.IL.X86.dll</HintPath>
+      <HintPath>..\Indy.IL2CPU.IL.X86\bin\Release\Indy.IL2CPU.IL.X86.dll</HintPath>
     </Reference>
     <Reference Include="Indy.IL2CPU.IL.X86.Native, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Cosmos.Build.Windows\bin\Debug\Indy.IL2CPU.IL.X86.Native.dll</HintPath>
+      <HintPath>..\Indy.IL2CPU.IL.X86.Native\bin\Release\Indy.IL2CPU.IL.X86.Native.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Microsoft.Build.Tasks" />
