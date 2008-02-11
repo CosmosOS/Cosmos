@@ -39,7 +39,7 @@
     <Reference Include="Cosmos.Build.Windows, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <ExecutableExtension>.exe</ExecutableExtension>
-      <HintPath>..\Cosmos.Build.Windows\bin\Debug\Cosmos.Build.Windows.dll</HintPath>
+      <HintPath>..\Cosmos.Build.Windows\bin\Release\Cosmos.Build.Windows.dll</HintPath>
     </Reference>
     <Reference Include="Cosmos.Kernel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
