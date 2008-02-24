@@ -17,7 +17,6 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public static void Assemble(CPU.Assembler aAssembler, int aElementSize) {
-			new CPUx86.Call("_CODE_REQUESTED_BREAK_");
 			aAssembler.StackContents.Pop();
 			aAssembler.StackContents.Pop();
 			aAssembler.StackContents.Push(new StackContent(4, typeof(uint)));
