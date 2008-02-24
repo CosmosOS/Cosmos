@@ -52,18 +52,17 @@ namespace Cosmos.Hardware.Storage {
 			}
 		}
 
-		public override unsafe bool ReadBlock(uint aBlock, byte* aBuffer) {
+		public override unsafe void ReadBlock(uint aBlock, byte* aBuffer) {
 			// 1) Read the status register of the primary or the secondary IDE controller. 
 			// 2) The BSY and DRQ bits must be zero if the controller is ready. 
-			DebugUtil.SendNumber("ATA", "ReadBlock", aBlock, 32);
+			//DebugUtil.SendNumber("ATA", "ReadBlock", aBlock, 32);
 			uint xSleepCount = Timeout;
 			while (((IOReadByte((ushort)(mControllerAddress + IDE_PORT_STATUS)) & (IDE_STATUSREG_BSY | IDE_STATUSREG_DRQ)) != 0) && xSleepCount > 0) {
 				mSleep(1);
 				xSleepCount--;
 			}
 			if (((IOReadByte((ushort)(mControllerAddress + IDE_PORT_STATUS)) & (IDE_STATUSREG_BSY | IDE_STATUSREG_DRQ)) != 0) && xSleepCount > 0) {
-				Console.WriteLine("[ATA#2] Read failed");
-				return false;
+				throw new Exception("[ATA#2] Read failed");
 			}
 			//3) Set the DEV bit to 0 for Drive0 and to 1 for Drive1 on the selected IDE controller using 
 			//   the Device/Head register and wait for approximately 400 nanoseconds using some NOP perhaps. 
@@ -76,8 +75,7 @@ namespace Cosmos.Hardware.Storage {
 				xSleepCount--;
 			}
 			if (((IOReadByte((ushort)(mControllerAddress + IDE_PORT_STATUS)) & (IDE_STATUSREG_BSY | IDE_STATUSREG_DRQ)) != 0) && xSleepCount > 0) {
-				Console.WriteLine("[ATA#5] Read failed");
-				return false;
+				throw new Exception("[ATA#5] Read failed");
 			}
 			// 6) Write the LBA28 address to the designated IDE registers. 
 			IOWriteByte((ushort)(mControllerAddress + IDE_PORT_LBABITS0TO7), (byte)aBlock);
@@ -91,8 +89,7 @@ namespace Cosmos.Hardware.Storage {
 			// 9) Read the Error register. If the ABRT bit is set then the Read Sector(s) command 
 			//    is not supported for that IDE drive. If the ABRT bit is not set, continue to the next step. 
 			if ((IOReadByte((ushort)(mControllerAddress + IDE_PORT_ERROR)) & IDE_ERRORREG_ABRT) == IDE_ERRORREG_ABRT) {
-				Console.WriteLine("[ATA#9] Read failed");
-				return false;
+				throw new Exception("[ATA#9] Read failed");
 			}
 			// 10) If you want to receive interrupts after reading each sector, clear the nIEN bit in the 
 			//     Device Control register. If you do not clear this bit then interrupts will not be generated 
@@ -112,8 +109,7 @@ namespace Cosmos.Hardware.Storage {
 				mSleep(1);
 			}
 			if ((IOReadByte((ushort)(mControllerAddress + IDE_PORT_STATUS)) & (IDE_STATUSREG_BSY | IDE_STATUSREG_DRQ)) != IDE_STATUSREG_DRQ) {
-				Console.WriteLine("[ATA#13] Read failed");
-				return false;
+				throw new Exception("[ATA#13] Read failed");
 			}
 			//14) Read one sector from the IDE Controller 16-bits at a time using the IN or the INSW instructions. 
 			ushort* xBuffer = (ushort*)aBuffer;
@@ -130,18 +126,16 @@ namespace Cosmos.Hardware.Storage {
 			IOReadByte((ushort)(mControllerAddress + IDE_PORT_STATUS));
 			//DebugUtil.SendATA_BlockReceived(mController, mDrive, (uint)aBlock, (ushort*)aBuffer);
 			//DebugUtil.ATA_ReadBlock(255, mControllerAddress, mDrive, aBlock);
-			return true;
 		}
 
-		public override bool WriteBlock(uint aBlock, byte[] aData) {
+		public override void WriteBlock(uint aBlock, byte[] aData) {
 			uint xSleepCount = Timeout;
 			while (((IOReadByte((ushort)(mControllerAddress + 0x206)) & 0x80) == 0x80) && xSleepCount > 0) {
 				mSleep(1);
 				xSleepCount--;
 			}
 			if (xSleepCount == 0) {
-				Console.WriteLine("[ATA|WriteBlockNew] Failed 1");
-				return false;
+				throw new Exception("[ATA|WriteBlockNew] Failed 1");
 			}
 			IOWriteByte((ushort)(mControllerAddress + IDE_PORT_FEATURES), 0);
 			IOWriteByte((ushort)(mControllerAddress + IDE_PORT_SECTORCOUNT), 1);
@@ -157,12 +151,10 @@ namespace Cosmos.Hardware.Storage {
 				xSleepCount--;
 			}
 			if (xSleepCount == 0) {
-				Console.WriteLine("[ATA|WriteBlockNew] Failed 2");
-				return false;
+				throw new Exception("[ATA|WriteBlockNew] Failed 2");
 			}
 			if ((IOReadByte((ushort)(mControllerAddress + 0x206)) & 0x1) != 0) {
-				Console.WriteLine("[ATA|WriteBlockNew] Not valid!");
-				return false;
+				throw new Exception("[ATA|WriteBlockNew] Not valid!");
 			}
 			xSleepCount = Timeout;
 			while (((IOReadByte((ushort)(mControllerAddress + 0x206)) & 0x8) == 0x8) && xSleepCount > 0) {
@@ -170,13 +162,11 @@ namespace Cosmos.Hardware.Storage {
 				xSleepCount--;
 			}
 			if (xSleepCount == 0) {
-				Console.WriteLine("[ATA|WriteBlockNew] Failed 3");
-				return false;
+				throw new Exception("[ATA|WriteBlockNew] Failed 3");
 			}
 			for (int i = 0; i < 256; i++) {
 				IOWriteWord(mControllerAddress, (ushort)((aData[i * 2]) | (aData[i * 2 + 1] << 8)));
 			}
-			return true;
 		}
 	}
 }

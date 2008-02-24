@@ -8,7 +8,7 @@ namespace Cosmos.Hardware.Storage {
 			get;
 		}
 
-		public abstract unsafe bool ReadBlock(uint aBlock, byte* aBuffer);
-		public abstract bool WriteBlock(uint aBlock, byte[] aData);
+		public abstract unsafe void ReadBlock(uint aBlock, byte* aBuffer);
+		public abstract void WriteBlock(uint aBlock, byte[] aData);
     }
 }

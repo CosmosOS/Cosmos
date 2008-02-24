@@ -109,10 +109,7 @@ namespace Cosmos.Kernel.FileSystem {
 
 		private bool ReadSuperBlock() {
 			ushort* xBuffer = (ushort*)Heap.MemAlloc(mBackend.BlockSize);
-			if (!mBackend.ReadBlock(2, (byte*)xBuffer)) {
-				Console.WriteLine("[Ext2|SuperBlock] Error while reading SuperBlock data");
-				return false;
-			}
+			mBackend.ReadBlock(2, (byte*)xBuffer);
 			byte* xByteBuff = (byte*)xBuffer;
 			var xByteBuffAsSuperBlock = (SuperBlock*)xByteBuff;
 			mSuperBlock = xByteBuffAsSuperBlock[0];
@@ -142,16 +139,11 @@ namespace Cosmos.Kernel.FileSystem {
 				uint xATABlock = (uint)(mBlockSize / mBackend.BlockSize);
 				xATABlock += (uint)(i / mGroupDescriptorsPerBlock);
 				if ((i % 16) == 0) {
-					if (!mBackend.ReadBlock(xATABlock, xBuffer)) {
-						Console.WriteLine("[Ext2|GroupDescriptors] Error while reading GroupDescriptor data");
-						return false;
-					}
+					mBackend.ReadBlock(xATABlock, xBuffer);
 				}
 				GroupDescriptor* xItem = (GroupDescriptor*)Heap.MemAlloc((uint)sizeof(GroupDescriptor));
 				CopyPointers((byte*)&xDescriptorPtr[i % mGroupDescriptorsPerBlock], (byte*)xItem, (uint)sizeof(GroupDescriptor));
-				fixed (GroupDescriptor* xDestPtr = &mGroupDescriptors[i]) {
-					*xDestPtr = *xItem;
-				}
+				mGroupDescriptors[i] = *xItem;
 				DebugUtil.SendExt2_GroupDescriptor("ReadGroupDescriptorsOfBlock", xATABlock, i, 0, xDescriptorPtr[i % mGroupDescriptorsPerBlock]);
 			}
 			return true;
@@ -346,11 +338,7 @@ namespace Cosmos.Kernel.FileSystem {
 			DebugUtil.SendNumber("Ext2", "ByteIndexInBackendBlock", xByteIndexInGroup, 32);
 			ushort* xBuffer = (ushort*)Heap.MemAlloc(mBackend.BlockSize);
 			aINode = default(INode);
-			if (!mBackend.ReadBlock(xStorageBlock, (byte*)xBuffer)) {
-				Heap.MemFree((uint)xBuffer);
-				Console.WriteLine("ReadINode, Reading storage block failed");
-				return false;
-			}
+			mBackend.ReadBlock(xStorageBlock, (byte*)xBuffer);
 			//byte* xINodeBuff = (byte*)((uint)xBuffer) + xByteIndexInBackendBlock;
 			INode* xINodePtr = (INode*)xBuffer;
 			DebugUtil.SendNumber("Ext2", "ReadINode, INodePointer index", ((aINodeNumber) % (mBackend.BlockSize / ((byte)sizeof(INode)))), 8);
@@ -411,10 +399,7 @@ namespace Cosmos.Kernel.FileSystem {
 			uint xBase = xBlock * (mBlockSize / mBackend.BlockSize);
 			for (int i = 0; i < (mBlockSize / mBackend.BlockSize); i++) {
 				byte* xTempBuffer = (byte*)(((uint)aBuffer) + (i * mBackend.BlockSize));
-				if (!mBackend.ReadBlock((uint)(xBase + i), xTempBuffer)) {
-					Console.WriteLine("ReadINodeContents, Reading of storage block failed!");
-					return false;
-				}
+				mBackend.ReadBlock((uint)(xBase + i), xTempBuffer);
 			}
 			return true;
 		}
@@ -449,10 +434,7 @@ namespace Cosmos.Kernel.FileSystem {
 					DebugUtil.SendExt2_GroupDescriptor("ReadFile", 0, (int)g, 0, xGroupDescriptor);
 					uint xTemp = ((xGroupDescriptor.INodeBitmap) * (mBlockSize / mBackend.BlockSize));
 					DebugUtil.SendNumber("Ext2", "INodeBitmap block", xTemp, 32);
-					if (!mBackend.ReadBlock((uint)((xGroupDescriptor.INodeBitmap) * (mBlockSize / mBackend.BlockSize)), xByteBuffer)) {
-						Heap.MemFree((uint)xBuffer);
-						return null;
-					}
+					mBackend.ReadBlock((uint)((xGroupDescriptor.INodeBitmap) * (mBlockSize / mBackend.BlockSize)), xByteBuffer);
 					xTemp = *(uint*)xBuffer;
 					DebugUtil.SendNumber("Ext2", "INodeBitmap", xTemp, 32);
 					if (!ConvertBitmapToBoolArray((uint*)xBuffer, xUsedINodes)) {
@@ -463,11 +445,7 @@ namespace Cosmos.Kernel.FileSystem {
 						if ((i % (mBackend.BlockSize / sizeof(INode))) == 0) {
 							uint index = (uint)((i % mSuperBlock.INodesPerGroup) * sizeof(INode));
 							uint offset = index / mBackend.BlockSize;
-							if (!mBackend.ReadBlock((uint)((xGroupDescriptor.INodeTable * (mBlockSize / mBackend.BlockSize)) + offset), xByteBuffer)) {
-								Console.WriteLine("[Ext2] Error reading INode table entries");
-								Heap.MemFree((uint)xBuffer);
-								return null;
-							}
+							mBackend.ReadBlock((uint)((xGroupDescriptor.INodeTable * (mBlockSize / mBackend.BlockSize)) + offset), xByteBuffer);
 						}
 						uint xINodeIdentifier = (uint)((g * mSuperBlock.INodesPerGroup) + i + 1);
 						if (xINodeIdentifier != xCurrentINode) {
@@ -476,11 +454,7 @@ namespace Cosmos.Kernel.FileSystem {
 						if (xUsedINodes[i]) {
 							DebugUtil.SendExt2_INode((uint)((g * mSuperBlock.INodesPerGroup) + i), &xINodeTable[i % (mBackend.BlockSize / sizeof(INode))]);
 							if (xPathPointer == xPath.Length) {
-								if (!mBackend.ReadBlock((uint)(xINodeTable[i % (mBackend.BlockSize / sizeof(INode))].Block1 * (mBlockSize / mBackend.BlockSize)), xByteBuffer)) {
-									Console.WriteLine("[Ext2] Error reading INode entries");
-									Heap.MemFree((uint)xBuffer);
-									return null;
-								}
+								mBackend.ReadBlock((uint)(xINodeTable[i % (mBackend.BlockSize / sizeof(INode))].Block1 * (mBlockSize / mBackend.BlockSize)), xByteBuffer);
 								byte[] xResult = new byte[xResultSize];
 								for (int b = 0; b < xResultSize; b++) {
 									xResult[b] = xByteBuffer[b];
@@ -489,11 +463,7 @@ namespace Cosmos.Kernel.FileSystem {
 								return xResult;
 							} else {
 								if ((xINodeTable[i % (mBackend.BlockSize / sizeof(INode))].Mode & INodeModeEnum.Directory) != 0) {
-									if (!mBackend.ReadBlock((uint)(xINodeTable[i % (mBackend.BlockSize / sizeof(INode))].Block1 * (mBlockSize / mBackend.BlockSize)), xByteBuffer)) {
-										Console.WriteLine("[Ext2] Error reading INode entries");
-										Heap.MemFree((uint)xBuffer);
-										return null;
-									}
+									mBackend.ReadBlock((uint)(xINodeTable[i % (mBackend.BlockSize / sizeof(INode))].Block1 * (mBlockSize / mBackend.BlockSize)), xByteBuffer);
 									DirectoryEntry* xEntryPtr = (DirectoryEntry*)xBuffer;
 									uint xTotalSize = xINodeTable[i % (mBackend.BlockSize / sizeof(INode))].Size;
 									while (xTotalSize != 0) {
@@ -527,6 +497,7 @@ namespace Cosmos.Kernel.FileSystem {
 		}
 
 		public string[] GetDirectoryEntries(string[] aPath) {
+			System.Diagnostics.Debugger.Break();
 			List<string> xResult = new List<string>(32);
 			ushort* xBuffer = (ushort*)Heap.MemAlloc(mBackend.BlockSize);
 			byte* xExt2BlockBuffer = (byte*)Heap.MemAlloc(mBlockSize);
