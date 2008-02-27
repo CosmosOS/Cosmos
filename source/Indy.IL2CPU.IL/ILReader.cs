@@ -21,14 +21,14 @@ namespace Indy.IL2CPU.IL {
 		private byte[] mOperand;
 		private bool mHasOperand;
 
-		public long OldPosition {
+		public int Position {
 			get;
 			private set;
 		}
 
-		public long Position {
+		public int NextPosition {
 			get {
-				return mStream.Position;
+				return (int)mStream.Position;
 			}
 		}
 
@@ -91,17 +91,17 @@ namespace Indy.IL2CPU.IL {
 				if (mOperandValueBranchPosition == null) {
 					//sbyte xTemp = (sbyte)mOperand;
 					//if (xTemp == mOperand) {
-					//    mOperandValueBranchPosition = Position + xTemp;
+					//    mOperandValueBranchPosition = NextPosition + xTemp;
 					//} else {
-					//						if (mStream.Length < (Position + mOperand + 1)) {
+					//						if (mStream.Length < (NextPosition + mOperand + 1)) {
 					//							mOperandValueBranchPosition = (uint)mOperand;
 					//						} else {
-					//							mOperandValueBranchPosition = (uint)(Position + mOperand);
+					//							mOperandValueBranchPosition = (uint)(NextPosition + mOperand);
 					//						}
 					if (!mIsShortcut) {
-						mOperandValueBranchPosition = (uint?)(Position + OperandValueInt32);
+						mOperandValueBranchPosition = (uint?)(NextPosition + OperandValueInt32);
 					} else {
-						mOperandValueBranchPosition = (uint?)(Position + (sbyte)OperandValueInt32);
+						mOperandValueBranchPosition = (uint?)(NextPosition + (sbyte)OperandValueInt32);
 					}
 					//}
 				}
@@ -183,7 +183,7 @@ namespace Indy.IL2CPU.IL {
 		}
 
 		public bool Read() {
-			OldPosition = Position;
+			Position = NextPosition;
 			int xByteValueInt = mStream.ReadByte();
 			OpCodeEnum xOpCode;
 			if (xByteValueInt == -1) {
@@ -231,10 +231,10 @@ namespace Indy.IL2CPU.IL {
 					}
 					uint[] xResult = new uint[xBranchLocations1.Length];
 					for (int i = 0; i < xBranchLocations1.Length; i++) {
-						if ((Position + xBranchLocations1[i]) < 0) {
+						if ((NextPosition + xBranchLocations1[i]) < 0) {
 							xResult[i] = (uint)xBranchLocations1[i];
 						} else {
-							xResult[i] = (uint)(Position + xBranchLocations1[i]);
+							xResult[i] = (uint)(NextPosition + xBranchLocations1[i]);
 						}
 					}
 					OperandValueBranchLocations = xResult;

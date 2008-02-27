@@ -9,6 +9,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		private string[] mAddresses;
 		protected void SetArgIndex(int aIndex, MethodInformation aMethodInfo) {
 			mAddresses = aMethodInfo.Arguments[aIndex].VirtualAddresses;
+
 		}
 		public Starg(ILReader aReader, MethodInformation aMethodInfo)
 			: base(aReader, aMethodInfo) {

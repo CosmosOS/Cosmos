@@ -19,18 +19,18 @@ namespace Indy.IL2CPU.IL.X86 {
 		/// </summary>
 		/// <param name="aAssembler"></param>
 		/// <param name="aAddress"></param>
-		public static void EmitCompareWithNull(Assembler.Assembler aAssembler, MethodInformation aMethodInfo, string aAddress, string aCurrentLabel, string aNextLabel, Action aEmitCleanupMethod) {
+		public static void EmitCompareWithNull(Assembler.Assembler aAssembler, MethodInformation aMethodInfo, string aAddress, string aCurrentLabel, string aNextLabel, Action aEmitCleanupMethod, int aCurrentILOffset) {
 			new CPUx86.Compare("dword " + aAddress, "0");
 			new CPUx86.JumpIfNotEquals(aNextLabel);
 			Type xNullRefExcType = typeof(NullReferenceException);
-			Newobj.Assemble(aAssembler, Engine.GetTypeInfo(xNullRefExcType).StorageSize, xNullRefExcType.GetConstructor(new Type[0]), Engine.RegisterType(xNullRefExcType), aCurrentLabel, aMethodInfo);
+			Newobj.Assemble(aAssembler, Engine.GetTypeInfo(xNullRefExcType).StorageSize, xNullRefExcType.GetConstructor(new Type[0]), Engine.RegisterType(xNullRefExcType), aCurrentLabel, aMethodInfo, aCurrentILOffset);
 			aAssembler.StackContents.Pop();
 			new CPUx86.Move("[" + DataMember.GetStaticFieldName(CPU.Assembler.CurrentExceptionRef) + "]", "eax");
 			Engine.QueueMethod(CPU.Assembler.CurrentExceptionOccurredRef);
 			new CPUx86.Call(Label.GenerateLabelName(CPU.Assembler.CurrentExceptionOccurredRef));
 			new CPUx86.Move("ecx", "3");
 			aEmitCleanupMethod();
-			Call.EmitExceptionLogic(aAssembler, aMethodInfo, aNextLabel, false);
+			Call.EmitExceptionLogic(aAssembler, aCurrentILOffset, aMethodInfo, aNextLabel, false);
 		}
 
 		public Op(ILReader aReader, MethodInformation aMethodInfo)
@@ -65,7 +65,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				mCatchType = null;
 			}
 			if (mCatchType != null && aMethodInfo != null && aMethodInfo.CurrentHandler != null && aMethodInfo.CurrentHandler.HandlerOffset > 0) {
-				mNeedsTypeCheck = aMethodInfo.CurrentHandler.HandlerOffset == aReader.Position;
+				mNeedsTypeCheck = aMethodInfo.CurrentHandler.HandlerOffset == aReader.NextPosition;
 			}
 		}
 

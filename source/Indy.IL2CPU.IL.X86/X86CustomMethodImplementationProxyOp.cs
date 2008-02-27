@@ -20,7 +20,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		protected override void CallProxiedMethod() {
-			Op x = new Call(ProxiedMethod);
+			Op x = new Call(ProxiedMethod, 0);
 			x.Assembler = Assembler;
 			x.Assemble();
 		}

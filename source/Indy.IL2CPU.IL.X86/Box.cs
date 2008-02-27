@@ -22,20 +22,20 @@ namespace Indy.IL2CPU.IL.X86 {
 			//} else {
 				mTheSize = Engine.GetFieldStorageSize(xTypeRef);
 			//}
-			if (((mTheSize / 4) * 4) != mTheSize) {
-				throw new Exception("Incorrect Datasize. ( ((mTheSize / 4) * 4) === mTheSize should evaluate to true!");
-			}
+			//if (((mTheSize / 4) * 4) != mTheSize) {
+			//    throw new Exception("Incorrect Datasize. ( ((mTheSize / 4) * 4) === mTheSize should evaluate to true!");
+			//}
 			//if (!(xTypeRef is GenericParameter)) {
 			mTypeId = Engine.RegisterType(xTypeRef);
 			//}
 		}
 
 		public override void DoAssemble() {
-			new CPUx86.Pushd("0x" + (4 + ObjectImpl.FieldDataOffset).ToString("X").ToUpper());
+			new CPUx86.Pushd("0x" + (ObjectImpl.FieldDataOffset + mTheSize + (4 - (mTheSize % 4))).ToString("X").ToUpper());
 			new CPUx86.Call(CPU.Label.GenerateLabelName(RuntimeEngineRefs.Heap_AllocNewObjectRef));
 			new CPUx86.Move("dword", CPUx86.Registers.AtEAX, "0x" + mTypeId.ToString("X"));
 			new CPUx86.Move("dword", "[eax + 4]", "0x" + InstanceTypeEnum.BoxedValueType.ToString("X"));
-			for (int i = 0; i < (mTheSize / 4); i++) {
+			for (int i = 0; i < ((mTheSize + (4 - (mTheSize % 4))) / 4); i++) {
 				new CPUx86.Pop(CPUx86.Registers.EDX);
 				new CPUx86.Move("dword", "[eax + 0x" + (ObjectImpl.FieldDataOffset + (i * 4)).ToString("X") + "]", "edx");
 			}

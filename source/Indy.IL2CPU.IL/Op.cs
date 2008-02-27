@@ -12,7 +12,7 @@ namespace Indy.IL2CPU.IL {
 		private readonly string mILComment;
 		private readonly bool mSupportsMetalMode;
 		public static string GetInstructionLabel(ILReader aReader) {
-			return GetInstructionLabel(aReader.OldPosition);
+			return GetInstructionLabel(aReader.Position);
 		}
 		public static string GetInstructionLabel(long aPosition) {
 			return ".L" + aPosition.ToString("X8");

@@ -411,7 +411,7 @@ namespace Indy.IL2CPU {
 						//        GenericParameter xGenericParam = xArray.ElementType as GenericParameter;
 						//        GenericParameter xFoundGenericParam = xFoundArray.ElementType as GenericParameter;
 						//        if (xGenericParam != null && xFoundGenericParam != null) {
-						//            if (xGenericParam.Position != xFoundGenericParam.Position) {
+						//            if (xGenericParam.NextPosition != xFoundGenericParam.NextPosition) {
 						//                continue;
 						//            }
 						//        }
@@ -551,8 +551,8 @@ namespace Indy.IL2CPU {
 		public static int GetFieldStorageSize(Type aType) {
 			if (aType.FullName == "System.Void") {
 				return 0;
-			}
-			if (!aType.IsValueType && aType.IsClass) {
+			}						   
+			if ((!aType.IsValueType && aType.IsClass) || aType.IsInterface) {
 				return 4;
 			}
 			switch (aType.FullName) {
@@ -766,12 +766,6 @@ namespace Indy.IL2CPU {
 								MethodBody xBody = xCurrentMethod.GetMethodBody();
 								// todo: add better detection of implementation state
 								if (xBody != null) {
-									// todo: add support for types which need different stack size
-									//foreach (LocalVariableInfo xLocal in xBody.LocalVariables) {
-									//    if (xLocal.LocalType.IsValueType && !xLocal.LocalType.IsPrimitive && !xLocal.LocalType.IsEnum && !xLocal.LocalType.IsPointer) {
-									//        throw new Exception("Structs as locals not yet supported!");
-									//    }
-									//}
 									mInstructionsToSkip = 0;
 									mAssembler.StackContents.Clear();
 									ILReader xReader = new ILReader(xCurrentMethod);
@@ -783,7 +777,7 @@ namespace Indy.IL2CPU {
 										ExceptionHandlingClause xCurrentHandler = null;
 										foreach (ExceptionHandlingClause xHandler in xBody.ExceptionHandlingClauses) {
 											if (xHandler.TryOffset > 0) {
-												if (xHandler.TryOffset <= xReader.Position && (xHandler.TryLength + xHandler.TryOffset) > xReader.Position) {
+												if (xHandler.TryOffset <= xReader.NextPosition && (xHandler.TryLength + xHandler.TryOffset) > xReader.NextPosition) {
 													if (xCurrentHandler == null) {
 														xCurrentHandler = xHandler;
 														continue;
@@ -796,7 +790,7 @@ namespace Indy.IL2CPU {
 												}
 											}
 											if (xHandler.HandlerOffset > 0) {
-												if (xHandler.HandlerOffset <= xReader.Position && (xHandler.HandlerOffset + xHandler.HandlerLength) > xReader.Position) {
+												if (xHandler.HandlerOffset <= xReader.NextPosition && (xHandler.HandlerOffset + xHandler.HandlerLength) > xReader.NextPosition) {
 													if (xCurrentHandler == null) {
 														xCurrentHandler = xHandler;
 														continue;
@@ -810,7 +804,7 @@ namespace Indy.IL2CPU {
 											}
 											if ((xHandler.Flags & ExceptionHandlingClauseOptions.Filter) > 0) {
 												if (xHandler.FilterOffset > 0) {
-													if (xHandler.FilterOffset <= xReader.Position) {
+													if (xHandler.FilterOffset <= xReader.NextPosition) {
 														if (xCurrentHandler == null) {
 															xCurrentHandler = xHandler;
 															continue;

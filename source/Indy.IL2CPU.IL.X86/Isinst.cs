@@ -13,6 +13,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		private int mTypeId;
 		private string mThisLabel;
 		private string mNextOpLabel;
+		private int mCurrentILOffset;
 		public Isinst(ILReader aReader, MethodInformation aMethodInfo)
 			: base(aReader, aMethodInfo) {
 			Type xType = aReader.OperandValueType;
@@ -21,8 +22,9 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			Type xTypeDef = xType;
 			mTypeId = Engine.RegisterType(xTypeDef);
-			mThisLabel = GetInstructionLabel(aReader.OldPosition);
-			mNextOpLabel = GetInstructionLabel(aReader.Position);
+			mThisLabel = GetInstructionLabel(aReader.Position);
+			mNextOpLabel = GetInstructionLabel(aReader.NextPosition);
+			mCurrentILOffset = (int)aReader.Position;
 		}
 
 		public override void DoAssemble() {
@@ -35,7 +37,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			Assembler.StackContents.Push(new StackContent(4, typeof(object)));
 			MethodBase xMethodIsInstance = Engine.GetMethodBase(typeof(VTablesImpl), "IsInstance", "System.Int32", "System.Int32");
 			Engine.QueueMethod(xMethodIsInstance);
-			Op xOp = new Call(xMethodIsInstance);
+			Op xOp = new Call(xMethodIsInstance, mCurrentILOffset);
 			xOp.Assembler = Assembler;
 			xOp.Assemble();
 			new CPUx86.Pop(CPUx86.Registers.EAX);

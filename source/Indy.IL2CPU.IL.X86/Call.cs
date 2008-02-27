@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-
 using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using System.Reflection;
@@ -20,17 +19,21 @@ namespace Indy.IL2CPU.IL.X86 {
 		private MethodInformation mMethodInfo;
 		private MethodInformation mTargetMethodInfo;
 		private string mNextLabelName;
-		public Call(MethodBase aMethod)
+		private int mCurrentILOffset;
+		public Call(MethodBase aMethod, int aCurrentILOffset)
 			: base(null, null) {
 			if (aMethod == null) {
 				throw new ArgumentNullException("aMethod");
 			}
-			Initialize(aMethod);
+			Initialize(aMethod, aCurrentILOffset);
 		}
 
-		public static void EmitExceptionLogic(Assembler.Assembler aAssembler, MethodInformation aMethodInfo, string aNextLabel, bool aDoTest) {
+		public static void EmitExceptionLogic(Assembler.Assembler aAssembler, int aCurrentOpOffset, MethodInformation aMethodInfo, string aNextLabel, bool aDoTest) {
 			string xJumpTo = MethodFooterOp.EndOfMethodLabelNameException;
 			if (aMethodInfo != null && aMethodInfo.CurrentHandler != null) {
+				if (aMethodInfo.CurrentHandler.HandlerOffset >= aCurrentOpOffset && (aMethodInfo.CurrentHandler.HandlerLength + aMethodInfo.CurrentHandler.HandlerOffset) <= aCurrentOpOffset) {
+					return;
+				}
 				switch (aMethodInfo.CurrentHandler.Flags) {
 					case ExceptionHandlingClauseOptions.Clause: {
 							xJumpTo = Op.GetInstructionLabel(aMethodInfo.CurrentHandler.HandlerOffset);
@@ -52,20 +55,15 @@ namespace Indy.IL2CPU.IL.X86 {
 				new CPUx86.Test("ecx", "2");
 				new CPUx86.JumpIfNotEquals(xJumpTo);
 			}
-			//    }
-			//    new CPUx86.JumpAlways(xJumpTo);
-			//}
 		}
 
-
-		private void Initialize(MethodBase aMethod) {
+		private void Initialize(MethodBase aMethod, int aCurrentILOffset) {
 			mIsDebugger_Break = aMethod.GetFullName() == "System.Void  System.Diagnostics.Debugger.Break()";
 			if (mIsDebugger_Break) {
 				return;
 			}
+			mCurrentILOffset = aCurrentILOffset;
 			mTargetMethodInfo = Engine.GetMethodInfo(aMethod, aMethod, Label.GenerateLabelName(aMethod), Engine.GetTypeInfo(aMethod.DeclaringType));
-
-
 			mResultSize = 0;
 			if (mTargetMethodInfo != null) {
 				mResultSize = mTargetMethodInfo.ReturnSize;
@@ -102,13 +100,13 @@ namespace Indy.IL2CPU.IL.X86 {
 			MethodBase xMethod = aReader.OperandValueMethod;
 			mMethodInfo = aMethodInfo;
 			if (!aReader.EndOfStream) {
-				mNextLabelName = GetInstructionLabel(aReader.Position);
+				mNextLabelName = GetInstructionLabel(aReader.NextPosition);
 			}
-			Initialize(xMethod);
+			Initialize(xMethod, (int)aReader.Position);
 		}
 		public void Assemble(string aMethod, int aArgumentCount) {
 			new CPUx86.Call(aMethod);
-			EmitExceptionLogic(Assembler, mMethodInfo, mNextLabelName, true);
+			EmitExceptionLogic(Assembler, mCurrentILOffset, mMethodInfo, mNextLabelName, true);
 			for (int i = 0; i < aArgumentCount; i++) {
 				Assembler.StackContents.Pop();
 			}

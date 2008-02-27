@@ -19,6 +19,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		private readonly string mLabelName;
 		private readonly MethodInformation mCurrentMethodInfo;
 		private readonly MethodInformation mTargetMethodInfo;
+		private readonly int mCurrentILOffset;
 		public Callvirt(ILReader aReader, MethodInformation aMethodInfo)
 			: base(aReader, aMethodInfo) {
 			mLabelName = GetInstructionLabel(aReader);
@@ -43,6 +44,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			mArgumentCount = mTargetMethodInfo.Arguments.Length;
 			mReturnSize = mTargetMethodInfo.ReturnSize;
 			mThisOffset = mTargetMethodInfo.Arguments[0].Offset;
+			mCurrentILOffset = aReader.Position;
 		}
 
 		public override void DoAssemble() {
@@ -59,13 +61,13 @@ namespace Indy.IL2CPU.IL.X86 {
 				}
 				//Assembler.Add(new CPUx86.Pop("eax"));
 				//Assembler.Add(new CPUx86.Pushd("eax"));
-				EmitCompareWithNull(Assembler, mCurrentMethodInfo, "[esp + 0x" + mThisOffset.ToString("X") + "]", mLabelName, mLabelName + "_AfterNullRefCheck", xEmitCleanup);
+				EmitCompareWithNull(Assembler, mCurrentMethodInfo, "[esp + 0x" + mThisOffset.ToString("X") + "]", mLabelName, mLabelName + "_AfterNullRefCheck", xEmitCleanup, mCurrentILOffset);
 				new CPU.Label(mLabelName + "_AfterNullRefCheck");
 				new CPUx86.Move(CPUx86.Registers.EAX, "[esp + 0x" + mThisOffset.ToString("X") + "]");
 				new CPUx86.Pushd(CPUx86.Registers.AtEAX);
 				new CPUx86.Pushd("0" + mMethodIdentifier.ToString("X") + "h");
 				new CPUx86.Call(CPU.Label.GenerateLabelName(VTablesImplRefs.GetMethodAddressForTypeRef));
-				Call.EmitExceptionLogic(Assembler, mCurrentMethodInfo, mLabelName + "_AfterAddressCheck", true);
+				Call.EmitExceptionLogic(Assembler, mCurrentILOffset, mCurrentMethodInfo, mLabelName + "_AfterAddressCheck", true);
 				new CPU.Label(mLabelName + "_AfterAddressCheck");
 				if (mTargetMethodInfo.Arguments[0].ArgumentType == typeof(object)) {
 					new CPUx86.Push("eax");

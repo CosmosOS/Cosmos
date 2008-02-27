@@ -54,7 +54,6 @@ namespace Indy.IL2CPU.Assembler {
 		}
 
 		public static void ExceptionOccurred() {
-			Console.WriteLine("Exception Occurred!");
 			System.Diagnostics.Debugger.Break();
 		}
 

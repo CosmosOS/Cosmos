@@ -21,7 +21,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				Ldarg.Ldarg(Assembler, MethodInfo.Arguments[i]);
 			}
 			Engine.QueueMethod(aMethod);
-			Op xOp = new Call(aMethod);
+			Op xOp = new Call(aMethod,0);
 			xOp.Assembler = Assembler;
 			xOp.Assemble();
 		}

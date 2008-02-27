@@ -15,6 +15,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		private string mNextOpLabel;
 		private Type mType;
 		private int mTypeSize;
+		private int mCurrentILOffset;
 		public Unbox(ILReader aReader, MethodInformation aMethodInfo)
 			: base(aReader, aMethodInfo) {
 			mType = aReader.OperandValueType;
@@ -24,11 +25,12 @@ namespace Indy.IL2CPU.IL.X86 {
 			mTypeSize = Engine.GetFieldStorageSize(mType);
 			mTypeId = Engine.RegisterType(mType);
 			mThisLabel = GetInstructionLabel(aReader);
-			mNextOpLabel = GetInstructionLabel(aReader.Position);
+			mNextOpLabel = GetInstructionLabel(aReader.NextPosition);
+			mCurrentILOffset = aReader.Position;
 		}
 		public override void DoAssemble() {
 			string mReturnNullLabel = mThisLabel + "_ReturnNull";
-			new CPUx86.Pop(CPUx86.Registers.EAX);
+			new CPUx86.Move(CPUx86.Registers.EAX, CPUx86.Registers.AtESP);
 			new CPUx86.Compare(CPUx86.Registers.EAX, "0");
 			new CPUx86.JumpIfZero(mReturnNullLabel);
 			new CPUx86.Pushd(CPUx86.Registers.AtEAX);
@@ -37,17 +39,26 @@ namespace Indy.IL2CPU.IL.X86 {
 			Assembler.StackContents.Push(new StackContent(4, typeof(uint)));
 			MethodBase xMethodIsInstance = Engine.GetMethodBase(Engine.GetType("", "Indy.IL2CPU.VTablesImpl"), "IsInstance", "System.Int32", "System.Int32");
 			Engine.QueueMethod(xMethodIsInstance);
-			Op xOp = new Call(xMethodIsInstance);
+			Op xOp = new Call(xMethodIsInstance, mCurrentILOffset);
 			xOp.Assembler = Assembler;
 			xOp.Assemble();
 			new CPUx86.Pop(CPUx86.Registers.EAX);
 			Assembler.StackContents.Pop();
 			new CPUx86.Compare(CPUx86.Registers.EAX, "0");
 			new CPUx86.JumpIfEquals(mReturnNullLabel);
-			new CPUx86.Pushd(CPUx86.Registers.EAX);
+			new CPUx86.Pop(CPUx86.Registers.EAX);
+			int xSize = mTypeSize;
+			if (xSize % 4 > 0) {
+				xSize += 4 - (xSize % 4);
+			}
+			int xItems = xSize /4;
+			for (int i = xItems - 1; i >= 0; i--) {
+				new CPUx86.Push("[eax + " + ((i * 4) + ObjectImpl.FieldDataOffset) + "]");
+			}
 			Assembler.StackContents.Push(new StackContent(mTypeSize, mType));
 			new CPUx86.JumpAlways(mNextOpLabel);
 			new CPU.Label(mReturnNullLabel);
+			new CPUx86.Add(CPUx86.Registers.ESP, "4");
 			new CPUx86.Pushd("0");
 			Assembler.StackContents.Push(new StackContent(4, typeof(object)));
 		}

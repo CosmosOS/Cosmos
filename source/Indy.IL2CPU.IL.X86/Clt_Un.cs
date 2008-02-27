@@ -13,7 +13,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		private readonly string CurInstructionLabel;
 		public Clt_Un(ILReader aReader, MethodInformation aMethodInfo)
 			: base(aReader, aMethodInfo) {
-			NextInstructionLabel = GetInstructionLabel(aReader.Position);
+			NextInstructionLabel = GetInstructionLabel(aReader.NextPosition);
 			CurInstructionLabel = GetInstructionLabel(aReader);
 		}
 		public override void DoAssemble() {

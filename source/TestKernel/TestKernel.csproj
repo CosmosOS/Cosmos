@@ -49,10 +49,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assertion.cs" />
     <Compile Include="Attributes.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestGroups.cs" />
+    <Compile Include="Tests\NoInit\mscorlib\System\ArrayListTest.cs" />
     <Compile Include="Tests\NoInit\StringTests.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -15,22 +15,20 @@ namespace Indy.IL2CPU.IL.X86 {
 		public MethodBase CtorDef;
 		public string CurrentLabel;
 		public MethodInformation MethodInformation;
-		public Newobj()
-			: base(null, null) {
-		}
-
+		public int ILOffset;
 		public Newobj(ILReader aReader, MethodInformation aMethodInfo)
 			: base(aReader, aMethodInfo) {
 			CtorDef = aReader.OperandValueMethod;
 			CurrentLabel = GetInstructionLabel(aReader);
 			MethodInformation = aMethodInfo;
+			ILOffset = (int)aReader.Position;
 		}
 
 		public override void DoAssemble() {
-			Assemble(Assembler, ObjectUtilities.GetObjectStorageSize(CtorDef.DeclaringType), CtorDef, Engine.RegisterType(CtorDef.DeclaringType), CurrentLabel, MethodInformation);
+			Assemble(Assembler, ObjectUtilities.GetObjectStorageSize(CtorDef.DeclaringType), CtorDef, Engine.RegisterType(CtorDef.DeclaringType), CurrentLabel, MethodInformation, ILOffset);
 		}
 
-		public static void Assemble(Assembler.Assembler aAssembler, int aObjectSize, MethodBase aCtorDef, int aTypeId, string aCurrentLabel, MethodInformation aCurrentMethodInformation) {
+		public static void Assemble(Assembler.Assembler aAssembler, int aObjectSize, MethodBase aCtorDef, int aTypeId, string aCurrentLabel, MethodInformation aCurrentMethodInformation, int aCurrentILOffset) {
 			if (aCtorDef != null) {
 				Engine.QueueMethod(aCtorDef);
 			} else {
@@ -103,7 +101,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				foreach (var xStackInt in aAssembler.StackContents) {
 					new CPUx86.Add("esp", xStackInt.Size.ToString());
 				}
-				Call.EmitExceptionLogic(aAssembler, aCurrentMethodInformation, aCurrentLabel + "_NO_ERROR_4", false);
+				Call.EmitExceptionLogic(aAssembler, aCurrentILOffset, aCurrentMethodInformation, aCurrentLabel + "_NO_ERROR_4", false);
 				new CPU.Label(aCurrentLabel + "_NO_ERROR_4");
 				new CPUx86.Pop(CPUx86.Registers.EAX);
 				//				aAssembler.StackSizes.Pop();
