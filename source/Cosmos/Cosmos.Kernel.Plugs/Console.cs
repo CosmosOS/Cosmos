@@ -91,6 +91,10 @@ namespace Cosmos.Kernel.Plugs {
 			WriteLine(aValue.ToString());
 		}
 
+		public static void WriteLine(int aValue) {
+			WriteLine(aValue.ToString());
+		}
+
 		public static void Write(char[] buffer) {
 			for (int i = 0; i < buffer.Length; i++)
 				Write(buffer[i]);
