@@ -551,7 +551,7 @@ namespace Indy.IL2CPU {
 		public static int GetFieldStorageSize(Type aType) {
 			if (aType.FullName == "System.Void") {
 				return 0;
-			}						   
+			}
 			if ((!aType.IsValueType && aType.IsClass) || aType.IsInterface) {
 				return 4;
 			}
@@ -1291,6 +1291,9 @@ namespace Indy.IL2CPU {
 				throw new Exception("ERROR: No Current Engine found!");
 			}
 			if (aType.IsArray || aType.IsPointer) {
+				if (aType.IsArray && aType.GetArrayRank() != 1) {
+					throw new Exception("Multidimensional arrays are not yet supported!");
+				}
 				aType = aType.GetElementType();
 			}
 			Type xFoundItem = mCurrent.mTypes.FirstOrDefault(x => x.FullName.Equals(aType.FullName));

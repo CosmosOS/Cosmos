@@ -232,8 +232,8 @@ namespace Cosmos.Kernel {
 			Hardware.DebugUtil.WriteNumber(aSuperBlock.DefResGID, 16);
 			Hardware.DebugUtil.WriteSerialString("\" FirstINode=\"");
 			Hardware.DebugUtil.WriteNumber(aSuperBlock.FirstINode, 32);
-			Hardware.DebugUtil.WriteSerialString("\" Padding1=\"");
-			Hardware.DebugUtil.WriteNumber(aSuperBlock.Padding1, 32);
+			Hardware.DebugUtil.WriteSerialString("\" INodeSize=\"");
+			Hardware.DebugUtil.WriteNumber(aSuperBlock.INodeSize, 32);
 			Hardware.DebugUtil.WriteSerialString("\" Padding2=\"");
 			Hardware.DebugUtil.WriteNumber(aSuperBlock.Padding2, 32);
 			Hardware.DebugUtil.WriteSerialString("\" Padding3=\"");

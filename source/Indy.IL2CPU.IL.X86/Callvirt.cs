@@ -80,7 +80,7 @@ namespace Indy.IL2CPU.IL.X86 {
 					new CPUx86.Add("eax", ObjectImpl.FieldDataOffset.ToString());
 					new CPUx86.Pushd("[eax]");
 					for (int i = mThisOffset; i > 0; i -= 4) {
-						new CPUx86.Push("[esp + " + mThisOffset + "]");
+						new CPUx86.Pushd("[esp + " + mThisOffset + "]");
 					}
 					new CPUx86.Move("eax", "esp");
 					new CPUx86.Add("eax", (mThisOffset).ToString());

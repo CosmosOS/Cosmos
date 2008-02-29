@@ -119,6 +119,9 @@ namespace Cosmos.Hardware.Storage {
 		public static void Initialize(Action<uint> aSleep) {
 			mSleep = aSleep;
 			ATAControllerInfo = new ushort[] { 0x1F0, 0x170 };
+		}
+
+		public static void PrintControllerInfo() {
 			string[] xControllerDescriptions = new string[] { "Primary", "Secondary" };
 			string[] xDrivesDescription = new string[] { "Master", "Slave" };
 			for (int i = 0; i < ATAControllerInfo.Length; i++) {

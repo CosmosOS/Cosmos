@@ -12,6 +12,10 @@ namespace Indy.IL2CPU.IL.CustomImplementations.System {
 			//
 		}
 
+		public static bool Equals(Enum aThis, object aEquals) {
+			throw new NotSupportedException("Enum.Equals not supported yet!");
+		}
+
 		//[PlugMethod(Signature = "System_String___System_Enum_ToString____")]
 		public static string ToString(ref uint aThis) {
 			return UInt32Impl.ToString(ref aThis);

@@ -14,6 +14,8 @@ namespace Cosmos.Kernel {
             // This should be the ONLY reference to the specific assembly
             // Later I would like to make this auto loading, but .NET's
             // init methods are a bit more work than Delphi's. :)
+			// MTW: you could use partial methods for this, but then you dont
+			// have control of the order in which the individual methods are called..
             Cosmos.Hardware.PC.Global.Init();
 
             // Now init kernel devices and rest of kernel

@@ -22,6 +22,7 @@ namespace Cosmos.Hardware.PC {
             // end partially new
             
             HW.Storage.ATA.Initialize(Sleep);
+			HW.Storage.ATAOld.Initialize(Sleep);
 			
             HW.CPU.CreateIDT();
             // end old -----------------
@@ -43,9 +44,11 @@ namespace Cosmos.Hardware.PC {
         public static void Sleep(uint aMSec) {
             uint xStart = TickCount;
             uint xEnd = xStart + aMSec;
+			Cosmos.Hardware.DebugUtil.SendNumber("PC", "Sleep", aMSec, 32);
             while (TickCount < xEnd) {
                 ;
             }
+			Cosmos.Hardware.DebugUtil.SendMessage("PC", "Sleeping done");
         }
     }
 }

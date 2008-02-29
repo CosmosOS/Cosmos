@@ -24,7 +24,7 @@ namespace Cosmos.Shell.Console.Commands {
 				System.Console.WriteLine("Error while initializing Ext2 Filesystem!");
 			} else {
 				System.Console.WriteLine("ATA and Ext2 successfully initialized!");
-				System.Diagnostics.Debugger.Break();
+				//    System.Diagnostics.Debugger.Break();
 				string[] files = xExt2.GetDirectoryEntries(new string[0]);
 				if (files == null) {
 					System.Console.WriteLine("Error while getting DirectoryEntries");

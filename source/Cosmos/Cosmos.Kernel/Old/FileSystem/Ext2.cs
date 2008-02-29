@@ -99,7 +99,6 @@ namespace Cosmos.Kernel.FileSystem {
 		private GroupDescriptor[] mGroupDescriptors;
 		public const uint EXT2_ROOT_INO = 0x02;
 
-
 		public Ext2(Storage aBackend) {
 			if (aBackend == null) {
 				throw new ArgumentNullException("aBackend");
@@ -128,11 +127,6 @@ namespace Cosmos.Kernel.FileSystem {
 		private unsafe bool ReadGroupDescriptorsOfBlock() {
 			byte* xBuffer = (byte*)Heap.MemAlloc(512);
 			mGroupDescriptors = new GroupDescriptor[mGroupsCount];
-			if (mBackend != null) {
-				Console.WriteLine("We still have a backend!");
-			} else {
-				Console.WriteLine("We lost our backend!");
-			}
 			GroupDescriptor* xDescriptorPtr = (GroupDescriptor*)xBuffer;
 			for (int i = 0; i < mGroupsCount; i++) {
 				DebugUtil.SendNumber("Ext2", "ReadGroupDescriptorsOfBlock, I", (uint)i, 16);
@@ -317,35 +311,25 @@ namespace Cosmos.Kernel.FileSystem {
 
 		private unsafe bool ReadINode(uint aINodeNumber, out INode aINode) {
 			DebugUtil.SendNumber("Ext2", "reading INode", aINodeNumber, 32);
-			DebugUtil.SendExt2_SuperBlock("SuperBlock", mSuperBlock);
 			aINodeNumber--;
-			uint xGroup = (aINodeNumber) / mSuperBlock.INodesPerGroup;
-			DebugUtil.SendNumber("Ext2", "Group", xGroup, 32);
-			uint xIndex = (aINodeNumber) % mSuperBlock.INodesPerGroup;
-			DebugUtil.SendNumber("Ext2", "Index", xIndex, 8);
-			uint xByteIndexInGroup = (xIndex * ((byte)sizeof(INode)));
-			DebugUtil.SendNumber("Ext2", "ByteIndexInGroup", xByteIndexInGroup, 16);
-			System.Diagnostics.Debugger.Break();
-			DebugUtil.SendExt2_GroupDescriptor("Ext2", 0, (int)xGroup, 0, mGroupDescriptors[xGroup]);
-			//this.fileSystem.GroupDescriptors[group].INodeTable + (index / this.fileSystem.BlockSize);
-			DebugUtil.SendNumber("Ext2", "Group_INodeTable", mGroupDescriptors[xGroup].INodeTable, 32);
-			uint xFSBlock = (uint)(mGroupDescriptors[xGroup].INodeTable + (xIndex / (1024 << mSuperBlock.LogBlockSize)));
-			DebugUtil.SendNumber("Ext2", "Logical Block", xFSBlock, 32);
-			uint xStorageBlock = (uint)(xFSBlock * ((1024 << mSuperBlock.LogBlockSize) / mBackend.BlockSize));
-			xStorageBlock += xByteIndexInGroup / mBackend.BlockSize;
-			DebugUtil.SendNumber("Ext2", "StorageBlock", xStorageBlock, 32);
-			uint xByteIndexInBackendBlock = xByteIndexInGroup / mBackend.BlockSize;
-			DebugUtil.SendNumber("Ext2", "ByteIndexInBackendBlock", xByteIndexInGroup, 32);
-			ushort* xBuffer = (ushort*)Heap.MemAlloc(mBackend.BlockSize);
-			aINode = default(INode);
-			mBackend.ReadBlock(xStorageBlock, (byte*)xBuffer);
-			//byte* xINodeBuff = (byte*)((uint)xBuffer) + xByteIndexInBackendBlock;
-			INode* xINodePtr = (INode*)xBuffer;
-			DebugUtil.SendNumber("Ext2", "ReadINode, INodePointer index", ((aINodeNumber) % (mBackend.BlockSize / ((byte)sizeof(INode)))), 8);
-			xINodePtr = &xINodePtr[((aINodeNumber - 1) % (byte)(mBackend.BlockSize / ((byte)sizeof(INode))))];
-			aINode = *xINodePtr;
-			DebugUtil.SendExt2_INode(aINodeNumber, xINodePtr);
-			Heap.MemFree((uint)xBuffer);
+			uint xGroup = aINodeNumber / mSuperBlock.INodesPerGroup;
+			DebugUtil.SendNumber("Ext2", "xGroup", xGroup, 32);
+			uint xIndex = (aINodeNumber % mSuperBlock.INodesPerGroup) * mSuperBlock.INodeSize;
+			DebugUtil.SendNumber("Ext2", "xIndex", xIndex, 32);
+			uint xOffset = aINodeNumber % mBlockSize;
+			DebugUtil.SendNumber("Ext2", "xOffset", xOffset, 32);
+			uint xLogBlockNumber = mGroupDescriptors[xGroup].INodeTable;
+			DebugUtil.SendNumber("Ext2", "InodeBitmap", mGroupDescriptors[xGroup].INodeBitmap, 32);
+			DebugUtil.SendNumber("Ext2", "xLogBlockNumber(1)", xLogBlockNumber, 32);
+			xLogBlockNumber += (xIndex / mBlockSize);
+			DebugUtil.SendNumber("Ext2", "xLogBlockNumber(2)", xLogBlockNumber, 32);
+			uint xPhBlockNumber = (xLogBlockNumber*mBlockSize)/mBackend.BlockSize;
+			byte* xBuff = (byte*)Heap.MemAlloc(mBlockSize);
+			mBackend.ReadBlock(xPhBlockNumber, xBuff);
+			DebugUtil.SendNumber("Ext2", "BlockOffset", ((aINodeNumber % mSuperBlock.INodesPerGroup) % (mBlockSize / mSuperBlock.INodeSize)) * mSuperBlock.INodeSize, 32);
+			xBuff += ((aINodeNumber % mSuperBlock.INodesPerGroup) % (mBlockSize / mSuperBlock.INodeSize)) * mSuperBlock.INodeSize;
+			aINode = *(INode*)xBuff;
+			DebugUtil.SendExt2_INode(aINodeNumber + 1, (INode*)xBuff);
 			return true;
 		}
 

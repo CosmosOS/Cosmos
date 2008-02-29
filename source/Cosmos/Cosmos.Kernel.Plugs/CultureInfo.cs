@@ -9,5 +9,9 @@ namespace Cosmos.Kernel.Plugs {
 		[PlugMethod(Signature="System_Void__System_Globalization_CultureInfo__cctor__")]
 		public static void CCtor() {
 		}
+
+		public static bool Equals(System.Globalization.CultureInfo aThis, object aThat) {
+			return false;
+		}
 	}
 }

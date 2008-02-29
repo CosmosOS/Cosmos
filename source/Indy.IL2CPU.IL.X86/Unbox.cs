@@ -53,7 +53,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			int xItems = xSize /4;
 			for (int i = xItems - 1; i >= 0; i--) {
-				new CPUx86.Push("[eax + " + ((i * 4) + ObjectImpl.FieldDataOffset) + "]");
+				new CPUx86.Pushd("[eax + " + ((i * 4) + ObjectImpl.FieldDataOffset) + "]");
 			}
 			Assembler.StackContents.Push(new StackContent(mTypeSize, mType));
 			new CPUx86.JumpAlways(mNextOpLabel);

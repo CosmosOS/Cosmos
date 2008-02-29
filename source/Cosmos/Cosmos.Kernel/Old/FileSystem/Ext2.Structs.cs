@@ -92,10 +92,8 @@ namespace Cosmos.Kernel.FileSystem {
 			public ushort DefResGID;
 			[FieldOffset(84)]
 			public uint FirstINode;
-
-
 			[FieldOffset(88)]
-			public uint Padding1;
+			public ushort INodeSize;
 			[FieldOffset(92)]
 			public uint Padding2;
 			[FieldOffset(96)]

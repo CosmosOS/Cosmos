@@ -33,14 +33,14 @@ namespace MonoTests.System.Collections
 				Assert ("null icollection error not thrown",
 					   errorThrown);
 			}
-			{
-				try {
-					Char [,] c1 = new Char [2, 2];
-					ArrayList al1 = new ArrayList (c1);
-					Fail ("Should fail with multi-dimensional array in constructor.");
-				} catch (RankException) {
-				}
-			}
+			//{
+			//    try {
+			//        Char [,] c1 = new Char [2, 2];
+			//        ArrayList al1 = new ArrayList (c1);
+			//        Fail ("Should fail with multi-dimensional array in constructor.");
+			//    } catch (RankException) {
+			//    }
+			//}
 
 			{
 				bool errorThrown = false;
@@ -235,18 +235,18 @@ namespace MonoTests.System.Collections
 				AssertEquals ("couldn't find end",
 						 -9, al1.BinarySearch ('e'));
 			}
-			// Sort
-			{
-				char [] starter = { 'd', 'b', 'f', 'e', 'a', 'c' };
-				ArrayList al1 = ArrayList.Adapter (starter);
-				al1.Sort ();
-				AssertEquals ("Should be sorted", 'a', al1 [0]);
-				AssertEquals ("Should be sorted", 'b', al1 [1]);
-				AssertEquals ("Should be sorted", 'c', al1 [2]);
-				AssertEquals ("Should be sorted", 'd', al1 [3]);
-				AssertEquals ("Should be sorted", 'e', al1 [4]);
-				AssertEquals ("Should be sorted", 'f', al1 [5]);
-			}
+			//// Sort
+			//{
+			//    char [] starter = { 'd', 'b', 'f', 'e', 'a', 'c' };
+			//    ArrayList al1 = ArrayList.Adapter (starter);
+			//    al1.Sort ();
+			//    AssertEquals ("Should be sorted", 'a', al1 [0]);
+			//    AssertEquals ("Should be sorted", 'b', al1 [1]);
+			//    AssertEquals ("Should be sorted", 'c', al1 [2]);
+			//    AssertEquals ("Should be sorted", 'd', al1 [3]);
+			//    AssertEquals ("Should be sorted", 'e', al1 [4]);
+			//    AssertEquals ("Should be sorted", 'f', al1 [5]);
+			//}
 
 			// TODO - test other adapter types?
 		}
@@ -554,20 +554,20 @@ namespace MonoTests.System.Collections
 				}
 				Assert ("error not thrown 1", errorThrown);
 			}
-			{
-				bool errorThrown = false;
-				try {
-					Char [] c1 = new Char [2];
-					ArrayList al1 = new ArrayList (c1);
-					Char [,] c2 = new Char [2, 2];
-					al1.CopyTo (c2, 2);
-				} catch (ArgumentException) {
-					errorThrown = true;
-				} catch (Exception e) {
-					Fail ("Incorrect exception thrown at 2: " + e.ToString ());
-				}
-				Assert ("error not thrown 2", errorThrown);
-			}
+			//{
+			//    bool errorThrown = false;
+			//    try {
+			//        Char [] c1 = new Char [2];
+			//        ArrayList al1 = new ArrayList (c1);
+			//        Char [,] c2 = new Char [2, 2];
+			//        al1.CopyTo (c2, 2);
+			//    } catch (ArgumentException) {
+			//        errorThrown = true;
+			//    } catch (Exception e) {
+			//        Fail ("Incorrect exception thrown at 2: " + e.ToString ());
+			//    }
+			//    Assert ("error not thrown 2", errorThrown);
+			//}
 			{
 				bool errorThrown = false;
 				try {
@@ -712,192 +712,192 @@ namespace MonoTests.System.Collections
 			}
 		}
 
-		[Test]
-		public static void TestEnumerator ()
-		{
-			String [] s1 = { "this", "is", "a", "test" };
-			ArrayList al1 = new ArrayList (s1);
-			IEnumerator en = al1.GetEnumerator ();
-			en.MoveNext ();
-			al1.Add ("something");
-			try {
-				en.MoveNext ();
-				Fail ("Add() didn't invalidate the enumerator");
-			} catch (InvalidOperationException) {
-				// do nothing...this is what we expect
-			}
+		//[Test]
+		//public static void TestEnumerator ()
+		//{
+		//    String [] s1 = { "this", "is", "a", "test" };
+		//    ArrayList al1 = new ArrayList (s1);
+		//    IEnumerator en = al1.GetEnumerator ();
+		//    en.MoveNext ();
+		//    al1.Add ("something");
+		//    try {
+		//        en.MoveNext ();
+		//        Fail ("Add() didn't invalidate the enumerator");
+		//    } catch (InvalidOperationException) {
+		//        // do nothing...this is what we expect
+		//    }
 
-			en = al1.GetEnumerator ();
-			en.MoveNext ();
-			al1.AddRange (al1);
-			try {
-				en.MoveNext ();
-				Fail ("AddRange() didn't invalidate the enumerator");
-			} catch (InvalidOperationException) {
-				// do nothing...this is what we expect
-			}
+		//    en = al1.GetEnumerator ();
+		//    en.MoveNext ();
+		//    al1.AddRange (al1);
+		//    try {
+		//        en.MoveNext ();
+		//        Fail ("AddRange() didn't invalidate the enumerator");
+		//    } catch (InvalidOperationException) {
+		//        // do nothing...this is what we expect
+		//    }
 
-			en = al1.GetEnumerator ();
-			en.MoveNext ();
-			al1.Clear ();
-			try {
-				en.MoveNext ();
-				Fail ("Clear() didn't invalidate the enumerator");
-			} catch (InvalidOperationException) {
-				// do nothing...this is what we expect
-			}
+		//    en = al1.GetEnumerator ();
+		//    en.MoveNext ();
+		//    al1.Clear ();
+		//    try {
+		//        en.MoveNext ();
+		//        Fail ("Clear() didn't invalidate the enumerator");
+		//    } catch (InvalidOperationException) {
+		//        // do nothing...this is what we expect
+		//    }
 
-			al1 = new ArrayList (s1);
-			en = al1.GetEnumerator ();
-			en.MoveNext ();
-			al1.Insert (0, "new first");
-			try {
-				en.MoveNext ();
-				Fail ("Insert() didn't invalidate the enumerator");
-			} catch (InvalidOperationException) {
-				// do nothing...this is what we expect
-			}
+		//    al1 = new ArrayList (s1);
+		//    en = al1.GetEnumerator ();
+		//    en.MoveNext ();
+		//    al1.Insert (0, "new first");
+		//    try {
+		//        en.MoveNext ();
+		//        Fail ("Insert() didn't invalidate the enumerator");
+		//    } catch (InvalidOperationException) {
+		//        // do nothing...this is what we expect
+		//    }
 
-			en = al1.GetEnumerator ();
-			en.MoveNext ();
-			al1.InsertRange (0, al1);
-			try {
-				en.MoveNext ();
-				Fail ("InsertRange() didn't invalidate the enumerator");
-			} catch (InvalidOperationException) {
-				// do nothing...this is what we expect
-			}
+		//    en = al1.GetEnumerator ();
+		//    en.MoveNext ();
+		//    al1.InsertRange (0, al1);
+		//    try {
+		//        en.MoveNext ();
+		//        Fail ("InsertRange() didn't invalidate the enumerator");
+		//    } catch (InvalidOperationException) {
+		//        // do nothing...this is what we expect
+		//    }
 
-			en = al1.GetEnumerator ();
-			en.MoveNext ();
-			al1.Remove ("this");
-			try {
-				en.MoveNext ();
-				Fail ("Remove() didn't invalidate the enumerator");
-			} catch (InvalidOperationException) {
-				// do nothing...this is what we expect
-			}
+		//    en = al1.GetEnumerator ();
+		//    en.MoveNext ();
+		//    al1.Remove ("this");
+		//    try {
+		//        en.MoveNext ();
+		//        Fail ("Remove() didn't invalidate the enumerator");
+		//    } catch (InvalidOperationException) {
+		//        // do nothing...this is what we expect
+		//    }
 
-			en = al1.GetEnumerator ();
-			en.MoveNext ();
-			al1.RemoveAt (2);
-			try {
-				en.MoveNext ();
-				Fail ("RemoveAt() didn't invalidate the enumerator");
-			} catch (InvalidOperationException) {
-				// do nothing...this is what we expect
-			}
+		//    en = al1.GetEnumerator ();
+		//    en.MoveNext ();
+		//    al1.RemoveAt (2);
+		//    try {
+		//        en.MoveNext ();
+		//        Fail ("RemoveAt() didn't invalidate the enumerator");
+		//    } catch (InvalidOperationException) {
+		//        // do nothing...this is what we expect
+		//    }
 
-			en = al1.GetEnumerator ();
-			en.MoveNext ();
-			al1.RemoveRange (1, 1);
-			try {
-				en.MoveNext ();
-				Fail ("RemoveRange() didn't invalidate the enumerator");
-			} catch (InvalidOperationException) {
-				// do nothing...this is what we expect
-			}
+		//    en = al1.GetEnumerator ();
+		//    en.MoveNext ();
+		//    al1.RemoveRange (1, 1);
+		//    try {
+		//        en.MoveNext ();
+		//        Fail ("RemoveRange() didn't invalidate the enumerator");
+		//    } catch (InvalidOperationException) {
+		//        // do nothing...this is what we expect
+		//    }
 
-			en = al1.GetEnumerator ();
-			en.MoveNext ();
-			al1.Reverse ();
-			try {
-				en.MoveNext ();
-				Fail ("Reverse() didn't invalidate the enumerator");
-			} catch (InvalidOperationException) {
-				// do nothing...this is what we expect
-			}
+		//    en = al1.GetEnumerator ();
+		//    en.MoveNext ();
+		//    al1.Reverse ();
+		//    try {
+		//        en.MoveNext ();
+		//        Fail ("Reverse() didn't invalidate the enumerator");
+		//    } catch (InvalidOperationException) {
+		//        // do nothing...this is what we expect
+		//    }
 
-			en = al1.GetEnumerator ();
-			en.MoveNext ();
-			al1.Sort ();
-			try {
-				en.MoveNext ();
-				Fail ("Sort() didn't invalidate the enumerator");
-			} catch (InvalidOperationException) {
-				// do nothing...this is what we expect
-			}
-		}
+		//    en = al1.GetEnumerator ();
+		//    en.MoveNext ();
+		//    al1.Sort ();
+		//    try {
+		//        en.MoveNext ();
+		//        Fail ("Sort() didn't invalidate the enumerator");
+		//    } catch (InvalidOperationException) {
+		//        // do nothing...this is what we expect
+		//    }
+		//}
 
-		[Test]
-		public static void TestGetEnumerator ()
-		{
-			{
-				bool errorThrown = false;
-				try {
-					ArrayList a = new ArrayList ();
-					IEnumerator en = a.GetEnumerator (-1, 1);
-				} catch (ArgumentOutOfRangeException) {
-					errorThrown = true;
-				}
-				Assert ("negative index error not thrown",
-					   errorThrown);
-			}
-			{
-				bool errorThrown = false;
-				try {
-					ArrayList a = new ArrayList ();
-					IEnumerator en = a.GetEnumerator (1, -1);
-				} catch (ArgumentOutOfRangeException) {
-					errorThrown = true;
-				}
-				Assert ("negative index error not thrown",
-					   errorThrown);
-			}
-			{
-				bool errorThrown = false;
-				try {
-					ArrayList a = new ArrayList ();
-					IEnumerator en = a.GetEnumerator (1, 1);
-				} catch (ArgumentException) {
-					errorThrown = true;
-				}
-				Assert ("out-of-range index error not thrown",
-					   errorThrown);
-			}
-			{
-				String [] s1 = { "this", "is", "a", "test" };
-				ArrayList al1 = new ArrayList (s1);
-				IEnumerator en = al1.GetEnumerator ();
-				AssertNotNull ("No enumerator", en);
+		//[Test]
+		//public static void TestGetEnumerator ()
+		//{
+		//    {
+		//        bool errorThrown = false;
+		//        try {
+		//            ArrayList a = new ArrayList ();
+		//            IEnumerator en = a.GetEnumerator (-1, 1);
+		//        } catch (ArgumentOutOfRangeException) {
+		//            errorThrown = true;
+		//        }
+		//        Assert ("negative index error not thrown",
+		//               errorThrown);
+		//    }
+		//    {
+		//        bool errorThrown = false;
+		//        try {
+		//            ArrayList a = new ArrayList ();
+		//            IEnumerator en = a.GetEnumerator (1, -1);
+		//        } catch (ArgumentOutOfRangeException) {
+		//            errorThrown = true;
+		//        }
+		//        Assert ("negative index error not thrown",
+		//               errorThrown);
+		//    }
+		//    {
+		//        bool errorThrown = false;
+		//        try {
+		//            ArrayList a = new ArrayList ();
+		//            IEnumerator en = a.GetEnumerator (1, 1);
+		//        } catch (ArgumentException) {
+		//            errorThrown = true;
+		//        }
+		//        Assert ("out-of-range index error not thrown",
+		//               errorThrown);
+		//    }
+		//    {
+		//        String [] s1 = { "this", "is", "a", "test" };
+		//        ArrayList al1 = new ArrayList (s1);
+		//        IEnumerator en = al1.GetEnumerator ();
+		//        AssertNotNull ("No enumerator", en);
 
-				for (int i = 0; i < s1.Length; i++) {
-					en.MoveNext ();
-					AssertEquals ("Not enumerating",
-							 al1 [i], en.Current);
-				}
-			}
-			{
-				String [] s1 = { "this", "is", "a", "test" };
-				ArrayList al1 = new ArrayList (s1);
-				IEnumerator en = al1.GetEnumerator (1, 2);
-				AssertNotNull ("No enumerator", en);
+		//        for (int i = 0; i < s1.Length; i++) {
+		//            en.MoveNext ();
+		//            AssertEquals ("Not enumerating",
+		//                     al1 [i], en.Current);
+		//        }
+		//    }
+		//    {
+		//        String [] s1 = { "this", "is", "a", "test" };
+		//        ArrayList al1 = new ArrayList (s1);
+		//        IEnumerator en = al1.GetEnumerator (1, 2);
+		//        AssertNotNull ("No enumerator", en);
 
-				for (int i = 0; i < 2; i++) {
-					en.MoveNext ();
-					AssertEquals ("Not enumerating",
-							 al1 [i + 1], en.Current);
-				}
-			}
-		}
+		//        for (int i = 0; i < 2; i++) {
+		//            en.MoveNext ();
+		//            AssertEquals ("Not enumerating",
+		//                     al1 [i + 1], en.Current);
+		//        }
+		//    }
+		//}
 
-		[Test]
-		[ExpectedException (typeof (ArgumentException))]
-		public static void GetEnumerator_IndexOverflow ()
-		{
-			ArrayList al = new ArrayList ();
-			al.Add(new object());
-			al.GetEnumerator (Int32.MaxValue, 0);
-		}
+		//[Test]
+		//[ExpectedException (typeof (ArgumentException))]
+		//public static void GetEnumerator_IndexOverflow ()
+		//{
+		//    ArrayList al = new ArrayList ();
+		//    al.Add(new object());
+		//    al.GetEnumerator (Int32.MaxValue, 0);
+		//}
 
-		[Test]
-		[ExpectedException (typeof (ArgumentException))]
-		public static void GetEnumerator_CountOverflow ()
-		{
-			ArrayList al = new ArrayList ();
-			al.Add(new object());
-			al.GetEnumerator (0, Int32.MaxValue);
-		}
+		//[Test]
+		//[ExpectedException (typeof (ArgumentException))]
+		//public static void GetEnumerator_CountOverflow ()
+		//{
+		//    ArrayList al = new ArrayList ();
+		//    al.Add(new object());
+		//    al.GetEnumerator (0, Int32.MaxValue);
+		//}
 
 		[Test]
 		public static void TestGetRange ()
@@ -1560,87 +1560,87 @@ namespace MonoTests.System.Collections
 			}
 		}
 
-		[Test]
-		public static void TestReverse ()
-		{
-			{
-				bool errorThrown = false;
-				try {
-					ArrayList al1 =
-						ArrayList.ReadOnly (new ArrayList ());
-					al1.Reverse ();
-				} catch (NotSupportedException) {
-					errorThrown = true;
-				}
-				Assert ("reverse on read only error not thrown",
-					   errorThrown);
-			}
-			{
-				bool errorThrown = false;
-				try {
-					char [] c = new Char [2];
-					ArrayList al1 = new ArrayList (c);
-					al1.Reverse (0, 3);
-				} catch (ArgumentException) {
-					errorThrown = true;
-				}
-				Assert ("error not thrown", errorThrown);
-			}
-			{
-				bool errorThrown = false;
-				try {
-					char [] c = new Char [2];
-					ArrayList al1 = new ArrayList (c);
-					al1.Reverse (3, 0);
-				} catch (ArgumentException) {
-					errorThrown = true;
-				}
-				Assert ("error not thrown", errorThrown);
-			}
-			{
-				char [] c = { 'a', 'b', 'c', 'd', 'e' };
-				ArrayList al1 = new ArrayList (c);
-				al1.Reverse (2, 1);
-				for (int i = 0; i < al1.Count; i++) {
-					AssertEquals ("Should be no change yet",
-							 c [i], al1 [i]);
-				}
-				al1.Reverse ();
-				for (int i = 0; i < al1.Count; i++) {
-					AssertEquals ("Should be reversed",
-							 c [i], al1 [4 - i]);
-				}
-				al1.Reverse ();
-				for (int i = 0; i < al1.Count; i++) {
-					AssertEquals ("Should be back to normal",
-							 c [i], al1 [i]);
-				}
-				al1.Reverse (1, 3);
-				AssertEquals ("Should be back to normal", c [0], al1 [0]);
-				AssertEquals ("Should be back to normal", c [3], al1 [1]);
-				AssertEquals ("Should be back to normal", c [2], al1 [2]);
-				AssertEquals ("Should be back to normal", c [1], al1 [3]);
-				AssertEquals ("Should be back to normal", c [4], al1 [4]);
-			}
-		}
+		//[Test]
+		//public static void TestReverse ()
+		//{
+		//    {
+		//        bool errorThrown = false;
+		//        try {
+		//            ArrayList al1 =
+		//                ArrayList.ReadOnly (new ArrayList ());
+		//            al1.Reverse ();
+		//        } catch (NotSupportedException) {
+		//            errorThrown = true;
+		//        }
+		//        Assert ("reverse on read only error not thrown",
+		//               errorThrown);
+		//    }
+		//    {
+		//        bool errorThrown = false;
+		//        try {
+		//            char [] c = new Char [2];
+		//            ArrayList al1 = new ArrayList (c);
+		//            al1.Reverse (0, 3);
+		//        } catch (ArgumentException) {
+		//            errorThrown = true;
+		//        }
+		//        Assert ("error not thrown", errorThrown);
+		//    }
+		//    {
+		//        bool errorThrown = false;
+		//        try {
+		//            char [] c = new Char [2];
+		//            ArrayList al1 = new ArrayList (c);
+		//            al1.Reverse (3, 0);
+		//        } catch (ArgumentException) {
+		//            errorThrown = true;
+		//        }
+		//        Assert ("error not thrown", errorThrown);
+		//    }
+		//    {
+		//        char [] c = { 'a', 'b', 'c', 'd', 'e' };
+		//        ArrayList al1 = new ArrayList (c);
+		//        al1.Reverse (2, 1);
+		//        for (int i = 0; i < al1.Count; i++) {
+		//            AssertEquals ("Should be no change yet",
+		//                     c [i], al1 [i]);
+		//        }
+		//        al1.Reverse ();
+		//        for (int i = 0; i < al1.Count; i++) {
+		//            AssertEquals ("Should be reversed",
+		//                     c [i], al1 [4 - i]);
+		//        }
+		//        al1.Reverse ();
+		//        for (int i = 0; i < al1.Count; i++) {
+		//            AssertEquals ("Should be back to normal",
+		//                     c [i], al1 [i]);
+		//        }
+		//        al1.Reverse (1, 3);
+		//        AssertEquals ("Should be back to normal", c [0], al1 [0]);
+		//        AssertEquals ("Should be back to normal", c [3], al1 [1]);
+		//        AssertEquals ("Should be back to normal", c [2], al1 [2]);
+		//        AssertEquals ("Should be back to normal", c [1], al1 [3]);
+		//        AssertEquals ("Should be back to normal", c [4], al1 [4]);
+		//    }
+		//}
 
-		[Test]
-		[ExpectedException (typeof (ArgumentException))]
-		public static void Reverse_IndexOverflow ()
-		{
-			ArrayList al = new ArrayList ();
-			al.Add(new object());
-			al.Reverse (Int32.MaxValue, 1);
-		}
+		//[Test]
+		//[ExpectedException (typeof (ArgumentException))]
+		//public static void Reverse_IndexOverflow ()
+		//{
+		//    ArrayList al = new ArrayList ();
+		//    al.Add(new object());
+		//    al.Reverse (Int32.MaxValue, 1);
+		//}
 
-		[Test]
-		[ExpectedException (typeof (ArgumentException))]
-		public static void Reverse_CountOverflow ()
-		{
-			ArrayList al = new ArrayList ();
-			al.Add(new object());
-			al.Reverse (1, Int32.MaxValue);
-		}
+		//[Test]
+		//[ExpectedException (typeof (ArgumentException))]
+		//public static void Reverse_CountOverflow ()
+		//{
+		//    ArrayList al = new ArrayList ();
+		//    al.Add(new object());
+		//    al.Reverse (1, Int32.MaxValue);
+		//}
 
 		[Test]
 		public static void TestSetRange ()
@@ -1738,68 +1738,68 @@ namespace MonoTests.System.Collections
 			}
 		}
 
-		[Test]
-		public static void TestSort ()
-		{
-			{
-				bool errorThrown = false;
-				try {
-					ArrayList al1 =
-						ArrayList.ReadOnly (new ArrayList ());
-					al1.Sort ();
-				} catch (NotSupportedException) {
-					errorThrown = true;
-				}
-				Assert ("sort on read only error not thrown",
-					   errorThrown);
-			}
-			{
-				char [] starter = { 'd', 'b', 'f', 'e', 'a', 'c' };
-				ArrayList al1 = new ArrayList (starter);
-				al1.Sort ();
-				AssertEquals ("Should be sorted", 'a', al1 [0]);
-				AssertEquals ("Should be sorted", 'b', al1 [1]);
-				AssertEquals ("Should be sorted", 'c', al1 [2]);
-				AssertEquals ("Should be sorted", 'd', al1 [3]);
-				AssertEquals ("Should be sorted", 'e', al1 [4]);
-				AssertEquals ("Should be sorted", 'f', al1 [5]);
-			}
-			{
-				ArrayList al1 = new ArrayList ();
-				al1.Add (null);
-				al1.Add (null);
-				al1.Add (32);
-				al1.Add (33);
-				al1.Add (null);
-				al1.Add (null);
+		//[Test]
+		//public static void TestSort ()
+		//{
+		//    {
+		//        bool errorThrown = false;
+		//        try {
+		//            ArrayList al1 =
+		//                ArrayList.ReadOnly (new ArrayList ());
+		//            al1.Sort ();
+		//        } catch (NotSupportedException) {
+		//            errorThrown = true;
+		//        }
+		//        Assert ("sort on read only error not thrown",
+		//               errorThrown);
+		//    }
+		//    {
+		//        char [] starter = { 'd', 'b', 'f', 'e', 'a', 'c' };
+		//        ArrayList al1 = new ArrayList (starter);
+		//        al1.Sort ();
+		//        AssertEquals ("Should be sorted", 'a', al1 [0]);
+		//        AssertEquals ("Should be sorted", 'b', al1 [1]);
+		//        AssertEquals ("Should be sorted", 'c', al1 [2]);
+		//        AssertEquals ("Should be sorted", 'd', al1 [3]);
+		//        AssertEquals ("Should be sorted", 'e', al1 [4]);
+		//        AssertEquals ("Should be sorted", 'f', al1 [5]);
+		//    }
+		//    {
+		//        ArrayList al1 = new ArrayList ();
+		//        al1.Add (null);
+		//        al1.Add (null);
+		//        al1.Add (32);
+		//        al1.Add (33);
+		//        al1.Add (null);
+		//        al1.Add (null);
 
-				al1.Sort ();
-				AssertEquals ("Should be null", null, al1 [0]);
-				AssertEquals ("Should be 2. null", null, al1 [1]);
-				AssertEquals ("Should be 3. null", null, al1 [2]);
-				AssertEquals ("Should be 4. null", null, al1 [3]);
-				AssertEquals ("Should be 32", 32, al1 [4]);
-				AssertEquals ("Should be 33", 33, al1 [5]);
-			}
-		}
+		//        al1.Sort ();
+		//        AssertEquals ("Should be null", null, al1 [0]);
+		//        AssertEquals ("Should be 2. null", null, al1 [1]);
+		//        AssertEquals ("Should be 3. null", null, al1 [2]);
+		//        AssertEquals ("Should be 4. null", null, al1 [3]);
+		//        AssertEquals ("Should be 32", 32, al1 [4]);
+		//        AssertEquals ("Should be 33", 33, al1 [5]);
+		//    }
+		//}
 
-		[Test]
-		[ExpectedException (typeof (ArgumentException))]
-		public static void Sort_IndexOverflow ()
-		{
-			ArrayList al = new ArrayList ();
-			al.Add(new object());
-			al.Sort (Int32.MaxValue, 1, null);
-		}
+		//[Test]
+		//[ExpectedException (typeof (ArgumentException))]
+		//public static void Sort_IndexOverflow ()
+		//{
+		//    ArrayList al = new ArrayList ();
+		//    al.Add(new object());
+		//    al.Sort (Int32.MaxValue, 1, null);
+		//}
 
-		[Test]
-		[ExpectedException (typeof (ArgumentException))]
-		public static void Sort_CountOverflow ()
-		{
-			ArrayList al = new ArrayList ();
-			al.Add(new object());
-			al.Sort (1, Int32.MaxValue, null);
-		}
+		//[Test]
+		//[ExpectedException (typeof (ArgumentException))]
+		//public static void Sort_CountOverflow ()
+		//{
+		//    ArrayList al = new ArrayList ();
+		//    al.Add(new object());
+		//    al.Sort (1, Int32.MaxValue, null);
+		//}
 
 		// TODO - Sort with IComparers
 
@@ -1946,18 +1946,18 @@ namespace MonoTests.System.Collections
 			AssertEquals ("#7", "2", target [0]);
 		}
 
-		[Test]
-#if ONLY_1_1
-	[Category ("NotDotNet")] // MS bug
-#endif
-		public static void IterateSelf ()
-		{
-			ArrayList list = new ArrayList ();
-			list.Add (list);
-			IEnumerator enumerator = list.GetEnumerator ();
-			Assert ("#1", enumerator.MoveNext ());
-			Assert ("#2", object.ReferenceEquals (list, enumerator.Current));
-			Assert ("#3", !enumerator.MoveNext ());
-		}
+//        [Test]
+//#if ONLY_1_1
+//    [Category ("NotDotNet")] // MS bug
+//#endif
+//        public static void IterateSelf ()
+//        {
+//            ArrayList list = new ArrayList ();
+//            list.Add (list);
+//            IEnumerator enumerator = list.GetEnumerator ();
+//            Assert ("#1", enumerator.MoveNext ());
+//            Assert ("#2", object.ReferenceEquals (list, enumerator.Current));
+//            Assert ("#3", !enumerator.MoveNext ());
+//        }
 	}
 }

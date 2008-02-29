@@ -30,7 +30,6 @@ namespace Indy.IL2CPU.IL.X86 {
 		public override void DoAssemble() {
 			string mReturnNullLabel = mThisLabel + "_ReturnNull";
 			new CPUx86.Pop(CPUx86.Registers.EAX);
-			Assembler.StackContents.Pop();
 			new CPUx86.Compare(CPUx86.Registers.EAX, "0");
 			new CPUx86.JumpIfZero(mReturnNullLabel);
 			new CPUx86.Pushd(CPUx86.Registers.AtEAX, "0" + mTypeId + "h");

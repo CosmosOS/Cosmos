@@ -36,8 +36,8 @@
             <LineBreak/>
             <InlineUIContainer>
                 <StackPanel>
-                <CheckBox Name="chckQEMUUseGDB" IsChecked="True">Use GDB Debugger</CheckBox>
-                <CheckBox Name="chckQEMUUseHD">Create hard disk image</CheckBox>
+                <CheckBox Name="chckQEMUUseGDB" IsChecked="True">Use _GDB Debugger</CheckBox>
+                <CheckBox Name="chckQEMUUseHD">Create _hard disk image</CheckBox>
                 </StackPanel>
             </InlineUIContainer>
         </Paragraph>

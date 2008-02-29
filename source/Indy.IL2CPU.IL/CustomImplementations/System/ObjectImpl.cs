@@ -10,5 +10,9 @@ namespace Indy.IL2CPU.IL.CustomImplementations.System {
 		public static string ToString(object aThis) {
 			return "--object--";
 		}
+
+		public static bool InternalEquals(object a, object b) {
+			return false;
+		}
 	}
 }
