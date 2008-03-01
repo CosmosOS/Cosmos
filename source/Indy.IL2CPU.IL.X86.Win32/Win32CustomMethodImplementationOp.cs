@@ -6,7 +6,6 @@ using Indy.IL2CPU.IL.X86;
 
 using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
-using Instruction = Mono.Cecil.Cil.Instruction;
 
 namespace Indy.IL2CPU.IL.X86.Win32 {
 	public class Win32CustomMethodImplementationOp: X86CustomMethodImplementationOp {
