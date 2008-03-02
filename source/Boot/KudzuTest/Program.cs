@@ -24,6 +24,10 @@ namespace KudzuTest {
 //			System.Diagnostics.Debugger.Break();
             Console.WriteLine("Boot complete");
 
+
+
+            Cosmos.Hardware.PC.Bus.PCIBus.Init();
+            Console.ReadLine();
             Tests.DoAll();
 
             //Cosmos.Kernel.Temp.Kudzu.PCI.Test();
