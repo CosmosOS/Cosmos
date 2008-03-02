@@ -20,12 +20,15 @@ namespace Cosmos.Kernel.Plugs {
 
 		public static string Concat(string aStrA, string aStrB) {
 			char[] xChars = new char[aStrA.Length + aStrB.Length];
-			for (int i = 0; i < aStrA.Length; i++) {
-				xChars[i] = aStrA[i];
-			}
-			for (int i = 0; i < aStrB.Length; i++) {
-				xChars[i + aStrA.Length] = aStrB[i];
-			}
+            int xPos = 0;
+            for (int i = 0; i < aStrA.Length; i++)
+            {
+                xChars[xPos++] = aStrA[i];
+            }
+            for (int i = 0; i < aStrB.Length; i++)
+            {
+                xChars[xPos++] = aStrB[i];
+            }
 			return new global::System.String(xChars);
 		}
 
@@ -37,15 +40,20 @@ namespace Cosmos.Kernel.Plugs {
 			if (aStrC == null)
 				aStrC = string.Empty;
 			char[] xChars = new char[aStrA.Length + aStrB.Length + aStrC.Length];
-			for (int i = 0; i < aStrA.Length; i++) {
-				xChars[i] = aStrA[i];
-			}
-			for (int i = 0; i < aStrB.Length; i++) {
-				xChars[i + aStrA.Length] = aStrB[i];
-			}
-			for (int i = 0; i < aStrC.Length; i++) {
-				xChars[i + aStrB.Length + aStrC.Length] = aStrC[i];
-			}
+            int xPos = 0;
+            for (int i = 0; i < aStrA.Length; i++)
+            {
+                xChars[xPos++] = aStrA[i];
+            }
+            for (int i = 0; i < aStrB.Length; i++)
+            {
+                xChars[xPos++] = aStrB[i];
+            }
+            for (int i = 0; i < aStrC.Length; i++)
+            {
+                xChars[xPos++] = aStrC[i];
+            }
+
 			return new global::System.String(xChars);
 		}
 
@@ -59,17 +67,18 @@ namespace Cosmos.Kernel.Plugs {
 			if (aStrD == null)
 				aStrD = string.Empty;
 			char[] xChars = new char[aStrA.Length + aStrB.Length + aStrC.Length + aStrD.Length];
+            int xPos = 0;
 			for (int i = 0; i < aStrA.Length; i++) {
-				xChars[i] = aStrA[i];
+				xChars[xPos++] = aStrA[i];
 			}
 			for (int i = 0; i < aStrB.Length; i++) {
-				xChars[i + aStrA.Length] = aStrB[i];
+                xChars[xPos++] = aStrB[i];
 			}
 			for (int i = 0; i < aStrC.Length; i++) {
-				xChars[i + aStrB.Length + aStrC.Length] = aStrC[i];
+                xChars[xPos++] = aStrC[i];
 			}
 			for (int i = 0; i < aStrD.Length; i++) {
-				xChars[i + aStrB.Length + aStrC.Length + aStrD.Length] = aStrD[i];
+                xChars[xPos++] = aStrD[i];
 			}
 			return new global::System.String(xChars);
 		}
