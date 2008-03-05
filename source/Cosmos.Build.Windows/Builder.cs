@@ -39,6 +39,8 @@ namespace Cosmos.Build.Windows {
 			try {
 				RegistryKey xKey = Registry.CurrentUser.OpenSubKey(@"Software\Cosmos");
 				string xResult;
+                // If no key, see if we are in dev mode
+                // Problem  - noone checked this for user kit mode and no key...
 				if (xKey == null) {
 					xResult = Directory.GetCurrentDirectory();
 					xResult = xResult.Substring(0, xResult.IndexOf("source"));
