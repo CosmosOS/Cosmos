@@ -11,11 +11,11 @@ AppSupportURL=http://www.gocosmos.org/
 AppUpdatesURL=http://www.gocosmos.org/
 DefaultDirName={pf}\Cosmos User Kit
 DefaultGroupName=Cosmos User Kit
-OutputDir=C:\source\Cosmos\Setup\Output
+OutputDir=.\Output
 OutputBaseFilename=CosmosUserKit
 Compression=lzma/ultra64
 SolidCompression=yes
-SourceDir=c:\source\Cosmos\Build
+SourceDir=..\build
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -25,14 +25,14 @@ Name: "{group}\{cm:ProgramOnTheWeb,Cosmos}"; Filename: "http://www.gocosmos.org/
 Name: "{group}\{cm:UninstallProgram,Uninstall}"; Filename: "{uninstallexe}"
 
 [Files]
-Source: "Cosmos.vsi"; DestDir: "{app}";
-Source: "GAC\*"; DestDir: "{app}\GAC"; Flags: recursesubdirs;
-Source: "ISO\*"; DestDir: "{app}\ISO"; Excludes: "output.bin"; Flags: recursesubdirs;
-Source: "PXE\*"; DestDir: "{app}\PXE"; Flags: recursesubdirs;
-Source: "Tools\*"; DestDir: "{app}\Tools"; Flags: recursesubdirs;
-Source: "VMWare\*"; DestDir: "{app}\VMWare"; Excludes: "*.log"; Flags: recursesubdirs;
-Source: "VPC\*"; DestDir: "{app}\VPC"; Flags: recursesubdirs;
+Source: "..\setup\Cosmos.vsi"; DestDir: "{app}";
+Source: "Tools\*"; DestDir: "{app}\Tools"; Excludes: "*.log;*.asm;output.bin"; Flags: recursesubdirs;
+Source: "..\source\Cosmos.Shell.Guess\bin\Debug\*.dll"; DestDir: "{app}\Tools\GAC";
+Source: "..\source\Cosmos.Shell.Guess\bin\Debug\IL2CPU.exe"; DestDir: "{app}\Tools\GAC";
 
 [Registry]
 Root: HKLM; Subkey: "Software\Cosmos"; ValueType: string; ValueName: "Build Path"; ValueData: "{app}";
+Root: HKLM; Subkey: "Software\Microsoft\.NETFramework\AssemblyFolders\Cosmos"; ValueType: string; ValueName: ""; ValueData: "{app}\Tools\GAC\";
 
+[Run]
+Filename: "{app}\Cosmos.vsi"; Verb: "open"; Flags: shellexec runascurrentuser;
