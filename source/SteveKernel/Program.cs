@@ -25,7 +25,7 @@ namespace SteveKernel
 
 
             Cosmos.Hardware.PC.Bus.PCIBus.Init();
-
+            Cosmos.Hardware.PC.Bus.PCIBus.DebugLSPCI();
 
 
             while (true)
