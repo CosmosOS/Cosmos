@@ -1,8 +1,8 @@
 ﻿<Window x:Class="Cosmos.Build.Windows.BuildOptionsWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Title="BuildOptionsWindow">
-    <FlowDocumentScrollViewer>
+    Title="BuildOptionsWindow" Width="500" Height="500">
+    <FlowDocumentScrollViewer Width="500">
     <FlowDocument Name="RootDoc">
         <BlockUIContainer>
             <Image Source="/Cosmos.Build.Windows;component/Logo-1.png" Width="229" />
@@ -64,7 +64,10 @@
         <Paragraph TextAlignment="Right">
             <InlineUIContainer>
                 <Button Name="butnBuild">_Build</Button>
-            </InlineUIContainer>
-        </Paragraph>
+             </InlineUIContainer>
+             <InlineUIContainer>
+                 <Button Name="butnCancel">_Cancel</Button>
+             </InlineUIContainer>
+            </Paragraph>
     </FlowDocument>
 </FlowDocumentScrollViewer></Window>

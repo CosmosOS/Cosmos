@@ -122,8 +122,11 @@ namespace Cosmos.Build.Windows {
 		public void Build() {
 			if (mConfig == null) {
 				BuildOptionsWindow xOptions = new BuildOptionsWindow(this);
-				xOptions.ShowDialog();
-				mConfig = xOptions;
+                
+                if ((bool)!xOptions.ShowDialog())
+                    return; //Cancel
+				
+                mConfig = xOptions;
 			}
 
 			if (mConfig.Compile) {

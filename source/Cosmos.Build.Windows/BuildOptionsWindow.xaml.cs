@@ -24,7 +24,9 @@ namespace Cosmos.Build.Windows {
             Loaded += delegate(object sender, RoutedEventArgs e) {
                 this.Activate();
             };
+
             butnBuild.Click += new RoutedEventHandler(butnBuild_Click);
+            butnCancel.Click += new RoutedEventHandler(butnCancel_Click);
 
             rdioQEMU.Checked += new RoutedEventHandler(rdioTarget_Checked);
             rdioQEMU.Unchecked += new RoutedEventHandler(rdioTarget_Unchecked);
@@ -107,7 +109,12 @@ namespace Cosmos.Build.Windows {
             } else if (rdioPXE.IsChecked.Value) {
                 mTarget = Builder.Target.PXE;
             }
-            Close();
+            this.DialogResult = true;
+        }
+
+        void butnCancel_Click(object sender, RoutedEventArgs e)
+        {
+            this.DialogResult = false;
         }
 
         #region IBuildConfiguration Members
