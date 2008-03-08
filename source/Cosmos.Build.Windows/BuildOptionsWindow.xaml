@@ -13,7 +13,8 @@
             <InlineUIContainer>
                 <WrapPanel Margin="30, 0">
                     <Label>Emulator: </Label>
-                    <RadioButton Name="rdioQEMU" GroupName="Target">_QEMU</RadioButton>
+                    <RadioButton Name="rdioQEMU" GroupName="Target"
+							IsChecked="True">_QEMU</RadioButton>
                     <RadioButton Name="rdioVMWare" GroupName="Target" Margin="15, 0">VM_Ware</RadioButton>
                     <RadioButton Name="rdioVPC" GroupName="Target" Margin="15, 0">Virtual _PC</RadioButton>
                 </WrapPanel>
@@ -36,7 +37,7 @@
             <LineBreak/>
             <InlineUIContainer>
                 <StackPanel>
-                <CheckBox Name="chckQEMUUseGDB" IsChecked="True">Use _GDB Debugger</CheckBox>
+                <CheckBox Name="chckQEMUUseGDB" IsChecked="False">Use _GDB Debugger</CheckBox>
                 <CheckBox Name="chckQEMUUseHD">Create _hard disk image</CheckBox>
                 </StackPanel>
             </InlineUIContainer>

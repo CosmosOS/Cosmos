@@ -31,7 +31,7 @@ Source: "..\source\Cosmos.Shell.Guess\bin\Debug\*.dll"; DestDir: "{app}\Tools\GA
 Source: "..\source\Cosmos.Shell.Guess\bin\Debug\IL2CPU.exe"; DestDir: "{app}\Tools\GAC";
 
 [Registry]
-Root: HKLM; Subkey: "Software\Cosmos"; ValueType: string; ValueName: "Build Path"; ValueData: "{app}";
+Root: HKCU; Subkey: "Software\Cosmos"; ValueType: string; ValueName: "Build Path"; ValueData: "{app}";
 Root: HKLM; Subkey: "Software\Microsoft\.NETFramework\AssemblyFolders\Cosmos"; ValueType: string; ValueName: ""; ValueData: "{app}\Tools\GAC\";
 
 [Run]

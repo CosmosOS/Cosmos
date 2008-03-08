@@ -3,14 +3,33 @@ using System.Collections.Generic;
 
 namespace Cosmos.Hardware.New.Storage {
 	partial class ATA {
-		private static ushort[] mControllerAddresses1 = new ushort[] { 
-			0x1F0,
-			0x170
-		};
-		private static ushort[] mControllerAddresses2 = new ushort[] { 
-		0x3F0,
-			0x370
-		};
+		//private static readonly ushort[] mControllerAddresses1 = new ushort[] { 
+		//    0x1F0,
+		//    0x170
+		//};
+		//private static readonly ushort[] mControllerAddresses2 = new ushort[] { 
+		//0x3F0,
+		//    0x370
+		//};
+		private static ushort GetControllerAddress1(int aIndex) {
+			if (aIndex == 0) {
+				return 0x1F0;
+			} else {
+				return 0x170;
+			}
+		}
+
+		private static ushort GetControllerAddress2(int aIndex) {
+			if (aIndex == 0) {
+				return 0x3F0;
+			} else {
+				return 0x370;
+			}
+		}
+
+		private static int GetControllerAddressCount() {
+			return 2;
+		}
 		private static string[] mControllerNumbers = new string[] { "First", "Second", "Third", "Fourth" };
 		private static string[] mControllerChannels = new string[] { "Primary", "Secondary" };
 		private static string[] mDriveNames = new string[] { "Master", "Slave" };

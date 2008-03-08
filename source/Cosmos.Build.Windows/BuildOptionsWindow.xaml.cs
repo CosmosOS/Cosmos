@@ -41,7 +41,7 @@ namespace Cosmos.Build.Windows {
             spanISOPath.Inlines.Add(mBuilder.BuildPath + "Cosmos.iso");
 
             mOptionsBlockPrefix = paraQEMUOptions.PreviousBlock;
-            RootDoc.Blocks.Remove(paraQEMUOptions);
+            //RootDoc.Blocks.Remove(paraQEMUOptions);
             RootDoc.Blocks.Remove(paraVMWareOptions);
             RootDoc.Blocks.Remove(paraVPCOptions);
             RootDoc.Blocks.Remove(paraISOOptions);

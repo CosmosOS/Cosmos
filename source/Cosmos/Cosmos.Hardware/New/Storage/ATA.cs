@@ -41,62 +41,78 @@ namespace Cosmos.Hardware.New.Storage {
 			DebugUtil.SendMessage("ATA", aName);
 			mName = aName;
 			mControllerIndex = aController;
-			mController = mControllerAddresses1[aController];
-			mController2 = mControllerAddresses2[aController];
-			DebugUtil.SendNumber("ATA", "Primary address", mController, 16);
-			DebugUtil.SendNumber("ATA", "Secondary address", mController2, 16);
+			mController = GetControllerAddress1(aController);
+			mController2 = GetControllerAddress2(aController);
 			mType = DeviceType.Storage;
 			mDrive = aDrive;
 			mController_Data = mController;
 			mIsPrimary = aController == 0;
-			mController_Error = mController;
-			mController_Error += 1;
-			DebugUtil.SendNumber("ATA", "mController_Error", mController_Error, 16);
+			mController_Error = (ushort)(mController + 1);
 			mController_FeatureReg = (ushort)(mController + 1);
-			DebugUtil.SendNumber("ATA", "mController_FeatureReg", mController_FeatureReg, 16);
 			mController_SectorCount = (ushort)(mController + 2);
-			DebugUtil.SendNumber("ATA", "mController_SectorCount", mController_SectorCount, 16);
 			mController_SectorNumber = (ushort)(mController + 3);
-			DebugUtil.SendNumber("ATA", "mController_SectorNumber", mController_SectorNumber, 16);
 			mController_CylinderLow = (ushort)(mController + 4);
-			DebugUtil.SendNumber("ATA", "mController_CylinderLow", mController_CylinderLow, 16);
 			mController_CylinderHigh = (ushort)(mController + 5);
-			DebugUtil.SendNumber("ATA", "mController_CylinderHigh", mController_CylinderHigh, 16);
 			mController_DeviceHead = (ushort)(mController + 6);
-			DebugUtil.SendNumber("ATA", "mController_DeviceHead", mController_DeviceHead, 16);
 			mController_PrimaryStatus = (ushort)(mController + 7);
-			DebugUtil.SendNumber("ATA", "mController_PrimaryStatus", mController_PrimaryStatus, 16);
 			mController_Command = (ushort)(mController + 7);
-			DebugUtil.SendNumber("ATA", "mController_Command", mController_Command, 16);
 			mController_AlternateStatus = (ushort)(mController2 + 8);
-			DebugUtil.SendNumber("ATA", "mController_AlternateStatus", mController_AlternateStatus, 16);
 			mController_DeviceControl = (ushort)(mController2 + 8);
-			DebugUtil.SendNumber("ATA", "mController_DeviceControl", mController_DeviceControl, 16);
 			mController_DeviceAddress = (ushort)(mController2 + 9);
-			DebugUtil.SendNumber("ATA", "mController_DeviceAddress", mController_DeviceAddress, 16);
-			DebugUtil.SendNumber("ATA", "Primary address", mController, 16);
-			DebugUtil.SendNumber("ATA", "Secondary address", mController2, 16);
 			IOWriteByte(mController_DeviceControl, 0);
+			mBlockCount = GetBlockCount();
 		}
 
-		private void Initialize() {
+		private ulong GetBlockCount() {
+			Console.WriteLine("Writing Device");
+			System.Diagnostics.Debugger.Break();
+			IOWriteByte(mController_DeviceHead, (byte)((mDrive << 4) + (1 << 6)));
+			uint xTimeout = Timeout;
+			Console.WriteLine("Waiting step1");
+			System.Diagnostics.Debugger.Break();
+			while ((IOReadByte(mController_Command) & IDE_STATUSREG_DRDY) == 0) {
+				mSleep(1);
+				xTimeout--;
+			}
+			if ((IOReadByte(mController_Command) & IDE_STATUSREG_DRDY) == 0) {
+				throw new Exception("[ATA#1] GetBlockCount failed!");
+			}
+			Console.WriteLine("Waiting done. Sending Command");
+			System.Diagnostics.Debugger.Break();
+			IOWriteByte(mController_Command, 0xF8);
+			xTimeout = Timeout;
+			Console.WriteLine("Waiting step 2");
+			System.Diagnostics.Debugger.Break();
+			while ((IOReadByte(mController_Command) & IDE_STATUSREG_BSY) != 0) {
+				mSleep(1);
+				xTimeout--;
+			}
+			if ((IOReadByte(mController_Command) & IDE_STATUSREG_BSY) != 0) {
+				throw new Exception("[ATA#2] GetBlockCount failed!");
+			}
+			Console.WriteLine("Waiting done, reading LBS");
+			System.Diagnostics.Debugger.Break();
+			uint xResult = IOReadByte(mController_SectorNumber);
+			xResult += (uint)IOReadByte(mController_CylinderLow) << 8;
+			xResult += (uint)IOReadByte(mController_CylinderHigh) << 16;
+			xResult += (uint)(IOReadByte(mController_DeviceHead) & 0xF) << 8;
+
+			return xResult;
 		}
 
 		public static void HandleInterruptSecondary() {
 			mSecondaryInterruptCount++;
-			IOReadByte((ushort)(mControllerAddresses1[0] + 7));
+			IOReadByte((ushort)(GetControllerAddress1(0) + 7));
 		}
 
 		private static uint mSecondaryInterruptCount;
 
 		public static void HandleInterruptPrimary() {
 			mPrimaryInterruptCount++;
-			IOReadByte((ushort)(mControllerAddresses1[1] + 7));
+			IOReadByte((ushort)(GetControllerAddress1(1) + 7));
 		}
 
 		private static uint mPrimaryInterruptCount;
-
-		private uint mBlockCount;
 
 		public static void Initialize(Action<uint> aSleep) {
 			if (aSleep == null) {
@@ -104,25 +120,31 @@ namespace Cosmos.Hardware.New.Storage {
 			}
 			mSleep = aSleep;
 			DebugUtil.SendMessage("ATA", "Start Device Detection");
-			for (byte xControllerBaseAIdx = 0; xControllerBaseAIdx < mControllerAddresses1.Length; xControllerBaseAIdx++) {
+			DebugUtil.SendNumber("ATA", "Controllers", (uint)GetControllerAddressCount(), 32);
+			for (byte xControllerBaseAIdx = 0; xControllerBaseAIdx < GetControllerAddressCount(); xControllerBaseAIdx++) {
 				for (byte xDrive = 0; xDrive < 2; xDrive++) {
-					IOWriteByte((ushort)(mControllerAddresses1[xControllerBaseAIdx] + ATA_DRIVEHEAD), (byte)((xControllerBaseAIdx << 4) | 0xA0 | (xDrive << 4)));
+					IOWriteByte((ushort)(GetControllerAddress1(xControllerBaseAIdx) + ATA_DRIVEHEAD), (byte)((xControllerBaseAIdx << 4) | 0xA0 | (xDrive << 4)));
 					mSleep(1);
-					if (IOReadByte((ushort)(mControllerAddresses1[xControllerBaseAIdx] + ATA_STATUS)) == 0x50) {
-						Device.Add(new ATA(String.Concat(mControllerNumbers[xControllerBaseAIdx], " ", mDriveNames[xDrive]), xControllerBaseAIdx, xDrive));
+					if (IOReadByte((ushort)(GetControllerAddress1(xControllerBaseAIdx) + ATA_STATUS)) == 0x50) {
+						ATA xATA;
+						Device.Add(xATA = new ATA(String.Concat(mControllerNumbers[xControllerBaseAIdx], " ", mDriveNames[xDrive]), xControllerBaseAIdx, xDrive));
+						DebugUtil.SendNumber("ATA", "Device Size", (uint)xATA.BlockCount, 32);
 					}
 				}
 			}
 		}
+
 		public override uint BlockSize {
 			get {
 				return 512;
 			}
 		}
 
+		private readonly ulong mBlockCount;
+
 		public override ulong BlockCount {
 			get {
-				throw new NotImplementedException();
+				return mBlockCount;
 			}
 		}
 		/* 
@@ -230,7 +252,7 @@ namespace Cosmos.Hardware.New.Storage {
 			IOWriteByte(mController_SectorNumber, (byte)aBlock);
 			IOWriteByte(mController_CylinderLow, (byte)(aBlock >> 8));
 			IOWriteByte(mController_CylinderHigh, (byte)(aBlock >> 16));
-			IOWriteByte( mController_DeviceHead, (byte)(0xE0 | (mDrive << 4) | (byte)(aBlock >> 24)));
+			IOWriteByte(mController_DeviceHead, (byte)(0xE0 | (mDrive << 4) | (byte)(aBlock >> 24)));
 			IOWriteByte(mController_DeviceControl, 0); // receive interrupts...
 			IOWriteByte(mController_Command, 0x30);
 			xSleepCount = Timeout;
