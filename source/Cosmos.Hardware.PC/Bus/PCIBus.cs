@@ -13,21 +13,21 @@ namespace Cosmos.Hardware.PC.Bus
         static public void Init()
         {
 #if DEBUG
-            Console.WriteLine("PCI Devices:");
-            Console.WriteLine();
+			//Console.WriteLine("PCI Devices:");
+			//Console.WriteLine();
 #endif
             List<PCIDevice> devices = new List<PCIDevice>();
             EnumerateBus(0, ref devices);
             Devices = devices.ToArray();
 #if DEBUG
-            Console.WriteLine("Done");
+			//Console.WriteLine("Done");
 #endif
         }
 
         private static void EnumerateBus(byte Bus, ref List<PCIDevice> Devices)
         {
 #if DEBUG
-            Console.WriteLine("EnumerateBus(" + Bus + ")");
+			//Console.WriteLine("EnumerateBus(" + Bus + ")");
 #endif
             for (byte xSlot = 0; xSlot < 32; xSlot++)
             {
@@ -55,8 +55,8 @@ namespace Cosmos.Hardware.PC.Bus
         {
             PCIBus.DeviceIDs xDeviceIDs = new PCIBus.DeviceIDs();
 
-            foreach (PCIDevice xPCIDevice in Cosmos.Hardware.PC.Bus.PCIBus.Devices)
-            {
+            for(int d =0;d<Cosmos.Hardware.PC.Bus.PCIBus.Devices.Length;d++){
+				var xPCIDevice = Cosmos.Hardware.PC.Bus.PCIBus.Devices[d];
                 string xVendor = xDeviceIDs.FindVendor(xPCIDevice.VendorID);
 
                 if (xVendor == default(string))

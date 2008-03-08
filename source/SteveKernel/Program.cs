@@ -24,7 +24,7 @@ namespace SteveKernel
             Console.WriteLine("Done booting");
 
 
-            Cosmos.Hardware.PC.Bus.PCIBus.Init();
+			Cosmos.Kernel.Boot.Default();
             Cosmos.Hardware.PC.Bus.PCIBus.DebugLSPCI();
 
 

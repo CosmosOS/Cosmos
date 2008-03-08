@@ -33,13 +33,9 @@ namespace Cosmos.Shell.Console {
 			_commands.Add(new Commands.HelpCommand(_commands));
 			_commands.Add(new Commands.TypeCommand());
 			_commands.Add(new Commands.VersionCommand());
-			_commands.Add(new Commands.DeviceCommand());
-            _commands.Add(new Commands.LspciCommand());
+			_commands.Add(new Commands.LspciCommand());
 
-            // TODO: this shouldn't go here:
-            Hardware.PC.Bus.PCIBus.Init();           
-
-			while (running) {
+            while (running) {
 				System.Console.Write("Running = ");
 				System.Console.Write(running.ToString());
 				System.Console.Write(" ");
