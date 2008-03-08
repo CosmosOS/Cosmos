@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Cosmos.Build.Windows;
+using Cosmos.Hardware;
 
 namespace Cosmos.Shell.Console {
 	public class MyClass {
@@ -38,7 +39,6 @@ namespace Cosmos.Shell.Console {
 				System.Console.Write("    ");
 				System.Console.WriteLine(E.Message);
 			}
-
 			System.Console.WriteLine("Halting system now..");
 			
 			// Halt system.

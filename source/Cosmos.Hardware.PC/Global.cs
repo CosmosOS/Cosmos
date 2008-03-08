@@ -27,6 +27,10 @@ namespace Cosmos.Hardware.PC {
             HW.CPU.CreateIDT();
             // end old -----------------
 
+			// MTW new
+			HW.New.Storage.ATA.Initialize(Sleep);
+			// MTW new end
+
             HW.Device.Add(new Bus.CPU.Keyboard());
         }
 

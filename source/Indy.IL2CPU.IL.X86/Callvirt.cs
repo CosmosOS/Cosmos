@@ -33,13 +33,14 @@ namespace Indy.IL2CPU.IL.X86 {
 			MethodBase xMethodDef = xMethod;
 			mMethodDescription = CPU.Label.GenerateLabelName(xMethodDef);
 			mTargetMethodInfo = Engine.GetMethodInfo(xMethodDef, xMethodDef, mMethodDescription, null);
-			if (xMethodDef.IsStatic || !xMethodDef.IsVirtual) {
+			if (xMethodDef.IsStatic || !xMethodDef.IsVirtual || xMethod.IsFinal) {
 				Engine.QueueMethod(xMethodDef);
 				mNormalAddress = CPU.Label.GenerateLabelName(xMethodDef);
 				mReturnSize = mTargetMethodInfo.ReturnSize;
 				return;
 			}
 			mMethodIdentifier = Engine.GetMethodIdentifier(xMethodDef);
+			
 			Engine.QueueMethod(VTablesImplRefs.GetMethodAddressForTypeRef);
 			mArgumentCount = mTargetMethodInfo.Arguments.Length;
 			mReturnSize = mTargetMethodInfo.ReturnSize;

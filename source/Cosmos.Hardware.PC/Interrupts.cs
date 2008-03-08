@@ -105,7 +105,9 @@ namespace Cosmos.Hardware.PC {
 
         //IRQ 14 - Primary IDE. If no Primary IDE this can be changed
         public static unsafe void HandleInterrupt_2E(InterruptContext* aContext) {
-			Storage.ATAOld.HandleInterruptPrimary();
+			Cosmos.Hardware.DebugUtil.SendMessage("IRQ", "Primary IDE");
+			//Storage.ATAOld.HandleInterruptPrimary();
+			New.Storage.ATA.HandleInterruptPrimary();
             Bus.CPU.PIC.SignalSecondary();
         }
 
@@ -120,7 +122,8 @@ namespace Cosmos.Hardware.PC {
 
         //IRQ 15 - Secondary IDE
         public static unsafe void HandleInterrupt_2F(InterruptContext* aContext) {
-            Storage.ATAOld.HandleInterruptSecondary();
+			New.Storage.ATA.HandleInterruptSecondary();
+			Cosmos.Hardware.DebugUtil.SendMessage("IRQ", "Secondary IDE");
             Bus.CPU.PIC.SignalSecondary();
         }
 

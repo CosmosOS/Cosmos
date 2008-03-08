@@ -33,7 +33,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			new CPUx86.Compare(CPUx86.Registers.EAX, "0");
 			new CPUx86.JumpIfZero(mReturnNullLabel);
 			new CPUx86.Pushd(CPUx86.Registers.AtEAX);
-			new CPUx86.Pushd("0" + mTypeId + "h");
+			new CPUx86.Pushd("0" + mTypeId );
 			Assembler.StackContents.Push(new StackContent(4, typeof(object)));
 			Assembler.StackContents.Push(new StackContent(4, typeof(object)));
 			MethodBase xMethodIsInstance = Engine.GetMethodBase(typeof(VTablesImpl), "IsInstance", "System.Int32", "System.Int32");

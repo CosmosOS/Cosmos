@@ -209,7 +209,7 @@ namespace Indy.IL2CPU {
 						if (!aInMetalMode) {
 							do {
 								int xOldCount = mMethods.Count;
-								ScanForMethodToIncludeForVMT();
+								ScanForMethodsToIncludeForVMT();
 								ProcessAllMethods();
 								if (xOldCount == mMethods.Count) {
 									break;
@@ -243,7 +243,7 @@ namespace Indy.IL2CPU {
 						if (!aInMetalMode) {
 							do {
 								int xOldCount = mMethods.Count;
-								ScanForMethodToIncludeForVMT();
+								ScanForMethodsToIncludeForVMT();
 								ProcessAllMethods();
 								if (xOldCount == mMethods.Count) {
 									break;
@@ -293,7 +293,7 @@ namespace Indy.IL2CPU {
 			xOp.Assemble();
 		}
 
-		private void ScanForMethodToIncludeForVMT() {
+		private void ScanForMethodsToIncludeForVMT() {
 			List<Type> xCheckedTypes = new List<Type>();
 			foreach (MethodBase xMethod in mMethods.Keys) {
 				if (xMethod.IsStatic) {
@@ -330,7 +330,7 @@ namespace Indy.IL2CPU {
 						if (xTD.BaseType == null) {
 							continue;
 						}
-						if (xMethod.IsVirtual && !xMethod.IsConstructor) {
+						if (xMethod.IsVirtual && !xMethod.IsConstructor&&!xMethod.IsFinal) {
 							Type xCurrentInspectedType = xTD.BaseType;
 							ParameterInfo[] xParams = xMethod.GetParameters();
 							Type[] xMethodParams = new Type[xParams.Length];
@@ -339,7 +339,6 @@ namespace Indy.IL2CPU {
 							}
 							MethodBase xBaseMethod = GetUltimateBaseMethod(xMethod, xMethodParams, xTD);
 							if (xBaseMethod != null && xBaseMethod != xMethod) {
-								//QueueMethod(xBaseMethod);
 								if (mMethods.ContainsKey(xBaseMethod)) {
 									QueueMethod(xMethod);
 								}
@@ -359,6 +358,17 @@ namespace Indy.IL2CPU {
 					}
 					aCurrentInspectedType = aCurrentInspectedType.BaseType;
 					MethodBase xFoundMethod = aCurrentInspectedType.GetMethod(aMethod.Name, aMethodParams);
+					ParameterInfo[] xParams = xFoundMethod.GetParameters();
+					bool xContinue = true;
+					for (int i = 0; i < xParams.Length; i++) {
+						if (xParams[i].ParameterType != aMethodParams[i]) {
+							xContinue = false;
+							continue;
+						}
+					}
+					if (!xContinue) {
+						continue;
+					}
 					if (xFoundMethod != null) {
 						if (xFoundMethod.IsVirtual == aMethod.IsVirtual && xFoundMethod.IsPrivate == false && xFoundMethod.IsPublic == aMethod.IsPublic && xFoundMethod.IsFamily == aMethod.IsFamily && xFoundMethod.IsFamilyAndAssembly == aMethod.IsFamilyAndAssembly && xFoundMethod.IsFamilyOrAssembly == aMethod.IsFamilyOrAssembly && xFoundMethod.IsFinal == false) {
 							xBaseMethod = xFoundMethod;
@@ -366,7 +376,6 @@ namespace Indy.IL2CPU {
 					}
 				}
 			} catch (Exception E) {
-				Console.WriteLine("Error while getting UltimateBaseMethod for method '{0}':\r\n{1}", aMethod.GetFullName(), E);
 				// todo: try to get rid of the try..catch
 			}
 			return xBaseMethod ?? aMethod;
@@ -700,6 +709,9 @@ namespace Indy.IL2CPU {
 						continue;
 					}
 					string xMethodName = Label.GenerateLabelName(xCurrentMethod);
+					if (xMethodName=="System_Boolean__System_Object_Equals_System_Object_") {
+						System.Diagnostics.Debugger.Break();
+					}
 					TypeInformation xTypeInfo = null;
 					{
 						if (!xCurrentMethod.IsStatic) {
@@ -1264,6 +1276,9 @@ namespace Indy.IL2CPU {
 			}
 			if (!aMethod.IsStatic) {
 				RegisterType(aMethod.DeclaringType);
+			}
+			if (aMethod.DeclaringType.FullName == "System.Object" && aMethod.Name == "Equals" && aMethod.GetParameters().Length == 1 && aMethod.GetParameters()[0].ParameterType.FullName == "System.Object") {
+				System.Diagnostics.Debugger.Break();
 			}
 			if (!mCurrent.mMethods.ContainsKey(aMethod)) {
 				mCurrent.mMethods.Add(aMethod, new QueuedMethodInformation() {

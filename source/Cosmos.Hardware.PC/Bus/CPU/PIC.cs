@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Hardware.PC.Bus.CPU {
     //TODO: Change this to be an instance like other drivers
-    public class PIC : Cosmos.Hardware.Device {
+    public abstract class PIC : Cosmos.Hardware.Device {
 		/// <summary>
 		/// Remaps the IRQ's to INT20-INT2F
 		/// </summary>

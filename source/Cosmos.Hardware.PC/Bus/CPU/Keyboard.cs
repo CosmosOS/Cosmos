@@ -13,5 +13,10 @@ namespace Cosmos.Hardware.PC.Bus.CPU {
             byte xByte = PC.Bus.CPUBus.Read8(0x60);
             ByteReceived(xByte);
         }
+		public override string Name {
+			get {
+				return "Keyboard";
+			}
+		}
     }
 }

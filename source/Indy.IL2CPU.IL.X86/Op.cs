@@ -23,7 +23,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			new CPUx86.Compare("dword " + aAddress, "0");
 			new CPUx86.JumpIfNotEquals(aNextLabel);
 			Type xNullRefExcType = typeof(NullReferenceException);
-			Newobj.Assemble(aAssembler, Engine.GetTypeInfo(xNullRefExcType).StorageSize, xNullRefExcType.GetConstructor(new Type[0]), Engine.RegisterType(xNullRefExcType), aCurrentLabel, aMethodInfo, aCurrentILOffset);
+			Newobj.Assemble(aAssembler, xNullRefExcType.GetConstructor(new Type[0]), Engine.RegisterType(xNullRefExcType), aCurrentLabel, aMethodInfo, aCurrentILOffset);
 			aAssembler.StackContents.Pop();
 			new CPUx86.Move("[" + DataMember.GetStaticFieldName(CPU.Assembler.CurrentExceptionRef) + "]", "eax");
 			Engine.QueueMethod(CPU.Assembler.CurrentExceptionOccurredRef);

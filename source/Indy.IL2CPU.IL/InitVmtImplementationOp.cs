@@ -139,6 +139,8 @@ namespace Indy.IL2CPU.IL {
 				//Pushd("0");
 				Call(SetTypeInfoRef);
 				for (int j = 0; j < xEmittedMethods.Count; j++) {
+					
+		
 					MethodBase xMethod = xEmittedMethods[j];
 #if MTW_DEBUG
 						xDebug.WriteStartElement("Method");
@@ -146,6 +148,9 @@ namespace Indy.IL2CPU.IL {
 						xDebug.WriteAttributeString("Name", xMethod.GetFullName());
 						xDebug.WriteEndElement();
 #endif
+					if (xMethod.DeclaringType.FullName == "System.Object" && xMethod.Name == "Equals" && xMethod.GetParameters().Length == 1 && xMethod.GetParameters()[0].ParameterType.FullName == "System.Object") {
+						System.Diagnostics.Debugger.Break();
+					}
 					Pushd("0" + i.ToString("X") + "h");
 					Pushd("0" + j.ToString("X") + "h");
 					ParameterInfo[] xParams = xMethod.GetParameters();

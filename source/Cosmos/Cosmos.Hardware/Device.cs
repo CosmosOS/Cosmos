@@ -3,37 +3,65 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace Cosmos.Hardware {
-    // This is the base class for all hardware devices. Hardware devices 
-    // are defined here as abstracts and overridden in specific implementations
-    // later
-    public abstract class Device {
-        public enum DeviceType { Unknown, Other, Keyboard, Mouse, Storage };
+	// This is the base class for all hardware devices. Hardware devices 
+	// are defined here as abstracts and overridden in specific implementations
+	// later
+	public abstract class Device:Hardware {
+		public enum DeviceType {
+			Unknown,
+			Other,
+			Keyboard,
+			Mouse,
+			Storage
+		};
 
-        public Device() {
-        }
+		public Device() {
+		}
 
-        static protected List<Device> mDevices = new List<Device>();
-        static public List<Device> Devices {
-            get { return mDevices; }
-        }
+		static protected List<Device> mDevices = new List<Device>();
+		static public List<Device> Devices {
+			get {
+				return mDevices;
+			}
+		}
 
-        static public void Add(Device aDevice) {
+		static public void Add(Device aDevice) {
+			if (aDevice == null) {
+				throw new ArgumentNullException("aDevice");
+			}
 			mDevices.Add(aDevice);
-        }
+		}
 
-        static public List<Device> Find(DeviceType aType) {
-            var xResult = new List<Device>();
-            foreach (var xDevice in mDevices) {
-                if (xDevice.Type == aType) {
-                    xResult.Add(xDevice);
-                }
-            }
-            return xResult;
-        }
+		public static Device FindFirst(DeviceType aType) {
+			for (int i = 0; i < mDevices.Count; i++) {
+				var xDevice = mDevices[i];
+				if (xDevice.Type == aType) {
+					return xDevice;
+				}
+			}
+			return null;
+		}
 
-        protected DeviceType mType = DeviceType.Unknown;
-        public DeviceType Type {
-            get { return mType; }
-        }
-    }
+		static public List<Device> Find(DeviceType aType) {
+			var xResult = new List<Device>();
+			for (int i = 0; i < mDevices.Count;i++){
+				var xDevice = mDevices[i];
+				if (xDevice.Type == aType) {
+					xResult.Add(xDevice);
+				}
+			}
+			return xResult;
+		}
+
+		protected DeviceType mType = DeviceType.Unknown;
+		public DeviceType Type {
+			get {
+				return mType;
+			}
+		}
+
+		public abstract string Name {
+			get;
+		}
+	}
 }

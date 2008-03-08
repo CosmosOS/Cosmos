@@ -10,22 +10,22 @@ namespace KudzuTest {
         public delegate object TestDelegate();
 
         static public void DoAll() {
-            Tests.Do("String Concatenation", Tests.StringConcat);
-            Console.WriteLine("String test");
-            Console.WriteLine("  " + Tests.StringConcat());
-            Console.WriteLine();
+			Tests.Do("String Concatenation", Tests.StringConcat);
+			Console.WriteLine("String test");
+			Console.WriteLine("  " + Tests.StringConcat());
+			Console.WriteLine();
 
-            Console.WriteLine("StringBuilder test");
-            Console.WriteLine(Tests.StringBuilder());
-            Console.WriteLine();
+			Console.WriteLine("StringBuilder test");
+			Console.WriteLine(Tests.StringBuilder());
+			Console.WriteLine();
 
-            Console.WriteLine("IntToStr 16 test");
-            Console.WriteLine("  " + Tests.IntToStr16());
-            Console.WriteLine();
+			Console.WriteLine("IntToStr 16 test");
+			Console.WriteLine("  " + Tests.IntToStr16());
+			Console.WriteLine();
 
-            Console.WriteLine("IntToStr 32 test");
-            Console.WriteLine("  " + Tests.IntToStr32());
-            Console.WriteLine();
+			Console.WriteLine("IntToStr 32 test");
+			Console.WriteLine("  " + Tests.IntToStr32());
+			Console.WriteLine();
 
 			Console.WriteLine("WriteLnUInt32 test");
 			Console.WriteLine("  " + Tests.WriteLnUInt32());
