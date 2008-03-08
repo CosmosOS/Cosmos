@@ -1158,7 +1158,7 @@ namespace Indy.IL2CPU {
 					//}
 					if (aTypeFields.ContainsKey(xFieldId)) {
 						continue;
-					}
+					}											 
 					int xOffset = aObjectStorageSize;
 					FieldOffsetAttribute xOffsetAttrib = xField.GetCustomAttributes(typeof(FieldOffsetAttribute), true).FirstOrDefault() as FieldOffsetAttribute;
 					if (xOffsetAttrib != null) {
@@ -1166,7 +1166,7 @@ namespace Indy.IL2CPU {
 					} else {
 						aObjectStorageSize += xFieldSize;
 					}
-					aTypeFields.Add(xField.GetFullName(), new TypeInformation.Field(xOffset, xFieldSize, aGCObjects, xFieldType, (xPlugFieldAttr != null && xPlugFieldAttr.IsExternalValue)));
+					aTypeFields.Add(xField.GetFullName(), new TypeInformation.Field(xFieldSize, aGCObjects, xFieldType, (xPlugFieldAttr != null && xPlugFieldAttr.IsExternalValue)));
 				}
 				while (xCurrentPlugFieldList.Count > 0) {
 					var xItem = xCurrentPlugFieldList.Values.First();
@@ -1187,7 +1187,7 @@ namespace Indy.IL2CPU {
 					}
 					int xOffset = aObjectStorageSize;
 					aObjectStorageSize += xFieldSize;
-					aTypeFields.Add(xItem.FieldId, new TypeInformation.Field(xOffset, xFieldSize, aGCObjects, xFieldType, xItem.IsExternalValue));
+					aTypeFields.Add(xItem.FieldId, new TypeInformation.Field(xOffset, aGCObjects, xFieldType, xItem.IsExternalValue));
 				}
 				if (aType.FullName != "System.Object" && aType.BaseType != null) {
 					aType = aType.BaseType;
@@ -1225,6 +1225,13 @@ namespace Indy.IL2CPU {
 				} else {
 					aObjectStorageSize = xStructLayout.Size;
 				}
+			}
+			int xOffset = 0;
+			for (int i = xTypeFields.Count - 1; i >= 0; i--) {
+				var xItem = xTypeFields.Values[i];
+				xItem.Offset = xOffset;
+				xOffset += xItem.Size;
+				xTypeFields[xTypeFields.Keys[i]] = xItem;
 			}
 			return xTypeFields;
 		}

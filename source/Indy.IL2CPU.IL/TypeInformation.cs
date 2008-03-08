@@ -7,7 +7,7 @@ namespace Indy.IL2CPU.IL {
 	// TODO: abstract this one out to a X86 specific one
 	public class TypeInformation {
 		public struct Field {
-			public readonly int Offset;
+			public int Offset;
 
 			public readonly int Size;
 
@@ -15,12 +15,12 @@ namespace Indy.IL2CPU.IL {
 			public readonly Type FieldType;
 			public readonly bool IsExternalField;
 
-			public Field(int aOffset, int aSize, bool aNeedsGC, Type aFieldType, bool aIsExternalField) {
-				Offset = aOffset;
+			public Field(int aSize, bool aNeedsGC, Type aFieldType, bool aIsExternalField) {
 				NeedsGC = aNeedsGC;
 				FieldType = aFieldType;
 				IsExternalField = aIsExternalField;
 				Size = aSize;
+				Offset = -1;
 			}
 
 			public override string ToString() {

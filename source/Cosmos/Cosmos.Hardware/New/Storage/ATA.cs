@@ -50,7 +50,7 @@ namespace Cosmos.Hardware.New.Storage {
 			mController_Data = mController;
 			mIsPrimary = aController == 0;
 			mController_Error = mController;
-			//mController_Error += 1;
+			mController_Error += 1;
 			DebugUtil.SendNumber("ATA", "mController_Error", mController_Error, 16);
 			mController_FeatureReg = (ushort)(mController + 1);
 			DebugUtil.SendNumber("ATA", "mController_FeatureReg", mController_FeatureReg, 16);
@@ -202,11 +202,6 @@ namespace Cosmos.Hardware.New.Storage {
 			byte[] xResult = new byte[512];
 			for (uint i = 0; i < 256; i++) {
 				ushort xValue = IOReadWord(mController);
-				if (xValue > 0) {
-					Console.Write("Block ");
-					Console.Write(aBlock.ToString());
-					Console.WriteLine(" Contains nonzero information!");
-				}
 				xResult[i * 2] = (byte)xValue;
 				xResult[(i * 2) + 1] = (byte)(xValue >> 8);
 			}
