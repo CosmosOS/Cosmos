@@ -37,7 +37,7 @@ namespace Cosmos.Shell.Console {
             _commands.Add(new Commands.LspciCommand());
 
             // TODO: this shouldn't go here:
-            //Hardware.PC.Bus.PCIBus.Init();
+            Hardware.PC.Bus.PCIBus.Init();           
 
 			while (running) {
 				System.Console.Write("Running = ");
