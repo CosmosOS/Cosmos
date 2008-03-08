@@ -55,6 +55,7 @@
     <Compile Include="Commands\FailCommand.cs" />
     <Compile Include="Commands\HelpCommand.cs" />
     <Compile Include="Commands\MountCommand.cs" />
+    <Compile Include="Commands\TimeCommand.cs" />
     <Compile Include="Commands\TypeCommand.cs" />
     <Compile Include="Commands\CommandBase.cs" />
     <Compile Include="Commands\VersionCommand.cs" />
