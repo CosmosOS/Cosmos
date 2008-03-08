@@ -25,6 +25,10 @@ namespace Cosmos.Shell.Console.Commands {
 
 		public abstract void Execute(string param);
 
-        public abstract void Help();
+        public virtual void Help()
+        {
+            System.Console.WriteLine(Name);
+            System.Console.WriteLine(" " + Summary);
+        }
 	}
 }

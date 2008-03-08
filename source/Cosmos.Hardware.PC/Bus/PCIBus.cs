@@ -8,148 +8,44 @@ namespace Cosmos.Hardware.PC.Bus
 
     public class PCIBus : Cosmos.Hardware.Bus.PCIBus
     {
-        protected const ushort ConfigAddr = 0xCF8;
-        protected const ushort ConfigData = 0xCFC;
+        public static List<PCIDevice> Devices = new List<PCIDevice>();
 
         static public void Init()
         {
-            var xDeviceIDs = new DeviceIDs();
-            Console.WriteLine("PCI Devices");
+#if DEBUG
+            Console.WriteLine("PCI Devices:");
             Console.WriteLine();
+#endif
 
-            byte xMaxBus = GetMaxBus();
-            for (byte xBus = 0; xBus <= xMaxBus; xBus++)
-            {
-                for (byte xSlot = 0; xSlot < 32; xSlot++)
-                {
-                    byte xMaxFunctions = 1;
+            EnumerateBus(0, ref Devices);
 
-                    for (byte xFunction = 0; xFunction < xMaxFunctions; xFunction++)
-                    {
-
-                        PCIDevice xPCIDevice = new PCIDevice(xBus, xSlot, xFunction);
-
-                        if (xPCIDevice.DeviceExists)
-                        {
-                            string xVendor = xDeviceIDs.FindVendor(xPCIDevice.VendorID);
-
-                            Console.Write(xPCIDevice.Bus.ToString());
-                            Console.Write("-");
-                            Console.Write(xPCIDevice.Slot.ToString());
-                            Console.Write("-");
-                            Console.Write(xPCIDevice.Function.ToString());
-                            Console.Write(" ");
-                            Console.Write(xVendor);
-                            Console.Write(": ");
-                            Console.Write(ToHex(xPCIDevice.DeviceID, 4));
-                            Console.Write(" Type: ");
-                            Console.Write(xPCIDevice.HeaderType.ToString());
-                            Console.Write(" Class: ");
-                            Console.Write(xPCIDevice.GetClassInfo());
-                            Console.WriteLine();
-                            Console.Write("Memory requirements: ");
-                            xPCIDevice.BaseAddress0 = 0xffffffff;
-                            Console.Write(ToHex(xPCIDevice.BaseAddress0, 8));
-                            Console.Write(",");
-                            xPCIDevice.BaseAddress1 = 0xffffffff;
-                            Console.Write(ToHex(xPCIDevice.BaseAddress1, 8));
-                            Console.Write(",");
-                            xPCIDevice.BaseAddress2 = 0xffffffff;
-                            Console.Write(ToHex(xPCIDevice.BaseAddress2, 8));
-                            Console.Write(",");
-                            xPCIDevice.BaseAddress3 = 0xffffffff;
-                            Console.Write(ToHex(xPCIDevice.BaseAddress3, 8));
-                            Console.Write(",");
-                            xPCIDevice.BaseAddress4 = 0xffffffff;
-                            Console.Write(ToHex(xPCIDevice.BaseAddress4, 8));
-                            Console.Write(",");
-                            xPCIDevice.BaseAddress5 = 0xffffffff;
-                            Console.Write(ToHex(xPCIDevice.BaseAddress5, 8));
-
-                            Console.WriteLine();
-
-                            if (xPCIDevice.IsMultiFunction)
-                                xMaxFunctions = 8;
-
-                        }
-                    }
-                }
-            }
             Console.WriteLine("Done");
         }
 
-        //private static char[] hex = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'e', 'd', 'f' };
 
-        private static string ToHex(UInt32 num, int length)
+        private static void EnumerateBus(byte Bus, ref List<PCIDevice> Devices)
         {
-            char[] ret = new char[length];
-            UInt32 cpy = num;
-
-            for (int index = length - 1; index >= 0; index--)
+            Console.WriteLine("EnumerateBus(" + Bus + ")");
+            for (byte xSlot = 0; xSlot < 32; xSlot++)
             {
-                ret[index] = hex(cpy & 0xf);
-                cpy = cpy / 16;
+                byte xMaxFunctions = 1;
+
+                for (byte xFunction = 0; xFunction < xMaxFunctions; xFunction++)
+                {
+                    PCIDevice xPCIDevice = PCIDevice.GetPCIDevice(Bus, xSlot, xFunction);
+
+                    if (xPCIDevice != null)
+                    {
+                        Devices.Add(xPCIDevice);
+
+                        if (xPCIDevice is PCIDeviceBridge)
+                            EnumerateBus(((PCIDeviceBridge)xPCIDevice).SecondaryBus, ref Devices);
+
+                        if (xPCIDevice.IsMultiFunction)
+                            xMaxFunctions = 8;
+                    }
+                }
             }
-            return "0x" + new string(ret);
-
-        }
-
-        private static char hex(uint p)
-        {
-            switch (p)
-            {
-                case 0:
-                    return '0';
-                case 1:
-                    return '1';
-                case 2:
-                    return '2';
-                case 3:
-                    return '3';
-                case 4:
-                    return '4';
-                case 5:
-                    return '5';
-                case 6:
-                    return '6';
-                case 7:
-                    return '7';
-                case 8:
-                    return '8';
-                case 9:
-                    return '9';
-                case 10:
-                    return 'a';
-                case 11:
-                    return 'b';
-                case 12:
-                    return 'c';
-                case 13:
-                    return 'd';
-                case 14:
-                    return 'e';
-                case 15:
-                    return 'f';
-
-            }
-            return ' ';
-        }
-
-        private static byte GetMaxBus()
-        {
-            /*
-union REGS r;
-
-r.h.ah = PCI_FUNCTION_ID; //0xb1
-
-r.h.al = PCI_BIOS_PRESENT; //0x01
-
-int86(0x1a, &r, &r);
-
-GetMaxBus = r.w.cx;
-             */
-
-            return 255;
         }
     }
 
@@ -188,15 +84,14 @@ GetMaxBus = r.w.cx;
     }
 
 
-    [Flags]
     public enum PCIHeaderType : byte
     {
         Normal = 0,
         Bridge = 1,
-        Cardbus = 2,
-        Multifunction = 0x10
+        Cardbus = 2
     }
 
+    
     [Flags]
     public enum PCIBist : byte
     {
@@ -206,10 +101,83 @@ GetMaxBus = r.w.cx;
     }
 
 
-
-    public class PCIDevice
+    public class PCIDeviceCardBus : PCIDevice
     {
-       private static string[] classtext = new string[]           
+        public PCIDeviceCardBus(byte bus, byte slot, byte function)
+            : base (bus,slot,function)
+        {
+        }
+
+        public override int GetNumberOfBaseAddresses()
+        {
+            return 6;
+        }
+    }
+
+    public class PCIDeviceBridge : PCIDevice
+    {
+        public PCIDeviceBridge(byte bus, byte slot, byte function)
+            : base (bus,slot,function)
+        {
+        }
+        public override int GetNumberOfBaseAddresses()
+        {
+            return 2;
+        }
+
+        public byte PrimaryBus { get { return Read8(0x18); } set { Write8(0x18, value); } }
+        public byte SecondaryBus { get { return Read8(0x19); } set { Write8(0x19, value); } }
+        public byte SubordinateBus { get { return Read8(0x1a); } set { Write8(0x1a, value); } }
+        public byte SecondaryLatencyTime { get { return Read8(0x1b); } set { Write8(0x1b, value); } }
+    }
+
+
+
+    public class PCIDeviceNormal : PCIDevice
+    {
+        public PCIDeviceNormal(byte bus, byte slot, byte function)
+            : base (bus,slot,function)
+        {
+        }
+
+        public override int GetNumberOfBaseAddresses()
+        {
+            return 6;
+        }
+        public UInt32 BaseAddress2 { get { return Read32(0x18); } set { Write32(0x18, value); } }
+        public UInt32 BaseAddress3 { get { return Read32(0x1a); } set { Write32(0x1a, value); } }
+        public UInt32 BaseAddress4 { get { return Read32(0x20); } set { Write32(0x20, value); } }
+        public UInt32 BaseAddress5 { get { return Read32(0x24); } set { Write32(0x24, value); } }
+       
+    }
+
+    public abstract class PCIDevice
+    {
+        
+        public abstract int GetNumberOfBaseAddresses();
+    
+
+        public static PCIDevice GetPCIDevice(byte bus, byte slot, byte function)
+        {
+            PCIDeviceNormal test = new PCIDeviceNormal(bus,slot,function);
+            
+            if (!test.DeviceExists)
+                return null;
+
+            if (test.HeaderType == PCIHeaderType.Normal)
+                return test;
+
+            if (test.HeaderType == PCIHeaderType.Cardbus)
+                return new PCIDeviceCardBus(bus,slot,function);
+
+            if (test.HeaderType == PCIHeaderType.Bridge)
+                return new PCIDeviceBridge(bus,slot,function);
+            
+            return null;
+        }
+    
+
+       private static string[] classtext = new string[]          
        {
         "pre pci 2.0",		// 00
         "disk",		// 01
@@ -228,7 +196,7 @@ GetMaxBus = r.w.cx;
 
         private static string[][] subclasstext = new string[][]
         { 
-            new string[] {},
+            new string[] { "VGA Device", "non VGA device"},
             new string[] { "SCSI" ,"IDE" , "floppy","IPI","RAID", "other" },
             new string[] { "Ethernet", "TokenRing", "FDDI" , "ATM" , "other" },
             new string[] { "VGA", "SuperVGA","XGA", "other"},
@@ -243,15 +211,18 @@ GetMaxBus = r.w.cx;
             new string[] { "Firewire", "ACCESS.bus" , "SSA", "USB" ,"Fiber Channel" , "other"},
         };
 
+
         public string GetClassInfo()
         {
             int cc = ClassCode;
-            if (cc >= classtext.Length)            
-                return "unknown class / subclass";
+            int sc = SubClass; 
             
-            int sc = SubClass;
+            if (cc >= classtext.Length)            
+                return "unknown class (" + cc.ToString() + ") / subclass (" + sc.ToString() + ")";
+            
+            
             if (sc >= subclasstext[cc].Length)            
-                return String.Concat(classtext[cc], " / unknown subclass");
+                return String.Concat(classtext[cc], " / unknown subclass (", sc.ToString(), ")");
             
             return String.Concat( classtext[cc] , " / " , subclasstext[cc][sc]);
         }
@@ -268,7 +239,7 @@ GetMaxBus = r.w.cx;
         private const UInt32 PCI_BASE_ADDRESS_IO_MASK = ~(UInt32)0x03;
 
 
-        public PCIDevice(byte bus, byte slot, byte function)
+        protected PCIDevice(byte bus, byte slot, byte function)
         {
             this.Bus = bus;
             this.Slot = slot;
@@ -280,7 +251,7 @@ GetMaxBus = r.w.cx;
         public byte Function { get; private set; }
 
         public bool DeviceExists { get { return VendorID != 0xFFFF && VendorID != 0x0; } }
-        public bool IsMultiFunction { get { return (HeaderType & PCIHeaderType.Multifunction) != 0; } }
+        public bool IsMultiFunction { get { return (Read8(0x0e) & 0xf0) != 0; } }
 
         public UInt32 VendorID { get { return Read16(0x0); } }
         public UInt16 DeviceID { get { return Read16(0x2); } }
@@ -295,26 +266,21 @@ GetMaxBus = r.w.cx;
 
         public byte CacheLineSize { get { return Read8(0x0c); } set { Write8(0x0c, value); } }
         public byte LatencyTimer { get { return Read8(0x0d); } set { Write8(0x0d, value); } }
-        public PCIHeaderType HeaderType { get { return (PCIHeaderType)Read8(0x0e); } set { Write8(0x0e, (byte)value); } }
+        public PCIHeaderType HeaderType { get { return (PCIHeaderType)(Read8(0x0e) & 0xf); } }
         public PCIBist Bist { get { return (PCIBist)Read8(0x0f); } set { Write8(0x0f, (byte)value); } }
 
         public UInt32 GetBaseAddress(byte index)
         {
-            return Read32((byte)(0x10b + index << 2));
+            return Read32((byte)(0x10 + index * 4));
         }
         public void SetBaseAddress(byte index, UInt32 value)
         {
-            Write32((byte)(0x10b + index << 2), value);
+            Write32((byte)(0x10 + index *4), value);
         }
 
         public UInt32 BaseAddress0 { get { return Read32(0x10); } set { Write32(0x10, value); } }
         public UInt32 BaseAddress1 { get { return Read32(0x14); } set { Write32(0x14, value); } }
-        public UInt32 BaseAddress2 { get { return Read32(0x18); } set { Write32(0x18, value); } }
-        public UInt32 BaseAddress3 { get { return Read32(0x1a); } set { Write32(0x1a, value); } }
-        public UInt32 BaseAddress4 { get { return Read32(0x20); } set { Write32(0x20, value); } }
-        public UInt32 BaseAddress5 { get { return Read32(0x24); } set { Write32(0x24, value); } }
-        // more registers need to be filled in
-
+         
         public byte InterruptLine { get { return Read8(0x3c); } set { Write8(0x3c, value); } }
         public byte InterruptPin { get { return Read8(0x3d); } set { Write8(0x3d, value); } }
         public byte MinGNT { get { return Read8(0x3e); } set { Write8(0x3e, value); } }
@@ -525,6 +491,6 @@ GetMaxBus = r.w.cx;
         {
             CPUBus.Write32(ConfigAddr, GetAddress(aRegister));
             CPUBus.Write8(ConfigData, value);
-        }
+        } 
     }
 }

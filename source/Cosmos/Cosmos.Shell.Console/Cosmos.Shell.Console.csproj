@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="Commands\BreakCommand.cs" />
     <Compile Include="Commands\ClsCommand.cs" />
+    <Compile Include="Commands\LspciCommand.cs" />
     <Compile Include="Commands\DeviceCommand.cs" />
     <Compile Include="Commands\DirCommand.cs" />
     <Compile Include="Commands\EchoCommand.cs" />

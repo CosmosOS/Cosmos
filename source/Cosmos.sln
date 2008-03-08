@@ -83,9 +83,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestSuite", "TestSuite", "{
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestKernel", "TestKernel\TestKernel.csproj", "{8F2D5231-CDE5-48FA-9D26-D4305B01FD3C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteveKernel", "SteveKernel\SteveKernel.csproj", "{8C566493-DBA5-45DD-93D4-89D4486CAAB6}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 34
+		SccNumberOfProjects = 35
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -221,6 +223,10 @@ Global
 		SccProjectTopLevelParentUniqueName33 = Cosmos.sln
 		SccProjectName33 = TestKernel
 		SccLocalPath33 = TestKernel
+		SccProjectUniqueName34 = SteveKernel\\SteveKernel.csproj
+		SccProjectTopLevelParentUniqueName34 = Cosmos.sln
+		SccProjectName34 = SteveKernel
+		SccLocalPath34 = SteveKernel
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -356,6 +362,10 @@ Global
 		{8F2D5231-CDE5-48FA-9D26-D4305B01FD3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8F2D5231-CDE5-48FA-9D26-D4305B01FD3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8F2D5231-CDE5-48FA-9D26-D4305B01FD3C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C566493-DBA5-45DD-93D4-89D4486CAAB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C566493-DBA5-45DD-93D4-89D4486CAAB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C566493-DBA5-45DD-93D4-89D4486CAAB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C566493-DBA5-45DD-93D4-89D4486CAAB6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -396,6 +406,7 @@ Global
 		{B69B89D4-54FC-41DF-B5D7-EE674CF60343} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
 		{AEC28E7E-1ABB-4ABC-8CE1-B74D9DC9B80E} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
 		{7EB6E2FF-74C8-4F59-9923-EB8EF1DE098E} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
+		{8C566493-DBA5-45DD-93D4-89D4486CAAB6} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
 		{8F2D5231-CDE5-48FA-9D26-D4305B01FD3C} = {7EB6E2FF-74C8-4F59-9923-EB8EF1DE098E}
 	EndGlobalSection
 EndGlobal
