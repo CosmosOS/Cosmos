@@ -217,7 +217,41 @@ namespace Cosmos.Hardware.New.Storage {
 		}
 
 		public override void WriteBlock(ulong aBlock, byte[] aContents) {
-			throw new NotImplementedException();
+			uint xSleepCount = Timeout;
+			while (((IOReadByte(mController_Command) & 0x80) == 0x80) && xSleepCount > 0) {
+				mSleep(1);
+				xSleepCount--;
+			}
+			if (xSleepCount == 0) {
+				throw new Exception("[ATA|WriteBlockNew] Failed 1");
+			}
+			IOWriteByte(mController_FeatureReg, 0);
+			IOWriteByte(mController_SectorCount, 1);
+			IOWriteByte(mController_SectorNumber, (byte)aBlock);
+			IOWriteByte(mController_CylinderLow, (byte)(aBlock >> 8));
+			IOWriteByte(mController_CylinderHigh, (byte)(aBlock >> 16));
+			IOWriteByte( mController_DeviceHead, (byte)(0xE0 | (mDrive << 4) | (byte)(aBlock >> 24)));
+			IOWriteByte(mController_DeviceControl, 0); // receive interrupts...
+			IOWriteByte(mController_Command, 0x30);
+			xSleepCount = Timeout;
+			while (((IOReadByte(mController_Command) & 0x80) == 0x80) && xSleepCount > 0) {
+				mSleep(1);
+				xSleepCount--;
+			}
+			if (xSleepCount == 0) {
+				throw new Exception("[ATA|WriteBlockNew] Failed 2");
+			}
+			xSleepCount = Timeout;
+			while (((IOReadByte(mController_AlternateStatus) & 0x8) == 0x8) && xSleepCount > 0) {
+				mSleep(1);
+				xSleepCount--;
+			}
+			if (xSleepCount == 0) {
+				throw new Exception("[ATA|WriteBlockNew] Failed 3");
+			}
+			for (int i = 0; i < 256; i++) {
+				IOWriteWord(mController_Data, (ushort)((aContents[i * 2]) | (aContents[i * 2 + 1] << 8)));
+			}
 		}
 
 		public override string Name {

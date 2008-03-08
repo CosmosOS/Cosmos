@@ -50,16 +50,11 @@ namespace Cosmos.Shell.Console.Commands {
 						System.Console.WriteLine("Storage device is null!");
 						return;
 					}
-					var xBytes = xBD.ReadBlock(2);
-					System.Console.Write("Byte 1-1: ");
-					System.Console.WriteLine(xBytes[6].ToString());
-					System.Console.Write("Byte 1-2: ");
-					System.Console.WriteLine(xBytes[7].ToString());
-					xBytes = xBD.ReadBlock(3);
-					System.Console.Write("Byte 2-1: ");
-					System.Console.WriteLine(xBytes[6].ToString());
-					System.Console.Write("Byte 2-2: ");
-					System.Console.WriteLine(xBytes[7].ToString());
+					var xBytes = new byte[512];
+					for (int i = 0; i < 512; i++) {
+						xBytes[i] = (byte)(i % 255);
+					}
+					xBD.WriteBlock(0, xBytes);
 				}
 			}
 		}
