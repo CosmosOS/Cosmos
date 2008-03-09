@@ -36,13 +36,39 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Cosmos.Build.Windows, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL" />
-    <Reference Include="Cosmos.Kernel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL" />
     <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Security\User.cs" />
+    <Compile Include="Shell\Prompt.cs" />
+    <Compile Include="Shell\Session.cs" />
+    <Compile Include="Test\Dummy.cs" />
+    <Compile Include="Test\IDummyInterface.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Cosmos.Build.Windows\Cosmos.Build.Windows.csproj">
+      <Project>{1F0EDE86-F6D4-4355-9A97-10E90457770C}</Project>
+      <Name>Cosmos.Build.Windows</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Hardware.PC\Cosmos.Hardware.PC.csproj">
+      <Project>{B024FADF-EF04-4602-A0F4-49016D68B2AF}</Project>
+      <Name>Cosmos.Hardware.PC</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos\Cosmos.Hardware\Cosmos.Hardware.csproj">
+      <Project>{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}</Project>
+      <Name>Cosmos.Hardware</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos\Cosmos.Kernel\Cosmos.Kernel.csproj">
+      <Project>{A1F83D9F-2D44-4264-A08B-416797123018}</Project>
+      <Name>Cosmos.Kernel</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Shell\Commands\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
