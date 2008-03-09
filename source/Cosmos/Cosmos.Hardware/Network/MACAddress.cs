@@ -10,7 +10,15 @@ namespace Cosmos.Hardware.Network
 
         public MACAddress(byte[] address)
         {
-            bytes = (byte[])address.Clone();
+            if (address == null || address.Length == 6)
+                throw new ArgumentException("address is null or wrong length", "address");
+
+            bytes[0] = address[0];
+            bytes[1] = address[1];
+            bytes[2] = address[2];
+            bytes[3] = address[3];
+            bytes[4] = address[4];
+            bytes[5] = address[5];
         }
 
         public MACAddress(MACAddress m) : this(m.bytes)
