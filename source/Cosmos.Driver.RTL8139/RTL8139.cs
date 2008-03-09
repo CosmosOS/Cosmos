@@ -31,7 +31,8 @@ namespace Cosmos.Driver.RTL8139
             myDevice = device;
             // etc
         }
-        
+
+        #region NetworkDevice members
         public override MACAddress MACAddress
         {
             get 
@@ -73,6 +74,7 @@ namespace Cosmos.Driver.RTL8139
         {
             throw new NotImplementedException();
         }
+        #endregion
 
         public override string Name
         {
