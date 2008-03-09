@@ -73,6 +73,7 @@
   <ItemGroup>
     <Compile Include="Boot.cs" />
     <Compile Include="Global.cs" />
+    <Compile Include="New\Partitioning\MBT.cs" />
     <Compile Include="Old\FileSystem\Ext2.Structs.cs" />
     <Compile Include="Old\FileSystem\Fat16.cs" />
     <Compile Include="Old\FileSystem\File.cs" />
@@ -89,9 +90,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Cosmos.snk" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="New\Partitioning\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

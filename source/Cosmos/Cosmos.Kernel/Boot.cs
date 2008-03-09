@@ -17,6 +17,7 @@ namespace Cosmos.Kernel {
 			// MTW: you could use partial methods for this, but then you dont
 			// have control of the order in which the individual methods are called..
             Cosmos.Hardware.PC.Global.Init();
+			New.Partitioning.MBT.Initialize();
 
             // Now init kernel devices and rest of kernel
             Keyboard.Initialize();

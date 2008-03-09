@@ -64,12 +64,8 @@ namespace Cosmos.Hardware.New.Storage {
 		}
 
 		private ulong GetBlockCount() {
-			Console.WriteLine("Writing Device");
-			System.Diagnostics.Debugger.Break();
 			IOWriteByte(mController_DeviceHead, (byte)((mDrive << 4) + (1 << 6)));
 			uint xTimeout = Timeout;
-			Console.WriteLine("Waiting step1");
-			System.Diagnostics.Debugger.Break();
 			while ((IOReadByte(mController_Command) & IDE_STATUSREG_DRDY) == 0) {
 				mSleep(1);
 				xTimeout--;
@@ -77,12 +73,8 @@ namespace Cosmos.Hardware.New.Storage {
 			if ((IOReadByte(mController_Command) & IDE_STATUSREG_DRDY) == 0) {
 				throw new Exception("[ATA#1] GetBlockCount failed!");
 			}
-			Console.WriteLine("Waiting done. Sending Command");
-			System.Diagnostics.Debugger.Break();
 			IOWriteByte(mController_Command, 0xF8);
 			xTimeout = Timeout;
-			Console.WriteLine("Waiting step 2");
-			System.Diagnostics.Debugger.Break();
 			while ((IOReadByte(mController_Command) & IDE_STATUSREG_BSY) != 0) {
 				mSleep(1);
 				xTimeout--;
@@ -90,13 +82,10 @@ namespace Cosmos.Hardware.New.Storage {
 			if ((IOReadByte(mController_Command) & IDE_STATUSREG_BSY) != 0) {
 				throw new Exception("[ATA#2] GetBlockCount failed!");
 			}
-			Console.WriteLine("Waiting done, reading LBS");
-			System.Diagnostics.Debugger.Break();
 			uint xResult = IOReadByte(mController_SectorNumber);
 			xResult += (uint)IOReadByte(mController_CylinderLow) << 8;
 			xResult += (uint)IOReadByte(mController_CylinderHigh) << 16;
 			xResult += (uint)(IOReadByte(mController_DeviceHead) & 0xF) << 8;
-
 			return xResult;
 		}
 
