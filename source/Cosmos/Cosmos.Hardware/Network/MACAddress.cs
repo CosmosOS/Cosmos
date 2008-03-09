@@ -10,8 +10,8 @@ namespace Cosmos.Hardware.Network
 
         public MACAddress(byte[] address)
         {
-            if (address == null || address.Length == 6)
-                throw new ArgumentException("address is null or wrong length", "address");
+            if (address == null || address.Length != 6)
+                throw new ArgumentException("MACAddress is null or has wrong length", "address");
 
             bytes[0] = address[0];
             bytes[1] = address[1];
@@ -19,6 +19,7 @@ namespace Cosmos.Hardware.Network
             bytes[3] = address[3];
             bytes[4] = address[4];
             bytes[5] = address[5];
+
         }
 
         public MACAddress(MACAddress m) : this(m.bytes)
@@ -71,6 +72,22 @@ namespace Cosmos.Hardware.Network
             }
             else
                 throw new ArgumentException("obj is not a MACAddress", "obj");
-        }        
+        }
+
+        public override string ToString()
+        {
+            string address = string.Empty;
+
+            foreach (byte i in bytes)
+            {
+                //TODO: Add padding to make correct width
+                //TODO: Print i as HEX
+                address = address + i.ToString() + ":";
+            }
+            
+            address.TrimEnd(':');
+
+            return address;
+        }
     }
 }

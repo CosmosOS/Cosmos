@@ -36,6 +36,18 @@ namespace FrodeTest
             Shell.Session currentSession =  Shell.Session.CreateSession(currentUser);
             currentSession.Run();
 
+
+            // Testing RTL8139 PCI networkcard
+            
+
+            //Find PCI device
+            Cosmos.Hardware.PC.Bus.PCIDevice pciNic = Cosmos.Hardware.PC.Bus.PCIDevice.GetPCIDevice(0,3,0);
+
+            //Load card
+            Cosmos.Driver.RTL8139.RTL8139 nic = new Cosmos.Driver.RTL8139.RTL8139(pciNic);
+            Console.WriteLine("MAC address: " + nic.MACAddress.ToString());
+
+
             //TESTING
             Test.Dummy dummy = new FrodeTest.Test.Dummy();
             dummy.Execute();
