@@ -22,5 +22,10 @@ namespace Cosmos.Shell.Console.Commands
             //TODO: For some reason the values output are too high. F.instance GetSeconds goes to 90.
             System.Console.WriteLine((int)RTC.GetHours() + ":" + RTC.GetMinutes() + ":" + RTC.GetSeconds());
         }
+
+        public override void Help()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

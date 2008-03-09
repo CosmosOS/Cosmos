@@ -74,5 +74,25 @@ namespace Cosmos.Hardware {
 		public abstract string Name {
 			get;
 		}
+
+        private bool _Enabled = false;
+        public bool IsEnabled
+        {
+            get
+            {
+                return _Enabled;
+            }
+        }
+        public virtual bool Enable()
+        {
+            _Enabled = true;
+            return true;
+        }
+
+        public virtual bool Disable()
+        {
+            _Enabled = false;
+            return true;
+        }
 	}
 }
