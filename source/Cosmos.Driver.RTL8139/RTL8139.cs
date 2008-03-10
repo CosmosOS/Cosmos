@@ -25,10 +25,10 @@ namespace Cosmos.Driver.RTL8139
         }
 
 
-        private PCIDevice myDevice;
+        private PCIDevice pciCard;
         public RTL8139(PCIDevice device)
         {
-            myDevice = device;
+            pciCard = device;
             // etc
         }
 
@@ -41,7 +41,7 @@ namespace Cosmos.Driver.RTL8139
                 byte[] bytes = new byte[6];
                 for (int i = 0; i < 6; i++)
                 {
-                    bytes[i] = myDevice.Read8((byte)i);
+                    bytes[i] = pciCard.Read8((byte)i);
                 }
 
                 MACAddress mac = new MACAddress(bytes);
@@ -81,20 +81,77 @@ namespace Cosmos.Driver.RTL8139
             get { return "Generic RTL 8139 Network device"; }
         }
 
-        public void EnableNIC()
+        public override bool Enable()
         {
             //Writes 0x00 to CONFIG_1 registers
-            myDevice.Write8((byte)RTL8139Register.Config1, 0x00);
+            pciCard.Write8((byte)RTL8139Register.Config1, 0x00);
+            return true;
         }
 
-
-        public void SoftResetNIC()
+        /// <summary>
+        /// Performs an internal system hardware reset of the network card.
+        /// </summary>
+        public void SoftReset()
         {
-            myDevice.Write8((byte)RTL8139Register.ChipCmd, 0x10);
-            //TODO: Should check the RST bit. It is high while resetting, and low when reset complete.
+            pciCard.Write8((byte)RTL8139Register.ChipCmd, 0x10);
+            //TODO: Should check the RST bit afterwards. It is high while resetting, and low when reset complete.
         }
 
-        private enum RTL8139Register
+        /// <summary>
+        /// Initialize the Receive Buffer. The RBSTART register consists of 4 bytes (0x30h to 0x33h) which should contain
+        /// the address of a buffer to save incoming data to.
+        /// </summary>
+        private void InitReceiveBuffer()
+        {
+            //TODO: Really unsure of the types and math here...
+            //char[] rx_buffer = new char[8192+16]; //8k + header
+            //pciCard.Write8(RTL8139Register.RxBuf, (byte)rx_buffer);
+        }
+
+        /// <summary>
+        /// The IRQMaskRegister
+        /// </summary>
+        private void SetIRQMaskRegister()
+        {
+            byte mask = (byte)(IRQMask.ROK & IRQMask.TOK);
+            pciCard.Write8((byte)RTL8139Register.IntrMask, mask);
+        }
+
+        /// <summary>
+        /// This register indicates the source of an interrupt when the INTA pin goes active. 
+        /// Enabling the corresponding bits in the Interrupt Mask Register (IMR) allows bits in this register to produce an interrupt. 
+        /// When an interrupt is active, one of more bits in this register are set to a “1”. 
+        /// The interrupt Status Register reflects all current pending interrupts, regardless of the state of the corresponding mask bit in the IMR. 
+        /// Reading the ISR clears all interrupts. Writing to the ISR has no effect.
+        /// </summary>
+        private void GetIRQServiceRegister()
+        {
+            //Could perhaps be used to raise events?
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Enable the NIC to be able to Recieve data.
+        /// </summary>
+        public void EnableRecieve()
+        {
+            byte command = (byte)CommandRegister.RE;
+            pciCard.Write8((byte)RTL8139Register.ChipCmd, command);
+        }
+
+        /// <summary>
+        /// Enable the NIC to be able to Transmit data.
+        /// </summary>
+        public void EnableTransmit()
+        {
+            byte command = (byte)CommandRegister.TE;
+            pciCard.Write8((byte)RTL8139Register.ChipCmd, command);
+        }
+
+        /// <summary>
+        /// The RTL8139 contains 64 x 16 bit EEPROM registers.
+        /// </summary>
+        private enum RTL8139Register : byte
         {
             MAC0 = 0x00,            // Ethernet hardware address
             MAR0 = 0x08,            // Multicast filter
@@ -127,6 +184,34 @@ namespace Cosmos.Driver.RTL8139
             NWayAdvert = 0x66,
             NWayLPAR = 0x68,
             NWayExpansion = 0x6A
+        }
+
+        /// <summary>
+        /// IRQ masks used in conjunction with IMR and ISR.
+        /// </summary>
+        private enum IRQMask : byte
+        {
+            ROK = 0x00,     //Receive (Rx) OK
+            RER = 0x01,     //Receive (Rx) Error
+            TOK = 0x02,     //Transmit (Tx) OK
+            TER = 0x03,     //Transmit (Tx) Error
+            RXOVW = 0x04,   //Rx Buffer Overflow
+            PUNLC = 0x05,   //Packed Underrun/Link Change
+            FOVW = 0x06,    //FIFO Overflow
+            LENCHG = 0x0D,  //Cable Length Changed
+            TIMEOUT = 0x0E, //Raised when TCTR register matches TimeInt register
+            SERR = 0x0F     //System Error. Might cause a reset.
+        }
+
+        /// <summary>
+        /// Bits used to issue commands to the RTL. Used in conjunction with register CHIPCMD (0x37h)
+        /// </summary>
+        private enum CommandRegister : byte
+        {
+            BUFE = 0x00,    //Buffer Empty, read-only
+            TE = 0x02,      //Transmitter Enable
+            RE = 0x03,      //Receiver Enable
+            RST = 0x04      //Software Reset
         }
     }
 }

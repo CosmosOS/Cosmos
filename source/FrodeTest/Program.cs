@@ -32,19 +32,22 @@ namespace FrodeTest
              * 3. Initialize Shell, and allow user to log in
              */
             
-            Security.User currentUser = Security.User.Authenticate("frode", "secret");
-            Shell.Session currentSession =  Shell.Session.CreateSession(currentUser);
-            currentSession.Run();
+            //Security.User currentUser = Security.User.Authenticate("frode", "secret");
+            //Shell.Session currentSession =  Shell.Session.CreateSession(currentUser);
+            //currentSession.Run();
 
 
             // Testing RTL8139 PCI networkcard
-            
-
             //Find PCI device
             Cosmos.Hardware.PC.Bus.PCIDevice pciNic = Cosmos.Hardware.PC.Bus.PCIDevice.GetPCIDevice(0,3,0);
 
             //Load card
             Cosmos.Driver.RTL8139.RTL8139 nic = new Cosmos.Driver.RTL8139.RTL8139(pciNic);
+            Console.WriteLine("Network card: " + nic.Name);
+            nic.Enable();
+            //nic.SoftReset();
+            nic.EnableRecieve();
+            nic.EnableTransmit();
             Console.WriteLine("MAC address: " + nic.MACAddress.ToString());
 
 
