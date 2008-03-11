@@ -46,8 +46,10 @@
     <Compile Include="Security\User.cs" />
     <Compile Include="Shell\Prompt.cs" />
     <Compile Include="Shell\Session.cs" />
-    <Compile Include="Test\Dummy.cs" />
-    <Compile Include="Test\IDummyInterface.cs" />
+    <Compile Include="Test\BoolTest.cs" />
+    <Compile Include="Test\InterfaceTest.cs" />
+    <Compile Include="Test\PacketHeaderTest.cs" />
+    <Compile Include="Test\RTL8139Test.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cosmos.Build.Windows\Cosmos.Build.Windows.csproj">
