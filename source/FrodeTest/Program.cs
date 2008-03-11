@@ -50,8 +50,24 @@ namespace FrodeTest
             nic.EnableTransmit();
             Console.WriteLine("MAC address: " + nic.MACAddress.ToString());
 
+            UInt16 data = 4;
+            Cosmos.Driver.RTL8139.PacketHeader head = new Cosmos.Driver.RTL8139.PacketHeader(data);
+            Console.WriteLine("IsRecieveOK - " + head.IsReceiveOk().ToString());
+            if (!head.IsReceiveOk())
+                Console.WriteLine("IsRecieveOK - returns false!");
 
-            //TESTING
+            Console.WriteLine("IsFrameAlignmentError - " + head.IsFrameAlignmentError().ToString());
+            if (!head.IsFrameAlignmentError())
+                Console.WriteLine("IsFrameAlignmentError - returns false!");
+
+            //TESTING TRUE/FALSE TOSTRING
+            bool yes = true;
+            bool no = false;
+            Console.WriteLine("true.ToString() gives: " + yes.ToString());
+            Console.WriteLine("false.ToString() gives: " + no.ToString());
+            
+
+            //TESTING IInterfaces
             Test.Dummy dummy = new FrodeTest.Test.Dummy();
             dummy.Execute();
              

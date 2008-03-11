@@ -41,11 +41,11 @@ namespace Cosmos.Driver.RTL8139
                 byte[] bytes = new byte[6];
                 for (int i = 0; i < 6; i++)
                 {
-                    bytes[i] = pciCard.Read8((byte)i);
+                    ushort address = (ushort)(pciCard.BaseAddress0 + (byte)RTL8139Register.Config0 + i);
+                    bytes[i] = CPUBus.Read8(address);
                 }
 
                 MACAddress mac = new MACAddress(bytes);
-
                 return mac;            
             }
         }
@@ -78,13 +78,15 @@ namespace Cosmos.Driver.RTL8139
 
         public override string Name
         {
-            get { return "Generic RTL 8139 Network device"; }
+            get { return "Generic RTL8139 Network device"; }
         }
 
         public override bool Enable()
         {
             //Writes 0x00 to CONFIG_1 registers
-            pciCard.Write8((byte)RTL8139Register.Config1, 0x00);
+            byte command = 0x00;
+            ushort address = (ushort)(pciCard.BaseAddress0 + (byte)RTL8139Register.Config1);
+            CPUBus.Write8(address, command);
             return true;
         }
 
@@ -93,7 +95,9 @@ namespace Cosmos.Driver.RTL8139
         /// </summary>
         public void SoftReset()
         {
-            pciCard.Write8((byte)RTL8139Register.ChipCmd, 0x10);
+            byte command = 0x10;
+            ushort address = (ushort)(pciCard.BaseAddress0 + (byte)RTL8139Register.ChipCmd);
+            CPUBus.Write8(address, command);
             //TODO: Should check the RST bit afterwards. It is high while resetting, and low when reset complete.
         }
 
@@ -114,7 +118,8 @@ namespace Cosmos.Driver.RTL8139
         private void SetIRQMaskRegister()
         {
             byte mask = (byte)(IRQMask.ROK & IRQMask.TOK);
-            pciCard.Write8((byte)RTL8139Register.IntrMask, mask);
+            ushort address = (ushort)(pciCard.BaseAddress0 + (byte)RTL8139Register.IntrMask);
+            CPUBus.Write8(address, mask);
         }
 
         /// <summary>
@@ -136,7 +141,8 @@ namespace Cosmos.Driver.RTL8139
         public void EnableRecieve()
         {
             byte command = (byte)CommandRegister.RE;
-            pciCard.Write8((byte)RTL8139Register.ChipCmd, command);
+            ushort address = (ushort)(pciCard.BaseAddress0 + (byte)RTL8139Register.ChipCmd);
+            CPUBus.Write8(address, command);
         }
 
         /// <summary>
@@ -145,7 +151,8 @@ namespace Cosmos.Driver.RTL8139
         public void EnableTransmit()
         {
             byte command = (byte)CommandRegister.TE;
-            pciCard.Write8((byte)RTL8139Register.ChipCmd, command);
+            ushort address = (ushort)(pciCard.BaseAddress0 + (byte)RTL8139Register.ChipCmd);
+            CPUBus.Write8(address, command);
         }
 
         /// <summary>
