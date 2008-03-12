@@ -7,7 +7,7 @@ using Indy.IL2CPU.Plugs;
 namespace Indy.IL2CPU.IL.CustomImplementations.System {
 	[Plug(Target=typeof(bool))]
 	public static class BooleanImpl {
-		public static string ToString(bool aThis) {
+		public static string ToString(ref bool aThis) {
 			if (aThis) {
 				return "true";
 			} else {
