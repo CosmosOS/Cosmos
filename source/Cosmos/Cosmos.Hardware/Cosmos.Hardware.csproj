@@ -48,6 +48,7 @@
     <Compile Include="Bus\Bus.cs" />
     <Compile Include="Bus\CPUBus.cs" />
     <Compile Include="Device.cs" />
+    <Compile Include="IOSpace.cs" />
     <Compile Include="Network\MACAddress.cs" />
     <Compile Include="Network\NetworkDevice.cs" />
     <Compile Include="New\Storage\ATA.Constants.cs" />

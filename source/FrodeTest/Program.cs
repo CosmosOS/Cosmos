@@ -24,14 +24,6 @@ namespace FrodeTest
             Cosmos.Kernel.Staging.DefaultStageQueue stages = new Cosmos.Kernel.Staging.DefaultStageQueue();
             stages.Enqueue(new Cosmos.Kernel.Staging.Stages.KernelStage());
             stages.Run();
-            //Stages
-            /*
-             * 1. Initialize hardware
-             * 2. Communicate with filesystem
-             * 2. Set up basic security
-             * 3. Initialize Shell, and allow user to log in
-             */
-            
             //Security.User currentUser = Security.User.Authenticate("frode", "secret");
             //Shell.Session currentSession =  Shell.Session.CreateSession(currentUser);
             //currentSession.Run();
@@ -40,11 +32,11 @@ namespace FrodeTest
             //Test
             Test.RTL8139Test.RunTest();
             Test.PacketHeaderTest.RunTest();
-            Test.BoolTest.RunTest();
-            Test.InterfaceTest.RunTest();
-
+            //Test.RAMBusTest.RunTest();
+            //Test.BoolTest.RunTest();
+            //Test.InterfaceTest.RunTest();
              
-
+            //Done
             Console.WriteLine("Shutting down computer");
             while (true)
                 ;

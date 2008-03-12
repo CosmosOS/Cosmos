@@ -41,8 +41,9 @@ namespace Cosmos.Driver.RTL8139
                 byte[] bytes = new byte[6];
                 for (int i = 0; i < 6; i++)
                 {
-                    ushort address = (ushort)(pciCard.BaseAddress0 + (byte)RTL8139Register.Config0 + i);
-                    bytes[i] = CPUBus.Read8(address);
+                    uint address = (uint)(pciCard.BaseAddress1 + (byte)RTL8139Register.MAC0 + i);
+                    
+                    bytes[i] = IOSpace.Read8(address);
                 }
 
                 MACAddress mac = new MACAddress(bytes);
@@ -86,7 +87,7 @@ namespace Cosmos.Driver.RTL8139
             //Writes 0x00 to CONFIG_1 registers
             byte command = 0x00;
             ushort address = (ushort)(pciCard.BaseAddress0 + (byte)RTL8139Register.Config1);
-            CPUBus.Write8(address, command);
+            IOSpace.Write8(address, command);
             return true;
         }
 
@@ -97,7 +98,7 @@ namespace Cosmos.Driver.RTL8139
         {
             byte command = 0x10;
             ushort address = (ushort)(pciCard.BaseAddress0 + (byte)RTL8139Register.ChipCmd);
-            CPUBus.Write8(address, command);
+            IOSpace.Write8(address, command);
             //TODO: Should check the RST bit afterwards. It is high while resetting, and low when reset complete.
         }
 
@@ -119,7 +120,7 @@ namespace Cosmos.Driver.RTL8139
         {
             byte mask = (byte)(IRQMask.ROK & IRQMask.TOK);
             ushort address = (ushort)(pciCard.BaseAddress0 + (byte)RTL8139Register.IntrMask);
-            CPUBus.Write8(address, mask);
+            IOSpace.Write8(address, mask);
         }
 
         /// <summary>
@@ -142,7 +143,7 @@ namespace Cosmos.Driver.RTL8139
         {
             byte command = (byte)CommandRegister.RE;
             ushort address = (ushort)(pciCard.BaseAddress0 + (byte)RTL8139Register.ChipCmd);
-            CPUBus.Write8(address, command);
+            IOSpace.Write8(address, command);
         }
 
         /// <summary>
@@ -152,7 +153,7 @@ namespace Cosmos.Driver.RTL8139
         {
             byte command = (byte)CommandRegister.TE;
             ushort address = (ushort)(pciCard.BaseAddress0 + (byte)RTL8139Register.ChipCmd);
-            CPUBus.Write8(address, command);
+            IOSpace.Write8(address, command);
         }
 
         /// <summary>

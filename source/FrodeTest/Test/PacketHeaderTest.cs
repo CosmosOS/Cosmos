@@ -9,15 +9,19 @@ namespace FrodeTest.Test
         public static void RunTest()
         {
 
-            UInt16 data = 4;
+            UInt16 data = 0;
             Cosmos.Driver.RTL8139.PacketHeader head = new Cosmos.Driver.RTL8139.PacketHeader(data);
-            Console.WriteLine("IsRecieveOK - " + head.IsReceiveOk().ToString());
-            if (!head.IsReceiveOk())
-                Console.WriteLine("IsRecieveOK - returns false!");
 
-            Console.WriteLine("IsFrameAlignmentError - " + head.IsFrameAlignmentError().ToString());
-            if (!head.IsFrameAlignmentError())
-                Console.WriteLine("IsFrameAlignmentError - returns false!");
+            Console.WriteLine("Binary value in head: " + data);
+            Console.WriteLine("IsRecieveOK - " + head.IsReceiveOk());
+            Console.WriteLine("IsFrameAlignmentError - " + head.IsFrameAlignmentError());
+            Console.WriteLine("IsCRCError - " + head.IsCRCError());
+            Console.WriteLine("IsLongPacket - " + head.IsLongPacket());
+            Console.WriteLine("IsRuntPacket - " + head.IsRuntPacket());
+            Console.WriteLine("IsISEPacket - " + head.IsInvalidSymbolError());
+            Console.WriteLine("IsBroadcast - " + head.IsBroadcastAddress());
+            Console.WriteLine("IsPhysical - " + head.IsPhysicalAddressMatch());
+            Console.WriteLine("IsMulticast - " + head.IsMulticastAddress());
         }
     }
 }
