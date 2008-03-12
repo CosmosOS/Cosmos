@@ -43,7 +43,7 @@ namespace Cosmos.Hardware
         #region Write to IO space
         public static unsafe void Write8(uint address, byte data)
         {
-            ushort* pointer = (ushort*)address;
+            byte* pointer = (byte*)address;
             *pointer = data;
         }
 
