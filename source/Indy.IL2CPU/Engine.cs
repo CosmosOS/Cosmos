@@ -110,18 +110,17 @@ namespace Indy.IL2CPU {
 					throw new ArgumentNullException("aGetFileNameForGroup");
 				}
 				mCrawledAssembly = Assembly.LoadFile(aAssembly);
+
 				MethodInfo xEntryPoint = (MethodInfo)mCrawledAssembly.EntryPoint;
+				if (xEntryPoint == null)
+					throw new NotSupportedException("No EntryPoint found!");
+
 				Type xEntryPointType = xEntryPoint.DeclaringType;
 				xEntryPoint = xEntryPointType.GetMethod("Init", new Type[0]);
-				if (xEntryPoint == null) {
-					xEntryPoint = mCrawledAssembly.EntryPoint;
-				}
+				
 				//List<string> xSearchDirs = new List<string>(new string[] { Path.GetDirectoryName(aAssembly), aAssemblyDir });
 				//xSearchDirs.AddRange((from item in aPlugs
 				//                      select Path.GetDirectoryName(item)).Distinct());
-				if (xEntryPoint == null) {
-					throw new NotSupportedException("No EntryPoint found!");
-				}
 				switch (aTargetPlatform) {
 					case TargetPlatformEnum.Win32: {
 							mMap = (OpCodeMap)Activator.CreateInstance(Type.GetType("Indy.IL2CPU.IL.X86.Win32.Win32OpCodeMap, Indy.IL2CPU.IL.X86.Win32", true));
