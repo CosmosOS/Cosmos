@@ -1,0 +1,26 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Cosmos.Driver.RTL8139.Register
+{
+    /// <summary>
+    /// The CommandRegister is used for issuing commands to the RTL8139.
+    /// Used for performing Software Reset, or enabling transmitter and receiver.
+    /// 1 Byte wide. Only one 4 bits used. (Bit 1, 5, 6, 7 not used)
+    /// Offset 0x37h from the base memory.
+    /// </summary>
+    public static class CommandRegister
+    {
+        /// <summary>
+        /// Bits used to issue commands to the RTL. Used in conjunction with register CHIPCMD (0x37h)
+        /// </summary>
+        public enum Bit : byte
+        {
+            BUFE = 0x00,    //Buffer Empty, read-only
+            TE = 0x02,      //Transmitter Enable
+            RE = 0x03,      //Receiver Enable
+            RST = 0x04      //Software Reset
+        }
+    }
+}

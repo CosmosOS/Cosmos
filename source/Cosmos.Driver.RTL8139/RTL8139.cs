@@ -4,6 +4,7 @@ using System.Text;
 using Cosmos.Hardware.Network;
 using Cosmos.Hardware.PC.Bus;
 using Cosmos.Hardware;
+using Cosmos.Driver.RTL8139.Register;
 
 namespace Cosmos.Driver.RTL8139
 {
@@ -41,7 +42,7 @@ namespace Cosmos.Driver.RTL8139
                 byte[] bytes = new byte[6];
                 for (int i = 0; i < 6; i++)
                 {
-                    uint address = (uint)(pciCard.BaseAddress1 + (byte)RTL8139Register.MAC0 + i);
+                    uint address = (uint)(pciCard.BaseAddress1 + (byte)MainRegister.Bit.MAC0 + i);
                     
                     bytes[i] = IOSpace.Read8(address);
                 }
@@ -84,9 +85,9 @@ namespace Cosmos.Driver.RTL8139
 
         public override bool Enable()
         {
-            //Writes 0x00 to CONFIG_1 registers
+            //Writes 0x00 to CONFIG_1 registers to enable card
             byte command = 0x00;
-            ushort address = (ushort)(pciCard.BaseAddress0 + (byte)RTL8139Register.Config1);
+            ushort address = (ushort)(pciCard.BaseAddress1 + (byte)MainRegister.Bit.Config1);
             IOSpace.Write8(address, command);
             return true;
         }
@@ -97,7 +98,7 @@ namespace Cosmos.Driver.RTL8139
         public void SoftReset()
         {
             byte command = 0x10;
-            ushort address = (ushort)(pciCard.BaseAddress0 + (byte)RTL8139Register.ChipCmd);
+            ushort address = (ushort)(pciCard.BaseAddress1 + (byte)MainRegister.Bit.ChipCmd);
             IOSpace.Write8(address, command);
             //TODO: Should check the RST bit afterwards. It is high while resetting, and low when reset complete.
         }
@@ -118,8 +119,8 @@ namespace Cosmos.Driver.RTL8139
         /// </summary>
         private void SetIRQMaskRegister()
         {
-            byte mask = (byte)(IRQMask.ROK & IRQMask.TOK);
-            ushort address = (ushort)(pciCard.BaseAddress0 + (byte)RTL8139Register.IntrMask);
+            byte mask = (byte)(Register.InterruptMaskRegister.Bit.ROK & Register.InterruptMaskRegister.Bit.TOK);
+            ushort address = (ushort)(pciCard.BaseAddress1 + (byte)MainRegister.Bit.IntrMask);
             IOSpace.Write8(address, mask);
         }
 
@@ -141,8 +142,8 @@ namespace Cosmos.Driver.RTL8139
         /// </summary>
         public void EnableRecieve()
         {
-            byte command = (byte)CommandRegister.RE;
-            ushort address = (ushort)(pciCard.BaseAddress0 + (byte)RTL8139Register.ChipCmd);
+            byte command = (byte)Register.CommandRegister.Bit.RE;
+            ushort address = (ushort)(pciCard.BaseAddress1 + (byte)MainRegister.Bit.ChipCmd);
             IOSpace.Write8(address, command);
         }
 
@@ -151,75 +152,95 @@ namespace Cosmos.Driver.RTL8139
         /// </summary>
         public void EnableTransmit()
         {
-            byte command = (byte)CommandRegister.TE;
-            ushort address = (ushort)(pciCard.BaseAddress0 + (byte)RTL8139Register.ChipCmd);
+            byte command = (byte)Register.CommandRegister.Bit.TE;
+            ushort address = (ushort)(pciCard.BaseAddress1 + (byte)MainRegister.Bit.ChipCmd);
             IOSpace.Write8(address, command);
         }
 
         /// <summary>
-        /// The RTL8139 contains 64 x 16 bit EEPROM registers.
+        /// A general purpose timer. Writing to this will reset timer.
         /// </summary>
-        private enum RTL8139Register : byte
+        public UInt32 TimerCount 
         {
-            MAC0 = 0x00,            // Ethernet hardware address
-            MAR0 = 0x08,            // Multicast filter
-            TxStatus0 = 0x10,       // Transmit status (Four 32bit registers)
-            TxAddr0 = 0x20,         // Tx descriptors (also four 32bit)
-            RxBuf = 0x30,
-            RxEarlyCnt = 0x34,
-            RxEarlyStatus = 0x36,
-            ChipCmd = 0x37,
-            RxBufPtr = 0x38,
-            RxBufAddr = 0x3A,
-            IntrMask = 0x3C,
-            IntrStatus = 0x3E,
-            TxConfig = 0x40,
-            RxConfig = 0x44,
-            Timer = 0x48,           // A general-purpose counter
-            RxMissed = 0x4C,        // 24 bits valid, write clears
-            Cfg9346 = 0x50,
-            Config0 = 0x51,
-            Config1 = 0x52,
-            FlashReg = 0x54,
-            GPPinData = 0x58,
-            GPPinDir = 0x59,
-            MII_SMI = 0x5A,
-            HltClk = 0x5B,
-            MultiIntr = 0x5C,
-            TxSummary = 0x60,
-            MII_BMCR = 0x62,
-            MII_BMSR = 0x64,
-            NWayAdvert = 0x66,
-            NWayLPAR = 0x68,
-            NWayExpansion = 0x6A
+            get 
+            {
+                return IOSpace.Read32((uint)(pciCard.BaseAddress1 + (byte)MainRegister.Bit.Timer));
+            } 
+            set
+            {
+                uint address = (uint)(pciCard.BaseAddress1 + (byte)MainRegister.Bit.Timer);
+                IOSpace.Write32(address, 0x00); //Resets timer
+            }
         }
 
         /// <summary>
-        /// IRQ masks used in conjunction with IMR and ISR.
+        /// The Early TX Threshold specifies the threshold level in Tx FIFO register before transmission begins.
+        /// The bytecount should not exceed 2048(2k bytes).
+        /// The bytecount also needs to be dividable by 32.
+        /// If bytecount 0 is set then NIC will use 8 bytes as threshold
         /// </summary>
-        private enum IRQMask : byte
+        /// <param name="bytecount">Number zero or a number dividable by 32.</param>
+        public void SetEarlyTXThreshold(uint bytecount)
         {
-            ROK = 0x00,     //Receive (Rx) OK
-            RER = 0x01,     //Receive (Rx) Error
-            TOK = 0x02,     //Transmit (Tx) OK
-            TER = 0x03,     //Transmit (Tx) Error
-            RXOVW = 0x04,   //Rx Buffer Overflow
-            PUNLC = 0x05,   //Packed Underrun/Link Change
-            FOVW = 0x06,    //FIFO Overflow
-            LENCHG = 0x0D,  //Cable Length Changed
-            TIMEOUT = 0x0E, //Raised when TCTR register matches TimeInt register
-            SERR = 0x0F     //System Error. Might cause a reset.
+            if (bytecount != 0 & (bytecount%32 > 0))
+                throw new ArgumentException("Early TX Threshold must be 0 or dividable by 32");
+
+            uint address = (uint)(pciCard.BaseAddress1 + (byte)MainRegister.Bit.RxEarlyCnt); //TODO: Correct register??
+            IOSpace.Write8(address, (byte)bytecount);
         }
 
         /// <summary>
-        /// Bits used to issue commands to the RTL. Used in conjunction with register CHIPCMD (0x37h)
+        /// Transmits the given Packet
         /// </summary>
-        private enum CommandRegister : byte
+        /// <param name="packet"></param>
+        public unsafe void Transmit(Packet packet)
         {
-            BUFE = 0x00,    //Buffer Empty, read-only
-            TE = 0x02,      //Transmitter Enable
-            RE = 0x03,      //Receiver Enable
-            RST = 0x04      //Software Reset
+            //Tell the PCI card the address of body of the Packet.
+            uint address = 
+                (uint)(pciCard.BaseAddress1 + 
+                (byte)MainRegister.Bit.TxAddr0) +
+                TransmitStatusDescriptor.GetCurrentTSDescriptor();
+            byte[] body = packet.PacketBody();
+
+            fixed (byte* bodystart = &body[0])
+            {
+                IOSpace.Write32(address, (uint)bodystart);
+            }
+
+            /*
+             * From Victor - an alternative way
+             * fixed (byte* umanagedPointer = yourVariable)
+             * {
+             * IntPtr address = (IntPtr)umanagedPointer;
+             * SomeFunction(address);
+             * //or any other code
+             * }
+             */
+
+            //Set the transmit status - which enables the transmit.
+            this.SetEarlyTXThreshold(1024);
+            this.ClearOWNBit();
+            TransmitStatusDescriptor.IncrementTSDescriptor();
         }
+
+        /// <summary>
+        /// Clears the OWN bit in the Transmit Status Descriptor. This starts poring the data from the 
+        /// buffer into the FIFO buffer on the PCI card. The data then moves from the FIFO to the network cable.
+        /// </summary>
+        private void ClearOWNBit()
+        {
+            uint address = (uint)(pciCard.BaseAddress1 + 
+                (byte)MainRegister.Bit.TxStatus0 +
+                TransmitStatusDescriptor.GetCurrentTSDescriptor() +
+                (byte)TransmitStatusDescriptor.Bit.OWN);
+
+            IOSpace.Write8(address, 0x00);
+        }
+
+
+
+
+
+
     }
 }

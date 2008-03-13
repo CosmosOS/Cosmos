@@ -9,7 +9,7 @@ namespace FrodeTest.Test
         public static void RunTest()
         {
 
-            UInt16 data = 0;
+            UInt16 data = 0xFFFF; //All 16 bits high
             Cosmos.Driver.RTL8139.PacketHeader head = new Cosmos.Driver.RTL8139.PacketHeader(data);
 
             Console.WriteLine("Binary value in head: " + data);

@@ -10,7 +10,17 @@ namespace Cosmos.Driver.RTL8139
     /// </summary>
     public class Packet
     {
+        private PacketHeader head;
         public PacketHeader Head { get; private set; }
-        public byte[] PacketBody { get; set; }
+
+        public Packet(PacketHeader newhead)
+        {
+            head = newhead;
+        }
+
+        public byte[] PacketBody()
+        {
+            return new byte[10]; //TODO: Redo this completely! Hardcoded to some bogus value now.
+        }
     }
 }

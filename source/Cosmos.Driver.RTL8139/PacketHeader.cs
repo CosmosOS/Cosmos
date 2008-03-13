@@ -71,11 +71,18 @@ namespace Cosmos.Driver.RTL8139
         /// <summary>
         /// Bitwise checks it the given bit is set in the PacketHeader.
         /// </summary>
-        /// <param name="bit"></param>
-        /// <returns>Returns TRUE if bit is set</returns>
+        /// <param name="bit">The zero-based position of a bit in the head. I.e. bit 1 is the second bit.</param>
+        /// <returns>Returns TRUE if bit is set in packetheader</returns>
         private bool CheckBit(PacketHeadBit bit)
         {
-            return ((head & (byte)bit) == (byte)bit);
+            //A single bit is LEFT SHIFTED the number a given number of bits.
+            //and bitwise AND'ed together with the packethead.
+            //So the initial value is   :       0000 0000.
+            //Left shifting a bit 3 bits:       0000 0100
+            //And'ed together with the head:    0101 0101 AND 0000 01000 => 0000 0100 (which is greater than zero - so bit is set).
+            
+            ushort mask = (ushort)(1 << (ushort)bit);
+            return (head & mask) != 0;
         }
 
         private enum PacketHeadBit : byte

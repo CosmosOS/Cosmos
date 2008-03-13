@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Cosmos.Driver.RTL8139.Register;
 
 namespace FrodeTest.Test
 {
@@ -14,18 +15,24 @@ namespace FrodeTest.Test
 
             //Load card
             Cosmos.Driver.RTL8139.RTL8139 nic = new Cosmos.Driver.RTL8139.RTL8139(pciNic);
-            
+
             Console.WriteLine("Network card: " + nic.Name);
             Console.WriteLine("BaseAddress0 is : " + pciNic.BaseAddress0);
             Console.WriteLine("BaseAddress1 is : " + pciNic.BaseAddress1);
             Console.WriteLine("MAC address: " + nic.MACAddress.ToString());
             Console.WriteLine("Enabling card...");
             nic.Enable();
-            //nic.SoftReset();
+            nic.SoftReset();
             nic.EnableRecieve();
             nic.EnableTransmit();
+            Cosmos.Hardware.PC.Global.Sleep(200); //Sleep two seconds
+            Console.WriteLine("Timer: " + nic.TimerCount);
 
-            
+
+            //Cosmos.Driver.RTL8139.PacketHeader head = new Cosmos.Driver.RTL8139.PacketHeader(0xFF);
+            Cosmos.Driver.RTL8139.Packet packet = new Cosmos.Driver.RTL8139.Packet(null);
+            nic.Transmit(packet);
+            Console.WriteLine("Transmit called");
         }
     }
 }

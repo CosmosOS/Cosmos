@@ -19,9 +19,26 @@ namespace FrodeTest.Shell
         {
             Console.Write(Prompt.LoadPrompt(xUser).PromptText());
             string command = Console.ReadLine();
+            Cosmos.Driver.RTL8139.RTL8139 nic = null;
 
             if (command.Equals("exit"))
                 return;
+            else if (command.Equals("nic"))
+            {
+                Cosmos.Hardware.PC.Bus.PCIDevice pciNic = Cosmos.Hardware.PC.Bus.PCIDevice.GetPCIDevice(0, 3, 0);
+                nic = new Cosmos.Driver.RTL8139.RTL8139(pciNic);
+                nic.Enable();
+                Console.WriteLine("Enabled Network card");
+            }
+            else if (command.Equals("timer"))
+            {
+                Console.WriteLine("NIC TimerCount: " + nic.TimerCount);
+            }
+            else if (command.Equals("reset"))
+            {
+                nic.TimerCount = 1;
+                Console.WriteLine("NIC TimerCount: " + nic.TimerCount);
+            }
             else
                 Console.WriteLine("No such systemcommand or application: " + command);
 

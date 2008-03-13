@@ -50,6 +50,10 @@
     <Compile Include="Packet.cs" />
     <Compile Include="PacketHeader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Register\CommandRegister.cs" />
+    <Compile Include="Register\InterruptMaskRegister.cs" />
+    <Compile Include="Register\MainRegister.cs" />
+    <Compile Include="Register\TransmitStatusDescriptor.cs" />
     <Compile Include="RTL8139.cs" />
   </ItemGroup>
   <ItemGroup>
