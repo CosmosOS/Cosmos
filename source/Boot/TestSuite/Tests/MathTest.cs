@@ -29,6 +29,10 @@ namespace TestSuite.Tests
             Assert(5 - 2 == 3, "5 - 2 == 3");
             Assert(2 + 5 * 2 == 12, "2 + 5 * 2 == 12");
             Assert((2 + 5) * 2 == 14, "(2 + 5) * 2 == 14");
+			//long al = 0x1FFFFFFFF;
+			//long bl = 0x1FFFFFFFF;//1L;
+			////al += bl;
+			//Assert(al == bl, "Int64 Equality");
 
             UInt32 a = 5;
             UInt32 b = 5;

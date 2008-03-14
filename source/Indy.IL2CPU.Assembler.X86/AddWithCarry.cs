@@ -8,16 +8,16 @@ namespace Indy.IL2CPU.Assembler.X86
 	[OpCode(0xFFFFFFFF, "adc")]
 	public class AddWithCarry : Instruction
 	{
-		public readonly string Address1;
-		public readonly string Address2;
-		public AddWithCarry(string aAddress1, string aAddress2)
+		public readonly string Dest;
+		public readonly string Source;
+		public AddWithCarry(string dest, string source)
 		{
-			Address1 = aAddress1;
-			Address2 = aAddress2;
+			Dest = dest;
+			Source = source;
 		}
 		public override string ToString()
 		{
-			return "adc " + Address1 + "," + Address2;
+			return "adc " + Dest + "," + Source;
 		}
 	}
 }

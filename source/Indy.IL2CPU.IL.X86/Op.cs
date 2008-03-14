@@ -264,12 +264,9 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			if (xSize.Size > 4) {
 				new CPUx86.Pop("eax");
-				new CPUx86.Add("esp", "4");
-				new CPUx86.Add("eax", "[esp]");
-				new CPUx86.Add("esp", "4");
-				new CPUx86.Add("esp", "4");
-				new CPUx86.Pushd("0");
-				new Pushd("eax");
+				new CPUx86.Pop("edx");
+				new CPUx86.Add("[esp]", "eax");
+				new CPUx86.AddWithCarry("[esp + 4]", "ebx");
 			} else {
 				new CPUx86.Pop("eax");
 				new CPUx86.Add("[esp]", "eax");
