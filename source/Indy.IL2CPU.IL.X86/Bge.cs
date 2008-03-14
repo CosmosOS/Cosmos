@@ -21,24 +21,14 @@ namespace Indy.IL2CPU.IL.X86 {
 			string BaseLabel = CurInstructionLabel + "__";
 			string LabelTrue = BaseLabel + "True";
 			string LabelFalse = BaseLabel + "False";
-#warning Code checking: strange code seems to be generated. Read the following comments:
 			//JumpAlways right after JumpIfGreaterOrEquals to the same label
 			//my offer is:
-			//new CPUx86.Pop(CPUx86.Registers.EAX);
-			//new CPUx86.Pop(CPUx86.Registers.EBX);
-			//new CPUx86.Compare(CPUx86.Registers.EAX, CPUx86.Registers.EBX);
-			//new CPUx86.JumpIfLess(LabelFalse);
-			//new CPU.JumpAlways(TargetLabel);
-			//new CPU.Label(LabelFalse);
 			new CPUx86.Pop(CPUx86.Registers.EAX);
-			new CPUx86.Compare(CPUx86.Registers.EAX, CPUx86.Registers.AtESP);
-			new CPUx86.JumpIfGreaterOrEquals(LabelTrue);
-			new CPUx86.JumpAlways(LabelTrue);
-			new CPU.Label(LabelTrue);
-			new CPUx86.Add(CPUx86.Registers.ESP, "4");
-			new CPUx86.JumpAlways(TargetLabel);
+			new CPUx86.Pop(CPUx86.Registers.EBX);
+			new CPUx86.Compare(CPUx86.Registers.EAX, CPUx86.Registers.EBX);
+			new CPUx86.JumpIfLess(LabelFalse);
+			new CPU.JumpAlways(TargetLabel);
 			new CPU.Label(LabelFalse);
-			new CPUx86.Add(CPUx86.Registers.ESP, "4");
 		}
 
 		private void DoAssemble64Bit() {
