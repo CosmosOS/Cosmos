@@ -18,7 +18,7 @@ namespace MathTest
 		// Main entry point of the kernel
 		public static void Init()
 		{
-			Cosmos.Kernel.CPU.Init();
+			//Cosmos.Kernel..CPU.Init();
 			Console.WriteLine("Done booting");
 			while (true)
 				;
