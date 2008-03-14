@@ -272,9 +272,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				new Pushd("eax");
 			} else {
 				new CPUx86.Pop("eax");
-				new CPUx86.Add("eax", "[esp]");
-				new CPUx86.Add("esp", "4");
-				new Pushd("eax");
+				new CPUx86.Add("[esp]", "eax");
 			}
 		}
 

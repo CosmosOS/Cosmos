@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Add.cs" />
+    <Compile Include="AddWithCarry.cs" />
     <Compile Include="And.cs" />
     <Compile Include="Assembler.cs" />
     <Compile Include="Call.cs" />
