@@ -82,7 +82,9 @@ namespace Cosmos.Kernel.New.Partitioning {
 					DebugUtil.SendDoubleNumber("MBT", "Entry Found. Start, Length in blocks", xStart, 32, xLength, 32);
 					if (xStart > 0 && xLength > 0) {
 						xStart += 2;
-						//Device.Add(new MBTPartition(xBlockDev, xStart, xLength, "Partition"));
+						Console.WriteLine("Add Partition to Device list");
+						System.Diagnostics.Debugger.Break();
+						Device.Add(new MBTPartition(xBlockDev, xStart, xLength, "Partition"));
 						DebugUtil.SendMessage("MBT", "FoundPartition");
 					}
 				}

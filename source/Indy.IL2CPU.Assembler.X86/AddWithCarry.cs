@@ -6,11 +6,11 @@ using System.Text;
 namespace Indy.IL2CPU.Assembler.X86
 {
 	[OpCode(0xFFFFFFFF, "adc")]
-	public class Add : Instruction
+	public class AddWithCarry : Instruction
 	{
 		public readonly string Address1;
 		public readonly string Address2;
-		public Add(string aAddress1, string aAddress2)
+		public AddWithCarry(string aAddress1, string aAddress2)
 		{
 			Address1 = aAddress1;
 			Address2 = aAddress2;
