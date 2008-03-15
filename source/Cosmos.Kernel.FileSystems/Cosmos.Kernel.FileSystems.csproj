@@ -40,10 +40,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="File.cs" />
-    <Compile Include="IFile.cs" />
+    <Compile Include="BaseFileSystem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Windows\File.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Cosmos\Cosmos.Hardware\Cosmos.Hardware.csproj">
+      <Project>{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}</Project>
+      <Name>Cosmos.Hardware</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
