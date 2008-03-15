@@ -42,7 +42,8 @@ namespace Cosmos.Driver.RTL8139
                 byte[] bytes = new byte[6];
                 for (int i = 0; i < 6; i++)
                 {
-                    uint address = (uint)(pciCard.BaseAddress1 + (byte)MainRegister.Bit.MAC0 + i);
+                    //(byte)MainRegister.Bit.MAC0
+                    uint address = (uint)(pciCard.BaseAddress1 + i);
                     
                     bytes[i] = IOSpace.Read8(address);
                 }
@@ -50,6 +51,23 @@ namespace Cosmos.Driver.RTL8139
                 MACAddress mac = new MACAddress(bytes);
                 return mac;            
             }
+        }
+
+        public string GetHardwareRevision()
+        {
+            uint address = pciCard.BaseAddress1 + (uint)MainRegister.Bit.TxConfig;
+            UInt32 tcrdata = IOSpace.Read32(address);
+            TransmitConfigurationRegister tcr = new TransmitConfigurationRegister(tcrdata);
+            return TransmitConfigurationRegister.GetHardwareRevision(tcr.GetHWVERID());
+        }
+
+        /// <summary>
+        /// Changes the Loopback mode. 
+        /// </summary>
+        /// <param name="value">True to enable Loopback. False for normal operation.</param>
+        public void SetLoopbackMode(bool value)
+        {
+            throw new NotImplementedException();
         }
 
         public override bool QueueBytes(byte[] buffer, int offset, int length)
@@ -104,22 +122,16 @@ namespace Cosmos.Driver.RTL8139
         }
 
         /// <summary>
-        /// Initialize the Receive Buffer. The RBSTART register consists of 4 bytes (0x30h to 0x33h) which should contain
-        /// the address of a buffer to save incoming data to.
-        /// </summary>
-        private void InitReceiveBuffer()
-        {
-            //TODO: Really unsure of the types and math here...
-            //char[] rx_buffer = new char[8192+16]; //8k + header
-            //pciCard.Write8(RTL8139Register.RxBuf, (byte)rx_buffer);
-        }
-
-        /// <summary>
         /// The IRQMaskRegister
         /// </summary>
         private void SetIRQMaskRegister()
         {
-            byte mask = (byte)(Register.InterruptMaskRegister.Bit.ROK & Register.InterruptMaskRegister.Bit.TOK);
+            byte mask = (byte)
+                (Register.InterruptMaskRegister.Bit.ROK & 
+                Register.InterruptMaskRegister.Bit.TOK &
+                Register.InterruptMaskRegister.Bit.RER &
+                Register.InterruptMaskRegister.Bit.TER
+                );
             ushort address = (ushort)(pciCard.BaseAddress1 + (byte)MainRegister.Bit.IntrMask);
             IOSpace.Write8(address, mask);
         }
@@ -190,10 +202,45 @@ namespace Cosmos.Driver.RTL8139
         }
 
         /// <summary>
+        /// Initialize the Receive Buffer. The RBSTART register consists of 4 bytes (0x30h to 0x33h) which should contain
+        /// the address of a buffer to save incoming data to.
+        /// </summary>
+        private void InitReceiveBuffer()
+        {
+            //TODO: Really unsure of the types and math here...
+            //char[] rx_buffer = new char[8192+16]; //8k + header
+            //pciCard.Write8(RTL8139Register.RxBuf, (byte)rx_buffer);
+            //byte[] rxbuffer = new byte(
+        }
+
+        /// <summary>
+        /// Takes a byte array, and a memory address. 
+        /// The memoryaddress of the begining of the bytearray is written to the memory address.
+        /// </summary>
+        /// <param name="bytearray"></param>
+        /// <param name="address"></param>
+        private unsafe void WriteBufferToPCI(byte[] bytearray, uint address)
+        {
+            fixed (byte* bodystart = &bytearray[0])
+            {
+                IOSpace.Write32(address, (uint)bodystart);
+            }
+
+            /* 
+             * From Victor - an alternative way
+             * fixed (byte* bodystart = &body[0])
+                {
+                    IntPtr bodyAddress = (IntPtr)bodystart;
+                    IOSpace.Write32(address, (uint)bodyAddress);
+                }
+             */
+        }
+
+        /// <summary>
         /// Transmits the given Packet
         /// </summary>
         /// <param name="packet"></param>
-        public unsafe void Transmit(Packet packet)
+        public void Transmit(Packet packet)
         {
             //Tell the PCI card the address of body of the Packet.
             uint address = 
@@ -202,20 +249,7 @@ namespace Cosmos.Driver.RTL8139
                 TransmitStatusDescriptor.GetCurrentTSDescriptor();
             byte[] body = packet.PacketBody();
 
-            fixed (byte* bodystart = &body[0])
-            {
-                IOSpace.Write32(address, (uint)bodystart);
-            }
-
-            /*
-             * From Victor - an alternative way
-             * fixed (byte* umanagedPointer = yourVariable)
-             * {
-             * IntPtr address = (IntPtr)umanagedPointer;
-             * SomeFunction(address);
-             * //or any other code
-             * }
-             */
+            this.WriteBufferToPCI(body, address);
 
             //Set the transmit status - which enables the transmit.
             this.SetEarlyTXThreshold(1024);

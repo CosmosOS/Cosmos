@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Cosmos.Driver.RTL8139.Misc;
 
 namespace Cosmos.Driver.RTL8139
 {
@@ -25,67 +26,50 @@ namespace Cosmos.Driver.RTL8139
 
         public bool IsReceiveOk()
         {
-            return CheckBit(PacketHeadBit.ROK);
+            return BinaryHelper.CheckBit(head, (ushort)PacketHeadBit.ROK);
         }
 
         public bool IsFrameAlignmentError()
         {
-            return CheckBit(PacketHeadBit.FAE);
+            return BinaryHelper.CheckBit(head, (ushort)PacketHeadBit.FAE);
         }
 
         public bool IsCRCError()
         {
-            return CheckBit(PacketHeadBit.CRC);
+            return BinaryHelper.CheckBit(head, (ushort)PacketHeadBit.CRC);
         }
 
         public bool IsLongPacket()
         {
-            return CheckBit(PacketHeadBit.LONG);
+            return BinaryHelper.CheckBit(head, (ushort)PacketHeadBit.LONG);
         }
 
         public bool IsRuntPacket()
         {
-            return CheckBit(PacketHeadBit.RUNT);
+            return BinaryHelper.CheckBit(head, (ushort)PacketHeadBit.RUNT);
         }
 
         public bool IsInvalidSymbolError()
         {
-            return CheckBit(PacketHeadBit.ISE);
+            return BinaryHelper.CheckBit(head, (ushort)PacketHeadBit.ISE);
         }
 
         public bool IsBroadcastAddress()
         {
-            return CheckBit(PacketHeadBit.BAR);
+            return BinaryHelper.CheckBit(head, (ushort)PacketHeadBit.BAR);
         }
 
         public bool IsPhysicalAddressMatch()
         {
-            return CheckBit(PacketHeadBit.PAM);
+            return BinaryHelper.CheckBit(head, (ushort)PacketHeadBit.PAM);
         }
 
         public bool IsMulticastAddress()
         {
-            return CheckBit(PacketHeadBit.MAR);
+            return BinaryHelper.CheckBit(head, (ushort)PacketHeadBit.MAR);
         }
 
-        /// <summary>
-        /// Bitwise checks it the given bit is set in the PacketHeader.
-        /// </summary>
-        /// <param name="bit">The zero-based position of a bit in the head. I.e. bit 1 is the second bit.</param>
-        /// <returns>Returns TRUE if bit is set in packetheader</returns>
-        private bool CheckBit(PacketHeadBit bit)
-        {
-            //A single bit is LEFT SHIFTED the number a given number of bits.
-            //and bitwise AND'ed together with the packethead.
-            //So the initial value is   :       0000 0000.
-            //Left shifting a bit 3 bits:       0000 0100
-            //And'ed together with the head:    0101 0101 AND 0000 01000 => 0000 0100 (which is greater than zero - so bit is set).
-            
-            ushort mask = (ushort)(1 << (ushort)bit);
-            return (head & mask) != 0;
-        }
-
-        private enum PacketHeadBit : byte
+        private enum PacketHeadBit : ushort
         {
             ROK = 0x00, //Receive OK
             FAE = 0x01, //Frame Alignment Error

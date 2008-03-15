@@ -17,15 +17,18 @@ namespace FrodeTest.Test
             Cosmos.Driver.RTL8139.RTL8139 nic = new Cosmos.Driver.RTL8139.RTL8139(pciNic);
 
             Console.WriteLine("Network card: " + nic.Name);
+            Console.WriteLine("HW Revision: " + nic.GetHardwareRevision());
+            Console.WriteLine("MAC address: " + nic.MACAddress.ToString());
+
             Console.WriteLine("BaseAddress0 is : " + pciNic.BaseAddress0);
             Console.WriteLine("BaseAddress1 is : " + pciNic.BaseAddress1);
-            Console.WriteLine("MAC address: " + nic.MACAddress.ToString());
             Console.WriteLine("Enabling card...");
             nic.Enable();
-            nic.SoftReset();
+            
+            //nic.SoftReset();
             nic.EnableRecieve();
             nic.EnableTransmit();
-            Cosmos.Hardware.PC.Global.Sleep(200); //Sleep two seconds
+            Cosmos.Hardware.PC.Global.Sleep(50);
             Console.WriteLine("Timer: " + nic.TimerCount);
 
 

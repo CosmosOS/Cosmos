@@ -115,7 +115,9 @@
     <Resource Include="Cosmos.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Logo-1.png" />
+    <Resource Include="C:\Documents and Settings\frode\Desktop\Logo-1.png">
+      <Link>Logo-1.png</Link>
+    </Resource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

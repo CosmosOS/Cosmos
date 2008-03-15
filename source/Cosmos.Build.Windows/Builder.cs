@@ -151,7 +151,7 @@ namespace Cosmos.Build.Windows {
 					Global.Call(ToolsPath + @"qemu\qemu.exe"
 						, "-L . -cdrom \"" + BuildPath + "Cosmos.iso\" -boot d -serial"
 						+ " \"file:" + BuildPath + "serial-debug.txt" + "\" -kernel-kqemu"
-						+ " -net nic,model=rtl8139"
+						+ " -net nic,model=rtl8139 -net tap,ifname=CosmosTAP"
 						, ToolsPath + @"qemu\"
 						, false, true);
 					break;
