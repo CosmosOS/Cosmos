@@ -4,7 +4,8 @@ using System.Text;
 
 namespace Cosmos.Kernel.FileSystems
 {
-    public class Class1
+    public interface IFile
     {
+        bool Exists(string path);
     }
 }
