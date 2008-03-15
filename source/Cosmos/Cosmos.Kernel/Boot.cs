@@ -8,6 +8,7 @@ namespace Cosmos.Kernel {
     // For now we just have default, but can add others in the future
     public class Boot {
         public static void Default() {
+			System.Diagnostics.Debugger.Break();
             //Init Heap first - Hardware loads devices and they need heap
 			Heap.CheckInit();
             
@@ -20,6 +21,8 @@ namespace Cosmos.Kernel {
 			New.Partitioning.MBT.Initialize();
 
             // Now init kernel devices and rest of kernel
+			Console.WriteLine("Init Keyboard");
+			System.Diagnostics.Debugger.Break();
             Keyboard.Initialize();
         }
     }

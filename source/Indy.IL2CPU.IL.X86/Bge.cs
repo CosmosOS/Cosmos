@@ -26,6 +26,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			//my offer is:
 			new CPUx86.Pop(CPUx86.Registers.EAX);
 			new CPUx86.Pop(CPUx86.Registers.EBX);
+			new CPUx86.Compare(CPUx86.Registers.EAX, CPUx86.Registers.EBX);
 			new CPUx86.JumpIfGreaterOrEquals(LabelTrue);
 			new CPUx86.JumpAlways(LabelFalse);
 			new CPU.Label(LabelTrue);

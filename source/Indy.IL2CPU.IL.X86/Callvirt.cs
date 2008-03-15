@@ -36,11 +36,8 @@ namespace Indy.IL2CPU.IL.X86 {
 			if (xMethodDef.IsStatic || !xMethodDef.IsVirtual || xMethod.IsFinal) {
 				Engine.QueueMethod(xMethodDef);
 				mNormalAddress = CPU.Label.GenerateLabelName(xMethodDef);
-				mReturnSize = mTargetMethodInfo.ReturnSize;
-				return;
 			}
 			mMethodIdentifier = Engine.GetMethodIdentifier(xMethodDef);
-			
 			Engine.QueueMethod(VTablesImplRefs.GetMethodAddressForTypeRef);
 			mArgumentCount = mTargetMethodInfo.Arguments.Length;
 			mReturnSize = mTargetMethodInfo.ReturnSize;
@@ -55,6 +52,8 @@ namespace Indy.IL2CPU.IL.X86 {
 				}
 			};
 			if (!String.IsNullOrEmpty(mNormalAddress)) {
+				EmitCompareWithNull(Assembler, mCurrentMethodInfo, "[esp + 0x" + mThisOffset.ToString("X") + "]", mLabelName, mLabelName + "_AfterNullRefCheck", xEmitCleanup, mCurrentILOffset);
+				new CPU.Label(mLabelName + "_AfterNullRefCheck");
 				new CPUx86.Call(mNormalAddress);
 			} else {
 				if (Assembler.InMetalMode) {

@@ -69,21 +69,20 @@ namespace Cosmos.Kernel.New.Partitioning {
 				int xContentsIndex = 0;
 				xContentsIndex = 0x1BE;
 				for (byte j = 0; j < 4; j++) {
+					DebugUtil.SendNumber("MBT", "Partition Status", xBlockContents[xContentsIndex], 8);
 					if (!(xBlockContents[xContentsIndex] == 0x80 || xBlockContents[xContentsIndex] == 0)) {
-						DebugUtil.SendNumber("MBT", "Partition Status", xBlockContents[xContentsIndex], 8);
 						xContentsIndex += 16;
 						continue;
 					}
-					xContentsIndex += 8;					
+					xContentsIndex += 8;
 					uint xStart = BitConverter.ToUInt32(xBlockContents, xContentsIndex);
 					xContentsIndex += 4;
 					uint xLength = BitConverter.ToUInt32(xBlockContents, xContentsIndex);
 					xContentsIndex += 4;
-					DebugUtil.SendDoubleNumber("MBT", "Entry Found. Start, Length in blocks", xStart, 32, xLength, 32);
 					if (xStart > 0 && xLength > 0) {
+						DebugUtil.SendDoubleNumber("MBT", "Entry Found. Start, Length in blocks", xStart, 32, xLength, 32);
 						xStart += 2;
 						Console.WriteLine("Add Partition to Device list");
-						System.Diagnostics.Debugger.Break();
 						Device.Add(new MBTPartition(xBlockDev, xStart, xLength, "Partition"));
 						DebugUtil.SendMessage("MBT", "FoundPartition");
 					}
