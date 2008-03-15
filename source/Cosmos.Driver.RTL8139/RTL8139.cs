@@ -105,7 +105,7 @@ namespace Cosmos.Driver.RTL8139
         {
             //Writes 0x00 to CONFIG_1 registers to enable card
             byte command = 0x00;
-            ushort address = (ushort)(pciCard.BaseAddress1 + (byte)MainRegister.Bit.Config1);
+            UInt32 address = pciCard.BaseAddress1 + (byte)MainRegister.Bit.Config1;
             IOSpace.Write8(address, command);
             return true;
         }
@@ -116,7 +116,7 @@ namespace Cosmos.Driver.RTL8139
         public void SoftReset()
         {
             byte command = 0x10;
-            ushort address = (ushort)(pciCard.BaseAddress1 + (byte)MainRegister.Bit.ChipCmd);
+            UInt32 address = pciCard.BaseAddress1 + (byte)MainRegister.Bit.ChipCmd;
             IOSpace.Write8(address, command);
             //TODO: Should check the RST bit afterwards. It is high while resetting, and low when reset complete.
         }
@@ -132,7 +132,7 @@ namespace Cosmos.Driver.RTL8139
                 Register.InterruptMaskRegister.Bit.RER &
                 Register.InterruptMaskRegister.Bit.TER
                 );
-            ushort address = (ushort)(pciCard.BaseAddress1 + (byte)MainRegister.Bit.IntrMask);
+            UInt32 address = pciCard.BaseAddress1 + (byte)MainRegister.Bit.IntrMask;
             IOSpace.Write8(address, mask);
         }
 
@@ -155,7 +155,7 @@ namespace Cosmos.Driver.RTL8139
         public void EnableRecieve()
         {
             byte command = (byte)Register.CommandRegister.Bit.RE;
-            ushort address = (ushort)(pciCard.BaseAddress1 + (byte)MainRegister.Bit.ChipCmd);
+            UInt32 address = pciCard.BaseAddress1 + (byte)MainRegister.Bit.ChipCmd;
             IOSpace.Write8(address, command);
         }
 
@@ -165,7 +165,7 @@ namespace Cosmos.Driver.RTL8139
         public void EnableTransmit()
         {
             byte command = (byte)Register.CommandRegister.Bit.TE;
-            ushort address = (ushort)(pciCard.BaseAddress1 + (byte)MainRegister.Bit.ChipCmd);
+            UInt32 address = pciCard.BaseAddress1 + (byte)MainRegister.Bit.ChipCmd;
             IOSpace.Write8(address, command);
         }
 
@@ -176,11 +176,11 @@ namespace Cosmos.Driver.RTL8139
         {
             get 
             {
-                return IOSpace.Read32((uint)(pciCard.BaseAddress1 + (byte)MainRegister.Bit.Timer));
+                return IOSpace.Read32(pciCard.BaseAddress1 + (byte)MainRegister.Bit.Timer);
             } 
             set
             {
-                uint address = (uint)(pciCard.BaseAddress1 + (byte)MainRegister.Bit.Timer);
+                UInt32 address = pciCard.BaseAddress1 + (byte)MainRegister.Bit.Timer;
                 IOSpace.Write32(address, 0x00); //Resets timer
             }
         }
@@ -192,12 +192,15 @@ namespace Cosmos.Driver.RTL8139
         /// If bytecount 0 is set then NIC will use 8 bytes as threshold
         /// </summary>
         /// <param name="bytecount">Number zero or a number dividable by 32.</param>
-        public void SetEarlyTXThreshold(uint bytecount)
+        public void SetEarlyTxThreshold(uint bytecount)
         {
-            if (bytecount != 0 & (bytecount%32 > 0))
+            //TODO: This method should be in TransmitStatusDescriptos.cs
+            if (bytecount != 0 & (bytecount % 32 > 0))
                 throw new ArgumentException("Early TX Threshold must be 0 or dividable by 32");
 
-            uint address = (uint)(pciCard.BaseAddress1 + (byte)MainRegister.Bit.RxEarlyCnt); //TODO: Correct register??
+            //Each of the four Transmit Status Descriptors (TSD) has its own EarlyTxThreshold.
+
+            UInt32 address = pciCard.BaseAddress1 + (byte)MainRegister.Bit.RxEarlyCnt;
             IOSpace.Write8(address, (byte)bytecount);
         }
 
@@ -243,16 +246,16 @@ namespace Cosmos.Driver.RTL8139
         public void Transmit(Packet packet)
         {
             //Tell the PCI card the address of body of the Packet.
-            uint address = 
-                (uint)(pciCard.BaseAddress1 + 
-                (byte)MainRegister.Bit.TxAddr0) +
+            UInt32 address = 
+                pciCard.BaseAddress1 + 
+                (byte)MainRegister.Bit.TxAddr0 +
                 TransmitStatusDescriptor.GetCurrentTSDescriptor();
             byte[] body = packet.PacketBody();
 
             this.WriteBufferToPCI(body, address);
 
             //Set the transmit status - which enables the transmit.
-            this.SetEarlyTXThreshold(1024);
+            this.SetEarlyTxThreshold(1024);
             this.ClearOWNBit();
             TransmitStatusDescriptor.IncrementTSDescriptor();
         }
@@ -263,10 +266,13 @@ namespace Cosmos.Driver.RTL8139
         /// </summary>
         private void ClearOWNBit()
         {
-            uint address = (uint)(pciCard.BaseAddress1 + 
+            UInt32 address = pciCard.BaseAddress1 + 
                 (byte)MainRegister.Bit.TxStatus0 +
-                TransmitStatusDescriptor.GetCurrentTSDescriptor() +
-                (byte)TransmitStatusDescriptor.Bit.OWN);
+                TransmitStatusDescriptor.GetCurrentTSDescriptor();
+                //(byte)TransmitStatusDescriptor.Bit.OWN);
+
+            //TransmitStatusDescriptor tsd = new TransmitStatusDescriptor();
+            //tsd.SaveToMemory();
 
             IOSpace.Write8(address, 0x00);
         }
