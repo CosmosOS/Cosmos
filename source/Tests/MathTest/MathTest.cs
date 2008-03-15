@@ -3,7 +3,7 @@ using Cosmos.Build.Windows;
 
 namespace MathTest
 {
-	class Program
+	class MathTest
 	{
 		#region Cosmos Builder logic
 		// Most users wont touch this. This will call the Cosmos Build tool
@@ -18,10 +18,13 @@ namespace MathTest
 		// Main entry point of the kernel
 		public static void Init()
 		{
-			//Cosmos.Kernel..CPU.Init();
+			Cosmos.Kernel.Boot.Default();
 			Console.WriteLine("Done booting");
+
+			LongArithmetics.Test();
+
 			while (true)
-				;
+				;			
 		}
 	}
 }
