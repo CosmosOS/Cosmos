@@ -96,6 +96,7 @@
     <Compile Include="ShiftRight.cs" />
     <Compile Include="Stosb.cs" />
     <Compile Include="Sub.cs" />
+    <Compile Include="SubWithCarry.cs" />
     <Compile Include="Test.cs" />
     <Compile Include="Xor.cs" />
   </ItemGroup>

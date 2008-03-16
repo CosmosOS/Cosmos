@@ -266,7 +266,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				new CPUx86.Pop("eax");
 				new CPUx86.Pop("edx");
 				new CPUx86.Add("[esp]", "eax");
-				new CPUx86.AddWithCarry("[esp + 4]", "ebx");
+				new CPUx86.AddWithCarry("[esp + 4]", "edx");
 			} else {
 				new CPUx86.Pop("eax");
 				new CPUx86.Add("[esp]", "eax");

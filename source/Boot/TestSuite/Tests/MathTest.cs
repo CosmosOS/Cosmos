@@ -30,9 +30,13 @@ namespace TestSuite.Tests
             Assert(2 + 5 * 2 == 12, "2 + 5 * 2 == 12");
             Assert((2 + 5) * 2 == 14, "(2 + 5) * 2 == 14");
 			long al = 0x1FFFFFFFF;
-			long bl = 0x20;//1L;
-			Assert(al != bl, "Int64 Inequality");
-			Assert(0x1FFFFFFFF + 0x01L == 0x200000000, "0x1FFFFFFFF + 0x01L == 0x200000000");
+			long bl = 0x300000000;	//1L;
+			al += 0x01;				//al == 0x200000000
+			bl -= 0xFFFFFFFFL;		//bl == 0x200000001
+			al -= 0x02;				//al == 0x1FFFFFFFE
+			bl -= 0x03;				//bl == 0x1FFFFFFFE
+			Assert(al == bl, "Int64 operations");
+			Assert((-41) - (-31) == -10, "Int64 negatives");
 
             UInt32 a = 5;
             UInt32 b = 5;
