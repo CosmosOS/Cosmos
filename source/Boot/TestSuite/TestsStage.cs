@@ -23,6 +23,7 @@ namespace TestSuite
             _tests.Add(new Tests.MathTest());
             _tests.Add(new Tests.StringTest());
             _tests.Add(new Tests.ParseTest());
+			_tests.Add(new Tests.OperatorsTest());
             Execute();
         }
 

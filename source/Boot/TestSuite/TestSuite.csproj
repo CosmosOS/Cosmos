@@ -37,12 +37,15 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestsStage.cs" />
     <Compile Include="Tests\MathTest.cs" />
+    <Compile Include="Tests\OperatorsTest.cs" />
     <Compile Include="Tests\ParseTest.cs" />
     <Compile Include="Tests\StringTest.cs" />
     <Compile Include="TestBase.cs" />
