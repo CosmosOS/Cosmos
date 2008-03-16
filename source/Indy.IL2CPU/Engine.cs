@@ -1017,7 +1017,7 @@ namespace Indy.IL2CPU {
 		public static TypeInformation GetTypeInfo(Type aType) {
 			TypeInformation xTypeInfo;
 			int xObjectStorageSize;
-			SortedList<string, TypeInformation.Field> xTypeFields = GetTypeFieldInfo(aType, out xObjectStorageSize);
+			Dictionary<string, TypeInformation.Field> xTypeFields = GetTypeFieldInfo(aType, out xObjectStorageSize);
 			xTypeInfo = new TypeInformation(xObjectStorageSize, xTypeFields, aType, (!aType.IsValueType) && aType.IsClass);
 			return xTypeInfo;
 		}
@@ -1106,12 +1106,12 @@ namespace Indy.IL2CPU {
 			return xMethodInfo;
 		}
 
-		public static SortedList<string, TypeInformation.Field> GetTypeFieldInfo(MethodBase aCurrentMethod, out int aObjectStorageSize) {
+		public static Dictionary<string, TypeInformation.Field> GetTypeFieldInfo(MethodBase aCurrentMethod, out int aObjectStorageSize) {
 			Type xCurrentInspectedType = aCurrentMethod.DeclaringType;
 			return GetTypeFieldInfo(xCurrentInspectedType, out aObjectStorageSize);
 		}
 
-		private static void GetTypeFieldInfoImpl(SortedList<string, TypeInformation.Field> aTypeFields, Type aType, ref int aObjectStorageSize, bool aGCObjects) {
+		private static void GetTypeFieldInfoImpl(Dictionary<string, TypeInformation.Field> aTypeFields, Type aType, ref int aObjectStorageSize) {
 			Type xActualType = aType;
 			Dictionary<string, PlugFieldAttribute> xCurrentPlugFieldList = new Dictionary<string, PlugFieldAttribute>();
 			do {
@@ -1146,9 +1146,9 @@ namespace Indy.IL2CPU {
 					if (xFieldType == null) {
 						xFieldType = xField.FieldType;
 					}
-					if ((!xFieldType.IsValueType && aGCObjects && xFieldType.IsClass) || (xPlugFieldAttr != null && xPlugFieldAttr.IsExternalValue && aGCObjects)) {
-						continue;
-					}
+					//if ((!xFieldType.IsValueType && aGCObjects && xFieldType.IsClass) || (xPlugFieldAttr != null && xPlugFieldAttr.IsExternalValue && aGCObjects)) {
+					//    continue;
+					//}
 					if ((xFieldType.IsClass && !xFieldType.IsValueType) || (xPlugFieldAttr != null && xPlugFieldAttr.IsExternalValue)) {
 						xFieldSize = 4;
 					} else {
@@ -1165,7 +1165,7 @@ namespace Indy.IL2CPU {
 					} else {
 						aObjectStorageSize += xFieldSize;
 					}
-					aTypeFields.Add(xField.GetFullName(), new TypeInformation.Field(xFieldSize, aGCObjects, xFieldType, (xPlugFieldAttr != null && xPlugFieldAttr.IsExternalValue)));
+					aTypeFields.Add(xField.GetFullName(), new TypeInformation.Field(xFieldSize, xFieldType.IsClass && !xFieldType.IsValueType, xFieldType, (xPlugFieldAttr != null && xPlugFieldAttr.IsExternalValue)));
 				}
 				while (xCurrentPlugFieldList.Count > 0) {
 					var xItem = xCurrentPlugFieldList.Values.First();
@@ -1176,9 +1176,6 @@ namespace Indy.IL2CPU {
 					if (xFieldType == null) {
 						xFieldType = xItem.FieldType;
 					}
-					if ((!xFieldType.IsValueType || xItem.IsExternalValue) && aGCObjects) {
-						continue;
-					}
 					if ((xFieldType.IsClass && !xFieldType.IsValueType) || xItem.IsExternalValue) {
 						xFieldSize = 4;
 					} else {
@@ -1186,7 +1183,7 @@ namespace Indy.IL2CPU {
 					}
 					int xOffset = aObjectStorageSize;
 					aObjectStorageSize += xFieldSize;
-					aTypeFields.Add(xItem.FieldId, new TypeInformation.Field(xOffset, aGCObjects, xFieldType, xItem.IsExternalValue));
+					aTypeFields.Add(xItem.FieldId, new TypeInformation.Field(xFieldSize, xFieldType.IsClass && !xFieldType.IsValueType, xFieldType, xItem.IsExternalValue));
 				}
 				if (aType.FullName != "System.Object" && aType.BaseType != null) {
 					aType = aType.BaseType;
@@ -1194,26 +1191,15 @@ namespace Indy.IL2CPU {
 					break;
 				}
 			} while (true);
-			//if (xActualType.FullName == "System.String" && aGCObjects) {
-			//    aTypeFields.Add("$$Storage$$", new TypeInformation.Field(aObjectStorageSize, 4, true, typeof(Array), false));
-			//    aObjectStorageSize += 4;
-			//}
-			//if (ObjectUtilities.IsDelegate(xActualType)) {
-			//    if (aGCObjects) {
-			//        aTypeFields.Add("$$Obj$$", new TypeInformation.Field(aObjectStorageSize, 4, true, typeof(object)));
-			//        aObjectStorageSize += 4;
-			//    } else {
-			//        aTypeFields.Add("$$Method$$", new TypeInformation.Field(aObjectStorageSize, 4, false, typeof(uint)));
-			//        aObjectStorageSize += 4;
-			//    }
-			//}
 		}
 
-		public static SortedList<string, TypeInformation.Field> GetTypeFieldInfo(Type aType, out int aObjectStorageSize) {
-			SortedList<string, TypeInformation.Field> xTypeFields = new SortedList<string, TypeInformation.Field>();
+		public static Dictionary<string, TypeInformation.Field> GetTypeFieldInfo(Type aType, out int aObjectStorageSize) {
+			Dictionary<string, TypeInformation.Field> xTypeFields = new Dictionary<string, TypeInformation.Field>();
 			aObjectStorageSize = 0;
-			GetTypeFieldInfoImpl(xTypeFields, aType, ref aObjectStorageSize, true);
-			GetTypeFieldInfoImpl(xTypeFields, aType, ref aObjectStorageSize, false);
+			if (aType == typeof(string)) {
+				System.Console.Write("");				
+			}
+			GetTypeFieldInfoImpl(xTypeFields, aType, ref aObjectStorageSize);
 			if (aType.IsExplicitLayout) {
 				var xStructLayout = aType.StructLayoutAttribute;
 				if (xStructLayout.Size == 0) {
@@ -1226,13 +1212,14 @@ namespace Indy.IL2CPU {
 				}
 			}
 			int xOffset = 0;
-			for (int i = xTypeFields.Count - 1; i >= 0; i--) {
-				var xItem = xTypeFields.Values[i];
+			Dictionary<string, TypeInformation.Field> xResult = new Dictionary<string,TypeInformation.Field>();
+			foreach(var item in xTypeFields.Reverse()){
+				var xItem = item.Value;
 				xItem.Offset = xOffset;
 				xOffset += xItem.Size;
-				xTypeFields[xTypeFields.Keys[i]] = xItem;
+				xResult.Add(item.Key, xItem);
 			}
-			return xTypeFields;
+			return xResult;
 		}
 
 		private static Op GetOpFromType(Type aType, ILReader aReader, MethodInformation aMethodInfo) {

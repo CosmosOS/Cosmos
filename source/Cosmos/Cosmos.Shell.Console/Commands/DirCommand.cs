@@ -17,6 +17,8 @@ namespace Cosmos.Shell.Console.Commands {
 		}
 
 		public override void Execute(string param) {
+			System.Console.Write("Device Count: ");
+			System.Console.WriteLine(Hardware.Device.Devices.Count.ToString());
 			for (int i = Hardware.Device.Devices.Count - 1; i >= 0; i--) {
 				var xDevice = Hardware.Device.Devices[i];
 				if (xDevice.Type == Cosmos.Hardware.Device.DeviceType.Storage) {
@@ -37,9 +39,31 @@ namespace Cosmos.Shell.Console.Commands {
 					}
 					return;
 				}
+				System.Console.Write("Device Type: ");
+				System.Console.WriteLine(GetDeviceTypeName(xDevice.Type));
 			}
 			System.Console.WriteLine("No BlockDevices found!");
 		}
+
+		private static string GetDeviceTypeName(Cosmos.Hardware.Device.DeviceType deviceType) {
+			switch (deviceType) {
+				case Cosmos.Hardware.Device.DeviceType.Storage:
+					return "Storage";
+				case Cosmos.Hardware.Device.DeviceType.Keyboard:
+					return "Keyboard";
+				case Cosmos.Hardware.Device.DeviceType.Mouse:
+					return "Mouse";
+				case Cosmos.Hardware.Device.DeviceType.Other:
+					return "Other";
+				case Cosmos.Hardware.Device.DeviceType.Unknown:
+					return "Unknown";
+				default:
+					return "Unknown value!";
+			}
+			
+		}
+
+		
 
 		public override void Help() {
 			System.Console.WriteLine("dir");

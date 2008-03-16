@@ -21,6 +21,15 @@ namespace Indy.IL2CPU.IL.X86 {
 			LiteralStr = aLiteralStr;
 		}
 
+//; 	'$$Storage$$': 'System.Char[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'
+//; 		Size: 12, Offset: 0, NeedsGC: True
+//; 	'System.Char System.String.m_firstChar': 'System.Char, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'
+//; 		Size: 4, Offset: 12, NeedsGC: False
+//; 	'System.Int32 System.String.m_stringLength': 'System.Int32, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'
+//; 		Size: 4, Offset: 16, NeedsGC: False
+//; 	'System.Int32 System.String.m_arrayLength': 'System.Int32, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'
+//; 		Size: 4, Offset: 20, NeedsGC: False
+
 
 		public static string GetContentsArrayName(Assembler.Assembler aAssembler, string aLiteral) {
 			Encoding xEncoding = Encoding.Unicode;
@@ -38,12 +47,11 @@ namespace Indy.IL2CPU.IL.X86 {
 				xRefByteArray.Append("0x" + ((uint)Engine.RegisterType(Engine.GetType("mscorlib", "System.String"))).ToString("X"));
 				xRefByteArray.Append(",0x" + ((uint)InstanceTypeEnum.StaticEmbeddedObject).ToString("X") + ",");
 				xRefByteArray.Append("0x" + (1).ToString("X") + ",");
-				xRefByteArray.Append(aLiteral.Length);
-				xRefByteArray.Append(",");
-				xRefByteArray.Append(aLiteral.Length);
-				xRefByteArray.Append(",");
+				xRefByteArray.Append(xDataName + "__Contents,");
 				xRefByteArray.Append(xDataName + "__Contents + 16,");
-				xRefByteArray.Append(xDataName + "__Contents");
+				xRefByteArray.Append(aLiteral.Length);
+				xRefByteArray.Append(",");
+				xRefByteArray.Append(aLiteral.Length);
 				aAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>(aAssembler.CurrentGroup, new DataMember(xDataName, "dd", xRefByteArray.ToString())));
 				aAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>(aAssembler.CurrentGroup, xDataMember=new DataMember(xDataName + "__Contents", "db", xDataVal)));
 				mDataMemberMap.Add(xDataVal, xDataMember);

@@ -53,18 +53,7 @@ namespace Cosmos.Hardware {
 			return xResult;
 		}
 
-		private DeviceType mTypeStorage = DeviceType.Unknown;
-		protected DeviceType mType {
-			get {
-				return mTypeStorage;
-			}
-			set {
-				mTypeStorage = value;
-				if (mTypeStorage == DeviceType.Other) {
-					System.Diagnostics.Debugger.Break();
-				}
-			}
-		}
+		protected DeviceType mType;
 		public DeviceType Type {
 			get {
 				return mType;

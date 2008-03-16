@@ -32,7 +32,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			new Indy.IL2CPU.Assembler.X86.Pop(CPUx86.Registers.EAX);
 			if (!mAssembler.InMetalMode) {
 				int xStorageSize;
-				SortedList<string, TypeInformation.Field> xFields = Engine.GetTypeFieldInfo(Engine.GetMethodBase(Engine.GetType("mscorlib", "System.String"), ".ctor", "System.Char[]"), out xStorageSize);
+				Dictionary<string, TypeInformation.Field> xFields = Engine.GetTypeFieldInfo(typeof(string), out xStorageSize);
 				new Indy.IL2CPU.Assembler.X86.Add(CPUx86.Registers.EAX, "0" + xFields["$$Storage$$"].Offset.ToString("X") + "h");
 				new Indy.IL2CPU.Assembler.X86.Move(CPUx86.Registers.EAX, CPUx86.Registers.AtEAX);
 				new Indy.IL2CPU.Assembler.X86.Add(CPUx86.Registers.EAX, "12");

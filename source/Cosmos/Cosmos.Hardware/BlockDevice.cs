@@ -4,6 +4,9 @@ using System.Text;
 
 namespace Cosmos.Hardware {
 	public abstract class BlockDevice: Device {
+		protected BlockDevice() {
+			mType = DeviceType.Storage;
+		}
 		public abstract uint BlockSize {
 			get;
 		}

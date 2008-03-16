@@ -28,11 +28,11 @@ namespace Indy.IL2CPU.IL {
 			}
 		}
 
-		public readonly SortedList<string, Field> Fields;
+		public readonly Dictionary<string, Field> Fields;
 		public readonly int StorageSize;
 		public readonly Type TypeDef;
 		public readonly bool NeedsGC;
-		public TypeInformation(int aStorageSize, SortedList<string, Field> aFields, Type aTypeDef, bool aNeedsGC) {
+		public TypeInformation(int aStorageSize, Dictionary<string, Field> aFields, Type aTypeDef, bool aNeedsGC) {
 			Fields = aFields;
 			StorageSize = aStorageSize;
 			TypeDef = aTypeDef;
