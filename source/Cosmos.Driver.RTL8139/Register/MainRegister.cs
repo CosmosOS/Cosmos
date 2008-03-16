@@ -13,8 +13,8 @@ namespace Cosmos.Driver.RTL8139.Register
         {
             MAC0 = 0x00,            // Ethernet hardware address
             MAR0 = 0x08,            // Multicast filter
-            TxStatus0 = 0x10,       // Transmit status (Four 32bit registers)
-            TxAddr0 = 0x20,         // Tx descriptors (also four 32bit)
+            TSD0 = 0x10,       // Transmit status (Four 32bit registers)
+            TSAD0 = 0x20,         // Tx descriptors (also four 32bit)
             RxBuf = 0x30,
             RxEarlyCnt = 0x34,
             RxEarlyStatus = 0x36,

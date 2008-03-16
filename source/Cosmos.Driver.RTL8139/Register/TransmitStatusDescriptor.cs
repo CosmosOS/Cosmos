@@ -1,6 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Cosmos.Hardware;
+using Cosmos.Hardware.PC.Bus;
+using Cosmos.Driver.RTL8139.Register;
+using Cosmos.Driver.RTL8139.Misc;
+
 
 namespace Cosmos.Driver.RTL8139.Register
 {
@@ -9,8 +14,49 @@ namespace Cosmos.Driver.RTL8139.Register
     /// The RTL8139 contains four of these descriptors. 
     /// Located at 0x10h, 0x14h, 0x18h and 0x1Ch, each is 4 bytes wide.
     /// </summary>
-    public static class TransmitStatusDescriptor
+    public class TransmitStatusDescriptor
     {
+        private UInt32 tds;
+        private PCIDevice pci;
+        private UInt32 tdsAddress;
+        public static TransmitStatusDescriptor Load(PCIDevice pciCard)
+        {
+            //Retrieve the 32 bits from the PCI card
+            //and create a TSD object
+            UInt32 address = pciCard.BaseAddress1 + (byte)MainRegister.Bit.TSD0 + GetCurrentTSDescriptor();
+            UInt32 foundbytes = IOSpace.Read32(address);
+            return new TransmitStatusDescriptor(foundbytes, pciCard, address);
+        }
+
+        private TransmitStatusDescriptor(UInt32 data, PCIDevice hw, UInt32 adr)
+        {
+            tds = data;
+            pci = hw;
+            tdsAddress = adr;
+        }
+
+        /// <summary>
+        /// Clears the OWN bit in the Transmit Status Descriptor. This starts poring the data from the 
+        /// buffer into the FIFO buffer on the PCI card. The data then moves from the FIFO to the network cable.
+        /// </summary>
+        public void ClearOWNBit()
+        {
+            //Read byte from register
+            byte offset = 8;
+            byte data = BinaryHelper.GetByteFrom32bit(tds, offset);
+            
+            //Turn off single OWN bit
+            data &= (byte)~(1 << (byte)(Bit.OWN - offset));
+
+            //Write all 8 bits back
+            IOSpace.Write8(tdsAddress + offset, data);
+        }
+
+        public UInt32 TSD()
+        {
+            return IOSpace.Read32(tdsAddress);
+        }
+
         public static bool CheckBit(UInt32 data, Bit bit)
         {
             ushort mask = (ushort)(1 << (ushort)bit);
@@ -58,5 +104,7 @@ namespace Cosmos.Driver.RTL8139.Register
         {
             return currentTSDescriptor;
         }
+
+
     }
 }

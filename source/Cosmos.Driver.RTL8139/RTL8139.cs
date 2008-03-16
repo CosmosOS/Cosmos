@@ -248,34 +248,19 @@ namespace Cosmos.Driver.RTL8139
             //Tell the PCI card the address of body of the Packet.
             UInt32 address = 
                 pciCard.BaseAddress1 + 
-                (byte)MainRegister.Bit.TxAddr0 +
+                (byte)MainRegister.Bit.TSD0 +
                 TransmitStatusDescriptor.GetCurrentTSDescriptor();
             byte[] body = packet.PacketBody();
 
             this.WriteBufferToPCI(body, address);
 
             //Set the transmit status - which enables the transmit.
+            TransmitStatusDescriptor tsd = TransmitStatusDescriptor.Load(pciCard);
             this.SetEarlyTxThreshold(1024);
-            this.ClearOWNBit();
+            tsd.ClearOWNBit();
             TransmitStatusDescriptor.IncrementTSDescriptor();
         }
 
-        /// <summary>
-        /// Clears the OWN bit in the Transmit Status Descriptor. This starts poring the data from the 
-        /// buffer into the FIFO buffer on the PCI card. The data then moves from the FIFO to the network cable.
-        /// </summary>
-        private void ClearOWNBit()
-        {
-            UInt32 address = pciCard.BaseAddress1 + 
-                (byte)MainRegister.Bit.TxStatus0 +
-                TransmitStatusDescriptor.GetCurrentTSDescriptor();
-                //(byte)TransmitStatusDescriptor.Bit.OWN);
-
-            //TransmitStatusDescriptor tsd = new TransmitStatusDescriptor();
-            //tsd.SaveToMemory();
-
-            IOSpace.Write8(address, 0x00);
-        }
 
 
 

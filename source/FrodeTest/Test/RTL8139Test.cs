@@ -25,7 +25,7 @@ namespace FrodeTest.Test
             Console.WriteLine("Enabling card...");
             nic.Enable();
             
-            //nic.SoftReset();
+            nic.SoftReset();
             nic.EnableRecieve();
             nic.EnableTransmit();
             Cosmos.Hardware.PC.Global.Sleep(50);
