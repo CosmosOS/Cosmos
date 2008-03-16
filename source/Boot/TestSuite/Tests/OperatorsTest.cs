@@ -24,7 +24,7 @@ namespace TestSuite.Tests
         public override void Test()
         {
             //switch block
-			int c = 42;
+			int c = 42; //BUG: Fails if type is byte - see Work Item #4054
 			switch (c)
 			{
 			case 192:
