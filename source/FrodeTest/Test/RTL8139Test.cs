@@ -31,9 +31,9 @@ namespace FrodeTest.Test
             Cosmos.Hardware.PC.Global.Sleep(50);
             Console.WriteLine("Timer: " + nic.TimerCount);
 
-
-            //Cosmos.Driver.RTL8139.PacketHeader head = new Cosmos.Driver.RTL8139.PacketHeader(0xFF);
-            Cosmos.Driver.RTL8139.Packet packet = new Cosmos.Driver.RTL8139.Packet(null);
+            Cosmos.Driver.RTL8139.PacketHeader head = new Cosmos.Driver.RTL8139.PacketHeader(0xFF);
+            byte[] data = Mock.FakeBroadcastPacket.GetFakePacket();
+            Cosmos.Driver.RTL8139.Packet packet = new Cosmos.Driver.RTL8139.Packet(head, data);
             nic.Transmit(packet);
             Console.WriteLine("Transmit called");
         }

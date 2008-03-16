@@ -42,9 +42,7 @@ namespace Cosmos.Driver.RTL8139
                 byte[] bytes = new byte[6];
                 for (int i = 0; i < 6; i++)
                 {
-                    //(byte)MainRegister.Bit.MAC0
                     uint address = (uint)(pciCard.BaseAddress1 + i);
-                    
                     bytes[i] = IOSpace.Read8(address);
                 }
 
@@ -116,13 +114,18 @@ namespace Cosmos.Driver.RTL8139
         public void SoftReset()
         {
             Console.WriteLine("Performing software reset of RTL8139");
+            CommandRegister cmdReg = CommandRegister.Load(pciCard);
+
+            //Tell RTL chip to issue a Reset
             byte command = (byte)CommandRegister.BitValue.RST; //0x10
-            UInt32 address = pciCard.BaseAddress1 + (byte)MainRegister.Bit.ChipCmd;
+            //UInt32 address = CommandRegister.GetCmdAddress(pciCard);
+            UInt32 address = cmdReg.GetCmdAddress();
             IOSpace.Write8(address, command);
 
-            CommandRegister cmd = new CommandRegister(IOSpace.Read8(address));
-            while (cmd.IsResetStatus())
+            //Wait while RST bit is active
+            while (cmdReg.IsResetStatus())
                 Console.WriteLine("Reset in progress...");
+
             Console.WriteLine("Reset Complete!");
         }
 
@@ -219,6 +222,10 @@ namespace Cosmos.Driver.RTL8139
             //char[] rx_buffer = new char[8192+16]; //8k + header
             //pciCard.Write8(RTL8139Register.RxBuf, (byte)rx_buffer);
             //byte[] rxbuffer = new byte(
+
+            //Prepare a buffer area
+
+            //Write the address of the buffer area to the RBSTART 
         }
 
         /// <summary>

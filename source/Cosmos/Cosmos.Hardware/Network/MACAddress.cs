@@ -79,14 +79,9 @@ namespace Cosmos.Hardware.Network
             string address = string.Empty;
 
             foreach (byte i in bytes)
-            {
-                //TODO: Add padding to make correct width
-                //TODO: Print i as HEX
                 address = address + ToHex(i, 2) + ":";
-            }
             
-            address.TrimEnd(':');
-            //address = address + " (as DECIMAL)";
+            address = address.TrimEnd(':');
 
             return address;
         }

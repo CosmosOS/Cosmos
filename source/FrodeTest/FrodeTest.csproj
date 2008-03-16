@@ -50,6 +50,7 @@
     <Compile Include="Test\BinaryHelperTest.cs" />
     <Compile Include="Test\BoolTest.cs" />
     <Compile Include="Test\InterfaceTest.cs" />
+    <Compile Include="Test\Mock\FakeBroadcastPacket.cs" />
     <Compile Include="Test\PacketHeaderTest.cs" />
     <Compile Include="Test\RAMBusTest.cs" />
     <Compile Include="Test\RTL8139Test.cs" />

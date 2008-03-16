@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using Cosmos.Driver.RTL8139.Misc;
+using Cosmos.Hardware;
+using Cosmos.Hardware.PC.Bus;
 
 namespace Cosmos.Driver.RTL8139.Register
 {
@@ -13,10 +15,37 @@ namespace Cosmos.Driver.RTL8139.Register
     /// </summary>
     public class CommandRegister
     {
-        private byte cmd;
-        public CommandRegister(byte data)
+        //private byte cmd;
+
+        private PCIDevice pcicard = null;
+        private UInt32 address = 0;
+
+        public static CommandRegister Load(PCIDevice pci)
         {
-            cmd = data;
+            //pcicard = pci;
+            UInt32 address = GetCmdAddress(pci);
+            return new CommandRegister(pci, address);
+        }
+
+        private CommandRegister(PCIDevice pci, UInt32 adr)
+        {
+            pcicard = pci;
+            address = adr;
+        }
+
+        public byte GetCmdRegister()
+        {
+            return IOSpace.Read8(GetCmdAddress());
+        }
+
+        public UInt32 GetCmdAddress()
+        {
+            return pcicard.BaseAddress1 + (byte)MainRegister.Bit.ChipCmd;
+        }
+
+        public static UInt32 GetCmdAddress(PCIDevice pci)
+        {
+            return pci.BaseAddress1 + (byte)MainRegister.Bit.ChipCmd;
         }
 
         /// <summary>
@@ -40,6 +69,7 @@ namespace Cosmos.Driver.RTL8139.Register
 
         public bool IsResetStatus()
         {
+            byte cmd = GetCmdRegister();
             return BinaryHelper.CheckBit(cmd, (byte)BitPosition.RST);
         }
 
