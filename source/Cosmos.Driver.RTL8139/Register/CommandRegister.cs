@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Cosmos.Driver.RTL8139.Misc;
 
 namespace Cosmos.Driver.RTL8139.Register
 {
@@ -10,17 +11,37 @@ namespace Cosmos.Driver.RTL8139.Register
     /// 1 Byte wide. Only one 4 bits used. (Bit 1, 5, 6, 7 not used)
     /// Offset 0x37h from the base memory.
     /// </summary>
-    public static class CommandRegister
+    public class CommandRegister
     {
+        private byte cmd;
+        public CommandRegister(byte data)
+        {
+            cmd = data;
+        }
+
         /// <summary>
         /// Bits used to issue commands to the RTL. Used in conjunction with register CHIPCMD (0x37h)
         /// </summary>
-        public enum Bit : byte
+        public enum BitPosition : byte
         {
             BUFE = 0x00,    //Buffer Empty, read-only
             TE = 0x02,      //Transmitter Enable
             RE = 0x03,      //Receiver Enable
             RST = 0x04      //Software Reset
         }
+
+        public enum BitValue : byte
+        {
+            BUFE = 1,
+            TE = 4,
+            RE = 8,
+            RST = 16
+        }
+
+        public bool IsResetStatus()
+        {
+            return BinaryHelper.CheckBit(cmd, (byte)BitPosition.RST);
+        }
+
     }
 }

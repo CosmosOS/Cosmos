@@ -115,10 +115,15 @@ namespace Cosmos.Driver.RTL8139
         /// </summary>
         public void SoftReset()
         {
-            byte command = 0x10;
+            Console.WriteLine("Performing software reset of RTL8139");
+            byte command = (byte)CommandRegister.BitValue.RST; //0x10
             UInt32 address = pciCard.BaseAddress1 + (byte)MainRegister.Bit.ChipCmd;
             IOSpace.Write8(address, command);
-            //TODO: Should check the RST bit afterwards. It is high while resetting, and low when reset complete.
+
+            CommandRegister cmd = new CommandRegister(IOSpace.Read8(address));
+            while (cmd.IsResetStatus())
+                Console.WriteLine("Reset in progress...");
+            Console.WriteLine("Reset Complete!");
         }
 
         /// <summary>
@@ -154,7 +159,7 @@ namespace Cosmos.Driver.RTL8139
         /// </summary>
         public void EnableRecieve()
         {
-            byte command = (byte)Register.CommandRegister.Bit.RE;
+            byte command = (byte)Register.CommandRegister.BitValue.RE;
             UInt32 address = pciCard.BaseAddress1 + (byte)MainRegister.Bit.ChipCmd;
             IOSpace.Write8(address, command);
         }
@@ -164,7 +169,7 @@ namespace Cosmos.Driver.RTL8139
         /// </summary>
         public void EnableTransmit()
         {
-            byte command = (byte)Register.CommandRegister.Bit.TE;
+            byte command = (byte)Register.CommandRegister.BitValue.TE;
             UInt32 address = pciCard.BaseAddress1 + (byte)MainRegister.Bit.ChipCmd;
             IOSpace.Write8(address, command);
         }

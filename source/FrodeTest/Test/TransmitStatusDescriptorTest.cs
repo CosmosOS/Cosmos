@@ -10,11 +10,11 @@ namespace FrodeTest.Test
         public static void RunTest()
         {
             //Testing that the TSD is rotating between the four Descriptors
-            for (int i = 0; i < 10; i++)
+            /*for (int i = 0; i < 10; i++)
             {
                 Console.WriteLine(TransmitStatusDescriptor.GetCurrentTSDescriptor());
                 TransmitStatusDescriptor.IncrementTSDescriptor();
-            }
+            }*/
             
 
             //Testing that OWN bit is cleared
