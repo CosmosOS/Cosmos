@@ -116,7 +116,6 @@ namespace Cosmos.Kernel.Plugs {
 			//   MTW: SOmehow an invalid opcode exception is occurring.
 			while (true) {
 				current = Keyboard.ReadChar();
-				System.Diagnostics.Debugger.Break();
 				if (current == '\n') {
 					break;
 				}

@@ -16,5 +16,6 @@ namespace Cosmos.Kernel.FileSystems {
 		public abstract void DeleteFile(string[] aFile);
 		public abstract void CreateFile(string[] aFile);
 		public abstract void MoveFile(string[] aSource, string[] aDest);
+		public abstract string[] GetDirContents(string[] aDir);
 	}
 }

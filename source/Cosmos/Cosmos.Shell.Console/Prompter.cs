@@ -35,6 +35,7 @@ namespace Cosmos.Shell.Console {
 			_commands.Add(new Commands.TypeCommand());
 			_commands.Add(new Commands.VersionCommand());
 			_commands.Add(new Commands.LspciCommand());
+			_commands.Add(new Commands.MountCommand());
 
             while (running) {
 				System.Console.Write("Running = ");

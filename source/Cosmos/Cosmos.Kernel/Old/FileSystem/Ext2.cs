@@ -91,7 +91,7 @@ namespace Cosmos.Kernel.FileSystem {
 				throw new NotImplementedException();
 			}
 		}
-		private Storage mBackend;
+		private Hardware.BlockDevice mBackend;
 		private SuperBlock mSuperBlock;
 		private uint mBlockSize;
 		private uint mGroupsCount;
@@ -99,7 +99,7 @@ namespace Cosmos.Kernel.FileSystem {
 		private GroupDescriptor[] mGroupDescriptors;
 		public const uint EXT2_ROOT_INO = 0x02;
 
-		public Ext2(Storage aBackend) {
+		public Ext2(Hardware.BlockDevice aBackend) {
 			if (aBackend == null) {
 				throw new ArgumentNullException("aBackend");
 			}
@@ -107,33 +107,36 @@ namespace Cosmos.Kernel.FileSystem {
 		}
 
 		private bool ReadSuperBlock() {
-			ushort* xBuffer = (ushort*)Heap.MemAlloc(mBackend.BlockSize);
-			mBackend.ReadBlock(2, (byte*)xBuffer);
-			byte* xByteBuff = (byte*)xBuffer;
-			var xByteBuffAsSuperBlock = (SuperBlock*)xByteBuff;
-			mSuperBlock = xByteBuffAsSuperBlock[0];
-			DebugUtil.SendExt2_SuperBlock("", mSuperBlock);
-			mBlockSize = (uint)(1024 << (byte)(mSuperBlock.LogBlockSize));
-			DebugUtil.SendDoubleNumber("Numbers", "", mSuperBlock.INodesCount, 32, mSuperBlock.INodesPerGroup, 32);
-			mGroupsCount = mSuperBlock.INodesCount / mSuperBlock.INodesPerGroup;
-			mGroupDescriptorsPerBlock = (uint)(mBlockSize / sizeof(GroupDescriptor));
-			if (!ReadGroupDescriptorsOfBlock()) {
-				return false;
+			
+			var xBytes = mBackend.ReadBlock(2);
+			fixed (byte* xByteBuff = &xBytes[0]) {
+				var xByteBuffAsSuperBlock = (SuperBlock*)xByteBuff;
+				mSuperBlock = xByteBuffAsSuperBlock[0];
+				DebugUtil.SendExt2_SuperBlock("", mSuperBlock);
+				mBlockSize = (uint)(1024 << (byte)(mSuperBlock.LogBlockSize));
+				DebugUtil.SendDoubleNumber("Numbers", "", mSuperBlock.INodesCount, 32, mSuperBlock.INodesPerGroup, 32);
+				mGroupsCount = mSuperBlock.INodesCount / mSuperBlock.INodesPerGroup;
+				mGroupDescriptorsPerBlock = (uint)(mBlockSize / sizeof(GroupDescriptor));
+				if (!ReadGroupDescriptorsOfBlock()) {
+					return false;
+				}
 			}
-			Heap.MemFree((uint)xBuffer);
 			return true;
 		}
 
 		private unsafe bool ReadGroupDescriptorsOfBlock() {
-			byte* xBuffer = (byte*)Heap.MemAlloc(512);
+			byte[] xBytes;
 			mGroupDescriptors = new GroupDescriptor[mGroupsCount];
-			GroupDescriptor* xDescriptorPtr = (GroupDescriptor*)xBuffer;
+			GroupDescriptor* xDescriptorPtr=(GroupDescriptor*)0;
 			for (int i = 0; i < mGroupsCount; i++) {
 				DebugUtil.SendNumber("Ext2", "ReadGroupDescriptorsOfBlock, I", (uint)i, 16);
 				uint xATABlock = (uint)(mBlockSize / mBackend.BlockSize);
 				xATABlock += (uint)(i / mGroupDescriptorsPerBlock);
 				if ((i % 16) == 0) {
-					mBackend.ReadBlock(xATABlock, xBuffer);
+					xBytes= mBackend.ReadBlock(xATABlock);
+					fixed (byte* xDescriptorPtr2 = &xBytes[0]) {
+						xDescriptorPtr = (GroupDescriptor*)xDescriptorPtr2;
+					}
 				}
 				GroupDescriptor* xItem = (GroupDescriptor*)Heap.MemAlloc((uint)sizeof(GroupDescriptor));
 				CopyPointers((byte*)&xDescriptorPtr[i % mGroupDescriptorsPerBlock], (byte*)xItem, (uint)sizeof(GroupDescriptor));
@@ -254,12 +257,11 @@ namespace Cosmos.Kernel.FileSystem {
 			uint xPhBlockNumber = (xLogBlockNumber * mBlockSize) / mBackend.BlockSize;
 			xPhBlockNumber += xIndex / mBackend.BlockSize;
 			xIndex %= mBackend.BlockSize;
-			byte* xBuff = (byte*)Heap.MemAlloc(mBackend.BlockSize);
-			mBackend.ReadBlock(xPhBlockNumber, xBuff);
+			var xBytes = mBackend.ReadBlock(xPhBlockNumber);
 			DebugUtil.SendNumber("Ext2", "BlockOffset", xIndex, 32);
-			xBuff += xIndex;
-			aINode = *(INode*)xBuff;
-			DebugUtil.SendExt2_INode(aINodeNumber + 1, (INode*)xBuff);
+			fixed (byte* xINodePtr = &xBytes[xIndex]) {
+				aINode = *(INode*)xINodePtr;
+			}
 			return true;
 		}
 
@@ -312,8 +314,10 @@ namespace Cosmos.Kernel.FileSystem {
 			}
 			uint xBase = xBlock * (mBlockSize / mBackend.BlockSize);
 			for (int i = 0; i < (mBlockSize / mBackend.BlockSize); i++) {
-				byte* xTempBuffer = (byte*)(((uint)aBuffer) + (i * mBackend.BlockSize));
-				mBackend.ReadBlock((uint)(xBase + i), xTempBuffer);
+				var xBytes = mBackend.ReadBlock((uint)(xBase + i));
+				for (int b = 0; b < xBytes.Length; b++) {
+					aBuffer[(i * mBackend.BlockSize) + b] = xBytes[b];
+				}
 			}
 			return true;
 		}

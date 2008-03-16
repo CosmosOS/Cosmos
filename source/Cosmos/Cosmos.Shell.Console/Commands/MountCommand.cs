@@ -3,6 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Cosmos.Shell.Console.Commands {
-	class MountCommand {
+	public class MountCommand: CommandBase {
+		public override string Name {
+			get {
+				return "mount";
+			}
+		}
+
+		public override string Summary {
+			get {
+				return "Tries to mount all blockdevices";
+			}
+		}
+
+		public override void Execute(string param) {
+			Cosmos.Kernel.New.Partitioning.MBT.Initialize();
+		}
+
+		public override void Help() {
+			System.Console.WriteLine("Tries to mount all blockdevices by probing MBT and FS's");
+		}
 	}
 }
