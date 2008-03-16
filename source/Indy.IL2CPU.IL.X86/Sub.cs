@@ -14,22 +14,23 @@ namespace Indy.IL2CPU.IL.X86 {
 			if (stackTop.IsFloat)
 				throw new NotImplementedException("floating-point arithmetics");
 
-			switch(stackTop.Size)
-			{
-			case 4:
-				new CPUx86.Pop(CPUx86.Registers.ECX);
-				new CPUx86.Pop(CPUx86.Registers.EAX);
-				new CPUx86.Sub(CPUx86.Registers.EAX, CPUx86.Registers.ECX);
-				new CPUx86.Push(CPUx86.Registers.EAX);
-				break;
-			case 8:
-				new CPUx86.Pop(CPUx86.Registers.EAX);
-				new CPUx86.Pop(CPUx86.Registers.EDX);
-				new CPUx86.Sub("[esp]", CPUx86.Registers.EAX);
-				new CPUx86.SubWithCarry("[esp + 4]", CPUx86.Registers.EDX);
-				break;
-			default:
-				throw new NotSupportedException(string.Format("sub operationd doesn't support size {0}", stackTop.Size));
+			switch (stackTop.Size) {
+				case 1:
+				case 2:
+				case 4:
+					new CPUx86.Pop(CPUx86.Registers.ECX);
+					new CPUx86.Pop(CPUx86.Registers.EAX);
+					new CPUx86.Sub(CPUx86.Registers.EAX, CPUx86.Registers.ECX);
+					new CPUx86.Push(CPUx86.Registers.EAX);
+					break;
+				case 8:
+					new CPUx86.Pop(CPUx86.Registers.EAX);
+					new CPUx86.Pop(CPUx86.Registers.EDX);
+					new CPUx86.Sub("[esp]", CPUx86.Registers.EAX);
+					new CPUx86.SubWithCarry("[esp + 4]", CPUx86.Registers.EDX);
+					break;
+				default:
+					throw new NotSupportedException(string.Format("sub operationd doesn't support size {0}", stackTop.Size));
 			}
 		}
 	}

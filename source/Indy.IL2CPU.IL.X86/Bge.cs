@@ -24,8 +24,9 @@ namespace Indy.IL2CPU.IL.X86 {
 #warning Code checking: strange code seems to be generated. Read the following comments:
 			//JumpAlways right after JumpIfGreaterOrEquals to the same label
 			//my offer is:
-			new CPUx86.Pop(CPUx86.Registers.EAX);
+			new CPUx86.Call("_CODE_REQUESTED_BREAK_");
 			new CPUx86.Pop(CPUx86.Registers.EBX);
+			new CPUx86.Pop(CPUx86.Registers.EAX);
 			new CPUx86.Compare(CPUx86.Registers.EAX, CPUx86.Registers.EBX);
 			new CPUx86.JumpIfGreaterOrEquals(LabelTrue);
 			new CPUx86.JumpAlways(LabelFalse);
