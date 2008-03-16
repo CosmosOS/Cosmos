@@ -19,12 +19,15 @@ namespace Cosmos.Build.Windows {
             xStartInfo.UseShellExecute = !aCapture;
             xStartInfo.RedirectStandardError = aCapture;
             xStartInfo.RedirectStandardOutput = aCapture;
+            Console.WriteLine("Please wait...executing " + xStartInfo.FileName + "...");
             var xProcess = Process.Start(xStartInfo);
             if (aWait) {
                 if (!xProcess.WaitForExit(60 * 1000) || xProcess.ExitCode != 0) {
                     //TODO: Fix
                     if (aCapture) {
-                        Console.WriteLine("Error during call");
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Error when executing: " + xStartInfo.FileName + " " + 
+                            xStartInfo.Arguments + " from directory " + xStartInfo.WorkingDirectory);
                         Console.Write(xProcess.StandardOutput.ReadToEnd());
                         Console.Write(xProcess.StandardError.ReadToEnd());
                     } else {
