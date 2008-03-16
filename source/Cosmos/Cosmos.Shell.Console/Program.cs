@@ -6,8 +6,8 @@ using Cosmos.Hardware;
 
 namespace Cosmos.Shell.Console {
 	public class MyClass {
-		public MyClass(int aParam1, int aParam2) {
-			System.Console.WriteLine("MyClass..ctor");
+		public virtual void Bladibla() {
+			System.Console.WriteLine("Bladibla!");
 		}
 	}
 	public class Program {
@@ -39,7 +39,8 @@ namespace Cosmos.Shell.Console {
 				System.Console.Write("    ");
 				System.Console.WriteLine(E.Message);
 			}
-
+			MyClass x = new MyClass();
+			x.Bladibla();
 			System.Console.WriteLine("Halting system now..");
 			
 			// Halt system.

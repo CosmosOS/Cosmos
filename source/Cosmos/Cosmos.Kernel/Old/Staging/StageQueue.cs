@@ -43,6 +43,7 @@ namespace Cosmos.Kernel.Staging {
 				_current = (StageBase)_initialize.Dequeue();
 
 				Console.Write("Entering stage ");
+				System.Diagnostics.Debugger.Break();
 				Console.Write(Current.Name);
 				Console.WriteLine(".");
 

@@ -124,6 +124,8 @@ namespace Indy.IL2CPU {
 				//Console.Write(", Method = ");
 				//Console.WriteLine(aMethodIndex.ToString());
 				do {
+					//Console.Write("Checking type ");
+					//Console.WriteLine(aType.ToString());
 					for (int i = 0; i < mTypes[aType].MethodIndexes.Length; i++) {
 						//Console.Write("    ");
 						//Console.WriteLine(mTypes[aType].MethodIndexes[i].ToString());
@@ -133,8 +135,6 @@ namespace Indy.IL2CPU {
 						}
 					}
 					aType = mTypes[aType].BaseTypeIdentifier;
-					//Console.Write("Switching to basetype ");
-					//Console.WriteLine(GetTypeName(aType));
 				} while (aType != 0);
 			}
 			throw new Exception("Cannot find virtual method!");
