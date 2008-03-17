@@ -48,6 +48,8 @@ namespace Cosmos.Build.Windows {
             RootDoc.Blocks.Remove(paraVPCOptions);
             RootDoc.Blocks.Remove(paraISOOptions);
             RootDoc.Blocks.Remove(paraPXEOptions);
+
+            LoadSettingsFromRegistry();
         }
 
         void rdioISO_Checked(object sender, RoutedEventArgs e) {
@@ -109,6 +111,8 @@ namespace Cosmos.Build.Windows {
             } else if (rdioPXE.IsChecked.Value) {
                 mTarget = Builder.Target.PXE;
             }
+
+            SaveSettingsToRegistry();
             this.DialogResult = true;
         }
 
@@ -116,6 +120,68 @@ namespace Cosmos.Build.Windows {
         {
             this.DialogResult = false;
         }
+
+        void SaveSettingsToRegistry()
+        {
+            string key = "BuildType";
+            if (rdioQEMU.IsChecked.Value)
+                BuildRegistry.Write(key, "QEMU");
+            else if (rdioVMWare.IsChecked.Value)
+                BuildRegistry.Write(key, "VMWare");
+            else if (rdioVPC.IsChecked.Value)
+                BuildRegistry.Write(key, "VPC");
+            else if (rdioISO.IsChecked.Value)
+                BuildRegistry.Write(key, "ISO");
+            else if (rdioPXE.IsChecked.Value)
+                BuildRegistry.Write(key, "PXE");
+            
+            key = "UseGDB";
+            BuildRegistry.Write(key, chckQEMUUseGDB.IsChecked.Value.ToString());
+
+            key = "CreateHDImage";
+            BuildRegistry.Write(key, chckQEMUUseHD.IsChecked.Value.ToString());
+
+            key = "CompileIL";
+            BuildRegistry.Write(key, buildCheckBox.IsChecked.Value.ToString());
+        }
+
+        void LoadSettingsFromRegistry()
+        {
+            string buildType = BuildRegistry.Read("BuildType");
+            switch (buildType)
+            {
+                case "QEMU":
+                    rdioQEMU.IsChecked = true;
+                    break;
+                case "VMWare":
+                    rdioVMWare.IsChecked = true;
+                    break;
+                case "VPC":
+                    rdioVPC.IsChecked = true;
+                    break;
+                case "ISO":
+                    rdioISO.IsChecked = true;
+                    break;
+                case "PXE":
+                    rdioPXE.IsChecked = true;
+                    break;
+            }
+
+
+            bool useGDB;
+            bool.TryParse(BuildRegistry.Read("UseGDB"), out useGDB);
+            chckQEMUUseGDB.IsChecked = useGDB;
+
+            bool createHDimg;
+            bool.TryParse(BuildRegistry.Read("CreateHDImage"), out createHDimg);
+            chckQEMUUseHD.IsChecked = createHDimg;
+
+            bool compileIL;
+            bool.TryParse(BuildRegistry.Read("CompileIL"), out compileIL);
+            buildCheckBox.IsChecked = compileIL;
+
+        }
+
 
         #region IBuildConfiguration Members
 
@@ -130,7 +196,7 @@ namespace Cosmos.Build.Windows {
 
         public bool Compile {
             get {
-                return buildCheckBox.IsChecked.Value;
+                return !buildCheckBox.IsChecked.Value;
             }
             set {
                 buildCheckBox.IsChecked = value;

@@ -1,7 +1,7 @@
 ﻿<Window x:Class="Cosmos.Build.Windows.BuildOptionsWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Title="BuildOptionsWindow" Width="500" Height="500">
+    Title="BuildOptionsWindow" Width="500" Height="480" WindowStartupLocation="CenterScreen">
     <FlowDocumentScrollViewer Width="500">
     <FlowDocument Name="RootDoc">
         <BlockUIContainer>
@@ -57,9 +57,8 @@
                 <LineBreak/>After building, start up another PC with network boot enabled and Cosmos will boot on to it automatically.
         </Paragraph>
         <Paragraph>
-            Uncheck 
             <InlineUIContainer><CheckBox Name="buildCheckBox" IsChecked="True"/></InlineUIContainer>
-            if you want to skip IL compilation.
+            Skip IL compilation.
         </Paragraph>
         <Paragraph TextAlignment="Right">
             <InlineUIContainer>

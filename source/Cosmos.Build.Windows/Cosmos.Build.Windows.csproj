@@ -78,6 +78,7 @@
     <Compile Include="BuildOptionsWindow.xaml.cs">
       <DependentUpon>BuildOptionsWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="BuildRegistry.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="IBuildConfiguration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
