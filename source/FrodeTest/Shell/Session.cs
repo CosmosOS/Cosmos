@@ -25,7 +25,7 @@ namespace FrodeTest.Shell
                 return;
             else if (command.Equals("nic"))
             {
-                Cosmos.Hardware.PC.Bus.PCIDevice pciNic = Cosmos.Hardware.PC.Bus.PCIDevice.GetPCIDevice(0, 3, 0);
+                Cosmos.Hardware.PC.Bus.PCIDevice pciNic = Cosmos.Hardware.PC.Bus.PCIBus.GetPCIDevice(0, 3, 0);
                 nic = new Cosmos.Driver.RTL8139.RTL8139(pciNic);
                 nic.Enable();
                 Console.WriteLine("Enabled Network card");

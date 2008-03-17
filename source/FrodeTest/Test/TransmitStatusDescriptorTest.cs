@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Cosmos.Driver.RTL8139.Register;
+using Cosmos.Hardware.PC.Bus;
 
 namespace FrodeTest.Test
 {
@@ -18,7 +19,8 @@ namespace FrodeTest.Test
             
 
             //Testing that OWN bit is cleared
-            TransmitStatusDescriptor tsd = TransmitStatusDescriptor.Load(Cosmos.Hardware.PC.Bus.PCIDevice.GetPCIDevice(0, 3, 0));
+            PCIDevice card = PCIBus.GetPCIDevice(0, 3, 0);
+            TransmitStatusDescriptor tsd = TransmitStatusDescriptor.Load(card);
             Console.WriteLine("Before bit is cleared: " + tsd.TSD());
             tsd.ClearOWNBit();
             Console.WriteLine("After bit cleared:     " + tsd.TSD());
