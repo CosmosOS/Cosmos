@@ -10,32 +10,55 @@ namespace Cosmos.Hardware.PC.Bus
     {
         public static PCIDevice[] Devices = new PCIDevice[0];
 
-        static public void Init()
+        private static bool haveEnumerated = false;
+
+        public static PCIDevice GetPCIDevice(byte bus, byte slot, byte function)
         {
-#if DEBUG
-			//Console.WriteLine("PCI Devices:");
-			//Console.WriteLine();
-#endif
+            if (!haveEnumerated)
+                Init();
+
+            foreach (PCIDevice dev in PCIBus.Devices)
+            {
+                if (dev.Bus == bus &&
+                    dev.Slot == slot &&
+                    dev.Function == function)
+
+                    return dev;
+            }
+
+            return null;
+        }
+
+        public static void Init()
+        {
             List<PCIDevice> devices = new List<PCIDevice>();
             EnumerateBus(0, ref devices);
             Devices = devices.ToArray();
-#if DEBUG
-			//Console.WriteLine("Done");
-#endif
+
+            haveEnumerated = true;
         }
 
         private static void EnumerateBus(byte Bus, ref List<PCIDevice> Devices)
         {
-#if DEBUG
-			//Console.WriteLine("EnumerateBus(" + Bus + ")");
-#endif
             for (byte xSlot = 0; xSlot < 32; xSlot++)
             {
                 byte xMaxFunctions = 1;
 
                 for (byte xFunction = 0; xFunction < xMaxFunctions; xFunction++)
                 {
-                    PCIDevice xPCIDevice = PCIDevice.GetPCIDevice(Bus, xSlot, xFunction);
+                    PCIDevice xPCIDevice = new PCIDeviceNormal(Bus, xSlot, xFunction);
+
+                    if (!xPCIDevice.DeviceExists)
+                        xPCIDevice = null;
+
+                    if (xPCIDevice.HeaderType == 0 /* PCIHeaderType.Normal */)
+                        xPCIDevice = xPCIDevice;
+
+                    if (xPCIDevice.HeaderType == 2 /* PCIHeaderType.Cardbus */)
+                        xPCIDevice = new PCIDeviceCardBus(Bus, xSlot, xFunction);
+
+                    if (xPCIDevice.HeaderType == 1 /* PCIHeaderType.Bridge */)
+                        xPCIDevice = new PCIDeviceBridge(Bus, xSlot, xFunction);
 
                     if (xPCIDevice != null)
                     {
@@ -74,7 +97,7 @@ namespace Cosmos.Hardware.PC.Bus
                 System.Console.WriteLine();
                 System.Console.Write(" Memory: ");
 
-                for (byte i = 0; i < xPCIDevice.GetNumberOfBaseAddresses(); i++)
+                for (byte i = 0; i < xPCIDevice.NumberOfBaseAddresses; i++)
                 {
                     System.Console.Write(ToHex(xPCIDevice.GetBaseAddress(i), 8));
                     System.Console.Write(" ");
@@ -84,7 +107,7 @@ namespace Cosmos.Hardware.PC.Bus
 
                 System.Console.Write(" Flags: ");
 
-                for (byte i = 0; i < xPCIDevice.GetNumberOfBaseAddresses(); i++)
+                for (byte i = 0; i < xPCIDevice.NumberOfBaseAddresses; i++)
                 {
                     UInt32 addr = xPCIDevice.GetBaseAddress(i);
                     xPCIDevice.SetBaseAddress(i, 0xffffffff);
@@ -98,6 +121,7 @@ namespace Cosmos.Hardware.PC.Bus
 
             }
         }
+
         private static string ToHex(UInt32 num, int length)
         {
             char[] ret = new char[length];
@@ -212,9 +236,12 @@ namespace Cosmos.Hardware.PC.Bus
         {
         }
 
-        public override int GetNumberOfBaseAddresses()
+        public override int NumberOfBaseAddresses
         {
-            return 6;
+            get
+            {
+                return 6;
+            }
         }
     }
 
@@ -224,10 +251,15 @@ namespace Cosmos.Hardware.PC.Bus
             : base (bus,slot,function)
         {
         }
-        public override int GetNumberOfBaseAddresses()
+
+        public override int NumberOfBaseAddresses
         {
-            return 2;
+             get
+            {
+                return 2;
+            }
         }
+
 
         public byte PrimaryBus { get { return Read8(0x18); } set { Write8(0x18, value); } }
         public byte SecondaryBus { get { return Read8(0x19); } set { Write8(0x19, value); } }
@@ -244,10 +276,14 @@ namespace Cosmos.Hardware.PC.Bus
         {
         }
 
-        public override int GetNumberOfBaseAddresses()
+        public override int NumberOfBaseAddresses
         {
-            return 6;
+            get
+            {
+                return 6;
+            }
         }
+
         public UInt32 BaseAddress2 { get { return Read32(0x18); } set { Write32(0x18, value); } }
         public UInt32 BaseAddress3 { get { return Read32(0x1a); } set { Write32(0x1a, value); } }
         public UInt32 BaseAddress4 { get { return Read32(0x20); } set { Write32(0x20, value); } }
@@ -257,32 +293,12 @@ namespace Cosmos.Hardware.PC.Bus
 
     public abstract class PCIDevice
     {
-        
-        public abstract int GetNumberOfBaseAddresses();
-    
 
-        public static PCIDevice GetPCIDevice(byte bus, byte slot, byte function)
-        {
-#if DEBUG
- //           Console.WriteLine("GetPCIDevice(bus " + bus + ", slot " + slot + ", function " + function+ ")");
-#endif
-            PCIDeviceNormal test = new PCIDeviceNormal(bus,slot,function);
-            
-            if (!test.DeviceExists)
-                return null;
-
-            if (test.HeaderType == 0 /* PCIHeaderType.Normal */)
-                return test;
-
-            if (test.HeaderType == 2 /* PCIHeaderType.Cardbus */)
-                return new PCIDeviceCardBus(bus,slot,function);
-
-            if (test.HeaderType == 1 /* PCIHeaderType.Bridge */)
-                return new PCIDeviceBridge(bus,slot,function);
-            
-            return null;
-        }
-    
+        public abstract int NumberOfBaseAddresses
+       {
+           get;
+       }
+           
 
        private static string[] classtext = new string[]          
        {
@@ -351,6 +367,58 @@ namespace Cosmos.Hardware.PC.Bus
             this.Bus = bus;
             this.Slot = slot;
             this.Function = function;
+            LayoutIO();
+        }
+
+        private bool NeedsIO = false;
+        private bool NeedsMemory = false;
+        
+        private void LayoutIO()
+        {
+            IOMaps = new AddressSpace[NumberOfBaseAddresses];
+
+            for (byte i = 0; i < NumberOfBaseAddresses; i++)
+            {
+                UInt32 address = GetBaseAddress(i);
+                SetBaseAddress(i, 0xffffffff);
+                UInt32 flags = GetBaseAddress(i);
+                SetBaseAddress(i, address);
+
+                if (address == 0)
+                {
+                    IOMaps[i] = null;
+                }
+                else if ((address & PCI_BASE_ADDRESS_SPACE) == PCI_BASE_ADDRESS_SPACE_MEMORY)
+                {
+                    flags &= PCI_BASE_ADDRESS_IO_MASK;
+                    UInt32 mask = (~flags << 1) | 0x1;
+                    UInt32 size = (mask & flags) & 0xffffffff;
+
+                    IOMaps[i] = new IOAddressSpace(address, size);
+
+                    NeedsIO = true;
+                }
+                else if ((address & PCI_BASE_ADDRESS_SPACE) == PCI_BASE_ADDRESS_SPACE_IO)
+                {
+                    flags &= PCI_BASE_ADDRESS_IO_MASK;
+                    UInt32 mask = (~flags << 1) | 0x1;
+                    UInt32 size = (mask & flags) & 0xffffffff;
+
+                    IOMaps[i] = new MemoryAddressSpace(address, size);
+
+                    NeedsMemory = true;
+                }
+            }
+        }
+
+        private AddressSpace[] IOMaps;
+
+        public AddressSpace GetAddressSpace(byte index)
+        {
+            if (index < 0 || index >= NumberOfBaseAddresses)
+                throw new ArgumentOutOfRangeException("index");
+
+            return IOMaps[index];
         }
 
         public byte Bus { get; private set; }
@@ -396,12 +464,19 @@ namespace Cosmos.Hardware.PC.Bus
         protected const ushort ConfigAddr = 0xCF8;
         protected const ushort ConfigData = 0xCFC;
 
-#if false
         
         public void DisableDevice()
         {
-            Command = Command & (!PCICommand.IO & !PCICommand.Master & PCICommand.Memort)
+            Command = Command & (~PCICommand.IO & ~PCICommand.Master & PCICommand.Memort);
         }
+
+        public void EnableDevice()
+        {
+            Command = Command & ((NeedsIO ? PCICommand.IO : 0) & PCICommand.Master & (NeedsMemory ? PCICommand.Memort : 0));
+        }
+
+
+#if false
         public bool LayoutDevice()
         {
             
