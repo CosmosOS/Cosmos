@@ -141,7 +141,7 @@ namespace Cosmos.Build.Windows {
             key = "CreateHDImage";
             BuildRegistry.Write(key, chckQEMUUseHD.IsChecked.Value.ToString());
 
-            key = "CompileIL";
+            key = "SkipIL";
             BuildRegistry.Write(key, buildCheckBox.IsChecked.Value.ToString());
         }
 
@@ -176,9 +176,9 @@ namespace Cosmos.Build.Windows {
             bool.TryParse(BuildRegistry.Read("CreateHDImage"), out createHDimg);
             chckQEMUUseHD.IsChecked = createHDimg;
 
-            bool compileIL;
-            bool.TryParse(BuildRegistry.Read("CompileIL"), out compileIL);
-            buildCheckBox.IsChecked = compileIL;
+            bool skipIL;
+            bool.TryParse(BuildRegistry.Read("SkipIL"), out skipIL);
+            buildCheckBox.IsChecked = skipIL;
 
         }
 
