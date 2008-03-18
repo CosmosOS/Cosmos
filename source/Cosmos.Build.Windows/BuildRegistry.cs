@@ -16,8 +16,15 @@ namespace Cosmos.Build.Windows
 
         public static string Read(string key)
         {
-            RegistryKey xKey = Registry.CurrentUser.OpenSubKey(@"Software\Cosmos");
-            return (string)xKey.GetValue(key);
+            try
+            {
+                RegistryKey xKey = Registry.CurrentUser.OpenSubKey(@"Software\Cosmos");
+                return (string)xKey.GetValue(key);
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }

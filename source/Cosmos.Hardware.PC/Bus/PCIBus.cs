@@ -31,7 +31,11 @@ namespace Cosmos.Hardware.PC.Bus
 
         public static void Init()
         {
+            Console.WriteLine("Cosmos.Hardware.PC.Bus.Init()");
+
             List<PCIDevice> devices = new List<PCIDevice>();
+            Console.WriteLine("- created generic");
+
             EnumerateBus(0, ref devices);
             Devices = devices.ToArray();
 
@@ -40,28 +44,33 @@ namespace Cosmos.Hardware.PC.Bus
 
         private static void EnumerateBus(byte Bus, ref List<PCIDevice> Devices)
         {
+            Console.WriteLine("Enumerate " + Bus ); 
+            
             for (byte xSlot = 0; xSlot < 32; xSlot++)
             {
+
+                Console.WriteLine("Enumerate " + Bus + "," + xSlot); 
+                
                 byte xMaxFunctions = 1;
 
                 for (byte xFunction = 0; xFunction < xMaxFunctions; xFunction++)
                 {
                     PCIDevice xPCIDevice = new PCIDeviceNormal(Bus, xSlot, xFunction);
 
-                    if (!xPCIDevice.DeviceExists)
-                        xPCIDevice = null;
-
-                    if (xPCIDevice.HeaderType == 0 /* PCIHeaderType.Normal */)
-                        xPCIDevice = xPCIDevice;
-
-                    if (xPCIDevice.HeaderType == 2 /* PCIHeaderType.Cardbus */)
-                        xPCIDevice = new PCIDeviceCardBus(Bus, xSlot, xFunction);
-
-                    if (xPCIDevice.HeaderType == 1 /* PCIHeaderType.Bridge */)
-                        xPCIDevice = new PCIDeviceBridge(Bus, xSlot, xFunction);
-
-                    if (xPCIDevice != null)
+                    if (xPCIDevice.DeviceExists)
                     {
+
+
+                        //if (xPCIDevice.HeaderType == 0 /* PCIHeaderType.Normal */)
+                        //  xPCIDevice = xPCIDevice;
+
+                        if (xPCIDevice.HeaderType == 2 /* PCIHeaderType.Cardbus */)
+                            xPCIDevice = new PCIDeviceCardBus(Bus, xSlot, xFunction);
+
+                        if (xPCIDevice.HeaderType == 1 /* PCIHeaderType.Bridge */)
+                            xPCIDevice = new PCIDeviceBridge(Bus, xSlot, xFunction);
+
+
                         Devices.Add(xPCIDevice);
 
                         if (xPCIDevice is PCIDeviceBridge)
@@ -367,12 +376,12 @@ namespace Cosmos.Hardware.PC.Bus
             this.Bus = bus;
             this.Slot = slot;
             this.Function = function;
-            LayoutIO();
         }
 
         private bool NeedsIO = false;
         private bool NeedsMemory = false;
-        
+
+        private bool _NeedsLayingout = true;
         private void LayoutIO()
         {
             IOMaps = new AddressSpace[NumberOfBaseAddresses];
@@ -409,6 +418,7 @@ namespace Cosmos.Hardware.PC.Bus
                     NeedsMemory = true;
                 }
             }
+            _NeedsLayingout = false;
         }
 
         private AddressSpace[] IOMaps;
@@ -417,6 +427,9 @@ namespace Cosmos.Hardware.PC.Bus
         {
             if (index < 0 || index >= NumberOfBaseAddresses)
                 throw new ArgumentOutOfRangeException("index");
+            
+            if (_NeedsLayingout)
+                LayoutIO();
 
             return IOMaps[index];
         }

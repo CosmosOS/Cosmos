@@ -41,14 +41,16 @@ namespace Cosmos.Build.Windows {
 				string xResult;
                 // If no key, see if we are in dev mode
                 // Problem  - noone checked this for user kit mode and no key...
-				if (xKey == null) {
+                xResult = (string)xKey.GetValue("Build Path");
+
+                if (xResult == null)
+                {
 					xResult = Directory.GetCurrentDirectory();
 					xResult = xResult.Substring(0, xResult.IndexOf("source"));
 					xResult += @"Build\";
-				} else {
-					xResult = (string)xKey.GetValue("Build Path");
 				}
-				if (String.IsNullOrEmpty(xResult)) {
+                
+                if (String.IsNullOrEmpty(xResult)) {
 					throw new Exception("Cannot find Cosmos build path in registry");
 				}
 				if (!xResult.EndsWith(@"\")) {
