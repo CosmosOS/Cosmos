@@ -88,11 +88,11 @@ namespace Cosmos.Driver.RTL8139.Register
                     return "RTL8139C";
                 case 233:
                     return "RTL8139C+";
-/*                case 240: //11110000
+                case 240: //11110000
                     return "RTL8139B";
-Crashes!                case 248: //11111000
+                case 248: //11111000
                     return "RTL8130";
-  */              default:
+                default:
                     return "Unknown RTL813xxx revision (" + hwverid + ")";
             }
 
