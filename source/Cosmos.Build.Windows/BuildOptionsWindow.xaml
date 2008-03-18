@@ -62,7 +62,7 @@
         </Paragraph>
         <Paragraph TextAlignment="Right">
             <InlineUIContainer>
-                <Button Name="butnBuild">_Build</Button>
+                <Button Name="butnBuild" IsDefault="True">_Build</Button>
              </InlineUIContainer>
              <InlineUIContainer>
                  <Button Name="butnCancel">_Cancel</Button>
