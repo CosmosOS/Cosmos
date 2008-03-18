@@ -27,6 +27,8 @@ namespace TestSuite.Tests
             Assert(2 * 2 == 4, "2 * 2 == 4");
             Assert(6 / 2 == 3, "6 / 2 == 3");
             Assert(5 - 2 == 3, "5 - 2 == 3");
+			Assert(-1 < 1, "-1 < 1");
+			Assert(0xFFFFFFFFu > 1u, "0xFFFFFFFFu > 1u");
             Assert(2 + 5 * 2 == 12, "2 + 5 * 2 == 12");
             Assert((2 + 5) * 2 == 14, "(2 + 5) * 2 == 14");
 			long al = 0x1FFFFFFFF;

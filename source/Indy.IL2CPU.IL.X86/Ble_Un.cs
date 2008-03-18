@@ -32,6 +32,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			string LabelFalse = BaseLabel + "False";
 			new CPUx86.Pop(CPUx86.Registers.EAX);
 			if (xSize > 4) {
+				throw new NotImplementedException("long comprasion is not implemented");
 				new CPUx86.Add(CPUx86.Registers.ESP, "4");
 			}
 			new CPUx86.Compare(CPUx86.Registers.EAX, CPUx86.Registers.AtESP);
@@ -39,12 +40,14 @@ namespace Indy.IL2CPU.IL.X86 {
 			new CPUx86.JumpAlways(LabelTrue);
 			new CPU.Label(LabelTrue);
 			if (xSize > 4) {
+				throw new NotImplementedException("long comprasion is not implemented");
 				new CPUx86.Add(CPUx86.Registers.ESP, "4");
 			}
 			new CPUx86.Add(CPUx86.Registers.ESP, "4");
 			new CPUx86.JumpAlways(TargetLabel);
 			new CPU.Label(LabelFalse);
 			if (xSize > 4) {
+				throw new NotImplementedException("long comprasion is not implemented");
 				new CPUx86.Add(CPUx86.Registers.ESP, "4");
 			}
 			new CPUx86.Add(CPUx86.Registers.ESP, "4");

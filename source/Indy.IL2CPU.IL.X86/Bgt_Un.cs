@@ -16,7 +16,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			CurInstructionLabel = GetInstructionLabel(aReader);
 		}
 		public override void DoAssemble() {
-			if (Assembler.StackContents.Pop().IsFloat) {
+			if (Assembler.StackContents.Peek().IsFloat) {
 				throw new Exception("Floats not yet supported");
 			}
 			string BaseLabel = CurInstructionLabel + "__";
@@ -29,6 +29,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			new CPUx86.Pop(CPUx86.Registers.EAX);
 			if (xSize > 4) {
+				throw new NotImplementedException("long comprasion is not implemented");
 				new CPUx86.Add("esp", "4");
 			}
 			new CPUx86.Compare(CPUx86.Registers.EAX, CPUx86.Registers.AtESP);
@@ -37,12 +38,14 @@ namespace Indy.IL2CPU.IL.X86 {
 			new CPU.Label(LabelTrue);
 			new CPUx86.Add(CPUx86.Registers.ESP, "4");
 			if (xSize > 4) {
+				throw new NotImplementedException("long comprasion is not implemented");
 				new CPUx86.Add("esp", "4");
 			}
 			new CPUx86.JumpAlways(TargetLabel);
 			new CPU.Label(LabelFalse);
 			new CPUx86.Add(CPUx86.Registers.ESP, "4");
 			if (xSize > 4) {
+				throw new NotImplementedException("long comprasion is not implemented");
 				new CPUx86.Add("esp", "4");
 			}
 

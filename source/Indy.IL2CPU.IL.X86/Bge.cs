@@ -44,7 +44,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		private void DoAssemble64Bit() {
-			throw new Exception("Not implemented");
+			throw new NotImplementedException("long comprasion is not implemented");
 			string BaseLabel = CurInstructionLabel + "__";
 			string LabelTrue = BaseLabel + "True";
 			string LabelFalse = BaseLabel + "False";
