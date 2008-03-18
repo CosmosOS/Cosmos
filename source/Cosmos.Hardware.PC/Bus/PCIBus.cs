@@ -106,7 +106,7 @@ namespace Cosmos.Hardware.PC.Bus
                 System.Console.WriteLine();
                 System.Console.Write(" Memory: ");
 
-                for (byte i = 0; i < xPCIDevice.NumberOfBaseAddresses; i++)
+                for (byte i = 0; i < xPCIDevice.NumberOfBaseAddresses(); i++)
                 {
                     System.Console.Write(ToHex(xPCIDevice.GetBaseAddress(i), 8));
                     System.Console.Write(" ");
@@ -116,7 +116,7 @@ namespace Cosmos.Hardware.PC.Bus
 
                 System.Console.Write(" Flags: ");
 
-                for (byte i = 0; i < xPCIDevice.NumberOfBaseAddresses; i++)
+                for (byte i = 0; i < xPCIDevice.NumberOfBaseAddresses(); i++)
                 {
                     UInt32 addr = xPCIDevice.GetBaseAddress(i);
                     xPCIDevice.SetBaseAddress(i, 0xffffffff);
@@ -245,12 +245,12 @@ namespace Cosmos.Hardware.PC.Bus
         {
         }
 
-        public override int NumberOfBaseAddresses
+        public override int NumberOfBaseAddresses()
         {
-            get
-            {
+            //get
+            //{
                 return 6;
-            }
+            //}
         }
     }
 
@@ -261,12 +261,12 @@ namespace Cosmos.Hardware.PC.Bus
         {
         }
 
-        public override int NumberOfBaseAddresses
+        public override int NumberOfBaseAddresses()
         {
-             get
-            {
+           //  get
+           // {
                 return 2;
-            }
+            ////}
         }
 
 
@@ -285,12 +285,12 @@ namespace Cosmos.Hardware.PC.Bus
         {
         }
 
-        public override int NumberOfBaseAddresses
+        public override int NumberOfBaseAddresses()
         {
-            get
-            {
+            //get
+            //{
                 return 6;
-            }
+            //}
         }
 
         public UInt32 BaseAddress2 { get { return Read32(0x18); } set { Write32(0x18, value); } }
@@ -303,10 +303,10 @@ namespace Cosmos.Hardware.PC.Bus
     public abstract class PCIDevice
     {
 
-        public abstract int NumberOfBaseAddresses
-       {
-           get;
-       }
+        public abstract int NumberOfBaseAddresses();
+       //{
+        //   get;
+       //}
            
 
        private static string[] classtext = new string[]          
@@ -384,9 +384,9 @@ namespace Cosmos.Hardware.PC.Bus
         private bool _NeedsLayingout = true;
         private void LayoutIO()
         {
-            IOMaps = new AddressSpace[NumberOfBaseAddresses];
+            IOMaps = new AddressSpace[NumberOfBaseAddresses()];
 
-            for (byte i = 0; i < NumberOfBaseAddresses; i++)
+            for (byte i = 0; i < NumberOfBaseAddresses(); i++)
             {
                 UInt32 address = GetBaseAddress(i);
                 SetBaseAddress(i, 0xffffffff);
@@ -425,7 +425,7 @@ namespace Cosmos.Hardware.PC.Bus
 
         public AddressSpace GetAddressSpace(byte index)
         {
-            if (index < 0 || index >= NumberOfBaseAddresses)
+            if (index < 0 || index >= NumberOfBaseAddresses())
                 throw new ArgumentOutOfRangeException("index");
             
             if (_NeedsLayingout)
