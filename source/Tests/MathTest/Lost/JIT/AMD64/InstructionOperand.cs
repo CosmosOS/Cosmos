@@ -14,6 +14,7 @@ namespace Lost.JIT.AMD64
 
 		internal static InstructionOperand[] GetOperands(string code)
 		{
+			if (code.Trim() != "") code += ",";
 			var match = _regex.Match(code);
 
 			var result = new InstructionOperand[match.Groups["operand"].Captures.Count];

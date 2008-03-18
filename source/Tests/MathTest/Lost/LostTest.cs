@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Lost.JIT.AMD64;
+using System.IO;
 //using Cosmos.Build.Windows;
 
 namespace Lost
@@ -12,8 +13,15 @@ namespace Lost
         [STAThread]
         static void Main(string[] args)
         {
-			var op = ProcessorInstruction.Parse("test:  ggf1: lock adc 10, 12,");
-			Console.WriteLine(op);
+			using (var source = new StreamReader(args[0]))
+			{
+				string srcLine;
+				while ((srcLine = source.ReadLine()) != null)
+				{
+					var op = ProcessorInstruction.Parse(srcLine);
+					Console.WriteLine(op);
+				}
+			}
 
 			Console.ReadKey();
         }
