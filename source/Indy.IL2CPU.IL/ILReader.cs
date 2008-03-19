@@ -152,14 +152,24 @@ namespace Indy.IL2CPU.IL {
 
 		private int? mOperandValueInt32;
 		public int OperandValueInt32 {
-			get {
-				if (mOperandValueInt32 == null) {
-					byte[] xData = new byte[4];
-					Array.Copy(Operand, xData, Math.Min(4, Operand.Length));
-					mOperandValueInt32 = BitConverter.ToInt32(xData, 0);
-				}
-				return mOperandValueInt32.Value;
-			}
+            get
+            {
+                if (!mIsShortcut)
+                {
+                    if (mOperandValueInt32 == null)
+                    {
+                        byte[] xData = new byte[4];
+                        Array.Copy(Operand, xData, Math.Min(4, Operand.Length));
+                        mOperandValueInt32 = BitConverter.ToInt32(xData, 0);
+                    }
+                }
+                else 
+                { 
+                    sbyte xShortValue = (sbyte)Operand[0]; 
+                    mOperandValueInt32 = xShortValue; 
+                }
+                return mOperandValueInt32.Value;
+            }
 		}
 
 		private Single? mOperandValueSingle;

@@ -25,11 +25,10 @@ namespace SteveKernel
         {
             Console.WriteLine("Done booting");
 
-
 			Cosmos.Kernel.Boot.Default();
-            //Cosmos.Hardware.PC.Bus.PCIBus.DebugLSPCI();
-
-
+            System.Diagnostics.Debugger.Break();
+            Cosmos.Hardware.PC.Bus.PCIBus.DebugLSPCI();
+            
             
             PCIDeviceNormal rtlpci = PCIBus.GetPCIDevice(0, 3, 0) as PCIDeviceNormal;
             if (rtlpci != null)

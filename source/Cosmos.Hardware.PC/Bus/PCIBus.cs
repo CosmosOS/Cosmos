@@ -31,10 +31,10 @@ namespace Cosmos.Hardware.PC.Bus
 
         public static void Init()
         {
-            Console.WriteLine("Cosmos.Hardware.PC.Bus.Init()");
+            //Console.WriteLine("Cosmos.Hardware.PC.Bus.Init()");
 
             List<PCIDevice> devices = new List<PCIDevice>();
-            Console.WriteLine("- created generic");
+            //Console.WriteLine("- created generic");
 
             EnumerateBus(0, ref devices);
             Devices = devices.ToArray();
@@ -44,7 +44,7 @@ namespace Cosmos.Hardware.PC.Bus
 
         private static void EnumerateBus(byte Bus, ref List<PCIDevice> Devices)
         {
-            Console.WriteLine("Enumerate " + Bus ); 
+            //Console.WriteLine("Enumerate " + Bus ); 
             
             for (byte xSlot = 0; xSlot < 32; xSlot++)
             {                
@@ -105,22 +105,20 @@ namespace Cosmos.Hardware.PC.Bus
 
                 for (byte i = 0; i < xPCIDevice.NumberOfBaseAddresses(); i++)
                 {
-                    System.Console.Write(ToHex(xPCIDevice.GetBaseAddress(i), 8));
-                    System.Console.Write(" ");
+                    AddressSpace a = xPCIDevice.GetAddressSpace(i);
+
+                    if (a != null)
+                    {
+                        System.Console.Write("register " + i + " @ " + ToHex(a.Offset, 8) + " (" + a.Size + "b) ");
+                        if (a is MemoryAddressSpace)
+                            Console.WriteLine("mem");
+                        else
+                            Console.WriteLine("io");
+                    }
                 }
 
                 System.Console.WriteLine();
 
-                System.Console.Write(" Flags: ");
-
-                for (byte i = 0; i < xPCIDevice.NumberOfBaseAddresses(); i++)
-                {
-                    UInt32 addr = xPCIDevice.GetBaseAddress(i);
-                    xPCIDevice.SetBaseAddress(i, 0xffffffff);
-                    System.Console.Write(ToHex(xPCIDevice.GetBaseAddress(i), 8));
-                    xPCIDevice.SetBaseAddress(i, addr);
-                    System.Console.Write(" ");
-                }
 
                 System.Console.WriteLine();
 
@@ -180,9 +178,9 @@ namespace Cosmos.Hardware.PC.Bus
                     return 'f';
             }
             return ' ';
-
         }
     }
+
     [Flags]
     public enum PCICommand : short
     {
@@ -381,7 +379,7 @@ namespace Cosmos.Hardware.PC.Bus
         private bool _NeedsLayingout = true;
         private void LayoutIO()
         {
-            Console.WriteLine("Checking AdressSpaces of PCI(" + Bus + ", " + Slot + ", " + Function + ")");
+            //Console.WriteLine("Checking AdressSpaces of PCI(" + Bus + ", " + Slot + ", " + Function + ")");
 
             IOMaps = new AddressSpace[NumberOfBaseAddresses()];
 
@@ -400,29 +398,24 @@ namespace Cosmos.Hardware.PC.Bus
                 }
                 else if ((address & PCI_BASE_ADDRESS_SPACE) == PCI_BASE_ADDRESS_SPACE_MEMORY)
                 {
-                    UInt32 mask = 0xfffffff; mask <<= 4;
-                    UInt32 size = /*PCI_BASE_ADDRESS_MEM_MASK*/ mask & flags;                   
-                    size = ~size; 
-                    size++;                    
+                    UInt32 size = ~(PCI_BASE_ADDRESS_MEM_MASK & flags)+1;                   
 
                     IOMaps[i] = new MemoryAddressSpace(address, size);
-                    Console.WriteLine("register " + i + " - " + size + "b mem");
+                    //Console.WriteLine("register " + i + " - " + size + "b mem");
 
                     NeedsIO = true;
                 }
                 else if ((address & PCI_BASE_ADDRESS_SPACE) == PCI_BASE_ADDRESS_SPACE_IO)
                 {
-                    UInt32 mask = 0x3fffffff; mask <<= 2;
-                    UInt32 size = mask & flags;
-                    size = ~size;
-                    size++;
+                    UInt32 size = ~(PCI_BASE_ADDRESS_IO_MASK & flags) +1;                    
 
                     IOMaps[i] = new IOAddressSpace(address, size);
-                    Console.WriteLine("register " + i + " - " + size + "b io");
+                    //Console.WriteLine("register " + i + " - " + size + "b io");
 
                     NeedsMemory = true;
                 }
             }
+
             _NeedsLayingout = false;
         }
 
@@ -493,155 +486,6 @@ namespace Cosmos.Hardware.PC.Bus
             Command = Command & ((NeedsIO ? PCICommand.IO : 0) & PCICommand.Master & (NeedsMemory ? PCICommand.Memort : 0));
         }
 
-
-#if false
-        public bool LayoutDevice()
-        {
-            
-	
-            PCICommand cmd = Command;
-	
-
-	for (int reg = 0; reg < 6; reg++)
-	{
-		/*
-		 * Figure out how much space and of what type this
-		 * device wants.
-		 */
-
-        SetBaseAddress(reg, 0xffffffff);
-
-        UInt32 bas = GetBaseAddress(reg);
-
-		
-		if (bas == 0)
-		{
-			/* this base-address register is unused */
-			continue;
-		}
-
-		/*
-		 * We've read the base address register back after
-		 * writing all ones and so now we must decode it.
-		 */
-
-		if ((base & PCI_BASE_ADDRESS_SPACE) == PCI_BASE_ADDRESS_SPACE_IO)
-		{
-			/*
-			 * I/O space base address register.
-			 */
-
-			cmd |= PCI_COMMAND_IO;
-
-			base &= PCI_BASE_ADDRESS_IO_MASK;
-			mask = (~base << 1) | 0x1;
-			size = (mask & base) & 0xffffffff;
-
-			/*
-			 * Align to multiple of size of minimum base.
-			 */
-
-			alignto = max_t(unsigned int, 0x040, size);
-			base = ALIGN(io_base, alignto);
-			io_base = base + size;
-			pci_write_config_dword(dev, reg, base | PCI_BASE_ADDRESS_SPACE_IO);
-
-			dev->resource[i].start = base;
-			dev->resource[i].end = dev->resource[i].start + size - 1;
-			dev->resource[i].flags = IORESOURCE_IO | PCI_BASE_ADDRESS_SPACE_IO;
-
-			DBG_DEVS(("layout_dev: IO address: %lX\n", base));
-		}
-		else
-		{
-			unsigned int type;
-
-			/*
-			 * Memory space base address register.
-			 */
-
-			cmd |= PCI_COMMAND_MEMORY;
-			type = base & PCI_BASE_ADDRESS_MEM_TYPE_MASK;
-			base &= PCI_BASE_ADDRESS_MEM_MASK;
-			mask = (~base << 1) | 0x1;
-			size = (mask & base) & 0xffffffff;
-			switch (type)
-			{
-			case PCI_BASE_ADDRESS_MEM_TYPE_32:
-			case PCI_BASE_ADDRESS_MEM_TYPE_64:
-				break;
-
-			case PCI_BASE_ADDRESS_MEM_TYPE_1M:
-				printk("bios32 WARNING: slot %d, function %d "
-				       "requests memory below 1MB---don't "
-				       "know how to do that.\n",
-				       PCI_SLOT(dev->devfn),
-				       PCI_FUNC(dev->devfn));
-				continue;
-			}
-
-			/*
-			 * Align to multiple of size of minimum base.
-			 */
-
-			alignto = max_t(unsigned int, 0x1000, size);
-			base = ALIGN(mem_base, alignto);
-			mem_base = base + size;
-			pci_write_config_dword(dev, reg, base);
-
-			dev->resource[i].start = base;
-			dev->resource[i].end = dev->resource[i].start + size - 1;
-			dev->resource[i].flags = IORESOURCE_MEM;
-
-			if (type == PCI_BASE_ADDRESS_MEM_TYPE_64)
-			{
-				/*
-				 * 64-bit address, set the highest 32 bits
-				 * to zero.
-				 */
-
-				reg += 4;
-				pci_write_config_dword(dev, reg, 0);
-
-				i++;
-				dev->resource[i].start = 0;
-				dev->resource[i].end = 0;
-				dev->resource[i].flags = 0;
-			}
-		}
-	}
-
-	/*
-	 * Enable device:
-	 */
-
-	if (dev->class >> 8 == PCI_CLASS_NOT_DEFINED ||
-	    dev->class >> 8 == PCI_CLASS_NOT_DEFINED_VGA ||
-	    dev->class >> 8 == PCI_CLASS_DISPLAY_VGA ||
-	    dev->class >> 8 == PCI_CLASS_DISPLAY_XGA)
-	{
-		/*
-		 * All of these (may) have I/O scattered all around
-		 * and may not use i/o-base address registers at all.
-		 * So we just have to always enable I/O to these
-		 * devices.
-		 */
-		cmd |= PCI_COMMAND_IO;
-	}
-
-	pci_write_config_word(dev, PCI_COMMAND, cmd | PCI_COMMAND_MASTER);
-
-	pci_write_config_byte(dev, PCI_LATENCY_TIMER, (disable_pci_burst) ? 0 : 32);
-
-	if (bus_info != NULL)
-		bus_info->conf_device(dev);	/* Machine dependent configuration. */
-
-	DBG_DEVS(("layout_dev: bus %d  slot 0x%x  VID 0x%x  DID 0x%x  class 0x%x\n",
-		  dev->bus->number, PCI_SLOT(dev->devfn), dev->vendor, dev->device, dev->class));
-}
-
-        }
-#endif
         private UInt32 GetAddress(byte aRegister)
         {
             return (UInt32)(

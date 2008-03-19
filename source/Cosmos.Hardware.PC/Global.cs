@@ -19,7 +19,9 @@ namespace Cosmos.Hardware.PC {
             // Partially new
             //HW.Interrupts.IRQ01 += new Interrupts.InterruptDelegate(Cosmos.Hardware.Keyboard.HandleKeyboardInterrupt);
             Interrupts.Init();
+
 			HW.PC.Bus.PCIBus.Init();
+
             // end partially new
             
             HW.Storage.ATA.Initialize(Sleep);
