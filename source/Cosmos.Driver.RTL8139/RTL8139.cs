@@ -27,10 +27,14 @@ namespace Cosmos.Driver.RTL8139
 
 
         private PCIDevice pciCard;
+        private MemoryAddressSpace mem;
+        private Register.MainRegister regs;
+
         public RTL8139(PCIDevice device)
         {
             pciCard = device;
-            // etc
+            mem = device.GetAddressSpace(1) as MemoryAddressSpace;
+            regs = new MainRegister(mem);
         }
 
         #region NetworkDevice members
@@ -102,9 +106,7 @@ namespace Cosmos.Driver.RTL8139
         public override bool Enable()
         {
             //Writes 0x00 to CONFIG_1 registers to enable card
-            byte command = 0x00;
-            UInt32 address = pciCard.BaseAddress1 + (byte)MainRegister.Bit.Config1;
-            IOSpace.Write8(address, command);
+            regs.Config1 = 0x00;            
             return true;
         }
 
@@ -114,17 +116,15 @@ namespace Cosmos.Driver.RTL8139
         public void SoftReset()
         {
             Console.WriteLine("Performing software reset of RTL8139");
-            CommandRegister cmdReg = CommandRegister.Load(pciCard);
-
-            //Tell RTL chip to issue a Reset
-            byte command = (byte)CommandRegister.BitValue.RST; //0x10
-            //UInt32 address = CommandRegister.GetCmdAddress(pciCard);
-            UInt32 address = cmdReg.GetCmdAddress();
-            IOSpace.Write8(address, command);
+           
+            //Tell RTL chip to issue a Reset`
+            regs.ChipCmd = MainRegister.ChipCommandFlags.RST;
 
             //Wait while RST bit is active
-            while (cmdReg.IsResetStatus())
+            while (regs.ChipCmdTest(MainRegister.ChipCommandFlags.RST))
+            {
                 Console.WriteLine("Reset in progress...");
+            }
 
             Console.WriteLine("Reset Complete!");
         }
@@ -162,9 +162,7 @@ namespace Cosmos.Driver.RTL8139
         /// </summary>
         public void EnableRecieve()
         {
-            byte command = (byte)Register.CommandRegister.BitValue.RE;
-            UInt32 address = pciCard.BaseAddress1 + (byte)MainRegister.Bit.ChipCmd;
-            IOSpace.Write8(address, command);
+            regs.ChipCmd = MainRegister.ChipCommandFlags.TE;
         }
 
         /// <summary>
@@ -172,9 +170,7 @@ namespace Cosmos.Driver.RTL8139
         /// </summary>
         public void EnableTransmit()
         {
-            byte command = (byte)Register.CommandRegister.BitValue.TE;
-            UInt32 address = pciCard.BaseAddress1 + (byte)MainRegister.Bit.ChipCmd;
-            IOSpace.Write8(address, command);
+            regs.ChipCmd = MainRegister.ChipCommandFlags.TE;
         }
 
         /// <summary>

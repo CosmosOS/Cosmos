@@ -6,7 +6,7 @@ namespace Cosmos.Hardware.Network
 {
     public class MACAddress : IComparable
     {
-        byte[] bytes= new byte[6];
+        public byte[] bytes= new byte[6];
 
         public MACAddress(byte[] address)
         {

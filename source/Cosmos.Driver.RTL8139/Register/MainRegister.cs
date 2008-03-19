@@ -1,11 +1,103 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Cosmos.Hardware.PC.Bus;
+using Cosmos.Hardware.Network;
 
 namespace Cosmos.Driver.RTL8139.Register
 {
     class MainRegister
     {
+        private MemoryAddressSpace mem;
+        public MainRegister(MemoryAddressSpace mem)
+        {
+            this.mem = mem;
+        }
+
+        public MACAddress Mac
+        {
+            get
+            {
+                byte[] b = new byte[6];
+
+                for (byte i = 0; i < 6; i++)
+                    b[i] = mem.Read8Unchecked((UInt32)Bit.MAC0 + i);
+                
+                return new MACAddress(b);
+            }
+            set
+            {
+                for (byte b=0; b<6; b++)
+                    mem.Write8Unchecked((UInt32)Bit.MAC0 + b, value.bytes[b]);      
+            }
+        }
+
+
+        public byte[] Mar
+        {
+            get
+            {
+                byte[] b = new byte[6];
+
+                for (byte i = 0; i < 6; i++)
+                    b[i] = mem.Read8Unchecked((UInt32)Bit.MAR0 + i);
+
+                return b;
+            }
+            set
+            {
+                for (byte b = 0; b < 6; b++)
+                    mem.Write8Unchecked((UInt32)Bit.MAR0 + b, value[b]);
+            }
+        }
+
+        public byte Config0
+        {
+            get
+            {
+                return mem.Read8Unchecked((UInt32)Bit.Config0);
+            }
+            set
+            {
+                mem.Write8Unchecked((UInt32)Bit.Config0, value);
+            }
+        }
+        public byte Config1
+        {
+            get
+            {
+                return mem.Read8Unchecked((UInt32)Bit.Config1);
+            }
+            set
+            {
+                mem.Write8Unchecked((UInt32)Bit.Config1, value);
+            }
+        }
+        public ChipCommandFlags ChipCmd
+        {
+            get
+            {
+                return (ChipCommandFlags)mem.Read8Unchecked((UInt32)Bit.ChipCmd);
+            }
+            set
+            {
+                mem.Write8Unchecked((UInt32)Bit.ChipCmd, (byte)value);
+            }
+        }
+        public bool ChipCmdTest(ChipCommandFlags mask)
+        {
+            return (ChipCmd & mask) == mask;
+        }
+
+        [Flags]
+        public enum ChipCommandFlags : byte
+        {
+            BUFE = 1,
+            TE = 4,
+            RE = 8,
+            RST = 16
+        }
+
         /// <summary>
         /// The RTL8139 contains 64 x 16 bit EEPROM registers.
         /// </summary>
