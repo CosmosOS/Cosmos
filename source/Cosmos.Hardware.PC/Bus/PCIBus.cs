@@ -47,10 +47,7 @@ namespace Cosmos.Hardware.PC.Bus
             Console.WriteLine("Enumerate " + Bus ); 
             
             for (byte xSlot = 0; xSlot < 32; xSlot++)
-            {
-
-                Console.WriteLine("Enumerate " + Bus + "," + xSlot); 
-                
+            {                
                 byte xMaxFunctions = 1;
 
                 for (byte xFunction = 0; xFunction < xMaxFunctions; xFunction++)
@@ -394,38 +391,34 @@ namespace Cosmos.Hardware.PC.Bus
                 SetBaseAddress(i, 0xffffffff);
                 UInt32 flags = GetBaseAddress(i);
                 SetBaseAddress(i, address);
-                Console.WriteLine(flags);
+
                 if (address == 0)
                 {
-                    Console.WriteLine("register " + i + " - none " + PCIBus.ToHex(flags,8));
+                    //Console.WriteLine("register " + i + " - none " + PCIBus.ToHex(flags,8));
 
                     IOMaps[i] = null;
                 }
                 else if ((address & PCI_BASE_ADDRESS_SPACE) == PCI_BASE_ADDRESS_SPACE_MEMORY)
                 {
-                    Console.WriteLine("flags " + PCIBus.ToHex(flags, 8));
-                    Console.WriteLine("mask " + PCIBus.ToHex(0xfffffff0, 8));
-                    
-                    UInt32 size = /*PCI_BASE_ADDRESS_MEM_MASK*/ 0xfffffff0 & flags;
-                    Console.WriteLine("AND " + PCIBus.ToHex(size,8));
-                    size = ~size;
-                    Console.WriteLine("NOT " + PCIBus.ToHex(size,8));
-                    size++;
-                    Console.WriteLine("ADD " + PCIBus.ToHex(size, 8));
-                    
+                    UInt32 mask = 0xfffffff; mask <<= 4;
+                    UInt32 size = /*PCI_BASE_ADDRESS_MEM_MASK*/ mask & flags;                   
+                    size = ~size; 
+                    size++;                    
+
                     IOMaps[i] = new MemoryAddressSpace(address, size);
-                    Console.WriteLine("register " + i + " - " + size + "b mem " + PCIBus.ToHex(flags,8));
+                    Console.WriteLine("register " + i + " - " + size + "b mem");
 
                     NeedsIO = true;
                 }
                 else if ((address & PCI_BASE_ADDRESS_SPACE) == PCI_BASE_ADDRESS_SPACE_IO)
                 {
-                    UInt32 size = PCI_BASE_ADDRESS_IO_MASK & flags;
+                    UInt32 mask = 0x3fffffff; mask <<= 2;
+                    UInt32 size = mask & flags;
                     size = ~size;
                     size++;
 
                     IOMaps[i] = new IOAddressSpace(address, size);
-                    Console.WriteLine("register " + i + " - " + size + "b io " + PCIBus.ToHex(flags,8));
+                    Console.WriteLine("register " + i + " - " + size + "b io");
 
                     NeedsMemory = true;
                 }
