@@ -86,7 +86,7 @@ namespace Cosmos.Driver.RTL8139.Register
                     return "RTL8139A-G";
                 case 232: //11101000
                     return "RTL8139C";
-                case 233:
+                case 233: //11101001
                     return "RTL8139C+";
                 case 240: //11110000
                     return "RTL8139B";

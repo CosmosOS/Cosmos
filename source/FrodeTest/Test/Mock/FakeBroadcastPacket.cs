@@ -6,6 +6,19 @@ namespace FrodeTest.Test.Mock
 {
     public class FakeBroadcastPacket
     {
+
+        public static byte[] GetFakePacketAllHigh()
+        {
+            byte[] p = new byte[150];
+            for (int i = 0; i < 149; i++)
+            {
+                p[i] = 0xFE;
+            }
+
+            return p;
+
+        }
+        
         //Builds a fake Broadcast packet.
         public static byte[] GetFakePacket()
         {

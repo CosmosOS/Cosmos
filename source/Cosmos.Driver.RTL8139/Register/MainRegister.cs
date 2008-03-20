@@ -73,6 +73,19 @@ namespace Cosmos.Driver.RTL8139.Register
                 mem.Write8Unchecked((UInt32)Bit.Config1, value);
             }
         }
+
+        public UInt32 TxConfig
+        {
+            get
+            {
+                return mem.Read32((UInt32)Bit.TxConfig);
+            }
+            set
+            {
+                mem.Write32((UInt32)Bit.TxConfig, value);
+            }
+        }
+
         public ChipCommandFlags ChipCmd
         {
             get

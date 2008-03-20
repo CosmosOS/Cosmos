@@ -43,7 +43,7 @@ namespace Cosmos.Driver.RTL8139
             get 
             { 
                 //Polls the PCI device for the MAC address
-                byte[] bytes = new byte[6];
+                /*byte[] bytes = new byte[6];
                 for (int i = 0; i < 6; i++)
                 {
                     uint address = (uint)(pciCard.BaseAddress1 + i);
@@ -52,13 +52,26 @@ namespace Cosmos.Driver.RTL8139
 
                 MACAddress mac = new MACAddress(bytes);
                 return mac;            
+                 * */
+
+                return regs.Mac;
             }
         }
 
         public string GetHardwareRevision()
         {
-            uint address = pciCard.BaseAddress1 + (uint)MainRegister.Bit.TxConfig;
+            /*uint address = pciCard.BaseAddress1 + (uint)MainRegister.Bit.TxConfig;
             UInt32 tcrdata = IOSpace.Read32(address);
+            TransmitConfigurationRegister tcr = new TransmitConfigurationRegister(tcrdata);
+            return TransmitConfigurationRegister.GetHardwareRevision(tcr.GetHWVERID());
+            */
+
+
+            uint address = pciCard.BaseAddress1 + (uint)MainRegister.Bit.TxConfig;
+            UInt32 tcrdataOld = IOSpace.Read32(address);
+            Console.WriteLine("Old TxConfig: " + tcrdataOld);
+            UInt32 tcrdata = regs.TxConfig;
+            Console.WriteLine("New TxConfig: " + tcrdata);
             TransmitConfigurationRegister tcr = new TransmitConfigurationRegister(tcrdata);
             return TransmitConfigurationRegister.GetHardwareRevision(tcr.GetHWVERID());
         }
@@ -108,6 +121,8 @@ namespace Cosmos.Driver.RTL8139
             //Writes 0x00 to CONFIG_1 registers to enable card
             regs.Config1 = 0x00;            
             return true;
+
+            
         }
 
         /// <summary>
@@ -232,26 +247,26 @@ namespace Cosmos.Driver.RTL8139
         /// <param name="address"></param>
         private unsafe void WriteBufferToPCI(byte[] bytearray, uint address)
         {
-            fixed (byte* bodystart = &bytearray[0])
+            /*fixed (byte* bodystart = &bytearray[0])
             {
                 IOSpace.Write32(address, (uint)bodystart);
             }
+            */
 
-            /* 
-             * From Victor - an alternative way
-             * fixed (byte* bodystart = &body[0])
-                {
-                    IntPtr bodyAddress = (IntPtr)bodystart;
-                    IOSpace.Write32(address, (uint)bodyAddress);
-                }
-             */
+
+            fixed (byte* bodystart = &bytearray[0])
+            {
+                IntPtr bodyAddress = (IntPtr)bodystart;
+                IOSpace.Write32(address, (uint)bodyAddress);
+                Console.WriteLine("Address: + " + (uint)bodyAddress);
+            }
         }
 
         /// <summary>
         /// Transmits the given Packet
         /// </summary>
         /// <param name="packet"></param>
-        public void Transmit(Packet packet)
+        public unsafe void Transmit(Packet packet)
         {
             //Tell the PCI card the address of body of the Packet.
             UInt32 address = 
@@ -260,11 +275,24 @@ namespace Cosmos.Driver.RTL8139
                 TransmitStatusDescriptor.GetCurrentTSDescriptor();
             byte[] body = packet.PacketBody();
 
+            Console.WriteLine("Packet to send: ");
+            foreach (byte item in body)
+            {
+                Console.Write(item + ":");
+            }
+            Console.WriteLine();
+
             this.WriteBufferToPCI(body, address);
+
+            Console.WriteLine("Data in TSD0:");
+            Console.WriteLine(IOSpace.Read32(address));
+
+            //Console.WriteLine("Address of packet: " + (string)(&body[0]));
 
             //Set the transmit status - which enables the transmit.
             TransmitStatusDescriptor tsd = TransmitStatusDescriptor.Load(pciCard);
             this.SetEarlyTxThreshold(1024);
+            Console.WriteLine("Sending...");
             tsd.ClearOWNBit();
             TransmitStatusDescriptor.IncrementTSDescriptor();
         }
