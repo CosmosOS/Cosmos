@@ -52,6 +52,25 @@ namespace Cosmos.Driver.RTL8139.Register
             IOSpace.Write8(tdsAddress + offset, data);
         }
 
+        /// <summary>
+        /// The total size in bytes of the data in the descriptor. Must not be longer then 1792 bytes (0x700h), this 
+        /// will set Tx queue invalid.
+        /// </summary>
+        public int Size 
+        {
+            get
+            {
+                byte offset = 0;
+                return (int)IOSpace.Read8(tds + offset);
+            }
+            set
+            {
+                //TODO: Check this - the register contains 12 bits. We only write 8 bits here.
+                byte offset = 0;
+                IOSpace.Write8(tds + offset, (byte)value);
+            }
+        }
+
         public UInt32 TSD()
         {
             return IOSpace.Read32(tdsAddress);

@@ -20,9 +20,12 @@ namespace Cosmos.Driver.RTL8139
             body = data;
         }
 
-        public byte[] PacketBody()
+        public byte[] PacketBody
         {
-            return body;
+            get
+            {
+                return body;
+            }
             //return new byte[10]; //TODO: Redo this completely! Hardcoded to some bogus value now.
         }
     }

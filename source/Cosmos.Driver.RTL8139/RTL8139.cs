@@ -227,16 +227,18 @@ namespace Cosmos.Driver.RTL8139
         /// Initialize the Receive Buffer. The RBSTART register consists of 4 bytes (0x30h to 0x33h) which should contain
         /// the address of a buffer to save incoming data to.
         /// </summary>
-        private void InitReceiveBuffer()
+        public void InitReceiveBuffer()
         {
-            //TODO: Really unsure of the types and math here...
-            //char[] rx_buffer = new char[8192+16]; //8k + header
-            //pciCard.Write8(RTL8139Register.RxBuf, (byte)rx_buffer);
-            //byte[] rxbuffer = new byte(
-
             //Prepare a buffer area
+            byte[] rxbuffer = new byte[2048];
+
+            UInt32 address = pciCard.BaseAddress1 + (byte)MainRegister.Bit.RxBuf;
 
             //Write the address of the buffer area to the RBSTART 
+            WriteAddressToPCI(ref rxbuffer, address);
+
+            Console.WriteLine("RxBuffer contains address: " + IOSpace.Read32(address));
+            
         }
 
         /// <summary>
@@ -245,20 +247,21 @@ namespace Cosmos.Driver.RTL8139
         /// </summary>
         /// <param name="bytearray"></param>
         /// <param name="address"></param>
-        private unsafe void WriteBufferToPCI(byte[] bytearray, uint address)
+        private unsafe void WriteAddressToPCI(ref byte[] bytearray, uint address)
         {
-            /*fixed (byte* bodystart = &bytearray[0])
-            {
-                IOSpace.Write32(address, (uint)bodystart);
-            }
-            */
+
+            /* The data in the bytearray contains the actual bytes we want to transfer to the network.
+             * This bytearray must be in a continous memoryarea on the computer.
+             * We then write the address of this memoryarea to the network card.
+             * The address is stored in the Transmit Start Address which corresponds to the Transmit Status Descriptor we are currently using (0-3).
+             */
 
 
             fixed (byte* bodystart = &bytearray[0])
             {
                 IntPtr bodyAddress = (IntPtr)bodystart;
                 IOSpace.Write32(address, (uint)bodyAddress);
-                Console.WriteLine("Address: + " + (uint)bodyAddress);
+                Console.WriteLine("Address where packet body is stored: " + (uint)bodyAddress);
             }
         }
 
@@ -271,37 +274,27 @@ namespace Cosmos.Driver.RTL8139
             //Tell the PCI card the address of body of the Packet.
             UInt32 address = 
                 pciCard.BaseAddress1 + 
-                (byte)MainRegister.Bit.TSD0 +
+                (byte)MainRegister.Bit.TSD0 + //I think this should be TSAD0, but then no packet is sent...
                 TransmitStatusDescriptor.GetCurrentTSDescriptor();
-            byte[] body = packet.PacketBody();
+            Console.WriteLine("Address of TSAD0: " + address);
 
-            Console.WriteLine("Packet to send: ");
-            foreach (byte item in body)
-            {
-                Console.Write(item + ":");
-            }
-            Console.WriteLine();
+            byte[] body = packet.PacketBody;
 
-            this.WriteBufferToPCI(body, address);
+            WriteAddressToPCI(ref body, address);
 
-            Console.WriteLine("Data in TSD0:");
+            Console.Write("Data in Transmit Status Descriptor " + TransmitStatusDescriptor.GetCurrentTSDescriptor() + ":");
             Console.WriteLine(IOSpace.Read32(address));
-
-            //Console.WriteLine("Address of packet: " + (string)(&body[0]));
+            //At this point the TSDA0 should contain the address of the data.
+            Console.WriteLine("The Data pointed to: " + IOSpace.Read32(IOSpace.Read32(address)));
 
             //Set the transmit status - which enables the transmit.
             TransmitStatusDescriptor tsd = TransmitStatusDescriptor.Load(pciCard);
-            this.SetEarlyTxThreshold(1024);
+            tsd.Size = body.Length;
+            Console.WriteLine("Told NIC to send " + tsd.Size + " bytes.");
+            SetEarlyTxThreshold(1024);
             Console.WriteLine("Sending...");
             tsd.ClearOWNBit();
             TransmitStatusDescriptor.IncrementTSDescriptor();
         }
-
-
-
-
-
-
-
     }
 }

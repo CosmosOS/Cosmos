@@ -33,7 +33,7 @@ namespace FrodeTest
             //Test.SwitchTest.RunTest();
             Test.RTL8139Test.RunTest();
             //Test.BinaryHelperTest.RunTest();
-            Test.TransmitStatusDescriptorTest.RunTest();
+            //Test.TransmitStatusDescriptorTest.RunTest();
             //Test.PacketHeaderTest.RunTest();
             //Test.RAMBusTest.RunTest();
             //Test.BoolTest.RunTest();

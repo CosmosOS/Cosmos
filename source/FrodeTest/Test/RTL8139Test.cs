@@ -15,7 +15,7 @@ namespace FrodeTest.Test
 
             //Console.WriteLine("PCI Command: " + pciNic.Command);
             //pciNic.EnableDevice();
-            Console.WriteLine("PCI Command: " + pciNic.Command);
+            //Console.WriteLine("PCI Command: " + pciNic.Command);
             
             if (!pciNic.DeviceExists)
                 Console.WriteLine("Unable to find PCI device for Network card");
@@ -31,18 +31,16 @@ namespace FrodeTest.Test
             Console.WriteLine("BaseAddress1 is : " + pciNic.BaseAddress1);
             Console.WriteLine("Enabling card...");
             nic.Enable();
-            
-            //nic.SoftReset();
+            //nic.InitReceiveBuffer();
             nic.EnableRecieve();
             nic.EnableTransmit();
-            Cosmos.Hardware.PC.Global.Sleep(50);
-            Console.WriteLine("Timer: " + nic.TimerCount);
+            //Cosmos.Hardware.PC.Global.Sleep(50);
+            //Console.WriteLine("Timer: " + nic.TimerCount);
 
             Cosmos.Driver.RTL8139.PacketHeader head = new Cosmos.Driver.RTL8139.PacketHeader(0x77);
-            byte[] data = Mock.FakeBroadcastPacket.GetFakePacket();
+            byte[] data = Mock.FakeBroadcastPacket.GetFakePacketAllHigh();
             Cosmos.Driver.RTL8139.Packet packet = new Cosmos.Driver.RTL8139.Packet(head, data);
             nic.Transmit(packet);
-            Console.WriteLine("Transmit called");
         }
     }
 }
