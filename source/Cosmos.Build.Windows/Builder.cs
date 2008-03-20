@@ -144,7 +144,7 @@ namespace Cosmos.Build.Windows {
 					RemoveFile(PXEPath + @"Boot\output.bin");
 					File.Move(BuildPath + "output.bin", PXEPath + @"Boot\output.bin");
 					// *Must* set working dir so tftpd32 will set itself to proper dir
-					Global.Call(PXEPath + "tftpd32.exe", "", PXEPath, false, false);
+                    Global.Call(PXEPath + "tftpd32.exe", "", PXEPath, false, true);
 					break;
 
 				case Target.QEMU:
@@ -180,7 +180,7 @@ namespace Cosmos.Build.Windows {
 					//in this case, GDB says "program not running". Not sure how to fix this properly.
 					Global.Call(ToolsPath + "gdb.exe"
 						, BuildPath + @"output.bin" + " --eval-command=\"target remote:1234\" --eval-command=\"b _CODE_REQUESTED_BREAK_\" --eval-command=\"c\""
-						, ToolsPath + @"qemu\", false, false);
+						, ToolsPath + @"qemu\", false, true);
 					break;
 
 				case Target.QEMU_GDB_HardDisk:
@@ -195,7 +195,7 @@ namespace Cosmos.Build.Windows {
 					//in this case, GDB says "program not running". Not sure how to fix this properly.
 					Global.Call(ToolsPath + "gdb.exe"
 						, BuildPath + @"output.bin" + " --eval-command=\"target remote:1234\" --eval-command=\"b _CODE_REQUESTED_BREAK_\" --eval-command=\"c\""
-						, ToolsPath + @"qemu\", false, false);
+                        , ToolsPath + @"qemu\", false, true);
 					break;
 
 				case Target.VMWare:

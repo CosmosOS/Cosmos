@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace Cosmos.Build.Windows {
     class Global {
@@ -21,7 +22,16 @@ namespace Cosmos.Build.Windows {
             xStartInfo.RedirectStandardOutput = aCapture;
             Console.WriteLine("Please wait...executing " + xStartInfo.FileName + "...");
             var xProcess = Process.Start(xStartInfo);
-            if (aWait) {
+            
+            if (!aWait && aCapture)
+            {
+                // we arent gonna wait till it has finished by default. 
+                // but if there was an error the app may exit quickly and we should display it
+                // wait a small amount of time then check
+                Thread.Sleep(500);
+            }
+
+            if (aWait || (aCapture && xProcess.HasExited)) {
                 if (!xProcess.WaitForExit(60 * 1000) || xProcess.ExitCode != 0) {
                     //TODO: Fix
                     if (aCapture) {
