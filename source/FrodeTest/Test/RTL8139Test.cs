@@ -10,28 +10,27 @@ namespace FrodeTest.Test
         public static void RunTest()
         {
             // Testing RTL8139 PCI networkcard
-            //Find PCI device
-            Cosmos.Hardware.PC.Bus.PCIDevice pciNic = Cosmos.Hardware.PC.Bus.PCIBus.GetPCIDevice(0, 3, 0);
-
-            //Console.WriteLine("PCI Command: " + pciNic.Command);
-            //pciNic.EnableDevice();
-            //Console.WriteLine("PCI Command: " + pciNic.Command);
-            
-            if (!pciNic.DeviceExists)
-                Console.WriteLine("Unable to find PCI device for Network card");
-
             //Load card
-            Cosmos.Driver.RTL8139.RTL8139 nic = new Cosmos.Driver.RTL8139.RTL8139(pciNic);
+            List<Cosmos.Driver.RTL8139.RTL8139> nics = Cosmos.Driver.RTL8139.RTL8139.FindRTL8139Devices();
+
+            if (nics.Count == 0)
+            {
+                Console.WriteLine("No Realtek 8139 network card found!!");
+                return;
+            }
+
+            Console.WriteLine(nics.Count + " network cards found");
+            Cosmos.Driver.RTL8139.RTL8139 nic = (Cosmos.Driver.RTL8139.RTL8139)nics[0];
 
             Console.WriteLine("Network card: " + nic.Name);
             Console.WriteLine("HW Revision: " + nic.GetHardwareRevision());
             Console.WriteLine("MAC address: " + nic.MACAddress.ToString());
 
-            Console.WriteLine("BaseAddress0 is : " + pciNic.BaseAddress0);
-            Console.WriteLine("BaseAddress1 is : " + pciNic.BaseAddress1);
+            //Console.WriteLine("BaseAddress0 is : " + pciNic.BaseAddress0);
+            //Console.WriteLine("BaseAddress1 is : " + pciNic.BaseAddress1);
             Console.WriteLine("Enabling card...");
             nic.Enable();
-            //nic.InitReceiveBuffer();
+            nic.InitReceiveBuffer();
             nic.EnableRecieve();
             nic.EnableTransmit();
             //Cosmos.Hardware.PC.Global.Sleep(50);

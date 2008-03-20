@@ -14,17 +14,22 @@ namespace Cosmos.Driver.RTL8139
     /// </summary>
     public class RTL8139 : NetworkDevice //, DeviceDriver interface
     {
-        public static Device[] FindDevices()  // DeviceDriver interface
+        /// <summary>
+        /// Retrieve all Realtek 8139 network cards found on computer.
+        /// </summary>
+        /// <returns></returns>
+        public static List<RTL8139> FindRTL8139Devices()
         {
-            List<Device> found = new List<Device>();
+            List<RTL8139> found = new List<RTL8139>();
 
             foreach (PCIDevice device in Cosmos.Hardware.PC.Bus.PCIBus.Devices)
-                if (device.VendorID == 0x10EC && device.DeviceID == 0x0139)
+            {
+                if (device.VendorID == 0x10EC && device.DeviceID == 0x8139)
                     found.Add(new RTL8139(device));
+            }
 
-            return found.ToArray();
+            return found;
         }
-
 
         private PCIDevice pciCard;
         private MemoryAddressSpace mem;
