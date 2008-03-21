@@ -38,6 +38,8 @@ namespace Cosmos.Build.Windows {
             rdioISO.Unchecked += new RoutedEventHandler(rdioISO_Unchecked);
             rdioPXE.Checked += new RoutedEventHandler(rdioPXE_Checked);
             rdioPXE.Unchecked += new RoutedEventHandler(rdioPXE_Unchecked);
+            rdioUSB.Checked += new RoutedEventHandler(rdioUSB_Checked);
+            rdioUSB.Unchecked += new RoutedEventHandler(rdioUSB_Unchecked);
 
             spanBuildPath.Inlines.Add(mBuilder.BuildPath);
             spanISOPath.Inlines.Add(mBuilder.BuildPath + "Cosmos.iso");
@@ -48,8 +50,16 @@ namespace Cosmos.Build.Windows {
             RootDoc.Blocks.Remove(paraVPCOptions);
             RootDoc.Blocks.Remove(paraISOOptions);
             RootDoc.Blocks.Remove(paraPXEOptions);
+            RootDoc.Blocks.Remove(paraUSBOptions);
 
             LoadSettingsFromRegistry();
+        }
+
+        void rdioUSB_Checked(object sender, RoutedEventArgs e) {
+            RootDoc.Blocks.InsertAfter(mOptionsBlockPrefix, paraUSBOptions);
+        }
+        void rdioUSB_Unchecked(object sender, RoutedEventArgs e) {
+            RootDoc.Blocks.Remove(paraUSBOptions);
         }
 
         void rdioISO_Checked(object sender, RoutedEventArgs e) {
@@ -109,46 +119,42 @@ namespace Cosmos.Build.Windows {
                 mTarget = Builder.Target.ISO;
             } else if (rdioPXE.IsChecked.Value) {
                 mTarget = Builder.Target.PXE;
+            } else if (rdioUSB.IsChecked.Value) {
+                mTarget = Builder.Target.USB;
             }
 
             SaveSettingsToRegistry();
-            this.DialogResult = true;
+            DialogResult = true;
         }
 
-        void butnCancel_Click(object sender, RoutedEventArgs e)
-        {
-            this.DialogResult = false;
+        void butnCancel_Click(object sender, RoutedEventArgs e) {
+            DialogResult = false;
         }
 
-        void SaveSettingsToRegistry()
-        {
-            string key = "BuildType";
-            if (rdioQEMU.IsChecked.Value)
-                BuildRegistry.Write(key, "QEMU");
-            else if (rdioVMWare.IsChecked.Value)
-                BuildRegistry.Write(key, "VMWare");
-            else if (rdioVPC.IsChecked.Value)
-                BuildRegistry.Write(key, "VPC");
-            else if (rdioISO.IsChecked.Value)
-                BuildRegistry.Write(key, "ISO");
-            else if (rdioPXE.IsChecked.Value)
-                BuildRegistry.Write(key, "PXE");
+        void SaveSettingsToRegistry() {
+            //TODO: This can be changed to enum.tostring
+            string xValue = "QEMU";
+            if (rdioVMWare.IsChecked.Value) {
+                xValue = "VMWare";
+            } else if (rdioVPC.IsChecked.Value) {
+                xValue = "VPC";
+            } else if (rdioISO.IsChecked.Value) {
+                xValue = "ISO";
+            } else if (rdioPXE.IsChecked.Value) {
+                xValue = "PXE";
+            } else if (rdioUSB.IsChecked.Value) {
+                xValue = "USB";
+            }
+            BuildRegistry.Write("BuildType", xValue);
             
-            key = "UseGDB";
-            BuildRegistry.Write(key, chckQEMUUseGDB.IsChecked.Value.ToString());
-
-            key = "CreateHDImage";
-            BuildRegistry.Write(key, chckQEMUUseHD.IsChecked.Value.ToString());
-
-            key = "SkipIL";
-            BuildRegistry.Write(key, buildCheckBox.IsChecked.Value.ToString());
+            BuildRegistry.Write("UseGDB", chckQEMUUseGDB.IsChecked.Value.ToString());
+            BuildRegistry.Write("CreateHDImage", chckQEMUUseHD.IsChecked.Value.ToString());
+            BuildRegistry.Write("SkipIL", buildCheckBox.IsChecked.Value.ToString());
         }
 
-        void LoadSettingsFromRegistry()
-        {
-            string buildType = BuildRegistry.Read("BuildType");
-            switch (buildType)
-            {
+        void LoadSettingsFromRegistry() {
+            string xBuildType = BuildRegistry.Read("BuildType");
+            switch (xBuildType) {
                 case "QEMU":
                     rdioQEMU.IsChecked = true;
                     break;
@@ -164,8 +170,10 @@ namespace Cosmos.Build.Windows {
                 case "PXE":
                     rdioPXE.IsChecked = true;
                     break;
+                case "USB":
+                    rdioUSB.IsChecked = true;
+                    break;
             }
-
 
             bool useGDB;
             bool.TryParse(BuildRegistry.Read("UseGDB"), out useGDB);
@@ -178,9 +186,7 @@ namespace Cosmos.Build.Windows {
             bool skipIL;
             bool.TryParse(BuildRegistry.Read("SkipIL"), out skipIL);
             buildCheckBox.IsChecked = skipIL;
-
         }
-
 
         #region IBuildConfiguration Members
 

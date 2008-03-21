@@ -1,7 +1,7 @@
 ﻿<Window x:Class="Cosmos.Build.Windows.BuildOptionsWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Title="BuildOptionsWindow" WindowStartupLocation="CenterScreen">
+    Title="BuildOptionsWindow" WindowStartupLocation="CenterScreen" Width="600">
     <FlowDocumentScrollViewer>
     <FlowDocument Name="RootDoc">
         <BlockUIContainer>
@@ -54,11 +54,15 @@
                 <LineBreak/>
                 <Span Name="spanISOPath"></Span>
         </Paragraph>
-        <Paragraph Name="paraPXEOptions">
-            <Bold>PXE Options</Bold>
+            <Paragraph Name="paraPXEOptions">
+                <Bold>PXE Options</Bold>
                 <LineBreak/>After building, start up another PC with network boot enabled and Cosmos will boot on to it automatically.
-        </Paragraph>
-        <Paragraph>
+            </Paragraph>
+            <Paragraph Name="paraUSBOptions">
+                <Bold>USB Options</Bold>
+                <LineBreak/>USB must be done manually. Please see the website. We are working on integrating it into this builder currently.
+            </Paragraph>
+            <Paragraph>
             <InlineUIContainer><CheckBox Name="buildCheckBox" IsChecked="True"/></InlineUIContainer>
             Skip IL compilation.
         </Paragraph>

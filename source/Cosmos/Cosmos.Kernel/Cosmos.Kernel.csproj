@@ -73,7 +73,6 @@
   <ItemGroup>
     <Compile Include="Boot.cs" />
     <Compile Include="Global.cs" />
-    <Compile Include="New\Partitioning\MBT.cs" />
     <Compile Include="Old\FileSystem\Ext2.Structs.cs" />
     <Compile Include="Old\FileSystem\Fat16.cs" />
     <Compile Include="Old\FileSystem\File.cs" />

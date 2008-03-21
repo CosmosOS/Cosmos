@@ -14,8 +14,9 @@ namespace Cosmos.Build.Windows {
 		public readonly string BuildPath;
 		public readonly string ToolsPath;
 		public readonly string ISOPath;
-		public readonly string PXEPath;
-		public readonly string AsmPath;
+        public readonly string PXEPath;
+        public readonly string USBPath;
+        public readonly string AsmPath;
 		public readonly string VMWarePath;
 		public readonly string VPCPath;
 		protected IBuildConfiguration mConfig;
@@ -24,8 +25,9 @@ namespace Cosmos.Build.Windows {
 			BuildPath = GetBuildPath();
 			ToolsPath = BuildPath + @"Tools\";
 			ISOPath = BuildPath + @"ISO\";
-			PXEPath = BuildPath + @"PXE\";
-			AsmPath = ToolsPath + @"asm\";
+            PXEPath = BuildPath + @"PXE\";
+            PXEPath = BuildPath + @"USB\";
+            AsmPath = ToolsPath + @"asm\";
 			VMWarePath = BuildPath + @"VMWare\";
 			VPCPath = BuildPath + @"VPC\";
 		}
@@ -43,8 +45,7 @@ namespace Cosmos.Build.Windows {
                 // Problem  - noone checked this for user kit mode and no key...
                 xResult = (string)xKey.GetValue("Build Path");
 
-                if (xResult == null)
-                {
+                if (xResult == null) {
 					xResult = Directory.GetCurrentDirectory();
 					xResult = xResult.Substring(0, xResult.IndexOf("source"));
 					xResult += @"Build\";
@@ -122,6 +123,7 @@ namespace Cosmos.Build.Windows {
 		public enum Target {
 			ISO,
 			PXE,
+            USB,
 			QEMU,
 			QEMU_HardDisk,
 			QEMU_GDB,
@@ -133,9 +135,9 @@ namespace Cosmos.Build.Windows {
 		public void Build() {
 			if (mConfig == null) {
 				BuildOptionsWindow xOptions = new BuildOptionsWindow(this);
-                
-                if ((bool)!xOptions.ShowDialog())
+                if ((bool)!xOptions.ShowDialog()) {
                     return; //Cancel
+                }
 				
                 mConfig = xOptions;
 			}
@@ -150,14 +152,26 @@ namespace Cosmos.Build.Windows {
 					MakeISO();
 					break;
 
-				case Target.PXE:
-					RemoveFile(PXEPath + @"Boot\output.bin");
-					File.Move(BuildPath + "output.bin", PXEPath + @"Boot\output.bin");
-					// *Must* set working dir so tftpd32 will set itself to proper dir
+                case Target.PXE:
+                    RemoveFile(PXEPath + @"Boot\output.bin");
+                    File.Move(BuildPath + "output.bin", PXEPath + @"Boot\output.bin");
+                    // *Must* set working dir so tftpd32 will set itself to proper dir
                     Global.Call(PXEPath + "tftpd32.exe", "", PXEPath, false, true);
-					break;
+                    break;
 
-				case Target.QEMU:
+                case Target.USB:
+                    RemoveFile(USBPath + @"output.bin");
+                    File.Move(BuildPath + @"output.bin", USBPath + @"output.bin");
+                    // Copy to USB device
+                    string xUSBLetter = "I";
+                    File.Copy(USBPath + @"output.bin", xUSBLetter + @":\");
+                    File.Copy(USBPath + @"mboot.c32", xUSBLetter + @":\");
+                    File.Copy(USBPath + @"syslinux.cfg", xUSBLetter + @":\");
+                    // Set MBR
+                    Global.Call(ToolsPath + "syslinux.exe", "-fma " + xUSBLetter + ":", ToolsPath, true, true);
+                    break;
+
+                case Target.QEMU:
 					MakeISO();
 					RemoveFile(BuildPath + "serial-debug.txt");
 					Global.Call(ToolsPath + @"qemu\qemu.exe"
