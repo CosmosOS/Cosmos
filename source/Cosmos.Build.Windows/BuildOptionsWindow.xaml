@@ -1,8 +1,8 @@
 ﻿<Window x:Class="Cosmos.Build.Windows.BuildOptionsWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Title="BuildOptionsWindow" Width="500" Height="480" WindowStartupLocation="CenterScreen">
-    <FlowDocumentScrollViewer Width="500">
+    Title="BuildOptionsWindow" WindowStartupLocation="CenterScreen">
+    <FlowDocumentScrollViewer>
     <FlowDocument Name="RootDoc">
         <BlockUIContainer>
             <Image Source="/Cosmos.Build.Windows;component/Logo-1.png" Width="229" />
@@ -24,7 +24,8 @@
                 <WrapPanel Margin="30, 0">
                     <Label>Hardware:</Label>
                     <RadioButton GroupName="Target" Name="rdioISO">_ISO</RadioButton>
-                    <RadioButton GroupName="Target" Name="rdioPXE" Margin="15, 0">_Network Boot</RadioButton>
+                    <RadioButton GroupName="Target" Name="rdioPXE" Margin="15, 0">_Network (PXE)</RadioButton>
+                    <RadioButton GroupName="Target" Name="rdioUSB" Margin="15, 0">_USB Device</RadioButton>
                 </WrapPanel>
             </InlineUIContainer>
         </Paragraph>
