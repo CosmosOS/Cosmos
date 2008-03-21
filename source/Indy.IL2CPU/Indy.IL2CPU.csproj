@@ -95,6 +95,7 @@
     <Compile Include="CustomImplementation\System\StringImpl.cs" />
     <Compile Include="CustomImplementation\System\RuntimeType.cs" />
     <Compile Include="CustomImplementation\System\StringImplRefs.cs" />
+    <Compile Include="DebugSymbols.cs" />
     <Compile Include="GCImplementationRefs.cs" />
     <Compile Include="GCImplementation.cs" />
     <Compile Include="Utilities.cs" />

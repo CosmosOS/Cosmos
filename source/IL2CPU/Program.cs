@@ -16,7 +16,7 @@ namespace IL2CPU {
 		public static string BCLDir;
 		public static List<string> Plugs = new List<string>();
 		public static bool MetalMode;
-		public static bool DebugMode = false;
+		public static string DebugFile;
 		public static TargetPlatformEnum TargetPlatform = TargetPlatformEnum.Win32;
 		public const string FAsmParamsTemplate_Win32 = "\"{1}\" \"{0}\"";
 
@@ -87,13 +87,9 @@ namespace IL2CPU {
 						}
 					case "debug": {
 							if (String.IsNullOrEmpty(xArgParts[1])) {
-								DebugMode = true;
-							} else {
-								if (!Boolean.TryParse(xArgParts[1], out DebugMode)) {
-									Console.WriteLine("Error parsing Debug argument. Invalid value. Valid values are '" + Boolean.TrueString + "' and '" + Boolean.FalseString + "', or use -metal/-metalmode, which is equal to -metal:true");
-									return false;
-								}
+							throw new Exception("When using the debug switch, you need to specify an output path!");
 							}
+							DebugFile = xArgParts[1];
 							break;
 						}
 					case "bcldir": {
@@ -155,7 +151,7 @@ namespace IL2CPU {
 					e.DebugLog += delegate(LogSeverityEnum aSeverity, string aMessage) {
 						switch (aSeverity) {
 							case LogSeverityEnum.Informational: {
-									if (!DebugMode) {
+									if (String.IsNullOrEmpty(DebugFile)) {
 										return;
 									}
 									break;
@@ -177,7 +173,7 @@ namespace IL2CPU {
 						xTestOutput = OutputFile;
 					}
 					Func<string, string> xGetFileNameForGroup = xGroup => Path.Combine(AsmFile, xGroup + ".asm");
-					e.Execute(InputFile, TargetPlatform, xGetFileNameForGroup, MetalMode, DebugMode, BCLDir, Plugs);
+					e.Execute(InputFile, TargetPlatform, xGetFileNameForGroup, MetalMode, DebugFile, BCLDir, Plugs);
 					ProcessStartInfo xFasmStartInfo = new ProcessStartInfo();
 					if (TargetPlatform != TargetPlatformEnum.NativeX86) {
 						xFasmStartInfo.FileName = FAsmFileName;

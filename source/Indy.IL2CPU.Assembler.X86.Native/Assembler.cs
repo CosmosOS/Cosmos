@@ -74,6 +74,9 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
 				//aOutputWriter.WriteLine("mb_info multiboot_info");
 				aOutputWriter.WriteLine("MultiBootInfo_Memory_High dd 0");
 				aOutputWriter.WriteLine("MultiBootInfo_Memory_Low dd 0");
+				if (Signature != null && Signature.Length > 0) {
+					aOutputWriter.WriteLine("{0} db {1}", SignatureLabelName, Signature.Aggregate<byte, string>("", (r, b) => r + b + ",") + "0");
+				}
 			}
 
 		}

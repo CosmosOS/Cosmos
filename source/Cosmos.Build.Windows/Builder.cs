@@ -102,7 +102,8 @@ namespace Cosmos.Build.Windows {
 			xSW.Start();
 			IL2CPU.Program.Main(new string[] {@"-in:" + xTarget.Location
                 , "-plug:" + ToolsPath + @"Cosmos.Kernel.Plugs\Cosmos.Kernel.Plugs.dll"
-                , "-platform:nativex86", "-asm:" + AsmPath}
+                , "-platform:nativex86", "-asm:" + AsmPath,
+				"-debug:d:\\debug.xml"}
 				);
 			xSW.Stop();
 			Console.WriteLine("IL2CPU Run took " + xSW.Elapsed.ToString());

@@ -9,6 +9,7 @@ namespace Indy.IL2CPU.Assembler {
 	public abstract class Assembler: IDisposable {
 		// TODO: When threading is being worked on, fix this to work multithreaded!
 		//public const string CurrentExceptionDataMember = "__CURRENT_EXCEPTION__";
+		public const string SignatureLabelName = "Image____SIGNATURE___";
 		public static Exception CurrentException;
 		public static void PrintException() {
 			Console.BackgroundColor = ConsoleColor.DarkRed;
@@ -51,6 +52,11 @@ namespace Indy.IL2CPU.Assembler {
 				}
 				return mCurrentExceptionOccurredRef;
 			}
+		}
+
+		public byte[] Signature {
+			get;
+			set;
 		}
 
 		public static void ExceptionOccurred() {

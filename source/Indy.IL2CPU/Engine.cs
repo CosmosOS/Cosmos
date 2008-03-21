@@ -11,6 +11,7 @@ using Indy.IL2CPU.Assembler.X86;
 using Indy.IL2CPU.IL;
 using Indy.IL2CPU.Plugs;
 using System.Runtime.InteropServices;
+using System.Xml.Serialization;
 
 namespace Indy.IL2CPU {
 	public class MethodBaseComparer: IComparer<MethodBase> {
@@ -93,7 +94,7 @@ namespace Indy.IL2CPU {
 
 		protected List<Type> mTypes = new List<Type>();
 		protected TypeEqualityComparer mTypesEqualityComparer = new TypeEqualityComparer();
-		//private DebugSymbols mDebugSymbols;
+		private DebugSymbols mDebugSymbols;
 
 		/// <summary>
 		/// Compiles an assembly to CPU-specific code. The entrypoint of the assembly will be 
@@ -104,23 +105,23 @@ namespace Indy.IL2CPU {
 		/// <param name="aTargetPlatform">The platform to target when assembling the code.</param>
 		/// <param name="aOutput"></param>
 		/// <param name="aInMetalMode">Whether or not the output is metalmode only.</param>
-		public void Execute(string aAssembly, TargetPlatformEnum aTargetPlatform, Func<string, string> aGetFileNameForGroup, bool aInMetalMode, bool aDebugMode, string aAssemblyDir, IEnumerable<string> aPlugs) {
+		public void Execute(string aAssembly, TargetPlatformEnum aTargetPlatform, Func<string, string> aGetFileNameForGroup, bool aInMetalMode, string aDebugSymbols, string aAssemblyDir, IEnumerable<string> aPlugs) {
 			mCurrent = this;
 			try {
 				if (aGetFileNameForGroup == null) {
 					throw new ArgumentNullException("aGetFileNameForGroup");
 				}
 				mCrawledAssembly = Assembly.LoadFile(aAssembly);
-				//if (!String.IsNullOrEmpty(aDebugSymbols)) {
-				//    mDebugSymbols = new DebugSymbols();
-				//}
+				if (!String.IsNullOrEmpty(aDebugSymbols)) {
+					mDebugSymbols = new DebugSymbols();
+				}
 				MethodInfo xEntryPoint = (MethodInfo)mCrawledAssembly.EntryPoint;
 				if (xEntryPoint == null)
 					throw new NotSupportedException("No EntryPoint found!");
 
 				Type xEntryPointType = xEntryPoint.DeclaringType;
 				xEntryPoint = xEntryPointType.GetMethod("Init", new Type[0]);
-				
+
 				//List<string> xSearchDirs = new List<string>(new string[] { Path.GetDirectoryName(aAssembly), aAssemblyDir });
 				//xSearchDirs.AddRange((from item in aPlugs
 				//                      select Path.GetDirectoryName(item)).Distinct());
@@ -137,6 +138,11 @@ namespace Indy.IL2CPU {
 						}
 					default:
 						throw new NotSupportedException("TargetPlatform '" + aTargetPlatform + "' not supported!");
+				}
+				if (mDebugSymbols != null) {
+					Guid xSig = Guid.NewGuid();
+					mDebugSymbols.Signature = xSig.ToString("B").ToUpperInvariant();
+					mAssembler.Signature = xSig.ToByteArray();
 				}
 				InitializePlugs(aPlugs);
 				using (mAssembler) {
@@ -168,7 +174,7 @@ namespace Indy.IL2CPU {
 					//    }
 					//}
 					mMap.Initialize(mAssembler, xAppDefs);
-					mAssembler.DebugMode = aDebugMode;
+					mAssembler.DebugMode = !String.IsNullOrEmpty(aDebugSymbols);
 					IL.Op.QueueMethod += QueueMethod;
 					IL.Op.QueueStaticField += QueueStaticField;
 					try {
@@ -256,6 +262,13 @@ namespace Indy.IL2CPU {
 						}
 						mMap.PostProcess(mAssembler);
 						ProcessAllStaticFields();
+						//if (mDebugSymbols != null) {
+						//    GenerateDebugSymbols();
+						//}
+						//XmlSerializer xSerializer = new XmlSerializer(typeof(DebugSymbols));
+						//using (FileStream xFS = new FileStream(aDebugSymbols, FileMode.Create)) {
+						//    xSerializer.Serialize(xFS, mDebugSymbols);
+						//}
 					} finally {
 						mAssembler.Flush();
 						IL.Op.QueueMethod -= QueueMethod;
@@ -265,6 +278,115 @@ namespace Indy.IL2CPU {
 			} finally {
 				mCurrent = null;
 			}
+		}
+
+		private void GenerateDebugSymbols() {
+			var xAssemblyComparer = new AssemblyEqualityComparer();
+			var xTypeComparer = new TypeEqualityComparer();
+			var xDbgAssemblies = new List<DebugSymbolsAssembly>();
+			foreach (var xAssembly in (from item in mTypes
+									   select item.Assembly).Distinct(xAssemblyComparer)) {
+				var xDbgAssembly = new DebugSymbolsAssembly();
+				var xDbgAssemblyTypes = new List<DebugSymbolsAssemblyType>();
+				xDbgAssembly.FileName = xAssembly.Location;
+				xDbgAssembly.FullName = xAssembly.GetName().FullName;
+				for (int xIdxTypes = 0; xIdxTypes < mTypes.Count; xIdxTypes++) {
+					var xType = mTypes[xIdxTypes];
+					if (!xAssemblyComparer.Equals(xAssembly, xType.Assembly)) {
+						continue;
+					}
+					var xDbgType = new DebugSymbolsAssemblyType();
+					if (xType.BaseType != null) {
+						xDbgType.BaseTypeId = (uint)RegisterType(xType.BaseType);
+					}
+					xDbgType.TypeId = (uint)xIdxTypes;
+					xDbgType.FullName = xType.FullName;
+					var xTypeFields = new List<DebugSymbolsAssemblyTypeField>();
+					int xObjStorage;
+					var xTypeInfo = GetTypeInfo(xType);
+					foreach (var xField in xType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static)) {
+						var xDbgField = new DebugSymbolsAssemblyTypeField();
+						xDbgField.Name = xField.Name;
+						xDbgField.IsStatic = xField.IsStatic;
+						if (xField.IsPublic) {
+							xDbgField.Visibility = "Public";
+						} else {
+							if (xField.IsPrivate) {
+								xDbgField.Visibility = "Private";
+							} else {
+								if (xField.IsFamily) {
+									xDbgField.Visibility = "Protected";
+								} else {
+									xDbgField.Visibility = "Internal";
+								}
+							}
+						}
+						xDbgField.FieldType = (uint)RegisterType(xField.FieldType);
+						if (xDbgField.IsStatic) {
+							xDbgField.Address = DataMember.GetStaticFieldName(xField);
+						} else {
+							xDbgField.Address = "+" + xTypeInfo.Fields[xField.GetFullName()].Offset;
+						}
+						xTypeFields.Add(xDbgField);
+					}
+					xDbgType.Field = xTypeFields.ToArray();
+					var xTypeMethods = new List<DebugSymbolsAssemblyTypeMethod>();
+					for (int xIdxMethods = 0; xIdxMethods < mMethods.Count; xIdxMethods++) {
+						var xMethod = mMethods.Keys[xIdxMethods];
+						if (!xTypeComparer.Equals(xMethod.DeclaringType, xType)) {
+							continue;
+						}
+						var xDbgMethod = new DebugSymbolsAssemblyTypeMethod();
+						xDbgMethod.Name = xMethod.Name;
+						xDbgMethod.MethodId = (uint)xIdxMethods;
+						xDbgMethod.Address = Label.GenerateLabelName(xMethod);
+						if (xMethod is ConstructorInfo) {
+							xDbgMethod.ReturnTypeId = (uint)RegisterType(typeof(void));
+						} else {
+							var xTheMethod = xMethod as MethodInfo;
+							if (xTheMethod != null) {
+								xDbgMethod.ReturnTypeId = (uint)RegisterType(xTheMethod.ReturnType);
+							} else {
+								xDbgMethod.ReturnTypeId = (uint)RegisterType(typeof(void));
+							}
+						}
+						if (xMethod.IsPublic) {
+							xDbgMethod.Visibility = "Public";
+						} else {
+							if (xMethod.IsPrivate) {
+								xDbgMethod.Visibility = "Private";
+							} else {
+								if (xMethod.IsFamily) {
+									xDbgMethod.Visibility = "Protected";
+								} else {
+									xDbgMethod.Visibility = "Internal";
+								}
+							}
+							xTypeMethods.Add(xDbgMethod);
+						}
+						MethodBody xBody = xMethod.GetMethodBody();
+						if (xBody != null) {
+							var xDbgLocals = new List<DebugSymbolsAssemblyTypeMethodLocal>();
+							var xMethodInfo = GetMethodInfo(xMethod, xMethod, Label.GenerateLabelName(xMethod), xTypeInfo);
+							if (xBody.LocalVariables != null) {
+								foreach (var xLocal in xBody.LocalVariables) {
+									var xDbgLocal = new DebugSymbolsAssemblyTypeMethodLocal();
+									xDbgLocal.Name = xLocal.LocalIndex.ToString();
+									xDbgLocal.LocalTypeId = (uint)RegisterType(xLocal.LocalType);
+									xDbgLocal.RelativeStartAddress = xMethodInfo.Locals[xLocal.LocalIndex].VirtualAddresses.First();
+									xDbgLocals.Add(xDbgLocal);
+								}
+							}
+							xDbgMethod.Local = xDbgLocals.ToArray();
+						}
+					}
+					xDbgType.Method = xTypeMethods.ToArray();
+					xDbgAssemblyTypes.Add(xDbgType);
+				}
+				xDbgAssembly.Type = xDbgAssemblyTypes.ToArray();
+				xDbgAssemblies.Add(xDbgAssembly);
+			}
+			mDebugSymbols.Assembly = xDbgAssemblies.ToArray();
 		}
 
 		private void GenerateVMT() {
@@ -332,7 +454,7 @@ namespace Indy.IL2CPU {
 						if (xTD.BaseType == null) {
 							continue;
 						}
-						if (xMethod.IsVirtual && !xMethod.IsConstructor&&!xMethod.IsFinal) {
+						if (xMethod.IsVirtual && !xMethod.IsConstructor && !xMethod.IsFinal) {
 							Type xCurrentInspectedType = xTD.BaseType;
 							ParameterInfo[] xParams = xMethod.GetParameters();
 							Type[] xMethodParams = new Type[xParams.Length];
@@ -711,7 +833,7 @@ namespace Indy.IL2CPU {
 						continue;
 					}
 					string xMethodName = Label.GenerateLabelName(xCurrentMethod);
-					if (xMethodName=="System_Boolean__System_Object_Equals_System_Object_") {
+					if (xMethodName == "System_Boolean__System_Object_Equals_System_Object_") {
 						System.Diagnostics.Debugger.Break();
 					}
 					TypeInformation xTypeInfo = null;
@@ -1160,7 +1282,7 @@ namespace Indy.IL2CPU {
 					//}
 					if (aTypeFields.ContainsKey(xFieldId)) {
 						continue;
-					}											 
+					}
 					int xOffset = aObjectStorageSize;
 					FieldOffsetAttribute xOffsetAttrib = xField.GetCustomAttributes(typeof(FieldOffsetAttribute), true).FirstOrDefault() as FieldOffsetAttribute;
 					if (xOffsetAttrib != null) {
@@ -1200,7 +1322,7 @@ namespace Indy.IL2CPU {
 			Dictionary<string, TypeInformation.Field> xTypeFields = new Dictionary<string, TypeInformation.Field>();
 			aObjectStorageSize = 0;
 			if (aType == typeof(string)) {
-				System.Console.Write("");				
+				System.Console.Write("");
 			}
 			GetTypeFieldInfoImpl(xTypeFields, aType, ref aObjectStorageSize);
 			if (aType.IsExplicitLayout) {
@@ -1215,8 +1337,8 @@ namespace Indy.IL2CPU {
 				}
 			}
 			int xOffset = 0;
-			Dictionary<string, TypeInformation.Field> xResult = new Dictionary<string,TypeInformation.Field>();
-			foreach(var item in xTypeFields.Reverse()){
+			Dictionary<string, TypeInformation.Field> xResult = new Dictionary<string, TypeInformation.Field>();
+			foreach (var item in xTypeFields.Reverse()) {
 				var xItem = item.Value;
 				xItem.Offset = xOffset;
 				xOffset += xItem.Size;
