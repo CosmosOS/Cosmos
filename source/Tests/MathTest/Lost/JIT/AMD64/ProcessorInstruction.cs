@@ -3,11 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.IO;
+using System.Diagnostics;
 
 namespace Lost.JIT.AMD64
 {
 	class ProcessorInstruction
 	{
+		const byte Lock = 0xF0;
+		const byte OperandSizeOverride = 0x66;
+		const byte AddressSizeOverride = 0x67;
+		const byte Rep = 0xF3;
+		const byte RepE = 0xF3;
+		const byte RepNE = 0xF2;
+
 		internal ProcessorInstruction()
 		{
 			_labels = new HashSet<InstructionLabel>();
@@ -44,6 +53,107 @@ namespace Lost.JIT.AMD64
 			get { return _comments; }
 		} string _comments;
 
+		#region Encoding
+		InstructionOperand Dest
+		{
+			get { return _operands[0]; }
+		}
+		InstructionOperand Source
+		{
+			get { return _operands[1]; }
+		}
+
+		#region Instructions
+		void AddWithCarry(Stream dest)
+		{
+			if (Dest.IsGeneralPurposeRegister)
+				if (Dest.Register == Register.AX && Source.IsImmediate)
+				{
+					switch (Dest.Size)
+					{
+					case 1:
+						if (Source.Size != null)
+							Debug.Assert(Source.Size == 1);
+
+						dest.WriteByte(0x14);
+						break;
+					case 2:
+						if (Source.Size != null)
+							Debug.Assert(Source.Size == 2);
+
+						dest.WriteByte(OperandSizeOverride);
+						dest.WriteByte(0x15);
+						break;
+					case 4:
+						if (Source.Size != null)
+							Debug.Assert(Source.Size == 4);
+
+						dest.WriteByte(0x15);
+						break;
+					case 8:
+						if (Source.Size != null)
+							Debug.Assert(Source.Size == 4);
+
+						dest.WriteByte((byte)Rex.Wide);
+						dest.WriteByte(0x15);
+						break;
+					default:
+						throw new NotSupportedException();
+					}
+					Source.WriteTo(dest);
+					return;
+				} //adc al/ax/etc, imm
+			if (Source.IsImmediate)
+			{
+				switch (Dest.Size)
+				{
+				case 1:
+					if (Source.Size != null)
+						Debug.Assert(Source.Size == 4);
+
+					dest.WriteByte(AddressSizeOverride);
+					dest.WriteByte(0x80);
+					dest.EncodeIndirectMemory(2, Dest.Register);
+					break;
+				}
+				Source.WriteTo(dest);
+				return;
+			}
+			Debug.Assert(false);
+		}
+		#endregion
+
+		public void Encode(Stream dest)
+		{
+			switch (_opCode)
+			{
+			case "adc":
+				AddWithCarry(dest);
+				break;
+			default:
+				throw new NotSupportedException(_opCode);
+			}
+		}
+
+		static void EncodeRegisterRegister(Rex rex, Register dest, Register source, byte opcode, Stream stream)
+		{
+			if (rex != Rex.None) stream.WriteByte((byte)rex);
+			stream.WriteByte(opcode);
+
+			stream.EncodeRegisters(dest, source);
+		}
+		static void EncodeRegister(Rex rex, Register dest, byte opcode, Stream stream)
+		{
+			if (rex != Rex.None) stream.WriteByte((byte)rex);
+
+			dest &= Register.Legacy;
+			Debug.Assert((opcode | (byte)Register.Legacy) == 0);
+			opcode |= (byte)dest;
+
+			stream.WriteByte(opcode);
+		}
+		#endregion
+
 		#region Parsing
 		public static ProcessorInstruction Parse(string code)
 		{
@@ -53,8 +163,7 @@ namespace Lost.JIT.AMD64
 			var comments = ExtractComments(ref code);
 			var operands = InstructionOperand.GetOperands(code);
 
-#warning FIRST STEP
-			var result = new ProcessorInstruction(instr, operands, labels, prefixes, comments);
+			var result = new ProcessorInstruction(instr.ToUpper(), operands, labels, prefixes, comments);
 
 			return result;
 		}

@@ -5,9 +5,10 @@ using System.Text;
 
 namespace Lost.JIT.AMD64
 {
+	[Obsolete("")]
 	class ImmediateOperand: InstructionOperand
 	{
-		internal ImmediateOperand(int size, ulong value)
+		internal ImmediateOperand(int size, ulong value):base(value.ToString(string.Format("0X{0}", size*2)))
 		{
 			switch (size)
 			{

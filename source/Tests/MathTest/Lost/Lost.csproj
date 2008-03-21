@@ -50,15 +50,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="JIT\AMD64\Enumerations.cs" />
     <Compile Include="JIT\AMD64\ImmediateOperand.cs" />
     <Compile Include="JIT\AMD64\InstructionLabel.cs" />
     <Compile Include="JIT\AMD64\InstructionOperand.cs" />
     <Compile Include="JIT\AMD64\InstructionPrefix.cs" />
+    <Compile Include="JIT\AMD64\ModRM.cs" />
     <Compile Include="JIT\AMD64\ProcessorInstruction.cs" />
     <Compile Include="LostTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="asm.asm" />
     <Content Include="test.asm">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
