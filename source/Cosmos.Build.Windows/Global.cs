@@ -45,6 +45,5 @@ namespace Cosmos.Build.Windows {
                 }
             }
         }
-
     }
 }
