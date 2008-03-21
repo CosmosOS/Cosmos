@@ -93,6 +93,7 @@ namespace Indy.IL2CPU {
 
 		protected List<Type> mTypes = new List<Type>();
 		protected TypeEqualityComparer mTypesEqualityComparer = new TypeEqualityComparer();
+		//private DebugSymbols mDebugSymbols;
 
 		/// <summary>
 		/// Compiles an assembly to CPU-specific code. The entrypoint of the assembly will be 
@@ -110,7 +111,9 @@ namespace Indy.IL2CPU {
 					throw new ArgumentNullException("aGetFileNameForGroup");
 				}
 				mCrawledAssembly = Assembly.LoadFile(aAssembly);
-
+				//if (!String.IsNullOrEmpty(aDebugSymbols)) {
+				//    mDebugSymbols = new DebugSymbols();
+				//}
 				MethodInfo xEntryPoint = (MethodInfo)mCrawledAssembly.EntryPoint;
 				if (xEntryPoint == null)
 					throw new NotSupportedException("No EntryPoint found!");

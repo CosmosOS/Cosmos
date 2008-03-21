@@ -38,7 +38,8 @@
             <InlineUIContainer>
                 <StackPanel>
                 <CheckBox Name="chckQEMUUseGDB" IsChecked="False">Use _GDB Debugger</CheckBox>
-                <CheckBox Name="chckQEMUUseHD">Create _hard disk image</CheckBox>
+                <CheckBox Name="chckQEMUUseHD"
+							IsChecked="False">Create _hard disk image</CheckBox>
                 </StackPanel>
             </InlineUIContainer>
         </Paragraph>

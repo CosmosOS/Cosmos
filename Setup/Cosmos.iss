@@ -30,6 +30,7 @@ Source: "Tools\*"; DestDir: "{app}\Tools"; Excludes: "*.log;*.asm;output.bin"; F
 Source: "..\source\Cosmos.Shell.Guess\bin\Debug\*.dll"; DestDir: "{app}\Tools\GAC";
 Source: "..\source\Cosmos.Shell.Guess\bin\Debug\IL2CPU.exe"; DestDir: "{app}\Tools\GAC";
 Source: "..\setup\RegGac.exe"; DestDir: "{app}";
+Source: "..\Build\ISO\*.*"; DestDir: "{app}\ISO"; Excludes: "output.bin";
 
 [Registry]
 Root: HKCU; Subkey: "Software\Cosmos"; ValueType: string; ValueName: "Build Path"; ValueData: "{app}";
@@ -37,36 +38,37 @@ Root: HKLM; Subkey: "Software\Microsoft\.NETFramework\AssemblyFolders\Cosmos"; V
 
 [Run]
 Filename: "{app}\Cosmos.vsi"; Verb: "open"; Flags: shellexec runascurrentuser;
-Filename: "{app}\RegGac.exe"; WorkingDir: "{app}"; Parameters: "install Cosmos.Build.Windows.dll gac"; Flags: runhidden;
-Filename: "{app}\RegGac.exe"; WorkingDir: "{app}"; Parameters: "install Cosmos.Hardware.dll gac"; Flags: runhidden;
-Filename: "{app}\RegGac.exe"; WorkingDir: "{app}"; Parameters: "install Cosmos.Hardware.PC.dll gac"; Flags: runhidden;
-Filename: "{app}\RegGac.exe"; WorkingDir: "{app}"; Parameters: "install Cosmos.Kernel.dll gac"; Flags: runhidden;
-Filename: "{app}\RegGac.exe"; WorkingDir: "{app}"; Parameters: "install IL2CPU.exe gac"; Flags: runhidden;
-Filename: "{app}\RegGac.exe"; WorkingDir: "{app}"; Parameters: "install Indy.IL2CPU.dll gac"; Flags: runhidden;
-Filename: "{app}\RegGac.exe"; WorkingDir: "{app}"; Parameters: "install Indy.IL2CPU.Assembler.dll gac"; Flags: runhidden;
-Filename: "{app}\RegGac.exe"; WorkingDir: "{app}"; Parameters: "install Indy.IL2CPU.Assembler.X86.dll gac"; Flags: runhidden;
-Filename: "{app}\RegGac.exe"; WorkingDir: "{app}"; Parameters: "install Indy.IL2CPU.Assembler.X86.Win32.dll gac"; Flags: runhidden;
-Filename: "{app}\RegGac.exe"; WorkingDir: "{app}"; Parameters: "install Indy.IL2CPU.Assembler.X86.Native.dll gac"; Flags: runhidden;
-Filename: "{app}\RegGac.exe"; WorkingDir: "{app}"; Parameters: "install Indy.IL2CPU.IL.dll gac"; Flags: runhidden;
-Filename: "{app}\RegGac.exe"; WorkingDir: "{app}"; Parameters: "install Indy.IL2CPU.IL.X86.dll gac"; Flags: runhidden;
-Filename: "{app}\RegGac.exe"; WorkingDir: "{app}"; Parameters: "install Indy.IL2CPU.IL.X86.Native.dll gac"; Flags: runhidden;
-Filename: "{app}\RegGac.exe"; WorkingDir: "{app}"; Parameters: "install Indy.IL2CPU.IL.X86.Win32.dll gac"; Flags: runhidden;
-Filename: "{app}\RegGac.exe"; WorkingDir: "{app}"; Parameters: "install Indy.IL2CPU.Plugs.dll gac"; Flags: runhidden;
+Filename: "{app}\RegGac.exe"; WorkingDir: "{app}\Tools\GAC"; Parameters: "install Cosmos.Build.Windows.dll gac"; Flags: runhidden;
+Filename: "{app}\RegGac.exe"; WorkingDir: "{app}\Tools\GAC"; Parameters: "install Cosmos.Hardware.dll gac"; Flags: runhidden;
+Filename: "{app}\RegGac.exe"; WorkingDir: "{app}\Tools\GAC"; Parameters: "install Cosmos.Hardware.PC.dll gac"; Flags: runhidden;
+Filename: "{app}\RegGac.exe"; WorkingDir: "{app}\Tools\GAC"; Parameters: "install Cosmos.Kernel.dll gac"; Flags: runhidden;
+Filename: "{app}\RegGac.exe"; WorkingDir: "{app}\Tools\GAC"; Parameters: "install IL2CPU.exe gac"; Flags: runhidden;
+Filename: "{app}\RegGac.exe"; WorkingDir: "{app}\Tools\GAC"; Parameters: "install Indy.IL2CPU.dll gac"; Flags: runhidden;
+Filename: "{app}\RegGac.exe"; WorkingDir: "{app}\Tools\GAC"; Parameters: "install Indy.IL2CPU.Assembler.dll gac"; Flags: runhidden;
+Filename: "{app}\RegGac.exe"; WorkingDir: "{app}\Tools\GAC"; Parameters: "install Indy.IL2CPU.Assembler.X86.dll gac"; Flags: runhidden;
+Filename: "{app}\RegGac.exe"; WorkingDir: "{app}\Tools\GAC"; Parameters: "install Indy.IL2CPU.Assembler.X86.Win32.dll gac"; Flags: runhidden;
+Filename: "{app}\RegGac.exe"; WorkingDir: "{app}\Tools\GAC"; Parameters: "install Indy.IL2CPU.Assembler.X86.Native.dll gac"; Flags: runhidden;
+Filename: "{app}\RegGac.exe"; WorkingDir: "{app}\Tools\GAC"; Parameters: "install Indy.IL2CPU.IL.dll gac"; Flags: runhidden;
+Filename: "{app}\RegGac.exe"; WorkingDir: "{app}\Tools\GAC"; Parameters: "install Indy.IL2CPU.IL.X86.dll gac"; Flags: runhidden;
+Filename: "{app}\RegGac.exe"; WorkingDir: "{app}\Tools\GAC"; Parameters: "install Indy.IL2CPU.IL.X86.Native.dll gac"; Flags: runhidden;
+Filename: "{app}\RegGac.exe"; WorkingDir: "{app}\Tools\GAC"; Parameters: "install Indy.IL2CPU.IL.X86.Win32.dll gac"; Flags: runhidden;
+Filename: "{app}\RegGac.exe"; WorkingDir: "{app}\Tools\GAC"; Parameters: "install Indy.IL2CPU.Plugs.dll gac"; Flags: runhidden;
+Filename: "{sys}\cmd.exe"; WorkingDir: "{app}"; Parameters: "/C del temp*.bat"; Flags: runhidden;
 
 [UninstallRun]
-Filename: "{app}\RegGac.exe"; WorkingDir: "{app}"; Parameters: "uninstall Cosmos.Build.Windows.dll gac"; Flags: runhidden;
-Filename: "{app}\RegGac.exe"; WorkingDir: "{app}"; Parameters: "uninstall Cosmos.Hardware.dll gac"; Flags: runhidden;
-Filename: "{app}\RegGac.exe"; WorkingDir: "{app}"; Parameters: "uninstall Cosmos.Hardware.PC.dll gac"; Flags: runhidden;
-Filename: "{app}\RegGac.exe"; WorkingDir: "{app}"; Parameters: "uninstall Cosmos.Kernel.dll gac"; Flags: runhidden;
-Filename: "{app}\RegGac.exe"; WorkingDir: "{app}"; Parameters: "uninstall IL2CPU.exe gac"; Flags: runhidden;
-Filename: "{app}\RegGac.exe"; WorkingDir: "{app}"; Parameters: "uninstall Indy.IL2CPU.dll gac"; Flags: runhidden;
-Filename: "{app}\RegGac.exe"; WorkingDir: "{app}"; Parameters: "uninstall Indy.IL2CPU.Assembler.dll gac"; Flags: runhidden;
-Filename: "{app}\RegGac.exe"; WorkingDir: "{app}"; Parameters: "uninstall Indy.IL2CPU.Assembler.X86.dll gac"; Flags: runhidden;
-Filename: "{app}\RegGac.exe"; WorkingDir: "{app}"; Parameters: "uninstall Indy.IL2CPU.Assembler.X86.Win32.dll gac"; Flags: runhidden;
-Filename: "{app}\RegGac.exe"; WorkingDir: "{app}"; Parameters: "uninstall Indy.IL2CPU.Assembler.X86.Native.dll gac"; Flags: runhidden;
-Filename: "{app}\RegGac.exe"; WorkingDir: "{app}"; Parameters: "uninstall Indy.IL2CPU.IL.dll gac"; Flags: runhidden;
-Filename: "{app}\RegGac.exe"; WorkingDir: "{app}"; Parameters: "uninstall Indy.IL2CPU.IL.X86.dll gac"; Flags: runhidden;
-Filename: "{app}\RegGac.exe"; WorkingDir: "{app}"; Parameters: "uninstall Indy.IL2CPU.IL.X86.Native.dll gac"; Flags: runhidden;
-Filename: "{app}\RegGac.exe"; WorkingDir: "{app}"; Parameters: "uninstall Indy.IL2CPU.IL.X86.Win32.dll gac"; Flags: runhidden;
-Filename: "{app}\RegGac.exe"; WorkingDir: "{app}"; Parameters: "uninstall Indy.IL2CPU.Plugs.dll gac"; Flags: runhidden;
+Filename: "{app}\RegGac.exe"; WorkingDir: "{app}\Tools\GAC"; Parameters: "uninstall Cosmos.Build.Windows.dll gac"; Flags: runhidden;
+Filename: "{app}\RegGac.exe"; WorkingDir: "{app}\Tools\GAC"; Parameters: "uninstall Cosmos.Hardware.dll gac"; Flags: runhidden;
+Filename: "{app}\RegGac.exe"; WorkingDir: "{app}\Tools\GAC"; Parameters: "uninstall Cosmos.Hardware.PC.dll gac"; Flags: runhidden;
+Filename: "{app}\RegGac.exe"; WorkingDir: "{app}\Tools\GAC"; Parameters: "uninstall Cosmos.Kernel.dll gac"; Flags: runhidden;
+Filename: "{app}\RegGac.exe"; WorkingDir: "{app}\Tools\GAC"; Parameters: "uninstall IL2CPU.exe gac"; Flags: runhidden;
+Filename: "{app}\RegGac.exe"; WorkingDir: "{app}\Tools\GAC"; Parameters: "uninstall Indy.IL2CPU.dll gac"; Flags: runhidden;
+Filename: "{app}\RegGac.exe"; WorkingDir: "{app}\Tools\GAC"; Parameters: "uninstall Indy.IL2CPU.Assembler.dll gac"; Flags: runhidden;
+Filename: "{app}\RegGac.exe"; WorkingDir: "{app}\Tools\GAC"; Parameters: "uninstall Indy.IL2CPU.Assembler.X86.dll gac"; Flags: runhidden;
+Filename: "{app}\RegGac.exe"; WorkingDir: "{app}\Tools\GAC"; Parameters: "uninstall Indy.IL2CPU.Assembler.X86.Win32.dll gac"; Flags: runhidden;
+Filename: "{app}\RegGac.exe"; WorkingDir: "{app}\Tools\GAC"; Parameters: "uninstall Indy.IL2CPU.Assembler.X86.Native.dll gac"; Flags: runhidden;
+Filename: "{app}\RegGac.exe"; WorkingDir: "{app}\Tools\GAC"; Parameters: "uninstall Indy.IL2CPU.IL.dll gac"; Flags: runhidden;
+Filename: "{app}\RegGac.exe"; WorkingDir: "{app}\Tools\GAC"; Parameters: "uninstall Indy.IL2CPU.IL.X86.dll gac"; Flags: runhidden;
+Filename: "{app}\RegGac.exe"; WorkingDir: "{app}\Tools\GAC"; Parameters: "uninstall Indy.IL2CPU.IL.X86.Native.dll gac"; Flags: runhidden;
+Filename: "{app}\RegGac.exe"; WorkingDir: "{app}\Tools\GAC"; Parameters: "uninstall Indy.IL2CPU.IL.X86.Win32.dll gac"; Flags: runhidden;
+Filename: "{app}\RegGac.exe"; WorkingDir: "{app}\Tools\GAC"; Parameters: "uninstall Indy.IL2CPU.Plugs.dll gac"; Flags: runhidden;
 

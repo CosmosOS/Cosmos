@@ -88,7 +88,8 @@ namespace Cosmos.Build.Windows {
         }
 
         void butnBuild_Click(object sender, RoutedEventArgs e) {
-            if (rdioQEMU.IsChecked.Value) {
+			mTarget = Builder.Target.QEMU;
+			if (rdioQEMU.IsChecked.Value) {
                 if (chckQEMUUseGDB.IsChecked.Value) {
                     if (chckQEMUUseHD.IsChecked.Value) {
                         mTarget = Builder.Target.QEMU_GDB_HardDisk;
@@ -98,8 +99,6 @@ namespace Cosmos.Build.Windows {
                 } else {
                     if (chckQEMUUseHD.IsChecked.Value) {
                         mTarget = Builder.Target.QEMU_HardDisk;
-                    } else {
-                        mTarget = Builder.Target.QEMU;
                     }
                 }
             } else if (rdioVMWare.IsChecked.Value) {

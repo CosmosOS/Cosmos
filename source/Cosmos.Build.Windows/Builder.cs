@@ -6,8 +6,8 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
-using Microsoft.Win32;
 using System.Threading;
+using Microsoft.Win32;
 
 namespace Cosmos.Build.Windows {
 	public class Builder {
@@ -67,6 +67,14 @@ namespace Cosmos.Build.Windows {
 				File.Delete(aPathname);
 			}
 		}
+		
+		protected void CopyFile(string aFrom, string aTo) {
+			string xDir = Path.GetDirectoryName(aTo);
+			if(!Directory.Exists(xDir)) {
+				Directory.CreateDirectory(xDir);
+			}
+			File.Copy(aFrom, aTo);
+		}
 
 		protected void RemoveReadOnly(string aPathname) {
 			var xAttribs = File.GetAttributes(aPathname);
@@ -79,7 +87,7 @@ namespace Cosmos.Build.Windows {
 		protected void MakeISO() {
 			RemoveFile(BuildPath + "cosmos.iso");
 			RemoveFile(ISOPath + "output.bin");
-			File.Copy(BuildPath + "output.bin", ISOPath + "output.bin");
+			CopyFile(BuildPath + "output.bin", ISOPath + "output.bin");
 			// From TFS its read only, mkisofs doesnt like that
 			RemoveReadOnly(ISOPath + "isolinux.bin");
 			Global.Call(ToolsPath + @"mkisofs.exe", @"-R -b isolinux.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o ..\Cosmos.iso .", ISOPath);
@@ -132,6 +140,7 @@ namespace Cosmos.Build.Windows {
 			}
 
 			if (mConfig.Compile) {
+				Console.WriteLine("Now compiling");
 				Compile();
 			}
 
