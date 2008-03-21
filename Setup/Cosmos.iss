@@ -27,8 +27,8 @@ Name: "{group}\{cm:UninstallProgram,Uninstall}"; Filename: "{uninstallexe}"
 [Files]
 Source: "..\setup\Cosmos.vsi"; DestDir: "{app}";
 Source: "Tools\*"; DestDir: "{app}\Tools"; Excludes: "*.log;*.asm;output.bin"; Flags: recursesubdirs;
-Source: "..\source\Cosmos.Shell.Guess\bin\Debug\*.dll"; DestDir: "{app}\Tools\GAC";
-Source: "..\source\Cosmos.Shell.Guess\bin\Debug\IL2CPU.exe"; DestDir: "{app}\Tools\GAC";
+Source: "..\source\Cosmos\Cosmos.Shell.Console\bin\Debug\*.dll"; DestDir: "{app}\Tools\GAC";
+Source: "..\source\Cosmos\Cosmos.Shell.Console\bin\Debug\IL2CPU.exe"; DestDir: "{app}\Tools\GAC";
 Source: "..\setup\RegGac.exe"; DestDir: "{app}";
 Source: "..\Build\ISO\*.*"; DestDir: "{app}\ISO"; Excludes: "output.bin";
 
