@@ -19,12 +19,12 @@ namespace FrodeTest.Test
             
 
             //Testing that OWN bit is cleared
-            PCIDevice card = PCIBus.GetPCIDevice(0, 3, 0);
+            /*PCIDevice card = PCIBus.GetPCIDevice(0, 3, 0);
             TransmitStatusDescriptor tsd = TransmitStatusDescriptor.Load(card);
             Console.WriteLine("Before bit is cleared: " + tsd.TSD());
             tsd.ClearOWNBit();
             Console.WriteLine("After bit cleared:     " + tsd.TSD());
-            
+            */
         }
     }
 }

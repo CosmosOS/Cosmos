@@ -24,6 +24,7 @@ namespace Cosmos.Driver.RTL8139
 
             foreach (PCIDevice device in Cosmos.Hardware.PC.Bus.PCIBus.Devices)
             {
+                //Console.WriteLine("VendorID: " + device.VendorID + " - DeviceID: " + device.DeviceID);
                 if (device.VendorID == 0x10EC && device.DeviceID == 0x8139)
                     found.Add(new RTL8139(device));
             }
@@ -34,6 +35,16 @@ namespace Cosmos.Driver.RTL8139
         private PCIDevice pciCard;
         private MemoryAddressSpace mem;
         private Register.MainRegister regs;
+        private byte[] TxBuffer0;
+        private byte[] TxBuffer1;
+        private byte[] TxBuffer2;
+        private byte[] TxBuffer3;
+        private byte[] RxBuffer;
+        //private byte[] RxBuffer2 = new byte[2048];
+        //private byte[] RxBuffer3 = new byte[2048];
+        //private byte[] RxBuffer4 = new byte[2048];
+
+
 
         public RTL8139(PCIDevice device)
         {
@@ -41,6 +52,8 @@ namespace Cosmos.Driver.RTL8139
             mem = device.GetAddressSpace(1) as MemoryAddressSpace;
             regs = new MainRegister(mem);
         }
+
+        public PCIDevice PCICard { get { return pciCard; } private set { ;} }
 
         #region NetworkDevice members
         public override MACAddress MACAddress
@@ -65,20 +78,35 @@ namespace Cosmos.Driver.RTL8139
 
         public string GetHardwareRevision()
         {
-            /*uint address = pciCard.BaseAddress1 + (uint)MainRegister.Bit.TxConfig;
-            UInt32 tcrdata = IOSpace.Read32(address);
-            TransmitConfigurationRegister tcr = new TransmitConfigurationRegister(tcrdata);
+            TransmitConfigurationRegister tcr = TransmitConfigurationRegister.Load(pciCard);
             return TransmitConfigurationRegister.GetHardwareRevision(tcr.GetHWVERID());
-            */
+        }
 
+        /// <summary>
+        /// Performs additional hardware initilization
+        /// </summary>
+        public void InitializeDriver()
+        {
+            //Turn on Tx and Rx
+            EnableTransmit();
+            EnableRecieve();
 
-            uint address = pciCard.BaseAddress1 + (uint)MainRegister.Bit.TxConfig;
-            UInt32 tcrdataOld = IOSpace.Read32(address);
-            Console.WriteLine("Old TxConfig: " + tcrdataOld);
-            UInt32 tcrdata = regs.TxConfig;
-            Console.WriteLine("New TxConfig: " + tcrdata);
-            TransmitConfigurationRegister tcr = new TransmitConfigurationRegister(tcrdata);
-            return TransmitConfigurationRegister.GetHardwareRevision(tcr.GetHWVERID());
+            //Initialize buffers
+            InitTransmitBuffer();
+            InitReceiveBuffer();
+
+            //Setting Transmit configuration
+            TransmitConfigurationRegister tcr = TransmitConfigurationRegister.Load(pciCard);
+            tcr.Init();
+            
+            //Setting Receive configuration
+            ReceiveConfigurationRegister rcr = ReceiveConfigurationRegister.Load(pciCard);
+            rcr.Init();
+            
+            //Enable IRQ Interrupt
+            SetIRQMaskRegister();
+            Console.WriteLine("PCI should raise IRQ" + pciCard.InterruptLine);
+            Cosmos.Hardware.PC.Interrupts.IRQ11 = new Cosmos.Hardware.PC.Interrupts.InterruptDelegate(HandleNetworkInterrupt);
         }
 
         /// <summary>
@@ -87,7 +115,14 @@ namespace Cosmos.Driver.RTL8139
         /// <param name="value">True to enable Loopback. False for normal operation.</param>
         public void SetLoopbackMode(bool value)
         {
-            throw new NotImplementedException();
+            TransmitConfigurationRegister tcr = TransmitConfigurationRegister.Load(pciCard);
+            tcr.LoopbackMode = value;
+        }
+
+        public bool GetLoopbackMode()
+        {
+            TransmitConfigurationRegister tcr = TransmitConfigurationRegister.Load(pciCard);
+            return tcr.LoopbackMode;
         }
 
         public override bool QueueBytes(byte[] buffer, int offset, int length)
@@ -126,8 +161,6 @@ namespace Cosmos.Driver.RTL8139
             //Writes 0x00 to CONFIG_1 registers to enable card
             regs.Config1 = 0x00;            
             return true;
-
-            
         }
 
         /// <summary>
@@ -150,6 +183,14 @@ namespace Cosmos.Driver.RTL8139
         }
 
         /// <summary>
+        /// (Should be) Called when the PCI network card raises an Interrupt.
+        /// </summary>
+        public static void HandleNetworkInterrupt()
+        {
+            Console.WriteLine("Network IRQ raised! Indicates data received...");
+        }
+
+        /// <summary>
         /// The IRQMaskRegister
         /// </summary>
         private void SetIRQMaskRegister()
@@ -160,6 +201,10 @@ namespace Cosmos.Driver.RTL8139
                 Register.InterruptMaskRegister.Bit.RER &
                 Register.InterruptMaskRegister.Bit.TER
                 );
+
+            //Note; The reference driver from Realtek sets mask = 0x7F (all bits high).
+            //mask = 0x7F;
+
             UInt32 address = pciCard.BaseAddress1 + (byte)MainRegister.Bit.IntrMask;
             IOSpace.Write8(address, mask);
         }
@@ -194,7 +239,7 @@ namespace Cosmos.Driver.RTL8139
         }
 
         /// <summary>
-        /// A general purpose timer. Writing to this will reset timer.
+        /// A general purpose timer. Writing to this will reset timer. NB: Timer does not work in Qemu.
         /// </summary>
         public UInt32 TimerCount 
         {
@@ -235,15 +280,31 @@ namespace Cosmos.Driver.RTL8139
         public void InitReceiveBuffer()
         {
             //Prepare a buffer area
-            byte[] rxbuffer = new byte[2048];
+
+            RxBuffer = new byte[2048];
 
             UInt32 address = pciCard.BaseAddress1 + (byte)MainRegister.Bit.RxBuf;
 
             //Write the address of the buffer area to the RBSTART 
-            WriteAddressToPCI(ref rxbuffer, address);
+            WriteAddressToPCI(ref RxBuffer, address);
 
+            Console.WriteLine("RxBuffer address: " + address);
             Console.WriteLine("RxBuffer contains address: " + IOSpace.Read32(address));
+        }
+
+        public void InitTransmitBuffer()
+        {
+            //Initialize Tx Buffers
+
+            TxBuffer0 = new byte[2048];
+            TxBuffer1 = new byte[2048];
+            TxBuffer2 = new byte[2048];
+            TxBuffer3 = new byte[2048];
             
+            WriteAddressToPCI(ref TxBuffer0, pciCard.BaseAddress1 + (byte)MainRegister.Bit.TSAD0);
+            WriteAddressToPCI(ref TxBuffer1, pciCard.BaseAddress1 + (byte)MainRegister.Bit.TSAD1);
+            WriteAddressToPCI(ref TxBuffer2, pciCard.BaseAddress1 + (byte)MainRegister.Bit.TSAD2);
+            WriteAddressToPCI(ref TxBuffer3, pciCard.BaseAddress1 + (byte)MainRegister.Bit.TSAD3);
         }
 
         /// <summary>
@@ -266,7 +327,7 @@ namespace Cosmos.Driver.RTL8139
             {
                 IntPtr bodyAddress = (IntPtr)bodystart;
                 IOSpace.Write32(address, (uint)bodyAddress);
-                Console.WriteLine("Address where packet body is stored: " + (uint)bodyAddress);
+                Console.WriteLine("Address where buffer is stored: " + (uint)bodyAddress);
             }
         }
 
@@ -274,32 +335,35 @@ namespace Cosmos.Driver.RTL8139
         /// Transmits the given Packet
         /// </summary>
         /// <param name="packet"></param>
-        public unsafe void Transmit(Packet packet)
+        public unsafe bool Transmit(Packet packet)
         {
-            //Tell the PCI card the address of body of the Packet.
-            UInt32 address = 
-                pciCard.BaseAddress1 + 
-                (byte)MainRegister.Bit.TSD0 + //I think this should be TSAD0, but then no packet is sent...
-                TransmitStatusDescriptor.GetCurrentTSDescriptor();
-            Console.WriteLine("Address of TSAD0: " + address);
+            //Put the packet into the correct TxBuffer
+            TxBuffer1 = packet.PacketBody;
 
-            byte[] body = packet.PacketBody;
+            //Cosmos.Hardware.PC.Global.Sleep(300);
 
-            WriteAddressToPCI(ref body, address);
-
-            Console.Write("Data in Transmit Status Descriptor " + TransmitStatusDescriptor.GetCurrentTSDescriptor() + ":");
-            Console.WriteLine(IOSpace.Read32(address));
+            //Console.Write("Data in Transmit Status Descriptor " + TransmitStatusDescriptor.GetCurrentTSDescriptor() + ":");
+            //Console.WriteLine(IOSpace.Read32(address));
             //At this point the TSDA0 should contain the address of the data.
-            Console.WriteLine("The Data pointed to: " + IOSpace.Read32(IOSpace.Read32(address)));
+            //Console.WriteLine("The Data pointed to: " + IOSpace.Read32(IOSpace.Read32(address)));
 
             //Set the transmit status - which enables the transmit.
             TransmitStatusDescriptor tsd = TransmitStatusDescriptor.Load(pciCard);
-            tsd.Size = body.Length;
+            tsd.Size = packet.PacketBody.Length;
             Console.WriteLine("Told NIC to send " + tsd.Size + " bytes.");
+
+            //Print packet
+            /*for (int i = 0; i < tsd.Size; i++)
+            {
+                Console.Write(TxBuffer1[i] + ":");
+            }*/
+
             SetEarlyTxThreshold(1024);
             Console.WriteLine("Sending...");
             tsd.ClearOWNBit();
             TransmitStatusDescriptor.IncrementTSDescriptor();
+
+            return true;
         }
     }
 }

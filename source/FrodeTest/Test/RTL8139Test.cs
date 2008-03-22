@@ -27,16 +27,14 @@ namespace FrodeTest.Test
             Console.WriteLine("MAC address: " + nic.MACAddress.ToString());
 
             //Console.WriteLine("BaseAddress0 is : " + pciNic.BaseAddress0);
-            //Console.WriteLine("BaseAddress1 is : " + pciNic.BaseAddress1);
+            Console.WriteLine("BaseAddress1 is : " + nic.PCICard.BaseAddress1);
             Console.WriteLine("Enabling card...");
+            //nic.SoftReset();
             nic.Enable();
-            nic.InitReceiveBuffer();
-            nic.EnableRecieve();
-            nic.EnableTransmit();
-            //Cosmos.Hardware.PC.Global.Sleep(50);
-            //Console.WriteLine("Timer: " + nic.TimerCount);
+            Console.WriteLine("Initializing driver...");
+            nic.InitializeDriver();
 
-            Cosmos.Driver.RTL8139.PacketHeader head = new Cosmos.Driver.RTL8139.PacketHeader(0x77);
+            Cosmos.Driver.RTL8139.PacketHeader head = new Cosmos.Driver.RTL8139.PacketHeader(0xFF);
             byte[] data = Mock.FakeBroadcastPacket.GetFakePacketAllHigh();
             Cosmos.Driver.RTL8139.Packet packet = new Cosmos.Driver.RTL8139.Packet(head, data);
             nic.Transmit(packet);

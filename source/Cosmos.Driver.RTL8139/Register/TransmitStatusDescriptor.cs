@@ -16,23 +16,50 @@ namespace Cosmos.Driver.RTL8139.Register
     /// </summary>
     public class TransmitStatusDescriptor
     {
-        private UInt32 tds;
         private PCIDevice pci;
         private UInt32 tdsAddress;
         public static TransmitStatusDescriptor Load(PCIDevice pciCard)
         {
             //Retrieve the 32 bits from the PCI card
             //and create a TSD object
-            UInt32 address = pciCard.BaseAddress1 + (byte)MainRegister.Bit.TSD0 + GetCurrentTSDescriptor();
-            UInt32 foundbytes = IOSpace.Read32(address);
-            return new TransmitStatusDescriptor(foundbytes, pciCard, address);
+            UInt32 address = 0;
+            switch (GetCurrentTSDescriptor())
+            {
+                case 0:
+                    address = pciCard.BaseAddress1 + (byte)MainRegister.Bit.TSD0;
+                    break;
+                case 1:
+                    address = pciCard.BaseAddress1 + (byte)MainRegister.Bit.TSD1;
+                    break;
+                case 2:
+                    address = pciCard.BaseAddress1 + (byte)MainRegister.Bit.TSD2;
+                    break;
+                case 3:
+                    address = pciCard.BaseAddress1 + (byte)MainRegister.Bit.TSD3;
+                    break;
+                default:
+                    Console.WriteLine("Illegal TSDescriptor in RTL driver!");
+                    break;
+            }
+
+            return new TransmitStatusDescriptor(pciCard, address);
         }
 
-        private TransmitStatusDescriptor(UInt32 data, PCIDevice hw, UInt32 adr)
+        private TransmitStatusDescriptor(PCIDevice hw, UInt32 adr)
         {
-            tds = data;
             pci = hw;
             tdsAddress = adr;
+        }
+
+        /// <summary>
+        /// Used to get the 32 bit value stored in the TransmitStatusDescriptor.
+        /// </summary>
+        private UInt32 TSD
+        {
+            get
+            {
+                return IOSpace.Read32(tdsAddress);
+            }
         }
 
         /// <summary>
@@ -43,13 +70,23 @@ namespace Cosmos.Driver.RTL8139.Register
         {
             //Read byte from register
             byte offset = 8;
-            byte data = BinaryHelper.GetByteFrom32bit(tds, offset);
+            byte data = BinaryHelper.GetByteFrom32bit(this.TSD, offset);
+
+
+            Console.WriteLine("OWN data before: " + BinaryHelper.CheckBit(this.TSD, 13));
             
             //Turn off single OWN bit
-            data &= (byte)~(1 << (byte)(Bit.OWN - offset));
+            //data &= (byte)~(1 << (byte)(BitValue.OWN - offset));
+            data &= (byte)~(1 << (byte)(13 - offset));
+
+            //TODO, change to this instead...
+//            if (BinaryHelper.CheckBit(data, 13 - offset)) //OWN bit is HIGH
+ //               BinaryHelper.FlipBit(data, 13 - offset);
 
             //Write all 8 bits back
             IOSpace.Write8(tdsAddress + offset, data);
+
+            Console.WriteLine("OWN data after: " + BinaryHelper.CheckBit(this.TSD, 13));
         }
 
         /// <summary>
@@ -61,49 +98,44 @@ namespace Cosmos.Driver.RTL8139.Register
             get
             {
                 byte offset = 0;
-                return (int)IOSpace.Read8(tds + offset);
+                //return (int)IOSpace.Read8(this.TSD + offset);
+                //return (int)IOSpace.Read8(
+                Console.WriteLine("TSD is: " + this.TSD);
+                Console.WriteLine("First 8 bits: " + (byte)BinaryHelper.GetByteFrom32bit(this.TSD, offset));
+                return (int)BinaryHelper.GetByteFrom32bit(this.TSD, offset);
             }
             set
             {
                 //TODO: Check this - the register contains 12 bits. We only write 8 bits here.
                 byte offset = 0;
-                IOSpace.Write8(tds + offset, (byte)value);
+                IOSpace.Write16(tdsAddress + offset, (UInt16)value);
+                //Console.WriteLine("Wrote value " + (UInt16)value + " to TDSAddress: " + tdsAddress);
+                //Console.WriteLine("Read again: " + IOSpace.Read8(tdsAddress + offset));
             }
         }
 
-        public UInt32 TSD()
+        public enum BitValue : uint
         {
-            return IOSpace.Read32(tdsAddress);
+            SIZE = BinaryHelper.BitPos.BIT0,       //12 bit long. Must not contain value over 0x700h
+            OWN = BinaryHelper.BitPos.BIT13,       //Set to 1 when transmit complete. Defaults to 1.
+            TUN = BinaryHelper.BitPos.BIT14,       //Transmit FIFO Underrun. Is set to 1 if TxFIFO was exhausted during transmition.
+            TOK = BinaryHelper.BitPos.BIT15,       //Transmit OK.
+            ERTXTH0 = BinaryHelper.BitPos.BIT16,   //Early TX Threshold 0-5
+            ERTXTH1 = BinaryHelper.BitPos.BIT17,
+            ERTXTH2 = BinaryHelper.BitPos.BIT18,
+            ERTXTH3 = BinaryHelper.BitPos.BIT19,
+            ERTXTH4 = BinaryHelper.BitPos.BIT20,
+            ERTXTH5 = BinaryHelper.BitPos.BIT21,
+            NCC0 = BinaryHelper.BitPos.BIT24,      //Number of Collision Count 0-3
+            NCC1 = BinaryHelper.BitPos.BIT25,
+            NCC2 = BinaryHelper.BitPos.BIT26,
+            NCC3 = BinaryHelper.BitPos.BIT27,
+            CDH = BinaryHelper.BitPos.BIT28,       //CD Heart Beat. Cleared in 100Mbps mode.
+            OWC = BinaryHelper.BitPos.BIT29,       //Out of Window Collision
+            TABT = BinaryHelper.BitPos.BIT30,      //Transmition aborted
+            CRS = BinaryHelper.BitPos.BIT31        //Carrier Sense Lost
         }
-
-        public static bool CheckBit(UInt32 data, Bit bit)
-        {
-            ushort mask = (ushort)(1 << (ushort)bit);
-            return (data & mask) != 0;
-        }
-
-        public enum Bit
-        {
-            SIZE = 0,       //12 bit long. Must not contain value over 0x700h
-            OWN = 13,       //Set to 1 when transmit complete. Defaults to 1.
-            TUN = 14,       //Transmit FIFO Underrun. Is set to 1 if TxFIFO was exhausted during transmition.
-            TOK = 15,       //Transmit OK.
-            ERTXTH0 = 16,   //Early TX Threshold 0-5
-            ERTXTH1 = 17,   
-            ERTXTH2 = 18,   
-            ERTXTH3 = 19,   
-            ERTXTH4 = 20,   
-            ERTXTH5 = 21,   
-            NCC0 = 24,      //Number of Collision Count 0-3
-            NCC1 = 25,      
-            NCC2 = 26,
-            NCC3 = 27,
-            CDH = 28,       //CD Heart Beat. Cleared in 100Mbps mode.
-            OWC = 29,       //Out of Window Collision
-            TABT = 30,      //Transmition aborted
-            CRS = 31        //Carrier Sense Lost
-        }
-
+        
         private static byte currentTSDescriptor = 0;
         /// <summary>
         /// Increments to the next Transmit Status Descriptor to use.

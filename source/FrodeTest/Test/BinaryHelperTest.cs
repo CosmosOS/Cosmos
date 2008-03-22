@@ -30,6 +30,12 @@ namespace FrodeTest.Test
             Console.WriteLine("Should be 224: " + BinaryHelper.GetByteFrom32bit(0x1C000000, 21));
 
             Console.WriteLine("Should be 5: " + BinaryHelper.GetByteFrom32bit(80, 4));
+
+            UInt32 data = 0;
+            Console.WriteLine("Should be FALSE: " + BinaryHelper.CheckBit(data, 0));
+
+            data = UInt32.MaxValue;
+            Console.WriteLine("Should be TRUE: " + BinaryHelper.CheckBit(data, 0));
         }
     }
 }

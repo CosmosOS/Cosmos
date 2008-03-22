@@ -55,6 +55,7 @@
     <Compile Include="Register\EarlyRxStatusRegister.cs" />
     <Compile Include="Register\InterruptMaskRegister.cs" />
     <Compile Include="Register\MainRegister.cs" />
+    <Compile Include="Register\ReceiveConfigurationRegister.cs" />
     <Compile Include="Register\TransmitConfigurationRegister.cs" />
     <Compile Include="Register\TransmitStatusDescriptor.cs" />
     <Compile Include="RTL8139.cs" />

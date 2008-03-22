@@ -8,6 +8,7 @@ namespace FrodeTest.Shell
     {
         Security.User xUser = null;
         static ushort xSessionId;
+        static Cosmos.Driver.RTL8139.RTL8139 nic = null;
 
         public Session(Security.User user)
         {
@@ -19,43 +20,59 @@ namespace FrodeTest.Shell
         {
             Console.Write(Prompt.LoadPrompt(xUser).PromptText());
             string command = Console.ReadLine();
-            Cosmos.Driver.RTL8139.RTL8139 nic = null;
+
 
             if (command.Equals("exit"))
                 return;
-            else if (command.Equals("nic"))
+/*            else if (command.Equals("nic"))
             {
                 Cosmos.Hardware.PC.Bus.PCIDevice pciNic = Cosmos.Hardware.PC.Bus.PCIBus.GetPCIDevice(0, 3, 0);
                 nic = new Cosmos.Driver.RTL8139.RTL8139(pciNic);
                 nic.Enable();
                 Console.WriteLine("Enabled Network card");
             }
+*/            else if(command.Equals("load"))
+            {
+                List<Cosmos.Driver.RTL8139.RTL8139> list = Cosmos.Driver.RTL8139.RTL8139.FindRTL8139Devices();
+                if (list.Count != 0)
+                {
+                    nic = list[0];
+                }
+
+                nic.Enable();
+                nic.InitializeDriver();
+            }
             else if (command.Equals("send"))
             {
-                //Console.WriteLine("NIC TimerCount: " + nic.TimerCount);
-                //Cosmos.Hardware.PC.Bus.PCIDevice pciNic = Cosmos.Hardware.PC.Bus.PCIBus.GetPCIDevice(0, 3, 0);
                 Cosmos.Driver.RTL8139.PacketHeader head = new Cosmos.Driver.RTL8139.PacketHeader(0xFF);
-                byte[] data = FrodeTest.Test.Mock.FakeBroadcastPacket.GetFakePacketAllHigh();
+                byte[] data = FrodeTest.Test.Mock.FakeBroadcastPacket.GetFakePacket();
                 Cosmos.Driver.RTL8139.Packet packet = new Cosmos.Driver.RTL8139.Packet(head, data);
 
-                //nic = new Cosmos.Driver.RTL8139.RTL8139(pciNic);
                 if (nic == null)
                 {
-                    Console.WriteLine("Enable NIC with command nic first");
+                    Console.WriteLine("Enable NIC with command load first");
                     return;
                 }
-                nic.Enable();
-                nic.EnableRecieve();
-                nic.EnableTransmit();
+
                 nic.Transmit(packet);
             }
             else if (command.Equals("reset"))
             {
                 //nic.TimerCount = 1;
                 nic.SoftReset();
-                nic.EnableTransmit();
-                nic.EnableRecieve();
-                Console.WriteLine("NIC reset");
+                nic.InitializeDriver();
+                Console.WriteLine("NIC has been reset");
+            }
+            else if(command.Equals("loop"))
+            {
+                Console.WriteLine("Toggle - current loopback mode: " + nic.GetLoopbackMode().ToString());
+                nic.SetLoopbackMode(!nic.GetLoopbackMode());
+                Console.WriteLine("Set to: " + nic.GetLoopbackMode().ToString());
+            }
+
+            else if (command.Equals("help"))
+            {
+                Console.WriteLine("Valid commands: load, send, loop, reset or exit");
             }
             else
                 Console.WriteLine("No such systemcommand or application: " + command);

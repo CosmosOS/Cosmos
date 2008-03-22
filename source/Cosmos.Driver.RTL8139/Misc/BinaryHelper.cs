@@ -26,6 +26,21 @@ namespace Cosmos.Driver.RTL8139.Misc
             return (data & mask) != 0;
         }
 
+        public static bool CheckBit(UInt32 data, ushort bit)
+        {
+            UInt32 mask = (UInt32)(1 << (int)bit);
+            return (data & mask) != 0;
+        }
+
+        /// <summary>
+        /// Changes the value in the given position. Either from low to high, or high to low.
+        /// Returns the same byte, but with one bit changed.
+        /// </summary>
+        public static byte FlipBit(byte data, ushort bit)
+        {
+            throw new NotImplementedException();
+        }
+
 
         /// <summary>
         /// Retrieves a byte of data from somewhere inside a 32 bit number. An offset is used to indicate where in
@@ -41,6 +56,45 @@ namespace Cosmos.Driver.RTL8139.Misc
 
             data = data >> offset;
             return (byte)data;
+        }
+
+        /// <summary>
+        /// Returns the HEX value of a given bitnumber
+        /// </summary>
+        public enum BitPos : uint
+        {
+            BIT0 = 0x1,
+            BIT1 = 0x2,
+            BIT2 = 0x4,
+            BIT3 = 0x8,
+            BIT4 = 0x10,
+            BIT5 = 0x20,
+            BIT6 = 0x40,
+            BIT7 = 0x80,
+            BIT8 = 0x100,
+            BIT9 = 0x200,
+            BIT10 = 0x400,
+            BIT11 = 0x800,
+            BIT12 = 0x1000,
+            BIT13 = 0x2000,
+            BIT14 = 0x4000,
+            BIT15 = 0x8000,
+            BIT16 = 0x10000,
+            BIT17 = 0x20000,
+            BIT18 = 0x40000,
+            BIT19 = 0x80000,
+            BIT20 = 0x100000,
+            BIT21 = 0x200000,
+            BIT22 = 0x400000,
+            BIT23 = 0x800000,
+            BIT24 = 0x1000000,
+            BIT25 = 0x2000000,
+            BIT26 = 0x4000000,
+            BIT27 = 0x8000000,
+            BIT28 = 0x10000000,
+            BIT29 = 0x20000000,
+            BIT30 = 0x40000000,
+            BIT31 = 0x80000000
         }
     }
 }

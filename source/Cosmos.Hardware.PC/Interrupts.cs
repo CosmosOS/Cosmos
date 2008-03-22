@@ -103,6 +103,14 @@ namespace Cosmos.Hardware.PC {
             Bus.CPU.PIC.SignalPrimary();
         }
 
+        //IRQ 11 - (Added for RTL8139 network card)
+        static public InterruptDelegate IRQ11;
+        public static unsafe void HandleInterrupt_2B(InterruptContext* aContext)
+        {
+            if (IRQ11 != null)
+                IRQ11();
+        }
+
         //IRQ 14 - Primary IDE. If no Primary IDE this can be changed
         public static unsafe void HandleInterrupt_2E(InterruptContext* aContext) {
 			Cosmos.Hardware.DebugUtil.SendMessage("IRQ", "Primary IDE");
@@ -241,6 +249,7 @@ namespace Cosmos.Hardware.PC {
 					HandleInterrupt_12(null);
                     HandleInterrupt_20(null);
                     HandleInterrupt_21(null);
+                    HandleInterrupt_2B(null);
                     HandleInterrupt_2E(null);
                     HandleInterrupt_2F(null);
 					HandleInterrupt_35(null);
