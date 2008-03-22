@@ -51,17 +51,18 @@ namespace Cosmos.Kernel.FileSystems {
         {
             //DebugUtil.SendMessage("MBT", "Initializing");
             //DebugUtil.SendNumber("MBT", "DeviceCount", (uint)Device.Devices.Count, 32);
-            Device.Devices.ForEach(delegate(Device d) 
-            {
-                addDevice(d as BlockDevice);
-            });
+
+            List<Device> mbtPartitions = new List<Device>();
+            Device.Devices.ForEach(dev => mbtPartitions.AddRange(getPartitions(dev as BlockDevice)));
+            Device.Devices.AddRange(mbtPartitions);
         }
 
-        private static void addDevice(BlockDevice xBlockDev)
+        private static List<Device> getPartitions(BlockDevice xBlockDev)
         {
             if (xBlockDev == null)
-                return;
+                return default(List<Device>);
 
+            List<Device> partitionList = new List<Device>();
             int xContentsIndex = 0x1BE;
             //DebugUtil.SendMessage("MBT", "Found Device");
             byte[] xBlockContents = xBlockDev.ReadBlock(0);
@@ -73,7 +74,7 @@ namespace Cosmos.Kernel.FileSystems {
             {
                 //DebugUtil.SendMessage("MBT", "Does not contain MBR");
                 //Hardware.DebugUtil.SendATA_BlockReceived(255, 255, 0, xBlockContents);
-                return;
+                return default(List<Device>);
             }
 
             for (byte j = 0; j < 4; j++)
@@ -94,10 +95,12 @@ namespace Cosmos.Kernel.FileSystems {
                     //DebugUtil.SendDoubleNumber("MBT", "Entry Found. Start, Length in blocks", xStart, 32, xLength, 32);
                     xStart += 2;
                     Console.WriteLine("Add Partition to Device list");
-                    Device.Add(new MBTPartition(xBlockDev, xStart, xLength, "Partition"));
+                    partitionList.Add(new MBTPartition(xBlockDev, xStart, xLength, "Partition"));
                     //DebugUtil.SendMessage("MBT", "FoundPartition");
                 }
             }
+
+            return partitionList;
         }
 	}
 }
