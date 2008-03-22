@@ -97,9 +97,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Hardware.Network.Eth
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Ethernet", "Ethernet", "{A6D98BB2-23CA-4E4C-840F-0175F090323B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Hardware.Network.Ethernet", "Drivers\Ethernet\Cosmos.Hardware.Network.Ethernet\Cosmos.Hardware.Network.Ethernet.csproj", "{00494BF0-8629-4D18-993B-224441E460D1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Network", "Network", "{8C1DBD4B-01D9-4285-A958-C26BBF8FD4E0}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 39
+		SccNumberOfProjects = 40
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -255,6 +259,10 @@ Global
 		SccProjectTopLevelParentUniqueName38 = Cosmos.sln
 		SccProjectName38 = Drivers/Ethernet/Cosmos.Hardware.Network.Ethernet.RTL8139
 		SccLocalPath38 = Drivers\\Ethernet\\Cosmos.Hardware.Network.Ethernet.RTL8139
+		SccProjectUniqueName39 = Drivers\\Ethernet\\Cosmos.Hardware.Network.Ethernet\\Cosmos.Hardware.Network.Ethernet.csproj
+		SccProjectTopLevelParentUniqueName39 = Cosmos.sln
+		SccProjectName39 = Drivers/Ethernet/Cosmos.Hardware.Network.Ethernet
+		SccLocalPath39 = Drivers\\Ethernet\\Cosmos.Hardware.Network.Ethernet
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -406,6 +414,10 @@ Global
 		{289839F2-263E-4B79-B63B-8CB8BF0788E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{289839F2-263E-4B79-B63B-8CB8BF0788E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{289839F2-263E-4B79-B63B-8CB8BF0788E1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00494BF0-8629-4D18-993B-224441E460D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00494BF0-8629-4D18-993B-224441E460D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00494BF0-8629-4D18-993B-224441E460D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00494BF0-8629-4D18-993B-224441E460D1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -451,7 +463,9 @@ Global
 		{DA1DFD9E-B80C-4304-BCBA-B313255F6B01} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
 		{EF65AFB7-9DC9-4ACD-946D-7E973A67DBBE} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
 		{8F2D5231-CDE5-48FA-9D26-D4305B01FD3C} = {7EB6E2FF-74C8-4F59-9923-EB8EF1DE098E}
-		{A6D98BB2-23CA-4E4C-840F-0175F090323B} = {E3AA753A-2E91-4FE7-A9E2-8119984DEA68}
+		{8C1DBD4B-01D9-4285-A958-C26BBF8FD4E0} = {E3AA753A-2E91-4FE7-A9E2-8119984DEA68}
 		{289839F2-263E-4B79-B63B-8CB8BF0788E1} = {A6D98BB2-23CA-4E4C-840F-0175F090323B}
+		{00494BF0-8629-4D18-993B-224441E460D1} = {A6D98BB2-23CA-4E4C-840F-0175F090323B}
+		{A6D98BB2-23CA-4E4C-840F-0175F090323B} = {8C1DBD4B-01D9-4285-A958-C26BBF8FD4E0}
 	EndGlobalSection
 EndGlobal
