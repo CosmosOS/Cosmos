@@ -10,10 +10,8 @@ namespace JoelBTest
         #region Cosmos Builder logic
         // Most users wont touch this. This will call the Cosmos Build tool
         [STAThread]
-        static void Main(string[] args)
-        {
-            var xBuilder = new Builder();
-            xBuilder.Build();
+        static void Main(string[] args) {
+            BuildUI.Run();
         }
         #endregion
 

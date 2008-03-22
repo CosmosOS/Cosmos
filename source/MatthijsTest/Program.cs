@@ -9,9 +9,8 @@ namespace MatthijsTest {
 		// Most users wont touch this. This will call the Cosmos Build tool
 		[STAThread]
 		static void Main(string[] args) {
-			var xBuilder = new Builder();
-			xBuilder.Build();
-		}
+            BuildUI.Run();
+        }
 		#endregion
 
 		public static void Init() {

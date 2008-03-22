@@ -60,11 +60,17 @@
             </Paragraph>
             <Paragraph Name="paraUSBOptions">
                 <Bold>USB Options</Bold>
-                <LineBreak/>USB must be done manually. Please see the website. We are working on integrating it into this builder currently.
+                <LineBreak/>Please choose a USB drive or stick that is formatted as FAT or FAT32. Note that selecting this device will overwrite the Master Boot Record (MBR). Because of this take care to select the proper device. After a succesful build, you can then use this device to boot a physical machine. You may need to select the BIOS boot menu, use a multi boot utility, or change the BIOS boot sequence.
+                <LineBreak/>Only removable drives formatted as FAT or FAT32 will be listed. If you do not see your device, check its format.
+                <LineBreak/>USB Device:
+                <InlineUIContainer>
+                    <ComboBox Name="cmboUSBDevice">
+                    </ComboBox>
+                </InlineUIContainer>
             </Paragraph>
             <Paragraph>
-            <InlineUIContainer><CheckBox Name="buildCheckBox" IsChecked="True"/></InlineUIContainer>
-            Skip IL compilation.
+            <InlineUIContainer><CheckBox Name="buildCheckBox"/></InlineUIContainer>
+            Skip IL compilation. Do not check this unless you understand the impact.
         </Paragraph>
         <Paragraph TextAlignment="Right">
             <InlineUIContainer>

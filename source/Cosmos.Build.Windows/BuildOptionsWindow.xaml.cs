@@ -12,14 +12,18 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 namespace Cosmos.Build.Windows {
-    public partial class BuildOptionsWindow : Window, IBuildConfiguration {
+    public partial class BuildOptionsWindow : Window {
 
         protected Block mOptionsBlockPrefix;
-        protected Builder mBuilder;
+        protected Builder mBuilder = new Builder();
 
-        public BuildOptionsWindow(Builder aBuilder) {
+        public static void Display() {
+            var xWindow = new BuildOptionsWindow();
+            xWindow.ShowDialog();
+        }
+
+        public BuildOptionsWindow() {
             InitializeComponent();
-            mBuilder = aBuilder;
 
             Loaded += delegate(object sender, RoutedEventArgs e) {
                 this.Activate();
@@ -51,6 +55,16 @@ namespace Cosmos.Build.Windows {
             RootDoc.Blocks.Remove(paraISOOptions);
             RootDoc.Blocks.Remove(paraPXEOptions);
             RootDoc.Blocks.Remove(paraUSBOptions);
+
+            var xDrives = System.IO.Directory.GetLogicalDrives();
+            foreach (string xDrive in xDrives) {
+                var xType = new System.IO.DriveInfo(xDrive);
+                if (xType.IsReady) {
+                    if ((xType.DriveType == System.IO.DriveType.Removable) && xType.DriveFormat.StartsWith("FAT")) {
+                        cmboUSBDevice.Items.Add(xDrive);
+                    }
+                }
+            }
 
             LoadSettingsFromRegistry();
         }
@@ -98,33 +112,28 @@ namespace Cosmos.Build.Windows {
         }
 
         void butnBuild_Click(object sender, RoutedEventArgs e) {
-			mTarget = Builder.Target.QEMU;
-			if (rdioQEMU.IsChecked.Value) {
-                if (chckQEMUUseGDB.IsChecked.Value) {
-                    if (chckQEMUUseHD.IsChecked.Value) {
-                        mTarget = Builder.Target.QEMU_GDB_HardDisk;
-                    } else {
-                        mTarget = Builder.Target.QEMU_GDB;
-                    }
-                } else {
-                    if (chckQEMUUseHD.IsChecked.Value) {
-                        mTarget = Builder.Target.QEMU_HardDisk;
-                    }
-                }
-            } else if (rdioVMWare.IsChecked.Value) {
-                mTarget = Builder.Target.VMWare;
-            } else if (rdioVPC.IsChecked.Value) {
-                mTarget = Builder.Target.VPC;
-            } else if (rdioISO.IsChecked.Value) {
-                mTarget = Builder.Target.ISO;
-            } else if (rdioPXE.IsChecked.Value) {
-                mTarget = Builder.Target.PXE;
-            } else if (rdioUSB.IsChecked.Value) {
-                mTarget = Builder.Target.USB;
+            SaveSettingsToRegistry();
+
+            if (!buildCheckBox.IsChecked.Value) {
+                Console.WriteLine("Compiling...");
+                mBuilder.Compile();
             }
 
-            SaveSettingsToRegistry();
-            DialogResult = true;
+            if (rdioQEMU.IsChecked.Value) {
+                mBuilder.MakeQEMU(chckQEMUUseHD.IsChecked.Value, chckQEMUUseGDB.IsChecked.Value);
+            } else if (rdioVMWare.IsChecked.Value) {
+                mBuilder.MakeVMWare();
+            } else if (rdioVPC.IsChecked.Value) {
+                mBuilder.MakeVPC();
+            } else if (rdioISO.IsChecked.Value) {
+                mBuilder.MakeISO();
+            } else if (rdioPXE.IsChecked.Value) {
+                mBuilder.MakePXE();
+            } else if (rdioUSB.IsChecked.Value) {
+                mBuilder.MakeUSB(cmboUSBDevice.Text[0]);
+            }
+            Console.WriteLine("Press enter to continue.");
+            Console.ReadLine();
         }
 
         void butnCancel_Click(object sender, RoutedEventArgs e) {
@@ -132,7 +141,6 @@ namespace Cosmos.Build.Windows {
         }
 
         void SaveSettingsToRegistry() {
-            //TODO: This can be changed to enum.tostring
             string xValue = "QEMU";
             if (rdioVMWare.IsChecked.Value) {
                 xValue = "VMWare";
@@ -145,15 +153,18 @@ namespace Cosmos.Build.Windows {
             } else if (rdioUSB.IsChecked.Value) {
                 xValue = "USB";
             }
-            BuildRegistry.Write("BuildType", xValue);
+            BuildRegistry.Write("Build Type", xValue);
             
-            BuildRegistry.Write("UseGDB", chckQEMUUseGDB.IsChecked.Value.ToString());
-            BuildRegistry.Write("CreateHDImage", chckQEMUUseHD.IsChecked.Value.ToString());
-            BuildRegistry.Write("SkipIL", buildCheckBox.IsChecked.Value.ToString());
+            BuildRegistry.Write("Use GDB", chckQEMUUseGDB.IsChecked.Value.ToString());
+            BuildRegistry.Write("Create HD Image", chckQEMUUseHD.IsChecked.Value.ToString());
+            BuildRegistry.Write("Skip IL", buildCheckBox.IsChecked.Value.ToString());
+            if (cmboUSBDevice.SelectedItem != null) {
+                BuildRegistry.Write("USB Device", cmboUSBDevice.Text);
+            }
         }
 
         void LoadSettingsFromRegistry() {
-            string xBuildType = BuildRegistry.Read("BuildType");
+            string xBuildType = BuildRegistry.Read("Build Type");
             switch (xBuildType) {
                 case "QEMU":
                     rdioQEMU.IsChecked = true;
@@ -176,38 +187,20 @@ namespace Cosmos.Build.Windows {
             }
 
             bool useGDB;
-            bool.TryParse(BuildRegistry.Read("UseGDB"), out useGDB);
+            bool.TryParse(BuildRegistry.Read("Use GDB"), out useGDB);
             chckQEMUUseGDB.IsChecked = useGDB;
 
             bool createHDimg;
-            bool.TryParse(BuildRegistry.Read("CreateHDImage"), out createHDimg);
+            bool.TryParse(BuildRegistry.Read("Create HD Image"), out createHDimg);
             chckQEMUUseHD.IsChecked = createHDimg;
 
             bool skipIL;
-            bool.TryParse(BuildRegistry.Read("SkipIL"), out skipIL);
+            bool.TryParse(BuildRegistry.Read("Skip IL"), out skipIL);
             buildCheckBox.IsChecked = skipIL;
+
+            string xUSBDevice = BuildRegistry.Read("USB Device");
+            cmboUSBDevice.SelectedIndex = cmboUSBDevice.Items.IndexOf(xUSBDevice);
         }
 
-        #region IBuildConfiguration Members
-
-        private Builder.Target mTarget;
-        public Builder.Target Target {
-            get {
-                return mTarget;
-            }
-            set {
-            }
-        }
-
-        public bool Compile {
-            get {
-                return !buildCheckBox.IsChecked.Value;
-            }
-            set {
-                buildCheckBox.IsChecked = value;
-            }
-        }
-
-        #endregion
     }
 }

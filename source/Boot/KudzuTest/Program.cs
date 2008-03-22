@@ -7,9 +7,8 @@ namespace KudzuTest {
 		// Most users wont touch this. This will call the Cosmos Build tool
 		[STAThread]
 		static void Main(string[] args) {
-			var xBuilder = new Builder();
-			xBuilder.Build();
-		}
+            BuildUI.Run();
+        }
 		#endregion
 
         static protected string StringTest() {

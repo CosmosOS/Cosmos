@@ -13,28 +13,10 @@ namespace Cosmos.Build.Windows {
 	public class Builder {
 		public readonly string BuildPath;
 		public readonly string ToolsPath;
-		public readonly string ISOPath;
-        public readonly string PXEPath;
-        public readonly string USBPath;
-        public readonly string AsmPath;
-		public readonly string VMWarePath;
-		public readonly string VPCPath;
-		protected IBuildConfiguration mConfig;
 
 		public Builder() {
 			BuildPath = GetBuildPath();
 			ToolsPath = BuildPath + @"Tools\";
-			ISOPath = BuildPath + @"ISO\";
-            PXEPath = BuildPath + @"PXE\";
-            PXEPath = BuildPath + @"USB\";
-            AsmPath = ToolsPath + @"asm\";
-			VMWarePath = BuildPath + @"VMWare\";
-			VPCPath = BuildPath + @"VPC\";
-		}
-
-		public Builder(IBuildConfiguration aConfig)
-			: this() {
-			mConfig = aConfig;
 		}
 
 		protected static string GetBuildPath() {
@@ -52,7 +34,7 @@ namespace Cosmos.Build.Windows {
 				}
                 
                 if (String.IsNullOrEmpty(xResult)) {
-					throw new Exception("Cannot find Cosmos build path in registry");
+					throw new Exception("Cannot find Cosmos build path in registry.");
 				}
 				if (!xResult.EndsWith(@"\")) {
 					xResult = xResult + @"\";
@@ -65,6 +47,7 @@ namespace Cosmos.Build.Windows {
 
 		protected void RemoveFile(string aPathname) {
 			if (File.Exists(aPathname)) {
+                RemoveReadOnly(aPathname);
 				File.Delete(aPathname);
 			}
 		}
@@ -85,32 +68,34 @@ namespace Cosmos.Build.Windows {
 			}
 		}
 
-		protected void MakeISO() {
-			RemoveFile(BuildPath + "cosmos.iso");
-			RemoveFile(ISOPath + "output.bin");
-			CopyFile(BuildPath + "output.bin", ISOPath + "output.bin");
+		public void MakeISO() {
+            string xPath = BuildPath + @"ISO\";
+            RemoveFile(BuildPath + "cosmos.iso");
+			RemoveFile(xPath + "output.bin");
+			CopyFile(BuildPath + "output.bin", xPath + "output.bin");
 			// From TFS its read only, mkisofs doesnt like that
-			RemoveReadOnly(ISOPath + "isolinux.bin");
-			Global.Call(ToolsPath + @"mkisofs.exe", @"-R -b isolinux.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o ..\Cosmos.iso .", ISOPath);
+			RemoveReadOnly(xPath + "isolinux.bin");
+			Global.Call(ToolsPath + @"mkisofs.exe", @"-R -b isolinux.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o ..\Cosmos.iso .", xPath);
 		}
 
 		public void Compile() {
-			if (!Directory.Exists(AsmPath)) {
-				Directory.CreateDirectory(AsmPath);
+            string xAsmPath = ToolsPath + @"asm\";
+            if (!Directory.Exists(xAsmPath)) {
+				Directory.CreateDirectory(xAsmPath);
 			}
 			Assembly xTarget = System.Reflection.Assembly.GetEntryAssembly();
 			Stopwatch xSW = new Stopwatch();
 			xSW.Start();
 			IL2CPU.Program.Main(new string[] {@"-in:" + xTarget.Location
                 , "-plug:" + ToolsPath + @"Cosmos.Kernel.Plugs\Cosmos.Kernel.Plugs.dll"
-                , "-platform:nativex86", "-asm:" + AsmPath,
+                , "-platform:nativex86", "-asm:" + xAsmPath,
 				"-debug:d:\\debug.xml"}
 				);
 			xSW.Stop();
 			Console.WriteLine("IL2CPU Run took " + xSW.Elapsed.ToString());
 
 			RemoveFile(BuildPath + "output.obj");
-			Global.Call(ToolsPath + @"nasm\nasm.exe", String.Format("-g -f elf -F stabs -o \"{0}\" \"{1}\"", BuildPath + "output.obj", AsmPath + "main.asm"), BuildPath);
+			Global.Call(ToolsPath + @"nasm\nasm.exe", String.Format("-g -f elf -F stabs -o \"{0}\" \"{1}\"", BuildPath + "output.obj", xAsmPath + "main.asm"), BuildPath);
 
 			RemoveFile(BuildPath + "output.bin");
 			Global.Call(ToolsPath + @"cygwin\ld.exe", String.Format("-Ttext 0x500000 -Tdata 0x200000 -e Kernel_Start -o \"{0}\" \"{1}\"", "output.bin", "output.obj"), BuildPath);
@@ -120,128 +105,67 @@ namespace Cosmos.Build.Windows {
 		public void BuildKernel() {
 		}
 
-		public enum Target {
-			ISO,
-			PXE,
-            USB,
-			QEMU,
-			QEMU_HardDisk,
-			QEMU_GDB,
-			QEMU_GDB_HardDisk,
-			VMWare,
-			VPC
-		};
+        public void MakeVPC() {
+            MakeISO();
+            string xPath = BuildPath + @"VPC\";
+            RemoveReadOnly(xPath + "Cosmos.vmc");
+            RemoveReadOnly(xPath + "hda.vhd");
+            Process.Start(xPath + "Cosmos.vmc");
+        }
 
-		public void Build() {
-			if (mConfig == null) {
-				BuildOptionsWindow xOptions = new BuildOptionsWindow(this);
-                if ((bool)!xOptions.ShowDialog()) {
-                    return; //Cancel
-                }
-				
-                mConfig = xOptions;
-			}
+        public void MakeVMWare() {
+            MakeISO();
+            string xPath = BuildPath + @"VMWare\";
+            RemoveReadOnly(xPath + "Cosmos.nvram");
+            RemoveReadOnly(xPath + "Cosmos.vmsd");
+            RemoveReadOnly(xPath + "Cosmos.vmx");
+            RemoveReadOnly(xPath + "Cosmos.vmxf");
+            RemoveReadOnly(xPath + "hda.vmdk");
+            Process.Start(xPath + "Cosmos.vmx");
+        }
 
-			if (mConfig.Compile) {
-				Console.WriteLine("Now compiling");
-				Compile();
-			}
+        public void MakeQEMU(bool aUseHDImage, bool aGDB) {
+            MakeISO();
+            RemoveFile(BuildPath + "serial-debug.txt");
+            Global.Call(ToolsPath + @"qemu\qemu.exe"
+                , (aUseHDImage ? "-hda \"" + BuildPath + "hda.img\" " : "")
+                + "-L . -cdrom \"" + BuildPath + "Cosmos.iso\" -boot d -serial"
+                + " \"file:" + BuildPath + "serial-debug.txt\""
+                + (aGDB ? "-S -s" : "-kernel-kqemu")
+                + " -net nic,model=rtl8139"
+                , ToolsPath + @"qemu\"
+                , false, true);
 
-			switch (mConfig.Target) {
-				case Target.ISO:
-					MakeISO();
-					break;
-
-                case Target.PXE:
-                    RemoveFile(PXEPath + @"Boot\output.bin");
-                    File.Move(BuildPath + "output.bin", PXEPath + @"Boot\output.bin");
-                    // *Must* set working dir so tftpd32 will set itself to proper dir
-                    Global.Call(PXEPath + "tftpd32.exe", "", PXEPath, false, true);
-                    break;
-
-                case Target.USB:
-                    RemoveFile(USBPath + @"output.bin");
-                    File.Move(BuildPath + @"output.bin", USBPath + @"output.bin");
-                    // Copy to USB device
-                    string xUSBLetter = "I";
-                    File.Copy(USBPath + @"output.bin", xUSBLetter + @":\");
-                    File.Copy(USBPath + @"mboot.c32", xUSBLetter + @":\");
-                    File.Copy(USBPath + @"syslinux.cfg", xUSBLetter + @":\");
-                    // Set MBR
-                    Global.Call(ToolsPath + "syslinux.exe", "-fma " + xUSBLetter + ":", ToolsPath, true, true);
-                    break;
-
-                case Target.QEMU:
-					MakeISO();
-					RemoveFile(BuildPath + "serial-debug.txt");
-					Global.Call(ToolsPath + @"qemu\qemu.exe"
-						, "-L . -cdrom \"" + BuildPath + "Cosmos.iso\" -boot d -serial"
-						+ " \"file:" + BuildPath + "serial-debug.txt" + "\" -kernel-kqemu"
-						+ " -net nic,model=rtl8139"
-						, ToolsPath + @"qemu\"
-						, false, true);
-					break;
-
-				case Target.QEMU_HardDisk:
-					MakeISO();
-					RemoveFile(BuildPath + "serial-debug.txt");
-					Global.Call(ToolsPath + @"qemu\qemu.exe"
-											, "-hda \"" + BuildPath + "hda.img\" -L . -cdrom \"" + BuildPath + "Cosmos.iso\" -boot d -serial \"file:" + BuildPath + "serial-debug.txt" + "\" -kernel-kqemu"
-											+ " -net nic,model=rtl8139"
-											, ToolsPath + @"qemu\"
-											, false, true);
-					break;
-
-				case Target.QEMU_GDB:
-					MakeISO();
-					RemoveFile(BuildPath + "serial-debug.txt");
-					Global.Call(ToolsPath + @"qemu\qemu.exe"
-						, "-L . -cdrom \"" + BuildPath + "Cosmos.iso\" -boot d -serial \"file:" + BuildPath + "serial-debug.txt" + "\" -S -s"
-						+ " -net nic,model=rtl8139"
-						, ToolsPath + @"qemu\"
-						, false, true);
-					//TODO: If the host is really busy, sometimes GDB can run before QEMU finishes loading.
-					//in this case, GDB says "program not running". Not sure how to fix this properly.
-					Global.Call(ToolsPath + "gdb.exe"
-						, BuildPath + @"output.bin" + " --eval-command=\"target remote:1234\" --eval-command=\"b _CODE_REQUESTED_BREAK_\" --eval-command=\"c\""
-						, ToolsPath + @"qemu\", false, true);
-					break;
-
-				case Target.QEMU_GDB_HardDisk:
-					MakeISO();
-					RemoveFile(BuildPath + "serial-debug.txt");
-					Global.Call(ToolsPath + @"qemu\qemu.exe"
-						 , "-hda \"" + BuildPath + "hda.img\" -L . -cdrom \"" + BuildPath + "Cosmos.iso\" -boot d -serial \"file:" + BuildPath + "serial-debug.txt" + "\" -S -s"
-						 + " -net nic,model=rtl8139"
-						 , ToolsPath + @"qemu\"
-						 , false, true);
+            if (aGDB) {
 					//TODO: If the host is really busy, sometimes GDB can run before QEMU finishes loading.
 					//in this case, GDB says "program not running". Not sure how to fix this properly.
 					Global.Call(ToolsPath + "gdb.exe"
 						, BuildPath + @"output.bin" + " --eval-command=\"target remote:1234\" --eval-command=\"b _CODE_REQUESTED_BREAK_\" --eval-command=\"c\""
                         , ToolsPath + @"qemu\", false, true);
-					break;
+            }
+        }
 
-				case Target.VMWare:
-					MakeISO();
-					RemoveReadOnly(VMWarePath + "Cosmos.nvram");
-					RemoveReadOnly(VMWarePath + "Cosmos.vmsd");
-					RemoveReadOnly(VMWarePath + "Cosmos.vmx");
-					RemoveReadOnly(VMWarePath + "Cosmos.vmxf");
-					RemoveReadOnly(VMWarePath + "hda.vmdk");
-					Process.Start(VMWarePath + "Cosmos.vmx");
-					break;
+        public void MakeUSB(char aDrive) {
+            string xPath = BuildPath + @"USB\";
+            RemoveFile(xPath + @"output.bin");
+            File.Move(BuildPath + @"output.bin", xPath + @"output.bin");
+            // Copy to USB device
+            RemoveFile(aDrive + @":\output.bin");
+            File.Copy(xPath + @"output.bin", aDrive + @":\output.bin");
+            RemoveFile(aDrive + @":\mboot.c32");
+            File.Copy(xPath + @"mboot.c32", aDrive + @":\mboot.c32");
+            RemoveFile(aDrive + @":\syslinux.cfg");
+            File.Copy(xPath + @"syslinux.cfg", aDrive + @":\syslinux.cfg");
+            // Set MBR
+            Global.Call(ToolsPath + "syslinux.exe", "-fma " + aDrive + ":", ToolsPath, true, true);
+        }
 
-				case Target.VPC:
-					MakeISO();
-					RemoveReadOnly(VPCPath + "Cosmos.vmc");
-					RemoveReadOnly(VPCPath + "hda.vhd");
-					Process.Start(VPCPath + "Cosmos.vmc");
-					break;
-
-			}
-			Console.WriteLine("Press enter to continue.");
-			Console.ReadLine();
-		}
+        public void MakePXE() {
+            string xPath = BuildPath + @"PXE\";
+            RemoveFile(xPath + @"Boot\output.bin");
+            File.Move(BuildPath + "output.bin", xPath + @"Boot\output.bin");
+            // *Must* set working dir so tftpd32 will set itself to proper dir
+            Global.Call(xPath + "tftpd32.exe", "", xPath, false, true);
+        }
 	}
 }
