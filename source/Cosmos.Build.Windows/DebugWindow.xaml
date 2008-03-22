@@ -1,8 +1,8 @@
 ﻿<Window x:Class="Cosmos.Build.Windows.DebugWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Title="DebugWindow" Height="300" Width="300">
+    Title="Cosmos Debuggger" Height="300" Width="300" Icon="/Cosmos.Build.Windows;component/Cosmos.ico">
     <Grid>
-        
+        <TextBlock Height="79" Name="textBlock1" VerticalAlignment="Top" TextWrapping="WrapWithOverflow">This is the debug window. Coming soon! For now, leave me open until you are done. Close and the application will terminate.</TextBlock>
     </Grid>
 </Window>

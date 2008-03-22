@@ -27,10 +27,24 @@ namespace Cosmos.Build.Windows {
             int xConsoleWindow = GetConsoleWindow();
             ShowWindow(xConsoleWindow, 0);
 
-            var xWindow = new OptionsWindow();
-            if (xWindow.ShowDialog().Value) {
+            var xOptionsWindow = new OptionsWindow();
+            if (xOptionsWindow.ShowDialog().Value) {
                 ShowWindow(xConsoleWindow, 1);
-                xWindow.DoBuild();
+                // Build Window is a hack to catch console out. We need
+                // to change the build process to use proper event notifications
+                // rather than just string output, and console at that.
+                //
+                // Doesnt currently work because we block the main thread
+                // Need to change to be threaded, or use code from XAMLPoint
+                //var xBuildWindow = new BuildWindow();
+                //xBuildWindow.Show();
+
+                xOptionsWindow.DoBuild();
+
+                var xDebugWindow = new DebugWindow();
+                xDebugWindow.ShowDialog();
+                //Console.WriteLine("Press enter to continue.");
+                //Console.ReadLine();
             }
         }
 
@@ -148,8 +162,6 @@ namespace Cosmos.Build.Windows {
             } else if (rdioUSB.IsChecked.Value) {
                 mBuilder.MakeUSB(cmboUSBDevice.Text[0]);
             }
-            Console.WriteLine("Press enter to continue.");
-            Console.ReadLine();
         }
 
         void butnCancel_Click(object sender, RoutedEventArgs e) {

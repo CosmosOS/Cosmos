@@ -1,7 +1,7 @@
 ﻿<Window x:Class="Cosmos.Build.Windows.OptionsWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Title="BuildOptionsWindow" WindowStartupLocation="CenterScreen" Width="600" Icon="/Cosmos.Build.Windows;component/Cosmos.ico">
+    Title="Build Options" WindowStartupLocation="CenterScreen" Width="600" Icon="/Cosmos.Build.Windows;component/Cosmos.ico">
     <FlowDocumentScrollViewer>
     <FlowDocument Name="RootDoc">
         <BlockUIContainer>
