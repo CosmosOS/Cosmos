@@ -12,6 +12,7 @@ using Indy.IL2CPU.IL;
 using Indy.IL2CPU.Plugs;
 using System.Runtime.InteropServices;
 using System.Xml.Serialization;
+using System.Collections.ObjectModel;
 
 namespace Indy.IL2CPU {
 	public class MethodBaseComparer: IComparer<MethodBase> {
@@ -92,9 +93,19 @@ namespace Indy.IL2CPU {
 		/// </summary>
 		protected SortedList<FieldInfo, bool> mStaticFields = new SortedList<FieldInfo, bool>(new FieldInfoComparer());
 
-		protected List<Type> mTypes = new List<Type>();
+		protected IList<Type> mTypes;
 		protected TypeEqualityComparer mTypesEqualityComparer = new TypeEqualityComparer();
 		private DebugSymbols mDebugSymbols;
+
+		public Engine() {
+			ObservableCollection<Type> xTest = new ObservableCollection<Type>();
+			xTest.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(xTest_CollectionChanged);
+			mTypes = xTest;
+		}
+
+		void xTest_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
+			Console.Write("");
+		}
 
 		/// <summary>
 		/// Compiles an assembly to CPU-specific code. The entrypoint of the assembly will be 
@@ -262,13 +273,13 @@ namespace Indy.IL2CPU {
 						}
 						mMap.PostProcess(mAssembler);
 						ProcessAllStaticFields();
-						//if (mDebugSymbols != null) {
-						//    GenerateDebugSymbols();
-						//}
-						//XmlSerializer xSerializer = new XmlSerializer(typeof(DebugSymbols));
-						//using (FileStream xFS = new FileStream(aDebugSymbols, FileMode.Create)) {
-						//    xSerializer.Serialize(xFS, mDebugSymbols);
-						//}
+						if (mDebugSymbols != null) {
+							GenerateDebugSymbols();
+						}
+						XmlSerializer xSerializer = new XmlSerializer(typeof(DebugSymbols));
+						using (FileStream xFS = new FileStream(aDebugSymbols, FileMode.Create)) {
+							xSerializer.Serialize(xFS, mDebugSymbols);
+						}
 					} finally {
 						mAssembler.Flush();
 						IL.Op.QueueMethod -= QueueMethod;
@@ -284,109 +295,117 @@ namespace Indy.IL2CPU {
 			var xAssemblyComparer = new AssemblyEqualityComparer();
 			var xTypeComparer = new TypeEqualityComparer();
 			var xDbgAssemblies = new List<DebugSymbolsAssembly>();
-			foreach (var xAssembly in (from item in mTypes
-									   select item.Assembly).Distinct(xAssemblyComparer)) {
-				var xDbgAssembly = new DebugSymbolsAssembly();
-				var xDbgAssemblyTypes = new List<DebugSymbolsAssemblyType>();
-				xDbgAssembly.FileName = xAssembly.Location;
-				xDbgAssembly.FullName = xAssembly.GetName().FullName;
-				for (int xIdxTypes = 0; xIdxTypes < mTypes.Count; xIdxTypes++) {
-					var xType = mTypes[xIdxTypes];
-					if (!xAssemblyComparer.Equals(xAssembly, xType.Assembly)) {
-						continue;
-					}
-					var xDbgType = new DebugSymbolsAssemblyType();
-					if (xType.BaseType != null) {
-						xDbgType.BaseTypeId = (uint)RegisterType(xType.BaseType);
-					}
-					xDbgType.TypeId = (uint)xIdxTypes;
-					xDbgType.FullName = xType.FullName;
-					var xTypeFields = new List<DebugSymbolsAssemblyTypeField>();
-					int xObjStorage;
-					var xTypeInfo = GetTypeInfo(xType);
-					foreach (var xField in xType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static)) {
-						var xDbgField = new DebugSymbolsAssemblyTypeField();
-						xDbgField.Name = xField.Name;
-						xDbgField.IsStatic = xField.IsStatic;
-						if (xField.IsPublic) {
-							xDbgField.Visibility = "Public";
-						} else {
-							if (xField.IsPrivate) {
-								xDbgField.Visibility = "Private";
-							} else {
-								if (xField.IsFamily) {
-									xDbgField.Visibility = "Protected";
-								} else {
-									xDbgField.Visibility = "Internal";
-								}
-							}
-						}
-						xDbgField.FieldType = (uint)RegisterType(xField.FieldType);
-						if (xDbgField.IsStatic) {
-							xDbgField.Address = DataMember.GetStaticFieldName(xField);
-						} else {
-							xDbgField.Address = "+" + xTypeInfo.Fields[xField.GetFullName()].Offset;
-						}
-						xTypeFields.Add(xDbgField);
-					}
-					xDbgType.Field = xTypeFields.ToArray();
-					var xTypeMethods = new List<DebugSymbolsAssemblyTypeMethod>();
-					for (int xIdxMethods = 0; xIdxMethods < mMethods.Count; xIdxMethods++) {
-						var xMethod = mMethods.Keys[xIdxMethods];
-						if (!xTypeComparer.Equals(xMethod.DeclaringType, xType)) {
+			int xTypeCount = mTypes.Count;
+			try {
+				foreach (var xAssembly in (from item in mTypes
+										   select item.Assembly).Distinct(xAssemblyComparer)) {
+					var xDbgAssembly = new DebugSymbolsAssembly();
+					var xDbgAssemblyTypes = new List<DebugSymbolsAssemblyType>();
+					xDbgAssembly.FileName = xAssembly.Location;
+					xDbgAssembly.FullName = xAssembly.GetName().FullName;
+					for (int xIdxTypes = 0; xIdxTypes < mTypes.Count; xIdxTypes++) {
+						var xType = mTypes[xIdxTypes];
+						if (!xAssemblyComparer.Equals(xAssembly, xType.Assembly)) {
 							continue;
 						}
-						var xDbgMethod = new DebugSymbolsAssemblyTypeMethod();
-						xDbgMethod.Name = xMethod.Name;
-						xDbgMethod.MethodId = (uint)xIdxMethods;
-						xDbgMethod.Address = Label.GenerateLabelName(xMethod);
-						if (xMethod is ConstructorInfo) {
-							xDbgMethod.ReturnTypeId = (uint)RegisterType(typeof(void));
-						} else {
-							var xTheMethod = xMethod as MethodInfo;
-							if (xTheMethod != null) {
-								xDbgMethod.ReturnTypeId = (uint)RegisterType(xTheMethod.ReturnType);
-							} else {
-								xDbgMethod.ReturnTypeId = (uint)RegisterType(typeof(void));
-							}
+						var xDbgType = new DebugSymbolsAssemblyType();
+						if (xType.BaseType != null) {
+							xDbgType.BaseTypeId = (uint)RegisterType(xType.BaseType);
 						}
-						if (xMethod.IsPublic) {
-							xDbgMethod.Visibility = "Public";
-						} else {
-							if (xMethod.IsPrivate) {
-								xDbgMethod.Visibility = "Private";
+						xDbgType.TypeId = (uint)xIdxTypes;
+						xDbgType.FullName = xType.FullName;
+						var xTypeFields = new List<DebugSymbolsAssemblyTypeField>();
+						int xObjStorage;
+						var xTypeInfo = GetTypeInfo(xType);
+						foreach (var xField in xType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static)) {
+							var xDbgField = new DebugSymbolsAssemblyTypeField();
+							xDbgField.Name = xField.Name;
+							xDbgField.IsStatic = xField.IsStatic;
+							if (xField.IsPublic) {
+								xDbgField.Visibility = "Public";
 							} else {
-								if (xMethod.IsFamily) {
-									xDbgMethod.Visibility = "Protected";
+								if (xField.IsPrivate) {
+									xDbgField.Visibility = "Private";
 								} else {
-									xDbgMethod.Visibility = "Internal";
+									if (xField.IsFamily) {
+										xDbgField.Visibility = "Protected";
+									} else {
+										xDbgField.Visibility = "Internal";
+									}
 								}
 							}
-							xTypeMethods.Add(xDbgMethod);
+							xDbgField.FieldType = (uint)RegisterType(xField.FieldType);
+							if (xDbgField.IsStatic) {
+								xDbgField.Address = DataMember.GetStaticFieldName(xField);
+							} else {
+								xDbgField.Address = "+" + xTypeInfo.Fields[xField.GetFullName()].Offset;
+							}
+							xTypeFields.Add(xDbgField);
 						}
-						MethodBody xBody = xMethod.GetMethodBody();
-						if (xBody != null) {
-							var xDbgLocals = new List<DebugSymbolsAssemblyTypeMethodLocal>();
-							var xMethodInfo = GetMethodInfo(xMethod, xMethod, Label.GenerateLabelName(xMethod), xTypeInfo);
-							if (xBody.LocalVariables != null) {
-								foreach (var xLocal in xBody.LocalVariables) {
-									var xDbgLocal = new DebugSymbolsAssemblyTypeMethodLocal();
-									xDbgLocal.Name = xLocal.LocalIndex.ToString();
-									xDbgLocal.LocalTypeId = (uint)RegisterType(xLocal.LocalType);
-									xDbgLocal.RelativeStartAddress = xMethodInfo.Locals[xLocal.LocalIndex].VirtualAddresses.First();
-									xDbgLocals.Add(xDbgLocal);
+						xDbgType.Field = xTypeFields.ToArray();
+						var xTypeMethods = new List<DebugSymbolsAssemblyTypeMethod>();
+						for (int xIdxMethods = 0; xIdxMethods < mMethods.Count; xIdxMethods++) {
+							var xMethod = mMethods.Keys[xIdxMethods];
+							if (!xTypeComparer.Equals(xMethod.DeclaringType, xType)) {
+								continue;
+							}
+							var xDbgMethod = new DebugSymbolsAssemblyTypeMethod();
+							xDbgMethod.Name = xMethod.Name;
+							xDbgMethod.MethodId = (uint)xIdxMethods;
+							xDbgMethod.Address = Label.GenerateLabelName(xMethod);
+							if (xMethod is ConstructorInfo) {
+								xDbgMethod.ReturnTypeId = (uint)RegisterType(typeof(void));
+							} else {
+								var xTheMethod = xMethod as MethodInfo;
+								if (xTheMethod != null) {
+									xDbgMethod.ReturnTypeId = (uint)RegisterType(xTheMethod.ReturnType);
+								} else {
+									xDbgMethod.ReturnTypeId = (uint)RegisterType(typeof(void));
 								}
 							}
-							xDbgMethod.Local = xDbgLocals.ToArray();
+							if (xMethod.IsPublic) {
+								xDbgMethod.Visibility = "Public";
+							} else {
+								if (xMethod.IsPrivate) {
+									xDbgMethod.Visibility = "Private";
+								} else {
+									if (xMethod.IsFamily) {
+										xDbgMethod.Visibility = "Protected";
+									} else {
+										xDbgMethod.Visibility = "Internal";
+									}
+								}
+								xTypeMethods.Add(xDbgMethod);
+							}
+							MethodBody xBody = xMethod.GetMethodBody();
+							if (xBody != null) {
+								var xDbgLocals = new List<DebugSymbolsAssemblyTypeMethodLocal>();
+								var xMethodInfo = GetMethodInfo(xMethod, xMethod, Label.GenerateLabelName(xMethod), xTypeInfo);
+								if (xBody.LocalVariables != null) {
+									foreach (var xLocal in xBody.LocalVariables) {
+										var xDbgLocal = new DebugSymbolsAssemblyTypeMethodLocal();
+										xDbgLocal.Name = xLocal.LocalIndex.ToString();
+										xDbgLocal.LocalTypeId = (uint)RegisterType(xLocal.LocalType);
+										xDbgLocal.RelativeStartAddress = xMethodInfo.Locals[xLocal.LocalIndex].VirtualAddresses.First();
+										xDbgLocals.Add(xDbgLocal);
+									}
+								}
+								xDbgMethod.Local = xDbgLocals.ToArray();
+							}
 						}
+						xDbgType.Method = xTypeMethods.ToArray();
+						xDbgAssemblyTypes.Add(xDbgType);
 					}
-					xDbgType.Method = xTypeMethods.ToArray();
-					xDbgAssemblyTypes.Add(xDbgType);
+					xDbgAssembly.Type = xDbgAssemblyTypes.ToArray();
+					xDbgAssemblies.Add(xDbgAssembly);
 				}
-				xDbgAssembly.Type = xDbgAssemblyTypes.ToArray();
-				xDbgAssemblies.Add(xDbgAssembly);
+				mDebugSymbols.Assembly = xDbgAssemblies.ToArray();
+			} finally {
+				if (xTypeCount != mTypes.Count) {
+					Console.WriteLine("TypeCount changed (was {0}, new {1})", xTypeCount, mTypes.Count);
+					Console.WriteLine("Last Type: {0}", mTypes.Last().FullName);
+				}
 			}
-			mDebugSymbols.Assembly = xDbgAssemblies.ToArray();
 		}
 
 		private void GenerateVMT() {

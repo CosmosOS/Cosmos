@@ -14,7 +14,7 @@ namespace Indy.IL2CPU.IL {
 			: base(aReader, aMethodInfo) {
 		}
 
-		private List<Type> mTypes;
+		private IList<Type> mTypes;
 		public MethodBase LoadTypeTableRef;
 		public MethodBase SetTypeInfoRef;				   
 		public MethodBase SetMethodInfoRef;
@@ -24,7 +24,7 @@ namespace Indy.IL2CPU.IL {
 		public IList<MethodBase> Methods;
 		public event GetMethodIdentifierEventHandler GetMethodIdentifier;
 
-		public List<Type> Types {
+		public IList<Type> Types {
 			get {
 				return mTypes;
 			}
