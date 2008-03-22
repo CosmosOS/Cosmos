@@ -93,7 +93,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lost", "Tests\MathTest\Lost
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Drivers", "Drivers", "{E3AA753A-2E91-4FE7-A9E2-8119984DEA68}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Hardware.Network.Ethernet", "Drivers\Cosmos.Hardware.Network.Ethernet\Cosmos.Hardware.Network.Ethernet.csproj", "{733E83F9-2E14-441E-8220-0B400FF99E8E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Hardware.Network.Ethernet.RTL8139", "Drivers\Ethernet\Cosmos.Hardware.Network.Ethernet.RTL8139\Cosmos.Hardware.Network.Ethernet.RTL8139.csproj", "{289839F2-263E-4B79-B63B-8CB8BF0788E1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Ethernet", "Ethernet", "{A6D98BB2-23CA-4E4C-840F-0175F090323B}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
@@ -249,10 +251,10 @@ Global
 		SccProjectTopLevelParentUniqueName37 = Cosmos.sln
 		SccProjectName37 = Tests/MathTest/Lost
 		SccLocalPath37 = Tests\\MathTest\\Lost
-		SccProjectUniqueName38 = Drivers\\Cosmos.Hardware.Network.Ethernet\\Cosmos.Hardware.Network.Ethernet.csproj
+		SccProjectUniqueName38 = Drivers\\Ethernet\\Cosmos.Hardware.Network.Ethernet.RTL8139\\Cosmos.Hardware.Network.Ethernet.RTL8139.csproj
 		SccProjectTopLevelParentUniqueName38 = Cosmos.sln
-		SccProjectName38 = Drivers/Cosmos.Hardware.Network.Ethernet
-		SccLocalPath38 = Drivers\\Cosmos.Hardware.Network.Ethernet
+		SccProjectName38 = Drivers/Ethernet/Cosmos.Hardware.Network.Ethernet.RTL8139
+		SccLocalPath38 = Drivers\\Ethernet\\Cosmos.Hardware.Network.Ethernet.RTL8139
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -400,10 +402,10 @@ Global
 		{EF65AFB7-9DC9-4ACD-946D-7E973A67DBBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EF65AFB7-9DC9-4ACD-946D-7E973A67DBBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EF65AFB7-9DC9-4ACD-946D-7E973A67DBBE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{733E83F9-2E14-441E-8220-0B400FF99E8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{733E83F9-2E14-441E-8220-0B400FF99E8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{733E83F9-2E14-441E-8220-0B400FF99E8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{733E83F9-2E14-441E-8220-0B400FF99E8E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{289839F2-263E-4B79-B63B-8CB8BF0788E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{289839F2-263E-4B79-B63B-8CB8BF0788E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{289839F2-263E-4B79-B63B-8CB8BF0788E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{289839F2-263E-4B79-B63B-8CB8BF0788E1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -449,6 +451,7 @@ Global
 		{DA1DFD9E-B80C-4304-BCBA-B313255F6B01} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
 		{EF65AFB7-9DC9-4ACD-946D-7E973A67DBBE} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
 		{8F2D5231-CDE5-48FA-9D26-D4305B01FD3C} = {7EB6E2FF-74C8-4F59-9923-EB8EF1DE098E}
-		{733E83F9-2E14-441E-8220-0B400FF99E8E} = {E3AA753A-2E91-4FE7-A9E2-8119984DEA68}
+		{A6D98BB2-23CA-4E4C-840F-0175F090323B} = {E3AA753A-2E91-4FE7-A9E2-8119984DEA68}
+		{289839F2-263E-4B79-B63B-8CB8BF0788E1} = {A6D98BB2-23CA-4E4C-840F-0175F090323B}
 	EndGlobalSection
 EndGlobal

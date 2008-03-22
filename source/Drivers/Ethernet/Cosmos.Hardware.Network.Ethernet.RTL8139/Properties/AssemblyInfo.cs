@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Cosmos.Hardware.Network.Ethernet")]
+[assembly: AssemblyTitle("Cosmos.Hardware.Network.Ethernet.RTL8139")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Chad Z. Hower")]
-[assembly: AssemblyProduct("Cosmos.Hardware.Network.Ethernet")]
+[assembly: AssemblyProduct("Cosmos.Hardware.Network.Ethernet.RTL8139")]
 [assembly: AssemblyCopyright("Copyright © Chad Z. Hower 2008")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("4cb1b44c-a095-435f-a4b5-60035ce90da0")]
+[assembly: Guid("46cc9611-2abc-4bac-bcc6-33b21d290252")]
 
 // Version information for an assembly consists of the following four values:
 //
