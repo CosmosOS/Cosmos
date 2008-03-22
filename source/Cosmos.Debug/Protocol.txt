@@ -1,0 +1,33 @@
+﻿Message: User
+-String
+
+Message: Location
+-UInt32 - Cross referenced into debug file which then can cross reference to cs file, 
+and byte position. Not line as C# allows more than one statement per line. How to map
+our IL input into C# file? Can we parse the .pdb files? Also cross referenced into IL and asm file
+
+Message: Variable
+-Set when variable value changes
+
+Message: Breakpoint
+-Breakpoint occurred - also allow breakpoints to be set. Need to leave noops in place that can be swapped
+
+UI's
+-New dialog after build dialog
+-Debug output Window in VS
+-Later on, all in VS
+
+Questions
+-How easy to feed into VS? - See note on express editions...
+-Simulate VS remote debug process?
+-Express editions do not allow loading of extensions - so may need to focus on our own
+UI then later we can have optional alternate plugins for non express as well.
+-Use reflector style functionaly to reverse to C# if we have to? Can we link to reflector itself?
+
+PDB
+-Description of PDB files - http://support.microsoft.com/kb/121366
+-TracePDB - http://msdn2.microsoft.com/en-us/library/ms797943.aspx
+-DumpBin - http://support.microsoft.com/kb/177429/
+-Trace FAQ - http://msdn2.microsoft.com/en-us/library/ms797199.aspx
+-Converting a managed PDB into a XML file - http://blogs.msdn.com/jmstall/archive/2005/08/25/pdb2xml.aspx
+-Debug Interface Access SDK - http://msdn2.microsoft.com/en-us/library/x93ctkx8.aspx

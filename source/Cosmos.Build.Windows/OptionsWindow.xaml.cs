@@ -10,19 +10,31 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Runtime.InteropServices;
 
 namespace Cosmos.Build.Windows {
-    public partial class BuildOptionsWindow : Window {
+    public partial class OptionsWindow : Window {
 
+        [DllImport("user32.dll")]
+        public static extern int ShowWindow(int Handle, int showState);
+        [DllImport("kernel32.dll")]
+        public static extern int GetConsoleWindow();
+        
         protected Block mOptionsBlockPrefix;
         protected Builder mBuilder = new Builder();
 
         public static void Display() {
-            var xWindow = new BuildOptionsWindow();
-            xWindow.ShowDialog();
+            int xConsoleWindow = GetConsoleWindow();
+            ShowWindow(xConsoleWindow, 0);
+
+            var xWindow = new OptionsWindow();
+            if (xWindow.ShowDialog().Value) {
+                ShowWindow(xConsoleWindow, 1);
+                xWindow.DoBuild();
+            }
         }
 
-        public BuildOptionsWindow() {
+        public OptionsWindow() {
             InitializeComponent();
 
             Loaded += delegate(object sender, RoutedEventArgs e) {
@@ -112,6 +124,10 @@ namespace Cosmos.Build.Windows {
         }
 
         void butnBuild_Click(object sender, RoutedEventArgs e) {
+            DialogResult = true;
+        }
+
+        protected void DoBuild() {
             SaveSettingsToRegistry();
 
             if (!buildCheckBox.IsChecked.Value) {

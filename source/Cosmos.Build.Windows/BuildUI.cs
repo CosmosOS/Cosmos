@@ -6,7 +6,7 @@ using System.Text;
 namespace Cosmos.Build.Windows {
     public class BuildUI {
         public static void Run() {
-            BuildOptionsWindow.Display();
+            OptionsWindow.Display();
         }
     }
 }

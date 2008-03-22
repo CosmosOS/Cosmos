@@ -1,11 +1,11 @@
-﻿<Window x:Class="Cosmos.Build.Windows.BuildOptionsWindow"
+﻿<Window x:Class="Cosmos.Build.Windows.OptionsWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Title="BuildOptionsWindow" WindowStartupLocation="CenterScreen" Width="600">
+    Title="BuildOptionsWindow" WindowStartupLocation="CenterScreen" Width="600" Icon="/Cosmos.Build.Windows;component/Cosmos.ico">
     <FlowDocumentScrollViewer>
     <FlowDocument Name="RootDoc">
         <BlockUIContainer>
-            <Image Source="/Cosmos.Build.Windows;component/Logo-1.png" Width="229" />
+            <Image Source="/Cosmos.Build.Windows;component/Logo-1.png" Width="150" />
         </BlockUIContainer>
         <Paragraph>
             Please select a build type:
