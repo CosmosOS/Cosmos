@@ -61,6 +61,10 @@
       <Project>{B024FADF-EF04-4602-A0F4-49016D68B2AF}</Project>
       <Name>Cosmos.Hardware.PC</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Cosmos.Kernel.FileSystems\Cosmos.Kernel.FileSystems.csproj">
+      <Project>{5C293BB9-FB42-495E-AAD9-D15888631CA4}</Project>
+      <Name>Cosmos.Kernel.FileSystems</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Indy.IL2CPU.Plugs\Indy.IL2CPU.Plugs.csproj">
       <Project>{E9B2E8CC-E264-42F9-9113-16B0A0431198}</Project>
       <Name>Indy.IL2CPU.Plugs</Name>
@@ -89,6 +93,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Cosmos.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="New\Partitioning\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Cosmos.Kernel.FileSystems;
 
 namespace Cosmos.Kernel {
     // This class provides boot configurations to be called
@@ -18,7 +19,7 @@ namespace Cosmos.Kernel {
 			// MTW: you could use partial methods for this, but then you dont
 			// have control of the order in which the individual methods are called..
             Cosmos.Hardware.PC.Global.Init();
-			//MBT.Initialize();
+			MBT.Initialize();
 
             // Now init kernel devices and rest of kernel
 			Console.WriteLine("Init Keyboard");
