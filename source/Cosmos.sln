@@ -91,9 +91,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel.FileSystems",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lost", "Tests\MathTest\Lost\Lost.csproj", "{EF65AFB7-9DC9-4ACD-946D-7E973A67DBBE}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Drivers", "Drivers", "{E3AA753A-2E91-4FE7-A9E2-8119984DEA68}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Hardware.Network.Ethernet", "Drivers\Cosmos.Hardware.Network.Ethernet\Cosmos.Hardware.Network.Ethernet.csproj", "{733E83F9-2E14-441E-8220-0B400FF99E8E}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 38
+		SccNumberOfProjects = 39
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -245,6 +249,10 @@ Global
 		SccProjectTopLevelParentUniqueName37 = Cosmos.sln
 		SccProjectName37 = Tests/MathTest/Lost
 		SccLocalPath37 = Tests\\MathTest\\Lost
+		SccProjectUniqueName38 = Drivers\\Cosmos.Hardware.Network.Ethernet\\Cosmos.Hardware.Network.Ethernet.csproj
+		SccProjectTopLevelParentUniqueName38 = Cosmos.sln
+		SccProjectName38 = Drivers/Cosmos.Hardware.Network.Ethernet
+		SccLocalPath38 = Drivers\\Cosmos.Hardware.Network.Ethernet
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -392,6 +400,10 @@ Global
 		{EF65AFB7-9DC9-4ACD-946D-7E973A67DBBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EF65AFB7-9DC9-4ACD-946D-7E973A67DBBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EF65AFB7-9DC9-4ACD-946D-7E973A67DBBE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{733E83F9-2E14-441E-8220-0B400FF99E8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{733E83F9-2E14-441E-8220-0B400FF99E8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{733E83F9-2E14-441E-8220-0B400FF99E8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{733E83F9-2E14-441E-8220-0B400FF99E8E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -437,5 +449,6 @@ Global
 		{DA1DFD9E-B80C-4304-BCBA-B313255F6B01} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
 		{EF65AFB7-9DC9-4ACD-946D-7E973A67DBBE} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
 		{8F2D5231-CDE5-48FA-9D26-D4305B01FD3C} = {7EB6E2FF-74C8-4F59-9923-EB8EF1DE098E}
+		{733E83F9-2E14-441E-8220-0B400FF99E8E} = {E3AA753A-2E91-4FE7-A9E2-8119984DEA68}
 	EndGlobalSection
 EndGlobal
