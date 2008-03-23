@@ -11,7 +11,7 @@ namespace FrodeTest.Test
         {
             // Testing RTL8139 PCI networkcard
             //Load card
-           var nics = Cosmos.Hardware.Network.Devices.RTL8139.RTL8139.FindRTL8139Devices();
+            var nics = RTL8139.FindRTL8139Devices();
 
             if (nics.Count == 0)
             {

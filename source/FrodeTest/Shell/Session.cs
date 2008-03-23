@@ -36,39 +36,39 @@ namespace FrodeTest.Shell
             {
                 var list = RTL8139.FindRTL8139Devices();
                 if (list.Count != 0)
-                {
                     nic = list[0];
-                }
+                else
+                    Console.WriteLine("Unable to find RTL8139 network card!");
 
                 nic.Enable();
                 nic.InitializeDriver();
             }
             else if (command.Equals("send"))
             {
+                if (nic == null)
+                {
+                    Console.WriteLine("Enable NIC with command 'load' first");
+                    return;
+                }               
+                
                 var head = new PacketHeader(0xFF);
                 byte[] data = FrodeTest.Test.Mock.FakeBroadcastPacket.GetFakePacket();
                 var packet = new Packet(head, data);
-
-                if (nic == null)
-                {
-                    Console.WriteLine("Enable NIC with command load first");
-                    return;
-                }
-
+                
                 nic.Transmit(packet);
             }
             else if (command.Equals("reset"))
             {
                 //nic.TimerCount = 1;
                 nic.SoftReset();
-                nic.InitializeDriver();
+                //nic.InitializeDriver();
                 Console.WriteLine("NIC has been reset");
             }
             else if(command.Equals("loop"))
             {
-                Console.WriteLine("Toggle - current loopback mode: " + nic.GetLoopbackMode().ToString());
+                Console.WriteLine("Toggeling loopback mode from : " + nic.GetLoopbackMode().ToString());
                 nic.SetLoopbackMode(!nic.GetLoopbackMode());
-                Console.WriteLine("Set to: " + nic.GetLoopbackMode().ToString());
+                Console.WriteLine("to: " + nic.GetLoopbackMode().ToString());
             }
 
             else if (command.Equals("help"))
@@ -76,7 +76,7 @@ namespace FrodeTest.Shell
                 Console.WriteLine("Valid commands: load, send, loop, reset or exit");
             }
             else
-                Console.WriteLine("No such systemcommand or application: " + command);
+                Console.WriteLine("No such systemcommand or application: " + command + ". Try typing 'help'.");
 
             Run(); //Recursive call
         }
