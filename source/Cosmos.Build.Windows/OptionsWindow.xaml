@@ -37,10 +37,10 @@
                 <Bold>General Options</Bold>
                 <LineBreak/>
                 <InlineUIContainer>
-                    <StackPanel>
+                    <StackPanel HorizontalAlignment="Left">
                     <CheckBox Name="chckCompileIL" IsChecked="True">Compile IL. Do not uncheck this unless you understand the impact.</CheckBox>
                         <Label>Cosmos Debug Port</Label>
-                        <ComboBox Name="cmboDebugPort"></ComboBox>
+                        <ComboBox Name="cmboDebugPort" HorizontalAlignment="Left" Width="100"></ComboBox>
                         </StackPanel>
                 </InlineUIContainer>
             </Paragraph>

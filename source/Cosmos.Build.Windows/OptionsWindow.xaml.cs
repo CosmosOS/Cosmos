@@ -92,7 +92,7 @@ namespace Cosmos.Build.Windows {
                 }
             }
 
-            cmboDebugPort.Items.Add("None");
+            cmboDebugPort.SelectedIndex = cmboDebugPort.Items.Add("None");
             cmboDebugPort.Items.Add("COM1");
             cmboDebugPort.Items.Add("COM2");
             cmboDebugPort.Items.Add("COM3");
