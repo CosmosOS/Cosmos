@@ -68,10 +68,6 @@
       <Project>{1F0EDE86-F6D4-4355-9A97-10E90457770C}</Project>
       <Name>Cosmos.Build.Windows</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Cosmos.Hardware.PC\Cosmos.Hardware.PC.csproj">
-      <Project>{B024FADF-EF04-4602-A0F4-49016D68B2AF}</Project>
-      <Name>Cosmos.Hardware.PC</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Indy.IL2CPU\Indy.IL2CPU.csproj">
       <Project>{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}</Project>
       <Name>Indy.IL2CPU</Name>

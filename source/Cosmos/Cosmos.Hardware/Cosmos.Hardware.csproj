@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Cosmos.Hardware</RootNamespace>
     <AssemblyName>Cosmos.Hardware</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
@@ -40,7 +40,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -53,6 +59,15 @@
     <Compile Include="Network\NetworkDevice.cs" />
     <Compile Include="New\Storage\ATA.Constants.cs" />
     <Compile Include="New\Storage\ATA.cs" />
+    <Compile Include="PC\Bus\AddressSpace.cs" />
+    <Compile Include="PC\Bus\CPUBus.cs" />
+    <Compile Include="PC\Bus\CPU\Keyboard.cs" />
+    <Compile Include="PC\Bus\CPU\PIC.cs" />
+    <Compile Include="PC\Bus\PCIBus.cs" />
+    <Compile Include="PC\DebugUtil.cs" />
+    <Compile Include="PC\Global.cs" />
+    <Compile Include="PC\Interrupts.cs" />
+    <Compile Include="PC\Processor.cs" />
     <Compile Include="TempDictionary.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Old\CPU.cs" />
@@ -74,6 +89,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Cosmos.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Network\Devices\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -53,10 +53,6 @@
       <Project>{1F7ACC2A-EA38-4B10-AB87-9450BBCC8D6F}</Project>
       <Name>Cosmos.Driver.RTL8139</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Cosmos.Hardware.PC\Cosmos.Hardware.PC.csproj">
-      <Project>{B024FADF-EF04-4602-A0F4-49016D68B2AF}</Project>
-      <Name>Cosmos.Hardware.PC</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Cosmos\Cosmos.Hardware\Cosmos.Hardware.csproj">
       <Project>{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}</Project>
       <Name>Cosmos.Hardware</Name>
