@@ -87,8 +87,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.FileSystem", "Cosmos
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lost", "Tests\MathTest\Lost\Lost.csproj", "{EF65AFB7-9DC9-4ACD-946D-7E973A67DBBE}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Drivers", "Drivers", "{E3AA753A-2E91-4FE7-A9E2-8119984DEA68}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{4DE8EC69-B412-41C4-BCD9-1E032984E888}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug", "Cosmos.Debug\Cosmos.Debug.csproj", "{23C298B4-A2A3-4D3F-A57F-CF068B572928}"
