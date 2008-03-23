@@ -38,8 +38,15 @@ namespace FrodeTest.Shell
                 if (list.Count != 0)
                     nic = list[0];
                 else
+                {
                     Console.WriteLine("Unable to find RTL8139 network card!");
+                }
 
+                Console.WriteLine("Enabling network card!");
+                Console.WriteLine(nic.Name);
+                Console.WriteLine("Revision: " + nic.GetHardwareRevision());
+                Console.WriteLine("MAC: " + nic.MACAddress);
+                
                 nic.Enable();
                 nic.InitializeDriver();
             }

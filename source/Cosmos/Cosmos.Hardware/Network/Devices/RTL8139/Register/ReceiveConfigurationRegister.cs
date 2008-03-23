@@ -30,7 +30,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
         public void Init()
         {
             UInt32 data = (UInt32)(BitValue.RBLEN0 | BitValue.MXDMA0 | BitValue.MXDMA1 | BitValue.AB | BitValue.AM | BitValue.APM);
-            Console.WriteLine("Data in INIT for RX is: " + data);
+            //Console.WriteLine("Data in INIT for RX is: " + data);
             IOSpace.Write32(rcrAddress, data);
         }
 

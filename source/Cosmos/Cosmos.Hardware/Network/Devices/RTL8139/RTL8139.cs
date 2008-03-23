@@ -104,7 +104,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             
             //Enable IRQ Interrupt
             SetIRQMaskRegister();
-            Console.WriteLine("PCI should raise IRQ" + pciCard.InterruptLine);
+            Console.WriteLine("Listening for IRQ" + pciCard.InterruptLine + " for incoming data...");
             Cosmos.Hardware.PC.Interrupts.IRQ11 = new Cosmos.Hardware.PC.Interrupts.InterruptDelegate(HandleNetworkInterrupt);
         }
 
@@ -224,7 +224,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         /// <summary>
         /// Enable the NIC to be able to Recieve data.
         /// </summary>
-        public void EnableRecieve()
+        private void EnableRecieve()
         {
             regs.ChipCmd = Register.MainRegister.ChipCommandFlags.TE;
         }
@@ -232,7 +232,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         /// <summary>
         /// Enable the NIC to be able to Transmit data.
         /// </summary>
-        public void EnableTransmit()
+        private void EnableTransmit()
         {
             regs.ChipCmd = Register.MainRegister.ChipCommandFlags.TE;
         }
@@ -260,9 +260,9 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         /// If bytecount 0 is set then NIC will use 8 bytes as threshold
         /// </summary>
         /// <param name="bytecount">Number zero or a number dividable by 32.</param>
-        public void SetEarlyTxThreshold(uint bytecount)
+        private void SetEarlyTxThreshold(uint bytecount)
         {
-            //TODO: This method should be in TransmitStatusDescriptos.cs
+            //TODO: This method should be in TransmitStatusDescriptors.cs
             if (bytecount != 0 & (bytecount % 32 > 0))
                 throw new ArgumentException("Early TX Threshold must be 0 or dividable by 32");
 
@@ -276,7 +276,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         /// Initialize the Receive Buffer. The RBSTART register consists of 4 bytes (0x30h to 0x33h) which should contain
         /// the address of a buffer to save incoming data to.
         /// </summary>
-        public void InitReceiveBuffer()
+        private void InitReceiveBuffer()
         {
             //Prepare a buffer area
 
@@ -287,11 +287,11 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             //Write the address of the buffer area to the RBSTART 
             WriteAddressToPCI(ref RxBuffer, address);
 
-            Console.WriteLine("RxBuffer address: " + address);
-            Console.WriteLine("RxBuffer contains address: " + IOSpace.Read32(address));
+            //Console.WriteLine("RxBuffer address: " + address);
+            //Console.WriteLine("RxBuffer contains address: " + IOSpace.Read32(address));
         }
 
-        public void InitTransmitBuffer()
+        private void InitTransmitBuffer()
         {
             //Initialize Tx Buffers
 
@@ -326,7 +326,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             {
                 IntPtr bodyAddress = (IntPtr)bodystart;
                 IOSpace.Write32(address, (uint)bodyAddress);
-                Console.WriteLine("Address where buffer is stored: " + (uint)bodyAddress);
+                //Console.WriteLine("Address where buffer is stored: " + (uint)bodyAddress);
             }
         }
 
@@ -334,7 +334,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         /// Transmits the given Packet
         /// </summary>
         /// <param name="packet"></param>
-        public unsafe bool Transmit(Packet packet)
+        public bool Transmit(Packet packet)
         {
             //Put the packet into the correct TxBuffer
             TxBuffer1 = packet.PacketBody;
@@ -358,7 +358,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             }*/
 
             SetEarlyTxThreshold(1024);
-            Console.WriteLine("Sending...");
+            Console.WriteLine("Sending packet...");
             tsd.ClearOWNBit();
             Register.TransmitStatusDescriptor.IncrementTSDescriptor();
 

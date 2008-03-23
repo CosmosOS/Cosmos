@@ -70,7 +70,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
             byte data = BinaryHelper.GetByteFrom32bit(this.TSD, offset);
 
 
-            Console.WriteLine("OWN data before: " + BinaryHelper.CheckBit(this.TSD, 13));
+            Console.WriteLine("OWN bit status in TransmitStatusDescriptor: " + BinaryHelper.CheckBit(this.TSD, 13));
             
             //Turn off single OWN bit
             //data &= (byte)~(1 << (byte)(BitValue.OWN - offset));
@@ -83,7 +83,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
             //Write all 8 bits back
             IOSpace.Write8(tdsAddress + offset, data);
 
-            Console.WriteLine("OWN data after: " + BinaryHelper.CheckBit(this.TSD, 13));
+            Console.WriteLine("OWN bit after turning off (should be false): " + BinaryHelper.CheckBit(this.TSD, 13));
         }
 
         /// <summary>
@@ -97,8 +97,8 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
                 byte offset = 0;
                 //return (int)IOSpace.Read8(this.TSD + offset);
                 //return (int)IOSpace.Read8(
-                Console.WriteLine("TSD is: " + this.TSD);
-                Console.WriteLine("First 8 bits: " + (byte)BinaryHelper.GetByteFrom32bit(this.TSD, offset));
+                Console.WriteLine("[Size]TSD is: " + this.TSD);
+                Console.WriteLine("[Size]First 8 bits: " + (byte)BinaryHelper.GetByteFrom32bit(this.TSD, offset));
                 return (int)BinaryHelper.GetByteFrom32bit(this.TSD, offset);
             }
             set
