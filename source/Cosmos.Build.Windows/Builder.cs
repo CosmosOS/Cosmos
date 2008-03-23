@@ -138,10 +138,12 @@ namespace Cosmos.Build.Windows {
                 // Boot CD ROM
                 + " -boot d"
                 // Setup serial port
-                // Might reenable serial file later for post debugging of CPU
+                // Might allow serial file later for post debugging of CPU
                 // etc since serial to TCP on a byte level is likely highly innefficient
                 // with the packet overhead
+                // COM1
                 + " -serial tcp::4444,server" + (aWaitSerialTCP ? "" : ",nowait")
+                // COM2
 				+ " -serial \"file:" + BuildPath + "debug.dbg\" "
                 // Enable acceleration if we are not using GDB
                 + (aGDB ? " -S -s" : " -kernel-kqemu")
