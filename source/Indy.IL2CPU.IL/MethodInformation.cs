@@ -79,7 +79,7 @@ namespace Indy.IL2CPU.IL {
 		public readonly TypeInformation TypeInfo;
 		public override string ToString() {
 			StringBuilder xSB = new StringBuilder();
-			xSB.AppendLine(String.Format("Method '{0}'\r\n", LabelName));
+			xSB.AppendLine(String.Format("Method '{0}'\r\n", Method.GetFullName()));
 			xSB.AppendLine("Locals:");
 			if (Locals.Length == 0) {
 				xSB.AppendLine("\t(none)");

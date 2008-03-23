@@ -16,32 +16,31 @@ namespace Cosmos.Shell.Console {
         // This contains code to launch the build console. Most users should not chagne this.
         [STAThread]
         public static void Main() {
-			var xBuilder = new Builder();
-			xBuilder.Build();
+			BuildUI.Run();
         }
         #endregion
 
         // Here is where your Cosmos code goes. This is the code that will be executed during Cosmos boot.
         // Write your code, and run. Cosmos build console will appear, select your target, and thats it!
         public static void Init() {
-			//try {
-			//    Cosmos.Kernel.Boot.Default();
-			//    System.Console.WriteLine("Creating StageQueue");
-			//    Kernel.Staging.DefaultStageQueue stages = new Cosmos.Kernel.Staging.DefaultStageQueue();
-			//    System.Console.WriteLine("Queueing Prompter");
-			//    stages.Enqueue(new Prompter());
-			//    System.Console.WriteLine("Done");
+			try {
+				Cosmos.Kernel.Boot.Default();
+				System.Console.WriteLine("Creating StageQueue");
+				Kernel.Staging.DefaultStageQueue stages = new Cosmos.Kernel.Staging.DefaultStageQueue();
+				System.Console.WriteLine("Queueing Prompter");
+				stages.Enqueue(new Prompter());
+				System.Console.WriteLine("Done");
 
-			//    stages.Run();
-			//    stages.Teardown();
-			//} catch (Exception E) {
-			//    System.Console.WriteLine("Error occurred:");
-			//    System.Console.Write("    ");
-			//    System.Console.WriteLine(E.Message);
-			//}
-			//MyClass x = new MyClass();
-			//x.Bladibla();
-			System.Console.WriteLine("Halting system now..");
+				stages.Run();
+				stages.Teardown();
+			} catch (Exception E) {
+				System.Console.WriteLine("Error occurred:");
+				System.Console.Write("    ");
+				System.Console.WriteLine(E.Message);
+			}
+			MyClass x = new MyClass();
+			x.Bladibla();
+			System.Console.WriteLine("Halting system now!..");
 			
 			// Halt system.
 			while (true)

@@ -17,7 +17,8 @@ namespace Cosmos.Shell.Console.Commands {
 		}
 
 		public override void Execute(string param) {
-			Cosmos.Kernel.New.Partitioning.MBT.Initialize();
+			System.Console.WriteLine("Not implemented!");
+			//Cosmos.Kernel.New.Partitioning.MBT.Initialize();
 		}
 
 		public override void Help() {

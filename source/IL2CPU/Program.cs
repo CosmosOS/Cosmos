@@ -173,7 +173,7 @@ namespace IL2CPU {
 						xTestOutput = OutputFile;
 					}
 					Func<string, string> xGetFileNameForGroup = xGroup => Path.Combine(AsmFile, xGroup + ".asm");
-					e.Execute(InputFile, TargetPlatform, xGetFileNameForGroup, MetalMode, DebugFile, BCLDir, Plugs);
+					e.Execute(InputFile, TargetPlatform, xGetFileNameForGroup, MetalMode, BCLDir, Plugs);
 					ProcessStartInfo xFasmStartInfo = new ProcessStartInfo();
 					if (TargetPlatform != TargetPlatformEnum.NativeX86) {
 						xFasmStartInfo.FileName = FAsmFileName;
@@ -183,7 +183,7 @@ namespace IL2CPU {
 						xFasmStartInfo.RedirectStandardOutput = false;
 						Process xFasm = Process.Start(xFasmStartInfo);
 						if (!xFasm.WaitForExit(60 * 1000) || xFasm.ExitCode != 0) {
-							Console.WriteLine("Error while running FASM!");
+							Console.WriteLine("Error while running NASM!");
 							Console.Write(xFasm.StandardOutput.ReadToEnd());
 							Console.Write(xFasm.StandardError.ReadToEnd());
 							return 3;

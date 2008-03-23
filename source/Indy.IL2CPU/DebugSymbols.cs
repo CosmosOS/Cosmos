@@ -124,9 +124,9 @@ namespace Indy.IL2CPU {
         
         private string fullNameField;
         
-        private uint typeIdField;
+        private int typeIdField;
         
-        private uint baseTypeIdField;
+        private int baseTypeIdField;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute("Field")]
@@ -160,10 +160,22 @@ namespace Indy.IL2CPU {
                 this.fullNameField = value;
             }
         }
+
+		[System.Xml.Serialization.XmlAttributeAttribute()]
+		public int StorageSize {
+			get {
+				return this.storageSizeField;
+			}
+			set {
+				this.storageSizeField = value;
+			}
+		}
+
+		private int storageSizeField;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public uint TypeId {
+        public int TypeId {
             get {
                 return this.typeIdField;
             }
@@ -174,7 +186,7 @@ namespace Indy.IL2CPU {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public uint BaseTypeId {
+        public int BaseTypeId {
             get {
                 return this.baseTypeIdField;
             }
@@ -194,7 +206,7 @@ namespace Indy.IL2CPU {
         
         private string nameField;
         
-        private uint fieldTypeField;
+        private int fieldTypeField;
         
         private bool isStaticField;
         
@@ -215,7 +227,7 @@ namespace Indy.IL2CPU {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public uint FieldType {
+        public int FieldType {
             get {
                 return this.fieldTypeField;
             }
@@ -272,9 +284,9 @@ namespace Indy.IL2CPU {
         
         private string nameField;
         
-        private uint methodIdField;
+        private int methodIdField;
         
-        private uint returnTypeIdField;
+        private int returnTypeIdField;
         
         private string visibilityField;
         
@@ -315,7 +327,7 @@ namespace Indy.IL2CPU {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public uint MethodId {
+        public int MethodId {
             get {
                 return this.methodIdField;
             }
@@ -326,7 +338,7 @@ namespace Indy.IL2CPU {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public uint ReturnTypeId {
+        public int ReturnTypeId {
             get {
                 return this.returnTypeIdField;
             }
@@ -368,7 +380,7 @@ namespace Indy.IL2CPU {
         
         private string nameField;
         
-        private uint localTypeIdField;
+        private int localTypeIdField;
         
         private string relativeStartAddressField;
         
@@ -385,7 +397,7 @@ namespace Indy.IL2CPU {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public uint LocalTypeId {
+        public int LocalTypeId {
             get {
                 return this.localTypeIdField;
             }

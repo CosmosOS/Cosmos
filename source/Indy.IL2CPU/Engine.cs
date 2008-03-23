@@ -72,6 +72,7 @@ namespace Indy.IL2CPU {
 	public class QueuedMethodInformation {
 		public bool Processed;
 		public int Index;
+		public DebugSymbolsAssemblyTypeMethodInstruction[] Instructions;
 	}
 
 	public class Engine {
@@ -93,19 +94,9 @@ namespace Indy.IL2CPU {
 		/// </summary>
 		protected SortedList<FieldInfo, bool> mStaticFields = new SortedList<FieldInfo, bool>(new FieldInfoComparer());
 
-		protected IList<Type> mTypes;
+		protected IList<Type> mTypes = new List<Type>();
 		protected TypeEqualityComparer mTypesEqualityComparer = new TypeEqualityComparer();
 		private DebugSymbols mDebugSymbols;
-
-		public Engine() {
-			ObservableCollection<Type> xTest = new ObservableCollection<Type>();
-			xTest.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(xTest_CollectionChanged);
-			mTypes = xTest;
-		}
-
-		void xTest_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
-			Console.Write("");
-		}
 
 		/// <summary>
 		/// Compiles an assembly to CPU-specific code. The entrypoint of the assembly will be 
@@ -116,16 +107,16 @@ namespace Indy.IL2CPU {
 		/// <param name="aTargetPlatform">The platform to target when assembling the code.</param>
 		/// <param name="aOutput"></param>
 		/// <param name="aInMetalMode">Whether or not the output is metalmode only.</param>
-		public void Execute(string aAssembly, TargetPlatformEnum aTargetPlatform, Func<string, string> aGetFileNameForGroup, bool aInMetalMode, string aDebugSymbols, string aAssemblyDir, IEnumerable<string> aPlugs) {
+		public void Execute(string aAssembly, TargetPlatformEnum aTargetPlatform, Func<string, string> aGetFileNameForGroup, bool aInMetalMode, string aAssemblyDir, IEnumerable<string> aPlugs) {
 			mCurrent = this;
 			try {
 				if (aGetFileNameForGroup == null) {
 					throw new ArgumentNullException("aGetFileNameForGroup");
 				}
 				mCrawledAssembly = Assembly.LoadFile(aAssembly);
-				if (!String.IsNullOrEmpty(aDebugSymbols)) {
-					mDebugSymbols = new DebugSymbols();
-				}
+				//if (!String.IsNullOrEmpty(aDebugSymbols)) {
+				//    mDebugSymbols = new DebugSymbols();
+				//}
 				MethodInfo xEntryPoint = (MethodInfo)mCrawledAssembly.EntryPoint;
 				if (xEntryPoint == null)
 					throw new NotSupportedException("No EntryPoint found!");
@@ -185,7 +176,8 @@ namespace Indy.IL2CPU {
 					//    }
 					//}
 					mMap.Initialize(mAssembler, xAppDefs);
-					mAssembler.DebugMode = !String.IsNullOrEmpty(aDebugSymbols);
+					mAssembler.DebugMode = false;
+					//!String.IsNullOrEmpty(aDebugSymbols);
 					IL.Op.QueueMethod += QueueMethod;
 					IL.Op.QueueStaticField += QueueStaticField;
 					try {
@@ -273,13 +265,13 @@ namespace Indy.IL2CPU {
 						}
 						mMap.PostProcess(mAssembler);
 						ProcessAllStaticFields();
-						if (mDebugSymbols != null) {
-							GenerateDebugSymbols();
-						}
-						XmlSerializer xSerializer = new XmlSerializer(typeof(DebugSymbols));
-						using (FileStream xFS = new FileStream(aDebugSymbols, FileMode.Create)) {
-							xSerializer.Serialize(xFS, mDebugSymbols);
-						}
+						//if (mDebugSymbols != null) {
+						//    GenerateDebugSymbols();
+						//}
+						//XmlSerializer xSerializer = new XmlSerializer(typeof(DebugSymbols));
+						//using (FileStream xFS = new FileStream(aDebugSymbols, FileMode.Create)) {
+						//    xSerializer.Serialize(xFS, mDebugSymbols);
+						//}
 					} finally {
 						mAssembler.Flush();
 						IL.Op.QueueMethod -= QueueMethod;
@@ -303,20 +295,26 @@ namespace Indy.IL2CPU {
 					var xDbgAssemblyTypes = new List<DebugSymbolsAssemblyType>();
 					xDbgAssembly.FileName = xAssembly.Location;
 					xDbgAssembly.FullName = xAssembly.GetName().FullName;
+					//if (xDbgAssembly.FullName == "Cosmos.Hardware, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983") {
+					//    System.Diagnostics.Debugger.Break();
+					//}
 					for (int xIdxTypes = 0; xIdxTypes < mTypes.Count; xIdxTypes++) {
 						var xType = mTypes[xIdxTypes];
 						if (!xAssemblyComparer.Equals(xAssembly, xType.Assembly)) {
 							continue;
 						}
 						var xDbgType = new DebugSymbolsAssemblyType();
+						//if (xType.FullName == "Cosmos.Hardware.Screen.Text") {
+						//    System.Diagnostics.Debugger.Break();
+						//}
 						if (xType.BaseType != null) {
-							xDbgType.BaseTypeId = (uint)RegisterType(xType.BaseType);
+							xDbgType.BaseTypeId = GetTypeId(xType.BaseType);
 						}
-						xDbgType.TypeId = (uint)xIdxTypes;
+						xDbgType.TypeId = xIdxTypes;
 						xDbgType.FullName = xType.FullName;
 						var xTypeFields = new List<DebugSymbolsAssemblyTypeField>();
-						int xObjStorage;
 						var xTypeInfo = GetTypeInfo(xType);
+						xDbgType.StorageSize = GetFieldStorageSize(xType);
 						foreach (var xField in xType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static)) {
 							var xDbgField = new DebugSymbolsAssemblyTypeField();
 							xDbgField.Name = xField.Name;
@@ -334,7 +332,7 @@ namespace Indy.IL2CPU {
 									}
 								}
 							}
-							xDbgField.FieldType = (uint)RegisterType(xField.FieldType);
+							xDbgField.FieldType = GetTypeId(xField.FieldType);
 							if (xDbgField.IsStatic) {
 								xDbgField.Address = DataMember.GetStaticFieldName(xField);
 							} else {
@@ -344,23 +342,27 @@ namespace Indy.IL2CPU {
 						}
 						xDbgType.Field = xTypeFields.ToArray();
 						var xTypeMethods = new List<DebugSymbolsAssemblyTypeMethod>();
-						for (int xIdxMethods = 0; xIdxMethods < mMethods.Count; xIdxMethods++) {
-							var xMethod = mMethods.Keys[xIdxMethods];
-							if (!xTypeComparer.Equals(xMethod.DeclaringType, xType)) {
+						foreach (var xMethod in xType.GetMethods(BindingFlags.ExactBinding | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance).Cast<MethodBase>().Union(xType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance))) {
+							var xIdxMethods = mMethods.IndexOfKey(xMethod);
+							if (xIdxMethods == -1) {
 								continue;
 							}
+							//var xMethod = mMethods.Keys[xIdxMethods];
+							//if (!xTypeComparer.Equals(xMethod.DeclaringType, xType)) {
+							//    continue;
+							//}
 							var xDbgMethod = new DebugSymbolsAssemblyTypeMethod();
 							xDbgMethod.Name = xMethod.Name;
-							xDbgMethod.MethodId = (uint)xIdxMethods;
+							xDbgMethod.MethodId = xIdxMethods;
 							xDbgMethod.Address = Label.GenerateLabelName(xMethod);
 							if (xMethod is ConstructorInfo) {
-								xDbgMethod.ReturnTypeId = (uint)RegisterType(typeof(void));
+								xDbgMethod.ReturnTypeId = GetTypeId(typeof(void));
 							} else {
 								var xTheMethod = xMethod as MethodInfo;
 								if (xTheMethod != null) {
-									xDbgMethod.ReturnTypeId = (uint)RegisterType(xTheMethod.ReturnType);
+									xDbgMethod.ReturnTypeId = GetTypeId(xTheMethod.ReturnType);
 								} else {
-									xDbgMethod.ReturnTypeId = (uint)RegisterType(typeof(void));
+									xDbgMethod.ReturnTypeId = GetTypeId(typeof(void));
 								}
 							}
 							if (xMethod.IsPublic) {
@@ -375,8 +377,8 @@ namespace Indy.IL2CPU {
 										xDbgMethod.Visibility = "Internal";
 									}
 								}
-								xTypeMethods.Add(xDbgMethod);
 							}
+							xTypeMethods.Add(xDbgMethod);
 							MethodBody xBody = xMethod.GetMethodBody();
 							if (xBody != null) {
 								var xDbgLocals = new List<DebugSymbolsAssemblyTypeMethodLocal>();
@@ -385,13 +387,14 @@ namespace Indy.IL2CPU {
 									foreach (var xLocal in xBody.LocalVariables) {
 										var xDbgLocal = new DebugSymbolsAssemblyTypeMethodLocal();
 										xDbgLocal.Name = xLocal.LocalIndex.ToString();
-										xDbgLocal.LocalTypeId = (uint)RegisterType(xLocal.LocalType);
+										xDbgLocal.LocalTypeId = GetTypeId(xLocal.LocalType);
 										xDbgLocal.RelativeStartAddress = xMethodInfo.Locals[xLocal.LocalIndex].VirtualAddresses.First();
 										xDbgLocals.Add(xDbgLocal);
 									}
 								}
 								xDbgMethod.Local = xDbgLocals.ToArray();
 							}
+							xDbgMethod.Body = mMethods.Values[xIdxMethods].Instructions;
 						}
 						xDbgType.Method = xTypeMethods.ToArray();
 						xDbgAssemblyTypes.Add(xDbgType);
@@ -852,9 +855,6 @@ namespace Indy.IL2CPU {
 						continue;
 					}
 					string xMethodName = Label.GenerateLabelName(xCurrentMethod);
-					if (xMethodName == "System_Boolean__System_Object_Equals_System_Object_") {
-						System.Diagnostics.Debugger.Break();
-					}
 					TypeInformation xTypeInfo = null;
 					{
 						if (!xCurrentMethod.IsStatic) {
@@ -924,12 +924,14 @@ namespace Indy.IL2CPU {
 									mInstructionsToSkip = 0;
 									mAssembler.StackContents.Clear();
 									ILReader xReader = new ILReader(xCurrentMethod);
+									var xInstructionInfos = new List<DebugSymbolsAssemblyTypeMethodInstruction>();
 									while (xReader.Read()) {
 										if (mInstructionsToSkip > 0) {
 											mInstructionsToSkip--;
 											continue;
 										}
 										ExceptionHandlingClause xCurrentHandler = null;
+										#region Exception handling support code
 										foreach (ExceptionHandlingClause xHandler in xBody.ExceptionHandlingClauses) {
 											if (xHandler.TryOffset > 0) {
 												if (xHandler.TryOffset <= xReader.NextPosition && (xHandler.TryLength + xHandler.TryOffset) > xReader.NextPosition) {
@@ -973,6 +975,7 @@ namespace Indy.IL2CPU {
 												}
 											}
 										}
+										#endregion
 										xMethodInfo.CurrentHandler = xCurrentHandler;
 										xOp = GetOpFromType(mMap.GetOpForOpCode(xReader.OpCode), xReader, xMethodInfo);
 										if ((!xOp.SupportsMetalMode) && mAssembler.InMetalMode) {
@@ -983,7 +986,33 @@ namespace Indy.IL2CPU {
 										foreach (var xStackContent in mAssembler.StackContents) {
 											new Comment("    " + xStackContent.Size);
 										}
+										DebugSymbolsAssemblyTypeMethodInstruction xInstructionInfo = null;
+										int xCurrentStack = 0;
+										if (mDebugSymbols != null) {
+											xInstructionInfo = new DebugSymbolsAssemblyTypeMethodInstruction();
+											string xLabel = Op.GetInstructionLabel(xReader);
+											if (xLabel.StartsWith(".")) {
+												xLabel = Label.LastFullLabel + xLabel;
+												xLabel = DataMember.FilterStringForIncorrectChars(xLabel);
+											}
+											xInstructionInfo.Address = xLabel;
+											xInstructionInfo.InstructionType = xReader.OpCode.ToString();
+											xCurrentStack = (from item in mAssembler.StackContents
+															 let xSize = (item.Size % 4 == 0) ? item.Size : (item.Size + (4 - (item.Size %4)))
+															 select xSize).Sum();
+										}
 										xOp.Assemble();
+										if (xInstructionInfo != null) {
+											int xNewStack = (from item in mAssembler.StackContents
+															 let xSize = (item.Size % 4 == 0) ? item.Size : (item.Size + (4 - (item.Size % 4)))
+															 select xSize).Sum();
+											xInstructionInfo.StackResult = xNewStack - xCurrentStack;
+											xInstructionInfo.StackResultSpecified = true;
+											xInstructionInfos.Add(xInstructionInfo);
+										}
+									}
+									if (mDebugSymbols != null) {
+										mMethods[xCurrentMethod].Instructions = xInstructionInfos.ToArray();
 									}
 								} else {
 									if ((xCurrentMethod.Attributes & MethodAttributes.PinvokeImpl) != 0) {
@@ -1456,6 +1485,27 @@ namespace Indy.IL2CPU {
 					RegisterType(xCurInspectedType);
 				}
 				return RegisterType(aType);
+			} else {
+				return mCurrent.mTypes.IndexOf(xFoundItem);
+			}
+		}
+
+		private static int GetTypeId(Type aType) {
+			if (aType == null) {
+				throw new ArgumentNullException("aType");
+			}
+			if (mCurrent == null) {
+				throw new Exception("ERROR: No Current Engine found!");
+			}
+			if (aType.IsArray || aType.IsPointer) {
+				if (aType.IsArray && aType.GetArrayRank() != 1) {
+					throw new Exception("Multidimensional arrays are not yet supported!");
+				}
+				aType = aType.GetElementType();
+			}
+			Type xFoundItem = mCurrent.mTypes.FirstOrDefault(x => x.FullName.Equals(aType.FullName));
+			if (xFoundItem == null) {
+				return -1;
 			} else {
 				return mCurrent.mTypes.IndexOf(xFoundItem);
 			}
