@@ -68,7 +68,6 @@
     <Compile Include="Network\Devices\RTL8139\RTL8139.cs" />
     <Compile Include="Network\MACAddress.cs" />
     <Compile Include="Network\NetworkDevice.cs" />
-    <Compile Include="Storage\Constants.cs" />
     <Compile Include="Storage\ATA\ATA.cs" />
     <Compile Include="PC\Bus\AddressSpace.cs" />
     <Compile Include="PC\Bus\CPUBus.cs" />

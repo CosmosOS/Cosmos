@@ -31,7 +31,7 @@ namespace Cosmos.Hardware.PC {
             // end old -----------------
 
 			// MTW new
-			HW.New.Storage.ATA.Initialize(Sleep);
+			HW.Storage.ATA2.ATA.Initialize(Sleep);
 			// MTW new end
 
             HW.Device.Add(new Bus.CPU.Keyboard());

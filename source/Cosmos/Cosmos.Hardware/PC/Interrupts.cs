@@ -115,7 +115,7 @@ namespace Cosmos.Hardware.PC {
         public static unsafe void HandleInterrupt_2E(InterruptContext* aContext) {
 			Cosmos.Hardware.DebugUtil.SendMessage("IRQ", "Primary IDE");
 			//Storage.ATAOld.HandleInterruptPrimary();
-			New.Storage.ATA.HandleInterruptPrimary();
+			Storage.ATA2.ATA.HandleInterruptPrimary();
             Bus.CPU.PIC.SignalSecondary();
         }
 
@@ -130,7 +130,7 @@ namespace Cosmos.Hardware.PC {
 
         //IRQ 15 - Secondary IDE
         public static unsafe void HandleInterrupt_2F(InterruptContext* aContext) {
-			New.Storage.ATA.HandleInterruptSecondary();
+			Storage.ATA2.ATA.HandleInterruptSecondary();
 			Cosmos.Hardware.DebugUtil.SendMessage("IRQ", "Secondary IDE");
             Bus.CPU.PIC.SignalSecondary();
         }
