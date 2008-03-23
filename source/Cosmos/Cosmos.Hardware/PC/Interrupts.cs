@@ -107,6 +107,11 @@ namespace Cosmos.Hardware.PC {
         static public InterruptDelegate IRQ11;
         public static unsafe void HandleInterrupt_2B(InterruptContext* aContext)
         {
+            //Debugging....
+            DebugUtil.LogInterruptOccurred(aContext);
+            Cosmos.Hardware.DebugUtil.SendMessage("Interrupts", "Interrupt 2B handler (for RTL)");
+            Console.WriteLine("IRQ 11 raised!");
+
             if (IRQ11 != null)
                 IRQ11();
         }
