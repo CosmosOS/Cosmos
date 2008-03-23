@@ -53,8 +53,16 @@ namespace Cosmos.FileSystem {
             //DebugUtil.SendNumber("MBT", "DeviceCount", (uint)Device.Devices.Count, 32);
 
             List<Device> mbtPartitions = new List<Device>();
-            Device.Devices.ForEach(dev => mbtPartitions.AddRange(getPartitions(dev as BlockDevice)));
-            Device.Devices.AddRange(mbtPartitions);
+			for (int i = 0; i < Device.Devices.Count; i++) {
+				if (Device.Devices[i].Type == Device.DeviceType.Storage) {
+					var xTest = getPartitions((BlockDevice)Device.Devices[i]);
+					if (xTest != null) {
+						for (int j = 0; j < xTest.Count; j++) {
+							Device.Add(xTest[j]);
+						}
+					}
+				}
+			}
         }
 
         private static List<Device> getPartitions(BlockDevice xBlockDev)
