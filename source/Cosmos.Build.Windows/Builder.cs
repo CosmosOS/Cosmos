@@ -127,14 +127,27 @@ namespace Cosmos.Build.Windows {
         public void MakeQEMU(bool aUseHDImage, bool aGDB) {
             MakeISO();
             RemoveFile(BuildPath + "serial-debug.txt");
+            // QEMU Docs - http://fabrice.bellard.free.fr/qemu/qemu-doc.html
             Global.Call(ToolsPath + @"qemu\qemu.exe"
-                , (aUseHDImage ? "-hda \"" + BuildPath + "hda.img\" " : "")
-                + "-L . -cdrom \"" + BuildPath + "Cosmos.iso\" -boot d -serial"
-                + " \"file:" + BuildPath + "serial-debug.txt\" "
-                + (aGDB ? "-S -s" : "-kernel-kqemu")
+                // HD image
+                , (aUseHDImage ? "-hda \"" + BuildPath + "hda.img\"" : "")
+                // Path for BIOS, VGA BIOS, and keymaps
+                + " -L ."
+                // CD ROM image
+                + " -cdrom \"" + BuildPath + "Cosmos.iso\""
+                // Boot CD ROM
+                + " -boot d"
+                // Setup serial port
+                // Might reenable serial file later for post debugging of CPU
+                // etc since serial to TCP on a byte level is likely highly innefficient
+                // with the packet overhead
+                //+ " -serial \"file:" + BuildPath + "serial-debug.txt\""
+                + " -serial tcp::4444,server,nowait"
+                // Enable acceleration if we are not using GDB
+                + (aGDB ? " -S -s" : " -kernel-kqemu")
+                // Ethernet card
                 + " -net nic,model=rtl8139"
-                , ToolsPath + @"qemu\"
-                , false, true);
+                , ToolsPath + @"qemu\", false, true);
 
             if (aGDB) {
 					//TODO: If the host is really busy, sometimes GDB can run before QEMU finishes loading.

@@ -12,9 +12,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 namespace Cosmos.Build.Windows {
-    /// <summary>
-    /// Interaction logic for DebugWindow.xaml
-    /// </summary>
     public partial class DebugWindow : Window {
         public DebugWindow() {
             InitializeComponent();
