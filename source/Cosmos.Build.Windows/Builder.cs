@@ -27,13 +27,22 @@ namespace Cosmos.Build.Windows {
                 // Problem  - noone checked this for user kit mode and no key...
                 xResult = (string)xKey.GetValue("Build Path");
 
+                // Dev kit
                 if (xResult == null) {
-					xResult = Directory.GetCurrentDirectory();
-					xResult = xResult.Substring(0, xResult.IndexOf("source"));
-					xResult += @"Build\";
+					xResult = Directory.GetCurrentDirectory().ToLowerInvariant();
+                    int xPos = xResult.IndexOf("source");
+                    if (xPos > -1) {
+                        // Hack around users that have source in the path 2x.. but wont 
+                        // accomodate if they have it >2 times
+                        int xPos2 = xResult.IndexOf("source", xPos + 1);
+                        if (xPos2 > -1) {
+                            xPos = xPos2;
+                        }
+                        xResult = xResult.Substring(0, xPos) + @"Build\";
+                    }
 				}
                 
-                if (String.IsNullOrEmpty(xResult)) {
+                if (xResult == "") {
 					throw new Exception("Cannot find Cosmos build path in registry.");
 				}
 				if (!xResult.EndsWith(@"\")) {

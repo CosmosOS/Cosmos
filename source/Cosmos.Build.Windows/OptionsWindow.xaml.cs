@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Runtime.InteropServices;
+using Microsoft.Win32;
 
 namespace Cosmos.Build.Windows {
     public partial class OptionsWindow : Window {
@@ -148,7 +149,7 @@ namespace Cosmos.Build.Windows {
         }
 
         protected void DoBuild() {
-            SaveSettingsToRegistry();
+            SavePrefs();
 
             if (chckCompileIL.IsChecked.Value) {
                 Console.WriteLine("Compiling...");
@@ -174,77 +175,78 @@ namespace Cosmos.Build.Windows {
             DialogResult = false;
         }
 
-        void SaveSettingsToRegistry() {
-            string xValue = "QEMU";
-            if (rdioVMWare.IsChecked.Value) {
-                xValue = "VMWare";
-            } else if (rdioVPC.IsChecked.Value) {
-                xValue = "VPC";
-            } else if (rdioISO.IsChecked.Value) {
-                xValue = "ISO";
-            } else if (rdioPXE.IsChecked.Value) {
-                xValue = "PXE";
-            } else if (rdioUSB.IsChecked.Value) {
-                xValue = "USB";
-            }
-            BuildRegistry.Write("Build Type", xValue);
+        protected const string mRegKey = @"Software\Cosmos\User Kit";
+        protected void SavePrefs() {
+            using (var xKey = Registry.CurrentUser.CreateSubKey(mRegKey)) {
+                string xTarget = "QEMU";
+                if (rdioVMWare.IsChecked.Value) {
+                    xTarget = "VMWare";
+                } else if (rdioVPC.IsChecked.Value) {
+                    xTarget = "VPC";
+                } else if (rdioISO.IsChecked.Value) {
+                    xTarget = "ISO";
+                } else if (rdioPXE.IsChecked.Value) {
+                    xTarget = "PXE";
+                } else if (rdioUSB.IsChecked.Value) {
+                    xTarget = "USB";
+                }
+                xKey.SetValue("Target", xTarget);
 
-            // General
-            BuildRegistry.Write("Compile IL", chckCompileIL.IsChecked.Value.ToString());
-            BuildRegistry.Write("Debug Port", (string)cmboDebugPort.SelectedValue);
+                // General
+                xKey.SetValue("Compile IL", chckCompileIL.IsChecked.Value, RegistryValueKind.DWord);
+                xKey.SetValue("Debug Port", cmboDebugPort.Text);
 
-            // QEMU
-            BuildRegistry.Write("Use GDB", chckQEMUUseGDB.IsChecked.Value.ToString());
-            BuildRegistry.Write("Create HD Image", chckQEMUUseHD.IsChecked.Value.ToString());
-            BuildRegistry.Write("Wait for Serial TCP", chckQEMUSerialWait.IsChecked.Value.ToString());
+                // QEMU
+                xKey.SetValue("Use GDB", chckQEMUUseGDB.IsChecked.Value, RegistryValueKind.DWord);
+                xKey.SetValue("Create HD Image", chckQEMUUseHD.IsChecked.Value, RegistryValueKind.DWord);
+                xKey.SetValue("Wait for Serial TCP", chckQEMUSerialWait.IsChecked.Value, RegistryValueKind.DWord);
 
-            // USB
-            if (cmboUSBDevice.SelectedItem != null) {
-                BuildRegistry.Write("USB Device", cmboUSBDevice.Text);
+                // USB
+                if (cmboUSBDevice.SelectedItem != null) {
+                    xKey.SetValue("USB Device", cmboUSBDevice.Text);
+                }
             }
         }
 
         void LoadSettingsFromRegistry() {
-            string xBuildType = BuildRegistry.Read("Build Type");
-            switch (xBuildType) {
-                case "QEMU":
-                    rdioQEMU.IsChecked = true;
-                    break;
-                case "VMWare":
-                    rdioVMWare.IsChecked = true;
-                    break;
-                case "VPC":
-                    rdioVPC.IsChecked = true;
-                    break;
-                case "ISO":
-                    rdioISO.IsChecked = true;
-                    break;
-                case "PXE":
-                    rdioPXE.IsChecked = true;
-                    break;
-                case "USB":
-                    rdioUSB.IsChecked = true;
-                    break;
+            using (var xKey = Registry.CurrentUser.CreateSubKey(mRegKey)) {
+                string xBuildType = (string)xKey.GetValue("Build Type", "QEMU");
+                switch (xBuildType) {
+                    case "QEMU":
+                        rdioQEMU.IsChecked = true;
+                        break;
+                    case "VMWare":
+                        rdioVMWare.IsChecked = true;
+                        break;
+                    case "VPC":
+                        rdioVPC.IsChecked = true;
+                        break;
+                    case "ISO":
+                        rdioISO.IsChecked = true;
+                        break;
+                    case "PXE":
+                        rdioPXE.IsChecked = true;
+                        break;
+                    case "USB":
+                        rdioUSB.IsChecked = true;
+                        break;
+                }
+
+                // General
+                chckCompileIL.IsChecked = ((int)xKey.GetValue("Compile IL", true) != 0);
+                cmboDebugPort.SelectedIndex = cmboDebugPort.Items.IndexOf(xKey.GetValue("Debug Port", ""));
+                if (cmboDebugPort.SelectedIndex == -1) {
+                    cmboDebugPort.SelectedIndex = 0;
+                }
+
+                // QEMU
+                chckQEMUUseGDB.IsChecked = ((int)xKey.GetValue("Use GDB", false) != 0);
+                chckQEMUUseHD.IsChecked = ((int)xKey.GetValue("Create HD Image", false) != 0);
+                chckQEMUSerialWait.IsChecked = ((int)xKey.GetValue("Wait for Serial TCP", false) != 0);
+
+                // USB
+                cmboUSBDevice.SelectedIndex = cmboUSBDevice.Items.IndexOf(xKey.GetValue("USB Device", ""));
             }
-
-            bool xBool;
-
-            // General
-            bool.TryParse(BuildRegistry.Read("Compile IL"), out xBool);
-            chckCompileIL.IsChecked = xBool;
-            bool.TryParse(BuildRegistry.Read("Include Cosmos Debug code"), out xBool);
-            cmboDebugPort.SelectedIndex = cmboDebugPort.Items.IndexOf(BuildRegistry.Read("Debug Port"));
-
-            // QEMU
-            bool.TryParse(BuildRegistry.Read("Use GDB"), out xBool);
-            chckQEMUUseGDB.IsChecked = xBool;
-            bool.TryParse(BuildRegistry.Read("Create HD Image"), out xBool);
-            chckQEMUUseHD.IsChecked = xBool;
-            bool.TryParse(BuildRegistry.Read("Wait for Serial TCP"), out xBool);
-            chckQEMUSerialWait.IsChecked = xBool;
-
-            // USB
-            cmboUSBDevice.SelectedIndex = cmboUSBDevice.Items.IndexOf(BuildRegistry.Read("USB Device"));
         }
 
     }
