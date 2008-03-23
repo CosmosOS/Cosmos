@@ -39,7 +39,8 @@
                 <InlineUIContainer>
                     <StackPanel>
                     <CheckBox Name="chckCompileIL" IsChecked="True">Compile IL. Do not uncheck this unless you understand the impact.</CheckBox>
-                    <CheckBox Name="chckCosmosDebugging">Include Cosmos debug code.</CheckBox>
+                        <Label>Cosmos Debug Port</Label>
+                        <ComboBox Name="cmboDebugPort"></ComboBox>
                         </StackPanel>
                 </InlineUIContainer>
             </Paragraph>

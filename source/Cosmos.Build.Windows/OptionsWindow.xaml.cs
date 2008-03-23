@@ -92,6 +92,12 @@ namespace Cosmos.Build.Windows {
                 }
             }
 
+            cmboDebugPort.Items.Add("None");
+            cmboDebugPort.Items.Add("COM1");
+            cmboDebugPort.Items.Add("COM2");
+            cmboDebugPort.Items.Add("COM3");
+            cmboDebugPort.Items.Add("COM4");
+
             LoadSettingsFromRegistry();
         }
 
@@ -185,7 +191,7 @@ namespace Cosmos.Build.Windows {
 
             // General
             BuildRegistry.Write("Compile IL", chckCompileIL.IsChecked.Value.ToString());
-            BuildRegistry.Write("Include Cosmos Debug code", chckCosmosDebugging.IsChecked.Value.ToString());
+            BuildRegistry.Write("Debug Port", (string)cmboDebugPort.SelectedValue);
 
             // QEMU
             BuildRegistry.Write("Use GDB", chckQEMUUseGDB.IsChecked.Value.ToString());
@@ -227,7 +233,7 @@ namespace Cosmos.Build.Windows {
             bool.TryParse(BuildRegistry.Read("Compile IL"), out xBool);
             chckCompileIL.IsChecked = xBool;
             bool.TryParse(BuildRegistry.Read("Include Cosmos Debug code"), out xBool);
-            chckCosmosDebugging.IsChecked = xBool;
+            cmboDebugPort.SelectedIndex = cmboDebugPort.Items.IndexOf(BuildRegistry.Read("Debug Port"));
 
             // QEMU
             bool.TryParse(BuildRegistry.Read("Use GDB"), out xBool);
@@ -238,8 +244,7 @@ namespace Cosmos.Build.Windows {
             chckQEMUSerialWait.IsChecked = xBool;
 
             // USB
-            string xUSBDevice = BuildRegistry.Read("USB Device");
-            cmboUSBDevice.SelectedIndex = cmboUSBDevice.Items.IndexOf(xUSBDevice);
+            cmboUSBDevice.SelectedIndex = cmboUSBDevice.Items.IndexOf(BuildRegistry.Read("USB Device"));
         }
 
     }
