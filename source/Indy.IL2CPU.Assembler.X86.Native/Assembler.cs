@@ -7,8 +7,10 @@ using System.Text;
 namespace Indy.IL2CPU.Assembler.X86.Native {
 	public class Assembler: X86.Assembler {
 		public const string BreakMethodName = "_CODE_REQUESTED_BREAK_";
-		public Assembler(Func<string, string> aGetStreamForGroup, bool aInMetalMode)
+		private byte? mComNumber;
+		public Assembler(Func<string, string> aGetStreamForGroup, bool aInMetalMode, byte? aComNumber)
 			: base(aGetStreamForGroup, aInMetalMode) {
+			mComNumber = aComNumber;
 		}
 
 		public Assembler(Func<string, string> aGetStreamForGroup)
@@ -40,6 +42,46 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
 				aOutputWriter.WriteLine("; some more startups todo");
 				aOutputWriter.WriteLine("				 cli");
 				//aOutputWriter.WriteLine("				 push ebx");
+				if (mComNumber != null) {
+					int xComAddr = 0;
+					switch (mComNumber.Value) {
+						case 1:
+							xComAddr = 0x3F8;
+							break;
+						case 2:
+							xComAddr = 0x2F8;
+							break;
+						case 3:
+							xComAddr = 0x3E8;
+							break;
+						case 4:
+							xComAddr = 0x2E8;
+							break;
+						default:
+							throw new Exception("Com " + mComNumber + " not supported!");
+					}
+					aOutputWriter.WriteLine("mov dx, 0x{0}", (xComAddr + 1).ToString("X"));
+					aOutputWriter.WriteLine("mov al, 0x00");
+					aOutputWriter.WriteLine("out DX, AL"); // disable all interrupts
+					aOutputWriter.WriteLine("mov dx, 0x{0}", (xComAddr + 3).ToString("X"));
+					aOutputWriter.WriteLine("mov al, 0x80");
+					aOutputWriter.WriteLine("out DX, AL");  // Enable DLAB (set baud rate divisor)
+					aOutputWriter.WriteLine("mov dx, 0x{0}", (xComAddr + 0).ToString("X"));
+					aOutputWriter.WriteLine("mov al, 0x01");
+					aOutputWriter.WriteLine("out DX, AL");  // Set divisor (lo byte)
+					aOutputWriter.WriteLine("mov dx, 0x{0}", (xComAddr + 1).ToString("X"));
+					aOutputWriter.WriteLine("mov al, 0x00");
+					aOutputWriter.WriteLine("out DX, AL");  //			  (hi byte)
+					aOutputWriter.WriteLine("mov dx, 0x{0}", (xComAddr + 3).ToString("X"));
+					aOutputWriter.WriteLine("mov al, 0x03");
+					aOutputWriter.WriteLine("out DX, AL");  // 8 bits, no parity, one stop bit
+					aOutputWriter.WriteLine("mov dx, 0x{0}", (xComAddr + 2).ToString("X"));
+					aOutputWriter.WriteLine("mov al, 0xC7");
+					aOutputWriter.WriteLine("out DX, AL");  // Enable FIFO, clear them, with 14-byte threshold
+					aOutputWriter.WriteLine("mov dx, 0x{0}", (xComAddr + 4).ToString("X"));
+					aOutputWriter.WriteLine("mov al, 0x03");
+					aOutputWriter.WriteLine("out DX, AL");  // IRQ-s enabled, RTS/DSR set
+				}
 				aOutputWriter.WriteLine("				 call " + EntryPointName);
 				aOutputWriter.WriteLine("			.loop:");
 				aOutputWriter.WriteLine("				 cli");
@@ -49,6 +91,63 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
 				aOutputWriter.WriteLine("         " + BreakMethodName + ":");
 				aOutputWriter.WriteLine("              ret");
 				aOutputWriter.WriteLine("                 ");
+				if (mComNumber != null) {
+					int xComAddr = 0;
+					switch (mComNumber.Value) {
+						case 1:
+							xComAddr = 0x3F8;
+							break;
+						case 2:
+							xComAddr = 0x2F8;
+							break;
+						case 3:
+							xComAddr = 0x3E8;
+							break;
+						case 4:
+							xComAddr = 0x2E8;
+							break;
+						default:
+							throw new Exception("Com " + mComNumber + " not supported!");
+					}
+					aOutputWriter.WriteLine("DebugPoint__:");
+					aOutputWriter.WriteLine("  .Wait1:");
+					aOutputWriter.WriteLine("    mov dx, " + (xComAddr + 5));
+					aOutputWriter.WriteLine("    mov al, 0");
+					aOutputWriter.WriteLine("    in al, dx");
+					aOutputWriter.WriteLine("    test al, 0x20");
+					aOutputWriter.WriteLine("    je .Wait1");
+					aOutputWriter.WriteLine("    mov dx, " + xComAddr);
+					aOutputWriter.WriteLine("    mov al, [esp+3]");
+					aOutputWriter.WriteLine("    out dx, al");
+					aOutputWriter.WriteLine("  .Wait2:");
+					aOutputWriter.WriteLine("    mov dx, " + (xComAddr + 5));
+					aOutputWriter.WriteLine("    mov al, 0");
+					aOutputWriter.WriteLine("    in al, dx");
+					aOutputWriter.WriteLine("    test al, 0x20");
+					aOutputWriter.WriteLine("    je .Wait2");
+					aOutputWriter.WriteLine("    mov dx, " + xComAddr);
+					aOutputWriter.WriteLine("    mov al, [esp+2]");
+					aOutputWriter.WriteLine("    out dx, al");
+					aOutputWriter.WriteLine("  .Wait3:");
+					aOutputWriter.WriteLine("    mov dx, " + (xComAddr + 5));
+					aOutputWriter.WriteLine("    mov al, 0");
+					aOutputWriter.WriteLine("    in al, dx");
+					aOutputWriter.WriteLine("    test al, 0x20");
+					aOutputWriter.WriteLine("    je .Wait3");
+					aOutputWriter.WriteLine("    mov dx, " + xComAddr);
+					aOutputWriter.WriteLine("    mov al, [esp+1]");
+					aOutputWriter.WriteLine("    out dx, al");
+					aOutputWriter.WriteLine("  .Wait4:");
+					aOutputWriter.WriteLine("    mov dx, " + (xComAddr + 5));
+					aOutputWriter.WriteLine("    mov al, 0");
+					aOutputWriter.WriteLine("    in al, dx");
+					aOutputWriter.WriteLine("    test al, 0x20");
+					aOutputWriter.WriteLine("    je .Wait4");
+					aOutputWriter.WriteLine("    mov dx, " + xComAddr);
+					aOutputWriter.WriteLine("    mov al, [esp]");
+					aOutputWriter.WriteLine("    out dx, al");
+					aOutputWriter.WriteLine("  ret");
+				}
 			}
 		}
 
@@ -113,34 +212,34 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
 			//mOutputWriter.WriteLine("org 0220000h    ; the best place to load our kernel to. ");
 			//mOutputWriter.WriteLine("use32           ; the kernel will be run in 32-bit protected mode, ");
 			aOutputWriter.WriteLine("");
-//			List<string> xTheLabels = new List<string>();
-//			string mLastRealLabel = "";
-//			foreach (IL2CPU.Assembler.Instruction x in mInstructions) {
-//				Label xLabel = x as Label;
-//				if (xLabel != null) {
-//					if (!xLabel.Name.StartsWith(".")) {
-//						mLastRealLabel = xLabel.Name;
-//						xTheLabels.Add(xLabel.Name);
-//					} else {
-//						xTheLabels.Add(mLastRealLabel + "@@" + xLabel.Name.Substring(1));
-//					}
-//				}
-//			}
-//			if (xTheLabels.Count > 0) {
+			//			List<string> xTheLabels = new List<string>();
+			//			string mLastRealLabel = "";
+			//			foreach (IL2CPU.Assembler.Instruction x in mInstructions) {
+			//				Label xLabel = x as Label;
+			//				if (xLabel != null) {
+			//					if (!xLabel.Name.StartsWith(".")) {
+			//						mLastRealLabel = xLabel.Name;
+			//						xTheLabels.Add(xLabel.Name);
+			//					} else {
+			//						xTheLabels.Add(mLastRealLabel + "@@" + xLabel.Name.Substring(1));
+			//					}
+			//				}
+			//			}
+			//			if (xTheLabels.Count > 0) {
 			//	mOutputWriter.WriteLine("include 'export.inc'");
 			//	mOutputWriter.WriteLine("section '.edata' export data readable");
 			//	mOutputWriter.WriteLine("");
 			//	mOutputWriter.WriteLine("\texport 'OUTPUT.dll', \\");
-//				for (int i = 0; i < xTheLabels.Count; i++) {
-//					if (i == (xTheLabels.Count - 1)) {
+			//				for (int i = 0; i < xTheLabels.Count; i++) {
+			//					if (i == (xTheLabels.Count - 1)) {
 			//			mOutputWriter.WriteLine("\t\t {0},'{1}'", xTheLabels[i].Replace("@@", "."), xTheLabels[i]);
-//					} else {
+			//					} else {
 			//				mOutputWriter.WriteLine("\t\t{0},'{1}', \\", xTheLabels[i].Replace("@@", "."), xTheLabels[i]);
-//					}
-					// public entry as 'entry'
-					//mOutputWriter.WriteLine("\tpublic {0} as '{0}'", xTheLabels[i].Replace("@@", "."), xTheLabels[i]);
-//				}
-//			}
+			//					}
+			// public entry as 'entry'
+			//mOutputWriter.WriteLine("\tpublic {0} as '{0}'", xTheLabels[i].Replace("@@", "."), xTheLabels[i]);
+			//				}
+			//			}
 			//mOutputWriter.WriteLine("section '.code' code readable executable");
 			aOutputWriter.WriteLine("");
 		}

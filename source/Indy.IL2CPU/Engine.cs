@@ -69,6 +69,11 @@ namespace Indy.IL2CPU {
 		NativeX86
 	}
 
+	public enum DebugModeEnum {
+		None,
+		IL
+	}
+
 	public class QueuedMethodInformation {
 		public bool Processed;
 		public int Index;
@@ -97,6 +102,7 @@ namespace Indy.IL2CPU {
 		protected IList<Type> mTypes = new List<Type>();
 		protected TypeEqualityComparer mTypesEqualityComparer = new TypeEqualityComparer();
 		private DebugSymbols mDebugSymbols;
+		private byte mDebugComport;
 
 		/// <summary>
 		/// Compiles an assembly to CPU-specific code. The entrypoint of the assembly will be 
@@ -107,7 +113,7 @@ namespace Indy.IL2CPU {
 		/// <param name="aTargetPlatform">The platform to target when assembling the code.</param>
 		/// <param name="aOutput"></param>
 		/// <param name="aInMetalMode">Whether or not the output is metalmode only.</param>
-		public void Execute(string aAssembly, TargetPlatformEnum aTargetPlatform, Func<string, string> aGetFileNameForGroup, bool aInMetalMode, string aAssemblyDir, IEnumerable<string> aPlugs) {
+		public void Execute(string aAssembly, TargetPlatformEnum aTargetPlatform, Func<string, string> aGetFileNameForGroup, bool aInMetalMode, string aAssemblyDir, IEnumerable<string> aPlugs, DebugModeEnum aDebugMode, byte aDebugComNumber) {
 			mCurrent = this;
 			try {
 				if (aGetFileNameForGroup == null) {
@@ -123,7 +129,7 @@ namespace Indy.IL2CPU {
 
 				Type xEntryPointType = xEntryPoint.DeclaringType;
 				xEntryPoint = xEntryPointType.GetMethod("Init", new Type[0]);
-
+				mDebugComport = aDebugComNumber;
 				//List<string> xSearchDirs = new List<string>(new string[] { Path.GetDirectoryName(aAssembly), aAssemblyDir });
 				//xSearchDirs.AddRange((from item in aPlugs
 				//                      select Path.GetDirectoryName(item)).Distinct());
@@ -135,7 +141,7 @@ namespace Indy.IL2CPU {
 						}
 					case TargetPlatformEnum.NativeX86: {
 							mMap = (OpCodeMap)Activator.CreateInstance(Type.GetType("Indy.IL2CPU.IL.X86.Native.NativeOpCodeMap, Indy.IL2CPU.IL.X86.Native", true));
-							mAssembler = new Assembler.X86.Native.Assembler(aGetFileNameForGroup, aInMetalMode);
+							mAssembler = new Assembler.X86.Native.Assembler(aGetFileNameForGroup, aInMetalMode, (aDebugMode != DebugModeEnum.None) ? aDebugComNumber : (byte?)null);
 							break;
 						}
 					default:
@@ -988,19 +994,21 @@ namespace Indy.IL2CPU {
 										}
 										DebugSymbolsAssemblyTypeMethodInstruction xInstructionInfo = null;
 										int xCurrentStack = 0;
+										string xLabel = Op.GetInstructionLabel(xReader);
+										if (xLabel.StartsWith(".")) {
+											xLabel = Label.LastFullLabel + xLabel;
+											xLabel = DataMember.FilterStringForIncorrectChars(xLabel);
+										}
 										if (mDebugSymbols != null) {
 											xInstructionInfo = new DebugSymbolsAssemblyTypeMethodInstruction();
-											string xLabel = Op.GetInstructionLabel(xReader);
-											if (xLabel.StartsWith(".")) {
-												xLabel = Label.LastFullLabel + xLabel;
-												xLabel = DataMember.FilterStringForIncorrectChars(xLabel);
-											}
 											xInstructionInfo.Address = xLabel;
 											xInstructionInfo.InstructionType = xReader.OpCode.ToString();
 											xCurrentStack = (from item in mAssembler.StackContents
-															 let xSize = (item.Size % 4 == 0) ? item.Size : (item.Size + (4 - (item.Size %4)))
+															 let xSize = (item.Size % 4 == 0) ? item.Size : (item.Size + (4 - (item.Size % 4)))
 															 select xSize).Sum();
 										}
+										// todo: calculate opcode number
+										mMap.EmitOpHeader(mAssembler, 0, xLabel, mDebugComport);
 										xOp.Assemble();
 										if (xInstructionInfo != null) {
 											int xNewStack = (from item in mAssembler.StackContents

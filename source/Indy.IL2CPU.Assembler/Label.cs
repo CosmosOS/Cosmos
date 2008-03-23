@@ -57,8 +57,8 @@ namespace Indy.IL2CPU.Assembler {
 
 		public static string LastFullLabel {
 			get;
-			private set;
-		}
+			set;
+		}							  
 
 		public Label(string aName) {
 			mName = aName;

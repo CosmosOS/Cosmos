@@ -105,6 +105,7 @@ namespace IL2CPU {
 						}
 				}
 			}
+			DebugFile = null;
 			if (String.IsNullOrEmpty(InputFile)) {
 				Console.WriteLine("Error: No InputFile specified!");
 				return false;
@@ -173,7 +174,7 @@ namespace IL2CPU {
 						xTestOutput = OutputFile;
 					}
 					Func<string, string> xGetFileNameForGroup = xGroup => Path.Combine(AsmFile, xGroup + ".asm");
-					e.Execute(InputFile, TargetPlatform, xGetFileNameForGroup, MetalMode, BCLDir, Plugs);
+					e.Execute(InputFile, TargetPlatform, xGetFileNameForGroup, MetalMode, BCLDir, Plugs, DebugModeEnum.IL, 2);
 					ProcessStartInfo xFasmStartInfo = new ProcessStartInfo();
 					if (TargetPlatform != TargetPlatformEnum.NativeX86) {
 						xFasmStartInfo.FileName = FAsmFileName;

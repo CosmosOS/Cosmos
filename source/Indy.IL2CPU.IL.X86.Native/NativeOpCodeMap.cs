@@ -6,7 +6,6 @@ using Indy.IL2CPU.Assembler;
 using Indy.IL2CPU.IL.X86.Native.CustomImplementations.System;
 using Indy.IL2CPU.IL.X86.Native.CustomImplementations.System.Diagnostics;
 
-
 using CPU = Indy.IL2CPU.Assembler.X86;
 using CPUNative = Indy.IL2CPU.Assembler.X86.Native;
 using System.Reflection;
@@ -24,7 +23,6 @@ namespace Indy.IL2CPU.IL.X86.Native {
 			Instance = this;
 		}
 
-	
 		protected override Type GetCustomMethodImplementationOp() {
 			return typeof(NativeCustomMethodImplementationOp);
 		}
@@ -41,97 +39,45 @@ namespace Indy.IL2CPU.IL.X86.Native {
 			return typeof(NativeMethodHeaderOp);
 		}
 
-		//		private SortedList<GlueMethodTypeEnum, MethodBase> mGlueMethods;
-		//		private SortedList<GluePlaceholderMethodTypeEnum, MethodBase> mGluePlaceholderMethods;
-		//		private SortedList<GlueFieldTypeEnum, FieldInfo> mGlueFields;
-
-		//		private void CheckGlueMethod() {
-		//			if (mGlueMethods != null) {
-		//				return;
-		//			}
-		//			mGlueMethods = new SortedList<GlueMethodTypeEnum, MethodBase>();
-		//			Assembly xCrawledAsm = Engine.GetCrawledAssembly();
-		//			foreach (ModuleDefinition xModule in xCrawledAsm.Modules) {
-		//				foreach (Type xType in xModule.Types) {
-		//					foreach (MethodBase xMethod in xType.Methods) {
-		//						IEnumerable<CustomAttribute> xAttribs = (from item in xMethod.CustomAttributes.Cast<CustomAttribute>()
-		//																 where item.Constructor.DeclaringType.FullName == typeof(GlueMethodAttribute).FullName
-		//																 select item);
-		//						if (xAttribs == null || xAttribs.Count() == 0) {
-		//							continue;
-		//						}
-		//						foreach (CustomAttribute xAttrib in xAttribs) {
-		//							if (!xAttrib.Resolved) {
-		//								if (!xAttrib.Resolve()) {
-		//									throw new Exception("Couldn't resolve attribute on method '" + xMethod.GetFullName());
-		//								}
-		//							}
-		//							mGlueMethods.Add((GlueMethodTypeEnum)xAttrib.Properties["MethodType"], xMethod);
-		//						}
-		//					}
-		//				}
-		//			}
-		//		}
-		//
-		//		private void CheckGluePlaceholderMethod() {
-		//			if (mGluePlaceholderMethods != null) {
-		//				return;
-		//			}
-		//			mGluePlaceholderMethods = new SortedList<GluePlaceholderMethodTypeEnum, MethodBase>();
-		//			Assembly xCrawledAsm = Engine.GetCrawledAssembly();
-		//			foreach (ModuleDefinition xModule in xCrawledAsm.Modules) {
-		//				foreach (Type xType in xModule.Types) {
-		//					foreach (MethodBase xMethod in xType.Methods) {
-		//						CustomAttribute xAttrib = (from item in xMethod.CustomAttributes.Cast<CustomAttribute>()
-		//												   where item.Constructor.DeclaringType.FullName == typeof(GluePlaceholderMethodAttribute).FullName
-		//												   select item).FirstOrDefault();
-		//						if (xAttrib == null) {
-		//							continue;
-		//						}
-		//						if (!xAttrib.Resolved) {
-		//							if (!xAttrib.Resolve()) {
-		//								throw new Exception("Couldn't resolve attribute on method '" + xMethod.GetFullName());
-		//							}
-		//						}
-		//						mGluePlaceholderMethods.Add((GluePlaceholderMethodTypeEnum)xAttrib.Properties["MethodType"], xMethod);
-		//					}
-		//				}
-		//			}
-		//		}
-		//
-		//		private void CheckGlueField() {
-		//			if (mGlueFields != null) {
-		//				return;
-		//			}
-		//			mGlueFields = new SortedList<GlueFieldTypeEnum, FieldInfo>();
-		//			Assembly xCrawledAsm = Engine.GetCrawledAssembly();
-		//			foreach (ModuleDefinition xModule in xCrawledAsm.Modules) {
-		//				foreach (Type xType in xModule.Types) {
-		//					foreach (FieldInfo xFieldInfo in xType.Fields) {
-		//						CustomAttribute xAttrib = (from item in xFieldInfo.CustomAttributes.Cast<CustomAttribute>()
-		//												   where item.Constructor.DeclaringType.FullName == typeof(GlueFieldAttribute).FullName
-		//												   select item).FirstOrDefault();
-		//						if (xAttrib == null) {
-		//							continue;
-		//						}
-		//						if (!xAttrib.Resolved) {
-		//							if (!xAttrib.Resolve()) {
-		//								throw new Exception("Couldn't resolve attribute on method '" + xFieldInfo.GetFullName());
-		//							}
-		//						}
-		//						if (mGlueFields.ContainsKey((GlueFieldTypeEnum)xAttrib.Properties["FieldType"])) {
-		//							throw new Exception("GlueField of type '" + ((GlueFieldTypeEnum)xAttrib.Properties["FieldType"]).ToString() + "' already found!");
-		//						}
-		//						mGlueFields.Add((GlueFieldTypeEnum)xAttrib.Properties["FieldType"], xFieldInfo);
-		//					}
-		//				}
-		//			}
-		//		}
-
 		public override IList<Assembly> GetPlugAssemblies() {
 			IList<Assembly> xResult = base.GetPlugAssemblies();
 			xResult.Add(typeof(NativeOpCodeMap).Assembly);
 			return xResult;
+		}
+
+		public override void EmitOpHeader(Indy.IL2CPU.Assembler.Assembler aAssembler, uint aOpId, string aOpLabel, ushort aDebugComport) {
+			base.EmitOpHeader(aAssembler, aOpId, aOpLabel, aDebugComport);
+			ushort xAddress = 0;
+			switch (aDebugComport) {
+				case 1:
+					xAddress = 0x3F8;
+					break;
+				case 2:
+					xAddress = 0x2F8;
+					break;
+				case 3:
+					xAddress = 0x3E8;
+					break;
+				case 4:
+					xAddress = 0x2E8;
+					break;
+				default:
+					throw new Exception("Com " + aDebugComport + " not supported!");
+			}
+			new CPU.Call("DebugPoint__");
+			//new CPUNative.InByte
+			//int is_transmit_empty() {
+			//   return inb(PORT + 5) & 0x20;
+			//}
+
+			//void write_serial(char a) {
+			//   while (is_transmit_empty() == 0)
+			//		;
+
+			//   outb(PORT,a);
+			//}
+
+
 		}
 
 		public override bool HasCustomAssembleImplementation(MethodInformation aMethodInfo, bool aInMetalMode) {
@@ -170,16 +116,7 @@ namespace Indy.IL2CPU.IL.X86.Native {
 						return true;
 					}
 				default: {
-//						CheckGluePlaceholderMethod();
-//						GluePlaceholderMethodTypeEnum? xMethodType = null;
-//						int xResult = (from item in mGluePlaceholderMethods.Keys
-//									   where Label.GenerateLabelName(mGluePlaceholderMethods[item]) == aMethodInfo.LabelName
-//									   select item).Count();
-//						if (xResult > 0) {
-//							return true;
-//						} else {
-							break;
-//						}
+						break;
 					}
 			}
 			return base.HasCustomAssembleImplementation(aMethodInfo, aInMetalMode);
@@ -202,139 +139,11 @@ namespace Indy.IL2CPU.IL.X86.Native {
 						return;
 					}
 				default: {
-//						CheckGluePlaceholderMethod();
-//						GluePlaceholderMethodTypeEnum? xMethodType = null;
-//
-//						foreach (GluePlaceholderMethodTypeEnum xTheMethodType in mGluePlaceholderMethods.Keys) {
-//							if (Label.GenerateLabelName(mGluePlaceholderMethods[xTheMethodType]) == aMethodInfo.LabelName) {
-//								xMethodType = xTheMethodType;
-//								break;
-//							}
-//						}
-//						if (xMethodType != null) {
-//							AssembleGluePlaceholderMethod(xMethodType.Value, aAssembler, aMethodInfo);
-//						}
 						break;
 					}
 			}
 			base.DoCustomAssembleImplementation(aInMetalMode, aAssembler, aMethodInfo);
 		}
-
-//		private void AssembleGluePlaceholderMethod(GluePlaceholderMethodTypeEnum aMethodType, Assembler.Assembler aAssembler, MethodInformation aMethodInfo) {
-//			switch (aMethodType) {
-//				case GluePlaceholderMethodTypeEnum.GDT_LoadArray: {
-//						FieldInfo xFieldDef = GetGlueField(GlueFieldTypeEnum.GDT_Array);
-//						string xFieldName = Assembler.DataMember.GetStaticFieldName(xFieldDef);
-//						string xFieldData = "0,0,0,0,";
-//						xFieldData += BitConverter.GetBytes((uint)InstanceTypeEnum.StaticEmbeddedArray).Aggregate("", (b, r) => r + b + ",");
-//						xFieldData += "3,0,0,0,";
-//						for (int i = 0; i < 3; i++) {
-//							xFieldData += ",0,0,0,0,0,0,0,0";
-//						}
-//						DataMember xDataItem = (from item in aAssembler.DataMembers
-//												where item.Name == xFieldName
-//												select item).FirstOrDefault();
-//						aAssembler.DataMembers.Remove(xDataItem);
-//						aAssembler.DataMembers.Add(new DataMember(xFieldName, "dd", xFieldName));
-//						aAssembler.DataMembers.Add(new DataMember(xFieldName + "___Contents", "db", xFieldData));
-//						xFieldDef = GetGlueField(GlueFieldTypeEnum.GDT_Pointer);
-//						string xPointerFieldName;
-//						Engine.QueueStaticField(xFieldDef, out xPointerFieldName);
-//						new CPU.Move("eax", xPointerFieldName);
-//						new CPU.Move("word [eax]", "0x" + ((8 * 3) - 1).ToString("X"));
-//						new CPU.Move("ecx", "[" + xFieldName + "]");
-//						new CPU.Add("ecx", "0xC");
-//						new CPU.Move("dword [eax + 2]", "ecx");
-//						break;
-//					}
-//				case GluePlaceholderMethodTypeEnum.GDT_Register: {
-//						FieldInfo xFieldDef = GetGlueField(GlueFieldTypeEnum.GDT_Pointer);
-//						string xPointerFieldName;
-//						Engine.QueueStaticField(xFieldDef, out xPointerFieldName);
-//						new CPU.Move("eax", xPointerFieldName);
-//						new CPUNative.Lgdt("[eax]");
-//						new CPU.Move("eax", "0x10");
-//						new CPU.Move("ds", "ax");
-//						new CPU.Move("es", "ax");
-//						new CPU.Move("fs", "ax");
-//						new CPU.Move("gs", "ax");
-//						new CPU.Move("ss", "ax");
-//						new CPU.JumpAlways("0x8:flush____gdt______table__part1");
-//						new Label("flush____gdt______table__part1");
-//						break;
-//					}
-//				case GluePlaceholderMethodTypeEnum.IDT_LoadArray: {
-//						MethodBase xTheMethod = GetGlueMethod(GlueMethodTypeEnum.IDT_SetHandler);
-//						Engine.QueueMethod(xTheMethod);
-//						mIDTSetHandlerMethodName = Label.GenerateLabelName(xTheMethod);
-//						FieldInfo xFieldDef = GetGlueField(GlueFieldTypeEnum.IDT_Array);
-//						string xFieldName = Assembler.DataMember.GetStaticFieldName(xFieldDef);
-//						string xFieldData = "0,0,0,0,";
-//						xFieldData += BitConverter.GetBytes((uint)InstanceTypeEnum.StaticEmbeddedArray).Aggregate("", (b, r) => r + b + ",");
-//						xFieldData += "1,0,0,0";
-//						for (int i = 0; i < 256; i++) {
-//							xFieldData += ",0,0,0,0,0,0,0,0";
-//						}
-//						DataMember xDataItem = (from item in aAssembler.DataMembers
-//												where item.Name == xFieldName
-//												select item).FirstOrDefault();
-//						aAssembler.DataMembers.Remove(xDataItem);
-//						aAssembler.DataMembers.Add(new DataMember(xFieldName, "dd", xFieldName + "___Contents"));
-//						aAssembler.DataMembers.Add(new DataMember(xFieldName + "___Contents", "db", xFieldData));
-//						xFieldDef = GetGlueField(GlueFieldTypeEnum.IDT_Pointer);
-//						string xPointerFieldName;
-//						Engine.QueueStaticField(xFieldDef, out xPointerFieldName);
-//						new CPU.Move("eax", xPointerFieldName);
-//						new CPU.Move("word [eax]", "0x" + ((8 * 256) - 1).ToString("X"));
-//						new CPU.Move("ecx", xFieldName + "___Contents");
-//						new CPU.Add("ecx", "0xC");
-//						new CPU.Move("dword [eax + 2]", "ecx");
-//						break;
-//					}
-//				case GluePlaceholderMethodTypeEnum.IDT_Register: {
-//						FieldInfo xFieldDef = GetGlueField(GlueFieldTypeEnum.IDT_Pointer);
-//						string xPointerFieldName;
-//						Engine.QueueStaticField(xFieldDef, out xPointerFieldName);
-//						MethodBase xTheMethod = GetGlueMethod(GlueMethodTypeEnum.IDT_SetHandler);
-//						Engine.QueueMethod(xTheMethod);
-//						mIDTSetHandlerMethodName = Label.GenerateLabelName(xTheMethod);
-//						new CPU.Call("___________REGISTER___ISRS_____");
-//						new CPU.Move("eax", xPointerFieldName);
-//						new CPUNative.Lidt("eax");
-//						GetGlueMethod(GlueMethodTypeEnum.IDT_InterruptHandler);
-//						break;
-//					}
-//				case GluePlaceholderMethodTypeEnum.IO_ReadByte: {
-//						new CPU.Xor("eax", "eax");
-//						IL.X86.Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
-//						new CPU.Pop("edx");
-//						new CPU.Move("eax", "0");
-//						new CPUNative.In("al", "dx");
-//						new CPU.Push("eax");
-//						break;
-//					}
-//				case GluePlaceholderMethodTypeEnum.IO_WriteByte: {
-//						Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
-//						new CPU.Pop("edx");
-//						Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[1]);
-//						new CPU.Pop("eax");
-//						new CPUNative.Out("dx", "al");
-//						break;
-//					}
-//				case GluePlaceholderMethodTypeEnum.IDT_EnableInterrupts: {
-//						new CPUNative.Sti();
-//						break;
-//					}
-//				case GluePlaceholderMethodTypeEnum.GetKernelResource: {
-//						new CPUNative.Break();
-//						break;
-//					}
-//				default:
-//					throw new NotImplementedException("GluePlaceholderMethod '" + aMethodType.ToString() + "' not implemented!");
-//			}
-//		}
-//
-//		private string mIDTSetHandlerMethodName;
 
 		private static void DoAssemble_String_GetByteFromChar(Assembler.Assembler aAssembler, MethodInformation aMethodInfo) {
 			X86.Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
@@ -342,94 +151,6 @@ namespace Indy.IL2CPU.IL.X86.Native {
 
 		public override void PostProcess(Indy.IL2CPU.Assembler.Assembler aAssembler) {
 			base.PostProcess(aAssembler);
-			//			Type xRuntimeEngineTypeDef = Engine.GetType(typeof(RuntimeEngineImpl).Assembly.GetName().Name, typeof(RuntimeEngineImpl).FullName);
-			//			MethodBase xTheMethod = GetGlueMethod(GlueMethodTypeEnum.IDT_SetHandler);
-			//			Engine.QueueMethod(xTheMethod);
-			//			mIDTSetHandlerMethodName = Label.GenerateLabelName(xTheMethod);
-			//			Console.WriteLine("IDTEntry size = {0}", Engine.GetFieldStorageSize(Engine.GetType(typeof(Cosmos.Kernel.Boot.Glue.IDTEntryStruct).Assembly.GetName().Name, typeof(Cosmos.Kernel.Boot.Glue.IDTEntryStruct).FullName)));
-			//			X86.X86MethodHeaderOp.AssembleHeader(aAssembler, "___________REGISTER___ISRS_____", new int[0], new MethodInformation.Argument[0]);
-			//			string xInterruptHandlerLabel = Label.GenerateLabelName(GetGlueMethod(GlueMethodTypeEnum.IDT_InterruptHandler));
-			//			int[] xInterruptsWithParam = new int[] { 8, 10, 11, 12, 13, 14 };
-			//			for (int i = 0; i < 256; i++) {
-			//				new CPU.Pushd("0x" + i.ToString("X"));
-			//				new CPU.Pushd("____INTERRUPT_HANDLER___" + i);
-			//				new CPU.Pushd("0x08");
-			//				new CPU.Pushd("0x8E");
-			//				new CPU.Call(mIDTSetHandlerMethodName);
-			//			}
-			//			X86.X86MethodFooterOp.AssembleFooter(0, aAssembler, new MethodInformation.Variable[0], new MethodInformation.Argument[0], 0);
-			//			for (int j = 0; j < 256; j++) {
-			//				new Label("____INTERRUPT_HANDLER___" + j);
-			//				new CPUNative.Cli();
-			//				new CPUNative.Break();
-			//				new CPUNative.Pushad();
-			//				new CPU.Pushd(j.ToString());
-			//				if (!xInterruptsWithParam.Contains(j)/* && !(j >= 0x20 && j <= 0x2F)*/) {
-			//					new CPU.Pushd("0");
-			//				}
-			//				new CPU.Call(xInterruptHandlerLabel);
-			//				new CPUNative.Popad();
-			//				new CPUNative.Break();
-			//				new CPUNative.Sti();
-			//				new CPUNative.IRet();
-			//			}
-			//			IEnumerable<Assembly> xAssemblies = Engine.GetAllAssemblies();
-			//			SortedList<int, byte[]> xResources = new SortedList<int, byte[]>();
-			//			foreach (Assembly xAssembly in xAssemblies) {
-			//				foreach (CustomAttribute xAttrib in xAssembly.CustomAttributes) {
-			//					if (!xAttrib.Resolved) {
-			//						xAttrib.Resolve();
-			//					}
-			//				}
-			//				IEnumerable<KeyValuePair<int, string>> xWantedResources = (from item in xAssembly.CustomAttributes.Cast<CustomAttribute>()
-			//																		   where item.Constructor.DeclaringType.FullName == typeof(KernelResourceAttribute).FullName
-			//																		   select new KeyValuePair<int, string>((int)item.ConstructorParameters[1],
-			//																			   (string)item.ConstructorParameters[0]));
-			//				foreach (KeyValuePair<int, string> xWantedResource in xWantedResources) {
-			//					foreach (ModuleDefinition xModule in xAssembly.Modules) {
-			//						foreach (Resource xResource in xModule.Resources) {
-			//							if (xResource.Name == xWantedResource.Value) {
-			//								EmbeddedResource xEmbedded = xResource as EmbeddedResource;
-			//								if (xEmbedded == null) {
-			//									throw new Exception("Resource found but was not an embedded resource (Resource Name = '" + xWantedResource.Value + "')");
-			//								}
-			//								xResources.Add(xWantedResource.Key, xEmbedded.Data);
-			//							}
-			//						}
-			//					}
-			//				}
-			//			}
-			//			StringBuilder xValue = new StringBuilder();
-			//			DataMember xDataMember;
-			//			for (int i = 0; i < xResources.Count; i++) {
-			//				xValue.Remove(0, xValue.Length);
-			//				xValue.Append("0,0,0,0,2,0,0,0,");
-			//				xValue.Append(BitConverter.GetBytes(xResources.Values[i].Length).Aggregate("", (r, v) => r + v + ","));
-			//				xValue.Append(xResources.Values[i].Aggregate("", (r, v) => r + v + ","));
-			//				xDataMember = new DataMember("embedded_resource_" + xResources.Keys[i] + "_contents", "db", xValue.ToString().TrimEnd(','));
-			//				aAssembler.DataMembers.Add(xDataMember);
-			//			}
-			//			MethodBase xGetResourceMethod = GetGluePlaceholderMethod(GluePlaceholderMethodTypeEnum.GetKernelResource);
-			//			MethodInformation xGetResourceMethodInfo = Engine.GetMethodInfo(xGetResourceMethod, xGetResourceMethod, xGetResourceMethod.Name, null);
-			//			string xGetResourceLabelName = Label.GenerateLabelName(xGetResourceMethod);
-			//			for (int i = 0; i < aAssembler.Instructions.Count; i++) {
-			//				if ((aAssembler.Instructions[i] is Label) && ((Label)aAssembler.Instructions[i]).Name == xGetResourceLabelName) {
-			//					aAssembler.Instructions.RemoveRange(i, 10);
-			//					break;
-			//				}
-			//			}
-			//			NativeMethodHeaderOp.AssembleHeader(aAssembler, xGetResourceLabelName, new int[0], new MethodInformation.Argument[0]);
-			//			Op.Ldarg(aAssembler, xGetResourceMethodInfo.Arguments[0]);
-			//			new CPU.Pop("eax");
-			//			foreach (int xId in xResources.Keys) {
-			//				new CPU.Move("ecx", "0x" + xId.ToString("X"));
-			//				new CPU.Compare("eax", "ecx");
-			//				new CPU.JumpIfNotEquals(".__after__" + xId);
-			//				new CPU.Push("embedded_resource_" + xId + "_contents");
-			//				new CPU.JumpAlways(".END__OF__METHOD");
-			//				new Label(".__after__" + xId);
-			//			}
-			//			NativeMethodFooterOp.AssembleFooter(4, aAssembler, new MethodInformation.Variable[0], new MethodInformation.Argument[0], 4);
 		}
 	}
 }

@@ -141,8 +141,8 @@ namespace Cosmos.Build.Windows {
                 // Might reenable serial file later for post debugging of CPU
                 // etc since serial to TCP on a byte level is likely highly innefficient
                 // with the packet overhead
-                //+ " -serial \"file:" + BuildPath + "serial-debug.txt\""
-                + " -serial tcp::4444,server" + (aWaitSerialTCP ? "" : ",nowait")
+                + " -serial tcp::4444,server"
+				+ " -serial \"file:" + BuildPath + "debug.dbg\" "
                 // Enable acceleration if we are not using GDB
                 + (aGDB ? " -S -s" : " -kernel-kqemu")
                 // Ethernet card
