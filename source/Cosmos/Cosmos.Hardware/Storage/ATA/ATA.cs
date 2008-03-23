@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Cosmos.Hardware.New.Storage {
+namespace Cosmos.Hardware.Storage.ATA {
 	public partial class ATA: BlockDevice {
 		private static Action<uint> mSleep;
 		private readonly string mName;
