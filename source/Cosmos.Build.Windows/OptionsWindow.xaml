@@ -33,6 +33,16 @@
                 <LineBreak/>                
                 <Span Name="spanBuildPath"></Span>
             </Paragraph>
+            <Paragraph Name="GeneralSettings">
+                <Bold>General Options</Bold>
+                <LineBreak/>
+                <InlineUIContainer>
+                    <StackPanel>
+                    <CheckBox Name="chckCompileIL" IsChecked="True">Compile IL. Do not uncheck this unless you understand the impact.</CheckBox>
+                    <CheckBox Name="chckCosmosDebugging">Include Cosmos debug code.</CheckBox>
+                        </StackPanel>
+                </InlineUIContainer>
+            </Paragraph>
             <Paragraph Name="paraQEMUOptions">
                 <Bold>QEMU Options</Bold>
             <LineBreak/>
@@ -68,13 +78,6 @@
                     </ComboBox>
                 </InlineUIContainer>
             </Paragraph>
-        <Paragraph Name="GeneralSettings">
-                <Bold>General settings</Bold>
-                <LineBreak/>
-                    <InlineUIContainer>
-                    <CheckBox Name="buildCheckBox">Skip IL compilation. Do not check this unless you understand the impact.</CheckBox>
-                </InlineUIContainer>
-        </Paragraph>
         <Paragraph TextAlignment="Right">
             <InlineUIContainer>
                 <Button Name="butnBuild" IsDefault="True">_Build</Button>
