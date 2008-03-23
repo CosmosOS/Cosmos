@@ -114,7 +114,7 @@ namespace Indy.IL2CPU.IL {
 		public virtual void PostProcess(Assembler.Assembler aAssembler) {
 		}
 
-		public virtual void EmitOpHeader(Assembler.Assembler aAssembler, uint aOpId, string aOpLabel, ushort aDebugComport) {
+		public virtual void EmitOpDebugHeader(Assembler.Assembler aAssembler, uint aOpId, string aOpLabel, ushort aDebugComport) {
 		}
 	}
 }

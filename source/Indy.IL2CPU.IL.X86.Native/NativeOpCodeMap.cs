@@ -45,8 +45,8 @@ namespace Indy.IL2CPU.IL.X86.Native {
 			return xResult;
 		}
 
-		public override void EmitOpHeader(Indy.IL2CPU.Assembler.Assembler aAssembler, uint aOpId, string aOpLabel, ushort aDebugComport) {
-			base.EmitOpHeader(aAssembler, aOpId, aOpLabel, aDebugComport);
+		public override void EmitOpDebugHeader(Indy.IL2CPU.Assembler.Assembler aAssembler, uint aOpId, string aOpLabel, ushort aDebugComport) {
+			base.EmitOpDebugHeader(aAssembler, aOpId, aOpLabel, aDebugComport);
 			ushort xAddress = 0;
 			switch (aDebugComport) {
 				case 1:

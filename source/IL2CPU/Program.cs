@@ -174,7 +174,7 @@ namespace IL2CPU {
 						xTestOutput = OutputFile;
 					}
 					Func<string, string> xGetFileNameForGroup = xGroup => Path.Combine(AsmFile, xGroup + ".asm");
-					e.Execute(InputFile, TargetPlatform, xGetFileNameForGroup, MetalMode, BCLDir, Plugs, DebugModeEnum.IL, 2);
+					e.Execute(InputFile, TargetPlatform, xGetFileNameForGroup, MetalMode, BCLDir, Plugs, DebugModeEnum.Source, 2);
 					ProcessStartInfo xFasmStartInfo = new ProcessStartInfo();
 					if (TargetPlatform != TargetPlatformEnum.NativeX86) {
 						xFasmStartInfo.FileName = FAsmFileName;

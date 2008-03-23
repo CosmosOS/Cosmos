@@ -13,6 +13,8 @@ using Indy.IL2CPU.Plugs;
 using System.Runtime.InteropServices;
 using System.Xml.Serialization;
 using System.Collections.ObjectModel;
+using System.Diagnostics.SymbolStore;
+using Microsoft.Samples.Debugging.CorSymbolStore;
 
 namespace Indy.IL2CPU {
 	public class MethodBaseComparer: IComparer<MethodBase> {
@@ -71,7 +73,8 @@ namespace Indy.IL2CPU {
 
 	public enum DebugModeEnum {
 		None,
-		IL
+		IL,
+		Source
 	}
 
 	public class QueuedMethodInformation {
@@ -101,8 +104,9 @@ namespace Indy.IL2CPU {
 
 		protected IList<Type> mTypes = new List<Type>();
 		protected TypeEqualityComparer mTypesEqualityComparer = new TypeEqualityComparer();
-		private DebugSymbols mDebugSymbols;
 		private byte mDebugComport;
+		private DebugModeEnum mDebugMode;
+		private List<DebugSymbol> mDebugSymbols = new List<DebugSymbol>();
 
 		/// <summary>
 		/// Compiles an assembly to CPU-specific code. The entrypoint of the assembly will be 
@@ -121,8 +125,9 @@ namespace Indy.IL2CPU {
 				}
 				mCrawledAssembly = Assembly.LoadFile(aAssembly);
 				//if (!String.IsNullOrEmpty(aDebugSymbols)) {
-				//    mDebugSymbols = new DebugSymbols();
+				//    mDebugSymbols = new DebugSymbolsOld();
 				//}
+				mDebugMode = aDebugMode;
 				MethodInfo xEntryPoint = (MethodInfo)mCrawledAssembly.EntryPoint;
 				if (xEntryPoint == null)
 					throw new NotSupportedException("No EntryPoint found!");
@@ -146,11 +151,6 @@ namespace Indy.IL2CPU {
 						}
 					default:
 						throw new NotSupportedException("TargetPlatform '" + aTargetPlatform + "' not supported!");
-				}
-				if (mDebugSymbols != null) {
-					Guid xSig = Guid.NewGuid();
-					mDebugSymbols.Signature = xSig.ToString("B").ToUpperInvariant();
-					mAssembler.Signature = xSig.ToByteArray();
 				}
 				InitializePlugs(aPlugs);
 				using (mAssembler) {
@@ -274,7 +274,7 @@ namespace Indy.IL2CPU {
 						//if (mDebugSymbols != null) {
 						//    GenerateDebugSymbols();
 						//}
-						//XmlSerializer xSerializer = new XmlSerializer(typeof(DebugSymbols));
+						//XmlSerializer xSerializer = new XmlSerializer(typeof(DebugSymbolsOld));
 						//using (FileStream xFS = new FileStream(aDebugSymbols, FileMode.Create)) {
 						//    xSerializer.Serialize(xFS, mDebugSymbols);
 						//}
@@ -408,8 +408,7 @@ namespace Indy.IL2CPU {
 					xDbgAssembly.Type = xDbgAssemblyTypes.ToArray();
 					xDbgAssemblies.Add(xDbgAssembly);
 				}
-				mDebugSymbols.Assembly = xDbgAssemblies.ToArray();
-			} finally {
+				} finally {
 				if (xTypeCount != mTypes.Count) {
 					Console.WriteLine("TypeCount changed (was {0}, new {1})", xTypeCount, mTypes.Count);
 					Console.WriteLine("Last Type: {0}", mTypes.Last().FullName);
@@ -610,99 +609,6 @@ namespace Indy.IL2CPU {
 			throw new Exception("Couldn't find Method! ('" + aRef.GetFullName() + "'");
 		}
 
-		[Obsolete]
-		public static Type GetDefinitionFromType2(Type aRef) {
-			if (aRef == null) {
-				throw new ArgumentNullException("aRef");
-			}
-			if (mCurrent == null) {
-				throw new Exception("No Current engine found!");
-			}
-			Type xTempResult = aRef as Type;
-			if (xTempResult != null) {
-				return xTempResult;
-			}
-			//GenericParameter xGenParam = aRef as GenericParameter;
-			//if (xGenParam != null) {
-			//    // todo: add support for generics
-			//    return GetType("mscorlib", "System.Object");
-			//}
-			//TypeSpecification xTypeSpec = aRef as TypeSpecification;
-			//if (xTypeSpec != null) {
-			//    return GetDefinitionFromType(xTypeSpec.ElementType);
-			//}
-			//if (aRef.FullName.Contains("modreq")) {
-			//    aRef = aRef.GetOriginalType();
-			//}
-			//AssemblyNameReference xAssemblyNameReference = aRef.Scope as AssemblyNameReference;
-			//if (xAssemblyNameReference != null) {
-			//    return GetType(mCurrent.mCrawledAssembly.Resolver.Resolve(xAssemblyNameReference), aRef.FullName);
-			//} else {
-			//    ModuleDefinition xReferencedModule = aRef.Scope as ModuleDefinition;
-			//    if (xReferencedModule != null) {
-			//        var xReferencedType = xReferencedModule.Types[aRef.FullName];
-			//        if (xReferencedType != null) {
-			//            return xReferencedType;
-			//        }
-			//        {
-			//            string theName = aRef.FullName;
-			//            while (theName.EndsWith("[]")) {
-			//                theName = theName.Substring(0, theName.Length - 2);
-			//            }
-			//            xReferencedType = xReferencedModule.Types[theName];
-			//            if (xReferencedType != null) {
-			//                return xReferencedType;
-			//            }
-			//        }
-			//        {
-			//            string theName = aRef.FullName;
-			//            while (theName.EndsWith("*")) {
-			//                theName = theName.Substring(0, theName.Length - 1);
-			//            }
-			//            xReferencedType = xReferencedModule.Types[theName];
-			//            if (xReferencedType != null) {
-			//                return xReferencedType;
-			//            }
-			//        }
-			//        {
-			//            string theName = aRef.FullName;
-			//            while (theName.EndsWith("&")) {
-			//                theName = theName.Substring(0, theName.Length - 1);
-			//            }
-			//            xReferencedType = xReferencedModule.Types[theName];
-			//            if (xReferencedType != null) {
-			//                return xReferencedType;
-			//            }
-			//        }
-			//        {
-			//            string theName = aRef.FullName;
-			//            if (theName.Contains("<") && theName.Contains(">")) {
-			//                theName = theName.Substring(0, theName.IndexOf("<"));
-			//            }
-			//            xReferencedType = xReferencedModule.Types[theName];
-			//            if (xReferencedType != null) {
-			//                return xReferencedType;
-			//            }
-			//        }
-			//    } else {
-			//        try {
-			//            string theScopeText = aRef.Scope == null ? "**NULL**" : aRef.Scope.GetType().FullName;
-			//            mCurrent.OnDebugLog(LogSeverityEnum.Informational, "Error: Unhandled scope: " + theScopeText);
-			//        } catch (NullReferenceException) {
-			//            string theScopeText = aRef.Scope == null ? "**NULL**" : aRef.Scope.GetType().FullName;
-			//            mCurrent.OnDebugLog(LogSeverityEnum.Informational, "Error: Unhandled scope: " + theScopeText);
-			//        } catch {
-			//            throw;
-			//        }
-			//    }
-			//}
-			//string xModuleName = "**NOT DEFINED**";
-			//if (aRef.Module != null && aRef.Module.Assembly != null) {
-			//    xModuleName = aRef.Module.Assembly.Name.Name;
-			//}
-			throw new Exception("Could not find Type! (" + aRef.ToString() + ")");
-		}
-
 		/// <summary>
 		/// Gives the size to store an instance of the <paramref name="aType"/> for use in a field.
 		/// </summary>
@@ -847,6 +753,10 @@ namespace Indy.IL2CPU {
 			}
 		}
 
+		private ISymbolReader GetSymbolReaderForAssembly(Assembly aAssembly) {
+			return SymbolAccess.GetReaderForFile(aAssembly.Location);
+		}
+
 		private void ProcessAllMethods() {
 			MethodBase xCurrentMethod;
 			while ((xCurrentMethod = (from item in mMethods.Keys
@@ -931,6 +841,31 @@ namespace Indy.IL2CPU {
 									mAssembler.StackContents.Clear();
 									ILReader xReader = new ILReader(xCurrentMethod);
 									var xInstructionInfos = new List<DebugSymbolsAssemblyTypeMethodInstruction>();
+									int xPreviousOffset = -1;
+									int[] xCodeOffsets = null;
+									ISymbolDocument[] xCodeDocuments = null;
+									int[] xCodeLines = null;
+									int[] xCodeColumns = null;
+									int[] xCodeEndLines = null;
+									int[] xCodeEndColumns = null;
+									int xCurrentOffset = 0;
+									bool xHasSymbols = false;
+									if (mDebugMode == DebugModeEnum.Source) {
+										var xSymbolReader = GetSymbolReaderForAssembly(xCurrentMethod.DeclaringType.Assembly);
+										if (xSymbolReader != null) {
+											var xSmbMethod = xSymbolReader.GetMethod(new SymbolToken(xCurrentMethod.MetadataToken));
+											if (xSmbMethod != null) {
+												xCodeOffsets = new int[xSmbMethod.SequencePointCount];
+												xCodeDocuments = new ISymbolDocument[xSmbMethod.SequencePointCount];
+												xCodeLines = new int[xSmbMethod.SequencePointCount];
+												xCodeColumns = new int[xSmbMethod.SequencePointCount];
+												xCodeEndLines = new int[xSmbMethod.SequencePointCount];
+												xCodeEndColumns = new int[xSmbMethod.SequencePointCount];
+												xSmbMethod.GetSequencePoints(xCodeOffsets, xCodeDocuments, xCodeLines, xCodeColumns, xCodeEndLines, xCodeEndColumns);
+												xHasSymbols = true;
+											}
+										}
+									}
 									while (xReader.Read()) {
 										if (mInstructionsToSkip > 0) {
 											mInstructionsToSkip--;
@@ -999,29 +934,59 @@ namespace Indy.IL2CPU {
 											xLabel = Label.LastFullLabel + xLabel;
 											xLabel = DataMember.FilterStringForIncorrectChars(xLabel);
 										}
-										if (mDebugSymbols != null) {
-											xInstructionInfo = new DebugSymbolsAssemblyTypeMethodInstruction();
-											xInstructionInfo.Address = xLabel;
-											xInstructionInfo.InstructionType = xReader.OpCode.ToString();
-											xCurrentStack = (from item in mAssembler.StackContents
-															 let xSize = (item.Size % 4 == 0) ? item.Size : (item.Size + (4 - (item.Size % 4)))
-															 select xSize).Sum();
-										}
+										//if (mDebugSymbols != null) {
+										//    xInstructionInfo = new DebugSymbolsAssemblyTypeMethodInstruction();
+										//    xInstructionInfo.Address = xLabel;
+										//    xInstructionInfo.InstructionType = xReader.OpCode.ToString();
+										//    xCurrentStack = (from item in mAssembler.StackContents
+										//                     let xSize = (item.Size % 4 == 0) ? item.Size : (item.Size + (4 - (item.Size % 4)))
+										//                     select xSize).Sum();
+										//}
 										// todo: calculate opcode number
-										mMap.EmitOpHeader(mAssembler, 0, xLabel, mDebugComport);
-										xOp.Assemble();
-										if (xInstructionInfo != null) {
-											int xNewStack = (from item in mAssembler.StackContents
-															 let xSize = (item.Size % 4 == 0) ? item.Size : (item.Size + (4 - (item.Size % 4)))
-															 select xSize).Sum();
-											xInstructionInfo.StackResult = xNewStack - xCurrentStack;
-											xInstructionInfo.StackResultSpecified = true;
-											xInstructionInfos.Add(xInstructionInfo);
+										bool aShouldIncludeDebugHeader = false;
+										#region determine if a new DebugHeader should be emitted
+										if (mDebugMode == DebugModeEnum.IL) {
+											aShouldIncludeDebugHeader = true;
+										} else {
+											if (mDebugMode == DebugModeEnum.Source) {
+												if (xPreviousOffset == -1) {
+													aShouldIncludeDebugHeader = true;
+												} else {
+													if (xHasSymbols) {
+														if (xCodeDocuments[xPreviousOffset] != xCodeDocuments[xCurrentOffset] ||
+															xCodeLines[xPreviousOffset] != xCodeLines[xCurrentOffset] ||
+															xCodeColumns[xPreviousOffset] != xCodeColumns[xCurrentOffset] ||
+															xCodeEndLines[xPreviousOffset] != xCodeEndLines[xCurrentOffset] ||
+															xCodeEndColumns[xPreviousOffset] != xCodeEndColumns[xCurrentOffset]) {
+															aShouldIncludeDebugHeader = true;
+														}
+													}
+												}
+											}
 										}
+										#endregion
+										if (aShouldIncludeDebugHeader) {
+											mMap.EmitOpDebugHeader(mAssembler, 0, xLabel, mDebugComport);
+											mDebugSymbols.Add(new DebugSymbol() {
+												AssemblyFileName = xCurrentMethod.DeclaringType.Assembly.Location,
+												InstructionOffset = xCurrentOffset,
+												LabelName = xLabel,
+												MethodMetaDataToken = xCurrentMethod.MetadataToken
+											});
+										}
+										xOp.Assemble();
+										//if (xInstructionInfo != null) {
+										//    int xNewStack = (from item in mAssembler.StackContents
+										//                     let xSize = (item.Size % 4 == 0) ? item.Size : (item.Size + (4 - (item.Size % 4)))
+										//                     select xSize).Sum();
+										//    xInstructionInfo.StackResult = xNewStack - xCurrentStack;
+										//    xInstructionInfo.StackResultSpecified = true;
+										//    xInstructionInfos.Add(xInstructionInfo);
+										//}
 									}
-									if (mDebugSymbols != null) {
-										mMethods[xCurrentMethod].Instructions = xInstructionInfos.ToArray();
-									}
+									//if (mDebugSymbols != null) {
+									//    mMethods[xCurrentMethod].Instructions = xInstructionInfos.ToArray();
+									//}
 								} else {
 									if ((xCurrentMethod.Attributes & MethodAttributes.PinvokeImpl) != 0) {
 										HandlePInvoke(xCurrentMethod, xMethodInfo);
