@@ -124,7 +124,7 @@ namespace Cosmos.Build.Windows {
             Process.Start(xPath + "Cosmos.vmx");
         }
 
-        public void MakeQEMU(bool aUseHDImage, bool aGDB) {
+        public void MakeQEMU(bool aUseHDImage, bool aGDB, bool aWaitSerialTCP) {
             MakeISO();
             RemoveFile(BuildPath + "serial-debug.txt");
             // QEMU Docs - http://fabrice.bellard.free.fr/qemu/qemu-doc.html
@@ -142,7 +142,7 @@ namespace Cosmos.Build.Windows {
                 // etc since serial to TCP on a byte level is likely highly innefficient
                 // with the packet overhead
                 //+ " -serial \"file:" + BuildPath + "serial-debug.txt\""
-                + " -serial tcp::4444,server,nowait"
+                + " -serial tcp::4444,server" + (aWaitSerialTCP ? "" : ",nowait")
                 // Enable acceleration if we are not using GDB
                 + (aGDB ? " -S -s" : " -kernel-kqemu")
                 // Ethernet card

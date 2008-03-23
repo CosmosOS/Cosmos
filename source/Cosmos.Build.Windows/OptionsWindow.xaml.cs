@@ -150,7 +150,7 @@ namespace Cosmos.Build.Windows {
             }
 
             if (rdioQEMU.IsChecked.Value) {
-                mBuilder.MakeQEMU(chckQEMUUseHD.IsChecked.Value, chckQEMUUseGDB.IsChecked.Value);
+                mBuilder.MakeQEMU(chckQEMUUseHD.IsChecked.Value, chckQEMUUseGDB.IsChecked.Value, chckQEMUSerialWait.IsChecked.Value);
             } else if (rdioVMWare.IsChecked.Value) {
                 mBuilder.MakeVMWare();
             } else if (rdioVPC.IsChecked.Value) {
@@ -183,8 +183,11 @@ namespace Cosmos.Build.Windows {
             }
             BuildRegistry.Write("Build Type", xValue);
             
+            // QEMU
             BuildRegistry.Write("Use GDB", chckQEMUUseGDB.IsChecked.Value.ToString());
             BuildRegistry.Write("Create HD Image", chckQEMUUseHD.IsChecked.Value.ToString());
+            BuildRegistry.Write("Wait for Serial TCP", chckQEMUSerialWait.IsChecked.Value.ToString());
+
             BuildRegistry.Write("Skip IL", buildCheckBox.IsChecked.Value.ToString());
             if (cmboUSBDevice.SelectedItem != null) {
                 BuildRegistry.Write("USB Device", cmboUSBDevice.Text);
@@ -214,17 +217,17 @@ namespace Cosmos.Build.Windows {
                     break;
             }
 
-            bool useGDB;
-            bool.TryParse(BuildRegistry.Read("Use GDB"), out useGDB);
-            chckQEMUUseGDB.IsChecked = useGDB;
+            bool xBool;
 
-            bool createHDimg;
-            bool.TryParse(BuildRegistry.Read("Create HD Image"), out createHDimg);
-            chckQEMUUseHD.IsChecked = createHDimg;
+            bool.TryParse(BuildRegistry.Read("Use GDB"), out xBool);
+            chckQEMUUseGDB.IsChecked = xBool;
+            bool.TryParse(BuildRegistry.Read("Create HD Image"), out xBool);
+            chckQEMUUseHD.IsChecked = xBool;
+            bool.TryParse(BuildRegistry.Read("Wait for Serial TCP"), out xBool);
+            chckQEMUSerialWait.IsChecked = xBool;
 
-            bool skipIL;
-            bool.TryParse(BuildRegistry.Read("Skip IL"), out skipIL);
-            buildCheckBox.IsChecked = skipIL;
+            bool.TryParse(BuildRegistry.Read("Skip IL"), out xBool);
+            buildCheckBox.IsChecked = xBool;
 
             string xUSBDevice = BuildRegistry.Read("USB Device");
             cmboUSBDevice.SelectedIndex = cmboUSBDevice.Items.IndexOf(xUSBDevice);
