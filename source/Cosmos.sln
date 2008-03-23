@@ -83,23 +83,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteveKernel", "SteveKernel\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrodeTest", "FrodeTest\FrodeTest.csproj", "{DA1DFD9E-B80C-4304-BCBA-B313255F6B01}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Driver.RTL8139", "Cosmos.Driver.RTL8139\Cosmos.Driver.RTL8139.csproj", "{1F7ACC2A-EA38-4B10-AB87-9450BBCC8D6F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel.FileSystems", "Cosmos.Kernel.FileSystems\Cosmos.Kernel.FileSystems.csproj", "{5C293BB9-FB42-495E-AAD9-D15888631CA4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.FileSystem", "Cosmos.Kernel.FileSystems\Cosmos.FileSystem.csproj", "{5C293BB9-FB42-495E-AAD9-D15888631CA4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lost", "Tests\MathTest\Lost\Lost.csproj", "{EF65AFB7-9DC9-4ACD-946D-7E973A67DBBE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Drivers", "Drivers", "{E3AA753A-2E91-4FE7-A9E2-8119984DEA68}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Hardware.Network.Ethernet.RTL8139", "Drivers\Ethernet\Cosmos.Hardware.Network.Ethernet.RTL8139\Cosmos.Hardware.Network.Ethernet.RTL8139.csproj", "{289839F2-263E-4B79-B63B-8CB8BF0788E1}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Ethernet", "Ethernet", "{A6D98BB2-23CA-4E4C-840F-0175F090323B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Hardware.Network.Ethernet", "Drivers\Ethernet\Cosmos.Hardware.Network.Ethernet\Cosmos.Hardware.Network.Ethernet.csproj", "{00494BF0-8629-4D18-993B-224441E460D1}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Network", "Network", "{8C1DBD4B-01D9-4285-A958-C26BBF8FD4E0}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "File Systems", "File Systems", "{9BAAEE70-F5A3-409F-8EEF-F46F7DDDB83D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{4DE8EC69-B412-41C4-BCD9-1E032984E888}"
 EndProject
@@ -109,7 +97,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MohammedTest", "MohammedTes
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 41
+		SccNumberOfProjects = 38
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -241,38 +229,26 @@ Global
 		SccProjectTopLevelParentUniqueName32 = Cosmos.sln
 		SccProjectName32 = FrodeTest
 		SccLocalPath32 = FrodeTest
-		SccProjectUniqueName33 = Cosmos.Driver.RTL8139\\Cosmos.Driver.RTL8139.csproj
+		SccProjectUniqueName33 = Tests\\MathTest\\Lost\\Lost.csproj
 		SccProjectTopLevelParentUniqueName33 = Cosmos.sln
-		SccProjectName33 = Cosmos.Driver.RTL8139
-		SccLocalPath33 = Cosmos.Driver.RTL8139
-		SccProjectUniqueName34 = Cosmos.Kernel.FileSystems\\Cosmos.Kernel.FileSystems.csproj
+		SccProjectName33 = Tests/MathTest/Lost
+		SccLocalPath33 = Tests\\MathTest\\Lost
+		SccProjectUniqueName34 = Cosmos.Debug\\Cosmos.Debug.csproj
 		SccProjectTopLevelParentUniqueName34 = Cosmos.sln
-		SccProjectName34 = Cosmos.Kernel.FileSystems
-		SccLocalPath34 = Cosmos.Kernel.FileSystems
-		SccProjectUniqueName35 = Tests\\MathTest\\Lost\\Lost.csproj
+		SccProjectName34 = Cosmos.Debug
+		SccLocalPath34 = Cosmos.Debug
+		SccProjectUniqueName35 = Boot\\KudzuTest\\Kudzu.csproj
 		SccProjectTopLevelParentUniqueName35 = Cosmos.sln
-		SccProjectName35 = Tests/MathTest/Lost
-		SccLocalPath35 = Tests\\MathTest\\Lost
-		SccProjectUniqueName36 = Drivers\\Ethernet\\Cosmos.Hardware.Network.Ethernet.RTL8139\\Cosmos.Hardware.Network.Ethernet.RTL8139.csproj
+		SccProjectName35 = Boot/KudzuTest
+		SccLocalPath35 = Boot\\KudzuTest
+		SccProjectUniqueName36 = MohammedTest\\MohammedTest.csproj
 		SccProjectTopLevelParentUniqueName36 = Cosmos.sln
-		SccProjectName36 = Drivers/Ethernet/Cosmos.Hardware.Network.Ethernet.RTL8139
-		SccLocalPath36 = Drivers\\Ethernet\\Cosmos.Hardware.Network.Ethernet.RTL8139
-		SccProjectUniqueName37 = Drivers\\Ethernet\\Cosmos.Hardware.Network.Ethernet\\Cosmos.Hardware.Network.Ethernet.csproj
+		SccProjectName36 = MohammedTest
+		SccLocalPath36 = MohammedTest
+		SccProjectUniqueName37 = Cosmos.Kernel.FileSystems\\Cosmos.FileSystem.csproj
 		SccProjectTopLevelParentUniqueName37 = Cosmos.sln
-		SccProjectName37 = Drivers/Ethernet/Cosmos.Hardware.Network.Ethernet
-		SccLocalPath37 = Drivers\\Ethernet\\Cosmos.Hardware.Network.Ethernet
-		SccProjectUniqueName38 = Cosmos.Debug\\Cosmos.Debug.csproj
-		SccProjectTopLevelParentUniqueName38 = Cosmos.sln
-		SccProjectName38 = Cosmos.Debug
-		SccLocalPath38 = Cosmos.Debug
-		SccProjectUniqueName39 = Boot\\KudzuTest\\Kudzu.csproj
-		SccProjectTopLevelParentUniqueName39 = Cosmos.sln
-		SccProjectName39 = Boot/KudzuTest
-		SccLocalPath39 = Boot\\KudzuTest
-		SccProjectUniqueName40 = MohammedTest\\MohammedTest.csproj
-		SccProjectTopLevelParentUniqueName40 = Cosmos.sln
-		SccProjectName40 = MohammedTest
-		SccLocalPath40 = MohammedTest
+		SccProjectName37 = Cosmos.Kernel.FileSystems
+		SccLocalPath37 = Cosmos.Kernel.FileSystems
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -404,10 +380,6 @@ Global
 		{DA1DFD9E-B80C-4304-BCBA-B313255F6B01}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DA1DFD9E-B80C-4304-BCBA-B313255F6B01}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DA1DFD9E-B80C-4304-BCBA-B313255F6B01}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1F7ACC2A-EA38-4B10-AB87-9450BBCC8D6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1F7ACC2A-EA38-4B10-AB87-9450BBCC8D6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1F7ACC2A-EA38-4B10-AB87-9450BBCC8D6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1F7ACC2A-EA38-4B10-AB87-9450BBCC8D6F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5C293BB9-FB42-495E-AAD9-D15888631CA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5C293BB9-FB42-495E-AAD9-D15888631CA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5C293BB9-FB42-495E-AAD9-D15888631CA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -416,14 +388,6 @@ Global
 		{EF65AFB7-9DC9-4ACD-946D-7E973A67DBBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EF65AFB7-9DC9-4ACD-946D-7E973A67DBBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EF65AFB7-9DC9-4ACD-946D-7E973A67DBBE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{289839F2-263E-4B79-B63B-8CB8BF0788E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{289839F2-263E-4B79-B63B-8CB8BF0788E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{289839F2-263E-4B79-B63B-8CB8BF0788E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{289839F2-263E-4B79-B63B-8CB8BF0788E1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{00494BF0-8629-4D18-993B-224441E460D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{00494BF0-8629-4D18-993B-224441E460D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{00494BF0-8629-4D18-993B-224441E460D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{00494BF0-8629-4D18-993B-224441E460D1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{23C298B4-A2A3-4D3F-A57F-CF068B572928}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{23C298B4-A2A3-4D3F-A57F-CF068B572928}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{23C298B4-A2A3-4D3F-A57F-CF068B572928}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -457,6 +421,7 @@ Global
 		{B168BEDD-C6A6-4E7C-B9A5-0144286E9E42} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
 		{A1F83D9F-2D44-4264-A08B-416797123018} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
 		{23C298B4-A2A3-4D3F-A57F-CF068B572928} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
+		{5C293BB9-FB42-495E-AAD9-D15888631CA4} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
 		{B0BBD2A2-4FAA-4730-9770-ACE6D9532132} = {E16DB75B-0F1D-4813-9103-F8FB6E7BAE2A}
 		{7BAB58BF-E8A1-4623-B6BF-4B90A0505226} = {E16DB75B-0F1D-4813-9103-F8FB6E7BAE2A}
 		{5784365C-ED22-42EB-BB8A-F3E09428D5B8} = {E16DB75B-0F1D-4813-9103-F8FB6E7BAE2A}
@@ -477,12 +442,5 @@ Global
 		{1240EAB3-D6B1-463A-BA83-436607A1F18E} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
 		{FF431742-6490-46B8-A9F6-734477D0725D} = {4DE8EC69-B412-41C4-BCD9-1E032984E888}
 		{8F2D5231-CDE5-48FA-9D26-D4305B01FD3C} = {7EB6E2FF-74C8-4F59-9923-EB8EF1DE098E}
-		{9BAAEE70-F5A3-409F-8EEF-F46F7DDDB83D} = {E3AA753A-2E91-4FE7-A9E2-8119984DEA68}
-		{1F7ACC2A-EA38-4B10-AB87-9450BBCC8D6F} = {E3AA753A-2E91-4FE7-A9E2-8119984DEA68}
-		{8C1DBD4B-01D9-4285-A958-C26BBF8FD4E0} = {E3AA753A-2E91-4FE7-A9E2-8119984DEA68}
-		{5C293BB9-FB42-495E-AAD9-D15888631CA4} = {9BAAEE70-F5A3-409F-8EEF-F46F7DDDB83D}
-		{A6D98BB2-23CA-4E4C-840F-0175F090323B} = {8C1DBD4B-01D9-4285-A958-C26BBF8FD4E0}
-		{00494BF0-8629-4D18-993B-224441E460D1} = {A6D98BB2-23CA-4E4C-840F-0175F090323B}
-		{289839F2-263E-4B79-B63B-8CB8BF0788E1} = {A6D98BB2-23CA-4E4C-840F-0175F090323B}
 	EndGlobalSection
 EndGlobal

@@ -1,6 +1,5 @@
 ﻿using System;
 using Cosmos.Build.Windows;
-using Cosmos.Driver.RTL8139;
 using Cosmos.Hardware.PC.Bus;
 
 namespace SteveKernel

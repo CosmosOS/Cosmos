@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Cosmos.Driver.RTL8139.Register;
 using Cosmos.Hardware.PC.Bus;
 
 namespace FrodeTest.Test

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Cosmos.Hardware.Network.Devices.RTL8139;
 
 namespace FrodeTest.Shell
 {
@@ -8,7 +9,7 @@ namespace FrodeTest.Shell
     {
         Security.User xUser = null;
         static ushort xSessionId;
-        static Cosmos.Driver.RTL8139.RTL8139 nic = null;
+        static Cosmos.Hardware.Network.Devices.RTL8139.RTL8139 nic = null;
 
         public Session(Security.User user)
         {
@@ -33,7 +34,7 @@ namespace FrodeTest.Shell
             }
 */            else if(command.Equals("load"))
             {
-                List<Cosmos.Driver.RTL8139.RTL8139> list = Cosmos.Driver.RTL8139.RTL8139.FindRTL8139Devices();
+                var list = RTL8139.FindRTL8139Devices();
                 if (list.Count != 0)
                 {
                     nic = list[0];
@@ -44,9 +45,9 @@ namespace FrodeTest.Shell
             }
             else if (command.Equals("send"))
             {
-                Cosmos.Driver.RTL8139.PacketHeader head = new Cosmos.Driver.RTL8139.PacketHeader(0xFF);
+                var head = new PacketHeader(0xFF);
                 byte[] data = FrodeTest.Test.Mock.FakeBroadcastPacket.GetFakePacket();
-                Cosmos.Driver.RTL8139.Packet packet = new Cosmos.Driver.RTL8139.Packet(head, data);
+                var packet = new Packet(head, data);
 
                 if (nic == null)
                 {

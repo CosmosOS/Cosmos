@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Cosmos.Hardware.Network.Devices.RTL8139;
 
 namespace FrodeTest.Test
 {
@@ -10,7 +11,7 @@ namespace FrodeTest.Test
         {
 
             UInt16 data = 0xFFFF; //All 16 bits high
-            Cosmos.Driver.RTL8139.PacketHeader head = new Cosmos.Driver.RTL8139.PacketHeader(data);
+            var head = new PacketHeader(data);
 
             Console.WriteLine("Binary value in head: " + data);
             Console.WriteLine("IsRecieveOK - " + head.IsReceiveOk());

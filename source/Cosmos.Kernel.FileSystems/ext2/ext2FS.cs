@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Cosmos.Kernel.FileSystems {
-	public class Ext2FS: BaseFileSystem {
+namespace Cosmos.FileSystem.ext2 {
+	public class Ext2FS: FileSystem {
 		public Ext2FS(Hardware.BlockDevice aBackend)
 			: base(aBackend) {
 		}

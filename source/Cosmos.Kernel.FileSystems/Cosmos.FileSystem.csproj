@@ -8,9 +8,9 @@
     <ProjectGuid>{5C293BB9-FB42-495E-AAD9-D15888631CA4}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Cosmos.Kernel.FileSystems</RootNamespace>
-    <AssemblyName>Cosmos.Kernel.FileSystems</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <RootNamespace>Cosmos.FileSystem</RootNamespace>
+    <AssemblyName>Cosmos.FileSystem</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
@@ -38,10 +38,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BaseFileSystem.cs" />
-    <Compile Include="Ext2FS.cs" />
+    <Compile Include="FileSystem.cs" />
+    <Compile Include="ext2\ext2FS.cs" />
     <Compile Include="MBT.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -53,6 +56,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Cosmos.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="FAT\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

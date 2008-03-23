@@ -55,6 +55,17 @@
     <Compile Include="Bus\CPUBus.cs" />
     <Compile Include="Device.cs" />
     <Compile Include="IOSpace.cs" />
+    <Compile Include="Network\Devices\RTL8139\BinaryHelper.cs" />
+    <Compile Include="Network\Devices\RTL8139\Packet.cs" />
+    <Compile Include="Network\Devices\RTL8139\PacketHeader.cs" />
+    <Compile Include="Network\Devices\RTL8139\Register\CommandRegister.cs" />
+    <Compile Include="Network\Devices\RTL8139\Register\EarlyRxStatusRegister.cs" />
+    <Compile Include="Network\Devices\RTL8139\Register\InterruptMaskRegister.cs" />
+    <Compile Include="Network\Devices\RTL8139\Register\MainRegister.cs" />
+    <Compile Include="Network\Devices\RTL8139\Register\ReceiveConfigurationRegister.cs" />
+    <Compile Include="Network\Devices\RTL8139\Register\TransmitConfigurationRegister.cs" />
+    <Compile Include="Network\Devices\RTL8139\Register\TransmitStatusDescriptor.cs" />
+    <Compile Include="Network\Devices\RTL8139\RTL8139.cs" />
     <Compile Include="Network\MACAddress.cs" />
     <Compile Include="Network\NetworkDevice.cs" />
     <Compile Include="New\Storage\ATA.Constants.cs" />
@@ -89,9 +100,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Cosmos.snk" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Network\Devices\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

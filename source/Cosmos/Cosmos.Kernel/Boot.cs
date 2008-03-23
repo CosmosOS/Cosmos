@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Cosmos.Kernel.FileSystems;
+using Cosmos.FileSystem;
 
 namespace Cosmos.Kernel {
     // This class provides boot configurations to be called

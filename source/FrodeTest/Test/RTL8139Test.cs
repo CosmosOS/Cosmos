@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Cosmos.Driver.RTL8139.Register;
+using Cosmos.Hardware.Network.Devices.RTL8139;
 
 namespace FrodeTest.Test
 {
@@ -11,7 +11,7 @@ namespace FrodeTest.Test
         {
             // Testing RTL8139 PCI networkcard
             //Load card
-            List<Cosmos.Driver.RTL8139.RTL8139> nics = Cosmos.Driver.RTL8139.RTL8139.FindRTL8139Devices();
+           var nics = Cosmos.Hardware.Network.Devices.RTL8139.RTL8139.FindRTL8139Devices();
 
             if (nics.Count == 0)
             {
@@ -20,7 +20,7 @@ namespace FrodeTest.Test
             }
 
             Console.WriteLine(nics.Count + " network cards found");
-            Cosmos.Driver.RTL8139.RTL8139 nic = (Cosmos.Driver.RTL8139.RTL8139)nics[0];
+            var nic = (RTL8139)nics[0];
 
             Console.WriteLine("Network card: " + nic.Name);
             Console.WriteLine("HW Revision: " + nic.GetHardwareRevision());
@@ -34,9 +34,9 @@ namespace FrodeTest.Test
             Console.WriteLine("Initializing driver...");
             nic.InitializeDriver();
 
-            Cosmos.Driver.RTL8139.PacketHeader head = new Cosmos.Driver.RTL8139.PacketHeader(0xFF);
+            var head = new PacketHeader(0xFF);
             byte[] data = Mock.FakeBroadcastPacket.GetFakePacketAllHigh();
-            Cosmos.Driver.RTL8139.Packet packet = new Cosmos.Driver.RTL8139.Packet(head, data);
+            var packet = new Packet(head, data);
             nic.Transmit(packet);
         }
     }

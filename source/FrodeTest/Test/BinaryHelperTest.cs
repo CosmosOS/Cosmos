@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Cosmos.Driver.RTL8139.Misc;
+using Cosmos.Hardware.Network.Devices.RTL8139;
 
 namespace FrodeTest.Test
 {

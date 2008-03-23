@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Cosmos.Kernel.FileSystems {
-	public abstract class BaseFileSystem {
+namespace Cosmos.FileSystem {
+	public abstract class FileSystem {
 		protected readonly Hardware.BlockDevice mBackend;
-		protected BaseFileSystem(Hardware.BlockDevice aBackend) {
+		protected FileSystem(Hardware.BlockDevice aBackend) {
 			if (aBackend == null) {
 				throw new ArgumentNullException("aBackend");
 			}
