@@ -142,9 +142,10 @@ namespace Cosmos.Build.Windows {
                 // etc since serial to TCP on a byte level is likely highly innefficient
                 // with the packet overhead
                 // COM1
-                + " -serial tcp::4444,server" + (aWaitSerialTCP ? "" : ",nowait")
+                //+ " -serial tcp::4444,server" + (aWaitSerialTCP ? "" : ",nowait")
+                //+ " -serial \"file:" + BuildPath + "trace.dat\" "
                 // COM2
-				+ " -serial \"file:" + BuildPath + "debug.dbg\" "
+				//+ " -serial \"file:" + BuildPath + "debug.dbg\" "
                 // Enable acceleration if we are not using GDB
                 + (aGDB ? " -S -s" : " -kernel-kqemu")
                 // Ethernet card

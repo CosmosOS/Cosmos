@@ -1,4 +1,7 @@
-﻿Message: User
+﻿Allow pessimistic tracing - trace only on marked trace points, and also allow classes and or method
+to be marked wtih an attribute for full tracing.
+
+Message: User
 -String
 
 Message: Location
