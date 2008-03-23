@@ -11,8 +11,7 @@ namespace Cosmos.Shell.Guess {
         [STAThread]
         public static void Main()
         {
-            var xBuilder = new Builder();
-            xBuilder.Build();
+            BuildUI.Run();
         }
         #endregion
 
