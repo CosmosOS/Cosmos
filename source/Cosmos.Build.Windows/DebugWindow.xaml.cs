@@ -19,11 +19,7 @@ namespace Cosmos.Build.Windows {
         protected TcpClient mClient;
         protected byte[] mTCPData = new byte[4];
 
-        /// <summary>
-        /// Displays the Debug Window.
-        /// </summary>
-        public DebugWindow()
-        {
+        public DebugWindow() {
             InitializeComponent();
             
             //Create a TCP connection to localhost:4444. We have already set up Qemu to listen to this port.
@@ -42,29 +38,23 @@ namespace Cosmos.Build.Windows {
         }
 
         protected delegate void ConnectionLostDelegate(Exception ex);
-        protected void ConnectionLost(Exception ex)
-        {
+        protected void ConnectionLost(Exception ex) {
             textBlock1.Text = "TCP Connection to virtual machine lost!" + Environment.NewLine;
             DebugGrid.Background = System.Windows.Media.Brushes.Red;
-            while (ex.InnerException != null)
-            {
+            while (ex.InnerException != null) {
                 textBlock1.Text += ex.Message + Environment.NewLine;
                 ex = ex.InnerException;
             }
         }
 
-        protected void TCPRead(IAsyncResult aResult) 
-        {
-            try
-            {
+        protected void TCPRead(IAsyncResult aResult) {
+            try {
                 var xStream = (NetworkStream)aResult.AsyncState;
                 int xCount = xStream.EndRead(aResult);
                 xStream.BeginRead(mTCPData, 0, mTCPData.Length, new AsyncCallback(TCPRead), xStream);
                 UInt32 xEIP = (UInt32)((mTCPData[0] << 24) | (mTCPData[1] << 16) | (mTCPData[2] << 8) | mTCPData[3]);
                 Dispatcher.BeginInvoke(DispatcherPriority.Normal, new DebugPacketRcvdDelegate(DebugPacketRcvd), xEIP);
-            }
-            catch (System.IO.IOException ex)
-            {
+            } catch (System.IO.IOException ex) {
                 Dispatcher.BeginInvoke(DispatcherPriority.Normal, new ConnectionLostDelegate(ConnectionLost), ex);
             }
             
