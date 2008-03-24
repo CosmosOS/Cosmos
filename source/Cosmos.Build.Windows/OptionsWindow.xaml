@@ -8,20 +8,19 @@
             <Image Source="/Cosmos.Build.Windows;component/Logo-1.png" Width="150" />
         </BlockUIContainer>
         <Paragraph>
-            Please select a build type:
+            Build type:
             <LineBreak/>
             <InlineUIContainer>
-                <WrapPanel Margin="30, 0">
+                <WrapPanel Margin="20, 0">
                     <Label>Emulator: </Label>
-                    <RadioButton Name="rdioQEMU" GroupName="Target"
-							IsChecked="True">_QEMU</RadioButton>
+                    <RadioButton Name="rdioQEMU" GroupName="Target">_QEMU</RadioButton>
                     <RadioButton Name="rdioVMWare" GroupName="Target" Margin="15, 0">VM_Ware</RadioButton>
                     <RadioButton Name="rdioVPC" GroupName="Target" Margin="15, 0">Virtual _PC</RadioButton>
                 </WrapPanel>
             </InlineUIContainer>
             <LineBreak/>
             <InlineUIContainer>
-                <WrapPanel Margin="30, 0">
+                <WrapPanel Margin="20, 0">
                     <Label>Hardware:</Label>
                     <RadioButton GroupName="Target" Name="rdioISO">_ISO</RadioButton>
                     <RadioButton GroupName="Target" Name="rdioPXE" Margin="15, 0">_Network (PXE)</RadioButton>
