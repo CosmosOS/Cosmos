@@ -1,5 +1,6 @@
 ﻿using System;
 using Cosmos.Build.Windows;
+using RTLDriver = Cosmos.Hardware.Network.Devices.RTL8139;
 
 namespace KudzuTest {
 	class Program {
@@ -7,33 +8,53 @@ namespace KudzuTest {
 		// Most users wont touch this. This will call the Cosmos Build tool
 		[STAThread]
 		static void Main(string[] args) {
+            var xData = RTL8139.SampleUDPBroadcast();
             BuildUI.Run();
         }
 		#endregion
 
-        static protected string StringTest() {
-		    string x = "Hello";
-            x = x + " world.";
-            return x;
-        }
+        // http://www.h7.dion.ne.jp/~qemu-win/HowToNetwork-en.html
+        //  -Set to user and IP's
+        // Arrays are not copied to TXBuffer, copying is also inefficient
+        // Fixed - is only temproary, it only works because we dont have a GC yet
+        // Ethernet frame checksum....
+        // need to dig
+        //   -Packet header in Frode code?
+        //   -TSD not getting set right I think.. .need to look deeper
 
-        // Main entry point of the kernel
 		public static void Init() {
             Cosmos.Kernel.Boot.Default();
-//			System.Diagnostics.Debugger.Break();
+			//System.Diagnostics.Debugger.Break();
             Console.WriteLine("Boot complete");
-
-
 
             //Cosmos.Hardware.PC.Bus.PCIBus.Init();
             //Console.ReadLine();
-            Tests.DoAll();
+            //Tests.DoAll();
 
             //Cosmos.Kernel.Temp.Kudzu.PCI.Test();
 
-            Console.WriteLine("Shell complete");
+            // Load
+            var xNICs = RTLDriver.RTL8139.FindRTL8139Devices();
+            if (xNICs.Count == 0) {
+                throw new Exception("Unable to find RTL8139 network card!");
+            }
+            var xNIC = xNICs[0];
+
+            Console.WriteLine("Enabling network card!");
+            Console.WriteLine(xNIC.Name);
+            Console.WriteLine("Revision: " + xNIC.GetHardwareRevision());
+            Console.WriteLine("MAC: " + xNIC.MACAddress);
+
+            xNIC.Enable();
+            xNIC.InitializeDriver();
+
+            var xData = RTL8139.SampleUDPBroadcast();
+            //xNIC.TransmitRaw(xData);
+
+            Console.WriteLine("Done");
             while (true)
 				;
 		}
+
 	}
 }

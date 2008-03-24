@@ -157,8 +157,10 @@ namespace Cosmos.Build.Windows {
 				//+ " -serial \"file:" + BuildPath + "debug.dbg\" "
                 // Enable acceleration if we are not using GDB
                 + (aGDB ? " -S -s" : " -kernel-kqemu")
-                // Ethernet card
-                + " -net nic,model=rtl8139"
+                // Ethernet card - Later the model should be a QEMU option on 
+                // options screen
+                + " -net nic,model=rtl8139,macaddr=52:54:00:12:34:57"
+                + " -net user"
                 , ToolsPath + @"qemu\", false, true);
 
             if (aGDB) {

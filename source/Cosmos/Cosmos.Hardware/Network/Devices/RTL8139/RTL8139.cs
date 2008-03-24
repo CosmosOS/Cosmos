@@ -364,5 +364,30 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
 
             return true;
         }
+
+        public bool TransmitRaw(byte[] aData) {
+            //Put the packet into the correct TxBuffer
+            // Frode... this doesnt copy.. it just changes the pointer....
+            TxBuffer1 = aData;
+
+            //Cosmos.Hardware.PC.Global.Sleep(300);
+
+            //Console.Write("Data in Transmit Status Descriptor " + TransmitStatusDescriptor.GetCurrentTSDescriptor() + ":");
+            //Console.WriteLine(IOSpace.Read32(address));
+            //At this point the TSDA0 should contain the address of the data.
+            //Console.WriteLine("The Data pointed to: " + IOSpace.Read32(IOSpace.Read32(address)));
+
+            //Set the transmit status - which enables the transmit.
+            var tsd = Register.TransmitStatusDescriptor.Load(pciCard);
+            tsd.Size = aData.Length;
+            Console.WriteLine("Told NIC to send " + tsd.Size + " bytes.");
+
+            SetEarlyTxThreshold(1024);
+            Console.WriteLine("Sending packet...");
+            tsd.ClearOWNBit();
+            Register.TransmitStatusDescriptor.IncrementTSDescriptor();
+
+            return true;
+        }
     }
 }
