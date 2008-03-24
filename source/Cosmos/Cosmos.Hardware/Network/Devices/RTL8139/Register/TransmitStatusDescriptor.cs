@@ -72,17 +72,16 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
         {
             UInt32 data = this.TSD;
 
-            Console.WriteLine("OWN bit status in TransmitStatusDescriptor: " + BinaryHelper.CheckBit(this.TSD, 13));
+            //Console.WriteLine("OWN bit status in TransmitStatusDescriptor: " + BinaryHelper.CheckBit(this.TSD, 13));
             
             //Turn off single OWN bit
             if (BinaryHelper.CheckBit(data, (ushort)(13))) //if OWN bit is HIGH
             {
-                Console.WriteLine("Flipping OWN bit...");
                 data = BinaryHelper.FlipBit(data, (ushort)(13));
             }
 
             this.TSD = data;
-            Console.WriteLine("OWN bit after turning off (should be false): " + BinaryHelper.CheckBit(this.TSD, 13));
+            //Console.WriteLine("OWN bit after turning off (should be false): " + BinaryHelper.CheckBit(this.TSD, 13));
         }
 
         /// <summary>

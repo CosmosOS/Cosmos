@@ -339,13 +339,6 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             //Put the packet into the correct TxBuffer
             TxBuffer1 = packet.PacketBody;
 
-            //Cosmos.Hardware.PC.Global.Sleep(300);
-
-            //Console.Write("Data in Transmit Status Descriptor " + TransmitStatusDescriptor.GetCurrentTSDescriptor() + ":");
-            //Console.WriteLine(IOSpace.Read32(address));
-            //At this point the TSDA0 should contain the address of the data.
-            //Console.WriteLine("The Data pointed to: " + IOSpace.Read32(IOSpace.Read32(address)));
-
             //Set the transmit status - which enables the transmit.
             var tsd = Register.TransmitStatusDescriptor.Load(pciCard);
             tsd.Size = packet.PacketBody.Length;
