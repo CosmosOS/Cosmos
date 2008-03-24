@@ -87,7 +87,7 @@ namespace IL2CPU {
 						}
 					case "debug": {
 							if (String.IsNullOrEmpty(xArgParts[1])) {
-							throw new Exception("When using the debug switch, you need to specify an output path!");
+								throw new Exception("When using the debug switch, you need to specify an output path!");
 							}
 							DebugFile = xArgParts[1];
 							break;
@@ -174,7 +174,7 @@ namespace IL2CPU {
 						xTestOutput = OutputFile;
 					}
 					Func<string, string> xGetFileNameForGroup = xGroup => Path.Combine(AsmFile, xGroup + ".asm");
-					e.Execute(InputFile, TargetPlatform, xGetFileNameForGroup, MetalMode, BCLDir, Plugs, DebugModeEnum.Source, 2);
+					e.Execute(InputFile, TargetPlatform, xGetFileNameForGroup, MetalMode, BCLDir, Plugs, DebugModeEnum.None, 0);
 					ProcessStartInfo xFasmStartInfo = new ProcessStartInfo();
 					if (TargetPlatform != TargetPlatformEnum.NativeX86) {
 						xFasmStartInfo.FileName = FAsmFileName;

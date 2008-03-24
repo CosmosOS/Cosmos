@@ -63,6 +63,9 @@ namespace Indy.IL2CPU.IL {
 			TypeInfo = aTypeInfo;
 			Method = aMethod;
 			ReturnType = aReturnType;
+			LocalsSize = (from item in aLocals
+						  let xSize = (item.Size % 4 == 0) ? item.Size : (item.Size + (4 - (item.Size % 4)))
+						  select xSize).Sum();
 		}
 
 		/// <summary>
@@ -77,6 +80,7 @@ namespace Indy.IL2CPU.IL {
 		public readonly Type ReturnType;
 		public readonly bool IsInstanceMethod;
 		public readonly TypeInformation TypeInfo;
+		public readonly int LocalsSize;
 		public override string ToString() {
 			StringBuilder xSB = new StringBuilder();
 			xSB.AppendLine(String.Format("Method '{0}'\r\n", Method.GetFullName()));

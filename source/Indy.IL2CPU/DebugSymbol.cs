@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace Indy.IL2CPU {
 	public class DebugSymbol {
@@ -21,6 +23,56 @@ namespace Indy.IL2CPU {
 		}
 
 		public string LabelName {
+			get;
+			set;
+		}
+	}
+
+	public class MLDebugSymbol {
+		public static void WriteSymbolsListToFile(IEnumerable<MLDebugSymbol> aSymbols, string aFile) {
+			using (XmlWriter xWriter = XmlWriter.Create(aFile)) {
+				xWriter.WriteStartDocument();
+				{
+					xWriter.WriteStartElement("MSILInstructions");
+					{
+						foreach (var item in aSymbols) {
+							xWriter.WriteStartElement("Instruction");
+							{
+								xWriter.WriteAttributeString("Label", item.LabelName);
+								xWriter.WriteAttributeString("Address", item.Address.ToString());
+								xWriter.WriteAttributeString("StackDifference", item.StackDifference.ToString());
+							}
+							xWriter.WriteEndElement();
+						}
+					}
+					xWriter.WriteEndElement();
+				}
+				xWriter.WriteEndDocument();
+			}
+		}
+
+		public static void ReadSymbolsListFromFile(List<MLDebugSymbol> aSymbols, string aFile) {
+			var xDoc = XDocument.Load(aFile);
+			aSymbols.Clear();
+			aSymbols.AddRange((from item in xDoc.Descendants("Instruction")
+							   select new MLDebugSymbol() {
+								   LabelName = item.Attribute("Label").Value,
+								   Address = (uint)item.Attribute("Address"),
+								   StackDifference = (int)item.Attribute("StackDifference")
+							   }));
+		}
+
+		public string LabelName {
+			get;
+			set;
+		}
+
+		public uint Address {
+			get;
+			set;
+		}
+
+		public int StackDifference {
 			get;
 			set;
 		}

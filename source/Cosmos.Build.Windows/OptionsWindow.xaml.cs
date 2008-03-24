@@ -233,16 +233,16 @@ namespace Cosmos.Build.Windows {
                 }
 
                 // General
-                chckCompileIL.IsChecked = ((int)xKey.GetValue("Compile IL", true) != 0);
+                chckCompileIL.IsChecked = ((int)xKey.GetValue("Compile IL", 1) != 0);
                 cmboDebugPort.SelectedIndex = cmboDebugPort.Items.IndexOf(xKey.GetValue("Debug Port", ""));
                 if (cmboDebugPort.SelectedIndex == -1) {
                     cmboDebugPort.SelectedIndex = 0;
                 }
 
                 // QEMU
-                chckQEMUUseGDB.IsChecked = ((int)xKey.GetValue("Use GDB", false) != 0);
-                chckQEMUUseHD.IsChecked = ((int)xKey.GetValue("Create HD Image", false) != 0);
-                chckQEMUSerialWait.IsChecked = ((int)xKey.GetValue("Wait for Serial TCP", false) != 0);
+                chckQEMUUseGDB.IsChecked = ((int)xKey.GetValue("Use GDB", 0) != 0);
+                chckQEMUUseHD.IsChecked = ((int)xKey.GetValue("Create HD Image", 0) != 0);
+                chckQEMUSerialWait.IsChecked = ((int)xKey.GetValue("Wait for Serial TCP", 0) != 0);
 
                 // USB
                 cmboUSBDevice.SelectedIndex = cmboUSBDevice.Items.IndexOf(xKey.GetValue("USB Device", ""));

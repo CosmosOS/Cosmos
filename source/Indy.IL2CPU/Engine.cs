@@ -74,7 +74,8 @@ namespace Indy.IL2CPU {
 	public enum DebugModeEnum {
 		None,
 		IL,
-		Source
+		Source,
+		MLUsingGDB
 	}
 
 	public class QueuedMethodInformation {
@@ -107,6 +108,8 @@ namespace Indy.IL2CPU {
 		private byte mDebugComport;
 		private DebugModeEnum mDebugMode;
 		private List<DebugSymbol> mDebugSymbols = new List<DebugSymbol>();
+		private List<MLDebugSymbol> mMLDebugSymbols = new List<MLDebugSymbol>();
+		private string mOutputDir;
 
 		/// <summary>
 		/// Compiles an assembly to CPU-specific code. The entrypoint of the assembly will be 
@@ -129,8 +132,10 @@ namespace Indy.IL2CPU {
 				//}
 				mDebugMode = aDebugMode;
 				MethodInfo xEntryPoint = (MethodInfo)mCrawledAssembly.EntryPoint;
-				if (xEntryPoint == null)
+				if (xEntryPoint == null) {
 					throw new NotSupportedException("No EntryPoint found!");
+				}
+				mOutputDir = Path.GetDirectoryName(aAssembly);
 
 				Type xEntryPointType = xEntryPoint.DeclaringType;
 				xEntryPoint = xEntryPointType.GetMethod("Init", new Type[0]);
@@ -146,7 +151,7 @@ namespace Indy.IL2CPU {
 						}
 					case TargetPlatformEnum.NativeX86: {
 							mMap = (OpCodeMap)Activator.CreateInstance(Type.GetType("Indy.IL2CPU.IL.X86.Native.NativeOpCodeMap, Indy.IL2CPU.IL.X86.Native", true));
-							mAssembler = new Assembler.X86.Native.Assembler(aGetFileNameForGroup, aInMetalMode, (aDebugMode != DebugModeEnum.None) ? aDebugComNumber : (byte?)null);
+							mAssembler = new Assembler.X86.Native.Assembler(aGetFileNameForGroup, aInMetalMode, ((aDebugMode != DebugModeEnum.None) && (aDebugMode!=DebugModeEnum.MLUsingGDB)) ? aDebugComNumber : (byte?)null);
 							break;
 						}
 					default:
@@ -271,6 +276,9 @@ namespace Indy.IL2CPU {
 						}
 						mMap.PostProcess(mAssembler);
 						ProcessAllStaticFields();
+						if (mMLDebugSymbols != null) {
+							MLDebugSymbol.WriteSymbolsListToFile(mMLDebugSymbols, Path.Combine(mOutputDir, "msil-instructions.dbg"));
+						}
 						//if (mDebugSymbols != null) {
 						//    GenerateDebugSymbols();
 						//}
@@ -408,7 +416,7 @@ namespace Indy.IL2CPU {
 					xDbgAssembly.Type = xDbgAssemblyTypes.ToArray();
 					xDbgAssemblies.Add(xDbgAssembly);
 				}
-				} finally {
+			} finally {
 				if (xTypeCount != mTypes.Count) {
 					Console.WriteLine("TypeCount changed (was {0}, new {1})", xTypeCount, mTypes.Count);
 					Console.WriteLine("Last Type: {0}", mTypes.Last().FullName);
@@ -973,6 +981,15 @@ namespace Indy.IL2CPU {
 												LabelName = xLabel,
 												MethodMetaDataToken = xCurrentMethod.MetadataToken
 											});
+										}
+										if (mMLDebugSymbols != null) {
+											var xMLSymbol = new MLDebugSymbol();
+											xMLSymbol.LabelName = xLabel;
+											int xStackSize = (from item in mAssembler.StackContents
+															  let xSize = (item.Size % 4 == 0) ? item.Size : (item.Size + (4 - (item.Size % 4)))
+															  select xSize).Sum();
+											xMLSymbol.StackDifference = xMethodInfo.LocalsSize + xStackSize;
+											mMLDebugSymbols.Add(xMLSymbol);
 										}
 										xOp.Assemble();
 										//if (xInstructionInfo != null) {
