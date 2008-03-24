@@ -19,26 +19,57 @@ namespace Cosmos.Build.Windows {
         protected TcpClient mClient;
         protected byte[] mTCPData = new byte[4];
 
+        /// <summary>
+        /// Displays the Debug Window.
+        /// </summary>
+        public DebugWindow()
+        {
+            InitializeComponent();
+            
+            //Create a TCP connection to localhost:4444. We have already set up Qemu to listen to this port.
+            mClient = new TcpClient();
+            mClient.Connect(new IPEndPoint(IPAddress.Loopback, 4444));
+
+            //Read TCP data from Qemu
+            var xStream = mClient.GetStream();
+            xStream.BeginRead(mTCPData, 0, mTCPData.Length, new AsyncCallback(TCPRead), xStream);
+            UInt32 xEIP = (UInt32)xStream.ReadByte();
+        }
+
         protected delegate void DebugPacketRcvdDelegate(UInt32 aEIP);
         protected void DebugPacketRcvd(UInt32 aEIP) {
             lablEIP.Content = aEIP.ToString("X");
         }
 
-        protected void TCPRead(IAsyncResult aResult) {
-            var xStream = (NetworkStream)aResult.AsyncState;
-            int xCount = xStream.EndRead(aResult);
-            xStream.BeginRead(mTCPData, 0, mTCPData.Length, new AsyncCallback(TCPRead), xStream);
-            UInt32 xEIP = (UInt32)((mTCPData[0] << 24) | (mTCPData[1] << 16) | (mTCPData[2] << 8) | mTCPData[3]);
-            Dispatcher.BeginInvoke(DispatcherPriority.Normal, new DebugPacketRcvdDelegate(DebugPacketRcvd), xEIP);
+        protected delegate void ConnectionLostDelegate(Exception ex);
+        protected void ConnectionLost(Exception ex)
+        {
+            textBlock1.Text = "TCP Connection to virtual machine lost!" + Environment.NewLine;
+            DebugGrid.Background = System.Windows.Media.Brushes.Red;
+            while (ex.InnerException != null)
+            {
+                textBlock1.Text += ex.Message + Environment.NewLine;
+                ex = ex.InnerException;
+            }
         }
 
-        public DebugWindow() {
-            InitializeComponent();
-            mClient = new TcpClient();
-            mClient.Connect(new IPEndPoint(IPAddress.Loopback, 4444));
-            var xStream = mClient.GetStream();
-            xStream.BeginRead(mTCPData, 0, mTCPData.Length, new AsyncCallback(TCPRead), xStream);
-            UInt32 xEIP = (UInt32)xStream.ReadByte();
+        protected void TCPRead(IAsyncResult aResult) 
+        {
+            try
+            {
+                var xStream = (NetworkStream)aResult.AsyncState;
+                int xCount = xStream.EndRead(aResult);
+                xStream.BeginRead(mTCPData, 0, mTCPData.Length, new AsyncCallback(TCPRead), xStream);
+                UInt32 xEIP = (UInt32)((mTCPData[0] << 24) | (mTCPData[1] << 16) | (mTCPData[2] << 8) | mTCPData[3]);
+                Dispatcher.BeginInvoke(DispatcherPriority.Normal, new DebugPacketRcvdDelegate(DebugPacketRcvd), xEIP);
+            }
+            catch (System.IO.IOException ex)
+            {
+                Dispatcher.BeginInvoke(DispatcherPriority.Normal, new ConnectionLostDelegate(ConnectionLost), ex);
+            }
+            
         }
+
+        
     }
 }
