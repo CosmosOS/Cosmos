@@ -4,9 +4,12 @@ using System.Text;
 
 namespace KudzuTest {
     public class Frame {
-        protected byte[] mData;
+        public byte[] mData;
 
         public Frame() {
+        }
+
+        public void Init1() {
             // This one is used
             //0000   ff ff ff ff ff ff 00 50 56 22 22 0d 08 00 45 00  .......PV""...E.
             //0010   00 1d 5a f8 00 00 80 11 09 23 c0 a8 16 0d ff ff  ..Z......#......
@@ -109,6 +112,55 @@ namespace KudzuTest {
             if (UpdateUDPChecksum() != 0x0630) {
                 throw new Exception("UDP Checksum error - ");
             }
+        }
+
+        public void Init2() {
+            // Checksums didnt work when running Cosmos so I made
+            // this packet using our code on Widnows
+            mData = new byte[43];
+		    mData[0] = 255;
+		    mData[1] = 255;
+		    mData[2] = 255;
+		    mData[3] = 255;
+		    mData[4] = 255;
+		    mData[5] = 255;
+		    mData[6] = 82;
+		    mData[7] = 84;
+		    mData[8] = 0;
+		    mData[9] = 18;
+		    mData[10] = 52;
+		    mData[11] = 87;
+		    mData[12] = 8;
+		    mData[13] = 0;
+		    mData[14] = 69;
+		    mData[15] = 0;
+		    mData[16] = 0;
+		    mData[17] = 29;
+		    mData[18] = 90;
+		    mData[19] = 248;
+		    mData[20] = 0;
+		    mData[21] = 0;
+		    mData[22] = 128;
+		    mData[23] = 17;
+		    mData[24] = 211;
+		    mData[25] = 201;
+		    mData[26] = 10;
+		    mData[27] = 0;
+		    mData[28] = 2;
+		    mData[29] = 15;
+		    mData[30] = 255;
+		    mData[31] = 255;
+		    mData[32] = 255;
+		    mData[33] = 255;
+		    mData[34] = 4;
+		    mData[35] = 73;
+		    mData[36] = 8;
+		    mData[37] = 174;
+		    mData[38] = 0;
+		    mData[39] = 9;
+		    mData[40] = 208;
+		    mData[41] = 214;
+            mData[42] = 22;
         }
 
         public void SetEthSrcMAC(byte aMAC1, byte aMAC2, byte aMAC3, byte aMAC4, byte aMAC5, byte aMAC6) {

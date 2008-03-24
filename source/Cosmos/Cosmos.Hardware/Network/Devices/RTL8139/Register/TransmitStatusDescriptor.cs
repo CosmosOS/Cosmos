@@ -16,8 +16,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
     {
         private PCIDevice pci;
         private UInt32 tsdAddress;
-        public static TransmitStatusDescriptor Load(PCIDevice pciCard)
-        {
+        public static TransmitStatusDescriptor Load(PCIDevice pciCard) {
             //Retrieve the 32 bits from the PCI card
             //and create a TSD object
             UInt32 address = 0;
