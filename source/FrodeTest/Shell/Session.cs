@@ -59,7 +59,7 @@ namespace FrodeTest.Shell
                 }               
                 
                 var head = new PacketHeader(0xFF);
-                byte[] data = FrodeTest.Test.Mock.FakeBroadcastPacket.GetFakePacketAllHigh();
+                byte[] data = FrodeTest.Test.Mock.FakeBroadcastPacket.GetFakePacket();
                 var packet = new Packet(head, data);
                 
                 nic.Transmit(packet);

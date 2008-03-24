@@ -337,7 +337,17 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         public bool Transmit(Packet packet)
         {
             //Put the packet into the correct TxBuffer
+            
+            //TODO: Do NOT set all registers! This works, but is not efficient!
+            TxBuffer0 = packet.PacketBody;
             TxBuffer1 = packet.PacketBody;
+            TxBuffer2 = packet.PacketBody;
+            TxBuffer3 = packet.PacketBody;
+            WriteAddressToPCI(ref TxBuffer0, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD0);
+            WriteAddressToPCI(ref TxBuffer1, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD1);
+            WriteAddressToPCI(ref TxBuffer2, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD2);
+            WriteAddressToPCI(ref TxBuffer3, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD3);
+
 
             //Set the transmit status - which enables the transmit.
             var tsd = Register.TransmitStatusDescriptor.Load(pciCard);
