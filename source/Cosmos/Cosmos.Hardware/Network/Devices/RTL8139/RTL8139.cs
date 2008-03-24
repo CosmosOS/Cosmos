@@ -322,10 +322,10 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
              */
 
 
-            fixed (byte* bodystart = &bytearray[0])
+            fixed (byte* bodystart = bytearray)
             {
                 IntPtr bodyAddress = (IntPtr)bodystart;
-                IOSpace.Write32(address, (uint)bodyAddress);
+                IOSpace.Write32(address, (uint)bodystart);
                 //Console.WriteLine("Address where buffer is stored: " + (uint)bodyAddress);
             }
         }
