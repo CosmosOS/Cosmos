@@ -37,6 +37,7 @@ namespace WindowsFormsApplication1
             mUdpState.EndPoint = new IPEndPoint(IPAddress.Any, 2222);
             mUdpState.Client = new UdpClient(mUdpState.EndPoint);
             mUdpState.Client.BeginReceive(new AsyncCallback(UdpReceive), mUdpState);
+            //Dispatcher.BeginInvoke(DispatcherPriority.Input, new XPTDataDelegate(XPTData), xBytes);
         }
         public void UdpReceive(IAsyncResult aResult) {
             var xState = (UdpState)aResult.AsyncState;

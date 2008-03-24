@@ -4,5 +4,7 @@
     Title="Cosmos Debuggger" Height="300" Width="300" Icon="/Cosmos.Build.Windows;component/Cosmos.ico">
     <Grid>
         <TextBlock Height="79" Name="textBlock1" VerticalAlignment="Top" TextWrapping="WrapWithOverflow">This is the debug window. Coming soon! For now, leave me open until you are done. Close and the application will terminate.</TextBlock>
+        <Label Height="28" HorizontalAlignment="Left" Margin="11,55,0,0" Name="label1" VerticalAlignment="Top" Width="34">EIP:</Label>
+        <Label Height="28" Margin="44,55,114,0" Name="lablEIP" VerticalAlignment="Top"></Label>
     </Grid>
 </Window>
