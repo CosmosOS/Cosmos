@@ -10,11 +10,12 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
     /// Transmit Status Register is used to describe how the process of transmitting data is going/gone.
     /// The RTL8139 contains four of these descriptors. 
     /// Located at 0x10h, 0x14h, 0x18h and 0x1Ch, each is 4 bytes wide.
+    /// NB! All Write access to this register has to be in double-word (i.e 32-bit) chuncks.
     /// </summary>
     public class TransmitStatusDescriptor
     {
         private PCIDevice pci;
-        private UInt32 tdsAddress;
+        private UInt32 tsdAddress;
         public static TransmitStatusDescriptor Load(PCIDevice pciCard)
         {
             //Retrieve the 32 bits from the PCI card
@@ -45,7 +46,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
         private TransmitStatusDescriptor(PCIDevice hw, UInt32 adr)
         {
             pci = hw;
-            tdsAddress = adr;
+            tsdAddress = adr;
         }
 
         /// <summary>
@@ -55,7 +56,11 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
         {
             get
             {
-                return IOSpace.Read32(tdsAddress);
+                return IOSpace.Read32(tsdAddress);
+            }
+            set
+            {
+                IOSpace.Write32(tsdAddress, value);
             }
         }
 
@@ -65,24 +70,18 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
         /// </summary>
         public void ClearOWNBit()
         {
-            //Read byte from register
-            byte offset = 8;
-            byte data = BinaryHelper.GetByteFrom32bit(this.TSD, offset);
-
+            UInt32 data = this.TSD;
 
             Console.WriteLine("OWN bit status in TransmitStatusDescriptor: " + BinaryHelper.CheckBit(this.TSD, 13));
             
             //Turn off single OWN bit
-            //data &= (byte)~(1 << (byte)(BitValue.OWN - offset));
-            data &= (byte)~(1 << (byte)(13 - offset));
+            if (BinaryHelper.CheckBit(data, (ushort)(13))) //if OWN bit is HIGH
+            {
+                Console.WriteLine("Flipping OWN bit...");
+                data = BinaryHelper.FlipBit(data, (ushort)(13));
+            }
 
-            //TODO, change to this instead...
-//            if (BinaryHelper.CheckBit(data, 13 - offset)) //OWN bit is HIGH
- //               BinaryHelper.FlipBit(data, 13 - offset);
-
-            //Write all 8 bits back
-            IOSpace.Write8(tdsAddress + offset, data);
-
+            this.TSD = data;
             Console.WriteLine("OWN bit after turning off (should be false): " + BinaryHelper.CheckBit(this.TSD, 13));
         }
 
@@ -94,26 +93,25 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
         {
             get
             {
-                byte offset = 0;
-                //return (int)IOSpace.Read8(this.TSD + offset);
-                //return (int)IOSpace.Read8(
-                Console.WriteLine("[Size]TSD is: " + this.TSD);
-                Console.WriteLine("[Size]First 8 bits: " + (byte)BinaryHelper.GetByteFrom32bit(this.TSD, offset));
-                return (int)BinaryHelper.GetByteFrom32bit(this.TSD, offset);
+                UInt16 mask = 8191; // 0001 1111 1111 1111
+                return (int)(this.TSD & mask);
             }
             set
             {
-                //TODO: Check this - the register contains 12 bits. We only write 8 bits here.
-                byte offset = 0;
-                IOSpace.Write16(tdsAddress + offset, (UInt16)value);
-                //Console.WriteLine("Wrote value " + (UInt16)value + " to TDSAddress: " + tdsAddress);
-                //Console.WriteLine("Read again: " + IOSpace.Read8(tdsAddress + offset));
+                UInt32 data = this.TSD;
+
+                //First AND all 13 SIZE bits to zero. Then OR together with the correct size.
+                UInt32 zeromask = 524287; //1111 1111 1111 1111 1110 0000 0000 0000
+                data = data & zeromask;
+                data = (UInt32)(data | (UInt32)value);
+
+                this.TSD = data;
             }
         }
 
         public enum BitValue : uint
         {
-            SIZE = BinaryHelper.BitPos.BIT0,       //12 bit long. Must not contain value over 0x700h
+            SIZE = BinaryHelper.BitPos.BIT0,       //13 bit long. Must not contain value over 0x700h
             OWN = BinaryHelper.BitPos.BIT13,       //Set to 1 when transmit complete. Defaults to 1.
             TUN = BinaryHelper.BitPos.BIT14,       //Transmit FIFO Underrun. Is set to 1 if TxFIFO was exhausted during transmition.
             TOK = BinaryHelper.BitPos.BIT15,       //Transmit OK.

@@ -33,12 +33,25 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         }
 
         /// <summary>
-        /// Changes the value in the given position. Either from low to high, or high to low.
+        /// Changes the value in the given position. Change bitvalue from low to high, or high to low.
         /// Returns the same byte, but with one bit changed.
         /// </summary>
-        public static byte FlipBit(byte data, ushort bit)
+        public static byte FlipBit(byte data, ushort bitposition)
         {
-            throw new NotImplementedException();
+            byte mask = (byte)(1 << bitposition);
+            if (CheckBit(data, bitposition))
+                return (byte)(data & ~mask);
+            else
+                return (byte)(data | mask);
+        }
+
+        public static UInt32 FlipBit(UInt32 data, ushort bitposition)
+        {
+            UInt32 mask = (UInt32)(1 << bitposition);
+            if (CheckBit(data, bitposition))
+                return (UInt32)(data & ~mask);
+            else
+                return (UInt32)(data | mask);
         }
 
 

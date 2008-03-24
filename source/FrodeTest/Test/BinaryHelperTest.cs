@@ -36,6 +36,20 @@ namespace FrodeTest.Test
 
             data = UInt32.MaxValue;
             Console.WriteLine("Should be TRUE: " + BinaryHelper.CheckBit(data, 0));
+
+            //Flip bit testing
+            byte flipbits = 0xFF; // 1111 1111
+            flipbits = BinaryHelper.FlipBit(flipbits, 0); //change to 1111 1110
+            Console.WriteLine("Should be 254: " + flipbits);
+
+            flipbits = 0x00;
+            flipbits = BinaryHelper.FlipBit(flipbits, 1); //change to 0000 0010
+            Console.WriteLine("Should be 2: " + flipbits);
+
+            flipbits = 0xF0;
+            flipbits = BinaryHelper.FlipBit(flipbits, 7); //change to 0111 0000
+            Console.WriteLine("Should be 112: " + flipbits);
+
         }
     }
 }
