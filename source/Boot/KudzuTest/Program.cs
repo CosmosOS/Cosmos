@@ -8,7 +8,7 @@ namespace KudzuTest {
 		// Most users wont touch this. This will call the Cosmos Build tool
 		[STAThread]
 		static void Main(string[] args) {
-            var xData = RTL8139.SampleUDPBroadcast();
+            new RTL8139().Init();
             BuildUI.Run();
         }
 		#endregion
@@ -48,7 +48,8 @@ namespace KudzuTest {
             xNIC.Enable();
             xNIC.InitializeDriver();
 
-            var xData = RTL8139.SampleUDPBroadcast();
+            var xFrame = new RTL8139();
+            xFrame.Init();
             //xNIC.TransmitRaw(xData);
 
             Console.WriteLine("Done");
