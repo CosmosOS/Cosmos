@@ -49,9 +49,9 @@ namespace Cosmos.Build.Windows {
 
 		protected delegate void ConnectionLostDelegate(Exception ex);
 		protected void ConnectionLost(Exception ex) {
-			textBlock1.Text = "TCP Connection to virtual machine lost!" + Environment.NewLine;
+			textBlock1.Text = "No TCP Connection to virtual machine!" + Environment.NewLine;
 			DebugGrid.Background = System.Windows.Media.Brushes.Red;
-			while (ex.InnerException != null) {
+			while (ex != null) {
 				textBlock1.Text += ex.Message + Environment.NewLine;
 				ex = ex.InnerException;
 			}
