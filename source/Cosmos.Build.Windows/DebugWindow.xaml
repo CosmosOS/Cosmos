@@ -6,5 +6,6 @@
         <TextBlock Height="79" Name="textBlock1" VerticalAlignment="Top" TextWrapping="WrapWithOverflow">This is the debug window. Coming soon! For now, leave me open until you are done. Close and the application will terminate.</TextBlock>
         <Label Height="28" HorizontalAlignment="Left" Margin="11,55,0,0" Name="label1" VerticalAlignment="Top" Width="34">EIP:</Label>
         <Label Height="28" Margin="44,55,114,0" Name="lablEIP" VerticalAlignment="Top"></Label>
+        <ListBox Margin="10,91,14,9" Name="lboxLog" />
     </Grid>
 </Window>

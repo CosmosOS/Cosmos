@@ -34,7 +34,9 @@ namespace Cosmos.Build.Windows {
 
         protected delegate void DebugPacketRcvdDelegate(UInt32 aEIP);
         protected void DebugPacketRcvd(UInt32 aEIP) {
-            lablEIP.Content = aEIP.ToString("X");
+            string xEIP = aEIP.ToString("X");
+            lablEIP.Content = xEIP; 
+            lboxLog.SelectedIndex = lboxLog.Items.Add(xEIP);
         }
 
         protected delegate void ConnectionLostDelegate(Exception ex);
