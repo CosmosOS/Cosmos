@@ -15,6 +15,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				case 1:
 				case 2:
 				case 4: {
+						new CPUx86.Noop();
 						break;
 					}
 				case 8: {

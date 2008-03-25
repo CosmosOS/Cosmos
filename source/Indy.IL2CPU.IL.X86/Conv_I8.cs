@@ -12,19 +12,20 @@ namespace Indy.IL2CPU.IL.X86 {
 			: base(aReader, aMethodInfo) {
 		}
 		public override void DoAssemble() {
-			var  xSource = Assembler.StackContents.Pop();
-			switch(xSource.Size) {
+			var xSource = Assembler.StackContents.Pop();
+			switch (xSource.Size) {
 				case 1:
 				case 2:
 				case 4: {
-					new CPUx86.Pop(CPUx86.Registers.EAX);
-					new CPUx86.Pushd("0");
-					new CPUx86.Pushd(CPUx86.Registers.EAX);
-					break;
-				}
+						new CPUx86.Pop(CPUx86.Registers.EAX);
+						new CPUx86.Pushd("0");
+						new CPUx86.Pushd(CPUx86.Registers.EAX);
+						break;
+					}
 				case 8: {
-					break;
-				}
+						new CPUx86.Noop();
+						break;
+					}
 				default:
 					throw new Exception("SourceSize " + xSource + " not supported!");
 			}

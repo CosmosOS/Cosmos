@@ -41,6 +41,10 @@ namespace Indy.IL2CPU {
 								xWriter.WriteAttributeString("Label", item.LabelName);
 								xWriter.WriteAttributeString("Address", item.Address.ToString());
 								xWriter.WriteAttributeString("StackDifference", item.StackDifference.ToString());
+								xWriter.WriteAttributeString("AssemblyFile", item.AssemblyFile);
+								xWriter.WriteAttributeString("TypeToken", item.TypeToken.ToString());
+								xWriter.WriteAttributeString("MethodToken", item.MethodToken.ToString());
+								xWriter.WriteAttributeString("ILOffset", item.ILOffset.ToString());
 							}
 							xWriter.WriteEndElement();
 						}
@@ -58,7 +62,11 @@ namespace Indy.IL2CPU {
 							   select new MLDebugSymbol() {
 								   LabelName = item.Attribute("Label").Value,
 								   Address = (uint)item.Attribute("Address"),
-								   StackDifference = (int)item.Attribute("StackDifference")
+								   StackDifference = (int)item.Attribute("StackDifference"),
+								   AssemblyFile = (string)item.Attribute("AssemblyFile"),
+								   TypeToken = (int)item.Attribute("TypeToken"),
+								   MethodToken = (int)item.Attribute("MethodToken"),
+								   ILOffset = (int)item.Attribute("ILOffset"),
 							   }));
 		}
 
@@ -73,6 +81,23 @@ namespace Indy.IL2CPU {
 		}
 
 		public int StackDifference {
+			get;
+			set;
+		}
+
+		public string AssemblyFile {
+			get;
+			set;
+		}
+		public int TypeToken {
+			get;
+			set;
+		}
+		public int MethodToken {
+			get;
+			set;
+		}
+		public int ILOffset {
 			get;
 			set;
 		}

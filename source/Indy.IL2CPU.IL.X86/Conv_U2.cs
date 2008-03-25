@@ -28,6 +28,7 @@ namespace Indy.IL2CPU.IL.X86 {
 						break;
 					}
 				case 2: {
+						new CPUx86.Noop();
 						break;
 					}
 				default:

@@ -15,53 +15,62 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 
 namespace Cosmos.Build.Windows {
-    public partial class DebugWindow : Window {
-        protected TcpClient mClient;
-        protected byte[] mTCPData = new byte[4];
+	public partial class DebugWindow: Window {
+		protected TcpClient mClient;
+		protected byte[] mTCPData = new byte[4];
+		protected int mCurrentPos = 0;
 
-        public DebugWindow() {
-            InitializeComponent();
-            
-            //Create a TCP connection to localhost:4444. We have already set up Qemu to listen to this port.
-            mClient = new TcpClient();
-            mClient.Connect(new IPEndPoint(IPAddress.Loopback, 4444));
+		public DebugWindow() {
+			InitializeComponent();
 
-            //Read TCP data from Qemu
-            var xStream = mClient.GetStream();
-            xStream.BeginRead(mTCPData, 0, mTCPData.Length, new AsyncCallback(TCPRead), xStream);
-            UInt32 xEIP = (UInt32)xStream.ReadByte();
-        }
+			//Create a TCP connection to localhost:4444. We have already set up Qemu to listen to this port.
+			mClient = new TcpClient();
+			mClient.Connect(new IPEndPoint(IPAddress.Loopback, 4444));
 
-        protected delegate void DebugPacketRcvdDelegate(UInt32 aEIP);
-        protected void DebugPacketRcvd(UInt32 aEIP) {
-            string xEIP = aEIP.ToString("X");
-            lablEIP.Content = xEIP; 
-            lboxLog.SelectedIndex = lboxLog.Items.Add(xEIP);
-        }
+			//Read TCP data from Qemu
+			var xStream = mClient.GetStream();
+			xStream.BeginRead(mTCPData, 0, mTCPData.Length, new AsyncCallback(TCPRead), xStream);
+			//            UInt32 xEIP = (UInt32)xStream.ReadByte();
+		}
 
-        protected delegate void ConnectionLostDelegate(Exception ex);
-        protected void ConnectionLost(Exception ex) {
-            textBlock1.Text = "TCP Connection to virtual machine lost!" + Environment.NewLine;
-            DebugGrid.Background = System.Windows.Media.Brushes.Red;
-            while (ex.InnerException != null) {
-                textBlock1.Text += ex.Message + Environment.NewLine;
-                ex = ex.InnerException;
-            }
-        }
+		protected delegate void DebugPacketRcvdDelegate(UInt32 aEIP);
+		protected void DebugPacketRcvd(UInt32 aEIP) {
+			string xEIP = aEIP.ToString("X8");
+			lablEIP.Content = xEIP;
+			lboxLog.SelectedIndex = lboxLog.Items.Add(xEIP);
+		}
 
-        protected void TCPRead(IAsyncResult aResult) {
-            try {
-                var xStream = (NetworkStream)aResult.AsyncState;
-                int xCount = xStream.EndRead(aResult);
-                xStream.BeginRead(mTCPData, 0, mTCPData.Length, new AsyncCallback(TCPRead), xStream);
-                UInt32 xEIP = (UInt32)((mTCPData[0] << 24) | (mTCPData[1] << 16) | (mTCPData[2] << 8) | mTCPData[3]);
-                Dispatcher.BeginInvoke(DispatcherPriority.Normal, new DebugPacketRcvdDelegate(DebugPacketRcvd), xEIP);
-            } catch (System.IO.IOException ex) {
-                Dispatcher.BeginInvoke(DispatcherPriority.Normal, new ConnectionLostDelegate(ConnectionLost), ex);
-            }
-            
-        }
+		protected delegate void ConnectionLostDelegate(Exception ex);
+		protected void ConnectionLost(Exception ex) {
+			textBlock1.Text = "TCP Connection to virtual machine lost!" + Environment.NewLine;
+			DebugGrid.Background = System.Windows.Media.Brushes.Red;
+			while (ex.InnerException != null) {
+				textBlock1.Text += ex.Message + Environment.NewLine;
+				ex = ex.InnerException;
+			}
+		}
 
-        
-    }
+		protected void TCPRead(IAsyncResult aResult) {
+			try {
+				var xStream = (NetworkStream)aResult.AsyncState;
+				int xCount = xStream.EndRead(aResult);
+				if (xCount != 4) {
+					if ((xCount + mCurrentPos) != 4) {
+						mCurrentPos += xCount;
+						xStream.BeginRead(mTCPData, mCurrentPos, 4 - mCurrentPos, new AsyncCallback(TCPRead), xStream);
+						return;
+					}
+				}
+				mCurrentPos = 0;
+				UInt32 xEIP = (UInt32)((mTCPData[0] << 24) | (mTCPData[1] << 16) | (mTCPData[2] << 8) | mTCPData[3]);
+				xStream.BeginRead(mTCPData, 0, mTCPData.Length, new AsyncCallback(TCPRead), xStream);
+				Dispatcher.BeginInvoke(DispatcherPriority.Normal, new DebugPacketRcvdDelegate(DebugPacketRcvd), xEIP);
+			} catch (System.IO.IOException ex) {
+				Dispatcher.BeginInvoke(DispatcherPriority.Normal, new ConnectionLostDelegate(ConnectionLost), ex);
+			}
+
+		}
+
+
+	}
 }

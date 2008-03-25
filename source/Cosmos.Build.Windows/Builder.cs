@@ -23,26 +23,26 @@ namespace Cosmos.Build.Windows {
 			try {
 				RegistryKey xKey = Registry.CurrentUser.OpenSubKey(@"Software\Cosmos");
 				string xResult;
-                // If no key, see if we are in dev mode
-                // Problem  - noone checked this for user kit mode and no key...
-                xResult = (string)xKey.GetValue("Build Path");
+				// If no key, see if we are in dev mode
+				// Problem  - noone checked this for user kit mode and no key...
+				xResult = (string)xKey.GetValue("Build Path");
 
-                // Dev kit
-                if (xResult == null) {
+				// Dev kit
+				if (xResult == null) {
 					xResult = Directory.GetCurrentDirectory().ToLowerInvariant();
-                    int xPos = xResult.IndexOf("source");
-                    if (xPos > -1) {
-                        // Hack around users that have source in the path 2x.. but wont 
-                        // accomodate if they have it >2 times
-                        int xPos2 = xResult.IndexOf("source", xPos + 1);
-                        if (xPos2 > -1) {
-                            xPos = xPos2;
-                        }
-                        xResult = xResult.Substring(0, xPos) + @"Build\";
-                    }
+					int xPos = xResult.IndexOf("source");
+					if (xPos > -1) {
+						// Hack around users that have source in the path 2x.. but wont 
+						// accomodate if they have it >2 times
+						int xPos2 = xResult.IndexOf("source", xPos + 1);
+						if (xPos2 > -1) {
+							xPos = xPos2;
+						}
+						xResult = xResult.Substring(0, xPos) + @"Build\";
+					}
 				}
-                
-                if (xResult == "") {
+
+				if (xResult == "") {
 					throw new Exception("Cannot find Cosmos build path in registry.");
 				}
 				if (!xResult.EndsWith(@"\")) {
@@ -56,14 +56,14 @@ namespace Cosmos.Build.Windows {
 
 		protected void RemoveFile(string aPathname) {
 			if (File.Exists(aPathname)) {
-                RemoveReadOnly(aPathname);
+				RemoveReadOnly(aPathname);
 				File.Delete(aPathname);
 			}
 		}
-		
+
 		protected void CopyFile(string aFrom, string aTo) {
 			string xDir = Path.GetDirectoryName(aTo);
-			if(!Directory.Exists(xDir)) {
+			if (!Directory.Exists(xDir)) {
 				Directory.CreateDirectory(xDir);
 			}
 			File.Copy(aFrom, aTo);
@@ -78,8 +78,8 @@ namespace Cosmos.Build.Windows {
 		}
 
 		public void MakeISO() {
-            string xPath = BuildPath + @"ISO\";
-            RemoveFile(BuildPath + "cosmos.iso");
+			string xPath = BuildPath + @"ISO\";
+			RemoveFile(BuildPath + "cosmos.iso");
 			RemoveFile(xPath + "output.bin");
 			CopyFile(BuildPath + "output.bin", xPath + "output.bin");
 			// From TFS its read only, mkisofs doesnt like that
@@ -88,8 +88,8 @@ namespace Cosmos.Build.Windows {
 		}
 
 		public void Compile() {
-            string xAsmPath = ToolsPath + @"asm\";
-            if (!Directory.Exists(xAsmPath)) {
+			string xAsmPath = ToolsPath + @"asm\";
+			if (!Directory.Exists(xAsmPath)) {
 				Directory.CreateDirectory(xAsmPath);
 			}
 			Assembly xTarget = System.Reflection.Assembly.GetEntryAssembly();
@@ -114,85 +114,85 @@ namespace Cosmos.Build.Windows {
 		public void BuildKernel() {
 		}
 
-        public void MakeVPC() {
-            MakeISO();
-            string xPath = BuildPath + @"VPC\";
-            RemoveReadOnly(xPath + "Cosmos.vmc");
-            RemoveReadOnly(xPath + "hda.vhd");
-            Process.Start(xPath + "Cosmos.vmc");
-        }
+		public void MakeVPC() {
+			MakeISO();
+			string xPath = BuildPath + @"VPC\";
+			RemoveReadOnly(xPath + "Cosmos.vmc");
+			RemoveReadOnly(xPath + "hda.vhd");
+			Process.Start(xPath + "Cosmos.vmc");
+		}
 
-        public void MakeVMWare() {
-            MakeISO();
-            string xPath = BuildPath + @"VMWare\";
-            RemoveReadOnly(xPath + "Cosmos.nvram");
-            RemoveReadOnly(xPath + "Cosmos.vmsd");
-            RemoveReadOnly(xPath + "Cosmos.vmx");
-            RemoveReadOnly(xPath + "Cosmos.vmxf");
-            RemoveReadOnly(xPath + "hda.vmdk");
-            Process.Start(xPath + "Cosmos.vmx");
-        }
+		public void MakeVMWare() {
+			MakeISO();
+			string xPath = BuildPath + @"VMWare\";
+			RemoveReadOnly(xPath + "Cosmos.nvram");
+			RemoveReadOnly(xPath + "Cosmos.vmsd");
+			RemoveReadOnly(xPath + "Cosmos.vmx");
+			RemoveReadOnly(xPath + "Cosmos.vmxf");
+			RemoveReadOnly(xPath + "hda.vmdk");
+			Process.Start(xPath + "Cosmos.vmx");
+		}
 
-        public void MakeQEMU(bool aUseHDImage, bool aGDB, bool aWaitSerialTCP) {
-            MakeISO();
-            RemoveFile(BuildPath + "serial-debug.txt");
-            // QEMU Docs - http://fabrice.bellard.free.fr/qemu/qemu-doc.html
-            Global.Call(ToolsPath + @"qemu\qemu.exe"
-                // HD image
-                , (aUseHDImage ? "-hda \"" + BuildPath + "hda.img\"" : "")
-                // Path for BIOS, VGA BIOS, and keymaps
-                + " -L ."
-                // CD ROM image
-                + " -cdrom \"" + BuildPath + "Cosmos.iso\""
-                // Boot CD ROM
-                + " -boot d"
-                // Setup serial port
-                // Might allow serial file later for post debugging of CPU
-                // etc since serial to TCP on a byte level is likely highly innefficient
-                // with the packet overhead
-                // COM1
-                + " -serial tcp::4444,server" + (aWaitSerialTCP ? "" : ",nowait")
-                + " -serial \"file:" + BuildPath + "trace.dat\" "
-                // COM2
+		public void MakeQEMU(bool aUseHDImage, bool aGDB, bool aWaitSerialTCP) {
+			MakeISO();
+			RemoveFile(BuildPath + "serial-debug.txt");
+			// QEMU Docs - http://fabrice.bellard.free.fr/qemu/qemu-doc.html
+			Global.Call(ToolsPath + @"qemu\qemu.exe"
+				// HD image
+				, (aUseHDImage ? "-hda \"" + BuildPath + "hda.img\"" : "")
+				// Path for BIOS, VGA BIOS, and keymaps
+				+ " -L ."
+				// CD ROM image
+				+ " -cdrom \"" + BuildPath + "Cosmos.iso\""
+				// Boot CD ROM
+				+ " -boot d"
+				// Setup serial port
+				// Might allow serial file later for post debugging of CPU
+				// etc since serial to TCP on a byte level is likely highly innefficient
+				// with the packet overhead
+				// COM1
 				+ " -serial \"file:" + BuildPath + "debug.dbg\" "
-                // Enable acceleration if we are not using GDB
-                + (aGDB ? " -S -s" : " -kernel-kqemu")
-                // Ethernet card - Later the model should be a QEMU option on 
-                // options screen
-                + " -net nic,model=rtl8139,macaddr=52:54:00:12:34:57"
-                + " -net user"
-                , ToolsPath + @"qemu\", false, true);
+				// COM2
+				+ (aWaitSerialTCP ? " -serial tcp::4444,server" + (aWaitSerialTCP ? "" : ",nowait") : "")
+				//                + " -serial \"file:" + BuildPath + "trace.dat\" "
+				// Enable acceleration if we are not using GDB
+				+(aGDB ? " -S -s" : " -kernel-kqemu")
+				// Ethernet card - Later the model should be a QEMU option on 
+				// options screen
+				+ " -net nic,model=rtl8139,macaddr=52:54:00:12:34:57"
+				+ " -net user"
+				, ToolsPath + @"qemu\", false, true);
 
-            if (aGDB) {
-					//TODO: If the host is really busy, sometimes GDB can run before QEMU finishes loading.
-					//in this case, GDB says "program not running". Not sure how to fix this properly.
-					Global.Call(ToolsPath + "gdb.exe"
-						, BuildPath + @"output.bin" + " --eval-command=\"target remote:1234\" --eval-command=\"b _CODE_REQUESTED_BREAK_\" --eval-command=\"c\""
-                        , ToolsPath + @"qemu\", false, false);
-            }
-        }
+			if (aGDB) {
+				//TODO: If the host is really busy, sometimes GDB can run before QEMU finishes loading.
+				//in this case, GDB says "program not running". Not sure how to fix this properly.
+				Global.Call(ToolsPath + "gdb.exe"
+					, BuildPath + @"output.bin" + " --eval-command=\"target remote:1234\" --eval-command=\"b _CODE_REQUESTED_BREAK_\" --eval-command=\"c\""
+					, ToolsPath + @"qemu\", false, false);
+			}
+		}
 
-        public void MakeUSB(char aDrive) {
-            string xPath = BuildPath + @"USB\";
-            RemoveFile(xPath + @"output.bin");
-            File.Move(BuildPath + @"output.bin", xPath + @"output.bin");
-            // Copy to USB device
-            RemoveFile(aDrive + @":\output.bin");
-            File.Copy(xPath + @"output.bin", aDrive + @":\output.bin");
-            RemoveFile(aDrive + @":\mboot.c32");
-            File.Copy(xPath + @"mboot.c32", aDrive + @":\mboot.c32");
-            RemoveFile(aDrive + @":\syslinux.cfg");
-            File.Copy(xPath + @"syslinux.cfg", aDrive + @":\syslinux.cfg");
-            // Set MBR
-            Global.Call(ToolsPath + "syslinux.exe", "-fma " + aDrive + ":", ToolsPath, true, true);
-        }
+		public void MakeUSB(char aDrive) {
+			string xPath = BuildPath + @"USB\";
+			RemoveFile(xPath + @"output.bin");
+			File.Move(BuildPath + @"output.bin", xPath + @"output.bin");
+			// Copy to USB device
+			RemoveFile(aDrive + @":\output.bin");
+			File.Copy(xPath + @"output.bin", aDrive + @":\output.bin");
+			RemoveFile(aDrive + @":\mboot.c32");
+			File.Copy(xPath + @"mboot.c32", aDrive + @":\mboot.c32");
+			RemoveFile(aDrive + @":\syslinux.cfg");
+			File.Copy(xPath + @"syslinux.cfg", aDrive + @":\syslinux.cfg");
+			// Set MBR
+			Global.Call(ToolsPath + "syslinux.exe", "-fma " + aDrive + ":", ToolsPath, true, true);
+		}
 
-        public void MakePXE() {
-            string xPath = BuildPath + @"PXE\";
-            RemoveFile(xPath + @"Boot\output.bin");
-            File.Move(BuildPath + "output.bin", xPath + @"Boot\output.bin");
-            // *Must* set working dir so tftpd32 will set itself to proper dir
-            Global.Call(xPath + "tftpd32.exe", "", xPath, false, true);
-        }
+		public void MakePXE() {
+			string xPath = BuildPath + @"PXE\";
+			RemoveFile(xPath + @"Boot\output.bin");
+			File.Move(BuildPath + "output.bin", xPath + @"Boot\output.bin");
+			// *Must* set working dir so tftpd32 will set itself to proper dir
+			Global.Call(xPath + "tftpd32.exe", "", xPath, false, true);
+		}
 	}
 }

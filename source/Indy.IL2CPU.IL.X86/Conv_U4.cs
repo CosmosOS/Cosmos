@@ -18,6 +18,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			switch (xStackItem.Size) {
 				case 1:
 				case 2: {
+						new CPUx86.Noop();
 						break;
 					}
 				case 8: {
@@ -27,6 +28,7 @@ namespace Indy.IL2CPU.IL.X86 {
 						break;
 					}
 				case 4: {
+						new CPUx86.Noop();
 						break;
 					}
 				default:

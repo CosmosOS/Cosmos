@@ -22,10 +22,11 @@ namespace Indy.IL2CPU.IL.X86 {
 						new CPUx86.Pushd(CPUx86.Registers.EAX);
 						Assembler.StackContents.Pop();
 						Assembler.StackContents.Push(new StackContent(8, typeof(Double)));
-					
+
 						break;
 					}
 				case 8: {
+						new CPUx86.Noop();
 						break;
 					}
 				default:

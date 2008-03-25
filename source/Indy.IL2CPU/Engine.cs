@@ -81,7 +81,7 @@ namespace Indy.IL2CPU {
 	public class QueuedMethodInformation {
 		public bool Processed;
 		public int Index;
-		public DebugSymbolsAssemblyTypeMethodInstruction[] Instructions;
+		public MLDebugSymbol[] Instructions;
 	}
 
 	public class Engine {
@@ -151,7 +151,7 @@ namespace Indy.IL2CPU {
 						}
 					case TargetPlatformEnum.NativeX86: {
 							mMap = (OpCodeMap)Activator.CreateInstance(Type.GetType("Indy.IL2CPU.IL.X86.Native.NativeOpCodeMap, Indy.IL2CPU.IL.X86.Native", true));
-							mAssembler = new Assembler.X86.Native.Assembler(aGetFileNameForGroup, aInMetalMode, ((aDebugMode != DebugModeEnum.None) && (aDebugMode!=DebugModeEnum.MLUsingGDB)) ? aDebugComNumber : (byte?)null);
+							mAssembler = new Assembler.X86.Native.Assembler(aGetFileNameForGroup, aInMetalMode, ((aDebugMode != DebugModeEnum.None) && (aDebugMode != DebugModeEnum.MLUsingGDB)) ? aDebugComNumber : (byte?)null);
 							break;
 						}
 					default:
@@ -298,7 +298,7 @@ namespace Indy.IL2CPU {
 		}
 
 		private void GenerateDebugSymbols() {
-			var xAssemblyComparer = new AssemblyEqualityComparer();
+			/*var xAssemblyComparer = new AssemblyEqualityComparer();
 			var xTypeComparer = new TypeEqualityComparer();
 			var xDbgAssemblies = new List<DebugSymbolsAssembly>();
 			int xTypeCount = mTypes.Count;
@@ -421,7 +421,7 @@ namespace Indy.IL2CPU {
 					Console.WriteLine("TypeCount changed (was {0}, new {1})", xTypeCount, mTypes.Count);
 					Console.WriteLine("Last Type: {0}", mTypes.Last().FullName);
 				}
-			}
+			}*/
 		}
 
 		private void GenerateVMT() {
@@ -858,6 +858,7 @@ namespace Indy.IL2CPU {
 									int[] xCodeEndColumns = null;
 									int xCurrentOffset = 0;
 									bool xHasSymbols = false;
+									List<MLDebugSymbol> xSymbols = null;
 									if (mDebugMode == DebugModeEnum.Source) {
 										var xSymbolReader = GetSymbolReaderForAssembly(xCurrentMethod.DeclaringType.Assembly);
 										if (xSymbolReader != null) {
@@ -873,8 +874,11 @@ namespace Indy.IL2CPU {
 												xHasSymbols = true;
 											}
 										}
+										xSymbols = new List<MLDebugSymbol>();
 									}
+									int xILIndex = -1;
 									while (xReader.Read()) {
+										xILIndex++;
 										if (mInstructionsToSkip > 0) {
 											mInstructionsToSkip--;
 											continue;
@@ -939,7 +943,7 @@ namespace Indy.IL2CPU {
 										int xCurrentStack = 0;
 										string xLabel = Op.GetInstructionLabel(xReader);
 										if (xLabel.StartsWith(".")) {
-											xLabel = Label.LastFullLabel + xLabel;
+											xLabel = Label.LastFullLabel + "__DOT__" + xLabel.Substring(1);
 											xLabel = DataMember.FilterStringForIncorrectChars(xLabel);
 										}
 										//if (mDebugSymbols != null) {
@@ -989,7 +993,12 @@ namespace Indy.IL2CPU {
 															  let xSize = (item.Size % 4 == 0) ? item.Size : (item.Size + (4 - (item.Size % 4)))
 															  select xSize).Sum();
 											xMLSymbol.StackDifference = xMethodInfo.LocalsSize + xStackSize;
+											xMLSymbol.AssemblyFile = xCurrentMethod.DeclaringType.Assembly.Location;
+											xMLSymbol.MethodToken = xCurrentMethod.MetadataToken;
+											xMLSymbol.TypeToken = xCurrentMethod.DeclaringType.MetadataToken;
+											xMLSymbol.ILOffset = xReader.Position;
 											mMLDebugSymbols.Add(xMLSymbol);
+											xSymbols.Add(xMLSymbol);
 										}
 										xOp.Assemble();
 										//if (xInstructionInfo != null) {
@@ -1000,6 +1009,9 @@ namespace Indy.IL2CPU {
 										//    xInstructionInfo.StackResultSpecified = true;
 										//    xInstructionInfos.Add(xInstructionInfo);
 										//}
+									}
+									if (xSymbols != null) {
+										mMethods[xCurrentMethod].Instructions = xSymbols.ToArray();
 									}
 									//if (mDebugSymbols != null) {
 									//    mMethods[xCurrentMethod].Instructions = xInstructionInfos.ToArray();
