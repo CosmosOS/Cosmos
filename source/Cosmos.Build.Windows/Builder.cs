@@ -151,10 +151,10 @@ namespace Cosmos.Build.Windows {
 				// etc since serial to TCP on a byte level is likely highly innefficient
 				// with the packet overhead
 				// COM1
-				+ " -serial \"file:" + BuildPath + "debug.dbg\" "
+				+ " -serial \"file:" + BuildPath + "COM1-output.dbg\" "
 				// COM2
-				+ (aWaitSerialTCP ? " -serial tcp::4444,server" + (aWaitSerialTCP ? "" : ",nowait") : "")
-				//                + " -serial \"file:" + BuildPath + "trace.dat\" "
+				//+ (aWaitSerialTCP ? " -serial tcp::4444,server" + (aWaitSerialTCP ? "" : ",nowait") : "")
+				+ " -serial \"file:" + BuildPath + "COM2-output.dbg\" "
 				// Enable acceleration if we are not using GDB
 				+(aGDB ? " -S -s" : " -kernel-kqemu")
 				// Ethernet card - Later the model should be a QEMU option on 

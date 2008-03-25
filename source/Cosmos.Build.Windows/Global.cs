@@ -21,6 +21,8 @@ namespace Cosmos.Build.Windows {
             xStartInfo.RedirectStandardError = aCapture;
             xStartInfo.RedirectStandardOutput = aCapture;
             var xProcess = Process.Start(xStartInfo);
+            Console.WriteLine("Please wait....executing: " + xStartInfo.FileName + " " +
+                            xStartInfo.Arguments + " from directory " + xStartInfo.WorkingDirectory);
             
             if (!aWait && aCapture)
             {

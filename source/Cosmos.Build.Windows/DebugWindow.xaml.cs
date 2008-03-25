@@ -21,23 +21,30 @@ namespace Cosmos.Build.Windows {
 		protected int mCurrentPos = 0;
 
 		public DebugWindow() {
-			InitializeComponent();
+            try
+            {
+                InitializeComponent();
 
-			//Create a TCP connection to localhost:4444. We have already set up Qemu to listen to this port.
-			mClient = new TcpClient();
-			mClient.Connect(new IPEndPoint(IPAddress.Loopback, 4444));
+                //Create a TCP connection to localhost:4444. We have already set up Qemu to listen to this port.
+                mClient = new TcpClient();
+                mClient.Connect(new IPEndPoint(IPAddress.Loopback, 4444));
 
-			//Read TCP data from Qemu
-			var xStream = mClient.GetStream();
-			xStream.BeginRead(mTCPData, 0, mTCPData.Length, new AsyncCallback(TCPRead), xStream);
-			//            UInt32 xEIP = (UInt32)xStream.ReadByte();
+                //Read TCP data from Qemu
+                var xStream = mClient.GetStream();
+                xStream.BeginRead(mTCPData, 0, mTCPData.Length, new AsyncCallback(TCPRead), xStream);
+                //            UInt32 xEIP = (UInt32)xStream.ReadByte();
+            }
+            catch (SocketException ex)
+            {
+                Dispatcher.BeginInvoke(DispatcherPriority.Normal, new ConnectionLostDelegate(ConnectionLost), ex);
+            }
 		}
 
 		protected delegate void DebugPacketRcvdDelegate(UInt32 aEIP);
 		protected void DebugPacketRcvd(UInt32 aEIP) {
 			string xEIP = aEIP.ToString("X8");
-			lablEIP.Content = xEIP;
-			lboxLog.SelectedIndex = lboxLog.Items.Add(xEIP);
+			lablEIP.Content = "0x" + xEIP;
+			lboxLog.SelectedIndex = lboxLog.Items.Add("0x" + xEIP);
 		}
 
 		protected delegate void ConnectionLostDelegate(Exception ex);
