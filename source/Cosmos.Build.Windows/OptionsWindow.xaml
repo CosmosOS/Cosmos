@@ -55,7 +55,15 @@
             </InlineUIContainer>
         </Paragraph>
         <Paragraph Name="paraVMWareOptions">
-        </Paragraph>
+                <Bold>VMWare Options</Bold>
+                <LineBreak/>
+                    <InlineUIContainer>
+                    <StackPanel>
+                        <RadioButton Name="rdVMWareWorkstation" GroupName="VMWareVersion" IsChecked="True">VMWare Workstation</RadioButton>
+                        <RadioButton Name="rdVMWareServer" GroupName="VMWareVersion">VMWare Server</RadioButton>
+                    </StackPanel>
+                </InlineUIContainer>
+            </Paragraph>
         <Paragraph Name="paraVPCOptions">
         </Paragraph>
         <Paragraph Name="paraISOOptions">

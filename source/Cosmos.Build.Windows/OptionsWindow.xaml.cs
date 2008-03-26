@@ -121,7 +121,7 @@ namespace Cosmos.Build.Windows {
         }
 
         protected void DoBuild() {
-            SavePrefs();
+            SaveSettingsToRegistry();
 
             if (chckCompileIL.IsChecked.Value) {
                 Console.WriteLine("Compiling...");
@@ -131,7 +131,14 @@ namespace Cosmos.Build.Windows {
             if (rdioQEMU.IsChecked.Value) {
                 mBuilder.MakeQEMU(chckQEMUUseHD.IsChecked.Value, chckQEMUUseGDB.IsChecked.Value, chckQEMUSerialWait.IsChecked.Value);
             } else if (rdioVMWare.IsChecked.Value) {
-                mBuilder.MakeVMWare();
+                string vmwareversion = string.Empty;
+                
+                if (rdVMWareServer.IsChecked.Value) 
+                    vmwareversion = rdVMWareServer.Content.ToString();
+                else if (rdVMWareWorkstation.IsChecked.Value)
+                    vmwareversion = rdVMWareWorkstation.Content.ToString();
+
+                mBuilder.MakeVMWare(vmwareversion);
             } else if (rdioVPC.IsChecked.Value) {
                 mBuilder.MakeVPC();
             } else if (rdioISO.IsChecked.Value) {
@@ -148,7 +155,7 @@ namespace Cosmos.Build.Windows {
         }
 
         protected const string mRegKey = @"Software\Cosmos\User Kit";
-        protected void SavePrefs() {
+        protected void SaveSettingsToRegistry() {
             using (var xKey = Registry.CurrentUser.CreateSubKey(mRegKey)) {
                 string xTarget = "QEMU";
                 if (rdioVMWare.IsChecked.Value) {
@@ -173,6 +180,15 @@ namespace Cosmos.Build.Windows {
                 xKey.SetValue("Create HD Image", chckQEMUUseHD.IsChecked.Value, RegistryValueKind.DWord);
                 xKey.SetValue("Wait for Serial TCP", chckQEMUSerialWait.IsChecked.Value, RegistryValueKind.DWord);
 
+                // VMWare
+                string xVMWareVersion = string.Empty;
+                if (rdVMWareServer.IsChecked.Value) 
+                    xVMWareVersion = "VMWare Server";
+                else if (rdVMWareWorkstation.IsChecked.Value)
+                    xVMWareVersion = "VMWare Workstation";
+                xKey.SetValue("VMWare Version", xVMWareVersion);
+                    
+
                 // USB
                 if (cmboUSBDevice.SelectedItem != null) {
                     xKey.SetValue("USB Device", cmboUSBDevice.Text);
@@ -182,7 +198,7 @@ namespace Cosmos.Build.Windows {
 
         void LoadSettingsFromRegistry() {
             using (var xKey = Registry.CurrentUser.CreateSubKey(mRegKey)) {
-                string xBuildType = (string)xKey.GetValue("Build Type", "QEMU");
+                string xBuildType = (string)xKey.GetValue("Target", "QEMU");
                 switch (xBuildType) {
                     case "QEMU":
                         rdioQEMU.IsChecked = true;
@@ -215,6 +231,18 @@ namespace Cosmos.Build.Windows {
                 chckQEMUUseGDB.IsChecked = ((int)xKey.GetValue("Use GDB", 0) != 0);
                 chckQEMUUseHD.IsChecked = ((int)xKey.GetValue("Create HD Image", 0) != 0);
                 chckQEMUSerialWait.IsChecked = ((int)xKey.GetValue("Wait for Serial TCP", 0) != 0);
+
+                // VMWare
+                string xVMWareVersion = (string)xKey.GetValue("VMWare Version", "VMWare Server");
+                switch (xVMWareVersion)
+                {
+                    case "VMWare Server":
+                        rdVMWareServer.IsChecked = true;
+                        break;
+                    case "VMWare Workstation":
+                        rdVMWareWorkstation.IsChecked = true;
+                        break;
+                }
 
                 // USB
                 cmboUSBDevice.SelectedIndex = cmboUSBDevice.Items.IndexOf(xKey.GetValue("USB Device", ""));

@@ -56,7 +56,7 @@ namespace Cosmos.Build.Windows {
 
 		protected void RemoveFile(string aPathname) {
 			if (File.Exists(aPathname)) {
-				RemoveReadOnly(aPathname);
+				RemoveReadOnlyAttribute(aPathname);
 				File.Delete(aPathname);
 			}
 		}
@@ -69,7 +69,7 @@ namespace Cosmos.Build.Windows {
 			File.Copy(aFrom, aTo);
 		}
 
-		protected void RemoveReadOnly(string aPathname) {
+		protected void RemoveReadOnlyAttribute(string aPathname) {
 			var xAttribs = File.GetAttributes(aPathname);
 			if ((xAttribs & FileAttributes.ReadOnly) > 0) {
 				// This works because we only do this if Read only is already set
@@ -83,7 +83,7 @@ namespace Cosmos.Build.Windows {
 			RemoveFile(xPath + "output.bin");
 			CopyFile(BuildPath + "output.bin", xPath + "output.bin");
 			// From TFS its read only, mkisofs doesnt like that
-			RemoveReadOnly(xPath + "isolinux.bin");
+			RemoveReadOnlyAttribute(xPath + "isolinux.bin");
 			Global.Call(ToolsPath + @"mkisofs.exe", @"-R -b isolinux.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o ..\Cosmos.iso .", xPath);
 		}
 
@@ -117,20 +117,27 @@ namespace Cosmos.Build.Windows {
 		public void MakeVPC() {
 			MakeISO();
 			string xPath = BuildPath + @"VPC\";
-			RemoveReadOnly(xPath + "Cosmos.vmc");
-			RemoveReadOnly(xPath + "hda.vhd");
+			RemoveReadOnlyAttribute(xPath + "Cosmos.vmc");
+			RemoveReadOnlyAttribute(xPath + "hda.vhd");
 			Process.Start(xPath + "Cosmos.vmc");
 		}
 
-		public void MakeVMWare() {
+		public void MakeVMWare(string aSelectedVersion) {
 			MakeISO();
 			string xPath = BuildPath + @"VMWare\";
-			RemoveReadOnly(xPath + "Cosmos.nvram");
-			RemoveReadOnly(xPath + "Cosmos.vmsd");
-			RemoveReadOnly(xPath + "Cosmos.vmx");
-			RemoveReadOnly(xPath + "Cosmos.vmxf");
-			RemoveReadOnly(xPath + "hda.vmdk");
-			Process.Start(xPath + "Cosmos.vmx");
+
+            if (aSelectedVersion == "VMWare Server")
+                xPath += @"Server\";
+            else if (aSelectedVersion == "VMWare Workstation")
+                xPath += @"Workstation\";
+
+			RemoveReadOnlyAttribute(xPath + "Cosmos.nvram");
+			RemoveReadOnlyAttribute(xPath + "Cosmos.vmsd");
+			RemoveReadOnlyAttribute(xPath + "Cosmos.vmx");
+			RemoveReadOnlyAttribute(xPath + "Cosmos.vmxf");
+			RemoveReadOnlyAttribute(xPath + "hda.vmdk");
+            
+            Process.Start(xPath + @"Cosmos.vmx");
 		}
 
 		public void MakeQEMU(bool aUseHDImage, bool aGDB, bool aWaitSerialTCP) {
@@ -153,8 +160,8 @@ namespace Cosmos.Build.Windows {
 				// COM1
 				+ " -serial \"file:" + BuildPath + "COM1-output.dbg\" "
 				// COM2
-				//+ (aWaitSerialTCP ? " -serial tcp::4444,server" + (aWaitSerialTCP ? "" : ",nowait") : "")
-				+ " -serial \"file:" + BuildPath + "COM2-output.dbg\" "
+                //+ (aWaitSerialTCP ? " -serial tcp::4444,server" + (aWaitSerialTCP ? "" : ",nowait") : "")
+                + " -serial \"file:" + BuildPath + "COM2-output.dbg\" "
 				// Enable acceleration if we are not using GDB
 				+(aGDB ? " -S -s" : " -kernel-kqemu")
 				// Ethernet card - Later the model should be a QEMU option on 
