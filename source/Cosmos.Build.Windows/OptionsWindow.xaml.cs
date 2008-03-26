@@ -42,8 +42,11 @@ namespace Cosmos.Build.Windows {
 
                 xOptionsWindow.DoBuild();
 
-                var xDebugWindow = new DebugWindow();
-                xDebugWindow.ShowDialog();
+                //Only show DebugWindow if virtual machine is Qemu.
+                if (xOptionsWindow.rdioQEMU.IsChecked.Value) {
+                    var xDebugWindow = new DebugWindow();
+                    xDebugWindow.ShowDialog();
+                }
             }
         }
 
