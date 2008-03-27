@@ -28,7 +28,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			Initialize(aMethod, aCurrentILOffset);
 		}
 
-		public static void EmitExceptionLogic(Assembler.Assembler aAssembler, int aCurrentOpOffset, MethodInformation aMethodInfo, string aNextLabel, bool aDoTest) {
+		public static void EmitExceptionLogic(Assembler.Assembler aAssembler, int aCurrentOpOffset, MethodInformation aMethodInfo, string aNextLabel, bool aDoTest, Action aCleanup) {
 			string xJumpTo = MethodFooterOp.EndOfMethodLabelNameException;
 			if (aMethodInfo != null && aMethodInfo.CurrentHandler != null) {
 				if (aMethodInfo.CurrentHandler.HandlerOffset >= aCurrentOpOffset && (aMethodInfo.CurrentHandler.HandlerLength + aMethodInfo.CurrentHandler.HandlerOffset) <= aCurrentOpOffset) {
@@ -53,7 +53,13 @@ namespace Indy.IL2CPU.IL.X86 {
 				new CPUx86.JumpAlways(xJumpTo);
 			} else {
 				new CPUx86.Test("ecx", "2");
-				new CPUx86.JumpIfNotEquals(xJumpTo);
+				if (aCleanup != null) {
+					new CPUx86.JumpIfEquals(aNextLabel);
+					aCleanup();
+					new CPUx86.JumpAlways(xJumpTo);
+				} else {
+					new CPUx86.JumpIfNotEquals(xJumpTo);
+				}
 			}
 		}
 
@@ -106,7 +112,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 		public void Assemble(string aMethod, int aArgumentCount) {
 			new CPUx86.Call(aMethod);
-			EmitExceptionLogic(Assembler, mCurrentILOffset, mMethodInfo, mNextLabelName, true);
+			EmitExceptionLogic(Assembler, mCurrentILOffset, mMethodInfo, mNextLabelName, true, null);
 			for (int i = 0; i < aArgumentCount; i++) {
 				Assembler.StackContents.Pop();
 			}

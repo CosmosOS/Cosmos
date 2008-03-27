@@ -52,7 +52,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			new CPU.Label(mReturnNullLabel);
 			new CPUx86.Add("esp", "4");
 			Newobj.Assemble(Assembler, typeof(InvalidCastException).GetConstructor(new Type[0]), Engine.RegisterType(typeof(InvalidCastException)), mThisLabel, mMethodInfo, mCurrentILOffset);
-			Call.EmitExceptionLogic(Assembler, mCurrentILOffset, mMethodInfo, mNextOpLabel, false);
+			Call.EmitExceptionLogic(Assembler, mCurrentILOffset, mMethodInfo, mNextOpLabel, false, null);
 		}
 	}
 }

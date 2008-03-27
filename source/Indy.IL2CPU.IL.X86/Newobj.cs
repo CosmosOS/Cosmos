@@ -102,7 +102,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			foreach (var xStackInt in aAssembler.StackContents) {
 				new CPUx86.Add("esp", xStackInt.Size.ToString());
 			}
-			Call.EmitExceptionLogic(aAssembler, aCurrentILOffset, aCurrentMethodInformation, aCurrentLabel + "_NO_ERROR_4", false);
+			Call.EmitExceptionLogic(aAssembler, aCurrentILOffset, aCurrentMethodInformation, aCurrentLabel + "_NO_ERROR_4", false, null);
 			new CPU.Label(aCurrentLabel + "_NO_ERROR_4");
 			new CPUx86.Pop(CPUx86.Registers.EAX);
 			//				aAssembler.StackSizes.Pop();

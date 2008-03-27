@@ -30,7 +30,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			new CPUx86.Call(Label.GenerateLabelName(CPU.Assembler.CurrentExceptionOccurredRef));
 			new CPUx86.Move("ecx", "3");
 			aEmitCleanupMethod();
-			Call.EmitExceptionLogic(aAssembler, aCurrentILOffset, aMethodInfo, aNextLabel, false);
+			Call.EmitExceptionLogic(aAssembler, aCurrentILOffset, aMethodInfo, aNextLabel, false, null);
 		}
 
 		public Op(ILReader aReader, MethodInformation aMethodInfo)

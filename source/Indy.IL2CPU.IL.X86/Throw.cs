@@ -23,7 +23,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			Engine.QueueMethod(CPU.Assembler.CurrentExceptionOccurredRef);
 			new CPUx86.Call(CPU.Label.GenerateLabelName(CPU.Assembler.CurrentExceptionOccurredRef));
 			new CPUx86.Move("ecx", "3");
-			Call.EmitExceptionLogic(aAssembler,aCurrentILOffset, aMethodInfo, null, false);
+			Call.EmitExceptionLogic(aAssembler, aCurrentILOffset, aMethodInfo, null, false, null);
 			aAssembler.StackContents.Pop();
 		}
 	

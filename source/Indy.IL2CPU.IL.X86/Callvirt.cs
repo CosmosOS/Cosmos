@@ -67,7 +67,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				new CPUx86.Pushd(CPUx86.Registers.AtEAX);
 				new CPUx86.Pushd("0" + mMethodIdentifier.ToString("X") + "h");
 				new CPUx86.Call(CPU.Label.GenerateLabelName(VTablesImplRefs.GetMethodAddressForTypeRef));
-				Call.EmitExceptionLogic(Assembler, mCurrentILOffset, mCurrentMethodInfo, mLabelName + "_AfterAddressCheck", true);
+				Call.EmitExceptionLogic(Assembler, mCurrentILOffset, mCurrentMethodInfo, mLabelName + "_AfterAddressCheck", true, xEmitCleanup);
 				new CPU.Label(mLabelName + "_AfterAddressCheck");
 				if (mTargetMethodInfo.Arguments[0].ArgumentType == typeof(object)) {
 					new CPUx86.Push("eax");
