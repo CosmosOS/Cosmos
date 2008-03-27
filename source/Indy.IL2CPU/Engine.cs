@@ -67,7 +67,6 @@ namespace Indy.IL2CPU {
 	public delegate void DebugLogHandler(LogSeverityEnum aSeverity, string aMessage);
 
 	public enum TargetPlatformEnum {
-		Win32,
 		NativeX86
 	}
 
@@ -144,11 +143,6 @@ namespace Indy.IL2CPU {
 				//xSearchDirs.AddRange((from item in aPlugs
 				//                      select Path.GetDirectoryName(item)).Distinct());
 				switch (aTargetPlatform) {
-					case TargetPlatformEnum.Win32: {
-							mMap = (OpCodeMap)Activator.CreateInstance(Type.GetType("Indy.IL2CPU.IL.X86.Win32.Win32OpCodeMap, Indy.IL2CPU.IL.X86.Win32", true));
-							mAssembler = new Assembler.X86.Win32.Assembler(aGetFileNameForGroup, aInMetalMode);
-							break;
-						}
 					case TargetPlatformEnum.NativeX86: {
 							mMap = (OpCodeMap)Activator.CreateInstance(Type.GetType("Indy.IL2CPU.IL.X86.Native.NativeOpCodeMap, Indy.IL2CPU.IL.X86.Native", true));
 							mAssembler = new Assembler.X86.Native.Assembler(aGetFileNameForGroup, aInMetalMode, ((aDebugMode != DebugModeEnum.None) && (aDebugMode != DebugModeEnum.MLUsingGDB)) ? aDebugComNumber : (byte?)null);

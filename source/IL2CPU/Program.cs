@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Indy.IL2CPU;
-using Indy.IL2CPU.IL.X86.Win32;
 using Indy.IL2CPU.IL.X86.Native;
 
 namespace IL2CPU {
@@ -17,10 +16,9 @@ namespace IL2CPU {
 		public static List<string> Plugs = new List<string>();
 		public static bool MetalMode;
 		public static string DebugFile;
-		public static TargetPlatformEnum TargetPlatform = TargetPlatformEnum.Win32;
+		public static TargetPlatformEnum TargetPlatform = TargetPlatformEnum.NativeX86;
 		public const string FAsmParamsTemplate_Win32 = "\"{1}\" \"{0}\"";
 
-		private Type win32Type = typeof(Win32OpCodeMap);
 		private Type nativeType = typeof(NativeOpCodeMap);
 
 		private static bool ParseArguments(IEnumerable<string> aArgs) {
@@ -170,9 +168,6 @@ namespace IL2CPU {
 						Console.ResetColor();
 					};
 					string xTestOutput = Path.GetTempFileName();
-					if (TargetPlatform == TargetPlatformEnum.Win32) {
-						xTestOutput = OutputFile;
-					}
 					Func<string, string> xGetFileNameForGroup = xGroup => Path.Combine(AsmFile, xGroup + ".asm");
 					e.Execute(InputFile, TargetPlatform, xGetFileNameForGroup, MetalMode, BCLDir, Plugs, DebugModeEnum.Source, 2);
 					ProcessStartInfo xFasmStartInfo = new ProcessStartInfo();
