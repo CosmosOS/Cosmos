@@ -140,7 +140,7 @@ namespace Cosmos.Build.Windows {
             Process.Start(xPath + @"Cosmos.vmx");
 		}
 
-		public void MakeQEMU(bool aUseHDImage, bool aGDB, bool aWaitSerialTCP) {
+		public void MakeQEMU(bool aUseHDImage, bool aGDB, bool aWaitSerialTCP, bool aDebugger) {
 			MakeISO();
 			RemoveFile(BuildPath + "serial-debug.txt");
 			// QEMU Docs - http://fabrice.bellard.free.fr/qemu/qemu-doc.html
@@ -160,8 +160,9 @@ namespace Cosmos.Build.Windows {
 				// COM1
 				+ " -serial \"file:" + BuildPath + "COM1-output.dbg\" "
 				// COM2
-                //+ (aWaitSerialTCP ? " -serial tcp::4444,server" + (aWaitSerialTCP ? "" : ",nowait") : "")
-                + " -serial \"file:" + BuildPath + "COM2-output.dbg\" "
+                + (aDebugger ?
+                 (aWaitSerialTCP ? " -serial tcp::4444,server" + (aWaitSerialTCP ? "" : ",nowait") : "")
+                 : " -serial \"file:" + BuildPath + "COM2-output.dbg\" ")
 				// Enable acceleration if we are not using GDB
 				+(aGDB ? " -S -s" : " -kernel-kqemu")
 				// Ethernet card - Later the model should be a QEMU option on 

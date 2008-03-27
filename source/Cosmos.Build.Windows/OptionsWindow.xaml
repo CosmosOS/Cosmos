@@ -32,15 +32,21 @@
                 <LineBreak/>                
                 <Span Name="spanBuildPath"></Span>
             </Paragraph>
-            <Paragraph Name="GeneralSettings">
+            <Paragraph Name="paraGeneralOptions">
                 <Bold>General Options</Bold>
                 <LineBreak/>
                 <InlineUIContainer>
                     <StackPanel HorizontalAlignment="Left">
                     <CheckBox Name="chckCompileIL" IsChecked="True">Compile IL. Do not uncheck this unless you understand the impact.</CheckBox>
-                        <Label>Cosmos Debug Port</Label>
-                        <ComboBox Name="cmboDebugPort" HorizontalAlignment="Left" Width="100"></ComboBox>
                         </StackPanel>
+                </InlineUIContainer>
+            </Paragraph>
+            <Paragraph Name="paraDebugOptions">
+                <Bold>Debug Options</Bold>
+                <LineBreak/>
+                Debug Port:
+                <InlineUIContainer>
+                        <ComboBox Name="cmboDebugPort" HorizontalAlignment="Left" Width="100"></ComboBox>
                 </InlineUIContainer>
             </Paragraph>
             <Paragraph Name="paraQEMUOptions">
@@ -48,8 +54,9 @@
             <LineBreak/>
             <InlineUIContainer>
                 <StackPanel>
-                <CheckBox Name="chckQEMUUseGDB" IsChecked="False">Use _GDB Debugger</CheckBox>
-                        <CheckBox Name="chckQEMUUseHD" IsChecked="False">Create _hard disk image</CheckBox>
+                        <CheckBox Name="chckQEMUUseGDB" IsChecked="False">Use GDB Debugger</CheckBox>
+                        <CheckBox Name="chckQEMUUseDebug" IsChecked="False">Use Cosmos Debugger</CheckBox>
+                        <CheckBox Name="chckQEMUUseHD" IsChecked="False">Create hard disk image</CheckBox>
                         <CheckBox Name="chckQEMUSerialWait" IsChecked="False">Wait for serial debug connection over TCP</CheckBox>
                     </StackPanel>
             </InlineUIContainer>
@@ -65,7 +72,10 @@
                 </InlineUIContainer>
             </Paragraph>
         <Paragraph Name="paraVPCOptions">
-        </Paragraph>
+                <Bold>Virtual PC Options</Bold>
+                <LineBreak/>
+                No options yet.
+            </Paragraph>
         <Paragraph Name="paraISOOptions">
                 <Bold>ISO Options</Bold>
                 <LineBreak/>ISO file will be output as:

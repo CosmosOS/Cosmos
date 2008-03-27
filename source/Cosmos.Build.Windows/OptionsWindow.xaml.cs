@@ -43,7 +43,8 @@ namespace Cosmos.Build.Windows {
                 xOptionsWindow.DoBuild();
 
                 //Only show DebugWindow if virtual machine is Qemu.
-                if (xOptionsWindow.rdioQEMU.IsChecked.Value) {
+                if ((xOptionsWindow.rdioQEMU.IsChecked.Value & xOptionsWindow.chckQEMUUseDebug.IsChecked.Value)
+                    | (xOptionsWindow.cmboDebugPort.SelectedIndex > 0)) {
                     var xDebugWindow = new DebugWindow();
                     xDebugWindow.ShowDialog();
                 }
@@ -57,6 +58,7 @@ namespace Cosmos.Build.Windows {
         }
 
         protected void TargetChanged(object aSender, RoutedEventArgs e) {
+            RootDoc.Blocks.Remove(paraDebugOptions);
             RootDoc.Blocks.Remove(paraQEMUOptions);
             RootDoc.Blocks.Remove(paraVMWareOptions);
             RootDoc.Blocks.Remove(paraVPCOptions);
@@ -65,14 +67,19 @@ namespace Cosmos.Build.Windows {
             RootDoc.Blocks.Remove(paraUSBOptions);
 
             if (aSender == rdioUSB) {
+                AddSection(paraDebugOptions);
                 AddSection(paraUSBOptions);
             } else if (aSender == rdioISO) {
+                AddSection(paraDebugOptions);
                 AddSection(paraISOOptions);
             } else if (aSender == rdioVPC) {
+                AddSection(paraDebugOptions);
                 AddSection(paraVPCOptions);
             } else if (aSender == rdioVMWare) {
+                AddSection(paraDebugOptions);
                 AddSection(paraVMWareOptions);
             } else if (aSender == rdioPXE) {
+                AddSection(paraDebugOptions);
                 AddSection(paraPXEOptions);
             } else if (aSender == rdioQEMU) {
                 AddSection(paraQEMUOptions);
@@ -81,7 +88,7 @@ namespace Cosmos.Build.Windows {
 
         public OptionsWindow() {
             InitializeComponent();
-            mOptionsBlockPrefix = paraQEMUOptions.PreviousBlock;
+            mOptionsBlockPrefix = paraGeneralOptions; // paraQEMUOptions.PreviousBlock;
 
             Loaded += delegate(object sender, RoutedEventArgs e) {
                 this.Activate();
@@ -97,6 +104,9 @@ namespace Cosmos.Build.Windows {
             rdioPXE.Checked += new RoutedEventHandler(TargetChanged);
             rdioUSB.Checked += new RoutedEventHandler(TargetChanged);
 
+            chckQEMUUseDebug.Checked += new RoutedEventHandler(chckQEMUUseDebug_Checked);
+            chckQEMUUseDebug.Unchecked += new RoutedEventHandler(chckQEMUUseDebug_Unchecked);
+
             spanBuildPath.Inlines.Add(mBuilder.BuildPath);
             spanISOPath.Inlines.Add(mBuilder.BuildPath + "Cosmos.iso");
 
@@ -110,13 +120,27 @@ namespace Cosmos.Build.Windows {
                 }
             }
 
-            cmboDebugPort.SelectedIndex = cmboDebugPort.Items.Add("None");
+            cmboDebugPort.SelectedIndex = cmboDebugPort.Items.Add("Disabled");
             cmboDebugPort.Items.Add("COM1");
             cmboDebugPort.Items.Add("COM2");
             cmboDebugPort.Items.Add("COM3");
             cmboDebugPort.Items.Add("COM4");
+            cmboDebugPort.Items.Add("Ethernet 1");
+            cmboDebugPort.Items.Add("Ethernet 2");
+            cmboDebugPort.Items.Add("Ethernet 3");
+            cmboDebugPort.Items.Add("Ethernet 4");
 
             LoadSettingsFromRegistry();
+        }
+
+        void chckQEMUUseDebug_Unchecked(object sender, RoutedEventArgs e) {
+            chckQEMUSerialWait.IsChecked = false;
+            chckQEMUSerialWait.IsEnabled = true;
+        }
+
+        void chckQEMUUseDebug_Checked(object sender, RoutedEventArgs e) {
+            chckQEMUSerialWait.IsChecked = true;
+            chckQEMUSerialWait.IsEnabled = false;
         }
 
         void butnBuild_Click(object sender, RoutedEventArgs e) {
@@ -132,7 +156,7 @@ namespace Cosmos.Build.Windows {
             }
 
             if (rdioQEMU.IsChecked.Value) {
-                mBuilder.MakeQEMU(chckQEMUUseHD.IsChecked.Value, chckQEMUUseGDB.IsChecked.Value, chckQEMUSerialWait.IsChecked.Value);
+                mBuilder.MakeQEMU(chckQEMUUseHD.IsChecked.Value, chckQEMUUseGDB.IsChecked.Value, chckQEMUSerialWait.IsChecked.Value, chckQEMUUseDebug.IsChecked.Value);
             } else if (rdioVMWare.IsChecked.Value) {
                 string vmwareversion = string.Empty;
                 
@@ -180,6 +204,7 @@ namespace Cosmos.Build.Windows {
 
                 // QEMU
                 xKey.SetValue("Use GDB", chckQEMUUseGDB.IsChecked.Value, RegistryValueKind.DWord);
+                xKey.SetValue("Use Debugger", chckQEMUUseDebug.IsChecked.Value, RegistryValueKind.DWord);
                 xKey.SetValue("Create HD Image", chckQEMUUseHD.IsChecked.Value, RegistryValueKind.DWord);
                 xKey.SetValue("Wait for Serial TCP", chckQEMUSerialWait.IsChecked.Value, RegistryValueKind.DWord);
 
@@ -232,13 +257,13 @@ namespace Cosmos.Build.Windows {
 
                 // QEMU
                 chckQEMUUseGDB.IsChecked = ((int)xKey.GetValue("Use GDB", 0) != 0);
+                chckQEMUUseDebug.IsChecked = ((int)xKey.GetValue("Use Debugger", 1) != 0);
                 chckQEMUUseHD.IsChecked = ((int)xKey.GetValue("Create HD Image", 0) != 0);
                 chckQEMUSerialWait.IsChecked = ((int)xKey.GetValue("Wait for Serial TCP", 0) != 0);
 
                 // VMWare
                 string xVMWareVersion = (string)xKey.GetValue("VMWare Version", "VMWare Server");
-                switch (xVMWareVersion)
-                {
+                switch (xVMWareVersion) {
                     case "VMWare Server":
                         rdVMWareServer.IsChecked = true;
                         break;
