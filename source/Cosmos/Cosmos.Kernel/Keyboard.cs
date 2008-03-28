@@ -83,7 +83,7 @@ namespace Cosmos.Kernel {
 				AddKey(0x12, 'e');
 				AddKey(0x120000, 'E');
 				AddKey(0x13, 'r');
-				AddKey(0x130000, 'r');
+				AddKey(0x130000, 'R');
 				AddKey(0x14, 't');
 				AddKey(0x140000, 'T');
 				AddKey(0x15, 'y');
