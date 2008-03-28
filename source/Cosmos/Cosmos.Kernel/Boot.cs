@@ -4,10 +4,18 @@ using System.Text;
 using Cosmos.FileSystem;
 
 namespace Cosmos.Kernel {
-    // This class provides boot configurations to be called
-    // as the first line from Application code.
-    // For now we just have default, but can add others in the future
+
+    /// <summary>
+    /// Boot configurations for Cosmos.
+    /// One of these configurations should be called from the first line of any Cosmos-based operating system.
+    /// For now we just have default, but can add others in the future.
+    /// </summary>
     public class Boot {
+
+        /// <summary>
+        /// Boot the kernel using default boot-configuration.
+        /// Initializes basic hardware like CPU, serialports, PCI, Keyboard and blockdevices.
+        /// </summary>
         public static void Default() {
 			System.Diagnostics.Debugger.Break();
             //Init Heap first - Hardware loads devices and they need heap
