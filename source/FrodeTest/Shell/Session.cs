@@ -64,18 +64,37 @@ namespace FrodeTest.Shell
                 
                 nic.Transmit(packet);
             }
+            else if (command.Equals("read"))
+            {
+                if (nic == null)
+                {
+                    Console.WriteLine("Enable NIC with command 'load' first");
+                    return;
+                }
+                Console.WriteLine("Data in RX Buffer:");
+                foreach (byte item in nic.ReadReceiveBuffer())
+                {
+                    Console.Write(item + ":");
+                }
+                //List<Packet> incomingPackets = nic.Recieve();
+            }
             else if (command.Equals("reset"))
             {
                 //nic.TimerCount = 1;
                 nic.SoftReset();
-                //nic.InitializeDriver();
+                nic.InitializeDriver();
                 Console.WriteLine("NIC has been reset");
             }
-            else if(command.Equals("loop"))
+            else if (command.Equals("loop"))
             {
                 Console.WriteLine("Toggeling loopback mode from : " + nic.GetLoopbackMode().ToString());
                 nic.SetLoopbackMode(!nic.GetLoopbackMode());
                 Console.WriteLine("to: " + nic.GetLoopbackMode().ToString());
+            }
+
+            else if (command.Equals("crash"))
+            {
+                throw new Exception("User forced an Exception", new Exception("Inner bug"));
             }
 
             else if (command.Equals("help"))

@@ -279,17 +279,19 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         private void InitReceiveBuffer()
         {
             //Prepare a buffer area
-
             RxBuffer = new byte[2048];
 
             UInt32 address = pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.RxBuf;
 
             //Write the address of the buffer area to the RBSTART 
             WriteAddressToPCI(ref RxBuffer, address);
-
-            //Console.WriteLine("RxBuffer address: " + address);
-            //Console.WriteLine("RxBuffer contains address: " + IOSpace.Read32(address));
         }
+
+        public byte[] ReadReceiveBuffer()
+        {
+            return RxBuffer;
+        }
+
 
         private void InitTransmitBuffer()
         {
