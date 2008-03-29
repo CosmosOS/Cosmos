@@ -42,6 +42,11 @@ namespace Cosmos.Hardware.PC.Bus
             haveEnumerated = true;
         }
 
+        /// <summary>
+        /// Enumerates a given bus, adding devices to Devices
+        /// </summary>
+        /// <param name="Bus">The bus number to enumerate</param>
+        /// <param name="Devices">The list of Devices</param>
         private static void EnumerateBus(byte Bus, ref List<PCIDevice> Devices)
         {
             //Console.WriteLine("Enumerate " + Bus ); 
@@ -233,6 +238,9 @@ namespace Cosmos.Hardware.PC.Bus
     }
 
 
+    /// <summary>
+    /// Class representing CardBus PCI Device device
+    /// </summary>
     public class PCIDeviceCardBus : PCIDevice
     {
         public PCIDeviceCardBus(byte bus, byte slot, byte function)
@@ -249,6 +257,9 @@ namespace Cosmos.Hardware.PC.Bus
         }
     }
 
+    /// <summary>
+    /// Class representing a PCI to PCI Bridge PCI Device
+    /// </summary>
     public class PCIDeviceBridge : PCIDevice
     {
         public PCIDeviceBridge(byte bus, byte slot, byte function)
@@ -264,7 +275,7 @@ namespace Cosmos.Hardware.PC.Bus
             ////}
         }
 
-
+        
         public byte PrimaryBus { get { return Read8(0x18); } set { Write8(0x18, value); } }
         public byte SecondaryBus { get { return Read8(0x19); } set { Write8(0x19, value); } }
         public byte SubordinateBus { get { return Read8(0x1a); } set { Write8(0x1a, value); } }
@@ -272,7 +283,9 @@ namespace Cosmos.Hardware.PC.Bus
     }
 
 
-
+    /// <summary>
+    /// Class representing a Normal PCI Device
+    /// </summary>
     public class PCIDeviceNormal : PCIDevice
     {
         public PCIDeviceNormal(byte bus, byte slot, byte function)
@@ -288,16 +301,23 @@ namespace Cosmos.Hardware.PC.Bus
             //}
         }
 
+        [Obsolete("Use PciDevice.GetAddressSpace(2)")]
         public UInt32 BaseAddress2 { get { return Read32(0x18); } set { Write32(0x18, value); } }
+        [Obsolete("Use PciDevice.GetAddressSpace(3)")]
         public UInt32 BaseAddress3 { get { return Read32(0x1a); } set { Write32(0x1a, value); } }
+        [Obsolete("Use PciDevice.GetAddressSpace(4)")]
         public UInt32 BaseAddress4 { get { return Read32(0x20); } set { Write32(0x20, value); } }
+        [Obsolete("Use PciDevice.GetAddressSpace(5)")]
         public UInt32 BaseAddress5 { get { return Read32(0x24); } set { Write32(0x24, value); } }
        
     }
 
     public abstract class PCIDevice
     {
-
+        /// <summary>
+        /// Gets the number of address spaces this device type has
+        /// </summary>
+        /// <returns></returns>
         public abstract int NumberOfBaseAddresses();
        //{
         //   get;
@@ -377,6 +397,10 @@ namespace Cosmos.Hardware.PC.Bus
         private bool NeedsMemory = false;
 
         private bool _NeedsLayingout = true;
+
+        /// <summary>
+        /// Creates the AddressSpaces for this device.
+        /// </summary>
         private void LayoutIO()
         {
             //Console.WriteLine("Checking AdressSpaces of PCI(" + Bus + ", " + Slot + ", " + Function + ")");
@@ -421,6 +445,11 @@ namespace Cosmos.Hardware.PC.Bus
 
         private AddressSpace[] IOMaps;
 
+        /// <summary>
+        /// Gets the AddressSpace object assosiated with the device
+        /// </summary>
+        /// <param name="index">Address Space to return</param>
+        /// <returns></returns>
         public AddressSpace GetAddressSpace(byte index)
         {
             if (index < 0 || index >= NumberOfBaseAddresses())
@@ -432,39 +461,95 @@ namespace Cosmos.Hardware.PC.Bus
             return IOMaps[index];
         }
 
+        /// <summary>
+        /// The bus the device is on
+        /// </summary>
         public byte Bus { get; private set; }
+        /// <summary>
+        /// The slot the device is using
+        /// </summary>
         public byte Slot { get; private set; }
+        /// <summary>
+        /// The function number of the device
+        /// </summary>
         public byte Function { get; private set; }
 
+        /// <summary>
+        /// Is this an actual device?
+        /// </summary>
         public bool DeviceExists { get { return VendorID != 0xFFFF && VendorID != 0x0; } }
+        /// <summary>
+        /// Is this a multifunction devie?
+        /// </summary>
         public bool IsMultiFunction { get { return (Read8(0x0e) & 0xf0) != 0; } }
 
+        /// <summary>
+        /// The Vendor ID
+        /// </summary>
         public UInt32 VendorID { get { return Read16(0x0); } }
+        /// <summary>
+        /// The Device ID
+        /// </summary>
         public UInt16 DeviceID { get { return Read16(0x2); } }
 
+        /// <summary>
+        /// the command register of this PCI Device
+        /// </summary>
         public PCICommand Command { get { return (PCICommand)Read16(0x4); } set { Write16(0x4, (ushort)value); } }
+        
+        /// <summary>
+        /// The Status Register of this PCI Device
+        /// </summary>
         public PCIStatus Status { get { return (PCIStatus)Read16(0x6); } set { Write16(0x6, (ushort)value); } }
 
+        /// <summary>
+        /// The Revision ID of this PCI Device
+        /// </summary>
         public byte RevisionID { get { return Read8(0x8); } }
+        /// <summary>
+        /// The Programming Interface Number of this PCI Device
+        /// </summary>
         public byte ProgIF { get { return Read8(0x9); } }
+        /// <summary>
+        /// The Sub class of this PCI Device
+        /// </summary>
         public byte SubClass { get { return Read8(0xa); } }
+        /// <summary>
+        /// The Class of this PCI Device
+        /// </summary>
         public byte ClassCode { get { return Read8(0xb); } }
 
+        /// <summary>
+        /// The Cache Line Size of this PCI Device
+        /// </summary>
         public byte CacheLineSize { get { return Read8(0x0c); } set { Write8(0x0c, value); } }
+        /// <summary>
+        /// The Latency Timer of this PCI Device
+        /// </summary>
         public byte LatencyTimer { get { return Read8(0x0d); } set { Write8(0x0d, value); } }
+        /// <summary>
+        /// The header type of this PCI Device
+        /// </summary>
         public byte HeaderType { get { return (byte)(Read8(0x0e) & 0xf); } }
+        /// <summary>
+        /// The BIST Register of this PCI Device
+        /// </summary>
         public PCIBist Bist { get { return (PCIBist)Read8(0x0f); } set { Write8(0x0f, (byte)value); } }
 
+        [Obsolete("This function should be private. Use PciDevice.GetAddressSpace(index)")]
         public UInt32 GetBaseAddress(byte index)
         {
             return Read32((byte)(0x10 + index * 4));
         }
+        [Obsolete("This function should be private")]
         public void SetBaseAddress(byte index, UInt32 value)
         {
             Write32((byte)(0x10 + index *4), value);
         }
 
+        [Obsolete("Use PciDevice.GetAddressSpace(0)")]
         public UInt32 BaseAddress0 { get { return Read32(0x10); } set { Write32(0x10, value); } }
+        [Obsolete("Use PciDevice.GetAddressSpace(1)")]
         public UInt32 BaseAddress1 { get { return Read32(0x14); } set { Write32(0x14, value); } }
          
         public byte InterruptLine { get { return Read8(0x3c); } set { Write8(0x3c, value); } }
@@ -475,12 +560,17 @@ namespace Cosmos.Hardware.PC.Bus
         protected const ushort ConfigAddr = 0xCF8;
         protected const ushort ConfigData = 0xCFC;
 
-        
+        /// <summary>
+        /// Disables the device
+        /// </summary>
         public void DisableDevice()
         {
             Command = Command & (~PCICommand.IO & ~PCICommand.Master & PCICommand.Memort);
         }
 
+        /// <summary>
+        /// enables the device
+        /// </summary>
         public void EnableDevice()
         {
             Command = Command & ((NeedsIO ? PCICommand.IO : 0) & PCICommand.Master & (NeedsMemory ? PCICommand.Memort : 0));
@@ -501,37 +591,37 @@ namespace Cosmos.Hardware.PC.Bus
                 | 0x80000000);
         }
 
-        public UInt32 Read32(byte aRegister)
+        protected UInt32 Read32(byte aRegister)
         {
             CPUBus.Write32(ConfigAddr, GetAddress(aRegister));
             return CPUBus.Read32(ConfigData);
         }
 
-        public UInt16 Read16(byte aRegister)
+        protected UInt16 Read16(byte aRegister)
         {
             CPUBus.Write32(ConfigAddr, GetAddress(aRegister));
             return CPUBus.Read16(ConfigData);
         }
 
-        public byte Read8(byte aRegister)
+        protected byte Read8(byte aRegister)
         {
             CPUBus.Write32(ConfigAddr, GetAddress(aRegister));
             return CPUBus.Read8(ConfigData);
         }
 
-        public void Write32(byte aRegister, UInt32 value)
+        protected void Write32(byte aRegister, UInt32 value)
         {
             CPUBus.Write32(ConfigAddr, GetAddress(aRegister));
             CPUBus.Write32(ConfigData, value);
         }
 
-        public void Write16(byte aRegister, UInt16 value)
+        protected void Write16(byte aRegister, UInt16 value)
         {
             CPUBus.Write32(ConfigAddr, GetAddress(aRegister));
             CPUBus.Write16(ConfigData, value);
         }
 
-        public void Write8(byte aRegister, byte value)
+        protected void Write8(byte aRegister, byte value)
         {
             CPUBus.Write32(ConfigAddr, GetAddress(aRegister));
             CPUBus.Write8(ConfigData, value);
