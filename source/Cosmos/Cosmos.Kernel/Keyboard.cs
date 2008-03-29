@@ -159,17 +159,25 @@ namespace Cosmos.Kernel {
 				#endregion
 
 				#region Special
-				AddKey(0x1C, '\n');
+                AddKey(0x0E, '\u0968');     //Backspace
+                AddKey(0x0E0000, '\u0968');
+                AddKey(0x0F, '\t');         //Tabulator
+				AddKey(0x1C, '\n');         //Enter
 				AddKey(0x1C0000, '\n');
-				AddKey(0x39, ' ');
+				AddKey(0x39, ' ');          //Space
 				AddKey(0x390000, ' ');
-				AddKey(0x0E, '\u0968');
-				AddKey(0x0E0000, '\u0968');
 				#endregion
 
-				#region Punctuation
+				#region Punctuation and Signs
+                AddKey(0x27, ';');
+                AddKey(0x28, '\'');
+                AddKey(0x2B, '\\');
+                AddKey(0x33, ',');
 				AddKey(0x34, '.');
+                AddKey(0x35, '/');
 				AddKey(0x340000, '>');
+                AddKey(0x4A, '-');
+                AddKey(0x4E, '+');
 				#endregion
 			}
 		}
