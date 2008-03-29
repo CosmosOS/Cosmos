@@ -34,7 +34,7 @@ namespace FrodeTest.Shell
             }
 */            else if(command.Equals("load"))
             {
-                var list = RTL8139.FindRTL8139Devices();
+                var list = RTL8139.FindAll();
                 if (list.Count != 0)
                     nic = list[0];
                 else
@@ -46,6 +46,7 @@ namespace FrodeTest.Shell
                 Console.WriteLine(nic.Name);
                 Console.WriteLine("Revision: " + nic.GetHardwareRevision());
                 Console.WriteLine("MAC: " + nic.MACAddress);
+
                 
                 nic.Enable();
                 nic.InitializeDriver();
@@ -78,6 +79,29 @@ namespace FrodeTest.Shell
                 }
                 //List<Packet> incomingPackets = nic.Recieve();
             }
+            else if (command.Equals("info"))
+            {
+                if (nic == null)
+                {
+                    Console.WriteLine("Network card not initialized yet.");
+                    return;
+                }
+                Console.WriteLine("Network card: " + nic.Name);
+                Console.WriteLine("Hardware revision: " + nic.GetHardwareRevision());
+                Console.WriteLine("MAC Address: " + nic.MACAddress);
+                Console.WriteLine();
+                Console.WriteLine("Loopback enabled?: " + nic.LoopbackMode.ToString());
+                Console.WriteLine("NIC enabled?: " + nic.IsEnabled.ToString());
+                Console.WriteLine("Promiscuous mode?: " + nic.PromiscuousMode.ToString());
+                
+                int xByteCount = 0;
+                foreach (byte b in nic.ReadReceiveBuffer())
+                {
+                    if (b != 0x00)
+                        xByteCount++;
+                }
+                Console.WriteLine("Read buffer contains " + xByteCount.ToString() + " bytes with data.");
+            }
             else if (command.Equals("reset"))
             {
                 //nic.TimerCount = 1;
@@ -87,14 +111,18 @@ namespace FrodeTest.Shell
             }
             else if (command.Equals("loop"))
             {
-                Console.WriteLine("Toggeling loopback mode from : " + nic.GetLoopbackMode().ToString());
-                nic.SetLoopbackMode(!nic.GetLoopbackMode());
-                Console.WriteLine("to: " + nic.GetLoopbackMode().ToString());
+                Console.WriteLine("Toggeling loopback mode from : " + nic.LoopbackMode.ToString());
+                nic.LoopbackMode = !nic.LoopbackMode;
+                Console.WriteLine("to: " + nic.LoopbackMode.ToString());
             }
 
             else if (command.Equals("crash"))
             {
                 throw new Exception("User forced an Exception", new Exception("Inner bug"));
+            }
+            else if (command.Equals("prom"))
+            {
+                nic.PromiscuousMode = !nic.PromiscuousMode;
             }
 
             else if (command.Equals("help"))

@@ -7,11 +7,12 @@ namespace FrodeTest.Test
 {
     public class RTL8139Test
     {
+        [Obsolete]
         public static void RunTest()
         {
             // Testing RTL8139 PCI networkcard
             //Load card
-            var nics = RTL8139.FindRTL8139Devices();
+            var nics = RTL8139.FindAll();
 
             if (nics.Count == 0)
             {
@@ -29,7 +30,6 @@ namespace FrodeTest.Test
             //Console.WriteLine("BaseAddress0 is : " + pciNic.BaseAddress0);
             Console.WriteLine("BaseAddress1 is : " + nic.PCICard.BaseAddress1);
             Console.WriteLine("Enabling card...");
-            //nic.SoftReset();
             nic.Enable();
             Console.WriteLine("Initializing driver...");
             nic.InitializeDriver();

@@ -17,7 +17,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         /// Retrieve all Realtek 8139 network cards found on computer.
         /// </summary>
         /// <returns></returns>
-        public static List<RTL8139> FindRTL8139Devices()
+        public static List<RTL8139> FindAll()
         {
             List<RTL8139> found = new List<RTL8139>();
 
@@ -39,11 +39,6 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         private byte[] TxBuffer2;
         private byte[] TxBuffer3;
         private byte[] RxBuffer;
-        //private byte[] RxBuffer2 = new byte[2048];
-        //private byte[] RxBuffer3 = new byte[2048];
-        //private byte[] RxBuffer4 = new byte[2048];
-
-
 
         public RTL8139(PCIDevice device)
         {
@@ -101,6 +96,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             //Setting Receive configuration
             var rcr = Register.ReceiveConfigurationRegister.Load(pciCard);
             rcr.Init();
+            rcr.PromiscuousMode = true;
             
             //Enable IRQ Interrupt
             SetIRQMaskRegister();
@@ -108,21 +104,42 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             Cosmos.Hardware.PC.Interrupts.IRQ11 = new Cosmos.Hardware.PC.Interrupts.InterruptDelegate(HandleNetworkInterrupt);
         }
 
+        #region Operational properties
+
         /// <summary>
         /// Changes the Loopback mode. 
         /// </summary>
         /// <param name="value">True to enable Loopback. False for normal operation.</param>
-        public void SetLoopbackMode(bool value)
+        public bool LoopbackMode
         {
-            var tcr = Register.TransmitConfigurationRegister.Load(pciCard);
-            tcr.LoopbackMode = value;
+            get
+            {
+                var tcr = Register.TransmitConfigurationRegister.Load(pciCard);
+                return tcr.LoopbackMode;
+            }
+            set
+            {
+                var tcr = Register.TransmitConfigurationRegister.Load(pciCard);
+                tcr.LoopbackMode = value;
+            }
         }
 
-        public bool GetLoopbackMode()
+        public bool PromiscuousMode
         {
-            var tcr = Register.TransmitConfigurationRegister.Load(pciCard);
-            return tcr.LoopbackMode;
+            get
+            {
+                var rcr = Register.ReceiveConfigurationRegister.Load(pciCard);
+                return rcr.PromiscuousMode;
+            }
+            set
+            {
+                var rcr = Register.ReceiveConfigurationRegister.Load(pciCard);
+                rcr.PromiscuousMode = value;
+            }
+
         }
+
+        #endregion
 
         public override bool QueueBytes(byte[] buffer, int offset, int length)
         {
@@ -155,11 +172,18 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             get { return "Generic RTL8139 Network device"; }
         }
 
+        #region Power and Initilization
+
+        /// <summary>
+        /// Enables RTL network card by setting CONFIG_1 register.
+        /// </summary>
+        /// <returns></returns>
         public override bool Enable()
         {
             //Writes 0x00 to CONFIG_1 registers to enable card
-            regs.Config1 = 0x00;            
-            return true;
+            regs.Config1 = 0x00;
+            
+            return base.Enable(); //enables PCI card as well
         }
 
         /// <summary>
@@ -180,6 +204,11 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
 
             Console.WriteLine("Reset Complete!");
         }
+
+        #endregion
+
+        #region Receive and Interrupt
+
 
         /// <summary>
         /// (Should be) Called when the PCI network card raises an Interrupt.
@@ -220,6 +249,8 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             //Could perhaps be used to raise events?
             throw new NotImplementedException();
         }
+
+        #endregion
 
         /// <summary>
         /// Enable the NIC to be able to Recieve data.
@@ -369,7 +400,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
 
             return true;
         }
-
+        
         public bool TransmitRaw(byte[] aData) {
             WriteAddressToPCI(ref aData, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD0);
 

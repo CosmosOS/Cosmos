@@ -14,12 +14,10 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
     /// </summary>
     public class TransmitConfigurationRegister
     {
-        private UInt32 tcr;
         private PCIDevice pci;
         private UInt32 tcrAddress;
         private TransmitConfigurationRegister(UInt32 data, PCIDevice hw, UInt32 adr)
         {
-            tcr = data;
             pci = hw;
             tcrAddress = adr;
         }
@@ -35,40 +33,45 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
         {
             //Set Interframe Gap and Max Burst Size (to 128 bytes)
             UInt32 data = (UInt32)(BitValue.IFG0 | BitValue.IFG1 | BitValue.MAXDMA0 | BitValue.MAXDMA1);
-            //Console.WriteLine("Data in INIT for TX:" + data);
-            IOSpace.Write32(tcrAddress, data);
+            this.TCR = data;
         }
 
         /// <summary>
-        /// Retrieves 6 bits 
+        /// Get or Sets all 32 bits in Transmit Configuration Register
+        /// </summary>
+        public UInt32 TCR
+        {
+            get
+            {
+                return IOSpace.Read32(tcrAddress);
+            }
+            private set
+            {
+                IOSpace.Write32(tcrAddress, value);
+            }
+        }
+
+        /// <summary>
+        /// Retrieves a number which indicates the Hardware Revision ID of the RTL card.
         /// </summary>
         /// <returns></returns>
         public byte GetHWVERID()
         {
             byte mask = 249; // 1111 1001
-            byte hwverid = BinaryHelper.GetByteFrom32bit(tcr, (byte)(23));
+            byte hwverid = BinaryHelper.GetByteFrom32bit(this.TCR, (byte)(23));
             return (byte)(mask & hwverid);
         }
         
-        //internal void SetLoopBack(bool value)
-        //{
-        //    //Change bits LBK0 and LBK1 to HIGH for Loopback, or LOW for Normal mode.
-        //    if (value)
-
-
-
-        //}
-
         public bool LoopbackMode 
         {
             get 
             {
-                UInt32 data = IOSpace.Read32(tcrAddress);
+                UInt32 data = this.TCR;
                 bool low = BinaryHelper.CheckBit(data, 17);
                 bool high = BinaryHelper.CheckBit(data, 18);
-                
+
                 if (low != high)
-                    Console.WriteLine("Warning: Loopback bits should always be the same!");
+                    throw new Exception("Loopback bits are mismatched in RTL drivers TCR PCI register!");
 
                 if (low && high)
                     return true;
@@ -76,14 +79,14 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
                     return false;
             }
             set 
-            { 
-                UInt32 data = IOSpace.Read32(tcrAddress);
+            {
+                UInt32 data = this.TCR;
                 if (value) //turn ON
                     data = (UInt32)(data | (uint)BitValue.LBK0 | (uint)BitValue.LBK1);
                 else //turn OFF
                     data = (UInt32)(data & (uint)~BitValue.LBK0 & (uint)~BitValue.LBK1);
 
-                IOSpace.Write32(tcrAddress, data); 
+                this.TCR = data;
             }
         }
 

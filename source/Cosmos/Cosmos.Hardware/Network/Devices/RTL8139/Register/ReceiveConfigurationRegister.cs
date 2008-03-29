@@ -9,6 +9,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
     /// <summary>
     /// Receive Configuration Register is used to set receive configuration.
     /// Offset 44h from main memory.
+    /// Is 32 bits wide.
     /// </summary>
     public class ReceiveConfigurationRegister
     {
@@ -34,13 +35,35 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
             IOSpace.Write32(rcrAddress, data);
         }
 
+        /// <summary>
+        /// Get or Sets all 32 bits in Receive Configuration Register
+        /// </summary>
         public UInt32 RCR 
         { 
             get 
             { 
                 return IOSpace.Read32(rcrAddress);
             } 
-            private set { ;} 
+            private set 
+            {
+                IOSpace.Write32(rcrAddress, value);
+            } 
+        }
+
+        /// <summary>
+        /// Gets or Sets the promiscuous mode. When Promisuous mode set ALL detected packets on network are put into Receive buffer, not
+        /// just the packets sent directly to us.
+        /// </summary>
+        public bool PromiscuousMode 
+        {
+            get
+            {
+                return BinaryHelper.CheckBit(IOSpace.Read32(rcrAddress), 0);
+            }
+            set
+            {
+                this.RCR = BinaryHelper.FlipBit(this.RCR, 0);
+            }
         }
 
         public enum BitValue : uint

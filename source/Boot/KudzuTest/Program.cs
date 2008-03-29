@@ -34,7 +34,7 @@ namespace KudzuTest {
             //Cosmos.Kernel.Temp.Kudzu.PCI.Test();
 
             // Load
-            var xNICs = RTLDriver.RTL8139.FindRTL8139Devices();
+            var xNICs = RTLDriver.RTL8139.FindAll();
             if (xNICs.Count == 0) {
                 throw new Exception("Unable to find RTL8139 network card!");
             }
