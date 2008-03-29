@@ -58,7 +58,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
         {
             get
             {
-                return BinaryHelper.CheckBit(IOSpace.Read32(rcrAddress), 0);
+                return BinaryHelper.CheckBit(this.RCR, 0);
             }
             set
             {
