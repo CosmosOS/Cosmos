@@ -1333,8 +1333,11 @@ namespace Indy.IL2CPU {
 						xOffset = xOffsetAttrib.Value;
 					} else {
 						aObjectStorageSize += xFieldSize;
+						xOffset = -1;
 					}
-					aTypeFields.Add(xField.GetFullName(), new TypeInformation.Field(xFieldSize, xFieldType.IsClass && !xFieldType.IsValueType, xFieldType, (xPlugFieldAttr != null && xPlugFieldAttr.IsExternalValue)));
+					aTypeFields.Add(xField.GetFullName(), new TypeInformation.Field(xFieldSize, xFieldType.IsClass && !xFieldType.IsValueType, xFieldType, (xPlugFieldAttr != null && xPlugFieldAttr.IsExternalValue)) {
+						Offset = xOffset
+					});
 				}
 				while (xCurrentPlugFieldList.Count > 0) {
 					var xItem = xCurrentPlugFieldList.Values.First();
@@ -1365,9 +1368,6 @@ namespace Indy.IL2CPU {
 		public static Dictionary<string, TypeInformation.Field> GetTypeFieldInfo(Type aType, out int aObjectStorageSize) {
 			Dictionary<string, TypeInformation.Field> xTypeFields = new Dictionary<string, TypeInformation.Field>();
 			aObjectStorageSize = 0;
-			if (aType == typeof(string)) {
-				System.Console.Write("");
-			}
 			GetTypeFieldInfoImpl(xTypeFields, aType, ref aObjectStorageSize);
 			if (aType.IsExplicitLayout) {
 				var xStructLayout = aType.StructLayoutAttribute;
@@ -1384,8 +1384,10 @@ namespace Indy.IL2CPU {
 			Dictionary<string, TypeInformation.Field> xResult = new Dictionary<string, TypeInformation.Field>();
 			foreach (var item in xTypeFields.Reverse()) {
 				var xItem = item.Value;
-				xItem.Offset = xOffset;
-				xOffset += xItem.Size;
+				if (item.Value.Offset == -1) {
+					xItem.Offset = xOffset;
+					xOffset += xItem.Size;
+				}
 				xResult.Add(item.Key, xItem);
 			}
 			return xResult;
