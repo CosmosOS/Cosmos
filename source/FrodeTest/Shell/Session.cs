@@ -101,6 +101,7 @@ namespace FrodeTest.Shell
                         xByteCount++;
                 }
                 Console.WriteLine("Read buffer contains " + xByteCount.ToString() + " bytes with data.");
+                Console.WriteLine("Read buffer empty flag? : " + nic.IsReceiveBufferEmpty());
             }
             else if (command.Equals("reset"))
             {

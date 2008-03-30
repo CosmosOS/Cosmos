@@ -167,6 +167,12 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         }
         #endregion
 
+        public bool IsReceiveBufferEmpty()
+        {
+            var cr = Register.CommandRegister.Load(pciCard);
+            return cr.IsRxBufferEmpty();
+        }
+
         public override string Name
         {
             get { return "Generic RTL8139 Network device"; }

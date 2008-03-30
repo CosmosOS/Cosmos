@@ -17,34 +17,38 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
         //private byte cmd;
 
         private PCIDevice pcicard = null;
-        private UInt32 address = 0;
+        private UInt32 crAddress = 0;
 
         public static CommandRegister Load(PCIDevice pci)
         {
-            //pcicard = pci;
-            UInt32 address = GetCmdAddress(pci);
+            UInt32 address = pci.BaseAddress1 + (byte)MainRegister.Bit.ChipCmd;
             return new CommandRegister(pci, address);
         }
 
         private CommandRegister(PCIDevice pci, UInt32 adr)
         {
             pcicard = pci;
-            address = adr;
+            crAddress = adr;
         }
 
-        public byte GetCmdRegister()
+        /// <summary>
+        /// Get or Sets the 8 bits in the Command Register.
+        /// </summary>
+        /// <returns></returns>
+        public byte CR
         {
-            return IOSpace.Read8(GetCmdAddress());
+            get { return IOSpace.Read8(crAddress); }
+            set { IOSpace.Write8(crAddress, value); }
         }
 
-        public UInt32 GetCmdAddress()
+        public bool IsRxBufferEmpty()
         {
-            return pcicard.BaseAddress1 + (byte)MainRegister.Bit.ChipCmd;
+            return BinaryHelper.CheckBit(this.CR, (byte)BitPosition.BUFE);
         }
 
-        public static UInt32 GetCmdAddress(PCIDevice pci)
+        public bool IsResetStatus()
         {
-            return pci.BaseAddress1 + (byte)MainRegister.Bit.ChipCmd;
+            return BinaryHelper.CheckBit(this.CR, (byte)BitPosition.RST);
         }
 
         /// <summary>
@@ -52,25 +56,18 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
         /// </summary>
         public enum BitPosition : byte
         {
-            BUFE = 0x00,    //Buffer Empty, read-only
-            TE = 0x02,      //Transmitter Enable
-            RE = 0x03,      //Receiver Enable
-            RST = 0x04      //Software Reset
+            BUFE = 0,    //Buffer Empty, read-only
+            TE = 2,      //Transmitter Enable
+            RE = 3,      //Receiver Enable
+            RST = 4      //Software Reset
         }
 
-        public enum BitValue : byte
+        public enum BitValue : uint
         {
-            BUFE = 1,
-            TE = 4,
-            RE = 8,
-            RST = 16
+            BUFE = BinaryHelper.BitPos.BIT0,
+            TE = BinaryHelper.BitPos.BIT2,
+            RE = BinaryHelper.BitPos.BIT3,
+            RST = BinaryHelper.BitPos.BIT4
         }
-
-        public bool IsResetStatus()
-        {
-            byte cmd = GetCmdRegister();
-            return BinaryHelper.CheckBit(cmd, (byte)BitPosition.RST);
-        }
-
     }
 }
