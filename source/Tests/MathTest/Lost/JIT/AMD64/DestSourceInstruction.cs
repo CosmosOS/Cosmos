@@ -14,6 +14,27 @@ namespace Lost.JIT.AMD64
 			this.Dest = dest;
 			this.Source = source;
 		}
+		public DestSourceInstruction(InstructionOperand dest, byte imm)
+		{
+			this.Dest = dest;
+			this.Source = new ImmediateOperand(imm);
+		}
+		public DestSourceInstruction(InstructionOperand dest, short imm)
+		{
+			this.Dest = dest;
+			this.Source = new ImmediateOperand(imm);
+		}
+		public DestSourceInstruction(InstructionOperand dest, int imm)
+		{
+			this.Dest = dest;
+			this.Source = new ImmediateOperand(imm);
+		}
+		public DestSourceInstruction(InstructionOperand dest, long imm)
+		{
+			this.Dest = dest;
+			this.Source = new ImmediateOperand(imm);
+		}
+
 
 		public InstructionOperand Dest { get; private set; }
 		public InstructionOperand Source { get; private set; }

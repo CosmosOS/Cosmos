@@ -12,6 +12,22 @@ namespace Lost.JIT.AMD64
 		public AddWithCarry(InstructionOperand dest, InstructionOperand source): base(dest, source)
 		{
 		}
+		public AddWithCarry(InstructionOperand dest, byte source)
+			: base(dest, source)
+		{
+		}
+		public AddWithCarry(InstructionOperand dest, short source)
+			: base(dest, source)
+		{
+		}
+		public AddWithCarry(InstructionOperand dest, int source)
+			: base(dest, source)
+		{
+		}
+		public AddWithCarry(InstructionOperand dest, long source)
+			: base(dest, source)
+		{
+		}
 
 		public override byte AccumulatorOpCode
 		{

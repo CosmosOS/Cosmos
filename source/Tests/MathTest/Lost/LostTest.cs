@@ -56,9 +56,9 @@ namespace Lost
 		{
 			Test("adc	al, 1\nadc	rcx, 1\nadc	rcx, 0xFFF\n",
 				new List<ProcessorInstruction>(){
-					new AddWithCarry(new GeneralPurposeRegister(Registers.AX, 1), new ImmediateOperand((byte)1)),
-					new AddWithCarry(new GeneralPurposeRegister(Registers.CX, 8), new ImmediateOperand((byte)1)),
-					new AddWithCarry(new GeneralPurposeRegister(Registers.CX, 8), new ImmediateOperand(0xFFF)),});
+					new AddWithCarry(GeneralPurposeRegister.AL, (byte)1),
+					new AddWithCarry(GeneralPurposeRegister.RCX, (byte)1),
+					new AddWithCarry(GeneralPurposeRegister.RCX, 0xFFF),});
 		}
 
 		static void Test(string fasm_code, IEnumerable<ProcessorInstruction> my_code)
