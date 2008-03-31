@@ -13,13 +13,24 @@ namespace Lost.JIT.AMD64
 		{
 		}
 
-		public override void Compile(Stream dest)
+		public override byte AccumulatorOpCode
 		{
-			throw new NotImplementedException();
+			get
+			{
+				return 0x14;
+			}
 		}
-		public override int? Size
+		public override byte ImmediateExt
 		{
-			get { throw new NotImplementedException(); }
+			get { return 0x02; }
+		}
+		public override byte ImmediateOpCode
+		{
+			get { return 0x80; }
+		}
+		public override byte RegisterOpCode
+		{
+			get { return 0x10; }
 		}
 	}
 }
