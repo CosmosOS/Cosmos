@@ -13,31 +13,36 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using Indy.IL2CPU;
 
 namespace Cosmos.Build.Windows {
 	public partial class DebugWindow: Window {
 		protected TcpClient mClient;
 		protected byte[] mTCPData = new byte[4];
 		protected int mCurrentPos = 0;
+		private DebugModeEnum mDebugMode;
+		private SourceInfos mSourceMappings;
 
 		public DebugWindow() {
-            try
-            {
-                InitializeComponent();
+			InitializeComponent();
+		}
 
-                //Create a TCP connection to localhost:4444. We have already set up Qemu to listen to this port.
-                mClient = new TcpClient();
-                mClient.Connect(new IPEndPoint(IPAddress.Loopback, 4444));
+		public void SetSourceInfoMap(SourceInfos aSourceMapping) {
+			try {
+				mDebugMode = DebugModeEnum.Source;
+				mSourceMappings = aSourceMapping;
+				//Create a TCP connection to localhost:4444. We have already set up Qemu to listen to this port.
+				mClient = new TcpClient();
+				mClient.Connect(new IPEndPoint(IPAddress.Loopback, 4444));
 
-                //Read TCP data from Qemu
-                var xStream = mClient.GetStream();
-                xStream.BeginRead(mTCPData, 0, mTCPData.Length, new AsyncCallback(TCPRead), xStream);
-                //            UInt32 xEIP = (UInt32)xStream.ReadByte();
-            }
-            catch (SocketException ex)
-            {
-                Dispatcher.BeginInvoke(DispatcherPriority.Normal, new ConnectionLostDelegate(ConnectionLost), ex);
-            }
+				//Read TCP data from Qemu
+				var xStream = mClient.GetStream();
+				xStream.BeginRead(mTCPData, 0, mTCPData.Length, new AsyncCallback(TCPRead), xStream);
+				//            UInt32 xEIP = (UInt32)xStream.ReadByte();
+			} catch (SocketException ex) {
+				Dispatcher.BeginInvoke(DispatcherPriority.Normal, new ConnectionLostDelegate(ConnectionLost), ex);
+			}
+
 		}
 
 		protected delegate void DebugPacketRcvdDelegate(UInt32 aEIP);

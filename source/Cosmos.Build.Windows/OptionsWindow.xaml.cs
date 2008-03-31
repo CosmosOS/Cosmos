@@ -49,6 +49,15 @@ namespace Cosmos.Build.Windows {
 				int xDebugPort = xOptionsWindow.cmboDebugPort.SelectedIndex;
 				if ((xIsQemu & xUseQemuDebug) | (!xIsQemu & (xDebugPort > 0))) {
 					var xDebugWindow = new DebugWindow();
+					if (xOptionsWindow.cmboDebugMode.SelectedIndex == 1) {
+						// source debugging
+						var xLabelByAddressMapping = ObjDump.GetLabelByAddressMapping(xOptionsWindow.mBuilder.BuildPath + "output.bin", xOptionsWindow.mBuilder.ToolsPath + @"cygwin\objdump.exe");
+						var xSourceMappings = SourceInfo.GetSourceInfo(xLabelByAddressMapping, xOptionsWindow.mBuilder.BuildPath + "debug.cxdb");
+						xDebugWindow.SetSourceInfoMap(xSourceMappings);
+					} else {
+						throw new Exception("Debug mode not supported!");
+					}
+
 					xDebugWindow.ShowDialog();
 				}
 			}
@@ -156,14 +165,15 @@ namespace Cosmos.Build.Windows {
 		}
 
 		protected void DoBuild() {
-            SaveSettingsToRegistry();
+			SaveSettingsToRegistry();
 
-            if (chckCompileIL.IsChecked.Value) {
-                Console.WriteLine("Compiling...");
+			if (chckCompileIL.IsChecked.Value) {
+				Console.WriteLine("Compiling...");
 				byte xComport = (byte)cmboDebugPort.SelectedIndex;
 				if (xComport > 3) {
 					throw new Exception("Debug port not supported yet!");
 				}
+				xComport++;
 				DebugModeEnum xDebugMode = DebugModeEnum.None;
 				if (cmboDebugMode.SelectedIndex == 0) {
 					xDebugMode = DebugModeEnum.IL;
@@ -177,32 +187,32 @@ namespace Cosmos.Build.Windows {
 				var xBuildWindow = new BuildWindow();
 				mBuilder.DebugLog += xBuildWindow.DoDebugMessage;
 				xBuildWindow.Show();
-                mBuilder.Compile(xDebugMode, xComport);
+				mBuilder.Compile(xDebugMode, xComport);
 				mBuilder.DebugLog -= xBuildWindow.DoDebugMessage;
 				xBuildWindow.Close();
-            }
+			}
 
-            if (rdioQEMU.IsChecked.Value) {
-                mBuilder.MakeQEMU(chckQEMUUseHD.IsChecked.Value, chckQEMUUseGDB.IsChecked.Value, chckQEMUUseDebug.IsChecked.Value, chckQEMUUseDebug.IsChecked.Value);
-            } else if (rdioVMWare.IsChecked.Value) {
-                string vmwareversion = string.Empty;
-                
-                if (rdVMWareServer.IsChecked.Value) 
-                    vmwareversion = rdVMWareServer.Content.ToString();
-                else if (rdVMWareWorkstation.IsChecked.Value)
-                    vmwareversion = rdVMWareWorkstation.Content.ToString();
+			if (rdioQEMU.IsChecked.Value) {
+				mBuilder.MakeQEMU(chckQEMUUseHD.IsChecked.Value, chckQEMUUseGDB.IsChecked.Value, chckQEMUUseDebug.IsChecked.Value, chckQEMUUseDebug.IsChecked.Value);
+			} else if (rdioVMWare.IsChecked.Value) {
+				string vmwareversion = string.Empty;
 
-                mBuilder.MakeVMWare(vmwareversion);
-            } else if (rdioVPC.IsChecked.Value) {
-                mBuilder.MakeVPC();
-            } else if (rdioISO.IsChecked.Value) {
-                mBuilder.MakeISO();
-            } else if (rdioPXE.IsChecked.Value) {
-                mBuilder.MakePXE();
-            } else if (rdioUSB.IsChecked.Value) {
-                mBuilder.MakeUSB(cmboUSBDevice.Text[0]);
-            }
-        }
+				if (rdVMWareServer.IsChecked.Value)
+					vmwareversion = rdVMWareServer.Content.ToString();
+				else if (rdVMWareWorkstation.IsChecked.Value)
+					vmwareversion = rdVMWareWorkstation.Content.ToString();
+
+				mBuilder.MakeVMWare(vmwareversion);
+			} else if (rdioVPC.IsChecked.Value) {
+				mBuilder.MakeVPC();
+			} else if (rdioISO.IsChecked.Value) {
+				mBuilder.MakeISO();
+			} else if (rdioPXE.IsChecked.Value) {
+				mBuilder.MakePXE();
+			} else if (rdioUSB.IsChecked.Value) {
+				mBuilder.MakeUSB(cmboUSBDevice.Text[0]);
+			}
+		}
 
 		void butnCancel_Click(object sender, RoutedEventArgs e) {
 			DialogResult = false;

@@ -119,7 +119,7 @@ namespace Indy.IL2CPU {
 		/// <param name="aTargetPlatform">The platform to target when assembling the code.</param>
 		/// <param name="aOutput"></param>
 		/// <param name="aInMetalMode">Whether or not the output is metalmode only.</param>
-		public void Execute(string aAssembly, TargetPlatformEnum aTargetPlatform, Func<string, string> aGetFileNameForGroup, bool aInMetalMode, IEnumerable<string> aPlugs, DebugModeEnum aDebugMode, byte aDebugComNumber) {
+		public void Execute(string aAssembly, TargetPlatformEnum aTargetPlatform, Func<string, string> aGetFileNameForGroup, bool aInMetalMode, IEnumerable<string> aPlugs, DebugModeEnum aDebugMode, byte aDebugComNumber, string aOutputDir) {
 			mCurrent = this;
 			try {
 				if (aGetFileNameForGroup == null) {
@@ -134,7 +134,7 @@ namespace Indy.IL2CPU {
 				if (xEntryPoint == null) {
 					throw new NotSupportedException("No EntryPoint found!");
 				}
-				mOutputDir = Path.GetDirectoryName(aAssembly);
+				mOutputDir = aOutputDir;
 
 				Type xEntryPointType = xEntryPoint.DeclaringType;
 				xEntryPoint = xEntryPointType.GetMethod("Init", new Type[0]);
@@ -271,7 +271,8 @@ namespace Indy.IL2CPU {
 						mMap.PostProcess(mAssembler);
 						ProcessAllStaticFields();
 						if (mMLDebugSymbols != null) {
-							MLDebugSymbol.WriteSymbolsListToFile(mMLDebugSymbols, Path.Combine(mOutputDir, "msil-instructions.dbg"));
+							string xOutputFile = Path.Combine(mOutputDir, "debug.cxdb");
+							MLDebugSymbol.WriteSymbolsListToFile(mMLDebugSymbols, xOutputFile);
 						}
 						//if (mDebugSymbols != null) {
 						//    GenerateDebugSymbols();
