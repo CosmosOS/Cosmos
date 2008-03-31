@@ -15,12 +15,12 @@ namespace Lost.JIT.AMD64
 		public abstract int? Size { get; }
 		public abstract void Compile(Stream destStream);
 
-		public static byte ModRM(int mod, int reg, Registers rm)
+		public static byte ModRM(int ext, Registers dest)
 		{
-			mod <<= 6;
-			mod += reg << 3;
-			mod += rm.GetIndex();
-			return (byte)mod;
+			int result = 0xC0;
+			result += ext << 3;
+			result += dest.GetIndex();
+			return (byte)result;
 		}
 	}
 }

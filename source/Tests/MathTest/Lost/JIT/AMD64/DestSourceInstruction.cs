@@ -56,7 +56,7 @@ namespace Lost.JIT.AMD64
 					#endregion
 
 					Rex rex = Rex.None;
-					if (dest.Register & Registers.NewRegsMask != Registers.None) rex |= Rex.Reg;
+					if ((dest.Register & Registers.NewRegsMask) != Registers.None) rex |= Rex.Reg;
 
 					#region INSTR regX, immX //reg64, imm32
 					if (dest.Size == source.Size || (dest.Size == 8 && source.Size == 4))
@@ -66,27 +66,27 @@ namespace Lost.JIT.AMD64
 						case 1:
 							if (rex != Rex.None) destStream.WriteByte((byte)rex);
 							destStream.WriteByte(ImmediateOpCode);
-							destStream.WriteByte(ModRM(0, ImmediateExt, dest.Register.GetIndex()));
+							destStream.WriteByte(ModRM(ImmediateExt, dest.Register));
 							destStream.WriteByte(source.Value);
 							return;
 						case 2:
 							destStream.WriteByte(OperandSizeOverride);
 							if (rex != Rex.None) destStream.WriteByte((byte)rex);
 							destStream.WriteByte(ImmediateOpCode + 1);
-							destStream.WriteByte(ModRM(0, ImmediateExt, dest.Register.GetIndex()));
+							destStream.WriteByte(ModRM(ImmediateExt, dest.Register));
 							destStream.WriteShort(source.Value);
 							return;
 						case 4:
 							if (rex != Rex.None) destStream.WriteByte((byte)rex);
 							destStream.WriteByte(ImmediateOpCode + 1);
-							destStream.WriteByte(ModRM(0, ImmediateExt, dest.Register.GetIndex()));
+							destStream.WriteByte(ModRM(ImmediateExt, dest.Register));
 							destStream.WriteInt(source.Value);
 							return;
 						case 8:
 							rex |= Rex.Wide;
 							destStream.WriteByte((byte)rex);
 							destStream.WriteByte(ImmediateOpCode + 1);
-							destStream.WriteByte(ModRM(0, ImmediateExt, dest.Register.GetIndex()));
+							destStream.WriteByte(ModRM(ImmediateExt, dest.Register));
 							destStream.WriteInt(source.Value);
 							return;
 						}
@@ -105,7 +105,7 @@ namespace Lost.JIT.AMD64
 						case 4:
 							if (rex != Rex.None) destStream.WriteByte((byte)rex);
 							destStream.WriteByte(ImmediateOpCode + 3);
-							destStream.WriteByte(ModRM(0, ImmediateExt, dest.Register.GetIndex()));
+							destStream.WriteByte(ModRM(ImmediateExt, dest.Register));
 							destStream.WriteByte(source.Value);
 							return;
 						case 8:
