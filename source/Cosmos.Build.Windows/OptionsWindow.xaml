@@ -1,108 +1,188 @@
-﻿<Window x:Class="Cosmos.Build.Windows.OptionsWindow"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Title="Build Options" WindowStartupLocation="CenterScreen" Width="600" Icon="/Cosmos.Build.Windows;component/Cosmos.ico">
-    <FlowDocumentScrollViewer>
-    <FlowDocument Name="RootDoc">
-        <BlockUIContainer>
-            <Image Source="/Cosmos.Build.Windows;component/Logo-1.png" Width="150" />
-        </BlockUIContainer>
-        <Paragraph>
-            Build type:
-            <LineBreak/>
-            <InlineUIContainer>
-                <WrapPanel Margin="20, 0">
-                    <Label>Emulator: </Label>
-                    <RadioButton Name="rdioQEMU" GroupName="Target">_QEMU</RadioButton>
-                    <RadioButton Name="rdioVMWare" GroupName="Target" Margin="15, 0">VM_Ware</RadioButton>
-                    <RadioButton Name="rdioVPC" GroupName="Target" Margin="15, 0">Virtual _PC</RadioButton>
-                </WrapPanel>
-            </InlineUIContainer>
-            <LineBreak/>
-            <InlineUIContainer>
-                <WrapPanel Margin="20, 0">
-                    <Label>Hardware:</Label>
-                    <RadioButton GroupName="Target" Name="rdioISO">_ISO</RadioButton>
-                    <RadioButton GroupName="Target" Name="rdioPXE" Margin="15, 0">_Network (PXE)</RadioButton>
-                    <RadioButton GroupName="Target" Name="rdioUSB" Margin="15, 0">_USB Device</RadioButton>
-                </WrapPanel>
-            </InlineUIContainer>
-        </Paragraph>
-            <Paragraph>Current build path is:
-                <LineBreak/>                
-                <Span Name="spanBuildPath"></Span>
-            </Paragraph>
-            <Paragraph Name="paraGeneralOptions">
-                <Bold>General Options</Bold>
-                <LineBreak/>
-                <InlineUIContainer>
-                    <StackPanel HorizontalAlignment="Left">
-                    <CheckBox Name="chckCompileIL" IsChecked="True">Compile IL. Do not uncheck this unless you understand the impact.</CheckBox>
-                        </StackPanel>
-                </InlineUIContainer>
-            </Paragraph>
-            <Paragraph Name="paraDebugOptions">
-                <Bold>Debug Options</Bold>
-                <LineBreak/>
-                Debug Port:
-                <InlineUIContainer>
-                        <ComboBox Name="cmboDebugPort" HorizontalAlignment="Left" Width="100"></ComboBox>
-                </InlineUIContainer>
-            </Paragraph>
-            <Paragraph Name="paraQEMUOptions">
-                <Bold>QEMU Options</Bold>
-            <LineBreak/>
-            <InlineUIContainer>
-                <StackPanel>
-                        <CheckBox Name="chckQEMUUseGDB" IsChecked="False">Use GDB Debugger</CheckBox>
-                        <CheckBox Name="chckQEMUUseDebug" IsChecked="False">Use Cosmos Debugger</CheckBox>
-                        <CheckBox Name="chckQEMUUseHD" IsChecked="False">Create hard disk image</CheckBox>
-                        <CheckBox Name="chckQEMUSerialWait" IsChecked="False">Wait for serial debug connection over TCP</CheckBox>
-                    </StackPanel>
-            </InlineUIContainer>
-        </Paragraph>
-        <Paragraph Name="paraVMWareOptions">
-                <Bold>VMWare Options</Bold>
-                <LineBreak/>
-                    <InlineUIContainer>
-                    <StackPanel>
-                        <RadioButton Name="rdVMWareWorkstation" GroupName="VMWareVersion" IsChecked="True">VMWare Workstation</RadioButton>
-                        <RadioButton Name="rdVMWareServer" GroupName="VMWareVersion">VMWare Server</RadioButton>
-                    </StackPanel>
-                </InlineUIContainer>
-            </Paragraph>
-        <Paragraph Name="paraVPCOptions">
-                <Bold>Virtual PC Options</Bold>
-                <LineBreak/>
-                No options yet.
-            </Paragraph>
-        <Paragraph Name="paraISOOptions">
-                <Bold>ISO Options</Bold>
-                <LineBreak/>ISO file will be output as:
-                <LineBreak/>
-                <Span Name="spanISOPath"></Span>
-        </Paragraph>
-            <Paragraph Name="paraPXEOptions">
-                <Bold>PXE Options</Bold>
-                <LineBreak/>After building, start up another PC with network boot enabled and Cosmos will boot on to it automatically.
-            </Paragraph>
-            <Paragraph Name="paraUSBOptions">
-                <Bold>USB Options</Bold>
-                <LineBreak/>Please choose a USB drive or stick that is formatted as FAT or FAT32. Note that selecting this device will overwrite the Master Boot Record (MBR) on the USB drive. Because of this take care to select the proper device. After a succesful build, you can then use this device to boot a physical machine. You may need to select the BIOS boot menu, use a multi boot utility, or change the BIOS boot sequence.
-                <LineBreak/>Only removable drives formatted as FAT or FAT32 will be listed. If you do not see your device, check its format.
-                <LineBreak/>USB Device:
-                <InlineUIContainer>
-                    <ComboBox Name="cmboUSBDevice" Width="100">
-                    </ComboBox>
-                </InlineUIContainer>
-            </Paragraph>
-        <Paragraph TextAlignment="Right">
-            <InlineUIContainer>
-                <Button Name="butnBuild" IsDefault="True">_Build</Button>
-             </InlineUIContainer>
-             <InlineUIContainer>
-                 <Button Name="butnCancel">_Cancel</Button>
-             </InlineUIContainer>
-            </Paragraph>
-    </FlowDocument>
-</FlowDocumentScrollViewer></Window>
+﻿<Window
+	x:Class="Cosmos.Build.Windows.OptionsWindow"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	Title="Build Options"
+	WindowStartupLocation="CenterScreen"
+	Width="600"
+	Icon="/Cosmos.Build.Windows;component/Cosmos.ico">
+	<FlowDocumentScrollViewer>
+		<FlowDocument
+			Name="RootDoc">
+			<BlockUIContainer>
+				<Image
+					Source="/Cosmos.Build.Windows;component/Logo-1.png"
+					Width="150" />
+			</BlockUIContainer>
+			<Paragraph>
+				Build type:
+				<LineBreak />
+				<InlineUIContainer>
+					<WrapPanel
+						Margin="20, 0">
+						<Label>Emulator:</Label>
+						<RadioButton
+							Name="rdioQEMU"
+							GroupName="Target">_QEMU</RadioButton>
+						<RadioButton
+							Name="rdioVMWare"
+							GroupName="Target"
+							Margin="15, 0">VM_Ware</RadioButton>
+						<RadioButton
+							Name="rdioVPC"
+							GroupName="Target"
+							Margin="15, 0">Virtual _PC</RadioButton>
+					</WrapPanel>
+				</InlineUIContainer>
+				<LineBreak />
+				<InlineUIContainer>
+					<WrapPanel
+						Margin="20, 0">
+						<Label>Hardware:</Label>
+						<RadioButton
+							GroupName="Target"
+							Name="rdioISO">_ISO</RadioButton>
+						<RadioButton
+							GroupName="Target"
+							Name="rdioPXE"
+							Margin="15, 0">_Network (PXE)</RadioButton>
+						<RadioButton
+							GroupName="Target"
+							Name="rdioUSB"
+							Margin="15, 0">_USB Device</RadioButton>
+					</WrapPanel>
+				</InlineUIContainer>
+			</Paragraph>
+			<Paragraph>Current build path is:
+				<LineBreak />
+				<Span
+					Name="spanBuildPath"></Span>
+			</Paragraph>
+			<Paragraph
+				Name="paraGeneralOptions">
+				<Bold>General Options</Bold>
+				<LineBreak />
+				<InlineUIContainer>
+					<StackPanel
+						HorizontalAlignment="Left">
+						<CheckBox
+							Name="chckCompileIL"
+							IsChecked="True">Compile IL. Do not uncheck this unless you understand the impact.</CheckBox>
+					</StackPanel>
+				</InlineUIContainer>
+			</Paragraph>
+			<Paragraph
+				Name="paraDebugOptions">
+				<Bold>Debug Options</Bold>
+				<LineBreak />
+				<InlineUIContainer>
+					<Grid>
+						<Grid.RowDefinitions>
+							<RowDefinition />
+							<RowDefinition />
+						</Grid.RowDefinitions>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition />
+							<ColumnDefinition Width="124" />
+						</Grid.ColumnDefinitions>
+						<TextBlock
+							Grid.Column="0"
+							Grid.Row="0">Debug Port </TextBlock>
+						<ComboBox
+							Name="cmboDebugPort"
+							Grid.Column="1"
+							Grid.Row="0"></ComboBox>
+						<TextBlock
+							Grid.Column="0"
+							Grid.Row="1"
+							Margin="0,0,6,0">Debug Mode </TextBlock>
+						<ComboBox
+							Name="cmboDebugMode" Grid.Column="1"
+							Grid.Row="1"/>
+					</Grid>
+				</InlineUIContainer>
+			</Paragraph>
+			<Paragraph
+				Name="paraQEMUOptions">
+				<Bold>QEMU Options</Bold>
+				<LineBreak />
+				<InlineUIContainer>
+					<StackPanel>
+						<CheckBox
+							Name="chckQEMUUseGDB"
+							IsChecked="False">Use GDB Debugger</CheckBox>
+						<CheckBox
+							Name="chckQEMUUseDebug"
+							IsChecked="False">Use Cosmos Debugger</CheckBox>
+						<CheckBox
+							Name="chckQEMUUseHD"
+							IsChecked="False">Create hard disk image</CheckBox>
+						<CheckBox
+							Name="chckQEMUSerialWait"
+							IsChecked="False">Wait for serial debug connection over TCP</CheckBox>
+					</StackPanel>
+				</InlineUIContainer>
+			</Paragraph>
+			<Paragraph
+				Name="paraVMWareOptions">
+				<Bold>VMWare Options</Bold>
+				<LineBreak />
+				<InlineUIContainer>
+					<StackPanel>
+						<RadioButton
+							Name="rdVMWareWorkstation"
+							GroupName="VMWareVersion"
+							IsChecked="True">VMWare Workstation</RadioButton>
+						<RadioButton
+							Name="rdVMWareServer"
+							GroupName="VMWareVersion">VMWare Server</RadioButton>
+					</StackPanel>
+				</InlineUIContainer>
+			</Paragraph>
+			<Paragraph
+				Name="paraVPCOptions">
+				<Bold>Virtual PC Options</Bold>
+				<LineBreak />
+				No options yet.
+			</Paragraph>
+			<Paragraph
+				Name="paraISOOptions">
+				<Bold>ISO Options</Bold>
+				<LineBreak /> ISO file will be output as:
+				<LineBreak />
+				<Span
+					Name="spanISOPath"></Span>
+			</Paragraph>
+			<Paragraph
+				Name="paraPXEOptions">
+				<Bold>PXE Options</Bold>
+				<LineBreak /> After building, start up another PC with network boot enabled and Cosmos will boot on to it automatically.
+			</Paragraph>
+			<Paragraph
+				Name="paraUSBOptions">
+				<Bold>USB Options</Bold>
+				<LineBreak /> Please choose a USB drive or stick that is formatted as FAT or FAT32. Note that selecting this device will overwrite the Master Boot Record (MBR) on the USB drive. Because of this take care to select the proper device. After a succesful build, you can then use this device to boot a physical machine. You may need to select the BIOS boot menu, use a multi boot utility, or change the BIOS boot sequence.
+				<LineBreak /> Only removable drives formatted as FAT or FAT32 will be listed. If you do not see your device, check its format.
+				<LineBreak /> USB Device:
+				<InlineUIContainer>
+					<ComboBox
+						Name="cmboUSBDevice"
+						Width="100">
+					</ComboBox>
+				</InlineUIContainer>
+			</Paragraph>
+			<Paragraph
+				TextAlignment="Right">
+				<InlineUIContainer>
+					<Button
+						Name="butnBuild"
+						IsDefault="True">_Build</Button>
+				</InlineUIContainer>
+				<InlineUIContainer>
+					<Button
+						Name="butnCancel">_Cancel</Button>
+				</InlineUIContainer>
+			</Paragraph>
+		</FlowDocument>
+	</FlowDocumentScrollViewer>
+</Window>

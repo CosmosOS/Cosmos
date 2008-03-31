@@ -11,41 +11,49 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Indy.IL2CPU;
+using System.Collections.ObjectModel;
+using System.Windows.Threading;
 
 namespace Cosmos.Build.Windows {
+	public class BuildLogMessage {
+		public LogSeverityEnum Severity {
+			get;
+			set;
+		}
+		public string Message {
+			get;
+			set;
+		}
+	}
+	public class BuildLogMessages: ObservableCollection<BuildLogMessage> {
+		public BuildLogMessages() {
+		}
+	}
     public partial class BuildWindow : Window {
-        protected class CaptureWriter : TextWriter {
-            protected StringBuilder mLine = new StringBuilder();
-            public delegate void NewLineDelegate(string aLine);
-            protected NewLineDelegate mOnNewLine;
-
-            public CaptureWriter(NewLineDelegate aOnNewLine) {
-                mOnNewLine += aOnNewLine;
-            }
-
-            public override Encoding Encoding {
-                get { return null; }
-            }
-
-            public override void Write(char aValue) {
-                if (aValue == "\r"[0]) {
-                } else if (aValue == "\n"[0]) {
-                    mOnNewLine(mLine.ToString());
-                    mLine.Length = 0;
-                } else {
-                    mLine.Append(aValue);
-                }
-            }
-        }
-
-        public void NewLine(string aLine) {
-            lboxLog.SelectedIndex = lboxLog.Items.Add(aLine);
-        }
-
         public BuildWindow() {
             InitializeComponent();
-            var xWriter = new CaptureWriter(NewLine);
-            Console.SetOut(xWriter);
+			Messages = (BuildLogMessages)((ObjectDataProvider)FindResource("BuildMessages")).Data;
+			if (Messages == null) {
+				throw new Exception("Message collection not found!");
+			}
         }
+
+		public readonly BuildLogMessages Messages;
+
+		public void DoDebugMessage(LogSeverityEnum aSeverity, string aMessage) {
+			var xMessage = new BuildLogMessage() {
+				Severity = aSeverity,
+				Message = aMessage
+			};
+			Messages.Add(xMessage);
+			lboxLog.ScrollIntoView(xMessage);
+			var xFrame = new DispatcherFrame();
+			Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Input, new DispatcherOperationCallback(delegate(object aParam) {
+				xFrame.Continue = false;
+				return null;
+			}), null);
+			Dispatcher.PushFrame(xFrame);
+		}
     }
 }

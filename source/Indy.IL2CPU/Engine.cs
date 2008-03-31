@@ -119,7 +119,7 @@ namespace Indy.IL2CPU {
 		/// <param name="aTargetPlatform">The platform to target when assembling the code.</param>
 		/// <param name="aOutput"></param>
 		/// <param name="aInMetalMode">Whether or not the output is metalmode only.</param>
-		public void Execute(string aAssembly, TargetPlatformEnum aTargetPlatform, Func<string, string> aGetFileNameForGroup, bool aInMetalMode, string aAssemblyDir, IEnumerable<string> aPlugs, DebugModeEnum aDebugMode, byte aDebugComNumber) {
+		public void Execute(string aAssembly, TargetPlatformEnum aTargetPlatform, Func<string, string> aGetFileNameForGroup, bool aInMetalMode, IEnumerable<string> aPlugs, DebugModeEnum aDebugMode, byte aDebugComNumber) {
 			mCurrent = this;
 			try {
 				if (aGetFileNameForGroup == null) {

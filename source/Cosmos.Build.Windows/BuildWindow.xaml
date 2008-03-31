@@ -1,8 +1,40 @@
-﻿<Window x:Class="Cosmos.Build.Windows.BuildWindow"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Title="Building Comsos Application" Height="300" Width="496" Icon="/Cosmos.Build.Windows;component/Cosmos.ico">
-    <Grid>
-        <ListBox Margin="0,0,0,32" Name="lboxLog" />
-    </Grid>
+﻿<Window
+	x:Class="Cosmos.Build.Windows.BuildWindow"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:local="clr-namespace:Cosmos.Build.Windows"
+	Title="Building Comsos Application"
+	Height="300"
+	Width="496"
+	Icon="/Cosmos.Build.Windows;component/Cosmos.ico">
+	<Window.Resources>
+		<ObjectDataProvider
+			x:Key="BuildMessages"
+			ObjectType="{x:Type local:BuildLogMessages}" />
+	</Window.Resources>
+	<Grid>
+		<ListBox
+			Margin="0,0,0,32"
+			ItemsSource="{Binding Source={StaticResource BuildMessages}}"
+			Name="lboxLog">
+			<ListBox.ItemTemplate>
+				<DataTemplate
+					DataType="{x:Type local:BuildLogMessage}">
+					<ListBoxItem
+						Name="item"
+						Content="{Binding Path=Message}" />
+					<DataTemplate.Triggers>
+						<DataTrigger
+							Binding="{Binding Path=Severity}"
+							Value="Error">
+							<Setter
+								TargetName="item"
+								Property="Foreground"
+								Value="Red" />
+						</DataTrigger>
+					</DataTemplate.Triggers>
+				</DataTemplate>
+			</ListBox.ItemTemplate>
+		</ListBox>
+	</Grid>
 </Window>

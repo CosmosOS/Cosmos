@@ -8,6 +8,8 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using Microsoft.Win32;
+using Indy.IL2CPU;
+using Indy.IL2CPU.IL.X86.Native;
 
 namespace Cosmos.Build.Windows {
 	public class Builder {
@@ -17,6 +19,8 @@ namespace Cosmos.Build.Windows {
 		public Builder() {
 			BuildPath = GetBuildPath();
 			ToolsPath = BuildPath + @"Tools\";
+			// MtW: leave this here, otherwise VS wont copy required dependencies!
+			typeof(NativeOpCodeMap).Equals(null);
 		}
 
 		protected static string GetBuildPath() {
@@ -87,7 +91,15 @@ namespace Cosmos.Build.Windows {
 			Global.Call(ToolsPath + @"mkisofs.exe", @"-R -b isolinux.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o ..\Cosmos.iso .", xPath);
 		}
 
-		public void Compile() {
+		private void DoDebugLog(LogSeverityEnum aSeverity, string aMessage) {
+			if (DebugLog != null) {
+				DebugLog(aSeverity, aMessage);
+			}
+		}
+
+		public event DebugLogHandler DebugLog;
+
+		public void Compile(DebugModeEnum aDebugMode, byte aDebugComport) {
 			string xAsmPath = ToolsPath + @"asm\";
 			if (!Directory.Exists(xAsmPath)) {
 				Directory.CreateDirectory(xAsmPath);
@@ -95,11 +107,10 @@ namespace Cosmos.Build.Windows {
 			Assembly xTarget = System.Reflection.Assembly.GetEntryAssembly();
 			Stopwatch xSW = new Stopwatch();
 			xSW.Start();
-			IL2CPU.Program.Main(new string[] {@"-in:" + xTarget.Location
-                , "-plug:" + ToolsPath + @"Cosmos.Kernel.Plugs\Cosmos.Kernel.Plugs.dll"
-                , "-platform:nativex86", "-asm:" + xAsmPath,
-				"-debug:d:\\debug.xml"}
-				);
+			var xEngine = new Engine();
+			xEngine.DebugLog += DoDebugLog;
+			xEngine.Execute(xTarget.Location, TargetPlatformEnum.NativeX86, g => Path.Combine(xAsmPath, g + ".asm"), false,
+				new string[] { Path.Combine(Path.Combine(ToolsPath, "Cosmos.Kernel.Plugs"), "Cosmos.Kernel.Plugs.dll") }, aDebugMode, aDebugComport);
 			xSW.Stop();
 			Console.WriteLine("IL2CPU Run took " + xSW.Elapsed.ToString());
 
@@ -126,18 +137,18 @@ namespace Cosmos.Build.Windows {
 			MakeISO();
 			string xPath = BuildPath + @"VMWare\";
 
-            if (aSelectedVersion == "VMWare Server")
-                xPath += @"Server\";
-            else if (aSelectedVersion == "VMWare Workstation")
-                xPath += @"Workstation\";
+			if (aSelectedVersion == "VMWare Server")
+				xPath += @"Server\";
+			else if (aSelectedVersion == "VMWare Workstation")
+				xPath += @"Workstation\";
 
 			RemoveReadOnlyAttribute(xPath + "Cosmos.nvram");
 			RemoveReadOnlyAttribute(xPath + "Cosmos.vmsd");
 			RemoveReadOnlyAttribute(xPath + "Cosmos.vmx");
 			RemoveReadOnlyAttribute(xPath + "Cosmos.vmxf");
 			RemoveReadOnlyAttribute(xPath + "hda.vmdk");
-            
-            Process.Start(xPath + @"Cosmos.vmx");
+
+			Process.Start(xPath + @"Cosmos.vmx");
 		}
 
 		public void MakeQEMU(bool aUseHDImage, bool aGDB, bool aWaitSerialTCP, bool aDebugger) {
@@ -160,15 +171,15 @@ namespace Cosmos.Build.Windows {
 				// COM1
 				+ " -serial \"file:" + BuildPath + "COM1-output.dbg\" "
 				// COM2
-                + (aDebugger ?
-                 (aWaitSerialTCP ? " -serial tcp::4444,server" + (aWaitSerialTCP ? "" : ",nowait") : "")
-                 : " -serial \"file:" + BuildPath + "COM2-output.dbg\" ")
+				+ (aDebugger ?
+				 (aWaitSerialTCP ? " -serial tcp::4444,server" + (aWaitSerialTCP ? "" : ",nowait") : "")
+				 : " -serial \"file:" + BuildPath + "COM2-output.dbg\" ")
 				// Enable acceleration if we are not using GDB
-				+(aGDB ? " -S -s" : " -kernel-kqemu")
+				+ (aGDB ? " -S -s" : " -kernel-kqemu")
 				// Ethernet card - Later the model should be a QEMU option on 
 				// options screen
 				+ " -net nic,model=rtl8139,macaddr=52:54:00:12:34:57"
-                //+ " -net tap,ifname=CosmosTAP" //for network testing
+				//+ " -net tap,ifname=CosmosTAP" //for network testing
 				+ " -net user"
 				, ToolsPath + @"qemu\", false, true);
 
