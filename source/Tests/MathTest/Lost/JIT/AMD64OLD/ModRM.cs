@@ -5,7 +5,7 @@ using System.Text;
 using System.Diagnostics;
 using System.IO;
 
-namespace Lost.JIT.AMD64
+namespace Lost.JIT.AMD64OLD
 {
 	static class ModRM
 	{

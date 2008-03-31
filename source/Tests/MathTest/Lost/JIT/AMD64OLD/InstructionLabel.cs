@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Lost.JIT.AMD64
+namespace Lost.JIT.AMD64OLD
 {
 	class InstructionLabel
 	{

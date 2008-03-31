@@ -50,12 +50,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="JIT\AMD64\Enumerations.cs" />
-    <Compile Include="JIT\AMD64\ImmediateOperand.cs" />
-    <Compile Include="JIT\AMD64\InstructionLabel.cs" />
+    <Compile Include="JIT\AMD64OLD\Enumerations.cs" />
+    <Compile Include="JIT\AMD64OLD\ImmediateOperand.cs" />
+    <Compile Include="JIT\AMD64OLD\InstructionLabel.cs" />
+    <Compile Include="JIT\AMD64OLD\InstructionOperand.cs" />
+    <Compile Include="JIT\AMD64OLD\InstructionPrefix.cs" />
+    <Compile Include="JIT\AMD64OLD\ModRM.cs" />
+    <Compile Include="JIT\AMD64OLD\ProcessorInstruction.cs" />
+    <Compile Include="JIT\AMD64\AddWithCarry.cs" />
+    <Compile Include="JIT\AMD64\DestSourceInstruction.cs" />
+    <Compile Include="JIT\AMD64\Registers.cs" />
+    <Compile Include="JIT\AMD64\GeneralPurposeRegister.cs" />
     <Compile Include="JIT\AMD64\InstructionOperand.cs" />
-    <Compile Include="JIT\AMD64\InstructionPrefix.cs" />
-    <Compile Include="JIT\AMD64\ModRM.cs" />
     <Compile Include="JIT\AMD64\ProcessorInstruction.cs" />
     <Compile Include="LostTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

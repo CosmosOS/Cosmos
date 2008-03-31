@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
 
-namespace Lost.JIT.AMD64
+namespace Lost.JIT.AMD64OLD
 {
 	class InstructionPrefix
 	{
