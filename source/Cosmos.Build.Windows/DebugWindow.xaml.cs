@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using Indy.IL2CPU;
+using System.IO;
 
 namespace Cosmos.Build.Windows {
 	public partial class DebugWindow: Window {
@@ -76,13 +77,92 @@ namespace Cosmos.Build.Windows {
 				mCurrentPos = 0;
 				UInt32 xEIP = (UInt32)((mTCPData[0] << 24) | (mTCPData[1] << 16) | (mTCPData[2] << 8) | mTCPData[3]);
 				xStream.BeginRead(mTCPData, 0, mTCPData.Length, new AsyncCallback(TCPRead), xStream);
-				Dispatcher.BeginInvoke(DispatcherPriority.Normal, new DebugPacketRcvdDelegate(DebugPacketRcvd), xEIP);
+				Dispatcher.BeginInvoke(DispatcherPriority.Background, new DebugPacketRcvdDelegate(DebugPacketRcvd), xEIP);
 			} catch (System.IO.IOException ex) {
-				Dispatcher.BeginInvoke(DispatcherPriority.Normal, new ConnectionLostDelegate(ConnectionLost), ex);
+				Dispatcher.BeginInvoke(DispatcherPriority.Background, new ConnectionLostDelegate(ConnectionLost), ex);
 			}
 
 		}
 
+		private static void GetLineInfo(string aData, int aLineStart, int aColumnStart, int aLineEnd, int aColumnEnd, out int oCharStart, out int oCharCount) {
+			int xCurrentPos = 0;
+			int xCurrentLine = 1;
+			oCharCount = 0;
+			oCharStart = 0;
+			while (xCurrentPos < aData.Length) {
+				int xTempPos = aData.IndexOfAny(new char[] { '\r', '\n' }, xCurrentPos);
+				if (xTempPos == -1) {
+					if (oCharStart > 0) {
+						oCharCount = xCurrentPos - oCharStart;
+					}
+					return;
+				}
+				xCurrentLine += 1;
+				xCurrentPos = xTempPos;
+				if (aData[xCurrentPos] == '\r' && aData.Length > (xCurrentPos + 1) && aData[xCurrentPos + 1] == '\n') {
+					xCurrentPos += 2;
+				} else {
+					xCurrentPos += 1;
+				}
+				if (xCurrentLine == aLineStart) {
+					oCharStart = xCurrentPos + aColumnStart;
+				}
+				if (xCurrentLine == aLineEnd) {
+					oCharCount = (xCurrentPos + aColumnEnd) - oCharStart;
+				}
+				if (oCharCount > 0 && oCharStart > 0) {
+					return;
+				}
+			}
+		}
 
+		private void lboxLog_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
+			var xItem = lboxLog.SelectedItem;
+			string xItemStr = xItem as String;
+			if (MessageBox.Show("Do you want to do analysis? (Press no if you dont know)", "Debug", MessageBoxButton.YesNo) != MessageBoxResult.Yes) {
+				if (!String.IsNullOrEmpty(xItemStr)) {
+					if (mDebugMode == DebugModeEnum.Source) {
+						var xSourceInfo = mSourceMappings.GetMapping(UInt32.Parse(xItemStr.Substring(2), System.Globalization.NumberStyles.HexNumber));
+						var xViewSrc = new ViewSourceWindow();
+						//int xCharStart;
+						//int xCharCount;
+						//GetLineInfo(xViewSrc.tboxSource.Text, xSourceInfo.Line, xSourceInfo.Column, xSourceInfo.LineEnd, xSourceInfo.ColumnEnd, out xCharStart, out xCharCount);
+						//if(
+						int xCharStart = xViewSrc.tboxSource.GetCharacterIndexFromLineIndex(xSourceInfo.Line);
+						int xCharEnd = xViewSrc.tboxSource.GetCharacterIndexFromLineIndex(xSourceInfo.LineEnd);
+						xCharStart += xSourceInfo.Column;
+						xCharEnd += xSourceInfo.ColumnEnd;
+						xViewSrc.tboxSource.Text = File.ReadAllText(xSourceInfo.SourceFile);
+						xViewSrc.tboxSource.ScrollToLine(xSourceInfo.Line);
+						xViewSrc.tboxSource.Select(xCharStart, xCharEnd - xCharStart);
+						xViewSrc.ShowDialog();
+					} else {
+						throw new Exception("Debug mode not supported!");
+					}
+					//xViewSrc.tboxSource.s
+				}
+			} else {
+				var xViewSrc = new ViewSourceWindow();
+				foreach (var xEIP in (from item in lboxLog.Items.Cast<string>()
+									  select item).Distinct(StringComparer.InvariantCultureIgnoreCase)) {
+					var xSourceInfo = mSourceMappings.GetMapping(UInt32.Parse(xEIP.Substring(2), System.Globalization.NumberStyles.HexNumber));
+					if (xSourceInfo == null) {
+						//MessageBox.Show("No source found for " + xEIP);
+						continue;
+					}
+					//var xViewSrc = new ViewSourceWindow();
+					//int xCharStart;
+					//int xCharCount;
+					//GetLineInfo(xViewSrc.tboxSource.Text, xSourceInfo.Line, xSourceInfo.Column, xSourceInfo.LineEnd, xSourceInfo.ColumnEnd, out xCharStart, out xCharCount);
+					//if(
+					int xCharStart = xViewSrc.tboxSource.GetCharacterIndexFromLineIndex(xSourceInfo.Line);
+					int xCharEnd = xViewSrc.tboxSource.GetCharacterIndexFromLineIndex(xSourceInfo.LineEnd);
+					if ((xCharEnd - xCharStart) > 4) {
+						MessageBox.Show(xEIP);
+						break;
+					}
+				}
+			}
+		}
 	}
 }

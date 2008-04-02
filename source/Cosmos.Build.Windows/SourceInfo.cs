@@ -10,8 +10,8 @@ using Indy.IL2CPU.IL;
 
 namespace Cosmos.Build.Windows {
 	public class SourceInfos: SortedList<uint, SourceInfo> {
-		public SourceInfo GetIndexClosestSmallerMatch(uint aValue) {
-			for (int i = 0; i < Count; i++) {
+		public SourceInfo GetMapping(uint aValue) {
+			for (int i = Count - 1; i >=0; i--) {
 				if (Keys[i] <= aValue) {
 					return Values[i];
 				} else {

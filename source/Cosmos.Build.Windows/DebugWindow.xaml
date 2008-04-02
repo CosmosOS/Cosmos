@@ -6,6 +6,6 @@
         <TextBlock Height="79" Name="textBlock1" VerticalAlignment="Top" TextWrapping="WrapWithOverflow">This is the debug window. Coming soon! For now, leave me open until you are done. Close and the application will terminate.</TextBlock>
         <Label Height="28" Margin="11,55,140,0" Name="label1" VerticalAlignment="Top">Executing Instruction Pointer(EIP):</Label>
         <Label Height="28" Margin="0,55,14,0" Name="lablEIP" VerticalAlignment="Top" HorizontalAlignment="Right" Width="126"></Label>
-        <ListBox FontFamily="Consolas" Margin="10,84,14,8" Name="lboxLog" />
+        <ListBox FontFamily="Consolas" Margin="10,84,14,8" Name="lboxLog" MouseDoubleClick="lboxLog_MouseDoubleClick" />
     </Grid>
 </Window>

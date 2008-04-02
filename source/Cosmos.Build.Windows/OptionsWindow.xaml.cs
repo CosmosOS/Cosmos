@@ -57,7 +57,6 @@ namespace Cosmos.Build.Windows {
 					} else {
 						throw new Exception("Debug mode not supported!");
 					}
-
 					xDebugWindow.ShowDialog();
 				}
 			}
