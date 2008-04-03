@@ -348,7 +348,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         /// </summary>
         /// <param name="bytearray"></param>
         /// <param name="address"></param>
-        private unsafe void WriteAddressToPCI(ref byte[] bytearray, uint address)
+        private void WriteAddressToPCI(ref byte[] bytearray, uint address)
         {
 
             /* The data in the bytearray contains the actual bytes we want to transfer to the network.
@@ -358,10 +358,24 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
              */
 
 
+            //fixed (byte* bodystart = bytearray)
+            //{
+            //    IntPtr bodyAddress = (IntPtr)bodystart;
+            //    IOSpace.Write32(address, (uint)bodystart);
+            //}
+
+            IOSpace.Write32(address, GetMemoryAddress(ref bytearray));
+        }
+
+        /// <summary>
+        /// Get the 32-bit address where the bytearray is stored.
+        /// </summary>
+        private unsafe UInt32 GetMemoryAddress(ref byte[] bytearray)
+        {
             fixed (byte* bodystart = bytearray)
             {
                 IntPtr bodyAddress = (IntPtr)bodystart;
-                IOSpace.Write32(address, (uint)bodystart);
+                return (UInt32)bodystart;
             }
         }
 
