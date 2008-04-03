@@ -14,8 +14,6 @@ namespace Cosmos.Build.Windows {
 			for (int i = Count - 1; i >=0; i--) {
 				if (Keys[i] <= aValue) {
 					return Values[i];
-				} else {
-					return null;
 				}
 			}
 			return null;

@@ -128,13 +128,18 @@ namespace Cosmos.Build.Windows {
 						//int xCharCount;
 						//GetLineInfo(xViewSrc.tboxSource.Text, xSourceInfo.Line, xSourceInfo.Column, xSourceInfo.LineEnd, xSourceInfo.ColumnEnd, out xCharStart, out xCharCount);
 						//if(
-						int xCharStart = xViewSrc.tboxSource.GetCharacterIndexFromLineIndex(xSourceInfo.Line);
-						int xCharEnd = xViewSrc.tboxSource.GetCharacterIndexFromLineIndex(xSourceInfo.LineEnd);
-						xCharStart += xSourceInfo.Column;
-						xCharEnd += xSourceInfo.ColumnEnd;
+						//int xCharStart = xViewSrc.tboxSource.GetCharacterIndexFromLineIndex(xSourceInfo.Line);
+						//int xCharEnd = xViewSrc.tboxSource.GetCharacterIndexFromLineIndex(xSourceInfo.LineEnd);
+						//xCharStart += xSourceInfo.Column;
+						//xCharEnd += xSourceInfo.ColumnEnd;
+						int xCharStart;
+						int xCharLength;
 						xViewSrc.tboxSource.Text = File.ReadAllText(xSourceInfo.SourceFile);
-						xViewSrc.tboxSource.ScrollToLine(xSourceInfo.Line);
-						xViewSrc.tboxSource.Select(xCharStart, xCharEnd - xCharStart);
+						GetLineInfo(xViewSrc.tboxSource.Text, xSourceInfo.Line, xSourceInfo.Column, xSourceInfo.LineEnd, xSourceInfo.ColumnEnd, out xCharStart, out xCharLength);
+						//xViewSrc.tboxSource.ScrollToLine(xSourceInfo.Line);
+						//xViewSrc.tboxSource.Select(xCharStart, xCharEnd - xCharStart);
+						xViewSrc.CharStart = xCharStart - 1;
+						xViewSrc.CharLength = xCharLength;
 						xViewSrc.ShowDialog();
 					} else {
 						throw new Exception("Debug mode not supported!");
@@ -143,25 +148,35 @@ namespace Cosmos.Build.Windows {
 				}
 			} else {
 				var xViewSrc = new ViewSourceWindow();
-				foreach (var xEIP in (from item in lboxLog.Items.Cast<string>()
-									  select item).Distinct(StringComparer.InvariantCultureIgnoreCase)) {
-					var xSourceInfo = mSourceMappings.GetMapping(UInt32.Parse(xEIP.Substring(2), System.Globalization.NumberStyles.HexNumber));
-					if (xSourceInfo == null) {
-						//MessageBox.Show("No source found for " + xEIP);
+				List<string> xItems = new List<string>();
+				for (int i = lboxLog.Items.Count - 1; i >= 0; i--) {
+					string xEIP = lboxLog.Items[i] as string;
+					if (xItems.Contains(xEIP, StringComparer.InvariantCultureIgnoreCase)) {
+						lboxLog.Items.RemoveAt(i);
 						continue;
 					}
-					//var xViewSrc = new ViewSourceWindow();
-					//int xCharStart;
-					//int xCharCount;
-					//GetLineInfo(xViewSrc.tboxSource.Text, xSourceInfo.Line, xSourceInfo.Column, xSourceInfo.LineEnd, xSourceInfo.ColumnEnd, out xCharStart, out xCharCount);
-					//if(
-					int xCharStart = xViewSrc.tboxSource.GetCharacterIndexFromLineIndex(xSourceInfo.Line);
-					int xCharEnd = xViewSrc.tboxSource.GetCharacterIndexFromLineIndex(xSourceInfo.LineEnd);
-					if ((xCharEnd - xCharStart) > 4) {
-						MessageBox.Show(xEIP);
-						break;
+					var xSourceInfo = mSourceMappings.GetMapping(UInt32.Parse(xEIP.Substring(2), System.Globalization.NumberStyles.HexNumber));
+					if (xSourceInfo == null) {
+						lboxLog.Items.RemoveAt(i);
+						continue;
 					}
 				}
+				//foreach (var xEIP in (from item in lboxLog.Items.Cast<string>()
+				//                      select item).Distinct(StringComparer.InvariantCultureIgnoreCase)) {
+
+				//    //var xViewSrc = new ViewSourceWindow();
+				//    //int xCharStart;
+				//    //int xCharCount;
+				//    //GetLineInfo(xViewSrc.tboxSource.Text, xSourceInfo.Line, xSourceInfo.Column, xSourceInfo.LineEnd, xSourceInfo.ColumnEnd, out xCharStart, out xCharCount);
+				//    //if(
+				//    int xCharStart = xViewSrc.tboxSource.GetCharacterIndexFromLineIndex(xSourceInfo.Line);
+				//    int xCharEnd = xViewSrc.tboxSource.GetCharacterIndexFromLineIndex(xSourceInfo.LineEnd);
+				//    if ((xCharEnd - xCharStart) > 4) {
+				//        MessageBox.Show(xEIP);
+				//        return;
+				//    }
+				//}
+				MessageBox.Show("Analysis finished!");
 			}
 		}
 	}

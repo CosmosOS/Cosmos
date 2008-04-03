@@ -19,5 +19,14 @@ namespace Cosmos.Build.Windows {
 		public ViewSourceWindow() {
 			InitializeComponent();
 		}
+
+		public int CharStart;
+		public int CharLength;
+
+		private void Window_Loaded(object sender, RoutedEventArgs e) {
+			tboxSource.Focus();
+			tboxSource.Select(CharStart, CharLength);
+		}
+
 	}
 }
