@@ -32,6 +32,12 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             return (data & mask) != 0;
         }
 
+        public static bool CheckBit(byte data, byte bit)
+        {
+            byte mask = (byte)(1 << bit);
+            return (data & mask) != 0;
+        }
+
         /// <summary>
         /// Changes the value in the given position. Change bitvalue from low to high, or high to low.
         /// Returns the same byte, but with one bit changed.

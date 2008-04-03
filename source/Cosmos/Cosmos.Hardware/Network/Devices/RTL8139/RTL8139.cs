@@ -99,7 +99,6 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         {
             get
             {
-                //var tcr = Register.TransmitConfigurationRegister.Load(pciCard);
                 var tcr = Register.TransmitConfigurationRegister.Load(mem);
                 return tcr.LoopbackMode;
             }
@@ -155,8 +154,8 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
 
         public bool IsReceiveBufferEmpty()
         {
-            var cr = Register.CommandRegister.Load(pciCard);
-            return cr.IsRxBufferEmpty();
+            var cr = Register.CommandRegister.Load(mem);
+            return cr.RxBufferEmpty;
         }
 
         public override string Name
@@ -184,11 +183,11 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         public void SoftReset()
         {
             //Tell RTL chip to issue a Reset`
-            regs.CommandRegister |= Register.CommandRegister.BitValue.RST;
-
+            var cr = Register.CommandRegister.Load(mem);
+            cr.Reset = true;
+            
             //Wait while RST bit is active
-            var cr = Register.CommandRegister.Load(pciCard);
-            while (cr.IsResetStatus())
+            while (cr.Reset)
             {
                 Console.WriteLine("Reset in progress");
             }
@@ -212,18 +211,15 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         /// </summary>
         private void SetIRQMaskRegister()
         {
-            byte mask = (byte)
-                (Register.InterruptMaskRegister.Bit.ROK & 
-                Register.InterruptMaskRegister.Bit.TOK &
-                Register.InterruptMaskRegister.Bit.RER &
+            //Note; The reference driver from Realtek sets mask = 0x7F (all bits high).
+            regs.IntrMask = (Register.CommandRegister.BitValue)
+                (
+                Register.InterruptMaskRegister.Bit.ROK & 
+                Register.InterruptMaskRegister.Bit.TOK & 
+                Register.InterruptMaskRegister.Bit.RER & 
                 Register.InterruptMaskRegister.Bit.TER
                 );
-
-            //Note; The reference driver from Realtek sets mask = 0x7F (all bits high).
-            //mask = 0x7F;
-
-            UInt32 address = pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.IntrMask;
-            IOSpace.Write8(address, mask);
+ 
         }
 
         /// <summary>
@@ -246,11 +242,10 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         /// </summary>
         private void EnableRecieve()
         {
-            //regs.ChipCmd |= Register.MainRegister.ChipCommandFlags.RE;
-            regs.CommandRegister |= Register.CommandRegister.BitValue.RE;
+            //regs.CommandRegister |= Register.CommandRegister.BitValue.RE;
 
-            //var cr = Register.CommandRegister.Load(pciCard);
-            //cr.IsRxEnabled = true;
+            var cr = Register.CommandRegister.Load(mem);
+            cr.RxEnabled = true;
         }
 
         /// <summary>
@@ -258,22 +253,22 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         /// </summary>
         private void EnableTransmit()
         {
-            //regs.ChipCmd |= Register.MainRegister.ChipCommandFlags.TE;
-            regs.CommandRegister |= Register.CommandRegister.BitValue.TE;
+            var cr = Register.CommandRegister.Load(mem);
+            cr.TxEnabled = true;
         }
 
         public bool IsTxEnabled()
         {
             //Whole method is just for testing
-            var cr = Register.CommandRegister.Load(pciCard);
-            return cr.IsTxEnabled();
+            var cr = Register.CommandRegister.Load(mem);
+            return cr.TxEnabled;
         }
 
         public bool IsRxEnabled()
         {
             //Whole method is just for testing
-            var cr = Register.CommandRegister.Load(pciCard);
-            return cr.IsRxEnabled();
+            var cr = Register.CommandRegister.Load(mem);
+            return cr.RxEnabled;
         }
 
         /// <summary>
@@ -367,7 +362,6 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             {
                 IntPtr bodyAddress = (IntPtr)bodystart;
                 IOSpace.Write32(address, (uint)bodystart);
-                //Console.WriteLine("Address where buffer is stored: " + (uint)bodyAddress);
             }
         }
 
@@ -394,12 +388,6 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             var tsd = Register.TransmitStatusDescriptor.Load(pciCard);
             tsd.Size = packet.PacketBody.Length;
             Console.WriteLine("Told NIC to send " + tsd.Size + " bytes.");
-
-            //Print packet
-            /*for (int i = 0; i < tsd.Size; i++)
-            {
-                Console.Write(TxBuffer1[i] + ":");
-            }*/
 
             SetEarlyTxThreshold(1024);
             Console.WriteLine("Sending packet...");

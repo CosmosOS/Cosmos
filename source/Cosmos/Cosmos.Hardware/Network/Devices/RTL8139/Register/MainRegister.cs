@@ -51,28 +51,32 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
             }
         }
 
+        [Obsolete]
         public byte Config0
         {
             get { return mem.Read8Unchecked((UInt32)Bit.Config0); }
             set { mem.Write8Unchecked((UInt32)Bit.Config0, value); }
         }
+        [Obsolete]
         public byte Config1
         {
             get { return mem.Read8Unchecked((UInt32)Bit.Config1); }
             set { mem.Write8Unchecked((UInt32)Bit.Config1, value); }
         }
 
+        [Obsolete]
         public UInt32 TxConfig
         {
             get { return mem.Read32((UInt32)Bit.TxConfig); }
             set { mem.Write32((UInt32)Bit.TxConfig, value); }
         }
 
-        public CommandRegister.BitValue CommandRegister
-        {
-            get { return (CommandRegister.BitValue)mem.Read8Unchecked((UInt32)Bit.ChipCmd); }
-            set { mem.Write8Unchecked((UInt32)Bit.ChipCmd, (byte)value); }
-        }
+        [Obsolete]
+        //public CommandRegister.BitValue CommandRegister
+        //{
+        //    get { return (CommandRegister.BitValue)mem.Read8Unchecked((UInt32)Bit.ChipCmd); }
+        //    set { mem.Write8Unchecked((UInt32)Bit.ChipCmd, (byte)value); }
+        //}
 
         /// <summary>
         /// Current Address of RX pointer. Also known as CAPR.
@@ -81,6 +85,12 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
         {
             get { return (CommandRegister.BitValue)mem.Read16Unchecked((UInt32)Bit.RxBufPtr); }
             set { mem.Write16Unchecked((UInt32)Bit.RxBufPtr, (UInt16)value); }
+        }
+
+        public CommandRegister.BitValue IntrMask
+        {
+            get { return (CommandRegister.BitValue)mem.Read16Unchecked((UInt32)Bit.IntrMask); }
+            set { mem.Write16Unchecked((UInt32)Bit.IntrMask, (UInt16)value); }
         }
 
         /// <summary>

@@ -13,6 +13,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
     /// </summary>
     class InterruptMaskRegister
     {
+        [Flags]
         public enum Bit : byte
         {
             ROK = 0x00,     //Receive (Rx) OK

@@ -14,21 +14,17 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
     /// </summary>
     public class CommandRegister
     {
-        //private byte cmd;
+        #region Constructor
 
-        private PCIDevice pcicard = null;
-        private UInt32 crAddress = 0;
-
-        public static CommandRegister Load(PCIDevice pci)
+        private MemoryAddressSpace xMem;
+        public static CommandRegister Load(MemoryAddressSpace aMem)
         {
-            UInt32 address = pci.BaseAddress1 + (byte)MainRegister.Bit.ChipCmd;
-            return new CommandRegister(pci, address);
+            return new CommandRegister(aMem);
         }
 
-        private CommandRegister(PCIDevice pci, UInt32 adr)
+        private CommandRegister(MemoryAddressSpace aMem)
         {
-            pcicard = pci;
-            crAddress = adr;
+            xMem = aMem;
         }
 
         /// <summary>
@@ -37,29 +33,64 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
         /// <returns></returns>
         public byte CR
         {
-            get { return IOSpace.Read8(crAddress); }
-            set { IOSpace.Write8(crAddress, value); }
+            get 
+            {
+                return xMem.Read8((UInt32)Register.MainRegister.Bit.ChipCmd);
+            }
+            set 
+            {
+                xMem.Write8((UInt32)Register.MainRegister.Bit.ChipCmd, value);
+            }
         }
 
-        public bool IsRxBufferEmpty()
+        #endregion
+
+        #region Register data
+
+        public bool Reset
         {
-            return BinaryHelper.CheckBit(this.CR, (byte)BitPosition.BUFE);
+            get { return GetBit(BitPosition.RST); }
+            set { SetBit(BitValue.RST, value); }
         }
 
-        public bool IsResetStatus()
+        public bool RxEnabled
         {
-            return BinaryHelper.CheckBit(this.CR, (byte)BitPosition.RST);
+            get { return GetBit(BitPosition.RE); }
+            set { SetBit(BitValue.RE, value); }
         }
 
-        public bool IsRxEnabled()
+        public bool TxEnabled
         {
-            return BinaryHelper.CheckBit(this.CR, (byte)BitPosition.RE);
+            get { return GetBit(BitPosition.TE); }
+            set { SetBit(BitValue.TE, value); }
         }
 
-        public bool IsTxEnabled()
+        public bool RxBufferEmpty 
         {
-            return BinaryHelper.CheckBit(this.CR, (byte)BitPosition.TE);
+            get { return GetBit(BitPosition.BUFE); }
+            private set { ; }
         }
+
+        #endregion
+
+        #region Accessors
+
+        private bool GetBit(BitPosition bit)
+        {
+            return BinaryHelper.CheckBit(this.CR, (byte)bit);
+        }
+
+        private void SetBit(BitValue bit, bool value)
+        {
+            if (value)
+                this.CR = (byte)(this.CR | (byte)bit);
+            else
+                this.CR = (byte)(this.CR & ~(byte)bit);
+        }
+
+        #endregion
+
+        #region Bits
 
         /// <summary>
         /// Bits used to issue commands to the RTL. Used in conjunction with register CHIPCMD (0x37h)
@@ -79,5 +110,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
             RE = BinaryHelper.BitPos.BIT3,
             RST = BinaryHelper.BitPos.BIT4
         }
+
+        #endregion
     }
 }
