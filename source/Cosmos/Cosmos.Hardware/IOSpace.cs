@@ -7,6 +7,7 @@ namespace Cosmos.Hardware
     /// <summary>
     /// The IOSpace class is used to access memory directly.
     /// </summary>
+    [Obsolete()]
     public static class IOSpace
     {
         #region Read from IO space

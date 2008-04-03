@@ -14,19 +14,16 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
     /// </summary>
     public class TransmitConfigurationRegister
     {
-        private PCIDevice pci;
-        private UInt32 tcrAddress;
-        private TransmitConfigurationRegister(UInt32 data, PCIDevice hw, UInt32 adr)
+        private MemoryAddressSpace xMem;
+
+        private TransmitConfigurationRegister(MemoryAddressSpace aMem)
         {
-            pci = hw;
-            tcrAddress = adr;
+            xMem = aMem;
         }
-        
-        public static TransmitConfigurationRegister Load(PCIDevice pcicard)
+
+        public static TransmitConfigurationRegister Load(MemoryAddressSpace aMem)
         {
-            UInt32 address = pcicard.BaseAddress1 + (byte)MainRegister.Bit.TxConfig;
-            UInt32 foundbytes = IOSpace.Read32(address);
-            return new TransmitConfigurationRegister(foundbytes, pcicard, address);
+            return new TransmitConfigurationRegister(aMem);
         }
 
         public void Init()
@@ -43,11 +40,11 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
         {
             get
             {
-                return IOSpace.Read32(tcrAddress);
+                return xMem.Read32Unchecked((UInt32)Register.MainRegister.Bit.TxConfig);
             }
             private set
             {
-                IOSpace.Write32(tcrAddress, value);
+                xMem.Write32Unchecked((UInt32)Register.MainRegister.Bit.TxConfig, value);
             }
         }
 

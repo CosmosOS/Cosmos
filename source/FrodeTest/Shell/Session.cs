@@ -92,6 +92,8 @@ namespace FrodeTest.Shell
                 Console.WriteLine();
                 Console.WriteLine("Loopback enabled?: " + nic.LoopbackMode.ToString());
                 Console.WriteLine("NIC enabled?: " + nic.IsEnabled.ToString());
+                Console.WriteLine("TX enabled?: " + nic.IsTxEnabled().ToString());
+                Console.WriteLine("RX enabled?: " + nic.IsRxEnabled().ToString());
                 Console.WriteLine("Promiscuous mode?: " + nic.PromiscuousMode.ToString());
                 
                 int xByteCount = 0;
@@ -100,7 +102,7 @@ namespace FrodeTest.Shell
                     if (b != 0x00)
                         xByteCount++;
                 }
-                Console.WriteLine("Read buffer contains " + xByteCount.ToString() + " bytes with data.");
+                Console.WriteLine("Read buffer contains " + xByteCount.ToString() + " non-zero bytes with data.");
                 Console.WriteLine("Read buffer empty flag? : " + nic.IsReceiveBufferEmpty());
             }
             else if (command.Equals("reset"))

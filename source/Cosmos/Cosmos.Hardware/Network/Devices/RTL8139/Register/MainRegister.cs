@@ -53,62 +53,34 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
 
         public byte Config0
         {
-            get
-            {
-                return mem.Read8Unchecked((UInt32)Bit.Config0);
-            }
-            set
-            {
-                mem.Write8Unchecked((UInt32)Bit.Config0, value);
-            }
+            get { return mem.Read8Unchecked((UInt32)Bit.Config0); }
+            set { mem.Write8Unchecked((UInt32)Bit.Config0, value); }
         }
         public byte Config1
         {
-            get
-            {
-                return mem.Read8Unchecked((UInt32)Bit.Config1);
-            }
-            set
-            {
-                mem.Write8Unchecked((UInt32)Bit.Config1, value);
-            }
+            get { return mem.Read8Unchecked((UInt32)Bit.Config1); }
+            set { mem.Write8Unchecked((UInt32)Bit.Config1, value); }
         }
 
         public UInt32 TxConfig
         {
-            get
-            {
-                return mem.Read32((UInt32)Bit.TxConfig);
-            }
-            set
-            {
-                mem.Write32((UInt32)Bit.TxConfig, value);
-            }
+            get { return mem.Read32((UInt32)Bit.TxConfig); }
+            set { mem.Write32((UInt32)Bit.TxConfig, value); }
         }
 
-        public ChipCommandFlags ChipCmd
+        public CommandRegister.BitValue CommandRegister
         {
-            get
-            {
-                return (ChipCommandFlags)mem.Read8Unchecked((UInt32)Bit.ChipCmd);
-            }
-            set
-            {
-                mem.Write8Unchecked((UInt32)Bit.ChipCmd, (byte)value);
-            }
-        }
-        public bool ChipCmdTest(ChipCommandFlags mask)
-        {
-            return (ChipCmd & mask) == mask;
+            get { return (CommandRegister.BitValue)mem.Read8Unchecked((UInt32)Bit.ChipCmd); }
+            set { mem.Write8Unchecked((UInt32)Bit.ChipCmd, (byte)value); }
         }
 
-        [Flags]
-        public enum ChipCommandFlags : byte
+        /// <summary>
+        /// Current Address of RX pointer. Also known as CAPR.
+        /// </summary>
+        public CommandRegister.BitValue RxBufPtr
         {
-            BUFE = 1,
-            TE = 4,
-            RE = 8,
-            RST = 16
+            get { return (CommandRegister.BitValue)mem.Read16Unchecked((UInt32)Bit.RxBufPtr); }
+            set { mem.Write16Unchecked((UInt32)Bit.RxBufPtr, (UInt16)value); }
         }
 
         /// <summary>
@@ -118,11 +90,11 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
         {
             MAC0 = 0x00,            // Ethernet hardware address
             MAR0 = 0x08,            // Multicast filter
-            TSD0 = 0x10,       // Transmit status (Four 32bit registers)
+            TSD0 = 0x10,            // Transmit status (Four 32bit registers)
             TSD1 = 0x14,
             TSD2 = 0x18,
             TSD3 = 0x1C,
-            TSAD0 = 0x20,         // Tx descriptors (also four 32bit)
+            TSAD0 = 0x20,           // Tx descriptors (also four 32bit)
             TSAD1 = 0x24,
             TSAD2 = 0x28,
             TSAD3 = 0x2C,
@@ -130,8 +102,8 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
             RxEarlyCnt = 0x34,
             RxEarlyStatus = 0x36,
             ChipCmd = 0x37,
-            RxBufPtr = 0x38,
-            RxBufAddr = 0x3A,
+            RxBufPtr = 0x38,        // Current Address of Packet Read
+            RxBufAddr = 0x3A,       // Current Buffer Address
             IntrMask = 0x3C,
             IntrStatus = 0x3E,
             TxConfig = 0x40,

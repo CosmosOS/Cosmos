@@ -51,6 +51,16 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
             return BinaryHelper.CheckBit(this.CR, (byte)BitPosition.RST);
         }
 
+        public bool IsRxEnabled()
+        {
+            return BinaryHelper.CheckBit(this.CR, (byte)BitPosition.RE);
+        }
+
+        public bool IsTxEnabled()
+        {
+            return BinaryHelper.CheckBit(this.CR, (byte)BitPosition.TE);
+        }
+
         /// <summary>
         /// Bits used to issue commands to the RTL. Used in conjunction with register CHIPCMD (0x37h)
         /// </summary>

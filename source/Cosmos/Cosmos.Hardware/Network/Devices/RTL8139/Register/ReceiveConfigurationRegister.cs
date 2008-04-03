@@ -13,26 +13,22 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
     /// </summary>
     public class ReceiveConfigurationRegister
     {
-        private PCIDevice pci;
-        private UInt32 rcrAddress;
+        private MemoryAddressSpace xMem;
 
-        public static ReceiveConfigurationRegister Load(PCIDevice pcicard)
+        public static ReceiveConfigurationRegister Load(MemoryAddressSpace aMem)
         {
-            UInt32 address = pcicard.BaseAddress1 + (byte)MainRegister.Bit.RxConfig;
-            return new ReceiveConfigurationRegister(pcicard, address);
+            return new ReceiveConfigurationRegister(aMem);
         }
-
-        public ReceiveConfigurationRegister(PCIDevice hw, UInt32 adr)
+        
+        private ReceiveConfigurationRegister(MemoryAddressSpace aMem)
         {
-            pci = hw;
-            rcrAddress = adr;
+            xMem = aMem;
         }
 
         public void Init()
         {
             UInt32 data = (UInt32)(BitValue.RBLEN0 | BitValue.MXDMA0 | BitValue.MXDMA1 | BitValue.AB | BitValue.AM | BitValue.APM);
-            //Console.WriteLine("Data in INIT for RX is: " + data);
-            IOSpace.Write32(rcrAddress, data);
+            this.RCR = data;
         }
 
         /// <summary>
@@ -41,12 +37,12 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
         public UInt32 RCR 
         { 
             get 
-            { 
-                return IOSpace.Read32(rcrAddress);
+            {
+                return xMem.Read32((UInt32)Register.MainRegister.Bit.RxConfig);
             } 
             private set 
             {
-                IOSpace.Write32(rcrAddress, value);
+                xMem.Write32((UInt32)Register.MainRegister.Bit.RxConfig, value);
             } 
         }
 

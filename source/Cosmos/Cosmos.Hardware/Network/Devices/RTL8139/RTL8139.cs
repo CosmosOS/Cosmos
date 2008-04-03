@@ -52,27 +52,12 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         #region NetworkDevice members
         public override MACAddress MACAddress
         {
-            get 
-            { 
-                //Polls the PCI device for the MAC address
-                /*byte[] bytes = new byte[6];
-                for (int i = 0; i < 6; i++)
-                {
-                    uint address = (uint)(pciCard.BaseAddress1 + i);
-                    bytes[i] = IOSpace.Read8(address);
-                }
-
-                MACAddress mac = new MACAddress(bytes);
-                return mac;            
-                 * */
-
-                return regs.Mac;
-            }
+            get { return regs.Mac; }
         }
 
         public string GetHardwareRevision()
         {
-            var tcr = Register.TransmitConfigurationRegister.Load(pciCard);
+            var tcr = Register.TransmitConfigurationRegister.Load(mem);
             return Register.TransmitConfigurationRegister.GetHardwareRevision(tcr.GetHWVERID());
         }
 
@@ -90,11 +75,11 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             InitReceiveBuffer();
 
             //Setting Transmit configuration
-            var tcr = Register.TransmitConfigurationRegister.Load(pciCard);
+            var tcr = Register.TransmitConfigurationRegister.Load(mem);
             tcr.Init();
             
             //Setting Receive configuration
-            var rcr = Register.ReceiveConfigurationRegister.Load(pciCard);
+            var rcr = Register.ReceiveConfigurationRegister.Load(mem);
             rcr.Init();
             rcr.PromiscuousMode = true;
             
@@ -114,12 +99,13 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         {
             get
             {
-                var tcr = Register.TransmitConfigurationRegister.Load(pciCard);
+                //var tcr = Register.TransmitConfigurationRegister.Load(pciCard);
+                var tcr = Register.TransmitConfigurationRegister.Load(mem);
                 return tcr.LoopbackMode;
             }
             set
             {
-                var tcr = Register.TransmitConfigurationRegister.Load(pciCard);
+                var tcr = Register.TransmitConfigurationRegister.Load(mem);
                 tcr.LoopbackMode = value;
             }
         }
@@ -128,12 +114,12 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         {
             get
             {
-                var rcr = Register.ReceiveConfigurationRegister.Load(pciCard);
+                var rcr = Register.ReceiveConfigurationRegister.Load(mem);
                 return rcr.PromiscuousMode;
             }
             set
             {
-                var rcr = Register.ReceiveConfigurationRegister.Load(pciCard);
+                var rcr = Register.ReceiveConfigurationRegister.Load(mem);
                 rcr.PromiscuousMode = value;
             }
 
@@ -197,18 +183,15 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         /// </summary>
         public void SoftReset()
         {
-            Console.WriteLine("Performing software reset of RTL8139");
-           
             //Tell RTL chip to issue a Reset`
-            regs.ChipCmd = Register.MainRegister.ChipCommandFlags.RST;
+            regs.CommandRegister |= Register.CommandRegister.BitValue.RST;
 
             //Wait while RST bit is active
-            while (regs.ChipCmdTest(Register.MainRegister.ChipCommandFlags.RST))
+            var cr = Register.CommandRegister.Load(pciCard);
+            while (cr.IsResetStatus())
             {
-                Console.WriteLine("Reset in progress...");
+                Console.WriteLine("Reset in progress");
             }
-
-            Console.WriteLine("Reset Complete!");
         }
 
         #endregion
@@ -263,7 +246,11 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         /// </summary>
         private void EnableRecieve()
         {
-            regs.ChipCmd = Register.MainRegister.ChipCommandFlags.TE;
+            //regs.ChipCmd |= Register.MainRegister.ChipCommandFlags.RE;
+            regs.CommandRegister |= Register.CommandRegister.BitValue.RE;
+
+            //var cr = Register.CommandRegister.Load(pciCard);
+            //cr.IsRxEnabled = true;
         }
 
         /// <summary>
@@ -271,7 +258,22 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         /// </summary>
         private void EnableTransmit()
         {
-            regs.ChipCmd = Register.MainRegister.ChipCommandFlags.TE;
+            //regs.ChipCmd |= Register.MainRegister.ChipCommandFlags.TE;
+            regs.CommandRegister |= Register.CommandRegister.BitValue.TE;
+        }
+
+        public bool IsTxEnabled()
+        {
+            //Whole method is just for testing
+            var cr = Register.CommandRegister.Load(pciCard);
+            return cr.IsTxEnabled();
+        }
+
+        public bool IsRxEnabled()
+        {
+            //Whole method is just for testing
+            var cr = Register.CommandRegister.Load(pciCard);
+            return cr.IsRxEnabled();
         }
 
         /// <summary>
@@ -310,13 +312,13 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         }
 
         /// <summary>
-        /// Initialize the Receive Buffer. The RBSTART register consists of 4 bytes (0x30h to 0x33h) which should contain
+        /// Initialize the Receive Buffer. The RBSTART register consists of 4 bytes (32-bits at 0x30h to 0x33h) which should contain
         /// the address of a buffer to save incoming data to.
         /// </summary>
         private void InitReceiveBuffer()
         {
             //Prepare a buffer area
-            RxBuffer = new byte[2048];
+            RxBuffer = new byte[50];
 
             UInt32 address = pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.RxBuf;
 
