@@ -46,8 +46,7 @@ namespace Cosmos.Build.Windows {
 				//Debug Window is only displayed if Qemu + Debug checked, or if other VM + Debugport selected
 				bool xIsQemu = xOptionsWindow.rdioQEMU.IsChecked.Value;
 				bool xUseQemuDebug = xOptionsWindow.chckQEMUUseDebug.IsChecked.Value;
-				int xDebugPort = xOptionsWindow.cmboDebugPort.SelectedIndex;
-				if ((xIsQemu & xUseQemuDebug) | (!xIsQemu & (xDebugPort > 0))) {
+				if (((xIsQemu & xUseQemuDebug) | (!xIsQemu & (xOptionsWindow.mComport > 0))) && xOptionsWindow.mDebugMode != DebugModeEnum.None) {
 					var xDebugWindow = new DebugWindow();
 					if (xOptionsWindow.cmboDebugMode.SelectedIndex == 1) {
 						// source debugging
@@ -144,7 +143,8 @@ namespace Cosmos.Build.Windows {
 			cmboDebugPort.Items.Add("Ethernet 4");
 
 			cmboDebugMode.Items.Add("IL");
-			cmboDebugMode.SelectedIndex = cmboDebugMode.Items.Add("Source");
+			cmboDebugMode.Items.Add("Source");
+			cmboDebugMode.SelectedIndex = cmboDebugMode.Items.Add("None");
 
 			LoadSettingsFromRegistry();
 		}
@@ -162,37 +162,43 @@ namespace Cosmos.Build.Windows {
 		void butnBuild_Click(object sender, RoutedEventArgs e) {
 			DialogResult = true;
 		}
-
+		DebugModeEnum mDebugMode;
+		byte mComport;
 		protected void DoBuild() {
 			SaveSettingsToRegistry();
 
-			if (chckCompileIL.IsChecked.Value) {
-				Console.WriteLine("Compiling...");
-				byte xComport = (byte)cmboDebugPort.SelectedIndex;
-				if (xComport > 3) {
-					throw new Exception("Debug port not supported yet!");
-				}
-				xComport++;
-				DebugModeEnum xDebugMode = DebugModeEnum.None;
-				if (cmboDebugMode.SelectedIndex == 0) {
-					xDebugMode = DebugModeEnum.IL;
+			mComport = (byte)cmboDebugPort.SelectedIndex;
+			if (mComport > 3) {
+				throw new Exception("Debug port not supported yet!");
+			}
+			mComport++;
+			mDebugMode = DebugModeEnum.None;
+			if (cmboDebugMode.SelectedIndex == 0) {
+				mDebugMode = DebugModeEnum.IL;
+			} else {
+				if (cmboDebugMode.SelectedIndex == 1) {
+					mDebugMode = DebugModeEnum.Source;
 				} else {
-					if (cmboDebugMode.SelectedIndex == 1) {
-						xDebugMode = DebugModeEnum.Source;
+					if (cmboDebugMode.SelectedIndex == 2) {
+						mDebugMode = DebugModeEnum.None;
 					} else {
 						throw new Exception("Selected debug mode not supported!");
 					}
 				}
+			}
+
+			if (chckCompileIL.IsChecked.Value) {
+				Console.WriteLine("Compiling...");
 				var xBuildWindow = new BuildWindow();
 				mBuilder.DebugLog += xBuildWindow.DoDebugMessage;
 				xBuildWindow.Show();
-				mBuilder.Compile(xDebugMode, xComport);
+				mBuilder.Compile(mDebugMode, mComport);
 				mBuilder.DebugLog -= xBuildWindow.DoDebugMessage;
 				xBuildWindow.Close();
 			}
 
 			if (rdioQEMU.IsChecked.Value) {
-				mBuilder.MakeQEMU(chckQEMUUseHD.IsChecked.Value, chckQEMUUseGDB.IsChecked.Value, chckQEMUUseDebug.IsChecked.Value, chckQEMUUseDebug.IsChecked.Value);
+				mBuilder.MakeQEMU(chckQEMUUseHD.IsChecked.Value, chckQEMUUseGDB.IsChecked.Value, mDebugMode != DebugModeEnum.None, mDebugMode != DebugModeEnum.None);
 			} else if (rdioVMWare.IsChecked.Value) {
 				string vmwareversion = string.Empty;
 

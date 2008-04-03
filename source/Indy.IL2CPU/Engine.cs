@@ -107,7 +107,7 @@ namespace Indy.IL2CPU {
 		private byte mDebugComport;
 		private DebugModeEnum mDebugMode;
 		private List<DebugSymbol> mDebugSymbols = new List<DebugSymbol>();
-		private List<MLDebugSymbol> mMLDebugSymbols = new List<MLDebugSymbol>();
+		private List<MLDebugSymbol> mSymbols = new List<MLDebugSymbol>();
 		private string mOutputDir;
 
 		/// <summary>
@@ -270,9 +270,9 @@ namespace Indy.IL2CPU {
 						}
 						mMap.PostProcess(mAssembler);
 						ProcessAllStaticFields();
-						if (mMLDebugSymbols != null) {
+						if (mSymbols != null) {
 							string xOutputFile = Path.Combine(mOutputDir, "debug.cxdb");
-							MLDebugSymbol.WriteSymbolsListToFile(mMLDebugSymbols, xOutputFile);
+							MLDebugSymbol.WriteSymbolsListToFile(mSymbols, xOutputFile);
 						}
 						//if (mDebugSymbols != null) {
 						//    GenerateDebugSymbols();
@@ -853,7 +853,6 @@ namespace Indy.IL2CPU {
 									int[] xCodeEndColumns = null;
 									int xCurrentOffset = 0;
 									bool xHasSymbols = false;
-									List<MLDebugSymbol> xSymbols = null;
 									if (mDebugMode == DebugModeEnum.Source) {
 										var xSymbolReader = GetSymbolReaderForAssembly(xCurrentMethod.DeclaringType.Assembly);
 										if (xSymbolReader != null) {
@@ -869,7 +868,6 @@ namespace Indy.IL2CPU {
 												xHasSymbols = true;
 											}
 										}
-										xSymbols = new List<MLDebugSymbol>();
 									}
 									int xILIndex = -1;
 									while (xReader.Read()) {
@@ -981,7 +979,7 @@ namespace Indy.IL2CPU {
 												MethodMetaDataToken = xCurrentMethod.MetadataToken
 											});
 										}
-										if (mMLDebugSymbols != null) {
+										if (mSymbols != null) {
 											var xMLSymbol = new MLDebugSymbol();
 											xMLSymbol.LabelName = xLabel;
 											int xStackSize = (from item in mAssembler.StackContents
@@ -992,8 +990,7 @@ namespace Indy.IL2CPU {
 											xMLSymbol.MethodToken = xCurrentMethod.MetadataToken;
 											xMLSymbol.TypeToken = xCurrentMethod.DeclaringType.MetadataToken;
 											xMLSymbol.ILOffset = xReader.Position;
-											mMLDebugSymbols.Add(xMLSymbol);
-											xSymbols.Add(xMLSymbol);
+											mSymbols.Add(xMLSymbol);
 										}
 										xOp.Assemble();
 										//if (xInstructionInfo != null) {
@@ -1005,8 +1002,8 @@ namespace Indy.IL2CPU {
 										//    xInstructionInfos.Add(xInstructionInfo);
 										//}
 									}
-									if (xSymbols != null) {
-										mMethods[xCurrentMethod].Instructions = xSymbols.ToArray();
+									if (mSymbols != null) {
+										mMethods[xCurrentMethod].Instructions = mSymbols.ToArray();
 									}
 									//if (mDebugSymbols != null) {
 									//    mMethods[xCurrentMethod].Instructions = xInstructionInfos.ToArray();
