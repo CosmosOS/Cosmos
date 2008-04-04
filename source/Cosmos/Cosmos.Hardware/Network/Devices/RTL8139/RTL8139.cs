@@ -33,7 +33,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
 
         private PCIDevice pciCard;
         private MemoryAddressSpace mem;
-        private Register.MainRegister regs;
+        private Register.MainRegister reg;
         private byte[] TxBuffer0;
         private byte[] TxBuffer1;
         private byte[] TxBuffer2;
@@ -44,7 +44,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         {
             pciCard = device;
             mem = device.GetAddressSpace(1) as MemoryAddressSpace;
-            regs = new Register.MainRegister(mem);
+            reg = new Register.MainRegister(mem);
         }
 
         public PCIDevice PCICard { get { return pciCard; } private set { ;} }
@@ -52,7 +52,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         #region NetworkDevice members
         public override MACAddress MACAddress
         {
-            get { return regs.Mac; }
+            get { return reg.Mac; }
         }
 
         public string GetHardwareRevision()
@@ -77,6 +77,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             //Setting Transmit configuration
             var tcr = Register.TransmitConfigurationRegister.Load(mem);
             tcr.Init();
+            SetEarlyTxThreshold(1024);
             
             //Setting Receive configuration
             var rcr = Register.ReceiveConfigurationRegister.Load(mem);
@@ -172,7 +173,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         public override bool Enable()
         {
             //Writes 0x00 to CONFIG_1 registers to enable card
-            regs.Config1 = 0x00;
+            reg.Config1 = 0x00;
             
             return base.Enable(); //enables PCI card as well
         }
@@ -212,7 +213,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         private void SetIRQMaskRegister()
         {
             //Note; The reference driver from Realtek sets mask = 0x7F (all bits high).
-            regs.IntrMask = (Register.CommandRegister.BitValue)
+            reg.IntrMask = (Register.CommandRegister.BitValue)
                 (
                 Register.InterruptMaskRegister.Bit.ROK & 
                 Register.InterruptMaskRegister.Bit.TOK & 
@@ -242,8 +243,6 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         /// </summary>
         private void EnableRecieve()
         {
-            //regs.CommandRegister |= Register.CommandRegister.BitValue.RE;
-
             var cr = Register.CommandRegister.Load(mem);
             cr.RxEnabled = true;
         }
@@ -257,19 +256,17 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             cr.TxEnabled = true;
         }
 
-        public bool IsTxEnabled()
+        public void DisplayDebugInfo()
         {
-            //Whole method is just for testing
             var cr = Register.CommandRegister.Load(mem);
-            return cr.TxEnabled;
+
+            Console.WriteLine("Tx enabled?: " + cr.TxEnabled.ToString());
+            Console.WriteLine("Rx enabled?: " + cr.RxEnabled.ToString());
+            Console.WriteLine("RxBufAddr: " + reg.RxBufAddr.ToString());
+            Console.WriteLine("RxBufPtr: " + reg.RxBufPtr.ToString());
+
         }
 
-        public bool IsRxEnabled()
-        {
-            //Whole method is just for testing
-            var cr = Register.CommandRegister.Load(mem);
-            return cr.RxEnabled;
-        }
 
         /// <summary>
         /// A general purpose timer. Writing to this will reset timer. NB: Timer does not work in Qemu.
@@ -357,13 +354,6 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
              * The address is stored in the Transmit Start Address which corresponds to the Transmit Status Descriptor we are currently using (0-3).
              */
 
-
-            //fixed (byte* bodystart = bytearray)
-            //{
-            //    IntPtr bodyAddress = (IntPtr)bodystart;
-            //    IOSpace.Write32(address, (uint)bodystart);
-            //}
-
             IOSpace.Write32(address, GetMemoryAddress(ref bytearray));
         }
 
@@ -397,15 +387,10 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             WriteAddressToPCI(ref TxBuffer2, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD2);
             WriteAddressToPCI(ref TxBuffer3, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD3);
 
-
-            //Set the transmit status - which enables the transmit.
             var tsd = Register.TransmitStatusDescriptor.Load(pciCard);
             tsd.Size = packet.PacketBody.Length;
             Console.WriteLine("Told NIC to send " + tsd.Size + " bytes.");
-
-            SetEarlyTxThreshold(1024);
-            Console.WriteLine("Sending packet...");
-            tsd.ClearOWNBit();
+            tsd.OWN = false; //Begins sending
             Register.TransmitStatusDescriptor.IncrementTSDescriptor();
 
             return true;
@@ -421,7 +406,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
 
             SetEarlyTxThreshold(1024);
             Console.WriteLine("Sending packet...");
-            tsd.ClearOWNBit();
+            tsd.OWN = false;
             Register.TransmitStatusDescriptor.IncrementTSDescriptor();
 
             return true;

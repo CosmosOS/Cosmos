@@ -71,13 +71,6 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
             set { mem.Write32((UInt32)Bit.TxConfig, value); }
         }
 
-        [Obsolete]
-        //public CommandRegister.BitValue CommandRegister
-        //{
-        //    get { return (CommandRegister.BitValue)mem.Read8Unchecked((UInt32)Bit.ChipCmd); }
-        //    set { mem.Write8Unchecked((UInt32)Bit.ChipCmd, (byte)value); }
-        //}
-
         /// <summary>
         /// Current Address of RX pointer. Also known as CAPR.
         /// </summary>
@@ -85,6 +78,15 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
         {
             get { return (CommandRegister.BitValue)mem.Read16Unchecked((UInt32)Bit.RxBufPtr); }
             set { mem.Write16Unchecked((UInt32)Bit.RxBufPtr, (UInt16)value); }
+        }
+
+        /// <summary>
+        /// Count of bytes received. Also known as CBR or CBA - Current Buffer Address. Is Read-Only.
+        /// </summary>
+        public UInt16 RxBufAddr
+        {
+            get { return (UInt16)mem.Read16Unchecked((UInt32)Bit.RxBufAddr); }
+            private set { ;}
         }
 
         public CommandRegister.BitValue IntrMask
