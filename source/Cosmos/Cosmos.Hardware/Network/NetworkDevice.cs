@@ -14,11 +14,11 @@ namespace Cosmos.Hardware.Network
 
         public abstract bool QueueBytes(byte[] buffer, int offset, int length);
 
-        public abstract bool RecieveBytes(byte[] buffer, int offset, int max);
+        public abstract bool ReceiveBytes(byte[] buffer, int offset, int max);
 
         public abstract int BytesAvailable();
 
         public abstract bool IsSendBufferFull();
-        public abstract bool IsRecieveBufferFull();        
+        public abstract bool IsReceiveBufferFull();        
     }
 }

@@ -157,7 +157,7 @@ namespace Cosmos.GdbClient
         }
 
         /// <summary>
-        /// Occurs when a acknowledge is recieved.
+        /// Occurs when an acknowledge is received.
         /// </summary>
         private void GotAcknowledge()
         {

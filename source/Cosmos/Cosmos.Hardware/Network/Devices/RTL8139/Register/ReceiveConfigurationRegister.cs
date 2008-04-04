@@ -115,7 +115,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
             RBLEN1 = BinaryHelper.BitPos.BIT12,
             /// <summary>
             /// Rx FIFO Threshold. Three bits wide.
-            /// When recieved byte count matches this level the incoming data will
+            /// When received byte count matches this level the incoming data will
             /// be transferred from FIFO to host memory.
             /// See 8139C+ specs for valid values.
             /// </summary>

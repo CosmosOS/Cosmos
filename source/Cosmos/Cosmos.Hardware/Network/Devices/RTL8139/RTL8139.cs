@@ -68,7 +68,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         {
             //Turn on Tx and Rx
             EnableTransmit();
-            EnableRecieve();
+            EnableReceive();
 
             //Initialize buffers
             InitTransmitBuffer();
@@ -132,7 +132,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             throw new NotImplementedException();
         }
 
-        public override bool RecieveBytes(byte[] buffer, int offset, int max)
+        public override bool ReceiveBytes(byte[] buffer, int offset, int max)
         {
             throw new NotImplementedException();
         }
@@ -147,7 +147,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             throw new NotImplementedException();
         }
 
-        public override bool IsRecieveBufferFull()
+        public override bool IsReceiveBufferFull()
         {
             throw new NotImplementedException();
         }
@@ -239,9 +239,9 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         #endregion
 
         /// <summary>
-        /// Enable the NIC to be able to Recieve data.
+        /// Enable the NIC to be able to Receive data.
         /// </summary>
-        private void EnableRecieve()
+        private void EnableReceive()
         {
             var cr = Register.CommandRegister.Load(mem);
             cr.RxEnabled = true;

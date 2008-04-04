@@ -14,7 +14,7 @@ namespace FrodeTest.Test
             var head = new PacketHeader(data);
 
             Console.WriteLine("Binary value in head: " + data);
-            Console.WriteLine("IsRecieveOK - " + head.IsReceiveOk());
+            Console.WriteLine("IsReceiveOK - " + head.IsReceiveOk());
             Console.WriteLine("IsFrameAlignmentError - " + head.IsFrameAlignmentError());
             Console.WriteLine("IsCRCError - " + head.IsCRCError());
             Console.WriteLine("IsLongPacket - " + head.IsLongPacket());
