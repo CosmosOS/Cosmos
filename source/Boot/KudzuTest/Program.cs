@@ -42,7 +42,7 @@ namespace KudzuTest {
 
             Console.WriteLine("Enabling network card!");
             Console.WriteLine(xNIC.Name);
-            Console.WriteLine("Revision: " + xNIC.GetHardwareRevision());
+            Console.WriteLine("Revision: " + xNIC.HardwareRevision);
             Console.WriteLine("MAC: " + xNIC.MACAddress);
 
             xNIC.Enable();

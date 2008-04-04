@@ -44,7 +44,7 @@ namespace FrodeTest.Shell
 
                 Console.WriteLine("Enabling network card!");
                 Console.WriteLine(nic.Name);
-                Console.WriteLine("Revision: " + nic.GetHardwareRevision());
+                Console.WriteLine("Revision: " + nic.HardwareRevision);
                 Console.WriteLine("MAC: " + nic.MACAddress);
 
                 
@@ -87,7 +87,7 @@ namespace FrodeTest.Shell
                     return;
                 }
                 Console.WriteLine("Network card: " + nic.Name);
-                Console.WriteLine("Hardware revision: " + nic.GetHardwareRevision());
+                Console.WriteLine("Hardware revision: " + nic.HardwareRevision);
                 Console.WriteLine("MAC Address: " + nic.MACAddress);
                 Console.WriteLine();
                 Console.WriteLine("Loopback enabled?: " + nic.LoopbackMode.ToString());

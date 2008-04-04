@@ -42,6 +42,9 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
 
         public RTL8139(PCIDevice device)
         {
+            if (device == null)
+                throw new ArgumentException("PCI Device is null. Unable to get RTL8139 card");
+
             pciCard = device;
             mem = device.GetAddressSpace(1) as MemoryAddressSpace;
             reg = new Register.MainRegister(mem);
@@ -55,10 +58,16 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             get { return reg.Mac; }
         }
 
-        public string GetHardwareRevision()
+        /// <summary>
+        /// Returns a text with the hardware revision model. F.instance RTL8139C+ or RTL8139.
+        /// </summary>
+        public string HardwareRevision
         {
-            var tcr = Register.TransmitConfigurationRegister.Load(mem);
-            return Register.TransmitConfigurationRegister.GetHardwareRevision(tcr.GetHWVERID());
+            get {
+                var tcr = Register.TransmitConfigurationRegister.Load(mem);
+                return Register.TransmitConfigurationRegister.GetHardwareRevision(tcr.GetHWVERID());
+            }
+            private set { ;}
         }
 
         /// <summary>
@@ -375,6 +384,8 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         /// <param name="packet"></param>
         public bool Transmit(Packet packet)
         {
+            if (packet == null)
+                return false;
             //Put the packet into the correct TxBuffer
             
             //TODO: Do NOT set all registers! This works, but is not efficient!

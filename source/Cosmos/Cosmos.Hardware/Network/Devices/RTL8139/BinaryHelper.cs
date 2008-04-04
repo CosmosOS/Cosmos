@@ -80,6 +80,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         /// <summary>
         /// Returns the HEX value of a given bitnumber
         /// </summary>
+        [Flags]
         public enum BitPos : uint
         {
             BIT0 = 0x1,

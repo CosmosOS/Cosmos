@@ -24,7 +24,7 @@ namespace FrodeTest.Test
             var nic = (RTL8139)nics[0];
 
             Console.WriteLine("Network card: " + nic.Name);
-            Console.WriteLine("HW Revision: " + nic.GetHardwareRevision());
+            Console.WriteLine("HW Revision: " + nic.HardwareRevision);
             Console.WriteLine("MAC address: " + nic.MACAddress.ToString());
 
             //Console.WriteLine("BaseAddress0 is : " + pciNic.BaseAddress0);
