@@ -14,7 +14,19 @@
 					Source="/Cosmos.Build.Windows;component/Logo-1.png"
 					Width="150" />
 			</BlockUIContainer>
-			<Paragraph>
+            <Paragraph Name="paraBuildButtons"
+				TextAlignment="Right">
+                <InlineUIContainer>
+                    <Button
+						Name="butnBuild"
+						IsDefault="True">_Build</Button>
+                </InlineUIContainer>
+                <InlineUIContainer>
+                    <Button
+						Name="butnCancel">_Cancel</Button>
+                </InlineUIContainer>
+            </Paragraph>
+            <Paragraph>
 				Build type:
 				<LineBreak />
 				<InlineUIContainer>
@@ -53,56 +65,26 @@
 					</WrapPanel>
 				</InlineUIContainer>
 			</Paragraph>
-			<Paragraph>Current build path is:
+			<Paragraph Name="paraBuildPath">Current build path is:
 				<LineBreak />
-				<Span
-					Name="spanBuildPath"></Span>
-			</Paragraph>
-			<Paragraph
-				Name="paraGeneralOptions">
-				<Bold>General Options</Bold>
-				<LineBreak />
-				<InlineUIContainer>
-					<StackPanel
-						HorizontalAlignment="Left">
-						<CheckBox
-							Name="chckCompileIL"
-							IsChecked="True">Compile IL. Do not uncheck this unless you understand the impact.</CheckBox>
-					</StackPanel>
-				</InlineUIContainer>
+				<Span Name="spanBuildPath"></Span>
 			</Paragraph>
 			<Paragraph
 				Name="paraDebugOptions">
 				<Bold>Debug Options</Bold>
 				<LineBreak />
+                Mode:
 				<InlineUIContainer>
-					<Grid>
-						<Grid.RowDefinitions>
-							<RowDefinition />
-							<RowDefinition />
-						</Grid.RowDefinitions>
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition />
-							<ColumnDefinition Width="124" />
-						</Grid.ColumnDefinitions>
-						<TextBlock
-							Grid.Column="0"
-							Grid.Row="0">Debug Port </TextBlock>
-						<ComboBox
-							Name="cmboDebugPort"
-							Grid.Column="1"
-							Grid.Row="0"></ComboBox>
-						<TextBlock
-							Grid.Column="0"
-							Grid.Row="1"
-							Margin="0,0,6,0">Debug Mode </TextBlock>
-						<ComboBox
-							Name="cmboDebugMode" Grid.Column="1"
-							Grid.Row="1"/>
-					</Grid>
-				</InlineUIContainer>
-			</Paragraph>
-			<Paragraph
+                        <ComboBox Name="cmboDebugMode"/>
+                </InlineUIContainer>
+                <Span Name="spanDebugOptionsPort">
+                    Port:
+                    <InlineUIContainer>
+                        <ComboBox Name="cmboDebugPort"/>
+                    </InlineUIContainer>
+            </Span>
+            </Paragraph>
+            <Paragraph
 				Name="paraQEMUOptions">
 				<Bold>QEMU Options</Bold>
 				<LineBreak />
@@ -112,14 +94,8 @@
 							Name="chckQEMUUseGDB"
 							IsChecked="False">Use GDB Debugger</CheckBox>
 						<CheckBox
-							Name="chckQEMUUseDebug"
-							IsChecked="False">Use Cosmos Debugger</CheckBox>
-						<CheckBox
 							Name="chckQEMUUseHD"
 							IsChecked="False">Create hard disk image</CheckBox>
-						<CheckBox
-							Name="chckQEMUSerialWait"
-							IsChecked="False">Wait for serial debug connection over TCP</CheckBox>
 					</StackPanel>
 				</InlineUIContainer>
 			</Paragraph>
@@ -128,14 +104,15 @@
 				<Bold>VMWare Options</Bold>
 				<LineBreak />
 				<InlineUIContainer>
-					<StackPanel>
+					<StackPanel Orientation="Horizontal">
 						<RadioButton
 							Name="rdVMWareWorkstation"
 							GroupName="VMWareVersion"
-							IsChecked="True">VMWare Workstation</RadioButton>
+							IsChecked="True">Workstation</RadioButton>
 						<RadioButton
 							Name="rdVMWareServer"
-							GroupName="VMWareVersion">VMWare Server</RadioButton>
+                            Margin="10, 0, 0, 0"
+							GroupName="VMWareVersion">Server</RadioButton>
 					</StackPanel>
 				</InlineUIContainer>
 			</Paragraph>
@@ -171,18 +148,19 @@
 					</ComboBox>
 				</InlineUIContainer>
 			</Paragraph>
-			<Paragraph
-				TextAlignment="Right">
-				<InlineUIContainer>
-					<Button
-						Name="butnBuild"
-						IsDefault="True">_Build</Button>
-				</InlineUIContainer>
-				<InlineUIContainer>
-					<Button
-						Name="butnCancel">_Cancel</Button>
-				</InlineUIContainer>
-			</Paragraph>
+            <Paragraph
+				Name="paraMiscOptions">
+                <Bold>Miscellaneous Options</Bold>
+                <LineBreak />
+                <InlineUIContainer>
+                    <StackPanel
+						HorizontalAlignment="Left">
+                        <CheckBox
+							Name="chckCompileIL"
+							IsChecked="True">Compile IL. Do not uncheck this unless you understand the impact.</CheckBox>
+                    </StackPanel>
+                </InlineUIContainer>
+            </Paragraph>
 		</FlowDocument>
 	</FlowDocumentScrollViewer>
 </Window>
