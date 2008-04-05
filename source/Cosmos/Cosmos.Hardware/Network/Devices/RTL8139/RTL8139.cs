@@ -34,6 +34,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         private PCIDevice pciCard;
         private MemoryAddressSpace mem;
         private Register.MainRegister reg;
+        private Register.ValueTypeRegisters valueReg;
         private byte[] TxBuffer0;
         private byte[] TxBuffer1;
         private byte[] TxBuffer2;
@@ -48,6 +49,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             pciCard = device;
             mem = device.GetAddressSpace(1) as MemoryAddressSpace;
             reg = new Register.MainRegister(mem);
+            valueReg = Register.ValueTypeRegisters.Load(mem);
         }
 
         public PCIDevice PCICard { get { return pciCard; } private set { ;} }
@@ -55,7 +57,11 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         #region NetworkDevice members
         public override MACAddress MACAddress
         {
-            get { return reg.Mac; }
+            get 
+            {
+                return valueReg.Mac;
+                //return reg.Mac; 
+            }
         }
 
         /// <summary>
@@ -181,8 +187,8 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         /// <returns></returns>
         public override bool Enable()
         {
-            //Writes 0x00 to CONFIG_1 registers to enable card
-            reg.Config1 = 0x00;
+            var config1 = Register.ConfigurationRegister1.Load(mem);
+            config1.PowerEnabled = true; //Uncertain if this is needed
             
             return base.Enable(); //enables PCI card as well
         }
@@ -268,14 +274,21 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         public void DisplayDebugInfo()
         {
             var cr = Register.CommandRegister.Load(mem);
+            var msr = Register.MediaStatusRegister.Load(mem);
 
             Console.WriteLine("Tx enabled?: " + cr.TxEnabled.ToString());
             Console.WriteLine("Rx enabled?: " + cr.RxEnabled.ToString());
             Console.WriteLine("RxBufAddr: " + reg.RxBufAddr.ToString());
             Console.WriteLine("RxBufPtr: " + reg.RxBufPtr.ToString());
+            Console.WriteLine("Speed 10Mb?: " + msr.Speed10MB.ToString());
+            Console.WriteLine("Link OK?: " + (!msr.LinkStatusInverse).ToString());
+        }
 
-            Console.WriteLine("Command Register: " + cr.ToString());
-
+        public void DumpRegisters()
+        {
+            Console.WriteLine("Command Register: " + Register.CommandRegister.Load(mem).ToString());
+            Console.WriteLine("Config1 Register: " + Register.ConfigurationRegister1.Load(mem).ToString());
+            Console.WriteLine("Media S Register: " + Register.MediaStatusRegister.Load(mem).ToString());
         }
 
 

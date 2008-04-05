@@ -14,62 +14,28 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
             this.mem = mem;
         }
 
-        public MACAddress Mac
-        {
-            get
-            {
-                byte[] b = new byte[6];
-
-                for (byte i = 0; i < 6; i++)
-                    b[i] = mem.Read8Unchecked((UInt32)Bit.MAC0 + i);
-                
-                return new MACAddress(b);
-            }
-            set
-            {
-                for (byte b=0; b<6; b++)
-                    mem.Write8Unchecked((UInt32)Bit.MAC0 + b, value.bytes[b]);      
-            }
-        }
 
 
-        public byte[] Mar
-        {
-            get
-            {
-                byte[] b = new byte[6];
 
-                for (byte i = 0; i < 6; i++)
-                    b[i] = mem.Read8Unchecked((UInt32)Bit.MAR0 + i);
+        //[Obsolete]
+        //public byte Config0
+        //{
+        //    get { return mem.Read8Unchecked((UInt32)Bit.Config0); }
+        //    set { mem.Write8Unchecked((UInt32)Bit.Config0, value); }
+        //}
+        //[Obsolete]
+        //public byte Config1
+        //{
+        //    get { return mem.Read8Unchecked((UInt32)Bit.Config1); }
+        //    set { mem.Write8Unchecked((UInt32)Bit.Config1, value); }
+        //}
 
-                return b;
-            }
-            set
-            {
-                for (byte b = 0; b < 6; b++)
-                    mem.Write8Unchecked((UInt32)Bit.MAR0 + b, value[b]);
-            }
-        }
-
-        [Obsolete]
-        public byte Config0
-        {
-            get { return mem.Read8Unchecked((UInt32)Bit.Config0); }
-            set { mem.Write8Unchecked((UInt32)Bit.Config0, value); }
-        }
-        [Obsolete]
-        public byte Config1
-        {
-            get { return mem.Read8Unchecked((UInt32)Bit.Config1); }
-            set { mem.Write8Unchecked((UInt32)Bit.Config1, value); }
-        }
-
-        [Obsolete]
-        public UInt32 TxConfig
-        {
-            get { return mem.Read32((UInt32)Bit.TxConfig); }
-            set { mem.Write32((UInt32)Bit.TxConfig, value); }
-        }
+        //[Obsolete]
+        //public UInt32 TxConfig
+        //{
+        //    get { return mem.Read32((UInt32)Bit.TxConfig); }
+        //    set { mem.Write32((UInt32)Bit.TxConfig, value); }
+        //}
 
         /// <summary>
         /// Current Address of RX pointer. Also known as CAPR.
@@ -126,7 +92,8 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
             Config0 = 0x51,
             Config1 = 0x52,
             FlashReg = 0x54,
-            GPPinData = 0x58,
+            MSR = 0x58,
+            //GPPinData = 0x58,
             GPPinDir = 0x59,
             MII_SMI = 0x5A,
             HltClk = 0x5B,

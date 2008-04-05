@@ -106,6 +106,15 @@ namespace FrodeTest.Shell
 
                 nic.DisplayDebugInfo();
             }
+            else if (command.Equals("dump"))
+            {
+                if (nic == null)
+                {
+                    Console.WriteLine("Network card not initialized yet.");
+                    return;
+                }
+                nic.DumpRegisters();
+            }
             else if (command.Equals("reset"))
             {
                 //nic.TimerCount = 1;
@@ -131,7 +140,11 @@ namespace FrodeTest.Shell
 
             else if (command.Equals("help"))
             {
-                Console.WriteLine("Valid commands: load, send, loop, reset or exit");
+                Console.WriteLine("Valid commands: info, load, send, dump, prom, loop, crash, reset or exit");
+            }
+            else if (command.Equals(string.Empty))
+            {
+                Console.WriteLine(string.Empty);
             }
             else
                 Console.WriteLine("No such systemcommand or application: " + command + ". Try typing 'help'.");
