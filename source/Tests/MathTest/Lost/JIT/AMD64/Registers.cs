@@ -43,5 +43,9 @@ namespace Lost.JIT.AMD64
 			register &= Registers.OldRegsMask;
 			return regIndex[(int)register];
 		}
+		public static bool IsNew(this Registers register)
+		{
+			return (register & Registers.NewRegsMask) != Registers.None;
+		}
 	}
 }

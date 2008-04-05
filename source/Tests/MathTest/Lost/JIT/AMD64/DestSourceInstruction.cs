@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.Diagnostics;
 
 namespace Lost.JIT.AMD64
 {
@@ -136,9 +137,42 @@ namespace Lost.JIT.AMD64
 						throw new NotSupportedException();
 					}
 					#endregion
+
+					throw new NotSupportedException();
 				}
 
 			}
+
+			int opcode_base = RegisterOpCode;
+			var memory = Dest is GeneralPurposeRegister ? Source as MemoryOperand : Dest as MemoryOperand;
+			var reg = Dest is GeneralPurposeRegister ? Dest as GeneralPurposeRegister : Source as GeneralPurposeRegister;
+			if (Dest is GeneralPurposeRegister) opcode_base += 2;
+			if (memory.RipBased)
+			{
+				Rex rex = Rex.None;
+				if (reg.Register.IsNew()) rex |= Rex.Reg;
+				switch (reg.Size)
+				{
+				case 1:
+					break;
+				case 2:
+					destStream.WriteByte(OperandSizeOverride);
+					goto case 4;
+				case 4:
+					opcode_base++;
+					break;
+				case 8:
+					rex |= Rex.Wide;
+					goto case 4;
+				default:
+					throw new NotSupportedException();
+				}
+				if (rex != Rex.None) destStream.WriteByte((byte)rex);
+				destStream.WriteByte(opcode_base);
+				ModRM(reg.Register, memory.Displacement, destStream);
+				return;
+			}
+
 			throw new NotImplementedException();
 		}
 		public override int? Size

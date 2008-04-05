@@ -22,5 +22,47 @@ namespace Lost.JIT.AMD64
 			result += dest.GetIndex();
 			return (byte)result;
 		}
+		public static void Write(Registers reg, Registers rm, Stream destStream)
+		{
+			int result = 0xC0;
+			result += reg.GetIndex() << 3;
+			result += rm.GetIndex();
+			destStream.WriteByte(result);
+		}
+		public static void ModRM(Registers reg, int disp32, Stream destStream)
+		{
+			int result = 0;
+			result += reg.GetIndex() << 3;
+			result += 5;
+			destStream.WriteByte(result);
+			destStream.WriteInt(disp32);
+		}
+
+		protected static class MOD
+		{
+			/// <summary>
+			/// регистр-регистр
+			/// </summary>
+			public const int RegReg = 0x3;
+			/// <summary>
+			/// Адресация без смещения
+			/// </summary>
+			public const int SBI = 0x00;
+			/// <summary>
+			/// Адресация с 8-ми битным смещением
+			/// </summary>
+			public const int D8 = 0x1;
+			/// <summary>
+			/// Адресация со смещением 16 или 32
+			/// </summary>
+			public const int DX = 0x2;
+		}
+		protected static class RM
+		{
+			/// <summary>
+			/// Используется SIB если RM == UseSIB
+			/// </summary>
+			public const int UseSIB = 0x04;
+		}
 	}
 }
