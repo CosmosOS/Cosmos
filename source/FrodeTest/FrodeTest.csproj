@@ -38,7 +38,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -50,6 +56,7 @@
     <Compile Include="Shell\Session.cs" />
     <Compile Include="Test\BinaryHelperTest.cs" />
     <Compile Include="Test\BoolTest.cs" />
+    <Compile Include="Test\ExtensionMethodsTest.cs" />
     <Compile Include="Test\InterfaceTest.cs" />
     <Compile Include="Test\Mock\FakeBroadcastPacket.cs" />
     <Compile Include="Test\PacketHeaderTest.cs" />

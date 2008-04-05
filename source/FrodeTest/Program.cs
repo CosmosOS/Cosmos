@@ -37,6 +37,7 @@ namespace FrodeTest
             //Test.RAMBusTest.RunTest();
             //Test.BoolTest.RunTest();
             //Test.InterfaceTest.RunTest();
+            Test.ExtensionMethodsTest.RunTest();
              
             //Done
             Console.WriteLine("Shutting down computer");
