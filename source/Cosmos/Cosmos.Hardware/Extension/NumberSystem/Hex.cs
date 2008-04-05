@@ -46,6 +46,20 @@ namespace Cosmos.Hardware.Extension.NumberSystem
 
         #endregion 
 
+        #region Prefix/Suffix
+
+        private static string GetPrefix()
+        {
+            return "0x";
+        }
+
+        private static string GetSuffix()
+        {
+            return "h";
+        }
+
+        #endregion
+
         #region Converters
 
         private static string ConvertToHex(UInt32 num)

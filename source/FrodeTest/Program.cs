@@ -36,7 +36,7 @@ namespace FrodeTest
             //Test.RAMBusTest.RunTest();
             //Test.BoolTest.RunTest();
             //Test.InterfaceTest.RunTest();
-            Test.ExtensionMethodsTest.RunTest();
+            //Test.ExtensionMethodsTest.RunTest();
             Test.NumberSystemTest.RunTest();
             Test.StringTest.RunTest();
              

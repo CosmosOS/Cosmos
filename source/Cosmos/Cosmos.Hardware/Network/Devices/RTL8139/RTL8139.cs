@@ -274,6 +274,8 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             Console.WriteLine("RxBufAddr: " + reg.RxBufAddr.ToString());
             Console.WriteLine("RxBufPtr: " + reg.RxBufPtr.ToString());
 
+            Console.WriteLine("Command Register: " + cr.ToString());
+
         }
 
 

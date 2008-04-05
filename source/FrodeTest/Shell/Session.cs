@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Cosmos.Hardware.Network.Devices.RTL8139;
+using Cosmos.Hardware.Extension.NumberSystem;
 
 namespace FrodeTest.Shell
 {
@@ -75,7 +76,7 @@ namespace FrodeTest.Shell
                 Console.WriteLine("Data in RX Buffer:");
                 foreach (byte item in nic.ReadReceiveBuffer())
                 {
-                    Console.Write(item + ":");
+                    Console.Write(item.ToHex() + ":");
                 }
                 //List<Packet> incomingPackets = nic.Recieve();
             }

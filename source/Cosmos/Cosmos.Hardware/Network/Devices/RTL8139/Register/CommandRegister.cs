@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Cosmos.Hardware;
 using Cosmos.Hardware.PC.Bus;
+using Cosmos.Hardware.Extension.NumberSystem;
 
 namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
 {
@@ -72,6 +73,12 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
         }
 
         #endregion
+
+        public override string ToString()
+        {
+            //return this.CR.ToBinary(8); //TODO: Use this when item #4238 has been fixed
+            return this.CR.ToBinary();
+        }
 
         #region Accessors
 
