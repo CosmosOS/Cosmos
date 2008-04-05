@@ -25,7 +25,6 @@ namespace FrodeTest
             Security.User currentUser = Security.User.Authenticate("frode", "secret");
             Shell.Session currentSession =  Shell.Session.CreateSession(currentUser);
             currentSession.Run();
-            
 
             //Test
             //Debug.SortedListSearcher.RunTest();
@@ -38,6 +37,7 @@ namespace FrodeTest
             //Test.BoolTest.RunTest();
             //Test.InterfaceTest.RunTest();
             Test.ExtensionMethodsTest.RunTest();
+            Test.NumberSystemTest.RunTest();
              
             //Done
             Console.WriteLine("Shutting down computer");

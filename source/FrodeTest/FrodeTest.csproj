@@ -49,6 +49,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Debug\SortedListSearcher.cs" />
+    <Compile Include="Extension\NumberSystem\Binary.cs" />
+    <Compile Include="Extension\NumberSystem\Hex.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Security\User.cs" />
@@ -59,6 +61,7 @@
     <Compile Include="Test\ExtensionMethodsTest.cs" />
     <Compile Include="Test\InterfaceTest.cs" />
     <Compile Include="Test\Mock\FakeBroadcastPacket.cs" />
+    <Compile Include="Test\NumberSystemTest.cs" />
     <Compile Include="Test\PacketHeaderTest.cs" />
     <Compile Include="Test\RAMBusTest.cs" />
     <Compile Include="Test\RTL8139Test.cs" />
