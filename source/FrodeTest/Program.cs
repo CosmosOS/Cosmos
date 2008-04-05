@@ -38,6 +38,7 @@ namespace FrodeTest
             //Test.InterfaceTest.RunTest();
             Test.ExtensionMethodsTest.RunTest();
             Test.NumberSystemTest.RunTest();
+            Test.StringTest.RunTest();
              
             //Done
             Console.WriteLine("Shutting down computer");

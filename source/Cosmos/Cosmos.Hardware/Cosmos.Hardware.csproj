@@ -54,6 +54,8 @@
     <Compile Include="Bus\Bus.cs" />
     <Compile Include="Bus\CPUBus.cs" />
     <Compile Include="Device.cs" />
+    <Compile Include="Extension\NumberSystem\Binary.cs" />
+    <Compile Include="Extension\NumberSystem\Hex.cs" />
     <Compile Include="IOSpace.cs" />
     <Compile Include="Network\Devices\RTL8139\BinaryHelper.cs" />
     <Compile Include="Network\Devices\RTL8139\Packet.cs" />

@@ -2,15 +2,46 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace FrodeTest.Extension.NumberSystem
+namespace Cosmos.Hardware.Extension.NumberSystem
 {
     public static class Hex
     {
 
         #region C# 3.0 Extension Methods
-        public static string AsHex(this int n)
+
+        //TODO: Can add several more overloads for other numbertypes, with and withouth width argument.
+
+        public static string ToHex(this byte n)
         {
             return ConvertToHex((UInt32)n);
+        }
+
+        /// <summary>
+        /// When width is supplied the hex value will be left padded with zeroes.
+        /// </summary>
+        public static string ToHex(this byte n, int width)
+        {
+            return ConvertToHex((UInt32)n).PadLeft(width, '0'); //NB; Crashes - see workitem #4238
+        }
+
+        public static string ToHex(this int n)
+        {
+            return ConvertToHex((UInt32)n);
+        }
+
+        public static string ToHex(this int n, int width)
+        {
+            return ConvertToHex((UInt32)n).PadLeft(width, '0');
+        }
+
+        public static string ToHex(this UInt16 n)
+        {
+            return ConvertToHex((UInt32)n);
+        }
+
+        public static string ToHex(this UInt16 n, int width)
+        {
+            return ConvertToHex((UInt32)n).PadLeft(width, '0');
         }
 
         #endregion 
@@ -57,17 +88,17 @@ namespace FrodeTest.Extension.NumberSystem
                 case 9:
                     return '9';
                 case 10:
-                    return 'A';
+                    return 'a';
                 case 11:
-                    return 'B';
+                    return 'b';
                 case 12:
-                    return 'C';
+                    return 'c';
                 case 13:
-                    return 'D';
+                    return 'd';
                 case 14:
-                    return 'E';
+                    return 'e';
                 case 15:
-                    return 'F';
+                    return 'f';
             }
             return ' ';
 

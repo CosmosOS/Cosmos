@@ -131,6 +131,7 @@ namespace Cosmos.Hardware.PC.Bus
             }
         }
 
+        [Obsolete("Use extensionmethod in Cosmos.Hardware.Extension.Numbersystem. See MACAddress.cs for example")]
         public static string ToHex(UInt32 num, int length)
         {
             char[] ret = new char[length];
@@ -145,6 +146,7 @@ namespace Cosmos.Hardware.PC.Bus
             return "0x" + new string(ret);
         }
 
+        [Obsolete]
         private static char hex(uint p)
         {
             switch (p)
