@@ -49,11 +49,11 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
         /// <summary>
         /// Count of bytes received. Also known as CBR or CBA - Current Buffer Address. Is Read-Only.
         /// </summary>
-        public UInt16 RxBufAddr
-        {
-            get { return (UInt16)mem.Read16Unchecked((UInt32)Bit.RxBufAddr); }
-            private set { ;}
-        }
+        //public UInt16 RxBufAddr
+        //{
+        //    get { return (UInt16)mem.Read16Unchecked((UInt32)Bit.RxBufAddr); }
+        //    private set { ;}
+        //}
 
         public CommandRegister.BitValue IntrMask
         {

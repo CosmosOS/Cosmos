@@ -90,7 +90,16 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
 
         //CAPR(?)
 
-        //CBR(?)
+        //CBR
+
+        #region CBR/CBP/Current Buffer Address/Buffer Write Pointer/Received byte count
+        public UInt16 CurrentBufferPointer 
+        {
+            get { return xMem.Read16((UInt32)MainRegister.Bit.RxBufAddr); }
+            private set { ;}
+        }
+
+        #endregion
 
         //TCTR
 

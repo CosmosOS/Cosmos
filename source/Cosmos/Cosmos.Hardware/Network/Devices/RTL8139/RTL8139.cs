@@ -278,10 +278,11 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
 
             Console.WriteLine("Tx enabled?: " + cr.TxEnabled.ToString());
             Console.WriteLine("Rx enabled?: " + cr.RxEnabled.ToString());
-            Console.WriteLine("RxBufAddr: " + reg.RxBufAddr.ToString());
+            //Console.WriteLine("RxBufAddr: " + reg.RxBufAddr.ToString());
             Console.WriteLine("RxBufPtr: " + reg.RxBufPtr.ToString());
             Console.WriteLine("Speed 10Mb?: " + msr.Speed10MB.ToString());
             Console.WriteLine("Link OK?: " + (!msr.LinkStatusInverse).ToString());
+            Console.WriteLine("CBR (byte count): " + valueReg.CurrentBufferPointer.ToString());
         }
 
         public void DumpRegisters()

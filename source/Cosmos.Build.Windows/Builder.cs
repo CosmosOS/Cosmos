@@ -179,7 +179,8 @@ namespace Cosmos.Build.Windows {
 				// Ethernet card - Later the model should be a QEMU option on 
 				// options screen
 				+ " -net nic,model=rtl8139,macaddr=52:54:00:12:34:57"
-				//+ " -net tap,ifname=CosmosTAP" //for network testing
+                //+ " -redir tcp:5555::23" //use 'telnet localhost 5555' to access machine
+                //+ " -net tap,ifname=CosmosTAP" //requires TAP installed on development computer
 				+ " -net user"
 				, ToolsPath + @"qemu\", false, true);
 
