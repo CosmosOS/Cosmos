@@ -58,6 +58,7 @@
     <Compile Include="Test\BoolTest.cs" />
     <Compile Include="Test\ExtensionMethodsTest.cs" />
     <Compile Include="Test\InterfaceTest.cs" />
+    <Compile Include="Test\IPv4Test.cs" />
     <Compile Include="Test\Mock\FakeBroadcastPacket.cs" />
     <Compile Include="Test\NumberSystemTest.cs" />
     <Compile Include="Test\PacketHeaderTest.cs" />
@@ -65,6 +66,7 @@
     <Compile Include="Test\RTL8139Test.cs" />
     <Compile Include="Test\StringTest.cs" />
     <Compile Include="Test\SwitchTest.cs" />
+    <Compile Include="Test\UDPTest.cs" />
     <Compile Include="Test\TransmitStatusDescriptorTest.cs" />
   </ItemGroup>
   <ItemGroup>
