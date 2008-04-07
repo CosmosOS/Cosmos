@@ -5,9 +5,9 @@ using System.Text;
 
 namespace Cosmos.Hardware.Network.TCPIPModel.TransportLayer.UDP
 {
-    public class Packet
+    public class UDPPacket
     {
-        public Packet(byte[] data)
+        public UDPPacket(byte[] data)
         {
             throw new NotImplementedException("UDP not impl");
         }

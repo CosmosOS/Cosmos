@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4;
+using Cosmos.Hardware.Network.Devices.RTL8139;
 
 namespace FrodeTest.Test
 {
@@ -12,12 +13,12 @@ namespace FrodeTest.Test
             Console.WriteLine("-- Testing IPv4 --");
 
             //Create a Packet
-            Packet ipv4Packet = new Packet();
-            ipv4Packet.DestinationAddress = new Address(10, 0, 2, 2); //Virtual DHCP server in Qemu
-            ipv4Packet.SourceAddress = new Address(10, 0, 2, 15); //Default IP address assigned in Qemu
+            IPv4Packet ipv4Packet = new IPv4Packet();
+            ipv4Packet.DestinationAddress = new IPv4Address(10, 0, 2, 2); //Virtual DHCP server in Qemu
+            ipv4Packet.SourceAddress = new IPv4Address(10, 0, 2, 15); //Default IP address assigned in Qemu
             
-            ipv4Packet.Protocol = Packet.Protocols.UDP;
-            ipv4Packet.FragmentFlags = Packet.Fragmentation.DoNotFragment;
+            ipv4Packet.Protocol = IPv4Packet.Protocols.UDP;
+            ipv4Packet.FragmentFlags = IPv4Packet.Fragmentation.DoNotFragment;
             ipv4Packet.FragmentOffset = 0;
             ipv4Packet.HeaderChecksum = ipv4Packet.CalculateHeaderChecksum();
             ipv4Packet.TotalLength = ipv4Packet.CalculateTotalLength();
@@ -47,18 +48,20 @@ namespace FrodeTest.Test
 
             //Console.WriteLine("Total length: " + ipv4Packet.TotalLength);
 
-            ////Send the Packet
-            //var nics = Cosmos.Hardware.Network.Devices.RTL8139.RTL8139.FindAll();
-            //if (nics.Count == 0)
-            //{
-            //    Console.WriteLine("No networkcard RTL8139 found");
-            //    return;
-            //}
+            //Send the Packet
+            var nics = Cosmos.Hardware.Network.Devices.RTL8139.RTL8139.FindAll();
+            if (nics.Count == 0)
+            {
+                Console.WriteLine("No networkcard RTL8139 found");
+                return;
+            }
 
-            //var nic = nics[0];
-            //nic.Enable();
-            //nic.InitializeDriver();
-            ////nic.Transmit(ipv4Packet.RawBytes());
+            var nic = nics[0];
+            nic.Enable();
+            nic.InitializeDriver();
+
+            Packet physicalPacket = new Packet(new PacketHeader(0xFF), ipv4Packet.RawBytes());
+            nic.Transmit(physicalPacket);
 
         }
     }

@@ -73,9 +73,9 @@
     <Compile Include="Network\Devices\RTL8139\RTL8139.cs" />
     <Compile Include="Network\MACAddress.cs" />
     <Compile Include="Network\NetworkDevice.cs" />
-    <Compile Include="Network\TCPIPModel\NetworkLayer\IPv4\Address.cs" />
-    <Compile Include="Network\TCPIPModel\NetworkLayer\IPv4\Packet.cs" />
-    <Compile Include="Network\TCPIPModel\TransportLayer\UDP\Packet.cs" />
+    <Compile Include="Network\TCPIPModel\NetworkLayer\IPv4\IPv4Address.cs" />
+    <Compile Include="Network\TCPIPModel\NetworkLayer\IPv4\IPv4Packet.cs" />
+    <Compile Include="Network\TCPIPModel\TransportLayer\UDP\UDPPacket.cs" />
     <Compile Include="Storage\ATA\ATA.cs" />
     <Compile Include="PC\Bus\AddressSpace.cs" />
     <Compile Include="PC\Bus\CPUBus.cs" />

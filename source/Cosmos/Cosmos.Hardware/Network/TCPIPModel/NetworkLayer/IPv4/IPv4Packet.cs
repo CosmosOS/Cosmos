@@ -6,13 +6,13 @@ using System.Text;
 namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
 {
     //See http://en.wikipedia.org/wiki/IPv4#Header
-    public class Packet
+    public class IPv4Packet
     {
-        public Packet()
+        public IPv4Packet()
         {
         }
 
-        public Packet(byte[] data)
+        public IPv4Packet(byte[] data)
         {
             this.Data = data;
         }
@@ -108,15 +108,15 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
             set { mHeaderChecksum = value;}
         }
 
-        private Address mSourceAddress;
-        public Address SourceAddress
+        private IPv4Address mSourceAddress;
+        public IPv4Address SourceAddress
         {
             get { return mSourceAddress; }
             set { mSourceAddress = value;}
         }
 
-        private Address mDestinationAddress;
-        public Address DestinationAddress
+        private IPv4Address mDestinationAddress;
+        public IPv4Address DestinationAddress
         {
             get { return mDestinationAddress; }
             set { mDestinationAddress = value;}
