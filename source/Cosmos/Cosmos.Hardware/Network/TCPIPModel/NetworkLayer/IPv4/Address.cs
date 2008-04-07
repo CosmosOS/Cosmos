@@ -17,11 +17,32 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
             address[3] = aFourth;
         }
 
+        public bool IsLoopbackAddress()
+        {
+            if (address[0] == 127)
+                return true;
+            else
+                return false;
+        }
+
         public bool IsBroadcastAddress()
         {
             //TODO: Check if the address is a BroadcastAddress.
 
             throw new NotImplementedException();
+        }
+
+        public override string ToString()
+        {
+            return
+                address[0] +
+                "." +
+                address[1] +
+                "." +
+                address[2] +
+                "." +
+                address[3];
+
         }
 
     }

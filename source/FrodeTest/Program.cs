@@ -39,8 +39,8 @@ namespace FrodeTest
             //Test.ExtensionMethodsTest.RunTest();
             //Test.NumberSystemTest.RunTest();
             Test.IPv4Test.RunTest();
-            Test.UDPTest.RunTest();
-            Test.StringTest.RunTest();
+            //Test.UDPTest.RunTest();
+            //Test.StringTest.RunTest();
              
             //Done
             Console.WriteLine("Shutting down computer");

@@ -133,6 +133,10 @@ namespace FrodeTest.Shell
             {
                 throw new Exception("User forced an Exception", new Exception("Inner bug"));
             }
+            else if (command.Equals("notimpl"))
+            {
+                throw new NotImplementedException();
+            }
             else if (command.Equals("prom"))
             {
                 nic.PromiscuousMode = !nic.PromiscuousMode;
