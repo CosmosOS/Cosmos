@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+//using System.Linq;
 using System.Text;
 
 namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
@@ -16,6 +16,26 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
             address[2] = aThird;
             address[3] = aFourth;
         }
+
+        //TODO: Uncomment - doesn't work in Cosmos yet. FL, 08.apr'08.
+        /*
+        public static IPv4Address Parse(string adr)
+        {
+            
+            string[] fragments = adr.Split('.');
+            if (fragments.Length == 4)
+            {
+                byte first = byte.Parse(fragments[0]);
+                byte second = byte.Parse(fragments[1]);
+                byte third = byte.Parse(fragments[2]);
+                byte fourth = byte.Parse(fragments[3]);
+                return new IPv4Address(first, second, third, fourth);
+            }
+            else
+            {
+                return null;
+            }
+        }*/
 
         public bool IsLoopbackAddress()
         {
@@ -42,7 +62,16 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
                 address[2] +
                 "." +
                 address[3];
+        }
 
+        public byte[] ToByteArray()
+        {
+            return address;
+        }
+
+        public UInt32 To32BitNumber()
+        {
+            return (UInt32)((address[0] << 0) | (address[1] << 4) | (address[2] << 8) | (address[3] << 16));
         }
 
     }

@@ -12,10 +12,10 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
         {
         }
 
-        public IPv4Packet(byte[] data)
-        {
-            this.Data = data;
-        }
+        //public IPv4Packet(byte[] data)
+        //{
+        //    this.Data = data;
+        //}
 
         public UInt16 CalculateHeaderChecksum()
         {
@@ -130,8 +130,8 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
 
         #endregion
 
-        private byte[] mData;
-        public byte[] Data
+        private List<byte> mData;
+        public List<byte> Data
         {
             get { return mData; }
             set { mData = value;}
@@ -147,8 +147,11 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
 
             //Add the packetsections together into 32-bit words
             fields.Add((UInt32)((this.Version << 0) | (this.HeaderLength << 4) | (this.TypeOfService << 8) | (this.TotalLength << 16)));
-            //UInt32 field2 = this.Identification + this.FragmentFlags + this.FragmentOffset;
-            //UInt32 field3 = this.TimeToLive + this.Protocol + this.HeaderChecksum;
+            fields.Add((UInt32)((this.Identification << 0) | (((byte)(this.FragmentFlags)) << 16) | (this.FragmentOffset << 19)));
+            fields.Add((UInt32)((this.TimeToLive << 0) | (((byte)(this.Protocol)) << 8) | (this.HeaderChecksum << 16)));
+            fields.Add(this.SourceAddress.To32BitNumber());
+            fields.Add(this.DestinationAddress.To32BitNumber());
+            //TODO - Options field
 
             //Split the 32-bit words into bytes
             //foreach (UInt32 field in fields)
@@ -167,12 +170,22 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
                 bytes.Add((byte)(fields[i] >> 24));
             }
 
+            //The main body of the packet
+            if (this.Data != null)
+            {
+                foreach (byte b in this.Data.ToArray())
+                {
+                    bytes.Add(b);
+                }
+            }
+            
+
             return bytes.ToArray();
         }
 
 
         //[Flags]
-        public enum Fragmentation
+        public enum Fragmentation : int
         {
             Reserved = 0,
             DoNotFragment = 1,
