@@ -37,6 +37,33 @@ namespace Lost.JIT.AMD64
 			destStream.WriteByte(result);
 			destStream.WriteInt(disp32);
 		}
+		public static void SIB(Registers reg, int scale, Registers index, Registers base_reg, Stream destStream, int disp, int disp_size)
+		{
+			int result = 0;
+			switch (disp_size)
+			{
+			case 1:
+				result = 1;
+			case 2:
+				result = 2;
+			case 4:
+				result = 3;
+			default:
+				throw new NotSupportedException("нет текста ошибки");
+			}
+			result <<= 6;
+			result += reg.GetIndex() << 3;
+			result += 5;
+			destStream.WriteByte(result);
+
+			destStream.WriteByte(SIB(scale, index, base_reg));
+
+			throw new NotImplementedException();
+		}
+		public static byte SIB(int scale, Registers index, Registers base_reg)
+		{
+			throw new NotImplementedException();
+		}
 
 		protected static class MOD
 		{

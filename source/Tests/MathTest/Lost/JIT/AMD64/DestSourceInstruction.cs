@@ -42,6 +42,7 @@ namespace Lost.JIT.AMD64
 
 		public override void Compile(Stream destStream)
 		{
+			#region INSTR dest, imm
 			if (Source is ImmediateOperand)
 			{
 				var source = Source as ImmediateOperand;
@@ -142,11 +143,14 @@ namespace Lost.JIT.AMD64
 				}
 
 			}
+			#endregion
 
 			int opcode_base = RegisterOpCode;
 			var memory = Dest is GeneralPurposeRegister ? Source as MemoryOperand : Dest as MemoryOperand;
 			var reg = Dest is GeneralPurposeRegister ? Dest as GeneralPurposeRegister : Source as GeneralPurposeRegister;
 			if (Dest is GeneralPurposeRegister) opcode_base += 2;
+
+			#region RIP-Relative addressing
 			if (memory.RipBased)
 			{
 				Rex rex = Rex.None;
@@ -171,6 +175,34 @@ namespace Lost.JIT.AMD64
 				destStream.WriteByte(opcode_base);
 				ModRM(reg.Register, memory.Displacement, destStream);
 				return;
+			}
+			#endregion
+
+			if (memory.RequiresSIB())
+			{
+				Rex rex = Rex.None;
+				if (reg.Register.IsNew()) rex != Rex.Reg;
+				if (memory.Base.Register.IsNew()) rex |= Rex.B;
+				if (memory.Index.Register.IsNew()) rex |= Rex.Index;
+				switch (reg.Size)
+				{
+				case 1:
+					break;
+				case 2:
+					destStream.WriteByte(OperandSizeOverride);
+					goto case 4;
+				case 4:
+					opcode_base++;
+					break;
+				case 8:
+					rex != Rex.Wide;
+					goto case 4;
+				default:
+					throw new NotSupportedException();
+				}
+				if (rex != Rex.None) destStream.WriteByte((byte)rex);
+				destStream.WriteByte(opcode_base);
+
 			}
 
 			throw new NotImplementedException();
