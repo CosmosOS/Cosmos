@@ -37,32 +37,57 @@ namespace Lost.JIT.AMD64
 			destStream.WriteByte(result);
 			destStream.WriteInt(disp32);
 		}
-		public static void SIB(Registers reg, int scale, Registers index, Registers base_reg, Stream destStream, int disp, int disp_size)
+		public static void SIB(Registers reg, int scale, GeneralPurposeRegister index, GeneralPurposeRegister base_reg, int disp, int disp_size, Stream destStream)
 		{
-			int result = 0;
+			int result;
 			switch (disp_size)
 			{
+			case 0:
+				result = 0;
+				break;
 			case 1:
 				result = 1;
+				break;
 			case 2:
 				result = 2;
+				disp_size = 4;
+				break;
 			case 4:
-				result = 3;
+				result = 2;
+				break;
 			default:
 				throw new NotSupportedException("нет текста ошибки");
 			}
 			result <<= 6;
 			result += reg.GetIndex() << 3;
-			result += 5;
+			result += 4;
 			destStream.WriteByte(result);
 
 			destStream.WriteByte(SIB(scale, index, base_reg));
 
-			throw new NotImplementedException();
+			switch (disp_size)
+			{
+			case 0: 
+				break;
+			case 1:
+				destStream.WriteByte(disp);
+				break;
+			case 2:
+				destStream.WriteShort(disp);
+				break;
+			case 4:
+				destStream.WriteInt(disp);
+				break;
+			default:
+				throw new NotSupportedException();
+			}
 		}
-		public static byte SIB(int scale, Registers index, Registers base_reg)
+		public static byte SIB(int scale, GeneralPurposeRegister index, GeneralPurposeRegister base_reg)
 		{
-			throw new NotImplementedException();
+			int result = scale.BitIndex() << 6;
+			result += index.Register.GetIndex() << 3;
+			result += base_reg.Register.GetIndex();
+			return checked((byte)result);
 		}
 
 		protected static class MOD

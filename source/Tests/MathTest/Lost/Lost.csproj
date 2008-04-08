@@ -51,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BinaryStreamExtensions.cs" />
+    <Compile Include="BitUtils.cs" />
     <Compile Include="JIT\AMD64OLD\Enumerations.cs" />
     <Compile Include="JIT\AMD64OLD\ImmediateOperand.cs" />
     <Compile Include="JIT\AMD64OLD\InstructionLabel.cs" />

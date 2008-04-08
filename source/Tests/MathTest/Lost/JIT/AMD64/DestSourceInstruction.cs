@@ -181,9 +181,13 @@ namespace Lost.JIT.AMD64
 			if (memory.RequiresSIB())
 			{
 				Rex rex = Rex.None;
-				if (reg.Register.IsNew()) rex != Rex.Reg;
-				if (memory.Base.Register.IsNew()) rex |= Rex.B;
-				if (memory.Index.Register.IsNew()) rex |= Rex.Index;
+				if (reg.Register.IsNew()) rex |= Rex.Reg;
+				if ((memory.Base != null) && memory.Base.Register.IsNew()) rex |= Rex.B;
+
+				if ((memory.Base != null) && (memory.Base.Register == Registers.SP))
+					memory.Index = GeneralPurposeRegister.SP;
+
+				if ((memory.Index != null) && memory.Index.Register.IsNew()) rex |= Rex.Index;
 				switch (reg.Size)
 				{
 				case 1:
@@ -195,16 +199,77 @@ namespace Lost.JIT.AMD64
 					opcode_base++;
 					break;
 				case 8:
-					rex != Rex.Wide;
+					rex |= Rex.Wide;
 					goto case 4;
 				default:
 					throw new NotSupportedException();
 				}
 				if (rex != Rex.None) destStream.WriteByte((byte)rex);
 				destStream.WriteByte(opcode_base);
-
+				SIB(reg.Register, memory.Scale, memory.Index, memory.Base, memory.Displacement, memory.DisplacementSize, destStream);
+				return;
 			}
 
+			if (memory.Index == null)
+			{
+				Rex rex = Rex.None;
+				if (reg.Register.IsNew()) rex |= Rex.Reg;
+				if (memory.Base.Register.IsNew()) rex |= Rex.B;
+				switch (reg.Size)
+				{
+				case 1:
+					break;
+				case 2:
+					destStream.WriteByte(OperandSizeOverride);
+					goto case 4;
+				case 4:
+					opcode_base++;
+					break;
+				case 8:
+					rex |= Rex.Wide;
+					goto case 4;
+				default:
+					throw new NotSupportedException();
+				}
+				if (rex != Rex.None) destStream.WriteByte((byte)rex);
+				destStream.WriteByte(opcode_base);
+				int modRM = 0;
+				if (memory.Displacement == 0)
+				{
+					modRM += reg.Register.GetIndex() << 3;
+					modRM += memory.Base.Register.GetIndex();
+					destStream.WriteByte(modRM);
+					return;
+				}
+				switch (memory.DisplacementSize)
+				{
+				case 1:
+					modRM = 1 << 6;
+					break;
+				case 4:
+					modRM = 2 << 6;
+					break;
+				default:
+					throw new NotImplementedException();
+				}
+				modRM += reg.Register.GetIndex() << 3;
+				modRM += memory.Base.Register.GetIndex();
+				destStream.WriteByte(modRM);
+				switch (memory.DisplacementSize)
+				{
+				case 1:
+					destStream.WriteByte(memory.Displacement);
+					break;
+				case 4:
+					destStream.WriteInt(memory.Displacement);
+					break;
+				default:
+					throw new NotImplementedException();
+				}
+
+				return;
+			}
+			
 			throw new NotImplementedException();
 		}
 		public override int? Size

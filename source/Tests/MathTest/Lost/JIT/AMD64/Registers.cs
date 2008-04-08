@@ -40,7 +40,7 @@ namespace Lost.JIT.AMD64
 
 		public static int GetIndex(this Registers register)
 		{
-			register &= Registers.OldRegsMask;
+			if ((register & Registers.OldRegsMask) == Registers.None) register = (Registers)((int)register >> 8);
 			return regIndex[(int)register];
 		}
 		public static bool IsNew(this Registers register)

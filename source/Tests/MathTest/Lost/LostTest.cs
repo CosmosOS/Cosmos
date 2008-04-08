@@ -54,14 +54,41 @@ namespace Lost
 
 		static void CompilationTest()
 		{
-			Test("adc	al, 1\nadc	rcx, 1\nadc	rcx, 0xFFF\n",
-				new List<ProcessorInstruction>(){
-					new AddWithCarry(GeneralPurposeRegister.AL, (byte)1),
-					new AddWithCarry(GeneralPurposeRegister.RCX, (byte)1),
-					new AddWithCarry(GeneralPurposeRegister.RCX, 0xFFF),});
+			Test("adc	al, 1", new AddWithCarry(GeneralPurposeRegister.AL, (byte)1));
+			Test("adc	rcx, 1", new AddWithCarry(GeneralPurposeRegister.RCX, (byte)1));
+			Test("adc	rcx, 0xFFF", new AddWithCarry(GeneralPurposeRegister.RCX, 0xFFF));
+			Test("adc	[rip + 1], rax",
+				new AddWithCarry(new MemoryOperand()
+					{
+						RipBased = true,
+						Displacement = 1,
+					}, GeneralPurposeRegister.RAX));
+			Test("adc	[rax], rax", new AddWithCarry(new MemoryOperand() {
+				Base = GeneralPurposeRegister.RAX,
+			}, GeneralPurposeRegister.RAX));
+
+			Test("adc	[rax + 3], r11",
+				new AddWithCarry(new MemoryOperand() {
+					Displacement = 3,
+					Base = GeneralPurposeRegister.RAX,
+				}, GeneralPurposeRegister.R11));
+
+			Test("adc	[rsp + 0xFFF], eax",
+				new AddWithCarry(new MemoryOperand() {
+					Displacement = 0xFFF,
+					Base = GeneralPurposeRegister.SP,
+				}, GeneralPurposeRegister.EAX));
+
+			Test("adc	al, [rax*2 + r11]",
+				new AddWithCarry(GeneralPurposeRegister.AL,
+					new MemoryOperand() {
+						Base = GeneralPurposeRegister.R11,
+						Index = GeneralPurposeRegister.RAX,
+						Scale = 2,
+					}));
 		}
 
-		static void Test(string fasm_code, IEnumerable<ProcessorInstruction> my_code)
+		static void Test(string fasm_code, ProcessorInstruction my_code)
 		{
 		    using (var writer = new StreamWriter(tempFile))
 			{
@@ -81,7 +108,7 @@ namespace Lost
 			byte[] my_out;
 			using (var stream = new MemoryStream())
 			{
-				foreach(var instr in my_code) instr.Compile(stream);
+				my_code.Compile(stream);
 				my_out = stream.ToArray();
 			}
 
