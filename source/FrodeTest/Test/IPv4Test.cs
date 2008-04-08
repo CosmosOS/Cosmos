@@ -37,10 +37,10 @@ namespace FrodeTest.Test
             Console.WriteLine("Destination address: " + ipv4Packet.DestinationAddress.ToString());
 
             Console.WriteLine("Raw bytes:");
-            /*foreach (byte b in ipv4Packet.RawBytes())
+            foreach (byte b in ipv4Packet.RawBytes())
             {
                 Console.Write(b + ":");
-            }*/
+            }
             //foreach (UInt32 field in ipv4Packet.RawFields())
             //{
             //    Console.
@@ -60,8 +60,8 @@ namespace FrodeTest.Test
             nic.Enable();
             nic.InitializeDriver();
 
-            Packet physicalPacket = new Packet(new PacketHeader(0xFF), ipv4Packet.RawBytes());
-            nic.Transmit(physicalPacket);
+            //Packet physicalPacket = new Packet(new PacketHeader(0xFF), ipv4Packet.RawBytes());
+            //nic.Transmit(physicalPacket);
 
         }
     }

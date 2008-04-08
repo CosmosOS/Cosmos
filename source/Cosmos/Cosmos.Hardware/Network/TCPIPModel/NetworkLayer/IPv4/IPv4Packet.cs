@@ -142,28 +142,34 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
         /// </summary>
         public byte[] RawBytes()
         {
-            //NB! THIS METHOD CRASHES COSMOS BUILDER!
-
             List<byte> bytes = new List<byte>();
             List<UInt32> fields = new List<UInt32>();
 
             //Add the packetsections together into 32-bit words
-            UInt32 field1 = (UInt32)((this.Version << 0) | (this.HeaderLength << 4) | (this.TypeOfService << 8) | (this.TotalLength << 16));
-            fields.Add(field1);
+            fields.Add((UInt32)((this.Version << 0) | (this.HeaderLength << 4) | (this.TypeOfService << 8) | (this.TotalLength << 16)));
             //UInt32 field2 = this.Identification + this.FragmentFlags + this.FragmentOffset;
             //UInt32 field3 = this.TimeToLive + this.Protocol + this.HeaderChecksum;
 
             //Split the 32-bit words into bytes
-            foreach (UInt32 field in fields)
+            //foreach (UInt32 field in fields)
+            //{
+            //    bytes.Add((byte)(field >> 0));
+            //    bytes.Add((byte)(field >> 8));
+            //    bytes.Add((byte)(field >> 16));
+            //    bytes.Add((byte)(field >> 24));
+            //}
+
+            for (int i = 0; i < fields.Count; i++)
             {
-                bytes.Add((byte)(field >> 0));
-                bytes.Add((byte)(field >> 8));
-                bytes.Add((byte)(field >> 16));
-                bytes.Add((byte)(field >> 24));
+                bytes.Add((byte)(fields[i] >> 0));
+                bytes.Add((byte)(fields[i] >> 8));
+                bytes.Add((byte)(fields[i] >> 16));
+                bytes.Add((byte)(fields[i] >> 24));
             }
 
             return bytes.ToArray();
         }
+
 
         //[Flags]
         public enum Fragmentation
