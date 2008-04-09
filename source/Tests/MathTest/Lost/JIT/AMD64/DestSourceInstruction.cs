@@ -79,7 +79,7 @@ namespace Lost.JIT.AMD64
 					#endregion
 
 					Rex rex = Rex.None;
-					if ((dest.Register & Registers.NewRegsMask) != Registers.None) rex |= Rex.Reg;
+					if (dest.Register.IsNew()) rex |= Rex.Reg;
 
 					#region INSTR regX, immX //reg64, imm32
 					if (dest.Size == source.Size || (dest.Size == 8 && source.Size == 4))
