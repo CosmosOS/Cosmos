@@ -226,6 +226,10 @@ namespace Lost.JIT.AMD64
 
 			throw new NotImplementedException();
 		}
+		public static void WriteOperand(int opcode_ext, Registers register, Stream destStream)
+		{
+			destStream.WriteByte(ModRM(3, opcode_ext, register.GetIndex()));
+		}
 		static byte Binary(int value)
 		{
 			int result = 0;
