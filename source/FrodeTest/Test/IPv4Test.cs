@@ -65,8 +65,8 @@ namespace FrodeTest.Test
             nic.Enable();
             nic.InitializeDriver();
 
-            //Packet physicalPacket = new Packet(new PacketHeader(0xFF), ipv4Packet.RawBytes());
-            //nic.Transmit(physicalPacket);
+            Packet physicalPacket = new Packet(new PacketHeader(0xFF), ipv4Packet.RawBytes());
+            nic.Transmit(physicalPacket);
 
         }
     }
