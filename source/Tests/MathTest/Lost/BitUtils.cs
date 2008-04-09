@@ -25,5 +25,13 @@ namespace Lost
 		{
 			return ((byte)value) == value;
 		}
+		public static bool FitsInSByte(this long value)
+		{
+			return ((sbyte)value) == value;
+		}
+		public static bool FitsInSByte(this int value)
+		{
+			return ((sbyte)value) == value;
+		}
 	}
 }
