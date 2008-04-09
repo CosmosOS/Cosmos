@@ -94,6 +94,40 @@ namespace Lost
 						Scale = 2,
 					}));
 			#endregion
+
+			#region ADC
+			Test("and	al, 1", new And(GeneralPurposeRegister.AL, (byte)1));
+			Test("and	rcx, 1", new And(GeneralPurposeRegister.RCX, (byte)1));
+			Test("and	rcx, 0xFFF", new And(GeneralPurposeRegister.RCX, 0xFFF));
+			Test("and	[rip + 1], rax",
+				new And(new MemoryOperand() {
+					RipBased = true,
+					Displacement = 1,
+				}, GeneralPurposeRegister.RAX));
+			Test("and	[rax], rax", new And(new MemoryOperand() {
+				Base = GeneralPurposeRegister.RAX,
+			}, GeneralPurposeRegister.RAX));
+
+			Test("and	[rax + 3], r11",
+				new And(new MemoryOperand() {
+					Displacement = 3,
+					Base = GeneralPurposeRegister.RAX,
+				}, GeneralPurposeRegister.R11));
+
+			Test("and	[rsp + 0xFFF], eax",
+				new And(new MemoryOperand() {
+					Displacement = 0xFFF,
+					Base = GeneralPurposeRegister.SP,
+				}, GeneralPurposeRegister.EAX));
+
+			Test("and	al, [rax*2 + r11]",
+				new And(GeneralPurposeRegister.AL,
+					new MemoryOperand() {
+						Base = GeneralPurposeRegister.R11,
+						Index = GeneralPurposeRegister.RAX,
+						Scale = 2,
+					}));
+			#endregion
 			#endregion
 
 			#region Stack
@@ -140,6 +174,27 @@ namespace Lost
 						Scale = 8,
 					}));
 			#endregion
+			#endregion
+
+			#region Control Transfers
+			#region Unconditional Jumps
+			Test("jmp	7", new Jump(5));
+			Test("jmp	0xFFF", new Jump(0xFFA));
+
+			Test("call	rax", new Call(GeneralPurposeRegister.RAX));
+			Test("call	qword [r12*8 + r11]", new Call(new MemoryOperand() {
+				Base = GeneralPurposeRegister.R11,
+				Index = GeneralPurposeRegister.R12,
+				Scale = 8,
+			}));
+			#endregion
+
+			#region Conditional Jumps
+			Test("je	7", new JumpIfEqual(5));
+			Test("je	0x1005", new JumpIfEqual(0xFFF));
+#warning FASM's immediates in Jumps are counted from current instruction IP 
+			#endregion
+
 			#endregion
 		}
 

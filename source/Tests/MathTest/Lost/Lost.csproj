@@ -60,8 +60,14 @@
     <Compile Include="JIT\AMD64OLD\ModRM.cs" />
     <Compile Include="JIT\AMD64OLD\ProcessorInstruction.cs" />
     <Compile Include="JIT\AMD64\AddWithCarry.cs" />
+    <Compile Include="JIT\AMD64\And.cs" />
+    <Compile Include="JIT\AMD64\BreakPoint.cs" />
+    <Compile Include="JIT\AMD64\Call.cs" />
+    <Compile Include="JIT\AMD64\ConditionalJumpInstruction.cs" />
     <Compile Include="JIT\AMD64\DestSourceInstruction.cs" />
     <Compile Include="JIT\AMD64\ImmediateOperand.cs" />
+    <Compile Include="JIT\AMD64\Jump.cs" />
+    <Compile Include="JIT\AMD64\JumpIfEqual.cs" />
     <Compile Include="JIT\AMD64\MemoryOperand.cs" />
     <Compile Include="JIT\AMD64\Pop.cs" />
     <Compile Include="JIT\AMD64\Push.cs" />
