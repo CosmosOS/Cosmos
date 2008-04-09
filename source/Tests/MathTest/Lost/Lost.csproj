@@ -63,6 +63,8 @@
     <Compile Include="JIT\AMD64\DestSourceInstruction.cs" />
     <Compile Include="JIT\AMD64\ImmediateOperand.cs" />
     <Compile Include="JIT\AMD64\MemoryOperand.cs" />
+    <Compile Include="JIT\AMD64\Pop.cs" />
+    <Compile Include="JIT\AMD64\Push.cs" />
     <Compile Include="JIT\AMD64\Registers.cs" />
     <Compile Include="JIT\AMD64\GeneralPurposeRegister.cs" />
     <Compile Include="JIT\AMD64\InstructionOperand.cs" />

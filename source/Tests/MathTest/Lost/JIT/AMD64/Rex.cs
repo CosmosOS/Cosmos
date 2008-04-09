@@ -33,14 +33,14 @@ namespace Lost.JIT.AMD64
 		/// <summary>
 		/// SIB index register extension. 
 		/// </summary>
-		Index = None | (1 << 1),
+		NewRegIndex = None | (1 << 1),
 		/// <summary>
 		/// SIB index register extension. 
 		/// Use Index mnenonic instead.
 		/// </summary>
 		X = None | (1 << 1),
 		/// <summary>
-		/// Extension of the ModRM r/m field1, SIB base field, or opcode reg field,
+		/// Extension of the ModRM r/m field1, SIB base field, or opcode reg field
 		/// </summary>
 		/// <remarks>
 		/// The REX.B bit adds a 1-bit (high) extension to either the ModRM r/m field to specify
@@ -48,5 +48,13 @@ namespace Lost.JIT.AMD64
 		/// about the REX.B bit.)
 		/// </remarks>
 		B = None | (1 << 0),
+		/// <summary>
+		/// Extension of opcode reg field
+		/// </summary>
+		NewRegOpcode = B,
+		/// <summary>
+		/// Extension of base field in SIB
+		/// </summary>
+		NewRegBase = B,
 	}
 }

@@ -14,4 +14,16 @@ namespace Lost
 			throw new ArgumentException("this");
 		}
 	}
+
+	public static class IntUtils
+	{
+		public static bool FitsInByte(this int value)
+		{
+			return ((byte)value) == value;
+		}
+		public static bool FitsInByte(this long value)
+		{
+			return ((byte)value) == value;
+		}
+	}
 }

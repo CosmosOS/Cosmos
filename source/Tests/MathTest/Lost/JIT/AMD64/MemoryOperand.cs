@@ -24,7 +24,7 @@ namespace Lost.JIT.AMD64
 			{
 				if (Displacement == 0) return 0;
 				if (((byte)Displacement) == Displacement) return 1;
-				if (((short)Displacement) == Displacement) return 2;
+				//if (((short)Displacement) == Displacement) return 2;
 				return 4;
 			}
 		}

@@ -187,7 +187,7 @@ namespace Lost.JIT.AMD64
 				if ((memory.Base != null) && (memory.Base.Register == Registers.SP))
 					memory.Index = GeneralPurposeRegister.SP;
 
-				if ((memory.Index != null) && memory.Index.Register.IsNew()) rex |= Rex.Index;
+				if ((memory.Index != null) && memory.Index.Register.IsNew()) rex |= Rex.NewRegIndex;
 				switch (reg.Size)
 				{
 				case 1:
@@ -206,7 +206,7 @@ namespace Lost.JIT.AMD64
 				}
 				if (rex != Rex.None) destStream.WriteByte((byte)rex);
 				destStream.WriteByte(opcode_base);
-				SIB(reg.Register, memory.Scale, memory.Index, memory.Base, memory.Displacement, memory.DisplacementSize, destStream);
+				SIB(reg.Register, memory, destStream);
 				return;
 			}
 
