@@ -46,6 +46,16 @@ namespace Lost
 			byte bvalue = checked((byte)value);
 			destStream.WriteByte(bvalue);
 		}
+		public static void WriteSByte(this Stream destStream, int value)
+		{
+			sbyte val = checked((sbyte)value);
+			destStream.WriteByte((byte)val);
+		}
+		public static void WriteSByte(this Stream destStream, long value)
+		{
+			sbyte val = checked((sbyte)value);
+			destStream.WriteByte((byte)val);
+		}
 		public static void WriteByte(this Stream destStream, long value)
 		{
 			byte bvalue = checked((byte)value);
