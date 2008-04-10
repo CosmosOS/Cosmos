@@ -52,6 +52,9 @@ namespace FrodeTest.Test
             Console.WriteLine();
             Console.WriteLine("Total length: " + ipv4Packet.TotalLength);
 
+            Console.WriteLine("IP4 Packet as ToString()");
+            Console.Write(ipv4Packet.ToString());
+
 
             //Send the Packet
             var nics = Cosmos.Hardware.Network.Devices.RTL8139.RTL8139.FindAll();

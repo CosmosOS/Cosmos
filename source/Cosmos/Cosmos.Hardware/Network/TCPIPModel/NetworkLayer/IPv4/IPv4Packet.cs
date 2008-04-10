@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 //using System.Linq;
 using System.Text;
+using Cosmos.Hardware.Extension.NumberSystem;
 
 namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
 {
@@ -27,9 +28,22 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
             return 0;
         }
 
+        public byte CalculateHeaderLength()
+        {
+            return 5; //TODO, include Options
+        }
+
         public byte CalculateTotalLength()
         {
-            return 0;
+            byte header = (byte)(CalculateHeaderLength() * (byte)4);
+            byte body;
+
+            if (this.Data != null)
+                body = (byte)this.Data.Count;
+            else
+                body = 0;
+
+            return (byte)(header + body);
         }
 
 
@@ -130,7 +144,7 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
 
         #endregion
 
-        private List<byte> mData;
+        private List<byte> mData = new List<byte>(0);
         public List<byte> Data
         {
             get { return mData; }
@@ -183,8 +197,42 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
             return bytes.ToArray();
         }
 
+        public override string ToString()
+        {
+            //Outputs the IP packet like Wireshark displays it
+            StringBuilder sb = new StringBuilder();
+            sb.Append("--------------------");
+            sb.Append(Environment.NewLine);
+            sb.Append("Version: " + this.Version);
+            sb.Append(Environment.NewLine);
+            sb.Append("Header length: " + this.HeaderLength + " bytes");
+            sb.Append(Environment.NewLine);
+            sb.Append("Total length: " + this.TotalLength);
+            sb.Append(Environment.NewLine);
+            sb.Append("Identification: 0x" + this.Identification.ToHex() + " (" + this.Identification + ")");
+            sb.Append(Environment.NewLine);
+            sb.Append("Flags: 0x" + ((byte)(this.FragmentFlags)).ToHex());
+            sb.Append(Environment.NewLine);
+            sb.Append("Fragment offset: " + this.FragmentOffset);
+            sb.Append(Environment.NewLine);
+            sb.Append("Time to live: " + this.TimeToLive);
+            sb.Append(Environment.NewLine);
+            sb.Append("Protocol: " + this.Protocol + " (0x" + ((byte)(this.Protocol)).ToHex() + ")");
+            sb.Append(Environment.NewLine);
+            sb.Append("Header checksum: 0x" + this.HeaderChecksum.ToHex() + " [unknown]");
+            sb.Append(Environment.NewLine);
+            sb.Append("Source: " + this.SourceAddress);
+            sb.Append(Environment.NewLine);
+            sb.Append("Destination: " + this.DestinationAddress.ToString());
+            sb.Append(Environment.NewLine);
+            sb.Append("--------------------");
+            sb.Append(Environment.NewLine);
 
-        //[Flags]
+            return sb.ToString();
+        }
+
+
+        [Flags]
         public enum Fragmentation : int
         {
             Reserved = 0,
