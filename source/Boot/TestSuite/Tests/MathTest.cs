@@ -38,7 +38,7 @@ namespace TestSuite.Tests
 			al -= 0x02;				//al == 0x1FFFFFFFE
 			bl -= 0x03;				//bl == 0x1FFFFFFFE
 			Assert(al == bl, "Int64 operations");
-			Assert((-41) - (-31) == -10, "Int64 negatives");
+			Assert((-41L) - (-31L) == -10L, "Int64 negatives");
 
             UInt32 a = 5;
             UInt32 b = 5;
