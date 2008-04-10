@@ -195,14 +195,7 @@ namespace Cosmos.Build.Windows {
 			if (rdioQEMU.IsChecked.Value) {
 				mBuilder.MakeQEMU(chckQEMUUseHD.IsChecked.Value, chckQEMUUseGDB.IsChecked.Value, mDebugMode != DebugModeEnum.None, mDebugMode != DebugModeEnum.None);
 			} else if (rdioVMWare.IsChecked.Value) {
-				string vmwareversion = string.Empty;
-
-				if (rdVMWareServer.IsChecked.Value)
-					vmwareversion = rdVMWareServer.Content.ToString();
-				else if (rdVMWareWorkstation.IsChecked.Value)
-					vmwareversion = rdVMWareWorkstation.Content.ToString();
-
-				mBuilder.MakeVMWare(vmwareversion);
+				mBuilder.MakeVMWare(rdVMWareServer.IsChecked.Value);
 			} else if (rdioVPC.IsChecked.Value) {
 				mBuilder.MakeVPC();
 			} else if (rdioISO.IsChecked.Value) {

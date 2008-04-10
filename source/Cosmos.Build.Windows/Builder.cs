@@ -133,13 +133,13 @@ namespace Cosmos.Build.Windows {
 			Process.Start(xPath + "Cosmos.vmc");
 		}
 
-		public void MakeVMWare(string aSelectedVersion) {
+		public void MakeVMWare(bool useVMWareServer) {
 			MakeISO();
 			string xPath = BuildPath + @"VMWare\";
 
-			if (aSelectedVersion == "VMWare Server")
+			if (useVMWareServer)
 				xPath += @"Server\";
-			else if (aSelectedVersion == "VMWare Workstation")
+			else 
 				xPath += @"Workstation\";
 
 			RemoveReadOnlyAttribute(xPath + "Cosmos.nvram");
