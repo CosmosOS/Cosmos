@@ -6,7 +6,7 @@ using HW = Cosmos.Hardware;
 
 namespace Cosmos.Hardware.PC {
     public class Global : Cosmos.Hardware.Global {
-        public static void Init() {
+        public static void Init(bool noATA, bool noATAOld, bool noATA2) {
             mProcessor = new Processor();
             Bus.CPU.PIC.Init(); 
 
@@ -23,19 +23,23 @@ namespace Cosmos.Hardware.PC {
 			HW.PC.Bus.PCIBus.Init();
 
             // end partially new
-            
-            HW.Storage.ATA.Initialize(Sleep);
-			HW.Storage.ATAOld.Initialize(Sleep);
+			if (!noATA) HW.Storage.ATA.Initialize(Sleep);
+			if (!noATAOld) HW.Storage.ATAOld.Initialize(Sleep);
 			
             HW.CPU.CreateIDT();
             // end old -----------------
 
 			// MTW new
-			HW.Storage.ATA2.ATA.Initialize(Sleep);
+			if (!noATA2) HW.Storage.ATA2.ATA.Initialize(Sleep);
 			// MTW new end
 
             HW.Device.Add(new Bus.CPU.Keyboard());
         }
+		[Obsolete("Use Init(noATA, noATAOld, noATA2)")]
+		public static void Init()
+		{
+			Init(false, false, false);
+		}
 
         public static uint TickCount {
             get;
