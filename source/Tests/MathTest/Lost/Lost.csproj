@@ -58,11 +58,12 @@
     <Compile Include="JIT\AMD64\Call.cs" />
     <Compile Include="JIT\AMD64\Compare.cs" />
     <Compile Include="JIT\AMD64\ConditionalJumpInstruction.cs" />
-    <Compile Include="JIT\AMD64\DestSourceInstruction.cs" />
+    <Compile Include="JIT\AMD64\AluInstruction.cs" />
     <Compile Include="JIT\AMD64\ImmediateOperand.cs" />
     <Compile Include="JIT\AMD64\Jump.cs" />
     <Compile Include="JIT\AMD64\JumpIfEqual.cs" />
     <Compile Include="JIT\AMD64\MemoryOperand.cs" />
+    <Compile Include="JIT\AMD64\Move.cs" />
     <Compile Include="JIT\AMD64\Pop.cs" />
     <Compile Include="JIT\AMD64\Push.cs" />
     <Compile Include="JIT\AMD64\Registers.cs" />

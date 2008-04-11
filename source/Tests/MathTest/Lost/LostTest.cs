@@ -94,6 +94,9 @@ namespace Lost
 						Index = GeneralPurposeRegister.RAX,
 						Scale = 2,
 					}));
+
+			Test(new AddWithCarry(GeneralPurposeRegister.RAX, GeneralPurposeRegister.RBP));
+			Test(new AddWithCarry(GeneralPurposeRegister.RBP, GeneralPurposeRegister.RSP));
 			#endregion
 
 			#region AND
@@ -128,6 +131,18 @@ namespace Lost
 						Index = GeneralPurposeRegister.RAX,
 						Scale = 2,
 					}));
+			#endregion
+
+			#region CMP
+			Test(new Compare(GeneralPurposeRegister.AL, (byte)1));
+			Test(new Compare(GeneralPurposeRegister.RCX, (byte)1));
+			Test(new Compare(GeneralPurposeRegister.R10, 0xFFF));
+
+			Test(new Compare(new MemoryOperand(){
+				Base = GeneralPurposeRegister.RAX,
+				Index = GeneralPurposeRegister.RAX,
+				Scale = 8,
+			}, GeneralPurposeRegister.R12));
 			#endregion
 			#endregion
 
@@ -197,6 +212,10 @@ namespace Lost
 			#endregion
 
 			#endregion
+
+			#region MOV
+			Test(new Move(GeneralPurposeRegister.R10, GeneralPurposeRegister.RSI));
+			#endregion MOV
 		}
 
 		static void Test(ProcessorInstruction my_code)
