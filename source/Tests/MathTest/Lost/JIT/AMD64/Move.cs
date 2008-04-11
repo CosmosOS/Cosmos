@@ -25,10 +25,9 @@ namespace Lost.JIT.AMD64
 
 		public override string ToFASM()
 		{
-			if ((Dest is GeneralPurposeRegister && Source is GeneralPurposeRegister)
-				//||
+			if ((Dest is GeneralPurposeRegister || Dest is MemoryOperand)
+				&& (Source is GeneralPurposeRegister || Source is MemoryOperand || Source is ImmediateOperand)
 				) return string.Format("mov {0}, {1}", Dest, Source);
-
 			throw new NotImplementedException();
 		}
 
@@ -90,6 +89,7 @@ namespace Lost.JIT.AMD64
 			#endregion Source is Immediate
 
 			int opcode_base = 0x88;
+			#region MOV reg, reg
 			if (Dest is GeneralPurposeRegister && Source is GeneralPurposeRegister)
 			{
 				var dest = Dest as GeneralPurposeRegister;
@@ -118,14 +118,36 @@ namespace Lost.JIT.AMD64
 				WriteOperands(source.Register, dest.Register, destStream);
 				return;
 			}
+			#endregion MOV reg, reg
+
+			#region MOV reg/mem, reg (MOV reg, reg/mem)
 			var memory = Dest is GeneralPurposeRegister ? Source as MemoryOperand : Dest as MemoryOperand;
 			reg = Dest is GeneralPurposeRegister ? Dest as GeneralPurposeRegister : Source as GeneralPurposeRegister;
 			if (Dest is GeneralPurposeRegister) opcode_base += 2;
-
-			#region Rip-Relative Addressing
 			rex = NeedsRex(memory);
 			if (reg.Register.IsNew()) rex |= Rex.Reg;
-			#endregion Rip-Relative Addressing
+
+			switch (reg.Size)
+			{
+			case 1:
+				break;
+			case 2:
+				destStream.WriteByte(OperandSizeOverride);
+				goto case 4;
+			case 4:
+				opcode_base++;
+				break;
+			case 8:
+				rex |= Rex.Wide;
+				goto case 4;
+			default:
+				throw new NotSupportedException();
+			}
+
+			if (rex != Rex.None) destStream.WriteRex(rex);
+			destStream.WriteByte(opcode_base);
+			WriteOperands(reg, memory, destStream);
+			#endregion
 		}
 	}
 }
