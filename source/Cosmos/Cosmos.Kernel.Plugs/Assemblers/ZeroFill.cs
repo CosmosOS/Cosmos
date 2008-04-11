@@ -16,11 +16,11 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 			new CPUx86.Move("ecx", "[ebp + 8]");  // length
 			new CPUx86.Move("eax", "0");
 			new CPUx86.ShiftRight("ecx", "ecx", "1");
-			new CPUx86.JumpNotCary(".step2");
+			new CPUx86.JumpNotCarry(".step2");
 			new CPUx86.Stosb();
 			new CPUAll.Label(".step2");
 			new CPUx86.ShiftRight("ecx", "ecx", "1");
-			new CPUx86.JumpNotCary(".step3");
+			new CPUx86.JumpNotCarry(".step3");
 			new CPUx86.Stosw();
 			new CPUAll.Label(".step3");
 			new CPUx86.RepeatStosd();						
