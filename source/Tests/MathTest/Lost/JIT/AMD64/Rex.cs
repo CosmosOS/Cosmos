@@ -49,12 +49,16 @@ namespace Lost.JIT.AMD64
 		/// </remarks>
 		B = None | (1 << 0),
 		/// <summary>
-		/// Extension of opcode reg field
+		/// Extension of opcode reg field.
 		/// </summary>
 		NewRegOpcode = B,
 		/// <summary>
 		/// Extension of base field in SIB
 		/// </summary>
 		NewRegBase = B,
+		/// <summary>
+		/// Extension of rm field.
+		/// </summary>
+		NewRegRM = B,
 	}
 }
