@@ -7,7 +7,7 @@ using System.IO;
 namespace Lost.JIT.AMD64
 {
 	[Serializable]
-	public sealed class Compare : DestSourceInstruction
+	public sealed class Compare : AluInstruction
 	{
 		public Compare(InstructionOperand dest, InstructionOperand source)
 			: base(dest, source)

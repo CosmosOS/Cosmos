@@ -8,29 +8,29 @@ using System.Diagnostics;
 namespace Lost.JIT.AMD64
 {
 	[Serializable]
-	public abstract class DestSourceInstruction: ProcessorInstruction
+	public abstract class AluInstruction: ProcessorInstruction
 	{
-		public DestSourceInstruction(InstructionOperand dest, InstructionOperand source)
+		public AluInstruction(InstructionOperand dest, InstructionOperand source)
 		{
 			this.Dest = dest;
 			this.Source = source;
 		}
-		public DestSourceInstruction(InstructionOperand dest, byte imm)
+		public AluInstruction(InstructionOperand dest, byte imm)
 		{
 			this.Dest = dest;
 			this.Source = new ImmediateOperand(imm);
 		}
-		public DestSourceInstruction(InstructionOperand dest, short imm)
+		public AluInstruction(InstructionOperand dest, short imm)
 		{
 			this.Dest = dest;
 			this.Source = new ImmediateOperand(imm);
 		}
-		public DestSourceInstruction(InstructionOperand dest, int imm)
+		public AluInstruction(InstructionOperand dest, int imm)
 		{
 			this.Dest = dest;
 			this.Source = new ImmediateOperand(imm);
 		}
-		public DestSourceInstruction(InstructionOperand dest, long imm)
+		public AluInstruction(InstructionOperand dest, long imm)
 		{
 			this.Dest = dest;
 			this.Source = new ImmediateOperand(imm);

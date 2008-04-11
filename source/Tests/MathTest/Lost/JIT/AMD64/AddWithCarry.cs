@@ -7,7 +7,7 @@ using System.IO;
 namespace Lost.JIT.AMD64
 {
 	[Serializable]
-	public sealed class AddWithCarry: DestSourceInstruction
+	public sealed class AddWithCarry: AluInstruction
 	{
 		public AddWithCarry(InstructionOperand dest, InstructionOperand source): base(dest, source)
 		{

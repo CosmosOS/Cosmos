@@ -7,7 +7,7 @@ using System.IO;
 namespace Lost.JIT.AMD64
 {
 	[Serializable]
-	public sealed class And : DestSourceInstruction
+	public sealed class And : AluInstruction
 	{
 		public And(InstructionOperand dest, InstructionOperand source)
 			: base(dest, source)
