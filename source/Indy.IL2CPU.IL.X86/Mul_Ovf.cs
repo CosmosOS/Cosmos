@@ -10,5 +10,11 @@ namespace Indy.IL2CPU.IL.X86 {
 		public Mul_Ovf(ILReader aReader, MethodInformation aMethodInfo)
 			: base(aReader, aMethodInfo) {
 		}
+
+		public override void DoAssemble()
+		{
+			throw new NotImplementedException();
+			base.DoAssemble();
+		}
 	}
 }

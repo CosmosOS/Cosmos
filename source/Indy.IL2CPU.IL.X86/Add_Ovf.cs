@@ -11,6 +11,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			: base(aReader, aMethodInfo) {
 		}
 		public override void DoAssemble() {
+			throw new NotImplementedException();
 			Add(Assembler);
 		}
 	}
