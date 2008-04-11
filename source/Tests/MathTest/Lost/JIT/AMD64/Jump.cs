@@ -40,5 +40,21 @@ namespace Lost.JIT.AMD64
 
 			throw new NotImplementedException();
 		}
+
+		public override string OpCodeFASM
+		{
+			get { return "jmp"; }
+		}
+
+		public override string ToFASM()
+		{
+			if (Dest is ImmediateOperand)
+			{
+				var dest = Dest as ImmediateOperand;
+				return string.Format("jmp {0}", dest.Value + (dest.Value.FitsInSByte()? 2: 5)); 
+			}
+
+			throw new NotImplementedException();
+		}
 	}
 }

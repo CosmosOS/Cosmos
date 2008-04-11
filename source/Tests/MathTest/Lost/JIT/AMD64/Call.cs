@@ -68,5 +68,15 @@ namespace Lost.JIT.AMD64
 
 			throw new NotImplementedException();
 		}
+
+		public override string OpCodeFASM
+		{
+			get { return "call"; }
+		}
+
+		public override string ToFASM()
+		{
+			return string.Format(Dest is MemoryOperand? "call qword {0}": "call {0}", Dest);
+		}
 	}
 }

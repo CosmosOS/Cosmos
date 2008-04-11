@@ -48,5 +48,10 @@ namespace Lost.JIT.AMD64
 		{
 			get { return 0x10; }
 		}
+
+		public override string OpCodeFASM
+		{
+			get { return "adc"; }
+		}
 	}
 }

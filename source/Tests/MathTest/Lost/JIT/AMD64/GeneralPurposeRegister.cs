@@ -6,7 +6,7 @@ using System.Text;
 namespace Lost.JIT.AMD64
 {
 	[Serializable]
-	public sealed class GeneralPurposeRegister: InstructionOperand
+	public sealed class GeneralPurposeRegister: InstructionOperand, IEquatable<GeneralPurposeRegister>
 	{
 		public GeneralPurposeRegister(Registers register, int size)
 		{
@@ -16,6 +16,28 @@ namespace Lost.JIT.AMD64
 
 		public int Size { get; private set; }
 		public Registers Register { get; private set; }
+
+		public override string ToString()
+		{
+			if (Register.IsNew() && (Size == 8)) return Register.ToString();
+			if (!Register.IsNew())
+			{
+				switch(Size)
+				{
+				case 2:
+					return Register.ToString();
+				case 4:
+					return 'E' + Register.ToString();
+				case 8:
+					return 'R' + Register.ToString();
+				case 1:
+					return Register.ToString().Substring(0, 1)+ 'L';
+				default:
+					throw new NotImplementedException();
+				}
+			}
+			throw new NotImplementedException();
+		}
 
 		public static readonly GeneralPurposeRegister RAX = new GeneralPurposeRegister(Registers.AX, 8);
 		public static readonly GeneralPurposeRegister RBX = new GeneralPurposeRegister(Registers.BX, 8);
@@ -60,5 +82,15 @@ namespace Lost.JIT.AMD64
 		//public static readonly GeneralPurposeRegister DI = new GeneralPurposeRegister(Registers.DI, 1);
 		//public static readonly GeneralPurposeRegister BP = new GeneralPurposeRegister(Registers.BP, 1);
 		//public static readonly GeneralPurposeRegister SP = new GeneralPurposeRegister(Registers.SP, 1);
+
+		#region IEquatable<GeneralPurposeRegister> Members
+
+		public bool Equals(GeneralPurposeRegister other)
+		{
+			if (other == null) return false;
+			return (other.Register == Register) && (other.Size == Size);
+		}
+
+		#endregion
 	}
 }

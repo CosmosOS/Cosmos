@@ -7,25 +7,25 @@ using System.IO;
 namespace Lost.JIT.AMD64
 {
 	[Serializable]
-	public sealed class And : DestSourceInstruction
+	public sealed class Compare : DestSourceInstruction
 	{
-		public And(InstructionOperand dest, InstructionOperand source)
+		public Compare(InstructionOperand dest, InstructionOperand source)
 			: base(dest, source)
 		{
 		}
-		public And(InstructionOperand dest, byte source)
+		public Compare(InstructionOperand dest, byte source)
 			: base(dest, source)
 		{
 		}
-		public And(InstructionOperand dest, short source)
+		public Compare(InstructionOperand dest, short source)
 			: base(dest, source)
 		{
 		}
-		public And(InstructionOperand dest, int source)
+		public Compare(InstructionOperand dest, int source)
 			: base(dest, source)
 		{
 		}
-		public And(InstructionOperand dest, long source)
+		public Compare(InstructionOperand dest, long source)
 			: base(dest, source)
 		{
 		}
@@ -34,12 +34,12 @@ namespace Lost.JIT.AMD64
 		{
 			get
 			{
-				return 0x24;
+				return 0x3C;
 			}
 		}
 		public override byte ImmediateExt
 		{
-			get { return 0x04; }
+			get { return 0x07; }
 		}
 		public override byte ImmediateOpCode
 		{
@@ -47,12 +47,12 @@ namespace Lost.JIT.AMD64
 		}
 		public override byte RegisterOpCode
 		{
-			get { return 0x20; }
+			get { return 0x38; }
 		}
 
 		public override string OpCodeFASM
 		{
-			get { return "and"; }
+			get { return "cmp"; }
 		}
 	}
 }

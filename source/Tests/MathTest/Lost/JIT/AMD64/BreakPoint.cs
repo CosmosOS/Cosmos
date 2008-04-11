@@ -18,5 +18,14 @@ namespace Lost.JIT.AMD64
 		{
 			destStream.WriteByte(0xCC);
 		}
+
+		public override string OpCodeFASM
+		{
+			get { return "int 3"; }
+		}
+		public override string ToFASM()
+		{
+			return OpCodeFASM;
+		}
 	}
 }

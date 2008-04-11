@@ -52,17 +52,11 @@
   <ItemGroup>
     <Compile Include="BinaryStreamExtensions.cs" />
     <Compile Include="BitUtils.cs" />
-    <Compile Include="JIT\AMD64OLD\Enumerations.cs" />
-    <Compile Include="JIT\AMD64OLD\ImmediateOperand.cs" />
-    <Compile Include="JIT\AMD64OLD\InstructionLabel.cs" />
-    <Compile Include="JIT\AMD64OLD\InstructionOperand.cs" />
-    <Compile Include="JIT\AMD64OLD\InstructionPrefix.cs" />
-    <Compile Include="JIT\AMD64OLD\ModRM.cs" />
-    <Compile Include="JIT\AMD64OLD\ProcessorInstruction.cs" />
     <Compile Include="JIT\AMD64\AddWithCarry.cs" />
     <Compile Include="JIT\AMD64\And.cs" />
     <Compile Include="JIT\AMD64\BreakPoint.cs" />
     <Compile Include="JIT\AMD64\Call.cs" />
+    <Compile Include="JIT\AMD64\Compare.cs" />
     <Compile Include="JIT\AMD64\ConditionalJumpInstruction.cs" />
     <Compile Include="JIT\AMD64\DestSourceInstruction.cs" />
     <Compile Include="JIT\AMD64\ImmediateOperand.cs" />

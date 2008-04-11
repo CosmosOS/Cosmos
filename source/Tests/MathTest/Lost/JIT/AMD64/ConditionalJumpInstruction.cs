@@ -23,7 +23,7 @@ namespace Lost.JIT.AMD64
 
 		public override void Compile(Stream destStream)
 		{
-			if (TargetOffset.FitsInByte())
+			if (TargetOffset.FitsInSByte())
 			{
 				destStream.WriteByte(OpcodeBase);
 				destStream.WriteSByte(TargetOffset);
@@ -37,5 +37,11 @@ namespace Lost.JIT.AMD64
 		}
 
 		protected abstract int OpcodeBase { get; }
+
+		public override string ToFASM()
+		{
+			return string.Format("{0} {1}", OpCodeFASM,
+				TargetOffset + (TargetOffset.FitsInSByte() ? 2 : 6));
+		}
 	}
 }

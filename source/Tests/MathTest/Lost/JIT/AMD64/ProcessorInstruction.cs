@@ -13,7 +13,14 @@ namespace Lost.JIT.AMD64
 		public const byte AddressSizeOverride = 0x67;
 
 		public abstract int? Size { get; }
+		public abstract string ToFASM();
+		public abstract string OpCodeFASM { get; }
 		public abstract void Compile(Stream destStream);
+
+		public override string ToString()
+		{
+			return ToFASM();
+		}
 
 		public static Rex NeedsRex(MemoryOperand memory)
 		{

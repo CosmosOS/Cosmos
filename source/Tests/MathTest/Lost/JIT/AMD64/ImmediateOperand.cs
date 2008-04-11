@@ -32,5 +32,11 @@ namespace Lost.JIT.AMD64
 
 		public long Value { get; private set; }
 		public int Size { get; private set; }
+
+		public override string ToString()
+		{
+			string digs = (Size * 2).ToString();
+			return "0x" + Value.ToString("X" + digs);
+		}
 	}
 }

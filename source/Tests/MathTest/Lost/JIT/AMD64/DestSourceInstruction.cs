@@ -277,6 +277,11 @@ namespace Lost.JIT.AMD64
 			get { throw new NotImplementedException(); }
 		}
 
+		public override string ToFASM()
+		{
+			return string.Format("{0} {1}, {2}", OpCodeFASM, Dest, Source);
+		}
+
 		/// <summary>
 		/// INSTR	accum, imm
 		/// </summary>

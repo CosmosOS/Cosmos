@@ -31,7 +31,8 @@ namespace Lost
 
 		static string RunFasm(string filename, string dest)
 		{
-			const string fasm = @"C:\Programs\Devel\asm\fasmw16726\fasm.exe";
+			//C:\Programs\Devel\asm\fasmw16726\
+			const string fasm = @"fasm.exe";
 
 			var par = new ProcessStartInfo(fasm, string.Format("\"{0}\" \"{1}\"", filename, dest));
 
@@ -83,7 +84,7 @@ namespace Lost
 			Test("adc	[rsp + 0xFFF], eax",
 				new AddWithCarry(new MemoryOperand() {
 					Displacement = 0xFFF,
-					Base = GeneralPurposeRegister.SP,
+					Base = GeneralPurposeRegister.RSP,
 				}, GeneralPurposeRegister.EAX));
 
 			Test("adc	al, [rax*2 + r11]",
@@ -95,7 +96,7 @@ namespace Lost
 					}));
 			#endregion
 
-			#region ADC
+			#region AND
 			Test("and	al, 1", new And(GeneralPurposeRegister.AL, (byte)1));
 			Test("and	rcx, 1", new And(GeneralPurposeRegister.RCX, (byte)1));
 			Test("and	rcx, 0xFFF", new And(GeneralPurposeRegister.RCX, 0xFFF));
@@ -117,7 +118,7 @@ namespace Lost
 			Test("and	[rsp + 0xFFF], eax",
 				new And(new MemoryOperand() {
 					Displacement = 0xFFF,
-					Base = GeneralPurposeRegister.SP,
+					Base = GeneralPurposeRegister.RSP,
 				}, GeneralPurposeRegister.EAX));
 
 			Test("and	al, [rax*2 + r11]",
@@ -153,7 +154,7 @@ namespace Lost
 				new Pop(
 					new MemoryOperand() {
 						Displacement = 0xFFF,
-						Base = GeneralPurposeRegister.SP,
+						Base = GeneralPurposeRegister.RSP,
 					}));
 			Test("pop	qword [r12*8 + r11]",
 				new Pop(
@@ -198,8 +199,16 @@ namespace Lost
 			#endregion
 		}
 
-		static void Test(string fasm_code, ProcessorInstruction my_code)
+		static void Test(ProcessorInstruction my_code)
 		{
+			Test(null, my_code);
+		}
+
+		static void Test(
+			string xxx,
+			ProcessorInstruction my_code)
+		{
+			string fasm_code = my_code.ToFASM();
 		    using (var writer = new StreamWriter(tempFile))
 			{
 				writer.WriteLine("use64");

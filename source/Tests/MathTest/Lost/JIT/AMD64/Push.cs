@@ -73,5 +73,14 @@ namespace Lost.JIT.AMD64
 				}
 			}
 		}
+
+		public override string OpCodeFASM
+		{
+			get { return "push"; }
+		}
+		public override string ToFASM()
+		{
+			return string.Format(Source is MemoryOperand ? "push qword {0}" : "push {0}", Source);
+		}
 	}
 }

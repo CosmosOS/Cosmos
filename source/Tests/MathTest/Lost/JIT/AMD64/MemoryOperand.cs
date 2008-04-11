@@ -44,5 +44,24 @@ namespace Lost.JIT.AMD64
 			}
 			return Base != null;
 		}
+
+		public override string ToString()
+		{
+			if (RipBased)
+				return string.Format("[RIP + 0x{0}]", Displacement.ToString("X8"));
+
+			var sb = new StringBuilder();
+			sb.AppendFormat("[{0}", Base);
+			if (Index != null)
+				if (Scale > 1)
+					sb.AppendFormat(" + {0}*{1}", Index, Scale);
+				else
+					sb.AppendFormat(" + {0}", Index);
+
+			if (Displacement != 0)
+				sb.AppendFormat(" + 0x{0}", Displacement.ToString("X16"));
+			sb.Append(']');
+			return sb.ToString();
+		}
 	}
 }

@@ -52,5 +52,14 @@ namespace Lost.JIT.AMD64
 			}
 			throw new InvalidProgramException();
 		}
+
+		public override string OpCodeFASM
+		{
+			get { return "pop"; }
+		}
+		public override string ToFASM()
+		{
+			return string.Format(Dest is MemoryOperand? "pop qword {0}":"pop {0}", Dest);
+		}
 	}
 }
