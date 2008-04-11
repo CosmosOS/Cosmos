@@ -45,7 +45,7 @@ namespace TestSuite.Tests
             Assert(a == b, "UInt32 Equality");
             b = 10;
             Assert(a != b, "UInt32 Inequality");
-			if (0xFFF00000002ul < 0xFF00000001ul) Console.WriteLine("UInt64 comprasion failed");
+			if (0xFFF00000002ul > 0xFF00000001ul) Console.WriteLine("UInt64 comprasion passed");
         }
     }
 }
