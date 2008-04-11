@@ -203,6 +203,9 @@ namespace Lost
 				Index = GeneralPurposeRegister.R12,
 				Scale = 8,
 			}));
+
+			Test(new Return());
+			Test(new Return(64));
 			#endregion
 
 			#region Conditional Jumps
@@ -220,11 +223,12 @@ namespace Lost
 				Index = GeneralPurposeRegister.RBP,
 				Scale = 4,
 			}));
-			Test(new Move(new MemoryOperand() {
-				Base = GeneralPurposeRegister.R11,
-				Index = GeneralPurposeRegister.RSP,
-				Scale = 2,
-			}, GeneralPurposeRegister.R11));
+			//Test(new Move(new MemoryOperand() {
+			//    Base = GeneralPurposeRegister.R11,
+			//    Index = GeneralPurposeRegister.RSP,
+			//    Scale = 2,
+			//}, GeneralPurposeRegister.R11));
+			//Invalid Address
 			#endregion MOV
 		}
 

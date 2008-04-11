@@ -70,6 +70,7 @@
     <Compile Include="JIT\AMD64\GeneralPurposeRegister.cs" />
     <Compile Include="JIT\AMD64\InstructionOperand.cs" />
     <Compile Include="JIT\AMD64\ProcessorInstruction.cs" />
+    <Compile Include="JIT\AMD64\Return.cs" />
     <Compile Include="JIT\AMD64\Rex.cs" />
     <Compile Include="LostTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
