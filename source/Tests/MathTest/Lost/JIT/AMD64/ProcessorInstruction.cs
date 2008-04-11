@@ -241,6 +241,10 @@ namespace Lost.JIT.AMD64
 		{
 			destStream.WriteByte(ModRM(3, dest, source));
 		}
+		public static void WriteOperands(GeneralPurposeRegister reg, MemoryOperand memory, Stream destStream)
+		{
+			WriteOperand(reg.Register.GetIndex(), memory, destStream);
+		}
 		static byte Binary(int value)
 		{
 			int result = 0;
