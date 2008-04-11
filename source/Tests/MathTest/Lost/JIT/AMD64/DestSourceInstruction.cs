@@ -79,7 +79,7 @@ namespace Lost.JIT.AMD64
 					#endregion
 
 					Rex rex = Rex.None;
-					if (dest.Register.IsNew()) rex |= Rex.Reg;
+					if (dest.Register.IsNew()) rex |= Rex.NewRegRM;
 
 					#region INSTR regX, immX //reg64, imm32
 					if (dest.Size == source.Size || (dest.Size == 8 && source.Size == 4))
@@ -146,6 +146,39 @@ namespace Lost.JIT.AMD64
 			#endregion
 
 			int opcode_base = RegisterOpCode;
+			#region OP regX, regX
+			if (Dest is GeneralPurposeRegister && Source is GeneralPurposeRegister)
+			{
+				var dest = Dest as GeneralPurposeRegister;
+				var source = Source as GeneralPurposeRegister;
+				if (dest.Size != source.Size) throw new NotSupportedException();
+				Rex rex = Rex.None;
+				if (dest.Register.IsNew()) rex |= Rex.NewRegRM;
+				if (source.Register.IsNew()) rex |= Rex.Reg;
+				switch (dest.Size)
+				{
+				case 1:
+					break;
+				case 2:
+					destStream.WriteByte(OperandSizeOverride);
+					goto case 4;
+				case 4:
+					opcode_base++;
+					break;
+				case 8:
+					rex |= Rex.Wide;
+					goto case 4;
+				default:
+					throw new NotSupportedException();
+				}
+				if (rex != Rex.None) destStream.WriteRex(rex);
+				destStream.WriteByte(opcode_base);
+				WriteOperands(source.Register, dest.Register, destStream);
+				return;
+			}
+			#endregion OP regX, regX
+
+			#region OP memX/regX, regX (OP regX, memX/regX)
 			var memory = Dest is GeneralPurposeRegister ? Source as MemoryOperand : Dest as MemoryOperand;
 			var reg = Dest is GeneralPurposeRegister ? Dest as GeneralPurposeRegister : Source as GeneralPurposeRegister;
 			if (Dest is GeneralPurposeRegister) opcode_base += 2;
@@ -178,6 +211,7 @@ namespace Lost.JIT.AMD64
 			}
 			#endregion
 
+			#region SIB addressing
 			if (memory.RequiresSIB())
 			{
 				Rex rex = Rex.None;
@@ -209,7 +243,9 @@ namespace Lost.JIT.AMD64
 				SIB(reg.Register, memory, destStream);
 				return;
 			}
+			#endregion SIB addressing
 
+			#region mem is [reg]
 			if (memory.Index == null)
 			{
 				Rex rex = Rex.None;
@@ -269,7 +305,9 @@ namespace Lost.JIT.AMD64
 
 				return;
 			}
-			
+			#endregion mem is [reg]
+			#endregion OP memX/regX, regX (OP regX, memX/regX)
+
 			throw new NotImplementedException();
 		}
 		public override int? Size
