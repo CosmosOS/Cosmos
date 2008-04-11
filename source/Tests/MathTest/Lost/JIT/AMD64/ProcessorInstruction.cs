@@ -233,9 +233,13 @@ namespace Lost.JIT.AMD64
 
 			throw new NotImplementedException();
 		}
-		public static void WriteOperand(int opcode_ext, Registers register, Stream destStream)
+		public static void WriteOperand(int opcode_ext, Registers rm, Stream destStream)
 		{
-			destStream.WriteByte(ModRM(3, opcode_ext, register.GetIndex()));
+			destStream.WriteByte(ModRM(3, opcode_ext, rm.GetIndex()));
+		}
+		public static void WriteOperands(Registers dest, Registers source, Stream destStream)
+		{
+			destStream.WriteByte(ModRM(3, dest, source));
 		}
 		static byte Binary(int value)
 		{
