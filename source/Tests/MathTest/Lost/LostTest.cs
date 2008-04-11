@@ -215,6 +215,15 @@ namespace Lost
 
 			#region MOV
 			Test(new Move(GeneralPurposeRegister.R10, GeneralPurposeRegister.RSI));
+			Test(new Move(GeneralPurposeRegister.R10, new MemoryOperand() {
+				Base = GeneralPurposeRegister.RAX,
+				Index = GeneralPurposeRegister.RBP,
+				Scale = 4,
+			}));
+			Test(new Move(new MemoryOperand() {
+				Base = GeneralPurposeRegister.R11,
+				Index = GeneralPurposeRegister.RAX,
+			}, GeneralPurposeRegister.R11));
 			#endregion MOV
 		}
 
