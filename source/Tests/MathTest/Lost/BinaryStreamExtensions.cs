@@ -12,6 +12,7 @@ namespace Lost
 		{
 			ushort uval = (ushort)value;
 			destStream.WriteByte((byte)(uval & 0xFFu));
+			destStream.WriteByte((byte)(uval >> 8));
 		}
 		public static void WriteShort(this Stream destStream, long value)
 		{
@@ -50,6 +51,11 @@ namespace Lost
 		{
 			sbyte val = checked((sbyte)value);
 			destStream.WriteByte((byte)val);
+		}
+		public static void WriteUShort(this Stream destStream, int value)
+		{
+			ushort val = checked((ushort)value);
+			destStream.WriteShort((short)val);
 		}
 		public static void WriteSByte(this Stream destStream, long value)
 		{
