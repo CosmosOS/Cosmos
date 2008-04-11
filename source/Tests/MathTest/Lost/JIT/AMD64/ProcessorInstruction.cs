@@ -150,6 +150,14 @@ namespace Lost.JIT.AMD64
 				if ((memory.Base != null) && (memory.Base.Register == Registers.SP))
 						memory.Index = GeneralPurposeRegister.SP;
 
+				if (GeneralPurposeRegister.RSP.Equals(memory.Index))
+					if (memory.Scale == 1)
+					{
+						var tmp = memory.Index;
+						memory.Index = memory.Base;
+						memory.Base = tmp;
+					} else throw new NotSupportedException();
+
 				int mode;
 				switch (memory.DisplacementSize)
 				{

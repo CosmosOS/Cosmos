@@ -222,7 +222,8 @@ namespace Lost
 			}));
 			Test(new Move(new MemoryOperand() {
 				Base = GeneralPurposeRegister.R11,
-				Index = GeneralPurposeRegister.RAX,
+				Index = GeneralPurposeRegister.RSP,
+				Scale = 2,
 			}, GeneralPurposeRegister.R11));
 			#endregion MOV
 		}
