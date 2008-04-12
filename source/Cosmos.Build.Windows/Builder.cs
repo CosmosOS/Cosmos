@@ -34,19 +34,13 @@ namespace Cosmos.Build.Windows {
 				// Dev kit
 				if (xResult == null) {
 					xResult = Directory.GetCurrentDirectory().ToLowerInvariant();
-					int xPos = xResult.IndexOf("source");
+					int xPos = xResult.LastIndexOf("source");
 					if (xPos > -1) {
-						// Hack around users that have source in the path 2x.. but wont 
-						// accomodate if they have it >2 times
-						int xPos2 = xResult.IndexOf("source", xPos + 1);
-						if (xPos2 > -1) {
-							xPos = xPos2;
-						}
 						xResult = xResult.Substring(0, xPos) + @"Build\";
 					}
 				}
 
-				if (xResult == "") {
+				if (string.IsNullOrEmpty(xResult)) {
 					throw new Exception("Cannot find Cosmos build path in registry.");
 				}
 				if (!xResult.EndsWith(@"\")) {
