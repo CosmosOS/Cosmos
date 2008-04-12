@@ -29,7 +29,8 @@ namespace Cosmos.Build.Windows {
 				string xResult;
 				// If no key, see if we are in dev mode
 				// Problem  - noone checked this for user kit mode and no key...
-				xResult = (string)xKey.GetValue("Build Path");
+				if (xKey != null)
+					xResult = (string)xKey.GetValue("Build Path");
 
 				// Dev kit
 				if (xResult == null) {
