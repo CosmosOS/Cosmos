@@ -23,30 +23,43 @@ namespace Cosmos.Build.Windows {
 			typeof(NativeOpCodeMap).Equals(null);
 		}
 
+        /// <summary>
+        /// Retrieves the path to the Build directory.
+        /// Looks first in the Registry. If no match found there it will use the Current Directory to calculate the
+        /// path to the Build directory.
+        /// </summary>
+        /// <returns>Full path to the Build directory.</returns>
 		protected static string GetBuildPath() {
 			try {
+                string xResult;
 				RegistryKey xKey = Registry.CurrentUser.OpenSubKey(@"Software\Cosmos");
-				string xResult;
-				// If no key, see if we are in dev mode
-				// Problem  - noone checked this for user kit mode and no key...
-				if (xKey != null)
-					xResult = (string)xKey.GetValue("Build Path");
 
-				// Dev kit
-				if (xResult == null) {
+                if (xKey != null) // Use Registry
+                {
+                    xResult = (string)xKey.GetValue("Build Path");
+                    if (string.IsNullOrEmpty(xResult))
+                        throw new Exception("Found Registry key, but no value named \"Build Path\"");
+                }
+                else //Use Current Directory
+                {
 					xResult = Directory.GetCurrentDirectory().ToLowerInvariant();
 					int xPos = xResult.LastIndexOf("source");
-					if (xPos > -1) {
-						xResult = xResult.Substring(0, xPos) + @"Build\";
-					}
+                    if (xPos > -1) {
+                        xResult = xResult.Substring(0, xPos) + @"Build\";
+                    }
+                    else {
+                        throw new Exception("Unable to find directory named 'source' when using CurrentDirectory.");
+                    }
 				}
 
 				if (string.IsNullOrEmpty(xResult)) {
-					throw new Exception("Cannot find Cosmos build path in registry.");
+					throw new Exception("Cannot find Cosmos build path either in the Registry or using current directory search.");
 				}
+
 				if (!xResult.EndsWith(@"\")) {
 					xResult = xResult + @"\";
 				}
+
 				return xResult;
 			} catch (Exception E) {
 				throw new Exception("Error while getting Cosmos Build Path!", E);
