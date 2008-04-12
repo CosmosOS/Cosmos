@@ -398,6 +398,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         /// Transmits the given Packet
         /// </summary>
         /// <param name="packet"></param>
+        [Obsolete]
         public bool Transmit(Packet packet)
         {
             if (packet == null)
@@ -422,7 +423,29 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
 
             return true;
         }
+
+        public bool TransmitBytes(byte[] aData)
+        {
+            //TODO: Do NOT set all registers! This works, but is not efficient!
+            TxBuffer0 = aData;
+            TxBuffer1 = aData;
+            TxBuffer2 = aData;
+            TxBuffer3 = aData;
+            WriteAddressToPCI(ref TxBuffer0, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD0);
+            WriteAddressToPCI(ref TxBuffer1, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD1);
+            WriteAddressToPCI(ref TxBuffer2, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD2);
+            WriteAddressToPCI(ref TxBuffer3, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD3);
+
+            var tsd = Register.TransmitStatusDescriptor.Load(pciCard);
+            tsd.Size = aData.Length;
+            Console.WriteLine("Told NIC to send " + tsd.Size + " bytes.");
+            tsd.OWN = false; //Begins sending
+            Register.TransmitStatusDescriptor.IncrementTSDescriptor();
+
+            return true;
+        }
         
+        [Obsolete]
         public bool TransmitRaw(byte[] aData) {
             WriteAddressToPCI(ref aData, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD0);
 

@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 using Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4;
+using Cosmos.Hardware.Network.TCPIPModel.PhysicalLayer.Ethernet2;
 using Cosmos.Hardware.Network.Devices.RTL8139;
+using Cosmos.Hardware.Extension.NumberSystem;
+using Cosmos.Hardware.Network;
 
 namespace FrodeTest.Test
 {
@@ -14,8 +17,10 @@ namespace FrodeTest.Test
 
             //Create a Packet
             IPv4Packet ipv4Packet = new IPv4Packet();
-            ipv4Packet.DestinationAddress = new IPv4Address(10, 0, 2, 2); //Virtual DHCP server in Qemu
-            ipv4Packet.SourceAddress = new IPv4Address(10, 0, 2, 15); //Default IP address assigned in Qemu
+            //ipv4Packet.DestinationAddress = new IPv4Address(10, 0, 2, 2); //Virtual DHCP server in Qemu
+            //ipv4Packet.SourceAddress = new IPv4Address(10, 0, 2, 15); //Default IP address assigned in Qemu
+            ipv4Packet.DestinationAddress = new IPv4Address(172,28,5,1);
+            ipv4Packet.SourceAddress = new IPv4Address(172,28,6,6);
             ipv4Packet.Protocol = IPv4Packet.Protocols.UDP;
             ipv4Packet.FragmentFlags = IPv4Packet.Fragmentation.DoNotFragment;
             ipv4Packet.FragmentOffset = 0;
@@ -47,7 +52,7 @@ namespace FrodeTest.Test
             Console.WriteLine("Raw bytes:");
             foreach (byte b in ipv4Packet.RawBytes())
             {
-                Console.Write(b + ":");
+                Console.Write(b.ToHex() + ":");
             }
             Console.WriteLine();
             Console.WriteLine("Total length: " + ipv4Packet.TotalLength);
@@ -68,8 +73,31 @@ namespace FrodeTest.Test
             nic.Enable();
             nic.InitializeDriver();
 
-            Packet physicalPacket = new Packet(new PacketHeader(0xFF), ipv4Packet.RawBytes());
-            nic.Transmit(physicalPacket);
+            Ethernet2Frame frame = new Ethernet2Frame();
+            byte[] mDest = new byte[6];
+            mDest[0] = 1;
+            mDest[1] = 0;
+            mDest[2] = 94;
+            mDest[3] = 127;
+            mDest[4] = 255;
+            mDest[5] = 250;
+            MACAddress macDest = new MACAddress(mDest);
+            frame.Destination = macDest;
+
+            byte[] mSrc = new byte[6];
+            mSrc[0] = 0;
+            mSrc[1] = 255;
+            mSrc[2] = 99;
+            mSrc[3] = 8;
+            mSrc[4] = 252;
+            mSrc[5] = 226;
+            MACAddress macSrc = new MACAddress(mSrc);
+            frame.Source = macSrc;
+            frame.Payload = ipv4Packet.RawBytes();
+
+            Console.WriteLine(frame.ToString());
+
+            nic.TransmitBytes(frame.RawBytes());
 
         }
     }

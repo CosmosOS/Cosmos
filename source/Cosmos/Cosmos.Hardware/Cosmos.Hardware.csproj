@@ -76,6 +76,7 @@
     <Compile Include="Network\TCPIPModel\NetworkLayer\ICMPv4\ICMPv4Packet.cs" />
     <Compile Include="Network\TCPIPModel\NetworkLayer\IPv4\IPv4Address.cs" />
     <Compile Include="Network\TCPIPModel\NetworkLayer\IPv4\IPv4Packet.cs" />
+    <Compile Include="Network\TCPIPModel\PhysicalLayer\Ethernet2\Ethernet2Frame.cs" />
     <Compile Include="Network\TCPIPModel\TransportLayer\UDP\UDPPacket.cs" />
     <Compile Include="Storage\ATA\ATA.cs" />
     <Compile Include="PC\Bus\AddressSpace.cs" />
@@ -110,6 +111,7 @@
     <None Include="Cosmos.snk" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Network\TCPIPModel\DataLinkLayer\" />
     <Folder Include="Network\TCPIPModel\NetworkLayer\IPv6\" />
     <Folder Include="Network\TCPIPModel\TransportLayer\TCP\" />
   </ItemGroup>

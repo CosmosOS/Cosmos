@@ -201,7 +201,7 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
         {
             //Outputs the IP packet like Wireshark displays it
             StringBuilder sb = new StringBuilder();
-            sb.Append("--------------------");
+            sb.Append("----- IPv4 Packet -----");
             sb.Append(Environment.NewLine);
             sb.Append("Version: " + this.Version);
             sb.Append(Environment.NewLine);
