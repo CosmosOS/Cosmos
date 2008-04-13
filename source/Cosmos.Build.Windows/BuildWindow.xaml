@@ -16,7 +16,8 @@
 		<ListBox
 			Margin="0,0,0,32"
 			ItemsSource="{Binding Source={StaticResource BuildMessages}}"
-			Name="lboxLog">
+			Name="lboxLog"
+			Background="White">
 			<ListBox.ItemTemplate>
 				<DataTemplate
 					DataType="{x:Type local:BuildLogMessage}">
@@ -31,6 +32,14 @@
 								TargetName="item"
 								Property="Foreground"
 								Value="Red" />
+						</DataTrigger>
+						<DataTrigger
+							Binding="{Binding Path=Severity}"
+							Value="Warning">
+							<Setter
+								TargetName="item"
+								Property="Foreground"
+								Value="Orange" />
 						</DataTrigger>
 					</DataTemplate.Triggers>
 				</DataTemplate>

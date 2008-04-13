@@ -189,7 +189,19 @@ namespace Cosmos.Build.Windows {
 				xBuildWindow.Show();
 				mBuilder.Compile(mDebugMode, mComport);
 				mBuilder.DebugLog -= xBuildWindow.DoDebugMessage;
+				var xMessages = (from item in xBuildWindow.Messages
+								 where item.Severity != LogSeverityEnum.Informational
+								 select item);
 				xBuildWindow.Close();
+				if (xMessages.Count() > 0) {
+					xBuildWindow = new BuildWindow();
+					xBuildWindow.Messages.Clear();
+					foreach (var item in xMessages) {
+						xBuildWindow.Messages.Add(item);
+					}
+					xBuildWindow.ShowDialog();
+					return;
+				}
 			}
 
 			if (rdioQEMU.IsChecked.Value) {
