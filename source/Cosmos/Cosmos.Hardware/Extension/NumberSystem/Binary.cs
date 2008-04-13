@@ -32,6 +32,16 @@ namespace Cosmos.Hardware.Extension.NumberSystem
             return bin;
         }
 
+        public static string ToBinary(this UInt16 n)
+        {
+            return ConvertToBinary((UInt32)n);
+        }
+
+        public static string ToBinary(this UInt16 n, int width)
+        {
+            return ConvertToBinary((UInt32)n).PadLeft(width, '0');
+        }
+
         public static string ToBinary(this int n)
         {
             return ConvertToBinary((UInt32)n);

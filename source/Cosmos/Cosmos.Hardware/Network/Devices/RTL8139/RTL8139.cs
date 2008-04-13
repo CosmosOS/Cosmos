@@ -228,13 +228,19 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         private void SetIRQMaskRegister()
         {
             //Note; The reference driver from Realtek sets mask = 0x7F (all bits high).
-            reg.IntrMask = (Register.CommandRegister.BitValue)
-                (
-                Register.InterruptMaskRegister.Bit.ROK & 
-                Register.InterruptMaskRegister.Bit.TOK & 
-                Register.InterruptMaskRegister.Bit.RER & 
-                Register.InterruptMaskRegister.Bit.TER
-                );
+            //reg.IntrMask = (Register.CommandRegister.BitValue)
+            //    (
+            //    Register.InterruptMaskRegister.Bit.ROK & 
+            //    Register.InterruptMaskRegister.Bit.TOK & 
+            //    Register.InterruptMaskRegister.Bit.RER & 
+            //    Register.InterruptMaskRegister.Bit.TER
+            //    );
+
+            var imr = Register.InterruptMaskRegister.Load(mem);
+            imr.ReceiveOK = true;
+            imr.ReceiveError = true;
+            imr.TransmitOK = true;
+            imr.TransmitError = true;
  
         }
 
@@ -275,6 +281,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         {
             var cr = Register.CommandRegister.Load(mem);
             var msr = Register.MediaStatusRegister.Load(mem);
+            var imr = Register.InterruptMaskRegister.Load(mem);
 
             Console.WriteLine("Tx enabled?: " + cr.TxEnabled.ToString());
             Console.WriteLine("Rx enabled?: " + cr.RxEnabled.ToString());
@@ -283,6 +290,9 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             Console.WriteLine("Speed 10Mb?: " + msr.Speed10MB.ToString());
             Console.WriteLine("Link OK?: " + (!msr.LinkStatusInverse).ToString());
             Console.WriteLine("CBR (byte count): " + valueReg.CurrentBufferPointer.ToString());
+            Console.WriteLine("IMR: " + imr.ToString());
+
+
         }
 
         public void DumpRegisters()

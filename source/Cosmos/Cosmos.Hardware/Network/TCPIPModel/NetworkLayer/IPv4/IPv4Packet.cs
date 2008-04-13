@@ -13,17 +13,22 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
         {
         }
 
-        //public IPv4Packet(byte[] data)
-        //{
-        //    this.Data = data;
-        //}
+        public static IPv4Packet Load(byte[] data)
+        {
+            throw new NotImplementedException("Can't parse incoming IPv4 packets yet");
+
+            //TODO: Get the correct bits and bytes...
+            //TODO: Maybe some endinan conversions are needed.
+            var p = new IPv4Packet();
+            p.Version = data[0];
+            p.HeaderLength = data[1];
+            //etc...
+
+            return p;
+        }
 
         public UInt16 CalculateHeaderChecksum()
         {
-            //16 bits one's complement of the one's complement sum of all 16-bit words in the headers.
-            //So if the header contains 200 one's then we one-complement that value.
-
-            //TODO - add algorithm. Now we just return 0 to indicate that checksum is turned off.
             UInt16 checksum = 0;
             List<UInt16> words = new List<ushort>();
 
@@ -302,6 +307,8 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
             sb.Append("Version: " + this.Version);
             sb.Append(Environment.NewLine);
             sb.Append("Header length: " + this.HeaderLength + " (" + this.HeaderLength*4 + " bytes)");
+            sb.Append(Environment.NewLine);
+            sb.Append("Type of Service/DiffServ: 0x" + this.TypeOfService.ToHex());
             sb.Append(Environment.NewLine);
             sb.Append("Total length: " + this.TotalLength + " bytes");
             sb.Append(Environment.NewLine);

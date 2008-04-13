@@ -34,20 +34,22 @@ namespace FrodeTest.Test
             data.Add(0xFB);
             data.Add(0xFA);
             ipv4Packet.Data = data;
-            
+
             ipv4Packet.HeaderLength = ipv4Packet.CalculateHeaderLength();
             ipv4Packet.TotalLength = ipv4Packet.CalculateTotalLength();
             ipv4Packet.HeaderChecksum = ipv4Packet.CalculateHeaderChecksum();
 
+            //UInt16 chk = ipv4Packet.CalculateHeaderChecksum();
+            //Console.WriteLine("Checksum: " + ipv4Packet.CalculateHeaderChecksum());
+            //Console.WriteLine("Saved checksum: " + chk);
 
-            UInt16 chk = ipv4Packet.CalculateHeaderChecksum();
-            if (ipv4Packet.HeaderChecksum == 0)
-                Console.WriteLine("IPv4 Packet Header Checksum turned off");
-            else if (ipv4Packet.HeaderChecksum != chk)
-            {
-                Console.WriteLine("IPv4 Packet Header Checksum failed!");
-                Console.WriteLine("Expected " + ipv4Packet.HeaderChecksum.ToHex() + " but found " + chk.ToHex());
-            }
+            //if (ipv4Packet.HeaderChecksum == 0)
+            //    Console.WriteLine("IPv4 Packet Header Checksum turned off");
+            //else if (ipv4Packet.HeaderChecksum != chk)
+            //{
+            //    Console.WriteLine("IPv4 Packet Header Checksum failed!");
+            //    Console.WriteLine("Expected " + ipv4Packet.HeaderChecksum.ToHex() + " but found " + chk.ToHex());
+            //}
 
             Console.WriteLine("IPv4 Packet data:");
             foreach (byte b in ipv4Packet.RawBytes())
