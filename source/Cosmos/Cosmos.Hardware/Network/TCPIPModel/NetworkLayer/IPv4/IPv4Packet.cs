@@ -24,8 +24,36 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
             //So if the header contains 200 one's then we one-complement that value.
 
             //TODO - add algorithm. Now we just return 0 to indicate that checksum is turned off.
-            
-            return 0;
+            UInt16 checksum = 0;
+            List<UInt16> words = new List<ushort>();
+
+            byte[] header = this.GetHeaderBytes();
+
+            //Assemble the bytes into 16-bit words
+            for (int index = 0; index < header.Length; index += 2)
+            {
+                UInt16 word = (UInt16)(header[index + 1] + (header[index] << 8));
+                words.Add(word);
+            }
+
+            //Reset the existing checksum in the header to 0.
+            words[5] = 0;
+
+            //Add together the 16-bit words
+            UInt32 total = 0;
+            for (int i = 0; i < words.Count; i++)
+            {
+                total = total + words[i];
+                if (total > UInt16.MaxValue)
+                {
+                    total = total - UInt16.MaxValue; //move carry
+                }
+            }
+
+            //Invert the bits
+            checksum = (UInt16)~total;
+
+            return checksum;
         }
 
         /// <summary>
@@ -205,9 +233,28 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
         /// </summary>
         public byte[] RawBytes()
         {
-            //TODO: Use the big-endian attribute which is not available yet.
+            List<byte> bytes = new List<byte>();
+            
+            // Header
+            foreach (byte b in GetHeaderBytes())
+            {
+                bytes.Add(b);
+            }
+            
+            // Main body of the packet
+            if (this.Data != null)
+            {
+                foreach (byte b in this.Data.ToArray())
+                {
+                    bytes.Add(b);
+                }
+            }
 
+            return bytes.ToArray();
+        }
 
+        private byte[] GetHeaderBytes()
+        {
             List<byte> bytes = new List<byte>();
             List<UInt32> fields = new List<UInt32>();
 
@@ -242,16 +289,8 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
 
             //TODO - Options field
 
-            //The main body of the packet
-            if (this.Data != null)
-            {
-                foreach (byte b in this.Data.ToArray())
-                {
-                    bytes.Add(b);
-                }
-            }
-
             return bytes.ToArray();
+
         }
 
         public override string ToString()
