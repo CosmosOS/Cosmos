@@ -80,7 +80,7 @@ namespace Cosmos.Hardware.Network
             string address = string.Empty;
 
             foreach (byte i in bytes)
-                address = address + i.ToHex() + ":"; //TODO: Set width to .ToHex(2) when workitem #4238 has been fixed.
+                address = address + i.ToHex(2) + ":";
             
             
             address = address.TrimEnd(':');

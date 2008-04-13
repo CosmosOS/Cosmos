@@ -51,7 +51,7 @@ namespace FrodeTest.Test
 
             Console.WriteLine("IPv4 Packet data:");
             foreach (byte b in ipv4Packet.RawBytes())
-                Console.Write(b.ToHex() + ":");
+                Console.Write(b.ToHex(2) + ":");
             Console.WriteLine();
             
             Console.Write(ipv4Packet.ToString());

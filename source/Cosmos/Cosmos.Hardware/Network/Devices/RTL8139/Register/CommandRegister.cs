@@ -76,8 +76,8 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
 
         public override string ToString()
         {
-            //return this.CR.ToBinary(8); //TODO: Use this when item #4238 has been fixed
-            return this.CR.ToBinary();
+            return this.CR.ToBinary(8);
+            //return this.CR.ToBinary();
         }
 
         #region Accessors

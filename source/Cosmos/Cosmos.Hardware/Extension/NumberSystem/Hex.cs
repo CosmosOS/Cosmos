@@ -21,7 +21,7 @@ namespace Cosmos.Hardware.Extension.NumberSystem
         /// </summary>
         public static string ToHex(this byte n, int width)
         {
-            return ConvertToHex((UInt32)n).PadLeft(width, '0'); //NB; Crashes - see workitem #4238
+            return ConvertToHex((UInt32)n).PadLeft(width, '0');
         }
 
         public static string ToHex(this int n)

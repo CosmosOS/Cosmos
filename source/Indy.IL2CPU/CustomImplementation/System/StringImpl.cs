@@ -41,6 +41,33 @@ namespace Indy.IL2CPU.CustomImplementation.System {
 			return -1;
 		}
 
+        public static string PadHelper(string aThis, int totalWidth, char paddingChar, bool isRightPadded)
+        {
+            char[] cs = new char[totalWidth];
+
+            int pos = aThis.Length;
+
+            if (isRightPadded)
+            {
+                for (int i = 0; i < aThis.Length; i++)
+                    cs[i] = aThis[i];
+
+                for (int i = aThis.Length; i < totalWidth; i++)
+                    cs[i] = paddingChar;
+            }
+            else
+            {
+                int offset = totalWidth - aThis.Length;
+                for (int i = 0; i < aThis.Length; i++)
+                    cs[i + offset] = aThis[i];
+
+                for (int i = 0; i < offset; i++)
+                    cs[i] = paddingChar;
+            }
+
+            return new string(cs);
+        }
+
 		public static string Substring(string aThis, int startpos) {
 			char[] cs = new char[aThis.Length - startpos];
 			int j = 0;

@@ -211,9 +211,9 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
         private UInt32 ConvertToBigEndian(UInt32 n)
         {
             string bin = n.ToBinary();
-            //bin = bin.PadLeft(8, '0');
-            while (bin.Length < 32)
-                bin = "0" + bin;
+            bin = bin.PadLeft(32, '0');
+            //while (bin.Length < 32)
+            //    bin = "0" + bin;
 
             string first = Reverse(bin.Substring(0, 8));
             string second = Reverse(bin.Substring(8, 8));
