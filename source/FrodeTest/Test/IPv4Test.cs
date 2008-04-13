@@ -15,18 +15,16 @@ namespace FrodeTest.Test
         {
             Console.WriteLine("-- Testing IPv4 --");
 
-            //Create a Packet
+            //Create a IPv4 Packet
             IPv4Packet ipv4Packet = new IPv4Packet();
             //ipv4Packet.DestinationAddress = new IPv4Address(10, 0, 2, 2); //Virtual DHCP server in Qemu
             //ipv4Packet.SourceAddress = new IPv4Address(10, 0, 2, 15); //Default IP address assigned in Qemu
             ipv4Packet.DestinationAddress = new IPv4Address(172,28,5,1);
             ipv4Packet.SourceAddress = new IPv4Address(172,28,6,6);
+            ipv4Packet.TypeOfService = 0;
             ipv4Packet.Protocol = IPv4Packet.Protocols.UDP;
             ipv4Packet.FragmentFlags = IPv4Packet.Fragmentation.DoNotFragment;
             ipv4Packet.FragmentOffset = 0;
-            ipv4Packet.HeaderChecksum = ipv4Packet.CalculateHeaderChecksum();
-            ipv4Packet.TotalLength = ipv4Packet.CalculateTotalLength();
-
             List<byte> data = new List<byte>();
             data.Add(0xFF);
             data.Add(0xFE);
@@ -39,27 +37,16 @@ namespace FrodeTest.Test
             else if(ipv4Packet.HeaderChecksum != ipv4Packet.CalculateHeaderChecksum())
                 Console.WriteLine("IPv4 Packet Header Checksum failed!");
 
-
+            ipv4Packet.HeaderLength = ipv4Packet.CalculateHeaderLength();
+            ipv4Packet.TotalLength = ipv4Packet.CalculateTotalLength();
+            ipv4Packet.HeaderChecksum = ipv4Packet.CalculateHeaderChecksum();
 
             Console.WriteLine("IPv4 Packet data:");
-            Console.WriteLine("Version: " + ipv4Packet.Version);
-            Console.WriteLine("Time to Live: " + ipv4Packet.TimeToLive);
-            //Console.WriteLine("Data: " + ipv4Packet.Data);
-            //Console.WriteLine("Protocol: " + Enum.GetName(typeof(Packet.Protocols), ipv4Packet.Protocol).ToString());
-            Console.WriteLine("Source address: " + ipv4Packet.SourceAddress.ToString());
-            Console.WriteLine("Destination address: " + ipv4Packet.DestinationAddress.ToString());
-            
-            Console.WriteLine("Raw bytes:");
             foreach (byte b in ipv4Packet.RawBytes())
-            {
                 Console.Write(b.ToHex() + ":");
-            }
             Console.WriteLine();
-            Console.WriteLine("Total length: " + ipv4Packet.TotalLength);
-
-            Console.WriteLine("IP4 Packet as ToString()");
+            
             Console.Write(ipv4Packet.ToString());
-
 
             //Send the Packet
             var nics = Cosmos.Hardware.Network.Devices.RTL8139.RTL8139.FindAll();
@@ -94,8 +81,6 @@ namespace FrodeTest.Test
             MACAddress macSrc = new MACAddress(mSrc);
             frame.Source = macSrc;
             frame.Payload = ipv4Packet.RawBytes();
-
-            Console.WriteLine(frame.ToString());
 
             nic.TransmitBytes(frame.RawBytes());
 

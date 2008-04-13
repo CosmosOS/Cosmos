@@ -28,6 +28,11 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
             return 0;
         }
 
+        /// <summary>
+        /// Internet Header Length (IHL) telling the number of 32-bit words in the header.
+        /// Minimum length is 5 words. Maximum is 15 words when Options are set.
+        /// </summary>
+        /// <returns></returns>
         public byte CalculateHeaderLength()
         {
             return 5; //TODO, include Options
@@ -56,10 +61,14 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
         }
 
         private byte mHeaderLength = 0;
+        /// <summary>
+        /// The number of 32-bit words in the header. Does not include the length of the data. Use TotalLength for that. 
+        /// Remember to multiply by four to get the byte count.
+        /// </summary>
         public byte HeaderLength
         {
-            get { return mHeaderLength;}
-            set { mHeaderLength = value;}
+            get { return mHeaderLength; }
+            set { mHeaderLength = value; }
         }
 
         private byte mTypeOfService = 0;
@@ -152,6 +161,43 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
         }
 
         /// <summary>
+        /// Reverses a string.
+        /// </summary>
+        private string Reverse(string s)
+        {
+            char[] c = s.ToCharArray();
+            string ts = string.Empty;
+
+            for (int i = c.Length - 1; i >= 0; i--)
+                ts += c[i].ToString();
+
+            return ts;
+        }
+
+        /// <summary>
+        /// Converts the four bytes in a 32-bit word into using big-endian instead of little-endian.
+        /// The four bytes retains their position, but the bits inside each of the bytes are reversed in order.
+        /// </summary>
+        /// <param name="n"></param>
+        /// <returns></returns>
+        private UInt32 ConvertToBigEndian(UInt32 n)
+        {
+            string bin = n.ToBinary();
+            //bin = bin.PadLeft(8, '0');
+            while (bin.Length < 32)
+                bin = "0" + bin;
+
+            string first = Reverse(bin.Substring(0, 8));
+            string second = Reverse(bin.Substring(8, 8));
+            string third = Reverse(bin.Substring(16, 8));
+            string fourth = Reverse(bin.Substring(24, 8));
+
+            bin = first + second + third + fourth;
+
+            return bin.FromBinary();
+        }
+
+        /// <summary>
         /// Returns the entire packet as a byte array.
         /// </summary>
         public byte[] RawBytes()
@@ -160,11 +206,24 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
             List<UInt32> fields = new List<UInt32>();
 
             //Add the packetsections together into 32-bit words
-            fields.Add((UInt32)((this.Version << 0) | (this.HeaderLength << 4) | (this.TypeOfService << 8) | (this.TotalLength << 16)));
-            fields.Add((UInt32)((this.Identification << 0) | (((byte)(this.FragmentFlags)) << 16) | (this.FragmentOffset << 19)));
-            fields.Add((UInt32)((this.TimeToLive << 0) | (((byte)(this.Protocol)) << 8) | (this.HeaderChecksum << 16)));
-            fields.Add(this.SourceAddress.To32BitNumber());
-            fields.Add(this.DestinationAddress.To32BitNumber());
+            //fields.Add((UInt32)((this.Version << 4) | (this.HeaderLength << 0) | (this.TypeOfService << 8) | (this.TotalLength << 24)));
+            //Console.WriteLine("As binary: " + ((UInt32)((this.Version << 4) | (this.HeaderLength << 0) | (this.TypeOfService << 8) | (this.TotalLength << 24))).ToBinary());
+            
+            //Testing big endian
+            UInt32 field1 = (UInt32)((this.Version << 0) | (this.HeaderLength << 4) | (this.TypeOfService << 8) | (this.TotalLength << 16));
+            field1 = ConvertToBigEndian(field1);
+            fields.Add(field1);
+
+            UInt32 field2 = (UInt32)((this.Identification << 0) | (((byte)(this.FragmentFlags)) << 16) | (this.FragmentOffset << 19));
+            fields.Add(ConvertToBigEndian(field2));
+            //fields.Add((UInt32)((this.Identification << 0) | (((byte)(this.FragmentFlags)) << 16) | (this.FragmentOffset << 19)));
+
+            UInt32 field3 = (UInt32)((this.TimeToLive << 0) | (((byte)(this.Protocol)) << 8) | (this.HeaderChecksum << 16));
+            fields.Add(ConvertToBigEndian(field3));
+            
+            //fields.Add((UInt32)((this.TimeToLive << 0) | (((byte)(this.Protocol)) << 8) | (this.HeaderChecksum << 16)));
+            fields.Add(ConvertToBigEndian(this.SourceAddress.To32BitNumber()));
+            fields.Add(ConvertToBigEndian(this.DestinationAddress.To32BitNumber()));
             //TODO - Options field
 
             //Split the 32-bit words into bytes
@@ -193,6 +252,7 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
                 }
             }
             
+            
 
             return bytes.ToArray();
         }
@@ -205,9 +265,9 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
             sb.Append(Environment.NewLine);
             sb.Append("Version: " + this.Version);
             sb.Append(Environment.NewLine);
-            sb.Append("Header length: " + this.HeaderLength + " bytes");
+            sb.Append("Header length: " + this.HeaderLength + " (" + this.HeaderLength*4 + " bytes)");
             sb.Append(Environment.NewLine);
-            sb.Append("Total length: " + this.TotalLength);
+            sb.Append("Total length: " + this.TotalLength + " bytes");
             sb.Append(Environment.NewLine);
             sb.Append("Identification: 0x" + this.Identification.ToHex() + " (" + this.Identification + ")");
             sb.Append(Environment.NewLine);
@@ -224,6 +284,8 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
             sb.Append("Source: " + this.SourceAddress);
             sb.Append(Environment.NewLine);
             sb.Append("Destination: " + this.DestinationAddress.ToString());
+            sb.Append(Environment.NewLine);
+            sb.Append("Data size: " + this.Data.Count + " bytes");
             sb.Append(Environment.NewLine);
             sb.Append("--------------------");
             sb.Append(Environment.NewLine);

@@ -42,6 +42,21 @@ namespace Cosmos.Hardware.Extension.NumberSystem
             return ConvertToBinary((UInt32)n).PadLeft(width, '0');
         }
 
+        public static string ToBinary(this UInt32 n)
+        {
+            return ConvertToBinary(n);
+        }
+
+        public static string ToBinary(this UInt32 n, int width)
+        {
+            return ConvertToBinary(n).PadLeft(width, '0');
+        }
+
+        public static UInt32 FromBinary(this string n)
+        {
+            return ConvertFromBinary(n);
+        }
+
         #endregion
 
         #region Prefix/Suffix
@@ -83,6 +98,22 @@ namespace Cosmos.Hardware.Extension.NumberSystem
             }
 
             return bin;
+        }
+
+        public static UInt32 ConvertFromBinary(string bin)
+        {
+            int multiplier = 1;
+            int value = 0;
+
+            for (int i = bin.Length - 1; i >= 0; i--)
+            {
+                if (bin[i].ToString() == "1")
+                    value += multiplier;
+                
+                multiplier *= 2;
+            }
+
+            return (UInt32)value;
         }
 
         private static bool IsOdd(this UInt32 n)
