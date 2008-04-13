@@ -192,7 +192,9 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
             string third = Reverse(bin.Substring(16, 8));
             string fourth = Reverse(bin.Substring(24, 8));
 
+            //Console.WriteLine("Little-endian: " + bin + " (as value: " + bin.FromBinary());
             bin = first + second + third + fourth;
+            //Console.WriteLine("Big-endian:    " + bin + " (as value: " + bin.FromBinary());
 
             return bin.FromBinary();
         }
@@ -210,18 +212,18 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
             //Console.WriteLine("As binary: " + ((UInt32)((this.Version << 4) | (this.HeaderLength << 0) | (this.TypeOfService << 8) | (this.TotalLength << 24))).ToBinary());
             
             //Testing big endian
-            UInt32 field1 = (UInt32)((this.Version << 0) | (this.HeaderLength << 4) | (this.TypeOfService << 8) | (this.TotalLength << 16));
-            field1 = ConvertToBigEndian(field1);
+            UInt32 field1 = (UInt32)((this.Version << 4) | (this.HeaderLength << 0) | (this.TypeOfService << 8) | (this.TotalLength << 24));
+            //field1 = ConvertToBigEndian(field1);
             fields.Add(field1);
 
-            UInt32 field2 = (UInt32)((this.Identification << 0) | (((byte)(this.FragmentFlags)) << 16) | (this.FragmentOffset << 19));
-            fields.Add(ConvertToBigEndian(field2));
-            //fields.Add((UInt32)((this.Identification << 0) | (((byte)(this.FragmentFlags)) << 16) | (this.FragmentOffset << 19)));
+            UInt32 field2 = (UInt32)((this.Identification << 8) | (((byte)(this.FragmentFlags)) << 21) | (byte)(this.FragmentOffset << 24)); //TODO: FragmentOffset should be 13 bits.
+            //fields.Add(ConvertToBigEndian(field2));
+            fields.Add(field2);
 
-            UInt32 field3 = (UInt32)((this.TimeToLive << 0) | (((byte)(this.Protocol)) << 8) | (this.HeaderChecksum << 16));
-            fields.Add(ConvertToBigEndian(field3));
+            UInt32 field3 = (UInt32)((this.TimeToLive << 0) | (((byte)(this.Protocol)) << 8) | (this.HeaderChecksum << 24));
+            //fields.Add(ConvertToBigEndian(field3));
+            fields.Add(field3);
             
-            //fields.Add((UInt32)((this.TimeToLive << 0) | (((byte)(this.Protocol)) << 8) | (this.HeaderChecksum << 16)));
             fields.Add(ConvertToBigEndian(this.SourceAddress.To32BitNumber()));
             fields.Add(ConvertToBigEndian(this.DestinationAddress.To32BitNumber()));
             //TODO - Options field

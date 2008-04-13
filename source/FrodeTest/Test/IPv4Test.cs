@@ -22,14 +22,17 @@ namespace FrodeTest.Test
             ipv4Packet.DestinationAddress = new IPv4Address(172,28,5,1);
             ipv4Packet.SourceAddress = new IPv4Address(172,28,6,6);
             ipv4Packet.TypeOfService = 0;
-            ipv4Packet.Protocol = IPv4Packet.Protocols.UDP;
+            ipv4Packet.Identification = 12345;
             ipv4Packet.FragmentFlags = IPv4Packet.Fragmentation.DoNotFragment;
             ipv4Packet.FragmentOffset = 0;
+            ipv4Packet.Protocol = IPv4Packet.Protocols.TCP;
             List<byte> data = new List<byte>();
             data.Add(0xFF);
             data.Add(0xFE);
             data.Add(0xFD);
             data.Add(0xFC);
+            data.Add(0xFB);
+            data.Add(0xFA);
             ipv4Packet.Data = data;
             
             if (ipv4Packet.HeaderChecksum == 0)
