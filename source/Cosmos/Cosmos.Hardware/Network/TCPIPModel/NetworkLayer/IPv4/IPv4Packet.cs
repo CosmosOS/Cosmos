@@ -201,17 +201,17 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
 
         /// <summary>
         /// Returns the entire packet as a byte array.
+        /// The header is using big-endian for the bytes.
         /// </summary>
         public byte[] RawBytes()
         {
+            //TODO: Use the big-endian attribute which is not available yet.
+
+
             List<byte> bytes = new List<byte>();
             List<UInt32> fields = new List<UInt32>();
 
             //Add the packetsections together into 32-bit words
-            //fields.Add((UInt32)((this.Version << 4) | (this.HeaderLength << 0) | (this.TypeOfService << 8) | (this.TotalLength << 24)));
-            //Console.WriteLine("As binary: " + ((UInt32)((this.Version << 4) | (this.HeaderLength << 0) | (this.TypeOfService << 8) | (this.TotalLength << 24))).ToBinary());
-            
-            //Testing big endian
             UInt32 field1 = (UInt32)((this.Version << 4) | (this.HeaderLength << 0) | (this.TypeOfService << 8) | (this.TotalLength << 24));
             //field1 = ConvertToBigEndian(field1);
             fields.Add(field1);
@@ -224,19 +224,7 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
             //fields.Add(ConvertToBigEndian(field3));
             fields.Add(field3);
             
-            fields.Add(ConvertToBigEndian(this.SourceAddress.To32BitNumber()));
-            fields.Add(ConvertToBigEndian(this.DestinationAddress.To32BitNumber()));
-            //TODO - Options field
-
             //Split the 32-bit words into bytes
-            //foreach (UInt32 field in fields)
-            //{
-            //    bytes.Add((byte)(field >> 0));
-            //    bytes.Add((byte)(field >> 8));
-            //    bytes.Add((byte)(field >> 16));
-            //    bytes.Add((byte)(field >> 24));
-            //}
-
             for (int i = 0; i < fields.Count; i++)
             {
                 bytes.Add((byte)(fields[i] >> 0));
@@ -244,6 +232,15 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
                 bytes.Add((byte)(fields[i] >> 16));
                 bytes.Add((byte)(fields[i] >> 24));
             }
+
+            //Source and Destination
+            foreach (byte b in SourceAddress.ToByteArray())
+                bytes.Add(b);
+
+            foreach (byte b in DestinationAddress.ToByteArray())
+                bytes.Add(b);
+
+            //TODO - Options field
 
             //The main body of the packet
             if (this.Data != null)
@@ -253,8 +250,6 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
                     bytes.Add(b);
                 }
             }
-            
-            
 
             return bytes.ToArray();
         }
