@@ -30,6 +30,7 @@ namespace RsenkTest
         /// <param name="path">The current path.</param>
         public static void Prompt(string user, string path)
         {
+            Console.ForegroundColor = NORMAL_COLOR;
             Console.Write("[" + user + ":" + path + "]" + SYM_NORM + " ");
         }
 

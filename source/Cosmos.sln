@@ -83,9 +83,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MohammedTest", "MohammedTes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kudzu-UDP", "Boot\Playgrounds\Kudzu UDP\Kudzu-UDP.csproj", "{813297D7-0AB4-43E1-99D3-97874FE10FE6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RsenkTest", "RsenkTest\RsenkTest.csproj", "{F598F906-8F3B-4EC1-AB8F-A9CBD8EBBE21}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 34
+		SccNumberOfProjects = 35
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -221,6 +223,10 @@ Global
 		SccProjectTopLevelParentUniqueName33 = Cosmos.sln
 		SccProjectName33 = Boot/Playgrounds/Kudzu\u0020UDP
 		SccLocalPath33 = Boot\\Playgrounds\\Kudzu\u0020UDP
+		SccProjectUniqueName34 = RsenkTest\\RsenkTest.csproj
+		SccProjectTopLevelParentUniqueName34 = Cosmos.sln
+		SccProjectName34 = RsenkTest
+		SccLocalPath34 = RsenkTest
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -357,6 +363,10 @@ Global
 		{813297D7-0AB4-43E1-99D3-97874FE10FE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{813297D7-0AB4-43E1-99D3-97874FE10FE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{813297D7-0AB4-43E1-99D3-97874FE10FE6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F598F906-8F3B-4EC1-AB8F-A9CBD8EBBE21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F598F906-8F3B-4EC1-AB8F-A9CBD8EBBE21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F598F906-8F3B-4EC1-AB8F-A9CBD8EBBE21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F598F906-8F3B-4EC1-AB8F-A9CBD8EBBE21}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -396,6 +406,7 @@ Global
 		{EF65AFB7-9DC9-4ACD-946D-7E973A67DBBE} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
 		{1240EAB3-D6B1-463A-BA83-436607A1F18E} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
 		{813297D7-0AB4-43E1-99D3-97874FE10FE6} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
+		{F598F906-8F3B-4EC1-AB8F-A9CBD8EBBE21} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
 		{8F2D5231-CDE5-48FA-9D26-D4305B01FD3C} = {4DE8EC69-B412-41C4-BCD9-1E032984E888}
 		{FF431742-6490-46B8-A9F6-734477D0725D} = {4DE8EC69-B412-41C4-BCD9-1E032984E888}
 	EndGlobalSection

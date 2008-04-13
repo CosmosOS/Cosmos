@@ -7,6 +7,7 @@ namespace RsenkTest.Commands
 {
     abstract class CommandBase
     {
+        protected List<ParameterBase> parameters;
         public abstract string Name { get; }
         public abstract string Summary { get; }
         public abstract void Help();

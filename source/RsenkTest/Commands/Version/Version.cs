@@ -7,6 +7,14 @@ namespace RsenkTest.Commands.Version
 {
     class Version : CommandBase
     {
+        public Version()
+        {
+            parameters = new List<ParameterBase>();
+
+            parameters.Add(new VerAll());
+            parameters.Add(new VerCommander());
+        }
+
         public override string Name
         {
             get { return "ver"; }

@@ -16,26 +16,36 @@ namespace RsenkTest
         public CommanderShell()
         {
             commands.Add(new ClearScreen());
+            commands.Add(new RsenkTest.Commands.Version.Version());
 
             interpreter = new Interpreter(commands);
         }
 
         public override void Initialize()
         {
+            //Clear the screen
+            interpreter.ParseCommand("cls").Execute();
+
             while (true) //Stay in the shell until exit
             {
                 Prompter.Prompt("rsenk330", "~");
                 string line = Console.ReadLine();
 
-                CommandBase command = interpreter.ParseCommand(line);
+                if (line.Equals("exit"))
+                    break;
 
-                if (command != null)
+                if (!String.IsNullOrEmpty(line))
                 {
-                    command.Execute();
-                }
-                else
-                {
-                    Prompter.PrintError("'" + line + "' is not a valid command. Type 'help' for a list of valid commands");
+                    CommandBase command = interpreter.ParseCommand(line);
+
+                    if (command != null)
+                    {
+                        command.Execute();
+                    }
+                    else
+                    {
+                        Prompter.PrintError("'" + line + "' is not a valid command. Type 'help' for a list of valid commands");
+                    }
                 }
             }
         }

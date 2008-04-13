@@ -26,16 +26,10 @@ namespace RsenkTest
 
         private CommandBase CheckCommand(string comm)
         {
-            CommandBase commandToRet = new RsenkTest.Commands.ClearScreen.ClearScreen();
-
-            //foreach (CommandBase command in _commands)
-            //{
-            //    if (command.Name == comm)
-            //    {
-            //        commandToRet = command;
-            //        break;
-            //    }
-            //}
+            CommandBase commandToRet = _commands.Find(delegate(CommandBase command)
+            {
+                return command.Name.Equals(comm);
+            });
 
             return commandToRet;
         }
