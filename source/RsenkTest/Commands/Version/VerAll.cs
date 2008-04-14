@@ -9,22 +9,22 @@ namespace RsenkTest.Commands.Version
     {
         public override string Name
         {
-            get { throw new NotImplementedException(); }
+            get { return "all"; }
         }
 
         public override string Summary
         {
-            get { throw new NotImplementedException(); }
+            get { return "Gets the version number of Cosmos and Commander"; }
         }
 
         public override void Help()
         {
-            throw new NotImplementedException();
+            Prompter.PrintMessage(""); //TODO: Finish this method
         }
 
         public override void Execute()
         {
-            throw new NotImplementedException();
+            Prompter.PrintMessage("About Commander:");
         }
 
         public override void Execute(params ParameterBase[] args)

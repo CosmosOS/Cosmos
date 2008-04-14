@@ -19,7 +19,7 @@ namespace RsenkTest.Commands.ClearScreen
 
         public override void Help()
         {
-            throw new NotImplementedException();
+            Console.WriteLine(""); //TODO: Write this method
         }
 
         public override void Execute(params ParameterBase[] args)

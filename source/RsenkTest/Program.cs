@@ -25,7 +25,7 @@ namespace RsenkTest
                 System.Console.WriteLine("                                      [ done ]");
 
                 System.Console.WriteLine("Queueing Shell");
-                stages.Enqueue(new CommanderShell());
+                stages.Enqueue(CommanderShell.GetInstance());
                 System.Console.WriteLine("                                      [ done ]");
 
                 stages.Run();

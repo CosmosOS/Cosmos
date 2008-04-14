@@ -9,7 +9,7 @@ namespace RsenkTest.Commands.Version
     {
         public Version()
         {
-            parameters = new List<ParameterBase>();
+            parameters = new List<CommandBase>();
 
             parameters.Add(new VerAll());
             parameters.Add(new VerCommander());
@@ -27,7 +27,15 @@ namespace RsenkTest.Commands.Version
 
         public override void Help()
         {
-            throw new NotImplementedException();
+            Prompter.PrintMessage("Usage: ver [arg].");
+            Prompter.PrintMessage("Valid args: ");
+
+            for (int x = 0; x < parameters.Count; x++)
+            {
+                Prompter.PrintMessage("  " + parameters[x].Name);
+            }
+
+            Prompter.PrintMessage("");
         }
 
         public override void Execute(params ParameterBase[] args)

@@ -90,5 +90,17 @@ namespace RsenkTest
 
             Console.WriteLine(message);
         }
+
+        public static void PrintCommandError(string name, bool invalidArg)
+        {
+            if (invalidArg)
+            {
+                PrintError("The argument(s) for '" + name + "' were incorrect. Type 'help [command]' for help.");
+            }
+            else
+            {
+                PrintError("'" + name + "' is not a valid command. Type 'help' for a list of valid commands.");
+            }
+        }
     }
 }

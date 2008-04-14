@@ -58,6 +58,7 @@
     <Compile Include="Commands\ClearScreen\ClearScreen.cs" />
     <Compile Include="Commands\CommandBase.cs" />
     <Compile Include="CommanderShell.cs" />
+    <Compile Include="Commands\HelpCommand.cs" />
     <Compile Include="Commands\ParameterBase.cs" />
     <Compile Include="Commands\Version\VerAll.cs" />
     <Compile Include="Commands\Version\VerCommander.cs" />

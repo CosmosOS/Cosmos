@@ -10,15 +10,25 @@ namespace RsenkTest
 {
     class CommanderShell : StageBase
     {
-        Interpreter interpreter;
-        List<CommandBase> commands = new List<CommandBase>();
+        private Interpreter interpreter;
+        private List<CommandBase> commands = new List<CommandBase>();
+        private static CommanderShell commander;
 
-        public CommanderShell()
+        private CommanderShell()
         {
             commands.Add(new ClearScreen());
             commands.Add(new RsenkTest.Commands.Version.Version());
+            commands.Add(new HelpCommand());
 
             interpreter = new Interpreter(commands);
+        }
+
+        public static CommanderShell GetInstance()
+        {
+            if (commander == null)
+                commander = new CommanderShell();
+
+            return commander;
         }
 
         public override void Initialize()
@@ -40,11 +50,12 @@ namespace RsenkTest
 
                     if (command != null)
                     {
-                        command.Execute();
+                        ParameterBase[] parameters = interpreter.ParseParameters(command, line);
+                        command.Execute(parameters);
                     }
                     else
                     {
-                        Prompter.PrintError("'" + line + "' is not a valid command. Type 'help' for a list of valid commands");
+                        Prompter.PrintCommandError(line, false);
                     }
                 }
             }
@@ -56,5 +67,34 @@ namespace RsenkTest
         }
 
         public override void Teardown() { }
+
+        public void PrintCommands()
+        {
+            string toPrint = "";
+            for (int x = 0; x < commands.Count; x++)
+            {
+                toPrint = commands[x].Name;
+
+                for (int i = commands[x].Name.Length; i < 11; i++)
+                {
+                    toPrint += " ";
+                }
+
+                toPrint += commands[x].Summary;
+
+                Prompter.PrintMessage(toPrint);
+            }
+
+            Prompter.PrintMessage("exit       Exits Commander\n");
+            Prompter.PrintMessage("Type 'help [command]' for more help.\n");
+        }
+
+        public List<CommandBase> Commands
+        {
+            get
+            {
+                return commands;
+            }
+        }
     }
 }

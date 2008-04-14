@@ -19,7 +19,7 @@ namespace RsenkTest.Commands.Version
 
         public override void Help()
         {
-            throw new NotImplementedException();
+            Prompter.PrintMessage(""); //TODO: Finish this method
         }
 
         public override void Execute()
@@ -27,11 +27,6 @@ namespace RsenkTest.Commands.Version
             Prompter.PrintMessage("Commander 0.0.0.1 alpha\n");
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="args"></param>
-        [Obsolete("This method was inherited from CommandBase and should not be used. User Execute() instead.")]
         public override void Execute(params ParameterBase[] args)
         {
             throw new NotImplementedException();
