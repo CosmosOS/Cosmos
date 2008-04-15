@@ -3,7 +3,7 @@
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:local="clr-namespace:Cosmos.Build.Windows"
-	Title="Building Comsos Application"
+	Title="Building Cosmos Application"
 	Height="300"
 	Width="496"
 	Icon="/Cosmos.Build.Windows;component/Cosmos.ico">
