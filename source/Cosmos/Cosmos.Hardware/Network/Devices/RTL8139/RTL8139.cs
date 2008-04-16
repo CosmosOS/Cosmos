@@ -241,7 +241,9 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             imr.ReceiveError = true;
             imr.TransmitOK = true;
             imr.TransmitError = true;
- 
+            imr.CableLengthChange = true;
+            imr.SystemError = true;
+            imr.TimeOut = true;
         }
 
         /// <summary>
