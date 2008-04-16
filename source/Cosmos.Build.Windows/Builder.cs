@@ -31,31 +31,24 @@ namespace Cosmos.Build.Windows {
         /// <returns>Full path to the Build directory.</returns>
 		protected static string GetBuildPath() {
 			try {
-                string xResult;
+                string xResult = "";
 				RegistryKey xKey = Registry.CurrentUser.OpenSubKey(@"Software\Cosmos");
 
-                if (xKey != null) // Use Registry
-                {
+                if (xKey != null) { // Use Registry
                     xResult = (string)xKey.GetValue("Build Path");
-                    if (string.IsNullOrEmpty(xResult))
-                        throw new Exception("Found Registry key, but no value named \"Build Path\"");
                 }
-                else //Use Current Directory
-                {
+                if (string.IsNullOrEmpty(xResult)) {
 					xResult = Directory.GetCurrentDirectory().ToLowerInvariant();
 					int xPos = xResult.LastIndexOf("source");
-                    if (xPos > -1) {
-                        xResult = xResult.Substring(0, xPos) + @"Build\";
-                    }
-                    else {
+                    if (xPos == -1) {
                         throw new Exception("Unable to find directory named 'source' when using CurrentDirectory.");
                     }
-				}
+                    xResult = xResult.Substring(0, xPos) + @"Build\";
+                }
 
 				if (string.IsNullOrEmpty(xResult)) {
 					throw new Exception("Cannot find Cosmos build path either in the Registry or using current directory search.");
 				}
-
 				if (!xResult.EndsWith(@"\")) {
 					xResult = xResult + @"\";
 				}
