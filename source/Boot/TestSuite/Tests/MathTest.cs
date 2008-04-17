@@ -48,6 +48,21 @@ namespace TestSuite.Tests
             Assert(a != b, "UInt32 Inequality");
 			if (0xFFF00000002ul > 0xFF00000001ul) Console.WriteLine("UInt64 comprasion passed");
 			if (0xFFF00000002ul == 0xFFF00000002ul) Console.WriteLine("Branch on Equality");
-        }
+
+			#region bge
+			Console.ForegroundColor = ConsoleColor.Red;
+			if (0xFFFFFFF000000002L >= 0xFFFFFFF000000002L) Console.ForegroundColor = ConsoleColor.White;
+			Console.Write("bge[e] ");
+			Console.ForegroundColor = ConsoleColor.Red;
+			if (!(0xFFFFFFF000000002L >= 0xFFFFFFFFFFFFFFFFL)) Console.ForegroundColor = ConsoleColor.White;
+			Console.Write("bge[!] ");
+			Console.ForegroundColor = ConsoleColor.Red;
+			if (0xFFFFFFFFFFFFFFFFL >= 0xFFFFFFF000000002L) Console.ForegroundColor = ConsoleColor.White;
+			Console.Write("bge[g]");
+			Console.WriteLine("");
+			#endregion
+
+
+		}
     }
 }
