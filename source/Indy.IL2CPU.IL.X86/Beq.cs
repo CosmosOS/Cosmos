@@ -32,7 +32,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				new CPUx86.JumpIfNotEquals(LabelFalse);
 				new CPUx86.JumpAlways(TargetLabel);
 				new CPU.Label(LabelFalse);
-				new CPUx86.Noop();
+				//new CPUx86.Noop();
 				//new CPUx86.JumpAlways(LabelFalse);
 				//new CPU.Label(LabelTrue);
 				//new CPUx86.Add(CPUx86.Registers.ESP, "4");
@@ -51,7 +51,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				new CPUx86.JumpIfNotZero(LabelFalse);
 				new CPUx86.JumpAlways(TargetLabel);
 				new CPU.Label(LabelFalse);
-				new CPUx86.Noop();
+				//new CPUx86.Noop();
 			}
 		}
 	}
