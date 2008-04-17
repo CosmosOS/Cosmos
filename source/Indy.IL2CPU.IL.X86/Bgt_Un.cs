@@ -56,7 +56,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				//value1: ECX:EBX
 				new CPUx86.Sub("ebx", "eax");
 				new CPUx86.SubWithCarry("ecx", "edx");
-				//result = value2 - value1
+				//result = value1 - value2
 				new CPUx86.JumpIfAbove(TargetLabel);
 			}
 

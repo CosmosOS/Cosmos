@@ -48,7 +48,6 @@ namespace Indy.IL2CPU.IL.X86 {
 			string BaseLabel = CurInstructionLabel + "__";
 			string LabelTrue = BaseLabel + "True";
 			string LabelFalse = BaseLabel + "False";
-			//target label is then value1 >= value2
 			new CPUx86.Pop(CPUx86.Registers.EAX);
 			new CPUx86.Pop(CPUx86.Registers.EDX);
 			//value2: EDX:EAX
@@ -57,8 +56,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			//value1: ECX:EBX
 			new CPUx86.Sub("ebx", "eax");
 			new CPUx86.SubWithCarry("ecx", "edx");
-			//result = value2 - value1
-			//result is less then zero then value1 > value2
+			//result = value1 - value2
 			new CPUx86.JumpIfGreaterOrEqual(TargetLabel);
 		}
 
