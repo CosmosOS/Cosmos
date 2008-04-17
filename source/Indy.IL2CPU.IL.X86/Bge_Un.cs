@@ -28,19 +28,16 @@ namespace Indy.IL2CPU.IL.X86 {
 			string LabelFalse = BaseLabel + "False";
 			if (xSize > 4)
 			{
-				//target label is then value1 >= value2
 				new CPUx86.Pop(CPUx86.Registers.EAX);
 				new CPUx86.Pop(CPUx86.Registers.EDX);
 				//value2: EDX:EAX
 				new CPUx86.Pop("ebx");
 				new CPUx86.Pop("ecx");
 				//value1: ECX:EBX
-				new CPUx86.Sub("eax", "ebx");
-				//lowers
-				new CPUx86.SubWithCarry("edx", "ecx");
-				//highs
-				//result is less then zero then value1 > value2
-				new CPUx86.JumpIfBelowOrEqual(TargetLabel);
+				new CPUx86.Sub("ebx", "eax");
+				new CPUx86.SubWithCarry("ecx", "edx");
+				//result = value1 - value2
+				new CPUx86.JumpIfGreaterOrEqual(TargetLabel);
 			}else
 			{
 				new CPUx86.Pop(CPUx86.Registers.EAX);
