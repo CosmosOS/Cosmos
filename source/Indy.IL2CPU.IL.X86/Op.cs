@@ -254,6 +254,18 @@ namespace Indy.IL2CPU.IL.X86 {
 			aAssembler.StackContents.Pop();
 		}
 
+		public static void AddWithOverflow(Assembler.Assembler aAssembler, bool signed)
+		{
+			throw new NotImplementedException();
+			Add(aAssembler);
+			if (signed)
+			{
+				new CPUx86.Interrupt(CPUx86.Interrupt.INTO);
+			} else
+			{
+				throw new NotImplementedException();
+			}
+		}
 		public static void Add(Assembler.Assembler aAssembler) {
 			StackContent xSize = aAssembler.StackContents.Pop();
 			if (xSize.IsFloat) {
