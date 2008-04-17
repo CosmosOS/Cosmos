@@ -35,6 +35,8 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         private MemoryAddressSpace mem;
         private Register.MainRegister reg;
         private Register.ValueTypeRegisters valueReg;
+        private Register.InterruptMaskRegister imr;
+        private Register.InterruptStatusRegister isr;
         private byte[] TxBuffer0;
         private byte[] TxBuffer1;
         private byte[] TxBuffer2;
@@ -50,6 +52,8 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             mem = device.GetAddressSpace(1) as MemoryAddressSpace;
             reg = new Register.MainRegister(mem);
             valueReg = Register.ValueTypeRegisters.Load(mem);
+            imr = Register.InterruptMaskRegister.Load(mem);
+            isr = Register.InterruptStatusRegister.Load(mem);
         }
 
         public PCIDevice PCICard { get { return pciCard; } private set { ;} }
@@ -102,7 +106,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             //Enable IRQ Interrupt
             SetIRQMaskRegister();
             Console.WriteLine("Listening for IRQ" + pciCard.InterruptLine + " for incoming data...");
-            Cosmos.Hardware.PC.Interrupts.IRQ11 = new Cosmos.Hardware.PC.Interrupts.InterruptDelegate(HandleNetworkInterrupt);
+            Cosmos.Hardware.PC.Interrupts.IRQ11 = new Cosmos.Hardware.PC.Interrupts.InterruptDelegate(this.HandleNetworkInterrupt);
         }
 
         #region Operational properties
@@ -217,10 +221,33 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         /// <summary>
         /// (Should be) Called when the PCI network card raises an Interrupt.
         /// </summary>
-        public static void HandleNetworkInterrupt()
+        public void HandleNetworkInterrupt()
         {
             Console.WriteLine("Network IRQ raised! Indicates data received...");
+
+            if (imr.ReceiveOK & isr.ReceiveOK)
+                Console.WriteLine("Receive OK");
+
+            if (imr.ReceiveError & isr.ReceiveError)
+                Console.WriteLine("Receive ERROR");
+
+            if (imr.TransmitOK & isr.TransmitOK)
+                Console.WriteLine("Transmit OK");
+
+            if (imr.TransmitError & isr.TransmitError)
+                Console.WriteLine("Transmit Error");
+
+            this.ResetAllIRQ();
+
         }
+
+        private void ResetAllIRQ()
+        {
+            //Setting a bit to 1 will reset it. So we write 16 one's to reset entire ISR.
+            isr.ISR = 0xFFFF;
+        }
+
+
 
         /// <summary>
         /// The IRQMaskRegister
@@ -228,14 +255,6 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         private void SetIRQMaskRegister()
         {
             //Note; The reference driver from Realtek sets mask = 0x7F (all bits high).
-            //reg.IntrMask = (Register.CommandRegister.BitValue)
-            //    (
-            //    Register.InterruptMaskRegister.Bit.ROK & 
-            //    Register.InterruptMaskRegister.Bit.TOK & 
-            //    Register.InterruptMaskRegister.Bit.RER & 
-            //    Register.InterruptMaskRegister.Bit.TER
-            //    );
-
             var imr = Register.InterruptMaskRegister.Load(mem);
             imr.ReceiveOK = true;
             imr.ReceiveError = true;
@@ -244,19 +263,6 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             imr.CableLengthChange = true;
             imr.SystemError = true;
             imr.TimeOut = true;
-        }
-
-        /// <summary>
-        /// This register indicates the source of an interrupt when the INTA pin goes active. 
-        /// Enabling the corresponding bits in the Interrupt Mask Register (IMR) allows bits in this register to produce an interrupt. 
-        /// When an interrupt is active, one of more bits in this register are set to a “1”. 
-        /// The interrupt Status Register reflects all current pending interrupts, regardless of the state of the corresponding mask bit in the IMR. 
-        /// Reading the ISR clears all interrupts. Writing to the ISR has no effect.
-        /// </summary>
-        private void GetIRQServiceRegister()
-        {
-            //Could perhaps be used to raise events?
-            throw new NotImplementedException();
         }
 
         #endregion
@@ -283,7 +289,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         {
             var cr = Register.CommandRegister.Load(mem);
             var msr = Register.MediaStatusRegister.Load(mem);
-            var imr = Register.InterruptMaskRegister.Load(mem);
+
 
             Console.WriteLine("Tx enabled?: " + cr.TxEnabled.ToString());
             Console.WriteLine("Rx enabled?: " + cr.RxEnabled.ToString());
@@ -293,6 +299,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             Console.WriteLine("Link OK?: " + (!msr.LinkStatusInverse).ToString());
             Console.WriteLine("CBR (byte count): " + valueReg.CurrentBufferPointer.ToString());
             Console.WriteLine("IMR: " + imr.ToString());
+            Console.WriteLine("ISR: " + isr.ToString());
 
 
         }

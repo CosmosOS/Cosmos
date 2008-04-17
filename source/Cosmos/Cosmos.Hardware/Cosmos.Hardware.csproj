@@ -64,6 +64,7 @@
     <Compile Include="Network\Devices\RTL8139\Register\ConfigurationRegister1.cs" />
     <Compile Include="Network\Devices\RTL8139\Register\EarlyRxStatusRegister.cs" />
     <Compile Include="Network\Devices\RTL8139\Register\InterruptMaskRegister.cs" />
+    <Compile Include="Network\Devices\RTL8139\Register\InterruptStatusRegister.cs" />
     <Compile Include="Network\Devices\RTL8139\Register\MainRegister.cs" />
     <Compile Include="Network\Devices\RTL8139\Register\MediaStatusRegister.cs" />
     <Compile Include="Network\Devices\RTL8139\Register\ReceiveConfigurationRegister.cs" />

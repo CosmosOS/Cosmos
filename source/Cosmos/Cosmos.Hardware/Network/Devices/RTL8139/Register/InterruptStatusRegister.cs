@@ -8,43 +8,41 @@ using Cosmos.Hardware.Extension.NumberSystem;
 namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
 {
     /// <summary>
-    /// This register masks the interrupts that can be generated from the InterruptStatusRegister (ISR).
-    /// Setting a bit to 1 will enable a corresponding bit in ISR to cause an interrupt.
-    /// During a hardware reset all bits are set to 0.
-    /// Offset 0x3C - 0x3D from base memory.
+    /// The InterruptStatusRegister is used to indicate why an IRQ was raised. Used in conjunction with the InterruptMaskRegister.
+    /// Offset 0x3E - 0x3F from base memory.
     /// 16 bit wide.
     /// </summary>
-    class InterruptMaskRegister
+    class InterruptStatusRegister
     {
 
         #region Constructor
 
         private MemoryAddressSpace xMem;
-        public static InterruptMaskRegister Load(MemoryAddressSpace aMem)
+        public static InterruptStatusRegister Load(MemoryAddressSpace aMem)
         {
-            return new InterruptMaskRegister(aMem);
+            return new InterruptStatusRegister(aMem);
         }
 
-        private InterruptMaskRegister(MemoryAddressSpace aMem)
+        private InterruptStatusRegister(MemoryAddressSpace aMem)
         {
             xMem = aMem;
         }
 
-        public UInt16 IMR
+        public UInt16 ISR
         {
             get
             {
-                return xMem.Read16((UInt32)Register.MainRegister.Bit.IntrMask);
+                return xMem.Read16((UInt32)Register.MainRegister.Bit.IntrStatus);
             }
             set
             {
-                xMem.Write16((UInt32)Register.MainRegister.Bit.IntrMask, value);
+                xMem.Write16((UInt32)Register.MainRegister.Bit.IntrStatus, value);
             }
         }
 
         public override string ToString()
         {
-            return this.IMR.ToBinary(16);
+            return this.ISR.ToBinary(16);
         }
 
         #endregion
@@ -129,15 +127,15 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
 
         private bool GetBit(BitPosition bit)
         {
-            return BinaryHelper.CheckBit(this.IMR, (byte)bit);
+            return BinaryHelper.CheckBit(this.ISR, (byte)bit);
         }
 
         private void SetBit(BitValue bit, bool value)
         {
             if (value)
-                this.IMR = (byte)(this.IMR | (byte)bit);
+                this.ISR = (byte)(this.ISR | (byte)bit);
             else
-                this.IMR = (byte)(this.IMR & ~(byte)bit);
+                this.ISR = (byte)(this.ISR & ~(byte)bit);
         }
 
         #endregion
@@ -174,7 +172,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
             SWINT = BinaryHelper.BitPos.BIT8,
             LENCHG = BinaryHelper.BitPos.BIT13,
             TIMEOUT = BinaryHelper.BitPos.BIT14,
-            SERR = BinaryHelper.BitPos.BIT15     
+            SERR = BinaryHelper.BitPos.BIT15
         }
 
         #endregion
