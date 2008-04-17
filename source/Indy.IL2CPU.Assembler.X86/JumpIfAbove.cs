@@ -7,7 +7,7 @@ namespace Indy.IL2CPU.Assembler.X86
 {
 	/// <summary>
 	/// CMP DEST, SOURCE
-	/// if (DEST > SOURCE) jump (unsigned)
+	/// if (DEST &gt; SOURCE) jump (unsigned)
 	/// </summary>
 	[OpCode(0xFFFFFFFF, "ja")]
 	public class JumpIfAbove : JumpBase

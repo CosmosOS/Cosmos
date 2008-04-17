@@ -61,6 +61,7 @@
     <Compile Include="Compare.cs" />
     <Compile Include="IDivide.cs" />
     <Compile Include="JumpIfAbove.cs" />
+    <Compile Include="JumpIfBelow.cs" />
     <Compile Include="JumpIfBelowOrEqual.cs" />
     <Compile Include="JumpIfCarry.cs" />
     <Compile Include="JumpIfGreaterOrEqual.cs" />
