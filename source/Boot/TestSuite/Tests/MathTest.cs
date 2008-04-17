@@ -108,6 +108,26 @@ namespace TestSuite.Tests
 
 			Console.WriteLine("");
 			#endregion bgt
+
+			#region bgt_un
+			Console.ForegroundColor = ConsoleColor.White;
+			if (0xFFFFFFF000000002LU > 0xFFFFFFF000000002LU) Console.ForegroundColor = ConsoleColor.Red;
+			Console.Write("bgt_un[e] ");
+
+			Console.ForegroundColor = ConsoleColor.White;
+			if (0xFFFFFFF000000002LU > 0xFFFFFFFFFFFFFFFFLU) Console.ForegroundColor = ConsoleColor.Red;
+			Console.Write("bgt_un[!] ");
+
+			Console.ForegroundColor = ConsoleColor.Red;
+			if (0xFFFFFFFFFFFFFFFFLU > 0xFFFFFFF000000002LU) Console.ForegroundColor = ConsoleColor.White;
+			Console.Write("bgt_un[g] ");
+
+			Console.ForegroundColor = ConsoleColor.White;
+			if (0x0000LU > 0xFFFFFFF000000002LU) Console.ForegroundColor = ConsoleColor.Red;
+			Console.Write("bgt_un[g0>=\"-\"]");
+
+			Console.WriteLine("");
+			#endregion bgt_un
 		}
     }
 }

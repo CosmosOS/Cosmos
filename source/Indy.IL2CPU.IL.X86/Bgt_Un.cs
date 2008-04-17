@@ -48,22 +48,16 @@ namespace Indy.IL2CPU.IL.X86 {
 
 			if (xSize == 8)
 			{
-				if (rightTop.Size < 8)
-					new CPUx86.Xor("ebx", "ebx");
-				else
-					new CPUx86.Pop("ebx");
-				new CPUx86.Pop("eax");
-
-				if (leftBottom.Size < 8)
-					new CPUx86.Xor("edx", "edx");
-				else
-					new CPUx86.Pop("edx");
+				new CPUx86.Pop(CPUx86.Registers.EAX);
+				new CPUx86.Pop(CPUx86.Registers.EDX);
+				//value2: EDX:EAX
+				new CPUx86.Pop("ebx");
 				new CPUx86.Pop("ecx");
-
-				new CPUx86.Sub("eax", "ecx");
-				new CPUx86.SubWithCarry("ebx", "edx");
-				new CPUx86.JumpIfCarry(LabelTrue);
-				return;
+				//value1: ECX:EBX
+				new CPUx86.Sub("ebx", "eax");
+				new CPUx86.SubWithCarry("ecx", "edx");
+				//result = value2 - value1
+				new CPUx86.JumpIfAbove(TargetLabel);
 			}
 
 			throw new NotSupportedException();
