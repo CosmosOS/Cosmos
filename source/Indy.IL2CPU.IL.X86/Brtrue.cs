@@ -14,16 +14,24 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public override void DoAssemble() {
-			new CPUx86.Popd(CPUx86.Registers.EAX);
 			int xSize = Assembler.StackContents.Pop().Size;
 			if (xSize > 8) {
 				throw new Exception("StackSize>8 not supported");
 			}
-			if (xSize > 4) {
-				new CPUx86.Add("esp", "4");
+			if (xSize > 4)
+			{
+				new CPUx86.Popd("eax");
+				new CPUx86.Popd("ebx");
+				new CPUx86.Xor("eax", "eax");
+				new CPUx86.JumpIfNotZero(TargetLabel);
+				new CPUx86.Xor("ebx", "ebx");
+				new CPUx86.JumpIfNotZero(TargetLabel);
+			} else
+			{
+				new CPUx86.Popd(CPUx86.Registers.EAX);
+				new CPUx86.Compare(CPUx86.Registers.EAX, "0");
+				new CPUx86.JumpIfNotEquals(TargetLabel);
 			}
-			new CPUx86.Compare(CPUx86.Registers.EAX, "0");
-			new CPUx86.JumpIfNotEquals(TargetLabel);
 		}
 	}
 }
