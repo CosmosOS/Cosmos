@@ -55,12 +55,11 @@ namespace Indy.IL2CPU.IL.X86 {
 			new CPUx86.Pop("ebx");
 			new CPUx86.Pop("ecx");
 			//value1: ECX:EBX
-			new CPUx86.Sub("eax", "ebx");
-			//lowers
-			new CPUx86.SubWithCarry("edx", "ecx");
-			//highs
+			new CPUx86.Sub("ebx", "eax");
+			new CPUx86.SubWithCarry("ecx", "edx");
+			//result = value2 - value1
 			//result is less then zero then value1 > value2
-			new CPUx86.JumpIfLessOrEqual(TargetLabel);
+			new CPUx86.JumpIfGreaterOrEqual(TargetLabel);
 		}
 
 		public override void DoAssemble() {

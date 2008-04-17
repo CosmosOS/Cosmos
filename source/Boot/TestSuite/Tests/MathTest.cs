@@ -52,17 +52,42 @@ namespace TestSuite.Tests
 			#region bge
 			Console.ForegroundColor = ConsoleColor.Red;
 			if (0xFFFFFFF000000002L >= 0xFFFFFFF000000002L) Console.ForegroundColor = ConsoleColor.White;
-			Console.Write("bge[e] ");
-			Console.ForegroundColor = ConsoleColor.Red;
-			if (!(0xFFFFFFF000000002L >= 0xFFFFFFFFFFFFFFFFL)) Console.ForegroundColor = ConsoleColor.White;
-			Console.Write("bge[!] ");
+			Console.Write("bge[e-] ");
+
+			Console.ForegroundColor = ConsoleColor.White;
+			if (0xFFFFFFF000000002L >= 0xFFFFFFFFFFFFFFFFL) Console.ForegroundColor = ConsoleColor.Red;
+			Console.Write("bge[!-] ");
+
 			Console.ForegroundColor = ConsoleColor.Red;
 			if (0xFFFFFFFFFFFFFFFFL >= 0xFFFFFFF000000002L) Console.ForegroundColor = ConsoleColor.White;
-			Console.Write("bge[g]");
+			Console.Write("bge[g-] ");
+
+			Console.ForegroundColor = ConsoleColor.Red;
+			if (0L >= -2L) Console.ForegroundColor = ConsoleColor.White;
+			Console.Write("bge[g0>=-]");
+
 			Console.WriteLine("");
-			#endregion
+			#endregion bge
 
+			#region bge_un
+			Console.ForegroundColor = ConsoleColor.Red;
+			if (0xFFFFFFF000000002LU >= 0xFFFFFFF000000002LU) Console.ForegroundColor = ConsoleColor.White;
+			Console.Write("bge_un[e] ");
 
+			Console.ForegroundColor = ConsoleColor.White;
+			if (0xFFFFFFF000000002LU >= 0xFFFFFFFFFFFFFFFFLU) Console.ForegroundColor = ConsoleColor.Red;
+			Console.Write("bge_un[!] ");
+
+			Console.ForegroundColor = ConsoleColor.Red;
+			if (0xFFFFFFFFFFFFFFFFLU >= 0xFFFFFFF000000002LU) Console.ForegroundColor = ConsoleColor.White;
+			Console.Write("bge_un[g] ");
+
+			Console.ForegroundColor = ConsoleColor.White;
+			if (0x0000LU >= 0xFFFFFFF000000002LU) Console.ForegroundColor = ConsoleColor.Red;
+			Console.Write("bge_un[g0>=\"-\"]");
+
+			Console.WriteLine("");
+			#endregion bge_un
 		}
     }
 }

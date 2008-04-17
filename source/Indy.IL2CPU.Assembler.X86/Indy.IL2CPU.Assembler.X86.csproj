@@ -60,7 +60,9 @@
     <Compile Include="CmpXchg.cs" />
     <Compile Include="Compare.cs" />
     <Compile Include="IDivide.cs" />
+    <Compile Include="JumpIfBelowOrEqual.cs" />
     <Compile Include="JumpIfCarry.cs" />
+    <Compile Include="JumpIfGreaterOrEqual.cs" />
     <Compile Include="JumpIfNotZero.cs" />
     <Compile Include="Stosw.cs" />
     <Compile Include="JumpNotCary.cs" />
