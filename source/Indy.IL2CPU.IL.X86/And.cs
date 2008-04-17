@@ -20,19 +20,23 @@ namespace Indy.IL2CPU.IL.X86 {
 			if (xSize > 8) {
 				throw new Exception("StackSize>8 not supported");
 			}
-			new CPU.Pop(CPU.Registers.EAX);
-			if (xSize > 4) {
-				new CPU.Add("esp", "4");
+			if (xSize > 4)
+			{
+				new CPU.Pop(CPU.Registers.EAX);
+				new CPU.Pop("ebx");
+				new CPU.Pop(CPU.Registers.EDX);
+				new CPU.Pop("ecx");
+				new CPU.And(CPU.Registers.EAX, CPU.Registers.EDX);
+				new CPU.And("ebx", "ecx");
+				new CPU.Pushd("ebx");
+				new CPU.Pushd(CPU.Registers.EAX);
+			}else
+			{
+				new CPU.Pop(CPU.Registers.EAX);
+				new CPU.Pop(CPU.Registers.EDX);
+				new CPU.And(CPU.Registers.EAX, CPU.Registers.EDX);
+				new CPU.Pushd(CPU.Registers.EAX);
 			}
-			new CPU.Pop(CPU.Registers.EDX);
-			if (xSize > 4) {
-				new CPU.Add("esp", "4");
-			}
-			new CPU.And(CPU.Registers.EAX, CPU.Registers.EDX);
-			if (xSize > 4) {
-				new CPU.Pushd("0");
-			}
-			new CPU.Pushd(CPU.Registers.EAX);
 			Assembler.StackContents.Push(xStackContent);
 		}
 	}
