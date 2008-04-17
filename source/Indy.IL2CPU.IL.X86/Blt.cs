@@ -61,31 +61,16 @@ namespace Indy.IL2CPU.IL.X86 {
 				new CPUx86.Add(CPUx86.Registers.ESP, "4");
 				break;
 			case 8:
-				new CPUx86.Pop(CPUx86.Registers.EBX);				//ebx = lowright
-				new CPUx86.Pop(CPUx86.Registers.EAX);				//eax = highright
-				new CPUx86.Pop(CPUx86.Registers.ECX);				//ecx = lowleft
-				new CPUx86.Pop(CPUx86.Registers.EDX);				//edx = high left
-
-				new CPUx86.Compare(CPUx86.Registers.EDX, CPUx86.Registers.EAX);
-
-				new CPUx86.JumpIfLess(LabelTrue);					//значение на глубине меньше
-				new CPUx86.JumpIfGreater(NextInstructionLabel);		//значение на глубине больше
-
-				if ((0xFFFFFFFF > 0xFFFFFFE) && (0xFFFF0000 < 0xFFFFFFFE))
-				{
-					new CPUx86.Compare(CPUx86.Registers.ECX, CPUx86.Registers.EBX);
-
-					new CPUx86.JumpIfLess(LabelTrue);
-					new CPUx86.JumpAlways(NextInstructionLabel);
-				} else
-					throw new NotImplementedException("long comprasion is not implemented");
-																
-				//значения старших 														
-
-				new CPU.Label(LabelTrue);
-				new CPUx86.JumpAlways(TargetLabel);
-
-				//throw new NotImplementedException("long comprasion is not implemented");
+				new CPUx86.Pop(CPUx86.Registers.EAX);
+				new CPUx86.Pop(CPUx86.Registers.EDX);
+				//value2: EDX:EAX
+				new CPUx86.Pop("ebx");
+				new CPUx86.Pop("ecx");
+				//value1: ECX:EBX
+				new CPUx86.Sub("ebx", "eax");
+				new CPUx86.SubWithCarry("ecx", "edx");
+				//result = value1 - value2
+				new CPUx86.JumpIfLess(TargetLabel);
 				break;
 			default:
 				throw new NotSupportedException(string.Format("comprasion of {0} byte values", xSize));
