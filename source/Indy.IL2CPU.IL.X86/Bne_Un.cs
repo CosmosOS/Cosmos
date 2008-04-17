@@ -26,26 +26,29 @@ namespace Indy.IL2CPU.IL.X86 {
 			string BaseLabel = CurInstructionLabel + "__";
 			string LabelTrue = BaseLabel + "True";
 			string LabelFalse = BaseLabel + "False";
-			new CPUx86.Pop(CPUx86.Registers.EAX);
-			if (xSize > 4) {
-				throw new NotImplementedException("long comprasion is not implemented");
-				new CPUx86.Add("esp", "4");
-			}
-			new CPUx86.Compare(CPUx86.Registers.EAX, CPUx86.Registers.AtESP);
-			new CPUx86.JumpIfEquals(LabelTrue);
-			new CPUx86.JumpAlways(LabelFalse);
-			new CPU.Label(LabelFalse);
-			new CPUx86.Add(CPUx86.Registers.ESP, "4");
-			if (xSize > 4) {
-				throw new NotImplementedException("long comprasion is not implemented");
-				new CPUx86.Add("esp", "4");
-			}
-			new CPUx86.JumpAlways(TargetLabel);
-			new CPU.Label(LabelTrue);
-			new CPUx86.Add(CPUx86.Registers.ESP, "4");
-			if (xSize > 4) {
-				throw new NotImplementedException("long comprasion is not implemented");
-				new CPUx86.Add("esp", "4");
+			if (xSize > 4)
+			{
+				new CPUx86.Pop("eax");
+				new CPUx86.Pop("ebx");
+				//value2 = EBX:EAX
+				new CPUx86.Pop("ecx");
+				new CPUx86.Pop("edx");
+				//value1 = EDX:ECX
+				new CPUx86.Xor("eax", "ecx");
+				new CPUx86.JumpIfNotZero(TargetLabel);
+				new CPUx86.Xor("ebx", "edx");
+				new CPUx86.JumpIfNotZero(TargetLabel);
+			} else
+			{
+				new CPUx86.Pop(CPUx86.Registers.EAX);
+				new CPUx86.Compare(CPUx86.Registers.EAX, CPUx86.Registers.AtESP);
+				new CPUx86.JumpIfEquals(LabelTrue);
+				new CPUx86.JumpAlways(LabelFalse);
+				new CPU.Label(LabelFalse);
+				new CPUx86.Add(CPUx86.Registers.ESP, "4");
+				new CPUx86.JumpAlways(TargetLabel);
+				new CPU.Label(LabelTrue);
+				new CPUx86.Add(CPUx86.Registers.ESP, "4");
 			}
 		}
 	}
