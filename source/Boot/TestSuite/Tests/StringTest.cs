@@ -24,6 +24,7 @@ namespace TestSuite.Tests
         public override void Test()
         {
             Assert("ABCDEFG".IndexOf('E') == 4, "\"ABCDEFG\".IndexOf('E') == 4");
+			Assert("ABCDEFG".LastIndexOf('E') == 4, "\"ABCDEFG\".IndexOf('E') == 4");
             Assert("0123456789".IndexOf('5') == 5, "\"0123456789\".IndexOf('5') == 5");
             Assert("0123456789"[5] == '5', "\"0123456789\"[5] == '5'");
             Assert("a" != "b", "\"a\" != \"b\"");
