@@ -10,5 +10,10 @@ namespace Indy.IL2CPU.IL.X86 {
 		public Add_Ovf_Un(ILReader aReader, MethodInformation aMethodInfo)
 			: base(aReader, aMethodInfo) {
 		}
+
+		public override void DoAssemble()
+		{
+			AddWithOverflow(Assembler, false);
+		}
 	}
 }
