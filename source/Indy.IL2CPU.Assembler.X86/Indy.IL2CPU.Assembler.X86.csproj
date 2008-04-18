@@ -70,6 +70,9 @@
     <Compile Include="JumpIfGreaterOrEqual.cs" />
     <Compile Include="JumpIfNotZero.cs" />
     <Compile Include="JumpOnGreater.cs" />
+    <Compile Include="MoveAndSignExtend.cs" />
+    <Compile Include="MoveAndZeroExtend.cs" />
+    <Compile Include="SignExtendAX.cs" />
     <Compile Include="Stosw.cs" />
     <Compile Include="JumpNotCary.cs" />
     <Compile Include="RepeatMovsb.cs" />

@@ -18,17 +18,19 @@ namespace Indy.IL2CPU.IL.X86 {
 			switch (xSource.Size) {
 				case 1:
 				case 2:
-				case 4: {
-						new CPUx86.Noop();
-						break;
-					}
-				case 8: {
-						new CPUx86.Pop(CPUx86.Registers.EAX);
-						new CPUx86.Add("esp", "4");
-						new CPUx86.Pushd(CPUx86.Registers.EAX);
-						break;
-
-					}
+					new CPUx86.Noop();
+					break;
+				case 4:
+					new CPUx86.Pop("eax");
+					new CPUx86.MoveAndSignExtend("eax", "ax");
+					new CPUx86.Push("eax");
+					break;
+				case 8:
+					new CPUx86.Pop(CPUx86.Registers.EAX);
+					new CPUx86.Pop("EBX");
+					new CPUx86.MoveAndSignExtend("eax", "ax");
+					new CPUx86.Pushd(CPUx86.Registers.EAX);
+					break;
 				default:
 					throw new Exception("SourceSize " + xSource + " not supported!");
 			}
