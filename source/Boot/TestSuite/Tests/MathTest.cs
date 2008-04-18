@@ -228,6 +228,64 @@ namespace TestSuite.Tests
 
 			Console.WriteLine("");
 			#endregion
+
+			bool codition;
+			#region cgt
+#warning this doesn't emit cgt => need another test
+			codition = (1L > 2L) && true;
+			Console.ForegroundColor = ConsoleColor.White;
+			if (codition) Console.ForegroundColor = ConsoleColor.Red;
+			Console.Write("cgt false  ");
+
+			codition = (2L > 1L) && true;
+			Console.ForegroundColor = ConsoleColor.Red;
+			if (codition) Console.ForegroundColor = ConsoleColor.White;
+			Console.Write("cgt true");
+
+			Console.WriteLine("");
+			#endregion cgt
+
+			#region cgt_un
+			codition = (1LU > 2LU) && true;
+			Console.ForegroundColor = ConsoleColor.White;
+			if (codition) Console.ForegroundColor = ConsoleColor.Red;
+			Console.Write("cgt_un false  ");
+
+			codition = (2LU > 1LU) && true;
+			Console.ForegroundColor = ConsoleColor.Red;
+			if (codition) Console.ForegroundColor = ConsoleColor.White;
+			Console.Write("cgt_un true");
+
+			Console.WriteLine("");
+			#endregion cgt_un
+
+			#region clt
+			codition = (1L < 2L) && true;
+			Console.ForegroundColor = ConsoleColor.Red;
+			if (codition) Console.ForegroundColor = ConsoleColor.White;
+			Console.Write("clt false  ");
+
+			codition = (2L < 1L) && true;
+			Console.ForegroundColor = ConsoleColor.White;
+			if (codition) Console.ForegroundColor = ConsoleColor.Red;
+			Console.Write("clt true");
+
+			Console.WriteLine("");
+			#endregion clt
+
+			#region clt_un
+			codition = (1LU < 2LU) && true;
+			Console.ForegroundColor = ConsoleColor.Red;
+			if (codition) Console.ForegroundColor = ConsoleColor.White;
+			Console.Write("clt_un false  ");
+
+			codition = (2LU < 1LU) && true;
+			Console.ForegroundColor = ConsoleColor.White;
+			if (codition) Console.ForegroundColor = ConsoleColor.Red;
+			Console.Write("clt_un true");
+
+			Console.WriteLine("");
+			#endregion clt_un
 		}
     }
 }
