@@ -9,8 +9,8 @@ namespace Indy.IL2CPU.Assembler.X86
 	/// CMP DEST, SOURCE
 	/// if (DEST > SOURCE) jump (signed)
 	/// </summary>
+#warning this instruction should be renamed to JumpIfGreater after corresponding obsolete instruction is deleted
 	[OpCode(0xFFFFFFFF, "jg")]
-	[Obsolete("This instruction's generated asm code differs from it's name. Use JumpOnGreater instead.")]
 	public class JumpOnGreater : JumpBase
 	{
 		public JumpOnGreater(string aAddress)

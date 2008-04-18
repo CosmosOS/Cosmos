@@ -59,8 +59,11 @@
     <Compile Include="CLD.cs" />
     <Compile Include="CmpXchg.cs" />
     <Compile Include="Compare.cs" />
+    <Compile Include="ConditionalMove.cs" />
+    <Compile Include="Condition.cs" />
     <Compile Include="IDivide.cs" />
     <Compile Include="JumpIfAbove.cs" />
+    <Compile Include="JumpIfAboveOrEqual.cs" />
     <Compile Include="JumpIfBelow.cs" />
     <Compile Include="JumpIfBelowOrEqual.cs" />
     <Compile Include="JumpIfCarry.cs" />
