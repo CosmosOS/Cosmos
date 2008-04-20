@@ -39,11 +39,9 @@ namespace Cosmos.Build.Windows {
 				//Read TCP data from Qemu
 				var xStream = mClient.GetStream();
 				xStream.BeginRead(mTCPData, 0, mTCPData.Length, new AsyncCallback(TCPRead), xStream);
-				//            UInt32 xEIP = (UInt32)xStream.ReadByte();
 			} catch (SocketException ex) {
 				Dispatcher.BeginInvoke(DispatcherPriority.Normal, new ConnectionLostDelegate(ConnectionLost), ex);
 			}
-
 		}
 
 		protected delegate void DebugPacketRcvdDelegate(UInt32 aEIP);

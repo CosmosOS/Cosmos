@@ -32,31 +32,20 @@ namespace Cosmos.Build.Windows {
 			var xOptionsWindow = new OptionsWindow();
 			if (xOptionsWindow.ShowDialog().Value) {
 				ShowWindow(xConsoleWindow, 1);
-				// Build Window is a hack to catch console out. We need
-				// to change the build process to use proper event notifications
-				// rather than just string output, and console at that.
-				//
-				// Doesnt currently work because we block the main thread
-				// Need to change to be threaded, or use code from XAMLPoint
-				//var xBuildWindow = new BuildWindow();
-				//xBuildWindow.Show();
-
 				xOptionsWindow.DoBuild();
 
 				//Debug Window is only displayed if Qemu + Debug checked, or if other VM + Debugport selected
 				bool xIsQemu = xOptionsWindow.rdioQEMU.IsChecked.Value;
-                // TODO: Change to use an enum
-                string xDebugMode = (string)xOptionsWindow.cmboDebugMode.SelectedValue;
-                bool xUseQemuDebug = xOptionsWindow.cmboDebugMode.SelectedIndex > 1;
-				if (((xIsQemu & xUseQemuDebug) | (!xIsQemu & (xOptionsWindow.mComport > 0))) && xOptionsWindow.mDebugMode != DebugModeEnum.None) {
+                bool xUseQemuDebug = xOptionsWindow.cmboDebugMode.SelectedIndex > 0;
+				if (((xIsQemu & xUseQemuDebug) | (!xIsQemu & (xOptionsWindow.mComport > 0)))
+                    && xOptionsWindow.mDebugMode != DebugModeEnum.None) {
 					var xDebugWindow = new DebugWindow();
-					if (xDebugMode == "Source") {
-						// source debugging
+                    if (xOptionsWindow.mDebugMode == DebugModeEnum.Source) {
 						var xLabelByAddressMapping = ObjDump.GetLabelByAddressMapping(xOptionsWindow.mBuilder.BuildPath + "output.bin", xOptionsWindow.mBuilder.ToolsPath + @"cygwin\objdump.exe");
 						var xSourceMappings = SourceInfo.GetSourceInfo(xLabelByAddressMapping, xOptionsWindow.mBuilder.BuildPath + "debug.cxdb");
 						xDebugWindow.SetSourceInfoMap(xSourceMappings);
 					} else {
-						throw new Exception("Debug mode not supported!");
+						throw new Exception("Debug mode not supported: " + xOptionsWindow.mDebugMode);
 					}
 					xDebugWindow.ShowDialog();
 				}
@@ -243,6 +232,7 @@ namespace Cosmos.Build.Windows {
 				// General
 				xKey.SetValue("Compile IL", chckCompileIL.IsChecked.Value, RegistryValueKind.DWord);
 				xKey.SetValue("Debug Port", cmboDebugPort.Text);
+                xKey.SetValue("Debug Mode", cmboDebugMode.Text);
 
 				// QEMU
 				xKey.SetValue("Use GDB", chckQEMUUseGDB.IsChecked.Value, RegistryValueKind.DWord);
@@ -250,12 +240,12 @@ namespace Cosmos.Build.Windows {
 
 				// VMWare
 				string xVMWareVersion = string.Empty;
-				if (rdVMWareServer.IsChecked.Value)
-					xVMWareVersion = "VMWare Server";
-				else if (rdVMWareWorkstation.IsChecked.Value)
-					xVMWareVersion = "VMWare Workstation";
+                if (rdVMWareServer.IsChecked.Value) {
+                    xVMWareVersion = "VMWare Server";
+                } else if (rdVMWareWorkstation.IsChecked.Value) {
+                    xVMWareVersion = "VMWare Workstation";
+                }
 				xKey.SetValue("VMWare Version", xVMWareVersion);
-
 
 				// USB
 				if (cmboUSBDevice.SelectedItem != null) {
@@ -290,10 +280,14 @@ namespace Cosmos.Build.Windows {
 
 				// General
 				chckCompileIL.IsChecked = ((int)xKey.GetValue("Compile IL", 1) != 0);
-				cmboDebugPort.SelectedIndex = cmboDebugPort.Items.IndexOf(xKey.GetValue("Debug Port", ""));
-				if (cmboDebugPort.SelectedIndex == -1) {
-					cmboDebugPort.SelectedIndex = 0;
-				}
+                cmboDebugPort.SelectedIndex = cmboDebugPort.Items.IndexOf(xKey.GetValue("Debug Port", ""));
+                if (cmboDebugPort.SelectedIndex == -1) {
+                    cmboDebugPort.SelectedIndex = 0;
+                }
+                cmboDebugMode.SelectedIndex = cmboDebugMode.Items.IndexOf(xKey.GetValue("Debug Mode", ""));
+                if (cmboDebugMode.SelectedIndex == -1) {
+                    cmboDebugMode.SelectedIndex = 0;
+                }
 
 				// QEMU
 				chckQEMUUseGDB.IsChecked = ((int)xKey.GetValue("Use GDB", 0) != 0);
