@@ -132,7 +132,7 @@ namespace Cosmos.Build.Windows {
 						//xCharEnd += xSourceInfo.ColumnEnd;
 						int xCharStart;
 						int xCharLength;
-						xViewSrc.tboxSource.Text = File.ReadAllText(xSourceInfo.SourceFile);
+						xViewSrc.LoadSourceFile(xSourceInfo.SourceFile);
 						GetLineInfo(xViewSrc.tboxSource.Text, xSourceInfo.Line, xSourceInfo.Column, xSourceInfo.LineEnd, xSourceInfo.ColumnEnd, out xCharStart, out xCharLength);
 						//xViewSrc.tboxSource.ScrollToLine(xSourceInfo.Line);
 						//xViewSrc.tboxSource.Select(xCharStart, xCharEnd - xCharStart);

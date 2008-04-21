@@ -12,9 +12,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 namespace Cosmos.Build.Windows {
-	/// <summary>
-	/// Interaction logic for ViewSourceWindow.xaml
-	/// </summary>
 	public partial class ViewSourceWindow: Window {
 		public ViewSourceWindow() {
 			InitializeComponent();
@@ -23,9 +20,24 @@ namespace Cosmos.Build.Windows {
 		public int CharStart;
 		public int CharLength;
 
+        public void LoadSourceFile(string aPathname) {
+            // Old
+            tboxSource.Text = System.IO.File.ReadAllText(aPathname);
+            // New
+            var xSourceCode = System.IO.File.ReadAllLines(aPathname);
+            var xPara = new Paragraph();
+            fdsvSource.Document.Blocks.Add(xPara);
+            foreach (var xLine in xSourceCode) {
+                xPara.Inlines.Add(xLine);
+                xPara.Inlines.Add(new LineBreak());
+            }
+        }
+
 		private void Window_Loaded(object sender, RoutedEventArgs e) {
+            // Old
 			tboxSource.Focus();
 			tboxSource.Select(CharStart, CharLength);
+            // New
 		}
 
 	}
