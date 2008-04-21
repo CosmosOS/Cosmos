@@ -52,7 +52,7 @@ namespace Cosmos.FileSystem {
             //DebugUtil.SendMessage("MBT", "Initializing");
             //DebugUtil.SendNumber("MBT", "DeviceCount", (uint)Device.Devices.Count, 32);
 
-            List<Device> mbtPartitions = new List<Device>();
+            //List<Device> mbtPartitions = new List<Device>();
 			for (int i = 0; i < Device.Devices.Count; i++) {
 				if (Device.Devices[i].Type == Device.DeviceType.Storage) {
 					var xTest = getPartitions((BlockDevice)Device.Devices[i]);
@@ -103,7 +103,7 @@ namespace Cosmos.FileSystem {
                     //DebugUtil.SendDoubleNumber("MBT", "Entry Found. Start, Length in blocks", xStart, 32, xLength, 32);
                     xStart += 2;
                     Console.WriteLine("Add Partition to Device list");
-                    partitionList.Add(new MBTPartition(xBlockDev, xStart, xLength, "Partition"));
+                    partitionList.Add(new MBTPartition(xBlockDev, xStart, xLength, "Partition")); //Causes System Fault on the HTC Shift!
                     //DebugUtil.SendMessage("MBT", "FoundPartition");
                 }
             }
