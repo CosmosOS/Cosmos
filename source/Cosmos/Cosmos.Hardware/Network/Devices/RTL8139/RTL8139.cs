@@ -247,10 +247,8 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             isr.ISR = 0xFFFF;
         }
 
-
-
         /// <summary>
-        /// The IRQMaskRegister
+        /// The IRQMaskRegister determines what kind of events which cause IRQ to be raised.
         /// </summary>
         private void SetIRQMaskRegister()
         {
@@ -309,6 +307,11 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             Console.WriteLine("Command Register: " + Register.CommandRegister.Load(mem).ToString());
             Console.WriteLine("Config1 Register: " + Register.ConfigurationRegister1.Load(mem).ToString());
             Console.WriteLine("Media S Register: " + Register.MediaStatusRegister.Load(mem).ToString());
+            Console.WriteLine("Interrupt Mask R: " + Register.InterruptMaskRegister.Load(mem).ToString());
+            Console.WriteLine("Interrupt Status: " + Register.InterruptStatusRegister.Load(mem).ToString());
+            Console.WriteLine("Rx Configuration: " + Register.ReceiveConfigurationRegister.Load(mem).ToString());
+            Console.WriteLine("Tx Configuration: " + Register.TransmitConfigurationRegister.Load(mem).ToString());
+            Console.WriteLine("Tx Status Descr.: " + Register.TransmitStatusDescriptor.Load(mem).ToString());
         }
 
 
@@ -434,7 +437,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             WriteAddressToPCI(ref TxBuffer2, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD2);
             WriteAddressToPCI(ref TxBuffer3, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD3);
 
-            var tsd = Register.TransmitStatusDescriptor.Load(pciCard);
+            var tsd = Register.TransmitStatusDescriptor.Load(mem);
             tsd.Size = packet.PacketBody.Length;
             Console.WriteLine("Told NIC to send " + tsd.Size + " bytes.");
             tsd.OWN = false; //Begins sending
@@ -455,7 +458,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             WriteAddressToPCI(ref TxBuffer2, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD2);
             WriteAddressToPCI(ref TxBuffer3, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD3);
 
-            var tsd = Register.TransmitStatusDescriptor.Load(pciCard);
+            var tsd = Register.TransmitStatusDescriptor.Load(mem);
             tsd.Size = aData.Length;
             Console.WriteLine("Told NIC to send " + tsd.Size + " bytes.");
             tsd.OWN = false; //Begins sending
@@ -469,7 +472,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             WriteAddressToPCI(ref aData, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD0);
 
             //Set the transmit status - which enables the transmit.
-            var tsd = Register.TransmitStatusDescriptor.Load(pciCard);
+            var tsd = Register.TransmitStatusDescriptor.Load(mem);
             tsd.Size = aData.Length;
             Console.WriteLine("Told NIC to send " + tsd.Size + " bytes.");
 

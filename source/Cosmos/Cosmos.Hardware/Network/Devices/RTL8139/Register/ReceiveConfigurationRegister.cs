@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Cosmos.Hardware;
 using Cosmos.Hardware.PC.Bus;
+using Cosmos.Hardware.Extension.NumberSystem;
 
 namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
 {
@@ -44,6 +45,12 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
             {
                 xMem.Write32((UInt32)Register.MainRegister.Bit.RxConfig, value);
             } 
+        }
+
+
+        public override string ToString()
+        {
+            return this.RCR.ToBinary(32);
         }
 
         /// <summary>

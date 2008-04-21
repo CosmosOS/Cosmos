@@ -22,8 +22,8 @@ namespace FrodeTest
             Cosmos.Kernel.Staging.DefaultStageQueue stages = new Cosmos.Kernel.Staging.DefaultStageQueue();
             stages.Enqueue(new Cosmos.Kernel.Staging.Stages.KernelStage());
             stages.Run();
-            Security.User currentUser = Security.User.Authenticate("frode", "secret");
-            Shell.Session currentSession =  Shell.Session.CreateSession(currentUser);
+            //Security.User currentUser = Security.User.Authenticate("frode", "secret");
+            Shell.Session currentSession =  Shell.Session.CreateSession(null);
             currentSession.Run();
 
             //Test
@@ -35,7 +35,7 @@ namespace FrodeTest
             //Test.PacketHeaderTest.RunTest();
             //Test.RAMBusTest.RunTest();
             //Test.BoolTest.RunTest();
-            Test.InterfaceTest.RunTest();
+            //Test.InterfaceTest.RunTest();
             //Test.ExtensionMethodsTest.RunTest();
             //Test.NumberSystemTest.RunTest();
             Test.IPv4Test.RunTest();

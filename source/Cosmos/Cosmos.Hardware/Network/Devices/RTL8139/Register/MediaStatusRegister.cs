@@ -85,7 +85,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
 
         public override string ToString()
         {
-            return this.MSR.ToBinary(); //Todo - set to .ToBinary(8) when bug fixed
+            return this.MSR.ToBinary(8);
         }
 
         #endregion

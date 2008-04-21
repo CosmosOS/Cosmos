@@ -16,17 +16,31 @@ namespace FrodeTest.Shell
             return new Prompt(user);
         }
 
+        public static Prompt LoadPrompt()
+        {
+            return new Prompt("Cosmos");
+        }
+
         //Private variables
         private Security.User xUser = null;
+        private string defaultPrompt = "";
 
         private Prompt(Security.User user)
         {
             xUser = user;
         }
 
+        private Prompt(string prompt)
+        {
+            defaultPrompt = prompt;
+        }
+
         public string PromptText()
         {
-            return "[" + xUser.Username + "]>";
+            if (xUser != null)
+                return "[" + xUser.Username + "]>";
+            else
+                return "[" + defaultPrompt + "]>";
         }
     }
 }

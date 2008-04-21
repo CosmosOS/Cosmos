@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Cosmos.Hardware;
 using Cosmos.Hardware.PC.Bus;
+using Cosmos.Hardware.Extension.NumberSystem;
 
 namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
 {
@@ -57,6 +58,12 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
             byte mask = 249; // 1111 1001
             byte hwverid = BinaryHelper.GetByteFrom32bit(this.TCR, (byte)(23));
             return (byte)(mask & hwverid);
+        }
+
+
+        public override string ToString()
+        {
+            return this.TCR.ToBinary(32);
         }
         
         public bool LoopbackMode 

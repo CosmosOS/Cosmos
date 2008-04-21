@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Cosmos.Hardware;
 using Cosmos.Hardware.PC.Bus;
+using Cosmos.Hardware.Extension.NumberSystem;
 
 namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
 {
@@ -16,39 +17,51 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
     {
         #region Constructor
 
-        private PCIDevice pci;
-        private UInt32 tsdAddress;
-        public static TransmitStatusDescriptor Load(PCIDevice pciCard) {
-            //Retrieve the 32 bits from the PCI card
-            //and create a TSD object
-            UInt32 address = 0;
-            switch (GetCurrentTSDescriptor())
-            {
-                case 0:
-                    address = pciCard.BaseAddress1 + (byte)MainRegister.Bit.TSD0;
-                    break;
-                case 1:
-                    address = pciCard.BaseAddress1 + (byte)MainRegister.Bit.TSD1;
-                    break;
-                case 2:
-                    address = pciCard.BaseAddress1 + (byte)MainRegister.Bit.TSD2;
-                    break;
-                case 3:
-                    address = pciCard.BaseAddress1 + (byte)MainRegister.Bit.TSD3;
-                    break;
-                default:
-                    Console.WriteLine("Illegal TSDescriptor in RTL driver!");
-                    break;
-            }
+//        private PCIDevice pci;
+//        private UInt32 tsdAddress;
+        private byte descriptorID = 0;
+        private MemoryAddressSpace xMem;
+        //public static TransmitStatusDescriptor Load(PCIDevice pciCard) {
+        //    //Retrieve the 32 bits from the PCI card
+        //    //and create a TSD object
+        //    UInt32 address = 0;
+        //    switch (GetCurrentTSDescriptor())
+        //    {
+        //        case 0:
+        //            address = pciCard.BaseAddress1 + (byte)MainRegister.Bit.TSD0;
+        //            break;
+        //        case 1:
+        //            address = pciCard.BaseAddress1 + (byte)MainRegister.Bit.TSD1;
+        //            break;
+        //        case 2:
+        //            address = pciCard.BaseAddress1 + (byte)MainRegister.Bit.TSD2;
+        //            break;
+        //        case 3:
+        //            address = pciCard.BaseAddress1 + (byte)MainRegister.Bit.TSD3;
+        //            break;
+        //        default:
+        //            Console.WriteLine("Illegal TSDescriptor in RTL driver!");
+        //            break;
+        //    }
 
-            return new TransmitStatusDescriptor(pciCard, address);
-        }
+        //    return new TransmitStatusDescriptor(pciCard, address);
+        //}
 
-        private TransmitStatusDescriptor(PCIDevice hw, UInt32 adr)
+        public static TransmitStatusDescriptor Load(MemoryAddressSpace aMem)
         {
-            pci = hw;
-            tsdAddress = adr;
+            return new TransmitStatusDescriptor(aMem);
         }
+
+        private TransmitStatusDescriptor(MemoryAddressSpace aMem)
+        {
+            xMem = aMem;
+        }
+
+        //private TransmitStatusDescriptor(PCIDevice hw, UInt32 adr)
+        //{
+        //    pci = hw;
+        //    tsdAddress = adr;
+        //}
 
         /// <summary>
         /// Used to get the 32 bit value stored in the TransmitStatusDescriptor.
@@ -57,11 +70,12 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
         {
             get
             {
-                return IOSpace.Read32(tsdAddress);
+                //TODO: Use all FOUR Descriptors!
+                return xMem.Read32((UInt32)Register.MainRegister.Bit.TSD0);
             }
             set
             {
-                IOSpace.Write32(tsdAddress, value);
+                xMem.Write32((UInt32)Register.MainRegister.Bit.TSD0, value);
             }
         }
 
@@ -121,6 +135,11 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
                 this.TSD = (byte)(this.TSD | (byte)bit);
             else
                 this.TSD = (byte)(this.TSD & ~(byte)bit);
+        }
+
+        public override string ToString()
+        {
+            return this.TSD.ToBinary(32);
         }
 
         #endregion

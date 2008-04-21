@@ -20,9 +20,9 @@ namespace FrodeTest.Shell
 
         internal void Run()
         {
-            Console.Write(Prompt.LoadPrompt(xUser).PromptText());
+            //Console.Write(Prompt.LoadPrompt(xUser).PromptText());
+            Console.Write("[cosmos]>");
             string command = Console.ReadLine();
-
 
             if (command.Equals("exit"))
                 return;
@@ -37,34 +37,34 @@ namespace FrodeTest.Shell
             {
                 var list = RTL8139.FindAll();
                 if (list.Count != 0)
+                {
                     nic = list[0];
+                    Console.WriteLine("Enabling network card!");
+                    Console.WriteLine(nic.Name);
+                    Console.WriteLine("Revision: " + nic.HardwareRevision);
+                    Console.WriteLine("MAC: " + nic.MACAddress);
+
+                    nic.Enable();
+                    nic.InitializeDriver();
+                }
                 else
                 {
                     Console.WriteLine("Unable to find RTL8139 network card!");
                 }
-
-                Console.WriteLine("Enabling network card!");
-                Console.WriteLine(nic.Name);
-                Console.WriteLine("Revision: " + nic.HardwareRevision);
-                Console.WriteLine("MAC: " + nic.MACAddress);
-
-                
-                nic.Enable();
-                nic.InitializeDriver();
             }
             else if (command.Equals("send"))
             {
                 if (nic == null)
                 {
                     Console.WriteLine("Enable NIC with command 'load' first");
-                    return;
-                }               
-                
-                var head = new PacketHeader(0xFF);
-                byte[] data = FrodeTest.Test.Mock.FakeBroadcastPacket.GetFakePacket();
-                var packet = new Packet(head, data);
-                
-                nic.Transmit(packet);
+                }
+                else
+                {
+                    var head = new PacketHeader(0xFF);
+                    byte[] data = FrodeTest.Test.Mock.FakeBroadcastPacket.GetFakePacket();
+                    var packet = new Packet(head, data);
+                    nic.Transmit(packet);
+                }
             }
             else if (command.Equals("read"))
             {
@@ -73,47 +73,53 @@ namespace FrodeTest.Shell
                     Console.WriteLine("Enable NIC with command 'load' first");
                     return;
                 }
-                Console.WriteLine("Data in RX Buffer:");
-                foreach (byte item in nic.ReadReceiveBuffer())
+                else
                 {
-                    Console.Write(item.ToHex() + ":");
+                    Console.WriteLine("Data in RX Buffer:");
+                    foreach (byte item in nic.ReadReceiveBuffer())
+                    {
+                        Console.Write(item.ToHex() + ":");
+                    }
                 }
-                //List<Packet> incomingPackets = nic.Recieve();
             }
             else if (command.Equals("info"))
             {
                 if (nic == null)
                 {
                     Console.WriteLine("Network card not initialized yet.");
-                    return;
                 }
-                Console.WriteLine("Network card: " + nic.Name);
-                Console.WriteLine("Hardware revision: " + nic.HardwareRevision);
-                Console.WriteLine("MAC Address: " + nic.MACAddress);
-                Console.WriteLine();
-                Console.WriteLine("Loopback enabled?: " + nic.LoopbackMode.ToString());
-                Console.WriteLine("NIC enabled?: " + nic.IsEnabled.ToString());
-                Console.WriteLine("Promiscuous mode?: " + nic.PromiscuousMode.ToString());
-                
-                int xByteCount = 0;
-                foreach (byte b in nic.ReadReceiveBuffer())
+                else
                 {
-                    if (b != 0x00)
-                        xByteCount++;
-                }
-                Console.WriteLine("Read buffer contains " + xByteCount.ToString() + " non-zero bytes with data.");
-                Console.WriteLine("Read buffer empty flag? : " + nic.IsReceiveBufferEmpty());
+                    Console.WriteLine("Network card: " + nic.Name);
+                    Console.WriteLine("Hardware revision: " + nic.HardwareRevision);
+                    Console.WriteLine("MAC Address: " + nic.MACAddress);
+                    Console.WriteLine();
+                    Console.WriteLine("Loopback enabled?: " + nic.LoopbackMode.ToString());
+                    Console.WriteLine("NIC enabled?: " + nic.IsEnabled.ToString());
+                    Console.WriteLine("Promiscuous mode?: " + nic.PromiscuousMode.ToString());
 
-                nic.DisplayDebugInfo();
+                    int xByteCount = 0;
+                    foreach (byte b in nic.ReadReceiveBuffer())
+                    {
+                        if (b != 0x00)
+                            xByteCount++;
+                    }
+                    Console.WriteLine("Read buffer contains " + xByteCount.ToString() + " non-zero bytes with data.");
+                    Console.WriteLine("Read buffer empty flag? : " + nic.IsReceiveBufferEmpty());
+
+                    nic.DisplayDebugInfo();
+                }
             }
             else if (command.Equals("dump"))
             {
                 if (nic == null)
                 {
                     Console.WriteLine("Network card not initialized yet.");
-                    return;
                 }
-                nic.DumpRegisters();
+                else
+                {
+                    nic.DumpRegisters();
+                }
             }
             else if (command.Equals("reset"))
             {
