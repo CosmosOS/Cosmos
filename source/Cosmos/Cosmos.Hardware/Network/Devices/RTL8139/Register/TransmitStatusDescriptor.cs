@@ -17,36 +17,8 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
     {
         #region Constructor
 
-//        private PCIDevice pci;
-//        private UInt32 tsdAddress;
-        private byte descriptorID = 0;
         private MemoryAddressSpace xMem;
-        //public static TransmitStatusDescriptor Load(PCIDevice pciCard) {
-        //    //Retrieve the 32 bits from the PCI card
-        //    //and create a TSD object
-        //    UInt32 address = 0;
-        //    switch (GetCurrentTSDescriptor())
-        //    {
-        //        case 0:
-        //            address = pciCard.BaseAddress1 + (byte)MainRegister.Bit.TSD0;
-        //            break;
-        //        case 1:
-        //            address = pciCard.BaseAddress1 + (byte)MainRegister.Bit.TSD1;
-        //            break;
-        //        case 2:
-        //            address = pciCard.BaseAddress1 + (byte)MainRegister.Bit.TSD2;
-        //            break;
-        //        case 3:
-        //            address = pciCard.BaseAddress1 + (byte)MainRegister.Bit.TSD3;
-        //            break;
-        //        default:
-        //            Console.WriteLine("Illegal TSDescriptor in RTL driver!");
-        //            break;
-        //    }
-
-        //    return new TransmitStatusDescriptor(pciCard, address);
-        //}
-
+ 
         public static TransmitStatusDescriptor Load(MemoryAddressSpace aMem)
         {
             return new TransmitStatusDescriptor(aMem);
@@ -57,12 +29,6 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
             xMem = aMem;
         }
 
-        //private TransmitStatusDescriptor(PCIDevice hw, UInt32 adr)
-        //{
-        //    pci = hw;
-        //    tsdAddress = adr;
-        //}
-
         /// <summary>
         /// Used to get the 32 bit value stored in the TransmitStatusDescriptor.
         /// </summary>
@@ -70,12 +36,50 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
         {
             get
             {
-                //TODO: Use all FOUR Descriptors!
-                return xMem.Read32((UInt32)Register.MainRegister.Bit.TSD0);
+                UInt32 address;
+                switch (GetCurrentTSDescriptor())
+                {
+                    case 0:
+                        address = (UInt32)Register.MainRegister.Bit.TSD0;
+                        break;
+                    case 1:
+                        address = (UInt32)Register.MainRegister.Bit.TSD1;
+                        break;
+                    case 2:
+                        address = (UInt32)Register.MainRegister.Bit.TSD2;
+                        break;
+                    case 3:
+                        address = (UInt32)Register.MainRegister.Bit.TSD3;
+                        break;
+                    default:
+                        throw new Exception("Problem with Transmit Status Descriptor");
+
+                }
+
+                return xMem.Read32(address);
             }
             set
             {
-                xMem.Write32((UInt32)Register.MainRegister.Bit.TSD0, value);
+                UInt32 address;
+                switch (GetCurrentTSDescriptor())
+                {
+                    case 0:
+                        address = (UInt32)Register.MainRegister.Bit.TSD0;
+                        break;
+                    case 1:
+                        address = (UInt32)Register.MainRegister.Bit.TSD1;
+                        break;
+                    case 2:
+                        address = (UInt32)Register.MainRegister.Bit.TSD2;
+                        break;
+                    case 3:
+                        address = (UInt32)Register.MainRegister.Bit.TSD3;
+                        break;
+                    default:
+                        throw new Exception("Problem with Transmit Status Descriptor");
+                }
+
+                xMem.Write32(address, value);
             }
         }
 

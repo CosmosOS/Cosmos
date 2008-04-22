@@ -9,8 +9,8 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
 {
 
     /// <summary>
-    /// The registers in the RTL 8139 can be divided in two types. The first type is the registers where each bit has
-    /// a meaning, and it is common to change specific bits. F.instance the CommandRegister where you have a Reset bit.
+    /// The registers in the RTL 8139 can be divided in two types. The first type are the registers where each bit has
+    /// a meaning, and where it is common to change specific bits. F.instance the CommandRegister where you have a Reset bit.
     /// 
     /// The other type of registers are the ones who contain values. Like a 32-bit pointer to an address, or a counter
     /// of some sort. Here we never set individual bits, but treat the entire 8, 16 or 32 bits as one logical unit.
@@ -85,6 +85,48 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
 
 
         //TSAD
+        #region Transmit Start Address of Descriptors
+
+        //public static byte CurrentDescriptor
+        //{
+        //    get { ;}
+        //    set { ;}
+        //}
+
+        /// <summary>
+        /// Returns the actual address in the current 
+        /// </summary>
+        public UInt32 TransmitStartAddress
+        {
+            get
+            {
+                UInt32 address = 0;
+                switch (Register.TransmitStatusDescriptor.GetCurrentTSDescriptor())
+                {
+                    case 0:
+                        address = (UInt32)MainRegister.Bit.TSAD0;
+                        break;
+                    case 1:
+                        address = (UInt32)MainRegister.Bit.TSAD1;
+                        break;
+                    case 2:
+                        address = (UInt32)MainRegister.Bit.TSAD2;
+                        break;
+                    case 3:
+                        address = (UInt32)MainRegister.Bit.TSAD3;
+                        break;
+                    default:
+                        throw new Exception("Illegal Transmit Status Descriptor");
+                        break;
+                }
+
+                return xMem.Read32(address);
+            }
+            private set { ;}
+
+        }
+
+        #endregion
 
         //RBSTART
 

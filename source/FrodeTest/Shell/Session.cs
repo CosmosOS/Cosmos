@@ -63,7 +63,9 @@ namespace FrodeTest.Shell
                     var head = new PacketHeader(0xFF);
                     byte[] data = FrodeTest.Test.Mock.FakeBroadcastPacket.GetFakePacket();
                     var packet = new Packet(head, data);
-                    nic.Transmit(packet);
+                    //nic.Transmit(packet);
+                    nic.TransmitBytes(data); //TODO: Wrap data in physical packet with header.
+                    //nic.TransmitBytes(data);
                 }
             }
             else if (command.Equals("read"))

@@ -4,6 +4,7 @@ using System.Text;
 using Cosmos.Hardware.Network;
 using Cosmos.Hardware.PC.Bus;
 using Cosmos.Hardware;
+using Cosmos.Hardware.Extension.NumberSystem;
 
 namespace Cosmos.Hardware.Network.Devices.RTL8139
 {
@@ -312,6 +313,8 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             Console.WriteLine("Rx Configuration: " + Register.ReceiveConfigurationRegister.Load(mem).ToString());
             Console.WriteLine("Tx Configuration: " + Register.TransmitConfigurationRegister.Load(mem).ToString());
             Console.WriteLine("Tx Status Descr.: " + Register.TransmitStatusDescriptor.Load(mem).ToString());
+            Console.WriteLine("Tx Start Address: " + valueReg.TransmitStartAddress);
+            Console.WriteLine("Current Descrip.: " + Register.TransmitStatusDescriptor.GetCurrentTSDescriptor());
         }
 
 
@@ -420,31 +423,31 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         /// Transmits the given Packet
         /// </summary>
         /// <param name="packet"></param>
-        [Obsolete]
-        public bool Transmit(Packet packet)
-        {
-            if (packet == null)
-                return false;
-            //Put the packet into the correct TxBuffer
+        //[Obsolete]
+        //public bool Transmit(Packet packet)
+        //{
+        //    if (packet == null)
+        //        return false;
+        //    //Put the packet into the correct TxBuffer
             
-            //TODO: Do NOT set all registers! This works, but is not efficient!
-            TxBuffer0 = packet.PacketBody;
-            TxBuffer1 = packet.PacketBody;
-            TxBuffer2 = packet.PacketBody;
-            TxBuffer3 = packet.PacketBody;
-            WriteAddressToPCI(ref TxBuffer0, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD0);
-            WriteAddressToPCI(ref TxBuffer1, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD1);
-            WriteAddressToPCI(ref TxBuffer2, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD2);
-            WriteAddressToPCI(ref TxBuffer3, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD3);
+        //    //TODO: Do NOT set all registers! This works, but is not efficient!
+        //    TxBuffer0 = packet.PacketBody;
+        //    TxBuffer1 = packet.PacketBody;
+        //    TxBuffer2 = packet.PacketBody;
+        //    TxBuffer3 = packet.PacketBody;
+        //    WriteAddressToPCI(ref TxBuffer0, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD0);
+        //    WriteAddressToPCI(ref TxBuffer1, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD1);
+        //    WriteAddressToPCI(ref TxBuffer2, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD2);
+        //    WriteAddressToPCI(ref TxBuffer3, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD3);
 
-            var tsd = Register.TransmitStatusDescriptor.Load(mem);
-            tsd.Size = packet.PacketBody.Length;
-            Console.WriteLine("Told NIC to send " + tsd.Size + " bytes.");
-            tsd.OWN = false; //Begins sending
-            Register.TransmitStatusDescriptor.IncrementTSDescriptor();
+        //    var tsd = Register.TransmitStatusDescriptor.Load(mem);
+        //    tsd.Size = packet.PacketBody.Length;
+        //    Console.WriteLine("Told NIC to send " + tsd.Size + " bytes.");
+        //    tsd.OWN = false; //Begins sending
+        //    Register.TransmitStatusDescriptor.IncrementTSDescriptor();
 
-            return true;
-        }
+        //    return true;
+        //}
 
         public bool TransmitBytes(byte[] aData)
         {
@@ -459,9 +462,12 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             WriteAddressToPCI(ref TxBuffer3, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD3);
 
             var tsd = Register.TransmitStatusDescriptor.Load(mem);
+            Console.WriteLine("Telling NIC to send " + aData.Length + " bytes.");
             tsd.Size = aData.Length;
-            Console.WriteLine("Told NIC to send " + tsd.Size + " bytes.");
+            Console.WriteLine("TransmitStatusDescriptor contains size of" + tsd.Size + " bytes.");
+            Console.WriteLine("TDS : " + tsd.ToString());
             tsd.OWN = false; //Begins sending
+            Console.WriteLine("TDS : " + tsd.ToString());
             Register.TransmitStatusDescriptor.IncrementTSDescriptor();
 
             return true;
