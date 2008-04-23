@@ -13,12 +13,18 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace Kudzu_SourceView {
-    /// <summary>
-    /// Interaction logic for Window1.xaml
-    /// </summary>
     public partial class Window1 : Window {
         public Window1() {
             InitializeComponent();
+            button1.Click += new RoutedEventHandler(button1_Click);
         }
+
+        void button1_Click(object sender, RoutedEventArgs e) {
+            var xView = new Cosmos.Build.Windows.ViewSourceWindow();
+            xView.LoadSourceFile(@"C:\source\Cosmos\source\Cosmos\Cosmos.Kernel\Keyboard.cs");
+            xView.SelectText(1, 4, 3, 8);
+            xView.Show();
+        }
+
     }
 }

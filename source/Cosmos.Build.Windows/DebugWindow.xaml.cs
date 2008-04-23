@@ -82,38 +82,6 @@ namespace Cosmos.Build.Windows {
 
 		}
 
-		private static void GetLineInfo(string aData, int aLineStart, int aColumnStart, int aLineEnd, int aColumnEnd, out int oCharStart, out int oCharCount) {
-			int xCurrentPos = 0;
-			int xCurrentLine = 1;
-			oCharCount = 0;
-			oCharStart = 0;
-			while (xCurrentPos < aData.Length) {
-				int xTempPos = aData.IndexOfAny(new char[] { '\r', '\n' }, xCurrentPos);
-				if (xTempPos == -1) {
-					if (oCharStart > 0) {
-						oCharCount = xCurrentPos - oCharStart;
-					}
-					return;
-				}
-				xCurrentLine += 1;
-				xCurrentPos = xTempPos;
-				if (aData[xCurrentPos] == '\r' && aData.Length > (xCurrentPos + 1) && aData[xCurrentPos + 1] == '\n') {
-					xCurrentPos += 2;
-				} else {
-					xCurrentPos += 1;
-				}
-				if (xCurrentLine == aLineStart) {
-					oCharStart = xCurrentPos + aColumnStart;
-				}
-				if (xCurrentLine == aLineEnd) {
-					oCharCount = (xCurrentPos + aColumnEnd) - oCharStart;
-				}
-				if (oCharCount > 0 && oCharStart > 0) {
-					return;
-				}
-			}
-		}
-
 		private void lboxLog_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
 			var xItem = lboxLog.SelectedItem;
 			string xItemStr = xItem as String;
@@ -122,27 +90,12 @@ namespace Cosmos.Build.Windows {
 					if (mDebugMode == DebugModeEnum.Source) {
 						var xSourceInfo = mSourceMappings.GetMapping(UInt32.Parse(xItemStr.Substring(2), System.Globalization.NumberStyles.HexNumber));
 						var xViewSrc = new ViewSourceWindow();
-						//int xCharStart;
-						//int xCharCount;
-						//GetLineInfo(xViewSrc.tboxSource.Text, xSourceInfo.Line, xSourceInfo.Column, xSourceInfo.LineEnd, xSourceInfo.ColumnEnd, out xCharStart, out xCharCount);
-						//if(
-						//int xCharStart = xViewSrc.tboxSource.GetCharacterIndexFromLineIndex(xSourceInfo.Line);
-						//int xCharEnd = xViewSrc.tboxSource.GetCharacterIndexFromLineIndex(xSourceInfo.LineEnd);
-						//xCharStart += xSourceInfo.Column;
-						//xCharEnd += xSourceInfo.ColumnEnd;
-						int xCharStart;
-						int xCharLength;
 						xViewSrc.LoadSourceFile(xSourceInfo.SourceFile);
-						GetLineInfo(xViewSrc.tboxSource.Text, xSourceInfo.Line, xSourceInfo.Column, xSourceInfo.LineEnd, xSourceInfo.ColumnEnd, out xCharStart, out xCharLength);
-						//xViewSrc.tboxSource.ScrollToLine(xSourceInfo.Line);
-						//xViewSrc.tboxSource.Select(xCharStart, xCharEnd - xCharStart);
-						xViewSrc.CharStart = xCharStart - 1;
-						xViewSrc.CharLength = xCharLength;
+						xViewSrc.SelectText(xSourceInfo.Line, xSourceInfo.Column, xSourceInfo.LineEnd, xSourceInfo.ColumnEnd);
 						xViewSrc.ShowDialog();
 					} else {
 						throw new Exception("Debug mode not supported!");
 					}
-					//xViewSrc.tboxSource.s
 				}
 			} else {
 				var xViewSrc = new ViewSourceWindow();

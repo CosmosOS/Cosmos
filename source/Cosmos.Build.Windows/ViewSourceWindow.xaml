@@ -1,13 +1,8 @@
 ﻿<Window x:Class="Cosmos.Build.Windows.ViewSourceWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Title="View Source" Height="500" Width="500" Loaded="Window_Loaded">
-    <Canvas>
-	<TextBox
-		x:Name="tboxSource"
-		HorizontalScrollBarVisibility="Auto"
-		VerticalScrollBarVisibility="Auto"
-		IsReadOnly="True" Height="210" Width="478" />
-        <FlowDocumentScrollViewer Canvas.Left="0" Canvas.Top="211" Height="251" Name="fdsvSource" Width="478" />
-        </Canvas>
+    Title="View Source" Height="500" Width="500">
+    <DockPanel LastChildFill="True">
+        <FlowDocumentScrollViewer Name="fdsvSource" />
+        </DockPanel>
 </Window>
