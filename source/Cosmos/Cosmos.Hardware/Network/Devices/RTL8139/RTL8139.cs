@@ -12,29 +12,14 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
     /// Driver for networkcards using the RTL8139 chip.
     /// Some documentation can be found at: http://www.osdev.org/wiki/RTL8139
     /// </summary>
-    public class RTL8139 : NetworkDevice //, DeviceDriver interface
+    public class RTL8139 : NetworkDevice
     {
-        /// <summary>
-        /// Retrieve all Realtek 8139 network cards found on computer.
-        /// </summary>
-        /// <returns></returns>
-        public static List<RTL8139> FindAll()
-        {
-            List<RTL8139> found = new List<RTL8139>();
-
-            foreach (PCIDevice device in Cosmos.Hardware.PC.Bus.PCIBus.Devices)
-            {
-                //Console.WriteLine("VendorID: " + device.VendorID + " - DeviceID: " + device.DeviceID);
-                if (device.VendorID == 0x10EC && device.DeviceID == 0x8139)
-                    found.Add(new RTL8139(device));
-            }
-
-            return found;
-        }
+        #region Construction
 
         private PCIDevice pciCard;
         private MemoryAddressSpace mem;
         private Register.MainRegister reg;
+        private Register.CommandRegister cr;
         private Register.ValueTypeRegisters valueReg;
         private Register.InterruptMaskRegister imr;
         private Register.InterruptStatusRegister isr;
@@ -57,15 +42,38 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             isr = Register.InterruptStatusRegister.Load(mem);
         }
 
-        public PCIDevice PCICard { get { return pciCard; } private set { ;} }
+        /// <summary>
+        /// Retrieve all Realtek 8139 network cards found on computer.
+        /// </summary>
+        /// <returns></returns>
+        public static List<RTL8139> FindAll()
+        {
+            List<RTL8139> found = new List<RTL8139>();
+
+            foreach (PCIDevice device in Cosmos.Hardware.PC.Bus.PCIBus.Devices)
+            {
+                //Console.WriteLine("VendorID: " + device.VendorID + " - DeviceID: " + device.DeviceID);
+                if (device.VendorID == 0x10EC && device.DeviceID == 0x8139)
+                    found.Add(new RTL8139(device));
+            }
+
+            return found;
+        }
+
+        #endregion
 
         #region NetworkDevice members
+
+        public override string Name
+        {
+            get { return "Generic RTL8139 Network device"; }
+        }
+        
         public override MACAddress MACAddress
         {
             get 
             {
                 return valueReg.Mac;
-                //return reg.Mac; 
             }
         }
 
@@ -80,6 +88,29 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             }
             private set { ;}
         }
+
+        public PCIDevice PCICard { get { return pciCard; } private set { ;} }
+
+
+        /// <summary>
+        /// A general purpose timer. Writing to this will reset timer. NB: Timer does not work in Qemu.
+        /// </summary>
+        public UInt32 TimerCount
+        {
+            get
+            {
+                return IOSpace.Read32(pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.Timer);
+            }
+            set
+            {
+                UInt32 address = pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.Timer;
+                IOSpace.Write32(address, 0x00); //Resets timer
+            }
+        }
+
+        #endregion
+
+        #region Power and Initilization
 
         /// <summary>
         /// Performs additional hardware initilization
@@ -105,10 +136,78 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             rcr.PromiscuousMode = true;
             
             //Enable IRQ Interrupt
-            SetIRQMaskRegister();
-            Console.WriteLine("Listening for IRQ" + pciCard.InterruptLine + " for incoming data...");
+            InitIRQMaskRegister();
             Cosmos.Hardware.PC.Interrupts.IRQ11 = new Cosmos.Hardware.PC.Interrupts.InterruptDelegate(this.HandleNetworkInterrupt);
+            //Console.WriteLine("Listening for IRQ" + pciCard.InterruptLine + ".");
         }
+
+        /// <summary>
+        /// Initialize the Receive Buffer. The RBSTART register consists of 4 bytes (32-bits at 0x30h to 0x33h) which should contain
+        /// the address of a buffer to save incoming data to.
+        /// </summary>
+        private void InitReceiveBuffer()
+        {
+            //Prepare a buffer area
+            RxBuffer = new byte[100];
+
+            UInt32 address = pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.RxBuf;
+
+            //Write the address of the buffer area to the RBSTART 
+            WriteAddressToPCI(ref RxBuffer, address);
+        }
+
+        private void InitTransmitBuffer()
+        {
+            //Initialize Tx Buffers
+
+            TxBuffer0 = new byte[2048];
+            TxBuffer1 = new byte[2048];
+            TxBuffer2 = new byte[2048];
+            TxBuffer3 = new byte[2048];
+
+            WriteAddressToPCI(ref TxBuffer0, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD0);
+            WriteAddressToPCI(ref TxBuffer1, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD1);
+            WriteAddressToPCI(ref TxBuffer2, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD2);
+            WriteAddressToPCI(ref TxBuffer3, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD3);
+        }
+
+        /// <summary>
+        /// Enables RTL network card by setting CONFIG_1 register.
+        /// </summary>
+        /// <returns></returns>
+        public override bool Enable()
+        {
+            var config1 = Register.ConfigurationRegister1.Load(mem);
+            config1.PowerEnabled = true; //Uncertain if this is needed
+
+            return base.Enable(); //enables PCI card as well
+        }
+
+        public override bool Disable()
+        {
+            var config1 = Register.ConfigurationRegister1.Load(mem);
+            config1.PowerEnabled = false;
+
+            return base.Disable();
+        }
+
+        /// <summary>
+        /// Performs an internal system hardware reset of the network card.
+        /// </summary>
+        public void SoftReset()
+        {
+            //Tell RTL chip to issue a Reset`
+            var cr = Register.CommandRegister.Load(mem);
+            cr.Reset = true;
+
+            //Wait while RST bit is active
+            while (cr.Reset)
+            {
+                Console.WriteLine("Reset in progress");
+            }
+        }
+
+        #endregion
 
         #region Operational properties
 
@@ -147,6 +246,22 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
 
         #endregion
 
+        #region Receive data
+
+        /// <summary>
+        /// Enable the NIC to be able to Receive data.
+        /// </summary>
+        private void EnableReceive()
+        {
+            var cr = Register.CommandRegister.Load(mem);
+            cr.RxEnabled = true;
+        }
+
+        public byte[] ReadReceiveBuffer()
+        {
+            return RxBuffer;
+        }
+
         public override bool QueueBytes(byte[] buffer, int offset, int length)
         {
             throw new NotImplementedException();
@@ -162,16 +277,10 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             throw new NotImplementedException();
         }
 
-        public override bool IsSendBufferFull()
-        {
-            throw new NotImplementedException();
-        }
-
         public override bool IsReceiveBufferFull()
         {
             throw new NotImplementedException();
         }
-        #endregion
 
         public bool IsReceiveBufferEmpty()
         {
@@ -179,63 +288,83 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             return cr.RxBufferEmpty;
         }
 
-        public override string Name
-        {
-            get { return "Generic RTL8139 Network device"; }
-        }
+        #endregion
 
-        #region Power and Initilization
+        #region Transmit data
 
         /// <summary>
-        /// Enables RTL network card by setting CONFIG_1 register.
+        /// Enable the NIC to be able to Transmit data.
         /// </summary>
-        /// <returns></returns>
-        public override bool Enable()
+        private void EnableTransmit()
         {
-            var config1 = Register.ConfigurationRegister1.Load(mem);
-            config1.PowerEnabled = true; //Uncertain if this is needed
-
-            return base.Enable(); //enables PCI card as well
-        }
-
-        public override bool Disable()
-        {
-            var config1 = Register.ConfigurationRegister1.Load(mem);
-            config1.PowerEnabled = false;
-
-            return base.Disable();
-        }
-
-        /// <summary>
-        /// Performs an internal system hardware reset of the network card.
-        /// </summary>
-        public void SoftReset()
-        {
-            //Tell RTL chip to issue a Reset`
             var cr = Register.CommandRegister.Load(mem);
-            cr.Reset = true;
-            
-            //Wait while RST bit is active
-            while (cr.Reset)
-            {
-                Console.WriteLine("Reset in progress");
-            }
+            cr.TxEnabled = true;
+        }
+
+        public override bool IsSendBufferFull()
+        {
+            throw new NotImplementedException();
+        }
+
+
+        public bool TransmitBytes(byte[] aData)
+        {
+            //TODO: Do NOT set all registers! This works, but is not efficient!
+            TxBuffer0 = aData;
+            TxBuffer1 = aData;
+            TxBuffer2 = aData;
+            TxBuffer3 = aData;
+            WriteAddressToPCI(ref TxBuffer0, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD0);
+            WriteAddressToPCI(ref TxBuffer1, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD1);
+            WriteAddressToPCI(ref TxBuffer2, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD2);
+            WriteAddressToPCI(ref TxBuffer3, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD3);
+
+            var tsd = Register.TransmitStatusDescriptor.Load(mem);
+            Console.WriteLine("Telling NIC to send " + aData.Length + " bytes.");
+            tsd.Size = aData.Length;
+            //Console.WriteLine("TransmitStatusDescriptor contains size of" + tsd.Size + " bytes.");
+            //Console.WriteLine("TDS : " + tsd.ToString());
+            tsd.OWN = false; //Begins sending
+            //Console.WriteLine("TDS : " + tsd.ToString());
+            Register.TransmitStatusDescriptor.IncrementTSDescriptor();
+
+            return true;
+        }
+
+        [Obsolete]
+        public bool TransmitRaw(byte[] aData)
+        {
+            WriteAddressToPCI(ref aData, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD0);
+
+            //Set the transmit status - which enables the transmit.
+            var tsd = Register.TransmitStatusDescriptor.Load(mem);
+            tsd.Size = aData.Length;
+            Console.WriteLine("Told NIC to send " + tsd.Size + " bytes.");
+
+            SetEarlyTxThreshold(1024);
+            Console.WriteLine("Sending packet...");
+            tsd.OWN = false;
+            Register.TransmitStatusDescriptor.IncrementTSDescriptor();
+
+            return true;
         }
 
         #endregion
-
+        
         #region Receive and Interrupt
-
-
+        
         /// <summary>
         /// (Should be) Called when the PCI network card raises an Interrupt.
         /// </summary>
         public void HandleNetworkInterrupt()
         {
-            Console.WriteLine("Interrupt handler in RTL8139 driver called!");
+            Console.Write("IRQ detected: ");
 
             if (imr.ReceiveOK & isr.ReceiveOK)
+            {
                 Console.WriteLine("Receive OK");
+                this.DisplayReadBuffer();
+            }
 
             if (imr.ReceiveError & isr.ReceiveError)
                 Console.WriteLine("Receive ERROR");
@@ -245,6 +374,27 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
 
             if (imr.TransmitError & isr.TransmitError)
                 Console.WriteLine("Transmit Error");
+
+            if (imr.RxBufferOverflow & isr.RxBufferOverflow)
+                Console.WriteLine("RxBufferOverflow");
+
+            if (imr.RxFifoOverflow & isr.RxFifoOverflow)
+                Console.WriteLine("RxFIFOOverflow");
+
+            if (imr.CableLengthChange & isr.CableLengthChange)
+                Console.WriteLine("Cable Length Change");
+
+            if (imr.PacketUnderrun & isr.PacketUnderrun)
+                Console.WriteLine("Packet Underrun");
+
+            if (imr.SoftwareInterrupt & isr.SoftwareInterrupt)
+                Console.WriteLine("Software Interrupt");
+
+            if (imr.TxDescriptorUnavailable & isr.TxDescriptorUnavailable)
+                Console.WriteLine("TxDescriptorUnavailable");
+
+            if (imr.SystemError & isr.SystemError)
+                Console.WriteLine("System Error!");
 
             this.ResetAllIRQ();
 
@@ -259,12 +409,12 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         /// <summary>
         /// The IRQMaskRegister determines what kind of events which cause IRQ to be raised.
         /// </summary>
-        private void SetIRQMaskRegister()
+        private void InitIRQMaskRegister()
         {
             //Note; The reference driver from Realtek sets mask = 0x7F (all bits high).
             var imr = Register.InterruptMaskRegister.Load(mem);
             //imr.IMR = 0x7F;
-            imr.IMR = 0xFFFF;
+            imr.IMR = 0xFFFF; //Listen for all IRQ events
 /*            imr.ReceiveOK = true;
             imr.ReceiveError = true;
             imr.TransmitOK = true;
@@ -276,29 +426,12 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
 
         #endregion
 
-        /// <summary>
-        /// Enable the NIC to be able to Receive data.
-        /// </summary>
-        private void EnableReceive()
-        {
-            var cr = Register.CommandRegister.Load(mem);
-            cr.RxEnabled = true;
-        }
-
-        /// <summary>
-        /// Enable the NIC to be able to Transmit data.
-        /// </summary>
-        private void EnableTransmit()
-        {
-            var cr = Register.CommandRegister.Load(mem);
-            cr.TxEnabled = true;
-        }
+        #region Debugging
 
         public void DisplayDebugInfo()
         {
             var cr = Register.CommandRegister.Load(mem);
             var msr = Register.MediaStatusRegister.Load(mem);
-
 
             Console.WriteLine("Tx enabled?: " + cr.TxEnabled.ToString());
             Console.WriteLine("Rx enabled?: " + cr.RxEnabled.ToString());
@@ -309,8 +442,6 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             Console.WriteLine("CBR (byte count): " + valueReg.CurrentBufferPointer.ToString());
             Console.WriteLine("IMR: " + imr.ToString());
             Console.WriteLine("ISR: " + isr.ToString());
-
-
         }
 
         public void DumpRegisters()
@@ -328,22 +459,22 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         }
 
 
-        /// <summary>
-        /// A general purpose timer. Writing to this will reset timer. NB: Timer does not work in Qemu.
-        /// </summary>
-        public UInt32 TimerCount 
+        //Just for testing
+        public void DisplayReadBuffer()
         {
-            get 
-            {
-                return IOSpace.Read32(pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.Timer);
-            } 
-            set
-            {
-                UInt32 address = pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.Timer;
-                IOSpace.Write32(address, 0x00); //Resets timer
-            }
+            Console.WriteLine("Read buffer contains " + this.ReadReceiveBuffer().Length + " bytes.");
+            Console.WriteLine("---------------------------------");
+            
+            foreach (byte b in this.ReadReceiveBuffer())
+                Console.Write(b.ToHex() + ":");
+            Console.WriteLine();
+            
+            Console.WriteLine("---------------------------------");
         }
 
+        #endregion
+
+        #region Misc
         /// <summary>
         /// The Early TX Threshold specifies the threshold level in Tx FIFO register before transmission begins.
         /// The bytecount should not exceed 2048(2k bytes).
@@ -361,42 +492,6 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
 
             UInt32 address = pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.RxEarlyCnt;
             IOSpace.Write8(address, (byte)bytecount);
-        }
-
-        /// <summary>
-        /// Initialize the Receive Buffer. The RBSTART register consists of 4 bytes (32-bits at 0x30h to 0x33h) which should contain
-        /// the address of a buffer to save incoming data to.
-        /// </summary>
-        private void InitReceiveBuffer()
-        {
-            //Prepare a buffer area
-            RxBuffer = new byte[50];
-
-            UInt32 address = pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.RxBuf;
-
-            //Write the address of the buffer area to the RBSTART 
-            WriteAddressToPCI(ref RxBuffer, address);
-        }
-
-        public byte[] ReadReceiveBuffer()
-        {
-            return RxBuffer;
-        }
-
-
-        private void InitTransmitBuffer()
-        {
-            //Initialize Tx Buffers
-
-            TxBuffer0 = new byte[2048];
-            TxBuffer1 = new byte[2048];
-            TxBuffer2 = new byte[2048];
-            TxBuffer3 = new byte[2048];
-
-            WriteAddressToPCI(ref TxBuffer0, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD0);
-            WriteAddressToPCI(ref TxBuffer1, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD1);
-            WriteAddressToPCI(ref TxBuffer2, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD2);
-            WriteAddressToPCI(ref TxBuffer3, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD3);
         }
 
         /// <summary>
@@ -429,75 +524,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             }
         }
 
-        /// <summary>
-        /// Transmits the given Packet
-        /// </summary>
-        /// <param name="packet"></param>
-        //[Obsolete]
-        //public bool Transmit(Packet packet)
-        //{
-        //    if (packet == null)
-        //        return false;
-        //    //Put the packet into the correct TxBuffer
-            
-        //    //TODO: Do NOT set all registers! This works, but is not efficient!
-        //    TxBuffer0 = packet.PacketBody;
-        //    TxBuffer1 = packet.PacketBody;
-        //    TxBuffer2 = packet.PacketBody;
-        //    TxBuffer3 = packet.PacketBody;
-        //    WriteAddressToPCI(ref TxBuffer0, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD0);
-        //    WriteAddressToPCI(ref TxBuffer1, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD1);
-        //    WriteAddressToPCI(ref TxBuffer2, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD2);
-        //    WriteAddressToPCI(ref TxBuffer3, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD3);
+        #endregion
 
-        //    var tsd = Register.TransmitStatusDescriptor.Load(mem);
-        //    tsd.Size = packet.PacketBody.Length;
-        //    Console.WriteLine("Told NIC to send " + tsd.Size + " bytes.");
-        //    tsd.OWN = false; //Begins sending
-        //    Register.TransmitStatusDescriptor.IncrementTSDescriptor();
-
-        //    return true;
-        //}
-
-        public bool TransmitBytes(byte[] aData)
-        {
-            //TODO: Do NOT set all registers! This works, but is not efficient!
-            TxBuffer0 = aData;
-            TxBuffer1 = aData;
-            TxBuffer2 = aData;
-            TxBuffer3 = aData;
-            WriteAddressToPCI(ref TxBuffer0, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD0);
-            WriteAddressToPCI(ref TxBuffer1, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD1);
-            WriteAddressToPCI(ref TxBuffer2, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD2);
-            WriteAddressToPCI(ref TxBuffer3, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD3);
-
-            var tsd = Register.TransmitStatusDescriptor.Load(mem);
-            Console.WriteLine("Telling NIC to send " + aData.Length + " bytes.");
-            tsd.Size = aData.Length;
-            Console.WriteLine("TransmitStatusDescriptor contains size of" + tsd.Size + " bytes.");
-            Console.WriteLine("TDS : " + tsd.ToString());
-            tsd.OWN = false; //Begins sending
-            Console.WriteLine("TDS : " + tsd.ToString());
-            Register.TransmitStatusDescriptor.IncrementTSDescriptor();
-
-            return true;
-        }
-        
-        [Obsolete]
-        public bool TransmitRaw(byte[] aData) {
-            WriteAddressToPCI(ref aData, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD0);
-
-            //Set the transmit status - which enables the transmit.
-            var tsd = Register.TransmitStatusDescriptor.Load(mem);
-            tsd.Size = aData.Length;
-            Console.WriteLine("Told NIC to send " + tsd.Size + " bytes.");
-
-            SetEarlyTxThreshold(1024);
-            Console.WriteLine("Sending packet...");
-            tsd.OWN = false;
-            Register.TransmitStatusDescriptor.IncrementTSDescriptor();
-
-            return true;
-        }
     }
 }
