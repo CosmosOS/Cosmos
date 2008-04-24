@@ -3,6 +3,12 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Title="View Source" Height="500" Width="500">
     <DockPanel LastChildFill="True">
+        <ToolBarTray Background="White" DockPanel.Dock="Top">
+            <ToolBar Band="1" BandIndex="1">
+                <Button>Continue</Button>
+                <Button>Step</Button>
+            </ToolBar>
+        </ToolBarTray>
         <FlowDocumentScrollViewer Name="fdsvSource" />
-        </DockPanel>
+    </DockPanel>
 </Window>

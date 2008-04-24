@@ -14,6 +14,7 @@ using System.Windows.Shapes;
 namespace Cosmos.Build.Windows {
 	public partial class ViewSourceWindow: Window {
         protected List<Run> mLines = new List<Run>();
+        protected FontFamily mFont = new FontFamily("Courier New");
 
 		public ViewSourceWindow() {
 			InitializeComponent();
@@ -23,12 +24,35 @@ namespace Cosmos.Build.Windows {
             var xSourceCode = System.IO.File.ReadAllLines(aPathname);
             var xPara = new Paragraph();
             fdsvSource.Document = new FlowDocument();
+            fdsvSource.Document.PageWidth = 100 * 96;
             fdsvSource.Document.Blocks.Add(xPara);
+            int xLineNo = 0;
             foreach (var xLine in xSourceCode) {
-                var xRun = new Run(xLine);
+                Run xRun;
+                
+                xLineNo++;
+                xRun = new Run(xLineNo.ToString().PadLeft(6) + " ");
+                xRun.MouseDown += new MouseButtonEventHandler(xRun_MouseDown);
+                xRun.FontFamily = mFont;
+                xRun.Cursor = Cursors.Arrow;
+                xRun.Background = Brushes.LightGray;
+                xPara.Inlines.Add(xRun);
+
+                xRun = new Run(xLine);
+                xRun.FontFamily = mFont;
                 mLines.Add(xRun);
                 xPara.Inlines.Add(xRun);
+
                 xPara.Inlines.Add(new LineBreak());
+            }
+        }
+
+        void xRun_MouseDown(object sender, MouseButtonEventArgs e) {
+            var xRun = (Run)sender;
+            if (xRun.Background == Brushes.Red) {
+                xRun.Background = Brushes.LightGray;
+            } else {
+                xRun.Background = Brushes.Red;
             }
         }
 
@@ -40,19 +64,21 @@ namespace Cosmos.Build.Windows {
                 if (aLength == -1) {
                     aLength = xText.Length - aColBegin;
                 }
-                string xSubText;
 
                 if (aColBegin > 0) {
                     var xRunLeft = new Run(xText.Substring(0, aColBegin - 1));
+                    xRunLeft.FontFamily = mFont;
                     xPara.Inlines.InsertBefore(xSelectedLine, xRunLeft);
                 }
 
                 var xRunSelected = new Run(xText.Substring(aColBegin, aLength));
+                xRunSelected.FontFamily = mFont;
                 xRunSelected.Background = Brushes.Red;
                 xPara.Inlines.InsertBefore(xSelectedLine, xRunSelected);
 
                 if (aColBegin + aLength < xText.Length) {
                     var xRunRight = new Run(xText.Substring(aColBegin + aLength));
+                    xRunRight.FontFamily = mFont;
                     xPara.Inlines.InsertBefore(xSelectedLine, xRunRight);
                 }
 
