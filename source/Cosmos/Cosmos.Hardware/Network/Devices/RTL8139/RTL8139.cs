@@ -62,54 +62,6 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
 
         #endregion
 
-        #region NetworkDevice members
-
-        public override string Name
-        {
-            get { return "Generic RTL8139 Network device"; }
-        }
-        
-        public override MACAddress MACAddress
-        {
-            get 
-            {
-                return valueReg.Mac;
-            }
-        }
-
-        /// <summary>
-        /// Returns a text with the hardware revision model. F.instance RTL8139C+ or RTL8139.
-        /// </summary>
-        public string HardwareRevision
-        {
-            get {
-                var tcr = Register.TransmitConfigurationRegister.Load(mem);
-                return Register.TransmitConfigurationRegister.GetHardwareRevision(tcr.GetHWVERID());
-            }
-            private set { ;}
-        }
-
-        public PCIDevice PCICard { get { return pciCard; } private set { ;} }
-
-
-        /// <summary>
-        /// A general purpose timer. Writing to this will reset timer. NB: Timer does not work in Qemu.
-        /// </summary>
-        public UInt32 TimerCount
-        {
-            get
-            {
-                return IOSpace.Read32(pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.Timer);
-            }
-            set
-            {
-                UInt32 address = pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.Timer;
-                IOSpace.Write32(address, 0x00); //Resets timer
-            }
-        }
-
-        #endregion
-
         #region Power and Initilization
 
         /// <summary>
@@ -244,6 +196,52 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
 
         }
 
+        public override string Name
+        {
+            get { return "Generic RTL8139 Network device"; }
+        }
+
+        public override MACAddress MACAddress
+        {
+            get
+            {
+                return valueReg.Mac;
+            }
+        }
+
+        /// <summary>
+        /// Returns a text with the hardware revision model. F.instance RTL8139C+ or RTL8139.
+        /// </summary>
+        public string HardwareRevision
+        {
+            get
+            {
+                var tcr = Register.TransmitConfigurationRegister.Load(mem);
+                return Register.TransmitConfigurationRegister.GetHardwareRevision(tcr.GetHWVERID());
+            }
+            private set { ;}
+        }
+
+        public PCIDevice PCICard { get { return pciCard; } private set { ;} }
+
+
+        /// <summary>
+        /// A general purpose timer. Writing to this will reset timer. NB: Timer does not work in Qemu.
+        /// </summary>
+        public UInt32 TimerCount
+        {
+            get
+            {
+                return IOSpace.Read32(pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.Timer);
+            }
+            set
+            {
+                UInt32 address = pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.Timer;
+                IOSpace.Write32(address, 0x00); //Resets timer
+            }
+        }
+
+
         #endregion
 
         #region Receive data
@@ -351,7 +349,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
 
         #endregion
         
-        #region Receive and Interrupt
+        #region Interrupt (IRQ)
         
         /// <summary>
         /// (Should be) Called when the PCI network card raises an Interrupt.
