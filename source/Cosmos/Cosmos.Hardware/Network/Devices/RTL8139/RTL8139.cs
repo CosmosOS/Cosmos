@@ -194,8 +194,16 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         {
             var config1 = Register.ConfigurationRegister1.Load(mem);
             config1.PowerEnabled = true; //Uncertain if this is needed
-            
+
             return base.Enable(); //enables PCI card as well
+        }
+
+        public override bool Disable()
+        {
+            var config1 = Register.ConfigurationRegister1.Load(mem);
+            config1.PowerEnabled = false;
+
+            return base.Disable();
         }
 
         /// <summary>
@@ -224,7 +232,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         /// </summary>
         public void HandleNetworkInterrupt()
         {
-            Console.WriteLine("Network IRQ raised! Indicates data received...");
+            Console.WriteLine("Interrupt handler in RTL8139 driver called!");
 
             if (imr.ReceiveOK & isr.ReceiveOK)
                 Console.WriteLine("Receive OK");
@@ -245,7 +253,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         private void ResetAllIRQ()
         {
             //Setting a bit to 1 will reset it. So we write 16 one's to reset entire ISR.
-            isr.ISR = 0xFFFF;
+            isr.ISR = isr.ISR;
         }
 
         /// <summary>
@@ -255,14 +263,16 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         {
             //Note; The reference driver from Realtek sets mask = 0x7F (all bits high).
             var imr = Register.InterruptMaskRegister.Load(mem);
-            imr.ReceiveOK = true;
+            //imr.IMR = 0x7F;
+            imr.IMR = 0xFFFF;
+/*            imr.ReceiveOK = true;
             imr.ReceiveError = true;
             imr.TransmitOK = true;
             imr.TransmitError = true;
             imr.CableLengthChange = true;
             imr.SystemError = true;
             imr.TimeOut = true;
-        }
+  */      }
 
         #endregion
 

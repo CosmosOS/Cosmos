@@ -114,6 +114,8 @@ namespace Cosmos.Hardware.PC {
 
             if (IRQ11 != null)
                 IRQ11();
+
+            Bus.CPU.PIC.SignalSecondary();
         }
 
         //IRQ 14 - Primary IDE. If no Primary IDE this can be changed

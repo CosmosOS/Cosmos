@@ -130,6 +130,19 @@ namespace FrodeTest.Shell
                 nic.InitializeDriver();
                 Console.WriteLine("NIC has been reset");
             }
+            else if (command.Equals("disable"))
+            {
+                nic.Disable();
+            }
+            else if (command.Equals("enable"))
+            {
+                nic.Enable();
+            }
+            else if (command.Equals("unload"))
+            {
+                nic.Disable();
+                nic = null;
+            }
             else if (command.Equals("loop"))
             {
                 Console.WriteLine("Toggeling loopback mode from : " + nic.LoopbackMode.ToString());
