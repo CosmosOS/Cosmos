@@ -11,7 +11,6 @@ namespace Indy.IL2CPU.IL.X86 {
 		private string mDataName;
 		private int mSize;
 		private bool mNeedsGC;
-		private Type mDataType;
 
 		public Ldsfld(ILReader aReader, MethodInformation aMethodInfo)
 			: base(aReader, aMethodInfo) {

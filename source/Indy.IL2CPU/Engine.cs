@@ -529,7 +529,7 @@ namespace Indy.IL2CPU {
 						}
 					}
 				}
-			} catch (Exception E) {
+			} catch (Exception) {
 				// todo: try to get rid of the try..catch
 			}
 			return xBaseMethod ?? aMethod;
@@ -932,8 +932,6 @@ namespace Indy.IL2CPU {
 										foreach (var xStackContent in mAssembler.StackContents) {
 											new Comment("    " + xStackContent.Size);
 										}
-										DebugSymbolsAssemblyTypeMethodInstruction xInstructionInfo = null;
-										int xCurrentStack = 0;
 										string xLabel = Op.GetInstructionLabel(xReader);
 										if (xLabel.StartsWith(".")) {
 											xLabel = Label.LastFullLabel + "__DOT__" + xLabel.Substring(1);
@@ -971,7 +969,7 @@ namespace Indy.IL2CPU {
 										}
 										#endregion
 										if (aShouldIncludeDebugHeader) {
-											mMap.EmitOpDebugHeader(mAssembler, 0, xLabel, mDebugComport);
+											mMap.EmitOpDebugHeader(mAssembler, 0, xLabel);
 											mDebugSymbols.Add(new DebugSymbol() {
 												AssemblyFileName = xCurrentMethod.DeclaringType.Assembly.Location,
 												InstructionOffset = xCurrentOffset,
@@ -1024,7 +1022,7 @@ namespace Indy.IL2CPU {
 					xOp.Assemble();
 					mAssembler.StackContents.Clear();
 					mMethods[xCurrentMethod].Processed = true;
-				} catch (Exception E) {
+				} catch (Exception) {
 					OnDebugLog(LogSeverityEnum.Error, xCurrentMethod.GetFullName());
 					throw;
 				}

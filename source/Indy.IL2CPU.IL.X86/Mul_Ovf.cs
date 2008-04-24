@@ -14,7 +14,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		public override void DoAssemble()
 		{
 			throw new NotImplementedException();
-			base.DoAssemble();
+			//base.DoAssemble();
 		}
 	}
 }

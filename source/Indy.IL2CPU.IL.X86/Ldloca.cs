@@ -8,7 +8,6 @@ namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(OpCodeEnum.Ldloca)]
 	public class Ldloca: Op {
 		private string mAddress;
-		private bool mIsReferenceTypeField;
 		protected void SetLocalIndex(int aIndex, MethodInformation aMethodInfo) {
 			mAddress = aMethodInfo.Locals[aIndex].VirtualAddresses.LastOrDefault();
 		}

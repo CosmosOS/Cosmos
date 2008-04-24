@@ -9,7 +9,6 @@ using CPUx86 = Indy.IL2CPU.Assembler.X86;
 namespace Indy.IL2CPU.IL.X86 {
 	public abstract class Op: IL.Op {
 		private bool mNeedsExceptionPush;
-		private bool mNeedsExceptionClear;
 		private Type mCatchType;
 		private string mNextInstructionLabel;
 		private bool mNeedsTypeCheck = false;
@@ -41,7 +40,6 @@ namespace Indy.IL2CPU.IL.X86 {
 					((aMethodInfo.CurrentHandler.Flags & ExceptionHandlingClauseOptions.Filter) > 0 && aMethodInfo.CurrentHandler.FilterOffset > 0 && aMethodInfo.CurrentHandler.FilterOffset == aReader.Position))
 					&& (aMethodInfo.CurrentHandler.Flags == ExceptionHandlingClauseOptions.Clause);
 				// todo: add support for exception clear again
-				bool mNeedsExceptionClear = false;
 				//mNeedsExceptionClear = ((aMethodInfo.CurrentHandler.HandlerOffset + aMethodInfo.CurrentHandler.HandlerLength) == (aReader.Offset + 1)) || 
 				//    ((aMethodInfo.CurrentHandler.FilterOffset+aMethodInfo.CurrentHandler.Filterle == (aReader.Offset + 1));
 				if (mNeedsExceptionPush && aMethodInfo.CurrentHandler.CatchType != null) {
@@ -254,10 +252,9 @@ namespace Indy.IL2CPU.IL.X86 {
 			aAssembler.StackContents.Pop();
 		}
 
-		public static void AddWithOverflow(Assembler.Assembler aAssembler, bool signed)
-		{
+		public static void AddWithOverflow(Assembler.Assembler aAssembler, bool signed) {
 			throw new NotImplementedException();
-			Add(aAssembler);
+			//Add(aAssembler);
 			throw new NotImplementedException();
 			//if (signed)
 			//{

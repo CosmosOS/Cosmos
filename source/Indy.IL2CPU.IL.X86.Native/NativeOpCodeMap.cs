@@ -45,39 +45,8 @@ namespace Indy.IL2CPU.IL.X86.Native {
 			return xResult;
 		}
 
-		public override void EmitOpDebugHeader(Indy.IL2CPU.Assembler.Assembler aAssembler, uint aOpId, string aOpLabel, ushort aDebugComport) {
-			base.EmitOpDebugHeader(aAssembler, aOpId, aOpLabel, aDebugComport);
-			ushort xAddress = 0;
-			switch (aDebugComport) {
-				case 1:
-					xAddress = 0x3F8;
-					break;
-				case 2:
-					xAddress = 0x2F8;
-					break;
-				case 3:
-					xAddress = 0x3E8;
-					break;
-				case 4:
-					xAddress = 0x2E8;
-					break;
-				default:
-					throw new Exception("Com " + aDebugComport + " not supported!");
-			}
+		public override void EmitOpDebugHeader(Indy.IL2CPU.Assembler.Assembler aAssembler, uint aOpId, string aOpLabel) {
 			new CPU.Call("DebugPoint__");
-			//new CPUNative.InByte
-			//int is_transmit_empty() {
-			//   return inb(PORT + 5) & 0x20;
-			//}
-
-			//void write_serial(char a) {
-			//   while (is_transmit_empty() == 0)
-			//		;
-
-			//   outb(PORT,a);
-			//}
-
-
 		}
 
 		public override bool HasCustomAssembleImplementation(MethodInformation aMethodInfo, bool aInMetalMode) {
