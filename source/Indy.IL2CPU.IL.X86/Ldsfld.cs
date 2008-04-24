@@ -66,7 +66,7 @@ namespace Indy.IL2CPU.IL.X86 {
 						throw new Exception("Remainder size " + (mSize) + " not supported!");
 				}
 			}
-			Assembler.StackContents.Push(new StackContent(mSize, mDataType));
+			Assembler.StackContents.Push(new StackContent(mSize, null));
 			if (mNeedsGC) {
 				new Dup(null, null) {
 					Assembler = this.Assembler
