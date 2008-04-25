@@ -17,6 +17,8 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
 			: base(aGetStreamForGroup) {
 		}
 
+        protected int[] mComPortAddress = {0x3F8, 0x2F8, 0x3E8, 0x2E8};
+
 		protected override void EmitCodeSectionHeader(string aGroup, StreamWriter aOutputWriter) {
 			base.EmitCodeSectionHeader(aGroup, aOutputWriter);
 			aOutputWriter.WriteLine("section .text");
@@ -43,23 +45,7 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
 				aOutputWriter.WriteLine("				 cli");
 				//aOutputWriter.WriteLine("				 push ebx");
 				if (mComNumber != null) {
-					int xComAddr = 0;
-					switch (mComNumber.Value) {
-						case 1:
-							xComAddr = 0x3F8;
-							break;
-						case 2:
-							xComAddr = 0x2F8;
-							break;
-						case 3:
-							xComAddr = 0x3E8;
-							break;
-						case 4:
-							xComAddr = 0x2E8;
-							break;
-						default:
-							throw new Exception("Com " + mComNumber + " not supported!");
-					}
+                    int xComAddr = mComPortAddress[mComNumber.Value - 1];
 					aOutputWriter.WriteLine("mov dx, 0x{0}", (xComAddr + 1).ToString("X"));
 					aOutputWriter.WriteLine("mov al, 0x00");
 					aOutputWriter.WriteLine("out DX, AL"); // disable all interrupts
@@ -92,61 +78,76 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
 				aOutputWriter.WriteLine("              ret");
 				aOutputWriter.WriteLine("                 ");
 				if (mComNumber != null) {
-					int xComAddr = 0;
-					switch (mComNumber.Value) {
-						case 1:
-							xComAddr = 0x3F8;
-							break;
-						case 2:
-							xComAddr = 0x2F8;
-							break;
-						case 3:
-							xComAddr = 0x3E8;
-							break;
-						case 4:
-							xComAddr = 0x2E8;
-							break;
-						default:
-							throw new Exception("Com " + mComNumber + " not supported!");
-					}
-					aOutputWriter.WriteLine("DebugPoint__:");
-					aOutputWriter.WriteLine("  .Wait1:");
-					aOutputWriter.WriteLine("    mov dx, " + (xComAddr + 5));
-					aOutputWriter.WriteLine("    mov al, 0");
-					aOutputWriter.WriteLine("    in al, dx");
-					aOutputWriter.WriteLine("    test al, 0x20");
-					aOutputWriter.WriteLine("    je .Wait1");
-					aOutputWriter.WriteLine("    mov dx, " + xComAddr);
-					aOutputWriter.WriteLine("    mov al, [esp+3]");
-					aOutputWriter.WriteLine("    out dx, al");
-					aOutputWriter.WriteLine("  .Wait2:");
-					aOutputWriter.WriteLine("    mov dx, " + (xComAddr + 5));
-					aOutputWriter.WriteLine("    mov al, 0");
-					aOutputWriter.WriteLine("    in al, dx");
-					aOutputWriter.WriteLine("    test al, 0x20");
-					aOutputWriter.WriteLine("    je .Wait2");
-					aOutputWriter.WriteLine("    mov dx, " + xComAddr);
-					aOutputWriter.WriteLine("    mov al, [esp+2]");
-					aOutputWriter.WriteLine("    out dx, al");
-					aOutputWriter.WriteLine("  .Wait3:");
-					aOutputWriter.WriteLine("    mov dx, " + (xComAddr + 5));
-					aOutputWriter.WriteLine("    mov al, 0");
-					aOutputWriter.WriteLine("    in al, dx");
-					aOutputWriter.WriteLine("    test al, 0x20");
-					aOutputWriter.WriteLine("    je .Wait3");
-					aOutputWriter.WriteLine("    mov dx, " + xComAddr);
-					aOutputWriter.WriteLine("    mov al, [esp+1]");
-					aOutputWriter.WriteLine("    out dx, al");
-					aOutputWriter.WriteLine("  .Wait4:");
-					aOutputWriter.WriteLine("    mov dx, " + (xComAddr + 5));
-					aOutputWriter.WriteLine("    mov al, 0");
-					aOutputWriter.WriteLine("    in al, dx");
-					aOutputWriter.WriteLine("    test al, 0x20");
-					aOutputWriter.WriteLine("    je .Wait4");
-					aOutputWriter.WriteLine("    mov dx, " + xComAddr);
-					aOutputWriter.WriteLine("    mov al, [esp]");
-					aOutputWriter.WriteLine("    out dx, al");
-					aOutputWriter.WriteLine("  ret");
+                    int xComAddr = mComPortAddress[mComNumber.Value - 1];
+
+                    aOutputWriter.WriteLine("WriteByteToComPort:");
+                    aOutputWriter.WriteLine("  WriteByteToComPort_Wait:");
+                    aOutputWriter.WriteLine("    mov dx, " + (xComAddr + 5));
+                    aOutputWriter.WriteLine("    in al, dx");
+                    aOutputWriter.WriteLine("    test al, 0x20");
+                    aOutputWriter.WriteLine("    je WriteByteToComPort_Wait");
+                    aOutputWriter.WriteLine("    mov dx, " + xComAddr);
+                    aOutputWriter.WriteLine("    mov eax, [esp + 4]");
+                    aOutputWriter.WriteLine("    out dx, al");
+                    aOutputWriter.WriteLine("    ret 4");
+
+                    aOutputWriter.WriteLine("DebugWriteEIP:");
+                    aOutputWriter.WriteLine("    mov al, [ebp+3]");
+                    aOutputWriter.WriteLine("    push eax");
+                    aOutputWriter.WriteLine("    call WriteByteToComPort");
+                    aOutputWriter.WriteLine("    mov al, [ebp+2]");
+                    aOutputWriter.WriteLine("    push eax");
+                    aOutputWriter.WriteLine("    call WriteByteToComPort");
+                    aOutputWriter.WriteLine("    mov al, [ebp+1]");
+                    aOutputWriter.WriteLine("    push eax");
+                    aOutputWriter.WriteLine("    call WriteByteToComPort");
+                    aOutputWriter.WriteLine("    mov al, [ebp]");
+                    aOutputWriter.WriteLine("    push eax");
+                    aOutputWriter.WriteLine("    call WriteByteToComPort");
+                    aOutputWriter.WriteLine("    ret");
+
+                    aOutputWriter.WriteLine("DebugPoint__:");
+                    aOutputWriter.WriteLine("    PUSHAD");
+                    aOutputWriter.WriteLine("    mov ebp, esp");
+                    aOutputWriter.WriteLine("    add ebp, 32");
+
+                    aOutputWriter.WriteLine("    mov dx, " + (xComAddr + 5));
+                    aOutputWriter.WriteLine("    in al, dx");
+                    aOutputWriter.WriteLine("    test al, 0x01");
+                    aOutputWriter.WriteLine("    jne DebugPoint_NoCmd");
+
+                    aOutputWriter.WriteLine("    mov dx, " + xComAddr);
+                    aOutputWriter.WriteLine("    in al, dx");
+                    aOutputWriter.WriteLine("    cmp al, 0x01"); // Turn Full Tracing on
+                    aOutputWriter.WriteLine("    jne DebugPoint_NotCmd01");
+                    aOutputWriter.WriteLine("    mov dword [TraceMode], 0x01");
+                    aOutputWriter.WriteLine("DebugPoint_NotCmd01:");
+                    aOutputWriter.WriteLine("    cmp al, 0x01"); // Turn Full Tracing off
+                    aOutputWriter.WriteLine("    jne DebugPoint_NotCmd02");
+                    aOutputWriter.WriteLine("    mov dword [TraceMode], 0x00");
+                    aOutputWriter.WriteLine("DebugPoint_NotCmd02:");
+
+                    // if data on comport
+                    // read commend
+                    // act on commend
+                    // Commands
+                    // -Trace on
+                    // -Trace off
+                    // -Evaluate variables
+                    // -Step to next debug call
+                    // end if
+
+                    aOutputWriter.WriteLine("DebugPoint_NoCmd:");
+
+                    // If trace flag
+                    aOutputWriter.WriteLine("    mov dword eax, [TraceMode]");
+                    aOutputWriter.WriteLine("    jnz DebugPoint_NoTrace");
+                    //Test this, doesnt seem ToString work ewven wehn 0
+                    aOutputWriter.WriteLine("    call DebugWriteEIP");
+                    aOutputWriter.WriteLine("  DebugPoint_NoTrace:");
+                    
+                    aOutputWriter.WriteLine("    POPAD");
+                    aOutputWriter.WriteLine("    ret");
 				}
 			}
 		}
@@ -176,7 +177,8 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
 				if (Signature != null && Signature.Length > 0) {
 					aOutputWriter.WriteLine("{0} db {1}", SignatureLabelName, Signature.Aggregate<byte, string>("", (r, b) => r + b + ",") + "0");
 				}
-			}
+                aOutputWriter.WriteLine("TraceMode dd 0x00000000");
+            }
 
 		}
 
