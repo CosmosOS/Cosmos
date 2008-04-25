@@ -4,16 +4,7 @@
     Title="Cosmos Debugger" Height="351" Width="551" Icon="/Cosmos.Build.Windows;component/Cosmos.ico"
     WindowState="Maximized">
     <DockPanel>
-        <DockPanel DockPanel.Dock="Left" Width="200">
-            <ToolBarTray Background="White" DockPanel.Dock="Top">
-                <ToolBar Band="1" BandIndex="1">
-                    <Button Name="butnPrevious">Previous</Button>
-                    <Separator/>
-                    <Button Name="butnNext">Next</Button>
-                </ToolBar>
-            </ToolBarTray>
-            <ListBox FontFamily="Consolas" Name="lboxLog" MouseDoubleClick="lboxLog_MouseDoubleClick" />
-        </DockPanel>
+        <ListBox DockPanel.Dock="Left" Width="200" FontFamily="Consolas" Name="lboxLog" />
         <DockPanel DockPanel.Dock="Left">
             <ToolBarTray Background="White" DockPanel.Dock="Top">
                 <ToolBar Band="1" BandIndex="1">

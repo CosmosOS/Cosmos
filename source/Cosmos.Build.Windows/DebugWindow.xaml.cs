@@ -28,6 +28,7 @@ namespace Cosmos.Build.Windows {
 
 		public DebugWindow() {
 			InitializeComponent();
+            lboxLog.SelectionChanged += new SelectionChangedEventHandler(lboxLog_SelectionChanged);
 		}
 
         public void LoadSourceFile(string aPathname) {
@@ -203,19 +204,22 @@ namespace Cosmos.Build.Windows {
             MessageBox.Show("Analysis finished!");
         }
 
-		protected void lboxLog_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
-			var xItem = lboxLog.SelectedItem;
-			string xItemStr = xItem as String;
-			if (!String.IsNullOrEmpty(xItemStr)) {
-				if (mDebugMode == DebugModeEnum.Source) {
-					var xSourceInfo = mSourceMappings.GetMapping(UInt32.Parse(xItemStr.Substring(2), System.Globalization.NumberStyles.HexNumber));
-					LoadSourceFile(xSourceInfo.SourceFile);
-					SelectText(xSourceInfo.Line, xSourceInfo.Column, xSourceInfo.LineEnd, xSourceInfo.ColumnEnd);
-				} else {
-					throw new Exception("Debug mode not supported!");
-				}
-			}
-		}
-	}
+        protected void SelectCode(uint aEIP) {
+            var xSourceInfo = mSourceMappings.GetMapping(aEIP);
+            LoadSourceFile(xSourceInfo.SourceFile);
+            SelectText(xSourceInfo.Line, xSourceInfo.Column, xSourceInfo.LineEnd, xSourceInfo.ColumnEnd);
+        }
 
+        void lboxLog_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+            string xItemStr = lboxLog.SelectedItem as String;
+            if (!String.IsNullOrEmpty(xItemStr)) {
+                if (mDebugMode == DebugModeEnum.Source) {
+                    SelectCode(UInt32.Parse(xItemStr.Substring(2), System.Globalization.NumberStyles.HexNumber));
+                } else {
+                    throw new Exception("Debug mode not supported!");
+                }
+            }
+        }
+
+    }
 }
