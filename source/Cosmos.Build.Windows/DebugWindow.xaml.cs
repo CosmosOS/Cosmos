@@ -32,7 +32,11 @@ namespace Cosmos.Build.Windows {
             lboxLog.SelectionChanged += new SelectionChangedEventHandler(lboxLog_SelectionChanged);
             butnTraceOff.Click += new RoutedEventHandler(butnTraceOff_Click);
             butnTraceOn.Click += new RoutedEventHandler(butnTraceOn_Click);
+            butnTest.Click += new RoutedEventHandler(butnTest_Click);
 		}
+
+        void butnTest_Click(object sender, RoutedEventArgs e) {
+        }
 
         void butnTraceOn_Click(object sender, RoutedEventArgs e) {
             SendDebugCmd(1);
@@ -133,7 +137,10 @@ namespace Cosmos.Build.Windows {
                 }
                 Select(aLineEnd, 0, aColEnd + 1);
             }
-            xRunSelected.BringIntoView();
+            fdsvSource.UpdateLayout();
+            if (xRunSelected != null) {
+                xRunSelected.BringIntoView();
+            }
         }
         
         public void SetSourceInfoMap(SourceInfos aSourceMapping) {

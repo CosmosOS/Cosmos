@@ -15,6 +15,8 @@
                     <Button Name="butnTraceOn">Trace On</Button>
                     <Separator/>
                     <Button Name="butnTraceOff">Trace Off</Button>
+                    <Separator/>
+                    <Button Name="butnTest">Test</Button>
                 </ToolBar>
             </ToolBarTray>
             <FlowDocumentScrollViewer Name="fdsvSource" />
