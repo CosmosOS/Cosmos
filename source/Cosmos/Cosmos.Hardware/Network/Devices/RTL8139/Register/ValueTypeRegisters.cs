@@ -130,18 +130,25 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
 
         //RBSTART
 
-        //CAPR(?)
+        /// <summary>
+        /// The address in the RxBuffer that the driver has read up to.
+        /// Also known as: CAPR / Current Address Pointer Read
+        /// </summary>
+        public UInt16 CurrentAddressOfPacketRead
+        {
+            get { return xMem.Read16((UInt32)MainRegister.Bit.RxBufPtr); }
+            set { xMem.Write16((UInt32)MainRegister.Bit.RxBufPtr, value); }
+        }
 
-        //CBR
-
-        #region CBR/CBP/Current Buffer Address/Buffer Write Pointer/Received byte count
-        public UInt16 CurrentBufferPointer 
+        /// <summary>
+        /// The CBR contains the address of the last byte in the RXBuffer.
+        /// Also known as: CBR/CBP/Current Buffer Address/Buffer Write Pointer/Received byte count
+        /// </summary>
+        public UInt16 CurrentBufferAddress
         {
             get { return xMem.Read16((UInt32)MainRegister.Bit.RxBufAddr); }
             private set { ;}
         }
-
-        #endregion
 
         //TCTR
 

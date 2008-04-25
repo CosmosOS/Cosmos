@@ -100,7 +100,8 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         private void InitReceiveBuffer()
         {
             //Prepare a buffer area
-            RxBuffer = new byte[100];
+            UInt16 bufferSize = (1024 * 16) + (4 * 4); //last 4  bytes used for CRC
+            RxBuffer = new byte[bufferSize];
 
             UInt32 address = pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.RxBuf;
 
@@ -257,7 +258,38 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
 
         public byte[] ReadReceiveBuffer()
         {
-            return RxBuffer;
+            List<byte> receivedBytes = new List<byte>();
+
+            Console.WriteLine("RxBuffer is at address " + GetMemoryAddress(ref RxBuffer));
+            Console.WriteLine("Received data from address " + valueReg.CurrentAddressOfPacketRead + " to address " + valueReg.CurrentBufferAddress);
+
+            //The data to be read is in the RxBuffer, but offset by the CBR.
+
+            //UInt16 readPointer = 
+
+            /*for (int i = valueReg.CurrentAddressOfPacketRead; i < valueReg.CurrentBufferAddress; i++)
+			{
+                receivedBytes.Add(RxBuffer[i]);
+			}*/
+
+            UInt16 readPointer = valueReg.CurrentAddressOfPacketRead;
+            UInt16 writtenPointer = valueReg.CurrentBufferAddress;
+            while (readPointer != writtenPointer)
+            {
+                receivedBytes.Add(RxBuffer[readPointer]);
+
+                if (readPointer == 0xFFF0)
+                    readPointer = 0;
+                else
+                    readPointer++;
+            }
+
+            //Update the CAPR so that the RTL8139 knows that we've read the data.
+            //valueReg.CurrentAddressOfPacketRead = valueReg.CurrentBufferAddress;
+            Console.WriteLine("Setting CAPR to " + readPointer);
+            valueReg.CurrentAddressOfPacketRead = readPointer;
+
+            return receivedBytes.ToArray();
         }
 
         public override bool QueueBytes(byte[] buffer, int offset, int length)
@@ -437,7 +469,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             Console.WriteLine("RxBufPtr: " + reg.RxBufPtr.ToString());
             Console.WriteLine("Speed 10Mb?: " + msr.Speed10MB.ToString());
             Console.WriteLine("Link OK?: " + (!msr.LinkStatusInverse).ToString());
-            Console.WriteLine("CBR (byte count): " + valueReg.CurrentBufferPointer.ToString());
+            Console.WriteLine("CBR (byte count): " + valueReg.CurrentBufferAddress.ToString());
             Console.WriteLine("IMR: " + imr.ToString());
             Console.WriteLine("ISR: " + isr.ToString());
         }
@@ -460,10 +492,12 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         //Just for testing
         public void DisplayReadBuffer()
         {
-            Console.WriteLine("Read buffer contains " + this.ReadReceiveBuffer().Length + " bytes.");
+            byte[] readData = this.ReadReceiveBuffer();
+
+            Console.WriteLine("Read buffer contains " + readData.Length + " bytes.");
             Console.WriteLine("---------------------------------");
             
-            foreach (byte b in this.ReadReceiveBuffer())
+            foreach (byte b in readData)
                 Console.Write(b.ToHex() + ":");
             Console.WriteLine();
             

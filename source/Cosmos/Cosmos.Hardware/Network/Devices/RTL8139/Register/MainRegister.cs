@@ -14,29 +14,6 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
             this.mem = mem;
         }
 
-
-
-
-        //[Obsolete]
-        //public byte Config0
-        //{
-        //    get { return mem.Read8Unchecked((UInt32)Bit.Config0); }
-        //    set { mem.Write8Unchecked((UInt32)Bit.Config0, value); }
-        //}
-        //[Obsolete]
-        //public byte Config1
-        //{
-        //    get { return mem.Read8Unchecked((UInt32)Bit.Config1); }
-        //    set { mem.Write8Unchecked((UInt32)Bit.Config1, value); }
-        //}
-
-        //[Obsolete]
-        //public UInt32 TxConfig
-        //{
-        //    get { return mem.Read32((UInt32)Bit.TxConfig); }
-        //    set { mem.Write32((UInt32)Bit.TxConfig, value); }
-        //}
-
         /// <summary>
         /// Current Address of RX pointer. Also known as CAPR.
         /// </summary>
