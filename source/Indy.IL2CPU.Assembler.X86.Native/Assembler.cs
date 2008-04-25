@@ -106,39 +106,76 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
                     aOutputWriter.WriteLine("    call WriteByteToComPort");
                     aOutputWriter.WriteLine("    ret");
 
+                    aOutputWriter.WriteLine("DebugPoint_WaitCmd:");
+                    aOutputWriter.WriteLine("    mov dx, " + (xComAddr + 5));
+                    aOutputWriter.WriteLine("    in al, dx");
+                    aOutputWriter.WriteLine("    test al, 0x01");
+                    aOutputWriter.WriteLine("    jz DebugPoint_WaitCmd");
+                    aOutputWriter.WriteLine("    jmp DebugPoint_ProcessCmd");
+
                     aOutputWriter.WriteLine("DebugPoint__:");
                     aOutputWriter.WriteLine("    PUSHAD");
                     aOutputWriter.WriteLine("    mov ebp, esp");
                     aOutputWriter.WriteLine("    add ebp, 32");
 
+                    // Check TraceMode
+                    aOutputWriter.WriteLine("    mov dword eax, [TraceMode]");
+                    aOutputWriter.WriteLine("    cmp al, 1"); // if 1, no tracing
+                    aOutputWriter.WriteLine("    je DebugPoint_NoTrace");
+                    //
+                    aOutputWriter.WriteLine("    call DebugWriteEIP");
+                    //
+                    aOutputWriter.WriteLine("    mov dword eax, [TraceMode]");
+                    aOutputWriter.WriteLine("    cmp al, 4");
+                    aOutputWriter.WriteLine("    je DebugPoint_WaitCmd");
+                    aOutputWriter.WriteLine("  DebugPoint_NoTrace:");
+
+                    //// Is there a new incoming command?
+                    aOutputWriter.WriteLine("  DebugPoint_CheckCmd:");
                     aOutputWriter.WriteLine("    mov dx, " + (xComAddr + 5));
                     aOutputWriter.WriteLine("    in al, dx");
                     aOutputWriter.WriteLine("    test al, 0x01");
                     aOutputWriter.WriteLine("    jz DebugPoint_AfterCmd");
 
+                    aOutputWriter.WriteLine("DebugPoint_ProcessCmd:");
                     aOutputWriter.WriteLine("    mov dx, " + xComAddr);
                     aOutputWriter.WriteLine("    in al, dx");
-                    aOutputWriter.WriteLine("    cmp al, 0x01"); // Turn Full Tracing on
-                    aOutputWriter.WriteLine("    jne DebugPoint_NotCmd01");
-                    aOutputWriter.WriteLine("    mov dword [TraceMode], 0x01");
-                    aOutputWriter.WriteLine("    jp DebugPoint_AfterCmd");
-                    aOutputWriter.WriteLine("DebugPoint_NotCmd01:");
-                    aOutputWriter.WriteLine("    cmp al, 0x02"); // Turn Full Tracing off
-                    aOutputWriter.WriteLine("    jne DebugPoint_NotCmd02");
-                    aOutputWriter.WriteLine("    mov dword [TraceMode], 0x00");
-                    aOutputWriter.WriteLine("    jp DebugPoint_AfterCmd");
-                    aOutputWriter.WriteLine("DebugPoint_NotCmd02:");
+                    aOutputWriter.WriteLine("    cmp al, 1"); // Turn Full Tracing off
+                    aOutputWriter.WriteLine("    jne DebugPoint_Cmd02");
+                    aOutputWriter.WriteLine("    mov dword [TraceMode], 1");
+                    aOutputWriter.WriteLine("    jmp DebugPoint_CheckCmd");
+                    //
+                    aOutputWriter.WriteLine("DebugPoint_Cmd02:");
+                    aOutputWriter.WriteLine("    cmp al, 2"); // Turn Full Tracing on
+                    aOutputWriter.WriteLine("    jne DebugPoint_Cmd03");
+                    aOutputWriter.WriteLine("    mov dword [TraceMode], 2");
+                    aOutputWriter.WriteLine("    jmp DebugPoint_CheckCmd");
+                    //
+                    aOutputWriter.WriteLine("DebugPoint_Cmd03:");
+                    aOutputWriter.WriteLine("    cmp al, 3"); // Step one
+                    aOutputWriter.WriteLine("    jne DebugPoint_Cmd04");
+                    aOutputWriter.WriteLine("    mov dword [TraceMode], 4");
+                    aOutputWriter.WriteLine("    jmp DebugPoint_AfterCmd");
+                    //
+                    aOutputWriter.WriteLine("DebugPoint_Cmd04:");
+                    aOutputWriter.WriteLine("    cmp al, 4"); // Immediate Break
+                    aOutputWriter.WriteLine("    jne DebugPoint_Cmd05");
+                    aOutputWriter.WriteLine("    mov dword [TraceMode], 4");
+                    aOutputWriter.WriteLine("    jmp DebugPoint_WaitCmd");
+                    //
+                    aOutputWriter.WriteLine("DebugPoint_Cmd05:");
                     // -Evaluate variables
                     // -Step to next debug call
+                    // Break points
+                    // Immediate break
                     aOutputWriter.WriteLine("DebugPoint_AfterCmd:");
 
-                    // Check TraceMode
-                    aOutputWriter.WriteLine("    mov dword eax, [TraceMode]");
-                    aOutputWriter.WriteLine("    cmp al, 0");
-                    aOutputWriter.WriteLine("    je DebugPoint_NoTrace");
-                    aOutputWriter.WriteLine("    call DebugWriteEIP");
-                    aOutputWriter.WriteLine("  DebugPoint_NoTrace:");
-                    
+                    // TraceMode
+                    // 1 - No tracing
+                    // 2 - Tracing
+                    // 3 - 
+                    // 4 - Break and wait
+
                     aOutputWriter.WriteLine("    POPAD");
                     aOutputWriter.WriteLine("    ret");
 				}
@@ -170,7 +207,7 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
 				if (Signature != null && Signature.Length > 0) {
 					aOutputWriter.WriteLine("{0} db {1}", SignatureLabelName, Signature.Aggregate<byte, string>("", (r, b) => r + b + ",") + "0");
 				}
-                aOutputWriter.WriteLine("TraceMode dd 1");
+                aOutputWriter.WriteLine("TraceMode dd 2");
             }
 
 		}

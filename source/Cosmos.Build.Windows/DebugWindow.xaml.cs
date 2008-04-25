@@ -26,6 +26,7 @@ namespace Cosmos.Build.Windows {
 		private SourceInfos mSourceMappings;
         protected List<Run> mLines = new List<Run>();
         protected FontFamily mFont = new FontFamily("Courier New");
+        protected bool mAutoDisplay = false;
 
 		public DebugWindow() {
 			InitializeComponent();
@@ -33,13 +34,30 @@ namespace Cosmos.Build.Windows {
             butnTraceOff.Click += new RoutedEventHandler(butnTraceOff_Click);
             butnTraceOn.Click += new RoutedEventHandler(butnTraceOn_Click);
             butnTest.Click += new RoutedEventHandler(butnTest_Click);
+            butnStep.Click += new RoutedEventHandler(butnStep_Click);
+            butnBreak.Click += new RoutedEventHandler(butnBreak_Click);
+            butnLogClear.Click += new RoutedEventHandler(butnLogClear_Click);
 		}
+
+        void butnLogClear_Click(object sender, RoutedEventArgs e) {
+            lboxLog.Items.Clear();
+        }
+
+        void butnBreak_Click(object sender, RoutedEventArgs e) {
+            SendDebugCmd(4);
+            mAutoDisplay = true;
+        }
+
+        void butnStep_Click(object sender, RoutedEventArgs e) {
+            SendDebugCmd(3);
+            mAutoDisplay = true;
+        }
 
         void butnTest_Click(object sender, RoutedEventArgs e) {
         }
 
         void butnTraceOn_Click(object sender, RoutedEventArgs e) {
-            SendDebugCmd(1);
+            SendDebugCmd(2);
         }
 
         protected void SendDebugCmd(byte aCmd) {
@@ -49,7 +67,7 @@ namespace Cosmos.Build.Windows {
         }
 
         void butnTraceOff_Click(object sender, RoutedEventArgs e) {
-            SendDebugCmd(2);
+            SendDebugCmd(1);
         }
 
         public void LoadSourceFile(string aPathname) {
@@ -139,7 +157,7 @@ namespace Cosmos.Build.Windows {
             }
             fdsvSource.UpdateLayout();
             if (xRunSelected != null) {
-                xRunSelected.BringIntoView();
+                xRunSelected.PreviousInline.BringIntoView();
             }
         }
         
@@ -163,6 +181,10 @@ namespace Cosmos.Build.Windows {
 		protected void DebugPacketRcvd(UInt32 aEIP) {
 			string xEIP = aEIP.ToString("X8");
             Log("0x" + xEIP);
+            if (mAutoDisplay) {
+                lboxLog.SelectedIndex = lboxLog.Items.Count - 1;
+                mAutoDisplay = false;
+            }
 		}
 
         protected void Log(string aText) {

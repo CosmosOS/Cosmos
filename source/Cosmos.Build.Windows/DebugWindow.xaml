@@ -4,17 +4,27 @@
     Title="Cosmos Debugger" Height="351" Width="551" Icon="/Cosmos.Build.Windows;component/Cosmos.ico"
     WindowState="Maximized">
     <DockPanel>
-        <ListBox DockPanel.Dock="Left" Width="200" FontFamily="Consolas" Name="lboxLog" />
+        <DockPanel Width="200" DockPanel.Dock="Left">
+            <ToolBarTray Background="White" DockPanel.Dock="Top">
+                <ToolBar Band="1" BandIndex="1">
+                    <Button Name="butnLogClear">Clear</Button>
+                    <Separator/>
+                </ToolBar>
+            </ToolBarTray>
+            <ListBox FontFamily="Consolas" Name="lboxLog" />
+        </DockPanel>
         <DockPanel DockPanel.Dock="Left">
             <ToolBarTray Background="White" DockPanel.Dock="Top">
                 <ToolBar Band="1" BandIndex="1">
-                    <Button>Continue</Button>
+                    <Button IsEnabled="False">Continue</Button>
                     <Separator/>
-                    <Button>Step</Button>
+                    <Button Name="butnStep">Step</Button>
                     <Separator/>
                     <Button Name="butnTraceOn">Trace On</Button>
                     <Separator/>
                     <Button Name="butnTraceOff">Trace Off</Button>
+                    <Separator/>
+                    <Button Name="butnBreak">Break</Button>
                     <Separator/>
                     <Button Name="butnTest">Test</Button>
                 </ToolBar>
