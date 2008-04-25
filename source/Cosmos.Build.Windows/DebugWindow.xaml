@@ -12,9 +12,9 @@
                     <Separator/>
                     <Button>Step</Button>
                     <Separator/>
-                    <Button>Trace On</Button>
+                    <Button Name="butnTraceOn">Trace On</Button>
                     <Separator/>
-                    <Button>Trace Off</Button>
+                    <Button Name="butnTraceOff">Trace Off</Button>
                 </ToolBar>
             </ToolBarTray>
             <FlowDocumentScrollViewer Name="fdsvSource" />

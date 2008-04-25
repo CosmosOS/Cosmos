@@ -18,7 +18,8 @@ using System.IO;
 
 namespace Cosmos.Build.Windows {
 	public partial class DebugWindow: Window {
-		protected TcpClient mClient;
+		protected TcpClient mTCPClient;
+        protected NetworkStream mTCPStream;
 		protected byte[] mTCPData = new byte[4];
 		protected int mCurrentPos = 0;
 		private DebugModeEnum mDebugMode;
@@ -29,7 +30,23 @@ namespace Cosmos.Build.Windows {
 		public DebugWindow() {
 			InitializeComponent();
             lboxLog.SelectionChanged += new SelectionChangedEventHandler(lboxLog_SelectionChanged);
+            butnTraceOff.Click += new RoutedEventHandler(butnTraceOff_Click);
+            butnTraceOn.Click += new RoutedEventHandler(butnTraceOn_Click);
 		}
+
+        void butnTraceOn_Click(object sender, RoutedEventArgs e) {
+            SendDebugCmd(1);
+        }
+
+        protected void SendDebugCmd(byte aCmd) {
+            var xData = new byte[1];
+            xData[0] = aCmd;
+            mTCPStream.Write(xData, 0, xData.Length);
+        }
+
+        void butnTraceOff_Click(object sender, RoutedEventArgs e) {
+            SendDebugCmd(2);
+        }
 
         public void LoadSourceFile(string aPathname) {
             var xSourceCode = System.IO.File.ReadAllLines(aPathname);
@@ -68,7 +85,8 @@ namespace Cosmos.Build.Windows {
             }
         }
 
-        protected void Select(int aLine, int aColBegin, int aLength) {
+        protected Run Select(int aLine, int aColBegin, int aLength) {
+            Run xRunSelected = null;
             if (aLength != 0) {
                 var xPara = (Paragraph)fdsvSource.Document.Blocks.FirstBlock;
                 var xSelectedLine = mLines[aLine];
@@ -83,7 +101,7 @@ namespace Cosmos.Build.Windows {
                     xPara.Inlines.InsertBefore(xSelectedLine, xRunLeft);
                 }
 
-                var xRunSelected = new Run(xText.Substring(aColBegin, aLength));
+                xRunSelected = new Run(xText.Substring(aColBegin, aLength));
                 xRunSelected.FontFamily = mFont;
                 xRunSelected.Background = Brushes.Red;
                 xPara.Inlines.InsertBefore(xSelectedLine, xRunSelected);
@@ -96,6 +114,7 @@ namespace Cosmos.Build.Windows {
 
                 xPara.Inlines.Remove(xSelectedLine);
             }
+            return xRunSelected;
         }
 
         public void SelectText(int aLineBegin, int aColBegin, int aLineEnd, int aColEnd) {
@@ -104,15 +123,17 @@ namespace Cosmos.Build.Windows {
             aLineEnd--;
             aColEnd--;
             //Currently can only be called once - need to fix it to reset so it can be called multiple times
+            Run xRunSelected;
             if (aLineBegin == aLineEnd) {
-                Select(aLineBegin, aColBegin, aColEnd - aColBegin);
+                xRunSelected = Select(aLineBegin, aColBegin, aColEnd - aColBegin);
             } else {
-                Select(aLineBegin, aColBegin, -1);
+                xRunSelected = Select(aLineBegin, aColBegin, -1);
                 for (int i = aLineBegin + 1; i <= aLineEnd - 1; i++) {
                     Select(i, 0, -1);
                 }
                 Select(aLineEnd, 0, aColEnd + 1);
             }
+            xRunSelected.BringIntoView();
         }
         
         public void SetSourceInfoMap(SourceInfos aSourceMapping) {
@@ -120,12 +141,12 @@ namespace Cosmos.Build.Windows {
 				mDebugMode = DebugModeEnum.Source;
 				mSourceMappings = aSourceMapping;
 				//Create a TCP connection to localhost:4444. We have already set up Qemu to listen to this port.
-				mClient = new TcpClient();
-				mClient.Connect(new IPEndPoint(IPAddress.Loopback, 4444));
+				mTCPClient = new TcpClient();
+                mTCPClient.Connect(new IPEndPoint(IPAddress.Loopback, 4444));
 
 				//Read TCP data from Qemu
-				var xStream = mClient.GetStream();
-				xStream.BeginRead(mTCPData, 0, mTCPData.Length, new AsyncCallback(TCPRead), xStream);
+				mTCPStream = mTCPClient.GetStream();
+                mTCPStream.BeginRead(mTCPData, 0, mTCPData.Length, new AsyncCallback(TCPRead), mTCPStream);
 			} catch (SocketException ex) {
 				Dispatcher.BeginInvoke(DispatcherPriority.Normal, new ConnectionLostDelegate(ConnectionLost), ex);
 			}

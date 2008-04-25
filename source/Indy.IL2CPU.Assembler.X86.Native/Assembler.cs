@@ -114,21 +114,23 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
                     aOutputWriter.WriteLine("    mov dx, " + (xComAddr + 5));
                     aOutputWriter.WriteLine("    in al, dx");
                     aOutputWriter.WriteLine("    test al, 0x01");
-                    aOutputWriter.WriteLine("    jne DebugPoint_NoCmd");
+                    aOutputWriter.WriteLine("    jz DebugPoint_AfterCmd");
 
                     aOutputWriter.WriteLine("    mov dx, " + xComAddr);
                     aOutputWriter.WriteLine("    in al, dx");
                     aOutputWriter.WriteLine("    cmp al, 0x01"); // Turn Full Tracing on
                     aOutputWriter.WriteLine("    jne DebugPoint_NotCmd01");
                     aOutputWriter.WriteLine("    mov dword [TraceMode], 0x01");
+                    aOutputWriter.WriteLine("    jp DebugPoint_AfterCmd");
                     aOutputWriter.WriteLine("DebugPoint_NotCmd01:");
-                    aOutputWriter.WriteLine("    cmp al, 0x01"); // Turn Full Tracing off
+                    aOutputWriter.WriteLine("    cmp al, 0x02"); // Turn Full Tracing off
                     aOutputWriter.WriteLine("    jne DebugPoint_NotCmd02");
                     aOutputWriter.WriteLine("    mov dword [TraceMode], 0x00");
+                    aOutputWriter.WriteLine("    jp DebugPoint_AfterCmd");
                     aOutputWriter.WriteLine("DebugPoint_NotCmd02:");
                     // -Evaluate variables
                     // -Step to next debug call
-                    aOutputWriter.WriteLine("DebugPoint_NoCmd:");
+                    aOutputWriter.WriteLine("DebugPoint_AfterCmd:");
 
                     // Check TraceMode
                     aOutputWriter.WriteLine("    mov dword eax, [TraceMode]");
@@ -168,7 +170,7 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
 				if (Signature != null && Signature.Length > 0) {
 					aOutputWriter.WriteLine("{0} db {1}", SignatureLabelName, Signature.Aggregate<byte, string>("", (r, b) => r + b + ",") + "0");
 				}
-                aOutputWriter.WriteLine("TraceMode dd 1");
+                aOutputWriter.WriteLine("TraceMode dd 0");
             }
 
 		}
