@@ -23,12 +23,98 @@ namespace Cosmos.Build.Windows {
 		protected int mCurrentPos = 0;
 		private DebugModeEnum mDebugMode;
 		private SourceInfos mSourceMappings;
+        protected List<Run> mLines = new List<Run>();
+        protected FontFamily mFont = new FontFamily("Courier New");
 
 		public DebugWindow() {
 			InitializeComponent();
 		}
 
-		public void SetSourceInfoMap(SourceInfos aSourceMapping) {
+        public void LoadSourceFile(string aPathname) {
+            var xSourceCode = System.IO.File.ReadAllLines(aPathname);
+            var xPara = new Paragraph();
+            mLines.Clear();
+            fdsvSource.Document = new FlowDocument();
+            fdsvSource.Document.PageWidth = 100 * 96;
+            fdsvSource.Document.Blocks.Add(xPara);
+            int xLineNo = 0;
+            foreach (var xLine in xSourceCode) {
+                Run xRun;
+
+                xLineNo++;
+                xRun = new Run(xLineNo.ToString().PadLeft(6) + " ");
+                xRun.MouseDown += new MouseButtonEventHandler(xRun_MouseDown);
+                xRun.FontFamily = mFont;
+                xRun.Cursor = Cursors.Arrow;
+                xRun.Background = Brushes.LightGray;
+                xPara.Inlines.Add(xRun);
+
+                xRun = new Run(xLine);
+                xRun.FontFamily = mFont;
+                mLines.Add(xRun);
+                xPara.Inlines.Add(xRun);
+
+                xPara.Inlines.Add(new LineBreak());
+            }
+        }
+
+        void xRun_MouseDown(object sender, MouseButtonEventArgs e) {
+            var xRun = (Run)sender;
+            if (xRun.Background == Brushes.Red) {
+                xRun.Background = Brushes.LightGray;
+            } else {
+                xRun.Background = Brushes.Red;
+            }
+        }
+
+        protected void Select(int aLine, int aColBegin, int aLength) {
+            if (aLength != 0) {
+                var xPara = (Paragraph)fdsvSource.Document.Blocks.FirstBlock;
+                var xSelectedLine = mLines[aLine];
+                string xText = xSelectedLine.Text;
+                if (aLength == -1) {
+                    aLength = xText.Length - aColBegin;
+                }
+
+                if (aColBegin > 0) {
+                    var xRunLeft = new Run(xText.Substring(0, aColBegin - 1));
+                    xRunLeft.FontFamily = mFont;
+                    xPara.Inlines.InsertBefore(xSelectedLine, xRunLeft);
+                }
+
+                var xRunSelected = new Run(xText.Substring(aColBegin, aLength));
+                xRunSelected.FontFamily = mFont;
+                xRunSelected.Background = Brushes.Red;
+                xPara.Inlines.InsertBefore(xSelectedLine, xRunSelected);
+
+                if (aColBegin + aLength < xText.Length) {
+                    var xRunRight = new Run(xText.Substring(aColBegin + aLength));
+                    xRunRight.FontFamily = mFont;
+                    xPara.Inlines.InsertBefore(xSelectedLine, xRunRight);
+                }
+
+                xPara.Inlines.Remove(xSelectedLine);
+            }
+        }
+
+        public void SelectText(int aLineBegin, int aColBegin, int aLineEnd, int aColEnd) {
+            aLineBegin--;
+            aColBegin--;
+            aLineEnd--;
+            aColEnd--;
+            //Currently can only be called once - need to fix it to reset so it can be called multiple times
+            if (aLineBegin == aLineEnd) {
+                Select(aLineBegin, aColBegin, aColEnd - aColBegin);
+            } else {
+                Select(aLineBegin, aColBegin, -1);
+                for (int i = aLineBegin + 1; i <= aLineEnd - 1; i++) {
+                    Select(i, 0, -1);
+                }
+                Select(aLineEnd, 0, aColEnd + 1);
+            }
+        }
+        
+        public void SetSourceInfoMap(SourceInfos aSourceMapping) {
 			try {
 				mDebugMode = DebugModeEnum.Source;
 				mSourceMappings = aSourceMapping;
@@ -47,16 +133,19 @@ namespace Cosmos.Build.Windows {
 		protected delegate void DebugPacketRcvdDelegate(UInt32 aEIP);
 		protected void DebugPacketRcvd(UInt32 aEIP) {
 			string xEIP = aEIP.ToString("X8");
-			lablEIP.Content = "0x" + xEIP;
-			lboxLog.SelectedIndex = lboxLog.Items.Add("0x" + xEIP);
+            Log("0x" + xEIP);
 		}
+
+        protected void Log(string aText) {
+            lboxLog.Items.Add(aText);
+        }
 
 		protected delegate void ConnectionLostDelegate(Exception ex);
 		protected void ConnectionLost(Exception ex) {
-			textBlock1.Text = "No TCP Connection to virtual machine!" + Environment.NewLine;
-			DebugGrid.Background = System.Windows.Media.Brushes.Red;
+		    Title = "No debug connection.";
+            lboxLog.Background = Brushes.Red;
 			while (ex != null) {
-				textBlock1.Text += ex.Message + Environment.NewLine;
+                Log(ex.Message);
 				ex = ex.InnerException;
 			}
 		}
@@ -82,53 +171,51 @@ namespace Cosmos.Build.Windows {
 
 		}
 
-		private void lboxLog_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
+        protected void Anaylyze() {
+            List<string> xItems = new List<string>();
+            for (int i = lboxLog.Items.Count - 1; i >= 0; i--) {
+                string xEIP = lboxLog.Items[i] as string;
+                if (xItems.Contains(xEIP, StringComparer.InvariantCultureIgnoreCase)) {
+                    lboxLog.Items.RemoveAt(i);
+                    continue;
+                }
+                var xSourceInfo = mSourceMappings.GetMapping(UInt32.Parse(xEIP.Substring(2), System.Globalization.NumberStyles.HexNumber));
+                if (xSourceInfo == null) {
+                    lboxLog.Items.RemoveAt(i);
+                    continue;
+                }
+            }
+            //foreach (var xEIP in (from item in lboxLog.Items.Cast<string>()
+            //                      select item).Distinct(StringComparer.InvariantCultureIgnoreCase)) {
+
+            //    //var xViewSrc = new ViewSourceWindow();
+            //    //int xCharStart;
+            //    //int xCharCount;
+            //    //GetLineInfo(xViewSrc.tboxSource.Text, xSourceInfo.Line, xSourceInfo.Column, xSourceInfo.LineEnd, xSourceInfo.ColumnEnd, out xCharStart, out xCharCount);
+            //    //if(
+            //    int xCharStart = xViewSrc.tboxSource.GetCharacterIndexFromLineIndex(xSourceInfo.Line);
+            //    int xCharEnd = xViewSrc.tboxSource.GetCharacterIndexFromLineIndex(xSourceInfo.LineEnd);
+            //    if ((xCharEnd - xCharStart) > 4) {
+            //        MessageBox.Show(xEIP);
+            //        return;
+            //    }
+            //}
+            MessageBox.Show("Analysis finished!");
+        }
+
+		protected void lboxLog_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
 			var xItem = lboxLog.SelectedItem;
 			string xItemStr = xItem as String;
-			if (MessageBox.Show("Do you want to do analysis? (Press no if you dont know)", "Debug", MessageBoxButton.YesNo) != MessageBoxResult.Yes) {
-				if (!String.IsNullOrEmpty(xItemStr)) {
-					if (mDebugMode == DebugModeEnum.Source) {
-						var xSourceInfo = mSourceMappings.GetMapping(UInt32.Parse(xItemStr.Substring(2), System.Globalization.NumberStyles.HexNumber));
-						var xViewSrc = new ViewSourceWindow();
-						xViewSrc.LoadSourceFile(xSourceInfo.SourceFile);
-						xViewSrc.SelectText(xSourceInfo.Line, xSourceInfo.Column, xSourceInfo.LineEnd, xSourceInfo.ColumnEnd);
-						xViewSrc.ShowDialog();
-					} else {
-						throw new Exception("Debug mode not supported!");
-					}
+			if (!String.IsNullOrEmpty(xItemStr)) {
+				if (mDebugMode == DebugModeEnum.Source) {
+					var xSourceInfo = mSourceMappings.GetMapping(UInt32.Parse(xItemStr.Substring(2), System.Globalization.NumberStyles.HexNumber));
+					LoadSourceFile(xSourceInfo.SourceFile);
+					SelectText(xSourceInfo.Line, xSourceInfo.Column, xSourceInfo.LineEnd, xSourceInfo.ColumnEnd);
+				} else {
+					throw new Exception("Debug mode not supported!");
 				}
-			} else {
-				var xViewSrc = new ViewSourceWindow();
-				List<string> xItems = new List<string>();
-				for (int i = lboxLog.Items.Count - 1; i >= 0; i--) {
-					string xEIP = lboxLog.Items[i] as string;
-					if (xItems.Contains(xEIP, StringComparer.InvariantCultureIgnoreCase)) {
-						lboxLog.Items.RemoveAt(i);
-						continue;
-					}
-					var xSourceInfo = mSourceMappings.GetMapping(UInt32.Parse(xEIP.Substring(2), System.Globalization.NumberStyles.HexNumber));
-					if (xSourceInfo == null) {
-						lboxLog.Items.RemoveAt(i);
-						continue;
-					}
-				}
-				//foreach (var xEIP in (from item in lboxLog.Items.Cast<string>()
-				//                      select item).Distinct(StringComparer.InvariantCultureIgnoreCase)) {
-
-				//    //var xViewSrc = new ViewSourceWindow();
-				//    //int xCharStart;
-				//    //int xCharCount;
-				//    //GetLineInfo(xViewSrc.tboxSource.Text, xSourceInfo.Line, xSourceInfo.Column, xSourceInfo.LineEnd, xSourceInfo.ColumnEnd, out xCharStart, out xCharCount);
-				//    //if(
-				//    int xCharStart = xViewSrc.tboxSource.GetCharacterIndexFromLineIndex(xSourceInfo.Line);
-				//    int xCharEnd = xViewSrc.tboxSource.GetCharacterIndexFromLineIndex(xSourceInfo.LineEnd);
-				//    if ((xCharEnd - xCharStart) > 4) {
-				//        MessageBox.Show(xEIP);
-				//        return;
-				//    }
-				//}
-				MessageBox.Show("Analysis finished!");
 			}
 		}
 	}
+
 }

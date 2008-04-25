@@ -11,7 +11,6 @@ namespace Indy.IL2CPU.IL.X86.Native {
 	public class NativeMethodHeaderOp: X86MethodHeaderOp {
 		public const string ISR_Suffix = "______ISR____WRAPPER";
 		private bool mIsInterruptHandler = false;
-		private byte mInterruptValue;
 		public NativeMethodHeaderOp(ILReader aReader, MethodInformation aMethodInfo)
 			: base(aReader, aMethodInfo) {
 			if (aMethodInfo == null) {
@@ -25,7 +24,7 @@ namespace Indy.IL2CPU.IL.X86.Native {
 			if (mIsInterruptHandler) {
 				string xWrapperName = LabelName + ISR_Suffix;
 				new CPU.Label(xWrapperName);
-				new CPU.Comment(mInterruptValue.ToString());
+				new CPU.Comment(0.ToString());
 				new CPUNative.Pushad();
 				new CPUNative.Cli();
 				new CPUx86.Call(LabelName);
