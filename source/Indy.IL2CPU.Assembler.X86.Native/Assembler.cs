@@ -170,7 +170,7 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
 				if (Signature != null && Signature.Length > 0) {
 					aOutputWriter.WriteLine("{0} db {1}", SignatureLabelName, Signature.Aggregate<byte, string>("", (r, b) => r + b + ",") + "0");
 				}
-                aOutputWriter.WriteLine("TraceMode dd 0");
+                aOutputWriter.WriteLine("TraceMode dd 1");
             }
 
 		}

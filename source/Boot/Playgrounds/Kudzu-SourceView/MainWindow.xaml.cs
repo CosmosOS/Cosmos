@@ -22,8 +22,8 @@ namespace Kudzu_SourceView {
         void button1_Click(object sender, RoutedEventArgs e) {
             var xView = new Cosmos.Build.Windows.DebugWindow();
             xView.LoadSourceFile(@"C:\source\Cosmos\source\Cosmos\Cosmos.Kernel\Keyboard.cs");
-            xView.SelectText(61, 4, 62, 8);
             xView.Show();
+            xView.SelectText(61, 4, 62, 8);
         }
 
     }
