@@ -126,23 +126,14 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
                     aOutputWriter.WriteLine("    jne DebugPoint_NotCmd02");
                     aOutputWriter.WriteLine("    mov dword [TraceMode], 0x00");
                     aOutputWriter.WriteLine("DebugPoint_NotCmd02:");
-
-                    // if data on comport
-                    // read commend
-                    // act on commend
-                    // Commands
-                    // -Trace on
-                    // -Trace off
                     // -Evaluate variables
                     // -Step to next debug call
-                    // end if
-
                     aOutputWriter.WriteLine("DebugPoint_NoCmd:");
 
-                    // If trace flag
+                    // Check TraceMode
                     aOutputWriter.WriteLine("    mov dword eax, [TraceMode]");
-                    aOutputWriter.WriteLine("    jnz DebugPoint_NoTrace");
-                    //Test this, doesnt seem ToString work ewven wehn 0
+                    aOutputWriter.WriteLine("    cmp al, 0");
+                    aOutputWriter.WriteLine("    je DebugPoint_NoTrace");
                     aOutputWriter.WriteLine("    call DebugWriteEIP");
                     aOutputWriter.WriteLine("  DebugPoint_NoTrace:");
                     
@@ -177,7 +168,7 @@ namespace Indy.IL2CPU.Assembler.X86.Native {
 				if (Signature != null && Signature.Length > 0) {
 					aOutputWriter.WriteLine("{0} db {1}", SignatureLabelName, Signature.Aggregate<byte, string>("", (r, b) => r + b + ",") + "0");
 				}
-                aOutputWriter.WriteLine("TraceMode dd 0x00000000");
+                aOutputWriter.WriteLine("TraceMode dd 0");
             }
 
 		}
