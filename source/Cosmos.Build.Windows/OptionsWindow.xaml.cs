@@ -165,6 +165,7 @@ namespace Cosmos.Build.Windows {
 				mDebugMode = DebugModeEnum.IL;
             } else if (xDebugMode == "Source") {
     			mDebugMode = DebugModeEnum.Source;
+				mComport = 1;
             } else if (xDebugMode == "None") {
 				mDebugMode = DebugModeEnum.None;
 			} else {
