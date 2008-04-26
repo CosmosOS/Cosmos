@@ -76,10 +76,6 @@
     <Compile Include="ValueTypeImpl.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Indy.IL2CPU.Assembler.X86.Native\Indy.IL2CPU.Assembler.X86.Native.csproj">
-      <Project>{6597AAC6-755D-47F9-ACF4-E13F65EC5418}</Project>
-      <Name>Indy.IL2CPU.Assembler.X86.Native</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Indy.IL2CPU.Assembler.X86\Indy.IL2CPU.Assembler.X86.csproj">
       <Project>{7F32CE06-13F2-4EDA-B588-3FAAFD25178A}</Project>
       <Name>Indy.IL2CPU.Assembler.X86</Name>

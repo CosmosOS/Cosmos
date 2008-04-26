@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading;
 using Microsoft.Win32;
 using Indy.IL2CPU;
-using Indy.IL2CPU.IL.X86.Native;
+using Indy.IL2CPU.IL.X86;
 
 namespace Cosmos.Build.Windows {
 	public class Builder {
@@ -20,7 +20,7 @@ namespace Cosmos.Build.Windows {
 			BuildPath = GetBuildPath();
 			ToolsPath = BuildPath + @"Tools\";
 			// MtW: leave this here, otherwise VS wont copy required dependencies!
-			typeof(NativeOpCodeMap).Equals(null);
+			typeof(X86OpCodeMap).Equals(null);
 		}
 
         /// <summary>
@@ -110,7 +110,7 @@ namespace Cosmos.Build.Windows {
 			xSW.Start();
 			var xEngine = new Engine();
 			xEngine.DebugLog += DoDebugLog;
-			xEngine.Execute(xTarget.Location, TargetPlatformEnum.NativeX86, g => Path.Combine(xAsmPath, g + ".asm"), false,
+			xEngine.Execute(xTarget.Location, TargetPlatformEnum.X86, g => Path.Combine(xAsmPath, g + ".asm"), false,
 				new string[] { Path.Combine(Path.Combine(ToolsPath, "Cosmos.Kernel.Plugs"), "Cosmos.Kernel.Plugs.dll") }, aDebugMode, aDebugComport, BuildPath);
 			xSW.Stop();
 			Console.WriteLine("IL2CPU Run took " + xSW.Elapsed.ToString());

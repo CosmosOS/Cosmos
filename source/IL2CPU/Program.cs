@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Indy.IL2CPU;
-using Indy.IL2CPU.IL.X86.Native;
+using Indy.IL2CPU.IL.X86;
 
 namespace IL2CPU {
 	public class Program {
@@ -16,10 +16,10 @@ namespace IL2CPU {
 		public static List<string> Plugs = new List<string>();
 		public static bool MetalMode;
 		public static string DebugFile;
-		public static TargetPlatformEnum TargetPlatform = TargetPlatformEnum.NativeX86;
+		public static TargetPlatformEnum TargetPlatform = TargetPlatformEnum.X86;
 		public const string FAsmParamsTemplate_Win32 = "\"{1}\" \"{0}\"";
 
-		private Type nativeType = typeof(NativeOpCodeMap);
+		private Type nativeType = typeof(X86OpCodeMap);
 
 		private static bool ParseArguments(IEnumerable<string> aArgs) {
 			Console.WriteLine("Initializing IL2CPU... This may take a minute so please wait for further status...");
@@ -127,7 +127,7 @@ namespace IL2CPU {
 
 		private static string ElfLDFileName {
 			get {
-				return Path.Combine(Path.Combine(ToolsDir, "Binutils-NativeX86"), "ld.exe");
+				return Path.Combine(Path.Combine(ToolsDir, "Binutils-X86"), "ld.exe");
 			}
 		}
 
@@ -171,7 +171,7 @@ namespace IL2CPU {
 					Func<string, string> xGetFileNameForGroup = xGroup => Path.Combine(AsmFile, xGroup + ".asm");
 					e.Execute(InputFile, TargetPlatform, xGetFileNameForGroup, MetalMode, Plugs, DebugModeEnum.Source, 2, AsmFile);
 					ProcessStartInfo xFasmStartInfo = new ProcessStartInfo();
-					if (TargetPlatform != TargetPlatformEnum.NativeX86) {
+					if (TargetPlatform != TargetPlatformEnum.X86) {
 						xFasmStartInfo.FileName = FAsmFileName;
 						xFasmStartInfo.Arguments = String.Format(FAsmParamsTemplate_Win32, xTestOutput, xGetFileNameForGroup("main"));
 						xFasmStartInfo.UseShellExecute = false;

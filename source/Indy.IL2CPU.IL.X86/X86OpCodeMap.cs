@@ -8,7 +8,7 @@ using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using Indy.IL2CPU.Assembler;
 
 namespace Indy.IL2CPU.IL.X86 {
-	public abstract class X86OpCodeMap: OpCodeMap {
+	public  class X86OpCodeMap: OpCodeMap {
 		protected override Type GetMethodHeaderOp() {
 			return typeof(X86MethodHeaderOp);
 		}
@@ -37,6 +37,10 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		protected override Type GetCustomMethodImplementationProxyOp() {
 			return typeof(X86CustomMethodImplementationProxyOp);
+		}
+
+		protected override Type GetCustomMethodImplementationOp() {
+			return null;
 		}
 
 		public override IList<Assembly> GetPlugAssemblies() {
@@ -163,6 +167,10 @@ namespace Indy.IL2CPU.IL.X86 {
 			new CPUx86.Pop(CPUx86.Registers.EAX);
 			new CPUx86.Move(CPUx86.Registers.EAX, CPUx86.Registers.ECX);
 			new CPUx86.Pushd(CPUx86.Registers.EAX);
+		}
+
+		public override void EmitOpDebugHeader(Indy.IL2CPU.Assembler.Assembler aAssembler, uint aOpId, string aOpLabel) {
+			new CPUx86.Call("DebugPoint__");
 		}
 	}
 }

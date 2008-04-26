@@ -134,10 +134,6 @@
       <Project>{B7E87073-CFFB-4972-BA0B-DCF0C3A0C930}</Project>
       <Name>IL2CPU %28IL2CPU\IL2CPU%29</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Indy.IL2CPU.IL.X86.Native\Indy.IL2CPU.IL.X86.Native.csproj">
-      <Project>{8D84CDE5-77A3-4E1F-B022-753E9E077926}</Project>
-      <Name>Indy.IL2CPU.IL.X86.Native</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Indy.IL2CPU.IL.X86\Indy.IL2CPU.IL.X86.csproj">
       <Project>{69C8D2C5-225C-4A00-BA55-AEF6719CBDBA}</Project>
       <Name>Indy.IL2CPU.IL.X86</Name>
