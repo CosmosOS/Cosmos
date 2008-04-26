@@ -87,11 +87,29 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
         //TSAD
         #region Transmit Start Address of Descriptors
 
-        //public static byte CurrentDescriptor
-        //{
-        //    get { ;}
-        //    set { ;}
-        //}
+        public UInt32 TSAD0
+        {
+            get { return xMem.Read32((UInt32)MainRegister.Bit.TSAD0); }
+            set { xMem.Write32((UInt32)MainRegister.Bit.TSAD0, value); }
+        }
+
+        public UInt32 TSAD1
+        {
+            get { return xMem.Read32((UInt32)MainRegister.Bit.TSAD1); }
+            set { xMem.Write32((UInt32)MainRegister.Bit.TSAD1, value); }
+        }
+
+        public UInt32 TSAD2
+        {
+            get { return xMem.Read32((UInt32)MainRegister.Bit.TSAD2); }
+            set { xMem.Write32((UInt32)MainRegister.Bit.TSAD2, value); }
+        }
+
+        public UInt32 TSAD3
+        {
+            get { return xMem.Read32((UInt32)MainRegister.Bit.TSAD3); }
+            set { xMem.Write32((UInt32)MainRegister.Bit.TSAD3, value); }
+        }
 
         /// <summary>
         /// Returns the actual address in the current 
@@ -100,6 +118,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
         {
             get
             {
+                //TODO: Usee properties above (TSAD0, TSAD1 etc...).
                 UInt32 address = 0;
                 switch (Register.TransmitStatusDescriptor.GetCurrentTSDescriptor())
                 {
@@ -129,6 +148,11 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
         #endregion
 
         //RBSTART
+        public UInt32 RBSTART
+        {
+            get { return xMem.Read32((UInt32)MainRegister.Bit.RxBuf); }
+            set { xMem.Write32((UInt32)MainRegister.Bit.RxBuf, value); }
+        }
 
         /// <summary>
         /// The address in the RxBuffer that the driver has read up to.

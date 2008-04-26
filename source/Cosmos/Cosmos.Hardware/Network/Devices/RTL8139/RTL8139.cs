@@ -36,7 +36,6 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
 
             pciCard = device;
             mem = device.GetAddressSpace(1) as MemoryAddressSpace;
-            reg = new Register.MainRegister(mem);
             valueReg = Register.ValueTypeRegisters.Load(mem);
             imr = Register.InterruptMaskRegister.Load(mem);
             isr = Register.InterruptStatusRegister.Load(mem);
@@ -103,10 +102,8 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             UInt16 bufferSize = (1024 * 16) + (4 * 4); //last 4  bytes used for CRC
             RxBuffer = new byte[bufferSize];
 
-            UInt32 address = pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.RxBuf;
-
             //Write the address of the buffer area to the RBSTART 
-            WriteAddressToPCI(ref RxBuffer, address);
+            valueReg.RBSTART = GetMemoryAddress(ref RxBuffer);
         }
 
         private void InitTransmitBuffer()
@@ -118,10 +115,10 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             TxBuffer2 = new byte[2048];
             TxBuffer3 = new byte[2048];
 
-            WriteAddressToPCI(ref TxBuffer0, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD0);
-            WriteAddressToPCI(ref TxBuffer1, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD1);
-            WriteAddressToPCI(ref TxBuffer2, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD2);
-            WriteAddressToPCI(ref TxBuffer3, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD3);
+            valueReg.TSAD0 = GetMemoryAddress(ref TxBuffer0);
+            valueReg.TSAD1 = GetMemoryAddress(ref TxBuffer1);
+            valueReg.TSAD2 = GetMemoryAddress(ref TxBuffer2);
+            valueReg.TSAD3 = GetMemoryAddress(ref TxBuffer3);
         }
 
         /// <summary>
@@ -265,13 +262,6 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
 
             //The data to be read is in the RxBuffer, but offset by the CBR.
 
-            //UInt16 readPointer = 
-
-            /*for (int i = valueReg.CurrentAddressOfPacketRead; i < valueReg.CurrentBufferAddress; i++)
-			{
-                receivedBytes.Add(RxBuffer[i]);
-			}*/
-
             UInt16 readPointer = valueReg.CurrentAddressOfPacketRead;
             UInt16 writtenPointer = valueReg.CurrentBufferAddress;
             while (readPointer != writtenPointer)
@@ -285,9 +275,8 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             }
 
             //Update the CAPR so that the RTL8139 knows that we've read the data.
-            //valueReg.CurrentAddressOfPacketRead = valueReg.CurrentBufferAddress;
-            Console.WriteLine("Setting CAPR to " + readPointer);
-            valueReg.CurrentAddressOfPacketRead = readPointer;
+            //Console.WriteLine("Setting CAPR to " + readPointer);
+            //valueReg.CurrentAddressOfPacketRead = readPointer; //TODO: Add this again
 
             return receivedBytes.ToArray();
         }
@@ -465,8 +454,6 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
 
             Console.WriteLine("Tx enabled?: " + cr.TxEnabled.ToString());
             Console.WriteLine("Rx enabled?: " + cr.RxEnabled.ToString());
-            //Console.WriteLine("RxBufAddr: " + reg.RxBufAddr.ToString());
-            Console.WriteLine("RxBufPtr: " + reg.RxBufPtr.ToString());
             Console.WriteLine("Speed 10Mb?: " + msr.Speed10MB.ToString());
             Console.WriteLine("Link OK?: " + (!msr.LinkStatusInverse).ToString());
             Console.WriteLine("CBR (byte count): " + valueReg.CurrentBufferAddress.ToString());

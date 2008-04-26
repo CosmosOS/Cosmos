@@ -8,39 +8,6 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
 {
     class MainRegister
     {
-        private MemoryAddressSpace mem;
-        public MainRegister(MemoryAddressSpace mem)
-        {
-            this.mem = mem;
-        }
-
-        /// <summary>
-        /// Current Address of RX pointer. Also known as CAPR.
-        /// </summary>
-        public CommandRegister.BitValue RxBufPtr
-        {
-            get { return (CommandRegister.BitValue)mem.Read16Unchecked((UInt32)Bit.RxBufPtr); }
-            set { mem.Write16Unchecked((UInt32)Bit.RxBufPtr, (UInt16)value); }
-        }
-
-        /// <summary>
-        /// Count of bytes received. Also known as CBR or CBA - Current Buffer Address. Is Read-Only.
-        /// </summary>
-        //public UInt16 RxBufAddr
-        //{
-        //    get { return (UInt16)mem.Read16Unchecked((UInt32)Bit.RxBufAddr); }
-        //    private set { ;}
-        //}
-
-        public CommandRegister.BitValue IntrMask
-        {
-            get { return (CommandRegister.BitValue)mem.Read16Unchecked((UInt32)Bit.IntrMask); }
-            set { mem.Write16Unchecked((UInt32)Bit.IntrMask, (UInt16)value); }
-        }
-
-        /// <summary>
-        /// The RTL8139 contains 64 x 16 bit EEPROM registers.
-        /// </summary>
         public enum Bit : byte
         {
             MAC0 = 0x00,            // Ethernet hardware address
