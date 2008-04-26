@@ -946,14 +946,14 @@ namespace Indy.IL2CPU {
 										//                     select xSize).Sum();
 										//}
 										// todo: calculate opcode number
-										bool aShouldIncludeDebugHeader = false;
+										bool xShouldIncludeDebugHeader = false;
 										#region determine if a new DebugHeader should be emitted
 										if (mDebugMode == DebugModeEnum.IL) {
-											aShouldIncludeDebugHeader = true;
+											xShouldIncludeDebugHeader = true;
 										} else {
 											if (mDebugMode == DebugModeEnum.Source) {
 												if (xPreviousOffset == -1) {
-													aShouldIncludeDebugHeader = true;
+													xShouldIncludeDebugHeader = true;
 												} else {
 													if (xHasSymbols) {
 														if (xCodeDocuments[xPreviousOffset] != xCodeDocuments[xCurrentOffset] ||
@@ -961,14 +961,15 @@ namespace Indy.IL2CPU {
 															xCodeColumns[xPreviousOffset] != xCodeColumns[xCurrentOffset] ||
 															xCodeEndLines[xPreviousOffset] != xCodeEndLines[xCurrentOffset] ||
 															xCodeEndColumns[xPreviousOffset] != xCodeEndColumns[xCurrentOffset]) {
-															aShouldIncludeDebugHeader = true;
+															xShouldIncludeDebugHeader = true;
 														}
 													}
 												}
 											}
 										}
+										xShouldIncludeDebugHeader &= xReader.OpCode != OpCodeEnum.Nop;
 										#endregion
-										if (aShouldIncludeDebugHeader) {
+										if (xShouldIncludeDebugHeader) {
 											mMap.EmitOpDebugHeader(mAssembler, 0, xLabel);
 											mDebugSymbols.Add(new DebugSymbol() {
 												AssemblyFileName = xCurrentMethod.DeclaringType.Assembly.Location,
