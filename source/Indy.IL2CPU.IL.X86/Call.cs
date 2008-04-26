@@ -50,13 +50,13 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			if (!aDoTest) {
 				//new CPUx86.Call("_CODE_REQUESTED_BREAK_");
-				new CPUx86.JumpAlways(xJumpTo);
+				new CPUx86.Jump(xJumpTo);
 			} else {
 				new CPUx86.Test(CPUx86.Registers.ECX, 2);
 				if (aCleanup != null) {
 					new CPUx86.JumpIfEquals(aNextLabel);
 					aCleanup();
-					new CPUx86.JumpAlways(xJumpTo);
+					new CPUx86.Jump(xJumpTo);
 				} else {
 					new CPUx86.JumpIfNotEquals(xJumpTo);
 				}

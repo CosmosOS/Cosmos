@@ -11,7 +11,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			: base(aReader, aMethodInfo) {
 		}
 		public override void DoAssemble() {
-			new CPU.JumpAlways(MethodFooterOp.EndOfMethodLabelNameNormal);
+			new CPU.Jump(MethodFooterOp.EndOfMethodLabelNameNormal);
 		}
 	}
 }

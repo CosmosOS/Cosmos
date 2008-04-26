@@ -36,7 +36,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				new CPUx86.JumpIfNotZero(LabelFalse);
 				new CPUx86.Xor("ebx", "ebx");
 				new CPUx86.JumpIfNotZero(LabelFalse);
-				new CPUx86.JumpAlways(TargetLabel);
+				new CPUx86.Jump(TargetLabel);
 				new CPU.Label(LabelFalse);
 			} else
 			{

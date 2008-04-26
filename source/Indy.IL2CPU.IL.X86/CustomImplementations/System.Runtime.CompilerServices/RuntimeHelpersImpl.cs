@@ -43,7 +43,7 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System.Runtime.CompilerServic
 			new Assembler.X86.Add(Assembler.X86.Registers.EDI, "1");
 			new Assembler.X86.Compare(Assembler.X86.Registers.EAX, Assembler.X86.Registers.ECX);
 			new Assembler.X86.JumpIfEquals(".EndLoop");
-			new Assembler.X86.JumpAlways(".StartLoop");
+			new Assembler.X86.Jump(".StartLoop");
 
 			new Assembler.Label(".EndLoop");
 		}

@@ -64,7 +64,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 			new Label(".RegisterIDT");
 			new CPUx86.Lidt(Registers.AtEAX);
 			new CPUx86.Break();
-			new CPUx86.JumpAlways("__AFTER__ALL__ISR__HANDLER__STUBS__");
+			new CPUx86.Jump("__AFTER__ALL__ISR__HANDLER__STUBS__");
 			int[] xInterruptsWithParam = new int[] { 8, 10, 11, 12, 13, 14 };
 			for (int j = 0; j < 256; j++) {
 				new Label("__ISR_Handler_" + j.ToString("X2"));
@@ -99,7 +99,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 				new CPUx86.Move("fs", Registers.AX);
 				new CPUx86.Move("gs", Registers.AX);
 				new CPUx86.Move("ss", Registers.AX);
-				new CPUx86.JumpAlways("0x8:__ISR_Handler_" + j.ToString("X2") + "_SetCS");
+				new CPUx86.Jump("0x8:__ISR_Handler_" + j.ToString("X2") + "_SetCS");
 				new Label("__ISR_Handler_" + j.ToString("X2") + "_SetCS");
 				MethodBase xHandler = GetInterruptHandler((byte)j);
 				if (xHandler == null) {

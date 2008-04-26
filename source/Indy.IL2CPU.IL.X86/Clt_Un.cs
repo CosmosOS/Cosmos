@@ -53,15 +53,15 @@ namespace Indy.IL2CPU.IL.X86 {
 				new CPUx86.Pushd(CPUx86.Registers.ECX);
 				new CPUx86.Compare(CPUx86.Registers.EAX, CPUx86.Registers.AtESP);
 				new CPUx86.JumpIfLess(LabelTrue);
-				new CPUx86.JumpAlways(LabelFalse);
+				new CPUx86.Jump(LabelFalse);
 				new CPU.Label(LabelTrue);
 				new CPUx86.Add(CPUx86.Registers.ESP, "4");
 				new CPUx86.Push("01h");
-				new CPUx86.JumpAlways(NextInstructionLabel);
+				new CPUx86.Jump(NextInstructionLabel);
 				new CPU.Label(LabelFalse);
 				new CPUx86.Add(CPUx86.Registers.ESP, "4");
 				new CPUx86.Push("00h");
-				new CPUx86.JumpAlways(NextInstructionLabel);
+				new CPUx86.Jump(NextInstructionLabel);
 			}
 		}
 	}

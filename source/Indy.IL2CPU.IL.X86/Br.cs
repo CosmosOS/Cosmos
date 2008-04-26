@@ -13,7 +13,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			mTargetInstructionName = GetInstructionLabel(aReader.OperandValueBranchPosition);
 		}
 		public override void DoAssemble() {
-			new CPU.JumpAlways(mTargetInstructionName);
+			new CPU.Jump(mTargetInstructionName);
 		}
 	}
 }

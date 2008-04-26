@@ -56,7 +56,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				new CPUx86.Pushd("[eax + " + ((i * 4) + ObjectImpl.FieldDataOffset) + "]");
 			}
 			Assembler.StackContents.Push(new StackContent(mTypeSize, mType));
-			new CPUx86.JumpAlways(mNextOpLabel);
+			new CPUx86.Jump(mNextOpLabel);
 			new CPU.Label(mReturnNullLabel);
 			new CPUx86.Add(CPUx86.Registers.ESP, "4");
 			new CPUx86.Pushd("0");

@@ -23,15 +23,15 @@ namespace Indy.IL2CPU.IL.X86 {
 			new CPUx86.Pop(CPUx86.Registers.EAX);
 			new CPUx86.Compare(CPUx86.Registers.EAX, CPUx86.Registers.AtESP);
 			new CPUx86.JumpIfEquals(LabelTrue);
-			new CPUx86.JumpAlways(LabelFalse);
+			new CPUx86.Jump(LabelFalse);
 			new CPU.Label(LabelTrue);
 			new CPUx86.Add(CPUx86.Registers.ESP, "4");
 			new CPUx86.Push("01h");
-			new CPUx86.JumpAlways(NextInstructionLabel);
+			new CPUx86.Jump(NextInstructionLabel);
 			new CPU.Label(LabelFalse);
 			new CPUx86.Add(CPUx86.Registers.ESP, "4");
 			new CPUx86.Push("00h");
-			new CPUx86.JumpAlways(NextInstructionLabel);
+			new CPUx86.Jump(NextInstructionLabel);
 		}
 
 		private void Assemble8Byte() {
@@ -53,14 +53,14 @@ namespace Indy.IL2CPU.IL.X86 {
 			new CPUx86.Add(CPUx86.Registers.ESP, "8");
 			new CPUx86.Add(CPUx86.Registers.EAX, "1");
 			new CPUx86.Push(CPUx86.Registers.EAX);
-			new CPUx86.JumpAlways(NextInstructionLabel);
+			new CPUx86.Jump(NextInstructionLabel);
 
 			new CPU.Label(LabelFalse);
 			//eax = 0
 			new CPUx86.Add(CPUx86.Registers.ESP, "8");
 			new CPUx86.Xor(CPUx86.Registers.EAX, CPUx86.Registers.EAX);
 			new CPUx86.Push(CPUx86.Registers.EAX);
-			new CPUx86.JumpAlways(NextInstructionLabel);
+			new CPUx86.Jump(NextInstructionLabel);
 		}
 
 		public override void DoAssemble() {

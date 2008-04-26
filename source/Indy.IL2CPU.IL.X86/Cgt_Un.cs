@@ -53,7 +53,7 @@ namespace Indy.IL2CPU.IL.X86 {
 
 				//new CPUx86.JumpIfAbove(LabelTrue);
 				//new CPUx86.Push("00h");
-				//new CPUx86.JumpAlways(NextInstructionLabel);
+				//new CPUx86.Jump(NextInstructionLabel);
 
 				//new CPU.Label(LabelTrue);
 				//new CPUx86.Push("01h");
@@ -68,7 +68,7 @@ namespace Indy.IL2CPU.IL.X86 {
 
 				new CPUx86.JumpIfAbove(LabelTrue);
 				new CPUx86.Push("00h");
-				new CPUx86.JumpAlways(NextInstructionLabel);
+				new CPUx86.Jump(NextInstructionLabel);
 
 				new CPU.Label(LabelTrue);
 				new CPUx86.Push("01h");

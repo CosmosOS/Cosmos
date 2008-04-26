@@ -42,7 +42,7 @@ namespace Indy.IL2CPU.IL.X86 {
 					}
 				}
 			}
-			new CPUx86.JumpAlways(EndOfMethodLabelNameException);
+			new CPUx86.Jump(EndOfMethodLabelNameException);
 			new Label(EndOfMethodLabelNameException);
 			if (!aAssembler.InMetalMode) {
 				if (aReturnSize > 0) {

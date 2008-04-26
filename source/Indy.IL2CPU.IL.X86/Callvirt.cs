@@ -91,7 +91,7 @@ namespace Indy.IL2CPU.IL.X86 {
 					for (int i = mThisOffset; i >= 0; i -= 4) {
 						new CPUx86.Add("esp", "4");
 					}
-					new CPUx86.JumpAlways(mLabelName + "__AFTER_NOT_BOXED_THIS");
+					new CPUx86.Jump(mLabelName + "__AFTER_NOT_BOXED_THIS");
 				}
 				new CPU.Label(mLabelName + "_NOT_BOXED_THIS");
 				new CPUx86.Call("eax");

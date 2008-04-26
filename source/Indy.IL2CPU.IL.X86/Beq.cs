@@ -30,13 +30,13 @@ namespace Indy.IL2CPU.IL.X86 {
 				new CPUx86.Pop(CPUx86.Registers.EBX);
 				new CPUx86.Compare(CPUx86.Registers.EAX, CPUx86.Registers.EBX);
 				new CPUx86.JumpIfNotEquals(LabelFalse);
-				new CPUx86.JumpAlways(TargetLabel);
+				new CPUx86.Jump(TargetLabel);
 				new CPU.Label(LabelFalse);
 				//new CPUx86.Noop();
-				//new CPUx86.JumpAlways(LabelFalse);
+				//new CPUx86.Jump(LabelFalse);
 				//new CPU.Label(LabelTrue);
 				//new CPUx86.Add(CPUx86.Registers.ESP, "4");
-				//new CPUx86.JumpAlways(TargetLabel);
+				//new CPUx86.Jump(TargetLabel);
 				//new CPU.Label(LabelFalse);
 				//new CPUx86.Add(CPUx86.Registers.ESP, "4");
 			} else
@@ -49,7 +49,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				new CPUx86.JumpIfNotZero(LabelFalse);
 				new CPUx86.Xor("ebx", "edx");
 				new CPUx86.JumpIfNotZero(LabelFalse);
-				new CPUx86.JumpAlways(TargetLabel);
+				new CPUx86.Jump(TargetLabel);
 				new CPU.Label(LabelFalse);
 				//new CPUx86.Noop();
 			}

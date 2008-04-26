@@ -109,14 +109,14 @@ namespace Indy.IL2CPU.Assembler.X86 {
                         new Push(Registers.EAX);
                         new Call("WriteByteToComPort");
                         new Ret();
-                        aOutputWriter.WriteLine(xAsm.GetContents());
 
-                        aOutputWriter.WriteLine("DebugPoint_WaitCmd:");
-                        aOutputWriter.WriteLine("    mov dx, " + (xComAddr + 5));
-                        aOutputWriter.WriteLine("    in al, dx");
-                        aOutputWriter.WriteLine("    test al, 0x01");
-                        aOutputWriter.WriteLine("    jz DebugPoint_WaitCmd");
-                        aOutputWriter.WriteLine("    jmp DebugPoint_ProcessCmd");
+                        new Label("DebugPoint_WaitCmd");
+                        new Move(Registers.DX, xComAddr + 5);
+                        new InByte(Registers.AL, Registers.DX);
+                        new Test(Registers.AL, 1);
+                        new JumpIfZero("DebugPoint_WaitCmd");
+                        new Jump("DebugPoint_ProcessCmd");
+                        aOutputWriter.WriteLine(xAsm.GetContents());
 
                         aOutputWriter.WriteLine("DebugPoint__:");
                         aOutputWriter.WriteLine("    PUSHAD");
