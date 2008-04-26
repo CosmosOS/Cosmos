@@ -8,7 +8,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
 	public class Assembler: Indy.IL2CPU.Assembler.Assembler {
 		public const string BreakMethodName = "_CODE_REQUESTED_BREAK_";
 		protected byte mComNumber = 0;
-		protected int[] mComPortAddresses = { 0x3F8, 0x2F8, 0x3E8, 0x2E8 };
+		protected UInt32[] mComPortAddresses = { 0x3F8, 0x2F8, 0x3E8, 0x2E8 };
 
 		public Assembler(Func<string, string> aGetStreamForGroup, bool aInMetalMode, byte aComNumber)
 			: base(aGetStreamForGroup, aInMetalMode) {
@@ -49,7 +49,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
 				    aOutputWriter.WriteLine("				 cli");
 				    //aOutputWriter.WriteLine("				 push ebx");
 				    if (mComNumber != null) {
-					    int xComAddr = mComPortAddresses[mComNumber - 1];
+					    UInt32 xComAddr = mComPortAddresses[mComNumber - 1];
 					    aOutputWriter.WriteLine("mov dx, 0x{0}", (xComAddr + 1).ToString("X"));
 					    aOutputWriter.WriteLine("mov al, 0x00");
 					    aOutputWriter.WriteLine("out DX, AL"); // disable all interrupts
@@ -82,7 +82,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
 				    aOutputWriter.WriteLine("              ret");
 				    aOutputWriter.WriteLine("                 ");
 				    if (mComNumber > 0) {
-					    int xComAddr = mComPortAddresses[mComNumber - 1];
+					    UInt32 xComAddr = mComPortAddresses[mComNumber - 1];
 
                         new Label("WriteByteToComPort");
                         new Label("WriteByteToComPort_Wait");
@@ -116,24 +116,24 @@ namespace Indy.IL2CPU.Assembler.X86 {
                         new Test(Registers.AL, 1);
                         new JumpIfZero("DebugPoint_WaitCmd");
                         new Jump("DebugPoint_ProcessCmd");
-                        aOutputWriter.WriteLine(xAsm.GetContents());
 
-                        aOutputWriter.WriteLine("DebugPoint__:");
-                        aOutputWriter.WriteLine("    PUSHAD");
-                        aOutputWriter.WriteLine("    mov ebp, esp");
-                        aOutputWriter.WriteLine("    add ebp, 32");
+                        new Label("DebugPoint__");
+                        new Pushad();
+                        new Move(Registers.EBP, Registers.ESP);
+                        new Add(Registers.EBP, 32);
 
                         // Check TraceMode
-                        aOutputWriter.WriteLine("    mov dword eax, [TraceMode]");
-                        aOutputWriter.WriteLine("    cmp al, 1"); // if 1, no tracing
-                        aOutputWriter.WriteLine("    je DebugPoint_NoTrace");
+                        new Move(Registers.EAX, "[TraceMode]");
+                        new Compare(Registers.AX, 1);
+                        new JumpIfEquals("DebugPoint_NoTrace");
                         //
-                        aOutputWriter.WriteLine("    call DebugWriteEIP");
+                        new Call("DebugWriteEIP");
                         //
-                        aOutputWriter.WriteLine("    mov dword eax, [TraceMode]");
-                        aOutputWriter.WriteLine("    cmp al, 4");
-                        aOutputWriter.WriteLine("    je DebugPoint_WaitCmd");
-                        aOutputWriter.WriteLine("  DebugPoint_NoTrace:");
+                        new Move(Registers.EAX, "[TraceMode]");
+                        new Compare(Registers.AL, 4);
+                        new JumpIfEquals("DebugPoint_WaitCmd");
+                        new Label("DebugPoint_NoTrace");
+                        aOutputWriter.WriteLine(xAsm.GetContents());
 
                         //// Is there a new incoming command?
                         aOutputWriter.WriteLine("  DebugPoint_CheckCmd:");

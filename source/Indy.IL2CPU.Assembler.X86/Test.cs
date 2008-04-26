@@ -7,9 +7,9 @@ namespace Indy.IL2CPU.Assembler.X86 {
 	[OpCode(0xFFFFFFFF, "test")]
 	public class Test: Instruction {
 		public readonly string Arg1;
-		public readonly int Arg2;
+		public readonly UInt32 Arg2;
 
-		public Test(string aArg1, int aArg2) {
+		public Test(string aArg1, UInt32 aArg2) {
 			Arg1 = aArg1;
 			Arg2 = aArg2;
 		}

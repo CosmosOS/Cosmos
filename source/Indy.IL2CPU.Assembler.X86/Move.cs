@@ -19,7 +19,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             Source = aSource;
         }
 
-        public Move(string aDestination, Int64 aSource) {
+        public Move(string aDestination, UInt32 aSource) {
             Destination = aDestination;
             Source = aSource.ToString();
         }
