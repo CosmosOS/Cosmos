@@ -5,7 +5,7 @@ using Indy.IL2CPU.Assembler.X86;
 using Indy.IL2CPU.Plugs;
 using Assembler = Indy.IL2CPU.Assembler.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
-using CPUNative = Indy.IL2CPU.Assembler.X86.Native;
+using CPUNative = Indy.IL2CPU.Assembler.X86;
 
 namespace Cosmos.Kernel.Plugs.Assemblers {
     public sealed class IORead8 : AssemblerMethod {

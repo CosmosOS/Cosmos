@@ -30,7 +30,7 @@ namespace Indy.IL2CPU.Assembler {
 				mMnemonic = xAttrib.Mnemonic;
 			}
 			if(aAddToAssembler) {
-				Assembler.CurrentInstance.Add(this);
+				Assembler.CurrentInstance.Peek().Add(this);
 			}
 		}
 	}

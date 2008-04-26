@@ -22,7 +22,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
 			return aGroup.Replace('-','_').Replace('.', '_');
 		}
 
-		protected override void EmitCodeSectionHeader(string aGroup, StreamWriter aOutputWriter) {
+		protected override void EmitCodeSectionHeader(string aGroup, TextWriter aOutputWriter) {
 			base.EmitCodeSectionHeader(aGroup, aOutputWriter);
 			aOutputWriter.WriteLine("section .text");
 			if (aGroup == MainGroup) {
@@ -49,27 +49,36 @@ namespace Indy.IL2CPU.Assembler.X86 {
 				//aOutputWriter.WriteLine("				 push ebx");
 				if (mComNumber != null) {
 					int xComAddr = mComPortAddress[mComNumber.Value - 1];
-					aOutputWriter.WriteLine("mov dx, 0x{0}", (xComAddr + 1).ToString("X"));
-					aOutputWriter.WriteLine("mov al, 0x00");
-					aOutputWriter.WriteLine("out DX, AL"); // disable all interrupts
-					aOutputWriter.WriteLine("mov dx, 0x{0}", (xComAddr + 3).ToString("X"));
-					aOutputWriter.WriteLine("mov al, 0x80");
-					aOutputWriter.WriteLine("out DX, AL");  // Enable DLAB (set baud rate divisor)
-					aOutputWriter.WriteLine("mov dx, 0x{0}", (xComAddr + 0).ToString("X"));
-					aOutputWriter.WriteLine("mov al, 0x01");
-					aOutputWriter.WriteLine("out DX, AL");  // Set divisor (lo byte)
-					aOutputWriter.WriteLine("mov dx, 0x{0}", (xComAddr + 1).ToString("X"));
-					aOutputWriter.WriteLine("mov al, 0x00");
-					aOutputWriter.WriteLine("out DX, AL");  //			  (hi byte)
-					aOutputWriter.WriteLine("mov dx, 0x{0}", (xComAddr + 3).ToString("X"));
-					aOutputWriter.WriteLine("mov al, 0x03");
-					aOutputWriter.WriteLine("out DX, AL");  // 8 bits, no parity, one stop bit
-					aOutputWriter.WriteLine("mov dx, 0x{0}", (xComAddr + 2).ToString("X"));
-					aOutputWriter.WriteLine("mov al, 0xC7");
-					aOutputWriter.WriteLine("out DX, AL");  // Enable FIFO, clear them, with 14-byte threshold
-					aOutputWriter.WriteLine("mov dx, 0x{0}", (xComAddr + 4).ToString("X"));
-					aOutputWriter.WriteLine("mov al, 0x03");
-					aOutputWriter.WriteLine("out DX, AL");  // IRQ-s enabled, RTS/DSR set
+					using (var xDumbAssembler = new DumbAssembler()) {
+						new Move(Registers.DX, (xComAddr + 1).ToString());
+						new Move(Registers.AL, 0.ToString());
+						new Out("dx", "al");// disable all interrupts
+
+						new Move(Registers.DX, (xComAddr + 3).ToString());
+						new Move(Registers.AL, 0x80.ToString());
+						new Out("dx", "al");//  Enable DLAB (set baud rate divisor)
+
+						new Move(Registers.DX, (xComAddr + 0).ToString());
+						new Move(Registers.AL, 0x1.ToString());
+						new Out("dx", "al");//	  Set diviso (low byte)
+
+						new Move(Registers.DX, (xComAddr + 1).ToString());
+						new Move(Registers.AL, 0x00.ToString());
+						new Out("dx", "al");// // set divisor (high byte)
+
+						new Move(Registers.DX, (xComAddr + 3).ToString());
+						new Move(Registers.AL, 0x03.ToString());
+						new Out("dx", "al");// // 8 bits, no parity, one stop bit
+
+						new Move(Registers.DX, (xComAddr + 2).ToString());
+						new Move(Registers.AL, 0xC7.ToString());
+						new Out("dx", "al");// Enable FIFO, clear them, with 14-byte threshold
+
+						new Move(Registers.DX, (xComAddr + 4).ToString());
+						new Move(Registers.AL, 0x03.ToString());
+						new Out("dx", "al");// IRQs enabled, RTS/DSR set
+						aOutputWriter.Write(xDumbAssembler.GetContents());
+					}
 				}
 				aOutputWriter.WriteLine("				 call " + EntryPointName);
 				aOutputWriter.WriteLine("			.loop:");
@@ -185,7 +194,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
 			}
 		}
 
-		protected override void EmitDataSectionHeader(string aGroup, StreamWriter aOutputWriter) {
+		protected override void EmitDataSectionHeader(string aGroup, TextWriter aOutputWriter) {
 			base.EmitDataSectionHeader(aGroup, aOutputWriter);
 			if (aGroup == MainGroup) {
 				aOutputWriter.WriteLine("section .data");
@@ -215,10 +224,10 @@ namespace Indy.IL2CPU.Assembler.X86 {
 
 		}
 
-		protected override void EmitIDataSectionHeader(string aGroup, StreamWriter aOutputWriter) {
+		protected override void EmitIDataSectionHeader(string aGroup, TextWriter aOutputWriter) {
 		}
 
-		protected override void EmitDataSectionFooter(string aGroup, StreamWriter aOutputWriter) {
+		protected override void EmitDataSectionFooter(string aGroup, TextWriter aOutputWriter) {
 			base.EmitDataSectionFooter(aGroup, aOutputWriter);
 			if (aGroup == MainGroup) {
 				aOutputWriter.WriteLine("");
@@ -234,7 +243,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
 			}
 		}
 
-		protected override void EmitHeader(string aGroup, StreamWriter aOutputWriter) {
+		protected override void EmitHeader(string aGroup, TextWriter aOutputWriter) {
 			//mOutputWriter.WriteLine("format ms coff  ");
 			//mOutputWriter.WriteLine("org 0220000h    ; the best place to load our kernel to. ");
 			aOutputWriter.WriteLine("use32           ; the kernel will be run in 32-bit protected mode, ");
@@ -245,7 +254,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
 			aOutputWriter.WriteLine("");
 		}
 
-		protected override void EmitIncludes(string aGroup, StreamWriter aOutputWriter) {
+		protected override void EmitIncludes(string aGroup, TextWriter aOutputWriter) {
 			foreach (string xInclude in (from item in Includes
 										 where String.Equals(item.Key, aGroup, StringComparison.InvariantCultureIgnoreCase)
 										 select item.Value).Distinct(StringComparer.InvariantCultureIgnoreCase)) {
@@ -253,14 +262,14 @@ namespace Indy.IL2CPU.Assembler.X86 {
 			}
 		}
 
-		protected override void EmitFooter(string aGroup, StreamWriter aOutputWriter) {
+		protected override void EmitFooter(string aGroup, TextWriter aOutputWriter) {
 			if (aGroup == MainGroup) {
 				aOutputWriter.WriteLine("_end_data:      ; -- end of CODE+DATA ");
 			}
 			aOutputWriter.WriteLine("%endif");
 		}
 
-		protected override void EmitImportMembers(string aGroup, StreamWriter aOutputWriter) {
+		protected override void EmitImportMembers(string aGroup, TextWriter aOutputWriter) {
 			if (ImportMembers.Count > 0) {
 				throw new Exception("You can't use P/Invoke in OS kernels");
 			}

@@ -4,7 +4,6 @@ using Indy.IL2CPU.Plugs;
 using Assembler = Indy.IL2CPU.Assembler.Assembler;
 using CPUAll = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
-using CPUNative = Indy.IL2CPU.Assembler.X86.Native;
 
 namespace Cosmos.Kernel.Plugs.Assemblers {
 	public class ZeroFill: AssemblerMethod {

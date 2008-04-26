@@ -5,7 +5,6 @@ using Indy.IL2CPU.Plugs;
 
 using Assembler = Indy.IL2CPU.Assembler.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
-using CPUNative = Indy.IL2CPU.Assembler.X86.Native;
 using HW = Cosmos.Hardware;
 
 namespace Cosmos.Kernel.Plugs.Assemblers {

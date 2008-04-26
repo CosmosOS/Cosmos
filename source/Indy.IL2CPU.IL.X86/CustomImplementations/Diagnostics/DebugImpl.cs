@@ -5,7 +5,7 @@ using System.Text;
 using Indy.IL2CPU.Plugs;
 using System.Diagnostics;
 
-namespace Indy.IL2CPU.IL.X86.Native.CustomImplementations.System.Diagnostics {
+namespace Indy.IL2CPU.IL.X86LinqTest.CustomImplementations.System.Diagnostics {
 	[Plug(Target=typeof(Debug))]
 	public static class DebugImpl {
 		public static void WriteLine(string aMessage) {

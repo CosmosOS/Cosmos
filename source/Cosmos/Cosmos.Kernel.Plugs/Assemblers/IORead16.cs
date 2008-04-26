@@ -5,7 +5,6 @@ using Indy.IL2CPU.Assembler.X86;
 using Indy.IL2CPU.Plugs;
 using Assembler = Indy.IL2CPU.Assembler.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
-using CPUNative = Indy.IL2CPU.Assembler.X86.Native;
 
 namespace Cosmos.Kernel.Plugs.Assemblers {
     public sealed class IORead16 : AssemblerMethod {
@@ -16,7 +15,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
             //TODO: Do we need to clear rest of EAX first?
 			//    MTW: technically not, as in other places, it _should_ be working with AL too..
 			new CPUx86.Move("eax", "0");
-            new CPUNative.InWord(Registers.AX, Registers.DX);
+			new CPUx86.InWord(Registers.AX, Registers.DX);
         	new CPUx86.Push(Registers.EAX);
         }
     }

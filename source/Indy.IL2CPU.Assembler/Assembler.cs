@@ -9,7 +9,7 @@ namespace Indy.IL2CPU.Assembler {
 	public abstract class Assembler: IDisposable {
 		// TODO: When threading is being worked on, fix this to work multithreaded!
 		//public const string CurrentExceptionDataMember = "__CURRENT_EXCEPTION__";
-		public const string SignatureLabelName = "Image____SIGNATURE___";
+		public const string SignatureLabelName = "____SIGNATURE___";
 		public static Exception CurrentException;
 		public static void PrintException() {
 			Console.BackgroundColor = ConsoleColor.DarkRed;
@@ -74,9 +74,12 @@ namespace Indy.IL2CPU.Assembler {
 			get;
 			set;
 		}
-		public static Assembler CurrentInstance {
+		public static Stack<Assembler> CurrentInstance {
 			get;
 			private set;
+		}
+		static Assembler() {
+			CurrentInstance = new Stack<Assembler>();
 		}
 		private Func<string, string> mGetFileNameForGroup;
 
@@ -89,10 +92,11 @@ namespace Indy.IL2CPU.Assembler {
 			: this(aGetStreamForGroup, false) {
 		}
 
+
 		public Assembler(Func<string, string> aGetFileNameForGroup, bool aInMetalMode) {
 			mGetFileNameForGroup = aGetFileNameForGroup;
 			mInMetalMode = aInMetalMode;
-			CurrentInstance = this;
+			CurrentInstance.Push(this);
 			//mInstructions.AddComplexIndexDefinition(
 		}
 
@@ -131,7 +135,7 @@ namespace Indy.IL2CPU.Assembler {
 			//		Anyhow, we need a way to clear the CurrentInstance property
 			mInstructions.Clear();
 			mDataMembers.Clear();
-			CurrentInstance = null;
+			CurrentInstance.Pop();
 		}
 
 		public void Add(params Instruction[] aReaders) {
@@ -145,7 +149,7 @@ namespace Indy.IL2CPU.Assembler {
 			set;
 		}
 
-		protected abstract void EmitHeader(string aGroup, StreamWriter aOutputWriter);
+		protected abstract void EmitHeader(string aGroup, TextWriter aOutputWriter);
 
 		private IEnumerable<string> GetAllGroupNames() {
 			List<string> xNames = new List<string>();
@@ -193,36 +197,7 @@ namespace Indy.IL2CPU.Assembler {
 					}
 					List<string> xLabels = new List<string>();
 					if (mInstructions.Count > 0) {
-						EmitCodeSectionHeader(xGroup, xOutputWriter);
-						xOutputWriter.WriteLine();
-						string xMainLabel = "";
-						foreach (Instruction x in (from item in mInstructions
-												   where String.Equals(item.Key, xGroup, StringComparison.InvariantCultureIgnoreCase)
-												   select item.Value)) {
-							string prefix = "\t\t\t";
-							Label xLabel = x as Label;
-							if (xLabel != null) {
-								string xFullName;
-								if (xLabel.Name[0] != '.') {
-									xMainLabel = xLabel.Name;
-									xFullName = xMainLabel;
-								} else {
-									xFullName = xMainLabel + xLabel.Name;
-									xLabels.Add(xFullName);
-								}
-								xOutputWriter.WriteLine();
-								if (x.ToString()[0] == '.') {
-									prefix = "\t\t";
-								} else {
-									prefix = "\t";
-								}
-								xOutputWriter.WriteLine(prefix + xFullName.Replace(".", "__DOT__") + ":");
-								continue;
-							}
-							xOutputWriter.WriteLine(prefix + x);
-						}
-						EmitCodeSectionFooter(xGroup, xOutputWriter);
-						xOutputWriter.WriteLine();
+						EmitCodeSection(xGroup, xOutputWriter, xLabels);
 					}
 					if (mImportMembers.Count > 0) {
 						EmitIDataSectionHeader(xGroup, xOutputWriter);
@@ -234,27 +209,60 @@ namespace Indy.IL2CPU.Assembler {
 			}
 		}
 
-		protected virtual void EmitIncludes(string aGroup, StreamWriter aOutputWriter) {
+		protected void EmitCodeSection(string aGroup, TextWriter aOutputWriter, List<string> aLabels) {
+			EmitCodeSectionHeader(aGroup, aOutputWriter);
+			aOutputWriter.WriteLine();
+			string xMainLabel = "";
+			foreach (Instruction x in (from item in mInstructions
+									   where String.Equals(item.Key, aGroup, StringComparison.InvariantCultureIgnoreCase)
+									   select item.Value)) {
+				string prefix = "\t\t\t";
+				Label xLabel = x as Label;
+				if (xLabel != null) {
+					string xFullName;
+					if (xLabel.Name[0] != '.') {
+						xMainLabel = xLabel.Name;
+						xFullName = xMainLabel;
+					} else {
+						xFullName = xMainLabel + xLabel.Name;
+						aLabels.Add(xFullName);
+					}
+					aOutputWriter.WriteLine();
+					if (x.ToString()[0] == '.') {
+						prefix = "\t\t";
+					} else {
+						prefix = "\t";
+					}
+					aOutputWriter.WriteLine(prefix + xFullName.Replace(".", "__DOT__") + ":");
+					continue;
+				}
+				aOutputWriter.WriteLine(prefix + x);
+			}
+			EmitCodeSectionFooter(aGroup, aOutputWriter);
+			aOutputWriter.WriteLine();
 		}
 
-		protected abstract void EmitImportMembers(string aGroup, StreamWriter aOutputWriter);
-
-		protected virtual void EmitIDataSectionHeader(string aGroup, StreamWriter aOutputWriter) {
+		protected virtual void EmitIncludes(string aGroup, TextWriter aOutputWriter) {
 		}
 
-		protected virtual void EmitIDataSectionFooter(string aGroup, StreamWriter aOutputWriter) {
+		protected abstract void EmitImportMembers(string aGroup, TextWriter aOutputWriter);
+
+		protected virtual void EmitIDataSectionHeader(string aGroup, TextWriter aOutputWriter) {
 		}
 
-		protected virtual void EmitCodeSectionHeader(string aGroup, StreamWriter aOutputWriter) {
+		protected virtual void EmitIDataSectionFooter(string aGroup, TextWriter aOutputWriter) {
 		}
 
-		protected virtual void EmitCodeSectionFooter(string aGroup, StreamWriter aOutputWriter) {
+		protected virtual void EmitCodeSectionHeader(string aGroup, TextWriter aOutputWriter) {
 		}
 
-		protected virtual void EmitDataSectionHeader(string aGroup, StreamWriter aOutputWriter) {
+		protected virtual void EmitCodeSectionFooter(string aGroup, TextWriter aOutputWriter) {
 		}
 
-		protected virtual void EmitDataSectionFooter(string aGroup, StreamWriter aOutputWriter) {
+		protected virtual void EmitDataSectionHeader(string aGroup, TextWriter aOutputWriter) {
+		}
+
+		protected virtual void EmitDataSectionFooter(string aGroup, TextWriter aOutputWriter) {
 		}
 
 		public string MainGroup {
@@ -262,7 +270,7 @@ namespace Indy.IL2CPU.Assembler {
 			set;
 		}
 
-		protected virtual void EmitFooter(string aGroup, StreamWriter aOutputWriter) {
+		protected virtual void EmitFooter(string aGroup, TextWriter aOutputWriter) {
 		}
 	}
 }

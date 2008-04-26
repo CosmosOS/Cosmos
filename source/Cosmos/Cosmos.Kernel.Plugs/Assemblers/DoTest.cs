@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Indy.IL2CPU.Plugs;
 using Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
-using CPUNative = Indy.IL2CPU.Assembler.X86.Native;
 
 namespace Cosmos.Kernel.Plugs.Assemblers {
 	public class DoTest: AssemblerMethod {

@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reflection;
 
 
-namespace Indy.IL2CPU.IL.X86.Native.CustomImplementations.System.Diagnostics {
+namespace Indy.IL2CPU.IL.X86LinqTest.CustomImplementations.System.Diagnostics {
 	public static class DebugImplRefs {
 		public static readonly MethodBase WriteLineRef;
 		public static readonly MethodBase WriteLineIfRef;
