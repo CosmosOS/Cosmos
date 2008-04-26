@@ -275,8 +275,8 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             }
 
             //Update the CAPR so that the RTL8139 knows that we've read the data.
-            //Console.WriteLine("Setting CAPR to " + readPointer);
-            //valueReg.CurrentAddressOfPacketRead = readPointer; //TODO: Add this again
+            //Console.WriteLine("Setting CAPR to " + readPointer + ". CBR is " + writtenPointer);
+            valueReg.CurrentAddressOfPacketRead = (UInt16)(readPointer - 16); //TODO: Figure out if 16 is the correct value. For now it works. RxBufferOverflow is no longer thrown.
 
             return receivedBytes.ToArray();
         }
