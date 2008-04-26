@@ -25,7 +25,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			Engine.QueueMethod(aMethod);
 			Call(CPU.Label.GenerateLabelName(aMethod));
 			if (!Assembler.InMetalMode) {
-				new CPUx86.Test("ecx", "2");
+				new CPUx86.Test(CPUx86.Registers.ECX, 2);
 				string xLabel = ".Call_Part2_" + xLabelId++.ToString();
 				new CPUx86.JumpIfEquals(xLabel);
 				//new CPUx86.Call("_CODE_REQUESTED_BREAK_");

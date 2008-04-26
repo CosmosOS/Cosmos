@@ -145,7 +145,8 @@ namespace Indy.IL2CPU {
 				switch (aTargetPlatform) {
 					case TargetPlatformEnum.X86: {
 							mMap = (OpCodeMap)Activator.CreateInstance(Type.GetType("Indy.IL2CPU.IL.X86.X86OpCodeMap, Indy.IL2CPU.IL.X86", true));
-							mAssembler = new Assembler.X86.Assembler(aGetFileNameForGroup, aInMetalMode, ((aDebugMode != DebugModeEnum.None) && (aDebugMode != DebugModeEnum.MLUsingGDB)) ? aDebugComNumber : (byte?)null);
+							mAssembler = new Assembler.X86.Assembler(aGetFileNameForGroup, aInMetalMode
+                                , ((aDebugMode != DebugModeEnum.None) && (aDebugMode != DebugModeEnum.MLUsingGDB)) ? aDebugComNumber : (byte)0);
 							break;
 						}
 					default:

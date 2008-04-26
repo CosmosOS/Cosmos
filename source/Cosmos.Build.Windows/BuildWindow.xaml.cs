@@ -16,7 +16,8 @@ using System.Collections.ObjectModel;
 using System.Windows.Threading;
 
 namespace Cosmos.Build.Windows {
-	public class BuildLogMessage {
+	
+    public class BuildLogMessage {
 		public LogSeverityEnum Severity {
 			get;
 			set;
@@ -26,10 +27,11 @@ namespace Cosmos.Build.Windows {
 			set;
 		}
 	}
-	public class BuildLogMessages: ObservableCollection<BuildLogMessage> {
-		public BuildLogMessages() {
-		}
+	
+    public class BuildLogMessages : ObservableCollection<BuildLogMessage> {
+		public BuildLogMessages() { }
 	}
+
     public partial class BuildWindow : Window {
         public BuildWindow() {
             InitializeComponent();
@@ -55,5 +57,6 @@ namespace Cosmos.Build.Windows {
 			}), null);
 			Dispatcher.PushFrame(xFrame);
 		}
+
     }
 }

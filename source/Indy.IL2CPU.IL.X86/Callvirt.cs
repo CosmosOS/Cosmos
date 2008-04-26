@@ -98,7 +98,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				new CPU.Label(mLabelName + "__AFTER_NOT_BOXED_THIS");
 			}
 			if (!Assembler.InMetalMode) {
-				new CPUx86.Test("ecx", "2");
+				new CPUx86.Test(CPUx86.Registers.ECX, 2);
 				new CPUx86.JumpIfNotEquals(MethodFooterOp.EndOfMethodLabelNameException);
 			}
 			new CPU.Comment("Argument Count = " + mArgumentCount.ToString());
@@ -107,17 +107,13 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			if (mReturnSize == 0) {
 				return;
-			}
-			if (mReturnSize <= 4) {
+			} else if (mReturnSize <= 4) {
 				new CPUx86.Pushd(CPUx86.Registers.EAX);
 				Assembler.StackContents.Push(new StackContent(mReturnSize, mCurrentMethodInfo.ReturnType));
-				return;
-			}
-			if (mReturnSize <= 8) {
+			} else if (mReturnSize <= 8) {
 				new CPUx86.Pushd(CPUx86.Registers.EBX);
 				new CPUx86.Pushd(CPUx86.Registers.EAX);
 				Assembler.StackContents.Push(new StackContent(mReturnSize, mCurrentMethodInfo.ReturnType));
-				return;
 			}
 		}
 	}

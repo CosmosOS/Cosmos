@@ -79,7 +79,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			//new CPUx86.Add(CPUx86.Registers.ESP, "0x4");
 			new CPUx86.Popd(CPUx86.Registers.EBP);
-			new CPUx86.Ret(aTotalArgsSize == 0 ? "" : aTotalArgsSize.ToString());
+			new CPUx86.Ret(aTotalArgsSize);
 		}
 	}
 }

@@ -7,15 +7,15 @@ namespace Indy.IL2CPU.Assembler.X86 {
 	[OpCode(0xFFFFFFFF, "test")]
 	public class Test: Instruction {
 		public readonly string Arg1;
-		public readonly string Arg2;
+		public readonly int Arg2;
 
-		public Test(string aArg1, string aArg2) {
+		public Test(string aArg1, int aArg2) {
 			Arg1 = aArg1;
 			Arg2 = aArg2;
 		}
 
 		public override string ToString() {
-			return "test " + Arg1 + "," + Arg2;
+			return "test " + Arg1 + ", " + Arg2;
 		}
 	}
 }

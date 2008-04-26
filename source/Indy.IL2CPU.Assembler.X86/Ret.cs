@@ -6,13 +6,17 @@ using System.Text;
 namespace Indy.IL2CPU.Assembler.X86 {
 	[OpCode(0xFFFFFFFF, "ret")]
 	public class Ret: Instruction{
-		public readonly string Argument;
-		public Ret(string aArgument) {
-			Argument = aArgument;
-		}
+		public readonly int Argument;
 
-		public override string ToString() {
-			return "ret " + Argument;
+        public Ret() : this(0) {
+        }
+
+        public Ret(int aArgument) {
+            Argument = aArgument;
+        }
+
+        public override string ToString() {
+            return ("ret " + ((Argument > 0) ? Argument.ToString() : "")).TrimEnd();
 		}
 	}
 }
