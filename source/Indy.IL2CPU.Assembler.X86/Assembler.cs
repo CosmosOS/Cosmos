@@ -133,14 +133,14 @@ namespace Indy.IL2CPU.Assembler.X86 {
                         new Compare(Registers.AL, 4);
                         new JumpIfEquals("DebugPoint_WaitCmd");
                         new Label("DebugPoint_NoTrace");
-                        aOutputWriter.WriteLine(xAsm.GetContents());
 
-                        //// Is there a new incoming command?
-                        aOutputWriter.WriteLine("  DebugPoint_CheckCmd:");
-                        aOutputWriter.WriteLine("    mov dx, " + (xComAddr + 5));
-                        aOutputWriter.WriteLine("    in al, dx");
-                        aOutputWriter.WriteLine("    test al, 0x01");
-                        aOutputWriter.WriteLine("    jz DebugPoint_AfterCmd");
+                        // Is there a new incoming command?
+                        new Label("DebugPoint_CheckCmd");
+                        new Move(Registers.DX, xComAddr + 5);
+                        new InByte(Registers.AL, Registers.DX);
+                        new Test(Registers.AL, 1);
+                        new JumpIfZero("DebugPoint_AfterCmd");
+                        aOutputWriter.WriteLine(xAsm.GetContents());
 
                         aOutputWriter.WriteLine("DebugPoint_ProcessCmd:");
                         aOutputWriter.WriteLine("    mov dx, " + xComAddr);
