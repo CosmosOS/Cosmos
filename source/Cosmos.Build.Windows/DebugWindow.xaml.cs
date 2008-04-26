@@ -28,8 +28,13 @@ namespace Cosmos.Build.Windows {
         protected FontFamily mFont = new FontFamily("Courier New");
         protected bool mAutoDisplay = false;
 
+        protected RoutedCommand mStepCommand;
+
 		public DebugWindow() {
 			InitializeComponent();
+
+            mStepCommand = new RoutedCommand();
+            
             lboxLog.SelectionChanged += new SelectionChangedEventHandler(lboxLog_SelectionChanged);
             butnTraceOff.Click += new RoutedEventHandler(butnTraceOff_Click);
             butnTraceOn.Click += new RoutedEventHandler(butnTraceOn_Click);
