@@ -22,12 +22,12 @@ namespace Indy.IL2CPU.Assembler.X86.X {
         }
 
         public static implicit operator RegisterAL(PortNumber aValue) {
-            new X86.InByte("AL", aValue.ToString());
+            new X86.InByte(Name, aValue.ToString());
             return Instance;
         }
 
         public static implicit operator RegisterAL(MemoryAction aAction) {
-            new X86.Move("AL", aAction.ToString());
+            new X86.Move(Name, aAction.ToString());
             return Instance;
         }
 

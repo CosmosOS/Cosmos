@@ -124,7 +124,7 @@
     <Compile Include="Test.cs" />
     <Compile Include="Xor.cs" />
     <Compile Include="X\AddressIndirect.cs" />
-    <Compile Include="X\AddressNumeric.cs" />
+    <Compile Include="X\AddressDirect.cs" />
     <Compile Include="X\Memory.cs" />
     <Compile Include="X\Address.cs" />
     <Compile Include="X\MemoryAction.cs" />

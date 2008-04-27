@@ -10,5 +10,13 @@ namespace Indy.IL2CPU.Assembler.X86.X {
             return new AddressIndirect(aRegister, 0);
         }
 
+        public static implicit operator Address(UInt32 aAddress) {
+            return new AddressDirect(aAddress);
+        }
+
+        public static implicit operator Address(string aLabel) {
+            return new AddressDirect(aLabel);
+        }
+
     }
 }

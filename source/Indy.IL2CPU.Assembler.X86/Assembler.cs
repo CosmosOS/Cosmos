@@ -23,33 +23,34 @@ namespace Indy.IL2CPU.Assembler.X86 {
 
                 Label = "DebugWriteEIP";
                 AL = Memory[EBP + 3];
-                new Push(Registers.EAX);
+                EAX.Push();
                 Call("WriteByteToComPort");
                 AL = Memory[EBP + 2];
-                new Push(Registers.EAX);
+                EAX.Push();
                 Call("WriteByteToComPort");
                 AL = Memory[EBP + 1];
-                new Push(Registers.EAX);
+                EAX.Push();
                 Call("WriteByteToComPort");
                 AL = Memory[EBP];
-                new Push(Registers.EAX);
+                EAX.Push();
                 Call("WriteByteToComPort");
                 Return();
 
                 Label = "DebugPoint_WaitCmd";
                 DX = xComStatusAddr;
-                new InByte(Registers.AL, Registers.DX);
+                AL = Port[DX];
                 AL.Test(0x01);
-                new JumpIfZero("DebugPoint_WaitCmd");
+                JumpIfZero("DebugPoint_WaitCmd");
                 Jump("DebugPoint_ProcessCmd");
 
                 Label = "DebugPoint__";
                 PushAll32();
-                new Move(Registers.EBP, Registers.ESP);
+                //new Move(Registers.EBP, Registers.ESP);
+                EBP = ESP;
                 new Add(Registers.EBP, 32);
 
                 // Check TraceMode
-                new Move(Registers.EAX, "[TraceMode]");
+                EAX = Memory["TraceMode"];
                 new Compare(Registers.AX, 1);
                 JumpIfEqual("DebugPoint_NoTrace");
                 //
