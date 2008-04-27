@@ -77,6 +77,7 @@ namespace Cosmos.Build.Windows {
 
         public void LoadSourceFile(string aPathname) {
             var xSourceCode = System.IO.File.ReadAllLines(aPathname);
+            lablSourceFilename.Content = System.IO.Path.GetFileName(aPathname);
             var xPara = new Paragraph();
             mLines.Clear();
             fdsvSource.Document = new FlowDocument();

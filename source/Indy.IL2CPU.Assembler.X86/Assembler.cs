@@ -184,8 +184,8 @@ namespace Indy.IL2CPU.Assembler.X86 {
                         new Ret();
                     }
                 }
+                aOutputWriter.WriteLine(xAsm.GetContents());
             }
-            aOutputWriter.WriteLine(xAsm.GetContents());
         }
 
 		protected override void EmitDataSectionHeader(string aGroup, TextWriter aOutputWriter) {

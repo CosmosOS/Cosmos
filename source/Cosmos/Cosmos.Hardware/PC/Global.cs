@@ -23,14 +23,20 @@ namespace Cosmos.Hardware.PC {
 			HW.PC.Bus.PCIBus.Init();
 
             // end partially new
-			if (!noATA) HW.Storage.ATA.Initialize(Sleep);
-			if (!noATAOld) HW.Storage.ATAOld.Initialize(Sleep);
+            if (!noATA) {
+                HW.Storage.ATA.Initialize(Sleep);
+            }
+            if (!noATAOld) {
+                HW.Storage.ATAOld.Initialize(Sleep);
+            }
 			
             HW.CPU.CreateIDT();
             // end old -----------------
 
 			// MTW new
-			if (!noATA2) HW.Storage.ATA2.ATA.Initialize(Sleep);
+            if (!noATA2) {
+                HW.Storage.ATA2.ATA.Initialize(Sleep);
+            }
 			// MTW new end
 
             HW.Device.Add(new Bus.CPU.Keyboard());
@@ -47,7 +53,7 @@ namespace Cosmos.Hardware.PC {
         }
 
         private static void Tick(object aSender, EventArgs aEventArgs) {
-            TickCount += 1;
+            TickCount++;
         }   
 
         //TODO: Change this to use an x86 Op or something so it doesnt

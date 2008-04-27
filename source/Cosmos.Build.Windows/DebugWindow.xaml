@@ -29,6 +29,7 @@
                     <Button Name="butnTest">Test</Button>
                 </ToolBar>
             </ToolBarTray>
+            <Label Name="lablSourceFilename" DockPanel.Dock="Top"></Label>
             <FlowDocumentScrollViewer Name="fdsvSource" />
         </DockPanel>
     </DockPanel>
