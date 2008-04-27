@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86.X {
-    public class PortSource {
+    public class PortNumber {
         string mPort;
 
-        public PortSource(string aPort) {
+        public PortNumber(string aPort) {
             mPort = aPort;
         }
 

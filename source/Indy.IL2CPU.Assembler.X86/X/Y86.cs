@@ -11,9 +11,12 @@ namespace Indy.IL2CPU.Assembler.X86.X {
 
         public RegisterDX DX = RegisterDX.Instance;
 
-        public PortSource Port(RegisterDX aDX) {
-            return new PortSource("DX");
-        }
+        public RegisterESP ESP = RegisterESP.Instance;
+
+        public RegisterEBP EBP = RegisterEBP.Instance;
+
+        public readonly Ports Port = new Ports();
+        public readonly Memory Memory = new Memory();
 
         public string Label {
             set { 
@@ -21,8 +24,32 @@ namespace Indy.IL2CPU.Assembler.X86.X {
             }
         }
 
+        public void Call(string aLabel) {
+            new X86.Call(aLabel);
+        }
+        public void Jump(string aLabel) {
+            new X86.Jump(aLabel);
+        }
         public void JumpIfEqual(string aLabel) {
             new X86.JumpIfEqual(aLabel);
+        }
+        public void JumpIfZero(string aLabel) {
+            new X86.JumpIfZero(aLabel);
+        }
+        public void JumpIfNotEqual(string aLabel) {
+            new X86.JumpIfNotEqual(aLabel);
+        }
+        public void PopAll32() {
+            new Popad();
+        }
+        public void PushAll32() {
+            new Pushad();
+        }
+        public void Return() {
+            new X86.Ret();
+        }
+        public void Return(UInt16 aBytes) {
+            new X86.Ret(aBytes);
         }
 
     }

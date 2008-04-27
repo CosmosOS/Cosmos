@@ -13,92 +13,92 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 Label = "WriteByteToComPort";
                 Label = "WriteByteToComPort_Wait";
                 DX = xComStatusAddr;
-                AL = Port(DX);
+                AL = Port[DX];
                 AL.Test(0x20);
                 JumpIfEqual("WriteByteToComPort_Wait");
                 DX = aComAddr;
-                new Move(Registers.AL, "[esp + 4]");
-                new Out(Registers.DX, Registers.AL);
-                new Ret(4);
+                AL = Memory[ESP + 4];
+                Port[DX] = AL;
+                Return(4);
 
-                new Label("DebugWriteEIP");
-                new Move(Registers.AL, "[ebp + 3]");
+                Label = "DebugWriteEIP";
+                AL = Memory[EBP + 3];
                 new Push(Registers.EAX);
-                new Call("WriteByteToComPort");
-                new Move(Registers.AL, "[ebp + 2]");
+                Call("WriteByteToComPort");
+                AL = Memory[EBP + 2];
                 new Push(Registers.EAX);
-                new Call("WriteByteToComPort");
-                new Move(Registers.AL, "[ebp + 1]");
+                Call("WriteByteToComPort");
+                AL = Memory[EBP + 1];
                 new Push(Registers.EAX);
-                new Call("WriteByteToComPort");
-                new Move(Registers.AL, "[ebp]");
+                Call("WriteByteToComPort");
+                AL = Memory[EBP];
                 new Push(Registers.EAX);
-                new Call("WriteByteToComPort");
-                new Ret();
+                Call("WriteByteToComPort");
+                Return();
 
-                new Label("DebugPoint_WaitCmd");
+                Label = "DebugPoint_WaitCmd";
                 DX = xComStatusAddr;
                 new InByte(Registers.AL, Registers.DX);
-                new Test(Registers.AL, 1);
+                AL.Test(0x01);
                 new JumpIfZero("DebugPoint_WaitCmd");
-                new Jump("DebugPoint_ProcessCmd");
+                Jump("DebugPoint_ProcessCmd");
 
-                new Label("DebugPoint__");
-                new Pushad();
+                Label = "DebugPoint__";
+                PushAll32();
                 new Move(Registers.EBP, Registers.ESP);
                 new Add(Registers.EBP, 32);
 
                 // Check TraceMode
                 new Move(Registers.EAX, "[TraceMode]");
                 new Compare(Registers.AX, 1);
-                new JumpIfEqual("DebugPoint_NoTrace");
+                JumpIfEqual("DebugPoint_NoTrace");
                 //
                 new Call("DebugWriteEIP");
                 //
                 new Move(Registers.EAX, "[TraceMode]");
                 new Compare(Registers.AL, 4);
-                new JumpIfEqual("DebugPoint_WaitCmd");
-                new Label("DebugPoint_NoTrace");
+                JumpIfEqual("DebugPoint_WaitCmd");
+                Label = "DebugPoint_NoTrace";
 
                 // Is there a new incoming command?
-                new Label("DebugPoint_CheckCmd");
+                Label = "DebugPoint_CheckCmd";
                 DX = xComStatusAddr;
-                new InByte(Registers.AL, Registers.DX);
-                new Test(Registers.AL, 1);
-                new JumpIfZero("DebugPoint_AfterCmd");
+                AL = Port[DX];
+                AL.Test(0x01);
+                JumpIfZero("DebugPoint_AfterCmd");
 
-                new Label("DebugPoint_ProcessCmd");
+                Label = "DebugPoint_ProcessCmd";
                 DX = aComAddr;
-                new InByte(Registers.AL, Registers.DX);
+                AL = Port[DX];
                 new Compare(Registers.AL, 1);
-                new JumpIfNotEqual("DebugPoint_Cmd02");
+                JumpIfNotEqual("DebugPoint_Cmd02");
                 new Move("dword", "[TraceMode]", 1);
-                new Jump("DebugPoint_CheckCmd");
+                Jump("DebugPoint_CheckCmd");
                 //
-                new Label("DebugPoint_Cmd02");
+                Label = "DebugPoint_Cmd02";
                 new Compare(Registers.AL, 2);
-                new JumpIfNotEqual("DebugPoint_Cmd03");
+                JumpIfNotEqual("DebugPoint_Cmd03");
                 new Move("dword", "[TraceMode]", 2);
-                new Jump("DebugPoint_CheckCmd");
+                Jump("DebugPoint_CheckCmd");
                 //
-                new Label("DebugPoint_Cmd03");
+                Label = "DebugPoint_Cmd03";
                 new Compare(Registers.AL, 3);
-                new JumpIfNotEqual("DebugPoint_Cmd04");
+                JumpIfNotEqual("DebugPoint_Cmd04");
                 new Move("dword", "[TraceMode]", 4);
-                new Jump("DebugPoint_AfterCmd");
+                Jump("DebugPoint_AfterCmd");
                 //
-                new Label("DebugPoint_Cmd04");
+                Label = "DebugPoint_Cmd04";
                 new Compare(Registers.AL, 4);
-                new JumpIfNotEqual("DebugPoint_Cmd05");
+                JumpIfNotEqual("DebugPoint_Cmd05");
                 new Move("dword", "[TraceMode]", 4);
-                new Jump("DebugPoint_WaitCmd");
+                Jump("DebugPoint_WaitCmd");
                 //
-                new Label("DebugPoint_Cmd05");
+                Label = "DebugPoint_Cmd05";
                 // -Evaluate variables
                 // -Step to next debug call
                 // Break points
                 // Immediate break
-                new Label("DebugPoint_AfterCmd");
+                Label = "DebugPoint_AfterCmd";
 
                 // TraceMode
                 // 1 - No tracing
@@ -106,8 +106,8 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 // 3 - 
                 // 4 - Break and wait
 
-                new Popad();
-                new Ret();
+                PopAll32();
+                Return();
             }
         }
 

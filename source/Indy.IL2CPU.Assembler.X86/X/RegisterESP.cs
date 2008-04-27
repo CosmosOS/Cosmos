@@ -4,15 +4,15 @@ using System.Linq;
 using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86.X {
-    public class RegisterEAX : Register32 {
-        public const string Name = "EAX";
-        public static readonly RegisterEAX Instance = new RegisterEAX();
+    public class RegisterESP : Register32 {
+        public const string Name = "ESP";
+        public static readonly RegisterESP Instance = new RegisterESP();
 
         public override string ToString() {
             return Name;
         }
 
-        public static implicit operator RegisterEAX(UInt32 aValue) {
+        public static implicit operator RegisterESP(UInt32 aValue) {
             Instance.Move(aValue.ToString());
             return Instance;
         }
