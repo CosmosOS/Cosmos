@@ -5,10 +5,115 @@ using System.Linq;
 using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
-	public class Assembler: Indy.IL2CPU.Assembler.Assembler {
+	public class Assembler : Indy.IL2CPU.Assembler.Assembler {
+        protected class Y86 : X.Y86 {
+
+            public void DebugStub(TextWriter aOutputWriter, UInt16 aComAddr) {
+                UInt16 xComStatusAddr = (UInt16)(aComAddr + 5);
+                Label = "WriteByteToComPort";
+                Label = "WriteByteToComPort_Wait";
+                DX = xComStatusAddr;
+                AL = Port(DX);
+                AL.Test(0x20);
+                JumpIfEqual("WriteByteToComPort_Wait");
+                DX = aComAddr;
+                new Move(Registers.AL, "[esp + 4]");
+                new Out(Registers.DX, Registers.AL);
+                new Ret(4);
+
+                new Label("DebugWriteEIP");
+                new Move(Registers.AL, "[ebp + 3]");
+                new Push(Registers.EAX);
+                new Call("WriteByteToComPort");
+                new Move(Registers.AL, "[ebp + 2]");
+                new Push(Registers.EAX);
+                new Call("WriteByteToComPort");
+                new Move(Registers.AL, "[ebp + 1]");
+                new Push(Registers.EAX);
+                new Call("WriteByteToComPort");
+                new Move(Registers.AL, "[ebp]");
+                new Push(Registers.EAX);
+                new Call("WriteByteToComPort");
+                new Ret();
+
+                new Label("DebugPoint_WaitCmd");
+                DX = xComStatusAddr;
+                new InByte(Registers.AL, Registers.DX);
+                new Test(Registers.AL, 1);
+                new JumpIfZero("DebugPoint_WaitCmd");
+                new Jump("DebugPoint_ProcessCmd");
+
+                new Label("DebugPoint__");
+                new Pushad();
+                new Move(Registers.EBP, Registers.ESP);
+                new Add(Registers.EBP, 32);
+
+                // Check TraceMode
+                new Move(Registers.EAX, "[TraceMode]");
+                new Compare(Registers.AX, 1);
+                new JumpIfEqual("DebugPoint_NoTrace");
+                //
+                new Call("DebugWriteEIP");
+                //
+                new Move(Registers.EAX, "[TraceMode]");
+                new Compare(Registers.AL, 4);
+                new JumpIfEqual("DebugPoint_WaitCmd");
+                new Label("DebugPoint_NoTrace");
+
+                // Is there a new incoming command?
+                new Label("DebugPoint_CheckCmd");
+                DX = xComStatusAddr;
+                new InByte(Registers.AL, Registers.DX);
+                new Test(Registers.AL, 1);
+                new JumpIfZero("DebugPoint_AfterCmd");
+
+                new Label("DebugPoint_ProcessCmd");
+                DX = aComAddr;
+                new InByte(Registers.AL, Registers.DX);
+                new Compare(Registers.AL, 1);
+                new JumpIfNotEqual("DebugPoint_Cmd02");
+                new Move("dword", "[TraceMode]", 1);
+                new Jump("DebugPoint_CheckCmd");
+                //
+                new Label("DebugPoint_Cmd02");
+                new Compare(Registers.AL, 2);
+                new JumpIfNotEqual("DebugPoint_Cmd03");
+                new Move("dword", "[TraceMode]", 2);
+                new Jump("DebugPoint_CheckCmd");
+                //
+                new Label("DebugPoint_Cmd03");
+                new Compare(Registers.AL, 3);
+                new JumpIfNotEqual("DebugPoint_Cmd04");
+                new Move("dword", "[TraceMode]", 4);
+                new Jump("DebugPoint_AfterCmd");
+                //
+                new Label("DebugPoint_Cmd04");
+                new Compare(Registers.AL, 4);
+                new JumpIfNotEqual("DebugPoint_Cmd05");
+                new Move("dword", "[TraceMode]", 4);
+                new Jump("DebugPoint_WaitCmd");
+                //
+                new Label("DebugPoint_Cmd05");
+                // -Evaluate variables
+                // -Step to next debug call
+                // Break points
+                // Immediate break
+                new Label("DebugPoint_AfterCmd");
+
+                // TraceMode
+                // 1 - No tracing
+                // 2 - Tracing
+                // 3 - 
+                // 4 - Break and wait
+
+                new Popad();
+                new Ret();
+            }
+        }
+
 		public const string BreakMethodName = "_CODE_REQUESTED_BREAK_";
 		protected byte mComNumber = 0;
-		protected UInt32[] mComPortAddresses = { 0x3F8, 0x2F8, 0x3E8, 0x2E8 };
+		protected UInt16[] mComPortAddresses = { 0x3F8, 0x2F8, 0x3E8, 0x2E8 };
 
 		public Assembler(Func<string, string> aGetStreamForGroup, bool aInMetalMode, byte aComNumber)
 			: base(aGetStreamForGroup, aInMetalMode) {
@@ -24,7 +129,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
 
 		protected override void EmitCodeSectionHeader(string aGroup, TextWriter aOutputWriter) {
 			base.EmitCodeSectionHeader(aGroup, aOutputWriter);
-            using (var xAsm = new DumbAssembler()) {
+            using (var xAsm = new RawAssembler()) {
 			    aOutputWriter.WriteLine("section .text");
 			    if (aGroup == MainGroup) {
 				    aOutputWriter.WriteLine("global Kernel_Start");
@@ -48,8 +153,8 @@ namespace Indy.IL2CPU.Assembler.X86 {
 				    aOutputWriter.WriteLine("; some more startups todo");
 				    aOutputWriter.WriteLine("				 cli");
 				    //aOutputWriter.WriteLine("				 push ebx");
-				    if (mComNumber != null) {
-					    UInt32 xComAddr = mComPortAddresses[mComNumber - 1];
+				    if (mComNumber > 0) {
+					    UInt16 xComAddr = mComPortAddresses[mComNumber - 1];
 					    aOutputWriter.WriteLine("mov dx, 0x{0}", (xComAddr + 1).ToString("X"));
 					    aOutputWriter.WriteLine("mov al, 0x00");
 					    aOutputWriter.WriteLine("out DX, AL"); // disable all interrupts
@@ -82,106 +187,8 @@ namespace Indy.IL2CPU.Assembler.X86 {
 				    aOutputWriter.WriteLine("              ret");
 				    aOutputWriter.WriteLine("                 ");
 				    if (mComNumber > 0) {
-					    UInt32 xComAddr = mComPortAddresses[mComNumber - 1];
-
-                        new Label("WriteByteToComPort");
-                        new Label("WriteByteToComPort_Wait");
-                        new Move(Registers.DX, xComAddr + 5);
-                        new InByte(Registers.AL, Registers.DX);
-                        new Test(Registers.AL, 0x20);
-                        new JumpIfEqual("WriteByteToComPort_Wait");
-                        new Move(Registers.DX, xComAddr);
-                        new Move(Registers.EAX, "[esp + 4]");
-                        new Out(Registers.DX, Registers.AL);
-                        new Ret(4);
-
-                        new Label("DebugWriteEIP");
-                        new Move(Registers.AL, "[ebp + 3]");
-                        new Push(Registers.EAX);
-                        new Call("WriteByteToComPort");
-                        new Move(Registers.AL, "[ebp + 2]");
-                        new Push(Registers.EAX);
-                        new Call("WriteByteToComPort");
-                        new Move(Registers.AL, "[ebp + 1]");
-                        new Push(Registers.EAX);
-                        new Call("WriteByteToComPort");
-                        new Move(Registers.AL, "[ebp]");
-                        new Push(Registers.EAX);
-                        new Call("WriteByteToComPort");
-                        new Ret();
-
-                        new Label("DebugPoint_WaitCmd");
-                        new Move(Registers.DX, xComAddr + 5);
-                        new InByte(Registers.AL, Registers.DX);
-                        new Test(Registers.AL, 1);
-                        new JumpIfZero("DebugPoint_WaitCmd");
-                        new Jump("DebugPoint_ProcessCmd");
-
-                        new Label("DebugPoint__");
-                        new Pushad();
-                        new Move(Registers.EBP, Registers.ESP);
-                        new Add(Registers.EBP, 32);
-
-                        // Check TraceMode
-                        new Move(Registers.EAX, "[TraceMode]");
-                        new Compare(Registers.AX, 1);
-                        new JumpIfEqual("DebugPoint_NoTrace");
-                        //
-                        new Call("DebugWriteEIP");
-                        //
-                        new Move(Registers.EAX, "[TraceMode]");
-                        new Compare(Registers.AL, 4);
-                        new JumpIfEqual("DebugPoint_WaitCmd");
-                        new Label("DebugPoint_NoTrace");
-
-                        // Is there a new incoming command?
-                        new Label("DebugPoint_CheckCmd");
-                        new Move(Registers.DX, xComAddr + 5);
-                        new InByte(Registers.AL, Registers.DX);
-                        new Test(Registers.AL, 1);
-                        new JumpIfZero("DebugPoint_AfterCmd");
-
-                        new Label("DebugPoint_ProcessCmd");
-                        new Move(Registers.DX, xComAddr);
-                        new InByte(Registers.AL, Registers.DX);
-                        new Compare(Registers.AL, 1);
-                        new JumpIfNotEqual("DebugPoint_Cmd02");
-                        new Move("dword", "[TraceMode]", 1);
-                        new Jump("DebugPoint_CheckCmd");
-                        //
-                        new Label("DebugPoint_Cmd02");
-                        new Compare(Registers.AL, 2);
-                        new JumpIfNotEqual("DebugPoint_Cmd03");
-                        new Move("dword", "[TraceMode]", 2);
-                        new Jump("DebugPoint_CheckCmd");
-                        //
-                        new Label("DebugPoint_Cmd03");
-                        new Compare(Registers.AL, 3);
-                        new JumpIfNotEqual("DebugPoint_Cmd04");
-                        new Move("dword", "[TraceMode]", 4);
-                        new Jump("DebugPoint_AfterCmd");
-                        //
-                        new Label("DebugPoint_Cmd04");
-                        new Compare(Registers.AL, 4);
-                        new JumpIfNotEqual("DebugPoint_Cmd05");
-                        new Move("dword", "[TraceMode]", 4);
-                        new Jump("DebugPoint_WaitCmd");
-                        //
-                        new Label("DebugPoint_Cmd05");
-                        // -Evaluate variables
-                        // -Step to next debug call
-                        // Break points
-                        // Immediate break
-                        new Label("DebugPoint_AfterCmd");
-
-                        // TraceMode
-                        // 1 - No tracing
-                        // 2 - Tracing
-                        // 3 - 
-                        // 4 - Break and wait
-
-                        new Popad();
-                        new Ret();
+                        var y = new Y86();
+                        y.DebugStub(aOutputWriter, mComPortAddresses[mComNumber - 1]);
                     }
                 }
                 aOutputWriter.WriteLine(xAsm.GetContents());
@@ -263,10 +270,5 @@ namespace Indy.IL2CPU.Assembler.X86 {
 			aOutputWriter.WriteLine("%endif");
 		}
 
-		protected override void EmitImportMembers(string aGroup, TextWriter aOutputWriter) {
-			if (ImportMembers.Count > 0) {
-				throw new Exception("You can't use P/Invoke in OS kernels");
-			}
-		}
 	}
 }

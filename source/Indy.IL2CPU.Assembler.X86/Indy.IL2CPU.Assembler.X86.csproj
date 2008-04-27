@@ -123,6 +123,15 @@
     <Compile Include="SubWithCarry.cs" />
     <Compile Include="Test.cs" />
     <Compile Include="Xor.cs" />
+    <Compile Include="X\PortSource.cs" />
+    <Compile Include="X\Register.cs" />
+    <Compile Include="X\Register08.cs" />
+    <Compile Include="X\Register16.cs" />
+    <Compile Include="X\Register32.cs" />
+    <Compile Include="X\RegisterAL.cs" />
+    <Compile Include="X\RegisterDX.cs" />
+    <Compile Include="X\RegisterEAX.cs" />
+    <Compile Include="X\Y86.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Indy.IL2CPU.Assembler\Indy.IL2CPU.Assembler.csproj">

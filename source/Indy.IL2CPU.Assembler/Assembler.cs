@@ -201,7 +201,6 @@ namespace Indy.IL2CPU.Assembler {
 					}
 					if (mImportMembers.Count > 0) {
 						EmitIDataSectionHeader(xGroup, xOutputWriter);
-						EmitImportMembers(xGroup, xOutputWriter);
 						EmitIDataSectionFooter(xGroup, xOutputWriter);
 					}
 					EmitFooter(xGroup, xOutputWriter);
@@ -244,8 +243,6 @@ namespace Indy.IL2CPU.Assembler {
 
 		protected virtual void EmitIncludes(string aGroup, TextWriter aOutputWriter) {
 		}
-
-		protected abstract void EmitImportMembers(string aGroup, TextWriter aOutputWriter);
 
 		protected virtual void EmitIDataSectionHeader(string aGroup, TextWriter aOutputWriter) {
 		}
