@@ -13,11 +13,16 @@
 			ObjectType="{x:Type local:BuildLogMessages}" />
 	</Window.Resources>
 	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition />
+			<RowDefinition
+				Height="32" />
+		</Grid.RowDefinitions>
 		<ListBox
-			Margin="0,0,0,32"
 			ItemsSource="{Binding Source={StaticResource BuildMessages}}"
 			Name="lboxLog"
-			Background="White">
+			Background="White"
+			Grid.RowSpan="2">
 			<ListBox.ItemTemplate>
 				<DataTemplate
 					DataType="{x:Type local:BuildLogMessage}">
@@ -45,5 +50,9 @@
 				</DataTemplate>
 			</ListBox.ItemTemplate>
 		</ListBox>
+		<ProgressBar
+			x:Name="progressBuild"
+			Grid.Row="1"
+			Value="0"></ProgressBar>
 	</Grid>
 </Window>

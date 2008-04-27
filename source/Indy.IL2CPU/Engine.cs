@@ -110,6 +110,30 @@ namespace Indy.IL2CPU {
 		private List<MLDebugSymbol> mSymbols = new List<MLDebugSymbol>();
 		private string mOutputDir;
 
+		public int ProgressMax {
+			get {
+				return mMethods.Count + mStaticFields.Count;
+			}
+		}
+
+		public int ProgressCurrent {
+			get {
+				return (from item in mMethods
+						where item.Value.Processed
+						select item).Count() +
+						(from item in mStaticFields
+						 where item.Value
+						 select item).Count();
+			}
+		}
+
+		public event Action ProgressChanged;
+		private void OnProgressChanged() {
+			if (ProgressChanged != null) {
+				ProgressChanged();
+			}
+		}
+
 		/// <summary>
 		/// Compiles an assembly to CPU-specific code. The entrypoint of the assembly will be 
 		/// crawled to see what is neccessary, same goes for all dependencies.
@@ -222,6 +246,7 @@ namespace Indy.IL2CPU {
 							Processed = false,
 							Index = mMethods.Count
 						});
+						OnProgressChanged();
 						ProcessAllMethods();
 						if (!aInMetalMode) {
 							do {
@@ -698,27 +723,6 @@ namespace Indy.IL2CPU {
 				xFieldName = DataMember.GetStaticFieldName(xCurrentField);
 				if (mAssembler.DataMembers.Count(x => x.Value.Name == xFieldName) == 0) {
 					RegisterType(xCurrentField.FieldType);
-					//xCurrentField.
-					//object xDefault = xCurrentField.GetRawConstantValue();
-					//if (xDefault != null) {
-					//    throw new Exception("Field has RawConstantValue, but this is not handled!");
-					//}
-					//if (xCurrentField.InitialValue != null && xCurrentField.InitialValue.Length > 0) {
-					//    string xTheData = "";
-					//    int xStorageSize = GetFieldStorageSize(xCurrentField.FieldType);
-					//    if (xCurrentField.InitialValue.Length > 4) {
-					//        xTheData = "0,0,0,0,";
-					//        xTheData += BitConverter.GetBytes(0x80000002).Aggregate("", (r, b) => r + b + ",");
-					//        xTheData += "1,0,0,0,";
-					//    }
-					//    xTheData += BitConverter.GetBytes(xCurrentField.InitialValue.Length).Aggregate("", (r, b) => r + b + ",");
-					//    xTheData += xCurrentField.InitialValue.Aggregate("", (r, b) => r + b + ",");
-					//    xTheData = xTheData.TrimEnd(',');
-					//    if (xTheData.Length == 0) {
-					//        throw new Exception("Field '" + xCurrentField.ToString() + "' doesn't have a valid size!");
-					//    }
-					//    mAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>(mAssembler.CurrentGroup, new DataMember(xFieldName, "db", xTheData)));
-					//} else 
 					{
 						int xTheSize;
 						string theType = "db";
@@ -754,6 +758,7 @@ namespace Indy.IL2CPU {
 					}
 				}
 				mStaticFields[xCurrentField] = true;
+				OnProgressChanged();
 			}
 		}
 
@@ -978,6 +983,7 @@ namespace Indy.IL2CPU {
 												LabelName = xLabel,
 												MethodMetaDataToken = xCurrentMethod.MetadataToken
 											});
+											xPreviousOffset = xCurrentOffset;
 										}
 										if (mSymbols != null) {
 											var xMLSymbol = new MLDebugSymbol();
@@ -1028,6 +1034,7 @@ namespace Indy.IL2CPU {
 					OnDebugLog(LogSeverityEnum.Error, xCurrentMethod.GetFullName());
 					throw;
 				}
+				OnProgressChanged();
 			}
 		}
 

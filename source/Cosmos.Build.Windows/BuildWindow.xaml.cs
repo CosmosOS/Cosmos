@@ -42,8 +42,28 @@ namespace Cosmos.Build.Windows {
         }
 
 		public readonly BuildLogMessages Messages;
+		public int ProgressMax {
+			get {
+				return (int)progressBuild.Maximum;
+			}
+			set {
+				progressBuild.Maximum = value;
+			}
+		}
+
+		public int ProgressCurrent {
+			get {
+				return (int)progressBuild.Value;
+			}
+			set {
+				progressBuild.Value = value;
+			}
+		}
 
 		public void DoDebugMessage(LogSeverityEnum aSeverity, string aMessage) {
+			if (aSeverity == LogSeverityEnum.Informational) {
+				return;
+			}
 			var xMessage = new BuildLogMessage() {
 				Severity = aSeverity,
 				Message = aMessage

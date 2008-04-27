@@ -99,6 +99,7 @@ namespace Cosmos.Build.Windows {
 		}
 
 		public event DebugLogHandler DebugLog;
+		public event Action<int, int> ProgressChanged;
 
 		public void Compile(DebugModeEnum aDebugMode, byte aDebugComport) {
 			string xAsmPath = ToolsPath + @"asm\";
@@ -109,6 +110,11 @@ namespace Cosmos.Build.Windows {
 			Stopwatch xSW = new Stopwatch();
 			xSW.Start();
 			var xEngine = new Engine();
+			xEngine.ProgressChanged += delegate() {
+				if (ProgressChanged != null) {
+					ProgressChanged(xEngine.ProgressMax, xEngine.ProgressCurrent);
+				}
+			};
 			xEngine.DebugLog += DoDebugLog;
 			xEngine.Execute(xTarget.Location, TargetPlatformEnum.X86, g => Path.Combine(xAsmPath, g + ".asm"), false,
 				new string[] { Path.Combine(Path.Combine(ToolsPath, "Cosmos.Kernel.Plugs"), "Cosmos.Kernel.Plugs.dll") }, aDebugMode, aDebugComport, BuildPath);

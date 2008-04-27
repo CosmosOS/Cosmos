@@ -13,6 +13,7 @@ using System.Windows.Shapes;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
 using Indy.IL2CPU;
+using System.Windows.Threading;
 
 namespace Cosmos.Build.Windows {
 	public partial class OptionsWindow: Window {
@@ -176,6 +177,16 @@ namespace Cosmos.Build.Windows {
 				Console.WriteLine("Compiling...");
 				var xBuildWindow = new BuildWindow();
 				mBuilder.DebugLog += xBuildWindow.DoDebugMessage;
+				mBuilder.ProgressChanged += delegate(int aMax, int aCurrent) {
+					xBuildWindow.ProgressMax = aMax;
+					xBuildWindow.ProgressCurrent = aCurrent;
+					var xFrame = new DispatcherFrame();
+					Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Input, new DispatcherOperationCallback(delegate(object aParam) {
+						xFrame.Continue = false;
+						return null;
+					}), null);
+					Dispatcher.PushFrame(xFrame);
+				};
 				xBuildWindow.Show();
 				mBuilder.Compile(mDebugMode, mComport);
 				mBuilder.DebugLog -= xBuildWindow.DoDebugMessage;
