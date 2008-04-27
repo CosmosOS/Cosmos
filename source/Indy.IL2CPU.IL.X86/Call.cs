@@ -54,11 +54,11 @@ namespace Indy.IL2CPU.IL.X86 {
 			} else {
 				new CPUx86.Test(CPUx86.Registers.ECX, 2);
 				if (aCleanup != null) {
-					new CPUx86.JumpIfEquals(aNextLabel);
+					new CPUx86.JumpIfEqual(aNextLabel);
 					aCleanup();
 					new CPUx86.Jump(xJumpTo);
 				} else {
-					new CPUx86.JumpIfNotEquals(xJumpTo);
+					new CPUx86.JumpIfNotEqual(xJumpTo);
 				}
 			}
 		}

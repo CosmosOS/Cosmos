@@ -45,7 +45,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			new CPUx86.Pop(CPUx86.Registers.EAX);
 			Assembler.StackContents.Pop();
 			new CPUx86.Compare(CPUx86.Registers.EAX, "0");
-			new CPUx86.JumpIfEquals(mReturnNullLabel);
+			new CPUx86.JumpIfEqual(mReturnNullLabel);
 			new CPUx86.Pop(CPUx86.Registers.EAX);
 			int xSize = mTypeSize;
 			if (xSize % 4 > 0) {

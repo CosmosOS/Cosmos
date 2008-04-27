@@ -48,7 +48,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			Assembler.StackContents.Pop();
 			new CPUx86.Pop(CPUx86.Registers.EAX);
 			new CPUx86.Compare(CPUx86.Registers.EAX, "0");
-			new CPUx86.JumpIfNotEquals(mNextOpLabel);
+			new CPUx86.JumpIfNotEqual(mNextOpLabel);
 			new CPU.Label(mReturnNullLabel);
 			new CPUx86.Add("esp", "4");
 			Newobj.Assemble(Assembler, typeof(InvalidCastException).GetConstructor(new Type[0]), Engine.RegisterType(typeof(InvalidCastException)), mThisLabel, mMethodInfo, mCurrentILOffset);

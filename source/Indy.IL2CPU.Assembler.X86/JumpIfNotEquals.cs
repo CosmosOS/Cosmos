@@ -8,8 +8,8 @@ namespace Indy.IL2CPU.Assembler.X86 {
 	/// Represents the JNE opcode
 	/// </summary>
 	[OpCode(0xFFFFFFFF, "jne")]
-	public class JumpIfNotEquals: JumpBase {
-		public JumpIfNotEquals(string aAddress)
+	public class JumpIfNotEqual: JumpBase {
+		public JumpIfNotEqual(string aAddress)
 			: base(aAddress) {
 		}
 		public override string ToString() {

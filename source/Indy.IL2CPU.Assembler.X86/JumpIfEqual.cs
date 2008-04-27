@@ -8,8 +8,8 @@ namespace Indy.IL2CPU.Assembler.X86 {
 	/// Represents the JE opcode
 	/// </summary>
 	[OpCode(0xFFFFFFFF, "je")]
-	public class JumpIfEquals: JumpBase {
-		public JumpIfEquals(string aAddress):base(aAddress) {
+	public class JumpIfEqual: JumpBase {
+		public JumpIfEqual(string aAddress):base(aAddress) {
 		}
 		public override string ToString() {
 			return "je near " + Address;

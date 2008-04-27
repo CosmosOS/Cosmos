@@ -89,7 +89,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                         new Move(Registers.DX, xComAddr + 5);
                         new InByte(Registers.AL, Registers.DX);
                         new Test(Registers.AL, 0x20);
-                        new JumpIfEquals("WriteByteToComPort_Wait");
+                        new JumpIfEqual("WriteByteToComPort_Wait");
                         new Move(Registers.DX, xComAddr);
                         new Move(Registers.EAX, "[esp + 4]");
                         new Out(Registers.DX, Registers.AL);
@@ -125,13 +125,13 @@ namespace Indy.IL2CPU.Assembler.X86 {
                         // Check TraceMode
                         new Move(Registers.EAX, "[TraceMode]");
                         new Compare(Registers.AX, 1);
-                        new JumpIfEquals("DebugPoint_NoTrace");
+                        new JumpIfEqual("DebugPoint_NoTrace");
                         //
                         new Call("DebugWriteEIP");
                         //
                         new Move(Registers.EAX, "[TraceMode]");
                         new Compare(Registers.AL, 4);
-                        new JumpIfEquals("DebugPoint_WaitCmd");
+                        new JumpIfEqual("DebugPoint_WaitCmd");
                         new Label("DebugPoint_NoTrace");
 
                         // Is there a new incoming command?
@@ -140,40 +140,39 @@ namespace Indy.IL2CPU.Assembler.X86 {
                         new InByte(Registers.AL, Registers.DX);
                         new Test(Registers.AL, 1);
                         new JumpIfZero("DebugPoint_AfterCmd");
-                        aOutputWriter.WriteLine(xAsm.GetContents());
 
-                        aOutputWriter.WriteLine("DebugPoint_ProcessCmd:");
-                        aOutputWriter.WriteLine("    mov dx, " + xComAddr);
-                        aOutputWriter.WriteLine("    in al, dx");
-                        aOutputWriter.WriteLine("    cmp al, 1"); // Turn Full Tracing off
-                        aOutputWriter.WriteLine("    jne DebugPoint_Cmd02");
-                        aOutputWriter.WriteLine("    mov dword [TraceMode], 1");
-                        aOutputWriter.WriteLine("    jmp DebugPoint_CheckCmd");
+                        new Label("DebugPoint_ProcessCmd");
+                        new Move(Registers.DX, xComAddr);
+                        new InByte(Registers.AL, Registers.DX);
+                        new Compare(Registers.AL, 1);
+                        new JumpIfNotEqual("DebugPoint_Cmd02");
+                        new Move("dword", "[TraceMode]", 1);
+                        new Jump("DebugPoint_CheckCmd");
                         //
-                        aOutputWriter.WriteLine("DebugPoint_Cmd02:");
-                        aOutputWriter.WriteLine("    cmp al, 2"); // Turn Full Tracing on
-                        aOutputWriter.WriteLine("    jne DebugPoint_Cmd03");
-                        aOutputWriter.WriteLine("    mov dword [TraceMode], 2");
-                        aOutputWriter.WriteLine("    jmp DebugPoint_CheckCmd");
+                        new Label("DebugPoint_Cmd02");
+                        new Compare(Registers.AL, 2);
+                        new JumpIfNotEqual("DebugPoint_Cmd03");
+                        new Move("dword", "[TraceMode]", 2);
+                        new Jump("DebugPoint_CheckCmd");
                         //
-                        aOutputWriter.WriteLine("DebugPoint_Cmd03:");
-                        aOutputWriter.WriteLine("    cmp al, 3"); // Step one
-                        aOutputWriter.WriteLine("    jne DebugPoint_Cmd04");
-                        aOutputWriter.WriteLine("    mov dword [TraceMode], 4");
-                        aOutputWriter.WriteLine("    jmp DebugPoint_AfterCmd");
+                        new Label("DebugPoint_Cmd03");
+                        new Compare(Registers.AL, 3);
+                        new JumpIfNotEqual("DebugPoint_Cmd04");
+                        new Move("dword", "[TraceMode]", 4);
+                        new Jump("DebugPoint_AfterCmd");
                         //
-                        aOutputWriter.WriteLine("DebugPoint_Cmd04:");
-                        aOutputWriter.WriteLine("    cmp al, 4"); // Immediate Break
-                        aOutputWriter.WriteLine("    jne DebugPoint_Cmd05");
-                        aOutputWriter.WriteLine("    mov dword [TraceMode], 4");
-                        aOutputWriter.WriteLine("    jmp DebugPoint_WaitCmd");
+                        new Label("DebugPoint_Cmd04");
+                        new Compare(Registers.AL, 4);
+                        new JumpIfNotEqual("DebugPoint_Cmd05");
+                        new Move("dword", "[TraceMode]", 4);
+                        new Jump("DebugPoint_WaitCmd");
                         //
-                        aOutputWriter.WriteLine("DebugPoint_Cmd05:");
+                        new Label("DebugPoint_Cmd05");
                         // -Evaluate variables
                         // -Step to next debug call
                         // Break points
                         // Immediate break
-                        aOutputWriter.WriteLine("DebugPoint_AfterCmd:");
+                        new Label("DebugPoint_AfterCmd");
 
                         // TraceMode
                         // 1 - No tracing
@@ -181,12 +180,13 @@ namespace Indy.IL2CPU.Assembler.X86 {
                         // 3 - 
                         // 4 - Break and wait
 
-                        aOutputWriter.WriteLine("    POPAD");
-                        aOutputWriter.WriteLine("    ret");
+                        new Popad();
+                        new Ret();
                     }
                 }
             }
-		}
+            aOutputWriter.WriteLine(xAsm.GetContents());
+        }
 
 		protected override void EmitDataSectionHeader(string aGroup, TextWriter aOutputWriter) {
 			base.EmitDataSectionHeader(aGroup, aOutputWriter);

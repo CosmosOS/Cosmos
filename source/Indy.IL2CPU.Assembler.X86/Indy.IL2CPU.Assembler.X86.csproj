@@ -99,7 +99,7 @@
     <Compile Include="Divide.cs" />
     <Compile Include="Instruction.cs" />
     <Compile Include="JumpAlways.cs" />
-    <Compile Include="JumpIfEquals.cs" />
+    <Compile Include="JumpIfEqual.cs" />
     <Compile Include="JumpIfGreater.cs" />
     <Compile Include="JumpIfGreaterOrEquals.cs" />
     <Compile Include="JumpIfLess.cs" />

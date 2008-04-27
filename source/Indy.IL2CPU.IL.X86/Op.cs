@@ -20,7 +20,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		/// <param name="aAddress"></param>
 		public static void EmitCompareWithNull(Assembler.Assembler aAssembler, MethodInformation aMethodInfo, string aAddress, string aCurrentLabel, string aNextLabel, Action aEmitCleanupMethod, int aCurrentILOffset) {
 			new CPUx86.Compare("dword " + aAddress, "0");
-			new CPUx86.JumpIfNotEquals(aNextLabel);
+			new CPUx86.JumpIfNotEqual(aNextLabel);
 			Type xNullRefExcType = typeof(NullReferenceException);
 			Newobj.Assemble(aAssembler, xNullRefExcType.GetConstructor(new Type[0]), Engine.RegisterType(xNullRefExcType), aCurrentLabel, aMethodInfo, aCurrentILOffset);
 			aAssembler.StackContents.Pop();
@@ -311,7 +311,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				new CPUx86.Pushd(Engine.RegisterType(mCatchType).ToString());
 				new CPUx86.Call(Label.GenerateLabelName(VTablesImplRefs.IsInstanceRef));
 				new CPUx86.Compare(Registers.EAX, "0");
-				new CPUx86.JumpIfEquals(mNextInstructionLabel);
+				new CPUx86.JumpIfEqual(mNextInstructionLabel);
 			}
 			if (mNeedsExceptionPush) {
 				new CPUx86.Push("dword [" + xCurExceptionFieldName + "]");

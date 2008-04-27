@@ -19,7 +19,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			new CPUx86.Pop(CPUx86.Registers.EAX);
 			for(int i = 0; i < mLabels.Length; i++){
 				new CPUx86.Compare(CPUx86.Registers.EAX, "0" + i.ToString("X") + "h");
-				new CPUx86.JumpIfEquals(mLabels[i]);
+				new CPUx86.JumpIfEqual(mLabels[i]);
 			}
 			Assembler.StackContents.Pop();
 		}

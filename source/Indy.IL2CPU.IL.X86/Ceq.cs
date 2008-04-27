@@ -22,7 +22,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			string LabelFalse = BaseLabel + "False";
 			new CPUx86.Pop(CPUx86.Registers.EAX);
 			new CPUx86.Compare(CPUx86.Registers.EAX, CPUx86.Registers.AtESP);
-			new CPUx86.JumpIfEquals(LabelTrue);
+			new CPUx86.JumpIfEqual(LabelTrue);
 			new CPUx86.Jump(LabelFalse);
 			new CPU.Label(LabelTrue);
 			new CPUx86.Add(CPUx86.Registers.ESP, "4");
@@ -44,7 +44,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			new CPUx86.Compare(CPUx86.Registers.EAX, "[esp + 4]");
 
 			new CPUx86.Pop(CPUx86.Registers.EAX);
-			new CPUx86.JumpIfNotEquals(LabelFalse);
+			new CPUx86.JumpIfNotEqual(LabelFalse);
 
 			new CPUx86.Xor(CPUx86.Registers.EAX, "[esp + 4]");
 			new CPUx86.JumpIfNotZero(LabelFalse);

@@ -74,7 +74,7 @@ namespace Indy.IL2CPU.IL.X86 {
 					new CPUx86.Move("eax", "[esp + " + (mThisOffset + 4) + "]");
 					new CPUx86.Compare("dword [eax + 4]", ((int)InstanceTypeEnum.BoxedValueType).ToString());
 					new CPUx86.Pop("eax");
-					new CPUx86.JumpIfNotEquals(mLabelName + "_NOT_BOXED_THIS");
+					new CPUx86.JumpIfNotEqual(mLabelName + "_NOT_BOXED_THIS");
 					new CPUx86.Push("eax");
 					new CPUx86.Move("eax", "[esp + " + (mThisOffset + 4) + "]");
 					new CPUx86.Add("eax", ObjectImpl.FieldDataOffset.ToString());
@@ -99,7 +99,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			if (!Assembler.InMetalMode) {
 				new CPUx86.Test(CPUx86.Registers.ECX, 2);
-				new CPUx86.JumpIfNotEquals(MethodFooterOp.EndOfMethodLabelNameException);
+				new CPUx86.JumpIfNotEqual(MethodFooterOp.EndOfMethodLabelNameException);
 			}
 			new CPU.Comment("Argument Count = " + mArgumentCount.ToString());
 			for (int i = 0; i < mArgumentCount; i++) {

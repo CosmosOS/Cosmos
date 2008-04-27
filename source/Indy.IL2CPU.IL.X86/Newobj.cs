@@ -94,7 +94,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			new CPUx86.Call(CPU.Label.GenerateLabelName(aCtorDef));
 			new CPUx86.Test(CPUx86.Registers.ECX, 2);
-			new CPUx86.JumpIfEquals(aCurrentLabel + "_NO_ERROR_4");
+			new CPUx86.JumpIfEqual(aCurrentLabel + "_NO_ERROR_4");
 			for (int i = 1; i < xCtorInfo.Arguments.Length; i++) {
 				new CPUx86.Add(CPUx86.Registers.ESP, (xCtorInfo.Arguments[i].Size % 4 == 0 ? xCtorInfo.Arguments[i].Size : ((xCtorInfo.Arguments[i].Size / 4) * 4) + 1).ToString());
 			}

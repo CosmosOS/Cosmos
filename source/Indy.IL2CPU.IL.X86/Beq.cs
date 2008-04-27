@@ -29,7 +29,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				new CPUx86.Pop(CPUx86.Registers.EAX);
 				new CPUx86.Pop(CPUx86.Registers.EBX);
 				new CPUx86.Compare(CPUx86.Registers.EAX, CPUx86.Registers.EBX);
-				new CPUx86.JumpIfNotEquals(LabelFalse);
+				new CPUx86.JumpIfNotEqual(LabelFalse);
 				new CPUx86.Jump(TargetLabel);
 				new CPU.Label(LabelFalse);
 				//new CPUx86.Noop();
