@@ -11,29 +11,30 @@ namespace Indy.IL2CPU.Assembler.X86 {
         protected void TraceOff() {
             Label = "DebugStub_TraceOff";
             Memory["DebugTraceMode", 32] = 0;
-            Jump("DebugStub_AfterCmd");
+            Jump("DebugStub_Exit");
         }
 
         protected void TraceOn() {
             Label = "DebugStub_TraceOn";
             Memory["DebugTraceMode", 32] = 1;
-            Jump("DebugStub_AfterCmd");
+            Jump("DebugStub_Exit");
         }
 
         protected void Break() {
             Label = "DebugStub_Break";
             Memory["DebugTraceMode", 32] = 4;
-            Jump("DebugPoint_WaitCmd");
+            Call("DebugPoint_WaitCmd");
+            Jump("DebugPoint_ProcessCmd");
         }
 
         protected void Step() {
             Label = "DebugStub_Step";
             Memory["DebugTraceMode", 32] = 4;
-            Jump("DebugStub_AfterCmd");
+            Jump("DebugStub_Exit");
         }
 
         protected void SendTrace() {
-            Label = "DebugWriteEIP";
+            Label = "SendTrace";
             AL = Memory[EBP + 3];
             EAX.Push();
             Call("WriteByteToComPort");
@@ -68,7 +69,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             AL = Port[DX];
             AL.Test(0x01);
             JumpIf(Flags.Zero, "DebugPoint_WaitCmd");
-            Jump("DebugPoint_ProcessCmd");
+            Return();
         }
 
         protected void DebugSuspend() {
@@ -84,6 +85,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
         public void Main(UInt16 aComAddr) {
             mComAddr = aComAddr;
             mComStatusAddr = (UInt16)(aComAddr + 5);
+            // Assembler.GetIdentifier
 
             TraceOff();
             TraceOn();
@@ -108,11 +110,13 @@ namespace Indy.IL2CPU.Assembler.X86 {
             EAX = Memory["DebugTraceMode"];
             AL.Compare(0);
             JumpIf(Flags.Equal, "DebugPoint_NoTrace");
-                Call("DebugWriteEIP");
+                Call("SendTrace");
 
                 EAX = Memory["DebugTraceMode"];
                 AL.Compare(4);
-                JumpIf(Flags.Equal, "DebugPoint_WaitCmd");
+                JumpIf(Flags.NotEqual, "DebugPoint_NoTrace");
+                Call("DebugPoint_WaitCmd");
+                Jump("DebugPoint_ProcessCmd");
             Label = "DebugPoint_NoTrace";
 
             // Is there a new incoming command?
@@ -121,27 +125,26 @@ namespace Indy.IL2CPU.Assembler.X86 {
             AL = Port[DX];
             AL.Test(0x01);
 
-            //Test current state, then separate command structure, when in break Wait for unbreak only but process others
-            JumpIf(Flags.Zero, "DebugStub_AfterCmd");
-                Label = "DebugPoint_ProcessCmd";
-                DX = aComAddr;
-                AL = Port[DX];
-                AL.Compare(1);
-                JumpIf(Flags.Equal, "DebugStub_TraceOff");
-                AL.Compare(2);
-                JumpIf(Flags.Equal, "DebugStub_TraceOn");
-                AL.Compare(3);
-                JumpIf(Flags.Equal, "DebugStub_Step");
-                AL.Compare(4);
-                JumpIf(Flags.Equal, "DebugStub_Break");
-                // -Evaluate variables
-                // -Step to next debug call
-                // Break points
-                // Immediate break
-            Label = "DebugStub_AfterCmd";
+            //separate command structure, when in break Wait for unbreak only but process others
+            JumpIf(Flags.Zero, "DebugStub_Exit");
+            Jump("DebugPoint_ProcessCmd");
+            Label = "DebugStub_Exit";
 
             PopAll32();
             Return();
+
+            Label = "DebugPoint_ProcessCmd";
+            DX = aComAddr;
+            AL = Port[DX];
+            AL.Compare(1);
+            JumpIf(Flags.Equal, "DebugStub_TraceOff");
+            AL.Compare(2);
+            JumpIf(Flags.Equal, "DebugStub_TraceOn");
+            AL.Compare(3);
+            JumpIf(Flags.Equal, "DebugStub_Step");
+            AL.Compare(4);
+            JumpIf(Flags.Equal, "DebugStub_Break");
+            Jump("DebugStub_Exit");
         }
     }
 }
