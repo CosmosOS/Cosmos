@@ -8,6 +8,21 @@ namespace Indy.IL2CPU.Assembler.X86 {
         protected UInt16 mComAddr;
         protected UInt16 mComStatusAddr;
 
+        protected void ProcessCmd() {
+            Label = "DebugPoint_ProcessCmd";
+            DX = mComAddr;
+            AL = Port[DX];
+            AL.Compare(1);
+            JumpIf(Flags.Equal, "DebugStub_TraceOff");
+            AL.Compare(2);
+            JumpIf(Flags.Equal, "DebugStub_TraceOn");
+            AL.Compare(3);
+            JumpIf(Flags.Equal, "DebugStub_Step");
+            AL.Compare(4);
+            JumpIf(Flags.Equal, "DebugStub_Break");
+            Jump("DebugStub_Exit");
+        }
+
         protected void TraceOff() {
             Label = "DebugStub_TraceOff";
             Memory["DebugTraceMode", 32] = 0;
@@ -87,6 +102,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             mComStatusAddr = (UInt16)(aComAddr + 5);
             // Assembler.GetIdentifier
 
+            ProcessCmd();
             TraceOff();
             TraceOn();
             Break();
@@ -132,19 +148,6 @@ namespace Indy.IL2CPU.Assembler.X86 {
 
             PopAll32();
             Return();
-
-            Label = "DebugPoint_ProcessCmd";
-            DX = aComAddr;
-            AL = Port[DX];
-            AL.Compare(1);
-            JumpIf(Flags.Equal, "DebugStub_TraceOff");
-            AL.Compare(2);
-            JumpIf(Flags.Equal, "DebugStub_TraceOn");
-            AL.Compare(3);
-            JumpIf(Flags.Equal, "DebugStub_Step");
-            AL.Compare(4);
-            JumpIf(Flags.Equal, "DebugStub_Break");
-            Jump("DebugStub_Exit");
         }
     }
 }
