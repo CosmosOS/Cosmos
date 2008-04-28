@@ -292,7 +292,7 @@ namespace Indy.IL2CPU {
 								}
 							} while (true);
 							mAssembler.CurrentGroup = "main";
-							GenerateVMT();
+							GenerateVMT(mDebugMode != DebugModeEnum.None);
 						}
 						mMap.PostProcess(mAssembler);
 						ProcessAllStaticFields();
@@ -445,8 +445,8 @@ namespace Indy.IL2CPU {
 			}*/
 		}
 
-		private void GenerateVMT() {
-			Op xOp = GetOpFromType(mMap.MethodHeaderOp, null, new MethodInformation("____INIT__VMT____", new MethodInformation.Variable[0], new MethodInformation.Argument[0], 0, false, null, null, typeof(void)));
+		private void GenerateVMT(bool aDebugMode) {
+			Op xOp = GetOpFromType(mMap.MethodHeaderOp, null, new MethodInformation("____INIT__VMT____", new MethodInformation.Variable[0], new MethodInformation.Argument[0], 0, false, null, null, typeof(void), aDebugMode));
 			xOp.Assembler = mAssembler;
 			xOp.Assemble();
 			InitVmtImplementationOp xInitVmtOp = (InitVmtImplementationOp)GetOpFromType(mMap.InitVmtImplementationOp, null, null);
@@ -468,7 +468,7 @@ namespace Indy.IL2CPU {
 				return GetMethodIdentifier(xMethod);
 			};
 			xInitVmtOp.Assemble();
-			xOp = GetOpFromType(mMap.MethodFooterOp, null, new MethodInformation("____INIT__VMT____", new MethodInformation.Variable[0], new MethodInformation.Argument[0], 0, false, null, null, typeof(void)));
+			xOp = GetOpFromType(mMap.MethodFooterOp, null, new MethodInformation("____INIT__VMT____", new MethodInformation.Variable[0], new MethodInformation.Argument[0], 0, false, null, null, typeof(void), aDebugMode));
 			xOp.Assembler = mAssembler;
 			xOp.Assemble();
 		}
@@ -786,7 +786,7 @@ namespace Indy.IL2CPU {
 							xTypeInfo = GetTypeInfo(xCurrentMethod.DeclaringType);
 						}
 					}
-					MethodInformation xMethodInfo = GetMethodInfo(xCurrentMethod, xCurrentMethod, xMethodName, xTypeInfo);
+					MethodInformation xMethodInfo = GetMethodInfo(xCurrentMethod, xCurrentMethod, xMethodName, xTypeInfo, mDebugMode!= DebugModeEnum.None);
 					IL.Op xOp = GetOpFromType(mMap.MethodHeaderOp, null, xMethodInfo);
 					xOp.Assembler = mAssembler;
 #if VERBOSE_DEBUG
@@ -1196,7 +1196,7 @@ namespace Indy.IL2CPU {
 			return xTypeInfo;
 		}
 
-		public static MethodInformation GetMethodInfo(MethodBase aCurrentMethodForArguments, MethodBase aCurrentMethodForLocals, string aMethodName, TypeInformation aTypeInfo) {
+		public static MethodInformation GetMethodInfo(MethodBase aCurrentMethodForArguments, MethodBase aCurrentMethodForLocals, string aMethodName, TypeInformation aTypeInfo, bool aDebugMode) {
 			MethodInformation xMethodInfo;
 			{
 				MethodInformation.Variable[] xVars = new MethodInformation.Variable[0];
@@ -1275,7 +1275,7 @@ namespace Indy.IL2CPU {
 					xResultSize = GetFieldStorageSize(xMethInfo.ReturnType);
 					xReturnType = xMethInfo.ReturnType;
 				}
-				xMethodInfo = new MethodInformation(aMethodName, xVars, xArgs, xResultSize, !aCurrentMethodForArguments.IsStatic, aTypeInfo, aCurrentMethodForArguments, xReturnType);
+				xMethodInfo = new MethodInformation(aMethodName, xVars, xArgs, xResultSize, !aCurrentMethodForArguments.IsStatic, aTypeInfo, aCurrentMethodForArguments, xReturnType, aDebugMode);
 			}
 			return xMethodInfo;
 		}

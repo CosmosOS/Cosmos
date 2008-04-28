@@ -32,7 +32,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			MethodBase xMethodDef = xMethod;
 			mMethodDescription = CPU.Label.GenerateLabelName(xMethodDef);
-			mTargetMethodInfo = Engine.GetMethodInfo(xMethodDef, xMethodDef, mMethodDescription, null);
+			mTargetMethodInfo = Engine.GetMethodInfo(xMethodDef, xMethodDef, mMethodDescription, null, aMethodInfo.DebugMode);
 			if (xMethodDef.IsStatic || !xMethodDef.IsVirtual || xMethod.IsFinal) {
 				Engine.QueueMethod(xMethodDef);
 				mNormalAddress = CPU.Label.GenerateLabelName(xMethodDef);

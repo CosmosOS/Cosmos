@@ -9,6 +9,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		public readonly int ReturnSize = 0;
 		public readonly MethodInformation.Variable[] Locals;
 		public readonly MethodInformation.Argument[] Args;
+		public readonly bool DebugMode;
 
 		public X86MethodFooterOp(ILReader aReader, MethodInformation aMethodInfo)
 			: base(aReader, aMethodInfo) {
@@ -19,16 +20,22 @@ namespace Indy.IL2CPU.IL.X86 {
 				Locals = aMethodInfo.Locals.ToArray();
 				Args = aMethodInfo.Arguments.ToArray();
 				ReturnSize = aMethodInfo.ReturnSize;
+				DebugMode = aMethodInfo.DebugMode;
 			}
 		}
 
 		public override void DoAssemble() {
 			AssembleFooter(ReturnSize, Assembler, Locals, Args, (from item in Args
-																 select item.Size).Sum());
+																 select item.Size).Sum(), DebugMode);
 		}
 
-		public static void AssembleFooter(int aReturnSize, Assembler.Assembler aAssembler, MethodInformation.Variable[] aLocals, MethodInformation.Argument[] aArgs, int aTotalArgsSize) {
+		public static void AssembleFooter(int aReturnSize, Assembler.Assembler aAssembler, MethodInformation.Variable[] aLocals, MethodInformation.Argument[] aArgs, int aTotalArgsSize, bool aDebugMode) {
 			new Label(EndOfMethodLabelNameNormal);
+			if(aDebugMode) {
+				new Comment("Debug mode");
+				// uncomment and adjust next line:
+				// new CPUx86.Call("XXXX");
+			}
 			new CPUx86.Move("ecx", "0");
 			if (aReturnSize > 0) {
 				if (aReturnSize > 8) {

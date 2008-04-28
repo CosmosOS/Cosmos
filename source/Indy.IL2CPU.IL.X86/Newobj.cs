@@ -35,7 +35,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				throw new ArgumentNullException("aCtorDef");
 			}
 			int xObjectSize = ObjectUtilities.GetObjectStorageSize(aCtorDef.DeclaringType);
-			MethodInformation xCtorInfo = Engine.GetMethodInfo(aCtorDef, aCtorDef, Label.GenerateLabelName(aCtorDef), Engine.GetTypeInfo(aCtorDef.DeclaringType));
+			MethodInformation xCtorInfo = Engine.GetMethodInfo(aCtorDef, aCtorDef, Label.GenerateLabelName(aCtorDef), Engine.GetTypeInfo(aCtorDef.DeclaringType), aCurrentMethodInformation.DebugMode);
 			for (int i = 1; i < xCtorInfo.Arguments.Length; i++) {
 				aAssembler.StackContents.Pop();
 			}

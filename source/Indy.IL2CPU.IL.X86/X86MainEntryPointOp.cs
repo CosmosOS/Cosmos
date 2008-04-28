@@ -47,12 +47,12 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public override void Enter(string aName) {
-			X86MethodHeaderOp.AssembleHeader(Assembler, aName, new MethodInformation.Variable[0], new MethodInformation.Argument[0]);
+			X86MethodHeaderOp.AssembleHeader(Assembler, aName, new MethodInformation.Variable[0], new MethodInformation.Argument[0], false);
 			mMethodName = aName;
 		}
 
 		public override void Exit() {
-			X86MethodFooterOp.AssembleFooter(0, Assembler, new MethodInformation.Variable[0], new MethodInformation.Argument[0], 0);
+			X86MethodFooterOp.AssembleFooter(0, Assembler, new MethodInformation.Variable[0], new MethodInformation.Argument[0], 0, false);
 		}
 	}
 }

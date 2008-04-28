@@ -14,6 +14,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		private string mThisLabel;
 		private string mNextOpLabel;
 		private int mCurrentILOffset;
+		private bool mDebugMode;
 		public Isinst(ILReader aReader, MethodInformation aMethodInfo)
 			: base(aReader, aMethodInfo) {
 			Type xType = aReader.OperandValueType;
@@ -25,6 +26,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			mThisLabel = GetInstructionLabel(aReader.Position);
 			mNextOpLabel = GetInstructionLabel(aReader.NextPosition);
 			mCurrentILOffset = (int)aReader.Position;
+			mDebugMode = aMethodInfo.DebugMode;
 		}
 
 		public override void DoAssemble() {
@@ -38,7 +40,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			Assembler.StackContents.Push(new StackContent(4, typeof(object)));
 			MethodBase xMethodIsInstance = Engine.GetMethodBase(typeof(VTablesImpl), "IsInstance", "System.Int32", "System.Int32");
 			Engine.QueueMethod(xMethodIsInstance);
-			Op xOp = new Call(xMethodIsInstance, mCurrentILOffset);
+			Op xOp = new Call(xMethodIsInstance, mCurrentILOffset, mDebugMode);
 			xOp.Assembler = Assembler;
 			xOp.Assemble();
 			Assembler.StackContents.Pop();

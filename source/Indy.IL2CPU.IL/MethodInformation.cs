@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
@@ -54,8 +53,9 @@ namespace Indy.IL2CPU.IL {
 			public readonly Type ArgumentType;
 		}
 
-		public MethodInformation(string aLabelName, Variable[] aLocals, Argument[] aArguments, int aReturnSize, bool aIsInstanceMethod, TypeInformation aTypeInfo, MethodBase aMethod, Type aReturnType) {
+		public MethodInformation(string aLabelName, Variable[] aLocals, Argument[] aArguments, int aReturnSize, bool aIsInstanceMethod, TypeInformation aTypeInfo, MethodBase aMethod, Type aReturnType, bool debugMode) {
 			Locals = aLocals;
+			DebugMode = debugMode;
 			LabelName = aLabelName;
 			Arguments = aArguments;
 			ReturnSize = aReturnSize;
@@ -81,15 +81,16 @@ namespace Indy.IL2CPU.IL {
 		public readonly bool IsInstanceMethod;
 		public readonly TypeInformation TypeInfo;
 		public readonly int LocalsSize;
+		public readonly bool DebugMode;
 		public override string ToString() {
-			StringBuilder xSB = new StringBuilder();
+			var xSB = new StringBuilder();
 			xSB.AppendLine(String.Format("Method '{0}'\r\n", Method.GetFullName()));
 			xSB.AppendLine("Locals:");
 			if (Locals.Length == 0) {
 				xSB.AppendLine("\t(none)");
 			}
-			int xCurIndex = 0;
-			foreach (Variable xVar in Locals) {
+			var xCurIndex = 0;
+			foreach (var xVar in Locals) {
 				xSB.AppendFormat("\t({0}) {1}\t{2}\t{3} (Type = {4})\r\n\r\n", xCurIndex++, xVar.Offset, xVar.Size, xVar.VirtualAddresses.FirstOrDefault(), xVar.VariableType.FullName);
 			}
 			xSB.AppendLine("Arguments:");
@@ -97,7 +98,7 @@ namespace Indy.IL2CPU.IL {
 				xSB.AppendLine("\t(none)");
 			}
 			xCurIndex = 0;
-			foreach (Argument xArg in Arguments) {
+			foreach (var xArg in Arguments) {
 				xSB.AppendLine(String.Format("\t({0}) {1}\t{2}\t{3} (Type = {4})\r\n", xCurIndex++, xArg.Offset, xArg.Size, xArg.VirtualAddresses.FirstOrDefault(), xArg.ArgumentType.FullName));
 			}
 			xSB.AppendLine("\tReturnSize: " + ReturnSize);

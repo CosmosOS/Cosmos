@@ -16,6 +16,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		private Type mType;
 		private int mTypeSize;
 		private int mCurrentILOffset;
+		private bool mDebugMode;
 		public Unbox(ILReader aReader, MethodInformation aMethodInfo)
 			: base(aReader, aMethodInfo) {
 			mType = aReader.OperandValueType;
@@ -27,6 +28,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			mThisLabel = GetInstructionLabel(aReader);
 			mNextOpLabel = GetInstructionLabel(aReader.NextPosition);
 			mCurrentILOffset = aReader.Position;
+			mDebugMode = aMethodInfo.DebugMode;
 		}
 		public override void DoAssemble() {
 			string mReturnNullLabel = mThisLabel + "_ReturnNull";
@@ -39,7 +41,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			Assembler.StackContents.Push(new StackContent(4, typeof(uint)));
 			MethodBase xMethodIsInstance = Engine.GetMethodBase(Engine.GetType("", "Indy.IL2CPU.VTablesImpl"), "IsInstance", "System.Int32", "System.Int32");
 			Engine.QueueMethod(xMethodIsInstance);
-			Op xOp = new Call(xMethodIsInstance, mCurrentILOffset);
+			Op xOp = new Call(xMethodIsInstance, mCurrentILOffset, mDebugMode);
 			xOp.Assembler = Assembler;
 			xOp.Assemble();
 			new CPUx86.Pop(CPUx86.Registers.EAX);

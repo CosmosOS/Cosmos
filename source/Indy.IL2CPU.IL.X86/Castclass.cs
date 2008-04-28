@@ -42,7 +42,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			Assembler.StackContents.Push(new StackContent(4, typeof(object)));
 			MethodBase xMethodIsInstance = Engine.GetMethodBase(typeof(VTablesImpl), "IsInstance", "System.Int32", "System.Int32");
 			Engine.QueueMethod(xMethodIsInstance);
-			Op xOp = new Call(xMethodIsInstance, mCurrentILOffset);
+			Op xOp = new Call(xMethodIsInstance, mCurrentILOffset, mMethodInfo.DebugMode);
 			xOp.Assembler = Assembler;
 			xOp.Assemble();
 			Assembler.StackContents.Pop();

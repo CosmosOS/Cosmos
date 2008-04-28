@@ -10,19 +10,21 @@ namespace Indy.IL2CPU.IL.X86 {
 		public readonly MethodInformation.Variable[] Locals;
 		public readonly string LabelName = "";
 		public readonly MethodInformation.Argument[] Args;
+		public readonly bool DebugMode;
 		public X86MethodHeaderOp(ILReader aReader, MethodInformation aMethodInfo)
 			: base(aReader, aMethodInfo) {
 			LabelName = aMethodInfo.LabelName;
 			Args = aMethodInfo.Arguments.ToArray();
 			Locals = aMethodInfo.Locals.ToArray();
+			DebugMode = aMethodInfo.DebugMode;
 		}
 
 		public override void DoAssemble() {
 			// TODO: add support for variables with a diff datasize, other than 32bit
-			AssembleHeader(Assembler, LabelName, Locals, Args);
+			AssembleHeader(Assembler, LabelName, Locals, Args, DebugMode);
 		}
 
-		public static void AssembleHeader(Assembler.Assembler aAssembler, string aLabelName, MethodInformation.Variable[] aLocals, MethodInformation.Argument[] aArguments) {
+		public static void AssembleHeader(Assembler.Assembler aAssembler, string aLabelName, MethodInformation.Variable[] aLocals, MethodInformation.Argument[] aArguments, bool aDebugMode) {
 			new CPU.Label(aLabelName);
 			new CPUx86.Pushd(CPUx86.Registers.EBP);
 #if EXT_DEBUG
@@ -42,6 +44,11 @@ namespace Indy.IL2CPU.IL.X86 {
 				for (int i = 0; i < (xLocal.Size / 4); i++) {
 					new CPUx86.Pushd("0");
 				}
+			}
+			if(aDebugMode) {
+				new Comment("Debug Mode");
+				// uncomment and adjust next line:
+				// new CPUx86.Call("XXXX");
 			}
 		}
 	}

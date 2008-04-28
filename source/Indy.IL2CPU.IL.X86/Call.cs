@@ -20,12 +20,12 @@ namespace Indy.IL2CPU.IL.X86 {
 		private MethodInformation mTargetMethodInfo;
 		private string mNextLabelName;
 		private int mCurrentILOffset;
-		public Call(MethodBase aMethod, int aCurrentILOffset)
+		public Call(MethodBase aMethod, int aCurrentILOffset, bool aDebugMode)
 			: base(null, null) {
 			if (aMethod == null) {
 				throw new ArgumentNullException("aMethod");
 			}
-			Initialize(aMethod, aCurrentILOffset);
+			Initialize(aMethod, aCurrentILOffset, aDebugMode);
 		}
 
 		public static void EmitExceptionLogic(Assembler.Assembler aAssembler, int aCurrentOpOffset, MethodInformation aMethodInfo, string aNextLabel, bool aDoTest, Action aCleanup) {
@@ -63,13 +63,13 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 		}
 
-		private void Initialize(MethodBase aMethod, int aCurrentILOffset) {
+		private void Initialize(MethodBase aMethod, int aCurrentILOffset, bool aDebugMode) {
 			mIsDebugger_Break = aMethod.GetFullName() == "System.Void  System.Diagnostics.Debugger.Break()";
 			if (mIsDebugger_Break) {
 				return;
 			}
 			mCurrentILOffset = aCurrentILOffset;
-			mTargetMethodInfo = Engine.GetMethodInfo(aMethod, aMethod, Label.GenerateLabelName(aMethod), Engine.GetTypeInfo(aMethod.DeclaringType));
+			mTargetMethodInfo = Engine.GetMethodInfo(aMethod, aMethod, Label.GenerateLabelName(aMethod), Engine.GetTypeInfo(aMethod.DeclaringType), aDebugMode);
 			mResultSize = 0;
 			if (mTargetMethodInfo != null) {
 				mResultSize = mTargetMethodInfo.ReturnSize;
@@ -108,7 +108,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			if (!aReader.EndOfStream) {
 				mNextLabelName = GetInstructionLabel(aReader.NextPosition);
 			}
-			Initialize(xMethod, (int)aReader.Position);
+			Initialize(xMethod, (int)aReader.Position,aMethodInfo.DebugMode);
 		}
 		public void Assemble(string aMethod, int aArgumentCount) {
 			new CPUx86.Call(aMethod);

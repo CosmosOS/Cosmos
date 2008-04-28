@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
-
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using System.Reflection;
 
 namespace Indy.IL2CPU.IL.X86 {
 	public abstract class X86CustomMethodImplementationOp: CustomMethodImplementationOp {
-		public X86CustomMethodImplementationOp(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
+		public X86CustomMethodImplementationOp(ILReader aReader, MethodInformation aMethodInfo): base(aReader, aMethodInfo) {
 		}
 
 		/// <summary>
@@ -21,7 +18,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				Ldarg.Ldarg(Assembler, MethodInfo.Arguments[i]);
 			}
 			Engine.QueueMethod(aMethod);
-			Op xOp = new Call(aMethod,0);
+			Op xOp = new Call(aMethod, 0, MethodInfo.DebugMode);
 			xOp.Assembler = Assembler;
 			xOp.Assemble();
 		}
@@ -32,7 +29,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			new Indy.IL2CPU.Assembler.X86.Pop(CPUx86.Registers.EAX);
 			if (!mAssembler.InMetalMode) {
 				int xStorageSize;
-				Dictionary<string, TypeInformation.Field> xFields = Engine.GetTypeFieldInfo(typeof(string), out xStorageSize);
+				Dictionary<string, TypeInformation.Field> xFields = Engine.GetTypeFieldInfo(typeof (string), out xStorageSize);
 				new Indy.IL2CPU.Assembler.X86.Add(CPUx86.Registers.EAX, "0" + xFields["$$Storage$$"].Offset.ToString("X") + "h");
 				new Indy.IL2CPU.Assembler.X86.Move(CPUx86.Registers.EAX, CPUx86.Registers.AtEAX);
 				new Indy.IL2CPU.Assembler.X86.Add(CPUx86.Registers.EAX, "12");
