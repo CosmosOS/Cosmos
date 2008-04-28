@@ -9,6 +9,8 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
     //See http://en.wikipedia.org/wiki/IPv4#Header
     public class IPv4Packet
     {
+        #region Constructor etc.
+
         public IPv4Packet()
         {
         }
@@ -26,6 +28,49 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
 
             return p;
         }
+
+
+        public override string ToString()
+        {
+            //Outputs the IP packet like Wireshark displays it
+            StringBuilder sb = new StringBuilder();
+            sb.Append("----- IPv4 Packet -----");
+            sb.Append(Environment.NewLine);
+            sb.Append("Version: " + this.Version);
+            sb.Append(Environment.NewLine);
+            sb.Append("Header length: " + this.HeaderLength + " (" + this.HeaderLength * 4 + " bytes)");
+            sb.Append(Environment.NewLine);
+            sb.Append("Type of Service/DiffServ: 0x" + this.TypeOfService.ToHex());
+            sb.Append(Environment.NewLine);
+            sb.Append("Total length: " + this.TotalLength + " bytes");
+            sb.Append(Environment.NewLine);
+            sb.Append("Identification: 0x" + this.Identification.ToHex() + " (" + this.Identification + ")");
+            sb.Append(Environment.NewLine);
+            sb.Append("Flags: 0x" + ((byte)(this.FragmentFlags)).ToHex());
+            sb.Append(Environment.NewLine);
+            sb.Append("Fragment offset: " + this.FragmentOffset);
+            sb.Append(Environment.NewLine);
+            sb.Append("Time to live: " + this.TimeToLive);
+            sb.Append(Environment.NewLine);
+            sb.Append("Protocol: " + this.Protocol + " (0x" + ((byte)(this.Protocol)).ToHex() + ")");
+            sb.Append(Environment.NewLine);
+            sb.Append("Header checksum: 0x" + this.HeaderChecksum.ToHex() + " [unknown]");
+            sb.Append(Environment.NewLine);
+            sb.Append("Source: " + this.SourceAddress);
+            sb.Append(Environment.NewLine);
+            sb.Append("Destination: " + this.DestinationAddress.ToString());
+            sb.Append(Environment.NewLine);
+            sb.Append("Data size: " + this.Data.Count + " bytes");
+            sb.Append(Environment.NewLine);
+            sb.Append("--------------------");
+            sb.Append(Environment.NewLine);
+
+            return sb.ToString();
+        }
+
+        #endregion
+
+        #region Calculations
 
         public UInt16 CalculateHeaderChecksum()
         {
@@ -84,8 +129,50 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
             return (byte)(header + body);
         }
 
+        #endregion
 
         #region Packet Header
+
+        private byte[] GetHeaderBytes()
+        {
+            List<byte> bytes = new List<byte>();
+            List<UInt32> fields = new List<UInt32>();
+
+            //Add the packetsections together into 32-bit words
+            UInt32 field1 = (UInt32)((this.Version << 4) | (this.HeaderLength << 0) | (this.TypeOfService << 8) | (this.TotalLength << 24));
+            //UInt32 field1 = (UInt32)((this.Version << 0) | (this.HeaderLength << 4) | (this.TypeOfService << 8) | (this.TotalLength << 16));
+            //field1 = ConvertToBigEndian(field1);
+            fields.Add(field1);
+
+            UInt32 field2 = (UInt32)((this.Identification << 8) | (((byte)(this.FragmentFlags)) << 21) | (byte)(this.FragmentOffset << 24)); //TODO: FragmentOffset should be 13 bits.
+            //fields.Add(ConvertToBigEndian(field2));
+            fields.Add(field2);
+
+            UInt32 field3 = (UInt32)((this.TimeToLive << 0) | (((byte)(this.Protocol)) << 8) | (this.HeaderChecksum << 24));
+            //fields.Add(ConvertToBigEndian(field3));
+            fields.Add(field3);
+
+            //Split the 32-bit words into bytes
+            for (int i = 0; i < fields.Count; i++)
+            {
+                bytes.Add((byte)(fields[i] >> 0));
+                bytes.Add((byte)(fields[i] >> 8));
+                bytes.Add((byte)(fields[i] >> 16));
+                bytes.Add((byte)(fields[i] >> 24));
+            }
+
+            //Source and Destination
+            foreach (byte b in SourceAddress.ToByteArray())
+                bytes.Add(b);
+
+            foreach (byte b in DestinationAddress.ToByteArray())
+                bytes.Add(b);
+
+            //TODO - Options field
+
+            return bytes.ToArray();
+
+        }
 
         public byte Version 
         {
@@ -186,12 +273,45 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
 
         #endregion
 
+        #region Packet Body
+
         private List<byte> mData = new List<byte>(0);
         public List<byte> Data
         {
             get { return mData; }
             set { mData = value;}
         }
+
+
+        /// <summary>
+        /// Returns the entire packet as a byte array.
+        /// The header is using big-endian for the bytes.
+        /// </summary>
+        public byte[] RawBytes()
+        {
+            List<byte> bytes = new List<byte>();
+
+            // Header
+            foreach (byte b in GetHeaderBytes())
+            {
+                bytes.Add(b);
+            }
+
+            // Main body of the packet
+            if (this.Data != null)
+            {
+                foreach (byte b in this.Data.ToArray())
+                {
+                    bytes.Add(b);
+                }
+            }
+
+            return bytes.ToArray();
+        }
+
+        #endregion
+
+        #region Misc
 
         /// <summary>
         /// Reverses a string.
@@ -232,110 +352,9 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
             return bin.FromBinary();
         }
 
-        /// <summary>
-        /// Returns the entire packet as a byte array.
-        /// The header is using big-endian for the bytes.
-        /// </summary>
-        public byte[] RawBytes()
-        {
-            List<byte> bytes = new List<byte>();
-            
-            // Header
-            foreach (byte b in GetHeaderBytes())
-            {
-                bytes.Add(b);
-            }
-            
-            // Main body of the packet
-            if (this.Data != null)
-            {
-                foreach (byte b in this.Data.ToArray())
-                {
-                    bytes.Add(b);
-                }
-            }
+        #endregion
 
-            return bytes.ToArray();
-        }
-
-        private byte[] GetHeaderBytes()
-        {
-            List<byte> bytes = new List<byte>();
-            List<UInt32> fields = new List<UInt32>();
-
-            //Add the packetsections together into 32-bit words
-            UInt32 field1 = (UInt32)((this.Version << 4) | (this.HeaderLength << 0) | (this.TypeOfService << 8) | (this.TotalLength << 24));
-            //field1 = ConvertToBigEndian(field1);
-            fields.Add(field1);
-
-            UInt32 field2 = (UInt32)((this.Identification << 8) | (((byte)(this.FragmentFlags)) << 21) | (byte)(this.FragmentOffset << 24)); //TODO: FragmentOffset should be 13 bits.
-            //fields.Add(ConvertToBigEndian(field2));
-            fields.Add(field2);
-
-            UInt32 field3 = (UInt32)((this.TimeToLive << 0) | (((byte)(this.Protocol)) << 8) | (this.HeaderChecksum << 24));
-            //fields.Add(ConvertToBigEndian(field3));
-            fields.Add(field3);
-            
-            //Split the 32-bit words into bytes
-            for (int i = 0; i < fields.Count; i++)
-            {
-                bytes.Add((byte)(fields[i] >> 0));
-                bytes.Add((byte)(fields[i] >> 8));
-                bytes.Add((byte)(fields[i] >> 16));
-                bytes.Add((byte)(fields[i] >> 24));
-            }
-
-            //Source and Destination
-            foreach (byte b in SourceAddress.ToByteArray())
-                bytes.Add(b);
-
-            foreach (byte b in DestinationAddress.ToByteArray())
-                bytes.Add(b);
-
-            //TODO - Options field
-
-            return bytes.ToArray();
-
-        }
-
-        public override string ToString()
-        {
-            //Outputs the IP packet like Wireshark displays it
-            StringBuilder sb = new StringBuilder();
-            sb.Append("----- IPv4 Packet -----");
-            sb.Append(Environment.NewLine);
-            sb.Append("Version: " + this.Version);
-            sb.Append(Environment.NewLine);
-            sb.Append("Header length: " + this.HeaderLength + " (" + this.HeaderLength*4 + " bytes)");
-            sb.Append(Environment.NewLine);
-            sb.Append("Type of Service/DiffServ: 0x" + this.TypeOfService.ToHex());
-            sb.Append(Environment.NewLine);
-            sb.Append("Total length: " + this.TotalLength + " bytes");
-            sb.Append(Environment.NewLine);
-            sb.Append("Identification: 0x" + this.Identification.ToHex() + " (" + this.Identification + ")");
-            sb.Append(Environment.NewLine);
-            sb.Append("Flags: 0x" + ((byte)(this.FragmentFlags)).ToHex());
-            sb.Append(Environment.NewLine);
-            sb.Append("Fragment offset: " + this.FragmentOffset);
-            sb.Append(Environment.NewLine);
-            sb.Append("Time to live: " + this.TimeToLive);
-            sb.Append(Environment.NewLine);
-            sb.Append("Protocol: " + this.Protocol + " (0x" + ((byte)(this.Protocol)).ToHex() + ")");
-            sb.Append(Environment.NewLine);
-            sb.Append("Header checksum: 0x" + this.HeaderChecksum.ToHex() + " [unknown]");
-            sb.Append(Environment.NewLine);
-            sb.Append("Source: " + this.SourceAddress);
-            sb.Append(Environment.NewLine);
-            sb.Append("Destination: " + this.DestinationAddress.ToString());
-            sb.Append(Environment.NewLine);
-            sb.Append("Data size: " + this.Data.Count + " bytes");
-            sb.Append(Environment.NewLine);
-            sb.Append("--------------------");
-            sb.Append(Environment.NewLine);
-
-            return sb.ToString();
-        }
-
+        #region Enumerations
 
         [Flags]
         public enum Fragmentation : int
@@ -355,8 +374,7 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
             SCTP = 132
         }
 
-
-
+        #endregion
 
     }
 }
