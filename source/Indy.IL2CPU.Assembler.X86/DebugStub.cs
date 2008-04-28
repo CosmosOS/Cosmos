@@ -10,13 +10,13 @@ namespace Indy.IL2CPU.Assembler.X86 {
 
         protected void TraceOff() {
             Label = "DebugStub_TraceOff";
-            Memory["DebugTraceMode", 32] = 1;
+            Memory["DebugTraceMode", 32] = 0;
             Jump("DebugStub_AfterCmd");
         }
 
         protected void TraceOn() {
             Label = "DebugStub_TraceOn";
-            Memory["DebugTraceMode", 32] = 2;
+            Memory["DebugTraceMode", 32] = 1;
             Jump("DebugStub_AfterCmd");
         }
 
@@ -71,6 +71,16 @@ namespace Indy.IL2CPU.Assembler.X86 {
             Jump("DebugPoint_ProcessCmd");
         }
 
+        protected void DebugSuspend() {
+            Label = "DebugPoint_DebugSuspend";
+            Return();
+        }
+
+        protected void DebugResume() {
+            Label = "DebugPoint_DebugResume";
+            Return();
+        }
+
         public void Main(UInt16 aComAddr) {
             mComAddr = aComAddr;
             mComStatusAddr = (UInt16)(aComAddr + 5);
@@ -82,6 +92,8 @@ namespace Indy.IL2CPU.Assembler.X86 {
             SendTrace();
             WriteByteToDebugger();
             WaitCmd();
+            DebugSuspend();
+            DebugResume();
 
             //"DebugTraceMode dd 1");
             //"DebugStatus dd 0");
@@ -94,7 +106,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
 
             // Check DebugTraceMode
             EAX = Memory["DebugTraceMode"];
-            AL.Compare(1);
+            AL.Compare(0);
             JumpIf(Flags.Equal, "DebugPoint_NoTrace");
                 Call("DebugWriteEIP");
 
@@ -108,6 +120,8 @@ namespace Indy.IL2CPU.Assembler.X86 {
             DX = mComStatusAddr;
             AL = Port[DX];
             AL.Test(0x01);
+
+            //Test current state, then separate command structure, when in break Wait for unbreak only but process others
             JumpIf(Flags.Zero, "DebugStub_AfterCmd");
                 Label = "DebugPoint_ProcessCmd";
                 DX = aComAddr;
