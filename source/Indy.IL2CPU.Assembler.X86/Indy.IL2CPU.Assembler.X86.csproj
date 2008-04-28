@@ -63,6 +63,7 @@
     <Compile Include="Compare.cs" />
     <Compile Include="ConditionalMove.cs" />
     <Compile Include="Condition.cs" />
+    <Compile Include="DebugStub.cs" />
     <Compile Include="IDivide.cs" />
     <Compile Include="InByte.cs" />
     <Compile Include="InDWord.cs" />
