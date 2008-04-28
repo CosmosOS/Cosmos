@@ -36,7 +36,6 @@ namespace Indy.IL2CPU.Assembler.X86.X {
                         break;
                     default:
                         throw new Exception("Invalid size: " + aSize.ToString());
-                        break;
                 }
                 new X86.Move(xSizeString, aAddress.ToString(), value.ToString());
             }

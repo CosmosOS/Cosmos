@@ -5,19 +5,34 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
     public class DebugStub : X.Y86 {
-        public void Main(UInt16 aComAddr) {
-            UInt16 xComStatusAddr = (UInt16)(aComAddr + 5);
-            Label = "WriteByteToComPort";
-            Label = "WriteByteToComPort_Wait";
-            DX = xComStatusAddr;
-            AL = Port[DX];
-            AL.Test(0x20);
-            JumpIf(Flags.Zero, "WriteByteToComPort_Wait");
-            DX = aComAddr;
-            AL = Memory[ESP + 4];
-            Port[DX] = AL;
-            Return(4);
+        protected UInt16 mComAddr;
+        protected UInt16 mComStatusAddr;
 
+        protected void TraceOff() {
+            Label = "DebugStub_TraceOff";
+            Memory["DebugTraceMode", 32] = 1;
+            Jump("DebugStub_AfterCmd");
+        }
+
+        protected void TraceOn() {
+            Label = "DebugStub_TraceOn";
+            Memory["DebugTraceMode", 32] = 2;
+            Jump("DebugStub_AfterCmd");
+        }
+
+        protected void Break() {
+            Label = "DebugStub_Break";
+            Memory["DebugTraceMode", 32] = 4;
+            Jump("DebugPoint_WaitCmd");
+        }
+
+        protected void Step() {
+            Label = "DebugStub_Step";
+            Memory["DebugTraceMode", 32] = 4;
+            Jump("DebugStub_AfterCmd");
+        }
+
+        protected void SendTrace() {
             Label = "DebugWriteEIP";
             AL = Memory[EBP + 3];
             EAX.Push();
@@ -32,13 +47,45 @@ namespace Indy.IL2CPU.Assembler.X86 {
             EAX.Push();
             Call("WriteByteToComPort");
             Return();
+        }
 
+        protected void WriteByteToDebugger() {
+            Label = "WriteByteToComPort";
+            Label = "WriteByteToComPort_Wait";
+            DX = mComStatusAddr;
+            AL = Port[DX];
+            AL.Test(0x20);
+            JumpIf(Flags.Zero, "WriteByteToComPort_Wait");
+            DX = mComAddr;
+            AL = Memory[ESP + 4];
+            Port[DX] = AL;
+            Return(4);
+        }
+
+        protected void WaitCmd() {
             Label = "DebugPoint_WaitCmd";
-            DX = xComStatusAddr;
+            DX = mComStatusAddr;
             AL = Port[DX];
             AL.Test(0x01);
             JumpIf(Flags.Zero, "DebugPoint_WaitCmd");
             Jump("DebugPoint_ProcessCmd");
+        }
+
+        public void Main(UInt16 aComAddr) {
+            mComAddr = aComAddr;
+            mComStatusAddr = (UInt16)(aComAddr + 5);
+
+            TraceOff();
+            TraceOn();
+            Break();
+            Step();
+            SendTrace();
+            WriteByteToDebugger();
+            WaitCmd();
+
+            //"DebugTraceMode dd 1");
+            //"DebugStatus dd 0");
+            //"DebugSuspendLevel dd 0");
 
             Label = "DebugPoint__";
             PushAll32();
@@ -49,59 +96,35 @@ namespace Indy.IL2CPU.Assembler.X86 {
             EAX = Memory["DebugTraceMode"];
             AL.Compare(1);
             JumpIf(Flags.Equal, "DebugPoint_NoTrace");
-            //
-            Call("DebugWriteEIP");
-            //
-            EAX = Memory["DebugTraceMode"];
-            AL.Compare(4);
-            JumpIf(Flags.Equal, "DebugPoint_WaitCmd");
+                Call("DebugWriteEIP");
+
+                EAX = Memory["DebugTraceMode"];
+                AL.Compare(4);
+                JumpIf(Flags.Equal, "DebugPoint_WaitCmd");
             Label = "DebugPoint_NoTrace";
 
             // Is there a new incoming command?
             Label = "DebugPoint_CheckCmd";
-            DX = xComStatusAddr;
+            DX = mComStatusAddr;
             AL = Port[DX];
             AL.Test(0x01);
-            JumpIf(Flags.Zero, "DebugPoint_AfterCmd");
-
-            Label = "DebugPoint_ProcessCmd";
-            DX = aComAddr;
-            AL = Port[DX];
-            AL.Compare(1);
-            JumpIf(Flags.NotEqual, "DebugPoint_Cmd02");
-            Memory["DebugTraceMode", 32] = 1;
-            Jump("DebugPoint_CheckCmd");
-            //
-            Label = "DebugPoint_Cmd02";
-            AL.Compare(2);
-            JumpIf(Flags.NotEqual, "DebugPoint_Cmd03");
-            Memory["DebugTraceMode", 32] = 2;
-            Jump("DebugPoint_CheckCmd");
-            //
-            Label = "DebugPoint_Cmd03";
-            AL.Compare(3);
-            JumpIf(Flags.NotEqual, "DebugPoint_Cmd04");
-            Memory["DebugTraceMode", 32] = 4;
-            Jump("DebugPoint_AfterCmd");
-            //
-            Label = "DebugPoint_Cmd04";
-            AL.Compare(4);
-            JumpIf(Flags.NotEqual, "DebugPoint_Cmd05");
-            Memory["DebugTraceMode", 32] = 4;
-            Jump("DebugPoint_WaitCmd");
-            //
-            Label = "DebugPoint_Cmd05";
-            // -Evaluate variables
-            // -Step to next debug call
-            // Break points
-            // Immediate break
-            Label = "DebugPoint_AfterCmd";
-
-            // DebugTraceMode
-            // 1 - No tracing
-            // 2 - Tracing
-            // 3 - 
-            // 4 - Break and wait
+            JumpIf(Flags.Zero, "DebugStub_AfterCmd");
+                Label = "DebugPoint_ProcessCmd";
+                DX = aComAddr;
+                AL = Port[DX];
+                AL.Compare(1);
+                JumpIf(Flags.Equal, "DebugStub_TraceOff");
+                AL.Compare(2);
+                JumpIf(Flags.Equal, "DebugStub_TraceOn");
+                AL.Compare(3);
+                JumpIf(Flags.Equal, "DebugStub_Step");
+                AL.Compare(4);
+                JumpIf(Flags.Equal, "DebugStub_Break");
+                // -Evaluate variables
+                // -Step to next debug call
+                // Break points
+                // Immediate break
+            Label = "DebugStub_AfterCmd";
 
             PopAll32();
             Return();
