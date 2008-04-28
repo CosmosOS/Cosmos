@@ -72,26 +72,25 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 AL = Port[DX];
                 AL.Compare(1);
                 JumpIf(Flags.NotEqual, "DebugPoint_Cmd02");
-                new Move("dword", "[TraceMode]", 1);
+                Memory["TraceMode", 32] = 1;
                 Jump("DebugPoint_CheckCmd");
                 //
                 Label = "DebugPoint_Cmd02";
                 AL.Compare(2);
                 JumpIf(Flags.NotEqual, "DebugPoint_Cmd03");
-                new Move("dword", "[TraceMode]", 2);
+                Memory["TraceMode", 32] = 2;
                 Jump("DebugPoint_CheckCmd");
                 //
                 Label = "DebugPoint_Cmd03";
                 AL.Compare(3);
                 JumpIf(Flags.NotEqual, "DebugPoint_Cmd04");
-                new Move("dword", "[TraceMode]", 4);
-                //Memory["Tracemode", 32] = 4;
+                Memory["TraceMode", 32] = 4;
                 Jump("DebugPoint_AfterCmd");
                 //
                 Label = "DebugPoint_Cmd04";
                 AL.Compare(4);
                 JumpIf(Flags.NotEqual, "DebugPoint_Cmd05");
-                new Move("dword", "[TraceMode]", 4);
+                Memory["TraceMode", 32] = 4;
                 Jump("DebugPoint_WaitCmd");
                 //
                 Label = "DebugPoint_Cmd05";
