@@ -20,32 +20,24 @@ namespace Indy.IL2CPU.Assembler.X86 {
             JumpIf(Flags.Equal, "DebugStub_Step");
             AL.Compare(4);
             JumpIf(Flags.Equal, "DebugStub_Break");
-            Jump("DebugStub_Exit");
-        }
+            Return();
 
-        protected void TraceOff() {
             Label = "DebugStub_TraceOff";
             Memory["DebugTraceMode", 32] = 0;
-            Jump("DebugStub_Exit");
-        }
+            Return();
 
-        protected void TraceOn() {
             Label = "DebugStub_TraceOn";
             Memory["DebugTraceMode", 32] = 1;
-            Jump("DebugStub_Exit");
-        }
+            Return();
 
-        protected void Break() {
+            Label = "DebugStub_Step";
+            Memory["DebugTraceMode", 32] = 4;
+            Return();
+
             Label = "DebugStub_Break";
             Memory["DebugTraceMode", 32] = 4;
             Call("DebugPoint_WaitCmd");
             Jump("DebugPoint_ProcessCmd");
-        }
-
-        protected void Step() {
-            Label = "DebugStub_Step";
-            Memory["DebugTraceMode", 32] = 4;
-            Jump("DebugStub_Exit");
         }
 
         protected void SendTrace() {
@@ -97,21 +89,23 @@ namespace Indy.IL2CPU.Assembler.X86 {
             Return();
         }
 
-        public void Main(UInt16 aComAddr) {
-            mComAddr = aComAddr;
-            mComStatusAddr = (UInt16)(aComAddr + 5);
-            // Assembler.GetIdentifier
-
+        protected void Emit() {
             ProcessCmd();
-            TraceOff();
-            TraceOn();
-            Break();
-            Step();
             SendTrace();
             WriteByteToDebugger();
             WaitCmd();
             DebugSuspend();
             DebugResume();
+        }
+
+        public void Main(UInt16 aComAddr) {
+            mComAddr = aComAddr;
+            mComStatusAddr = (UInt16)(aComAddr + 5);
+            Emit();
+            // For Unique Labels
+            //  Assembler.GetIdentifier
+            // For System..Break
+            //  public class BreakAssembler: AssemblerMethod
 
             //"DebugTraceMode dd 1");
             //"DebugStatus dd 0");
@@ -124,28 +118,25 @@ namespace Indy.IL2CPU.Assembler.X86 {
 
             // Check DebugTraceMode
             EAX = Memory["DebugTraceMode"];
+            //TODO: Change this to support CallIf(AX == 0, "SendTrace");
             AL.Compare(0);
-            JumpIf(Flags.Equal, "DebugPoint_NoTrace");
-                Call("SendTrace");
+            CallIf(Flags.NotEqual, "SendTrace");
 
-                EAX = Memory["DebugTraceMode"];
-                AL.Compare(4);
-                JumpIf(Flags.NotEqual, "DebugPoint_NoTrace");
-                Call("DebugPoint_WaitCmd");
-                Jump("DebugPoint_ProcessCmd");
-            Label = "DebugPoint_NoTrace";
+            //EAX = Memory["DebugTraceMode"];
+            //AL.Compare(4);
+            //JumpIf(Flags.NotEqual, "DebugPoint_NoBreak");
+            //    Call("DebugStub_Break");
+            //    Jump("DebugStub_Exit");
+            //Label = "DebugPoint_NoBreak";
 
             // Is there a new incoming command?
             Label = "DebugPoint_CheckCmd";
             DX = mComStatusAddr;
             AL = Port[DX];
             AL.Test(0x01);
+            CallIf(Flags.NotZero, "DebugPoint_ProcessCmd");
 
-            //separate command structure, when in break Wait for unbreak only but process others
-            JumpIf(Flags.Zero, "DebugStub_Exit");
-            Jump("DebugPoint_ProcessCmd");
             Label = "DebugStub_Exit";
-
             PopAll32();
             Return();
         }

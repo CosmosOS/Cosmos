@@ -28,8 +28,29 @@ namespace Indy.IL2CPU.Assembler.X86.X {
             }
         }
 
+        private uint mLabelCounter = 0;
+        public string NewLabel() {
+            mLabelCounter++;
+            return GetType().Name + mLabelCounter.ToString("X8").ToUpper();
+        }
+
         public void Call(string aLabel) {
             new X86.Call(aLabel);
+        }
+
+        public void CallIf(Flags aFlags, string aLabel) {
+            // TODO: This is inefficient - lots of jumps
+            // Maybe make an invert function for Flags
+            var xLabelIf = NewLabel();
+            var xLabelExit = NewLabel();
+
+            JumpIf(aFlags, xLabelIf);
+            Jump(xLabelExit);
+
+            Label = xLabelIf;
+            Call(aLabel);
+
+            Label = xLabelExit;
         }
 
         public void Jump(string aLabel) {

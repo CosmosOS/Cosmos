@@ -85,7 +85,8 @@ namespace Indy.IL2CPU.Assembler {
 
 		private uint mDataMemberCounter = 0;
 		public string GetIdentifier(string aPrefix) {
-			return aPrefix + mDataMemberCounter++.ToString("X8").ToUpper();
+            mDataMemberCounter++;
+			return aPrefix + mDataMemberCounter.ToString("X8").ToUpper();
 		}
 
 		public Assembler(Func<string, string> aGetStreamForGroup)
