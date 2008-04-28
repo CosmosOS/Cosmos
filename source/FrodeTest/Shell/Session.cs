@@ -26,14 +26,11 @@ namespace FrodeTest.Shell
 
             if (command.Equals("exit"))
                 return;
-/*            else if (command.Equals("nic"))
+            else if (command.Equals("ether"))
             {
-                Cosmos.Hardware.PC.Bus.PCIDevice pciNic = Cosmos.Hardware.PC.Bus.PCIBus.GetPCIDevice(0, 3, 0);
-                nic = new Cosmos.Driver.RTL8139.RTL8139(pciNic);
-                nic.Enable();
-                Console.WriteLine("Enabled Network card");
+                Test.Ethernet2FrameTest.RunTest();
             }
-*/            else if(command.Equals("load"))
+            else if (command.Equals("load"))
             {
                 var list = RTL8139.FindAll();
                 if (list.Count != 0)

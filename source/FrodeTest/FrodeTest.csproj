@@ -56,6 +56,7 @@
     <Compile Include="Shell\Session.cs" />
     <Compile Include="Test\BinaryHelperTest.cs" />
     <Compile Include="Test\BoolTest.cs" />
+    <Compile Include="Test\Ethernet2FrameTest.cs" />
     <Compile Include="Test\ExtensionMethodsTest.cs" />
     <Compile Include="Test\InterfaceTest.cs" />
     <Compile Include="Test\IPv4Test.cs" />

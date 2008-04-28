@@ -13,6 +13,9 @@ namespace Cosmos.Hardware.Network.TCPIPModel.PhysicalLayer.Ethernet2
         }
 
         private MACAddress xDestination = null;
+        /// <summary>
+        /// The MAC address of the network card to receive the frame.
+        /// </summary>
         public MACAddress Destination
         {
             get { return xDestination; }
@@ -20,12 +23,19 @@ namespace Cosmos.Hardware.Network.TCPIPModel.PhysicalLayer.Ethernet2
         }
 
         private MACAddress xSource = null;
+        /// <summary>
+        /// The MAC address of the network card sending the frame..
+        /// </summary>
         public MACAddress Source
         {
             get { return xSource; }
             set { xSource = value; }
         }
 
+        /// <summary>
+        /// Describes what kind of packet is inside the frame. Typically 0x0800 for IPv4 or 0x0806 for ARP.
+        /// See http://en.wikipedia.org/wiki/EtherType for types.
+        /// </summary>
         public byte[] EtherType
         {
             get
@@ -39,12 +49,18 @@ namespace Cosmos.Hardware.Network.TCPIPModel.PhysicalLayer.Ethernet2
         }
 
         private byte[] xPayload;
+        /// <summary>
+        /// The actual data inside the frame, in raw byte format. F.instance an IPv4 or IPv6 packet.
+        /// </summary>
         public byte[] Payload
         {
             get { return xPayload; }
             set { xPayload = value; }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public UInt32 CRC32 { get; set; }
 
         //public byte InterframeGap { get; set; }
