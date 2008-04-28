@@ -78,5 +78,23 @@ namespace Cosmos.Build.Windows {
 			Dispatcher.PushFrame(xFrame);
 		}
 
+
+        public static System.Diagnostics.Stopwatch xBuildTimer;
+        public TimeSpan CalculateRemainingTime(int completedCount, int totalCount)
+        {
+            if (xBuildTimer == null)
+            {
+                xBuildTimer = new System.Diagnostics.Stopwatch();
+                xBuildTimer.Start();
+            }
+
+            long percentComplete = ((completedCount * 100 / totalCount) + 1);
+            if (percentComplete == 0) //Avoid Divide by Zero
+                percentComplete = 1;
+
+            long remaining = (xBuildTimer.ElapsedMilliseconds / percentComplete) * (100 - percentComplete);
+
+            return new TimeSpan(remaining * 10000);
+        }
     }
 }
