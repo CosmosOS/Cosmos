@@ -4,15 +4,12 @@ using System.Linq;
 using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86.X {
-    public class MemoryAction {
-        protected string mValue;
+    public class MemoryAction : Action {
 
+        // This form used for reading memory - Addresses are passed in
         public MemoryAction(string aValue) {
             mValue = aValue;
         }
 
-        public override string ToString() {
-            return mValue;
-        }
     }
 }

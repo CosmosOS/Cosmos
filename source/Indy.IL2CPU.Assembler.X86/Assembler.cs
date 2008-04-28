@@ -15,7 +15,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 DX = xComStatusAddr;
                 AL = Port[DX];
                 AL.Test(0x20);
-                JumpIfEqual("WriteByteToComPort_Wait");
+                JumpIf(Flags.Zero, "WriteByteToComPort_Wait");
                 DX = aComAddr;
                 AL = Memory[ESP + 4];
                 Port[DX] = AL;
@@ -40,25 +40,24 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 DX = xComStatusAddr;
                 AL = Port[DX];
                 AL.Test(0x01);
-                JumpIfZero("DebugPoint_WaitCmd");
+                JumpIf(Flags.Zero, "DebugPoint_WaitCmd");
                 Jump("DebugPoint_ProcessCmd");
 
                 Label = "DebugPoint__";
                 PushAll32();
-                //new Move(Registers.EBP, Registers.ESP);
                 EBP = ESP;
-                new Add(Registers.EBP, 32);
+                EBP.Add(32);
 
                 // Check TraceMode
                 EAX = Memory["TraceMode"];
-                new Compare(Registers.AX, 1);
-                JumpIfEqual("DebugPoint_NoTrace");
+                AL.Compare(1);
+                JumpIf(Flags.Equal, "DebugPoint_NoTrace");
                 //
-                new Call("DebugWriteEIP");
+                Call("DebugWriteEIP");
                 //
-                new Move(Registers.EAX, "[TraceMode]");
-                new Compare(Registers.AL, 4);
-                JumpIfEqual("DebugPoint_WaitCmd");
+                EAX = Memory["TraceMode"];
+                AL.Compare(4);
+                JumpIf(Flags.Equal, "DebugPoint_WaitCmd");
                 Label = "DebugPoint_NoTrace";
 
                 // Is there a new incoming command?
@@ -66,31 +65,32 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 DX = xComStatusAddr;
                 AL = Port[DX];
                 AL.Test(0x01);
-                JumpIfZero("DebugPoint_AfterCmd");
+                JumpIf(Flags.Zero, "DebugPoint_AfterCmd");
 
                 Label = "DebugPoint_ProcessCmd";
                 DX = aComAddr;
                 AL = Port[DX];
-                new Compare(Registers.AL, 1);
-                JumpIfNotEqual("DebugPoint_Cmd02");
+                AL.Compare(1);
+                JumpIf(Flags.NotEqual, "DebugPoint_Cmd02");
                 new Move("dword", "[TraceMode]", 1);
                 Jump("DebugPoint_CheckCmd");
                 //
                 Label = "DebugPoint_Cmd02";
-                new Compare(Registers.AL, 2);
-                JumpIfNotEqual("DebugPoint_Cmd03");
+                AL.Compare(2);
+                JumpIf(Flags.NotEqual, "DebugPoint_Cmd03");
                 new Move("dword", "[TraceMode]", 2);
                 Jump("DebugPoint_CheckCmd");
                 //
                 Label = "DebugPoint_Cmd03";
-                new Compare(Registers.AL, 3);
-                JumpIfNotEqual("DebugPoint_Cmd04");
+                AL.Compare(3);
+                JumpIf(Flags.NotEqual, "DebugPoint_Cmd04");
                 new Move("dword", "[TraceMode]", 4);
+                //Memory["Tracemode", 32] = 4;
                 Jump("DebugPoint_AfterCmd");
                 //
                 Label = "DebugPoint_Cmd04";
-                new Compare(Registers.AL, 4);
-                JumpIfNotEqual("DebugPoint_Cmd05");
+                AL.Compare(4);
+                JumpIf(Flags.NotEqual, "DebugPoint_Cmd05");
                 new Move("dword", "[TraceMode]", 4);
                 Jump("DebugPoint_WaitCmd");
                 //

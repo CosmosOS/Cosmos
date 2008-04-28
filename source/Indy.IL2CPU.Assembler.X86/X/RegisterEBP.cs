@@ -17,8 +17,6 @@ namespace Indy.IL2CPU.Assembler.X86.X {
             return Instance;
         }
 
-        // TODO: Use Generics to add all the stuff that is common between all register
-        // but must exist on actual register type
         public static implicit operator RegisterEBP(RegisterESP aValue) {
             Instance.Move(aValue.ToString());
             return Instance;

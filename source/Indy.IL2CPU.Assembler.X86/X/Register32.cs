@@ -10,5 +10,13 @@ namespace Indy.IL2CPU.Assembler.X86.X {
             return new AddressIndirect(aBaseRegister, aDisplacement);
         }
 
+        // This syntax would be nice:
+        // EBP = EBP + 32
+        // But it would conflict with C#'s resolution of [EBP + 4] becuase
+        // C# on operator overloads does not look at return type, only argument types
+        public void Add(UInt32 aValue) {
+            new Add(ToString(), aValue);
+        }
+
     }
 }

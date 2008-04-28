@@ -6,6 +6,10 @@ using X86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.Assembler.X86.X {
     public class Y86 {
+        public enum Flags { 
+            Zero, NotZero, Equal, NotEqual // Zero is synonym for Equal
+        };
+
         public RegisterEAX EAX = RegisterEAX.Instance;
         public RegisterAL AL = RegisterAL.Instance;
 
@@ -27,27 +31,36 @@ namespace Indy.IL2CPU.Assembler.X86.X {
         public void Call(string aLabel) {
             new X86.Call(aLabel);
         }
+
         public void Jump(string aLabel) {
             new X86.Jump(aLabel);
         }
-        public void JumpIfEqual(string aLabel) {
-            new X86.JumpIfEqual(aLabel);
+
+        public void JumpIf(Flags aFlags, string aLabel) {
+            switch (aFlags) {
+                case Flags.Zero:
+                case Flags.Equal:
+                    new X86.JumpIfZero(aLabel);
+                    break;
+                case Flags.NotZero:
+                case Flags.NotEqual:
+                    new X86.JumpIfNotZero(aLabel);
+                    break;
+            }
         }
-        public void JumpIfZero(string aLabel) {
-            new X86.JumpIfZero(aLabel);
-        }
-        public void JumpIfNotEqual(string aLabel) {
-            new X86.JumpIfNotEqual(aLabel);
-        }
+
         public void PopAll32() {
             new Popad();
         }
+
         public void PushAll32() {
             new Pushad();
         }
+        
         public void Return() {
             new X86.Ret();
         }
+        
         public void Return(UInt16 aBytes) {
             new X86.Ret(aBytes);
         }

@@ -26,7 +26,7 @@ namespace Indy.IL2CPU.Assembler.X86.X {
             return Instance;
         }
 
-        public static implicit operator RegisterAL(MemoryAction aAction) {
+        public static implicit operator RegisterAL(Action aAction) {
             new X86.Move(Name, aAction.ToString());
             return Instance;
         }
