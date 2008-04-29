@@ -49,12 +49,12 @@ namespace Cosmos.Build.Windows {
         }
 
         void butnBreak_Click(object sender, RoutedEventArgs e) {
-            SendDebugCmd(4);
+            SendDebugCmd(3);
             mAutoDisplay = true;
         }
 
         void butnStep_Click(object sender, RoutedEventArgs e) {
-            SendDebugCmd(3);
+            //SendDebugCmd(3);
             mAutoDisplay = true;
         }
 
