@@ -117,9 +117,10 @@ namespace Indy.IL2CPU.Assembler.X86 {
 
         protected void Executing() {
             Label = "DebugStub_Executing";
-            EAX = Memory["DebugTraceMode"];
             //TODO: Change this to support CallIf(AL == 1, "DebugStub_SendTrace");
+            EAX = Memory["DebugTraceMode"];
             AL.Compare((int)Tracing.On);
+            //Memory["DebugTraceMode", 32];
                 CallIf(Flags.Equal, "DebugStub_SendTrace");
 
             // Is there a new incoming command?
