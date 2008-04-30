@@ -93,5 +93,13 @@ namespace Indy.IL2CPU.Assembler.X86.X {
             new X86.Ret(aBytes);
         }
 
+        public void EnableInterrupts() {
+            new X86.Sti();
+        }
+
+        public void DisableInterrupts() {
+            new X86.Cli();
+        }
+
     }
 }

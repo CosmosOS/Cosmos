@@ -50,10 +50,11 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 CallIf(Flags.Equal, "DebugStub_TraceOn", "DebugStub_WaitCmd");
             AL.Compare((byte)Command.Break);
                 // Break command is also the continue command
-                CallIf(Flags.Equal, "DebugStub_Continue");
+                CallIf(Flags.Equal, "DebugStub_Continue", "DebugStub_Break_Exit");
             AL.Compare((byte)Command.Step);
-                CallIf(Flags.Equal, "DebugStub_Step");
-                
+                CallIf(Flags.Equal, "DebugStub_Step", "DebugStub_Break_Exit");
+
+            Label = "DebugStub_Break_Exit";
             Return();
         }
 
@@ -149,6 +150,21 @@ namespace Indy.IL2CPU.Assembler.X86 {
 
             Label = "DebugPoint__";
             //
+            // If debug stub is in break, and then an IRQ happens, the IRQ
+            // can call debug stub again. This causes two debug stubs to 
+            // run which causes havoc. So we only allow one to run.
+            // We arent multi threaded yet, so this works fine.
+            // IRQ's are disabled between Compare and JumpIf so an IRQ cant
+            // happen in between them which could then cause double entry again
+            //DisableInterrupts();
+            Memory["DebugRunning", 32].Compare(0);
+            JumpIf(Flags.Equal, "DebugStub_Start");
+                //EnableInterrupts();
+                Return();
+            Label = "DebugStub_Start";
+            Memory["DebugRunning", 32] = 1;
+            //EnableInterrupts();
+            //
             PushAll32();
             EBP = ESP;
             EBP.Add(32);
@@ -165,6 +181,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             Call("DebugStub_Executing");
             
             PopAll32();
+            Memory["DebugRunning", 32] = 0;
             Return();
         }
     }
