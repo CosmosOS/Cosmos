@@ -20,9 +20,7 @@
                     <Separator/>
                     <Button Name="butnStep">Step</Button>
                     <Separator/>
-                    <Button Name="butnTraceOn">Trace On</Button>
-                    <Separator/>
-                    <Button Name="butnTraceOff">Trace Off</Button>
+                    <Button Name="butnTrace">Trace</Button>
                     <Separator/>
                     <Button Name="butnBreak">Break</Button>
                     <Separator/>

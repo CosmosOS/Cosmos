@@ -14,5 +14,9 @@ namespace Indy.IL2CPU.Assembler.X86.X {
         public static implicit operator Action(UInt32 aValue) {
             return new ConstantAction(aValue);
         }
+
+        public static implicit operator Action(Register aRegister) {
+            return new RegisterAction(aRegister.ToString());
+        }
     }
 }

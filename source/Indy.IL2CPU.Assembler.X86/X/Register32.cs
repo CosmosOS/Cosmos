@@ -18,5 +18,12 @@ namespace Indy.IL2CPU.Assembler.X86.X {
             new Add(ToString(), aValue);
         }
 
+        public void Compare(UInt32 aValue) {
+            new Compare(ToString(), aValue);
+        }
+
+        public void Test(UInt32 aValue) {
+            new X86.Test(ToString(), aValue);
+        }
     }
 }

@@ -119,6 +119,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 aOutputWriter.WriteLine("DebugStatus dd 0");
                 aOutputWriter.WriteLine("DebugSuspendLevel dd 0");
                 aOutputWriter.WriteLine("DebugEIP dd 0");
+                aOutputWriter.WriteLine("DebugTraceSent dd 0");
             }
 
 		}

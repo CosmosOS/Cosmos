@@ -11,5 +11,9 @@ namespace Indy.IL2CPU.Assembler.X86.X {
             mValue = aValue;
         }
 
+        //TODO: Put memory compare here - will later have to limit it to the size
+        // variant and if possible to self usage, ie no assignments. May however result 
+        // in too many class variants to be worth while.
+
     }
 }

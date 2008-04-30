@@ -9,10 +9,15 @@ namespace Indy.IL2CPU.Assembler.X86.X {
             get {
                 return new MemoryAction(aAddress.ToString());
             }
-            //set {
+            set {
                 // Future - need to handle registers, but should reject
                 // any memory, memory should force size usage below
-            //}
+                if (value is RegisterAction) {
+                    new X86.Move(aAddress.ToString(), value.ToString());
+                } else {
+                    throw new Exception("For non register assignments to memory, a size must be specified.");
+                }
+            }
         }
 
         public Action this[Address aAddress, byte aSize] {

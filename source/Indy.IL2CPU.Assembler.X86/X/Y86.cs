@@ -39,6 +39,10 @@ namespace Indy.IL2CPU.Assembler.X86.X {
         }
 
         public void CallIf(Flags aFlags, string aLabel) {
+            CallIf(aFlags, aLabel, "");
+        }
+
+        public void CallIf(Flags aFlags, string aLabel, string aJumpAfter) {
             // TODO: This is inefficient - lots of jumps
             // Maybe make an invert function for Flags
             var xLabelIf = NewLabel();
@@ -49,6 +53,9 @@ namespace Indy.IL2CPU.Assembler.X86.X {
 
             Label = xLabelIf;
             Call(aLabel);
+            if (aJumpAfter != "") {
+                Jump(aJumpAfter);
+            }
 
             Label = xLabelExit;
         }

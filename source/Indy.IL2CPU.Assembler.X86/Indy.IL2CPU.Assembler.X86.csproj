@@ -138,6 +138,7 @@
     <Compile Include="X\Register08.cs" />
     <Compile Include="X\Register16.cs" />
     <Compile Include="X\Register32.cs" />
+    <Compile Include="X\RegisterAction.cs" />
     <Compile Include="X\RegisterAL.cs" />
     <Compile Include="X\RegisterDX.cs" />
     <Compile Include="X\RegisterEAX.cs" />
