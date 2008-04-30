@@ -7,10 +7,10 @@ namespace Indy.IL2CPU.Assembler.X86.X {
     public class Memory {
         public Action this[Address aAddress] {
             get {
-                return new MemoryAction(aAddress.ToString());
+                return new Action(aAddress.ToString());
             }
             set {
-                if (value is RegisterAction) {
+                if (value.IsRegister) {
                     new X86.Move(aAddress.ToString(), value.ToString());
                 } else {
                     throw new Exception("For non register assignments to memory, a size must be specified.");
@@ -20,10 +20,10 @@ namespace Indy.IL2CPU.Assembler.X86.X {
 
         public Action this[Address aAddress, byte aSize] {
             get {
-                return new MemoryAction(aAddress.ToString());
+                return new Action(aAddress.ToString());
             }
             set {
-                new X86.Move(MemoryAction.SizeToString(aSize), aAddress.ToString(), value.ToString());
+                new X86.Move(Action.SizeToString(aSize), aAddress.ToString(), value.ToString());
             }
         }
     }
