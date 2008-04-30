@@ -5,9 +5,9 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86.X {
     public class Memory {
-        public Action this[Address aAddress] {
+        public MemoryAction this[Address aAddress] {
             get {
-                return new Action(aAddress.ToString());
+                return new MemoryAction(aAddress.ToString());
             }
             set {
                 if (value.IsRegister) {
@@ -18,12 +18,12 @@ namespace Indy.IL2CPU.Assembler.X86.X {
             }
         }
 
-        public Action this[Address aAddress, byte aSize] {
+        public MemoryAction this[Address aAddress, byte aSize] {
             get {
-                return new Action(aAddress.ToString());
+                return new MemoryAction(aAddress.ToString(), aSize);
             }
             set {
-                new X86.Move(Action.SizeToString(aSize), aAddress.ToString(), value.ToString());
+                new X86.Move(MemoryAction.SizeToString(aSize), aAddress.ToString(), value.ToString());
             }
         }
     }

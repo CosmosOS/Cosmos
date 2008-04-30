@@ -60,9 +60,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
         protected void SendTrace() {
             Label = "DebugStub_SendTrace";
 
-            //TODO: Convert to memory compare
-            EAX = Memory["DebugTraceSent"];
-            EAX.Compare(1);
+            Memory["DebugTraceSent", 32].Compare(1);
             JumpIf(Flags.Equal, "DebugStub_SendTrace_Exit");
                 Memory["DebugTraceSent", 32] = 1;
 
@@ -118,9 +116,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
         protected void Executing() {
             Label = "DebugStub_Executing";
             //TODO: Change this to support CallIf(AL == 1, "DebugStub_SendTrace");
-            EAX = Memory["DebugTraceMode"];
-            AL.Compare((int)Tracing.On);
-            //Memory["DebugTraceMode", 32];
+            Memory["DebugTraceMode", 32].Compare((int)Tracing.On);
                 CallIf(Flags.Equal, "DebugStub_SendTrace");
 
             // Is there a new incoming command?

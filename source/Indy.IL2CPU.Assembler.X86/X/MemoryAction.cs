@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86.X {
-    public class Action {
+    public class MemoryAction {
         protected string mValue;
         public bool IsRegister = false;
 
@@ -12,32 +12,32 @@ namespace Indy.IL2CPU.Assembler.X86.X {
             return mValue;
         }
 
-        public static implicit operator Action(UInt32 aValue) {
-            return new Action(aValue);
+        public static implicit operator MemoryAction(UInt32 aValue) {
+            return new MemoryAction(aValue);
         }
 
-        public static implicit operator Action(Register aRegister) {
-            return new Action(aRegister.ToString(), true);
+        public static implicit operator MemoryAction(Register aRegister) {
+            return new MemoryAction(aRegister.ToString(), true);
         }
 
         protected byte mSize = 0;
 
         // For registers
-        public Action(string aValue, bool aIsRegister) {
+        public MemoryAction(string aValue, bool aIsRegister) {
             mValue = aValue;
             IsRegister = aIsRegister;
         }
         // This form used for reading memory - Addresses are passed in
-        public Action(string aValue) {
+        public MemoryAction(string aValue) {
             mValue = aValue;
         }
-        public Action(string aValue, byte aSize) {
+        public MemoryAction(string aValue, byte aSize) {
             mValue = aValue;
             mSize = aSize;
         }
 
         // For constants/literals
-        public Action(UInt32 aValue) {
+        public MemoryAction(UInt32 aValue) {
             mValue = aValue.ToString();
         }
 
@@ -52,7 +52,7 @@ namespace Indy.IL2CPU.Assembler.X86.X {
                 case 64:
                     return "qword";
                 default:
-                    throw new Exception("Invalid size: " + aSize.ToString());
+                    throw new Exception("Invalid size: " + aSize);
             }
         }
 
