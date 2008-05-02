@@ -30,6 +30,10 @@ namespace FrodeTest.Shell
             {
                 Test.Ethernet2FrameTest.RunTest();
             }
+            else if (command.Equals("ip"))
+            {
+                Test.IPv4Test.RunTest();
+            }
             else if (command.Equals("load"))
             {
                 var list = RTL8139.FindAll();

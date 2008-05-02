@@ -135,6 +135,10 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
 
         private byte[] GetHeaderBytes()
         {
+            //TODO - the following things don't work (because of endianism)
+            // Identification + Flags + Fragment Offset
+            // Header Checksum
+
             List<byte> bytes = new List<byte>();
             List<UInt32> fields = new List<UInt32>();
 
@@ -144,12 +148,14 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
             //field1 = ConvertToBigEndian(field1);
             fields.Add(field1);
 
-            UInt32 field2 = (UInt32)((this.Identification << 8) | (((byte)(this.FragmentFlags)) << 21) | (byte)(this.FragmentOffset << 24)); //TODO: FragmentOffset should be 13 bits.
+            //UInt32 field2 = (UInt32)((this.Identification << 8) | (((byte)(this.FragmentFlags)) << 21) | (byte)(this.FragmentOffset << 24)); //TODO: FragmentOffset should be 13 bits.
             //fields.Add(ConvertToBigEndian(field2));
-            fields.Add(field2);
+            UInt32 field2 = (UInt32)((this.Identification << 8) | ((byte)(this.FragmentFlags)) << 21 | (this.FragmentOffset << 24));
+            //field2 = (UInt32)System.Net.IPAddress.HostToNetworkOrder(field2);
+            fields.Add((UInt32)HostToNetworkOrder((int)field2));
 
-            UInt32 field3 = (UInt32)((this.TimeToLive << 0) | (((byte)(this.Protocol)) << 8) | (this.HeaderChecksum << 24));
-            //fields.Add(ConvertToBigEndian(field3));
+            UInt32 field3 = (UInt32)((this.TimeToLive << 0) | (((byte)(this.Protocol)) << 8) | (UInt16)(this.HeaderChecksum << 16));
+            //field3 = ConvertToBigEndian(field3);
             fields.Add(field3);
 
             //Split the 32-bit words into bytes
@@ -350,6 +356,31 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
             //Console.WriteLine("Big-endian:    " + bin + " (as value: " + bin.FromBinary());
 
             return bin.FromBinary();
+        }
+
+        public short HostToNetworkOrder(short host)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static int HostToNetworkOrder(int n)
+        {
+            string bin = n.ToBinary();
+            bin = bin.PadLeft(32, '0');
+
+            string first = bin.Substring(0, 8);
+            string second = bin.Substring(8, 8);
+            string third = bin.Substring(16, 8);
+            string fourth = bin.Substring(24, 8);
+
+            bin = fourth + third + second + first;
+
+            return (int)bin.FromBinary();
+        }
+
+        public long HostToNetworkOrder(long host)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
