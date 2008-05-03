@@ -191,7 +191,6 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
             new CPUx86.Sti();
             new CPUx86.Move("[InterruptsEnabledFlag]",
                             1);
-            // todo: add a datamember in which the interrupt state is stored
         }
     }
 }
