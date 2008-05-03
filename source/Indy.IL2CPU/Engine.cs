@@ -786,7 +786,7 @@ namespace Indy.IL2CPU {
 							xTypeInfo = GetTypeInfo(xCurrentMethod.DeclaringType);
 						}
 					}
-					MethodInformation xMethodInfo = GetMethodInfo(xCurrentMethod, xCurrentMethod, xMethodName, xTypeInfo, mDebugMode!= DebugModeEnum.None);
+MethodInformation xMethodInfo = GetMethodInfo(xCurrentMethod, xCurrentMethod, xMethodName, xTypeInfo, mDebugMode!= DebugModeEnum.None);
 					IL.Op xOp = GetOpFromType(mMap.MethodHeaderOp, null, xMethodInfo);
 					xOp.Assembler = mAssembler;
 #if VERBOSE_DEBUG

@@ -11,20 +11,22 @@ namespace Indy.IL2CPU.IL.X86 {
 		public readonly string LabelName = "";
 		public readonly MethodInformation.Argument[] Args;
 		public readonly bool DebugMode;
+	    public readonly bool MethodIsNonDebuggable;
 		public X86MethodHeaderOp(ILReader aReader, MethodInformation aMethodInfo)
 			: base(aReader, aMethodInfo) {
 			LabelName = aMethodInfo.LabelName;
 			Args = aMethodInfo.Arguments.ToArray();
 			Locals = aMethodInfo.Locals.ToArray();
 			DebugMode = aMethodInfo.DebugMode;
+		    MethodIsNonDebuggable = aMethodInfo.IsNonDebuggable;
 		}
 
 		public override void DoAssemble() {
 			// TODO: add support for variables with a diff datasize, other than 32bit
-			AssembleHeader(Assembler, LabelName, Locals, Args, DebugMode);
+            AssembleHeader(Assembler, LabelName, Locals, Args, DebugMode, MethodIsNonDebuggable);
 		}
 
-		public static void AssembleHeader(Assembler.Assembler aAssembler, string aLabelName, MethodInformation.Variable[] aLocals, MethodInformation.Argument[] aArguments, bool aDebugMode) {
+		public static void AssembleHeader(Assembler.Assembler aAssembler, string aLabelName, MethodInformation.Variable[] aLocals, MethodInformation.Argument[] aArguments, bool aDebugMode, bool aIsNonDebuggable) {
 			new CPU.Label(aLabelName);
 			new CPUx86.Pushd(CPUx86.Registers.EBP);
 #if EXT_DEBUG
@@ -45,10 +47,8 @@ namespace Indy.IL2CPU.IL.X86 {
 					new CPUx86.Pushd("0");
 				}
 			}
-			if(aDebugMode) {
-				new Comment("Debug Mode");
-				// uncomment and adjust next line:
-				// new CPUx86.Call("XXXX");
+			if(aDebugMode&&!aIsNonDebuggable) {
+			    new CPUx86.Call("DebugPoint_DebugSuspend");
 			}
 		}
 	}
