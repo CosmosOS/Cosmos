@@ -150,29 +150,25 @@ namespace Indy.IL2CPU.Assembler.X86 {
 
             Label = "DebugPoint__";
 
-            // For now, if IRQ's arent started yet, we are still very early on
-            // and we just exit. Dont think we need the C# debugger earlier than
-            // that. If so have to change the EnableInterrupts to only occur
-            // if this is set.
-            //Memory["InterruptsEnabledFlag", 32].Compare(0);
-            //JumpIf(Flags.Equal, "DebugStub_IRQsOK");
-            //Return();
-            Label = "DebugStub_IRQsOK";
-
             // If debug stub is in break, and then an IRQ happens, the IRQ
             // can call debug stub again. This causes two debug stubs to 
             // run which causes havoc. So we only allow one to run.
             // We arent multi threaded yet, so this works fine.
             // IRQ's are disabled between Compare and JumpIf so an IRQ cant
             // happen in between them which could then cause double entry again
-            //DisableInterrupts();
+            DisableInterrupts();
             Memory["DebugRunning", 32].Compare(0);
             JumpIf(Flags.Equal, "DebugStub_Start");
-                //EnableInterrupts();
-                Return();
+                Memory["InterruptsEnabledFlag", 32].Compare(0);
+                JumpIf(Flags.Equal, "DebugStub_Return");
+                EnableInterrupts();
+                Jump("DebugStub_Return");
             Label = "DebugStub_Start";
             Memory["DebugRunning", 32] = 1;
-            //EnableInterrupts();
+            Memory["InterruptsEnabledFlag", 32].Compare(0);
+            JumpIf(Flags.Equal, "DebugStub_NoSTI");
+            EnableInterrupts();
+            Label = "DebugStub_NoSTI";
             //
             PushAll32();
             EBP = ESP;
@@ -191,6 +187,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             
             PopAll32();
             Memory["DebugRunning", 32] = 0;
+            Label = "DebugStub_Return";
             Return();
         }
     }
