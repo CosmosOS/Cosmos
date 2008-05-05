@@ -20,6 +20,16 @@ namespace Indy.IL2CPU.Assembler.X86.X {
             return new MemoryAction(aRegister.ToString(), true);
         }
 
+        public static MemoryAction operator ++(MemoryAction aTarget) {
+            new X86.Inc(SizeToString(aTarget.mSize), aTarget.ToString());
+            return null;
+        }
+
+        public static MemoryAction operator --(MemoryAction aTarget) {
+            new X86.Dec(SizeToString(aTarget.mSize), aTarget.ToString());
+            return null;
+        }
+
         protected byte mSize = 0;
 
         // For registers

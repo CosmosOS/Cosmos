@@ -23,7 +23,11 @@ namespace Indy.IL2CPU.Assembler.X86.X {
                 return new MemoryAction(aAddress.ToString(), aSize);
             }
             set {
-                new X86.Move(MemoryAction.SizeToString(aSize), aAddress.ToString(), value.ToString());
+                // ++ operators return ++
+                // Maybe later change ++ etc to return actions?
+                if (value != null) {
+                    new X86.Move(MemoryAction.SizeToString(aSize), aAddress.ToString(), value.ToString());
+                }
             }
         }
     }

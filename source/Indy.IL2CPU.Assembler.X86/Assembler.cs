@@ -118,7 +118,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 aOutputWriter.WriteLine("DebugTraceMode dd 1"); // Tracing: On, Off
                 aOutputWriter.WriteLine("DebugStatus dd 0"); // Run, Break, Stepping
                 aOutputWriter.WriteLine("DebugRunning dd 0"); // 0 = Not in, 1 = already running
-                aOutputWriter.WriteLine("DebugSuspendLevel dd 0");
+                aOutputWriter.WriteLine("DebugSuspendLevel dd 0"); // Nesting control for non steppable routines
                 aOutputWriter.WriteLine("DebugEIP dd 0"); // Last EIP value
                 aOutputWriter.WriteLine("DebugTraceSent dd 0");
             }

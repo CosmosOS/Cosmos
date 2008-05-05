@@ -96,11 +96,13 @@ namespace Indy.IL2CPU.Assembler.X86 {
 
         protected void DebugSuspend() {
             Label = "DebugPoint_DebugSuspend";
+            //Memory["DebugSuspendLevel", 32]++;
             Return();
         }
 
         protected void DebugResume() {
             Label = "DebugPoint_DebugResume";
+            //Memory["DebugSuspendLevel", 32]--;
             Return();
         }
 
@@ -157,12 +159,22 @@ namespace Indy.IL2CPU.Assembler.X86 {
             // IRQ's are disabled between Compare and JumpIf so an IRQ cant
             // happen in between them which could then cause double entry again
             DisableInterrupts();
+
+            Memory["DebugSuspendLevel", 32].Compare(0);
+            JumpIf(Flags.Equal, "DebugStub_Running");
+                Memory["InterruptsEnabledFlag", 32].Compare(0);
+                JumpIf(Flags.Equal, "DebugStub_Return");
+                EnableInterrupts();
+                Jump("DebugStub_Return");
+
+            Label = "DebugStub_Running";
             Memory["DebugRunning", 32].Compare(0);
             JumpIf(Flags.Equal, "DebugStub_Start");
                 Memory["InterruptsEnabledFlag", 32].Compare(0);
                 JumpIf(Flags.Equal, "DebugStub_Return");
                 EnableInterrupts();
                 Jump("DebugStub_Return");
+
             Label = "DebugStub_Start";
             Memory["DebugRunning", 32] = 1;
             Memory["InterruptsEnabledFlag", 32].Compare(0);

@@ -64,8 +64,10 @@
     <Compile Include="ConditionalMove.cs" />
     <Compile Include="Condition.cs" />
     <Compile Include="DebugStub.cs" />
+    <Compile Include="Dec.cs" />
     <Compile Include="IDivide.cs" />
     <Compile Include="InByte.cs" />
+    <Compile Include="Inc.cs" />
     <Compile Include="InDWord.cs" />
     <Compile Include="InWord.cs" />
     <Compile Include="IRet.cs" />
