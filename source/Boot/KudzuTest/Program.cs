@@ -6,7 +6,7 @@ namespace KudzuTest {
 	class Program {
 		[STAThread]
 		static void Main(string[] args) {
-            //RTL8139.Test();
+            RTL8139.Test();
             BuildUI.Run();
         }
 
