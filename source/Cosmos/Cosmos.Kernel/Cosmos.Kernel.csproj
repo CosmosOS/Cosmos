@@ -88,7 +88,6 @@
     <Compile Include="Old\Staging\StageQueue.cs" />
     <Compile Include="Old\Staging\Stages\KernelStage.cs" />
     <Compile Include="StringFuncs.cs" />
-    <Compile Include="Temp\Kudzu\PCI.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Cosmos.snk" />

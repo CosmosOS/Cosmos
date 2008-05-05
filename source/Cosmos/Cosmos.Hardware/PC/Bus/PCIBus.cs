@@ -9,13 +9,13 @@ namespace Cosmos.Hardware.PC.Bus
     public class PCIBus : Cosmos.Hardware.Bus.PCIBus
     {
         public static PCIDevice[] Devices = new PCIDevice[0];
-
-        private static bool haveEnumerated = false;
+        protected static bool mEnumerationCompleted = false;
 
         public static PCIDevice GetPCIDevice(byte bus, byte slot, byte function)
         {
-            if (!haveEnumerated)
+            if (!mEnumerationCompleted) {
                 Init();
+            }
 
             foreach (PCIDevice dev in PCIBus.Devices)
             {
@@ -29,17 +29,13 @@ namespace Cosmos.Hardware.PC.Bus
             return null;
         }
 
-        public static void Init()
-        {
-            //Console.WriteLine("Cosmos.Hardware.PC.Bus.Init()");
-
+        public static void Init() {
             List<PCIDevice> devices = new List<PCIDevice>();
-            //Console.WriteLine("- created generic");
 
             EnumerateBus(0, ref devices);
             Devices = devices.ToArray();
 
-            haveEnumerated = true;
+            mEnumerationCompleted = true;
         }
 
         /// <summary>
@@ -115,19 +111,15 @@ namespace Cosmos.Hardware.PC.Bus
                     if (a != null)
                     {
                         System.Console.Write("register " + i + " @ " + ToHex(a.Offset, 8) + " (" + a.Size + "b) ");
-                        if (a is MemoryAddressSpace)
+                        if (a is MemoryAddressSpace) {
                             Console.WriteLine("mem");
-                        else
+                        } else {
                             Console.WriteLine("io");
+                        }
                     }
                 }
-
                 System.Console.WriteLine();
-
-
                 System.Console.WriteLine();
-
-
             }
         }
 

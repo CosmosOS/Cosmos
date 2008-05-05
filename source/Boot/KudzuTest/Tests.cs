@@ -42,34 +42,29 @@ namespace KudzuTest {
             Console.WriteLine();
         }
 
-        //Fail - Returns in hex, and also wrong value
         static public object ConcatConversion() {
             int x = 1000;
             return x + " Euros, but should be 1000. Not even correct by value";
         }
 
-        //Fail - Crashes
         static public object ConcatConversion2() {
             UInt32 y = 100;
             UInt32 z = 100;
             return y + "-" + z;
         }
 
-        //Fail - crashes...
         static public object ConcatConversion3() {
             UInt32 y = 100;
             UInt32 z = 100;
             return y.ToString() + "-" + z.ToString();
         }
 
-        //Fail - IL2CPU error on compile
         static public object Dictionary() {
             var x = new Dictionary<UInt32, string>();
             x.Add(1000, "Hello");
             return null;
         }
 
-        //Fail - Cant even use this method
         static public void Do(string aName, TestDelegate aTest) {
             Console.WriteLine("Test: " + aName);
             object xTestResult = aTest();
@@ -79,33 +74,28 @@ namespace KudzuTest {
             Console.WriteLine();
         }
 
-        //Fail - IL2CPU fails to compile. Missing P/Invoke IIRC
         static public object WriteLnUInt32() {
             UInt32 x = 1000;
             Console.WriteLine(x);
             return null;
         }
 
-        //Fail, outputs partial garbage
         static public string IntToStr16() {
             UInt16 x16 = 1000;
             return "1000=" + x16.ToString();
         }
 
-        //Fail, outputs hex instead of decimal
         static public string IntToStr32() {
             UInt32 x32 = 1000;
             return "1000=" + x32.ToString();
         }
 
-        //Pass
         static public string StringConcat() {
             string x = "Hello";
             x = x + " world.";
             return x;
         }
 
-        //Fail - Important
         static public string StringBuilder() {
 			var xSB = new System.Text.StringBuilder("Hello");
 			xSB.Append(" world.");

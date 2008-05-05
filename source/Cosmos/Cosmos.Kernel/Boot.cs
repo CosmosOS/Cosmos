@@ -17,7 +17,6 @@ namespace Cosmos.Kernel {
         /// Initializes basic hardware like CPU, serialports, PCI, Keyboard and blockdevices.
         /// </summary>
         public static void Default() {
-			System.Diagnostics.Debugger.Break();
             //Init Heap first - Hardware loads devices and they need heap
 			Heap.CheckInit();
             
@@ -30,9 +29,9 @@ namespace Cosmos.Kernel {
 			MBT.Initialize();
 
             // Now init kernel devices and rest of kernel
-			Console.WriteLine("Init Keyboard");
-			System.Diagnostics.Debugger.Break();
             Keyboard.Initialize();
+
+            Cosmos.Hardware.PC.Bus.PCIBus.Init();
         }
     }
 }
