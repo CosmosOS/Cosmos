@@ -85,13 +85,15 @@ namespace Indy.IL2CPU.IL {
             LocalsSize = (from item in aLocals
                           let xSize = (item.Size%4 == 0)
                                           ? item.Size
-                                          : (item.Size + (4 - (item.Size%4)))
+                                          : (item.Size + (4 - (item.Size % 4)))
                           select xSize).Sum();
-            IsNonDebuggable = aMethod.GetCustomAttributes(typeof(DebuggerStepThroughAttribute),
-                                                          false).Length != 0 || aMethod.DeclaringType.GetCustomAttributes(typeof(DebuggerStepThroughAttribute),
-                                                                                                                          false).Length != 0 || aMethod.DeclaringType.Module.GetCustomAttributes(typeof(DebuggerStepThroughAttribute),
-                                                                                                                                                                                                 false).Length != 0 || aMethod.DeclaringType.Assembly.GetCustomAttributes(typeof(DebuggerStepThroughAttribute),
-                                                                                                                                                                                                                                                                          false).Length != 0;
+            if (aMethod != null) {
+                IsNonDebuggable =
+                 aMethod.GetCustomAttributes(typeof(DebuggerStepThroughAttribute), false).Length != 0
+                 || aMethod.DeclaringType.GetCustomAttributes(typeof(DebuggerStepThroughAttribute), false).Length != 0
+                 || aMethod.DeclaringType.Module.GetCustomAttributes(typeof(DebuggerStepThroughAttribute), false).Length != 0
+                 || aMethod.DeclaringType.Assembly.GetCustomAttributes(typeof(DebuggerStepThroughAttribute), false).Length != 0;
+            }
         }
 
         /// <summary>

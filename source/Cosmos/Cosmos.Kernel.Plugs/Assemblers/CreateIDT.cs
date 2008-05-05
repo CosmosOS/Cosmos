@@ -100,8 +100,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
                 new Label("__ISR_Handler_" + j.ToString("X2"));
                 //if (j < 0x20 || j > 0x2F || true) {
                 new CPUx86.Cli();
-                new CPUx86.Move("[InterruptsEnabledFlag]",
-                                0);
+                new CPUx86.Move("dword", "[InterruptsEnabledFlag]", 0);
                 //}
                 new CPUx86.Break();
                 if (Array.IndexOf(xInterruptsWithParam,
@@ -181,16 +180,14 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
                 new Label("__ISR_Handler_" + j.ToString("X2") + "_END");
                 //if (j < 0x20 || j > 0x2F) {
                 new CPUx86.Sti();
-                new CPUx86.Move("[InterruptsEnabledFlag]",
-                                1);
+                new CPUx86.Move("dword", "[InterruptsEnabledFlag]", 1);
                 //}
                 new CPUx86.IRet();
             }
             new Label("__AFTER__ALL__ISR__HANDLER__STUBS__");
             new CPUx86.Noop();
             new CPUx86.Sti();
-            new CPUx86.Move("[InterruptsEnabledFlag]",
-                            1);
+            new CPUx86.Move("dword", "[InterruptsEnabledFlag]", 1);
         }
     }
 }
