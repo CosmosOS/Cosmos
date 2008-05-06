@@ -85,7 +85,6 @@
     <Compile Include="Old\Staging\IStage.cs" />
     <Compile Include="Old\Staging\StageQueue.cs" />
     <Compile Include="Old\Staging\Stages\KernelStage.cs" />
-    <Compile Include="StringFuncs.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Cosmos.snk" />
