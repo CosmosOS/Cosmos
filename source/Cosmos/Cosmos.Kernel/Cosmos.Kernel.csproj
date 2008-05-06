@@ -47,7 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Old\DebugUtil-Old.cs" />
+    <Compile Include="Old\Debug.cs" />
     <Compile Include="Old\FileSystem\Ext2.cs" />
     <Compile Include="Old\FileSystem\Ext2Old.cs" />
     <Compile Include="Old\FileSystem\Ext2Old.Structs.cs" />
