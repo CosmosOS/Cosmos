@@ -40,12 +40,12 @@ namespace Cosmos.Hardware.PC {
 			// MTW new end
 
             HW.Device.Add(new Bus.CPU.Keyboard());
+            Cosmos.Hardware.PC.Bus.PCIBus.Init();
         }
-		[Obsolete("Use Init(noATA, noATAOld, noATA2)")]
-		public static void Init()
-		{
+
+        public static void Init() {
 			Init(false, false, false);
-		}
+        }
 
         public static uint TickCount {
             get;

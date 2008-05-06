@@ -47,7 +47,7 @@ namespace Cosmos.FileSystem {
 				}
 			}
 		}
-        public static void Initialize() 
+        public static void Init() 
         {
             //DebugUtil.SendMessage("MBT", "Initializing");
             //DebugUtil.SendNumber("MBT", "DeviceCount", (uint)Device.Devices.Count, 32);
