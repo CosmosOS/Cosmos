@@ -118,11 +118,8 @@ namespace Cosmos.Kernel.Plugs {
 				current = Cosmos.Hardware.KeyboardOld.ReadChar();
 				if (current == '\n') {
 					break;
-				}
-                if (current == '\u0968') // Backspace
-                {
-                    if (chars.Count != 0)
-                    {
+				} else if (current == '\u0968') { // Backspace   
+                    if (chars.Count > 0) {
                         chars.RemoveAt(chars.Count - 1);
                         TextScreen.CurrentChar--;
                         TextScreen.WriteChar(' ');
@@ -137,8 +134,9 @@ namespace Cosmos.Kernel.Plugs {
 
 			// HACK: Should use .ToArray here.
 			char[] final = new char[chars.Count];
-			for (int i = 0; i < final.Length; i++)
-				final[i] = chars[i];
+            for (int i = 0; i < final.Length; i++) {
+                final[i] = chars[i];
+            }
 
 			return new string(final);
 		}
