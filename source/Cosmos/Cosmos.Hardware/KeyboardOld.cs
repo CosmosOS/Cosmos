@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Text;
 using HW = Cosmos.Hardware;
 
-namespace Cosmos.Kernel {
-	public class Keyboard {
+namespace Cosmos.Hardware {
+	public class KeyboardOld {
 		private class KeyMapping {
 			public uint Scancode;
 			public char Value;
@@ -39,9 +39,9 @@ namespace Cosmos.Kernel {
 							if (!aReleased) {
 								char xTheChar;
 								if (!GetCharValue(xTheScancode, out xTheChar)) {
-									DebugUtil.SendError("Keyboard", "error while getting scancode character!");
+									//DebugUtil.SendError("Keyboard", "error while getting scancode character!");
 								} else {
-									DebugUtil.SendDoubleNumber("Keyboard", "Scancode and Char", xTheScancode, 32, xTheChar, 16);
+									//DebugUtil.SendDoubleNumber("Keyboard", "Scancode and Char", xTheScancode, 32, xTheChar, 16);
 								}
 								mBuffer.Enqueue(xTheScancode);
 							}
@@ -49,7 +49,7 @@ namespace Cosmos.Kernel {
 						break;
 					}
 			}
-			DebugUtil.SendKeyboardEvent(xTheScancode, aReleased);
+			//DebugUtil.SendKeyboardEvent(xTheScancode, aReleased);
 		}
 
 		// Can merge HandleScancode after we remove old code
@@ -66,7 +66,7 @@ namespace Cosmos.Kernel {
 				mBuffer = new Queue<uint>(BufferSize);
 
 				// Old
-				Hardware.Keyboard.Initialize(HandleScancode);
+				Keyboard.Initialize(HandleScancode);
 				// New
 				// TODO: Need to add support for mult keyboards. ie one in PS2 and one in USB, or even more
 				//var xKeyboard = (HW.SerialDevice)(HW.Device.Find(HW.Device.DeviceType.Keyboard)[0]);

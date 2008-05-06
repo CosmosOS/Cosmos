@@ -40,6 +40,7 @@ namespace Cosmos.Hardware.PC {
 			// MTW new end
 
             HW.Device.Add(new Bus.CPU.Keyboard());
+            KeyboardOld.Initialize();
             Cosmos.Hardware.PC.Bus.PCIBus.Init();
         }
 

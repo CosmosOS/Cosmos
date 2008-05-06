@@ -54,7 +54,6 @@
     <Compile Include="Old\FileSystem\FileSystem.cs" />
     <Compile Include="Old\FileSystem\ISO9660.cs" />
     <Compile Include="Heap.cs" />
-    <Compile Include="Keyboard.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Old\TextScreen-Old.cs" />
   </ItemGroup>

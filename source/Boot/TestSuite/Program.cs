@@ -21,7 +21,7 @@ namespace TestSuite {
 
 			Console.WriteLine("Init Keyboard");
 			System.Diagnostics.Debugger.Break();
-			Keyboard.Initialize();
+			KeyboardOld.Initialize();
 
             Cosmos.Kernel.Staging.DefaultStageQueue stages = new Cosmos.Kernel.Staging.DefaultStageQueue();
             stages.Enqueue(new TestsStage());

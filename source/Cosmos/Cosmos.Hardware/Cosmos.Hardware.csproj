@@ -57,6 +57,7 @@
     <Compile Include="Extension\NumberSystem\Binary.cs" />
     <Compile Include="Extension\NumberSystem\Hex.cs" />
     <Compile Include="IOSpace.cs" />
+    <Compile Include="KeyboardOld.cs" />
     <Compile Include="Network\Devices\RTL8139\BinaryHelper.cs" />
     <Compile Include="Network\Devices\RTL8139\Packet.cs" />
     <Compile Include="Network\Devices\RTL8139\PacketHeader.cs" />
