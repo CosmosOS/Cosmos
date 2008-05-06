@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Cosmos.Kernel.Staging;
 using RsenkTest.Commands;
 using RsenkTest.Commands.ClearScreen;
 
 namespace RsenkTest
 {
-    class CommanderShell : StageBase
+    class CommanderShell //: StageBase
     {
         private Interpreter interpreter;
         private List<CommandBase> commands = new List<CommandBase>();
@@ -31,7 +30,7 @@ namespace RsenkTest
             return commander;
         }
 
-        public override void Initialize()
+        public  void Initialize()
         {
             //Clear the screen
             interpreter.ParseCommand("cls").Execute();
@@ -61,12 +60,10 @@ namespace RsenkTest
             }
         }
 
-        public override string Name
+        public  string Name
         {
             get { return "Cosmos Commander Shell"; }
         }
-
-        public override void Teardown() { }
 
         public void PrintCommands()
         {

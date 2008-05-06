@@ -80,10 +80,6 @@
     <Compile Include="Old\FileSystem\FileSystem2.cs" />
     <Compile Include="Old\FileSystem\Path.cs" />
     <Compile Include="Old\FileSystem\TestsMatthijs.cs" />
-    <Compile Include="Old\Staging\DefaultStageQueue.cs" />
-    <Compile Include="Old\Staging\IStage.cs" />
-    <Compile Include="Old\Staging\StageQueue.cs" />
-    <Compile Include="Old\Staging\Stages\KernelStage.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Cosmos.snk" />

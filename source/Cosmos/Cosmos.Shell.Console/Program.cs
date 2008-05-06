@@ -25,14 +25,8 @@ namespace Cosmos.Shell.Console {
         public static void Init() {
 			try {
 				Cosmos.Kernel.Boot.Default();
-				System.Console.WriteLine("Creating StageQueue");
-				Kernel.Staging.DefaultStageQueue stages = new Cosmos.Kernel.Staging.DefaultStageQueue();
-				System.Console.WriteLine("Queueing Prompter");
-				stages.Enqueue(new Prompter());
-				System.Console.WriteLine("Done");
+				//stages.Enqueue(new Prompter());
 
-				stages.Run();
-				stages.Teardown();
 			} catch (Exception E) {
 				System.Console.WriteLine("Error occurred:");
 				System.Console.Write("    ");

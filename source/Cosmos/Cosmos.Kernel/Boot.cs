@@ -27,6 +27,7 @@ namespace Cosmos.Kernel {
 			// have control of the order in which the individual methods are called..
             Cosmos.Hardware.PC.Global.Init();
 			MBT.Init();
+            Console.Clear();
         }
     }
 }

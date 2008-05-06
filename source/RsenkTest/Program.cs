@@ -20,16 +20,10 @@ namespace RsenkTest
             try
             {
                 Cosmos.Kernel.Boot.Default();
-                System.Console.Write("Creating StageQueue");
-                Cosmos.Kernel.Staging.DefaultStageQueue stages = new Cosmos.Kernel.Staging.DefaultStageQueue();
                 System.Console.WriteLine("                                      [ done ]");
 
                 System.Console.WriteLine("Queueing Shell");
-                stages.Enqueue(CommanderShell.GetInstance());
                 System.Console.WriteLine("                                      [ done ]");
-
-                stages.Run();
-                stages.Teardown();
             }
             catch (PrompterException e)
             {

@@ -17,10 +17,6 @@ namespace Cosmos.Shell.Guess {
 		public static void Init() {
 			Kernel.Boot.Default();
 
-			Kernel.Staging.DefaultStageQueue stages = new Cosmos.Kernel.Staging.DefaultStageQueue();
-
-			stages.Run();
-
 			Random mt = new Random();
 			int num = mt.Next();
 
@@ -44,8 +40,6 @@ namespace Cosmos.Shell.Guess {
 			}
 
 			System.Console.WriteLine("You got it!!!!");
-
-			stages.Teardown();
 		}
 	}
 }
