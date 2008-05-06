@@ -81,7 +81,6 @@
     <Compile Include="Old\FileSystem\FileSystem2.cs" />
     <Compile Include="Old\FileSystem\Path.cs" />
     <Compile Include="Old\FileSystem\TestsMatthijs.cs" />
-    <Compile Include="Old\LinkedFormats\ELF.cs" />
     <Compile Include="Old\Staging\DefaultStageQueue.cs" />
     <Compile Include="Old\Staging\IStage.cs" />
     <Compile Include="Old\Staging\StageQueue.cs" />
