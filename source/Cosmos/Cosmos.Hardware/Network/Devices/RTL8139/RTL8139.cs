@@ -17,7 +17,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         #region Construction
 
         private PCIDevice pciCard;
-        private MemoryAddressSpace mem;
+        private Kernel.MemoryAddressSpace mem;
         private Register.MainRegister reg;
         private Register.CommandRegister cr;
         private Register.ValueTypeRegisters valueReg;
@@ -35,7 +35,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
                 throw new ArgumentException("PCI Device is null. Unable to get RTL8139 card");
 
             pciCard = device;
-            mem = device.GetAddressSpace(1) as MemoryAddressSpace;
+            mem = device.GetAddressSpace(1) as Kernel.MemoryAddressSpace;
             valueReg = Register.ValueTypeRegisters.Load(mem);
             imr = Register.InterruptMaskRegister.Load(mem);
             isr = Register.InterruptStatusRegister.Load(mem);
@@ -230,13 +230,13 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         {
             get
             {
-                var xMem = new MemoryAddressSpace(pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.Timer, 1);
+                var xMem = new Kernel.MemoryAddressSpace(pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.Timer, 1);
                 return xMem.Read32(0);
             }
             set
             {
                 UInt32 address = pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.Timer;
-                var xMem = new MemoryAddressSpace(address, 1);
+                var xMem = new Kernel.MemoryAddressSpace(address, 1);
                 xMem.Write32(0, 0); //Resets timer
             }
         }
@@ -512,7 +512,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             //Each of the four Transmit Status Descriptors (TSD) has its own EarlyTxThreshold.
 
             UInt32 address = pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.RxEarlyCnt;
-            var xMem = new MemoryAddressSpace(address, 1);
+            var xMem = new Kernel.MemoryAddressSpace(address, 1);
             xMem.Write8(0, (byte)bytecount);
         }
 
@@ -531,7 +531,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
              * The address is stored in the Transmit Start Address which corresponds to the Transmit Status Descriptor we are currently using (0-3).
              */
 
-            var xMem = new MemoryAddressSpace(address, 1);
+            var xMem = new Kernel.MemoryAddressSpace(address, 1);
             xMem.Write32(0, GetMemoryAddress(ref bytearray));
         }
 

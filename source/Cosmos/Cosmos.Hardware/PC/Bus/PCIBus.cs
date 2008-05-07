@@ -106,12 +106,12 @@ namespace Cosmos.Hardware.PC.Bus
 
                 for (byte i = 0; i < xPCIDevice.NumberOfBaseAddresses(); i++)
                 {
-                    AddressSpace a = xPCIDevice.GetAddressSpace(i);
+                    Kernel.AddressSpace a = xPCIDevice.GetAddressSpace(i);
 
                     if (a != null)
                     {
                         System.Console.Write("register " + i + " @ " + ToHex(a.Offset, 8) + " (" + a.Size + "b) ");
-                        if (a is MemoryAddressSpace) {
+                        if (a is Kernel.MemoryAddressSpace) {
                             Console.WriteLine("mem");
                         } else {
                             Console.WriteLine("io");
@@ -399,7 +399,7 @@ namespace Cosmos.Hardware.PC.Bus
         {
             //Console.WriteLine("Checking AdressSpaces of PCI(" + Bus + ", " + Slot + ", " + Function + ")");
 
-            IOMaps = new AddressSpace[NumberOfBaseAddresses()];
+            IOMaps = new Kernel.AddressSpace[NumberOfBaseAddresses()];
 
             for (byte i = 0; i < NumberOfBaseAddresses(); i++)
             {
@@ -416,18 +416,18 @@ namespace Cosmos.Hardware.PC.Bus
                 }
                 else if ((address & PCI_BASE_ADDRESS_SPACE) == PCI_BASE_ADDRESS_SPACE_MEMORY)
                 {
-                    UInt32 size = ~(PCI_BASE_ADDRESS_MEM_MASK & flags)+1;                   
+                    UInt32 size = ~(PCI_BASE_ADDRESS_MEM_MASK & flags)+1;
 
-                    IOMaps[i] = new MemoryAddressSpace(address, size);
+                    IOMaps[i] = new Kernel.MemoryAddressSpace(address, size);
                     //Console.WriteLine("register " + i + " - " + size + "b mem");
 
                     NeedsIO = true;
                 }
                 else if ((address & PCI_BASE_ADDRESS_SPACE) == PCI_BASE_ADDRESS_SPACE_IO)
                 {
-                    UInt32 size = ~(PCI_BASE_ADDRESS_IO_MASK & flags) +1;                    
+                    UInt32 size = ~(PCI_BASE_ADDRESS_IO_MASK & flags) +1;
 
-                    IOMaps[i] = new IOAddressSpace(address, size);
+                    IOMaps[i] = new Kernel.IOAddressSpace(address, size);
                     //Console.WriteLine("register " + i + " - " + size + "b io");
 
                     NeedsMemory = true;
@@ -437,14 +437,14 @@ namespace Cosmos.Hardware.PC.Bus
             _NeedsLayingout = false;
         }
 
-        private AddressSpace[] IOMaps;
+        private Kernel.AddressSpace[] IOMaps;
 
         /// <summary>
         /// Gets the AddressSpace object assosiated with the device
         /// </summary>
         /// <param name="index">Address Space to return</param>
         /// <returns></returns>
-        public AddressSpace GetAddressSpace(byte index)
+        public Kernel.AddressSpace GetAddressSpace(byte index)
         {
             if (index < 0 || index >= NumberOfBaseAddresses())
                 throw new ArgumentOutOfRangeException("index");

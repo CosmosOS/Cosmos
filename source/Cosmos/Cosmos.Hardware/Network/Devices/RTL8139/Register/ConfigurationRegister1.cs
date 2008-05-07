@@ -11,13 +11,13 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
     {
         #region Constructor
 
-        private MemoryAddressSpace xMem;
-        public static ConfigurationRegister1 Load(MemoryAddressSpace aMem)
+        private Kernel.MemoryAddressSpace xMem;
+        public static ConfigurationRegister1 Load(Kernel.MemoryAddressSpace aMem)
         {
             return new ConfigurationRegister1(aMem);
         }
 
-        private ConfigurationRegister1(MemoryAddressSpace aMem)
+        private ConfigurationRegister1(Kernel.MemoryAddressSpace aMem)
         {
             xMem = aMem;
         }

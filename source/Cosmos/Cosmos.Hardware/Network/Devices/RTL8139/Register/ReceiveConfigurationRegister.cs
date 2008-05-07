@@ -14,14 +14,14 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
     /// </summary>
     public class ReceiveConfigurationRegister
     {
-        private MemoryAddressSpace xMem;
+        private Kernel.MemoryAddressSpace xMem;
 
-        public static ReceiveConfigurationRegister Load(MemoryAddressSpace aMem)
+        public static ReceiveConfigurationRegister Load(Kernel.MemoryAddressSpace aMem)
         {
             return new ReceiveConfigurationRegister(aMem);
         }
-        
-        private ReceiveConfigurationRegister(MemoryAddressSpace aMem)
+
+        private ReceiveConfigurationRegister(Kernel.MemoryAddressSpace aMem)
         {
             xMem = aMem;
         }

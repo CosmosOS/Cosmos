@@ -79,7 +79,6 @@
     <Compile Include="Network\TCPIPModel\PhysicalLayer\Ethernet2\Ethernet2Frame.cs" />
     <Compile Include="Network\TCPIPModel\TransportLayer\UDP\UDPPacket.cs" />
     <Compile Include="Storage\ATA\ATA.cs" />
-    <Compile Include="PC\Bus\AddressSpace.cs" />
     <Compile Include="PC\Bus\Keyboard.cs" />
     <Compile Include="PC\Bus\PIC.cs" />
     <Compile Include="PC\Bus\PCIBus.cs" />

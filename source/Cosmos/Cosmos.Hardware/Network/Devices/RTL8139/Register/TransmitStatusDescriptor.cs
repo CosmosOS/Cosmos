@@ -17,14 +17,14 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
     {
         #region Constructor
 
-        private MemoryAddressSpace xMem;
- 
-        public static TransmitStatusDescriptor Load(MemoryAddressSpace aMem)
+        private Kernel.MemoryAddressSpace xMem;
+
+        public static TransmitStatusDescriptor Load(Kernel.MemoryAddressSpace aMem)
         {
             return new TransmitStatusDescriptor(aMem);
         }
 
-        private TransmitStatusDescriptor(MemoryAddressSpace aMem)
+        private TransmitStatusDescriptor(Kernel.MemoryAddressSpace aMem)
         {
             xMem = aMem;
         }

@@ -10,14 +10,14 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
     public class MediaStatusRegister
     {
         #region Constructor
-        
-        private MemoryAddressSpace xMem;
-        public static MediaStatusRegister Load(MemoryAddressSpace aMem)
+
+        private Kernel.MemoryAddressSpace xMem;
+        public static MediaStatusRegister Load(Kernel.MemoryAddressSpace aMem)
         {
             return new MediaStatusRegister(aMem);
         }
 
-        private MediaStatusRegister(MemoryAddressSpace aMem)
+        private MediaStatusRegister(Kernel.MemoryAddressSpace aMem)
         {
             xMem = aMem;
         }

@@ -15,14 +15,14 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
     /// </summary>
     public class TransmitConfigurationRegister
     {
-        private MemoryAddressSpace xMem;
+        private Kernel.MemoryAddressSpace xMem;
 
-        private TransmitConfigurationRegister(MemoryAddressSpace aMem)
+        private TransmitConfigurationRegister(Kernel.MemoryAddressSpace aMem)
         {
             xMem = aMem;
         }
 
-        public static TransmitConfigurationRegister Load(MemoryAddressSpace aMem)
+        public static TransmitConfigurationRegister Load(Kernel.MemoryAddressSpace aMem)
         {
             return new TransmitConfigurationRegister(aMem);
         }

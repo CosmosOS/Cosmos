@@ -17,13 +17,13 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
 
         #region Constructor
 
-        private MemoryAddressSpace xMem;
-        public static InterruptStatusRegister Load(MemoryAddressSpace aMem)
+        private Kernel.MemoryAddressSpace xMem;
+        public static InterruptStatusRegister Load(Kernel.MemoryAddressSpace aMem)
         {
             return new InterruptStatusRegister(aMem);
         }
 
-        private InterruptStatusRegister(MemoryAddressSpace aMem)
+        private InterruptStatusRegister(Kernel.MemoryAddressSpace aMem)
         {
             xMem = aMem;
         }

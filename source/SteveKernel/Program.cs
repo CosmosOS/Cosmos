@@ -31,7 +31,7 @@ namespace SteveKernel
             if (rtlpci != null)
                 Console.WriteLine("got rtl pci");
 
-            MemoryAddressSpace mas = rtlpci.GetAddressSpace(1) as MemoryAddressSpace;
+            Cosmos.Kernel.MemoryAddressSpace mas = rtlpci.GetAddressSpace(1) as Cosmos.Kernel.MemoryAddressSpace;
             if (mas != null)
                 Console.WriteLine("got mas");
             
