@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CPU.cs" />
+    <Compile Include="CPUBus.cs" />
     <Compile Include="Global.cs" />
   </ItemGroup>
   <ItemGroup>

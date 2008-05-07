@@ -4,7 +4,7 @@ using System.Text;
 using Indy.IL2CPU.Plugs;
 
 namespace Cosmos.Kernel.Plugs.Hardware.PC.Bus {
-    [Plug(Target = typeof(Cosmos.Hardware.PC.Bus.CPUBus))]
+    [Plug(Target = typeof(Cosmos.Kernel.CPUBus))]
     class CPUBus {
 		[PlugMethod(MethodAssembler = typeof(Assemblers.IOWrite8))]
         public static void Write8(UInt16 aPort, byte aData) { }
