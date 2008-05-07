@@ -98,7 +98,6 @@
     <Compile Include="Old\Storage\ATA.cs" />
     <Compile Include="Old\Storage\ATAOld.cs" />
     <Compile Include="Old\Storage\Storage.cs" />
-    <Compile Include="Bus\USBBus.cs" />
     <Compile Include="SerialDevice.cs" />
     <Compile Include="TextScreen-Old.cs" />
   </ItemGroup>
