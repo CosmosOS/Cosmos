@@ -43,8 +43,6 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Debug.cs" />
@@ -53,10 +51,6 @@
     <Compile Include="TextScreen-Old.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Cosmos.Kernel.FileSystems\Cosmos.FileSystem.csproj">
-      <Project>{5C293BB9-FB42-495E-AAD9-D15888631CA4}</Project>
-      <Name>Cosmos.FileSystem</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Indy.IL2CPU.Plugs\Indy.IL2CPU.Plugs.csproj">
       <Project>{E9B2E8CC-E264-42F9-9113-16B0A0431198}</Project>
       <Name>Indy.IL2CPU.Plugs</Name>
