@@ -34,11 +34,7 @@ namespace Indy.IL2CPU.IL.X86 {
         public static void AssembleFooter(int aReturnSize, Assembler.Assembler aAssembler, MethodInformation.Variable[] aLocals, MethodInformation.Argument[] aArgs, int aTotalArgsSize, bool aDebugMode, bool aIsNonDebuggable)
         {
 			new Label(EndOfMethodLabelNameNormal);
-            if (aDebugMode && !aIsNonDebuggable)
-            {
-                new CPUx86.Call("DebugPoint_DebugSuspend");
-            }
-			new CPUx86.Move("ecx", "0");
+            new CPUx86.Move("ecx", "0");
 			if (aReturnSize > 0) {
 				if (aReturnSize > 8) {
 					throw new Exception("ReturnValue sizes larger than 8 not supported yet");
@@ -53,6 +49,10 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			new CPUx86.Jump(EndOfMethodLabelNameException);
 			new Label(EndOfMethodLabelNameException);
+            if (aDebugMode && aIsNonDebuggable)
+            {
+                new CPUx86.Call("DebugPoint_DebugResume");
+            }
 			if (!aAssembler.InMetalMode) {
 				if (aReturnSize > 0) {
 					new CPUx86.Push("eax");

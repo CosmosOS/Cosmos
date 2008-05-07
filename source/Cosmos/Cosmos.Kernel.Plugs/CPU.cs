@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Indy.IL2CPU.Assembler.X86;
 using Indy.IL2CPU.Plugs;
 using HW = Cosmos.Hardware;
 
@@ -57,4 +58,25 @@ namespace Cosmos.Kernel.Plugs {
 		public static void DoTest() {
 		}
 	}
+
+    [Plug(TargetName = "MatthijsTest.Program, MatthijsTest")]
+    public class TestPlug
+    {
+        [PlugMethod(MethodAssembler = typeof(GetResumeAndResumeAssembler))]
+        public static void GetResumeAndResume(ref uint aSuspend)
+        {
+            aSuspend = 0;
+        }
+    }
+
+    public class GetResumeAndResumeAssembler : AssemblerMethod
+    {
+        public override void Assemble(Indy.IL2CPU.Assembler.Assembler aAssembler)
+        {
+            new Move("eax",
+                     "[ebp + 8]");
+            new Move("ebx", "[DebugSuspendLevel]");
+            new Move("[eax]", "ebx");
+        }
+    }
 }

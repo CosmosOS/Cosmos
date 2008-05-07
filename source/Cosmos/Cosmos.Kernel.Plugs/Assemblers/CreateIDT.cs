@@ -84,11 +84,6 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 
             #endregion
 
-            aAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>("main",
-                                                                            new DataMember("InterruptsEnabledFlag",
-                                                                                           "dd",
-                                                                                           "0")));
-
             new CPUx86.Move(Registers.EAX,
                             "_NATIVE_IDT_Pointer");
             new Label(".RegisterIDT");

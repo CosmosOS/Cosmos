@@ -96,13 +96,13 @@ namespace Indy.IL2CPU.Assembler.X86 {
 
         protected void DebugSuspend() {
             Label = "DebugPoint_DebugSuspend";
-            //Memory["DebugSuspendLevel", 32]++;
+            Memory["DebugSuspendLevel", 32]++;
             Return();
         }
 
         protected void DebugResume() {
             Label = "DebugPoint_DebugResume";
-            //Memory["DebugSuspendLevel", 32]--;
+            Memory["DebugSuspendLevel", 32]--;
             Return();
         }
 

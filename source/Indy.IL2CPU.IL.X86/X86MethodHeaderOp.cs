@@ -47,7 +47,7 @@ namespace Indy.IL2CPU.IL.X86 {
 					new CPUx86.Pushd("0");
 				}
 			}
-			if(aDebugMode&&!aIsNonDebuggable) {
+			if(aDebugMode&& aIsNonDebuggable) {
 			    new CPUx86.Call("DebugPoint_DebugSuspend");
 			}
 		}
