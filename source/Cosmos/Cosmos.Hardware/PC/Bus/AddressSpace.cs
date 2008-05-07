@@ -3,17 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Cosmos.Hardware.PC.Bus
-{
-    public abstract class AddressSpace
-    {
+namespace Cosmos.Hardware.PC.Bus {
+    public abstract class AddressSpace {
         public UInt32 Offset;
         public UInt32 Size;
 
-        public AddressSpace(UInt32 offset, UInt32 size)
-        {
-            this.Offset = offset;
-            this.Size = size;
+        public AddressSpace(UInt32 offset, UInt32 size) {
+            Offset = offset;
+            Size = size;
         }
 
         /// <summary>
@@ -103,14 +100,12 @@ namespace Cosmos.Hardware.PC.Bus
 
     public unsafe class MemoryAddressSpace : AddressSpace
     {
-        public MemoryAddressSpace(UInt32 offset, UInt32 size)
-            : base(offset, size)
-        {
-        }
+        public MemoryAddressSpace(UInt32 offset, UInt32 size) : base(offset, size)
+        {   }
 
         public override byte Read8(UInt32 offset)
         {
-            if (offset < 0 || offset > Size)
+            if (offset > Size)
                 throw new ArgumentOutOfRangeException("offset");
             return *(byte*)(this.Offset + offset);
         }

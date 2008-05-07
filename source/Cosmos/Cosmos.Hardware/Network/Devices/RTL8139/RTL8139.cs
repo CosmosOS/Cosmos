@@ -230,12 +230,14 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         {
             get
             {
-                return IOSpace.Read32(pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.Timer);
+                var xMem = new MemoryAddressSpace(pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.Timer, 1);
+                return xMem.Read32(0);
             }
             set
             {
                 UInt32 address = pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.Timer;
-                IOSpace.Write32(address, 0x00); //Resets timer
+                var xMem = new MemoryAddressSpace(address, 1);
+                xMem.Write32(0, 0); //Resets timer
             }
         }
 
@@ -510,7 +512,8 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             //Each of the four Transmit Status Descriptors (TSD) has its own EarlyTxThreshold.
 
             UInt32 address = pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.RxEarlyCnt;
-            IOSpace.Write8(address, (byte)bytecount);
+            var xMem = new MemoryAddressSpace(address, 1);
+            xMem.Write8(0, (byte)bytecount);
         }
 
         /// <summary>
