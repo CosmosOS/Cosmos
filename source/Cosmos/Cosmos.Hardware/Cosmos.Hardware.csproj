@@ -87,7 +87,6 @@
     <Compile Include="PC\Bus\CPU\PIC.cs" />
     <Compile Include="PC\Bus\PCIBus.cs" />
     <Compile Include="PC\DebugUtil.cs" />
-    <Compile Include="PC\Global.cs" />
     <Compile Include="PC\Interrupts.cs" />
     <Compile Include="TempDictionary.cs" />
     <Compile Include="Global.cs" />

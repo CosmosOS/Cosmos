@@ -24,7 +24,7 @@ namespace Cosmos.Sys {
             // init methods are a bit more work than Delphi's. :)
 			// MTW: you could use partial methods for this, but then you dont
 			// have control of the order in which the individual methods are called..
-            Cosmos.Hardware.PC.Global.Init();
+            Hardware.Global.Init();
             Console.Clear();
         }
     }
