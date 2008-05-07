@@ -181,64 +181,64 @@ namespace Cosmos.Hardware.PC.Bus {
         {
             if (offset < 0 || offset > Size)
                 throw new ArgumentOutOfRangeException("offset");
-            return CPUBus.Read8((UInt16)(this.Offset + offset));
+            return Kernel.CPUBus.Read8((UInt16)(this.Offset + offset));
         }
         public override UInt16 Read16(UInt32 offset)
         {
             if (offset < 0 || offset > Size)
                 throw new ArgumentOutOfRangeException("offset");
-            return CPUBus.Read16((UInt16)(this.Offset + offset));
+            return Kernel.CPUBus.Read16((UInt16)(this.Offset + offset));
         }
         public override UInt32 Read32(UInt32 offset)
         {
             if (offset < 0 || offset > Size)
                 throw new ArgumentOutOfRangeException("offset");
-            return CPUBus.Read32((UInt16)(this.Offset + offset));
+            return Kernel.CPUBus.Read32((UInt16)(this.Offset + offset));
         }
 
         public override byte Read8Unchecked(UInt32 offset)
         {
-            return CPUBus.Read8((UInt16)(this.Offset + offset));
+            return Kernel.CPUBus.Read8((UInt16)(this.Offset + offset));
         }
         public override UInt16 Read16Unchecked(UInt32 offset)
         {
-            return CPUBus.Read16((UInt16)(this.Offset + offset));
+            return Kernel.CPUBus.Read16((UInt16)(this.Offset + offset));
         }
         public override UInt32 Read32Unchecked(UInt32 offset)
         {
-            return CPUBus.Read32((UInt16)(this.Offset + offset));
+            return Kernel.CPUBus.Read32((UInt16)(this.Offset + offset));
         }
 
         public override void Write8(UInt32 offset, byte value)
         {
             if (offset < 0 || offset > Size)
                 throw new ArgumentOutOfRangeException("offset");
-            CPUBus.Write8((UInt16)(this.Offset + offset), value);
+            Kernel.CPUBus.Write8((UInt16)(this.Offset + offset), value);
         }
         public override void Write16(UInt32 offset, UInt16 value)
         {
             if (offset < 0 || offset > Size)
                 throw new ArgumentOutOfRangeException("offset");
-            CPUBus.Write16((UInt16)(this.Offset + offset), value);
+            Kernel.CPUBus.Write16((UInt16)(this.Offset + offset), value);
         }
         public override void Write32(UInt32 offset, UInt32 value)
         {
             if (offset < 0 || offset > Size)
                 throw new ArgumentOutOfRangeException("offset");
-            CPUBus.Write32((UInt16)(this.Offset + offset), value);
+            Kernel.CPUBus.Write32((UInt16)(this.Offset + offset), value);
         }
 
         public override void Write8Unchecked(UInt32 offset, byte value)
         {
-            CPUBus.Write8((UInt16)(this.Offset + offset), value);
+            Kernel.CPUBus.Write8((UInt16)(this.Offset + offset), value);
         }
         public override void Write16Unchecked(UInt32 offset, UInt16 value)
         {
-            CPUBus.Write16((UInt16)(this.Offset + offset), value);
+            Kernel.CPUBus.Write16((UInt16)(this.Offset + offset), value);
         }
         public override void Write32Unchecked(UInt32 offset, UInt32 value)
         {
-            CPUBus.Write32((UInt16)(this.Offset + offset), value);
+            Kernel.CPUBus.Write32((UInt16)(this.Offset + offset), value);
         }
     }
 }

@@ -10,7 +10,7 @@ namespace Cosmos.Hardware.PC.Bus.CPU {
         }
 
         public void InterruptReceived() {
-            byte xByte = PC.Bus.CPUBus.Read8(0x60);
+            byte xByte = Kernel.CPUBus.Read8(0x60);
             ByteReceived(xByte);
         }
 		public override string Name {

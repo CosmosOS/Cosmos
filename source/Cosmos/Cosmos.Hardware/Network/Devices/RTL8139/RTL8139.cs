@@ -531,7 +531,8 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
              * The address is stored in the Transmit Start Address which corresponds to the Transmit Status Descriptor we are currently using (0-3).
              */
 
-            IOSpace.Write32(address, GetMemoryAddress(ref bytearray));
+            var xMem = new MemoryAddressSpace(address, 1);
+            xMem.Write32(0, GetMemoryAddress(ref bytearray));
         }
 
         /// <summary>

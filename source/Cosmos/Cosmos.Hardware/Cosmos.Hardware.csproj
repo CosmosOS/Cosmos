@@ -52,7 +52,6 @@
   <ItemGroup>
     <Compile Include="BlockDevice.cs" />
     <Compile Include="Bus\Bus.cs" />
-    <Compile Include="Bus\CPUBus.cs" />
     <Compile Include="Device.cs" />
     <Compile Include="Extension\NumberSystem\Binary.cs" />
     <Compile Include="Extension\NumberSystem\Hex.cs" />
@@ -81,9 +80,8 @@
     <Compile Include="Network\TCPIPModel\TransportLayer\UDP\UDPPacket.cs" />
     <Compile Include="Storage\ATA\ATA.cs" />
     <Compile Include="PC\Bus\AddressSpace.cs" />
-    <Compile Include="PC\Bus\CPUBus.cs" />
-    <Compile Include="PC\Bus\CPU\Keyboard.cs" />
-    <Compile Include="PC\Bus\CPU\PIC.cs" />
+    <Compile Include="PC\Bus\Keyboard.cs" />
+    <Compile Include="PC\Bus\PIC.cs" />
     <Compile Include="PC\Bus\PCIBus.cs" />
     <Compile Include="PC\DebugUtil.cs" />
     <Compile Include="PC\Interrupts.cs" />

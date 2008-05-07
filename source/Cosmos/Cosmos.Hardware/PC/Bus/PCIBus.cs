@@ -587,38 +587,38 @@ namespace Cosmos.Hardware.PC.Bus
 
         protected UInt32 Read32(byte aRegister)
         {
-            CPUBus.Write32(ConfigAddr, GetAddress(aRegister));
-            return CPUBus.Read32(ConfigData);
+            Kernel.CPUBus.Write32(ConfigAddr, GetAddress(aRegister));
+            return Kernel.CPUBus.Read32(ConfigData);
         }
 
         protected UInt16 Read16(byte aRegister)
         {
-            CPUBus.Write32(ConfigAddr, GetAddress(aRegister));
-            return CPUBus.Read16(ConfigData);
+            Kernel.CPUBus.Write32(ConfigAddr, GetAddress(aRegister));
+            return Kernel.CPUBus.Read16(ConfigData);
         }
 
         protected byte Read8(byte aRegister)
         {
-            CPUBus.Write32(ConfigAddr, GetAddress(aRegister));
-            return CPUBus.Read8(ConfigData);
+            Kernel.CPUBus.Write32(ConfigAddr, GetAddress(aRegister));
+            return Kernel.CPUBus.Read8(ConfigData);
         }
 
         protected void Write32(byte aRegister, UInt32 value)
         {
-            CPUBus.Write32(ConfigAddr, GetAddress(aRegister));
-            CPUBus.Write32(ConfigData, value);
+            Kernel.CPUBus.Write32(ConfigAddr, GetAddress(aRegister));
+            Kernel.CPUBus.Write32(ConfigData, value);
         }
 
         protected void Write16(byte aRegister, UInt16 value)
         {
-            CPUBus.Write32(ConfigAddr, GetAddress(aRegister));
-            CPUBus.Write16(ConfigData, value);
+            Kernel.CPUBus.Write32(ConfigAddr, GetAddress(aRegister));
+            Kernel.CPUBus.Write16(ConfigData, value);
         }
 
         protected void Write8(byte aRegister, byte value)
         {
-            CPUBus.Write32(ConfigAddr, GetAddress(aRegister));
-            CPUBus.Write8(ConfigData, value);
+            Kernel.CPUBus.Write32(ConfigAddr, GetAddress(aRegister));
+            Kernel.CPUBus.Write8(ConfigData, value);
         } 
     }
 }
