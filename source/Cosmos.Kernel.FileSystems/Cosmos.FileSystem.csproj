@@ -27,6 +27,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -46,6 +47,17 @@
     <Compile Include="FileSystem.cs" />
     <Compile Include="ext2\ext2FS.cs" />
     <Compile Include="MBT.cs" />
+    <Compile Include="Old\Ext2.cs" />
+    <Compile Include="Old\Ext2.Structs.cs" />
+    <Compile Include="Old\Ext2Old.cs" />
+    <Compile Include="Old\Ext2Old.Structs.cs" />
+    <Compile Include="Old\Fat16.cs" />
+    <Compile Include="Old\File.cs" />
+    <Compile Include="Old\FileSystem.cs" />
+    <Compile Include="Old\FileSystem2.cs" />
+    <Compile Include="Old\ISO9660.cs" />
+    <Compile Include="Old\Path.cs" />
+    <Compile Include="Old\TestsMatthijs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

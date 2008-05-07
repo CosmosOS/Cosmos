@@ -24,8 +24,9 @@ namespace Cosmos.Kernel.FileSystem {
 		}
 
 		public static unsafe void PrintAllFilesAndDirectories(byte aController, byte aDrive) {
-			ushort* xBuffer = (ushort*)Heap.MemAlloc(512);
-			if (!Hardware.Storage.ATAOld.ReadDataNew(aController, aDrive, 2, xBuffer)) {
+            //ushort* xBuffer = (ushort*)Heap.MemAlloc(512);
+            ushort* xBuffer = null;
+            if (!Hardware.Storage.ATAOld.ReadDataNew(aController, aDrive, 2, xBuffer)) {
 				Console.WriteLine("[Ext2|SuperBlock] Error while reading SuperBlock data");
 				return;
 			}
@@ -82,7 +83,7 @@ namespace Cosmos.Kernel.FileSystem {
 									xName[c] = (char)xNamePtr[c];
 								}
 								string s = new String(xName);
-								DebugUtil.SendMessage("Ext2, DirectoryEntryName", s);
+//								DebugUtil.SendMessage("Ext2, DirectoryEntryName", s);
 								//}
 								xPtrAddress += xEntryPtr->RecordLength;
 								xTotalSize -= xEntryPtr->RecordLength;
@@ -94,12 +95,13 @@ namespace Cosmos.Kernel.FileSystem {
 				}
 			}
 
-			DebugUtil.SendNumber("Ext2", "Used INode count", xCount, 32);
+//			DebugUtil.SendNumber("Ext2", "Used INode count", xCount, 32);
 		}
 
 		public static unsafe byte[] ReadFile(byte aController, byte aDrive, string[] xPath) {
-			ushort* xBuffer = (ushort*)Heap.MemAlloc(512);
-			if (!Hardware.Storage.ATAOld.ReadDataNew(aController, aDrive, 2, xBuffer)) {
+            //ushort* xBuffer = (ushort*)Heap.MemAlloc(512);
+            ushort* xBuffer = null;
+            if (!Hardware.Storage.ATAOld.ReadDataNew(aController, aDrive, 2, xBuffer)) {
 				Console.WriteLine("[Ext2|SuperBlock] Error while reading SuperBlock data");
 				return null;
 			}
@@ -135,7 +137,7 @@ namespace Cosmos.Kernel.FileSystem {
 				Hardware.Storage.ATAOld.WriteNumber(xCurrentINode, 32);
 				Console.WriteLine("");
 
-				DebugUtil.SendNumber("Ext2", "Current INode", xCurrentINode, 32);
+//				DebugUtil.SendNumber("Ext2", "Current INode", xCurrentINode, 32);
 				for (uint g = 0; g < xGroupDescriptors.Length; g++) {
 					GroupDescriptor xGroupDescriptor = xGroupDescriptors[g];
 					if (!Hardware.Storage.ATAOld.ReadDataNew(aController, aDrive, (int)((xGroupDescriptor.INodeBitmap) * 8), xBuffer)) {

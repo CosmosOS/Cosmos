@@ -47,15 +47,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Old\Debug.cs" />
-    <Compile Include="Old\FileSystem\Ext2.cs" />
-    <Compile Include="Old\FileSystem\Ext2Old.cs" />
-    <Compile Include="Old\FileSystem\Ext2Old.Structs.cs" />
-    <Compile Include="Old\FileSystem\FileSystem.cs" />
-    <Compile Include="Old\FileSystem\ISO9660.cs" />
+    <Compile Include="Debug.cs" />
     <Compile Include="Heap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Old\TextScreen-Old.cs" />
+    <Compile Include="TextScreen-Old.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Cosmos.Kernel.FileSystems\Cosmos.FileSystem.csproj">
@@ -74,12 +69,6 @@
   <ItemGroup>
     <Compile Include="Boot.cs" />
     <Compile Include="Global.cs" />
-    <Compile Include="Old\FileSystem\Ext2.Structs.cs" />
-    <Compile Include="Old\FileSystem\Fat16.cs" />
-    <Compile Include="Old\FileSystem\File.cs" />
-    <Compile Include="Old\FileSystem\FileSystem2.cs" />
-    <Compile Include="Old\FileSystem\Path.cs" />
-    <Compile Include="Old\FileSystem\TestsMatthijs.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Cosmos.snk" />
