@@ -59,7 +59,7 @@ namespace Cosmos.Kernel {
 			DebugUtil.SendMM_Init(mStartAddress, mLength);
 		}
 		private static bool mInited;
-		public static void CheckInit() {
+		public static void Init() {
 			if (!mInited) {
 				mInited = true;
 				Initialize(CPU.EndOfKernel, (CPU.AmountOfMemory * 1024 * 1024) - 1024);
@@ -67,7 +67,7 @@ namespace Cosmos.Kernel {
 		}
 
 		public static uint MemAlloc(uint aLength) {
-			CheckInit();
+			Init();
 			uint xTemp = mStartAddress;
 			if ((xTemp + aLength) > (mStart + mLength)) {
 				Console.WriteLine("Too large memory block allocated!");
