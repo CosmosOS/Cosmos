@@ -11,14 +11,19 @@ namespace Cosmos.Kernel {
         /// Gets the amount of RAM in MB's.
         /// </summary>
         /// <returns></returns>
+        // Plugged
         protected static uint GetAmountOfRAM() {
             return 0;
         }
 
+        // Plugged
         protected static uint GetEndOfKernel() {
             return 0;
         }
-        
+
+        // Plugged
+        public static void CreateGDT() { }
+
         public static uint AmountOfMemory {
 			get {
 				return GetAmountOfRAM();
@@ -31,17 +36,21 @@ namespace Cosmos.Kernel {
 			}
 		}
 
-		public static void ZeroFill(uint aStartAddress, uint aLength) {
+        // Plugged
+        public static void ZeroFill(uint aStartAddress, uint aLength) {
 		}
 
-		public static uint GetCurrentESP() {
+        // Plugged
+        public static uint GetCurrentESP() {
 			return 0;
 		}
 
-		public static uint GetEndOfStack() {
+        // Plugged
+        public static uint GetEndOfStack() {
 			return 0;
 		}
 
+        // Plugged
 		public static void DoTest() {
 		}
 	}

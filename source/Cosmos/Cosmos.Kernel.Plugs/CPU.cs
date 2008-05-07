@@ -11,6 +11,9 @@ namespace Cosmos.Kernel.Plugs {
 		public static void CreateIDT() {
 		}
 
+        [PlugMethod(MethodAssembler = typeof(Assemblers.CreateGDT))]
+        public static void CreateGDT() { }
+
         [PlugMethod(MethodAssembler = typeof(Assemblers.GetAmountOfRAM))]
         public static uint GetAmountOfRAM() {
             return 0;

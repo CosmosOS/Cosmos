@@ -7,7 +7,7 @@ using HW = Cosmos.Hardware;
 namespace Cosmos.Hardware.PC {
     public class Global : Cosmos.Hardware.Global {
         public static void Init(bool noATA, bool noATAOld, bool noATA2) {
-            mProcessor = new Processor();
+            Kernel.CPU.CreateGDT();
             Bus.CPU.PIC.Init(); 
 
             //All old.. need to port ----------------
