@@ -22,7 +22,7 @@ namespace SteveKernel
         {
             Console.WriteLine("Done booting");
 
-			Cosmos.Kernel.Boot.Default();
+			Cosmos.Sys.Boot.Default();
             System.Diagnostics.Debugger.Break();
             Cosmos.Hardware.PC.Bus.PCIBus.DebugLSPCI();
             

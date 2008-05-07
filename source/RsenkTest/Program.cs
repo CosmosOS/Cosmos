@@ -19,7 +19,7 @@ namespace RsenkTest
         {
             try
             {
-                Cosmos.Kernel.Boot.Default();
+                Cosmos.Sys.Boot.Default();
                 System.Console.WriteLine("                                      [ done ]");
 
                 System.Console.WriteLine("Queueing Shell");

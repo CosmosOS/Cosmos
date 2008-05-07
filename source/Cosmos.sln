@@ -79,7 +79,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kudzu-SourceView", "Boot\Pl
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kudzu", "Kudzu", "{9AB7CE5D-C1E5-49AD-9CCB-53863FBCDFAF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.System", "Cosmos\Cosmos.System\Cosmos.System.csproj", "{819DB8FC-5DA1-461F-83C9-2F5C88088C94}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Sys", "Cosmos\Cosmos.System\Cosmos.Sys.csproj", "{819DB8FC-5DA1-461F-83C9-2F5C88088C94}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
@@ -207,7 +207,7 @@ Global
 		SccProjectTopLevelParentUniqueName30 = Cosmos.sln
 		SccProjectName30 = Boot/Playgrounds/Kudzu-SourceView
 		SccLocalPath30 = Boot\\Playgrounds\\Kudzu-SourceView
-		SccProjectUniqueName31 = Cosmos\\Cosmos.System\\Cosmos.System.csproj
+		SccProjectUniqueName31 = Cosmos\\Cosmos.System\\Cosmos.Sys.csproj
 		SccProjectTopLevelParentUniqueName31 = Cosmos.sln
 		SccProjectName31 = Cosmos/Cosmos.System
 		SccLocalPath31 = Cosmos\\Cosmos.System

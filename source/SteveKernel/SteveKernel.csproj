@@ -53,6 +53,10 @@
       <Project>{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}</Project>
       <Name>Cosmos.Hardware</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Cosmos\Cosmos.System\Cosmos.Sys.csproj">
+      <Project>{819DB8FC-5DA1-461F-83C9-2F5C88088C94}</Project>
+      <Name>Cosmos.Sys</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

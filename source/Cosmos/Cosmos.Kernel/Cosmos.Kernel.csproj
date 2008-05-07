@@ -67,7 +67,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Boot.cs" />
     <Compile Include="Global.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Cosmos.FileSystem;
 
-namespace Cosmos.Kernel {
+namespace Cosmos.Sys {
 
     /// <summary>
     /// Boot configurations for Cosmos.
@@ -18,7 +17,7 @@ namespace Cosmos.Kernel {
         /// </summary>
         public static void Default() {
             //Init Heap first - Hardware loads devices and they need heap
-			Heap.CheckInit();
+			Cosmos.Kernel.Heap.CheckInit();
             
             // This should be the ONLY reference to the specific assembly
             // Later I would like to make this auto loading, but .NET's
@@ -26,7 +25,6 @@ namespace Cosmos.Kernel {
 			// MTW: you could use partial methods for this, but then you dont
 			// have control of the order in which the individual methods are called..
             Cosmos.Hardware.PC.Global.Init();
-			MBT.Init();
             Console.Clear();
         }
     }

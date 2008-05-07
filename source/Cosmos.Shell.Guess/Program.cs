@@ -15,7 +15,7 @@ namespace Cosmos.Shell.Guess {
 		#endregion
 
 		public static void Init() {
-			Kernel.Boot.Default();
+			Cosmos.Sys.Boot.Default();
 
 			Random mt = new Random();
 			int num = mt.Next();

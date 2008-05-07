@@ -24,13 +24,13 @@ namespace Cosmos.Shell.Console {
         // Write your code, and run. Cosmos build console will appear, select your target, and thats it!
         public static void Init() {
 			try {
-				Cosmos.Kernel.Boot.Default();
+				Cosmos.Sys.Boot.Default();
 				//stages.Enqueue(new Prompter());
 
 			} catch (Exception E) {
-				System.Console.WriteLine("Error occurred:");
-				System.Console.Write("    ");
-				System.Console.WriteLine(E.Message);
+                System.Console.WriteLine("Error occurred:");
+                System.Console.Write("    ");
+                System.Console.WriteLine(E.Message);
 			}
 			MyClass x = new MyClass();
 			x.Bladibla();

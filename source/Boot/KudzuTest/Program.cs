@@ -48,7 +48,7 @@ namespace KudzuTest {
         //xNIC.TransmitRaw(xFrame.mData);
 
 		public static void Init() {
-            Cosmos.Kernel.Boot.Default();
+            Cosmos.Sys.Boot.Default();
 			//System.Diagnostics.Debugger.Break();
             Console.Clear();
             Console.WriteLine("Boot complete");
