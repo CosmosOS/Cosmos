@@ -21,6 +21,7 @@ namespace FrodeTest
             
             //Security.User currentUser = Security.User.Authenticate("frode", "secret");
             Shell.Session currentSession =  Shell.Session.CreateSession(null);
+            currentSession.Run();
 
             //Test
             //Debug.SortedListSearcher.RunTest();
