@@ -24,29 +24,8 @@ namespace Cosmos.Shell.Console.Commands
             {
                 DisplayVersion();
             }
-            else if (param.CompareTo("dev") == 0)
-            {
-                DisplayDevelopers();
-            }
             else
                 Help();
-        }
-
-        private void DisplayDevelopers()
-        {
-			Hardware.DebugUtil.SendMessage("Version", "Starting Developers list");
-			Hardware.DebugUtil.SendNumber("Version.Developers", "StackPointer", Hardware.CPU.GetCurrentESP(), 32);
-            System.Console.ForegroundColor = ConsoleColor.Red;
-            System.Console.WriteLine("Cosmos Developers");
-            System.Console.WriteLine("~~~~~~~~~~~~~~~~~");
-            System.Console.ForegroundColor = ConsoleColor.White;
-
-            System.Console.WriteLine("Chad Z. Hower");
-            System.Console.WriteLine("Matthijs ter Woord");
-            System.Console.WriteLine("Jonathan Dickinson");
-            System.Console.WriteLine("Scott Balmos");
-            System.Console.WriteLine("");
-			Hardware.DebugUtil.SendMessage("Version", "End of Developers list");
         }
 
         private void DisplayVersion()

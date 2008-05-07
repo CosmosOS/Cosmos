@@ -92,7 +92,6 @@
     <Compile Include="PC\Processor.cs" />
     <Compile Include="TempDictionary.cs" />
     <Compile Include="Global.cs" />
-    <Compile Include="Old\CPU.cs" />
     <Compile Include="Old\DebugUtil.cs" />
     <Compile Include="Old\Hardware.cs" />
     <Compile Include="Old\Keyboard.cs" />
@@ -108,9 +107,16 @@
     <Compile Include="Old\Storage\Storage.cs" />
     <Compile Include="Bus\USBBus.cs" />
     <Compile Include="SerialDevice.cs" />
+    <Compile Include="TextScreen-Old.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Cosmos.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Cosmos.Kernel\Cosmos.Kernel.csproj">
+      <Project>{A1F83D9F-2D44-4264-A08B-416797123018}</Project>
+      <Name>Cosmos.Kernel</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Network\TCPIPModel\DataLinkLayer\" />

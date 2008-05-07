@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Cosmos.Hardware;
 using Indy.IL2CPU.Plugs;
 
 namespace Cosmos.Kernel {
@@ -26,7 +25,7 @@ namespace Cosmos.Kernel {
 
 		private static void ClearMemory(uint aStartAddress, uint aLength) {
 			//int xStart = (RTC.GetMinutes() * 60) + RTC.GetSeconds();
-			Hardware.CPU.ZeroFill(aStartAddress, aLength);
+			CPU.ZeroFill(aStartAddress, aLength);
 			//int xEnd = (RTC.GetMinutes() * 60) + RTC.GetSeconds();
 			//int xDiff = xEnd - xStart;
 			//Console.Write("Time to clear ");
@@ -63,7 +62,7 @@ namespace Cosmos.Kernel {
 		public static void CheckInit() {
 			if (!mInited) {
 				mInited = true;
-				Initialize(Hardware.CPU.EndOfKernel, (Hardware.CPU.AmountOfMemory * 1024 * 1024) - 1024);
+				Initialize(CPU.EndOfKernel, (CPU.AmountOfMemory * 1024 * 1024) - 1024);
 			}
 		}
 
@@ -73,7 +72,7 @@ namespace Cosmos.Kernel {
 			if ((xTemp + aLength) > (mStart + mLength)) {
 				Console.WriteLine("Too large memory block allocated!");
 				Console.Write("   BlockSize = ");
-				Hardware.Storage.ATAOld.WriteNumber(aLength, 32);
+				//Hardware.Storage.ATAOld.WriteNumber(aLength, 32);
 				Console.WriteLine("");
 				System.Diagnostics.Debugger.Break();
 			}

@@ -30,7 +30,7 @@ namespace Cosmos.Hardware.PC {
                 HW.Storage.ATAOld.Initialize(Sleep);
             }
 			
-            HW.CPU.CreateIDT();
+            Cosmos.Kernel.CPU.CreateIDT();
             // end old -----------------
 
 			// MTW new

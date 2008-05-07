@@ -5,13 +5,23 @@ using Indy.IL2CPU.Plugs;
 using HW = Cosmos.Hardware;
 
 namespace Cosmos.Kernel.Plugs {
-    [Plug(Target = typeof(HW.CPU))]
+    [Plug(Target = typeof(Kernel.CPU))]
     public static class CPU {
 		[PlugMethod(MethodAssembler = typeof(Assemblers.CreateIDT))]
 		public static void CreateIDT() {
 		}
 
-		[PlugMethod(MethodAssembler = typeof(Assemblers.ZeroFill))]
+        [PlugMethod(MethodAssembler = typeof(Assemblers.GetAmountOfRAM))]
+        public static uint GetAmountOfRAM() {
+            return 0;
+        }
+
+        [PlugMethod(MethodAssembler = typeof(Assemblers.GetEndOfKernel))]
+        public static uint GetEndOfKernel() {
+            return 0;
+        }
+        
+        [PlugMethod(MethodAssembler = typeof(Assemblers.ZeroFill))]
 		// TODO: implement this using REP STOSB and REPO STOSD
 		public static unsafe void ZeroFill(uint aStartAddress, uint aLength) {
 			Console.Write("Clearing ");

@@ -2,12 +2,24 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Cosmos.Hardware {
-	public class CPU: Hardware {
+namespace Cosmos.Kernel {
+	public class CPU {
         // Plugged
         public static void CreateIDT() { }
 
-		public static uint AmountOfMemory {
+        /// <summary>
+        /// Gets the amount of RAM in MB's.
+        /// </summary>
+        /// <returns></returns>
+        protected static uint GetAmountOfRAM() {
+            return 0;
+        }
+
+        protected static uint GetEndOfKernel() {
+            return 0;
+        }
+        
+        public static uint AmountOfMemory {
 			get {
 				return GetAmountOfRAM();
 			}

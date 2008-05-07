@@ -2,150 +2,150 @@
 namespace Cosmos.Kernel {
 	public static class DebugUtil {
 		public static void Initialize() {
-			Hardware.DebugUtil.Initialize();
+			//Hardware.DebugUtil.Initialize();
 		}
 
 		private static void StartLogging() {
-			Hardware.DebugUtil.StartLogging();
+			//Hardware.DebugUtil.StartLogging();
 		}
 
 		private static void EndLogging() {
-			Hardware.DebugUtil.EndLogging();
+			//Hardware.DebugUtil.EndLogging();
 		}
 
 		public static void SendNumber(string aModule, string aDescription, uint aNumber, byte aBits) {
-			StartLogging();
-			Hardware.DebugUtil.WriteSerialString("<Number Module=\"");
-			Hardware.DebugUtil.WriteSerialString(aModule);
-			Hardware.DebugUtil.WriteSerialString("\" Description=\"");
-			Hardware.DebugUtil.WriteSerialString(aDescription);
-			Hardware.DebugUtil.WriteSerialString("\" Number=\"");
-			Hardware.DebugUtil.WriteNumber(aNumber, aBits);
-			Hardware.DebugUtil.WriteSerialString("\"/>\r\n");
-			EndLogging();
+            //StartLogging();
+            //Hardware.DebugUtil.WriteSerialString("<Number Module=\"");
+            //Hardware.DebugUtil.WriteSerialString(aModule);
+            //Hardware.DebugUtil.WriteSerialString("\" Description=\"");
+            //Hardware.DebugUtil.WriteSerialString(aDescription);
+            //Hardware.DebugUtil.WriteSerialString("\" Number=\"");
+            //Hardware.DebugUtil.WriteNumber(aNumber, aBits);
+            //Hardware.DebugUtil.WriteSerialString("\"/>\r\n");
+            //EndLogging();
 		}
 
 		public static void SendTestCase(string testcase) {
-			StartLogging();
-			Hardware.DebugUtil.WriteSerialString("<TestCase_Started Name=\"");
-			Hardware.DebugUtil.WriteSerialString(testcase);
-			Hardware.DebugUtil.WriteSerialString("\"/>\r\n");
-			EndLogging();
+            //StartLogging();
+            //Hardware.DebugUtil.WriteSerialString("<TestCase_Started Name=\"");
+            //Hardware.DebugUtil.WriteSerialString(testcase);
+            //Hardware.DebugUtil.WriteSerialString("\"/>\r\n");
+            //EndLogging();
 		}
 
 		public static void SendTestAssert(bool condition, string message) {
-			StartLogging();
-			Hardware.DebugUtil.WriteSerialString("<TestCase Message=\"");
-			Hardware.DebugUtil.WriteSerialString(message);
-			Hardware.DebugUtil.WriteSerialString("\" Success=\"");
+            //StartLogging();
+            //Hardware.DebugUtil.WriteSerialString("<TestCase Message=\"");
+            //Hardware.DebugUtil.WriteSerialString(message);
+            //Hardware.DebugUtil.WriteSerialString("\" Success=\"");
 
-			if (condition)
-				Hardware.DebugUtil.WriteSerialString("yes");
-			else
-				Hardware.DebugUtil.WriteSerialString("no");
+            //if (condition)
+            //    Hardware.DebugUtil.WriteSerialString("yes");
+            //else
+            //    Hardware.DebugUtil.WriteSerialString("no");
 
-			Hardware.DebugUtil.WriteSerialString("\"/>\r\n");
-			EndLogging();
+            //Hardware.DebugUtil.WriteSerialString("\"/>\r\n");
+            //EndLogging();
 		}
 
 		public static void SendDoubleNumber(string aModule, string aDescription, uint aNumber, byte aBits, uint aNumber2, byte aBits2) {
-			StartLogging();
-			Hardware.DebugUtil.WriteSerialString("<Number Module=\"");
-			Hardware.DebugUtil.WriteSerialString(aModule);
-			Hardware.DebugUtil.WriteSerialString("\" Description=\"");
-			Hardware.DebugUtil.WriteSerialString(aDescription);
-			Hardware.DebugUtil.WriteSerialString("\" Number1=\"");
-			Hardware.DebugUtil.WriteNumber(aNumber, aBits);
-			Hardware.DebugUtil.WriteSerialString("\" Number2=\"");
-			Hardware.DebugUtil.WriteNumber(aNumber2, aBits2);
-			Hardware.DebugUtil.WriteSerialString("\"/>\r\n");
-			EndLogging();
+            //StartLogging();
+            //Hardware.DebugUtil.WriteSerialString("<Number Module=\"");
+            //Hardware.DebugUtil.WriteSerialString(aModule);
+            //Hardware.DebugUtil.WriteSerialString("\" Description=\"");
+            //Hardware.DebugUtil.WriteSerialString(aDescription);
+            //Hardware.DebugUtil.WriteSerialString("\" Number1=\"");
+            //Hardware.DebugUtil.WriteNumber(aNumber, aBits);
+            //Hardware.DebugUtil.WriteSerialString("\" Number2=\"");
+            //Hardware.DebugUtil.WriteNumber(aNumber2, aBits2);
+            //Hardware.DebugUtil.WriteSerialString("\"/>\r\n");
+            //EndLogging();
 		}
 
 		public static void SendMessage(string aModule, string aData) {
-			StartLogging();
-			Hardware.DebugUtil.WriteSerialString("<Message Type=\"Info\" Module=\"");
-			Hardware.DebugUtil.WriteSerialString(aModule);
-			Hardware.DebugUtil.WriteSerialString("\" String=\"");
-			Hardware.DebugUtil.WriteSerialString(aData);
-			Hardware.DebugUtil.WriteSerialString("\"/>\r\n");
-			EndLogging();
+            //StartLogging();
+            //Hardware.DebugUtil.WriteSerialString("<Message Type=\"Info\" Module=\"");
+            //Hardware.DebugUtil.WriteSerialString(aModule);
+            //Hardware.DebugUtil.WriteSerialString("\" String=\"");
+            //Hardware.DebugUtil.WriteSerialString(aData);
+            //Hardware.DebugUtil.WriteSerialString("\"/>\r\n");
+            //EndLogging();
 		}
 
 		public static void SendKeyboardEvent(uint aScanCode, bool aReleased) {
-			StartLogging();
-			Hardware.DebugUtil.WriteSerialString("<KeyboardEvent ScanCode=\"");
-			Hardware.DebugUtil.WriteNumber(aScanCode, 32);
-			Hardware.DebugUtil.WriteSerialString("\" Released=\"");
-			if (aReleased) {
-				Hardware.DebugUtil.WriteSerialString("true");
-			} else {
-				Hardware.DebugUtil.WriteSerialString("false");
-			}
-			Hardware.DebugUtil.WriteSerialString("\"/>\r\n");
-			EndLogging();
+            //StartLogging();
+            //Hardware.DebugUtil.WriteSerialString("<KeyboardEvent ScanCode=\"");
+            //Hardware.DebugUtil.WriteNumber(aScanCode, 32);
+            //Hardware.DebugUtil.WriteSerialString("\" Released=\"");
+            //if (aReleased) {
+            //    Hardware.DebugUtil.WriteSerialString("true");
+            //} else {
+            //    Hardware.DebugUtil.WriteSerialString("false");
+            //}
+            //Hardware.DebugUtil.WriteSerialString("\"/>\r\n");
+            //EndLogging();
 		}
 
 		public static void SendError(string aModule, string aData) {
-			StartLogging();
-			Hardware.DebugUtil.WriteSerialString("<Error Module=\"");
-			Hardware.DebugUtil.WriteSerialString(aModule);
-			Hardware.DebugUtil.WriteSerialString("\" String=\"");
-			Hardware.DebugUtil.WriteSerialString(aData);
-			Hardware.DebugUtil.WriteSerialString("\"/>\r\n");
-			EndLogging();
+            //StartLogging();
+            //Hardware.DebugUtil.WriteSerialString("<Error Module=\"");
+            //Hardware.DebugUtil.WriteSerialString(aModule);
+            //Hardware.DebugUtil.WriteSerialString("\" String=\"");
+            //Hardware.DebugUtil.WriteSerialString(aData);
+            //Hardware.DebugUtil.WriteSerialString("\"/>\r\n");
+            //EndLogging();
 		}
 
 		public static void SendError(string aModule, string aDescription, uint aData, byte aBits) {
-			StartLogging();
-			Hardware.DebugUtil.WriteSerialString("<Error Module=\"");
-			Hardware.DebugUtil.WriteSerialString(aModule);
-			Hardware.DebugUtil.WriteSerialString("\" String=\"");
-			Hardware.DebugUtil.WriteSerialString(aDescription);
-			Hardware.DebugUtil.WriteSerialString("\" Data=\"");
-			Hardware.DebugUtil.WriteNumber(aData, aBits);
-			Hardware.DebugUtil.WriteSerialString("\"/>\r\n");
-			EndLogging();
+            //StartLogging();
+            //Hardware.DebugUtil.WriteSerialString("<Error Module=\"");
+            //Hardware.DebugUtil.WriteSerialString(aModule);
+            //Hardware.DebugUtil.WriteSerialString("\" String=\"");
+            //Hardware.DebugUtil.WriteSerialString(aDescription);
+            //Hardware.DebugUtil.WriteSerialString("\" Data=\"");
+            //Hardware.DebugUtil.WriteNumber(aData, aBits);
+            //Hardware.DebugUtil.WriteSerialString("\"/>\r\n");
+            //EndLogging();
 		}
 
 		public static void SendWarning(string aModule, string aData) {
-			StartLogging();
-			Hardware.DebugUtil.WriteSerialString("<Warning Module=\"");
-			Hardware.DebugUtil.WriteSerialString(aModule);
-			Hardware.DebugUtil.WriteSerialString("\" String=\"");
-			Hardware.DebugUtil.WriteSerialString(aData);
-			Hardware.DebugUtil.WriteSerialString("\"/>\r\n");
-			EndLogging();
+            //StartLogging();
+            //Hardware.DebugUtil.WriteSerialString("<Warning Module=\"");
+            //Hardware.DebugUtil.WriteSerialString(aModule);
+            //Hardware.DebugUtil.WriteSerialString("\" String=\"");
+            //Hardware.DebugUtil.WriteSerialString(aData);
+            //Hardware.DebugUtil.WriteSerialString("\"/>\r\n");
+            //EndLogging();
 		}
 
 		public static void SendMM_Alloc(uint aStartAddr, uint aLength) {
-			StartLogging();
-			Hardware.DebugUtil.WriteSerialString("<MM_Alloc StartAddr=\"");
-			Hardware.DebugUtil.WriteNumber(aStartAddr, 32);
-			Hardware.DebugUtil.WriteSerialString("\" Length=\"");
-			Hardware.DebugUtil.WriteNumber(aLength, 32);
-			Hardware.DebugUtil.WriteSerialString("\"/>\r\n");
-			EndLogging();
+            //StartLogging();
+            //Hardware.DebugUtil.WriteSerialString("<MM_Alloc StartAddr=\"");
+            //Hardware.DebugUtil.WriteNumber(aStartAddr, 32);
+            //Hardware.DebugUtil.WriteSerialString("\" Length=\"");
+            //Hardware.DebugUtil.WriteNumber(aLength, 32);
+            //Hardware.DebugUtil.WriteSerialString("\"/>\r\n");
+            //EndLogging();
 		}
 
 		public static void SendMM_Init(uint aStartAddr, uint aLength) {
-			StartLogging();
-			Hardware.DebugUtil.WriteSerialString("<MM_Init StartAddr=\"");
-			Hardware.DebugUtil.WriteNumber(aStartAddr, 32);
-			Hardware.DebugUtil.WriteSerialString("\" Length=\"");
-			Hardware.DebugUtil.WriteNumber(aLength, 32);
-			Hardware.DebugUtil.WriteSerialString("\"/>\r\n");
-			EndLogging();
+            //StartLogging();
+            //Hardware.DebugUtil.WriteSerialString("<MM_Init StartAddr=\"");
+            //Hardware.DebugUtil.WriteNumber(aStartAddr, 32);
+            //Hardware.DebugUtil.WriteSerialString("\" Length=\"");
+            //Hardware.DebugUtil.WriteNumber(aLength, 32);
+            //Hardware.DebugUtil.WriteSerialString("\"/>\r\n");
+            //EndLogging();
 		}
 
 		public static void SendMM_Free(uint aStartAddr, uint aLength) {
-			StartLogging();
-			Hardware.DebugUtil.WriteSerialString("<MM_Free StartAddr=\"");
-			Hardware.DebugUtil.WriteNumber(aStartAddr, 32);
-			Hardware.DebugUtil.WriteSerialString("\" Length=\"");
-			Hardware.DebugUtil.WriteNumber(aLength, 32);
-			Hardware.DebugUtil.WriteSerialString("\"/>\r\n");
-			EndLogging();
+            //StartLogging();
+            //Hardware.DebugUtil.WriteSerialString("<MM_Free StartAddr=\"");
+            //Hardware.DebugUtil.WriteNumber(aStartAddr, 32);
+            //Hardware.DebugUtil.WriteSerialString("\" Length=\"");
+            //Hardware.DebugUtil.WriteNumber(aLength, 32);
+            //Hardware.DebugUtil.WriteSerialString("\"/>\r\n");
+            //EndLogging();
 		}
 
         //internal static void SendExt2_GroupDescriptor(string aDescription, uint aBlock, int aIndex, uint aAddresss, FileSystem.Ext2.GroupDescriptor aDescriptor) {
@@ -743,29 +743,29 @@ namespace Cosmos.Kernel {
         //}
 
 		internal static void SendByteStream(string aModule, string aDescription, byte[] aContents) {
-			StartLogging();
-			Hardware.DebugUtil.WriteSerialString("<ByteStream Module=\"");
-			Hardware.DebugUtil.WriteSerialString(aModule);
-			Hardware.DebugUtil.WriteSerialString("\" Description=\"");
-			Hardware.DebugUtil.WriteSerialString(aDescription);
-			Hardware.DebugUtil.WriteSerialString("\" Contents=\"0x");
-			for (int i = 0; i < aContents.Length; i++) {
-				Hardware.DebugUtil.WriteNumber(aContents[i], 8, false);
-			}
-			Hardware.DebugUtil.WriteSerialString("\"/>\r\n");
+            //StartLogging();
+            //Hardware.DebugUtil.WriteSerialString("<ByteStream Module=\"");
+            //Hardware.DebugUtil.WriteSerialString(aModule);
+            //Hardware.DebugUtil.WriteSerialString("\" Description=\"");
+            //Hardware.DebugUtil.WriteSerialString(aDescription);
+            //Hardware.DebugUtil.WriteSerialString("\" Contents=\"0x");
+            //for (int i = 0; i < aContents.Length; i++) {
+            //    Hardware.DebugUtil.WriteNumber(aContents[i], 8, false);
+            //}
+            //Hardware.DebugUtil.WriteSerialString("\"/>\r\n");
 		}
 
 		internal static unsafe void SendBytes(string aModule, string aDescription, byte* aContents, uint aIndex, uint aCount) {
-			StartLogging();
-			Hardware.DebugUtil.WriteSerialString("<ByteStream Module=\"");
-			Hardware.DebugUtil.WriteSerialString(aModule);
-			Hardware.DebugUtil.WriteSerialString("\" Description=\"");
-			Hardware.DebugUtil.WriteSerialString(aDescription);
-			Hardware.DebugUtil.WriteSerialString("\" Contents=\"0x");
-			for (uint i = aIndex; i < aCount; i++) {
-				Hardware.DebugUtil.WriteNumber(aContents[i], 8, false);
-			}
-			Hardware.DebugUtil.WriteSerialString("\"/>\r\n");
+            //StartLogging();
+            //Hardware.DebugUtil.WriteSerialString("<ByteStream Module=\"");
+            //Hardware.DebugUtil.WriteSerialString(aModule);
+            //Hardware.DebugUtil.WriteSerialString("\" Description=\"");
+            //Hardware.DebugUtil.WriteSerialString(aDescription);
+            //Hardware.DebugUtil.WriteSerialString("\" Contents=\"0x");
+            //for (uint i = aIndex; i < aCount; i++) {
+            //    Hardware.DebugUtil.WriteNumber(aContents[i], 8, false);
+            //}
+            //Hardware.DebugUtil.WriteSerialString("\"/>\r\n");
 		}
 	}
 }
