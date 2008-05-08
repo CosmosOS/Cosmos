@@ -53,7 +53,10 @@ namespace KudzuTest {
             Console.Clear();
             Console.WriteLine("Boot complete");
 
-            //DoLoop();
+            //Loop();
+
+            //Cosmos.Hardware.PC.Bus.PCIBus.Init();
+            //Console.ReadLine();
             //Tests.DoAll();
             RTL8139.Test();
 

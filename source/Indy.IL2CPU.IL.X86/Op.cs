@@ -288,16 +288,50 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public static void Ldloc(Assembler.Assembler aAssembler, MethodInformation.Variable aLocal, bool aAddGCCode) {
-			foreach (string s in aLocal.VirtualAddresses) {
-				new CPUx86.Move("eax", "[" + s + "]");
-				new CPUx86.Push("eax");
-			}
-			aAssembler.StackContents.Push(new StackContent(aLocal.Size, aLocal.VariableType));
-			if (!aAssembler.InMetalMode && aAddGCCode && aLocal.IsReferenceType) {
-				new CPUx86.Push("eax");
-				Engine.QueueMethod(GCImplementationRefs.IncRefCountRef);
-				new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef));
-			}
+            if (aLocal.VirtualAddresses.Length > 1)
+            {
+                foreach (string s in aLocal.VirtualAddresses)
+                {
+                    new CPUx86.Move("eax",
+                                    "[" + s + "]");
+                    new CPUx86.Push("eax");
+                }
+            }
+            else {
+                new CPUx86.Xor("eax",
+                               "eax");
+
+                switch (Engine.GetFieldStorageSize(aLocal.VariableType))
+                {
+                    case 1: {
+                        new CPUx86.Move("al",
+                                        "[" + aLocal.VirtualAddresses.First() + "]");
+                        break;
+                    }
+                    case 2:
+                        {
+                            new CPUx86.Move("ax",
+                                            "[" + aLocal.VirtualAddresses.First() + "]");
+                            break;
+                        }
+                    case 4:
+                        {
+                            new CPUx86.Move("eax",
+                                            "[" + aLocal.VirtualAddresses.First() + "]");
+                            break;
+                        }
+                }
+                new CPUx86.Push("eax");
+                if (!aAssembler.InMetalMode && aAddGCCode &&
+                    aLocal.IsReferenceType) {
+                    new CPUx86.Push("eax");
+                    Engine.QueueMethod(GCImplementationRefs.IncRefCountRef);
+                    new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef));
+                }
+            }
+            aAssembler.StackContents.Push(new StackContent(aLocal.Size,
+                                               aLocal.VariableType));
+
 		}
 
 		protected override void AssembleHeader() {

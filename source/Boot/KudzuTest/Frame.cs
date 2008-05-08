@@ -106,11 +106,19 @@ namespace KudzuTest {
             // UDP Data
             mData[42] = 0x16;
 
-            if (UpdateIPChecksum() != 0x0923) {
-                throw new Exception("IP Checksum error");
+            var xIPChecksum = UpdateIPChecksum();
+            var xUDPChecksum = UpdateUDPChecksum();
+            if (xIPChecksum != 0x0923)
+            {
+                string xMSG = "IP Checksum error. Was ";
+                xMSG += xIPChecksum.ToString();
+                throw new Exception(xMSG);
             }
-            if (UpdateUDPChecksum() != 0x0630) {
-                throw new Exception("UDP Checksum error");
+            if (xUDPChecksum != 0x0630)
+            {
+                string xMSG = "UDP Checksum error. Was ";
+                xMSG += xUDPChecksum.ToString();
+                throw new Exception(xMSG);
             }
         }
 
@@ -195,15 +203,9 @@ namespace KudzuTest {
             for (int i = 14; i < 34; i = i + 2) {
                 xResult += (UInt16)((mData[i] << 8) + mData[i + 1]);
             }
-			Console.Write("IP, after for loop, result = ");
-			Console.WriteLine(xResult.ToString());
             xResult = (~((xResult & 0xFFFF) + (xResult >> 16)));
-			Console.Write("IP, second time, result = ");
-			Console.WriteLine(xResult.ToString());
-			mData[24] = (byte)(xResult >> 8);
+            mData[24] = (byte)(xResult >> 8);
             mData[25] = (byte)(xResult & 0xFF);
-			Console.Write("IP, third time, result = ");
-			Console.WriteLine(xResult.ToString());
             return (UInt16)xResult;
         }
 
@@ -217,35 +219,23 @@ namespace KudzuTest {
             for (int i = 34; i < 42; i = i + 2) {
                 xResult += (UInt16)((mData[i] << 8) + mData[i + 1]);
             }
-			Console.Write("IP, after for loop, result = ");
-			Console.WriteLine(xResult.ToString());
 			// Data
             xResult += (UInt16)((mData[42] << 8) + 0);
-			Console.Write("IP, 1, result = ");
-			Console.WriteLine(xResult.ToString());
-			// Pseudo header
+            // Pseudo header
             // --Protocol
             // TODO: Change to actually iterate data
             xResult += (UInt16)(mData[23]);
-			Console.Write("IP, 2, result = ");
-			Console.WriteLine(xResult.ToString());
-			// --IP Source
+            // --IP Source
             xResult += (UInt16)((mData[26] << 8) + mData[27]);
             xResult += (UInt16)((mData[28] << 8) + mData[29]);
-			Console.Write("IP, 3, result = ");
-			Console.WriteLine(xResult.ToString());
-			// --IP Dest
+            // --IP Dest
             xResult += (UInt16)((mData[30] << 8) + mData[31]);
             xResult += (UInt16)((mData[32] << 8) + mData[33]);
-			Console.Write("IP, 4, result = ");
-			Console.WriteLine(xResult.ToString());
-			// --UDP Length
+            // --UDP Length
             xResult += (UInt16)((mData[38] << 8) + mData[39]);
 
             xResult = (~((xResult & 0xFFFF) + (xResult >> 16)));
-			Console.Write("IP, 5, result = ");
-			Console.WriteLine(xResult.ToString());
-
+            
             mData[40] = (byte)(xResult >> 8);
             mData[41] = (byte)(xResult & 0xFF);
 

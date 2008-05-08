@@ -22,7 +22,7 @@ namespace MatthijsTest {
         }
 
         public static void Init() {
-            Cosmos.Kernel.Boot.Default();
+            //Cosmos.Kernel.Boot.Default();
             var xTest = new Object();
         }
     }

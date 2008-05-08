@@ -10,6 +10,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		private string mAddress;
 		protected void SetLocalIndex(int aIndex, MethodInformation aMethodInfo) {
 			mAddress = aMethodInfo.Locals[aIndex].VirtualAddresses.LastOrDefault();
+            if(String.IsNullOrEmpty(mAddress)){System.Diagnostics.Debugger.Break();}
 		}
 		public Ldloca(ILReader aReader, MethodInformation aMethodInfo)
 			: base(aReader, aMethodInfo) {

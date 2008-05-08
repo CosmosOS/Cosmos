@@ -1208,15 +1208,16 @@ MethodInformation xMethodInfo = GetMethodInfo(xCurrentMethod, xCurrentMethod, xM
 					xVars = new MethodInformation.Variable[xBody.LocalVariables.Count];
 					foreach (LocalVariableInfo xVarDef in xBody.LocalVariables) {
 						int xVarSize = GetFieldStorageSize(xVarDef.LocalType);
-						if ((xVarSize % 4) != 0) {
-							xVarSize += 4 - (xVarSize % 4);
-						}
-						xVars[xVarDef.LocalIndex] = new MethodInformation.Variable(xCurOffset, xVarSize, !xVarDef.LocalType.IsValueType, xVarDef.LocalType);
+                        if ((xVarSize % 4) != 0)
+                        {
+                            xVarSize += 4 - (xVarSize % 4);
+                        }
+                        xVars[xVarDef.LocalIndex] = new MethodInformation.Variable(xCurOffset, xVarSize, !xVarDef.LocalType.IsValueType, xVarDef.LocalType);
 						// todo: implement support for generic parameters?
 						//if (!(xVarDef.VariableType is GenericParameter)) {
 						RegisterType(xVarDef.LocalType);
 						//}
-						xCurOffset += xVarSize;
+                        xCurOffset += xVarSize;
 					}
 				}
 				MethodInformation.Argument[] xArgs;

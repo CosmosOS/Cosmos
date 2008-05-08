@@ -14,9 +14,10 @@ namespace Indy.IL2CPU.IL {
                             Type aVariableType) {
                 Offset = aOffset;
                 Size = aSize;
-                VirtualAddresses = new string[Size/4];
-                for (int i = 0; i < (Size/4); i++) {
-                    VirtualAddresses[i] = "ebp - 0" + (Offset + ((i + 1)*4) + 0).ToString("X") + "h";
+                VirtualAddresses = new string[Size / 4];
+                for (int i = 0; i < (Size / 4); i++)
+                {
+                    VirtualAddresses[i] = "ebp - 0" + (Offset + ((i + 1) * 4) + 0).ToString("X") + "h";
                 }
                 IsReferenceType = aIsReferenceTypeField;
                 VariableType = aVariableType;
@@ -47,9 +48,9 @@ namespace Indy.IL2CPU.IL {
                             Type aArgumentType) {
                 Size = aSize;
                 Offset = aOffset;
-                VirtualAddresses = new string[Size/4];
-                for (int i = 0; i < (Size/4); i++) {
-                    VirtualAddresses[i] = "ebp + 0" + (Offset + ((i + 1)*4) + 4).ToString("X") + "h";
+                VirtualAddresses = new string[Size / 4];
+                for (int i = 0; i < (Size / 4); i++) {
+                    VirtualAddresses[i] = "ebp + 0" + (Offset + ((i + 1) * 4) + 4).ToString("X") + "h";
                 }
                 Kind = aKind;
                 ArgumentType = aArgumentType;
@@ -83,16 +84,16 @@ namespace Indy.IL2CPU.IL {
             Method = aMethod;
             ReturnType = aReturnType;
             LocalsSize = (from item in aLocals
-                          let xSize = (item.Size%4 == 0)
+                          let xSize = (item.Size % 4 == 0)
                                           ? item.Size
                                           : (item.Size + (4 - (item.Size % 4)))
                           select xSize).Sum();
             if (aMethod != null) {
-                IsNonDebuggable =
-                 aMethod.GetCustomAttributes(typeof(DebuggerStepThroughAttribute), false).Length != 0
-                 || aMethod.DeclaringType.GetCustomAttributes(typeof(DebuggerStepThroughAttribute), false).Length != 0
-                 || aMethod.DeclaringType.Module.GetCustomAttributes(typeof(DebuggerStepThroughAttribute), false).Length != 0
-                 || aMethod.DeclaringType.Assembly.GetCustomAttributes(typeof(DebuggerStepThroughAttribute), false).Length != 0;
+                IsNonDebuggable = aMethod.GetCustomAttributes(typeof(DebuggerStepThroughAttribute),
+                                                              false).Length != 0 || aMethod.DeclaringType.GetCustomAttributes(typeof(DebuggerStepThroughAttribute),
+                                                                                                                              false).Length != 0 || aMethod.DeclaringType.Module.GetCustomAttributes(typeof(DebuggerStepThroughAttribute),
+                                                                                                                                                                                                     false).Length != 0 || aMethod.DeclaringType.Assembly.GetCustomAttributes(typeof(DebuggerStepThroughAttribute),
+                                                                                                                                                                                                                                                                              false).Length != 0;
             }
         }
 
