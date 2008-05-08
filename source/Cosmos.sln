@@ -81,9 +81,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kudzu", "Kudzu", "{9AB7CE5D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Sys", "Cosmos\Cosmos.System\Cosmos.Sys.csproj", "{819DB8FC-5DA1-461F-83C9-2F5C88088C94}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CosmosFlatFileUpdater", "CosmosFlatFileUpdater\CosmosFlatFileUpdater.csproj", "{BD36BB36-1F48-4C6F-91AC-D20FBC2BFA14}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 32
+		SccNumberOfProjects = 33
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -211,6 +213,10 @@ Global
 		SccProjectTopLevelParentUniqueName31 = Cosmos.sln
 		SccProjectName31 = Cosmos/Cosmos.System
 		SccLocalPath31 = Cosmos\\Cosmos.System
+		SccProjectUniqueName32 = CosmosFlatFileUpdater\\CosmosFlatFileUpdater.csproj
+		SccProjectTopLevelParentUniqueName32 = Cosmos.sln
+		SccProjectName32 = CosmosFlatFileUpdater
+		SccLocalPath32 = CosmosFlatFileUpdater
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -339,6 +345,10 @@ Global
 		{819DB8FC-5DA1-461F-83C9-2F5C88088C94}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{819DB8FC-5DA1-461F-83C9-2F5C88088C94}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{819DB8FC-5DA1-461F-83C9-2F5C88088C94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD36BB36-1F48-4C6F-91AC-D20FBC2BFA14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD36BB36-1F48-4C6F-91AC-D20FBC2BFA14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD36BB36-1F48-4C6F-91AC-D20FBC2BFA14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD36BB36-1F48-4C6F-91AC-D20FBC2BFA14}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -363,6 +373,7 @@ Global
 		{7BAB58BF-E8A1-4623-B6BF-4B90A0505226} = {E16DB75B-0F1D-4813-9103-F8FB6E7BAE2A}
 		{5784365C-ED22-42EB-BB8A-F3E09428D5B8} = {E16DB75B-0F1D-4813-9103-F8FB6E7BAE2A}
 		{26E45503-4490-4E38-A8C5-14159B25D6D1} = {E16DB75B-0F1D-4813-9103-F8FB6E7BAE2A}
+		{BD36BB36-1F48-4C6F-91AC-D20FBC2BFA14} = {E16DB75B-0F1D-4813-9103-F8FB6E7BAE2A}
 		{E2C54C80-75F3-4249-93B4-0003A4AF705F} = {6F91B8C3-1A78-49D7-B915-F13EDFDAFDB3}
 		{C97DE890-58D2-41A1-86D0-A2E919E6DD80} = {6F91B8C3-1A78-49D7-B915-F13EDFDAFDB3}
 		{E4A9F8F0-D0DC-465A-A64A-FE56504D397E} = {6F91B8C3-1A78-49D7-B915-F13EDFDAFDB3}
