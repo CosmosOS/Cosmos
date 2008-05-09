@@ -110,11 +110,14 @@ namespace Indy.IL2CPU.IL.X86 {
 			} else if (mReturnSize <= 4) {
 				new CPUx86.Pushd(CPUx86.Registers.EAX);
 				Assembler.StackContents.Push(new StackContent(mReturnSize, mCurrentMethodInfo.ReturnType));
-			} else if (mReturnSize <= 8) {
-				new CPUx86.Pushd(CPUx86.Registers.EBX);
-				new CPUx86.Pushd(CPUx86.Registers.EAX);
-				Assembler.StackContents.Push(new StackContent(mReturnSize, mCurrentMethodInfo.ReturnType));
-			}
+            }
+            else if (mReturnSize <= 8)
+            {
+                new CPUx86.Pushd(CPUx86.Registers.EBX);
+                new CPUx86.Pushd(CPUx86.Registers.EAX);
+                Assembler.StackContents.Push(new StackContent(mReturnSize, mCurrentMethodInfo.ReturnType));
+            }
+            else { throw new NotSupportedException(">8 byte return codes not yet supported!"); }
 		}
 	}
 }
