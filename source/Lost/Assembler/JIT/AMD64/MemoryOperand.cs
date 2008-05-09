@@ -33,6 +33,23 @@ namespace Lost.JIT.AMD64
 		public GeneralPurposeRegister Index { get; set; }
 		public GeneralPurposeRegister Base { get; set; }
 
+		public static MemoryOperand operator +(MemoryOperand memory, GeneralPurposeRegister register)
+		{
+			if (memory.Base != null) throw new InvalidOperationException("can't use two base registers");
+			return new MemoryOperand() {
+				Base = register,
+				Displacement = memory.Displacement,
+				//DisplacementSize = memory.DisplacementSize,
+				Index = memory.Index,
+				RipBased = memory.RipBased,
+				Scale = memory.Scale,
+			};
+		}
+		public static MemoryOperand operator +(GeneralPurposeRegister register, MemoryOperand memory)
+		{
+			return memory + register;
+		}
+
 		public bool RequiresSIB()
 		{
 			if (RipBased) return false;

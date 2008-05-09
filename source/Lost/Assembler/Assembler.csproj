@@ -9,7 +9,7 @@
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Lost</RootNamespace>
-    <AssemblyName>Lost</AssemblyName>
+    <AssemblyName>LostAssembler</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
@@ -21,7 +21,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -29,11 +29,11 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\Lost.XML</DocumentationFile>
+    <DocumentationFile>..\Release\Assembler.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="BinaryStreamExtensions.cs" />
     <Compile Include="BitUtils.cs" />
+    <Compile Include="JIT\AMD64\Add.cs" />
     <Compile Include="JIT\AMD64\AddWithCarry.cs" />
     <Compile Include="JIT\AMD64\And.cs" />
     <Compile Include="JIT\AMD64\BreakPoint.cs" />
@@ -62,6 +63,8 @@
     <Compile Include="JIT\AMD64\ImmediateOperand.cs" />
     <Compile Include="JIT\AMD64\Jump.cs" />
     <Compile Include="JIT\AMD64\JumpIfEqual.cs" />
+    <Compile Include="JIT\AMD64\Label.cs" />
+    <Compile Include="JIT\AMD64\LabelOperand.cs" />
     <Compile Include="JIT\AMD64\MemoryOperand.cs" />
     <Compile Include="JIT\AMD64\Move.cs" />
     <Compile Include="JIT\AMD64\Pop.cs" />

@@ -38,5 +38,22 @@ namespace Lost.JIT.AMD64
 			string digs = (Size * 2).ToString();
 			return "0x" + Value.ToString("X" + digs);
 		}
+
+		public static implicit operator ImmediateOperand(byte value)
+		{
+			return new ImmediateOperand(value);
+		}
+		public static implicit operator ImmediateOperand(short value)
+		{
+			return new ImmediateOperand(value);
+		}
+		public static implicit operator ImmediateOperand(int value)
+		{
+			return new ImmediateOperand(value);
+		}
+		public static implicit operator ImmediateOperand(long value)
+		{
+			return new ImmediateOperand(value);
+		}
 	}
 }

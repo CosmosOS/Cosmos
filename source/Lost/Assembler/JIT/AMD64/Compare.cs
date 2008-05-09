@@ -13,22 +13,6 @@ namespace Lost.JIT.AMD64
 			: base(dest, source)
 		{
 		}
-		public Compare(InstructionOperand dest, byte source)
-			: base(dest, source)
-		{
-		}
-		public Compare(InstructionOperand dest, short source)
-			: base(dest, source)
-		{
-		}
-		public Compare(InstructionOperand dest, int source)
-			: base(dest, source)
-		{
-		}
-		public Compare(InstructionOperand dest, long source)
-			: base(dest, source)
-		{
-		}
 
 		public override byte AccumulatorOpCode
 		{

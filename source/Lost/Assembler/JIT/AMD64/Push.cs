@@ -9,21 +9,9 @@ namespace Lost.JIT.AMD64
 {
 	public sealed class Push : ProcessorInstruction
 	{
-		public Push(GeneralPurposeRegister register)
+		public Push(InstructionOperand source)
 		{
-			Source = register;
-		}
-		public Push(MemoryOperand memory)
-		{
-			Source = memory;
-		}
-		public Push(ImmediateOperand immediate)
-		{
-			Source = immediate;
-		}
-		public Push(int value)
-		{
-			Source = new ImmediateOperand(value);
+			Source = source;
 		}
 
 		public InstructionOperand Source

@@ -9,9 +9,9 @@ namespace Lost.JIT.AMD64
 	[Serializable]
 	public sealed class Jump: ProcessorInstruction
 	{
-		public Jump(int targetOffset)
+		public Jump(InstructionOperand operand)
 		{
-			Dest = new ImmediateOperand(targetOffset);
+			Dest = operand;
 		}
 
 		public InstructionOperand Dest { get; set; }

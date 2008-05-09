@@ -9,13 +9,9 @@ namespace Lost.JIT.AMD64
 {
 	public sealed class Pop: ProcessorInstruction
 	{
-		public Pop(GeneralPurposeRegister register)
+		public Pop(InstructionOperand dest)
 		{
-			Dest = register;
-		}
-		public Pop(MemoryOperand memory)
-		{
-			Dest = memory;
+			Dest = dest;
 		}
 
 		public InstructionOperand Dest

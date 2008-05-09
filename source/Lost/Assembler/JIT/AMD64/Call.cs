@@ -9,17 +9,9 @@ namespace Lost.JIT.AMD64
 	[Serializable]
 	public sealed class Call: ProcessorInstruction
 	{
-		public Call(int targetOffset)
+		public Call(InstructionOperand target)
 		{
-			Dest = new ImmediateOperand(targetOffset);
-		}
-		public Call(GeneralPurposeRegister targetAddress)
-		{
-			Dest = targetAddress;
-		}
-		public Call(MemoryOperand targetAddress)
-		{
-			Dest = targetAddress;
+			Dest = target;
 		}
 
 		public InstructionOperand Dest { get; set; }

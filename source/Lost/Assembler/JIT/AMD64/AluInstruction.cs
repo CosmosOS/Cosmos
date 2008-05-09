@@ -15,27 +15,6 @@ namespace Lost.JIT.AMD64
 			this.Dest = dest;
 			this.Source = source;
 		}
-		public AluInstruction(InstructionOperand dest, byte imm)
-		{
-			this.Dest = dest;
-			this.Source = new ImmediateOperand(imm);
-		}
-		public AluInstruction(InstructionOperand dest, short imm)
-		{
-			this.Dest = dest;
-			this.Source = new ImmediateOperand(imm);
-		}
-		public AluInstruction(InstructionOperand dest, int imm)
-		{
-			this.Dest = dest;
-			this.Source = new ImmediateOperand(imm);
-		}
-		public AluInstruction(InstructionOperand dest, long imm)
-		{
-			this.Dest = dest;
-			this.Source = new ImmediateOperand(imm);
-		}
-
 
 		public InstructionOperand Dest { get; private set; }
 		public InstructionOperand Source { get; private set; }

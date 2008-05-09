@@ -17,6 +17,22 @@ namespace Lost.JIT.AMD64
 		public int Size { get; private set; }
 		public Registers Register { get; private set; }
 
+		public static MemoryOperand operator *(GeneralPurposeRegister gpr, int scale)
+		{
+			return new MemoryOperand() {
+				Index = gpr,
+				Scale = scale,
+			};
+		}
+
+		public static MemoryOperand operator +(GeneralPurposeRegister gpr, int baseValue)
+		{
+			return new MemoryOperand() {
+				Base = gpr,
+				Displacement = baseValue,
+			};
+		}
+
 		public override string ToString()
 		{
 			if (Register.IsNew() && (Size == 8)) return Register.ToString();
