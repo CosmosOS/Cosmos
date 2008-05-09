@@ -70,10 +70,11 @@ namespace Indy.IL2CPU.IL {
 		}
 
 		public virtual IList<Assembly> GetPlugAssemblies() {
-			List<Assembly> xResult = new List<Assembly>();
-			xResult.Add(typeof(OpCodeMap).Assembly);
-			xResult.Add(Assembly.Load("Indy.IL2CPU"));
-			return xResult;
+			var xResult = new List<Assembly> {
+			                                     typeof(OpCodeMap).Assembly,
+			                                     Assembly.Load("Indy.IL2CPU")
+			                                 };
+		    return xResult;
 		}
 
 		public MethodBase GetCustomMethodImplementation(string aOrigMethodName, bool aInMetalMode) {

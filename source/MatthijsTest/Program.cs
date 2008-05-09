@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 using Cosmos.Build.Windows;
+using System.Collections;
 
 namespace MatthijsTest {
-    public class Program {
+   public class Program {
         #region Cosmos Builder logic
 
         // Most users wont touch this. This will call the Cosmos Build tool
@@ -15,6 +16,20 @@ namespace MatthijsTest {
 
         #endregion
 
+        public class MessageContainer : IEnumerable
+        {
+            public IEnumerator GetEnumerator() {
+                yield return "String1";
+                yield return "String2";
+                yield return "String3";
+                yield return "String4";
+                yield return "String5";
+
+            }
+        }
+
+
+
         public static void GetResumeAndResume(ref uint aSuspend)
         {
             aSuspend = 0;
@@ -22,8 +37,10 @@ namespace MatthijsTest {
         }
 
         public static void Init() {
-            //Cosmos.Kernel.Boot.Default();
-            var xTest = new Object();
+            var xTest = (IEnumerable)new string[] { "String1", "String2", "String3" };
+            foreach(string xItem in xTest){
+                Console.WriteLine(xItem);                    
+            }
         }
     }
 }

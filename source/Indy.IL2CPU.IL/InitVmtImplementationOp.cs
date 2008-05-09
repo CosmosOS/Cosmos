@@ -1,4 +1,4 @@
-﻿//#define MTW_DEBUG
+﻿#define MTW_DEBUG
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +8,15 @@ using System.Xml;
 using System.Reflection;
 
 namespace Indy.IL2CPU.IL {
+    public class MethodBaseComparer : IComparer<MethodBase>
+    {
+        #region IComparer<MethodBase> Members
+        public int Compare(MethodBase x, MethodBase y)
+        {
+            return x.GetFullName().CompareTo(y.GetFullName());
+        }
+        #endregion
+    }
 	public abstract class InitVmtImplementationOp: Op {
 		public delegate int GetMethodIdentifierEventHandler(MethodBase aMethod);
 		public InitVmtImplementationOp(ILReader aReader, MethodInformation aMethodInfo)
@@ -80,17 +89,27 @@ namespace Indy.IL2CPU.IL {
 					xDebug.WriteAttributeString("Id", i.ToString("X"));
 #endif
 				Type xType = mTypes[i];
-				List<MethodBase> xEmittedMethods = new List<MethodBase>();
+                if (xType.IsInterface) { continue; }
+                // value contains true if the method is an interface method definition
+                SortedList<MethodBase, bool> xEmittedMethods = new SortedList<MethodBase, bool>(new MethodBaseComparer());
 				foreach (MethodBase xMethod in xType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)) {
 					if (Methods.Contains(xMethod) && !xMethod.IsAbstract) {
-						xEmittedMethods.Add(xMethod);
+						xEmittedMethods.Add(xMethod, false);
 					}
 				}
 				foreach (MethodBase xCtor in xType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)) {
 					if (Methods.Contains(xCtor) && !xCtor.IsAbstract) {
-						xEmittedMethods.Add(xCtor);
+						xEmittedMethods.Add(xCtor, false);
 					}
 				}
+                foreach (var xIntf in xType.GetInterfaces()) {
+                    var xIntfMap = xType.GetInterfaceMap(xIntf);
+                    for (int xI = 0; xI < xIntfMap.InterfaceMethods.Length; xI++) {
+                        if (Methods.Contains(xIntfMap.InterfaceMethods[xI])) {
+                            xEmittedMethods.Add(xIntfMap.InterfaceMethods[xI], true);
+                        }
+                    }
+                }
 				Pushd("0" + i.ToString("X") + "h");
 				int? xBaseIndex = null;
 				if (xType.BaseType == null) {
@@ -103,7 +122,7 @@ namespace Indy.IL2CPU.IL {
 						}
 					}
 				}
-				if (xBaseIndex == null) {
+                if (xBaseIndex == null) {
 					throw new Exception("Base type not found!");
 				}
 #if MTW_DEBUG
@@ -139,26 +158,22 @@ namespace Indy.IL2CPU.IL {
 				//Pushd("0");
 				Call(SetTypeInfoRef);
 				for (int j = 0; j < xEmittedMethods.Count; j++) {
-					
-		
-					MethodBase xMethod = xEmittedMethods[j];
+					MethodBase xMethod = xEmittedMethods.Keys[j];
+                    var xMethodId =GetMethodIdentifier(xMethod); 
+                    if (xEmittedMethods.Values[j]) {
+                        var xIntfMap = xType.GetInterfaceMap(xMethod.DeclaringType);
+                        xMethod = xIntfMap.TargetMethods[Array.IndexOf<MethodBase>(xIntfMap.InterfaceMethods, xMethod)];
+                    }
 #if MTW_DEBUG
 						xDebug.WriteStartElement("Method");
-						xDebug.WriteAttributeString("Id", GetMethodIdentifier(xMethod).ToString("X"));
+                        xDebug.WriteAttributeString("Id", xMethodId.ToString("X"));
 						xDebug.WriteAttributeString("Name", xMethod.GetFullName());
 						xDebug.WriteEndElement();
 #endif
-					if (xMethod.DeclaringType.FullName == "System.Object" && xMethod.Name == "Equals" && xMethod.GetParameters().Length == 1 && xMethod.GetParameters()[0].ParameterType.FullName == "System.Object") {
-						System.Diagnostics.Debugger.Break();
-					}
 					Pushd("0" + i.ToString("X") + "h");
 					Pushd("0" + j.ToString("X") + "h");
-					ParameterInfo[] xParams = xMethod.GetParameters();
-					Type[] xMethodParams = new Type[xParams.Length];
-					for (int k = 0; k < xParams.Length; k++) {
-						xMethodParams[k] = xParams[k].ParameterType;
-					}
-					Pushd("0" + GetMethodIdentifier(xMethod).ToString("X") + "h");
+
+                    Pushd("0" + xMethodId.ToString("X") + "h");
 					Pushd(Label.GenerateLabelName(xMethod));
 					//xDataValue = Encoding.ASCII.GetBytes(GetFullName(xMethod)).Aggregate("", (b, x) => b + x + ",") + "0";
 					//xDataName = "____SYSTEM____METHOD___" + DataMember.FilterStringForIncorrectChars(GetFullName(xMethod));

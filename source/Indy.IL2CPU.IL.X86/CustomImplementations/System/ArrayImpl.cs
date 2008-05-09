@@ -18,6 +18,16 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System {
 			}
 		}
 
+        public static int GetUpperBound(Array aThis, int aDimension) {
+            return GetLength(aThis, aDimension) - 1;
+        }
+
+        public static int GetLength(Array aThis, int aDimension)
+        {
+            if (aDimension != 0) { throw new NotSupportedException("Multidimensional array's are not yet supported!"); }
+            return aThis.Length;
+        }
+
 
 		[PlugMethod(Signature = "System_Boolean__System_Array_TrySZBinarySearch_System_Array__System_Int32__System_Int32__System_Object__System_Int32__")]
 		public static unsafe bool TrySZBinarySearch(uint* aArray, uint sourceIndex, uint count, uint value, out uint retVal) {
@@ -68,10 +78,10 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System {
 			if (aDimension != 0) {
 				throw new NotSupportedException("Multidimensional arrays not supported yet!");
 			}
-			return get_Length(aThis);
+            return 0;
 		}
 
-		[PlugMethod(Signature = "System_Object__System_Array_GetValue_System_Int32_")]
+        [PlugMethod(Signature = "System_Object__System_Array_GetValue_System_Int32_")]
 		public static unsafe uint GetValue(uint* aThis, int aIndex) {
 			aThis += 3;
 			uint xElementSize = *aThis;
@@ -89,6 +99,8 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System {
 			}
 			throw new NotSupportedException("GetValue not supported in this situation!");
 		}
+
+        public static unsafe object GetValue(Array aThis, params int[] aIndices) { throw new NotImplementedException("Multidimensional arrays not supported yet!"); }
 
 		[PlugMethod(Signature = "System_Void__System_Array_SetValue_System_Object__System_Int32_")]
 		public static unsafe void SetValue(uint* aThis, uint aValue, int aIndex) {

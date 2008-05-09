@@ -473,61 +473,102 @@ namespace Indy.IL2CPU {
 			xOp.Assemble();
 		}
 
-		private void ScanForMethodsToIncludeForVMT() {
-			List<Type> xCheckedTypes = new List<Type>();
-			foreach (MethodBase xMethod in mMethods.Keys) {
-				if (xMethod.IsStatic) {
-					continue;
-				}
-				Type xCurrentType = xMethod.DeclaringType;
-				if (!xCheckedTypes.Contains(xCurrentType, mTypesEqualityComparer)) {
-					xCheckedTypes.Add(xCurrentType);
-				}
-			}
-			foreach (Type xType in mTypes) {
-				if (!xCheckedTypes.Contains(xType, mTypesEqualityComparer)) {
-					xCheckedTypes.Add(xType);
-				}
-			}
-			for (int i = 0; i < xCheckedTypes.Count; i++) {
-				Type xCurrentType = xCheckedTypes[i];
-				while (xCurrentType != null) {
-					if (!xCheckedTypes.Contains(xCurrentType, mTypesEqualityComparer)) {
-						xCheckedTypes.Add(xCurrentType);
-					}
-					if (xCurrentType.FullName == "System.Object") {
-						break;
-					}
-					if (xCurrentType.BaseType == null) {
-						break;
-					}
-					xCurrentType = xCurrentType.BaseType;
-				}
-			}
-			foreach (Type xTD in xCheckedTypes) {
-				foreach (MethodBase xMethod in xTD.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly)) {
-					if (!xMethod.IsStatic) {
-						if (xTD.BaseType == null) {
-							continue;
-						}
-						if (xMethod.IsVirtual && !xMethod.IsConstructor && !xMethod.IsFinal) {
-							Type xCurrentInspectedType = xTD.BaseType;
-							ParameterInfo[] xParams = xMethod.GetParameters();
-							Type[] xMethodParams = new Type[xParams.Length];
-							for (int i = 0; i < xParams.Length; i++) {
-								xMethodParams[i] = xParams[i].ParameterType;
-							}
-							MethodBase xBaseMethod = GetUltimateBaseMethod(xMethod, xMethodParams, xTD);
-							if (xBaseMethod != null && xBaseMethod != xMethod) {
-								if (mMethods.ContainsKey(xBaseMethod)) {
-									QueueMethod(xMethod);
-								}
-							}
-						}
-					}
-				}
-			}
-		}
+        private void ScanForMethodsToIncludeForVMT()
+        {
+            List<Type> xCheckedTypes = new List<Type>();
+            foreach (MethodBase xMethod in mMethods.Keys)
+            {
+                if (xMethod.IsStatic)
+                {
+                    continue;
+                }
+                Type xCurrentType = xMethod.DeclaringType;
+                if (!xCheckedTypes.Contains(xCurrentType, mTypesEqualityComparer))
+                {
+                    xCheckedTypes.Add(xCurrentType);
+                }
+            }
+            foreach (Type xType in mTypes)
+            {
+                if (!xCheckedTypes.Contains(xType, mTypesEqualityComparer))
+                {
+                    xCheckedTypes.Add(xType);
+                }
+            }
+            for (int i = 0; i < xCheckedTypes.Count; i++)
+            {
+                Type xCurrentType = xCheckedTypes[i];
+                while (xCurrentType != null)
+                {
+                    if (!xCheckedTypes.Contains(xCurrentType, mTypesEqualityComparer))
+                    {
+                        xCheckedTypes.Add(xCurrentType);
+                    }
+                    if (xCurrentType.FullName == "System.Object")
+                    {
+                        break;
+                    }
+                    if (xCurrentType.BaseType == null)
+                    {
+                        break;
+                    }
+                    xCurrentType = xCurrentType.BaseType;
+                }
+            }
+            foreach (Type xTD in xCheckedTypes)
+            {
+                foreach (MethodBase xMethod in xTD.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly))
+                {
+                    if (!xMethod.IsStatic)
+                    {
+                        if (xTD.BaseType == null)
+                        {
+                            continue;
+                        }
+                        if (xMethod.IsVirtual && !xMethod.IsConstructor && !xMethod.IsFinal)
+                        {
+                            Type xCurrentInspectedType = xTD.BaseType;
+                            ParameterInfo[] xParams = xMethod.GetParameters();
+                            Type[] xMethodParams = new Type[xParams.Length];
+                            for (int i = 0; i < xParams.Length; i++)
+                            {
+                                xMethodParams[i] = xParams[i].ParameterType;
+                            }
+                            MethodBase xBaseMethod = GetUltimateBaseMethod(xMethod, xMethodParams, xTD);
+                            if (xBaseMethod != null && xBaseMethod != xMethod)
+                            {
+                                if (mMethods.ContainsKey(xBaseMethod))
+                                {
+                                    QueueMethod(xMethod);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            for(int j = 0; j < mMethods.Count;j++){
+                var xMethod = mMethods.Skip(j).First();
+                if (xMethod.Key.DeclaringType.IsInterface)
+                {
+                    var xInterface = xMethod.Key.DeclaringType;
+                    foreach (var xImplType in mTypes)
+                    {
+                        if (xImplType.IsInterface) { continue; }
+                        if (xImplType.GetInterfaces().Contains(xInterface))
+                        {
+                            var xIntfMap = xImplType.GetInterfaceMap(xInterface);
+                            for (int i = 0; i < xIntfMap.InterfaceMethods.Length; i++)
+                            {
+                                if (mMethods.ContainsKey(xIntfMap.InterfaceMethods[i]))
+                                {
+                                    QueueMethod(xIntfMap.TargetMethods[i]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
 		private static MethodBase GetUltimateBaseMethod(MethodBase aMethod, Type[] aMethodParams, Type aCurrentInspectedType) {
 			MethodBase xBaseMethod = null;
@@ -780,7 +821,7 @@ namespace Indy.IL2CPU {
 						continue;
 					}
 					string xMethodName = Label.GenerateLabelName(xCurrentMethod);
-					TypeInformation xTypeInfo = null;
+                    TypeInformation xTypeInfo = null;
 					{
 						if (!xCurrentMethod.IsStatic) {
 							xTypeInfo = GetTypeInfo(xCurrentMethod.DeclaringType);
@@ -1161,13 +1202,20 @@ MethodInformation xMethodInfo = GetMethodInfo(xCurrentMethod, xCurrentMethod, xM
 						foreach (MethodBase xOrigMethodDef in xTypeRef.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.NonPublic)) {
 							string xOrigStrippedSignature = GetStrippedMethodBaseFullName(xOrigMethodDef);
 							if (xOrigStrippedSignature == xStrippedSignature) {
+                                if (mPlugMethods.ContainsKey(Label.GenerateLabelName(xOrigMethodDef)))
+                                {
+                                    System.Diagnostics.Debugger.Break();
+                                }
 								mPlugMethods.Add(Label.GenerateLabelName(xOrigMethodDef), xMethod);
 							}
 						}
 						foreach (MethodBase xOrigMethodDef in xTypeRef.GetConstructors(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.NonPublic)) {
 							string xOrigStrippedSignature = GetStrippedMethodBaseFullName(xOrigMethodDef);
 							if (xOrigStrippedSignature == xStrippedSignature) {
-								mPlugMethods.Add(Label.GenerateLabelName(xOrigMethodDef), xMethod);
+                                if (mPlugMethods.ContainsKey(Label.GenerateLabelName(xOrigMethodDef)))
+                                {
+                                    System.Diagnostics.Debugger.Break();
+                                } mPlugMethods.Add(Label.GenerateLabelName(xOrigMethodDef), xMethod);
 							}
 						}
 					}

@@ -7,8 +7,10 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
+using System.Diagnostics;
 
 namespace Indy.IL2CPU {
+    [DebuggerStepThrough]
 	public static class GCImplementation {
 		private static int mLock = 0;
 		private static void AcquireLock() {
