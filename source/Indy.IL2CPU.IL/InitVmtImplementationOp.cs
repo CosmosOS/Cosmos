@@ -1,4 +1,4 @@
-﻿#define MTW_DEBUG
+﻿//#define MTW_DEBUG
 using System;
 using System.Collections.Generic;
 using System.Linq;
