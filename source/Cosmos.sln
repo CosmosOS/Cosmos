@@ -65,8 +65,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrodeTest", "FrodeTest\Frod
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.FileSystem", "Cosmos.Kernel.FileSystems\Cosmos.FileSystem.csproj", "{5C293BB9-FB42-495E-AAD9-D15888631CA4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lost", "Tests\MathTest\Lost\Lost.csproj", "{EF65AFB7-9DC9-4ACD-946D-7E973A67DBBE}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{4DE8EC69-B412-41C4-BCD9-1E032984E888}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MohammedTest", "MohammedTest\MohammedTest.csproj", "{1240EAB3-D6B1-463A-BA83-436607A1F18E}"
@@ -85,7 +83,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CosmosFlatFileUpdater", "Co
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 33
+		SccNumberOfProjects = 32
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -181,42 +179,38 @@ Global
 		SccProjectTopLevelParentUniqueName23 = Cosmos.sln
 		SccProjectName23 = FrodeTest
 		SccLocalPath23 = FrodeTest
-		SccProjectUniqueName24 = Tests\\MathTest\\Lost\\Lost.csproj
+		SccProjectUniqueName24 = Boot\\KudzuTest\\Kudzu.csproj
 		SccProjectTopLevelParentUniqueName24 = Cosmos.sln
-		SccProjectName24 = Tests/MathTest/Lost
-		SccLocalPath24 = Tests\\MathTest\\Lost
-		SccProjectUniqueName25 = Boot\\KudzuTest\\Kudzu.csproj
+		SccProjectName24 = Boot/KudzuTest
+		SccLocalPath24 = Boot\\KudzuTest
+		SccProjectUniqueName25 = MohammedTest\\MohammedTest.csproj
 		SccProjectTopLevelParentUniqueName25 = Cosmos.sln
-		SccProjectName25 = Boot/KudzuTest
-		SccLocalPath25 = Boot\\KudzuTest
-		SccProjectUniqueName26 = MohammedTest\\MohammedTest.csproj
+		SccProjectName25 = MohammedTest
+		SccLocalPath25 = MohammedTest
+		SccProjectUniqueName26 = Cosmos.Kernel.FileSystems\\Cosmos.FileSystem.csproj
 		SccProjectTopLevelParentUniqueName26 = Cosmos.sln
-		SccProjectName26 = MohammedTest
-		SccLocalPath26 = MohammedTest
-		SccProjectUniqueName27 = Cosmos.Kernel.FileSystems\\Cosmos.FileSystem.csproj
+		SccProjectName26 = Cosmos.Kernel.FileSystems
+		SccLocalPath26 = Cosmos.Kernel.FileSystems
+		SccProjectUniqueName27 = Boot\\Playgrounds\\Kudzu\u0020UDP\\Kudzu-UDP.csproj
 		SccProjectTopLevelParentUniqueName27 = Cosmos.sln
-		SccProjectName27 = Cosmos.Kernel.FileSystems
-		SccLocalPath27 = Cosmos.Kernel.FileSystems
-		SccProjectUniqueName28 = Boot\\Playgrounds\\Kudzu\u0020UDP\\Kudzu-UDP.csproj
+		SccProjectName27 = Boot/Playgrounds/Kudzu\u0020UDP
+		SccLocalPath27 = Boot\\Playgrounds\\Kudzu\u0020UDP
+		SccProjectUniqueName28 = RsenkTest\\RsenkTest.csproj
 		SccProjectTopLevelParentUniqueName28 = Cosmos.sln
-		SccProjectName28 = Boot/Playgrounds/Kudzu\u0020UDP
-		SccLocalPath28 = Boot\\Playgrounds\\Kudzu\u0020UDP
-		SccProjectUniqueName29 = RsenkTest\\RsenkTest.csproj
+		SccProjectName28 = RsenkTest
+		SccLocalPath28 = RsenkTest
+		SccProjectUniqueName29 = Boot\\Playgrounds\\Kudzu-SourceView\\Kudzu-SourceView.csproj
 		SccProjectTopLevelParentUniqueName29 = Cosmos.sln
-		SccProjectName29 = RsenkTest
-		SccLocalPath29 = RsenkTest
-		SccProjectUniqueName30 = Boot\\Playgrounds\\Kudzu-SourceView\\Kudzu-SourceView.csproj
+		SccProjectName29 = Boot/Playgrounds/Kudzu-SourceView
+		SccLocalPath29 = Boot\\Playgrounds\\Kudzu-SourceView
+		SccProjectUniqueName30 = Cosmos\\Cosmos.System\\Cosmos.Sys.csproj
 		SccProjectTopLevelParentUniqueName30 = Cosmos.sln
-		SccProjectName30 = Boot/Playgrounds/Kudzu-SourceView
-		SccLocalPath30 = Boot\\Playgrounds\\Kudzu-SourceView
-		SccProjectUniqueName31 = Cosmos\\Cosmos.System\\Cosmos.Sys.csproj
+		SccProjectName30 = Cosmos/Cosmos.System
+		SccLocalPath30 = Cosmos\\Cosmos.System
+		SccProjectUniqueName31 = CosmosFlatFileUpdater\\CosmosFlatFileUpdater.csproj
 		SccProjectTopLevelParentUniqueName31 = Cosmos.sln
-		SccProjectName31 = Cosmos/Cosmos.System
-		SccLocalPath31 = Cosmos\\Cosmos.System
-		SccProjectUniqueName32 = CosmosFlatFileUpdater\\CosmosFlatFileUpdater.csproj
-		SccProjectTopLevelParentUniqueName32 = Cosmos.sln
-		SccProjectName32 = CosmosFlatFileUpdater
-		SccLocalPath32 = CosmosFlatFileUpdater
+		SccProjectName31 = CosmosFlatFileUpdater
+		SccLocalPath31 = CosmosFlatFileUpdater
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -321,10 +315,6 @@ Global
 		{5C293BB9-FB42-495E-AAD9-D15888631CA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5C293BB9-FB42-495E-AAD9-D15888631CA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5C293BB9-FB42-495E-AAD9-D15888631CA4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EF65AFB7-9DC9-4ACD-946D-7E973A67DBBE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EF65AFB7-9DC9-4ACD-946D-7E973A67DBBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EF65AFB7-9DC9-4ACD-946D-7E973A67DBBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EF65AFB7-9DC9-4ACD-946D-7E973A67DBBE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1240EAB3-D6B1-463A-BA83-436607A1F18E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1240EAB3-D6B1-463A-BA83-436607A1F18E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1240EAB3-D6B1-463A-BA83-436607A1F18E}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -382,7 +372,6 @@ Global
 		{605F8D53-66FA-4BEC-844E-F63209B855C9} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
 		{8C566493-DBA5-45DD-93D4-89D4486CAAB6} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
 		{DA1DFD9E-B80C-4304-BCBA-B313255F6B01} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
-		{EF65AFB7-9DC9-4ACD-946D-7E973A67DBBE} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
 		{1240EAB3-D6B1-463A-BA83-436607A1F18E} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
 		{F598F906-8F3B-4EC1-AB8F-A9CBD8EBBE21} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
 		{8F2D5231-CDE5-48FA-9D26-D4305B01FD3C} = {4DE8EC69-B412-41C4-BCD9-1E032984E888}
