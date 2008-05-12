@@ -124,23 +124,22 @@ namespace Indy.IL2CPU.IL.X86 {
 							// param 0 is instance of eventhandler
 							// param 1 is sender
 							// param 2 is eventargs
+						    new Label(".LoadTargetObject");
 							Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
 							Ldarg.Ldfld(aAssembler, aMethodInfo.TypeInfo, "System.Object System.Delegate._target");
+						    new Label(".LoadMethodParams");
 							for (int i = 1; i < aMethodInfo.Arguments.Length; i++) {
 								Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[i]);
 							}
+						    new Label(".LoadMethodPointer");
 							Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
 							Ldarg.Ldfld(aAssembler, aMethodInfo.TypeInfo, "System.IntPtr System.Delegate._methodPtr");
 							new CPUx86.Pop("eax");
 							new CPUx86.Call(CPUx86.Registers.EAX);
+						    new CPUx86.Add("esp",
+						                   "4");
 							//							new CPUx86.Pop(CPUx86.Registers.EAX);
-							new CPUx86.Move("esp", "ebp");
-							if (aMethodInfo.ReturnType != null && aMethodInfo.ReturnType != typeof(void)) {
-								if (aMethodInfo.ReturnSize > 4) {
-									new CPUx86.Push(CPUx86.Registers.EBX);
-								}
-								new CPUx86.Push(CPUx86.Registers.EAX);
-							}
+							//new CPUx86.Move("esp", "ebp");
 							break;
 						}
 					}

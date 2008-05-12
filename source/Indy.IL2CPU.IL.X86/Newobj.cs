@@ -48,7 +48,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			new CPUx86.Pushd("0" + (xObjectSize + xExtraSize).ToString("X").ToUpper() + "h");
 			new CPUx86.Call(CPU.Label.GenerateLabelName(GCImplementationRefs.AllocNewObjectRef));
 			Engine.QueueMethod(CPU.Assembler.CurrentExceptionOccurredRef);
-			new CPUx86.Pushd(CPUx86.Registers.EAX);
+			//new CPUx86.Pushd(CPUx86.Registers.EAX);
 			new CPUx86.Test(CPUx86.Registers.ECX, 2);
 			//new CPUx86.JumpIfEquals(aCurrentLabel + "_NO_ERROR_1");
 			//for (int i = 1; i < xCtorInfo.Arguments.Length; i++) {
@@ -57,10 +57,10 @@ namespace Indy.IL2CPU.IL.X86 {
 			//new CPUx86.Add("esp", "4");
 			//Call.EmitExceptionLogic(aAssembler, aCurrentMethodInformation, aCurrentLabel + "_NO_ERROR_1", false);
 			//new CPU.Label(aCurrentLabel + "_NO_ERROR_1");
-			new CPUx86.Pushd(CPUx86.Registers.EAX);
-			new CPUx86.Pushd(CPUx86.Registers.EAX);
-			new CPUx86.Pushd(CPUx86.Registers.EAX);
-			new CPUx86.Pushd(CPUx86.Registers.EAX);
+			new CPUx86.Pushd(CPUx86.Registers.AtESP);
+            new CPUx86.Pushd(CPUx86.Registers.AtESP);
+            new CPUx86.Pushd(CPUx86.Registers.AtESP);
+            new CPUx86.Pushd(CPUx86.Registers.AtESP);
 			new CPUx86.Call(CPU.Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef));
 			//new CPUx86.Test("ecx", "2");
 			//new CPUx86.JumpIfEquals(aCurrentLabel + "_NO_ERROR_2");

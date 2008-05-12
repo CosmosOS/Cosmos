@@ -53,11 +53,10 @@ namespace Indy.IL2CPU.IL.X86 {
 			// the total array size is now on the stack.
 			Engine.QueueMethod(GCImplementationRefs.AllocNewObjectRef);
 			new CPUx86.Call(CPU.Label.GenerateLabelName(GCImplementationRefs.AllocNewObjectRef));
-			new CPUx86.Pushd(CPUx86.Registers.EAX);
-			new CPUx86.Pushd(CPUx86.Registers.EAX);
-			new CPUx86.Pushd(CPUx86.Registers.EAX);
-			new CPUx86.Pushd(CPUx86.Registers.EAX);
-			new CPUx86.Pushd(CPUx86.Registers.EAX);
+			new CPUx86.Pushd(CPUx86.Registers.AtESP);
+            new CPUx86.Pushd(CPUx86.Registers.AtESP);
+            new CPUx86.Pushd(CPUx86.Registers.AtESP);
+            new CPUx86.Pushd(CPUx86.Registers.AtESP);
 			//new CPUx86.Pushd(CPUx86.Registers.EDI);
 			Engine.QueueMethod(GCImplementationRefs.IncRefCountRef);
 			new CPUx86.Call(CPU.Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef));

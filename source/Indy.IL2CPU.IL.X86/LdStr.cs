@@ -21,14 +21,14 @@ namespace Indy.IL2CPU.IL.X86 {
 			LiteralStr = aLiteralStr;
 		}
 
-//; 	'$$Storage$$': 'System.Char[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'
-//; 		Size: 12, Offset: 0, NeedsGC: True
-//; 	'System.Char System.String.m_firstChar': 'System.Char, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'
-//; 		Size: 4, Offset: 12, NeedsGC: False
-//; 	'System.Int32 System.String.m_stringLength': 'System.Int32, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'
-//; 		Size: 4, Offset: 16, NeedsGC: False
-//; 	'System.Int32 System.String.m_arrayLength': 'System.Int32, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'
-//; 		Size: 4, Offset: 20, NeedsGC: False
+            //; 	'$$Storage$$': 'System.Char[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'
+            //; 		Size: 4, Offset: 0, NeedsGC: True
+            //; 	'System.Char System.String.m_firstChar': 'System.Char, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'
+            //; 		Size: 4, Offset: 4, NeedsGC: False
+            //; 	'System.Int32 System.String.m_stringLength': 'System.Int32, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'
+            //; 		Size: 4, Offset: 8, NeedsGC: False
+            //; 	'System.Int32 System.String.m_arrayLength': 'System.Int32, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'
+            //; 		Size: 4, Offset: 12, NeedsGC: False
 
 
 		public static string GetContentsArrayName(Assembler.Assembler aAssembler, string aLiteral) {

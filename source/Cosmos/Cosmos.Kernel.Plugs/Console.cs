@@ -115,7 +115,7 @@ namespace Cosmos.Kernel.Plugs {
 			// HACK: convert this to "while ((current = Keyboard.ReadChar()) != '\n') {" 
 			//   MTW: SOmehow an invalid opcode exception is occurring.
 			while (true) {
-				current = Cosmos.Hardware.KeyboardOld.ReadChar();
+			    current = Cosmos.Hardware.KeyboardOld.ReadChar();
 				if (current == '\n') {
 					break;
 				} else if (current == '\u0968') { // Backspace   

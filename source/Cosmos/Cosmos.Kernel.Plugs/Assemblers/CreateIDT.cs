@@ -73,6 +73,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
                 new CPUx86.Move("[_NATIVE_IDT_Contents + " + ((i*8) + 7) + "]",
                                 Registers.AH);
             }
+            new Label("______AFTER__IDT__TABLE__INIT__");
             xFieldName = "_NATIVE_IDT_Pointer";
             xFieldData = "0x07FF,0,0"; //(_NATIVE_IDT_Contents and 0xFFFF),(_NATIVE_IDT_Contents shr 16)";
             aAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>(aAssembler.CurrentGroup,

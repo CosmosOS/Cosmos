@@ -20,13 +20,12 @@ namespace Indy.IL2CPU.IL.X86 {
 		private readonly MethodInformation mCurrentMethodInfo;
 		private readonly MethodInformation mTargetMethodInfo;
 		private readonly int mCurrentILOffset;
+	    private readonly int mExtraStackSpace;
 		public Callvirt(ILReader aReader, MethodInformation aMethodInfo)
 			: base(aReader, aMethodInfo) {
 			mLabelName = GetInstructionLabel(aReader);
 			mCurrentMethodInfo = aMethodInfo;
-			int xThisOffSet = (from item in aMethodInfo.Locals
-							   select item.Offset + item.Size).LastOrDefault();
-			MethodBase xMethod = aReader.OperandValueMethod;
+		    MethodBase xMethod = aReader.OperandValueMethod;
 			if (xMethod == null) {
 				throw new Exception("Unable to determine Method!");
 			}
@@ -43,6 +42,8 @@ namespace Indy.IL2CPU.IL.X86 {
 			mReturnSize = mTargetMethodInfo.ReturnSize;
 			mThisOffset = mTargetMethodInfo.Arguments[0].Offset;
 			mCurrentILOffset = aReader.Position;
+            mExtraStackSpace = mTargetMethodInfo.ExtraStackSize;
+
 		}
 
 		public override void DoAssemble() {
@@ -54,7 +55,11 @@ namespace Indy.IL2CPU.IL.X86 {
 			if (!String.IsNullOrEmpty(mNormalAddress)) {
 				EmitCompareWithNull(Assembler, mCurrentMethodInfo, "[esp + 0x" + mThisOffset.ToString("X") + "]", mLabelName, mLabelName + "_AfterNullRefCheck", xEmitCleanup, mCurrentILOffset);
 				new CPU.Label(mLabelName + "_AfterNullRefCheck");
-				new CPUx86.Call(mNormalAddress);
+                if(mExtraStackSpace>0) {
+                    new CPUx86.Sub("esp",
+                                   mExtraStackSpace.ToString());
+                }
+			    new CPUx86.Call(mNormalAddress);
 			} else {
 				if (Assembler.InMetalMode) {
 					throw new Exception("Virtual methods not supported in Metal mode! (Called method = '" + mMethodDescription + "')");
@@ -78,22 +83,42 @@ namespace Indy.IL2CPU.IL.X86 {
 					new CPUx86.Push("eax");
 					new CPUx86.Move("eax", "[esp + " + (mThisOffset + 4) + "]");
 					new CPUx86.Add("eax", ObjectImpl.FieldDataOffset.ToString());
-					new CPUx86.Pushd("[eax]");
-					for (int i = mThisOffset; i > 0; i -= 4) {
-						new CPUx86.Pushd("[esp + " + mThisOffset + "]");
-					}
-					new CPUx86.Move("eax", "esp");
-					new CPUx86.Add("eax", (mThisOffset).ToString());
-					new CPUx86.Pushd(CPUx86.Registers.EAX);
-					new CPUx86.Move("eax", "[esp + " + (mThisOffset + 8) + "]");
-					new CPUx86.Call(CPUx86.Registers.EAX);
-					new CPUx86.Add("esp", "8");
-					for (int i = mThisOffset; i >= 0; i -= 4) {
-						new CPUx86.Add("esp", "4");
-					}
+                    // TODO: add support for automatic unboxing of values of >4bytes
+				    new CPUx86.Move("eax",
+				                    "[eax]");
+				    new CPUx86.Move("[esp + " + mThisOffset + "]",
+				                    "eax");
+                    //new CPUx86.Pushd("[eax]");
+                    //for (int i = mThisOffset; i > 0; i -= 4) {
+                    //    new CPUx86.Pushd("[esp + " + mThisOffset + "]");
+                    //}
+                    //new CPUx86.Move("eax", "esp");
+                    //new CPUx86.Add("eax", (mThisOffset).ToString());
+                    //new CPUx86.Pushd(CPUx86.Registers.EAX);
+                    //new CPUx86.Move("eax", "[esp + " + (mThisOffset + 8) + "]");
+                    //if (mExtraStackSpace > 0)
+                    //{
+                    //    new CPUx86.Sub("esp",
+                    //                   mExtraStackSpace.ToString());
+                    //}
+                    //new CPUx86.Call(CPUx86.Registers.EAX);
+                    //// todo: fix this.
+                    //// MtW: Dutch: CallVirt kopieert de arguments, dus nu moeten we de result terug kopieren
+                    //if (mReturnSize > 0) {
+                    //    throw new NotImplementedException("TODO"); }
+                    //new CPUx86.Add("esp", "8");
+                    //for (int i = mThisOffset; i >= 0; i -= 4) {
+                    //    new CPUx86.Add("esp", "4");
+                    //}
 					new CPUx86.Jump(mLabelName + "__AFTER_NOT_BOXED_THIS");
 				}
 				new CPU.Label(mLabelName + "_NOT_BOXED_THIS");
+			    new CPUx86.Pop("eax");
+                if (mExtraStackSpace > 0)
+                {
+                    new CPUx86.Sub("esp",
+                                   mExtraStackSpace.ToString());
+                }
 				new CPUx86.Call("eax");
 				new CPU.Label(mLabelName + "__AFTER_NOT_BOXED_THIS");
 			}
@@ -105,19 +130,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			for (int i = 0; i < mArgumentCount; i++) {
 				Assembler.StackContents.Pop();
 			}
-			if (mReturnSize == 0) {
-				return;
-			} else if (mReturnSize <= 4) {
-				new CPUx86.Pushd(CPUx86.Registers.EAX);
-				Assembler.StackContents.Push(new StackContent(mReturnSize, mCurrentMethodInfo.ReturnType));
-            }
-            else if (mReturnSize <= 8)
-            {
-                new CPUx86.Pushd(CPUx86.Registers.EBX);
-                new CPUx86.Pushd(CPUx86.Registers.EAX);
-                Assembler.StackContents.Push(new StackContent(mReturnSize, mCurrentMethodInfo.ReturnType));
-            }
-            else { throw new NotSupportedException(">8 byte return codes not yet supported!"); }
+            Assembler.StackContents.Push(new StackContent(mReturnSize));
 		}
 	}
 }

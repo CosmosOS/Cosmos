@@ -15,8 +15,7 @@ namespace Indy.IL2CPU.IL {
                 Offset = aOffset;
                 Size = aSize;
                 VirtualAddresses = new string[Size / 4];
-                for (int i = 0; i < (Size / 4); i++)
-                {
+                for (int i = 0; i < (Size / 4); i++) {
                     VirtualAddresses[i] = "ebp - 0" + (Offset + ((i + 1) * 4) + 0).ToString("X") + "h";
                 }
                 IsReferenceType = aIsReferenceTypeField;
@@ -44,25 +43,87 @@ namespace Indy.IL2CPU.IL {
             public Argument(int aSize,
                             int aOffset,
                             KindEnum aKind,
-                            bool mIsReferenceType,
+                            bool aIsReferenceType,
                             Type aArgumentType) {
-                Size = aSize;
+                mSize = aSize;
+                mVirtualAddresses = new string[mSize / 4];
+                mKind = aKind;
+                mArgumentType = aArgumentType;
+                mIsReferenceType = aIsReferenceType;
+                mOffset = -1;
                 Offset = aOffset;
-                VirtualAddresses = new string[Size / 4];
-                for (int i = 0; i < (Size / 4); i++) {
-                    VirtualAddresses[i] = "ebp + 0" + (Offset + ((i + 1) * 4) + 4).ToString("X") + "h";
-                }
-                Kind = aKind;
-                ArgumentType = aArgumentType;
-                IsReferenceType = mIsReferenceType;
             }
 
-            public readonly string[] VirtualAddresses;
-            public readonly int Size;
-            public readonly bool IsReferenceType;
-            public readonly int Offset;
-            public readonly KindEnum Kind;
-            public readonly Type ArgumentType;
+            private string[] mVirtualAddresses;
+
+            public string[] VirtualAddresses {
+                get {
+                    return mVirtualAddresses;
+                }
+                internal set {
+                    mVirtualAddresses = value;
+                }
+            }
+
+            private int mSize;
+
+            public int Size {
+                get {
+                    return mSize;
+                }
+                internal set {
+                    mSize = value;
+                }
+            }
+
+            private bool mIsReferenceType;
+
+            public bool IsReferenceType {
+                get {
+                    return mIsReferenceType;
+                }
+                internal set {
+                    mIsReferenceType = value;
+                }
+            }
+
+            private int mOffset;
+
+            public int Offset {
+                get {
+                    return mOffset;
+                }
+                internal set {
+                    if (mOffset != value) {
+                        mOffset = value;
+                        for (int i = 0; i < (mSize / 4); i++) {
+                            mVirtualAddresses[i] = "ebp + 0" + (mOffset + ((i + 1) * 4) + 4).ToString("X") + "h";
+                        }
+                    }
+                }
+            }
+
+            private KindEnum mKind;
+
+            public KindEnum Kind {
+                get {
+                    return mKind;
+                }
+                internal set {
+                    mKind = value;
+                }
+            }
+
+            private Type mArgumentType;
+
+            public Type ArgumentType {
+                get {
+                    return mArgumentType;
+                }
+                internal set {
+                    mArgumentType = value;
+                }
+            }
         }
 
         public MethodInformation(string aLabelName,
@@ -95,7 +156,21 @@ namespace Indy.IL2CPU.IL {
                                                                                                                                                                                                      false).Length != 0 || aMethod.DeclaringType.Assembly.GetCustomAttributes(typeof(DebuggerStepThroughAttribute),
                                                                                                                                                                                                                                                                               false).Length != 0;
             }
+            var xRoundedSize = ReturnSize;
+            if (xRoundedSize % 4 > 0) {
+                xRoundedSize += (4 - (ReturnSize % 4));
+            }
+
+            ExtraStackSize = xRoundedSize - (from item in aArguments
+                                             select item.Size).Sum();
+            if (ExtraStackSize > 0) {
+                for (int i = 0; i < Arguments.Length; i++) {
+                    Arguments[i].Offset += ExtraStackSize;
+                }
+            }
         }
+
+        public readonly int ExtraStackSize;
 
         /// <summary>
         /// This variable is only updated when the MethodInformation instance is supplied by the Engine.ProcessAllMethods method

@@ -20,12 +20,17 @@ namespace Indy.IL2CPU.IL.X86 {
 		private MethodInformation mTargetMethodInfo;
 		private string mNextLabelName;
 		private int mCurrentILOffset;
+        public Call(MethodBase aMethod, int aCurrentILOffset, bool aDebugMode, int aExtraStackSpace): base(null, null)
+        {
+            if (aMethod == null)
+            {
+                throw new ArgumentNullException("aMethod");
+            }
+            Initialize(aMethod, aCurrentILOffset, aDebugMode);
+        }
+
 		public Call(MethodBase aMethod, int aCurrentILOffset, bool aDebugMode)
-			: base(null, null) {
-			if (aMethod == null) {
-				throw new ArgumentNullException("aMethod");
-			}
-			Initialize(aMethod, aCurrentILOffset, aDebugMode);
+			: this(aMethod, aCurrentILOffset, aDebugMode, 0) {
 		}
 
 		public static void EmitExceptionLogic(Assembler.Assembler aAssembler, int aCurrentOpOffset, MethodInformation aMethodInfo, string aNextLabel, bool aDoTest, Action aCleanup) {
@@ -65,7 +70,7 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		private void Initialize(MethodBase aMethod, int aCurrentILOffset, bool aDebugMode) {
 			mIsDebugger_Break = aMethod.GetFullName() == "System.Void  System.Diagnostics.Debugger.Break()";
-			if (mIsDebugger_Break) {
+		    if (mIsDebugger_Break) {
 				return;
 			}
 			mCurrentILOffset = aCurrentILOffset;
@@ -108,28 +113,24 @@ namespace Indy.IL2CPU.IL.X86 {
 			if (!aReader.EndOfStream) {
 				mNextLabelName = GetInstructionLabel(aReader.NextPosition);
 			}
-			Initialize(xMethod, (int)aReader.Position,aMethodInfo.DebugMode);
+            Initialize(xMethod, (int)aReader.Position,aMethodInfo.DebugMode);
 		}
 		public void Assemble(string aMethod, int aArgumentCount) {
+            if (mTargetMethodInfo.ExtraStackSize > 0)
+            {
+                new CPUx86.Sub("esp",
+                               mTargetMethodInfo.ExtraStackSize.ToString());
+            }
 			new CPUx86.Call(aMethod);
-			EmitExceptionLogic(Assembler, mCurrentILOffset, mMethodInfo, mNextLabelName, true, null);
+            EmitExceptionLogic(Assembler, mCurrentILOffset, mMethodInfo, mNextLabelName, true, null);
 			for (int i = 0; i < aArgumentCount; i++) {
 				Assembler.StackContents.Pop();
 			}
 			if (mResultSize == 0) {
 				return;
 			}
-			if (mResultSize <= 4) {
-				new CPUx86.Push(CPUx86.Registers.EAX);
-				Assembler.StackContents.Push(new StackContent(mResultSize, ((MethodInfo)mTargetMethodInfo.Method).ReturnType));
-				return;
-			}
-			if (mResultSize <= 8) {
-				new CPUx86.Push(CPUx86.Registers.EBX);
-				new CPUx86.Push(CPUx86.Registers.EAX);
-				Assembler.StackContents.Push(new StackContent(mResultSize, ((MethodInfo)mTargetMethodInfo.Method).ReturnType));
-				return;
-			}
+		    Assembler.StackContents.Push(new StackContent(mResultSize,
+		                                                  ((MethodInfo)mTargetMethodInfo.Method).ReturnType));
 		}
 
 		protected virtual void HandleDebuggerBreak() {
