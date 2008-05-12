@@ -32,13 +32,12 @@ namespace MatthijsTest
         {
             Console.Clear();
             Console.WriteLine("Kernel started!");
-            ITest xTest = new TestImpl();
-            xTest.DoMessage();
-            //var xTest = new List<string>() { "String1", "String2", "String3", "String4" };
-            //foreach (string xItem in xTest.ToArray()) { Console.WriteLine(xItem); }
-            //Console.WriteLine();
-            //Console.Write("Number: ");
-            //Console.WriteLine(GetValue().ToString());
+            int xTest = 987;
+            IntPtr xPtr = (IntPtr)xTest;
+            xTest = (int)xPtr;
+            Console.Write("Value: ");
+            Console.Write(xTest.ToString());
+            Console.WriteLine();
         }
     }
 
