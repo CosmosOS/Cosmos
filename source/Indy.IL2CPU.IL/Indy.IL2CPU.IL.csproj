@@ -64,6 +64,7 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="ILReader.cs" />
     <Compile Include="ILReader.Utilities.cs" />
+    <Compile Include="INeedsMethodInfo.cs" />
     <Compile Include="InitVmtImplementationOp.cs" />
     <Compile Include="MainEntryPointOp.cs" />
     <Compile Include="MethodFooterOp.cs" />

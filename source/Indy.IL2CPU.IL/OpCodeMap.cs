@@ -90,27 +90,18 @@ namespace Indy.IL2CPU.IL {
 		}
 
 		public virtual void DoCustomAssembleImplementation(bool aInMetalMode, Assembler.Assembler aAssembler, MethodInformation aMethodInfo) {
-			PlugMethodAttribute xAttrib = (PlugMethodAttribute)aMethodInfo.Method.GetCustomAttributes(typeof(PlugMethodAttribute), true).Cast<PlugMethodAttribute>().FirstOrDefault();
+			PlugMethodAttribute xAttrib = aMethodInfo.Method.GetCustomAttributes(typeof(PlugMethodAttribute), true).Cast<PlugMethodAttribute>().FirstOrDefault();
 			if (xAttrib != null) {
 				Type xAssemblerType = xAttrib.MethodAssembler;
 				if (xAssemblerType != null) {
-					AssemblerMethod xAssembler = (AssemblerMethod)Activator.CreateInstance(xAssemblerType);
+					var xAssembler = (AssemblerMethod)Activator.CreateInstance(xAssemblerType);
+				    var xNeedsMethodInfo = xAssembler as INeedsMethodInfo;
+                    if (xNeedsMethodInfo != null) {
+                        xNeedsMethodInfo.MethodInfo = aMethodInfo; }
 					xAssembler.Assemble(aAssembler);
 				}
 			}
-		}
-
-		private static Type GetType(Assembly aAssembly, string aType) {
-			string xActualTypeName = aType;
-			if (xActualTypeName.Contains("<") && xActualTypeName.Contains(">")) {
-				xActualTypeName = xActualTypeName.Substring(0, xActualTypeName.IndexOf("<"));
-			}
-			Type xResult = aAssembly.GetType(aType, false);
-			if (xResult != null) {
-				return xResult;
-			}
-			throw new Exception("Type '" + aType + "' not found in assembly '" + aAssembly + "'!");
-		}
+		} 
 
 		public virtual void PostProcess(Assembler.Assembler aAssembler) {
 		}

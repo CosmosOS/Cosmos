@@ -5,9 +5,9 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
 	[OpCode(0xFFFFFFFF, "rep movsb")]
-	public class RepeatMovsd: Instruction {
+	public class RepeatMovsb: Instruction {
 		//public readonly string Destination;
-		public RepeatMovsd() {
+		public RepeatMovsb() {
 			//	Destination = aDestination;
 		}
 		//public override string ToString() {

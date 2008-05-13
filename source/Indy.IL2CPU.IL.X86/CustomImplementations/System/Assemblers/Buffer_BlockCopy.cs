@@ -29,7 +29,7 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System.Assemblers {
 			new CPUx86.Add("edi", "eax");
 
 			new CPUx86.Move("ecx", "[ebp + 8]");
-			new CPUx86.RepeatMovsd();
+			new CPUx86.RepeatMovsb();
 		}
 	}
 }

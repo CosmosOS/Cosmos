@@ -31,11 +31,11 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		public override void DoAssemble() {
 			string mReturnNullLabel = mThisLabel + "_ReturnNull";
-			new CPUx86.Move(CPUx86.Registers.EAX, CPUx86.Registers.AtESP);
+			new CPUx86.Move(CPUx86.Registers.EAX, "[esp]");
 			new CPUx86.Compare(CPUx86.Registers.EAX, "0");
 			new CPUx86.JumpIfZero(mReturnNullLabel);
 			new CPUx86.Pushd(CPUx86.Registers.AtEAX);
-			new CPUx86.Pushd("0" + mTypeId );
+			new CPUx86.Pushd("0x" + mTypeId.ToString("X"));
 			Assembler.StackContents.Push(new StackContent(4, typeof(object)));
 			Assembler.StackContents.Push(new StackContent(4, typeof(object)));
 			MethodBase xMethodIsInstance = Engine.GetMethodBase(typeof(VTablesImpl), "IsInstance", "System.Int32", "System.Int32");

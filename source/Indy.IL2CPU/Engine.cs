@@ -578,8 +578,7 @@ namespace Indy.IL2CPU {
                         if (xTD.BaseType == null) {
                             continue;
                         }
-                        if (xMethod.IsVirtual && !xMethod.IsConstructor &&
-                            !xMethod.IsFinal) {
+                        if (xMethod.IsVirtual && !xMethod.IsConstructor) {
                             Type xCurrentInspectedType = xTD.BaseType;
                             ParameterInfo[] xParams = xMethod.GetParameters();
                             Type[] xMethodParams = new Type[xParams.Length];
@@ -639,8 +638,7 @@ namespace Indy.IL2CPU {
                         break;
                     }
                     aCurrentInspectedType = aCurrentInspectedType.BaseType;
-                    MethodBase xFoundMethod = aCurrentInspectedType.GetMethod(aMethod.Name,
-                                                                              aMethodParams);
+                    MethodBase xFoundMethod = aCurrentInspectedType.GetMethod(aMethod.Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, Type.DefaultBinder, aMethodParams, new ParameterModifier[0]);
                     ParameterInfo[] xParams = xFoundMethod.GetParameters();
                     bool xContinue = true;
                     for (int i = 0; i < xParams.Length; i++) {
@@ -654,7 +652,12 @@ namespace Indy.IL2CPU {
                         continue;
                     }
                     if (xFoundMethod != null) {
-                        if (xFoundMethod.IsVirtual == aMethod.IsVirtual && xFoundMethod.IsPrivate == false && xFoundMethod.IsPublic == aMethod.IsPublic && xFoundMethod.IsFamily == aMethod.IsFamily && xFoundMethod.IsFamilyAndAssembly == aMethod.IsFamilyAndAssembly && xFoundMethod.IsFamilyOrAssembly == aMethod.IsFamilyOrAssembly &&
+                        if (xFoundMethod.IsVirtual == aMethod.IsVirtual && 
+                            xFoundMethod.IsPrivate == false && 
+                            xFoundMethod.IsPublic == aMethod.IsPublic && 
+                            xFoundMethod.IsFamily == aMethod.IsFamily && 
+                            xFoundMethod.IsFamilyAndAssembly == aMethod.IsFamilyAndAssembly && 
+                            xFoundMethod.IsFamilyOrAssembly == aMethod.IsFamilyOrAssembly &&
                             xFoundMethod.IsFinal == false) {
                             xBaseMethod = xFoundMethod;
                         }
@@ -1445,6 +1448,7 @@ namespace Indy.IL2CPU {
                                                                                                                 xCurOffset,
                                                                                                                 xKind,
                                                                                                                 !xParamDef.ParameterType.IsValueType,
+                                                                                                                GetTypeInfo(xParamDef.ParameterType),
                                                                                                                 xParamDef.ParameterType);
                                                                       xCurOffset += xArgSize;
                                                                   }
@@ -1454,6 +1458,7 @@ namespace Indy.IL2CPU {
                                                                                                             xCurOffset,
                                                                                                             MethodInformation.Argument.KindEnum.In,
                                                                                                             !aCurrentMethodForArguments.DeclaringType.IsValueType,
+                                                                                                            GetTypeInfo(aCurrentMethodForArguments.DeclaringType),
                                                                                                             aCurrentMethodForArguments.DeclaringType);
                                                               } else {
                                                                   ParameterInfo[] xParameters = aCurrentMethodForArguments.GetParameters();
@@ -1477,6 +1482,7 @@ namespace Indy.IL2CPU {
                                                                                                                 xCurOffset,
                                                                                                                 xKind,
                                                                                                                 !xParamDef.ParameterType.IsValueType,
+                                                                                                                GetTypeInfo(xParamDef.ParameterType),
                                                                                                                 xParamDef.ParameterType);
                                                                       xCurOffset += xArgSize;
                                                                   }
@@ -1509,7 +1515,7 @@ namespace Indy.IL2CPU {
                                     out aObjectStorageSize);
         }
 
-        private static void GetTypeFieldInfoImpl(Dictionary<string, TypeInformation.Field> aTypeFields,
+        private static void GetTypeFieldInfoImpl(List<KeyValuePair<string, TypeInformation.Field>> aTypeFields,
                                                  Type aType,
                                                  ref int aObjectStorageSize) {
             Type xActualType = aType;
@@ -1522,7 +1528,8 @@ namespace Indy.IL2CPU {
                                                   item.Value);
                     }
                 }
-                foreach (FieldInfo xField in aType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)) {
+                foreach (FieldInfo xField in aType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly))
+                {
                     if (xField.IsStatic) {
                         continue;
                     }
@@ -1557,9 +1564,9 @@ namespace Indy.IL2CPU {
                         xFieldSize = GetFieldStorageSize(xFieldType);
                     }
                     //}
-                    if (aTypeFields.ContainsKey(xFieldId)) {
-                        continue;
-                    }
+                    if ((from item in aTypeFields
+                         where item.Key == xFieldId
+                         select item).Count() > 0) { continue; }
                     int xOffset = aObjectStorageSize;
                     FieldOffsetAttribute xOffsetAttrib = xField.GetCustomAttributes(typeof(FieldOffsetAttribute),
                                                                                     true).FirstOrDefault() as FieldOffsetAttribute;
@@ -1569,13 +1576,13 @@ namespace Indy.IL2CPU {
                         aObjectStorageSize += xFieldSize;
                         xOffset = -1;
                     }
-                    aTypeFields.Add(xField.GetFullName(),
+                    aTypeFields.Insert(0, new KeyValuePair<string,TypeInformation.Field>(xField.GetFullName(),
                                     new TypeInformation.Field(xFieldSize,
                                                               xFieldType.IsClass && !xFieldType.IsValueType,
                                                               xFieldType,
                                                               (xPlugFieldAttr != null && xPlugFieldAttr.IsExternalValue)) {
                                                                                                                               Offset = xOffset
-                                                                                                                          });
+                                                                                                                          }));
                 }
                 while (xCurrentPlugFieldList.Count > 0) {
                     var xItem = xCurrentPlugFieldList.Values.First();
@@ -1594,11 +1601,11 @@ namespace Indy.IL2CPU {
                     }
                     int xOffset = aObjectStorageSize;
                     aObjectStorageSize += xFieldSize;
-                    aTypeFields.Add(xItem.FieldId,
+                    aTypeFields.Insert(0, new KeyValuePair<string,TypeInformation.Field>(xItem.FieldId,
                                     new TypeInformation.Field(xFieldSize,
                                                               xFieldType.IsClass && !xFieldType.IsValueType,
                                                               xFieldType,
-                                                              xItem.IsExternalValue));
+                                                              xItem.IsExternalValue)));
                 }
                 if (aType.FullName != "System.Object" &&
                     aType.BaseType != null) {
@@ -1611,7 +1618,7 @@ namespace Indy.IL2CPU {
 
         public static Dictionary<string, TypeInformation.Field> GetTypeFieldInfo(Type aType,
                                                                                  out int aObjectStorageSize) {
-            Dictionary<string, TypeInformation.Field> xTypeFields = new Dictionary<string, TypeInformation.Field>();
+                                                                                     var xTypeFields = new List<KeyValuePair<string, TypeInformation.Field>>();
             aObjectStorageSize = 0;
             GetTypeFieldInfoImpl(xTypeFields,
                                  aType,
@@ -1619,8 +1626,8 @@ namespace Indy.IL2CPU {
             if (aType.IsExplicitLayout) {
                 var xStructLayout = aType.StructLayoutAttribute;
                 if (xStructLayout.Size == 0) {
-                    aObjectStorageSize = (from item in xTypeFields.Values
-                                          let xSize = item.Offset + item.Size
+                    aObjectStorageSize = (from item in xTypeFields
+                                          let xSize = item.Value.Offset + item.Value.Size
                                           orderby xSize
                                           select xSize).FirstOrDefault();
                 } else {
@@ -1629,10 +1636,9 @@ namespace Indy.IL2CPU {
             }
             int xOffset = 0;
             Dictionary<string, TypeInformation.Field> xResult = new Dictionary<string, TypeInformation.Field>();
-            foreach (var item in xTypeFields.Reverse()) {
+            foreach (var item in xTypeFields) {
                 var xItem = item.Value;
-                if (item.Value.Offset ==
-                    -1) {
+                if (item.Value.Offset == -1) {
                     xItem.Offset = xOffset;
                     xOffset += xItem.Size;
                 }
@@ -1700,6 +1706,7 @@ namespace Indy.IL2CPU {
             if (mCurrent == null) {
                 throw new Exception("ERROR: No Current Engine found!");
             }
+            if (aMethod == null) { System.Diagnostics.Debugger.Break(); }
             if (!aMethod.IsStatic) {
                 RegisterType(aMethod.DeclaringType);
             }
@@ -1739,7 +1746,11 @@ namespace Indy.IL2CPU {
                     aType.GetArrayRank() != 1) {
                     throw new Exception("Multidimensional arrays are not yet supported!");
                 }
-                aType = aType.GetElementType();
+                if (aType.IsArray) { aType = typeof(Array); }
+                else
+                {
+                    aType = aType.GetElementType();
+                }
             }
             Type xFoundItem = mCurrent.mTypes.FirstOrDefault(x => x.FullName.Equals(aType.FullName));
             if (xFoundItem == null) {

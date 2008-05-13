@@ -20,33 +20,29 @@ namespace MatthijsTest
 
         #endregion
 
-        public static void GetResumeAndResume(ref uint aSuspend)
-        {
-            aSuspend = 0;
-            throw new NotImplementedException();
-        }
-        public static int GetValue() {
-            return 5; }
+       
 
         public static void Init()
         {
             Console.Clear();
             Console.WriteLine("Kernel started!");
-            int xTest = 987;
-            IntPtr xPtr = (IntPtr)xTest;
-            xTest = (int)xPtr;
-            Console.Write("Value: ");
-            Console.Write(xTest.ToString());
-            Console.WriteLine();
+            Console.WriteLine("Starting doing tests");
+            DoIt();
+            Console.WriteLine("Done");
         }
-    }
 
-    public interface ITest {
-        void DoMessage();}
+        public class TestType { public void DoIt(object sender, EventArgs e) { Console.WriteLine("Writeline from an instance method!"); } }
 
-    public class TestImpl : ITest {
-        public void DoMessage() {
-            Console.WriteLine("Message from interface member");
+        public static void DoIt()
+        {
+            EventHandler xEvent = WriteMessage1;
+            var xType = new TestType();
+            xEvent += xType.DoIt;
+            xEvent += WriteMessage2;
+            xEvent(null, null);
         }
+
+        public static void WriteMessage1(object sender, EventArgs e) { Console.WriteLine("Message 1"); }
+        public static void WriteMessage2(object sender, EventArgs e) { Console.WriteLine("Message 2"); }
     }
 }

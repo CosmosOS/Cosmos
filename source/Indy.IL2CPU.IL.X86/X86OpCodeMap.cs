@@ -6,6 +6,7 @@ using System.Reflection;
 using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using Indy.IL2CPU.Assembler;
+using Indy.IL2CPU.IL.X86.CustomImplementations.System;
 
 namespace Indy.IL2CPU.IL.X86 {
 	public  class X86OpCodeMap: OpCodeMap {
@@ -51,10 +52,11 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		public override bool HasCustomAssembleImplementation(MethodInformation aMethodInfo, bool aInMetalMode) {
 			switch (aMethodInfo.LabelName) {
-				case "System_Object___System_Threading_Interlocked_CompareExchange___System_Object___System_Object__System_Object___": {
+                case "System_Object__System_Threading_Interlocked_CompareExchange_System_Object___System_Object__System_Object_":
+                    {
 						return true;
 					}
-				case "System_Int32___System_Threading_Interlocked_CompareExchange___System_Int32___System_Int32__System_Int32___": {
+				case "System_Int32__System_Threading_Interlocked_CompareExchange_System_Int32___System_Int32__System_Int32_": {
 						return true;
 					}
 				case "System_String___System_String_FastAllocateString___System_Int32___": {
@@ -66,9 +68,10 @@ namespace Indy.IL2CPU.IL.X86 {
 				case "System_IntPtr___System_Delegate_GetInvokeMethod____": {
 						return true;
 					}
-				//case "System_IntPtr___System_Delegate_GetMulticastInvoke____": {
-				//        return true;
-				//    }
+                case "System_IntPtr__System_Delegate_GetMulticastInvoke__":
+                    {
+				        return true;
+				    }
 				case "System_MulticastDelegate___System_Delegate_InternalAllocLike___System_Delegate___": {
 						return true;
 					}
@@ -87,21 +90,27 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 		}
 
+        private static readonly MethodBase InvokeMulticastRef = typeof(MulticastDelegateImpl).GetMethod("InvokeMulticast", BindingFlags.Public | BindingFlags.Static);
+
 		public override void DoCustomAssembleImplementation(bool aInMetalMode, Indy.IL2CPU.Assembler.Assembler aAssembler, MethodInformation aMethodInfo) {
 			switch (aMethodInfo.LabelName) {
-				case "System_Object___System_Threading_Interlocked_CompareExchange___System_Object___System_Object__System_Object___": {
+                case "System_Object__System_Threading_Interlocked_CompareExchange_System_Object___System_Object__System_Object_":
+                    {
 						Assemble_System_Threading_Interlocked_CompareExchange__Object(aAssembler, aMethodInfo);
 						break;
 					}
-				case "System_Int32___System_Threading_Interlocked_CompareExchange___System_Int32___System_Int32__System_Int32___": {
+				case "System_Int32__System_Threading_Interlocked_CompareExchange_System_Int32___System_Int32__System_Int32_": {
 						Assemble_System_Threading_Interlocked_CompareExchange__Object(aAssembler, aMethodInfo);
 						break;
 					}
-				//case "System_IntPtr___System_Delegate_GetMulticastInvoke____": {
-				//        Engine.QueueMethod(CustomImplementations.System.EventHandlerImplRefs.MulticastInvokeRef);
-				//        new CPUx86.Push(CPU.Label.GenerateLabelName(CustomImplementations.System.EventHandlerImplRefs.MulticastInvokeRef));
-				//        break;
-				//    }
+                case "System_IntPtr__System_Delegate_GetMulticastInvoke__":
+                    {
+                        //IL.X86.Op.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
+                        
+                        Engine.QueueMethod(InvokeMulticastRef);
+                    new CPUx86.Push(Label.GenerateLabelName(InvokeMulticastRef));
+				        break;
+				    }
 				case "System_MulticastDelegate___System_Delegate_InternalAllocLike___System_Delegate___": {
 						break;
 					}
@@ -118,26 +127,45 @@ namespace Indy.IL2CPU.IL.X86 {
 							xOp.Assembler = aAssembler;
 							xOp.ProxiedMethod = CustomImplementations.System.EventHandlerImplRefs.CtorRef;
 							xOp.Assemble();
+                            Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
+                            //
+                            var xInvokeMethod = aMethodInfo.TypeInfo.TypeDef.GetMethod("Invoke");
+                            var xDelegateMethodInfo = Engine.GetMethodInfo(xInvokeMethod, xInvokeMethod, xInvokeMethod.Name, aMethodInfo.TypeInfo, aMethodInfo.DebugMode);
+                            int xArgSize = (from item in xDelegateMethodInfo.Arguments
+                                            select item.Size + (item.Size % 4 == 0
+                                                                    ? 0
+                                                                    : (4 - (item.Size % 4)))).Take(xDelegateMethodInfo.Arguments.Length).Sum();
+                            new CPUx86.Push((xArgSize-4).ToString());
+                            new CPU.Label(".SetArgSize");
+                            aAssembler.StackContents.Push(new StackContent(4));
+                            Stfld.Stfld(aAssembler, aMethodInfo.TypeInfo, aMethodInfo.TypeInfo.Fields["$$ArgSize$$"]);
 							break;
 						}
-						if (aMethodInfo.Method.Name == "Invoke") {
+                        if (aMethodInfo.Method.Name == "Invoke") {
 							// param 0 is instance of eventhandler
 							// param 1 is sender
 							// param 2 is eventargs
 						    new Label(".LoadTargetObject");
 							Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
-							Ldarg.Ldfld(aAssembler, aMethodInfo.TypeInfo, "System.Object System.Delegate._target");
-						    new Label(".LoadMethodParams");
-							for (int i = 1; i < aMethodInfo.Arguments.Length; i++) {
-								Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[i]);
-							}
-						    new Label(".LoadMethodPointer");
-							Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
-							Ldarg.Ldfld(aAssembler, aMethodInfo.TypeInfo, "System.IntPtr System.Delegate._methodPtr");
-							new CPUx86.Pop("eax");
-							new CPUx86.Call(CPUx86.Registers.EAX);
-						    new CPUx86.Add("esp",
-						                   "4");
+                            //Ldarg.Ldfld(aAssembler, aMethodInfo.TypeInfo, "System.Object System.Delegate._target");
+                            //new Label(".LoadMethodParams");
+                            //for (int i = 1; i < aMethodInfo.Arguments.Length; i++) {
+                            //    Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[i]);
+                            //}
+                            //new Label(".LoadMethodPointer");
+                            //Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
+                            //Ldarg.Ldfld(aAssembler, aMethodInfo.TypeInfo, "System.IntPtr System.Delegate._methodPtr");
+                            //new CPUx86.Pop("eax");
+                            //new CPUx86.Call(CPUx86.Registers.EAX);
+                            //new CPUx86.Add("esp",
+                            //               "4");
+                            Engine.QueueMethod(InvokeMulticastRef);
+                            new CPUx86.Call(Label.GenerateLabelName(InvokeMulticastRef));
+                            var xGetInvocationListMethod = typeof(MulticastDelegate).GetMethod("GetInvocationList");
+                            Engine.QueueMethod(xGetInvocationListMethod);
+                            xGetInvocationListMethod = typeof(Delegate).GetMethod("GetInvocationList");
+                            Engine.QueueMethod(xGetInvocationListMethod);
+
 							//							new CPUx86.Pop(CPUx86.Registers.EAX);
 							//new CPUx86.Move("esp", "ebp");
 							break;

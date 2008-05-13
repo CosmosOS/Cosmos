@@ -9,17 +9,21 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System {
 	//[PlugField(FieldId = "$$Method$$", FieldType = typeof(object))]
 	//[PlugField(FieldId = "$$Object$$", FieldType = typeof(object))]
 	public static class DelegateImpl {
-		//[PlugMethod(Signature = "System_IntPtr___System_Delegate_GetInvokeMethod____")]
-		//public static unsafe uint GetInvokeMethod(uint* aThis, [FieldAccess(Name = "$$Method$$")]uint aInvokeMethod) {
-		//    //return *(aThis + 2);
-		//    return aInvokeMethod;
-		//}
 
-		//public static void DoSomethingWithDelegate(Delegate aDelegate) {
-		//    // fake method to have the type Delegate referenced by the assembly
-		//    object o = aDelegate.Target;
-		//    object o2 = o;
+        [PlugMethod(Signature = "System_MulticastDelegate__System_Delegate_InternalAllocLike_System_Delegate_")]
+        public unsafe static uint InternalAllocLike(uint* aDelegate) {
+            uint xNeededSize = 1024; // 24 is needed fields for Multicast Delegate
+            xNeededSize += 12;
+            uint xResultAddr = GCImplementation.AllocNewObject(xNeededSize);
+            byte* xResult = (byte*)xResultAddr;
+            byte* xDelegateAsByte = (byte*)aDelegate;
+            for (int i = 0; i < 1024; i++)
+            {
+                xResult[i] = xDelegateAsByte[i];
+            }
+            return xResultAddr;
+        }
 
-		//}
+        public static IntPtr GetInvokeMethod() { return IntPtr.Zero; }
 	}
 }

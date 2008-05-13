@@ -44,6 +44,7 @@ namespace Indy.IL2CPU.IL {
                             int aOffset,
                             KindEnum aKind,
                             bool aIsReferenceType,
+                TypeInformation aTypeInfo,
                             Type aArgumentType) {
                 mSize = aSize;
                 mVirtualAddresses = new string[mSize / 4];
@@ -51,6 +52,7 @@ namespace Indy.IL2CPU.IL {
                 mArgumentType = aArgumentType;
                 mIsReferenceType = aIsReferenceType;
                 mOffset = -1;
+                TypeInfo = aTypeInfo;
                 Offset = aOffset;
             }
 
@@ -124,6 +126,8 @@ namespace Indy.IL2CPU.IL {
                     mArgumentType = value;
                 }
             }
+
+            public readonly TypeInformation TypeInfo;
         }
 
         public MethodInformation(string aLabelName,
