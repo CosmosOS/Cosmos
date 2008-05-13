@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 using Cosmos.Build.Windows;
 using System.Collections;
@@ -20,29 +22,25 @@ namespace MatthijsTest
 
         #endregion
 
-       
+        [ManifestResourceStream(ResourceName="MatthijsTest.Test.txt")]
+        private static readonly byte[] TheManifestResource;
 
         public static void Init()
         {
             Console.Clear();
-            Console.WriteLine("Kernel started!");
-            Console.WriteLine("Starting doing tests");
-            DoIt();
-            Console.WriteLine("Done");
+            if (TheManifestResource == null) {
+                Console.WriteLine("Field TheManifestResource is null!");
+                return; }
+            Console.Write("Length: ");
+            Console.WriteLine(TheManifestResource.Length.ToString());
+            int xLength = TheManifestResource.Length;
+            if(xLength > 10) {
+                Console.WriteLine("Too much data!");
+                return;
+            }
+            for(int i = 0; i < xLength;i++) {
+                Console.WriteLine(TheManifestResource[i].ToString()); 
+            }
         }
-
-        public class TestType { public void DoIt(object sender, EventArgs e) { Console.WriteLine("Writeline from an instance method!"); } }
-
-        public static void DoIt()
-        {
-            EventHandler xEvent = WriteMessage1;
-            var xType = new TestType();
-            xEvent += xType.DoIt;
-            xEvent += WriteMessage2;
-            xEvent(null, null);
-        }
-
-        public static void WriteMessage1(object sender, EventArgs e) { Console.WriteLine("Message 1"); }
-        public static void WriteMessage2(object sender, EventArgs e) { Console.WriteLine("Message 2"); }
     }
 }

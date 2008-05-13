@@ -841,43 +841,92 @@ namespace Indy.IL2CPU {
                            xFieldName);
                 xFieldName = DataMember.GetStaticFieldName(xCurrentField);
                 if (mAssembler.DataMembers.Count(x => x.Value.Name == xFieldName) == 0) {
-                    RegisterType(xCurrentField.FieldType);
+                    var xItem = (from item in xCurrentField.GetCustomAttributes(false)
+                                 where item.GetType().FullName == "ManifestResourceStreamAttribute"
+                                 select item).FirstOrDefault();
+                    string xManifestResourceName = null;
+                    if (xItem != null)
                     {
-                        int xTheSize;
-                        string theType = "db";
-                        Type xFieldTypeDef = xCurrentField.FieldType;
-                        //TypeSpecification xTypeSpec = xCurrentField.FieldType as TypeSpecification;
-                        //if (xTypeSpec == null) {
-                        if (!xFieldTypeDef.IsClass ||
-                            xFieldTypeDef.IsValueType) {
-                            xTheSize = GetFieldStorageSize(xCurrentField.FieldType);
-                        } else {
-                            xTheSize = 4;
-                        }
-                        //} else {
-                        //xTheSize = 4;
-                        //}
-                        if (xTheSize == 4) {
-                            theType = "dd";
-                            xTheSize = 1;
-                        } else {
-                            if (xTheSize == 2) {
-                                theType = "dw";
-                                xTheSize = 1;
-                            }
-                        }
+                        var xItemType = xItem.GetType();
+                        xManifestResourceName = (string)xItemType.GetField("ResourceName").GetValue(xItem);
+                    }
+                    if (xManifestResourceName != null) {
+                        RegisterType(xCurrentField.FieldType);
                         string xTheData = "";
-                        if (xTheSize == 0) {
-                            throw new Exception("Field '" + xCurrentField.ToString() + "' doesn't have a valid size!");
-                        }
-                        for (uint i = 0; i < xTheSize; i++) {
-                            xTheData += "0,";
+                        using (var xStream = xCurrentField.DeclaringType.Assembly.GetManifestResourceStream(xManifestResourceName))
+                        {
+                            // todo: abstract this array code out.
+                            StringBuilder xSB = new StringBuilder((int)((xStream.Length * 4) + 32));
+                            xSB.Append(BitConverter.GetBytes(Engine.RegisterType(Engine.GetType("mscorlib", "System.Array"))).Aggregate("", (r, b) => r + b + ","));
+                            xSB.Append(BitConverter.GetBytes((uint)InstanceTypeEnum.StaticEmbeddedArray).Aggregate("", (r, b) => r + b + ","));
+                            xSB.Append(BitConverter.GetBytes((int)xStream.Length).Aggregate("", (r, b) => r + b + ","));
+                            xSB.Append(BitConverter.GetBytes((int)1).Aggregate("", (r, b) => r + b + ","));
+                            var xBuff = new byte [128];
+                            while(xStream.Position < xStream.Length){
+                                int xBytesRead = xStream.Read(xBuff, 0, 128);
+                                xSB.Append(xBuff.Take(xBytesRead).Aggregate("", (r, b) => r + b + ","));
+                            }
+                            xTheData = xSB.ToString();
                         }
                         xTheData = xTheData.TrimEnd(',');
-                        mAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>(mAssembler.CurrentGroup,
-                                                                                        new DataMember(xFieldName,
-                                                                                                       theType,
+                        mAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>("ManifestResourceStreams",
+                                                                                        new DataMember("___" + xFieldName + "___Contents",
+                                                                                                       "db",
                                                                                                        xTheData)));
+                        mAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>("ManifestResourceStreams",
+                                                                                        new DataMember(xFieldName,
+                                                                                                       "dd",
+                                                                                                       "___" + xFieldName + "___Contents")));
+                    }
+                    else
+                    {
+                        RegisterType(xCurrentField.FieldType);
+                        {
+                            int xTheSize;
+                            string theType = "db";
+                            Type xFieldTypeDef = xCurrentField.FieldType;
+                            //TypeSpecification xTypeSpec = xCurrentField.FieldType as TypeSpecification;
+                            //if (xTypeSpec == null) {
+                            if (!xFieldTypeDef.IsClass ||
+                                xFieldTypeDef.IsValueType)
+                            {
+                                xTheSize = GetFieldStorageSize(xCurrentField.FieldType);
+                            }
+                            else
+                            {
+                                xTheSize = 4;
+                            }
+                            //} else {
+                            //xTheSize = 4;
+                            //}
+                            if (xTheSize == 4)
+                            {
+                                theType = "dd";
+                                xTheSize = 1;
+                            }
+                            else
+                            {
+                                if (xTheSize == 2)
+                                {
+                                    theType = "dw";
+                                    xTheSize = 1;
+                                }
+                            }
+                            string xTheData = "";
+                            if (xTheSize == 0)
+                            {
+                                throw new Exception("Field '" + xCurrentField.ToString() + "' doesn't have a valid size!");
+                            }
+                            for (uint i = 0; i < xTheSize; i++)
+                            {
+                                xTheData += "0,";
+                            }
+                            xTheData = xTheData.TrimEnd(',');
+                            mAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>(mAssembler.CurrentGroup,
+                                                                                            new DataMember(xFieldName,
+                                                                                                           theType,
+                                                                                                           xTheData)));
+                        }
                     }
                 }
                 mStaticFields[xCurrentField] = true;
