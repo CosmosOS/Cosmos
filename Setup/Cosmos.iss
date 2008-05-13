@@ -10,7 +10,7 @@ AppPublisher=Cosmos Project
 AppPublisherURL=http://www.gocosmos.org/
 AppSupportURL=http://www.gocosmos.org/
 AppUpdatesURL=http://www.gocosmos.org/
-DefaultDirName={pf}\Cosmos User Kit
+DefaultDirName={userappdata}\Cosmos User Kit
 DefaultGroupName=Cosmos User Kit
 OutputDir=.\Output
 OutputBaseFilename=CosmosUserKit
@@ -103,9 +103,8 @@ Name: "{group}\{cm:UninstallProgram,Uninstall}"; Filename: "{uninstallexe}"
 Source: "..\setup\Cosmos.vsi"; DestDir: "{app}";
 Source: "Tools\*"; DestDir: "{app}\Tools"; Excludes: "*.log;*.asm;output.bin"; Flags: recursesubdirs;
 Source: "..\source\Cosmos\Cosmos.Shell.Console\bin\Debug\*.dll"; DestDir: "{app}\Tools\GAC";
-Source: "..\source\IL2CPU\bin\Debug\IL2CPU.exe"; DestDir: "{app}\Tools\GAC";
 Source: "..\setup\RegGac.exe"; DestDir: "{app}";
-Source: "..\Build\ISO\*.*"; DestDir: "{userappdata}\Cosmos User Kit\ISO"; Excludes: "output.bin";
+Source: "..\Build\ISO\*.*"; DestDir: "{app}\ISO"; Excludes: "output.bin";
 
 [Registry]
 Root: HKCU; Subkey: "Software\Cosmos"; ValueType: string; ValueName: "Build Path"; ValueData: "{app}";
