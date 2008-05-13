@@ -34,10 +34,10 @@ namespace Indy.IL2CPU {
 			if (aType == null) {
 				throw new ArgumentNullException("aType");
 			}
-			int xResult;
-			Engine.GetTypeFieldInfo(aType, out xResult);
-			xResult += ObjectImpl.FieldDataOffset;
-			return xResult;
+			var xTypeInfo = Engine.GetTypeInfo(aType);
+		    return xTypeInfo.NeedsGC
+		               ? xTypeInfo.StorageSize + ObjectImpl.FieldDataOffset
+		               : xTypeInfo.StorageSize;
 		}
 	}
 }
