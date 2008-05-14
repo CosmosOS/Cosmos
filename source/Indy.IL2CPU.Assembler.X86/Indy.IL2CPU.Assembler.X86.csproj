@@ -63,6 +63,7 @@
     <Compile Include="Compare.cs" />
     <Compile Include="ConditionalMove.cs" />
     <Compile Include="Condition.cs" />
+    <Compile Include="RotateThroughCarryRight.cs" />
     <Compile Include="DebugStub.cs" />
     <Compile Include="Dec.cs" />
     <Compile Include="IDivide.cs" />
@@ -86,6 +87,7 @@
     <Compile Include="Out.cs" />
     <Compile Include="Popad.cs" />
     <Compile Include="Pushad.cs" />
+    <Compile Include="RotateThroughCarryLeft.cs" />
     <Compile Include="SignExtendAX.cs" />
     <Compile Include="Sti.cs" />
     <Compile Include="Stosw.cs" />

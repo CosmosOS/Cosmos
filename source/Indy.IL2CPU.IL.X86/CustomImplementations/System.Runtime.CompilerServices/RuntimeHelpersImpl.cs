@@ -33,7 +33,6 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System.Runtime.CompilerServic
 			new Assembler.X86.Move("ecx", "eax");
 			new Assembler.X86.Move(Assembler.X86.Registers.EAX, "0");
 			new Assembler.X86.Add(Assembler.X86.Registers.EDI, "4");
-			new Assembler.X86.Add(Assembler.X86.Registers.ESI, "16");
 
 			new Assembler.Label(".StartLoop");
 			new Assembler.X86.Move("byte", Assembler.X86.Registers.DL, Assembler.X86.Registers.AtESI);

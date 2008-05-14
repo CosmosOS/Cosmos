@@ -66,7 +66,6 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
                 new CPUx86.Move("byte [_NATIVE_IDT_Contents + " + ((i*8) + 5) + "]",
                                 "0x8E");
                 new CPUx86.ShiftRight("eax",
-                                      "eax",
                                       "16");
                 new CPUx86.Move("[_NATIVE_IDT_Contents + " + ((i*8) + 6) + "]",
                                 Registers.AL);

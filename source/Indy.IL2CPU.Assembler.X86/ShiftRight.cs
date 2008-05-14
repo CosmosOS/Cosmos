@@ -8,14 +8,12 @@ namespace Indy.IL2CPU.Assembler.X86 {
 	public class ShiftRight: Instruction {
 		private string mDestination;
 		private string mCount;
-		private string mSource;
-		public ShiftRight(string aDestination, string aSource, string aCount) {
+		public ShiftRight(string aDestination, string aCount) {
 			mDestination = aDestination;
 			mCount = aCount;
-			mSource = aSource;
 		}
 		public override string ToString() {
-			return "shrd " + mDestination + ", " + mSource + ", " + mCount;
+			return "shr " + mDestination + ", " + mCount;
 		}
 	}
 }

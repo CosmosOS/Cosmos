@@ -840,6 +840,8 @@ namespace Indy.IL2CPU {
                            "Processing Static Field '{0}'",
                            xFieldName);
                 xFieldName = DataMember.GetStaticFieldName(xCurrentField);
+                if (xCurrentField.ToString() == "__StaticArrayInitTypeSize=16 $$method0x6000002-1") { System.Diagnostics.Debugger.Break(); }
+
                 if (mAssembler.DataMembers.Count(x => x.Value.Name == xFieldName) == 0) {
                     var xItem = (from item in xCurrentField.GetCustomAttributes(false)
                                  where item.GetType().FullName == "ManifestResourceStreamAttribute"
@@ -914,14 +916,35 @@ namespace Indy.IL2CPU {
                                     xTheSize = 1;
                                 }
                             }
+                            object xValue = xCurrentField.GetValue(null);
                             string xTheData = "";
+                            if (xValue != null)
+                            {
+                                try
+                                {
+                                    if (xValue.GetType().IsValueType)
+                                    {
+                                        StringBuilder xSB = new StringBuilder(xTheSize * 3);
+                                        for (int i = 0; i < xTheSize; i++)
+                                        {
+                                            xSB.Append(Marshal.ReadByte(xValue,
+                                                                        i));
+                                            xSB.Append(",");
+                                        }
+                                        xTheData = xSB.Remove(xSB.Length - 1,
+                                                              1).ToString();
+                                    }
+                                }
+                                catch { }
+                            }
                             if (xTheSize == 0)
                             {
                                 throw new Exception("Field '" + xCurrentField.ToString() + "' doesn't have a valid size!");
                             }
-                            for (uint i = 0; i < xTheSize; i++)
-                            {
-                                xTheData += "0,";
+                            if (String.IsNullOrEmpty(xTheData)) {
+                                for (uint i = 0; i < xTheSize; i++) {
+                                    xTheData += "0,";
+                                }
                             }
                             xTheData = xTheData.TrimEnd(',');
                             mAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>(mAssembler.CurrentGroup,
