@@ -41,6 +41,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			mArgumentCount = mTargetMethodInfo.Arguments.Length;
 			mReturnSize = mTargetMethodInfo.ReturnSize;
 			mThisOffset = mTargetMethodInfo.Arguments[0].Offset;
+            if (mTargetMethodInfo.ExtraStackSize > 0) { mThisOffset -= mTargetMethodInfo.ExtraStackSize; }
 			mCurrentILOffset = aReader.Position;
             mExtraStackSpace = mTargetMethodInfo.ExtraStackSize;
 

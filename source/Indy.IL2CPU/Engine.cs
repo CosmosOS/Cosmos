@@ -139,7 +139,7 @@ namespace Indy.IL2CPU {
         }
 
         public event Action ProgressChanged;
-
+        private Func<string, string> mGetFileNameForGroup;
         private void OnProgressChanged() {
             if (ProgressChanged != null) {
                 ProgressChanged();
@@ -853,26 +853,28 @@ namespace Indy.IL2CPU {
                     if (xManifestResourceName != null) {
                         RegisterType(xCurrentField.FieldType);
                         string xTheData = "";
+                        string xFileName = Path.Combine(mOutputDir, (xCurrentField.DeclaringType.Assembly.FullName + "__" + xManifestResourceName).Replace(",", "_") + ".res");
                         using (var xStream = xCurrentField.DeclaringType.Assembly.GetManifestResourceStream(xManifestResourceName))
                         {
-                            // todo: abstract this array code out.
-                            StringBuilder xSB = new StringBuilder((int)((xStream.Length * 4) + 32));
-                            xSB.Append(BitConverter.GetBytes(Engine.RegisterType(Engine.GetType("mscorlib", "System.Array"))).Aggregate("", (r, b) => r + b + ","));
-                            xSB.Append(BitConverter.GetBytes((uint)InstanceTypeEnum.StaticEmbeddedArray).Aggregate("", (r, b) => r + b + ","));
-                            xSB.Append(BitConverter.GetBytes((int)xStream.Length).Aggregate("", (r, b) => r + b + ","));
-                            xSB.Append(BitConverter.GetBytes((int)1).Aggregate("", (r, b) => r + b + ","));
-                            var xBuff = new byte [128];
-                            while(xStream.Position < xStream.Length){
-                                int xBytesRead = xStream.Read(xBuff, 0, 128);
-                                xSB.Append(xBuff.Take(xBytesRead).Aggregate("", (r, b) => r + b + ","));
+                            using (var xTarget = File.Create(xFileName))
+                            {
+                                // todo: abstract this array code out.
+                                xTarget.Write(BitConverter.GetBytes(Engine.RegisterType(Engine.GetType("mscorlib", "System.Array"))), 0, 4);
+                                xTarget.Write(BitConverter.GetBytes((uint)InstanceTypeEnum.StaticEmbeddedArray), 0, 4);
+                                xTarget.Write(BitConverter.GetBytes((int)xStream.Length), 0, 4);
+                                xTarget.Write(BitConverter.GetBytes((int)1), 0, 4);
+                                var xBuff = new byte[128];
+                                while (xStream.Position < xStream.Length)
+                                {
+                                    int xBytesRead = xStream.Read(xBuff, 0, 128);
+                                    xTarget.Write(xBuff, 0, xBytesRead);
+                                }
                             }
-                            xTheData = xSB.ToString();
                         }
-                        xTheData = xTheData.TrimEnd(',');
                         mAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>("ManifestResourceStreams",
                                                                                         new DataMember("___" + xFieldName + "___Contents",
-                                                                                                       "db",
-                                                                                                       xTheData)));
+                                                                                                       "incbin",
+                                                                                                       "\"" + xFileName + "\"")));
                         mAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>("ManifestResourceStreams",
                                                                                         new DataMember(xFieldName,
                                                                                                        "dd",

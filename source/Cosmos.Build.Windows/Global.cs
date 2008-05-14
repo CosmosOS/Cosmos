@@ -34,7 +34,7 @@ namespace Cosmos.Build.Windows {
             }
 
             if (aWait || (aCapture && xProcess.HasExited)) {
-                if (!xProcess.WaitForExit(60 * 1000) || xProcess.ExitCode != 0) {
+                if (!xProcess.WaitForExit(120 * 1000) || xProcess.ExitCode != 0) {
                     //TODO: Fix
                     if (aCapture) {
                         Console.ForegroundColor = ConsoleColor.Red;

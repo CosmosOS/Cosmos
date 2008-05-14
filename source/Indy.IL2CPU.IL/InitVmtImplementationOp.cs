@@ -1,5 +1,4 @@
-﻿#define MTW_DEBUG
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,7 +21,10 @@ namespace Indy.IL2CPU.IL {
 		public InitVmtImplementationOp(ILReader aReader, MethodInformation aMethodInfo)
 			: base(aReader, aMethodInfo) {
 		}
-
+        private static readonly bool mDebugMode = false;
+        static InitVmtImplementationOp() {
+            mDebugMode = Environment.MachineName.Equals("laptop-matthijs", StringComparison.InvariantCultureIgnoreCase);
+        }
 		private IList<Type> mTypes;
 		public MethodBase LoadTypeTableRef;
 		public MethodBase SetTypeInfoRef;				   
@@ -46,20 +48,23 @@ namespace Indy.IL2CPU.IL {
 		protected abstract void Call(MethodBase aMethod);
 
 		public override void DoAssemble() {
-#if MTW_DEBUG
-			using (XmlWriter xDebug = XmlWriter.Create(@"d:\vtables.xml")) {
-				xDebug.WriteStartDocument();
-				xDebug.WriteStartElement("VTables");
-				xDebug.WriteStartElement("AllMethods");
-				for(int i = 0; i < Methods.Count; i++){
-					MethodBase xTheMethod = Methods[i];
-					xDebug.WriteStartElement("Method");
-					xDebug.WriteAttributeString("Id", GetMethodIdentifier(xTheMethod).ToString("X"));
-					xDebug.WriteAttributeString("Name", xTheMethod.GetFullName());
-					xDebug.WriteEndElement();
-				}
-				xDebug.WriteEndElement();
-#endif
+            XmlWriter xDebug=null;
+            if (mDebugMode)
+            {
+                xDebug = XmlWriter.Create(@"d:\vtables.xml");
+                xDebug.WriteStartDocument();
+                xDebug.WriteStartElement("VTables");
+                xDebug.WriteStartElement("AllMethods");
+                for (int i = 0; i < Methods.Count; i++)
+                {
+                    MethodBase xTheMethod = Methods[i];
+                    xDebug.WriteStartElement("Method");
+                    xDebug.WriteAttributeString("Id", GetMethodIdentifier(xTheMethod).ToString("X"));
+                    xDebug.WriteAttributeString("Name", xTheMethod.GetFullName());
+                    xDebug.WriteEndElement();
+                }
+                xDebug.WriteEndElement();
+            }
 			string xTheName = DataMember.GetStaticFieldName(TypesFieldRef);
 			DataMember xDataMember = (from item in Assembler.DataMembers
 									  where item.Value.Name == xTheName
@@ -84,11 +89,12 @@ namespace Indy.IL2CPU.IL {
 			Pushd("0" + mTypes.Count.ToString("X") + "h");
 			Call(LoadTypeTableRef);
 			for (int i = 0; i < mTypes.Count; i++) {
-#if MTW_DEBUG
-					xDebug.WriteStartElement("Type");
-					xDebug.WriteAttributeString("Id", i.ToString("X"));
+                if (mDebugMode)
+                {
+                    xDebug.WriteStartElement("Type");
+                    xDebug.WriteAttributeString("Id", i.ToString("X"));
                     xDebug.WriteAttributeString("Name", mTypes[i].FullName);
-#endif
+                }
                     try
                     {
                         Type xType = mTypes[i];
@@ -159,9 +165,10 @@ namespace Indy.IL2CPU.IL {
                         {
                             throw new Exception("Base type not found!");
                         }
-#if MTW_DEBUG
-                        xDebug.WriteAttributeString("BaseId", xBaseIndex.Value.ToString("X"));
-#endif
+                        if (mDebugMode)
+                        {
+                            xDebug.WriteAttributeString("BaseId", xBaseIndex.Value.ToString("X"));
+                        }
                         if (!xType.IsInterface)
                         {
 
@@ -215,12 +222,13 @@ namespace Indy.IL2CPU.IL {
                                 if (xNewMethod == null) { System.Diagnostics.Debugger.Break(); }
                                 xMethod = xNewMethod;
                             }
-#if MTW_DEBUG
-                            xDebug.WriteStartElement("Method");
-                            xDebug.WriteAttributeString("Id", xMethodId.ToString("X"));
-                            xDebug.WriteAttributeString("Name", xMethod.GetFullName());
-                            xDebug.WriteEndElement();
-#endif
+                            if (mDebugMode)
+                            {
+                                xDebug.WriteStartElement("Method");
+                                xDebug.WriteAttributeString("Id", xMethodId.ToString("X"));
+                                xDebug.WriteAttributeString("Name", xMethod.GetFullName());
+                                xDebug.WriteEndElement();
+                            }
                             if (!xType.IsInterface)
                             {
 
@@ -240,14 +248,17 @@ namespace Indy.IL2CPU.IL {
                     }
                     finally
                     {
-#if MTW_DEBUG
-                        xDebug.WriteEndElement();
-#endif
+                        if (mDebugMode)
+                        {
+                            xDebug.WriteEndElement();
+                        }
                     }
 			}
-#if MTW_DEBUG
-			}
-#endif
+            if (mDebugMode)
+            {
+                xDebug.Close();
+            }
+
 		}
 	}
 }
