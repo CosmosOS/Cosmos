@@ -331,7 +331,11 @@ namespace Indy.IL2CPU {
                             GenerateVMT(mDebugMode != DebugModeEnum.None);
                         }
                         mMap.PostProcess(mAssembler);
-                        ProcessAllStaticFields();
+                        try
+                        {
+                            ProcessAllStaticFields();
+                        }
+                        catch (Exception E) { mDebugLog(LogSeverityEnum.Error, E.Message); }
                         if (mSymbols != null) {
                             string xOutputFile = Path.Combine(mOutputDir,
                                                               "debug.cxdb");
@@ -858,6 +862,7 @@ namespace Indy.IL2CPU {
                         string xFileName = Path.Combine(mOutputDir, (xCurrentField.DeclaringType.Assembly.FullName + "__" + xManifestResourceName).Replace(",", "_") + ".res");
                         using (var xStream = xCurrentField.DeclaringType.Assembly.GetManifestResourceStream(xManifestResourceName))
                         {
+                            if (xStream == null) { throw new Exception("Resource '" + xManifestResourceName + "' not found!"); }
                             using (var xTarget = File.Create(xFileName))
                             {
                                 // todo: abstract this array code out.

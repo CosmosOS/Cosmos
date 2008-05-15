@@ -23,8 +23,13 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			var right = Assembler.StackContents.Pop();
 			var left = Assembler.StackContents.Pop();
-			if (right.Size != left.Size)
-				throw new NotImplementedException("mixed size operations are not implemented");
+            if (right.Size != left.Size)
+            {
+                if (right.Size > 4 || left.Size > 4)
+                {
+                    throw new NotImplementedException("mixed size operations are not implemented! (" + left.Size + "/" + right.Size + ")");
+                }
+            }
 
 			int xSize = right.Size;
 

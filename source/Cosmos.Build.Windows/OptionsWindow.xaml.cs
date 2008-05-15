@@ -153,58 +153,74 @@ namespace Cosmos.Build.Windows {
 		byte mComport;
 
 		protected void DoBuild() {
-			SaveSettingsToRegistry();
+            try
+            {
+                SaveSettingsToRegistry();
 
-			mComport = (byte)cmboDebugPort.SelectedIndex;
-			if (mComport > 3) {
-				throw new Exception("Debug port not supported yet!");
-			}
-			mComport++;
-            string xDebugMode = (string)cmboDebugMode.SelectedValue;
-            mDebugMode = DebugModeEnum.None;
-            if (xDebugMode == "IL") {
-				mDebugMode = DebugModeEnum.IL;
-            } else if (xDebugMode == "Source") {
-    			mDebugMode = DebugModeEnum.Source;
-				mComport = 1;
-            } else if (xDebugMode == "None") {
-				mDebugMode = DebugModeEnum.None;
-			} else {
-				throw new Exception("Selected debug mode not supported!");
-			}
+                mComport = (byte)cmboDebugPort.SelectedIndex;
+                if (mComport > 3)
+                {
+                    throw new Exception("Debug port not supported yet!");
+                }
+                mComport++;
+                string xDebugMode = (string)cmboDebugMode.SelectedValue;
+                mDebugMode = DebugModeEnum.None;
+                if (xDebugMode == "IL")
+                {
+                    mDebugMode = DebugModeEnum.IL;
+                }
+                else if (xDebugMode == "Source")
+                {
+                    mDebugMode = DebugModeEnum.Source;
+                    mComport = 1;
+                }
+                else if (xDebugMode == "None")
+                {
+                    mDebugMode = DebugModeEnum.None;
+                }
+                else
+                {
+                    throw new Exception("Selected debug mode not supported!");
+                }
 
-			if (chckCompileIL.IsChecked.Value) {
-				Console.WriteLine("Compiling...");
-				var xBuildWindow = new BuildWindow();
-				mBuilder.DebugLog += xBuildWindow.DoDebugMessage;
-				mBuilder.ProgressChanged += delegate(int aMax, int aCurrent) {
-					xBuildWindow.ProgressMax = aMax;
-					xBuildWindow.ProgressCurrent = aCurrent;
-					var xFrame = new DispatcherFrame();
-					Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Input, new DispatcherOperationCallback(delegate(object aParam) {
-						xFrame.Continue = false;
-						return null;
-					}), null);
-					Dispatcher.PushFrame(xFrame);
-				};
-				xBuildWindow.Show();
-				mBuilder.Compile(mDebugMode, mComport);
-				mBuilder.DebugLog -= xBuildWindow.DoDebugMessage;
-				var xMessages = (from item in xBuildWindow.Messages
-								 where item.Severity != LogSeverityEnum.Informational
-								 select item);
-				xBuildWindow.Close();
-				if (xMessages.Count() > 0) {
-					xBuildWindow = new BuildWindow();
-					xBuildWindow.Messages.Clear();
-					foreach (var item in xMessages) {
-						xBuildWindow.Messages.Add(item);
-					}
-					xBuildWindow.ShowDialog();
-					return;
-				}
-			}
-
+                if (chckCompileIL.IsChecked.Value)
+                {
+                    Console.WriteLine("Compiling...");
+                    var xBuildWindow = new BuildWindow();
+                    mBuilder.DebugLog += xBuildWindow.DoDebugMessage;
+                    mBuilder.ProgressChanged += delegate(int aMax, int aCurrent)
+                    {
+                        xBuildWindow.ProgressMax = aMax;
+                        xBuildWindow.ProgressCurrent = aCurrent;
+                        var xFrame = new DispatcherFrame();
+                        Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Input, new DispatcherOperationCallback(delegate(object aParam)
+                        {
+                            xFrame.Continue = false;
+                            return null;
+                        }), null);
+                        Dispatcher.PushFrame(xFrame);
+                    };
+                    xBuildWindow.Show();
+                    mBuilder.Compile(mDebugMode, mComport);
+                    mBuilder.DebugLog -= xBuildWindow.DoDebugMessage;
+                    var xMessages = (from item in xBuildWindow.Messages
+                                     where item.Severity != LogSeverityEnum.Informational
+                                     select item);
+                    xBuildWindow.Close();
+                    if (xMessages.Count() > 0)
+                    {
+                        xBuildWindow = new BuildWindow();
+                        xBuildWindow.Messages.Clear();
+                        foreach (var item in xMessages)
+                        {
+                            xBuildWindow.Messages.Add(item);
+                        }
+                        xBuildWindow.ShowDialog();
+                        return;
+                    }
+                }
+            }
+            catch (Exception E) { System.Diagnostics.Debugger.Break(); }
 			if (rdioQEMU.IsChecked.Value) {
 				mBuilder.MakeQEMU(chckQEMUUseHD.IsChecked.Value, chckQEMUUseGDB.IsChecked.Value, mDebugMode != DebugModeEnum.None, mDebugMode != DebugModeEnum.None);
 			} else if (rdioVMWare.IsChecked.Value) {

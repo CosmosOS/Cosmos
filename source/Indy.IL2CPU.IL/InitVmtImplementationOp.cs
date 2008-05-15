@@ -206,22 +206,6 @@ namespace Indy.IL2CPU.IL {
                         {
                             MethodBase xMethod = xEmittedMethods.Keys[j];
                             var xMethodId = GetMethodIdentifier(xMethod);
-                            if (xEmittedMethods.Values[j])
-                            {
-                                var xNewMethod = xType.GetMethod(xMethod.DeclaringType.FullName + "." + xMethod.Name,
-                                                                    (from xParam in xMethod.GetParameters()
-                                                                     select xParam.ParameterType).ToArray());
-
-                                if (xNewMethod == null)
-                                {
-                                    // get private implemenation
-                                    xNewMethod = xType.GetMethod(xMethod.Name,
-                                                                    (from xParam in xMethod.GetParameters()
-                                                                     select xParam.ParameterType).ToArray());
-                                }
-                                if (xNewMethod == null) { System.Diagnostics.Debugger.Break(); }
-                                xMethod = xNewMethod;
-                            }
                             if (mDebugMode)
                             {
                                 xDebug.WriteStartElement("Method");
@@ -231,7 +215,38 @@ namespace Indy.IL2CPU.IL {
                             }
                             if (!xType.IsInterface)
                             {
+                                if (xEmittedMethods.Values[j])
+                                {
+                                    var xNewMethod = xType.GetMethod(xMethod.DeclaringType.FullName + "." + xMethod.Name,
+                                                                        (from xParam in xMethod.GetParameters()
+                                                                         select xParam.ParameterType).ToArray());
 
+                                    if (xNewMethod == null)
+                                    {
+                                        // get private implemenation
+                                        xNewMethod = xType.GetMethod(xMethod.Name,
+                                                                        (from xParam in xMethod.GetParameters()
+                                                                         select xParam.ParameterType).ToArray());
+                                    }
+                                    if (xNewMethod == null)
+                                    {
+                                        try
+                                        {
+                                            var xMap = xType.GetInterfaceMap(xMethod.DeclaringType);
+                                            for (int k = 0; k < xMap.InterfaceMethods.Length; k++)
+                                            {
+                                                if (xMap.InterfaceMethods[k] == xMethod)
+                                                {
+                                                    xNewMethod = xMap.TargetMethods[k];
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        catch { }
+                                    }
+                                    if (xNewMethod == null) { System.Diagnostics.Debugger.Break(); }
+                                    xMethod = xNewMethod;
+                                }
                                 Pushd("0" + i.ToString("X") + "h");
                                 Pushd("0" + j.ToString("X") + "h");
 
