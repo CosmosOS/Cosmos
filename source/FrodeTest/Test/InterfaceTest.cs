@@ -7,6 +7,7 @@ namespace FrodeTest.Test
     interface IDummyInterface
     {
         string Execute();
+        string Property { get; set; }
     }
 
     class Dummy : IDummyInterface
@@ -16,6 +17,19 @@ namespace FrodeTest.Test
             Console.WriteLine("Inside Execute in Interface implementor...");
             return "Interfaces WORKS";
         }
+
+        private string xProperty;
+        public string Property
+        {
+            get
+            {
+                return xProperty;
+            }
+            set
+            {
+                xProperty = value;
+            }
+        }
     }
 
     public class InterfaceTest
@@ -23,7 +37,9 @@ namespace FrodeTest.Test
         public static void RunTest()
         {
             Test.Dummy dummy = new FrodeTest.Test.Dummy();
-            dummy.Execute();
+            Console.WriteLine(dummy.Execute());
+            dummy.Property = "Hello Interfaces!";
+            Console.WriteLine("Property get: " + dummy.Property);
         }
     }
 }
