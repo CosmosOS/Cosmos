@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using Cosmos.Build.Windows;
-using System.Collections;
+using System.IO.Compression;
 using System.Security.Cryptography;
+using Cosmos.Build.Windows;
+using ICSharpCode.SharpZipLib.Zip.Compression;
+using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
+using Huffman;
 
 namespace MatthijsTest
 {
@@ -26,6 +25,8 @@ namespace MatthijsTest
 
         [ManifestResourceStream(ResourceName = "MatthijsTest.Test.txt")]
         private static readonly byte[] TheManifestResource;
+        [ManifestResourceStream(ResourceName = "MatthijsTest.Test.txt.gz")]
+        private static readonly byte[] TheManifestResourceZipped;
 
         public static unsafe void Init()
         {
@@ -35,25 +36,9 @@ namespace MatthijsTest
             Console.Write("Length: ");
             Console.WriteLine(((int)xMS.Length).ToString());
 
-            SHA256Managed xSHA = new SHA256Managed();
-            var xHash = xSHA.ComputeHash(xMS);
-            Console.Write("0x");
-            for (int i = 0; i < xHash.Length; i++)
-            {
-                PrintHex(xHash[i]);
-            }
-            Console.WriteLine("");
-
-        }
-
-        internal static unsafe void DWORDFromBigEndian(uint* x, int digits, byte* block)
-        {
-            int index = 0x0;
-            for (int i = 0x0; index < digits; i += 0x4)
-            {
-                x[index] = (uint)((((block[i] << 0x18) | (block[i + 0x1] << 0x10)) | (block[i + 0x2] << 0x8)) | block[i + 0x3]);
-                index++;
-            }
+            var xHA = new HuffmanAlgorithm();
+            xHA.Shrink(
+            xSHA.Initialize(); 
         }
 
         private static string SingleDigitToHex(byte d)

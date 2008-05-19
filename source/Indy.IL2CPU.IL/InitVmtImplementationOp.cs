@@ -23,6 +23,7 @@ namespace Indy.IL2CPU.IL {
 		}
         private static readonly bool mDebugMode = false;
         static InitVmtImplementationOp() {
+            // flag for conditional debug code for Matthijs, please leave it.
             mDebugMode = Environment.MachineName.Equals("laptop-matthijs", StringComparison.InvariantCultureIgnoreCase);
         }
 		private IList<Type> mTypes;
@@ -30,7 +31,7 @@ namespace Indy.IL2CPU.IL {
 		public MethodBase SetTypeInfoRef;				   
 		public MethodBase SetMethodInfoRef;
 		public FieldInfo TypesFieldRef;
-		public int VTableEntrySize;
+		public int VTableEntrySize; 
 		public uint ArrayTypeId;
 		public IList<MethodBase> Methods;
 		public event GetMethodIdentifierEventHandler GetMethodIdentifier;
@@ -129,6 +130,21 @@ namespace Indy.IL2CPU.IL {
                                     xActualMethod = xType.GetMethod(xMethodIntf.Name,
                                                                     (from xParam in xMethodIntf.GetParameters()
                                                                      select xParam.ParameterType).ToArray());
+                                } if (xActualMethod == null)
+                                {
+                                    try
+                                    {
+                                        var xMap = xType.GetInterfaceMap(xIntf);
+                                        for (int k = 0; k < xMap.InterfaceMethods.Length; k++)
+                                        {
+                                            if (xMap.InterfaceMethods[k] == xMethodIntf)
+                                            {
+                                                xActualMethod = xMap.TargetMethods[k];
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    catch { }
                                 }
                                 if (Methods.Contains(xMethodIntf))
                                 {
@@ -168,6 +184,9 @@ namespace Indy.IL2CPU.IL {
                         if (mDebugMode)
                         {
                             xDebug.WriteAttributeString("BaseId", xBaseIndex.Value.ToString("X"));
+                        }
+                        for (int x = xEmittedMethods.Count - 1; x >= 0; x--) {
+                            if (!Methods.Contains(xEmittedMethods.Keys[x])) { xEmittedMethods.RemoveAt(x); }
                         }
                         if (!xType.IsInterface)
                         {

@@ -153,8 +153,6 @@ namespace Cosmos.Build.Windows {
 		byte mComport;
 
 		protected void DoBuild() {
-            try
-            {
                 SaveSettingsToRegistry();
 
                 mComport = (byte)cmboDebugPort.SelectedIndex;
@@ -187,26 +185,31 @@ namespace Cosmos.Build.Windows {
                 {
                     Console.WriteLine("Compiling...");
                     var xBuildWindow = new BuildWindow();
-                    mBuilder.DebugLog += xBuildWindow.DoDebugMessage;
-                    mBuilder.ProgressChanged += delegate(int aMax, int aCurrent)
+                    IEnumerable<BuildLogMessage> xMessages = new BuildLogMessage[0];
+                    try
                     {
-                        xBuildWindow.ProgressMax = aMax;
-                        xBuildWindow.ProgressCurrent = aCurrent;
-                        var xFrame = new DispatcherFrame();
-                        Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Input, new DispatcherOperationCallback(delegate(object aParam)
+                        mBuilder.DebugLog += xBuildWindow.DoDebugMessage;
+                        mBuilder.ProgressChanged += delegate(int aMax, int aCurrent)
                         {
-                            xFrame.Continue = false;
-                            return null;
-                        }), null);
-                        Dispatcher.PushFrame(xFrame);
-                    };
-                    xBuildWindow.Show();
-                    mBuilder.Compile(mDebugMode, mComport);
-                    mBuilder.DebugLog -= xBuildWindow.DoDebugMessage;
-                    var xMessages = (from item in xBuildWindow.Messages
+                            xBuildWindow.ProgressMax = aMax;
+                            xBuildWindow.ProgressCurrent = aCurrent;
+                            var xFrame = new DispatcherFrame();
+                            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Input, new DispatcherOperationCallback(delegate(object aParam)
+                            {
+                                xFrame.Continue = false;
+                                return null;
+                            }), null);
+                            Dispatcher.PushFrame(xFrame);
+                        };
+                        xBuildWindow.Show();
+                        mBuilder.Compile(mDebugMode, mComport);
+                    }
+                    catch { }
+                        mBuilder.DebugLog -= xBuildWindow.DoDebugMessage;
+                        xMessages = (from item in xBuildWindow.Messages
                                      where item.Severity != LogSeverityEnum.Informational
-                                     select item);
-                    xBuildWindow.Close();
+                                     select item).ToArray();
+                        xBuildWindow.Close();
                     if (xMessages.Count() > 0)
                     {
                         xBuildWindow = new BuildWindow();
@@ -219,8 +222,6 @@ namespace Cosmos.Build.Windows {
                         return;
                     }
                 }
-            }
-            catch (Exception E) { System.Diagnostics.Debugger.Break(); }
 			if (rdioQEMU.IsChecked.Value) {
 				mBuilder.MakeQEMU(chckQEMUUseHD.IsChecked.Value, chckQEMUUseGDB.IsChecked.Value, mDebugMode != DebugModeEnum.None, mDebugMode != DebugModeEnum.None);
 			} else if (rdioVMWare.IsChecked.Value) {

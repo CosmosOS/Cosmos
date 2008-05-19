@@ -624,6 +624,22 @@ namespace Indy.IL2CPU {
                                                                 (from xParam in xMethod.Key.GetParameters()
                                                                  select xParam.ParameterType).ToArray());
                         }
+                        if (xActualMethod == null)
+                        {
+                            try
+                            {
+                                var xMap = xImplType.GetInterfaceMap(xInterface);
+                                for (int k = 0; k < xMap.InterfaceMethods.Length; k++)
+                                {
+                                    if (xMap.InterfaceMethods[k] == xMethod.Key)
+                                    {
+                                        xActualMethod = xMap.TargetMethods[k];
+                                        break;
+                                    }
+                                }
+                            }
+                            catch { }
+                        }
                         if (xActualMethod != null) {
                             QueueMethod(xActualMethod);
                         }
