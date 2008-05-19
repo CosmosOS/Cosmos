@@ -197,6 +197,7 @@ namespace Cosmos.Hardware {
 					return true;
 				}
 			}
+		    Console.WriteLine("Char not found!");
 			aValue = '\0';
 			return false;
 		}

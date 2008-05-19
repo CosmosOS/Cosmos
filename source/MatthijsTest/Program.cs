@@ -23,23 +23,36 @@ namespace MatthijsTest
 
         #endregion
 
-        [ManifestResourceStream(ResourceName = "MatthijsTest.Test.txt")]
-        private static readonly byte[] TheManifestResource;
-        [ManifestResourceStream(ResourceName = "MatthijsTest.Test.txt.gz")]
-        private static readonly byte[] TheManifestResourceZipped;
+        //[ManifestResourceStream(ResourceName = "MatthijsTest.Test.txt")]
+        //private static readonly byte[] TheManifestResource;
+        //[ManifestResourceStream(ResourceName = "MatthijsTest.Test.txt.gz")]
+        //private static readonly byte[] TheManifestResourceZipped;
 
         public static unsafe void Init()
         {
             Console.Clear();
 
-            MemoryStream xMS = new MemoryStream(TheManifestResource, false);
-            Console.Write("Length: ");
-            Console.WriteLine(((int)xMS.Length).ToString());
-
-            var xHA = new HuffmanAlgorithm();
-            xHA.Shrink(
-            xSHA.Initialize(); 
+            theEvent += Handler1;
+            theEvent += Handler2
+                ;
+            theEvent("", null);
         }
+
+        public static void Handler1(object sender, EventArgs e) {
+            if(sender==null) {
+                Console.WriteLine("Sender is null");
+            }else{Console.WriteLine("Sender is not null");}
+        }
+
+        public static void Handler2(object sender, EventArgs e) {
+            if (sender == null)
+            {
+                Console.WriteLine("Sender is null");
+            }
+            else { Console.WriteLine("Sender is not null"); }
+        }
+
+        private static EventHandler theEvent;
 
         private static string SingleDigitToHex(byte d)
         {

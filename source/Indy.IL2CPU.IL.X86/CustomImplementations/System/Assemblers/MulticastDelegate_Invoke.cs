@@ -67,7 +67,7 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System.Assemblers {
             new CPUx86.Add("esi",
                            "ecx");
             new CPUx86.Add("esi",
-                           "40"); // 32 for the Pushad, 16 for the method header
+                           "44"); // 32 for the Pushad, 16 for the method header
             new CPUx86.RepeatMovsb();
             new CPUx86.Pop("edi");
             new CPUx86.Call("edi");
