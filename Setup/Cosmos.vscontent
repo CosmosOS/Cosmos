@@ -3,7 +3,7 @@
     xmlns="http://schemas.microsoft.com/developer/vscontent/2005">
   <Content>
     <FileName>CosmosBoot.zip</FileName>
-    <DisplayName>Cosmost Boot Application</DisplayName>
+    <DisplayName>Cosmos Boot Application</DisplayName>
     <Description>Template to create a self booting Cosmos application.</Description>
     <FileContentType>VSTemplate</FileContentType>
     <ContentVersion>1.0</ContentVersion>
