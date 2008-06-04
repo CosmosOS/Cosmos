@@ -7,7 +7,7 @@ namespace Cosmos.Shell.Guess
 {
     /// <summary>
     /// Uses nasty security holed pointer logic to get the next
-    /// value.
+    /// value. This is our PRNG
     /// </summary>
     public unsafe class Random
     {
