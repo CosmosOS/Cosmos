@@ -1,6 +1,9 @@
 ﻿using System;
 using Cosmos.Build.Windows;
 using Cosmos.Hardware.PC.Bus;
+using Cosmos.FileSystem;
+using Cosmos.Hardware;
+using System.Diagnostics;
 
 namespace SteveKernel
 {
@@ -20,10 +23,51 @@ namespace SteveKernel
         // Main entry point of the kernel
         public static void Init()
         {
+            Cosmos.Sys.Boot.Default();
             Console.WriteLine("Done booting");
 
-			Cosmos.Sys.Boot.Default();
-            System.Diagnostics.Debugger.Break();
+
+            Console.WriteLine("looking for devices");
+            Debugger.Break();
+            Cosmos.Hardware.Storage.ATA2.ATA.Initialize(Cosmos.Hardware.Global.Sleep);
+
+            Console.WriteLine("looking for mbr");
+
+            for (int i = 0; i < Cosmos.Hardware.Device.Devices.Count; i++)
+            {
+                Device dev = Cosmos.Hardware.Device.Devices[i];
+
+
+                if (dev is Disk)
+                {
+                    Disk bd = dev as Disk;
+                    MBR mbr = new MBR(bd);
+
+                    Console.WriteLine("WARNING: ABOUT TO REWRITE MBR OF " + bd.Name);
+                    Console.ReadLine();
+
+                    mbr.DiskSignature = 0x12345678;
+                    mbr.Partition[0].StartLBA = 1;
+                    mbr.Partition[0].EndLBA = (uint)(bd.BlockCount - 2);
+                    mbr.Partition[0].PartitionType = 0x0c;
+                    mbr.Partition[0].Bootable = true;
+
+                    mbr.Save();
+
+                    Console.WriteLine("wrote a fat partition of size + " + ((mbr.Partition[0].EndLBA - mbr.Partition[0].StartLBA)) * 512); ;
+
+
+                    Console.ReadLine();
+                }
+                else
+                {
+
+                    Console.WriteLine("skipping " +dev.Name);
+                }
+            }
+
+            
+			System.Diagnostics.Debugger.Break();
             Cosmos.Hardware.PC.Bus.PCIBus.DebugLSPCI();
             
             

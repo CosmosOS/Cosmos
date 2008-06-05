@@ -2,6 +2,7 @@
 using Cosmos.Hardware.Storage;
 using System.Collections.Generic;
 using System.IO;
+using Cosmos.FileSystem;
 
 namespace Cosmos.Kernel.FileSystem {
 	public unsafe partial class Ext2 {
@@ -81,8 +82,13 @@ namespace Cosmos.Kernel.FileSystem {
 			}
 
 			public override long Seek(long offset, SeekOrigin origin) {
-				throw new NotImplementedException();
-			}
+                if (origin == SeekOrigin.Begin)
+                    mPosition = (uint)offset;
+                else if (origin == SeekOrigin.Current)
+                    mPosition += (uint)offset;
+                else
+                    mPosition = (uint)(Length + offset);
+            }
 
 			public override void SetLength(long value) {
 				throw new NotImplementedException();
@@ -92,7 +98,8 @@ namespace Cosmos.Kernel.FileSystem {
 				throw new NotImplementedException();
 			}
 		}
-		private Hardware.BlockDevice mBackend;
+
+		private Partition mBackend;
 		private SuperBlock mSuperBlock;
 		private uint mBlockSize;
 		private uint mGroupsCount;
@@ -100,7 +107,7 @@ namespace Cosmos.Kernel.FileSystem {
 		private GroupDescriptor[] mGroupDescriptors;
 		public const uint EXT2_ROOT_INO = 0x02;
 
-		public Ext2(Hardware.BlockDevice aBackend) {
+		public Ext2(Partition aBackend) {
 			if (aBackend == null) {
 				throw new ArgumentNullException("aBackend");
 			}

@@ -30,7 +30,7 @@ namespace Cosmos.FileSystem {
 			}
 
 			private ulong GetActualBlock(ulong aBlock) {
-				return aBlock;
+				return aBlock + mBlockStart;
 			}
 
 			public override byte[] ReadBlock(ulong aBlock) {

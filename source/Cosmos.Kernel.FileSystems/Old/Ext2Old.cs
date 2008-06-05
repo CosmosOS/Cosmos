@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace Cosmos.Kernel.FileSystem {
-	public partial class Ext2Old: FileSystem {
+	public partial class Ext2Old {
 
 		private static unsafe GroupDescriptor[] ReadGroupDescriptorsOfBlock(byte aController, byte aDrive, uint aBlockGroup, SuperBlock aSuperBlock, ushort* aBuffer) {
 			uint xGroupDescriptorCount = aSuperBlock.INodesCount / aSuperBlock.INodesPerGroup;

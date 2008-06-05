@@ -5,7 +5,7 @@ using Cosmos.Hardware.Storage;
 
 namespace Cosmos.Kernel.FileSystem
 {
-    public class Fat16 : FileSystem2
+    public class Fat16 
     {
         private struct Header
         {
@@ -119,18 +119,9 @@ namespace Cosmos.Kernel.FileSystem
 
         }
 
-        public override File[] GetFiles(Path path)
-        {
-            return new File[0];
-        }
-
-        public override int ReadData(Path path, byte[] data, int start, int count)
-        {
-            return 0;
-        }
 
         private string _label;
-        public override string Label
+        public string Label
         {
             get
             {
@@ -154,14 +145,14 @@ namespace Cosmos.Kernel.FileSystem
         {
         }
 
-        public override void Open()
+        public void Open()
         {
             _header = new Header();
             
             // TODO: Read the header.
         }
 
-        public override void Dispose()
+        public  void Dispose()
         {
         }
     }
