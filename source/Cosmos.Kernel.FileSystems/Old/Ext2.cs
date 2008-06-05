@@ -88,6 +88,7 @@ namespace Cosmos.Kernel.FileSystem {
                     mPosition += (uint)offset;
                 else
                     mPosition = (uint)(Length + offset);
+                return mPosition;
             }
 
 			public override void SetLength(long value) {
