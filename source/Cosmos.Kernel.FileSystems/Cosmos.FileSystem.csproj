@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FAT32\BootSector.cs" />
     <Compile Include="FileSystem.cs" />
     <Compile Include="ext2\ext2FS.cs" />
     <Compile Include="MBR.cs" />
