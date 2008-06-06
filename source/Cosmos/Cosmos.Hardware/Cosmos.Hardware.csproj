@@ -52,6 +52,9 @@
   <ItemGroup>
     <Compile Include="BlockDevice.cs" />
     <Compile Include="Bus\Bus.cs" />
+    <Compile Include="Bus\USB\USBHost.cs" />
+    <Compile Include="Bus\USB\USBHostOHCI.cs" />
+    <Compile Include="Bus\USB\USBHostOHCIRegisters.cs" />
     <Compile Include="Device.cs" />
     <Compile Include="Extension\NumberSystem\Binary.cs" />
     <Compile Include="Extension\NumberSystem\Hex.cs" />
