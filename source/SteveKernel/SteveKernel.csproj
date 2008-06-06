@@ -43,10 +43,13 @@
       <HintPath>..\Cosmos\Cosmos.Kernel\bin\Debug\Cosmos.Kernel.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VGA.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cosmos.Kernel.FileSystems\Cosmos.FileSystem.csproj">
