@@ -9,12 +9,18 @@ namespace FrodeTest.Test
     {
         public static void RunTest()
         {
-            Console.WriteLine("Testing String");
+            Console.WriteLine("-- Testing String --");
 
             Console.Write("LeftPadding: ");
             string hex = "F";
             hex = hex.PadLeft(2, '0');
             Console.WriteLine(hex);
+
+            //Add char and string
+            //Bug discovered 7.june. SysFault when adding char and string.
+            string added = string.Empty;
+            added = ((char)('c')) + "oncatenating char and string works.";
+            Console.WriteLine(added);
         }
     }
 }

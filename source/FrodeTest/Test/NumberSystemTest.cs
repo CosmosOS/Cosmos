@@ -10,7 +10,7 @@ namespace FrodeTest.Test
     {
         public static void RunTest()
         {
-            Console.WriteLine("Testing Numbersystems");
+            Console.WriteLine("--Testing Numbersystems--");
 
             Console.WriteLine("0 as HEX: " + 0.ToHex());
             Console.WriteLine("10 as HEX: " + 10.ToHex());

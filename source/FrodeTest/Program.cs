@@ -24,6 +24,7 @@ namespace FrodeTest
             currentSession.Run();
 
             //Test
+            Console.WriteLine("---- RUNNING PREDEFINED TESTS ----");
             //Debug.SortedListSearcher.RunTest();
             //Test.SwitchTest.RunTest();
             //Test.RTL8139Test.RunTest();
@@ -34,10 +35,12 @@ namespace FrodeTest
             //Test.BoolTest.RunTest();
             //Test.InterfaceTest.RunTest();
             //Test.ExtensionMethodsTest.RunTest();
-            //Test.NumberSystemTest.RunTest();
-            Test.IPv4Test.RunTest();
+            Test.StringTest.RunTest();
+            Test.NumberSystemTest.RunTest();
+            //Test.IPv4Test.RunTest();
             //Test.UDPTest.RunTest();
-            //Test.StringTest.RunTest();
+            
+            Test.MACAddressTest.RunTest();
              
             //Done
             Console.WriteLine("Shutting down computer");

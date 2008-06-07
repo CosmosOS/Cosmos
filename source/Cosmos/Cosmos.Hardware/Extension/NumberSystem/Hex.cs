@@ -68,11 +68,12 @@ namespace Cosmos.Hardware.Extension.NumberSystem
 
             while (num >= 16)
             {
-                xHex = (SingleDigitToHex((byte)(num & 0xf))) + xHex;
+                //Note; char is converted to string because Cosmos crashes when adding char and string. Frode, 7.june.
+                xHex = SingleDigitToHex((byte)(num & 0xf)).ToString() + xHex;
                 num = num / 16;
             }
 
-            xHex = SingleDigitToHex((byte)(num & 0xf)) + xHex;
+            xHex = SingleDigitToHex((byte)(num & 0xf)).ToString() + xHex;
 
             return xHex;
         }

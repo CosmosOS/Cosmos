@@ -34,6 +34,17 @@ namespace FrodeTest.Shell
             {
                 Test.IPv4Test.RunTest();
             }
+            else if (command.Equals("mac"))
+            {
+                if (nic == null)
+                {
+                    Console.WriteLine("Enable NIC with command 'load' first");
+                }
+                else
+                {
+                    Console.WriteLine("MAC: " + nic.MACAddress);
+                }
+            }
             else if (command.Equals("load"))
             {
                 var list = RTL8139.FindAll();
