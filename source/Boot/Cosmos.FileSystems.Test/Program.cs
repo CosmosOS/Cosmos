@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define USEFILE
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -27,48 +29,39 @@ internal const int FILE_ATTRIBUTE_NORMAL = 0x80;
 
 
 
-        static void Main(string[] args)
-        {
-        
+static void Main(string[] args)
+{
+
 #if USEFILE
             Stream s = File.Open("hda.img", FileMode.OpenOrCreate);
             s.Seek(1000 * 512 - 1, SeekOrigin.Begin);
             s.WriteByte(0);
 #else
-SafeFileHandle h = null;
-h = CreateFile("\\\\.\\PhysicalDrive1",GENERIC_READ | GENERIC_WRITE, 0, IntPtr.Zero, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, new SafeFileHandle(IntPtr.Zero, true));
-if (h.IsInvalid)
-{
-    Console.WriteLine("wnope");
-    Console.ReadLine();
-}
+    SafeFileHandle h = null;
+    h = CreateFile("\\\\.\\PhysicalDrive1", GENERIC_READ | GENERIC_WRITE, 0, IntPtr.Zero, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, new SafeFileHandle(IntPtr.Zero, true));
+    if (h.IsInvalid)
+    {
+        Console.WriteLine("wnope");
+        Console.ReadLine();
+    }
     Stream s = new FileStream(h, FileAccess.ReadWrite);
-    // Read from stream
-
-
-
+ 
 #endif
 
-            Disk bd = new StreamDisk(s,1500*1024*1024);
-            byte[] blank = new byte[512];
-            bd.WriteBlock(0, blank);
+    Disk bd = new StreamDisk(s, 1500 * 1024 * 1024);
+    
+    //byte[] blank = new byte[512];
+    //bd.WriteBlock(0, blank);
 
-            MBR mbr = new MBR(bd);
+    MBR mbr = new MBR(bd);
 
-            mbr.DiskSignature = 0x12345678;
-            //mbr.Partition[0].Bootable = true;
-            mbr.Partition[0].StartLBA = 10;
-            mbr.Partition[0].LengthLBA = (uint)(bd.BlockCount - 20);
-            mbr.Partition[0].PartitionType =0x0b;
-            mbr.Save();
+    Partition p = mbr.Partition[0].GetPartitionDevice();
 
-            Partition p = mbr.Partition[0].GetPartitionDevice();
+    FAT32 fat32 = new FAT32(p);
+    fat32.Format("hello!", 512);
+    s.Flush();
 
-            FAT32 fat32 = new FAT32(p);
-            fat32.Format("hello!", 512);
-            s.Flush();
-            
-        }
+}
     }
 
     class StreamDisk : Disk
