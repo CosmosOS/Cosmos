@@ -67,7 +67,7 @@ if (h.IsInvalid)
             FAT32 fat32 = new FAT32(p);
             fat32.Format("hello!", 512);
             s.Flush();
-
+            
         }
     }
 
