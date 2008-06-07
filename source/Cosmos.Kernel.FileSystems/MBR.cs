@@ -180,7 +180,7 @@ namespace Cosmos.FileSystem
                     mbr.Sector[offset + 11] = b[3];
                 }
             }
-            public uint EndLBA
+            public uint LengthLBA
             {
                 get
                 {
@@ -219,7 +219,7 @@ namespace Cosmos.FileSystem
             {
                 Mbr = mbr;
                 Start = info.StartLBA;
-                Length = info.EndLBA - info.StartLBA;
+                Length = info.LengthLBA;
                 Identifier = info.PartitionType;
                 blockDev = mbr.blockdevice;
             }

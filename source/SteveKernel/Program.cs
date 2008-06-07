@@ -48,13 +48,13 @@ namespace SteveKernel
 
                     mbr.DiskSignature = 0x12345678;
                     mbr.Partition[0].StartLBA = 1;
-                    mbr.Partition[0].EndLBA = (uint)(bd.BlockCount - 2);
+                    mbr.Partition[0].LengthLBA = (uint)(bd.BlockCount - 1);
                     mbr.Partition[0].PartitionType = 0x0c;
                     mbr.Partition[0].Bootable = true;
 
                     mbr.Save();
 
-                    Console.WriteLine("wrote a fat partition of size + " + ((mbr.Partition[0].EndLBA - mbr.Partition[0].StartLBA)) * 512); ;
+                    Console.WriteLine("wrote a fat partition of size + " + (mbr.Partition[0].LengthLBA) * 512); ;
 
 
                     Console.ReadLine();

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Cosmos.Hardware;
+using Cosmos.Kernel;
 
 namespace SteveKernel
 {

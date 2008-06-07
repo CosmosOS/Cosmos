@@ -47,6 +47,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FAT32\BootSector.cs" />
+    <Compile Include="FAT32\DirectoryTable.cs" />
+    <Compile Include="FAT32\FAT.cs" />
+    <Compile Include="FAT32\FATStream.cs" />
+    <Compile Include="FAT32\FileAllocationTable.cs" />
+    <Compile Include="FAT32\FileSystemInfo32.cs" />
     <Compile Include="FileSystem.cs" />
     <Compile Include="ext2\ext2FS.cs" />
     <Compile Include="MBR.cs" />
