@@ -3,26 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Cosmos.Hardware.PC.Bus
-{
+namespace Cosmos.Hardware.PC.Bus {
 
-    public class PCIBus : Cosmos.Hardware.Bus.PCIBus
-    {
-        public static PCIDevice[] Devices = new PCIDevice[0];
+    public class PCIBus : Cosmos.Hardware.Bus.PCIBus {
+        protected static PCIDevice[] mDevices;
+        public static PCIDevice[] Devices {
+            get { return mDevices; }
+        }
+
         protected static bool mEnumerationCompleted = false;
 
-        public static PCIDevice GetPCIDevice(byte bus, byte slot, byte function)
-        {
+        public static PCIDevice GetPCIDevice(byte bus, byte slot, byte function) {
             if (!mEnumerationCompleted) {
                 Init();
             }
 
-            foreach (PCIDevice dev in PCIBus.Devices)
-            {
+            foreach (PCIDevice dev in PCIBus.Devices) {
                 if (dev.Bus == bus &&
                     dev.Slot == slot &&
                     dev.Function == function)
-
                     return dev;
             }
 
@@ -30,11 +29,9 @@ namespace Cosmos.Hardware.PC.Bus
         }
 
         public static void Init() {
-            List<PCIDevice> devices = new List<PCIDevice>();
-
-            EnumerateBus(0, ref devices);
-            Devices = devices.ToArray();
-
+            var xDevices = new List<PCIDevice>();
+            EnumerateBus(0, ref xDevices);
+            mDevices = xDevices.ToArray();
             mEnumerationCompleted = true;
         }
 
@@ -43,140 +40,38 @@ namespace Cosmos.Hardware.PC.Bus
         /// </summary>
         /// <param name="Bus">The bus number to enumerate</param>
         /// <param name="Devices">The list of Devices</param>
-        private static void EnumerateBus(byte Bus, ref List<PCIDevice> Devices)
-        {
+        private static void EnumerateBus(byte aBus, ref List<PCIDevice> rDevices) {
             //Console.WriteLine("Enumerate " + Bus ); 
             
-            for (byte xSlot = 0; xSlot < 32; xSlot++)
-            {                
+            for (byte xSlot = 0; xSlot < 32; xSlot++) {                
                 byte xMaxFunctions = 1;
+                for (byte xFunction = 0; xFunction < xMaxFunctions; xFunction++) {
+                    PCIDevice xPCIDevice = new PCIDeviceNormal(aBus, xSlot, xFunction);
 
-                for (byte xFunction = 0; xFunction < xMaxFunctions; xFunction++)
-                {
-                    PCIDevice xPCIDevice = new PCIDeviceNormal(Bus, xSlot, xFunction);
-
-                    if (xPCIDevice.DeviceExists)
-                    {
-
-
+                    if (xPCIDevice.DeviceExists) {
                         //if (xPCIDevice.HeaderType == 0 /* PCIHeaderType.Normal */)
                         //  xPCIDevice = xPCIDevice;
 
-                        if (xPCIDevice.HeaderType == 2 /* PCIHeaderType.Cardbus */)
-                            xPCIDevice = new PCIDeviceCardBus(Bus, xSlot, xFunction);
+                        if (xPCIDevice.HeaderType == 2) { /* PCIHeaderType.Cardbus */
+                            xPCIDevice = new PCIDeviceCardBus(aBus, xSlot, xFunction);
+                        }
 
-                        if (xPCIDevice.HeaderType == 1 /* PCIHeaderType.Bridge */)
-                            xPCIDevice = new PCIDeviceBridge(Bus, xSlot, xFunction);
+                        if (xPCIDevice.HeaderType == 1) { /* PCIHeaderType.Bridge */
+                            xPCIDevice = new PCIDeviceBridge(aBus, xSlot, xFunction);
+                        }
 
+                        rDevices.Add(xPCIDevice);
 
-                        Devices.Add(xPCIDevice);
+                        if (xPCIDevice is PCIDeviceBridge) {
+                            EnumerateBus(((PCIDeviceBridge)xPCIDevice).SecondaryBus, ref rDevices);
+                        }
 
-                        if (xPCIDevice is PCIDeviceBridge)
-                            EnumerateBus(((PCIDeviceBridge)xPCIDevice).SecondaryBus, ref Devices);
-
-                        if (xPCIDevice.IsMultiFunction)
+                        if (xPCIDevice.IsMultiFunction) {
                             xMaxFunctions = 8;
-                    }
-                }
-            }
-        }
-
-        public static void DebugLSPCI()
-        {
-            PCIBus.DeviceIDs xDeviceIDs = new PCIBus.DeviceIDs();
-
-            for(int d =0;d<Cosmos.Hardware.PC.Bus.PCIBus.Devices.Length;d++){
-				var xPCIDevice = Cosmos.Hardware.PC.Bus.PCIBus.Devices[d];
-                string xVendor = xDeviceIDs.FindVendor(xPCIDevice.VendorID);
-
-                if (xVendor == default(string))
-                    xVendor = ToHex(xPCIDevice.VendorID, 4);
-
-                System.Console.Write(xPCIDevice.Bus + "-" + xPCIDevice.Slot + "-" + xPCIDevice.Function);
-                System.Console.Write(" " + xVendor + ":" + ToHex(xPCIDevice.DeviceID, 4));
-                System.Console.WriteLine(" Type: " + xPCIDevice.HeaderType + " IRQ: " + xPCIDevice.InterruptLine);
-                //                                /*Enum.GetName(typeof(PCIHeaderType), */ xPCIDevice.HeaderType/*) */);
-                //                           Console.WriteLine(" Status: " + xPCIDevice.Status + " " +
-                //                               /*Enum.GetName(typeof(PCIStatus),  */xPCIDevice.Status/*) */);
-                //                            Console.WriteLine(" Command: " + xPCIDevice.Command + " " +
-                //                                /*Enum.GetName(typeof(PCICommand), */xPCIDevice.Command /* ) */);
-                System.Console.Write(" Class [" + ToHex((UInt32)((xPCIDevice.ClassCode << 8) | xPCIDevice.SubClass), 4) + "] " + xPCIDevice.GetClassInfo());
-                System.Console.WriteLine();
-                System.Console.Write(" Memory: ");
-
-                for (byte i = 0; i < xPCIDevice.NumberOfBaseAddresses(); i++)
-                {
-                    Kernel.AddressSpace a = xPCIDevice.GetAddressSpace(i);
-
-                    if (a != null)
-                    {
-                        System.Console.Write("register " + i + " @ " + ToHex(a.Offset, 8) + " (" + a.Size + "b) ");
-                        if (a is Kernel.MemoryAddressSpace) {
-                            Console.WriteLine("mem");
-                        } else {
-                            Console.WriteLine("io");
                         }
                     }
                 }
-                System.Console.WriteLine();
-                System.Console.WriteLine();
             }
-        }
-
-        [Obsolete("Use extensionmethod in Cosmos.Hardware.Extension.Numbersystem. See MACAddress.cs for example")]
-        public static string ToHex(UInt32 num, int length)
-        {
-            char[] ret = new char[length];
-            UInt32 cpy = num;
-
-            for (int index = length - 1; index >= 0; index--)
-            {
-                ret[index] = hex(cpy & 0xf);
-                cpy = cpy / 16;
-            }
-
-            return "0x" + new string(ret);
-        }
-
-        [Obsolete]
-        private static char hex(uint p)
-        {
-            switch (p)
-            {
-                case 0:
-                    return '0';
-                case 1:
-                    return '1';
-                case 2:
-                    return '2';
-                case 3:
-                    return '3';
-                case 4:
-                    return '4';
-                case 5:
-                    return '5';
-                case 6:
-                    return '6';
-                case 7:
-                    return '7';
-                case 8:
-                    return '8';
-                case 9:
-                    return '9';
-                case 10:
-                    return 'a';
-                case 11:
-                    return 'b';
-                case 12:
-                    return 'c';
-                case 13:
-                    return 'd';
-                case 14:
-                    return 'e';
-                case 15:
-                    return 'f';
-            }
-            return ' ';
         }
     }
 

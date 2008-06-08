@@ -6,7 +6,7 @@ namespace KudzuTest {
 	class Program {
 		[STAThread]
 		static void Main(string[] args) {
-            RTL8139.Test();
+            //RTL8139.Test();
             BuildUI.Run();
         }
 
@@ -55,10 +55,10 @@ namespace KudzuTest {
 
             //Loop();
 
-            //Cosmos.Hardware.PC.Bus.PCIBus.Init();
+            PCITest.Test();
             //Console.ReadLine();
             //Tests.DoAll();
-            RTL8139.Test();
+            //RTL8139.Test();
 
             Console.WriteLine("All tasks complete, halting.");
             while (true) { } 

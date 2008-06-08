@@ -68,7 +68,9 @@ namespace SteveKernel
 
             
 			System.Diagnostics.Debugger.Break();
-            Cosmos.Hardware.PC.Bus.PCIBus.DebugLSPCI();
+            // Kudzu: Moved to Kudzu.PCITest - maybe should go somehwere common, but dont want debug
+            // in main Cosmos code
+            //Cosmos.Hardware.PC.Bus.PCIBus.DebugLSPCI();
             
             
             PCIDeviceNormal rtlpci = PCIBus.GetPCIDevice(0, 3, 0) as PCIDeviceNormal;
@@ -82,7 +84,8 @@ namespace SteveKernel
             Console.WriteLine("dumping memory space:");
             
             for (uint i = 0; i < mas.Size; i++) 
-                Console.Write(PCIBus.ToHex(mas.Read8Unchecked(i),2) +" ");
+                // Conver to extensino method as per your commetns. :)
+                //Console.Write(PCIBus.ToHex(mas.Read8Unchecked(i),2) +" ");
 
 
             while (true)

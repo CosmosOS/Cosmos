@@ -20,7 +20,7 @@ namespace Cosmos.Shell.Console.Commands
 
         public override void Execute(string param)
         {
-            Cosmos.Hardware.PC.Bus.PCIBus.DebugLSPCI();
+            //Cosmos.Hardware.PC.Bus.PCIBus.DebugLSPCI();
             
         }  
     
