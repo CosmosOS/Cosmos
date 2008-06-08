@@ -134,9 +134,6 @@ namespace Cosmos.Kernel.FileSystem
             }
         }
 
-        private ATA _ata;
-        private Header _header;
-
         public Fat16(ATA ata)
         {
         }
@@ -147,7 +144,7 @@ namespace Cosmos.Kernel.FileSystem
 
         public void Open()
         {
-            _header = new Header();
+            //_header = new Header();
             
             // TODO: Read the header.
         }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Cosmos.Hardware.Network.Devices.RTL8139;
-using Cosmos.Hardware.Extension.NumberSystem;
+using Cosmos.Kernel;
 
 namespace FrodeTest.Shell
 {

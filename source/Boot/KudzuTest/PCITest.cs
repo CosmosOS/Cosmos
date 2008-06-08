@@ -17,8 +17,9 @@ namespace KudzuTest {
                 var xPCIDevice = Cosmos.Hardware.PC.Bus.PCIBus.Devices[d];
                 string xVendor = xDeviceIDs.FindVendor(xPCIDevice.VendorID);
 
-                if (xVendor == default(string))
+                if (xVendor == null) {
                     xVendor = ToHex(xPCIDevice.VendorID, 4);
+                }
 
                 System.Console.Write(xPCIDevice.Bus + "-" + xPCIDevice.Slot + "-" + xPCIDevice.Function);
                 System.Console.Write(" " + xVendor + ":" + ToHex(xPCIDevice.DeviceID, 4));

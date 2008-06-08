@@ -83,7 +83,7 @@ namespace SteveKernel
             
             Console.WriteLine("dumping memory space:");
             
-            for (uint i = 0; i < mas.Size; i++) 
+            //for (uint i = 0; i < mas.Size; i++) 
                 // Conver to extensino method as per your commetns. :)
                 //Console.Write(PCIBus.ToHex(mas.Read8Unchecked(i),2) +" ");
 

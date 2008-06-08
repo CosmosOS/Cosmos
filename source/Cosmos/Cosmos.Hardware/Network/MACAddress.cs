@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Cosmos.Hardware.Extension.NumberSystem;
+using Cosmos.Kernel;
 
 namespace Cosmos.Hardware.Network
 {

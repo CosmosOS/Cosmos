@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-//using System.Linq;
 using System.Text;
-using Cosmos.Hardware.Extension.NumberSystem;
+using Cosmos.Kernel;
 
 namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
 {
@@ -21,12 +20,12 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
 
             //TODO: Get the correct bits and bytes...
             //TODO: Maybe some endinan conversions are needed.
-            var p = new IPv4Packet();
-            p.Version = data[0];
-            p.HeaderLength = data[1];
+            //var p = new IPv4Packet();
+            //p.Version = data[0];
+            //p.HeaderLength = data[1];
             //etc...
 
-            return p;
+            //return p;
         }
 
 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Cosmos.Hardware.Extension.NumberSystem;
+using Cosmos.Kernel;
 
 namespace FrodeTest.Test
 {

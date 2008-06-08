@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Cosmos.Hardware.Extension.NumberSystem
-{
-    public static class Hex
+namespace Cosmos.Kernel {
+    public static class HexExtension
     {
 
         #region C# 3.0 Extension Methods

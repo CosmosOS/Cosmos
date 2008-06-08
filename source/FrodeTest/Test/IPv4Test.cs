@@ -4,7 +4,7 @@ using System.Text;
 using Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4;
 using Cosmos.Hardware.Network.TCPIPModel.PhysicalLayer.Ethernet2;
 using Cosmos.Hardware.Network.Devices.RTL8139;
-using Cosmos.Hardware.Extension.NumberSystem;
+using Cosmos.Kernel;
 using Cosmos.Hardware.Network;
 
 namespace FrodeTest.Test

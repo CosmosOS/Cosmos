@@ -3,7 +3,7 @@ using System.Collections.Generic;
 //using System.Linq;
 using System.Text;
 using Cosmos.Hardware.PC.Bus;
-using Cosmos.Hardware.Extension.NumberSystem;
+using Cosmos.Kernel;
 
 namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
 {

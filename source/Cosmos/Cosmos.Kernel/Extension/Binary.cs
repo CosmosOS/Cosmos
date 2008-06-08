@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Cosmos.Hardware.Extension.NumberSystem
-{
-    public static class Binary
-    {
+namespace Cosmos.Kernel {
+    public static class BinaryExtension {
         #region Extension methods
 
         public static string ToBinary(this byte n)

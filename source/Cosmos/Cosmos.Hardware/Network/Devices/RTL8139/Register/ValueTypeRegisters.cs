@@ -136,7 +136,6 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
                         break;
                     default:
                         throw new Exception("Illegal Transmit Status Descriptor");
-                        break;
                 }
 
                 return xMem.Read32(address);
