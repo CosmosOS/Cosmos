@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace Cosmos.Kernel {
-    public static class HexExtension
-    {
-
+    public static class HexExtension {
         #region C# 3.0 Extension Methods
 
         //TODO: Can add several more overloads for other numbertypes, with and withouth width argument.
@@ -33,14 +31,21 @@ namespace Cosmos.Kernel {
             return ConvertToHex((UInt32)n).PadLeft(width, '0');
         }
 
-        public static string ToHex(this UInt16 n)
-        {
+        public static string ToHex(this UInt16 n) {
             return ConvertToHex((UInt32)n);
         }
 
-        public static string ToHex(this UInt16 n, int width)
-        {
+        public static string ToHex(this UInt16 n, int width) {
             return ConvertToHex((UInt32)n).PadLeft(width, '0');
+        }
+
+
+        public static string ToHex(this uint aValue) {
+            return ConvertToHex(aValue);
+        }
+
+        public static string ToHex(this uint aValue, int aWidth) {
+            return ConvertToHex(aValue).PadLeft(aWidth, '0');
         }
 
         #endregion 
