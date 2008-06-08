@@ -18,8 +18,8 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
 
         private PCIDevice pciCard;
         private Kernel.MemoryAddressSpace mem;
-        private Register.MainRegister reg;
-        private Register.CommandRegister cr;
+        //private Register.MainRegister reg;
+        //private Register.CommandRegister cr;
         private Register.ValueTypeRegisters valueReg;
         private Register.InterruptMaskRegister imr;
         private Register.InterruptStatusRegister isr;
@@ -473,8 +473,8 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             Console.WriteLine("Rx Configuration: " + Register.ReceiveConfigurationRegister.Load(mem).ToString());
             Console.WriteLine("Tx Configuration: " + Register.TransmitConfigurationRegister.Load(mem).ToString());
             Console.WriteLine("Tx Status Descr.: " + Register.TransmitStatusDescriptor.Load(mem).ToString());
-            Console.WriteLine("Tx Start Address: " + valueReg.TransmitStartAddress);
-            Console.WriteLine("Current Descrip.: " + Register.TransmitStatusDescriptor.GetCurrentTSDescriptor());
+            Console.WriteLine("Tx Start Address: " + valueReg.TransmitStartAddress.ToString());
+            Console.WriteLine("Current Descrip.: " + Register.TransmitStatusDescriptor.GetCurrentTSDescriptor().ToString());
         }
 
 
@@ -514,6 +514,9 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             UInt32 address = pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.RxEarlyCnt;
             var xMem = new Kernel.MemoryAddressSpace(address, 1);
             xMem.Write8(0, (byte)bytecount);
+
+            //TODO: The code above (with the warning, could probably be replaced with the following line). Need to test.
+            //mem.Write8((byte)Register.MainRegister.Bit.RxEarlyCnt, 0);
         }
 
         /// <summary>

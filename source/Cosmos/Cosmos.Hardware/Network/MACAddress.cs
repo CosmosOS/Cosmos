@@ -75,6 +75,11 @@ namespace Cosmos.Hardware.Network
                 throw new ArgumentException("obj is not a MACAddress", "obj");
         }
 
+        public override int GetHashCode()
+        {
+            return (GetType().FullName + "|" + this.ToString()).GetHashCode();
+        }
+
         public override string ToString()
         {
             string address = string.Empty;
