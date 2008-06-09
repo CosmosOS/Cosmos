@@ -30,12 +30,22 @@ namespace MatthijsTest
 
         public static unsafe void Init()
         {
-            Console.Clear();
+            //Console.Clear();
 
-            theEvent += Handler1;
-            theEvent += Handler2
-                ;
-            theEvent("", null);
+            //theEvent += Handler1;
+            //theEvent += Handler2
+            //    ;
+            //theEvent("", null);
+            Console.Clear();
+            Console.Write("Data: '");
+            byte xByte = 25;
+            var xData = "Dat";
+            xData = xData + "a " + xByte;// +".";
+
+            Console.Write(xData);
+            Console.WriteLine("'");
+            
+            Console.WriteLine("Done");
         }
 
         public static void Handler1(object sender, EventArgs e) {

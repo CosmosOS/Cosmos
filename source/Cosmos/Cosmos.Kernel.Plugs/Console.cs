@@ -60,9 +60,9 @@ namespace Cosmos.Kernel.Plugs {
 					   
 		//TODO: Console uses TextWriter - intercept and plug it instead
 		public static void Clear() {
-			TextScreen.Clear();
-            set_CursorLeft(0);
-            set_CursorTop(0);
+            //TextScreen.Clear();
+            //set_CursorLeft(0);
+            //set_CursorTop(0);
 		}
 
 		public static void Write(char aChar) {
