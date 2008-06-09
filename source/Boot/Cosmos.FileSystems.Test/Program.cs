@@ -1,4 +1,4 @@
-﻿#define USEFILE
+﻿//#define USEFILE
 
 using System;
 using System.Collections.Generic;
@@ -10,6 +10,7 @@ using Cosmos.FileSystem;
 using Cosmos.FileSystem.FAT32;
 using Microsoft.Win32.SafeHandles;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 namespace Cosmos.FileSystems.Test
 {
@@ -37,6 +38,8 @@ static void Main(string[] args)
             s.Seek(1000 * 512 - 1, SeekOrigin.Begin);
             s.WriteByte(0);
 #else
+    Debug.Assert(   false, "WARNING! About to access physical disk!! WARNING!");
+
     SafeFileHandle h = null;
     h = CreateFile("\\\\.\\PhysicalDrive1", GENERIC_READ | GENERIC_WRITE, 0, IntPtr.Zero, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, new SafeFileHandle(IntPtr.Zero, true));
     if (h.IsInvalid)
@@ -50,15 +53,33 @@ static void Main(string[] args)
 
     Disk bd = new StreamDisk(s, 1500 * 1024 * 1024);
     
-    //byte[] blank = new byte[512];
-    //bd.WriteBlock(0, blank);
+    byte[] blank = new byte[512];
+    bd.WriteBlock(0, blank);
 
     MBR mbr = new MBR(bd);
+    mbr.DiskSignature = 0x10101010;
+    mbr.Partition[0].StartLBA = 0x1;
+    mbr.Partition[0].LengthLBA = 0x100000;
+    mbr.Partition[0].PartitionType = 0x0c;
+    mbr.Partition[1].StartLBA = 0x100001;
+    mbr.Partition[1].LengthLBA = 0x100000;
+    mbr.Partition[1].PartitionType = 0x0c;
+    //mbr.Save();
 
     Partition p = mbr.Partition[0].GetPartitionDevice();
 
     FAT32 fat32 = new FAT32(p);
-    fat32.Format("hello!", 512);
+    Stream fs = new FATStream(fat32, fat32.FileAllocationTable, 2);
+
+    byte[] b = new byte[16];
+    int bytes;
+    while ((bytes = fs.Read(b, 0, 16)) != 0)
+    {
+        for (int i = 0; i < bytes; i++)
+            Console.Write(" 0x" + b[i].ToString("x"));
+        Console.WriteLine();
+    }
+
     s.Flush();
 
 }

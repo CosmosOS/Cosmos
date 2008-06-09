@@ -39,7 +39,7 @@ namespace Cosmos.FileSystem.FAT32
             FileAllocationTable = new FileAllocationTableFAT32(this, p,
                 BootSector.ReservedSectorCount, 
                 (uint)(BootSector.ReservedSectorCount + BootSector.FATsz16));
-
+            CalcOffsets();
         }
         public void Format(string label, uint clustersize)
         {

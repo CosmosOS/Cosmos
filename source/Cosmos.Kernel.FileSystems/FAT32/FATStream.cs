@@ -20,7 +20,9 @@ namespace Cosmos.FileSystem.FAT32
             this.fat = fat;
             this.startcluster = startcluster;
 
-            ClusterSize = fat.ClusterSize;   
+            ClusterSize = fat.ClusterSize;
+
+            Restart(0);
         }
 
         public override bool CanRead
@@ -92,6 +94,8 @@ namespace Cosmos.FileSystem.FAT32
             CurrentClusterStart += ClusterSize;
             CurrentClusterEnd = CurrentClusterStart + ClusterSize;
             CurrentClusterNumber = fat.GetNextCluster(CurrentClusterNumber);
+            if (CurrentClusterNumber == (fat as FileAllocationTableFAT32).ClusterEOL)
+                throw new Exception("end of file");
             CurrentCluster = fs.ReadCluster(CurrentClusterNumber);
         }
 
@@ -102,6 +106,9 @@ namespace Cosmos.FileSystem.FAT32
             CurrentClusterNumber = startcluster;
             while (value >= CurrentClusterStart + ClusterSize) // TODO: check eof!
             {
+                if (CurrentClusterNumber == (fat as FileAllocationTableFAT32).ClusterEOL)
+                    throw new Exception("end of file");
+
                 CurrentClusterStart += ClusterSize;
                 CurrentClusterNumber = fat.GetNextCluster(CurrentClusterNumber);
             }

@@ -28,7 +28,7 @@ namespace Cosmos.FileSystem.FAT32
             this.fat32 = fat32;
             this.FirstSector = firstsector;
             this.SecondSector = secondsector;
-            this.TotalClusters = fat32.BootSector.TotalSectors32/ fat32.BootSector.SectorsPerCluster;
+            this.TotalClusters = (fat32.BootSector.TotalSectors32-fat32.BootSector.ReservedSectorCount)/ fat32.BootSector.SectorsPerCluster;
             this.p = p;
             this.ClusterSize = (uint)(fat32.BootSector.SectorsPerCluster * fat32.BootSector.BytesPerSec);
 
@@ -102,7 +102,9 @@ namespace Cosmos.FileSystem.FAT32
             uint index = actualcluster & Mask;
             uint sector = FirstSector + actualcluster >> Shift;
 
-            return ((uint*)(GetSector(sector)[0]))[index];
+            byte[] data= GetSector(sector);
+
+            return BitConverter.ToUInt32(data,(int)(index<<2));
         }
         private unsafe void WriteClusterAllocation(uint actualcluster, uint value)
         {
@@ -110,7 +112,13 @@ namespace Cosmos.FileSystem.FAT32
             uint sector = FirstSector + actualcluster >> Shift;
 
             byte[] data = GetSector(sector);
-            ((uint*)data[0])[index] = value;
+            byte[] b = BitConverter.GetBytes(value);
+            index <<= 2;
+            data[index++] = b[0];
+            data[index++] = b[1];
+            data[index++] = b[2];
+            data[index++] = b[3];
+
             SetSector(sector, data);
         }
 
