@@ -5,6 +5,7 @@ using Cosmos.Hardware.Storage;
 
 namespace Cosmos.Kernel.FileSystem
 {
+#if FALSE
     public class Fat16 
     {
         private struct Header
@@ -153,4 +154,5 @@ namespace Cosmos.Kernel.FileSystem
         {
         }
     }
-}
+#endif
+    }

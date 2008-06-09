@@ -298,10 +298,10 @@ namespace Cosmos.Hardware.PC.Bus {
 
             for (byte i = 0; i < NumberOfBaseAddresses(); i++)
             {
-                UInt32 address = GetBaseAddress(i);
-                SetBaseAddress(i, 0xffffffff);
-                UInt32 flags = GetBaseAddress(i);
-                SetBaseAddress(i, address);
+                UInt32 address = GetBaseAddressInternal(i);
+                SetBaseAddressInternal(i, 0xffffffff);
+                UInt32 flags = GetBaseAddressInternal(i);
+                SetBaseAddressInternal(i, address);
 
                 if (address == 0)
                 {
@@ -430,10 +430,15 @@ namespace Cosmos.Hardware.PC.Bus {
         {
             return Read32((byte)(0x10 + index * 4));
         }
-        [Obsolete("This function should be private")]
-        public void SetBaseAddress(byte index, UInt32 value)
+
+        public UInt32 GetBaseAddressInternal(byte index)
         {
-            Write32((byte)(0x10 + index *4), value);
+            return Read32((byte)(0x10 + index * 4));
+        }
+        
+        private void SetBaseAddressInternal(byte index, UInt32 value)
+        {
+            Write32((byte)(0x10 + index * 4), value);
         }
 
         [Obsolete("Use PciDevice.GetAddressSpace(0)")]

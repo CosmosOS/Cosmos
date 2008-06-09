@@ -139,7 +139,7 @@ namespace Indy.IL2CPU {
         }
 
         public event Action ProgressChanged;
-        private Func<string, string> mGetFileNameForGroup;
+        //private Func<string, string> mGetFileNameForGroup;
         private void OnProgressChanged() {
             if (ProgressChanged != null) {
                 ProgressChanged();
@@ -874,7 +874,7 @@ namespace Indy.IL2CPU {
                     }
                     if (xManifestResourceName != null) {
                         RegisterType(xCurrentField.FieldType);
-                        string xTheData = "";
+                        
                         string xFileName = Path.Combine(mOutputDir, (xCurrentField.DeclaringType.Assembly.FullName + "__" + xManifestResourceName).Replace(",", "_") + ".res");
                         using (var xStream = xCurrentField.DeclaringType.Assembly.GetManifestResourceStream(xManifestResourceName))
                         {

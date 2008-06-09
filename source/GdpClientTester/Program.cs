@@ -35,7 +35,7 @@ namespace GdpClientTester
             start.BeginInvoke(null, null);
 
             int ticks = Environment.TickCount;
-            int count = 1;
+            //int count = 1;
 
             while (true)
             {
@@ -49,8 +49,8 @@ namespace GdpClientTester
                 //count ++;
              }
 
-            Console.WriteLine("Done");
-            Console.ReadLine();
+            //Console.WriteLine("Done");
+            //Console.ReadLine();
         }
 
         private static void Worker()

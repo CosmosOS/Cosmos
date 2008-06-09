@@ -5,6 +5,7 @@ using System.IO;
 using Cosmos.FileSystem;
 
 namespace Cosmos.Kernel.FileSystem {
+#if EXT2OLD
 	public unsafe partial class Ext2 {
 		private class FileStream: Stream {
 			private uint mINodeNumber;
@@ -469,4 +470,5 @@ namespace Cosmos.Kernel.FileSystem {
 			return true;
 		}
 	}
-}
+#endif
+    }
