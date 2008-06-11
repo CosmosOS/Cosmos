@@ -21,6 +21,13 @@ namespace FrodeTest.Test
             string added = string.Empty;
             added = ((char)('c')) + "oncatenating char and string works.";
             Console.WriteLine(added);
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append("String");
+            sb.Append("Builder");
+            sb.Append(Environment.NewLine);
+            sb.Append("Works");
+            Console.WriteLine(sb.ToString());
         }
     }
 }

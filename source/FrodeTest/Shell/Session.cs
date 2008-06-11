@@ -21,10 +21,10 @@ namespace FrodeTest.Shell
         internal void Run()
         {
             //Console.Write(Prompt.LoadPrompt(xUser).PromptText());
-            Console.Write("[cosmos]>");
+            Console.Write(@"Cosmos:\>");
             string command = Console.ReadLine();
 
-            if (command.Equals("exit"))
+            if (command.Equals("exit") || command.Equals("test"))
                 return;
             else if (command.Equals("ether"))
             {
@@ -177,7 +177,7 @@ namespace FrodeTest.Shell
 
             else if (command.Equals("help"))
             {
-                Console.WriteLine("Valid commands: info, load, send, dump, prom, loop, crash, reset or exit");
+                Console.WriteLine("Valid commands: info, load, test, send, read, mac, ip, dump, prom, loop, crash, notimpl, enable, disable, reset or exit");
             }
             else if (command.Equals(string.Empty))
             {

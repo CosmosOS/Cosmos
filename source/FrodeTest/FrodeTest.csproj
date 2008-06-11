@@ -61,6 +61,7 @@
     <Compile Include="Test\InterfaceTest.cs" />
     <Compile Include="Test\IPv4Test.cs" />
     <Compile Include="Test\MACAddressTest.cs" />
+    <Compile Include="Test\BasicTest.cs" />
     <Compile Include="Test\Mock\FakeBroadcastPacket.cs" />
     <Compile Include="Test\NumberSystemTest.cs" />
     <Compile Include="Test\PacketHeaderTest.cs" />

@@ -57,13 +57,12 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
             sb.Append(Environment.NewLine);
             sb.Append("Source: " + this.SourceAddress);
             sb.Append(Environment.NewLine);
-            sb.Append("Destination: " + this.DestinationAddress.ToString());
+            sb.Append("Destination: " + this.DestinationAddress);
             sb.Append(Environment.NewLine);
             sb.Append("Data size: " + this.Data.Count + " bytes");
             sb.Append(Environment.NewLine);
             sb.Append("--------------------");
             sb.Append(Environment.NewLine);
-
             return sb.ToString();
         }
 

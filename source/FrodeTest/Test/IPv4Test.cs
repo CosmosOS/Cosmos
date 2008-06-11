@@ -19,7 +19,7 @@ namespace FrodeTest.Test
             IPv4Packet ipv4Packet = new IPv4Packet();
             //ipv4Packet.DestinationAddress = new IPv4Address(10, 0, 2, 2); //Virtual DHCP server in Qemu
             //ipv4Packet.SourceAddress = new IPv4Address(10, 0, 2, 15); //Default IP address assigned in Qemu
-            ipv4Packet.DestinationAddress = new IPv4Address(172,28,5,1);
+            ipv4Packet.DestinationAddress = new IPv4Address(172, 28, 6, 1);
             ipv4Packet.SourceAddress = new IPv4Address(172,28,6,6);
             ipv4Packet.TypeOfService = 0;
             ipv4Packet.Identification = 12345;
@@ -34,7 +34,7 @@ namespace FrodeTest.Test
             data.Add(0xFB);
             data.Add(0xFA);
             ipv4Packet.Data = data;
-
+            
             ipv4Packet.HeaderLength = ipv4Packet.CalculateHeaderLength();
             ipv4Packet.TotalLength = ipv4Packet.CalculateTotalLength();
             ipv4Packet.HeaderChecksum = ipv4Packet.CalculateHeaderChecksum();

@@ -21,10 +21,12 @@ namespace FrodeTest
             
             //Security.User currentUser = Security.User.Authenticate("frode", "secret");
             Shell.Session currentSession =  Shell.Session.CreateSession(null);
+            Console.WriteLine("*** COSMOS Operating System - Frode's Test Suite ***");
             currentSession.Run();
 
             //Test
             Console.WriteLine("---- RUNNING PREDEFINED TESTS ----");
+            
             //Debug.SortedListSearcher.RunTest();
             //Test.SwitchTest.RunTest();
             //Test.RTL8139Test.RunTest();
@@ -32,8 +34,9 @@ namespace FrodeTest
             //Test.TransmitStatusDescriptorTest.RunTest();
             //Test.PacketHeaderTest.RunTest();
             //Test.RAMBusTest.RunTest();
-            //Test.BoolTest.RunTest();
-            //Test.InterfaceTest.RunTest();
+            Test.BoolTest.RunTest();
+            Test.BasicTest.RunTest();
+            Test.InterfaceTest.RunTest();
             //Test.ExtensionMethodsTest.RunTest();
             Test.StringTest.RunTest();
             Test.NumberSystemTest.RunTest();
