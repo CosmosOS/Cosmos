@@ -57,5 +57,21 @@ namespace Cosmos.Kernel.Plugs {
 		[PlugMethod(MethodAssembler=typeof(Assemblers.DoTest))]
 		public static void DoTest() {
 		}
+
+
+        [PlugMethod(MethodAssembler = typeof(Assemblers.CPUIDSupport))]
+        public static uint HasCPUIDSupport()
+        {
+            return 0;
+        }
+
+        [PlugMethod(MethodAssembler=typeof(Assemblers.GetCPUIDInternal))]
+        public static void GetCPUId(out uint d, out uint c, out uint b, out uint a, uint v)
+        {
+            d = 0;
+            c = 0;
+            b = 0;
+            a = 0;
+        }
 	}
 }

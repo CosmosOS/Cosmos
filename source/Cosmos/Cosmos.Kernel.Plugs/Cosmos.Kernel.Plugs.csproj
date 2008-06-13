@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArrayListImpl.cs" />
+    <Compile Include="Assemblers\CPUID.cs" />
     <Compile Include="Assemblers\DoTest.cs" />
     <Compile Include="Assemblers\GetAmountOfRAM.cs" />
     <Compile Include="Assemblers\GetCurrentESP.cs" />

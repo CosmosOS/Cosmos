@@ -51,7 +51,68 @@ namespace Cosmos.Kernel {
 		}
 
         // Plugged
-		public static void DoTest() {
-		}
+        public static void DoTest()
+        {
+        }
+
+
+
+        private static string CPUIDuint2string(uint a)
+        {
+            return new string(new char[] { (char)(a), (char)(a >> 8), (char)(a >> 16), (char)(a >> 24) });
+        }
+
+        private static bool HaveCheckedCPUID = false;
+        private static bool HasCPUID = false;
+        private static string CPUString = null;
+
+        public static string CPUVendor
+        {
+            get
+            {
+                if (CPUString == null)
+                {
+                    if (CPUIDSupport)
+                    {
+                        uint d,c,b,a;
+                        GetCPUId(out d, out c, out b, out a, 0);
+                        CPUString = CPUIDuint2string(b) + CPUIDuint2string(d) + CPUIDuint2string(c);
+                    }
+                    else
+                    {
+                        CPUString = string.Empty;
+                    }
+                }
+                return CPUString;
+            }
+        }
+
+        public static bool CPUIDSupport
+        {
+            get
+            {
+                if (!HaveCheckedCPUID)
+                {
+                    HaveCheckedCPUID = true;
+                    HasCPUID = (HasCPUIDSupport() != 0);
+                }
+                return HasCPUID;
+            }
+        }
+
+        // Plugged
+        public static uint HasCPUIDSupport()
+        {
+            return 0;
+        }
+
+        // Plugged
+        public static void GetCPUId(out uint d, out uint c, out uint b, out uint a, uint v)
+        {
+            d = 0;
+            c = 0;
+            b = 0;
+            a = 0;
+        }
 	}
 }
