@@ -652,13 +652,15 @@ namespace Indy.IL2CPU {
                                                         Type[] aMethodParams,
                                                         Type aCurrentInspectedType) {
             MethodBase xBaseMethod = null;
-            try {
+            //try {
                 while (true) {
                     if (aCurrentInspectedType.BaseType == null) {
                         break;
                     }
                     aCurrentInspectedType = aCurrentInspectedType.BaseType;
                     MethodBase xFoundMethod = aCurrentInspectedType.GetMethod(aMethod.Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, Type.DefaultBinder, aMethodParams, new ParameterModifier[0]);
+                    if (xFoundMethod == null)
+                        break;
                     ParameterInfo[] xParams = xFoundMethod.GetParameters();
                     bool xContinue = true;
                     for (int i = 0; i < xParams.Length; i++) {
@@ -683,9 +685,9 @@ namespace Indy.IL2CPU {
                         }
                     }
                 }
-            } catch (Exception) {
+            //} catch (Exception) {
                 // todo: try to get rid of the try..catch
-            }
+            //}
             return xBaseMethod ?? aMethod;
         }
 
@@ -1296,9 +1298,15 @@ namespace Indy.IL2CPU {
                     xOp.Assemble();
                     mAssembler.StackContents.Clear();
                     mMethods[xCurrentMethod].Processed = true;
-                } catch (Exception) {
+                } catch (Exception e) 
+                {
                     OnDebugLog(LogSeverityEnum.Error,
                                xCurrentMethod.GetFullName());
+                    OnDebugLog(LogSeverityEnum.Warning,
+                               e.Message);
+                    OnDebugLog(LogSeverityEnum.Warning,
+                               e.StackTrace);
+                    
                     throw;
                 }
                 OnProgressChanged();
