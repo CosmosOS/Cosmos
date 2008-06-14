@@ -18,10 +18,11 @@ namespace FrodeTest
         public static void Init()
         {
             Cosmos.Sys.Boot.Default();
-            
-            //Security.User currentUser = Security.User.Authenticate("frode", "secret");
-            Shell.Session currentSession =  Shell.Session.CreateSession(null);
+
             Console.WriteLine("*** COSMOS Operating System - Frode's Test Suite ***");
+            Console.WriteLine("CPU: " + Cosmos.Kernel.CPU.CPUVendor);
+
+            Shell.Session currentSession =  Shell.Session.CreateSession(null);
             currentSession.Run();
 
             //Test
@@ -42,7 +43,6 @@ namespace FrodeTest
             Test.NumberSystemTest.RunTest();
             //Test.IPv4Test.RunTest();
             //Test.UDPTest.RunTest();
-            
             Test.MACAddressTest.RunTest();
              
             //Done
