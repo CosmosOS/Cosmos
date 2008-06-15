@@ -18,8 +18,8 @@ namespace Cosmos.Hardware {
 
 		public static void Initialize(EventHandler aTick) {
 			mTick = aTick;
-			SetInterval(1); // interval 1 is slowest, mostly useful for debugging..
-			//SetInterval(1193); // interval 1193 is aprox 1 millisecond
+			//SetInterval(1); // interval 1 is slowest, mostly useful for debugging..
+			SetInterval(1193); // interval 1193 is aprox 1 millisecond
 		}
 
 		private static EventHandler mTick;

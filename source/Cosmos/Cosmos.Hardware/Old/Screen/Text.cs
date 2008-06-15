@@ -20,44 +20,50 @@ namespace Cosmos.Hardware.Screen {
 
 		public static unsafe void Clear() {
 			CheckInit();
-			for (int i = 0; i < Columns * (Lines + 1); i++) {
-				byte* xScreenPtr = (byte*)VideoAddr;
-				xScreenPtr += i * 2;
+
+            byte* xScreenPtr = (byte*)VideoAddr;
+
+			for (int i = 0; i < Columns * (Lines + 1); i++) {				
 				*xScreenPtr = 0;
-				xScreenPtr += 1;
+				xScreenPtr++;
 				*xScreenPtr = Color;
+                xScreenPtr++;
 			}
 		}
 
 		public static unsafe void ScrollUp() {
 			CheckInit();
+            int Columns2 = Columns * 2;
+            byte* xScreenPtr = (byte*)(VideoAddr );
 			for (int i = 0; i < Columns * (Lines); i++) {
-				byte* xScreenPtr = (byte*)(VideoAddr + (i * 2));
-				*xScreenPtr = *(xScreenPtr + (Columns * 2));
-				xScreenPtr += 1;
-				*xScreenPtr = *(xScreenPtr + (Columns * 2));
+				*xScreenPtr = *(xScreenPtr + Columns2);
+				xScreenPtr ++;
+				*xScreenPtr = *(xScreenPtr + Columns2);
+                xScreenPtr++;				
 			}
+
+            xScreenPtr = (byte*)(VideoAddr + ( Lines * Columns) * 2);	
 			for (int i = 0; i < Columns; i++) {
-				byte* xScreenPtr = (byte*)(VideoAddr + (i + Lines * Columns) * 2);
 				*xScreenPtr = 0;
-				xScreenPtr += 1;
+				xScreenPtr ++;
 				*xScreenPtr = Color;
+                xScreenPtr++;
 			}
 		}
 
 		public unsafe static void PutChar(int aLine, int aPos, char aChar) {
 			CheckInit();
-			int xScreenOffset = ((aPos + (aLine * 80)) * 2);
-			byte* xScreenPtr = (byte*)((0xB8000) + xScreenOffset);
+			int xScreenOffset = ((aPos + (aLine * Columns)) * 2);
+            byte* xScreenPtr = (byte*)(VideoAddr + xScreenOffset);
 			byte xVal = (byte)aChar;
-			*xScreenPtr = (byte)(xVal & 0xFF);
-			xScreenPtr += 1;
+			*xScreenPtr = xVal;
+			xScreenPtr ++;
 			*xScreenPtr = Color;
 		}
 
 		public static void SetColors(ConsoleColor foreground, ConsoleColor background) {
 			CheckInit();
-			Color = (byte)((byte)foreground | ((byte)background << 4));
+            Color = (byte)((byte)(foreground ) | ((byte)(background ) << 4));
 		}
 	}
 }

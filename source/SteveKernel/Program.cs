@@ -4,6 +4,7 @@ using Cosmos.Hardware.PC.Bus;
 using Cosmos.FileSystem;
 using Cosmos.Hardware;
 using System.Diagnostics;
+using S = Cosmos.Hardware.Screen.Text;
 
 namespace SteveKernel
 {
@@ -17,13 +18,166 @@ namespace SteveKernel
         }
         #endregion
 
+        class Player
+        {
+            public int x,y,d,i;
+            public bool alive;
+        }
+
+        private class MRandom
+        {
+            int a = 214013;
+            int x = 0x72535;
+            int c = 2531011;
 
 
-
+            public MRandom(int seed)
+            {
+                x = seed;
+            }
+            public int Next(int p)
+            {
+                x = (a * x + c);
+                return x % p;
+            }
+        }
         // Main entry point of the kernel
         public static void Init()
         {
             Cosmos.Sys.Boot.Default();
+
+            Console.WriteLine(Cosmos.Kernel.CPU.CPUVendor);
+
+            S.Clear();
+            for (int f = 8; f < 16; f++)
+                for (int b = 0; b < 8; b++)
+                {
+                    S.SetColors((ConsoleColor)f, (ConsoleColor)b);
+                    Console.Write("     Nibbles on COSMOS! coded by Stephen Remde     ");
+                }
+
+            wait(5000);
+
+
+            MRandom r = new MRandom((int)Cosmos.Hardware.Global.TickCount + Cosmos.Hardware.RTC.GetSeconds());
+
+            int playersc = 15;
+
+            while (true)
+            {
+                S.SetColors(ConsoleColor.Black, ConsoleColor.Black);
+                S.Clear();
+                
+                Player[] players = new Player[playersc];
+
+                bool[] board = new bool[S.Columns * S.Lines];
+
+                for (int i = 0; i < playersc; i++)
+                {
+
+                    players[i] = new Player()
+                    {
+                        x = r.Next(S.Columns),
+                        y = r.Next(S.Lines),
+                        d = r.Next(4),
+                        i = i,
+                        alive = true
+                    };
+                }
+
+                bool playera = true;
+                while (playera)
+                {
+                    wait(25);
+
+                    playera = false;
+
+                    foreach (Player p in players)
+                    {
+                        if (p.alive)
+                        {
+                            S.SetColors((ConsoleColor)(p.i + 1), (ConsoleColor)(p.i + 1));
+                            S.PutChar(p.y, p.x, 'X');
+                            
+                            board[p.x + p.y * S.Columns] = true;
+                        
+                            p.alive = false;
+                        
+                            for (int dd = 0; dd < 4; dd++)
+                            {
+                                int nx = p.x;
+                                int ny = p.y;
+                                switch ((p.d + dd) % 4)
+                                {
+                                    case 0:
+                                        nx--;
+                                        break;
+                                    case 1:
+                                        ny--;
+                                        break;
+                                    case 2:
+                                        nx++;
+                                        break;
+                                    case 3:
+                                        ny++;
+                                        break;
+                                }
+                                if (nx >= 0 && nx < S.Columns && ny >= 0 && ny < S.Lines &&
+                                    board[nx + ny * S.Columns] == false)
+                                {
+                                    p.alive = true;
+                                    p.x = nx;
+                                    p.y = ny;
+                                    p.d = (p.d + dd) % 4;
+                                    playera = true;
+                                    break;
+                                }
+
+                            }
+                        }
+                    }
+                }                
+
+                wait(2000);
+            }
+        }
+        private static void wait(int ms)
+        {
+            long tick = Cosmos.Hardware.Global.TickCount + Cosmos.Hardware.PIT.TicksPerSecond * ms / 1000;
+            while (Cosmos.Hardware.Global.TickCount < tick)
+                ;
+        }
+
+        private  void c()
+        {
+            //byte mybyte = 0;
+            //string s  = ((byte)0).ToString();
+            //string s2 = ((object)mybyte).ToString();
+
+            //object oo;
+            //byte bb = (byte)5;
+            //byte[] ba = new byte[1];
+            //ba[0] = 6;
+                        
+            //oo = ba[0];
+            //Console.WriteLine("" + oo.ToString());
+            //Console.WriteLine(""+ba[0].ToString());
+            //oo = bb;
+            //Console.WriteLine("" + oo);
+            //Console.WriteLine("" + bb);
+
+            //byte by = 8;
+            //Console.WriteLine(by);
+            //Console.WriteLine(by.ToString());
+
+
+#if false
+            Console.WriteLine(u(a) + u(b) + u(c) + u(d));
+            Cosmos.Kernel.CPU.GetCPUId(out d, out c, out b, out a, 1);
+            Console.WriteLine(u(a) + u(b) + u(c) + u(d));
+
+
+
             Console.WriteLine("Done booting");
 
 
@@ -87,7 +241,7 @@ namespace SteveKernel
                 // Conver to extensino method as per your commetns. :)
                 //Console.Write(PCIBus.ToHex(mas.Read8Unchecked(i),2) +" ");
 
-
+#endif
             while (true)
                 ;
         }
