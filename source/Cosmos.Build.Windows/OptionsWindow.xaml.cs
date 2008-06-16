@@ -166,6 +166,7 @@ namespace Cosmos.Build.Windows {
                 if (xDebugMode == "IL")
                 {
                     mDebugMode = DebugModeEnum.IL;
+                    throw new NotSupportedException("Debug mode IL isn't supported yet, use Source instead.");
                 }
                 else if (xDebugMode == "Source")
                 {
@@ -191,6 +192,7 @@ namespace Cosmos.Build.Windows {
                         mBuilder.DebugLog += xBuildWindow.DoDebugMessage;
                         mBuilder.ProgressChanged += delegate(int aMax, int aCurrent)
                         {
+                            xBuildWindow.progressText.Content = String.Format("Processing method {0:d} of {1:d}", aCurrent, aMax);
                             xBuildWindow.ProgressMax = aMax;
                             xBuildWindow.ProgressCurrent = aCurrent;
                             var xFrame = new DispatcherFrame();

@@ -14,15 +14,30 @@
 	</Window.Resources>
 	<Grid>
 		<Grid.RowDefinitions>
+            <RowDefinition Height="48" />
+            <RowDefinition Height="20" />
+            <RowDefinition Height="24" />
 			<RowDefinition />
-			<RowDefinition
-				Height="32" />
+			
 		</Grid.RowDefinitions>
-		<ListBox
+        <Label 
+            x:Name="progressText"
+            Grid.Row="0"            
+            Content="Unknown"></Label>
+        <ProgressBar
+			x:Name="progressBuild"
+			Grid.Row="1"
+			Value="0"></ProgressBar>
+        <Label 
+            x:Name="warningLabel"
+            Grid.Row="2"
+            FontWeight="bold"
+            Content="Warning/Error messages:"></Label>
+        <ListBox
 			ItemsSource="{Binding Source={StaticResource BuildMessages}}"
 			Name="lboxLog"
 			Background="White"
-			Grid.RowSpan="2">
+			Grid.Row="3">
 			<ListBox.ItemTemplate>
 				<DataTemplate
 					DataType="{x:Type local:BuildLogMessage}">
@@ -50,9 +65,5 @@
 				</DataTemplate>
 			</ListBox.ItemTemplate>
 		</ListBox>
-		<ProgressBar
-			x:Name="progressBuild"
-			Grid.Row="1"
-			Value="0"></ProgressBar>
-	</Grid>
+    </Grid>
 </Window>

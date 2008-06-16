@@ -88,13 +88,16 @@ namespace Cosmos.Build.Windows {
                 xBuildTimer.Start();
             }
 
-            long percentComplete = ((completedCount * 100 / totalCount) + 1);
+            long percentComplete = ((completedCount * 100 / totalCount));
             if (percentComplete == 0) //Avoid Divide by Zero
                 percentComplete = 1;
 
-            long remaining = (xBuildTimer.ElapsedMilliseconds / percentComplete) * (100 - percentComplete);
+            long remaining = ((xBuildTimer.ElapsedMilliseconds) / percentComplete) * (100 - percentComplete);
 
-            return new TimeSpan(remaining * 10000);
+            if (completedCount == 10 || completedCount == 780)
+                MessageBox.Show("One percent takes " + xBuildTimer.ElapsedMilliseconds / percentComplete);
+
+            return new TimeSpan(remaining * 1000 * 10);
         }
     }
 }
