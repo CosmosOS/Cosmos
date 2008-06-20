@@ -27,6 +27,7 @@ namespace Cosmos.Hardware {
 				mEscaped = false;
 			}
 			switch (xTheScancode) {
+                case 0x36:
 				case 0x2A: {
 						mShiftState = !aReleased;
 						break;
@@ -75,6 +76,9 @@ namespace Cosmos.Hardware {
 
 				mKeys = new List<KeyMapping>(128);
 
+                //TODO: Direction Arrows, alt, ctrl, num pad, function keys, insert, home, pg up, delete, end, page down, esc, fn (for laptops)
+                
+                //reference: http://www.win.tue.nl/~aeb/linux/kbd/scancodes-1.html#ss1.1
 				#region Letters
 				AddKey(0x10, 'q');
 				AddKey(0x100000, 'Q');
@@ -133,8 +137,10 @@ namespace Cosmos.Hardware {
 				#endregion
 
 				#region digits
-				AddKey(0x1, '`');
-				AddKey(0x10000, '~');
+                //AddKey(0x1, '`');
+                //AddKey(0x10000, '~');
+                AddKey(0x29, '`');
+                AddKey(0x290000, '~');
 				AddKey(0x2, '1');
 				AddKey(0x20000, '!');
 				AddKey(0x3, '2');
@@ -170,18 +176,31 @@ namespace Cosmos.Hardware {
 
 				#region Punctuation and Signs
                 AddKey(0x27, ';');
+                AddKey(0x270000, ':');
                 AddKey(0x28, '\'');
+                AddKey(0x280000, '"');
                 AddKey(0x2B, '\\');
+                AddKey(0x2B0000, '|');
                 AddKey(0x33, ',');
+                AddKey(0x330000, '<');
 				AddKey(0x34, '.');
+                AddKey(0x340000, '>');
                 AddKey(0x35, '/');
-				AddKey(0x340000, '>');
-                AddKey(0x4A, '-');
-                AddKey(0x4E, '+');
+                AddKey(0x350000, '?');
+                //AddKey(0x4A, '-');
+                AddKey(0x0C, '-');
+                AddKey(0x0C0000, '_');
+                AddKey(0x0D, '=');
+                AddKey(0x0D0000, '+');
+                //AddKey(0x4E, '+');
+                AddKey(0x1A, '[');
+                AddKey(0x1A0000, '{');
+                AddKey(0x1B, ']');
+                AddKey(0x1B0000, '}');
 				#endregion
 			}
 		}
-
+        
 		public static void Initialize() {
 			CheckInit();
 		}

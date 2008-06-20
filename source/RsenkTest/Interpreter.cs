@@ -2,108 +2,64 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using RsenkTest.Commands;
 
 namespace RsenkTest
 {
-    class Interpreter
+    public class Interpreter
     {
-        private List<CommandBase> _commands;
-
-        public Interpreter(List<CommandBase> commands)
+        public static List<String> GetParsed(string line)
         {
-            _commands = commands;
-        }
+            List<String> retList = new List<String>();
+            string lineOld = "";
 
-        /// <summary>
-        /// Parses the command off. Reads everything up to the first space.
-        /// </summary>
-        /// <param name="line"></param>
-        /// <returns>Returns the command if it exists, otherwise null.</returns>
-        public CommandBase ParseCommand(string line)
-        {
-            string command = line.Substring(0, line.IndexOf(' '));
-
-            CommandBase commandToRet = CheckCommand(command);
-
-            return commandToRet;
-        }
-
-        /// <summary>
-        /// Checks to see if the command is valid.
-        /// </summary>
-        /// <param name="comm"></param>
-        /// <returns>Returns the command in the form of CommandBase if found, otherwise returns null.</returns>
-        private CommandBase CheckCommand(string comm)
-        {
-            CommandBase commandToRet = _commands.Find(delegate(CommandBase command)
+            //Read command
+            String command = ReadCommand(line);
+            if (!String.IsNullOrEmpty(command))
             {
-                return command.Name.Equals(comm);
-            });
-
-            return commandToRet;
-        }
-
-        public ParameterBase[] ParseParameters(CommandBase command, string line)
-        {
-            ParameterBase[] parameters = new ParameterBase[0];
-            line = line.Substring(command.Name.Length + 1).Trim();
-            bool invalidArg = false;
-
-            if ((command != null) && (String.IsNullOrEmpty(line)))
-            {
-                List<ParameterBase> paramsTemp = new List<ParameterBase>();
-
-                while (line.Length > 0)
-                {
-                    string param = line.Substring(0, line.IndexOf(' '));
-                    Console.WriteLine(param);
-                    line = line.Substring(line.IndexOf(' '));
-                    Console.WriteLine(line);
-
-                    if (param.Equals(line))
-                    {
-                        break;
-                    }
-
-                    ParameterBase temp = ValidParam(command, param);
-
-                    if (temp != null)
-                        paramsTemp.Add(temp);
-                    else
-                    {
-                        invalidArg = true;
-                        break;
-                    }
-                }
-
-                if (line.Trim().Length > 0)
-                {
-                    ParameterBase temp = ValidParam(command, line);
-
-                    if (temp != null)
-                        paramsTemp.Add(temp);
-                    else
-                        invalidArg = true;
-                }
-
-                if (!invalidArg)
-                {
-                    parameters = paramsTemp.ToArray();
-                }
+                retList.Add(command);
+                line = line.Substring(command.Length); //remove the command
+                line = line.Trim(); //remove any whitespace
             }
 
-            return parameters;
+            //Read all arguments
+            while (line.Trim().Length > 0)
+            {
+                String arg = ReadArgument(line);
+                if (!String.IsNullOrEmpty(arg))
+                {
+                    retList.Add(arg);
+                    line = line.Substring(arg.Length);
+                    line = line.Trim();
+                }
+                else
+                    break;
+            }
+
+            return retList;
         }
 
-        private ParameterBase ValidParam(CommandBase command, string paramToCheck)
+        private static string ReadCommand(string line)
         {
-            ParameterBase param = command.Parameters.Find(delegate(CommandBase parameter)
+            //String.Contains() doesn't work yet, so check manually...
+            for (int x = 0; x < line.Length; x++)
             {
-                return parameter.Name.Equals(paramToCheck);
-            }) as ParameterBase;
+                if (line[x].Equals(' '))
+                    return line.Substring(0, x);
+            }
 
-            return param;
+            return line;
+        }
+
+        private static string ReadArgument(string line)
+        {
+            //String.Contains() doesn't work yet, so check manually...
+            for (int x = 0; x < line.Length; x++)
+            {
+                if (line[x].Equals(' '))
+                    return line.Substring(0, x);
+            }
+
+            return line;
         }
     }
 }

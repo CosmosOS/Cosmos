@@ -10,8 +10,8 @@ namespace RsenkTest
         private const ConsoleColor NORMAL_COLOR = ConsoleColor.White;
         private const ConsoleColor WARNING_COLOR = ConsoleColor.Yellow;
         private const ConsoleColor ERROR_COLOR = ConsoleColor.Red;
-        private const char SYM_ROOT = '#';
-        private const char SYM_NORM = '$';
+        private const string SYM_ROOT = "#";
+        private const string SYM_NORM = "$";
 
         /// <summary>
         /// The different message types possible
@@ -31,7 +31,7 @@ namespace RsenkTest
         public static void Prompt(string user, string path)
         {
             Console.ForegroundColor = NORMAL_COLOR;
-            Console.Write("[" + user + ":" + path + "]" + SYM_NORM + " ");
+            Console.Write(user + ":" + path  + SYM_NORM + " ");
         }
 
         /// <summary>

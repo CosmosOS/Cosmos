@@ -55,14 +55,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Commands\ClearScreen\ClearScreen.cs" />
-    <Compile Include="Commands\CommandBase.cs" />
-    <Compile Include="CommanderShell.cs" />
-    <Compile Include="Commands\HelpCommand.cs" />
-    <Compile Include="Commands\ParameterBase.cs" />
-    <Compile Include="Commands\Version\VerAll.cs" />
-    <Compile Include="Commands\Version\VerCommander.cs" />
-    <Compile Include="Commands\Version\Version.cs" />
+    <Compile Include="Commander.cs" />
     <Compile Include="Interpreter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Prompter.cs" />

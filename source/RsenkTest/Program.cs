@@ -1,7 +1,8 @@
 ﻿using System;
 using Cosmos.Build.Windows;
+using RsenkTest;
 
-namespace RsenkTest
+namespace CosmosBoot
 {
     class Program
     {
@@ -17,18 +18,10 @@ namespace RsenkTest
         // Main entry point of the kernel
         public static void Init()
         {
-            try
-            {
-                Cosmos.Sys.Boot.Default();
-                System.Console.WriteLine("                                      [ done ]");
+            Cosmos.Sys.Boot.Default();
 
-                System.Console.WriteLine("Queueing Shell");
-                System.Console.WriteLine("                                      [ done ]");
-            }
-            catch (PrompterException e)
-            {
-                Prompter.PrintError(e.Message);
-            }
+            Commander shell = Commander.GetInstance();
+            shell.Start();
 
             while (true)
                 ;
