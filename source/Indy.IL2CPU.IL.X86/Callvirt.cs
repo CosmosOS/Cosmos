@@ -128,6 +128,7 @@ namespace Indy.IL2CPU.IL.X86 {
                      * EAX contains the method to call
                      */
                     new CPUx86.JumpIfNotEqual(mLabelName + "_NOT_BOXED_THIS");
+                    new CPUx86.Pop("eax");
                     //new CPUx86.Pop("ecx");
                     new CPUx86.Move("ecx", "eax");
                     /*
