@@ -25,15 +25,9 @@ namespace KudzuTest {
 			Console.WriteLine("  " + Tests.IntToStr16());
 			Console.WriteLine();
 
-            Console.WriteLine("Pause");
-            Console.ReadLine();
-
 			Console.WriteLine("IntToStr 32 test");
 			Console.WriteLine("  " + Tests.IntToStr32());
 			Console.WriteLine();
-
-            Console.WriteLine("Pause");
-            Console.ReadLine();
 
             Console.WriteLine("WriteLnUInt32 test");
 			Console.WriteLine("  " + Tests.WriteLnUInt32());
@@ -42,9 +36,6 @@ namespace KudzuTest {
 			//Console.WriteLine("Dictionary test");
 			//Console.WriteLine("  " + Tests.Dictionary());
 			//Console.WriteLine();
-
-            Console.WriteLine("Pause");
-            Console.ReadLine();
 
             Console.WriteLine("Concat conversion test");
 			Console.WriteLine("  " + Tests.ConcatConversion());
