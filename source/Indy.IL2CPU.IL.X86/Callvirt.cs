@@ -98,7 +98,14 @@ namespace Indy.IL2CPU.IL.X86 {
                 new CPUx86.Pushd(CPUx86.Registers.AtEAX);
                 new CPUx86.Pushd("0" + mMethodIdentifier.ToString("X") + "h");
                 new CPUx86.Call(CPU.Label.GenerateLabelName(VTablesImplRefs.GetMethodAddressForTypeRef));
-                new CPUx86.Pop("eax");
+
+                int xTest = 1;
+                if (xTest == 1) {
+                    // M - Ok, Frode/Guess - Crash
+                    new CPUx86.Pop("eax");
+                } else if (xTest == 2) {
+                    // M - Box problem, Frode/Guess - Ok
+                }
     
                 /*
                  * On the stack now:
