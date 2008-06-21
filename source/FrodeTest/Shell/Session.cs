@@ -8,19 +8,13 @@ namespace FrodeTest.Shell
 {
     public class Session
     {
-        Security.User xUser = null;
-        static ushort xSessionId;
         static Cosmos.Hardware.Network.Devices.RTL8139.RTL8139 nic = null;
 
-        public Session(Security.User user)
+        /// <summary>
+        /// Starts an interactive session where user can input commands.
+        /// </summary>
+        public static void Run()
         {
-            xSessionId++;
-            xUser = user;
-        }
-
-        internal void Run()
-        {
-            //Console.Write(Prompt.LoadPrompt(xUser).PromptText());
             Console.Write(@"Cosmos:\>");
             string command = Console.ReadLine();
 
@@ -187,11 +181,6 @@ namespace FrodeTest.Shell
                 Console.WriteLine("No such systemcommand or application: " + command + ". Try typing 'help'.");
 
             Run(); //Recursive call
-        }
-
-        internal static Session CreateSession(FrodeTest.Security.User currentUser)
-        {
-            return new Session(currentUser);
         }
     }
 }
