@@ -10,13 +10,14 @@ namespace KudzuTest {
         public delegate object TestDelegate();
 
         static public void DoAll() {
-			Tests.Do("String Concatenation", Tests.StringConcat);
-			Console.WriteLine("String test");
-			Console.WriteLine("  " + Tests.StringConcat());
-			Console.WriteLine();
-            return;
+            // Delegate version
+            //Tests.Do("String Concatenation", Tests.StringConcat);
 
-			Console.WriteLine("StringBuilder test");
+            Console.WriteLine("String test");
+			Console.WriteLine("  " + Tests.StringConcat());
+            Console.WriteLine();
+
+            Console.WriteLine("StringBuilder test");
 			Console.WriteLine(Tests.StringBuilder());
 			Console.WriteLine();
 
