@@ -98,6 +98,8 @@ namespace Indy.IL2CPU.IL.X86 {
                 new CPUx86.Pushd(CPUx86.Registers.AtEAX);
                 new CPUx86.Pushd("0" + mMethodIdentifier.ToString("X") + "h");
                 new CPUx86.Call(CPU.Label.GenerateLabelName(VTablesImplRefs.GetMethodAddressForTypeRef));
+                new CPUx86.Pop("eax");
+    
                 /*
                  * On the stack now:
                  * $esp                 Params
