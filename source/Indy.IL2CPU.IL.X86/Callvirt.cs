@@ -99,12 +99,16 @@ namespace Indy.IL2CPU.IL.X86 {
                 new CPUx86.Pushd("0" + mMethodIdentifier.ToString("X") + "h");
                 new CPUx86.Call(CPU.Label.GenerateLabelName(VTablesImplRefs.GetMethodAddressForTypeRef));
 
-                int xTest = 1;
+                int xTest = 3;
                 if (xTest == 1) {
                     // M - Ok, Frode/Guess - Crash
                     new CPUx86.Pop("eax");
                 } else if (xTest == 2) {
                     // M - Box problem, Frode/Guess - Ok
+                } else if (xTest == 3) {
+                    // M - Box problem,, Frode/Guess - Ok
+                    new CPUx86.Pop("eax");
+                    new CPUx86.Push("eax");
                 }
     
                 /*
@@ -122,7 +126,7 @@ namespace Indy.IL2CPU.IL.X86 {
                                         xEmitCleanup);
                 new CPU.Label(mLabelName + "_AfterAddressCheck");
                 if (mTargetMethodInfo.Arguments[0].ArgumentType == typeof(object)) {
-                    new CPUx86.Push("eax");
+                    ///////new CPUx86.Push("eax");
                     /*
                      * On the stack now:
                      * $esp                     method to call
