@@ -98,18 +98,6 @@ namespace Indy.IL2CPU.IL.X86 {
                 new CPUx86.Pushd(CPUx86.Registers.AtEAX);
                 new CPUx86.Pushd("0" + mMethodIdentifier.ToString("X") + "h");
                 new CPUx86.Call(CPU.Label.GenerateLabelName(VTablesImplRefs.GetMethodAddressForTypeRef));
-
-                int xTest = 3;
-                if (xTest == 1) {
-                    // M - Ok, Frode/Guess - Crash
-                    new CPUx86.Pop("eax");
-                } else if (xTest == 2) {
-                    // M - Box problem, Frode/Guess - Ok
-                } else if (xTest == 3) {
-                    // M - Box problem,, Frode/Guess - Ok
-                    new CPUx86.Pop("eax");
-                    new CPUx86.Push("eax");
-                }
     
                 /*
                  * On the stack now:
@@ -126,15 +114,13 @@ namespace Indy.IL2CPU.IL.X86 {
                                         xEmitCleanup);
                 new CPU.Label(mLabelName + "_AfterAddressCheck");
                 if (mTargetMethodInfo.Arguments[0].ArgumentType == typeof(object)) {
-                    ///////new CPUx86.Push("eax");
                     /*
                      * On the stack now:
                      * $esp                     method to call
                      * $esp + 4                 Params
                      * $esp + mThisOffset + 4   This
                      */
-                    new CPUx86.Move("eax",
-                                    "[esp + " + (mThisOffset + 4) + "]");
+                    new CPUx86.Move("eax", "[esp + " + (mThisOffset + 4) + "]");
                     new CPUx86.Compare("dword [eax + 4]",
                                        ((int)InstanceTypeEnum.BoxedValueType).ToString());
                     new CPUx86.Pop("eax");
@@ -147,8 +133,7 @@ namespace Indy.IL2CPU.IL.X86 {
                      */
                     new CPUx86.JumpIfNotEqual(mLabelName + "_NOT_BOXED_THIS");
                     //new CPUx86.Pop("ecx");
-                    new CPUx86.Move("ecx",
-                                    "eax");
+                    new CPUx86.Move("ecx", "eax");
                     /*
                      * On the stack now:
                      * $esp                 Params
@@ -156,8 +141,7 @@ namespace Indy.IL2CPU.IL.X86 {
                      * 
                      * ECX contains the method to call
                      */
-                    new CPUx86.Move("eax",
-                                    "[esp + " + (mThisOffset) + "]");
+                    new CPUx86.Move("eax", "[esp + " + (mThisOffset) + "]");
                     /*
                      * On the stack now:
                      * $esp                 Params
@@ -165,11 +149,9 @@ namespace Indy.IL2CPU.IL.X86 {
                      * 
                      * ECX contains the method to call
                      * EAX contains $This, but boxed
-                     */
-                    new CPUx86.Add("eax",
-                                   ObjectImpl.FieldDataOffset.ToString());
-                    new CPUx86.Move("[esp + " + mThisOffset + "]",
-                                    "eax");
+                     */ 
+                    new CPUx86.Add("eax", ObjectImpl.FieldDataOffset.ToString());
+                    new CPUx86.Move("[esp + " + mThisOffset + "]", "eax");
                     /*
                      * On the stack now:
                      * $esp                 Params
@@ -183,45 +165,18 @@ namespace Indy.IL2CPU.IL.X86 {
                      * $esp                    Method to call
                      * $esp + 4                Params
                      * $esp + mThisOffset + 4  This
-                     * 
                      */
-
-                    //new CPUx86.Pushd("[eax]");
-                    //for (int i = mThisOffset; i > 0; i -= 4) {
-                    //    new CPUx86.Pushd("[esp + " + mThisOffset + "]");
-                    //}
-                    //new CPUx86.Move("eax", "esp");
-                    //new CPUx86.Add("eax", (mThisOffset).ToString());
-                    //new CPUx86.Pushd(CPUx86.Registers.EAX);
-                    //new CPUx86.Move("eax", "[esp + " + (mThisOffset + 8) + "]");
-                    //if (mExtraStackSpace > 0)
-                    //{
-                    //    new CPUx86.Sub("esp",
-                    //                   mExtraStackSpace.ToString());
-                    //}
-                    //new CPUx86.Call(CPUx86.Registers.EAX);
-                    //// todo: fix this.
-                    //// MtW: Dutch: CallVirt kopieert de arguments, dus nu moeten we de result terug kopieren
-                    //if (mReturnSize > 0) {
-                    //    throw new NotImplementedException("TODO"); }
-                    //new CPUx86.Add("esp", "8");
-                    //for (int i = mThisOffset; i >= 0; i -= 4) {
-                    //    new CPUx86.Add("esp", "4");
-                    //}
-                    new CPUx86.Jump(mLabelName + "_NOT_BOXED_THIS");
                 }
                 new CPU.Label(mLabelName + "_NOT_BOXED_THIS");
                 new CPUx86.Pop("eax");
                 if (mExtraStackSpace > 0) {
-                    new CPUx86.Sub("esp",
-                                   mExtraStackSpace.ToString());
+                    new CPUx86.Sub("esp", mExtraStackSpace.ToString());
                 }
                 new CPUx86.Call("eax");
                 new CPU.Label(mLabelName + "__AFTER_NOT_BOXED_THIS");
             }
             if (!Assembler.InMetalMode) {
-                new CPUx86.Test(CPUx86.Registers.ECX,
-                                2);
+                new CPUx86.Test(CPUx86.Registers.ECX, 2);
                 new CPUx86.JumpIfNotEqual(MethodFooterOp.EndOfMethodLabelNameException);
             }
             new CPU.Comment("Argument Count = " + mArgumentCount.ToString());
