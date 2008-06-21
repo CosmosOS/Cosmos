@@ -36,16 +36,29 @@ namespace MatthijsTest
             //theEvent += Handler2
             //    ;
             //theEvent("", null);
-            Console.Clear();
-            Console.Write("Data: '");
-            byte xByte = 25;
-            var xData = "Dat";
-            xData = xData + "a " + xByte;// +".";
+            //Console.Clear();
+            //Console.Write("Data: '");
+            //byte xByte = 25;
+            //var xData = "Dat";
+            //xData = xData + "a " + xByte;// +".";
 
-            Console.Write(xData);
-            Console.WriteLine("'");
-            
-            Console.WriteLine("Done");
+            //Console.Write(xData);
+            //Console.WriteLine("'");
+            start:
+            byte xB = 1;
+            object xO = xB;
+            Console.WriteLine(xO.ToString());
+            int xI32 = 8346;
+            xO = xI32;
+            Console.WriteLine(xO.ToString());
+            short xI16 = 355;
+            xO = xI16;
+            Console.WriteLine(xO.ToString());
+            ushort xU16 = 6735;
+            xO = xU16;
+            Console.WriteLine(xO.ToString());
+            //goto start;
+            //Console.WriteLine("Done");
         }
 
         public static void Handler1(object sender, EventArgs e) {

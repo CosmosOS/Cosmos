@@ -8,7 +8,7 @@ namespace Indy.IL2CPU.IL.CustomImplementations.System {
 	[Plug(Target = typeof(byte))]
 	public static class ByteImpl {
 		//[PlugMethod(Signature = "System_String___System_Byte_ToString____")]
-		public static string ToString(ref byte aThis) {
+		public static string ToString(byte aThis) {
 			return UInt32Impl.GetNumberString(aThis, false);
 		}
 	}

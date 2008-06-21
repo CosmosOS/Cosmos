@@ -8,7 +8,7 @@ namespace Indy.IL2CPU.IL.CustomImplementations.System {
 	[Plug(Target=typeof(short))]
 	public static class Int16Impl {
 		//[PlugMethod(Signature = "System_String___System_Int16_ToString____")]
-		public static string ToString(ref short aThis) {
+		public static string ToString(short aThis) {
 			return Int32Impl.GetNumberString(aThis);
 		}
 
