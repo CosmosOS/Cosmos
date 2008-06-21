@@ -120,7 +120,6 @@ namespace Indy.IL2CPU.IL.X86 {
                     new CPUx86.Move("eax", "[esp + " + (mThisOffset + 4) + "]");
                     new CPUx86.Compare("dword [eax + 4]",
                                        ((int)InstanceTypeEnum.BoxedValueType).ToString());
-                    new CPUx86.Pop("eax");
                     /*
                      * On the stack now:
                      * $esp                 Params
