@@ -156,23 +156,12 @@ namespace Indy.IL2CPU.IL.X86 {
                      */
                     new CPUx86.Add("eax",
                                    ObjectImpl.FieldDataOffset.ToString());
-                    // TODO: add support for automatic unboxing of values of >4bytes
-                    new CPUx86.Move("eax",
-                                    "[eax]");
-                    /*
-                     * On the stack now:
-                     * $esp                 Params
-                     * $esp + mThisOffset   This
-                     * 
-                     * ECX contains the method to call
-                     * EAX contains the first 4 bytes of the boxed this
-                     */
-                    new CPUx86.Move("[esp + " + (mThisOffset) + "]",
+                    new CPUx86.Move("[esp + " + mThisOffset + "]",
                                     "eax");
                     /*
                      * On the stack now:
                      * $esp                 Params
-                     * $esp + mThisOffset   Unboxed This, but only first 4 bytes.
+                     * $esp + mThisOffset   Pointer to address inside box
                      * 
                      * ECX contains the method to call
                      */

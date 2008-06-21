@@ -57,6 +57,7 @@ namespace MatthijsTest
             ushort xU16 = 6735;
             xO = xU16;
             Console.WriteLine(xO.ToString());
+            Console.WriteLine(xU16.ToString());
             //goto start;
             //Console.WriteLine("Done");
         }
