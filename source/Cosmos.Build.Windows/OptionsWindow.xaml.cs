@@ -187,37 +187,33 @@ namespace Cosmos.Build.Windows {
                     Console.WriteLine("Compiling...");
                     var xBuildWindow = new BuildWindow();
                     IEnumerable<BuildLogMessage> xMessages = new BuildLogMessage[0];
-                    try
+
+                    mBuilder.DebugLog += xBuildWindow.DoDebugMessage;
+                    mBuilder.ProgressChanged += delegate(int aMax, int aCurrent)
                     {
-                        mBuilder.DebugLog += xBuildWindow.DoDebugMessage;
-                        mBuilder.ProgressChanged += delegate(int aMax, int aCurrent)
+                        xBuildWindow.progressText.Content = String.Format("Processing method {0:d} of {1:d}", aCurrent, aMax);
+                        xBuildWindow.ProgressMax = aMax;
+                        xBuildWindow.ProgressCurrent = aCurrent;
+                        var xFrame = new DispatcherFrame();
+                        Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Input, new DispatcherOperationCallback(delegate(object aParam)
                         {
-                            xBuildWindow.progressText.Content = String.Format("Processing method {0:d} of {1:d}", aCurrent, aMax);
-                            xBuildWindow.ProgressMax = aMax;
-                            xBuildWindow.ProgressCurrent = aCurrent;
-                            var xFrame = new DispatcherFrame();
-                            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Input, new DispatcherOperationCallback(delegate(object aParam)
-                            {
-                                xFrame.Continue = false;
-                                return null;
-                            }), null);
-                            Dispatcher.PushFrame(xFrame);
-                        };
-                        xBuildWindow.Show();
-                        mBuilder.Compile(mDebugMode, mComport);
-                    }
-                    catch { }
-                        mBuilder.DebugLog -= xBuildWindow.DoDebugMessage;
-                        xMessages = (from item in xBuildWindow.Messages
-                                     where item.Severity != LogSeverityEnum.Informational
-                                     select item).ToArray();
-                        xBuildWindow.Close();
-                    if (xMessages.Count() > 0)
-                    {
+                            xFrame.Continue = false;
+                            return null;
+                        }), null);
+                        Dispatcher.PushFrame(xFrame);
+                    };
+                    xBuildWindow.Show();
+                    mBuilder.Compile(mDebugMode, mComport);
+                   
+                    mBuilder.DebugLog -= xBuildWindow.DoDebugMessage;
+                    xMessages = (from item in xBuildWindow.Messages
+                                 where item.Severity != LogSeverityEnum.Informational
+                                 select item).ToArray();
+                    xBuildWindow.Close();
+                    if (xMessages.Count() > 0) {
                         xBuildWindow = new BuildWindow();
                         xBuildWindow.Messages.Clear();
-                        foreach (var item in xMessages)
-                        {
+                        foreach (var item in xMessages) {
                             xBuildWindow.Messages.Add(item);
                         }
                         xBuildWindow.ShowDialog();
