@@ -53,11 +53,9 @@ namespace KudzuTest {
             Console.Clear();
             Console.WriteLine("Boot complete");
 
-            //Loop();
-
-            PCITest.Test();
+            //PCITest.Test();
             //Console.ReadLine();
-            //Tests.DoAll();
+            Tests.DoAll();
             //RTL8139.Test();
 
             Console.WriteLine("All tasks complete, halting.");

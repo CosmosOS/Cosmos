@@ -14,6 +14,7 @@ namespace KudzuTest {
 			Console.WriteLine("String test");
 			Console.WriteLine("  " + Tests.StringConcat());
 			Console.WriteLine();
+            return;
 
 			Console.WriteLine("StringBuilder test");
 			Console.WriteLine(Tests.StringBuilder());
