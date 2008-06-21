@@ -136,12 +136,6 @@ namespace Indy.IL2CPU.Assembler {
             }
         }
 
-        public bool InMetalMode {
-            get {
-                return mInMetalMode;
-            }
-        }
-
         public void Dispose() {
             // MtW: I know, IDisposable usage for this isn't really nice, but for now this should be fine.
             //		Anyhow, we need a way to clear the CurrentInstance property

@@ -1067,9 +1067,8 @@ namespace Indy.IL2CPU {
                         }
                     }
                     if (!xContentProduced) {
-                        if (mMap.HasCustomAssembleImplementation(xMethodInfo,
-                                                                 mAssembler.InMetalMode)) {
-                            mMap.DoCustomAssembleImplementation(mAssembler.InMetalMode,
+                        if (mMap.HasCustomAssembleImplementation(xMethodInfo, false)) {
+                            mMap.DoCustomAssembleImplementation(false,
                                                                 mAssembler,
                                                                 xMethodInfo);
                         } else {
@@ -1187,10 +1186,6 @@ namespace Indy.IL2CPU {
                                         xOp = GetOpFromType(mMap.GetOpForOpCode(xReader.OpCode),
                                                             xReader,
                                                             xMethodInfo);
-                                        if ((!xOp.SupportsMetalMode) &&
-                                            mAssembler.InMetalMode) {
-                                            throw new Exception("OpCode '" + xReader.OpCode + "' not supported in Metal mode!");
-                                        }
                                         xOp.Assembler = mAssembler;
                                         new Comment("StackItems = " + mAssembler.StackContents.Count);
                                         foreach (var xStackContent in mAssembler.StackContents) {
@@ -1429,13 +1424,8 @@ namespace Indy.IL2CPU {
                             if (!xPlugMethodAttrib.Enabled) {
                                 continue;
                             }
-                            if (mAssembler.InMetalMode &&
-                                !xPlugMethodAttrib.InMetalMode) {
+                            if (!xPlugMethodAttrib.InNormalMode) {
                                 continue;
-                            } else {
-                                if (!xPlugMethodAttrib.InNormalMode) {
-                                    continue;
-                                }
                             }
                             if (!String.IsNullOrEmpty(xSignature)) {
                                 if (mPlugMethods.ContainsKey(xSignature)) {

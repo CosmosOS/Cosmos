@@ -24,15 +24,13 @@ namespace Indy.IL2CPU.IL.X86 {
 		public override void Call(MethodBase aMethod) {
 			Engine.QueueMethod(aMethod);
 			Call(CPU.Label.GenerateLabelName(aMethod));
-			if (!Assembler.InMetalMode) {
-				new CPUx86.Test(CPUx86.Registers.ECX, 2);
-				string xLabel = ".Call_Part2_" + xLabelId++.ToString();
-				new CPUx86.JumpIfEqual(xLabel);
-				//new CPUx86.Call("_CODE_REQUESTED_BREAK_");
-				Engine.QueueMethod(Engine.GetMethodBase(typeof(Assembler.Assembler), "PrintException"));
-				new CPUx86.Call(CPU.Label.GenerateLabelName(Engine.GetMethodBase(typeof(Assembler.Assembler), "PrintException")));
-				new CPU.Label(xLabel);
-			}
+			new CPUx86.Test(CPUx86.Registers.ECX, 2);
+			string xLabel = ".Call_Part2_" + xLabelId++.ToString();
+			new CPUx86.JumpIfEqual(xLabel);
+			//new CPUx86.Call("_CODE_REQUESTED_BREAK_");
+			Engine.QueueMethod(Engine.GetMethodBase(typeof(Assembler.Assembler), "PrintException"));
+			new CPUx86.Call(CPU.Label.GenerateLabelName(Engine.GetMethodBase(typeof(Assembler.Assembler), "PrintException")));
+			new CPU.Label(xLabel);
 			MethodInfo xMethodInfo = aMethod as MethodInfo;
 			if (xMethodInfo != null) {
 				if (!xMethodInfo.ReturnType.FullName.StartsWith("System.Void")) {

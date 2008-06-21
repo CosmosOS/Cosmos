@@ -19,11 +19,9 @@ namespace Indy.IL2CPU.IL.X86 {
 			if (xStackSize % 4 != 0) {
 				xStackSize += 4 - xStackSize % 4;
 			}
-			if (!aAssembler.InMetalMode) {
-				new CPUx86.Pushd("[esp + " + (xStackSize + 4) + "]");
-				Engine.QueueMethod(GCImplementationRefs.DecRefCountRef);
-				new CPUx86.Call(IL2CPU.Assembler.Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef));
-			}
+			new CPUx86.Pushd("[esp + " + (xStackSize + 4) + "]");
+			Engine.QueueMethod(GCImplementationRefs.DecRefCountRef);
+			new CPUx86.Call(IL2CPU.Assembler.Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef));
 			new CPUx86.Move(CPUx86.Registers.EBX, "[esp + " + xStackSize + "]"); // the index
 			new CPUx86.Move(CPUx86.Registers.ECX, "[esp + " + (xStackSize + 4) + "]"); // the array
 			new CPUx86.Add(CPUx86.Registers.ECX, (ObjectImpl.FieldDataOffset + 4).ToString());

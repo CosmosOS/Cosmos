@@ -27,14 +27,12 @@ namespace Indy.IL2CPU.IL.X86 {
 			// arg 0 == this
 			AssembleOp(new Ldarg(MethodInfo, 0));
 			new Indy.IL2CPU.Assembler.X86.Pop(CPUx86.Registers.EAX);
-			if (!mAssembler.InMetalMode) {
-				int xStorageSize;
-				Dictionary<string, TypeInformation.Field> xFields = Engine.GetTypeFieldInfo(typeof (string), out xStorageSize);
-				new Indy.IL2CPU.Assembler.X86.Add(CPUx86.Registers.EAX, "0" + xFields["$$Storage$$"].Offset.ToString("X") + "h");
-				new Indy.IL2CPU.Assembler.X86.Move(CPUx86.Registers.EAX, CPUx86.Registers.AtEAX);
-				new Indy.IL2CPU.Assembler.X86.Add(CPUx86.Registers.EAX, "12");
-				new Indy.IL2CPU.Assembler.X86.Pushd(CPUx86.Registers.EAX);
-			}
+			int xStorageSize;
+			Dictionary<string, TypeInformation.Field> xFields = Engine.GetTypeFieldInfo(typeof (string), out xStorageSize);
+			new Indy.IL2CPU.Assembler.X86.Add(CPUx86.Registers.EAX, "0" + xFields["$$Storage$$"].Offset.ToString("X") + "h");
+			new Indy.IL2CPU.Assembler.X86.Move(CPUx86.Registers.EAX, CPUx86.Registers.AtEAX);
+			new Indy.IL2CPU.Assembler.X86.Add(CPUx86.Registers.EAX, "12");
+			new Indy.IL2CPU.Assembler.X86.Pushd(CPUx86.Registers.EAX);
 		}
 
 		private void AssembleOp(X86.Op aOp) {

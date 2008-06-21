@@ -77,7 +77,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				new Push(CPUx86.Registers.EAX);
 			}
 			aAssembler.StackContents.Push(new StackContent(aArg.Size, aArg.ArgumentType));
-			if (!aAssembler.InMetalMode && aAddGCCode && aArg.IsReferenceType) {
+			if (aAddGCCode && aArg.IsReferenceType) {
 				new CPUx86.Push(CPUx86.Registers.EAX);
 				Engine.QueueMethod(GCImplementationRefs.IncRefCountRef);
 				new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef));
@@ -89,7 +89,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 		public static void Ldflda(Assembler.Assembler aAssembler, TypeInformation aType, TypeInformation.Field aField, bool aDerefExternalAddress) {
 			int aExtraOffset = 0;
-			if (aType.NeedsGC && !aAssembler.InMetalMode) {
+			if (aType.NeedsGC) {
 				aExtraOffset = 12;
 			}
 			new Popd(CPUx86.Registers.EAX);
@@ -141,7 +141,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		public static void Ldfld(Assembler.Assembler aAssembler, TypeInformation aType, TypeInformation.Field aField, bool aAddGCCode, bool aDerefExternalField) {
 			aAssembler.StackContents.Pop();
 			int aExtraOffset = 0;
-			if (aType.NeedsGC && !aAssembler.InMetalMode) {
+			if (aType.NeedsGC) {
 				aExtraOffset = 12;
 			}
 			new CPUx86.Pop("ecx");
@@ -194,7 +194,7 @@ namespace Indy.IL2CPU.IL.X86 {
 						throw new Exception("Remainder size " + (aField.Size) + " not supported!");
 				}
 			}
-			if (aAddGCCode && aField.NeedsGC && !aAssembler.InMetalMode) {
+			if (aAddGCCode && aField.NeedsGC) {
 				new CPUx86.Pushd(Registers.AtESP);
 				Engine.QueueMethod(GCImplementationRefs.IncRefCountRef);
 				new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef));
@@ -209,7 +209,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				xRoundedSize += 4 - (xRoundedSize % 4);
 			}
 			int aExtraOffset = 0;
-			if (aType.NeedsGC && !aAssembler.InMetalMode) {
+			if (aType.NeedsGC) {
 				aExtraOffset = 12;
 				new CPUx86.Pushd("[esp + 4]");
 				//Ldfld(aAssembler, aType, aField, false);
@@ -242,7 +242,7 @@ namespace Indy.IL2CPU.IL.X86 {
 					throw new Exception("Remainder size " + (aField.Size % 4) + " not supported!");
 
 			}
-			if (aField.NeedsGC && !aAssembler.InMetalMode) {
+			if (aField.NeedsGC) {
 				new CPUx86.Pushd(Registers.ECX);
 				new CPUx86.Pushd(Registers.EAX);
 				new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef));
@@ -322,8 +322,7 @@ namespace Indy.IL2CPU.IL.X86 {
                         }
                 }
                 new CPUx86.Push("eax");
-                if (!aAssembler.InMetalMode && aAddGCCode &&
-                    aLocal.IsReferenceType) {
+                if (aAddGCCode && aLocal.IsReferenceType) {
                     new CPUx86.Push("eax");
                     Engine.QueueMethod(GCImplementationRefs.IncRefCountRef);
                     new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef));

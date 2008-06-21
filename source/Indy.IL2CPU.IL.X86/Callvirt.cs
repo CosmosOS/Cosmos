@@ -75,9 +75,6 @@ namespace Indy.IL2CPU.IL.X86 {
                 }
                 new CPUx86.Call(mNormalAddress);
             } else {
-                if (Assembler.InMetalMode) {
-                    throw new Exception("Virtual methods not supported in Metal mode! (Called method = '" + mMethodDescription + "')");
-                }
                 /*
                  * On the stack now:
                  * $esp                 Params
@@ -175,10 +172,8 @@ namespace Indy.IL2CPU.IL.X86 {
                 new CPUx86.Call("eax");
                 new CPU.Label(mLabelName + "__AFTER_NOT_BOXED_THIS");
             }
-            if (!Assembler.InMetalMode) {
-                new CPUx86.Test(CPUx86.Registers.ECX, 2);
-                new CPUx86.JumpIfNotEqual(MethodFooterOp.EndOfMethodLabelNameException);
-            }
+            new CPUx86.Test(CPUx86.Registers.ECX, 2);
+            new CPUx86.JumpIfNotEqual(MethodFooterOp.EndOfMethodLabelNameException);
             new CPU.Comment("Argument Count = " + mArgumentCount.ToString());
             for (int i = 0; i < mArgumentCount; i++) {
                 Assembler.StackContents.Pop();

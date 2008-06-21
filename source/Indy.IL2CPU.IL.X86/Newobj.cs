@@ -60,10 +60,7 @@ namespace Indy.IL2CPU.IL.X86 {
                 }
                 Engine.QueueMethod(GCImplementationRefs.AllocNewObjectRef);
                 Engine.QueueMethod(GCImplementationRefs.IncRefCountRef);
-                int xExtraSize = 16;
-                if (!aAssembler.InMetalMode) {
-                    xExtraSize += 4;
-                }
+                int xExtraSize = 20;
                 new Pushd("0" + (xObjectSize + xExtraSize).ToString("X").ToUpper() + "h");
                 new Assembler.X86.Call(Label.GenerateLabelName(GCImplementationRefs.AllocNewObjectRef));
                 Engine.QueueMethod(CPU.Assembler.CurrentExceptionOccurredRef);

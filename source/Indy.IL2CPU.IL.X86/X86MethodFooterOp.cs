@@ -68,33 +68,30 @@ namespace Indy.IL2CPU.IL.X86
             {
                 new CPUx86.Call("DebugPoint_DebugResume");
             }
-            if (!aAssembler.InMetalMode)
-            {
-                if ((from xLocal in aLocals
-                     where xLocal.IsReferenceType
-                     select 1).Count() > 0 || (from xArg in aArgs
-                                               where xArg.IsReferenceType
-                                               select 1).Count() > 0) {
-                    new CPUx86.Push("ecx");
-                    Engine.QueueMethod(GCImplementationRefs.DecRefCountRef);
-                    foreach (MethodInformation.Variable xLocal in aLocals) {
-                        if (xLocal.IsReferenceType) {
-                            Op.Ldloc(aAssembler,
-                                     xLocal,
-                                     false);
-                            new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef));
-                        }
+            if ((from xLocal in aLocals
+                 where xLocal.IsReferenceType
+                 select 1).Count() > 0 || (from xArg in aArgs
+                                           where xArg.IsReferenceType
+                                           select 1).Count() > 0) {
+                new CPUx86.Push("ecx");
+                Engine.QueueMethod(GCImplementationRefs.DecRefCountRef);
+                foreach (MethodInformation.Variable xLocal in aLocals) {
+                    if (xLocal.IsReferenceType) {
+                        Op.Ldloc(aAssembler,
+                                 xLocal,
+                                 false);
+                        new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef));
                     }
-                    foreach (MethodInformation.Argument xArg in aArgs) {
-                        if (xArg.IsReferenceType) {
-                            Op.Ldarg(aAssembler,
-                                     xArg,
-                                     false);
-                            new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef));
-                        }
-                    }
-                    new CPUx86.Pop("ecx");
                 }
+                foreach (MethodInformation.Argument xArg in aArgs) {
+                    if (xArg.IsReferenceType) {
+                        Op.Ldarg(aAssembler,
+                                 xArg,
+                                 false);
+                        new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef));
+                    }
+                }
+                new CPUx86.Pop("ecx");
             }
             for (int j = aLocals.Length - 1; j >= 0; j--)
             {
