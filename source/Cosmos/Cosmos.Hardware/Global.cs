@@ -18,14 +18,12 @@ namespace Cosmos.Hardware {
             Interrupts.Init();
             Kernel.CPU.CreateIDT();
 
-            PC.Bus.PCIBus.Init();
+            PCIBus.Init();
 
             // Old
             Keyboard.Initialize();
             // New
             //Device.Add(new PC.Bus.CPU.Keyboard());
-
-            Cosmos.Hardware.PC.Bus.PCIBus.Init();
         }
 
         public static uint TickCount {

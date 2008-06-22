@@ -49,7 +49,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         {
             List<RTL8139> found = new List<RTL8139>();
 
-            foreach (PCIDevice device in Cosmos.Hardware.PC.Bus.PCIBus.Devices)
+            foreach (PCIDevice device in Cosmos.Hardware.PCIBus.Devices)
             {
                 //Console.WriteLine("VendorID: " + device.VendorID + " - DeviceID: " + device.DeviceID);
                 if (device.VendorID == 0x10EC && device.DeviceID == 0x8139)

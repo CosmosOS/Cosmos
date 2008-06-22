@@ -7,16 +7,16 @@ using Cosmos.Kernel;
 namespace KudzuTest {
     public class PCITest {
         public static void Test() {
-            HW.PC.Bus.PCIBus.Init();
+            HW.PCIBus.Init();
             WriteDevices();
         }
 
         public static void WriteDevices() {
-            var xDeviceIDs = new HW.PC.Bus.PCIBus.DeviceIDs();
+            var xDeviceIDs = new HW.PCIBus.DeviceIDs();
 
-            Console.WriteLine(HW.PC.Bus.PCIBus.Devices.Length);
-            for (int d = 0; d < HW.PC.Bus.PCIBus.Devices.Length; d++) {
-                var xPCIDevice = HW.PC.Bus.PCIBus.Devices[d];
+            Console.WriteLine(HW.PCIBus.Devices.Length);
+            for (int d = 0; d < HW.PCIBus.Devices.Length; d++) {
+                var xPCIDevice = HW.PCIBus.Devices[d];
             //foreach(
                 string xVendor = xDeviceIDs.FindVendor(xPCIDevice.VendorID);
 
