@@ -41,16 +41,24 @@ namespace WindowsFormsApplication1 {
             public UdpClient Client;
         }
 
-        public delegate void PacketRecievedDelegate();
+        public delegate void PacketRecievedDelegate(byte[] aData);
         
         public void UdpReceive(IAsyncResult aResult) {
             var xState = (UdpState)aResult.AsyncState;
             var xBytes = xState.Client.EndReceive(aResult, ref xState.EndPoint);
-            BeginInvoke(new PacketRecievedDelegate(PacketRecieved));
+            BeginInvoke(new PacketRecievedDelegate(PacketRecieved), xBytes);
         }
 
-        public void PacketRecieved() {
-            Text = "Packet Received";
+        public void PacketRecieved(byte[] aData) {
+            var xSB = new StringBuilder();
+            foreach (var xByte in aData) {
+                xSB.AppendLine(xByte.ToString("X2"));
+            }
+            textResults.Lines = new string[] { xSB.ToString() };
+        }
+
+        private void butnClear_Click(object sender, EventArgs e) {
+            textResults.Clear();
         }
 
     }
