@@ -2,11 +2,46 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
-using HW = Cosmos.Hardware;
 
 namespace Cosmos.Hardware {
-	public class KeyboardOld {
-		private class KeyMapping {
+
+    //public class Keyboard : Cosmos.Hardware.SerialDevice {
+    //    public Keyboard() {
+    //        mType = DeviceType.Keyboard;
+    //    }
+
+    //    public void InterruptReceived() {
+    //        byte xByte = Kernel.CPUBus.Read8(0x60);
+    //        ByteReceived(xByte);
+    //    }
+    //    public override string Name {
+    //        get {
+    //            return "Keyboard";
+    //        }
+    //    }
+    //}
+
+    public delegate void HandleKeyboardDelegate(byte aScanCode, bool aReleased);
+    public class Keyboard : Hardware {
+        private static HandleKeyboardDelegate mHandleKeyboardKey;
+        public static void Initialize(HandleKeyboardDelegate aHandleKeyboardKeyDelegate) {
+            mHandleKeyboardKey = aHandleKeyboardKeyDelegate;
+        }
+
+        public static void HandleKeyboardInterrupt() {
+            if (mHandleKeyboardKey != null) {
+                byte xScanCode = IOReadByte(0x60);
+                bool xReleased = (xScanCode & 0x80) == 0x80;
+                if (xReleased) {
+                    xScanCode = (byte)(xScanCode ^ 0x80);
+                }
+                mHandleKeyboardKey(xScanCode, xReleased);
+            } else {
+                DebugUtil.SendError("Keyboard", "No Keyboard Handler found!");
+            }
+        }
+        
+        private class KeyMapping {
 			public uint Scancode;
 			public char Value;
 			public KeyMapping(uint aScanCode, char aValue) {

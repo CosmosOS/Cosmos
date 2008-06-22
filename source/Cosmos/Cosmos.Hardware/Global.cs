@@ -20,8 +20,11 @@ namespace Cosmos.Hardware {
 
             PC.Bus.PCIBus.Init();
 
-            Device.Add(new PC.Bus.CPU.Keyboard());
-            KeyboardOld.Initialize();
+            // Old
+            Keyboard.Initialize();
+            // New
+            //Device.Add(new PC.Bus.CPU.Keyboard());
+
             Cosmos.Hardware.PC.Bus.PCIBus.Init();
         }
 

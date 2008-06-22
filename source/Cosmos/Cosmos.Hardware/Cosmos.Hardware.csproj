@@ -56,7 +56,7 @@
     <Compile Include="Bus\USB\USBHostOHCI.cs" />
     <Compile Include="Bus\USB\USBHostOHCIRegisters.cs" />
     <Compile Include="Device.cs" />
-    <Compile Include="KeyboardOld.cs" />
+    <Compile Include="Keyboard.cs" />
     <Compile Include="Network\Devices\RTL8139\BinaryHelper.cs" />
     <Compile Include="Network\Devices\RTL8139\Packet.cs" />
     <Compile Include="Network\Devices\RTL8139\PacketHeader.cs" />
@@ -80,7 +80,6 @@
     <Compile Include="Network\TCPIPModel\PhysicalLayer\Ethernet2\Ethernet2Frame.cs" />
     <Compile Include="Network\TCPIPModel\TransportLayer\UDP\UDPPacket.cs" />
     <Compile Include="Storage\ATA\ATA.cs" />
-    <Compile Include="PC\Bus\Keyboard.cs" />
     <Compile Include="PC\Bus\PIC.cs" />
     <Compile Include="PC\Bus\PCIBus.cs" />
     <Compile Include="PC\DebugUtil.cs" />
@@ -89,7 +88,6 @@
     <Compile Include="Global.cs" />
     <Compile Include="Old\DebugUtil.cs" />
     <Compile Include="Old\Hardware.cs" />
-    <Compile Include="Old\Keyboard.cs" />
     <Compile Include="Old\PIT.cs" />
     <Compile Include="Bus\PCIBus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
