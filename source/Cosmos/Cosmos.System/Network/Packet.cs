@@ -11,16 +11,17 @@ namespace Cosmos.Sys.Network {
         // user that it is not a direct access, but incurs a performance
         // penalty to call
         public byte[] GetData() {
-            Finalize();
+            Conclude();
             return mData;
         }
 
-        protected void Initialize(byte[] aData, int aHeaderSize) {
+        protected virtual int Initialize(byte[] aData, int aHeaderSize) {
             mData = new byte[aData.Length + 8];
             aData.CopyTo(mData, 8);
+            return 0;
         }
 
-        protected virtual void Finalize() {
+        protected virtual void Conclude() {
         }
     }
 }
