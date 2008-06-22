@@ -85,7 +85,7 @@
     <Compile Include="PC\Bus\PCIBus.cs" />
     <Compile Include="PC\DebugUtil.cs" />
     <Compile Include="PC\Interrupts.cs" />
-    <Compile Include="TempDictionary.cs" />
+    <Compile Include="Old\TempDictionary.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Old\DebugUtil.cs" />
     <Compile Include="Old\Hardware.cs" />
