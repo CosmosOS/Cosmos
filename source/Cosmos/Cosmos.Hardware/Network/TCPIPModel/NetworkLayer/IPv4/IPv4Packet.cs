@@ -142,18 +142,12 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
 
             //Add the packetsections together into 32-bit words
             UInt32 field1 = (UInt32)((this.Version << 4) | (this.HeaderLength << 0) | (this.TypeOfService << 8) | (this.TotalLength << 24));
-            //UInt32 field1 = (UInt32)((this.Version << 0) | (this.HeaderLength << 4) | (this.TypeOfService << 8) | (this.TotalLength << 16));
-            //field1 = ConvertToBigEndian(field1);
             fields.Add(field1);
 
-            //UInt32 field2 = (UInt32)((this.Identification << 8) | (((byte)(this.FragmentFlags)) << 21) | (byte)(this.FragmentOffset << 24)); //TODO: FragmentOffset should be 13 bits.
-            //fields.Add(ConvertToBigEndian(field2));
             UInt32 field2 = (UInt32)((this.Identification << 8) | ((byte)(this.FragmentFlags)) << 21 | (this.FragmentOffset << 24));
-            //field2 = (UInt32)System.Net.IPAddress.HostToNetworkOrder(field2);
-            fields.Add((UInt32)HostToNetworkOrder((int)field2));
+            //fields.Add((UInt32)HostToNetworkOrder((int)field2));
 
             UInt32 field3 = (UInt32)((this.TimeToLive << 0) | (((byte)(this.Protocol)) << 8) | (UInt16)(this.HeaderChecksum << 16));
-            //field3 = ConvertToBigEndian(field3);
             fields.Add(field3);
 
             //Split the 32-bit words into bytes
@@ -337,49 +331,69 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
         /// </summary>
         /// <param name="n"></param>
         /// <returns></returns>
-        private UInt32 ConvertToBigEndian(UInt32 n)
+        //private UInt32 ConvertToBigEndian(UInt32 n)
+        //{
+        //    string bin = n.ToBinary();
+        //    bin = bin.PadLeft(32, '0');
+        //    //while (bin.Length < 32)
+        //    //    bin = "0" + bin;
+
+        //    string first = Reverse(bin.Substring(0, 8));
+        //    string second = Reverse(bin.Substring(8, 8));
+        //    string third = Reverse(bin.Substring(16, 8));
+        //    string fourth = Reverse(bin.Substring(24, 8));
+
+        //    //Console.WriteLine("Little-endian: " + bin + " (as value: " + bin.FromBinary());
+        //    bin = first + second + third + fourth;
+        //    //Console.WriteLine("Big-endian:    " + bin + " (as value: " + bin.FromBinary());
+
+        //    return bin.FromBinary();
+        //}
+
+        //public short HostToNetworkOrder(short host)
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+        //private static int HostToNetworkOrder(int n)
+        //{
+        //    string bin = n.ToBinary();
+        //    bin = bin.PadLeft(32, '0');
+
+        //    string first = bin.Substring(0, 8);
+        //    string second = bin.Substring(8, 8);
+        //    string third = bin.Substring(16, 8);
+        //    string fourth = bin.Substring(24, 8);
+
+        //    bin = fourth + third + second + first;
+
+        //    return (int)bin.FromBinary();
+        //}
+
+        public static long HostToNetworkOrder(int data)
         {
-            string bin = n.ToBinary();
-            bin = bin.PadLeft(32, '0');
-            //while (bin.Length < 32)
-            //    bin = "0" + bin;
+            int xResult = 0;
+            byte xTemp = 0;
 
-            string first = Reverse(bin.Substring(0, 8));
-            string second = Reverse(bin.Substring(8, 8));
-            string third = Reverse(bin.Substring(16, 8));
-            string fourth = Reverse(bin.Substring(24, 8));
+            xTemp = (byte)data;
+            xResult = xTemp << 24;
 
-            //Console.WriteLine("Little-endian: " + bin + " (as value: " + bin.FromBinary());
-            bin = first + second + third + fourth;
-            //Console.WriteLine("Big-endian:    " + bin + " (as value: " + bin.FromBinary());
+            xTemp = (byte)(data >> 8);
+            xResult += xTemp << 16;
 
-            return bin.FromBinary();
+            xTemp = (byte)(data >> 16);
+            xResult += xTemp << 8;
+
+            xTemp = (byte)(data >> 24);
+            xResult += xTemp;
+
+            return xResult;
         }
 
-        public short HostToNetworkOrder(short host)
-        {
-            throw new NotImplementedException();
-        }
-
-        private static int HostToNetworkOrder(int n)
-        {
-            string bin = n.ToBinary();
-            bin = bin.PadLeft(32, '0');
-
-            string first = bin.Substring(0, 8);
-            string second = bin.Substring(8, 8);
-            string third = bin.Substring(16, 8);
-            string fourth = bin.Substring(24, 8);
-
-            bin = fourth + third + second + first;
-
-            return (int)bin.FromBinary();
-        }
-
-        public long HostToNetworkOrder(long host)
-        {
-            throw new NotImplementedException();
-        }
+        //public long HostToNetworkOrder(long host)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
         #endregion
 
