@@ -33,7 +33,9 @@ namespace KudzuTest {
             xNIC.Enable();
             xNIC.InitializeDriver();
 
-            xNIC.TransmitRaw(xFrame.mData);
+            while (true) {
+                xNIC.TransmitRaw(xFrame.mData);
+            }
         }
 
     }
