@@ -49,6 +49,8 @@
     <Compile Include="Boot.cs" />
     <Compile Include="Deboot.cs" />
     <Compile Include="Global.cs" />
+    <Compile Include="Network\Packet.cs" />
+    <Compile Include="Network\UDPPacket.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

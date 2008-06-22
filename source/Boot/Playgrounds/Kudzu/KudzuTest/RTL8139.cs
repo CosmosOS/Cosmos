@@ -7,7 +7,7 @@ namespace KudzuTest {
 
         public static Frame CreateTestFrame() {
             var xFrame = new Frame();
-            xFrame.Init1();
+            xFrame.InitTest();
             xFrame.SetEthSrcMAC(0x52, 0x54, 0x00, 0x12, 0x34, 0x57);
             xFrame.SetIPSrcAddr(10, 0, 2, 15);
             xFrame.SetIPDestAddr(255, 255, 255, 255);
@@ -22,7 +22,7 @@ namespace KudzuTest {
         }
 
         public static void Test() {
-            Console.WriteLine("Start listening application an another host,");
+            Console.WriteLine("Start server application an another host,");
             Console.WriteLine("then press enter to send test packet.");
             Console.ReadLine();
             Console.WriteLine("Sending test packet");
