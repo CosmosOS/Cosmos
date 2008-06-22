@@ -46,8 +46,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CosmosBoot", "CosmosBoot\Co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Shell.Guess", "Cosmos.Shell.Guess\Cosmos.Shell.Guess.csproj", "{C97DE890-58D2-41A1-86D0-A2E919E6DD80}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kudzu", "Boot\KudzuTest\Kudzu.csproj", "{30057B5B-8BEE-4712-8243-9A42DF8A0C76}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestSuite", "Boot\TestSuite\TestSuite.csproj", "{FF431742-6490-46B8-A9F6-734477D0725D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.GdbClient", "Cosmos.GdbClient\Cosmos.GdbClient.csproj", "{5784365C-ED22-42EB-BB8A-F3E09428D5B8}"
@@ -83,6 +81,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.FileSystems.Test", "Boot\Cosmos.FileSystems.Test\Cosmos.FileSystems.Test.csproj", "{C1025F9D-3D8D-4C4B-98A5-877EE50F37FE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kudzu-SourceView", "Boot\Playgrounds\Kudzu\Kudzu-SourceView\Kudzu-SourceView.csproj", "{1E31A694-81BB-4628-B704-DA190E7E94CA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kudzu", "Boot\Playgrounds\Kudzu\KudzuTest\Kudzu.csproj", "{30057B5B-8BEE-4712-8243-9A42DF8A0C76}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
@@ -182,38 +182,38 @@ Global
 		SccProjectTopLevelParentUniqueName23 = Cosmos.sln
 		SccProjectName23 = FrodeTest
 		SccLocalPath23 = FrodeTest
-		SccProjectUniqueName24 = Boot\\KudzuTest\\Kudzu.csproj
+		SccProjectUniqueName24 = MohammedTest\\MohammedTest.csproj
 		SccProjectTopLevelParentUniqueName24 = Cosmos.sln
-		SccProjectName24 = Boot/KudzuTest
-		SccLocalPath24 = Boot\\KudzuTest
-		SccProjectUniqueName25 = MohammedTest\\MohammedTest.csproj
+		SccProjectName24 = MohammedTest
+		SccLocalPath24 = MohammedTest
+		SccProjectUniqueName25 = Cosmos.Kernel.FileSystems\\Cosmos.FileSystem.csproj
 		SccProjectTopLevelParentUniqueName25 = Cosmos.sln
-		SccProjectName25 = MohammedTest
-		SccLocalPath25 = MohammedTest
-		SccProjectUniqueName26 = Cosmos.Kernel.FileSystems\\Cosmos.FileSystem.csproj
+		SccProjectName25 = Cosmos.Kernel.FileSystems
+		SccLocalPath25 = Cosmos.Kernel.FileSystems
+		SccProjectUniqueName26 = RsenkTest\\RsenkTest.csproj
 		SccProjectTopLevelParentUniqueName26 = Cosmos.sln
-		SccProjectName26 = Cosmos.Kernel.FileSystems
-		SccLocalPath26 = Cosmos.Kernel.FileSystems
-		SccProjectUniqueName27 = RsenkTest\\RsenkTest.csproj
+		SccProjectName26 = RsenkTest
+		SccLocalPath26 = RsenkTest
+		SccProjectUniqueName27 = Cosmos\\Cosmos.System\\Cosmos.Sys.csproj
 		SccProjectTopLevelParentUniqueName27 = Cosmos.sln
-		SccProjectName27 = RsenkTest
-		SccLocalPath27 = RsenkTest
-		SccProjectUniqueName28 = Cosmos\\Cosmos.System\\Cosmos.Sys.csproj
+		SccProjectName27 = Cosmos/Cosmos.System
+		SccLocalPath27 = Cosmos\\Cosmos.System
+		SccProjectUniqueName28 = CosmosFlatFileUpdater\\CosmosFlatFileUpdater.csproj
 		SccProjectTopLevelParentUniqueName28 = Cosmos.sln
-		SccProjectName28 = Cosmos/Cosmos.System
-		SccLocalPath28 = Cosmos\\Cosmos.System
-		SccProjectUniqueName29 = CosmosFlatFileUpdater\\CosmosFlatFileUpdater.csproj
+		SccProjectName28 = CosmosFlatFileUpdater
+		SccLocalPath28 = CosmosFlatFileUpdater
+		SccProjectUniqueName29 = Boot\\Cosmos.FileSystems.Test\\Cosmos.FileSystems.Test.csproj
 		SccProjectTopLevelParentUniqueName29 = Cosmos.sln
-		SccProjectName29 = CosmosFlatFileUpdater
-		SccLocalPath29 = CosmosFlatFileUpdater
-		SccProjectUniqueName30 = Boot\\Cosmos.FileSystems.Test\\Cosmos.FileSystems.Test.csproj
+		SccProjectName29 = Boot/Cosmos.FileSystems.Test
+		SccLocalPath29 = Boot\\Cosmos.FileSystems.Test
+		SccProjectUniqueName30 = Boot\\Playgrounds\\Kudzu\\Kudzu-SourceView\\Kudzu-SourceView.csproj
 		SccProjectTopLevelParentUniqueName30 = Cosmos.sln
-		SccProjectName30 = Boot/Cosmos.FileSystems.Test
-		SccLocalPath30 = Boot\\Cosmos.FileSystems.Test
-		SccProjectUniqueName31 = Boot\\Playgrounds\\Kudzu\\Kudzu-SourceView\\Kudzu-SourceView.csproj
+		SccProjectName30 = Boot/Playgrounds/Kudzu/Kudzu-SourceView
+		SccLocalPath30 = Boot\\Playgrounds\\Kudzu\\Kudzu-SourceView
+		SccProjectUniqueName31 = Boot\\Playgrounds\\Kudzu\\KudzuTest\\Kudzu.csproj
 		SccProjectTopLevelParentUniqueName31 = Cosmos.sln
-		SccProjectName31 = Boot/Playgrounds/Kudzu/Kudzu-SourceView
-		SccLocalPath31 = Boot\\Playgrounds\\Kudzu\\Kudzu-SourceView
+		SccProjectName31 = Boot/Playgrounds/Kudzu/KudzuTest
+		SccLocalPath31 = Boot\\Playgrounds\\Kudzu\\KudzuTest
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -284,10 +284,6 @@ Global
 		{C97DE890-58D2-41A1-86D0-A2E919E6DD80}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C97DE890-58D2-41A1-86D0-A2E919E6DD80}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C97DE890-58D2-41A1-86D0-A2E919E6DD80}.Release|Any CPU.Build.0 = Release|Any CPU
-		{30057B5B-8BEE-4712-8243-9A42DF8A0C76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{30057B5B-8BEE-4712-8243-9A42DF8A0C76}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{30057B5B-8BEE-4712-8243-9A42DF8A0C76}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{30057B5B-8BEE-4712-8243-9A42DF8A0C76}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FF431742-6490-46B8-A9F6-734477D0725D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FF431742-6490-46B8-A9F6-734477D0725D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FF431742-6490-46B8-A9F6-734477D0725D}.Release|Any CPU.Build.0 = Release|Any CPU
@@ -342,6 +338,10 @@ Global
 		{1E31A694-81BB-4628-B704-DA190E7E94CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1E31A694-81BB-4628-B704-DA190E7E94CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1E31A694-81BB-4628-B704-DA190E7E94CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30057B5B-8BEE-4712-8243-9A42DF8A0C76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30057B5B-8BEE-4712-8243-9A42DF8A0C76}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30057B5B-8BEE-4712-8243-9A42DF8A0C76}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30057B5B-8BEE-4712-8243-9A42DF8A0C76}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -380,7 +380,7 @@ Global
 		{8F2D5231-CDE5-48FA-9D26-D4305B01FD3C} = {4DE8EC69-B412-41C4-BCD9-1E032984E888}
 		{FF431742-6490-46B8-A9F6-734477D0725D} = {4DE8EC69-B412-41C4-BCD9-1E032984E888}
 		{C1025F9D-3D8D-4C4B-98A5-877EE50F37FE} = {4DE8EC69-B412-41C4-BCD9-1E032984E888}
-		{30057B5B-8BEE-4712-8243-9A42DF8A0C76} = {9AB7CE5D-C1E5-49AD-9CCB-53863FBCDFAF}
 		{1E31A694-81BB-4628-B704-DA190E7E94CA} = {9AB7CE5D-C1E5-49AD-9CCB-53863FBCDFAF}
+		{30057B5B-8BEE-4712-8243-9A42DF8A0C76} = {9AB7CE5D-C1E5-49AD-9CCB-53863FBCDFAF}
 	EndGlobalSection
 EndGlobal
