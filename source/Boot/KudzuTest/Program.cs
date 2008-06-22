@@ -6,7 +6,7 @@ namespace KudzuTest {
 	class Program {
 		[STAThread]
 		static void Main(string[] args) {
-            RTL8139.Test();
+            //RTL8139.Test();
             BuildUI.Run();
         }
 
@@ -19,18 +19,10 @@ namespace KudzuTest {
         //   -Packet header in Frode code?
         //   -TSD not getting set right I think.. .need to look deeper
 
-        public static void DoLoop() {
-            int i = 0;
-            while (i < int.MaxValue) {
-                i++;
-                Console.WriteLine(i);
-            }
-        }
 
 		public static void Init() {
             Cosmos.Sys.Boot.Default();
 			//System.Diagnostics.Debugger.Break();
-            Console.Clear();
             Console.WriteLine("Boot complete");
 
             //PCITest.Test();
@@ -41,5 +33,13 @@ namespace KudzuTest {
             Cosmos.Sys.Deboot.Halt();
 		}
 
-	}
+        public static void DoLoop() {
+            int i = 0;
+            while (i < int.MaxValue) {
+                i++;
+                Console.WriteLine(i);
+            }
+        }
+    
+    }
 }

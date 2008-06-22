@@ -30,13 +30,10 @@ namespace KudzuTest {
             Console.WriteLine("Revision: " + xNIC.HardwareRevision);
             Console.WriteLine("MAC: " + xNIC.MACAddress);
 
-            //xNIC.Enable();
-            //xNIC.InitializeDriver();
+            xNIC.Enable();
+            xNIC.InitializeDriver();
 
-            //var xFrame = new Frame();
-            ////xFrame.Init1();
-            //xFrame.Init2();
-            //xNIC.TransmitRaw(xFrame.mData);
+            xNIC.TransmitRaw(xFrame.mData);
         }
 
     }
