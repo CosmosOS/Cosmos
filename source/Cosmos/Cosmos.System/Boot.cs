@@ -20,5 +20,6 @@ namespace Cosmos.Sys {
             Hardware.Global.Init();
             Console.Clear();
         }
+
     }
 }

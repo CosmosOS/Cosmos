@@ -58,8 +58,8 @@ namespace KudzuTest {
             Tests.DoAll();
             //RTL8139.Test();
 
-            Console.WriteLine("All tasks complete, halting.");
-            while (true) { } 
+            //TODO: Make this automatically called after Init if no other shut downs are called
+            Cosmos.Sys.Deboot.Halt();
 		}
 
 	}

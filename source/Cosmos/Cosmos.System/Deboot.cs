@@ -1,0 +1,23 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace Cosmos.Sys {
+    public class Deboot {
+        public static void Halt() {
+            Console.WriteLine("Cosmos: Halting system.");
+            while (true) { }
+        }
+
+        public static void ShutDown() {
+            //TODO: For now we just call Halt
+            Halt();
+        }
+
+        public static void Reboot() {
+            //TODO: For now we just call Halt
+            Halt();
+        }
+    }
+}
