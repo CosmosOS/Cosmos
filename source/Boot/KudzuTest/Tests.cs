@@ -12,6 +12,7 @@ namespace KudzuTest {
         static public void DoAll() {
             // Delegate version
             //Tests.Do("String Concatenation", Tests.StringConcat);
+            //return;
 
             Console.WriteLine("String test");
 			Console.WriteLine("  " + Tests.StringConcat());
@@ -33,9 +34,10 @@ namespace KudzuTest {
 			Console.WriteLine("  " + Tests.WriteLnUInt32());
 			Console.WriteLine();
 
-			//Console.WriteLine("Dictionary test");
+			Console.WriteLine("Dictionary test");
+            //M - uncomment this and IL2CPU fails on compile
 			//Console.WriteLine("  " + Tests.Dictionary());
-			//Console.WriteLine();
+			Console.WriteLine();
 
             Console.WriteLine("Concat conversion test");
 			Console.WriteLine("  " + Tests.ConcatConversion());
@@ -64,7 +66,7 @@ namespace KudzuTest {
         static public object Dictionary() {
             var x = new Dictionary<UInt32, string>();
             x.Add(1000, "Hello");
-            return null;
+            return x[1000];
         }
 
         static public void Do(string aName, TestDelegate aTest) {
