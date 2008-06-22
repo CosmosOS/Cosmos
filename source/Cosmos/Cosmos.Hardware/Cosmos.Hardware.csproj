@@ -106,8 +106,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Network\TCPIPModel\DataLinkLayer\" />
-    <Folder Include="Network\TCPIPModel\NetworkLayer\IPv6\" />
     <Folder Include="Network\TCPIPModel\TransportLayer\TCP\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
