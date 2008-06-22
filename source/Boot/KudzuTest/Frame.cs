@@ -108,14 +108,12 @@ namespace KudzuTest {
 
             var xIPChecksum = UpdateIPChecksum();
             var xUDPChecksum = UpdateUDPChecksum();
-            if (xIPChecksum != 0x0923)
-            {
+            if (xIPChecksum != 0x0923) {
                 string xMSG = "IP Checksum error. Was ";
                 xMSG += xIPChecksum.ToString();
                 throw new Exception(xMSG);
             }
-            if (xUDPChecksum != 0x0630)
-            {
+            if (xUDPChecksum != 0x0630) {
                 string xMSG = "UDP Checksum error. Was ";
                 xMSG += xUDPChecksum.ToString();
                 throw new Exception(xMSG);

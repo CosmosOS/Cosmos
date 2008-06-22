@@ -6,7 +6,7 @@ namespace KudzuTest {
 	class Program {
 		[STAThread]
 		static void Main(string[] args) {
-            //RTL8139.Test();
+            RTL8139.Test();
             BuildUI.Run();
         }
 
@@ -27,26 +27,6 @@ namespace KudzuTest {
             }
         }
 
-        // Load
-        //var xNICs = RTLDriver.RTL8139.FindAll();
-        //if (xNICs.Count == 0) {
-        //    throw new Exception("Unable to find RTL8139 network card!");
-        //}
-        //var xNIC = xNICs[0];
-
-        //Console.WriteLine("Enabling network card!");
-        //Console.WriteLine(xNIC.Name);
-        //Console.WriteLine("Revision: " + xNIC.HardwareRevision);
-        //Console.WriteLine("MAC: " + xNIC.MACAddress);
-
-        //xNIC.Enable();
-        //xNIC.InitializeDriver();
-
-        //var xFrame = new Frame();
-        ////xFrame.Init1();
-        //xFrame.Init2();
-        //xNIC.TransmitRaw(xFrame.mData);
-
 		public static void Init() {
             Cosmos.Sys.Boot.Default();
 			//System.Diagnostics.Debugger.Break();
@@ -54,9 +34,8 @@ namespace KudzuTest {
             Console.WriteLine("Boot complete");
 
             //PCITest.Test();
-            //Console.ReadLine();
-            Tests.DoAll();
-            //RTL8139.Test();
+            //Tests.DoAll();
+            RTL8139.Test();
 
             //TODO: Make this automatically called after Init if no other shut downs are called
             Cosmos.Sys.Deboot.Halt();
