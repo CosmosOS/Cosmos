@@ -6,7 +6,9 @@ namespace KudzuTest {
 	class Program {
 		[STAThread]
 		static void Main(string[] args) {
-            //RTL8139.Test();
+            // This is here to run it on Windows and see results when necessary
+            // Then can be run on Cosmos to see if values are the same
+            //RTL8139.CreateTestFrame();
             BuildUI.Run();
         }
 

@@ -5,7 +5,7 @@ using System.Text;
 namespace KudzuTest {
     public class RTL8139 {
 
-        public static void Test() {
+        public static Frame CreateTestFrame() {
             var xFrame = new Frame();
             xFrame.Init1();
             xFrame.SetEthSrcMAC(0x52, 0x54, 0x00, 0x12, 0x34, 0x57);
@@ -18,11 +18,17 @@ namespace KudzuTest {
             //xFrame = new Frame();
             //xFrame.Init2();
 
-            // Load
+            return xFrame;
+        }
+
+        public static void Test() {
+            Console.WriteLine("Start listening application an another host,");
+            Console.WriteLine("then press enter to send test packet.");
+            Console.ReadLine();
+            Console.WriteLine("Sending test packet");
+            var xFrame = CreateTestFrame();
+
             var xNICs = Cosmos.Hardware.Network.Devices.RTL8139.RTL8139.FindAll();
-            if (xNICs.Count == 0) {
-                throw new Exception("Unable to find RTL8139 network card!");
-            }
             var xNIC = xNICs[0];
 
             Console.WriteLine("Enabling network card!");
@@ -33,9 +39,7 @@ namespace KudzuTest {
             xNIC.Enable();
             xNIC.InitializeDriver();
 
-            while (true) {
-                xNIC.TransmitRaw(xFrame.mData);
-            }
+            xNIC.TransmitRaw(xFrame.mData);
         }
 
     }
