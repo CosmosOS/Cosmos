@@ -72,8 +72,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{4DE8EC69
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MohammedTest", "MohammedTest\MohammedTest.csproj", "{1240EAB3-D6B1-463A-BA83-436607A1F18E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kudzu-UDP", "Boot\Playgrounds\Kudzu UDP\Kudzu-UDP.csproj", "{813297D7-0AB4-43E1-99D3-97874FE10FE6}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RsenkTest", "RsenkTest\RsenkTest.csproj", "{F598F906-8F3B-4EC1-AB8F-A9CBD8EBBE21}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kudzu-SourceView", "Boot\Playgrounds\Kudzu-SourceView\Kudzu-SourceView.csproj", "{1E31A694-81BB-4628-B704-DA190E7E94CA}"
@@ -88,7 +86,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.FileSystems.Test", "
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 33
+		SccNumberOfProjects = 32
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -196,30 +194,26 @@ Global
 		SccProjectTopLevelParentUniqueName26 = Cosmos.sln
 		SccProjectName26 = Cosmos.Kernel.FileSystems
 		SccLocalPath26 = Cosmos.Kernel.FileSystems
-		SccProjectUniqueName27 = Boot\\Playgrounds\\Kudzu\u0020UDP\\Kudzu-UDP.csproj
+		SccProjectUniqueName27 = RsenkTest\\RsenkTest.csproj
 		SccProjectTopLevelParentUniqueName27 = Cosmos.sln
-		SccProjectName27 = Boot/Playgrounds/Kudzu\u0020UDP
-		SccLocalPath27 = Boot\\Playgrounds\\Kudzu\u0020UDP
-		SccProjectUniqueName28 = RsenkTest\\RsenkTest.csproj
+		SccProjectName27 = RsenkTest
+		SccLocalPath27 = RsenkTest
+		SccProjectUniqueName28 = Boot\\Playgrounds\\Kudzu-SourceView\\Kudzu-SourceView.csproj
 		SccProjectTopLevelParentUniqueName28 = Cosmos.sln
-		SccProjectName28 = RsenkTest
-		SccLocalPath28 = RsenkTest
-		SccProjectUniqueName29 = Boot\\Playgrounds\\Kudzu-SourceView\\Kudzu-SourceView.csproj
+		SccProjectName28 = Boot/Playgrounds/Kudzu-SourceView
+		SccLocalPath28 = Boot\\Playgrounds\\Kudzu-SourceView
+		SccProjectUniqueName29 = Cosmos\\Cosmos.System\\Cosmos.Sys.csproj
 		SccProjectTopLevelParentUniqueName29 = Cosmos.sln
-		SccProjectName29 = Boot/Playgrounds/Kudzu-SourceView
-		SccLocalPath29 = Boot\\Playgrounds\\Kudzu-SourceView
-		SccProjectUniqueName30 = Cosmos\\Cosmos.System\\Cosmos.Sys.csproj
+		SccProjectName29 = Cosmos/Cosmos.System
+		SccLocalPath29 = Cosmos\\Cosmos.System
+		SccProjectUniqueName30 = CosmosFlatFileUpdater\\CosmosFlatFileUpdater.csproj
 		SccProjectTopLevelParentUniqueName30 = Cosmos.sln
-		SccProjectName30 = Cosmos/Cosmos.System
-		SccLocalPath30 = Cosmos\\Cosmos.System
-		SccProjectUniqueName31 = CosmosFlatFileUpdater\\CosmosFlatFileUpdater.csproj
+		SccProjectName30 = CosmosFlatFileUpdater
+		SccLocalPath30 = CosmosFlatFileUpdater
+		SccProjectUniqueName31 = Boot\\Cosmos.FileSystems.Test\\Cosmos.FileSystems.Test.csproj
 		SccProjectTopLevelParentUniqueName31 = Cosmos.sln
-		SccProjectName31 = CosmosFlatFileUpdater
-		SccLocalPath31 = CosmosFlatFileUpdater
-		SccProjectUniqueName32 = Boot\\Cosmos.FileSystems.Test\\Cosmos.FileSystems.Test.csproj
-		SccProjectTopLevelParentUniqueName32 = Cosmos.sln
-		SccProjectName32 = Boot/Cosmos.FileSystems.Test
-		SccLocalPath32 = Boot\\Cosmos.FileSystems.Test
+		SccProjectName31 = Boot/Cosmos.FileSystems.Test
+		SccLocalPath31 = Boot\\Cosmos.FileSystems.Test
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -328,10 +322,6 @@ Global
 		{1240EAB3-D6B1-463A-BA83-436607A1F18E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1240EAB3-D6B1-463A-BA83-436607A1F18E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1240EAB3-D6B1-463A-BA83-436607A1F18E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{813297D7-0AB4-43E1-99D3-97874FE10FE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{813297D7-0AB4-43E1-99D3-97874FE10FE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{813297D7-0AB4-43E1-99D3-97874FE10FE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{813297D7-0AB4-43E1-99D3-97874FE10FE6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F598F906-8F3B-4EC1-AB8F-A9CBD8EBBE21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F598F906-8F3B-4EC1-AB8F-A9CBD8EBBE21}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F598F906-8F3B-4EC1-AB8F-A9CBD8EBBE21}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -390,7 +380,6 @@ Global
 		{8F2D5231-CDE5-48FA-9D26-D4305B01FD3C} = {4DE8EC69-B412-41C4-BCD9-1E032984E888}
 		{FF431742-6490-46B8-A9F6-734477D0725D} = {4DE8EC69-B412-41C4-BCD9-1E032984E888}
 		{C1025F9D-3D8D-4C4B-98A5-877EE50F37FE} = {4DE8EC69-B412-41C4-BCD9-1E032984E888}
-		{813297D7-0AB4-43E1-99D3-97874FE10FE6} = {9AB7CE5D-C1E5-49AD-9CCB-53863FBCDFAF}
 		{1E31A694-81BB-4628-B704-DA190E7E94CA} = {9AB7CE5D-C1E5-49AD-9CCB-53863FBCDFAF}
 		{30057B5B-8BEE-4712-8243-9A42DF8A0C76} = {9AB7CE5D-C1E5-49AD-9CCB-53863FBCDFAF}
 	EndGlobalSection
