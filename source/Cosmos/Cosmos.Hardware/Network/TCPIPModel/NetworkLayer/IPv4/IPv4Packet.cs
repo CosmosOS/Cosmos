@@ -142,12 +142,15 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
 
             //Add the packetsections together into 32-bit words
             UInt32 field1 = (UInt32)((this.Version << 4) | (this.HeaderLength << 0) | (this.TypeOfService << 8) | (this.TotalLength << 24));
+            Console.WriteLine("Field1: " + field1.ToBinary(32));
             fields.Add(field1);
 
             UInt32 field2 = (UInt32)((this.Identification << 8) | ((byte)(this.FragmentFlags)) << 21 | (this.FragmentOffset << 24));
+            Console.WriteLine("Field2: " + field2.ToBinary(32));
             //fields.Add((UInt32)HostToNetworkOrder((int)field2));
 
             UInt32 field3 = (UInt32)((this.TimeToLive << 0) | (((byte)(this.Protocol)) << 8) | (UInt16)(this.HeaderChecksum << 16));
+            Console.WriteLine("Field3: " + field3.ToBinary(32));
             fields.Add(field3);
 
             //Split the 32-bit words into bytes

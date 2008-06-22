@@ -18,9 +18,9 @@ namespace FrodeTest.Test
 
             //Add char and string
             //Bug discovered 7.june. SysFault when adding char and string.
-            //string added = string.Empty;
-            //added = ((char)('c')) + "oncatenating char and string works.";
-            //Console.WriteLine(added);
+            string added = string.Empty;
+            added = ((char)('c')) + "oncatenating char and string works.";
+            Console.WriteLine(added);
 
             StringBuilder sb = new StringBuilder();
             sb.Append("String");

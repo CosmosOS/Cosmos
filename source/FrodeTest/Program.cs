@@ -27,12 +27,12 @@ namespace FrodeTest
             //Test
             Console.WriteLine("---- RUNNING PREDEFINED TESTS ----");
             Test.StringTest.RunTest();
-            Test.BasicTest.RunTest();
-            Test.SwitchTest.RunTest();
+            //Test.BasicTest.RunTest();
+            //Test.SwitchTest.RunTest();
             
-            Test.BoolTest.RunTest();
-            Test.InterfaceTest.RunTest();
-            Test.ExtensionMethodsTest.RunTest();
+            //Test.BoolTest.RunTest();
+            //Test.InterfaceTest.RunTest();
+            //Test.ExtensionMethodsTest.RunTest();
             //Test.BinaryHelperTest.RunTest();
             //Test.TransmitStatusDescriptorTest.RunTest();
             //Test.PacketHeaderTest.RunTest();
