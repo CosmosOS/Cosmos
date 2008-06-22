@@ -9,13 +9,13 @@ namespace Cosmos.Hardware {
 
         public static void Init() {
             Kernel.CPU.CreateGDT();
-            PC.Bus.CPU.PIC.Init();
+            PIC.Init();
 
             Serial.InitSerial(0);
             PIT.Initialize(Tick);
 
             //HW.Interrupts.IRQ01 += new Interrupts.InterruptDelegate(Cosmos.Hardware.Keyboard.HandleKeyboardInterrupt);
-            PC.Interrupts.Init();
+            Interrupts.Init();
             Kernel.CPU.CreateIDT();
 
             PC.Bus.PCIBus.Init();

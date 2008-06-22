@@ -88,7 +88,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             
             //Enable IRQ Interrupt
             InitIRQMaskRegister();
-            Cosmos.Hardware.PC.Interrupts.IRQ11 = new Cosmos.Hardware.PC.Interrupts.InterruptDelegate(this.HandleNetworkInterrupt);
+            Cosmos.Hardware.Interrupts.IRQ11 = new Cosmos.Hardware.Interrupts.InterruptDelegate(this.HandleNetworkInterrupt);
             //Console.WriteLine("Listening for IRQ" + pciCard.InterruptLine + ".");
         }
 

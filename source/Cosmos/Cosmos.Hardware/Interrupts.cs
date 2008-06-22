@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 
-namespace Cosmos.Hardware.PC {
+namespace Cosmos.Hardware {
     public class Interrupts {
         [StructLayout(LayoutKind.Explicit, Size=76)]
         public struct InterruptContext {
@@ -55,9 +55,9 @@ namespace Cosmos.Hardware.PC {
 			DebugUtil.LogInterruptOccurred(aContext);
 			if (aContext->Interrupt >= 0x20 && aContext->Interrupt <= 0x2F) {
                 if (aContext->Interrupt >= 0x28) {
-                    Bus.CPU.PIC.SignalSecondary();
+                    PIC.SignalSecondary();
                 } else {
-                    Bus.CPU.PIC.SignalPrimary();
+                    PIC.SignalPrimary();
                 }
             }
         }
@@ -81,7 +81,7 @@ namespace Cosmos.Hardware.PC {
         //IRQ 0 - System timer. Reserved for the system. Cannot be changed by a user.
         public static unsafe void HandleInterrupt_20(InterruptContext* aContext) {
 			PIT.HandleInterrupt();
-            Bus.CPU.PIC.SignalPrimary();
+            PIC.SignalPrimary();
         }
 
         static public InterruptDelegate IRQ01;
@@ -100,7 +100,7 @@ namespace Cosmos.Hardware.PC {
             //
             // - End change area
 
-            Bus.CPU.PIC.SignalPrimary();
+            PIC.SignalPrimary();
         }
 
         //IRQ 11 - (Added for RTL8139 network card)
@@ -112,10 +112,11 @@ namespace Cosmos.Hardware.PC {
             //Cosmos.Hardware.DebugUtil.SendMessage("Interrupts", "Interrupt 2B handler (for RTL)");
             //Console.WriteLine("IRQ 11 raised!");
 
-            if (IRQ11 != null)
+            if (IRQ11 != null) {
                 IRQ11();
+            }
 
-            Bus.CPU.PIC.SignalSecondary();
+            PIC.SignalSecondary();
         }
 
         //IRQ 14 - Primary IDE. If no Primary IDE this can be changed
@@ -123,7 +124,7 @@ namespace Cosmos.Hardware.PC {
 			Cosmos.Hardware.DebugUtil.SendMessage("IRQ", "Primary IDE");
 			//Storage.ATAOld.HandleInterruptPrimary();
 			Storage.ATA2.ATA.HandleInterruptPrimary();
-            Bus.CPU.PIC.SignalSecondary();
+            PIC.SignalSecondary();
         }
 
 		public static unsafe void HandleInterrupt_35(InterruptContext* aContext) {
@@ -139,7 +140,7 @@ namespace Cosmos.Hardware.PC {
         public static unsafe void HandleInterrupt_2F(InterruptContext* aContext) {
 			Storage.ATA2.ATA.HandleInterruptSecondary();
 			Cosmos.Hardware.DebugUtil.SendMessage("IRQ", "Secondary IDE");
-            Bus.CPU.PIC.SignalSecondary();
+            PIC.SignalSecondary();
         }
 
         public static unsafe void HandleInterrupt_00(InterruptContext* aContext) {

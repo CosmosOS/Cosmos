@@ -29,8 +29,8 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
         }
 
         private static MethodBase GetInterruptHandler(byte aInterrupt) {
-            return GetMethodDef(typeof(Cosmos.Hardware.PC.Interrupts).Assembly,
-                                typeof(Cosmos.Hardware.PC.Interrupts).FullName,
+            return GetMethodDef(typeof(Cosmos.Hardware.Interrupts).Assembly,
+                                typeof(Cosmos.Hardware.Interrupts).FullName,
                                 "HandleInterrupt_" + aInterrupt.ToString("X2"),
                                 false);
         }
@@ -147,8 +147,8 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
                 new Label("__ISR_Handler_" + j.ToString("X2") + "_SetCS");
                 MethodBase xHandler = GetInterruptHandler((byte) j);
                 if (xHandler == null) {
-                    xHandler = GetMethodDef(typeof(Cosmos.Hardware.PC.Interrupts).Assembly,
-                                            typeof(Cosmos.Hardware.PC.Interrupts).FullName,
+                    xHandler = GetMethodDef(typeof(Cosmos.Hardware.Interrupts).Assembly,
+                                            typeof(Cosmos.Hardware.Interrupts).FullName,
                                             "HandleInterrupt_Default",
                                             true);
                 }
