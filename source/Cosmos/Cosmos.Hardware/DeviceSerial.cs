@@ -9,7 +9,7 @@ namespace Cosmos.Hardware {
     // for higher speed serial devices. However I suspect
     // higher speed serial devices will use a block transfer
     // type.
-    public abstract class SerialDevice : Device {
+    public abstract class DeviceSerial : Device {
         public delegate void ByteReceivedDelegate(byte aValue);
         public ByteReceivedDelegate ByteReceived;
     }

@@ -96,7 +96,7 @@
     <Compile Include="Old\Storage\ATA.cs" />
     <Compile Include="Old\Storage\ATAOld.cs" />
     <Compile Include="Old\Storage\Storage.cs" />
-    <Compile Include="SerialDevice.cs" />
+    <Compile Include="DeviceSerial.cs" />
     <Compile Include="TextScreen.cs" />
   </ItemGroup>
   <ItemGroup>
