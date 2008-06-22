@@ -10,7 +10,6 @@ namespace RsenkTest
         public static List<String> GetParsed(string line)
         {
             List<String> retList = new List<String>();
-            string lineOld = "";
 
             //Read command
             String command = ReadCommand(line);

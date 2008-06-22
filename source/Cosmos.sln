@@ -20,6 +20,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Hardware", "Cosmos\Cosmos.Hardware\Cosmos.Hardware.csproj", "{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kernel", "Kernel", "{0D558E33-78B0-47DB-B5EF-B7C2F3114D75}"
+	ProjectSection(SolutionItems) = preProject
+		Notes.html = Notes.html
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel.Plugs", "Cosmos\Cosmos.Kernel.Plugs\Cosmos.Kernel.Plugs.csproj", "{B168BEDD-C6A6-4E7C-B9A5-0144286E9E42}"
 EndProject

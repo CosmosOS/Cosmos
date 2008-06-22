@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Cosmos.Kernel;
+using Cosmos.Hardware;
 using Indy.IL2CPU.Plugs;
 
 namespace Cosmos.Kernel.Plugs {
@@ -38,7 +39,7 @@ namespace Cosmos.Kernel.Plugs {
         }
 
 		public static int get_CursorTop() {
-			return TextScreen.CurrentLine;
+            return TextScreen.CurrentRow;
 		}
 
         public static void set_CursorLeft(int x)
@@ -47,15 +48,15 @@ namespace Cosmos.Kernel.Plugs {
         }
 
 		public static void set_CursorTop(int y) {
-			TextScreen.CurrentLine = y;
+            TextScreen.CurrentRow = y;
 		}
 
 		public static int get_WindowHeight() {
-			return TextScreen.WindowHeight;
+            return TextScreen.Rows;
 		}
 
 		public static int get_WindowWidth() {
-			return TextScreen.WindowWidth;
+			return TextScreen.Columns;
 		}
 					   
 		//TODO: Console uses TextWriter - intercept and plug it instead

@@ -4,7 +4,7 @@ using Cosmos.Hardware.PC.Bus;
 using Cosmos.FileSystem;
 using Cosmos.Hardware;
 using System.Diagnostics;
-using S = Cosmos.Hardware.Screen.Text;
+using S = Cosmos.Hardware.TextScreen;
 
 namespace SteveKernel
 {
@@ -70,7 +70,7 @@ namespace SteveKernel
                 
                 Player[] players = new Player[playersc];
 
-                bool[] board = new bool[S.Columns * S.Lines];
+                bool[] board = new bool[S.Columns * S.Rows];
 
                 for (int i = 0; i < playersc; i++)
                 {
@@ -78,7 +78,7 @@ namespace SteveKernel
                     players[i] = new Player()
                     {
                         x = r.Next(S.Columns),
-                        y = r.Next(S.Lines),
+                        y = r.Next(S.Rows),
                         d = r.Next(4),
                         i = i,
                         alive = true
@@ -122,7 +122,7 @@ namespace SteveKernel
                                         ny++;
                                         break;
                                 }
-                                if (nx >= 0 && nx < S.Columns && ny >= 0 && ny < S.Lines &&
+                                if (nx >= 0 && nx < S.Columns && ny >= 0 && ny < S.Rows &&
                                     board[nx + ny * S.Columns] == false)
                                 {
                                     p.alive = true;
