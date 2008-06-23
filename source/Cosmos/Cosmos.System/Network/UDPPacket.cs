@@ -10,14 +10,14 @@ namespace Cosmos.Sys.Network {
             mHeaderBegin = Initialize(aData, 8, 0x11, aSrcIP, aDestIP);
             // Source Port
             mData[mHeaderBegin] = (byte)(aSrcPort >> 8);
-            mData[mHeaderBegin + 1] = (byte)(aSrcPort & 0xFF);
+            mData[mHeaderBegin + 1] = (byte)aSrcPort;
             // Destination Port
             mData[mHeaderBegin + 2] = (byte)(aDestPort >> 8);
-            mData[mHeaderBegin + 3] = (byte)(aDestPort & 0xFF);
+            mData[mHeaderBegin + 3] = (byte)aDestPort;
             // Length
             int xSize = mData.Length - mHeaderBegin;
             mData[mHeaderBegin + 4] = (byte)(xSize >> 8);
-            mData[mHeaderBegin + 5] = (byte)(xSize & 0xFF);
+            mData[mHeaderBegin + 5] = (byte)xSize;
         }
 
         protected new int mHeaderBegin;
@@ -57,7 +57,7 @@ namespace Cosmos.Sys.Network {
             //xResult = (~((xResult & 0xFFFF) + (xResult >> 16)));
 
             //mData[40] = (byte)(xResult >> 8);
-            //mData[41] = (byte)(xResult & 0xFF);
+            //mData[41] = (byte)xResult;
 
             //return (UInt16)xResult;
         }

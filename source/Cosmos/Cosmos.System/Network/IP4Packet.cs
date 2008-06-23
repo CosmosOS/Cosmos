@@ -20,7 +20,7 @@ namespace Cosmos.Sys.Network {
             // Total Length - IP Packet + sub packets + data (i.e. IP + UDP + UPD Data)
             int xSize = mData.Length - mHeaderBegin;
             mData[mHeaderBegin + 2] = (byte)(xSize >> 8);
-            mData[mHeaderBegin + 3] = (byte)(xSize & 0xFF);
+            mData[mHeaderBegin + 3] = (byte)xSize;
             // IP - Identification - Varies
             // This field is an identification field and is primarily used for uniquely identifying fragments of an original IP datagram. Some experimental work has suggested using the ID field for other purposes, such as for adding packet-tracing information to datagrams in order to help trace back datagrams with spoofed source addresses.
             mData[mHeaderBegin + 4] = 0x5a;
@@ -44,12 +44,12 @@ namespace Cosmos.Sys.Network {
             mData[mHeaderBegin + 12] = (byte)(aSrcIP >> 24);
             mData[mHeaderBegin + 13] = (byte)(aSrcIP >> 16);
             mData[mHeaderBegin + 14] = (byte)(aSrcIP >> 8);
-            mData[mHeaderBegin + 15] = (byte)(aSrcIP & 0xFF);
+            mData[mHeaderBegin + 15] = (byte)aSrcIP;
             // Destination IP
             mData[mHeaderBegin + 16] = (byte)(aDestIP >> 24);
             mData[mHeaderBegin + 17] = (byte)(aDestIP >> 16);
             mData[mHeaderBegin + 18] = (byte)(aDestIP >> 8);
-            mData[mHeaderBegin + 19] = (byte)(aDestIP & 0xFF);
+            mData[mHeaderBegin + 19] = (byte)aDestIP;
 
             return mHeaderBegin + mHeaderSize;
         }
@@ -66,7 +66,7 @@ namespace Cosmos.Sys.Network {
             xResult = (~((xResult & 0xFFFF) + (xResult >> 16)));
             // Store result
             mData[mHeaderBegin + 10] = (byte)(xResult >> 8);
-            mData[mHeaderBegin + 11] = (byte)(xResult & 0xFF);
+            mData[mHeaderBegin + 11] = (byte)xResult;
         }
     }
 }
