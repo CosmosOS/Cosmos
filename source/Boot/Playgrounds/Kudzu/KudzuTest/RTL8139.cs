@@ -7,7 +7,10 @@ namespace KudzuTest {
 
         public static Frame CreateTestFrame() {
             var xFrame = new Frame();
+            
             xFrame.InitTest();
+            //xFrame.InitHacked();
+
             xFrame.SetEthSrcMAC(0x52, 0x54, 0x00, 0x12, 0x34, 0x57);
             xFrame.SetIPSrcAddr(10, 0, 2, 15);
             xFrame.SetIPDestAddr(255, 255, 255, 255);

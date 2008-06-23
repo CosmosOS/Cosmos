@@ -15,9 +15,9 @@ namespace Cosmos.Sys.Network {
             return mData;
         }
 
-        protected virtual int Initialize(byte[] aData, int aHeaderSize) {
-            mData = new byte[aData.Length + 8];
-            aData.CopyTo(mData, 8);
+        protected int Initialize(byte[] aData, int aHeaderSize) {
+            mData = new byte[aData.Length + aHeaderSize];
+            aData.CopyTo(mData, aHeaderSize);
             return 0;
         }
 

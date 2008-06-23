@@ -30,45 +30,9 @@ namespace KudzuTest {
             mData[12] = 0x08;
             mData[13] = 0x00;
 
-            // IP - Version + Header length
-            mData[14] = 0x45;
-            // IP - Differntiated Services Field
-            mData[15] = 0x00;
-            // IP - Total Length
-            mData[16] = 0x00;
-            mData[17] = 0x1d;
-            // IP - Identification - Varies
-            // This field is an identification field and is primarily used for uniquely identifying fragments of an original IP datagram. Some experimental work has suggested using the ID field for other purposes, such as for adding packet-tracing information to datagrams in order to help trace back datagrams with spoofed source addresses.
-            mData[18] = 0x5a;
-            mData[19] = 0xf8;
-            // IP - Flags + Fragment Offset
-            mData[20] = 0x00;
-            mData[21] = 0x00;
-            // IP - TTL
-            mData[22] = 0x80;
-            // IP - Protocol, x11 = UDP
-            mData[23] = 0x11;
-            // IP - Header Checksum - Varies
-            // In 1's complement, there are 2 representations for zero: 0000000000000000 and 1111111111111111. 
-            // Note that flipping the bits of the one gives you the other. A header checksum of "0"
-            // (allowed for some protocols, e.g. UDP) denotes that the checksum was not calculated. 
-            // Thus, implementations which do calculate a checksum make sure to give a result of 0xffff rather 
-            // that 0, when the checksum is actually zero.
-            mData[24] = 0x09;
-            mData[25] = 0x23;
-            // IP - Source IP
-            mData[26] = 0xc0;
-            mData[27] = 0xa8;
-            mData[28] = 0x16;
-            mData[29] = 0x0d;
-            // IP - Destination IP
-            mData[30] = 0xFF;
-            mData[31] = 0xFF;
-            mData[32] = 0xFF;
-            mData[33] = 0xFF;
-
-            var xUDP = new Cosmos.Sys.Network.UDPPacket(0x0449, 2222, new byte[] { 0x16 });
-            xUDP.GetData().CopyTo(mData, 34);
+            var xUDP = new Cosmos.Sys.Network.UDPPacket(0xC0A8160D, 0x0449, 0xFFFFFFFF, 2222, new byte[] { 0x16 });
+            var xUDPData = xUDP.GetData();
+            xUDPData.CopyTo(mData, 14);
         }
 
         public void InitHacked() {

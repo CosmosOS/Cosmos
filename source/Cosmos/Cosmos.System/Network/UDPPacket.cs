@@ -6,8 +6,8 @@ using System.Text;
 namespace Cosmos.Sys.Network {
     // http://en.wikipedia.org/wiki/User_Datagram_Protocol
     public class UDPPacket : IP4Packet {
-        public UDPPacket(int aSrcPort, int aDestPort, byte[] aData) {
-            mHeaderBegin = Initialize(aData, 8);
+        public UDPPacket(uint aSrcIP, UInt16 aSrcPort, uint aDestIP, UInt16 aDestPort, byte[] aData) {
+            mHeaderBegin = Initialize(aData, 8, aSrcIP, aDestIP);
             // Source Port
             mData[mHeaderBegin] = (byte)(aSrcPort >> 8);
             mData[mHeaderBegin + 1] = (byte)(aSrcPort & 0xFF);
@@ -15,11 +15,12 @@ namespace Cosmos.Sys.Network {
             mData[mHeaderBegin + 2] = (byte)(aDestPort >> 8);
             mData[mHeaderBegin + 3] = (byte)(aDestPort & 0xFF);
             // Length
-            mData[mHeaderBegin + 4] = (byte)(mData.Length >> 8);
-            mData[mHeaderBegin + 5] = (byte)(mData.Length & 0xFF);
+            int xSize = mData.Length - mHeaderBegin;
+            mData[mHeaderBegin + 4] = (byte)(xSize >> 8);
+            mData[mHeaderBegin + 5] = (byte)(xSize & 0xFF);
         }
 
-        protected new int mHeaderBegin = 0;
+        protected new int mHeaderBegin;
 
         protected override void Conclude() {
             base.Conclude();
