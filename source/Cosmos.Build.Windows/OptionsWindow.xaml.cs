@@ -142,6 +142,11 @@ namespace Cosmos.Build.Windows {
             cmboDebugMode.Items.Add("IL");
 			cmboDebugMode.Items.Add("Source");
 
+            foreach (string nic in Enum.GetNames(typeof(Builder.QemuNetworkCard)))
+            {
+                cmboNetworkCards.Items.Add(nic);
+            }
+
 			LoadSettingsFromRegistry();
 		}
 
@@ -221,7 +226,14 @@ namespace Cosmos.Build.Windows {
                     }
                 }
 			if (rdioQEMU.IsChecked.Value) {
-				mBuilder.MakeQEMU(chckQEMUUseHD.IsChecked.Value, chckQEMUUseGDB.IsChecked.Value, mDebugMode != DebugModeEnum.None, mDebugMode != DebugModeEnum.None);
+				mBuilder.MakeQEMU(
+                    chckQEMUUseHD.IsChecked.Value, 
+                    chckQEMUUseGDB.IsChecked.Value, 
+                    mDebugMode != DebugModeEnum.None, 
+                    mDebugMode != DebugModeEnum.None, 
+                    chckQEMUUseNetworkTAP.IsChecked.Value,
+                    cmboNetworkCards.SelectedValue
+                    );
 			} else if (rdioVMWare.IsChecked.Value) {
 				mBuilder.MakeVMWare(rdVMWareServer.IsChecked.Value);
 			} else if (rdioVPC.IsChecked.Value) {

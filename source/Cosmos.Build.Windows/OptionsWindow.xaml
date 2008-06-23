@@ -96,12 +96,22 @@
 						<CheckBox
 							Name="chckQEMUUseHD"
 							IsChecked="False">Create hard disk image</CheckBox>
+
 					</StackPanel>
 				</InlineUIContainer>
+                <LineBreak/><LineBreak />
+                <Bold>Network options</Bold>
+                <LineBreak />
+                Network card:
+                <ComboBox Name="cmboNetworkCards" Width="200" SelectedIndex="1"/>
+                <LineBreak />
+                <InlineUIContainer>
+                    <CheckBox Name="chckQEMUUseNetworkTAP" IsChecked="False">Enable network TAP (requires TAP named CosmosTAP)</CheckBox>
+                </InlineUIContainer>
 			</Paragraph>
 			<Paragraph
 				Name="paraVMWareOptions">
-				<Bold>VMWare Options</Bold>
+				    <Bold>VMWare Options</Bold>
 				<LineBreak />
 				<InlineUIContainer>
 					<StackPanel Orientation="Horizontal">

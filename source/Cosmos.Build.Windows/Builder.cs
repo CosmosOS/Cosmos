@@ -158,7 +158,7 @@ namespace Cosmos.Build.Windows {
 			Process.Start(xPath + @"Cosmos.vmx");
 		}
 
-		public void MakeQEMU(bool aUseHDImage, bool aGDB, bool aWaitSerialTCP, bool aDebugger) {
+		public void MakeQEMU(bool aUseHDImage, bool aGDB, bool aWaitSerialTCP, bool aDebugger, bool aUseNetworkTap, object aNetworkCard) {
 			MakeISO();
 			RemoveFile(BuildPath + "serial-debug.txt");
 			// QEMU Docs - http://fabrice.bellard.free.fr/qemu/qemu-doc.html
@@ -184,11 +184,10 @@ namespace Cosmos.Build.Windows {
 				+ " -serial \"file:" + BuildPath + "COM2-output.dbg\" "
 				// Enable acceleration if we are not using GDB
 				+ (aGDB ? " -S -s" : " -kernel-kqemu")
-				// Ethernet card - Later the model should be a QEMU option on 
-				// options screen
-				+ " -net nic,model=rtl8139,macaddr=52:54:00:12:34:57"
+				// Ethernet card
+				+ string.Format(" -net nic,model={0},macaddr=52:54:00:12:34:57", Enum.Parse(typeof(QemuNetworkCard), aNetworkCard.ToString()))
                 //+ " -redir tcp:5555::23" //use f.instance 'telnet localhost 5555' or 'http://localhost:5555/' to access machine
-                //+ " -net tap,ifname=CosmosTAP" //requires TAP installed on development computer
+                + (aUseNetworkTap ? " -net tap,ifname=CosmosTAP" : "") //requires TAP installed on development computer
 				+ " -net user"
 				, ToolsPath + @"qemu\", false, true);
 
@@ -200,6 +199,16 @@ namespace Cosmos.Build.Windows {
 					, ToolsPath + @"qemu\", false, false);
 			}
 		}
+
+        /// <summary>
+        /// The virtual network cards supported by Qemu
+        /// </summary>
+        public enum QemuNetworkCard
+        {
+            ne2k_pci,
+            rtl8139,
+            pcnet
+        }
 
 		public void MakeUSB(char aDrive) {
 			string xPath = BuildPath + @"USB\";
