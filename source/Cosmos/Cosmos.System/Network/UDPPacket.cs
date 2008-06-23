@@ -7,7 +7,7 @@ namespace Cosmos.Sys.Network {
     // http://en.wikipedia.org/wiki/User_Datagram_Protocol
     public class UDPPacket : IP4Packet {
         public UDPPacket(uint aSrcIP, UInt16 aSrcPort, uint aDestIP, UInt16 aDestPort, byte[] aData) {
-            mHeaderBegin = Initialize(aData, 8, aSrcIP, aDestIP);
+            mHeaderBegin = Initialize(aData, 8, 0x11, aSrcIP, aDestIP);
             // Source Port
             mData[mHeaderBegin] = (byte)(aSrcPort >> 8);
             mData[mHeaderBegin + 1] = (byte)(aSrcPort & 0xFF);

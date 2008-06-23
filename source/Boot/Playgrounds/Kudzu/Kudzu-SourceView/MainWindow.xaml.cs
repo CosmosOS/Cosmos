@@ -16,6 +16,8 @@ namespace Kudzu_SourceView {
     public partial class Window1 : Window {
         public Window1() {
             InitializeComponent();
+            int x = 0xFFFFFF;
+            byte y = (byte)x;
             button1.Click += new RoutedEventHandler(button1_Click);
         }
 
