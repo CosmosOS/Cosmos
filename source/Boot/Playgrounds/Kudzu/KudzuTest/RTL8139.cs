@@ -11,8 +11,6 @@ namespace KudzuTest {
             xFrame.InitTest();
 
             xFrame.SetEthSrcMAC(0x52, 0x54, 0x00, 0x12, 0x34, 0x57);
-            xFrame.UpdateIPChecksum();
-            xFrame.UpdateUDPChecksum();
 
             return xFrame;
         }

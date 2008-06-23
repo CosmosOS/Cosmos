@@ -38,8 +38,8 @@ namespace Cosmos.Sys.Network {
             // (allowed for some protocols, e.g. UDP) denotes that the checksum was not calculated. 
             // Thus, implementations which do calculate a checksum make sure to give a result of 0xffff rather 
             // that 0, when the checksum is actually zero.
-            mData[mHeaderBegin + 10] = 0x09;
-            mData[mHeaderBegin + 11] = 0x23;
+            mData[mHeaderBegin + 10] = 0x00;
+            mData[mHeaderBegin + 11] = 0x00;
             // Source IP
             mData[mHeaderBegin + 12] = (byte)(aSrcIP >> 24);
             mData[mHeaderBegin + 13] = (byte)(aSrcIP >> 16);
@@ -52,6 +52,21 @@ namespace Cosmos.Sys.Network {
             mData[mHeaderBegin + 19] = (byte)(aDestIP & 0xFF);
 
             return mHeaderBegin + mHeaderSize;
+        }
+
+        protected override void Conclude() {
+            base.Conclude();
+            mData[mHeaderBegin + 10] = 0;
+            mData[mHeaderBegin + 11] = 0;
+            // TODO: Change this to a ASM and use 32 bit addition
+            UInt32 xResult = 0;
+            for (int i = 0; i < mHeaderSize; i = i + 2) {
+                xResult += (UInt16)((mData[mHeaderBegin + i] << 8) + mData[mHeaderBegin + i + 1]);
+            }
+            xResult = (~((xResult & 0xFFFF) + (xResult >> 16)));
+            // Store result
+            mData[mHeaderBegin + 10] = (byte)(xResult >> 8);
+            mData[mHeaderBegin + 11] = (byte)(xResult & 0xFF);
         }
     }
 }
