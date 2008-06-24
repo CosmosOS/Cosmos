@@ -7,7 +7,8 @@ namespace Cosmos.Hardware {
         public static int CurrentRow = 0;
         public static int CurrentChar = 0;
         protected const int VideoAddr = 0xB8000;
-        protected const byte DefaultColor = 7;
+        //protected const byte DefaultColor = 7; //Gray
+        protected const byte DefaultColor = 15; //White
         protected static bool mInitialized = false;
         protected static byte Color;
 
@@ -34,6 +35,8 @@ namespace Cosmos.Hardware {
                 CurrentRow -= 1;
 				CurrentChar = 0;
 			}
+
+            SetCursor();
         }
 
 		public static unsafe void Clear() {
@@ -49,6 +52,8 @@ namespace Cosmos.Hardware {
 
             CurrentChar = 0;
             CurrentRow = 0;
+
+            SetCursor();
         }
 
         public static void WriteChar(char aChar) {
@@ -57,6 +62,8 @@ namespace Cosmos.Hardware {
             if (CurrentChar == Columns) {
 				NewLine();
             }
+
+            SetCursor();
         }
 
 		protected static unsafe void ScrollUp() {
@@ -77,6 +84,8 @@ namespace Cosmos.Hardware {
 				*xScreenPtr = Color;
                 xScreenPtr++;
 			}
+
+            SetCursor();
 		}
 
 		public unsafe static void PutChar(int aLine, int aRow, char aChar) {
@@ -87,11 +96,41 @@ namespace Cosmos.Hardware {
 			*xScreenPtr = xVal;
 			xScreenPtr ++;
 			*xScreenPtr = Color;
+
+            SetCursor();
 		}
 
 		public static void SetColors(ConsoleColor aForeground, ConsoleColor aBackground) {
 			CheckInit();
             Color = (byte)((byte)(aForeground ) | ((byte)(aBackground ) << 4));
 		}
+
+        public static void SetCursor()
+        {
+            CheckInit();
+
+            // TODO:
+            // Set AH = 0x02
+            // Set BH = 0
+            // Set DH = CurrentRow
+            // Set DL = CurrentChar 
+            // Call interrupt 0x10
+
+            //Store a backup of the color so that we can make sure the cursor is white
+            byte tempColor = Color;
+
+            Color = DefaultColor;
+
+            char position = (char)((CurrentRow * 80) + CurrentChar);
+
+            // cursor low byte to VGA index register
+            Cosmos.Kernel.CPUBus.Write8(0x3D4, 0x0F);
+            Cosmos.Kernel.CPUBus.Write8(0x3D5, (byte)(position & 0xFF));
+            // cursor high byte to vga index register
+            Cosmos.Kernel.CPUBus.Write8(0x3D4, 0x0E);
+            Cosmos.Kernel.CPUBus.Write8(0x3D5, (byte)((position >> 8) & 0xFF));
+
+            Color = tempColor;
+        }
     }
 }
