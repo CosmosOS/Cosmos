@@ -8,6 +8,12 @@ namespace Cosmos.Kernel.Plugs {
 	public static class ThreadImpl {
 		public static IntPtr InternalGetCurrentThread() {
 			return IntPtr.Zero;
+
 		}
+        public static void Sleep(int millisecondsTimeout)
+        {
+            Cosmos.Hardware.Global.Sleep((uint) millisecondsTimeout);
+        }
+
 	}
 }
