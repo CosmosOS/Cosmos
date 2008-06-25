@@ -34,7 +34,8 @@ namespace KudzuTest {
             xNIC.Enable();
             xNIC.InitializeDriver();
 
-            xNIC.TransmitRaw(xEthernet.GetData());
+            //Removed by Frode during cleanup
+            //xNIC.TransmitRaw(xEthernet.GetData());
         }
 
     }

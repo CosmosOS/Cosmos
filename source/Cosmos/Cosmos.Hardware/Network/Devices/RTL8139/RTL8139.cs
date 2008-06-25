@@ -18,8 +18,6 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
 
         private PCIDevice pciCard;
         private Kernel.MemoryAddressSpace mem;
-        //private Register.MainRegister reg;
-        //private Register.CommandRegister cr;
         private Register.ValueTypeRegisters valueReg;
         private Register.InterruptMaskRegister imr;
         private Register.InterruptStatusRegister isr;
@@ -230,14 +228,12 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         {
             get
             {
-                var xMem = new Kernel.MemoryAddressSpace(pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.Timer, 1);
-                return xMem.Read32(0);
+                return mem.Read32((byte)Register.MainRegister.Bit.Timer);
             }
             set
             {
-                UInt32 address = pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.Timer;
-                var xMem = new Kernel.MemoryAddressSpace(address, 1);
-                xMem.Write32(0, 0); //Resets timer
+                //Reset timer
+                mem.Write32((byte)Register.MainRegister.Bit.Timer, 0);
             }
         }
 
@@ -335,10 +331,10 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             TxBuffer1 = aData;
             TxBuffer2 = aData;
             TxBuffer3 = aData;
-            WriteAddressToPCI(ref TxBuffer0, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD0);
-            WriteAddressToPCI(ref TxBuffer1, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD1);
-            WriteAddressToPCI(ref TxBuffer2, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD2);
-            WriteAddressToPCI(ref TxBuffer3, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD3);
+            WriteAddressToPCI(ref TxBuffer0, (byte)Register.MainRegister.Bit.TSAD0);
+            WriteAddressToPCI(ref TxBuffer1, (byte)Register.MainRegister.Bit.TSAD1);
+            WriteAddressToPCI(ref TxBuffer2, (byte)Register.MainRegister.Bit.TSAD2);
+            WriteAddressToPCI(ref TxBuffer3, (byte)Register.MainRegister.Bit.TSAD3);
 
             var tsd = Register.TransmitStatusDescriptor.Load(mem);
             Console.WriteLine("Telling NIC to send " + aData.Length + " bytes.");
@@ -347,24 +343,6 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             //Console.WriteLine("TDS : " + tsd.ToString());
             tsd.OWN = false; //Begins sending
             //Console.WriteLine("TDS : " + tsd.ToString());
-            Register.TransmitStatusDescriptor.IncrementTSDescriptor();
-
-            return true;
-        }
-
-        [Obsolete]
-        public bool TransmitRaw(byte[] aData)
-        {
-            WriteAddressToPCI(ref aData, pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.TSAD0);
-
-            //Set the transmit status - which enables the transmit.
-            var tsd = Register.TransmitStatusDescriptor.Load(mem);
-            tsd.Size = aData.Length;
-            Console.WriteLine("Told NIC to send " + tsd.Size + " bytes.");
-
-            SetEarlyTxThreshold(1024);
-            Console.WriteLine("Sending packet...");
-            tsd.OWN = false;
             Register.TransmitStatusDescriptor.IncrementTSDescriptor();
 
             return true;
@@ -511,12 +489,11 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
 
             //Each of the four Transmit Status Descriptors (TSD) has its own EarlyTxThreshold.
 
-            UInt32 address = pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.RxEarlyCnt;
-            var xMem = new Kernel.MemoryAddressSpace(address, 1);
-            xMem.Write8(0, (byte)bytecount);
+            //UInt32 address = pciCard.BaseAddress1 + (byte)Register.MainRegister.Bit.RxEarlyCnt;
+            //var xMem = new Kernel.MemoryAddressSpace(address, 1);
+            //xMem.Write8(0, (byte)bytecount);
 
-            //TODO: The code above (with the warning, could probably be replaced with the following line). Need to test.
-            //mem.Write8((byte)Register.MainRegister.Bit.RxEarlyCnt, 0);
+            mem.Write8((byte)Register.MainRegister.Bit.RxEarlyCnt, (byte)bytecount);
         }
 
         /// <summary>
@@ -525,7 +502,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         /// </summary>
         /// <param name="bytearray"></param>
         /// <param name="address"></param>
-        private void WriteAddressToPCI(ref byte[] bytearray, uint address)
+        private void WriteAddressToPCI(ref byte[] bytearray, byte addressOffset)
         {
 
             /* The data in the bytearray contains the actual bytes we want to transfer to the network.
@@ -534,8 +511,10 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
              * The address is stored in the Transmit Start Address which corresponds to the Transmit Status Descriptor we are currently using (0-3).
              */
 
-            var xMem = new Kernel.MemoryAddressSpace(address, 1);
-            xMem.Write32(0, GetMemoryAddress(ref bytearray));
+            //var xMem = new Kernel.MemoryAddressSpace(address, 1);
+            //xMem.Write32(0, GetMemoryAddress(ref bytearray));
+
+            mem.Write32(addressOffset, GetMemoryAddress(ref bytearray));
         }
 
         /// <summary>
