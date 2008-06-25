@@ -5,11 +5,7 @@ using Cosmos.Build.Windows;
 using Cosmos.Hardware;
 
 namespace Cosmos.Shell.Console {
-	public class MyClass {
-		public virtual void Bladibla() {
-			System.Console.WriteLine("Bladibla!");
-		}
-	}
+
 	public class Program {
 
         #region Build Console
@@ -25,6 +21,7 @@ namespace Cosmos.Shell.Console {
         public static void Init() {
 			try {
 				Cosmos.Sys.Boot.Default();
+                System.Console.WriteLine("Sorry - the Cosmos.Shell.Console is currently not working.");
 				//stages.Enqueue(new Prompter());
 
 			} catch (Exception E) {
@@ -32,8 +29,7 @@ namespace Cosmos.Shell.Console {
                 System.Console.Write("    ");
                 System.Console.WriteLine(E.Message);
 			}
-			MyClass x = new MyClass();
-			x.Bladibla();
+
 			System.Console.WriteLine("Halting system now!..");
 			
 			// Halt system.
