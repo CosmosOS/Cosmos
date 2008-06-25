@@ -54,6 +54,7 @@
     <Compile Include="Assemblers\GetCurrentESP.cs" />
     <Compile Include="Assemblers\GetEndOfKernel.cs" />
     <Compile Include="Assemblers\GetEndOfStack.cs" />
+    <Compile Include="Assemblers\Halt.cs" />
     <Compile Include="Assemblers\IORead16.cs" />
     <Compile Include="Assemblers\IORead32.cs" />
     <Compile Include="Assemblers\IOWrite16.cs" />

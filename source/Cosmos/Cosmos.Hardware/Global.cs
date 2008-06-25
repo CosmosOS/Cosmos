@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Cosmos.Kernel;
 
 namespace Cosmos.Hardware {
     public class Global {
@@ -42,7 +43,7 @@ namespace Cosmos.Hardware {
             uint xEnd = xStart + aMSec;
             Cosmos.Hardware.DebugUtil.SendNumber("PC", "Sleep", aMSec, 32);
             while (TickCount < xEnd) {
-                ;
+                CPU.Halt();
             }
             Cosmos.Hardware.DebugUtil.SendMessage("PC", "Sleeping done");
         }

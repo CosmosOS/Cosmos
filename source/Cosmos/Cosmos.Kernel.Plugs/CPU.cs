@@ -73,5 +73,12 @@ namespace Cosmos.Kernel.Plugs {
             b = 0;
             a = 0;
         }
+
+        [PlugMethod(MethodAssembler = typeof(Assemblers.Halt))]
+        public static void Halt()
+        {
+
+        }
+
 	}
 }

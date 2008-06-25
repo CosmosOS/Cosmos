@@ -64,6 +64,7 @@
     <Compile Include="ConditionalMove.cs" />
     <Compile Include="Condition.cs" />
     <Compile Include="CpuId.cs" />
+    <Compile Include="Hlt.cs" />
     <Compile Include="Popfd.cs" />
     <Compile Include="RotateThroughCarryRight.cs" />
     <Compile Include="DebugStub.cs" />

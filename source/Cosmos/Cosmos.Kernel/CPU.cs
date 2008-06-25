@@ -114,5 +114,11 @@ namespace Cosmos.Kernel {
             b = 0;
             a = 0;
         }
+
+        //Plugged
+        public static void Halt()
+        {
+            
+        }
 	}
 }
