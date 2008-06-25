@@ -276,6 +276,8 @@ namespace Cosmos.Build.Windows {
 				// QEMU
 				xKey.SetValue("Use GDB", chckQEMUUseGDB.IsChecked.Value, RegistryValueKind.DWord);
 				xKey.SetValue("Create HD Image", chckQEMUUseHD.IsChecked.Value, RegistryValueKind.DWord);
+                xKey.SetValue("Use network TAP", chckQEMUUseNetworkTAP.IsChecked.Value, RegistryValueKind.DWord);
+                xKey.SetValue("Network Card", cmboNetworkCards.Text, RegistryValueKind.String);
 
 				// VMWare
 				string xVMWareVersion = string.Empty;
@@ -331,6 +333,8 @@ namespace Cosmos.Build.Windows {
 				// QEMU
 				chckQEMUUseGDB.IsChecked = ((int)xKey.GetValue("Use GDB", 0) != 0);
 				chckQEMUUseHD.IsChecked = ((int)xKey.GetValue("Create HD Image", 0) != 0);
+                chckQEMUUseNetworkTAP.IsChecked = ((int)xKey.GetValue("Use network TAP", 0) != 0);
+                cmboNetworkCards.SelectedIndex = cmboNetworkCards.Items.IndexOf(xKey.GetValue("Network Card", Builder.QemuNetworkCard.rtl8139.ToString()));
 
 				// VMWare
 				string xVMWareVersion = (string)xKey.GetValue("VMWare Version", "VMWare Server");
