@@ -36,14 +36,17 @@ namespace Cosmos.Hardware {
             TickCount++;
         }
 
-        //TODO: Change this to use an x86 Op or something so it doesnt
-        // just thrash
         public static void Sleep(uint aMSec) {
-            uint xStart = TickCount;
-            uint xEnd = xStart + aMSec;
             Cosmos.Hardware.DebugUtil.SendNumber("PC", "Sleep", aMSec, 32);
-            while (TickCount < xEnd) {
-                CPU.Halt();
+            CPU.Halt();//At least one hlt even if aMSec is 0
+            if (aMSec > 0)
+            {
+                uint xStart = TickCount;
+                uint xEnd = xStart + aMSec;
+                while (TickCount < xEnd)
+                {
+                    CPU.Halt();
+                }
             }
             Cosmos.Hardware.DebugUtil.SendMessage("PC", "Sleeping done");
         }
