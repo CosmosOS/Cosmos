@@ -296,7 +296,9 @@ namespace Cosmos.Hardware
             CheckInit();
             char xResult = '\0';
             while (mBuffer.Count == 0 || !GetCharValue(mBuffer.Dequeue(), out xResult))
-                ;
+            {
+                Global.Sleep(10); //ToDo optimize value 
+            }
             return xResult;
         }
 
