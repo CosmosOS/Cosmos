@@ -21,7 +21,6 @@ namespace KudzuTest {
                 , 0x525400123457
                 , 0xFFFFFFFFFFFF
                 , 0x800);
-            //xEthernet.SetSrcMAC(0x52, 0x54, 0x00, 0x12, 0x34, 0x57);
 
             var xNICs = Cosmos.Hardware.Network.Devices.RTL8139.RTL8139.FindAll();
             var xNIC = xNICs[0];

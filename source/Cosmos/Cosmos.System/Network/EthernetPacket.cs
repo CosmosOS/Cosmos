@@ -9,7 +9,6 @@ namespace Cosmos.Sys.Network {
         protected int mHeaderBegin;
 
         public EthernetPacket(byte[] aData, UInt64 aSrcMAC, UInt64 aDestMAC, UInt16 aType) {
-//        public EthernetPacket(byte[] aData, UInt16 aType) {
             mHeaderBegin = Initialize(aData, mHeaderSize);
             // Ethernet - Destination
             mData[0] = (byte)(aDestMAC >> 40);
@@ -19,25 +18,16 @@ namespace Cosmos.Sys.Network {
             mData[4] = (byte)(aDestMAC >> 8);
             mData[5] = (byte)aDestMAC;
             // Ethernet - Source
-            mData[6] = 0x00;
-            mData[7] = 0x50;
-            mData[8] = 0x56;
-            mData[9] = 0x22;
-            mData[10] = 0x22;
-            mData[11] = 0x0d;
+            mData[6] = (byte)(aSrcMAC >> 40);
+            mData[7] = (byte)(aSrcMAC >> 32);
+            mData[8] = (byte)(aSrcMAC >> 24);
+            mData[9] = (byte)(aSrcMAC >> 16);
+            mData[10] = (byte)(aSrcMAC >> 8);
+            mData[11] = (byte)aSrcMAC;
             // Ethernet - Type - 0800 = IP
             mData[12] = (byte)(aType >> 8);
             mData[13] = (byte)aType;
         }
 
-        // TODO: Remove this, this is becuase of a 64 bit bug with Cosmos
-        public void SetSrcMAC(byte aMAC1, byte aMAC2, byte aMAC3, byte aMAC4, byte aMAC5, byte aMAC6) {
-            mData[6] = aMAC1;
-            mData[7] = aMAC2;
-            mData[8] = aMAC3;
-            mData[9] = aMAC4;
-            mData[10] = aMAC5;
-            mData[11] = aMAC6;
-        }
     }
 }
