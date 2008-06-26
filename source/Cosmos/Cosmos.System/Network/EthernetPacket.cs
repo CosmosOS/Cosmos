@@ -8,16 +8,16 @@ namespace Cosmos.Sys.Network {
         protected byte mHeaderSize = 14;
         protected int mHeaderBegin;
 
-//        public EthernetPacket(byte[] aData, UInt64 aSrcMAC, UInt64 aDestMAC, UInt16 aType) {
-        public EthernetPacket(byte[] aData, UInt16 aType) {
+        public EthernetPacket(byte[] aData, UInt64 aSrcMAC, UInt64 aDestMAC, UInt16 aType) {
+//        public EthernetPacket(byte[] aData, UInt16 aType) {
             mHeaderBegin = Initialize(aData, mHeaderSize);
             // Ethernet - Destination
-            mData[0] = 0xFF;
-            mData[1] = 0xFF;
-            mData[2] = 0xFF;
-            mData[3] = 0xFF;
-            mData[4] = 0xFF;
-            mData[5] = 0xFF;
+            mData[0] = (byte)(aDestMAC >> 40);
+            mData[1] = (byte)(aDestMAC >> 32);
+            mData[2] = (byte)(aDestMAC >> 24);
+            mData[3] = (byte)(aDestMAC >> 16);
+            mData[4] = (byte)(aDestMAC >> 8);
+            mData[5] = (byte)aDestMAC;
             // Ethernet - Source
             mData[6] = 0x00;
             mData[7] = 0x50;

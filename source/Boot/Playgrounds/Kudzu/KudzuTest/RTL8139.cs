@@ -18,10 +18,10 @@ namespace KudzuTest {
                 , 2222
                 , new byte[] { 0x16 });
             var xEthernet = new Cosmos.Sys.Network.EthernetPacket(xUDP.GetData()
-                //, 0x525400123457
-                //, 0xFFFFFFFFFFFF
+                , 0x525400123457
+                , 0xFFFFFFFFFFFF
                 , 0x800);
-            xEthernet.SetSrcMAC(0x52, 0x54, 0x00, 0x12, 0x34, 0x57);
+            //xEthernet.SetSrcMAC(0x52, 0x54, 0x00, 0x12, 0x34, 0x57);
 
             var xNICs = Cosmos.Hardware.Network.Devices.RTL8139.RTL8139.FindAll();
             var xNIC = xNICs[0];
@@ -35,7 +35,7 @@ namespace KudzuTest {
             xNIC.InitializeDriver();
 
             //Removed by Frode during cleanup
-            //xNIC.TransmitRaw(xEthernet.GetData());
+            xNIC.TransmitBytes(xEthernet.GetData());
         }
 
     }
