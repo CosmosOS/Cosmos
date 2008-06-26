@@ -23,8 +23,7 @@ namespace CosmosBoot
             Commander shell = Commander.GetInstance();
             shell.Start();
 
-            while (true)
-                ;
+            while (true) ;
         }
     }
 }
