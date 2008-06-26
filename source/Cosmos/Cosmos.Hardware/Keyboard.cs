@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using Cosmos.Kernel;
 
 namespace Cosmos.Hardware
 {
@@ -286,7 +287,7 @@ namespace Cosmos.Hardware
                     return true;
                 }
             }
-            Console.WriteLine("Char not found!");
+            DebugUtil.SendError("Keyboard", "Char not found: Scancode = " + aScanCode.ToHex());
             aValue = '\0';
             return false;
         }
