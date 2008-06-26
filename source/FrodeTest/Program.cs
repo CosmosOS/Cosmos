@@ -45,8 +45,7 @@ namespace FrodeTest
              
             //Done
             Console.WriteLine("Shutting down computer");
-            while (true)
-                ;
+            Cosmos.Sys.Deboot.ShutDown();            
         }
     }
 }

@@ -7,7 +7,10 @@ namespace Cosmos.Sys {
     public class Deboot {
         public static void Halt() {
             Console.WriteLine("Cosmos: Halting system.");
-            while (true) { }
+            while (true)
+            {
+                Cosmos.Kernel.CPU.Halt();
+            }
         }
 
         public static void ShutDown() {
