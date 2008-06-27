@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using Cosmos.Build.Windows;
+using Cosmos.Sys;
 
 namespace EsxTest
 {
@@ -20,11 +21,11 @@ namespace EsxTest
         public static void Init()
         {
             Cosmos.Sys.Boot.Default();
-            Console.WriteLine("Sleep ESX!");
-            while (true)
-            {
-                Thread.Sleep(100);
-            }
+            Console.WriteLine("Sleep 3000 ESX!");
+            Thread.Sleep(3000);
+            Console.WriteLine("Reboot");
+            Deboot.Reboot();            
         }
+
     }
 }

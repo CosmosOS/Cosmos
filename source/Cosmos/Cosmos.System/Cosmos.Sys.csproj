@@ -56,6 +56,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Indy.IL2CPU.Plugs\Indy.IL2CPU.Plugs.csproj">
+      <Project>{E9B2E8CC-E264-42F9-9113-16B0A0431198}</Project>
+      <Name>Indy.IL2CPU.Plugs</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Cosmos.Hardware\Cosmos.Hardware.csproj">
       <Project>{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}</Project>
       <Name>Cosmos.Hardware</Name>

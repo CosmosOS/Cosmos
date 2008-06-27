@@ -116,8 +116,12 @@ namespace Cosmos.Build.Windows {
 				}
 			};
 			xEngine.DebugLog += DoDebugLog;
-			xEngine.Execute(xTarget.Location, TargetPlatformEnum.X86, g => Path.Combine(xAsmPath, g + ".asm"), false,
-                new string[] { Path.Combine(Path.Combine(ToolsPath, "Cosmos.Kernel.Plugs"), "Cosmos.Kernel.Plugs.dll") }, aDebugMode, aDebugComport, xAsmPath);
+            xEngine.Execute(xTarget.Location, TargetPlatformEnum.X86, g => Path.Combine(xAsmPath, g + ".asm"), false,
+                new string[]
+                    {
+                        Path.Combine(Path.Combine(ToolsPath, "Cosmos.Kernel.Plugs"), "Cosmos.Kernel.Plugs.dll"), 
+                        Path.Combine(Path.Combine(ToolsPath, "Cosmos.Sys.Plugs"), "Cosmos.Sys.Plugs.dll")
+                    }, aDebugMode, aDebugComport, xAsmPath);
 			xSW.Stop();
 			Console.WriteLine("IL2CPU Run took " + xSW.Elapsed.ToString());
 

@@ -18,9 +18,9 @@ namespace Cosmos.Sys {
             Halt();
         }
 
+        //Plugged
         public static void Reboot() {
-            //TODO: For now we just call Halt
-            Halt();
+
         }
     }
 }
