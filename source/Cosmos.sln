@@ -90,9 +90,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EsxTest", "Playgrounds\Ralf
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Sys.Plugs", "Cosmos\Cosmos.Sys.Plugs\Cosmos.Sys.Plugs.csproj", "{6110AD07-EB07-4A99-BB73-7A69AF5732F1}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cipher", "Cipher", "{97AC0D14-645F-4BC2-B5A6-A4CA1C6198D4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CipherTest", "CipherTest\CipherTest.csproj", "{1325C57A-B64D-4DE9-9FA0-5C0C5464D85D}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 34
+		SccNumberOfProjects = 35
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -228,6 +232,10 @@ Global
 		SccProjectTopLevelParentUniqueName33 = Cosmos.sln
 		SccProjectName33 = Cosmos/Cosmos.Sys.Plugs
 		SccLocalPath33 = Cosmos\\Cosmos.Sys.Plugs
+		SccProjectUniqueName34 = CipherTest\\CipherTest.csproj
+		SccProjectTopLevelParentUniqueName34 = Cosmos.sln
+		SccProjectName34 = CipherTest
+		SccLocalPath34 = CipherTest
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -364,6 +372,10 @@ Global
 		{6110AD07-EB07-4A99-BB73-7A69AF5732F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6110AD07-EB07-4A99-BB73-7A69AF5732F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6110AD07-EB07-4A99-BB73-7A69AF5732F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1325C57A-B64D-4DE9-9FA0-5C0C5464D85D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1325C57A-B64D-4DE9-9FA0-5C0C5464D85D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1325C57A-B64D-4DE9-9FA0-5C0C5464D85D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1325C57A-B64D-4DE9-9FA0-5C0C5464D85D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -404,8 +416,10 @@ Global
 		{F598F906-8F3B-4EC1-AB8F-A9CBD8EBBE21} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
 		{9AB7CE5D-C1E5-49AD-9CCB-53863FBCDFAF} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
 		{079D6377-44C2-4155-B73A-E634E8F1BF6E} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
+		{97AC0D14-645F-4BC2-B5A6-A4CA1C6198D4} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
 		{1E31A694-81BB-4628-B704-DA190E7E94CA} = {9AB7CE5D-C1E5-49AD-9CCB-53863FBCDFAF}
 		{30057B5B-8BEE-4712-8243-9A42DF8A0C76} = {9AB7CE5D-C1E5-49AD-9CCB-53863FBCDFAF}
 		{86689365-73B3-4AF5-9E63-4BC2D2C4DC85} = {079D6377-44C2-4155-B73A-E634E8F1BF6E}
+		{1325C57A-B64D-4DE9-9FA0-5C0C5464D85D} = {97AC0D14-645F-4BC2-B5A6-A4CA1C6198D4}
 	EndGlobalSection
 EndGlobal
