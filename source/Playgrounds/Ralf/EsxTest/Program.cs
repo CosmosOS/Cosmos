@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading;
 using Cosmos.Build.Windows;
+using Cosmos.Hardware;
+using Cosmos.Kernel;
 using Cosmos.Sys;
 
 namespace EsxTest
@@ -21,11 +23,31 @@ namespace EsxTest
         public static void Init()
         {
             Cosmos.Sys.Boot.Default();
-            Console.WriteLine("Sleep 3000 ESX!");
-            Thread.Sleep(3000);
-            Console.WriteLine("Reboot");
-            Deboot.Reboot();            
+            PCIBus.Init();
+            var deviceIDs = new PCIBus.DeviceIDs();
+            foreach (var device in PCIBus.Devices)
+            {
+                Console.WriteLine("DeviceID: " + device.DeviceID);
+                Console.WriteLine("VendorID: " + device.VendorID);
+                if (deviceIDs.FindVendor(device.VendorID) != null)
+                {
+                    Console.WriteLine("Vendor: " + deviceIDs.FindVendor(device.VendorID));
+                }
+                else
+                {
+                    Console.WriteLine("Vendor: unknown");
+                }
+                Console.WriteLine("Type: " + device.HeaderType);
+                Console.WriteLine("IRQ: " + device.InterruptLine);
+                Console.WriteLine("Classcode: " + device.ClassCode);
+                Console.WriteLine("SubClass:  " + device.SubClass);
+                Console.WriteLine(device.GetClassInfo());
+                Console.ReadLine();
+            }
+            Console.WriteLine("No more devices");
+            Console.WriteLine("Press Enter for Reboot");
+            Console.ReadLine();
+            Deboot.Reboot();
         }
-
     }
 }
