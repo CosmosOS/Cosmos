@@ -30,8 +30,8 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System.Assemblers
 			 * ECX contains the argument size
 			 */
 			new CPU.Label("____DEBUG_FOR_MULTICAST___");
-			new CPUx86.Cli();//DEBUG ONLY
-#warning reenable interupts when issue is fixed!!!
+//            new CPUx86.Cli();//DEBUG ONLY
+//#warning reenable interupts when issue is fixed!!!
 			new CPU.Comment("move address of delgate to eax");
 			new CPUx86.Move("eax", "[" + MethodInfo.Arguments[0].VirtualAddresses[0] + "]");
 			var xGetInvocationListMethod = typeof(MulticastDelegate).GetMethod("GetInvocationList");
@@ -108,8 +108,8 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System.Assemblers
 			new CPUx86.Jump(".BEGIN_OF_LOOP");
 
 			new CPU.Label(".END_OF_INVOKE_");
-			new CPUx86.Sti();
-#warning remove this ^ sti call when issue is fixed!!!
+//            new CPUx86.Sti();
+//#warning remove this ^ sti call when issue is fixed!!!
 			//MethodInfo.Arguments[0].
 			//            new CPUx86.Move("ebx", "[eax + " + (MethodInfo.Arguments[0].TypeInfo.Fields["$$ArgSize$$"].Offset + 12) + "]");
 
