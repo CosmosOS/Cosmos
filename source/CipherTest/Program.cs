@@ -19,32 +19,42 @@ namespace CipherTest
 
 		public static void Times4(int i)
 		{
+			Console.WriteLine("One Argument Test");
 			Console.WriteLine("i=" + i.ToString());
 			int x = i * 4;
-			Console.WriteLine(x);
+			Console.WriteLine("i*4="+x);
 			//return x;
 		}
 
 		public static void Times2(int i,int t)
 		{
+			Console.WriteLine("Two Argument Test");
 			Console.WriteLine("i=" + i.ToString() + ";t=" + t.ToString());
 			int x = i * 2;
-			Console.WriteLine(x);
+			Console.WriteLine("i*2="+x.ToString());
 		}
 
-		public delegate void Test(int i);
+		public delegate void Test2Args(int i,int t);
+		public delegate void Test1Args(int i);
+
+		public delegate void TestNoArgs();
+
+		public delegate int TestReturn();
 
 		public static void Init()
 		{
 			Cosmos.Sys.Boot.Default();
 			Console.WriteLine("Boot complete");
 			Console.WriteLine("Press a key to test delegates!");
-			Test t = Times4;
-			//int x=
-			t(4);
-			//t += Times2;
-			//t(4,3);
-			//Console.WriteLine(x);
+			Test2Args testfor2args = Times2;
+			testfor2args(4, 3);
+			Test1Args testFor1Arg = Times4;
+			testFor1Arg(4);
+			TestNoArgs testNoArgs = () => Console.WriteLine("NoArgs");
+			testNoArgs();
+			TestReturn testForReturnvalues = return2;
+			int i=testForReturnvalues();
+			Console.WriteLine(i);
 			if (Console.ReadLine() == "r")
 			{
 				Console.WriteLine("Rebooting...");
@@ -53,7 +63,7 @@ namespace CipherTest
 			else
 				Cosmos.Sys.Deboot.Halt();
 		}
-		public static int return2(int i)
+		public static int return2()
 		{
 			return 2;
 		}

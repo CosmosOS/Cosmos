@@ -67,17 +67,10 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System.Assemblers
 			new CPUx86.JumpIfZero(".NO_THIS");
 			new CPUx86.Push("edi");
 
-			//new CPU.Comment("we have a this on the stack so we need to be above it when copying");
-			//new CPUx86.Add("esi", "4");
-
 			new CPU.Label(".NO_THIS");
 
 			new CPU.Comment("make space for us to copy the arguments too");
 			new CPUx86.Sub("esp", "ecx");
-			//new CPUx86.Compare("edi", "0");//_target is null
-			//new CPUx86.JumpIfZero(".NO_THIS2");
-
-			//new CPU.Label(".NO_THIS2");
 			new CPU.Comment("move the current delegate to edi");
 			new CPUx86.Move("edi", "[eax]");
 			new CPU.Comment("move the methodptr from that delegate to edi ");
@@ -90,15 +83,12 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System.Assemblers
 			new CPUx86.Add("edi", "4");
 			//we allocated the argsize on the stack once, and it we need to get above the original args
 			new CPU.Comment("we allocated argsize on the stack once");
-			new CPUx86.Add("esi", "ecx");
-			//new CPUx86.Add("esi","ecx");
 			new CPU.Comment("add another to the source location 32 for the Pushad + 16 for the current stack");
-			new CPUx86.Sub("esi", "ecx"); // 32 for the Pushad + 12 for the call stack
-			new CPU.Literal("LEA esi,[esi+52]");
+			new CPUx86.Add("esi", 52);
 			new CPUx86.RepeatMovsb();
 			new CPUx86.Pop("edi");
 			new CPUx86.Call("edi");
-			if (MethodInfo.ReturnSize > 0)
+			if (MethodInfo.ReturnType != typeof(void))
 			{
 				//we return a var
 			}
