@@ -22,20 +22,29 @@ namespace CipherTest
 			Console.WriteLine("One Argument Test");
 			Console.WriteLine("i=" + i.ToString());
 			int x = i * 4;
-			Console.WriteLine("i*4="+x);
+			Console.WriteLine("i*4=" + x);
 			//return x;
 		}
 
-		public static void Times2(int i,int t)
+		public static void Times2(int i, int t)
 		{
 			Console.WriteLine("Two Argument Test");
 			Console.WriteLine("i=" + i.ToString() + ";t=" + t.ToString());
 			int x = i * 2;
-			Console.WriteLine("i*2="+x.ToString());
+			Console.WriteLine("i*2=" + x.ToString());
 		}
 
-		public delegate void Test2Args(int i,int t);
+		public static void VarArgs(params int[] i)
+		{
+			Console.WriteLine("Var Argument Test -- just like one arg");
+			foreach (var item in i)
+				Console.WriteLine("item=" + item.ToString());
+
+		}
+
+		public delegate void Test2Args(int i, int t);
 		public delegate void Test1Args(int i);
+		public delegate void TestVarArgs(params int[] i);
 
 		public delegate void TestNoArgs();
 
@@ -46,14 +55,17 @@ namespace CipherTest
 			Cosmos.Sys.Boot.Default();
 			Console.WriteLine("Boot complete");
 			Console.WriteLine("Press a key to test delegates!");
+			Console.ReadLine();
 			Test2Args testfor2args = Times2;
 			testfor2args(4, 3);
 			Test1Args testFor1Arg = Times4;
 			testFor1Arg(4);
 			TestNoArgs testNoArgs = () => Console.WriteLine("NoArgs");
 			testNoArgs();
+			Console.WriteLine("Test Returning delegates");
+			Console.ReadLine();
 			TestReturn testForReturnvalues = return2;
-			int i=testForReturnvalues();
+			int i = testForReturnvalues();
 			Console.WriteLine(i);
 			if (Console.ReadLine() == "r")
 			{
@@ -65,7 +77,7 @@ namespace CipherTest
 		}
 		public static int return2()
 		{
-			return 2;
+			return 0xdead;
 		}
 		public static int return3(int i)
 		{
