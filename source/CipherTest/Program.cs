@@ -58,6 +58,8 @@ namespace CipherTest
 			Console.ReadLine();
 			Test2Args testfor2args = Times2;
 			testfor2args(4, 3);
+			testfor2args += Times2;
+			testfor2args(4, 3);
 			Test1Args testFor1Arg = Times4;
 			testFor1Arg(4);
 			TestNoArgs testNoArgs = () => Console.WriteLine("NoArgs");
@@ -66,6 +68,9 @@ namespace CipherTest
 			Console.ReadLine();
 			TestReturn testForReturnvalues = return2;
 			int i = testForReturnvalues();
+			Console.WriteLine(i);
+			testForReturnvalues += return3;
+			i = testForReturnvalues();
 			Console.WriteLine(i);
 			if (Console.ReadLine() == "r")
 			{
@@ -79,7 +84,7 @@ namespace CipherTest
 		{
 			return 0xdead;
 		}
-		public static int return3(int i)
+		public static int return3()
 		{
 			return 3;
 		}

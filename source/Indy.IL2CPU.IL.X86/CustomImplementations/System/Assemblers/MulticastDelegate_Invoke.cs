@@ -30,8 +30,8 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System.Assemblers
 			 * ECX contains the argument size
 			 */
 			new CPU.Label("____DEBUG_FOR_MULTICAST___");
-//            new CPUx86.Cli();//DEBUG ONLY
-//#warning reenable interupts when issue is fixed!!!
+			new CPUx86.Cli();//DEBUG ONLY
+#warning reenable interupts when issue is fixed!!!
 			new CPU.Comment("move address of delgate to eax");
 			new CPUx86.Move("eax", "[" + MethodInfo.Arguments[0].VirtualAddresses[0] + "]");
 			var xGetInvocationListMethod = typeof(MulticastDelegate).GetMethod("GetInvocationList");
@@ -68,7 +68,6 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System.Assemblers
 			new CPUx86.Move("edi", "[" + MethodInfo.Arguments[0].VirtualAddresses[0] + "]");
 			new CPU.Comment("edi = ptr to delegate object should be a pointer to the delgates context ie (this) for the methods ");
 			new CPUx86.Move("edi", "[edi + " + (MethodInfo.Arguments[0].TypeInfo.Fields["System.Object System.Delegate._target"].Offset + 12) + "]");//i really dont get the +12
-			new CPU.Comment("if this == null");
 			new CPUx86.Compare("edi", "0");
 			new CPUx86.JumpIfZero(".NO_THIS");
 			new CPUx86.Push("edi");
@@ -102,6 +101,15 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System.Assemblers
 			//new CPUx86.Move(Registers.EAX, "[esp]");
 			//new CPUx86.Move("[esp+0x20]", Registers.EAX);
 			//new CPU.Label(".getReturn");
+			new CPU.Comment("edi = ptr to delegate object");
+			new CPUx86.Move("edi", "[" + MethodInfo.Arguments[0].VirtualAddresses[0] + "]");
+			new CPU.Comment("edi = ptr to delegate object should be a pointer to the delgates context ie (this) for the methods ");
+			new CPUx86.Move("edi", "[edi + " + (MethodInfo.Arguments[0].TypeInfo.Fields["System.Object System.Delegate._target"].Offset + 12) + "]");//i really dont get the +12
+			new CPUx86.Compare("edi", "0");
+			new CPUx86.JumpIfZero(".noTHIStoPop");
+			new CPUx86.Popd("edi");
+			new CPUx86.Move("[esp]", "edi");
+			new CPU.Label(".noTHIStoPop");
 			new CPUx86.Popad();
 			new CPUx86.Inc("edx");
 			new CPUx86.Add("eax", 4);
@@ -120,8 +128,8 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System.Assemblers
 			new CPUx86.Pushd(Registers.EDX);//ebp
 			new CPUx86.Move("[esp+12]", Registers.EDI);
 			new CPU.Label(".noReturn");
-//            new CPUx86.Sti();
-//#warning remove this ^ sti call when issue is fixed!!!
+			new CPUx86.Sti();
+#warning remove this ^ sti call when issue is fixed!!!
 			//MethodInfo.Arguments[0].
 			//            new CPUx86.Move("ebx", "[eax + " + (MethodInfo.Arguments[0].TypeInfo.Fields["$$ArgSize$$"].Offset + 12) + "]");
 
