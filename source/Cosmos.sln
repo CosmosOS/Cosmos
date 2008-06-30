@@ -94,9 +94,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cipher", "Cipher", "{97AC0D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CipherTest", "CipherTest\CipherTest.csproj", "{1325C57A-B64D-4DE9-9FA0-5C0C5464D85D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCIHelper", "Playgrounds\Ralf\PCIHelper\PCIHelper.csproj", "{D5FAEE65-F23D-40A4-9F03-1928A3C3F81B}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 35
+		SccNumberOfProjects = 36
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -236,6 +238,10 @@ Global
 		SccProjectTopLevelParentUniqueName34 = Cosmos.sln
 		SccProjectName34 = CipherTest
 		SccLocalPath34 = CipherTest
+		SccProjectUniqueName35 = Playgrounds\\Ralf\\PCIHelper\\PCIHelper.csproj
+		SccProjectTopLevelParentUniqueName35 = Cosmos.sln
+		SccProjectName35 = Playgrounds/Ralf/PCIHelper
+		SccLocalPath35 = Playgrounds\\Ralf\\PCIHelper
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -376,6 +382,10 @@ Global
 		{1325C57A-B64D-4DE9-9FA0-5C0C5464D85D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1325C57A-B64D-4DE9-9FA0-5C0C5464D85D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1325C57A-B64D-4DE9-9FA0-5C0C5464D85D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5FAEE65-F23D-40A4-9F03-1928A3C3F81B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5FAEE65-F23D-40A4-9F03-1928A3C3F81B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5FAEE65-F23D-40A4-9F03-1928A3C3F81B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5FAEE65-F23D-40A4-9F03-1928A3C3F81B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -420,6 +430,7 @@ Global
 		{1E31A694-81BB-4628-B704-DA190E7E94CA} = {9AB7CE5D-C1E5-49AD-9CCB-53863FBCDFAF}
 		{30057B5B-8BEE-4712-8243-9A42DF8A0C76} = {9AB7CE5D-C1E5-49AD-9CCB-53863FBCDFAF}
 		{86689365-73B3-4AF5-9E63-4BC2D2C4DC85} = {079D6377-44C2-4155-B73A-E634E8F1BF6E}
+		{D5FAEE65-F23D-40A4-9F03-1928A3C3F81B} = {079D6377-44C2-4155-B73A-E634E8F1BF6E}
 		{1325C57A-B64D-4DE9-9FA0-5C0C5464D85D} = {97AC0D14-645F-4BC2-B5A6-A4CA1C6198D4}
 	EndGlobalSection
 EndGlobal

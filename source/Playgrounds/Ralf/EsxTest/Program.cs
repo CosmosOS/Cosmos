@@ -27,8 +27,6 @@ namespace EsxTest
             var deviceIDs = new PCIBus.DeviceIDs();
             foreach (var device in PCIBus.Devices)
             {
-                Console.WriteLine("DeviceID: " + device.DeviceID);
-                Console.WriteLine("VendorID: " + device.VendorID);
                 if (deviceIDs.FindVendor(device.VendorID) != null)
                 {
                     Console.WriteLine("Vendor: " + deviceIDs.FindVendor(device.VendorID));
@@ -37,6 +35,8 @@ namespace EsxTest
                 {
                     Console.WriteLine("Vendor: unknown");
                 }
+                Console.WriteLine("VendorID: 0x" + device.VendorID.ToHex(4));
+                Console.WriteLine("DeviceID: 0x" + device.DeviceID.ToHex(4));
                 Console.WriteLine("Type: " + device.HeaderType);
                 Console.WriteLine("IRQ: " + device.InterruptLine);
                 Console.WriteLine("Classcode: " + device.ClassCode);
