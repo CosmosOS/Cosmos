@@ -27,12 +27,13 @@ namespace FrodeTest.Test
             ipv4Packet.FragmentOffset = 0;
             ipv4Packet.Protocol = IPv4Packet.Protocols.TCP;
             List<byte> data = new List<byte>();
-            data.Add(0xFF);
-            data.Add(0xFE);
-            data.Add(0xFD);
-            data.Add(0xFC);
-            data.Add(0xFB);
-            data.Add(0xFA);
+            //data.Add(0xFF);
+            //data.Add(0xFE);
+            //data.Add(0xFD);
+            //data.Add(0xFC);
+            //data.Add(0xFB);
+            //data.Add(0xFA);
+            data.Add(0x31); //the number 1
             ipv4Packet.Data = data;
             
             ipv4Packet.HeaderLength = ipv4Packet.CalculateHeaderLength();
