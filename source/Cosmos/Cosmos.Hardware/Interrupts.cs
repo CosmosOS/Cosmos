@@ -103,6 +103,19 @@ namespace Cosmos.Hardware {
             PIC.SignalPrimary();
         }
 
+        //IRQ 5 - (Added for ES1370 AudioPCI)
+        static public InterruptDelegate IRQ05;
+        public static unsafe void HandleInterrupt_25(InterruptContext* aContext)
+        {
+            if (IRQ05 != null)
+            {
+                IRQ05();
+            }
+
+            PIC.SignalSecondary();
+        }
+
+
         //IRQ 11 - (Added for RTL8139 network card)
         static public InterruptDelegate IRQ11;
         public static unsafe void HandleInterrupt_2B(InterruptContext* aContext)
@@ -257,6 +270,7 @@ namespace Cosmos.Hardware {
 					HandleInterrupt_12(null);
                     HandleInterrupt_20(null);
                     HandleInterrupt_21(null);
+                    HandleInterrupt_25(null);
                     HandleInterrupt_2B(null);
                     HandleInterrupt_2E(null);
                     HandleInterrupt_2F(null);

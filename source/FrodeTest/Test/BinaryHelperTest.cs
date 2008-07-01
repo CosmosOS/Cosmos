@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Cosmos.Hardware.Network.Devices.RTL8139;
+using Cosmos.Hardware;
 
 namespace FrodeTest.Test
 {

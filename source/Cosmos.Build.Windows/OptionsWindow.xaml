@@ -6,14 +6,14 @@
 	WindowStartupLocation="CenterScreen"
 	Width="600"
 	Icon="/Cosmos.Build.Windows;component/Cosmos.ico">
-	<FlowDocumentScrollViewer>
-		<FlowDocument
+    <FlowDocumentScrollViewer>
+        <FlowDocument
 			Name="RootDoc">
-			<BlockUIContainer>
-				<Image
+            <BlockUIContainer>
+                <Image
 					Source="/Cosmos.Build.Windows;component/Logo-1.png"
 					Width="150" />
-			</BlockUIContainer>
+            </BlockUIContainer>
             <Paragraph Name="paraBuildButtons"
 				TextAlignment="Right">
                 <InlineUIContainer>
@@ -27,79 +27,80 @@
                 </InlineUIContainer>
             </Paragraph>
             <Paragraph>
-				Build type:
-				<LineBreak />
-				<InlineUIContainer>
-					<WrapPanel
+                Build type:
+                <LineBreak />
+                <InlineUIContainer>
+                    <WrapPanel
 						Margin="20, 0">
-						<Label>Emulator:</Label>
-						<RadioButton
+                        <Label>Emulator:</Label>
+                        <RadioButton
 							Name="rdioQEMU"
 							GroupName="Target">_QEMU</RadioButton>
-						<RadioButton
+                        <RadioButton
 							Name="rdioVMWare"
 							GroupName="Target"
 							Margin="15, 0">VM_Ware</RadioButton>
-						<RadioButton
+                        <RadioButton
 							Name="rdioVPC"
 							GroupName="Target"
 							Margin="15, 0">Virtual _PC</RadioButton>
-					</WrapPanel>
-				</InlineUIContainer>
-				<LineBreak />
-				<InlineUIContainer>
-					<WrapPanel
+                    </WrapPanel>
+                </InlineUIContainer>
+                <LineBreak />
+                <InlineUIContainer>
+                    <WrapPanel
 						Margin="20, 0">
-						<Label>Hardware:</Label>
-						<RadioButton
+                        <Label>Hardware:</Label>
+                        <RadioButton
 							GroupName="Target"
 							Name="rdioISO">_ISO</RadioButton>
-						<RadioButton
+                        <RadioButton
 							GroupName="Target"
 							Name="rdioPXE"
 							Margin="15, 0">_Network (PXE)</RadioButton>
-						<RadioButton
+                        <RadioButton
 							GroupName="Target"
 							Name="rdioUSB"
 							Margin="15, 0">_USB Device</RadioButton>
-					</WrapPanel>
-				</InlineUIContainer>
-			</Paragraph>
-			<Paragraph Name="paraBuildPath">Current build path is:
-				<LineBreak />
-				<Span Name="spanBuildPath"></Span>
-			</Paragraph>
-			<Paragraph
+                    </WrapPanel>
+                </InlineUIContainer>
+            </Paragraph>
+            <Paragraph Name="paraBuildPath">Current build path is:
+                <LineBreak />
+                <Span Name="spanBuildPath"></Span>
+            </Paragraph>
+            <Paragraph
 				Name="paraDebugOptions">
-				<Bold>Debug Options</Bold>
-				<LineBreak />
+                <Bold>Debug Options</Bold>
+                <LineBreak />
                 Mode:
-				<InlineUIContainer>
-                        <ComboBox Name="cmboDebugMode"/>
+                <InlineUIContainer>
+                    <ComboBox Name="cmboDebugMode"/>
                 </InlineUIContainer>
                 <Span Name="spanDebugOptionsPort">
                     Port:
                     <InlineUIContainer>
                         <ComboBox Name="cmboDebugPort"/>
                     </InlineUIContainer>
-            </Span>
+                </Span>
             </Paragraph>
             <Paragraph
 				Name="paraQEMUOptions">
-				<Bold>QEMU Options</Bold>
-				<LineBreak />
-				<InlineUIContainer>
-					<StackPanel>
-						<CheckBox
+                <Bold>QEMU Options</Bold>
+                <LineBreak />
+                <InlineUIContainer>
+                    <StackPanel>
+                        <CheckBox
 							Name="chckQEMUUseGDB"
 							IsChecked="False">Use GDB Debugger</CheckBox>
-						<CheckBox
+                        <CheckBox
 							Name="chckQEMUUseHD"
 							IsChecked="False">Create hard disk image</CheckBox>
 
-					</StackPanel>
-				</InlineUIContainer>
-                <LineBreak/><LineBreak />
+                    </StackPanel>
+                </InlineUIContainer>
+                <LineBreak/>
+                <LineBreak />
                 <Bold>Network options</Bold>
                 <LineBreak />
                 Network card:
@@ -108,56 +109,63 @@
                 <InlineUIContainer>
                     <CheckBox Name="chckQEMUUseNetworkTAP" IsChecked="False">Enable network TAP (requires TAP named CosmosTAP)</CheckBox>
                 </InlineUIContainer>
-			</Paragraph>
-			<Paragraph
+                <LineBreak/>
+                <LineBreak />
+                <Bold>Audio options</Bold>
+                <LineBreak />
+                Audio card:
+                <ComboBox Name="cmboAudioCards" Width="200" SelectedIndex="1"/>
+                <LineBreak />
+            </Paragraph>
+            <Paragraph
 				Name="paraVMWareOptions">
-				    <Bold>VMWare Options</Bold>
-				<LineBreak />
-				<InlineUIContainer>
-					<StackPanel Orientation="Horizontal">
-						<RadioButton
+                <Bold>VMWare Options</Bold>
+                <LineBreak />
+                <InlineUIContainer>
+                    <StackPanel Orientation="Horizontal">
+                        <RadioButton
 							Name="rdVMWareWorkstation"
 							GroupName="VMWareVersion"
 							IsChecked="True">Workstation</RadioButton>
-						<RadioButton
+                        <RadioButton
 							Name="rdVMWareServer"
                             Margin="10, 0, 0, 0"
 							GroupName="VMWareVersion">Server</RadioButton>
-					</StackPanel>
-				</InlineUIContainer>
-			</Paragraph>
-			<Paragraph
+                    </StackPanel>
+                </InlineUIContainer>
+            </Paragraph>
+            <Paragraph
 				Name="paraVPCOptions">
-				<Bold>Virtual PC Options</Bold>
-				<LineBreak />
-				No options yet.
-			</Paragraph>
-			<Paragraph
+                <Bold>Virtual PC Options</Bold>
+                <LineBreak />
+                No options yet.
+            </Paragraph>
+            <Paragraph
 				Name="paraISOOptions">
-				<Bold>ISO Options</Bold>
-				<LineBreak /> ISO file will be output as:
-				<LineBreak />
-				<Span
+                <Bold>ISO Options</Bold>
+                <LineBreak /> ISO file will be output as:
+                <LineBreak />
+                <Span
 					Name="spanISOPath"></Span>
-			</Paragraph>
-			<Paragraph
+            </Paragraph>
+            <Paragraph
 				Name="paraPXEOptions">
-				<Bold>PXE Options</Bold>
-				<LineBreak /> After building, start up another PC with network boot enabled and Cosmos will boot on to it automatically.
-			</Paragraph>
-			<Paragraph
+                <Bold>PXE Options</Bold>
+                <LineBreak /> After building, start up another PC with network boot enabled and Cosmos will boot on to it automatically.
+            </Paragraph>
+            <Paragraph
 				Name="paraUSBOptions">
-				<Bold>USB Options</Bold>
-				<LineBreak /> Please choose a USB drive or stick that is formatted as FAT or FAT32. Note that selecting this device will overwrite the Master Boot Record (MBR) on the USB drive. Because of this take care to select the proper device. After a succesful build, you can then use this device to boot a physical machine. You may need to select the BIOS boot menu, use a multi boot utility, or change the BIOS boot sequence.
-				<LineBreak /> Only removable drives formatted as FAT or FAT32 will be listed. If you do not see your device, check its format.
-				<LineBreak /> USB Device:
-				<InlineUIContainer>
-					<ComboBox
+                <Bold>USB Options</Bold>
+                <LineBreak /> Please choose a USB drive or stick that is formatted as FAT or FAT32. Note that selecting this device will overwrite the Master Boot Record (MBR) on the USB drive. Because of this take care to select the proper device. After a succesful build, you can then use this device to boot a physical machine. You may need to select the BIOS boot menu, use a multi boot utility, or change the BIOS boot sequence.
+                <LineBreak /> Only removable drives formatted as FAT or FAT32 will be listed. If you do not see your device, check its format.
+                <LineBreak /> USB Device:
+                <InlineUIContainer>
+                    <ComboBox
 						Name="cmboUSBDevice"
 						Width="100">
-					</ComboBox>
-				</InlineUIContainer>
-			</Paragraph>
+                    </ComboBox>
+                </InlineUIContainer>
+            </Paragraph>
             <Paragraph
 				Name="paraMiscOptions">
                 <Bold>Miscellaneous Options</Bold>
@@ -171,6 +179,6 @@
                     </StackPanel>
                 </InlineUIContainer>
             </Paragraph>
-		</FlowDocument>
-	</FlowDocumentScrollViewer>
+        </FlowDocument>
+    </FlowDocumentScrollViewer>
 </Window>
