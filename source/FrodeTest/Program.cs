@@ -26,7 +26,8 @@ namespace FrodeTest
 
             //Test
             Console.WriteLine("---- RUNNING PREDEFINED TESTS ----");
-            Test.StringTest.RunTest();
+            //Test.StringTest.RunTest();
+            //Test.IPv4AddressTest.RunTest();
             //Test.BasicTest.RunTest();
             //Test.SwitchTest.RunTest();
             

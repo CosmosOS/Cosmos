@@ -18,7 +18,6 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
         }
 
         //TODO: Uncomment - doesn't work in Cosmos yet. FL, 08.apr'08.
-        /*
         public static IPv4Address Parse(string adr)
         {
             
@@ -35,7 +34,7 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
             {
                 return null;
             }
-        }*/
+        }
 
         public bool IsLoopbackAddress()
         {

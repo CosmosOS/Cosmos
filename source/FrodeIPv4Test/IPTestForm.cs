@@ -21,23 +21,32 @@ namespace FrodeIPv4Test
 
         private void button1_Click(object sender, EventArgs e)
         {
+            bytesTextBox.Text = "";
+
             IPv4Packet packet = new IPv4Packet();
 
-            packet.DestinationAddress = new IPv4Address(172, 28, 6, 1); //TODO: add parse
-            packet.SourceAddress = new IPv4Address(172, 28, 6, 6);
-            packet.Identification = 0;
+            //packet.DestinationAddress = new IPv4Address(172, 28, 6, 1); //TODO: add parse
+            packet.DestinationAddress = IPv4Address.Parse(destinationTextBox.Text);
+            packet.SourceAddress = IPv4Address.Parse(sourceTextBox.Text);
+            packet.Identification = ushort.Parse(identificationTextBox.Text);
             packet.FragmentFlags = IPv4Packet.Fragmentation.DoNotFragment;
-            packet.FragmentOffset = 0;
+            packet.FragmentOffset = ushort.Parse(fragmentOffsetTextBox.Text);
             packet.Protocol = IPv4Packet.Protocols.TCP;
 
             List<byte> data = new List<byte>();
-            data.Add(0xFF);
-            data.Add(0xFE);
-            data.Add(0xFD);
-            data.Add(0xFC);
-            data.Add(0xFB);
-            data.Add(0xFA);
+            //data.Add(0xFF);
+            //data.Add(0xFE);
+            //data.Add(0xFD);
+            //data.Add(0xFC);
+            //data.Add(0xFB);
+            //data.Add(0xFA);
+            //packet.Data = data;
+
+            foreach (char c in dataTextBox.Text.ToCharArray())
+                data.Add((byte)c);
+
             packet.Data = data;
+            
 
             packet.HeaderLength = packet.CalculateHeaderLength();
             packet.TotalLength = packet.CalculateTotalLength();
