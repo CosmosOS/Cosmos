@@ -105,7 +105,7 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
         }
 
         /// <summary>
-        /// Internet Header Length (IHL) telling the number of 32-bit words in the header.
+        /// Internet Header Length (IHL) tells the number of 32-bit words in the header.
         /// Minimum length is 5 words. Maximum is 15 words when Options are set.
         /// </summary>
         /// <returns></returns>
@@ -148,6 +148,7 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
             UInt32 field2 = (UInt32)((this.Identification << 8) | ((byte)(this.FragmentFlags)) << 21 | (this.FragmentOffset << 24));
             Console.WriteLine("Field2: " + field2.ToBinary(32));
             //fields.Add((UInt32)HostToNetworkOrder((int)field2));
+            fields.Add(field2);
 
             UInt32 field3 = (UInt32)((this.TimeToLive << 0) | (((byte)(this.Protocol)) << 8) | (UInt16)(this.HeaderChecksum << 16));
             Console.WriteLine("Field3: " + field3.ToBinary(32));

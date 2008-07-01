@@ -8,6 +8,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
     /// The packethead consists of two bytes (i.e. 16 bits).
     /// A PacketHead contains information about a network Packet, and its transfer.
     /// </summary>
+    [Obsolete("Use Ethernet2Frame instead.")]
     public class PacketHeader
     {
         private UInt16 head;

@@ -5,6 +5,7 @@ using Cosmos.Hardware.Network;
 using Cosmos.Hardware.PC.Bus;
 using Cosmos.Hardware;
 using Cosmos.Kernel;
+using Cosmos.Hardware.Network.TCPIPModel.PhysicalLayer.Ethernet2;
 
 namespace Cosmos.Hardware.Network.Devices.RTL8139
 {
@@ -346,6 +347,11 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             Register.TransmitStatusDescriptor.IncrementTSDescriptor();
 
             return true;
+        }
+
+        public bool TransmitFrame(Ethernet2Frame frame)
+        {
+            return this.TransmitBytes(frame.RawBytes());
         }
 
         #endregion

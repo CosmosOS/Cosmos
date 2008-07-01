@@ -8,6 +8,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
     /// A network Packet used when transferring data over a network. 
     /// Consists of a body (with the data) and a head (with info about the packet)
     /// </summary>
+    [Obsolete("Use Ethernet2Frame instead.")]
     public class Packet
     {
         private PacketHeader head;

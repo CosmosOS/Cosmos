@@ -39,18 +39,7 @@ namespace FrodeTest.Test
             ipv4Packet.TotalLength = ipv4Packet.CalculateTotalLength();
             ipv4Packet.HeaderChecksum = ipv4Packet.CalculateHeaderChecksum();
 
-            //UInt16 chk = ipv4Packet.CalculateHeaderChecksum();
-            //Console.WriteLine("Checksum: " + ipv4Packet.CalculateHeaderChecksum());
-            //Console.WriteLine("Saved checksum: " + chk);
-
-            //if (ipv4Packet.HeaderChecksum == 0)
-            //    Console.WriteLine("IPv4 Packet Header Checksum turned off");
-            //else if (ipv4Packet.HeaderChecksum != chk)
-            //{
-            //    Console.WriteLine("IPv4 Packet Header Checksum failed!");
-            //    Console.WriteLine("Expected " + ipv4Packet.HeaderChecksum.ToHex() + " but found " + chk.ToHex());
-            //}
-
+            //Write some debug info to screen
             Console.WriteLine("IPv4 Packet data:");
             foreach (byte b in ipv4Packet.RawBytes())
                 Console.Write(b.ToHex(2) + ":");
@@ -71,28 +60,31 @@ namespace FrodeTest.Test
             nic.InitializeDriver();
 
             Ethernet2Frame frame = new Ethernet2Frame();
-            byte[] mDest = new byte[6];
-            mDest[0] = 1;
-            mDest[1] = 0;
-            mDest[2] = 94;
-            mDest[3] = 127;
-            mDest[4] = 255;
-            mDest[5] = 250;
-            MACAddress macDest = new MACAddress(mDest);
-            frame.Destination = macDest;
+            //byte[] mDest = new byte[6];
+            //mDest[0] = 1;
+            //mDest[1] = 0;
+            //mDest[2] = 94;
+            //mDest[3] = 127;
+            //mDest[4] = 255;
+            //mDest[5] = 250;
+            //MACAddress macDest = new MACAddress(mDest);
+            //frame.Destination = macDest;
+            frame.Destination = nic.MACAddress;
 
-            byte[] mSrc = new byte[6];
-            mSrc[0] = 0;
-            mSrc[1] = 255;
-            mSrc[2] = 99;
-            mSrc[3] = 8;
-            mSrc[4] = 252;
-            mSrc[5] = 226;
-            MACAddress macSrc = new MACAddress(mSrc);
-            frame.Source = macSrc;
+            //byte[] mSrc = new byte[6];
+            //mSrc[0] = 0;
+            //mSrc[1] = 255;
+            //mSrc[2] = 99;
+            //mSrc[3] = 8;
+            //mSrc[4] = 252;
+            //mSrc[5] = 226;
+            //MACAddress macSrc = new MACAddress(mSrc);
+            //frame.Source = macSrc;
+            frame.Source = nic.MACAddress;
             frame.Payload = ipv4Packet.RawBytes();
 
-            nic.TransmitBytes(frame.RawBytes());
+            //nic.TransmitBytes(frame.RawBytes());
+            nic.TransmitFrame(frame);
 
         }
     }

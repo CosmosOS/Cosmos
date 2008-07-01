@@ -20,6 +20,8 @@ namespace FrodeTest.Shell
 
             if (command.Equals("exit") || command.Equals("test"))
                 return;
+            else if (command.Equals("reboot"))
+                Cosmos.Sys.Deboot.Reboot();
             else if (command.Equals("ether"))
             {
                 Test.Ethernet2FrameTest.RunTest();
@@ -58,22 +60,22 @@ namespace FrodeTest.Shell
                     Console.WriteLine("Unable to find RTL8139 network card!");
                 }
             }
-            else if (command.Equals("send"))
-            {
-                if (nic == null)
-                {
-                    Console.WriteLine("Enable NIC with command 'load' first");
-                }
-                else
-                {
-                    var head = new PacketHeader(0xFF);
-                    byte[] data = FrodeTest.Test.Mock.FakeBroadcastPacket.GetFakePacket();
-                    var packet = new Packet(head, data);
-                    //nic.Transmit(packet);
-                    nic.TransmitBytes(data); //TODO: Wrap data in physical packet with header.
-                    //nic.TransmitBytes(data);
-                }
-            }
+            //else if (command.Equals("send"))
+            //{
+            //    if (nic == null)
+            //    {
+            //        Console.WriteLine("Enable NIC with command 'load' first");
+            //    }
+            //    else
+            //    {
+            //        var head = new PacketHeader(0xFF);
+            //        byte[] data = FrodeTest.Test.Mock.FakeBroadcastPacket.GetFakePacket();
+            //        var packet = new Packet(head, data);
+            //        //nic.Transmit(packet);
+            //        nic.TransmitBytes(data); //TODO: Wrap data in physical packet with header.
+            //        //nic.TransmitBytes(data);
+            //    }
+            //}
             else if (command.Equals("read"))
             {
                 if (nic == null)
@@ -131,10 +133,15 @@ namespace FrodeTest.Shell
             }
             else if (command.Equals("reset"))
             {
-                //nic.TimerCount = 1;
-                nic.SoftReset();
-                nic.InitializeDriver();
-                Console.WriteLine("NIC has been reset");
+                if (nic == null)
+                    Console.WriteLine("Network card not initialized yet.");
+                else
+                {
+                    //nic.TimerCount = 1;
+                    nic.SoftReset();
+                    nic.InitializeDriver();
+                    Console.WriteLine("NIC has been reset");
+                }
             }
             else if (command.Equals("disable"))
             {
@@ -171,7 +178,7 @@ namespace FrodeTest.Shell
 
             else if (command.Equals("help"))
             {
-                Console.WriteLine("Valid commands: info, load, test, send, read, mac, ip, dump, prom, loop, crash, notimpl, enable, disable, reset or exit");
+                Console.WriteLine("Valid commands: info, load, test, send, read, mac, ip, dump, prom, loop, crash, notimpl, enable, disable, reset, reboot or exit");
             }
             else if (command.Equals(string.Empty))
             {
