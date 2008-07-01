@@ -168,7 +168,7 @@ namespace Indy.IL2CPU.IL.X86
 							new CPU.Label(".SetArgSize");
 							aAssembler.StackContents.Push(new StackContent(4));
 							Stfld.Stfld(aAssembler, aMethodInfo.TypeInfo, aMethodInfo.TypeInfo.Fields["$$ArgSize$$"]);
-							if (xDelegateMethodInfo.ReturnType != typeof(void)&&xDelegateMethodInfo.Method.Name=="Invoke")
+							if (xDelegateMethodInfo.ReturnType != typeof(void))
 							{
 								Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
 								new CPUx86.Pushd("1");

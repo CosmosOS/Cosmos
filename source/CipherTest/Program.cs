@@ -8,6 +8,28 @@ namespace CipherTest
 {
 	class Program
 	{
+		public Program()
+		{
+			
+		}
+
+		public Program(int i)
+		{
+			delegatevar = i;
+		}
+
+		private int delegatevar = 0;
+
+		public int InstanceReturn()
+		{
+			return delegatevar;
+		}
+
+		public void InstancePrint()
+		{
+			Console.WriteLine(delegatevar);
+		}
+
 		[STAThread]
 		static void Main(string[] args)
 		{
@@ -64,12 +86,19 @@ namespace CipherTest
 			testFor1Arg(4);
 			TestNoArgs testNoArgs = () => Console.WriteLine("NoArgs");
 			testNoArgs();
+			var p = new Program(0xfeed);
+			Console.WriteLine("Instance call");
+			testNoArgs = p.InstancePrint;
 			Console.WriteLine("Test Returning delegates");
 			Console.ReadLine();
 			TestReturn testForReturnvalues = return2;
 			int i = testForReturnvalues();
 			Console.WriteLine(i);
 			testForReturnvalues += return3;
+			i = testForReturnvalues();
+			Console.WriteLine(i);
+			Console.WriteLine("Instace Return");
+			testForReturnvalues = p.InstanceReturn;
 			i = testForReturnvalues();
 			Console.WriteLine(i);
 			if (Console.ReadLine() == "r")
