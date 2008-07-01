@@ -35,6 +35,14 @@ namespace EsxTest
                 {
                     Console.WriteLine("Vendor: unknown");
                 }
+                if (deviceIDs.FindDevice(device.VendorID,device.DeviceID) != null)
+                {
+                    Console.WriteLine("Device: " + deviceIDs.FindDevice(device.VendorID, device.DeviceID));
+                }
+                else
+                {
+                    Console.WriteLine("Device: unknown 0x" + device.VendorID.ToHex(4)+device.DeviceID.ToHex(4));
+                }
                 Console.WriteLine("VendorID: 0x" + device.VendorID.ToHex(4));
                 Console.WriteLine("DeviceID: 0x" + device.DeviceID.ToHex(4));
                 Console.WriteLine("Type: " + device.HeaderType);
