@@ -89,6 +89,7 @@ namespace CipherTest
 			var p = new Program(0xfeed);
 			Console.WriteLine("Instance call");
 			testNoArgs = p.InstancePrint;
+			testNoArgs();
 			Console.WriteLine("Test Returning delegates");
 			Console.ReadLine();
 			TestReturn testForReturnvalues = return2;
