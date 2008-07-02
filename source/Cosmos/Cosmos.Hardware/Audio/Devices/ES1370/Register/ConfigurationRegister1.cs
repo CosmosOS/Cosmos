@@ -84,6 +84,7 @@ namespace Cosmos.Hardware.Audio.Devices.ES1370.Register
         [Flags]
         public enum BitPosition : byte
         {
+            /*
             PMEN = 0,   //Power Management Enable
             VPD = 1,    //Enable Vital Product Data
             IOMAP = 2,  //I/O Mapping
@@ -92,11 +93,13 @@ namespace Cosmos.Hardware.Audio.Devices.ES1370.Register
             DVRLOAD = 5,//Driver Load
             LEDS0 = 6,
             LEDS1 = 7
+             */
         }
 
         [Flags]
         public enum BitValue : uint
         {
+            /*
             PMEN = BinaryHelper.BitPos.BIT0,
             VPD = BinaryHelper.BitPos.BIT1,
             IOMAP = BinaryHelper.BitPos.BIT2,
@@ -105,6 +108,7 @@ namespace Cosmos.Hardware.Audio.Devices.ES1370.Register
             DVRLOAD = BinaryHelper.BitPos.BIT5,
             LEDS0 = BinaryHelper.BitPos.BIT6,
             LEDS1 = BinaryHelper.BitPos.BIT7
+             */
         }
 
         #endregion

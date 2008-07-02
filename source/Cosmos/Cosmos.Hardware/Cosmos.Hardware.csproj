@@ -56,7 +56,6 @@
     <Compile Include="Audio\Devices\ES1370\Register\InterruptMaskRegister.cs" />
     <Compile Include="Audio\Devices\ES1370\Register\InterruptStatusRegister.cs" />
     <Compile Include="Audio\Devices\ES1370\Register\MainRegister.cs" />
-    <Compile Include="Audio\Devices\ES1370\Register\MediaStatusRegister.cs" />
     <Compile Include="BlockDevice.cs" />
     <Compile Include="USB\USBHost.cs" />
     <Compile Include="USB\USBHostOHCI.cs" />
