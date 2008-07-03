@@ -3,32 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Cosmos.Hardware;
+using Cosmos.Hardware.Audio.Devices.ES1370.Register;
 namespace Cosmos.Hardware.Audio.Devices.ES1370
 {
     /// <summary>
     /// Driver for the soundcard Ensoniq 1370 AudioPCI (testing for QEMU audio emulation)
     /// It should work also in Ensoniq 1371 all revision.
     /// </summary>
-    public class ENS1370
+    public class ES1370
     {
         #region Construction
 
         private PCIDevice pciCard;
         private Cosmos.Kernel.MemoryAddressSpace mem;
-        //private Register.ValueTypeRegisters valueReg;
-        //private Register.InterruptMaskRegister imr;
-        //private Register.InterruptStatusRegister isr;
 
-        public ENS1370(PCIDevice device)
+        public ES1370(PCIDevice device)
         {
             if (device == null)
-                throw new ArgumentException("PCI Device is null. Unable to get ENS1370 card");
+                throw new ArgumentException("PCI Device is null. Unable to get ES1370 card");
 
             pciCard = device;
             mem = device.GetAddressSpace(1) as Cosmos.Kernel.MemoryAddressSpace;
-            //valueReg = Register.ValueTypeRegisters.Load(mem);
-            //imr = Register.InterruptMaskRegister.Load(mem);
-            //isr = Register.InterruptStatusRegister.Load(mem);
         }
         #endregion
 
@@ -36,15 +31,15 @@ namespace Cosmos.Hardware.Audio.Devices.ES1370
         /// Retrieve all Ensoniq AudioPCI 1370 cards found on computer.
         /// </summary>
         /// <returns></returns>
-        public static List<ENS1370> FindAll()
+        public static List<ES1370> FindAll()
         {
-            List<ENS1370> found = new List<ENS1370>();
+            List<ES1370> found = new List<ES1370>();
 
             foreach (PCIDevice device in Cosmos.Hardware.PCIBus.Devices)
             {
                 Console.WriteLine("VendorID: " + device.VendorID + " - DeviceID: " + device.DeviceID);
                 if (device.VendorID == 0x10EC && device.DeviceID == 0x8139)
-                    found.Add(new ENS1370(device));
+                    found.Add(new ES1370(device));
             }
 
             return found;
@@ -52,34 +47,31 @@ namespace Cosmos.Hardware.Audio.Devices.ES1370
         #region Power and Initilization
         public void InitializeDriver()
         {
+            //Enable IRQ Interrupt
+            InitIRQMaskRegister();
+            Cosmos.Hardware.Interrupts.IRQ05 = new Cosmos.Hardware.Interrupts.InterruptDelegate(this.HandleNetworkInterrupt);
         }
         
         public bool Enable()
         {
-            return true;
+            var control = ControlRegister.Load(mem);
+            control.PowerEnabled=true;
+            return control.PowerEnabled;
         }
 
         public bool Disable()
         {
-            return false;
+            var control = ControlRegister.Load(mem);
+            control.PowerEnabled = false;
+            return control.PowerEnabled;
         }
         #endregion
 
         public string Name
         {
-            get { return "Generic ENS1370 Audio device"; }
+            get { return "Generic ES1370 Audio device"; }
         }
 
-        public string HardwareRevision
-        {
-            get
-            {
-                //var tcr = Register.TransmitConfigurationRegister.Load(mem);
-                //return Register.TransmitConfigurationRegister.GetHardwareRevision(tcr.GetHWVERID());
-                return "";
-            }
-            private set { ;}
-        }
 
         public PCIDevice PCICard { get { return pciCard; } private set { ;} }
         #region Interrupt (IRQ)
@@ -170,13 +162,8 @@ namespace Cosmos.Hardware.Audio.Devices.ES1370
 
         public void DumpRegisters()
         {
-            /*
-            Console.WriteLine("Command Register: " + Register.CommandRegister.Load(mem).ToString());
-            Console.WriteLine("Config1 Register: " + Register.ConfigurationRegister1.Load(mem).ToString());
-            Console.WriteLine("Media S Register: " + Register.MediaStatusRegister.Load(mem).ToString());
-            Console.WriteLine("Interrupt Mask R: " + Register.InterruptMaskRegister.Load(mem).ToString());
-            Console.WriteLine("Interrupt Status: " + Register.InterruptStatusRegister.Load(mem).ToString());
-             */
+            Console.WriteLine("Control Register: " + Register.ControlRegister.Load(mem).ToString());
+            Console.WriteLine("Status Register: " + Register.InterruptStatusRegister.Load(mem).ToString());
         }
         #endregion
 

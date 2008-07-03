@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Cosmos.Hardware;
+using Cosmos.Hardware.PC.Bus;
+using Cosmos.Kernel;
 namespace Cosmos.Hardware.Audio.Devices.ES1370.Register
 {
     class ControlRegister
@@ -43,7 +43,7 @@ namespace Cosmos.Hardware.Audio.Devices.ES1370.Register
         {
             get
             { 
-                return GetBit(BitPosition.SERRDis); 
+                return !GetBit(BitPosition.SERRDis); 
             }
             set
             { 
@@ -164,8 +164,7 @@ namespace Cosmos.Hardware.Audio.Devices.ES1370.Register
 
         public override string ToString()
         {
-            //return this.CONTROL.ToBinary(8);
-            return null;
+            return this.CONTROL.ToBinary(8);
         }
 
         #endregion
