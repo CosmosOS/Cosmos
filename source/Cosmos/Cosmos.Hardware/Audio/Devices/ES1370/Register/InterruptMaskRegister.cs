@@ -47,15 +47,17 @@ namespace Cosmos.Hardware.Audio.Devices.ES1370.Register
 
         private bool GetBit(BitPosition bit)
         {
-            return BinaryHelper.CheckBit(this.IMR, (byte)bit);
+            //return BinaryHelper.CheckBit(this.IMR, (byte)bit);
+            return false;
         }
 
         private void SetBit(BitValue bit, bool value)
-        {
+        {/*
             if (value)
                 this.IMR = (byte)(this.IMR | (byte)bit);
             else
                 this.IMR = (byte)(this.IMR & ~(byte)bit);
+          */
         }
 
         #endregion
