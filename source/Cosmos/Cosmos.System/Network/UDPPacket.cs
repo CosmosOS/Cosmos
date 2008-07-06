@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Sys.Network {
     // http://en.wikipedia.org/wiki/User_Datagram_Protocol
-    public class UDPPacket : IP4Packet {
+    public class UDPPacket : IPPacket {
         protected new int mHeaderBegin;
 
         public UDPPacket(uint aSrcIP, UInt16 aSrcPort, uint aDestIP, UInt16 aDestPort, byte[] aData) {

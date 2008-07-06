@@ -50,7 +50,7 @@
     <Compile Include="Deboot.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Network\EthernetPacket.cs" />
-    <Compile Include="Network\IP4Packet.cs" />
+    <Compile Include="Network\IPPacket.cs" />
     <Compile Include="Network\Packet.cs" />
     <Compile Include="Network\UDPPacket.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

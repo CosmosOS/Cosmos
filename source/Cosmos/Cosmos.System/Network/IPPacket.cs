@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Sys.Network {
     // http://en.wikipedia.org/wiki/IPv4
-    public abstract class IP4Packet : Packet {
+    public abstract class IPPacket : Packet {
         protected byte mHeaderSize = 20;
         protected int mHeaderBegin;
 
