@@ -1,23 +1,21 @@
 ﻿using System;
 using System.IO;
 using System.IO.Compression;
+using System.Net;
 using System.Security.Cryptography;
 using Cosmos.Build.Windows;
 using ICSharpCode.SharpZipLib.Zip.Compression;
 using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 using Huffman;
 
-namespace MatthijsTest
-{
-
-    public class Program
-    {
+namespace MatthijsTest {
+    public class Program {
         #region Cosmos Builder logic
 
         // Most users wont touch this. This will call the Cosmos Build tool
         [STAThread]
-        private static void Main(string[] args)
-        {
+        private static void Main(string[] args) {
+            Init();
             BuildUI.Run();
         }
 
@@ -28,8 +26,23 @@ namespace MatthijsTest
         //[ManifestResourceStream(ResourceName = "MatthijsTest.Test.txt.gz")]
         //private static readonly byte[] TheManifestResourceZipped;
 
-        public static unsafe void Init()
-        {
+        private static ushort HostToNetwork(ushort aValue) {
+            return (ushort)((aValue << 8) | ((aValue >> 8) & 0xFF));
+        }
+
+        private static uint HostToNetwork(uint aValue) {
+            return (uint)(((HostToNetwork((ushort)aValue) & 0xffff) << 0x10) | (HostToNetwork((ushort)(aValue >> 0x10)) & 0xffff));
+        }
+
+        public static void Init() {
+            uint xTest = 0x01020304;
+            Console.Write("Host: ");
+            PrintHex(xTest);
+            Console.WriteLine("");
+            xTest = HostToNetwork(xTest);
+            Console.Write("Network: ");
+            PrintHex(xTest);
+            Console.WriteLine("");
             //Console.Clear();
 
             //theEvent += Handler1;
@@ -44,45 +57,47 @@ namespace MatthijsTest
 
             //Console.Write(xData);
             //Console.WriteLine("'");
-            start:
-            byte xB = 1;
-            object xO = xB;
-            Console.WriteLine(xO.ToString());
-            int xI32 = 8346;
-            xO = xI32;
-            Console.WriteLine(xO.ToString());
-            short xI16 = 355;
-            xO = xI16;
-            Console.WriteLine(xO.ToString());
-            ushort xU16 = 6735;
-            xO = xU16;
-            Console.WriteLine(xO.ToString());
-            Console.WriteLine(xU16.ToString());
+            //start:
+            //byte xB = 1;
+            //object xO = xB;
+            //Console.WriteLine(xO.ToString());
+            //int xI32 = 8346;
+            //xO = xI32;
+            //Console.WriteLine(xO.ToString());
+            //short xI16 = 355;
+            //xO = xI16;
+            //Console.WriteLine(xO.ToString());
+            //ushort xU16 = 6735;
+            //xO = xU16;
+            //Console.WriteLine(xO.ToString());
+            //Console.WriteLine(xU16.ToString());
             //goto start;
             //Console.WriteLine("Done");
         }
 
-        public static void Handler1(object sender, EventArgs e) {
-            if(sender==null) {
+        public static void Handler1(object sender,
+                                    EventArgs e) {
+            if (sender == null) {
                 Console.WriteLine("Sender is null");
-            }else{Console.WriteLine("Sender is not null");}
+            } else {
+                Console.WriteLine("Sender is not null");
+            }
         }
 
-        public static void Handler2(object sender, EventArgs e) {
-            if (sender == null)
-            {
+        public static void Handler2(object sender,
+                                    EventArgs e) {
+            if (sender == null) {
                 Console.WriteLine("Sender is null");
+            } else {
+                Console.WriteLine("Sender is not null");
             }
-            else { Console.WriteLine("Sender is not null"); }
         }
 
         private static EventHandler theEvent;
 
-        private static string SingleDigitToHex(byte d)
-        {
+        private static string SingleDigitToHex(byte d) {
             d &= 0xF;
-            switch (d)
-            {
+            switch (d) {
                 case 0:
                     return "0";
                 case 1:
@@ -117,17 +132,14 @@ namespace MatthijsTest
                     return "F";
             }
             return " ";
-
         }
 
-        public static void PrintHex(byte aByte)
-        {
+        public static void PrintHex(byte aByte) {
             Console.Write(SingleDigitToHex((byte)(aByte / 16)));
             Console.Write(SingleDigitToHex((byte)(aByte & 0xF)));
         }
 
-        public static void PrintHex(uint aUint)
-        {
+        public static void PrintHex(uint aUint) {
             Console.Write(SingleDigitToHex((byte)(aUint >> 28)));
             Console.Write(SingleDigitToHex((byte)(aUint >> 24)));
             Console.Write(SingleDigitToHex((byte)(aUint >> 20)));

@@ -1298,9 +1298,7 @@ namespace Indy.IL2CPU {
                     OnDebugLog(LogSeverityEnum.Error,
                                xCurrentMethod.GetFullName());
                     OnDebugLog(LogSeverityEnum.Warning,
-                               e.Message);
-                    OnDebugLog(LogSeverityEnum.Warning,
-                               e.StackTrace);
+                               e.ToString());
                     
                     throw;
                 }
