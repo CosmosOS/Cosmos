@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Sys.Network {
     // http://en.wikipedia.org/wiki/User_Datagram_Protocol
-    public class UDPPacket : IPPacket {
+    public class UDPPacket : IP4Packet {
         protected new int mHeaderBegin;
 
         public UDPPacket(uint aSrcIP, UInt16 aSrcPort, uint aDestIP, UInt16 aDestPort, byte[] aData) {
@@ -24,6 +24,11 @@ namespace Cosmos.Sys.Network {
             }
         }
 
+        // Properties are bound directly to data. For frequent updates this is slower
+        // but typically users will not make frequent updates.
+        // Doing it this way instead of storing in a property and inserted later
+        // saves memory, and also eliminates the need later to write separate 
+        // parse routines when we receive packets.
         public UInt16 SourcePort {
             get {
                 return (UInt16)(mData[mHeaderBegin] << 8 | mData[mHeaderBegin + 1]);

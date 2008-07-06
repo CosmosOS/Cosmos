@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Cosmos.Sys.Network;
 
 namespace KudzuTest {
     public class RTL8139 {
@@ -12,15 +13,12 @@ namespace KudzuTest {
             Console.WriteLine("Sending test packet");
 
             var xUDP = new Cosmos.Sys.Network.UDPPacket(
-                0x0A00020F // 10.0.2.15
-                , 0x0449
-                , 0xFFFFFFFF // 255.255.255.255, Broadcast
-                , 2222
+                0x0A00020F, 0x0449 // 10.0.2.15
+                , 0xFFFFFFFF, 2222 // 255.255.255.255, Broadcast
                 , new byte[] { 0x16 });
-            var xEthernet = new Cosmos.Sys.Network.EthernetPacket(xUDP.GetData()
-                , 0x525400123457
-                , 0xFFFFFFFFFFFF
-                , 0x800);
+            var xEthernet = new EthernetPacket(xUDP.GetData()
+                , 0x525400123457, 0xFFFFFFFFFFFF
+                , EthernetPacket.PacketType.IP);
 
             var xNICs = Cosmos.Hardware.Network.Devices.RTL8139.RTL8139.FindAll();
             var xNIC = xNICs[0];

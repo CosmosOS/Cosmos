@@ -5,11 +5,11 @@ using System.Text;
 
 namespace Cosmos.Sys.Network {
     // http://en.wikipedia.org/wiki/IPv4
-    public abstract class IPPacket : Packet {
+    public abstract class IP4Packet : Packet {
         protected byte mHeaderSize = 20;
         protected int mHeaderBegin;
 
-        protected int Initialize(byte[] aData, int aHeaderSize, byte aProtocol, uint aSrcIP, uint aDestIP) {
+        protected int Initialize(byte[] aData, int aHeaderSize, byte aProtocol, uint aSrcAddr, uint aDestAddr) {
             mHeaderBegin = base.Initialize(aData, mHeaderSize + aHeaderSize);
             // Version + Header length
             // 0x40 is the version (4 in high nibble, i.e. 4x)
@@ -30,8 +30,7 @@ namespace Cosmos.Sys.Network {
             mData[mHeaderBegin + 7] = 0x00;
             // TTL
             mData[mHeaderBegin + 8] = 0x80;
-            // Protocol
-            mData[mHeaderBegin + 9] = aProtocol;
+            Protocol = aProtocol;
             // IP - Header Checksum - Varies
             // In 1's complement, there are 2 representations for zero: 0000000000000000 and 1111111111111111. 
             // Note that flipping the bits of the one gives you the other. A header checksum of "0"
@@ -40,18 +39,51 @@ namespace Cosmos.Sys.Network {
             // that 0, when the checksum is actually zero.
             mData[mHeaderBegin + 10] = 0x00;
             mData[mHeaderBegin + 11] = 0x00;
-            // Source IP
-            mData[mHeaderBegin + 12] = (byte)(aSrcIP >> 24);
-            mData[mHeaderBegin + 13] = (byte)(aSrcIP >> 16);
-            mData[mHeaderBegin + 14] = (byte)(aSrcIP >> 8);
-            mData[mHeaderBegin + 15] = (byte)aSrcIP;
-            // Destination IP
-            mData[mHeaderBegin + 16] = (byte)(aDestIP >> 24);
-            mData[mHeaderBegin + 17] = (byte)(aDestIP >> 16);
-            mData[mHeaderBegin + 18] = (byte)(aDestIP >> 8);
-            mData[mHeaderBegin + 19] = (byte)aDestIP;
+            SourceAddress = aSrcAddr;
+            DestinationAddress = aDestAddr;
 
             return mHeaderBegin + mHeaderSize;
+        }
+
+        public byte Protocol {
+            get {
+                return mData[mHeaderBegin + 9];
+            }
+            set {
+                mData[mHeaderBegin + 9] = value;
+            }
+        }
+
+        public uint SourceAddress {
+            get {
+                return (uint)(
+                    mData[mHeaderBegin + 12] << 24
+                    | mData[mHeaderBegin + 13] << 16
+                    | mData[mHeaderBegin + 14] << 8
+                    | mData[mHeaderBegin + 15]);
+            }
+            set {
+                mData[mHeaderBegin + 12] = (byte)(value >> 24);
+                mData[mHeaderBegin + 13] = (byte)(value >> 16);
+                mData[mHeaderBegin + 14] = (byte)(value >> 8);
+                mData[mHeaderBegin + 15] = (byte)value;
+            }
+        }
+
+        public uint DestinationAddress {
+            get {
+                return (uint)(
+                    mData[mHeaderBegin + 16] << 24
+                    | mData[mHeaderBegin + 17] << 16
+                    | mData[mHeaderBegin + 18] << 8
+                    | mData[mHeaderBegin + 19]);
+            }
+            set {
+                mData[mHeaderBegin + 16] = (byte)(value >> 24);
+                mData[mHeaderBegin + 17] = (byte)(value >> 16);
+                mData[mHeaderBegin + 18] = (byte)(value >> 8);
+                mData[mHeaderBegin + 19] = (byte)value;
+            }
         }
 
         protected override void Conclude() {
