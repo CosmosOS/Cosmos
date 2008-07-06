@@ -6,21 +6,43 @@ using System.Text;
 namespace Cosmos.Sys.Network {
     // http://en.wikipedia.org/wiki/User_Datagram_Protocol
     public class UDPPacket : IP4Packet {
+        protected new int mHeaderBegin;
+
         public UDPPacket(uint aSrcIP, UInt16 aSrcPort, uint aDestIP, UInt16 aDestPort, byte[] aData) {
             mHeaderBegin = Initialize(aData, 8, 0x11, aSrcIP, aDestIP);
-            // Source Port
-            mData[mHeaderBegin] = (byte)(aSrcPort >> 8);
-            mData[mHeaderBegin + 1] = (byte)aSrcPort;
-            // Destination Port
-            mData[mHeaderBegin + 2] = (byte)(aDestPort >> 8);
-            mData[mHeaderBegin + 3] = (byte)aDestPort;
+            SourcePort = aSrcPort;
+            DestinationPort = aDestPort;
             // Length
             int xSize = mData.Length - mHeaderBegin;
             mData[mHeaderBegin + 4] = (byte)(xSize >> 8);
             mData[mHeaderBegin + 5] = (byte)xSize;
         }
 
-        protected new int mHeaderBegin;
+        public UInt16 Length {
+            get {
+                return (UInt16)(mData[mHeaderBegin + 4] << 8 | mData[mHeaderBegin + 5]);
+            }
+        }
+
+        public UInt16 SourcePort {
+            get {
+                return (UInt16)(mData[mHeaderBegin] << 8 | mData[mHeaderBegin + 1]);
+            }
+            set {
+                mData[mHeaderBegin] = (byte)(value >> 8);
+                mData[mHeaderBegin + 1] = (byte)value;
+            }
+        }
+
+        public UInt16 DestinationPort {
+            get {
+                return (UInt16)(mData[mHeaderBegin + 2] << 8 | mData[mHeaderBegin + 3]);
+            }
+            set {
+                mData[mHeaderBegin + 2] = (byte)(value >> 8);
+                mData[mHeaderBegin + 3] = (byte)value;
+            }
+        }
 
         protected override void Conclude() {
             base.Conclude();

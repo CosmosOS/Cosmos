@@ -70,7 +70,6 @@
     <Compile Include="Test\RTL8139Test.cs" />
     <Compile Include="Test\StringTest.cs" />
     <Compile Include="Test\SwitchTest.cs" />
-    <Compile Include="Test\UDPTest.cs" />
     <Compile Include="Test\TransmitStatusDescriptorTest.cs" />
   </ItemGroup>
   <ItemGroup>
