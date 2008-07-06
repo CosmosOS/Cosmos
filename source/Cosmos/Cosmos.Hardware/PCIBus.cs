@@ -87,6 +87,8 @@ namespace Cosmos.Hardware {
                 //8e2e 7100  KF-230TX/2
                 //a0a0 0007  ALN-325C
 
+                mVendors.Add(0x1274, "Ensoniq");
+
                 //Found on ESX Server:
                 mVendors.Add(0x15AD, "VMware Inc.");
                 mVendors.Add(0x1000, "LSI Logic 53C810 Device");
@@ -1614,6 +1616,8 @@ namespace Cosmos.Hardware {
                 mDevices.Add(0x80867113,@"82371AB/EB/MB");
                 mDevices.Add(0x101300B8,@"CL-GD5446");
                 mDevices.Add(0x10222000,@"Am79C970/1/2/3/5/6");
+                mDevices.Add(0x10EC8029,@"RTL8029(as)pci ethernet nic");
+                mDevices.Add(0x12745000,@"ES1373");
 
                 //For now it is too slow to add all vendors
 
