@@ -110,7 +110,7 @@
             this.identificationTextBox.Name = "identificationTextBox";
             this.identificationTextBox.Size = new System.Drawing.Size(162, 20);
             this.identificationTextBox.TabIndex = 7;
-            this.identificationTextBox.Text = "32767";
+            this.identificationTextBox.Text = "3";
             // 
             // label4
             // 
@@ -127,7 +127,7 @@
             this.fragmentOffsetTextBox.Name = "fragmentOffsetTextBox";
             this.fragmentOffsetTextBox.Size = new System.Drawing.Size(162, 20);
             this.fragmentOffsetTextBox.TabIndex = 7;
-            this.fragmentOffsetTextBox.Text = "0";
+            this.fragmentOffsetTextBox.Text = "1";
             // 
             // label5
             // 

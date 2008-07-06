@@ -141,18 +141,28 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
             List<UInt32> fields = new List<UInt32>();
 
             //Add the packetsections together into 32-bit words
-            UInt32 field1 = (UInt32)((this.Version << 4) | (this.HeaderLength << 0) | (this.TypeOfService << 8) | (this.TotalLength << 24));
-            Console.WriteLine("Field1: " + field1.ToBinary(32));
-            fields.Add(field1);
+            //UInt32 field1 = 0;
+            UInt32 xVersion = (UInt32)(this.Version << 28);
+            UInt32 xHeaderLength = (UInt32)(this.HeaderLength << 24);
+            UInt32 xTypeOfService = (UInt32)(this.TypeOfService << 16);
+            UInt32 xTotalLength = (UInt32)(this.TotalLength << 0);
+            //field1 = ;
+            fields.Add(HostToNetwork(xVersion + xHeaderLength + xTypeOfService + xTotalLength));
 
-            UInt32 field2 = (UInt32)((this.Identification << 8) | ((byte)(this.FragmentFlags)) << 21 | (this.FragmentOffset << 24));
-            Console.WriteLine("Field2: " + field2.ToBinary(32));
-            //fields.Add((UInt32)HostToNetworkOrder((int)field2));
-            fields.Add(field2);
+            //UInt32 field2 = (UInt32)((this.Identification << 16) | ((byte)(this.FragmentFlags)) << 12 | (this.FragmentOffset << 1));
+            UInt32 field2 = 0;
+            UInt32 Identity = (UInt32)(this.Identification << 16);
+            UInt32 Flags = (UInt32)((byte)(this.FragmentFlags)) << 14;
+            UInt32 Offset = (UInt32)((this.FragmentOffset) & (UInt16)0xFF);
+            field2 = Identity + Flags + Offset;
+            fields.Add(HostToNetwork(field2));
 
-            UInt32 field3 = (UInt32)((this.TimeToLive << 0) | (((byte)(this.Protocol)) << 8) | (UInt16)(this.HeaderChecksum << 16));
-            Console.WriteLine("Field3: " + field3.ToBinary(32));
-            fields.Add(field3);
+            //UInt32 field3 = (UInt32)((this.TimeToLive << 0) | (((byte)(this.Protocol)) << 8) | (UInt16)(this.HeaderChecksum << 16));
+            UInt32 xTimeToLive = (UInt32)(this.TimeToLive << 24);
+            UInt32 xProtocol = (UInt32)((byte)this.Protocol << 16);
+            UInt32 xHeaderChecksum = (UInt32)(this.HeaderChecksum << 0);
+            //Console.WriteLine("Field3: " + field3.ToBinary(32));
+            fields.Add(HostToNetwork(xTimeToLive + xProtocol + xHeaderChecksum));
 
             //Split the 32-bit words into bytes
             for (int i = 0; i < fields.Count; i++)
@@ -394,6 +404,16 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
             return xResult;
         }
 
+        private static ushort HostToNetwork(ushort aValue)
+        {
+            return (ushort)((aValue << 8) | ((aValue >> 8) & 0xFF));
+        }
+
+        private static uint HostToNetwork(uint aValue)
+        {
+            return (uint)(((HostToNetwork((ushort)aValue) & 0xffff) << 0x10) | (HostToNetwork((ushort)(aValue >> 0x10)) & 0xffff));
+        }
+
         //public long HostToNetworkOrder(long host)
         //{
         //    throw new NotImplementedException();
@@ -406,9 +426,9 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
         [Flags]
         public enum Fragmentation : int
         {
-            Reserved = 0,
+            MoreFragments = 0,
             DoNotFragment = 1,
-            MoreFragments = 2
+            Reserved = 2
         }
 
         public enum Protocols
