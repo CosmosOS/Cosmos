@@ -80,7 +80,6 @@
     <Compile Include="Network\Devices\RTL8139\RTL8139.cs" />
     <Compile Include="Network\MACAddress.cs" />
     <Compile Include="Network\NetworkDevice.cs" />
-    <Compile Include="Network\TCPIPModel\ICMPv4Packet.cs" />
     <Compile Include="Network\TCPIPModel\IPv4Address.cs" />
     <Compile Include="Network\TCPIPModel\IPv4Packet.cs" />
     <Compile Include="Network\TCPIPModel\Ethernet2Frame.cs" />
