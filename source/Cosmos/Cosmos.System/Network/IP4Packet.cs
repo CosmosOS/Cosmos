@@ -9,6 +9,15 @@ namespace Cosmos.Sys.Network {
         protected byte mHeaderSize = 20;
         protected int mHeaderBegin;
 
+        /// <summary>
+        /// Initialized the IPv4 packet.
+        /// </summary>
+        /// <param name="aData"></param>
+        /// <param name="aHeaderSize"></param>
+        /// <param name="aProtocol"></param>
+        /// <param name="aSrcAddr"></param>
+        /// <param name="aDestAddr"></param>
+        /// <returns></returns>
         protected int Initialize(byte[] aData, int aHeaderSize, byte aProtocol, uint aSrcAddr, uint aDestAddr) {
             mHeaderBegin = base.Initialize(aData, mHeaderSize + aHeaderSize);
             // Version + Header length
@@ -86,13 +95,27 @@ namespace Cosmos.Sys.Network {
             }
         }
 
+        /// <summary>
+        /// Concludes the IP4Packet by setting checksum, etc.
+        /// </summary>
         protected override void Conclude() {
             base.Conclude();
+            this.SetChecksum();
+        }
+
+        /// <summary>
+        /// Calculates and saves the checksum for the IPv4 packet.
+        /// </summary>
+        private void SetChecksum()
+        {
+            //Blank out checksum bytes
             mData[mHeaderBegin + 10] = 0;
             mData[mHeaderBegin + 11] = 0;
+
             // TODO: Change this to a ASM and use 32 bit addition
             UInt32 xResult = 0;
-            for (int i = 0; i < mHeaderSize; i = i + 2) {
+            for (int i = 0; i < mHeaderSize; i = i + 2)
+            {
                 xResult += (UInt16)((mData[mHeaderBegin + i] << 8) + mData[mHeaderBegin + i + 1]);
             }
             xResult = (~((xResult & 0xFFFF) + (xResult >> 16)));
@@ -100,5 +123,7 @@ namespace Cosmos.Sys.Network {
             mData[mHeaderBegin + 10] = (byte)(xResult >> 8);
             mData[mHeaderBegin + 11] = (byte)xResult;
         }
+
+
     }
 }

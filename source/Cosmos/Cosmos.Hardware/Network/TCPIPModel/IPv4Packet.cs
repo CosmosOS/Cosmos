@@ -6,6 +6,7 @@ using Cosmos.Kernel;
 namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
 {
     //See http://en.wikipedia.org/wiki/IPv4#Header
+    [Obsolete("Use Cosmos.Sys.IP4Packet instead")]
     public class IPv4Packet
     {
         #region Constructor etc.
@@ -442,6 +443,7 @@ namespace Cosmos.Hardware.Network.TCPIPModel.NetworkLayer.IPv4
         }
 
         #endregion
+
 
     }
 }

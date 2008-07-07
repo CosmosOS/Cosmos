@@ -15,12 +15,21 @@ namespace Cosmos.Sys.Network {
             return mData;
         }
 
+        /// <summary>
+        /// Initializes the Packet with some data and sets a size for the header. This is used to determine the size of the bytearray.
+        /// </summary>
+        /// <param name="aData">A bytearray used to initialize the size of the packet.</param>
+        /// <param name="aHeaderSize">Used to determine the difference between the header and the body.</param>
+        /// <returns>Always 0</returns>
         protected int Initialize(byte[] aData, int aHeaderSize) {
             mData = new byte[aData.Length + aHeaderSize];
             aData.CopyTo(mData, aHeaderSize);
             return 0;
         }
 
+        /// <summary>
+        /// Concludes the Packet
+        /// </summary>
         protected virtual void Conclude() {
         }
     }

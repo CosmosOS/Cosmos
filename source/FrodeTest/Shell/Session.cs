@@ -30,6 +30,10 @@ namespace FrodeTest.Shell
             {
                 Test.IPv4Test.RunTest();
             }
+            else if (command.Equals("icmp"))
+            {
+                Test.ICMPv4Test.RunTest();
+            }
             else if (command.Equals("mac"))
             {
                 if (nic == null)
