@@ -1,0 +1,82 @@
+﻿Audio specification ES1370 (basic reprodution NO gameport NO registration):
+it should miss some pages yet
+
+-int index
+-string id
+-int enable
+
+CONTROL --> 0x00
+MSFMTSEL --> 1 on 15 MPEG data SONY(0)/I2S(1)
+MSBB --> 1 on 14 clock source for DAC: gen (0) - MPEG(1)
+BREQ --> 1 on 7 memory bus request enable
+DAC1EN--> 1 on 6 DAC1 playback enable
+DAC2EN--> 1 on 5 DAC2 playback enable
+UART-->1 on 3 UART enable
+CDC-->1 on 1 codec interface enable
+SERRDIS-->1 on 0 PCI serr disable
+
+STATUS --> 0x04 
+INTR --> 1 on 31 interrupt pending
+CSTAT--> 1 on 10 codec busying / writing on register
+CBUSY--> 1 on 9 codec busying 
+CWRIP --> 1 on 8 codec register in writing
+MCBB --> 1 on 4 CCB interrupt pending
+IART --> 1 on 3 UART interrupt pending
+DAC1-->1 on 2 DAC1 interrupt pending
+DAC2-->1 on 1 DAC2 interrupt pending
+
+UARTDATA--> 0x08
+
+UARTINFO->0x09
+RXINT-->1 on 7 RX interrupt verified
+TXINT->1 on 2 TX interrupt verified
+TXRDY-->1 on 1 TX ready
+RX-->1 on 0 RX ready
+
+MEMPAGE-->0x0c (Memory page address)
+
+CODEC--> 0x10 (CODEC write register)
+
+SERIAL--> 0x20 Serial interface control register
+LOOPDC2-->1 on 14 DAC2 mode: loop(0) stop(1)
+LOOPDC1-->1 on 13 DAC1 mode: loop(0) stop(1)
+PAUSEDC2-->1 on 14 DAC2 mode: play(0) pause(1)
+PAUSEDC1-->1 on 13 DAC1 mode: play(0) pause(1)
+DAC2INT-->1 on 9 DAC2 interrupt enable
+DAC1INT-->1 on 8 DAC1 interrupt enable
+SCTRLD-->1 on 7 reload DAC1 sample counter
+DACSEN-->1 on 6 DAC2 playbacking on LOOPDC2 on stop mode:  playback zeros (0) playback last sample(1)
+
+DAC1COUNT-->0x24 DAC1 sample count register
+
+DAC2COUNT-->0x28 DAC2 sample count register
+
+DAC1FRAME-->0x30 DAC1 frame address
+
+DAC1SIZE-->0x34 DAC1 frame size
+
+DAC2FRAME-->0x38 DAC2 frame address
+
+DAC2SIZE-->0x3c DAC2 frame size
+
+UARTFIFO-->UART FIFO register
+
+DACPAGE-->0x0c
+
+UARTPAGE-->0x0e
+
+UART1-->0x0f
+
+SMPREGDC1-->DAC1 Sample rate converter adresses 0x70
+SMPREGDC2-->DAC2 Sample rate converter adresses 0x74
+SMPREGVOLDC1-->0x7c
+SMPREGVOLDC2-->0x7e
+SMPREGTRUNC-->0x00
+SMPREGINT-->0x01
+SMPREGACCUM-->in fractional 0x02
+SMPREGVFREQ-->in fratction 0x03
+
+PLAY1MODE 0x0001
+PLAY2MODE 0x0002
+OUTPUTMODE-->0x0001 MIDI
+INPUTMODE-->0x0002 MIDI

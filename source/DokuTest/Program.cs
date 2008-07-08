@@ -19,7 +19,6 @@ namespace DokuTest
 
             Console.WriteLine("*** COSMOS Operating System - Doku's Test Suite ***");
             Console.WriteLine("*** Ensoniq AudioPCI 1370 testing ***");
-            Console.WriteLine("Phase 1: ");
             ES1370.test();
 
             Console.WriteLine("Shutting down computer");
