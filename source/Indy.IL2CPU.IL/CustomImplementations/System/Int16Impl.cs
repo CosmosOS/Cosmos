@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using Indy.IL2CPU.Plugs;
@@ -12,7 +13,11 @@ namespace Indy.IL2CPU.IL.CustomImplementations.System {
 			return Int32Impl.GetNumberString(aThis);
 		}
 
-        public static Int16 Parse(string s)
+        public static bool TryParse(string s, NumberStyles style, IFormatProvider provider, out short result) {
+            throw new NotImplementedException();
+        }
+
+	    public static Int16 Parse(string s)
         {
             const string digits = "0123456789";
             Int16 result = 0;

@@ -37,6 +37,8 @@ namespace MatthijsTest {
 
         public static void Init() {
            //Dictionary<int, int> xDict = new Dictionary<int, int>();
+            PrintHex((uint)IPAddress.HostToNetworkOrder(0x01020304));
+            Console.WriteLine("");
             Console.WriteLine("Done.");
         }
 

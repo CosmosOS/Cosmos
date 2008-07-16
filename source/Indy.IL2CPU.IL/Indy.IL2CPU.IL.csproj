@@ -50,8 +50,11 @@
     <Compile Include="CustomImplementations\System\CharImpl.cs" />
     <Compile Include="CustomImplementations\System\EnvironmentImpl.cs" />
     <Compile Include="CustomImplementations\System\GCImpl.cs" />
+    <Compile Include="CustomImplementations\System\Globalization\NumberFormatInfoImpl.cs" />
     <Compile Include="CustomImplementations\System\Int64Impl.cs" />
     <Compile Include="CustomImplementations\System\IntPtrImpl.cs" />
+    <Compile Include="CustomImplementations\System\Net\IPAddressImpl.cs" />
+    <Compile Include="CustomImplementations\System\Net\SocketAddressImpl.cs" />
     <Compile Include="CustomImplementations\System\Runtime\InteropServices\SafeHandleImpl.cs" />
     <Compile Include="CustomImplementations\System\Threading\Interlocked.cs" />
     <Compile Include="CustomImplementations\System\UInt32Impl.cs" />

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -175,6 +176,7 @@ namespace Indy.IL2CPU.IL {
         }
 
         public readonly int ExtraStackSize;
+        public readonly IDictionary<string, object> MethodData;
 
         /// <summary>
         /// This variable is only updated when the MethodInformation instance is supplied by the Engine.ProcessAllMethods method

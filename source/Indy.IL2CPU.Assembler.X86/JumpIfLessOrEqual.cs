@@ -13,7 +13,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
 			: base(aAddress) {
 		}
 		public override string ToString() {
-			return "jle " + Address;
+			return "jle near " + Address;
 		}
 	}
 }
