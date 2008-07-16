@@ -1,6 +1,5 @@
 using System;
-
-
+using System.Collections.Generic;
 using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using System.Reflection;
@@ -11,6 +10,18 @@ namespace Indy.IL2CPU.IL.X86 {
 	public class Newarr: Op {
 		private int mElementSize;
 		private string mCtorName;
+        public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
+            Type xTypeRef = aReader.OperandValueType;
+            if (xTypeRef == null)
+            {
+                throw new Exception("No TypeRef found!");
+            }
+            Engine.RegisterType(xTypeRef);
+            Type xArrayType = Engine.GetType("mscorlib", "System.Array");
+            Engine.RegisterType(xArrayType);
+            MethodBase xCtor = xArrayType.GetConstructors(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance)[0];
+            Engine.QueueMethod(xCtor);
+        }
 
 		public Newarr(Type aTypeRef, string aBaseLabelName)
 			: base(null, null) {

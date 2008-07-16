@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 
@@ -11,6 +12,15 @@ namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(OpCodeEnum.Ldftn)]
 	public class Ldftn: Op {
 		private string mFunctionLabel;
+
+        public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
+            MethodBase xMethodRef = aReader.OperandValueMethod;
+            if (xMethodRef == null)
+            {
+                throw new Exception("Unable to determine Method!");
+            }
+            Engine.QueueMethod(xMethodRef);
+        }
 
 		public Ldftn(ILReader aReader, MethodInformation aMethodInfo)
 			: base(aReader, aMethodInfo) {

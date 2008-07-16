@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Indy.IL2CPU.Assembler;
 
 
@@ -11,6 +12,10 @@ namespace Indy.IL2CPU.IL.X86 {
 		private string mDataName;
 		private int mSize;
 		private bool mNeedsGC;
+        public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
+            FieldInfo xField = aReader.OperandValueField;
+            Engine.QueueStaticField(xField);
+        }
 
 		public Ldsfld(ILReader aReader, MethodInformation aMethodInfo)
 			: base(aReader, aMethodInfo) {

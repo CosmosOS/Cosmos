@@ -224,22 +224,27 @@ namespace Cosmos.Build.Windows {
                     if (xMessages.Count() > 0) {
                         xBuildWindow = new BuildWindow();
                         xBuildWindow.Messages.Clear();
+
                         foreach (var item in xMessages) {
                             xBuildWindow.Messages.Add(item);
                         }
                         xBuildWindow.ShowDialog();
                         return;
                     }
-                } catch {
+                } catch (Exception E){
                     if (xBuildWindow.Visibility == System.Windows.Visibility.Visible) {
                         xBuildWindow.Close();
                     }
-                    xMessages = (from item in xBuildWindow.Messages
+                    var xTheMessages = (from item in xBuildWindow.Messages
                                  where item.Severity != LogSeverityEnum.Informational
-                                 select item).ToArray(); 
+                                 select item).ToList();
+                    xTheMessages.Add(new BuildLogMessage() {
+                                                               Severity=LogSeverityEnum.Error,
+                                                               Message = E.ToString()
+                                                           });
                     xBuildWindow = new BuildWindow();
-                    xBuildWindow.Messages.Clear();
-                    foreach (var item in xMessages)
+                        xBuildWindow.Messages.Clear();
+                        foreach (var item in xTheMessages)
                     {
                         xBuildWindow.Messages.Add(item);
                     }

@@ -11,7 +11,11 @@ namespace Indy.IL2CPU.IL.X86 {
 	public class LdStr: Op {
 		private static Dictionary<string, DataMember> mDataMemberMap = new Dictionary<string, DataMember>();
 		public readonly string LiteralStr;
-		public LdStr(ILReader aReader, MethodInformation aMethodInfo)
+		public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
+		    Engine.RegisterType(typeof(string));
+        }
+
+        public LdStr(ILReader aReader, MethodInformation aMethodInfo)
 			: base(aReader, aMethodInfo) {
 			LiteralStr = aReader.OperandValueStr;
 		}
@@ -20,16 +24,6 @@ namespace Indy.IL2CPU.IL.X86 {
 			: base(null, null) {
 			LiteralStr = aLiteralStr;
 		}
-
-            //; 	'$$Storage$$': 'System.Char[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'
-            //; 		Size: 4, Offset: 0, NeedsGC: True
-            //; 	'System.Char System.String.m_firstChar': 'System.Char, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'
-            //; 		Size: 4, Offset: 4, NeedsGC: False
-            //; 	'System.Int32 System.String.m_stringLength': 'System.Int32, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'
-            //; 		Size: 4, Offset: 8, NeedsGC: False
-            //; 	'System.Int32 System.String.m_arrayLength': 'System.Int32, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'
-            //; 		Size: 4, Offset: 12, NeedsGC: False
-
 
 		public static string GetContentsArrayName(Assembler.Assembler aAssembler, string aLiteral) {
 			Encoding xEncoding = Encoding.Unicode;

@@ -238,5 +238,13 @@ namespace Indy.IL2CPU.IL.X86
 		{
 			new CPUx86.Call("DebugPoint__");
 		}
+
+        public override void PreProcess(Indy.IL2CPU.Assembler.Assembler mAssembler)
+        {
+            base.PreProcess(mAssembler);
+            RegisterAllUtilityMethods(delegate(MethodBase aMethod) {
+                                          Engine.QueueMethod(aMethod);
+                                      });
+        }
 	}
 }

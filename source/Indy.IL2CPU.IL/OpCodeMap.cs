@@ -10,6 +10,7 @@ using Indy.IL2CPU.Plugs;
 namespace Indy.IL2CPU.IL {
 	public abstract class OpCodeMap {
 		protected readonly SortedList<OpCodeEnum, Type> mMap = new SortedList<OpCodeEnum, Type>();
+        protected readonly SortedList<OpCodeEnum, Action<ILReader, MethodInformation, SortedList<string, object>>> mScanMethods = new SortedList<OpCodeEnum, Action<ILReader, MethodInformation, SortedList<string, object>>>();
 
 		protected OpCodeMap() {
 			MethodHeaderOp = GetMethodHeaderOp();								   
@@ -33,7 +34,15 @@ namespace Indy.IL2CPU.IL {
 		protected abstract Type GetInitVmtImplementationOp();
 		protected abstract Type GetMainEntryPointOp();
 
-		public virtual void Initialize(Assembler.Assembler aAssembler, IEnumerable<Assembly> aApplicationAssemblies) {
+        public void ScanILCode(ILReader aReader, MethodInformation aMethod, SortedList<string, object> aMethodData) {
+            if(mScanMethods.ContainsKey(aReader.OpCode)) {
+                mScanMethods[aReader.OpCode](aReader,
+                                             aMethod,
+                                             aMethodData);
+            }
+        }
+
+	    public virtual void Initialize(Assembler.Assembler aAssembler, IEnumerable<Assembly> aApplicationAssemblies) {
 			foreach (var xItem in (from item in ImplementationAssembly.GetTypes()
 								   let xAttrib = item.GetCustomAttributes(typeof(OpCodeAttribute), true).FirstOrDefault() as OpCodeAttribute
 								   where item.IsSubclassOf(typeof(Op)) && xAttrib != null
@@ -43,6 +52,13 @@ namespace Indy.IL2CPU.IL {
 								   })) {
 				try {
 					mMap.Add(xItem.OpCode, xItem.Type);
+				    var xMethod = xItem.Type.GetMethod("ScanOp",
+				                         new Type[] {typeof(ILReader), typeof(MethodInformation), typeof(SortedList<string, object>)});
+                    if (xMethod != null) {
+                        mScanMethods.Add(xItem.OpCode,
+                                         (Action<ILReader, MethodInformation, SortedList<string, object>>)Delegate.CreateDelegate(typeof(Action<ILReader, MethodInformation, SortedList<string, object>>),
+                                                                                                                                  xMethod));
+                    }
 				} catch {
 					Console.WriteLine("Was adding op " + xItem.OpCode);
 					throw;
@@ -107,5 +123,13 @@ namespace Indy.IL2CPU.IL {
 		}
 
 		public abstract void EmitOpDebugHeader(Assembler.Assembler aAssembler, uint aOpId, string aOpLabel);
-	}
+
+        protected virtual void RegisterAllUtilityMethods(Action<MethodBase> aRegister) {
+        }
+
+	    public virtual void PreProcess(Indy.IL2CPU.Assembler.Assembler mAssembler)
+        {
+            
+        }
+    }
 }

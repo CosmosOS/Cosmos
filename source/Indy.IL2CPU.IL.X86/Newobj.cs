@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -19,7 +20,19 @@ namespace Indy.IL2CPU.IL.X86
 		public int ILOffset;
 		public MethodInformation MethodInformation;
 
-		public Newobj(ILReader aReader,
+        public static void ScanOp(MethodBase aCtor) {
+            Call.ScanOp(aCtor);
+            Call.ScanOp(GCImplementationRefs.AllocNewObjectRef);
+            Call.ScanOp(CPU.Assembler.CurrentExceptionOccurredRef);
+            Call.ScanOp(GCImplementationRefs.IncRefCountRef);
+        }
+
+        public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
+            var xCtorDef = aReader.OperandValueMethod;
+            ScanOp(xCtorDef);
+        }
+
+	    public Newobj(ILReader aReader,
 					  MethodInformation aMethodInfo)
 			: base(aReader,
 				   aMethodInfo)

@@ -90,8 +90,14 @@ namespace Indy.IL2CPU {
 
     public class QueuedMethodInformation {
         public bool Processed;
+        public bool PreProcessed;
         public int Index;
         public MLDebugSymbol[] Instructions;
+        public readonly SortedList<string, object> Info = new SortedList<string, object>(StringComparer.InvariantCultureIgnoreCase);
+    }
+
+    public class QueuedStaticFieldInformation {
+        public bool Processed;
     }
 
     public class Engine {
@@ -107,12 +113,12 @@ namespace Indy.IL2CPU {
         /// <summary>
         /// Contains a list of all methods. This includes methods to be processed and already processed.
         /// </summary>
-        protected SortedList<MethodBase, QueuedMethodInformation> mMethods = new SortedList<MethodBase, QueuedMethodInformation>(new MethodBaseComparer());
+        protected IDictionary<MethodBase, QueuedMethodInformation> mMethods = new SortedList<MethodBase, QueuedMethodInformation>(new MethodBaseComparer());
 
         /// <summary>
         /// Contains a list of all static fields. This includes static fields to be processed and already processed.
         /// </summary>
-        protected SortedList<FieldInfo, bool> mStaticFields = new SortedList<FieldInfo, bool>(new FieldInfoComparer());
+        protected IDictionary<FieldInfo, QueuedStaticFieldInformation> mStaticFields = new SortedList<FieldInfo, QueuedStaticFieldInformation>(new FieldInfoComparer());
 
         protected IList<Type> mTypes = new List<Type>();
         protected TypeEqualityComparer mTypesEqualityComparer = new TypeEqualityComparer();
@@ -133,7 +139,7 @@ namespace Indy.IL2CPU {
                 return (from item in mMethods
                         where item.Value.Processed
                         select item).Count() + (from item in mStaticFields
-                                                where item.Value
+                                                where item.Value.Processed
                                                 select item).Count();
             }
         }
@@ -247,6 +253,7 @@ namespace Indy.IL2CPU {
                                                                        Processed = false,
                                                                        Index = mMethods.Count
                                                                    });
+                        mMethods.Add(typeof(Assembler.Assembler).GetMethod("PrintException"), new QueuedMethodInformation(){Index=mMethods.Count});
                         if (!aInMetalMode) {
                             mMethods.Add(VTablesImplRefs.LoadTypeTableRef,
                                          new QueuedMethodInformation() {
@@ -273,6 +280,22 @@ namespace Indy.IL2CPU {
                                                                            Processed = false,
                                                                            Index = mMethods.Count
                                                                        });
+                            mMethods.Add(GCImplementationRefs.IncRefCountRef,
+                                         new QueuedMethodInformation() {
+                                                                           Processed = false,
+                                                                           Index = mMethods.Count
+                                                                       });
+                            mMethods.Add(GCImplementationRefs.DecRefCountRef,
+                                         new QueuedMethodInformation() {
+                                                                           Processed = false,
+                                                                           Index = mMethods.Count
+                                                                       });
+                            mMethods.Add(GCImplementationRefs.AllocNewObjectRef,
+                                                                     new QueuedMethodInformation()
+                                                                     {
+                                                                         Processed = false,
+                                                                         Index = mMethods.Count
+                                                                     });
                         }
                         mMethods.Add(xEntryPoint,
                                      new QueuedMethodInformation() {
@@ -280,16 +303,22 @@ namespace Indy.IL2CPU {
                                                                        Index = mMethods.Count
                                                                    });
                         OnProgressChanged();
-                        ProcessAllMethods();
-                        if (!aInMetalMode) {
-                            do {
+                        ScanAllMethods();
+                        ScanAllStaticFields();
+                        if (!aInMetalMode)
+                        {
+                            do
+                            {
                                 int xOldCount = mMethods.Count;
+                                ScanAllMethods();
+                                ScanAllStaticFields();
                                 ScanForMethodsToIncludeForVMT();
-                                ProcessAllMethods();
-                                if (xOldCount == mMethods.Count) {
+                                if (xOldCount == mMethods.Count)
+                                {
                                     break;
                                 }
                             } while (true);
+                            mAssembler.CurrentGroup = "main";
                         }
                         // initialize the runtime engine
                         mAssembler.CurrentGroup = "main";
@@ -310,32 +339,26 @@ namespace Indy.IL2CPU {
                             }
                         }
                         xEntryPointOp.Call(xEntryPoint);
-                        if (xEntryPoint.ReturnType ==
-                            typeof(void)) {
+                        if (xEntryPoint.ReturnType == typeof(void)) {
                             xEntryPointOp.Pushd("0");
                         }
                         // todo: implement support for returncodes?
                         xEntryPointOp.Call(RuntimeEngineRefs.FinalizeApplicationRef);
                         xEntryPointOp.Exit();
+                        mMap.PreProcess(mAssembler);
+                        mMethods = new ReadOnlyDictionary<MethodBase, QueuedMethodInformation>(mMethods);
+                        mStaticFields = new ReadOnlyDictionary<FieldInfo, QueuedStaticFieldInformation>(mStaticFields);
                         ProcessAllMethods();
+                        mMap.PostProcess(mAssembler);
+                        try {
+                            ProcessAllStaticFields();
+                        } catch (Exception E) {
+                            mDebugLog(LogSeverityEnum.Error,
+                                      E.Message);
+                        }
                         if (!aInMetalMode) {
-                            do {
-                                int xOldCount = mMethods.Count;
-                                ScanForMethodsToIncludeForVMT();
-                                ProcessAllMethods();
-                                if (xOldCount == mMethods.Count) {
-                                    break;
-                                }
-                            } while (true);
-                            mAssembler.CurrentGroup = "main";
                             GenerateVMT(mDebugMode != DebugModeEnum.None);
                         }
-                        mMap.PostProcess(mAssembler);
-                        try
-                        {
-                            ProcessAllStaticFields();
-                        }
-                        catch (Exception E) { mDebugLog(LogSeverityEnum.Error, E.Message); }
                         if (mSymbols != null) {
                             string xOutputFile = Path.Combine(mOutputDir,
                                                               "debug.cxdb");
@@ -358,6 +381,126 @@ namespace Indy.IL2CPU {
             } finally {
                 mCurrent = null;
             }
+        }
+
+        private void ScanAllMethods() {
+            MethodBase xCurrentMethod;
+            while ((xCurrentMethod = (from item in mMethods.Keys
+                                      where !mMethods[item].PreProcessed
+                                      select item).FirstOrDefault()) != null) {
+                if(xCurrentMethod.ToString().Contains("Assembler.Assembler.PrintException()")) {
+                    System.Diagnostics.Debugger.Break();
+                }
+                try {
+                    mAssembler.CurrentGroup = GetGroupForType(xCurrentMethod.DeclaringType);
+                    RegisterType(xCurrentMethod.DeclaringType);
+                    mMethods[xCurrentMethod].PreProcessed = true;
+                    if (xCurrentMethod.IsAbstract) {
+                        continue;
+                    }
+                    string xMethodName = Label.GenerateLabelName(xCurrentMethod);
+                    TypeInformation xTypeInfo = null;
+                    {
+                        if (!xCurrentMethod.IsStatic) {
+                            xTypeInfo = GetTypeInfo(xCurrentMethod.DeclaringType);
+                        }
+                    }
+                    MethodInformation xMethodInfo = GetMethodInfo(xCurrentMethod,
+                                                                  xCurrentMethod,
+                                                                  xMethodName,
+                                                                  xTypeInfo,
+                                                                  mDebugMode != DebugModeEnum.None);
+                    bool xIsCustomImplementation = false;
+                    MethodBase xCustomImplementation = GetCustomMethodImplementation(xMethodName);
+                    if (xCustomImplementation != null) {
+                        xIsCustomImplementation = true;
+                        QueueMethod(xCustomImplementation);
+                    }
+
+                    // what to do if a method doesn't have a body?
+                    if (xIsCustomImplementation) {
+                        continue;
+                    }
+                    Type xOpType = mMap.GetOpForCustomMethodImplementation(xMethodName);
+                    if (xOpType != null) {
+                        Op xMethodOp = GetOpFromType(xOpType,
+                                                     null,
+                                                     xMethodInfo);
+                        if (xMethodOp != null) {
+                            continue;
+                        }
+                    }
+                    if (mMap.HasCustomAssembleImplementation(xMethodInfo,
+                                                             false)) {
+                        continue;
+                    }
+
+                    //xCurrentMethod.GetMethodImplementationFlags() == MethodImplAttributes.
+                    MethodBody xBody = xCurrentMethod.GetMethodBody();
+                    // todo: add better detection of implementation state
+                    if (xBody != null) {
+                        mInstructionsToSkip = 0;
+                        mAssembler.StackContents.Clear();
+                        ILReader xReader = new ILReader(xCurrentMethod);
+                        var xInstructionInfos = new List<DebugSymbolsAssemblyTypeMethodInstruction>();
+                        int xPreviousOffset = -1;
+                        int[] xCodeOffsets = null;
+                        ISymbolDocument[] xCodeDocuments = null;
+                        int[] xCodeLines = null;
+                        int[] xCodeColumns = null;
+                        int[] xCodeEndLines = null;
+                        int[] xCodeEndColumns = null;
+                        int xCurrentOffset = 0;
+                        bool xHasSymbols = false;
+                        if (mDebugMode == DebugModeEnum.Source) {
+                            var xSymbolReader = GetSymbolReaderForAssembly(xCurrentMethod.DeclaringType.Assembly);
+                            if (xSymbolReader != null) {
+                                var xSmbMethod = xSymbolReader.GetMethod(new SymbolToken(xCurrentMethod.MetadataToken));
+                                if (xSmbMethod != null) {
+                                    xCodeOffsets = new int[xSmbMethod.SequencePointCount];
+                                    xCodeDocuments = new ISymbolDocument[xSmbMethod.SequencePointCount];
+                                    xCodeLines = new int[xSmbMethod.SequencePointCount];
+                                    xCodeColumns = new int[xSmbMethod.SequencePointCount];
+                                    xCodeEndLines = new int[xSmbMethod.SequencePointCount];
+                                    xCodeEndColumns = new int[xSmbMethod.SequencePointCount];
+                                    xSmbMethod.GetSequencePoints(xCodeOffsets,
+                                                                 xCodeDocuments,
+                                                                 xCodeLines,
+                                                                 xCodeColumns,
+                                                                 xCodeEndLines,
+                                                                 xCodeEndColumns);
+                                    xHasSymbols = true;
+                                }
+                            }
+                        }
+                        int xILIndex = -1;
+                        while (xReader.Read()) {
+                            mMap.ScanILCode(xReader,
+                                            xMethodInfo,
+                                            mMethods[xCurrentMethod].Info);
+                            //
+                        }
+                    }
+                } catch (Exception e) {
+                    OnDebugLog(LogSeverityEnum.Error,
+                               xCurrentMethod.GetFullName());
+                    OnDebugLog(LogSeverityEnum.Warning,
+                               e.ToString());
+
+                    throw;
+                }
+                OnProgressChanged();
+            }
+            foreach (Type xType in mTypes) {
+                foreach (MethodBase xMethod in xType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)) {
+                    if (xMethod.IsStatic) {
+                     QueueMethod(xMethod);
+                    }
+                }
+            }
+        }
+
+        private void ScanAllStaticFields() {
         }
 
         private void GenerateDebugSymbols() {
@@ -511,7 +654,7 @@ namespace Indy.IL2CPU {
             xInitVmtOp.LoadTypeTableRef = VTablesImplRefs.LoadTypeTableRef;
             xInitVmtOp.TypesFieldRef = VTablesImplRefs.VTablesImplDef.GetField("mTypes",
                                                                                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
-            xInitVmtOp.Methods = mMethods.Keys;
+            xInitVmtOp.Methods = mMethods.Keys.ToList();
             xInitVmtOp.VTableEntrySize = GetFieldStorageSize(GetType("",
                                                                      typeof(VTable).FullName.Replace('+',
                                                                                                      '.')));
@@ -592,8 +735,7 @@ namespace Indy.IL2CPU {
                             MethodBase xBaseMethod = GetUltimateBaseMethod(xMethod,
                                                                            xMethodParams,
                                                                            xTD);
-                            if (xBaseMethod != null &&
-                                xBaseMethod != xMethod) {
+                            if (xBaseMethod != null && xBaseMethod != xMethod) {
                                 if (mMethods.ContainsKey(xBaseMethod)) {
                                     QueueMethod(xMethod);
                                 }
@@ -610,8 +752,8 @@ namespace Indy.IL2CPU {
                         if (xImplType.IsInterface) {
                             continue;
                         }
-                        if (!xInterface.IsAssignableFrom(xImplType)) { 
-                            continue; 
+                        if (!xInterface.IsAssignableFrom(xImplType)) {
+                            continue;
                         }
 
                         var xActualMethod = xImplType.GetMethod(xInterface.FullName + "." + xMethod.Key.Name,
@@ -624,21 +766,17 @@ namespace Indy.IL2CPU {
                                                                 (from xParam in xMethod.Key.GetParameters()
                                                                  select xParam.ParameterType).ToArray());
                         }
-                        if (xActualMethod == null)
-                        {
-                            try
-                            {
+                        if (xActualMethod == null) {
+                            try {
                                 var xMap = xImplType.GetInterfaceMap(xInterface);
-                                for (int k = 0; k < xMap.InterfaceMethods.Length; k++)
-                                {
-                                    if (xMap.InterfaceMethods[k] == xMethod.Key)
-                                    {
+                                for (int k = 0; k < xMap.InterfaceMethods.Length; k++) {
+                                    if (xMap.InterfaceMethods[k] == xMethod.Key) {
                                         xActualMethod = xMap.TargetMethods[k];
                                         break;
                                     }
                                 }
+                            } catch {
                             }
-                            catch { }
                         }
                         if (xActualMethod != null) {
                             QueueMethod(xActualMethod);
@@ -653,40 +791,38 @@ namespace Indy.IL2CPU {
                                                         Type aCurrentInspectedType) {
             MethodBase xBaseMethod = null;
             //try {
-                while (true) {
-                    if (aCurrentInspectedType.BaseType == null) {
-                        break;
-                    }
-                    aCurrentInspectedType = aCurrentInspectedType.BaseType;
-                    MethodBase xFoundMethod = aCurrentInspectedType.GetMethod(aMethod.Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, Type.DefaultBinder, aMethodParams, new ParameterModifier[0]);
-                    if (xFoundMethod == null)
-                        break;
-                    ParameterInfo[] xParams = xFoundMethod.GetParameters();
-                    bool xContinue = true;
-                    for (int i = 0; i < xParams.Length; i++) {
-                        if (xParams[i].ParameterType !=
-                            aMethodParams[i]) {
-                            xContinue = false;
-                            continue;
-                        }
-                    }
-                    if (!xContinue) {
+            while (true) {
+                if (aCurrentInspectedType.BaseType == null) {
+                    break;
+                }
+                aCurrentInspectedType = aCurrentInspectedType.BaseType;
+                MethodBase xFoundMethod = aCurrentInspectedType.GetMethod(aMethod.Name,
+                                                                          BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance,
+                                                                          Type.DefaultBinder,
+                                                                          aMethodParams,
+                                                                          new ParameterModifier[0]);
+                if (xFoundMethod == null) {
+                    break;
+                }
+                ParameterInfo[] xParams = xFoundMethod.GetParameters();
+                bool xContinue = true;
+                for (int i = 0; i < xParams.Length; i++) {
+                    if (xParams[i].ParameterType != aMethodParams[i]) {
+                        xContinue = false;
                         continue;
                     }
-                    if (xFoundMethod != null) {
-                        if (xFoundMethod.IsVirtual == aMethod.IsVirtual && 
-                            xFoundMethod.IsPrivate == false && 
-                            xFoundMethod.IsPublic == aMethod.IsPublic && 
-                            xFoundMethod.IsFamily == aMethod.IsFamily && 
-                            xFoundMethod.IsFamilyAndAssembly == aMethod.IsFamilyAndAssembly && 
-                            xFoundMethod.IsFamilyOrAssembly == aMethod.IsFamilyOrAssembly &&
-                            xFoundMethod.IsFinal == false) {
-                            xBaseMethod = xFoundMethod;
-                        }
+                }
+                if (!xContinue) {
+                    continue;
+                }
+                if (xFoundMethod != null) {
+                    if (xFoundMethod.IsVirtual == aMethod.IsVirtual && xFoundMethod.IsPrivate == false && xFoundMethod.IsPublic == aMethod.IsPublic && xFoundMethod.IsFamily == aMethod.IsFamily && xFoundMethod.IsFamilyAndAssembly == aMethod.IsFamilyAndAssembly && xFoundMethod.IsFamilyOrAssembly == aMethod.IsFamilyOrAssembly && xFoundMethod.IsFinal == false) {
+                        xBaseMethod = xFoundMethod;
                     }
                 }
+            }
             //} catch (Exception) {
-                // todo: try to get rid of the try..catch
+            // todo: try to get rid of the try..catch
             //}
             return xBaseMethod ?? aMethod;
         }
@@ -695,8 +831,7 @@ namespace Indy.IL2CPU {
         public static MethodBase GetDefinitionFromMethodBase2(MethodBase aRef) {
             Type xTypeDef;
             bool xIsArray = false;
-            if (aRef.DeclaringType.FullName.Contains("[]") || aRef.DeclaringType.FullName.Contains("[,]") ||
-                aRef.DeclaringType.FullName.Contains("[,,]")) {
+            if (aRef.DeclaringType.FullName.Contains("[]") || aRef.DeclaringType.FullName.Contains("[,]") || aRef.DeclaringType.FullName.Contains("[,,]")) {
                 xTypeDef = typeof(Array);
                 xIsArray = true;
             } else {
@@ -717,14 +852,12 @@ namespace Indy.IL2CPU {
             }
             if (xMethod == null) {
                 foreach (MethodBase xFoundMethod in xTypeDef.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)) {
-                    if (xFoundMethod.Name !=
-                        aRef.Name) {
+                    if (xFoundMethod.Name != aRef.Name) {
                         continue;
                     }
                     string[] xRefNameParts = aRef.ToString().Split(' ');
                     string[] xFoundNameParts = xFoundMethod.ToString().Split(' ');
-                    if (xFoundNameParts[0] !=
-                        xRefNameParts[0]) {
+                    if (xFoundNameParts[0] != xRefNameParts[0]) {
                         //if (!(xFoundMethod.ReturnType.ReturnType is GenericParameter && aRef.ReturnType.ReturnType is GenericParameter)) {
                         //    ArrayType xFoundArray = xFoundMethod.ReturnType.ReturnType as ArrayType;
                         //    ArrayType xArray = aRef.ReturnType.ReturnType as ArrayType;
@@ -745,14 +878,12 @@ namespace Indy.IL2CPU {
                     }
                     ParameterInfo[] xFoundParams = xFoundMethod.GetParameters();
                     ParameterInfo[] xRefParams = aRef.GetParameters();
-                    if (xFoundParams.Length !=
-                        xRefParams.Length) {
+                    if (xFoundParams.Length != xRefParams.Length) {
                         continue;
                     }
                     bool xMismatch = false;
                     for (int i = 0; i < xFoundParams.Length; i++) {
-                        if (xFoundParams[i].ParameterType.FullName !=
-                            xRefParams[i].ParameterType.FullName) {
+                        if (xFoundParams[i].ParameterType.FullName != xRefParams[i].ParameterType.FullName) {
                             //if (xFoundMethod.Parameters[i].ParameterType is GenericParameter && aRef.Parameters[i].ParameterType is GenericParameter) {
                             //	continue;
                             //}
@@ -785,8 +916,7 @@ namespace Indy.IL2CPU {
             if (aType.FullName == "System.Void") {
                 return 0;
             }
-            if ((!aType.IsValueType && aType.IsClass) ||
-                aType.IsInterface) {
+            if ((!aType.IsValueType && aType.IsClass) || aType.IsInterface) {
                 return 4;
             }
             switch (aType.FullName) {
@@ -854,7 +984,7 @@ namespace Indy.IL2CPU {
         private void ProcessAllStaticFields() {
             FieldInfo xCurrentField;
             while ((xCurrentField = (from item in mStaticFields.Keys
-                                     where !mStaticFields[item]
+                                     where !mStaticFields[item].Processed
                                      select item).FirstOrDefault()) != null) {
                 mAssembler.CurrentGroup = GetGroupForType(xCurrentField.DeclaringType);
                 string xFieldName = xCurrentField.GetFullName();
@@ -862,37 +992,52 @@ namespace Indy.IL2CPU {
                            "Processing Static Field '{0}'",
                            xFieldName);
                 xFieldName = DataMember.GetStaticFieldName(xCurrentField);
-                if (xCurrentField.ToString() == "__StaticArrayInitTypeSize=16 $$method0x6000002-1") { System.Diagnostics.Debugger.Break(); }
+                if (xCurrentField.ToString() == "__StaticArrayInitTypeSize=16 $$method0x6000002-1") {
+                    System.Diagnostics.Debugger.Break();
+                }
 
                 if (mAssembler.DataMembers.Count(x => x.Value.Name == xFieldName) == 0) {
                     var xItem = (from item in xCurrentField.GetCustomAttributes(false)
                                  where item.GetType().FullName == "ManifestResourceStreamAttribute"
                                  select item).FirstOrDefault();
                     string xManifestResourceName = null;
-                    if (xItem != null)
-                    {
+                    if (xItem != null) {
                         var xItemType = xItem.GetType();
                         xManifestResourceName = (string)xItemType.GetField("ResourceName").GetValue(xItem);
                     }
                     if (xManifestResourceName != null) {
                         RegisterType(xCurrentField.FieldType);
-                        
-                        string xFileName = Path.Combine(mOutputDir, (xCurrentField.DeclaringType.Assembly.FullName + "__" + xManifestResourceName).Replace(",", "_") + ".res");
-                        using (var xStream = xCurrentField.DeclaringType.Assembly.GetManifestResourceStream(xManifestResourceName))
-                        {
-                            if (xStream == null) { throw new Exception("Resource '" + xManifestResourceName + "' not found!"); }
-                            using (var xTarget = File.Create(xFileName))
-                            {
+
+                        string xFileName = Path.Combine(mOutputDir,
+                                                        (xCurrentField.DeclaringType.Assembly.FullName + "__" + xManifestResourceName).Replace(",",
+                                                                                                                                               "_") + ".res");
+                        using (var xStream = xCurrentField.DeclaringType.Assembly.GetManifestResourceStream(xManifestResourceName)) {
+                            if (xStream == null) {
+                                throw new Exception("Resource '" + xManifestResourceName + "' not found!");
+                            }
+                            using (var xTarget = File.Create(xFileName)) {
                                 // todo: abstract this array code out.
-                                xTarget.Write(BitConverter.GetBytes(Engine.RegisterType(Engine.GetType("mscorlib", "System.Array"))), 0, 4);
-                                xTarget.Write(BitConverter.GetBytes((uint)InstanceTypeEnum.StaticEmbeddedArray), 0, 4);
-                                xTarget.Write(BitConverter.GetBytes((int)xStream.Length), 0, 4);
-                                xTarget.Write(BitConverter.GetBytes((int)1), 0, 4);
+                                xTarget.Write(BitConverter.GetBytes(Engine.RegisterType(Engine.GetType("mscorlib",
+                                                                                                       "System.Array"))),
+                                              0,
+                                              4);
+                                xTarget.Write(BitConverter.GetBytes((uint)InstanceTypeEnum.StaticEmbeddedArray),
+                                              0,
+                                              4);
+                                xTarget.Write(BitConverter.GetBytes((int)xStream.Length),
+                                              0,
+                                              4);
+                                xTarget.Write(BitConverter.GetBytes((int)1),
+                                              0,
+                                              4);
                                 var xBuff = new byte[128];
-                                while (xStream.Position < xStream.Length)
-                                {
-                                    int xBytesRead = xStream.Read(xBuff, 0, 128);
-                                    xTarget.Write(xBuff, 0, xBytesRead);
+                                while (xStream.Position < xStream.Length) {
+                                    int xBytesRead = xStream.Read(xBuff,
+                                                                  0,
+                                                                  128);
+                                    xTarget.Write(xBuff,
+                                                  0,
+                                                  xBytesRead);
                                 }
                             }
                         }
@@ -904,9 +1049,7 @@ namespace Indy.IL2CPU {
                                                                                         new DataMember(xFieldName,
                                                                                                        "dd",
                                                                                                        "___" + xFieldName + "___Contents")));
-                    }
-                    else
-                    {
+                    } else {
                         RegisterType(xCurrentField.FieldType);
                         {
                             int xTheSize;
@@ -914,42 +1057,30 @@ namespace Indy.IL2CPU {
                             Type xFieldTypeDef = xCurrentField.FieldType;
                             //TypeSpecification xTypeSpec = xCurrentField.FieldType as TypeSpecification;
                             //if (xTypeSpec == null) {
-                            if (!xFieldTypeDef.IsClass ||
-                                xFieldTypeDef.IsValueType)
-                            {
+                            if (!xFieldTypeDef.IsClass || xFieldTypeDef.IsValueType) {
                                 xTheSize = GetFieldStorageSize(xCurrentField.FieldType);
-                            }
-                            else
-                            {
+                            } else {
                                 xTheSize = 4;
                             }
                             //} else {
                             //xTheSize = 4;
                             //}
-                            if (xTheSize == 4)
-                            {
+                            if (xTheSize == 4) {
                                 theType = "dd";
                                 xTheSize = 1;
-                            }
-                            else
-                            {
-                                if (xTheSize == 2)
-                                {
+                            } else {
+                                if (xTheSize == 2) {
                                     theType = "dw";
                                     xTheSize = 1;
                                 }
                             }
                             object xValue = xCurrentField.GetValue(null);
                             string xTheData = "";
-                            if (xValue != null)
-                            {
-                                try
-                                {
-                                    if (xValue.GetType().IsValueType)
-                                    {
+                            if (xValue != null) {
+                                try {
+                                    if (xValue.GetType().IsValueType) {
                                         StringBuilder xSB = new StringBuilder(xTheSize * 3);
-                                        for (int i = 0; i < xTheSize; i++)
-                                        {
+                                        for (int i = 0; i < xTheSize; i++) {
                                             xSB.Append(Marshal.ReadByte(xValue,
                                                                         i));
                                             xSB.Append(",");
@@ -957,11 +1088,10 @@ namespace Indy.IL2CPU {
                                         xTheData = xSB.Remove(xSB.Length - 1,
                                                               1).ToString();
                                     }
+                                } catch {
                                 }
-                                catch { }
                             }
-                            if (xTheSize == 0)
-                            {
+                            if (xTheSize == 0) {
                                 throw new Exception("Field '" + xCurrentField.ToString() + "' doesn't have a valid size!");
                             }
                             if (String.IsNullOrEmpty(xTheData)) {
@@ -977,7 +1107,7 @@ namespace Indy.IL2CPU {
                         }
                     }
                 }
-                mStaticFields[xCurrentField] = true;
+                mStaticFields[xCurrentField].Processed = true;
                 OnProgressChanged();
             }
         }
@@ -1067,7 +1197,8 @@ namespace Indy.IL2CPU {
                         }
                     }
                     if (!xContentProduced) {
-                        if (mMap.HasCustomAssembleImplementation(xMethodInfo, false)) {
+                        if (mMap.HasCustomAssembleImplementation(xMethodInfo,
+                                                                 false)) {
                             mMap.DoCustomAssembleImplementation(false,
                                                                 mAssembler,
                                                                 xMethodInfo);
@@ -1132,14 +1263,12 @@ namespace Indy.IL2CPU {
 
                                         foreach (ExceptionHandlingClause xHandler in xBody.ExceptionHandlingClauses) {
                                             if (xHandler.TryOffset > 0) {
-                                                if (xHandler.TryOffset <= xReader.NextPosition &&
-                                                    (xHandler.TryLength + xHandler.TryOffset) > xReader.NextPosition) {
+                                                if (xHandler.TryOffset <= xReader.NextPosition && (xHandler.TryLength + xHandler.TryOffset) > xReader.NextPosition) {
                                                     if (xCurrentHandler == null) {
                                                         xCurrentHandler = xHandler;
                                                         continue;
                                                     }
-                                                    if (xHandler.TryOffset > xCurrentHandler.TryOffset &&
-                                                        (xHandler.TryLength + xHandler.TryOffset) < (xCurrentHandler.TryLength + xCurrentHandler.TryOffset)) {
+                                                    if (xHandler.TryOffset > xCurrentHandler.TryOffset && (xHandler.TryLength + xHandler.TryOffset) < (xCurrentHandler.TryLength + xCurrentHandler.TryOffset)) {
                                                         // only replace if the current found handler is narrower
                                                         xCurrentHandler = xHandler;
                                                         continue;
@@ -1147,14 +1276,12 @@ namespace Indy.IL2CPU {
                                                 }
                                             }
                                             if (xHandler.HandlerOffset > 0) {
-                                                if (xHandler.HandlerOffset <= xReader.NextPosition &&
-                                                    (xHandler.HandlerOffset + xHandler.HandlerLength) > xReader.NextPosition) {
+                                                if (xHandler.HandlerOffset <= xReader.NextPosition && (xHandler.HandlerOffset + xHandler.HandlerLength) > xReader.NextPosition) {
                                                     if (xCurrentHandler == null) {
                                                         xCurrentHandler = xHandler;
                                                         continue;
                                                     }
-                                                    if (xHandler.HandlerOffset > xCurrentHandler.HandlerOffset &&
-                                                        (xHandler.HandlerOffset + xHandler.HandlerLength) < (xCurrentHandler.HandlerOffset + xCurrentHandler.HandlerLength)) {
+                                                    if (xHandler.HandlerOffset > xCurrentHandler.HandlerOffset && (xHandler.HandlerOffset + xHandler.HandlerLength) < (xCurrentHandler.HandlerOffset + xCurrentHandler.HandlerLength)) {
                                                         // only replace if the current found handler is narrower
                                                         xCurrentHandler = xHandler;
                                                         continue;
@@ -1163,14 +1290,12 @@ namespace Indy.IL2CPU {
                                             }
                                             if ((xHandler.Flags & ExceptionHandlingClauseOptions.Filter) > 0) {
                                                 if (xHandler.FilterOffset > 0) {
-                                                    if (xHandler.FilterOffset <=
-                                                        xReader.NextPosition) {
+                                                    if (xHandler.FilterOffset <= xReader.NextPosition) {
                                                         if (xCurrentHandler == null) {
                                                             xCurrentHandler = xHandler;
                                                             continue;
                                                         }
-                                                        if (xHandler.FilterOffset >
-                                                            xCurrentHandler.FilterOffset) {
+                                                        if (xHandler.FilterOffset > xCurrentHandler.FilterOffset) {
                                                             // only replace if the current found handler is narrower
                                                             xCurrentHandler = xHandler;
                                                             continue;
@@ -1217,8 +1342,7 @@ namespace Indy.IL2CPU {
                                                     xShouldIncludeDebugHeader = true;
                                                 } else {
                                                     if (xHasSymbols) {
-                                                        if (xCodeDocuments[xPreviousOffset] != xCodeDocuments[xCurrentOffset] || xCodeLines[xPreviousOffset] != xCodeLines[xCurrentOffset] || xCodeColumns[xPreviousOffset] != xCodeColumns[xCurrentOffset] || xCodeEndLines[xPreviousOffset] != xCodeEndLines[xCurrentOffset] ||
-                                                            xCodeEndColumns[xPreviousOffset] != xCodeEndColumns[xCurrentOffset]) {
+                                                        if (xCodeDocuments[xPreviousOffset] != xCodeDocuments[xCurrentOffset] || xCodeLines[xPreviousOffset] != xCodeLines[xCurrentOffset] || xCodeColumns[xPreviousOffset] != xCodeColumns[xCurrentOffset] || xCodeEndLines[xPreviousOffset] != xCodeEndLines[xCurrentOffset] || xCodeEndColumns[xPreviousOffset] != xCodeEndColumns[xCurrentOffset]) {
                                                             xShouldIncludeDebugHeader = true;
                                                         }
                                                     }
@@ -1293,13 +1417,12 @@ namespace Indy.IL2CPU {
                     xOp.Assemble();
                     mAssembler.StackContents.Clear();
                     mMethods[xCurrentMethod].Processed = true;
-                } catch (Exception e) 
-                {
+                } catch (Exception e) {
                     OnDebugLog(LogSeverityEnum.Error,
                                xCurrentMethod.GetFullName());
                     OnDebugLog(LogSeverityEnum.Warning,
                                e.ToString());
-                    
+
                     throw;
                 }
                 OnProgressChanged();
@@ -1338,8 +1461,7 @@ namespace Indy.IL2CPU {
             ParameterInfo[] xParams = aMethod.GetParameters();
             bool xParamAdded = false;
             for (int i = 0; i < xParams.Length; i++) {
-                if (xParams[i].Name == "aThis" &&
-                    i == 0) {
+                if (xParams[i].Name == "aThis" && i == 0) {
                     continue;
                 }
                 if (xParams[i].IsDefined(typeof(FieldAccessAttribute),
@@ -1396,8 +1518,7 @@ namespace Indy.IL2CPU {
                     }
                     PlugFieldAttribute[] xTypePlugFields = xType.Key.GetCustomAttributes(typeof(PlugFieldAttribute),
                                                                                          false) as PlugFieldAttribute[];
-                    if (xTypePlugFields != null &&
-                        xTypePlugFields.Length > 0) {
+                    if (xTypePlugFields != null && xTypePlugFields.Length > 0) {
                         Dictionary<string, PlugFieldAttribute> xPlugFields;
                         if (mPlugFields.ContainsKey(xTypeRef)) {
                             xPlugFields = mPlugFields[xTypeRef];
@@ -1619,8 +1740,7 @@ namespace Indy.IL2CPU {
                                                   item.Value);
                     }
                 }
-                foreach (FieldInfo xField in aType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly))
-                {
+                foreach (FieldInfo xField in aType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly)) {
                     if (xField.IsStatic) {
                         continue;
                     }
@@ -1648,8 +1768,7 @@ namespace Indy.IL2CPU {
                     //if ((!xFieldType.IsValueType && aGCObjects && xFieldType.IsClass) || (xPlugFieldAttr != null && xPlugFieldAttr.IsExternalValue && aGCObjects)) {
                     //    continue;
                     //}
-                    if ((xFieldType.IsClass && !xFieldType.IsValueType) ||
-                        (xPlugFieldAttr != null && xPlugFieldAttr.IsExternalValue)) {
+                    if ((xFieldType.IsClass && !xFieldType.IsValueType) || (xPlugFieldAttr != null && xPlugFieldAttr.IsExternalValue)) {
                         xFieldSize = 4;
                     } else {
                         xFieldSize = GetFieldStorageSize(xFieldType);
@@ -1657,7 +1776,9 @@ namespace Indy.IL2CPU {
                     //}
                     if ((from item in aTypeFields
                          where item.Key == xFieldId
-                         select item).Count() > 0) { continue; }
+                         select item).Count() > 0) {
+                        continue;
+                    }
                     int xOffset = aObjectStorageSize;
                     FieldOffsetAttribute xOffsetAttrib = xField.GetCustomAttributes(typeof(FieldOffsetAttribute),
                                                                                     true).FirstOrDefault() as FieldOffsetAttribute;
@@ -1667,13 +1788,14 @@ namespace Indy.IL2CPU {
                         aObjectStorageSize += xFieldSize;
                         xOffset = -1;
                     }
-                    aTypeFields.Insert(0, new KeyValuePair<string,TypeInformation.Field>(xField.GetFullName(),
-                                    new TypeInformation.Field(xFieldSize,
-                                                              xFieldType.IsClass && !xFieldType.IsValueType,
-                                                              xFieldType,
-                                                              (xPlugFieldAttr != null && xPlugFieldAttr.IsExternalValue)) {
-                                                                                                                              Offset = xOffset
-                                                                                                                          }));
+                    aTypeFields.Insert(0,
+                                       new KeyValuePair<string, TypeInformation.Field>(xField.GetFullName(),
+                                                                                       new TypeInformation.Field(xFieldSize,
+                                                                                                                 xFieldType.IsClass && !xFieldType.IsValueType,
+                                                                                                                 xFieldType,
+                                                                                                                 (xPlugFieldAttr != null && xPlugFieldAttr.IsExternalValue)) {
+                                                                                                                                                                                 Offset = xOffset
+                                                                                                                                                                             }));
                 }
                 while (xCurrentPlugFieldList.Count > 0) {
                     var xItem = xCurrentPlugFieldList.Values.First();
@@ -1684,22 +1806,21 @@ namespace Indy.IL2CPU {
                     if (xFieldType == null) {
                         xFieldType = xItem.FieldType;
                     }
-                    if ((xFieldType.IsClass && !xFieldType.IsValueType) ||
-                        xItem.IsExternalValue) {
+                    if ((xFieldType.IsClass && !xFieldType.IsValueType) || xItem.IsExternalValue) {
                         xFieldSize = 4;
                     } else {
                         xFieldSize = GetFieldStorageSize(xFieldType);
                     }
                     int xOffset = aObjectStorageSize;
                     aObjectStorageSize += xFieldSize;
-                    aTypeFields.Insert(0, new KeyValuePair<string,TypeInformation.Field>(xItem.FieldId,
-                                    new TypeInformation.Field(xFieldSize,
-                                                              xFieldType.IsClass && !xFieldType.IsValueType,
-                                                              xFieldType,
-                                                              xItem.IsExternalValue)));
+                    aTypeFields.Insert(0,
+                                       new KeyValuePair<string, TypeInformation.Field>(xItem.FieldId,
+                                                                                       new TypeInformation.Field(xFieldSize,
+                                                                                                                 xFieldType.IsClass && !xFieldType.IsValueType,
+                                                                                                                 xFieldType,
+                                                                                                                 xItem.IsExternalValue)));
                 }
-                if (aType.FullName != "System.Object" &&
-                    aType.BaseType != null) {
+                if (aType.FullName != "System.Object" && aType.BaseType != null) {
                     aType = aType.BaseType;
                 } else {
                     break;
@@ -1709,7 +1830,7 @@ namespace Indy.IL2CPU {
 
         public static Dictionary<string, TypeInformation.Field> GetTypeFieldInfo(Type aType,
                                                                                  out int aObjectStorageSize) {
-                                                                                     var xTypeFields = new List<KeyValuePair<string, TypeInformation.Field>>();
+            var xTypeFields = new List<KeyValuePair<string, TypeInformation.Field>>();
             aObjectStorageSize = 0;
             GetTypeFieldInfoImpl(xTypeFields,
                                  aType,
@@ -1752,8 +1873,7 @@ namespace Indy.IL2CPU {
                 throw new Exception("ERROR: No Current Engine found!");
             }
             if (!mCurrent.mStaticFields.ContainsKey(aField)) {
-                mCurrent.mStaticFields.Add(aField,
-                                           false);
+                mCurrent.mStaticFields.Add(aField, new QueuedStaticFieldInformation());
             }
         }
 
@@ -1797,18 +1917,20 @@ namespace Indy.IL2CPU {
             if (mCurrent == null) {
                 throw new Exception("ERROR: No Current Engine found!");
             }
-            if (aMethod == null) { System.Diagnostics.Debugger.Break(); }
+            if (aMethod == null) {
+                System.Diagnostics.Debugger.Break();
+            }
             if (!aMethod.IsStatic) {
                 RegisterType(aMethod.DeclaringType);
             }
-            if (aMethod.DeclaringType.FullName == "System.Object" && aMethod.Name == "Equals" && aMethod.GetParameters().Length == 1 &&
-                aMethod.GetParameters()[0].ParameterType.FullName == "System.Object") {
+            if (aMethod.DeclaringType.FullName == "System.Object" && aMethod.Name == "Equals" && aMethod.GetParameters().Length == 1 && aMethod.GetParameters()[0].ParameterType.FullName == "System.Object") {
                 System.Diagnostics.Debugger.Break();
             }
             if (!mCurrent.mMethods.ContainsKey(aMethod)) {
                 mCurrent.mMethods.Add(aMethod,
                                       new QueuedMethodInformation() {
                                                                         Processed = false,
+                                                                        PreProcessed = false,
                                                                         Index = mCurrent.mMethods.Count
                                                                     });
             }
@@ -1831,23 +1953,20 @@ namespace Indy.IL2CPU {
             if (mCurrent == null) {
                 throw new Exception("ERROR: No Current Engine found!");
             }
-            if (aType.IsArray ||
-                aType.IsPointer) {
-                if (aType.IsArray &&
-                    aType.GetArrayRank() != 1) {
+            if (aType.IsArray || aType.IsPointer) {
+                if (aType.IsArray && aType.GetArrayRank() != 1) {
                     throw new Exception("Multidimensional arrays are not yet supported!");
                 }
-                if (aType.IsArray) { aType = typeof(Array); }
-                else
-                {
+                if (aType.IsArray) {
+                    aType = typeof(Array);
+                } else {
                     aType = aType.GetElementType();
                 }
             }
             Type xFoundItem = mCurrent.mTypes.FirstOrDefault(x => x.FullName.Equals(aType.FullName));
             if (xFoundItem == null) {
                 mCurrent.mTypes.Add(aType);
-                if (aType.FullName != "System.Object" &&
-                    aType.BaseType != null) {
+                if (aType.FullName != "System.Object" && aType.BaseType != null) {
                     Type xCurInspectedType = aType.BaseType;
                     RegisterType(xCurInspectedType);
                 }
@@ -1864,10 +1983,8 @@ namespace Indy.IL2CPU {
             if (mCurrent == null) {
                 throw new Exception("ERROR: No Current Engine found!");
             }
-            if (aType.IsArray ||
-                aType.IsPointer) {
-                if (aType.IsArray &&
-                    aType.GetArrayRank() != 1) {
+            if (aType.IsArray || aType.IsPointer) {
+                if (aType.IsArray && aType.GetArrayRank() != 1) {
                     throw new Exception("Multidimensional arrays are not yet supported!");
                 }
                 aType = aType.GetElementType();
@@ -1971,8 +2088,7 @@ namespace Indy.IL2CPU {
                 //					xAssemblyDef = mCurrent.mCrawledAssembly.Resolver.Resolve(aAssembly);
                 //				}
                 //				mCurrent.mAssemblyDefCache.Add(aAssembly, xAssemblyDef);
-                if (String.IsNullOrEmpty(aAssembly) || aAssembly == typeof(Engine).Assembly.GetName().Name ||
-                    aAssembly == typeof(Engine).Assembly.GetName().FullName) {
+                if (String.IsNullOrEmpty(aAssembly) || aAssembly == typeof(Engine).Assembly.GetName().Name || aAssembly == typeof(Engine).Assembly.GetName().FullName) {
                     aAssembly = typeof(Engine).Assembly.FullName;
                 }
                 xAssemblyDef = Assembly.Load(aAssembly);
@@ -1987,8 +2103,7 @@ namespace Indy.IL2CPU {
                 throw new Exception("ERROR: No Current Engine found!");
             }
             string xActualTypeName = aType;
-            if (xActualTypeName.Contains("<") &&
-                xActualTypeName.Contains(">")) {
+            if (xActualTypeName.Contains("<") && xActualTypeName.Contains(">")) {
                 xActualTypeName = xActualTypeName.Substring(0,
                                                             xActualTypeName.IndexOf("<"));
             }
@@ -2009,14 +2124,12 @@ namespace Indy.IL2CPU {
                     continue;
                 }
                 ParameterInfo[] xParams = xMethod.GetParameters();
-                if (xParams.Length !=
-                    aParamTypes.Length) {
+                if (xParams.Length != aParamTypes.Length) {
                     continue;
                 }
                 bool errorFound = false;
                 for (int i = 0; i < xParams.Length; i++) {
-                    if (xParams[i].ParameterType.FullName !=
-                        aParamTypes[i]) {
+                    if (xParams[i].ParameterType.FullName != aParamTypes[i]) {
                         errorFound = true;
                         break;
                     }
@@ -2030,14 +2143,12 @@ namespace Indy.IL2CPU {
                     continue;
                 }
                 ParameterInfo[] xParams = xMethod.GetParameters();
-                if (xParams.Length !=
-                    aParamTypes.Length) {
+                if (xParams.Length != aParamTypes.Length) {
                     continue;
                 }
                 bool errorFound = false;
                 for (int i = 0; i < xParams.Length; i++) {
-                    if (xParams[i].ParameterType.FullName !=
-                        aParamTypes[i]) {
+                    if (xParams[i].ParameterType.FullName != aParamTypes[i]) {
                         errorFound = true;
                         break;
                     }

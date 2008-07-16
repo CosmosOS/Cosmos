@@ -1,6 +1,6 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
-
 
 using CPU = Indy.IL2CPU.Assembler.X86;
 
@@ -11,6 +11,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		protected void SetArgIndex(int aIndex, MethodInformation aMethodInfo) {
 			mArgument = aMethodInfo.Arguments[aIndex];
 		}
+
 		public Ldarg(MethodInformation aMethodInfo, int aIndex)
 			: base(null, aMethodInfo) {
 			SetArgIndex(aIndex, aMethodInfo);

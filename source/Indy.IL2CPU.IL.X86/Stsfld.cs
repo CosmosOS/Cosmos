@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Indy.IL2CPU.Assembler;
 
 
@@ -14,13 +15,17 @@ namespace Indy.IL2CPU.IL.X86 {
 		private bool mNeedsGC;
 		private string mBaseLabel;
 
+        public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
+            FieldInfo xField = aReader.OperandValueField;
+            Engine.QueueStaticField(xField);
+        }
 
 		public Stsfld(ILReader aReader, MethodInformation aMethodInfo)
 			: base(aReader, aMethodInfo) {
 			FieldInfo xField = aReader.OperandValueField;
 			mSize = Engine.GetFieldStorageSize(xField.FieldType);
 			Engine.QueueStaticField(xField, out mDataName);
-			mNeedsGC = !xField.FieldType.IsValueType && xField.FieldType.FullName != "System.String";
+			mNeedsGC = !xField.FieldType.IsValueType;
 			mDataType = xField.FieldType;
 			mBaseLabel = GetInstructionLabel(aReader);
 		}

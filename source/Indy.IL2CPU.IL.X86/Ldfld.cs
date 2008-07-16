@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 
@@ -10,6 +11,16 @@ namespace Indy.IL2CPU.IL.X86 {
 	public class Ldfld: Op {
 		private readonly TypeInformation.Field mField;
 		private readonly TypeInformation mType;
+        public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
+            FieldInfo xField = aReader.OperandValueField;
+            if (xField == null)
+            {
+                throw new Exception("Field not found!");
+            }
+            Engine.RegisterType(xField.DeclaringType);
+            Engine.RegisterType(xField.FieldType);
+        }
+
 		public Ldfld(TypeInformation.Field aField)
 			: base(null, null) {
 			mField = aField;

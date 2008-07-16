@@ -20,7 +20,23 @@ namespace Indy.IL2CPU.IL.X86 {
 		private MethodInformation mTargetMethodInfo;
 		private string mNextLabelName;
 		private int mCurrentILOffset;
-        public Call(MethodBase aMethod, int aCurrentILOffset, bool aDebugMode, int aExtraStackSpace): base(null, null)
+
+        public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
+            MethodBase xMethod = aReader.OperandValueMethod;
+            ScanOp(xMethod);
+        }
+
+        public static void ScanOp(MethodBase aTargetMethod) {
+            Engine.QueueMethod(aTargetMethod);
+            foreach (ParameterInfo xParam in aTargetMethod.GetParameters())
+            {
+                Engine.RegisterType(xParam.ParameterType);
+            }
+            var xTargetMethodInfo = Engine.GetMethodInfo(aTargetMethod, aTargetMethod, Label.GenerateLabelName(aTargetMethod), Engine.GetTypeInfo(aTargetMethod.DeclaringType), false);
+            Engine.RegisterType(xTargetMethodInfo.ReturnType);
+        }
+
+	    public Call(MethodBase aMethod, int aCurrentILOffset, bool aDebugMode, int aExtraStackSpace): base(null, null)
         {
             if (aMethod == null)
             {

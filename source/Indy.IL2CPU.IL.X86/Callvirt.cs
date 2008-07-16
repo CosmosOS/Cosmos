@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
@@ -19,6 +20,31 @@ namespace Indy.IL2CPU.IL.X86 {
         private readonly MethodInformation mTargetMethodInfo;
         private readonly int mCurrentILOffset;
         private readonly int mExtraStackSpace;
+
+        public static void ScanOp(ILReader aReader,
+                                  MethodInformation aMethodInfo,
+                                  SortedList<string, object> aMethodData) {
+            MethodBase xMethod = aReader.OperandValueMethod;
+            if (xMethod == null) {
+                throw new Exception("Unable to determine Method!");
+            }
+            MethodBase xMethodDef = xMethod;
+            var xMethodDescription = CPU.Label.GenerateLabelName(xMethodDef);
+            var xTargetMethodInfo = Engine.GetMethodInfo(xMethodDef,
+                                                         xMethodDef,
+                                                         xMethodDescription,
+                                                         null,
+                                                         aMethodInfo.DebugMode);
+            foreach (var xParam in xMethodDef.GetParameters()) {
+                Engine.RegisterType(xParam.ParameterType);
+            }
+            Engine.RegisterType(xTargetMethodInfo.ReturnType);
+            Engine.QueueMethod(xMethodDef);
+            Engine.QueueMethod(VTablesImplRefs.GetMethodAddressForTypeRef);
+            Engine.QueueMethod(CPU.Assembler.CurrentExceptionOccurredRef);
+            Engine.RegisterType(typeof(NullReferenceException));
+            Engine.QueueMethod(typeof(NullReferenceException).GetConstructor(new Type[0]));
+        }
 
         public Callvirt(ILReader aReader,
                         MethodInformation aMethodInfo)
@@ -95,7 +121,7 @@ namespace Indy.IL2CPU.IL.X86 {
                 new CPUx86.Pushd(CPUx86.Registers.AtEAX);
                 new CPUx86.Pushd("0" + mMethodIdentifier.ToString("X") + "h");
                 new CPUx86.Call(CPU.Label.GenerateLabelName(VTablesImplRefs.GetMethodAddressForTypeRef));
-    
+
                 /*
                  * On the stack now:
                  * $esp                 Params
@@ -117,7 +143,8 @@ namespace Indy.IL2CPU.IL.X86 {
                      * $esp + 4                 Params
                      * $esp + mThisOffset + 4   This
                      */
-                    new CPUx86.Move("eax", "[esp + " + (mThisOffset + 4) + "]");
+                    new CPUx86.Move("eax",
+                                    "[esp + " + (mThisOffset + 4) + "]");
                     new CPUx86.Compare("dword [eax + 4]",
                                        ((int)InstanceTypeEnum.BoxedValueType).ToString());
                     /*
@@ -136,7 +163,8 @@ namespace Indy.IL2CPU.IL.X86 {
                      * 
                      * ECX contains the method to call
                      */
-                    new CPUx86.Move("eax", "[esp + " + (mThisOffset) + "]");
+                    new CPUx86.Move("eax",
+                                    "[esp + " + (mThisOffset) + "]");
                     /*
                      * On the stack now:
                      * $esp                 Params
@@ -144,9 +172,11 @@ namespace Indy.IL2CPU.IL.X86 {
                      * 
                      * ECX contains the method to call
                      * EAX contains $This, but boxed
-                     */ 
-                    new CPUx86.Add("eax", ObjectImpl.FieldDataOffset.ToString());
-                    new CPUx86.Move("[esp + " + mThisOffset + "]", "eax");
+                     */
+                    new CPUx86.Add("eax",
+                                   ObjectImpl.FieldDataOffset.ToString());
+                    new CPUx86.Move("[esp + " + mThisOffset + "]",
+                                    "eax");
                     /*
                      * On the stack now:
                      * $esp                 Params
@@ -165,12 +195,14 @@ namespace Indy.IL2CPU.IL.X86 {
                 new CPU.Label(mLabelName + "_NOT_BOXED_THIS");
                 new CPUx86.Pop("eax");
                 if (mExtraStackSpace > 0) {
-                    new CPUx86.Sub("esp", mExtraStackSpace.ToString());
+                    new CPUx86.Sub("esp",
+                                   mExtraStackSpace.ToString());
                 }
                 new CPUx86.Call("eax");
                 new CPU.Label(mLabelName + "__AFTER_NOT_BOXED_THIS");
             }
-            new CPUx86.Test(CPUx86.Registers.ECX, 2);
+            new CPUx86.Test(CPUx86.Registers.ECX,
+                            2);
             new CPUx86.JumpIfNotEqual(MethodFooterOp.EndOfMethodLabelNameException);
             new CPU.Comment("Argument Count = " + mArgumentCount.ToString());
             for (int i = 0; i < mArgumentCount; i++) {

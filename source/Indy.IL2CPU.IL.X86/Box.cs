@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Indy.IL2CPU.Assembler;
 using CPU = Indy.IL2CPU.Assembler;
@@ -10,7 +11,16 @@ namespace Indy.IL2CPU.IL.X86 {
 		private int mTheSize;
 		private int mTypeId;
 
-		public Box(ILReader aReader, MethodInformation aMethodInfo)
+        public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
+            Type xTypeRef = aReader.OperandValueType as Type;
+            if (xTypeRef == null)
+            {
+                throw new Exception("Couldn't determine Type!");
+            } 
+            Engine.RegisterType(xTypeRef);
+        }
+
+	    public Box(ILReader aReader, MethodInformation aMethodInfo)
 			: base(aReader, aMethodInfo) {
 			Type xTypeRef = aReader.OperandValueType as Type;
 			if (xTypeRef == null) {
@@ -26,7 +36,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			//    throw new Exception("Incorrect Datasize. ( ((mTheSize / 4) * 4) === mTheSize should evaluate to true!");
 			//}
 			//if (!(xTypeRef is GenericParameter)) {
-			mTypeId = Engine.RegisterType(xTypeRef);
+                mTypeId = Engine.RegisterType(xTypeRef);
 			//}
 		}
 

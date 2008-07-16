@@ -107,6 +107,7 @@
     <Compile Include="DebugSymbolsOld.cs" />
     <Compile Include="GCImplementationRefs.cs" />
     <Compile Include="GCImplementation.cs" />
+    <Compile Include="ReadOnlyDictionary.cs" />
     <Compile Include="Utilities.cs" />
     <Compile Include="VTablesImpl.cs" />
     <Compile Include="VTablesImplRefs.cs" />

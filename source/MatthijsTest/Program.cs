@@ -36,7 +36,8 @@ namespace MatthijsTest {
         }
 
         public static void Init() {
-           Dictionary<int, int> xDict = new Dictionary<int, int>();
+           //Dictionary<int, int> xDict = new Dictionary<int, int>();
+            Console.WriteLine("Done.");
         }
 
         public static void Handler1(object sender,
