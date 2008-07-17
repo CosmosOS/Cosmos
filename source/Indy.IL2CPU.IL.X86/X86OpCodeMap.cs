@@ -114,7 +114,32 @@ namespace Indy.IL2CPU.IL.X86
 		}
 
 		private static readonly MethodBase InvokeMulticastRef = typeof(MulticastDelegateImpl).GetMethod("InvokeMulticast", BindingFlags.Public | BindingFlags.Static);
-
+        public override void ScanCustomAssembleImplementation(MethodInformation aMethod, bool aInMetalMode)
+        {
+            base.ScanCustomAssembleImplementation(aMethod, aInMetalMode);
+            if (ObjectUtilities.IsDelegate(aMethod.Method.DeclaringType))
+            {
+                if (aMethod.LabelName.EndsWith("__ctor_System_Object__System_IntPtr_"))
+                {
+                    //for (int i = 0; i < aMethodInfo.Arguments.Length; i++) {
+                    //    Op.Ldarg(aAssembler, aMethodInfo.Arguments[i]);
+                    //}
+                    //new Call(CustomImplementations.System.EventHandlerImplRefs.CtorRef) {
+                    //    Assembler = aAssembler
+                    //}.Assemble();
+                    Engine.QueueMethod(CustomImplementations.System.EventHandlerImplRefs.CtorRef);
+                    Engine.QueueMethod(aMethod.TypeInfo.TypeDef.GetMethod("Invoke"));
+                    return;
+                }
+                if (aMethod.Method.Name == "Invoke")
+                {
+                    Engine.QueueMethod(InvokeMulticastRef);
+                    Engine.QueueMethod(typeof(MulticastDelegate).GetMethod("GetInvocationList"));
+                    Engine.QueueMethod(typeof(Delegate).GetMethod("GetInvocationList"));
+                    return;
+                }
+            }
+        }
 		public override void DoCustomAssembleImplementation(bool aInMetalMode, Indy.IL2CPU.Assembler.Assembler aAssembler, MethodInformation aMethodInfo)
 		{
 			switch (aMethodInfo.LabelName)
@@ -242,9 +267,13 @@ namespace Indy.IL2CPU.IL.X86
         public override void PreProcess(Indy.IL2CPU.Assembler.Assembler mAssembler)
         {
             base.PreProcess(mAssembler);
-            RegisterAllUtilityMethods(delegate(MethodBase aMethod) {
-                                          Engine.QueueMethod(aMethod);
-                                      });
+            RegisterAllUtilityMethods(Engine.QueueMethod);
+            Engine.QueueMethod(EventHandlerImplRefs.CtorRef);
+            Engine.QueueMethod(InvokeMulticastRef);
+            var xGetInvocationListMethod = typeof(MulticastDelegate).GetMethod("GetInvocationList");
+            Engine.QueueMethod(xGetInvocationListMethod);
+            xGetInvocationListMethod = typeof(Delegate).GetMethod("GetInvocationList");
+            Engine.QueueMethod(xGetInvocationListMethod);
         }
 	}
 }

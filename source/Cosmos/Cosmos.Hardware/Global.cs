@@ -13,7 +13,7 @@ namespace Cosmos.Hardware {
             PIC.Init();
 
             Serial.InitSerial(0);
-            PIT.Initialize(Tick);
+            //PIT.Initialize(Tick);
 
             //HW.Interrupts.IRQ01 += new Interrupts.InterruptDelegate(Cosmos.Hardware.Keyboard.HandleKeyboardInterrupt);
             Interrupts.Init();
@@ -36,7 +36,9 @@ namespace Cosmos.Hardware {
             TickCount++;
         }
 
-        public static void Sleep(uint aMSec) {
+        // DO NOT USE, try to keep the kernel tickless
+        // note: if you do use it, first enable PIT in code again..
+        public static void Sleep_Old(uint aMSec) {
             Cosmos.Hardware.DebugUtil.SendNumber("PC", "Sleep", aMSec, 32);
             CPU.Halt();//At least one hlt even if aMSec is 0
             if (aMSec > 0)

@@ -16,7 +16,7 @@ namespace MatthijsTest {
         // Most users wont touch this. This will call the Cosmos Build tool
         [STAThread]
         private static void Main(string[] args) {
-            Init();
+            //Init();
             BuildUI.Run();
         }
 
@@ -37,9 +37,10 @@ namespace MatthijsTest {
 
         public static void Init() {
            //Dictionary<int, int> xDict = new Dictionary<int, int>();
-            PrintHex((uint)IPAddress.HostToNetworkOrder(0x01020304));
-            Console.WriteLine("");
-            Console.WriteLine("Done.");
+            Cosmos.Sys.Boot.Default();
+            Console.WriteLine("Press a key");
+            Console.ReadLine();
+            Console.WriteLine("Done");
         }
 
         public static void Handler1(object sender,

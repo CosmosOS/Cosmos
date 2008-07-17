@@ -105,7 +105,10 @@ namespace Indy.IL2CPU.IL {
 			return false;
 		}
 
-		public virtual void DoCustomAssembleImplementation(bool aInMetalMode, Assembler.Assembler aAssembler, MethodInformation aMethodInfo) {
+        public virtual void ScanCustomAssembleImplementation(MethodInformation aMethod, bool aInMetalMode) {
+        }
+
+	    public virtual void DoCustomAssembleImplementation(bool aInMetalMode, Assembler.Assembler aAssembler, MethodInformation aMethodInfo) {
 			PlugMethodAttribute xAttrib = aMethodInfo.Method.GetCustomAttributes(typeof(PlugMethodAttribute), true).Cast<PlugMethodAttribute>().FirstOrDefault();
 			if (xAttrib != null) {
 				Type xAssemblerType = xAttrib.MethodAssembler;

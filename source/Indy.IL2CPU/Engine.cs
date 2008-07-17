@@ -409,7 +409,8 @@ namespace Indy.IL2CPU {
                                                                   xCurrentMethod,
                                                                   xMethodName,
                                                                   xTypeInfo,
-                                                                  mDebugMode != DebugModeEnum.None);
+                                                                  mDebugMode != DebugModeEnum.None,
+                                                                  mMethods[xCurrentMethod].Info);
                     bool xIsCustomImplementation = false;
                     MethodBase xCustomImplementation = GetCustomMethodImplementation(xMethodName);
                     if (xCustomImplementation != null) {
@@ -432,6 +433,7 @@ namespace Indy.IL2CPU {
                     }
                     if (mMap.HasCustomAssembleImplementation(xMethodInfo,
                                                              false)) {
+                        mMap.ScanCustomAssembleImplementation(xMethodInfo, false);
                         continue;
                     }
 
@@ -641,7 +643,7 @@ namespace Indy.IL2CPU {
                                                          null,
                                                          null,
                                                          typeof(void),
-                                                         aDebugMode));
+                                                         aDebugMode,new Dictionary<string, object>()));
             xOp.Assembler = mAssembler;
             xOp.Assemble();
             InitVmtImplementationOp xInitVmtOp = (InitVmtImplementationOp)GetOpFromType(mMap.InitVmtImplementationOp,
@@ -680,7 +682,7 @@ namespace Indy.IL2CPU {
                                                       null,
                                                       null,
                                                       typeof(void),
-                                                      aDebugMode));
+                                                      aDebugMode, new Dictionary<string, object>()));
             xOp.Assembler = mAssembler;
             xOp.Assemble();
         }
@@ -1142,7 +1144,8 @@ namespace Indy.IL2CPU {
                                                                   xCurrentMethod,
                                                                   xMethodName,
                                                                   xTypeInfo,
-                                                                  mDebugMode != DebugModeEnum.None);
+                                                                  mDebugMode != DebugModeEnum.None,
+                                                                  mMethods[xCurrentMethod].Info);
                     IL.Op xOp = GetOpFromType(mMap.MethodHeaderOp,
                                               null,
                                               xMethodInfo);
@@ -1605,12 +1608,25 @@ namespace Indy.IL2CPU {
                                             (!aType.IsValueType) && aType.IsClass);
             return xTypeInfo;
         }
+        public static MethodInformation GetMethodInfo(MethodBase aCurrentMethodForArguments,
+                                                              MethodBase aCurrentMethodForLocals,
+                                                              string aMethodName,
+                                                              TypeInformation aTypeInfo,
+                                                              bool aDebugMode) {
+            return GetMethodInfo(aCurrentMethodForArguments,
+                                 aCurrentMethodForLocals,
+                                 aMethodName,
+                                 aTypeInfo,
+                                 aDebugMode,
+                                 null);
+        }
 
         public static MethodInformation GetMethodInfo(MethodBase aCurrentMethodForArguments,
                                                       MethodBase aCurrentMethodForLocals,
                                                       string aMethodName,
                                                       TypeInformation aTypeInfo,
-                                                      bool aDebugMode) {
+                                                      bool aDebugMode,
+            IDictionary<string, object> aMethodData) {
             MethodInformation xMethodInfo;
                                                           {
                                                               MethodInformation.Variable[] xVars = new MethodInformation.Variable[0];
@@ -1715,7 +1731,8 @@ namespace Indy.IL2CPU {
                                                                                                   aTypeInfo,
                                                                                                   aCurrentMethodForArguments,
                                                                                                   xReturnType,
-                                                                                                  aDebugMode);
+                                                                                                  aDebugMode,
+                                                                                                  aMethodData);
                                                           }
             return xMethodInfo;
         }

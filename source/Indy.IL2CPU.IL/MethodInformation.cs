@@ -139,7 +139,8 @@ namespace Indy.IL2CPU.IL {
                                  TypeInformation aTypeInfo,
                                  MethodBase aMethod,
                                  Type aReturnType,
-                                 bool debugMode) {
+                                 bool debugMode,
+                                 IDictionary<string, object> aMethodData) {
             Locals = aLocals;
             DebugMode = debugMode;
             LabelName = aLabelName;
@@ -149,6 +150,7 @@ namespace Indy.IL2CPU.IL {
             TypeInfo = aTypeInfo;
             Method = aMethod;
             ReturnType = aReturnType;
+            MethodData = aMethodData;
             LocalsSize = (from item in aLocals
                           let xSize = (item.Size % 4 == 0)
                                           ? item.Size

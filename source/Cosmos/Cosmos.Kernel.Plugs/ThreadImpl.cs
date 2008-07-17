@@ -12,7 +12,8 @@ namespace Cosmos.Kernel.Plugs {
 		}
         public static void Sleep(int millisecondsTimeout)
         {
-            Cosmos.Hardware.Global.Sleep((uint) millisecondsTimeout);
+            //Cosmos.Hardware.Global.Sleep((uint) millisecondsTimeout);
+            Kernel.CPU.Halt();
         }
 
 	}

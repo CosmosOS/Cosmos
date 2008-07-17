@@ -14,6 +14,7 @@ namespace Indy.IL2CPU.IL.X86
         public readonly MethodInformation.Argument[] Args;
         public readonly bool DebugMode;
         public readonly bool MethodIsNonDebuggable;
+        public readonly int LocAllocItemCount;
 
         public X86MethodFooterOp(ILReader aReader, MethodInformation aMethodInfo)
             : base(aReader, aMethodInfo)
@@ -28,16 +29,21 @@ namespace Indy.IL2CPU.IL.X86
                 ReturnSize = aMethodInfo.ReturnSize;
                 DebugMode = aMethodInfo.DebugMode;
                 MethodIsNonDebuggable = aMethodInfo.IsNonDebuggable;
+                LocAllocItemCount = 0;
+                if(aMethodInfo.MethodData == null){System.Diagnostics.Debugger.Break();}
+                if (aMethodInfo.MethodData.ContainsKey(Localloc.LocAllocCountMethodDataEntry)) {
+                    LocAllocItemCount = (int)aMethodInfo.MethodData[Localloc.LocAllocCountMethodDataEntry];
+                }
             }
         }
 
         public override void DoAssemble()
         {
             AssembleFooter(ReturnSize, Assembler, Locals, Args, (from item in Args
-                                                                 select item.Size).Sum(), DebugMode, MethodIsNonDebuggable);
+                                                                 select item.Size).Sum(), DebugMode, MethodIsNonDebuggable, LocAllocItemCount);
         }
 
-        public static void AssembleFooter(int aReturnSize, Assembler.Assembler aAssembler, MethodInformation.Variable[] aLocals, MethodInformation.Argument[] aArgs, int aTotalArgsSize, bool aDebugMode, bool aIsNonDebuggable)
+        public static void AssembleFooter(int aReturnSize, Assembler.Assembler aAssembler, MethodInformation.Variable[] aLocals, MethodInformation.Argument[] aArgs, int aTotalArgsSize, bool aDebugMode, bool aIsNonDebuggable, int aLocAllocItemCount)
         {
             int xReturnSize = aReturnSize;
             if (xReturnSize % 4 > 0)
@@ -64,6 +70,10 @@ namespace Indy.IL2CPU.IL.X86
             }
             new CPUx86.Jump(EndOfMethodLabelNameException);
             new Label(EndOfMethodLabelNameException);
+            for (int i = 0; i < aLocAllocItemCount;i++ )
+            {
+                new CPUx86.Call(Label.GenerateLabelName(typeof(RuntimeEngine).GetMethod("Heap_Free")));
+            }
             if (aDebugMode && aIsNonDebuggable)
             {
                 new CPUx86.Call("DebugPoint_DebugResume");
