@@ -37,10 +37,10 @@ namespace MatthijsTest {
 
         public static void Init() {
            //Dictionary<int, int> xDict = new Dictionary<int, int>();
-            Cosmos.Sys.Boot.Default();
-            Console.WriteLine("Press a key");
-            Console.ReadLine();
-            Console.WriteLine("Done");
+            Cosmos.Sys.Boot.MtWDefault();
+            //Console.WriteLine("Press a key");
+            //Console.ReadLine();
+            //Console.WriteLine("Done");
         }
 
         public static void Handler1(object sender,

@@ -24,6 +24,7 @@ namespace Cosmos.Hardware {
             // Old
             Keyboard.Initialize();
             // New
+            Storage.ATA.ATA.Initialize();
             //Device.Add(new PC.Bus.CPU.Keyboard());
         }
 

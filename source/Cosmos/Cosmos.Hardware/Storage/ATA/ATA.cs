@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cosmos.Kernel;
 
-namespace Cosmos.Hardware.Storage.ATA2 {
+namespace Cosmos.Hardware.Storage.ATA {
 	public class ATA: BlockDevice {
         //private static readonly ushort[] mControllerAddresses1 = new ushort[] { 
         //    0x1F0,
@@ -129,8 +130,7 @@ namespace Cosmos.Hardware.Storage.ATA2 {
 
         }
         
-        private static Action<uint> mSleep;
-		private readonly string mName;
+        private readonly string mName;
 		private readonly byte mControllerIndex;
 		private readonly ushort mController;
 		private readonly ushort mController2;
@@ -193,7 +193,7 @@ namespace Cosmos.Hardware.Storage.ATA2 {
 			IOWriteByte(mController_DeviceHead, (byte)((mDrive << 4) + (1 << 6)));
 			uint xTimeout = Timeout;
 			while ((IOReadByte(mController_Command) & IDE_STATUSREG_DRDY) == 0) {
-				mSleep(1);
+				CPU.Halt();
 				xTimeout--;
 			}
 			if ((IOReadByte(mController_Command) & IDE_STATUSREG_DRDY) == 0) {
@@ -202,7 +202,7 @@ namespace Cosmos.Hardware.Storage.ATA2 {
 			IOWriteByte(mController_Command, 0xF8);
 			xTimeout = Timeout;
 			while ((IOReadByte(mController_Command) & IDE_STATUSREG_BSY) != 0) {
-				mSleep(1);
+                CPU.Halt();
 				xTimeout--;
 			}
 			if ((IOReadByte(mController_Command) & IDE_STATUSREG_BSY) != 0) {
@@ -229,20 +229,15 @@ namespace Cosmos.Hardware.Storage.ATA2 {
 
 		private static uint mPrimaryInterruptCount;
 
-		public static void Initialize(Action<uint> aSleep) {
-			if (aSleep == null) {
-				throw new ArgumentNullException("aSleep");
-			}
-			mSleep = aSleep;
+		public static void Initialize() {
 			DebugUtil.SendMessage("ATA", "Start Device Detection");
 			DebugUtil.SendNumber("ATA", "Controllers", (uint)GetControllerAddressCount(), 32);
 			for (byte xControllerBaseAIdx = 0; xControllerBaseAIdx < GetControllerAddressCount(); xControllerBaseAIdx++) {
 				for (byte xDrive = 0; xDrive < 2; xDrive++) {
 					IOWriteByte((ushort)(GetControllerAddress1(xControllerBaseAIdx) + ATA_DRIVEHEAD), (byte)((xControllerBaseAIdx << 4) | 0xA0 | (xDrive << 4)));
 
-                    Console.WriteLine("ok1"); 
-                    
-                    mSleep(1);
+                    Console.WriteLine("ok1");
+                    CPU.Halt();
                     Console.WriteLine("ok2");
 					if (IOReadByte((ushort)(GetControllerAddress1(xControllerBaseAIdx) + ATA_STATUS)) == 0x50) {
 						ATA xATA;
@@ -287,7 +282,7 @@ namespace Cosmos.Hardware.Storage.ATA2 {
 			DebugUtil.SendNumber("ATA", "ReadBlock", (ushort)aBlock, 32);
 			uint xSleepCount = Timeout;
 			while (((IOReadByte(mController_Command) & (IDE_STATUSREG_BSY | IDE_STATUSREG_DRQ)) != 0) && xSleepCount > 0) {
-				mSleep(1);
+                CPU.Halt();
 				xSleepCount--;
 			}
 			if (((IOReadByte(mController_Command) & (IDE_STATUSREG_BSY | IDE_STATUSREG_DRQ)) != 0) && xSleepCount > 0) {
@@ -300,7 +295,7 @@ namespace Cosmos.Hardware.Storage.ATA2 {
 			//5) The BSY and DRQ bits must be 0 again for you to know that the IDE controller and the selected IDE drive are ready. 
 			xSleepCount = Timeout;
 			while (((IOReadByte(mController_Command) & (IDE_STATUSREG_BSY | IDE_STATUSREG_DRQ)) != 0) && xSleepCount > 0) {
-				mSleep(1);
+                CPU.Halt();
 				xSleepCount--;
 			}
 			if (((IOReadByte(mController_Command) & (IDE_STATUSREG_BSY | IDE_STATUSREG_DRQ)) != 0) && xSleepCount > 0) {
@@ -335,7 +330,7 @@ namespace Cosmos.Hardware.Storage.ATA2 {
 			xSleepCount = Timeout;
 			while (((IOReadByte(mController_Command) & (IDE_STATUSREG_BSY | IDE_STATUSREG_DRQ)) != IDE_STATUSREG_DRQ) && xSleepCount != 0) {
 				xSleepCount--;
-				mSleep(1);
+                CPU.Halt();
 			}
 			if ((IOReadByte(mController_Command) & (IDE_STATUSREG_BSY | IDE_STATUSREG_DRQ)) != IDE_STATUSREG_DRQ) {
 				throw new Exception("[ATA#13] Read failed");
@@ -361,7 +356,7 @@ namespace Cosmos.Hardware.Storage.ATA2 {
 		public override void WriteBlock(ulong aBlock, byte[] aContents) {
 			uint xSleepCount = Timeout;
 			while (((IOReadByte(mController_Command) & 0x80) == 0x80) && xSleepCount > 0) {
-				mSleep(1);
+                CPU.Halt();
 				xSleepCount--;
 			}
 			if (xSleepCount == 0) {
@@ -377,7 +372,7 @@ namespace Cosmos.Hardware.Storage.ATA2 {
 			IOWriteByte(mController_Command, 0x30);
 			xSleepCount = Timeout;
 			while (((IOReadByte(mController_Command) & 0x80) == 0x80) && xSleepCount > 0) {
-				mSleep(1);
+                CPU.Halt();
 				xSleepCount--;
 			}
 			if (xSleepCount == 0) {
@@ -385,7 +380,7 @@ namespace Cosmos.Hardware.Storage.ATA2 {
 			}
 			xSleepCount = Timeout;
 			while (((IOReadByte(mController_AlternateStatus) & 0x8) == 0x8) && xSleepCount > 0) {
-				mSleep(1);
+                CPU.Halt();
 				xSleepCount--;
 			}
 			if (xSleepCount == 0) {
