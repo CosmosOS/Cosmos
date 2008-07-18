@@ -109,12 +109,10 @@ static void Main(string[] args)
             get { return (ulong)(length / BlockSize); }
         }
 
-        public override byte[] ReadBlock(ulong aBlock)
+        public override void ReadBlock(ulong aBlock, byte[] aBuffer)
         {
-            byte[] b = new byte[(uint)BlockSize];
             s.Seek((uint)(aBlock * BlockSize), SeekOrigin.Begin);
-            s.Read(b, 0, (int)BlockSize);
-            return b;
+            s.Read(aBuffer, 0, (int)BlockSize);
         }
 
         public override void WriteBlock(ulong aBlock, byte[] aContents)

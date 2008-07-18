@@ -33,8 +33,8 @@ namespace Cosmos.FileSystem {
 				return aBlock + mBlockStart;
 			}
 
-			public override byte[] ReadBlock(ulong aBlock) {
-				return mBackend.ReadBlock(GetActualBlock(aBlock));
+			public override void ReadBlock(ulong aBlock, byte[] aBuffer) {
+				mBackend.ReadBlock(GetActualBlock(aBlock), aBuffer);
 			}
 
 			public override void WriteBlock(ulong aBlock, byte[] aContents) {
@@ -73,7 +73,8 @@ namespace Cosmos.FileSystem {
             List<Device> partitionList = new List<Device>();
             int xContentsIndex = 0x1BE;
             //DebugUtil.SendMessage("MBT", "Found Device");
-            byte[] xBlockContents = xBlockDev.ReadBlock(0);
+            byte[] xBlockContents = new byte[xBlockDev.BlockSize];
+            xBlockDev.ReadBlock(0, xBlockContents);
             // detecting whether MBT or not
             //DebugUtil.SendNumber("MBT", "xBlockDev.BlockSize", xBlockDev.BlockSize, 32);
 

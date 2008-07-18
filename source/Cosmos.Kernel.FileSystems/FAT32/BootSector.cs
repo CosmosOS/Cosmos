@@ -256,7 +256,7 @@ namespace Cosmos.FileSystem.FAT32
 
         public void Refresh()
         {
-            Sector = p.ReadBlock(0);
+            p.ReadBlock(0, Sector);
         }
         public void Save()
         {

@@ -20,7 +20,7 @@ namespace Cosmos.FileSystem.FAT32
 
         public void Load()
         {
-            Sector = p.ReadBlock(Offset);
+            p.ReadBlock(Offset, Sector);
         }
         public void Load(uint Offset)
         {

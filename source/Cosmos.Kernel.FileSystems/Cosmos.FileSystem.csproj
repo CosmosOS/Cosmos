@@ -46,14 +46,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Ext2\Ext2.cs" />
+    <Compile Include="Ext2\Ext2.Structs.cs" />
     <Compile Include="FAT32\BootSector.cs" />
     <Compile Include="FAT32\DirectoryTable.cs" />
     <Compile Include="FAT32\FAT.cs" />
     <Compile Include="FAT32\FATStream.cs" />
     <Compile Include="FAT32\FileAllocationTable.cs" />
     <Compile Include="FAT32\FileSystemInfo32.cs" />
-    <Compile Include="FileSystem.cs" />
-    <Compile Include="ext2\ext2FS.cs" />
+    <Compile Include="Filesystem.cs" />
+    <Compile Include="FileSystem_Old.cs" />
     <Compile Include="MBR.cs" />
     <Compile Include="MBT.cs" />
     <Compile Include="Old\Ext2.cs" />

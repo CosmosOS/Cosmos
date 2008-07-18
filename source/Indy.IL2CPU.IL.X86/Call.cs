@@ -94,9 +94,6 @@ namespace Indy.IL2CPU.IL.X86 {
 			mResultSize = 0;
 			if (mTargetMethodInfo != null) {
 				mResultSize = mTargetMethodInfo.ReturnSize;
-				if (mResultSize > 8) {
-					throw new Exception("ReturnValues of sizes larger than 8 bytes not supported yet (" + mResultSize + ")");
-				}
 			}
 			LabelName = CPU.Label.GenerateLabelName(aMethod);
 			Engine.QueueMethod(aMethod);

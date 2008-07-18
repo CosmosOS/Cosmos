@@ -105,7 +105,7 @@ namespace Cosmos.FileSystem
         public void Refresh()
         {
             // disable and remove any partitions we already added
-            Sector = blockdevice.ReadBlock(0);
+            blockdevice.ReadBlock(0, Sector);
             //add partitons back to device list
         }
         public void Save()
@@ -234,9 +234,9 @@ namespace Cosmos.FileSystem
                 get { return Length; }
             }
 
-            public override byte[] ReadBlock(ulong aBlock)
+            public override void ReadBlock(ulong aBlock, byte[] aBuffer)
             {
-                return blockDev.ReadBlock(aBlock + Start);
+                blockDev.ReadBlock(aBlock + Start, aBuffer);
             }
 
             public override void WriteBlock(ulong aBlock, byte[] aContents)

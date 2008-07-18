@@ -6486,8 +6486,8 @@ namespace Cosmos.Hardware {
         /// <summary>
         /// Enumerates a given bus, adding devices to Devices
         /// </summary>
-        /// <param name="Bus">The bus number to enumerate</param>
-        /// <param name="Devices">The list of Devices</param>
+        /// <param name="aBus">The bus number to enumerate</param>
+        /// <param name="rDevices">The list of Devices</param>
         private static void EnumerateBus(byte aBus, ref List<PCIDevice> rDevices) {
             //Console.WriteLine("Enumerate " + Bus ); 
             

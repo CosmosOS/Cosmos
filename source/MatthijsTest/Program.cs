@@ -5,6 +5,9 @@ using System.IO.Compression;
 using System.Net;
 using System.Security.Cryptography;
 using Cosmos.Build.Windows;
+using Cosmos.FileSystem.Ext2;
+using Cosmos.Hardware;
+using Cosmos.Hardware.Storage.ATA;
 using ICSharpCode.SharpZipLib.Zip.Compression;
 using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 using Huffman;
@@ -36,11 +39,18 @@ namespace MatthijsTest {
         }
 
         public static void Init() {
-           //Dictionary<int, int> xDict = new Dictionary<int, int>();
-            Cosmos.Sys.Boot.MtWDefault();
+            //Dictionary<int, int> xDict = new Dictionary<int, int>();
+            Cosmos.Sys.Boot.Default();
             //Console.WriteLine("Press a key");
             //Console.ReadLine();
             //Console.WriteLine("Done");
+            var xStorage = Cosmos.Hardware.Device.FindFirst(Device.DeviceType.Storage) as BlockDevice;
+            if (xStorage == null)
+            {
+                Console.WriteLine("ERROR: StorageDevice not found!");
+                return;
+            }
+            var xExt2 = new Ext2(xStorage);
         }
 
         public static void Handler1(object sender,

@@ -1857,7 +1857,7 @@ namespace Indy.IL2CPU {
                 if (xStructLayout.Size == 0) {
                     aObjectStorageSize = (from item in xTypeFields
                                           let xSize = item.Value.Offset + item.Value.Size
-                                          orderby xSize
+                                          orderby xSize descending 
                                           select xSize).FirstOrDefault();
                 } else {
                     aObjectStorageSize = xStructLayout.Size;

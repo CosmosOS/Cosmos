@@ -142,7 +142,7 @@ namespace Cosmos.FileSystem.FAT32
             if (Sector != SectorNumber)
             {
                 SectorNumber = Sector;
-                CachedSector = p.ReadBlock(Sector);
+                p.ReadBlock(Sector, CachedSector);
             }
             return CachedSector;
         }

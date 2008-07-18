@@ -15,7 +15,7 @@ namespace Cosmos.Hardware {
 			get;
 		}
 
-		public abstract byte[] ReadBlock(ulong aBlock);
+		public abstract void ReadBlock(ulong aBlock, byte[] aContents);
 		public abstract void WriteBlock(ulong aBlock, byte[] aContents);
 	}
 }

@@ -94,10 +94,10 @@ namespace Cosmos.FileSystem.FAT32
             byte[] data = new byte[ClusterSize];
             
             uint Sector = FirstSectorOfCluster(cluster);
-
+            byte[] read = new byte[p.BlockSize];
             for (int i = 0; i < SectorsPerCluster; i++)
             {
-                byte[] read = p.ReadBlock(Sector++);
+                p.ReadBlock(Sector++, read);
                 Array.Copy(read, 0, data, i * BytesPerSector, BytesPerSector);
             }
             return data;

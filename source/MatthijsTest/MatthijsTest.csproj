@@ -59,6 +59,14 @@
       <Project>{1F0EDE86-F6D4-4355-9A97-10E90457770C}</Project>
       <Name>Cosmos.Build.Windows</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Kernel.FileSystems\Cosmos.FileSystem.csproj">
+      <Project>{5C293BB9-FB42-495E-AAD9-D15888631CA4}</Project>
+      <Name>Cosmos.FileSystem</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos\Cosmos.Hardware\Cosmos.Hardware.csproj">
+      <Project>{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}</Project>
+      <Name>Cosmos.Hardware</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Cosmos\Cosmos.Kernel\Cosmos.Kernel.csproj">
       <Project>{A1F83D9F-2D44-4264-A08B-416797123018}</Project>
       <Name>Cosmos.Kernel</Name>

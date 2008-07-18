@@ -45,13 +45,9 @@ namespace MohammedTest
             }
         }
 
-        public override byte[] ReadBlock(ulong aBlock)
+        public override void ReadBlock(ulong aBlock, byte[] aBuffer)
         {
-            byte[] buff = new byte[MAXBLOCKSIZE];
-
-            str.Read(buff, (int)aBlock, MAXBLOCKSIZE);
-
-            return buff;
+            str.Read(aBuffer, (int)aBlock, MAXBLOCKSIZE);
         }
 
         public override void WriteBlock(ulong aBlock, byte[] aContents)

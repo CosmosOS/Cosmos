@@ -276,7 +276,7 @@ namespace Cosmos.Hardware.Storage.ATA {
 #define CB_ASTAT 8   // alternate status in     pio_base_addr2+6
 #define CB_DC    8   // device control      out pio_base_addr2+6
 #define CB_DA    9   // device address   in     pio_base_addr2+7*/
-		public override byte[] ReadBlock(ulong aBlock) {
+		public override void ReadBlock(ulong aBlock, byte[] aBuffer) {
 			// 1) Read the status register of the primary or the secondary IDE controller. 
 			// 2) The BSY and DRQ bits must be zero if the controller is ready. 
 			DebugUtil.SendNumber("ATA", "ReadBlock", (ushort)aBlock, 32);
@@ -336,11 +336,10 @@ namespace Cosmos.Hardware.Storage.ATA {
 				throw new Exception("[ATA#13] Read failed");
 			}
 			//14) Read one sector from the IDE Controller 16-bits at a time using the IN or the INSW instructions. 
-			byte[] xResult = new byte[512];
 			for (uint i = 0; i < 256; i++) {
 				ushort xValue = IOReadWord(mController);
-				xResult[i * 2] = (byte)xValue;
-				xResult[(i * 2) + 1] = (byte)(xValue >> 8);
+                aBuffer[i * 2] = (byte)xValue;
+                aBuffer[(i * 2) + 1] = (byte)(xValue >> 8);
 			}
 			// 15) See if you have to read one more sector. If yes, repeat from step 11 again. 
 			//16) If you don't need to read any more sectors, read the Alternate Status Register and ignore the byte that you read. 
@@ -349,8 +348,7 @@ namespace Cosmos.Hardware.Storage.ATA {
 			//    the INTRQ and you will not have pending IRQs waiting to be detected. This is a MUST to read 
 			//    the status register when you are done reading from IDE ports. 
 			IOReadByte(mController_Command);
-			DebugUtil.SendATA_BlockReceived(mControllerIndex, mDrive, (uint)aBlock, xResult);
-			return xResult;
+            DebugUtil.SendATA_BlockReceived(mControllerIndex, mDrive, (uint)aBlock, aBuffer);
 		}
 
 		public override void WriteBlock(ulong aBlock, byte[] aContents) {
