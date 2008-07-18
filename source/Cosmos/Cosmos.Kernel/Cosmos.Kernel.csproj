@@ -63,6 +63,7 @@
     <Compile Include="CPUBus.cs" />
     <Compile Include="Extension\Binary.cs" />
     <Compile Include="Extension\Hex.cs" />
+    <Compile Include="GC.cs" />
     <Compile Include="Global.cs" />
   </ItemGroup>
   <ItemGroup>

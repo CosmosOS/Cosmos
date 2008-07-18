@@ -65,6 +65,7 @@
     <Compile Include="Assemblers\IOWrite8.cs" />
     <Compile Include="Assemblers\ZeroFill.cs" />
     <Compile Include="CultureInfo.cs" />
+    <Compile Include="GCImplementationImpl.cs" />
     <Compile Include="Hardware\PC\Bus\CPUBus.cs" />
     <Compile Include="HeapImpl.cs" />
     <Compile Include="String.cs" />

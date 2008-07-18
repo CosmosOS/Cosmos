@@ -23,6 +23,28 @@ namespace EsxTest
         public static void Init()
         {
             Cosmos.Sys.Boot.Default();
+            //PciTest();
+            GCTest();
+        }
+
+        class Test
+        {
+            private int a;
+        }
+
+        private static void GCTest()
+        {
+            Console.WriteLine("GCTest");
+
+            var test = new Test();
+
+            Console.WriteLine("Press Enter for Reboot");
+            Console.ReadLine();
+            Deboot.Reboot();
+        }
+
+        private static void PciTest()
+        {
             PCIBus.Init();
             var deviceIDs = new PCIBus.DeviceIDs();
             foreach (var device in PCIBus.Devices)
