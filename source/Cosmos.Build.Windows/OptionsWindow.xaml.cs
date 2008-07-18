@@ -196,21 +196,26 @@ namespace Cosmos.Build.Windows {
 
                 mBuilder.DebugLog += xBuildWindow.DoDebugMessage;
                 mBuilder.ProgressChanged += delegate(int aMax,
-                                                     int aCurrent) {
-                                                xBuildWindow.progressText.Content = String.Format("Processing method {0:d} of {1:d}",
-                                                                                                  aCurrent,
-                                                                                                  aMax);
-                                                xBuildWindow.ProgressMax = aMax;
-                                                xBuildWindow.ProgressCurrent = aCurrent;
-                                                var xFrame = new DispatcherFrame();
-                                                Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Input,
-                                                                                         new DispatcherOperationCallback(delegate(object aParam) {
-                                                                                                                             xFrame.Continue = false;
-                                                                                                                             return null;
-                                                                                                                         }),
-                                                                                         null);
-                                                Dispatcher.PushFrame(xFrame);
-                                            };
+                                                     int aCurrent)
+                {
+                    string xRemainingTime = String.Format(System.Globalization.CultureInfo.InvariantCulture.DateTimeFormat, 
+                        "{0:T}", new DateTime(xBuildWindow.CalculateRemainingTime(aCurrent, aMax).Ticks));
+
+                    xBuildWindow.progressText.Content = String.Format("Processing method {0:d} of {1:d}{2}({3} remaining)",
+                                                                      aCurrent,
+                                                                      aMax, Environment.NewLine, xRemainingTime);
+                    xBuildWindow.ProgressMax = aMax;
+                    xBuildWindow.ProgressCurrent = aCurrent;
+                    var xFrame = new DispatcherFrame();
+                    Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Input,
+                                                             new DispatcherOperationCallback(delegate(object aParam)
+                    {
+                        xFrame.Continue = false;
+                        return null;
+                    }),
+                                                             null);
+                    Dispatcher.PushFrame(xFrame);
+                };
                 xBuildWindow.Show();
                 try {
                     mBuilder.Compile(mDebugMode,
