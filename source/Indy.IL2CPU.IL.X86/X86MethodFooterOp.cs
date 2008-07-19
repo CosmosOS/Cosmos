@@ -30,7 +30,10 @@ namespace Indy.IL2CPU.IL.X86
                 DebugMode = aMethodInfo.DebugMode;
                 MethodIsNonDebuggable = aMethodInfo.IsNonDebuggable;
                 LocAllocItemCount = 0;
-                if(aMethodInfo.MethodData == null){System.Diagnostics.Debugger.Break();}
+                if (aMethodInfo.LabelName.Contains("TestMethodThreeParams") || aMethodInfo.LabelName.Contains("TestMethodComplicated"))
+                {
+                    System.Diagnostics.Debugger.Break();
+                }
                 if (aMethodInfo.MethodData.ContainsKey(Localloc.LocAllocCountMethodDataEntry)) {
                     LocAllocItemCount = (int)aMethodInfo.MethodData[Localloc.LocAllocCountMethodDataEntry];
                 }
@@ -54,12 +57,30 @@ namespace Indy.IL2CPU.IL.X86
             new CPUx86.Move("ecx", "0");
             if (aReturnSize > 0)
             {
+                //var xArgSize = (from item in aArgs
+                //                let xSize = item.Size + item.Offset
+                //                select xSize).FirstOrDefault();
+                //new Comment(String.Format("ReturnSize = {0}, ArgumentSize = {1}",
+                //                          aReturnSize,
+                //                          xArgSize));
+                //int xOffset = 4;
+                //if(xArgSize>0) {
+                //    xArgSize -= xReturnSize;
+                //    xOffset = xArgSize;
+                //}
                 int xOffset = 4;
                 if (aArgs.Length > 0)
                 {
-                    xOffset = aArgs.First().Offset+4;
-                    if (xOffset < 0) {
-                        xOffset = 0; }
+                    // old code:
+                    //xOffset = aArgs.First().Offset + 4;
+                    //if (xOffset < 0)
+                    //{
+                    //    xOffset = 0;
+                    //}
+
+                    // new code:
+                    xOffset = (from item in aArgs
+                               select item.Offset + item.Size).First();
                 }
                 for (int i = 0; i < xReturnSize / 4; i++)
                 {
