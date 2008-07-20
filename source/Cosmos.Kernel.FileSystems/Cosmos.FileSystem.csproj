@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DebugUtil.cs" />
     <Compile Include="Ext2\Ext2.cs" />
     <Compile Include="Ext2\Ext2.Structs.cs" />
     <Compile Include="FAT32\BootSector.cs" />

@@ -77,10 +77,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Test.txt" />
+    <None Include="Test.txt" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Test.txt.gz" />
+    <None Include="Test.txt.gz" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="ICSharpCode.SharpZipLib.dll" />

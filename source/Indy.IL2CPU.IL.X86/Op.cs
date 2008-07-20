@@ -209,37 +209,12 @@ namespace Indy.IL2CPU.IL.X86 {
                 new CPUx86.Move("ecx",
                                 "[ecx]");
             }
-            if (aField.Size >= 4) {
                 for (int i = 1; i <= (aField.Size / 4); i++) {
                     new CPUx86.Move("eax",
                                     "[ecx + 0x" + (aField.Size - (i * 4)).ToString("X") + "]");
                     new CPUx86.Pushd("eax");
                 }
-                switch (aField.Size % 4) {
-                    case 1: {
-                        new CPUx86.Move("eax",
-                                        "0");
-                        new CPUx86.Move("al",
-                                        "[ecx]");
-                        new CPUx86.Push("eax");
-                        break;
-                    }
-                    case 2: {
-                        new CPUx86.Move("eax",
-                                        "0");
-                        new CPUx86.Move("ax",
-                                        "[ecx + 0x]");
-                        new CPUx86.Push("eax");
-                        break;
-                    }
-                    case 0: {
-                        break;
-                    }
-                    default:
-                        throw new Exception("Remainder size " + (aField.Size % 4) + " not supported!");
-                }
-            } else {
-                switch (aField.Size) {
+                switch (aField.Size%4) {
                     case 1: {
                         new CPUx86.Move("eax",
                                         "0");
@@ -262,7 +237,6 @@ namespace Indy.IL2CPU.IL.X86 {
                     default:
                         throw new Exception("Remainder size " + (aField.Size) + " not supported!");
                 }
-            }
             if (aAddGCCode && aField.NeedsGC) {
                 new CPUx86.Pushd(Registers.AtESP);
                 Engine.QueueMethod(GCImplementationRefs.IncRefCountRef);

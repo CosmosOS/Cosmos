@@ -17,7 +17,7 @@ namespace Indy.IL2CPU.Assembler.X86
 		}
 		public override string ToString()
 		{
-			return "jge " + Address;
+			return "jge near " + Address;
 		}
 	}
 }

@@ -39,18 +39,64 @@ namespace MatthijsTest {
         }
 
         public static void Init() {
-            //Dictionary<int, int> xDict = new Dictionary<int, int>();
             Cosmos.Sys.Boot.Default();
-            //Console.WriteLine("Press a key");
-            //Console.ReadLine();
-            //Console.WriteLine("Done");
             var xStorage = Cosmos.Hardware.Device.FindFirst(Device.DeviceType.Storage) as BlockDevice;
-            if (xStorage == null)
-            {
+            if (xStorage == null) {
                 Console.WriteLine("ERROR: StorageDevice not found!");
                 return;
             }
             var xExt2 = new Ext2(xStorage);
+            var xDirectoryListing = xExt2.GetDirectoryListing(xExt2.RootId);
+            if (xDirectoryListing == null) {
+                Console.WriteLine("No DirectoryListing!");
+            } else {
+                Console.Write("Directory entries count: ");
+                Console.WriteLine(xDirectoryListing.Length.ToString());
+                for (int i = 0; i < xDirectoryListing.Length; i++) {
+                    Console.Write(xDirectoryListing[i].Name);
+                    if (xDirectoryListing[i].IsDirectory) {
+                        Console.WriteLine("/");
+                        if(xDirectoryListing[i].Id != xExt2.RootId) {
+                            var xDirListing2 = xExt2.GetDirectoryListing(xDirectoryListing[i].Id);
+                            for(int j = 0; j<xDirListing2.Length;j++) {
+                                Console.Write("    ");
+                                Console.Write(xDirListing2[j].Name);
+                                if (xDirListing2[j].IsDirectory) {
+                                    Console.WriteLine("/");
+                                }else{Console.WriteLine("");}
+
+                            }
+                        }
+                    } else {
+                        Console.WriteLine("");
+                    }
+                }
+            }
+            Console.WriteLine("Shutting down!");
+        }
+
+        public static int TestMethodNoParams() {
+            return 23;
+        }
+
+        public static int TestMethodOneParams(int theValue) {
+            return theValue * 2;
+        }
+
+        public static int TestMethodTwoParams(int theValue,
+                                              int theValue2) {
+            return theValue + theValue2;
+        }
+
+        public static int TestMethodThreeParams(int theValue,
+                                                int theValue2,
+                                                int theValue3) {
+            return theValue + theValue2 + theValue3;
+        }
+
+        public static int TestMethodComplicated(ulong aValue,
+                                                bool atest) {
+            return 7356;
         }
 
         public static void Handler1(object sender,

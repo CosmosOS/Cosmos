@@ -15,13 +15,21 @@ namespace Indy.IL2CPU.IL.CustomImplementations.System {
 			const string xDigits = "0123456789";
 			char[] xResultChars = new char[21];
 			int xCurrentPos = 20;
-			while (aValue > 0) {
-				byte xPos = (byte)(aValue % 10);
-				aValue /= 10;
-				xResultChars[xCurrentPos] = xDigits[xPos];
-				xCurrentPos -= 1;
-			}
-			if (aIsNegative) {
+            if (aValue > 0)
+            {
+                while (aValue > 0)
+                {
+                    byte xPos = (byte)(aValue % 10);
+                    aValue /= 10;
+                    xResultChars[xCurrentPos] = xDigits[xPos];
+                    xCurrentPos -= 1;
+                }
+            }
+            else {
+                xResultChars[xCurrentPos] = '0';
+                xCurrentPos -= 1;
+            }
+		    if (aIsNegative) {
 				xResultChars[xCurrentPos] = '-';
 				xCurrentPos -= 1;
 			}

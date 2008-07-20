@@ -7,7 +7,7 @@ using Indy.IL2CPU.Plugs;
 namespace Indy.IL2CPU.IL.CustomImplementations.System
 {
     [Plug(Target=typeof(Int64))]
-    public class Int64Impl
+    public  class Int64Impl
     {
         public static string ToString(ref long aThis)
         {

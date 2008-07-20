@@ -206,49 +206,7 @@ namespace Cosmos.FileSystem.Ext2 {
             public uint OSD1;
 
             [FieldOffset(40)]
-            public uint Block1;
-
-            [FieldOffset(44)]
-            public uint Block2;
-
-            [FieldOffset(48)]
-            public uint Block3;
-
-            [FieldOffset(52)]
-            public uint Block4;
-
-            [FieldOffset(56)]
-            public uint Block5;
-
-            [FieldOffset(60)]
-            public uint Block6;
-
-            [FieldOffset(64)]
-            public uint Block7;
-
-            [FieldOffset(68)]
-            public uint Block8;
-
-            [FieldOffset(72)]
-            public uint Block9;
-
-            [FieldOffset(76)]
-            public uint Block10;
-
-            [FieldOffset(80)]
-            public uint Block11;
-
-            [FieldOffset(84)]
-            public uint Block12;
-
-            [FieldOffset(88)]
-            public uint Block13;
-
-            [FieldOffset(92)]
-            public uint Block14;
-
-            [FieldOffset(96)]
-            public uint Block15;
+            public uint Block;
 
             [FieldOffset(100)]
             public uint Generation;

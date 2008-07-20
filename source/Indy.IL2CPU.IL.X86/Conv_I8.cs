@@ -1,6 +1,4 @@
 using System;
-using System.IO;
-
 
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using Indy.IL2CPU.Assembler;

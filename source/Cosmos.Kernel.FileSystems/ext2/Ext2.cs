@@ -1,8 +1,10 @@
-﻿using System;
+﻿#define EXT2Debug
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Cosmos.Hardware;
+using HW=Cosmos.Hardware;
 
 namespace Cosmos.FileSystem.Ext2 {
     public unsafe partial class Ext2 : Filesystem {
@@ -11,136 +13,206 @@ namespace Cosmos.FileSystem.Ext2 {
         private GroupDescriptor[] mGroupDescriptors;
         private byte[] mBuffer;
         private byte* mBufferAddress;
-       
 
         public Ext2(BlockDevice aBackend) {
             mBackend = aBackend;
             Initialize();
-            Console.Write("BlockSize: ");
-            Console.WriteLine(BlockSize.ToString());
         }
 
         private void Initialize() {
-            mBuffer= new byte[mBackend.BlockSize];
-            fixed(byte* xBufferAddress = &mBuffer[0]) {
+            mBuffer = new byte[mBackend.BlockSize];
+            fixed (byte* xBufferAddress = &mBuffer[0]) {
                 mBufferAddress = xBufferAddress;
             }
             // first get the superblock;
             var mBufferAsSuperblock = (SuperBlock*)mBufferAddress;
-            mBackend.ReadBlock(2, mBuffer);
+            mBackend.ReadBlock(2,
+                               mBuffer);
             mSuperblock = *mBufferAsSuperblock;
-            mSuperblock.DoSomething();
-            Console.Write("INode count: ");
-            Console.WriteLine(mSuperblock.INodesCount.ToString());
-            Console.Write("LogBlockSize: ");
-            Console.WriteLine(mSuperblock.LogBlockSize.ToString());
-            Console.Write("BlockCount: ");
-            Console.WriteLine(mSuperblock.BlockCount.ToString());
-            Console.Write("Reserved Block Count: ");
-            Console.WriteLine(mSuperblock.RBlocksCount.ToString());
-            Console.Write("Free Block Count: ");
-            Console.WriteLine(mSuperblock.FreeBlocksCount.ToString());
-            Console.Write("Free INodes Count: ");
-            Console.WriteLine(mSuperblock.FreeINodesCount.ToString());
-            Console.Write("First Data Block: ");
-            Console.WriteLine(mSuperblock.FirstDataBlock.ToString());
-            Console.Write("Log Block Size: ");
-            Console.WriteLine(mSuperblock.LogBlockSize.ToString());
-            Console.Write("Log Frag Size: ");
-            Console.WriteLine(mSuperblock.LogFragSize.ToString());
-            Console.Write("Blocks per group: ");
-            Console.WriteLine(mSuperblock.BlocksPerGroup.ToString());
+            DebugUtil.Send_Ext2SuperBlock(mSuperblock);
+            // read the group descriptors
+            uint xGroupDescriptorCount = mSuperblock.INodesCount / mSuperblock.INodesPerGroup;
+            mGroupDescriptors = new GroupDescriptor[xGroupDescriptorCount];
+            var xDescriptorPtr = (GroupDescriptor*)mBufferAddress;
+            for (int i = 0; i < xGroupDescriptorCount; i++) {
+                uint xATABlock = 8;
+                xATABlock += (uint)(i / 16);
+                if ((i % 16) == 0) {
+                    mBackend.ReadBlock(xATABlock,
+                                       mBuffer);
+                }
+                mGroupDescriptors[i] = xDescriptorPtr[i % 16];
+            }
+            DebugUtil.Send_Ext2GroupDescriptors(mGroupDescriptors);
         }
 
         public override uint BlockSize {
             get {
-                uint xTemp = 1;
-                return xTemp << mSuperblock.LogBlockSize;
+                return ((uint)1024) << mSuperblock.LogBlockSize;
             }
         }
 
-        public override unsafe FilesystemEntry[] GetDirectoryListing(ulong aId) {
-//            byte[] xBuffer = new byte[mBackend.BlockSize];
-//            fixed (byte* xBufferAddress = &xBuffer[0]) {
-//                mBackend.ReadBlock(2,
-//                                   xBuffer);
-//                var xSuperBlock = *(SuperBlock*)xBufferAddress;
-//                int xBlockSize = (int)(1024 << (byte)(xSuperBlock.LogBlockSize));
-//                uint xGroupsCount = xSuperBlock.INodesCount / xSuperBlock.INodesPerGroup;
-//                uint xGroupDescriptorsPerBlock = (uint)(xBlockSize / sizeof(GroupDescriptor));
-//                GroupDescriptor[] xGroupDescriptors = ReadGroupDescriptorsOfBlock(xSuperBlock.FirstDataBlock + 1,
-//                                                                                  xSuperBlock,
-//                                                                                  xBuffer);
-//                if (xGroupDescriptors == null) {
-//                    throw new Exception("Error reading GroupDescriptors!");
-//                }
-//                bool[] xUsedINodes = new bool[32];
-//                uint xCount = 0;
-//                INode* xINodeTable = (INode*)xBufferAddress;
-//                for (uint g = 0; g < xGroupDescriptors.Length; g++) {
-//                    GroupDescriptor xGroupDescriptor = xGroupDescriptors[g];
-//                    mBackend.ReadBlock(((xGroupDescriptor.INodeBitmap) * 8), xBuffer);
-//                    if (!ConvertBitmapToBoolArray((uint*)xBuffer,
-//                                                  xUsedINodes)) {
-//                        return;
-//                    }
-//                    for (int i = 0; i < 32; i++) {
-//                        if ((i % 4) == 0) {
-//                            uint index = (uint)((i % xSuperBlock.INodesPerGroup) * sizeof(INode));
-//                            uint offset = index / 512;
-//                            if (!Hardware.Storage.ATAOld.ReadDataNew(aController,
-//                                                                     aDrive,
-//                                                                     (int)((xGroupDescriptor.INodeTable * 8) + offset),
-//                                                                     xBuffer)) {
-//                                Console.WriteLine("[Ext2] Error reading INode table entries");
-//                                return;
-//                            }
-//                        }
-//                        uint xINodeIdentifier = (uint)((g * xSuperBlock.INodesPerGroup) + i + 1);
-//                        if (xINodeIdentifier == 0xB) {
-//                            continue;
-//                        }
-//                        if (xUsedINodes[i]) {
-//                            INode xINode = xINodeTable[i % 4];
-//                            //DebugUtil.SendExt2_INode((uint)((g * xSuperBlock.INodesPerGroup) + i), g, &xINodeTable[i % 4]);
-//                            if ((xINode.Mode & INodeModeEnum.Directory) != 0) {
-//                                //DebugUtil.SendNumber("Ext2", "Directory found", (uint)((g * xSuperBlock.INodesPerGroup) + i + 1), 32);
-//                                if (!Hardware.Storage.ATAOld.ReadDataNew(aController,
-//                                                                         aDrive,
-//                                                                         (int)(xINode.Block1 * 8),
-//                                                                         xBuffer)) {
-//                                    Console.WriteLine("[Ext2] Error reading INode entries");
-//                                    return;
-//                                }
-//                                DirectoryEntry* xEntryPtr = (DirectoryEntry*)xBuffer;
-//                                uint xTotalSize = xINode.Size;
-//                                while (xTotalSize != 0 /* && xEntryPtr->@INode != 0*/) {
-//                                    //DebugUtil.SendExt2_DirectoryEntry(xEntryPtr);
-//                                    uint xPtrAddress = (uint)xEntryPtr;
-//                                    //if (xEntryPtr->@INode == 0xC) {
-//                                    char[] xName = new char[xEntryPtr->NameLength];
-//                                    byte* xNamePtr = &xEntryPtr->FirstNameChar;
-//                                    for (int c = 0; c < xName.Length; c++) {
-//                                        xName[c] = (char)xNamePtr[c];
-//                                    }
-//                                    string s = new String(xName);
-//                                    //								DebugUtil.SendMessage("Ext2, DirectoryEntryName", s);
-//                                    //}
-//                                    xPtrAddress += xEntryPtr->RecordLength;
-//                                    xTotalSize -= xEntryPtr->RecordLength;
-//                                    xEntryPtr = (DirectoryEntry*)xPtrAddress;
-//                                }
-//                            }
-//                            xCount++;
-//                        }
-//                    }
-//                }
-//            }
-////			DebugUtil.SendNumber("Ext2", "Used INode count", xCount, 32);
-            return null;
+        public override ulong RootId {
+            get {
+                return 2;
+            }
         }
 
-        public override void ReadBlock(ulong aId,
+        private bool GetBitState(ulong aBitmapStart,
+                                 int aIndex) {
+            var xPhyBlock = aBitmapStart * 8;
+            xPhyBlock += (ulong)aIndex % 4096;
+            mBackend.ReadBlock(xPhyBlock,
+                               mBuffer);
+            aIndex /= 4096;
+            int xBufferIndex = aIndex / 8;
+            aIndex /= 8;
+            return (mBufferAddress[xBufferIndex] & (1 << aIndex)) != 0;
+        }
+
+        public override FilesystemEntry[] GetDirectoryListing(ulong aId) {
+            var xId = (uint)(aId - 1);
+            var xGroup = (uint)(xId / mSuperblock.INodesPerGroup);
+            var xGroupIndex = (uint)(xId % mSuperblock.INodesPerGroup);
+            HW.DebugUtil.SendNumber("Ext2",
+                                    "INode Id",
+                                    (uint)xId,
+                                    32);
+            HW.DebugUtil.SendNumber("Ext2",
+                                    "Group",
+                                    xGroup,
+                                    32);
+            HW.DebugUtil.SendNumber("Ext2",
+                                    "GroupIndex",
+                                    xGroupIndex,
+                                    32);
+            // read the inode:
+            var xTableBlockOffset = (uint)(xGroupIndex % (ulong)(BlockSize / sizeof(INode)));
+            var xTableBlock = mGroupDescriptors[xGroup].INodeTable;
+            HW.DebugUtil.SendNumber("Ext2",
+                                    "TableBlockOffset(1)",
+                                    xTableBlockOffset,
+                                    32);
+            xTableBlock *= (BlockSize / mBackend.BlockSize);
+            // below these two lines, the blocks are physical blocks!
+            HW.DebugUtil.SendNumber("Ext2",
+                                    "TableBlockOffset(2)",
+                                    xTableBlockOffset,
+                                    32);
+            HW.DebugUtil.SendNumber("Ext2",
+                                    "Physical TableBlock",
+                                    xTableBlock,
+                                    32);
+            HW.DebugUtil.SendNumber("Ext2",
+                                    "TableBlockOffset(Final)",
+                                    xTableBlockOffset,
+                                    32);
+            mBackend.ReadBlock(xTableBlock,
+                               mBuffer);
+            INode xINode;
+            fixed (byte* xTempAddress = &mBuffer[0]) {
+                var xINodeAddress = (INode*)xTempAddress;
+                xINode = xINodeAddress[(int)xTableBlockOffset];
+                HW.DebugUtil.SendNumber("Ext2",
+                                        "INode mode first byte",
+                                        mBufferAddress[sizeof(INode)],
+                                        32);
+                HW.DebugUtil.SendNumber("Ext2",
+                                        "INode mode",
+                                        (ushort)xINode.Mode,
+                                        32);
+            }
+            byte[] xFSBuffer = new byte[BlockSize];
+            var xResult = new List<FilesystemEntry>(10);
+            var xDirEntriesPerFSBlock = BlockSize / sizeof(DirectoryEntry);
+            uint xBlockId = 0;
+            while (ReadDataBlock(xINode,
+                                 xBlockId,
+                                 xFSBuffer)) {
+                HW.DebugUtil.WriteBinary("Ext2",
+                                         "Directory Entry binary",
+                                         xFSBuffer,
+                                         0,
+                                         (int)BlockSize);
+                HW.DebugUtil.SendNumber("Ext2",
+                                        "First byte of datablock",
+                                        xFSBuffer[0],
+                                        8);
+                int xIndex = 0;
+                while(xIndex < BlockSize) {
+                    var xINodeNumber = BitConverter.ToUInt32(xFSBuffer,
+                                                       xIndex);
+                    var xRecLength = BitConverter.ToUInt16(xFSBuffer,
+                                                           xIndex+4);
+                    if (xINodeNumber > 0) {
+                        var xNameLength = xFSBuffer[xIndex + 6];
+                        var xFileType = xFSBuffer[xIndex + 7];
+                        var xFSEntry = new FilesystemEntry();
+                        xFSEntry.Id = xINodeNumber;
+                        xFSEntry.IsDirectory = xFileType == 2; // 2 == directory
+                        xFSEntry.IsReadonly = true;
+                        char[] xName = new char[xNameLength];
+                        for (int c = 0; c < xName.Length; c++) {
+                            xName[c] = (char)xFSBuffer[xIndex + 8 + c];
+                        }
+                        xFSEntry.Name = new string(xName);
+                        xResult.Add(xFSEntry);
+                    }
+                    xIndex += xRecLength;
+                }
+                xBlockId++;
+            }
+            return xResult.ToArray();
+        }
+
+        /// <summary>
+        /// Reads the contents of an inode, resolving all indirect/bi-indirect/tri-indirect block arrays
+        /// </summary>
+        /// <param name="aINode"></param>
+        /// <param name="aBlockId">This is zero-based!</param>
+        /// <param name="aBuffer"></param>
+        /// <returns></returns>
+        private bool ReadDataBlock(INode aINode,
+                                   uint aBlockId,
+                                   byte[] aBuffer) {
+            if (aBuffer.Length != BlockSize) {
+                throw new Exception("Incorrect buffer size!");
+            }
+            HW.DebugUtil.SendNumber("Ext2",
+                                    "BlockId",
+                                    aBlockId,
+                                    32);
+            if (aBlockId >= 0 && aBlockId <= 11) {
+                uint* xBlocks = &aINode.Block;
+                var xBlockId = xBlocks[aBlockId];
+                if (xBlockId == 0) {
+                    return false;
+                }
+                var xPhyBlocksPerFSBlock = (BlockSize / mBackend.BlockSize);
+                HW.DebugUtil.SendNumber("Ext2",
+                                        "PhyBlocksPerFSBlock",
+                                        xPhyBlocksPerFSBlock,
+                                        32);
+                xBlockId *= xPhyBlocksPerFSBlock;
+                for (var i = 0; i < xPhyBlocksPerFSBlock; i++) {
+                    mBackend.ReadBlock((ulong)(xBlockId + i),
+                                       mBuffer);
+                    Array.Copy(mBuffer,
+                               0,
+                               aBuffer,
+                               (mBackend.BlockSize * i),
+                               mBackend.BlockSize);
+                }
+                HW.DebugUtil.SendNumber("Ext2",
+                                        "BlockAddress",
+                                        xBlockId,
+                                        32);
+                return true;
+            }
+            return false;
+        }
+
+        public override bool ReadBlock(ulong aId,
                                        ulong aBlock,
                                        byte[] aBuffer) {
             throw new System.NotImplementedException();
