@@ -7,10 +7,6 @@ using System.Security.Cryptography;
 using Cosmos.Build.Windows;
 using Cosmos.FileSystem.Ext2;
 using Cosmos.Hardware;
-using Cosmos.Hardware.Storage.ATA;
-using ICSharpCode.SharpZipLib.Zip.Compression;
-using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
-using Huffman;
 
 namespace MatthijsTest {
     public class Program {
@@ -24,11 +20,6 @@ namespace MatthijsTest {
         }
 
         #endregion
-
-        //[ManifestResourceStream(ResourceName = "MatthijsTest.Test.txt")]
-        //private static readonly byte[] TheManifestResource;
-        //[ManifestResourceStream(ResourceName = "MatthijsTest.Test.txt.gz")]
-        //private static readonly byte[] TheManifestResourceZipped;
 
         private static ushort HostToNetwork(ushort aValue) {
             return (ushort)((aValue << 8) | ((aValue >> 8) & 0xFF));
@@ -47,28 +38,37 @@ namespace MatthijsTest {
             }
             var xExt2 = new Ext2(xStorage);
             var xDirectoryListing = xExt2.GetDirectoryListing(xExt2.RootId);
+            bool xFileWritten = false;
             if (xDirectoryListing == null) {
                 Console.WriteLine("No DirectoryListing!");
             } else {
                 Console.Write("Directory entries count: ");
                 Console.WriteLine(xDirectoryListing.Length.ToString());
                 for (int i = 0; i < xDirectoryListing.Length; i++) {
+                    Console.Write(((uint)xDirectoryListing[i].Id).ToString());
+                    Console.Write("|");
                     Console.Write(xDirectoryListing[i].Name);
                     if (xDirectoryListing[i].IsDirectory) {
                         Console.WriteLine("/");
-                        if(xDirectoryListing[i].Id != xExt2.RootId) {
-                            var xDirListing2 = xExt2.GetDirectoryListing(xDirectoryListing[i].Id);
-                            for(int j = 0; j<xDirListing2.Length;j++) {
-                                Console.Write("    ");
-                                Console.Write(xDirListing2[j].Name);
-                                if (xDirListing2[j].IsDirectory) {
-                                    Console.WriteLine("/");
-                                }else{Console.WriteLine("");}
-
-                            }
-                        }
                     } else {
-                        Console.WriteLine("");
+                        Console.Write("|");
+                        Console.WriteLine(((uint)xDirectoryListing[i].Size).ToString());
+                        if (!xFileWritten) {
+                            xFileWritten = true;
+                            byte[] xBuff = new byte[xExt2.BlockSize];
+
+                            if (!xExt2.ReadBlock(xDirectoryListing[i].Id,
+                                                 0,
+                                                 xBuff)) {
+                                Console.WriteLine("Error while reading file contents!");
+                                continue;
+                            }
+                            var xChars = new char[xDirectoryListing[i].Size];
+                            for (int j = 0; j < xBuff.Length; j++) {
+                                xChars[j] = (char)xBuff[j];
+                            }
+                            Console.Write(new string(xChars));
+                        }
                     }
                 }
             }

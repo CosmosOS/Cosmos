@@ -9,6 +9,7 @@ namespace Cosmos.FileSystem {
         public string Name;
         public bool IsDirectory;
         public bool IsReadonly;
+        public ulong Size;
     }
 
     public abstract class Filesystem {

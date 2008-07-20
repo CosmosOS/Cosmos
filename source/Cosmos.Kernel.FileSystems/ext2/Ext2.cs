@@ -71,9 +71,73 @@ namespace Cosmos.FileSystem.Ext2 {
         }
 
         public override FilesystemEntry[] GetDirectoryListing(ulong aId) {
-            var xId = (uint)(aId - 1);
+            var xBaseINodeNumber = (uint)aId;
+            HW.DebugUtil.SendNumber("Ext2",
+                                    "Getting DirectoryListing of INode",
+                                    xBaseINodeNumber,
+                                    32);
+            INode xINode;
+            GetINode(xBaseINodeNumber,
+                     out xINode);
+            byte[] xFSBuffer = new byte[BlockSize];
+            var xResult = new List<FilesystemEntry>(10);
+            var xDirEntriesPerFSBlock = BlockSize / sizeof(DirectoryEntry);
+            uint xBlockId = 0;
+            while (ReadDataBlock(xINode,
+                                 xBlockId,
+                                 xFSBuffer)) {
+                HW.DebugUtil.WriteBinary("Ext2",
+                                         "Directory Entry binary",
+                                         xFSBuffer,
+                                         0,
+                                         (int)BlockSize);
+                HW.DebugUtil.SendNumber("Ext2",
+                                        "First byte of datablock",
+                                        xFSBuffer[0],
+                                        8);
+                int xIndex = 0;
+                while (xIndex < BlockSize) {
+                    var xINodeNumber = BitConverter.ToUInt32(xFSBuffer,
+                                                             xIndex);
+                    var xRecLength = BitConverter.ToUInt16(xFSBuffer,
+                                                           xIndex + 4);
+                    if (xINodeNumber > 0) {
+                        if (xINodeNumber != xBaseINodeNumber) {
+                            var xNameLength = xFSBuffer[xIndex + 6];
+                            var xFileType = xFSBuffer[xIndex + 7];
+                            var xFSEntry = new FilesystemEntry();
+                            xFSEntry.Id = xINodeNumber;
+                            xFSEntry.IsDirectory = xFileType == 2; // 2 == directory
+                            xFSEntry.IsReadonly = true;
+                            //xFSEntry.Size = GetINode(xINodeNumber).Size;
+                            char[] xName = new char[xNameLength];
+                            for (int c = 0; c < xName.Length; c++) {
+                                xName[c] = (char)xFSBuffer[xIndex + 8 + c];
+                            }
+                            xFSEntry.Name = new string(xName);
+                            xResult.Add(xFSEntry);
+                        }
+                    }
+                    xIndex += xRecLength;
+                }
+                xBlockId++;
+            }
+            for (int i = 0; i < xResult.Count; i++) {
+                INode xTheINode;
+                GetINode((uint)xResult[i].Id,
+                         out xTheINode);
+                xResult[i].Size = xTheINode.Size;
+            }
+            return xResult.ToArray();
+        }
+
+        private void GetINode(uint aINodeNumber,
+                              out INode oINode) {
+            var xId = aINodeNumber - 1;
             var xGroup = (uint)(xId / mSuperblock.INodesPerGroup);
             var xGroupIndex = (uint)(xId % mSuperblock.INodesPerGroup);
+            HW.DebugUtil.SendMessage("Ext2",
+                                     "Reading INode");
             HW.DebugUtil.SendNumber("Ext2",
                                     "INode Id",
                                     (uint)xId,
@@ -89,16 +153,15 @@ namespace Cosmos.FileSystem.Ext2 {
             // read the inode:
             var xTableBlockOffset = (uint)(xGroupIndex % (ulong)(BlockSize / sizeof(INode)));
             var xTableBlock = mGroupDescriptors[xGroup].INodeTable;
+            xTableBlock += xGroupIndex / (uint)(BlockSize / sizeof(INode));
             HW.DebugUtil.SendNumber("Ext2",
                                     "TableBlockOffset(1)",
                                     xTableBlockOffset,
                                     32);
             xTableBlock *= (BlockSize / mBackend.BlockSize);
+            xTableBlock += xTableBlockOffset / (uint)(mBackend.BlockSize / sizeof(INode));
+            xTableBlockOffset = xTableBlockOffset % (uint)(mBackend.BlockSize / sizeof(INode));
             // below these two lines, the blocks are physical blocks!
-            HW.DebugUtil.SendNumber("Ext2",
-                                    "TableBlockOffset(2)",
-                                    xTableBlockOffset,
-                                    32);
             HW.DebugUtil.SendNumber("Ext2",
                                     "Physical TableBlock",
                                     xTableBlock,
@@ -122,47 +185,7 @@ namespace Cosmos.FileSystem.Ext2 {
                                         (ushort)xINode.Mode,
                                         32);
             }
-            byte[] xFSBuffer = new byte[BlockSize];
-            var xResult = new List<FilesystemEntry>(10);
-            var xDirEntriesPerFSBlock = BlockSize / sizeof(DirectoryEntry);
-            uint xBlockId = 0;
-            while (ReadDataBlock(xINode,
-                                 xBlockId,
-                                 xFSBuffer)) {
-                HW.DebugUtil.WriteBinary("Ext2",
-                                         "Directory Entry binary",
-                                         xFSBuffer,
-                                         0,
-                                         (int)BlockSize);
-                HW.DebugUtil.SendNumber("Ext2",
-                                        "First byte of datablock",
-                                        xFSBuffer[0],
-                                        8);
-                int xIndex = 0;
-                while(xIndex < BlockSize) {
-                    var xINodeNumber = BitConverter.ToUInt32(xFSBuffer,
-                                                       xIndex);
-                    var xRecLength = BitConverter.ToUInt16(xFSBuffer,
-                                                           xIndex+4);
-                    if (xINodeNumber > 0) {
-                        var xNameLength = xFSBuffer[xIndex + 6];
-                        var xFileType = xFSBuffer[xIndex + 7];
-                        var xFSEntry = new FilesystemEntry();
-                        xFSEntry.Id = xINodeNumber;
-                        xFSEntry.IsDirectory = xFileType == 2; // 2 == directory
-                        xFSEntry.IsReadonly = true;
-                        char[] xName = new char[xNameLength];
-                        for (int c = 0; c < xName.Length; c++) {
-                            xName[c] = (char)xFSBuffer[xIndex + 8 + c];
-                        }
-                        xFSEntry.Name = new string(xName);
-                        xResult.Add(xFSEntry);
-                    }
-                    xIndex += xRecLength;
-                }
-                xBlockId++;
-            }
-            return xResult.ToArray();
+            oINode = xINode;
         }
 
         /// <summary>
@@ -215,7 +238,15 @@ namespace Cosmos.FileSystem.Ext2 {
         public override bool ReadBlock(ulong aId,
                                        ulong aBlock,
                                        byte[] aBuffer) {
-            throw new System.NotImplementedException();
+            INode xTheINode;
+            uint xId = (uint)aId;
+            HW.DebugUtil.SendNumber("Ext2", "ReadingBlock of INode", xId, 32);
+            HW.DebugUtil.SendNumber("Ext2", "Reading Blocknr", (uint)aBlock, 32);
+            GetINode(xId,
+                     out xTheINode);
+            return ReadDataBlock(xTheINode,
+                                 (uint)aBlock,
+                                 aBuffer);
         }
     }
 }
