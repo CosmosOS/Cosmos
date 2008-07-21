@@ -83,9 +83,9 @@ namespace Cosmos.FileSystem.Ext2 {
             var xResult = new List<FilesystemEntry>(10);
             var xDirEntriesPerFSBlock = BlockSize / sizeof(DirectoryEntry);
             uint xBlockId = 0;
-            while (ReadDataBlock(xINode,
-                                 xBlockId,
-                                 xFSBuffer)) {
+            while (ReadINodeBlock(xINode,
+                                  xBlockId,
+                                  xFSBuffer)) {
                 HW.DebugUtil.WriteBinary("Ext2",
                                          "Directory Entry binary",
                                          xFSBuffer,
@@ -195,9 +195,9 @@ namespace Cosmos.FileSystem.Ext2 {
         /// <param name="aBlockId">This is zero-based!</param>
         /// <param name="aBuffer"></param>
         /// <returns></returns>
-        private bool ReadDataBlock(INode aINode,
-                                   uint aBlockId,
-                                   byte[] aBuffer) {
+        private bool ReadINodeBlock(INode aINode,
+                                    uint aBlockId,
+                                    byte[] aBuffer) {
             if (aBuffer.Length != BlockSize) {
                 throw new Exception("Incorrect buffer size!");
             }
@@ -205,34 +205,56 @@ namespace Cosmos.FileSystem.Ext2 {
                                     "BlockId",
                                     aBlockId,
                                     32);
-            if (aBlockId >= 0 && aBlockId <= 11) {
-                uint* xBlocks = &aINode.Block;
+            uint* xBlocks = &aINode.Block;
+            if (aBlockId >= 0 && aBlockId <= 11)
+            {
                 var xBlockId = xBlocks[aBlockId];
-                if (xBlockId == 0) {
+                if (xBlockId == 0)
+                {
                     return false;
                 }
-                var xPhyBlocksPerFSBlock = (BlockSize / mBackend.BlockSize);
-                HW.DebugUtil.SendNumber("Ext2",
-                                        "PhyBlocksPerFSBlock",
-                                        xPhyBlocksPerFSBlock,
-                                        32);
-                xBlockId *= xPhyBlocksPerFSBlock;
-                for (var i = 0; i < xPhyBlocksPerFSBlock; i++) {
-                    mBackend.ReadBlock((ulong)(xBlockId + i),
-                                       mBuffer);
-                    Array.Copy(mBuffer,
-                               0,
-                               aBuffer,
-                               (mBackend.BlockSize * i),
-                               mBackend.BlockSize);
-                }
-                HW.DebugUtil.SendNumber("Ext2",
-                                        "BlockAddress",
-                                        xBlockId,
-                                        32);
+                ReadDataBlock(xBlockId,
+                              aBuffer);
                 return true;
+            } else {
+                uint xIndirectBlockRefsPerDataBlock = BlockSize / 4;
+                HW.DebugUtil.SendNumber("Ext2", "Indirect block reference count per data block", xIndirectBlockRefsPerDataBlock, 32);
+                if ((aBlockId-12) < xIndirectBlockRefsPerDataBlock) {
+                    var xBlockId = xBlocks[12];
+                    if (xBlockId == 0)
+                    {
+                        return false;
+                    }
+                    ReadDataBlock(xBlockId,
+                                  aBuffer);
+                    var xTheBlock = BitConverter.ToUInt32(aBuffer,
+                                                          (int)((aBlockId - 11) * 4));
+                    ReadDataBlock(xTheBlock,
+                                  aBuffer);
+                    return true;
+                }
+                Console.WriteLine("Reading indirect blocks not yet supported!");
             }
             return false;
+        }
+
+        private void ReadDataBlock(uint aBlockId,
+                                   byte[] aBuffer) {
+            var xPhyBlocksPerFSBlock = (BlockSize / mBackend.BlockSize);
+            HW.DebugUtil.SendNumber("Ext2",
+                                    "PhyBlocksPerFSBlock",
+                                    xPhyBlocksPerFSBlock,
+                                    32);
+            aBlockId *= xPhyBlocksPerFSBlock;
+            for (var i = 0; i < xPhyBlocksPerFSBlock; i++) {
+                mBackend.ReadBlock((ulong)(aBlockId + i),
+                                   mBuffer);
+                Array.Copy(mBuffer,
+                           0,
+                           aBuffer,
+                           (mBackend.BlockSize * i),
+                           mBackend.BlockSize);
+            }
         }
 
         public override bool ReadBlock(ulong aId,
@@ -240,13 +262,19 @@ namespace Cosmos.FileSystem.Ext2 {
                                        byte[] aBuffer) {
             INode xTheINode;
             uint xId = (uint)aId;
-            HW.DebugUtil.SendNumber("Ext2", "ReadingBlock of INode", xId, 32);
-            HW.DebugUtil.SendNumber("Ext2", "Reading Blocknr", (uint)aBlock, 32);
+            HW.DebugUtil.SendNumber("Ext2",
+                                    "ReadingBlock of INode",
+                                    xId,
+                                    32);
+            HW.DebugUtil.SendNumber("Ext2",
+                                    "Reading Blocknr",
+                                    (uint)aBlock,
+                                    32);
             GetINode(xId,
                      out xTheINode);
-            return ReadDataBlock(xTheINode,
-                                 (uint)aBlock,
-                                 aBuffer);
+            return ReadINodeBlock(xTheINode,
+                                  (uint)aBlock,
+                                  aBuffer);
         }
     }
 }
