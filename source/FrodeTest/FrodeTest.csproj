@@ -48,6 +48,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Application\ConsoleApplicationManager.cs" />
+    <Compile Include="Application\IConsoleApplication.cs" />
+    <Compile Include="Application\net.cs" />
+    <Compile Include="Application\ping.cs" />
     <Compile Include="Debug\SortedListSearcher.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -62,6 +66,7 @@
     <Compile Include="Test\InterfaceTest.cs" />
     <Compile Include="Test\IPv4AddressTest.cs" />
     <Compile Include="Test\IPv4Test.cs" />
+    <Compile Include="Test\LinqTest.cs" />
     <Compile Include="Test\MACAddressTest.cs" />
     <Compile Include="Test\BasicTest.cs" />
     <Compile Include="Test\Mock\FakeBroadcastPacket.cs" />

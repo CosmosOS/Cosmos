@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Cosmos.Hardware.Network.Devices.RTL8139;
 using Cosmos.Kernel;
+using FrodeTest.Application;
 
 namespace FrodeTest.Shell
 {
@@ -30,6 +31,15 @@ namespace FrodeTest.Shell
             {
                 Test.IPv4Test.RunTest();
             }
+            //else if (command.Equals("ping"))
+            //{
+            //    ping xPingApplication = new ping();
+            //    xPingApplication.Execute("172.28.5.1");
+            //}
+            //else if (command.Equals("ping"))
+            //{
+
+            //}
             else if (command.Equals("icmp"))
             {
                 Test.ICMPv4Test.RunTest();
@@ -180,16 +190,26 @@ namespace FrodeTest.Shell
                 nic.PromiscuousMode = !nic.PromiscuousMode;
             }
 
-            else if (command.Equals("help"))
-            {
-                Console.WriteLine("Valid commands: info, load, test, send, read, mac, ip, dump, prom, loop, crash, notimpl, enable, disable, reset, reboot or exit");
-            }
-            else if (command.Equals(string.Empty))
-            {
-                Console.WriteLine(string.Empty);
-            }
+            //else if (command.Equals("help"))
+            //{
+            //    Console.WriteLine("Valid commands: info, load, test, send, read, mac, ip, dump, prom, loop, crash, notimpl, enable, disable, reset, reboot or exit");
+            //}
+            //else if (command.Equals(string.Empty))
+            //{
+            //    Console.WriteLine(string.Empty);
+            //}
             else
-                Console.WriteLine("No such systemcommand or application: " + command + ". Try typing 'help'.");
+            {
+                Application.ConsoleApplicationManager conAppManager = new FrodeTest.Application.ConsoleApplicationManager();
+                
+                Application.IConsoleApplication xConsoleApp = conAppManager.GetConsoleApplication(command);
+                if (xConsoleApp != null)
+                    xConsoleApp.Execute("theArgument");
+                else
+                    //No command found
+                    Console.WriteLine("No such systemcommand or application: " + command + ". Try typing 'help'.");
+            }
+                
 
             Run(); //Recursive call
         }

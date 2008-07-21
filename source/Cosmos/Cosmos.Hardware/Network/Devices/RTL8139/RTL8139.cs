@@ -324,7 +324,11 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             throw new NotImplementedException();
         }
 
-
+        /// <summary>
+        /// Transmits the byte array out onto the network wire.
+        /// </summary>
+        /// <param name="aData"></param>
+        /// <returns></returns>
         public bool TransmitBytes(byte[] aData)
         {
             //TODO: Do NOT set all registers! This works, but is not efficient!
@@ -349,6 +353,11 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             return true;
         }
 
+        /// <summary>
+        /// Converts the frame into a byte array, and sends it using TransmitBytes.
+        /// </summary>
+        /// <param name="frame"></param>
+        /// <returns></returns>
         public bool TransmitFrame(Ethernet2Frame frame)
         {
             return this.TransmitBytes(frame.RawBytes());

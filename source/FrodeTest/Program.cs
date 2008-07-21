@@ -43,6 +43,7 @@ namespace FrodeTest
             //Test.IPv4Test.RunTest();
             //Test.UDPTest.RunTest();
             //Test.MACAddressTest.RunTest();
+            //Test.LinqTest.RunTest();
              
             //Done
             Console.WriteLine("Shutting down computer");
