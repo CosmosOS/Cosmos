@@ -78,7 +78,7 @@ namespace Cosmos.Hardware.Audio.Devices.ES1370
         /// <summary>
         /// (Should be) Called when the PCI audio card raises an Interrupt.
         /// </summary>
-        public void HandleNetworkInterrupt()
+        public void HandleNetworkInterrupt(ref Interrupts.InterruptContext aContext)
         {
             Console.Write("IRQ detected: ");
             /*

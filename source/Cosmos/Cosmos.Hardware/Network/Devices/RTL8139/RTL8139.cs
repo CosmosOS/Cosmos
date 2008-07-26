@@ -370,7 +370,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         /// <summary>
         /// (Should be) Called when the PCI network card raises an Interrupt.
         /// </summary>
-        public void HandleNetworkInterrupt()
+        public void HandleNetworkInterrupt(ref Interrupts.InterruptContext aContext)
         {
             Console.Write("IRQ detected: ");
 

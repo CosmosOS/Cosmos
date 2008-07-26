@@ -8,6 +8,7 @@ using Cosmos.Build.Windows;
 using Cosmos.FileSystem;
 using Cosmos.FileSystem.Ext2;
 using Cosmos.Hardware;
+using Cosmos.Kernel;
 
 namespace MatthijsTest {
     public class Program {
@@ -86,51 +87,29 @@ namespace MatthijsTest {
             }else{Console.WriteLine("Not enough data");}
         }
 
-        public static void Init() {
+        public delegate void TestDelegate(int aValue, ref bool aResult);
+
+        public static void Handler1(int aValue, ref bool aResult)
+        {
+            Console.Write("Result = ");
+            if (!aResult)
+            {
+                Console.WriteLine("false");
+                aResult = true;
+            }else{Console.WriteLine("true");}
+        }
+
+        [ManifestResourceStream(ResourceName = "MatthijsTest.TestV86MExecution")]
+        public static readonly byte[] TestV86MExecution;
+
+        public static void Init()
+        {
             Cosmos.Sys.Boot.Default();
-            var xStorage = Cosmos.Hardware.Device.FindFirst(Device.DeviceType.Storage) as BlockDevice;
-            if (xStorage == null) {
-                Console.WriteLine("ERROR: StorageDevice not found!");
-                return;
-            }
-            var xExt2 = new Ext2(xStorage);
-            var xDirectoryListing = xExt2.GetDirectoryListing(xExt2.RootId);
-            bool xFileWritten = false;
-            if (xDirectoryListing == null) {
-                Console.WriteLine("No DirectoryListing!");
-            } else {
-                Console.Write("Directory entries count: ");
-                Console.WriteLine(xDirectoryListing.Length.ToString());
-                for (int i = 0; i < xDirectoryListing.Length; i++) {
-                    Console.Write(((uint)xDirectoryListing[i].Id).ToString());
-                    Console.Write("|");
-                    Console.Write(xDirectoryListing[i].Name);
-                    if (xDirectoryListing[i].IsDirectory) {
-                        Console.WriteLine("/");
-                        var xDirList2 = xExt2.GetDirectoryListing(xDirectoryListing[i].Id);
-                        for (int j = 0; j < xDirList2.Length; j++) {
-                            Console.Write("    ");
-                            Console.Write(((uint)xDirList2[j].Id).ToString());
-                            Console.Write("|");
-                            Console.Write(xDirList2[j].Name);
-                            if (xDirList2[j].IsDirectory) {
-                                Console.WriteLine("/");
-                            } else {
-                                Console.Write("|");
-                                Console.WriteLine(((uint)xDirList2[j].Size).ToString());
-                                ProcessFile(xExt2,
-                                            xDirList2[j]);
-                            }
-                        }
-                    } else {
-                        Console.Write("|");
-                        Console.WriteLine(((uint)xDirectoryListing[i].Size).ToString());
-                        ProcessFile(xExt2,
-                                    xDirectoryListing[i]);
-                    }
-                }
-            }
-            Console.WriteLine("Shutting down!");
+            Virtual8086ModeMonitor.ExecuteTask(TestV86MExecution);
+            Console.WriteLine("After V86 task");
+            do {
+                Console.WriteLine(Console.ReadLine());
+            } while (true);
         }
 
         public static int TestMethodNoParams() {

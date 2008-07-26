@@ -5,7 +5,7 @@ using System.Text;
 namespace Cosmos.Kernel {
 	public class CPU {
         // Plugged
-        public static void CreateIDT() { }
+        public static void CreateIDT(bool aEnableInterruptsImmediately) { }
 
         /// <summary>
         /// Gets the amount of RAM in MB's.
@@ -119,6 +119,23 @@ namespace Cosmos.Kernel {
         public static void Halt()
         {
             
+        }
+
+        // plugged
+        public static void Interrupt30(ref uint aEAX, ref uint aEBX, ref uint aECX, ref uint aEDX) {
+            aEAX = 0;
+        }
+
+        public static bool IsVirtual8086Mode() {
+            return false;
+        }
+
+        public static unsafe byte* GetTSS() {
+            return null;
+        }
+
+        public static void LoadTSS() {
+            //
         }
 	}
 }

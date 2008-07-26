@@ -58,6 +58,7 @@
     <Compile Include="Audio\Devices\ES1370\Register\MainRegister.cs" />
     <Compile Include="Audio\Devices\ES1370\Register\SerialInterfaceRegister.cs" />
     <Compile Include="BlockDevice.cs" />
+    <Compile Include="Enums.cs" />
     <Compile Include="USB\USBHost.cs" />
     <Compile Include="USB\USBHostOHCI.cs" />
     <Compile Include="USB\USBHostOHCIRegisters.cs" />
@@ -100,6 +101,7 @@
     <Compile Include="Old\Storage\Storage.cs" />
     <Compile Include="DeviceSerial.cs" />
     <Compile Include="TextScreen.cs" />
+    <Compile Include="Virtual8086ModeMonitor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Cosmos.snk" />

@@ -65,6 +65,7 @@
     <Compile Include="Condition.cs" />
     <Compile Include="CpuId.cs" />
     <Compile Include="Hlt.cs" />
+    <Compile Include="LoadTR.cs" />
     <Compile Include="Popfd.cs" />
     <Compile Include="RotateThroughCarryRight.cs" />
     <Compile Include="DebugStub.cs" />
@@ -92,6 +93,7 @@
     <Compile Include="Pushad.cs" />
     <Compile Include="RotateThroughCarryLeft.cs" />
     <Compile Include="SignExtendAX.cs" />
+    <Compile Include="smsw.cs" />
     <Compile Include="Sti.cs" />
     <Compile Include="Stosw.cs" />
     <Compile Include="JumpNotCary.cs" />

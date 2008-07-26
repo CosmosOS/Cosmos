@@ -35,6 +35,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
                                 false);
         }
 
+        // there's one argument. 
         public override void Assemble(Assembler aAssembler) {
             #region generate IDT table
 
@@ -54,6 +55,11 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
                                                                             new DataMember(xFieldName,
                                                                                            "db",
                                                                                            xFieldData.TrimEnd(','))));
+            xFieldData = "";
+            for (int i = 0; i < 26;i++ ) {
+                xFieldData += "0,";
+            }
+            aAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>("main", new DataMember("TSS_0", "dd", xFieldData.TrimEnd(','))));
             for (int i = 0; i < 256; i++) {
                 new CPUx86.Move(Registers.EAX,
                                 "__ISR_Handler_" + i.ToString("X2"));
@@ -95,7 +101,19 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
                 new Label("__ISR_Handler_" + j.ToString("X2"));
                 //if (j < 0x20 || j > 0x2F || true) {
                 new CPUx86.Cli();
-                new CPUx86.Move("dword", "[InterruptsEnabledFlag]", 0);
+                new CPUx86.Move("eax", "0x10");
+                new CPUx86.Move("ds",
+                                "eax");
+                new CPUx86.Move("es",
+                                "eax");
+                new CPUx86.Move("fs",
+                                "eax");
+                new CPUx86.Move("gs",
+                                "eax");
+                new CPUx86.Move("ss",
+                                "eax");
+                                
+								new CPUx86.Move("dword", "[InterruptsEnabledFlag]", 0);
                 //}
                 new CPUx86.Break();
                 if (Array.IndexOf(xInterruptsWithParam,
@@ -106,43 +124,8 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
                 new CPUx86.Pushd("0x" + j.ToString("X"));
                 new CPUx86.Pushad();
                 new CPUx86.Move("eax",
-                                "0");
-                new CPUx86.Move("ax",
-                                "ds");
-                new CPUx86.Push("eax");
-                new CPUx86.Move("eax",
-                                "0");
-                new CPUx86.Move("ax",
-                                "es");
-                new CPUx86.Push("eax");
-                new CPUx86.Move("eax",
-                                "0");
-                new CPUx86.Move("ax",
-                                "fs");
-                new CPUx86.Push("eax");
-                new CPUx86.Move("eax",
-                                "0");
-                new CPUx86.Move("ax",
-                                "gs");
-                new CPUx86.Push("eax");
-                new CPUx86.Move("ax",
-                                "ss");
-                new CPUx86.Push("eax");
-                new CPUx86.Move("eax",
                                 "esp");
                 new CPUx86.Push("eax");
-                new CPUx86.Move("eax",
-                                "0x10");
-                new CPUx86.Move("ds",
-                                Registers.AX);
-                new CPUx86.Move("es",
-                                Registers.AX);
-                new CPUx86.Move("fs",
-                                Registers.AX);
-                new CPUx86.Move("gs",
-                                Registers.AX);
-                new CPUx86.Move("ss",
-                                Registers.AX);
                 new CPUx86.Jump("0x8:__ISR_Handler_" + j.ToString("X2") + "_SetCS");
                 new Label("__ISR_Handler_" + j.ToString("X2") + "_SetCS");
                 MethodBase xHandler = GetInterruptHandler((byte) j);
@@ -153,21 +136,6 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
                                             true);
                 }
                 new CPUx86.Call(Label.GenerateLabelName(xHandler));
-                new CPUx86.Pop("eax");
-                new CPUx86.Move("ss",
-                                "ax");
-                new CPUx86.Pop("eax");
-                new CPUx86.Move("gs",
-                                "ax");
-                new CPUx86.Pop("eax");
-                new CPUx86.Move("gs",
-                                "ax");
-                new CPUx86.Pop("eax");
-                new CPUx86.Move("es",
-                                "ax");
-                new CPUx86.Pop("eax");
-                new CPUx86.Move("ds",
-                                "ax");
                 new CPUx86.Popad();
                 new CPUx86.Add("esp",
                                "8");
@@ -181,8 +149,14 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
             }
             new Label("__AFTER__ALL__ISR__HANDLER__STUBS__");
             new CPUx86.Noop();
+            new CPUx86.Move("eax",
+                            "[ebp + 8]");
+            new CPUx86.Compare("eax",
+                               "0");
+            new CPUx86.JumpIfZero(".__AFTER_ENABLE_INTERRUPTS");
             new CPUx86.Sti();
             new CPUx86.Move("dword", "[InterruptsEnabledFlag]", 1);
+            new Label(".__AFTER_ENABLE_INTERRUPTS");
         }
     }
 }

@@ -9,7 +9,7 @@ namespace Cosmos.Kernel.Plugs {
     [Plug(Target = typeof(Kernel.CPU))]
     public static class CPU {
 		[PlugMethod(MethodAssembler = typeof(Assemblers.CreateIDT))]
-		public static void CreateIDT() {
+		public static void CreateIDT(bool aEnableInterruptsImmediately) {
 		}
 
         [PlugMethod(MethodAssembler = typeof(Assemblers.CreateGDT))]
@@ -80,5 +80,24 @@ namespace Cosmos.Kernel.Plugs {
 
         }
 
-	}
+        [PlugMethod(MethodAssembler = typeof(Assemblers.Interrupt30))]
+        public static void Interrupt30(ref uint aEAX, ref uint aEBX, ref uint aECX, ref uint aEDX) {
+            aEAX = 0;
+        }
+
+        [PlugMethod(MethodAssembler = typeof(Assemblers.IsVirtual8086Mode))]
+        public static bool IsVirtual8086Mode() {
+            return false;
+        }
+
+        [PlugMethod(MethodAssembler = typeof(Assemblers.GetTSS))]
+        public static unsafe byte* GetTSS() {
+            return null;
+        }
+
+        [PlugMethod(MethodAssembler = typeof(Assemblers.LoadTSS))]
+        public static void LoadTSS() {
+            //
+        }
+    }
 }

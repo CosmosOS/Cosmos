@@ -36,7 +36,7 @@ namespace Cosmos.Hardware
             CheckInit();
         }
 
-        public static void HandleKeyboardInterrupt()
+        public static void HandleKeyboardInterrupt(ref Interrupts.InterruptContext aContext)
         {
             if (mHandleKeyboardKey != null)
             {
@@ -116,7 +116,7 @@ namespace Cosmos.Hardware
             HandleScancode(aValue, xReleased);
         }
 
-        private static void CheckInit()
+        private static unsafe void CheckInit()
         {
             if (mBuffer == null)
             {
@@ -124,6 +124,7 @@ namespace Cosmos.Hardware
 
                 // Old
                 Keyboard.Initialize(HandleScancode);
+                Interrupts.IRQ01 += HandleKeyboardInterrupt;
                 // New
                 // TODO: Need to add support for mult keyboards. ie one in PS2 and one in USB, or even more
                 //var xKeyboard = (HW.SerialDevice)(HW.Device.Find(HW.Device.DeviceType.Keyboard)[0]);

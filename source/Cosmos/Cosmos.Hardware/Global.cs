@@ -17,7 +17,8 @@ namespace Cosmos.Hardware {
 
             //HW.Interrupts.IRQ01 += new Interrupts.InterruptDelegate(Cosmos.Hardware.Keyboard.HandleKeyboardInterrupt);
             Interrupts.Init();
-            Kernel.CPU.CreateIDT();
+            Kernel.CPU.CreateIDT(true);
+            Virtual8086ModeMonitor.Initialize();
 
             PCIBus.Init();
 

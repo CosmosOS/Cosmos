@@ -79,6 +79,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
 				    aOutputWriter.WriteLine("				 hlt");
 				    aOutputWriter.WriteLine("				 jmp .loop");
 				    aOutputWriter.WriteLine("                 ");
+
 				    if (mComNumber > 0) {
                         var xStub = new DebugStub();
                         xStub.Main(mComPortAddresses[mComNumber - 1]);

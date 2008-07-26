@@ -4,50 +4,55 @@ using System.Text;
 
 namespace Cosmos.Hardware {
 	public static class DebugUtil {
-        public static unsafe void LogInterruptOccurred(Interrupts.InterruptContext* aContext) {
-            uint aInterrupt = aContext->Interrupt;
-            Cosmos.Hardware.DebugUtil.StartLogging();
-            Cosmos.Hardware.DebugUtil.WriteSerialString("<InterruptOccurred Interrupt=\"");
-            Cosmos.Hardware.DebugUtil.WriteNumber(aContext->Interrupt, 32);
-            Cosmos.Hardware.DebugUtil.WriteSerialString("\" SS=\"");
-            Cosmos.Hardware.DebugUtil.WriteNumber(aContext->SS, 32);
-            Cosmos.Hardware.DebugUtil.WriteSerialString("\" GS=\"");
-            Cosmos.Hardware.DebugUtil.WriteNumber(aContext->GS, 32);
-            Cosmos.Hardware.DebugUtil.WriteSerialString("\" FS=\"");
-            Cosmos.Hardware.DebugUtil.WriteNumber(aContext->FS, 32);
-            Cosmos.Hardware.DebugUtil.WriteSerialString("\" ES=\"");
-            Cosmos.Hardware.DebugUtil.WriteNumber(aContext->ES, 32);
-            Cosmos.Hardware.DebugUtil.WriteSerialString("\" DS=\"");
-            Cosmos.Hardware.DebugUtil.WriteNumber(aContext->DS, 32);
-            Cosmos.Hardware.DebugUtil.WriteSerialString("\" CS=\"");
-            Cosmos.Hardware.DebugUtil.WriteNumber(aContext->CS, 32);
-            Cosmos.Hardware.DebugUtil.WriteSerialString("\" ESI=\"");
-            Cosmos.Hardware.DebugUtil.WriteNumber(aContext->ESI, 32);
-            Cosmos.Hardware.DebugUtil.WriteSerialString("\" EDI=\"");
-            Cosmos.Hardware.DebugUtil.WriteNumber(aContext->EDI, 32);
-            Cosmos.Hardware.DebugUtil.WriteSerialString("\" EBP=\"");
-            Cosmos.Hardware.DebugUtil.WriteNumber(aContext->EBP, 32);
-            Cosmos.Hardware.DebugUtil.WriteSerialString("\" ESP=\"");
-            Cosmos.Hardware.DebugUtil.WriteNumber(aContext->ESP, 32);
-            Cosmos.Hardware.DebugUtil.WriteSerialString("\" EBX=\"");
-            Cosmos.Hardware.DebugUtil.WriteNumber(aContext->EBX, 32);
-            Cosmos.Hardware.DebugUtil.WriteSerialString("\" EDX=\"");
-            Cosmos.Hardware.DebugUtil.WriteNumber(aContext->EDX, 32);
-            Cosmos.Hardware.DebugUtil.WriteSerialString("\" ECX=\"");
-            Cosmos.Hardware.DebugUtil.WriteNumber(aContext->ECX, 32);
-            Cosmos.Hardware.DebugUtil.WriteSerialString("\" EAX=\"");
-            Cosmos.Hardware.DebugUtil.WriteNumber(aContext->EAX, 32);
-            Cosmos.Hardware.DebugUtil.WriteSerialString("\" Param=\"");
-            Cosmos.Hardware.DebugUtil.WriteNumber(aContext->Param, 32);
-            Cosmos.Hardware.DebugUtil.WriteSerialString("\" EFlags=\"");
-            Cosmos.Hardware.DebugUtil.WriteNumber(aContext->EFlags, 32);
-            Cosmos.Hardware.DebugUtil.WriteSerialString("\" UserESP=\"");
-            Cosmos.Hardware.DebugUtil.WriteNumber(aContext->UserESP, 32);
-            Cosmos.Hardware.DebugUtil.WriteSerialString("\"/>\r\n");
-            Cosmos.Hardware.DebugUtil.EndLogging();
+        public static void LogInterruptOccurred(ref Interrupts.InterruptContext aContext) {
+            StartLogging();
+            WriteSerialString("<InterruptOccurred Interrupt=\"");
+            WriteNumber(aContext.Interrupt,
+                        32);
+            WriteSerialString("\" CS=\"");
+            WriteNumber(aContext.CS,
+                        32);
+            WriteSerialString("\" ESI=\"");
+            WriteNumber(aContext.ESI,
+                        32);
+            WriteSerialString("\" EDI=\"");
+            WriteNumber(aContext.EDI,
+                        32);
+            WriteSerialString("\" EBP=\"");
+            WriteNumber(aContext.EBP,
+                        32);
+            WriteSerialString("\" ESP=\"");
+            WriteNumber(aContext.ESP,
+                        32);
+            WriteSerialString("\" EAX=\"");
+            WriteNumber(aContext.EAX,
+                        32);
+            WriteSerialString("\" EBX=\"");
+            WriteNumber(aContext.EBX,
+                        32);
+            WriteSerialString("\" ECX=\"");
+            WriteNumber(aContext.ECX,
+                        32);
+            WriteSerialString("\" EDX=\"");
+            WriteNumber(aContext.EDX,
+                        32);
+            WriteSerialString("\" Param=\"");
+            WriteNumber(aContext.Param,
+                        32);
+            WriteSerialString("\" EFlags=\"");
+            WriteNumber((uint)aContext.EFlags,
+                        32);
+            WriteSerialString("\" UserESP=\"");
+            WriteNumber(aContext.UserESP,
+                        32);
+            WriteSerialString("\" EIP=\"");
+            WriteNumber(aContext.EIP,
+                        32);
+            WriteSerialString("\"/>\r\n");
+            EndLogging();
         }
-        
-        public static void Initialize() {
+
+	    public static void Initialize() {
 		}
 
 		public static void StartLogging() {
@@ -73,7 +78,7 @@ namespace Cosmos.Hardware {
 			StartLogging();
 			WriteSerialString("<Error Module=\"");
 			WriteSerialString(aModule);
-			WriteSerialString("\" String=\"");
+		    WriteSerialString("\" String=\"");
 			WriteSerialString(aData);
 			WriteSerialString("\"/>\r\n");
 			EndLogging();
@@ -219,6 +224,20 @@ namespace Cosmos.Hardware {
         public static void WriteBinary(string aModule, string aMessage, byte[] aValue, int aIndex, int aLength)
         {
             StartLogging();
+            WriteSerialString("<Binary Module=\"");
+            WriteSerialString(aModule);
+            WriteSerialString("\" Message=\"");
+            WriteSerialString(aMessage);
+            WriteSerialString("\" Value=\"");
+            for (int i = 0; i < aLength; i++)
+            {
+                WriteNumber(aValue[aIndex + i], 8, false);
+            }
+            WriteSerialString("\"/>\r\n");
+        }
+        
+        public static unsafe void WriteBinary(string aModule, string aMessage, byte* aValue, int aIndex, int aLength) {
+						StartLogging();
             WriteSerialString("<Binary Module=\"");
             WriteSerialString(aModule);
             WriteSerialString("\" Message=\"");
