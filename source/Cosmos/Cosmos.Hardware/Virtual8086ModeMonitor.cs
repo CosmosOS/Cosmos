@@ -28,7 +28,7 @@ namespace Cosmos.Hardware {
                                 case 5: {
                                     aContext.EFlags ^= (EFlagsEnum)0x20000;
                                     aContext.EIP = mOriginalEIP + 5;
-                                    aContext.ESP = mOriginalESP;
+                                    aContext.UserESP = mOriginalESP;
                                     aContext.EBP = mOriginalEBP;
                                     //aContext.EBP = 0x30;
                                    // aContext.ESP -= 0x18; // magical number
@@ -72,7 +72,7 @@ namespace Cosmos.Hardware {
                 }
                 aContext.EFlags |= ((EFlagsEnum)0x20200);
                 mOriginalEIP = aContext.EIP;
-                mOriginalESP = aContext.ESP;
+                mOriginalESP = aContext.UserESP;
                 mOriginalEBP = aContext.EBP;
                 byte* xTSSPtr = CPU.GetTSS();
                 Interrupts.TSS* xTSS = (Interrupts.TSS*)xTSSPtr;
