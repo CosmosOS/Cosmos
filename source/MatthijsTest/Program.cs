@@ -102,11 +102,15 @@ namespace MatthijsTest {
         [ManifestResourceStream(ResourceName = "MatthijsTest.TestV86MExecution")]
         public static readonly byte[] TestV86MExecution;
 
+        public static void DoTest() {
+            Console.WriteLine("Original WriteLine");
+        }
+
         public static void Init()
         {
             Cosmos.Sys.Boot.Default();
-            Virtual8086ModeMonitor.ExecuteTask(TestV86MExecution);
-            Console.WriteLine("After V86 task");
+            DoTest();
+            Console.WriteLine("Done");
             do {
                 Console.WriteLine(Console.ReadLine());
             } while (true);

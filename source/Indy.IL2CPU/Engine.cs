@@ -1489,10 +1489,16 @@ namespace Indy.IL2CPU {
                 throw new Exception("PlugFields list already initialized!");
             }
 
-            AppDomain.CurrentDomain.AssemblyLoad += CurrentDomain_AssemblyLoad;
-
             mPlugMethods = new SortedList<string, MethodBase>();
             mPlugFields = new SortedList<Type, Dictionary<string, PlugFieldAttribute>>(new TypeComparer());
+
+            AppDomain.CurrentDomain.AssemblyLoad += CurrentDomain_AssemblyLoad;
+            foreach(var xAsm in AppDomain.CurrentDomain.GetAssemblies()) {
+                if (xAsm.GetName().Name == "MatthijsTest") {
+                    System.Diagnostics.Debugger.Break();
+                }
+                CheckAssemblyForPlugAssemblies(xAsm);
+            }
             List<Assembly> xPlugs = new List<Assembly>();
             var xComparer = new AssemblyEqualityComparer();
 
@@ -1535,7 +1541,7 @@ namespace Indy.IL2CPU {
                 return;
 
             //Search for related .config file
-            string configFile = aAssembly.Location + ".config";
+            string configFile = aAssembly.Location + ".cosmos-config";
             if (System.IO.File.Exists(configFile))
             {
                 //Load and parse all PlugAssemblies referred to in the .config file
@@ -1555,9 +1561,25 @@ namespace Indy.IL2CPU {
             //Parse XML and get all the PlugAssembly names
             XmlDocument xml = new XmlDocument();
             xml.Load(configFile);
+            // do version check:
+            if(xml.DocumentElement.Attributes["version"]==null ||xml.DocumentElement.Attributes["version"].Value != "1") {
+                throw new Exception(".DLL configuration version mismatch!");
+            }
 
+            string xHintPath = null;
+            if(xml.DocumentElement.Attributes["hintpath"]!=null) {
+                xHintPath = xml.DocumentElement.Attributes["hintpath"].Value;
+            }
             foreach (XmlNode assemblyName in xml.GetElementsByTagName("plug-assembly"))
             {
+                string xName = assemblyName.InnerText;
+                if(xName.EndsWith(".dll", StringComparison.InvariantCultureIgnoreCase) || xName.EndsWith(".exe", StringComparison.InvariantCultureIgnoreCase)) {
+                    if(!String.IsNullOrEmpty(xHintPath)) {
+                        yield return Assembly.LoadFile(Path.Combine(xHintPath,
+                                                                    xName));
+                        continue;
+                    }
+                }
                 yield return Assembly.Load(assemblyName.InnerText);
             }
         }
@@ -1568,6 +1590,7 @@ namespace Indy.IL2CPU {
         /// </summary>
         private void LoadPlugAssembly(Assembly aAssemblyDef)
         {
+            if(aAssemblyDef==null){System.Diagnostics.Debugger.Break();}
             foreach (var xType in (from item in aAssemblyDef.GetTypes()
                                    let xCustomAttribs = item.GetCustomAttributes(typeof(PlugAttribute),
                                                                                  false)
@@ -1597,12 +1620,10 @@ namespace Indy.IL2CPU {
                     }
                     foreach (var xPlugField in xTypePlugFields)
                     {
-                        if (xPlugFields.ContainsKey(xPlugField.FieldId))
-                        {
-                            throw new Exception("PlugField already defined!");
+                        if (!xPlugFields.ContainsKey(xPlugField.FieldId)) {
+                            xPlugFields.Add(xPlugField.FieldId,
+                                            xPlugField);
                         }
-                        xPlugFields.Add(xPlugField.FieldId,
-                                        xPlugField);
                     }
                 }
 
@@ -1624,12 +1645,10 @@ namespace Indy.IL2CPU {
                         }
                         if (!String.IsNullOrEmpty(xSignature))
                         {
-                            if (mPlugMethods.ContainsKey(xSignature))
-                            {
-                                System.Diagnostics.Debugger.Break();
+                            if (!mPlugMethods.ContainsKey(xSignature)) {
+                                mPlugMethods.Add(xSignature,
+                                                 xMethod);
                             }
-                            mPlugMethods.Add(xSignature,
-                                             xMethod);
                             continue;
                         }
                     }
@@ -1639,12 +1658,10 @@ namespace Indy.IL2CPU {
                         string xOrigStrippedSignature = GetStrippedMethodBaseFullName(xOrigMethodDef);
                         if (xOrigStrippedSignature == xStrippedSignature)
                         {
-                            if (mPlugMethods.ContainsKey(Label.GenerateLabelName(xOrigMethodDef)))
-                            {
-                                System.Diagnostics.Debugger.Break();
+                            if (!mPlugMethods.ContainsKey(Label.GenerateLabelName(xOrigMethodDef))) {
+                                mPlugMethods.Add(Label.GenerateLabelName(xOrigMethodDef),
+                                                 xMethod);
                             }
-                            mPlugMethods.Add(Label.GenerateLabelName(xOrigMethodDef),
-                                             xMethod);
                         }
                     }
                     foreach (MethodBase xOrigMethodDef in xTypeRef.GetConstructors(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.NonPublic))
