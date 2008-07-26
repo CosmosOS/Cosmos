@@ -28,6 +28,12 @@ namespace FrodeTest.Test
             sb.Append(Environment.NewLine);
             sb.Append("Works");
             Console.WriteLine(sb.ToString());
+
+            //Splitting
+            //This fails in Cosmos! Frode, 21.july
+            //string sentence = "This is a long string with many words";
+            //string[] words = sentence.Split((char)' ');
+
         }
     }
 }

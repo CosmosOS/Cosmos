@@ -1488,106 +1488,180 @@ namespace Indy.IL2CPU {
             if (mPlugFields != null) {
                 throw new Exception("PlugFields list already initialized!");
             }
+
+            AppDomain.CurrentDomain.AssemblyLoad += CurrentDomain_AssemblyLoad;
+
             mPlugMethods = new SortedList<string, MethodBase>();
             mPlugFields = new SortedList<Type, Dictionary<string, PlugFieldAttribute>>(new TypeComparer());
             List<Assembly> xPlugs = new List<Assembly>();
             var xComparer = new AssemblyEqualityComparer();
+
             foreach (string s in aPlugs) {
                 Assembly a = Assembly.LoadFrom(s);
                 a.GetTypes();
-                if (!xPlugs.Contains(a,
-                                     xComparer)) {
+                if (!xPlugs.Contains(a, xComparer)) {
                     xPlugs.Add(a);
                 }
             }
+
             foreach (var item in GetPlugAssemblies()) {
-                if (!xPlugs.Contains(item,
-                                     xComparer)) {
+                if (!xPlugs.Contains(item, xComparer)) {
                     xPlugs.Add(item);
                 }
             }
+
             foreach (Assembly xAssemblyDef in xPlugs) {
-                foreach (var xType in (from item in xAssemblyDef.GetTypes()
-                                       let xCustomAttribs = item.GetCustomAttributes(typeof(PlugAttribute),
-                                                                                     false)
-                                       where xCustomAttribs != null && xCustomAttribs.Length > 0
-                                       select new KeyValuePair<Type, PlugAttribute>(item,
-                                                                                    (PlugAttribute)xCustomAttribs[0]))) {
-                    PlugAttribute xPlugAttrib = xType.Value;
-                    Type xTypeRef = xPlugAttrib.Target;
-                    if (xTypeRef == null) {
-                        xTypeRef = Type.GetType(xPlugAttrib.TargetName,
-                                                true);
-                    }
-                    PlugFieldAttribute[] xTypePlugFields = xType.Key.GetCustomAttributes(typeof(PlugFieldAttribute),
-                                                                                         false) as PlugFieldAttribute[];
-                    if (xTypePlugFields != null && xTypePlugFields.Length > 0) {
-                        Dictionary<string, PlugFieldAttribute> xPlugFields;
-                        if (mPlugFields.ContainsKey(xTypeRef)) {
-                            xPlugFields = mPlugFields[xTypeRef];
-                        } else {
-                            mPlugFields.Add(xTypeRef,
-                                            xPlugFields = new Dictionary<string, PlugFieldAttribute>());
-                        }
-                        foreach (var xPlugField in xTypePlugFields) {
-                            if (xPlugFields.ContainsKey(xPlugField.FieldId)) {
-                                throw new Exception("PlugField already defined!");
-                            }
-                            xPlugFields.Add(xPlugField.FieldId,
-                                            xPlugField);
-                        }
-                    }
-                    foreach (MethodBase xMethod in xType.Key.GetMethods(BindingFlags.Public | BindingFlags.Static)) {
-                        PlugMethodAttribute xPlugMethodAttrib = xMethod.GetCustomAttributes(typeof(PlugMethodAttribute),
-                                                                                            true).Cast<PlugMethodAttribute>().FirstOrDefault();
-                        string xSignature = String.Empty;
-                        if (xPlugMethodAttrib != null) {
-                            xSignature = xPlugMethodAttrib.Signature;
-                            if (!xPlugMethodAttrib.Enabled) {
-                                continue;
-                            }
-                            if (!xPlugMethodAttrib.InNormalMode) {
-                                continue;
-                            }
-                            if (!String.IsNullOrEmpty(xSignature)) {
-                                if (mPlugMethods.ContainsKey(xSignature)) {
-                                    System.Diagnostics.Debugger.Break();
-                                }
-                                mPlugMethods.Add(xSignature,
-                                                 xMethod);
-                                continue;
-                            }
-                        }
-                        string xStrippedSignature = GetStrippedMethodBaseFullName(xMethod);
-                        foreach (MethodBase xOrigMethodDef in xTypeRef.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.NonPublic)) {
-                            string xOrigStrippedSignature = GetStrippedMethodBaseFullName(xOrigMethodDef);
-                            if (xOrigStrippedSignature == xStrippedSignature) {
-                                if (mPlugMethods.ContainsKey(Label.GenerateLabelName(xOrigMethodDef))) {
-                                    System.Diagnostics.Debugger.Break();
-                                }
-                                mPlugMethods.Add(Label.GenerateLabelName(xOrigMethodDef),
-                                                 xMethod);
-                            }
-                        }
-                        foreach (MethodBase xOrigMethodDef in xTypeRef.GetConstructors(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.NonPublic)) {
-                            string xOrigStrippedSignature = GetStrippedMethodBaseFullName(xOrigMethodDef);
-                            if (xOrigStrippedSignature == xStrippedSignature) {
-                                if (mPlugMethods.ContainsKey(Label.GenerateLabelName(xOrigMethodDef))) {
-                                    System.Diagnostics.Debugger.Break();
-                                }
-                                mPlugMethods.Add(Label.GenerateLabelName(xOrigMethodDef),
-                                                 xMethod);
-                            }
-                        }
-                    }
-                }
+                LoadPlugAssembly(xAssemblyDef);
             }
-            //Console.Write(new String('-', Console.WindowWidth));
+            
             Console.WriteLine("Recognized Plug methods:");
             foreach (string s in mPlugMethods.Keys) {
                 Console.WriteLine(s);
             }
-            //Console.Write(new String('-', Console.WindowWidth));
+        }
+
+        void CurrentDomain_AssemblyLoad(object sender, AssemblyLoadEventArgs args)
+        {
+            CheckAssemblyForPlugAssemblies(args.LoadedAssembly);
+        }
+
+        /// <summary>
+        /// Load any plug assemblies referred to in this assembly's .config file.
+        /// </summary>
+        private void CheckAssemblyForPlugAssemblies(Assembly aAssembly)
+        {
+            //If in the GAC, then ignore assembly
+            if (aAssembly.GlobalAssemblyCache)
+                return;
+
+            //Search for related .config file
+            string configFile = aAssembly.Location + ".config";
+            if (System.IO.File.Exists(configFile))
+            {
+                //Load and parse all PlugAssemblies referred to in the .config file
+                foreach (Assembly xAssembly in GetAssembliesFromConfigFile(configFile))
+                {
+                    LoadPlugAssembly(xAssembly);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Retrieves a list of plug assemblies from the given .config file.
+        /// </summary>
+        /// <param name="configFile"></param>
+        private IEnumerable<Assembly> GetAssembliesFromConfigFile(string configFile)
+        {
+            //Parse XML and get all the PlugAssembly names
+            XmlDocument xml = new XmlDocument();
+            xml.Load(configFile);
+
+            foreach (XmlNode assemblyName in xml.GetElementsByTagName("plug-assembly"))
+            {
+                yield return Assembly.Load(assemblyName.InnerText);
+            }
+        }
+
+        /// <summary>
+        /// Searches assembly for methods or fields marked with custom attributes PlugMethodAttribute or PlugFieldAttribute.
+        /// Matches found are inserted in SortedLists mPlugMethods and mPlugFields.
+        /// </summary>
+        private void LoadPlugAssembly(Assembly aAssemblyDef)
+        {
+            foreach (var xType in (from item in aAssemblyDef.GetTypes()
+                                   let xCustomAttribs = item.GetCustomAttributes(typeof(PlugAttribute),
+                                                                                 false)
+                                   where xCustomAttribs != null && xCustomAttribs.Length > 0
+                                   select new KeyValuePair<Type, PlugAttribute>(item,
+                                                                                (PlugAttribute)xCustomAttribs[0])))
+                                                                                {
+                PlugAttribute xPlugAttrib = xType.Value;
+                Type xTypeRef = xPlugAttrib.Target;
+                if (xTypeRef == null) {
+                    xTypeRef = Type.GetType(xPlugAttrib.TargetName, true);
+                }
+
+                PlugFieldAttribute[] xTypePlugFields = xType.Key.GetCustomAttributes(typeof(PlugFieldAttribute),
+                                                                                     false) as PlugFieldAttribute[];
+                if (xTypePlugFields != null && xTypePlugFields.Length > 0)
+                {
+                    Dictionary<string, PlugFieldAttribute> xPlugFields;
+                    if (mPlugFields.ContainsKey(xTypeRef))
+                    {
+                        xPlugFields = mPlugFields[xTypeRef];
+                    }
+                    else
+                    {
+                        mPlugFields.Add(xTypeRef,
+                                        xPlugFields = new Dictionary<string, PlugFieldAttribute>());
+                    }
+                    foreach (var xPlugField in xTypePlugFields)
+                    {
+                        if (xPlugFields.ContainsKey(xPlugField.FieldId))
+                        {
+                            throw new Exception("PlugField already defined!");
+                        }
+                        xPlugFields.Add(xPlugField.FieldId,
+                                        xPlugField);
+                    }
+                }
+
+                foreach (MethodBase xMethod in xType.Key.GetMethods(BindingFlags.Public | BindingFlags.Static))
+                {
+                    PlugMethodAttribute xPlugMethodAttrib = xMethod.GetCustomAttributes(typeof(PlugMethodAttribute),
+                                                                                        true).Cast<PlugMethodAttribute>().FirstOrDefault();
+                    string xSignature = String.Empty;
+                    if (xPlugMethodAttrib != null)
+                    {
+                        xSignature = xPlugMethodAttrib.Signature;
+                        if (!xPlugMethodAttrib.Enabled)
+                        {
+                            continue;
+                        }
+                        if (!xPlugMethodAttrib.InNormalMode)
+                        {
+                            continue;
+                        }
+                        if (!String.IsNullOrEmpty(xSignature))
+                        {
+                            if (mPlugMethods.ContainsKey(xSignature))
+                            {
+                                System.Diagnostics.Debugger.Break();
+                            }
+                            mPlugMethods.Add(xSignature,
+                                             xMethod);
+                            continue;
+                        }
+                    }
+                    string xStrippedSignature = GetStrippedMethodBaseFullName(xMethod);
+                    foreach (MethodBase xOrigMethodDef in xTypeRef.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.NonPublic))
+                    {
+                        string xOrigStrippedSignature = GetStrippedMethodBaseFullName(xOrigMethodDef);
+                        if (xOrigStrippedSignature == xStrippedSignature)
+                        {
+                            if (mPlugMethods.ContainsKey(Label.GenerateLabelName(xOrigMethodDef)))
+                            {
+                                System.Diagnostics.Debugger.Break();
+                            }
+                            mPlugMethods.Add(Label.GenerateLabelName(xOrigMethodDef),
+                                             xMethod);
+                        }
+                    }
+                    foreach (MethodBase xOrigMethodDef in xTypeRef.GetConstructors(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.NonPublic))
+                    {
+                        string xOrigStrippedSignature = GetStrippedMethodBaseFullName(xOrigMethodDef);
+                        if (xOrigStrippedSignature == xStrippedSignature)
+                        {
+                            if (mPlugMethods.ContainsKey(Label.GenerateLabelName(xOrigMethodDef)))
+                            {
+                                System.Diagnostics.Debugger.Break();
+                            }
+                            mPlugMethods.Add(Label.GenerateLabelName(xOrigMethodDef),
+                                             xMethod);
+                        }
+                    }
+                }
+            }
         }
 
         private MethodBase GetCustomMethodImplementation(string aMethodName) {
