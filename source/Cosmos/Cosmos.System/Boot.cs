@@ -19,6 +19,7 @@ namespace Cosmos.Sys {
         public static void Default() {
             Kernel.Global.Init();
             Hardware.Global.Init();
+            VFSManager.Initialize();
             Console.Clear();
         }
     }

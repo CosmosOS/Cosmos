@@ -388,9 +388,6 @@ namespace Indy.IL2CPU {
             while ((xCurrentMethod = (from item in mMethods.Keys
                                       where !mMethods[item].PreProcessed
                                       select item).FirstOrDefault()) != null) {
-                if(xCurrentMethod.ToString().Contains("Assembler.Assembler.PrintException()")) {
-                    System.Diagnostics.Debugger.Break();
-                }
                 try {
                     mAssembler.CurrentGroup = GetGroupForType(xCurrentMethod.DeclaringType);
                     RegisterType(xCurrentMethod.DeclaringType);
@@ -994,10 +991,6 @@ namespace Indy.IL2CPU {
                            "Processing Static Field '{0}'",
                            xFieldName);
                 xFieldName = DataMember.GetStaticFieldName(xCurrentField);
-                if (xCurrentField.ToString() == "__StaticArrayInitTypeSize=16 $$method0x6000002-1") {
-                    System.Diagnostics.Debugger.Break();
-                }
-
                 if (mAssembler.DataMembers.Count(x => x.Value.Name == xFieldName) == 0) {
                     var xItem = (from item in xCurrentField.GetCustomAttributes(false)
                                  where item.GetType().FullName == "ManifestResourceStreamAttribute"
@@ -1494,9 +1487,6 @@ namespace Indy.IL2CPU {
 
             AppDomain.CurrentDomain.AssemblyLoad += CurrentDomain_AssemblyLoad;
             foreach(var xAsm in AppDomain.CurrentDomain.GetAssemblies()) {
-                if (xAsm.GetName().Name == "MatthijsTest") {
-                    System.Diagnostics.Debugger.Break();
-                }
                 CheckAssemblyForPlugAssemblies(xAsm);
             }
             List<Assembly> xPlugs = new List<Assembly>();
@@ -1590,7 +1580,6 @@ namespace Indy.IL2CPU {
         /// </summary>
         private void LoadPlugAssembly(Assembly aAssemblyDef)
         {
-            if(aAssemblyDef==null){System.Diagnostics.Debugger.Break();}
             foreach (var xType in (from item in aAssemblyDef.GetTypes()
                                    let xCustomAttribs = item.GetCustomAttributes(typeof(PlugAttribute),
                                                                                  false)

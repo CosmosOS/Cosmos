@@ -109,7 +109,11 @@ namespace MatthijsTest {
         public static void Init()
         {
             Cosmos.Sys.Boot.Default();
-            DoTest();
+            char[] xChars = new char[] {'a', 'b', 'c', 'd', 'e'};
+            var xStr = new String(xChars);
+            Console.WriteLine(xStr);
+            xChars[0] = 'z';
+            Console.WriteLine(xStr);
             Console.WriteLine("Done");
             do {
                 Console.WriteLine(Console.ReadLine());
