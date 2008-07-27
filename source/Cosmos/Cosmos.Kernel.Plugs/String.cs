@@ -4,9 +4,9 @@ using System.Text;
 using Indy.IL2CPU.Plugs;
 
 namespace Cosmos.Kernel.Plugs {
-	[Plug(Target = typeof(string))]
-	public class String {
-		/*public int IndexOf(char c)
+    [Plug(Target = typeof(string))]
+    public class String {
+        /*public int IndexOf(char c)
 		{
 			// TODO: We can't get 'this'
 			//string me = ToString();
@@ -18,73 +18,162 @@ namespace Cosmos.Kernel.Plugs {
 			return -1;
 		}*/
 
-		public static string Concat(string aStrA, string aStrB) {
-			char[] xChars = new char[aStrA.Length + aStrB.Length];
+        public static string Concat(string aStrA,
+                                    string aStrB) {
+            char[] xChars = new char[aStrA.Length + aStrB.Length];
             int xPos = 0;
-            for (int i = 0; i < aStrA.Length; i++)
-            {
+            for (int i = 0; i < aStrA.Length; i++) {
                 xChars[xPos++] = aStrA[i];
             }
-            for (int i = 0; i < aStrB.Length; i++)
-            {
+            for (int i = 0; i < aStrB.Length; i++) {
                 xChars[xPos++] = aStrB[i];
             }
-			return new global::System.String(xChars);
-		}
+            return new global::System.String(xChars);
+        }
 
-		public static string Concat(string aStrA, string aStrB, string aStrC) {
-			if (aStrA == null)
-				aStrA = string.Empty;
-			if (aStrB == null)
-				aStrB = string.Empty;
-			if (aStrC == null)
-				aStrC = string.Empty;
-			char[] xChars = new char[aStrA.Length + aStrB.Length + aStrC.Length];
+        public static string Concat(string aStrA,
+                                    string aStrB,
+                                    string aStrC) {
+            if (aStrA == null) {
+                aStrA = string.Empty;
+            }
+            if (aStrB == null) {
+                aStrB = string.Empty;
+            }
+            if (aStrC == null) {
+                aStrC = string.Empty;
+            }
+            char[] xChars = new char[aStrA.Length + aStrB.Length + aStrC.Length];
             int xPos = 0;
-            for (int i = 0; i < aStrA.Length; i++)
-            {
+            for (int i = 0; i < aStrA.Length; i++) {
                 xChars[xPos++] = aStrA[i];
             }
-            for (int i = 0; i < aStrB.Length; i++)
-            {
+            for (int i = 0; i < aStrB.Length; i++) {
                 xChars[xPos++] = aStrB[i];
             }
-            for (int i = 0; i < aStrC.Length; i++)
-            {
+            for (int i = 0; i < aStrC.Length; i++) {
                 xChars[xPos++] = aStrC[i];
             }
 
-			return new global::System.String(xChars);
-		}
+            return new global::System.String(xChars);
+        }
 
-		public static string Concat(string aStrA, string aStrB, string aStrC, string aStrD) {
-			if (aStrA == null)
-				aStrA = string.Empty;
-			if (aStrB == null)
-				aStrB = string.Empty;
-			if (aStrC == null)
-				aStrC = string.Empty;
-			if (aStrD == null)
-				aStrD = string.Empty;
-			char[] xChars = new char[aStrA.Length + aStrB.Length + aStrC.Length + aStrD.Length];
+        public static string Concat(string aStrA,
+                                    string aStrB,
+                                    string aStrC,
+                                    string aStrD) {
+            if (aStrA == null) {
+                aStrA = string.Empty;
+            }
+            if (aStrB == null) {
+                aStrB = string.Empty;
+            }
+            if (aStrC == null) {
+                aStrC = string.Empty;
+            }
+            if (aStrD == null) {
+                aStrD = string.Empty;
+            }
+            char[] xChars = new char[aStrA.Length + aStrB.Length + aStrC.Length + aStrD.Length];
             int xPos = 0;
-			for (int i = 0; i < aStrA.Length; i++) {
-				xChars[xPos++] = aStrA[i];
-			}
-			for (int i = 0; i < aStrB.Length; i++) {
+            for (int i = 0; i < aStrA.Length; i++) {
+                xChars[xPos++] = aStrA[i];
+            }
+            for (int i = 0; i < aStrB.Length; i++) {
                 xChars[xPos++] = aStrB[i];
-			}
-			for (int i = 0; i < aStrC.Length; i++) {
+            }
+            for (int i = 0; i < aStrC.Length; i++) {
                 xChars[xPos++] = aStrC[i];
-			}
-			for (int i = 0; i < aStrD.Length; i++) {
+            }
+            for (int i = 0; i < aStrD.Length; i++) {
                 xChars[xPos++] = aStrD[i];
-			}
-			return new global::System.String(xChars);
-		}
+            }
+            return new global::System.String(xChars);
+        }
 
-		public static bool EqualsHelper(string aStrA, string aStrB) {
-			return aStrA.CompareTo(aStrB) == 0;
-		}
-	}
+        public static bool EqualsHelper(string aStrA,
+                                        string aStrB) {
+            return aStrA.CompareTo(aStrB) == 0;
+        }
+
+        private static bool CharArrayContainsChar(char[] aArray,
+                                                  char aChar) {
+            for (int i = 0; i < aArray.Length; i++) {
+                if (aArray[i] == aChar) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public static int IndexOf(string aThis,
+                                  char aSeparator,
+                                  int aStartIndex,
+                                  int aCount) {
+            int xEndIdx = aStartIndex + aCount;
+            for (int i = aStartIndex; i < xEndIdx; i++) {
+                if (aThis[i] == aSeparator) {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        public static int IndexOfAny(string aThis,
+                                     char[] aSeparators,
+                                     int aStartIndex) {
+            int xResult = -1;
+            for (int i = 0; i < aSeparators.Length; i++) {
+                var xValue = aThis.IndexOf(aSeparators[i],
+                                           aStartIndex);
+                if (xValue < xResult || xResult == -1) {
+                    xResult = xValue;
+                }
+            }
+            return xResult;
+        }
+
+        public static string Substring(string aThis,
+                                       int aStartIndex,
+                                       int aCount) {
+            var xChars = new char[aCount];
+            for (int i = 0; i < aCount; i++) {
+                xChars[i] = aThis[aStartIndex + i];
+            }
+            return new string(xChars);
+        }
+
+        private static string[] Split(string aThis,
+                                      char[] aSeparators,
+                                      StringSplitOptions aSplitOptions) {
+            List<string> xResult = new List<string>();
+            int xCurPos = 0;
+            if (CharArrayContainsChar(aSeparators,
+                                      aThis[0])) {
+                xCurPos = 1;
+                if (aSplitOptions == StringSplitOptions.None) {
+                    xResult.Add("");
+                }
+            }
+            while (xCurPos < aThis.Length) {
+                int xNextPos = IndexOfAny(aThis,
+                                          aSeparators,
+                                          xCurPos);
+                if (xNextPos == -1) {
+                    xResult.Add(aThis.Substring(xCurPos));
+                    break;
+                }
+                if (xNextPos == xCurPos) {
+                    if (aSplitOptions == StringSplitOptions.None) {
+                        xResult.Add("");
+                    }
+                    xCurPos = xNextPos + 1;
+                }
+                xResult.Add(aThis.Substring(xCurPos,
+                                            xNextPos - xCurPos));
+                xCurPos = xNextPos + 1;
+            }
+            return xResult.ToArray();
+        }
+    }
 }

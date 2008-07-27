@@ -118,12 +118,22 @@ namespace MatthijsTest {
                 Console.Write(e.Message);
                 Console.WriteLine("'");
             }
-            //VFSManager.
+            var xItems = VFSManager.GetDirectoryListing("/1/TempDir");
+            Console.WriteLine("Directory items of /:");
+            for (int i = 0; i < xItems.Length;i++ ) {
+                Console.Write(xItems[i].Name);
+                if (xItems[i].IsDirectory)
+                {
+                    Console.WriteLine("/");
 
+                }
+                else {
+                    Console.WriteLine("");
+                }
+            }
             Console.WriteLine("Done");
             do {
                 Console.WriteLine(Console.ReadLine());
-                var xTest = new char[1024 * 1024 * 10];
             } while (true);
         }
 

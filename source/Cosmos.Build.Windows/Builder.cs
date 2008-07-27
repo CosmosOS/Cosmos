@@ -195,11 +195,30 @@ namespace Cosmos.Build.Windows
             MakeISO();
             RemoveFile(BuildPath + "serial-debug.txt");
             // QEMU Docs - http://fabrice.bellard.free.fr/qemu/qemu-doc.html
-            if(File.Exists(BuildPath + "COM1-output.dbg")){File.Delete(BuildPath+"COM1-output.dbg");}
-            if (File.Exists(BuildPath + "COM2-output.dbg")) { File.Delete(BuildPath + "COM2-output.dbg"); }
+            if (File.Exists(BuildPath + "COM1-output.dbg")) {
+                File.Delete(BuildPath + "COM1-output.dbg");
+            }
+            if (File.Exists(BuildPath + "COM2-output.dbg")) {
+                File.Delete(BuildPath + "COM2-output.dbg");
+            }
+            string xHDString = "";
+            if (aUseHDImage) {
+                if (File.Exists(BuildPath + "hda.img")) {
+                    xHDString += "-hda \"" + BuildPath + "hda.img\" ";
+                }
+                if (File.Exists(BuildPath + "hdb.img"))
+                {
+                    xHDString += "-hdb \"" + BuildPath + "hdb.img\" ";
+                }
+                if (File.Exists(BuildPath + "hdd.img"))
+                {
+                    xHDString += "-hdb \"" + BuildPath + "hdd.img\" ";
+                }
+            }
+
             Global.Call(ToolsPath + @"qemu\qemu.exe"
                 // HD image
-                , (aUseHDImage ? "-hda \"" + BuildPath + "hda.img\"" : "")
+                , xHDString
                 // Path for BIOS, VGA BIOS, and keymaps
                 + " -L ."
                 // CD ROM image

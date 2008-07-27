@@ -52,7 +52,101 @@ namespace Cosmos.Sys {
             if(String.IsNullOrEmpty(aPath)) {
                 throw new ArgumentNullException("aPath");
             }
-            return null;
+            if(aPath[0]!='/' && aPath[0]!='\\') {
+                throw new Exception("Incorrect path, should start with / or \\!");
+            }
+            if (aPath.Length == 1)
+            {
+                // get listing of all drives:
+                var xResult = new FilesystemEntry[mFilesystems.Count];
+                for (int i = 0; i < mFilesystems.Count; i++)
+                {
+                    xResult[i] = new FilesystemEntry()
+                    {
+                        Id = (ulong)i,
+                        IsDirectory = true,
+                        IsReadonly = true,
+                        Name = i.ToString()
+                    };
+                }
+                return xResult;
+            }
+            else
+            {
+                string[] xPathParts;
+                if (aPath[0] == '/')
+                {
+                    xPathParts = aPath.Split(new char[] { '/' },
+                                             StringSplitOptions.RemoveEmptyEntries);
+                }
+                else
+                {
+                    xPathParts = aPath.Split(new char[] { '\\' },
+                                             StringSplitOptions.RemoveEmptyEntries);
+                }
+                // first get the correct FS
+                var xFS = mFilesystems[ParseStringToInt(xPathParts[0])];
+                var xCurrentFSEntryId = xFS.RootId;
+                for(int i = 1; i < xPathParts.Length;i++) {
+                    var xListing = xFS.GetDirectoryListing(xCurrentFSEntryId);
+                    bool xFound = false;
+                    for(int j = 0; j < xListing.Length;j++) {
+                        if(xListing[j].Name.Equals(xPathParts[i])) {
+                            xCurrentFSEntryId = xListing[j].Id;
+                            xFound = true;
+                            break;
+                        }
+                    }
+                    if(!xFound) {
+                        throw new Exception("Path not found!");
+                    }
+                }
+                return xFS.GetDirectoryListing(xCurrentFSEntryId);
+            }
+        }
+
+        private static int ParseStringToInt(string aString) {
+            int xResult = 0;
+            for(int i = 0; i < aString.Length;i++) {
+                if(i>0) {
+                    xResult *= 10;
+                }
+                #region actual parsing
+                switch (aString[i]) {
+                    case '0':
+                        break;
+                    case '1':
+                        xResult += 1;
+                        break;
+                    case '2':
+                        xResult += 2;
+                        break;
+                    case '3':
+                        xResult += 3;
+                        break;
+                    case '4':
+                        xResult += 4;
+                        break;
+                    case '5':
+                        xResult += 5;
+                        break;
+                    case '6':
+                        xResult += 6;
+                        break;
+                    case '7':
+                        xResult += 7;
+                        break;
+                    case '8':
+                        xResult += 8;
+                        break;
+                    case '9':
+                        xResult += 9;
+                        break;
+                        default:throw new Exception("Wrong number format!");
+                }
+                #endregion
+            }
+            return xResult;
         }
     }
 }

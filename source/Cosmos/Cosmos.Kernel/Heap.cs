@@ -90,21 +90,41 @@ namespace Cosmos.Kernel {
             }
         }
 
+        private static bool mDebugDisplayInitialized = false;
+
         // this method displays the used/total memory of the heap on the first line of the text screen
         private static void UpdateDebugDisplay() {
-            int xOldPositionLeft = Console.CursorLeft;
-            int xOldPositionTop = Console.CursorTop;
-            Console.CursorLeft = 0;
-            Console.CursorTop = 0;
-            Console.Write("[Heap Usage: ");
-            WriteNumber(mStartAddress,
-                        32);
-            Console.Write("/");
-            WriteNumber(mEndOfRam,
-                        32);
-            Console.Write("] bytes");
-            Console.CursorLeft = xOldPositionLeft;
-            Console.CursorTop = xOldPositionTop;
+            if (!mDebugDisplayInitialized) {
+                mDebugDisplayInitialized = true;
+                int xOldPositionLeft = Console.CursorLeft;
+                int xOldPositionTop = Console.CursorTop;
+                Console.CursorLeft = 0;
+                Console.CursorTop = 0;
+                Console.Write("[Heap Usage: ");
+                WriteNumber(mStartAddress,
+                            32);
+                Console.Write("/");
+                WriteNumber(mEndOfRam,
+                            32);
+                Console.Write("] bytes");
+                while(Console.CursorLeft < (Console.WindowWidth-1)) {
+                    Console.Write(" ");
+                }
+                Console.CursorLeft = xOldPositionLeft;
+                Console.CursorTop = xOldPositionTop;
+            }else {
+                int xOldPositionLeft = Console.CursorLeft;
+                int xOldPositionTop = Console.CursorTop;
+                Console.CursorLeft = 13;
+                Console.CursorTop = 0;
+                WriteNumber(mStartAddress,
+                            32);
+                Console.Write("/");
+                WriteNumber(mEndOfRam,
+                            32);
+                Console.CursorLeft = xOldPositionLeft;
+                Console.CursorTop = xOldPositionTop;
+            }
         }
 
         private static bool mInited;

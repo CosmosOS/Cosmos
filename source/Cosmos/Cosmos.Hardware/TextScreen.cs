@@ -51,7 +51,7 @@ namespace Cosmos.Hardware
         {
             CheckInit();
             
-            byte* xScreenPtr = (byte*)VideoAddr;
+            byte* xScreenPtr = (byte*)(VideoAddr + (Columns*2));
             for (int i = (Columns*2); i < Columns * (Rows + 1); i++)
             {
                 *xScreenPtr = 0;

@@ -12,6 +12,10 @@ namespace Indy.IL2CPU.IL.CustomImplementations.System {
 			char[] xResult = new char[1];
 			xResult[0] = aThis;
 			return new String(xResult);
-		}
+		} 
+
+        public static bool IsWhiteSpace(char aChar) {
+            return aChar == ' ' || aChar == '\t';
+        }
 	}
 }
