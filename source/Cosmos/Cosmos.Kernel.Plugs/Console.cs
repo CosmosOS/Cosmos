@@ -69,8 +69,6 @@ namespace Cosmos.Kernel.Plugs
         public static void Clear()
         {
             TextScreen.Clear();
-            set_CursorLeft(0);
-            set_CursorTop(0);
         }
 
         public static void Write(char aChar)

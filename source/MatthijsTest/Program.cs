@@ -9,6 +9,7 @@ using Cosmos.FileSystem;
 using Cosmos.FileSystem.Ext2;
 using Cosmos.Hardware;
 using Cosmos.Kernel;
+using Cosmos.Sys;
 
 namespace MatthijsTest {
     public class Program {
@@ -108,15 +109,21 @@ namespace MatthijsTest {
 
         public static void Init()
         {
-            Cosmos.Sys.Boot.Default();
-            char[] xChars = new char[] {'a', 'b', 'c', 'd', 'e'};
-            var xStr = new String(xChars);
-            Console.WriteLine(xStr);
-            xChars[0] = 'z';
-            Console.WriteLine(xStr);
+            try
+            {
+                Cosmos.Sys.Boot.Default();
+            }
+            catch (Exception e) {
+                Console.Write("Error occurred: '");
+                Console.Write(e.Message);
+                Console.WriteLine("'");
+            }
+            //VFSManager.
+
             Console.WriteLine("Done");
             do {
                 Console.WriteLine(Console.ReadLine());
+                var xTest = new char[1024 * 1024 * 10];
             } while (true);
         }
 

@@ -50,9 +50,9 @@ namespace Cosmos.Hardware
         public static unsafe void Clear()
         {
             CheckInit();
-
+            
             byte* xScreenPtr = (byte*)VideoAddr;
-            for (int i = 0; i < Columns * (Rows + 1); i++)
+            for (int i = (Columns*2); i < Columns * (Rows + 1); i++)
             {
                 *xScreenPtr = 0;
                 xScreenPtr++;
@@ -61,7 +61,7 @@ namespace Cosmos.Hardware
             }
 
             CurrentChar = 0;
-            CurrentRow = 0;
+            CurrentRow = 1;
 
             SetCursor();
         }
@@ -81,9 +81,9 @@ namespace Cosmos.Hardware
         protected static unsafe void ScrollUp()
         {
             CheckInit();
-            int Columns2 = Columns * 2;
-            byte* xScreenPtr = (byte*)(VideoAddr);
-            for (int i = 0; i < Columns * Rows; i++)
+            int Columns2 = Columns;
+            byte* xScreenPtr = (byte*)(VideoAddr+Columns2);
+            for (int i = Columns2; i < Columns * Rows; i++)
             {
                 *xScreenPtr = *(xScreenPtr + Columns2);
                 xScreenPtr++;
@@ -150,7 +150,7 @@ namespace Cosmos.Hardware
             Color = tempColor;
         }
 
-        private static int mCurrentRow = 0;
+        private static int mCurrentRow = 1;
         public static int CurrentRow 
         {
             get

@@ -48,6 +48,11 @@ namespace Cosmos.Sys {
                                           32);
         }
 
-        //public static FilesystemEntry[] GetDirectoryListing() 
+        public static FilesystemEntry[] GetDirectoryListing(string aPath) {
+            if(String.IsNullOrEmpty(aPath)) {
+                throw new ArgumentNullException("aPath");
+            }
+            return null;
+        }
     }
 }

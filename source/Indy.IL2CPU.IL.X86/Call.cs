@@ -128,25 +128,34 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
             Initialize(xMethod, (int)aReader.Position,aMethodInfo.DebugMode);
 		}
-		public void Assemble(string aMethod, int aArgumentCount) {
-            if (mTargetMethodInfo.ExtraStackSize > 0)
-            {
+        public void Assemble(string aMethod, int aArgumentCount) {
+            if (mTargetMethodInfo.ExtraStackSize > 0) {
                 new CPUx86.Sub("esp",
                                mTargetMethodInfo.ExtraStackSize.ToString());
             }
-			new CPUx86.Call(aMethod);
-            EmitExceptionLogic(Assembler, mCurrentILOffset, mMethodInfo, mNextLabelName, true, null);
-			for (int i = 0; i < aArgumentCount; i++) {
-				Assembler.StackContents.Pop();
-			}
-			if (mResultSize == 0) {
-				return;
-			}
-		    Assembler.StackContents.Push(new StackContent(mResultSize,
-		                                                  ((MethodInfo)mTargetMethodInfo.Method).ReturnType));
-		}
+            new CPUx86.Call(aMethod);
+            if (mResultSize != 0) {
+                new CPUx86.Pop("eax");
+            }
+            EmitExceptionLogic(Assembler,
+                               mCurrentILOffset,
+                               mMethodInfo,
+                               mNextLabelName,
+                               true,
+                               null);
+            for (int i = 0; i < aArgumentCount; i++) {
+                Assembler.StackContents.Pop();
+            }
+            if (mResultSize == 0) {
+                return;
+            }
+            new CPUx86.Push("eax");
 
-		protected virtual void HandleDebuggerBreak() {
+            Assembler.StackContents.Push(new StackContent(mResultSize,
+                                                          ((MethodInfo)mTargetMethodInfo.Method).ReturnType));
+        }
+
+	    protected virtual void HandleDebuggerBreak() {
 			//
 		}
 
