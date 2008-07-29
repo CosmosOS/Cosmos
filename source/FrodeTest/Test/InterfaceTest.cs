@@ -38,8 +38,13 @@ namespace FrodeTest.Test
         {
             Test.Dummy dummy = new FrodeTest.Test.Dummy();
             Console.WriteLine(dummy.Execute());
-            dummy.Property = "Hello Interfaces!";
+            dummy.Property = "Using class";
             Console.WriteLine("Property get: " + dummy.Property);
+
+            IDummyInterface dmy = new FrodeTest.Test.Dummy();
+            Console.WriteLine(dmy.Execute());
+            dmy.Property = "Using interface";
+            Console.WriteLine("Property is: " + dmy.Property);
         }
     }
 }

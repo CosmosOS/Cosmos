@@ -31,10 +31,10 @@ namespace FrodeTest
             //Test.BasicTest.RunTest();
             //Test.SwitchTest.RunTest();
             
-            //Test.BoolTest.RunTest();
-            //Test.InterfaceTest.RunTest();
-            //Test.ExtensionMethodsTest.RunTest();
-            //Test.BinaryHelperTest.RunTest();
+            Test.BoolTest.RunTest();
+            Test.InterfaceTest.RunTest();
+            Test.ExtensionMethodsTest.RunTest();
+            Test.BinaryHelperTest.RunTest();
             //Test.TransmitStatusDescriptorTest.RunTest();
             //Test.PacketHeaderTest.RunTest();
             //Test.RAMBusTest.RunTest();

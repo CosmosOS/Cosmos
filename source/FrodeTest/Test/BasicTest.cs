@@ -9,7 +9,7 @@ namespace FrodeTest.Test
         public static void RunTest()
         {
             Console.WriteLine(" -- Testing Basic functionality --");
-            
+
             Console.WriteLine("Byte 0: " + ((byte)0));
             Console.WriteLine("Byte 1: " + ((byte)1));
             Console.WriteLine("Byte 2: " + ((byte)2));
@@ -18,21 +18,15 @@ namespace FrodeTest.Test
             Console.WriteLine("Byte 5: " + ((byte)5));
             Console.WriteLine("Byte 6: " + ((byte)6));
 
-            Console.ReadLine();
-
             Console.WriteLine("Integer 0: " + ((int)0));
             Console.WriteLine("Integer 6: " + ((int)6));
             Console.WriteLine("Integer 10: " + ((int)10));
-
-            Console.ReadLine();
 
             Console.WriteLine("Char F: " + ((char)'F'));
             Console.WriteLine("Char r: " + ((char)'r'));
             Console.WriteLine("Char o: " + ((char)'o'));
             Console.WriteLine("Char d: " + ((char)'d'));
             Console.WriteLine("Char e: " + ((char)'e'));
-
-            Console.ReadLine();
 
             byte[] bArray = new byte[4];
             bArray[0] = (byte)0;

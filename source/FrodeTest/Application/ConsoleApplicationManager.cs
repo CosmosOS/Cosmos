@@ -19,8 +19,9 @@ namespace FrodeTest.Application
             //Scan through and find all applications.
 
             //Adding them manually for now. Until we can scan the harddrive/memory.
-            mApplications.Add(new ping());
             mApplications.Add(new net());
+            mApplications.Add(new ping());
+            mApplications.Add(new reboot());
         }
 
         public IConsoleApplication GetConsoleApplication(string name)
@@ -44,6 +45,7 @@ namespace FrodeTest.Application
             //                                    select application);
 
             //return (IConsoleApplication)xApplication;
+            Cosmos.Kernel.DebugUtil.SendMessage("ConsoleApplicationManager.cs", "Returning from GetConsoleApplication");
             return (IConsoleApplication)mApplications[1];
         }
     }

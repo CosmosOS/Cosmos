@@ -21,8 +21,8 @@ namespace FrodeTest.Shell
 
             if (command.Equals("exit") || command.Equals("test"))
                 return;
-            else if (command.Equals("reboot"))
-                Cosmos.Sys.Deboot.Reboot();
+            //else if (command.Equals("reboot"))
+            //    Cosmos.Sys.Deboot.Reboot();
             else if (command.Equals("ether"))
             {
                 Test.Ethernet2FrameTest.RunTest();
@@ -201,15 +201,24 @@ namespace FrodeTest.Shell
             else
             {
                 Application.ConsoleApplicationManager conAppManager = new FrodeTest.Application.ConsoleApplicationManager();
+
+                //string cmd = command.Substring(0, command.IndexOf(' ')+1);
+                //string args = command.Substring(command.IndexOf(' '), command.Length);
                 
                 Application.IConsoleApplication xConsoleApp = conAppManager.GetConsoleApplication(command);
                 if (xConsoleApp != null)
-                    xConsoleApp.Execute("theArgument");
+                {
+                    DebugUtil.SendMessage("Session.cs", "Calling Execute");
+                    xConsoleApp.Execute("dummy");
+                    DebugUtil.SendMessage("Session.cs", "Returned from Execute");
+                    //Console.WriteLine(String.Format("(Executed {0}", xConsoleApp.CommandName));
+                }
                 else
+                {
                     //No command found
                     Console.WriteLine("No such systemcommand or application: " + command + ". Try typing 'help'.");
+                }
             }
-                
 
             Run(); //Recursive call
         }
