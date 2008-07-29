@@ -105,17 +105,21 @@ namespace Cosmos.FileSystem.Ext2 {
                         if (xINodeNumber != xBaseINodeNumber) {
                             var xNameLength = xFSBuffer[xIndex + 6];
                             var xFileType = xFSBuffer[xIndex + 7];
-                            var xFSEntry = new FilesystemEntry();
-                            xFSEntry.Id = xINodeNumber;
-                            xFSEntry.IsDirectory = xFileType == 2; // 2 == directory
-                            xFSEntry.IsReadonly = true;
-                            //xFSEntry.Size = GetINode(xINodeNumber).Size;
-                            char[] xName = new char[xNameLength];
-                            for (int c = 0; c < xName.Length; c++) {
-                                xName[c] = (char)xFSBuffer[xIndex + 8 + c];
+                            if (!(xNameLength == 2 && xFSBuffer[xIndex + 8] == (byte)'.' && xFSBuffer[xIndex + 9] == (byte)'.')) {
+                                var xFSEntry = new FilesystemEntry {
+                                                                       Id = xINodeNumber,
+                                                                       IsDirectory = (xFileType == 2),
+                                                                       IsReadonly = true,
+                                                                       Filesystem = this
+                                                                   };
+                                //xFSEntry.Size = GetINode(xINodeNumber).Size;
+                                char[] xName = new char[xNameLength];
+                                for (int c = 0; c < xName.Length; c++) {
+                                    xName[c] = (char)xFSBuffer[xIndex + 8 + c];
+                                }
+                                xFSEntry.Name = new string(xName);
+                                xResult.Add(xFSEntry);
                             }
-                            xFSEntry.Name = new string(xName);
-                            xResult.Add(xFSEntry);
                         }
                     }
                     xIndex += xRecLength;
@@ -206,11 +210,9 @@ namespace Cosmos.FileSystem.Ext2 {
                                     aBlockId,
                                     32);
             uint* xBlocks = &aINode.Block;
-            if (aBlockId >= 0 && aBlockId <= 11)
-            {
+            if (aBlockId >= 0 && aBlockId <= 11) {
                 var xBlockId = xBlocks[aBlockId];
-                if (xBlockId == 0)
-                {
+                if (xBlockId == 0) {
                     return false;
                 }
                 ReadDataBlock(xBlockId,
@@ -218,11 +220,13 @@ namespace Cosmos.FileSystem.Ext2 {
                 return true;
             } else {
                 uint xIndirectBlockRefsPerDataBlock = BlockSize / 4;
-                HW.DebugUtil.SendNumber("Ext2", "Indirect block reference count per data block", xIndirectBlockRefsPerDataBlock, 32);
-                if ((aBlockId-12) < xIndirectBlockRefsPerDataBlock) {
+                HW.DebugUtil.SendNumber("Ext2",
+                                        "Indirect block reference count per data block",
+                                        xIndirectBlockRefsPerDataBlock,
+                                        32);
+                if ((aBlockId - 12) < xIndirectBlockRefsPerDataBlock) {
                     var xBlockId = xBlocks[12];
-                    if (xBlockId == 0)
-                    {
+                    if (xBlockId == 0) {
                         return false;
                     }
                     ReadDataBlock(xBlockId,
@@ -280,8 +284,13 @@ namespace Cosmos.FileSystem.Ext2 {
         public static bool BlockDeviceContainsExt2(BlockDevice aDevice) {
             byte[] xBuffer = new byte[aDevice.BlockSize];
             // todo: implement better detection
-            aDevice.ReadBlock(2, xBuffer);
-            Hardware.DebugUtil.WriteBinary("Ext2", "Detecting Ext2 (1)", xBuffer, 55, 4);
+            aDevice.ReadBlock(2,
+                              xBuffer);
+            Hardware.DebugUtil.WriteBinary("Ext2",
+                                           "Detecting Ext2 (1)",
+                                           xBuffer,
+                                           55,
+                                           4);
             return xBuffer[56] == 0x53 && xBuffer[57] == 0xEF;
         }
     }

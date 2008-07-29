@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Cosmos.FileSystem;
 using Cosmos.FileSystem.Ext2;
@@ -48,70 +49,98 @@ namespace Cosmos.Sys {
                                           32);
         }
 
-        public static FilesystemEntry[] GetDirectoryListing(string aPath) {
-            if(String.IsNullOrEmpty(aPath)) {
+        private static FilesystemEntry GetDirectoryEntry(string aPath) {
+            if (String.IsNullOrEmpty(aPath)) {
                 throw new ArgumentNullException("aPath");
             }
-            if(aPath[0]!='/' && aPath[0]!='\\') {
+            if (aPath[0] != '/' && aPath[0] != '\\') {
                 throw new Exception("Incorrect path, should start with / or \\!");
             }
-            if (aPath.Length == 1)
-            {
-                // get listing of all drives:
-                var xResult = new FilesystemEntry[mFilesystems.Count];
-                for (int i = 0; i < mFilesystems.Count; i++)
-                {
-                    xResult[i] = new FilesystemEntry()
-                    {
-                        Id = (ulong)i,
-                        IsDirectory = true,
-                        IsReadonly = true,
-                        Name = i.ToString()
-                    };
-                }
-                return xResult;
-            }
-            else
-            {
+            if (aPath.Length == 1) {
+                return null;
+            } else {
                 string[] xPathParts;
-                if (aPath[0] == '/')
-                {
-                    xPathParts = aPath.Split(new char[] { '/' },
+                if (aPath[0] == '/') {
+                    xPathParts = aPath.Split(new char[] {'/'},
                                              StringSplitOptions.RemoveEmptyEntries);
-                }
-                else
-                {
-                    xPathParts = aPath.Split(new char[] { '\\' },
+                } else {
+                    xPathParts = aPath.Split(new char[] {'\\'},
                                              StringSplitOptions.RemoveEmptyEntries);
                 }
                 // first get the correct FS
-                var xFS = mFilesystems[ParseStringToInt(xPathParts[0])];
+                var xFS = mFilesystems[ParseStringToInt(xPathParts[0],
+                                                        0)];
                 var xCurrentFSEntryId = xFS.RootId;
-                for(int i = 1; i < xPathParts.Length;i++) {
+                if (xPathParts.Length == 1) {
+                    return null;
+                }
+                for (int i = 1; i < (xPathParts.Length); i++) {
                     var xListing = xFS.GetDirectoryListing(xCurrentFSEntryId);
                     bool xFound = false;
-                    for(int j = 0; j < xListing.Length;j++) {
-                        if(xListing[j].Name.Equals(xPathParts[i])) {
+                    for (int j = 0; j < xListing.Length; j++) {
+                        if (xListing[j].Name.Equals(xPathParts[i])) {
                             xCurrentFSEntryId = xListing[j].Id;
+                            if (i == (xPathParts.Length - 1)) {
+                                return xListing[j];
+                            }
                             xFound = true;
                             break;
                         }
                     }
-                    if(!xFound) {
+                    if (!xFound) {
                         throw new Exception("Path not found!");
                     }
                 }
-                return xFS.GetDirectoryListing(xCurrentFSEntryId);
+                throw new Exception("Path not found!");
             }
         }
 
-        private static int ParseStringToInt(string aString) {
+        public static FilesystemEntry[] GetDirectoryListing(string aPath) {
+            if (String.IsNullOrEmpty(aPath)) {
+                throw new ArgumentNullException("aPath");
+            }
+            if (aPath[0] != '/' && aPath[0] != '\\') {
+                throw new Exception("Incorrect path, should start with / or \\!");
+            }
+            if (aPath.Length == 1) {
+                // get listing of all drives:
+                var xResult = new FilesystemEntry[mFilesystems.Count];
+                for (int i = 0; i < mFilesystems.Count; i++) {
+                    xResult[i] = new FilesystemEntry() {
+                                                           Id = (ulong)i,
+                                                           IsDirectory = true,
+                                                           IsReadonly = true,
+                                                           Name = i.ToString()
+                                                       };
+                }
+                return xResult;
+            } else {
+                string xParentPath = aPath;
+                if (String.IsNullOrEmpty(xParentPath)) {
+                    var xFS = mFilesystems[ParseStringToInt(aPath,
+                                                            1)];
+                    return xFS.GetDirectoryListing(xFS.RootId);
+                }
+                var xParentItem = GetDirectoryEntry(xParentPath);
+                if (xParentItem == null) {
+                    var xFS = mFilesystems[ParseStringToInt(aPath,
+                                                            1)];
+                    return xFS.GetDirectoryListing(xFS.RootId);
+                }
+                return xParentItem.Filesystem.GetDirectoryListing(xParentItem.Id);
+            }
+        }
+
+        private static int ParseStringToInt(string aString,
+                                            int aOffset) {
             int xResult = 0;
-            for(int i = 0; i < aString.Length;i++) {
-                if(i>0) {
+            for (int i = aOffset; i < aString.Length; i++) {
+                if (i > 0) {
                     xResult *= 10;
                 }
+
                 #region actual parsing
+
                 switch (aString[i]) {
                     case '0':
                         break;
@@ -142,11 +171,35 @@ namespace Cosmos.Sys {
                     case '9':
                         xResult += 9;
                         break;
-                        default:throw new Exception("Wrong number format!");
+                    default:
+                        throw new Exception("Wrong number format!");
                 }
+
                 #endregion
             }
             return xResult;
+        }
+
+        public static bool FileExists(string s) {
+            var xEntries = GetDirectoryListing(Path.GetDirectoryName(s));
+            string xFileName = Path.GetFileName(s);
+            for (int i = 0; i < xEntries.Length; i++) {
+                if (xEntries[i].Name.Equals(xFileName)) {
+                    return !xEntries[i].IsDirectory;
+                }
+            }
+            return false;
+        }
+
+        public static bool DirectoryExists(string s) {
+            var xEntries = GetDirectoryListing(Path.GetDirectoryName(s));
+            string xDirName = Path.GetFileName(s);
+            for (int i = 0; i < xEntries.Length; i++) {
+                if (xEntries[i].Name.Equals(xDirName)) {
+                    return xEntries[i].IsDirectory;
+                }
+            }
+            return false;
         }
     }
 }

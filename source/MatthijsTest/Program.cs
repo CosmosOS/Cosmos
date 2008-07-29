@@ -46,22 +46,24 @@ namespace MatthijsTest {
                     return;
                 }
                 int xCurLength = xTotalBuff.Length % xTempBuff.Length;
-                if (xCurLength == 0)
-                {
+                if (xCurLength == 0) {
                     xCurLength = xTempBuff.Length;
                 }
-                Array.Copy(xTempBuff, 0, xTotalBuff, i * xTempBuff.Length, xCurLength);
-                if ((i+1) == (xTotalBuff.Length / xTempBuff.Length)) {
-                    break;                    
+                Array.Copy(xTempBuff,
+                           0,
+                           xTotalBuff,
+                           i * xTempBuff.Length,
+                           xCurLength);
+                if ((i + 1) == (xTotalBuff.Length / xTempBuff.Length)) {
+                    break;
                 }
             }
-            if(aEntry.Size>=512) {
+            if (aEntry.Size >= 512) {
                 var xBlockCount = ((uint)(aEntry.Size)) / 512;
                 if (aEntry.Size % 512 > 0) {
                     xBlockCount ++;
                 }
-                for (var i = 0; i < xBlockCount; i++)
-                {
+                for (var i = 0; i < xBlockCount; i++) {
                     var xCurBlockSize = 512;
                     var xCharBuffer = new char[512];
                     if (i == (xBlockCount - 1)) {
@@ -69,8 +71,7 @@ namespace MatthijsTest {
                             xCurBlockSize = (int)(xTotalBuff.Length - (uint)(xBlockCount * 512));
                         }
                     }
-                    for (int j = 0; j < xCurBlockSize; j++)
-                    {
+                    for (int j = 0; j < xCurBlockSize; j++) {
                         xCharBuffer[j] = (char)xTotalBuff[(i * 512) + j];
                     }
                     Console.Write("Printing file ");
@@ -80,24 +81,29 @@ namespace MatthijsTest {
                     Console.Write(" of ");
                     Console.Write(xBlockCount.ToString());
                     Console.WriteLine(":");
-                    Console.WriteLine(new string(xCharBuffer, 0, xCurBlockSize));
+                    Console.WriteLine(new string(xCharBuffer,
+                                                 0,
+                                                 xCurBlockSize));
                     Console.Write("Press a key to continue");
                     Console.ReadLine();
                 }
-
-            }else{Console.WriteLine("Not enough data");}
+            } else {
+                Console.WriteLine("Not enough data");
+            }
         }
 
-        public delegate void TestDelegate(int aValue, ref bool aResult);
+        public delegate void TestDelegate(int aValue,
+                                          ref bool aResult);
 
-        public static void Handler1(int aValue, ref bool aResult)
-        {
+        public static void Handler1(int aValue,
+                                    ref bool aResult) {
             Console.Write("Result = ");
-            if (!aResult)
-            {
+            if (!aResult) {
                 Console.WriteLine("false");
                 aResult = true;
-            }else{Console.WriteLine("true");}
+            } else {
+                Console.WriteLine("true");
+            }
         }
 
         [ManifestResourceStream(ResourceName = "MatthijsTest.TestV86MExecution")]
@@ -107,30 +113,45 @@ namespace MatthijsTest {
             Console.WriteLine("Original WriteLine");
         }
 
-        public static void Init()
-        {
-            try
-            {
+        public static void Init() {
+            try {
                 Cosmos.Sys.Boot.Default();
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 Console.Write("Error occurred: '");
                 Console.Write(e.Message);
                 Console.WriteLine("'");
             }
-            var xItems = VFSManager.GetDirectoryListing("/1/TempDir");
-            Console.WriteLine("Directory items of /:");
-            for (int i = 0; i < xItems.Length;i++ ) {
-                Console.Write(xItems[i].Name);
-                if (xItems[i].IsDirectory)
-                {
-                    Console.WriteLine("/");
-
-                }
-                else {
-                    Console.WriteLine("");
-                }
+            // /1/TempDir/SubFile3
+            if (Directory.Exists("/1/TempDir")) {
+                Console.WriteLine("Directory TempDir exists!");
+            } else {
+                Console.WriteLine("Directory TempDir does not exist!");
             }
+            if (File.Exists("/1/TempDir/SubFile3")) {
+                Console.WriteLine("File SubFile3 exists!");
+            } else {
+                Console.WriteLine("File SubFile3 does not exist!");
+            }
+            if (File.Exists("/1/TempDir/SubFile6")) {
+                Console.WriteLine("File SubFile6 exists!");
+            } else {
+                Console.WriteLine("File SubFile6 does not exist!");
+            }
+            //var xItems = VFSManager.GetDirectoryListing("/1/TempDir");
+            //Console.WriteLine("Directory items of /:");
+            //for (int i = 0; i < xItems.Length; i++)
+            //{
+            //    Console.Write(xItems[i].Name);
+            //    if (xItems[i].IsDirectory)
+            //    {
+            //        Console.WriteLine("/");
+
+            //    }
+            //    else
+            //    {
+            //        Console.WriteLine("");
+            //    }
+            //}
             Console.WriteLine("Done");
             do {
                 Console.WriteLine(Console.ReadLine());

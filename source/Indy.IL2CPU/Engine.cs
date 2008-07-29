@@ -2016,12 +2016,10 @@ namespace Indy.IL2CPU {
             }
             if (aMethod == null) {
                 System.Diagnostics.Debugger.Break();
+                throw new ArgumentNullException("aMethod");
             }
             if (!aMethod.IsStatic) {
                 RegisterType(aMethod.DeclaringType);
-            }
-            if (aMethod.DeclaringType.FullName == "System.Object" && aMethod.Name == "Equals" && aMethod.GetParameters().Length == 1 && aMethod.GetParameters()[0].ParameterType.FullName == "System.Object") {
-                System.Diagnostics.Debugger.Break();
             }
             if (!mCurrent.mMethods.ContainsKey(aMethod)) {
                 mCurrent.mMethods.Add(aMethod,

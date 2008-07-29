@@ -133,6 +133,19 @@ namespace Cosmos.Kernel.Plugs {
             return xResult;
         }
 
+        public static int LastIndexOfAny(string aThis,
+                                         char[] aChars,
+                                         int aStartIndex,
+                                         int aCount) {
+            for (int i = 0; i < aCount; i++) {
+                if (CharArrayContainsChar(aChars,
+                                          aThis[aStartIndex - i])) {
+                    return aStartIndex - i;
+                }
+            }
+            return -1;
+        }
+
         public static string Substring(string aThis,
                                        int aStartIndex,
                                        int aCount) {
