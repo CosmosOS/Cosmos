@@ -9,11 +9,14 @@ namespace FrodeTest.Test
     {
         public static void RunTest()
         {
-            //ThrowStaticExceptionReturnBool();
-            //ThrowStaticExceptionReturnList();
+            //ThrowStaticExceptionReturnVoid(); //OK
+            //ThrowStaticExceptionReturnBool(); //OK
+            //ThrowStaticExceptionReturnList(); //OK
 
             var e = new ExceptionTest();
-            e.ThrowInstanceExceptionReturnList();
+            //e.ThrowInstanceExceptionReturnList(); //FAIL
+            e.ThrowInstanceExceptionReturnBool(); //FAIL
+            //e.ThrowInstanceExceptionReturnVoid(); //OK
         }
 
         public static void ThrowStaticExceptionReturnVoid()
