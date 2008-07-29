@@ -342,12 +342,11 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             WriteAddressToPCI(ref TxBuffer3, (byte)Register.MainRegister.Bit.TSAD3);
 
             var tsd = Register.TransmitStatusDescriptor.Load(mem);
-            Console.WriteLine("Telling NIC to send " + aData.Length + " bytes.");
+            //Console.WriteLine("Telling NIC to send " + aData.Length + " bytes.");
             tsd.Size = aData.Length;
-            //Console.WriteLine("TransmitStatusDescriptor contains size of" + tsd.Size + " bytes.");
-            //Console.WriteLine("TDS : " + tsd.ToString());
-            tsd.OWN = false; //Begins sending
-            //Console.WriteLine("TDS : " + tsd.ToString());
+            
+            tsd.OWN = false; //Begins sending - causes QEMU to DIE (Frode, 29.july)!
+            
             Register.TransmitStatusDescriptor.IncrementTSDescriptor();
 
             return true;

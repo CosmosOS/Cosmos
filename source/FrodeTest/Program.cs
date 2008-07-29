@@ -38,12 +38,14 @@ namespace FrodeTest
             //Test.TransmitStatusDescriptorTest.RunTest();
             //Test.PacketHeaderTest.RunTest();
             //Test.RAMBusTest.RunTest();
-            //Test.RTL8139Test.RunTest();
             //Test.NumberSystemTest.RunTest();
             //Test.IPv4Test.RunTest();
             //Test.UDPTest.RunTest();
             //Test.MACAddressTest.RunTest();
             //Test.LinqTest.RunTest();
+
+            //Tests ready for Matthijs to fix ;)
+            Test.RTL8139Test.RunTest();
             Test.ExceptionTest.RunTest();
              
             //Done

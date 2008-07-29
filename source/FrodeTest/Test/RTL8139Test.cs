@@ -1,43 +1,36 @@
-﻿//using System;
-//using System.Collections.Generic;
-//using System.Text;
-//using Cosmos.Hardware.Network.Devices.RTL8139;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using Cosmos.Hardware.Network.Devices.RTL8139;
+using Cosmos.Sys.Network;
 
-//namespace FrodeTest.Test
-//{
-//    public class RTL8139Test
-//    {
-//        [Obsolete]
-//        public static void RunTest()
-//        {
-//            // Testing RTL8139 PCI networkcard
-//            //Load card
-//            var nics = RTL8139.FindAll();
+namespace FrodeTest.Test
+{
+    public class RTL8139Test
+    {
+        [Obsolete]
+        public static void RunTest()
+        {
+            // Testing RTL8139 PCI networkcard
+            //Load card
+            var xNics = RTL8139.FindAll();
 
-//            if (nics.Count == 0)
-//            {
-//                Console.WriteLine("No Realtek 8139 network card found!!");
-//                return;
-//            }
+            if (xNics.Count == 0)
+            {
+                Console.WriteLine("No Realtek 8139 network card found!!");
+                return;
+            }
 
-//            Console.WriteLine(nics.Count + " network cards found");
-//            var nic = (RTL8139)nics[0];
+            Console.WriteLine(xNics.Count + " network cards found");
+            var xNic = (RTL8139)xNics[0];
 
-//            Console.WriteLine("Network card: " + nic.Name);
-//            Console.WriteLine("HW Revision: " + nic.HardwareRevision);
-//            Console.WriteLine("MAC address: " + nic.MACAddress.ToString());
+            xNic.Enable();
+            xNic.InitializeDriver();
 
-//            //Console.WriteLine("BaseAddress0 is : " + pciNic.BaseAddress0);
-//            Console.WriteLine("BaseAddress1 is : " + nic.PCICard.BaseAddress1);
-//            Console.WriteLine("Enabling card...");
-//            nic.Enable();
-//            Console.WriteLine("Initializing driver...");
-//            nic.InitializeDriver();
+            byte[] xPingData = { (byte)'a', (byte)'b', (byte)'c', (byte)'d', (byte)'e', (byte)'f' };
+            var xPingOut = new ICMPPacket(1, 2, ICMPPacket.ICMPType.EchoRequest, xPingData, 0);
 
-//            var head = new PacketHeader(0xFF);
-//            byte[] data = Mock.FakeBroadcastPacket.GetFakePacketAllHigh();
-//            var packet = new Packet(head, data);
-//            nic.Transmit(packet);
-//        }
-//    }
-//}
+            xNic.TransmitBytes(xPingOut.GetData());
+        }
+    }
+}
