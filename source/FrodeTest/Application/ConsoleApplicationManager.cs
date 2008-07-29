@@ -24,14 +24,14 @@ namespace FrodeTest.Application
             mApplications.Add(new reboot());
         }
 
+        /// <summary>
+        /// Get the IConsoleApplication with the given name, or null if no such application found.
+        /// </summary>
         public IConsoleApplication GetConsoleApplication(string name)
         {
             //Return the IConsoleApplication with the given name
-            if (mApplications == null)
-                throw new Exception("No console applications found");
-
             if (String.IsNullOrEmpty(name))
-                throw new ArgumentException("Console name is empty or null");
+                return null;
 
             //if (name == "help")
             //{
@@ -42,10 +42,9 @@ namespace FrodeTest.Application
 
             //var xApplication = (from application in mApplications
             //                                    where application.CommandName == name
-            //                                    select application);
+            //                                    select application).First();
 
-            //return (IConsoleApplication)xApplication;
-            Cosmos.Kernel.DebugUtil.SendMessage("ConsoleApplicationManager.cs", "Returning from GetConsoleApplication");
+            //return xApplication;
             return (IConsoleApplication)mApplications[1];
         }
     }

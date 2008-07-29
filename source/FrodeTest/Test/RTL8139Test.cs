@@ -8,7 +8,6 @@ namespace FrodeTest.Test
 {
     public class RTL8139Test
     {
-        [Obsolete]
         public static void RunTest()
         {
             // Testing RTL8139 PCI networkcard
