@@ -201,5 +201,29 @@ namespace Cosmos.Sys {
             }
             return false;
         }
+
+        public static string[] GetDirectories(string aDir)
+        {
+            List<string> xDirectories = new List<string>();
+            var xEntries = GetDirectoryListing(Path.GetDirectoryName(aDir));
+
+            foreach (FilesystemEntry entry in xEntries)
+                if (entry.IsDirectory)
+                    xDirectories.Add(entry.Name);
+
+            return xDirectories.ToArray();
+        }
+
+        public static string[] GetFiles(string aDir)
+        {
+            List<string> xFiles = new List<string>();
+            var xEntries = GetDirectoryListing(Path.GetDirectoryName(aDir));
+
+            foreach (FilesystemEntry entry in xEntries)
+                if (!entry.IsDirectory)
+                    xFiles.Add(entry.Name);
+
+            return xFiles.ToArray();            
+        }
     }
 }

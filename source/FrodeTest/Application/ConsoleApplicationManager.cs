@@ -19,6 +19,7 @@ namespace FrodeTest.Application
             //Scan through and find all applications.
 
             //Adding them manually for now. Until we can scan the harddrive/memory.
+            mApplications.Add(new dir());
             mApplications.Add(new net());
             mApplications.Add(new ping());
             mApplications.Add(new reboot());
@@ -45,7 +46,7 @@ namespace FrodeTest.Application
             //                                    select application).First();
 
             //return xApplication;
-            return (IConsoleApplication)mApplications[1];
+            return (IConsoleApplication)mApplications[0];
         }
     }
 }

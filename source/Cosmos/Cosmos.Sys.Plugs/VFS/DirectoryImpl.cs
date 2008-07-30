@@ -12,5 +12,15 @@ namespace Cosmos.Sys.Plugs {
         public static bool Exists(string aDir) {
             return VFSManager.DirectoryExists(aDir);
         }
+
+        public static string[] GetDirectories(string aDir)
+        {
+            return VFSManager.GetDirectories(aDir);
+        }
+
+        public static string[] GetFiles(string aDir)
+        {
+            return VFSManager.GetFiles(aDir);
+        }
     }
 }

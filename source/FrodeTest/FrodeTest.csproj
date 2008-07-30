@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Application\ConsoleApplicationManager.cs" />
+    <Compile Include="Application\dir.cs" />
     <Compile Include="Application\IConsoleApplication.cs" />
     <Compile Include="Application\net.cs" />
     <Compile Include="Application\ping.cs" />
@@ -80,11 +81,16 @@
     <Compile Include="Test\StringTest.cs" />
     <Compile Include="Test\SwitchTest.cs" />
     <Compile Include="Test\TransmitStatusDescriptorTest.cs" />
+    <Compile Include="Test\VirtualFileSystemTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cosmos.Build.Windows\Cosmos.Build.Windows.csproj">
       <Project>{1F0EDE86-F6D4-4355-9A97-10E90457770C}</Project>
       <Name>Cosmos.Build.Windows</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Kernel.FileSystems\Cosmos.FileSystem.csproj">
+      <Project>{5C293BB9-FB42-495E-AAD9-D15888631CA4}</Project>
+      <Name>Cosmos.FileSystem</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos\Cosmos.Hardware\Cosmos.Hardware.csproj">
       <Project>{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}</Project>
