@@ -192,18 +192,26 @@ namespace Cosmos.Sys {
         }
 
         public static bool DirectoryExists(string s) {
-            var xEntries = GetDirectoryListing(Path.GetDirectoryName(s));
-            string xDirName = Path.GetFileName(s);
-            for (int i = 0; i < xEntries.Length; i++) {
-                if (xEntries[i].Name.Equals(xDirName)) {
-                    return xEntries[i].IsDirectory;
+                var xEntries = GetDirectoryListing(Path.GetDirectoryName(s));
+                string xDirName = Path.GetFileName(s);
+                for (int i = 0; i < xEntries.Length; i++)
+                {
+                    if (xEntries[i].Name.Equals(xDirName))
+                    {
+                        return xEntries[i].IsDirectory;
+                    }
                 }
-            }
-            return false;
+                return false;
         }
 
         public static string[] GetDirectories(string aDir)
         {
+            if (aDir == null)
+                throw new ArgumentNullException("aDir is null");
+
+            if (!Directory.Exists(aDir))
+                throw new DirectoryNotFoundException("Unable to find directory " + aDir);
+
             List<string> xDirectories = new List<string>();
             var xEntries = GetDirectoryListing(Path.GetDirectoryName(aDir));
 
@@ -216,6 +224,12 @@ namespace Cosmos.Sys {
 
         public static string[] GetFiles(string aDir)
         {
+            if (aDir == null)
+                throw new ArgumentNullException("aDir is null");
+
+            if (!Directory.Exists(aDir))
+                throw new DirectoryNotFoundException("Unable to find directory " + aDir);
+
             List<string> xFiles = new List<string>();
             var xEntries = GetDirectoryListing(Path.GetDirectoryName(aDir));
 
@@ -233,7 +247,6 @@ namespace Cosmos.Sys {
                 xDrives.Add(entry.Name);
 
             return xDrives.ToArray();
-                
         }
 
 

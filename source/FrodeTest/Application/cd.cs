@@ -11,18 +11,42 @@ namespace FrodeTest.Application
     {
         #region IConsoleApplication Members
 
-        public int Execute(object args)
+        public int Execute(string[] args)
         {
-            if (String.IsNullOrEmpty(args.ToString()))
+            Cosmos.Kernel.DebugUtil.SendMessage("cd.cs", "Executing cd command");
+            if (args == null)
                 return 0;
 
-            if (args.ToString() == "..")
+            if (String.IsNullOrEmpty(args[0]))
+                return 0;
+
+            if (args[0] == "..")
             {
                 //Go up one directory
+
+                //TODO: Use DirectoryInfo.GetParent
+                string xCurDir = EnvironmentVariables.GetCurrent().CurrentDirectory;
+                xCurDir = xCurDir.TrimEnd(Path.DirectorySeparatorChar);
+                EnvironmentVariables.GetCurrent().CurrentDirectory = xCurDir.Substring(0, xCurDir.LastIndexOf(Path.DirectorySeparatorChar));
+
                 return 0;
             }
 
-            EnvironmentVariables.GetCurrent().CurrentDirectory = EnvironmentVariables.GetCurrent().CurrentDirectory + Path.DirectorySeparatorChar + args.ToString();
+            string xNewPath = EnvironmentVariables.GetCurrent().CurrentDirectory + args[0] + Path.DirectorySeparatorChar;
+            Cosmos.Kernel.DebugUtil.SendMessage("cd.cs", "Checking path " + xNewPath);
+            if (Directory.Exists(xNewPath))
+            {
+                EnvironmentVariables.GetCurrent().CurrentDirectory = xNewPath;
+            }
+            else if (Directory.Exists(args[0] + Path.DirectorySeparatorChar))
+            {
+                EnvironmentVariables.GetCurrent().CurrentDirectory += args[0] + Path.DirectorySeparatorChar;
+            }
+            else
+            {
+                Console.WriteLine("Unknown path.");
+                return -1;
+            }
 
             return 0;
         }
@@ -34,7 +58,7 @@ namespace FrodeTest.Application
 
         public string Description
         {
-            get { throw new NotImplementedException(); }
+            get { return "Change the current directory"; }
         }
 
         #endregion

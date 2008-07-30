@@ -5,6 +5,7 @@ using System.Text;
 using Cosmos.Sys;
 using Cosmos.FileSystem;
 using System.IO;
+using FrodeTest.Shell;
 
 namespace FrodeTest.Application
 {
@@ -12,16 +13,16 @@ namespace FrodeTest.Application
     {
         #region IConsoleApplication Members
 
-        public int Execute(object args)
+        public int Execute(string[] args)
         {
             //Get current directory
-            string xCurrentDirectory = "/1/";
+            string xCurrentDirectory = EnvironmentVariables.GetCurrent().CurrentDirectory;
 
             foreach (string xDirectory in Directory.GetDirectories(xCurrentDirectory))
                 Console.WriteLine("<DIR>   " + xDirectory);
 
             foreach (string xFile in Directory.GetFiles(xCurrentDirectory))
-                Console.Write("        " + xFile);
+                Console.WriteLine("        " + xFile);
 
             return 0;
         }

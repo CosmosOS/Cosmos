@@ -9,7 +9,7 @@ namespace FrodeTest.Application
 {
     public class ping : IConsoleApplication
     {
-        public int Execute(object args)
+        public int Execute(string[] args)
         {
             //Parse args into a host/ip
             //System.Net.IPAddress xDestinationIP = IPAddress.Parse("172.28.5.10");

@@ -177,48 +177,30 @@ namespace FrodeTest.Shell
                 nic.LoopbackMode = !nic.LoopbackMode;
                 Console.WriteLine("to: " + nic.LoopbackMode.ToString());
             }
-
-            else if (command.Equals("crash"))
-            {
-                throw new Exception("User forced an Exception", new Exception("Inner bug"));
-            }
-            else if (command.Equals("notimpl"))
-            {
-                throw new NotImplementedException();
-            }
             else if (command.Equals("prom"))
             {
                 nic.PromiscuousMode = !nic.PromiscuousMode;
             }
-
-            //else if (command.Equals("help"))
-            //{
-            //    Console.WriteLine("Valid commands: info, load, test, send, read, mac, ip, dump, prom, loop, crash, notimpl, enable, disable, reset, reboot or exit");
-            //}
-            //else if (command.Equals(string.Empty))
-            //{
-            //    Console.WriteLine(string.Empty);
-            //}
             else
             {
                 Application.ConsoleApplicationManager conAppManager = new FrodeTest.Application.ConsoleApplicationManager();
+                ConsoleApplicationManager.CommandLineSentence xCommand = new ConsoleApplicationManager.CommandLineSentence(command);
 
-                //string cmd = command.Substring(0, command.IndexOf(' ')+1);
-                string args = command.Substring(command.IndexOf(' '), command.Length+1);
+                //Console.WriteLine("cmd:" + xCommand.Command + ":");
+                //Console.WriteLine("args:" + xCommand.Arguments[ + ":");
+                //foreach (string arg in xCommand.Arguments)
+                //{
+                //    Console.WriteLine("Argument:" + arg + ":");
+                //}
                 
-                Application.IConsoleApplication xConsoleApp = conAppManager.GetConsoleApplication(command);
+                Application.IConsoleApplication xConsoleApp = conAppManager.GetConsoleApplication(xCommand.Command);
                 if (xConsoleApp != null)
                 {
-                    DebugUtil.SendMessage("Session.cs", "Calling Execute");
-                    xConsoleApp.Execute(args);
-                    DebugUtil.SendMessage("Session.cs", "Returned from Execute");
-                    //Console.WriteLine(String.Format("(Executed {0}", xConsoleApp.CommandName));
+                    DebugUtil.SendMessage("Session.cs", "About to Execute a command");
+                    xConsoleApp.Execute(xCommand.Arguments);
                 }
                 else
-                {
-                    //No command found
-                    Console.WriteLine("No such systemcommand or application: " + command + ". Try typing 'help'.");
-                }
+                    Console.WriteLine("Unknown command or application: " + xCommand.Command + ". Try typing 'help'.");
             }
 
             Run(); //Recursive call

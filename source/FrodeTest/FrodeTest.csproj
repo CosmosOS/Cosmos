@@ -52,6 +52,7 @@
     <Compile Include="Application\cd.cs" />
     <Compile Include="Application\ConsoleApplicationManager.cs" />
     <Compile Include="Application\dir.cs" />
+    <Compile Include="Application\help.cs" />
     <Compile Include="Application\IConsoleApplication.cs" />
     <Compile Include="Application\net.cs" />
     <Compile Include="Application\ping.cs" />

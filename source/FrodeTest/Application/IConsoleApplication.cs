@@ -12,7 +12,7 @@ namespace FrodeTest.Application
         /// </summary>
         /// <param name="args"></param>
         /// <returns>0 for success, negative number for general error</returns>
-        int Execute(object args);
+        int Execute(string[] args);
 
         /// <summary>
         /// The single-word command.

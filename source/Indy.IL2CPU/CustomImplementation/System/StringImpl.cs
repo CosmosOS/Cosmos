@@ -41,6 +41,18 @@ namespace Indy.IL2CPU.CustomImplementation.System {
 			return -1;
 		}
 
+        public static int LastIndexOf(string aThis, char c)
+        {
+            for (int i = aThis.Length; i < 0; i++)
+            {
+                if (aThis[i] == c)
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
         public static string PadHelper(string aThis, int totalWidth, char paddingChar, bool isRightPadded)
         {
             char[] cs = new char[totalWidth];

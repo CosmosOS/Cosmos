@@ -9,7 +9,7 @@ namespace FrodeTest.Application
     {
         #region IConsoleApplication Members
 
-        public int Execute(object args)
+        public int Execute(string[] args)
         {
             ////string[] a = ((string)args).Split(' ');
             //string[] a = new string[] {"enable", "dummy"};

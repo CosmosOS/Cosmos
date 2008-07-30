@@ -11,20 +11,18 @@ namespace FrodeTest.Application
 
         public ConsoleApplicationManager()
         {
-            this.SetAllConsoleApplications();
-        }
-
-        private void SetAllConsoleApplications()
-        {
-            //Scan through and find all applications.
+             //Scan through and find all applications.
 
             //Adding them manually for now. Until we can scan the harddrive/memory.
             mApplications.Add(new cd());
             mApplications.Add(new dir());
+            mApplications.Add(new help());
             mApplications.Add(new net());
             mApplications.Add(new ping());
-            mApplications.Add(new reboot());
+            mApplications.Add(new reboot());     
         }
+
+        public List<IConsoleApplication> AllConsoleApplications { get { return mApplications; } }
 
         /// <summary>
         /// Get the IConsoleApplication with the given name, or null if no such application found.
@@ -34,6 +32,18 @@ namespace FrodeTest.Application
             //Return the IConsoleApplication with the given name
             if (String.IsNullOrEmpty(name))
                 return null;
+
+            for (int i = 0; i < mApplications.Count; i++)
+            {
+                if (mApplications[i].CommandName == name)
+                    return mApplications[i];
+            }
+
+            return null;
+            //    if (app.CommandName.Equals(name))
+            //        return app;
+
+            //return null;
 
             //if (name == "help")
             //{
@@ -47,7 +57,30 @@ namespace FrodeTest.Application
             //                                    select application).First();
 
             //return xApplication;
-            return (IConsoleApplication)mApplications[0];
+            //return (IConsoleApplication)mApplications[0];
+        }
+        
+        public class CommandLineSentence
+        {
+            public CommandLineSentence(string command)
+            {
+                string[] words = command.Split((char)' ');
+                mCommand = words[0];
+                mArguments = new string[words.Length - 1];
+
+                for (int i = 1; i < words.Length; i++)
+                {
+                    Console.WriteLine("Length");
+                    mArguments[i - 1] = words[i];
+                }
+            }
+
+            private string mCommand;
+            public string Command { get { return mCommand; } }
+
+            private string[] mArguments;
+            public string[] Arguments { get { return mArguments; } }
+
         }
     }
 }

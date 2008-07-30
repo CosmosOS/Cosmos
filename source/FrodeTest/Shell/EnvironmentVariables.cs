@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 
 namespace FrodeTest.Shell
 {
@@ -21,7 +22,7 @@ namespace FrodeTest.Shell
         {
         }
 
-        private string mCurrentDirectory = "/";
+        private string mCurrentDirectory = Path.DirectorySeparatorChar.ToString();
         public string CurrentDirectory { get { return mCurrentDirectory; } set { mCurrentDirectory = value; } }
     }
 }
