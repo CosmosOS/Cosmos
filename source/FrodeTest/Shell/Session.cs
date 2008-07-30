@@ -16,7 +16,8 @@ namespace FrodeTest.Shell
         /// </summary>
         public static void Run()
         {
-            Console.Write(@"Cosmos:\>");
+            //Console.Write(@"Cosmos:\>");
+            Console.Write(EnvironmentVariables.GetCurrent().CurrentDirectory + ">");
             string command = Console.ReadLine();
 
             if (command.Equals("exit") || command.Equals("test"))
@@ -203,13 +204,13 @@ namespace FrodeTest.Shell
                 Application.ConsoleApplicationManager conAppManager = new FrodeTest.Application.ConsoleApplicationManager();
 
                 //string cmd = command.Substring(0, command.IndexOf(' ')+1);
-                //string args = command.Substring(command.IndexOf(' '), command.Length);
+                string args = command.Substring(command.IndexOf(' '), command.Length+1);
                 
                 Application.IConsoleApplication xConsoleApp = conAppManager.GetConsoleApplication(command);
                 if (xConsoleApp != null)
                 {
                     DebugUtil.SendMessage("Session.cs", "Calling Execute");
-                    xConsoleApp.Execute("dummy");
+                    xConsoleApp.Execute(args);
                     DebugUtil.SendMessage("Session.cs", "Returned from Execute");
                     //Console.WriteLine(String.Format("(Executed {0}", xConsoleApp.CommandName));
                 }

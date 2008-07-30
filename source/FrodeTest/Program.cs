@@ -27,7 +27,7 @@ namespace FrodeTest
 
             //Test
             Console.WriteLine("---- RUNNING PREDEFINED TESTS ----");
-            Test.StringTest.RunTest();
+            //Test.StringTest.RunTest();
             //Test.IPv4AddressTest.RunTest();
             //Test.BasicTest.RunTest();
             //Test.SwitchTest.RunTest();
@@ -44,12 +44,12 @@ namespace FrodeTest
             //Test.UDPTest.RunTest();
             //Test.MACAddressTest.RunTest();
             //Test.LinqTest.RunTest();
-            Test.VirtualFileSystemTest.RunTest();
-            Console.ReadLine();
+            //Test.VirtualFileSystemTest.RunTest();
+            //Console.ReadLine();
 
             //Tests ready for Matthijs to fix ;)
             //Test.RTL8139Test.RunTest();
-            //Test.ExceptionTest.RunTest();
+            Test.ExceptionTest.RunTest();
              
             //Done
             Console.WriteLine("Shutting down computer");

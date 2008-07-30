@@ -19,6 +19,7 @@ namespace FrodeTest.Application
             //Scan through and find all applications.
 
             //Adding them manually for now. Until we can scan the harddrive/memory.
+            mApplications.Add(new cd());
             mApplications.Add(new dir());
             mApplications.Add(new net());
             mApplications.Add(new ping());

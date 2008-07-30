@@ -21,6 +21,8 @@ namespace FrodeTest.Test
             foreach (string drive in Directory.GetLogicalDrives())
                 Console.WriteLine("    " + drive);
 
+            Console.WriteLine("Directory separator: " + Path.DirectorySeparatorChar.ToString());
+
 
             //Console.WriteLine(Directory.Exists("/1/TempDir"));
             Console.WriteLine("About to check Directory.Exists");

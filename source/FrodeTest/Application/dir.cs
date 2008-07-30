@@ -18,26 +18,10 @@ namespace FrodeTest.Application
             string xCurrentDirectory = "/1/";
 
             foreach (string xDirectory in Directory.GetDirectories(xCurrentDirectory))
-            {
-                Console.Write("<DIR>   ");
-                Console.WriteLine(xDirectory);
-            }
+                Console.WriteLine("<DIR>   " + xDirectory);
 
             foreach (string xFile in Directory.GetFiles(xCurrentDirectory))
-            {
-                Console.Write("        ");
-                Console.WriteLine(xFile);
-            }
-
-            //foreach (FilesystemEntry entry in VFSManager.GetDirectoryListing(xCurrentDirectory))
-            //{
-            //    if (entry.IsDirectory)
-            //        Console.Write("<DIR>      ");
-            //    else
-            //        Console.Write("           ");
-
-            //    Console.WriteLine(entry.Name);
-            //}
+                Console.Write("        " + xFile);
 
             return 0;
         }

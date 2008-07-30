@@ -49,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Application\cd.cs" />
     <Compile Include="Application\ConsoleApplicationManager.cs" />
     <Compile Include="Application\dir.cs" />
     <Compile Include="Application\IConsoleApplication.cs" />
@@ -59,6 +60,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Security\User.cs" />
+    <Compile Include="Shell\EnvironmentVariables.cs" />
     <Compile Include="Shell\Prompt.cs" />
     <Compile Include="Shell\Session.cs" />
     <Compile Include="Test\BinaryHelperTest.cs" />
