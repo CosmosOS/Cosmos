@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.FileSystem {
+    /// <summary>
+    /// Represents either a directory or a file in a filesystem. The entry also contains metadata, such as name, attributes, etc.
+    /// </summary>
     public class FilesystemEntry {
         public ulong Id;
         public string Name;

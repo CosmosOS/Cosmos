@@ -223,7 +223,19 @@ namespace Cosmos.Sys {
                 if (!entry.IsDirectory)
                     xFiles.Add(entry.Name);
 
-            return xFiles.ToArray();            
+            return xFiles.ToArray();
         }
+
+        public static string[] GetLogicalDrives()
+        {
+            List<string> xDrives = new List<string>();
+            foreach (FilesystemEntry entry in GetDirectoryListing("/"))
+                xDrives.Add(entry.Name);
+
+            return xDrives.ToArray();
+                
+        }
+
+
     }
 }

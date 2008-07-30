@@ -22,5 +22,10 @@ namespace Cosmos.Sys.Plugs {
         {
             return VFSManager.GetFiles(aDir);
         }
+
+        public static string[] GetLogicalDrives()
+        {
+            return VFSManager.GetLogicalDrives();
+        }
     }
 }

@@ -17,6 +17,10 @@ namespace FrodeTest.Test
             //    Console.WriteLine(entry.Name);
             //}
 
+            Console.WriteLine("Drives found:");
+            foreach (string drive in Directory.GetLogicalDrives())
+                Console.WriteLine("    " + drive);
+
 
             //Console.WriteLine(Directory.Exists("/1/TempDir"));
             Console.WriteLine("About to check Directory.Exists");

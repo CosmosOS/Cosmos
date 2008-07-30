@@ -29,10 +29,33 @@ namespace FrodeTest.Test
             sb.Append("Works");
             Console.WriteLine(sb.ToString());
 
+            //.Contains
+            //Bug discovered 30.july
+            //string xStringWithWorld = "HelloWorld!";
+            //if (xStringWithWorld.Contains("World"))
+            //    Console.WriteLine("Contains works!");
+            //else
+            //    Console.WriteLine("Contains doesn't work");
+
             //Splitting
-            //This fails in Cosmos! Frode, 21.july
-            //string sentence = "This is a long string with many words";
-            //string[] words = sentence.Split((char)' ');
+            string sentence = "This is a long string with many words";
+            string[] words = sentence.Split((char)' ');
+            Console.WriteLine(words[3]);
+            Console.WriteLine(words[5]);
+
+            ////.StartsWith
+            //string xBeginWithHello = "Hello world";
+            //if (xBeginWithHello.StartsWith("Hello"))
+            //    Console.WriteLine(".StartsWith works");
+            //else
+            //    Console.WriteLine(".StartsWith FAILS!");
+
+            //.EndsWith
+            //string xEndsWithWorld = "Hello World";
+            //if (xEndsWithWorld.EndsWith("World"))
+            //    Console.WriteLine(".EndsWith works");
+            //else
+            //    Console.WriteLine(".EndsWith FAILS!");
 
         }
     }
