@@ -120,7 +120,7 @@ namespace Cosmos.Build.Windows
         }
 
         public event DebugLogHandler DebugLog;
-        public event Action<int, int> ProgressChanged;
+        public event Action<int, int, string> ProgressChanged;
 
         public void Compile(DebugModeEnum aDebugMode, byte aDebugComport)
         {
@@ -137,7 +137,7 @@ namespace Cosmos.Build.Windows
             {
                 if (ProgressChanged != null)
                 {
-                    ProgressChanged(xEngine.ProgressMax, xEngine.ProgressCurrent);
+                    ProgressChanged(xEngine.ProgressMax, xEngine.ProgressCurrent, xEngine.ProgressMessage);
                 }
             };
             xEngine.DebugLog += DoDebugLog;

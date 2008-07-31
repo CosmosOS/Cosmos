@@ -196,14 +196,19 @@ namespace Cosmos.Build.Windows {
 
                 mBuilder.DebugLog += xBuildWindow.DoDebugMessage;
                 mBuilder.ProgressChanged += delegate(int aMax,
-                                                     int aCurrent)
+                                                     int aCurrent,
+                                                     string aCurrentMethod)
                 {
                     string xRemainingTime = String.Format(System.Globalization.CultureInfo.InvariantCulture.DateTimeFormat, 
                         "{0:T}", new DateTime(xBuildWindow.CalculateRemainingTime(aCurrent, aMax).Ticks));
 
-                    xBuildWindow.progressText.Content = String.Format("Processing method {0:d} of {1:d}{2}({3} remaining)",
+                    xBuildWindow.progressText.Content = String.Format("Processing method {0:d} of {1:d}{2}({3} remaining){4}{5}",
                                                                       aCurrent,
-                                                                      aMax, Environment.NewLine, xRemainingTime);
+                                                                      aMax, 
+                                                                      Environment.NewLine, 
+                                                                      xRemainingTime, 
+                                                                      Environment.NewLine,
+                                                                      aCurrentMethod);
                     xBuildWindow.ProgressMax = aMax;
                     xBuildWindow.ProgressCurrent = aCurrent;
                     var xFrame = new DispatcherFrame();
@@ -226,6 +231,8 @@ namespace Cosmos.Build.Windows {
                                  where item.Severity != LogSeverityEnum.Informational
                                  select item).ToArray();
                     xBuildWindow.Close();
+
+                    //If there were any warnings or errors, then show dialog again
                     if (xMessages.Count() > 0) {
                         xBuildWindow = new BuildWindow();
                         xBuildWindow.Messages.Clear();

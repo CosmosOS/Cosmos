@@ -144,6 +144,20 @@ namespace Indy.IL2CPU {
             }
         }
 
+        private string mProgressMessage = String.Empty;
+        /// <summary>
+        /// Message indicating the current build process. Setting this will also trigger a ProgressChanged event for any listeners.
+        /// </summary>
+        public string ProgressMessage
+        {
+            get { return mProgressMessage; }
+            set
+            {
+                mProgressMessage = value;
+                OnProgressChanged();
+            }
+        }
+
         public event Action ProgressChanged;
         //private Func<string, string> mGetFileNameForGroup;
         private void OnProgressChanged() {
@@ -362,6 +376,7 @@ namespace Indy.IL2CPU {
                         if (mSymbols != null) {
                             string xOutputFile = Path.Combine(mOutputDir,
                                                               "debug.cxdb");
+                            this.ProgressMessage = String.Format("Dumping Symbols to file {0}", xOutputFile);
                             MLDebugSymbol.WriteSymbolsListToFile(mSymbols,
                                                                  xOutputFile);
                         }
@@ -373,6 +388,7 @@ namespace Indy.IL2CPU {
                         //    xSerializer.Serialize(xFS, mDebugSymbols);
                         //}
                     } finally {
+                        this.ProgressMessage = "Cleanup";
                         mAssembler.Flush();
                         IL.Op.QueueMethod -= QueueMethod;
                         IL.Op.QueueStaticField -= QueueStaticField;
@@ -380,6 +396,7 @@ namespace Indy.IL2CPU {
                 }
             } finally {
                 mCurrent = null;
+                this.ProgressMessage = "Done";
             }
         }
 
@@ -388,6 +405,7 @@ namespace Indy.IL2CPU {
             while ((xCurrentMethod = (from item in mMethods.Keys
                                       where !mMethods[item].PreProcessed
                                       select item).FirstOrDefault()) != null) {
+                this.ProgressMessage = String.Format("Scanning {0}", xCurrentMethod.GetFullName());
                 try {
                     mAssembler.CurrentGroup = GetGroupForType(xCurrentMethod.DeclaringType);
                     RegisterType(xCurrentMethod.DeclaringType);
@@ -488,7 +506,7 @@ namespace Indy.IL2CPU {
 
                     throw;
                 }
-                OnProgressChanged();
+                //OnProgressChanged();
             }
             foreach (Type xType in mTypes) {
                 foreach (MethodBase xMethod in xType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)) {
@@ -630,6 +648,7 @@ namespace Indy.IL2CPU {
         }
 
         private void GenerateVMT(bool aDebugMode) {
+            this.ProgressMessage = "Generating VMT";
             Op xOp = GetOpFromType(mMap.MethodHeaderOp,
                                    null,
                                    new MethodInformation("____INIT__VMT____",
@@ -981,10 +1000,13 @@ namespace Indy.IL2CPU {
         }
 
         private void ProcessAllStaticFields() {
-            FieldInfo xCurrentField;
-            while ((xCurrentField = (from item in mStaticFields.Keys
-                                     where !mStaticFields[item].Processed
-                                     select item).FirstOrDefault()) != null) {
+        //    FieldInfo xCurrentField;
+        //    while ((xCurrentField = (from item in mStaticFields.Keys
+        //                             where !mStaticFields[item].Processed
+        //                             select item).FirstOrDefault()) != null) {
+            foreach (FieldInfo xCurrentField in mStaticFields.Keys)
+            {
+                this.ProgressMessage = String.Format("Processing (static) {0}", xCurrentField.GetFullName());
                 mAssembler.CurrentGroup = GetGroupForType(xCurrentField.DeclaringType);
                 string xFieldName = xCurrentField.GetFullName();
                 OnDebugLog(LogSeverityEnum.Informational,
@@ -1103,7 +1125,7 @@ namespace Indy.IL2CPU {
                     }
                 }
                 mStaticFields[xCurrentField].Processed = true;
-                OnProgressChanged();
+                //OnProgressChanged();
             }
         }
 
@@ -1121,6 +1143,7 @@ namespace Indy.IL2CPU {
             foreach (MethodBase xCurrentMethod in mMethods.Keys)
             {
                 try {
+                    this.ProgressMessage = String.Format("Processing (instance) {0}", xCurrentMethod.GetFullName());
                     mAssembler.CurrentGroup = GetGroupForType(xCurrentMethod.DeclaringType);
                     OnDebugLog(LogSeverityEnum.Informational,
                                "Processing method '{0}'",
@@ -1425,7 +1448,7 @@ namespace Indy.IL2CPU {
 
                     throw;
                 }
-                OnProgressChanged();
+                //OnProgressChanged();
             }
         }
 

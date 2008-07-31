@@ -14,7 +14,7 @@
 	</Window.Resources>
 	<Grid>
 		<Grid.RowDefinitions>
-            <RowDefinition Height="48" />
+            <RowDefinition Height="60" />
             <RowDefinition Height="20" />
             <RowDefinition Height="24" />
 			<RowDefinition />
