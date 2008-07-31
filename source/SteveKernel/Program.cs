@@ -1,10 +1,5 @@
 ﻿using System;
 using Cosmos.Build.Windows;
-using Cosmos.Hardware.PC.Bus;
-using Cosmos.FileSystem;
-using Cosmos.Hardware;
-using System.Diagnostics;
-
 
 namespace SteveKernel
 {
@@ -21,7 +16,10 @@ namespace SteveKernel
         // Main entry point of the kernel
         public static void Init()
         {
-            VGA.Test();
+
+            Cosmos.Sys.Boot.Default();
+
+            //VGA.Test();
         }
     }
 }
