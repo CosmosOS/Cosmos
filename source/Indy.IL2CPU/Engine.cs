@@ -1112,10 +1112,14 @@ namespace Indy.IL2CPU {
         }
 
         private void ProcessAllMethods() {
-            MethodBase xCurrentMethod;
-            while ((xCurrentMethod = (from item in mMethods.Keys
-                                      where !mMethods[item].Processed
-                                      select item).FirstOrDefault()) != null) {
+
+
+            //MethodBase xCurrentMethod;
+            //while ((xCurrentMethod = (from item in mMethods.Keys
+            //                          where !mMethods[item].Processed
+            //                          select item).FirstOrDefault()) != null)
+            foreach (MethodBase xCurrentMethod in mMethods.Keys)
+            {
                 try {
                     mAssembler.CurrentGroup = GetGroupForType(xCurrentMethod.DeclaringType);
                     OnDebugLog(LogSeverityEnum.Informational,
