@@ -53,25 +53,45 @@ namespace SteveKernel
         {
             Cosmos.Sys.Boot.Default();
 
-            S.Clear();
+            S.ReallyClearScreen();
+            Console.WriteLine("");
+            Console.WriteLine("");
+            Console.WriteLine("");
+            Console.WriteLine("");
+            S.SetColors(ConsoleColor.Yellow, ConsoleColor.DarkBlue);
+            Console.Write("                                                                                ");
+            Console.Write("                                                                                ");
+            Console.Write("                 @       @     @       @       @                                ");
+            Console.Write("                 @@      @     @       @       @                                ");
+            Console.Write("                 @ @     @  @  @       @       @                                ");
+            Console.Write("                 @  @    @     @       @       @                                ");
+            Console.Write("                 @   @   @  @  @@@@@   @@@@@   @   @@@@    @@@@                 ");
+            Console.Write("                 @    @  @  @  @    @  @    @  @  @    @  @                     ");
+            Console.Write("                 @     @ @  @  @    @  @    @  @  @@@@@    @@@@                 ");
+            Console.Write("                 @      @@  @  @    @  @    @  @  @            @                ");
+            Console.Write("                 @       @  @  @@@@@   @@@@@   @   @@@@    @@@@                 ");
+            Console.Write("                                                                                ");
+            Console.Write("                                                                                ");
+            
+            S.SetColors(ConsoleColor.White, ConsoleColor.Black);
+            Console.WriteLine("");            
+            Console.WriteLine("                       Coded for COSMOS by Stephen Remde");
 
-            for (int f = 8; f < 16; f++)
-                for (int b = 0; b < 8; b++)
-                {
-                    S.SetColors((ConsoleColor)f, (ConsoleColor)b);
-                    Console.Write("     Nibbles on COSMOS! coded by Stephen Remde     ");
-                }
+            
 
             Wait(5000);
 
-            Random myRandom = new Random((int)Cosmos.Hardware.Global.TickCount + Cosmos.Hardware.RTC.GetSeconds());
+            Random myRandom = new Random(
+                (int)Cosmos.Hardware.Global.TickCount 
+                + Cosmos.Hardware.RTC.GetSeconds());
 
             int playerCount = 15;
-
+                        
             while (true)
             {
                 S.SetColors(ConsoleColor.Black, ConsoleColor.Black);
-                S.Clear();
+
+                S.ReallyClearScreen();
 
                 Player[] myPlayers = new Player[playerCount];
 
@@ -79,7 +99,6 @@ namespace SteveKernel
 
                 for (int i = 0; i < playerCount; i++)
                 {
-
                     myPlayers[i] = new Player()
                     {
                         X = myRandom.Next(S.Columns),
@@ -89,7 +108,7 @@ namespace SteveKernel
                         Alive = true
                     };
                 }
-
+                
                 bool aPlayerIsAlive = true;
 
                 while (aPlayerIsAlive)
@@ -101,10 +120,11 @@ namespace SteveKernel
                     foreach (Player p in myPlayers)
                     {
                         if (p.Alive)
-                        {
+                        {                            
                             S.SetColors((ConsoleColor)(p.PlayerNumber + 1), (ConsoleColor)(p.PlayerNumber + 1));
+                
                             S.PutChar(p.Y, p.X, 'X');
-
+                            
                             isBlocked[p.X + p.Y * S.Columns] = true;
 
                             p.Alive = false;
@@ -113,6 +133,7 @@ namespace SteveKernel
                             {
                                 int newX = p.X;
                                 int newY = p.Y;
+
                                 switch ((p.Direction + newRotation) % 4)
                                 {
                                     case 0:
@@ -129,33 +150,28 @@ namespace SteveKernel
                                         break;
                                 }
 
-                                if (newX >= 0 && newX < S.Columns && newY >= 0 && newY < S.Rows &&
-                                    isBlocked[newX + newY * S.Columns] == false)
+                                if (newX >= 0 && newX < S.Columns && newY >= 0 && newY < S.Rows && !isBlocked[newX + newY * S.Columns])
                                 {
                                     p.Alive = true;
                                     p.X = newX;
                                     p.Y = newY;
                                     p.Direction = (p.Direction + newRotation) % 4;
                                     aPlayerIsAlive = true;
+
                                     break;
                                 }
-
-                            }
-                        }
-                    }
+                            }                             
+                        }                                  
+                    }                 
                 }
-
+                
                 Wait(2000);
-            }
+            }             
         }
 
-        private static void Wait(int milliseconds)
+        private static void Wait(uint milliseconds)
         {
-            long waitUntil = Cosmos.Hardware.Global.TickCount +
-                Cosmos.Hardware.PIT.TicksPerSecond * milliseconds / 1000;
-
-            while (Cosmos.Hardware.Global.TickCount < waitUntil)
-                ;
+            Cosmos.Hardware.PIT.Wait(milliseconds);
         }
     }
 }

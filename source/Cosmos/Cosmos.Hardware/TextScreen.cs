@@ -6,10 +6,7 @@ namespace Cosmos.Hardware
 {
     public class TextScreen
     {
-        //public static int CurrentRow = 0;
-        //public static int CurrentChar = 0;
         protected const int VideoAddr = 0xB8000;
-        //protected const byte DefaultColor = 7; //Gray
         protected const byte DefaultColor = 15; //White
         protected static bool mInitialized = false;
         protected static byte Color;
@@ -25,7 +22,7 @@ namespace Cosmos.Hardware
 
         public static int Rows
         {
-            get { return 24; }
+            get { return 25; }
         }
 
         public static int Columns
@@ -51,8 +48,8 @@ namespace Cosmos.Hardware
         {
             CheckInit();
             
-            byte* xScreenPtr = (byte*)(VideoAddr + (Columns*2));
-            for (int i = (Columns*2); i < Columns * (Rows + 1); i++)
+            byte* xScreenPtr = (byte*)(VideoAddr + (2 * Columns));
+            for (int i = 0; i < Columns * (Rows -1); i++)
             {
                 *xScreenPtr = 0;
                 xScreenPtr++;
@@ -65,7 +62,24 @@ namespace Cosmos.Hardware
 
             SetCursor();
         }
+        public static unsafe void ReallyClearScreen()
+        {
+            CheckInit();
 
+            byte* xScreenPtr = (byte*)(VideoAddr);
+            for (int i = 0; i < Columns * Rows; i++)
+            {
+                *xScreenPtr = 0;
+                xScreenPtr++;
+                *xScreenPtr = Color;
+                xScreenPtr++;
+            }
+
+            CurrentChar = 0;
+            CurrentRow = 1;
+
+            SetCursor();
+        }
         public static void WriteChar(char aChar)
         {
             PutChar(CurrentRow, CurrentChar, aChar);

@@ -12,5 +12,12 @@ namespace Indy.IL2CPU.IL.CustomImplementations.System.Globalization {
             Console.WriteLine("NumberFormatInfo.GetInstance(IFormatProvider) is not working!");
             return null;
         }
+    
+
+        public static NumberFormatInfo get_CurrentInfo()
+        {
+            Console.WriteLine("NumberFormatInfo.get_CurrentInfo is not working!");
+            return null;
+        }
     }
 }

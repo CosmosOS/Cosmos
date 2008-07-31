@@ -55,6 +55,7 @@
     <Compile Include="CustomImplementations\System\IntPtrImpl.cs" />
     <Compile Include="CustomImplementations\System\Net\IPAddressImpl.cs" />
     <Compile Include="CustomImplementations\System\Net\SocketAddressImpl.cs" />
+    <Compile Include="CustomImplementations\System\NumberImpl.cs" />
     <Compile Include="CustomImplementations\System\Runtime\InteropServices\SafeHandleImpl.cs" />
     <Compile Include="CustomImplementations\System\Threading\Interlocked.cs" />
     <Compile Include="CustomImplementations\System\UInt32Impl.cs" />
