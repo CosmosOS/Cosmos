@@ -49,7 +49,7 @@ namespace Cosmos.Sys {
                                           32);
         }
 
-        private static FilesystemEntry GetDirectoryEntry(string aPath) {
+        public static FilesystemEntry GetDirectoryEntry(string aPath) {
             if (String.IsNullOrEmpty(aPath)) {
                 throw new ArgumentNullException("aPath");
             }
@@ -95,12 +95,17 @@ namespace Cosmos.Sys {
             }
         }
 
+        /// <summary>
+        /// Retrieves an array of FilesystemEntries (i.e. Directories and Files) in the gives Directory path.
+        /// </summary>
+        /// <param name="aPath">Directory to search in.</param>
+        /// <returns>All Directories and Files in the given path.</returns>
         public static FilesystemEntry[] GetDirectoryListing(string aPath) {
             if (String.IsNullOrEmpty(aPath)) {
                 throw new ArgumentNullException("aPath");
             }
             if (aPath[0] != '/' && aPath[0] != '\\') {
-                throw new Exception("Incorrect path, should start with / or \\!");
+                throw new Exception("Incorrect path, must start with / or \\!");
             }
             if (aPath.Length == 1) {
                 // get listing of all drives:
