@@ -197,7 +197,7 @@ namespace Cosmos.Build.Windows {
                 mBuilder.DebugLog += xBuildWindow.DoDebugMessage;
                 mBuilder.ProgressChanged += delegate(int aMax,
                                                      int aCurrent,
-                                                     string aCurrentMethod)
+                                                     string aMessage)
                 {
                     string xRemainingTime = String.Format(System.Globalization.CultureInfo.InvariantCulture.DateTimeFormat, 
                         "{0:T}", new DateTime(xBuildWindow.CalculateRemainingTime(aCurrent, aMax).Ticks));
@@ -208,7 +208,7 @@ namespace Cosmos.Build.Windows {
                                                                       Environment.NewLine, 
                                                                       xRemainingTime, 
                                                                       Environment.NewLine,
-                                                                      aCurrentMethod);
+                                                                      aMessage);
                     xBuildWindow.ProgressMax = aMax;
                     xBuildWindow.ProgressCurrent = aCurrent;
                     var xFrame = new DispatcherFrame();
