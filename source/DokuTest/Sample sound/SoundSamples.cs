@@ -6,13 +6,13 @@ using System.Text;
 namespace DokuTest.Sample_sound
 {
     public static class SoundSamples
-    {
+    {/*
         uint rate;
         uint channels;
         uint freq;
 
-        public SoundSamples()
-        public class sineSignal
-        
+        public SoundSamples(){}
+        public class sineSignal { }
+       */ 
     }
 }

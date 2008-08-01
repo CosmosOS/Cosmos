@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30428</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -47,16 +47,26 @@
     <Reference Include="System.Data.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Audio\Components\ADCEntity.cs" />
+    <Compile Include="Audio\Components\DACEntity.cs" />
+    <Compile Include="Audio\Components\UARTEntity.cs" />
+    <Compile Include="Audio\Devices\ES1370\Registers\CommandRegister.cs" />
+    <Compile Include="Audio\Devices\ES1370\Registers\ControlRegister.cs" />
+    <Compile Include="Audio\Devices\ES1370\Registers\InterruptStatusRegister.cs" />
+    <Compile Include="Audio\Devices\ES1370\Registers\MainRegister.cs" />
+    <Compile Include="Audio\Devices\ES1370\Registers\SerialInterfaceRegister.cs" />
+    <Compile Include="Audio\Devices\ES1370\Registers\UARTInterfaceRegister.cs" />
+    <Compile Include="Audio\Devices\GenericSoundCard.cs" />
+    <Compile Include="Audio\Managers\ADCManager.cs" />
+    <Compile Include="Audio\Managers\DACManager.cs" />
     <Compile Include="Audio\Devices\ES1370\ES1370.cs" />
-    <Compile Include="Audio\Devices\ES1370\Register\CommandRegister.cs" />
-    <Compile Include="Audio\Devices\ES1370\Register\ControlRegister.cs" />
-    <Compile Include="Audio\Devices\ES1370\Register\InterruptMaskRegister.cs" />
-    <Compile Include="Audio\Devices\ES1370\Register\InterruptStatusRegister.cs" />
-    <Compile Include="Audio\Devices\ES1370\Register\MainRegister.cs" />
-    <Compile Include="Audio\Devices\ES1370\Register\SerialInterfaceRegister.cs" />
+    <Compile Include="Audio\Managers\UARTManager.cs" />
+    <Compile Include="Audio\PCMStream.cs" />
     <Compile Include="BlockDevice.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="USB\USBHost.cs" />

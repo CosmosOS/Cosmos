@@ -18,7 +18,9 @@ namespace DokuTest
             xAudioCard.Enable();
             xAudioCard.InitializeDriver();
             xAudioCard.DumpRegisters();
-
+            Console.WriteLine("Disabling first audio card...");
+            xAudioCard.Disable();
+            xAudioCard.DumpRegisters();
         }
     }
 }

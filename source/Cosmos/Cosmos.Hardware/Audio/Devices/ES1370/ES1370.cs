@@ -3,30 +3,33 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Cosmos.Hardware;
-using Cosmos.Hardware.Audio.Devices.ES1370.Register;
+using Cosmos.Hardware.Audio.Devices.ES1370.Registers;
+using Cosmos.Hardware.Audio.Managers;
+using Cosmos.Hardware.Audio.Components;
 namespace Cosmos.Hardware.Audio.Devices.ES1370
 {
     /// <summary>
     /// Driver for the soundcard Ensoniq 1370 AudioPCI (testing for QEMU audio emulation)
     /// It should work also in Ensoniq 1371 all revision.
     /// </summary>
-    public class ES1370
+    public class ES1370 : GenericSoundCard
     {
-        #region Construction
+        private InterruptStatusRegister isr;
+        private ControlRegister cr;
+        private SerialInterfaceRegister sir;
+        private UARTInterfaceRegister uir;
+        public int[] FixedRatesSupported={5512, 11025, 22050, 44100};
 
-        private PCIDevice pciCard;
-        private Cosmos.Kernel.MemoryAddressSpace mem;
-
-        public ES1370(PCIDevice device)
+        public ES1370(PCIDevice device) : base(device)
         {
-            if (device == null)
-                throw new ArgumentException("PCI Device is null. Unable to get ES1370 card");
+            isr=(InterruptStatusRegister.Load(getMemReference()));
+            sir = (SerialInterfaceRegister.Load(getMemReference()));
+            uir = (UARTInterfaceRegister.Load(getMemReference()));
+            cr=(ControlRegister.Load(getMemReference()));
+            dacs.Add(new DACManager(new DACEntity((byte)MainRegister.Bit.Dac1FrameAddr, (byte)MainRegister.Bit.Dac1FrameSize)));
+            dacs.Add(new DACManager(new DACEntity((byte)MainRegister.Bit.Dac1FrameAddr, (byte)MainRegister.Bit.Dac1FrameSize)));
 
-            pciCard = device;
-            mem = device.GetAddressSpace(1) as Cosmos.Kernel.MemoryAddressSpace;
         }
-        #endregion
-
         /// <summary>
         /// Retrieve all Ensoniq AudioPCI 1370 cards found on computer.
         /// </summary>
@@ -44,27 +47,25 @@ namespace Cosmos.Hardware.Audio.Devices.ES1370
 
             return found;
         }
-        #region Power and Initilization
-        public void InitializeDriver()
+
+        #region Power Management
+        public override bool Enable()
         {
-            //Enable IRQ Interrupt
-            InitIRQMaskRegister();
-            Cosmos.Hardware.Interrupts.IRQ05 = new Cosmos.Hardware.Interrupts.InterruptDelegate(this.HandleNetworkInterrupt);
+            cr.PowerEnabled=true;
+            return cr.PowerEnabled;
         }
         
-        public bool Enable()
+        public override bool Disable()
         {
-            var control = ControlRegister.Load(mem);
-            control.PowerEnabled=true;
-            return control.PowerEnabled;
+            cr.PowerEnabled = false;
+            return cr.PowerEnabled;
         }
 
-        public bool Disable()
+        public void InitializeDriver()
         {
-            var control = ControlRegister.Load(mem);
-            control.PowerEnabled = false;
-            return control.PowerEnabled;
+            Cosmos.Hardware.Interrupts.IRQ05 = new Cosmos.Hardware.Interrupts.InterruptDelegate(this.HandleAudioInterrupt);
         }
+
         #endregion
 
         public string Name
@@ -73,99 +74,55 @@ namespace Cosmos.Hardware.Audio.Devices.ES1370
         }
 
 
-        public PCIDevice PCICard { get { return pciCard; } private set { ;} }
+        
         #region Interrupt (IRQ)
         /// <summary>
         /// (Should be) Called when the PCI audio card raises an Interrupt.
         /// </summary>
-        public void HandleNetworkInterrupt(ref Interrupts.InterruptContext aContext)
+        public void HandleAudioInterrupt(ref Interrupts.InterruptContext aContext)
         {
             Console.Write("IRQ detected: ");
-            /*
-            if (imr.ReceiveOK & isr.ReceiveOK)
-            {
-                Console.WriteLine("Receive OK");
-                this.DisplayReadBuffer();
-            }
-
-            if (imr.ReceiveError & isr.ReceiveError)
-                Console.WriteLine("Receive ERROR");
-
-            if (imr.TransmitOK & isr.TransmitOK)
-                Console.WriteLine("Transmit OK");
-
-            if (imr.TransmitError & isr.TransmitError)
-                Console.WriteLine("Transmit Error");
-
-            if (imr.RxBufferOverflow & isr.RxBufferOverflow)
-                Console.WriteLine("RxBufferOverflow");
-
-            if (imr.RxFifoOverflow & isr.RxFifoOverflow)
-                Console.WriteLine("RxFIFOOverflow");
-
-            if (imr.CableLengthChange & isr.CableLengthChange)
-                Console.WriteLine("Cable Length Change");
-
-            if (imr.PacketUnderrun & isr.PacketUnderrun)
-                Console.WriteLine("Packet Underrun");
-
-            if (imr.SoftwareInterrupt & isr.SoftwareInterrupt)
-                Console.WriteLine("Software Interrupt");
-
-            if (imr.TxDescriptorUnavailable & isr.TxDescriptorUnavailable)
-                Console.WriteLine("TxDescriptorUnavailable");
-
-            if (imr.SystemError & isr.SystemError)
-                Console.WriteLine("System Error!");
-            */
+            if (isr.CodecBusyIntEnabled)
+                Console.WriteLine("Codec busy Interrupt! ");
+            if(isr.CodecStatusIntEnabled)
+                Console.WriteLine("Codec Enabled Interrupt! ");
+            if (isr.CodecWriteInProgressEnabled)
+                Console.WriteLine("Codec WriteInProgress Interrupt!");
+            if (isr.DAC1InterruptEnabled)
+                Console.WriteLine("DAC1 Interrupt!");
+            if (isr.DAC2InterruptEnabled)
+                Console.WriteLine("DAC2 Interrupt!");
+            if (isr.UARTInterruptEnabled)
+                Console.WriteLine("UART Interrupt!");
+            if (isr.MCCBIntEnabled)
+                Console.WriteLine("MCCB Interrupt!");
             this.ResetAllIRQ();
 
         }
 
         private void ResetAllIRQ()
         {
-            //Setting a bit to 1 will reset it. So we write 16 one's to reset entire ISR.
-            //isr.ISR = isr.ISR;
+            //Setting a bit to 1 will reset it. So we write 16 one's to reset entire getISR().
+            isr.ISR = 0xFFFF;
         }
 
         /// <summary>
         /// The IRQMaskRegister determines what kind of events which cause IRQ to be raised.
         /// </summary>
-        private void InitIRQMaskRegister()
-        {
-            //Note; The reference driver from Realtek sets mask = 0x7F (all bits high).
-            //var imr = Register.InterruptMaskRegister.Load(mem);
-            //imr.IMR = 0x7F;
-            //imr.IMR = 0xFFFF; //Listen for all IRQ events
-/*            imr.ReceiveOK = true;
-            imr.ReceiveError = true;
-            imr.TransmitOK = true;
-            imr.TransmitError = true;
-            imr.CableLengthChange = true;
-            imr.SystemError = true;
-            imr.TimeOut = true;
-  */      }
-
         #endregion
         #region Debugging
 
-        public void DisplayDebugInfo()
-        {
-            //var cr = Register.CommandRegister.Load(mem);
-            //var msr = Register.MediaStatusRegister.Load(mem);
-
-            
-
-            //Console.WriteLine("IMR: " + imr.ToString());
-            //Console.WriteLine("ISR: " + isr.ToString());
-        }
-
         public void DumpRegisters()
         {
-            Console.WriteLine("Control Register: " + Register.ControlRegister.Load(mem).ToString());
-            Console.WriteLine("Status Register: " + Register.InterruptStatusRegister.Load(mem).ToString());
+            Console.WriteLine("Control Register: " + cr.ToString());
+            Console.WriteLine("Status Register: " + isr.ToString());
         }
         #endregion
+
+        public void prepareStreamPlayBack(PCMStream pcmStream)
+        {
+
+        }
 
     }
 }
