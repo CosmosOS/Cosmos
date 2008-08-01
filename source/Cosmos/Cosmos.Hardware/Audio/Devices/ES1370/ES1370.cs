@@ -5,7 +5,7 @@ using System.Text;
 using Cosmos.Hardware;
 using Cosmos.Hardware.Audio.Devices.ES1370.Registers;
 using Cosmos.Hardware.Audio.Managers;
-using Cosmos.Hardware.Audio.Components;
+using Cosmos.Hardware.Audio.Devices.ES1370.Components;
 namespace Cosmos.Hardware.Audio.Devices.ES1370
 {
     /// <summary>
@@ -19,6 +19,8 @@ namespace Cosmos.Hardware.Audio.Devices.ES1370
         private SerialInterfaceRegister sir;
         private UARTInterfaceRegister uir;
         public int[] FixedRatesSupported={5512, 11025, 22050, 44100};
+        public const int SRClock = 1411200;
+        
 
         public ES1370(PCIDevice device) : base(device)
         {
@@ -26,8 +28,8 @@ namespace Cosmos.Hardware.Audio.Devices.ES1370
             sir = (SerialInterfaceRegister.Load(getMemReference()));
             uir = (UARTInterfaceRegister.Load(getMemReference()));
             cr=(ControlRegister.Load(getMemReference()));
-            dacs.Add(new DACManager(new DACEntity((byte)MainRegister.Bit.Dac1FrameAddr, (byte)MainRegister.Bit.Dac1FrameSize)));
-            dacs.Add(new DACManager(new DACEntity((byte)MainRegister.Bit.Dac1FrameAddr, (byte)MainRegister.Bit.Dac1FrameSize)));
+            dacs.Add(new DACManager(new DACak4531((byte)MainRegister.Bit.Dac1FrameAddr, (byte)MainRegister.Bit.Dac1FrameSize)));
+            dacs.Add(new DACManager(new DACak4531((byte)MainRegister.Bit.Dac2FrameAddr, (byte)MainRegister.Bit.Dac2FrameSize)));
 
         }
         /// <summary>

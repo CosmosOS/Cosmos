@@ -55,6 +55,7 @@
     <Compile Include="Audio\Components\ADCEntity.cs" />
     <Compile Include="Audio\Components\DACEntity.cs" />
     <Compile Include="Audio\Components\UARTEntity.cs" />
+    <Compile Include="Audio\Devices\ES1370\Components\DACak4531.cs" />
     <Compile Include="Audio\Devices\ES1370\Registers\CommandRegister.cs" />
     <Compile Include="Audio\Devices\ES1370\Registers\ControlRegister.cs" />
     <Compile Include="Audio\Devices\ES1370\Registers\InterruptStatusRegister.cs" />
