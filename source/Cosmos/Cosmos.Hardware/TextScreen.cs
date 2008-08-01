@@ -95,9 +95,9 @@ namespace Cosmos.Hardware
         protected static unsafe void ScrollUp()
         {
             CheckInit();
-            int Columns2 = Columns;
-            byte* xScreenPtr = (byte*)(VideoAddr+Columns2);
-            for (int i = Columns2; i < Columns * Rows; i++)
+            int Columns2 = Columns * 2;
+            byte* xScreenPtr = (byte*)(VideoAddr);
+            for (int i = 0; i < Columns * Rows; i++)
             {
                 *xScreenPtr = *(xScreenPtr + Columns2);
                 xScreenPtr++;
