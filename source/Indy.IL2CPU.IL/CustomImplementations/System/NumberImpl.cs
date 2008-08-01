@@ -14,7 +14,10 @@ namespace Indy.IL2CPU.IL.CustomImplementations.System
         public static string FormatInt32(int aInt, string aStr, NumberFormatInfo aFormat)
         {
             return "this is a test - fix me in Indy.IL2CPU.IL.CustomImplementations.System.NumberImpl.FormatInt32";
-
+        }
+        public static string FormatDouble(double aInt, string aStr, NumberFormatInfo aFormat)
+        {
+            return "this is a test - fix me in Indy.IL2CPU.IL.CustomImplementations.System.NumberImpl.FormatDouble";
         }
     }
 }
