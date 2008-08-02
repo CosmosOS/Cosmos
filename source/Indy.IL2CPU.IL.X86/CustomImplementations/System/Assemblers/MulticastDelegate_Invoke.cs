@@ -30,8 +30,8 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System.Assemblers
 			 * ECX contains the argument size
 			 */
 			new CPU.Label("____DEBUG_FOR_MULTICAST___");
-//            new CPUx86.Cli();//DEBUG ONLY
-//#warning reenable interupts when issue is fixed!!!
+            //            new CPUx86.Cli();//DEBUG ONLY
+            //#warning reenable interupts when issue is fixed!!!
 			new CPU.Comment("move address of delgate to eax");
 			new CPUx86.Move("eax", "[" + MethodInfo.Arguments[0].VirtualAddresses[0] + "]");
 			var xGetInvocationListMethod = typeof(MulticastDelegate).GetMethod("GetInvocationList");
@@ -105,21 +105,21 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System.Assemblers
 			new CPUx86.Move("edi", "[" + MethodInfo.Arguments[0].VirtualAddresses[0] + "]");
 			new CPU.Comment("edi = ptr to delegate object should be a pointer to the delgates context ie (this) for the methods ");
 			new CPUx86.Move("edi", "[edi + " + (MethodInfo.Arguments[0].TypeInfo.Fields["System.Object System.Delegate._target"].Offset + 12) + "]");//i really dont get the +12
-			new CPUx86.Compare("edi", "0");
-			new CPUx86.JumpIfEqual(".noTHIStoPop");
-			new CPUx86.Move("edx", "[" + MethodInfo.Arguments[0].VirtualAddresses[0] + "]");//addrof the delegate
-			new CPUx86.Move("edx", "[edx+" + (MethodInfo.Arguments[0].TypeInfo.Fields["$$ReturnsValue$$"].Offset + 12) + "]");
-			new CPUx86.Compare(Registers.EDX, 0);
-			new JumpIfNotEqual(".needToPopThis");
-			new CPU.Comment("ecx = ptr to delegate object");
-			new CPUx86.Move("ecx", "[" + MethodInfo.Arguments[0].VirtualAddresses[0] + "]");//addrof the delegate
-			new CPU.Comment("ecx points to the size of the delegated methods arguments");
-			new CPUx86.Move("ecx", "[ecx + " + (MethodInfo.Arguments[0].TypeInfo.Fields["$$ArgSize$$"].Offset + 12) + "]");//the size of the arguments to the method? + 12??? -- 12 is the size of the current call stack.. i think
-			new CPUx86.Compare("ecx", "0");
-			new CPUx86.JumpIfLessOrEqual(".noTHIStoPop");
-			new CPU.Label(".needToPopThis");
-			new CPUx86.Popd("edi");
-			new CPUx86.Move("[esp]", "edi");
+            //new CPUx86.Compare("edi", "0");
+            //new CPUx86.JumpIfEqual(".noTHIStoPop");
+            //new CPUx86.Move("edx", "[" + MethodInfo.Arguments[0].VirtualAddresses[0] + "]");//addrof the delegate
+            //new CPUx86.Move("edx", "[edx+" + (MethodInfo.Arguments[0].TypeInfo.Fields["$$ReturnsValue$$"].Offset + 12) + "]");
+            //new CPUx86.Compare(Registers.EDX, 0);
+            //new JumpIfNotEqual(".needToPopThis");
+            //new CPU.Comment("ecx = ptr to delegate object");
+            //new CPUx86.Move("ecx", "[" + MethodInfo.Arguments[0].VirtualAddresses[0] + "]");//addrof the delegate
+            //new CPU.Comment("ecx points to the size of the delegated methods arguments");
+            //new CPUx86.Move("ecx", "[ecx + " + (MethodInfo.Arguments[0].TypeInfo.Fields["$$ArgSize$$"].Offset + 12) + "]");//the size of the arguments to the method? + 12??? -- 12 is the size of the current call stack.. i think
+            //new CPUx86.Compare("ecx", "0");
+            //new CPUx86.JumpIfLessOrEqual(".noTHIStoPop");
+			//new CPU.Label(".needToPopThis");
+			//new CPUx86.Popd("edi");
+			//new CPUx86.Move("[esp]", "edi");
 			new CPU.Label(".noTHIStoPop");
 			new CPUx86.Popad();
 			new CPUx86.Inc("edx");

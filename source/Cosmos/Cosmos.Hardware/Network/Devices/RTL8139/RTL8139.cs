@@ -87,10 +87,13 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             
             //Enable IRQ Interrupt
             InitIRQMaskRegister();
-            Cosmos.Hardware.Interrupts.IRQ11 = new Cosmos.Hardware.Interrupts.InterruptDelegate(this.HandleNetworkInterrupt);
+            mInstance = this;
+            Cosmos.Hardware.Interrupts.IRQ11 += HandleNetworkInterrupt;
             //Console.WriteLine("Listening for IRQ" + pciCard.InterruptLine + ".");
+
         }
 
+        private static RTL8139 mInstance;
         /// <summary>
         /// Initialize the Receive Buffer. The RBSTART register consists of 4 bytes (32-bits at 0x30h to 0x33h) which should contain
         /// the address of a buffer to save incoming data to.
@@ -369,47 +372,48 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         /// <summary>
         /// (Should be) Called when the PCI network card raises an Interrupt.
         /// </summary>
-        public void HandleNetworkInterrupt(ref Interrupts.InterruptContext aContext)
+        public static void HandleNetworkInterrupt(ref Interrupts.InterruptContext aContext)
         {
             Console.Write("IRQ detected: ");
 
-            if (imr.ReceiveOK & isr.ReceiveOK)
+            if (mInstance.imr.ReceiveOK & mInstance.isr.ReceiveOK)
             {
                 Console.WriteLine("Receive OK");
-                this.DisplayReadBuffer();
+                mInstance.DisplayReadBuffer();
             }
 
-            if (imr.ReceiveError & isr.ReceiveError)
+            if (mInstance.imr.ReceiveError & mInstance.isr.ReceiveError)
                 Console.WriteLine("Receive ERROR");
 
-            if (imr.TransmitOK & isr.TransmitOK)
+            if (mInstance.imr.TransmitOK & mInstance.isr.TransmitOK)
                 Console.WriteLine("Transmit OK");
 
-            if (imr.TransmitError & isr.TransmitError)
+            if (mInstance.imr.TransmitError & mInstance.isr.TransmitError)
                 Console.WriteLine("Transmit Error");
 
-            if (imr.RxBufferOverflow & isr.RxBufferOverflow)
+            if (mInstance.imr.RxBufferOverflow & mInstance.isr.RxBufferOverflow)
                 Console.WriteLine("RxBufferOverflow");
 
-            if (imr.RxFifoOverflow & isr.RxFifoOverflow)
+            if (mInstance.imr.RxFifoOverflow & mInstance.isr.RxFifoOverflow)
                 Console.WriteLine("RxFIFOOverflow");
 
-            if (imr.CableLengthChange & isr.CableLengthChange)
+            if (mInstance.imr.CableLengthChange & mInstance.isr.CableLengthChange)
                 Console.WriteLine("Cable Length Change");
 
-            if (imr.PacketUnderrun & isr.PacketUnderrun)
+            if (mInstance.imr.PacketUnderrun & mInstance.isr.PacketUnderrun)
                 Console.WriteLine("Packet Underrun");
 
-            if (imr.SoftwareInterrupt & isr.SoftwareInterrupt)
+            if (mInstance.imr.SoftwareInterrupt & mInstance.isr.SoftwareInterrupt)
                 Console.WriteLine("Software Interrupt");
 
-            if (imr.TxDescriptorUnavailable & isr.TxDescriptorUnavailable)
+            if (mInstance.imr.TxDescriptorUnavailable & mInstance.isr.TxDescriptorUnavailable)
                 Console.WriteLine("TxDescriptorUnavailable");
 
-            if (imr.SystemError & isr.SystemError)
+            if (mInstance.imr.SystemError & mInstance.isr.SystemError)
                 Console.WriteLine("System Error!");
 
-            this.ResetAllIRQ();
+            mInstance.ResetAllIRQ();
+            //Console.ReadLine();
 
         }
 

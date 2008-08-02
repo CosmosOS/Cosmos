@@ -124,48 +124,26 @@ namespace MatthijsTest {
             }
         }
 
-        public static void Init() {
-            try {
-                new TestClass().ThrowException2();
-            }catch(Exception E){Console.Write("Exception caught: ");Console.WriteLine(E.ToString());}
-            //try {
-            //    Cosmos.Sys.Boot.Default();
-            //} catch (Exception e) {
-            //    Console.Write("Error occurred: '");
-            //    Console.Write(e.Message);
-            //    Console.WriteLine("'");
-            //}
-            //// /1/TempDir/SubFile3
-            //if (Directory.Exists("/1/TempDir")) {
-            //    Console.WriteLine("Directory TempDir exists!");
-            //} else {
-            //    Console.WriteLine("Directory TempDir does not exist!");
-            //}
-            //if (File.Exists("/1/TempDir/SubFile3")) {
-            //    Console.WriteLine("File SubFile3 exists!");
-            //} else {
-            //    Console.WriteLine("File SubFile3 does not exist!");
-            //}
-            //if (File.Exists("/1/TempDir/SubFile6")) {
-            //    Console.WriteLine("File SubFile6 exists!");
-            //} else {
-            //    Console.WriteLine("File SubFile6 does not exist!");
-            //}
-            //var xItems = VFSManager.GetDirectoryListing("/1/TempDir");
-            //Console.WriteLine("Directory items of /:");
-            //for (int i = 0; i < xItems.Length; i++)
-            //{
-            //    Console.Write(xItems[i].Name);
-            //    if (xItems[i].IsDirectory)
-            //    {
-            //        Console.WriteLine("/");
+        private static void MyMethod() {
+            Console.WriteLine("From static method");
+            Console.ReadLine();
+        }
 
-            //    }
-            //    else
-            //    {
-            //        Console.WriteLine("");
-            //    }
-            //}
+        public class TestClassEvents
+        {
+            public void Test()
+            {
+                Console.WriteLine("From instance method");
+            }
+        }
+
+        private static event Action TestEvent;
+        public static void Init() {
+            var xTest = new TestClassEvents();
+            TestEvent = xTest.Test;
+            TestEvent += MyMethod;
+            TestEvent();
+
             Console.WriteLine("Done");
             do {
                 Console.WriteLine(Console.ReadLine());
