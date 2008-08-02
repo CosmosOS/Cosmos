@@ -78,6 +78,31 @@ namespace Cosmos.Build.Windows {
 			Dispatcher.PushFrame(xFrame);
 		}
 
+        public void DoProgressMessage(int aMax, int aCurrent, string aMessage)
+        {
+            string xRemainingTime = String.Format(System.Globalization.CultureInfo.InvariantCulture.DateTimeFormat,
+                "{0:T}", new DateTime(CalculateRemainingTime(aCurrent, aMax).Ticks));
+
+            progressText.Content = String.Format("Processing method {0:d} of {1:d}{2}({3} remaining){4}{5}",
+                                                              aCurrent,
+                                                              aMax,
+                                                              Environment.NewLine,
+                                                              xRemainingTime,
+                                                              Environment.NewLine,
+                                                              aMessage);
+            ProgressMax = aMax;
+            ProgressCurrent = aCurrent;
+            var xFrame = new DispatcherFrame();
+            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Input,
+                                                     new DispatcherOperationCallback(delegate(object aParam)
+            {
+                xFrame.Continue = false;
+                return null;
+            }),
+                                                     null);
+            Dispatcher.PushFrame(xFrame);
+        }
+
 
         public static System.Diagnostics.Stopwatch xBuildTimer;
         public TimeSpan CalculateRemainingTime(int completedCount, int totalCount)

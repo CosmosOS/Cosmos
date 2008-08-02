@@ -4,8 +4,8 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:local="clr-namespace:Cosmos.Build.Windows"
 	Title="Building Cosmos Application"
-	Height="300"
-	Width="496"
+	Height="350"
+	Width="1000"
 	Icon="/Cosmos.Build.Windows;component/Cosmos.ico">
 	<Window.Resources>
 		<ObjectDataProvider

@@ -195,42 +195,18 @@ namespace Cosmos.Build.Windows {
                 IEnumerable<BuildLogMessage> xMessages = new BuildLogMessage[0];
 
                 mBuilder.DebugLog += xBuildWindow.DoDebugMessage;
-                mBuilder.ProgressChanged += delegate(int aMax,
-                                                     int aCurrent,
-                                                     string aMessage)
-                {
-                    string xRemainingTime = String.Format(System.Globalization.CultureInfo.InvariantCulture.DateTimeFormat, 
-                        "{0:T}", new DateTime(xBuildWindow.CalculateRemainingTime(aCurrent, aMax).Ticks));
-
-                    xBuildWindow.progressText.Content = String.Format("Processing method {0:d} of {1:d}{2}({3} remaining){4}{5}",
-                                                                      aCurrent,
-                                                                      aMax, 
-                                                                      Environment.NewLine, 
-                                                                      xRemainingTime, 
-                                                                      Environment.NewLine,
-                                                                      aMessage);
-                    xBuildWindow.ProgressMax = aMax;
-                    xBuildWindow.ProgressCurrent = aCurrent;
-                    var xFrame = new DispatcherFrame();
-                    Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Input,
-                                                             new DispatcherOperationCallback(delegate(object aParam)
-                    {
-                        xFrame.Continue = false;
-                        return null;
-                    }),
-                                                             null);
-                    Dispatcher.PushFrame(xFrame);
-                };
+                mBuilder.ProgressChanged += xBuildWindow.DoProgressMessage;
                 xBuildWindow.Show();
                 try {
                     mBuilder.Compile(mDebugMode,
                                      mComport);
-
+                    
                     mBuilder.DebugLog -= xBuildWindow.DoDebugMessage;
+                    mBuilder.ProgressChanged -= xBuildWindow.DoProgressMessage;
+
                     xMessages = (from item in xBuildWindow.Messages
                                  where item.Severity != LogSeverityEnum.Informational
                                  select item).ToArray();
-                    xBuildWindow.Close();
 
                     //If there were any warnings or errors, then show dialog again
                     if (xMessages.Count() > 0) {

@@ -226,7 +226,7 @@ namespace Cosmos.Build.Windows
                 // Path for BIOS, VGA BIOS, and keymaps
                 + " -L ."
                 // CD ROM image
-                + " -cdrom " + BuildPath + "Cosmos.iso"
+                + " -cdrom \"" + BuildPath + "Cosmos.iso\""
                 // Boot CD ROM
                 + " -boot d"
                 // Audio hardware
