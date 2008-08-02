@@ -114,6 +114,7 @@ namespace Indy.IL2CPU {
         /// Contains a list of all methods. This includes methods to be processed and already processed.
         /// </summary>
         protected IDictionary<MethodBase, QueuedMethodInformation> mMethods = new SortedList<MethodBase, QueuedMethodInformation>(new MethodBaseComparer());
+        
 
         /// <summary>
         /// Contains a list of all static fields. This includes static fields to be processed and already processed.
@@ -405,7 +406,7 @@ namespace Indy.IL2CPU {
             while ((xCurrentMethod = (from item in mMethods.Keys
                                       where !mMethods[item].PreProcessed
                                       select item).FirstOrDefault()) != null) {
-                this.ProgressMessage = String.Format("Scanning {0}", xCurrentMethod.GetFullName());
+                this.ProgressMessage = String.Format("Scanning method: {0}", xCurrentMethod.GetFullName());
                 try {
                     mAssembler.CurrentGroup = GetGroupForType(xCurrentMethod.DeclaringType);
                     RegisterType(xCurrentMethod.DeclaringType);
@@ -460,14 +461,14 @@ namespace Indy.IL2CPU {
                         mAssembler.StackContents.Clear();
                         ILReader xReader = new ILReader(xCurrentMethod);
                         var xInstructionInfos = new List<DebugSymbolsAssemblyTypeMethodInstruction>();
-                        int xPreviousOffset = -1;
+                        //int xPreviousOffset = -1;
                         int[] xCodeOffsets = null;
                         ISymbolDocument[] xCodeDocuments = null;
                         int[] xCodeLines = null;
                         int[] xCodeColumns = null;
                         int[] xCodeEndLines = null;
                         int[] xCodeEndColumns = null;
-                        int xCurrentOffset = 0;
+                        //int xCurrentOffset = 0;
                         bool xHasSymbols = false;
                         if (mDebugMode == DebugModeEnum.Source) {
                             var xSymbolReader = GetSymbolReaderForAssembly(xCurrentMethod.DeclaringType.Assembly);
@@ -490,7 +491,7 @@ namespace Indy.IL2CPU {
                                 }
                             }
                         }
-                        int xILIndex = -1;
+                        //int xILIndex = -1;
                         while (xReader.Read()) {
                             mMap.ScanILCode(xReader,
                                             xMethodInfo,
@@ -648,7 +649,7 @@ namespace Indy.IL2CPU {
         }
 
         private void GenerateVMT(bool aDebugMode) {
-            this.ProgressMessage = "Generating VMT";
+            this.ProgressMessage = "Generating Virtual Method Table";
             Op xOp = GetOpFromType(mMap.MethodHeaderOp,
                                    null,
                                    new MethodInformation("____INIT__VMT____",
@@ -704,6 +705,7 @@ namespace Indy.IL2CPU {
         }
 
         private void ScanForMethodsToIncludeForVMT() {
+            this.ProgressMessage = "Scanning methods for Virtual Method Table";
             List<Type> xCheckedTypes = new List<Type>();
             foreach (MethodBase xMethod in mMethods.Keys) {
                 if (xMethod.IsStatic) {
@@ -1006,7 +1008,7 @@ namespace Indy.IL2CPU {
         //                             select item).FirstOrDefault()) != null) {
             foreach (FieldInfo xCurrentField in mStaticFields.Keys)
             {
-                this.ProgressMessage = String.Format("Processing (static) {0}", xCurrentField.GetFullName());
+                this.ProgressMessage = String.Format("Processing static field: {0}", xCurrentField.GetFullName());
                 mAssembler.CurrentGroup = GetGroupForType(xCurrentField.DeclaringType);
                 string xFieldName = xCurrentField.GetFullName();
                 OnDebugLog(LogSeverityEnum.Informational,
@@ -1143,7 +1145,7 @@ namespace Indy.IL2CPU {
             foreach (MethodBase xCurrentMethod in mMethods.Keys)
             {
                 try {
-                    this.ProgressMessage = String.Format("Processing (instance) {0}", xCurrentMethod.GetFullName());
+                    this.ProgressMessage = String.Format("Processing method: {0}", xCurrentMethod.GetFullName());
                     mAssembler.CurrentGroup = GetGroupForType(xCurrentMethod.DeclaringType);
                     OnDebugLog(LogSeverityEnum.Informational,
                                "Processing method '{0}'",
@@ -1515,6 +1517,8 @@ namespace Indy.IL2CPU {
                 throw new Exception("PlugFields list already initialized!");
             }
 
+            this.ProgressMessage = "Initializing Plugs";
+
             mPlugMethods = new SortedList<string, MethodBase>();
             mPlugFields = new SortedList<Type, Dictionary<string, PlugFieldAttribute>>(new TypeComparer());
 
@@ -1543,10 +1547,11 @@ namespace Indy.IL2CPU {
                 LoadPlugAssembly(xAssemblyDef);
             }
             
-            Console.WriteLine("Recognized Plug methods:");
-            foreach (string s in mPlugMethods.Keys) {
-                Console.WriteLine(s);
-            }
+            //Console.WriteLine("Recognized Plug methods:");
+            this.ProgressMessage = String.Format("Plugs loaded: {0} methods and {1} fields", mPlugMethods.Count, mPlugFields.Count);
+            //foreach (string s in mPlugMethods.Keys) {
+            //    Console.WriteLine(s);
+            //}
         }
 
         void CurrentDomain_AssemblyLoad(object sender, AssemblyLoadEventArgs args)
@@ -1613,6 +1618,7 @@ namespace Indy.IL2CPU {
         /// </summary>
         private void LoadPlugAssembly(Assembly aAssemblyDef)
         {
+            
             foreach (var xType in (from item in aAssemblyDef.GetTypes()
                                    let xCustomAttribs = item.GetCustomAttributes(typeof(PlugAttribute),
                                                                                  false)
