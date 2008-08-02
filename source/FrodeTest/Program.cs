@@ -17,8 +17,9 @@ namespace FrodeTest
         //This is the playground for Frode "Scalpel" Lillerud.
         public static void Init()
         {
-            bool xTest = false;
-            if (xTest) {
+            bool xTest = true;
+            if (xTest)
+            {
                 Cosmos.Sys.Boot.Default();
             }
 
@@ -27,9 +28,8 @@ namespace FrodeTest
 
             //Shell.Session.Run();
 
-
             //Test
-            Console.WriteLine("---- RUNNING PREDEFINED TESTS ----");
+            //Console.WriteLine("---- RUNNING PREDEFINED TESTS ----");
             //Test.StringTest.RunTest();
             //Test.IPv4AddressTest.RunTest();
             //Test.BasicTest.RunTest();
@@ -51,8 +51,8 @@ namespace FrodeTest
             //Test.DirectoryInfoTest.RunTest();
 
             //Tests ready for Matthijs to fix ;)
-            //Test.RTL8139Test.RunTest();
-            Test.ExceptionTest.RunTest();
+            Test.RTL8139Test.RunTest();
+            //Test.ExceptionTest.RunTest();
              
             //Done
             Console.WriteLine("Shutting down computer");
