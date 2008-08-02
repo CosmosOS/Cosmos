@@ -42,6 +42,9 @@ namespace Cosmos.Build.Windows {
                             xStartInfo.Arguments + " from directory " + xStartInfo.WorkingDirectory);
                         Console.Write(xProcess.StandardOutput.ReadToEnd());
                         Console.Write(xProcess.StandardError.ReadToEnd());
+                        Console.WriteLine();
+                        Console.WriteLine("Press any key to continue");
+                        Console.ReadLine();
                     } else {
                         throw new Exception("Call failed");
                     }
