@@ -197,6 +197,8 @@ namespace Cosmos.Sys {
         }
 
         public static bool DirectoryExists(string s) {
+            try
+            {
                 var xEntries = GetDirectoryListing(Path.GetDirectoryName(s));
                 string xDirName = Path.GetFileName(s);
                 for (int i = 0; i < xEntries.Length; i++)
@@ -207,6 +209,13 @@ namespace Cosmos.Sys {
                     }
                 }
                 return false;
+            }
+            catch (Exception e)
+            {
+                Cosmos.Kernel.DebugUtil.SendWarning("VFS", e.Message);
+                return false;
+            }
+             
         }
 
         public static string[] GetDirectories(string aDir)

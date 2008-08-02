@@ -10,11 +10,9 @@ namespace Cosmos.Sys.Plugs
 {
     [Plug(Target=typeof(DirectoryInfo))]
     [PlugField(FieldId = "$$Storage$$", FieldType = typeof(FilesystemEntry))]
-    public class DirectoryInfoImpl
+    //[PlugField(FieldId = "$$Path$$", FieldType = typeof(String))]
+    public static class DirectoryInfoImpl
     {
-
-        //NB; THIS PLUG DOESN'T WORK YET!
-
         [PlugMethod(Signature="System_Void__System_IO_DirectoryInfo__ctor_System_String_")]
         public static void ctor(
             DirectoryInfo aThis,
@@ -22,6 +20,9 @@ namespace Cosmos.Sys.Plugs
             String aPath
             )
         {
+            if (aPath == null)
+                throw new ArgumentNullException("aPath is null in DirectoryInfo ctor");
+
             //Search for directory
             if (!VFSManager.DirectoryExists(aPath))
                 throw new DirectoryNotFoundException("Unable to find directory " + aPath);
@@ -30,11 +31,26 @@ namespace Cosmos.Sys.Plugs
             aStorage = VFSManager.GetDirectoryEntry(aPath);
         }
 
+        public static bool get_Exists([FieldAccess(Name = "$$Storage$$")] ref FilesystemEntry aStorage)
+        {
+            //TODO: actually test if it exists
+            return (aStorage != null);
+        }
 
-        //Plug for DirectoryInfo.Fullname
-        public string get_FullName([FieldAccess(Name="$$Storage$$")] ref FilesystemEntry aStorage)
+        public static string get_FullName([FieldAccess(Name="$$Storage$$")] ref FilesystemEntry aStorage)
+        {
+            //TODO: return FULL name
+            return aStorage.Name;
+        }
+
+        public static string get_Name([FieldAccess(Name = "$$Storage$$")] ref FilesystemEntry aStorage)
         {
             return aStorage.Name;
         }
+
+        //public static string ToString([FieldAccess(Name = "$$Path$$")] ref String aPath)
+        //{
+        //    return "ToString()";
+        //}
     }
 }
