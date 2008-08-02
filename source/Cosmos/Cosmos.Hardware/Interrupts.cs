@@ -381,7 +381,7 @@ namespace Cosmos.Hardware {
                                             string aDescription,
                                             string aName,
                                             ref InterruptContext ctx) {
-            const string SysFault = "System Fault";
+            const string SysFault = "*** System Fault ***  ";
 
             //Console.ForegroundColor = ConsoleColor.White;
             //Console.BackgroundColor = ConsoleColor.DarkRed;
