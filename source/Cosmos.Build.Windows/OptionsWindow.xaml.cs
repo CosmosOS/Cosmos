@@ -311,7 +311,7 @@ namespace Cosmos.Build.Windows {
 
                 // General
                 xKey.SetValue("Compile IL",
-                              chckCompileIL.IsChecked.Value,
+                              true,  //Force checkbox to be on, was chckCompileIL.IsChecked.Value,
                               RegistryValueKind.DWord);
                 xKey.SetValue("Debug Port",
                               cmboDebugPort.Text);
