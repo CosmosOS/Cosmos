@@ -15,7 +15,7 @@ namespace Cosmos.Build.Windows
 {
     public class Builder
     {
-        public readonly string BuildPath;
+        public string BuildPath;
         public readonly string ToolsPath;
 
         public Builder()
@@ -193,6 +193,10 @@ namespace Cosmos.Build.Windows
         public void MakeQEMU(bool aUseHDImage, bool aGDB, bool aWaitSerialTCP, bool aDebugger, bool aUseNetworkTap, object aNetworkCard, object aAudioCard)
         {
             MakeISO();
+
+            //From v0.9.1 Qemu requires forward slashes in path
+            BuildPath = BuildPath.Replace((char)@"\"[0], (char)'/');
+
             RemoveFile(BuildPath + "serial-debug.txt");
             // QEMU Docs - http://fabrice.bellard.free.fr/qemu/qemu-doc.html
             if (File.Exists(BuildPath + "COM1-output.dbg")) {
@@ -222,7 +226,7 @@ namespace Cosmos.Build.Windows
                 // Path for BIOS, VGA BIOS, and keymaps
                 + " -L ."
                 // CD ROM image
-                + " -cdrom \"" + BuildPath + "Cosmos.iso\""
+                + " -cdrom " + BuildPath + "Cosmos.iso"
                 // Boot CD ROM
                 + " -boot d"
                 // Audio hardware
