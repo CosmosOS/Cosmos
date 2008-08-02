@@ -20,7 +20,10 @@ namespace Cosmos.Hardware.Audio.Devices.ES1370
         private UARTInterfaceRegister uir;
         public int[] FixedRatesSupported={5512, 11025, 22050, 44100};
         public const int SRClock = 1411200;
-        
+        public const int  minClockDen=29;
+        public const int maxClockDen=353;
+        public const int clockStep=1;
+
 
         public ES1370(PCIDevice device) : base(device)
         {
@@ -28,9 +31,10 @@ namespace Cosmos.Hardware.Audio.Devices.ES1370
             sir = (SerialInterfaceRegister.Load(getMemReference()));
             uir = (UARTInterfaceRegister.Load(getMemReference()));
             cr=(ControlRegister.Load(getMemReference()));
-            dacs.Add(new DACManager(new DACak4531((byte)MainRegister.Bit.Dac1FrameAddr, (byte)MainRegister.Bit.Dac1FrameSize)));
-            dacs.Add(new DACManager(new DACak4531((byte)MainRegister.Bit.Dac2FrameAddr, (byte)MainRegister.Bit.Dac2FrameSize)));
-
+            dacs.Add(new DACManager(new DACak4531(), cr.DAC1Enabled,(byte)MainRegister.Bit.Dac1FrameAddr, (byte)MainRegister.Bit.Dac1FrameSize));
+            dacs.Add(new DACManager(new DACak4531(), cr.DAC2Enabled, (byte)MainRegister.Bit.Dac2FrameAddr, (byte)MainRegister.Bit.Dac2FrameSize));
+            foreach (var dac in dacs.ToArray())
+                preparePlayBackOnDac(dac);
         }
         /// <summary>
         /// Retrieve all Ensoniq AudioPCI 1370 cards found on computer.
@@ -121,9 +125,13 @@ namespace Cosmos.Hardware.Audio.Devices.ES1370
         }
         #endregion
 
-        public void prepareStreamPlayBack(PCMStream pcmStream)
+#region I/O Helper routine
+        private void setDataOnDACCodec(DACManager dacManager){ }
+#endregion
+        private void preparePlayBackOnDac(DACManager dacManager)
         {
-
+            bool state = dacManager.setDACStateEnabled(true);
+            Console.WriteLine("State: " + state);
         }
 
     }

@@ -7,6 +7,6 @@ namespace Cosmos.Hardware.Audio.Devices
 {
     public class DACEntity
     {
-        public DACEntity(byte dacAddr, byte dacSizeAddr) { }
+        public DACEntity() { }
     }
 }

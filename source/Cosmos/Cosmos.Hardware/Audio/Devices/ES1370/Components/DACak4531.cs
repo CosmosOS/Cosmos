@@ -7,7 +7,7 @@ namespace Cosmos.Hardware.Audio.Devices.ES1370.Components
 {
     class DACak4531 : DACEntity
     {
-        public DACak4531(byte dacAddr,byte dacSizeAddr) : base(dacAddr, dacSizeAddr) { }
+        public DACak4531() : base() { }
 
         public enum Bit : byte
         {
@@ -16,7 +16,19 @@ namespace Cosmos.Hardware.Audio.Devices.ES1370.Components
             LeftVoiceVol= 0x02,  // channel volume left
             RightVoiceVol = 0x03, //channel volume right
             LeftFMVol = 0x04, //FM volume left
-            RightFMVol = 0x05//FM volume right
+            RightFMVol = 0x05,//FM volume right
+            LeftCDVol = 0x06, //CD Volume left
+            RightCDVol = 0x07,
+            MonoLeft = 0x0c, //Mono volume left
+            MonoRight= 0x0d, //Mono volume right
+            MonoOutVol= 0x0f, //Mono out volume
+            Sw1Out=0x10, //Mixer output chooser 1
+            Sw2Out = 0x11, //Mixer output chooser 2
+            Sw1In = 0x12,
+            Sw2In = 0x13,
+            Reset=0x16,
+            Clock=0x17,
+            Ad=0x18
         }
     }
 }

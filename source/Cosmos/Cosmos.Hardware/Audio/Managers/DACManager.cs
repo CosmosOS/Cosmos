@@ -9,15 +9,21 @@ namespace Cosmos.Hardware.Audio.Managers
     public class DACManager
     {
         private DACEntity dacEntity;
-        private long dataSize;
-        public DACManager(DACEntity dacEntity)
+        private byte dacAddr;
+        private byte dacSizeAddr;
+        bool dacEnabled;
+        public DACManager(DACEntity dacEntity, bool dacEnabled , byte dacAddr, byte dacSizeAddr)
         {
             this.dacEntity = dacEntity;
-            this.dataSize = 0;
+            this.dacAddr = dacAddr;
+            this.dacSizeAddr = dacSizeAddr;
+            this.dacEnabled = dacEnabled;
         }
-        protected void prepareDACStreamPlayBack(PCMStream pcmStream, int rate)
-        {
 
+        public bool setDACStateEnabled(bool state)
+        {
+            dacEnabled = state;
+            return dacEnabled;
         }
     }
 }

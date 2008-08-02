@@ -7,6 +7,11 @@ namespace Cosmos.Hardware.Audio.Devices
 {
     public class PCMStream
     {
+        int rate;
+        int[] data;
+        public PCMStream(int rate, int[] data)
+        {
+        }
 
     }
 }

@@ -14,7 +14,6 @@ namespace Cosmos.Hardware.Audio.Devices
         protected List<ADCManager> adcs;
         protected List<UARTManager> uarts;
 
-
         #endregion
 
         public GenericSoundCard(PCIDevice device){
