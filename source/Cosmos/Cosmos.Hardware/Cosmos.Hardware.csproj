@@ -112,7 +112,6 @@
     <Compile Include="Old\Storage\Storage.cs" />
     <Compile Include="DeviceSerial.cs" />
     <Compile Include="TextScreen.cs" />
-    <Compile Include="Virtual8086ModeMonitor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Cosmos.snk" />

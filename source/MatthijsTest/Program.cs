@@ -113,30 +113,44 @@ namespace MatthijsTest {
             Console.WriteLine("Original WriteLine");
         }
 
+        public class TestClass {
+            public int ThrowException2() {
+                ThrowException();
+                return 1;
+            }
+
+            public int ThrowException() {
+                throw new Exception("Test Error");
+            }
+        }
+
         public static void Init() {
             try {
-                Cosmos.Sys.Boot.Default();
-            } catch (Exception e) {
-                Console.Write("Error occurred: '");
-                Console.Write(e.Message);
-                Console.WriteLine("'");
-            }
-            // /1/TempDir/SubFile3
-            if (Directory.Exists("/1/TempDir")) {
-                Console.WriteLine("Directory TempDir exists!");
-            } else {
-                Console.WriteLine("Directory TempDir does not exist!");
-            }
-            if (File.Exists("/1/TempDir/SubFile3")) {
-                Console.WriteLine("File SubFile3 exists!");
-            } else {
-                Console.WriteLine("File SubFile3 does not exist!");
-            }
-            if (File.Exists("/1/TempDir/SubFile6")) {
-                Console.WriteLine("File SubFile6 exists!");
-            } else {
-                Console.WriteLine("File SubFile6 does not exist!");
-            }
+                new TestClass().ThrowException2();
+            }catch(Exception E){Console.Write("Exception caught: ");Console.WriteLine(E.ToString());}
+            //try {
+            //    Cosmos.Sys.Boot.Default();
+            //} catch (Exception e) {
+            //    Console.Write("Error occurred: '");
+            //    Console.Write(e.Message);
+            //    Console.WriteLine("'");
+            //}
+            //// /1/TempDir/SubFile3
+            //if (Directory.Exists("/1/TempDir")) {
+            //    Console.WriteLine("Directory TempDir exists!");
+            //} else {
+            //    Console.WriteLine("Directory TempDir does not exist!");
+            //}
+            //if (File.Exists("/1/TempDir/SubFile3")) {
+            //    Console.WriteLine("File SubFile3 exists!");
+            //} else {
+            //    Console.WriteLine("File SubFile3 does not exist!");
+            //}
+            //if (File.Exists("/1/TempDir/SubFile6")) {
+            //    Console.WriteLine("File SubFile6 exists!");
+            //} else {
+            //    Console.WriteLine("File SubFile6 does not exist!");
+            //}
             //var xItems = VFSManager.GetDirectoryListing("/1/TempDir");
             //Console.WriteLine("Directory items of /:");
             //for (int i = 0; i < xItems.Length; i++)

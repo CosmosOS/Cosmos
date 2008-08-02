@@ -1226,15 +1226,16 @@ namespace Indy.IL2CPU {
                                                                 mAssembler,
                                                                 xMethodInfo);
                         } else {
-                            if (Enum.GetNames(typeof(CustomMethodEnum)).Contains(xMethodName)) {
-                                CustomMethodImplementationOp xCustomMethodImplOp = (CustomMethodImplementationOp)GetOpFromType(mMap.CustomMethodImplementationOp,
-                                                                                                                               null,
-                                                                                                                               xMethodInfo);
-                                xCustomMethodImplOp.Assembler = mAssembler;
-                                xCustomMethodImplOp.Method = (CustomMethodEnum)Enum.Parse(typeof(CustomMethodEnum),
-                                                                                          xMethodName);
-                                xCustomMethodImplOp.Assemble();
-                            } else {
+                            //if (Enum.GetNames(typeof(CustomMethodEnum)).Contains(xMethodName)) {
+                            //    CustomMethodImplementationOp xCustomMethodImplOp = (CustomMethodImplementationOp)GetOpFromType(mMap.CustomMethodImplementationOp,
+                            //                                                                                                   null,
+                            //                                                                                                   xMethodInfo);
+                            //    xCustomMethodImplOp.Assembler = mAssembler;
+                            //    xCustomMethodImplOp.Method = (CustomMethodEnum)Enum.Parse(typeof(CustomMethodEnum),
+                            //                                                              xMethodName);
+                            //    xCustomMethodImplOp.Assemble();
+                            //} else {
+                            {
                                 //xCurrentMethod.GetMethodImplementationFlags() == MethodImplAttributes.
                                 MethodBody xBody = xCurrentMethod.GetMethodBody();
                                 // todo: add better detection of implementation state
@@ -1283,18 +1284,23 @@ namespace Indy.IL2CPU {
                                         ExceptionHandlingClause xCurrentHandler = null;
 
                                         #region Exception handling support code
-
+                                        // todo: add support for nested handlers using a stack or so..
                                         foreach (ExceptionHandlingClause xHandler in xBody.ExceptionHandlingClauses) {
-                                            if (xHandler.TryOffset > 0) {
-                                                if (xHandler.TryOffset <= xReader.NextPosition && (xHandler.TryLength + xHandler.TryOffset) > xReader.NextPosition) {
+                                            if (xHandler.TryOffset > 0)
+                                            {
+                                                if (xHandler.TryOffset <= xReader.NextPosition && (xHandler.TryLength + xHandler.TryOffset) > xReader.NextPosition)
+                                                {
                                                     if (xCurrentHandler == null) {
                                                         xCurrentHandler = xHandler;
                                                         continue;
-                                                    }
-                                                    if (xHandler.TryOffset > xCurrentHandler.TryOffset && (xHandler.TryLength + xHandler.TryOffset) < (xCurrentHandler.TryLength + xCurrentHandler.TryOffset)) {
-                                                        // only replace if the current found handler is narrower
-                                                        xCurrentHandler = xHandler;
-                                                        continue;
+                                                    } else
+                                                    {
+                                                        if (xHandler.TryOffset > xCurrentHandler.TryOffset && (xHandler.TryLength + xHandler.TryOffset) < (xCurrentHandler.TryLength + xCurrentHandler.TryOffset))
+                                                        {
+                                                            // only replace if the current found handler is narrower
+                                                            xCurrentHandler = xHandler;
+                                                            continue;
+                                                        }
                                                     }
                                                 }
                                             }

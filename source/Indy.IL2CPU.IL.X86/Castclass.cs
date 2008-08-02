@@ -58,10 +58,11 @@ namespace Indy.IL2CPU.IL.X86 {
 			Assembler.StackContents.Push(new StackContent(4, typeof(object)));
 			MethodBase xMethodIsInstance = Engine.GetMethodBase(typeof(VTablesImpl), "IsInstance", "System.Int32", "System.Int32");
 			Engine.QueueMethod(xMethodIsInstance);
-			Op xOp = new Call(xMethodIsInstance, mCurrentILOffset, mMethodInfo.DebugMode);
+            Op xOp = new Call(xMethodIsInstance, mCurrentILOffset, mMethodInfo.DebugMode, mThisLabel + "_After_IsInstance_Call");
 			xOp.Assembler = Assembler;
 			xOp.Assemble();
-			Assembler.StackContents.Pop();
+		    new CPU.Label(mThisLabel + "_After_IsInstance_Call");
+			Assembler.StackContents.Pop(); 
 			new CPUx86.Pop(CPUx86.Registers.EAX);
 			new CPUx86.Compare(CPUx86.Registers.EAX, "0");
 			new CPUx86.JumpIfNotEqual(mNextOpLabel);

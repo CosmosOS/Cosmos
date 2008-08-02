@@ -22,9 +22,10 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		protected override void CallProxiedMethod() {
-			Op x = new Call(ProxiedMethod, 0, mDebugMode, MethodInfo.ExtraStackSize);
+			Op x = new Call(ProxiedMethod, 0, mDebugMode, MethodInfo.ExtraStackSize, ".AfterProxyCall");
 			x.Assembler = Assembler;
 			x.Assemble();
+		    new Label(".AfterProxyCall");
 		}
 
 		protected override void Ldloc(int index) {

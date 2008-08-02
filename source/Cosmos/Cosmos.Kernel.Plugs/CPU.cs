@@ -85,16 +85,6 @@ namespace Cosmos.Kernel.Plugs {
             aEAX = 0;
         }
 
-        [PlugMethod(MethodAssembler = typeof(Assemblers.IsVirtual8086Mode))]
-        public static bool IsVirtual8086Mode() {
-            return false;
-        }
-
-        [PlugMethod(MethodAssembler = typeof(Assemblers.GetTSS))]
-        public static unsafe byte* GetTSS() {
-            return null;
-        }
-
         [PlugMethod(MethodAssembler = typeof(Assemblers.LoadTSS))]
         public static void LoadTSS() {
             //

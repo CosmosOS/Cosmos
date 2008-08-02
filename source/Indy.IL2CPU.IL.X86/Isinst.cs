@@ -66,9 +66,11 @@ namespace Indy.IL2CPU.IL.X86 {
             Engine.QueueMethod(xMethodIsInstance);
             Op xOp = new Call(xMethodIsInstance,
                               mCurrentILOffset,
-                              mDebugMode);
+                              mDebugMode,
+                              mThisLabel+ "_After_IsInstance_Call");
             xOp.Assembler = Assembler;
             xOp.Assemble();
+            new Label(mThisLabel + "_After_IsInstance_Call");
             Assembler.StackContents.Pop();
             new CPUx86.Pop(CPUx86.Registers.EAX);
             new CPUx86.Compare(CPUx86.Registers.EAX,

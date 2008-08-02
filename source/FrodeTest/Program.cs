@@ -17,7 +17,10 @@ namespace FrodeTest
         //This is the playground for Frode "Scalpel" Lillerud.
         public static void Init()
         {
-            Cosmos.Sys.Boot.Default();
+            bool xTest = false;
+            if (xTest) {
+                Cosmos.Sys.Boot.Default();
+            }
 
             Console.WriteLine("*** COSMOS Operating System - Frode's Test Suite ***");
             //Console.WriteLine("CPU: " + Cosmos.Kernel.CPU.CPUVendor);
@@ -45,7 +48,7 @@ namespace FrodeTest
             //Test.MACAddressTest.RunTest();
             //Test.LinqTest.RunTest();
             //Test.VirtualFileSystemTest.RunTest();
-            Test.DirectoryInfoTest.RunTest();
+            //Test.DirectoryInfoTest.RunTest();
 
             //Tests ready for Matthijs to fix ;)
             //Test.RTL8139Test.RunTest();
@@ -53,7 +56,7 @@ namespace FrodeTest
              
             //Done
             Console.WriteLine("Shutting down computer");
-            Cosmos.Sys.Deboot.ShutDown();            
+            //Cosmos.Sys.Deboot.ShutDown();            
         }
     }
 }

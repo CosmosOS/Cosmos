@@ -78,9 +78,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="TestV86MExecution" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="MatthijsTest.exe.cosmos-config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

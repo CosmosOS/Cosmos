@@ -18,9 +18,10 @@ namespace Indy.IL2CPU.IL.X86 {
 				Ldarg.Ldarg(Assembler, MethodInfo.Arguments[i]);
 			}
 			Engine.QueueMethod(aMethod);
-			Op xOp = new Call(aMethod, 0, MethodInfo.DebugMode);
-			xOp.Assembler = Assembler;
-			xOp.Assemble();
+		    throw new NotImplementedException();
+			//Op xOp = new Call(aMethod, 0, MethodInfo.DebugMode);
+			//xOp.Assembler = Assembler;
+			//xOp.Assemble();
 		}
 
 		protected override void Assemble_System_UInt32___Indy_IL2CPU_CustomImplementation_System_StringImpl_GetStorage___System_UInt32___() {

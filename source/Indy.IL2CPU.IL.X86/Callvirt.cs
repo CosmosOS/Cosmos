@@ -194,16 +194,33 @@ namespace Indy.IL2CPU.IL.X86 {
                 }
                 new CPU.Label(mLabelName + "_NOT_BOXED_THIS");
                 new CPUx86.Pop("eax");
-                if (mExtraStackSpace > 0) {
+                if (mExtraStackSpace > 0) { 
                     new CPUx86.Sub("esp",
                                    mExtraStackSpace.ToString());
                 }
                 new CPUx86.Call("eax");
                 new CPU.Label(mLabelName + "__AFTER_NOT_BOXED_THIS");
             }
-            new CPUx86.Test(CPUx86.Registers.ECX,
-                            2);
-            new CPUx86.JumpIfNotEqual(MethodFooterOp.EndOfMethodLabelNameException);
+            Call.EmitExceptionLogic(Assembler,
+                               mCurrentILOffset,
+                               mCurrentMethodInfo,
+                               mLabelName + "__NO_EXCEPTION_AFTER_CALL",
+                               true,
+                               delegate()
+                               {
+                                   var xResultSize = mTargetMethodInfo.ReturnSize;
+                                   if (xResultSize % 4 != 0)
+                                   {
+                                       xResultSize += 4 - (xResultSize % 4);
+                                   }
+                                   for (int i = 0; i < xResultSize / 4; i++)
+                                   {
+                                       new CPUx86.Add("esp",
+                                                      "4");
+                                   }
+                               });
+
+            new CPU.Label(mLabelName + "__NO_EXCEPTION_AFTER_CALL");
             new CPU.Comment("Argument Count = " + mArgumentCount.ToString());
             for (int i = 0; i < mArgumentCount; i++) {
                 Assembler.StackContents.Pop();

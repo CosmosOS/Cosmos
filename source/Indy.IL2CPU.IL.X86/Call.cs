@@ -36,38 +36,45 @@ namespace Indy.IL2CPU.IL.X86 {
             Engine.RegisterType(xTargetMethodInfo.ReturnType);
         }
 
-	    public Call(MethodBase aMethod, int aCurrentILOffset, bool aDebugMode, int aExtraStackSpace): base(null, null)
+	    public Call(MethodBase aMethod,
+	                int aCurrentILOffset,
+	                bool aDebugMode,
+	                int aExtraStackSpace,
+	                string aNormalNext): base(null, null)
         {
             if (aMethod == null)
             {
                 throw new ArgumentNullException("aMethod");
             }
             Initialize(aMethod, aCurrentILOffset, aDebugMode);
+	        mNextLabelName = aNormalNext;
         }
 
-		public Call(MethodBase aMethod, int aCurrentILOffset, bool aDebugMode)
-			: this(aMethod, aCurrentILOffset, aDebugMode, 0) {
+		public Call(MethodBase aMethod, int aCurrentILOffset, bool aDebugMode,string aNormalNext)
+			: this(aMethod, aCurrentILOffset, aDebugMode, 0, aNormalNext) {
 		}
 
 		public static void EmitExceptionLogic(Assembler.Assembler aAssembler, int aCurrentOpOffset, MethodInformation aMethodInfo, string aNextLabel, bool aDoTest, Action aCleanup) {
 			string xJumpTo = MethodFooterOp.EndOfMethodLabelNameException;
 			if (aMethodInfo != null && aMethodInfo.CurrentHandler != null) {
-				if (aMethodInfo.CurrentHandler.HandlerOffset >= aCurrentOpOffset && (aMethodInfo.CurrentHandler.HandlerLength + aMethodInfo.CurrentHandler.HandlerOffset) <= aCurrentOpOffset) {
-					return;
-				}
-				switch (aMethodInfo.CurrentHandler.Flags) {
-					case ExceptionHandlingClauseOptions.Clause: {
-							xJumpTo = Op.GetInstructionLabel(aMethodInfo.CurrentHandler.HandlerOffset);
-							break;
-						}
-					case ExceptionHandlingClauseOptions.Finally: {
-							xJumpTo = Op.GetInstructionLabel(aMethodInfo.CurrentHandler.HandlerOffset);
-							break;
-						}
-					default: {
-							throw new Exception("ExceptionHandlerType '" + aMethodInfo.CurrentHandler.Flags.ToString() + "' not supported yet!");
-						}
-				}
+                // todo add support for nested handlers, see comment in Engine.cs
+                //if (!((aMethodInfo.CurrentHandler.HandlerOffset < aCurrentOpOffset) || (aMethodInfo.CurrentHandler.HandlerLength + aMethodInfo.CurrentHandler.HandlerOffset) <= aCurrentOpOffset)) {
+                new CPU.Comment(String.Format("CurrentOffset = {0}, HandlerStartOffset = {1}", aCurrentOpOffset, aMethodInfo.CurrentHandler.HandlerOffset));
+                if(aMethodInfo.CurrentHandler.HandlerOffset > aCurrentOpOffset) {
+                    switch (aMethodInfo.CurrentHandler.Flags) {
+                        case ExceptionHandlingClauseOptions.Clause: {
+                            xJumpTo = Op.GetInstructionLabel(aMethodInfo.CurrentHandler.HandlerOffset);
+                            break;
+                        }
+                        case ExceptionHandlingClauseOptions.Finally: {
+                            xJumpTo = Op.GetInstructionLabel(aMethodInfo.CurrentHandler.HandlerOffset);
+                            break;
+                        }
+                        default: {
+                            throw new Exception("ExceptionHandlerType '" + aMethodInfo.CurrentHandler.Flags.ToString() + "' not supported yet!");
+                        }
+                    }
+                }
 			}
 			if (!aDoTest) {
 				//new CPUx86.Call("_CODE_REQUESTED_BREAK_");
@@ -125,8 +132,10 @@ namespace Indy.IL2CPU.IL.X86 {
 			mMethodInfo = aMethodInfo;
 			if (!aReader.EndOfStream) {
 				mNextLabelName = GetInstructionLabel(aReader.NextPosition);
+			}else {
+			    mNextLabelName = X86MethodFooterOp.EndOfMethodLabelNameNormal;
 			}
-            Initialize(xMethod, (int)aReader.Position,aMethodInfo.DebugMode);
+		    Initialize(xMethod, (int)aReader.Position,aMethodInfo.DebugMode);
 		}
         public void Assemble(string aMethod, int aArgumentCount) {
             if (mTargetMethodInfo.ExtraStackSize > 0) {
@@ -134,22 +143,30 @@ namespace Indy.IL2CPU.IL.X86 {
                                mTargetMethodInfo.ExtraStackSize.ToString());
             }
             new CPUx86.Call(aMethod);
-            if (mResultSize != 0) {
-                new CPUx86.Pop("eax");
-            }
+            //if (mResultSize != 0) {
+                //new CPUx86.Pop("eax");
+            //}
             EmitExceptionLogic(Assembler,
                                mCurrentILOffset,
                                mMethodInfo,
                                mNextLabelName,
                                true,
-                               null);
+                               delegate() {
+                                   var xResultSize = mTargetMethodInfo.ReturnSize;
+                                   if(xResultSize %4!=0) {
+                                       xResultSize += 4 - (xResultSize % 4);
+                                   }
+                                   for(int i = 0; i< xResultSize/4;i++) {
+                                       new CPUx86.Add("esp",
+                                                      "4");
+                                   }
+                               });
             for (int i = 0; i < aArgumentCount; i++) {
                 Assembler.StackContents.Pop();
             }
             if (mResultSize == 0) {
                 return;
             }
-            new CPUx86.Push("eax");
 
             Assembler.StackContents.Push(new StackContent(mResultSize,
                                                           ((MethodInfo)mTargetMethodInfo.Method).ReturnType));
