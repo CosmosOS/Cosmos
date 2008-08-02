@@ -223,8 +223,8 @@ namespace Cosmos.Sys {
             if (aDir == null)
                 throw new ArgumentNullException("aDir is null");
 
-            if (!Directory.Exists(aDir))
-                throw new DirectoryNotFoundException("Unable to find directory " + aDir);
+            //if (!Directory.Exists(aDir))
+            //    throw new DirectoryNotFoundException("Unable to find directory " + aDir);
 
             List<string> xDirectories = new List<string>();
             var xEntries = GetDirectoryListing(Path.GetDirectoryName(aDir));
@@ -241,8 +241,8 @@ namespace Cosmos.Sys {
             if (aDir == null)
                 throw new ArgumentNullException("aDir is null");
 
-            if (!Directory.Exists(aDir))
-                throw new DirectoryNotFoundException("Unable to find directory " + aDir);
+            //if (!Directory.Exists(aDir))
+            //    throw new DirectoryNotFoundException("Unable to find directory " + aDir);
 
             List<string> xFiles = new List<string>();
             var xEntries = GetDirectoryListing(Path.GetDirectoryName(aDir));

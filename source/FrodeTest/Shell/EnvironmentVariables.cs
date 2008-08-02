@@ -22,7 +22,7 @@ namespace FrodeTest.Shell
         {
         }
 
-        private string mCurrentDirectory = Path.DirectorySeparatorChar.ToString();
+        private string mCurrentDirectory = "/0/";
         public string CurrentDirectory { get { return mCurrentDirectory; } set { mCurrentDirectory = value; } }
     }
 }

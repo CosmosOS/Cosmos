@@ -24,8 +24,8 @@ namespace Cosmos.Sys.Plugs
                 throw new ArgumentNullException("aPath is null in DirectoryInfo ctor");
 
             //Search for directory
-            if (!VFSManager.DirectoryExists(aPath))
-                throw new DirectoryNotFoundException("Unable to find directory " + aPath);
+            //if (!VFSManager.DirectoryExists(aPath))
+            //    throw new DirectoryNotFoundException("Unable to find directory " + aPath);
 
             //If it exists, then get the directory as a FilesystemEntry
             aStorage = VFSManager.GetDirectoryEntry(aPath);
@@ -48,6 +48,21 @@ namespace Cosmos.Sys.Plugs
             return aStorage.Name;
         }
 
+        //public static FileInfo[] GetFiles(DirectoryInfo aThis, [FieldAccess(Name = "$$Storage$$")] ref FilesystemEntry aStorage)
+        //{
+        //    List<FileInfo> xFiles = new List<FileInfo>();
+        //    //Get all entries in the directory, except the Directories
+        //    var xEntries = VFSManager.GetDirectoryListing("/1/lost+found");
+            
+        //    foreach (FilesystemEntry xEntry in xEntries)
+        //    {
+        //        xFiles.Add(new FileInfo(xEntry.Name));
+        //    }
+
+        //    return xFiles.ToArray();
+        //}
+        
+        
         //public static string ToString([FieldAccess(Name = "$$Path$$")] ref String aPath)
         //{
         //    return "ToString()";

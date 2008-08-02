@@ -58,6 +58,7 @@
     <Compile Include="VFS\DirectoryImpl.cs" />
     <Compile Include="VFS\DirectoryInfoImpl.cs" />
     <Compile Include="VFS\FileImpl.cs" />
+    <Compile Include="VFS\FileInfoImpl.cs" />
     <Compile Include="VFS\PathImpl.cs" />
   </ItemGroup>
   <ItemGroup>

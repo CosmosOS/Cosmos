@@ -48,11 +48,13 @@ namespace FrodeTest
             //Test.MACAddressTest.RunTest();
             //Test.LinqTest.RunTest();
             //Test.VirtualFileSystemTest.RunTest();
-            //Test.DirectoryInfoTest.RunTest();
+
 
             //Tests ready for Matthijs to fix ;)
             Test.RTL8139Test.RunTest();
             //Test.ExceptionTest.RunTest();
+            //Test.DirectoryInfoTest.RunTest();
+            //Test.FileInfoTest.RunTest();
              
             //Done
             Console.WriteLine("Shutting down computer");

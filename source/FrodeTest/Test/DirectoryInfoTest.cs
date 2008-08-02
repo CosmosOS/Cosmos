@@ -15,7 +15,13 @@ namespace FrodeTest.Test
             DirectoryInfo dir = new DirectoryInfo("/1/lost+found");
             Console.WriteLine("FullName: " + dir.FullName);
             Console.WriteLine("Name: " + dir.Name);
+            
             //Console.WriteLine("ToString: " + dir.ToString());
+
+            //Console.WriteLine("Files in the directory:");
+            //foreach (FileInfo file in dir.GetFiles())
+            //    Console.WriteLine(file.Name);
+
 
             if (dir.Exists)
                 Console.WriteLine("Exists");
