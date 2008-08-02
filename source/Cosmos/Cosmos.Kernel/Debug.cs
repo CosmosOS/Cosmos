@@ -1,5 +1,6 @@
 ﻿
 namespace Cosmos.Kernel {
+    [System.Obsolete("Use Cosmos.Hardware.DebugUtil")]
 	public static class DebugUtil {
 		public static void Initialize() {
 			//Hardware.DebugUtil.Initialize();
