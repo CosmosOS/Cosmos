@@ -11,19 +11,27 @@ namespace Cosmos.Shell.Guess
     /// </summary>
     public unsafe class Random
     {
-        private int val;
+        private int a = 214013;
+        private int x = 0x72535;
+        private int c = 2531011;
 
-        public Random()
+
+        public Random() : this( 
+                (int)Cosmos.Hardware.Global.TickCount 
+                + Cosmos.Hardware.RTC.GetSeconds())
         {
-            int max = Hardware.RTC.GetHours();
-            max *= (int)Hardware.RTC.GetMinutes();
-            max *= (int)Hardware.RTC.GetSeconds();
-            val = (max / 432);
         }
 
-        public int Next()
+        public Random(int seed)
         {
-            return val;
+            x = seed;
         }
+
+        public int Next(int p)
+        {
+            x = (a * x + c);
+            return x % p;
+        }
+
     }
 }
