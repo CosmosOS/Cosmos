@@ -45,9 +45,12 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DrawingTest.cs" />
+    <Compile Include="GraphicsImpl.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VGA.cs" />
@@ -64,6 +67,10 @@
     <ProjectReference Include="..\Cosmos\Cosmos.System\Cosmos.Sys.csproj">
       <Project>{819DB8FC-5DA1-461F-83C9-2F5C88088C94}</Project>
       <Name>Cosmos.Sys</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Indy.IL2CPU.Plugs\Indy.IL2CPU.Plugs.csproj">
+      <Project>{E9B2E8CC-E264-42F9-9113-16B0A0431198}</Project>
+      <Name>Indy.IL2CPU.Plugs</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

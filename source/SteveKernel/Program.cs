@@ -1,5 +1,6 @@
 ﻿using System;
 using Cosmos.Build.Windows;
+using System.Drawing;
 
 namespace SteveKernel
 {
@@ -11,7 +12,7 @@ namespace SteveKernel
         static void Main(string[] args) {
             BuildUI.Run();
         }
-        #endregion
+    #endregion
         
         // Main entry point of the kernel
         public static void Init()
@@ -19,7 +20,11 @@ namespace SteveKernel
 
             Cosmos.Sys.Boot.Default();
 
-            //VGA.Test();
+
+            Cosmos.Hardware.VGAScreen.SetMode80x50xText();
+
+            for (int i=0;i<1000; i++)
+                Console.Write("sdkjfhdsf dfs sdf dsf sdf sdf sdf sf sdkjfhskjfhsdkjh");
         }
     }
 }
