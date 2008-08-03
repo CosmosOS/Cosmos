@@ -95,7 +95,7 @@
 							IsChecked="False">Use GDB Debugger</CheckBox>
                         <CheckBox
 							Name="chckQEMUUseHD"
-							IsChecked="False">Create hard disk image</CheckBox>
+							IsChecked="False">Attach harddisk images</CheckBox>
 
                     </StackPanel>
                 </InlineUIContainer>
