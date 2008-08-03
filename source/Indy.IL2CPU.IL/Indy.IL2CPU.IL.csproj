@@ -48,6 +48,8 @@
     <Compile Include="CustomImplementations\System\BooleanImpl.cs" />
     <Compile Include="CustomImplementations\System\ByteImpl.cs" />
     <Compile Include="CustomImplementations\System\CharImpl.cs" />
+    <Compile Include="CustomImplementations\System\Drawing1\ColorImpl.cs" />
+    <Compile Include="CustomImplementations\System\Drawing1\SRImpl.cs" />
     <Compile Include="CustomImplementations\System\EnvironmentImpl.cs" />
     <Compile Include="CustomImplementations\System\GCImpl.cs" />
     <Compile Include="CustomImplementations\System\Globalization\NumberFormatInfoImpl.cs" />
@@ -98,6 +100,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Cosmos.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="CustomImplementations\System\Resource\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
