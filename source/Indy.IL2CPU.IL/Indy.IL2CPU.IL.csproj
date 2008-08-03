@@ -58,6 +58,7 @@
     <Compile Include="CustomImplementations\System\Net\IPAddressImpl.cs" />
     <Compile Include="CustomImplementations\System\Net\SocketAddressImpl.cs" />
     <Compile Include="CustomImplementations\System\NumberImpl.cs" />
+    <Compile Include="CustomImplementations\System\Resource\ResourceManager.cs" />
     <Compile Include="CustomImplementations\System\Runtime\InteropServices\SafeHandleImpl.cs" />
     <Compile Include="CustomImplementations\System\Threading\Interlocked.cs" />
     <Compile Include="CustomImplementations\System\UInt32Impl.cs" />
@@ -100,9 +101,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Cosmos.snk" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="CustomImplementations\System\Resource\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
