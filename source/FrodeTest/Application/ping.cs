@@ -4,6 +4,7 @@ using System.Text;
 using Cosmos.Sys.Network;
 using Cosmos.Hardware.Network.Devices.RTL8139;
 using System.Net;
+using Cosmos.Hardware;
 
 namespace FrodeTest.Application
 {
@@ -28,12 +29,12 @@ namespace FrodeTest.Application
 
             if (xNic.TransmitBytes(xPingOut.GetData()))
             {
-                Cosmos.Kernel.DebugUtil.SendMessage("ping.cs", "Leaving Execute");
+                DebugUtil.SendMessage("ping.cs", "Leaving Execute");
                 return 0;
             }
             else
             {
-                Cosmos.Kernel.DebugUtil.SendMessage("ping.cs", "Leaving Execute");
+                DebugUtil.SendMessage("ping.cs", "Leaving Execute");
                 return -1;
             }
             

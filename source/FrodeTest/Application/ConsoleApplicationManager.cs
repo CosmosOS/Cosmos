@@ -16,10 +16,12 @@ namespace FrodeTest.Application
             //Adding them manually for now. Until we can scan the harddrive/memory.
             mApplications.Add(new cd());
             mApplications.Add(new dir());
+            mApplications.Add(new drives());
             mApplications.Add(new help());
             mApplications.Add(new net());
             mApplications.Add(new ping());
-            mApplications.Add(new reboot());     
+            mApplications.Add(new reboot());
+            mApplications.Add(new type());
         }
 
         public List<IConsoleApplication> AllConsoleApplications { get { return mApplications; } }

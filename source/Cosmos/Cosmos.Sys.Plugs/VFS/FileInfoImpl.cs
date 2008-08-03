@@ -19,12 +19,20 @@ namespace Cosmos.Sys.Plugs
             String aFile
             )
         {
-            aStorage = VFSManager.GetDirectoryEntry(aFile);
+            var xEntry = VFSManager.GetDirectoryEntry(aFile);
+
+            if (!xEntry.IsDirectory)
+                aStorage = xEntry;
         }
 
         public static string get_Name([FieldAccess(Name = "$$Storage$$")] ref FilesystemEntry aStorage)
         {
             return "Filename" + aStorage.Name;
+        }
+
+        public static bool get_Exists([FieldAccess(Name = "$$Storage$$")] ref FilesystemEntry aStorage)
+        {
+            return VFSManager.FileExists(aStorage.Name);
         }
     }
 }

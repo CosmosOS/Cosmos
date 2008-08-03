@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using FrodeTest.Shell;
 using System.IO;
+using Cosmos.Hardware;
 
 namespace FrodeTest.Application
 {
@@ -13,41 +14,48 @@ namespace FrodeTest.Application
 
         public int Execute(string[] args)
         {
-            Cosmos.Kernel.DebugUtil.SendMessage("cd.cs", "Executing cd command");
-            if (args == null)
-                return 0;
-
-            if (String.IsNullOrEmpty(args[0]))
-                return 0;
-
-            if (args[0] == "..")
+            try
             {
-                //Go up one directory
+                DebugUtil.SendMessage("cd.cs", "Executing cd command");
+                if (args == null)
+                    return 0;
 
-                //TODO: Use DirectoryInfo.GetParent
-                string xCurDir = EnvironmentVariables.GetCurrent().CurrentDirectory;
-                xCurDir = xCurDir.TrimEnd(Path.DirectorySeparatorChar);
-                EnvironmentVariables.GetCurrent().CurrentDirectory = xCurDir.Substring(0, xCurDir.LastIndexOf(Path.DirectorySeparatorChar));
+                if (String.IsNullOrEmpty(args[0]))
+                    return 0;
 
-                return 0;
+                if (args[0] == "..")
+                {
+                    //Go up one directory
+
+                    //TODO: Use DirectoryInfo.GetParent
+                    string xCurDir = EnvironmentVariables.GetCurrent().CurrentDirectory;
+                    xCurDir = xCurDir.TrimEnd(Path.DirectorySeparatorChar);
+                    EnvironmentVariables.GetCurrent().CurrentDirectory = xCurDir.Substring(0, xCurDir.LastIndexOf(Path.DirectorySeparatorChar));
+
+                    return 0;
+                }
+
+                string xNewPath = EnvironmentVariables.GetCurrent().CurrentDirectory + args[0] + "/";
+                DebugUtil.SendMessage("cd.cs", "Checking path " + xNewPath);
+                if (Directory.Exists(xNewPath))
+                {
+                    EnvironmentVariables.GetCurrent().CurrentDirectory = xNewPath;
+                }
+                else if (Directory.Exists(args[0] + "/"))
+                {
+                    EnvironmentVariables.GetCurrent().CurrentDirectory += args[0] + "/";
+                }
+                else
+                {
+                    Console.WriteLine("Unknown path, didn't match " + xNewPath + " or " + args[0] + "/");
+                    return -1;
+                }
             }
-
-            string xNewPath = EnvironmentVariables.GetCurrent().CurrentDirectory + args[0] + Path.DirectorySeparatorChar;
-            Cosmos.Kernel.DebugUtil.SendMessage("cd.cs", "Checking path " + xNewPath);
-            if (Directory.Exists(xNewPath))
+            catch (Exception e)
             {
-                EnvironmentVariables.GetCurrent().CurrentDirectory = xNewPath;
+                Console.WriteLine("ERROR: " + e.Message);
             }
-            else if (Directory.Exists(args[0] + Path.DirectorySeparatorChar))
-            {
-                EnvironmentVariables.GetCurrent().CurrentDirectory += args[0] + Path.DirectorySeparatorChar;
-            }
-            else
-            {
-                Console.WriteLine("Unknown path.");
-                return -1;
-            }
-
+             
             return 0;
         }
 

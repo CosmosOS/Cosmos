@@ -504,7 +504,6 @@ namespace Indy.IL2CPU {
                                xCurrentMethod.GetFullName());
                     OnDebugLog(LogSeverityEnum.Warning,
                                e.ToString());
-
                     throw;
                 }
                 //OnProgressChanged();
@@ -1453,7 +1452,6 @@ namespace Indy.IL2CPU {
                                xCurrentMethod.GetFullName());
                     OnDebugLog(LogSeverityEnum.Warning,
                                e.ToString());
-
                     throw;
                 }
                 //OnProgressChanged();
@@ -1548,10 +1546,12 @@ namespace Indy.IL2CPU {
             }
             
             //Console.WriteLine("Recognized Plug methods:");
-            this.ProgressMessage = String.Format("Plugs loaded: {0} methods and {1} fields", mPlugMethods.Count, mPlugFields.Count);
-            //foreach (string s in mPlugMethods.Keys) {
-            //    Console.WriteLine(s);
-            //}
+            string xPlugsLoadedMessage = String.Format("Plugs loaded: {0} methods and {1} fields", mPlugMethods.Count, mPlugFields.Count);
+            this.ProgressMessage = xPlugsLoadedMessage;
+            foreach (string s in mPlugMethods.Keys) {
+                Console.WriteLine(s);
+            }
+            Console.WriteLine(xPlugsLoadedMessage);
         }
 
         void CurrentDomain_AssemblyLoad(object sender, AssemblyLoadEventArgs args)

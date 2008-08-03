@@ -15,16 +15,23 @@ namespace FrodeTest.Application
 
         public int Execute(string[] args)
         {
-            //Get current directory
-            string xCurrentDirectory = EnvironmentVariables.GetCurrent().CurrentDirectory;
+            try
+            {
+                //Get current directory
+                string xCurrentDirectory = EnvironmentVariables.GetCurrent().CurrentDirectory;
+                Console.WriteLine(" Directory of " + xCurrentDirectory);
 
-            foreach (string xDirectory in Directory.GetDirectories(xCurrentDirectory))
-                Console.WriteLine("<DIR>   " + xDirectory);
+                foreach (string xDirectory in Directory.GetDirectories(xCurrentDirectory))
+                    Console.WriteLine("<DIR>   " + xDirectory);
 
-            foreach (string xFile in Directory.GetFiles(xCurrentDirectory))
-                Console.WriteLine("        " + xFile);
-
-            return 0;
+                foreach (string xFile in Directory.GetFiles(xCurrentDirectory))
+                    Console.WriteLine("        " + xFile);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("ERROR: " + e.Message);
+            }
+                return 0;
         }
 
         public string CommandName

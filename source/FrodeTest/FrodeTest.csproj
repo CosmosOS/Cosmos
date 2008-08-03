@@ -52,11 +52,13 @@
     <Compile Include="Application\cd.cs" />
     <Compile Include="Application\ConsoleApplicationManager.cs" />
     <Compile Include="Application\dir.cs" />
+    <Compile Include="Application\drives.cs" />
     <Compile Include="Application\help.cs" />
     <Compile Include="Application\IConsoleApplication.cs" />
     <Compile Include="Application\net.cs" />
     <Compile Include="Application\ping.cs" />
     <Compile Include="Application\reboot.cs" />
+    <Compile Include="Application\type.cs" />
     <Compile Include="Debug\SortedListSearcher.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

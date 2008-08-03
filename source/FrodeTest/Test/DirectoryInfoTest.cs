@@ -12,7 +12,7 @@ namespace FrodeTest.Test
         {
             Console.WriteLine("-- TESTING System.IO.DirectoryInfo --");
 
-            DirectoryInfo dir = new DirectoryInfo("/1/lost+found");
+            DirectoryInfo dir = new DirectoryInfo("/0/lost+found/");
             Console.WriteLine("FullName: " + dir.FullName);
             Console.WriteLine("Name: " + dir.Name);
             
@@ -24,9 +24,9 @@ namespace FrodeTest.Test
 
 
             if (dir.Exists)
-                Console.WriteLine("Exists");
+                Console.WriteLine("Directory exists");
             else
-                Console.WriteLine("Doesn't exist");
+                Console.WriteLine("Directory doesn't exist");
         }
     }
 }

@@ -196,7 +196,6 @@ namespace FrodeTest.Shell
                 Application.IConsoleApplication xConsoleApp = conAppManager.GetConsoleApplication(xCommand.Command);
                 if (xConsoleApp != null)
                 {
-                    DebugUtil.SendMessage("Session.cs", "About to Execute a command");
                     xConsoleApp.Execute(xCommand.Arguments);
                 }
                 else
