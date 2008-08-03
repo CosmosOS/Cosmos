@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace DokuTest.Sample_sound
+namespace DokuTest.SampleSounds
 {
     public static class SoundSamples
     {
 
-        public static Cosmos.Hardware.Audio.Devices.PCMStream generateSineWaveForm(double freq, int rate, int count, int sampleSize, int[] channelsList, int period, int nPeriods, double phase)
+        public static Cosmos.Hardware.Audio.PCMStream generateSineWaveForm(double freq, int rate, double phase)
         {
             double max_phase = 1.0 / freq;
             double step = 1.0 / (double)rate;
@@ -18,7 +18,7 @@ namespace DokuTest.Sample_sound
             List<int> frames = new List<int>();
 
             int ind_chan;
-            while (count-- > 0)
+            //while (count-- > 0)
             {/*
                 for (ind_chan = 0; ind_chan < nChannels; ind_chan++)
                 {

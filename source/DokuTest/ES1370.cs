@@ -18,6 +18,9 @@ namespace DokuTest
             xAudioCard.Enable();
             xAudioCard.InitializeDriver();
             xAudioCard.DumpRegisters();
+            Console.WriteLine("Test sine waves");
+            Cosmos.Hardware.Audio.PCMStream sinewave = SampleSounds.SoundSamples.generateSineWaveForm(440, 44100, 0);
+
             Console.WriteLine("Disabling first audio card...");
             xAudioCard.Disable();
             xAudioCard.DumpRegisters();
