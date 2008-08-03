@@ -32,7 +32,7 @@ namespace Cosmos.Sys.Plugs {
                 xFileNames.Add(xFile.Name);
             }
             return xFileNames.ToArray();
-            
+
             //return (from xFileName in VFSManager.GetFiles(aDir) select xFileName.Name).ToArray();
         }
 

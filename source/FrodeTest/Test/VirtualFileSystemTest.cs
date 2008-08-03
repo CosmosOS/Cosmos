@@ -23,14 +23,22 @@ namespace FrodeTest.Test
 
             Console.WriteLine("Directory separator: " + Path.DirectorySeparatorChar.ToString());
 
+            //Console.WriteLine("Contents of Readme.txt: " + File.ReadAllText("/0/Readme.txt"));
+
 
             //Console.WriteLine(Directory.Exists("/1/TempDir"));
-            Console.WriteLine("About to check Directory.Exists");
-            Console.ReadLine();
-            if (Directory.Exists(@"/1/TempDir/"))
+            if (Directory.Exists(@"/0/lost+found/"))
                 Console.WriteLine(@"Found TempDir");
             else
-                Console.WriteLine(@"Unable to find TempDir");
+                Console.WriteLine(@"Unable to find lost+found");
+
+            FilesystemEntry xAlfaDir = VFSManager.GetDirectoryEntry("/0/Alfa/Bravo/");
+            Console.WriteLine("Alfadir: " + xAlfaDir.Name);
+            foreach (FilesystemEntry xEntry in VFSManager.GetDirectoryListing(xAlfaDir))
+            {
+                Console.WriteLine(xEntry.Name);
+            }
+            
         }
     }
 }

@@ -26,7 +26,7 @@ namespace FrodeTest
             Console.WriteLine("*** COSMOS Operating System - Frode's Test Suite ***");
             //Console.WriteLine("CPU: " + Cosmos.Kernel.CPU.CPUVendor);
 
-            Shell.Session.Run();
+            //Shell.Session.Run();
 
             //Test
             //Console.WriteLine("---- RUNNING PREDEFINED TESTS ----");
@@ -47,9 +47,11 @@ namespace FrodeTest
             //Test.UDPTest.RunTest();
             //Test.MACAddressTest.RunTest();
             //Test.LinqTest.RunTest();
+            //Test.ExceptionTest.RunTest();
+            //Test.FilesystemEntryTest.RunTest();
             Test.VirtualFileSystemTest.RunTest();
-            Test.DirectoryInfoTest.RunTest();
-            Test.FileInfoTest.RunTest();
+            //Test.DirectoryInfoTest.RunTest();
+            //Test.FileInfoTest.RunTest();
 
 
             //Tests ready for Matthijs to fix ;)

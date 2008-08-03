@@ -6,7 +6,7 @@ using Cosmos.FileSystem;
 using Cosmos.FileSystem.Ext2;
 using Cosmos.Hardware;
 using Cosmos.Hardware.Storage;
-using DebugUtil=Cosmos.FileSystem.DebugUtil;
+//using DebugUtil=Cosmos.FileSystem.DebugUtil;
 
 namespace Cosmos.Sys {
     public static class VFSManager {
@@ -49,7 +49,13 @@ namespace Cosmos.Sys {
                                           32);
         }
 
+        /// <summary>
+        /// Get a single directory from the given path.
+        /// </summary>
+        /// <param name="aPath"></param>
+        /// <returns></returns>
         public static FilesystemEntry GetDirectoryEntry(string aPath) {
+            Cosmos.Hardware.DebugUtil.SendMessage("GetDirectoryEntry", "Searching for " + aPath);
             if (String.IsNullOrEmpty(aPath)) {
                 throw new ArgumentNullException("aPath");
             }
@@ -78,9 +84,11 @@ namespace Cosmos.Sys {
                     var xListing = xFS.GetDirectoryListing(xCurrentFSEntryId);
                     bool xFound = false;
                     for (int j = 0; j < xListing.Length; j++) {
+                        Cosmos.Hardware.DebugUtil.SendMessage("GetDirectoryEntry","Checking if " + xListing[j].Name + " equals " + xPathParts[i]);
                         if (xListing[j].Name.Equals(xPathParts[i])) {
                             xCurrentFSEntryId = xListing[j].Id;
                             if (i == (xPathParts.Length - 1)) {
+                                Cosmos.Hardware.DebugUtil.SendMessage("GetDirectoryEntry", "Found match! : " + xListing[j].Name);
                                 return xListing[j];
                             }
                             xFound = true;
@@ -88,9 +96,11 @@ namespace Cosmos.Sys {
                         }
                     }
                     if (!xFound) {
+                        Cosmos.Hardware.DebugUtil.SendError("GetDirectoryEntry", "Path not found(1)");
                         throw new Exception("Path not found!");
                     }
                 }
+                Cosmos.Hardware.DebugUtil.SendError("GetDirectoryEntry", "Path not found(2)");
                 throw new Exception("Path not found!");
             }
         }
@@ -132,6 +142,20 @@ namespace Cosmos.Sys {
                 }
                 return xParentItem.Filesystem.GetDirectoryListing(xParentItem.Id);
             }
+        }
+
+        /// <summary>
+        /// Retrieves all files and directories in the given directory entry.
+        /// </summary>
+        /// <param name="aDirectory">Must be a Directory entry.</param>
+        /// <returns></returns>
+        public static FilesystemEntry[] GetDirectoryListing(FilesystemEntry aDirectory)
+        {
+            if (!aDirectory.IsDirectory)
+                throw new ArgumentException("Only Directories are allowed");
+
+            var xFS = aDirectory.Filesystem;
+            return xFS.GetDirectoryListing(aDirectory.Id);
         }
 
         /// <summary>
@@ -196,35 +220,83 @@ namespace Cosmos.Sys {
         public static bool FileExists(string s) {
             try
             {
+                var xDirectory = GetDirectoryEntry(Path.GetDirectoryName(s));
+
+                Cosmos.Hardware.DebugUtil.SendMessage("FileExists", "1");
                 var xEntries = GetDirectoryListing(Path.GetDirectoryName(s));
+                Cosmos.Hardware.DebugUtil.SendMessage("FileExists", "2");
                 string xFileName = Path.GetFileName(s);
+                Cosmos.Hardware.DebugUtil.SendMessage("FileExists", "3");
                 for (int i = 0; i < xEntries.Length; i++)
                 {
+                    Cosmos.Hardware.DebugUtil.SendMessage("FileExists", "4");
                     if (xEntries[i].Name.Equals(xFileName))
                     {
+                        Cosmos.Hardware.DebugUtil.SendMessage("FileExists", "5");
                         return !xEntries[i].IsDirectory;
                     }
                 }
                 return false;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Cosmos.Hardware.DebugUtil.SendMessage("FileExists", e.Message);
                 return false;
             }
         }
 
         public static string ReadFileAsString(string aFile)
         {
-            //var xFile = GetFileEntry(aFile);
-            //var xFS = GetFileSystemFromPath(aFile, 1);
+            var xFile = GetFileEntry(aFile);
+            Hardware.DebugUtil.SendMessage("ReadFile", "Found file " + xFile.Id.ToString());
+            var xFS = GetFileSystemFromPath(aFile, 1);
+            Hardware.DebugUtil.SendMessage("ReadFile", "Found filesystem " + xFS.RootId.ToString());
 
-            //byte[] xFileBuffer = new byte[255];
-            //if (xFS.ReadBlock(xFile.Id, 0, xFileBuffer))
-            //    return xFileBuffer.ToString();
-            //else
-            //    throw new Exception("Unable to read contents of file " + xFile);
+            byte[] xSingleBlockBuffer = new byte[xFS.BlockSize];
+            byte[] xAllBlocksBuffer = new byte[xFile.Size];
+
+            for (uint i = 0; i < (xAllBlocksBuffer.Length/xSingleBlockBuffer.Length); i++)
+            {
+                Hardware.DebugUtil.SendMessage("ReadFile", "Reading block " + i.ToString());
+                //Read the block
+                if (!xFS.ReadBlock(xFile.Id, i, xSingleBlockBuffer))
+                {
+                    Console.Write("Error while processing file! (");
+                    Console.Write(((uint)xFile.Id).ToString());
+                    Console.WriteLine(")");
+                    return "";
+                }
+
+                int xCurLength = xAllBlocksBuffer.Length % xSingleBlockBuffer.Length;
+                if (xCurLength == 0)
+                {
+                    xCurLength = xSingleBlockBuffer.Length;
+                }
+
+                //Copy the single block into the full buffer
+                Array.Copy(xSingleBlockBuffer, 0, xAllBlocksBuffer, i * xSingleBlockBuffer.Length, xCurLength);
+
+                //If we read exactly to the end, then break
+                if ((i + 1) == (xAllBlocksBuffer.Length / xSingleBlockBuffer.Length))
+                {
+                    break;
+                }
+            }
+
+            if (xAllBlocksBuffer.Length > 0)
+            {
+                System.Text.StringBuilder xBuilder = new System.Text.StringBuilder(xAllBlocksBuffer.Length);
+                for (int i = 0; i < xAllBlocksBuffer.Length; i++)
+                {
+                    xBuilder.Append(xAllBlocksBuffer[i].ToString());
+                }
+                return xBuilder.ToString();
+                //return new string(xAllBlocksBuffer).ToString();
+            }
+            else
+                throw new Exception("Unable to read contents of file " + xFile);
             
-            return "Dummy file contents";
+            //return "Dummy file contents";
         }
 
         /// <summary>
@@ -254,6 +326,11 @@ namespace Cosmos.Sys {
              
         }
 
+        /// <summary>
+        /// Retrieve multiple directories from the given directory.
+        /// </summary>
+        /// <param name="aDir"></param>
+        /// <returns></returns>
         public static FilesystemEntry[] GetDirectories(string aDir)
         {
             if (aDir == null)
@@ -274,25 +351,48 @@ namespace Cosmos.Sys {
             return xDirectories.ToArray();
         }
 
+
+        /// <summary>
+        /// Retrieve a specific file with the given path.
+        /// </summary>
+        /// <param name="aFile"></param>
+        /// <returns></returns>
         public static FilesystemEntry GetFileEntry(String aFile)
         {
+            Hardware.DebugUtil.SendMessage("GetFileEntry", "Searching for file " + aFile);
             string xFileName = Path.GetFileName(aFile);
+            Hardware.DebugUtil.SendMessage("GetFileEntry", "Filename is " + xFileName);
 
             //Find the directory first.
-            var xDirectory = VFSManager.GetDirectoryEntry(Path.GetDirectoryName(aFile));
+            var xDirectory = VFSManager.GetDirectoryEntry(Path.GetDirectoryName(aFile)); 
+            Hardware.DebugUtil.SendMessage("GetFileEntry", "Directory is " + xDirectory.Name);
 
             //Then find file in that directory
-            var xFS = GetFileSystemFromPath(aFile, 1);
+            //var xFS = GetFileSystemFromPath(aFile, 1);
+            //Hardware.DebugUtil.SendMessage("GetFileEntry", "Got filesystem");
 
-            FilesystemEntry[] xEntries = xFS.GetDirectoryListing(xDirectory.Id);
+            //FilesystemEntry[] xEntries = xFS.GetDirectoryListing(xDirectory.Id);
+            //Hardware.DebugUtil.SendMessage("GetFileEntry", "Got Directory Listing");
+
+            FilesystemEntry[] xEntries = GetDirectoryListing(xDirectory);
+
             foreach (FilesystemEntry xEntry in xEntries)
+            {
+                Hardware.DebugUtil.SendMessage("GetFileEntry", "Matching " + xEntry.Name + " with " + xFileName);
                 if (xEntry.Name == xFileName)
                     return xEntry;
+            }
 
             //throw new FileNotFoundException();
+            Hardware.DebugUtil.SendMessage("GetFileEntry", "File not found: " + aFile);
             return null;
         }
 
+        /// <summary>
+        /// Get all the files in the given directory.
+        /// </summary>
+        /// <param name="aDir"></param>
+        /// <returns></returns>
         public static FilesystemEntry[] GetFiles(string aDir)
         {
             if (aDir == null)
@@ -333,6 +433,31 @@ namespace Cosmos.Sys {
             //return (from xEntry in GetDirectoryListing(aDir) where !xEntry.IsDirectory select xEntry).ToArray();
         }
 
+        /// <summary>
+        /// Get the files in the given Directory entry
+        /// </summary>
+        /// <param name="aDir">Must be a Directory</param>
+        /// <returns></returns>
+        public static FilesystemEntry[] GetFiles(FilesystemEntry aDir)
+        {
+            if (aDir == null)
+                throw new ArgumentNullException("aDir in GetFiles(FilesystemEntry)");
+
+            if (!aDir.IsDirectory)
+                throw new Exception("Must be a directory");
+
+            List<FilesystemEntry> xFiles = new List<FilesystemEntry>();
+            foreach (FilesystemEntry xEntry in GetDirectoryListing(aDir))
+                if (!xEntry.IsDirectory)
+                    xFiles.Add(xEntry);
+
+            return xFiles.ToArray();
+        }
+
+        /// <summary>
+        /// Get the logical drives found. Formatted as 1:/
+        /// </summary>
+        /// <returns></returns>
         public static string[] GetLogicalDrives()
         {
             List<string> xDrives = new List<string>();

@@ -58,8 +58,6 @@ namespace FrodeTest.Test {
                 Console.WriteLine("7");
                 Cosmos.Hardware.DebugUtil.SendMessage("ExceptionTest", "7 done");
             }
-
-            e.ThrowInstanceExceptionReturnBool();
         }
 
         public static void ThrowStaticExceptionReturnVoid() {
