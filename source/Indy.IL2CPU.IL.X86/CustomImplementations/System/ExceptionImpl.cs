@@ -15,9 +15,14 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System {
 		public static unsafe string GetClassName(uint* aThis) {
 			int xObjectType = (int)*aThis;
 			return VTablesImpl.GetTypeName(xObjectType);
-	}
+	    }
 
-		[PlugMethod(Signature = "System_String__System_Exception_GetMessageFromNativeResources_System_Exception_ExceptionMessageKind_")]
+        public static string get_Message(Exception aThis, [FieldAccess(Name = "System.String System.Exception._message")]string mMessage)
+        {
+            return mMessage;
+        }
+
+	    [PlugMethod(Signature = "System_String__System_Exception_GetMessageFromNativeResources_System_Exception_ExceptionMessageKind_")]
 		public static string GetMessageFromNativeResources(int aKind) {
 			if (aKind == 0x3) {
 				return "Out of memory!";

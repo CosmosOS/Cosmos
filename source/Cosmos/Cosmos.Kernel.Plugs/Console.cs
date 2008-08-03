@@ -126,6 +126,10 @@ namespace Cosmos.Kernel.Plugs
             TextScreen.NewLine();
         }
 
+        public static int Read() {
+            return Keyboard.ReadChar();
+        }
+
         public static string ReadLine()
         {
             List<char> chars = new List<char>(32);

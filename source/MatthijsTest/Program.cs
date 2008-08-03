@@ -10,6 +10,7 @@ using Cosmos.FileSystem.Ext2;
 using Cosmos.Hardware;
 using Cosmos.Kernel;
 using Cosmos.Sys;
+using Mono.Terminal;
 
 namespace MatthijsTest {
     public class Program {
@@ -139,11 +140,18 @@ namespace MatthijsTest {
 
         private static event Action TestEvent;
         public static void Init() {
-            var xTest = new TestClassEvents();
-            TestEvent = xTest.Test;
-            TestEvent += MyMethod;
-            TestEvent();
-
+            bool xTest = false;
+            if (xTest)
+            {
+                Cosmos.Sys.Boot.Default();
+            }
+            //Application.Init(false);
+            //Application.ColorDialogNormal = (int)ConsoleColor.DarkGray;
+//            Application.
+            Dialog d = new Dialog(40, 8, "Hello");
+            d.Redraw();
+            //d.Add(new Label(0, 0, "Hello World"));
+            //Application.Run(d);
             Console.WriteLine("Done");
             do {
                 Console.WriteLine(Console.ReadLine());

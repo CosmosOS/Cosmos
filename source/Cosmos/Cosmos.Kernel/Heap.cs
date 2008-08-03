@@ -119,9 +119,6 @@ namespace Cosmos.Kernel {
                 Console.CursorTop = 0;
                 WriteNumber(mStartAddress,
                             32);
-                Console.Write("/");
-                WriteNumber(mEndOfRam,
-                            32);
                 Console.CursorLeft = xOldPositionLeft;
                 Console.CursorTop = xOldPositionTop;
             }

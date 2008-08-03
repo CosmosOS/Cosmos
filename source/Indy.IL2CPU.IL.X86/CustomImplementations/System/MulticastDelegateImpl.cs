@@ -13,5 +13,10 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System {
         {
             throw new Exception("This method should be implemented using a MethodAssembler");
         }
+
+        public static bool Equals(MulticastDelegate aThis, object aThat) {
+            // todo: implement MulticastDelegate.Equals(MulticastDelegate)
+            return false;
+        }
 	}
 }

@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<cosmos-config version="1" hintpath="D:\.NET\Cosmos\repos\source\3PLibraryPlugs\mono-curses.Plugs\bin\debug">
+  <plug-assembly>mono-curses.Plugs.dll</plug-assembly>
+</cosmos-config>

@@ -22,7 +22,8 @@ namespace Cosmos.Hardware
 
         public static int Rows
         {
-            get { return 25; }
+            // for now 24 lines, as it's one line for the Heap Debug Display
+            get { return 24; }
         }
 
         public static int Columns
@@ -49,7 +50,7 @@ namespace Cosmos.Hardware
             CheckInit();
             
             byte* xScreenPtr = (byte*)(VideoAddr + (2 * Columns));
-            for (int i = 0; i < Columns * (Rows -1); i++)
+            for (int i = 0; i < Columns * (Rows); i++)
             {
                 *xScreenPtr = 0;
                 xScreenPtr++;
@@ -96,7 +97,7 @@ namespace Cosmos.Hardware
         {
             CheckInit();
             int Columns2 = Columns * 2;
-            byte* xScreenPtr = (byte*)(VideoAddr);
+            byte* xScreenPtr = (byte*)(VideoAddr + Columns2);
             for (int i = 0; i < Columns * Rows; i++)
             {
                 *xScreenPtr = *(xScreenPtr + Columns2);

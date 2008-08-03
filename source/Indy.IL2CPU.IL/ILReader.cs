@@ -112,18 +112,27 @@ namespace Indy.IL2CPU.IL {
 		private FieldInfo mOperandValueField;
 		public FieldInfo OperandValueField {
 			get {
-				if (mOperandValueField == null) {
-					Type[] xTypeGenArgs = null;
-					Type[] xMethodGenArgs = null;
-					if (mMethod.DeclaringType.IsGenericType) {
-						xTypeGenArgs = mMethod.DeclaringType.GetGenericArguments();
-					}
-					if (mMethod.IsGenericMethod) {
-						xMethodGenArgs = mMethod.GetGenericArguments();
-					}
-					mOperandValueField = mModule.ResolveField(OperandValueInt32, xTypeGenArgs, xMethodGenArgs);
-				}
-				return mOperandValueField;
+                if (mOperandValueField == null) {
+                    try
+                    {
+                        Type[] xTypeGenArgs = null;
+                        Type[] xMethodGenArgs = null;
+                        if (mMethod.DeclaringType.IsGenericType)
+                        {
+                            xTypeGenArgs = mMethod.DeclaringType.GetGenericArguments();
+                        }
+                        if (mMethod.IsGenericMethod)
+                        {
+                            xMethodGenArgs = mMethod.GetGenericArguments();
+                        }
+                        mOperandValueField = mModule.ResolveField(OperandValueInt32,
+                                                                  xTypeGenArgs,
+                                                                  xMethodGenArgs);
+                    }
+                    catch {
+                    }
+                }
+			    return mOperandValueField;
 			}
 		}
 
@@ -131,15 +140,20 @@ namespace Indy.IL2CPU.IL {
 		public Type OperandValueType {
 			get {
 				if (mOperandValueType == null) {
-					Type[] xTypeGenArgs = null;
-					Type[] xMethodGenArgs = null;
-					if (mMethod.DeclaringType.IsGenericType) {
-						xTypeGenArgs = mMethod.DeclaringType.GetGenericArguments();
-					}
-					if (mMethod.IsGenericMethod) {
-						xMethodGenArgs = mMethod.GetGenericArguments();
-					}
-					mOperandValueType = mModule.ResolveType(OperandValueInt32, xTypeGenArgs, xMethodGenArgs);
+                   try{
+                        Type[] xTypeGenArgs = null;
+                        Type[] xMethodGenArgs = null;
+                        if (mMethod.DeclaringType.IsGenericType) {
+                            xTypeGenArgs = mMethod.DeclaringType.GetGenericArguments();
+                        }
+                        if (mMethod.IsGenericMethod) {
+                            xMethodGenArgs = mMethod.GetGenericArguments();
+                        }
+                        mOperandValueType = mModule.ResolveType(OperandValueInt32,
+                                                                xTypeGenArgs,
+                                                                xMethodGenArgs);
+                    }catch {
+                    }
 				}
 				return mOperandValueType;
 			}

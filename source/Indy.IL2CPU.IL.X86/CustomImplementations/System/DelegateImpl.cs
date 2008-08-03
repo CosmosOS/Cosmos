@@ -35,5 +35,9 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System
 		//}
 
 		public static IntPtr GetInvokeMethod() { return IntPtr.Zero; }
+        public static bool Equals(Delegate aThis, object aThat) {
+            // todo: implement proper Delegate.Equals(object)
+            return false;
+        }
 	}
 }
