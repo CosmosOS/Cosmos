@@ -24,9 +24,9 @@ namespace Cosmos.Sys {
             #endregion
         }
 
-        public static void Initialize() {
+        public static void Init() {
             if (mFilesystems != null) {
-                throw new Exception("FSManager already initialized!");
+                throw new Exception("Virtual File System Manager already initialized!");
             }
             mFilesystems = new List<Filesystem>(4);
             for (int i = 0; i < Device.Devices.Count; i++) {
@@ -114,11 +114,12 @@ namespace Cosmos.Sys {
             if (String.IsNullOrEmpty(aPath)) {
                 throw new ArgumentNullException("aPath is null in GetDirectoryListing");
             }
+            
             if (aPath[0] != '/' && aPath[0] != '\\') {
                 throw new Exception("Incorrect path, must start with / or \\!");
-            }
+            }                
+           
             if (aPath.Length == 1) {
-                // get listing of all drives:
                 var xResult = new FilesystemEntry[mFilesystems.Count];
                 for (int i = 0; i < mFilesystems.Count; i++) {
                     xResult[i] = new FilesystemEntry() {
@@ -140,8 +141,10 @@ namespace Cosmos.Sys {
                     var xFS = GetFileSystemFromPath(aPath,1);
                     return xFS.GetDirectoryListing(xFS.RootId);
                 }
+                
                 return xParentItem.Filesystem.GetDirectoryListing(xParentItem.Id);
             }
+            
         }
 
         /// <summary>

@@ -17,9 +17,16 @@ namespace Cosmos.Sys {
         /// Initializes basic hardware like CPU, serialports, PCI, Keyboard and blockdevices.
         /// </summary>
         public static void Default() {
+            Console.Clear();
+            Console.WriteLine("Initializing KERNEL");
             Kernel.Global.Init();
+
+            Console.WriteLine("Initializing HARDWARE");
             Hardware.Global.Init();
-            VFSManager.Initialize();
+
+            Console.WriteLine("Initializing SYSTEM");
+            Sys.Global.Init();
+            
             Console.Clear();
         }
     }

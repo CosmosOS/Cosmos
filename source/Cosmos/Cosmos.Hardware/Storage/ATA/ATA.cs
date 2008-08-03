@@ -235,15 +235,12 @@ namespace Cosmos.Hardware.Storage.ATA {
 			for (byte xControllerBaseAIdx = 0; xControllerBaseAIdx < GetControllerAddressCount(); xControllerBaseAIdx++) {
 				for (byte xDrive = 0; xDrive < 2; xDrive++) {
 					IOWriteByte((ushort)(GetControllerAddress1(xControllerBaseAIdx) + ATA_DRIVEHEAD), (byte)((xControllerBaseAIdx << 4) | 0xA0 | (xDrive << 4)));
-
-                    Console.WriteLine("ok1");
+                    Console.WriteLine("        Drive " + xDrive);
                     CPU.Halt();
-                    Console.WriteLine("ok2");
 					if (IOReadByte((ushort)(GetControllerAddress1(xControllerBaseAIdx) + ATA_STATUS)) == 0x50) {
 						ATA xATA;
 						Device.Add(xATA = new ATA(String.Concat(mControllerNumbers[xControllerBaseAIdx], " ", mDriveNames[xDrive]), xControllerBaseAIdx, xDrive));
 						DebugUtil.SendNumber("ATA", "Device Size", (uint)xATA.BlockCount, 32);
-                        Console.WriteLine("ok3");
 					}
 				}
 			}

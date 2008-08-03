@@ -9,21 +9,28 @@ namespace Cosmos.Hardware {
         }
 
         public static void Init() {
+            Console.WriteLine("    Init Global Descriptor Table");
             Kernel.CPU.CreateGDT();
+            Console.WriteLine("    Init PIC");
             PIC.Init();
 
+            Console.WriteLine("    Init Serial");
             Serial.InitSerial(0);
             //PIT.Initialize(Tick);
 
             //HW.Interrupts.IRQ01 += new Interrupts.InterruptDelegate(Cosmos.Hardware.Keyboard.HandleKeyboardInterrupt);
+            Console.WriteLine("    Init IRQ");
             Interrupts.Init();
             Kernel.CPU.CreateIDT(true);
-            
+
+            Console.WriteLine("    Init PCIBus");
             PCIBus.Init();
 
             // Old
+            Console.WriteLine("    Init Keyboard");
             Keyboard.Initialize();
             // New
+            Console.WriteLine("    Init ATA");
             Storage.ATA.ATA.Initialize();
             //Device.Add(new PC.Bus.CPU.Keyboard());
         }
