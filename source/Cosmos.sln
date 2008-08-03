@@ -110,9 +110,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mono-curses.Plugs", "3PLibr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Demos.NibblesCS", "Cosmos.Demos.NibblesCS\Cosmos.Demos.NibblesCS.csproj", "{301BAFD2-D15B-4B95-8C59-65D7D0390A76}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VGAFontMaker", "VGAFontMaker\VGAFontMaker.csproj", "{5DC4FE9C-A91A-42C1-A18B-B28E8388A8C4}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 40
+		SccNumberOfProjects = 41
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -272,6 +274,10 @@ Global
 		SccProjectTopLevelParentUniqueName39 = Cosmos.sln
 		SccProjectName39 = Cosmos.Demos.NibblesCS
 		SccLocalPath39 = Cosmos.Demos.NibblesCS
+		SccProjectUniqueName40 = VGAFontMaker\\VGAFontMaker.csproj
+		SccProjectTopLevelParentUniqueName40 = Cosmos.sln
+		SccProjectName40 = VGAFontMaker
+		SccLocalPath40 = VGAFontMaker
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -432,6 +438,10 @@ Global
 		{301BAFD2-D15B-4B95-8C59-65D7D0390A76}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{301BAFD2-D15B-4B95-8C59-65D7D0390A76}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{301BAFD2-D15B-4B95-8C59-65D7D0390A76}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5DC4FE9C-A91A-42C1-A18B-B28E8388A8C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5DC4FE9C-A91A-42C1-A18B-B28E8388A8C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5DC4FE9C-A91A-42C1-A18B-B28E8388A8C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5DC4FE9C-A91A-42C1-A18B-B28E8388A8C4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -475,6 +485,7 @@ Global
 		{079D6377-44C2-4155-B73A-E634E8F1BF6E} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
 		{97AC0D14-645F-4BC2-B5A6-A4CA1C6198D4} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
 		{77DE5600-A012-49E5-8877-67CDB0304B0A} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
+		{5DC4FE9C-A91A-42C1-A18B-B28E8388A8C4} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
 		{605F8D53-66FA-4BEC-844E-F63209B855C9} = {B2F8734A-DA5C-4F65-BD67-B9E717DC510E}
 		{DA1DFD9E-B80C-4304-BCBA-B313255F6B01} = {55682BBB-A596-4C97-BED5-8BCCBAD81439}
 		{1A26AB20-C7BB-4AAC-8B8A-A1960DC82CAD} = {55682BBB-A596-4C97-BED5-8BCCBAD81439}

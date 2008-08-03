@@ -21,7 +21,7 @@ namespace SteveKernel
             Cosmos.Sys.Boot.Default();
 
 
-            Cosmos.Hardware.VGAScreen.SetMode80x50xText();
+            Cosmos.Hardware.VGAScreen.SetMode80x25xText();
 
             for (int i=0;i<1000; i++)
                 Console.Write("sdkjfhdsf dfs sdf dsf sdf sdf sdf sf sdkjfhskjfhsdkjh");
