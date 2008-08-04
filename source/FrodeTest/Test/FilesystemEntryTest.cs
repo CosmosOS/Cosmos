@@ -37,7 +37,7 @@ namespace FrodeTest.Test
         public static FilesystemEntry[] GetMultipleEntries()
         {
             var xResult = new List<FilesystemEntry>(2);
-            for (int i = 10; i < 20; i++)
+            for (int i = 10; i < 13; i++)
             {
                 var xEntry = new FilesystemEntry { Name = i.ToString() };
                 xResult.Add(xEntry);

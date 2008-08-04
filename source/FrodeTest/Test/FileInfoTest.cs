@@ -14,10 +14,10 @@ namespace FrodeTest.Test
 
             FileInfo file = new FileInfo("/0/Readme.txt");
             Console.WriteLine("Name: " + file.Name);
-            if (file.Exists)
-                Console.WriteLine("File exists");
-            else
-                Console.WriteLine("File does not exist!");
+            //if (file.Exists)
+            //    Console.WriteLine("File exists");
+            //else
+            //    Console.WriteLine("File does not exist!");
 
 
         }

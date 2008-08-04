@@ -17,7 +17,7 @@ namespace FrodeTest.Shell
         public static void Run()
         {
             //Console.Write(@"Cosmos:\>");
-            Console.Write(EnvironmentVariables.GetCurrent().CurrentDirectory + ">");
+            Console.Write(System.IO.Directory.GetCurrentDirectory() + ">");
             string command = Console.ReadLine();
 
             if (command.Equals("exit") || command.Equals("test"))

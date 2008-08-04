@@ -12,15 +12,17 @@ namespace FrodeTest.Test
         {
             Console.WriteLine("-- TESTING System.IO.DirectoryInfo --");
 
-            DirectoryInfo dir = new DirectoryInfo("/0/Frode/");
-            //Console.WriteLine("FullName: " + dir.FullName);
-            //Console.WriteLine("Name: " + dir.Name);
-            
-            //Console.WriteLine("ToString: " + dir.ToString());
+            //Console.WriteLine("CurrentDirectory: " + Environment.CurrentDirectory);
 
-            //Console.WriteLine("Files in the directory:");
-            //foreach (FileInfo file in dir.GetFiles())
-            //    Console.WriteLine(file.Name);
+            DirectoryInfo dir = new DirectoryInfo("/0/lost+found/");
+            Console.WriteLine("FullName: " + dir.FullName);
+            Console.WriteLine("Name: " + dir.Name);
+
+            Console.WriteLine("ToString: " + dir.ToString());
+
+            Console.WriteLine("Files in the directory:");
+            foreach (FileInfo file in dir.GetFiles())
+                Console.WriteLine(file.Name);
 
 
             if (dir.Exists)

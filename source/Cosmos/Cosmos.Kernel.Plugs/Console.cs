@@ -89,6 +89,11 @@ namespace Cosmos.Kernel.Plugs
                 {
                     continue;
                 }
+                if (aText[i] == '\t')
+                {
+                    Write("    ");
+                    continue;
+                }
                 TextScreen.WriteChar(aText[i]);
             }
         }
@@ -225,3 +230,4 @@ namespace Cosmos.Kernel.Plugs
         }
     }
 }
+

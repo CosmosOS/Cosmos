@@ -49,6 +49,39 @@ namespace Cosmos.Sys {
                                           32);
         }
 
+        //Path examples:
+
+        //  1:\Dir\File.txt
+        //  1:\Dir\
+        //  1:\Dir
+        //  1:/Dir/
+        //  0:\Dir\Sub
+        //  Sub
+        //  Sub/
+        //  Sub\File.txt
+        //  ..\Other\File.txt
+        //  ..\..\Other
+
+        public static bool ContainsVolumeSeparator(this string aPath)
+        {
+            return aPath.Contains(Path.VolumeSeparatorChar);
+        }
+
+        public static bool IsAbsolutePath(this string aPath)
+        {
+            return aPath.ContainsVolumeSeparator();
+        }
+
+        public static bool IsRelativePath(this string aPath)
+        {
+            return !aPath.ContainsVolumeSeparator();
+        }
+
+        public static string[] SplitPath(string aPath)
+        {
+            return aPath.Split(new char[]{Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar}, StringSplitOptions.RemoveEmptyEntries);
+        }
+
         /// <summary>
         /// Get a single directory from the given path.
         /// </summary>

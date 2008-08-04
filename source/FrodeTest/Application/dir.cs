@@ -18,14 +18,20 @@ namespace FrodeTest.Application
             try
             {
                 //Get current directory
-                string xCurrentDirectory = EnvironmentVariables.GetCurrent().CurrentDirectory;
-                Console.WriteLine(" Directory of " + xCurrentDirectory);
+                string xDir = string.Empty;
+                if (args[0] != null)
+                    xDir = args[0];
+                else
+                    xDir = Directory.GetCurrentDirectory();
+                //xDir= EnvironmentVariables.GetCurrent().CurrentDirectory; //HACK
 
-                foreach (string xDirectory in Directory.GetDirectories(xCurrentDirectory))
-                    Console.WriteLine("<DIR>   " + xDirectory);
+                Console.WriteLine(" Directory of " + xDir);
 
-                foreach (string xFile in Directory.GetFiles(xCurrentDirectory))
-                    Console.WriteLine("        " + xFile);
+                foreach (string xDirectory in Directory.GetDirectories(xDir))
+                    Console.WriteLine("<DIR>\t" + xDirectory);
+
+                foreach (string xFile in Directory.GetFiles(xDir))
+                    Console.WriteLine("\t\t" + xFile);
             }
             catch (Exception e)
             {
