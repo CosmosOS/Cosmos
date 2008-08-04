@@ -844,19 +844,32 @@ namespace Indy.IL2CPU {
                 if (!xContinue) {
                     continue;
                 }
-                if (xFoundMethod.IsVirtual == aMethod.IsVirtual && xFoundMethod.IsPrivate == false && xFoundMethod.IsPublic == aMethod.IsPublic && xFoundMethod.IsFamily == aMethod.IsFamily && xFoundMethod.IsFamilyAndAssembly == aMethod.IsFamilyAndAssembly && xFoundMethod.IsFamilyOrAssembly == aMethod.IsFamilyOrAssembly && xFoundMethod.IsFinal == false) {
-                    var xFoundMethInfo = xFoundMethod as MethodInfo;
-                    var xBaseMethInfo = xBaseMethod as MethodInfo;
-                    if (xFoundMethInfo == null && xBaseMethInfo == null) {
-                        xBaseMethod = xFoundMethod;
-                    }
-                    if (xFoundMethInfo != null && xBaseMethInfo != null) {
-                        if (xFoundMethInfo.ReturnType.AssemblyQualifiedName.Equals(xBaseMethInfo.ReturnType.AssemblyQualifiedName)) {
+                if (xFoundMethod != null)
+                {
+                    xBaseMethod = xFoundMethod;
+
+                    if (xFoundMethod.IsVirtual == aMethod.IsVirtual && xFoundMethod.IsPrivate == false && xFoundMethod.IsPublic == aMethod.IsPublic && xFoundMethod.IsFamily == aMethod.IsFamily && xFoundMethod.IsFamilyAndAssembly == aMethod.IsFamilyAndAssembly && xFoundMethod.IsFamilyOrAssembly == aMethod.IsFamilyOrAssembly && xFoundMethod.IsFinal == false)
+                    {
+                        var xFoundMethInfo = xFoundMethod as MethodInfo;
+                        var xBaseMethInfo = xBaseMethod as MethodInfo;
+                        if (xFoundMethInfo == null && xBaseMethInfo == null)
+                        {
                             xBaseMethod = xFoundMethod;
                         }
+                        if (xFoundMethInfo != null && xBaseMethInfo != null)
+                        {
+                            if (xFoundMethInfo.ReturnType.AssemblyQualifiedName.Equals(xBaseMethInfo.ReturnType.AssemblyQualifiedName))
+                            {
+                                xBaseMethod = xFoundMethod;
+                            }
+                        }
+                        //xBaseMethod = xFoundMethod;
                     }
-                    //xBaseMethod = xFoundMethod;
                 }
+                //else
+                //{
+                //    xBaseMethod = xFoundMethod;
+                //}
             }
             //} catch (Exception) {
             // todo: try to get rid of the try..catch
