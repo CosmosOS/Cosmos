@@ -21,10 +21,17 @@ namespace SteveKernel
             Cosmos.Sys.Boot.Default();
 
 
-            Cosmos.Hardware.VGAScreen.SetMode80x25xText();
+            Random r = new Random(0);
+            Console.WriteLine(r.Next().ToString());
+            Console.WriteLine(r.Next().ToString());
+            Console.WriteLine(r.Next().ToString());
+            Console.WriteLine(r.Next().ToString());
+            Console.WriteLine(r.Next().ToString());
 
-            for (int i=0;i<1000; i++)
-                Console.Write("sdkjfhdsf dfs sdf dsf sdf sdf sdf sf sdkjfhskjfhsdkjh");
+            //Cosmos.Hardware.VGAScreen.SetMode80x25xText();
+
+            //for (int i=0;i<1000; i++)
+            //    Console.Write("sdkjfhdsf dfs sdf dsf sdf sdf sdf sf sdkjfhskjfhsdkjh");
         }
     }
 }

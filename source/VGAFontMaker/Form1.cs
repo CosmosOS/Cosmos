@@ -278,7 +278,8 @@ namespace VGAFontMaker
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-                  Font F = new Font(new FontFamily("Lucida Console"), 15, GraphicsUnit.Pixel);
+                  Font F = new Font(FontFamily.Families.First(f => f.GetName(0).Contains("Jupiter")), 16);
+
             for (int i = 32; i < 128; i++)
             {
                 Bitmap bit= new Bitmap(8, 16, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
@@ -292,7 +293,7 @@ namespace VGAFontMaker
                 g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
 
                 g.DrawString((char)i + " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!\"£$%^&*();'#:@~,./<>?\\|[]{}-=_+`¬",
-                    F, Brushes.White, -3, 0);
+                    F, Brushes.White, -3, -3);
 
                 g.Flush();
 

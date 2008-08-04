@@ -22,12 +22,14 @@ namespace Cosmos.Shell.Guess {
             Cosmos.Hardware.VGAScreen.SetMode80x25xText();
 
 
-            Random mt = new Random();
+            Random mt = new Random(
+                (int)(Cosmos.Hardware.Global.TickCount + Cosmos.Hardware.RTC.GetSeconds())
+                );
 
             while (true)
             {
 
-                int num = mt.Next(100);
+                int num = mt.Next() % 100; 
 
                 System.Console.WriteLine("I am thinking of a number between 0 and 100. What is it?");
                 System.Console.ForegroundColor = ConsoleColor.Blue;

@@ -11,5 +11,7 @@ namespace Indy.IL2CPU.IL.CustomImplementations.System
     {
         [PlugMethod(Signature = "System_Environment_OSName__System_Environment_get_OSInfo__")]
         public static int get_OSName() { return 0x82; }
+
     }
+
 }
