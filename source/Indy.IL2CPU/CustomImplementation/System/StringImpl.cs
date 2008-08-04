@@ -32,14 +32,18 @@ namespace Indy.IL2CPU.CustomImplementation.System {
 			return String.Concat(xStrings);
 		}
 
-		public static int IndexOf(string aThis, char c) {
-			for (int i = 0; i < aThis.Length; i++) {
-				if (aThis[i] == c) {
-					return i;
-				}
-			}
-			return -1;
-		}
+        //Plugged in Cosmos.Kernel.Plugs/String.cs
+        //public static int IndexOf(string aThis, char c, int offset, int count)
+        //{
+        //    for (int i = offset ; i < count; i++)
+        //    {
+        //        if (aThis[i] == c)
+        //        {
+        //            return i;
+        //        }
+        //    }
+        //    return -1;
+        //}
 
         public static int LastIndexOf(string aThis, char c)
         {
@@ -101,6 +105,21 @@ namespace Indy.IL2CPU.CustomImplementation.System {
 
 			return new string(cs);
 		}
+
+        public static string Replace(string aThis, char oldValue, char newValue)
+        {
+            char[] cs = new char[aThis.Length];
+
+            for (int i = 0; i < aThis.Length; i++)
+            {
+                if (aThis[i] != oldValue)
+                    cs[i] = aThis[i];
+                else
+                    cs[i] = newValue;
+            }
+
+            return new string(cs);
+        }
 
 		// HACK: We need to redo this once char support is complete (only returns 0, -1).
 		public static int CompareTo(string aThis, string other) {

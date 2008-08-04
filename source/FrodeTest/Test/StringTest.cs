@@ -66,6 +66,15 @@ namespace FrodeTest.Test
             Console.WriteLine("Long string \\ Long String");
             Console.WriteLine("Back to normal");
 
+            //.IndexOf
+            Console.WriteLine("Should be  0: " + "otto".IndexOf('o'));
+            Console.WriteLine("Should be  3: " + "otto".IndexOf('o', 1));
+            Console.WriteLine("Should be -1: " + "otto".IndexOf('o', 1, 1));
+            //Console.WriteLine("otto".IndexOf("tt"));
+
+            //.Replace
+            Console.WriteLine("Hello".Replace('l', 'E'));
+
             // Add \t as Tab
             //Console.WriteLine("Column1\tColumn2");
 
