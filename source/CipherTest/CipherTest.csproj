@@ -62,9 +62,9 @@
       <Project>{5784365C-ED22-42EB-BB8A-F3E09428D5B8}</Project>
       <Name>Cosmos.GdbClient</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Cosmos.Shell.Guess\Cosmos.Shell.Guess.csproj">
+    <ProjectReference Include="..\Cosmos.Shell.Guess\Cosmos.Demo.Guess.csproj">
       <Project>{C97DE890-58D2-41A1-86D0-A2E919E6DD80}</Project>
-      <Name>Cosmos.Shell.Guess</Name>
+      <Name>Cosmos.Demo.Guess</Name>
     </ProjectReference>
     <ProjectReference Include="..\CosmosBoot\CosmosBoot.csproj">
       <Project>{E2C54C80-75F3-4249-93B4-0003A4AF705F}</Project>

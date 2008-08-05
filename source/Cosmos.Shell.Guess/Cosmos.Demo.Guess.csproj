@@ -8,8 +8,8 @@
     <ProjectGuid>{C97DE890-58D2-41A1-86D0-A2E919E6DD80}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Cosmos.Shell.Guess</RootNamespace>
-    <AssemblyName>Cosmos.Shell.Guess</AssemblyName>
+    <RootNamespace>Cosmos.Demo.Guess</RootNamespace>
+    <AssemblyName>Cosmos.Demo.Guess</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>

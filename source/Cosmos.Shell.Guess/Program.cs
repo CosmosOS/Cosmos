@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Cosmos.Build.Windows;
 
-namespace Cosmos.Shell.Guess {
+namespace Cosmos.Demo.Guess {
 	public class Program {
 
 		#region Build Console
