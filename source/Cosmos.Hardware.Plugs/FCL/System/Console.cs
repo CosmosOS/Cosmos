@@ -4,7 +4,7 @@ using System.Text;
 using Cosmos.Hardware;
 using Indy.IL2CPU.Plugs;
 
-namespace Cosmos.Kernel.Plugs
+namespace Cosmos.Hardware.Plugs.FCL.System
 {
     [Plug(Target = typeof(System.Console))]
     class Console

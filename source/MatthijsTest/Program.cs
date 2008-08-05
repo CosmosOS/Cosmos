@@ -138,7 +138,7 @@ namespace MatthijsTest {
             }
         }
 
-        private static event Action TestEvent;
+        //private static event Action TestEvent;
         public static void Init() {
             bool xTest = false;
             if (xTest)

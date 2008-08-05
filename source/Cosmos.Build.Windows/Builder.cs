@@ -145,6 +145,7 @@ namespace Cosmos.Build.Windows
                 new string[]
                     {
                         Path.Combine(Path.Combine(ToolsPath, "Cosmos.Kernel.Plugs"), "Cosmos.Kernel.Plugs.dll"), 
+                        Path.Combine(Path.Combine(ToolsPath, "Cosmos.Hardware.Plugs"), "Cosmos.Hardware.Plugs.dll"), 
                         Path.Combine(Path.Combine(ToolsPath, "Cosmos.Sys.Plugs"), "Cosmos.Sys.Plugs.dll")
                     }, aDebugMode, aDebugComport, xAsmPath);
             xSW.Stop();
