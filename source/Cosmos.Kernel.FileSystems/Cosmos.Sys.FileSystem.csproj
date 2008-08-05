@@ -59,11 +59,6 @@
     <Compile Include="FileSystem_Old.cs" />
     <Compile Include="MBR.cs" />
     <Compile Include="MBT.cs" />
-    <Compile Include="Old\Ext2.cs" />
-    <Compile Include="Old\Ext2.Structs.cs" />
-    <Compile Include="Old\Ext2Old.cs" />
-    <Compile Include="Old\Ext2Old.Structs.cs" />
-    <Compile Include="Old\Fat16.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
