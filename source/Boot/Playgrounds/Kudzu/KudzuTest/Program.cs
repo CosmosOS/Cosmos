@@ -13,8 +13,9 @@ namespace KudzuTest {
         }
 
 		public static void Init() {
-            Cosmos.Sys.Boot.Default();
-			//System.Diagnostics.Debugger.Break();
+            var xBoot = new Cosmos.Sys.Boot();
+            xBoot.Execute();
+            //System.Diagnostics.Debugger.Break();
             Console.WriteLine("Boot complete");
 
             //PCITest.Test();

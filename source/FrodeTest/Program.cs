@@ -17,7 +17,8 @@ namespace FrodeTest
         //This is the playground for Frode "Scalpel" Lillerud.
         public static void Init()
         {
-            Cosmos.Sys.Boot.Default();
+            var xBoot = new Cosmos.Sys.Boot();
+            xBoot.Execute();
             //Cosmos.Hardware.VGAScreen.SetMode90x30xText();
 
             //Console.WriteLine("*** COSMOS Operating System - Frode's Test Suite ***");

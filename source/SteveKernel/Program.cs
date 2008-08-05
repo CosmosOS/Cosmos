@@ -17,9 +17,8 @@ namespace SteveKernel
         // Main entry point of the kernel
         public static void Init()
         {
-
-            Cosmos.Sys.Boot.Default();
-
+            var xBoot = new Cosmos.Sys.Boot();
+            xBoot.Execute();
 
             Random r = new Random(0);
             Console.WriteLine(r.Next().ToString());

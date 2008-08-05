@@ -20,7 +20,8 @@ namespace Cosmos.Shell.Console {
         // Write your code, and run. Cosmos build console will appear, select your target, and thats it!
         public static void Init() {
 			try {
-				Cosmos.Sys.Boot.Default();
+                var xBoot = new Cosmos.Sys.Boot();
+                xBoot.Execute();
                 System.Console.WriteLine("Sorry - the Cosmos.Shell.Console is currently not working.");
 				//stages.Enqueue(new Prompter());
 

@@ -14,46 +14,32 @@ namespace Cosmos.Shell.Guess {
 		}
 		#endregion
 
-        public static void Init()
-        {
-            Cosmos.Sys.Boot.Default();
+        public static void Init() {
+            var xBoot = new Cosmos.Sys.Boot();
+            xBoot.Execute();
 
-
-            Cosmos.Hardware.VGAScreen.SetMode80x25xText();
-
-
-            Random mt = new Random(
-                (int)(Cosmos.Hardware.Global.TickCount + Cosmos.Hardware.RTC.GetSeconds())
-                );
-
-            while (true)
-            {
-
-                int num = mt.Next() % 100; 
-
-                System.Console.WriteLine("I am thinking of a number between 0 and 100. What is it?");
-                System.Console.ForegroundColor = ConsoleColor.Blue;
-                System.Console.Write("Take a guess: ");
-                System.Console.ForegroundColor = ConsoleColor.White;
-                short guess = short.Parse(System.Console.ReadLine());
-
-                while (guess != num)
-                {
-                    System.Console.ForegroundColor = ConsoleColor.Red;
-                    if (guess > num)
-                        System.Console.WriteLine("Too high.");
-                    else
-                        System.Console.WriteLine("Too low.");
-
-                    System.Console.ForegroundColor = ConsoleColor.Blue;
-                    System.Console.Write("Take another guess: ");
-                    System.Console.ForegroundColor = ConsoleColor.White;
-                    guess = short.Parse(System.Console.ReadLine());
+            Random xRandom = new Random((int)(Cosmos.Hardware.Global.TickCount
+                + Cosmos.Hardware.RTC.GetSeconds()));
+            // Divide by 100, get remainder
+            int xMagicNo = xRandom.Next() % 100;
+            Console.WriteLine("I am thinking of a number between 0 and 100. What is it?");
+            while (true) {
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.Write("Take a guess: ");
+                Console.ForegroundColor = ConsoleColor.White;
+                short xGuess = short.Parse(Console.ReadLine());
+                if (xGuess == xMagicNo) {
+                    break;
                 }
 
-                System.Console.WriteLine("You got it!!!!");
+                Console.ForegroundColor = ConsoleColor.Red;
+                if (xGuess > xMagicNo) {
+                    Console.WriteLine("Too high.");
+                } else {
+                    Console.WriteLine("Too low.");
+                }
             }
-
+            Console.WriteLine("You got it!!!!");
         }
     }
 }

@@ -27,7 +27,9 @@ namespace EsxTest
 //            {
 //                Cosmos.Sys.Boot.Default();
 //            }
-            Cosmos.Sys.Boot.Default();
+            var xBoot = new Cosmos.Sys.Boot();
+            xBoot.Execute();
+
             RandomTest();
             //PciTest();
             //HeapTest();

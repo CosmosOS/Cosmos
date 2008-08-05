@@ -13,10 +13,14 @@ namespace CosmosBoot {
 
 		// Main entry point of the kernel
 		public static void Init() {
-            Cosmos.Sys.Boot.Default();
-			Console.WriteLine("Welcome! You just booted C# code. Please edit Program.cs to fit your needs");
-			while (true)
-				;
+            var xBoot = new Cosmos.Sys.Boot();
+            xBoot.Execute();
+
+            Console.WriteLine("Congratulations! You just booted C# code.");
+            Console.WriteLine("Edit Program.cs to create your own Operating System.");
+            while (true) {
+                // Put your code here
+            }
 		}
 	}
 }

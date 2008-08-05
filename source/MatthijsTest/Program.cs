@@ -143,7 +143,8 @@ namespace MatthijsTest {
             bool xTest = false;
             if (xTest)
             {
-                Cosmos.Sys.Boot.Default();
+                var xBoot = new Cosmos.Sys.Boot();
+                xBoot.Execute();
             }
             //Application.Init(false);
             //Application.ColorDialogNormal = (int)ConsoleColor.DarkGray;

@@ -193,36 +193,46 @@ namespace Cosmos.Hardware
 
         public delegate void SetPixelDelegate(uint x, uint y, uint c);
 
-        public static void SetMode40x24xText()
-        {
-            WriteVGARegisters(g_40x25_text);
-            WriteFont(g_8x16_font, 16);
+        public static void SetTextMode(int aCols, int aRows) {
+            bool xValidSize = true;
+            if (aCols == 40) {
+                if (aRows == 25) {
+                    WriteVGARegisters(g_40x25_text);
+                    WriteFont(g_8x16_font, 16);
+                } else if (aRows == 50) {
+                    WriteVGARegisters(g_40x50_text);
+                    WriteFont(g_8x8_font, 8);
+                } else {
+                    xValidSize = false;
+                }
+            } else if (aCols == 80) {
+                if (aRows == 25) {
+                    WriteVGARegisters(g_80x25_text);
+                    WriteFont(g_8x16_font, 16);
+                } else if (aRows == 50) {
+                    WriteVGARegisters(g_80x50_text);
+                    WriteFont(g_8x8_font, 8);
+                } else {
+                    xValidSize = false;
+                }
+            } else if (aCols == 90) {
+                if (aRows == 30) {
+                    WriteVGARegisters(g_90x30_text);
+                    WriteFont(g_8x16_font, 16);
+                } else if (aRows == 60) {
+                    WriteVGARegisters(g_90x60_text);
+                    WriteFont(g_8x8_font, 8);
+                } else {
+                    xValidSize = false;
+                }
+            } else {
+                xValidSize = false;
+            }
+            if (!xValidSize) {
+                throw new Exception("Invalid text size: " + aCols + "x" + aRows);
+            }
         }
-        public static void SetMode40x50xText()
-        {
-            WriteVGARegisters(g_40x50_text);
-            WriteFont(g_8x8_font, 8);
-        }
-        public static void SetMode80x25xText()
-        {
-            WriteVGARegisters(g_80x25_text);
-            WriteFont(g_8x16_font, 16);
-        }
-        public static void SetMode80x50xText()
-        {
-            WriteVGARegisters(g_80x50_text);
-            WriteFont(g_8x8_font, 8);
-        }
-        public static void SetMode90x30xText()
-        {
-            WriteVGARegisters(g_90x30_text);
-            WriteFont(g_8x16_font, 16);
-        }
-        public static void SetMode90x60xText()
-        {
-            WriteVGARegisters(g_90x60_text);
-            WriteFont(g_8x8_font, 8);
-        }
+
         public static void SetMode640x480x2()
         {
             WriteVGARegisters(g_640x480x2);

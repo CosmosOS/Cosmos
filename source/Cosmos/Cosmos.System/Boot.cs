@@ -15,18 +15,19 @@ namespace Cosmos.Sys {
         /// <summary>
         /// Boot the kernel using default boot-configuration.
         /// Initializes basic hardware like CPU, serialports, PCI, Keyboard and blockdevices.
+        /// Later properties will be added, which will alter this. 
+        /// However if no properties are changed from defaults, and Execute is called it should
+        /// perform a default boot.
         /// </summary>
-        public static void Default() {
+        public void Execute() {
+            Hardware.VGAScreen.SetTextMode(80, 25);
             Console.Clear();
-            Console.WriteLine("Initializing KERNEL");
+
             Kernel.Global.Init();
-
-            Console.WriteLine("Initializing HARDWARE");
             Hardware.Global.Init();
-
-            Console.WriteLine("Initializing SYSTEM");
             Sys.Global.Init();
-            
+
+            // Clear again in case debug information has been written out
             Console.Clear();
         }
     }

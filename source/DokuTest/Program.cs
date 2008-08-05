@@ -15,7 +15,8 @@ namespace DokuTest
 
         public static void Init()
         {
-            Cosmos.Sys.Boot.Default();
+            var xBoot = new Cosmos.Sys.Boot();
+            xBoot.Execute();
 
             Console.WriteLine("*** COSMOS Operating System - Doku's Test Suite ***");
             Console.WriteLine("*** Ensoniq AudioPCI 1370 testing ***");

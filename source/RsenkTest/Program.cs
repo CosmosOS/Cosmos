@@ -18,7 +18,8 @@ namespace CosmosBoot
         // Main entry point of the kernel
         public static void Init()
         {
-            Cosmos.Sys.Boot.Default();
+            var xBoot = new Cosmos.Sys.Boot();
+            xBoot.Execute();
 
             Commander shell = Commander.GetInstance();
             shell.Start();

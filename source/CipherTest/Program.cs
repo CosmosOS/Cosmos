@@ -74,8 +74,10 @@ namespace CipherTest
 
 		public static void Init()
 		{
-			Cosmos.Sys.Boot.Default();
-			Console.WriteLine("Boot complete");
+            var xBoot = new Cosmos.Sys.Boot();
+            xBoot.Execute();
+            
+            Console.WriteLine("Boot complete");
 			Console.WriteLine("Press a key to test delegates!");
 			Console.ReadLine();
 			Test2Args testfor2args = Times2;
