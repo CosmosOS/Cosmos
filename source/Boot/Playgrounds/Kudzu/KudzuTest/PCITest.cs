@@ -4,7 +4,7 @@ using System.Text;
 using HW = Cosmos.Hardware;
 using Cosmos.Kernel;
 
-namespace KudzuTest {
+namespace Cosmos.Playground.Kudzu {
     public class PCITest {
         public static void Test() {
             HW.PCIBus.Init();

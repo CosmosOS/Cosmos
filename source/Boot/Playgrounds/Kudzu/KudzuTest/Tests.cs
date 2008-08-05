@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace KudzuTest {
+namespace Cosmos.Playground.Kudzu {
     public class Tests {
         // yeah, its crappy, but its a hacked together basic test
         // framework. We do need a real one that should be in 

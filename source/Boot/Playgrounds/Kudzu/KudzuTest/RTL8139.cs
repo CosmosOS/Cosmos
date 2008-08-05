@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Cosmos.Sys.Network;
 
-namespace KudzuTest {
+namespace Cosmos.Playground.Kudzu {
     public class RTL8139 {
 
         public static void Test() {

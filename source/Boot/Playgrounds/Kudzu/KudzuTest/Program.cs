@@ -2,7 +2,7 @@
 using Cosmos.Build.Windows;
 using RTLDriver = Cosmos.Hardware.Network.Devices.RTL8139;
 
-namespace KudzuTest {
+namespace Cosmos.Playground.Kudzu {
 	class Program {
 		[STAThread]
 		static void Main(string[] args) {

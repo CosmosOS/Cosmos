@@ -8,8 +8,8 @@
     <ProjectGuid>{30057B5B-8BEE-4712-8243-9A42DF8A0C76}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>KudzuTest</RootNamespace>
-    <AssemblyName>KudzuTest</AssemblyName>
+    <RootNamespace>Cosmos.Playground.Kudzu</RootNamespace>
+    <AssemblyName>Cosmos.Playground.Kudzu</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
