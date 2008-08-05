@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 
-namespace Cosmos.FileSystem.FAT32
+namespace Cosmos.Sys.FileSystem.FAT32
 {
     public class FATStream : Stream
     {

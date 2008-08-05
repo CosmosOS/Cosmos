@@ -8,8 +8,8 @@
     <ProjectGuid>{5C293BB9-FB42-495E-AAD9-D15888631CA4}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Cosmos.FileSystem</RootNamespace>
-    <AssemblyName>Cosmos.FileSystem</AssemblyName>
+    <RootNamespace>Cosmos.Sys.FileSystem</RootNamespace>
+    <AssemblyName>Cosmos.Sys.FileSystem</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
@@ -64,7 +64,6 @@
     <Compile Include="Old\Ext2Old.cs" />
     <Compile Include="Old\Ext2Old.Structs.cs" />
     <Compile Include="Old\Fat16.cs" />
-    <Compile Include="Old\ISO9660.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

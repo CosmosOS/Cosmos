@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Cosmos.Hardware;
 using System.Runtime.InteropServices;
 
-namespace Cosmos.FileSystem {
+namespace Cosmos.Sys.FileSystem {
 	public static class MBT {
 		private class MBTPartition: BlockDevice {
 			private readonly BlockDevice mBackend;

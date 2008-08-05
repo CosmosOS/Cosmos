@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Cosmos.FileSystem;
-using Cosmos.FileSystem.Ext2;
+using Cosmos.Sys.FileSystem;
+using Cosmos.Sys.FileSystem.Ext2;
 using Cosmos.Hardware;
 using Cosmos.Hardware.Storage;
 //using DebugUtil=Cosmos.FileSystem.DebugUtil;

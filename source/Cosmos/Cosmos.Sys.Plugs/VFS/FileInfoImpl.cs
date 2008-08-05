@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Indy.IL2CPU.Plugs;
 using System.IO;
-using Cosmos.FileSystem;
+using Cosmos.Sys.FileSystem;
 
 namespace Cosmos.Sys.Plugs
 {

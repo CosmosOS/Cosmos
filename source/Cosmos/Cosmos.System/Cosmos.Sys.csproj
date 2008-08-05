@@ -60,9 +60,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Cosmos.Kernel.FileSystems\Cosmos.FileSystem.csproj">
+    <ProjectReference Include="..\..\Cosmos.Kernel.FileSystems\Cosmos.Sys.FileSystem.csproj">
       <Project>{5C293BB9-FB42-495E-AAD9-D15888631CA4}</Project>
-      <Name>Cosmos.FileSystem</Name>
+      <Name>Cosmos.Sys.FileSystem</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Indy.IL2CPU.Plugs\Indy.IL2CPU.Plugs.csproj">
       <Project>{E9B2E8CC-E264-42F9-9113-16B0A0431198}</Project>

@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cosmos.Sys.FileSystem;
 
-namespace Cosmos.FileSystem.FAT32
+namespace Cosmos.Sys.FileSystem.FAT32
 {
     public class FileSystemInfo32
     {

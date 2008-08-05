@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Cosmos.Hardware;
 
-namespace Cosmos.FileSystem
+namespace Cosmos.Sys.FileSystem
 {
     public class MBR : PartitionManager
     {

@@ -56,9 +56,9 @@
     <Compile Include="VGA.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Cosmos.Kernel.FileSystems\Cosmos.FileSystem.csproj">
+    <ProjectReference Include="..\Cosmos.Kernel.FileSystems\Cosmos.Sys.FileSystem.csproj">
       <Project>{5C293BB9-FB42-495E-AAD9-D15888631CA4}</Project>
-      <Name>Cosmos.FileSystem</Name>
+      <Name>Cosmos.Sys.FileSystem</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos\Cosmos.Hardware\Cosmos.Hardware.csproj">
       <Project>{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}</Project>

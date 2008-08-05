@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Cosmos.FileSystem {
+namespace Cosmos.Sys.FileSystem {
     /// <summary>
     /// Represents either a directory or a file in a filesystem. The entry also contains metadata, such as name, attributes, etc.
     /// </summary>

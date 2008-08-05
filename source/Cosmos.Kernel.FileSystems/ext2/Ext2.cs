@@ -5,8 +5,9 @@ using System.Linq;
 using System.Text;
 using Cosmos.Hardware;
 using HW=Cosmos.Hardware;
+using Cosmos.Sys.FileSystem;
 
-namespace Cosmos.FileSystem.Ext2 {
+namespace Cosmos.Sys.FileSystem.Ext2 {
     public unsafe partial class Ext2 : Filesystem {
         private readonly BlockDevice mBackend;
         private SuperBlock mSuperblock;

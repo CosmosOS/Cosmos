@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Cosmos.FileSystem.Ext2 {
+namespace Cosmos.Sys.FileSystem.Ext2 {
     partial class Ext2 {
         [StructLayout(LayoutKind.Explicit)]
         internal struct SuperBlock {

@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Indy.IL2CPU.Plugs;
-using Cosmos.FileSystem;
+using Cosmos.Sys.FileSystem;
 
 namespace Cosmos.Sys.Plugs {
     [Plug(Target=typeof(Directory))]

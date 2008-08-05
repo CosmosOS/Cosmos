@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Cosmos.FileSystem.FAT32
+namespace Cosmos.Sys.FileSystem.FAT32
 {
     public class DirectoryTable
     {

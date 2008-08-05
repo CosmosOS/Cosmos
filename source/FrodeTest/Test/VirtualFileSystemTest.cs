@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Cosmos.Sys;
-using Cosmos.FileSystem;
+using Cosmos.Sys.FileSystem;
 using System.IO;
 
 namespace FrodeTest.Test
