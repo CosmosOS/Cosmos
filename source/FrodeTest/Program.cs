@@ -20,18 +20,31 @@ namespace FrodeTest
             Cosmos.Sys.Boot.Default();
             //Cosmos.Hardware.VGAScreen.SetMode90x30xText();
 
-            Console.WriteLine("*** COSMOS Operating System - Frode's Test Suite ***");
+            //Console.WriteLine("*** COSMOS Operating System - Frode's Test Suite ***");
             //Console.WriteLine("CPU: " + Cosmos.Kernel.CPU.CPUVendor);
+            try
+            {
+
 
             //Shell.Session.Run();
+            //Console.WriteLine("Print char: ");
+            //PrintBackslash();
+            //Console.WriteLine("Second: ");
+            //WriteChar(92, 10, 20, 1, 1);
+            //Console.WriteLine("Third: ");
+            //Cosmos.Hardware.TextScreen.WriteChar('\\');
+            //Console.Write('\\');
 
+
+            
+            //Console.WriteLine(@"\");
             //Test
             //Console.WriteLine("---- RUNNING PREDEFINED TESTS ----");
-            Test.StringTest.RunTest();
+            //Test.StringTest.RunTest();
             //Test.IPv4AddressTest.RunTest();
             //Test.BasicTest.RunTest();
             //Test.SwitchTest.RunTest();
-            
+            //Console.ReadLine();
             //Test.BoolTest.RunTest();
             //Test.InterfaceTest.RunTest();
             //Test.ExtensionMethodsTest.RunTest();
@@ -53,11 +66,30 @@ namespace FrodeTest
             //Tests ready for Matthijs to fix ;)
             //Test.RTL8139Test.RunTest();
             //Test.ExceptionTest.RunTest();
-
+            
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
              
             //Done
             Console.WriteLine();
             Cosmos.Sys.Deboot.ShutDown();            
+        }
+
+        public static unsafe void PrintBackslash()
+        {
+            byte* xTestByte = (byte*)(0xB8011 + 160);
+            *xTestByte = 65;
+        }
+
+        public static unsafe void WriteChar(byte aChar, byte forecolor, byte backcolor, int x, int y)
+        {
+            short attrib = (short)((backcolor << 4) | (forecolor & 0x0F));
+            short* where;
+            where = (short*)0xB8000 + (y * 80 + x);
+            *where = (short)(aChar | (attrib << 8));
         }
     }
 }

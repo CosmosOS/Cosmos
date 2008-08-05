@@ -14,9 +14,15 @@ namespace Cosmos.Sys.Plugs {
             return VFSManager.DirectoryExists(aDir);
         }
 
+        private static string mCurrentDirectory = @"/0/";
         public static string GetCurrentDirectory()
         {
-            return @"0:/";
+            return mCurrentDirectory;
+        }
+
+        public static void SetCurrentDirectory(string aDir)
+        {
+            mCurrentDirectory = aDir;
         }
 
         public static string[] GetDirectories(string aDir)

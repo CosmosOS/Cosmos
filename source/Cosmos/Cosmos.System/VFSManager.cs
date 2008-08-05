@@ -64,7 +64,8 @@ namespace Cosmos.Sys {
 
         public static bool ContainsVolumeSeparator(this string aPath)
         {
-            return aPath.Contains(Path.VolumeSeparatorChar);
+            return (aPath[1] == Path.VolumeSeparatorChar);
+            //return aPath.Contains(Path.VolumeSeparatorChar);
         }
 
         public static bool IsAbsolutePath(this string aPath)
@@ -79,8 +80,22 @@ namespace Cosmos.Sys {
 
         public static string[] SplitPath(string aPath)
         {
-            return aPath.Split(new char[]{Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar}, StringSplitOptions.RemoveEmptyEntries);
+            return aPath.Split(GetDirectorySeparators(), StringSplitOptions.RemoveEmptyEntries);
         }
+
+        private static char[] GetDirectorySeparators()
+        {
+            return new char[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar };
+        }
+
+        //public static bool IsADriveVolume(this string aPath)
+        //{
+        //    string xPath = aPath.Replace('\\', '-');//(GetDirectorySeparators());
+        //    xPath = xPath.Replace('/', (char)(""[0]));
+
+        //    Console.WriteLine(xPath);
+        //    return false;
+        //}
 
         /// <summary>
         /// Get a single directory from the given path.
@@ -92,9 +107,9 @@ namespace Cosmos.Sys {
             if (String.IsNullOrEmpty(aPath)) {
                 throw new ArgumentNullException("aPath");
             }
-            if (aPath[0] != '/' && aPath[0] != '\\') {
-                throw new Exception("Incorrect path, should start with / or \\!");
-            }
+            //if (aPath[0] != '/' && aPath[0] != '\\') {
+            //    throw new Exception("Incorrect path, should start with / or \\!");
+            //}
             if (aPath.Length == 1) {
                 return null;
             } else {

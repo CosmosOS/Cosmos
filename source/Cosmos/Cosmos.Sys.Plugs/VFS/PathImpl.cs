@@ -32,5 +32,10 @@ namespace Cosmos.Sys.Plugs {
             }
             return aPath.Substring(xIndex + 1, aPath.Length - xIndex - 1);
         }
+
+        public static bool IsPathRooted(string aPath)
+        {
+            return aPath.IsAbsolutePath();
+        }
     }
 }

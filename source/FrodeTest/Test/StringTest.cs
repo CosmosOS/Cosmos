@@ -66,6 +66,14 @@ namespace FrodeTest.Test
             Console.WriteLine("Long string \\ Long String");
             Console.WriteLine("Back to normal");
 
+            //Bug
+            //string xTemp = "\\";
+            //Console.WriteLine(xTemp.Length);
+            //for (int i = 0; i < xTemp.Length; i++)
+            //{
+            //    Console.Write(((byte)xTemp[i]).ToString());
+            //}
+
             //.IndexOf
             Console.WriteLine("Should be  0: " + "otto".IndexOf('o'));
             Console.WriteLine("Should be  3: " + "otto".IndexOf('o', 1));
@@ -73,7 +81,7 @@ namespace FrodeTest.Test
             //Console.WriteLine("otto".IndexOf("tt"));
 
             //.Replace
-            Console.WriteLine("Hello".Replace('l', 'E'));
+            //Console.WriteLine("Hello".Replace('l', 'E'));
 
             // Add \t as Tab
             //Console.WriteLine("Column1\tColumn2");
