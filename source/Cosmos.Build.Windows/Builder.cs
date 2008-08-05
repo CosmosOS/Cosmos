@@ -144,7 +144,6 @@ namespace Cosmos.Build.Windows
             xEngine.Execute(xTarget.Location, TargetPlatformEnum.X86, g => Path.Combine(xAsmPath, g + ".asm"), false,
                 new string[]
                     {
-                        Path.Combine(Path.Combine(ToolsPath, "Cosmos.Plugs.FCL"), "Cosmos.Plugs.FCL.dll"), 
                         Path.Combine(Path.Combine(ToolsPath, "Cosmos.Kernel.Plugs"), "Cosmos.Kernel.Plugs.dll"), 
                         Path.Combine(Path.Combine(ToolsPath, "Cosmos.Sys.Plugs"), "Cosmos.Sys.Plugs.dll")
                     }, aDebugMode, aDebugComport, xAsmPath);
