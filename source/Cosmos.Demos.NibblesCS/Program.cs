@@ -5,7 +5,7 @@ using Cosmos.Hardware;
 using System.Diagnostics;
 using S = Cosmos.Hardware.TextScreen;
 
-namespace SteveKernel
+namespace Cosmos.Demo.Nibbles
 {
     class Program
     {

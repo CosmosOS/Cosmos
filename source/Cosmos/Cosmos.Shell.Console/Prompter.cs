@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Cosmos.Shell.Console {
+namespace Cosmos.Demo.Shell {
 	/// <summary>
 	/// The demonstration prompter.
 	/// </summary>

@@ -4,7 +4,7 @@ using System.Text;
 using Cosmos.Build.Windows;
 using Cosmos.Hardware;
 
-namespace Cosmos.Shell.Console {
+namespace Cosmos.Demo.Shell {
 
 	public class Program {
 

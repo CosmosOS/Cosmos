@@ -82,9 +82,9 @@
       <Project>{A1F83D9F-2D44-4264-A08B-416797123018}</Project>
       <Name>Cosmos.Kernel</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Cosmos\Cosmos.Shell.Console\Cosmos.Shell.Console.csproj">
+    <ProjectReference Include="..\Cosmos\Cosmos.Shell.Console\Cosmos.Demo.Shell.csproj">
       <Project>{E4A9F8F0-D0DC-465A-A64A-FE56504D397E}</Project>
-      <Name>Cosmos.Shell.Console</Name>
+      <Name>Cosmos.Demo.Shell</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos\Cosmos.Sys.Plugs\Cosmos.Sys.Plugs.csproj">
       <Project>{6110AD07-EB07-4A99-BB73-7A69AF5732F1}</Project>
