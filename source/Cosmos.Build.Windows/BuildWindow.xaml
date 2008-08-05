@@ -5,8 +5,8 @@
 	xmlns:local="clr-namespace:Cosmos.Build.Windows"
 	Title="Building Cosmos Application"
 	Height="350"
-	Width="1000"
-	Icon="/Cosmos.Build.Windows;component/Cosmos.ico">
+	Width="589"
+	Icon="/Cosmos.Build.Windows;component/Cosmos.ico" WindowState="Maximized">
 	<Window.Resources>
 		<ObjectDataProvider
 			x:Key="BuildMessages"
