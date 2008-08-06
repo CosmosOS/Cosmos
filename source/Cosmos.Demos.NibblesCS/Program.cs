@@ -82,9 +82,9 @@ namespace Cosmos.Demo.Nibbles
                 {
                     myPlayers[i] = new Player()
                     {
-                        X = myRandom.Next(S.Columns),
-                        Y = myRandom.Next(S.Rows),
-                        Direction = myRandom.Next(4),
+                        X = myRandom.Next() % S.Columns,
+                        Y = myRandom.Next() % S.Rows,
+                        Direction = myRandom.Next() % 4,
                         PlayerNumber = i,
                         Alive = true
                     };
