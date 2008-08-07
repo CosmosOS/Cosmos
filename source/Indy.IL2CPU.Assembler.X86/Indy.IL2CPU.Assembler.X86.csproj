@@ -63,6 +63,8 @@
     <Compile Include="Compare.cs" />
     <Compile Include="ConditionalMove.cs" />
     <Compile Include="Condition.cs" />
+    <Compile Include="FXStore.cs" />
+    <Compile Include="FXSave.cs" />
     <Compile Include="CpuId.cs" />
     <Compile Include="Hlt.cs" />
     <Compile Include="LoadTR.cs" />

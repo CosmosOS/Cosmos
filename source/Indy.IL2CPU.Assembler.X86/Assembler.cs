@@ -73,6 +73,30 @@ namespace Indy.IL2CPU.Assembler.X86 {
 					    aOutputWriter.WriteLine("mov al, 0x03");
 					    aOutputWriter.WriteLine("out DX, AL");  // IRQ-s enabled, RTS/DSR set
 				    }
+
+                    // SSE init
+                    // CR4[bit 9]=1, CR4[bit 10]=1, CR0[bit 2]=0, CR0[bit 1]=1
+
+                    aOutputWriter.WriteLine("mov eax, cr4");
+                    aOutputWriter.WriteLine("or eax, 0x100");
+                    aOutputWriter.WriteLine("mov cr4, eax");
+
+                    aOutputWriter.WriteLine("mov eax, cr4");
+                    aOutputWriter.WriteLine("or eax, 0x200");
+                    aOutputWriter.WriteLine("mov cr4, eax");
+
+                    aOutputWriter.WriteLine("mov eax, cr0");
+                    aOutputWriter.WriteLine("and eax, 0xfffffffd");
+                    aOutputWriter.WriteLine("mov cr0, eax");
+
+                    aOutputWriter.WriteLine("mov eax, cr0");
+                    aOutputWriter.WriteLine("or eax, 0x1");
+                    aOutputWriter.WriteLine("mov cr0, eax");
+                    
+
+
+                    // END SSE INIT
+
 				    aOutputWriter.WriteLine("				 call " + EntryPointName);
 				    aOutputWriter.WriteLine("			.loop:");
 				    aOutputWriter.WriteLine("				 cli");

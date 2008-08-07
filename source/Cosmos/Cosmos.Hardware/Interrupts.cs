@@ -62,50 +62,62 @@ namespace Cosmos.Hardware {
             [FieldOffset(102)]
             public ushort IOPBOffset;
         }
+
+        [StructLayout(LayoutKind.Explicit, Size = 512)]
+        public struct MMXContext
+        {
+        }
 				
-        [StructLayout(LayoutKind.Explicit, Size = 76)]
+        [StructLayout(LayoutKind.Explicit, Size = 80)]
         public struct InterruptContext {
             [FieldOffset(0)]
-            public uint EDI;
+            public unsafe MMXContext* MMXContext;
 
             [FieldOffset(4)]
+            public uint EDI;
+            
+            [FieldOffset(8)]
             public uint ESI;
 
-            [FieldOffset(8)]
+            [FieldOffset(12)]
             public uint EBP;
 
-            [FieldOffset(12)]
+            [FieldOffset(16)]
             public uint ESP;
 
-            [FieldOffset(16)]
+            [FieldOffset(20)]
             public uint EBX;
 
-            [FieldOffset(20)]
+            [FieldOffset(24)]
             public uint EDX;
 
-            [FieldOffset(24)]
+            [FieldOffset(28)]
             public uint ECX;
 
-            [FieldOffset(28)]
+            [FieldOffset(32)]
             public uint EAX;
 
-            [FieldOffset(32)]
+            [FieldOffset(36)]
             public uint Interrupt;
 
-            [FieldOffset(36)]
+            [FieldOffset(40)]
             public uint Param;
 
-            [FieldOffset(40)]
+            [FieldOffset(44)]
             public uint EIP;
 
-            [FieldOffset(44)]
+            [FieldOffset(48)]
             public uint CS;
 
-            [FieldOffset(48)]
+            [FieldOffset(52)]
             public EFlagsEnum EFlags;
 
-            [FieldOffset(52)]
+            [FieldOffset(56)]
             public uint UserESP;
+
+            
+
+
         }
 
         public static void HandleInterrupt_Default(ref InterruptContext aContext) {
