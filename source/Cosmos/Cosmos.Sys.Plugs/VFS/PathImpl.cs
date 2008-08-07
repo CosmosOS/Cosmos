@@ -33,6 +33,14 @@ namespace Cosmos.Sys.Plugs {
             return aPath.Substring(xIndex + 1, aPath.Length - xIndex - 1);
         }
 
+        public static string GetPathRoot(string aPath)
+        {
+            if (aPath.IsAbsolutePath())
+                return new String(new char[]{aPath[0], aPath[1], aPath[2]});
+            else
+                return String.Empty;
+        }
+
         public static bool IsPathRooted(string aPath)
         {
             return aPath.IsAbsolutePath();

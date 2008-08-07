@@ -156,43 +156,68 @@ namespace Cosmos.Sys {
         /// <summary>
         /// Retrieves an array of FilesystemEntries (i.e. Directories and Files) in the gives Directory path.
         /// </summary>
-        /// <param name="aPath">Directory to search in.</param>
+        /// <param name="aPath">Directory to search in. Can be absolute and relative.</param>
         /// <returns>All Directories and Files in the given path.</returns>
         public static FilesystemEntry[] GetDirectoryListing(string aPath) {
+            
             if (String.IsNullOrEmpty(aPath)) {
                 throw new ArgumentNullException("aPath is null in GetDirectoryListing");
             }
             
-            if (aPath[0] != '/' && aPath[0] != '\\') {
-                throw new Exception("Incorrect path, must start with / or \\!");
-            }                
-           
-            if (aPath.Length == 1) {
-                var xResult = new FilesystemEntry[mFilesystems.Count];
-                for (int i = 0; i < mFilesystems.Count; i++) {
-                    xResult[i] = new FilesystemEntry() {
-                                                           Id = (ulong)i,
-                                                           IsDirectory = true,
-                                                           IsReadonly = true,
-                                                           Name = i.ToString()
-                                                       };
-                }
-                return xResult;
-            } else {
+            //if (aPath[0] != '/' && aPath[0] != '\\') {
+            //    throw new Exception("Incorrect path, must start with / or \\!");
+            //}                
+
+            //if (aPath.Trim(Path.VolumeSeparatorChar).Length == 1)
+            //{
+            //    return GetVolumes(mFilesystems);
+            //}
+
+            //var xFS = GetFileSystemFromPath(aPath, 1);
+            //return xFS.GetDirectoryListing(xFS.RootId);
+
+            if (aPath.Length == 1)
+            {
+                return GetVolumes();
+            }
+            else
+            {
                 string xParentPath = aPath;
-                if (String.IsNullOrEmpty(xParentPath)) {
+                if (String.IsNullOrEmpty(xParentPath))
+                {
                     var xFS = GetFileSystemFromPath(aPath, 1);
                     return xFS.GetDirectoryListing(xFS.RootId);
                 }
-                var xParentItem = GetDirectoryEntry(xParentPath);
-                if (xParentItem == null) {
-                    var xFS = GetFileSystemFromPath(aPath,1);
+                var xParentItem = GetDirectoryEntry(aPath);
+                if (xParentItem == null)
+                {
+                    var xFS = GetFileSystemFromPath(aPath, 1);
                     return xFS.GetDirectoryListing(xFS.RootId);
                 }
-                
+
                 return xParentItem.Filesystem.GetDirectoryListing(xParentItem.Id);
             }
             
+        }
+
+        private static FilesystemEntry[] GetVolumes()
+        {
+        //    if (aFilesystems == null)
+        //        throw new ArgumentNullException("mFilesystems has not been initialized");
+
+            //Get volumes
+            var xResult = new FilesystemEntry[mFilesystems.Count];
+            for (int i = 0; i < mFilesystems.Count; i++)
+            {
+                xResult[i] = new FilesystemEntry()
+                {
+                    Id = (ulong)i,
+                    IsDirectory = true,
+                    IsReadonly = true,
+                    Name = i.ToString() //Volume number
+                };
+            }
+            return xResult;
         }
 
         /// <summary>

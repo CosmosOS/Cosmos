@@ -36,10 +36,22 @@ namespace FrodeTest.Test
 
             //Check relative and absolute paths
             if (!Path.IsPathRooted("0:/Alfa/"))
-                Console.WriteLine("Fail!");
+                Console.WriteLine("Fail1");
             if (Path.IsPathRooted("Alfa"))
-                Console.WriteLine("Fail!!");
-            
+                Console.WriteLine("Fail2");
+
+            Console.WriteLine("GetDirectoryName: " + Path.GetDirectoryName("/0/Zulu"));
+            Console.WriteLine("GetDirectoryName: " + Path.GetDirectoryName("/0/Zulu/"));
+
+            //Check directory exists
+            if (Directory.Exists("/0/Illegal/"))
+                Console.WriteLine("Fail3");
+            if (!Directory.Exists("/0/Zulu"))
+                Console.WriteLine("Fail4");
+            if (!Directory.Exists("/0/Zulu/"))
+                Console.WriteLine("Fail5");
+            //if (!Directory.Exists("0:/Frode/"))
+            //    Console.WriteLine("Fail6");
             //Change directory
             //Enumerate directory
 
@@ -47,6 +59,9 @@ namespace FrodeTest.Test
             Console.WriteLine("Drives found:");
             foreach (string drive in Directory.GetLogicalDrives())
                 Console.WriteLine("    " + drive);
+
+            Console.WriteLine("PathRoot (1:/): " + Path.GetPathRoot("1:/Alfa/"));
+            Console.WriteLine("PathRoot (blank): " + Path.GetPathRoot("ShouldBeBlank"));
 
             //Console.WriteLine("Directory separator: " + Path.DirectorySeparatorChar.ToString());
             //Console.WriteLine("Directory separator (alternative): " + Path.AltDirectorySeparatorChar.ToString());
