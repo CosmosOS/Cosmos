@@ -322,7 +322,19 @@ namespace Indy.IL2CPU.IL.X86 {
         public static void Add(Assembler.Assembler aAssembler) {
             StackContent xSize = aAssembler.StackContents.Pop();
             if (xSize.IsFloat) {
-                throw new Exception("Floats not yet supported!");
+
+                if (xSize.Size > 4)
+                {
+                    throw new Exception("doubles not supported yet!");
+                }
+                else
+                {
+                    new CPUx86.SSE.MovSS("xmm0", "[esp]");
+                    new CPUx86.Add("esp", "4");
+                    new CPUx86.SSE.MovSS("xmm1", "[esp]");
+                    new CPUx86.SSE.AddSS("xmm0", "xmm1");
+                    new CPUx86.SSE.MovSS("[esp]", "xmm0");
+                }
             }
             if (xSize.Size > 8) {
                 throw new Exception("Size '" + xSize.Size + "' not supported");
