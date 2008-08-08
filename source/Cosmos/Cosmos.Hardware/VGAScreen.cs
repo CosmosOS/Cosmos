@@ -193,46 +193,40 @@ namespace Cosmos.Hardware
 
         public delegate void SetPixelDelegate(uint x, uint y, uint c);
 
-        public static void SetTextMode(int aCols, int aRows) {
-            bool xValidSize = true;
-            if (aCols == 40) {
-                if (aRows == 25) {
+        public enum TextSize { Size40x25, Size40x50, Size80x25, Size80x50, Size90x30, Size90x60 };
+
+        public static void SetTextMode(TextSize aSize) {
+            switch (aSize) {
+                case TextSize.Size40x25:
                     WriteVGARegisters(g_40x25_text);
                     WriteFont(g_8x16_font, 16);
-                } else if (aRows == 50) {
+                    break;
+                case TextSize.Size40x50:
                     WriteVGARegisters(g_40x50_text);
                     WriteFont(g_8x8_font, 8);
-                } else {
-                    xValidSize = false;
-                }
-            } else if (aCols == 80) {
-                if (aRows == 25) {
+                    break;
+                case TextSize.Size80x25:
                     WriteVGARegisters(g_80x25_text);
                     WriteFont(g_8x16_font, 16);
-                } else if (aRows == 50) {
+                    break;
+                case TextSize.Size80x50:
                     WriteVGARegisters(g_80x50_text);
                     WriteFont(g_8x8_font, 8);
-                } else {
-                    xValidSize = false;
-                }
-            } else if (aCols == 90) {
-                if (aRows == 30) {
+                    break;
+                case TextSize.Size90x30:
                     WriteVGARegisters(g_90x30_text);
                     WriteFont(g_8x16_font, 16);
-                } else if (aRows == 60) {
+                    break;
+                case TextSize.Size90x60:
                     WriteVGARegisters(g_90x60_text);
                     WriteFont(g_8x8_font, 8);
-                } else {
-                    xValidSize = false;
-                }
-            } else {
-                xValidSize = false;
-            }
-            if (!xValidSize) {
-                throw new Exception("Invalid text size: " + aCols + "x" + aRows);
+                    break;
+                default:
+                    throw new Exception("Invalid text size.");
             }
         }
 
+        //TODO: Change this to be like SetTextmode, but take two enums. One for size, one for bit depth
         public static void SetMode640x480x2()
         {
             WriteVGARegisters(g_640x480x2);

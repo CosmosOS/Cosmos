@@ -20,7 +20,7 @@ namespace Cosmos.Sys {
         /// perform a default boot.
         /// </summary>
         public void Execute() {
-            Hardware.VGAScreen.SetTextMode(80, 25);
+            Hardware.VGAScreen.SetTextMode(VGAScreen.TextSize.Size80x25);
             Console.Clear();
 
             Kernel.Global.Init();

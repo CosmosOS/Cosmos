@@ -13,26 +13,40 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
     /// Driver for networkcards using the RTL8139 chip.
     /// Some documentation can be found at: http://www.osdev.org/wiki/RTL8139
     /// </summary>
-    public class RTL8139 : NetworkDevice
-    {
-        #region Construction
+    public class RTL8139 : NetworkDevice {
+        protected PCIDevice pciCard;
+        protected Kernel.MemoryAddressSpace mem;
+        protected Register.ValueTypeRegisters valueReg;
+        protected Register.InterruptMaskRegister imr;
+        protected Register.InterruptStatusRegister isr;
+        protected byte[] TxBuffer0;
+        protected byte[] TxBuffer1;
+        protected byte[] TxBuffer2;
+        protected byte[] TxBuffer3;
+        protected byte[] RxBuffer;
 
-        private PCIDevice pciCard;
-        private Kernel.MemoryAddressSpace mem;
-        private Register.ValueTypeRegisters valueReg;
-        private Register.InterruptMaskRegister imr;
-        private Register.InterruptStatusRegister isr;
-        private byte[] TxBuffer0;
-        private byte[] TxBuffer1;
-        private byte[] TxBuffer2;
-        private byte[] TxBuffer3;
-        private byte[] RxBuffer;
+        //TODO: Remove this later, should also be a prop to be proper but since it 
+        // will be removed later...
+        public static bool DebugOutput = true;
+
+        // Writing out to the console is slow and often other interrupts come in
+        // before its done. So this allows us to turn it on and off
+        protected static void DebugWriteLine(string aText) {
+            if (DebugOutput) {
+                Console.WriteLine(aText);
+            }
+        }
+        protected static void DebugWrite(string aText) {
+            if (DebugOutput) {
+                Console.Write(aText);
+            }
+        }
 
         public RTL8139(PCIDevice device)
         {
-            if (device == null)
+            if (device == null) {
                 throw new ArgumentException("PCI Device is null. Unable to get RTL8139 card");
-
+            }
             pciCard = device;
             mem = device.GetAddressSpace(1) as Kernel.MemoryAddressSpace;
             valueReg = Register.ValueTypeRegisters.Load(mem);
@@ -47,18 +61,13 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         public static List<RTL8139> FindAll()
         {
             List<RTL8139> found = new List<RTL8139>();
-
-            foreach (PCIDevice device in Cosmos.Hardware.PCIBus.Devices)
-            {
-                //Console.WriteLine("VendorID: " + device.VendorID + " - DeviceID: " + device.DeviceID);
+            foreach (PCIDevice device in Cosmos.Hardware.PCIBus.Devices) {
+                //DebugWriteLine("VendorID: " + device.VendorID + " - DeviceID: " + device.DeviceID);
                 if (device.VendorID == 0x10EC && device.DeviceID == 0x8139)
                     found.Add(new RTL8139(device));
             }
-
             return found;
         }
-
-        #endregion
 
         #region Power and Initilization
 
@@ -89,7 +98,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             InitIRQMaskRegister();
             mInstance = this;
             Cosmos.Hardware.Interrupts.IRQ11 += HandleNetworkInterrupt;
-            //Console.WriteLine("Listening for IRQ" + pciCard.InterruptLine + ".");
+            //DebugWriteLine("Listening for IRQ" + pciCard.InterruptLine + ".");
 
         }
 
@@ -155,7 +164,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             //Wait while RST bit is active
             while (cr.Reset)
             {
-                Console.WriteLine("Reset in progress");
+                DebugWriteLine("Reset in progress");
             }
         }
 
@@ -259,8 +268,8 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         {
             List<byte> receivedBytes = new List<byte>();
 
-            Console.WriteLine("RxBuffer is at address " + GetMemoryAddress(ref RxBuffer));
-            Console.WriteLine("Received data from address " + valueReg.CurrentAddressOfPacketRead + " to address " + valueReg.CurrentBufferAddress);
+            DebugWriteLine("RxBuffer is at address " + GetMemoryAddress(ref RxBuffer));
+            DebugWriteLine("Received data from address " + valueReg.CurrentAddressOfPacketRead + " to address " + valueReg.CurrentBufferAddress);
 
             //The data to be read is in the RxBuffer, but offset by the CBR.
 
@@ -277,7 +286,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             }
 
             //Update the CAPR so that the RTL8139 knows that we've read the data.
-            //Console.WriteLine("Setting CAPR to " + readPointer + ". CBR is " + writtenPointer);
+            //DebugWriteLine("Setting CAPR to " + readPointer + ". CBR is " + writtenPointer);
             valueReg.CurrentAddressOfPacketRead = (UInt16)(readPointer - 16); //TODO: Figure out if 16 is the correct value. For now it works. RxBufferOverflow is no longer thrown.
 
             return receivedBytes.ToArray();
@@ -345,7 +354,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             WriteAddressToPCI(ref TxBuffer3, (byte)Register.MainRegister.Bit.TSAD3);
 
             var tsd = Register.TransmitStatusDescriptor.Load(mem);
-            //Console.WriteLine("Telling NIC to send " + aData.Length + " bytes.");
+            //DebugWriteLine("Telling NIC to send " + aData.Length + " bytes.");
             tsd.Size = aData.Length;
             
             tsd.OWN = false; //Begins sending - causes QEMU to DIE (Frode, 29.july)!
@@ -374,43 +383,43 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         /// </summary>
         public static void HandleNetworkInterrupt(ref Interrupts.InterruptContext aContext)
         {
-            Console.Write("IRQ detected: ");
+            DebugWrite("IRQ detected: ");
 
             if (mInstance.imr.ReceiveOK & mInstance.isr.ReceiveOK)
             {
-                Console.WriteLine("Receive OK");
+                DebugWriteLine("Receive OK");
                 mInstance.DisplayReadBuffer();
             }
 
             if (mInstance.imr.ReceiveError & mInstance.isr.ReceiveError)
-                Console.WriteLine("Receive ERROR");
+                DebugWriteLine("Receive ERROR");
 
             if (mInstance.imr.TransmitOK & mInstance.isr.TransmitOK)
-                Console.WriteLine("Transmit OK");
+                DebugWriteLine("Transmit OK");
 
             if (mInstance.imr.TransmitError & mInstance.isr.TransmitError)
-                Console.WriteLine("Transmit Error");
+                DebugWriteLine("Transmit Error");
 
             if (mInstance.imr.RxBufferOverflow & mInstance.isr.RxBufferOverflow)
-                Console.WriteLine("RxBufferOverflow");
+                DebugWriteLine("RxBufferOverflow");
 
             if (mInstance.imr.RxFifoOverflow & mInstance.isr.RxFifoOverflow)
-                Console.WriteLine("RxFIFOOverflow");
+                DebugWriteLine("RxFIFOOverflow");
 
             if (mInstance.imr.CableLengthChange & mInstance.isr.CableLengthChange)
-                Console.WriteLine("Cable Length Change");
+                DebugWriteLine("Cable Length Change");
 
             if (mInstance.imr.PacketUnderrun & mInstance.isr.PacketUnderrun)
-                Console.WriteLine("Packet Underrun");
+                DebugWriteLine("Packet Underrun");
 
             if (mInstance.imr.SoftwareInterrupt & mInstance.isr.SoftwareInterrupt)
-                Console.WriteLine("Software Interrupt");
+                DebugWriteLine("Software Interrupt");
 
             if (mInstance.imr.TxDescriptorUnavailable & mInstance.isr.TxDescriptorUnavailable)
-                Console.WriteLine("TxDescriptorUnavailable");
+                DebugWriteLine("TxDescriptorUnavailable");
 
             if (mInstance.imr.SystemError & mInstance.isr.SystemError)
-                Console.WriteLine("System Error!");
+                DebugWriteLine("System Error!");
 
             mInstance.ResetAllIRQ();
             //Console.ReadLine();
@@ -450,27 +459,27 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             var cr = Register.CommandRegister.Load(mem);
             var msr = Register.MediaStatusRegister.Load(mem);
 
-            Console.WriteLine("Tx enabled?: " + cr.TxEnabled.ToString());
-            Console.WriteLine("Rx enabled?: " + cr.RxEnabled.ToString());
-            Console.WriteLine("Speed 10Mb?: " + msr.Speed10MB.ToString());
-            Console.WriteLine("Link OK?: " + (!msr.LinkStatusInverse).ToString());
-            Console.WriteLine("CBR (byte count): " + valueReg.CurrentBufferAddress.ToString());
-            Console.WriteLine("IMR: " + imr.ToString());
-            Console.WriteLine("ISR: " + isr.ToString());
+            DebugWriteLine("Tx enabled?: " + cr.TxEnabled.ToString());
+            DebugWriteLine("Rx enabled?: " + cr.RxEnabled.ToString());
+            DebugWriteLine("Speed 10Mb?: " + msr.Speed10MB.ToString());
+            DebugWriteLine("Link OK?: " + (!msr.LinkStatusInverse).ToString());
+            DebugWriteLine("CBR (byte count): " + valueReg.CurrentBufferAddress.ToString());
+            DebugWriteLine("IMR: " + imr.ToString());
+            DebugWriteLine("ISR: " + isr.ToString());
         }
 
         public void DumpRegisters()
         {
-            Console.WriteLine("Command Register: " + Register.CommandRegister.Load(mem).ToString());
-            Console.WriteLine("Config1 Register: " + Register.ConfigurationRegister1.Load(mem).ToString());
-            Console.WriteLine("Media S Register: " + Register.MediaStatusRegister.Load(mem).ToString());
-            Console.WriteLine("Interrupt Mask R: " + Register.InterruptMaskRegister.Load(mem).ToString());
-            Console.WriteLine("Interrupt Status: " + Register.InterruptStatusRegister.Load(mem).ToString());
-            Console.WriteLine("Rx Configuration: " + Register.ReceiveConfigurationRegister.Load(mem).ToString());
-            Console.WriteLine("Tx Configuration: " + Register.TransmitConfigurationRegister.Load(mem).ToString());
-            Console.WriteLine("Tx Status Descr.: " + Register.TransmitStatusDescriptor.Load(mem).ToString());
-            Console.WriteLine("Tx Start Address: " + valueReg.TransmitStartAddress.ToString());
-            Console.WriteLine("Current Descrip.: " + Register.TransmitStatusDescriptor.GetCurrentTSDescriptor().ToString());
+            DebugWriteLine("Command Register: " + Register.CommandRegister.Load(mem).ToString());
+            DebugWriteLine("Config1 Register: " + Register.ConfigurationRegister1.Load(mem).ToString());
+            DebugWriteLine("Media S Register: " + Register.MediaStatusRegister.Load(mem).ToString());
+            DebugWriteLine("Interrupt Mask R: " + Register.InterruptMaskRegister.Load(mem).ToString());
+            DebugWriteLine("Interrupt Status: " + Register.InterruptStatusRegister.Load(mem).ToString());
+            DebugWriteLine("Rx Configuration: " + Register.ReceiveConfigurationRegister.Load(mem).ToString());
+            DebugWriteLine("Tx Configuration: " + Register.TransmitConfigurationRegister.Load(mem).ToString());
+            DebugWriteLine("Tx Status Descr.: " + Register.TransmitStatusDescriptor.Load(mem).ToString());
+            DebugWriteLine("Tx Start Address: " + valueReg.TransmitStartAddress.ToString());
+            DebugWriteLine("Current Descrip.: " + Register.TransmitStatusDescriptor.GetCurrentTSDescriptor().ToString());
         }
 
 
@@ -479,14 +488,14 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         {
             byte[] readData = this.ReadReceiveBuffer();
 
-            Console.WriteLine("Read buffer contains " + readData.Length + " bytes.");
-            Console.WriteLine("---------------------------------");
+            DebugWriteLine("Read buffer contains " + readData.Length + " bytes.");
+            DebugWriteLine("---------------------------------");
             
             foreach (byte b in readData)
-                Console.Write(b.ToHex() + ":");
-            Console.WriteLine();
+                DebugWrite(b.ToHex() + ":");
+            DebugWriteLine("");
             
-            Console.WriteLine("---------------------------------");
+            DebugWriteLine("---------------------------------");
         }
 
         #endregion

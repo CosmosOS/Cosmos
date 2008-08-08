@@ -12,7 +12,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
     /// Offset 0x3E - 0x3F from base memory.
     /// 16 bit wide.
     /// </summary>
-    class InterruptStatusRegister
+    public class InterruptStatusRegister
     {
 
         #region Constructor
