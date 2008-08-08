@@ -33,7 +33,7 @@ namespace Cosmos.Demo.Nibbles
         {
             var xBoot = new Cosmos.Sys.Boot();
             xBoot.Execute();
-
+            
             S.ReallyClearScreen();
             Console.WriteLine("");
             Console.WriteLine("");
@@ -57,10 +57,17 @@ namespace Cosmos.Demo.Nibbles
             S.SetColors(ConsoleColor.White, ConsoleColor.Black);
             Console.WriteLine("");            
             Console.WriteLine("                       Coded for COSMOS by Stephen Remde");
-
+            Console.WriteLine("");
+            Console.WriteLine("");
+            Console.WriteLine("");
+            Console.WriteLine("");
+            S.SetColors(ConsoleColor.Gray, ConsoleColor.Black);
+            Console.WriteLine("Press any key to continue...");
+            Console.WriteLine("");
+            Console.ReadLine();
             
 
-            Wait(5000);
+            //Wait(5000);
 
             Random myRandom = new Random(
                 (int)Cosmos.Hardware.Global.TickCount 

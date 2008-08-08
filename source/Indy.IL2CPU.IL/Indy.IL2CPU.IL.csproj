@@ -49,6 +49,7 @@
     <Compile Include="CustomImplementations\System\BooleanImpl.cs" />
     <Compile Include="CustomImplementations\System\ByteImpl.cs" />
     <Compile Include="CustomImplementations\System\CharImpl.cs" />
+    <Compile Include="CustomImplementations\System\SingleImpl.cs" />
     <Compile Include="CustomImplementations\System\Drawing1\ColorImpl.cs" />
     <Compile Include="CustomImplementations\System\Drawing1\SRImpl.cs" />
     <Compile Include="CustomImplementations\System\EnvironmentImpl.cs" />

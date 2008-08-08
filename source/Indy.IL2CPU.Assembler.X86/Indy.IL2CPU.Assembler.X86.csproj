@@ -96,6 +96,8 @@
     <Compile Include="RotateThroughCarryLeft.cs" />
     <Compile Include="SignExtendAX.cs" />
     <Compile Include="smsw.cs" />
+    <Compile Include="SSE\AddSS.cs" />
+    <Compile Include="SSE\MovSS.cs" />
     <Compile Include="Sti.cs" />
     <Compile Include="Stosw.cs" />
     <Compile Include="JumpNotCary.cs" />

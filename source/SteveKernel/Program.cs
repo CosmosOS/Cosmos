@@ -20,17 +20,9 @@ namespace SteveKernel
             var xBoot = new Cosmos.Sys.Boot();
             xBoot.Execute();
 
-            Random r = new Random(0);
-            Console.WriteLine(r.Next().ToString());
-            Console.WriteLine(r.Next().ToString());
-            Console.WriteLine(r.Next().ToString());
-            Console.WriteLine(r.Next().ToString());
-            Console.WriteLine(r.Next().ToString());
+            float f = 0f;
 
-            //Cosmos.Hardware.VGAScreen.SetMode80x25xText();
-
-            //for (int i=0;i<1000; i++)
-            //    Console.Write("sdkjfhdsf dfs sdf dsf sdf sdf sdf sf sdkjfhskjfhsdkjh");
+            f += 1;
         }
     }
 }
