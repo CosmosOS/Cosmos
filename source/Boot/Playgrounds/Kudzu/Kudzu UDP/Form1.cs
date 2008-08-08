@@ -17,7 +17,7 @@ namespace WindowsFormsApplication1 {
             // QEMU disconencts TAP each time. So you have to let QEMU run and 
             // let it connect TAP before you run this program else it wont
             // bind to that interface.
-            mUdpState.EndPoint = new IPEndPoint(IPAddress.Any, 2222);
+            mUdpState.EndPoint = new IPEndPoint(IPAddress.Any, 32000);
             mUdpState.Client = new UdpClient(mUdpState.EndPoint);
             mUdpState.Client.BeginReceive(new AsyncCallback(UdpReceive), mUdpState);
         }
@@ -28,10 +28,10 @@ namespace WindowsFormsApplication1 {
             xSocket.EnableBroadcast = true;
             var xIP = IPAddress.Broadcast;
             //var xIP = new IPAddress(new byte[] { 10, 0, 2, 15 });
-            var xEndPoint = new IPEndPoint(xIP, 2222);
+            var xEndPoint = new IPEndPoint(xIP, 32000);
 
             byte[] xBytes = new byte[1];
-            xBytes[0] = 22;
+            xBytes[0] = 23;
             xSocket.SendTo(xBytes, xEndPoint);
         }
 
@@ -46,13 +46,14 @@ namespace WindowsFormsApplication1 {
         public void UdpReceive(IAsyncResult aResult) {
             var xState = (UdpState)aResult.AsyncState;
             var xBytes = xState.Client.EndReceive(aResult, ref xState.EndPoint);
+            xState.Client.BeginReceive(new AsyncCallback(UdpReceive), xState);
             BeginInvoke(new PacketRecievedDelegate(PacketRecieved), xBytes);
         }
 
         public void PacketRecieved(byte[] aData) {
             var xSB = new StringBuilder();
             foreach (var xByte in aData) {
-                xSB.AppendLine(xByte.ToString("X2"));
+                xSB.AppendLine(xByte.ToString());
             }
             textResults.Lines = new string[] { xSB.ToString() };
         }
