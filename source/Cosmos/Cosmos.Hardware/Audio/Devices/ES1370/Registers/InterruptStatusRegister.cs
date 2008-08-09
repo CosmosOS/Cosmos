@@ -44,46 +44,46 @@ namespace Cosmos.Hardware.Audio.Devices.ES1370.Registers
         #endregion
 
         #region Data
-        public bool DAC1InterruptEnabled
+        public bool IsDAC1InterruptEnabled
         {
-            get { return GetBit(BitPosition.DAC1IntEn); }
-            set { SetBit(BitValue.DAC1IntEn, value); }
+            get { return GetBit(BitPosition.IsDAC1IntEn); }
+            set { SetBit(BitValue.IsDAC1IntEn, value); }
         }
 
-        public bool DAC2InterruptEnabled
+        public bool IsDAC2InterruptEnabled
         {
-            get { return GetBit(BitPosition.DAC2IntEn); }
-            set { SetBit(BitValue.DAC2IntEn, value); }
+            get { return GetBit(BitPosition.IsDAC2IntEn); }
+            set { SetBit(BitValue.IsDAC2IntEn, value); }
         }
 
-        public bool UARTInterruptEnabled
+        public bool IsUARTInterruptEnabled
         {
-            get { return GetBit(BitPosition.UARTIntEn); }
-            set { SetBit(BitValue.UARTIntEn, value); }
+            get { return GetBit(BitPosition.IsUARTIntEn); }
+            set { SetBit(BitValue.IsUARTIntEn, value); }
         }
 
-        public bool CodecWriteInProgressEnabled
+        public bool IsCodecWriteInProgressEnabled
         {
-            get { return GetBit(BitPosition.CodecWIPIntEn); }
-            set { SetBit(BitValue.CodecWIPIntEn, value); }
+            get { return GetBit(BitPosition.IsCodecWIPIntEn); }
+            set { SetBit(BitValue.IsCodecWIPIntEn, value); }
         }
 
-        public bool CodecBusyIntEnabled
+        public bool IsCodecBusyIntEnabled
         {
-            get { return GetBit(BitPosition.CodecBusyIntEn); }
-            set { SetBit(BitValue.CodecBusyIntEn, value); }
+            get { return GetBit(BitPosition.IsCodecBusyIntEn); }
+            set { SetBit(BitValue.IsCodecBusyIntEn, value); }
         }
 
-        public bool CodecStatusIntEnabled
+        public bool IsCodecStatusIntEnabled
         {
-            get { return GetBit(BitPosition.CodecStatIntEn); }
-            set { SetBit(BitValue.CodecStatIntEn, value); }
+            get { return GetBit(BitPosition.IsCodecStatIntEn); }
+            set { SetBit(BitValue.IsCodecStatIntEn, value); }
         }
 
-        public bool MCCBIntEnabled
+        public bool IsMCCBIntEnabled
         {
-            get { return GetBit(BitPosition.MCCBIntEn); }
-            set { SetBit(BitValue.MCCBIntEn, value); }
+            get { return GetBit(BitPosition.IsMCCBIntEn); }
+            set { SetBit(BitValue.IsMCCBIntEn, value); }
         }
         #endregion
 
@@ -110,24 +110,24 @@ namespace Cosmos.Hardware.Audio.Devices.ES1370.Registers
         [Flags]
         public enum BitPosition : byte
         {
-            DAC2IntEn = 1,
-            DAC1IntEn = 2,
-            UARTIntEn = 3,
-            MCCBIntEn = 4,
-            CodecWIPIntEn = 8,
-            CodecBusyIntEn = 9,
-            CodecStatIntEn = 10
+            IsDAC2IntEn = 1,
+            IsDAC1IntEn = 2,
+            IsUARTIntEn = 3,
+            IsMCCBIntEn = 4,
+            IsCodecWIPIntEn = 8,
+            IsCodecBusyIntEn = 9,
+            IsCodecStatIntEn = 10
         }
 
         public enum BitValue : uint
         {
-            DAC2IntEn = BinaryHelper.BitPos.BIT1,
-            DAC1IntEn = BinaryHelper.BitPos.BIT2,
-            UARTIntEn = BinaryHelper.BitPos.BIT3,
-            MCCBIntEn = BinaryHelper.BitPos.BIT4,
-            CodecWIPIntEn = BinaryHelper.BitPos.BIT8,
-            CodecBusyIntEn = BinaryHelper.BitPos.BIT9,
-            CodecStatIntEn = BinaryHelper.BitPos.BIT10
+            IsDAC2IntEn = BinaryHelper.BitPos.BIT1,
+            IsDAC1IntEn = BinaryHelper.BitPos.BIT2,
+            IsUARTIntEn = BinaryHelper.BitPos.BIT3,
+            IsMCCBIntEn = BinaryHelper.BitPos.BIT4,
+            IsCodecWIPIntEn = BinaryHelper.BitPos.BIT8,
+            IsCodecBusyIntEn = BinaryHelper.BitPos.BIT9,
+            IsCodecStatIntEn = BinaryHelper.BitPos.BIT10
         }
 
         #endregion

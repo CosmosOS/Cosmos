@@ -7,16 +7,20 @@ namespace Cosmos.Hardware.Audio
 {
     public class PCMStream
     {
-        int rate;
-        short[] data;
-        double phase;
-        public PCMStream(int rate, short[] data, double phase)
+        double freq;
+        char[] data;
+        public PCMStream(double freq, char[] data)
         {
-            this.rate = rate;
+            this.freq = freq;
             this.data = data;
-            this.phase = phase;
-
         }
-
+        public char[] getData()
+        {
+            return data;
+        }
+        public double getFreq()
+        {
+            return freq;
+        }
     }
 }

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.Hardware.Audio.Devices.ES1370.Components
 {
-    class DACak4531 : DACEntity
+    class DACak4531 : Cosmos.Hardware.Audio.Devices.Generic.Components.DACEntity
     {
         public DACak4531() : base() { }
 

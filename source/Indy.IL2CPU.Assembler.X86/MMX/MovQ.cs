@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Cosmos.Hardware.Audio.Components
+namespace Indy.IL2CPU.Assembler.X86.MMX
 {
-    public class UARTEntity
+    class MovQ
     {
     }
 }

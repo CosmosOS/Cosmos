@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using Cosmos.Hardware;
 using Cosmos.Hardware.Audio.Devices.ES1370.Registers;
-using Cosmos.Hardware.Audio.Managers;
 using Cosmos.Hardware.Audio.Devices.ES1370.Components;
+using Cosmos.Hardware.Audio.Devices.ES1370.Managers;
 namespace Cosmos.Hardware.Audio.Devices.ES1370
 {
     /// <summary>
@@ -23,7 +23,17 @@ namespace Cosmos.Hardware.Audio.Devices.ES1370
         public const int  minClockDen=29;
         public const int maxClockDen=353;
         public const int clockStep=1;
-
+        public const byte DACPage = 0x0c;
+        public const byte UARTPage = 0x0e;
+        public const byte UART1Page = 0x0f;
+        public const byte DAC1SMPREG =0x70;
+        public const byte DAC2SMPREG=0x74;
+        public const byte DAC1VolSMPREG=0x7c;
+        public const byte DAC2VolSMPREG=0x7e;
+        public const byte TruncNumSMPREG=0x00;
+        public const byte INTRegsSMPREG=0x01;
+        public const byte AccumFrac=0x02;
+        public const byte VFreqFrac = 0x03;
 
         public ES1370(PCIDevice device) : base(device)
         {
@@ -31,10 +41,8 @@ namespace Cosmos.Hardware.Audio.Devices.ES1370
             sir = (SerialInterfaceRegister.Load(getMemReference()));
             uir = (UARTInterfaceRegister.Load(getMemReference()));
             cr=(ControlRegister.Load(getMemReference()));
-            dacs.Add(new DACManager(new DACak4531(), cr.DAC1Enabled,(byte)MainRegister.Bit.Dac1FrameAddr, (byte)MainRegister.Bit.Dac1FrameSize));
-            dacs.Add(new DACManager(new DACak4531(), cr.DAC2Enabled, (byte)MainRegister.Bit.Dac2FrameAddr, (byte)MainRegister.Bit.Dac2FrameSize));
-            foreach (var dac in dacs.ToArray())
-                preparePlayBackOnDac(dac);
+            //dacs.Add(new AK(new DACak4531(), cr.DAC1Enabled,(byte)MainRegister.Bit.SerialIntContr,MainRegister.Bit.Dac1FrameAddr, (byte)MainRegister.Bit.Dac1FrameSize));
+            //dacs.Add(new DACManager(new DACak4531(), cr.DAC2Enabled, (byte)MainRegister.Bit.SerialIntContr, (byte)MainRegister.Bit.Dac2FrameAddr, (byte)MainRegister.Bit.Dac2FrameSize));
         }
         /// <summary>
         /// Retrieve all Ensoniq AudioPCI 1370 cards found on computer.
@@ -88,19 +96,19 @@ namespace Cosmos.Hardware.Audio.Devices.ES1370
         public void HandleAudioInterrupt(ref Interrupts.InterruptContext aContext)
         {
             Console.Write("IRQ detected: ");
-            if (isr.CodecBusyIntEnabled)
+            if (isr.IsCodecBusyIntEnabled)
                 Console.WriteLine("Codec busy Interrupt! ");
-            if(isr.CodecStatusIntEnabled)
+            if(isr.IsCodecStatusIntEnabled)
                 Console.WriteLine("Codec Enabled Interrupt! ");
-            if (isr.CodecWriteInProgressEnabled)
+            if (isr.IsCodecWriteInProgressEnabled)
                 Console.WriteLine("Codec WriteInProgress Interrupt!");
-            if (isr.DAC1InterruptEnabled)
+            if (isr.IsDAC1InterruptEnabled)
                 Console.WriteLine("DAC1 Interrupt!");
-            if (isr.DAC2InterruptEnabled)
+            if (isr.IsDAC2InterruptEnabled)
                 Console.WriteLine("DAC2 Interrupt!");
-            if (isr.UARTInterruptEnabled)
+            if (isr.IsUARTInterruptEnabled)
                 Console.WriteLine("UART Interrupt!");
-            if (isr.MCCBIntEnabled)
+            if (isr.IsMCCBIntEnabled)
                 Console.WriteLine("MCCB Interrupt!");
             this.ResetAllIRQ();
 
@@ -126,13 +134,71 @@ namespace Cosmos.Hardware.Audio.Devices.ES1370
         #endregion
 
 #region I/O Helper routine
-        private void setDataOnDACCodec(DACManager dacManager){ }
-#endregion
-        private void preparePlayBackOnDac(DACManager dacManager)
+        private void setDataOnDACCodec(AK4531Manager dacManager){ }
+        private byte getMemPageValueByNum(byte num)
         {
-            bool state = dacManager.setDACStateEnabled(true);
-            Console.WriteLine("State: " + state);
+           return getMemReference().Read8((UInt32)(Registers.MainRegister.Bit.MemPageAddr+(byte)((num) & 0x0f)));
         }
+
+        private void setMemPageValueByNum(byte num, byte value)
+        {
+            getMemReference().Write8((UInt32)(Registers.MainRegister.Bit.MemPageAddr + (byte)((num) & 0x0f)), value);
+        }
+        private int getDAC2DividendRatio(int num)
+        {
+            int offset = (((num) & 0x1fff) << 16);
+            return getMemReference().Read8((UInt32)(Registers.MainRegister.Bit.Control + (byte)offset));
+        }
+        private void setDAC2ClockInDividendRatio(int num,byte value)
+        {
+            int offset = (((num) >> 16) & 0x1fff);
+            getMemReference().Write8((UInt32)(Registers.MainRegister.Bit.Control + (byte)offset),value);
+        }
+        private int getDAC1ClockDividendRatio(byte num)
+        {
+            int offset = (((num) & 0x03) << 12);
+            return getMemReference().Read8((UInt32)(((Registers.MainRegister.Bit.Control) + (byte)offset)));
+        }
+
+        private void setVoiceCodeFromCCBNum(byte num, byte value)
+        {
+            int offset = (((num) >> 5) & 0x03);
+            getMemReference().Write8((UInt32)(Registers.MainRegister.Bit.Status + (byte)offset), value);
+        }
+
+        private void setTxUARTInterruptInFromNum(int num, byte value){
+            byte offset = (byte)(((num) >> 5) & 0x03);
+            getMemReference().Write8((UInt32)(MainRegister.Bit.UartInfo + (byte)offset), value);
+        }
+        private byte getTxUARTInterruptOutFromNum(byte num)
+        {
+            byte offset = (byte)(((num) & 0x03 ) << 5);
+            return getMemReference().Read8((UInt32)(MainRegister.Bit.UartInfo + (byte)offset));
+        }
+        private byte controlOutFromNum(byte num)
+        {
+            return getMemReference().Read8((UInt32)(MainRegister.Bit.UartInfo + (byte)((num) & 0x03)));
+        }
+
+        private int SRClockDivideByNum(int n)
+        {
+            return (SRClock / n - 2);
+        }
+
+#endregion
+        private void preparePlayBackOnDac(AK4531Manager dacManager)
+        {
+            //dacManager.setDACStateEnabled(true);
+            
+        }
+        public override void playStream(PCMStream pcmStream)
+        {
+            for (int count = 0; count < pcmStream.getData().Length; count++)
+            {
+
+            }
+        }
+
 
     }
 }

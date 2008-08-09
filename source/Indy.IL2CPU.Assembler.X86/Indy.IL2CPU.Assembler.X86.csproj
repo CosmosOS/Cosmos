@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30428</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{7F32CE06-13F2-4EDA-B588-3FAAFD25178A}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -68,6 +68,9 @@
     <Compile Include="CpuId.cs" />
     <Compile Include="Hlt.cs" />
     <Compile Include="LoadTR.cs" />
+    <Compile Include="MMX\Emms.cs" />
+    <Compile Include="MMX\MovD.cs" />
+    <Compile Include="MMX\MovQ.cs" />
     <Compile Include="Popfd.cs" />
     <Compile Include="RotateThroughCarryRight.cs" />
     <Compile Include="DebugStub.cs" />
@@ -96,8 +99,10 @@
     <Compile Include="RotateThroughCarryLeft.cs" />
     <Compile Include="SignExtendAX.cs" />
     <Compile Include="smsw.cs" />
+    <Compile Include="SSE\AddPS.cs" />
     <Compile Include="SSE\AddSS.cs" />
     <Compile Include="SSE\MovSS.cs" />
+    <Compile Include="SSE\SubPS.cs" />
     <Compile Include="Sti.cs" />
     <Compile Include="Stosw.cs" />
     <Compile Include="JumpNotCary.cs" />
@@ -164,6 +169,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Cosmos.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="3DNow!2\" />
+    <Folder Include="3DNow!\" />
+    <Folder Include="AMD-MMX\" />
+    <Folder Include="Cyrix-EMMX\" />
+    <Folder Include="SSE2\" />
+    <Folder Include="SSE3\" />
+    <Folder Include="SSE4\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

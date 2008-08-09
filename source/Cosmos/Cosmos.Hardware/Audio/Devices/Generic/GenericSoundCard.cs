@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Cosmos.Hardware.Audio.Managers;
+using Cosmos.Hardware.Audio.Devices.Generic.Managers;
 namespace Cosmos.Hardware.Audio.Devices
 {
     public abstract class GenericSoundCard
@@ -31,7 +31,7 @@ namespace Cosmos.Hardware.Audio.Devices
         public abstract bool Disable();
         public abstract bool Enable();
         #endregion
-
+        public abstract void playStream(PCMStream pcmStream);
         #region Helpers
         protected Cosmos.Kernel.MemoryAddressSpace getMemReference()
         {
