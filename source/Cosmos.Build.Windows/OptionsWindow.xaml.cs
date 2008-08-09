@@ -47,7 +47,7 @@ namespace Cosmos.Build.Windows {
                         var xLabelByAddressMapping = ObjDump.GetLabelByAddressMapping(xOptionsWindow.mBuilder.BuildPath + "output.bin",
                                                                                       xOptionsWindow.mBuilder.ToolsPath + @"cygwin\objdump.exe");
                         var xSourceMappings = SourceInfo.GetSourceInfo(xLabelByAddressMapping,
-                                                                       xOptionsWindow.mBuilder.BuildPath + "debug.cxdb");
+                                                                       xOptionsWindow.mBuilder.BuildPath + "Tools/asm/debug.cxdb");
                         xDebugWindow.SetSourceInfoMap(xSourceMappings);
                     } else {
                         throw new Exception("Debug mode not supported: " + xOptionsWindow.mDebugMode);
