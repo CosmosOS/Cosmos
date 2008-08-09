@@ -41,7 +41,10 @@ namespace Indy.IL2CPU.IL.X86
 			CurrentLabel = GetInstructionLabel(aReader);
 			MethodInformation = aMethodInfo;
 			ILOffset = aReader.Position;
+	        mNextLabel = GetInstructionLabel(aReader.NextPosition);
 		}
+
+	    private string mNextLabel;
 
 		public override void DoAssemble()
 		{
@@ -50,7 +53,7 @@ namespace Indy.IL2CPU.IL.X86
 					 Engine.RegisterType(CtorDef.DeclaringType),
 					 CurrentLabel,
 					 MethodInformation,
-					 ILOffset);
+                     ILOffset, mNextLabel);
 		}
 
 		public static void Assemble(Assembler.Assembler aAssembler,
@@ -58,7 +61,8 @@ namespace Indy.IL2CPU.IL.X86
 									int aTypeId,
 									string aCurrentLabel,
 									MethodInformation aCurrentMethodInformation,
-									int aCurrentILOffset)
+									int aCurrentILOffset,
+            string aNextLabel)
 		{
 			if (aCtorDef != null)
 			{
@@ -187,63 +191,52 @@ namespace Indy.IL2CPU.IL.X86
 			}
 			else
 			{
-				int xSize = xTypeInfo.StorageSize;
-				if (xSize % 4 != 0)
-				{
-					xSize += 4 - (xSize % 4);
-				}
-				new CPUx86.Move("eax",
-								"esp");
-				for (int i = 0; i < xSize / 4; i++)
-				{
-					new CPUx86.Push("0");
-				}
-				new CPUx86.Push("esp");
-				int xArgSize = (from item in xCtorInfo.Arguments
-								select item.Size + (item.Size % 4 == 0
-														? 0
-														: (4 - (item.Size % 4)))).Take(xCtorInfo.Arguments.Length - 1).Sum();
-				if (xArgSize < xSize)
-				{
-					throw new NotImplementedException("Support for creating new structs using a ctor which argument size is less than the struct size is not yet supported!");
-				}
-				xArgSize += xSize + 4;
-				for (int i = 1; i < xCtorInfo.Arguments.Length; i++)
-				{
-					new Pushd("[esp + 0x" + (xArgSize + 4).ToString("X") + "]");
-				}
-				new Assembler.X86.Call(Label.GenerateLabelName(aCtorDef));
-				new Test(Registers.ECX,
-						 2);
-				new JumpIfEqual(aCurrentLabel + "_NO_ERROR_4");
-				for (int i = 1; i < xCtorInfo.Arguments.Length; i++)
-				{
-					new Assembler.X86.Add(Registers.ESP,
-										  (xCtorInfo.Arguments[i].Size % 4 == 0
-											   ? xCtorInfo.Arguments[i].Size
-											   : ((xCtorInfo.Arguments[i].Size / 4) * 4) + 1).ToString());
-				}
-				new Assembler.X86.Add(Registers.ESP,
-									  "4");
-				foreach (StackContent xStackInt in aAssembler.StackContents)
-				{
-					new Assembler.X86.Add(Registers.ESP,
-										  xStackInt.Size.ToString());
-				}
-				Call.EmitExceptionLogic(aAssembler,
-										aCurrentILOffset,
-										aCurrentMethodInformation,
-										aCurrentLabel + "_NO_ERROR_4",
-										false,
-										null);
-				new Label(aCurrentLabel + "_NO_ERROR_4");
-				// at this point, there's the normal arguments on the stack, and the newly created object value
-				for (int i = 0; i < xSize / 4; i++)
-				{
-					new CPUx86.Pop("eax");
-					new CPUx86.Move("[esp + " + (xArgSize + i * 4) + "]",
-									"eax");
-				}
+				/*
+                 * Current sitation on stack:
+                 *   $ESP       Arg
+                 *   $ESP+..    other items
+                 *   
+                 * What should happen:
+                 *  + The stack should be increased to allow space to contain:
+                 *         + .ctor arguments
+                 *         + struct _pointer_ (ref to start of emptied space)
+                 *         + empty space for struct
+                 *  + arguments should be copied to the new place
+                 *  + old place where arguments were should be cleared
+                 *  + pointer should be set
+                 *  + call .ctor
+                 */
+			    var xStorageSize = xTypeInfo.StorageSize;
+                if (xStorageSize % 4 != 0) {
+                    xStorageSize += 4 - (xStorageSize % 4);
+                }
+			    int xArgSize = (from item in xCtorInfo.Arguments
+			                    select item.Size + (item.Size % 4 == 0
+			                                            ? 0
+			                                            : (4 - (item.Size % 4)))).Take(xCtorInfo.Arguments.Length - 1).Sum();
+			    int xExtraArgSize = xStorageSize - xArgSize;
+                if (xExtraArgSize < 0) {
+                    xExtraArgSize = 0;
+                }
+                if(xExtraArgSize>0) {
+                    new CPUx86.Sub("esp",
+                                   xExtraArgSize.ToString());
+                }
+			    new CPUx86.Push("esp");
+                aAssembler.StackContents.Push(new StackContent(4));
+                for(int i = 0; i<(xArgSize/4);i++) {
+                    new CPUx86.Pushd("[esp + " + (xStorageSize + 4) + "]"); // + 4 because the ptr is pushed too
+                    new CPUx86.Move("dword [esp + " + (xStorageSize + 4 + 4) + "]",
+                                    "0"); // clear the original place of the args
+                }
+			    var xCall = new Call(aCtorDef,
+			                         aCurrentILOffset,
+			                         true,
+			                         aNextLabel);
+                xCall.Assembler = aAssembler;
+			    xCall.Assemble();
+                aAssembler.StackContents.Push(new StackContent(xStorageSize,
+                                                               aCtorDef.DeclaringType));
 			}
 		}
 	}

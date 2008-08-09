@@ -146,17 +146,17 @@ namespace MatthijsTest {
                 var xBoot = new Cosmos.Sys.Boot();
                 xBoot.Execute();
             }
-            //Application.Init(false);
-            //Application.ColorDialogNormal = (int)ConsoleColor.DarkGray;
-//            Application.
-            Dialog d = new Dialog(40, 8, "Hello");
-            d.Redraw();
-            //d.Add(new Label(0, 0, "Hello World"));
-            //Application.Run(d);
-            Console.WriteLine("Done");
-            do {
-                Console.WriteLine(Console.ReadLine());
-            } while (true);
+            int i = 0;
+            while (true)
+            {
+                Console.WriteLine(i);
+                ++i;
+            }
+            //var xPtr = new IntPtr(0);
+            //Console.WriteLine("Done");
+            //do {
+            //    Console.WriteLine(Console.ReadLine());
+            //} while (true);
         }
 
         public static int TestMethodNoParams() {

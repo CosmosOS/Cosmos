@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Reflection;
 using Indy.IL2CPU.Assembler;
@@ -34,7 +34,8 @@ namespace Indy.IL2CPU.IL.X86 {
                             Engine.RegisterType(xNullRefExcType),
                             aCurrentLabel,
                             aMethodInfo,
-                            aCurrentILOffset);
+                            aCurrentILOffset, aCurrentLabel + "__After_NullRef_ctor");
+            new Label(aCurrentLabel + "__After_NullRef_ctor");
             aAssembler.StackContents.Pop();
             new CPUx86.Move("[" + DataMember.GetStaticFieldName(CPU.Assembler.CurrentExceptionRef) + "]",
                             "eax");
