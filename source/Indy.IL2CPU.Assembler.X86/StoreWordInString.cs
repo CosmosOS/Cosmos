@@ -5,6 +5,6 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
 	[OpCode(0xFFFFFFFF, "stosw")]
-	public class Stosw: Instruction {
+	public class StoreWordInString: Instruction {
 	}
 }

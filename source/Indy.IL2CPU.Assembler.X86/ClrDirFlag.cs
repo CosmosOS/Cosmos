@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
-	[OpCode(0xFFFFFFFF, "stosb")]
-	public class Stosb: Instruction {
+	[OpCode(0xFFFFFFFF, "cld")]
+	public class ClrDirFlag: Instruction {
 	}
 }

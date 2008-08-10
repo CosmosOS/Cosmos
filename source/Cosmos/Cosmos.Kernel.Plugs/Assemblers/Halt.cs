@@ -15,7 +15,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers
     {
         public override void Assemble(Assembler aAssembler)
         {
-            new CPUx86.Hlt();
+            new CPUx86.Halt();
         }
     }
 }

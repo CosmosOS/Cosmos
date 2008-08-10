@@ -86,11 +86,11 @@ namespace Indy.IL2CPU.Assembler.X86.X {
         }
         
         public void Return() {
-            new X86.Ret();
+            new X86.Return();
         }
         
         public void Return(UInt16 aBytes) {
-            new X86.Ret(aBytes);
+            new X86.Return(aBytes);
         }
 
         public void EnableInterrupts() {
@@ -98,7 +98,7 @@ namespace Indy.IL2CPU.Assembler.X86.X {
         }
 
         public void DisableInterrupts() {
-            new X86.Cli();
+            new X86.ClrInterruptFlag();
         }
 
     }

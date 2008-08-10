@@ -17,6 +17,7 @@ namespace DokuTest
         {
             var xBoot = new Cosmos.Sys.Boot();
             xBoot.Execute();
+            /*
             Console.ForegroundColor=ConsoleColor.Black;
             Console.WriteLine("011000000111011011110000101101101101010110000011010100111110010010110110000000");
             Console.Write("0100010011110");
@@ -67,7 +68,7 @@ namespace DokuTest
             Console.ForegroundColor = ConsoleColor.Green;
             Console.Write("1100001");
             Console.ForegroundColor = ConsoleColor.Black;
-            /*Console.Write("10111");
+            Console.Write("10111");
             Console.ForegroundColor = ConsoleColor.Green;
             Console.Write("1001001");
             Console.ForegroundColor = ConsoleColor.Black;
@@ -76,13 +77,13 @@ namespace DokuTest
             Console.Write("10111011101");
             Console.ForegroundColor = ConsoleColor.Black;
             Console.Write("0");
-            Console.ForegroundColor = ConsoleColor.Green;
+            Console.ForegroundColor = ConsoleColor.Green;*/
             int i = 0;
             while (true)
             {
                 Console.WriteLine(i);
                 ++i;
-            }*/
+            }
             Console.Read();
             Console.WriteLine("*** COSMOS Operating System - Doku's Test Suite ***");
             Console.WriteLine("*** Ensoniq AudioPCI 1370 testing ***");

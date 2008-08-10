@@ -100,7 +100,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
             for (int j = 0; j < 256; j++) {
                 new Label("__ISR_Handler_" + j.ToString("X2"));
                 //if (j < 0x20 || j > 0x2F || true) {
-                new CPUx86.Cli();
+                new CPUx86.ClrInterruptFlag();
                 new CPUx86.Move("eax", "0x10");
                 new CPUx86.Move("ds",
                                 "eax");
@@ -164,7 +164,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
                 new CPUx86.Sti();
                 new CPUx86.Move("dword", "[InterruptsEnabledFlag]", 1);
                 //}
-                new CPUx86.IRet();
+                new CPUx86.InterruptReturn();
             }
             new Label("__AFTER__ALL__ISR__HANDLER__STUBS__");
             new CPUx86.Noop();

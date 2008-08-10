@@ -10,7 +10,7 @@ namespace Cosmos.Sys.Plugs.Assemblers
     {
         public override void Assemble(Assembler aAssembler)
         {
-        	new CPUx86.Cli();
+        	new CPUx86.ClrInterruptFlag();
         	new CPUx86.Move(Registers.DX, 0x60);
     /* Clear all keyboard buffers (output and command buffers) */
         	new CPUAll.Label(".clearBuffer");
@@ -26,7 +26,7 @@ namespace Cosmos.Sys.Plugs.Assemblers
         	new Move(Registers.AL, 0xfe);
         	new Out(Registers.DX, Registers.AL);
             new CPUAll.Label(".loop");//failed... halt
-            new CPUx86.Hlt();
+            new CPUx86.Halt();
             new CPUx86.Jump(".loop");
         }
     }

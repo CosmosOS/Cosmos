@@ -62,7 +62,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers
             //; 	ReturnSize: 0
         public override void Assemble(Assembler aAssembler)
         {
-            new CPUx86.Cli();
+            new CPUx86.ClrInterruptFlag();
             new CPUx86.Move("eax", "[ebp + 08h]");
             new CPUx86.CpuId();
             new CPUx86.Move("edi", "[ebp + 18h]");

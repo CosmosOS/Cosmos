@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86.MMX
 {
-    class MovQ
+    class MoveQuad
     {
     }
 }

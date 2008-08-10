@@ -36,60 +36,57 @@ namespace Cosmos.Kernel {
                 switch (xCurrentDigit)
                 {
                     case 0:
-                        xDigitString = "0";
-                        goto default;
+                        Console.Write('0');
+                        break;
                     case 1:
-                        xDigitString = "1";
-                        goto default;
+                        Console.Write('1');
+                        break;
                     case 2:
-                        xDigitString = "2";
-                        goto default;
+                        Console.Write('2');
+                        break;
                     case 3:
-                        xDigitString = "3";
-                        goto default;
+                        Console.Write('3');
+                        break;
                     case 4:
-                        xDigitString = "4";
-                        goto default;
+                        Console.Write('4');
+                        break;
                     case 5:
-                        xDigitString = "5";
-                        goto default;
+                        Console.Write('5');
+                        break;
                     case 6:
-                        xDigitString = "6";
-                        goto default;
+                        Console.Write('6');
+                        break;
                     case 7:
-                        xDigitString = "7";
-                        goto default;
+                        Console.Write('7');
+                        break;
                     case 8:
-                        xDigitString = "8";
-                        goto default;
+                        Console.Write('8');
+                        break;
                     case 9:
-                        xDigitString = "9";
-                        goto default;
+                        Console.Write('9');
+                        break;
                     case 10:
-                        xDigitString = "A";
-                        goto default;
+                        Console.Write('A');
+                        break;
                     case 11:
-                        xDigitString = "B";
-                        goto default;
+                        Console.Write('B');
+                        break;
                     case 12:
-                        xDigitString = "C";
-                        goto default;
+                        Console.Write('C');
+                        break;
                     case 13:
-                        xDigitString = "D";
-                        goto default;
+                        Console.Write('D');
+                        break;
                     case 14:
-                        xDigitString = "E";
-                        goto default;
+                        Console.Write('E');
+                        break;
                     case 15:
-                        xDigitString = "F";
-                        goto default;
-                    default:
-                        Console.Write(xDigitString);
+                        Console.Write('F');
                         break;
                 }
             }
         }
-
+        
         private static bool mDebugDisplayInitialized = false;
 
         // this method displays the used/total memory of the heap on the first line of the text screen
@@ -102,14 +99,14 @@ namespace Cosmos.Kernel {
                 Console.CursorTop = 0;
                 Console.Write("[Heap Usage: ");
                 WriteNumber(mStartAddress,
-                            32);
+                           32);
                 Console.Write("/");
                 WriteNumber(mEndOfRam,
-                            32);
+                          32);
                 Console.Write("] bytes");
                 while(Console.CursorLeft < (Console.WindowWidth-1)) {
-                    Console.Write(" ");
-                }
+                   Console.Write(" ");
+             }
                 Console.CursorLeft = xOldPositionLeft;
                 Console.CursorTop = xOldPositionTop;
             }else {
@@ -288,52 +285,52 @@ namespace Cosmos.Kernel {
 //                {
 //                    case 0:
 //                        xDigitString = "0";
-//                        goto default;
+//                        
 //                    case 1:
 //                        xDigitString = "1";
-//                        goto default;
+//                        
 //                    case 2:
 //                        xDigitString = "2";
-//                        goto default;
+//                        
 //                    case 3:
 //                        xDigitString = "3";
-//                        goto default;
+//                        
 //                    case 4:
 //                        xDigitString = "4";
-//                        goto default;
+//                        
 //                    case 5:
 //                        xDigitString = "5";
-//                        goto default;
+//                        
 //                    case 6:
 //                        xDigitString = "6";
-//                        goto default;
+//                        
 //                    case 7:
 //                        xDigitString = "7";
-//                        goto default;
+//                        
 //                    case 8:
 //                        xDigitString = "8";
-//                        goto default;
+//                        
 //                    case 9:
 //                        xDigitString = "9";
-//                        goto default;
+//                        
 //                    case 10:
 //                        xDigitString = "A";
-//                        goto default;
+//                        
 //                    case 11:
 //                        xDigitString = "B";
-//                        goto default;
+//                        
 //                    case 12:
 //                        xDigitString = "C";
-//                        goto default;
+//                        
 //                    case 13:
 //                        xDigitString = "D";
-//                        goto default;
+//                        
 //                    case 14:
 //                        xDigitString = "E";
-//                        goto default;
+//                        
 //                    case 15:
 //                        xDigitString = "F";
-//                        goto default;
+//                        
 //                    default:
 //                        Console.Write(xDigitString);
 //                        break;

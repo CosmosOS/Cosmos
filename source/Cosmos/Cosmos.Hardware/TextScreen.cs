@@ -10,7 +10,6 @@ namespace Cosmos.Hardware
         protected const byte DefaultColor = 15; //White
         protected static bool mInitialized = false;
         protected static byte Color;
-
         protected static void CheckInit()
         {
             if (!mInitialized)
@@ -127,7 +126,6 @@ namespace Cosmos.Hardware
             *xScreenPtr = xVal;
             xScreenPtr++;
             *xScreenPtr = Color;
-
             SetCursor();
         }
 
