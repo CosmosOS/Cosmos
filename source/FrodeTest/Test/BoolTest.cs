@@ -13,6 +13,19 @@ namespace FrodeTest.Test
             bool no = false;
             Console.WriteLine("true.ToString() gives: " + yes.ToString());
             Console.WriteLine("false.ToString() gives: " + no.ToString());
+
+
+            CompareNullReturnFalse();
+        }
+
+        public static bool CompareNullReturnFalse()
+        {
+            return (GetNull() != null);
+        }
+
+        public static object GetNull()
+        {
+            return null;
         }
     }
 }

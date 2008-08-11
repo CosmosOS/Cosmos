@@ -17,24 +17,54 @@ namespace FrodeTest.Test
             //    Console.WriteLine(entry.Name);
             //}
 
+
+            //Check directory exists
+            Cosmos.Hardware.DebugUtil.SendMessage("VFSTest.cs", "Check directory exists");
+            if (Directory.Exists("/0/Illegal/"))
+                Console.WriteLine("Fail3");
+            if (!Directory.Exists("/0/Zulu"))
+                Console.WriteLine("Fail4");
+            if (!Directory.Exists("/0/Zulu/"))
+                Console.WriteLine("Fail5");
+
+            //Check file exists
+            Cosmos.Hardware.DebugUtil.SendMessage("VFSTest.cs", "Check file exists");
+            if (!File.Exists("/0/Readme.txt"))
+                Console.WriteLine("Fail-File1");
+            if (File.Exists("/0/BogusFile.txt"))
+                Console.WriteLine("Fail-File2");
+            if (!File.Exists("/0/Alfa/Bravo/slide_puzzle.lua"))
+                Console.WriteLine("Fail-File3");
+
+
             //Current directory
+            Cosmos.Hardware.DebugUtil.SendMessage("VFSTest.cs", "Testing Current Directory");
             Console.WriteLine("Current directory: " + Directory.GetCurrentDirectory());
             Directory.SetCurrentDirectory("/0/Alfa/Bravo/");
             Console.WriteLine("Current directory: " + Directory.GetCurrentDirectory());
 
             //Enumerate directories
+            Cosmos.Hardware.DebugUtil.SendMessage("VFSTest.cs", "Enumerating directories");
             foreach (string xDir in Directory.GetDirectories(Directory.GetCurrentDirectory()))
+            {
+                Cosmos.Hardware.DebugUtil.SendMessage("VFSTest.cs", "Enumerating directory " + xDir);
                 Console.WriteLine(xDir);
+            }
             //Enumerate files
+            Cosmos.Hardware.DebugUtil.SendMessage("VFSTest.cs", "Enumerating files");
             foreach (string xFile in Directory.GetFiles(Directory.GetCurrentDirectory()))
+            {
                 Console.WriteLine(xFile);
+            }
 
             //Get specific directory
+            Cosmos.Hardware.DebugUtil.SendMessage("VFSTest.cs", "Get specific directory");
             DirectoryInfo xDirInfo = new DirectoryInfo(Directory.GetCurrentDirectory());
             Console.Write("Got directory : " + xDirInfo.Name);
             Cosmos.Hardware.TextScreen.NewLine();
 
             //Check relative and absolute paths
+            Cosmos.Hardware.DebugUtil.SendMessage("VFSTest.cs", "Check relative and absolute paths");
             if (!Path.IsPathRooted("0:/Alfa/"))
                 Console.WriteLine("Fail1");
             if (Path.IsPathRooted("Alfa"))
@@ -43,23 +73,29 @@ namespace FrodeTest.Test
             Console.WriteLine("GetDirectoryName: " + Path.GetDirectoryName("/0/Zulu"));
             Console.WriteLine("GetDirectoryName: " + Path.GetDirectoryName("/0/Zulu/"));
 
-            //Check directory exists
-            if (Directory.Exists("/0/Illegal/"))
-                Console.WriteLine("Fail3");
-            if (!Directory.Exists("/0/Zulu"))
-                Console.WriteLine("Fail4");
-            if (!Directory.Exists("/0/Zulu/"))
-                Console.WriteLine("Fail5");
+            Cosmos.Hardware.DebugUtil.SendMessage("VFSTest.cs", "Splitting");
+            //SplitPath
+            string xPathToSplit = @"0:\Alfa\Bravo\Charlie\";
+            string[] xParts = VFSManager.SplitPath(xPathToSplit);
+            Console.WriteLine("Splitting " + xPathToSplit + " into: ");
+            for (int i = 0; i < xParts.Length; i++)
+            {
+                Console.WriteLine(xParts[i]);
+            }
+
             //if (!Directory.Exists("0:/Frode/"))
             //    Console.WriteLine("Fail6");
             //Change directory
             //Enumerate directory
 
             //Enumerate drives
+            Cosmos.Hardware.DebugUtil.SendMessage("VFSTest.cs", "Enumerate drives");
             Console.WriteLine("Drives found:");
             foreach (string drive in Directory.GetLogicalDrives())
                 Console.WriteLine("    " + drive);
 
+            //GetPathRoot
+            Cosmos.Hardware.DebugUtil.SendMessage("VFSTest.cs", "Testing GetPathRoot");
             Console.WriteLine("PathRoot (1:/): " + Path.GetPathRoot("1:/Alfa/"));
             Console.WriteLine("PathRoot (blank): " + Path.GetPathRoot("ShouldBeBlank"));
 

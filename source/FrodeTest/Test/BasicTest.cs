@@ -35,6 +35,14 @@ namespace FrodeTest.Test
             bArray[3] = (byte)3;
 
             Console.WriteLine("Byte array: " + bArray[0] + "." + bArray[1] + "." + bArray[2] + "." + bArray[3]);
+
+            //Looping
+            string[] stringArray = new string[] { "Foreach", "over", "String", "array", "works"};
+            foreach (string s in stringArray)
+            {
+                Console.Write(s + " ");
+            }
+            Console.WriteLine();
         }
     }
 }
