@@ -24,14 +24,14 @@ namespace Cosmos.Hardware {
             Kernel.CPU.CreateIDT(true);
 
             Console.WriteLine("    Init PCIBus");
-            PCIBus.Init();
+            //PCIBus.Init();
 
             // Old
             Console.WriteLine("    Init Keyboard");
             Keyboard.Initialize();
             // New
             Console.WriteLine("    Init ATA");
-            Storage.ATA.ATA.Initialize();
+            //Storage.ATA.ATA.Initialize();
             //Device.Add(new PC.Bus.CPU.Keyboard());
         }
 
