@@ -8,21 +8,21 @@ namespace EsxTest
 {
     unsafe class Program
     {
-        static bool Test = true;
+        static bool Test = false;
 
         #region Cosmos Builder logic
         // Most users wont touch this. This will call the Cosmos Build tool
         [STAThread]
         static void Main(string[] args)
         {
-            if (!Test)
-            {
+            //if (!Test)
+            //{
                 BuildUI.Run();
-            }
-            else
-            {
-                Init();
-            }
+            //}
+            //else
+            //{
+            //    Init();
+            //}
         }
 
         #endregion

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30428</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{7F32CE06-13F2-4EDA-B588-3FAAFD25178A}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -122,6 +122,7 @@
     <Compile Include="Compare.cs" />
     <Compile Include="ConditionalMove.cs" />
     <Compile Include="Condition.cs" />
+    <Compile Include="JumpIfECXZero.cs" />
     <Compile Include="DAA.cs" />
     <Compile Include="DAS.cs" />
     <Compile Include="SetDirectionFlag.cs" />

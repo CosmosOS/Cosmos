@@ -28,13 +28,11 @@ namespace Cosmos.Kernel {
             uint xValue = aNumber;
             byte xCurrentBits = aBits;
             Console.Write("0x");
-            while (xCurrentBits >= 4)
-            {
+            while (xCurrentBits >= 4) {
                 xCurrentBits -= 4;
                 byte xCurrentDigit = (byte)((xValue >> xCurrentBits) & 0xF);
                 string xDigitString = null;
-                switch (xCurrentDigit)
-                {
+                switch (xCurrentDigit) {
                     case 0:
                         xDigitString = "0";
                         goto default;
@@ -84,6 +82,9 @@ namespace Cosmos.Kernel {
                         xDigitString = "F";
                         goto default;
                     default:
+                        if (xDigitString == null) {
+                            System.Diagnostics.Debugger.Break();
+                        }
                         Console.Write(xDigitString);
                         break;
                 }

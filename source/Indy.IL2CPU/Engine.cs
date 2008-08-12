@@ -322,7 +322,8 @@ namespace Indy.IL2CPU {
                                                                    });
                         OnProgressChanged();
                         ScanAllMethods();
-                        ScanAllStaticFields();
+                        ScanAllStaticFields(); 
+                        mMap.PreProcess(mAssembler);
                         if (!aInMetalMode) {
                             do {
                                 int xOldCount = mMethods.Count;
@@ -360,7 +361,6 @@ namespace Indy.IL2CPU {
                         // todo: implement support for returncodes?
                         xEntryPointOp.Call(RuntimeEngineRefs.FinalizeApplicationRef);
                         xEntryPointOp.Exit();
-                        mMap.PreProcess(mAssembler);
                         mMethods = new ReadOnlyDictionary<MethodBase, QueuedMethodInformation>(mMethods);
                         mStaticFields = new ReadOnlyDictionary<FieldInfo, QueuedStaticFieldInformation>(mStaticFields);
                         ProcessAllMethods();
@@ -2087,10 +2087,6 @@ namespace Indy.IL2CPU {
         public static void QueueMethod(MethodBase aMethod) {
             if (mCurrent == null) {
                 throw new Exception("ERROR: No Current Engine found!");
-            }
-            if (aMethod == null) {
-                System.Diagnostics.Debugger.Break();
-                throw new ArgumentNullException("aMethod");
             }
             if (!aMethod.IsStatic) {
                 RegisterType(aMethod.DeclaringType);

@@ -140,7 +140,7 @@ namespace MatthijsTest {
 
         //private static event Action TestEvent;
         public static void Init() {
-            bool xTest = false;
+            bool xTest = true;
             if (xTest)
             {
                 var xBoot = new Cosmos.Sys.Boot();

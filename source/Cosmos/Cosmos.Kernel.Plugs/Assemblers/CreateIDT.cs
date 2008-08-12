@@ -12,7 +12,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
     public class CreateIDT : AssemblerMethod {
         private static MethodBase GetMethodDef(Assembly aAssembly,
                                                string aType,
-                                               string aMethodName,
+                                               string aMethodName, 
                                                bool aErrorWhenNotFound) {
             System.Type xType = aAssembly.GetType(aType,
                                                   false);
@@ -99,23 +99,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
             var xInterruptsWithParam = new int[] {8, 10, 11, 12, 13, 14};
             for (int j = 0; j < 256; j++) {
                 new Label("__ISR_Handler_" + j.ToString("X2"));
-                //if (j < 0x20 || j > 0x2F || true) {
-                new CPUx86.ClrInterruptFlag();
-                new CPUx86.Move("eax", "0x10");
-                new CPUx86.Move("ds",
-                                "eax");
-                new CPUx86.Move("es",
-                                "eax");
-                new CPUx86.Move("fs",
-                                "eax");
-                new CPUx86.Move("gs",
-                                "eax");
-                new CPUx86.Move("ss",
-                                "eax");
-                                
-								new CPUx86.Move("dword", "[InterruptsEnabledFlag]", 0);
-                //}
-                new CPUx86.Break();
+                new CPUx86.Move("dword", "[InterruptsEnabledFlag]", 0);
                 if (Array.IndexOf(xInterruptsWithParam,
                                   j) ==
                     -1) {
@@ -136,7 +120,9 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 
                 new CPUx86.Push("eax"); // 
                 new CPUx86.Push("eax"); // pass old stack address (pointer to InterruptContext struct) to the interrupt handler
-
+                new CPUx86.Move("eax",
+                                "esp");
+                new CPUx86.Push("eax");
                 new CPUx86.Jump("0x8:__ISR_Handler_" + j.ToString("X2") + "_SetCS");
                 new Label("__ISR_Handler_" + j.ToString("X2") + "_SetCS");
                 MethodBase xHandler = GetInterruptHandler((byte) j);
@@ -150,7 +136,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
                 new CPUx86.Pop("eax");
                 
                 new CPUx86.FXStore("[esp]");
-                
+
                 new CPUx86.Move("esp", "eax"); // this restores the stack for the FX stuff, except the pointer to the FX data
                 new CPUx86.Add("esp", "4"); // "pop" the pointer
                 
@@ -160,8 +146,9 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
                                "8");
                 new CPUx86.Break();
                 new Label("__ISR_Handler_" + j.ToString("X2") + "_END");
+                // MtW: Appearantly, we dont need to enable interrupts on exit
                 //if (j < 0x20 || j > 0x2F) {
-                new CPUx86.Sti();
+                //new CPUx86.Sti();
                 new CPUx86.Move("dword", "[InterruptsEnabledFlag]", 1);
                 //}
                 new CPUx86.InterruptReturn();

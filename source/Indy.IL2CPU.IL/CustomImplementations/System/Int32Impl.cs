@@ -18,7 +18,12 @@ namespace Indy.IL2CPU.IL.CustomImplementations.System {
 				xIsNegative = true;
 				aValue *= -1;
 			}
-			return UInt32Impl.GetNumberString((uint)aValue, xIsNegative);
+			var xResult = UInt32Impl.GetNumberString((uint)aValue, xIsNegative);
+            if(xResult==null) {
+                global::System.Diagnostics.Debugger.Break();
+                return UInt32Impl.GetNumberString((uint)aValue, xIsNegative);
+            }
+		    return xResult;
 		}
 	}
 }

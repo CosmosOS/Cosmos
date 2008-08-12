@@ -25,9 +25,15 @@ namespace Indy.IL2CPU.IL.X86 {
                                                string aNextLabel,
                                                Action aEmitCleanupMethod,
                                                int aCurrentILOffset) {
+            //new CPUx86.Move("ecx",
+                            //"[esp]");
             new CPUx86.Compare("dword " + aAddress,
                                "0");
-            new CPUx86.JumpIfNotEqual(aNextLabel);
+            new CPUx86.JumpIfZero(aCurrentLabel + "_Step1");
+            new CPUx86.Jump(aNextLabel);
+            //new CPUx86.JumpIfNotEqual(aNextLabel);
+            new Label(aCurrentLabel + "_Step1");
+            new CPUx86.Call("DEBUG_STUB_");
             Type xNullRefExcType = typeof(NullReferenceException);
             Newobj.Assemble(aAssembler,
                             xNullRefExcType.GetConstructor(new Type[0]),

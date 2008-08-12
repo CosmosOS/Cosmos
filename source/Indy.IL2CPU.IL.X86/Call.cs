@@ -173,7 +173,7 @@ namespace Indy.IL2CPU.IL.X86 {
         }
 
 	    protected virtual void HandleDebuggerBreak() {
-			//
+	        new CPUx86.Call("DEBUG_STUB_");
 		}
 
 		public override void DoAssemble() {
