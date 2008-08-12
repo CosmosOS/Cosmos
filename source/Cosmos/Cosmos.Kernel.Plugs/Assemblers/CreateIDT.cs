@@ -114,7 +114,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
                 // store floating point data
                 new CPUx86.And("esp", "0xfffffff0"); // fxsave needs to be 16-byte alligned
                 new CPUx86.Sub("esp", "512"); // fxsave needs 512 bytes
-                new CPUx86.FXSave("[esp]"); // save the registers
+                //new CPUx86.FXSave("[esp]"); // save the registers
                 new CPUx86.Sub("eax", "4");
                 new CPUx86.Move("[eax]", "esp");
 
@@ -135,7 +135,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
                 new CPUx86.Call(Label.GenerateLabelName(xHandler));
                 new CPUx86.Pop("eax");
                 
-                new CPUx86.FXStore("[esp]");
+                //new CPUx86.FXStore("[esp]");
 
                 new CPUx86.Move("esp", "eax"); // this restores the stack for the FX stuff, except the pointer to the FX data
                 new CPUx86.Add("esp", "4"); // "pop" the pointer
@@ -150,7 +150,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
                 //if (j < 0x20 || j > 0x2F) {
                 //new CPUx86.Sti();
                 new CPUx86.Move("dword", "[InterruptsEnabledFlag]", 1);
-                //}
+                //} 
                 new CPUx86.InterruptReturn();
             }
             new Label("__AFTER__ALL__ISR__HANDLER__STUBS__");
