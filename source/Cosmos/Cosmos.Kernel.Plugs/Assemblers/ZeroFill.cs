@@ -10,7 +10,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 
 		//		public static void ZeroFill(uint aStartAddress, uint aLength) {}
 		public override void Assemble(Assembler aAssembler) {
-            new CPUx86.ClrDirFlag();
+            new ClrDirFlag();
 			new CPUx86.Move("edi", "[ebp + 0xC]"); // address
 			new CPUx86.Move("ecx", "[ebp + 8]");  // length
 			new CPUx86.Move("eax", "0");

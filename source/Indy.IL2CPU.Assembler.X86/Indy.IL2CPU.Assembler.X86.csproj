@@ -80,6 +80,7 @@
     <Compile Include="CmpByteString.cs" />
     <Compile Include="CmpWordString.cs" />
     <Compile Include="EffectAddr.cs" />
+    <Compile Include="JumpOnGreater.cs" />
     <Compile Include="LoadESWithPointer.cs" />
     <Compile Include="FlagIntoAH.cs" />
     <Compile Include="LoadByte.cs" />

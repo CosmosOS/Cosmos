@@ -38,7 +38,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				new CPUx86.Sub("ebx", "eax");
 				new CPUx86.SubWithCarry("ecx", "edx");
 				//result = value1 - value2
-				new CPUx86.JumpIfGreater(TargetLabel);
+				new CPUx86.JumpOnGreater(TargetLabel);
 			}else
 			{
 				new CPUx86.Pop(CPUx86.Registers.EAX);
