@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+//using System.Linq;
 using Cosmos.Sys.FileSystem;
 using Cosmos.Sys.FileSystem.Ext2;
 using Cosmos.Hardware;
@@ -14,7 +14,6 @@ namespace Cosmos.Sys {
 
         private static void DetectFilesystem(BlockDevice aDevice) {
             #region Ext2
-
             if (Ext2.BlockDeviceContainsExt2(aDevice)) {
                 aDevice.Used = true;
                 var xFS = new Ext2(aDevice);
@@ -47,6 +46,8 @@ namespace Cosmos.Sys {
                                           "Registered Filesystems",
                                           (uint)mFilesystems.Count,
                                           32);
+            if (mFilesystems.Count == 0)
+                Console.WriteLine("WARNING: No filesystems found in VFS init!");
         }
 
         //Path examples:
@@ -65,7 +66,6 @@ namespace Cosmos.Sys {
         public static bool ContainsVolumeSeparator(this string aPath)
         {
             return (aPath[1] == Path.VolumeSeparatorChar);
-            //return aPath.Contains(Path.VolumeSeparatorChar);
         }
 
         public static bool IsAbsolutePath(this string aPath)
@@ -199,8 +199,8 @@ namespace Cosmos.Sys {
 
         private static FilesystemEntry[] GetVolumes()
         {
-        //    if (aFilesystems == null)
-        //        throw new ArgumentNullException("mFilesystems has not been initialized");
+            //if (aFilesystems == null)
+            //    throw new ArgumentNullException("mFilesystems has not been initialized");
 
             //Get volumes
             var xResult = new FilesystemEntry[mFilesystems.Count];
@@ -238,7 +238,10 @@ namespace Cosmos.Sys {
         /// <returns>A filesystem</returns>
         private static Filesystem GetFileSystemFromPath(string aPath, int aOffset)
         {
-            return mFilesystems[ParseStringToInt(aPath, aOffset)];
+            if (mFilesystems.Count == 0)
+                throw new Exception("No filesystems found");
+            else
+                return mFilesystems[ParseStringToInt(aPath, aOffset)];
         }
 
         private static int ParseStringToInt(string aString,
@@ -316,7 +319,7 @@ namespace Cosmos.Sys {
             }
             catch (Exception e)
             {
-                Cosmos.Hardware.DebugUtil.SendMessage("FileExists", e.Message);
+                Cosmos.Hardware.DebugUtil.SendMessage("FileExists", "Error!: " + e.Message);
                 return false;
             }
         }
@@ -544,7 +547,7 @@ namespace Cosmos.Sys {
         public static string[] GetLogicalDrives()
         {
             List<string> xDrives = new List<string>();
-            foreach (FilesystemEntry entry in GetDirectoryListing("/"))
+            foreach (FilesystemEntry entry in GetVolumes())
                 xDrives.Add(entry.Name + Path.VolumeSeparatorChar + Path.DirectorySeparatorChar);
 
             return xDrives.ToArray();
