@@ -24,7 +24,7 @@ namespace Cosmos.Hardware {
             Kernel.CPU.CreateIDT(true);
 
             Console.WriteLine("    Init PCIBus");
-            //PCIBus.Init();
+            PCIBus.Init();
 
             // Old
             Console.WriteLine("    Init Keyboard");

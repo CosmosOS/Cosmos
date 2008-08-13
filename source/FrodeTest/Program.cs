@@ -60,18 +60,18 @@ namespace FrodeTest
             //Test.LinqTest.RunTest();
             //Test.ExceptionTest.RunTest();
             //Test.FilesystemEntryTest.RunTest();
-            Test.VirtualFileSystemTest.RunTest();
+            //Test.VirtualFileSystemTest.RunTest();
             //Test.DirectoryInfoTest.RunTest();
             //Test.FileInfoTest.RunTest();
 
             //Tests ready for Matthijs to fix ;)
-            //Test.RTL8139Test.RunTest();
+            Test.RTL8139Test.RunTest();
             //Test.ExceptionTest.RunTest();
             
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine("CRITICAL ERROR: " + ex.Message);
             }
              
             //Done

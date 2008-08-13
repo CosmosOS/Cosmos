@@ -12,7 +12,14 @@ namespace FrodeTest.Test
         {
             // Testing RTL8139 PCI networkcard
             //Load card
-            var xNic = RTL8139.FindAll()[0];
+            var xNics = RTL8139.FindAll();
+            if (xNics.Count == 0)
+            {
+                Console.WriteLine("No network cards found");
+                return;
+            }
+
+            var xNic = xNics[0];
 
             xNic.Enable();
             xNic.InitializeDriver();
