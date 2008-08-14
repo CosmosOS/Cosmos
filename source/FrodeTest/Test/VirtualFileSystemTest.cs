@@ -19,29 +19,44 @@ namespace FrodeTest.Test
 
 
             //Check directory exists
-            Cosmos.Hardware.DebugUtil.SendMessage("VFSTest.cs", "Check directory exists");
-            if (Directory.Exists("/0/Illegal/"))
-                Console.WriteLine("Fail3");
-            if (!Directory.Exists("/0/Zulu"))
-                Console.WriteLine("Fail4");
-            if (!Directory.Exists("/0/Zulu/"))
-                Console.WriteLine("Fail5");
+            //Cosmos.Hardware.DebugUtil.SendMessage("VFSTest.cs", "Check directory exists");
+            //if (Directory.Exists("/0/Illegal/"))
+            //    Console.WriteLine("Fail3");
+            //if (!Directory.Exists("/0/Zulu"))
+            //    Console.WriteLine("Fail4");
+            //if (!Directory.Exists("/0/Zulu/"))
+            //    Console.WriteLine("Fail5");
+            Check.Text = "/0/Illegal/";
+            Check.Validate(!Directory.Exists(Check.Text));
+            Check.Text = "/0/Zulu";
+            Check.Validate(Directory.Exists(Check.Text));
+            Check.Text = "/0/Zulu/";
+            Check.Validate(Directory.Exists(Check.Text));
 
             //Check file exists
-            Cosmos.Hardware.DebugUtil.SendMessage("VFSTest.cs", "Check file exists");
-            if (!File.Exists("/0/Readme.txt"))
-                Console.WriteLine("Fail-File1");
-            if (File.Exists("/0/BogusFile.txt"))
-                Console.WriteLine("Fail-File2");
-            if (!File.Exists("/0/Alfa/Bravo/slide_puzzle.lua"))
-                Console.WriteLine("Fail-File3");
+            //Cosmos.Hardware.DebugUtil.SendMessage("VFSTest.cs", "Check file exists");
+            //if (!File.Exists("/0/Readme.txt"))
+            //    Console.WriteLine("Fail-File1");
+            //if (File.Exists("/0/BogusFile.txt"))
+            //    Console.WriteLine("Fail-File2");
+            //if (!File.Exists("/0/Alfa/Bravo/slide_puzzle.lua"))
+            //    Console.WriteLine("Fail-File3");
+            Check.Text = "/0/Readme.txt";
+            Check.Validate(File.Exists(Check.Text));
+            Check.Text = "/0/BogusFile.txt";
+            Check.Validate(!File.Exists(Check.Text));
+            Check.Text = "/0/Alfa/Bravo/slide_puzzle.lua";
+            Check.Validate(File.Exists(Check.Text));
 
 
             //Current directory
-            Cosmos.Hardware.DebugUtil.SendMessage("VFSTest.cs", "Testing Current Directory");
-            Console.WriteLine("Current directory: " + Directory.GetCurrentDirectory());
-            Directory.SetCurrentDirectory("/0/Alfa/Bravo/");
-            Console.WriteLine("Current directory: " + Directory.GetCurrentDirectory());
+            //Cosmos.Hardware.DebugUtil.SendMessage("VFSTest.cs", "Testing Current Directory");
+            //Console.WriteLine("Current directory: " + Directory.GetCurrentDirectory());
+            //Directory.SetCurrentDirectory("/0/Alfa/Bravo/");
+            //Console.WriteLine("Current directory: " + Directory.GetCurrentDirectory());
+            Check.Text = "/0/Alfa/Bravo/";
+            Directory.SetCurrentDirectory(Check.Text);
+            Check.Validate(Directory.GetCurrentDirectory() == Check.Text);
 
             //Enumerate directories
             Cosmos.Hardware.DebugUtil.SendMessage("VFSTest.cs", "Enumerating directories");
