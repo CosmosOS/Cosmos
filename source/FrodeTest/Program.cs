@@ -25,6 +25,14 @@ namespace FrodeTest
             //Console.WriteLine("CPU: " + Cosmos.Kernel.CPU.CPUVendor);
             try
             {
+                Check.Text = "OK test";
+                Check.OK();
+                Check.Text = "Fail test";
+                Check.Fail();
+                Check.Text = "1 == 1";
+                Check.Validate(1 == 1);
+                Check.Text = "2 == 1";
+                Check.Validate(2 == 1);
                 //Cosmos.Hardware.DebugUtil.SendMessage("FrodeTest", "Initializing VFSManager");
                 //Cosmos.Sys.VFSManager.Init();
                 //Cosmos.Hardware.DebugUtil.SendMessage("FrodeTest", "Done initializing VFSManager");

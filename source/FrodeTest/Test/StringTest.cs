@@ -75,9 +75,11 @@ namespace FrodeTest.Test
             //}
 
             //.IndexOf
-            Console.WriteLine("Should be  0: " + "otto".IndexOf('o'));
-            Console.WriteLine("Should be  3: " + "otto".IndexOf('o', 1));
-            Console.WriteLine("Should be -1: " + "otto".IndexOf('o', 1, 1));
+            //Console.WriteLine("Should be  0: " + "otto".IndexOf('o'));
+            //Console.WriteLine("Should be  3: " + "otto".IndexOf('o', 1));
+            //Console.WriteLine("Should be -1: " + "otto".IndexOf('o', 1, 1));
+            Check.Text = "IndexOf(char, int, int);";
+            Check.Validate("otto".IndexOf('0', 1, 1) == -1);
             //Console.WriteLine("otto".IndexOf("tt"));
 
             //.Replace

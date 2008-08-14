@@ -59,6 +59,7 @@
     <Compile Include="Application\ping.cs" />
     <Compile Include="Application\reboot.cs" />
     <Compile Include="Application\type.cs" />
+    <Compile Include="Check.cs" />
     <Compile Include="Debug\SortedListSearcher.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
