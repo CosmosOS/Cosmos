@@ -17,13 +17,13 @@ using Indy.IL2CPU;
 using System.IO;
 
 namespace Cosmos.Build.Windows {
-	public partial class DebugWindow: Window {
-		protected TcpClient mTCPClient;
+    public partial class DebugWindow : Window {
+        protected TcpClient mTCPClient;
         protected NetworkStream mTCPStream;
-		protected byte[] mTCPData = new byte[4];
-		protected int mCurrentPos = 0;
-		private DebugModeEnum mDebugMode;
-		private SourceInfos mSourceMappings;
+        protected byte[] mTCPData = new byte[4];
+        protected int mCurrentPos = 0;
+        private DebugModeEnum mDebugMode;
+        private SourceInfos mSourceMappings;
         protected List<Run> mLines = new List<Run>();
         protected FontFamily mFont = new FontFamily("Courier New");
         protected bool mAutoDisplay = false;
@@ -33,36 +33,45 @@ namespace Cosmos.Build.Windows {
         protected RoutedCommand mStepCommand;
 
         protected void UpdateCaptions() {
-            butnTrace.Content = mTracing ? "Trace Off" : "Trace On";
-            butnBreak.Content = mBreak ? "Continue" : "Break";
+            butnTrace.Content = mTracing
+                                    ? "Trace Off"
+                                    : "Trace On";
+            butnBreak.Content = mBreak
+                                    ? "Continue"
+                                    : "Break";
         }
 
-		public DebugWindow() {
-			InitializeComponent();
+        public DebugWindow() {
+            InitializeComponent();
 
             mStepCommand = new RoutedCommand();
 
             UpdateCaptions();
-            
+
             lboxLog.SelectionChanged += new SelectionChangedEventHandler(lboxLog_SelectionChanged);
             butnTrace.Click += new RoutedEventHandler(butnTrace_Click);
             butnTest.Click += new RoutedEventHandler(butnTest_Click);
             butnStep.Click += new RoutedEventHandler(butnStep_Click);
             butnBreak.Click += new RoutedEventHandler(butnBreak_Click);
             butnLogClear.Click += new RoutedEventHandler(butnLogClear_Click);
-		}
+        }
 
-        void butnTrace_Click(object sender, RoutedEventArgs e) {
-            SendDebugCmd((byte)(mTracing ? 1 : 2));
+        private void butnTrace_Click(object sender,
+                                     RoutedEventArgs e) {
+            SendDebugCmd((byte)(mTracing
+                                    ? 1
+                                    : 2));
             mTracing = !mTracing;
             UpdateCaptions();
         }
 
-        void butnLogClear_Click(object sender, RoutedEventArgs e) {
+        private void butnLogClear_Click(object sender,
+                                        RoutedEventArgs e) {
             lboxLog.Items.Clear();
         }
 
-        void butnBreak_Click(object sender, RoutedEventArgs e) {
+        private void butnBreak_Click(object sender,
+                                     RoutedEventArgs e) {
             SendDebugCmd(3);
             mBreak = !mBreak;
             UpdateCaptions();
@@ -71,18 +80,22 @@ namespace Cosmos.Build.Windows {
             }
         }
 
-        void butnStep_Click(object sender, RoutedEventArgs e) {
+        private void butnStep_Click(object sender,
+                                    RoutedEventArgs e) {
             SendDebugCmd(4);
             mAutoDisplay = true;
         }
 
-        void butnTest_Click(object sender, RoutedEventArgs e) {
+        private void butnTest_Click(object sender,
+                                    RoutedEventArgs e) {
         }
 
         protected void SendDebugCmd(byte aCmd) {
             var xData = new byte[1];
             xData[0] = aCmd;
-            mTCPStream.Write(xData, 0, xData.Length);
+            mTCPStream.Write(xData,
+                             0,
+                             xData.Length);
         }
 
         public void LoadSourceFile(string aPathname) {
@@ -114,7 +127,8 @@ namespace Cosmos.Build.Windows {
             }
         }
 
-        void xRun_MouseDown(object sender, MouseButtonEventArgs e) {
+        private void xRun_MouseDown(object sender,
+                                    MouseButtonEventArgs e) {
             var xRun = (Run)sender;
             if (xRun.Background == Brushes.Red) {
                 xRun.Background = Brushes.LightGray;
@@ -123,7 +137,9 @@ namespace Cosmos.Build.Windows {
             }
         }
 
-        protected Run Select(int aLine, int aColBegin, int aLength) {
+        protected Run Select(int aLine,
+                             int aColBegin,
+                             int aLength) {
             Run xRunSelected = null;
             if (aLength != 0) {
                 var xPara = (Paragraph)fdsvSource.Document.Blocks.FirstBlock;
@@ -134,20 +150,25 @@ namespace Cosmos.Build.Windows {
                 }
 
                 if (aColBegin > 0) {
-                    var xRunLeft = new Run(xText.Substring(0, aColBegin - 1));
+                    var xRunLeft = new Run(xText.Substring(0,
+                                                           aColBegin - 1));
                     xRunLeft.FontFamily = mFont;
-                    xPara.Inlines.InsertBefore(xSelectedLine, xRunLeft);
+                    xPara.Inlines.InsertBefore(xSelectedLine,
+                                               xRunLeft);
                 }
 
-                xRunSelected = new Run(xText.Substring(aColBegin, aLength));
+                xRunSelected = new Run(xText.Substring(aColBegin,
+                                                       aLength));
                 xRunSelected.FontFamily = mFont;
                 xRunSelected.Background = Brushes.Red;
-                xPara.Inlines.InsertBefore(xSelectedLine, xRunSelected);
+                xPara.Inlines.InsertBefore(xSelectedLine,
+                                           xRunSelected);
 
                 if (aColBegin + aLength < xText.Length) {
                     var xRunRight = new Run(xText.Substring(aColBegin + aLength));
                     xRunRight.FontFamily = mFont;
-                    xPara.Inlines.InsertBefore(xSelectedLine, xRunRight);
+                    xPara.Inlines.InsertBefore(xSelectedLine,
+                                               xRunRight);
                 }
 
                 xPara.Inlines.Remove(xSelectedLine);
@@ -155,7 +176,10 @@ namespace Cosmos.Build.Windows {
             return xRunSelected;
         }
 
-        public void SelectText(int aLineBegin, int aColBegin, int aLineEnd, int aColEnd) {
+        public void SelectText(int aLineBegin,
+                               int aColBegin,
+                               int aLineEnd,
+                               int aColEnd) {
             aLineBegin--;
             aColBegin--;
             aLineEnd--;
@@ -163,93 +187,126 @@ namespace Cosmos.Build.Windows {
             //Currently can only be called once - need to fix it to reset so it can be called multiple times
             Run xRunSelected;
             if (aLineBegin == aLineEnd) {
-                xRunSelected = Select(aLineBegin, aColBegin, aColEnd - aColBegin);
+                xRunSelected = Select(aLineBegin,
+                                      aColBegin,
+                                      aColEnd - aColBegin);
             } else {
-                xRunSelected = Select(aLineBegin, aColBegin, -1);
+                xRunSelected = Select(aLineBegin,
+                                      aColBegin,
+                                      -1);
                 for (int i = aLineBegin + 1; i <= aLineEnd - 1; i++) {
-                    Select(i, 0, -1);
+                    Select(i,
+                           0,
+                           -1);
                 }
-                Select(aLineEnd, 0, aColEnd + 1);
+                Select(aLineEnd,
+                       0,
+                       aColEnd + 1);
             }
             fdsvSource.UpdateLayout();
             if (xRunSelected != null) {
                 xRunSelected.PreviousInline.BringIntoView();
             }
         }
-        
+
         public void SetSourceInfoMap(SourceInfos aSourceMapping) {
-			try {
-				mDebugMode = DebugModeEnum.Source;
-				mSourceMappings = aSourceMapping;
-				//Create a TCP connection to localhost:4444. We have already set up Qemu to listen to this port.
-				mTCPClient = new TcpClient();
-                mTCPClient.Connect(new IPEndPoint(IPAddress.Loopback, 4444));
+            try {
+                mDebugMode = DebugModeEnum.Source;
+                mSourceMappings = aSourceMapping;
+                //Create a TCP connection to localhost:4444. We have already set up Qemu to listen to this port.
+                mTCPClient = new TcpClient();
+                mTCPClient.Connect(new IPEndPoint(IPAddress.Loopback,
+                                                  4444));
 
-				//Read TCP data from Qemu
-				mTCPStream = mTCPClient.GetStream();
-                mTCPStream.BeginRead(mTCPData, 0, mTCPData.Length, new AsyncCallback(TCPRead), mTCPStream);
-			} catch (SocketException ex) {
-				Dispatcher.BeginInvoke(DispatcherPriority.Normal, new ConnectionLostDelegate(ConnectionLost), ex);
-			}
-		}
+                //Read TCP data from Qemu
+                mTCPStream = mTCPClient.GetStream();
+                mTCPStream.BeginRead(mTCPData,
+                                     0,
+                                     mTCPData.Length,
+                                     new AsyncCallback(TCPRead),
+                                     mTCPStream);
+            } catch (SocketException ex) {
+                Dispatcher.BeginInvoke(DispatcherPriority.Normal,
+                                       new ConnectionLostDelegate(ConnectionLost),
+                                       ex);
+            }
+        }
 
-		protected delegate void DebugPacketRcvdDelegate(UInt32 aEIP);
-		protected void DebugPacketRcvd(UInt32 aEIP) {
-			string xEIP = aEIP.ToString("X8");
+        protected delegate void DebugPacketRcvdDelegate(UInt32 aEIP);
+
+        protected void DebugPacketRcvd(UInt32 aEIP) {
+            string xEIP = aEIP.ToString("X8");
             Log("0x" + xEIP);
             if (mAutoDisplay) {
                 try {
                     lboxLog.SelectedIndex = lboxLog.Items.Count - 1;
-                }catch {
+                } catch {
                 }
                 mAutoDisplay = false;
             }
-		}
-
-        protected void Log(string aText) {
-            lboxLog.Items.Add(aText);
         }
 
-		protected delegate void ConnectionLostDelegate(Exception ex);
-		protected void ConnectionLost(Exception ex) {
-		    Title = "No debug connection.";
+        protected void Log(string aText) {
+            lboxLog.Items.Add(new EIPEntry() {
+                                                 EIP = aText,
+                                                 Index = lboxLog.Items.Count
+                                             });
+        }
+
+        protected delegate void ConnectionLostDelegate(Exception ex);
+
+        protected void ConnectionLost(Exception ex) {
+            Title = "No debug connection.";
             lboxLog.Background = Brushes.Red;
-			while (ex != null) {
+            while (ex != null) {
                 Log(ex.Message);
-				ex = ex.InnerException;
-			}
-		}
+                ex = ex.InnerException;
+            }
+        }
 
-		protected void TCPRead(IAsyncResult aResult) {
-			try {
-				var xStream = (NetworkStream)aResult.AsyncState;
-				int xCount = xStream.EndRead(aResult);
-				if (xCount != 4) {
-					if ((xCount + mCurrentPos) != 4) {
-						mCurrentPos += xCount;
-						xStream.BeginRead(mTCPData, mCurrentPos, 4 - mCurrentPos, new AsyncCallback(TCPRead), xStream);
-						return;
-					}
-				}
-				mCurrentPos = 0;
-				UInt32 xEIP = (UInt32)((mTCPData[0] << 24) | (mTCPData[1] << 16) | (mTCPData[2] << 8) | mTCPData[3]);
-				xStream.BeginRead(mTCPData, 0, mTCPData.Length, new AsyncCallback(TCPRead), xStream);
-				Dispatcher.BeginInvoke(DispatcherPriority.Background, new DebugPacketRcvdDelegate(DebugPacketRcvd), xEIP);
-			} catch (System.IO.IOException ex) {
-				Dispatcher.BeginInvoke(DispatcherPriority.Background, new ConnectionLostDelegate(ConnectionLost), ex);
-			}
-
-		}
+        protected void TCPRead(IAsyncResult aResult) {
+            try {
+                var xStream = (NetworkStream)aResult.AsyncState;
+                int xCount = xStream.EndRead(aResult);
+                if (xCount != 4) {
+                    if ((xCount + mCurrentPos) != 4) {
+                        mCurrentPos += xCount;
+                        xStream.BeginRead(mTCPData,
+                                          mCurrentPos,
+                                          4 - mCurrentPos,
+                                          new AsyncCallback(TCPRead),
+                                          xStream);
+                        return;
+                    }
+                }
+                mCurrentPos = 0;
+                UInt32 xEIP = (UInt32)((mTCPData[0] << 24) | (mTCPData[1] << 16) | (mTCPData[2] << 8) | mTCPData[3]);
+                xStream.BeginRead(mTCPData,
+                                  0,
+                                  mTCPData.Length,
+                                  new AsyncCallback(TCPRead),
+                                  xStream);
+                Dispatcher.BeginInvoke(DispatcherPriority.Background,
+                                       new DebugPacketRcvdDelegate(DebugPacketRcvd),
+                                       xEIP);
+            } catch (System.IO.IOException ex) {
+                Dispatcher.BeginInvoke(DispatcherPriority.Background,
+                                       new ConnectionLostDelegate(ConnectionLost),
+                                       ex);
+            }
+        }
 
         protected void Anaylyze() {
             List<string> xItems = new List<string>();
             for (int i = lboxLog.Items.Count - 1; i >= 0; i--) {
                 string xEIP = lboxLog.Items[i] as string;
-                if (xItems.Contains(xEIP, StringComparer.InvariantCultureIgnoreCase)) {
+                if (xItems.Contains(xEIP,
+                                    StringComparer.InvariantCultureIgnoreCase)) {
                     lboxLog.Items.RemoveAt(i);
                     continue;
                 }
-                var xSourceInfo = mSourceMappings.GetMapping(UInt32.Parse(xEIP.Substring(2), System.Globalization.NumberStyles.HexNumber));
+                var xSourceInfo = mSourceMappings.GetMapping(UInt32.Parse(xEIP.Substring(2),
+                                                                          System.Globalization.NumberStyles.HexNumber));
                 if (xSourceInfo == null) {
                     lboxLog.Items.RemoveAt(i);
                     continue;
@@ -284,21 +341,30 @@ namespace Cosmos.Build.Windows {
             }
         }
 
-        void lboxLog_SelectionChanged(object sender, SelectionChangedEventArgs e) {
-            string xItemStr = lboxLog.SelectedItem as String;
-            if (!String.IsNullOrEmpty(xItemStr)) {
+        private void lboxLog_SelectionChanged(object sender,
+                                              SelectionChangedEventArgs e) {
+            var xItem = lboxLog.SelectedItem as EIPEntry;
+            if (xItem != null) {
                 if (mDebugMode == DebugModeEnum.Source) {
-                    SelectCode(UInt32.Parse(xItemStr.Substring(2), System.Globalization.NumberStyles.HexNumber));
+                    SelectCode(UInt32.Parse(xItem.EIP.Substring(2),
+                                            System.Globalization.NumberStyles.HexNumber));
                 } else {
                     throw new Exception("Debug mode not supported!");
                 }
             }
-            for(int i = lboxLog.SelectedItems.Count-1; i>=0;i--) {
-                if(lboxLog.SelectedItems[i] == lboxLog.SelectedItem)
-                {
-                    continue;}
-                lboxLog.SelectedItems.RemoveAt(i);
-            }
+        }
+    }
+
+    public class EIPEntry {
+        public string EIP;
+        public long Index;
+
+        public override int GetHashCode() {
+            return Index.GetHashCode();
+        }
+
+        public override string ToString() {
+            return EIP;
         }
     }
 }
