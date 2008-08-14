@@ -198,7 +198,10 @@ namespace Cosmos.Build.Windows {
 			string xEIP = aEIP.ToString("X8");
             Log("0x" + xEIP);
             if (mAutoDisplay) {
-                lboxLog.SelectedIndex = lboxLog.Items.Count - 1;
+                try {
+                    lboxLog.SelectedIndex = lboxLog.Items.Count - 1;
+                }catch {
+                }
                 mAutoDisplay = false;
             }
 		}
@@ -272,8 +275,13 @@ namespace Cosmos.Build.Windows {
 
         protected void SelectCode(uint aEIP) {
             var xSourceInfo = mSourceMappings.GetMapping(aEIP);
-            LoadSourceFile(xSourceInfo.SourceFile);
-            SelectText(xSourceInfo.Line, xSourceInfo.Column, xSourceInfo.LineEnd, xSourceInfo.ColumnEnd);
+            if (xSourceInfo != null) {
+                LoadSourceFile(xSourceInfo.SourceFile);
+                SelectText(xSourceInfo.Line,
+                           xSourceInfo.Column,
+                           xSourceInfo.LineEnd,
+                           xSourceInfo.ColumnEnd);
+            }
         }
 
         void lboxLog_SelectionChanged(object sender, SelectionChangedEventArgs e) {
@@ -285,7 +293,12 @@ namespace Cosmos.Build.Windows {
                     throw new Exception("Debug mode not supported!");
                 }
             }
+            for(int i = lboxLog.SelectedItems.Count-1; i>=0;i--) {
+                if(lboxLog.SelectedItems[i] == lboxLog.SelectedItem)
+                {
+                    continue;}
+                lboxLog.SelectedItems.RemoveAt(i);
+            }
         }
-
     }
 }

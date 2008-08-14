@@ -11,7 +11,7 @@
                     <Separator/>
                 </ToolBar>
             </ToolBarTray>
-            <ListBox FontFamily="Consolas" Name="lboxLog" />
+            <ListBox FontFamily="Consolas" Name="lboxLog" SelectionMode="Single" />
         </DockPanel>
         <DockPanel DockPanel.Dock="Left">
             <ToolBarTray Background="White" DockPanel.Dock="Top">

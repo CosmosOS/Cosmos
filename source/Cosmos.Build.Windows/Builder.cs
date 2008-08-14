@@ -196,7 +196,7 @@ namespace Cosmos.Build.Windows
             MakeISO();
 
             //From v0.9.1 Qemu requires forward slashes in path
-            BuildPath = BuildPath.Replace((char)@"\"[0], (char)'/');
+            BuildPath = BuildPath.Replace('\\', '/');
 
             RemoveFile(BuildPath + "serial-debug.txt");
             // QEMU Docs - http://fabrice.bellard.free.fr/qemu/qemu-doc.html

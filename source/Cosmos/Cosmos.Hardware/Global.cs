@@ -31,7 +31,7 @@ namespace Cosmos.Hardware {
             Keyboard.Initialize();
             // New
             Console.WriteLine("    Init ATA");
-            //Storage.ATA.ATA.Initialize();
+            Storage.ATA.ATA.Initialize();
             //Device.Add(new PC.Bus.CPU.Keyboard());
         }
 
