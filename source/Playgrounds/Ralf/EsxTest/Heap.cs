@@ -3,6 +3,7 @@
 using System;
 using System.IO;
 using System.Text;
+using Cosmos.Kernel;
 
 namespace EsxTest
 {
@@ -10,7 +11,7 @@ namespace EsxTest
 
     public struct FragmentHeader
     {
-        internal const UInt32 HeaderSize = 4;   //to avoid the usage of sizeof(FragmentHeader)
+        internal const UInt32 HeaderSize = 4;    //to avoid the usage of sizeof(FragmentHeader)
         internal const UInt32 MaxSizeIndex = 31; //Max value for SizeIndex (31 on 32Bit Systems) (255 on 256Bit Systems ;-)
 
         private const UInt32 HasChild1Bit = 0x100;
@@ -56,10 +57,13 @@ namespace EsxTest
             }
             private set
             {
+                #region validation
+                //general heap logic problem, if one these exceptions occurs 
                 if (value > MaxSizeIndex)
                 {
                     Heap.CallException("FragmentHeader.SizeIndex overflow");
                 }
+                #endregion
                 _Header = _Header & 0xFF;
                 _Header = _Header | (UInt32)(value);
             }
@@ -72,10 +76,13 @@ namespace EsxTest
             {
                 if (value)
                 {
+                    #region validation
+                    //general heap logic problem, if one these exceptions occurs 
                     if (HasData)
                     {
                         Heap.CallException("Set HasChild1 true failed! Data exists");
                     }
+                    #endregion
                     _Header = (_Header | HasChild1Bit);
                 }
                 else
@@ -92,10 +99,13 @@ namespace EsxTest
             {
                 if (value)
                 {
+                    #region validation
+                    //general heap logic problem, if one these exceptions occurs 
                     if (HasData)
                     {
                         Heap.CallException("Set HasChild2 true failed! Data exits");
                     }
+                    #endregion
                     _Header = (_Header | HasChild2Bit);
                 }
                 else
@@ -114,10 +124,13 @@ namespace EsxTest
             {
                 if (value)
                 {
+                    #region validation
+                    //general heap logic problem, if one these exceptions occurs 
                     if (HasChild)
                     {
                         Heap.CallException("Set HasData true failed! Child exits");
                     }
+                    #endregion
                     _Header = _Header | HasDataBit;
                 }
                 else
@@ -196,10 +209,13 @@ namespace EsxTest
         {
             get
             {
+                #region validation
+                //general heap logic problem, if one these exceptions occurs 
                 if (FragmentAddress == Heap.StartAddress)
                 {
                     Heap.CallException("No Parent available");
                 }
+                #endregion
                 if (IsChild2OfParent)
                 {
                     return FragmentAddress - Heap.GetFragmentSize(SizeIndex) - HeaderSize;
@@ -211,6 +227,8 @@ namespace EsxTest
         internal unsafe void AllocateInParent()
         {
             var parentHeader = (FragmentHeader*) ParentAddress;
+            #region validation
+            //general heap logic problem, if one these exceptions occurs 
             if ((*parentHeader).HasData)
             {
                 Heap.CallException("AllocateInParent failed: Data already exits", FragmentAddress);
@@ -221,7 +239,6 @@ namespace EsxTest
                 {
                     Heap.CallException("AllocateInParent failed: Child2 already exits", FragmentAddress);
                 }
-                (*parentHeader).HasChild2 = true;
             }
             else
             {
@@ -229,13 +246,24 @@ namespace EsxTest
                 {
                     Heap.CallException("AllocateInParent failed: Child1 already exits", FragmentAddress);
                 }
+            }
+            #endregion
+            if (IsChild2OfParent)
+            {
+                (*parentHeader).HasChild2 = true;
+            }
+            else
+            {
                 (*parentHeader).HasChild1 = true;
             }
+
         }
 
         internal unsafe void FreeInParent()
         {
             var parentHeader = (FragmentHeader*) ParentAddress;
+            #region validation
+            //general heap logic problem, if one these exceptions occurs 
             if ((*parentHeader).HasData)
             {
                 Heap.CallException("FreeInParent failed: Parent HasData ", FragmentAddress);
@@ -246,7 +274,6 @@ namespace EsxTest
                 {
                     Heap.CallException("FreeInParent failed: Child2 doesnt exits", FragmentAddress);
                 }
-                (*parentHeader).HasChild2 = false;
             }
             else
             {
@@ -254,6 +281,14 @@ namespace EsxTest
                 {
                     Heap.CallException("FreeInParent failed: Child1 doesnt exits", FragmentAddress);
                 }
+            }
+            #endregion
+            if (IsChild2OfParent)
+            {
+                (*parentHeader).HasChild2 = false;
+            }
+            else
+            {
                 (*parentHeader).HasChild1 = false;
             }
         }
@@ -270,15 +305,15 @@ namespace EsxTest
             Heap.Debug("[" + Convert.ToString(address - Heap.StartAddress, 10) + "]   si=" + (*header).SizeIndex + " header=" +
                        Convert.ToString((*header)._Header, 16));
 
-            StringBuilder sb = new StringBuilder();
-            
-            for (int i = 0; i < Heap.GetFragmentDataSize((*header).SizeIndex); i++)
-            {
-                var b = (byte*) ((*header).DataAddress+i);
-                sb.Append(Convert.ToString(*b,16));
-                sb.Append(" ");
-            }
-            Heap.Debug(sb.ToString());
+//            StringBuilder sb = new StringBuilder();
+//            
+//            for (int i = 0; i < Heap.GetFragmentDataSize((*header).SizeIndex); i++)
+//            {
+//                var b = (byte*) ((*header).DataAddress+i);
+//                sb.Append(Convert.ToString(*b,16));
+//                sb.Append(" ");
+//            }
+//            Heap.Debug(sb.ToString());
 #else
             Heap.WriteNumber(address);
 //            Heap.Debug("");
@@ -372,33 +407,61 @@ namespace EsxTest
     }
 
     public static class Heap
-    {
+    {       
+        private const byte PointerSize = 4; //4 Byte on 32Bit Systems
         internal static UInt32 StartAddress { get; private set; }
         private static UInt32 EndAddress { get; set; }
         private static UInt32 Size { get; set; }
-        public static UInt32 MaxFragmentDataSize { get; private set; }
-        public static int MaxFragmentSizeIndex { get; private set; }
+        internal static UInt32 MaxFragmentDataSize { get; private set; }
+        internal static int MaxFragmentSizeIndex { get; private set; }
 
         private static bool Initiated { get; set; }
 
-        public static unsafe void Init(UInt32 startAddress,UInt32 size)
+        public static unsafe void Init(UInt32 startAddress,UInt32 size, UInt32 cacheSize)
         {
             Debug("Begin Init");
             if (Initiated)
                 return;
             DebugActive = false;
-            StartAddress = startAddress;
-            EndAddress = StartAddress + size - (4 - (size % 4)) - 4;
+#if NOCOSMOS
+            DebugActive = true;
+#endif
+            if (cacheSize>=size)
+            {
+                CallException("Init: cachesize>=size");
+            }
+            CacheSize = cacheSize;
+
+            MaxStackValue = CacheSize / CacheStackPointerMemorySize;
+            if (MaxStackValue == 0)
+            {
+                CallException("Init: cacheSize too small");
+            }
+            if (CacheSize % CacheStackPointerMemorySize!=0)
+            {
+                CallException("Init: wrong cacheSize");                
+            }
+            CacheStackPointerAddress = startAddress;
+            ZeroFill(CacheStackPointerAddress, CacheStackPointerMemorySize);
+
+            CacheAddress = CacheStackPointerAddress + CacheStackPointerMemorySize;
+            ZeroFill(CacheAddress, CacheSize);
+
+            StartAddress = CacheAddress + CacheSize;
+            EndAddress = StartAddress 
+                + (size - CacheSize - CacheStackPointerMemorySize) 
+                - (PointerSize - ((size - CacheSize - CacheStackPointerMemorySize) % PointerSize)) - PointerSize;
             Size = EndAddress - StartAddress;
-            ResetNextFreeFragments();
             MaxFragmentDataSize = Size - FragmentHeader.HeaderSize;
             CalculateFragmentSizes(Size);
             var RootHeader = (FragmentHeader*)StartAddress;
             (*RootHeader).Initialize(MaxFragmentSizeIndex);
             //ClearFragment(StartAddress, GetFragmentDataSize((*RootHeader).SizeIndex)); //this is bad for ESX Server
 #if NOCOSMOS
-            Debug("");
-            Debug(StartAddress);
+            Debug("CacheStackPointerAddress=" + CacheStackPointerAddress);
+            Debug("CacheAddress=" + CacheAddress);
+            Debug("StartAddress=" + StartAddress);
+            Debug("EndAddress=" + EndAddress);
             Debug("");
 #endif
             PushFreeFragmentAddress(MaxFragmentSizeIndex, StartAddress);
@@ -411,6 +474,7 @@ namespace EsxTest
         }
 
 
+
         public static unsafe UInt32 MemAlloc(UInt32 size)
         {
 #if NOCOSMOS
@@ -420,7 +484,7 @@ namespace EsxTest
 #endif
             if (!Initiated)
             {
-                CallException("MemAlloc-> Call to Heap.Init()"); //Todo: eliminate this behaviour, we need a centralized point for Heap.Init
+                CallException("MemAlloc: not Initiated"); //Todo: eliminate this behaviour, we need a centralized point for Heap.Init
             }
             if (size == 0)
             {
@@ -432,36 +496,27 @@ namespace EsxTest
                 CallException("MemAlloc: Too large memory block allocated!");
             }
             var fragmentAddress = GetFreeFragmentAddress(sizeIndex);
-            bool created = false;
             if (fragmentAddress == 0)
             {
-                created = true;
                 fragmentAddress = CreateFragment(sizeIndex);
             }
             if (fragmentAddress==0)
             {
                 CallException("MemAlloc: Out of memory");
             }
-
             var fragmentHeader = (FragmentHeader*)fragmentAddress;
             (*fragmentHeader).HasData = true;
-
+            #region validation
+            //general heap logic problem, if one these exceptions occurs 
             if ((*fragmentHeader).SizeIndex != sizeIndex)
             {
-                if (created)
-                {
-                    CallException("MemAlloc´: SizeIndex wrong (created)", fragmentAddress);
-                }
-                else
-                {
-                    CallException("MemAlloc: SizeIndex wrong", fragmentAddress);
-                }
+                CallException("MemAlloc: SizeIndex wrong", fragmentAddress);
             }
-
             if (GetFragmentDataSize((*fragmentHeader).SizeIndex) < size)
             {
                 CallException("MemAlloc: HeaderSize mismatch", fragmentAddress);
             }
+            #endregion
             ClearFragment(fragmentAddress,size);            
             ++HeapCounter.MemAlloc;
             ++HeapCounter.Count;
@@ -506,11 +561,14 @@ namespace EsxTest
 #endif
 
             Debug(fragmentAddress);
+            #region validation
+            //general heap logic problem, if one these exceptions occurs 
             var header = (FragmentHeader*) fragmentAddress;
             if (size>GetFragmentDataSize((*header).SizeIndex))
             {
                 CallException("ClearFragment: size mismatch", fragmentAddress);
             }
+            #endregion
             ZeroFill(fragmentAddress + FragmentHeader.HeaderSize, size);
             Debug("After Clear:");
             Debug(fragmentAddress);
@@ -531,7 +589,7 @@ namespace EsxTest
                 ptr++;
             }
 #else
-            //ToDo CPU.ZeroFill(address, size);
+            CPU.ZeroFill(address, size);
 #endif
         }
 
@@ -949,8 +1007,7 @@ namespace EsxTest
                 for (int sizeIndex = startSizeIndex - 1; sizeIndex >= 0; sizeIndex--)
                 {
                     var childFragmentSize = GetFragmentSize(sizeIndex + 1) / 2 - FragmentHeader.HeaderSize;
-                    childFragmentSize -= (4-(childFragmentSize%4));
-
+                    childFragmentSize -= (PointerSize - (childFragmentSize % PointerSize)); //ensure alignment
                     if ((childFragmentSize==0) ||(childFragmentSize>GetFragmentSize(sizeIndex + 1)))
                     {
                         success = false;
@@ -992,38 +1049,13 @@ namespace EsxTest
 
         #region FragmentCache
 
-        //ToDo Implement StackCache to reduce the HeapCounter.SearchTotal
 
-//        private static UInt32 CacheSize { get; set; }
-//        private static UInt32 CacheAddress { get; set; }
-//        private static UInt32 _CacheLevel;
-//        public static UInt32 CacheLevel
-//        {
-//            get
-//            {
-//                return _CacheLevel;
-//            }
-//            private set
-//            {
-//                if (value != _CacheLevel)
-//                {
-//                    _CacheLevel = value;
-//                    UInt32 size = 0;
-//                    var start = (int)_CacheLevel;
-//                    for (int i = 0; i < FragmentHeader.MaxSizeIndex + 1; i++)
-//                    {
-//                        size += (UInt32)(1 << start);
-//                        if (start > 0)
-//                        {
-//                            --start;
-//                        }
-//                    }
-//                    CacheSize = size * 4;
-//                }
-//            }
-//        }
-
-
+        private static UInt32 MaxStackValue { get; set; }
+        private static UInt32 CacheStackPointerAddress { get; set; }
+        private static UInt32 CacheStackPointerMemorySize { get { return PointerSize * (FragmentHeader.MaxSizeIndex + 1); } }
+        private static UInt32 CacheSize { get; set; }
+        private static UInt32 CacheSizePerIndex { get { return CacheSize / (FragmentHeader.MaxSizeIndex + 1); } }
+        private static UInt32 CacheAddress { get; set; }
 
         private static unsafe void PushFreeFragmentAddress(int sizeIndex, UInt32 address)
         {
@@ -1036,6 +1068,11 @@ namespace EsxTest
 #endif
                 Debug(address);
                 ++HeapCounter.CachePush;
+
+                #region validation
+
+                //general heap logic problem, if one these exceptions occurs 
+
                 var header = (FragmentHeader*)address;
                 if ((*header).SizeIndex != sizeIndex)
                 {
@@ -1067,285 +1104,104 @@ namespace EsxTest
                         }
                     }
                 }
-            }
-            switch (sizeIndex)
-            {
-                case 0:
-                    Fragment00000001 = address;
-                    break;
-                case 1:
-                    Fragment00000002 = address;
-                    break;
-                case 2:
-                    Fragment00000004 = address;
-                    break;
-                case 3:
-                    Fragment00000008 = address;
-                    break;
-                case 4:
-                    Fragment00000010 = address;
-                    break;
-                case 5:
-                    Fragment00000020 = address;
-                    break;
-                case 6:
-                    Fragment00000040 = address;
-                    break;
-                case 7:
-                    Fragment00000080 = address;
-                    break;
-                case 8:
-                    Fragment00000100 = address;
-                    break;
-                case 9:
-                    Fragment00000200 = address;
-                    break;
-                case 10:
-                    Fragment00000400 = address;
-                    break;
-                case 11:
-                    Fragment00000800 = address;
-                    break;
-                case 12:
-                    Fragment00001000 = address;
-                    break;
-                case 13:
-                    Fragment00002000 = address;
-                    break;
-                case 14:
-                    Fragment00004000 = address;
-                    break;
-                case 15:
-                    Fragment00008000 = address;
-                    break;
-                case 16:
-                    Fragment00010000 = address;
-                    break;
-                case 17:
-                    Fragment00020000 = address;
-                    break;
-                case 18:
-                    Fragment00040000 = address;
-                    break;
-                case 19:
-                    Fragment00080000 = address;
-                    break;
-                case 20:
-                    Fragment00100000 = address;
-                    break;
-                case 21:
-                    Fragment00200000 = address;
-                    break;
-                case 22:
-                    Fragment00400000 = address;
-                    break;
-                case 23:
-                    Fragment00800000 = address;
-                    break;
-                case 24:
-                    Fragment01000000 = address;
-                    break;
-                case 25:
-                    Fragment02000000 = address;
-                    break;
-                case 26:
-                    Fragment04000000 = address;
-                    break;
-                case 27:
-                    Fragment08000000 = address;
-                    break;
-                case 28:
-                    Fragment10000000 = address;
-                    break;
-                case 29:
-                    Fragment20000000 = address;
-                    break;
-                case 30:
-                    Fragment40000000 = address;
-                    break;
-                case 31:
-                    Fragment80000000 = address;
-                    break;
-                default:
-                    CallException("PushFreeFragmentAddress: Worng sizeIndex",address);
-                    break;
+                if (sizeIndex > MaxFragmentSizeIndex)
+                {
+                    CallException("PushFreeFragmentAddress: Worng sizeIndex", address);
+                }
+                #endregion
+
+                var stackPtr = (UInt32*)(CacheStackPointerAddress + sizeIndex * PointerSize);
+                if ((*stackPtr) < MaxStackValue )
+                {
+                    var cacheValuePtr =
+                        (UInt32*)
+                        (CacheAddress + CacheSizePerIndex * sizeIndex + (*stackPtr) * PointerSize);
+
+                    if ((UInt32)cacheValuePtr > StartAddress)
+                    {
+#if NOCOSMOS
+                        Debug("cacheValuePtr=" + (UInt32)cacheValuePtr);
+                        Debug("StartAddress=" + StartAddress);
+#endif
+                        CallException("PushFreeFragmentAddress: cacheValuePtr out of range");
+                    }
+                    if ((UInt32)cacheValuePtr < CacheAddress)
+                    {
+                        CallException("PushFreeFragmentAddress: cacheValuePtr out of range");
+                    }
+
+                    (*cacheValuePtr) = address;
+#if NOCOSMOS
+                    Debug("Push SizeIndex= " + sizeIndex + " cachePtr=" + (UInt32) cacheValuePtr + " <- " + address);
+#endif
+                    ++(*stackPtr);
+                }
             }
         }
 
-        private static UInt32 PopFreeFragmentAddress(int sizeIndex)
+        private unsafe static UInt32 PopFreeFragmentAddress(int sizeIndex)
         {
-            UInt32 address;
-            switch (sizeIndex)
+            UInt32 address=0;
+
+            if (sizeIndex > MaxFragmentSizeIndex)
             {
-                case 0:
-                    address = Fragment00000001;
-                    break;
-                case 1:
-                    address = Fragment00000002;
-                    break;
-                case 2:
-                    address = Fragment00000004;
-                    break;
-                case 3:
-                    address = Fragment00000008;
-                    break;
-                case 4:
-                    address = Fragment00000010;
-                    break;
-                case 5:
-                    address = Fragment00000020;
-                    break;
-                case 6:
-                    address = Fragment00000040;
-                    break;
-                case 7:
-                    address = Fragment00000080;
-                    break;
-                case 8:
-                    address = Fragment00000100;
-                    break;
-                case 9:
-                    address = Fragment00000200;
-                    break;
-                case 10:
-                    address = Fragment00000400;
-                    break;
-                case 11:
-                    address = Fragment00000800;
-                    break;
-                case 12:
-                    address = Fragment00001000;
-                    break;
-                case 13:
-                    address = Fragment00002000;
-                    break;
-                case 14:
-                    address = Fragment00004000;
-                    break;
-                case 15:
-                    address = Fragment00008000;
-                    break;
-                case 16:
-                    address = Fragment00010000;
-                    break;
-                case 17:
-                    address = Fragment00020000;
-                    break;
-                case 18:
-                    address = Fragment00040000;
-                    break;
-                case 19:
-                    address = Fragment00080000;
-                    break;
-                case 20:
-                    address = Fragment00100000;
-                    break;
-                case 21:
-                    address = Fragment00200000;
-                    break;
-                case 22:
-                    address = Fragment00400000;
-                    break;
-                case 23:
-                    address = Fragment00800000;
-                    break;
-                case 24:
-                    address = Fragment01000000;
-                    break;
-                case 25:
-                    address = Fragment02000000;
-                    break;
-                case 26:
-                    address = Fragment04000000;
-                    break;
-                case 27:
-                    address = Fragment08000000;
-                    break;
-                case 28:
-                    address = Fragment10000000;
-                    break;
-                case 29:
-                    address = Fragment20000000;
-                    break;
-                case 30:
-                    address = Fragment40000000;
-                    break;
-                case 31:
-                    address = Fragment80000000;
-                    break;
-                default:
-                    CallException("PopFreeFragmentAddress: Wrong sizeIndex");
-                    return 0;
+                CallException("PopFreeFragmentAddress: Worng sizeIndex");
             }
-            ResetNextFreeFragment(sizeIndex);
-            //Debug("Pop si=", (UInt32)sizeIndex);
-            if (address != 0)
+            var stackPtr = (UInt32*)(CacheStackPointerAddress + sizeIndex * PointerSize);
+            if ((*stackPtr)>MaxStackValue)
             {
 #if NOCOSMOS
-                Debug("Pop si=" + sizeIndex);
-#else
-                Debug("Pop");
+                DebugActive = true;
+                Debug("(*stackPtr)=" + (*stackPtr));
+                Debug("sizeIndex=" + sizeIndex);
 #endif
-                Debug(address);
-                unsafe
+                CallException("PopFreeFragmentAddress: Wrong stackValue detetced");
+            }
+            while ((*stackPtr) > 0)
+            {
+                --(*stackPtr);
+                var cacheValuePtr = (UInt32*)(CacheAddress + CacheSizePerIndex * sizeIndex + (*stackPtr) * PointerSize);
+                #region validation
+
+                //general heap logic problem, if one these exceptions occurs 
+
+                if ((UInt32)cacheValuePtr>StartAddress)
                 {
-                    ++HeapCounter.CachePop;
-                    var header = (FragmentHeader*) address;
-                    if ((*header).SizeIndex != sizeIndex)
-                    {
-                        CallException("PopFreeFragmentAddress: SizeIndex mismatch", address);
-                    }
+#if NOCOSMOS
+                    Debug("cacheValuePtr="+(UInt32)cacheValuePtr);
+                    Debug("StartAddress="+StartAddress);
+#endif
+                    CallException("PopFreeFragmentAddress: cacheValuePtr out of range");
                 }
+                if ((UInt32)cacheValuePtr < CacheAddress)
+                {
+                    CallException("PopFreeFragmentAddress: cacheValuePtr out of range");
+                }
+                #endregion
+
+                address =(*cacheValuePtr);
+#if NOCOSMOS
+                Debug("Pop SizeIndex=" + sizeIndex + " cachePtr=" + (UInt32)cacheValuePtr + " <- " + address); 
+#endif
+                if (address != 0)
+                {
+                    var header = (FragmentHeader*) address;
+                    if ((*header).IsEmpty)
+                    {
+                        ++HeapCounter.CachePop;
+#if NOCOSMOS
+                        Debug("Pop si=" + sizeIndex);
+#else
+                    Debug("Pop");
+#endif
+                        return address;
+                    }
+                    address = 0;//Cached fragment is already used by Child or Parent - this can happen
+                }                
             }
             return address;
         }
 
-        private static void ResetNextFreeFragments()
-        {
-            for (int sizeIndex = 0; sizeIndex < 32; sizeIndex++)
-            {
-                ResetNextFreeFragment(sizeIndex);
-            }
-        }
-
-        private static void ResetNextFreeFragment(int sizeIndex)
-        {
-            PushFreeFragmentAddress(sizeIndex, 0);
-        }
-
-        private static UInt32 Fragment00000001 { get; set; }
-        private static UInt32 Fragment00000002 { get; set; }
-        private static UInt32 Fragment00000004 { get; set; }
-        private static UInt32 Fragment00000008 { get; set; }
-        private static UInt32 Fragment00000010 { get; set; }
-        private static UInt32 Fragment00000020 { get; set; }
-        private static UInt32 Fragment00000040 { get; set; }
-        private static UInt32 Fragment00000080 { get; set; }
-        private static UInt32 Fragment00000100 { get; set; }
-        private static UInt32 Fragment00000200 { get; set; }
-        private static UInt32 Fragment00000400 { get; set; }
-        private static UInt32 Fragment00000800 { get; set; }
-        private static UInt32 Fragment00001000 { get; set; }
-        private static UInt32 Fragment00002000 { get; set; }
-        private static UInt32 Fragment00004000 { get; set; }
-        private static UInt32 Fragment00008000 { get; set; }
-
-        private static UInt32 Fragment00010000 { get; set; }
-        private static UInt32 Fragment00020000 { get; set; }
-        private static UInt32 Fragment00040000 { get; set; }
-        private static UInt32 Fragment00080000 { get; set; }
-        private static UInt32 Fragment00100000 { get; set; }
-        private static UInt32 Fragment00200000 { get; set; }
-        private static UInt32 Fragment00400000 { get; set; }
-        private static UInt32 Fragment00800000 { get; set; }
-        private static UInt32 Fragment01000000 { get; set; }
-        private static UInt32 Fragment02000000 { get; set; }
-        private static UInt32 Fragment04000000 { get; set; }
-        private static UInt32 Fragment08000000 { get; set; }
-        private static UInt32 Fragment10000000 { get; set; }
-        private static UInt32 Fragment20000000 { get; set; }
-        private static UInt32 Fragment40000000 { get; set; }
-        private static UInt32 Fragment80000000 { get; set; }
 
         #endregion
 

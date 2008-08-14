@@ -15,14 +15,14 @@ namespace EsxTest
         [STAThread]
         static void Main(string[] args)
         {
-            //if (!Test)
-            //{
+            if (!Test)
+            {
                 BuildUI.Run();
-            //}
-            //else
-            //{
-            //    Init();
-            //}
+            }
+            else
+            {
+                Init();
+            }
         }
 
         #endregion
@@ -40,13 +40,22 @@ namespace EsxTest
             }
 
 
+            //SimpleTest();
             //RandomTest();
             //PciTest();
             HeapTest();
         }
 
 
-
+        private static void SimpleTest()
+        {
+            int i = 0;
+            while (true)
+            {
+                Console.WriteLine(i);
+                ++i;
+            }
+        }
         private static void RandomTest()
         {
             while (true)
@@ -59,7 +68,7 @@ namespace EsxTest
 
         //private static byte* memPtr;
 
-        private static UInt32 Size=200000;
+        private static UInt32 Size=3000000;
 
         private static void HeapTest()
         {
@@ -70,8 +79,8 @@ namespace EsxTest
 
             fixed (byte* memPtr = &Memory[0])
             {
-                Heap.Init((UInt32) memPtr, Size);
-                Heap.DebugActive = false;
+                Heap.Init((UInt32) memPtr, Size,65536);
+                //Heap.DebugActive = true;
                 UInt32 p0 = 0;
                 UInt32 p1 = 0;
                 UInt32 p2 = 0;
@@ -86,7 +95,7 @@ namespace EsxTest
                         uint index = MTRandom.Next(1000);
                         if (pointer[index]==0)
                         {
-                            pointer[index] = Heap.MemAlloc(MTRandom.Next(100) + 1);
+                            pointer[index] = Heap.MemAlloc(MTRandom.Next(5000) + 1);
                         }
                         else
                         {
@@ -177,6 +186,7 @@ namespace EsxTest
             Console.WriteLine("Press Enter for Reboot");
             Console.ReadLine();
             Deboot.Reboot();
+
         }
     }
 }
