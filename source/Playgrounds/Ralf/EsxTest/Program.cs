@@ -6,7 +6,7 @@ using Cosmos.Sys;
 
 namespace EsxTest
 {
-    unsafe class Program
+    class Program
     {
         static bool Test = false;
 
@@ -70,28 +70,48 @@ namespace EsxTest
 
         private static UInt32 Size=3000000;
 
-        private static void HeapTest()
+        private unsafe static void HeapTest()
         {
             Console.WriteLine("HeapTest");
             byte[] Memory = new byte[Size];
-//            memPtr =
-//                (byte*)Cosmos.Kernel.Heap.MemAlloc(HeaderSize);
-
             fixed (byte* memPtr = &Memory[0])
             {
+                byte counter = 0;
+                UInt32 testSize;
+                byte* testPointer;
                 Heap.Init((UInt32) memPtr, Size,65536);
                 //Heap.DebugActive = true;
-                UInt32 p0 = 0;
-                UInt32 p1 = 0;
-                UInt32 p2 = 0;
-                UInt32 p3 = 0;
-
                 while (true)
                 {
-                    Console.Clear();
+                    ++counter;
+
+                    Console.CursorLeft = 0;
+                    Console.CursorTop = 0;
                     HeapCounter.Print();
-                    for (int i = 0; i < 1000; i++)
+
+                    testSize = MTRandom.Next(5000) + 1;
+                    testPointer = (byte*)Heap.MemAlloc(testSize);
+                    var incPointer = testPointer;
+                    for (int i = 0; i < testSize; i++)
                     {
+                        (*incPointer) = counter;
+                        ++incPointer;
+                    }
+
+                    for (int i = 0; i < 500; i++)
+                    {
+                        incPointer = testPointer;
+                        for (int j = 0; j < testSize; j++)
+                        {
+                            if ((*incPointer) != counter)
+                            {
+                                Console.WriteLine("Heap failure!");
+                                while (true)
+                                {
+
+                                }
+                            }
+                        }
                         uint index = MTRandom.Next(1000);
                         if (pointer[index]==0)
                         {
@@ -102,53 +122,10 @@ namespace EsxTest
                             Heap.MemFree(pointer[index]);
                             pointer[index] = 0;                            
                         }
-                        
                     }
-
-//                    //Heap.DebugActive = true;
-//                    for (int i = 0; i < 4; i++)
-//                    {
-//                        UInt32 n = MTRandom.Next(20) + 1;
-//                        switch (i)
-//                        {
-//                            case 0:
-//                                p0 = Heap.MemAlloc(n);
-//                                break;
-//                            case 1:
-//                                p1 = Heap.MemAlloc(n);
-//                                break;
-//                            case 2:
-//                                p2 = Heap.MemAlloc(n);
-//                                break;
-//                            case 3:
-//                                p3 = Heap.MemAlloc(n);
-//                                break;
-//                        }
-//                    }
-//                    for (int i = 0; i < 4; i++)
-//                    {
-//                        switch (i)
-//                        {
-//                            case 0:
-//                                Heap.MemFree(p0);
-//                                break;
-//                            case 1:
-//                                Heap.MemFree(p1);
-//                                break;
-//                            case 2:
-//                                Heap.MemFree(p2);
-//                                break;
-//                            case 3:
-//                                Heap.MemFree(p3);
-//                                break;
-//                        }
-//                    }
+                    Heap.MemFree((UInt32) testPointer);
                 }
             }
-
-            //            Console.WriteLine("Press Enter for Reboot");
-            //            Console.ReadLine();
-            //            Deboot.Reboot();
         }
 
         private static void PciTest()
