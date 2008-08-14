@@ -111,6 +111,7 @@ namespace EsxTest
 
                                 }
                             }
+                            ++incPointer;
                         }
                         uint index = MTRandom.Next(1000);
                         if (pointer[index]==0)
