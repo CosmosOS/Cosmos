@@ -226,23 +226,23 @@ namespace EsxTest
 
         internal unsafe void AllocateInParent()
         {
-            var parentHeaderPtr = (FragmentHeader*) ParentAddress;
+            var parentPtr = (FragmentHeader*) ParentAddress;
             #region validation
             //general heap logic problem, if one these exceptions occurs 
-            if (parentHeaderPtr->HasData)
+            if (parentPtr->HasData)
             {
                 Heap.CallException("AllocateInParent failed: Data already exits", FragmentAddress);
             }
             if (IsChild2OfParent)
             {
-                if (parentHeaderPtr->HasChild2)
+                if (parentPtr->HasChild2)
                 {
                     Heap.CallException("AllocateInParent failed: Child2 already exits", FragmentAddress);
                 }
             }
             else
             {
-                if (parentHeaderPtr->HasChild1)
+                if (parentPtr->HasChild1)
                 {
                     Heap.CallException("AllocateInParent failed: Child1 already exits", FragmentAddress);
                 }
@@ -250,34 +250,34 @@ namespace EsxTest
             #endregion
             if (IsChild2OfParent)
             {
-                parentHeaderPtr->HasChild2 = true;
+                parentPtr->HasChild2 = true;
             }
             else
             {
-                parentHeaderPtr->HasChild1 = true;
+                parentPtr->HasChild1 = true;
             }
 
         }
 
         internal unsafe void FreeInParent()
         {
-            var parentHeaderPtr = (FragmentHeader*) ParentAddress;
+            var parentPtr = (FragmentHeader*) ParentAddress;
             #region validation
             //general heap logic problem, if one these exceptions occurs 
-            if (parentHeaderPtr->HasData)
+            if (parentPtr->HasData)
             {
                 Heap.CallException("FreeInParent failed: Parent HasData ", FragmentAddress);
             }
             if (IsChild2OfParent)
             {
-                if (!parentHeaderPtr->HasChild2)
+                if (!parentPtr->HasChild2)
                 {
                     Heap.CallException("FreeInParent failed: Child2 doesnt exits", FragmentAddress);
                 }
             }
             else
             {
-                if (!parentHeaderPtr->HasChild1)
+                if (!parentPtr->HasChild1)
                 {
                     Heap.CallException("FreeInParent failed: Child1 doesnt exits", FragmentAddress);
                 }
@@ -285,11 +285,11 @@ namespace EsxTest
             #endregion
             if (IsChild2OfParent)
             {
-                parentHeaderPtr->HasChild2 = false;
+                parentPtr->HasChild2 = false;
             }
             else
             {
-                parentHeaderPtr->HasChild1 = false;
+                parentPtr->HasChild1 = false;
             }
         }
 
@@ -454,8 +454,8 @@ namespace EsxTest
             Size = EndAddress - StartAddress;
             MaxFragmentDataSize = Size - FragmentHeader.HeaderSize;
             CalculateFragmentSizes(Size);
-            var rootHeaderPtr = (FragmentHeader*)StartAddress;
-            rootHeaderPtr->Initialize(MaxFragmentSizeIndex);
+            var rootPtr = (FragmentHeader*)StartAddress;
+            rootPtr->Initialize(MaxFragmentSizeIndex);
             //ClearFragment(StartAddress, GetFragmentDataSize((*RootHeader).SizeIndex)); //this is bad for ESX Server
 #if NOCOSMOS
             Debug("CacheStackPointerAddress=" + CacheStackPointerAddress);
@@ -504,15 +504,15 @@ namespace EsxTest
             {
                 CallException("MemAlloc: Out of memory");
             }
-            var fragmentHeaderPtr = (FragmentHeader*)fragmentAddress;
-            fragmentHeaderPtr->HasData = true;
+            var fragmentPtr = (FragmentHeader*)fragmentAddress;
+            fragmentPtr->HasData = true;
             #region validation
             //general heap logic problem, if one these exceptions occurs 
-            if (fragmentHeaderPtr->SizeIndex != sizeIndex)
+            if (fragmentPtr->SizeIndex != sizeIndex)
             {
                 CallException("MemAlloc: SizeIndex wrong", fragmentAddress);
             }
-            if (GetFragmentDataSize(fragmentHeaderPtr->SizeIndex) < size)
+            if (GetFragmentDataSize(fragmentPtr->SizeIndex) < size)
             {
                 CallException("MemAlloc: HeaderSize mismatch", fragmentAddress);
             }
@@ -520,7 +520,7 @@ namespace EsxTest
             ClearFragment(fragmentAddress,size);            
             ++HeapCounter.MemAlloc;
             ++HeapCounter.Count;
-            HeapCounter.DataSize += GetFragmentSize(fragmentHeaderPtr->SizeIndex);
+            HeapCounter.DataSize += GetFragmentSize(fragmentPtr->SizeIndex);
             Debug(fragmentAddress);
 #if NOCOSMOS
             Debug("End Malloc HeaderSize=" + size);
@@ -541,14 +541,14 @@ namespace EsxTest
                 CallException("MemFree: pointer==0");
             }
             var fragmentAddress = pointer - FragmentHeader.HeaderSize;
-            var fragmentHeaderPtr = (FragmentHeader*)fragmentAddress;
+            var fragmentPtr = (FragmentHeader*)fragmentAddress;
             Debug(fragmentAddress);
-            fragmentHeaderPtr->HasData = false;
-            fragmentHeaderPtr->FreeInParent();
-            PushFreeFragmentAddress(fragmentHeaderPtr->SizeIndex, fragmentAddress);
+            fragmentPtr->HasData = false;
+            fragmentPtr->FreeInParent();
+            PushFreeFragmentAddress(fragmentPtr->SizeIndex, fragmentAddress);
             ++HeapCounter.MemFree;
             --HeapCounter.Count;
-            HeapCounter.DataSize -= GetFragmentSize(fragmentHeaderPtr->SizeIndex);
+            HeapCounter.DataSize -= GetFragmentSize(fragmentPtr->SizeIndex);
             Debug("End MemFree");
         }
 
@@ -563,8 +563,8 @@ namespace EsxTest
             Debug(fragmentAddress);
             #region validation
             //general heap logic problem, if one these exceptions occurs 
-            var headerPtr = (FragmentHeader*) fragmentAddress;
-            if (size>GetFragmentDataSize(headerPtr->SizeIndex))
+            var fragmentPtr = (FragmentHeader*) fragmentAddress;
+            if (size>GetFragmentDataSize(fragmentPtr->SizeIndex))
             {
                 CallException("ClearFragment: size mismatch", fragmentAddress);
             }
@@ -616,100 +616,100 @@ namespace EsxTest
 #else
             Debug("Begin GetFreeFragmentAddress");
 #endif
-            var address = PopFreeFragmentAddress(sizeIndex);
-            if (address != 0)
+            var fragmentAddress = PopFreeFragmentAddress(sizeIndex);
+            if (fragmentAddress != 0)
             {
-                if (address != StartAddress)
+                if (fragmentAddress != StartAddress)
                 {
-                    var headerPtr = (FragmentHeader*) address;
-                    headerPtr->AllocateInParent();
+                    var fragmentPtr = (FragmentHeader*) fragmentAddress;
+                    fragmentPtr->AllocateInParent();
                 }
             }
             else
             {
                 //Starting at the root of the heap
                 ++HeapCounter.Search;
-                address = SearchFreeFragmentAddress(sizeIndex, StartAddress);
-                if (address != 0)
+                fragmentAddress = SearchFreeFragmentAddress(sizeIndex, StartAddress);
+                if (fragmentAddress != 0)
                 {
                     Debug("Search success");
-                    Debug(address);
+                    Debug(fragmentAddress);
                 }
             }
 
-            Debug(address);
+            Debug(fragmentAddress);
 #if NOCOSMOS
             Debug("End GetFreeFragmentAddress si=" + sizeIndex);
 #else
             Debug("End GetFreeFragmentAddress");
 #endif
-            return address;
+            return fragmentAddress;
         }
 
-        private static unsafe UInt32 SearchFreeFragmentAddress(int sizeIndex, UInt32 address)
+        private static unsafe UInt32 SearchFreeFragmentAddress(int sizeIndex, UInt32 fragmentAddress)
         {
 #if NOCOSMOS
             Debug("Begin SearchFreeFragmentAddress for sizeIndex=" + sizeIndex + "in Fragment:");
 #else
             Debug("Begin SearchFreeFragmentAddress");
 #endif
-            Debug(address);
+            Debug(fragmentAddress);
             ++DebugTab;
             ++HeapCounter.SearchTotal;
-            UInt32 freeAddress = 0;            
-            var headerPtr = (FragmentHeader*)address;
-            if (sizeIndex+1 <= headerPtr->SizeIndex)
+            UInt32 freeFragmentAddress = 0;            
+            var fragmentPtr = (FragmentHeader*)fragmentAddress;
+            if (sizeIndex+1 <= fragmentPtr->SizeIndex)
             {
-                if (sizeIndex+1 == headerPtr->SizeIndex)
+                if (sizeIndex+1 == fragmentPtr->SizeIndex)
                 {
-                    if (headerPtr->IsEmpty)
+                    if (fragmentPtr->IsEmpty)
                     {
-                        freeAddress = headerPtr->Child1Address;
-                        var child1HeaderPtr = (FragmentHeader*) freeAddress;
-                        child1HeaderPtr->Initialize(sizeIndex);
-                        headerPtr->HasChild1 = true;
-                        var child2HeaderPtr = (FragmentHeader*)headerPtr->Child2Address;
-                        child2HeaderPtr->Initialize(sizeIndex);
-                        child2HeaderPtr->IsChild2OfParent = true;
-                        PushFreeFragmentAddress(sizeIndex, headerPtr->Child2Address);
+                        freeFragmentAddress = fragmentPtr->Child1Address;
+                        var child1Ptr = (FragmentHeader*) freeFragmentAddress;
+                        child1Ptr->Initialize(sizeIndex);
+                        fragmentPtr->HasChild1 = true;
+                        var child2Ptr = (FragmentHeader*)fragmentPtr->Child2Address;
+                        child2Ptr->Initialize(sizeIndex);
+                        child2Ptr->IsChild2OfParent = true;
+                        PushFreeFragmentAddress(sizeIndex, fragmentPtr->Child2Address);
                         ++HeapCounter.SearchSuccess;
                     }
                 }
-                if (freeAddress == 0)
+                if (freeFragmentAddress == 0)
                 {
-                    if (headerPtr->HasChild1)
+                    if (fragmentPtr->HasChild1)
                     {
-                        freeAddress = SearchFreeFragmentAddress(sizeIndex, headerPtr->Child1Address);
+                        freeFragmentAddress = SearchFreeFragmentAddress(sizeIndex, fragmentPtr->Child1Address);
                     }
-                    if (freeAddress == 0)
+                    if (freeFragmentAddress == 0)
                     {
-                        if (headerPtr->HasChild2)
+                        if (fragmentPtr->HasChild2)
                         {
-                            freeAddress = SearchFreeFragmentAddress(sizeIndex , headerPtr->Child2Address);
+                            freeFragmentAddress = SearchFreeFragmentAddress(sizeIndex , fragmentPtr->Child2Address);
                         }
                     }
                 }
             }
-            if (freeAddress != 0)
+            if (freeFragmentAddress != 0)
             {
-                var freeHeaderPtr = (FragmentHeader*) freeAddress;
-                if (freeHeaderPtr->SizeIndex!=sizeIndex)
+                var freeFragmentPtr = (FragmentHeader*) freeFragmentAddress;
+                if (freeFragmentPtr->SizeIndex!=sizeIndex)
                 {
-                    CallException("SearchFreeFragmentAddress: SizeIndex mismatch", freeAddress);
+                    CallException("SearchFreeFragmentAddress: SizeIndex mismatch", freeFragmentAddress);
                 }                
             }
             --DebugTab;
-            if (freeAddress != 0)
+            if (freeFragmentAddress != 0)
             {
                 Debug("Found:");
-                Debug(freeAddress);
+                Debug(freeFragmentAddress);
             }
 #if NOCOSMOS
             Debug("End SearchFreeFragmentAddress for sizeIndex=" + sizeIndex);
 #else
             Debug("End SearchFreeFragmentAddress");
 #endif
-            return freeAddress;
+            return freeFragmentAddress;
         }
 
         private static unsafe UInt32 CreateFragment(int sizeIndex)
@@ -742,28 +742,28 @@ namespace EsxTest
             }
             else
             {
-                var parentHeaderPtr = (FragmentHeader*) parentFragmentAddress;
+                var parentFragmentPtr = (FragmentHeader*) parentFragmentAddress;
 
-                if (parentHeaderPtr->HasChild1 && parentHeaderPtr->HasChild2)
+                if (parentFragmentPtr->HasChild1 && parentFragmentPtr->HasChild2)
                 {
                     //Out of memory
                     return 0;
                 }
 
-                parentHeaderPtr->HasChild1 = true;
-                fragmentAddress = parentHeaderPtr->Child1Address;
-                var child2Address = parentHeaderPtr->Child2Address;
-                var child2HeaderPtr = (FragmentHeader*) child2Address;
-                child2HeaderPtr->Initialize(sizeIndex);
-                child2HeaderPtr->IsChild2OfParent = true;
+                parentFragmentPtr->HasChild1 = true;
+                fragmentAddress = parentFragmentPtr->Child1Address;
+                var child2Address = parentFragmentPtr->Child2Address;
+                var child2Ptr = (FragmentHeader*) child2Address;
+                child2Ptr->Initialize(sizeIndex);
+                child2Ptr->IsChild2OfParent = true;
                 PushFreeFragmentAddress(sizeIndex, child2Address);
                 if (fragmentAddress == 0)
                 {
                     CallException("CreateFragment failed");
                 }
                 ++HeapCounter.Create;
-                var fragmentHeaderPtr = (FragmentHeader*) fragmentAddress;
-                fragmentHeaderPtr->Initialize(sizeIndex);
+                var fragmentPtr = (FragmentHeader*) fragmentAddress;
+                fragmentPtr->Initialize(sizeIndex);
                 --DebugTab;
                 Debug("Created:");
                 Debug(fragmentAddress);
@@ -1057,48 +1057,48 @@ namespace EsxTest
         private static UInt32 CacheSizePerIndex { get { return CacheSize / (FragmentHeader.MaxSizeIndex + 1); } }
         private static UInt32 CacheAddress { get; set; }
 
-        private static unsafe void PushFreeFragmentAddress(int sizeIndex, UInt32 address)
+        private static unsafe void PushFreeFragmentAddress(int sizeIndex, UInt32 fragmentAddress)
         {
-            if (address != 0)
+            if (fragmentAddress != 0)
             {
 #if NOCOSMOS
                 Debug("Push si=" + sizeIndex);
 #else
                 Debug("Push");
 #endif
-                Debug(address);
+                Debug(fragmentAddress);
                 ++HeapCounter.CachePush;
 
                 #region validation
 
                 //general heap logic problem, if one these exceptions occurs 
 
-                var headerPtr = (FragmentHeader*)address;
-                if (headerPtr->SizeIndex != sizeIndex)
+                var fragmentPtr = (FragmentHeader*)fragmentAddress;
+                if (fragmentPtr->SizeIndex != sizeIndex)
                 {
-                    CallException("PushFreeFragmentAddress: sizeIndex mismatch", address);
+                    CallException("PushFreeFragmentAddress: sizeIndex mismatch", fragmentAddress);
                 }
-                if (!headerPtr->IsEmpty)
+                if (!fragmentPtr->IsEmpty)
                 {
-                    CallException("PushFreeFragmentAddress: not empty", address);
+                    CallException("PushFreeFragmentAddress: not empty", fragmentAddress);
                 }
-                if (headerPtr->HasParent)
+                if (fragmentPtr->HasParent)
                 {
-                    var parentHeaderPtr = (FragmentHeader*) headerPtr->ParentAddress;
-                    if (parentHeaderPtr->HasData)
+                    var parentPtr = (FragmentHeader*) fragmentPtr->ParentAddress;
+                    if (parentPtr->HasData)
                     {
                         CallException("PushFreeFragmentAddress: Parent HasData");
                     }
-                    if (headerPtr->IsChild2OfParent)
+                    if (fragmentPtr->IsChild2OfParent)
                     {
-                        if (parentHeaderPtr->HasChild2)
+                        if (parentPtr->HasChild2)
                         {
                             CallException("PushFreeFragmentAddress: ChildBit2 in Parent");
                         }
                     }
                     else
                     {
-                        if (parentHeaderPtr->HasChild1)
+                        if (parentPtr->HasChild1)
                         {
                             CallException("PushFreeFragmentAddress: ChildBit1 in Parent");
                         }
@@ -1106,7 +1106,7 @@ namespace EsxTest
                 }
                 if (sizeIndex > MaxFragmentSizeIndex)
                 {
-                    CallException("PushFreeFragmentAddress: Worng sizeIndex", address);
+                    CallException("PushFreeFragmentAddress: Worng sizeIndex", fragmentAddress);
                 }
                 #endregion
 
@@ -1130,9 +1130,9 @@ namespace EsxTest
                         CallException("PushFreeFragmentAddress: cacheValuePtr out of range");
                     }
 
-                    (*cacheValuePtr) = address;
+                    (*cacheValuePtr) = fragmentAddress;
 #if NOCOSMOS
-                    Debug("Push SizeIndex= " + sizeIndex + " cachePtr=" + (UInt32) cacheValuePtr + " <- " + address);
+                    Debug("Push SizeIndex= " + sizeIndex + " cachePtr=" + (UInt32)cacheValuePtr + " <- " + fragmentAddress);
 #endif
                     ++(*stackPtr);
                 }
@@ -1141,7 +1141,7 @@ namespace EsxTest
 
         private unsafe static UInt32 PopFreeFragmentAddress(int sizeIndex)
         {
-            UInt32 address=0;
+            UInt32 fragmentAddress=0;
 
             if (sizeIndex > MaxFragmentSizeIndex)
             {
@@ -1179,14 +1179,14 @@ namespace EsxTest
                 }
                 #endregion
 
-                address =(*cacheValuePtr);
+                fragmentAddress =(*cacheValuePtr);
 #if NOCOSMOS
-                Debug("Pop SizeIndex=" + sizeIndex + " cachePtr=" + (UInt32)cacheValuePtr + " <- " + address); 
+                Debug("Pop SizeIndex=" + sizeIndex + " cachePtr=" + (UInt32)cacheValuePtr + " <- " + fragmentAddress); 
 #endif
-                if (address != 0)
+                if (fragmentAddress != 0)
                 {
-                    var headerPtr = (FragmentHeader*) address;
-                    if (headerPtr->IsEmpty)
+                    var fragmentPtr = (FragmentHeader*) fragmentAddress;
+                    if (fragmentPtr->IsEmpty)
                     {
                         ++HeapCounter.CachePop;
 #if NOCOSMOS
@@ -1194,12 +1194,12 @@ namespace EsxTest
 #else
                     Debug("Pop");
 #endif
-                        return address;
+                        return fragmentAddress;
                     }
-                    address = 0;//Cached fragment is already used by Child or Parent - this can happen
+                    fragmentAddress = 0;//Cached fragment is already used by Child or Parent - this can happen
                 }                
             }
-            return address;
+            return fragmentAddress;
         }
 
 

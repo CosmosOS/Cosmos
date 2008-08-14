@@ -86,7 +86,7 @@ namespace EsxTest
                     ++counter;
 
                     Console.CursorLeft = 0;
-                    Console.CursorTop = 0;
+                    Console.CursorTop = 1;
                     HeapCounter.Print();
 
                     testSize = MTRandom.Next(5000) + 1;
