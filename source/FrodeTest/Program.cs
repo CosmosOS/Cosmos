@@ -21,57 +21,62 @@ namespace FrodeTest
             xBoot.Execute();
             //Cosmos.Hardware.VGAScreen.SetMode90x30xText();
 
-            //Console.WriteLine("*** COSMOS Operating System - Frode's Test Suite ***");
+            Console.WriteLine("*** COSMOS Operating System - Frode's Test Suite ***");
             //Console.WriteLine("CPU: " + Cosmos.Kernel.CPU.CPUVendor);
             try
             {
+                //Cosmos.Hardware.DebugUtil.SendMessage("FrodeTest", "Initializing VFSManager");
+                //Cosmos.Sys.VFSManager.Init();
+                //Cosmos.Hardware.DebugUtil.SendMessage("FrodeTest", "Done initializing VFSManager");
+
+                //Shell.Session.Run();
+                //Console.Write('1');
+                //PrintBackslash();
+                //Console.Write('2');
+                //WriteChar(92, 10, 20, 1, 1);
+                //Console.Write('3');
+                ////Cosmos.Hardware.TextScreen.WriteChar('\\');
+                //Console.Write('4');
+                ////Console.Write('\\');
+                //Console.Write('5');
+                ////Console.Write("\\");
 
 
-            //Shell.Session.Run();
-            //Console.WriteLine("Print char: ");
-            //PrintBackslash();
-            //Console.WriteLine("Second: ");
-            //WriteChar(92, 10, 20, 1, 1);
-            //Console.WriteLine("Third: ");
-            //Cosmos.Hardware.TextScreen.WriteChar('\\');
-            //Console.Write('\\');
 
+                //Console.WriteLine(@"\");
+                //Test
+                //Console.WriteLine("---- RUNNING PREDEFINED TESTS ----");
+                Test.StringTest.RunTest();
+                //Test.IPv4AddressTest.RunTest();
+                //Test.BasicTest.RunTest();
+                //Test.SwitchTest.RunTest();
+                //Console.ReadLine();
+                //Test.BoolTest.RunTest();
+                //Test.InterfaceTest.RunTest();
+                //Test.ExtensionMethodsTest.RunTest();
+                //Test.BinaryHelperTest.RunTest();
+                //Test.TransmitStatusDescriptorTest.RunTest();
+                //Test.PacketHeaderTest.RunTest();
+                //Test.RAMBusTest.RunTest();
+                //Test.NumberSystemTest.RunTest();
+                //Test.IPv4Test.RunTest();
+                //Test.UDPTest.RunTest();
+                //Test.MACAddressTest.RunTest();
+                //Test.LinqTest.RunTest();
+                //Test.ExceptionTest.RunTest();
+                //Test.FilesystemEntryTest.RunTest();
+                //Test.VirtualFileSystemTest.RunTest();
+                //Test.DirectoryInfoTest.RunTest();
+                //Test.FileInfoTest.RunTest();
 
-            
-            //Console.WriteLine(@"\");
-            //Test
-            //Console.WriteLine("---- RUNNING PREDEFINED TESTS ----");
-            //Test.StringTest.RunTest();
-            //Test.IPv4AddressTest.RunTest();
-            //Test.BasicTest.RunTest();
-            //Test.SwitchTest.RunTest();
-            //Console.ReadLine();
-            //Test.BoolTest.RunTest();
-            //Test.InterfaceTest.RunTest();
-            //Test.ExtensionMethodsTest.RunTest();
-            //Test.BinaryHelperTest.RunTest();
-            //Test.TransmitStatusDescriptorTest.RunTest();
-            //Test.PacketHeaderTest.RunTest();
-            //Test.RAMBusTest.RunTest();
-            //Test.NumberSystemTest.RunTest();
-            //Test.IPv4Test.RunTest();
-            //Test.UDPTest.RunTest();
-            //Test.MACAddressTest.RunTest();
-            //Test.LinqTest.RunTest();
-            //Test.ExceptionTest.RunTest();
-            //Test.FilesystemEntryTest.RunTest();
-            //Test.VirtualFileSystemTest.RunTest();
-            //Test.DirectoryInfoTest.RunTest();
-            //Test.FileInfoTest.RunTest();
+                //Tests ready for Matthijs to fix ;)
+                //Test.RTL8139Test.RunTest();
+                //Test.ExceptionTest.RunTest();
 
-            //Tests ready for Matthijs to fix ;)
-            Test.RTL8139Test.RunTest();
-            //Test.ExceptionTest.RunTest();
-            
             }
             catch (Exception ex)
             {
-                Console.WriteLine("CRITICAL ERROR: " + ex.Message);
+                Console.WriteLine(ex.GetType().ToString());
             }
              
             //Done
