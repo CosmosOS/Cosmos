@@ -6490,16 +6490,27 @@ namespace Cosmos.Hardware {
         /// <param name="rDevices">The list of Devices</param>
         private static void EnumerateBus(byte aBus, ref List<PCIDevice> rDevices) {
             //Console.WriteLine("Enumerate " + Bus ); 
-            
+            DebugUtil.SendNumber("PCI", "Enumerating bus", aBus, 8);
             for (byte xSlot = 0; xSlot < 32; xSlot++) {                
                 byte xMaxFunctions = 1;
+                DebugUtil.SendNumber("PCI",
+                                     "Enumerating slot",
+                                     xSlot,
+                                     8);
                 for (byte xFunction = 0; xFunction < xMaxFunctions; xFunction++) {
+                    DebugUtil.SendNumber("PCI",
+                                         "Enumerating function",
+                                         xFunction,
+                                         8);
                     PCIDevice xPCIDevice = new PCIDeviceNormal(aBus, xSlot, xFunction);
-
+                    DebugUtil.SendMessage("PCI", xPCIDevice.DeviceExists ? "Device exists" : "Device doesnt exist");
                     if (xPCIDevice.DeviceExists) {
                         //if (xPCIDevice.HeaderType == 0 /* PCIHeaderType.Normal */)
                         //  xPCIDevice = xPCIDevice;
-
+                        DebugUtil.SendNumber("PCI",
+                                             "HeaderType",
+                                             xPCIDevice.HeaderType,
+                                             8);
                         if (xPCIDevice.HeaderType == 2) { /* PCIHeaderType.Cardbus */
                             xPCIDevice = new PCIDeviceCardBus(aBus, xSlot, xFunction);
                         }
@@ -6511,6 +6522,11 @@ namespace Cosmos.Hardware {
                         rDevices.Add(xPCIDevice);
 
                         if (xPCIDevice is PCIDeviceBridge) {
+                            DebugUtil.SendMessage("PCI", "PCI device is a Bridge");
+                            DebugUtil.SendNumber("PCI",
+                                                 "SecondaryBus",
+                                                 ((PCIDeviceBridge)xPCIDevice).SecondaryBus,
+                                                 8);
                             EnumerateBus(((PCIDeviceBridge)xPCIDevice).SecondaryBus, ref rDevices);
                         }
 
@@ -6816,9 +6832,9 @@ namespace Cosmos.Hardware {
         /// </summary>
         public bool DeviceExists { get { return VendorID != 0xFFFF && VendorID != 0x0; } }
         /// <summary>
-        /// Is this a multifunction devie?
+        /// Is this a multifunction device?
         /// </summary>
-        public bool IsMultiFunction { get { return (Read8(0x0e) & 0xf0) != 0; } }
+        public bool IsMultiFunction { get { return (Read8(0x0e) & 0x80) != 0; } }
 
         /// <summary>
         /// The Vendor ID

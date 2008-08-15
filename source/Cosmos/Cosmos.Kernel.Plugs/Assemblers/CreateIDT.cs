@@ -110,11 +110,12 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 
 
                 new CPUx86.Move("eax", "esp"); // preserve old stack address for passing to interrupt handler
-
+                new Label(".BeforeAlign");
+                //new CPUx86.Call("DEBUG_STUB_");
                 // store floating point data
                 new CPUx86.And("esp", "0xfffffff0"); // fxsave needs to be 16-byte alligned
                 new CPUx86.Sub("esp", "512"); // fxsave needs 512 bytes
-                //new CPUx86.FXSave("[esp]"); // save the registers
+                new CPUx86.FXSave("[esp]"); // save the registers
                 new CPUx86.Sub("eax", "4");
                 new CPUx86.Move("[eax]", "esp");
 
