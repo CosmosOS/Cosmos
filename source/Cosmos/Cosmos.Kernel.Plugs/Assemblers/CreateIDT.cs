@@ -108,22 +108,21 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
                 new CPUx86.Pushd("0x" + j.ToString("X"));
                 new CPUx86.Pushad();
 
-
+                new CPUx86.Sub("esp",
+                               "4");
                 new CPUx86.Move("eax", "esp"); // preserve old stack address for passing to interrupt handler
-                new Label(".BeforeAlign");
-                //new CPUx86.Call("DEBUG_STUB_");
+                
                 // store floating point data
                 new CPUx86.And("esp", "0xfffffff0"); // fxsave needs to be 16-byte alligned
                 new CPUx86.Sub("esp", "512"); // fxsave needs 512 bytes
                 new CPUx86.FXSave("[esp]"); // save the registers
-                new CPUx86.Sub("eax", "4");
                 new CPUx86.Move("[eax]", "esp");
 
                 new CPUx86.Push("eax"); // 
                 new CPUx86.Push("eax"); // pass old stack address (pointer to InterruptContext struct) to the interrupt handler
-                new CPUx86.Move("eax",
-                                "esp");
-                new CPUx86.Push("eax");
+                //new CPUx86.Move("eax",
+                //                "esp");
+                //new CPUx86.Push("eax");
                 new CPUx86.Jump("0x8:__ISR_Handler_" + j.ToString("X2") + "_SetCS");
                 new Label("__ISR_Handler_" + j.ToString("X2") + "_SetCS");
                 MethodBase xHandler = GetInterruptHandler((byte) j);
@@ -135,8 +134,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
                 }
                 new CPUx86.Call(Label.GenerateLabelName(xHandler));
                 new CPUx86.Pop("eax");
-                
-                //new CPUx86.FXStore("[esp]");
+                new CPUx86.FXStore("[esp]");
 
                 new CPUx86.Move("esp", "eax"); // this restores the stack for the FX stuff, except the pointer to the FX data
                 new CPUx86.Add("esp", "4"); // "pop" the pointer

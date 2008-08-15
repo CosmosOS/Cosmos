@@ -146,13 +146,7 @@ namespace MatthijsTest {
                 var xBoot = new Cosmos.Sys.Boot();
                 xBoot.Execute();
             }
-            //int i = 0;
-            //while (true)
-            //{
-            //    Console.WriteLine(i);
-            //    ++i;
-            //}
-            //var xPtr = new IntPtr(0);
+            
             Console.WriteLine("Done");
             do
             {
