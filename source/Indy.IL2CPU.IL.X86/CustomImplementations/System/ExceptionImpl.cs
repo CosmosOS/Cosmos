@@ -17,7 +17,7 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System {
 			return VTablesImpl.GetTypeName(xObjectType);
 	    }
 
-        public static string get_Message(Exception aThis, [FieldAccess(Name = "System.String System.Exception._message")]string mMessage)
+        public static string get_Message(Exception aThis, [FieldAccess(Name = "System.String System.Exception._message")]ref string mMessage)
         {
             return mMessage;
         }

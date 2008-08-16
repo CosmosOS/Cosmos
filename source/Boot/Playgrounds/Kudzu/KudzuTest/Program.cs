@@ -18,9 +18,9 @@ namespace Cosmos.Playground.Kudzu {
             //System.Diagnostics.Debugger.Break();
             Console.WriteLine("Boot complete");
 
-            //PCITest.Test();
+            PCITest.Test();
             //Tests.DoAll();
-            RTL8139.Test();
+            //RTL8139.Test();
 
             //TODO: Make this automatically called after Init if no other shut downs are called
             Cosmos.Sys.Deboot.Halt();

@@ -34,5 +34,9 @@ namespace Cosmos.Sys.Plugs
         {
             return VFSManager.FileExists(aStorage.Name);
         }
+
+        public static string ToString(FileInfo aThis) {
+            return "FileInfo.ToString() not yet implemented!";
+        }
     }
 }

@@ -6775,7 +6775,7 @@ namespace Cosmos.Hardware {
                 }
                 else if ((address & PCI_BASE_ADDRESS_SPACE) == PCI_BASE_ADDRESS_SPACE_MEMORY)
                 {
-                    UInt32 size = ~(PCI_BASE_ADDRESS_MEM_MASK & flags)+1;
+                    UInt32 size = (~(PCI_BASE_ADDRESS_MEM_MASK & flags))+1;
 
                     IOMaps[i] = new Kernel.MemoryAddressSpace(address, size);
                     //Console.WriteLine("register " + i + " - " + size + "b mem");
@@ -6834,7 +6834,7 @@ namespace Cosmos.Hardware {
         /// <summary>
         /// Is this a multifunction device?
         /// </summary>
-        public bool IsMultiFunction { get { return (Read8(0x0e) & 0x80) != 0; } }
+        public bool IsMultiFunction { get { return (Read8(0x0e) & 0xF0) != 0; } }
 
         /// <summary>
         /// The Vendor ID

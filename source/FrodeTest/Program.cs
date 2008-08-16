@@ -65,8 +65,8 @@ namespace FrodeTest
                 //Test.LinqTest.RunTest();
                 //Test.ExceptionTest.RunTest();
                 //Test.FilesystemEntryTest.RunTest();
-                Test.VirtualFileSystemTest.RunTest();
-                //Test.DirectoryInfoTest.RunTest();
+                //Test.VirtualFileSystemTest.RunTest();
+                Test.DirectoryInfoTest.RunTest();
                 //Test.FileInfoTest.RunTest();
 
                 //Tests ready for Matthijs to fix ;)

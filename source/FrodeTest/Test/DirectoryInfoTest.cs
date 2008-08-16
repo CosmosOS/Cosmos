@@ -15,14 +15,14 @@ namespace FrodeTest.Test
             //Console.WriteLine("CurrentDirectory: " + Environment.CurrentDirectory);
 
             DirectoryInfo dir = new DirectoryInfo("/0/lost+found/");
-            Console.WriteLine("FullName: " + dir.FullName);
+            //Console.WriteLine("FullName: " + dir.FullName);
             Console.WriteLine("Name: " + dir.Name);
 
-            Console.WriteLine("ToString: " + dir.ToString());
+            //Console.WriteLine("ToString: " + dir.ToString());
 
-            Console.WriteLine("Files in the directory:");
-            foreach (FileInfo file in dir.GetFiles())
-                Console.WriteLine(file.Name);
+            //Console.WriteLine("Files in the directory:");
+            //foreach (FileInfo file in dir.GetFiles())
+            //    Console.WriteLine(file.Name);
 
 
             if (dir.Exists)

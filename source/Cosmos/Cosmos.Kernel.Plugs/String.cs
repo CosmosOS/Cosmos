@@ -91,6 +91,41 @@ namespace Cosmos.Kernel.Plugs {
             return new global::System.String(xChars);
         }
 
+        public static int IndexOf(string aThis, string aSubStr, int aStart, int aLength, StringComparison aComparison) {
+            int xEndIdx = aStart + aLength;
+            for (int i = aStart; i < xEndIdx; i++) {
+                bool xFound = true;
+                for (int j = 0; j < aSubStr.Length; j++) {
+                    if (aThis[i + j] != aSubStr[j]) {
+                        xFound = false;
+                        break;
+                    }
+                }
+                if (xFound) {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        public static bool EndsWith(string aThis, string aSubStr, StringComparison aComparison) {
+            int xLastIdx = aThis.Length - aSubStr.Length - 1;
+            for(int i = 0; i < aSubStr.Length; i++) {
+                if(aThis[xLastIdx+i] != aSubStr[i]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+//        System.Int32  System.String.IndexOf(System.String, System.Int32, System.Int32, System.StringComparison)
+
+        public static bool Equals(string aThis, string aThat, StringComparison aComparison) {
+#warning TODO: implement
+            return EqualsHelper(aThis,
+                                aThat);
+        }
+
         public static bool EqualsHelper(string aStrA,
                                         string aStrB) {
             return aStrA.CompareTo(aStrB) == 0;

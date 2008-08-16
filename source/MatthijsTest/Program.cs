@@ -146,7 +146,13 @@ namespace MatthijsTest {
                 var xBoot = new Cosmos.Sys.Boot();
                 xBoot.Execute();
             }
-            
+            try {
+                throw new Exception("Test error");
+            }
+            catch (Exception E) {
+                Console.Write("Error: ");
+                Console.WriteLine(E.Message);
+            }
             Console.WriteLine("Done");
             do
             {

@@ -31,19 +31,19 @@ namespace Cosmos.Sys.Plugs
             aStorage = VFSManager.GetDirectoryEntry(aPath);
         }
 
-        public static bool get_Exists([FieldAccess(Name = "$$Storage$$")] ref FilesystemEntry aStorage)
+        public static bool get_Exists(DirectoryInfo aThis, [FieldAccess(Name = "$$Storage$$")] ref FilesystemEntry aStorage)
         {
             //TODO: actually test if it exists
             return (aStorage != null);
         }
 
-        public static string get_FullName([FieldAccess(Name="$$Storage$$")] ref FilesystemEntry aStorage)
+        public static string get_FullName(DirectoryInfo aThis, [FieldAccess(Name = "$$Storage$$")] ref FilesystemEntry aStorage)
         {
             //TODO: return FULL name
             return aStorage.Name;
         }
 
-        public static string get_Name([FieldAccess(Name = "$$Storage$$")] ref FilesystemEntry aStorage)
+        public static string get_Name(DirectoryInfo aThis, [FieldAccess(Name = "$$Storage$$")] ref FilesystemEntry aStorage)
         {
             return aStorage.Name;
         }
@@ -61,11 +61,11 @@ namespace Cosmos.Sys.Plugs
 
         //    return xFiles.ToArray();
         //}
-        
-        
-        //public static string ToString([FieldAccess(Name = "$$Path$$")] ref String aPath)
-        //{
-        //    return "ToString()";
-        //}
+
+
+        public static string ToString([FieldAccess(Name = "$$Path$$")] ref String aPath)
+        {
+            return "DirectoryInfo.ToString() not yet implemented";
+        }
     }
 }
