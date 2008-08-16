@@ -12,8 +12,14 @@ namespace FrodeTest.Test
         {
             Console.WriteLine("-- Testing System.IO.FileInfo --");
 
-            FileInfo file = new FileInfo("/0/Readme.txt");
-            Console.WriteLine("Name: " + file.Name);
+            Check.Text = "/0/Readme.txt";
+            FileInfo file = new FileInfo(Check.Text);
+            Check.Validate(file.Name == "Readme.txt");
+
+            Check.Text = "Exists";
+            Check.Validate(file.Exists);
+
+            //Console.WriteLine("Name: " + file.Name);
             //if (file.Exists)
             //    Console.WriteLine("File exists");
             //else

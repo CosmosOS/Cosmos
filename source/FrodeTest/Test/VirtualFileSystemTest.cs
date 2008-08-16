@@ -12,6 +12,8 @@ namespace FrodeTest.Test
     {
         public static void RunTest()
         {
+
+
             //foreach (FilesystemEntry entry in VFSManager.GetDirectoryListing("/1/"))
             //{
             //    Console.WriteLine(entry.Name);
@@ -134,6 +136,12 @@ namespace FrodeTest.Test
             ////{
             ////    Console.WriteLine(xEntry.Name);
             ////}
+
+            //Get DirectoryEntry
+            Check.Text = "/0/Alfa";
+            Check.Validate(VFSManager.GetDirectoryEntry(Check.Text) != null);
+            //Check.Text = "/0/Alfa/";
+            //Check.Validate(VFSManager.GetDirectoryEntry(Check.Text).Name != null);
         }
     }
 }
