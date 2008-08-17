@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Cosmos.Hardware;
 using Cosmos.Sys.Network;
 
 namespace Cosmos.Playground.Kudzu {
@@ -17,7 +18,7 @@ namespace Cosmos.Playground.Kudzu {
                 // are using the same IP on host for testing
                 0x0A00020F, 32001 // 10.0.2.15
                 , 0xFFFFFFFF, 32000 // 255.255.255.255, Broadcast
-                , new byte[] { 0x16 });
+                , new byte[] { 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16 });
             var xEthernet = new EthernetPacket(xUDP.GetData()
                 , 0x525400123457, 0xFFFFFFFFFFFF
                 , EthernetPacket.PacketType.IP);
@@ -35,7 +36,10 @@ namespace Cosmos.Playground.Kudzu {
             xNIC.InitializeDriver();
 
             Console.WriteLine("Sending bytes.");
-            xNIC.TransmitBytes(xEthernet.GetData());
+            var xBytes = xEthernet.GetData();
+            DebugUtil.WriteBinary("RTLTest", "Prepare to send packet", xBytes);
+            System.Diagnostics.Debugger.Break();
+            xNIC.TransmitBytes(xBytes);
         }
 
     }

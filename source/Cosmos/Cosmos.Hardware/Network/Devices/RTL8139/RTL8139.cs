@@ -551,7 +551,6 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         {
             fixed (byte* bodystart = bytearray)
             {
-                IntPtr bodyAddress = (IntPtr)bodystart;
                 return (UInt32)bodystart;
             }
         }

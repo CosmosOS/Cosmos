@@ -224,6 +224,7 @@ namespace Indy.IL2CPU.IL.X86
                 }
 			    new CPUx86.Push("esp");
                 aAssembler.StackContents.Push(new StackContent(4));
+                //at this point, we need to move copy all arguments over. 
                 for(int i = 0; i<(xArgSize/4);i++) {
                     new CPUx86.Pushd("[esp + " + (xStorageSize + 4) + "]"); // + 4 because the ptr is pushed too
                     new CPUx86.Move("dword [esp + " + (xStorageSize + 4 + 4) + "]",

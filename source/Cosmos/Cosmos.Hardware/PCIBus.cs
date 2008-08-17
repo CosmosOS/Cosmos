@@ -6490,27 +6490,11 @@ namespace Cosmos.Hardware {
         /// <param name="rDevices">The list of Devices</param>
         private static void EnumerateBus(byte aBus, ref List<PCIDevice> rDevices) {
             //Console.WriteLine("Enumerate " + Bus ); 
-            DebugUtil.SendNumber("PCI", "Enumerating bus", aBus, 8);
             for (byte xSlot = 0; xSlot < 32; xSlot++) {                
                 byte xMaxFunctions = 1;
-                DebugUtil.SendNumber("PCI",
-                                     "Enumerating slot",
-                                     xSlot,
-                                     8);
                 for (byte xFunction = 0; xFunction < xMaxFunctions; xFunction++) {
-                    DebugUtil.SendNumber("PCI",
-                                         "Enumerating function",
-                                         xFunction,
-                                         8);
                     PCIDevice xPCIDevice = new PCIDeviceNormal(aBus, xSlot, xFunction);
-                    DebugUtil.SendMessage("PCI", xPCIDevice.DeviceExists ? "Device exists" : "Device doesnt exist");
                     if (xPCIDevice.DeviceExists) {
-                        //if (xPCIDevice.HeaderType == 0 /* PCIHeaderType.Normal */)
-                        //  xPCIDevice = xPCIDevice;
-                        DebugUtil.SendNumber("PCI",
-                                             "HeaderType",
-                                             xPCIDevice.HeaderType,
-                                             8);
                         if (xPCIDevice.HeaderType == 2) { /* PCIHeaderType.Cardbus */
                             xPCIDevice = new PCIDeviceCardBus(aBus, xSlot, xFunction);
                         }
@@ -6520,13 +6504,8 @@ namespace Cosmos.Hardware {
                         }
 
                         rDevices.Add(xPCIDevice);
-
-                        if (xPCIDevice is PCIDeviceBridge) {
-                            DebugUtil.SendMessage("PCI", "PCI device is a Bridge");
-                            DebugUtil.SendNumber("PCI",
-                                                 "SecondaryBus",
-                                                 ((PCIDeviceBridge)xPCIDevice).SecondaryBus,
-                                                 8);
+                        if (xPCIDevice is PCIDeviceBridge)
+                        {
                             EnumerateBus(((PCIDeviceBridge)xPCIDevice).SecondaryBus, ref rDevices);
                         }
 
@@ -6757,7 +6736,6 @@ namespace Cosmos.Hardware {
         private void LayoutIO()
         {
             //Console.WriteLine("Checking AdressSpaces of PCI(" + Bus + ", " + Slot + ", " + Function + ")");
-
             IOMaps = new Kernel.AddressSpace[NumberOfBaseAddresses()];
 
             for (byte i = 0; i < NumberOfBaseAddresses(); i++)
@@ -6766,7 +6744,6 @@ namespace Cosmos.Hardware {
                 SetBaseAddressInternal(i, 0xffffffff);
                 UInt32 flags = GetBaseAddressInternal(i);
                 SetBaseAddressInternal(i, address);
-
                 if (address == 0)
                 {
                     //Console.WriteLine("register " + i + " - none " + PCIBus.ToHex(flags,8));
@@ -6776,7 +6753,6 @@ namespace Cosmos.Hardware {
                 else if ((address & PCI_BASE_ADDRESS_SPACE) == PCI_BASE_ADDRESS_SPACE_MEMORY)
                 {
                     UInt32 size = (~(PCI_BASE_ADDRESS_MEM_MASK & flags))+1;
-
                     IOMaps[i] = new Kernel.MemoryAddressSpace(address, size);
                     //Console.WriteLine("register " + i + " - " + size + "b mem");
 
@@ -6784,9 +6760,8 @@ namespace Cosmos.Hardware {
                 }
                 else if ((address & PCI_BASE_ADDRESS_SPACE) == PCI_BASE_ADDRESS_SPACE_IO)
                 {
-                    UInt32 size = ~(PCI_BASE_ADDRESS_IO_MASK & flags) +1;
-
-                    IOMaps[i] = new Kernel.IOAddressSpace(address, size);
+                    UInt32 size = ~(PCI_BASE_ADDRESS_IO_MASK & flags) + 1;
+                    IOMaps[i] = new Kernel.IOAddressSpace(address-1, size);
                     //Console.WriteLine("register " + i + " - " + size + "b io");
 
                     NeedsMemory = true;
@@ -6897,12 +6872,12 @@ namespace Cosmos.Hardware {
 
         public UInt32 GetBaseAddressInternal(byte index)
         {
-            return Read32((byte)(0x10 + index * 4));
+            return Read32((byte)(0x10 + (index * 4)));
         }
         
         private void SetBaseAddressInternal(byte index, UInt32 value)
         {
-            Write32((byte)(0x10 + index * 4), value);
+            Write32((byte)(0x10 + (index * 4)), value);
         }
 
         [Obsolete("Use PciDevice.GetAddressSpace(0)")]
