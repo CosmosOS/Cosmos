@@ -45,6 +45,35 @@ namespace FrodeTest.Test
 
             Check.Text = "GetParent";
             Check.Validate(Directory.GetParent("/0/Alfa/Bravo").Name == "Alfa");
+            try
+            {
+                Directory.GetParent(null);
+                Check.Fail();
+            }
+            catch (ArgumentNullException)
+            {
+                Check.OK();
+            }
+            catch (Exception)
+            {
+                Check.Fail();
+            }
+
+            try
+            {
+                Directory.GetParent("");
+                Check.Fail();
+            }
+            catch (ArgumentException)
+            {
+                Check.OK();
+            }
+            catch (Exception)
+            {
+                Check.Fail();
+            }
+
+            //Check.Validate(Directory.GetParent("/") == null);
 
             Check.Text = "New VolumeSeparator";
             Check.Validate(Directory.Exists(@"0:/Alfa/"));

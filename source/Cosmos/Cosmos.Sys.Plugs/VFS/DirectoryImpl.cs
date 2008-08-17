@@ -54,7 +54,17 @@ namespace Cosmos.Sys.Plugs {
 
         public static DirectoryInfo GetParent(string aDir)
         {
-            return new DirectoryInfo(Path.GetDirectoryName(aDir));
+            if (aDir == null)
+                throw new ArgumentNullException("aDir");
+
+            if (aDir.Length == 0)
+                throw new ArgumentException("aDir is empty");
+
+            string xDirectoryName = Path.GetDirectoryName(aDir);
+            if (xDirectoryName == null)
+                return null;
+
+            return new DirectoryInfo(xDirectoryName);
         }
     }
 }
