@@ -19,7 +19,14 @@ namespace Cosmos.Sys.Plugs
             String aFile
             )
         {
-            var xEntry = VFSManager.GetDirectoryEntry(aFile);
+            //Determine if aFile is relative or absolute
+            string xFile;
+            if (aFile.IsRelativePath())
+                xFile = Directory.GetCurrentDirectory() + aFile;
+            else
+                xFile = aFile;
+
+            var xEntry = VFSManager.GetDirectoryEntry(xFile);
 
             if (!xEntry.IsDirectory)
                 aStorage = xEntry;

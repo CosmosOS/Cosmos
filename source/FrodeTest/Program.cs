@@ -21,17 +21,13 @@ namespace FrodeTest
             //xBoot.Execute();
 
             new Cosmos.Sys.Boot().Execute();
-            //Cosmos.Hardware.VGAScreen.SetMode90x30xText();
 
             Console.WriteLine("*** COSMOS Operating System - Frode's Test Suite ***");
-            //Console.WriteLine("CPU: " + Cosmos.Kernel.CPU.CPUVendor);
             try
             {
-                //Cosmos.Hardware.DebugUtil.SendMessage("FrodeTest", "Initializing VFSManager");
-                //Cosmos.Sys.VFSManager.Init();
-                //Cosmos.Hardware.DebugUtil.SendMessage("FrodeTest", "Done initializing VFSManager");
-
                 //Shell.Session.Run();
+
+                //Testing \\-string bug
                 //Console.Write('1');
                 //PrintBackslash();
                 //Console.Write('2');
@@ -42,11 +38,9 @@ namespace FrodeTest
                 ////Console.Write('\\');
                 //Console.Write('5');
                 ////Console.Write("\\");
-
-
-
                 //Console.WriteLine(@"\");
-                //Test
+
+                //TEST FRAMEWORK
                 //Console.WriteLine("---- RUNNING PREDEFINED TESTS ----");
                 //Test.StringTest.RunTest();
                 //Test.IPv4AddressTest.RunTest();
@@ -67,7 +61,7 @@ namespace FrodeTest
                 //Test.LinqTest.RunTest();
                 //Test.ExceptionTest.RunTest();
                 //Test.FilesystemEntryTest.RunTest();
-                Test.VirtualFileSystemTest.RunTest();
+                //Test.VirtualFileSystemTest.RunTest();
                 Test.DirectoryTest.RunTest();
                 Test.FileTest.RunTest();
                 Test.DirectoryInfoTest.RunTest();
@@ -75,12 +69,12 @@ namespace FrodeTest
 
                 //Tests ready for Matthijs to fix ;)
                 //Test.RTL8139Test.RunTest();
-                //Test.ExceptionTest.RunTest();
-
+                Test.ExceptionTest.RunTest();
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.GetType().ToString());
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("General error in FrodeTest: " + ex.Message);
             }
              
             //Done

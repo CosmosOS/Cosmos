@@ -10,13 +10,14 @@ namespace Cosmos.Sys.Plugs
 {
     [Plug(Target=typeof(DirectoryInfo))]
     [PlugField(FieldId = "$$Storage$$", FieldType = typeof(FilesystemEntry))]
-    //[PlugField(FieldId = "$$Path$$", FieldType = typeof(String))]
+    [PlugField(FieldId = "$$FullPath$$", FieldType = typeof(String))]
     public static class DirectoryInfoImpl
     {
-        [PlugMethod(Signature="System_Void__System_IO_DirectoryInfo__ctor_System_String_")]
+        [PlugMethod(Signature = "System_Void__System_IO_DirectoryInfo__ctor_System_String_")]
         public static void ctor(
             DirectoryInfo aThis,
             [FieldAccess(Name = "$$Storage$$")] ref FilesystemEntry aStorage,
+            [FieldAccess(Name = "$$FullPath$$")] String aFullPath,
             String aPath
             )
         {
@@ -29,6 +30,7 @@ namespace Cosmos.Sys.Plugs
 
             //If it exists, then get the directory as a FilesystemEntry
             aStorage = VFSManager.GetDirectoryEntry(aPath);
+            //aFullPath = aPath;
         }
 
         public static bool get_Exists(DirectoryInfo aThis, [FieldAccess(Name = "$$Storage$$")] ref FilesystemEntry aStorage)
@@ -37,11 +39,19 @@ namespace Cosmos.Sys.Plugs
             return (aStorage != null);
         }
 
-        public static string get_FullName(DirectoryInfo aThis, [FieldAccess(Name = "$$Storage$$")] ref FilesystemEntry aStorage)
-        {
-            //TODO: return FULL name
-            return aStorage.Name;
-        }
+        //public static string FullName
+        //{
+        //    get
+        //    {
+        //        return ".FullName isn't implemented yet";
+        //    }
+        //}
+
+        //public static string get_FullName(DirectoryInfo aThis, [FieldAccess(Name = "$$FullPath$$")] String aFullPath)
+        //{
+        //    //TODO: return FULL name
+        //    return aFullPath;
+        //}
 
         public static string get_Name(DirectoryInfo aThis, [FieldAccess(Name = "$$Storage$$")] ref FilesystemEntry aStorage)
         {
@@ -54,7 +64,9 @@ namespace Cosmos.Sys.Plugs
             var xEntries = VFSManager.GetFiles(aStorage);
 
             foreach (FilesystemEntry xEntry in xEntries)
+            {
                 xFiles.Add(new FileInfo(xEntry.Name));
+            }
 
             return xFiles.ToArray();
 

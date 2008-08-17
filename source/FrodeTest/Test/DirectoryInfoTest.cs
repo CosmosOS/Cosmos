@@ -12,23 +12,25 @@ namespace FrodeTest.Test
         {
             Console.WriteLine("Running DirectoryInfoTest");
 
-            //Console.WriteLine("CurrentDirectory: " + Environment.CurrentDirectory);
-
             Check.Text = "ctor";
             DirectoryInfo dir = new DirectoryInfo("/0/lost+found/");
             Check.Validate(dir != null);
             Check.Validate(dir.Name == "lost+found");
+            Check.Validate(dir.FullName == "/0/lost+found/");
+            Console.WriteLine("Fullname: " + dir.FullName);
             Check.Text = "Exists for /0/lost+found/";
             Check.Validate(dir.Exists);
 
             DirectoryInfo dir2 = new DirectoryInfo("/0/Alfa/Bravo/");
+            Console.WriteLine("Dir2: " + dir2.FullName);
+            Console.WriteLine("Dir : " + dir.FullName);
             Check.Text = "Exists for /0/Alfa/Bravo/";
             Check.Validate(dir2.Exists);
             Check.Text = "GetFiles for /0/Alfa/Bravo/";
-            //Check.Validate(dir2.GetFiles().Length == 1);
-            //Console.WriteLine("Files in the directory:");
-            //foreach (FileInfo file in dir2.GetFiles())
-            //    Console.WriteLine(file.Name);
+            Check.Validate(dir2.GetFiles().Length == 1);
+            Console.WriteLine("Files in the directory:");
+            foreach (FileInfo file in dir2.GetFiles())
+                Console.WriteLine(file.Name);
 
             dir = new DirectoryInfo("/0/");
             Check.Text = "Exists for /0/";
