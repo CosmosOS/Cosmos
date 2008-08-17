@@ -110,7 +110,7 @@ namespace Cosmos.Sys {
             //if (aPath[0] != '/' && aPath[0] != '\\') {
             //    throw new Exception("Incorrect path, should start with / or \\!");
             //}
-            if (aPath.Length == 1) {
+            if (aPath.Length == 1) { //Uber-root (/)
                 Cosmos.Hardware.DebugUtil.SendMessage("GetDirectoryEntry", "aPath is 1 long!");
                 return null;
             } else {
@@ -126,7 +126,8 @@ namespace Cosmos.Sys {
                 Cosmos.Hardware.DebugUtil.SendMessage("GetDirectoryEntry", "Found filesystem " + xCurrentFSEntryId);
                 if (xPathParts.Length == 1) {
                     Cosmos.Hardware.DebugUtil.SendMessage("GetDirectoryEntry", "Returning root entry");
-                    return GetVolumeEntry(0); //TODO: Hardcoded to 0
+                    return GetVolumeEntry(ParseStringToInt(xPathParts[0], 0));
+                    //return null;
                 }
                 for (int i = 1; i < (xPathParts.Length); i++) {
                     var xListing = xFS.GetDirectoryListing(xCurrentFSEntryId);
@@ -170,7 +171,7 @@ namespace Cosmos.Sys {
 
             //if (aPath.Trim(Path.VolumeSeparatorChar).Length == 1)
             //{
-            //    return GetVolumes(mFilesystems);
+            //    return GetVolumeEntry(0);
             //}
 
             //var xFS = GetFileSystemFromPath(aPath, 1);
@@ -182,18 +183,21 @@ namespace Cosmos.Sys {
             }
             else
             {
-                string xParentPath = aPath;
-                if (String.IsNullOrEmpty(xParentPath))
-                {
-                    var xFS = GetFileSystemFromPath(aPath, 1);
-                    return xFS.GetDirectoryListing(xFS.RootId);
-                }
+                //string xParentPath = aPath;
+                //if (String.IsNullOrEmpty(xParentPath))
+                //{
+                //    Cosmos.Hardware.DebugUtil.SendMessage("GetDirectoryListing", "Should never come here!");
+                //    var xFS = GetFileSystemFromPath(aPath, 1);
+                //    Cosmos.Hardware.DebugUtil.SendMessage("GetDirectoryListing", "1-RootId=" + xFS.RootId.ToString());
+                //    return xFS.GetDirectoryListing(xFS.RootId);
+                //}
+
                 var xParentItem = GetDirectoryEntry(aPath);
-                if (xParentItem == null)
-                {
-                    var xFS = GetFileSystemFromPath(aPath, 1);
-                    return xFS.GetDirectoryListing(xFS.RootId);
-                }
+                //if (xParentItem == null)
+                //{
+                //    var xFS = GetFileSystemFromPath(aPath, 1);
+                //    return xFS.GetDirectoryListing(xFS.RootId);
+                //}
 
                 return xParentItem.Filesystem.GetDirectoryListing(xParentItem.Id);
             }
@@ -214,11 +218,11 @@ namespace Cosmos.Sys {
                 Filesystem = xFS,
                 IsDirectory = true,
                 IsReadonly = true,
-                Id = (ulong)volumeId
+                Id = (ulong)xFS.RootId
             };
         }
 
-        private static FilesystemEntry[] GetVolumes()
+        public static FilesystemEntry[] GetVolumes()
         {
             //if (aFilesystems == null)
             //    throw new ArgumentNullException("mFilesystems has not been initialized");
@@ -243,6 +247,7 @@ namespace Cosmos.Sys {
                 throw new ArgumentException("Only Directories are allowed");
 
             var xFS = aDirectory.Filesystem;
+            Cosmos.Hardware.DebugUtil.SendMessage("GetDirectorylisting", "ID is " + aDirectory.Id);
             return xFS.GetDirectoryListing(aDirectory.Id);
         }
 
@@ -553,15 +558,17 @@ namespace Cosmos.Sys {
                 throw new Exception("Must be a directory");
 
             List<FilesystemEntry> xFiles = new List<FilesystemEntry>();
-            foreach (FilesystemEntry xEntry in GetDirectoryListing(aDir))
+            foreach (FilesystemEntry xEntry in VFSManager.GetDirectoryListing(aDir))
+            {
                 if (!xEntry.IsDirectory)
                     xFiles.Add(xEntry);
+            }
 
             return xFiles.ToArray();
         }
 
         /// <summary>
-        /// Get the logical drives found. Formatted as 1:/
+        /// Get the logical drives found. Formatted as 1:\
         /// </summary>
         /// <returns></returns>
         public static string[] GetLogicalDrives()

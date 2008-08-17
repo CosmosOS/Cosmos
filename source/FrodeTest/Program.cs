@@ -17,8 +17,10 @@ namespace FrodeTest
         //This is the playground for Frode "Scalpel" Lillerud.
         public static void Init()
         {
-            var xBoot = new Cosmos.Sys.Boot();
-            xBoot.Execute();
+            //var xBoot = new Cosmos.Sys.Boot();
+            //xBoot.Execute();
+
+            new Cosmos.Sys.Boot().Execute();
             //Cosmos.Hardware.VGAScreen.SetMode90x30xText();
 
             Console.WriteLine("*** COSMOS Operating System - Frode's Test Suite ***");
@@ -29,7 +31,7 @@ namespace FrodeTest
                 //Cosmos.Sys.VFSManager.Init();
                 //Cosmos.Hardware.DebugUtil.SendMessage("FrodeTest", "Done initializing VFSManager");
 
-                Shell.Session.Run();
+                //Shell.Session.Run();
                 //Console.Write('1');
                 //PrintBackslash();
                 //Console.Write('2');
@@ -65,10 +67,10 @@ namespace FrodeTest
                 //Test.LinqTest.RunTest();
                 //Test.ExceptionTest.RunTest();
                 //Test.FilesystemEntryTest.RunTest();
-                //Test.VirtualFileSystemTest.RunTest();
-                //Test.DirectoryTest.RunTest();
-                //Test.FileTest.RunTest();
-                //Test.DirectoryInfoTest.RunTest();
+                Test.VirtualFileSystemTest.RunTest();
+                Test.DirectoryTest.RunTest();
+                Test.FileTest.RunTest();
+                Test.DirectoryInfoTest.RunTest();
                 //Test.FileInfoTest.RunTest();
 
                 //Tests ready for Matthijs to fix ;)

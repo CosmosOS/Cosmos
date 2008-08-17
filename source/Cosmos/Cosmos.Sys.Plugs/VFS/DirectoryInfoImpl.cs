@@ -48,19 +48,26 @@ namespace Cosmos.Sys.Plugs
             return aStorage.Name;
         }
 
-        //public static FileInfo[] GetFiles(DirectoryInfo aThis, [FieldAccess(Name = "$$Storage$$")] ref FilesystemEntry aStorage)
-        //{
-        //    List<FileInfo> xFiles = new List<FileInfo>();
-        //    //Get all entries in the directory, except the Directories
-        //    var xEntries = VFSManager.GetDirectoryListing("/1/lost+found");
-            
-        //    foreach (FilesystemEntry xEntry in xEntries)
-        //    {
-        //        xFiles.Add(new FileInfo(xEntry.Name));
-        //    }
+        public static FileInfo[] GetFiles(DirectoryInfo aThis, [FieldAccess(Name = "$$Storage$$")] ref FilesystemEntry aStorage)
+        {
+            List<FileInfo> xFiles = new List<FileInfo>();
+            var xEntries = VFSManager.GetFiles(aStorage);
 
-        //    return xFiles.ToArray();
-        //}
+            foreach (FilesystemEntry xEntry in xEntries)
+                xFiles.Add(new FileInfo(xEntry.Name));
+
+            return xFiles.ToArray();
+
+            //Alternative implementation
+            //var xEntries = VFSManager.GetFiles(aStorage);
+            //FileInfo[] files = new FileInfo[xEntries.Length];
+            //for (int i = 0; i < xEntries.Length; i++)
+            //{
+            //    files[i] = new FileInfo(xEntries[i].Name);
+            //}
+
+            //return files;
+        }
 
 
         public static string ToString([FieldAccess(Name = "$$Path$$")] ref String aPath)

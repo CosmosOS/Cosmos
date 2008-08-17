@@ -12,7 +12,21 @@ namespace FrodeTest.Test
     {
         public static void RunTest()
         {
+            //Checking drives
+            foreach (FilesystemEntry xEntry in VFSManager.GetDirectoryListing("/"))
+                Console.WriteLine("Drive: " + xEntry.Name);
 
+            //Checking volumes
+            foreach (FilesystemEntry xVolume in VFSManager.GetVolumes())
+                Console.WriteLine("Volume: " + xVolume.Name);
+
+            //Checking root of 0-drive
+            foreach (FilesystemEntry xEntry in VFSManager.GetDirectoryListing("/0/"))
+                Console.WriteLine("Root: " + xEntry.Name);
+
+            //Checking sub-directory
+            foreach (FilesystemEntry xEntry in VFSManager.GetDirectoryListing("/0/Alfa/Bravo/"))
+                Console.WriteLine("Subdir: " + xEntry.Name);
 
             //foreach (FilesystemEntry entry in VFSManager.GetDirectoryListing("/1/"))
             //{
