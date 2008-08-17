@@ -71,6 +71,8 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
             get { return GetBit(BitPosition.BUFE); }
             private set { ; }
         }
+        // add bit 7, WRAP, for circular buffer
+
 
         #endregion
 

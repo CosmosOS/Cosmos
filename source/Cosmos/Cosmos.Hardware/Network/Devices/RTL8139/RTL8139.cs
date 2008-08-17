@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Cosmos.Hardware.Network;
+using Cosmos.Hardware.Network.Devices.RTL8139.Register;
 using Cosmos.Hardware.PC.Bus;
 using Cosmos.Hardware;
 using Cosmos.Kernel;
@@ -24,7 +25,8 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         protected byte[] TxBuffer2;
         protected byte[] TxBuffer3;
         protected byte[] RxBuffer;
-
+        protected ushort RxBufferIdx = 0;
+        private const ushort RxBufferSize = 34832;
         //TODO: Remove this later, should also be a prop to be proper but since it 
         // will be removed later...
         public static bool DebugOutput = true;
@@ -32,14 +34,15 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         // Writing out to the console is slow and often other interrupts come in
         // before its done. So this allows us to turn it on and off
         protected static void DebugWriteLine(string aText) {
-            if (DebugOutput) {
-                Console.WriteLine(aText);
-            }
+            //if (DebugOutput) {
+DebugUtil.SendMessage("RTL8139", aText);
+//                Console.WriteLine(aText);
+            //}
         }
         protected static void DebugWrite(string aText) {
-            if (DebugOutput) {
-                Console.Write(aText);
-            }
+  //          if (DebugOutput) {
+            DebugWriteLine(aText);
+//            }
         }
 
         public RTL8139(PCIDevice device)
@@ -76,6 +79,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         /// </summary>
         public void InitializeDriver()
         {
+            mBuffer=new Queue<byte[]>(16);
             //Turn on Tx and Rx
             EnableTransmit();
             EnableReceive();
@@ -110,11 +114,13 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         private void InitReceiveBuffer()
         {
             //Prepare a buffer area
-            UInt16 bufferSize = (1024 * 16) + (4 * 4); //last 4  bytes used for CRC
-            RxBuffer = new byte[bufferSize];
+            //UInt16 bufferSize = (1024 * 16) + (4 * 4); //last 4  bytes used for CRC
+            RxBuffer = new byte[RxBufferSize];
+            RxBufferIdx = 3 & (~3);
 
             //Write the address of the buffer area to the RBSTART 
             valueReg.RBSTART = GetMemoryAddress(ref RxBuffer);
+            DebugUtil.SendNumber("RTL8139", "DataBuffer address", GetMemoryAddress(ref RxBuffer), 32);
         }
 
         private void InitTransmitBuffer()
@@ -190,17 +196,24 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             }
         }
 
+        private ReceiveConfigurationRegister mRCR;
+        public ReceiveConfigurationRegister RCR
+        {
+            get
+            {
+                return mRCR;
+            }
+        }
+
         public bool PromiscuousMode
         {
             get
             {
-                var rcr = Register.ReceiveConfigurationRegister.Load(mem);
-                return rcr.PromiscuousMode;
+                return RCR.PromiscuousMode;
             }
             set
             {
-                var rcr = Register.ReceiveConfigurationRegister.Load(mem);
-                rcr.PromiscuousMode = value;
+                RCR.PromiscuousMode = value;
             }
 
         }
@@ -261,13 +274,17 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         private void EnableReceive()
         {
             var cr = Register.CommandRegister.Load(mem);
+            //outportl(0x44, 0xf | (1 << 7)); // (1 << 7) is the WRAP bit, 0xf is AB+AM+APM+AAP
+            mRCR = ReceiveConfigurationRegister.Load(mem);
             cr.RxEnabled = true;
         }
+
+        public Queue<byte[]> mBuffer;
 
         public byte[] ReadReceiveBuffer()
         {
             List<byte> receivedBytes = new List<byte>();
-
+//DebugUtil.WriteBinary("RTL8139", "RxBuffer", RxBuffer);
             DebugWriteLine("RxBuffer is at address " + GetMemoryAddress(ref RxBuffer));
             DebugWriteLine("Received data from address " + valueReg.CurrentAddressOfPacketRead + " to address " + valueReg.CurrentBufferAddress);
 
@@ -275,21 +292,26 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
 
             UInt16 readPointer = valueReg.CurrentAddressOfPacketRead;
             UInt16 writtenPointer = valueReg.CurrentBufferAddress;
-            while (readPointer != writtenPointer)
-            {
+            readPointer += 20;
+            DebugUtil.SendNumber("RTL8139", "ReadPointer", readPointer, 16);
+            DebugUtil.SendNumber("RTL8139", "WrittenPointer", writtenPointer, 16);
+            for (int i = 0; i < writtenPointer; i++) {
+                //while (readPointer != writtenPointer)
+                //{
                 receivedBytes.Add(RxBuffer[readPointer]);
 
-                if (readPointer == 0xFFF0)
-                    readPointer = 0;
-                else
-                    readPointer++;
+                //if (readPointer == 0xFFF0)
+                //    readPointer = 0;
+                //else
+                readPointer++;
             }
-
+            var xResult = receivedBytes.ToArray();
+            DebugUtil.WriteBinary("Test", "Received Data", xResult);
             //Update the CAPR so that the RTL8139 knows that we've read the data.
             //DebugWriteLine("Setting CAPR to " + readPointer + ". CBR is " + writtenPointer);
             valueReg.CurrentAddressOfPacketRead = (UInt16)(readPointer - 16); //TODO: Figure out if 16 is the correct value. For now it works. RxBufferOverflow is no longer thrown.
 
-            return receivedBytes.ToArray();
+            return xResult;
         }
 
         public override bool QueueBytes(byte[] buffer, int offset, int length)
@@ -377,49 +399,141 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         #endregion
         
         #region Interrupt (IRQ)
-        
+
+        private void HandleReceiveInterrupt() {
+            //var xStatus = isr.ISR;
+            mem.Write32((uint)MainRegister.Bit.Cfg9346,
+                        0xc0);
+            DebugUtil.SendMessage("RTL8139", "HandleReceiveInterrupt");
+            while ((mem.Read8((uint)MainRegister.Bit.ChipCmd) & 0x01) == 0) {
+                DebugUtil.WriteBinary("RTL8139",
+                                      "Full RxBuffer",
+                                      RxBuffer);
+                DebugUtil.SendNumber("RTL8139",
+                                     "RxBufferIdx",
+                                     (uint)RxBufferIdx,
+                                     32);
+                // iterate while buffer is not empty
+                uint xStatus = BitConverter.ToUInt32(RxBuffer,
+                                                     RxBufferIdx);
+                uint xLen = xStatus >> 16;
+                DebugUtil.SendNumber("RTL8139",
+                                     "Packet length",
+                                     xLen,
+                                     16);
+                if (xLen == 0xFFF0) {
+                    break;
+                }
+                if (xLen == 0) {
+                    break;
+                }
+                /* check for:
+                 * * Invalid Symbol error (100b-tx) = 0x20
+                 * * runt packet = 0x10
+                 * * long packet (>4k) = 0x8
+                 * * CRC error = 0x4
+                 * * frame alignment error = 0x2
+                 */
+                if ((xStatus & 0x3E) != 0) {
+                    // handle error    
+                    DebugUtil.SendMessage("RTL8139",
+                                          "Error in ReceiveInterrupt");
+                    DebugUtil.SendNumber("RTL8139", "Error in interrupt", xStatus & 0x3E, 8);
+                    mem.Write8((uint)MainRegister.Bit.ChipCmd, 0x4); // only TX enabled
+                    // set up rx mode/configuration
+                    RCR.RCR = (UInt32)(ReceiveConfigurationRegister.BitValue.RBLEN0 | ReceiveConfigurationRegister.BitValue.MXDMA0 | ReceiveConfigurationRegister.BitValue.MXDMA1 | ReceiveConfigurationRegister.BitValue.AB | ReceiveConfigurationRegister.BitValue.AM | ReceiveConfigurationRegister.BitValue.APM);
+
+                    RxBufferIdx = valueReg.CurrentBufferAddress;
+                    valueReg.CurrentAddressOfPacketRead = (ushort)RxBufferIdx;
+
+                    mem.Write8((uint)MainRegister.Bit.ChipCmd, 0xC); // both TX and RX enabled
+
+                    RCR.RCR = (UInt32)(ReceiveConfigurationRegister.BitValue.RBLEN0 | ReceiveConfigurationRegister.BitValue.MXDMA0 | ReceiveConfigurationRegister.BitValue.MXDMA1 | ReceiveConfigurationRegister.BitValue.AB | ReceiveConfigurationRegister.BitValue.AM | ReceiveConfigurationRegister.BitValue.APM);
+
+                    // Enable interrupts
+                    imr.IMR = 0x7F;
+                    break;
+                } else {
+                    xLen -= 4;
+                    RxBufferIdx += 4;
+                    var xBuff = new byte[xLen];
+                    for (uint i = 0; i < xLen; i++) {
+                        xBuff[i] = RxBuffer[i + RxBufferIdx];
+                    }
+                    DebugUtil.WriteBinary("RTL8139",
+                                          "Package received",
+                                          xBuff);
+                    mBuffer.Enqueue(xBuff);
+                    DebugUtil.SendNumber("RTL8139", "xLen", xLen, 32);
+                    DebugUtil.SendNumber("RTL8139",
+                                         "RxBufferIdx",
+                                         (uint)RxBufferIdx,
+                                         32);
+                    DebugUtil.SendNumber("RTL8139",
+                                         "RxBuffer.Length",
+                                         (uint)RxBuffer.Length,
+                                         32);
+                    RxBufferIdx += (ushort)((xLen + 4 + 3) & 0xFFFFFFFC);
+                    DebugUtil.SendNumber("RTL8139",
+                                         "RxBufferIdx1",
+                                         (uint)RxBufferIdx,
+                                         32);
+                    if (RxBufferIdx > RxBufferSize) {
+                        RxBufferIdx -= RxBufferSize;
+                    }
+                    DebugUtil.SendNumber("RTL8139",
+                                         "RxBufferIdx2",
+                                         (uint)RxBufferIdx,
+                                         32);
+                }
+                valueReg.CurrentAddressOfPacketRead = (ushort)(RxBufferIdx - 16);
+//                break;
+            }
+            mem.Write32((uint)MainRegister.Bit.Cfg9346,
+                        0x0);
+        }
+
         /// <summary>
         /// (Should be) Called when the PCI network card raises an Interrupt.
         /// </summary>
         public static void HandleNetworkInterrupt(ref Interrupts.InterruptContext aContext)
         {
-            DebugWrite("IRQ detected: ");
-
-            if (mInstance.imr.ReceiveOK & mInstance.isr.ReceiveOK)
+            if (mInstance.isr.ReceiveOK)
             {
-                DebugWriteLine("Receive OK");
-                mInstance.DisplayReadBuffer();
+                DebugWriteLine("IRQ detected: Receive OK");
+                mInstance.HandleReceiveInterrupt();
             }
 
-            if (mInstance.imr.ReceiveError & mInstance.isr.ReceiveError)
-                DebugWriteLine("Receive ERROR");
+            if (mInstance.isr.ReceiveError)
+                DebugWriteLine("IRQ detected: Receive ERROR");
 
-            if (mInstance.imr.TransmitOK & mInstance.isr.TransmitOK)
-                DebugWriteLine("Transmit OK");
-
+            if (mInstance.isr.TransmitOK)
+                DebugWriteLine("IRQ detected: Transmit OK");
+            
             if (mInstance.imr.TransmitError & mInstance.isr.TransmitError)
-                DebugWriteLine("Transmit Error");
+                DebugWriteLine("IRQ detected: Transmit Error");
 
             if (mInstance.imr.RxBufferOverflow & mInstance.isr.RxBufferOverflow)
-                DebugWriteLine("RxBufferOverflow");
+                DebugWriteLine("IRQ detected: RxBufferOverflow");
 
             if (mInstance.imr.RxFifoOverflow & mInstance.isr.RxFifoOverflow)
-                DebugWriteLine("RxFIFOOverflow");
+                DebugWriteLine("IRQ detected: RxFIFOOverflow");
 
             if (mInstance.imr.CableLengthChange & mInstance.isr.CableLengthChange)
-                DebugWriteLine("Cable Length Change");
+                DebugWriteLine("IRQ detected: Cable Length Change");
 
             if (mInstance.imr.PacketUnderrun & mInstance.isr.PacketUnderrun)
-                DebugWriteLine("Packet Underrun");
+                DebugWriteLine("IRQ detected: Packet Underrun");
 
             if (mInstance.imr.SoftwareInterrupt & mInstance.isr.SoftwareInterrupt)
-                DebugWriteLine("Software Interrupt");
+                DebugWriteLine("IRQ detected: Software Interrupt");
 
             if (mInstance.imr.TxDescriptorUnavailable & mInstance.isr.TxDescriptorUnavailable)
-                DebugWriteLine("TxDescriptorUnavailable");
+                DebugWriteLine("IRQ detected: TxDescriptorUnavailable");
 
             if (mInstance.imr.SystemError & mInstance.isr.SystemError)
-                DebugWriteLine("System Error!");
+                DebugWriteLine("IRQ detected: System Error!");
+
 
             mInstance.ResetAllIRQ();
             //Console.ReadLine();
@@ -438,9 +552,8 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         private void InitIRQMaskRegister()
         {
             //Note; The reference driver from Realtek sets mask = 0x7F (all bits high).
-            var imr = Register.InterruptMaskRegister.Load(mem);
-            //imr.IMR = 0x7F;
-            imr.IMR = 0xFFFF; //Listen for all IRQ events
+            imr.IMR = 0x7F;
+            //imr.IMR = 0xFFFF; //Listen for all IRQ events
 /*            imr.ReceiveOK = true;
             imr.ReceiveError = true;
             imr.TransmitOK = true;
@@ -486,16 +599,16 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         //Just for testing
         public void DisplayReadBuffer()
         {
-            byte[] readData = this.ReadReceiveBuffer();
+            //byte[] readData = this.ReadReceiveBuffer();
 
-            DebugWriteLine("Read buffer contains " + readData.Length + " bytes.");
-            DebugWriteLine("---------------------------------");
+            //DebugWriteLine("Read buffer contains " + readData.Length + " bytes.");
+            //DebugWriteLine("---------------------------------");
             
-            foreach (byte b in readData)
-                DebugWrite(b.ToHex() + ":");
-            DebugWriteLine("");
+            //foreach (byte b in readData)
+            //    DebugWrite(b.ToHex() + ":");
+            //DebugWriteLine("");
             
-            DebugWriteLine("---------------------------------");
+            //DebugWriteLine("---------------------------------");
         }
 
         #endregion

@@ -41,12 +41,11 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
             {
                 return xMem.Read32((UInt32)Register.MainRegister.Bit.RxConfig);
             } 
-            private set 
+            set 
             {
                 xMem.Write32((UInt32)Register.MainRegister.Bit.RxConfig, value);
             } 
         }
-
 
         public override string ToString()
         {
@@ -66,6 +65,25 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139.Register
             set
             {
                 this.RCR = BinaryHelper.FlipBit(this.RCR, 0);
+            }
+        }
+        
+        /// <summary>
+        /// Enables the Rx buffer to act as a ring buffer: if a packet is being written near 
+        /// the end of the buffer and the RTL8139 knows you've already handled data before this 
+        /// (thanks to CAPR), the packet will continue at the beginning of the buffer. 
+        /// </summary>
+        public bool Wrap
+        {
+            get
+            {
+                return BinaryHelper.CheckBit(RCR,
+                                             7);
+            }
+            set
+            {
+                RCR = BinaryHelper.FlipBit(RCR,
+                                           7);
             }
         }
 
