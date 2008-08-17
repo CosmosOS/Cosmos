@@ -31,8 +31,11 @@ namespace FrodeTest.Shell
             else if (command.Equals("ip"))
             {
                 Test.IPv4Test.RunTest();
+            }else if (command.Equals("udp")) 
+            {
+                Test.UDPTest.RunTests();
             }
-            //else if (command.Equals("ping"))
+                //else if (command.Equals("ping"))
             //{
             //    ping xPingApplication = new ping();
             //    xPingApplication.Execute("172.28.5.1");

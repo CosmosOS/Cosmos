@@ -29,7 +29,7 @@ namespace FrodeTest
                 //Cosmos.Sys.VFSManager.Init();
                 //Cosmos.Hardware.DebugUtil.SendMessage("FrodeTest", "Done initializing VFSManager");
 
-                //Shell.Session.Run();
+                Shell.Session.Run();
                 //Console.Write('1');
                 //PrintBackslash();
                 //Console.Write('2');
@@ -66,8 +66,8 @@ namespace FrodeTest
                 //Test.ExceptionTest.RunTest();
                 //Test.FilesystemEntryTest.RunTest();
                 //Test.VirtualFileSystemTest.RunTest();
-                Test.DirectoryTest.RunTest();
-                Test.FileTest.RunTest();
+                //Test.DirectoryTest.RunTest();
+                //Test.FileTest.RunTest();
                 //Test.DirectoryInfoTest.RunTest();
                 //Test.FileInfoTest.RunTest();
 
