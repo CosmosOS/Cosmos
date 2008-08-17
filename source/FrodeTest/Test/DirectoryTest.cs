@@ -21,15 +21,19 @@ namespace FrodeTest.Test
             Check.Text = "GetDirectories";
             //Check.Validate(Directory.GetDirectories("/0/").Length == 3);
             Check.Validate(Directory.GetDirectories("/0/Alfa/").Length == 1);
-            try
+            try //Should throw a DirectoryNotFoundException
             {
                 Check.Text = "GetDirectories - Exception";
                 Directory.GetDirectories("/0/InvalidDir");
                 Check.Fail();
             }
-            catch (Exception)
+            catch (DirectoryNotFoundException)
             {
                 Check.OK();
+            }
+            catch (Exception)
+            {
+                Check.Fail();
             }
 
             Check.Text = "GetFiles";

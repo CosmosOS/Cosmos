@@ -124,10 +124,10 @@ namespace Cosmos.Sys {
                 //var xFS = mFilesystems[ParseStringToInt(xPathParts[0], 0)];
                 var xCurrentFSEntryId = xFS.RootId;
                 Cosmos.Hardware.DebugUtil.SendMessage("GetDirectoryEntry", "Found filesystem " + xCurrentFSEntryId);
-                //if (xPathParts.Length == 1) {
-                //    //return null;
-                //     xFS.GetDirectoryListing(xFS.RootId);
-                //}
+                if (xPathParts.Length == 1) {
+                    Cosmos.Hardware.DebugUtil.SendMessage("GetDirectoryEntry", "Returning root entry");
+                    return GetVolumeEntry(0); //TODO: Hardcoded to 0
+                }
                 for (int i = 1; i < (xPathParts.Length); i++) {
                     var xListing = xFS.GetDirectoryListing(xCurrentFSEntryId);
                     bool xFound = false;
@@ -479,7 +479,8 @@ namespace Cosmos.Sys {
             //FilesystemEntry[] xEntries = xFS.GetDirectoryListing(xDirectory.Id);
             //Hardware.DebugUtil.SendMessage("GetFileEntry", "Got Directory Listing");
 
-            FilesystemEntry[] xEntries = GetDirectoryListing(xDirectory);
+            FilesystemEntry[] xEntries = VFSManager.GetDirectoryListing(xDirectory);
+            Cosmos.Hardware.DebugUtil.SendMessage("GetFileEntry", "Found " + xEntries.Length + " entries");
 
             foreach (FilesystemEntry xEntry in xEntries)
             {
