@@ -10,6 +10,8 @@ namespace FrodeTest.Test
     {
         public static void RunTest()
         {
+            Console.WriteLine("Running DirectoryTest");
+
             Check.Text = "Exists";
             Check.Validate(Directory.Exists("/0/"));
             Check.Validate(Directory.Exists("/0/Alfa/"));
@@ -17,7 +19,7 @@ namespace FrodeTest.Test
             Check.Validate(!Directory.Exists("/0/InvalidDir/"));
 
             Check.Text = "GetDirectories";
-            Check.Validate(Directory.GetDirectories("/0/").Length == 3);
+            //Check.Validate(Directory.GetDirectories("/0/").Length == 3);
             Check.Validate(Directory.GetDirectories("/0/Alfa/").Length == 1);
 
             Check.Text = "GetFiles";
@@ -28,7 +30,7 @@ namespace FrodeTest.Test
             Check.Validate(Directory.GetLogicalDrives().Length == 2);
 
             Check.Text = "GetParent";
-            Check.Validate(Directory.GetParent("/0/Alfa/Bravo/") == "/0/Alfa/");
+            Check.Validate(Directory.GetParent("/0/Alfa/Bravo").Name == "Alfa");
         }
     }
 }

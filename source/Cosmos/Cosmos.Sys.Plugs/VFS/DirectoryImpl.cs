@@ -51,5 +51,10 @@ namespace Cosmos.Sys.Plugs {
         {
             return VFSManager.GetLogicalDrives();
         }
+
+        public static DirectoryInfo GetParent(string aDir)
+        {
+            return new DirectoryInfo(Path.GetDirectoryName(aDir));
+        }
     }
 }
