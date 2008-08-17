@@ -16,25 +16,32 @@ namespace FrodeTest.Application
         {
             try
             {
-                //Get current directory
+                //Get directory
                 string xDir = string.Empty;
                 if (args[0] != null)
                     xDir = args[0];
                 else
                     xDir = Directory.GetCurrentDirectory();
-                //xDir= EnvironmentVariables.GetCurrent().CurrentDirectory; //HACK
 
-                Console.WriteLine(" Directory of " + xDir);
+                if (!Directory.Exists(xDir))
+                {
+                    Console.WriteLine("No such directory: " + xDir);
+                    return -1;
+                }
+                else
+                {
+                    Console.WriteLine(" Directory of " + xDir);
 
-                foreach (string xDirectory in Directory.GetDirectories(xDir))
-                    Console.WriteLine("<DIR>\t" + xDirectory);
+                    foreach (string xDirectory in Directory.GetDirectories(xDir))
+                        Console.WriteLine("<DIR>\t" + xDirectory);
 
-                foreach (string xFile in Directory.GetFiles(xDir))
-                    Console.WriteLine("\t\t" + xFile);
+                    foreach (string xFile in Directory.GetFiles(xDir))
+                        Console.WriteLine("\t\t" + xFile);
+                }
             }
             catch (Exception e)
             {
-                Console.WriteLine("ERROR: " + e.Message);
+                Console.WriteLine("ERROR in dir command: " + e.Message);
             }
                 return 0;
         }

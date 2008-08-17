@@ -30,7 +30,7 @@ namespace FrodeTest.Application
                     //TODO: Use DirectoryInfo.GetParent
                     string xCurDir = Directory.GetCurrentDirectory();
                     xCurDir = xCurDir.TrimEnd(Path.DirectorySeparatorChar);
-                    //EnvironmentVariables.GetCurrent().CurrentDirectory = xCurDir.Substring(0, xCurDir.LastIndexOf(Path.DirectorySeparatorChar));
+                    
                     Directory.SetCurrentDirectory(
                         Directory.GetCurrentDirectory().Substring(
                             0, 
@@ -41,16 +41,14 @@ namespace FrodeTest.Application
                     return 0;
                 }
 
-                string xNewPath = Directory.GetCurrentDirectory() + args[0] + "/"; //EnvironmentVariables.GetCurrent().CurrentDirectory + args[0] + "/";
+                string xNewPath = Directory.GetCurrentDirectory() + args[0] + "/";
                 DebugUtil.SendMessage("cd.cs", "Checking path " + xNewPath);
                 if (Directory.Exists(xNewPath))
                 {
-                    //EnvironmentVariables.GetCurrent().CurrentDirectory = xNewPath;
                     Directory.SetCurrentDirectory(xNewPath);
                 }
                 else if (Directory.Exists(args[0] + "/"))
                 {
-                    //EnvironmentVariables.GetCurrent().CurrentDirectory += args[0] + "/";
                     Directory.SetCurrentDirectory(Directory.GetCurrentDirectory() + args[0] + "/");
                 }
                 else

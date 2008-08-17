@@ -97,13 +97,13 @@ namespace Cosmos.Sys {
         //    return false;
         //}
 
+
         /// <summary>
         /// Get a single directory from the given path.
         /// </summary>
-        /// <param name="aPath"></param>
+        /// <param name="aPath">Absolute path</param>
         /// <returns></returns>
         public static FilesystemEntry GetDirectoryEntry(string aPath) {
-            Cosmos.Hardware.DebugUtil.SendMessage("GetDirectoryEntry", "Searching for " + aPath);
             //if (String.IsNullOrEmpty(aPath)) {
             //    throw new ArgumentNullException("aPath");
             //}
@@ -115,9 +115,12 @@ namespace Cosmos.Sys {
                 return null;
             } else {
                 string[] xPathParts = SplitPath(aPath);
+
+
                 // first get the correct FS
                 Cosmos.Hardware.DebugUtil.SendMessage("GetDirectoryEntry", "Searching for filesystem");
                 var xFS = GetFileSystemFromPath(xPathParts[0], 0);
+
                 //var xFS = mFilesystems[ParseStringToInt(xPathParts[0], 0)];
                 var xCurrentFSEntryId = xFS.RootId;
                 Cosmos.Hardware.DebugUtil.SendMessage("GetDirectoryEntry", "Found filesystem " + xCurrentFSEntryId);
@@ -156,7 +159,7 @@ namespace Cosmos.Sys {
         /// <param name="aPath">Directory to search in. Can be absolute and relative.</param>
         /// <returns>All Directories and Files in the given path.</returns>
         public static FilesystemEntry[] GetDirectoryListing(string aPath) {
-            
+
             if (String.IsNullOrEmpty(aPath)) {
                 throw new ArgumentNullException("aPath is null in GetDirectoryListing");
             }
@@ -197,6 +200,24 @@ namespace Cosmos.Sys {
             
         }
 
+
+        /// <summary>
+        /// Get a single volume
+        /// </summary>
+        public static FilesystemEntry GetVolumeEntry(int volumeId)
+        {
+            var xFS = GetFileSystemFromPath(volumeId.ToString(), 0);
+
+            return new FilesystemEntry()
+            {
+                Name = volumeId.ToString(),
+                Filesystem = xFS,
+                IsDirectory = true,
+                IsReadonly = true,
+                Id = (ulong)volumeId
+            };
+        }
+
         private static FilesystemEntry[] GetVolumes()
         {
             //if (aFilesystems == null)
@@ -206,13 +227,7 @@ namespace Cosmos.Sys {
             var xResult = new FilesystemEntry[mFilesystems.Count];
             for (int i = 0; i < mFilesystems.Count; i++)
             {
-                xResult[i] = new FilesystemEntry()
-                {
-                    Id = (ulong)i,
-                    IsDirectory = true,
-                    IsReadonly = true,
-                    Name = i.ToString() //Volume number
-                };
+                xResult[i] = GetVolumeEntry(i);
             }
             return xResult;
         }
@@ -426,7 +441,11 @@ namespace Cosmos.Sys {
 
             List<FilesystemEntry> xDirectories = new List<FilesystemEntry>();
             Cosmos.Hardware.DebugUtil.SendMessage("GetDirectories", "About to GetDirectoryListing");
-            var xEntries = VFSManager.GetDirectoryListing(Path.GetDirectoryName(aDir));
+
+            var xDir = VFSManager.GetDirectoryEntry(Path.GetDirectoryName(aDir));
+            Cosmos.Hardware.DebugUtil.SendMessage("GetDirectories", xDir.Name + " with ID " + xDir.Id.ToString());
+            var xEntries = VFSManager.GetDirectoryListing(xDir);
+            //var xEntries = VFSManager.GetDirectoryListing(Path.GetDirectoryName(aDir));
 
             foreach (FilesystemEntry entry in xEntries)
                 if (entry.IsDirectory)
@@ -508,7 +527,7 @@ namespace Cosmos.Sys {
             //    throw new DirectoryNotFoundException("Unable to find directory " + aDir);
 
             List<FilesystemEntry> xFiles = new List<FilesystemEntry>();
-            var xEntries = GetDirectoryListing(Path.GetDirectoryName(aDir));
+            var xEntries = VFSManager.GetDirectoryListing(Path.GetDirectoryName(aDir));
 
             foreach (FilesystemEntry entry in xEntries)
                 if (!entry.IsDirectory)
