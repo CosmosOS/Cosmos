@@ -19,6 +19,10 @@ namespace Cosmos.Sys.Network {
             this.Type = aType;
         }
 
+        public EthernetPacket(byte[] aRawData) {
+            mData = aRawData;
+        }
+
         public uint Type {
             get {
                 return (uint)(mData[12] << 8 | mData[13]);
@@ -48,6 +52,8 @@ namespace Cosmos.Sys.Network {
                 mData[5] = (byte)value;
             }
         }
+
+//        public 
 
         public UInt64 SourceAddress {
             get {

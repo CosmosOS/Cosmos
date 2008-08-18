@@ -178,7 +178,14 @@ namespace MatthijsTest {
             Console.WriteLine("Kernel done doing it's thing...");
             do {
                 Console.WriteLine(Console.ReadLine());
-                EthernetPacket.
+                while (xNIC.mBuffer.Count > 0) {
+                    var xPacket = xNIC.mBuffer.Dequeue();
+                    ushort x = (ushort)((xPacket[0x12] << 8) | xPacket[0x13]);
+                    DebugUtil.SendNumber("Test",
+                                         "Identification",
+                                         x,
+                                         16);
+                }
             } while (true);
         }
 

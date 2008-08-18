@@ -18,6 +18,10 @@ namespace Cosmos.Sys.Network {
             mData[mHeaderBegin + 5] = (byte)xSize;
         }
 
+        public UDPPacket(byte[] aRawData) {
+            mData = aRawData;
+        }
+
         public UInt16 Length {
             get {
                 return (UInt16)(mData[mHeaderBegin + 4] << 8 | mData[mHeaderBegin + 5]);
