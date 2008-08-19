@@ -15,12 +15,37 @@ namespace Cosmos.Demos.Snake
             BuildUI.Run();
         }
 
+        enum Direction
+        {
+            Left=0,
+            Up,
+            Right,
+            Down
+        }
+
+        enum Key
+        {
+            Escape = 1,
+            Up = 72,
+            Left = 75,
+            Right = 77,
+            Down = 80
+        }
+
+        enum Blocked
+        {
+            Empty = 0,
+            Snake,
+            Fruit,
+        }
+
         /// <summary>
         /// Object to hold player data
         /// </summary>
         private class Player
         {
-            public int X,Y,Direction, PlayerNumber;//,PrevX=-1,PrevY=-1;
+            public int X,Y;
+            public Direction direction;
             public bool Alive;
         }
 
@@ -31,15 +56,15 @@ namespace Cosmos.Demos.Snake
         {
             if (snake != null && !aReleased)
             {
-                if (aScanCode == 75)
-                    snake.Direction = 0;
-                else if (aScanCode == 72)
-                    snake.Direction = 1;
-                else if (aScanCode == 77)
-                    snake.Direction = 2;
-                else if (aScanCode == 80)
-                    snake.Direction = 3;
-                else if (aScanCode == 1)
+                if (aScanCode == (byte)Key.Left)
+                    snake.direction = Direction.Left;
+                else if (aScanCode == (byte)Key.Up)
+                    snake.direction = Direction.Up;
+                else if (aScanCode == (byte)Key.Right)
+                    snake.direction = Direction.Right;
+                else if (aScanCode == (byte)Key.Down)
+                    snake.direction = Direction.Down;
+                else if (aScanCode == (byte)Key.Escape)
                     running = false;
             }
         }
@@ -50,7 +75,6 @@ namespace Cosmos.Demos.Snake
             private int x = 0x72535;
             private int c = 2531011;
 
-
             public Random(int seed)
             {
                 x = seed;
@@ -60,13 +84,6 @@ namespace Cosmos.Demos.Snake
                 x = (a * x + c);
                 return x % p;
             }
-        }
-
-        enum Blocked
-        {
-            Empty=0,
-            Snake,
-            Fruit,
         }
 
         static Random rand = null;
@@ -113,11 +130,13 @@ namespace Cosmos.Demos.Snake
 
             S.ReallyClearScreen();
 
-            snake = new Player();
-            snake.X = S.Columns / 2;
-            snake.Y = S.Rows / 2;
-            snake.Direction = 0;
-            snake.Alive = true;
+            snake = new Player()
+            {
+                X = S.Columns / 2,
+                Y = S.Rows / 2,
+                direction = Direction.Left,
+                Alive = true
+            };
             int score = 0;
 
             Blocked[] isBlocked = new Blocked[S.Columns * S.Rows];
@@ -125,10 +144,12 @@ namespace Cosmos.Demos.Snake
             rand = new Random((int)Cosmos.Hardware.Global.TickCount
                 + Cosmos.Hardware.RTC.GetSeconds());
 
-            Player fruit = new Player();
+            Player fruit = new Player()
+            {
+                X=rand.Next(S.Columns),
+                Y=rand.Next(S.Rows)
+            };
 
-            fruit.X = rand.Next(S.Columns);
-            fruit.Y = rand.Next(S.Rows);
             S.SetColors(ConsoleColor.Red, ConsoleColor.Red);
             S.PutChar(fruit.Y, fruit.X, '*');
             isBlocked[fruit.X + fruit.Y * S.Columns] = Blocked.Fruit;
@@ -145,7 +166,10 @@ namespace Cosmos.Demos.Snake
                 if (!running)
                     break;
 
-                Cosmos.Hardware.PIT.Wait(50);
+                if (snake.direction == Direction.Up || snake.direction == Direction.Down)
+                    Cosmos.Hardware.PIT.Wait(100);//Going up or down is faster then left or right so slow down
+                else
+                    Cosmos.Hardware.PIT.Wait(50);
 
                 S.SetColors(ConsoleColor.White, ConsoleColor.Black);
                 string strscore = score.ToString();
@@ -175,23 +199,24 @@ namespace Cosmos.Demos.Snake
 
                 isBlocked[snake.X + snake.Y * S.Columns] = Blocked.Snake;
 
-                switch(snake.Direction)
+                switch(snake.direction)
                 {
-                    case 0://Left
+                    case Direction.Left:
                         snake.X--;
                         break;
-                    case 1://Up
+                    case Direction.Up:
                         snake.Y--;
                         break;
-                    case 2://Right
+                    case Direction.Right:
                         snake.X++;
                         break;
-                    case 3://Down
+                    case Direction.Down:
                         snake.Y++;
                         break;
                 }
 
-                if (snake.X > S.Columns || snake.Y > S.Rows || snake.X < 0 || snake.Y < 0 || isBlocked[snake.X + snake.Y * S.Columns] == Blocked.Snake)
+                if (snake.X > S.Columns || snake.Y > S.Rows || snake.X < 0 || snake.Y < 0 
+                    || isBlocked[snake.X + snake.Y * S.Columns] == Blocked.Snake)
                 {
                     snake.Alive = false;
                 }
@@ -207,11 +232,12 @@ namespace Cosmos.Demos.Snake
                     score++;
                 }
             }
-
+            
             S.ReallyClearScreen();
             S.SetColors(ConsoleColor.White, ConsoleColor.Black);
-            Console.WriteLine("Shutting down snake game");
-            Cosmos.Sys.Deboot.ShutDown();
+            //Console.WriteLine("Shutting down snake game");
+            //Cosmos.Sys.Deboot.ShutDown();
+            Cosmos.Sys.Deboot.Reboot();
         }
     }
 }
