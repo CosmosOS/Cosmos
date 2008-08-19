@@ -70,9 +70,55 @@ namespace Cosmos.Kernel.Plugs
             TextScreen.Clear();
         }
 
+        #region Write
+
+        public static void Write(char[] aBuffer)
+        {
+            Write(aBuffer, 0, aBuffer.Length);
+        }
+
         public static void Write(char aChar)
         {
             TextScreen.WriteChar(aChar);
+        }
+
+        public static void Write(Int32 aInt)
+        {
+            Write(aInt.ToString());
+        }
+
+        public static void Write(Int64 aLong)
+        {
+            Write(aLong.ToString());
+        }
+
+        public static void Write(bool aBool)
+        {
+            Write(aBool.ToString());
+        }
+
+        public static void Write(char[] aBuffer, int aIndex, int aCount)
+        {
+            if (aBuffer == null)
+            {
+                throw new ArgumentNullException("aBuffer");
+            }
+            if (aIndex < 0)
+            {
+                throw new ArgumentOutOfRangeException("aIndex");
+            }
+            if (aCount < 0)
+            {
+                throw new ArgumentOutOfRangeException("aCount");
+            }
+            if ((aBuffer.Length - aIndex) < aCount)
+            {
+                throw new ArgumentException();
+            }
+            for (int i = 0; i < aCount; i++)
+            {
+                Write(aBuffer[aIndex + i]);
+            }
         }
 
         public static void Write(string aText)
@@ -97,26 +143,13 @@ namespace Cosmos.Kernel.Plugs
             }
         }
 
-        public static void WriteLine(string aLine)
+        #endregion
+
+        #region WriteLine
+
+        public static void WriteLine()
         {
-            Write(aLine);
             TextScreen.NewLine();
-        }
-
-        public static void WriteLine(uint aValue)
-        {
-            WriteLine(aValue.ToString());
-        }
-
-        public static void WriteLine(int aValue)
-        {
-            WriteLine(aValue.ToString());
-        }
-
-        public static void Write(char[] buffer)
-        {
-            for (int i = 0; i < buffer.Length; i++)
-                Write(buffer[i]);
         }
 
         public static void WriteLine(char[] buffer)
@@ -125,10 +158,43 @@ namespace Cosmos.Kernel.Plugs
             WriteLine();
         }
 
-        public static void WriteLine()
+        public static void WriteLine(bool aBool)
         {
-            TextScreen.NewLine();
+            Write(aBool);
+            WriteLine();
         }
+
+        public static void WriteLine(char aChar)
+        {
+            Write(aChar);
+            WriteLine();
+        }
+
+        public static void WriteLine(string aLine)
+        {
+            Write(aLine);
+            WriteLine();
+        }
+
+        public static void WriteLine(uint aValue)
+        {
+            Write(aValue);
+            WriteLine();
+        }
+
+        public static void WriteLine(int aValue)
+        {
+            Write(aValue);
+            WriteLine();
+        }
+
+        public static void WriteLine(char[] aBuffer, int aIndex, int aCount)
+        {
+            Write(aBuffer, aIndex, aCount);
+            WriteLine();
+        }
+
+        #endregion
 
         public static int Read() {
             return Keyboard.ReadChar();

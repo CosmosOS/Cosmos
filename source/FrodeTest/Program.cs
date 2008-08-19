@@ -26,6 +26,8 @@ namespace FrodeTest
             try
             {
                 //Shell.Session.Run();
+                
+                //Console.WriteLine(b);
 
                 //Testing \\-string bug
                 //Console.Write('1');
@@ -42,6 +44,7 @@ namespace FrodeTest
 
                 //TEST FRAMEWORK
                 //Console.WriteLine("---- RUNNING PREDEFINED TESTS ----");
+                Test.ConsoleTest.RunTest();
                 //Test.StringTest.RunTest();
                 //Test.IPv4AddressTest.RunTest();
                 //Test.BasicTest.RunTest();
@@ -62,14 +65,15 @@ namespace FrodeTest
                 //Test.ExceptionTest.RunTest();
                 //Test.FilesystemEntryTest.RunTest();
                 //Test.VirtualFileSystemTest.RunTest();
+                //Test.Ext2Test.RunTest();
                 Test.DirectoryTest.RunTest();
                 Test.FileTest.RunTest();
                 Test.DirectoryInfoTest.RunTest();
-                //Test.FileInfoTest.RunTest();
+                Test.FileInfoTest.RunTest();
 
                 //Tests ready for Matthijs to fix ;)
                 //Test.RTL8139Test.RunTest();
-                Test.ExceptionTest.RunTest();
+                //Test.ExceptionTest.RunTest();
             }
             catch (Exception ex)
             {
