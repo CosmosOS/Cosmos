@@ -112,9 +112,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VGAFontMaker", "VGAFontMake
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Hardware.Plugs", "Cosmos.Hardware.Plugs\Cosmos.Hardware.Plugs.csproj", "{BCB66614-20FE-4184-B214-FD42844AD8A6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Demos.Snake", "Cosmos.Demos.Snake\Cosmos.Demos.Snake.csproj", "{A38CF66E-A15A-417E-B958-48EF357D7AB3}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 41
+		SccNumberOfProjects = 42
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -278,6 +280,10 @@ Global
 		SccProjectTopLevelParentUniqueName40 = Cosmos.sln
 		SccProjectName40 = Cosmos.Hardware.Plugs
 		SccLocalPath40 = Cosmos.Hardware.Plugs
+		SccProjectUniqueName41 = Cosmos.Demos.Snake\\Cosmos.Demos.Snake.csproj
+		SccProjectTopLevelParentUniqueName41 = Cosmos.sln
+		SccProjectName41 = Cosmos.Demos.Snake
+		SccLocalPath41 = Cosmos.Demos.Snake
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -442,6 +448,10 @@ Global
 		{BCB66614-20FE-4184-B214-FD42844AD8A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BCB66614-20FE-4184-B214-FD42844AD8A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BCB66614-20FE-4184-B214-FD42844AD8A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A38CF66E-A15A-417E-B958-48EF357D7AB3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A38CF66E-A15A-417E-B958-48EF357D7AB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A38CF66E-A15A-417E-B958-48EF357D7AB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A38CF66E-A15A-417E-B958-48EF357D7AB3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -473,6 +483,7 @@ Global
 		{C97DE890-58D2-41A1-86D0-A2E919E6DD80} = {6F91B8C3-1A78-49D7-B915-F13EDFDAFDB3}
 		{E4A9F8F0-D0DC-465A-A64A-FE56504D397E} = {6F91B8C3-1A78-49D7-B915-F13EDFDAFDB3}
 		{301BAFD2-D15B-4B95-8C59-65D7D0390A76} = {6F91B8C3-1A78-49D7-B915-F13EDFDAFDB3}
+		{A38CF66E-A15A-417E-B958-48EF357D7AB3} = {6F91B8C3-1A78-49D7-B915-F13EDFDAFDB3}
 		{1F0EDE86-F6D4-4355-9A97-10E90457770C} = {2DE75CE4-7A3B-4659-84FC-16F5EC0AEDE4}
 		{8F2D5231-CDE5-48FA-9D26-D4305B01FD3C} = {4DE8EC69-B412-41C4-BCD9-1E032984E888}
 		{FF431742-6490-46B8-A9F6-734477D0725D} = {4DE8EC69-B412-41C4-BCD9-1E032984E888}
