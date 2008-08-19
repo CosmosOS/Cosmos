@@ -117,6 +117,18 @@ namespace Cosmos.Hardware
             SetCursor();
         }
 
+        public unsafe static void RemoveChar(int aLine, int aRow)
+        {
+            CheckInit();
+            int xScreenOffset = ((aRow + (aLine * Columns)) * 2);
+            byte* xScreenPtr = (byte*)(VideoAddr + xScreenOffset);
+            *xScreenPtr = 0;
+            xScreenPtr++;
+            *xScreenPtr = 0;
+
+            SetCursor();
+        }
+
         public unsafe static void PutChar(int aLine, int aRow, char aChar)
         {
             CheckInit();
