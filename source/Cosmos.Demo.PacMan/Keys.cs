@@ -5,11 +5,12 @@ using System.Text;
 
 namespace Cosmos.Demo.Pacman
 {
-        public enum Direction
-        {
-            Left = 0,
-            Up,
-            Right,
-            Down
-        }
+    public enum Key
+    {
+        Up = 72,
+        Left = 75,
+        Right = 77,
+        Down = 80
+    }
+
 }

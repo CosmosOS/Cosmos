@@ -114,7 +114,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Hardware.Plugs", "Co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Demos.Snake", "Cosmos.Demos.Snake\Cosmos.Demos.Snake.csproj", "{A38CF66E-A15A-417E-B958-48EF357D7AB3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Demo.Pacman", "ConsoleApplication1\Cosmos.Demo.Pacman.csproj", "{A9B31697-9530-4D85-8123-0508A4E1EA70}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Demo.Pacman", "Cosmos.Demo.Pacman\Cosmos.Demo.Pacman.csproj", "{A9B31697-9530-4D85-8123-0508A4E1EA70}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
@@ -286,10 +286,10 @@ Global
 		SccProjectTopLevelParentUniqueName41 = Cosmos.sln
 		SccProjectName41 = Cosmos.Demos.Snake
 		SccLocalPath41 = Cosmos.Demos.Snake
-		SccProjectUniqueName42 = ConsoleApplication1\\Cosmos.Demo.Pacman.csproj
+		SccProjectUniqueName42 = Cosmos.Demo.Pacman\\Cosmos.Demo.Pacman.csproj
 		SccProjectTopLevelParentUniqueName42 = Cosmos.sln
-		SccProjectName42 = ConsoleApplication1
-		SccLocalPath42 = ConsoleApplication1
+		SccProjectName42 = Cosmos.Demo.Pacman
+		SccLocalPath42 = Cosmos.Demo.Pacman
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

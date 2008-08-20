@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Cosmos.Demo.PacMan")]
+[assembly: AssemblyTitle("Cosmos.Demo.Pacman")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("CASA")]
-[assembly: AssemblyProduct("Cosmos.Demo.PacMan")]
-[assembly: AssemblyCopyright("Copyright © CASA 2008")]
+[assembly: AssemblyProduct("Cosmos.Demo.Pacman")]
+[assembly: AssemblyCopyright("Copyright © Dokugogagoji 2008")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("85a0f9b2-8909-4380-b5e6-5244edcac332")]
+[assembly: Guid("04030b64-a667-43e8-977b-af93e33202e5")]
 
 // Version information for an assembly consists of the following four values:
 //

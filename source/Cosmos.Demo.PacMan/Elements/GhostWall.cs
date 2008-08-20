@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace ConsoleApplication1.Elements.GhostType
+namespace Cosmos.Demo.Pacman.Elements
 {
-    class Akabei
+    class GhostWall
     {
     }
 }

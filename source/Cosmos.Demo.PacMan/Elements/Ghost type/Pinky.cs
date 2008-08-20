@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Cosmos.Demo.Pacman.Elements
+namespace Cosmos.Demo.Pacman.Elements.Ghost_type
 {
-    public class Pacman
+    class Pinky
     {
-        public Direction direction;
     }
 }

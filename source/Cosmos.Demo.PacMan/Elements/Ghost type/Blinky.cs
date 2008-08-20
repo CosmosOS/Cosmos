@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace ConsoleApplication1.Elements.Ghost_type
+namespace Cosmos.Demo.Pacman.Elements.GhostType
 {
-    class Guzuta
+    class Blinky
     {
     }
 }
