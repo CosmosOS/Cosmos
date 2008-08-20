@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Indy.IL2CPU.Assembler.X86
+namespace Indy.IL2CPU.Assembler.X86.SSE4a
 {
-    class ByteToWord
+    class ExtractQ
     {
     }
 }

@@ -5,7 +5,8 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86
 {
-    class AAD
+    [OpCode(0xFFFFFFFF, "aad")]
+    public class AAD:Instruction
     {
     }
 }

@@ -5,7 +5,8 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86
 {
-    class AAM
+    [OpCode(0xFFFFFFFF, "aam")]
+    public class AAM : Instruction
     {
     }
 }

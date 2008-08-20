@@ -5,7 +5,9 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86
 {
-    class ClrCarryFlag
+    [OpCode(0xFFFFFFFF, "clc")]
+    public class ClrCarryFlag : Instruction
     {
+
     }
 }

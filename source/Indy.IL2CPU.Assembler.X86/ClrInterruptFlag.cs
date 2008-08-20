@@ -5,6 +5,6 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
 	[OpCode(0xFFFFFFFF, "cli")]
-	public class ClrInterruptFlag: X86.Instruction {
+	public class ClrInterruptFlag: Instruction {
 	}
 }

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{7F32CE06-13F2-4EDA-B588-3FAAFD25178A}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -53,14 +53,52 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="186-188AndUp\Bound.cs" />
+    <Compile Include="186-188AndUp\EnterStackFrame.cs" />
+    <Compile Include="186-188AndUp\InPortToString.cs" />
+    <Compile Include="186-188AndUp\LeaveStackFrame.cs" />
+    <Compile Include="186-188AndUp\OutStringToPort.cs" />
+    <Compile Include="186-188AndUp\PopAll.cs" />
+    <Compile Include="186-188AndUp\PushAll.cs" />
+    <Compile Include="286AndUp\AdjustRPL.cs" />
+    <Compile Include="286AndUp\ClrTaskSwitchFlag.cs" />
     <Compile Include="286AndUp\Lgdt.cs" />
     <Compile Include="286AndUp\Lidt.cs" />
+    <Compile Include="286AndUp\LoadAR.cs" />
+    <Compile Include="286AndUp\LoadGDT.cs" />
+    <Compile Include="286AndUp\LoadLDT.cs" />
+    <Compile Include="286AndUp\LoadMSW.cs" />
+    <Compile Include="286AndUp\LoadSegLimit.cs" />
+    <Compile Include="286AndUp\StoreGDT.cs" />
+    <Compile Include="286AndUp\StoreIDT.cs" />
+    <Compile Include="286AndUp\StoreLDT.cs" />
+    <Compile Include="286AndUp\StoreMSW.cs" />
+    <Compile Include="286AndUp\StoreTR.cs" />
+    <Compile Include="286AndUp\VerifySegForReading.cs" />
+    <Compile Include="286AndUp\VerifySegForWriting.cs" />
     <Compile Include="286Exclusive\LoadAll.cs" />
+    <Compile Include="386AndUp\BitScanForward.cs" />
+    <Compile Include="386AndUp\BitScanReverse.cs" />
+    <Compile Include="386AndUp\BitTest.cs" />
+    <Compile Include="386AndUp\BitTestAndCompl.cs" />
+    <Compile Include="386AndUp\BitTestAndReset.cs" />
+    <Compile Include="386AndUp\BitTestAndSet.cs" />
+    <Compile Include="386AndUp\CmpStringDoubleW.cs" />
+    <Compile Include="386AndUp\DoubleWToQuadW.cs" />
     <Compile Include="386AndUp\InvokeICE.cs" />
+    <Compile Include="386AndUp\WToDoubleW.cs" />
     <Compile Include="386Exclusive\LoadAllD.cs" />
     <Compile Include="3DNow!2\FloatToInt16.cs" />
+    <Compile Include="3DNow!2\Geode\Reciprocal.cs" />
+    <Compile Include="3DNow!2\Geode\ReciprocalSQRT.cs" />
     <Compile Include="3DNow!2\Int16ToFloat.cs" />
     <Compile Include="3DNow!2\InvertBottomTopAndStore.cs" />
+    <Compile Include="486AndUp\ByteSwap.cs" />
+    <Compile Include="486AndUp\CmpAndXchg.cs" />
+    <Compile Include="486AndUp\InvalidateCache.cs" />
+    <Compile Include="486AndUp\InvalidateTLBEntry.cs" />
+    <Compile Include="486AndUp\WBAndInvalidateCache.cs" />
+    <Compile Include="486AndUp\XchgAndAdd.cs" />
     <Compile Include="8086Exclusive\PopCS.cs" />
     <Compile Include="AAA.cs" />
     <Compile Include="AAD.cs" />
@@ -81,6 +119,8 @@
     <Compile Include="CmpWordString.cs" />
     <Compile Include="EffectAddr.cs" />
     <Compile Include="JumpOnGreater.cs" />
+    <Compile Include="K6-2AndUp\SysCall.cs" />
+    <Compile Include="K6-2AndUp\SysReturn.cs" />
     <Compile Include="LoadESWithPointer.cs" />
     <Compile Include="FlagIntoAH.cs" />
     <Compile Include="LoadByte.cs" />
@@ -95,6 +135,11 @@
     <Compile Include="MoveSB.cs" />
     <Compile Include="MoveSW.cs" />
     <Compile Include="LoadPointerDS.cs" />
+    <Compile Include="PentiumAndUp\CmpAndXchg8B.cs" />
+    <Compile Include="PentiumAndUp\ReadMSR.cs" />
+    <Compile Include="PentiumAndUp\ReadTimeStampCounter.cs" />
+    <Compile Include="PentiumAndUp\WriteMSR.cs" />
+    <Compile Include="PentiumMMXAndUp\ReadPerfCounter.cs" />
     <Compile Include="Popd.cs" />
     <Compile Include="Pushd.cs" />
     <Compile Include="Repeat.cs" />
@@ -109,12 +154,11 @@
     <Compile Include="ReturnNear.cs" />
     <Compile Include="SetALByCarry.cs" />
     <Compile Include="SpecialDebug\Break.cs" />
-    <Compile Include="ByteToWord.cs" />
+    <Compile Include="ConvByteToWord.cs" />
     <Compile Include="Call.cs" />
     <Compile Include="ClrDirFlag.cs" />
     <Compile Include="ClrInterruptFlag.cs" />
     <Compile Include="ClrCarryFlag.cs" />
-    <Compile Include="CmpByteInString.cs" />
     <Compile Include="CmpMem.cs" />
     <Compile Include="CmpWord.cs" />
     <Compile Include="CmpWordInString.cs" />
@@ -128,8 +172,6 @@
     <Compile Include="SetDirectionFlag.cs" />
     <Compile Include="Escape.cs" />
     <Compile Include="Exchange.cs" />
-    <Compile Include="SSE\FXStore.cs" />
-    <Compile Include="SSE\FXSave.cs" />
     <Compile Include="486AndUp\CpuId.cs" />
     <Compile Include="Halt.cs" />
     <Compile Include="IMultiply.cs" />
@@ -192,12 +234,54 @@
     <Compile Include="ShiftAritRight.cs" />
     <Compile Include="386AndUp\SignExtendAX.cs" />
     <Compile Include="SingleWordToDouble.cs" />
-    <Compile Include="286AndUp\smsw.cs" />
-    <Compile Include="SSE\AddPS.cs" />
-    <Compile Include="SSE\AddSS.cs" />
-    <Compile Include="SSE\MovSS.cs" />
-    <Compile Include="SSE\SubPS.cs" />
     <Compile Include="SetInterruptFlag.cs" />
+    <Compile Include="SSE4a\ExtractQ.cs" />
+    <Compile Include="SSE4a\InsertQ.cs" />
+    <Compile Include="SSE4a\LeadingZeroCount.cs" />
+    <Compile Include="SSE4a\MoveNTSD.cs" />
+    <Compile Include="SSE4a\MoveNTSS.cs" />
+    <Compile Include="SSE4a\PopulationCount.cs" />
+    <Compile Include="SSE4dot2\CRC32.cs" />
+    <Compile Include="SSE4dot2\PCMPESTRI.cs" />
+    <Compile Include="SSE4dot2\PCMPESTRM.cs" />
+    <Compile Include="SSE4dot2\PCMPGTQ.cs" />
+    <Compile Include="SSE4dot2\PCMPISTRI.cs" />
+    <Compile Include="SSE4dot2\PCMPISTRM.cs" />
+    <Compile Include="SSE4dot2\PopulationCount.cs" />
+    <Compile Include="SSEAndMMX2\AddPS.cs" />
+    <Compile Include="SSEAndMMX2\AddSS.cs" />
+    <Compile Include="SSEAndMMX2\CmpOrdSS.cs" />
+    <Compile Include="SSEAndMMX2\CmpPS.cs" />
+    <Compile Include="SSEAndMMX2\CmpSS.cs" />
+    <Compile Include="SSEAndMMX2\CmpUnordSS.cs" />
+    <Compile Include="SSEAndMMX2\DividePS.cs" />
+    <Compile Include="SSEAndMMX2\DivideSS.cs" />
+    <Compile Include="SSEAndMMX2\FXSave.cs" />
+    <Compile Include="SSEAndMMX2\FXStore.cs" />
+    <Compile Include="SSEAndMMX2\MaxPS.cs" />
+    <Compile Include="SSEAndMMX2\MaxSS.cs" />
+    <Compile Include="SSEAndMMX2\MinPS.cs" />
+    <Compile Include="SSEAndMMX2\MinSS.cs" />
+    <Compile Include="SSEAndMMX2\MoveAPS.cs" />
+    <Compile Include="SSEAndMMX2\MoveHLPS.cs" />
+    <Compile Include="SSEAndMMX2\MoveHPS.cs" />
+    <Compile Include="SSEAndMMX2\MoveLHPS.cs" />
+    <Compile Include="SSEAndMMX2\MoveLPS.cs" />
+    <Compile Include="SSEAndMMX2\MoveSS.cs" />
+    <Compile Include="SSEAndMMX2\MoveUPS.cs" />
+    <Compile Include="SSEAndMMX2\MultiplyPS.cs" />
+    <Compile Include="SSEAndMMX2\MultiplySS.cs" />
+    <Compile Include="SSEAndMMX2\ReciprocalPS.cs" />
+    <Compile Include="SSEAndMMX2\ReciprocalSQRTPS.cs" />
+    <Compile Include="SSEAndMMX2\ReciprocalSQRTSS.cs" />
+    <Compile Include="SSEAndMMX2\ReciprocalSS.cs" />
+    <Compile Include="SSEAndMMX2\ShufflePS.cs" />
+    <Compile Include="SSEAndMMX2\SQRTPS.cs" />
+    <Compile Include="SSEAndMMX2\SQRTSS.cs" />
+    <Compile Include="SSEAndMMX2\SubPS.cs" />
+    <Compile Include="SSEAndMMX2\SubSS.cs" />
+    <Compile Include="SSEAndMMX2\UnpackAndILeaveHPS.cs" />
+    <Compile Include="SSEAndMMX2\UnpackAndILeaveLPS.cs" />
     <Compile Include="StoreSD.cs" />
     <Compile Include="StoreWordInString.cs" />
     <Compile Include="JumpIfNotCarry.cs" />
@@ -263,20 +347,13 @@
     <None Include="Cosmos.snk" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="186-188AndUp\" />
     <Folder Include="3DNow!\" />
     <Folder Include="AMD-V_AndUp\" />
     <Folder Include="Cyrix-EMMX\" />
-    <Folder Include="Geode\" />
-    <Folder Include="K6-2AndUp\" />
-    <Folder Include="MMX2\" />
-    <Folder Include="PentiumAndUp\" />
     <Folder Include="PentiumProAndUp\" />
     <Folder Include="SSE2\" />
     <Folder Include="SSE3\" />
-    <Folder Include="SSE4a\" />
     <Folder Include="SSE4dot1\" />
-    <Folder Include="SSE4dot2\" />
     <Folder Include="SSSE3\" />
     <Folder Include="VTAndUp\" />
     <Folder Include="x87\" />

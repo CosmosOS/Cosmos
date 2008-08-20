@@ -5,7 +5,8 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86
 {
-    class MoveSW
+    [OpCode(0xFFFFFFFF, "movsw")]
+    public class MoveSW: Instruction
     {
     }
 }

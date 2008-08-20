@@ -5,7 +5,12 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86
 {
-    class RepeatBase
-    {
+    public abstract class RepeatBase: Instruction {
+        public readonly string instruction;
+
+        protected RepeatBase(string instruction) {
+            this.instruction = instruction;
+        }
+
     }
 }

@@ -5,11 +5,11 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86.SSE {
 	[OpCode(0xFFFFFFFF, "movss")]
-    public class MovSS : Instruction
+    public class MoveSS : Instruction
     {
 		private string mDestination;
 		private string mSource;
-		public MovSS(string aDestination, string aSource) {
+		public MoveSS(string aDestination, string aSource) {
 			mDestination = aDestination;
 			mSource = aSource;
 		}
