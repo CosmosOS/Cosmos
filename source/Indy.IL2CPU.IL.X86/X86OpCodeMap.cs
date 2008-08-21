@@ -40,11 +40,6 @@ namespace Indy.IL2CPU.IL.X86
 			return typeof(X86MainEntryPointOp);
 		}
 
-		protected override Type GetPInvokeMethodBodyOp()
-		{
-			return typeof(X86PInvokeMethodBodyOp);
-		}
-
 		protected override Type GetCustomMethodImplementationProxyOp()
 		{
 			return typeof(X86CustomMethodImplementationProxyOp);

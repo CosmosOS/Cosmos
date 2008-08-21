@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30428</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -91,6 +91,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomImplementation\AssemblerImpl.cs" />
     <Compile Include="CustomImplementation\Microsoft\Win32\RegistryKeyImpl.cs" />
     <Compile Include="CustomImplementation\System\ArrayImpl.cs" />
     <Compile Include="CustomImplementation\System\ArrayImplRefs.cs" />
@@ -108,6 +109,7 @@
     <Compile Include="DebugSymbolsOld.cs" />
     <Compile Include="GCImplementationRefs.cs" />
     <Compile Include="GCImplementation.cs" />
+    <Compile Include="PassedEngineValue.cs" />
     <Compile Include="ReadOnlyDictionary.cs" />
     <Compile Include="Utilities.cs" />
     <Compile Include="VTablesImpl.cs" />

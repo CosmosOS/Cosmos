@@ -14,7 +14,6 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 		    string xFieldData // Null Segment
 		        = "0,0,0,0,0,0,0,0" // Code Segment
 		          + ", 0xFF, 0xFF, 0, 0, 0, 0x99, 0xCF, 0" // Data Segment
-		          + ", 0xFF,0xFF,0,0,0,0x93,0xCF,0" // TSS
 		          + ", 0xFF,0xFF,0,0,0,0x93,0xCF,0";
 			//aAssembler.DataMembers.Add(new KeyValuePair<string, DataMember> (aAssembler.CurrentGroup,new DataMember(xFieldName, "db", xFieldData)));
 			//xFieldName = "_NATIVE_GDT_Pointer";
@@ -22,28 +21,11 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 			//aAssembler.DataMembers.Add(new KeyValuePair<string, DataMember> (aAssembler.CurrentGroup,new DataMember(xFieldName, "dw", "0x37,0,0")));
 
             aAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>(aAssembler.CurrentGroup, new DataMember(xFieldName, "db", xFieldData)));
-            aAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>(aAssembler.CurrentGroup, new DataMember("_NATIVE_GDT_Pointer", "dw", "0x1F,0,0")));
+            aAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>(aAssembler.CurrentGroup, new DataMember("_NATIVE_GDT_Pointer", "dw", "0x17,0,0")));
 
 			new CPUx86.Move(Registers.EAX, "_NATIVE_GDT_Pointer");
 			new CPUx86.Move("dword [_NATIVE_GDT_Pointer + 2]", "_NATIVE_GDT_Contents");
-            // setup TSS descriptor
-            new CPUx86.Move(Registers.EAX,
-                                "TSS_0");
-            new CPUx86.Move("word [_NATIVE_GDT_Contents + " + (24 + 0) + "]",
-                            "0x67");
-            new CPUx86.Move("word [_NATIVE_GDT_Contents + " + (24 + 2) + "]",
-                            "ax");
-            new CPUx86.ShiftRight("eax",
-                                  "16");
-            new CPUx86.Move("byte [_NATIVE_GDT_Contents + " + (24 + 4) + "]",
-                            "al");
-            new CPUx86.Move("byte [_NATIVE_GDT_Contents + " + (24 + 5) + "]",
-                            "10001001b");
-            new CPUx86.Move("byte [_NATIVE_GDT_Contents + " + (24 + 6) + "]",
-                            "00000000b");
-            new CPUx86.Move("byte [_NATIVE_GDT_Contents + " + (24 + 7) + "]",
-                            "0");
-
+            
 			new Label(".RegisterGDT");
             new CPUx86.Move(Registers.EAX, "_NATIVE_GDT_Pointer");
 			new CPUNative.Lgdt(Registers.AtEAX);

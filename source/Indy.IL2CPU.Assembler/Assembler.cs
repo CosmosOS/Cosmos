@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Reflection;
+using System.Threading;
 
 namespace Indy.IL2CPU.Assembler {
     public abstract class Assembler : IDisposable {
@@ -70,7 +71,6 @@ namespace Indy.IL2CPU.Assembler {
         protected List<KeyValuePair<string, Instruction>> mInstructions = new List<KeyValuePair<string, Instruction>>();
         private List<KeyValuePair<string, DataMember>> mDataMembers = new List<KeyValuePair<string, DataMember>>();
         private List<KeyValuePair<string, string>> mIncludes = new List<KeyValuePair<string, string>>();
-        private List<KeyValuePair<string, ImportMember>> mImportMembers = new List<KeyValuePair<string, ImportMember>>();
         private readonly bool mInMetalMode = false;
         public readonly Stack<StackContent> StackContents = new Stack<StackContent>();
 
@@ -79,14 +79,25 @@ namespace Indy.IL2CPU.Assembler {
             set;
         }
 
-        private static Stack<Assembler> mCurrentInstance;
+        private static ReaderWriterLocker mCurrentInstanceLocker = new ReaderWriterLocker();
+        private static SortedList<int, Stack<Assembler>> mCurrentInstance = new SortedList<int, Stack<Assembler>>();
 
         public static Stack<Assembler> CurrentInstance {
             get {
-                if (mCurrentInstance == null) {
-                    mCurrentInstance = new Stack<Assembler>();
+                using(mCurrentInstanceLocker.AcquireReaderLock()) {
+                    if(mCurrentInstance.ContainsKey(Thread.CurrentThread.ManagedThreadId)) {
+                        return mCurrentInstance[Thread.CurrentThread.ManagedThreadId];
+                    }
                 }
-                return mCurrentInstance;
+                using(mCurrentInstanceLocker.AcquireWriterLock()) {
+                    if (mCurrentInstance.ContainsKey(Thread.CurrentThread.ManagedThreadId))
+                    {
+                        return mCurrentInstance[Thread.CurrentThread.ManagedThreadId];
+                    }
+                    var xResult = new Stack<Assembler>();
+                    mCurrentInstance.Add(Thread.CurrentThread.ManagedThreadId, xResult);
+                    return xResult;
+                }
             }
         }
 
@@ -112,21 +123,26 @@ namespace Indy.IL2CPU.Assembler {
             //mInstructions.AddComplexIndexDefinition(
         }
 
-        public List<KeyValuePair<string, Instruction>> Instructions {
-            get {
-                return mInstructions;
-            }
+        public List<KeyValuePair<string, Instruction>> GetInstructions() {
+//using (mInstructionsLocker.AcquireReaderLock()) {
+//    if(mInstructions.ContainsKey(Thread.CurrentThread.ManagedThreadId)) {
+//        return mInstructions[Thread.CurrentThread.ManagedThreadId];
+//    }
+//}
+//            using(mInstructionsLocker.AcquireWriterLock()) {
+//                // do this check again, between the two locks, the situation might have changed.
+//                if (mInstructions.ContainsKey(Thread.CurrentThread.ManagedThreadId))
+//                {
+//                    return mInstructions[Thread.CurrentThread.ManagedThreadId];
+//                }
+//                var xResult = new
+//            }
+            throw new NotImplementedException("After multi-threaded refactorings, this hasn't been implemented again, yet");
         }
 
         public List<KeyValuePair<string, DataMember>> DataMembers {
             get {
                 return mDataMembers;
-            }
-        }
-
-        public List<KeyValuePair<string, ImportMember>> ImportMembers {
-            get {
-                return mImportMembers;
             }
         }
 
@@ -161,15 +177,11 @@ namespace Indy.IL2CPU.Assembler {
 
         private IEnumerable<string> GetAllGroupNames() {
             List<string> xNames = new List<string>();
-            xNames.AddRange((from item in mInstructions
+            xNames.AddRange((from item in mMergedInstructions
                              where !xNames.Contains(item.Key,
                                                     StringComparer.InvariantCultureIgnoreCase)
                              select item.Key));
             xNames.AddRange((from item in mDataMembers
-                             where !xNames.Contains(item.Key,
-                                                    StringComparer.InvariantCultureIgnoreCase)
-                             select item.Key));
-            xNames.AddRange((from item in mImportMembers
                              where !xNames.Contains(item.Key,
                                                     StringComparer.InvariantCultureIgnoreCase)
                              select item.Key));
@@ -181,23 +193,36 @@ namespace Indy.IL2CPU.Assembler {
             return xNames;
         }
 
+        protected List<KeyValuePair<string, Instruction>> mMergedInstructions;
+
         public virtual void Flush() {
+            mMergedInstructions = new List<KeyValuePair<string, Instruction>>();
+            using(Assembler.mCurrentInstanceLocker.AcquireReaderLock()) {
+                foreach(var xItem in mCurrentInstance.Values) {
+                    if(xItem.Count >0) {
+                        var xAsm = xItem.Peek();
+                        if (xAsm != this) {
+                            mDataMembers.AddRange(xAsm.mDataMembers);
+                            mIncludes.AddRange(xAsm.mIncludes);
+                        }
+                    }
+                }
+            }
+            mMergedInstructions.AddRange(mInstructions);
+            var xAllGroupNames = GetAllGroupNames();
             foreach (string xGroup in GetAllGroupNames()) {
                 using (StreamWriter xOutputWriter = new StreamWriter(mGetFileNameForGroup(xGroup))) {
                     // write .asm header
-                    EmitHeader(xGroup,
-                               xOutputWriter);
                     if (xGroup == MainGroup) {
-                        foreach (string xTheGroup in GetAllGroupNames()) {
+                        foreach (string xTheGroup in xAllGroupNames) {
                             if (xGroup != xTheGroup) {
                                 mIncludes.Add(new KeyValuePair<string, string>(xGroup,
                                                                                mGetFileNameForGroup(xTheGroup)));
                             }
                         }
                     }
-                    xOutputWriter.WriteLine();
-                    EmitIncludes(xGroup,
-                                 xOutputWriter);
+                    EmitHeader(xGroup,
+                               xOutputWriter);
                     xOutputWriter.WriteLine();
                     if (mDataMembers.Count > 0) {
                         EmitDataSectionHeader(xGroup,
@@ -214,17 +239,10 @@ namespace Indy.IL2CPU.Assembler {
                                               xOutputWriter);
                         xOutputWriter.WriteLine();
                     }
-                    List<string> xLabels = new List<string>();
-                    if (mInstructions.Count > 0) {
+                    if (mMergedInstructions.Count > 0) {
                         EmitCodeSection(xGroup,
                                         xOutputWriter,
-                                        xLabels);
-                    }
-                    if (mImportMembers.Count > 0) {
-                        EmitIDataSectionHeader(xGroup,
-                                               xOutputWriter);
-                        EmitIDataSectionFooter(xGroup,
-                                               xOutputWriter);
+                                        mMergedInstructions);
                     }
                     EmitFooter(xGroup,
                                xOutputWriter);
@@ -234,12 +252,12 @@ namespace Indy.IL2CPU.Assembler {
 
         protected void EmitCodeSection(string aGroup,
                                        TextWriter aOutputWriter,
-                                       List<string> aLabels) {
+                                       List<KeyValuePair<string, Instruction>> aInstructions) {
             EmitCodeSectionHeader(aGroup,
                                   aOutputWriter);
             aOutputWriter.WriteLine();
             string xMainLabel = "";
-            foreach (Instruction x in (from item in mInstructions
+            foreach (Instruction x in (from item in aInstructions
                                        where String.Equals(item.Key,
                                                            aGroup,
                                                            StringComparison.InvariantCultureIgnoreCase)
@@ -253,7 +271,6 @@ namespace Indy.IL2CPU.Assembler {
                         xFullName = xMainLabel;
                     } else {
                         xFullName = xMainLabel + xLabel.Name;
-                        aLabels.Add(xFullName);
                     }
                     aOutputWriter.WriteLine();
                     if (x.ToString()[0] == '.') {
@@ -274,14 +291,6 @@ namespace Indy.IL2CPU.Assembler {
 
         protected virtual void EmitIncludes(string aGroup,
                                             TextWriter aOutputWriter) {
-        }
-
-        protected virtual void EmitIDataSectionHeader(string aGroup,
-                                                      TextWriter aOutputWriter) {
-        }
-
-        protected virtual void EmitIDataSectionFooter(string aGroup,
-                                                      TextWriter aOutputWriter) {
         }
 
         protected virtual void EmitCodeSectionHeader(string aGroup,

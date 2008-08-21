@@ -59,7 +59,6 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
             for (int i = 0; i < 26;i++ ) {
                 xFieldData += "0,";
             }
-            aAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>("main", new DataMember("TSS_0", "dd", xFieldData.TrimEnd(','))));
             for (int i = 0; i < 256; i++) {
                 new CPUx86.Move(Registers.EAX,
                                 "__ISR_Handler_" + i.ToString("X2"));

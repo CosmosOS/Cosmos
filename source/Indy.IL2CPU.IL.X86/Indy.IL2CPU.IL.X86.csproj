@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30428</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{69C8D2C5-225C-4A00-BA55-AEF6719CBDBA}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -250,7 +250,6 @@
     <Compile Include="Unbox_Any.cs" />
     <Compile Include="Volatile.cs" />
     <Compile Include="X86OpCodeMap.cs" />
-    <Compile Include="X86PInvokeMethodBodyOp.cs" />
     <Compile Include="Xor.cs" />
   </ItemGroup>
   <ItemGroup>

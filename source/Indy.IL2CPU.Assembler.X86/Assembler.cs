@@ -151,9 +151,6 @@ namespace Indy.IL2CPU.Assembler.X86 {
 
 		}
 
-		protected override void EmitIDataSectionHeader(string aGroup, TextWriter aOutputWriter) {
-		}
-
 		protected override void EmitDataSectionFooter(string aGroup, TextWriter aOutputWriter) {
 			base.EmitDataSectionFooter(aGroup, aOutputWriter);
 			if (aGroup == MainGroup) {
@@ -171,14 +168,13 @@ namespace Indy.IL2CPU.Assembler.X86 {
 		}
 
 		protected override void EmitHeader(string aGroup, TextWriter aOutputWriter) {
-			//mOutputWriter.WriteLine("format ms coff  ");
-			//mOutputWriter.WriteLine("org 0220000h    ; the best place to load our kernel to. ");
 			aOutputWriter.WriteLine("use32           ; the kernel will be run in 32-bit protected mode, ");
 			aOutputWriter.WriteLine("");
 			aOutputWriter.WriteLine("%ifdef {0}", GetValidGroupName(aGroup));
 			aOutputWriter.WriteLine("%else");
 			aOutputWriter.WriteLine("  %define {0} 1", GetValidGroupName(aGroup));
 			aOutputWriter.WriteLine("");
+            EmitIncludes(aGroup, aOutputWriter);
 		}
 
 		protected override void EmitIncludes(string aGroup, TextWriter aOutputWriter) {

@@ -11,9 +11,10 @@ namespace Indy.IL2CPU.Assembler {
 		public string GetContents() {
 			using (var sw = new StringWriter()) {
 				var xLabels = new List<string>();
-				foreach (var xGroup in
-                 (from item in Instructions select item.Key).Distinct()) {
-					EmitCodeSection(xGroup, sw, xLabels);
+			    this.Flush();
+                foreach (var xGroup in (from item in mMergedInstructions select item.Key).Distinct())
+                {
+                    EmitCodeSection(xGroup, sw, mMergedInstructions);
 				}
 				return sw.ToString();
 			}

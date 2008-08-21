@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -35,11 +37,81 @@ namespace Cosmos.Build.Windows {
     public partial class BuildWindow : Window {
         public BuildWindow() {
             InitializeComponent();
-			Messages = (BuildLogMessages)((ObjectDataProvider)FindResource("BuildMessages")).Data;
-			if (Messages == null) {
-				throw new Exception("Message collection not found!");
-			}
+            Messages = (BuildLogMessages)((ObjectDataProvider)FindResource("BuildMessages")).Data;
+            if (Messages == null) {
+                throw new Exception("Message collection not found!");
+            }
+
+            mTimer = new DispatcherTimer(DispatcherPriority.Input);
+            mTimer.Tick += mTimer_Tick;
+            mTimer.Interval = new TimeSpan(0, 0, 0, 0, 10);// 100msec
+            mTimer.Start();
+            //var xSyncContext = new DispatcherSynchronizationContext();
+            //SynchronizationContext.SetSynchronizationContext(xSyncContext);
+            //mWorker = new BackgroundWorker();
+            //mWorker.WorkerReportsProgress = true;
+            //mWorker.WorkerSupportsCancellation = false;
+            //mWorker.ProgressChanged += delegate(object aSender,
+            //                                    ProgressChangedEventArgs e)
+            //{
+            //                               do {
+            //                                   string xRemainingTime = String.Format(System.Globalization.CultureInfo.InvariantCulture.DateTimeFormat,
+            //                                                                         "{0:T}",
+            //                                                                         new DateTime(CalculateRemainingTime(mCurrent,
+            //                                                                                                             mMax).Ticks));
+
+            //                                   progressText.Content = String.Format("Processing method {0:d} of {1:d}{2}({3} remaining){4}{5} {6} - {7}",
+            //                                                                        mCurrent,
+            //                                                                        mMax,
+            //                                                                        Environment.NewLine,
+            //                                                                        xRemainingTime,
+            //                                                                        Environment.NewLine,
+            //                                                                        mMessage, mCurrent, mMax);
+            //                                   ProgressMax = mMax;
+            //                                   ProgressCurrent = mCurrent;
+            //                                   Thread.Sleep(100);
+            //                                   //var xFrame = new DispatcherFrame();
+            //                                   //Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Input, new DispatcherOperationCallback(delegate(object aParam)
+            //                                   //{
+            //                                   //    xFrame.Continue = false;
+            //                                   //    return null;
+            //                                   //}), null);
+            //                                   //Dispatcher.PushFrame(xFrame);
+            //                               } while ((mCurrent < mMax) && mMax >0);
+            //};
+            //mWorker.DoWork += delegate
+            //{
+            //    do
+            //    {
+            //        Thread.Sleep(10);
+            //        mWorker.ReportProgress(1);
+            //    } while (mCurrent < mMax);
+            //};
+            //mWorker.RunWorkerAsync();
         }
+
+        private BackgroundWorker mWorker;
+
+        void mTimer_Tick(object sender, EventArgs e)
+        {
+            string xRemainingTime = String.Format(System.Globalization.CultureInfo.InvariantCulture.DateTimeFormat,
+                                                  "{0:T}",
+                                                  new DateTime(CalculateRemainingTime(mCurrent,
+                                                                                      mMax).Ticks));
+
+            progressText.Content = String.Format("Processing method {0:d} of {1:d}{2}({3} remaining){4}{5} {6} - {7}",
+                                                 mCurrent,
+                                                 mMax,
+                                                 Environment.NewLine,
+                                                 xRemainingTime,
+                                                 Environment.NewLine,
+                                                 mMessage, mCurrent, mMax);
+            ProgressMax = mMax;
+            ProgressCurrent = mCurrent;
+
+        }
+
+        private DispatcherTimer mTimer;
 
 		public readonly BuildLogMessages Messages;
 		public int ProgressMax {
@@ -78,29 +150,46 @@ namespace Cosmos.Build.Windows {
 			Dispatcher.PushFrame(xFrame);
 		}
 
-        public void DoProgressMessage(int aMax, int aCurrent, string aMessage)
-        {
-            string xRemainingTime = String.Format(System.Globalization.CultureInfo.InvariantCulture.DateTimeFormat,
-                "{0:T}", new DateTime(CalculateRemainingTime(aCurrent, aMax).Ticks));
+        private int mMax;
+        private int mCurrent;
+        private string mMessage;
 
-            progressText.Content = String.Format("Processing method {0:d} of {1:d}{2}({3} remaining){4}{5}",
-                                                              aCurrent,
-                                                              aMax,
-                                                              Environment.NewLine,
-                                                              xRemainingTime,
-                                                              Environment.NewLine,
-                                                              aMessage);
-            ProgressMax = aMax;
-            ProgressCurrent = aCurrent;
+        public void PreventFreezing() {
             var xFrame = new DispatcherFrame();
-            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Input,
-                                                     new DispatcherOperationCallback(delegate(object aParam)
+            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Input, new DispatcherOperationCallback(delegate(object aParam)
             {
                 xFrame.Continue = false;
                 return null;
-            }),
-                                                     null);
+            }), null);
             Dispatcher.PushFrame(xFrame);
+        }
+
+        public void DoProgressMessage(int aMax, int aCurrent, string aMessage)
+        {
+            mCurrent = aCurrent;
+            mMax = aMax;
+            mMessage = aMessage;
+            PreventFreezing();
+//            var xFrame = new DispatcherFrame();
+//            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background,
+//                                                     new DispatcherOperationCallback(delegate(object aData)
+//            {
+//                string xRemainingTime = String.Format(System.Globalization.CultureInfo.InvariantCulture.DateTimeFormat,
+//"{0:T}", new DateTime(CalculateRemainingTime(mCurrent, mMax).Ticks));
+
+//                progressText.Content = String.Format("Processing method {0:d} of {1:d}{2}({3} remaining){4}{5}",
+//                                                                  mCurrent,
+//                                                                  mMax,
+//                                                                  Environment.NewLine,
+//                                                                  xRemainingTime,
+//                                                                  Environment.NewLine,
+//                                                                  mMessage);
+//                ProgressMax = mMax;
+//                ProgressCurrent = mCurrent;
+//                //xFrame.Continue = false;
+//                return null;
+//            }), null);
+//            Dispatcher.PushFrame(xFrame);
         }
 
 

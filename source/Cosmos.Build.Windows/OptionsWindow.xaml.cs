@@ -193,7 +193,7 @@ namespace Cosmos.Build.Windows {
                 Console.WriteLine("Compiling...");
                 var xBuildWindow = new BuildWindow();
                 IEnumerable<BuildLogMessage> xMessages = new BuildLogMessage[0];
-
+                mBuilder.PreventFreezing += xBuildWindow.PreventFreezing;
                 mBuilder.DebugLog += xBuildWindow.DoDebugMessage;
                 mBuilder.ProgressChanged += xBuildWindow.DoProgressMessage;
                 xBuildWindow.Show();

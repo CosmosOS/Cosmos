@@ -15,7 +15,6 @@ namespace Indy.IL2CPU.IL {
 		protected OpCodeMap() {
 			MethodHeaderOp = GetMethodHeaderOp();								   
 			MethodFooterOp = GetMethodFooterOp();
-			PInvokeMethodBodyOp = GetPInvokeMethodBodyOp();
 			CustomMethodImplementationProxyOp = GetCustomMethodImplementationProxyOp();
 			CustomMethodImplementationOp = GetCustomMethodImplementationOp();
 			InitVmtImplementationOp = GetInitVmtImplementationOp();
@@ -28,7 +27,6 @@ namespace Indy.IL2CPU.IL {
 
 		protected abstract Type GetMethodHeaderOp();
 		protected abstract Type GetMethodFooterOp();
-		protected abstract Type GetPInvokeMethodBodyOp();
 		protected abstract Type GetCustomMethodImplementationProxyOp();
 		protected abstract Type GetCustomMethodImplementationOp();
 		protected abstract Type GetInitVmtImplementationOp();

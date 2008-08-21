@@ -17,7 +17,6 @@ namespace Cosmos.Build.Windows
     {
         public string BuildPath;
         public readonly string ToolsPath;
-
         public Builder()
         {
             BuildPath = GetBuildPath();
@@ -141,13 +140,21 @@ namespace Cosmos.Build.Windows
                 }
             };
             xEngine.DebugLog += DoDebugLog;
-            xEngine.Execute(xTarget.Location, TargetPlatformEnum.X86, g => Path.Combine(xAsmPath, g + ".asm"), false,
+            var passed = new PassedEngineValue(xTarget.Location, TargetPlatformEnum.X86, g => Path.Combine(xAsmPath, g + ".asm"), false,
                 new string[]
                     {
                         Path.Combine(Path.Combine(ToolsPath, "Cosmos.Kernel.Plugs"), "Cosmos.Kernel.Plugs.dll"), 
                         Path.Combine(Path.Combine(ToolsPath, "Cosmos.Hardware.Plugs"), "Cosmos.Hardware.Plugs.dll"), 
                         Path.Combine(Path.Combine(ToolsPath, "Cosmos.Sys.Plugs"), "Cosmos.Sys.Plugs.dll")
                     }, aDebugMode, aDebugComport, xAsmPath);
+            
+            var threadEngine = new Thread(new ParameterizedThreadStart(xEngine.Execute));
+            threadEngine.Start(passed);
+            while (threadEngine.IsAlive) {
+                Thread.Sleep(25);
+                PreventFreezing();
+            }
+            
             xSW.Stop();
             Console.WriteLine("IL2CPU Run took " + xSW.Elapsed.ToString());
 
@@ -158,6 +165,8 @@ namespace Cosmos.Build.Windows
             Global.Call(ToolsPath + @"cygwin\ld.exe", String.Format("-Ttext 0x500000 -Tdata 0x200000 -e Kernel_Start -o \"{0}\" \"{1}\"", "output.bin", "output.obj"), BuildPath);
             RemoveFile(BuildPath + "output.obj");
         }
+
+        public event Action PreventFreezing;
 
         public void BuildKernel()
         {
