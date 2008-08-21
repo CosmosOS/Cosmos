@@ -2551,6 +2551,7 @@ while(true) {
             if (!mEmitDependencyGraph) {
                 return;
             }
+            return;
             if (!aIsContainer) {
                 aMessage = "\t" + aMessage;
             }
