@@ -34,6 +34,19 @@ namespace Cosmos.Kernel.Plugs
             TextScreen.SetColors(_foreground, _background);
         }
 
+        public static void Beep(int aFrequency, int aDuration)
+        {
+            if (aFrequency < 37 || aFrequency > 32767)
+                throw new ArgumentOutOfRangeException("Frequency must be between 37 and 32767Hz");
+
+            if (aDuration <= 0)
+                throw new ArgumentOutOfRangeException("Duration must be more than 0");
+
+            PIT.PlaySound(aFrequency);
+            PIT.Wait((uint)aDuration);
+            PIT.MuteSound();
+        }
+
         public static int get_CursorLeft()
         {
             return TextScreen.CurrentChar;

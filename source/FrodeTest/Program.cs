@@ -25,8 +25,12 @@ namespace FrodeTest
             Console.WriteLine("*** COSMOS Operating System - Frode's Test Suite ***");
             try
             {
+                //while (true)
+                //Console.Beep(2000, 2);
+                Console.Beep();
+                    //Cosmos.Hardware.PIT.PlaySound(3000);
+                //Console.Beep();
                 //Shell.Session.Run();
-                
                 //Console.WriteLine(b);
 
                 //Testing \\-string bug
@@ -44,7 +48,7 @@ namespace FrodeTest
 
                 //TEST FRAMEWORK
                 //Console.WriteLine("---- RUNNING PREDEFINED TESTS ----");
-                Test.ConsoleTest.RunTest();
+                //Test.ConsoleTest.RunTest();
                 //Test.StringTest.RunTest();
                 //Test.IPv4AddressTest.RunTest();
                 //Test.BasicTest.RunTest();
@@ -66,10 +70,10 @@ namespace FrodeTest
                 //Test.FilesystemEntryTest.RunTest();
                 //Test.VirtualFileSystemTest.RunTest();
                 //Test.Ext2Test.RunTest();
-                Test.DirectoryTest.RunTest();
-                Test.FileTest.RunTest();
-                Test.DirectoryInfoTest.RunTest();
-                Test.FileInfoTest.RunTest();
+                //Test.DirectoryTest.RunTest();
+                //Test.FileTest.RunTest();
+                //Test.DirectoryInfoTest.RunTest();
+                //Test.FileInfoTest.RunTest();
 
                 //Tests ready for Matthijs to fix ;)
                 //Test.RTL8139Test.RunTest();

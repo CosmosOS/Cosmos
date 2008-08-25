@@ -43,5 +43,22 @@ namespace Cosmos.Hardware {
 			//mTick(null, null);
 		    mTicked = true;
 		}
+
+        public static void PlaySound(int aFrequency)
+        {
+            // http://www.ifi.uio.no/~inf3150/grupper/1/pcspeaker.html
+            int xFrequency = (1193180 / aFrequency);
+            IOWriteByte(0x61, IOReadByte((0x61) | 3)); //Enable speaker
+            IOWriteByte(0x43, 0xB6); //Init sound
+            IOWriteByte(0x42, (byte)((byte)0xff & xFrequency)); //LSB
+            IOWriteByte(0x42, (byte)(xFrequency >> 8)); //MSB
+        }
+
+        public static void MuteSound()
+        {
+            //Note; Disabling speaker doesn't work??
+            IOWriteByte(0x61, (byte)(IOReadByte(0x61) & 0xFC)); //Disable speaker
+            
+        }
 	}
 }

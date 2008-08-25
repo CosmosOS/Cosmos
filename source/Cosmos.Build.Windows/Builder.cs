@@ -275,6 +275,7 @@ namespace Cosmos.Build.Windows
         ///</summary>
         public enum QemuAudioCard
         {
+            pcspk,
             sb16,
             es1370,
             adlib
