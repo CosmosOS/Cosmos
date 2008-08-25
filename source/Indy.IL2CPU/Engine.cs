@@ -455,7 +455,7 @@ namespace Indy.IL2CPU {
                 {
                     if (mThreadEvents[i] != null)
                     {
-                        if (mThreadEvents[i].WaitOne(10))
+                        if (mThreadEvents[i].WaitOne(10,false))
                         {
                             mThreadEvents[i].Close();
                             mThreadEvents[i] = null;
