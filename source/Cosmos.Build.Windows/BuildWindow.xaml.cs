@@ -140,8 +140,13 @@ namespace Cosmos.Build.Windows {
 				Severity = aSeverity,
 				Message = aMessage
 			};
-			Messages.Add(xMessage);
-			lboxLog.ScrollIntoView(xMessage);
+		    Dispatcher.BeginInvoke(DispatcherPriority.Input,
+		                           new DispatcherOperationCallback(delegate(object aTheMessage) {
+		                                                               Messages.Add((BuildLogMessage)aTheMessage);
+		                                                               lboxLog.ScrollIntoView((BuildLogMessage)aTheMessage);
+		                                                               return null;
+		                                                           }),
+		                           xMessage);
 			var xFrame = new DispatcherFrame();
 			Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Input, new DispatcherOperationCallback(delegate(object aParam) {
 				xFrame.Continue = false;
@@ -192,10 +197,14 @@ namespace Cosmos.Build.Windows {
 //            Dispatcher.PushFrame(xFrame);
         }
 
+        public bool BuildRunning = true;
 
         public static System.Diagnostics.Stopwatch xBuildTimer;
         public TimeSpan CalculateRemainingTime(int completedCount, int totalCount)
         {
+            if(!BuildRunning) {
+                xBuildTimer.Stop();
+            }
             if (xBuildTimer == null)
             {
                 xBuildTimer = new System.Diagnostics.Stopwatch();

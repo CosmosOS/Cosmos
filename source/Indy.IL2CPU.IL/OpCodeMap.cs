@@ -73,7 +73,6 @@ namespace Indy.IL2CPU.IL {
 
 		public readonly Type MethodHeaderOp;
 		public readonly Type MethodFooterOp;
-		public readonly Type PInvokeMethodBodyOp;
 		public readonly Type CustomMethodImplementationProxyOp;
 		public readonly Type CustomMethodImplementationOp;
 		public readonly Type InitVmtImplementationOp;

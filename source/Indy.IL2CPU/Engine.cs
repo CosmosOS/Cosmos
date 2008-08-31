@@ -1637,10 +1637,12 @@ while(true) {
                                     //}
                                 } else {
                                     if ((xCurrentMethod.Attributes & MethodAttributes.PinvokeImpl) != 0) {
-                                        HandlePInvoke(xCurrentMethod,
-                                                      xMethodInfo);
+                                        OnDebugLog(LogSeverityEnum.Error,
+                                                   "Method '{0}' not generated!",
+                                                   xCurrentMethod.GetFullName());
+                                        new Comment("Method not being generated yet, as it's handled by a PInvoke");
                                     } else {
-                                        OnDebugLog(LogSeverityEnum.Warning,
+                                        OnDebugLog(LogSeverityEnum.Error,
                                                    "Method '{0}' not generated!",
                                                    xCurrentMethod.GetFullName());
                                         new Comment("Method not being generated yet, as it's handled by an iCall");
@@ -2516,16 +2518,6 @@ while(true) {
             }
             throw new Exception("Method not found!");
         }
-
-        private void HandlePInvoke(MethodBase aMethod,
-                                   MethodInformation aMethodInfo) {
-            IL.Op xPInvokeMethodBodyOp = (IL.Op)Activator.CreateInstance(mMap.PInvokeMethodBodyOp,
-                                                                         aMethod,
-                                                                         aMethodInfo);
-            xPInvokeMethodBodyOp.Assembler = mAssembler;
-            xPInvokeMethodBodyOp.Assemble();
-        }
-
         public static IEnumerable<Assembly> GetAllAssemblies() {
             using (mCurrent.mMethodsLocker.AcquireReaderLock()) {
                 return (from item in mCurrent.mMethods.Keys

@@ -210,7 +210,9 @@ namespace Cosmos.Build.Windows {
 
                     //If there were any warnings or errors, then show dialog again
                     if (xMessages.Count() > 0) {
-                        xBuildWindow = new BuildWindow();
+                        xBuildWindow = new BuildWindow {
+                                                           BuildRunning = false
+                                                       };
                         xBuildWindow.Messages.Clear();
 
                         foreach (var item in xMessages) {
