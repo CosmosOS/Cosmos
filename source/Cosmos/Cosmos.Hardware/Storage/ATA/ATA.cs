@@ -182,9 +182,9 @@ namespace Cosmos.Hardware.Storage.ATA {
 			mController_DeviceHead = (ushort)(mController + 6);
 			mController_PrimaryStatus = (ushort)(mController + 7);
 			mController_Command = (ushort)(mController + 7);
-			mController_AlternateStatus = (ushort)(mController2 + 8);
-			mController_DeviceControl = (ushort)(mController2 + 8);
-			mController_DeviceAddress = (ushort)(mController2 + 9);
+			mController_AlternateStatus = (ushort)(mController2 + 6);
+			mController_DeviceControl = (ushort)(mController2 + 6);
+			mController_DeviceAddress = (ushort)(mController2 + 7);
 			IOWriteByte(mController_DeviceControl, 0);
 			mBlockCount = GetBlockCount();
 		}

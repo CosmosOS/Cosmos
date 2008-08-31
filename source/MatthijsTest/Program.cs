@@ -144,55 +144,16 @@ namespace MatthijsTest {
 
         //private static event Action TestEvent;
         public static void Init() {
-            bool xTest = false;
+            bool xTest = true;
             if (xTest)
             {
                 var xBoot = new Cosmos.Sys.Boot();
-                xBoot.Execute();
+                xBoot.MtWExecute();
             }
-            TestPInvoke();
-            //var xUDP = new Cosmos.Sys.Network.UDPPacket(// Use a different port so it does not conflict wtih listener since we
-            //    // are using the same IP on host for testing
-            //    0x0A00020F,
-            //    32001 // 10.0.2.15
-            //    ,
-            //    0xFFFFFFFF,
-            //    32000 // 255.255.255.255, Broadcast
-            //    ,
-            //    new byte[] {0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16});
-            //var xEthernet = new EthernetPacket(xUDP.GetData(),
-            //                                   0x525400123457,
-            //                                   0xFFFFFFFFFFFF,
-            //                                   EthernetPacket.PacketType.IP);
-
-            //Cosmos.Hardware.Network.Devices.RTL8139.RTL8139.DebugOutput = false;
-            //var xNICs = Cosmos.Hardware.Network.Devices.RTL8139.RTL8139.FindAll();
-            //var xNIC = xNICs[0];
-
-            //Console.WriteLine(xNIC.Name);
-            //Console.WriteLine("Revision: " + xNIC.HardwareRevision);
-            //Console.WriteLine("MAC: " + xNIC.MACAddress);
-
-            //Console.WriteLine("Enabling network card.");
-            //xNIC.Enable();
-            //xNIC.InitializeDriver();
-
-            //Console.WriteLine("Sending bytes.");
-            //var xBytes = xEthernet.GetData();
-            //System.Diagnostics.Debugger.Break();
-            //xNIC.TransmitBytes(xBytes);
-            //Console.WriteLine("Kernel done doing it's thing...");
-            //do {
-            //    Console.WriteLine(Console.ReadLine());
-            //    while (xNIC.mBuffer.Count > 0) {
-            //        var xPacket = xNIC.mBuffer.Dequeue();
-            //        ushort x = (ushort)((xPacket[0x12] << 8) | xPacket[0x13]);
-            //        DebugUtil.SendNumber("Test",
-            //                             "Identification",
-            //                             x,
-            //                             16);
-            //    }
-            //} while (true);
+            var xEntries = Directory.GetFiles("/");
+            for(int i = 0; i < xEntries.Length;i++) {
+                Console.WriteLine(xEntries[i]);
+            }
         }
 
         public static int TestMethodNoParams() {

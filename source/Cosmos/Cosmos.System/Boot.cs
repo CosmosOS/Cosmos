@@ -30,5 +30,17 @@ namespace Cosmos.Sys {
             // Clear again in case debug information has been written out
             Console.Clear();
         }
+
+        public void MtWExecute() {
+            Hardware.VGAScreen.SetTextMode(VGAScreen.TextSize.Size80x25);
+            Console.Clear();
+
+            Kernel.Global.Init();
+            Hardware.Global.Init();
+            //Sys.Global.Init();
+
+            //// Clear again in case debug information has been written out
+            //Console.Clear();
+        }
     }
 }

@@ -5,9 +5,6 @@ using Cosmos.Kernel;
 
 namespace Cosmos.Hardware {
     public class Global {
-        public static void InitMatthijs(bool noATA, bool noATAOld, bool noATA2) {
-        }
-
         public static void Init() {
             Console.WriteLine("    Init Global Descriptor Table");
             Kernel.CPU.CreateGDT();
