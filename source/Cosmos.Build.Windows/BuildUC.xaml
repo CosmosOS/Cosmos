@@ -1,25 +1,21 @@
-﻿<Window
-	x:Class="Cosmos.Build.Windows.BuildWindow"
-	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+﻿<UserControl x:Class="Cosmos.Build.Windows.BuildUC"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:local="clr-namespace:Cosmos.Build.Windows"
-	Title="Building Cosmos Application"
-	Height="350"
-	Width="589"
-	Icon="/Cosmos.Build.Windows;component/Cosmos.ico" WindowState="Maximized">
-	<Window.Resources>
-		<ObjectDataProvider
+    Height="300" Width="300">
+    <UserControl.Resources>
+        <ObjectDataProvider
 			x:Key="BuildMessages"
 			ObjectType="{x:Type local:BuildLogMessages}" />
-	</Window.Resources>
-	<Grid>
-		<Grid.RowDefinitions>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
             <RowDefinition Height="60" />
             <RowDefinition Height="20" />
             <RowDefinition Height="24" />
-			<RowDefinition />
-			
-		</Grid.RowDefinitions>
+            <RowDefinition />
+
+        </Grid.RowDefinitions>
         <Label 
             x:Name="progressText"
             Grid.Row="0"            
@@ -38,32 +34,32 @@
 			Name="lboxLog"
 			Background="White"
 			Grid.Row="3">
-			<ListBox.ItemTemplate>
-				<DataTemplate
+            <ListBox.ItemTemplate>
+                <DataTemplate
 					DataType="{x:Type local:BuildLogMessage}">
-					<ListBoxItem
+                    <ListBoxItem
 						Name="item"
 						Content="{Binding Path=Message}" />
-					<DataTemplate.Triggers>
-						<DataTrigger
+                    <DataTemplate.Triggers>
+                        <DataTrigger
 							Binding="{Binding Path=Severity}"
 							Value="Error">
-							<Setter
+                            <Setter
 								TargetName="item"
 								Property="Foreground"
 								Value="Red" />
-						</DataTrigger>
-						<DataTrigger
+                        </DataTrigger>
+                        <DataTrigger
 							Binding="{Binding Path=Severity}"
 							Value="Warning">
-							<Setter
+                            <Setter
 								TargetName="item"
 								Property="Foreground"
 								Value="Orange" />
-						</DataTrigger>
-					</DataTemplate.Triggers>
-				</DataTemplate>
-			</ListBox.ItemTemplate>
-		</ListBox>
+                        </DataTrigger>
+                    </DataTemplate.Triggers>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
     </Grid>
-</Window>
+</UserControl>

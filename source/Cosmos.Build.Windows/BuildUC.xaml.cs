@@ -18,7 +18,7 @@ using System.Collections.ObjectModel;
 using System.Windows.Threading;
 
 namespace Cosmos.Build.Windows {
-	
+
     public class BuildLogMessage {
 		public LogSeverityEnum Severity {
 			get;
@@ -34,8 +34,8 @@ namespace Cosmos.Build.Windows {
 		public BuildLogMessages() { }
 	}
 
-    public partial class BuildWindow : Window {
-        public BuildWindow() {
+    public partial class BuildUC : UserControl {
+        public BuildUC() {
             InitializeComponent();
             Messages = (BuildLogMessages)((ObjectDataProvider)FindResource("BuildMessages")).Data;
             if (Messages == null) {
@@ -214,8 +214,10 @@ namespace Cosmos.Build.Windows {
             if (totalCount <= 0) //Avoid Divide by Zero
                 totalCount = 1;
             long percentComplete = ((completedCount * 100 / totalCount));
-            if (percentComplete <= 0) //Avoid Divide by Zero
+            //Avoid Divide by Zero
+            if (percentComplete <= 0) {
                 percentComplete = 1;
+            }
 
             long remaining = ((xBuildTimer.ElapsedMilliseconds) / percentComplete) * (100 - percentComplete);
 

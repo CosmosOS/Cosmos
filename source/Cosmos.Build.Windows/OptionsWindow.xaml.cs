@@ -29,19 +29,17 @@ namespace Cosmos.Build.Windows {
 
         public static void Display() {
             int xConsoleWindow = GetConsoleWindow();
-            ShowWindow(xConsoleWindow,
-                       0);
+            ShowWindow(xConsoleWindow, 0);
 
             var xOptionsWindow = new OptionsWindow();
             if (xOptionsWindow.ShowDialog().Value) {
-                ShowWindow(xConsoleWindow,
-                           1);
+                ShowWindow(xConsoleWindow, 1);
                 xOptionsWindow.DoBuild();
 
                 //Debug Window is only displayed if Qemu + Debug checked, or if other VM + Debugport selected
                 bool xIsQemu = xOptionsWindow.rdioQEMU.IsChecked.Value;
                 bool xUseQemuDebug = xOptionsWindow.cmboDebugMode.SelectedIndex > 0;
-                if (((xIsQemu & xUseQemuDebug) | (!xIsQemu & (xOptionsWindow.mComport > 0))) && xOptionsWindow.mDebugMode != DebugModeEnum.None) {
+                if (((xIsQemu & xUseQemuDebug) | (!xIsQemu & (xOptionsWindow.mComPort > 0))) && xOptionsWindow.mDebugMode != DebugModeEnum.None) {
                     var xDebugWindow = new DebugWindow();
                     if (xOptionsWindow.mDebugMode == DebugModeEnum.Source) {
                         var xLabelByAddressMapping = ObjDump.GetLabelByAddressMapping(xOptionsWindow.mBuilder.BuildPath + "output.bin",
@@ -165,16 +163,16 @@ namespace Cosmos.Build.Windows {
         }
 
         private DebugModeEnum mDebugMode;
-        private byte mComport;
+        private byte mComPort;
 
         protected void DoBuild() {
             SaveSettingsToRegistry();
 
-            mComport = (byte)cmboDebugPort.SelectedIndex;
-            if (mComport > 3) {
+            mComPort = (byte)cmboDebugPort.SelectedIndex;
+            if (mComPort > 3) {
                 throw new Exception("Debug port not supported yet!");
             }
-            mComport++;
+            mComPort++;
             string xDebugMode = (string)cmboDebugMode.SelectedValue;
             mDebugMode = DebugModeEnum.None;
             if (xDebugMode == "IL") {
@@ -182,7 +180,7 @@ namespace Cosmos.Build.Windows {
                 throw new NotSupportedException("Debug mode IL isn't supported yet, use Source instead.");
             } else if (xDebugMode == "Source") {
                 mDebugMode = DebugModeEnum.Source;
-                mComport = 1;
+                mComPort = 1;
             } else if (xDebugMode == "None") {
                 mDebugMode = DebugModeEnum.None;
             } else {
@@ -190,55 +188,9 @@ namespace Cosmos.Build.Windows {
             }
 
             if (chckCompileIL.IsChecked.Value) {
-                Console.WriteLine("Compiling...");
-                var xBuildWindow = new BuildWindow();
-                IEnumerable<BuildLogMessage> xMessages = new BuildLogMessage[0];
-                mBuilder.PreventFreezing += xBuildWindow.PreventFreezing;
-                mBuilder.DebugLog += xBuildWindow.DoDebugMessage;
-                mBuilder.ProgressChanged += xBuildWindow.DoProgressMessage;
-                xBuildWindow.Show();
-                try {
-                    mBuilder.Compile(mDebugMode,
-                                     mComport);
-                    
-                    mBuilder.DebugLog -= xBuildWindow.DoDebugMessage;
-                    mBuilder.ProgressChanged -= xBuildWindow.DoProgressMessage;
-
-                    xMessages = (from item in xBuildWindow.Messages
-                                 where item.Severity != LogSeverityEnum.Informational
-                                 select item).ToArray();
-
-                    //If there were any warnings or errors, then show dialog again
-                    if (xMessages.Count() > 0) {
-                        xBuildWindow = new BuildWindow {
-                                                           BuildRunning = false
-                                                       };
-                        xBuildWindow.Messages.Clear();
-
-                        foreach (var item in xMessages) {
-                            xBuildWindow.Messages.Add(item);
-                        }
-                        xBuildWindow.ShowDialog();
-                        return;
-                    }
-                } catch (Exception E){
-                    if (xBuildWindow.Visibility == System.Windows.Visibility.Visible) {
-                        xBuildWindow.Close();
-                    }
-                    var xTheMessages = (from item in xBuildWindow.Messages
-                                 where item.Severity != LogSeverityEnum.Informational
-                                 select item).ToList();
-                    xTheMessages.Add(new BuildLogMessage() {
-                                                               Severity=LogSeverityEnum.Error,
-                                                               Message = E.ToString()
-                                                           });
-                    xBuildWindow = new BuildWindow();
-                        xBuildWindow.Messages.Clear();
-                        foreach (var item in xTheMessages)
-                    {
-                        xBuildWindow.Messages.Add(item);
-                    }
-                    xBuildWindow.ShowDialog();
+                var xMainWindow = new MainWindow();
+                xMainWindow.Show();
+                if (xMainWindow.PhaseBuild(mBuilder, mDebugMode, mComPort) == false) {
                     return;
                 }
             }

@@ -99,8 +99,7 @@ namespace Cosmos.Build.Windows
             }
         }
 
-        public void MakeISO()
-        {
+        public void MakeISO() {
             string xPath = BuildPath + @"ISO\";
             RemoveFile(BuildPath + "cosmos.iso");
             RemoveFile(xPath + "output.bin");
@@ -110,10 +109,8 @@ namespace Cosmos.Build.Windows
             Global.Call(ToolsPath + @"mkisofs.exe", @"-R -b isolinux.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o ..\Cosmos.iso .", xPath);
         }
 
-        private void DoDebugLog(LogSeverityEnum aSeverity, string aMessage)
-        {
-            if (DebugLog != null)
-            {
+        private void DoDebugLog(LogSeverityEnum aSeverity, string aMessage) {
+            if (DebugLog != null) {
                 DebugLog(aSeverity, aMessage);
             }
         }
@@ -121,11 +118,9 @@ namespace Cosmos.Build.Windows
         public event DebugLogHandler DebugLog;
         public event Action<int, int, string> ProgressChanged;
 
-        public void Compile(DebugModeEnum aDebugMode, byte aDebugComport)
-        {
+        public void Compile(DebugModeEnum aDebugMode, byte aDebugComport) {
             string xAsmPath = ToolsPath + @"asm\";
-            if (!Directory.Exists(xAsmPath))
-            {
+            if (!Directory.Exists(xAsmPath)) {
                 Directory.CreateDirectory(xAsmPath);
             }
             Assembly xTarget = System.Reflection.Assembly.GetEntryAssembly();
