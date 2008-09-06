@@ -39,6 +39,7 @@ namespace FrodeTest.Test
             Check.Text = "GetFiles";
             Check.Validate(Directory.GetFiles("/0/Alfa/").Length == 0);
             Check.Validate(Directory.GetFiles("/0/Alfa/Bravo/").Length == 1);
+            Check.Validate(Directory.GetFiles("/0/Alfa/Bravo/", "*", SearchOption.TopDirectoryOnly).Length == 1);
 
             Check.Text = "GetLogicalDrives";
             Check.Validate(Directory.GetLogicalDrives().Length == 2);

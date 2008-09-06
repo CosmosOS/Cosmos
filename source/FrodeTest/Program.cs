@@ -54,7 +54,7 @@ namespace FrodeTest
                 //Test.BasicTest.RunTest();
                 //Test.SwitchTest.RunTest();
                 //Console.ReadLine();
-                Test.BoolTest.RunTest();
+                //Test.BoolTest.RunTest();
                 //Test.InterfaceTest.RunTest();
                 //Test.ExtensionMethodsTest.RunTest();
                 //Test.BinaryHelperTest.RunTest();
@@ -70,9 +70,9 @@ namespace FrodeTest
                 //Test.FilesystemEntryTest.RunTest();
                 //Test.VirtualFileSystemTest.RunTest();
                 //Test.Ext2Test.RunTest();
-                //Test.DirectoryTest.RunTest();
+                Test.DirectoryTest.RunTest();
                 //Test.FileTest.RunTest();
-                //Test.DirectoryInfoTest.RunTest();
+                Test.DirectoryInfoTest.RunTest();
                 //Test.FileInfoTest.RunTest();
 
                 //Tests ready for Matthijs to fix ;)

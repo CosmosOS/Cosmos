@@ -586,6 +586,26 @@ namespace Cosmos.Sys {
             return xDrives.ToArray();
         }
 
+        //Mimics the behaviour of System.IO.Directory.InternalGetFileDirectoryNames
+        public static string[] InternalGetFileDirectoryNames(string path, string userPathOriginal, string searchPattern, bool includeFiles, bool includeDirs, SearchOption searchOption)
+        {
+            //TODO: Add SearchOption functionality
+            //TODO: What is userPathOriginal?
+            //TODO: Add SearchPattern functionality
 
+            List<string> xFileAndDirectoryNames = new List<string>();
+            
+            FilesystemEntry[] xEntries = VFSManager.GetDirectoryListing(path);
+
+            foreach (FilesystemEntry xEntry in xEntries)
+            {
+                if (xEntry.IsDirectory && includeDirs)
+                    xFileAndDirectoryNames.Add(xEntry.Name);
+                else if (!xEntry.IsDirectory && includeFiles)
+                    xFileAndDirectoryNames.Add(xEntry.Name);
+            }
+
+            return xFileAndDirectoryNames.ToArray();
+        }
     }
 }
