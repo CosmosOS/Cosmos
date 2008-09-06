@@ -174,7 +174,7 @@ namespace Indy.IL2CPU {
                 return mProgressMessage;
             }
             set {
-                //mProgressMessage = value;
+                mProgressMessage = value;
                 OnProgressChanged();
             }
         }

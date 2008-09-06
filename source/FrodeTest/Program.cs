@@ -27,7 +27,7 @@ namespace FrodeTest
             {
                 //while (true)
                 //Console.Beep(2000, 2);
-                Console.Beep();
+                //Console.Beep();
                     //Cosmos.Hardware.PIT.PlaySound(3000);
                 //Console.Beep();
                 //Shell.Session.Run();
@@ -54,7 +54,7 @@ namespace FrodeTest
                 //Test.BasicTest.RunTest();
                 //Test.SwitchTest.RunTest();
                 //Console.ReadLine();
-                //Test.BoolTest.RunTest();
+                Test.BoolTest.RunTest();
                 //Test.InterfaceTest.RunTest();
                 //Test.ExtensionMethodsTest.RunTest();
                 //Test.BinaryHelperTest.RunTest();
