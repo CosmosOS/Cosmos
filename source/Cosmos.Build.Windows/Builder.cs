@@ -11,12 +11,12 @@ using Microsoft.Win32;
 using Indy.IL2CPU;
 using Indy.IL2CPU.IL.X86;
 
-namespace Cosmos.Build.Windows
-{
-    public class Builder
-    {
+namespace Cosmos.Build.Windows {
+
+    public class Builder {
         public string BuildPath;
         public readonly string ToolsPath;
+        
         public Builder()
         {
             BuildPath = GetBuildPath();
@@ -24,7 +24,7 @@ namespace Cosmos.Build.Windows
             // MtW: leave this here, otherwise VS wont copy required dependencies!
             typeof(X86OpCodeMap).Equals(null);
         }
-
+        
         /// <summary>
         /// Retrieves the path to the Build directory.
         /// Looks first in the Registry. If no match found there it will use the Current Directory to calculate the

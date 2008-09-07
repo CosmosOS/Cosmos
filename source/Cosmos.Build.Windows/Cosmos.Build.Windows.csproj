@@ -54,6 +54,7 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -98,6 +99,7 @@
     <Compile Include="BuildUC.xaml.cs">
       <DependentUpon>BuildUC.xaml</DependentUpon>
     </Compile>
+    <Compile Include="KeyState.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>

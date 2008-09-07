@@ -18,8 +18,7 @@ using System.Windows.Threading;
 namespace Cosmos.Build.Windows {
     public partial class OptionsWindow : Window {
         [DllImport("user32.dll")]
-        public static extern int ShowWindow(int Handle,
-                                            int showState);
+        public static extern int ShowWindow(int Handle, int showState);
 
         [DllImport("kernel32.dll")]
         public static extern int GetConsoleWindow();
@@ -32,7 +31,22 @@ namespace Cosmos.Build.Windows {
             ShowWindow(xConsoleWindow, 0);
 
             var xOptionsWindow = new OptionsWindow();
-            if (xOptionsWindow.ShowDialog().Value) {
+            bool xDoBuild = true;
+            var xShowOptions = xOptionsWindow.chbxShowOptions.IsChecked.Value;
+            // If the user doenst have the option to auto show, then look
+            // for control key pressed
+            if (!xShowOptions) {
+                // We should use the WPF Keyboard.IsKeyDown, but it does not work here.
+                // It appears that it gets initialized at some point later
+                // or after a WPF window is shown, but it does not work here for sure
+                // so instead we have to us an extern.
+                xShowOptions = KeyState.IsKeyDown(System.Windows.Forms.Keys.RControlKey)
+                    || KeyState.IsKeyDown(System.Windows.Forms.Keys.LControlKey);
+            }
+            if (xShowOptions) {
+                xDoBuild = xOptionsWindow.ShowDialog().Value;
+            }
+            if (xDoBuild) {
                 ShowWindow(xConsoleWindow, 1);
                 xOptionsWindow.DoBuild();
 
@@ -153,12 +167,10 @@ namespace Cosmos.Build.Windows {
             foreach (string sc in Enum.GetNames(typeof(Builder.QemuAudioCard))) {
                 cmboAudioCards.Items.Add(sc);
             }
-
             LoadSettingsFromRegistry();
         }
 
-        private void butnBuild_Click(object sender,
-                                     RoutedEventArgs e) {
+        private void butnBuild_Click(object sender, RoutedEventArgs e) {
             DialogResult = true;
         }
 
@@ -187,7 +199,7 @@ namespace Cosmos.Build.Windows {
                 throw new Exception("Selected debug mode not supported!");
             }
 
-            if (chckCompileIL.IsChecked.Value) {
+            if (chbxCompileIL.IsChecked.Value) {
                 var xMainWindow = new MainWindow();
                 xMainWindow.Show();
                 if (xMainWindow.PhaseBuild(mBuilder, mDebugMode, mComPort) == false) {
@@ -215,8 +227,7 @@ namespace Cosmos.Build.Windows {
             }
         }
 
-        private void butnCancel_Click(object sender,
-                                      RoutedEventArgs e) {
+        private void butnCancel_Click(object sender, RoutedEventArgs e) {
             DialogResult = false;
         }
 
@@ -236,17 +247,15 @@ namespace Cosmos.Build.Windows {
                 } else if (rdioUSB.IsChecked.Value) {
                     xTarget = "USB";
                 }
-                xKey.SetValue("Target",
-                              xTarget);
+                xKey.SetValue("Target", xTarget);
 
-                // General
-                xKey.SetValue("Compile IL",
-                              true,  //Force checkbox to be on, was chckCompileIL.IsChecked.Value,
-                              RegistryValueKind.DWord);
-                xKey.SetValue("Debug Port",
-                              cmboDebugPort.Text);
-                xKey.SetValue("Debug Mode",
-                              cmboDebugMode.Text);
+                // Misc
+                xKey.SetValue("Show Options Window", chbxShowOptions.IsChecked.Value, RegistryValueKind.DWord);
+                //Force checkbox to be on, was chckCompileIL.IsChecked.Value,
+                xKey.SetValue("Compile IL", true, RegistryValueKind.DWord);
+                              
+                xKey.SetValue("Debug Port", cmboDebugPort.Text);
+                xKey.SetValue("Debug Mode", cmboDebugMode.Text);
 
                 // QEMU
                 xKey.SetValue("Use GDB",
@@ -271,13 +280,11 @@ namespace Cosmos.Build.Windows {
                 } else if (rdVMWareWorkstation.IsChecked.Value) {
                     xVMWareVersion = "VMWare Workstation";
                 }
-                xKey.SetValue("VMWare Version",
-                              xVMWareVersion);
+                xKey.SetValue("VMWare Version", xVMWareVersion);
 
                 // USB
                 if (cmboUSBDevice.SelectedItem != null) {
-                    xKey.SetValue("USB Device",
-                                  cmboUSBDevice.Text);
+                    xKey.SetValue("USB Device", cmboUSBDevice.Text);
                 }
             }
         }
@@ -307,9 +314,10 @@ namespace Cosmos.Build.Windows {
                         break;
                 }
 
-                // General
-                chckCompileIL.IsChecked = ((int)xKey.GetValue("Compile IL",
-                                                              1) != 0);
+                // Misc
+                chbxShowOptions.IsChecked = ((int)xKey.GetValue("Show Options Window", 1) != 0);
+                chbxCompileIL.IsChecked = ((int)xKey.GetValue("Compile IL", 1) != 0);
+                
                 cmboDebugPort.SelectedIndex = cmboDebugPort.Items.IndexOf(xKey.GetValue("Debug Port",
                                                                                         ""));
                 if (cmboDebugPort.SelectedIndex == -1) {
@@ -333,8 +341,7 @@ namespace Cosmos.Build.Windows {
                 cmboAudioCards.SelectedIndex = cmboAudioCards.Items.IndexOf(xKey.GetValue("Audio Card",
                                                                                           Builder.QemuAudioCard.es1370.ToString()));
                 // VMWare
-                string xVMWareVersion = (string)xKey.GetValue("VMWare Version",
-                                                              "VMWare Server");
+                string xVMWareVersion = (string)xKey.GetValue("VMWare Version", "VMWare Server");
                 switch (xVMWareVersion) {
                     case "VMWare Server":
                         rdVMWareServer.IsChecked = true;
@@ -345,8 +352,7 @@ namespace Cosmos.Build.Windows {
                 }
 
                 // USB
-                cmboUSBDevice.SelectedIndex = cmboUSBDevice.Items.IndexOf(xKey.GetValue("USB Device",
-                                                                                        ""));
+                cmboUSBDevice.SelectedIndex = cmboUSBDevice.Items.IndexOf(xKey.GetValue("USB Device", ""));
             }
         }
     }
