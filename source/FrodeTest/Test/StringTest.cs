@@ -122,9 +122,13 @@ namespace FrodeTest.Test
             Check.Text = "String.Split";
             Check.Validate("Hello World".Split(new string[] { "l" }, 30, StringSplitOptions.RemoveEmptyEntries).Length == 3);
 
-            //Check.Text = "String.StartsWith";
-            //Check.Validate("test".StartsWith("te"));
-            //Check.Validate(!"test".StartsWith("boo", false, System.Globalization.CultureInfo.CurrentCulture));
+            Check.Text = "String.StartsWith";
+            Check.Validate("test".StartsWith("te"));
+            Check.Validate("test".StartsWith("te", StringComparison.CurrentCulture));
+            Check.Validate(!"test".StartsWith("boo", false, System.Globalization.CultureInfo.CurrentCulture));
+            Check.Validate("test".StartsWith("test"));
+            Check.Validate(!"test".StartsWith("testlong"));
+
 
             Check.Text = "String.Substring";
             Check.Validate("test".Substring(1, 2).Equals("es"));

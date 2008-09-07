@@ -222,6 +222,21 @@ namespace Cosmos.Kernel.Plugs {
                 return -1;
         }
 
+        public static bool StartsWith(string aThis, string aSubStr, StringComparison aComparison)
+        {
+            return StartsWith(aThis, aSubStr, true, null);
+        }
+
+        public static bool StartsWith(string aThis, string aSubStr, bool aIgnoreCase, System.Globalization.CultureInfo aCulture)
+        {
+            for (int i = 0; i < aSubStr.Length; i++)
+            {
+                if (aThis[i] != aSubStr[i])
+                    return false;
+            }
+            return true;
+        }
+
         public static string Substring(string aThis,
                                        int aStartIndex,
                                        int aCount) {
