@@ -32,31 +32,6 @@ namespace Indy.IL2CPU.CustomImplementation.System {
 			return String.Concat(xStrings);
 		}
 
-        //Plugged in Cosmos.Kernel.Plugs/String.cs
-        //public static int IndexOf(string aThis, char c, int offset, int count)
-        //{
-        //    for (int i = offset ; i < count; i++)
-        //    {
-        //        if (aThis[i] == c)
-        //        {
-        //            return i;
-        //        }
-        //    }
-        //    return -1;
-        //}
-
-        public static int LastIndexOf(string aThis, char c)
-        {
-            for (int i = aThis.Length; i < 0; i++)
-            {
-                if (aThis[i] == c)
-                {
-                    return i;
-                }
-            }
-            return -1;
-        }
-
         public static string PadHelper(string aThis, int totalWidth, char paddingChar, bool isRightPadded)
         {
             char[] cs = new char[totalWidth];

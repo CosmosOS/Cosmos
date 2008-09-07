@@ -19,6 +19,9 @@ namespace FrodeTest.Test
             Check.Validate(!Directory.Exists("/0/InvalidDir/"));
 
             Check.Text = "GetDirectories";
+            foreach (string dir in Directory.GetDirectories("/0"))
+                Console.WriteLine("Dir: " + dir);
+
             //Check.Validate(Directory.GetDirectories("/0/").Length == 3);
             Check.Validate(Directory.GetDirectories("/0/Alfa/").Length == 1);
             try //Should throw a DirectoryNotFoundException
@@ -76,8 +79,8 @@ namespace FrodeTest.Test
 
             //Check.Validate(Directory.GetParent("/") == null);
 
-            Check.Text = "New VolumeSeparator";
-            Check.Validate(Directory.Exists(@"0:/Alfa/"));
+            //Check.Text = "New VolumeSeparator";
+            //Check.Validate(Directory.Exists(@"0:/Alfa/"));
         }
     }
 }

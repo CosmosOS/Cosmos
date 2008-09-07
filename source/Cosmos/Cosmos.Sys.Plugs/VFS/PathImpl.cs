@@ -14,36 +14,75 @@ namespace Cosmos.Sys.Plugs {
         /// </summary>
         /// <param name="aPath"></param>
         /// <returns></returns>
-        public static string GetDirectoryName(string aPath) 
+        //public static string GetDirectoryName(string aPath) 
+        //{
+        //    int xIndex = aPath.LastIndexOfAny(new char[] {'/', '\\'});
+        //    if (xIndex == -1) {
+        //        return aPath;
+        //    }
+        //    return aPath.Substring(0, xIndex);
+        //}
+
+        //public static string GetFileName(string aPath)
+        //{
+        //    int xIndex = aPath.LastIndexOfAny(new char[] { '/', '\\' });
+        //    if (xIndex == -1)
+        //    {
+        //        return aPath;
+        //    }
+        //    return aPath.Substring(xIndex + 1, aPath.Length - xIndex - 1);
+        //}
+
+        //public static string GetPathRoot(string aPath)
+        //{
+        //    if (aPath.IsAbsolutePath())
+        //        return new String(new char[] { aPath[0], aPath[1], aPath[2] });
+        //    else
+        //        return String.Empty;
+        //}
+
+        //public static bool IsPathRooted(string aPath)
+        //{
+        //    return aPath.IsAbsolutePath();
+        //}
+
+        public static string GetFullPath(string aPath)
         {
-            int xIndex = aPath.LastIndexOfAny(new char[] {'/', '\\'});
-            if (xIndex == -1) {
-                return aPath;
-            }
-            return aPath.Substring(0, xIndex);
+            //Plug is used to avoid call to FileIOPermission
+            return GetGetFullPathInternalPath(aPath);
         }
 
-        public static string GetFileName(string aPath)
+        public static string GetGetFullPathInternalPath(string aPath)
         {
-            int xIndex = aPath.LastIndexOfAny(new char[] { '/', '\\' });
-            if (xIndex == -1)
+            //Exact copy of .NET's version of GetGetFullPathInternalPath
+            if (aPath == null)
             {
-                return aPath;
+                throw new ArgumentNullException("path");
             }
-            return aPath.Substring(xIndex + 1, aPath.Length - xIndex - 1);
+            return NormalizePath(aPath, true);
         }
 
-        public static string GetPathRoot(string aPath)
+        public static string NormalizePath(string aPath, bool aFullCheck)
         {
-            if (aPath.IsAbsolutePath())
-                return new String(new char[]{aPath[0], aPath[1], aPath[2]});
-            else
-                return String.Empty;
+            if (aPath.IsRelativePath())
+                return Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + aPath;
+            else 
+                return aPath.TrimEnd(new char[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar });
         }
 
-        public static bool IsPathRooted(string aPath)
+        public static string GetRandomFileName()
         {
-            return aPath.IsAbsolutePath();
+            return "random.tmp";
+        }
+
+        public static string GetTempFileName()
+        {
+            return "\0\tempfile.tmp";
+        }
+
+        public static string GetTempPath()
+        {
+            return @"\0\Temp";
         }
     }
 }

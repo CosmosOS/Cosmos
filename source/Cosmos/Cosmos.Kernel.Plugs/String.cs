@@ -168,6 +168,11 @@ namespace Cosmos.Kernel.Plugs {
             return xResult;
         }
 
+        public static int LastIndexOf(string aThis, char aChar, int aStartIndex, int aCount)
+        {
+            return LastIndexOfAny(aThis, new char[] {aChar}, aStartIndex, aCount);
+        }
+
         public static int LastIndexOfAny(string aThis,
                                          char[] aChars,
                                          int aStartIndex,

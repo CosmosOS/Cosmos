@@ -63,19 +63,21 @@ namespace Cosmos.Sys {
         //  ..\Other\File.txt
         //  ..\..\Other
 
-        public static bool ContainsVolumeSeparator(this string aPath)
-        {
-            return (aPath[1] == Path.VolumeSeparatorChar);
-        }
+        //public static bool ContainsVolumeSeparator(this string aPath)
+        //{
+        //    return (aPath[1] == Path.VolumeSeparatorChar);
+        //}
 
         public static bool IsAbsolutePath(this string aPath)
         {
-            return aPath.ContainsVolumeSeparator();
+            return ((aPath[0] == Path.DirectorySeparatorChar) || aPath[0] == Path.AltDirectorySeparatorChar);
+            //return aPath.ContainsVolumeSeparator();
         }
 
         public static bool IsRelativePath(this string aPath)
         {
-            return !aPath.ContainsVolumeSeparator();
+            return ((aPath[0] != Path.DirectorySeparatorChar) || aPath[0] != Path.AltDirectorySeparatorChar);
+            //return !aPath.ContainsVolumeSeparator();
         }
 
         public static string[] SplitPath(string aPath)
@@ -594,7 +596,16 @@ namespace Cosmos.Sys {
             //TODO: Add SearchPattern functionality
 
             List<string> xFileAndDirectoryNames = new List<string>();
+
+            //Validate input arguments
+            if ((searchOption != SearchOption.TopDirectoryOnly) && (searchOption != SearchOption.AllDirectories))
+                throw new ArgumentOutOfRangeException("searchOption");
+
+            searchPattern = searchPattern.TrimEnd(new char[0]);
+            if (searchPattern.Length == 0)
+                return new string[0];
             
+            //Perform search in filesystem
             FilesystemEntry[] xEntries = VFSManager.GetDirectoryListing(path);
 
             foreach (FilesystemEntry xEntry in xEntries)

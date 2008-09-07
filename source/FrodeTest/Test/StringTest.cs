@@ -11,6 +11,16 @@ namespace FrodeTest.Test
         {
             Console.WriteLine("-- Testing String --");
 
+            Check.Text = "String.IndexOf(char, int, int);";
+            Check.Validate("otto".IndexOf('0', 1, 1) == -1);
+
+            Check.Text = "String.LastIndexOf(char)";
+            //Console.WriteLine("Readme.txt".LastIndexOf('.'));
+            Check.Validate("Readme.txt".LastIndexOf('.') == 6);
+
+            Check.Text = "String.Length";
+            Check.Validate("StringWithLength18".Length == 18);
+
             //Console.Write("LeftPadding: ");
             //string hex = "F";
             //hex = hex.PadLeft(2, '0');
@@ -59,12 +69,12 @@ namespace FrodeTest.Test
 
             //Bug, found 4.aug
             //Printing 0:\ will print previous string in buffer instead!
-            Console.WriteLine("This should be printed ONCE");
-            Console.WriteLine("\\");
-            Console.WriteLine(@"0:\");
-            Console.WriteLine(@"\");
-            Console.WriteLine("Long string \\ Long String");
-            Console.WriteLine("Back to normal");
+            //Console.WriteLine("This should be printed ONCE");
+            //Console.WriteLine("\\");
+            //Console.WriteLine(@"0:\");
+            //Console.WriteLine(@"\");
+            //Console.WriteLine("Long string \\ Long String");
+            //Console.WriteLine("Back to normal");
 
             //Bug
             //string xTemp = "\\";
@@ -78,8 +88,7 @@ namespace FrodeTest.Test
             //Console.WriteLine("Should be  0: " + "otto".IndexOf('o'));
             //Console.WriteLine("Should be  3: " + "otto".IndexOf('o', 1));
             //Console.WriteLine("Should be -1: " + "otto".IndexOf('o', 1, 1));
-            Check.Text = "IndexOf(char, int, int);";
-            Check.Validate("otto".IndexOf('0', 1, 1) == -1);
+            
             //Console.WriteLine("otto".IndexOf("tt"));
 
             //.Replace
@@ -87,6 +96,7 @@ namespace FrodeTest.Test
 
             // Add \t as Tab
             //Console.WriteLine("Column1\tColumn2");
+
 
         }
     }

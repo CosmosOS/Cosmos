@@ -31,5 +31,12 @@ namespace FrodeTest
             Console.WriteLine("FAIL [" + Text + "]");
             Console.ForegroundColor = ConsoleColor.White;
         }
+
+        internal static void SetHeadingText(string heading)
+        {
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine("-- " + heading + " --");
+            Console.ForegroundColor = ConsoleColor.White;
+        }
     }
 }

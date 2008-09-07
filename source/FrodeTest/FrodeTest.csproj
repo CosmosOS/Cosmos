@@ -89,6 +89,7 @@
     <Compile Include="Test\Mock\FakeBroadcastPacket.cs" />
     <Compile Include="Test\NumberSystemTest.cs" />
     <Compile Include="Test\PacketHeaderTest.cs" />
+    <Compile Include="Test\PathTest.cs" />
     <Compile Include="Test\RAMBusTest.cs" />
     <Compile Include="Test\RTL8139Test.cs" />
     <Compile Include="Test\StringTest.cs" />
