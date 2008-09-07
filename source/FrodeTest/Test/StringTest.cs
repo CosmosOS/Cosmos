@@ -9,22 +9,148 @@ namespace FrodeTest.Test
     {
         public static void RunTest()
         {
-            Console.WriteLine("-- Testing String --");
+            Check.SetHeadingText("Testing System.String - Static methods");
 
-            Check.Text = "String.IndexOf(char, int, int);";
-            Check.Validate("otto".IndexOf('0', 1, 1) == -1);
+            //Static methods
+            //Check.Text = "String.Compare";
+            //Check.Validate(String.Compare("test", "test") == 0);
+            //Check.Validate(String.Compare("test", "other") == 1);
 
-            Check.Text = "String.LastIndexOf(char)";
-            //Console.WriteLine("Readme.txt".LastIndexOf('.'));
+            Check.Text = "String.CompareOrdinal";
+            Check.Validate(String.CompareOrdinal("test", "test") == 0);
+            Check.Validate(String.CompareOrdinal("test", "other") == 5);
+
+            Check.Text = "String.Concat";
+            Check.Validate(String.Concat("A", "B", "C", "D").Equals("ABCD"));
+
+            Check.Text = "String.Copy";
+            Check.Validate(String.Copy("test").Equals("test"));
+
+            Check.Text = "String.Equals";
+            Check.Validate(String.Equals("test", "test", StringComparison.OrdinalIgnoreCase));
+            Check.Validate(!String.Equals("test", "other", StringComparison.CurrentCulture));
+
+            Check.Text = "String.Format";
+            Check.Validate(String.Format("Word:{0}", "Format").Equals("Word:Format"));
+
+            //Check.Text = "String.Intern";
+            //Check.Validate(String.Intern("test").Equals("test"));
+
+            //Check.Text = "String.IsInterned";
+            //Check.Validate(String.IsInterned("test").Equals("test"));
+
+            Check.Text = "String.IsNullOrEmpty";
+            Check.Validate(String.IsNullOrEmpty(null));
+            Check.Validate(String.IsNullOrEmpty(String.Empty));
+            Check.Validate(!String.IsNullOrEmpty("not empty"));
+
+            Check.Text = "String.Join";
+            Check.Validate(String.Join(":", new string[] { "Hello", "World" }, 0, 2).Equals("Hello:World"));
+
+
+            Check.SetHeadingText("Testing System.String - Instance methods");
+
+            Check.Text = "String.Clone";
+            Check.Validate("test".Clone().ToString() == "test");
+
+            Check.Text = "String.CompareTo";
+            Check.Validate("test".CompareTo("test") == 0);
+
+            Check.Text = "String.Contains";
+            Check.Validate("test".Contains("e"));
+
+            Check.Text = "String.CopyTo";
+            char[] destination = new char[10];
+            "test".CopyTo(0, destination, 0, 4);
+            Check.Validate((destination[0] == 't') && (destination[1] == 'e') && (destination[2] == 's') && (destination[3] == 't'));
+
+            //Check.Text = "String.EndsWith";
+            //Check.Validate("test".EndsWith("st"));
+            //Check.Validate("test".EndsWith("st", StringComparison.CurrentCulture));
+
+            Check.Text = "String.IndexOf";
+            Check.Validate("test".IndexOf('t', 0, 2) == 0);
+            Check.Validate("test".IndexOf('B', 1, 1) == -1);
+
+            Check.Text = "String.IndexOfAny";
+            Check.Validate("test".IndexOfAny(new char[] { 'a', 'b' }, 0, 4) == -1);
+            Check.Validate("test".IndexOfAny(new char[] { 'e', 's' }, 0, 4) == 1);
+
+            //Check.Text = "String.Insert";
+            //Check.Validate("Hello".Insert(5, " World").Equals("Hello World"));
+            
+            //Check.Text = "String.IsNormalized";
+            //Check.Validate("test".IsNormalized());
+
+            Check.Text = "String.LastIndexOf";
             Check.Validate("Readme.txt".LastIndexOf('.') == 6);
+
+            Check.Text = "String.LastIndexOfAny";
+            Check.Validate("test".LastIndexOfAny(new char[] { 'a', 'b' }, 0, 4) == -1);
+            Check.Validate("test".LastIndexOfAny(new char[] { 'a', 't' }, 3, 4) == 3);
 
             Check.Text = "String.Length";
             Check.Validate("StringWithLength18".Length == 18);
 
-            //Console.Write("LeftPadding: ");
-            //string hex = "F";
-            //hex = hex.PadLeft(2, '0');
-            //Console.WriteLine(hex);
+            //Check.Text = "String.Normalize";
+            //Check.Validate("test".Normalize(NormalizationForm.FormKD).Equals("test"));
+
+            Check.Text = "String.PadLeft";
+            Check.Validate("test".PadLeft(8, '!').Equals("!!!!test"));
+
+            Check.Text = "String.PadRight";
+            Check.Validate("test".PadRight(8, '!').Equals("test!!!!"));
+
+            Check.Text = "String.Remove";
+            Check.Validate("test".Remove(2).Equals("te"));
+            Check.Validate("test".Remove(1, 2).Equals("tt"));
+
+            Check.Text = "String.Replace(char, char)";
+            Check.Validate("test".Replace('t', 'p').Equals("pesp"));
+            Check.Text = "String.Replace(string, string)";
+            //Check.Validate("test".Replace("es", "amti").Equals("tamtit")); //Uses .Insert - fix that first.
+
+            Check.Text = "String.Split";
+            Check.Validate("Hello World".Split(new string[] { "l" }, 30, StringSplitOptions.RemoveEmptyEntries).Length == 3);
+
+            //Check.Text = "String.StartsWith";
+            //Check.Validate("test".StartsWith("te"));
+            //Check.Validate(!"test".StartsWith("boo", false, System.Globalization.CultureInfo.CurrentCulture));
+
+            Check.Text = "String.Substring";
+            Check.Validate("test".Substring(1, 2).Equals("es"));
+
+            Check.Text = "String.ToCharArray";
+            Check.Validate("test".ToCharArray().Length == 4);
+            Check.Validate(("test".ToCharArray()[0] == 't') && ("test".ToCharArray()[2] == 's'));
+
+            //Check.Text = "String.ToLower";
+            //Check.Validate("tESt".ToLower().Equals("test"));
+
+            //Check.Text = "String.ToLowerInvariant";
+            //Check.Validate("tESt".ToLowerInvariant().Equals("test"));
+
+            Check.Text = "String.ToString";
+            Check.Validate("test".ToString().Equals("test"));
+
+            //Check.Text = "String.ToUpper";
+            //Check.Validate("test".ToUpper().Equals("TEST"));
+
+            //Check.Text = "String.ToUpperInvariant";
+            //Check.Validate("test".ToUpperInvariant().Equals("TEST"));
+
+            Check.Text = "String.Trim";
+            Check.Validate("  test  .".Trim(new char[] { ' ', '.' }).Equals("test"));
+
+            Check.Text = "String.TrimEnd";
+            Check.Validate("test".TrimEnd(new char[] {'t'}).Equals("tes"));
+
+            Check.Text = "String.TrimStart";
+            Check.Validate("test".TrimStart(new char[] { 't' }).Equals("est"));
+
+
+
+            // VARIOUS BUGS ETC.
 
             //Add char and string
             //Bug discovered 7.june. SysFault when adding char and string.
@@ -38,34 +164,6 @@ namespace FrodeTest.Test
             //sb.Append(Environment.NewLine);
             //sb.Append("Works");
             //Console.WriteLine(sb.ToString());
-
-            //.Contains
-            //Bug discovered 30.july
-            //string xStringWithWorld = "HelloWorld!";
-            //if (xStringWithWorld.Contains("World"))
-            //    Console.WriteLine("Contains works!");
-            //else
-            //    Console.WriteLine("Contains doesn't work");
-
-            //Splitting
-            //string sentence = "This is a long string with many words";
-            //string[] words = sentence.Split((char)' ');
-            //Console.WriteLine(words[3]);
-            //Console.WriteLine(words[5]);
-
-            ////.StartsWith
-            //string xBeginWithHello = "Hello world";
-            //if (xBeginWithHello.StartsWith("Hello"))
-            //    Console.WriteLine(".StartsWith works");
-            //else
-            //    Console.WriteLine(".StartsWith FAILS!");
-
-            //.EndsWith
-            //string xEndsWithWorld = "Hello World";
-            //if (xEndsWithWorld.EndsWith("World"))
-            //    Console.WriteLine(".EndsWith works");
-            //else
-            //    Console.WriteLine(".EndsWith FAILS!");
 
             //Bug, found 4.aug
             //Printing 0:\ will print previous string in buffer instead!
@@ -83,16 +181,6 @@ namespace FrodeTest.Test
             //{
             //    Console.Write(((byte)xTemp[i]).ToString());
             //}
-
-            //.IndexOf
-            //Console.WriteLine("Should be  0: " + "otto".IndexOf('o'));
-            //Console.WriteLine("Should be  3: " + "otto".IndexOf('o', 1));
-            //Console.WriteLine("Should be -1: " + "otto".IndexOf('o', 1, 1));
-            
-            //Console.WriteLine("otto".IndexOf("tt"));
-
-            //.Replace
-            //Console.WriteLine("Hello".Replace('l', 'E'));
 
             // Add \t as Tab
             //Console.WriteLine("Column1\tColumn2");

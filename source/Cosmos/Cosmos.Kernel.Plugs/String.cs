@@ -156,11 +156,13 @@ namespace Cosmos.Kernel.Plugs {
 
         public static int IndexOfAny(string aThis,
                                      char[] aSeparators,
-                                     int aStartIndex) {
+                                     int aStartIndex,
+                                     int aLength) {
             int xResult = -1;
             for (int i = 0; i < aSeparators.Length; i++) {
                 var xValue = aThis.IndexOf(aSeparators[i],
-                                           aStartIndex);
+                                           aStartIndex, 
+                                           aLength);
                 if (xValue < xResult || xResult == -1) {
                     xResult = xValue;
                 }
@@ -186,6 +188,15 @@ namespace Cosmos.Kernel.Plugs {
             return -1;
         }
 
+        public static int nativeCompareOrdinalEx(string aStrA, int aIndexA, string aStrB, int aIndexB, int aCount)
+        {
+            //Just a basic implementation
+            if (aStrA == aStrB)
+                return 0;
+            else
+                return -1;
+        }
+
         public static string Substring(string aThis,
                                        int aStartIndex,
                                        int aCount) {
@@ -196,37 +207,49 @@ namespace Cosmos.Kernel.Plugs {
             return new string(xChars);
         }
 
-        private static string[] Split(string aThis,
-                                      char[] aSeparators,
-                                      StringSplitOptions aSplitOptions) {
-            List<string> xResult = new List<string>();
-            int xCurPos = 0;
-            if (CharArrayContainsChar(aSeparators,
-                                      aThis[0])) {
-                xCurPos = 1;
-                if (aSplitOptions == StringSplitOptions.None) {
-                    xResult.Add("");
-                }
-            }
-            while (xCurPos < aThis.Length) {
-                int xNextPos = IndexOfAny(aThis,
-                                          aSeparators,
-                                          xCurPos);
-                if (xNextPos == -1) {
-                    xResult.Add(aThis.Substring(xCurPos));
-                    break;
-                }
-                if (xNextPos == xCurPos) {
-                    if (aSplitOptions == StringSplitOptions.None) {
-                        xResult.Add("");
-                    }
-                    xCurPos = xNextPos + 1;
-                }
-                xResult.Add(aThis.Substring(xCurPos,
-                                            xNextPos - xCurPos));
-                xCurPos = xNextPos + 1;
-            }
-            return xResult.ToArray();
+        public static string Remove(string aThis, int aStart, int aCount)
+        {
+            return aThis.Substring(0, aStart) + aThis.Substring(aStart+aCount, aThis.Length-(aStart+aCount));
         }
+
+        //private static string[] Split(string aThis,
+        //                              char[] aSeparators,
+        //                              StringSplitOptions aSplitOptions)
+        //{
+        //    List<string> xResult = new List<string>();
+        //    int xCurPos = 0;
+        //    if (CharArrayContainsChar(aSeparators,
+        //                              aThis[0]))
+        //    {
+        //        xCurPos = 1;
+        //        if (aSplitOptions == StringSplitOptions.None)
+        //        {
+        //            xResult.Add("");
+        //        }
+        //    }
+        //    while (xCurPos < aThis.Length)
+        //    {
+        //        int xNextPos = String.IndexOfAny(aThis,
+        //                                  aSeparators,
+        //                                  xCurPos, aThis.Length - xCurPos);
+        //        if (xNextPos == -1)
+        //        {
+        //            xResult.Add(aThis.Substring(xCurPos));
+        //            break;
+        //        }
+        //        if (xNextPos == xCurPos)
+        //        {
+        //            if (aSplitOptions == StringSplitOptions.None)
+        //            {
+        //                xResult.Add("");
+        //            }
+        //            xCurPos = xNextPos + 1;
+        //        }
+        //        xResult.Add(aThis.Substring(xCurPos,
+        //                                    xNextPos - xCurPos));
+        //        xCurPos = xNextPos + 1;
+        //    }
+        //    return xResult.ToArray();
+        //}
     }
 }

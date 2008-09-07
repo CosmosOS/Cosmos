@@ -49,7 +49,7 @@ namespace FrodeTest
                 //TEST FRAMEWORK
                 //Console.WriteLine("---- RUNNING PREDEFINED TESTS ----");
                 //Test.ConsoleTest.RunTest();
-                //Test.StringTest.RunTest();
+                Test.StringTest.RunTest();
                 //Test.IPv4AddressTest.RunTest();
                 //Test.BasicTest.RunTest();
                 //Test.SwitchTest.RunTest();
@@ -68,11 +68,11 @@ namespace FrodeTest
                 //Test.LinqTest.RunTest();
                 //Test.ExceptionTest.RunTest();
                 //Test.FilesystemEntryTest.RunTest();
-                Test.VirtualFileSystemTest.RunTest();
+                //Test.VirtualFileSystemTest.RunTest();
                 //Test.Ext2Test.RunTest();
-                Test.PathTest.RunTest();
+                //Test.PathTest.RunTest();
                 //Test.DirectoryTest.RunTest();
-                Test.FileTest.RunTest();
+                //Test.FileTest.RunTest();
                 //Test.DirectoryInfoTest.RunTest();
                 //Test.FileInfoTest.RunTest();
 
