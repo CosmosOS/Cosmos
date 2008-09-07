@@ -61,12 +61,12 @@
             </WrapPanel>
             <WrapPanel Margin="10,10,0,0">
                 <Label Margin="0,0,10,0">Network Card:</Label>
-                <ComboBox Margin="0,0,30,0" Name="cmboNetworkCards" Width="200" SelectedIndex="1"/>
-                <CheckBox Name="chckQEMUUseNetworkTAP" IsChecked="False">Enable network TAP (requires TAP named CosmosTAP)</CheckBox>
+                <ComboBox Margin="0,0,30,0" Name="cmboNetworkCards" SelectedIndex="1"/>
+                <CheckBox Name="chckQEMUUseNetworkTAP" IsChecked="False">Enable network TAP. The TAP must be named CosmosTAP.</CheckBox>
             </WrapPanel>
             <WrapPanel Margin="10,10,0,0">
                 <Label Margin="0,0,10,0">Audio Card:</Label>
-                <ComboBox Name="cmboAudioCards" Width="200" SelectedIndex="1"/>
+                <ComboBox Name="cmboAudioCards" SelectedIndex="1"/>
             </WrapPanel>
         </StackPanel>
 
@@ -81,7 +81,7 @@
             <TextBlock Margin="10,10,10,0" TextWrapping="Wrap">Only removable drives formatted as FAT or FAT32 will be listed. If you do not see your device, check its format.</TextBlock>
             <WrapPanel Margin="10,10,0,0">
                 <Label Margin="0,0,10,0">USB Device on drive letter:</Label>
-                <ComboBox Name="cmboUSBDevice" Width="100"/>
+                <ComboBox Name="cmboUSBDevice"/>
             </WrapPanel>
         </StackPanel>
 
