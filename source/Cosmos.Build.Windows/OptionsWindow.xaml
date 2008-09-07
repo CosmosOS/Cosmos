@@ -20,18 +20,24 @@
         <TextBlock TextWrapping="Wrap" Margin="20,0" Name="tblkBuildPath">Build Path</TextBlock>
 
         <Label Margin="0,10" Background="LightGray" FontWeight="Bold">Target</Label>
-        <TextBlock Margin="10,0">Emulators &amp; Virtualization</TextBlock>
-        <WrapPanel Margin="20, 0">
-            <RadioButton Name="rdioQEMU" GroupName="Target" Margin="10, 0, 0, 0">_QEMU</RadioButton>
-            <RadioButton Name="rdioVMWare" GroupName="Target" Margin="10, 0, 0, 0">VM_Ware</RadioButton>
-            <RadioButton Name="rdioVPC" GroupName="Target" Margin="10,0,0,0">Virtual _PC</RadioButton>
-        </WrapPanel>
-        <TextBlock Margin="10,10,0,0">Hardware</TextBlock>
-        <WrapPanel Margin="20,0">
-            <RadioButton GroupName="Target"	Name="rdioISO" Margin="10, 0, 0, 0">_ISO</RadioButton>
-            <RadioButton GroupName="Target" Name="rdioPXE" Margin="10, 0, 0, 0">_Network (PXE)</RadioButton>
-            <RadioButton GroupName="Target" Name="rdioUSB" Margin="10, 0, 0, 0">_USB Device</RadioButton>
-        </WrapPanel>
+        <WrapPanel>
+            <StackPanel>
+                <TextBlock Margin="10,0,0,0">Emulators &amp; Virtualization</TextBlock>
+                <WrapPanel Margin="20,0,0,0">
+                    <RadioButton Name="rdioQEMU" GroupName="Target" Margin="10, 0, 0, 0">_QEMU</RadioButton>
+                    <RadioButton Name="rdioVMWare" GroupName="Target" Margin="10, 0, 0, 0">VM_Ware</RadioButton>
+                    <RadioButton Name="rdioVPC" GroupName="Target" Margin="10,0,0,0">Virtual _PC</RadioButton>
+                </WrapPanel>
+            </StackPanel>
+            <StackPanel Margin="10,0,0,0">
+                <TextBlock Margin="10,0,0,0">Hardware</TextBlock>
+                <WrapPanel Margin="20,0,0,0">
+                    <RadioButton GroupName="Target"	Name="rdioISO" Margin="10, 0, 0, 0">_ISO</RadioButton>
+                    <RadioButton GroupName="Target" Name="rdioPXE" Margin="10, 0, 0, 0">_Network (PXE)</RadioButton>
+                    <RadioButton GroupName="Target" Name="rdioUSB" Margin="10, 0, 0, 0">_USB Device</RadioButton>
+                </WrapPanel>
+            </StackPanel>
+        </WrapPanel>            
 
         <StackPanel Name="spnlDebugger">
             <Label Margin="0,10,0,0" Background="LightGray" FontWeight="Bold">Cosmos Debugger</Label>
@@ -74,7 +80,7 @@
             <TextBlock Margin="10,10,10,0" TextWrapping="Wrap">Please choose a USB drive or stick that is formatted as FAT or FAT32. Note that selecting this device will overwrite the Master Boot Record (MBR) on the USB drive. Because of this take care to select the proper device. After a succesful build, you can then use this device to boot a physical machine. You may need to select the BIOS boot menu, use a multi boot utility, or change the BIOS boot sequence.</TextBlock>
             <TextBlock Margin="10,10,10,0" TextWrapping="Wrap">Only removable drives formatted as FAT or FAT32 will be listed. If you do not see your device, check its format.</TextBlock>
             <WrapPanel Margin="10,10,0,0">
-                <Label Margin="0,0,10,0">USB Device on driver letter:</Label>
+                <Label Margin="0,0,10,0">USB Device on drive letter:</Label>
                 <ComboBox Name="cmboUSBDevice" Width="100"/>
             </WrapPanel>
         </StackPanel>
