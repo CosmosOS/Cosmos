@@ -137,11 +137,12 @@ namespace FrodeTest.Test
             Check.Validate("test".ToCharArray().Length == 4);
             Check.Validate(("test".ToCharArray()[0] == 't') && ("test".ToCharArray()[2] == 's'));
 
-            //Check.Text = "String.ToLower";
-            //Check.Validate("tESt".ToLower().Equals("test"));
+            Check.Text = "String.ToLower";
+            Check.Validate("TEST!".ToLower().Equals("test!"));
+            Check.Validate("wOrDs".ToLower(null).Equals("words"));
 
-            //Check.Text = "String.ToLowerInvariant";
-            //Check.Validate("tESt".ToLowerInvariant().Equals("test"));
+            Check.Text = "String.ToLowerInvariant";
+            Check.Validate("tESt".ToLowerInvariant().Equals("test"));
 
             Check.Text = "String.ToString";
             Check.Validate("test".ToString().Equals("test"));

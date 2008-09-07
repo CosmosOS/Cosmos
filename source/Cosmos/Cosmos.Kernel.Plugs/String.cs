@@ -262,5 +262,24 @@ namespace Cosmos.Kernel.Plugs {
             }
             return aThis;
         }
+
+        public static string ToLower(string aThis, System.Globalization.CultureInfo aCulture)
+        {
+            List<char> xChars = new List<char>(aThis.Length);
+
+            foreach (char c in aThis.ToCharArray())
+            {
+                int xAsciiCode = (int)c;
+                if ((xAsciiCode <= 90) && (xAsciiCode >= 65))
+                {
+                    xAsciiCode += 32;
+                    xChars.Add((char)xAsciiCode);
+                }
+                else
+                    xChars.Add(c);
+            }
+
+            return new string(xChars.ToArray());
+        }
     }
 }
