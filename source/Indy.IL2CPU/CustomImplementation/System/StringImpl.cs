@@ -96,16 +96,7 @@ namespace Indy.IL2CPU.CustomImplementation.System {
             return new string(cs);
         }
 
-        public static string Replace(string aThis, string oldValue, string newValue)
-        {
-            while (aThis.IndexOf(oldValue) != -1)
-            {
-                int xIndex = aThis.IndexOf(oldValue);
-                aThis.Remove(xIndex, oldValue.Length);
-                aThis.Insert(xIndex, newValue);
-            }
-            return aThis;
-        }
+
 
 		// HACK: We need to redo this once char support is complete (only returns 0, -1).
 		public static int CompareTo(string aThis, string other) {

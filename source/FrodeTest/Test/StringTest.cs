@@ -71,19 +71,24 @@ namespace FrodeTest.Test
             Check.Text = "String.IndexOf";
             Check.Validate("test".IndexOf('t', 0, 2) == 0);
             Check.Validate("test".IndexOf('B', 1, 1) == -1);
+            Check.Validate("test".IndexOf("st") == 2);
+            Check.Validate("test".IndexOf("es", 1, 3, StringComparison.CurrentCulture) == 1);
 
             Check.Text = "String.IndexOfAny";
             Check.Validate("test".IndexOfAny(new char[] { 'a', 'b' }, 0, 4) == -1);
             Check.Validate("test".IndexOfAny(new char[] { 'e', 's' }, 0, 4) == 1);
 
-            //Check.Text = "String.Insert";
-            //Check.Validate("Hello".Insert(5, " World").Equals("Hello World"));
+            Check.Text = "String.Insert";
+            Check.Validate("Hello".Insert(5, " World").Equals("Hello World"));
             
             //Check.Text = "String.IsNormalized";
             //Check.Validate("test".IsNormalized());
 
             Check.Text = "String.LastIndexOf";
             Check.Validate("Readme.txt".LastIndexOf('.') == 6);
+
+            Console.WriteLine("Press any key to continue");
+            Console.ReadLine();
 
             Check.Text = "String.LastIndexOfAny";
             Check.Validate("test".LastIndexOfAny(new char[] { 'a', 'b' }, 0, 4) == -1);
@@ -105,10 +110,11 @@ namespace FrodeTest.Test
             Check.Validate("test".Remove(2).Equals("te"));
             Check.Validate("test".Remove(1, 2).Equals("tt"));
 
+
             Check.Text = "String.Replace(char, char)";
             Check.Validate("test".Replace('t', 'p').Equals("pesp"));
             Check.Text = "String.Replace(string, string)";
-            //Check.Validate("test".Replace("es", "amti").Equals("tamtit")); //Uses .Insert - fix that first.
+            Check.Validate("test".Replace("es", "amti").Equals("tamtit")); //Uses .Insert - fix that first.
 
             Check.Text = "String.Split";
             Check.Validate("Hello World".Split(new string[] { "l" }, 30, StringSplitOptions.RemoveEmptyEntries).Length == 3);
