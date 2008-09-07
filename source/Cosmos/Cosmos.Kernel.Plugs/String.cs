@@ -265,21 +265,28 @@ namespace Cosmos.Kernel.Plugs {
 
         public static string ToLower(string aThis, System.Globalization.CultureInfo aCulture)
         {
-            List<char> xChars = new List<char>(aThis.Length);
+            return ChangeCasing(aThis, 65, 90, 32);
+        }
 
-            foreach (char c in aThis.ToCharArray())
+        public static string ToUpper(string aThis, System.Globalization.CultureInfo aCulture)
+        {
+            return ChangeCasing(aThis, 97, 122, -32);
+        }
+
+        private static string ChangeCasing(string aValue, int lowerAscii, int upperAscii, int offset)
+        {
+            char[] xChars = new char[aValue.Length];
+
+            for (int i = 0; i < aValue.Length; i++)
             {
-                int xAsciiCode = (int)c;
-                if ((xAsciiCode <= 90) && (xAsciiCode >= 65))
-                {
-                    xAsciiCode += 32;
-                    xChars.Add((char)xAsciiCode);
-                }
+                int xAsciiCode = (int)aValue[i];
+                if ((xAsciiCode <= upperAscii) && (xAsciiCode >= lowerAscii))
+                    xChars[i] = (char)(xAsciiCode+offset);
                 else
-                    xChars.Add(c);
+                    xChars[i] = aValue[i];
             }
 
-            return new string(xChars.ToArray());
+            return new string(xChars);
         }
     }
 }

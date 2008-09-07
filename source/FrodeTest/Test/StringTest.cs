@@ -147,11 +147,11 @@ namespace FrodeTest.Test
             Check.Text = "String.ToString";
             Check.Validate("test".ToString().Equals("test"));
 
-            //Check.Text = "String.ToUpper";
-            //Check.Validate("test".ToUpper().Equals("TEST"));
+            Check.Text = "String.ToUpper";
+            Check.Validate("test".ToUpper().Equals("TEST"));
 
-            //Check.Text = "String.ToUpperInvariant";
-            //Check.Validate("test".ToUpperInvariant().Equals("TEST"));
+            Check.Text = "String.ToUpperInvariant";
+            Check.Validate("test".ToUpperInvariant().Equals("TEST"));
 
             Check.Text = "String.Trim";
             Check.Validate("  test  .".Trim(new char[] { ' ', '.' }).Equals("test"));
