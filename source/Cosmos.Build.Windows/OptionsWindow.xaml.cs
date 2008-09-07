@@ -69,58 +69,26 @@ namespace Cosmos.Build.Windows {
             }
         }
 
-        protected void AddSection(params Paragraph[] aParagraphs) {
-            foreach (var xPara in aParagraphs) {
-                RootDoc.Blocks.InsertAfter(mOptionsBlockPrefix,
-                                           xPara);
+        protected void TargetChanged(object aSender, RoutedEventArgs e) {
+            spnlDebugger.Visibility = Visibility.Visible;
+            wpnlDebugPort.Visibility = Visibility.Visible;
+            if (aSender == rdioQEMU) {
+                wpnlDebugPort.Visibility = Visibility.Collapsed;
             }
-        }
-
-        protected void TargetChanged(object aSender,
-                                     RoutedEventArgs e) {
-            RootDoc.Blocks.Remove(paraDebugOptions);
-            paraDebugOptions.Inlines.Remove(spanDebugOptionsPort);
-            RootDoc.Blocks.Remove(paraQEMUOptions);
-            RootDoc.Blocks.Remove(paraVMWareOptions);
-            RootDoc.Blocks.Remove(paraVPCOptions);
-            RootDoc.Blocks.Remove(paraISOOptions);
-            RootDoc.Blocks.Remove(paraPXEOptions);
-            RootDoc.Blocks.Remove(paraUSBOptions);
-
-            if (aSender == rdioUSB) {
-                AddSection(paraDebugOptions);
-                AddSection(paraUSBOptions);
-                paraDebugOptions.Inlines.Add(spanDebugOptionsPort);
-            } else if (aSender == rdioISO) {
-                AddSection(paraDebugOptions);
-                AddSection(paraISOOptions);
-                paraDebugOptions.Inlines.Add(spanDebugOptionsPort);
-            } else if (aSender == rdioVPC) {
-                AddSection(paraDebugOptions);
-                AddSection(paraVPCOptions);
-                paraDebugOptions.Inlines.Add(spanDebugOptionsPort);
-            } else if (aSender == rdioVMWare) {
-                AddSection(paraDebugOptions);
-                AddSection(paraVMWareOptions);
-                paraDebugOptions.Inlines.Add(spanDebugOptionsPort);
-            } else if (aSender == rdioPXE) {
-                AddSection(paraDebugOptions);
-                AddSection(paraPXEOptions);
-                paraDebugOptions.Inlines.Add(spanDebugOptionsPort);
-            } else if (aSender == rdioQEMU) {
-                AddSection(paraDebugOptions);
-                AddSection(paraQEMUOptions);
-            }
+            spnlQEMU.Visibility = aSender == rdioQEMU ? Visibility.Visible : Visibility.Collapsed;
+            spnlVPC.Visibility = aSender == rdioVPC ? Visibility.Visible : Visibility.Collapsed;
+            spnlISO.Visibility = aSender == rdioISO ? Visibility.Visible : Visibility.Collapsed;
+            spnlPXE.Visibility = aSender == rdioPXE ? Visibility.Visible : Visibility.Collapsed;
+            spnlUSB.Visibility = aSender == rdioUSB ? Visibility.Visible : Visibility.Collapsed;
+            spnlVMWare.Visibility = aSender == rdioVMWare ? Visibility.Visible : Visibility.Collapsed;
         }
 
         public OptionsWindow() {
             InitializeComponent();
-            mOptionsBlockPrefix = paraBuildPath; // paraQEMUOptions.PreviousBlock;
 
-            Loaded += delegate(object sender,
-                               RoutedEventArgs e) {
-                          this.Activate();
-                      };
+            Loaded += delegate(object sender, RoutedEventArgs e) {
+                this.Activate();
+            };
 
             butnBuild.Click += new RoutedEventHandler(butnBuild_Click);
             butnCancel.Click += new RoutedEventHandler(butnCancel_Click);
@@ -132,8 +100,8 @@ namespace Cosmos.Build.Windows {
             rdioPXE.Checked += new RoutedEventHandler(TargetChanged);
             rdioUSB.Checked += new RoutedEventHandler(TargetChanged);
 
-            spanBuildPath.Inlines.Add(mBuilder.BuildPath);
-            spanISOPath.Inlines.Add(mBuilder.BuildPath + "Cosmos.iso");
+            tblkBuildPath.Text = mBuilder.BuildPath;
+            tblkISOPath.Text = mBuilder.BuildPath + "Cosmos.iso";
 
             var xDrives = System.IO.Directory.GetLogicalDrives();
             foreach (string xDrive in xDrives) {
@@ -152,20 +120,20 @@ namespace Cosmos.Build.Windows {
             cmboDebugPort.SelectedIndex = cmboDebugPort.Items.Add("COM2");
             cmboDebugPort.Items.Add("COM3");
             cmboDebugPort.Items.Add("COM4");
-            cmboDebugPort.Items.Add("Ethernet 1");
-            cmboDebugPort.Items.Add("Ethernet 2");
-            cmboDebugPort.Items.Add("Ethernet 3");
-            cmboDebugPort.Items.Add("Ethernet 4");
+            //cmboDebugPort.Items.Add("Ethernet 1");
+            //cmboDebugPort.Items.Add("Ethernet 2");
+            //cmboDebugPort.Items.Add("Ethernet 3");
+            //cmboDebugPort.Items.Add("Ethernet 4");
 
             cmboDebugMode.SelectedIndex = cmboDebugMode.Items.Add("None");
             cmboDebugMode.Items.Add("IL");
             cmboDebugMode.Items.Add("Source");
 
-            foreach (string nic in Enum.GetNames(typeof(Builder.QemuNetworkCard))) {
-                cmboNetworkCards.Items.Add(nic);
+            foreach (string xNIC in Enum.GetNames(typeof(Builder.QemuNetworkCard))) {
+                cmboNetworkCards.Items.Add(xNIC);
             }
-            foreach (string sc in Enum.GetNames(typeof(Builder.QemuAudioCard))) {
-                cmboAudioCards.Items.Add(sc);
+            foreach (string xSoundCard in Enum.GetNames(typeof(Builder.QemuAudioCard))) {
+                cmboAudioCards.Items.Add(xSoundCard);
             }
             LoadSettingsFromRegistry();
         }
@@ -207,8 +175,8 @@ namespace Cosmos.Build.Windows {
                 }
             }
             if (rdioQEMU.IsChecked.Value) {
-                mBuilder.MakeQEMU(chckQEMUUseHD.IsChecked.Value,
-                                  chckQEMUUseGDB.IsChecked.Value,
+                mBuilder.MakeQEMU(chbxQEMUUseHD.IsChecked.Value,
+                                  chbxQEMUUseGDB.IsChecked.Value,
                                   mDebugMode != DebugModeEnum.None,
                                   mDebugMode != DebugModeEnum.None,
                                   chckQEMUUseNetworkTAP.IsChecked.Value,
@@ -258,15 +226,9 @@ namespace Cosmos.Build.Windows {
                 xKey.SetValue("Debug Mode", cmboDebugMode.Text);
 
                 // QEMU
-                xKey.SetValue("Use GDB",
-                              chckQEMUUseGDB.IsChecked.Value,
-                              RegistryValueKind.DWord);
-                xKey.SetValue("Create HD Image",
-                              chckQEMUUseHD.IsChecked.Value,
-                              RegistryValueKind.DWord);
-                xKey.SetValue("Use network TAP",
-                              chckQEMUUseNetworkTAP.IsChecked.Value,
-                              RegistryValueKind.DWord);
+                xKey.SetValue("Use GDB", chbxQEMUUseGDB.IsChecked.Value, RegistryValueKind.DWord);
+                xKey.SetValue("Create HD Image", chbxQEMUUseHD.IsChecked.Value, RegistryValueKind.DWord);
+                xKey.SetValue("Use network TAP", chckQEMUUseNetworkTAP.IsChecked.Value, RegistryValueKind.DWord);
                 xKey.SetValue("Network Card",
                               cmboNetworkCards.Text,
                               RegistryValueKind.String);
@@ -330,10 +292,8 @@ namespace Cosmos.Build.Windows {
                 }
 
                 // QEMU
-                chckQEMUUseGDB.IsChecked = ((int)xKey.GetValue("Use GDB",
-                                                               0) != 0);
-                chckQEMUUseHD.IsChecked = ((int)xKey.GetValue("Create HD Image",
-                                                              0) != 0);
+                chbxQEMUUseGDB.IsChecked = ((int)xKey.GetValue("Use GDB", 0) != 0);
+                chbxQEMUUseHD.IsChecked = ((int)xKey.GetValue("Create HD Image", 0) != 0);
                 chckQEMUUseNetworkTAP.IsChecked = ((int)xKey.GetValue("Use network TAP",
                                                                       0) != 0);
                 cmboNetworkCards.SelectedIndex = cmboNetworkCards.Items.IndexOf(xKey.GetValue("Network Card",
@@ -354,6 +314,11 @@ namespace Cosmos.Build.Windows {
                 // USB
                 cmboUSBDevice.SelectedIndex = cmboUSBDevice.Items.IndexOf(xKey.GetValue("USB Device", ""));
             }
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

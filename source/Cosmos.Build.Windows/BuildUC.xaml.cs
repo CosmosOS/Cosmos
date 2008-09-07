@@ -90,7 +90,7 @@ namespace Cosmos.Build.Windows {
             //mWorker.RunWorkerAsync();
         }
 
-        private BackgroundWorker mWorker;
+        //private BackgroundWorker mWorker;
 
         void mTimer_Tick(object sender, EventArgs e)
         {
