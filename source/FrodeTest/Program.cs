@@ -25,13 +25,9 @@ namespace FrodeTest
             Console.WriteLine("*** COSMOS Operating System - Frode's Test Suite ***");
             try
             {
-                //while (true)
-                //Console.Beep(2000, 2);
-                //Console.Beep();
-                    //Cosmos.Hardware.PIT.PlaySound(3000);
-                //Console.Beep();
-                //Shell.Session.Run();
-                //Console.WriteLine(b);
+
+                //System.Globalization.CultureInfo c = new System.Globalization.CultureInfo(1044);
+                //Console.WriteLine(c.EnglishName);
 
                 //Testing \\-string bug
                 //Console.Write('1');

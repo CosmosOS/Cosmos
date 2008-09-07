@@ -64,9 +64,12 @@ namespace FrodeTest.Test
             "test".CopyTo(0, destination, 0, 4);
             Check.Validate((destination[0] == 't') && (destination[1] == 'e') && (destination[2] == 's') && (destination[3] == 't'));
 
-            //Check.Text = "String.EndsWith";
-            //Check.Validate("test".EndsWith("st"));
-            //Check.Validate("test".EndsWith("st", StringComparison.CurrentCulture));
+            Check.Text = "String.EndsWith";
+            Check.Validate("test".EndsWith("st"));
+            Check.Validate("test".EndsWith("st", StringComparison.CurrentCulture));
+            Check.Validate("test".EndsWith("st", true, null));
+            Check.Validate("test".EndsWith("test"));
+            Check.Validate(!"test".EndsWith("VeryLongText"));
 
             Check.Text = "String.IndexOf";
             Check.Validate("test".IndexOf('t', 0, 2) == 0);

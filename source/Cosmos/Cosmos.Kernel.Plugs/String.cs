@@ -108,8 +108,22 @@ namespace Cosmos.Kernel.Plugs {
             return -1;
         }
 
+        public static bool EndsWith(string aThis, string aSubStr, bool aIgnoreCase, System.Globalization.CultureInfo aCulture)
+        {
+            return EndsWith(aThis, aSubStr, StringComparison.CurrentCulture);
+        }
+
         public static bool EndsWith(string aThis, string aSubStr, StringComparison aComparison) {
-            int xLastIdx = aThis.Length - aSubStr.Length - 1;
+            if (aSubStr == null)
+                throw new ArgumentNullException("aSubStr");
+
+            if (aThis == aSubStr)
+                return true;
+
+            if (aSubStr.Length == 0)
+                return true;
+
+            int xLastIdx = aThis.Length - aSubStr.Length;
             for(int i = 0; i < aSubStr.Length; i++) {
                 if(aThis[xLastIdx+i] != aSubStr[i]) {
                     return false;
