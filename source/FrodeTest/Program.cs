@@ -25,6 +25,11 @@ namespace FrodeTest
             Console.WriteLine("*** COSMOS Operating System - Frode's Test Suite ***");
             try
             {
+                System.IO.DriveInfo d = new System.IO.DriveInfo("0");
+                Console.WriteLine(d.DriveFormat);
+                System.IO.DriveInfo[] drives = System.IO.DriveInfo.GetDrives();
+                Console.WriteLine("Drives: " + drives.Length);
+                Console.WriteLine(drives[0].DriveFormat);
                 //Testing \\-string bug
                 //Console.Write('1');
                 //PrintBackslash();

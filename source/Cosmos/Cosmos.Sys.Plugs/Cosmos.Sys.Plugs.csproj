@@ -57,6 +57,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VFS\DirectoryImpl.cs" />
     <Compile Include="VFS\DirectoryInfoImpl.cs" />
+    <Compile Include="VFS\DriveInfoImpl.cs" />
     <Compile Include="VFS\FileImpl.cs" />
     <Compile Include="VFS\FileInfoImpl.cs" />
     <Compile Include="VFS\FileSystemInfoImpl.cs" />
