@@ -14,14 +14,15 @@ namespace Cosmos.Sys.Plugs {
         /// </summary>
         /// <param name="aPath"></param>
         /// <returns></returns>
-        //public static string GetDirectoryName(string aPath) 
-        //{
-        //    int xIndex = aPath.LastIndexOfAny(new char[] {'/', '\\'});
-        //    if (xIndex == -1) {
-        //        return aPath;
-        //    }
-        //    return aPath.Substring(0, xIndex);
-        //}
+        public static string GetDirectoryName(string aPath)
+        {
+            int xIndex = aPath.LastIndexOfAny(new char[] { '/', '\\' });
+            if (xIndex == -1)
+            {
+                return aPath;
+            }
+            return aPath.Substring(0, xIndex);
+        }
 
         //public static string GetFileName(string aPath)
         //{
@@ -49,12 +50,12 @@ namespace Cosmos.Sys.Plugs {
         public static string GetFullPath(string aPath)
         {
             //Plug is used to avoid call to FileIOPermission
-            return GetGetFullPathInternalPath(aPath);
+            return GetFullPathInternal(aPath);
         }
 
-        public static string GetGetFullPathInternalPath(string aPath)
+        public static string GetFullPathInternal(string aPath)
         {
-            //Exact copy of .NET's version of GetGetFullPathInternalPath
+            //Exact copy of .NET's version of GetFullPathInternal
             if (aPath == null)
             {
                 throw new ArgumentNullException("path");

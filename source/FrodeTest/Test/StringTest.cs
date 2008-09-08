@@ -46,7 +46,9 @@ namespace FrodeTest.Test
 
             Check.Text = "String.Join";
             Check.Validate(String.Join(":", new string[] { "Hello", "World" }, 0, 2).Equals("Hello:World"));
-
+            
+            Console.WriteLine("Press any key to continue");
+            Console.ReadLine();
 
             Check.SetHeadingText("Testing System.String - Instance methods");
 
@@ -117,7 +119,7 @@ namespace FrodeTest.Test
             Check.Text = "String.Replace(char, char)";
             Check.Validate("test".Replace('t', 'p').Equals("pesp"));
             Check.Text = "String.Replace(string, string)";
-            Check.Validate("test".Replace("es", "amti").Equals("tamtit")); //Uses .Insert - fix that first.
+            Check.Validate("test".Replace("es", "amti").Equals("tamtit"));
 
             Check.Text = "String.Split";
             Check.Validate("Hello World".Split(new string[] { "l" }, 30, StringSplitOptions.RemoveEmptyEntries).Length == 3);

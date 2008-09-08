@@ -10,7 +10,7 @@ namespace FrodeTest.Test
     {
         public static void RunTest()
         {
-            Console.WriteLine("Running DirectoryTest");
+            Check.SetHeadingText("Testing System.IO.Directory");
 
             Check.Text = "Exists";
             Check.Validate(Directory.Exists("/0/"));
@@ -19,8 +19,6 @@ namespace FrodeTest.Test
             Check.Validate(!Directory.Exists("/0/InvalidDir/"));
 
             Check.Text = "GetDirectories";
-            foreach (string dir in Directory.GetDirectories("/0"))
-                Console.WriteLine("Dir: " + dir);
 
             //Check.Validate(Directory.GetDirectories("/0/").Length == 3);
             Check.Validate(Directory.GetDirectories("/0/Alfa/").Length == 1);
@@ -76,7 +74,7 @@ namespace FrodeTest.Test
             {
                 Check.Fail();
             }
-
+            
             //Check.Validate(Directory.GetParent("/") == null);
 
             //Check.Text = "New VolumeSeparator";

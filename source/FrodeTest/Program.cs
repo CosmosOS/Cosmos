@@ -25,10 +25,6 @@ namespace FrodeTest
             Console.WriteLine("*** COSMOS Operating System - Frode's Test Suite ***");
             try
             {
-
-                //System.Globalization.CultureInfo c = new System.Globalization.CultureInfo(1044);
-                //Console.WriteLine(c.EnglishName);
-
                 //Testing \\-string bug
                 //Console.Write('1');
                 //PrintBackslash();
@@ -45,7 +41,7 @@ namespace FrodeTest
                 //TEST FRAMEWORK
                 //Console.WriteLine("---- RUNNING PREDEFINED TESTS ----");
                 //Test.ConsoleTest.RunTest();
-                Test.StringTest.RunTest();
+                //Test.StringTest.RunTest();
                 //Test.IPv4AddressTest.RunTest();
                 //Test.BasicTest.RunTest();
                 //Test.SwitchTest.RunTest();
