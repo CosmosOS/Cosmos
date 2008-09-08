@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.IO;
 using System.Text;
 using System.Windows.Threading;
 
@@ -11,6 +12,7 @@ namespace Cosmos.Build.Windows {
         protected TcpListener mTCPListener;
         protected NetworkStream mTCPStream;
         protected byte[] mTCPData = new byte[4];
+        protected int mCurrentPos = 0;
 
         public DebugConnectorQEMU() {
             mTCPListener = new TcpListener(IPAddress.Loopback, 4444);
@@ -19,8 +21,8 @@ namespace Cosmos.Build.Windows {
         }
 
         public void DoAcceptTcpClientCallback(IAsyncResult aResult) {
-            TcpListener xListener = (TcpListener) aResult.AsyncState;
-            TcpClient xClient = xListener.EndAcceptTcpClient(aResult);
+            var xListener = (TcpListener) aResult.AsyncState;
+            var xClient = xListener.EndAcceptTcpClient(aResult);
             mTCPStream = xClient.GetStream();
             mTCPStream.BeginRead(mTCPData, 0, mTCPData.Length, new AsyncCallback(TCPRead), mTCPStream);
         }
@@ -31,10 +33,9 @@ namespace Cosmos.Build.Windows {
             mTCPStream.Write(xData, 0, xData.Length);
         }
 
-        protected int mCurrentPos = 0;
         protected void TCPRead(IAsyncResult aResult) {
             try {
-                var xStream = (NetworkStream)aResult.AsyncState;
+                var xStream = (Stream)aResult.AsyncState;
                 int xCount = xStream.EndRead(aResult);
                 if (xCount != 4) {
                     if ((xCount + mCurrentPos) != 4) {
