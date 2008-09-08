@@ -143,10 +143,7 @@ namespace Cosmos.Build.Windows {
             return xRunSelected;
         }
 
-        public void SelectText(int aLineBegin,
-                               int aColBegin,
-                               int aLineEnd,
-                               int aColEnd) {
+        public void SelectText(int aLineBegin, int aColBegin, int aLineEnd, int aColEnd) {
             aLineBegin--;
             aColBegin--;
             aLineEnd--;
@@ -158,17 +155,11 @@ namespace Cosmos.Build.Windows {
                                       aColBegin,
                                       aColEnd - aColBegin);
             } else {
-                xRunSelected = Select(aLineBegin,
-                                      aColBegin,
-                                      -1);
+                xRunSelected = Select(aLineBegin, aColBegin, -1);
                 for (int i = aLineBegin + 1; i <= aLineEnd - 1; i++) {
-                    Select(i,
-                           0,
-                           -1);
+                    Select(i, 0, -1);
                 }
-                Select(aLineEnd,
-                       0,
-                       aColEnd + 1);
+                Select(aLineEnd, 0, aColEnd + 1);
             }
             fdsvSource.UpdateLayout();
             if (xRunSelected != null) {
@@ -176,10 +167,11 @@ namespace Cosmos.Build.Windows {
             }
         }
 
-        public void SetSourceInfoMap(SourceInfos aSourceMapping) {
+        public void SetSourceInfoMap(SourceInfos aSourceMapping, DebugConnector aDebugConnector) {
             mDebugMode = DebugModeEnum.Source;
             mSourceMapping = aSourceMapping;
-            mDebugConnector = new DebugConnectorQEMU();
+            
+            mDebugConnector = aDebugConnector;
             mDebugConnector.Dispatcher = Dispatcher;
             mDebugConnector.ConnectionLost += ConnectionLost;
             mDebugConnector.DebugPacketReceived += DebugPacketReceived;
@@ -197,10 +189,12 @@ namespace Cosmos.Build.Windows {
         }
 
         protected void Log(string aText) {
-            lboxLog.Items.Add(new EIPEntry() {
-                                                 EIP = aText,
-                                                 Index = lboxLog.Items.Count
-                                             });
+            lboxLog.Items.Add(
+                new EIPEntry() {
+                    EIP = aText,
+                    Index = lboxLog.Items.Count
+                 }
+             );
         }
 
         protected void ConnectionLost(Exception ex) {
@@ -216,8 +210,7 @@ namespace Cosmos.Build.Windows {
             List<string> xItems = new List<string>();
             for (int i = lboxLog.Items.Count - 1; i >= 0; i--) {
                 string xEIP = lboxLog.Items[i] as string;
-                if (xItems.Contains(xEIP,
-                                    StringComparer.InvariantCultureIgnoreCase)) {
+                if (xItems.Contains(xEIP, StringComparer.InvariantCultureIgnoreCase)) {
                     lboxLog.Items.RemoveAt(i);
                     continue;
                 }

@@ -25,14 +25,15 @@ namespace Cosmos.Build.Windows {
 
         protected Block mOptionsBlockPrefix;
         protected Builder mBuilder = new Builder();
+        protected string mLastSelectedUSBDrive;
 
-        public static void Display() {
+        public void Display() {
+            // Hide the console window
             int xConsoleWindow = GetConsoleWindow();
             ShowWindow(xConsoleWindow, 0);
 
-            var xOptionsWindow = new OptionsWindow();
             bool xDoBuild = true;
-            var xShowOptions = xOptionsWindow.chbxShowOptions.IsChecked.Value;
+            var xShowOptions = chbxShowOptions.IsChecked.Value;
             // If the user doenst have the option to auto show, then look
             // for control key pressed
             if (!xShowOptions) {
@@ -44,37 +45,114 @@ namespace Cosmos.Build.Windows {
                     || KeyState.IsKeyDown(System.Windows.Forms.Keys.LControlKey);
             }
             if (xShowOptions) {
-                xDoBuild = xOptionsWindow.ShowDialog().Value;
+                xDoBuild = ShowDialog().Value;
             }
             if (xDoBuild) {
-                ShowWindow(xConsoleWindow, 1);
-                xOptionsWindow.DoBuild();
+                SaveSettingsToRegistry();
 
-                //Debug Window is only displayed if Qemu + Debug checked, or if other VM + Debugport selected
-                bool xIsQemu = xOptionsWindow.rdioQEMU.IsChecked.Value;
-                bool xUseCosmosDebug = xOptionsWindow.rdioDebugModeNone.IsChecked.Value == false;
-                if (((xIsQemu & xUseCosmosDebug) | (!xIsQemu & (xOptionsWindow.mComPort > 0))) && xOptionsWindow.mDebugMode != DebugModeEnum.None) {
-                    var xDebugWindow = new DebugWindow();
-                    if (xOptionsWindow.mDebugMode == DebugModeEnum.Source) {
-                        var xLabelByAddressMapping = ObjDump.GetLabelByAddressMapping(xOptionsWindow.mBuilder.BuildPath + "output.bin",
-                                                                                      xOptionsWindow.mBuilder.ToolsPath + @"cygwin\objdump.exe");
-                        var xSourceMappings = SourceInfo.GetSourceInfo(xLabelByAddressMapping,
-                                                                       xOptionsWindow.mBuilder.BuildPath + "Tools/asm/debug.cxdb");
-                        xDebugWindow.SetSourceInfoMap(xSourceMappings);
-                    } else {
-                        throw new Exception("Debug mode not supported: " + xOptionsWindow.mDebugMode);
+                mComPort = (byte)cmboDebugPort.SelectedIndex;
+                if (mComPort > 3) {
+                    throw new Exception("Debug port not supported yet!");
+                }
+                mComPort++;
+                if (rdioDebugModeNone.IsChecked.Value) {
+                    mDebugMode = DebugModeEnum.None;
+                } else if (rdioDebugModeIL.IsChecked.Value) {
+                    mDebugMode = DebugModeEnum.IL;
+                    throw new NotSupportedException("Debug mode IL isn't supported yet, use Source instead.");
+                } else if (rdioDebugModeSource.IsChecked.Value) {
+                    mDebugMode = DebugModeEnum.Source;
+                    mComPort = 1;
+                } else {
+                    throw new Exception("Unknown debug mode.");
+                }
+
+                // Call IL2CPU
+                if (chbxCompileIL.IsChecked.Value) {
+                    //TODO: Eventually eliminate the console window completely
+                    //ShowWindow(xConsoleWindow, 1);
+                    var xMainWindow = new MainWindow();
+                    xMainWindow.Show();
+                    if (xMainWindow.PhaseBuild(mBuilder, mDebugMode, mComPort) == false) {
+                        return;
                     }
+                }
+                
+                DebugWindow xDebugWindow = null;
+                // Debug Window is only displayed if Qemu + Debug checked
+                // or if other VM + Debugport selected
+                if (!rdioDebugModeNone.IsChecked.Value) {
+                    xDebugWindow = new DebugWindow();
+                    if (mDebugMode == DebugModeEnum.Source) {
+                        var xLabelByAddressMapping = ObjDump.GetLabelByAddressMapping(
+                            mBuilder.BuildPath + "output.bin"
+                            , mBuilder.ToolsPath + @"cygwin\objdump.exe");
+                        var xSourceMappings = SourceInfo.GetSourceInfo(xLabelByAddressMapping
+                            , mBuilder.BuildPath + "Tools/asm/debug.cxdb");
+                              
+                        DebugConnector xDebugConnector;
+                        if (rdioQEMU.IsChecked.Value) {
+                            xDebugConnector = new DebugConnectorQEMU();
+                        } else if (rdioVMWare.IsChecked.Value) {
+                            xDebugConnector = new DebugConnectorVMWare();
+                        } else {
+                            throw new Exception("TODO: Make a connector for raw serial");
+                        }
+                        xDebugWindow.SetSourceInfoMap(xSourceMappings, xDebugConnector);
+                    } else {
+                        throw new Exception("Debug mode not supported: " + mDebugMode);
+                    }
+                }
+
+                // Launch emulators or other final actions
+                if (rdioQEMU.IsChecked.Value) {
+                    ShowWindow(xConsoleWindow, 1);
+                    mBuilder.MakeQEMU(chbxQEMUUseHD.IsChecked.Value,
+                                      chbxQEMUUseGDB.IsChecked.Value,
+                                      mDebugMode != DebugModeEnum.None,
+                                      chckQEMUUseNetworkTAP.IsChecked.Value,
+                                      cmboNetworkCards.SelectedValue,
+                                      cmboAudioCards.SelectedValue);
+                } else if (rdioVMWare.IsChecked.Value) {
+                    mBuilder.MakeVMWare(rdVMWareServer.IsChecked.Value);
+                } else if (rdioVPC.IsChecked.Value) {
+                    mBuilder.MakeVPC();
+                } else if (rdioISO.IsChecked.Value) {
+                    mBuilder.MakeISO();
+                } else if (rdioPXE.IsChecked.Value) {
+                    mBuilder.MakePXE();
+                } else if (rdioUSB.IsChecked.Value) {
+                    mBuilder.MakeUSB(cmboUSBDevice.Text[0]);
+                }
+
+                if (xDebugWindow != null) {
                     xDebugWindow.ShowDialog();
                 }
             }
         }
 
         protected void TargetChanged(object aSender, RoutedEventArgs e) {
-            spnlDebugger.Visibility = Visibility.Visible;
-            wpnlDebugPort.Visibility = Visibility.Visible;
-            if (aSender == rdioQEMU) {
-                wpnlDebugPort.Visibility = Visibility.Collapsed;
+            // .IsReady takes quite some time, so instead of delaying
+            // every run, instead we load it on demand
+            if ((aSender == rdioUSB) && (cmboUSBDevice.Items.Count == 0)) {
+                var xDrives = System.IO.Directory.GetLogicalDrives();
+                foreach (string xDrive in xDrives) {
+                    var xType = new System.IO.DriveInfo(xDrive);
+                    if (xType.IsReady) {
+                        if ((xType.DriveType == System.IO.DriveType.Removable)
+                         && xType.DriveFormat.StartsWith("FAT")) {
+                            cmboUSBDevice.Items.Add(xDrive);
+                        }
+                    }
+                }
+                cmboUSBDevice.SelectedIndex = cmboUSBDevice.Items.IndexOf(mLastSelectedUSBDrive);
             }
+
+            spnlDebugger.Visibility = Visibility.Visible;
+            // for now its hidden. VMWare and QEMU are hardcoded to Com1 for now
+            // and the Comos Debugger doesnt have direct serial connectivity yet
+            wpnlDebugPort.Visibility = Visibility.Collapsed;
+            
             spnlQEMU.Visibility = aSender == rdioQEMU ? Visibility.Visible : Visibility.Collapsed;
             spnlVPC.Visibility = aSender == rdioVPC ? Visibility.Visible : Visibility.Collapsed;
             spnlISO.Visibility = aSender == rdioISO ? Visibility.Visible : Visibility.Collapsed;
@@ -103,27 +181,7 @@ namespace Cosmos.Build.Windows {
             tblkBuildPath.Text = mBuilder.BuildPath;
             tblkISOPath.Text = mBuilder.BuildPath + "Cosmos.iso";
 
-            var xDrives = System.IO.Directory.GetLogicalDrives();
-            foreach (string xDrive in xDrives) {
-                var xType = new System.IO.DriveInfo(xDrive);
-                if (xType.IsReady) {
-                    if ((xType.DriveType == System.IO.DriveType.Removable) && xType.DriveFormat.StartsWith("FAT")) {
-                        cmboUSBDevice.Items.Add(xDrive);
-                    }
-                }
-            }
-
             cmboDebugPort.Items.Add("Disabled");
-            // MtW: for now, leave COM1 out, as COM1 is used by the Cosmos kernel to output debug messages
-            // Kudzu: Need to configure that too....
-            //cmboDebugPort.Items.Add("COM1");
-            cmboDebugPort.SelectedIndex = cmboDebugPort.Items.Add("COM2");
-            cmboDebugPort.Items.Add("COM3");
-            cmboDebugPort.Items.Add("COM4");
-            //cmboDebugPort.Items.Add("Ethernet 1");
-            //cmboDebugPort.Items.Add("Ethernet 2");
-            //cmboDebugPort.Items.Add("Ethernet 3");
-            //cmboDebugPort.Items.Add("Ethernet 4");
 
             foreach (string xNIC in Enum.GetNames(typeof(Builder.QemuNetworkCard))) {
                 cmboNetworkCards.Items.Add(xNIC);
@@ -140,54 +198,6 @@ namespace Cosmos.Build.Windows {
 
         private DebugModeEnum mDebugMode;
         private byte mComPort;
-
-        protected void DoBuild() {
-            SaveSettingsToRegistry();
-
-            mComPort = (byte)cmboDebugPort.SelectedIndex;
-            if (mComPort > 3) {
-                throw new Exception("Debug port not supported yet!");
-            }
-            mComPort++;
-            if (rdioDebugModeNone.IsChecked.Value) {
-                mDebugMode = DebugModeEnum.None;
-            } else if (rdioDebugModeIL.IsChecked.Value) {
-                mDebugMode = DebugModeEnum.IL;
-                throw new NotSupportedException("Debug mode IL isn't supported yet, use Source instead.");
-            } else if (rdioDebugModeSource.IsChecked.Value) {
-                mDebugMode = DebugModeEnum.Source;
-                mComPort = 1;
-            } else {
-                throw new Exception("Unknown debug mode.");
-            }
-
-            if (chbxCompileIL.IsChecked.Value) {
-                var xMainWindow = new MainWindow();
-                xMainWindow.Show();
-                if (xMainWindow.PhaseBuild(mBuilder, mDebugMode, mComPort) == false) {
-                    return;
-                }
-            }
-            if (rdioQEMU.IsChecked.Value) {
-                mBuilder.MakeQEMU(chbxQEMUUseHD.IsChecked.Value,
-                                  chbxQEMUUseGDB.IsChecked.Value,
-                                  mDebugMode != DebugModeEnum.None,
-                                  mDebugMode != DebugModeEnum.None,
-                                  chckQEMUUseNetworkTAP.IsChecked.Value,
-                                  cmboNetworkCards.SelectedValue,
-                                  cmboAudioCards.SelectedValue);
-            } else if (rdioVMWare.IsChecked.Value) {
-                mBuilder.MakeVMWare(rdVMWareServer.IsChecked.Value);
-            } else if (rdioVPC.IsChecked.Value) {
-                mBuilder.MakeVPC();
-            } else if (rdioISO.IsChecked.Value) {
-                mBuilder.MakeISO();
-            } else if (rdioPXE.IsChecked.Value) {
-                mBuilder.MakePXE();
-            } else if (rdioUSB.IsChecked.Value) {
-                mBuilder.MakeUSB(cmboUSBDevice.Text[0]);
-            }
-        }
 
         private void butnCancel_Click(object sender, RoutedEventArgs e) {
             DialogResult = false;
@@ -239,15 +249,10 @@ namespace Cosmos.Build.Windows {
                               cmboAudioCards.Text,
                               RegistryValueKind.String);
                 // VMWare
-                string xVMWareVersion = string.Empty;
-                if (rdVMWareServer.IsChecked.Value) {
-                    xVMWareVersion = "VMWare Server";
-                } else if (rdVMWareWorkstation.IsChecked.Value) {
-                    xVMWareVersion = "VMWare Workstation";
-                }
-                xKey.SetValue("VMWare Version", xVMWareVersion);
+                xKey.SetValue("VMWare Edition", rdVMWareWorkstation.IsChecked.Value ? "Workstation" : "Server");
 
                 // USB
+                // Only save if selected since we lazy load the USB combo
                 if (cmboUSBDevice.SelectedItem != null) {
                     xKey.SetValue("USB Device", cmboUSBDevice.Text);
                 }
@@ -304,29 +309,26 @@ namespace Cosmos.Build.Windows {
                 chbxQEMUUseGDB.IsChecked = ((int)xKey.GetValue("Use GDB", 0) != 0);
                 chbxQEMUUseHD.IsChecked = ((int)xKey.GetValue("Create HD Image", 0) != 0);
                 chckQEMUUseNetworkTAP.IsChecked = ((int)xKey.GetValue("Use network TAP", 0) != 0);
-                cmboNetworkCards.SelectedIndex = cmboNetworkCards.Items.IndexOf(xKey.GetValue("Network Card",
-                                                                                              Builder.QemuNetworkCard.rtl8139.ToString()));
-                cmboAudioCards.SelectedIndex = cmboAudioCards.Items.IndexOf(xKey.GetValue("Audio Card",
-                                                                                          Builder.QemuAudioCard.es1370.ToString()));
+                cmboNetworkCards.SelectedIndex = cmboNetworkCards.Items.IndexOf(xKey.GetValue("Network Card"
+                 , Builder.QemuNetworkCard.rtl8139.ToString()));
+                cmboAudioCards.SelectedIndex = cmboAudioCards.Items.IndexOf(xKey.GetValue("Audio Card"
+                 , Builder.QemuAudioCard.es1370.ToString()));
                 // VMWare
-                string xVMWareVersion = (string)xKey.GetValue("VMWare Version", "VMWare Server");
+                string xVMWareVersion = (string)xKey.GetValue("VMWare Edition", "Server");
                 switch (xVMWareVersion) {
-                    case "VMWare Server":
+                    case "Server":
                         rdVMWareServer.IsChecked = true;
                         break;
-                    case "VMWare Workstation":
+                    case "Workstation":
                         rdVMWareWorkstation.IsChecked = true;
                         break;
                 }
 
                 // USB
-                cmboUSBDevice.SelectedIndex = cmboUSBDevice.Items.IndexOf(xKey.GetValue("USB Device", ""));
+                // Combo is lazy loaded, so we just store it for later
+                mLastSelectedUSBDrive = (string)xKey.GetValue("USB Device", "");
             }
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-
-        }
     }
 }

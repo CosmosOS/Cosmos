@@ -52,7 +52,7 @@ svga.vramSize = "3145728"
 serial0.present = "TRUE"
 serial0.fileType = "pipe"
 serial0.fileName = "\\.\pipe\CosmosDebug"
-serial0.pipe.endPoint = "client"
+serial0.pipe.endPoint = "server"
 serial0.tryNoRxLoss = "TRUE"
 
 vmotion.checkpointFBSize = "3145728"

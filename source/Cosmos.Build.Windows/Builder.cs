@@ -195,8 +195,7 @@ namespace Cosmos.Build.Windows {
             Process.Start(xPath + @"Cosmos.vmx");
         }
 
-        public void MakeQEMU(bool aUseHDImage, bool aGDB, bool aWaitSerialTCP, bool aDebugger, bool aUseNetworkTap, object aNetworkCard, object aAudioCard)
-        {
+        public void MakeQEMU(bool aUseHDImage, bool aGDB, bool aDebugger, bool aUseNetworkTap, object aNetworkCard, object aAudioCard) {
             MakeISO();
 
             //From v0.9.1 Qemu requires forward slashes in path
@@ -215,12 +214,10 @@ namespace Cosmos.Build.Windows {
                 if (File.Exists(BuildPath + "hda.img")) {
                     xHDString += "-hda \"" + BuildPath + "hda.img\" ";
                 }
-                if (File.Exists(BuildPath + "hdb.img"))
-                {
+                if (File.Exists(BuildPath + "hdb.img")) {
                     xHDString += "-hdb \"" + BuildPath + "hdb.img\" ";
                 }
-                if (File.Exists(BuildPath + "hdd.img"))
-                {
+                if (File.Exists(BuildPath + "hdd.img")) {
                     xHDString += "-hdb \"" + BuildPath + "hdd.img\" ";
                 }
             }
@@ -242,9 +239,12 @@ namespace Cosmos.Build.Windows {
                 // with the packet overhead
                 //
                 // COM1
-                + (aDebugger ?
-                 (aWaitSerialTCP ? " -serial tcp::4444,server" + (aWaitSerialTCP ? "" : ",nowait") : "")
-                 : " -serial \"file:" + BuildPath + "COM1-output.dbg\" ")
+                //" -serial tcp::4444,server"
+                //TODO: QEMU supports pipes like VMWare - Change this to a pipe and use same 
+                // handler as VMWare?
+                + (aDebugger ? " -serial tcp:127.0.0.1:4444"
+                // We have to output to a dummy file, so the other port will always be COM2
+                 : " -serial null")
                 // COM2
                 + " -serial \"file:" + BuildPath + "COM2-output.dbg\" "
                 // Enable acceleration if we are not using GDB
@@ -256,39 +256,22 @@ namespace Cosmos.Build.Windows {
                 + " -net user"
                 , ToolsPath + @"qemu\", false, true);
 
-            if (aGDB)
-            {
+            if (aGDB) {
                 //TODO: If the host is really busy, sometimes GDB can run before QEMU finishes loading.
                 //in this case, GDB says "program not running". Not sure how to fix this properly.
+                // Add a sleep? :)
                 Global.Call(ToolsPath + "gdb.exe"
                     , BuildPath + @"output.bin" + " --eval-command=\"target remote:1234\" --eval-command=\"b _CODE_REQUESTED_BREAK_\" --eval-command=\"c\""
                     , ToolsPath + @"qemu\", false, false);
             }
         }
-        ///<summary>
-        ///The virtual audio cards supported by Qemu
-        ///</summary>
-        public enum QemuAudioCard
-        {
-            pcspk,
-            sb16,
-            es1370,
-            adlib
-        }
 
+        // Dont change these, these are passed directly to QEMU.
+        // Need to fix this so we display better things, and dont tie to QEMU constants
+        public enum QemuAudioCard { pcspk, sb16, es1370, adlib }
+        public enum QemuNetworkCard { ne2k_pci, rtl8139, pcnet }
 
-        /// <summary>
-        /// The virtual network cards supported by Qemu
-        /// </summary>
-        public enum QemuNetworkCard
-        {
-            ne2k_pci,
-            rtl8139,
-            pcnet
-        }
-
-        public void MakeUSB(char aDrive)
-        {
+        public void MakeUSB(char aDrive) {
             string xPath = BuildPath + @"USB\";
             RemoveFile(xPath + @"output.bin");
             File.Move(BuildPath + @"output.bin", xPath + @"output.bin");
@@ -303,8 +286,7 @@ namespace Cosmos.Build.Windows {
             Global.Call(ToolsPath + "syslinux.exe", "-fma " + aDrive + ":", ToolsPath, true, true);
         }
 
-        public void MakePXE()
-        {
+        public void MakePXE() {
             string xPath = BuildPath + @"PXE\";
             RemoveFile(xPath + @"Boot\output.bin");
             File.Move(BuildPath + "output.bin", xPath + @"Boot\output.bin");

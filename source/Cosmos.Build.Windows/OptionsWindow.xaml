@@ -5,7 +5,7 @@
 	Title="Build"
 	WindowStartupLocation="CenterScreen"
 	Width="765.153"
-	Icon="/Cosmos.Build.Windows;component/Cosmos.ico" Loaded="Window_Loaded" WindowState="Maximized">
+	Icon="/Cosmos.Build.Windows;component/Cosmos.ico" WindowState="Maximized">
     <StackPanel>
         <DockPanel>
             <StackPanel DockPanel.Dock="Right" Width="75">

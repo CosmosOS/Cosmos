@@ -8,25 +8,23 @@ using System.Windows.Threading;
 
 namespace Cosmos.Build.Windows {
     public class DebugConnectorQEMU : DebugConnector {
-        protected TcpClient mTCPClient;
+        protected TcpListener mTCPListener;
         protected NetworkStream mTCPStream;
         protected byte[] mTCPData = new byte[4];
 
         public DebugConnectorQEMU() {
-            try {
-                // Create a TCP connection to localhost:4444. 
-                // We have already set up Qemu to listen to this port.
-                mTCPClient = new TcpClient();
-                mTCPClient.Connect(new IPEndPoint(IPAddress.Loopback, 4444));
-
-                //Read TCP data from Qemu
-                mTCPStream = mTCPClient.GetStream();
-                mTCPStream.BeginRead(mTCPData, 0, mTCPData.Length, new AsyncCallback(TCPRead), mTCPStream);
-            } catch (SocketException ex) {
-                Dispatcher.BeginInvoke(DispatcherPriority.Normal, ConnectionLost, ex);
-            }
+            mTCPListener = new TcpListener(IPAddress.Loopback, 4444);
+            mTCPListener.Start();
+            mTCPListener.BeginAcceptTcpClient(new AsyncCallback(DoAcceptTcpClientCallback), mTCPListener);
         }
 
+        public void DoAcceptTcpClientCallback(IAsyncResult aResult) {
+            TcpListener xListener = (TcpListener) aResult.AsyncState;
+            TcpClient xClient = xListener.EndAcceptTcpClient(aResult);
+            mTCPStream = xClient.GetStream();
+            mTCPStream.BeginRead(mTCPData, 0, mTCPData.Length, new AsyncCallback(TCPRead), mTCPStream);
+        }
+        
         public override void SendCommand(byte aCmd) {
             var xData = new byte[1];
             xData[0] = aCmd;
