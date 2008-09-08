@@ -225,8 +225,7 @@ namespace Cosmos.Build.Windows {
 
                 // Misc
                 xKey.SetValue("Show Options Window", chbxShowOptions.IsChecked.Value, RegistryValueKind.DWord);
-                //Force checkbox to be on, was chckCompileIL.IsChecked.Value,
-                xKey.SetValue("Compile IL", true, RegistryValueKind.DWord);
+                xKey.SetValue("Compile IL", chckCompileIL.IsChecked.Value, RegistryValueKind.DWord);
                               
                 // Debug                              
                 xKey.SetValue("Debug Port", cmboDebugPort.Text);
