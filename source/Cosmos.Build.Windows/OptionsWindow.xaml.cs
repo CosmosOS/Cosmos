@@ -52,8 +52,8 @@ namespace Cosmos.Build.Windows {
 
                 //Debug Window is only displayed if Qemu + Debug checked, or if other VM + Debugport selected
                 bool xIsQemu = xOptionsWindow.rdioQEMU.IsChecked.Value;
-                bool xUseQemuDebug = xOptionsWindow.cmboDebugMode.SelectedIndex > 0;
-                if (((xIsQemu & xUseQemuDebug) | (!xIsQemu & (xOptionsWindow.mComPort > 0))) && xOptionsWindow.mDebugMode != DebugModeEnum.None) {
+                bool xUseCosmosDebug = xOptionsWindow.rdioDebugModeNone.IsChecked.Value == false;
+                if (((xIsQemu & xUseCosmosDebug) | (!xIsQemu & (xOptionsWindow.mComPort > 0))) && xOptionsWindow.mDebugMode != DebugModeEnum.None) {
                     var xDebugWindow = new DebugWindow();
                     if (xOptionsWindow.mDebugMode == DebugModeEnum.Source) {
                         var xLabelByAddressMapping = ObjDump.GetLabelByAddressMapping(xOptionsWindow.mBuilder.BuildPath + "output.bin",
@@ -125,10 +125,6 @@ namespace Cosmos.Build.Windows {
             //cmboDebugPort.Items.Add("Ethernet 3");
             //cmboDebugPort.Items.Add("Ethernet 4");
 
-            cmboDebugMode.SelectedIndex = cmboDebugMode.Items.Add("None");
-            cmboDebugMode.Items.Add("IL");
-            cmboDebugMode.Items.Add("Source");
-
             foreach (string xNIC in Enum.GetNames(typeof(Builder.QemuNetworkCard))) {
                 cmboNetworkCards.Items.Add(xNIC);
             }
@@ -153,18 +149,16 @@ namespace Cosmos.Build.Windows {
                 throw new Exception("Debug port not supported yet!");
             }
             mComPort++;
-            string xDebugMode = (string)cmboDebugMode.SelectedValue;
-            mDebugMode = DebugModeEnum.None;
-            if (xDebugMode == "IL") {
+            if (rdioDebugModeNone.IsChecked.Value) {
+                mDebugMode = DebugModeEnum.None;
+            } else if (rdioDebugModeIL.IsChecked.Value) {
                 mDebugMode = DebugModeEnum.IL;
                 throw new NotSupportedException("Debug mode IL isn't supported yet, use Source instead.");
-            } else if (xDebugMode == "Source") {
+            } else if (rdioDebugModeSource.IsChecked.Value) {
                 mDebugMode = DebugModeEnum.Source;
                 mComPort = 1;
-            } else if (xDebugMode == "None") {
-                mDebugMode = DebugModeEnum.None;
             } else {
-                throw new Exception("Selected debug mode not supported!");
+                throw new Exception("Unknown debug mode.");
             }
 
             if (chbxCompileIL.IsChecked.Value) {
@@ -222,8 +216,17 @@ namespace Cosmos.Build.Windows {
                 //Force checkbox to be on, was chckCompileIL.IsChecked.Value,
                 xKey.SetValue("Compile IL", true, RegistryValueKind.DWord);
                               
+                // Debug                              
                 xKey.SetValue("Debug Port", cmboDebugPort.Text);
-                xKey.SetValue("Debug Mode", cmboDebugMode.Text);
+                string xDebugMode = "QEMU";
+                if (rdioDebugModeNone.IsChecked.Value) {
+                    xDebugMode = "None";
+                } else if (rdioDebugModeIL.IsChecked.Value) {
+                    xDebugMode = "IL";
+                } else if (rdioDebugModeSource.IsChecked.Value) {
+                    xDebugMode = "Source";
+                }
+                xKey.SetValue("Debug Mode", xDebugMode);
 
                 // QEMU
                 xKey.SetValue("Use GDB", chbxQEMUUseGDB.IsChecked.Value, RegistryValueKind.DWord);
@@ -253,8 +256,7 @@ namespace Cosmos.Build.Windows {
 
         private void LoadSettingsFromRegistry() {
             using (var xKey = Registry.CurrentUser.CreateSubKey(mRegKey)) {
-                string xBuildType = (string)xKey.GetValue("Target",
-                                                          "QEMU");
+                string xBuildType = (string)xKey.GetValue("Target", "QEMU");
                 switch (xBuildType) {
                     case "QEMU":
                         rdioQEMU.IsChecked = true;
@@ -279,23 +281,29 @@ namespace Cosmos.Build.Windows {
                 // Misc
                 chbxShowOptions.IsChecked = ((int)xKey.GetValue("Show Options Window", 1) != 0);
                 chbxCompileIL.IsChecked = ((int)xKey.GetValue("Compile IL", 1) != 0);
-                
-                cmboDebugPort.SelectedIndex = cmboDebugPort.Items.IndexOf(xKey.GetValue("Debug Port",
-                                                                                        ""));
+
+                // Debug                
+                cmboDebugPort.SelectedIndex = cmboDebugPort.Items.IndexOf(xKey.GetValue("Debug Port", ""));
                 if (cmboDebugPort.SelectedIndex == -1) {
                     cmboDebugPort.SelectedIndex = 0;
                 }
-                cmboDebugMode.SelectedIndex = cmboDebugMode.Items.IndexOf(xKey.GetValue("Debug Mode",
-                                                                                        ""));
-                if (cmboDebugMode.SelectedIndex == -1) {
-                    cmboDebugMode.SelectedIndex = 0;
+                string xDebugMode = (string)xKey.GetValue("Debug Mode", "None");
+                switch (xDebugMode) {
+                    case "None":
+                        rdioDebugModeNone.IsChecked = true;
+                        break;
+                    case "IL":
+                        rdioDebugModeIL.IsChecked = true;
+                        break;
+                    case "Source":
+                        rdioDebugModeSource.IsChecked = true;
+                        break;
                 }
 
                 // QEMU
                 chbxQEMUUseGDB.IsChecked = ((int)xKey.GetValue("Use GDB", 0) != 0);
                 chbxQEMUUseHD.IsChecked = ((int)xKey.GetValue("Create HD Image", 0) != 0);
-                chckQEMUUseNetworkTAP.IsChecked = ((int)xKey.GetValue("Use network TAP",
-                                                                      0) != 0);
+                chckQEMUUseNetworkTAP.IsChecked = ((int)xKey.GetValue("Use network TAP", 0) != 0);
                 cmboNetworkCards.SelectedIndex = cmboNetworkCards.Items.IndexOf(xKey.GetValue("Network Card",
                                                                                               Builder.QemuNetworkCard.rtl8139.ToString()));
                 cmboAudioCards.SelectedIndex = cmboAudioCards.Items.IndexOf(xKey.GetValue("Audio Card",

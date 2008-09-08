@@ -44,7 +44,9 @@
             <WrapPanel>
                 <WrapPanel Margin="10,10,0,0">
                     <Label Margin="0,0,10,0">Mode:</Label>
-                    <ComboBox Name="cmboDebugMode"/>
+                    <RadioButton Name="rdioDebugModeNone" GroupName="DebugMode" Margin="0,5,0,0" IsChecked="True">None</RadioButton>
+                    <RadioButton Name="rdioDebugModeIL" GroupName="DebugMode" Margin="10, 5, 0, 0">IL</RadioButton>
+                    <RadioButton Name="rdioDebugModeSource" GroupName="DebugMode" Margin="10,5,0,0">Source</RadioButton>
                 </WrapPanel>
                 <WrapPanel Name="wpnlDebugPort" Margin="30,10,0,0">
                     <Label Margin="0,0,10,0">COM Port:</Label>
