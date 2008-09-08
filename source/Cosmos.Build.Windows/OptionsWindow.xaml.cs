@@ -106,7 +106,9 @@ namespace Cosmos.Build.Windows {
 
                 // Launch emulators or other final actions
                 if (rdioQEMU.IsChecked.Value) {
-                    ShowWindow(xConsoleWindow, 1);
+                    // Uncomment if problems with QEMU to see output
+                    // TODO: Capture and send to debug window
+                    //ShowWindow(xConsoleWindow, 1);
                     mBuilder.MakeQEMU(chbxQEMUUseHD.IsChecked.Value,
                                       chbxQEMUUseGDB.IsChecked.Value,
                                       mDebugMode != DebugModeEnum.None,
