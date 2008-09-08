@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Sockets;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -18,34 +16,25 @@ using System.IO;
 
 namespace Cosmos.Build.Windows {
     public partial class DebugWindow : Window {
-        protected TcpClient mTCPClient;
-        protected NetworkStream mTCPStream;
-        protected byte[] mTCPData = new byte[4];
-        protected int mCurrentPos = 0;
-        private DebugModeEnum mDebugMode;
-        private SourceInfos mSourceMappings;
+        protected DebugModeEnum mDebugMode;
+        protected SourceInfos mSourceMapping;
         protected List<Run> mLines = new List<Run>();
         protected FontFamily mFont = new FontFamily("Courier New");
         protected bool mAutoDisplay = false;
         protected bool mTracing = true;
         protected bool mBreak = false;
-
         protected RoutedCommand mStepCommand;
+        protected DebugConnector mDebugConnector;
 
         protected void UpdateCaptions() {
-            butnTrace.Content = mTracing
-                                    ? "Trace Off"
-                                    : "Trace On";
-            butnBreak.Content = mBreak
-                                    ? "Continue"
-                                    : "Break";
+            butnTrace.Content = "Trace " + (mTracing ? "Off" : "On");
+            butnBreak.Content = mBreak ? "Continue" : "Break";
         }
 
         public DebugWindow() {
             InitializeComponent();
 
             mStepCommand = new RoutedCommand();
-
             UpdateCaptions();
 
             lboxLog.SelectionChanged += new SelectionChangedEventHandler(lboxLog_SelectionChanged);
@@ -56,23 +45,18 @@ namespace Cosmos.Build.Windows {
             butnLogClear.Click += new RoutedEventHandler(butnLogClear_Click);
         }
 
-        private void butnTrace_Click(object sender,
-                                     RoutedEventArgs e) {
-            SendDebugCmd((byte)(mTracing
-                                    ? 1
-                                    : 2));
+        private void butnTrace_Click(object sender, RoutedEventArgs e) {
+            mDebugConnector.SendCommand((byte)(mTracing ? 1 : 2));
             mTracing = !mTracing;
             UpdateCaptions();
         }
 
-        private void butnLogClear_Click(object sender,
-                                        RoutedEventArgs e) {
+        private void butnLogClear_Click(object sender, RoutedEventArgs e) {
             lboxLog.Items.Clear();
         }
 
-        private void butnBreak_Click(object sender,
-                                     RoutedEventArgs e) {
-            SendDebugCmd(3);
+        private void butnBreak_Click(object sender, RoutedEventArgs e) {
+            mDebugConnector.SendCommand(3);
             mBreak = !mBreak;
             UpdateCaptions();
             if (mBreak) {
@@ -80,22 +64,12 @@ namespace Cosmos.Build.Windows {
             }
         }
 
-        private void butnStep_Click(object sender,
-                                    RoutedEventArgs e) {
-            SendDebugCmd(4);
+        private void butnStep_Click(object sender, RoutedEventArgs e) {
+            mDebugConnector.SendCommand(4);
             mAutoDisplay = true;
         }
 
-        private void butnTest_Click(object sender,
-                                    RoutedEventArgs e) {
-        }
-
-        protected void SendDebugCmd(byte aCmd) {
-            var xData = new byte[1];
-            xData[0] = aCmd;
-            mTCPStream.Write(xData,
-                             0,
-                             xData.Length);
+        private void butnTest_Click(object sender, RoutedEventArgs e) {
         }
 
         public void LoadSourceFile(string aPathname) {
@@ -127,19 +101,12 @@ namespace Cosmos.Build.Windows {
             }
         }
 
-        private void xRun_MouseDown(object sender,
-                                    MouseButtonEventArgs e) {
+        private void xRun_MouseDown(object sender, MouseButtonEventArgs e) {
             var xRun = (Run)sender;
-            if (xRun.Background == Brushes.Red) {
-                xRun.Background = Brushes.LightGray;
-            } else {
-                xRun.Background = Brushes.Red;
-            }
+            xRun.Background = (xRun.Background == Brushes.Red) ? Brushes.LightGray : Brushes.Red;
         }
 
-        protected Run Select(int aLine,
-                             int aColBegin,
-                             int aLength) {
+        protected Run Select(int aLine, int aColBegin, int aLength) {
             Run xRunSelected = null;
             if (aLength != 0) {
                 var xPara = (Paragraph)fdsvSource.Document.Blocks.FirstBlock;
@@ -210,38 +177,21 @@ namespace Cosmos.Build.Windows {
         }
 
         public void SetSourceInfoMap(SourceInfos aSourceMapping) {
-            try {
-                mDebugMode = DebugModeEnum.Source;
-                mSourceMappings = aSourceMapping;
-                //Create a TCP connection to localhost:4444. We have already set up Qemu to listen to this port.
-                mTCPClient = new TcpClient();
-                mTCPClient.Connect(new IPEndPoint(IPAddress.Loopback,
-                                                  4444));
-
-                //Read TCP data from Qemu
-                mTCPStream = mTCPClient.GetStream();
-                mTCPStream.BeginRead(mTCPData,
-                                     0,
-                                     mTCPData.Length,
-                                     new AsyncCallback(TCPRead),
-                                     mTCPStream);
-            } catch (SocketException ex) {
-                Dispatcher.BeginInvoke(DispatcherPriority.Normal,
-                                       new ConnectionLostDelegate(ConnectionLost),
-                                       ex);
-            }
+            mDebugMode = DebugModeEnum.Source;
+            mSourceMapping = aSourceMapping;
+            mDebugConnector = new DebugConnectorQEMU();
+            mDebugConnector.Dispatcher = Dispatcher;
+            mDebugConnector.ConnectionLost += ConnectionLost;
+            mDebugConnector.DebugPacketReceived += DebugPacketReceived;
         }
 
-        protected delegate void DebugPacketRcvdDelegate(UInt32 aEIP);
-
-        protected void DebugPacketRcvd(UInt32 aEIP) {
+        protected void DebugPacketReceived(UInt32 aEIP) {
             string xEIP = aEIP.ToString("X8");
             Log("0x" + xEIP);
             if (mAutoDisplay) {
                 try {
                     lboxLog.SelectedIndex = lboxLog.Items.Count - 1;
-                } catch {
-                }
+                } catch { }
                 mAutoDisplay = false;
             }
         }
@@ -253,46 +203,12 @@ namespace Cosmos.Build.Windows {
                                              });
         }
 
-        protected delegate void ConnectionLostDelegate(Exception ex);
-
         protected void ConnectionLost(Exception ex) {
             Title = "No debug connection.";
             lboxLog.Background = Brushes.Red;
             while (ex != null) {
                 Log(ex.Message);
                 ex = ex.InnerException;
-            }
-        }
-
-        protected void TCPRead(IAsyncResult aResult) {
-            try {
-                var xStream = (NetworkStream)aResult.AsyncState;
-                int xCount = xStream.EndRead(aResult);
-                if (xCount != 4) {
-                    if ((xCount + mCurrentPos) != 4) {
-                        mCurrentPos += xCount;
-                        xStream.BeginRead(mTCPData,
-                                          mCurrentPos,
-                                          4 - mCurrentPos,
-                                          new AsyncCallback(TCPRead),
-                                          xStream);
-                        return;
-                    }
-                }
-                mCurrentPos = 0;
-                UInt32 xEIP = (UInt32)((mTCPData[0] << 24) | (mTCPData[1] << 16) | (mTCPData[2] << 8) | mTCPData[3]);
-                xStream.BeginRead(mTCPData,
-                                  0,
-                                  mTCPData.Length,
-                                  new AsyncCallback(TCPRead),
-                                  xStream);
-                Dispatcher.BeginInvoke(DispatcherPriority.Background,
-                                       new DebugPacketRcvdDelegate(DebugPacketRcvd),
-                                       xEIP);
-            } catch (System.IO.IOException ex) {
-                Dispatcher.BeginInvoke(DispatcherPriority.Background,
-                                       new ConnectionLostDelegate(ConnectionLost),
-                                       ex);
             }
         }
 
@@ -305,7 +221,7 @@ namespace Cosmos.Build.Windows {
                     lboxLog.Items.RemoveAt(i);
                     continue;
                 }
-                var xSourceInfo = mSourceMappings.GetMapping(UInt32.Parse(xEIP.Substring(2),
+                var xSourceInfo = mSourceMapping.GetMapping(UInt32.Parse(xEIP.Substring(2),
                                                                           System.Globalization.NumberStyles.HexNumber));
                 if (xSourceInfo == null) {
                     lboxLog.Items.RemoveAt(i);
@@ -331,7 +247,7 @@ namespace Cosmos.Build.Windows {
         }
 
         protected void SelectCode(uint aEIP) {
-            var xSourceInfo = mSourceMappings.GetMapping(aEIP);
+            var xSourceInfo = mSourceMapping.GetMapping(aEIP);
             if (xSourceInfo != null) {
                 LoadSourceFile(xSourceInfo.SourceFile);
                 SelectText(xSourceInfo.Line,
@@ -341,13 +257,12 @@ namespace Cosmos.Build.Windows {
             }
         }
 
-        private void lboxLog_SelectionChanged(object sender,
-                                              SelectionChangedEventArgs e) {
+        private void lboxLog_SelectionChanged(object sender, SelectionChangedEventArgs e) {
             var xItem = lboxLog.SelectedItem as EIPEntry;
             if (xItem != null) {
                 if (mDebugMode == DebugModeEnum.Source) {
-                    SelectCode(UInt32.Parse(xItem.EIP.Substring(2),
-                                            System.Globalization.NumberStyles.HexNumber));
+                    SelectCode(UInt32.Parse(xItem.EIP.Substring(2)
+                        , System.Globalization.NumberStyles.HexNumber));
                 } else {
                     throw new Exception("Debug mode not supported!");
                 }
