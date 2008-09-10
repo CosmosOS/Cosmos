@@ -101,6 +101,7 @@
     </Compile>
     <Compile Include="DebugConnector.cs" />
     <Compile Include="DebugConnectorQEMU.cs" />
+    <Compile Include="DebugConnectorStream.cs" />
     <Compile Include="DebugConnectorVMWare.cs" />
     <Compile Include="KeyState.cs" />
     <Compile Include="MainWindow.xaml.cs">
