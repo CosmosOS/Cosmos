@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using System.Globalization;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,6 +18,11 @@ using System.IO;
 
 namespace Cosmos.Build.Windows {
     public partial class DebugWindow : Window {
+        protected class TraceItem {
+            public string EIP { get; set; }
+            public string SourceFile { get; set; }
+        }
+    
         protected DebugModeEnum mDebugMode;
         protected SourceInfos mSourceMapping;
         protected List<Run> mLines = new List<Run>();
@@ -25,6 +32,7 @@ namespace Cosmos.Build.Windows {
         protected bool mBreak = false;
         protected RoutedCommand mStepCommand;
         protected DebugConnector mDebugConnector;
+        protected ObservableCollection<TraceItem> mTraceLog = new ObservableCollection<TraceItem>();
 
         protected void UpdateCaptions() {
             butnTrace.Content = "Trace " + (mTracing ? "Off" : "On");
@@ -37,7 +45,9 @@ namespace Cosmos.Build.Windows {
             mStepCommand = new RoutedCommand();
             UpdateCaptions();
 
-            //lboxLog.SelectionChanged += new SelectionChangedEventHandler(lboxLog_SelectionChanged);
+            listLog.ItemsSource = mTraceLog;
+            listLog.SelectionChanged += new SelectionChangedEventHandler(lboxLog_SelectionChanged);
+
             butnTrace.Click += new RoutedEventHandler(butnTrace_Click);
             butnTest.Click += new RoutedEventHandler(butnTest_Click);
             butnStep.Click += new RoutedEventHandler(butnStep_Click);
@@ -52,7 +62,7 @@ namespace Cosmos.Build.Windows {
         }
 
         private void butnLogClear_Click(object sender, RoutedEventArgs e) {
-            //lboxLog.Items.Clear();
+            listLog.Items.Clear();
         }
 
         private void butnBreak_Click(object sender, RoutedEventArgs e) {
@@ -178,11 +188,18 @@ namespace Cosmos.Build.Windows {
         }
 
         protected void DebugPacketReceived(UInt32 aEIP) {
-            string xEIP = aEIP.ToString("X8");
-            Log("0x" + xEIP);
+            var xSourceInfo = mSourceMapping.GetMapping(aEIP);
+            var xTraceItem = new TraceItem() {
+                EIP = aEIP.ToString("X8")
+            };
+            // Dont show path or extension, reducing widhth is important
+            var xFileInfo = new FileInfo(xSourceInfo.SourceFile);
+            xTraceItem.SourceFile = xFileInfo.Name.Substring(0, xFileInfo.Name.Length - xFileInfo.Extension.Length);
+            
+            mTraceLog.Add(xTraceItem);
             if (mAutoDisplay) {
                 try {
-                    //lboxLog.SelectedIndex = lboxLog.Items.Count - 1;
+                    listLog.SelectedIndex = listLog.Items.Count - 1;
                 } catch { }
                 mAutoDisplay = false;
             }
@@ -199,7 +216,7 @@ namespace Cosmos.Build.Windows {
 
         protected void ConnectionLost(Exception ex) {
             Title = "No debug connection.";
-            //lboxLog.Background = Brushes.Red;
+            listLog.Background = Brushes.Red;
             while (ex != null) {
                 Log(ex.Message);
                 ex = ex.InnerException;
@@ -251,15 +268,14 @@ namespace Cosmos.Build.Windows {
         }
 
         private void lboxLog_SelectionChanged(object sender, SelectionChangedEventArgs e) {
-//            var xItem = lboxLog.SelectedItem as EIPEntry;
-            //if (xItem != null) {
-            //    if (mDebugMode == DebugModeEnum.Source) {
-            //        SelectCode(UInt32.Parse(xItem.EIP.Substring(2)
-            //            , System.Globalization.NumberStyles.HexNumber));
-            //    } else {
-            //        throw new Exception("Current debug mode is not supported!");
-            //    }
-            //}
+            var xItem = listLog.SelectedItem as TraceItem;
+            if (xItem != null) {
+                if (mDebugMode == DebugModeEnum.Source) {
+                    SelectCode(UInt32.Parse(xItem.EIP, NumberStyles.HexNumber));
+                } else {
+                    throw new Exception("Current debug mode is not supported.");
+                }
+            }
         }
     }
 
