@@ -37,7 +37,7 @@ namespace Cosmos.Build.Windows {
             mStepCommand = new RoutedCommand();
             UpdateCaptions();
 
-            lboxLog.SelectionChanged += new SelectionChangedEventHandler(lboxLog_SelectionChanged);
+            //lboxLog.SelectionChanged += new SelectionChangedEventHandler(lboxLog_SelectionChanged);
             butnTrace.Click += new RoutedEventHandler(butnTrace_Click);
             butnTest.Click += new RoutedEventHandler(butnTest_Click);
             butnStep.Click += new RoutedEventHandler(butnStep_Click);
@@ -52,7 +52,7 @@ namespace Cosmos.Build.Windows {
         }
 
         private void butnLogClear_Click(object sender, RoutedEventArgs e) {
-            lboxLog.Items.Clear();
+            //lboxLog.Items.Clear();
         }
 
         private void butnBreak_Click(object sender, RoutedEventArgs e) {
@@ -182,62 +182,62 @@ namespace Cosmos.Build.Windows {
             Log("0x" + xEIP);
             if (mAutoDisplay) {
                 try {
-                    lboxLog.SelectedIndex = lboxLog.Items.Count - 1;
+                    //lboxLog.SelectedIndex = lboxLog.Items.Count - 1;
                 } catch { }
                 mAutoDisplay = false;
             }
         }
 
         protected void Log(string aText) {
-            lboxLog.Items.Add(
-                new EIPEntry() {
-                    EIP = aText,
-                    Index = lboxLog.Items.Count
-                 }
-             );
+            //lboxLog.Items.Add(
+            //    new EIPEntry() {
+            //        EIP = aText,
+            //        Index = lboxLog.Items.Count
+            //     }
+            // );
         }
 
         protected void ConnectionLost(Exception ex) {
             Title = "No debug connection.";
-            lboxLog.Background = Brushes.Red;
+            //lboxLog.Background = Brushes.Red;
             while (ex != null) {
                 Log(ex.Message);
                 ex = ex.InnerException;
             }
         }
 
-        protected void Anaylyze() {
-            List<string> xItems = new List<string>();
-            for (int i = lboxLog.Items.Count - 1; i >= 0; i--) {
-                string xEIP = lboxLog.Items[i] as string;
-                if (xItems.Contains(xEIP, StringComparer.InvariantCultureIgnoreCase)) {
-                    lboxLog.Items.RemoveAt(i);
-                    continue;
-                }
-                var xSourceInfo = mSourceMapping.GetMapping(UInt32.Parse(xEIP.Substring(2),
-                                                                          System.Globalization.NumberStyles.HexNumber));
-                if (xSourceInfo == null) {
-                    lboxLog.Items.RemoveAt(i);
-                    continue;
-                }
-            }
-            //foreach (var xEIP in (from item in lboxLog.Items.Cast<string>()
-            //                      select item).Distinct(StringComparer.InvariantCultureIgnoreCase)) {
+        //protected void Anaylyze() {
+        //    List<string> xItems = new List<string>();
+        //    for (int i = lboxLog.Items.Count - 1; i >= 0; i--) {
+        //        string xEIP = lboxLog.Items[i] as string;
+        //        if (xItems.Contains(xEIP, StringComparer.InvariantCultureIgnoreCase)) {
+        //            lboxLog.Items.RemoveAt(i);
+        //            continue;
+        //        }
+        //        var xSourceInfo = mSourceMapping.GetMapping(UInt32.Parse(xEIP.Substring(2),
+        //                                                                  System.Globalization.NumberStyles.HexNumber));
+        //        if (xSourceInfo == null) {
+        //            lboxLog.Items.RemoveAt(i);
+        //            continue;
+        //        }
+        //    }
+        //    //foreach (var xEIP in (from item in lboxLog.Items.Cast<string>()
+        //    //                      select item).Distinct(StringComparer.InvariantCultureIgnoreCase)) {
 
-            //    //var xViewSrc = new ViewSourceWindow();
-            //    //int xCharStart;
-            //    //int xCharCount;
-            //    //GetLineInfo(xViewSrc.tboxSource.Text, xSourceInfo.Line, xSourceInfo.Column, xSourceInfo.LineEnd, xSourceInfo.ColumnEnd, out xCharStart, out xCharCount);
-            //    //if(
-            //    int xCharStart = xViewSrc.tboxSource.GetCharacterIndexFromLineIndex(xSourceInfo.Line);
-            //    int xCharEnd = xViewSrc.tboxSource.GetCharacterIndexFromLineIndex(xSourceInfo.LineEnd);
-            //    if ((xCharEnd - xCharStart) > 4) {
-            //        MessageBox.Show(xEIP);
-            //        return;
-            //    }
-            //}
-            MessageBox.Show("Analysis finished!");
-        }
+        //    //    //var xViewSrc = new ViewSourceWindow();
+        //    //    //int xCharStart;
+        //    //    //int xCharCount;
+        //    //    //GetLineInfo(xViewSrc.tboxSource.Text, xSourceInfo.Line, xSourceInfo.Column, xSourceInfo.LineEnd, xSourceInfo.ColumnEnd, out xCharStart, out xCharCount);
+        //    //    //if(
+        //    //    int xCharStart = xViewSrc.tboxSource.GetCharacterIndexFromLineIndex(xSourceInfo.Line);
+        //    //    int xCharEnd = xViewSrc.tboxSource.GetCharacterIndexFromLineIndex(xSourceInfo.LineEnd);
+        //    //    if ((xCharEnd - xCharStart) > 4) {
+        //    //        MessageBox.Show(xEIP);
+        //    //        return;
+        //    //    }
+        //    //}
+        //    MessageBox.Show("Analysis finished!");
+        //}
 
         protected void SelectCode(uint aEIP) {
             var xSourceInfo = mSourceMapping.GetMapping(aEIP);
@@ -251,15 +251,15 @@ namespace Cosmos.Build.Windows {
         }
 
         private void lboxLog_SelectionChanged(object sender, SelectionChangedEventArgs e) {
-            var xItem = lboxLog.SelectedItem as EIPEntry;
-            if (xItem != null) {
-                if (mDebugMode == DebugModeEnum.Source) {
-                    SelectCode(UInt32.Parse(xItem.EIP.Substring(2)
-                        , System.Globalization.NumberStyles.HexNumber));
-                } else {
-                    throw new Exception("Current debug mode is not supported!");
-                }
-            }
+//            var xItem = lboxLog.SelectedItem as EIPEntry;
+            //if (xItem != null) {
+            //    if (mDebugMode == DebugModeEnum.Source) {
+            //        SelectCode(UInt32.Parse(xItem.EIP.Substring(2)
+            //            , System.Globalization.NumberStyles.HexNumber));
+            //    } else {
+            //        throw new Exception("Current debug mode is not supported!");
+            //    }
+            //}
         }
     }
 

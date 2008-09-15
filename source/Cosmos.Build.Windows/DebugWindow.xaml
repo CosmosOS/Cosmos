@@ -17,7 +17,8 @@
                     <Separator/>
                 </ToolBar>
             </ToolBarTray>
-            <ListBox FontFamily="Consolas" Name="lboxLog" SelectionMode="Single"/>
+            <ListView x:Name="listLog">
+            </ListView>
         </DockPanel>
         <GridSplitter Grid.Row="0" Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
         <DockPanel Grid.Row="0" Grid.Column="2">
@@ -34,7 +35,7 @@
                     <Button Name="butnTest">Test</Button>
                 </ToolBar>
             </ToolBarTray>
-            <Label Name="lablSourceFilename" DockPanel.Dock="Top"></Label>
+            <Label Name="lablSourceFilename" DockPanel.Dock="Top">Source File Name</Label>
             <FlowDocumentScrollViewer Name="fdsvSource" />
         </DockPanel>
     </Grid>
