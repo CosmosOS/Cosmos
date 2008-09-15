@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cosmos.IL2CPU.Debug;
 
 namespace Indy.IL2CPU.Assembler.X86 {
     public class DebugStub : X.Y86 {
@@ -12,8 +13,6 @@ namespace Indy.IL2CPU.Assembler.X86 {
         protected enum Command { TraceOff = 1, TraceOn = 2, Break = 3, Step = 4 }
         // Current status of OS Debug Stub
         protected enum Status { Run = 0, Break = 1, Stepping = 2 }
-        // Type of message sent to client debugger
-        protected enum MsgType { TracePoint = 0 }
 
         protected void Commands() {
             Label = "DebugStub_TraceOff";
