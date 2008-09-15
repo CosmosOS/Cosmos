@@ -257,7 +257,7 @@ namespace Cosmos.Build.Windows {
                     SelectCode(UInt32.Parse(xItem.EIP.Substring(2)
                         , System.Globalization.NumberStyles.HexNumber));
                 } else {
-                    throw new Exception("Debug mode not supported!");
+                    throw new Exception("Current debug mode is not supported!");
                 }
             }
         }

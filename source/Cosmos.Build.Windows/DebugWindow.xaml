@@ -4,18 +4,23 @@
     xmlns:Windows="clr-namespace:Cosmos.Build.Windows"
     Title="Cosmos Debugger" Height="351" Width="551" Icon="/Cosmos.Build.Windows;component/Cosmos.ico"
     WindowState="Maximized">
-    <DockPanel>
-        <DockPanel Width="200" DockPanel.Dock="Left">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="5" />
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <DockPanel Grid.Row="0" Grid.Column="0">
             <ToolBarTray Background="White" DockPanel.Dock="Top">
                 <ToolBar Band="1" BandIndex="1">
                     <Button Name="butnLogClear">Clear</Button>
-                    <Button Name="butnSort">Sort</Button>
                     <Separator/>
                 </ToolBar>
             </ToolBarTray>
             <ListBox FontFamily="Consolas" Name="lboxLog" SelectionMode="Single"/>
         </DockPanel>
-        <DockPanel DockPanel.Dock="Left">
+        <GridSplitter Grid.Row="0" Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
+        <DockPanel Grid.Row="0" Grid.Column="2">
             <ToolBarTray Background="White" DockPanel.Dock="Top">
                 <ToolBar Band="1" BandIndex="1">
                     <Button IsEnabled="False">Continue</Button>
@@ -32,5 +37,5 @@
             <Label Name="lablSourceFilename" DockPanel.Dock="Top"></Label>
             <FlowDocumentScrollViewer Name="fdsvSource" />
         </DockPanel>
-    </DockPanel>
+    </Grid>
 </Window>
