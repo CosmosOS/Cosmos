@@ -8,8 +8,12 @@ namespace Indy.IL2CPU.Assembler.X86 {
         protected UInt16 mComAddr;
         protected UInt16 mComStatusAddr;
         protected enum Tracing { Off = 0, On = 1 };
+        // These commands come from the client debugger to OS
         protected enum Command { TraceOff = 1, TraceOn = 2, Break = 3, Step = 4 }
+        // Current status of OS Debug Stub
         protected enum Status { Run = 0, Break = 1, Stepping = 2 }
+        // Type of message sent to client debugger
+        protected enum MsgType { TracePoint = 0 }
 
         protected void Commands() {
             Label = "DebugStub_TraceOff";
@@ -65,6 +69,12 @@ namespace Indy.IL2CPU.Assembler.X86 {
             JumpIf(Flags.Equal, "DebugStub_SendTrace_Exit");
                 Memory["DebugTraceSent", 32] = 1;
 
+                // Write the type
+                //TODO: Add extension methods so we can do int.Push, byte.Push, etc
+                AL = (int)MsgType.TracePoint;
+                EAX.Push();
+                Call("WriteByteToComPort");
+                // Send EIP
                 AL = Memory[EBP + 3];
                 EAX.Push();
                 Call("WriteByteToComPort");
@@ -81,7 +91,11 @@ namespace Indy.IL2CPU.Assembler.X86 {
             Return();
         }
 
-        protected void WriteByteToDebugger() {
+        protected void WriteByteToComPort() {
+            // This sucks to use the stack, but x86 can only read and write ports from AL and
+            // we need to read a port before we can write out the value to another port.
+            // The overheada is a lot, but compared to the speed of the serial and the fact
+            // that we wait on the serial port anyways, its a wash.
             Label = "WriteByteToComPort";
             Label = "WriteByteToComPort_Wait";
             DX = mComStatusAddr;
@@ -110,7 +124,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             Commands();
             Executing();
             SendTrace();
-            WriteByteToDebugger();
+            WriteByteToComPort();
             DebugSuspend();
             DebugResume();
             Break();
