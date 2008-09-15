@@ -18,9 +18,12 @@ using System.IO;
 
 namespace Cosmos.Build.Windows {
     public partial class DebugWindow : Window {
+        protected enum TraceItemType {Trace, Message}
+    
         protected class TraceItem {
             public UInt32 EIP { get; set; }
             public string SourceFile { get; set; }
+            public TraceItemType Type { get; set; }
         }
     
         protected DebugModeEnum mDebugMode;
@@ -191,6 +194,7 @@ namespace Cosmos.Build.Windows {
             var xSourceInfo = mSourceMapping.GetMapping(aEIP);
             var xTraceItem = new TraceItem() {
                 EIP = aEIP
+                , Type = TraceItemType.Trace
             };
             // Dont show path or extension, reducing widhth is important
             var xFileInfo = new FileInfo(xSourceInfo.SourceFile);

@@ -20,7 +20,14 @@
             <ListView x:Name="listLog">
                 <ListView.View>
                     <GridView AllowsColumnReorder="true">
-                        <GridViewColumn Width="75" Header="EIP" DisplayMemberBinding="{Binding Path=EIP, StringFormat=X8}" />
+                        <GridViewColumn Width="75" Header="EIP" >
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Path=EIP, StringFormat=X8}" FontFamily="Courier"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Width="75" Header="Type" DisplayMemberBinding="{Binding Path=Type}" />
                         <GridViewColumn Width="100" Header="Source File" DisplayMemberBinding="{Binding Path=SourceFile}" />
                     </GridView>
                 </ListView.View>
