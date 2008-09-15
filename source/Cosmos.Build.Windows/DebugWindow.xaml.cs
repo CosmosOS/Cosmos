@@ -19,7 +19,7 @@ using System.IO;
 namespace Cosmos.Build.Windows {
     public partial class DebugWindow : Window {
         protected class TraceItem {
-            public string EIP { get; set; }
+            public UInt32 EIP { get; set; }
             public string SourceFile { get; set; }
         }
     
@@ -190,7 +190,7 @@ namespace Cosmos.Build.Windows {
         protected void DebugPacketReceived(UInt32 aEIP) {
             var xSourceInfo = mSourceMapping.GetMapping(aEIP);
             var xTraceItem = new TraceItem() {
-                EIP = aEIP.ToString("X8")
+                EIP = aEIP
             };
             // Dont show path or extension, reducing widhth is important
             var xFileInfo = new FileInfo(xSourceInfo.SourceFile);
@@ -271,7 +271,7 @@ namespace Cosmos.Build.Windows {
             var xItem = listLog.SelectedItem as TraceItem;
             if (xItem != null) {
                 if (mDebugMode == DebugModeEnum.Source) {
-                    SelectCode(UInt32.Parse(xItem.EIP, NumberStyles.HexNumber));
+                    SelectCode(xItem.EIP);
                 } else {
                     throw new Exception("Current debug mode is not supported.");
                 }
