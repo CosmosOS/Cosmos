@@ -70,7 +70,9 @@ namespace Cosmos.Build.Windows {
                 // Call IL2CPU
                 if (chbxCompileIL.IsChecked.Value) {
                     //TODO: Eventually eliminate the console window completely
-                    //ShowWindow(xConsoleWindow, 1);
+                    if (chbxShowConsoleWindow.IsChecked.Value) {
+                        ShowWindow(xConsoleWindow, 1);
+                    }
                     var xMainWindow = new MainWindow();
                     xMainWindow.Show();
                     if (xMainWindow.PhaseBuild(mBuilder, mDebugMode, mComPort) == false) {
@@ -223,10 +225,6 @@ namespace Cosmos.Build.Windows {
                 }
                 xKey.SetValue("Target", xTarget);
 
-                // Misc
-                xKey.SetValue("Show Options Window", chbxShowOptions.IsChecked.Value, RegistryValueKind.DWord);
-                xKey.SetValue("Compile IL", chbxCompileIL.IsChecked.Value, RegistryValueKind.DWord);
-                              
                 // Debug                              
                 xKey.SetValue("Debug Port", cmboDebugPort.Text);
                 string xDebugMode = "QEMU";
@@ -257,6 +255,11 @@ namespace Cosmos.Build.Windows {
                 if (cmboUSBDevice.SelectedItem != null) {
                     xKey.SetValue("USB Device", cmboUSBDevice.Text);
                 }
+
+                // Misc
+                xKey.SetValue("Show Options Window", chbxShowOptions.IsChecked.Value, RegistryValueKind.DWord);
+                xKey.SetValue("Show Console Window", chbxShowConsoleWindow.IsChecked.Value, RegistryValueKind.DWord);
+                xKey.SetValue("Compile IL", chbxCompileIL.IsChecked.Value, RegistryValueKind.DWord);                              
             }
         }
 
@@ -286,6 +289,7 @@ namespace Cosmos.Build.Windows {
 
                 // Misc
                 chbxShowOptions.IsChecked = ((int)xKey.GetValue("Show Options Window", 1) != 0);
+                chbxShowConsoleWindow.IsChecked = ((int)xKey.GetValue("Show Console Window", 0) != 0);
                 chbxCompileIL.IsChecked = ((int)xKey.GetValue("Compile IL", 1) != 0);
 
                 // Debug                

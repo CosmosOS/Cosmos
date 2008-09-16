@@ -151,7 +151,6 @@ namespace Cosmos.Build.Windows {
             }
             
             xSW.Stop();
-            Console.WriteLine("IL2CPU Run took " + xSW.Elapsed.ToString());
 
             RemoveFile(BuildPath + "output.obj");
             Global.Call(ToolsPath + @"nasm\nasm.exe", String.Format("-g -f elf -F stabs -o \"{0}\" \"{1}\"", BuildPath + "output.obj", xAsmPath + "main.asm"), BuildPath);
