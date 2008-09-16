@@ -59,6 +59,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             Return();
         }
 
+        // Modifies: EAX
         protected void SendTrace() {
             Label = "DebugStub_SendTrace";
 
@@ -88,10 +89,27 @@ namespace Indy.IL2CPU.Assembler.X86 {
             Return();
         }
 
+        // Modifies EAX
+        protected void SendText() {
+            Label = "DebugStub_SendText";
+
+            // Write the type
+            AL = (int)MsgType.Text;
+            EAX.Push();
+            Call("WriteByteToComPort");
+            // Write Length
+            AL = Memory[EBP + 8];
+            EAX.Push();
+            Call("WriteByteToComPort");
+
+            Return();
+        }
+
+        // Modifies: EAX, EDX
         protected void WriteByteToComPort() {
             // This sucks to use the stack, but x86 can only read and write ports from AL and
             // we need to read a port before we can write out the value to another port.
-            // The overheada is a lot, but compared to the speed of the serial and the fact
+            // The overhead is a lot, but compared to the speed of the serial and the fact
             // that we wait on the serial port anyways, its a wash.
             Label = "WriteByteToComPort";
             Label = "WriteByteToComPort_Wait";
@@ -121,6 +139,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             Commands();
             Executing();
             SendTrace();
+            SendText();
             WriteByteToComPort();
             DebugSuspend();
             DebugResume();

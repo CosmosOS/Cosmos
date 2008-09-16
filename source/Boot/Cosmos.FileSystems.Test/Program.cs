@@ -38,7 +38,7 @@ static void Main(string[] args)
             s.Seek(1000 * 512 - 1, SeekOrigin.Begin);
             s.WriteByte(0);
 #else
-    Debug.Assert(   false, "WARNING! About to access physical disk!! WARNING!");
+    //Debug.Assert(   false, "WARNING! About to access physical disk!! WARNING!");
 
     SafeFileHandle h = null;
     h = CreateFile("\\\\.\\PhysicalDrive1", GENERIC_READ | GENERIC_WRITE, 0, IntPtr.Zero, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, new SafeFileHandle(IntPtr.Zero, true));

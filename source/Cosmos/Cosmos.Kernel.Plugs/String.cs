@@ -4,7 +4,8 @@ using System.Text;
 using Indy.IL2CPU.Plugs;
 
 namespace Cosmos.Kernel.Plugs {
-    //TODO: Move this and other FCL plugs to Cosmos.Plugs assembly
+    //TODO: Move this and other FCL plugs to Cosmos.Plugs assembly. some plugs like Console need hardware
+    // but these generics ones should be moved, this does not depend on kernel
     [Plug(Target = typeof(string))]
     public class String {
         /*public int IndexOf(char c)
@@ -19,8 +20,7 @@ namespace Cosmos.Kernel.Plugs {
 			return -1;
 		}*/
 
-        public static string Concat(string aStrA,
-                                    string aStrB) {
+        public static string Concat(string aStrA, string aStrB) {
             char[] xChars = new char[aStrA.Length + aStrB.Length];
             int xPos = 0;
             for (int i = 0; i < aStrA.Length; i++) {

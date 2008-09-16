@@ -48,7 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArrayListImpl.cs" />
-    <Compile Include="Assemblers\Debug.cs" />
+    <Compile Include="Assemblers\Debugger.cs" />
     <Compile Include="Assemblers\LoadTSS.cs" />
     <Compile Include="Assemblers\CPUID.cs" />
     <Compile Include="Assemblers\DoTest.cs" />
@@ -69,7 +69,7 @@
     <Compile Include="Assemblers\IOWrite8.cs" />
     <Compile Include="Assemblers\ZeroFill.cs" />
     <Compile Include="CultureInfo.cs" />
-    <Compile Include="Debug.cs" />
+    <Compile Include="Debugger.cs" />
     <Compile Include="GCImplementationImpl.cs" />
     <Compile Include="Hardware\PC\Bus\CPUBus.cs" />
     <Compile Include="HeapImpl.cs" />

@@ -186,8 +186,13 @@ namespace Cosmos.Build.Windows {
             mDebugConnector.Dispatcher = Dispatcher;
             mDebugConnector.ConnectionLost += ConnectionLost;
             mDebugConnector.CmdTrace += CmdTrace;
+            mDebugConnector.CmdText += CmdText;
         }
 
+        protected void CmdText(string aText) {
+            Log(TraceItemType.Message, aText);
+        }
+        
         protected void CmdTrace(UInt32 aEIP) {
             var xSourceInfo = mSourceMapping.GetMapping(aEIP);
             var xTraceItem = new TraceItem() {

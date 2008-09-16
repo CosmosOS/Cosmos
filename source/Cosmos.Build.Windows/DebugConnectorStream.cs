@@ -16,6 +16,7 @@ namespace Cosmos.Build.Windows {
         // Current packet size - Set after first byte (command) is received
         // Set to 0 when waiting on a packet
         private int mPacketSize = 0;
+        private MsgType mMsgType;
  
         public override void SendCommand(byte aCmd) {
             var xData = new byte[1];
@@ -39,9 +40,13 @@ namespace Cosmos.Build.Windows {
                     return;
                 // Command received, determine packet size 
                 } else if (mCurrentPos == 0) {
-                    switch (mPacket[0]) {
-                        case (int)MsgType.TracePoint:
+                    mMsgType = (MsgType)mPacket[0];
+                    switch (mMsgType) {
+                        case MsgType.TracePoint:
                             mPacketSize = 5;
+                            break;
+                        case MsgType.Text:
+                            mPacketSize = 2;
                             break;
                         default:
                             throw new Exception("Unknown debug command");
@@ -49,10 +54,17 @@ namespace Cosmos.Build.Windows {
                     mCurrentPos = 1;
                     xBytesToRead = mPacketSize - 1;
                 // Full packet received, process it
-                } else if ((xCount + mCurrentPos) == mPacket.Length) {
-                    UInt32 xEIP = (UInt32)((mPacket[1] << 24) | (mPacket[2] << 16)
-                        | (mPacket[3] << 8) | mPacket[4]);
-                    Dispatcher.BeginInvoke(DispatcherPriority.Background, CmdTrace, xEIP);
+                } else if ((xCount + mCurrentPos) == mPacketSize) {
+                    switch (mMsgType) {
+                        case MsgType.TracePoint:
+                            UInt32 xEIP = (UInt32)((mPacket[1] << 24) | (mPacket[2] << 16)
+                                | (mPacket[3] << 8) | mPacket[4]);
+                            Dispatcher.BeginInvoke(DispatcherPriority.Background, CmdTrace, xEIP);
+                            break;
+                        case MsgType.Text:
+                            Dispatcher.BeginInvoke(DispatcherPriority.Background, CmdText, mPacket[1].ToString());
+                            break;
+                    }
                     // Request next command
                     mCurrentPos = 0;
                     mPacketSize = 0;
