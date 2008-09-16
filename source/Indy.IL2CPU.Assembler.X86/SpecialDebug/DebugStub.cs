@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using Cosmos.IL2CPU.Debug;
 
+//TODO: The asm code here is not efficient. Our first priority is to make it functionally robust and working
+// We will later optimize this
 namespace Indy.IL2CPU.Assembler.X86 {
     public class DebugStub : X.Y86 {
         protected UInt16 mComAddr;
@@ -89,7 +91,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             Return();
         }
 
-        // Modifies EAX
+        // Modifies EAX, ECX, EDX, ESI
         protected void SendText() {
             Label = "DebugStub_SendText";
 
@@ -98,10 +100,26 @@ namespace Indy.IL2CPU.Assembler.X86 {
             EAX.Push();
             Call("WriteByteToComPort");
             // Write Length
-            AL = Memory[EBP + 8];
+            EAX = Memory[EBP + 12];
+            ECX = EAX; // Store in counter for later
             EAX.Push();
             Call("WriteByteToComPort");
-
+        
+            //Need to find out which of these causes an error, watch output and trap errors
+            // Address of string
+            //new X86.Move("ESI", "[EBP + 8]");
+            //Label = "DebugStub_SendTextWriteChar";
+            //ECX.Compare(0);
+            //    JumpIf(Flags.Equal, "DebugStub_SendTextExit");
+            //new X86.Move("AL", "[ESI]");
+            //EAX.Push();
+            //TODO: Change WriteByteToComPort to take an address to write to in a register
+            //Call("WriteByteToComPort");
+            //new X86.Dec("ECX");
+            //new X86.Inc("ESI");
+            //Jump("DebugStub_SendTextWriteChar");
+   
+            Label = "DebugStub_SendTextExit";
             Return();
         }
 

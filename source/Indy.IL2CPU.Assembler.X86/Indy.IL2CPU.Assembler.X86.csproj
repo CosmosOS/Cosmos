@@ -334,6 +334,8 @@
     <Compile Include="X\RegisterDX.cs" />
     <Compile Include="X\RegisterEAX.cs" />
     <Compile Include="X\RegisterEBP.cs" />
+    <Compile Include="X\RegisterECX.cs" />
+    <Compile Include="X\RegisterEDX.cs" />
     <Compile Include="X\RegisterESP.cs" />
     <Compile Include="X\Y86.cs" />
   </ItemGroup>

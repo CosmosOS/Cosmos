@@ -10,9 +10,13 @@ namespace Indy.IL2CPU.Assembler.X86.X {
             Zero, NotZero, Equal, NotEqual // Zero is synonym for Equal
         };
 
+        //TODO: Add registers as needed, not all are here yet
         public RegisterEAX EAX = RegisterEAX.Instance;
         public RegisterAL AL = RegisterAL.Instance;
 
+        public RegisterEAX ECX = RegisterEAX.Instance;
+
+        public RegisterEAX EDX = RegisterEAX.Instance;
         public RegisterDX DX = RegisterDX.Instance;
 
         public RegisterESP ESP = RegisterESP.Instance;

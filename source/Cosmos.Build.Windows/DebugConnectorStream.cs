@@ -53,6 +53,11 @@ namespace Cosmos.Build.Windows {
                     }
                     mCurrentPos = 1;
                     xBytesToRead = mPacketSize - 1;
+                // Read size byte
+                } else if ((mMsgType == MsgType.Text) && (mCurrentPos == 1)) {
+                    mCurrentPos = 2;
+                    xBytesToRead = mPacket[1];
+                    mPacket = new byte[xBytesToRead + 2];
                 // Full packet received, process it
                 } else if ((xCount + mCurrentPos) == mPacketSize) {
                     switch (mMsgType) {
@@ -69,6 +74,7 @@ namespace Cosmos.Build.Windows {
                     mCurrentPos = 0;
                     mPacketSize = 0;
                     xBytesToRead = 1;
+                    mPacket = new byte[5];
                 } else {
                     mCurrentPos += xCount;
                     xBytesToRead = mPacketSize - mCurrentPos;
