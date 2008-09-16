@@ -126,32 +126,28 @@ namespace Cosmos.Build.Windows {
                 var xPara = (Paragraph)fdsvSource.Document.Blocks.FirstBlock;
                 var xSelectedLine = mLines[aLine];
                 string xText = xSelectedLine.Text;
+                // aLength = -1 means to end
                 if (aLength == -1) {
                     aLength = xText.Length - aColBegin;
                 }
-
+                // If not begin at col 0, then we need to leave some deselected area
                 if (aColBegin > 0) {
-                    var xRunLeft = new Run(xText.Substring(0,
-                                                           aColBegin - 1));
+                    var xRunLeft = new Run(xText.Substring(0, aColBegin));
                     xRunLeft.FontFamily = mFont;
-                    xPara.Inlines.InsertBefore(xSelectedLine,
-                                               xRunLeft);
+                    xPara.Inlines.InsertBefore(xSelectedLine, xRunLeft);
                 }
-
-                xRunSelected = new Run(xText.Substring(aColBegin,
-                                                       aLength));
+                // Selected portion
+                xRunSelected = new Run(xText.Substring(aColBegin, aLength));
                 xRunSelected.FontFamily = mFont;
                 xRunSelected.Background = Brushes.Red;
-                xPara.Inlines.InsertBefore(xSelectedLine,
-                                           xRunSelected);
-
+                xPara.Inlines.InsertBefore(xSelectedLine, xRunSelected);
+                // Unselected on right if there is some
                 if (aColBegin + aLength < xText.Length) {
                     var xRunRight = new Run(xText.Substring(aColBegin + aLength));
                     xRunRight.FontFamily = mFont;
-                    xPara.Inlines.InsertBefore(xSelectedLine,
-                                               xRunRight);
+                    xPara.Inlines.InsertBefore(xSelectedLine, xRunRight);
                 }
-
+                // Remove the old line
                 xPara.Inlines.Remove(xSelectedLine);
             }
             return xRunSelected;
@@ -162,12 +158,12 @@ namespace Cosmos.Build.Windows {
             aColBegin--;
             aLineEnd--;
             aColEnd--;
-            //Currently can only be called once - need to fix it to reset so it can be called multiple times
+
             Run xRunSelected;
+            // Its all on one line
             if (aLineBegin == aLineEnd) {
-                xRunSelected = Select(aLineBegin,
-                                      aColBegin,
-                                      aColEnd - aColBegin);
+                xRunSelected = Select(aLineBegin, aColBegin, aColEnd - aColBegin);
+            // Its split across multiple lines so we need to select multiple lines
             } else {
                 xRunSelected = Select(aLineBegin, aColBegin, -1);
                 for (int i = aLineBegin + 1; i <= aLineEnd - 1; i++) {
@@ -175,6 +171,7 @@ namespace Cosmos.Build.Windows {
                 }
                 Select(aLineEnd, 0, aColEnd + 1);
             }
+            // Scroll it into view
             fdsvSource.UpdateLayout();
             if (xRunSelected != null) {
                 xRunSelected.PreviousInline.BringIntoView();
@@ -261,13 +258,10 @@ namespace Cosmos.Build.Windows {
         //}
 
         protected void SelectCode(uint aEIP) {
-            var xSourceInfo = mSourceMapping.GetMapping(aEIP);
-            if (xSourceInfo != null) {
-                LoadSourceFile(xSourceInfo.SourceFile);
-                SelectText(xSourceInfo.Line,
-                           xSourceInfo.Column,
-                           xSourceInfo.LineEnd,
-                           xSourceInfo.ColumnEnd);
+            var x = mSourceMapping.GetMapping(aEIP);
+            if (x != null) {
+                LoadSourceFile(x.SourceFile);
+                SelectText(x.Line, x.Column, x.LineEnd, x.ColumnEnd);
             }
         }
 
