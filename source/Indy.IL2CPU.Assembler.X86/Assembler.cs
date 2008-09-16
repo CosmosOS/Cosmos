@@ -139,7 +139,8 @@ namespace Indy.IL2CPU.Assembler.X86 {
 				if (Signature != null && Signature.Length > 0) {
 					aOutputWriter.WriteLine("{0} db {1}", SignatureLabelName, Signature.Aggregate<byte, string>("", (r, b) => r + b + ",") + "0");
 				}
-                aOutputWriter.WriteLine("DebugTraceMode dd 1"); // Tracing: On, Off
+				//TODO: Move this to call DebugStub and it it output this stuff.
+                aOutputWriter.WriteLine("DebugTraceMode dd 0"); // Tracing: 0=Off, 1=On
                 aOutputWriter.WriteLine("DebugStatus dd 0"); // Run, Break, Stepping
                 aOutputWriter.WriteLine("DebugRunning dd 0"); // 0 = Not in, 1 = already running
                 aOutputWriter.WriteLine("DebugSuspendLevel dd 0"); // Nesting control for non steppable routines

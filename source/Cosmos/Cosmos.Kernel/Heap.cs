@@ -19,7 +19,6 @@ namespace Cosmos.Kernel {
             mStartAddress = (mStartAddress / 4) * 4;
             mLength -= 1024;
             ClearMemory(aStartAddress, mLength);
-            DebugUtil.SendMM_Init(mStartAddress, mLength);
             UpdateDebugDisplay();
         }
 
@@ -149,7 +148,6 @@ namespace Cosmos.Kernel {
                 System.Diagnostics.Debugger.Break();
             }
             mStartAddress += aLength;
-            DebugUtil.SendMM_Alloc(xTemp, aLength);
             UpdateDebugDisplay();
             return xTemp;
         }

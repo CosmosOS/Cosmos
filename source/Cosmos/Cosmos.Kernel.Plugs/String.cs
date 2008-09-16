@@ -4,6 +4,7 @@ using System.Text;
 using Indy.IL2CPU.Plugs;
 
 namespace Cosmos.Kernel.Plugs {
+    //TODO: Move this and other FCL plugs to Cosmos.Plugs assembly
     [Plug(Target = typeof(string))]
     public class String {
         /*public int IndexOf(char c)

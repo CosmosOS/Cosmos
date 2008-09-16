@@ -61,10 +61,7 @@ namespace Cosmos.Kernel.Plugs {
         }
 
         [PlugMethod(MethodAssembler = typeof(Assemblers.Halt))]
-        public static void Halt()
-        {
-
-        }
+        public static void Halt() { }
 
         [PlugMethod(MethodAssembler = typeof(Assemblers.Interrupt30))]
         public static void Interrupt30(ref uint aEAX, ref uint aEBX, ref uint aECX, ref uint aEDX) {

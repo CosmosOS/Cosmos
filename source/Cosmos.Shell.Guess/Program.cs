@@ -18,11 +18,13 @@ namespace Cosmos.Demo.Guess {
             var xBoot = new Cosmos.Sys.Boot();
             xBoot.Execute();
 
+        Cosmos.Kernel.Debug.TraceOn();
             Random xRandom = new Random((int)(Cosmos.Hardware.Global.TickCount
                 + Cosmos.Hardware.RTC.GetSeconds()));
             // Divide by 100, get remainder
             int xMagicNo = xRandom.Next() % 100;
             Console.WriteLine("I am thinking of a number between 0 and 100. What is it?");
+        Cosmos.Kernel.Debug.TraceOff();
             while (true) {
                 Console.ForegroundColor = ConsoleColor.Blue;
                 Console.Write("Take a guess: ");
