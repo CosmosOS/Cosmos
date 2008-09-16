@@ -116,13 +116,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Demos.Snake", "Cosmo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Demo.Pacman", "Cosmos.Demo.Pacman\Cosmos.Demo.Pacman.csproj", "{A9B31697-9530-4D85-8123-0508A4E1EA70}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug", "Kernel\Cosmos.Debug\Cosmos.Debug.csproj", "{85837622-CF7A-4237-8002-2304B74E7384}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU.Debug", "IL2CPU\Cosmos.IL2CPU.Debug\Cosmos.IL2CPU.Debug.csproj", "{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 45
+		SccNumberOfProjects = 44
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -294,14 +292,10 @@ Global
 		SccProjectTopLevelParentUniqueName42 = Cosmos.sln
 		SccProjectName42 = Cosmos.Demo.Pacman
 		SccLocalPath42 = Cosmos.Demo.Pacman
-		SccProjectUniqueName43 = Kernel\\Cosmos.Debug\\Cosmos.Debug.csproj
+		SccProjectUniqueName43 = IL2CPU\\Cosmos.IL2CPU.Debug\\Cosmos.IL2CPU.Debug.csproj
 		SccProjectTopLevelParentUniqueName43 = Cosmos.sln
-		SccProjectName43 = Kernel/Cosmos.Debug
-		SccLocalPath43 = Kernel\\Cosmos.Debug
-		SccProjectUniqueName44 = IL2CPU\\Cosmos.IL2CPU.Debug\\Cosmos.IL2CPU.Debug.csproj
-		SccProjectTopLevelParentUniqueName44 = Cosmos.sln
-		SccProjectName44 = IL2CPU/Cosmos.IL2CPU.Debug
-		SccLocalPath44 = IL2CPU\\Cosmos.IL2CPU.Debug
+		SccProjectName43 = IL2CPU/Cosmos.IL2CPU.Debug
+		SccLocalPath43 = IL2CPU\\Cosmos.IL2CPU.Debug
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -474,10 +468,6 @@ Global
 		{A9B31697-9530-4D85-8123-0508A4E1EA70}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A9B31697-9530-4D85-8123-0508A4E1EA70}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A9B31697-9530-4D85-8123-0508A4E1EA70}.Release|Any CPU.Build.0 = Release|Any CPU
-		{85837622-CF7A-4237-8002-2304B74E7384}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{85837622-CF7A-4237-8002-2304B74E7384}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{85837622-CF7A-4237-8002-2304B74E7384}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{85837622-CF7A-4237-8002-2304B74E7384}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -506,7 +496,6 @@ Global
 		{819DB8FC-5DA1-461F-83C9-2F5C88088C94} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
 		{6110AD07-EB07-4A99-BB73-7A69AF5732F1} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
 		{BCB66614-20FE-4184-B214-FD42844AD8A6} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
-		{85837622-CF7A-4237-8002-2304B74E7384} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
 		{7BAB58BF-E8A1-4623-B6BF-4B90A0505226} = {E16DB75B-0F1D-4813-9103-F8FB6E7BAE2A}
 		{5784365C-ED22-42EB-BB8A-F3E09428D5B8} = {E16DB75B-0F1D-4813-9103-F8FB6E7BAE2A}
 		{26E45503-4490-4E38-A8C5-14159B25D6D1} = {E16DB75B-0F1D-4813-9103-F8FB6E7BAE2A}

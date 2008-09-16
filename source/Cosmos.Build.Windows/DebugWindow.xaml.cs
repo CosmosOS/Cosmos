@@ -13,12 +13,13 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using Indy.IL2CPU;
 using System.IO;
+using Indy.IL2CPU;
+using Cosmos.IL2CPU.Debug;
 
 namespace Cosmos.Build.Windows {
     public partial class DebugWindow : Window {
-        protected enum TraceItemType {Trace, Message}
+        protected enum TraceItemType {Trace, Message, Error}
     
         protected class TraceItem {
             public UInt32 EIP { get; set; }
@@ -187,10 +188,10 @@ namespace Cosmos.Build.Windows {
             mDebugConnector = aDebugConnector;
             mDebugConnector.Dispatcher = Dispatcher;
             mDebugConnector.ConnectionLost += ConnectionLost;
-            mDebugConnector.DebugPacketReceived += DebugPacketReceived;
+            mDebugConnector.CmdTrace += CmdTrace;
         }
 
-        protected void DebugPacketReceived(UInt32 aEIP) {
+        protected void CmdTrace(UInt32 aEIP) {
             var xSourceInfo = mSourceMapping.GetMapping(aEIP);
             var xTraceItem = new TraceItem() {
                 EIP = aEIP
@@ -208,21 +209,20 @@ namespace Cosmos.Build.Windows {
                 mAutoDisplay = false;
             }
         }
-
-        protected void Log(string aText) {
-            //lboxLog.Items.Add(
-            //    new EIPEntry() {
-            //        EIP = aText,
-            //        Index = lboxLog.Items.Count
-            //     }
-            // );
+        
+        protected void Log(TraceItemType aType, string aMsg) {
+            var xTraceItem = new TraceItem() {
+                Type = aType
+                , SourceFile = aMsg
+            };
+            mTraceLog.Add(xTraceItem);
         }
 
         protected void ConnectionLost(Exception ex) {
             Title = "No debug connection.";
             listLog.Background = Brushes.Red;
             while (ex != null) {
-                Log(ex.Message);
+                Log(TraceItemType.Error, ex.Message);
                 ex = ex.InnerException;
             }
         }
@@ -283,16 +283,4 @@ namespace Cosmos.Build.Windows {
         }
     }
 
-    public class EIPEntry {
-        public string EIP;
-        public long Index;
-
-        public override int GetHashCode() {
-            return Index.GetHashCode();
-        }
-
-        public override string ToString() {
-            return EIP;
-        }
-    }
 }

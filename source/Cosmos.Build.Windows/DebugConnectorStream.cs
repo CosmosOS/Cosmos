@@ -4,12 +4,18 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Threading;
+using Cosmos.IL2CPU.Debug;
 
 namespace Cosmos.Build.Windows {
     public abstract class DebugConnectorStream : DebugConnector {
         private Stream mStream;
-        private byte[] mPacket = new byte[4];
+        // Buffer to hold incoming message
+        private byte[] mPacket = new byte[5];
+        // Current # of bytes in mPacket
         private int mCurrentPos = 0;
+        // Current packet size - Set after first byte (command) is received
+        // Set to 0 when waiting on a packet
+        private int mPacketSize = 0;
  
         public override void SendCommand(byte aCmd) {
             var xData = new byte[1];
@@ -19,26 +25,43 @@ namespace Cosmos.Build.Windows {
         
         protected void Start(Stream aStream) {
             mStream = aStream;
-            aStream.BeginRead(mPacket, 0, mPacket.Length, new AsyncCallback(DoRead), aStream);
+            // Request first command
+            aStream.BeginRead(mPacket, 0, 1, new AsyncCallback(DoRead), aStream);
         }
 
         private void DoRead(IAsyncResult aResult) {
             try {
                 var xStream = (Stream)aResult.AsyncState;
                 int xCount = xStream.EndRead(aResult);
-                if (xCount != 4) {
-                    if ((xCount + mCurrentPos) != 4) {
-                        mCurrentPos += xCount;
-                        xStream.BeginRead(mPacket, mCurrentPos, 4 - mCurrentPos
-                            , new AsyncCallback(DoRead), xStream);
-                        return;
+                int xBytesToRead;
+                // If 0, end of stream then just exit without calling BeginRead again
+                if (xCount == 0) {
+                    return;
+                // Command received, determine packet size 
+                } else if (mCurrentPos == 0) {
+                    switch (mPacket[0]) {
+                        case (int)MsgType.TracePoint:
+                            mPacketSize = 5;
+                            break;
+                        default:
+                            throw new Exception("Unknown debug command");
                     }
+                    mCurrentPos = 1;
+                    xBytesToRead = mPacketSize - 1;
+                // Full packet received, process it
+                } else if ((xCount + mCurrentPos) == mPacket.Length) {
+                    UInt32 xEIP = (UInt32)((mPacket[1] << 24) | (mPacket[2] << 16)
+                        | (mPacket[3] << 8) | mPacket[4]);
+                    Dispatcher.BeginInvoke(DispatcherPriority.Background, CmdTrace, xEIP);
+                    // Request next command
+                    mCurrentPos = 0;
+                    mPacketSize = 0;
+                    xBytesToRead = 1;
+                } else {
+                    mCurrentPos += xCount;
+                    xBytesToRead = mPacketSize - mCurrentPos;
                 }
-                mCurrentPos = 0;
-                UInt32 xEIP = (UInt32)((mPacket[0] << 24) | (mPacket[1] << 16)
-                    | (mPacket[2] << 8) | mPacket[3]);
-                xStream.BeginRead(mPacket, 0, mPacket.Length, new AsyncCallback(DoRead), xStream);
-                Dispatcher.BeginInvoke(DispatcherPriority.Background, DebugPacketReceived, xEIP);
+                xStream.BeginRead(mPacket, mCurrentPos, xBytesToRead, new AsyncCallback(DoRead), xStream);
             } catch (System.IO.IOException ex) {
                 Dispatcher.BeginInvoke(DispatcherPriority.Background, ConnectionLost, ex);
             }

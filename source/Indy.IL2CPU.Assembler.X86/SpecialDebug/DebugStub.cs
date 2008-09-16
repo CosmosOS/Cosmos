@@ -9,10 +9,8 @@ namespace Indy.IL2CPU.Assembler.X86 {
         protected UInt16 mComAddr;
         protected UInt16 mComStatusAddr;
         protected enum Tracing { Off = 0, On = 1 };
-        // These commands come from the client debugger to OS
-        protected enum Command { TraceOff = 1, TraceOn = 2, Break = 3, Step = 4 }
         // Current status of OS Debug Stub
-        protected enum Status { Run = 0, Break = 1, Stepping = 2 }
+        public enum Status { Run = 0, Break = 1, Stepping = 2 }
 
         protected void Commands() {
             Label = "DebugStub_TraceOff";
