@@ -8,13 +8,19 @@ namespace Indy.IL2CPU.Assembler.X86 {
 		public readonly string Address;
 
 		protected JumpBase(string aAddress) {
-			Address = aAddress;
-			if (Address.StartsWith(".")) {
-				//string xPrefix = (from item in Assembler.CurrentInstance.Instructions
-				//                  where !Label.GetLabel(item).StartsWith(".")
-				//                  select Label.GetLabel(item)).Last();
-				string xPrefix = Label.LastFullLabel;
-				Address = xPrefix + "__DOT__" + Address.Substring(1);
+			if (aAddress.StartsWith(".")) {
+				aAddress = Label.LastFullLabel + "__DOT__" + aAddress.Substring(1);
+			}
+			// If it has a :, then its a far call so dont add near
+			if (aAddress.Contains(':')) {
+			    Address = aAddress;
+			} else {
+			    // Nasm by default issues conditional branches as short
+			    // and we often exceed the distance
+			    // For now we go for simplicity. Later when we optimize and have
+			    // our own assembler, we should consider using short jumps
+			    // if they are faster
+			    Address = "near " + aAddress;
 			}
 		}
 	}
