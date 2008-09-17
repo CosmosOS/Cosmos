@@ -21,9 +21,9 @@ namespace Cosmos.Demo.Guess {
         Debugger.TraceOn();
             Random xRandom = new Random((int)(Cosmos.Hardware.Global.TickCount
                 + Cosmos.Hardware.RTC.GetSeconds()));
-        Debugger.Send("Hello");
             // Divide by 100, get remainder
             int xMagicNo = xRandom.Next() % 100;
+        Debugger.Send("The magic number is " + xMagicNo);
             Console.WriteLine("I am thinking of a number between 0 and 100. What is it?");
         Debugger.TraceOff();
             while (true) {
