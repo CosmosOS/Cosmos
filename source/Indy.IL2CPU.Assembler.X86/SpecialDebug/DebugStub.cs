@@ -13,6 +13,24 @@ namespace Indy.IL2CPU.Assembler.X86 {
         protected enum Tracing { Off = 0, On = 1 };
         // Current status of OS Debug Stub
         public enum Status { Run = 0, Break = 1, Stepping = 2 }
+        
+        // A bit of a hack as a static? Other ideas?
+        public static void EmitDataSection(System.IO.TextWriter aWriter) {
+             // Tracing: 0=Off, 1=On
+            aWriter.WriteLine("DebugTraceMode dd 0");
+            // Run, Break, Stepping
+            aWriter.WriteLine("DebugStatus dd 0"); 
+            // 0 = Not in, 1 = already running
+            aWriter.WriteLine("DebugRunning dd 0"); 
+            // Nesting control for non steppable routines
+            aWriter.WriteLine("DebugSuspendLevel dd 0");
+            // Nesting control for non steppable routines 
+            aWriter.WriteLine("DebugResumeLevel dd 0"); 
+            // Last EIP value
+            aWriter.WriteLine("DebugEIP dd 0"); 
+            aWriter.WriteLine("InterruptsEnabledFlag dd 0");
+            aWriter.WriteLine("DebugTraceSent dd 0");
+        }
 
         protected void Commands() {
             Label = "DebugStub_TraceOff";
@@ -112,9 +130,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             ECX.Compare(0);
                 JumpIf(Flags.Equal, "DebugStub_SendTextExit");
             new X86.Move("AL", "[ESI]");
-            //AL = 0xFF;
             EAX.Push();
-            //TODO: Change WriteByteToComPort to take an address to write to in a register
             Call("WriteByteToComPort");
             new X86.Dec("ECX");
             // We are storing as 16 bits, but for now I will transmit 8 bits
@@ -133,6 +149,10 @@ namespace Indy.IL2CPU.Assembler.X86 {
             // we need to read a port before we can write out the value to another port.
             // The overhead is a lot, but compared to the speed of the serial and the fact
             // that we wait on the serial port anyways, its a wash.
+            //
+            // This could be changed to use interrupts, but that then copmlicates
+            // the code and causes interaction with other code. DebugStub should be
+            // as isolated as possible from any other code.
             Label = "WriteByteToComPort";
             Label = "WriteByteToComPort_Wait";
             DX = mComStatusAddr;
