@@ -93,16 +93,16 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 EAX.Push();
                 Call("WriteByteToComPort");
                 // Send EIP
-                AL = Memory[EBP + 3];
-                EAX.Push();
-                Call("WriteByteToComPort");
-                AL = Memory[EBP + 2];
+                AL = Memory[EBP];
                 EAX.Push();
                 Call("WriteByteToComPort");
                 AL = Memory[EBP + 1];
                 EAX.Push();
                 Call("WriteByteToComPort");
-                AL = Memory[EBP];
+                AL = Memory[EBP + 2];
+                EAX.Push();
+                Call("WriteByteToComPort");
+                AL = Memory[EBP + 3];
                 EAX.Push();
                 Call("WriteByteToComPort");
             Label = "DebugStub_SendTrace_Exit";
@@ -146,7 +146,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
         // Input: ESI
         // Output: None
         // Modifies: EAX, EDX
-        //
+        
         // Sends byte at [ESI] to com port and does esi + 1
         protected void WriteByteToComPort() {
             // This sucks to use the stack, but x86 can only read and write ports from AL and

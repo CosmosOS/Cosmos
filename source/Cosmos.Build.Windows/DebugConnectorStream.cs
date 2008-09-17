@@ -63,8 +63,8 @@ namespace Cosmos.Build.Windows {
                 } else if ((xCount + mCurrentPos) == mPacketSize) {
                     switch (mMsgType) {
                         case MsgType.TracePoint:
-                            UInt32 xEIP = (UInt32)((mPacket[1] << 24) | (mPacket[2] << 16)
-                                | (mPacket[3] << 8) | mPacket[4]);
+                            UInt32 xEIP = (UInt32)((mPacket[4] << 24) | (mPacket[3] << 16)
+                                | (mPacket[2] << 8) | mPacket[1]);
                             Dispatcher.BeginInvoke(DispatcherPriority.Background, CmdTrace, xEIP);
                             break;
                         case MsgType.Text:
