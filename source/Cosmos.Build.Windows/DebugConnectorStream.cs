@@ -55,9 +55,10 @@ namespace Cosmos.Build.Windows {
                     xBytesToRead = mPacketSize - 1;
                 // Read size byte
                 } else if ((mMsgType == MsgType.Text) && (mCurrentPos == 1)) {
-                    mCurrentPos = 2;
                     xBytesToRead = mPacket[1];
-                    mPacket = new byte[xBytesToRead + 2];
+                    mCurrentPos = 2;
+                    mPacketSize = xBytesToRead + mCurrentPos;
+                    mPacket = new byte[mPacketSize];
                 // Full packet received, process it
                 } else if ((xCount + mCurrentPos) == mPacketSize) {
                     switch (mMsgType) {
@@ -67,7 +68,8 @@ namespace Cosmos.Build.Windows {
                             Dispatcher.BeginInvoke(DispatcherPriority.Background, CmdTrace, xEIP);
                             break;
                         case MsgType.Text:
-                            Dispatcher.BeginInvoke(DispatcherPriority.Background, CmdText, mPacket[1].ToString());
+                            string xText = ASCIIEncoding.ASCII.GetString(mPacket, 2, mPacket.Length - 2);
+                            Dispatcher.BeginInvoke(DispatcherPriority.Background, CmdText, xText);
                             break;
                     }
                     // Request next command

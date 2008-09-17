@@ -99,6 +99,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             AL = (int)MsgType.Text;
             EAX.Push();
             Call("WriteByteToComPort");
+            
             // Write Length
             EAX = Memory[EBP + 12];
             ECX = EAX; // Store in counter for later
@@ -107,17 +108,20 @@ namespace Indy.IL2CPU.Assembler.X86 {
         
             //Need to find out which of these causes an error, watch output and trap errors
             // Address of string
-            new X86.Move("ESI", "[EBP + 8]");
+            //new X86.Move("EAX", "[EBP + 8]");
+            // Dereference pointer
+            //new X86.Move("ESI", "[EAX]");
             Label = "DebugStub_SendTextWriteChar";
             ECX.Compare(0);
-            //    JumpIf(Flags.Equal, "DebugStub_SendTextExit");
-            new X86.Move("AL", "[ESI]");
-            //EAX.Push();
+                JumpIf(Flags.Equal, "DebugStub_SendTextExit");
+            //new X86.Move("AL", "[ESI]");
+            AL = 0xFF;
+            EAX.Push();
             //TODO: Change WriteByteToComPort to take an address to write to in a register
-            //Call("WriteByteToComPort");
+            Call("WriteByteToComPort");
             new X86.Dec("ECX");
             new X86.Inc("ESI");
-            //Jump("DebugStub_SendTextWriteChar");
+            Jump("DebugStub_SendTextWriteChar");
    
             Label = "DebugStub_SendTextExit";
             Return();
