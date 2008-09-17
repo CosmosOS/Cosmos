@@ -21,5 +21,10 @@ namespace Indy.IL2CPU.Assembler.X86.X {
             Instance.Move(aValue.ToString());
             return Instance;
         }
+
+        public static implicit operator RegisterECX(RegisterEAX aValue) {
+            Instance.Move(aValue.ToString());
+            return Instance;
+        }
     }
 }

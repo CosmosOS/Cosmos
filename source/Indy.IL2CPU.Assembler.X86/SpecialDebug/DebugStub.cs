@@ -120,7 +120,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             //TODO: Change WriteByteToComPort to take an address to write to in a register
             Call("WriteByteToComPort");
             new X86.Dec("ECX");
-            new X86.Inc("ESI");
+            //new X86.Inc("ESI");
             Jump("DebugStub_SendTextWriteChar");
    
             Label = "DebugStub_SendTextExit";

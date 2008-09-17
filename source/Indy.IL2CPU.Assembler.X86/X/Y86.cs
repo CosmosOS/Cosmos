@@ -14,9 +14,9 @@ namespace Indy.IL2CPU.Assembler.X86.X {
         public RegisterEAX EAX = RegisterEAX.Instance;
         public RegisterAL AL = RegisterAL.Instance;
 
-        public RegisterEAX ECX = RegisterEAX.Instance;
+        public RegisterECX ECX = RegisterECX.Instance;
 
-        public RegisterEAX EDX = RegisterEAX.Instance;
+        public RegisterEDX EDX = RegisterEDX.Instance;
         public RegisterDX DX = RegisterDX.Instance;
 
         public RegisterESP ESP = RegisterESP.Instance;

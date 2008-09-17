@@ -32,7 +32,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
 
         public override string ToString() {
 			if (String.IsNullOrEmpty(Size)) {
-				return "mov " + Destination + "," + Source;
+				return "mov " + Destination + ", " + Source;
 			} else {
 				return "mov " + Size + " " + Destination + ", " + Source;
 			}
