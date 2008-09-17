@@ -143,7 +143,11 @@ namespace Indy.IL2CPU.Assembler.X86 {
             Return();
         }
 
+        // Input: ESI
+        // Output: None
         // Modifies: EAX, EDX
+        //
+        // Sends byte at [ESI] to com port and does esi + 1
         protected void WriteByteToComPort() {
             // This sucks to use the stack, but x86 can only read and write ports from AL and
             // we need to read a port before we can write out the value to another port.
@@ -154,8 +158,10 @@ namespace Indy.IL2CPU.Assembler.X86 {
             // the code and causes interaction with other code. DebugStub should be
             // as isolated as possible from any other code.
             Label = "WriteByteToComPort";
-            Label = "WriteByteToComPort_Wait";
+            // Sucks again to use DX just for this, but x86 only supports
+            // 8 bit address for literals on ports
             DX = mComStatusAddr;
+            Label = "WriteByteToComPort_Wait";
             AL = Port[DX];
             AL.Test(0x20);
                 JumpIf(Flags.Zero, "WriteByteToComPort_Wait");
