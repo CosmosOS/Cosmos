@@ -87,13 +87,8 @@ namespace Indy.IL2CPU.Assembler.X86 {
             JumpIf(Flags.Equal, "DebugStub_SendTrace_Exit");
                 Memory["DebugTraceSent", 32] = 1;
 
-                // Write the type
-                //TODO: Add extension methods so we can do int.Push, byte.Push, etc
                 AL = (int)MsgType.TracePoint;
-                EAX.Push();
-                ESI = ESP;
-                Call("WriteByteToComPort");
-                EAX.Pop();
+                Call("WriteALToComPort");
                 
                 // Send EIP
                 ESI = EBP;
@@ -105,16 +100,15 @@ namespace Indy.IL2CPU.Assembler.X86 {
             Return();
         }
 
-        // Modifies EAX, ECX, EDX, ESI
+        // Input: Stack
+        // Output: None
+        // Modifies: EAX, ECX, EDX, ESI
         protected void SendText() {
             Label = "DebugStub_SendText";
 
             // Write the type
             AL = (int)MsgType.Text;
-            EAX.Push();
-            ESI = ESP;
-            Call("WriteByteToComPort");
-            EAX.Pop();
+            Call("WriteALToComPort");
             
             //TODO: Limited to 255 bytes, need to send 2 bytes
             // Write Length
@@ -139,6 +133,19 @@ namespace Indy.IL2CPU.Assembler.X86 {
             Return();
         }
 
+        // Input AL
+        // Output: None
+        // Modifies: EAX, EDX, ESI
+        protected void WriteALToComPort() {
+            Label = "WriteALToComPort";
+            //TODO: Make a data point to put this in instead of using stack
+            EAX.Push();
+            ESI = ESP;
+            Call("WriteByteToComPort");
+            EAX.Pop(); // Is a local, cant use Return(4)
+            Return();
+        }
+        
         // Input: ESI
         // Output: None
         // Modifies: EAX, EDX
@@ -192,6 +199,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             Executing();
             SendTrace();
             SendText();
+            WriteALToComPort();
             WriteByteToComPort();
             DebugSuspend();
             DebugResume();
