@@ -11,6 +11,10 @@ namespace Indy.IL2CPU.Assembler.X86.X {
             new Push(ToString());
         }
 
+        public void Pop() {
+            new Pop(ToString());
+        }
+
         protected void Move(string aValue) {
             new X86.Move(ToString(), aValue);
         }

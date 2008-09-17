@@ -91,19 +91,15 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 //TODO: Add extension methods so we can do int.Push, byte.Push, etc
                 AL = (int)MsgType.TracePoint;
                 EAX.Push();
+                ESI = ESP;
                 Call("WriteByteToComPort");
+                EAX.Pop();
+                
                 // Send EIP
-                AL = Memory[EBP];
-                EAX.Push();
+                ESI = EBP;
                 Call("WriteByteToComPort");
-                AL = Memory[EBP + 1];
-                EAX.Push();
                 Call("WriteByteToComPort");
-                AL = Memory[EBP + 2];
-                EAX.Push();
                 Call("WriteByteToComPort");
-                AL = Memory[EBP + 3];
-                EAX.Push();
                 Call("WriteByteToComPort");
             Label = "DebugStub_SendTrace_Exit";
             Return();
@@ -116,26 +112,26 @@ namespace Indy.IL2CPU.Assembler.X86 {
             // Write the type
             AL = (int)MsgType.Text;
             EAX.Push();
+            ESI = ESP;
             Call("WriteByteToComPort");
+            EAX.Pop();
             
+            //TODO: Limited to 255 bytes, need to send 2 bytes
             // Write Length
-            EAX = Memory[EBP + 12];
-            ECX = EAX; // Store in counter for later
-            EAX.Push();
+            ESI = EBP;
+            new Add("ESI", 12);
+            ECX = Memory[ESI];
             Call("WriteByteToComPort");
         
             // Address of string
-            new X86.Move("ESI", "[EBP + 8]");
+            ESI = Memory[EBP + 8];
             Label = "DebugStub_SendTextWriteChar";
             ECX.Compare(0);
                 JumpIf(Flags.Equal, "DebugStub_SendTextExit");
-            new X86.Move("AL", "[ESI]");
-            EAX.Push();
             Call("WriteByteToComPort");
             new X86.Dec("ECX");
             // We are storing as 16 bits, but for now I will transmit 8 bits
-            // So we inc twice to skip the 0
-            new X86.Inc("ESI");
+            // So we inc again to skip the 0
             new X86.Inc("ESI");
             Jump("DebugStub_SendTextWriteChar");
    
@@ -146,7 +142,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
         // Input: ESI
         // Output: None
         // Modifies: EAX, EDX
-        
+        //
         // Sends byte at [ESI] to com port and does esi + 1
         protected void WriteByteToComPort() {
             // This sucks to use the stack, but x86 can only read and write ports from AL and
@@ -161,14 +157,22 @@ namespace Indy.IL2CPU.Assembler.X86 {
             // Sucks again to use DX just for this, but x86 only supports
             // 8 bit address for literals on ports
             DX = mComStatusAddr;
+            
+            // Wait for serial port to be ready
             Label = "WriteByteToComPort_Wait";
             AL = Port[DX];
             AL.Test(0x20);
                 JumpIf(Flags.Zero, "WriteByteToComPort_Wait");
+            
+            // Set address of port
             DX = mComAddr;
-            AL = Memory[ESP + 4];
+            // Get byte to send
+            AL = Memory[ESI];
+            // Send the byte
             Port[DX] = AL;
-            Return(4);
+            
+            new Inc("ESI");
+            Return();
         }
 
         protected void DebugSuspend() {

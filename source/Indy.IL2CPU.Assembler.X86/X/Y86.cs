@@ -19,9 +19,9 @@ namespace Indy.IL2CPU.Assembler.X86.X {
         public RegisterEDX EDX = RegisterEDX.Instance;
         public RegisterDX DX = RegisterDX.Instance;
 
-        public RegisterESP ESP = RegisterESP.Instance;
-
         public RegisterEBP EBP = RegisterEBP.Instance;
+        public RegisterESP ESP = RegisterESP.Instance;
+        public RegisterESI ESI = RegisterESI.Instance;
 
         public readonly Ports Port = new Ports();
         public readonly Memory Memory = new Memory();
