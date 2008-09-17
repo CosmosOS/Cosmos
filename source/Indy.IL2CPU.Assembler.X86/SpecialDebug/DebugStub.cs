@@ -106,21 +106,21 @@ namespace Indy.IL2CPU.Assembler.X86 {
             EAX.Push();
             Call("WriteByteToComPort");
         
-            //Need to find out which of these causes an error, watch output and trap errors
             // Address of string
-            //new X86.Move("EAX", "[EBP + 8]");
-            // Dereference pointer
-            //new X86.Move("ESI", "[EAX]");
+            new X86.Move("ESI", "[EBP + 8]");
             Label = "DebugStub_SendTextWriteChar";
             ECX.Compare(0);
                 JumpIf(Flags.Equal, "DebugStub_SendTextExit");
-            //new X86.Move("AL", "[ESI]");
-            AL = 0xFF;
+            new X86.Move("AL", "[ESI]");
+            //AL = 0xFF;
             EAX.Push();
             //TODO: Change WriteByteToComPort to take an address to write to in a register
             Call("WriteByteToComPort");
             new X86.Dec("ECX");
-            //new X86.Inc("ESI");
+            // We are storing as 16 bits, but for now I will transmit 8 bits
+            // So we inc twice to skip the 0
+            new X86.Inc("ESI");
+            new X86.Inc("ESI");
             Jump("DebugStub_SendTextWriteChar");
    
             Label = "DebugStub_SendTextExit";
