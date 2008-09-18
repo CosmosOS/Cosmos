@@ -12,7 +12,7 @@ using System.Diagnostics;
 namespace Indy.IL2CPU {
     [DebuggerStepThrough]
 	public static class GCImplementation {
-		private static int mLock = 0;
+		private static int mLock;
 		private static void AcquireLock() {
 //			do {
 //			} while (Interlocked.CompareExchange(ref mLock, 1, 0) != 0);

@@ -517,18 +517,12 @@ namespace Indy.IL2CPU {
                                                         mDebugMode != DebugModeEnum.None,
                                                         mMethods[xCurrentMethod].Info);
                         }
-                        bool xIsCustomImplementation = false;
                         MethodBase xCustomImplementation = GetCustomMethodImplementation(xMethodName);
                         if (xCustomImplementation != null) {
-                            xIsCustomImplementation = true;
                             QueueMethod(xCustomImplementation);
                             using (mMethodsLocker.AcquireReaderLock()) {
                                 mMethods[xCurrentMethod].Implementation = xCustomImplementation;
                             }
-                        }
-
-                        // what to do if a method doesn't have a body?
-                        if (xIsCustomImplementation) {
                             continue;
                         }
                         Type xOpType = mMap.GetOpForCustomMethodImplementation(xMethodName);
@@ -540,10 +534,8 @@ namespace Indy.IL2CPU {
                                 continue;
                             }
                         }
-                        if (mMap.HasCustomAssembleImplementation(xMethodInfo,
-                                                                 false)) {
-                            mMap.ScanCustomAssembleImplementation(xMethodInfo,
-                                                                  false);
+                        if (mMap.HasCustomAssembleImplementation(xMethodInfo, false)) {
+                            mMap.ScanCustomAssembleImplementation(xMethodInfo, false);
                             continue;
                         }
 
@@ -555,53 +547,17 @@ namespace Indy.IL2CPU {
                             mAssembler.StackContents.Clear();
                             ILReader xReader = new ILReader(xCurrentMethod);
                             var xInstructionInfos = new List<DebugSymbolsAssemblyTypeMethodInstruction>();
-                            //int xPreviousOffset = -1;
-                            int[] xCodeOffsets = null;
-                            ISymbolDocument[] xCodeDocuments = null;
-                            int[] xCodeLines = null;
-                            int[] xCodeColumns = null;
-                            int[] xCodeEndLines = null;
-                            int[] xCodeEndColumns = null;
-                            //int xCurrentOffset = 0;
-                            bool xHasSymbols = false;
-                            if (mDebugMode == DebugModeEnum.Source) {
-                                var xSymbolReader = GetSymbolReaderForAssembly(xCurrentMethod.DeclaringType.Assembly);
-                                if (xSymbolReader != null) {
-                                    var xSmbMethod = xSymbolReader.GetMethod(new SymbolToken(xCurrentMethod.MetadataToken));
-                                    if (xSmbMethod != null) {
-                                        xCodeOffsets = new int[xSmbMethod.SequencePointCount];
-                                        xCodeDocuments = new ISymbolDocument[xSmbMethod.SequencePointCount];
-                                        xCodeLines = new int[xSmbMethod.SequencePointCount];
-                                        xCodeColumns = new int[xSmbMethod.SequencePointCount];
-                                        xCodeEndLines = new int[xSmbMethod.SequencePointCount];
-                                        xCodeEndColumns = new int[xSmbMethod.SequencePointCount];
-                                        xSmbMethod.GetSequencePoints(xCodeOffsets,
-                                                                     xCodeDocuments,
-                                                                     xCodeLines,
-                                                                     xCodeColumns,
-                                                                     xCodeEndLines,
-                                                                     xCodeEndColumns);
-                                        xHasSymbols = true;
-                                    }
-                                }
-                            }
-                            //int xILIndex = -1;
                             while (xReader.Read()) {
                                 SortedList<string, object> xInfo = null;
                                 using (mMethodsLocker.AcquireReaderLock()) {
                                     xInfo = mMethods[xCurrentMethod].Info;
                                 }
-                                mMap.ScanILCode(xReader,
-                                                xMethodInfo,
-                                                xInfo);
-                                //
+                                mMap.ScanILCode(xReader, xMethodInfo, xInfo);
                             }
                         }
                     } catch (Exception e) {
-                        OnDebugLog(LogSeverityEnum.Error,
-                                   xCurrentMethod.GetFullName());
-                        OnDebugLog(LogSeverityEnum.Warning,
-                                   e.ToString());
+                        OnDebugLog(LogSeverityEnum.Error, xCurrentMethod.GetFullName());
+                        OnDebugLog(LogSeverityEnum.Warning, e.ToString());
                         throw;
                     }
                     //OnProgressChanged();
@@ -615,13 +571,12 @@ namespace Indy.IL2CPU {
                         }
                     }
                 }
-            }finally {
+            } finally {
                 mThreadEvents[xThreadIndex].Set();
-
             }
         }
 
-        private void ScanAllStaticFields() {
+        private void ScanAllStaticFields() { 
         }
 
         private void GenerateDebugSymbols() {
@@ -1375,11 +1330,9 @@ while(true) {
                                               xMethodInfo);
                     xOp.Assembler = mAssembler;
 #if VERBOSE_DEBUG
-                    string comment = "";
-                    if (xMethodInfo.TypeInfo == null) {
-                        comment = "(No Type Info available)";
-                    } else {
-                        comment = "Type Info:\r\n \r\n" + xMethodInfo.TypeInfo.ToString();
+                    string comment = "(No Type Info available)";
+                    if (xMethodInfo.TypeInfo != null) {
+                        comment = "Type Info:\r\n \r\n" + xMethodInfo.TypeInfo;
                     }
                     foreach (string s in comment.Trim().Split(new string[] {"\r\n"},
                                                               StringSplitOptions.RemoveEmptyEntries)) {
@@ -1392,11 +1345,8 @@ while(true) {
                     }
 #endif
                     xOp.Assemble();
-                    bool xIsCustomImplementation = false;
                     MethodBase xCustomImplementation = GetCustomMethodImplementation(xMethodName);
-                    if (xCustomImplementation != null) {
-                        xIsCustomImplementation = true;
-                    }
+                    bool xIsCustomImplementation = (xCustomImplementation != null);
                     // what to do if a method doesn't have a body?
                     bool xContentProduced = false;
                     if (xIsCustomImplementation) {
@@ -1449,35 +1399,6 @@ while(true) {
                                     ILReader xReader = new ILReader(xCurrentMethod);
                                     var xInstructionInfos = new List<DebugSymbolsAssemblyTypeMethodInstruction>();
                                     int xPreviousOffset = -1;
-                                    int[] xCodeOffsets = null;
-                                    ISymbolDocument[] xCodeDocuments = null;
-                                    int[] xCodeLines = null;
-                                    int[] xCodeColumns = null;
-                                    int[] xCodeEndLines = null;
-                                    int[] xCodeEndColumns = null;
-                                    int xCurrentOffset = 0;
-                                    bool xHasSymbols = false;
-                                    if (mDebugMode == DebugModeEnum.Source) {
-                                        var xSymbolReader = GetSymbolReaderForAssembly(xCurrentMethod.DeclaringType.Assembly);
-                                        if (xSymbolReader != null) {
-                                            var xSmbMethod = xSymbolReader.GetMethod(new SymbolToken(xCurrentMethod.MetadataToken));
-                                            if (xSmbMethod != null) {
-                                                xCodeOffsets = new int[xSmbMethod.SequencePointCount];
-                                                xCodeDocuments = new ISymbolDocument[xSmbMethod.SequencePointCount];
-                                                xCodeLines = new int[xSmbMethod.SequencePointCount];
-                                                xCodeColumns = new int[xSmbMethod.SequencePointCount];
-                                                xCodeEndLines = new int[xSmbMethod.SequencePointCount];
-                                                xCodeEndColumns = new int[xSmbMethod.SequencePointCount];
-                                                xSmbMethod.GetSequencePoints(xCodeOffsets,
-                                                                             xCodeDocuments,
-                                                                             xCodeLines,
-                                                                             xCodeColumns,
-                                                                             xCodeEndLines,
-                                                                             xCodeEndColumns);
-                                                xHasSymbols = true;
-                                            }
-                                        }
-                                    }
                                     int xILIndex = -1;
                                     while (xReader.Read()) {
                                         xILIndex++;
@@ -1567,32 +1488,25 @@ while(true) {
                                             // For IL, we emit for every one
                                             xEmitTracer = true;
                                         } else if (mDebugMode == DebugModeEnum.Source) {
-                                            if (xPreviousOffset == -1) {
-                                                xEmitTracer = true;
-                                            } else if (xHasSymbols) {
-                                                xEmitTracer =
-                                                 (xCodeDocuments[xPreviousOffset] != xCodeDocuments[xCurrentOffset] 
-                                                 || xCodeLines[xPreviousOffset] != xCodeLines[xCurrentOffset] 
-                                                 || xCodeColumns[xPreviousOffset] != xCodeColumns[xCurrentOffset] 
-                                                 || xCodeEndLines[xPreviousOffset] != xCodeEndLines[xCurrentOffset] 
-                                                 || xCodeEndColumns[xPreviousOffset] != xCodeEndColumns[xCurrentOffset]);
-                                                // The above code doesnt work correctly and produces horrible results
-                                                // For now we enable all, and it works pretty well
-                                                xEmitTracer = true;
-                                            }
+                                            // We should detect each line, but it appears 
+                                            // some recent chagnes already cause this 
+                                            // method only to be called already on chagnes.
+                                            // So if so, IL above is wrong
+                                            xEmitTracer = true;
                                         }
                                         if (xEmitTracer) { 
                                             mMap.EmitOpDebugHeader(mAssembler, 0, xLabel);
                                             using (mDebugSymbolsLocker.AcquireWriterLock()) {
                                                 mDebugSymbols.Add(new DebugSymbol() {
-                                                                                        AssemblyFileName = xCurrentMethod.DeclaringType.Assembly.Location,
-                                                                                        InstructionOffset = xCurrentOffset,
-                                                                                        LabelName = xLabel,
-                                                                                        MethodMetaDataToken = xCurrentMethod.MetadataToken
-                                                                                    });
+                                                    AssemblyFileName = xCurrentMethod.DeclaringType.Assembly.Location,
+                                                    InstructionOffset = 0,
+                                                    LabelName = xLabel,
+                                                    MethodMetaDataToken = xCurrentMethod.MetadataToken
+                                                });
                                             }
-                                            xPreviousOffset = xCurrentOffset;
-                                        } using (mSymbolsLocker.AcquireWriterLock()) {
+                                        }
+                                        
+                                        using (mSymbolsLocker.AcquireWriterLock()) {
                                             if (mSymbols != null) {
                                                 var xMLSymbol = new MLDebugSymbol();
                                                 xMLSymbol.LabelName = xLabel;
@@ -2534,18 +2448,7 @@ while(true) {
 
         private static bool mEmitDependencyGraph = false;
 
-        public static void EmitDependencyGraphLine(bool aIsContainer,
-                                                   string aMessage) {
-            if (!mEmitDependencyGraph) {
-                return;
-            }
-            return;
-            if (!aIsContainer) {
-                aMessage = "\t" + aMessage;
-            }
-            aMessage += "\r\n";
-            File.AppendAllText(@"d:\dependencygraph.txt",
-                               aMessage);
+        public static void EmitDependencyGraphLine(bool aIsContainer, string aMessage) {
         }
 
         static Engine() {
