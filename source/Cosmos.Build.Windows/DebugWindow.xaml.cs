@@ -50,7 +50,7 @@ namespace Cosmos.Build.Windows {
             UpdateCaptions();
 
             listLog.ItemsSource = mTraceLog;
-            listLog.SelectionChanged += new SelectionChangedEventHandler(lboxLog_SelectionChanged);
+            listLog.SelectionChanged += new SelectionChangedEventHandler(listLog_SelectionChanged);
 
             butnTrace.Click += new RoutedEventHandler(butnTrace_Click);
             butnTest.Click += new RoutedEventHandler(butnTest_Click);
@@ -270,7 +270,7 @@ namespace Cosmos.Build.Windows {
             }
         }
 
-        private void lboxLog_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+        private void listLog_SelectionChanged(object sender, SelectionChangedEventArgs e) {
             var xItem = listLog.SelectedItem as TraceItem;
             if (xItem != null) {
                 if (xItem.EIP > 0) {
