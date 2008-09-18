@@ -23,7 +23,7 @@ namespace Cosmos.Demo.Guess {
                 + Cosmos.Hardware.RTC.GetSeconds()));
             // Divide by 100, get remainder
             int xMagicNo = xRandom.Next() % 100;
-        //Debugger.Send("The magic number is " + xMagicNo);
+        Debugger.Send("The magic number is " + xMagicNo);
             Console.WriteLine("I am thinking of a number between 0 and 100. What is it?");
         Debugger.TraceOff();
             while (true) {
