@@ -55,22 +55,24 @@ namespace Indy.IL2CPU.Assembler.X86 {
             Memory["DebugStatus", 32] = (int)Status.Break;
             Call("DebugStub_SendTrace");
 
+            // Wait for a command
             DX = mComStatusAddr;
             Label = "DebugStub_WaitCmd";
             AL = Port[DX];
             AL.Test(0x01);
             JumpIf(Flags.Zero, "DebugStub_WaitCmd");
 
+            // Read command from port
             DX = mComAddr;
             AL = Port[DX];
 
-            //TODO: AL could also change... need to jump and not compare further
             AL.Compare((byte)Command.TraceOff);
                 CallIf(Flags.Equal, "DebugStub_TraceOff", "DebugStub_WaitCmd");
             AL.Compare((byte)Command.TraceOn);
                 CallIf(Flags.Equal, "DebugStub_TraceOn", "DebugStub_WaitCmd");
             AL.Compare((byte)Command.Break);
                 // Break command is also the continue command
+                // If received while in break, then it continues
                 CallIf(Flags.Equal, "DebugStub_Continue", "DebugStub_Break_Exit");
             AL.Compare((byte)Command.Step);
                 CallIf(Flags.Equal, "DebugStub_Step", "DebugStub_Break_Exit");

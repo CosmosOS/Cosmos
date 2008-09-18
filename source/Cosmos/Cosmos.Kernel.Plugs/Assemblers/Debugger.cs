@@ -6,6 +6,16 @@ using X86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Cosmos.Kernel.Plugs.Assemblers {
     public class DebugAsm : X86.X.Y86 {
+        public void Break() {
+            PushAll32();
+            Call("DebugStub_Break");
+            PopAll32();
+        }
+
+        public void SendText() {
+            Call("DebugStub_SendText");
+        }
+
         public void TraceOff() {
             PushAll32();
             Call("DebugStub_TraceOff");
@@ -16,10 +26,6 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
             PushAll32();
             Call("DebugStub_TraceOn");
             PopAll32();
-        }
-
-        public void SendText() {
-            Call("DebugStub_SendText");
         }
     }
 
@@ -39,6 +45,11 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
         }
     }
 
+    public class DebugBreak : AssemblerMethod {
+        public override void Assemble(Asm.Assembler aAssembler) {
+            new DebugAsm().Break();
+        }
+    }
 
     public class DebugSend : AssemblerMethod {
         public override void Assemble(Asm.Assembler aAssembler) {

@@ -20,7 +20,8 @@ namespace Cosmos.Playground.Kudzu {
 
             //PCITest.Test();
             //Tests.DoAll();
-            RTL8139.Test();
+            //RTL8139.Test();
+            Debugger.Main();
 
             //TODO: Make this automatically called after Init if no other shut downs are called
             Cosmos.Sys.Deboot.Halt();
