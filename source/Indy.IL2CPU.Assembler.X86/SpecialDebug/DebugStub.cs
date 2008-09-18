@@ -110,11 +110,11 @@ namespace Indy.IL2CPU.Assembler.X86 {
             AL = (int)MsgType.Text;
             Call("WriteALToComPort");
             
-            //TODO: Limited to 255 bytes, need to send 2 bytes
             // Write Length
             ESI = EBP;
             new Add("ESI", 12);
             ECX = Memory[ESI];
+            Call("WriteByteToComPort");
             Call("WriteByteToComPort");
         
             // Address of string

@@ -51,7 +51,7 @@ namespace Cosmos.Build.Windows {
         }
         
         private void PacketTextSize(byte[] aPacket) {
-            Next((int)aPacket[0], PacketText);
+            Next(GetUInt16(aPacket, 0), PacketText);
         }
         
         private void PacketText(byte[] aPacket) {
@@ -67,7 +67,7 @@ namespace Cosmos.Build.Windows {
                     Next(4, PacketTracePoint);            
                     break;
                 case MsgType.Text:
-                    Next(1, PacketTextSize);            
+                    Next(2, PacketTextSize);            
                     break;
                 default:
                     throw new Exception("Unknown debug command");
