@@ -139,7 +139,7 @@ namespace Cosmos.Build.Windows {
                 // Selected portion
                 xRunSelected = new Run(xText.Substring(aColBegin, aLength));
                 xRunSelected.FontFamily = mFont;
-                xRunSelected.Background = Brushes.Red;
+                xRunSelected.Background = Brushes.Yellow;
                 xPara.Inlines.InsertBefore(xSelectedLine, xRunSelected);
                 // Unselected on right if there is some
                 if (aColBegin + aLength < xText.Length) {
@@ -273,10 +273,12 @@ namespace Cosmos.Build.Windows {
         private void lboxLog_SelectionChanged(object sender, SelectionChangedEventArgs e) {
             var xItem = listLog.SelectedItem as TraceItem;
             if (xItem != null) {
-                if (mDebugMode == DebugModeEnum.Source) {
-                    SelectCode(xItem.EIP);
-                } else {
-                    throw new Exception("Current debug mode is not supported.");
+                if (xItem.EIP > 0) {
+                    if (mDebugMode == DebugModeEnum.Source) {
+                        SelectCode(xItem.EIP);
+                    } else {
+                        throw new Exception("Current debug mode is not supported.");
+                    }
                 }
             }
         }
