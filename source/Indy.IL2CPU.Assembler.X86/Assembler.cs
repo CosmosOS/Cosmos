@@ -7,7 +7,6 @@ using System.Text;
 namespace Indy.IL2CPU.Assembler.X86 {
 	public class Assembler : Indy.IL2CPU.Assembler.Assembler {
 
-        public const string BreakMethodName = "DebugStub_Break";
 		protected byte mComNumber = 0;
 		protected UInt16[] mComPortAddresses = { 0x3F8, 0x2F8, 0x3E8, 0x2E8 };
 
@@ -92,9 +91,6 @@ namespace Indy.IL2CPU.Assembler.X86 {
                     aOutputWriter.WriteLine("mov eax, cr0");
                     aOutputWriter.WriteLine("or eax, 0x1");
                     aOutputWriter.WriteLine("mov cr0, eax");
-                    
-
-
                     // END SSE INIT
 
 				    aOutputWriter.WriteLine("				 call " + EntryPointName);

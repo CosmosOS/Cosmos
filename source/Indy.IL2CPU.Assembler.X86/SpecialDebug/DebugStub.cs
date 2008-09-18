@@ -239,10 +239,9 @@ namespace Indy.IL2CPU.Assembler.X86 {
             mComAddr = aComAddr;
             mComStatusAddr = (UInt16)(aComAddr + 5);
             Emit();
-            // For System..Break
-            //  public class BreakAssembler: AssemblerMethod
 
-            Label = "DebugPoint__";
+            // Main entry point that IL2CPU generated code calls
+            Label = "DebugStub_Tracer";
 
             // If debug stub is in break, and then an IRQ happens, the IRQ
             // can call debug stub again. This causes two debug stubs to 

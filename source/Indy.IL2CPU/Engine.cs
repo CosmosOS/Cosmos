@@ -1560,33 +1560,29 @@ while(true) {
                                         //                     select xSize).Sum();
                                         //}
                                         // todo: calculate opcode number
-                                        bool xShouldIncludeDebugHeader = false;
-
-                                        #region determine if a new DebugHeader should be emitted
-
+                                        
+                                        // determine if a new DebugHeader should be emitted
+                                        bool xEmitTracer = false;
                                         if (mDebugMode == DebugModeEnum.IL) {
-                                            xShouldIncludeDebugHeader = true;
-                                        } else {
-                                            if (mDebugMode == DebugModeEnum.Source) {
-                                                if (xPreviousOffset == -1) {
-                                                    xShouldIncludeDebugHeader = true;
-                                                } else {
-                                                    if (xHasSymbols) {
-                                                        if (xCodeDocuments[xPreviousOffset] != xCodeDocuments[xCurrentOffset] || xCodeLines[xPreviousOffset] != xCodeLines[xCurrentOffset] || xCodeColumns[xPreviousOffset] != xCodeColumns[xCurrentOffset] || xCodeEndLines[xPreviousOffset] != xCodeEndLines[xCurrentOffset] || xCodeEndColumns[xPreviousOffset] != xCodeEndColumns[xCurrentOffset]) {
-                                                            xShouldIncludeDebugHeader = true;
-                                                        }
-                                                    }
-                                                }
+                                            // For IL, we emit for every one
+                                            xEmitTracer = true;
+                                        } else if (mDebugMode == DebugModeEnum.Source) {
+                                            if (xPreviousOffset == -1) {
+                                                xEmitTracer = true;
+                                            } else if (xHasSymbols) {
+                                                xEmitTracer =
+                                                 (xCodeDocuments[xPreviousOffset] != xCodeDocuments[xCurrentOffset] 
+                                                 || xCodeLines[xPreviousOffset] != xCodeLines[xCurrentOffset] 
+                                                 || xCodeColumns[xPreviousOffset] != xCodeColumns[xCurrentOffset] 
+                                                 || xCodeEndLines[xPreviousOffset] != xCodeEndLines[xCurrentOffset] 
+                                                 || xCodeEndColumns[xPreviousOffset] != xCodeEndColumns[xCurrentOffset]);
+                                                // The above code doesnt work correctly and produces horrible results
+                                                // For now we enable all, and it works pretty well
+                                                xEmitTracer = true;
                                             }
                                         }
-                                        xShouldIncludeDebugHeader &= xReader.OpCode != OpCodeEnum.Nop;
-
-                                        #endregion
-
-                                        if (xShouldIncludeDebugHeader) {
-                                            mMap.EmitOpDebugHeader(mAssembler,
-                                                                   0,
-                                                                   xLabel);
+                                        if (xEmitTracer) { 
+                                            mMap.EmitOpDebugHeader(mAssembler, 0, xLabel);
                                             using (mDebugSymbolsLocker.AcquireWriterLock()) {
                                                 mDebugSymbols.Add(new DebugSymbol() {
                                                                                         AssemblyFileName = xCurrentMethod.DeclaringType.Assembly.Location,

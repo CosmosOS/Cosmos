@@ -254,9 +254,8 @@ namespace Indy.IL2CPU.IL.X86
 			new CPUx86.Pushd(CPUx86.Registers.EAX);
 		}
 
-		public override void EmitOpDebugHeader(Indy.IL2CPU.Assembler.Assembler aAssembler, uint aOpId, string aOpLabel)
-		{
-			new CPUx86.Call("DebugPoint__");
+		public override void EmitOpDebugHeader(Indy.IL2CPU.Assembler.Assembler aAssembler, uint aOpId, string aOpLabel) {
+			new CPUx86.Call("DebugStub_Tracer");
 		}
 
         public override void PreProcess(Indy.IL2CPU.Assembler.Assembler mAssembler)
