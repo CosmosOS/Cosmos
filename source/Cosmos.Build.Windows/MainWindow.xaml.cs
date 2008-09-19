@@ -35,28 +35,27 @@ namespace Cosmos.Build.Windows {
                 aBuilder.DebugLog -= xBuildUC.DoDebugMessage;
                 aBuilder.ProgressChanged -= xBuildUC.DoProgressMessage;
 
-                xMessages = (from item in xBuildUC.Messages
-                             where item.Severity != LogSeverityEnum.Informational
-                             select item).ToArray();
+                //xMessages = (from item in xBuildUC.Messages
+                //             where item.Severity != LogSeverityEnum.Informational
+                //             select item).ToArray();
 
-                //If there were any warnings or errors, then show dialog again
-                if (xMessages.Count() > 0) {
-                    xBuildUC.BuildRunning = false;
-                    return false;
-                }
+                ////If there were any warnings or errors, then show dialog again
+                //if (xMessages.Count() > 0) {
+                //    return false;
+                //}
             } catch (Exception E) {
-                var xTheMessages = (from item in xBuildUC.Messages
-                                    where item.Severity != LogSeverityEnum.Informational
-                                    select item).ToList();
-                xTheMessages.Add(new BuildLogMessage() {
-                    Severity = LogSeverityEnum.Error,
-                    Message = E.ToString()
-                });
-                xBuildUC.Messages.Clear();
-                foreach (var item in xTheMessages) {
-                    xBuildUC.Messages.Add(item);
-                }
-                return false;
+                //var xTheMessages = (from item in xBuildUC.Messages
+                //                    where item.Severity != LogSeverityEnum.Informational
+                //                    select item).ToList();
+                //xTheMessages.Add(new BuildLogMessage() {
+                //    Severity = LogSeverityEnum.Error,
+                //    Message = E.ToString()
+                //});
+                //xBuildUC.Messages.Clear();
+                //foreach (var item in xTheMessages) {
+                //    xBuildUC.Messages.Add(item);
+                //}
+                //return false;
             }
             Close();
             return true;

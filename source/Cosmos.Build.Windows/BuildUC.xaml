@@ -3,63 +3,27 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:local="clr-namespace:Cosmos.Build.Windows"
     Height="300" Width="300">
-    <UserControl.Resources>
-        <ObjectDataProvider
-			x:Key="BuildMessages"
-			ObjectType="{x:Type local:BuildLogMessages}" />
-    </UserControl.Resources>
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="15"/>
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="60" />
-            <RowDefinition Height="20" />
-            <RowDefinition Height="24" />
-            <RowDefinition />
-
+            <RowDefinition Height="*" />
+            <RowDefinition Height="10" />
+            <RowDefinition Height="100" />
         </Grid.RowDefinitions>
-        <Label 
-            x:Name="progressText"
-            Grid.Row="0"            
-            Content="Unknown"></Label>
-        <ProgressBar
-			x:Name="progressBuild"
-			Grid.Row="1"
-			Value="0"></ProgressBar>
-        <Label 
-            x:Name="warningLabel"
-            Grid.Row="2"
-            FontWeight="bold"
-            Content="Warning/Error messages:"></Label>
-        <ListBox
-			ItemsSource="{Binding Source={StaticResource BuildMessages}}"
-			Name="lboxLog"
-			Background="White"
-			Grid.Row="3">
-            <ListBox.ItemTemplate>
-                <DataTemplate
-					DataType="{x:Type local:BuildLogMessage}">
-                    <ListBoxItem
-						Name="item"
-						Content="{Binding Path=Message}" />
-                    <DataTemplate.Triggers>
-                        <DataTrigger
-							Binding="{Binding Path=Severity}"
-							Value="Error">
-                            <Setter
-								TargetName="item"
-								Property="Foreground"
-								Value="Red" />
-                        </DataTrigger>
-                        <DataTrigger
-							Binding="{Binding Path=Severity}"
-							Value="Warning">
-                            <Setter
-								TargetName="item"
-								Property="Foreground"
-								Value="Orange" />
-                        </DataTrigger>
-                    </DataTemplate.Triggers>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+        
+        <ProgressBar Grid.Row="0" Grid.RowSpan="3" Grid.Column="1" x:Name="pbarMain" Orientation="Vertical"
+                     Value="0" Width="Auto" Height="Auto"/>
+        
+        <ListBox Grid.Row="0" Grid.Column="0" x:Name="listProgress" Height="Auto" Width="Auto"/>
+        
+        <GridSplitter Grid.Row="1" Grid.Column="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
+
+        <DockPanel Grid.Row="2" Grid.Column="0">
+            <Label x:Name="warningLabel" DockPanel.Dock="Top" FontWeight="bold" Content="Warnings &amp; Errors"/>
+            <ListBox x:Name="listErrors"/>
+        </DockPanel>
     </Grid>
 </UserControl>

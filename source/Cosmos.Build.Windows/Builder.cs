@@ -127,10 +127,8 @@ namespace Cosmos.Build.Windows {
             Stopwatch xSW = new Stopwatch();
             xSW.Start();
             var xEngine = new Engine();
-            xEngine.ProgressChanged += delegate()
-            {
-                if (ProgressChanged != null)
-                {
+            xEngine.ProgressChanged += delegate() {
+                if (ProgressChanged != null) {
                     ProgressChanged(xEngine.ProgressMax, xEngine.ProgressCurrent, xEngine.ProgressMessage);
                 }
             };

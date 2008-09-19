@@ -163,10 +163,7 @@ namespace Indy.IL2CPU {
         }
 
         private string mProgressMessage = String.Empty;
-
-        /// <summary>
-        /// Message indicating the current build process. Setting this will also trigger a ProgressChanged event for any listeners.
-        /// </summary>
+        // Message indicating the current build process. Setting this will also trigger a ProgressChanged event for any listeners.
         public string ProgressMessage {
             get {
                 return mProgressMessage;
@@ -178,7 +175,6 @@ namespace Indy.IL2CPU {
         }
 
         public event Action ProgressChanged;
-        //private Func<string, string> mGetFileNameForGroup;
         private void OnProgressChanged() {
             if (ProgressChanged != null) {
                 ProgressChanged();
@@ -403,12 +399,10 @@ namespace Indy.IL2CPU {
                         }
                         using (mSymbolsLocker.AcquireReaderLock()) {
                             if (mSymbols != null) {
-                                string xOutputFile = Path.Combine(mOutputDir,
-                                                                  "debug.cxdb");
+                                string xOutputFile = Path.Combine(mOutputDir, "debug.cxdb");
                                 this.ProgressMessage = String.Format("Dumping Symbols to file {0}",
                                                                      xOutputFile);
-                                MLDebugSymbol.WriteSymbolsListToFile(mSymbols,
-                                                                     xOutputFile);
+                                MLDebugSymbol.WriteSymbolsListToFile(mSymbols, xOutputFile);
                             }
                         }
                     } finally {
