@@ -9,15 +9,16 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using Microsoft.Win32;
 using Indy.IL2CPU;
 
 namespace Cosmos.Build.Windows {
-    public partial class OptionsWindow : Window {
-
+    public partial class OptionsUC : UserControl {
         protected string mLastSelectedUSBDrive;
+        protected bool mSaveSettings = true;
         
         protected DebugModeEnum mDebugMode;
         public DebugModeEnum DebugMode {
@@ -27,48 +28,6 @@ namespace Cosmos.Build.Windows {
         protected byte mComPort;
         public byte ComPort {
             get { return mComPort; }
-        }
-
-        public bool Display(string aBuildPath) {
-            tblkBuildPath.Text = aBuildPath;
-            tblkISOPath.Text = aBuildPath + "Cosmos.iso";
-
-            var xShowOptions = chbxShowOptions.IsChecked.Value;
-            // If the user doenst have the option to auto show, then look
-            // for control key pressed
-            if (!xShowOptions) {
-                // We should use the WPF Keyboard.IsKeyDown, but it does not work here.
-                // It appears that it gets initialized at some point later
-                // or after a WPF window is shown, but it does not work here for sure
-                // so instead we have to us an extern.
-                xShowOptions = KeyState.IsKeyDown(System.Windows.Forms.Keys.RControlKey)
-                    || KeyState.IsKeyDown(System.Windows.Forms.Keys.LControlKey);
-            }
-
-            bool xDoBuild = true;
-            if (xShowOptions) {
-                xDoBuild = ShowDialog().Value;
-            }
-            if (xDoBuild) {
-                SaveSettingsToRegistry();
-                mComPort = (byte)cmboDebugPort.SelectedIndex;
-                if (mComPort > 3) {
-                    throw new Exception("Debug port not supported yet!");
-                }
-                mComPort++;
-                if (rdioDebugModeNone.IsChecked.Value) {
-                    mDebugMode = DebugModeEnum.None;
-                } else if (rdioDebugModeIL.IsChecked.Value) {
-                    mDebugMode = DebugModeEnum.IL;
-                    throw new NotSupportedException("Debug mode IL isn't supported yet, use Source instead.");
-                } else if (rdioDebugModeSource.IsChecked.Value) {
-                    mDebugMode = DebugModeEnum.Source;
-                    mComPort = 1;
-                } else {
-                    throw new Exception("Unknown debug mode.");
-                }
-            }
-            return xDoBuild;
         }
 
         protected void TargetChanged(object aSender, RoutedEventArgs e) {
@@ -100,14 +59,44 @@ namespace Cosmos.Build.Windows {
             spnlUSB.Visibility = aSender == rdioUSB ? Visibility.Visible : Visibility.Collapsed;
             spnlVMWare.Visibility = aSender == rdioVMWare ? Visibility.Visible : Visibility.Collapsed;
         }
+        
+        public Action Proceed;
+        public Action Stop;
 
-        public OptionsWindow() {
+        private void butnBuild_Click(object sender, RoutedEventArgs e) {
+            if (mSaveSettings) {
+                SaveSettingsToRegistry();
+            }
+            mComPort = (byte)cmboDebugPort.SelectedIndex;
+            if (mComPort > 3) {
+                throw new Exception("Debug port not supported yet!");
+            }
+            mComPort++;
+            if (rdioDebugModeNone.IsChecked.Value) {
+                mDebugMode = DebugModeEnum.None;
+            } else if (rdioDebugModeIL.IsChecked.Value) {
+                mDebugMode = DebugModeEnum.IL;
+                throw new NotSupportedException("Debug mode IL isn't supported yet, use Source instead.");
+            } else if (rdioDebugModeSource.IsChecked.Value) {
+                mDebugMode = DebugModeEnum.Source;
+                mComPort = 1;
+            } else {
+                throw new Exception("Unknown debug mode.");
+            }
+            Proceed();
+        }
+        
+        private void butnCancel_Click(object sender, RoutedEventArgs e) {
+            Stop();
+        }
+        
+        public OptionsUC(string aBuildPath) {
             InitializeComponent();
+            Height = float.NaN;
+            Width = float.NaN;
 
-            Loaded += delegate(object sender, RoutedEventArgs e) {
-                this.Activate();
-            };
-
+            Loaded += new RoutedEventHandler(OptionsUC_Loaded);
+            
             butnBuild.Click += new RoutedEventHandler(butnBuild_Click);
             butnCancel.Click += new RoutedEventHandler(butnCancel_Click);
 
@@ -117,6 +106,9 @@ namespace Cosmos.Build.Windows {
             rdioISO.Checked += new RoutedEventHandler(TargetChanged);
             rdioPXE.Checked += new RoutedEventHandler(TargetChanged);
             rdioUSB.Checked += new RoutedEventHandler(TargetChanged);
+
+            tblkBuildPath.Text = aBuildPath;
+            tblkISOPath.Text = aBuildPath + "Cosmos.iso";
 
             cmboDebugPort.Items.Add("Disabled");
 
@@ -129,12 +121,24 @@ namespace Cosmos.Build.Windows {
             LoadSettingsFromRegistry();
         }
 
-        private void butnBuild_Click(object sender, RoutedEventArgs e) {
-            DialogResult = true;
-        }
-
-        private void butnCancel_Click(object sender, RoutedEventArgs e) {
-            DialogResult = false;
+        void OptionsUC_Loaded(object sender, RoutedEventArgs e) {
+            var xShowOptions = chbxShowOptions.IsChecked.Value;
+            // If the user doenst have the option to auto show, then look
+            // for control key pressed
+            if (!xShowOptions) {
+                // We should use the WPF Keyboard.IsKeyDown, but it does not work here.
+                // It appears that it gets initialized at some point later
+                // or after a WPF window is shown, but it does not work here for sure
+                // so instead we have to us an extern.
+                xShowOptions = KeyState.IsKeyDown(System.Windows.Forms.Keys.RControlKey)
+                    || KeyState.IsKeyDown(System.Windows.Forms.Keys.LControlKey);
+            }
+            if (!xShowOptions) {
+                mSaveSettings = false;
+                // Need to do this so we dont stuff up the main flow
+                // where message processing continues. 
+                butnBuild.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            }
         }
 
         protected const string mRegKey = @"Software\Cosmos\User Kit";
@@ -264,6 +268,5 @@ namespace Cosmos.Build.Windows {
                 mLastSelectedUSBDrive = (string)xKey.GetValue("USB Device", "");
             }
         }
-
     }
 }

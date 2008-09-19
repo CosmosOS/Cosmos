@@ -85,7 +85,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="OptionsWindow.xaml">
+    <Page Include="OptionsUC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -108,8 +108,8 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ObjDump.cs" />
-    <Compile Include="OptionsWindow.xaml.cs">
-      <DependentUpon>OptionsWindow.xaml</DependentUpon>
+    <Compile Include="OptionsUC.xaml.cs">
+      <DependentUpon>OptionsUC.xaml</DependentUpon>
     </Compile>
     <Compile Include="BuildUI.cs" />
     <Compile Include="DebugWindow.xaml.cs">

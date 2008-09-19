@@ -16,6 +16,9 @@ namespace Cosmos.Build.Windows {
     public partial class MainWindow : Window {
         public MainWindow() {
             InitializeComponent();
+            Loaded += delegate(object sender, RoutedEventArgs e) {
+                this.Activate();
+            };
         }
 
     }

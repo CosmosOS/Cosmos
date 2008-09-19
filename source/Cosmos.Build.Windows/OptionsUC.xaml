@@ -1,11 +1,7 @@
-﻿<Window
-	x:Class="Cosmos.Build.Windows.OptionsWindow"
-	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-	Title="Build"
-	WindowStartupLocation="CenterScreen"
-	Width="765.153"
-	Icon="/Cosmos.Build.Windows;component/Cosmos.ico" WindowState="Maximized">
+﻿<UserControl x:Class="Cosmos.Build.Windows.OptionsUC"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Height="Auto" Width="600">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -18,7 +14,7 @@
             </StackPanel>
             <Image Source="/Cosmos.Build.Windows;component/Logo-1.png" Width="150" />
         </DockPanel>
-            
+
         <ScrollViewer Grid.Row="1" CanContentScroll="False" ScrollViewer.VerticalScrollBarVisibility="Auto">
             <StackPanel>
                 <Label Margin="0,10" Background="LightGray" FontWeight="Bold">Status</Label>
@@ -43,7 +39,7 @@
                             <RadioButton GroupName="Target" Name="rdioUSB" Margin="10, 0, 0, 0">_USB Device</RadioButton>
                         </WrapPanel>
                     </StackPanel>
-                </WrapPanel>            
+                </WrapPanel>
 
                 <StackPanel Name="spnlDebugger">
                     <Label Margin="0,10,0,0" Background="LightGray" FontWeight="Bold">Cosmos Debugger</Label>
@@ -127,4 +123,4 @@
             </StackPanel>
         </ScrollViewer>
     </Grid>
-</Window>
+</UserControl>

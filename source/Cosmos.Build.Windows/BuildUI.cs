@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Windows;
 using Microsoft.Win32;
 using Indy.IL2CPU;
 
@@ -14,86 +15,104 @@ namespace Cosmos.Build.Windows {
         [DllImport("kernel32.dll")]
         protected static extern int GetConsoleWindow();
 
-        public static void Run() {
-            // Hide the console window
-            int xConsoleWindow = GetConsoleWindow();
-            ShowWindow(xConsoleWindow, 0);
-
-            var xBuilder = new Builder();
-
-            var xOptionsWindow = new OptionsWindow();
-            if (!xOptionsWindow.Display(xBuilder.BuildPath)) {
-                return;
-            }
-            
+        protected Builder mBuilder = new Builder();
+        protected int mConsoleWindow;
+        protected MainWindow mMainWindow;
+        protected OptionsUC mOptionsUC;
+                
+        protected void OptionsProceed() {
             // Call IL2CPU
-            if (xOptionsWindow.chbxCompileIL.IsChecked.Value) {
+            if (mOptionsUC.chbxCompileIL.IsChecked.Value) {
                 //TODO: Eventually eliminate the console window completely
-                if (xOptionsWindow.chbxShowConsoleWindow.IsChecked.Value) {
-                    ShowWindow(xConsoleWindow, 1);
+                if (mOptionsUC.chbxShowConsoleWindow.IsChecked.Value) {
+                    ShowWindow(mConsoleWindow, 1);
                 }
-                var xMainWindow = new MainWindow();
-                xMainWindow.Show();
                 var xBuildUC = new BuildUC();
-                xMainWindow.Content = xBuildUC;
-                if (!xBuildUC.Display(xBuilder, xOptionsWindow.DebugMode, xOptionsWindow.ComPort)) {
+                mMainWindow.Content = xBuildUC;
+                if (xBuildUC.Display(mBuilder, mOptionsUC.DebugMode, mOptionsUC.ComPort) == false) {
                     return;
                 }
-                xMainWindow.Close();
             }
+            mMainWindow.Close();
             
             DebugWindow xDebugWindow = null;
             // Debug Window is only displayed if Qemu + Debug checked
             // or if other VM + Debugport selected
-            if (!xOptionsWindow.rdioDebugModeNone.IsChecked.Value) {
+            if (!mOptionsUC.rdioDebugModeNone.IsChecked.Value) {
                 xDebugWindow = new DebugWindow();
-                if (xOptionsWindow.DebugMode == DebugModeEnum.Source) {
+                if (mOptionsUC.DebugMode == DebugModeEnum.Source) {
                     var xLabelByAddressMapping = ObjDump.GetLabelByAddressMapping(
-                        xBuilder.BuildPath + "output.bin"
-                        , xBuilder.ToolsPath + @"cygwin\objdump.exe");
+                        mBuilder.BuildPath + "output.bin"
+                        , mBuilder.ToolsPath + @"cygwin\objdump.exe");
                     var xSourceMappings = SourceInfo.GetSourceInfo(xLabelByAddressMapping
-                        , xBuilder.BuildPath + "Tools/asm/debug.cxdb");
+                        , mBuilder.BuildPath + "Tools/asm/debug.cxdb");
                           
                     DebugConnector xDebugConnector;
-                    if (xOptionsWindow.rdioQEMU.IsChecked.Value) {
+                    if (mOptionsUC.rdioQEMU.IsChecked.Value) {
                         xDebugConnector = new DebugConnectorQEMU();
-                    } else if (xOptionsWindow.rdioVMWare.IsChecked.Value) {
+                    } else if (mOptionsUC.rdioVMWare.IsChecked.Value) {
                         xDebugConnector = new DebugConnectorVMWare();
                     } else {
                         throw new Exception("TODO: Make a connector for raw serial");
                     }
                     xDebugWindow.SetSourceInfoMap(xSourceMappings, xDebugConnector);
                 } else {
-                    throw new Exception("Debug mode not supported: " + xOptionsWindow.DebugMode);
+                    throw new Exception("Debug mode not supported: " + mOptionsUC.DebugMode);
                 }
             }
 
             // Launch emulators or other final actions
-            if (xOptionsWindow.rdioQEMU.IsChecked.Value) {
+            if (mOptionsUC.rdioQEMU.IsChecked.Value) {
                 // Uncomment if problems with QEMU to see output
                 // TODO: Capture and send to debug window
                 //ShowWindow(xConsoleWindow, 1);
-                xBuilder.MakeQEMU(xOptionsWindow.chbxQEMUUseHD.IsChecked.Value,
-                                  xOptionsWindow.chbxQEMUUseGDB.IsChecked.Value,
-                                  xOptionsWindow.DebugMode != DebugModeEnum.None,
-                                  xOptionsWindow.chckQEMUUseNetworkTAP.IsChecked.Value,
-                                  xOptionsWindow.cmboNetworkCards.SelectedValue,
-                                  xOptionsWindow.cmboAudioCards.SelectedValue);
-            } else if (xOptionsWindow.rdioVMWare.IsChecked.Value) {
-                xBuilder.MakeVMWare(xOptionsWindow.rdVMWareServer.IsChecked.Value);
-            } else if (xOptionsWindow.rdioVPC.IsChecked.Value) {
-                xBuilder.MakeVPC();
-            } else if (xOptionsWindow.rdioISO.IsChecked.Value) {
-                xBuilder.MakeISO();
-            } else if (xOptionsWindow.rdioPXE.IsChecked.Value) {
-                xBuilder.MakePXE();
-            } else if (xOptionsWindow.rdioUSB.IsChecked.Value) {
-                xBuilder.MakeUSB(xOptionsWindow.cmboUSBDevice.Text[0]);
+                mBuilder.MakeQEMU(mOptionsUC.chbxQEMUUseHD.IsChecked.Value,
+                                  mOptionsUC.chbxQEMUUseGDB.IsChecked.Value,
+                                  mOptionsUC.DebugMode != DebugModeEnum.None,
+                                  mOptionsUC.chckQEMUUseNetworkTAP.IsChecked.Value,
+                                  mOptionsUC.cmboNetworkCards.SelectedValue,
+                                  mOptionsUC.cmboAudioCards.SelectedValue);
+            } else if (mOptionsUC.rdioVMWare.IsChecked.Value) {
+                mBuilder.MakeVMWare(mOptionsUC.rdVMWareServer.IsChecked.Value);
+            } else if (mOptionsUC.rdioVPC.IsChecked.Value) {
+                mBuilder.MakeVPC();
+            } else if (mOptionsUC.rdioISO.IsChecked.Value) {
+                mBuilder.MakeISO();
+            } else if (mOptionsUC.rdioPXE.IsChecked.Value) {
+                mBuilder.MakePXE();
+            } else if (mOptionsUC.rdioUSB.IsChecked.Value) {
+                mBuilder.MakeUSB(mOptionsUC.cmboUSBDevice.Text[0]);
             }
 
             if (xDebugWindow != null) {
                 xDebugWindow.ShowDialog();
             }
         }
+
+        protected void OptionsStop() {
+            mMainWindow.Close();
+        }
+
+        protected void Execute() {
+            // Hide the console window
+            mConsoleWindow = GetConsoleWindow();
+            ShowWindow(mConsoleWindow, 0);
+
+            // Create here, after we hide console Window so it gets hidden quickly
+            mMainWindow = new MainWindow();
+            
+            mOptionsUC = new OptionsUC(mBuilder.BuildPath);
+            mOptionsUC.Proceed = OptionsProceed;
+            mOptionsUC.Stop = OptionsStop;
+            mMainWindow.Content = mOptionsUC;
+            
+            mMainWindow.ShowDialog();
+        }
+
+        public static void Run() {
+            var xBuildUI = new BuildUI();
+            xBuildUI.Execute();
+        }
+        
     }
 }
