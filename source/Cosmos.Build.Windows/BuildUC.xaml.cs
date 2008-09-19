@@ -31,8 +31,6 @@ namespace Cosmos.Build.Windows {
     public partial class BuildUC : UserControl {
         public BuildUC() {
             InitializeComponent();
-            Height = float.NaN;
-            Width = float.NaN;
         }
 
         public bool Display(Builder aBuilder, DebugModeEnum aDebugMode, byte aComPort) {

@@ -92,8 +92,6 @@ namespace Cosmos.Build.Windows {
         
         public OptionsUC(string aBuildPath) {
             InitializeComponent();
-            Height = float.NaN;
-            Width = float.NaN;
 
             Loaded += new RoutedEventHandler(OptionsUC_Loaded);
             

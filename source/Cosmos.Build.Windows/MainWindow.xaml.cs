@@ -20,6 +20,12 @@ namespace Cosmos.Build.Windows {
                 this.Activate();
             };
         }
+        
+        public void LoadControl(UserControl aControl) {
+            aControl.Width = double.NaN;
+            aControl.Height = double.NaN;
+            Content = aControl;
+        }
 
     }
 }

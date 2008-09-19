@@ -28,7 +28,7 @@ namespace Cosmos.Build.Windows {
                     ShowWindow(mConsoleWindow, 1);
                 }
                 var xBuildUC = new BuildUC();
-                mMainWindow.Content = xBuildUC;
+                mMainWindow.LoadControl(xBuildUC);
                 if (xBuildUC.Display(mBuilder, mOptionsUC.DebugMode, mOptionsUC.ComPort) == false) {
                     return;
                 }
@@ -104,7 +104,7 @@ namespace Cosmos.Build.Windows {
             mOptionsUC = new OptionsUC(mBuilder.BuildPath);
             mOptionsUC.Proceed = OptionsProceed;
             mOptionsUC.Stop = OptionsStop;
-            mMainWindow.Content = mOptionsUC;
+            mMainWindow.LoadControl(mOptionsUC);
             
             mMainWindow.ShowDialog();
         }
