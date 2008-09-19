@@ -10,29 +10,29 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using System.Runtime.InteropServices;
+using System.Windows.Threading;
 using Microsoft.Win32;
 using Indy.IL2CPU;
-using System.Windows.Threading;
 
 namespace Cosmos.Build.Windows {
     public partial class OptionsWindow : Window {
-        [DllImport("user32.dll")]
-        public static extern int ShowWindow(int Handle, int showState);
 
-        [DllImport("kernel32.dll")]
-        public static extern int GetConsoleWindow();
-
-        protected Block mOptionsBlockPrefix;
-        protected Builder mBuilder = new Builder();
         protected string mLastSelectedUSBDrive;
+        
+        protected DebugModeEnum mDebugMode;
+        public DebugModeEnum DebugMode {
+            get { return mDebugMode; }
+        }
+        
+        protected byte mComPort;
+        public byte ComPort {
+            get { return mComPort; }
+        }
 
-        public void Display() {
-            // Hide the console window
-            int xConsoleWindow = GetConsoleWindow();
-            ShowWindow(xConsoleWindow, 0);
+        public bool Display(string aBuildPath) {
+            tblkBuildPath.Text = aBuildPath;
+            tblkISOPath.Text = aBuildPath + "Cosmos.iso";
 
-            bool xDoBuild = true;
             var xShowOptions = chbxShowOptions.IsChecked.Value;
             // If the user doenst have the option to auto show, then look
             // for control key pressed
@@ -44,12 +44,13 @@ namespace Cosmos.Build.Windows {
                 xShowOptions = KeyState.IsKeyDown(System.Windows.Forms.Keys.RControlKey)
                     || KeyState.IsKeyDown(System.Windows.Forms.Keys.LControlKey);
             }
+
+            bool xDoBuild = true;
             if (xShowOptions) {
                 xDoBuild = ShowDialog().Value;
             }
             if (xDoBuild) {
                 SaveSettingsToRegistry();
-
                 mComPort = (byte)cmboDebugPort.SelectedIndex;
                 if (mComPort > 3) {
                     throw new Exception("Debug port not supported yet!");
@@ -66,73 +67,8 @@ namespace Cosmos.Build.Windows {
                 } else {
                     throw new Exception("Unknown debug mode.");
                 }
-
-                // Call IL2CPU
-                if (chbxCompileIL.IsChecked.Value) {
-                    //TODO: Eventually eliminate the console window completely
-                    if (chbxShowConsoleWindow.IsChecked.Value) {
-                        ShowWindow(xConsoleWindow, 1);
-                    }
-                    var xMainWindow = new MainWindow();
-                    xMainWindow.Show();
-                    if (xMainWindow.PhaseBuild(mBuilder, mDebugMode, mComPort) == false) {
-                        return;
-                    }
-                }
-                
-                DebugWindow xDebugWindow = null;
-                // Debug Window is only displayed if Qemu + Debug checked
-                // or if other VM + Debugport selected
-                if (!rdioDebugModeNone.IsChecked.Value) {
-                    xDebugWindow = new DebugWindow();
-                    if (mDebugMode == DebugModeEnum.Source) {
-                        var xLabelByAddressMapping = ObjDump.GetLabelByAddressMapping(
-                            mBuilder.BuildPath + "output.bin"
-                            , mBuilder.ToolsPath + @"cygwin\objdump.exe");
-                        var xSourceMappings = SourceInfo.GetSourceInfo(xLabelByAddressMapping
-                            , mBuilder.BuildPath + "Tools/asm/debug.cxdb");
-                              
-                        DebugConnector xDebugConnector;
-                        if (rdioQEMU.IsChecked.Value) {
-                            xDebugConnector = new DebugConnectorQEMU();
-                        } else if (rdioVMWare.IsChecked.Value) {
-                            xDebugConnector = new DebugConnectorVMWare();
-                        } else {
-                            throw new Exception("TODO: Make a connector for raw serial");
-                        }
-                        xDebugWindow.SetSourceInfoMap(xSourceMappings, xDebugConnector);
-                    } else {
-                        throw new Exception("Debug mode not supported: " + mDebugMode);
-                    }
-                }
-
-                // Launch emulators or other final actions
-                if (rdioQEMU.IsChecked.Value) {
-                    // Uncomment if problems with QEMU to see output
-                    // TODO: Capture and send to debug window
-                    //ShowWindow(xConsoleWindow, 1);
-                    mBuilder.MakeQEMU(chbxQEMUUseHD.IsChecked.Value,
-                                      chbxQEMUUseGDB.IsChecked.Value,
-                                      mDebugMode != DebugModeEnum.None,
-                                      chckQEMUUseNetworkTAP.IsChecked.Value,
-                                      cmboNetworkCards.SelectedValue,
-                                      cmboAudioCards.SelectedValue);
-                } else if (rdioVMWare.IsChecked.Value) {
-                    mBuilder.MakeVMWare(rdVMWareServer.IsChecked.Value);
-                } else if (rdioVPC.IsChecked.Value) {
-                    mBuilder.MakeVPC();
-                } else if (rdioISO.IsChecked.Value) {
-                    mBuilder.MakeISO();
-                } else if (rdioPXE.IsChecked.Value) {
-                    mBuilder.MakePXE();
-                } else if (rdioUSB.IsChecked.Value) {
-                    mBuilder.MakeUSB(cmboUSBDevice.Text[0]);
-                }
-
-                if (xDebugWindow != null) {
-                    xDebugWindow.ShowDialog();
-                }
             }
+            return xDoBuild;
         }
 
         protected void TargetChanged(object aSender, RoutedEventArgs e) {
@@ -182,9 +118,6 @@ namespace Cosmos.Build.Windows {
             rdioPXE.Checked += new RoutedEventHandler(TargetChanged);
             rdioUSB.Checked += new RoutedEventHandler(TargetChanged);
 
-            tblkBuildPath.Text = mBuilder.BuildPath;
-            tblkISOPath.Text = mBuilder.BuildPath + "Cosmos.iso";
-
             cmboDebugPort.Items.Add("Disabled");
 
             foreach (string xNIC in Enum.GetNames(typeof(Builder.QemuNetworkCard))) {
@@ -199,9 +132,6 @@ namespace Cosmos.Build.Windows {
         private void butnBuild_Click(object sender, RoutedEventArgs e) {
             DialogResult = true;
         }
-
-        private DebugModeEnum mDebugMode;
-        private byte mComPort;
 
         private void butnCancel_Click(object sender, RoutedEventArgs e) {
             DialogResult = false;

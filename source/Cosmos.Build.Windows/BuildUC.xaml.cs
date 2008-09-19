@@ -31,29 +31,31 @@ namespace Cosmos.Build.Windows {
     public partial class BuildUC : UserControl {
         public BuildUC() {
             InitializeComponent();
+            Height = float.NaN;
+            Width = float.NaN;
+        }
+
+        public bool Display(Builder aBuilder, DebugModeEnum aDebugMode, byte aComPort) {
+            IEnumerable<BuildLogMessage> xMessages = new BuildLogMessage[0];
+            aBuilder.PreventFreezing += PreventFreezing;
+            aBuilder.DebugLog += DoDebugMessage;
+            aBuilder.ProgressChanged += DoProgressMessage;
+            //try {
+                aBuilder.Compile(aDebugMode, aComPort);
+
+                aBuilder.DebugLog -= DoDebugMessage;
+                aBuilder.ProgressChanged -= DoProgressMessage;
+            //} catch {
+            //    return false;
+            //}
+            return true;
         }
 
 		public void DoDebugMessage(LogSeverityEnum aSeverity, string aMessage) {
 			if (aSeverity == LogSeverityEnum.Informational) {
 				return;
 			}
-            //Dispatcher.BeginInvoke(DispatcherPriority.Input,
-            //                       new DispatcherOperationCallback(delegate(object aTheMessage) {
-            //                                                           Messages.Add((BuildLogMessage)aTheMessage);
-            //                                                           lboxLog.ScrollIntoView((BuildLogMessage)aTheMessage);
-            //                                                           return null;
-            //                                                       }),
-            //                       xMessage);
-            //var xFrame = new DispatcherFrame();
-            //Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Input, new DispatcherOperationCallback(delegate(object aParam) {
-            //    xFrame.Continue = false;
-            //    return null;
-            //}), null);
-            //Dispatcher.PushFrame(xFrame);
 		}
-
-        private int mMax;
-        private int mCurrent;
 
         public void PreventFreezing() {
             var xFrame = new DispatcherFrame();
@@ -65,19 +67,16 @@ namespace Cosmos.Build.Windows {
             Dispatcher.PushFrame(xFrame);
         }
         
-        protected delegate void ProgressMessageReceivedDelegate(string aMsg);
         protected void ProgressMessageReceived(string aMsg) {
-            listProgress.Items.Add(aMsg);
-            // Old code
-            pbarMain.Maximum = mMax;
-            pbarMain.Value = mCurrent;
+            listProgress.SelectedIndex = listProgress.Items.Add(aMsg);
+            listProgress.ScrollIntoView(listProgress.Items[listProgress.SelectedIndex]);
         }
         
         public void DoProgressMessage(int aMax, int aCurrent, string aMessage) {
-            mCurrent = aCurrent;
-            mMax = aMax;
-            Dispatcher.BeginInvoke(DispatcherPriority.Input
-                , new ProgressMessageReceivedDelegate(ProgressMessageReceived), aMessage);
+            var xAction = (Action)delegate() { 
+                ProgressMessageReceived(aMessage); 
+            };
+            Dispatcher.BeginInvoke(DispatcherPriority.Input, xAction);
             PreventFreezing();
         }
 

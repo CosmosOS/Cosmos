@@ -18,47 +18,5 @@ namespace Cosmos.Build.Windows {
             InitializeComponent();
         }
 
-        // TODO: Move this into BuildUC
-        public bool PhaseBuild(Builder aBuilder, DebugModeEnum aDebugMode, byte aComPort) {
-            var xBuildUC = new BuildUC();
-            xBuildUC.Height = float.NaN;
-            xBuildUC.Width = float.NaN;
-            Content = xBuildUC;
-
-            IEnumerable<BuildLogMessage> xMessages = new BuildLogMessage[0];
-            aBuilder.PreventFreezing += xBuildUC.PreventFreezing;
-            aBuilder.DebugLog += xBuildUC.DoDebugMessage;
-            aBuilder.ProgressChanged += xBuildUC.DoProgressMessage;
-            try {
-                aBuilder.Compile(aDebugMode, aComPort);
-
-                aBuilder.DebugLog -= xBuildUC.DoDebugMessage;
-                aBuilder.ProgressChanged -= xBuildUC.DoProgressMessage;
-
-                //xMessages = (from item in xBuildUC.Messages
-                //             where item.Severity != LogSeverityEnum.Informational
-                //             select item).ToArray();
-
-                ////If there were any warnings or errors, then show dialog again
-                //if (xMessages.Count() > 0) {
-                //    return false;
-                //}
-            } catch (Exception E) {
-                //var xTheMessages = (from item in xBuildUC.Messages
-                //                    where item.Severity != LogSeverityEnum.Informational
-                //                    select item).ToList();
-                //xTheMessages.Add(new BuildLogMessage() {
-                //    Severity = LogSeverityEnum.Error,
-                //    Message = E.ToString()
-                //});
-                //xBuildUC.Messages.Clear();
-                //foreach (var item in xTheMessages) {
-                //    xBuildUC.Messages.Add(item);
-                //}
-                //return false;
-            }
-            Close();
-            return true;
-        }
     }
 }

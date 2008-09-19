@@ -4,18 +4,11 @@
 	xmlns:local="clr-namespace:Cosmos.Build.Windows"
     Height="300" Width="300">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="15"/>
-        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="10" />
             <RowDefinition Height="100" />
         </Grid.RowDefinitions>
-        
-        <ProgressBar Grid.Row="0" Grid.RowSpan="3" Grid.Column="1" x:Name="pbarMain" Orientation="Vertical"
-                     Value="0" Width="Auto" Height="Auto"/>
         
         <ListBox Grid.Row="0" Grid.Column="0" x:Name="listProgress" Height="Auto" Width="Auto"/>
         
