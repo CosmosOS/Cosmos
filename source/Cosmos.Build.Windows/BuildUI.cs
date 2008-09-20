@@ -103,6 +103,9 @@ namespace Cosmos.Build.Windows {
             
             var xApp = new System.Windows.Application();
             xApp.Startup += new StartupEventHandler(xApp_Startup);
+            // If an exception occurs here, something bad happened in final stages of build.
+            // Or you forgot to close QEMU last time and this happens when debugging and you try
+            // to run QEMU again.
             xApp.Run();        
         }
 

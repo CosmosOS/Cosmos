@@ -25,9 +25,6 @@ namespace Cosmos.Build.Windows {
         
         protected void Start(Stream aStream) {
             mStream = aStream;
-            var xIncoming = new Incoming() { 
-                Stream = aStream 
-            };
             // Request first command
             Next(1, PacketReceived);
         }
