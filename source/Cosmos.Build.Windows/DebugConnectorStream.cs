@@ -16,7 +16,7 @@ namespace Cosmos.Build.Windows {
             public byte[] Packet;
             // Current # of bytes in mPacket
             public int CurrentPos = 0;
-            public PacketReceivedDelegate Completed;
+            public Action<byte[]> Completed;
         }
  
         protected override void SendData(byte[] aBytes) {
@@ -30,7 +30,7 @@ namespace Cosmos.Build.Windows {
         }
         
         protected override void PacketTracePoint(byte[] aPacket) {
-            CmdTrace(GetUInt32(aPacket, 0));
+            CmdTrace(mCurrentMsgType, GetUInt32(aPacket, 0));
             Next(1, PacketCommand);
         }
         
@@ -39,7 +39,7 @@ namespace Cosmos.Build.Windows {
             Next(1, PacketCommand);
         }
         
-        protected override void Next(int aPacketSize, PacketReceivedDelegate aCompleted) {
+        protected override void Next(int aPacketSize, Action<byte[]> aCompleted) {
             var xIncoming = new Incoming() {
                 Packet = new byte[aPacketSize]
                 , Stream = mStream

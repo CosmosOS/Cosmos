@@ -12,13 +12,13 @@ namespace Indy.IL2CPU.Assembler.X86 {
         protected UInt16 mComStatusAddr;
         protected enum Tracing { Off = 0, On = 1 };
         // Current status of OS Debug Stub
-        public enum Status { Run = 0, Break = 1, Stepping = 2 }
+        public enum Status { Run = 0, Break = 1 }
         
         // A bit of a hack as a static? Other ideas?
         public static void EmitDataSection(System.IO.TextWriter aWriter) {
              // Tracing: 0=Off, 1=On
             aWriter.WriteLine("DebugTraceMode dd 0");
-            // Run, Break, Stepping
+            // enum Status
             aWriter.WriteLine("DebugStatus dd 0"); 
             // 0 = Not in, 1 = already running
             aWriter.WriteLine("DebugRunning dd 0"); 
@@ -29,7 +29,6 @@ namespace Indy.IL2CPU.Assembler.X86 {
             // Last EIP value
             aWriter.WriteLine("DebugEIP dd 0"); 
             aWriter.WriteLine("InterruptsEnabledFlag dd 0");
-            aWriter.WriteLine("DebugTraceSent dd 0");
             // If set to 1, on next trace a break will occur
             aWriter.WriteLine("DebugBreakOnNextTrace dd 0");
         }
@@ -48,7 +47,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             Return();
 
             Label = "DebugStub_Step";
-            Memory["DebugStatus", 32] = (int)Status.Stepping;
+            Memory["DebugStatus", 32] = (int)Status.Break;
             Return();
         }
 
@@ -92,20 +91,24 @@ namespace Indy.IL2CPU.Assembler.X86 {
         protected void SendTrace() {
             Label = "DebugStub_SendTrace";
 
-            Memory["DebugTraceSent", 32].Compare(1);
-            JumpIf(Flags.Equal, "DebugStub_SendTrace_Exit");
-                Memory["DebugTraceSent", 32] = 1;
+            Memory["DebugStatus", 32].Compare((int)Status.Run);
+            JumpIf(Flags.Equal, "DebugStub_SendTrace_Normal");
+            AL = (int)MsgType.BreakPoint;
+            Jump("DebugStub_SendTraceType");
+            
+            Label = "DebugStub_SendTrace_Normal";
+            AL = (int)MsgType.TracePoint;
 
-                AL = (int)MsgType.TracePoint;
-                Call("WriteALToComPort");
-                
-                // Send EIP. EBP points to location with EIP
-                ESI = EBP;
-                Call("WriteByteToComPort");
-                Call("WriteByteToComPort");
-                Call("WriteByteToComPort");
-                Call("WriteByteToComPort");
-            Label = "DebugStub_SendTrace_Exit";
+            Label = "DebugStub_SendTraceType";
+            Call("WriteALToComPort");
+                        
+            // Send EIP. EBP points to location with EIP
+            ESI = EBP;
+            Call("WriteByteToComPort");
+            Call("WriteByteToComPort");
+            Call("WriteByteToComPort");
+            Call("WriteByteToComPort");
+
             Return();
         }
 
@@ -292,8 +295,6 @@ namespace Indy.IL2CPU.Assembler.X86 {
             //
             EAX = Memory[EBP];
             Memory["DebugEIP"] = EAX;
-            //
-            Memory["DebugTraceSent", 32] = 0;
 
             //if tracemode = 4
             //   SendTrace

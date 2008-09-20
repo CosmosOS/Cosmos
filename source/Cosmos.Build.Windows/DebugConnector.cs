@@ -6,20 +6,18 @@ using Cosmos.IL2CPU.Debug;
 
 namespace Cosmos.Build.Windows {
     public abstract class DebugConnector {
-        protected delegate void PacketReceivedDelegate(byte[] aBytes);
-        public delegate void ConnectionLostDelegate(Exception ex);
-        public delegate void CmdTextDelegate(string aText);
-        
         //TODO: These should not be this way and should in fact
         // be checked or better yet done by constructor arguments
         // but that puts a restriction on where the sub classes
         // are created.
-        public ConnectionLostDelegate ConnectionLost;
-        public Action<UInt32> CmdTrace;
-        public CmdTextDelegate CmdText;
+        public Action<Exception> ConnectionLost;
+        public Action<MsgType, UInt32> CmdTrace;
+        public Action<string> CmdText;
+        
+        protected MsgType mCurrentMsgType;
         
         protected abstract void SendData(byte[] aBytes);
-        protected abstract void Next(int aPacketSize, PacketReceivedDelegate aCompleted);        
+        protected abstract void Next(int aPacketSize, Action<byte[]> aCompleted);        
         protected abstract void PacketTracePoint(byte[] aPacket);
         protected abstract void PacketText(byte[] aPacket);
     
@@ -39,9 +37,11 @@ namespace Cosmos.Build.Windows {
         }
         
         protected void PacketCommand(byte[] aPacket) {
+            mCurrentMsgType = (MsgType)aPacket[0];
             // Could change to an array, but really not much benefit
-            switch ((MsgType)aPacket[0]) {
+            switch (mCurrentMsgType) {
                 case MsgType.TracePoint:
+                case MsgType.BreakPoint:
                     Next(4, PacketTracePoint);            
                     break;
                 case MsgType.Text:

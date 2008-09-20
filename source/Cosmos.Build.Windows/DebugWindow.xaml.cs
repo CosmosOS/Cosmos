@@ -19,7 +19,7 @@ using Cosmos.IL2CPU.Debug;
 
 namespace Cosmos.Build.Windows {
     public partial class DebugWindow : Window {
-        protected enum TraceItemType {Trace, Message, Error}
+        protected enum TraceItemType {Trace, Message, Break, Error}
     
         protected class TraceItem {
             public UInt32 EIP { get; set; }
@@ -198,12 +198,12 @@ namespace Cosmos.Build.Windows {
             Dispatcher.BeginInvoke(xAction);
         }
         
-        protected void CmdTrace(UInt32 aEIP) {
+        protected void CmdTrace(MsgType aMsgType, UInt32 aEIP) {
             var xAction = (Action)delegate() {
                 var xSourceInfo = mSourceMapping.GetMapping(aEIP);
                 var xTraceItem = new TraceItem() {
                     EIP = aEIP
-                    , Type = TraceItemType.Trace
+                    , Type = (aMsgType == MsgType.TracePoint ? TraceItemType.Trace : TraceItemType.Break)
                 };
                 // Should not be null, but is possible with some plugs
                 if (xSourceInfo != null) {

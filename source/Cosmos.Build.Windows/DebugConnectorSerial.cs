@@ -10,7 +10,7 @@ namespace Cosmos.Build.Windows {
             throw new NotImplementedException();
         }
 
-        protected override void Next(int aPacketSize, DebugConnector.PacketReceivedDelegate aCompleted)
+        protected override void Next(int aPacketSize, Action<byte[]> aCompleted)
         {
             throw new NotImplementedException();
         }

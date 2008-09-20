@@ -11,7 +11,7 @@ namespace Cosmos.Playground.Kudzu {
             // Divide by 100, get remainder
             int xMagicNo = xRandom.Next() % 100;
             Dbg.Debugger.Send("The magic number is " + xMagicNo);
-            Dbg.Debugger.Break();
+            //Dbg.Debugger.Break();
             Console.WriteLine("Hello world");
             Dbg.Debugger.TraceOn();
             int xDummy = 4;
