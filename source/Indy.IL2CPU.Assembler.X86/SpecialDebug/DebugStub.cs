@@ -30,6 +30,8 @@ namespace Indy.IL2CPU.Assembler.X86 {
             aWriter.WriteLine("DebugEIP dd 0"); 
             aWriter.WriteLine("InterruptsEnabledFlag dd 0");
             aWriter.WriteLine("DebugTraceSent dd 0");
+            // If set to 1, on next trace a break will occur
+            aWriter.WriteLine("DebugBreakOnNextTrace dd 0");
         }
 
         protected void Commands() {
@@ -51,7 +53,12 @@ namespace Indy.IL2CPU.Assembler.X86 {
         }
 
         protected void Break() {
+            // Should only be called internally by DebugStub. Has a lot of preconditions
+            // Externals should use BreakOnNextTrace instead
             Label = "DebugStub_Break";
+            // Reset request in case there was one
+            Memory["DebugBreakOnNextTrace", 32] = 0;
+            // Set break status
             Memory["DebugStatus", 32] = (int)Status.Break;
             Call("DebugStub_SendTrace");
 
@@ -92,7 +99,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 AL = (int)MsgType.TracePoint;
                 Call("WriteALToComPort");
                 
-                // Send EIP
+                // Send EIP. EBP points to location with EIP
                 ESI = EBP;
                 Call("WriteByteToComPort");
                 Call("WriteByteToComPort");
@@ -210,6 +217,12 @@ namespace Indy.IL2CPU.Assembler.X86 {
 
         protected void Executing() {
             Label = "DebugStub_Executing";
+            
+            // See if there is a requested break
+            //TODO: Change this to support CallIf(AL == 1, "DebugStub_SendTrace");
+            Memory["DebugBreakOnNextTrace", 32].Compare(1);
+                CallIf(Flags.Equal, "DebugStub_Break");
+            
             //TODO: Change this to support CallIf(AL == 1, "DebugStub_SendTrace");
             Memory["DebugTraceMode", 32].Compare((int)Tracing.On);
                 CallIf(Flags.Equal, "DebugStub_SendTrace");
@@ -241,7 +254,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             Emit();
 
             // Main entry point that IL2CPU generated code calls
-            Label = "DebugStub_Tracer";
+            Label = "DebugStub_TracerEntry";
 
             // If debug stub is in break, and then an IRQ happens, the IRQ
             // can call debug stub again. This causes two debug stubs to 

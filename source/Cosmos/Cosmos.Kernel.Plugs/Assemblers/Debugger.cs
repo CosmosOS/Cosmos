@@ -7,9 +7,7 @@ using X86 = Indy.IL2CPU.Assembler.X86;
 namespace Cosmos.Kernel.Plugs.Assemblers {
     public class DebugAsm : X86.X.Y86 {
         public void Break() {
-            PushAll32();
-            Call("DebugStub_Break");
-            PopAll32();
+            Memory["DebugBreakOnNextTrace", 32] = 1;
         }
 
         public void SendText() {

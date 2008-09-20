@@ -255,7 +255,7 @@ namespace Indy.IL2CPU.IL.X86
 		}
 
 		public override void EmitOpDebugHeader(Indy.IL2CPU.Assembler.Assembler aAssembler, uint aOpId, string aOpLabel) {
-			new CPUx86.Call("DebugStub_Tracer");
+			new CPUx86.Call("DebugStub_TracerEntry");
 		}
 
         public override void PreProcess(Indy.IL2CPU.Assembler.Assembler mAssembler)
