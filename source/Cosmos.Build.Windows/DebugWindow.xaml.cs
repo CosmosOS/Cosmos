@@ -183,33 +183,39 @@ namespace Cosmos.Build.Windows {
             mSourceMapping = aSourceMapping;
             
             mDebugConnector = aDebugConnector;
-            mDebugConnector.Dispatcher = Dispatcher;
             mDebugConnector.ConnectionLost += ConnectionLost;
             mDebugConnector.CmdTrace += CmdTrace;
             mDebugConnector.CmdText += CmdText;
         }
 
         protected void CmdText(string aText) {
-            Log(TraceItemType.Message, aText);
+            var xAction = (Action)delegate() {
+                Log(TraceItemType.Message, aText);
+            };
+            Dispatcher.BeginInvoke(xAction);
         }
         
         protected void CmdTrace(UInt32 aEIP) {
-            var xSourceInfo = mSourceMapping.GetMapping(aEIP);
-            var xTraceItem = new TraceItem() {
-                EIP = aEIP
-                , Type = TraceItemType.Trace
+            var xAction = (Action)delegate() {
+                var xSourceInfo = mSourceMapping.GetMapping(aEIP);
+                var xTraceItem = new TraceItem() {
+                    EIP = aEIP
+                    , Type = TraceItemType.Trace
+                };
+                // Dont show path or extension, reducing widhth is important
+                var xFileInfo = new FileInfo(xSourceInfo.SourceFile);
+                xTraceItem.SourceFile = xFileInfo.Name.Substring(0
+                    , xFileInfo.Name.Length - xFileInfo.Extension.Length);
+                
+                mTraceLog.Add(xTraceItem);
+                if (mAutoDisplay) {
+                    try {
+                        listLog.SelectedIndex = listLog.Items.Count - 1;
+                    } catch { }
+                    mAutoDisplay = false;
+                }
             };
-            // Dont show path or extension, reducing widhth is important
-            var xFileInfo = new FileInfo(xSourceInfo.SourceFile);
-            xTraceItem.SourceFile = xFileInfo.Name.Substring(0, xFileInfo.Name.Length - xFileInfo.Extension.Length);
-            
-            mTraceLog.Add(xTraceItem);
-            if (mAutoDisplay) {
-                try {
-                    listLog.SelectedIndex = listLog.Items.Count - 1;
-                } catch { }
-                mAutoDisplay = false;
-            }
+            Dispatcher.BeginInvoke(xAction);
         }
         
         protected void Log(TraceItemType aType, string aMsg) {
@@ -221,12 +227,15 @@ namespace Cosmos.Build.Windows {
         }
 
         protected void ConnectionLost(Exception ex) {
-            Title = "No debug connection.";
-            listLog.Background = Brushes.Red;
-            while (ex != null) {
-                Log(TraceItemType.Error, ex.Message);
-                ex = ex.InnerException;
-            }
+            var xAction = (Action)delegate() {
+                Title = "No debug connection.";
+                listLog.Background = Brushes.Red;
+                while (ex != null) {
+                    Log(TraceItemType.Error, ex.Message);
+                    ex = ex.InnerException;
+                }
+            };
+            Dispatcher.BeginInvoke(xAction);
         }
 
         //protected void Anaylyze() {

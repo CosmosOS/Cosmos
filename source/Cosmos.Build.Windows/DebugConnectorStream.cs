@@ -30,12 +30,12 @@ namespace Cosmos.Build.Windows {
         }
         
         protected override void PacketTracePoint(byte[] aPacket) {
-            Dispatcher.BeginInvoke(CmdTrace, GetUInt32(aPacket, 0));
+            CmdTrace(GetUInt32(aPacket, 0));
             Next(1, PacketCommand);
         }
         
         protected override void PacketText(byte[] aPacket) {
-            Dispatcher.BeginInvoke(CmdText, ASCIIEncoding.ASCII.GetString(aPacket));
+            CmdText(ASCIIEncoding.ASCII.GetString(aPacket));
             Next(1, PacketCommand);
         }
         
@@ -66,7 +66,7 @@ namespace Cosmos.Build.Windows {
                     xIncoming.Completed(xIncoming.Packet);
                 }
             } catch (System.IO.IOException ex) {
-                Dispatcher.BeginInvoke(DispatcherPriority.Background, ConnectionLost, ex);
+                ConnectionLost(ex);
             }
         }
 
