@@ -90,7 +90,8 @@ namespace Cosmos.Build.Windows {
                 xDebugWindow.Show();
             }
             // Need to close MainWindow after DebugWindow is shown since it is the main Window
-            mMainWindow.Close();
+            // Problems around with DebugWindow getting stuck - seeing if this helps.
+            mMainWindow.Hide();
         }
 
         protected void OptionsStop() {
