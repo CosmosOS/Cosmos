@@ -16,11 +16,13 @@ namespace Cosmos.Build.Windows {
     public class Builder {
         public string BuildPath;
         public readonly string ToolsPath;
+        public readonly string AsmPath;
         public readonly Engine Engine = new Engine();
         
         public Builder() {
             BuildPath = GetBuildPath();
             ToolsPath = BuildPath + @"Tools\";
+            AsmPath = ToolsPath + @"asm\";
             // MtW: leave this here, otherwise VS wont copy required dependencies!
             typeof(X86OpCodeMap).Equals(null);
         }
@@ -31,10 +33,8 @@ namespace Cosmos.Build.Windows {
         /// path to the Build directory.
         /// </summary>
         /// <returns>Full path to the Build directory.</returns>
-        protected static string GetBuildPath()
-        {
-            try
-            {
+        protected static string GetBuildPath() {
+            try {
                 string xResult = "";
                 RegistryKey xKey = Registry.CurrentUser.OpenSubKey(@"Software\Cosmos");
 
@@ -53,8 +53,7 @@ namespace Cosmos.Build.Windows {
                     xResult = xResult.Substring(0, xPos) + @"Build\";
                 }
 
-                if (string.IsNullOrEmpty(xResult))
-                {
+                if (string.IsNullOrEmpty(xResult)) {
                     throw new Exception("Cannot find Cosmos build path either in the Registry or using current directory search.");
                 }
                 if (!xResult.EndsWith(@"\"))
@@ -63,9 +62,7 @@ namespace Cosmos.Build.Windows {
                 }
 
                 return xResult;
-            }
-            catch (Exception E)
-            {
+            } catch (Exception E) {
                 throw new Exception("Error while getting Cosmos Build Path!", E);
             }
         }
@@ -109,26 +106,20 @@ namespace Cosmos.Build.Windows {
             Global.Call(ToolsPath + @"mkisofs.exe", @"-R -b isolinux.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o ..\Cosmos.iso .", xPath);
         }
 
-        private void DoDebugLog(LogSeverityEnum aSeverity, string aMessage) {
-            if (DebugLog != null) {
-                DebugLog(aSeverity, aMessage);
-            }
-        }
-
-        public event DebugLogHandler DebugLog;
         public event Action<int, int, string> ProgressChanged;
-
+        public event Action CompileCompleted;
+    
         protected void ThreadExecute(object aParam) {
             var xParam = (PassedEngineValue)aParam;
             Engine.Execute(xParam.aAssembly, xParam.aTargetPlatform, xParam.aGetFileNameForGroup
              , xParam.aInMetalMode, xParam.aPlugs, xParam.aDebugMode, xParam.aDebugComNumber
              , xParam.aOutputDir);
+            CompileCompleted.Invoke();
         }
 
-        public void Compile(DebugModeEnum aDebugMode, byte aDebugComport) {
-            string xAsmPath = ToolsPath + @"asm\";
-            if (!Directory.Exists(xAsmPath)) {
-                Directory.CreateDirectory(xAsmPath);
+        public void BeginCompile(DebugModeEnum aDebugMode, byte aDebugComport) {
+            if (!Directory.Exists(AsmPath)) {
+                Directory.CreateDirectory(AsmPath);
             }
             Assembly xTarget = System.Reflection.Assembly.GetEntryAssembly();
             Engine.ProgressChanged += delegate() {
@@ -136,30 +127,28 @@ namespace Cosmos.Build.Windows {
                     ProgressChanged(Engine.ProgressMax, Engine.ProgressCurrent, Engine.ProgressMessage);
                 }
             };
-            Engine.DebugLog += DoDebugLog;
-            var xEngineParams = new PassedEngineValue(xTarget.Location, TargetPlatformEnum.X86, g => Path.Combine(xAsmPath, g + ".asm"), false,
-                new string[] {
-                        Path.Combine(Path.Combine(ToolsPath, "Cosmos.Kernel.Plugs"), "Cosmos.Kernel.Plugs.dll"), 
-                        Path.Combine(Path.Combine(ToolsPath, "Cosmos.Hardware.Plugs"), "Cosmos.Hardware.Plugs.dll"), 
-                        Path.Combine(Path.Combine(ToolsPath, "Cosmos.Sys.Plugs"), "Cosmos.Sys.Plugs.dll")
-                    }, aDebugMode, aDebugComport, xAsmPath);
+            var xEngineParams = new PassedEngineValue(xTarget.Location, TargetPlatformEnum.X86, g => Path.Combine(AsmPath, g + ".asm"), false
+             , new string[] {
+                Path.Combine(Path.Combine(ToolsPath, "Cosmos.Kernel.Plugs"), "Cosmos.Kernel.Plugs.dll"), 
+                Path.Combine(Path.Combine(ToolsPath, "Cosmos.Hardware.Plugs"), "Cosmos.Hardware.Plugs.dll"), 
+                Path.Combine(Path.Combine(ToolsPath, "Cosmos.Sys.Plugs"), "Cosmos.Sys.Plugs.dll")
+             }
+             , aDebugMode, aDebugComport, AsmPath);
             
             var xThread = new Thread(new ParameterizedThreadStart(ThreadExecute));
             xThread.Start(xEngineParams);
-            while (xThread.IsAlive) {
-                Thread.Sleep(25);
-                PreventFreezing();
-            }
-            
+        }
+        
+        public void Assemble() {
             RemoveFile(BuildPath + "output.obj");
-            Global.Call(ToolsPath + @"nasm\nasm.exe", String.Format("-g -f elf -F stabs -o \"{0}\" \"{1}\"", BuildPath + "output.obj", xAsmPath + "main.asm"), BuildPath);
-
+            Global.Call(ToolsPath + @"nasm\nasm.exe", String.Format("-g -f elf -F stabs -o \"{0}\" \"{1}\"", BuildPath + "output.obj", AsmPath + "main.asm"), BuildPath);
+        }
+        
+        public void Link() {
             RemoveFile(BuildPath + "output.bin");
             Global.Call(ToolsPath + @"cygwin\ld.exe", String.Format("-Ttext 0x500000 -Tdata 0x200000 -e Kernel_Start -o \"{0}\" \"{1}\"", "output.bin", "output.obj"), BuildPath);
             RemoveFile(BuildPath + "output.obj");
         }
-
-        public event Action PreventFreezing;
 
         public void MakeVPC() {
             MakeISO();

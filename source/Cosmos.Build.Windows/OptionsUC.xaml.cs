@@ -62,11 +62,8 @@ namespace Cosmos.Build.Windows {
         
         public Action Proceed;
         public Action Stop;
-
-        private void butnBuild_Click(object sender, RoutedEventArgs e) {
-            if (mSaveSettings) {
-                SaveSettingsToRegistry();
-            }
+        
+        protected void UpdateProperties() {
             mComPort = (byte)cmboDebugPort.SelectedIndex;
             if (mComPort > 3) {
                 throw new Exception("Debug port not supported yet!");
@@ -82,6 +79,13 @@ namespace Cosmos.Build.Windows {
                 mComPort = 1;
             } else {
                 throw new Exception("Unknown debug mode.");
+            }
+        }
+
+        private void butnBuild_Click(object sender, RoutedEventArgs e) {
+            if (mSaveSettings) {
+                SaveSettingsToRegistry();
+                UpdateProperties();
             }
             Proceed();
         }
@@ -117,6 +121,8 @@ namespace Cosmos.Build.Windows {
                 cmboAudioCards.Items.Add(xSoundCard);
             }
             LoadSettingsFromRegistry();
+            // Call here for when this dialog is bypassed, others read these values
+            UpdateProperties();
         }
 
         void OptionsUC_Loaded(object sender, RoutedEventArgs e) {

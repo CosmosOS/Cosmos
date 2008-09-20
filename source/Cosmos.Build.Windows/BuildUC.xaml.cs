@@ -19,34 +19,29 @@ using System.Windows.Threading;
 
 namespace Cosmos.Build.Windows {
 
-    public class BuildLogMessage {
-		public LogSeverityEnum Severity { get; set; }
-		public string Message { get; set; }
-	}
-	
-    public class BuildLogMessages : ObservableCollection<BuildLogMessage> {
-		public BuildLogMessages() { }
-	}
-
     public partial class BuildUC : UserControl {
         public BuildUC() {
             InitializeComponent();
         }
 
-        public bool Display(Builder aBuilder, DebugModeEnum aDebugMode, byte aComPort) {
-            IEnumerable<BuildLogMessage> xMessages = new BuildLogMessage[0];
-            aBuilder.PreventFreezing += PreventFreezing;
-            aBuilder.DebugLog += DoDebugMessage;
+        protected Builder mBuilder;
+        
+        public void BeginBuild(Builder aBuilder, DebugModeEnum aDebugMode, byte aComPort) {
+            mBuilder = aBuilder;
             aBuilder.ProgressChanged += DoProgressMessage;
-            //try {
-                aBuilder.Compile(aDebugMode, aComPort);
+            aBuilder.CompileCompleted += new Action(aBuilder_CompileCompleted);
+            aBuilder.BeginCompile(aDebugMode, aComPort);
+        }
 
-                aBuilder.DebugLog -= DoDebugMessage;
-                aBuilder.ProgressChanged -= DoProgressMessage;
-            //} catch {
-            //    return false;
-            //}
-            return true;
+        public event Action CompileCompleted;
+
+        protected void aBuilder_CompileCompleted() {
+            Dispatcher.BeginInvoke(
+             (Action)delegate() {
+                mBuilder.ProgressChanged -= DoProgressMessage;
+                CompileCompleted.Invoke();
+             }
+            );
         }
 
 		public void DoDebugMessage(LogSeverityEnum aSeverity, string aMessage) {
@@ -55,16 +50,6 @@ namespace Cosmos.Build.Windows {
 			}
 		}
 
-        public void PreventFreezing() {
-            var xFrame = new DispatcherFrame();
-            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Input, new DispatcherOperationCallback(delegate(object aParam)
-            {
-                xFrame.Continue = false;
-                return null;
-            }), null);
-            Dispatcher.PushFrame(xFrame);
-        }
-        
         protected void ProgressMessageReceived(string aMsg) {
             listProgress.SelectedIndex = listProgress.Items.Add(aMsg);
             listProgress.ScrollIntoView(listProgress.Items[listProgress.SelectedIndex]);
@@ -74,8 +59,10 @@ namespace Cosmos.Build.Windows {
             var xAction = (Action)delegate() { 
                 ProgressMessageReceived(aMessage); 
             };
-            Dispatcher.BeginInvoke(DispatcherPriority.Input, xAction);
-            PreventFreezing();
+            // Do not use BeginInvoke - if BeginInvoke is used these stack up 
+            // and continue to come in and tie up the main thread after the engine completes
+            // and the window is closed
+            Dispatcher.Invoke(DispatcherPriority.Input, xAction);
         }
 
     }

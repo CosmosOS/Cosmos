@@ -28,16 +28,21 @@ namespace Cosmos.Build.Windows {
                 }
                 var xBuildUC = new BuildUC();
                 mMainWindow.LoadControl(xBuildUC);
-                if (xBuildUC.Display(mBuilder, mOptionsUC.DebugMode, mOptionsUC.ComPort) == false) {
-                    return;
-                }
+                xBuildUC.CompileCompleted += new Action(BuildUC_CompileCompleted);
+                xBuildUC.BeginBuild(mBuilder, mOptionsUC.DebugMode, mOptionsUC.ComPort);
             }
-            
-            DebugWindow xDebugWindow = null;
+        }
+
+        protected void BuildUC_CompileCompleted() {
+            mBuilder.Assemble();
+            mBuilder.Link();
+                
             // Debug Window is only displayed if Qemu + Debug checked
             // or if other VM + Debugport selected
+            DebugWindow xDebugWindow = null;
             if (!mOptionsUC.rdioDebugModeNone.IsChecked.Value) {
                 xDebugWindow = new DebugWindow();
+                
                 if (mOptionsUC.DebugMode == DebugModeEnum.Source) {
                     var xLabelByAddressMapping = ObjDump.GetLabelByAddressMapping(
                         mBuilder.BuildPath + "output.bin"
@@ -78,10 +83,13 @@ namespace Cosmos.Build.Windows {
             } else if (mOptionsUC.rdioUSB.IsChecked.Value) {
                 mBuilder.MakeUSB(mOptionsUC.cmboUSBDevice.Text[0]);
             }
-
+            // Show the debug Window later - if we show it earlier some of the stuff blocks the
+            // main thread for a bit and causes the debug window to visibly stick for a bit
+            // and then it has to play catch up for a while
             if (xDebugWindow != null) {
                 xDebugWindow.Show();
             }
+            // Need to close MainWindow after DebugWindow is shown since it is the main Window
             mMainWindow.Close();
         }
 
