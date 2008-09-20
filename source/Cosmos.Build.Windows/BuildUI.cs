@@ -23,7 +23,6 @@ namespace Cosmos.Build.Windows {
         protected void OptionsProceed() {
             // Call IL2CPU
             if (mOptionsUC.chbxCompileIL.IsChecked.Value) {
-                //TODO: Eventually eliminate the console window completely
                 if (mOptionsUC.chbxShowConsoleWindow.IsChecked.Value) {
                     ShowWindow(mConsoleWindow, 1);
                 }
@@ -33,7 +32,6 @@ namespace Cosmos.Build.Windows {
                     return;
                 }
             }
-            mMainWindow.Close();
             
             DebugWindow xDebugWindow = null;
             // Debug Window is only displayed if Qemu + Debug checked
@@ -63,9 +61,6 @@ namespace Cosmos.Build.Windows {
 
             // Launch emulators or other final actions
             if (mOptionsUC.rdioQEMU.IsChecked.Value) {
-                // Uncomment if problems with QEMU to see output
-                // TODO: Capture and send to debug window
-                //ShowWindow(xConsoleWindow, 1);
                 mBuilder.MakeQEMU(mOptionsUC.chbxQEMUUseHD.IsChecked.Value,
                                   mOptionsUC.chbxQEMUUseGDB.IsChecked.Value,
                                   mOptionsUC.DebugMode != DebugModeEnum.None,
@@ -85,8 +80,9 @@ namespace Cosmos.Build.Windows {
             }
 
             if (xDebugWindow != null) {
-                xDebugWindow.ShowDialog();
+                xDebugWindow.Show();
             }
+            mMainWindow.Close();
         }
 
         protected void OptionsStop() {
@@ -97,16 +93,24 @@ namespace Cosmos.Build.Windows {
             // Hide the console window
             mConsoleWindow = GetConsoleWindow();
             ShowWindow(mConsoleWindow, 0);
+            
+            var xApp = new System.Windows.Application();
+            xApp.Startup += new StartupEventHandler(xApp_Startup);
+            xApp.Run();        
+        }
 
+        void xApp_Startup(object sender, StartupEventArgs e) {
             // Create here, after we hide console Window so it gets hidden quickly
             mMainWindow = new MainWindow();
-            
+            mMainWindow.Loaded += new RoutedEventHandler(mMainWindow_Loaded);
+            mMainWindow.Show();
+        }
+
+        void mMainWindow_Loaded(object sender, RoutedEventArgs e) {
             mOptionsUC = new OptionsUC(mBuilder.BuildPath);
             mOptionsUC.Proceed = OptionsProceed;
             mOptionsUC.Stop = OptionsStop;
             mMainWindow.LoadControl(mOptionsUC);
-            
-            mMainWindow.ShowDialog();
         }
 
         public static void Run() {

@@ -16,9 +16,9 @@ namespace Cosmos.Build.Windows {
     public class Builder {
         public string BuildPath;
         public readonly string ToolsPath;
+        public readonly Engine Engine = new Engine();
         
-        public Builder()
-        {
+        public Builder() {
             BuildPath = GetBuildPath();
             ToolsPath = BuildPath + @"Tools\";
             // MtW: leave this here, otherwise VS wont copy required dependencies!
@@ -118,38 +118,39 @@ namespace Cosmos.Build.Windows {
         public event DebugLogHandler DebugLog;
         public event Action<int, int, string> ProgressChanged;
 
+        protected void ThreadExecute(object aParam) {
+            var xParam = (PassedEngineValue)aParam;
+            Engine.Execute(xParam.aAssembly, xParam.aTargetPlatform, xParam.aGetFileNameForGroup
+             , xParam.aInMetalMode, xParam.aPlugs, xParam.aDebugMode, xParam.aDebugComNumber
+             , xParam.aOutputDir);
+        }
+
         public void Compile(DebugModeEnum aDebugMode, byte aDebugComport) {
             string xAsmPath = ToolsPath + @"asm\";
             if (!Directory.Exists(xAsmPath)) {
                 Directory.CreateDirectory(xAsmPath);
             }
             Assembly xTarget = System.Reflection.Assembly.GetEntryAssembly();
-            Stopwatch xSW = new Stopwatch();
-            xSW.Start();
-            var xEngine = new Engine();
-            xEngine.ProgressChanged += delegate() {
+            Engine.ProgressChanged += delegate() {
                 if (ProgressChanged != null) {
-                    ProgressChanged(xEngine.ProgressMax, xEngine.ProgressCurrent, xEngine.ProgressMessage);
+                    ProgressChanged(Engine.ProgressMax, Engine.ProgressCurrent, Engine.ProgressMessage);
                 }
             };
-            xEngine.DebugLog += DoDebugLog;
-            var passed = new PassedEngineValue(xTarget.Location, TargetPlatformEnum.X86, g => Path.Combine(xAsmPath, g + ".asm"), false,
-                new string[]
-                    {
+            Engine.DebugLog += DoDebugLog;
+            var xEngineParams = new PassedEngineValue(xTarget.Location, TargetPlatformEnum.X86, g => Path.Combine(xAsmPath, g + ".asm"), false,
+                new string[] {
                         Path.Combine(Path.Combine(ToolsPath, "Cosmos.Kernel.Plugs"), "Cosmos.Kernel.Plugs.dll"), 
                         Path.Combine(Path.Combine(ToolsPath, "Cosmos.Hardware.Plugs"), "Cosmos.Hardware.Plugs.dll"), 
                         Path.Combine(Path.Combine(ToolsPath, "Cosmos.Sys.Plugs"), "Cosmos.Sys.Plugs.dll")
                     }, aDebugMode, aDebugComport, xAsmPath);
             
-            var threadEngine = new Thread(new ParameterizedThreadStart(xEngine.Execute));
-            threadEngine.Start(passed);
-            while (threadEngine.IsAlive) {
+            var xThread = new Thread(new ParameterizedThreadStart(ThreadExecute));
+            xThread.Start(xEngineParams);
+            while (xThread.IsAlive) {
                 Thread.Sleep(25);
                 PreventFreezing();
             }
             
-            xSW.Stop();
-
             RemoveFile(BuildPath + "output.obj");
             Global.Call(ToolsPath + @"nasm\nasm.exe", String.Format("-g -f elf -F stabs -o \"{0}\" \"{1}\"", BuildPath + "output.obj", xAsmPath + "main.asm"), BuildPath);
 
@@ -160,12 +161,7 @@ namespace Cosmos.Build.Windows {
 
         public event Action PreventFreezing;
 
-        public void BuildKernel()
-        {
-        }
-
-        public void MakeVPC()
-        {
+        public void MakeVPC() {
             MakeISO();
             string xPath = BuildPath + @"VPC\";
             RemoveReadOnlyAttribute(xPath + "Cosmos.vmc");
@@ -173,15 +169,15 @@ namespace Cosmos.Build.Windows {
             Process.Start(xPath + "Cosmos.vmc");
         }
 
-        public void MakeVMWare(bool useVMWareServer)
-        {
+        public void MakeVMWare(bool useVMWareServer) {
             MakeISO();
             string xPath = BuildPath + @"VMWare\";
 
-            if (useVMWareServer)
+            if (useVMWareServer) {
                 xPath += @"Server\";
-            else
+            } else {
                 xPath += @"Workstation\";
+            }
 
             RemoveReadOnlyAttribute(xPath + "Cosmos.nvram");
             RemoveReadOnlyAttribute(xPath + "Cosmos.vmsd");

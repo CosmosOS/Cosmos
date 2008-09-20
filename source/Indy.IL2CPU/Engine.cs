@@ -2406,17 +2406,5 @@ namespace Indy.IL2CPU {
 
         #endregion
 
-        public void Execute(object p)
-        {
-            PassedEngineValue passed = (PassedEngineValue)p;
-            Execute(passed.aAssembly,
-                            passed.aTargetPlatform,
-                            passed.aGetFileNameForGroup,
-                            passed.aInMetalMode,
-                            passed.aPlugs,
-                            passed.aDebugMode,
-                            passed.aDebugComNumber,
-                            passed.aOutputDir);
-        }
     }
 }
