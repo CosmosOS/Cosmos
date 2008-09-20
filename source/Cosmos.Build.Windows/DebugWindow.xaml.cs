@@ -31,16 +31,20 @@ namespace Cosmos.Build.Windows {
         protected SourceInfos mSourceMapping;
         protected List<Run> mLines = new List<Run>();
         protected FontFamily mFont = new FontFamily("Courier New");
-        protected bool mAutoDisplay = false;
         protected bool mTracing = true;
-        protected bool mBreak = false;
         protected RoutedCommand mStepCommand;
         protected DebugConnector mDebugConnector;
         protected ObservableCollection<TraceItem> mTraceLog = new ObservableCollection<TraceItem>();
 
+        // This and other status items are here and not in DebugConnector
+        // so we will always be in sync with the UI. Since notificaitons
+        // are invoked, the DebugConnector could have a state different than what
+        // the UI is showing if it is still catching up
+        protected bool mAtBreakPoint = false;
+        
         protected void UpdateCaptions() {
             butnTrace.Content = "Trace " + (mTracing ? "Off" : "On");
-            butnBreak.Content = mBreak ? "Continue" : "Break";
+            butnBreak.Content = mAtBreakPoint ? "Continue" : "Break";
         }
 
         public DebugWindow() {
@@ -70,17 +74,16 @@ namespace Cosmos.Build.Windows {
         }
 
         private void butnBreak_Click(object sender, RoutedEventArgs e) {
-            mDebugConnector.SendCommand(3);
-            mBreak = !mBreak;
-            UpdateCaptions();
-            if (mBreak) {
-                mAutoDisplay = true;
+            mDebugConnector.SendCommand((int)Command.Break);
+            // Only reset, dont set. Set is done by the break notification
+            if (mAtBreakPoint) {
+                mAtBreakPoint = false;
+                UpdateCaptions();
             }
         }
 
         private void butnStep_Click(object sender, RoutedEventArgs e) {
-            mDebugConnector.SendCommand(4);
-            mAutoDisplay = true;
+            mDebugConnector.SendCommand((int)Command.Step);
         }
 
         private void butnTest_Click(object sender, RoutedEventArgs e) {
@@ -214,12 +217,12 @@ namespace Cosmos.Build.Windows {
                 }
                 
                 mTraceLog.Add(xTraceItem);
-                if (mAutoDisplay) {
-                    try {
-                        listLog.SelectedIndex = listLog.Items.Count - 1;
-                    } catch { }
-                    mAutoDisplay = false;
+                mAtBreakPoint = aMsgType == MsgType.BreakPoint;
+                if (mAtBreakPoint) {
+                    listLog.SelectedIndex = listLog.Items.Count - 1;
+                    listLog.ScrollIntoView(listLog.SelectedItem);
                 }
+                UpdateCaptions();
             };
             Dispatcher.BeginInvoke(xAction);
         }

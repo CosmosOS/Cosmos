@@ -35,15 +35,13 @@
         <DockPanel Grid.Row="0" Grid.Column="2">
             <ToolBarTray Background="White" DockPanel.Dock="Top">
                 <ToolBar Band="1" BandIndex="1">
-                    <Button IsEnabled="False">Continue</Button>
+                    <Button Name="butnBreak">Break</Button>
                     <Separator/>
                     <Button Name="butnStep">Step</Button>
                     <Separator/>
                     <Button Name="butnTrace">Trace</Button>
                     <Separator/>
-                    <Button Name="butnBreak">Break</Button>
-                    <Separator/>
-                    <Button Name="butnTest">Test</Button>
+                    <Button Visibility="Hidden" Name="butnTest">Test</Button>
                 </ToolBar>
             </ToolBarTray>
             <Label Name="lablSourceFilename" DockPanel.Dock="Top">Source File Name</Label>

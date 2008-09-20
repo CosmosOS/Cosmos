@@ -42,12 +42,8 @@ namespace Indy.IL2CPU.Assembler.X86 {
             Memory["DebugTraceMode", 32] = (int)Tracing.On;
             Return();
 
-            Label = "DebugStub_Continue";
-            Memory["DebugStatus", 32] = (int)Status.Run;
-            Return();
-
             Label = "DebugStub_Step";
-            Memory["DebugStatus", 32] = (int)Status.Break;
+            Memory["DebugBreakOnNextTrace", 32] = 1;
             Return();
         }
 
@@ -79,11 +75,12 @@ namespace Indy.IL2CPU.Assembler.X86 {
             AL.Compare((byte)Command.Break);
                 // Break command is also the continue command
                 // If received while in break, then it continues
-                CallIf(Flags.Equal, "DebugStub_Continue", "DebugStub_Break_Exit");
+                JumpIf(Flags.Equal, "DebugStub_Break_Exit");
             AL.Compare((byte)Command.Step);
                 CallIf(Flags.Equal, "DebugStub_Step", "DebugStub_Break_Exit");
 
             Label = "DebugStub_Break_Exit";
+            Memory["DebugStatus", 32] = (int)Status.Run;
             Return();
         }
 
