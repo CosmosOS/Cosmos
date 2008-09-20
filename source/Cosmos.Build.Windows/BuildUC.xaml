@@ -11,6 +11,8 @@
         </Grid.RowDefinitions>
         
         <StackPanel Grid.Row="0" Height="Auto" Width="Auto">
+            <Label Content="Methods scanned:"/>
+            <ProgressBar x:Name="progMethodsScanned" Height="15" Margin="15,0" Maximum="100" Value="50" />
             <Label Content="Methods processed:"/>
             <ProgressBar x:Name="progMethodsProcessed" Height="15" Margin="15,0"/>
             <Label Content="Static fields processed:"/>

@@ -47,6 +47,9 @@ namespace Cosmos.Build.Windows {
 
         protected void Engine_CompilingMethods(int aValue, int aMax) {
             var xAction = (Action)delegate() { 
+                if (progMethodsScanned.Value < 100) {
+                    progMethodsScanned.Value = 100;
+                }
                 progMethodsProcessed.Maximum = aMax;
                 progMethodsProcessed.Value = aValue;
             };
