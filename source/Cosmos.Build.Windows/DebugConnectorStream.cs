@@ -55,8 +55,7 @@ namespace Cosmos.Build.Windows {
         }
         
         private void PacketText(byte[] aPacket) {
-            Dispatcher.BeginInvoke(DispatcherPriority.Background, CmdText
-                , ASCIIEncoding.ASCII.GetString(aPacket));
+            Dispatcher.BeginInvoke(CmdText, ASCIIEncoding.ASCII.GetString(aPacket));
             Next(1, PacketReceived);
         }
         
