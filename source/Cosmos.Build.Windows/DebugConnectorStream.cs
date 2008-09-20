@@ -13,7 +13,7 @@ namespace Cosmos.Build.Windows {
         protected class Incoming {
             public Stream Stream;
             // Buffer to hold incoming message
-            public byte[] Packet = new byte[5];
+            public byte[] Packet;
             // Current # of bytes in mPacket
             public int CurrentPos = 0;
             public PacketReceivedDelegate Completed;

@@ -139,7 +139,10 @@ namespace Cosmos.Build.Windows {
                 // Selected portion
                 xRunSelected = new Run(xText.Substring(aColBegin, aLength));
                 xRunSelected.FontFamily = mFont;
-                xRunSelected.Background = Brushes.Yellow;
+                // When using Callstack, VS uses GreenYellow
+                // Yellow for stepping
+                // Red for breakpoints
+                xRunSelected.Background = Brushes.GreenYellow;
                 xPara.Inlines.InsertBefore(xSelectedLine, xRunSelected);
                 // Unselected on right if there is some
                 if (aColBegin + aLength < xText.Length) {
@@ -202,10 +205,13 @@ namespace Cosmos.Build.Windows {
                     EIP = aEIP
                     , Type = TraceItemType.Trace
                 };
-                // Dont show path or extension, reducing widhth is important
-                var xFileInfo = new FileInfo(xSourceInfo.SourceFile);
-                xTraceItem.SourceFile = xFileInfo.Name.Substring(0
-                    , xFileInfo.Name.Length - xFileInfo.Extension.Length);
+                // Should not be null, but is possible with some plugs
+                if (xSourceInfo != null) {
+                    // Dont show path or extension, reducing widhth is important
+                    var xFileInfo = new FileInfo(xSourceInfo.SourceFile);
+                    xTraceItem.SourceFile = xFileInfo.Name.Substring(0
+                        , xFileInfo.Name.Length - xFileInfo.Extension.Length);
+                }
                 
                 mTraceLog.Add(xTraceItem);
                 if (mAutoDisplay) {
