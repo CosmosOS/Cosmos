@@ -37,10 +37,10 @@ namespace Cosmos.Sys {
 
             Kernel.Global.Init();
             Hardware.Global.Init();
-            //Sys.Global.Init();
+            Sys.Global.Init();
 
-            //// Clear again in case debug information has been written out
-            //Console.Clear();
+            // Clear again in case debug information has been written out
+            Console.Clear();
         }
     }
 }
