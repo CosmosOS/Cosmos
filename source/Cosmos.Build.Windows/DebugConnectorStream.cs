@@ -26,17 +26,17 @@ namespace Cosmos.Build.Windows {
         protected void Start(Stream aStream) {
             mStream = aStream;
             // Request first command
-            Next(1, PacketReceived);
+            Next(1, PacketCommand);
         }
         
         protected override void PacketTracePoint(byte[] aPacket) {
             Dispatcher.BeginInvoke(CmdTrace, GetUInt32(aPacket, 0));
-            Next(1, PacketReceived);
+            Next(1, PacketCommand);
         }
         
         protected override void PacketText(byte[] aPacket) {
             Dispatcher.BeginInvoke(CmdText, ASCIIEncoding.ASCII.GetString(aPacket));
-            Next(1, PacketReceived);
+            Next(1, PacketCommand);
         }
         
         protected override void Next(int aPacketSize, PacketReceivedDelegate aCompleted) {

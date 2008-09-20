@@ -43,7 +43,7 @@ namespace Cosmos.Build.Windows {
            return (UInt16)((aBytes[aOffset + 1] << 8) | aBytes[aOffset + 0]);
         }
         
-        protected void PacketReceived(byte[] aPacket) {
+        protected void PacketCommand(byte[] aPacket) {
             // Could change to an array, but really not much benefit
             switch ((MsgType)aPacket[0]) {
                 case MsgType.TracePoint:

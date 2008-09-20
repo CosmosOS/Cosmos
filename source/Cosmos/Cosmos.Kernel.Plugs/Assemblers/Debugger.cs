@@ -13,7 +13,9 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
         }
 
         public void SendText() {
+            PushAll32();
             Call("DebugStub_SendText");
+            PopAll32();
         }
 
         public void TraceOff() {
