@@ -83,15 +83,14 @@ namespace Cosmos.Build.Windows {
             } else if (mOptionsUC.rdioUSB.IsChecked.Value) {
                 mBuilder.MakeUSB(mOptionsUC.cmboUSBDevice.Text[0]);
             }
-            // Show the debug Window later - if we show it earlier some of the stuff blocks the
-            // main thread for a bit and causes the debug window to visibly stick for a bit
-            // and then it has to play catch up for a while
-            if (xDebugWindow != null) {
-                xDebugWindow.Show();
-            }
             // Need to close MainWindow after DebugWindow is shown since it is the main Window
-            // Problems around with DebugWindow getting stuck - seeing if this helps.
+            // Problems around with DebugWindow getting stuck - seeing if this helps by hiding 
+            // instead of closing
             mMainWindow.Hide();
+            if (xDebugWindow != null) {
+                xDebugWindow.ShowDialog();
+            }
+            mMainWindow.Close();
         }
 
         protected void OptionsStop() {

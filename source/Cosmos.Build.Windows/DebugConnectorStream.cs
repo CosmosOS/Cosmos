@@ -46,9 +46,7 @@ namespace Cosmos.Build.Windows {
         }
         
         private void PacketTracePoint(byte[] aPacket) {
-            // Do not use BeginInvoke. Cosmos waits on the serial port. While it is buffered a bit
-            // this will keep Cosmos from running too far ahead - probably? :)
-            Dispatcher.Invoke(CmdTrace, GetUInt32(aPacket, 0));
+            Dispatcher.BeginInvoke(CmdTrace, GetUInt32(aPacket, 0));
             Next(1, PacketReceived);
         }
         
