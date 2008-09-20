@@ -28,7 +28,7 @@ namespace Cosmos.Build.Windows {
         
         public void BeginBuild(Builder aBuilder, DebugModeEnum aDebugMode, byte aComPort) {
             mBuilder = aBuilder;
-            aBuilder.ProgressChanged += DoProgressMessage;
+            aBuilder.Engine.ProgressChanged += DoProgressMessage;
             aBuilder.CompileCompleted += new Action(aBuilder_CompileCompleted);
             aBuilder.BeginCompile(aDebugMode, aComPort);
         }
@@ -38,7 +38,7 @@ namespace Cosmos.Build.Windows {
         protected void aBuilder_CompileCompleted() {
             Dispatcher.BeginInvoke(
              (Action)delegate() {
-                mBuilder.ProgressChanged -= DoProgressMessage;
+                mBuilder.Engine.ProgressChanged -= DoProgressMessage;
                 CompileCompleted.Invoke();
              }
             );
@@ -55,14 +55,14 @@ namespace Cosmos.Build.Windows {
             listProgress.ScrollIntoView(listProgress.Items[listProgress.SelectedIndex]);
         }
         
-        public void DoProgressMessage(int aMax, int aCurrent, string aMessage) {
+        public void DoProgressMessage(string aMessage) {
             var xAction = (Action)delegate() { 
                 ProgressMessageReceived(aMessage); 
             };
             // Do not use BeginInvoke - if BeginInvoke is used these stack up 
             // and continue to come in and tie up the main thread after the engine completes
             // and the window is closed
-            Dispatcher.Invoke(DispatcherPriority.Input, xAction);
+            Dispatcher.Invoke(xAction);
         }
 
     }

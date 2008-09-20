@@ -106,7 +106,6 @@ namespace Cosmos.Build.Windows {
             Global.Call(ToolsPath + @"mkisofs.exe", @"-R -b isolinux.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o ..\Cosmos.iso .", xPath);
         }
 
-        public event Action<int, int, string> ProgressChanged;
         public event Action CompileCompleted;
     
         protected void ThreadExecute(object aParam) {
@@ -122,11 +121,6 @@ namespace Cosmos.Build.Windows {
                 Directory.CreateDirectory(AsmPath);
             }
             Assembly xTarget = System.Reflection.Assembly.GetEntryAssembly();
-            Engine.ProgressChanged += delegate() {
-                if (ProgressChanged != null) {
-                    ProgressChanged(Engine.ProgressMax, Engine.ProgressCurrent, Engine.ProgressMessage);
-                }
-            };
             var xEngineParams = new PassedEngineValue(xTarget.Location, TargetPlatformEnum.X86, g => Path.Combine(AsmPath, g + ".asm"), false
              , new string[] {
                 Path.Combine(Path.Combine(ToolsPath, "Cosmos.Kernel.Plugs"), "Cosmos.Kernel.Plugs.dll"), 

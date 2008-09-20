@@ -170,16 +170,11 @@ namespace Indy.IL2CPU {
             }
             set {
                 mProgressMessage = value;
-                OnProgressChanged();
+                ProgressChanged.Invoke(value);
             }
         }
 
-        public event Action ProgressChanged;
-        private void OnProgressChanged() {
-            if (ProgressChanged != null) {
-                ProgressChanged();
-            }
-        }
+        public event Action<string> ProgressChanged;
 
         /// <summary>
         /// Compiles an assembly to CPU-specific code. The entrypoint of the assembly will be 
@@ -334,7 +329,7 @@ namespace Indy.IL2CPU {
                                                                            Index = mMethods.Count
                                                                        });
                         }
-                        OnProgressChanged();
+                        //ProgressChanged();
                         ScanAllMethods();
                         ScanAllStaticFields(); 
                         mMap.PreProcess(mAssembler);
@@ -1360,7 +1355,6 @@ namespace Indy.IL2CPU {
                                 int[] xCodeColumns = null;
                                 int[] xCodeEndLines = null;
                                 int[] xCodeEndColumns = null;
-                                bool xHasSymbols = false;
                                 if (mDebugMode == DebugModeEnum.Source) {
                                     var xSymbolReader = GetSymbolReaderForAssembly(xCurrentMethod.DeclaringType.Assembly);
                                     if (xSymbolReader != null) {
@@ -1377,7 +1371,6 @@ namespace Indy.IL2CPU {
                                             xCodeEndColumns = new int[xSmbMethod.SequencePointCount];
                                             xSmbMethod.GetSequencePoints(xCodeOffsets, xCodeDocuments
                                              , xCodeLines, xCodeColumns, xCodeEndLines, xCodeEndColumns);
-                                            xHasSymbols = true;
                                         }
                                     }
                                 }
@@ -1562,8 +1555,7 @@ namespace Indy.IL2CPU {
                 if (i == 0 && (aRefMethod != null && !aRefMethod.IsStatic)) {
                     continue;
                 }
-                if (xParams[i].IsDefined(typeof(FieldAccessAttribute),
-                                         true)) {
+                if (xParams[i].IsDefined(typeof(FieldAccessAttribute), true)) {
                     continue;
                 }
                 if (xParamAdded) {
