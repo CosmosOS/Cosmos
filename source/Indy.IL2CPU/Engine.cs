@@ -69,18 +69,11 @@ namespace Indy.IL2CPU {
         }
     }
 
-    public enum LogSeverityEnum {
-        Informational,
-        Warning,
-        Error
-    }
+    public enum LogSeverityEnum { Warning, Error }
 
-    public delegate void DebugLogHandler(LogSeverityEnum aSeverity,
-                                         string aMessage);
+    public delegate void DebugLogHandler(LogSeverityEnum aSeverity, string aMessage);
 
-    public enum TargetPlatformEnum {
-        X86
-    }
+    public enum TargetPlatformEnum { X86 }
 
     public enum DebugModeEnum {
         None,
@@ -317,7 +310,6 @@ namespace Indy.IL2CPU {
                                                                            Index = mMethods.Count
                                                                        });
                         }
-                        //ProgressChanged();
                         ScanAllMethods();
                         ScanAllStaticFields(); 
                         mMap.PreProcess(mAssembler);
@@ -1098,9 +1090,6 @@ namespace Indy.IL2CPU {
                                                      xCurrentField.GetFullName()));
                 mAssembler.CurrentGroup = GetGroupForType(xCurrentField.DeclaringType);
                 string xFieldName = xCurrentField.GetFullName();
-                OnDebugLog(LogSeverityEnum.Informational,
-                           "Processing Static Field '{0}'",
-                           xFieldName);
                 xFieldName = DataMember.GetStaticFieldName(xCurrentField);
                 if (mAssembler.DataMembers.Count(x => x.Value.Name == xFieldName) == 0) {
                     var xItem = (from item in xCurrentField.GetCustomAttributes(false)
@@ -1243,9 +1232,6 @@ namespace Indy.IL2CPU {
                                                          xCurrentMethod.GetFullName()));
                     EmitDependencyGraphLine(true, xCurrentMethod.GetFullName());
                     mAssembler.CurrentGroup = GetGroupForType(xCurrentMethod.DeclaringType);
-                    OnDebugLog(LogSeverityEnum.Informational,
-                               "Processing method '{0}'",
-                               xCurrentMethod.GetFullName());
                     RegisterType(xCurrentMethod.DeclaringType);
                     if (xCurrentMethod.IsAbstract) {
                         using (mMethodsLocker.AcquireReaderLock()) {

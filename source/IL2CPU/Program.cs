@@ -149,12 +149,6 @@ namespace IL2CPU {
 					Engine e = new Engine();
 					e.DebugLog += delegate(LogSeverityEnum aSeverity, string aMessage) {
 						switch (aSeverity) {
-							case LogSeverityEnum.Informational: {
-									if (String.IsNullOrEmpty(DebugFile)) {
-										return;
-									}
-									break;
-								}
 							case LogSeverityEnum.Warning: {
 									Console.ForegroundColor = ConsoleColor.Yellow;
 									break;

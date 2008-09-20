@@ -44,12 +44,6 @@ namespace Cosmos.Build.Windows {
             );
         }
 
-		public void DoDebugMessage(LogSeverityEnum aSeverity, string aMessage) {
-			if (aSeverity == LogSeverityEnum.Informational) {
-				return;
-			}
-		}
-
         protected void ProgressMessageReceived(string aMsg) {
             listProgress.SelectedIndex = listProgress.Items.Add(aMsg);
             listProgress.ScrollIntoView(listProgress.Items[listProgress.SelectedIndex]);
