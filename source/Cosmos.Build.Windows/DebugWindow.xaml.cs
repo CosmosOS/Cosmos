@@ -66,7 +66,7 @@ namespace Cosmos.Build.Windows {
         }
 
         private void butnLogClear_Click(object sender, RoutedEventArgs e) {
-            listLog.Items.Clear();
+            mTraceLog.Clear();
         }
 
         private void butnBreak_Click(object sender, RoutedEventArgs e) {

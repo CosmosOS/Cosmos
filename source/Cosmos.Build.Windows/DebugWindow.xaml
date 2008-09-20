@@ -17,21 +17,19 @@
                     <Separator/>
                 </ToolBar>
             </ToolBarTray>
-            <ListView x:Name="listLog">
-                <ListView.View>
-                    <GridView AllowsColumnReorder="true">
-                        <GridViewColumn Width="75" Header="EIP" >
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Path=EIP, StringFormat=X8}" FontFamily="Courier"/>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn Width="75" Header="Type" DisplayMemberBinding="{Binding Path=Type}" />
-                        <GridViewColumn Width="100" Header="Source File" DisplayMemberBinding="{Binding Path=SourceFile}" />
-                    </GridView>
-                </ListView.View>
-            </ListView>
+            <ListBox x:Name="listLog">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Margin="0,5">
+                            <WrapPanel>
+                                <TextBlock Margin="0,3,0,0" Text="{Binding Path=EIP, StringFormat=X8}" FontFamily="Courier"/>
+                                <TextBlock Margin="5,0,0,0" Text="{Binding Path=Type}"/>
+                            </WrapPanel>
+                            <TextBlock Margin="10,0,0,0" TextWrapping="Wrap" Text="{Binding Path=SourceFile}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
         </DockPanel>
         <GridSplitter Grid.Row="0" Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
         <DockPanel Grid.Row="0" Grid.Column="2">
