@@ -1186,12 +1186,8 @@ namespace Indy.IL2CPU {
                     using(mMethodsLocker.AcquireReaderLock()) {
                         xMethodScanInfo = mMethods[xCurrentMethod].Info;
                     }
-                    MethodInformation xMethodInfo = GetMethodInfo(xCurrentMethod,
-                                                                  xCurrentMethod,
-                                                                  xMethodName,
-                                                                  xTypeInfo,
-                                                                  mDebugMode != DebugModeEnum.None,
-                                                                  xMethodScanInfo);
+                    MethodInformation xMethodInfo = GetMethodInfo(xCurrentMethod, xCurrentMethod
+                     , xMethodName, xTypeInfo, mDebugMode != DebugModeEnum.None, xMethodScanInfo);
                     IL.Op xOp = GetOpFromType(mMap.MethodHeaderOp, null, xMethodInfo);
                     xOp.Assembler = mAssembler;
 #if VERBOSE_DEBUG
@@ -1199,13 +1195,13 @@ namespace Indy.IL2CPU {
                     if (xMethodInfo.TypeInfo != null) {
                         comment = "Type Info:\r\n \r\n" + xMethodInfo.TypeInfo;
                     }
-                    foreach (string s in comment.Trim().Split(new string[] {"\r\n"},
-                                                              StringSplitOptions.RemoveEmptyEntries)) {
+                    foreach (string s in comment.Trim().Split(new string[] {"\r\n"}
+                     , StringSplitOptions.RemoveEmptyEntries)) {
                         new Comment(s);
                     }
                     comment = xMethodInfo.ToString();
-                    foreach (string s in comment.Trim().Split(new string[] {"\r\n"},
-                                                              StringSplitOptions.RemoveEmptyEntries)) {
+                    foreach (string s in comment.Trim().Split(new string[] {"\r\n"}
+                     , StringSplitOptions.RemoveEmptyEntries)) {
                         new Comment(s);
                     }
 #endif
@@ -1252,11 +1248,6 @@ namespace Indy.IL2CPU {
                                 // Section currently is dead code. Working on matching it up 
                                 // with contents from inside the read
                                 int[] xCodeOffsets = null;
-                                ISymbolDocument[] xCodeDocuments = null;
-                                int[] xCodeLines = null;
-                                int[] xCodeColumns = null;
-                                int[] xCodeEndLines = null;
-                                int[] xCodeEndColumns = null;
                                 if (mDebugMode == DebugModeEnum.Source) {
                                     var xSymbolReader = GetSymbolReaderForAssembly(xCurrentMethod.DeclaringType.Assembly);
                                     if (xSymbolReader != null) {
@@ -1266,11 +1257,11 @@ namespace Indy.IL2CPU {
                                         // that a breakpoint can occur one. Essentially, an atomic source line in C#
                                         if (xSmbMethod != null) {
                                             xCodeOffsets = new int[xSmbMethod.SequencePointCount];
-                                            xCodeDocuments = new ISymbolDocument[xSmbMethod.SequencePointCount];
-                                            xCodeLines = new int[xSmbMethod.SequencePointCount];
-                                            xCodeColumns = new int[xSmbMethod.SequencePointCount];
-                                            xCodeEndLines = new int[xSmbMethod.SequencePointCount];
-                                            xCodeEndColumns = new int[xSmbMethod.SequencePointCount];
+                                            var xCodeDocuments = new ISymbolDocument[xSmbMethod.SequencePointCount];
+                                            var xCodeLines = new int[xSmbMethod.SequencePointCount];
+                                            var xCodeColumns = new int[xSmbMethod.SequencePointCount];
+                                            var xCodeEndLines = new int[xSmbMethod.SequencePointCount];
+                                            var xCodeEndColumns = new int[xSmbMethod.SequencePointCount];
                                             xSmbMethod.GetSequencePoints(xCodeOffsets, xCodeDocuments
                                              , xCodeLines, xCodeColumns, xCodeEndLines, xCodeEndColumns);
                                         }
@@ -1339,7 +1330,7 @@ namespace Indy.IL2CPU {
                                         xLabel = DataMember.FilterStringForIncorrectChars(xLabel);
                                     }
                                     
-                                    // determine if a new DebugHeader should be emitted
+                                    // Determine if a new DebugHeader should be emitted
                                     bool xEmitTracer = false;
                                     if (mDebugMode == DebugModeEnum.IL) {
                                         // For IL, we emit for every one
@@ -1351,6 +1342,7 @@ namespace Indy.IL2CPU {
                                             xEmitTracer = xCodeOffsets.Contains(xReader.Position);
                                         }
                                     }
+                                    //xCurrentMethod.DeclaringType.Namespace
                                     if (xEmitTracer) { 
                                         mMap.EmitOpDebugHeader(mAssembler, 0, xLabel);
                                     }

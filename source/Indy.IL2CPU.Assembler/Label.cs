@@ -8,10 +8,10 @@ using System.Reflection;
 namespace Indy.IL2CPU.Assembler {
 	public class Label: Instruction {
 		public static string GetFullName(MethodBase aMethod) {
-			StringBuilder xBuilder = new StringBuilder();
+			var xBuilder = new StringBuilder();
 			string[] xParts = aMethod.ToString().Split(' ');
 			string[] xParts2 = xParts.Skip(1).ToArray();
-			MethodInfo xMethodInfo = aMethod as MethodInfo;
+			var xMethodInfo = aMethod as MethodInfo;
 			if (xMethodInfo != null) {
 				xBuilder.Append(xMethodInfo.ReturnType.FullName);
 			} else {
@@ -40,12 +40,12 @@ namespace Indy.IL2CPU.Assembler {
 			xBuilder.Append(")");
 			return xBuilder.ToString();
 		}
+		
 		private static MD5 mHash = MD5.Create();
+		
 		private string mName;
 		public string Name {
-			get {
-				return mName;
-			}
+			get { return mName; }
 		}
 
 		public static string GetLabel(object aObject) {

@@ -8,9 +8,7 @@ using Cosmos.IL2CPU.Debug;
 
 namespace Cosmos.Build.Windows {
     public abstract class DebugConnectorStream : DebugConnector {
-        private Stream mStream;
-        
-        protected delegate void PacketReceivedDelegate(byte[] aBytes);
+        protected Stream mStream;
         
         protected class Incoming {
             public Stream Stream;
@@ -21,10 +19,8 @@ namespace Cosmos.Build.Windows {
             public PacketReceivedDelegate Completed;
         }
  
-        public override void SendCommand(byte aCmd) {
-            var xData = new byte[1];
-            xData[0] = aCmd;
-            mStream.Write(xData, 0, xData.Length);
+        protected override void SendData(byte[] aBytes) {
+            mStream.Write(aBytes, 0, aBytes.Length);
         }
         
         protected void Start(Stream aStream) {
@@ -36,44 +32,17 @@ namespace Cosmos.Build.Windows {
             Next(1, PacketReceived);
         }
         
-        private UInt32 GetUInt32(byte[] aBytes, int aOffset) {
-           return (UInt32)((aBytes[aOffset + 3] << 24) | (aBytes[aOffset + 2] << 16)
-              | (aBytes[aOffset + 1] << 8) | aBytes[aOffset + 0]);
-        }
-        
-        private UInt16 GetUInt16(byte[] aBytes, int aOffset) {
-           return (UInt16)((aBytes[aOffset + 1] << 8) | aBytes[aOffset + 0]);
-        }
-        
-        private void PacketTracePoint(byte[] aPacket) {
+        protected override void PacketTracePoint(byte[] aPacket) {
             Dispatcher.BeginInvoke(CmdTrace, GetUInt32(aPacket, 0));
             Next(1, PacketReceived);
         }
         
-        private void PacketTextSize(byte[] aPacket) {
-            Next(GetUInt16(aPacket, 0), PacketText);
-        }
-        
-        private void PacketText(byte[] aPacket) {
+        protected override void PacketText(byte[] aPacket) {
             Dispatcher.BeginInvoke(CmdText, ASCIIEncoding.ASCII.GetString(aPacket));
             Next(1, PacketReceived);
         }
         
-        private void PacketReceived(byte[] aPacket) {
-            // Could change to an array, but really not much benefit
-            switch ((MsgType)aPacket[0]) {
-                case MsgType.TracePoint:
-                    Next(4, PacketTracePoint);            
-                    break;
-                case MsgType.Text:
-                    Next(2, PacketTextSize);            
-                    break;
-                default:
-                    throw new Exception("Unknown debug command");
-            }
-        }
-
-        private void Next(int aPacketSize, PacketReceivedDelegate aCompleted) {
+        protected override void Next(int aPacketSize, PacketReceivedDelegate aCompleted) {
             var xIncoming = new Incoming() {
                 Packet = new byte[aPacketSize]
                 , Stream = mStream
@@ -82,7 +51,7 @@ namespace Cosmos.Build.Windows {
             mStream.BeginRead(xIncoming.Packet, 0, aPacketSize, new AsyncCallback(DoRead), xIncoming);
         }
         
-        private void DoRead(IAsyncResult aResult) {
+        protected void DoRead(IAsyncResult aResult) {
             try {
                 var xIncoming = (Incoming)aResult.AsyncState;
                 int xCount = xIncoming.Stream.EndRead(aResult);
