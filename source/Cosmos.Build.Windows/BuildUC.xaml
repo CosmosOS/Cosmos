@@ -10,11 +10,16 @@
             <RowDefinition Height="100" />
         </Grid.RowDefinitions>
         
-        <ListBox Grid.Row="0" Grid.Column="0" x:Name="listProgress" Height="Auto" Width="Auto"/>
+        <StackPanel Grid.Row="0" Height="Auto" Width="Auto">
+            <Label Content="Methods processed:"/>
+            <ProgressBar x:Name="progMethodsProcessed" Height="15" Margin="15,0"/>
+            <Label Content="Static fields processed:"/>
+            <ProgressBar x:Name="progStaticFieldsProcessed" Height="15" Margin="15,0"/>
+        </StackPanel>
         
-        <GridSplitter Grid.Row="1" Grid.Column="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
+        <GridSplitter Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
 
-        <DockPanel Grid.Row="2" Grid.Column="0">
+        <DockPanel Grid.Row="2" >
             <Label x:Name="warningLabel" DockPanel.Dock="Top" FontWeight="bold" Content="Warnings &amp; Errors"/>
             <ListBox x:Name="listErrors"/>
         </DockPanel>

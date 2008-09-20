@@ -28,9 +28,32 @@ namespace Cosmos.Build.Windows {
         
         public void BeginBuild(Builder aBuilder, DebugModeEnum aDebugMode, byte aComPort) {
             mBuilder = aBuilder;
-            aBuilder.Engine.ProgressChanged += DoProgressMessage;
+            aBuilder.Engine.CompilingMethods += new Action<int, int>(Engine_CompilingMethods);
+            aBuilder.Engine.CompilingStaticFields += new Action<int, int>(Engine_CompilingStaticFields);
             aBuilder.CompileCompleted += new Action(aBuilder_CompileCompleted);
             aBuilder.BeginCompile(aDebugMode, aComPort);
+        }
+
+        protected void Engine_CompilingStaticFields(int aValue, int aMax) {
+            var xAction = (Action)delegate() { 
+                progStaticFieldsProcessed.Maximum = aMax;
+                progStaticFieldsProcessed.Value = aValue;
+            };
+            // Do not use BeginInvoke - if BeginInvoke is used these stack up 
+            // and continue to come in and tie up the main thread after the engine completes
+            // and the window is closed
+            Dispatcher.Invoke(xAction);
+        }
+
+        protected void Engine_CompilingMethods(int aValue, int aMax) {
+            var xAction = (Action)delegate() { 
+                progMethodsProcessed.Maximum = aMax;
+                progMethodsProcessed.Value = aValue;
+            };
+            // Do not use BeginInvoke - if BeginInvoke is used these stack up 
+            // and continue to come in and tie up the main thread after the engine completes
+            // and the window is closed
+            Dispatcher.Invoke(xAction);
         }
 
         public event Action CompileCompleted;
@@ -38,25 +61,9 @@ namespace Cosmos.Build.Windows {
         protected void aBuilder_CompileCompleted() {
             Dispatcher.BeginInvoke(
              (Action)delegate() {
-                mBuilder.Engine.ProgressChanged -= DoProgressMessage;
                 CompileCompleted.Invoke();
              }
             );
-        }
-
-        protected void ProgressMessageReceived(string aMsg) {
-            listProgress.SelectedIndex = listProgress.Items.Add(aMsg);
-            listProgress.ScrollIntoView(listProgress.Items[listProgress.SelectedIndex]);
-        }
-        
-        public void DoProgressMessage(string aMessage) {
-            var xAction = (Action)delegate() { 
-                ProgressMessageReceived(aMessage); 
-            };
-            // Do not use BeginInvoke - if BeginInvoke is used these stack up 
-            // and continue to come in and tie up the main thread after the engine completes
-            // and the window is closed
-            Dispatcher.Invoke(xAction);
         }
 
     }

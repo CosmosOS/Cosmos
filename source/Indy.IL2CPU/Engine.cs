@@ -125,37 +125,8 @@ namespace Indy.IL2CPU {
         private ReaderWriterLocker mSymbolsLocker = new ReaderWriterLocker();
         private string mOutputDir;
 
-        public int ProgressMax {
-            get {
-                var xResult = 0;
-                using (mMethodsLocker.AcquireReaderLock()) {
-                    xResult += mMethods.Count;
-                }
-                using(mStaticFieldsLocker.AcquireReaderLock()) {
-                    xResult += mStaticFields.Count;
-                }
-                return xResult;
-            }
-        }
-
-        public int ProgressCurrent {
-            get {
-                var xResult = 0;
-                using (mMethodsLocker.AcquireReaderLock()) {
-                    xResult += (from item in mMethods
-                                where item.Value.Processed
-                                select item).Count();
-                }
-                using (mStaticFieldsLocker.AcquireReaderLock()) {
-                    xResult += (from item in mStaticFields
-                                where item.Value.Processed
-                                select item).Count();
-                }
-                return xResult;
-            }
-        }
-
-        public event Action<string> ProgressChanged;
+        public event Action<int, int> CompilingMethods;
+        public event Action<int, int> CompilingStaticFields;
 
         /// <summary>
         /// Compiles an assembly to CPU-specific code. The entrypoint of the assembly will be 
@@ -188,8 +159,7 @@ namespace Indy.IL2CPU {
                 mOutputDir = aOutputDir;
 
                 Type xEntryPointType = xEntryPoint.DeclaringType;
-                xEntryPoint = xEntryPointType.GetMethod("Init",
-                                                        new Type[0]);
+                xEntryPoint = xEntryPointType.GetMethod("Init", new Type[0]);
                 mDebugComport = aDebugComNumber;
                 //List<string> xSearchDirs = new List<string>(new string[] { Path.GetDirectoryName(aAssembly), aAssemblyDir });
                 //xSearchDirs.AddRange((from item in aPlugs
@@ -393,23 +363,17 @@ namespace Indy.IL2CPU {
         private int mThreadCount = Environment.ProcessorCount;
         private AutoResetEvent[] mThreadEvents = new AutoResetEvent[Environment.ProcessorCount];
 
-        private void ScanAllMethods()
-        {
-            for (int i = 0; i < mThreadCount; i++)
-            {
+        private void ScanAllMethods() {
+            for (int i = 0; i < mThreadCount; i++) {
                 mThreadEvents[i] = new AutoResetEvent(false);
                 var xThread = new Thread(DoScanMethods);
                 xThread.Start(i);
             }
             int xFinishedThreads = 0;
-            while (xFinishedThreads < mThreadCount)
-            {
-                for (int i = 0; i < mThreadCount; i++)
-                {
-                    if (mThreadEvents[i] != null)
-                    {
-                        if (mThreadEvents[i].WaitOne(10,false))
-                        {
+            while (xFinishedThreads < mThreadCount) {
+                for (int i = 0; i < mThreadCount; i++) {
+                    if (mThreadEvents[i] != null) {
+                        if (mThreadEvents[i].WaitOne(10, false)) {
                             mThreadEvents[i].Close();
                             mThreadEvents[i] = null;
                             xFinishedThreads++;
@@ -420,14 +384,12 @@ namespace Indy.IL2CPU {
         }
 
         private void DoScanMethods(object aData) {
+            //ProgressChanged.Invoke("Scanning methods");
             int xThreadIndex = (int)aData;
             try {
                 int xIndex = -1;
                 MethodBase xCurrentMethod;
                 while (true) {
-                    //while ((xCurrentMethod = (from item in mMethods.Keys
-                    //                          where !mMethods[item].PreProcessed
-                    //                          select item).FirstOrDefault()) != null) {
                     xIndex++;
                     if ((xIndex % mThreadCount) != xThreadIndex) {
                         continue;
@@ -440,7 +402,7 @@ namespace Indy.IL2CPU {
                     if (xCurrentMethod == null) {
                         break;
                     }
-                    ProgressChanged.Invoke(String.Format("Scanning method: {0}", xCurrentMethod.GetFullName()));
+                    //ProgressChanged.Invoke(String.Format("Scanning method: {0}", xCurrentMethod.GetFullName()));
                     EmitDependencyGraphLine(true, xCurrentMethod.GetFullName());
                     try {
                         mAssembler.CurrentGroup = GetGroupForType(xCurrentMethod.DeclaringType);
@@ -1072,22 +1034,20 @@ namespace Indy.IL2CPU {
         }
 
         private void ProcessAllStaticFields() {
-            //    FieldInfo xCurrentField;
-            //    while ((xCurrentField = (from item in mStaticFields.Keys
-            //                             where !mStaticFields[item].Processed
-            //                             select item).FirstOrDefault()) != null) {
             int i = -1;
-            while(true){
+            int xCount = 0;
+            while (true) {
                 i++;
                 FieldInfo xCurrentField;
                 using(mStaticFieldsLocker.AcquireReaderLock()) {
-                    if (i == mStaticFields.Count) {
+                    xCount = mStaticFields.Count;
+                    if (i == xCount) {
                         break;
                     }
                     xCurrentField = mStaticFields.Keys.ElementAt(i);
                 }
-                ProgressChanged.Invoke(String.Format("Processing static field: {0}",
-                                                     xCurrentField.GetFullName()));
+                CompilingStaticFields(i, xCount);
+                //ProgressChanged.Invoke(String.Format("Processing static field: {0}", xCurrentField.GetFullName()));
                 mAssembler.CurrentGroup = GetGroupForType(xCurrentField.DeclaringType);
                 string xFieldName = xCurrentField.GetFullName();
                 xFieldName = DataMember.GetStaticFieldName(xCurrentField);
@@ -1102,7 +1062,6 @@ namespace Indy.IL2CPU {
                     }
                     if (xManifestResourceName != null) {
                         RegisterType(xCurrentField.FieldType);
-
                         string xFileName = Path.Combine(mOutputDir,
                                                         (xCurrentField.DeclaringType.Assembly.FullName + "__" + xManifestResourceName).Replace(",",
                                                                                                                                                "_") + ".res");
@@ -1119,20 +1078,12 @@ namespace Indy.IL2CPU {
                                 xTarget.Write(BitConverter.GetBytes((uint)InstanceTypeEnum.StaticEmbeddedArray),
                                               0,
                                               4);
-                                xTarget.Write(BitConverter.GetBytes((int)xStream.Length),
-                                              0,
-                                              4);
-                                xTarget.Write(BitConverter.GetBytes((int)1),
-                                              0,
-                                              4);
+                                xTarget.Write(BitConverter.GetBytes((int)xStream.Length), 0, 4);
+                                xTarget.Write(BitConverter.GetBytes((int)1), 0, 4);
                                 var xBuff = new byte[128];
                                 while (xStream.Position < xStream.Length) {
-                                    int xBytesRead = xStream.Read(xBuff,
-                                                                  0,
-                                                                  128);
-                                    xTarget.Write(xBuff,
-                                                  0,
-                                                  xBytesRead);
+                                    int xBytesRead = xStream.Read(xBuff, 0, 128);
+                                    xTarget.Write(xBuff, 0, xBytesRead);
                                 }
                             }
                         }
@@ -1146,69 +1097,56 @@ namespace Indy.IL2CPU {
                                                                                                        "___" + xFieldName + "___Contents")));
                     } else {
                         RegisterType(xCurrentField.FieldType);
-                        {
-                            int xTheSize;
-                            string theType = "db";
-                            Type xFieldTypeDef = xCurrentField.FieldType;
-                            //TypeSpecification xTypeSpec = xCurrentField.FieldType as TypeSpecification;
-                            //if (xTypeSpec == null) {
-                            if (!xFieldTypeDef.IsClass || xFieldTypeDef.IsValueType) {
-                                xTheSize = GetFieldStorageSize(xCurrentField.FieldType);
-                            } else {
-                                xTheSize = 4;
-                            }
-                            //} else {
-                            //xTheSize = 4;
-                            //}
-                            if (xTheSize == 4) {
-                                theType = "dd";
-                                xTheSize = 1;
-                            } else {
-                                if (xTheSize == 2) {
-                                    theType = "dw";
-                                    xTheSize = 1;
-                                }
-                            }
-                            string xTheData = "";
-                            try {
-                                object xValue = xCurrentField.GetValue(null);
-                                if (xValue != null) {
-                                    try {
-                                        if (xValue.GetType().IsValueType) {
-                                            StringBuilder xSB = new StringBuilder(xTheSize * 3);
-                                            for (int x = 0; x < xTheSize; x++) {
-                                                xSB.Append(Marshal.ReadByte(xValue,
-                                                                            x));
-                                                xSB.Append(",");
-                                            }
-                                            xTheData = xSB.Remove(xSB.Length - 1,
-                                                                  1).ToString();
-                                        }
-                                    } catch {
-                                    }
-                                }
-                            } catch {
-                            }
-                            if (xTheSize == 0) {
-                                throw new Exception("Field '" + xCurrentField.ToString() + "' doesn't have a valid size!");
-                            }
-                            if (String.IsNullOrEmpty(xTheData)) {
-                                for (uint x = 0; x < xTheSize; x++) {
-                                    xTheData += "0,";
-                                }
-                            }
-                            xTheData = xTheData.TrimEnd(',');
-                            mAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>(mAssembler.CurrentGroup,
-                                                                                            new DataMember(xFieldName,
-                                                                                                           theType,
-                                                                                                           xTheData)));
+                        int xTheSize;
+                        string theType = "db";
+                        Type xFieldTypeDef = xCurrentField.FieldType;
+                        if (!xFieldTypeDef.IsClass || xFieldTypeDef.IsValueType) {
+                            xTheSize = GetFieldStorageSize(xCurrentField.FieldType);
+                        } else {
+                            xTheSize = 4;
                         }
+                        if (xTheSize == 4) {
+                            theType = "dd";
+                            xTheSize = 1;
+                        } else if (xTheSize == 2) {
+                            theType = "dw";
+                            xTheSize = 1;
+                        }
+                        string xTheData = "";
+                        try {
+                            object xValue = xCurrentField.GetValue(null);
+                            if (xValue != null) {
+                                try {
+                                    if (xValue.GetType().IsValueType) {
+                                        StringBuilder xSB = new StringBuilder(xTheSize * 3);
+                                        for (int x = 0; x < xTheSize; x++) {
+                                            xSB.Append(Marshal.ReadByte(xValue, x) + ",");
+                                        }
+                                        xTheData = xSB.Remove(xSB.Length - 1, 1).ToString();
+                                    }
+                                } catch {
+                                }
+                            }
+                        } catch {
+                        }
+                        if (xTheSize == 0) {
+                            throw new Exception("Field '" + xCurrentField.ToString() + "' doesn't have a valid size!");
+                        }
+                        if (String.IsNullOrEmpty(xTheData)) {
+                            for (uint x = 0; x < xTheSize; x++) {
+                                xTheData += "0,";
+                            }
+                        }
+                        xTheData = xTheData.TrimEnd(',');
+                        mAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>(
+                         mAssembler.CurrentGroup, new DataMember(xFieldName, theType, xTheData)));
                     }
                 }
                 using (mStaticFieldsLocker.AcquireReaderLock()) {
                     mStaticFields[xCurrentField].Processed = true;
                 }
             }
+            CompilingStaticFields(i, xCount);
         }
 
         private ISymbolReader GetSymbolReaderForAssembly(Assembly aAssembly) {
@@ -1217,19 +1155,19 @@ namespace Indy.IL2CPU {
 
         private void ProcessAllMethods() {
             int i = -1;
-            while(true) {
+            int xCount = 0;
+            while (true) {
                 i++;
                 MethodBase xCurrentMethod;
                 using(mMethodsLocker.AcquireReaderLock()) {
-                    if (i == mMethods.Count) {
+                    xCount = mMethods.Count;
+                    if (i == xCount) {
                         break;
                     }
                     xCurrentMethod = mMethods.Keys.ElementAt(i);
                 }
-
+                CompilingMethods(i, xCount);
                 try {
-                    ProgressChanged.Invoke(String.Format("Processing method: {0}",
-                                                         xCurrentMethod.GetFullName()));
                     EmitDependencyGraphLine(true, xCurrentMethod.GetFullName());
                     mAssembler.CurrentGroup = GetGroupForType(xCurrentMethod.DeclaringType);
                     RegisterType(xCurrentMethod.DeclaringType);
@@ -1254,9 +1192,7 @@ namespace Indy.IL2CPU {
                                                                   xTypeInfo,
                                                                   mDebugMode != DebugModeEnum.None,
                                                                   xMethodScanInfo);
-                    IL.Op xOp = GetOpFromType(mMap.MethodHeaderOp,
-                                              null,
-                                              xMethodInfo);
+                    IL.Op xOp = GetOpFromType(mMap.MethodHeaderOp, null, xMethodInfo);
                     xOp.Assembler = mAssembler;
 #if VERBOSE_DEBUG
                     string comment = "(No Type Info available)";
@@ -1483,6 +1419,7 @@ namespace Indy.IL2CPU {
                     throw;
                 }
             }
+            CompilingMethods(i, xCount);
         }
 
         private IList<Assembly> GetPlugAssemblies() {

@@ -83,7 +83,6 @@ namespace Cosmos.Build.Windows {
             } else if (mOptionsUC.rdioUSB.IsChecked.Value) {
                 mBuilder.MakeUSB(mOptionsUC.cmboUSBDevice.Text[0]);
             }
-            // Need to close MainWindow after DebugWindow is shown since it is the main Window
             // Problems around with DebugWindow getting stuck - seeing if this helps by hiding 
             // instead of closing
             mMainWindow.Hide();
