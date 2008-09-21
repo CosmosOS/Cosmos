@@ -9,7 +9,7 @@ using System.Reflection;
 using Indy.IL2CPU.Assembler;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Castclass, false)]
+	[OpCode(OpCodeEnum.Castclass)]
 	public class Castclass: Op {
 		private int mTypeId;
 		private string mThisLabel;

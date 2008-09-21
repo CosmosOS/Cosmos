@@ -135,13 +135,11 @@ namespace Indy.IL2CPU {
         /// <param name="aAssembly">The assembly of which to crawl the entry-point method.</param>
         /// <param name="aTargetPlatform">The platform to target when assembling the code.</param>
         /// <param name="aOutput"></param>
-        /// <param name="aInMetalMode">Whether or not the output is metalmode only.</param>
         
         //TODO: Way too many params, these should be properties
         public void Execute(string aAssembly,
                             TargetPlatformEnum aTargetPlatform,
                             Func<string, string> aGetFileNameForGroup,
-                            bool aInMetalMode,
                             IEnumerable<string> aPlugs,
                             DebugMode aDebugMode,
                             byte aDebugComNumber,
@@ -169,7 +167,6 @@ namespace Indy.IL2CPU {
                     case TargetPlatformEnum.X86: {
                         mMap = (OpCodeMap)Activator.CreateInstance(Type.GetType("Indy.IL2CPU.IL.X86.X86OpCodeMap, Indy.IL2CPU.IL.X86", true));
                         mAssembler = new Assembler.X86.Assembler(aGetFileNameForGroup,
-                                                                 aInMetalMode,
                                                                  ((aDebugMode != DebugMode.None) && (aDebugMode != DebugMode.MLUsingGDB))
                                                                      ? aDebugComNumber
                                                                      : (byte)0);
@@ -230,7 +227,6 @@ namespace Indy.IL2CPU {
                                          new QueuedMethodInformation() {
                                                                            Index = mMethods.Count
                                                                        });
-                            if (!aInMetalMode) {
                                 mMethods.Add(VTablesImplRefs.LoadTypeTableRef,
                                              new QueuedMethodInformation() {
                                                                                Processed = false,
@@ -271,7 +267,6 @@ namespace Indy.IL2CPU {
                                                                                Processed = false,
                                                                                Index = mMethods.Count
                                                                            });
-                            }
                             mMethods.Add(xEntryPoint,
                                          new QueuedMethodInformation() {
                                                                            Processed = false,
@@ -281,7 +276,6 @@ namespace Indy.IL2CPU {
                         ScanAllMethods();
                         ScanAllStaticFields(); 
                         mMap.PreProcess(mAssembler);
-                        if (!aInMetalMode) {
                             do {
                                 int xOldCount;
                                 using (mMethodsLocker.AcquireReaderLock()) {
@@ -300,7 +294,6 @@ namespace Indy.IL2CPU {
                                 }
                             } while (true);
                             mAssembler.CurrentGroup = "main";
-                        }
                         // initialize the runtime engine
                         mAssembler.CurrentGroup = "main";
                         MainEntryPointOp xEntryPointOp = (MainEntryPointOp)GetOpFromType(mMap.MainEntryPointOp,
@@ -309,9 +302,7 @@ namespace Indy.IL2CPU {
                         xEntryPointOp.Assembler = mAssembler;
                         xEntryPointOp.Enter(Assembler.Assembler.EntryPointName);
                         xEntryPointOp.Call(RuntimeEngineRefs.InitializeApplicationRef);
-                        if (!aInMetalMode) {
-                            xEntryPointOp.Call("____INIT__VMT____");
-                        }
+                        xEntryPointOp.Call("____INIT__VMT____");
                         using (mTypesLocker.AcquireWriterLock()) {
                             foreach (Type xType in mTypes) {
                                 foreach (MethodBase xMethod in xType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)) {
@@ -337,9 +328,7 @@ namespace Indy.IL2CPU {
                         ProcessAllMethods();
                         mMap.PostProcess(mAssembler);
                         ProcessAllStaticFields();
-                        if (!aInMetalMode) {
-                            GenerateVMT(mDebugMode != DebugMode.None);
-                        }
+                        GenerateVMT(mDebugMode != DebugMode.None);
                         using (mSymbolsLocker.AcquireReaderLock()) {
                             if (mSymbols != null) {
                                 string xOutputFile = Path.Combine(mOutputDir, "debug.cxdb");
@@ -440,8 +429,8 @@ namespace Indy.IL2CPU {
                                 continue;
                             }
                         }
-                        if (mMap.HasCustomAssembleImplementation(xMethodInfo, false)) {
-                            mMap.ScanCustomAssembleImplementation(xMethodInfo, false);
+                        if (mMap.HasCustomAssembleImplementation(xMethodInfo)) {
+                            mMap.ScanCustomAssembleImplementation(xMethodInfo);
                             continue;
                         }
 
@@ -1232,8 +1221,8 @@ namespace Indy.IL2CPU {
                         }
                     }
                     if (!xContentProduced) {
-                        if (mMap.HasCustomAssembleImplementation(xMethodInfo, false)) {
-                            mMap.DoCustomAssembleImplementation(false, mAssembler, xMethodInfo);
+                        if (mMap.HasCustomAssembleImplementation(xMethodInfo)) {
+                            mMap.DoCustomAssembleImplementation(mAssembler, xMethodInfo);
                         // No plugs, we need to compile the IL from the method
                         } else {
                             MethodBody xBody = xCurrentMethod.GetMethodBody();

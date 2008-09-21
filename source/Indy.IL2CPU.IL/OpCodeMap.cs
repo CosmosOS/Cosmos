@@ -90,11 +90,11 @@ namespace Indy.IL2CPU.IL {
 		    return xResult;
 		}
 
-		public MethodBase GetCustomMethodImplementation(string aOrigMethodName, bool aInMetalMode) {
+		public MethodBase GetCustomMethodImplementation(string aOrigMethodName) {
 			return null;
 		}
 
-		public virtual bool HasCustomAssembleImplementation(MethodInformation aMethod, bool aInMetalMode) {
+		public virtual bool HasCustomAssembleImplementation(MethodInformation aMethod) {
 			PlugMethodAttribute xResult = ((PlugMethodAttribute[])aMethod.Method.GetCustomAttributes(typeof(PlugMethodAttribute), true)).FirstOrDefault();
 			if (xResult != null) {
 				return xResult.MethodAssembler != null;
@@ -102,10 +102,10 @@ namespace Indy.IL2CPU.IL {
 			return false;
 		}
 
-        public virtual void ScanCustomAssembleImplementation(MethodInformation aMethod, bool aInMetalMode) {
+        public virtual void ScanCustomAssembleImplementation(MethodInformation aMethod) {
         }
 
-	    public virtual void DoCustomAssembleImplementation(bool aInMetalMode, Assembler.Assembler aAssembler, MethodInformation aMethodInfo) {
+	    public virtual void DoCustomAssembleImplementation(Assembler.Assembler aAssembler, MethodInformation aMethodInfo) {
 			PlugMethodAttribute xAttrib = aMethodInfo.Method.GetCustomAttributes(typeof(PlugMethodAttribute), true).Cast<PlugMethodAttribute>().FirstOrDefault();
 			if (xAttrib != null) {
 				Type xAssemblerType = xAttrib.MethodAssembler;

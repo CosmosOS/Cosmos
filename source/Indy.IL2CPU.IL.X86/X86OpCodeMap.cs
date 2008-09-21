@@ -57,7 +57,7 @@ namespace Indy.IL2CPU.IL.X86
 			return xResult;
 		}
 
-		public override bool HasCustomAssembleImplementation(MethodInformation aMethodInfo, bool aInMetalMode)
+		public override bool HasCustomAssembleImplementation(MethodInformation aMethodInfo)
 		{
 			switch (aMethodInfo.LabelName)
 			{
@@ -103,15 +103,15 @@ namespace Indy.IL2CPU.IL.X86
 								return true;
 							}
 						}
-						return base.HasCustomAssembleImplementation(aMethodInfo, aInMetalMode);
+						return base.HasCustomAssembleImplementation(aMethodInfo);
 					}
 			}
 		}
 
 		private static readonly MethodBase InvokeMulticastRef = typeof(MulticastDelegateImpl).GetMethod("InvokeMulticast", BindingFlags.Public | BindingFlags.Static);
-        public override void ScanCustomAssembleImplementation(MethodInformation aMethod, bool aInMetalMode)
+        public override void ScanCustomAssembleImplementation(MethodInformation aMethod)
         {
-            base.ScanCustomAssembleImplementation(aMethod, aInMetalMode);
+            base.ScanCustomAssembleImplementation(aMethod);
             if (ObjectUtilities.IsDelegate(aMethod.Method.DeclaringType))
             {
                 if (aMethod.LabelName.EndsWith("__ctor_System_Object__System_IntPtr_"))
@@ -135,7 +135,7 @@ namespace Indy.IL2CPU.IL.X86
                 }
             }
         }
-		public override void DoCustomAssembleImplementation(bool aInMetalMode, Indy.IL2CPU.Assembler.Assembler aAssembler, MethodInformation aMethodInfo)
+		public override void DoCustomAssembleImplementation(Indy.IL2CPU.Assembler.Assembler aAssembler, MethodInformation aMethodInfo)
 		{
 			switch (aMethodInfo.LabelName)
 			{
@@ -228,7 +228,7 @@ namespace Indy.IL2CPU.IL.X86
 							break;
 						}
 					}
-					base.DoCustomAssembleImplementation(aInMetalMode, aAssembler, aMethodInfo);
+					base.DoCustomAssembleImplementation(aAssembler, aMethodInfo);
 					break;
 			}
 		}

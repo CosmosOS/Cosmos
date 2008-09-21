@@ -7,14 +7,9 @@ namespace Indy.IL2CPU.IL {
 	[AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = false)]
 	public class OpCodeAttribute: Attribute {
 		public readonly OpCodeEnum OpCode;
-		public readonly bool IsMetallic = true;
 
 		public OpCodeAttribute(OpCodeEnum aOpCode) {
 			OpCode = aOpCode;
-		}
-		public OpCodeAttribute(OpCodeEnum aOpCode, bool aIsMetallic)
-			: this(aOpCode) {
-			IsMetallic = aIsMetallic;
 		}
 	}
 }

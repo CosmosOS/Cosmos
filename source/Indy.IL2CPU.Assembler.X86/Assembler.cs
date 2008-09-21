@@ -10,8 +10,8 @@ namespace Indy.IL2CPU.Assembler.X86 {
 		protected byte mComNumber = 0;
 		protected UInt16[] mComPortAddresses = { 0x3F8, 0x2F8, 0x3E8, 0x2E8 };
 
-		public Assembler(Func<string, string> aGetStreamForGroup, bool aInMetalMode, byte aComNumber)
-			: base(aGetStreamForGroup, aInMetalMode) {
+		public Assembler(Func<string, string> aGetStreamForGroup, byte aComNumber)
+			: base(aGetStreamForGroup) {
 			mComNumber = aComNumber;
 		}
 

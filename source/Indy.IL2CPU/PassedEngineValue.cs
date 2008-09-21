@@ -9,7 +9,6 @@ namespace Indy.IL2CPU {
         public string aAssembly;
         public TargetPlatformEnum aTargetPlatform;
         public Func<string, string> aGetFileNameForGroup;
-        public bool aInMetalMode;
         public IEnumerable<string> aPlugs;
         public DebugMode aDebugMode;
         public byte aDebugComNumber;
@@ -19,7 +18,6 @@ namespace Indy.IL2CPU {
         public PassedEngineValue(string aAssembly,
          TargetPlatformEnum aTargetPlatform,
          Func<string, string> aGetFileNameForGroup,
-         bool aInMetalMode,
          IEnumerable<string> aPlugs,
          DebugMode aDebugMode,
          byte aDebugComNumber,
@@ -28,7 +26,6 @@ namespace Indy.IL2CPU {
             this.aAssembly = aAssembly;
             this.aTargetPlatform = aTargetPlatform;
             this.aGetFileNameForGroup = aGetFileNameForGroup;
-            this.aInMetalMode = aInMetalMode;
             this.aPlugs = aPlugs;
             this.aDebugMode = aDebugMode;
             this.aDebugComNumber = aDebugComNumber;

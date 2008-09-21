@@ -12,7 +12,7 @@ using Assembler = Indy.IL2CPU.Assembler.Assembler;
 
 namespace Indy.IL2CPU.IL.X86
 {
-	[OpCode(OpCodeEnum.Newobj, false)]
+	[OpCode(OpCodeEnum.Newobj)]
 	public class Newobj : Op
 	{
 		public MethodBase CtorDef;

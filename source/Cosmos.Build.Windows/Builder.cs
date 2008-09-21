@@ -112,7 +112,7 @@ namespace Cosmos.Build.Windows {
             var xParam = (PassedEngineValue)aParam;
             Engine.TraceAssemblies = xParam.TraceAssemblies;
             Engine.Execute(xParam.aAssembly, xParam.aTargetPlatform, xParam.aGetFileNameForGroup
-             , xParam.aInMetalMode, xParam.aPlugs, xParam.aDebugMode, xParam.aDebugComNumber
+             , xParam.aPlugs, xParam.aDebugMode, xParam.aDebugComNumber
              , xParam.aOutputDir);
             CompileCompleted.Invoke();
         }
@@ -123,7 +123,7 @@ namespace Cosmos.Build.Windows {
             }
             Assembly xTarget = System.Reflection.Assembly.GetEntryAssembly();
             var xEngineParams = new PassedEngineValue(xTarget.Location, TargetPlatformEnum.X86
-             , g => Path.Combine(AsmPath, g + ".asm"), false
+             , g => Path.Combine(AsmPath, g + ".asm")
              , new string[] {
                 Path.Combine(Path.Combine(ToolsPath, "Cosmos.Kernel.Plugs"), "Cosmos.Kernel.Plugs.dll"), 
                 Path.Combine(Path.Combine(ToolsPath, "Cosmos.Hardware.Plugs"), "Cosmos.Hardware.Plugs.dll"), 

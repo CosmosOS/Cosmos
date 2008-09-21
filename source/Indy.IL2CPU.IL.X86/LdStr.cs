@@ -7,7 +7,7 @@ using Asm = Indy.IL2CPU.Assembler.Assembler;
 using System.Collections.Generic;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Ldstr, true)]
+	[OpCode(OpCodeEnum.Ldstr)]
 	public class LdStr: Op {
 		private static Dictionary<string, DataMember> mDataMemberMap = new Dictionary<string, DataMember>();
 		public readonly string LiteralStr;

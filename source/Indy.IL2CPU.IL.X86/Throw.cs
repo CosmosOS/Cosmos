@@ -7,7 +7,7 @@ using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Throw, false)]
+	[OpCode(OpCodeEnum.Throw)]
 	public class Throw: Op {
 		private MethodInformation mMethodInfo;
 		private int mCurrentILOffset;

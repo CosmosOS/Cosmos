@@ -6,7 +6,7 @@ using System.IO;
 
 namespace Indy.IL2CPU.Assembler {
 	public class RawAssembler : Assembler {
-		public RawAssembler() : base(null, false) { }
+		public RawAssembler() : base(null) { }
 
 		public string GetContents() {
 			using (var sw = new StringWriter()) {

@@ -10,7 +10,6 @@ namespace Indy.IL2CPU.IL {
 	public abstract class Op {
 		private readonly string mCurrentInstructionLabel;
 		private readonly string mILComment;
-		private readonly bool mSupportsMetalMode;
 		public static string GetInstructionLabel(ILReader aReader) {
 			return GetInstructionLabel(aReader.Position);
 		}
@@ -44,10 +43,6 @@ namespace Indy.IL2CPU.IL {
 				// todo: need to add the real operand here?
 				mILComment = "; IL: " + aReader.OpCode + " " + aReader.Operand;
 			}
-			OpCodeAttribute xAttrib = GetType().GetCustomAttributes(typeof(OpCodeAttribute), true).Cast<OpCodeAttribute>().FirstOrDefault();
-			if (xAttrib != null) {
-				mSupportsMetalMode = xAttrib.IsMetallic;
-			}
 		}
 
 		// This is a prop and not a constructor arg for two reasons. Ok, mostly for one
@@ -63,12 +58,6 @@ namespace Indy.IL2CPU.IL {
 			}
 			set {
 				mAssembler = value;
-			}
-		}
-
-		public bool SupportsMetalMode {
-			get {
-				return mSupportsMetalMode;
 			}
 		}
 

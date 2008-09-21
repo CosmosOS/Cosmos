@@ -4,7 +4,7 @@ using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using Indy.IL2CPU.Assembler;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Ldlen, true)]
+	[OpCode(OpCodeEnum.Ldlen)]
 	public class Ldlen: Op {
 		public Ldlen(ILReader aReader, MethodInformation aMethodInfo)
 			: base(aReader, aMethodInfo) {

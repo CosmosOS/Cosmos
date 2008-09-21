@@ -7,7 +7,7 @@ using System.Reflection;
 using Indy.IL2CPU.Assembler;
 
 namespace Indy.IL2CPU.IL.X86 {
-    [OpCode(OpCodeEnum.Callvirt, true)]
+    [OpCode(OpCodeEnum.Callvirt)]
     public class Callvirt : Op {
         private readonly int mMethodIdentifier;
         private readonly string mNormalAddress;

@@ -5,7 +5,7 @@ using System.IO;
 using CPU = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Ldelem_I, true)]
+	[OpCode(OpCodeEnum.Ldelem_I)]
 	public class Ldelem_I: Op {
 		public Ldelem_I(ILReader aReader, MethodInformation aMethodInfo)
 			: base(aReader, aMethodInfo) {

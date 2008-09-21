@@ -6,7 +6,7 @@ using System.Reflection;
 using Indy.IL2CPU.Assembler;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Newarr, false)]
+	[OpCode(OpCodeEnum.Newarr)]
 	public class Newarr: Op {
 		private int mElementSize;
 		private string mCtorName;

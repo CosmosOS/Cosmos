@@ -69,7 +69,6 @@ namespace Indy.IL2CPU.Assembler {
         protected List<KeyValuePair<string, Instruction>> mInstructions = new List<KeyValuePair<string, Instruction>>();
         private List<KeyValuePair<string, DataMember>> mDataMembers = new List<KeyValuePair<string, DataMember>>();
         private List<KeyValuePair<string, string>> mIncludes = new List<KeyValuePair<string, string>>();
-        private readonly bool mInMetalMode = false;
         public readonly Stack<StackContent> StackContents = new Stack<StackContent>();
 
         private static ReaderWriterLocker mCurrentInstanceLocker = new ReaderWriterLocker();
@@ -103,11 +102,8 @@ namespace Indy.IL2CPU.Assembler {
             return aPrefix + mDataMemberCounter.ToString("X8").ToUpper();
         }
 
-        public Assembler(Func<string, string> aGetStreamForGroup) : this(aGetStreamForGroup, false) { }
-
-        public Assembler(Func<string, string> aGetFileNameForGroup, bool aInMetalMode) {
+        public Assembler(Func<string, string> aGetFileNameForGroup) {
             mGetFileNameForGroup = aGetFileNameForGroup;
-            mInMetalMode = aInMetalMode;
             CurrentInstance.Push(this);
             //mInstructions.AddComplexIndexDefinition(
         }

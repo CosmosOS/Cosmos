@@ -14,7 +14,6 @@ namespace IL2CPU {
 		public static string AsmFile;
 		public static string BCLDir;
 		public static List<string> Plugs = new List<string>();
-		public static bool MetalMode;
 		public static string DebugFile;
 		public static TargetPlatformEnum TargetPlatform = TargetPlatformEnum.X86;
 		public const string FAsmParamsTemplate_Win32 = "\"{1}\" \"{0}\"";
@@ -61,17 +60,6 @@ namespace IL2CPU {
 								return false;
 							}
 							Plugs.Add(xArgParts[1]);
-							break;
-						}
-					case "metal": {
-							if (String.IsNullOrEmpty(xArgParts[1])) {
-								MetalMode = true;
-							} else {
-								if (!Boolean.TryParse(xArgParts[1], out MetalMode)) {
-									Console.WriteLine("Error parsing MetalMode argument. Invalid value. Valid values are '" + Boolean.TrueString + "' and '" + Boolean.FalseString + "', or use -metal/-metalmode, which is equal to -metal:true");
-									return false;
-								}
-							}
 							break;
 						}
 					case "platform": {
@@ -163,7 +151,7 @@ namespace IL2CPU {
 					};
 					string xTestOutput = Path.GetTempFileName();
 					Func<string, string> xGetFileNameForGroup = xGroup => Path.Combine(AsmFile, xGroup + ".asm");
-					e.Execute(InputFile, TargetPlatform, xGetFileNameForGroup, MetalMode, Plugs, DebugMode.Source, 2, AsmFile);
+					e.Execute(InputFile, TargetPlatform, xGetFileNameForGroup, Plugs, DebugMode.Source, 2, AsmFile);
 					ProcessStartInfo xFasmStartInfo = new ProcessStartInfo();
 					if (TargetPlatform != TargetPlatformEnum.X86) {
 						xFasmStartInfo.FileName = FAsmFileName;

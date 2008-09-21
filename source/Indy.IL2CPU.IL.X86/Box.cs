@@ -6,7 +6,7 @@ using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Box, false)]
+	[OpCode(OpCodeEnum.Box)]
 	public class Box: Op {
 		private int mTheSize;
 		private int mTypeId;
