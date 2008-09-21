@@ -149,10 +149,6 @@
       <Project>{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}</Project>
       <Name>Cosmos.Debug</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Indy.IL2CPU.IL.X86\Indy.IL2CPU.IL.X86.csproj">
-      <Project>{69C8D2C5-225C-4A00-BA55-AEF6719CBDBA}</Project>
-      <Name>Indy.IL2CPU.IL.X86</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Indy.IL2CPU\Indy.IL2CPU.csproj">
       <Project>{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}</Project>
       <Name>Indy.IL2CPU</Name>

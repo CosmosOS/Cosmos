@@ -89,12 +89,6 @@
     <None Include="Tests\TestEmptyMethodApp\TestEmptyMethodApp.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Indy.IL2CPU.IL.X86\Indy.IL2CPU.IL.X86.csproj">
-      <Project>{69C8D2C5-225C-4A00-BA55-AEF6719CBDBA}</Project>
-      <Name>Indy.IL2CPU.IL.X86</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Tests\TestEmptyMethodApp\TestEmptyMethodApp.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
