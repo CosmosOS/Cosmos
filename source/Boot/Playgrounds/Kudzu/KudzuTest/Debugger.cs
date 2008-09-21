@@ -9,9 +9,9 @@ namespace Cosmos.Playground.Kudzu {
             Random xRandom = new Random((int)(Cosmos.Hardware.Global.TickCount
                 + Cosmos.Hardware.RTC.GetSeconds()));
             // Divide by 100, get remainder
+            Dbg.Debugger.Break();
             int xMagicNo = xRandom.Next() % 100;
             Dbg.Debugger.Send("The magic number is " + xMagicNo);
-            Dbg.Debugger.Break();
             Console.WriteLine("Hello world");
             Dbg.Debugger.TraceOn();
             int xDummy = 4;
