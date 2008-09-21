@@ -47,6 +47,9 @@ namespace Cosmos.Build.Windows {
                 case MsgType.Message:
                     Next(2, PacketTextSize);            
                     break;
+                case (MsgType)0:
+                    Next(1, PacketCommand);
+                    break;
                 default:
                     throw new Exception("Unknown debug command");
             }

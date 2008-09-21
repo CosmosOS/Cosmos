@@ -56,7 +56,9 @@ namespace Cosmos.Build.Windows {
                         xDebugConnector = new DebugConnectorQEMU();
                     } else if (mOptionsUC.rdioVMWare.IsChecked.Value) {
                         xDebugConnector = new DebugConnectorVMWare();
-                    } else {
+                    } else if(mOptionsUC.rdioUSB.IsChecked.Value) {
+                        xDebugConnector = new DebugConnectorSerial();
+                    }else{
                         throw new Exception("TODO: Make a connector for raw serial");
                     }
                     xDebugWindow.SetSourceInfoMap(xSourceMappings, xDebugConnector);

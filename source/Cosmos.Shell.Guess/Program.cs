@@ -18,11 +18,11 @@ namespace Cosmos.Demo.Guess {
         public static void Init() {
             var xBoot = new Cosmos.Sys.Boot();
             xBoot.Execute();
-
             Random xRandom = new Random((int)(Cosmos.Hardware.Global.TickCount
                 + Cosmos.Hardware.RTC.GetSeconds()));
             // Divide by 100, get remainder
             int xMagicNo = xRandom.Next() % 100;
+            Debugger.Send("Magic Number is " + xMagicNo);
             Console.WriteLine("I am thinking of a number between 0 and 100. What is it?");
             while (true) {
                 Console.ForegroundColor = ConsoleColor.Blue;
@@ -32,7 +32,8 @@ namespace Cosmos.Demo.Guess {
                 if (xGuess == xMagicNo) {
                     break;
                 }
-
+                Debugger.Send("Guessed number is " + xGuess);
+                Debugger.Break();
                 Console.ForegroundColor = ConsoleColor.Red;
                 if (xGuess > xMagicNo) {
                     Console.WriteLine("Too high.");

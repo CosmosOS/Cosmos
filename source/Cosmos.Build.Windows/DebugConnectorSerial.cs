@@ -2,27 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO.Ports;
 
 namespace Cosmos.Build.Windows {
-    public class DebugConnectorSerial : DebugConnector {
-        protected override void SendData(byte[] aBytes)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override void Next(int aPacketSize, Action<byte[]> aCompleted)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override void PacketText(byte[] aPacket)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override void PacketTracePoint(byte[] aPacket)
-        {
-            throw new NotImplementedException();
+    public class DebugConnectorSerial : DebugConnectorStream {
+        private SerialPort mPort;
+        public DebugConnectorSerial() { 
+            // TODO: MtW - Make COM port configurable
+            mPort = new SerialPort("COM4", 9600, Parity.None, 8, StopBits.One);
+            mPort.Handshake = Handshake.None;
+            mPort.Open();
+            Start(mPort.BaseStream);
         }
     }
 }
