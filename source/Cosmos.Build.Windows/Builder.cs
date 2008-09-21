@@ -110,24 +110,26 @@ namespace Cosmos.Build.Windows {
     
         protected void ThreadExecute(object aParam) {
             var xParam = (PassedEngineValue)aParam;
+            Engine.TraceAssemblies = xParam.TraceAssemblies;
             Engine.Execute(xParam.aAssembly, xParam.aTargetPlatform, xParam.aGetFileNameForGroup
              , xParam.aInMetalMode, xParam.aPlugs, xParam.aDebugMode, xParam.aDebugComNumber
              , xParam.aOutputDir);
             CompileCompleted.Invoke();
         }
 
-        public void BeginCompile(DebugModeEnum aDebugMode, byte aDebugComport) {
+        public void BeginCompile(DebugModeEnum aDebugMode, Options aOptions, byte aDebugComport) {
             if (!Directory.Exists(AsmPath)) {
                 Directory.CreateDirectory(AsmPath);
             }
             Assembly xTarget = System.Reflection.Assembly.GetEntryAssembly();
-            var xEngineParams = new PassedEngineValue(xTarget.Location, TargetPlatformEnum.X86, g => Path.Combine(AsmPath, g + ".asm"), false
+            var xEngineParams = new PassedEngineValue(xTarget.Location, TargetPlatformEnum.X86
+             , g => Path.Combine(AsmPath, g + ".asm"), false
              , new string[] {
                 Path.Combine(Path.Combine(ToolsPath, "Cosmos.Kernel.Plugs"), "Cosmos.Kernel.Plugs.dll"), 
                 Path.Combine(Path.Combine(ToolsPath, "Cosmos.Hardware.Plugs"), "Cosmos.Hardware.Plugs.dll"), 
                 Path.Combine(Path.Combine(ToolsPath, "Cosmos.Sys.Plugs"), "Cosmos.Sys.Plugs.dll")
              }
-             , aDebugMode, aDebugComport, AsmPath);
+             , aDebugMode, aDebugComport, AsmPath, aOptions.TraceAssemblies);
             
             var xThread = new Thread(new ParameterizedThreadStart(ThreadExecute));
             xThread.Start(xEngineParams);

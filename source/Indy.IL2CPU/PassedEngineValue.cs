@@ -4,10 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-namespace Indy.IL2CPU
-{
-    public class PassedEngineValue
-    {
+namespace Indy.IL2CPU {
+    public class PassedEngineValue {
         public string aAssembly;
         public TargetPlatformEnum aTargetPlatform;
         public Func<string, string> aGetFileNameForGroup;
@@ -16,15 +14,17 @@ namespace Indy.IL2CPU
         public DebugModeEnum aDebugMode;
         public byte aDebugComNumber;
         public string aOutputDir;
+        public TraceAssemblies TraceAssemblies;
+        
         public PassedEngineValue(string aAssembly,
-                            TargetPlatformEnum aTargetPlatform,
-                            Func<string, string> aGetFileNameForGroup,
-                            bool aInMetalMode,
-                            IEnumerable<string> aPlugs,
-                            DebugModeEnum aDebugMode,
-                            byte aDebugComNumber,
-                            string aOutputDir)
-        {
+         TargetPlatformEnum aTargetPlatform,
+         Func<string, string> aGetFileNameForGroup,
+         bool aInMetalMode,
+         IEnumerable<string> aPlugs,
+         DebugModeEnum aDebugMode,
+         byte aDebugComNumber,
+         string aOutputDir
+         , TraceAssemblies aTraceAssemblies) {
             this.aAssembly = aAssembly;
             this.aTargetPlatform = aTargetPlatform;
             this.aGetFileNameForGroup = aGetFileNameForGroup;
@@ -33,6 +33,7 @@ namespace Indy.IL2CPU
             this.aDebugMode = aDebugMode;
             this.aDebugComNumber = aDebugComNumber;
             this.aOutputDir = aOutputDir;
+            this.TraceAssemblies = aTraceAssemblies;
         }
     }
 }

@@ -19,14 +19,12 @@ using Cosmos.IL2CPU.Debug;
 
 namespace Cosmos.Build.Windows {
     public partial class DebugWindow : Window {
-        protected enum TraceItemType {Trace, Message, Break, Error}
-    
         protected class TraceItem {
             public UInt32 EIP { get; set; }
             public string SourceFile { get; set; }
-            public TraceItemType Type { get; set; }
+            public MsgType Type { get; set; }
         }
-    
+        
         protected DebugModeEnum mDebugMode;
         protected SourceInfos mSourceMapping;
         protected List<Run> mLines = new List<Run>();
@@ -41,6 +39,7 @@ namespace Cosmos.Build.Windows {
         // are invoked, the DebugConnector could have a state different than what
         // the UI is showing if it is still catching up
         protected bool mAtBreakPoint = false;
+        protected bool mIsConnected = true;
         
         protected void UpdateCaptions() {
             butnTrace.Content = "Trace " + (mTracing ? "Off" : "On");
@@ -52,41 +51,13 @@ namespace Cosmos.Build.Windows {
 
             mStepCommand = new RoutedCommand();
             UpdateCaptions();
+            
+            // Managing state takes some work. We have to introduce new responses from the DebugStub
+            // or add a byte to all trace returns
+            butnTrace.Visibility = Visibility.Hidden;
 
             listLog.ItemsSource = mTraceLog;
             listLog.SelectionChanged += new SelectionChangedEventHandler(listLog_SelectionChanged);
-
-            butnTrace.Click += new RoutedEventHandler(butnTrace_Click);
-            butnTest.Click += new RoutedEventHandler(butnTest_Click);
-            butnStep.Click += new RoutedEventHandler(butnStep_Click);
-            butnBreak.Click += new RoutedEventHandler(butnBreak_Click);
-            butnLogClear.Click += new RoutedEventHandler(butnLogClear_Click);
-        }
-
-        private void butnTrace_Click(object sender, RoutedEventArgs e) {
-            mDebugConnector.SendCommand((byte)(mTracing ? 1 : 2));
-            mTracing = !mTracing;
-            UpdateCaptions();
-        }
-
-        private void butnLogClear_Click(object sender, RoutedEventArgs e) {
-            mTraceLog.Clear();
-        }
-
-        private void butnBreak_Click(object sender, RoutedEventArgs e) {
-            mDebugConnector.SendCommand((int)Command.Break);
-            // Only reset, dont set. Set is done by the break notification
-            if (mAtBreakPoint) {
-                mAtBreakPoint = false;
-                UpdateCaptions();
-            }
-        }
-
-        private void butnStep_Click(object sender, RoutedEventArgs e) {
-            mDebugConnector.SendCommand((int)Command.Step);
-        }
-
-        private void butnTest_Click(object sender, RoutedEventArgs e) {
         }
 
         public void LoadSourceFile(string aPathname) {
@@ -196,7 +167,7 @@ namespace Cosmos.Build.Windows {
 
         protected void CmdText(string aText) {
             var xAction = (Action)delegate() {
-                Log(TraceItemType.Message, aText);
+                Log(MsgType.Message, aText);
             };
             Dispatcher.BeginInvoke(xAction);
         }
@@ -206,7 +177,7 @@ namespace Cosmos.Build.Windows {
                 var xSourceInfo = mSourceMapping.GetMapping(aEIP);
                 var xTraceItem = new TraceItem() {
                     EIP = aEIP
-                    , Type = (aMsgType == MsgType.TracePoint ? TraceItemType.Trace : TraceItemType.Break)
+                    , Type = aMsgType
                 };
                 // Should not be null, but is possible with some plugs
                 if (xSourceInfo != null) {
@@ -218,7 +189,7 @@ namespace Cosmos.Build.Windows {
                 
                 mTraceLog.Add(xTraceItem);
                 mAtBreakPoint = aMsgType == MsgType.BreakPoint;
-                if (mAtBreakPoint) {
+                if (mAtBreakPoint | (aMsgType == MsgType.Error)) {
                     listLog.SelectedIndex = listLog.Items.Count - 1;
                     listLog.ScrollIntoView(listLog.SelectedItem);
                 }
@@ -227,7 +198,7 @@ namespace Cosmos.Build.Windows {
             Dispatcher.BeginInvoke(xAction);
         }
         
-        protected void Log(TraceItemType aType, string aMsg) {
+        protected void Log(MsgType aType, string aMsg) {
             var xTraceItem = new TraceItem() {
                 Type = aType
                 , SourceFile = aMsg
@@ -237,12 +208,8 @@ namespace Cosmos.Build.Windows {
 
         protected void ConnectionLost(Exception ex) {
             var xAction = (Action)delegate() {
-                Title = "No debug connection.";
-                listLog.Background = Brushes.Red;
-                while (ex != null) {
-                    Log(TraceItemType.Error, ex.Message);
-                    ex = ex.InnerException;
-                }
+                Log(MsgType.Error, "Connection to Cosmos lost.");
+                mIsConnected = false;
             };
             Dispatcher.BeginInvoke(xAction);
         }
@@ -300,6 +267,54 @@ namespace Cosmos.Build.Windows {
                 }
             }
         }
+
+        private void ExecuteStepCommand(object sender, ExecutedRoutedEventArgs e) {
+             mDebugConnector.SendCommand((int)Command.Step);
+        }
+
+        private void ExecuteTestCommand(object sender, ExecutedRoutedEventArgs e) {
+
+        }
+
+        private void ExecuteTraceCommand(object sender, ExecutedRoutedEventArgs e) {
+            mDebugConnector.SendCommand((byte)(mTracing ? 1 : 2));
+            mTracing = !mTracing;
+            UpdateCaptions();
+        }
+
+        private void ExecuteBreakCommand(object sender, ExecutedRoutedEventArgs e) {
+            mDebugConnector.SendCommand((int)Command.Break);
+            // Only reset, dont set. Set is done by the break notification
+            if (mAtBreakPoint) {
+                mAtBreakPoint = false;
+                UpdateCaptions();
+            }
+        }
+
+        private void ExecuteClearCommand(object sender, ExecutedRoutedEventArgs e) {
+            mTraceLog.Clear();
+        }
+
+        private void StepCanExecute(object sender, CanExecuteRoutedEventArgs e) {
+            e.CanExecute = mIsConnected;
+        }
+
+        private void TraceCanExecute(object sender, CanExecuteRoutedEventArgs e) {
+            e.CanExecute = mIsConnected;
+        }
+
+        private void BreakCanExecute(object sender, CanExecuteRoutedEventArgs e) {
+            e.CanExecute = mIsConnected;
+        }
+
+        private void ClearCanExecute(object sender, CanExecuteRoutedEventArgs e) {
+            if (listLog == null) {
+                e.CanExecute = false;
+            } else {
+                e.CanExecute = listLog.Items.Count > 0;
+            }
+        }
+        
     }
 
 }

@@ -26,12 +26,12 @@ namespace Cosmos.Build.Windows {
 
         protected Builder mBuilder;
         
-        public void BeginBuild(Builder aBuilder, DebugModeEnum aDebugMode, byte aComPort) {
+        public void BeginBuild(Builder aBuilder, Options aOptions, DebugModeEnum aDebugMode, byte aComPort) {
             mBuilder = aBuilder;
             aBuilder.Engine.CompilingMethods += new Action<int, int>(Engine_CompilingMethods);
             aBuilder.Engine.CompilingStaticFields += new Action<int, int>(Engine_CompilingStaticFields);
             aBuilder.CompileCompleted += new Action(aBuilder_CompileCompleted);
-            aBuilder.BeginCompile(aDebugMode, aComPort);
+            aBuilder.BeginCompile(aDebugMode, aOptions, aComPort);
         }
 
         protected void Engine_CompilingStaticFields(int aValue, int aMax) {

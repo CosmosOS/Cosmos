@@ -109,6 +109,7 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ObjDump.cs" />
+    <Compile Include="Options.cs" />
     <Compile Include="OptionsUC.xaml.cs">
       <DependentUpon>OptionsUC.xaml</DependentUpon>
     </Compile>

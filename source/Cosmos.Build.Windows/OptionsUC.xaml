@@ -44,12 +44,22 @@
                 <StackPanel Name="spnlDebugger">
                     <Label Margin="0,10,0,0" Background="LightGray" FontWeight="Bold">Cosmos Debugger</Label>
                     <WrapPanel>
-                        <WrapPanel Margin="10,10,0,0">
-                            <Label Margin="0,0,10,0">Mode:</Label>
-                            <RadioButton Name="rdioDebugModeNone" GroupName="DebugMode" Margin="0,5,0,0" IsChecked="True">None</RadioButton>
-                            <RadioButton Name="rdioDebugModeIL" GroupName="DebugMode" Margin="10, 5, 0, 0">IL</RadioButton>
-                            <RadioButton Name="rdioDebugModeSource" GroupName="DebugMode" Margin="10,5,0,0">Source</RadioButton>
-                        </WrapPanel>
+                        <StackPanel>
+                            <TextBlock Margin="10,0,0,0">Source Level</TextBlock>
+                            <WrapPanel Margin="20,0,0,0">
+                                <RadioButton Name="rdioDebugModeNone" GroupName="DebugMode" Margin="10,0,0,0" IsChecked="True">None</RadioButton>
+                                <RadioButton Name="rdioDebugModeIL" GroupName="DebugMode" Margin="10, 0, 0, 0">IL</RadioButton>
+                                <RadioButton Name="rdioDebugModeSource" GroupName="DebugMode" Margin="10,0,0,0">Source</RadioButton>
+                            </WrapPanel>
+                        </StackPanel>
+                        <StackPanel>
+                            <TextBlock Margin="10,0,0,0">Traced Assemblies</TextBlock>
+                            <WrapPanel Margin="20,0,0,0">
+                                <RadioButton Name="rdioDebugAssembliesAll" GroupName="DebugAsseblies" Margin="10,0,0,0">All</RadioButton>
+                                <RadioButton Name="rdioDebugAssembliesCosmos" GroupName="DebugAsseblies" Margin="10, 0, 0, 0" IsChecked="True">Cosmos &amp; User</RadioButton>
+                                <RadioButton Name="rdioDebugAssembliesUser" GroupName="DebugAsseblies" Margin="10,0,0,0">User Only</RadioButton>
+                            </WrapPanel>
+                        </StackPanel>
                         <WrapPanel Name="wpnlDebugPort" Margin="30,10,0,0">
                             <Label Margin="0,0,10,0">COM Port:</Label>
                             <ComboBox Name="cmboDebugPort"/>

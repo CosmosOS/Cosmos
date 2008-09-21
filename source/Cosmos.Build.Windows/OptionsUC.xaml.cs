@@ -19,6 +19,7 @@ namespace Cosmos.Build.Windows {
     public partial class OptionsUC : UserControl {
         protected string mLastSelectedUSBDrive;
         protected bool mSaveSettings = true;
+        protected Options mOptions;
         
         protected DebugModeEnum mDebugMode;
         public DebugModeEnum DebugMode {
@@ -84,7 +85,7 @@ namespace Cosmos.Build.Windows {
 
         private void butnBuild_Click(object sender, RoutedEventArgs e) {
             if (mSaveSettings) {
-                SaveSettingsToRegistry();
+                SaveOptions();
                 UpdateProperties();
             }
             Proceed();
@@ -94,9 +95,11 @@ namespace Cosmos.Build.Windows {
             Stop();
         }
         
-        public OptionsUC(string aBuildPath) {
+        public OptionsUC(string aBuildPath, Options aOptions) {
             InitializeComponent();
 
+            mOptions = aOptions;
+            
             Loaded += new RoutedEventHandler(OptionsUC_Loaded);
             
             butnBuild.Click += new RoutedEventHandler(butnBuild_Click);
@@ -120,7 +123,7 @@ namespace Cosmos.Build.Windows {
             foreach (string xSoundCard in Enum.GetNames(typeof(Builder.QemuAudioCard))) {
                 cmboAudioCards.Items.Add(xSoundCard);
             }
-            LoadSettingsFromRegistry();
+            LoadOptions();
             // Call here for when this dialog is bypassed, others read these values
             UpdateProperties();
         }
@@ -145,10 +148,17 @@ namespace Cosmos.Build.Windows {
             }
         }
 
-        protected const string mRegKey = @"Software\Cosmos\User Kit";
+        protected void SaveOptions() {
+            if (rdioDebugAssembliesAll.IsChecked.Value) {
+                mOptions.TraceAssemblies = TraceAssemblies.All;
+            } else if (rdioDebugAssembliesCosmos.IsChecked.Value) {
+                mOptions.TraceAssemblies = TraceAssemblies.Cosmos;
+            } else if (rdioDebugAssembliesUser.IsChecked.Value) {
+                mOptions.TraceAssemblies = TraceAssemblies.User;
+            }
+            mOptions.Save();
 
-        protected void SaveSettingsToRegistry() {
-            using (var xKey = Registry.CurrentUser.CreateSubKey(mRegKey)) {
+            using (var xKey = Registry.CurrentUser.CreateSubKey(Options.RegKey)) {
                 string xTarget = "QEMU";
                 if (rdioVMWare.IsChecked.Value) {
                     xTarget = "VMWare";
@@ -201,8 +211,12 @@ namespace Cosmos.Build.Windows {
             }
         }
 
-        private void LoadSettingsFromRegistry() {
-            using (var xKey = Registry.CurrentUser.CreateSubKey(mRegKey)) {
+        private void LoadOptions() {
+            rdioDebugAssembliesAll.IsChecked = (mOptions.TraceAssemblies == TraceAssemblies.All);
+            rdioDebugAssembliesCosmos.IsChecked = (mOptions.TraceAssemblies == TraceAssemblies.Cosmos);
+            rdioDebugAssembliesUser.IsChecked = (mOptions.TraceAssemblies == TraceAssemblies.User);
+        
+            using (var xKey = Registry.CurrentUser.CreateSubKey(Options.RegKey)) {
                 string xBuildType = (string)xKey.GetValue("Target", "QEMU");
                 switch (xBuildType) {
                     case "QEMU":

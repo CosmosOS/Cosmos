@@ -17,6 +17,7 @@ namespace Cosmos.Build.Windows {
 
         protected Builder mBuilder = new Builder();
         protected int mConsoleWindow;
+        protected Options mOptions = new Options();
         protected MainWindow mMainWindow;
         protected OptionsUC mOptionsUC;
                 
@@ -29,7 +30,7 @@ namespace Cosmos.Build.Windows {
                 var xBuildUC = new BuildUC();
                 mMainWindow.LoadControl(xBuildUC);
                 xBuildUC.CompileCompleted += new Action(BuildUC_CompileCompleted);
-                xBuildUC.BeginBuild(mBuilder, mOptionsUC.DebugMode, mOptionsUC.ComPort);
+                xBuildUC.BeginBuild(mBuilder, mOptions, mOptionsUC.DebugMode, mOptionsUC.ComPort);
             }
         }
 
@@ -117,7 +118,8 @@ namespace Cosmos.Build.Windows {
         }
 
         void mMainWindow_Loaded(object sender, RoutedEventArgs e) {
-            mOptionsUC = new OptionsUC(mBuilder.BuildPath);
+            mOptions.Load();
+            mOptionsUC = new OptionsUC(mBuilder.BuildPath, mOptions);
             mOptionsUC.Proceed = OptionsProceed;
             mOptionsUC.Stop = OptionsStop;
             mMainWindow.LoadControl(mOptionsUC);

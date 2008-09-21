@@ -75,12 +75,9 @@ namespace Indy.IL2CPU {
 
     public enum TargetPlatformEnum { X86 }
 
-    public enum DebugModeEnum {
-        None,
-        IL,
-        Source,
-        MLUsingGDB
-    }
+    public enum TraceAssemblies {All, Cosmos, User};
+
+    public enum DebugModeEnum { None, IL, Source, MLUsingGDB }
 
     public class QueuedMethodInformation {
         public bool Processed;
@@ -101,6 +98,8 @@ namespace Indy.IL2CPU {
         protected DebugLogHandler mDebugLog;
         protected OpCodeMap mMap;
         protected Assembler.Assembler mAssembler;
+        
+        public TraceAssemblies TraceAssemblies { get; set; }
 
         private SortedList<string, MethodBase> mPlugMethods;
         private SortedList<Type, Dictionary<string, PlugFieldAttribute>> mPlugFields;
@@ -137,6 +136,8 @@ namespace Indy.IL2CPU {
         /// <param name="aTargetPlatform">The platform to target when assembling the code.</param>
         /// <param name="aOutput"></param>
         /// <param name="aInMetalMode">Whether or not the output is metalmode only.</param>
+        
+        //TODO: Way too many params, these should be properties
         public void Execute(string aAssembly,
                             TargetPlatformEnum aTargetPlatform,
                             Func<string, string> aGetFileNameForGroup,
@@ -1330,21 +1331,52 @@ namespace Indy.IL2CPU {
                                         xLabel = DataMember.FilterStringForIncorrectChars(xLabel);
                                     }
                                     
-                                    // Determine if a new DebugHeader should be emitted
+                                    // Determine if a new DebugStub should be emitted
                                     bool xEmitTracer = false;
-                                    if (mDebugMode == DebugModeEnum.IL) {
-                                        // For IL, we emit for every one
-                                        xEmitTracer = true;
-                                    } else if (mDebugMode == DebugModeEnum.Source) {
-                                        // If the current position equals one of the offsets, then we have
-                                        // reached a new atomic C# statement
-                                        if (xCodeOffsets != null) {
-                                            xEmitTracer = xCodeOffsets.Contains(xReader.Position);
+                                    // Set based on TracedAssemblies
+                                    // NOTE - These if statemens can be optimized down - but clarity is
+                                    // more importnat the optimizations would not offer much benefit
+                                    if (TraceAssemblies != TraceAssemblies.All) {
+                                        string xNS = xCurrentMethod.DeclaringType.Namespace;
+                                        if (xNS.StartsWith("System.", StringComparison.InvariantCultureIgnoreCase)) {
+                                        } else if (xNS.ToLower() == "system") {
+                                        } else if (xNS.StartsWith("Microsoft.", StringComparison.InvariantCultureIgnoreCase)) {
+                                        } else if (TraceAssemblies == TraceAssemblies.Cosmos) {
+                                            xEmitTracer = true;
+                                        } else {
+                                            //TODO: Currently for User we only include the entry assembly
+                                            //we need to somehow flag Cosmos assemblies specifically
+                                            //Maybe an attribute that could be used to turn tracing on and off
+                                            if (xNS.StartsWith("Cosmos.Demo.", StringComparison.InvariantCultureIgnoreCase)) {
+                                                xEmitTracer = true;
+                                            } else if (xNS.StartsWith("Cosmos.Playground.", StringComparison.InvariantCultureIgnoreCase)) {
+                                                xEmitTracer = true;
+                                            // Must come 2nd becuase it is a substring of previous comparisons
+                                            } else if (xNS.StartsWith("Cosmos.", StringComparison.InvariantCultureIgnoreCase)) {
+                                            // No . on this one. We might need Indy. in future, but not Indy.IL2CPU, but there is 
+                                            // an asm of just Indy.IL2CPU
+                                            } else if (xNS.StartsWith("Indy.IL2CPU", StringComparison.InvariantCultureIgnoreCase)) {
+                                            } else {
+                                                xEmitTracer = true;
+                                            }
                                         }
                                     }
-                                    //xCurrentMethod.DeclaringType.Namespace
-                                    if (xEmitTracer) { 
-                                        mMap.EmitOpDebugHeader(mAssembler, 0, xLabel);
+                                    // Check options for Debug Level
+                                    if (xEmitTracer) {
+                                        if (mDebugMode == DebugModeEnum.IL) {
+                                            // For IL, we emit for every one
+                                            xEmitTracer = true;
+                                        } else if (mDebugMode == DebugModeEnum.Source) {
+                                            // If the current position equals one of the offsets, then we have
+                                            // reached a new atomic C# statement
+                                            if (xCodeOffsets != null) {
+                                                xEmitTracer = xCodeOffsets.Contains(xReader.Position);
+                                            }
+                                        }
+
+                                        if (xEmitTracer) { 
+                                            mMap.EmitOpDebugHeader(mAssembler, 0, xLabel);
+                                        }
                                     }
                                     
                                     using (mSymbolsLocker.AcquireWriterLock()) {

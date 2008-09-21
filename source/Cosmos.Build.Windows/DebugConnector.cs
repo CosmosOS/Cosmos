@@ -44,7 +44,7 @@ namespace Cosmos.Build.Windows {
                 case MsgType.BreakPoint:
                     Next(4, PacketTracePoint);            
                     break;
-                case MsgType.Text:
+                case MsgType.Message:
                     Next(2, PacketTextSize);            
                     break;
                 default:

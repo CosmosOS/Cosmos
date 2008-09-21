@@ -116,7 +116,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             Label = "DebugStub_SendText";
 
             // Write the type
-            AL = (int)MsgType.Text;
+            AL = (int)MsgType.Message;
             Call("WriteALToComPort");
             
             // Write Length
