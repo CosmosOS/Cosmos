@@ -11,7 +11,7 @@ namespace Cosmos.Build.Windows {
             Call(aEXEPathname, aArgLine, aWorkDir, true, true);
         }
 
-        public static void Call(string aEXEPathname, string aArgLine, string aWorkDir, bool aWait, bool aCapture) {
+        public static Process Call(string aEXEPathname, string aArgLine, string aWorkDir, bool aWait, bool aCapture) {
             var xStartInfo = new ProcessStartInfo();
             xStartInfo.FileName = aEXEPathname;
             xStartInfo.Arguments = aArgLine;
@@ -25,8 +25,7 @@ namespace Cosmos.Build.Windows {
             Console.WriteLine("Please wait....executing: " + xStartInfo.FileName + " " +
                             xStartInfo.Arguments + " from directory " + xStartInfo.WorkingDirectory);
             
-            if (!aWait && aCapture)
-            {
+            if (!aWait && aCapture) {
                 // we arent gonna wait till it has finished by default. 
                 // but if there was an error the app may exit quickly and we should display it
                 // wait a small amount of time then check
@@ -50,6 +49,7 @@ namespace Cosmos.Build.Windows {
                     }
                 }
             }
+            return xProcess;
         }
     }
 }

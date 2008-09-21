@@ -68,8 +68,9 @@ namespace Cosmos.Build.Windows {
             }
 
             // Launch emulators or other final actions
+            System.Diagnostics.Process xQEMU;
             if (mOptionsUC.rdioQEMU.IsChecked.Value) {
-                mBuilder.MakeQEMU(mOptions.CreateHDImage, mOptions.UseGDB
+                xQEMU = mBuilder.MakeQEMU(mOptions.CreateHDImage, mOptions.UseGDB
                  , mOptions.DebugMode != DebugMode.None, mOptions.UseNetworkTAP
                  , mOptionsUC.cmboNetworkCards.SelectedValue, mOptionsUC.cmboAudioCards.SelectedValue);
             } else if (mOptionsUC.rdioVMWare.IsChecked.Value) {
@@ -86,6 +87,7 @@ namespace Cosmos.Build.Windows {
             // Problems around with DebugWindow getting stuck, this seems to work
             mMainWindow.Hide();
             if (xDebugWindow != null) {
+                //xQEMU.MainWindowHandle
                 xDebugWindow.ShowDialog();
             }
             mMainWindow.Close();

@@ -173,7 +173,7 @@ namespace Cosmos.Build.Windows {
             Process.Start(xPath + @"Cosmos.vmx");
         }
 
-        public void MakeQEMU(bool aUseHDImage, bool aGDB, bool aDebugger, bool aUseNetworkTap, object aNetworkCard, object aAudioCard) {
+        public Process MakeQEMU(bool aUseHDImage, bool aGDB, bool aDebugger, bool aUseNetworkTap, object aNetworkCard, object aAudioCard) {
             MakeISO();
 
             //From v0.9.1 Qemu requires forward slashes in path
@@ -200,7 +200,7 @@ namespace Cosmos.Build.Windows {
                 }
             }
 
-            Global.Call(ToolsPath + @"qemu\qemu.exe"
+            var xProcess = Global.Call(ToolsPath + @"qemu\qemu.exe"
                 // HD image
                 , xHDString
                 // Path for BIOS, VGA BIOS, and keymaps
@@ -242,6 +242,7 @@ namespace Cosmos.Build.Windows {
                     , BuildPath + @"output.bin" + " --eval-command=\"target remote:1234\" --eval-command=\"b _CODE_REQUESTED_BREAK_\" --eval-command=\"c\""
                     , ToolsPath + @"qemu\", false, false);
             }
+            return xProcess;
         }
 
         // Dont change these, these are passed directly to QEMU.
