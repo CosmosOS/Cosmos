@@ -53,6 +53,7 @@
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -70,7 +71,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RuntimeEngineImpl.cs" />
     <Compile Include="RuntimeEngineRefs.cs" />
-    <Compile Include="RuntimeEngine\Heap.cs" />
+    <Compile Include="Heap.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Indy.IL2CPU.Assembler.X86\Indy.IL2CPU.Assembler.X86.csproj">
@@ -109,6 +110,49 @@
     <Compile Include="DebugSymbolsOld.cs" />
     <Compile Include="GCImplementationRefs.cs" />
     <Compile Include="GCImplementation.cs" />
+    <Compile Include="IL\CustomImplementations\System\BooleanImpl.cs" />
+    <Compile Include="IL\CustomImplementations\System\ByteImpl.cs" />
+    <Compile Include="IL\CustomImplementations\System\CharImpl.cs" />
+    <Compile Include="IL\CustomImplementations\System\Drawing1\ColorImpl.cs" />
+    <Compile Include="IL\CustomImplementations\System\Drawing1\SRImpl.cs" />
+    <Compile Include="IL\CustomImplementations\System\EnumImpl.cs" />
+    <Compile Include="IL\CustomImplementations\System\EnvironmentImpl.cs" />
+    <Compile Include="IL\CustomImplementations\System\GCImpl.cs" />
+    <Compile Include="IL\CustomImplementations\System\Globalization\NumberFormatInfoImpl.cs" />
+    <Compile Include="IL\CustomImplementations\System\Int16Impl.cs" />
+    <Compile Include="IL\CustomImplementations\System\Int32Impl.cs" />
+    <Compile Include="IL\CustomImplementations\System\Int64Impl.cs" />
+    <Compile Include="IL\CustomImplementations\System\IntPtrImpl.cs" />
+    <Compile Include="IL\CustomImplementations\System\Net\IPAddressImpl.cs" />
+    <Compile Include="IL\CustomImplementations\System\Net\SocketAddressImpl.cs" />
+    <Compile Include="IL\CustomImplementations\System\NumberImpl.cs" />
+    <Compile Include="IL\CustomImplementations\System\ObjectImpl.cs" />
+    <Compile Include="IL\CustomImplementations\System\Resource\ResourceManager.cs" />
+    <Compile Include="IL\CustomImplementations\System\Runtime\InteropServices\SafeHandleImpl.cs" />
+    <Compile Include="IL\CustomImplementations\System\SingleImpl.cs" />
+    <Compile Include="IL\CustomImplementations\System\SRImpl.cs" />
+    <Compile Include="IL\CustomImplementations\System\Threading\Interlocked.cs" />
+    <Compile Include="IL\CustomImplementations\System\UInt16Impl.cs" />
+    <Compile Include="IL\CustomImplementations\System\UInt32Impl.cs" />
+    <Compile Include="IL\CustomImplementations\System\UInt64Impl.cs" />
+    <Compile Include="IL\CustomMethodImplementationOp.cs" />
+    <Compile Include="IL\CustomMethodImplementationProxyOp.cs" />
+    <Compile Include="IL\Enums.cs" />
+    <Compile Include="IL\Extensions.cs" />
+    <Compile Include="IL\ILReader.cs" />
+    <Compile Include="IL\ILReader.Utilities.cs" />
+    <Compile Include="IL\INeedsMethodInfo.cs" />
+    <Compile Include="IL\InitVmtImplementationOp.cs" />
+    <Compile Include="IL\MainEntryPointOp.cs" />
+    <Compile Include="IL\MethodFooterOp.cs" />
+    <Compile Include="IL\MethodHeaderOp.cs" />
+    <Compile Include="IL\MethodInformation.cs" />
+    <Compile Include="IL\Op.cs" />
+    <Compile Include="IL\OpCodeAttribute.cs" />
+    <Compile Include="IL\OpCodeMap.cs" />
+    <Compile Include="IL\PInvokeMethodBodyOp.cs" />
+    <Compile Include="IL\TypeInformation.cs" />
+    <Compile Include="IL\Utilities.cs" />
     <Compile Include="PassedEngineValue.cs" />
     <Compile Include="ReadOnlyDictionary.cs" />
     <Compile Include="Utilities.cs" />
