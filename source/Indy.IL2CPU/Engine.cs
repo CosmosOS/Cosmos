@@ -165,7 +165,7 @@ namespace Indy.IL2CPU {
                 //                      select Path.GetDirectoryName(item)).Distinct());
                 switch (aTargetPlatform) {
                     case TargetPlatformEnum.X86: {
-                        mMap = (OpCodeMap)Activator.CreateInstance(Type.GetType("Indy.IL2CPU.IL.X86.X86OpCodeMap, Indy.IL2CPU.IL.X86", true));
+                        mMap = new Indy.IL2CPU.IL.X86.X86OpCodeMap();
                         mAssembler = new Assembler.X86.Assembler(aGetFileNameForGroup,
                                                                  ((aDebugMode != DebugMode.None) && (aDebugMode != DebugMode.MLUsingGDB))
                                                                      ? aDebugComNumber
