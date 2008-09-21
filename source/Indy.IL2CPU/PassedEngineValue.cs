@@ -11,7 +11,7 @@ namespace Indy.IL2CPU {
         public Func<string, string> aGetFileNameForGroup;
         public bool aInMetalMode;
         public IEnumerable<string> aPlugs;
-        public DebugModeEnum aDebugMode;
+        public DebugMode aDebugMode;
         public byte aDebugComNumber;
         public string aOutputDir;
         public TraceAssemblies TraceAssemblies;
@@ -21,7 +21,7 @@ namespace Indy.IL2CPU {
          Func<string, string> aGetFileNameForGroup,
          bool aInMetalMode,
          IEnumerable<string> aPlugs,
-         DebugModeEnum aDebugMode,
+         DebugMode aDebugMode,
          byte aDebugComNumber,
          string aOutputDir
          , TraceAssemblies aTraceAssemblies) {

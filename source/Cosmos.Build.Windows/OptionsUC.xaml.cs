@@ -21,8 +21,8 @@ namespace Cosmos.Build.Windows {
         protected bool mSaveSettings = true;
         protected Options mOptions;
         
-        protected DebugModeEnum mDebugMode;
-        public DebugModeEnum DebugMode {
+        protected DebugMode mDebugMode;
+        public DebugMode DebugMode {
             get { return mDebugMode; }
         }
         
@@ -72,12 +72,12 @@ namespace Cosmos.Build.Windows {
             }
             mComPort++;
             if (rdioDebugModeNone.IsChecked.Value) {
-                mDebugMode = DebugModeEnum.None;
+                mDebugMode = DebugMode.None;
             } else if (rdioDebugModeIL.IsChecked.Value) {
-                mDebugMode = DebugModeEnum.IL;
+                mDebugMode = DebugMode.IL;
                 throw new NotSupportedException("Debug mode IL isn't supported yet, use Source instead.");
             } else if (rdioDebugModeSource.IsChecked.Value) {
-                mDebugMode = DebugModeEnum.Source;
+                mDebugMode = DebugMode.Source;
                 mComPort = 1;
             } else {
                 throw new Exception("Unknown debug mode.");
@@ -170,15 +170,14 @@ namespace Cosmos.Build.Windows {
                 mOptions.Target = "USB";
             }
             mOptions.DebugPort = cmboDebugPort.Text;
-            string xDebugMode = "QEMU";
+
             if (rdioDebugModeNone.IsChecked.Value) {
-                xDebugMode = "None";
+                mOptions.DebugMode = DebugMode.None;
             } else if (rdioDebugModeIL.IsChecked.Value) {
-                xDebugMode = "IL";
+                mOptions.DebugMode = DebugMode.IL;
             } else if (rdioDebugModeSource.IsChecked.Value) {
-                xDebugMode = "Source";
+                mOptions.DebugMode = DebugMode.Source;
             }
-            mOptions.DebugMode = xDebugMode;
             mOptions.UseGDB = chbxQEMUUseGDB.IsChecked.Value;
             mOptions.CreateHDImage = chbxQEMUUseHD.IsChecked.Value;
             mOptions.UseNetworkTAP = chckQEMUUseNetworkTAP.IsChecked.Value;
@@ -230,18 +229,9 @@ namespace Cosmos.Build.Windows {
                 if (cmboDebugPort.SelectedIndex == -1) {
                     cmboDebugPort.SelectedIndex = 0;
                 }
-                string xDebugMode = mOptions.DebugMode;
-                switch (xDebugMode) {
-                    case "None":
-                        rdioDebugModeNone.IsChecked = true;
-                        break;
-                    case "IL":
-                        rdioDebugModeIL.IsChecked = true;
-                        break;
-                    case "Source":
-                        rdioDebugModeSource.IsChecked = true;
-                        break;
-                }
+                rdioDebugModeNone.IsChecked = mOptions.DebugMode == DebugMode.None;
+                rdioDebugModeIL.IsChecked = mOptions.DebugMode == DebugMode.IL;
+                rdioDebugModeSource.IsChecked = mOptions.DebugMode == DebugMode.Source;
 
                 // QEMU
                 chbxQEMUUseGDB.IsChecked = mOptions.UseGDB;

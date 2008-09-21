@@ -18,6 +18,8 @@ using Microsoft.Samples.Debugging.CorSymbolStore;
 using System.Threading;
 
 namespace Indy.IL2CPU {
+    public enum DebugMode { None, IL, Source, MLUsingGDB }
+
     public class MethodBaseComparer : IComparer<MethodBase> {
         #region IComparer<MethodBase> Members
 
@@ -77,8 +79,6 @@ namespace Indy.IL2CPU {
 
     public enum TraceAssemblies {All, Cosmos, User};
 
-    public enum DebugModeEnum { None, IL, Source, MLUsingGDB }
-
     public class QueuedMethodInformation {
         public bool Processed;
         public bool PreProcessed;
@@ -119,7 +119,7 @@ namespace Indy.IL2CPU {
         protected ReaderWriterLocker mTypesLocker = new ReaderWriterLocker();
         protected TypeEqualityComparer mTypesEqualityComparer = new TypeEqualityComparer();
         private byte mDebugComport;
-        private DebugModeEnum mDebugMode;
+        private DebugMode mDebugMode;
         private List<MLDebugSymbol> mSymbols = new List<MLDebugSymbol>();
         private ReaderWriterLocker mSymbolsLocker = new ReaderWriterLocker();
         private string mOutputDir;
@@ -143,7 +143,7 @@ namespace Indy.IL2CPU {
                             Func<string, string> aGetFileNameForGroup,
                             bool aInMetalMode,
                             IEnumerable<string> aPlugs,
-                            DebugModeEnum aDebugMode,
+                            DebugMode aDebugMode,
                             byte aDebugComNumber,
                             string aOutputDir) {
             mCurrent = this;
@@ -171,7 +171,7 @@ namespace Indy.IL2CPU {
                                                                                 true));
                         mAssembler = new Assembler.X86.Assembler(aGetFileNameForGroup,
                                                                  aInMetalMode,
-                                                                 ((aDebugMode != DebugModeEnum.None) && (aDebugMode != DebugModeEnum.MLUsingGDB))
+                                                                 ((aDebugMode != DebugMode.None) && (aDebugMode != DebugMode.MLUsingGDB))
                                                                      ? aDebugComNumber
                                                                      : (byte)0);
                         break;
@@ -339,7 +339,7 @@ namespace Indy.IL2CPU {
                         mMap.PostProcess(mAssembler);
                         ProcessAllStaticFields();
                         if (!aInMetalMode) {
-                            GenerateVMT(mDebugMode != DebugModeEnum.None);
+                            GenerateVMT(mDebugMode != DebugMode.None);
                         }
                         using (mSymbolsLocker.AcquireReaderLock()) {
                             if (mSymbols != null) {
@@ -423,7 +423,7 @@ namespace Indy.IL2CPU {
                                                         xCurrentMethod,
                                                         xMethodName,
                                                         xTypeInfo,
-                                                        mDebugMode != DebugModeEnum.None,
+                                                        mDebugMode != DebugMode.None,
                                                         mMethods[xCurrentMethod].Info);
                         }
                         MethodBase xCustomImplementation = GetCustomMethodImplementation(xMethodName);
@@ -1186,7 +1186,7 @@ namespace Indy.IL2CPU {
                         xMethodScanInfo = mMethods[xCurrentMethod].Info;
                     }
                     MethodInformation xMethodInfo = GetMethodInfo(xCurrentMethod, xCurrentMethod
-                     , xMethodName, xTypeInfo, mDebugMode != DebugModeEnum.None, xMethodScanInfo);
+                     , xMethodName, xTypeInfo, mDebugMode != DebugMode.None, xMethodScanInfo);
                     IL.Op xOp = GetOpFromType(mMap.MethodHeaderOp, null, xMethodInfo);
                     xOp.Assembler = mAssembler;
 #if VERBOSE_DEBUG
@@ -1247,7 +1247,7 @@ namespace Indy.IL2CPU {
                                 // Section currently is dead code. Working on matching it up 
                                 // with contents from inside the read
                                 int[] xCodeOffsets = null;
-                                if (mDebugMode == DebugModeEnum.Source) {
+                                if (mDebugMode == DebugMode.Source) {
                                     var xSymbolReader = GetSymbolReaderForAssembly(xCurrentMethod.DeclaringType.Assembly);
                                     if (xSymbolReader != null) {
                                         var xSmbMethod = xSymbolReader.GetMethod(new SymbolToken(xCurrentMethod.MetadataToken));
@@ -1361,16 +1361,16 @@ namespace Indy.IL2CPU {
                                     }
                                     // Check options for Debug Level
                                     if (xEmitTracer) {
-                                        if (mDebugMode == DebugModeEnum.IL) {
+                                        if (mDebugMode == DebugMode.IL) {
                                             // For IL, we emit for every one
                                             xEmitTracer = true;
-                                        } else if (mDebugMode == DebugModeEnum.Source) {
+                                        } else if (mDebugMode == DebugMode.Source) {
                                             // If the current position equals one of the offsets, then we have
                                             // reached a new atomic C# statement
                                             if (xCodeOffsets != null) {
                                                 xEmitTracer = xCodeOffsets.Contains(xReader.Position);
                                             }
-                                        } else if (mDebugMode == DebugModeEnum.None) {
+                                        } else if (mDebugMode == DebugMode.None) {
                                             xEmitTracer = false;
                                         }
 

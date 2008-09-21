@@ -117,7 +117,7 @@ namespace Cosmos.Build.Windows {
             CompileCompleted.Invoke();
         }
 
-        public void BeginCompile(DebugModeEnum aDebugMode, Options aOptions, byte aDebugComport) {
+        public void BeginCompile(DebugMode aDebugMode, Options aOptions, byte aDebugComport) {
             if (!Directory.Exists(AsmPath)) {
                 Directory.CreateDirectory(AsmPath);
             }

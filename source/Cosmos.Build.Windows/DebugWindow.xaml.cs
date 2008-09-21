@@ -25,7 +25,7 @@ namespace Cosmos.Build.Windows {
             public MsgType Type { get; set; }
         }
         
-        protected DebugModeEnum mDebugMode;
+        protected DebugMode mDebugMode;
         protected SourceInfos mSourceMapping;
         protected List<Run> mLines = new List<Run>();
         protected FontFamily mFont = new FontFamily("Courier New");
@@ -156,7 +156,7 @@ namespace Cosmos.Build.Windows {
         }
 
         public void SetSourceInfoMap(SourceInfos aSourceMapping, DebugConnector aDebugConnector) {
-            mDebugMode = DebugModeEnum.Source;
+            mDebugMode = DebugMode.Source;
             mSourceMapping = aSourceMapping;
             
             mDebugConnector = aDebugConnector;
@@ -259,7 +259,7 @@ namespace Cosmos.Build.Windows {
             var xItem = listLog.SelectedItem as TraceItem;
             if (xItem != null) {
                 if (xItem.EIP > 0) {
-                    if (mDebugMode == DebugModeEnum.Source) {
+                    if (mDebugMode == DebugMode.Source) {
                         SelectCode(xItem.EIP);
                     } else {
                         throw new Exception("Current debug mode is not supported.");

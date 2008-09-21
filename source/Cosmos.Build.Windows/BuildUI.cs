@@ -41,16 +41,13 @@ namespace Cosmos.Build.Windows {
                 ShowWindow(mConsoleWindow, 0);
             }
                 
-            // Debug Window is only displayed if Qemu + Debug checked
-            // or if other VM + Debugport selected
             DebugWindow xDebugWindow = null;
-            if (!mOptionsUC.rdioDebugModeNone.IsChecked.Value) {
+            if (mOptionsUC.rdioDebugModeNone.IsChecked.Value == false) {
                 xDebugWindow = new DebugWindow();
                 
-                if (mOptionsUC.DebugMode == DebugModeEnum.Source) {
+                if (mOptionsUC.DebugMode == DebugMode.Source) {
                     var xLabelByAddressMapping = ObjDump.GetLabelByAddressMapping(
-                        mBuilder.BuildPath + "output.bin"
-                        , mBuilder.ToolsPath + @"cygwin\objdump.exe");
+                        mBuilder.BuildPath + "output.bin", mBuilder.ToolsPath + @"cygwin\objdump.exe");
                     var xSourceMappings = SourceInfo.GetSourceInfo(xLabelByAddressMapping
                         , mBuilder.BuildPath + "Tools/asm/debug.cxdb");
                           
@@ -61,8 +58,8 @@ namespace Cosmos.Build.Windows {
                         xDebugConnector = new DebugConnectorVMWare();
                     } else if(mOptionsUC.rdioUSB.IsChecked.Value) {
                         xDebugConnector = new DebugConnectorSerial();
-                    }else{
-                        throw new Exception("TODO: Make a connector for raw serial");
+                    } else {
+                        throw new Exception("Unknown connector type");
                     }
                     xDebugWindow.SetSourceInfoMap(xSourceMappings, xDebugConnector);
                 } else {
@@ -72,12 +69,9 @@ namespace Cosmos.Build.Windows {
 
             // Launch emulators or other final actions
             if (mOptionsUC.rdioQEMU.IsChecked.Value) {
-                mBuilder.MakeQEMU(mOptionsUC.chbxQEMUUseHD.IsChecked.Value,
-                                  mOptionsUC.chbxQEMUUseGDB.IsChecked.Value,
-                                  mOptionsUC.DebugMode != DebugModeEnum.None,
-                                  mOptionsUC.chckQEMUUseNetworkTAP.IsChecked.Value,
-                                  mOptionsUC.cmboNetworkCards.SelectedValue,
-                                  mOptionsUC.cmboAudioCards.SelectedValue);
+                mBuilder.MakeQEMU(mOptions.CreateHDImage, mOptions.UseGDB
+                 , mOptions.DebugMode != DebugMode.None, mOptions.UseNetworkTAP
+                 , mOptionsUC.cmboNetworkCards.SelectedValue, mOptionsUC.cmboAudioCards.SelectedValue);
             } else if (mOptionsUC.rdioVMWare.IsChecked.Value) {
                 mBuilder.MakeVMWare(mOptionsUC.rdVMWareServer.IsChecked.Value);
             } else if (mOptionsUC.rdioVPC.IsChecked.Value) {
@@ -89,8 +83,7 @@ namespace Cosmos.Build.Windows {
             } else if (mOptionsUC.rdioUSB.IsChecked.Value) {
                 mBuilder.MakeUSB(mOptionsUC.cmboUSBDevice.Text[0]);
             }
-            // Problems around with DebugWindow getting stuck - seeing if this helps by hiding 
-            // instead of closing
+            // Problems around with DebugWindow getting stuck, this seems to work
             mMainWindow.Hide();
             if (xDebugWindow != null) {
                 xDebugWindow.ShowDialog();

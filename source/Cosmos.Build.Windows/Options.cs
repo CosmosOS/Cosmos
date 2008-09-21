@@ -8,29 +8,26 @@ using Indy.IL2CPU;
 namespace Cosmos.Build.Windows {
  
     public class Options {
-        public const string RegKey = @"Software\Cosmos\User Kit";
-
+        protected const string RegKey = @"Software\Cosmos\User Kit";
+        
+        protected object ReadEnum(RegistryKey aKey, string aName, object aDefault) {
+            object xValue = aKey.GetValue(aName);
+            if (xValue != null) {
+                return Enum.Parse(aDefault.GetType(), (string)xValue, true);
+            } else {
+                return aDefault;
+            }
+        }
+        
         public void Load() {
             using (var xKey = Registry.CurrentUser.OpenSubKey(Options.RegKey, false)) {
-                object xValue;
-                if (xKey == null) {
-                    CompileIL = true;
-                    Target = "QEMU";
-                    ShowOptions = true;
-                    NetworkCard = Builder.QemuNetworkCard.rtl8139.ToString();
-                    AudioCard = Builder.QemuAudioCard.es1370.ToString();
-                    return; 
-                }
                 //TODO: Use attributes or just name and reflection to save/load
-                xValue = xKey.GetValue("Debug Trace Assemblies");
-                if (xValue != null) {
-                    TraceAssemblies = (TraceAssemblies)Enum.Parse(typeof(TraceAssemblies), (string)xValue, true);
-                } else {
-                    TraceAssemblies = TraceAssemblies.Cosmos;
-                }
+                TraceAssemblies = (TraceAssemblies)ReadEnum(xKey, "Debug Trace Assemblies", TraceAssemblies.Cosmos);
+                DebugMode = (DebugMode)ReadEnum(xKey, "Debug Mode", DebugMode.Source);
+
+                //TODO: all strings need converted to enums that are enums...
                 Target = (string)xKey.GetValue("Target");
                 DebugPort = (string)xKey.GetValue("Debug Port");
-                DebugMode = (string)xKey.GetValue("Debug Mode");
                 UseGDB = Boolean.Parse((string)xKey.GetValue("UseGDB", "false"));
                 CreateHDImage = Boolean.Parse((string)xKey.GetValue("Use HD Image", "false"));
                 UseNetworkTAP = Boolean.Parse((string)xKey.GetValue("Use TAP", "false"));
@@ -65,7 +62,7 @@ namespace Cosmos.Build.Windows {
         public TraceAssemblies TraceAssemblies { get; set; }
         public string Target { get; set; }
         public string DebugPort { get; set; }
-        public string DebugMode { get; set; }
+        public DebugMode DebugMode { get; set; }
         public bool UseGDB { get; set; }
         public bool CreateHDImage { get; set; }
         public bool UseNetworkTAP { get; set; }
