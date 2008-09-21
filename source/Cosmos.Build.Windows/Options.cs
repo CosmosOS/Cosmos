@@ -33,13 +33,13 @@ namespace Cosmos.Build.Windows {
                 DebugMode = (string)xKey.GetValue("Debug Mode");
                 UseGDB = Boolean.Parse((string)xKey.GetValue("UseGDB", "false"));
                 CreateHDImage = Boolean.Parse((string)xKey.GetValue("Use HD Image", "false"));
-                UseNetworkTAP = Boolean.Parse((string)xKey.GetValue("Use Network TAP", "false"));
+                UseNetworkTAP = Boolean.Parse((string)xKey.GetValue("Use TAP", "false"));
                 NetworkCard = (string)xKey.GetValue("NetworkCard", Builder.QemuNetworkCard.rtl8139.ToString());
                 AudioCard = (string)xKey.GetValue("AudioCard", Builder.QemuAudioCard.es1370.ToString());
                 VMWareEdition = (string)xKey.GetValue("VMWare Edition");
                 USBDevice = (string)xKey.GetValue("USB Device");
                 ShowOptions = Boolean.Parse((string)xKey.GetValue("Show Options", "true"));
-                ShowConsoleWindow = Boolean.Parse((string)xKey.GetValue("Show Console Window", "false"));
+                ShowConsoleWindow = Boolean.Parse((string)xKey.GetValue("Show Console", "false"));
                 CompileIL = Boolean.Parse((string)xKey.GetValue("CompileIL", "true"));
             }
         }
@@ -52,13 +52,13 @@ namespace Cosmos.Build.Windows {
                 xKey.SetValue("Debug Mode", DebugMode);
                 xKey.SetValue("UseGDB", UseGDB.ToString());
                 xKey.SetValue("Use HD Image", CreateHDImage.ToString());
-                xKey.SetValue("Use Network TAP", UseNetworkTAP.ToString());
+                xKey.SetValue("Use TAP", UseNetworkTAP.ToString());
                 xKey.SetValue("NetworkCard", NetworkCard);
                 xKey.SetValue("AudioCard", AudioCard);
                 xKey.SetValue("VMWare Edition", VMWareEdition ?? "");
                 xKey.SetValue("USB Device", USBDevice??"");
                 xKey.SetValue("Show Options", ShowOptions.ToString());
-                xKey.SetValue("Show Console Window", ShowConsoleWindow.ToString());
+                xKey.SetValue("Show Console", ShowConsoleWindow.ToString());
                 xKey.SetValue("CompileIL", CompileIL.ToString());
                 xKey.Flush();
             }

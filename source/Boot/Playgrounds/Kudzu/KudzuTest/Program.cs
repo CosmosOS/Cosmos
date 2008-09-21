@@ -14,15 +14,16 @@ namespace Cosmos.Playground.Kudzu {
 
 		public static void Init() {
             var xBoot = new Cosmos.Sys.Boot();
-            xBoot.Execute();
-            //System.Diagnostics.Debugger.Break();
+            xBoot.Execute();            
             Console.WriteLine("Boot complete");
 
             //PCITest.Test();
             //Tests.DoAll();
             //RTL8139.Test();
-            Debugger.Main();
+            //Debugger.Main();
 
+            Console.WriteLine("Done - Waiting");
+            Console.ReadLine();
             //TODO: Make this automatically called after Init if no other shut downs are called
             Cosmos.Sys.Deboot.Halt();
 		}
