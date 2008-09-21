@@ -167,8 +167,7 @@ namespace Indy.IL2CPU {
                 //                      select Path.GetDirectoryName(item)).Distinct());
                 switch (aTargetPlatform) {
                     case TargetPlatformEnum.X86: {
-                        mMap = (OpCodeMap)Activator.CreateInstance(Type.GetType("Indy.IL2CPU.IL.X86.X86OpCodeMap, Indy.IL2CPU.IL.X86",
-                                                                                true));
+                        mMap = (OpCodeMap)Activator.CreateInstance(Type.GetType("Indy.IL2CPU.IL.X86.X86OpCodeMap, Indy.IL2CPU.IL.X86", true));
                         mAssembler = new Assembler.X86.Assembler(aGetFileNameForGroup,
                                                                  aInMetalMode,
                                                                  ((aDebugMode != DebugMode.None) && (aDebugMode != DebugMode.MLUsingGDB))
@@ -1187,7 +1186,8 @@ namespace Indy.IL2CPU {
                     }
                     MethodInformation xMethodInfo = GetMethodInfo(xCurrentMethod, xCurrentMethod
                      , xMethodName, xTypeInfo, mDebugMode != DebugMode.None, xMethodScanInfo);
-                    IL.Op xOp = GetOpFromType(mMap.MethodHeaderOp, null, xMethodInfo);
+                    
+                    Op xOp = GetOpFromType(mMap.MethodHeaderOp, null, xMethodInfo);
                     xOp.Assembler = mAssembler;
 #if VERBOSE_DEBUG
                     string comment = "(No Type Info available)";
@@ -1318,6 +1318,7 @@ namespace Indy.IL2CPU {
                                     xMethodInfo.CurrentHandler = xCurrentHandler;
                                     xOp = GetOpFromType(mMap.GetOpForOpCode(xReader.OpCode), xReader
                                      , xMethodInfo);
+                                    
                                     xOp.Assembler = mAssembler;
                                     new Comment("StackItems = " + mAssembler.StackContents.Count);
                                     foreach (var xStackContent in mAssembler.StackContents) {
@@ -1331,51 +1332,57 @@ namespace Indy.IL2CPU {
                                     
                                     // Determine if a new DebugStub should be emitted
                                     bool xEmitTracer = false;
-                                    // Set based on TracedAssemblies
-                                    // NOTE - These if statemens can be optimized down - but clarity is
-                                    // more importnat the optimizations would not offer much benefit
-                                    if (TraceAssemblies != TraceAssemblies.All) {
-                                        string xNS = xCurrentMethod.DeclaringType.Namespace;
-                                        if (xNS.StartsWith("System.", StringComparison.InvariantCultureIgnoreCase)) {
-                                        } else if (xNS.ToLower() == "system") {
-                                        } else if (xNS.StartsWith("Microsoft.", StringComparison.InvariantCultureIgnoreCase)) {
-                                        } else if (TraceAssemblies == TraceAssemblies.Cosmos) {
-                                            xEmitTracer = true;
-                                        } else {
-                                            //TODO: Currently for User we only include the entry assembly
-                                            //we need to somehow flag Cosmos assemblies specifically
-                                            //Maybe an attribute that could be used to turn tracing on and off
-                                            if (xNS.StartsWith("Cosmos.Demo.", StringComparison.InvariantCultureIgnoreCase)) {
+                                    // Skip NOOP's so we dont have breakpoints on them
+                                    //TODO: Each IL op should exist in IL, and descendants in IL.X86.
+                                    // Because of this we have this hack
+                                    bool xIsNoop = (xOp.ToString() == "Indy.IL2CPU.IL.X86.Nop");
+                                    if (xIsNoop == false) {
+                                        // Set based on TracedAssemblies
+                                        // NOTE - These if statemens can be optimized down - but clarity is
+                                        // more importnat the optimizations would not offer much benefit
+                                        if (TraceAssemblies != TraceAssemblies.All) {
+                                            string xNS = xCurrentMethod.DeclaringType.Namespace;
+                                            if (xNS.StartsWith("System.", StringComparison.InvariantCultureIgnoreCase)) {
+                                            } else if (xNS.ToLower() == "system") {
+                                            } else if (xNS.StartsWith("Microsoft.", StringComparison.InvariantCultureIgnoreCase)) {
+                                            } else if (TraceAssemblies == TraceAssemblies.Cosmos) {
                                                 xEmitTracer = true;
-                                            } else if (xNS.StartsWith("Cosmos.Playground.", StringComparison.InvariantCultureIgnoreCase)) {
-                                                xEmitTracer = true;
-                                            // Must come 2nd becuase it is a substring of previous comparisons
-                                            } else if (xNS.StartsWith("Cosmos.", StringComparison.InvariantCultureIgnoreCase)) {
-                                            // No . on this one. We might need Indy. in future, but not Indy.IL2CPU, but there is 
-                                            // an asm of just Indy.IL2CPU
-                                            } else if (xNS.StartsWith("Indy.IL2CPU", StringComparison.InvariantCultureIgnoreCase)) {
                                             } else {
+                                                //TODO: Currently for User we only include the entry assembly
+                                                //we need to somehow flag Cosmos assemblies specifically
+                                                //Maybe an attribute that could be used to turn tracing on and off
+                                                if (xNS.StartsWith("Cosmos.Demo.", StringComparison.InvariantCultureIgnoreCase)) {
+                                                    xEmitTracer = true;
+                                                } else if (xNS.StartsWith("Cosmos.Playground.", StringComparison.InvariantCultureIgnoreCase)) {
+                                                    xEmitTracer = true;
+                                                // Must come 2nd becuase it is a substring of previous comparisons
+                                                } else if (xNS.StartsWith("Cosmos.", StringComparison.InvariantCultureIgnoreCase)) {
+                                                // No . on this one. We might need Indy. in future, but not Indy.IL2CPU, but there is 
+                                                // an asm of just Indy.IL2CPU
+                                                } else if (xNS.StartsWith("Indy.IL2CPU", StringComparison.InvariantCultureIgnoreCase)) {
+                                                } else {
+                                                    xEmitTracer = true;
+                                                }
+                                            }
+                                        }
+                                        // Check options for Debug Level
+                                        if (xEmitTracer) {
+                                            if (mDebugMode == DebugMode.IL) {
+                                                // For IL, we emit for every one
                                                 xEmitTracer = true;
+                                            } else if (mDebugMode == DebugMode.Source) {
+                                                // If the current position equals one of the offsets, then we have
+                                                // reached a new atomic C# statement
+                                                if (xCodeOffsets != null) {
+                                                    xEmitTracer = xCodeOffsets.Contains(xReader.Position);
+                                                }
+                                            } else if (mDebugMode == DebugMode.None) {
+                                                xEmitTracer = false;
                                             }
-                                        }
-                                    }
-                                    // Check options for Debug Level
-                                    if (xEmitTracer) {
-                                        if (mDebugMode == DebugMode.IL) {
-                                            // For IL, we emit for every one
-                                            xEmitTracer = true;
-                                        } else if (mDebugMode == DebugMode.Source) {
-                                            // If the current position equals one of the offsets, then we have
-                                            // reached a new atomic C# statement
-                                            if (xCodeOffsets != null) {
-                                                xEmitTracer = xCodeOffsets.Contains(xReader.Position);
-                                            }
-                                        } else if (mDebugMode == DebugMode.None) {
-                                            xEmitTracer = false;
-                                        }
 
-                                        if (xEmitTracer) { 
-                                            mMap.EmitOpDebugHeader(mAssembler, 0, xLabel);
+                                            if (xEmitTracer) { 
+                                                mMap.EmitOpDebugHeader(mAssembler, 0, xLabel);
+                                            }
                                         }
                                     }
                                     
@@ -1974,12 +1981,8 @@ namespace Indy.IL2CPU {
             return xResult;
         }
 
-        private static Op GetOpFromType(Type aType,
-                                        ILReader aReader,
-                                        MethodInformation aMethodInfo) {
-            return (IL.Op)Activator.CreateInstance(aType,
-                                                   aReader,
-                                                   aMethodInfo);
+        private static Op GetOpFromType(Type aType, ILReader aReader, MethodInformation aMethodInfo) {
+            return (Op)Activator.CreateInstance(aType, aReader, aMethodInfo);
         }
 
         public static void QueueStaticField(FieldInfo aField) {
