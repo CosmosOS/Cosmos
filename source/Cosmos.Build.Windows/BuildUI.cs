@@ -4,16 +4,20 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
+using System.Windows.Interop;
 using Microsoft.Win32;
 using Indy.IL2CPU;
 
 namespace Cosmos.Build.Windows {
     public class BuildUI {
         [DllImport("user32.dll")]
-        protected static extern int ShowWindow(int Handle, int showState);
+        protected static extern int ShowWindow(int aHandle, int aShowState);
 
         [DllImport("kernel32.dll")]
         protected static extern int GetConsoleWindow();
+
+        [DllImport("user32.dll")]
+        protected static extern IntPtr SetParent(IntPtr aWndChild, IntPtr aWndNewParent);
 
         protected Builder mBuilder = new Builder();
         protected int mConsoleWindow;
@@ -68,7 +72,7 @@ namespace Cosmos.Build.Windows {
             }
 
             // Launch emulators or other final actions
-            System.Diagnostics.Process xQEMU;
+            System.Diagnostics.Process xQEMU = null;
             if (mOptionsUC.rdioQEMU.IsChecked.Value) {
                 xQEMU = mBuilder.MakeQEMU(mOptions.CreateHDImage, mOptions.UseGDB
                  , mOptions.DebugMode != DebugMode.None, mOptions.UseNetworkTAP
@@ -87,7 +91,11 @@ namespace Cosmos.Build.Windows {
             // Problems around with DebugWindow getting stuck, this seems to work
             mMainWindow.Hide();
             if (xDebugWindow != null) {
-                //xQEMU.MainWindowHandle
+                // Beginnings of experiment to host QEMU
+                //if (xQEMU != null) {
+                //    IntPtr xDbgHandle = new WindowInteropHelper(Application.Current.MainWindow).Handle;
+                //    SetParent(xQEMU.MainWindowHandle, xDbgHandle);
+                //}
                 xDebugWindow.ShowDialog();
             }
             mMainWindow.Close();
