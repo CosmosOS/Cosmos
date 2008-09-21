@@ -51,6 +51,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
 				    if (mComNumber > 0) {
 					    UInt16 xComAddr = mComPortAddresses[mComNumber - 1];
                         // 9600 baud, 8 databits, no parity, 1 stopbit
+                        aOutputWriter.WriteLine("#define DEBUGSTUB 1");
 					    aOutputWriter.WriteLine("mov dx, 0x{0}", (xComAddr + 1).ToString("X"));
 					    aOutputWriter.WriteLine("mov al, 0x00");
 					    aOutputWriter.WriteLine("out DX, AL"); // disable all interrupts

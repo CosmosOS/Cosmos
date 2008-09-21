@@ -60,7 +60,7 @@
                                 <RadioButton Name="rdioDebugAssembliesUser" GroupName="DebugAsseblies" Margin="10,0,0,0">User Only</RadioButton>
                             </WrapPanel>
                         </StackPanel>
-                        <WrapPanel Name="wpnlDebugPort" Margin="30,10,0,0">
+                        <WrapPanel Name="wpnlDebugPort" Margin="30,10,0,0" ToolTip="This is the COM-port on the machine running the debugger">
                             <Label Margin="0,0,10,0">COM Port:</Label>
                             <ComboBox Name="cmboDebugPort"/>
                         </WrapPanel>

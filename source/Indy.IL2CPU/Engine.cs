@@ -1372,6 +1372,8 @@ namespace Indy.IL2CPU {
                                             if (xCodeOffsets != null) {
                                                 xEmitTracer = xCodeOffsets.Contains(xReader.Position);
                                             }
+                                        } else if (mDebugMode == DebugModeEnum.None) {
+                                            xEmitTracer = false;
                                         }
 
                                         if (xEmitTracer) { 

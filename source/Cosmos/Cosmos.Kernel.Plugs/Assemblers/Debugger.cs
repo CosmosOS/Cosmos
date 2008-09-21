@@ -7,25 +7,33 @@ using X86 = Indy.IL2CPU.Assembler.X86;
 namespace Cosmos.Kernel.Plugs.Assemblers {
     public class DebugAsm : X86.X.Y86 {
         public void Break() {
+            new Indy.IL2CPU.Assembler.Literal("%ifdef DEBUGSTUB");
             Memory["DebugBreakOnNextTrace", 32] = 1;
+            new Indy.IL2CPU.Assembler.Literal("%endif");
         }
 
         public void SendText() {
+            new Indy.IL2CPU.Assembler.Literal("%ifdef DEBUGSTUB");
             PushAll32();
             Call("DebugStub_SendText");
             PopAll32();
+            new Indy.IL2CPU.Assembler.Literal("%endif");
         }
 
         public void TraceOff() {
+            new Indy.IL2CPU.Assembler.Literal("%ifdef DEBUGSTUB");
             PushAll32();
             Call("DebugStub_TraceOff");
             PopAll32();
+            new Indy.IL2CPU.Assembler.Literal("%endif");
         }
 
         public void TraceOn() {
+            new Indy.IL2CPU.Assembler.Literal("%ifdef DEBUGSTUB");
             PushAll32();
             Call("DebugStub_TraceOn");
             PopAll32();
+            new Indy.IL2CPU.Assembler.Literal("%endif");
         }
     }
 

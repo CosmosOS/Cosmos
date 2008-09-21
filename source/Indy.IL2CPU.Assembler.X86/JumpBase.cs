@@ -6,13 +6,13 @@ using System.Text;
 namespace Indy.IL2CPU.Assembler.X86 {
 	public abstract class JumpBase: Instruction {
 		public readonly string Address;
-
+        protected virtual bool NeedsNear{get{return true;}}
 		protected JumpBase(string aAddress) {
 			if (aAddress.StartsWith(".")) {
 				aAddress = Label.LastFullLabel + "__DOT__" + aAddress.Substring(1);
 			}
 			// If it has a :, then its a far call so dont add near
-			if (aAddress.Contains(':')) {
+			if (aAddress.Contains(':') || !NeedsNear) {
 			    Address = aAddress;
 			} else {
 			    // Nasm by default issues conditional branches as short

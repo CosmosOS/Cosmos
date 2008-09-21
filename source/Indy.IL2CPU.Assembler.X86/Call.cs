@@ -9,6 +9,12 @@ namespace Indy.IL2CPU.Assembler.X86 {
 		public Call(string aAddress)
 			: base(aAddress) {
 		}
+
+        protected override bool NeedsNear {
+            get {
+                return false;
+            }
+        }
 		public override string ToString() {
 			return "call " + Address;
 		}
