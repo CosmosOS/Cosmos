@@ -48,6 +48,8 @@ namespace Cosmos.Build.Windows {
                     Next(2, PacketTextSize);            
                     break;
                 case (MsgType)0:
+                    // MtW: When implementing Serial support for debugging on real hardware, it appears
+                    //      that when booting a machine, in the bios it emits zero's to the serial port.
                     Next(1, PacketCommand);
                     break;
                 default:

@@ -59,6 +59,7 @@ namespace Cosmos.Build.Windows {
             spnlPXE.Visibility = aSender == rdioPXE ? Visibility.Visible : Visibility.Collapsed;
             spnlUSB.Visibility = aSender == rdioUSB ? Visibility.Visible : Visibility.Collapsed;
             spnlVMWare.Visibility = aSender == rdioVMWare ? Visibility.Visible : Visibility.Collapsed;
+            wpnlDebugPort.Visibility = aSender == cmboDebugPort ? Visibility.Visible : Visibility.Collapsed;
         }
         
         public Action Proceed;
