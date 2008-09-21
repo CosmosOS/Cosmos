@@ -39,14 +39,13 @@ namespace Cosmos.Build.Windows {
                 VMWareEdition = (string)xKey.GetValue("VMWare Edition");
                 USBDevice = (string)xKey.GetValue("USB Device");
                 ShowOptions = Boolean.Parse((string)xKey.GetValue("Show Options", "true"));
-                ShowConsoleWindow = Boolean.Parse((string)xKey.GetValue("Show Console", "false"));
                 CompileIL = Boolean.Parse((string)xKey.GetValue("CompileIL", "true"));
             }
         }
 
         public void Save() {
             using (var xKey = Registry.CurrentUser.CreateSubKey(Options.RegKey)) {
-                xKey.SetValue("Debug Trace Assemblies", TraceAssemblies.ToString());
+                xKey.SetValue("Debug Trace Assemblies", TraceAssemblies);
                 xKey.SetValue("Target", Target);
                 xKey.SetValue("Debug Port", DebugPort);
                 xKey.SetValue("Debug Mode", DebugMode);
@@ -58,7 +57,6 @@ namespace Cosmos.Build.Windows {
                 xKey.SetValue("VMWare Edition", VMWareEdition ?? "");
                 xKey.SetValue("USB Device", USBDevice??"");
                 xKey.SetValue("Show Options", ShowOptions.ToString());
-                xKey.SetValue("Show Console", ShowConsoleWindow.ToString());
                 xKey.SetValue("CompileIL", CompileIL.ToString());
                 xKey.Flush();
             }
@@ -76,7 +74,6 @@ namespace Cosmos.Build.Windows {
         public string VMWareEdition { get; set; }
         public string USBDevice { get; set; }
         public bool ShowOptions { get; set; }
-        public bool ShowConsoleWindow { get; set; }
         public bool CompileIL { get; set; }
     }
 }

@@ -123,9 +123,6 @@
                     <CheckBox IsChecked="True" Name="chbxShowOptions">Always show this window</CheckBox>
                     <TextBlock TextWrapping="Wrap" Margin="35,0">If unchecked, this screen will not be shown on each build and the last options will be used. To redisplay this window, hold down the Control key.</TextBlock>
 
-                    <CheckBox Margin="0,10,0,0" Name="chbxShowConsoleWindow" IsChecked="False">Show console window during build</CheckBox>
-                    <TextBlock TextWrapping="Wrap" Margin="35,0">If the build window hangs, this option can be used to view the output from the assembler and other tools called by the build process.</TextBlock>
-
                     <CheckBox Margin="0,10,0,0" Name="chbxCompileIL" IsChecked="True">Compile IL.</CheckBox>
                     <TextBlock TextWrapping="Wrap" Margin="35,0">Warning: This is an advanced option and normally should remain checked.</TextBlock>
                 </StackPanel>

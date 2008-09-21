@@ -24,9 +24,6 @@ namespace Cosmos.Build.Windows {
         protected void OptionsProceed() {
             // Call IL2CPU
             if (mOptionsUC.chbxCompileIL.IsChecked.Value) {
-                if (mOptionsUC.chbxShowConsoleWindow.IsChecked.Value) {
-                    ShowWindow(mConsoleWindow, 1);
-                }
                 var xBuildUC = new BuildUC();
                 mMainWindow.LoadControl(xBuildUC);
                 xBuildUC.CompileCompleted += new Action(BuildUC_CompileCompleted);
@@ -35,8 +32,14 @@ namespace Cosmos.Build.Windows {
         }
 
         protected void BuildUC_CompileCompleted() {
-            mBuilder.Assemble();
-            mBuilder.Link();
+            if (mOptionsUC.chbxCompileIL.IsChecked.Value) {
+                // We always show the window now since when its shown its
+                // for a short time and not in "paralell" as it was before.
+                ShowWindow(mConsoleWindow, 1);
+                mBuilder.Assemble();
+                mBuilder.Link();
+                ShowWindow(mConsoleWindow, 0);
+            }
                 
             // Debug Window is only displayed if Qemu + Debug checked
             // or if other VM + Debugport selected

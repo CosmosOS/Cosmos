@@ -190,7 +190,6 @@ namespace Cosmos.Build.Windows {
                 mOptions.USBDevice = cmboUSBDevice.Text;
             }
             mOptions.ShowOptions = chbxShowOptions.IsChecked.Value;
-            mOptions.ShowConsoleWindow = chbxShowConsoleWindow.IsChecked.Value;
             mOptions.CompileIL = chbxCompileIL.IsChecked.Value;
             mOptions.Save();
         }
@@ -224,7 +223,6 @@ namespace Cosmos.Build.Windows {
 
                 // Misc
                 chbxShowOptions.IsChecked = mOptions.ShowOptions;
-                chbxShowConsoleWindow.IsChecked = mOptions.ShowConsoleWindow;
                 chbxCompileIL.IsChecked = mOptions.CompileIL;
 
                 // Debug                

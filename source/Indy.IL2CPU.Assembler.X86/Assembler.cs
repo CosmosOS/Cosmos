@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
 	public class Assembler : Indy.IL2CPU.Assembler.Assembler {
-
+        //TODO: COM Port info - should be in assembler? Assembler should not know about comports...
 		protected byte mComNumber = 0;
 		protected UInt16[] mComPortAddresses = { 0x3F8, 0x2F8, 0x3E8, 0x2E8 };
 
@@ -51,7 +51,6 @@ namespace Indy.IL2CPU.Assembler.X86 {
 				    if (mComNumber > 0) {
 					    UInt16 xComAddr = mComPortAddresses[mComNumber - 1];
                         // 9600 baud, 8 databits, no parity, 1 stopbit
-                        aOutputWriter.WriteLine("%define DEBUGSTUB 1");
 					    aOutputWriter.WriteLine("mov dx, 0x{0}", (xComAddr + 1).ToString("X"));
 					    aOutputWriter.WriteLine("mov al, 0x00");
 					    aOutputWriter.WriteLine("out DX, AL"); // disable all interrupts
@@ -125,13 +124,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
 				aOutputWriter.WriteLine("dd -0x1BADB002-MBFLAGS  ; checksum=-(FLAGS+0x1BADB002) ");
 				aOutputWriter.WriteLine("; other data - that is the additional (optional) header which helps to load  ");
 				aOutputWriter.WriteLine("; the kernel. ");
-				//aOutputWriter.WriteLine("        dd _start       ; header_addr ");
-				//aOutputWriter.WriteLine("        dd _start       ; load_addr ");
-				//aOutputWriter.WriteLine("        dd _end_data    ; load_end_addr ");
-				//aOutputWriter.WriteLine("        dd _end         ; bss_end_addr ");
-				//aOutputWriter.WriteLine("        dd Kernel_Start ; entry ");
 				aOutputWriter.WriteLine("; end of header ");
-				//aOutputWriter.WriteLine("mb_info multiboot_info");
 				aOutputWriter.WriteLine("MultiBootInfo_Memory_High dd 0");
 				aOutputWriter.WriteLine("MultiBootInfo_Memory_Low dd 0");
 				if (Signature != null && Signature.Length > 0) {
@@ -156,13 +149,16 @@ namespace Indy.IL2CPU.Assembler.X86 {
 				aOutputWriter.WriteLine("_end:   ; end of BSS - here's the virtual and logical end.");
 			}
 		}
-
+		
 		protected override void EmitHeader(string aGroup, TextWriter aOutputWriter) {
 			aOutputWriter.WriteLine("use32           ; the kernel will be run in 32-bit protected mode, ");
 			aOutputWriter.WriteLine("");
 			aOutputWriter.WriteLine("%ifdef {0}", GetValidGroupName(aGroup));
 			aOutputWriter.WriteLine("%else");
 			aOutputWriter.WriteLine("  %define {0} 1", GetValidGroupName(aGroup));
+            if (mComNumber > 0) {
+    			aOutputWriter.WriteLine("%define DEBUGSTUB 1");
+            }
 			aOutputWriter.WriteLine("");
             EmitIncludes(aGroup, aOutputWriter);
 		}

@@ -14,11 +14,12 @@ namespace Indy.IL2CPU.Assembler {
         public static Exception CurrentException;
 
         public static void PrintException() {
+            // The RSOD - Red Screen of Death
             Console.BackgroundColor = ConsoleColor.DarkRed;
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.Clear();
 
-            Console.WriteLine("Cosmos Kernel. Copyright 2008 The Cosmos Project.");
+            Console.WriteLine("Cosmos Kernel. Copyright 2007-2008, The Cosmos Project.");
             Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
             Console.WriteLine("");
             Console.WriteLine("An unhandled kernel exception occurred.");
@@ -58,10 +59,7 @@ namespace Indy.IL2CPU.Assembler {
             }
         }
 
-        public byte[] Signature {
-            get;
-            set;
-        }
+        public byte[] Signature { get; set; }
 
         public static void ExceptionOccurred() {
             System.Diagnostics.Debugger.Break();
@@ -73,11 +71,6 @@ namespace Indy.IL2CPU.Assembler {
         private List<KeyValuePair<string, string>> mIncludes = new List<KeyValuePair<string, string>>();
         private readonly bool mInMetalMode = false;
         public readonly Stack<StackContent> StackContents = new Stack<StackContent>();
-
-        public bool DebugMode {
-            get;
-            set;
-        }
 
         private static ReaderWriterLocker mCurrentInstanceLocker = new ReaderWriterLocker();
         private static SortedList<int, Stack<Assembler>> mCurrentInstance = new SortedList<int, Stack<Assembler>>();
@@ -110,13 +103,9 @@ namespace Indy.IL2CPU.Assembler {
             return aPrefix + mDataMemberCounter.ToString("X8").ToUpper();
         }
 
-        public Assembler(Func<string, string> aGetStreamForGroup)
-            : this(aGetStreamForGroup,
-                   false) {
-        }
+        public Assembler(Func<string, string> aGetStreamForGroup) : this(aGetStreamForGroup, false) { }
 
-        public Assembler(Func<string, string> aGetFileNameForGroup,
-                         bool aInMetalMode) {
+        public Assembler(Func<string, string> aGetFileNameForGroup, bool aInMetalMode) {
             mGetFileNameForGroup = aGetFileNameForGroup;
             mInMetalMode = aInMetalMode;
             CurrentInstance.Push(this);
@@ -141,15 +130,11 @@ namespace Indy.IL2CPU.Assembler {
         }
 
         public List<KeyValuePair<string, DataMember>> DataMembers {
-            get {
-                return mDataMembers;
-            }
+            get { return mDataMembers; }
         }
 
         public List<KeyValuePair<string, string>> Includes {
-            get {
-                return mIncludes;
-            }
+            get { return mIncludes; }
         }
 
         public void Dispose() {
@@ -162,8 +147,7 @@ namespace Indy.IL2CPU.Assembler {
 
         public void Add(params Instruction[] aReaders) {
             foreach (Instruction xInstruction in aReaders) {
-                mInstructions.Add(new KeyValuePair<string, Instruction>(CurrentGroup,
-                                                                        xInstruction));
+                mInstructions.Add(new KeyValuePair<string, Instruction>(CurrentGroup, xInstruction));
             }
         }
 
@@ -221,12 +205,10 @@ namespace Indy.IL2CPU.Assembler {
                             }
                         }
                     }
-                    EmitHeader(xGroup,
-                               xOutputWriter);
+                    EmitHeader(xGroup, xOutputWriter);
                     xOutputWriter.WriteLine();
                     if (mDataMembers.Count > 0) {
-                        EmitDataSectionHeader(xGroup,
-                                              xOutputWriter);
+                        EmitDataSectionHeader(xGroup, xOutputWriter);
                         xOutputWriter.WriteLine();
                         foreach (DataMember xMember in (from item in mDataMembers
                                                         where String.Equals(item.Key,
@@ -244,24 +226,21 @@ namespace Indy.IL2CPU.Assembler {
                                         xOutputWriter,
                                         mMergedInstructions);
                     }
-                    EmitFooter(xGroup,
-                               xOutputWriter);
+                    EmitFooter(xGroup, xOutputWriter);
                 }
             }
         }
 
-        protected void EmitCodeSection(string aGroup,
-                                       TextWriter aOutputWriter,
-                                       List<KeyValuePair<string, Instruction>> aInstructions) {
-            EmitCodeSectionHeader(aGroup,
-                                  aOutputWriter);
+        protected void EmitCodeSection(string aGroup, TextWriter aOutputWriter
+         , List<KeyValuePair<string, Instruction>> aInstructions) {
+            EmitCodeSectionHeader(aGroup, aOutputWriter);
             aOutputWriter.WriteLine();
             string xMainLabel = "";
             foreach (Instruction x in (from item in aInstructions
                                        where String.Equals(item.Key,
                                                            aGroup,
                                                            StringComparison.InvariantCultureIgnoreCase)
-                                       select item.Value)) {
+             select item.Value)) {
                 string prefix = "\t\t\t";
                 Label xLabel = x as Label;
                 if (xLabel != null) {
@@ -278,14 +257,12 @@ namespace Indy.IL2CPU.Assembler {
                     } else {
                         prefix = "\t";
                     }
-                    aOutputWriter.WriteLine(prefix + xFullName.Replace(".",
-                                                                       "__DOT__") + ":");
+                    aOutputWriter.WriteLine(prefix + xFullName.Replace(".", "__DOT__") + ":");
                     continue;
                 }
                 aOutputWriter.WriteLine(prefix + x);
             }
-            EmitCodeSectionFooter(aGroup,
-                                  aOutputWriter);
+            EmitCodeSectionFooter(aGroup, aOutputWriter);
             aOutputWriter.WriteLine();
         }
 
@@ -301,21 +278,10 @@ namespace Indy.IL2CPU.Assembler {
                                                      TextWriter aOutputWriter) {
         }
 
-        protected virtual void EmitDataSectionHeader(string aGroup,
-                                                     TextWriter aOutputWriter) {
-        }
+        protected virtual void EmitDataSectionHeader(string aGroup, TextWriter aOutputWriter) { }
 
-        protected virtual void EmitDataSectionFooter(string aGroup,
-                                                     TextWriter aOutputWriter) {
-        }
-
-        public string MainGroup {
-            get;
-            set;
-        }
-
-        protected virtual void EmitFooter(string aGroup,
-                                          TextWriter aOutputWriter) {
-        }
+        protected virtual void EmitDataSectionFooter(string aGroup, TextWriter aOutputWriter) { }
+        protected virtual void EmitFooter(string aGroup, TextWriter aOutputWriter) {  }
+        public string MainGroup { get; set; }
     }
 }

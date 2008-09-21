@@ -208,9 +208,7 @@ namespace Indy.IL2CPU {
                     //        }
                     //    }
                     //}
-                    mMap.Initialize(mAssembler,
-                                    xAppDefs);
-                    mAssembler.DebugMode = false;
+                    mMap.Initialize(mAssembler, xAppDefs);
                     //!String.IsNullOrEmpty(aDebugSymbols);
                     IL.Op.QueueMethod += QueueMethod;
                     IL.Op.QueueStaticField += QueueStaticField;

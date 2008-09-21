@@ -20,7 +20,7 @@ namespace Cosmos.Playground.Kudzu {
             //PCITest.Test();
             //Tests.DoAll();
             //RTL8139.Test();
-            //Debugger.Main();
+            Debugger.Main();
 
             Console.WriteLine("Done - Waiting");
             Console.ReadLine();
