@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30428</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{BCB66614-20FE-4184-B214-FD42844AD8A6}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -65,9 +65,9 @@
       <Project>{8E8CAD9B-C092-4071-AD92-E7A4E7BA776F}</Project>
       <Name>Indy.IL2CPU.Assembler</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Indy.IL2CPU.Plugs\Indy.IL2CPU.Plugs.csproj">
-      <Project>{E9B2E8CC-E264-42F9-9113-16B0A0431198}</Project>
-      <Name>Indy.IL2CPU.Plugs</Name>
+    <ProjectReference Include="..\Indy.IL2CPU\Indy.IL2CPU.csproj">
+      <Project>{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}</Project>
+      <Name>Indy.IL2CPU</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

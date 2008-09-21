@@ -17,7 +17,6 @@ namespace Indy.IL2CPU.IL.CustomImplementations.System.Resources
 
         {
             throw new Exception("System.Resources.ResourceManager.InternalGetResourceSet need pluging properly");
-            return null;
         }
 
     }

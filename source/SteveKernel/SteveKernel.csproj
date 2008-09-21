@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{8C566493-DBA5-45DD-93D4-89D4486CAAB6}</ProjectGuid>
     <OutputType>Exe</OutputType>
@@ -68,9 +68,9 @@
       <Project>{819DB8FC-5DA1-461F-83C9-2F5C88088C94}</Project>
       <Name>Cosmos.Sys</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Indy.IL2CPU.Plugs\Indy.IL2CPU.Plugs.csproj">
-      <Project>{E9B2E8CC-E264-42F9-9113-16B0A0431198}</Project>
-      <Name>Indy.IL2CPU.Plugs</Name>
+    <ProjectReference Include="..\Indy.IL2CPU\Indy.IL2CPU.csproj">
+      <Project>{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}</Project>
+      <Name>Indy.IL2CPU</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

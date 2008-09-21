@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30428</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{819DB8FC-5DA1-461F-83C9-2F5C88088C94}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -63,10 +63,6 @@
     <ProjectReference Include="..\..\Cosmos.Kernel.FileSystems\Cosmos.Sys.FileSystem.csproj">
       <Project>{5C293BB9-FB42-495E-AAD9-D15888631CA4}</Project>
       <Name>Cosmos.Sys.FileSystem</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Indy.IL2CPU.Plugs\Indy.IL2CPU.Plugs.csproj">
-      <Project>{E9B2E8CC-E264-42F9-9113-16B0A0431198}</Project>
-      <Name>Indy.IL2CPU.Plugs</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos.Hardware\Cosmos.Hardware.csproj">
       <Project>{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}</Project>

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{F215BFCA-3280-497B-B186-2E097DFB4551}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -55,13 +55,13 @@
     <Compile Include="WidgetImpl.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Indy.IL2CPU.Plugs\Indy.IL2CPU.Plugs.csproj">
-      <Project>{E9B2E8CC-E264-42F9-9113-16B0A0431198}</Project>
-      <Name>Indy.IL2CPU.Plugs</Name>
-    </ProjectReference>
+    <Content Include="mono-curses.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="mono-curses.dll" />
+    <ProjectReference Include="..\..\Indy.IL2CPU\Indy.IL2CPU.csproj">
+      <Project>{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}</Project>
+      <Name>Indy.IL2CPU</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

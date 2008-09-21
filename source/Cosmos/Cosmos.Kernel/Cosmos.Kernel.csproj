@@ -52,12 +52,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Indy.IL2CPU.Plugs\Indy.IL2CPU.Plugs.csproj">
-      <Project>{E9B2E8CC-E264-42F9-9113-16B0A0431198}</Project>
-      <Name>Indy.IL2CPU.Plugs</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="AddressSpace.cs" />
     <Compile Include="CPU.cs" />
     <Compile Include="CPUBus.cs" />
