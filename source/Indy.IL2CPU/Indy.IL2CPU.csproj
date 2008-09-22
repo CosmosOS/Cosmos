@@ -78,14 +78,6 @@
       <Project>{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}</Project>
       <Name>Cosmos.Debug</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Indy.IL2CPU.Assembler.X86\Indy.IL2CPU.Assembler.X86.csproj">
-      <Project>{7F32CE06-13F2-4EDA-B588-3FAAFD25178A}</Project>
-      <Name>Indy.IL2CPU.Assembler.X86</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Indy.IL2CPU.Assembler\Indy.IL2CPU.Assembler.csproj">
-      <Project>{8E8CAD9B-C092-4071-AD92-E7A4E7BA776F}</Project>
-      <Name>Indy.IL2CPU.Assembler</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assembler\Assembler.cs" />
