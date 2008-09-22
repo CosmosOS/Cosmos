@@ -1019,6 +1019,58 @@ namespace Indy.IL2CPU {
         private static string GetGroupForType(Type aType) {
             return aType.Module.Assembly.GetName().Name;
         }
+        
+        protected void EmitTracer(Op aOp, string aNamespace, int aPos, int[] aCodeOffsets, string aLabel) {
+            // NOTE - These if statemens can be optimized down - but clarity is
+            // more importnat the optimizations would not offer much benefit
+
+            // Determine if a new DebugStub should be emitted
+            bool xEmit = false;
+            // Skip NOOP's so we dont have breakpoints on them
+            //TODO: Each IL op should exist in IL, and descendants in IL.X86.
+            // Because of this we have this hack
+            if (aOp.ToString() == "Indy.IL2CPU.IL.X86.Nop") {
+                return;
+            } else if (mDebugMode == DebugMode.None) {
+                return;
+            } else  if (mDebugMode == DebugMode.Source) {
+                // If the current position equals one of the offsets, then we have
+                // reached a new atomic C# statement
+                if (aCodeOffsets != null) {
+                    if (aCodeOffsets.Contains(aPos) == false) {
+                        return;
+                    }
+                }
+            }
+            
+            // Check options for Debug Level
+            // Set based on TracedAssemblies
+            if (TraceAssemblies == TraceAssemblies.Cosmos || TraceAssemblies == TraceAssemblies.User) {
+                if (aNamespace.StartsWith("System.", StringComparison.InvariantCultureIgnoreCase)) {
+                    return;
+                } else if (aNamespace.ToLower() == "system") {
+                    return;
+                } else if (aNamespace.StartsWith("Microsoft.", StringComparison.InvariantCultureIgnoreCase)) {
+                    return;
+                }
+            }
+            if (TraceAssemblies == TraceAssemblies.User) {
+                //TODO: Maybe an attribute that could be used to turn tracing on and off
+                //TODO: This doesnt match Cosmos.Kernel exact vs Cosmos.Kernel., so a user 
+                // could do Cosmos.KernelMine and it will fail. Need to fix this
+                if (aNamespace.StartsWith("Cosmos.Kernel", StringComparison.InvariantCultureIgnoreCase)) {
+                    return;
+                } else if (aNamespace.StartsWith("Cosmos.Sys", StringComparison.InvariantCultureIgnoreCase)) {
+                    return;
+                } else if (aNamespace.StartsWith("Cosmos.Hardware", StringComparison.InvariantCultureIgnoreCase)) {
+                    return;
+                } else if (aNamespace.StartsWith("Indy.IL2CPU", StringComparison.InvariantCultureIgnoreCase)) {
+                    return;
+                }
+            }
+            // If we made it this far, emit the Tracer
+            mMap.EmitOpDebugHeader(mAssembler, 0, aLabel);
+        }
 
         private void ProcessAllStaticFields() {
             int i = -1;
@@ -1313,67 +1365,17 @@ namespace Indy.IL2CPU {
                                     foreach (var xStackContent in mAssembler.StackContents) {
                                         new Comment("    " + xStackContent.Size);
                                     }
+                                    
+                                    // Create label for current point
                                     string xLabel = Op.GetInstructionLabel(xReader);
                                     if (xLabel.StartsWith(".")) {
-                                        xLabel = Label.LastFullLabel + "__DOT__" + xLabel.Substring(1);
-                                        xLabel = DataMember.FilterStringForIncorrectChars(xLabel);
+                                        xLabel = DataMember.FilterStringForIncorrectChars(
+                                            Label.LastFullLabel + "__DOT__" + xLabel.Substring(1));
                                     }
                                     
-                                    // Determine if a new DebugStub should be emitted
-                                    bool xEmitTracer = false;
-                                    // Skip NOOP's so we dont have breakpoints on them
-                                    //TODO: Each IL op should exist in IL, and descendants in IL.X86.
-                                    // Because of this we have this hack
-                                    bool xIsNoop = (xOp.ToString() == "Indy.IL2CPU.IL.X86.Nop");
-                                    if (xIsNoop == false) {
-                                        // Set based on TracedAssemblies
-                                        // NOTE - These if statemens can be optimized down - but clarity is
-                                        // more importnat the optimizations would not offer much benefit
-                                        if (TraceAssemblies != TraceAssemblies.All) {
-                                            string xNS = xCurrentMethod.DeclaringType.Namespace;
-                                            if (xNS.StartsWith("System.", StringComparison.InvariantCultureIgnoreCase)) {
-                                            } else if (xNS.ToLower() == "system") {
-                                            } else if (xNS.StartsWith("Microsoft.", StringComparison.InvariantCultureIgnoreCase)) {
-                                            } else if (TraceAssemblies == TraceAssemblies.Cosmos) {
-                                                xEmitTracer = true;
-                                            } else {
-                                                //TODO: Currently for User we only include the entry assembly
-                                                //we need to somehow flag Cosmos assemblies specifically
-                                                //Maybe an attribute that could be used to turn tracing on and off
-                                                if (xNS.StartsWith("Cosmos.Demo.", StringComparison.InvariantCultureIgnoreCase)) {
-                                                    xEmitTracer = true;
-                                                } else if (xNS.StartsWith("Cosmos.Playground.", StringComparison.InvariantCultureIgnoreCase)) {
-                                                    xEmitTracer = true;
-                                                // Must come 2nd becuase it is a substring of previous comparisons
-                                                } else if (xNS.StartsWith("Cosmos.", StringComparison.InvariantCultureIgnoreCase)) {
-                                                // No . on this one. We might need Indy. in future, but not Indy.IL2CPU, but there is 
-                                                // an asm of just Indy.IL2CPU
-                                                } else if (xNS.StartsWith("Indy.IL2CPU", StringComparison.InvariantCultureIgnoreCase)) {
-                                                } else {
-                                                    xEmitTracer = true;
-                                                }
-                                            }
-                                        }
-                                        // Check options for Debug Level
-                                        if (xEmitTracer) {
-                                            if (mDebugMode == DebugMode.IL) {
-                                                // For IL, we emit for every one
-                                                xEmitTracer = true;
-                                            } else if (mDebugMode == DebugMode.Source) {
-                                                // If the current position equals one of the offsets, then we have
-                                                // reached a new atomic C# statement
-                                                if (xCodeOffsets != null) {
-                                                    xEmitTracer = xCodeOffsets.Contains(xReader.Position);
-                                                }
-                                            } else if (mDebugMode == DebugMode.None) {
-                                                xEmitTracer = false;
-                                            }
-
-                                            if (xEmitTracer) { 
-                                                mMap.EmitOpDebugHeader(mAssembler, 0, xLabel);
-                                            }
-                                        }
-                                    }
+                                    // Possibly emit Tracer call
+                                    EmitTracer(xOp, xCurrentMethod.DeclaringType.Namespace, xReader.Position,
+                                        xCodeOffsets, xLabel);
                                     
                                     using (mSymbolsLocker.AcquireWriterLock()) {
                                         if (mSymbols != null) {
