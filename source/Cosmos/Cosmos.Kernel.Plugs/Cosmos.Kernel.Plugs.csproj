@@ -48,7 +48,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArrayListImpl.cs" />
-    <Compile Include="Assemblers\Debugger.cs" />
     <Compile Include="Assemblers\LoadTSS.cs" />
     <Compile Include="Assemblers\CPUID.cs" />
     <Compile Include="Assemblers\DoTest.cs" />
