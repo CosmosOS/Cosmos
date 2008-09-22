@@ -11,11 +11,11 @@
         </Grid.RowDefinitions>
         
         <StackPanel Grid.Row="0" Height="Auto" Width="Auto">
-            <Label Content="Methods scanned:"/>
+            <Label Content="Scanning methods:"/>
             <ProgressBar x:Name="progMethodsScanned" Height="15" Margin="15,0" Maximum="100" Value="50" />
-            <Label Content="Methods processed:"/>
+            <Label Content="Processing methods:"/>
             <ProgressBar x:Name="progMethodsProcessed" Height="15" Margin="15,0"/>
-            <Label Content="Static fields processed:"/>
+            <Label Content="Processing static fields:"/>
             <ProgressBar x:Name="progStaticFieldsProcessed" Height="15" Margin="15,0"/>
         </StackPanel>
         
