@@ -21,35 +21,35 @@ namespace Cosmos.Kernel.Plugs {
         public static void TraceOn() { }
     }
 
-    public class DebugAsm : X86.X.Y86 {
+    public class DebuggerAsm : X86.X.Y86 {
         public void Break() {
-            new Indy.IL2CPU.Assembler.Literal("%ifdef DEBUGSTUB");
+            Quote("%ifdef DEBUGSTUB");
             Memory["DebugBreakOnNextTrace", 32] = 1;
-            new Indy.IL2CPU.Assembler.Literal("%endif");
+            Quote("%endif");
         }
 
         public void SendText() {
-            new Indy.IL2CPU.Assembler.Literal("%ifdef DEBUGSTUB");
+            Quote("%ifdef DEBUGSTUB");
             PushAll32();
             Call("DebugStub_SendText");
             PopAll32();
-            new Indy.IL2CPU.Assembler.Literal("%endif");
+            Quote("%endif");
         }
 
         public void TraceOff() {
-            new Indy.IL2CPU.Assembler.Literal("%ifdef DEBUGSTUB");
+            Quote("%ifdef DEBUGSTUB");
             PushAll32();
             Call("DebugStub_TraceOff");
             PopAll32();
-            new Indy.IL2CPU.Assembler.Literal("%endif");
+            Quote("%endif");
         }
 
         public void TraceOn() {
-            new Indy.IL2CPU.Assembler.Literal("%ifdef DEBUGSTUB");
+            Quote("%ifdef DEBUGSTUB");
             PushAll32();
             Call("DebugStub_TraceOn");
             PopAll32();
-            new Indy.IL2CPU.Assembler.Literal("%endif");
+            Quote("%endif");
         }
     }
 
@@ -59,25 +59,25 @@ namespace Cosmos.Kernel.Plugs {
     public class DebugTraceOff : AssemblerMethod {
         //TODO: Make a new AssemblerMethod option that can use x# more direct somehow
         public override void Assemble(Asm.Assembler aAssembler) {
-            new DebugAsm().TraceOff();
+            new DebuggerAsm().TraceOff();
         }
     }
 
     public class DebugTraceOn : AssemblerMethod {
         public override void Assemble(Asm.Assembler aAssembler) {
-            new DebugAsm().TraceOn();
+            new DebuggerAsm().TraceOn();
         }
     }
 
     public class DebugBreak : AssemblerMethod {
         public override void Assemble(Asm.Assembler aAssembler) {
-            new DebugAsm().Break();
+            new DebuggerAsm().Break();
         }
     }
 
     public class DebugSend : AssemblerMethod {
         public override void Assemble(Asm.Assembler aAssembler) {
-            new DebugAsm().SendText();
+            new DebuggerAsm().SendText();
         }
     }
 }

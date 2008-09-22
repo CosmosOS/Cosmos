@@ -41,6 +41,10 @@ namespace Indy.IL2CPU.Assembler.X86.X {
         public void Call(string aLabel) {
             new X86.Call(aLabel);
         }
+        
+        public void Quote(string aText) {
+            new Indy.IL2CPU.Assembler.Literal(aText);
+        }
 
         public void CallIf(Flags aFlags, string aLabel) {
             CallIf(aFlags, aLabel, "");
