@@ -5,7 +5,7 @@ namespace Cosmos.Sys.Plugs
     [Plug(Target = typeof(Sys.Deboot))]
     public static class Deboot
     {
-        [PlugMethod(MethodAssembler = typeof(Assemblers.Reboot))]
+        [PlugMethod(Assembler = typeof(Assemblers.Reboot))]
         public static void Reboot()
         {
 

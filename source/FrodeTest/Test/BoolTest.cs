@@ -44,8 +44,7 @@ namespace FrodeTest.Test
             {
                 Check.OK();
             }
-            catch (Exception ex)
-            {
+            catch {
                 Check.Fail();
             }
 

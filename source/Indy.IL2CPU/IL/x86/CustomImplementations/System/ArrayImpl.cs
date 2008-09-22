@@ -60,7 +60,7 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System {
 			return false;
 		}
 
-		[PlugMethod(MethodAssembler = typeof(Assemblers.Array_InternalCopy))]
+		[PlugMethod(Assembler = typeof(Assemblers.Array_InternalCopy))]
 		public static void Copy(Array sourceArray, int sourceIndex, Array destinationArray, int destinationIndex, int length, bool reliable) {
 		}
 

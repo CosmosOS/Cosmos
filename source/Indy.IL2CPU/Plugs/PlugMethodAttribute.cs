@@ -5,6 +5,6 @@ namespace Indy.IL2CPU.Plugs {
 	public sealed class PlugMethodAttribute: Attribute {
 		public string Signature = null;
 		public bool Enabled = true;
-		public Type MethodAssembler = null;
+		public Type Assembler = null;
 	}
 }

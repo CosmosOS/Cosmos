@@ -8,16 +8,16 @@ using X86 = Indy.IL2CPU.Assembler.X86;
 namespace Cosmos.Kernel.Plugs {
     [Plug(Target = typeof(Cosmos.Debug.Debugger))]
     public class Debugger {
-	    [PlugMethod(MethodAssembler = typeof(DebugBreak))]
+	    [PlugMethod(Assembler = typeof(DebugBreak))]
         public static unsafe void Break() { }
 
-		[PlugMethod(MethodAssembler = typeof(DebugSend))]
+		[PlugMethod(Assembler = typeof(DebugSend))]
         public static unsafe void Send(int aLength, char* aText) { }
 
-		[PlugMethod(MethodAssembler = typeof(DebugTraceOff))]
+		[PlugMethod(Assembler = typeof(DebugTraceOff))]
         public static void TraceOff() { }
 
-		[PlugMethod(MethodAssembler = typeof(DebugTraceOn))]
+		[PlugMethod(Assembler = typeof(DebugTraceOn))]
         public static void TraceOn() { }
     }
 

@@ -13,7 +13,7 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System.Runtime.CompilerServic
 			//todo: do something
 		}
 
-		[PlugMethod(MethodAssembler = typeof(InitializeArrayAssembler))]
+		[PlugMethod(Assembler = typeof(InitializeArrayAssembler))]
 		public static void InitializeArray(Array array, RuntimeFieldHandle fldHandle) {
 		}
 	}

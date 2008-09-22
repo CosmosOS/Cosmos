@@ -97,7 +97,7 @@ namespace Indy.IL2CPU.IL {
 		public virtual bool HasCustomAssembleImplementation(MethodInformation aMethod) {
 			PlugMethodAttribute xResult = ((PlugMethodAttribute[])aMethod.Method.GetCustomAttributes(typeof(PlugMethodAttribute), true)).FirstOrDefault();
 			if (xResult != null) {
-				return xResult.MethodAssembler != null;
+				return xResult.Assembler != null;
 			}
 			return false;
 		}
@@ -108,7 +108,7 @@ namespace Indy.IL2CPU.IL {
 	    public virtual void DoCustomAssembleImplementation(Assembler.Assembler aAssembler, MethodInformation aMethodInfo) {
 			PlugMethodAttribute xAttrib = aMethodInfo.Method.GetCustomAttributes(typeof(PlugMethodAttribute), true).Cast<PlugMethodAttribute>().FirstOrDefault();
 			if (xAttrib != null) {
-				Type xAssemblerType = xAttrib.MethodAssembler;
+				Type xAssemblerType = xAttrib.Assembler;
 				if (xAssemblerType != null) {
 					var xAssembler = (AssemblerMethod)Activator.CreateInstance(xAssemblerType);
 				    var xNeedsMethodInfo = xAssembler as INeedsMethodInfo;

@@ -8,7 +8,7 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System {
 	[Plug(Target = typeof(global::System.Buffer))]
 	public class Buffer {
 
-		[PlugMethod(MethodAssembler = typeof(Assemblers.Buffer_BlockCopy))]
+		[PlugMethod(Assembler = typeof(Assemblers.Buffer_BlockCopy))]
 		public static void BlockCopy(Array src, int srcOffset, Array dst, int dstOffset, int count) {
 		}
 
