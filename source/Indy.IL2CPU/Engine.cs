@@ -1642,9 +1642,6 @@ namespace Indy.IL2CPU {
                         if (!xPlugMethodAttrib.Enabled) {
                             continue;
                         }
-                        if (!xPlugMethodAttrib.InNormalMode) {
-                            continue;
-                        }
                         if (!String.IsNullOrEmpty(xSignature)) {
                             if (!mPlugMethods.ContainsKey(xSignature)) {
                                 mPlugMethods.Add(xSignature,

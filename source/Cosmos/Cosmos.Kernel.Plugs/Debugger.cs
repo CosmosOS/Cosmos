@@ -8,7 +8,7 @@ using X86 = Indy.IL2CPU.Assembler.X86;
 namespace Cosmos.Kernel.Plugs {
     [Plug(Target = typeof(Cosmos.Debug.Debugger))]
     public class Debugger {
-		[PlugMethod(MethodAssembler = typeof(DebugBreak))]
+	    [PlugMethod(MethodAssembler = typeof(DebugBreak))]
         public static unsafe void Break() { }
 
 		[PlugMethod(MethodAssembler = typeof(DebugSend))]

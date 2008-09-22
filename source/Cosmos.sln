@@ -21,6 +21,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel.LogTail", "Cosmos\Cosmos.Kernel.LogTail\Cosmos.Kernel.LogTail.csproj", "{7BAB58BF-E8A1-4623-B6BF-4B90A0505226}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IL2CPU", "IL2CPU", "{4070490F-A3FD-4E97-A89D-A1C96EF7BD37}"
+	ProjectSection(SolutionItems) = preProject
+		Plugs.html = Plugs.html
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Misc", "Misc", "{E16DB75B-0F1D-4813-9103-F8FB6E7BAE2A}"
 EndProject

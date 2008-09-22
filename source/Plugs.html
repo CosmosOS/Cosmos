@@ -1,0 +1,112 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>Untitled Page</title>
+</head>
+<body>
+
+    <h3>
+        Temporary Location</h3>
+    <p>
+        Please move this to the website later</p>
+    <h3>
+        Function</h3>
+    <p>
+        Plugs are a mechanism IL2CPU uses to replace functionaly on a method by method 
+        basis in binary assemblies. Plugs can be used to implement icalls, or simply 
+        replace functionality with custom implementation without needing to change the 
+        source or replace a complete assembly.</p>
+    <p>
+        For example many .NET methods rely on Win API calls. Cosmos cannot support 
+        these, and instead of emulating the P/Invoke layer, IL2CPU can swap in a 
+        different implementation for those methods.</p>
+    <p>
+        Plugs are essential for implementing icall functionality as well since icalls 
+        are provided by the .NET runtime itself and not the assembly, and Cosmos only 
+        uses the IL from the assemblies, and not any part of the .NET runtime.</p>
+    <p>
+        Plugs can also be used to bridge managed code to unmanaged assembly 
+        implementation. This is a rarely needed use outside fo the kernel, but is 
+        necessary for debugging calls, Interrupts, and other such low level 
+        functionality. By using plugs, a managed interface can be put onto an assembly 
+        language implementation. In such a case, an empty method body is created in the 
+        client assembly.</p>
+    <h3>
+        Plug Assemblies</h3>
+    <p>
+        Plug implementations are implemented in separate assemblies and the calling 
+        assembly has no idea it is interfacing with a plug. Typically plug assemblies 
+        are created as companion assemblies as &lt;client assembly&gt;.Plugs. For example, the 
+        plugs for Cosmos.Kernel exist in Cosmos.Kernel.Plugs.</p>
+    <p>
+        Plug assemblies must then be listed with IL2CPU to be included.</p>
+    <h3>
+        Types</h3>
+    <p>
+        Plug implementations can be written in a .NET language (source), or in assembly.</p>
+    <h3>
+        Source Plugs</h3>
+    <p>
+        Source plugs are the simplest type of plug. Plugs rely on attributes, so the 
+        source file must use the namespace Indy.IL2CPU.Plugs.</p>
+    <pre>using Indy.IL2CPU.Plugs; </pre>
+    <p>
+        Next create a class and apply the attribute [Plug(Target = typeof(x))] to the 
+        class where x is the type that the plug will apply to. Here is an excerpt from a 
+        plug for the string class.</p>
+    <pre>
+[Plug(Target = typeof(string))]
+public class String {    </pre>
+    <p>
+        The class is named string by convention. However the class can be named 
+        anything. Since it exists in the Cosmos.Kernel.Plugs namespace it will not 
+        conflict with the system.string that it plugs. The Target argument to the Plug 
+        attribute is what specifes which class the plug applies to.</p>
+    <pre>
+[Plug(Target = typeof(string))]
+public class String {
+    public static string Concat(string aStrA, string aStrB) {
+        char[] xChars = new char[aStrA.Length + aStrB.Length];
+        int xPos = 0;
+        for (int i = 0; i < aStrA.Length; i++) {
+            xChars[xPos++] = aStrA[i];
+        }
+        for (int i = 0; i < aStrB.Length; i++) {
+            xChars[xPos++] = aStrB[i];
+        }
+        return new global::System.String(xChars);
+    }    </pre>
+    <p>
+        The next step is to implement the method. Declare a method with the same name 
+        and signature as the method whose implementation that you want to replace. It 
+        works very much like overrides to in descendant classes, however instead of 
+        keywords attributes are used.</p>
+    <p>
+        Now at runtime, instead of the real string.Concat being called, the above 
+        implementation is used insted. In the case of string.Concat this is importante 
+        because string.Concat relies on an icall, which means the functionality is 
+        provided by the .NET runtime and not the library. This means it is not available 
+        as IL or in the assembly itself.</p>
+    <h3>
+        Assembly Plugs</h3>
+
+    <p>
+        Assembly plugs are a bit more complex, but allow a source level interface to map 
+        to an assembly level implementation. First the plug must be defined using the 
+        Plug attribute as in source plugs. But in addition empty methods with the 
+        PlugMethod attribute applied.</p>
+    <pre>
+[Plug(Target = typeof(Cosmos.Debug.Debugger))]
+public class Debugger {
+	[PlugMethod(MethodAssembler = typeof(DebugBreak))]
+	public static unsafe void Break() { }</pre>
+
+    <p>
+        The method declaration is used to provide a type safe and easy way to match 
+        another method signature. However since the implementation is in assembly, it 
+        cannot be coded here. Instead the PlugMethod attribute points to another class 
+        which is an AssemblerMethod descendant. This class (in this case DebugBreak) is 
+        then used to create the assembly language during compilation.</p>
+
+</body>
+</html>
