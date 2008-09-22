@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Threading;
-using Cosmos.IL2CPU.Debug;
+using Cosmos.Debug;
 
 namespace Cosmos.Build.Windows {
     public abstract class DebugConnectorStream : DebugConnector {

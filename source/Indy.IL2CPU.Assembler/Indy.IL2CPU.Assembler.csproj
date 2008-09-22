@@ -51,19 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assembler.cs" />
-    <Compile Include="Comment.cs" />
-    <Compile Include="DataMember.cs" />
-    <Compile Include="RawAssembler.cs" />
-    <Compile Include="ImportMember.cs" />
-    <Compile Include="ImportMethodMember.cs" />
-    <Compile Include="Instruction.cs" />
-    <Compile Include="Label.cs" />
-    <Compile Include="Literal.cs" />
-    <Compile Include="OpCodeAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReaderWriterLocker.cs" />
-    <Compile Include="StackContent.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Cosmos.snk" />
