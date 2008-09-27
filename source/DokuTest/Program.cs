@@ -78,16 +78,13 @@ namespace DokuTest
             Console.ForegroundColor = ConsoleColor.Black;
             Console.Write("0");
             Console.ForegroundColor = ConsoleColor.Green;*/
-            int i = 0;
-            while (true)
-            {
-                Console.WriteLine(i);
-                ++i;
-            }
+
             Console.Read();
             Console.WriteLine("*** COSMOS Operating System - Doku's Test Suite ***");
-            Console.WriteLine("*** Ensoniq AudioPCI 1370 testing ***");
-            ES1370.test();
+            //Console.WriteLine("*** Ensoniq AudioPCI 1370 testing ***");
+            //ES1370.test();
+            Console.WriteLine("*** PC Speaker testing ***");
+            PcSpeaker.test();
             Console.WriteLine("Shutting down computer");
             Cosmos.Sys.Deboot.ShutDown();            
         }
