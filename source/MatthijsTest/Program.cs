@@ -64,7 +64,12 @@ namespace MatthijsTest {
             //xNIC.TransmitBytes(xBytes);
             //Console.WriteLine("Klaar!");
             //Console.WriteLine(xNIC.mBuffer.Count.ToString());
-            Console.WriteLine("Hello, World!");
+            uint i = 0;
+            Cosmos.Debug.Debugger.Break();
+            do {
+                Console.WriteLine(i.ToString());
+                i++;
+            } while (true);
         }
 
         public static int TestMethodNoParams()

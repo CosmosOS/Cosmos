@@ -26,9 +26,8 @@ namespace Cosmos.Build.Windows {
             get { return mDebugMode; }
         }
         
-        protected byte mComPort;
         public byte ComPort {
-            get { return mComPort; }
+            get { return (byte)cmboDebugPort.SelectedIndex; }
         }
 
         protected void TargetChanged(object aSender, RoutedEventArgs e) {
@@ -66,11 +65,6 @@ namespace Cosmos.Build.Windows {
         public Action Stop;
         
         protected void UpdateProperties() {
-            mComPort = (byte)cmboDebugPort.SelectedIndex;
-            if (mComPort > 3) {
-                throw new Exception("Debug port not supported yet!");
-            }
-            mComPort++;
             if (rdioDebugModeNone.IsChecked.Value) {
                 mDebugMode = DebugMode.None;
             } else if (rdioDebugModeIL.IsChecked.Value) {
@@ -78,7 +72,6 @@ namespace Cosmos.Build.Windows {
                 throw new NotSupportedException("Debug mode IL isn't supported yet, use Source instead.");
             } else if (rdioDebugModeSource.IsChecked.Value) {
                 mDebugMode = DebugMode.Source;
-                mComPort = 1;
             } else {
                 throw new Exception("Unknown debug mode.");
             }
@@ -117,6 +110,18 @@ namespace Cosmos.Build.Windows {
             tblkISOPath.Text = aBuildPath + "Cosmos.iso";
 
             cmboDebugPort.Items.Add("Disabled");
+            cmboDebugPort.Items.Add("COM1");
+            cmboDebugPort.Items.Add("COM2");
+            cmboDebugPort.Items.Add("COM3");
+            cmboDebugPort.Items.Add("COM4");
+            cmboDebugPort.Items.Add("COM5");
+            cmboDebugPort.Items.Add("COM6"); 
+            cmboDebugPort.Items.Add("COM7");
+            cmboDebugPort.Items.Add("COM8"); 
+            cmboDebugPort.Items.Add("COM9");
+            cmboDebugPort.Items.Add("COM10"); 
+            cmboDebugPort.Items.Add("COM11");
+            cmboDebugPort.Items.Add("COM12");
 
             foreach (string xNIC in Enum.GetNames(typeof(Builder.QemuNetworkCard))) {
                 cmboNetworkCards.Items.Add(xNIC);

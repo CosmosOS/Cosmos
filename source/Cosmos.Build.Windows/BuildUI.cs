@@ -61,8 +61,10 @@ namespace Cosmos.Build.Windows {
                     } else if (mOptionsUC.rdioVMWare.IsChecked.Value) {
                         xDebugConnector = new DebugConnectorVMWare();
                     } else if(mOptionsUC.rdioUSB.IsChecked.Value) {
-                        xDebugConnector = new DebugConnectorSerial();
-                    } else {
+                        xDebugConnector = new DebugConnectorSerial(mOptionsUC.ComPort);
+                    } else if(mOptionsUC.rdioPXE.IsChecked.Value) {
+                        xDebugConnector = new DebugConnectorSerial(mOptionsUC.ComPort);
+                    }else {
                         throw new Exception("Unknown connector type");
                     }
                     xDebugWindow.SetSourceInfoMap(xSourceMappings, xDebugConnector);

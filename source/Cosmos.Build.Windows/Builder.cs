@@ -112,7 +112,7 @@ namespace Cosmos.Build.Windows {
             var xParam = (PassedEngineValue)aParam;
             Engine.TraceAssemblies = xParam.TraceAssemblies;
             Engine.Execute(xParam.aAssembly, xParam.aTargetPlatform, xParam.aGetFileNameForGroup
-             , xParam.aPlugs, xParam.aDebugMode, xParam.aDebugComNumber
+             , xParam.aPlugs, xParam.aDebugMode, 1
              , xParam.aOutputDir);
             CompileCompleted.Invoke();
         }
