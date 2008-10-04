@@ -21,22 +21,24 @@ namespace Cosmos.Build.Windows {
         
         public void Load() {
             using (var xKey = Registry.CurrentUser.OpenSubKey(Options.RegKey, false)) {
-                //TODO: Use attributes or just name and reflection to save/load
-                TraceAssemblies = (TraceAssemblies)ReadEnum(xKey, "Debug Trace Assemblies", TraceAssemblies.Cosmos);
-                DebugMode = (DebugMode)ReadEnum(xKey, "Debug Mode", DebugMode.Source);
+                try {
+                    //TODO: Use attributes or just name and reflection to save/load
+                    TraceAssemblies = (TraceAssemblies)ReadEnum(xKey, "Debug Trace Assemblies", TraceAssemblies.Cosmos);
+                    DebugMode = (DebugMode)ReadEnum(xKey, "Debug Mode", DebugMode.Source);
 
-                //TODO: all strings need converted to enums that are enums...
-                Target = (string)xKey.GetValue("Target");
-                DebugPort = (string)xKey.GetValue("Debug Port");
-                UseGDB = Boolean.Parse((string)xKey.GetValue("UseGDB", "false"));
-                CreateHDImage = Boolean.Parse((string)xKey.GetValue("Use HD Image", "false"));
-                UseNetworkTAP = Boolean.Parse((string)xKey.GetValue("Use TAP", "false"));
-                NetworkCard = (string)xKey.GetValue("NetworkCard", Builder.QemuNetworkCard.rtl8139.ToString());
-                AudioCard = (string)xKey.GetValue("AudioCard", Builder.QemuAudioCard.es1370.ToString());
-                VMWareEdition = (string)xKey.GetValue("VMWare Edition");
-                USBDevice = (string)xKey.GetValue("USB Device");
-                ShowOptions = Boolean.Parse((string)xKey.GetValue("Show Options", "true"));
-                CompileIL = Boolean.Parse((string)xKey.GetValue("CompileIL", "true"));
+                    //TODO: all strings need converted to enums that are enums...
+                    Target = (string)xKey.GetValue("Target");
+                    DebugPort = (string)xKey.GetValue("Debug Port");
+                    UseGDB = Boolean.Parse((string)xKey.GetValue("UseGDB", "false"));
+                    CreateHDImage = Boolean.Parse((string)xKey.GetValue("Use HD Image", "false"));
+                    UseNetworkTAP = Boolean.Parse((string)xKey.GetValue("Use TAP", "false"));
+                    NetworkCard = (string)xKey.GetValue("NetworkCard", Builder.QemuNetworkCard.rtl8139.ToString());
+                    AudioCard = (string)xKey.GetValue("AudioCard", Builder.QemuAudioCard.es1370.ToString());
+                    VMWareEdition = (string)xKey.GetValue("VMWare Edition");
+                    USBDevice = (string)xKey.GetValue("USB Device");
+                    ShowOptions = Boolean.Parse((string)xKey.GetValue("Show Options", "true"));
+                    CompileIL = Boolean.Parse((string)xKey.GetValue("CompileIL", "true"));
+                } catch (Exception) { }
             }
         }
 
