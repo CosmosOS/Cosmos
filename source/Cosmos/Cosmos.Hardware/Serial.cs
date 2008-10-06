@@ -5,10 +5,17 @@ using System.Text;
 namespace Cosmos.Hardware {
 	public class Serial: Hardware {
 		private const ushort COM1 = 0x3F8;
+        private const ushort COM2 = 0x2F8;
 		private static bool _serialInited = false;
 
 		private static ushort GetSerialAddr(byte aSerialIdx) {
-			return COM1;
+            if (aSerialIdx == 1) {
+                return COM1;
+            }
+            if(aSerialIdx==2) {
+                return COM2;
+            }
+            throw new Exception("Serial port not available");
 		}
 
 		public static void InitSerial(byte aSerialIdx) {

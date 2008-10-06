@@ -1,4 +1,4 @@
-﻿#define EXT2Debug
+﻿//#define EXT2Debug
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -119,7 +119,9 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
                                     xName[c] = (char)xFSBuffer[xIndex + 8 + c];
                                 }
                                 xFSEntry.Name = new string(xName);
-                                xResult.Add(xFSEntry);
+                                if (!xFSEntry.Name.Equals("lost+found")) {
+                                    xResult.Add(xFSEntry);
+                                }
                             }
                         }
                     }

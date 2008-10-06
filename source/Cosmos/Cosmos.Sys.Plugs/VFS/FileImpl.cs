@@ -14,7 +14,7 @@ namespace Cosmos.Sys.Plugs {
 
         public static string ReadAllText(string aFile)
         {
-            ////Find file
+            //Find file
             if (!File.Exists(aFile))
                 return "Could not find file " + aFile;
                 //throw new FileNotFoundException("Could not find file " + aFile);

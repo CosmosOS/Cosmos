@@ -29,47 +29,47 @@ namespace MatthijsTest {
         #endregion
 
         public static void Init() {
-            bool xTest = false;
+            bool xTest = true;
             if (xTest)
             {
                 var xBoot = new Cosmos.Sys.Boot();
                 xBoot.Execute();
             }
-            //var xUDP = new Cosmos.Sys.Network.UDPPacket(
-            //    // Use a different port so it does not conflict wtih listener since we
-            //    // are using the same IP on host for testing
-            //    0x0A00020F, 32001 // 10.0.2.15
-            //    , 0xFFFFFFFF, 32000 // 255.255.255.255, Broadcast
-            //    , new byte[] { 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16 });
-            //var xEthernet = new EthernetPacket(xUDP.GetData()
-            //    , 0x525400123457, 0xFFFFFFFFFFFF
-            //    , EthernetPacket.PacketType.IP);
+            while(true) {
+                Console.Write("/0/>");
+                string xCommand = Console.ReadLine();
+                if(xCommand.StartsWith("dir")) {
+                    HandleDir();
+                    continue;
+                }
+                if (xCommand.StartsWith("type ")) {
+                    HandleType(xCommand);
+                    continue;
+                }
+                Console.Write("Command '");
+                Console.WriteLine(xCommand);
+                Console.WriteLine("' not found!");
+            }
+            Console.WriteLine("Done");
+        }
 
-            //Cosmos.Hardware.Network.Devices.RTL8139.RTL8139.DebugOutput = false;
-            //var xNICs = Cosmos.Hardware.Network.Devices.RTL8139.RTL8139.FindAll();
-            //var xNIC = xNICs[0];
+        private static void HandleType(string command) {
+            string xFile = command.Substring(5);
+            Console.WriteLine(File.ReadAllText("/0/" +xFile));
+        }
 
-            //Console.WriteLine(xNIC.Name);
-            //Console.WriteLine("Revision: " + xNIC.HardwareRevision);
-            //Console.WriteLine("MAC: " + xNIC.MACAddress);
-
-            //Console.WriteLine("Enabling network card.");
-            //xNIC.Enable();
-            //xNIC.InitializeDriver();
-
-            //Console.WriteLine("Sending bytes.");
-            //var xBytes = xEthernet.GetData();
-            //DebugUtil.WriteBinary("RTLTest", "Prepare to send packet", xBytes);
-            //System.Diagnostics.Debugger.Break();
-            //xNIC.TransmitBytes(xBytes);
-            //Console.WriteLine("Klaar!");
-            //Console.WriteLine(xNIC.mBuffer.Count.ToString());
-            uint i = 0;
-            Cosmos.Debug.Debugger.Break();
-            do {
-                Console.WriteLine(i.ToString());
-                i++;
-            } while (true);
+        private static void HandleDir() {
+            var xItems = Directory.GetDirectories("/0");
+            for(int i = 0; i<xItems.Length;i++) {
+                Console.Write("./");
+                Console.Write(xItems[i]);
+                Console.WriteLine("/");
+            }
+            xItems = Directory.GetFiles("/0");
+            for(int i = 0; i<xItems.Length;i++) {
+                Console.Write("./");
+                Console.WriteLine(xItems[i]);
+            }
         }
 
         public static int TestMethodNoParams()

@@ -351,15 +351,20 @@ namespace Cosmos.Sys {
 
         public static string ReadFileAsString(string aFile)
         {
+            Hardware.DebugUtil.SendMessage("ReadFile", "Start reading file now");
             var xFile = GetFileEntry(aFile);
             Hardware.DebugUtil.SendMessage("ReadFile", "Found file " + xFile.Id.ToString());
-            var xFS = GetFileSystemFromPath(aFile, 1);
-            Hardware.DebugUtil.SendMessage("ReadFile", "Found filesystem " + xFS.RootId.ToString());
+            var xFS = xFile.Filesystem;//GetFileSystemFromPath(aFile, 1);
+            //Hardware.DebugUtil.SendMessage("ReadFile", "Found filesystem " + xFS.RootId.ToString());
 
             byte[] xSingleBlockBuffer = new byte[xFS.BlockSize];
             byte[] xAllBlocksBuffer = new byte[xFile.Size];
-
-            for (uint i = 0; i < (xAllBlocksBuffer.Length/xSingleBlockBuffer.Length); i++)
+            int xBlockCount = (xAllBlocksBuffer.Length / xSingleBlockBuffer.Length);
+            if ((xAllBlocksBuffer.Length % xSingleBlockBuffer.Length) > 0) {
+                xBlockCount++;
+            }
+            Hardware.DebugUtil.SendNumber("ReadFile", "xBlockCount", (uint)xBlockCount, 32);
+            for (uint i = 0; i < xBlockCount; i++)
             {
                 Hardware.DebugUtil.SendMessage("ReadFile", "Reading block " + i.ToString());
                 //Read the block
@@ -370,18 +375,26 @@ namespace Cosmos.Sys {
                     Console.WriteLine(")");
                     return "";
                 }
-
-                int xCurLength = xAllBlocksBuffer.Length % xSingleBlockBuffer.Length;
-                if (xCurLength == 0)
-                {
-                    xCurLength = xSingleBlockBuffer.Length;
+                Hardware.DebugUtil.SendMessage("ReadFile", "After ReadBlock");
+                //int xCurLength = xAllBlocksBuffer.Length % xSingleBlockBuffer.Length;
+                int xCurLength = (int)xFS.BlockSize;
+                if(i == (xBlockCount-1)) {
+                    if(xFile.Size % xFS.BlockSize != 0) {
+                        // if the last block is read, we should only read the last couple of bytes (not always full block)
+                        xCurLength = (int)(xFile.Size % xFS.BlockSize);
+                    }
                 }
+                Hardware.DebugUtil.SendNumber("ReadFile", "xCurLength", (uint)xCurLength, 32);
+                //if (xCurLength == 0)
+                //{
+                //    xCurLength = xSingleBlockBuffer.Length;
+                //}
 
                 //Copy the single block into the full buffer
                 Array.Copy(xSingleBlockBuffer, 0, xAllBlocksBuffer, i * xSingleBlockBuffer.Length, xCurLength);
 
                 //If we read exactly to the end, then break
-                if ((i + 1) == (xAllBlocksBuffer.Length / xSingleBlockBuffer.Length))
+                if ((i + 1) == xBlockCount)
                 {
                     break;
                 }
@@ -392,7 +405,7 @@ namespace Cosmos.Sys {
                 System.Text.StringBuilder xBuilder = new System.Text.StringBuilder(xAllBlocksBuffer.Length);
                 for (int i = 0; i < xAllBlocksBuffer.Length; i++)
                 {
-                    xBuilder.Append(xAllBlocksBuffer[i].ToString());
+                    xBuilder.Append(((char)xAllBlocksBuffer[i]).ToString());
                 }
                 return xBuilder.ToString();
                 //return new string(xAllBlocksBuffer).ToString();
