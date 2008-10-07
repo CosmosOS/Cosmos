@@ -5,7 +5,7 @@ using System.Text;
 using Microsoft.Win32;
 using Indy.IL2CPU;
 
-namespace Cosmos.Build.Windows {
+namespace Cosmos.Compiler.Builder {
  
     public class Options {
         protected const string RegKey = @"Software\Cosmos\User Kit";

@@ -6,7 +6,7 @@ using System.Text;
 using System.Windows.Threading;
 using Cosmos.Compiler.Debug;
 
-namespace Cosmos.Build.Windows {
+namespace Cosmos.Compiler.Builder {
     public abstract class DebugConnectorStream : DebugConnector {
         protected Stream mStream;
         

@@ -1,7 +1,7 @@
-﻿<UserControl x:Class="Cosmos.Build.Windows.BuildUC"
+﻿<UserControl x:Class="Cosmos.Compiler.Builder.BuildUC"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-	xmlns:local="clr-namespace:Cosmos.Build.Windows"
+	xmlns:local="clr-namespace:Cosmos.Compiler.Builder"
     Height="300" Width="300">
     <Grid>
         <Grid.RowDefinitions>

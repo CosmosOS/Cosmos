@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{8F2D5231-CDE5-48FA-9D26-D4305B01FD3C}</ProjectGuid>
     <OutputType>Exe</OutputType>
@@ -58,9 +58,9 @@
     <Compile Include="Tests\NoInit\StringTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Cosmos.Build.Windows\Cosmos.Build.Windows.csproj">
+    <ProjectReference Include="..\Cosmos.Build.Windows\Cosmos.Compiler.Builder.csproj">
       <Project>{1F0EDE86-F6D4-4355-9A97-10E90457770C}</Project>
-      <Name>Cosmos.Build.Windows</Name>
+      <Name>Cosmos.Compiler.Builder</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

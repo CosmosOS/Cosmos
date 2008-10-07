@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{F598F906-8F3B-4EC1-AB8F-A9CBD8EBBE21}</ProjectGuid>
     <OutputType>Exe</OutputType>
@@ -37,10 +37,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Cosmos.Build.Windows, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Cosmos.Build.Windows\bin\Debug\Cosmos.Build.Windows.dll</HintPath>
-    </Reference>
     <Reference Include="Cosmos.Kernel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Cosmos\Cosmos.Kernel\bin\Debug\Cosmos.Kernel.dll</HintPath>
@@ -64,6 +60,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Cosmos.Build.Windows\Cosmos.Compiler.Builder.csproj">
+      <Project>{1F0EDE86-F6D4-4355-9A97-10E90457770C}</Project>
+      <Name>Cosmos.Compiler.Builder</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Cosmos\Cosmos.System\Cosmos.Sys.csproj">
       <Project>{819DB8FC-5DA1-461F-83C9-2F5C88088C94}</Project>
       <Name>Cosmos.Sys</Name>

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-namespace Cosmos.Build.Windows {
+namespace Cosmos.Compiler.Builder {
     public class Global {
         public static void Call(string aEXEPathname, string aArgLine, string aWorkDir) {
             Call(aEXEPathname, aArgLine, aWorkDir, true, true);

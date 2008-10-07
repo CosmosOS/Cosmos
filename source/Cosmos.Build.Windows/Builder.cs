@@ -11,7 +11,7 @@ using Microsoft.Win32;
 using Indy.IL2CPU;
 using Indy.IL2CPU.IL.X86;
 
-namespace Cosmos.Build.Windows {
+namespace Cosmos.Compiler.Builder {
 
     public class Builder {
         public string BuildPath;

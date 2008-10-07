@@ -17,7 +17,7 @@ using Indy.IL2CPU;
 using System.Collections.ObjectModel;
 using System.Windows.Threading;
 
-namespace Cosmos.Build.Windows {
+namespace Cosmos.Compiler.Builder {
 
     public partial class BuildUC : UserControl {
         public BuildUC() {

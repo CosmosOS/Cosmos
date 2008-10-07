@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Cosmos.Build.Windows.OptionsUC"
+﻿<UserControl x:Class="Cosmos.Compiler.Builder.OptionsUC"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Height="Auto" Width="600">
@@ -12,7 +12,7 @@
                 <Button Name="butnBuild" Margin="5" IsDefault="True">_Build</Button>
                 <Button Name="butnCancel" Margin="5" IsCancel="True">_Cancel</Button>
             </StackPanel>
-            <Image Source="/Cosmos.Build.Windows;component/Logo-1.png" Width="150" />
+            <Image Source="/Cosmos.Compiler.Builder;component/Logo-1.png" Width="150" />
         </DockPanel>
 
         <ScrollViewer Grid.Row="1" CanContentScroll="False" ScrollViewer.VerticalScrollBarVisibility="Auto">

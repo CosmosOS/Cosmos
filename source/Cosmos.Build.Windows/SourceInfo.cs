@@ -8,7 +8,7 @@ using Microsoft.Samples.Debugging.CorSymbolStore;
 using System.Diagnostics.SymbolStore;
 using Indy.IL2CPU.IL;
 
-namespace Cosmos.Build.Windows {
+namespace Cosmos.Compiler.Builder {
 	public class SourceInfos: SortedList<uint, SourceInfo> {
 		public SourceInfo GetMapping(uint aValue) {
 			for (int i = Count - 1; i >=0; i--) {

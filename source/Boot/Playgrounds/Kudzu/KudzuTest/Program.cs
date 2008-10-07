@@ -1,5 +1,5 @@
 ﻿using System;
-using Cosmos.Build.Windows;
+using Cosmos.Compiler.Builder;
 using RTLDriver = Cosmos.Hardware.Network.Devices.RTL8139;
 
 namespace Cosmos.Playground.Kudzu {

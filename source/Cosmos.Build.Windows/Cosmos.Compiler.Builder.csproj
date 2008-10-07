@@ -8,8 +8,8 @@
     <ProjectGuid>{1F0EDE86-F6D4-4355-9A97-10E90457770C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Cosmos.Build.Windows</RootNamespace>
-    <AssemblyName>Cosmos.Build.Windows</AssemblyName>
+    <RootNamespace>Cosmos.Compiler.Builder</RootNamespace>
+    <AssemblyName>Cosmos.Compiler.Builder</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>

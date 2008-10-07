@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO.Ports;
 
-namespace Cosmos.Build.Windows {
+namespace Cosmos.Compiler.Builder {
     public class DebugConnectorSerial : DebugConnectorStream {
         private SerialPort mPort;
         public DebugConnectorSerial(byte aPort) { 

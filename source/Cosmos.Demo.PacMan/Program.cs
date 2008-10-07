@@ -1,5 +1,5 @@
 ﻿using System;
-using Cosmos.Build.Windows;
+using Cosmos.Compiler.Builder;
 using Cosmos.Demo.Pacman.Elements;
 using S = Cosmos.Hardware.TextScreen;
 

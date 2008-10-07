@@ -1,5 +1,5 @@
 ﻿using System;
-using Cosmos.Build.Windows;
+using Cosmos.Compiler.Builder;
 
 namespace CosmosBoot {
 	class Program {

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Threading;
 
-namespace Cosmos.Build.Windows {
+namespace Cosmos.Compiler.Builder {
     public class DebugConnectorVMWare : DebugConnectorStream {
     
         public DebugConnectorVMWare() {

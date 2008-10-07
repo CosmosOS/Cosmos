@@ -5,7 +5,7 @@ using System.IO.Compression;
 using System.Net;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
-using Cosmos.Build.Windows;
+using Cosmos.Compiler.Builder;
 using Cosmos.Sys.FileSystem;
 using Cosmos.Sys.FileSystem.Ext2;
 using Cosmos.Hardware;

@@ -8,7 +8,7 @@ using System.Windows.Interop;
 using Microsoft.Win32;
 using Indy.IL2CPU;
 
-namespace Cosmos.Build.Windows {
+namespace Cosmos.Compiler.Builder {
     public class BuildUI {
         [DllImport("user32.dll")]
         protected static extern int ShowWindow(int aHandle, int aShowState);

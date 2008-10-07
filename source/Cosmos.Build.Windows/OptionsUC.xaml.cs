@@ -15,7 +15,7 @@ using System.Windows.Threading;
 using Microsoft.Win32;
 using Indy.IL2CPU;
 
-namespace Cosmos.Build.Windows {
+namespace Cosmos.Compiler.Builder {
     public partial class OptionsUC : UserControl {
         protected string mLastSelectedUSBDrive;
         protected bool mSaveSettings = true;

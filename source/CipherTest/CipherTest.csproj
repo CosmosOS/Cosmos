@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{1325C57A-B64D-4DE9-9FA0-5C0C5464D85D}</ProjectGuid>
     <OutputType>Exe</OutputType>
@@ -54,9 +54,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Cosmos.Build.Windows\Cosmos.Build.Windows.csproj">
+    <ProjectReference Include="..\Cosmos.Build.Windows\Cosmos.Compiler.Builder.csproj">
       <Project>{1F0EDE86-F6D4-4355-9A97-10E90457770C}</Project>
-      <Name>Cosmos.Build.Windows</Name>
+      <Name>Cosmos.Compiler.Builder</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos.GdbClient\Cosmos.GdbClient.csproj">
       <Project>{5784365C-ED22-42EB-BB8A-F3E09428D5B8}</Project>

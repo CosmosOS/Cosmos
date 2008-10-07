@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Cosmos.Compiler.Debug;
 
-namespace Cosmos.Build.Windows {
+namespace Cosmos.Compiler.Builder {
     public abstract class DebugConnector {
         //TODO: These should not be this way and should in fact
         // be checked or better yet done by constructor arguments

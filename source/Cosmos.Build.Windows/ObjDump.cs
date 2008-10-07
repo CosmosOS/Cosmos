@@ -5,7 +5,7 @@ using System.Text;
 using System.Diagnostics;
 using System.IO;
 
-namespace Cosmos.Build.Windows {
+namespace Cosmos.Compiler.Builder {
 	public class ObjDump {
 		public static SortedList<uint, string> GetLabelByAddressMapping(string aKernel, string aObjDumpExe) {
 			string[] xSymbolsContents;

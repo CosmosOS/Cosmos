@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Cosmos.Build.Windows;
+using Cosmos.Compiler.Builder;
 using System.Collections;
 
 namespace TestKernel {

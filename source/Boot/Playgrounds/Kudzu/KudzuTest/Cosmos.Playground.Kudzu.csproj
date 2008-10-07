@@ -53,9 +53,9 @@
     <Compile Include="Tests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Cosmos.Build.Windows\Cosmos.Build.Windows.csproj">
+    <ProjectReference Include="..\..\..\..\Cosmos.Build.Windows\Cosmos.Compiler.Builder.csproj">
       <Project>{1F0EDE86-F6D4-4355-9A97-10E90457770C}</Project>
-      <Name>Cosmos.Build.Windows</Name>
+      <Name>Cosmos.Compiler.Builder</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\Cosmos\Cosmos.Hardware\Cosmos.Hardware.csproj">
       <Project>{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}</Project>

@@ -5,7 +5,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace Cosmos.Build.Windows {
+namespace Cosmos.Compiler.Builder {
 
     public class KeyState {
         [Flags]

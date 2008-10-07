@@ -17,7 +17,7 @@ using System.IO;
 using Indy.IL2CPU;
 using Cosmos.Compiler.Debug;
 
-namespace Cosmos.Build.Windows {
+namespace Cosmos.Compiler.Builder {
     public partial class DebugWindow : Window {
         protected class TraceItem {
             public UInt32 EIP { get; set; }

@@ -7,7 +7,7 @@ using System.IO;
 using System.Text;
 using System.Windows.Threading;
 
-namespace Cosmos.Build.Windows {
+namespace Cosmos.Compiler.Builder {
     public class DebugConnectorQEMU : DebugConnectorStream {
 
         public DebugConnectorQEMU() {
