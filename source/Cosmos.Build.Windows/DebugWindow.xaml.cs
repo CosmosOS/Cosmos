@@ -15,7 +15,7 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.IO;
 using Indy.IL2CPU;
-using Cosmos.Debug;
+using Cosmos.Compiler.Debug;
 
 namespace Cosmos.Build.Windows {
     public partial class DebugWindow : Window {

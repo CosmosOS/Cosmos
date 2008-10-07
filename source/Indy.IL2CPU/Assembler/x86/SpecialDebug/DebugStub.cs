@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Cosmos.Debug;
+using Cosmos.Compiler.Debug;
 
 //TODO: The asm code here is not efficient. Our first priority is to make it functionally robust and working
 // We will later optimize this

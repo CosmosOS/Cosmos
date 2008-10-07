@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Cosmos.Debug;
+using Cosmos.Compiler.Debug;
 
 namespace Cosmos.Build.Windows {
     public abstract class DebugConnector {

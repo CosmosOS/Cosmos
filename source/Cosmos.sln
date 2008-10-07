@@ -106,7 +106,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Demos.Snake", "Cosmo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Demo.Pacman", "Cosmos.Demo.Pacman\Cosmos.Demo.Pacman.csproj", "{A9B31697-9530-4D85-8123-0508A4E1EA70}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug", "IL2CPU\Cosmos.IL2CPU.Debug\Cosmos.Debug.csproj", "{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Debug", "IL2CPU\Cosmos.IL2CPU.Debug\Cosmos.Compiler.Debug.csproj", "{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Hardware", "Hardware", "{F18343D8-D22D-485B-A583-83C09A0C92B1}"
 EndProject
@@ -262,7 +262,7 @@ Global
 		SccProjectTopLevelParentUniqueName36 = Cosmos.sln
 		SccProjectName36 = Cosmos.Demo.Pacman
 		SccLocalPath36 = Cosmos.Demo.Pacman
-		SccProjectUniqueName37 = IL2CPU\\Cosmos.IL2CPU.Debug\\Cosmos.Debug.csproj
+		SccProjectUniqueName37 = IL2CPU\\Cosmos.IL2CPU.Debug\\Cosmos.Compiler.Debug.csproj
 		SccProjectTopLevelParentUniqueName37 = Cosmos.sln
 		SccProjectName37 = IL2CPU/Cosmos.IL2CPU.Debug
 		SccLocalPath37 = IL2CPU\\Cosmos.IL2CPU.Debug

@@ -74,9 +74,9 @@
     <Compile Include="Heap.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\IL2CPU\Cosmos.IL2CPU.Debug\Cosmos.Debug.csproj">
+    <ProjectReference Include="..\IL2CPU\Cosmos.IL2CPU.Debug\Cosmos.Compiler.Debug.csproj">
       <Project>{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}</Project>
-      <Name>Cosmos.Debug</Name>
+      <Name>Cosmos.Compiler.Debug</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

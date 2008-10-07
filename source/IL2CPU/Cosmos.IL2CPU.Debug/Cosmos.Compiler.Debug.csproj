@@ -8,8 +8,8 @@
     <ProjectGuid>{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Cosmos.Debug</RootNamespace>
-    <AssemblyName>Cosmos.Debug</AssemblyName>
+    <RootNamespace>Cosmos.Compiler.Debug</RootNamespace>
+    <AssemblyName>Cosmos.Compiler.Debug</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
