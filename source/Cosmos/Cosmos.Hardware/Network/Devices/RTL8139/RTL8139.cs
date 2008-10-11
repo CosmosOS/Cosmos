@@ -82,12 +82,11 @@ DebugUtil.SendMessage("RTL8139", aText);
             mBuffer=new Queue<byte[]>(16);
             //Turn on Tx and Rx
             EnableTransmit();
-            EnableReceive();
-
+            //EnableReceive();
             //Initialize buffers
             InitTransmitBuffer();
-            InitReceiveBuffer();
-
+            //InitReceiveBuffer();
+            
             //Setting Transmit configuration
             var tcr = Register.TransmitConfigurationRegister.Load(mem);
             tcr.Init();
@@ -99,9 +98,9 @@ DebugUtil.SendMessage("RTL8139", aText);
             rcr.PromiscuousMode = true;
             
             //Enable IRQ Interrupt
+            Cosmos.Hardware.Interrupts.IRQ11 += HandleNetworkInterrupt;
             InitIRQMaskRegister();
             mInstance = this;
-            Cosmos.Hardware.Interrupts.IRQ11 += HandleNetworkInterrupt;
             //DebugWriteLine("Listening for IRQ" + pciCard.InterruptLine + ".");
 
         }
@@ -378,11 +377,9 @@ DebugUtil.SendMessage("RTL8139", aText);
             var tsd = Register.TransmitStatusDescriptor.Load(mem);
             //DebugWriteLine("Telling NIC to send " + aData.Length + " bytes.");
             tsd.Size = aData.Length;
-            
             tsd.OWN = false; //Begins sending - causes QEMU to DIE (Frode, 29.july)!
             
             Register.TransmitStatusDescriptor.IncrementTSDescriptor();
-
             return true;
         }
 
@@ -406,9 +403,9 @@ DebugUtil.SendMessage("RTL8139", aText);
                         0xc0);
             DebugUtil.SendMessage("RTL8139", "HandleReceiveInterrupt");
             while ((mem.Read8((uint)MainRegister.Bit.ChipCmd) & 0x01) == 0) {
-                DebugUtil.WriteBinary("RTL8139",
-                                      "Full RxBuffer",
-                                      RxBuffer);
+                //DebugUtil.WriteBinary("RTL8139",
+                //                      "Full RxBuffer",
+                //                      RxBuffer);
                 DebugUtil.SendNumber("RTL8139",
                                      "RxBufferIdx",
                                      (uint)RxBufferIdx,
