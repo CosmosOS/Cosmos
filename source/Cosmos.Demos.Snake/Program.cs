@@ -56,14 +56,22 @@ namespace Cosmos.Demos.Snake
         {
             if (snake != null && !aReleased)
             {
-                if (aScanCode == (byte)Key.Left)
+                if (aScanCode == (byte)Key.Left && snake.direction != Direction.Right)
+                {
                     snake.direction = Direction.Left;
-                else if (aScanCode == (byte)Key.Up)
+                }
+                else if (aScanCode == (byte)Key.Up && snake.direction != Direction.Down)
+                {
                     snake.direction = Direction.Up;
-                else if (aScanCode == (byte)Key.Right)
+                }
+                else if (aScanCode == (byte)Key.Right && snake.direction != Direction.Left)
+                {
                     snake.direction = Direction.Right;
-                else if (aScanCode == (byte)Key.Down)
+                }
+                else if (aScanCode == (byte)Key.Down && snake.direction != Direction.Up)
+                {
                     snake.direction = Direction.Down;
+                }
                 else if (aScanCode == (byte)Key.Escape)
                     running = false;
             }
@@ -198,7 +206,7 @@ namespace Cosmos.Demos.Snake
                     pause--;
 
                 isBlocked[snake.X + snake.Y * S.Columns] = Blocked.Snake;
-
+                
                 switch(snake.direction)
                 {
                     case Direction.Left:
