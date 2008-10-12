@@ -34,15 +34,11 @@ namespace Cosmos.Compiler.Builder {
         /// </summary>
         /// <returns>Full path to the Build directory.</returns>
         protected static string GetBuildPath() {
-            try {
+            try { 
                 string xResult = "";
-                RegistryKey xKey = Registry.CurrentUser.OpenSubKey(@"Software\Cosmos");
-
-                if (xKey != null)
-                { // Use Registry
-                    xResult = (string)xKey.GetValue("Build Path");
-                }
-                if (string.IsNullOrEmpty(xResult))
+                var xOptions = new Options();
+                xOptions.Load();
+                if (string.IsNullOrEmpty(xOptions.BuildPath))
                 {
                     xResult = Directory.GetCurrentDirectory().ToLowerInvariant();
                     int xPos = xResult.LastIndexOf("source");
@@ -51,16 +47,18 @@ namespace Cosmos.Compiler.Builder {
                         throw new Exception("Unable to find directory named 'source' when using CurrentDirectory.");
                     }
                     xResult = xResult.Substring(0, xPos) + @"Build\";
+                    xOptions.BuildPath = xResult;
                 }
 
                 if (string.IsNullOrEmpty(xResult)) {
-                    throw new Exception("Cannot find Cosmos build path either in the Registry or using current directory search.");
+                    throw new Exception("Cannot find Cosmos build path!");
                 }
                 if (!xResult.EndsWith(@"\"))
                 {
                     xResult = xResult + @"\";
                 }
-
+                xOptions.BuildPath = xResult;
+                xOptions.Save();
                 return xResult;
             } catch (Exception E) {
                 throw new Exception("Error while getting Cosmos Build Path!", E);

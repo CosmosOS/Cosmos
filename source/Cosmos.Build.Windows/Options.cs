@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Xml;
 using Microsoft.Win32;
 using Indy.IL2CPU;
 
@@ -9,56 +11,143 @@ namespace Cosmos.Compiler.Builder {
  
     public class Options {
         protected const string RegKey = @"Software\Cosmos\User Kit";
-        
-        protected object ReadEnum(RegistryKey aKey, string aName, object aDefault) {
-            object xValue = aKey.GetValue(aName);
+        public Options() {
+            CompileIL = true;
+            Target = "QEMU";
+            NetworkCard = Builder.QemuNetworkCard.rtl8139.ToString();
+            AudioCard = Builder.QemuAudioCard.sb16.ToString();
+        }
+
+        protected TEnum ReadEnum<TEnum>(XmlDocument aDoc, string aName, TEnum aDefault) {
+
+            string xValue = ReadValue(aDoc,
+                                      aName,
+                                      null);
             if (xValue != null) {
-                return Enum.Parse(aDefault.GetType(), (string)xValue, true);
+                return (TEnum)Enum.Parse(typeof(TEnum), xValue, true);
             } else {
                 return aDefault;
             }
         }
-        
-        public void Load() {
-            using (var xKey = Registry.CurrentUser.CreateSubKey(Options.RegKey)) {
-                //TODO: Use attributes or just name and reflection to save/load
-                TraceAssemblies = (TraceAssemblies)ReadEnum(xKey, "Debug Trace Assemblies", TraceAssemblies.Cosmos);
-                DebugMode = (DebugMode)ReadEnum(xKey, "Debug Mode", DebugMode.Source);
-                //TODO: Use attributes or just name and reflection to save/load
-                TraceAssemblies = (TraceAssemblies)ReadEnum(xKey, "Debug Trace Assemblies", TraceAssemblies.Cosmos);
-                DebugMode = (DebugMode)ReadEnum(xKey, "Debug Mode", DebugMode.Source);
 
-                //TODO: all strings need converted to enums that are enums...
-                Target = (string)xKey.GetValue("Target");
-                DebugPort = (string)xKey.GetValue("Debug Port");
-                UseGDB = Boolean.Parse((string)xKey.GetValue("UseGDB", "false"));
-                CreateHDImage = Boolean.Parse((string)xKey.GetValue("Use HD Image", "false"));
-                UseNetworkTAP = Boolean.Parse((string)xKey.GetValue("Use TAP", "false"));
-                NetworkCard = (string)xKey.GetValue("NetworkCard", Builder.QemuNetworkCard.rtl8139.ToString());
-                AudioCard = (string)xKey.GetValue("AudioCard", Builder.QemuAudioCard.es1370.ToString());
-                VMWareEdition = (string)xKey.GetValue("VMWare Edition");
-                USBDevice = (string)xKey.GetValue("USB Device");
-                ShowOptions = Boolean.Parse((string)xKey.GetValue("Show Options", "true"));
-                CompileIL = Boolean.Parse((string)xKey.GetValue("CompileIL", "true"));
+        protected string ReadValue(XmlDocument aDoc, string aName, string aDefault) {
+            var xElem = aDoc.SelectSingleNode("/settings/" + aName);
+            if(xElem!=null) {
+                return xElem.InnerText.Trim();
+            }
+            return aDefault;
+        }
+
+        protected static string ConfigDirName {
+            get {
+                if (Environment.OSVersion.Platform == PlatformID.Unix ||
+                    Environment.OSVersion.Platform == PlatformID.MacOSX) {
+                    return ".cosmos";
+                } else {
+                    return "Cosmos";
+                }
             }
         }
 
+        public void Load() {
+            var xDoc = new XmlDocument();
+            var xFileName = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                                                      ConfigDirName),
+                                         "BuilderConfig.xml");
+            if (!File.Exists(xFileName)) {
+                return;
+            }
+            xDoc.Load(xFileName);
+            TraceAssemblies = ReadEnum(xDoc,
+                                       "DebugTraceAssemblies",
+                                       Indy.IL2CPU.TraceAssemblies.Cosmos);
+            DebugMode = ReadEnum(xDoc,
+                                 "DebugMode",
+                                 DebugMode.Source);
+            Target = ReadValue(xDoc,
+                               "Target",
+                               "");
+            DebugPort = ReadValue(xDoc,
+                                  "DebugPort",
+                                  "");
+            UseGDB = Boolean.Parse(ReadValue(xDoc,
+                                             "UseGDB",
+                                             "false"));
+            CreateHDImage = Boolean.Parse(ReadValue(xDoc,
+                                                    "UseHDImage",
+                                                    "False"));
+            UseNetworkTAP = Boolean.Parse(ReadValue(xDoc,
+                                                    "UseTAP",
+                                                    "False"));
+            // todo: make NetworkCard, AudioCard properties strongly typed
+            NetworkCard = ReadValue(xDoc,
+                                    "NetworkCard",
+                                    Builder.QemuNetworkCard.rtl8139.ToString());
+            AudioCard = ReadValue(xDoc,
+                                  "AudioCard",
+                                  Builder.QemuAudioCard.es1370.ToString());
+            VMWareEdition = ReadValue(xDoc,
+                                      "VMWareEdition",
+                                      "");
+            USBDevice = ReadValue(xDoc,
+                                  "USBDevice",
+                                  "");
+            ShowOptions = Boolean.Parse(ReadValue(xDoc,
+                                                  "ShowOptions",
+                                                  "true"));
+            CompileIL = Boolean.Parse(ReadValue(xDoc,
+                                                "CompileIL",
+                                                "true"));
+        }
+
         public void Save() {
-            using (var xKey = Registry.CurrentUser.CreateSubKey(Options.RegKey)) {
-                xKey.SetValue("Debug Trace Assemblies", TraceAssemblies);
-                xKey.SetValue("Target", Target);
-                xKey.SetValue("Debug Port", DebugPort);
-                xKey.SetValue("Debug Mode", DebugMode);
-                xKey.SetValue("UseGDB", UseGDB.ToString());
-                xKey.SetValue("Use HD Image", CreateHDImage.ToString());
-                xKey.SetValue("Use TAP", UseNetworkTAP.ToString());
-                xKey.SetValue("NetworkCard", NetworkCard);
-                xKey.SetValue("AudioCard", AudioCard);
-                xKey.SetValue("VMWare Edition", VMWareEdition ?? "");
-                xKey.SetValue("USB Device", USBDevice??"");
-                xKey.SetValue("Show Options", ShowOptions.ToString());
-                xKey.SetValue("CompileIL", CompileIL.ToString());
-                xKey.Flush();
+            var xFileName = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                                                     ConfigDirName),
+                                        "BuilderConfig.xml");
+            if (File.Exists(xFileName)) {
+                File.Delete(xFileName);
+            } else {
+                if (!Directory.Exists(Path.GetDirectoryName(xFileName))) {
+                    Directory.CreateDirectory(Path.GetDirectoryName(xFileName));
+                }
+            }
+            using (var xWriter = XmlWriter.Create(xFileName)) {
+                xWriter.WriteStartDocument();
+                xWriter.WriteStartElement("settings");
+                Action<string, string> xWriteValue = delegate(string aKey,
+                                                              string aValue) {
+                                                         xWriter.WriteStartElement(aKey);
+                                                         xWriter.WriteValue(aValue??"");
+                                                         xWriter.WriteEndElement();
+                                                     };
+                xWriteValue("DebugTraceAssemblies",
+                            TraceAssemblies.ToString());
+                xWriteValue("Target",
+                            Target);
+                xWriteValue("DebugPort",
+                            DebugPort);
+                xWriteValue("DebugMode",
+                            DebugMode.ToString());
+                xWriteValue("UseGDB",
+                            UseGDB.ToString());
+                xWriteValue("UseHDImage",
+                            CreateHDImage.ToString());
+                xWriteValue("UseTAP",
+                            UseNetworkTAP.ToString());
+                xWriteValue("NetworkCard",
+                            NetworkCard);
+                xWriteValue("AudioCard",
+                            AudioCard);
+                xWriteValue("VMWareEdition",
+                            VMWareEdition);
+                xWriteValue("USBDevice",
+                            USBDevice);
+                xWriteValue("ShowOptions",
+                            ShowOptions.ToString());
+                xWriteValue("CompileIL",
+                            CompileIL.ToString());
+                xWriter.WriteEndDocument();
+                xWriter.Flush();
             }
         }
         
@@ -75,5 +164,9 @@ namespace Cosmos.Compiler.Builder {
         public string USBDevice { get; set; }
         public bool ShowOptions { get; set; }
         public bool CompileIL { get; set; }
+        public string BuildPath {
+            get;
+            set;
+        }
     }
 }
