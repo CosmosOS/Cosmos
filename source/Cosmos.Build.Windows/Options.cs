@@ -16,6 +16,7 @@ namespace Cosmos.Compiler.Builder {
             Target = "QEMU";
             NetworkCard = Builder.QemuNetworkCard.rtl8139.ToString();
             AudioCard = Builder.QemuAudioCard.sb16.ToString();
+            ShowOptions = true;
         }
 
         protected TEnum ReadEnum<TEnum>(XmlDocument aDoc, string aName, TEnum aDefault) {
