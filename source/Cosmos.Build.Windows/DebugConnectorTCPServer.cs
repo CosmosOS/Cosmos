@@ -8,9 +8,9 @@ using System.Text;
 using System.Windows.Threading;
 
 namespace Cosmos.Compiler.Builder {
-    public class DebugConnectorQEMU : DebugConnectorStream {
+    public class DebugConnectorTCPServer : DebugConnectorStream {
 
-        public DebugConnectorQEMU() {
+        public DebugConnectorTCPServer() {
             var xTCPListener = new TcpListener(IPAddress.Loopback, 4444);
             xTCPListener.Start();
             xTCPListener.BeginAcceptTcpClient(new AsyncCallback(DoAcceptTcpClientCallback), xTCPListener);

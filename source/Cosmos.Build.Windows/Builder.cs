@@ -25,6 +25,7 @@ namespace Cosmos.Compiler.Builder {
             AsmPath = ToolsPath + @"asm\";
             // MtW: leave this here, otherwise VS wont copy required dependencies!
             typeof(X86OpCodeMap).Equals(null);
+            
         }
         
         /// <summary>
@@ -36,9 +37,8 @@ namespace Cosmos.Compiler.Builder {
         protected static string GetBuildPath() {
             try { 
                 string xResult = "";
-                var xOptions = new Options();
-                xOptions.Load();
-                if (string.IsNullOrEmpty(xOptions.BuildPath))
+                Options.Load();
+                if (string.IsNullOrEmpty(Options.BuildPath))
                 {
                     xResult = Directory.GetCurrentDirectory().ToLowerInvariant();
                     int xPos = xResult.LastIndexOf("source");
@@ -47,7 +47,7 @@ namespace Cosmos.Compiler.Builder {
                         throw new Exception("Unable to find directory named 'source' when using CurrentDirectory.");
                     }
                     xResult = xResult.Substring(0, xPos) + @"Build\";
-                    xOptions.BuildPath = xResult;
+                    Options.BuildPath = xResult;
                 }
 
                 if (string.IsNullOrEmpty(xResult)) {
@@ -57,8 +57,8 @@ namespace Cosmos.Compiler.Builder {
                 {
                     xResult = xResult + @"\";
                 }
-                xOptions.BuildPath = xResult;
-                xOptions.Save();
+                Options.BuildPath = xResult;
+                Options.Save();
                 return xResult;
             } catch (Exception E) {
                 throw new Exception("Error while getting Cosmos Build Path!", E);
@@ -115,7 +115,7 @@ namespace Cosmos.Compiler.Builder {
             CompileCompleted.Invoke();
         }
 
-        public void BeginCompile(DebugMode aDebugMode, Options aOptions, byte aDebugComport) {
+        public void BeginCompile(DebugMode aDebugMode, byte aDebugComport) {
             if (!Directory.Exists(AsmPath)) {
                 Directory.CreateDirectory(AsmPath);
             }
@@ -127,7 +127,7 @@ namespace Cosmos.Compiler.Builder {
                 Path.Combine(Path.Combine(ToolsPath, "Cosmos.Hardware.Plugs"), "Cosmos.Hardware.Plugs.dll"), 
                 Path.Combine(Path.Combine(ToolsPath, "Cosmos.Sys.Plugs"), "Cosmos.Sys.Plugs.dll")
              }
-             , aDebugMode, aDebugComport, AsmPath, aOptions.TraceAssemblies);
+             , aDebugMode, aDebugComport, AsmPath, Options.TraceAssemblies);
             
             var xThread = new Thread(new ParameterizedThreadStart(ThreadExecute));
             xThread.Start(xEngineParams);
@@ -171,7 +171,7 @@ namespace Cosmos.Compiler.Builder {
             Process.Start(xPath + @"Cosmos.vmx");
         }
 
-        public Process MakeQEMU(bool aUseHDImage, bool aGDB, bool aDebugger, bool aUseNetworkTap, object aNetworkCard, object aAudioCard) {
+        public Process MakeQEMU(bool aUseHDImage, bool aGDB, bool aDebugger, string aDebugComMode, bool aUseNetworkTap, object aNetworkCard, object aAudioCard) {
             MakeISO();
 
             //From v0.9.1 Qemu requires forward slashes in path
@@ -208,29 +208,24 @@ namespace Cosmos.Compiler.Builder {
                 // Boot CD ROM
                 + " -boot d"
                 // Audio hardware
-                + " -soundhw " + Enum.Parse(typeof(QemuAudioCard), aAudioCard.ToString())
+                + " -soundhw " + aAudioCard
                 // Setup serial port
                 // Might allow serial file later for post debugging of CPU
                 // etc since serial to TCP on a byte level is likely highly innefficient
                 // with the packet overhead
                 //
                 // COM1
-                //" -serial tcp::4444,server"
-                //TODO: QEMU supports pipes like VMWare - Change this to a pipe and use same 
-                // handler as VMWare?
-                + (aDebugger ? " -serial tcp:127.0.0.1:4444"
-                // We have to output to a dummy file, so the other port will always be COM2
-                 : " -serial null")
+                + (aDebugger ? " "+aDebugComMode : " -serial null")
                 // COM2
-                + " -serial \"file:" + BuildPath + "COM2-output.dbg\" "
+                + " -serial file:\"" + BuildPath + "COM2-output.dbg\""
                 // Enable acceleration if we are not using GDB
                 + (aGDB ? " -S -s" : " -kernel-kqemu")
                 // Ethernet card
-                + string.Format(" -net nic,model={0},macaddr=52:54:00:12:34:57", Enum.Parse(typeof(QemuNetworkCard), aNetworkCard.ToString()))
+                + string.Format(" -net nic,model={0},macaddr=52:54:00:12:34:57", aNetworkCard)
                 //+ " -redir tcp:5555::23" //use f.instance 'telnet localhost 5555' or 'http://localhost:5555/' to access machine
                 + (aUseNetworkTap ? " -net tap,ifname=CosmosTAP" : "") //requires TAP installed on development computer
-                + " -net user"
-                , ToolsPath + @"qemu\", false, true);
+                + " -net user\""
+                , ToolsPath + @"qemu", false, true);
 
             if (aGDB) {
                 //TODO: If the host is really busy, sometimes GDB can run before QEMU finishes loading.
@@ -242,12 +237,7 @@ namespace Cosmos.Compiler.Builder {
             }
             return xProcess;
         }
-
-        // Dont change these, these are passed directly to QEMU.
-        // Need to fix this so we display better things, and dont tie to QEMU constants
-        public enum QemuAudioCard { pcspk, sb16, es1370, adlib }
-        public enum QemuNetworkCard { ne2k_pci, rtl8139, pcnet }
-
+        
         public void MakeUSB(char aDrive) {
             string xPath = BuildPath + @"USB\";
             RemoveFile(xPath + @"output.bin");

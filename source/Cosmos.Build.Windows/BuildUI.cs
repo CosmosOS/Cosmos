@@ -31,7 +31,7 @@ namespace Cosmos.Compiler.Builder {
                 var xBuildUC = new BuildUC();
                 mMainWindow.LoadControl(xBuildUC);
                 xBuildUC.CompileCompleted += new Action(BuildUC_CompileCompleted);
-                xBuildUC.BeginBuild(mBuilder, mOptions, mOptionsUC.DebugMode, mOptionsUC.ComPort);
+                xBuildUC.BeginBuild(mBuilder, mOptionsUC.DebugMode, mOptionsUC.ComPort);
             }
         }
 
@@ -46,50 +46,81 @@ namespace Cosmos.Compiler.Builder {
             }
                 
             DebugWindow xDebugWindow = null;
+            System.Diagnostics.Process xQEMU = null;
             if (mOptionsUC.rdioDebugModeNone.IsChecked.Value == false) {
                 xDebugWindow = new DebugWindow();
-                
                 if (mOptionsUC.DebugMode == DebugMode.Source) {
                     var xLabelByAddressMapping = ObjDump.GetLabelByAddressMapping(
                         mBuilder.BuildPath + "output.bin", mBuilder.ToolsPath + @"cygwin\objdump.exe");
                     var xSourceMappings = SourceInfo.GetSourceInfo(xLabelByAddressMapping
                         , mBuilder.BuildPath + "Tools/asm/debug.cxdb");
                           
-                    DebugConnector xDebugConnector;
-                    if (mOptionsUC.rdioQEMU.IsChecked.Value) {
-                        xDebugConnector = new DebugConnectorQEMU();
+                    DebugConnector xDebugConnector=null;
+                    if (mOptionsUC.rdioQEMU.IsChecked.Value){
+                        if (mOptionsUC.cmbDebugComMode.Text ==
+                        "TCP: Cosmos Debugger as server on port 4444, QEmu as client")
+                        {
+                            xDebugConnector = new DebugConnectorTCPServer();
+                            xQEMU = mBuilder.MakeQEMU(Options.CreateHDImage, Options.UseGDB
+                                , Options.DebugMode != DebugMode.None, (String)Options.QEmuDebugComType[Options.DebugComMode], Options.UseNetworkTAP
+                                , (String)Options.QEmuNetworkCard[Options.NetworkCard], (String)Options.QEmuAudioCard[Options.AudioCard]);
+                        }
+                        
+                        else if (mOptionsUC.cmbDebugComMode.Text ==
+                        "TCP: Cosmos Debugger as client, QEmu as server on port 4444")
+                        {
+                            xQEMU = mBuilder.MakeQEMU(Options.CreateHDImage, Options.UseGDB
+                                , Options.DebugMode != DebugMode.None, (String)Options.QEmuDebugComType[Options.DebugComMode], Options.UseNetworkTAP
+                                , (String)Options.QEmuNetworkCard[Options.NetworkCard], (String)Options.QEmuAudioCard[Options.AudioCard]);
+                            xDebugConnector = new DebugConnectorTCPClient();
+                        }
+                        
+                        else if (mOptionsUC.cmbDebugComMode.Text ==
+                            "Named pipe: Cosmos Debugger as client, QEmu as server")
+                        {
+                            xQEMU = mBuilder.MakeQEMU(Options.CreateHDImage, Options.UseGDB
+                                , Options.DebugMode != DebugMode.None, (String)Options.QEmuDebugComType[Options.DebugComMode], Options.UseNetworkTAP
+                                , (String)Options.QEmuNetworkCard[Options.NetworkCard], (String)Options.QEmuAudioCard[Options.AudioCard]);
+                            xDebugConnector = new DebugConnectorPipeClient();
+                        }
+                        else if (mOptionsUC.cmbDebugComMode.Text ==
+                            "Named pipe: Cosmos Debugger as server, QEmu as client")
+                        {
+                            xDebugConnector = new DebugConnectorPipeServer();
+                            xQEMU = mBuilder.MakeQEMU(Options.CreateHDImage, Options.UseGDB
+                                , Options.DebugMode != DebugMode.None, (String)Options.QEmuDebugComType[Options.DebugComMode], Options.UseNetworkTAP
+                                , (String)Options.QEmuNetworkCard[Options.NetworkCard], (String)Options.QEmuAudioCard[Options.AudioCard]);
+                        }
                     } else if (mOptionsUC.rdioVMWare.IsChecked.Value) {
-                        xDebugConnector = new DebugConnectorVMWare();
+                        xDebugConnector = new DebugConnectorPipeServer();
+                        mBuilder.MakeVMWare(mOptionsUC.rdVMWareServer.IsChecked.Value);
                     } else if(mOptionsUC.rdioUSB.IsChecked.Value) {
                         xDebugConnector = new DebugConnectorSerial(mOptionsUC.ComPort);
                     } else if(mOptionsUC.rdioPXE.IsChecked.Value) {
                         xDebugConnector = new DebugConnectorSerial(mOptionsUC.ComPort);
-                    }else {
-                        throw new Exception("Unknown connector type");
+                    } else if (mOptionsUC.rdioVPC.IsChecked.Value) {
+                         mBuilder.MakeVPC();
+                    } else if (mOptionsUC.rdioISO.IsChecked.Value) {
+                        mBuilder.MakeISO();
+                    } else if (mOptionsUC.rdioPXE.IsChecked.Value) {
+                        mBuilder.MakePXE();
+                    } else if (mOptionsUC.rdioUSB.IsChecked.Value) {
+                        mBuilder.MakeUSB(mOptionsUC.cmboUSBDevice.Text[0]);
+                    }
+                    else
+                    {
+                        throw new Exception("Debug mode not supported: " + mOptionsUC.DebugMode);
                     }
                     xDebugWindow.SetSourceInfoMap(xSourceMappings, xDebugConnector);
-                } else {
+                }
+                else
+                {
                     throw new Exception("Debug mode not supported: " + mOptionsUC.DebugMode);
                 }
             }
 
-            // Launch emulators or other final actions
-            System.Diagnostics.Process xQEMU = null;
-            if (mOptionsUC.rdioQEMU.IsChecked.Value) {
-                xQEMU = mBuilder.MakeQEMU(mOptions.CreateHDImage, mOptions.UseGDB
-                 , mOptions.DebugMode != DebugMode.None, mOptions.UseNetworkTAP
-                 , mOptionsUC.cmboNetworkCards.SelectedValue, mOptionsUC.cmboAudioCards.SelectedValue);
-            } else if (mOptionsUC.rdioVMWare.IsChecked.Value) {
-                mBuilder.MakeVMWare(mOptionsUC.rdVMWareServer.IsChecked.Value);
-            } else if (mOptionsUC.rdioVPC.IsChecked.Value) {
-                mBuilder.MakeVPC();
-            } else if (mOptionsUC.rdioISO.IsChecked.Value) {
-                mBuilder.MakeISO();
-            } else if (mOptionsUC.rdioPXE.IsChecked.Value) {
-                mBuilder.MakePXE();
-            } else if (mOptionsUC.rdioUSB.IsChecked.Value) {
-                mBuilder.MakeUSB(mOptionsUC.cmboUSBDevice.Text[0]);
-            }
+                
+            
             // Problems around with DebugWindow getting stuck, this seems to work
             mMainWindow.Hide();
             if (xDebugWindow != null) {
@@ -128,7 +159,7 @@ namespace Cosmos.Compiler.Builder {
         }
 
         void mMainWindow_Loaded(object sender, RoutedEventArgs e) {
-            mOptions.Load();
+            Options.Load();
             mOptionsUC = new OptionsUC(mBuilder.BuildPath, mOptions);
             mOptionsUC.Proceed = OptionsProceed;
             mOptionsUC.Stop = OptionsStop;

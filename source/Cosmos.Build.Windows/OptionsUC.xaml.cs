@@ -14,6 +14,7 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using Microsoft.Win32;
 using Indy.IL2CPU;
+using System.Collections;
 
 namespace Cosmos.Compiler.Builder {
     public partial class OptionsUC : UserControl {
@@ -123,11 +124,16 @@ namespace Cosmos.Compiler.Builder {
             cmboDebugPort.Items.Add("COM11");
             cmboDebugPort.Items.Add("COM12");
 
-            foreach (string xNIC in Enum.GetNames(typeof(Builder.QemuNetworkCard))) {
-                cmboNetworkCards.Items.Add(xNIC);
+            foreach (DictionaryEntry xNIC in Options.QEmuNetworkCard) {
+                cmboNetworkCards.Items.Add(xNIC.Key);
             }
-            foreach (string xSoundCard in Enum.GetNames(typeof(Builder.QemuAudioCard))) {
-                cmboAudioCards.Items.Add(xSoundCard);
+            foreach (DictionaryEntry xSoundCard in Options.QEmuAudioCard)
+            {
+                cmboAudioCards.Items.Add(xSoundCard.Key);
+            }
+            foreach (DictionaryEntry xDebugComMode in Options.QEmuDebugComType)
+            {
+                cmbDebugComMode.Items.Add(xDebugComMode.Key);
             }
             LoadOptions();
             // Call here for when this dialog is bypassed, others read these values
@@ -156,54 +162,55 @@ namespace Cosmos.Compiler.Builder {
 
         protected void SaveOptions() {
             if (rdioDebugAssembliesAll.IsChecked.Value) {
-                mOptions.TraceAssemblies = TraceAssemblies.All;
+                Options.TraceAssemblies = TraceAssemblies.All;
             } else if (rdioDebugAssembliesCosmos.IsChecked.Value) {
-                mOptions.TraceAssemblies = TraceAssemblies.Cosmos;
+                Options.TraceAssemblies = TraceAssemblies.Cosmos;
             } else if (rdioDebugAssembliesUser.IsChecked.Value) {
-                mOptions.TraceAssemblies = TraceAssemblies.User;
+                Options.TraceAssemblies = TraceAssemblies.User;
             }
-            mOptions.Target = "QEMU";
+            Options.Target = "QEMU";
             if (rdioVMWare.IsChecked.Value) {
-                mOptions.Target = "VMWare";
+                Options.Target = "VMWare";
             } else if (rdioVPC.IsChecked.Value) {
-                mOptions.Target = "VPC";
+                Options.Target = "VPC";
             } else if (rdioISO.IsChecked.Value) {
-                mOptions.Target = "ISO";
+                Options.Target = "ISO";
             } else if (rdioPXE.IsChecked.Value) {
-                mOptions.Target = "PXE";
+                Options.Target = "PXE";
             } else if (rdioUSB.IsChecked.Value) {
-                mOptions.Target = "USB";
+                Options.Target = "USB";
             }
-            mOptions.DebugPort = cmboDebugPort.Text;
+            Options.DebugPort = cmboDebugPort.Text;
 
             if (rdioDebugModeNone.IsChecked.Value) {
-                mOptions.DebugMode = DebugMode.None;
+                Options.DebugMode = DebugMode.None;
             } else if (rdioDebugModeIL.IsChecked.Value) {
-                mOptions.DebugMode = DebugMode.IL;
+                Options.DebugMode = DebugMode.IL;
             } else if (rdioDebugModeSource.IsChecked.Value) {
-                mOptions.DebugMode = DebugMode.Source;
+                Options.DebugMode = DebugMode.Source;
             }
-            mOptions.UseGDB = chbxQEMUUseGDB.IsChecked.Value;
-            mOptions.CreateHDImage = chbxQEMUUseHD.IsChecked.Value;
-            mOptions.UseNetworkTAP = chckQEMUUseNetworkTAP.IsChecked.Value;
-            mOptions.NetworkCard = cmboNetworkCards.Text;
-            mOptions.AudioCard = cmboAudioCards.Text;
+            Options.UseGDB = chbxQEMUUseGDB.IsChecked.Value;
+            Options.CreateHDImage = chbxQEMUUseHD.IsChecked.Value;
+            Options.UseNetworkTAP = chckQEMUUseNetworkTAP.IsChecked.Value;
+            Options.NetworkCard = cmboNetworkCards.Text;
+            Options.AudioCard = cmboAudioCards.Text;
 
-            mOptions.VMWareEdition = rdVMWareWorkstation.IsChecked.Value ? "Workstation" : "Server";
+            Options.VMWareEdition = rdVMWareWorkstation.IsChecked.Value ? "Workstation" : "Server";
             if (cmboUSBDevice.SelectedItem != null) {
-                mOptions.USBDevice = cmboUSBDevice.Text;
+                Options.USBDevice = cmboUSBDevice.Text;
             }
-            mOptions.ShowOptions = chbxShowOptions.IsChecked.Value;
-            mOptions.CompileIL = chbxCompileIL.IsChecked.Value;
-            mOptions.Save();
+            Options.ShowOptions = chbxShowOptions.IsChecked.Value;
+            Options.CompileIL = chbxCompileIL.IsChecked.Value;
+            Options.DebugComMode = cmbDebugComMode.Text;
+            Options.Save();
         }
 
         private void LoadOptions() {
-            rdioDebugAssembliesAll.IsChecked = (mOptions.TraceAssemblies == TraceAssemblies.All);
-            rdioDebugAssembliesCosmos.IsChecked = (mOptions.TraceAssemblies == TraceAssemblies.Cosmos);
-            rdioDebugAssembliesUser.IsChecked = (mOptions.TraceAssemblies == TraceAssemblies.User);
+            rdioDebugAssembliesAll.IsChecked = (Options.TraceAssemblies == TraceAssemblies.All);
+            rdioDebugAssembliesCosmos.IsChecked = (Options.TraceAssemblies == TraceAssemblies.Cosmos);
+            rdioDebugAssembliesUser.IsChecked = (Options.TraceAssemblies == TraceAssemblies.User);
         
-                string xBuildType = mOptions.Target;
+                string xBuildType = Options.Target;
                 switch (xBuildType) {
                     case "QEMU":
                         rdioQEMU.IsChecked = true;
@@ -226,26 +233,26 @@ namespace Cosmos.Compiler.Builder {
                 }
 
                 // Misc
-                chbxShowOptions.IsChecked = mOptions.ShowOptions;
-                chbxCompileIL.IsChecked = mOptions.CompileIL;
+                chbxShowOptions.IsChecked = Options.ShowOptions;
+                chbxCompileIL.IsChecked = Options.CompileIL;
 
                 // Debug                
-                cmboDebugPort.SelectedIndex = cmboDebugPort.Items.IndexOf(mOptions.DebugPort);
+                cmboDebugPort.SelectedIndex = cmboDebugPort.Items.IndexOf(Options.DebugPort);
                 if (cmboDebugPort.SelectedIndex == -1) {
                     cmboDebugPort.SelectedIndex = 0;
                 }
-                rdioDebugModeNone.IsChecked = mOptions.DebugMode == DebugMode.None;
-                rdioDebugModeIL.IsChecked = mOptions.DebugMode == DebugMode.IL;
-                rdioDebugModeSource.IsChecked = mOptions.DebugMode == DebugMode.Source;
+                rdioDebugModeNone.IsChecked = Options.DebugMode == DebugMode.None;
+                rdioDebugModeIL.IsChecked = Options.DebugMode == DebugMode.IL;
+                rdioDebugModeSource.IsChecked = Options.DebugMode == DebugMode.Source;
 
                 // QEMU
-                chbxQEMUUseGDB.IsChecked = mOptions.UseGDB;
-                chbxQEMUUseHD.IsChecked = mOptions.CreateHDImage;
-                chckQEMUUseNetworkTAP.IsChecked = mOptions.UseNetworkTAP;
-                cmboNetworkCards.SelectedIndex = cmboNetworkCards.Items.IndexOf(mOptions.NetworkCard);
-                cmboAudioCards.SelectedIndex = cmboAudioCards.Items.IndexOf(mOptions.AudioCard);
+                chbxQEMUUseGDB.IsChecked = Options.UseGDB;
+                chbxQEMUUseHD.IsChecked = Options.CreateHDImage;
+                chckQEMUUseNetworkTAP.IsChecked = Options.UseNetworkTAP;
+                cmboNetworkCards.SelectedIndex = cmboNetworkCards.Items.IndexOf(Options.NetworkCard);
+                cmboAudioCards.SelectedIndex = cmboAudioCards.Items.IndexOf(Options.AudioCard);
                 // VMWare
-                string xVMWareVersion = mOptions.VMWareEdition;
+                string xVMWareVersion = Options.VMWareEdition;
                 switch (xVMWareVersion) {
                     case "Server":
                         rdVMWareServer.IsChecked = true;
@@ -254,10 +261,12 @@ namespace Cosmos.Compiler.Builder {
                         rdVMWareWorkstation.IsChecked = true;
                         break;
                 }
-
+                cmbDebugComMode.SelectedIndex = cmbDebugComMode.Items.IndexOf(Options.DebugComMode);
                 // USB
                 // Combo is lazy loaded, so we just store it for later
-                mLastSelectedUSBDrive = mOptions.USBDevice;
+                mLastSelectedUSBDrive = Options.USBDevice;
             }
+
+        
     }
 }

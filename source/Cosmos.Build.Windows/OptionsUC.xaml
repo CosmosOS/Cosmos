@@ -71,7 +71,7 @@
                     <Label Margin="0,10,0,0" Background="LightGray" FontWeight="Bold">QEMU Emulator</Label>
                     <WrapPanel>
                         <CheckBox Name="chbxQEMUUseGDB" Margin="10,10,30,0" IsChecked="False">Enable GDB</CheckBox>
-                        <CheckBox Name="chbxQEMUUseHD" Margin="10,10,0,0" IsChecked="False">Enable hard disk images</CheckBox>
+                        <CheckBox Name="chbxQEMUUseHD" Margin="10,10,30,0" IsChecked="False">Enable hard disk images</CheckBox>
                     </WrapPanel>
                     <WrapPanel Margin="10,10,0,0">
                         <Label Margin="0,0,10,0">Network Card:</Label>
@@ -83,7 +83,10 @@
                         <ComboBox Name="cmboAudioCards" SelectedIndex="1"/>
                     </WrapPanel>
                 </StackPanel>
-
+                <StackPanel Name="DebugComMode">
+                    <Label Background="LightGray" FontWeight="Bold">Debug communication mode</Label>
+                    <ComboBox Height="23" Name="cmbDebugComMode"/>
+                </StackPanel>
                 <StackPanel Name="spnlPXE">
                     <Label Margin="0,10,0,0" Background="LightGray" FontWeight="Bold">PXE Network Boot</Label>
                     <TextBlock Margin="10,10,10,0" TextWrapping="Wrap">After building, start up another PC with network boot enabled and Cosmos will boot on to it automatically.</TextBlock>
@@ -98,6 +101,7 @@
                         <ComboBox Name="cmboUSBDevice"/>
                     </WrapPanel>
                 </StackPanel>
+
 
                 <StackPanel Name="spnlVMWare">
                     <Label Margin="0,10,0,0" Background="LightGray" FontWeight="Bold">VMWare</Label>

@@ -7,9 +7,9 @@ using System.Text;
 using System.Windows.Threading;
 
 namespace Cosmos.Compiler.Builder {
-    public class DebugConnectorVMWare : DebugConnectorStream {
+    public class DebugConnectorPipeServer : DebugConnectorStream {
     
-        public DebugConnectorVMWare() {
+        public DebugConnectorPipeServer() {
             NamedPipeServerStream xPipe = new NamedPipeServerStream("CosmosDebug", PipeDirection.InOut, 1
              , PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
             xPipe.BeginWaitForConnection(new AsyncCallback(DoWaitForConnection), xPipe);

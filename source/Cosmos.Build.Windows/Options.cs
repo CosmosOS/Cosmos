@@ -6,20 +6,46 @@ using System.Text;
 using System.Xml;
 using Microsoft.Win32;
 using Indy.IL2CPU;
+using System.Collections;
 
 namespace Cosmos.Compiler.Builder {
  
     public class Options {
+        public readonly static Hashtable QEmuAudioCard;
+        public readonly static Hashtable QEmuNetworkCard;
+        public readonly static Hashtable QEmuDebugComType;
+        //public Hashtable VmWareDebugComType = new Hashtable();
         protected const string RegKey = @"Software\Cosmos\User Kit";
-        public Options() {
+        static Options() {
+            QEmuAudioCard=new Hashtable();
+            QEmuNetworkCard=new Hashtable();
+            QEmuDebugComType = new Hashtable();
+            //public enum QemuAudioCard { pcspk, sb16, es1370, adlib }
+            //public enum QemuNetworkCard { ne2k_pci, rtl8139, pcnet }
+            QEmuAudioCard.Add("PC Speaker", "pcspk");
+            //QEmuAudioCard.Add("Ensoniq ES1370 PCI", "es1370");
+            //QEmuAudioCard.Add("SoundBlaster 16", "sb16");
+            //QEmuAudioCard.Add("Adlib", "adlib");
+            QEmuNetworkCard.Add("Realtek RTL8139", "rtl8139");
+            //QEmuAudioCard.Add("ISA NE2000","ne2k_pci"
+            //QEmuAudioCard.Add("PCnet","pcnet");
+            QEmuDebugComType.Add("Named pipe: Cosmos Debugger as client, QEmu as server", "-serial pipe:CosmosDebug");
+            QEmuDebugComType.Add("Named pipe: Cosmos Debugger as server, QEmu as client", "-serial pipe_client:CosmosDebug");
+            QEmuDebugComType.Add("TCP: Cosmos Debugger as client, QEmu as server on port 4444", "-serial tcp:127.0.0.1:4444,server");
+            QEmuDebugComType.Add("TCP: Cosmos Debugger as server on port 4444, QEmu as client", "-serial tcp:127.0.0.1:4444");
+            //DebugComType.Add("UDP: Cosmos Debugger as server on port 4444, QEmu as client", "-serial null");
+            //DebugComType.Add("UDP: Cosmos Debugger as client on port 4444, QEmu as server", "-serial null");
+            //DebugComType.Add("Telnet: Cosmos Debugger as server on port 4444, QEmu as client", "-serial null");
+            //DebugComType.Add("Telnet: Cosmos Debugger as client, QEmu as server on port 4444", "-serial null");
+            //DebugComType.Add("COM: Cosmos Debugger as server, QEmu as client", "-serial null");
+            //DebugComType.Add("COM: Cosmos Debugger as client, QEmu as server", "-serial null");
+
             CompileIL = true;
             Target = "QEMU";
-            NetworkCard = Builder.QemuNetworkCard.rtl8139.ToString();
-            AudioCard = Builder.QemuAudioCard.sb16.ToString();
             ShowOptions = true;
         }
 
-        protected TEnum ReadEnum<TEnum>(XmlDocument aDoc, string aName, TEnum aDefault) {
+        protected static TEnum ReadEnum<TEnum>(XmlDocument aDoc, string aName, TEnum aDefault) {
 
             string xValue = ReadValue(aDoc,
                                       aName,
@@ -31,7 +57,7 @@ namespace Cosmos.Compiler.Builder {
             }
         }
 
-        protected string ReadValue(XmlDocument aDoc, string aName, string aDefault) {
+        protected static string ReadValue(XmlDocument aDoc, string aName, string aDefault) {
             var xElem = aDoc.SelectSingleNode("/settings/" + aName);
             if(xElem!=null) {
                 return xElem.InnerText.Trim();
@@ -50,7 +76,7 @@ namespace Cosmos.Compiler.Builder {
             }
         }
 
-        public void Load() {
+        public static void Load() {
             var xDoc = new XmlDocument();
             var xFileName = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                                                       ConfigDirName),
@@ -83,10 +109,10 @@ namespace Cosmos.Compiler.Builder {
             // todo: make NetworkCard, AudioCard properties strongly typed
             NetworkCard = ReadValue(xDoc,
                                     "NetworkCard",
-                                    Builder.QemuNetworkCard.rtl8139.ToString());
+                                    "Realtek RTL8139");
             AudioCard = ReadValue(xDoc,
                                   "AudioCard",
-                                  Builder.QemuAudioCard.es1370.ToString());
+                                  "PC Speaker");
             VMWareEdition = ReadValue(xDoc,
                                       "VMWareEdition",
                                       "");
@@ -99,9 +125,10 @@ namespace Cosmos.Compiler.Builder {
             CompileIL = Boolean.Parse(ReadValue(xDoc,
                                                 "CompileIL",
                                                 "true"));
+            DebugComMode = ReadValue(xDoc,"DebugComMode","TCP: Cosmos Debugger as server on port 4444, QEmu as client");
         }
 
-        public void Save() {
+        public static void Save() {
             var xFileName = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                                                      ConfigDirName),
                                         "BuilderConfig.xml");
@@ -147,25 +174,27 @@ namespace Cosmos.Compiler.Builder {
                             ShowOptions.ToString());
                 xWriteValue("CompileIL",
                             CompileIL.ToString());
+                xWriteValue("DebugComMode", DebugComMode.ToString());
                 xWriter.WriteEndDocument();
                 xWriter.Flush();
             }
         }
         
-        public TraceAssemblies TraceAssemblies { get; set; }
-        public string Target { get; set; }
-        public string DebugPort { get; set; }
-        public DebugMode DebugMode { get; set; }
-        public bool UseGDB { get; set; }
-        public bool CreateHDImage { get; set; }
-        public bool UseNetworkTAP { get; set; }
-        public string NetworkCard { get; set; }
-        public string AudioCard { get; set; }
-        public string VMWareEdition { get; set; }
-        public string USBDevice { get; set; }
-        public bool ShowOptions { get; set; }
-        public bool CompileIL { get; set; }
-        public string BuildPath {
+        public static TraceAssemblies TraceAssemblies { get; set; }
+        public static string Target { get; set; }
+        public static string DebugPort { get; set; }
+        public static DebugMode DebugMode { get; set; }
+        public static string DebugComMode { get; set; }
+        public static bool UseGDB { get; set; }
+        public static bool CreateHDImage { get; set; }
+        public static bool UseNetworkTAP { get; set; }
+        public static string NetworkCard { get; set; }
+        public static string AudioCard { get; set; }
+        public static string VMWareEdition { get; set; }
+        public static string USBDevice { get; set; }
+        public static bool ShowOptions { get; set; }
+        public static bool CompileIL { get; set; }
+        public static string BuildPath {
             get;
             set;
         }

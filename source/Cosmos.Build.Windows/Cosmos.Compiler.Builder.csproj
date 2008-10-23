@@ -99,11 +99,13 @@
     <Compile Include="BuildUC.xaml.cs">
       <DependentUpon>BuildUC.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DebugConnectorPipeClient.cs" />
+    <Compile Include="DebugConnectorTCPClient.cs" />
     <Compile Include="DebugConnector.cs" />
-    <Compile Include="DebugConnectorQEMU.cs" />
+    <Compile Include="DebugConnectorPipeServer.cs" />
     <Compile Include="DebugConnectorSerial.cs" />
     <Compile Include="DebugConnectorStream.cs" />
-    <Compile Include="DebugConnectorVMWare.cs" />
+    <Compile Include="DebugConnectorTCPServer.cs" />
     <Compile Include="KeyState.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
