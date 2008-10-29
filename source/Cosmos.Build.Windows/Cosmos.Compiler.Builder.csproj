@@ -151,6 +151,10 @@
       <Project>{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}</Project>
       <Name>Cosmos.Compiler.Debug</Name>
     </ProjectReference>
+    <ProjectReference Include="..\IL2CPU\IL2CPU\IL2CPU.csproj">
+      <Project>{8142656B-0A4B-4E05-BBE4-AA31CE7B18FA}</Project>
+      <Name>IL2CPU</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Indy.IL2CPU\Indy.IL2CPU.csproj">
       <Project>{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}</Project>
       <Name>Indy.IL2CPU</Name>

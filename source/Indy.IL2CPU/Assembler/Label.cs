@@ -41,8 +41,6 @@ namespace Indy.IL2CPU.Assembler {
 			return xBuilder.ToString();
 		}
 		
-		private static MD5 mHash = MD5.Create();
-		
 		private string mName;
 		public string Name {
 			get { return mName; }
@@ -74,7 +72,11 @@ namespace Indy.IL2CPU.Assembler {
 		public static string GenerateLabelName(MethodBase aMethod) {
 			string xResult = DataMember.FilterStringForIncorrectChars(GetFullName(aMethod));
 			if (xResult.Length > 245) {
-				xResult = mHash.ComputeHash(Encoding.Default.GetBytes(xResult)).Aggregate("_", (r, x) => r + x.ToString("X2"));
+                using (var xHash = MD5.Create()) {
+                    xResult = xHash.ComputeHash(Encoding.Default.GetBytes(xResult)).Aggregate("_",
+                                                                                              (r,
+                                                                                               x) => r + x.ToString("X2"));
+                }
 			}
 			return xResult;
 		}

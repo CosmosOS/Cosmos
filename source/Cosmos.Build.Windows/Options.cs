@@ -9,7 +9,10 @@ using Indy.IL2CPU;
 using System.Collections;
 
 namespace Cosmos.Compiler.Builder {
- 
+    public enum dotNETFrameworkImplementationEnum {
+        Microsoft = 0,
+        ProjectMono
+    }
     public class Options {
         public readonly static Hashtable QEmuAudioCard;
         public readonly static Hashtable QEmuNetworkCard;
@@ -125,6 +128,9 @@ namespace Cosmos.Compiler.Builder {
             CompileIL = Boolean.Parse(ReadValue(xDoc,
                                                 "CompileIL",
                                                 "true"));
+            dotNETFrameworkImplementation = ReadEnum(xDoc,
+                                                     "dotNETFrameworkImplementation",
+                                                     dotNETFrameworkImplementationEnum.Microsoft);
             DebugComMode = ReadValue(xDoc,"DebugComMode","TCP: Cosmos Debugger as server on port 4444, QEmu as client");
         }
 
@@ -174,6 +180,8 @@ namespace Cosmos.Compiler.Builder {
                             ShowOptions.ToString());
                 xWriteValue("CompileIL",
                             CompileIL.ToString());
+                xWriteValue("dotNETFrameworkImplementation",
+                            dotNETFrameworkImplementation.ToString());
                 xWriteValue("DebugComMode", DebugComMode.ToString());
                 xWriter.WriteEndDocument();
                 xWriter.Flush();
@@ -195,6 +203,11 @@ namespace Cosmos.Compiler.Builder {
         public static bool ShowOptions { get; set; }
         public static bool CompileIL { get; set; }
         public static string BuildPath {
+            get;
+            set;
+        }
+
+        public static dotNETFrameworkImplementationEnum dotNETFrameworkImplementation {
             get;
             set;
         }

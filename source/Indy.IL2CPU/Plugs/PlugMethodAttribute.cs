@@ -6,5 +6,7 @@ namespace Indy.IL2CPU.Plugs {
 		public string Signature = null;
 		public bool Enabled = true;
 		public Type Assembler = null;
+        public bool IsMonoOnly = false;
+        public bool IsMicrosoftdotNETOnly = false;
 	}
 }

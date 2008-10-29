@@ -7,8 +7,7 @@ using Indy.IL2CPU.Plugs;
 
 namespace Indy.IL2CPU.IL.CustomImplementations.System
 {
-
-    [Plug(TargetName="System.Number, mscorlib")] // not sure about FQN or not, also have a look at the param name
+    [Plug(TargetName="System.Number, mscorlib", IsMicrosoftdotNETOnly=true)] // not sure about FQN or not, also have a look at the param name
     public static class NumberImpl
     {
         public static string FormatInt32(int aInt, string aStr, NumberFormatInfo aFormat)

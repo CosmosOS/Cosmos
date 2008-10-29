@@ -22,5 +22,8 @@ namespace Indy.IL2CPU.Plugs {
 			get;
 			set;
 		}
+
+        public bool IsMonoOnly = false;
+        public bool IsMicrosoftdotNETOnly = false;
 	}
 }

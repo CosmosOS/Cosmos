@@ -118,9 +118,18 @@ namespace Cosmos.Compiler.Builder {
                     throw new Exception("Debug mode not supported: " + mOptionsUC.DebugMode);
                 }
             }
+            if (mOptionsUC.rdioQEMU.IsChecked.Value) {
+                xQEMU = mBuilder.MakeQEMU(Options.CreateHDImage,
+                                          Options.UseGDB,
+                                          false,
+                                          "",
+                                          Options.UseNetworkTAP,
+                                          (String)Options.QEmuNetworkCard[Options.NetworkCard],
+                                          (String)Options.QEmuAudioCard[Options.AudioCard]);
+            }
 
-                
-            
+
+
             // Problems around with DebugWindow getting stuck, this seems to work
             mMainWindow.Hide();
             if (xDebugWindow != null) {

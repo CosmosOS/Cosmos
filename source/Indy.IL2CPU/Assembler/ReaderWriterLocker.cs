@@ -8,14 +8,14 @@ namespace Indy.IL2CPU.Assembler {
     /// implementation, and automatically upgrades reader locks, if neccessary.
     /// </summary>
     public sealed class ReaderWriterLocker {
-        private readonly ReaderWriterLockSlim mLock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+        private readonly ReaderWriterLock mLock = new ReaderWriterLock();
 
         /// <summary>
         /// Returns whether or not a writer lock is currently held.
         /// </summary>
         public bool WriterLockHeld {
             get {
-                return mLock.IsWriteLockHeld;
+                return mLock.IsWriterLockHeld;
             }
         }
 
@@ -24,7 +24,7 @@ namespace Indy.IL2CPU.Assembler {
         /// </summary>
         public bool ReaderLockHeld {
             get {
-                return mLock.IsReadLockHeld || mLock.IsWriteLockHeld;
+                return mLock.IsReaderLockHeld || mLock.IsWriterLockHeld;
             }
         }
 
@@ -34,10 +34,10 @@ namespace Indy.IL2CPU.Assembler {
         /// <returns>A <see cref="IDisposable"/> implementation, which releases the reader lock on disposal, or null if there was
         /// already a reader lock held.</returns>
         public IDisposable AcquireReaderLock() {
-            if (mLock.IsReadLockHeld || mLock.IsWriteLockHeld) {
+            if (mLock.IsReaderLockHeld || mLock.IsWriterLockHeld) {
                 return null;
             }
-            mLock.EnterReadLock();
+            mLock.AcquireReaderLock(-1);
             return new ReadUnlocker(mLock);
         }
 
@@ -47,52 +47,52 @@ namespace Indy.IL2CPU.Assembler {
         /// <returns>A <see cref="IDisposable"/> implementation, which restores the lock state on disposal, or null if there was
         /// already a reader lock held.</returns>
         public IDisposable AcquireWriterLock() {
-            if (mLock.IsWriteLockHeld) {
+            if (mLock.IsWriterLockHeld) {
                 return null;
             }
-            if (mLock.IsReadLockHeld) {
+            if (mLock.IsReaderLockHeld) {
                 return new UpgradedReadLock(mLock);
             }
-            mLock.EnterWriteLock();
+            mLock.AcquireWriterLock(-1);
             return new WriteUnlocker(mLock);
         }
 
         private sealed class ReadUnlocker : IDisposable {
-            private readonly ReaderWriterLockSlim mLock;
+            private readonly ReaderWriterLock mLock;
 
-            public ReadUnlocker(ReaderWriterLockSlim theLock) {
+            public ReadUnlocker(ReaderWriterLock theLock) {
                 mLock = theLock;
             }
 
             public void Dispose() {
-                mLock.ExitReadLock();
+                mLock.ReleaseReaderLock();
             }
         }
 
         private sealed class UpgradedReadLock : IDisposable {
-            private readonly ReaderWriterLockSlim mLock;
+            private readonly ReaderWriterLock mLock;
 
-            public UpgradedReadLock(ReaderWriterLockSlim aLock) {
+            public UpgradedReadLock(ReaderWriterLock aLock) {
                 mLock = aLock;
-                aLock.ExitReadLock();
-                aLock.EnterWriteLock();
+                aLock.ReleaseReaderLock();
+                aLock.AcquireWriterLock(-1);
             }
 
             public void Dispose() {
-                mLock.ExitWriteLock();
-                mLock.EnterReadLock();
+                mLock.ReleaseWriterLock();
+                mLock.AcquireReaderLock(-1);
             }
         }
 
         private sealed class WriteUnlocker : IDisposable {
-            private readonly ReaderWriterLockSlim mLock;
+            private readonly ReaderWriterLock mLock;
 
-            public WriteUnlocker(ReaderWriterLockSlim theLock) {
+            public WriteUnlocker(ReaderWriterLock theLock) {
                 mLock = theLock;
             }
 
             public void Dispose() {
-                mLock.ExitWriteLock();
+                mLock.ReleaseWriterLock();
             }
         }
     }

@@ -8,7 +8,6 @@ namespace Indy.IL2CPU {
     public class PassedEngineValue {
         public string aAssembly;
         public TargetPlatformEnum aTargetPlatform;
-        public Func<string, string> aGetFileNameForGroup;
         public IEnumerable<string> aPlugs;
         public DebugMode aDebugMode;
         public byte aDebugComNumber;
@@ -17,7 +16,6 @@ namespace Indy.IL2CPU {
         
         public PassedEngineValue(string aAssembly,
          TargetPlatformEnum aTargetPlatform,
-         Func<string, string> aGetFileNameForGroup,
          IEnumerable<string> aPlugs,
          DebugMode aDebugMode,
          byte aDebugComNumber,
@@ -25,7 +23,6 @@ namespace Indy.IL2CPU {
          , TraceAssemblies aTraceAssemblies) {
             this.aAssembly = aAssembly;
             this.aTargetPlatform = aTargetPlatform;
-            this.aGetFileNameForGroup = aGetFileNameForGroup;
             this.aPlugs = aPlugs;
             this.aDebugMode = aDebugMode;
             this.aDebugComNumber = aDebugComNumber;

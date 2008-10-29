@@ -28,10 +28,24 @@ namespace Cosmos.Compiler.Builder {
         
         public void BeginBuild(Builder aBuilder, DebugMode aDebugMode, byte aComPort) {
             mBuilder = aBuilder;
-            aBuilder.Engine.CompilingMethods += new Action<int, int>(Engine_CompilingMethods);
-            aBuilder.Engine.CompilingStaticFields += new Action<int, int>(Engine_CompilingStaticFields);
-            aBuilder.CompileCompleted += new Action(aBuilder_CompileCompleted);
+            aBuilder.CompilingMethods += new Action<int, int>(Engine_CompilingMethods);
+            aBuilder.CompilingStaticFields += new Action<int, int>(Engine_CompilingStaticFields);
+            aBuilder.CompileCompleted += aBuilder_CompileCompleted;
+            aBuilder.LogMessage += aBuilder_LogMessage;
             aBuilder.BeginCompile(aDebugMode, aComPort);
+        }
+
+        protected void aBuilder_LogMessage(LogSeverityEnum aSeverity, string aMessage) {
+            var xAction = (Action)delegate() {
+                listErrors.Items.Add(String.Format("{0} - {1}",
+                                               aSeverity,
+                                               aMessage));
+            };
+            // Do not use BeginInvoke - if BeginInvoke is used these stack up 
+            // and continue to come in and tie up the main thread after the engine completes
+            // and the window is closed
+            Dispatcher.Invoke(xAction);
+            
         }
 
         protected void Engine_CompilingStaticFields(int aValue, int aMax) {
@@ -64,9 +78,10 @@ namespace Cosmos.Compiler.Builder {
         protected void aBuilder_CompileCompleted() {
             Dispatcher.BeginInvoke(
              (Action)delegate() {
-                CompileCompleted.Invoke();
-             }
-            );
+                         if (listErrors.Items.Count == 0) {
+                             CompileCompleted.Invoke();
+                         }
+                     });
         }
 
     }

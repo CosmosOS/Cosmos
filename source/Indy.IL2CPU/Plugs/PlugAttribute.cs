@@ -5,5 +5,7 @@ namespace Indy.IL2CPU.Plugs {
 	public sealed class PlugAttribute: Attribute {
 		public Type Target;
 		public string TargetName;
+	    public bool IsMonoOnly = false;
+	    public bool IsMicrosoftdotNETOnly = false;
 	}
 }

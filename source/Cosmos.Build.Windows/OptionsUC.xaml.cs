@@ -199,6 +199,12 @@ namespace Cosmos.Compiler.Builder {
             if (cmboUSBDevice.SelectedItem != null) {
                 Options.USBDevice = cmboUSBDevice.Text;
             }
+            if (rdioMSNET.IsChecked.Value) {
+                Options.dotNETFrameworkImplementation = dotNETFrameworkImplementationEnum.Microsoft;
+            }
+            if(rdioProjectMono.IsChecked.Value){
+                Options.dotNETFrameworkImplementation = dotNETFrameworkImplementationEnum.ProjectMono;
+            }
             Options.ShowOptions = chbxShowOptions.IsChecked.Value;
             Options.CompileIL = chbxCompileIL.IsChecked.Value;
             Options.DebugComMode = cmbDebugComMode.Text;
@@ -261,7 +267,18 @@ namespace Cosmos.Compiler.Builder {
                         rdVMWareWorkstation.IsChecked = true;
                         break;
                 }
-                cmbDebugComMode.SelectedIndex = cmbDebugComMode.Items.IndexOf(Options.DebugComMode);
+            switch(Options.dotNETFrameworkImplementation) {
+                case dotNETFrameworkImplementationEnum.Microsoft:
+                    rdioMSNET.IsChecked = true;
+                    break;
+                case dotNETFrameworkImplementationEnum.ProjectMono:
+                    rdioProjectMono.IsChecked = true;
+                    break;
+                    default: // safe programming
+                    throw new Exception(".NET Framework implementation '" + Options.dotNETFrameworkImplementation.ToString() + "' not supported!");
+
+            }
+            cmbDebugComMode.SelectedIndex = cmbDebugComMode.Items.IndexOf(Options.DebugComMode);
                 // USB
                 // Combo is lazy loaded, so we just store it for later
                 mLastSelectedUSBDrive = Options.USBDevice;

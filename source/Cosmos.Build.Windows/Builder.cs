@@ -10,6 +10,8 @@ using System.Threading;
 using Microsoft.Win32;
 using Indy.IL2CPU;
 using Indy.IL2CPU.IL.X86;
+using IL2CPU;
+using System.IO.Pipes;
 
 namespace Cosmos.Compiler.Builder {
 
@@ -48,6 +50,8 @@ namespace Cosmos.Compiler.Builder {
                     }
                     xResult = xResult.Substring(0, xPos) + @"Build\";
                     Options.BuildPath = xResult;
+                }else {
+                    xResult = Options.BuildPath;
                 }
 
                 if (string.IsNullOrEmpty(xResult)) {
@@ -105,13 +109,148 @@ namespace Cosmos.Compiler.Builder {
         }
 
         public event Action CompileCompleted;
+        public event Action<int, int> CompilingMethods;
+        public event Action<int, int> CompilingStaticFields;
+        public event Action<LogSeverityEnum, string> LogMessage;
+        private void OnCompilingMethods(int aCur, int aMax) {
+            if (CompilingMethods != null) { CompilingMethods(aCur, aMax); }
+        }
+
+        private void OnCompilingStaticFields(int aCur, int aMax) {
+            if (CompilingStaticFields != null) { CompilingStaticFields(aCur, aMax); }
+        }
+
+        private void OnLogMessage(LogSeverityEnum aSeverity, string aMessage) {
+            if (LogMessage != null) { LogMessage(aSeverity, aMessage); }
+        }
     
         protected void ThreadExecute(object aParam) {
             var xParam = (PassedEngineValue)aParam;
             Engine.TraceAssemblies = xParam.TraceAssemblies;
-            Engine.Execute(xParam.aAssembly, xParam.aTargetPlatform, xParam.aGetFileNameForGroup
-             , xParam.aPlugs, xParam.aDebugMode, 1
-             , xParam.aOutputDir);
+            Engine.CompilingMethods += OnCompilingMethods;
+            Engine.CompilingStaticFields += OnCompilingStaticFields;
+            try {
+                Engine.DebugLog += OnLogMessage;
+                Engine.Execute(xParam.aAssembly,
+                               xParam.aTargetPlatform,
+                               g => Path.Combine(AsmPath,
+                                                 g + ".asm"),
+                               xParam.aPlugs,
+                               xParam.aDebugMode,
+                               1,
+                               xParam.aOutputDir);
+            }catch(Exception E) {
+                
+            }
+            CompileCompleted.Invoke();
+        }
+
+        private string GetMonoExeFilename() {
+            return Path.Combine(Path.Combine(Path.Combine(Path.Combine(GetBuildPath(),
+                                                                       "Tools"),
+                                                          "Mono"),
+                                             "bin"),
+                                "mono.exe");
+        }
+
+        private string GetMonoLibDir() {
+            return Path.Combine(Path.Combine(Path.Combine(GetBuildPath(),
+                                                          "Tools"),
+                                             "Mono"),
+                                "lib");
+        }
+
+        protected void MonoThreadExecute(object aParam) {
+            var xParam = (PassedEngineValue)aParam;
+            var xExeParamsBuilder = new StringBuilder();
+            xExeParamsBuilder.AppendFormat("\"{0}\" ",
+                                           typeof(IL2CPU.Program).Assembly.Location);
+            xExeParamsBuilder.AppendFormat("/assembly \"{0}\" ",
+                                           xParam.aAssembly);
+            if (xParam.aOutputDir.EndsWith("\\")) {
+                xExeParamsBuilder.AppendFormat("/output \"{0}\\\" ",
+                                            xParam.aOutputDir);
+            } else {
+                xExeParamsBuilder.AppendFormat("/output \"{0}\" ",
+                                               xParam.aOutputDir);
+            }
+            xExeParamsBuilder.AppendFormat("/trace \"{0}\" ",
+                                           xParam.TraceAssemblies.ToString());
+            xExeParamsBuilder.AppendFormat("/target X86 ");
+            xExeParamsBuilder.AppendFormat("/comport 1 ");
+            foreach (var xPlug in xParam.aPlugs) {
+                xExeParamsBuilder.AppendFormat("/plug \"{0}\" ",
+                                               xPlug);
+            }
+            xExeParamsBuilder.AppendFormat("/logpipe CosmosCompileLog");
+            //var xProcess = Process.Start(@"C:\Program Files\Mono-2.0.1\bin\mono.exe",
+            //                             xExeParamsBuilder.ToString());
+            var xProcessStartInfo = new ProcessStartInfo(GetMonoExeFilename());
+            //var xProcessStartInfo = new ProcessStartInfo(typeof(IL2CPU.Program).Assembly.Location);
+            xProcessStartInfo.Arguments = xExeParamsBuilder.ToString();
+            xProcessStartInfo.RedirectStandardError = true;
+            xProcessStartInfo.RedirectStandardInput = true;
+            xProcessStartInfo.RedirectStandardOutput = true;
+            xProcessStartInfo.EnvironmentVariables.Add("MONO_PATH", GetMonoLibDir());
+            xProcessStartInfo.UseShellExecute = false;
+            using (var xLogStream= new System.IO.Pipes.NamedPipeServerStream("CosmosCompileLog",PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous | PipeOptions.WriteThrough)) {
+                AutoResetEvent xWaitForConEvent = new AutoResetEvent(false);
+                var xAsyncCookie = xLogStream.BeginWaitForConnection(delegate { xWaitForConEvent.Set(); }, null);
+                var xProcess = Process.Start(xProcessStartInfo);
+                try {
+                    while (!xProcess.HasExited) {
+                        if (xWaitForConEvent.WaitOne(100)) {
+                            break;
+                        }
+                    }
+                    xLogStream.EndWaitForConnection(xAsyncCookie);
+                    bool xRunning = true;
+                        do {
+                            //while (!xLogStream.DataAvailable) { Thread.Sleep(15); }
+                            var xBuff = new byte[1];
+                            if (xLogStream.Read(xBuff, 0, 1) != 1) { throw new Exception("No Command received!"); }
+                            switch (xBuff[0]) {
+                                case (byte)LogChannelCommand.CompilingMethods: {
+                                        xBuff = new byte[8];
+                                        if (xLogStream.Read(xBuff, 0, 8) != 8) { throw new Exception("No complete CompilingMethods data received!"); }
+                                        var xCurrent = BitConverter.ToInt32(xBuff, 0);
+                                        var xMax = BitConverter.ToInt32(xBuff, 4);
+                                        OnCompilingMethods(xCurrent, xMax);
+                                        break;
+                                    }
+                                case (byte)LogChannelCommand.CompilingFields: {
+                                        xBuff = new byte[8];
+                                        if (xLogStream.Read(xBuff, 0, 8) != 8) { throw new Exception("No complete CompilingFields data received!"); }
+                                        var xCurrent = BitConverter.ToInt32(xBuff, 0);
+                                        var xMax = BitConverter.ToInt32(xBuff, 4);
+                                        OnCompilingStaticFields(xCurrent, xMax);
+                                        break;
+                                    }
+                                case (byte)LogChannelCommand.LogMessage: {
+                                        xBuff = new byte[5];
+                                        if (xLogStream.Read(xBuff, 0, 5) != 5) { throw new Exception("No complete LogMessage data received!"); }
+                                        var xSeverity = (LogSeverityEnum)xBuff[0];
+                                        var xStringLength = BitConverter.ToInt32(xBuff, 1);
+                                        xBuff = new byte[xStringLength];
+                                        if (xLogStream.Read(xBuff, 0, xStringLength) != xStringLength) { throw new Exception("No complete LogMessage data received! (2)"); }
+                                        var xMessage = Encoding.Unicode.GetString(xBuff);
+                                        OnLogMessage(xSeverity, xMessage);
+                                        break;
+                                    }
+                                case (byte)LogChannelCommand.EndOfProcessing: {
+                                    xRunning = false;
+                                    break;
+                                }
+                            }
+                        } while (!xProcess.HasExited && xRunning);
+                } catch (Exception E) {
+                    if (xLogStream.IsConnected && !xProcess.HasExited) {
+                        throw new Exception("Error while processing log command", E);
+                    }
+                }
+                if (!xProcess.HasExited) { xProcess.Kill(); }
+            }
+            // at the end:
             CompileCompleted.Invoke();
         }
 
@@ -121,16 +260,20 @@ namespace Cosmos.Compiler.Builder {
             }
             Assembly xTarget = System.Reflection.Assembly.GetEntryAssembly();
             var xEngineParams = new PassedEngineValue(xTarget.Location, TargetPlatformEnum.X86
-             , g => Path.Combine(AsmPath, g + ".asm")
-             , new string[] {
-                Path.Combine(Path.Combine(ToolsPath, "Cosmos.Kernel.Plugs"), "Cosmos.Kernel.Plugs.dll"), 
-                Path.Combine(Path.Combine(ToolsPath, "Cosmos.Hardware.Plugs"), "Cosmos.Hardware.Plugs.dll"), 
-                Path.Combine(Path.Combine(ToolsPath, "Cosmos.Sys.Plugs"), "Cosmos.Sys.Plugs.dll")
-             }
-             , aDebugMode, aDebugComport, AsmPath, Options.TraceAssemblies);
-            
-            var xThread = new Thread(new ParameterizedThreadStart(ThreadExecute));
-            xThread.Start(xEngineParams);
+                , new string[] {
+                    Path.Combine(Path.Combine(ToolsPath, "Cosmos.Kernel.Plugs"), "Cosmos.Kernel.Plugs.dll"), 
+                    Path.Combine(Path.Combine(ToolsPath, "Cosmos.Hardware.Plugs"), "Cosmos.Hardware.Plugs.dll"), 
+                    Path.Combine(Path.Combine(ToolsPath, "Cosmos.Sys.Plugs"), "Cosmos.Sys.Plugs.dll")
+                }
+                 , aDebugMode, aDebugComport, AsmPath, Options.TraceAssemblies);
+
+            if (Options.dotNETFrameworkImplementation == dotNETFrameworkImplementationEnum.Microsoft) {
+                var xThread = new Thread(new ParameterizedThreadStart(ThreadExecute));
+                xThread.Start(xEngineParams);
+            }else {
+                var xThread = new Thread(MonoThreadExecute);
+                xThread.Start(xEngineParams);
+            }
         }
         
         public void Assemble() {
@@ -208,7 +351,7 @@ namespace Cosmos.Compiler.Builder {
                 // Boot CD ROM
                 + " -boot d"
                 // Audio hardware
-                + " -soundhw " + aAudioCard
+                + (String.IsNullOrEmpty(aAudioCard as String) ? "" : " -soundhw " + aAudioCard)
                 // Setup serial port
                 // Might allow serial file later for post debugging of CPU
                 // etc since serial to TCP on a byte level is likely highly innefficient
@@ -221,10 +364,10 @@ namespace Cosmos.Compiler.Builder {
                 // Enable acceleration if we are not using GDB
                 + (aGDB ? " -S -s" : " -kernel-kqemu")
                 // Ethernet card
-                + string.Format(" -net nic,model={0},macaddr=52:54:00:12:34:57", aNetworkCard)
+                + (String.IsNullOrEmpty(aNetworkCard as String) ? "" : string.Format(" -net nic,model={0},macaddr=52:54:00:12:34:57", aNetworkCard))
                 //+ " -redir tcp:5555::23" //use f.instance 'telnet localhost 5555' or 'http://localhost:5555/' to access machine
-                + (aUseNetworkTap ? " -net tap,ifname=CosmosTAP" : "") //requires TAP installed on development computer
-                + " -net user\""
+                + (String.IsNullOrEmpty(aNetworkCard as String) ? "" :(aUseNetworkTap ? " -net tap,ifname=CosmosTAP" : "") //requires TAP installed on development computer
+                + " -net user\"")
                 , ToolsPath + @"qemu", false, true);
 
             if (aGDB) {

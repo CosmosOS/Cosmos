@@ -71,7 +71,7 @@ namespace Indy.IL2CPU {
         }
     }
 
-    public enum LogSeverityEnum { Warning, Error }
+    public enum LogSeverityEnum:byte { Warning = 0, Error = 1, Informational = 2 }
 
     public delegate void DebugLogHandler(LogSeverityEnum aSeverity, string aMessage);
 
@@ -149,7 +149,7 @@ namespace Indy.IL2CPU {
                 if (aGetFileNameForGroup == null) {
                     throw new ArgumentNullException("aGetFileNameForGroup");
                 }
-                mCrawledAssembly = Assembly.LoadFile(aAssembly);
+                mCrawledAssembly = Assembly.LoadFrom(aAssembly);
                 mDebugMode = aDebugMode;
                 MethodInfo xEntryPoint = (MethodInfo)mCrawledAssembly.EntryPoint;
                 if (xEntryPoint == null) {
@@ -160,6 +160,7 @@ namespace Indy.IL2CPU {
                 Type xEntryPointType = xEntryPoint.DeclaringType;
                 xEntryPoint = xEntryPointType.GetMethod("Init", new Type[0]);
                 mDebugComport = aDebugComNumber;
+                AppDomain.CurrentDomain.AppendPrivatePath(Path.GetDirectoryName(mCrawledAssembly.Location));
                 //List<string> xSearchDirs = new List<string>(new string[] { Path.GetDirectoryName(aAssembly), aAssemblyDir });
                 //xSearchDirs.AddRange((from item in aPlugs
                 //                      select Path.GetDirectoryName(item)).Distinct());
@@ -347,8 +348,8 @@ namespace Indy.IL2CPU {
         }
 
         // EDIT BELOW TO CHANGE THREAD COUNT:
-        private int mThreadCount = Environment.ProcessorCount;
-        private AutoResetEvent[] mThreadEvents = new AutoResetEvent[Environment.ProcessorCount];
+        private int mThreadCount = 1;// Environment.ProcessorCount;
+        private AutoResetEvent[] mThreadEvents = new AutoResetEvent[1];//new AutoResetEvent[mThreadCount];
 
         private void ScanAllMethods() {
             for (int i = 0; i < mThreadCount; i++) {
@@ -1206,6 +1207,7 @@ namespace Indy.IL2CPU {
                     xCurrentMethod = mMethods.Keys.ElementAt(i);
                 }
                 CompilingMethods(i, xCount);
+                OnDebugLog(LogSeverityEnum.Warning, "Processing method {0}", xCurrentMethod.GetFullName());
                 try {
                     EmitDependencyGraphLine(true, xCurrentMethod.GetFullName());
                     mAssembler.CurrentGroup = GetGroupForType(xCurrentMethod.DeclaringType);
@@ -1611,6 +1613,12 @@ namespace Indy.IL2CPU {
                                    select new KeyValuePair<Type, PlugAttribute>(item,
                                                                                 (PlugAttribute)xCustomAttribs[0]))) {
                 PlugAttribute xPlugAttrib = xType.Value;
+                if (xPlugAttrib.IsMonoOnly && !RunningOnMono) {
+                    continue;
+                }
+                if (xPlugAttrib.IsMicrosoftdotNETOnly && RunningOnMono) {
+                    continue;
+                }
                 Type xTypeRef = xPlugAttrib.Target;
                 if (xTypeRef == null) {
                     xTypeRef = Type.GetType(xPlugAttrib.TargetName,
@@ -1628,6 +1636,12 @@ namespace Indy.IL2CPU {
                                         xPlugFields = new Dictionary<string, PlugFieldAttribute>());
                     }
                     foreach (var xPlugField in xTypePlugFields) {
+                        if (xPlugAttrib.IsMonoOnly && !RunningOnMono) {
+                            continue;
+                        }
+                        if (xPlugAttrib.IsMicrosoftdotNETOnly && RunningOnMono) {
+                            continue;
+                        }
                         if (!xPlugFields.ContainsKey(xPlugField.FieldId)) {
                             xPlugFields.Add(xPlugField.FieldId,
                                             xPlugField);
@@ -1642,6 +1656,12 @@ namespace Indy.IL2CPU {
                     if (xPlugMethodAttrib != null) {
                         xSignature = xPlugMethodAttrib.Signature;
                         if (!xPlugMethodAttrib.Enabled) {
+                            continue;
+                        }
+                        if (xPlugAttrib.IsMonoOnly && !RunningOnMono) {
+                            continue;
+                        }
+                        if (xPlugAttrib.IsMicrosoftdotNETOnly && RunningOnMono) {
                             continue;
                         }
                         if (!String.IsNullOrEmpty(xSignature)) {
@@ -1915,7 +1935,10 @@ namespace Indy.IL2CPU {
                     if (xFieldType == null) {
                         xFieldType = xItem.FieldType;
                     }
-                    if ((xFieldType.IsClass && !xFieldType.IsValueType) || xItem.IsExternalValue) {
+                    if(xFieldType == null) {
+                        Engine.mCurrent.OnDebugLog(LogSeverityEnum.Error, "Plugged field {0} not found! (On Type {1})", xItem.FieldId, aType.AssemblyQualifiedName);
+                    }
+                    if (xItem.IsExternalValue||(xFieldType.IsClass && !xFieldType.IsValueType)) {
                         xFieldSize = 4;
                     } else {
                         xFieldSize = GetFieldStorageSize(xFieldType);
@@ -2300,9 +2323,11 @@ namespace Indy.IL2CPU {
             if (mEmitDependencyGraph) {
                 File.Delete(@"d:\dependencygraph.txt");
             }
+            RunningOnMono = Type.GetType("Mono.Runtime") != null;
         }
 
         #endregion
 
+        public static readonly bool RunningOnMono;
     }
 }
