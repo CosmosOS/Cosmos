@@ -505,6 +505,7 @@
     <Compile Include="IL\x86\CustomImplementations\Diagnostics\DebuggerImpl.cs" />
     <Compile Include="IL\x86\CustomImplementations\Diagnostics\DebugImpl.cs" />
     <Compile Include="IL\x86\CustomImplementations\Diagnostics\DebugImplRefs.cs" />
+    <Compile Include="IL\x86\CustomImplementations\Mono\System\StringImpl.cs" />
     <Compile Include="IL\x86\CustomImplementations\System.Runtime.CompilerServices\RuntimeHelpersImpl.cs" />
     <Compile Include="IL\x86\CustomImplementations\System\ArrayImpl.cs" />
     <Compile Include="IL\x86\CustomImplementations\System\Assemblers\Array_InternalCopy.cs" />
@@ -520,8 +521,7 @@
     <Compile Include="IL\x86\CustomImplementations\System\MulticastDelegateImplRefs.cs" />
     <Compile Include="IL\x86\CustomImplementations\System\ObjectImpl.cs" />
     <Compile Include="IL\x86\CustomImplementations\System\ObjectImplRefs.cs" />
-    <Compile Include="IL\x86\CustomImplementations\System\StringImpl.cs" />
-    <Compile Include="IL\x86\CustomImplementations\System\StringImplRefs.cs" />
+    <Compile Include="IL\x86\CustomImplementations\MS\System\StringImpl.cs" />
     <Compile Include="IL\x86\Div.cs" />
     <Compile Include="IL\x86\Div_Un.cs" />
     <Compile Include="IL\x86\Dup.cs" />
@@ -666,6 +666,7 @@
     <Folder Include="Assembler\x86\SSSE3\" />
     <Folder Include="Assembler\x86\VTAndUp\" />
     <Folder Include="Assembler\x86\x87\" />
+    <Folder Include="IL\x86\CustomImplementations\Generic\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

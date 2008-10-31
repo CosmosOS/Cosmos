@@ -1207,7 +1207,7 @@ namespace Indy.IL2CPU {
                     xCurrentMethod = mMethods.Keys.ElementAt(i);
                 }
                 CompilingMethods(i, xCount);
-                OnDebugLog(LogSeverityEnum.Warning, "Processing method {0}", xCurrentMethod.GetFullName());
+                OnDebugLog(LogSeverityEnum.Informational, "Processing method {0}", xCurrentMethod.GetFullName());
                 try {
                     EmitDependencyGraphLine(true, xCurrentMethod.GetFullName());
                     mAssembler.CurrentGroup = GetGroupForType(xCurrentMethod.DeclaringType);

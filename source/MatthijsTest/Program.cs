@@ -29,31 +29,32 @@ namespace MatthijsTest {
         #endregion
 
         public static void Init() {
-            bool xTest = true;
+            bool xTest = false;
             if (xTest)
             {
                 var xBoot = new Cosmos.Sys.Boot();
                 xBoot.Execute();
             }
-            while(true) {
-                Console.Write("/0/>");
-                string xCommand = Console.ReadLine();
-                if(xCommand.StartsWith("dir")) {
-                    HandleDir();
-                    continue;
-                }
-                if (xCommand.StartsWith("type ")) {
-                    HandleType(xCommand);
-                    continue;
-                }
-                if(xCommand.StartsWith("net broadcast ")) {
-                    HandleSendBroadCast(xCommand);
-                    return;
-                }
-                Console.Write("Command '");
-                Console.WriteLine(xCommand);
-                Console.WriteLine("' not found!");
-            }
+            //while(true) {
+            //    Console.Write("/0/>");
+            //    string xCommand = Console.ReadLine();
+            //    if(xCommand.StartsWith("dir")) {
+            //        HandleDir();
+            //        continue;
+            //    }
+            //    if (xCommand.StartsWith("type ")) {
+            //        HandleType(xCommand);
+            //        continue;
+            //    }
+            //    if(xCommand.StartsWith("net broadcast ")) {
+            //        HandleSendBroadCast(xCommand);
+            //        return;
+            //    }
+            //    Console.Write("Command '");
+            //    Console.WriteLine(xCommand);
+            //    Console.WriteLine("' not found!");
+            //}
+            Console.WriteLine("Cosmos booted!");
         }
 
         private static void HandleSendBroadCast(string command) {

@@ -2,8 +2,8 @@
 using System.Linq;
 using Indy.IL2CPU.Plugs;
 
-namespace Indy.IL2CPU.IL.X86.CustomImplementations.System {
-	[Plug(Target = typeof(String))]
+namespace Indy.IL2CPU.IL.X86.CustomImplementations.MS.System {
+	[Plug(Target = typeof(String), IsMicrosoftdotNETOnly = true)]
 	[PlugField(FieldId = "$$Storage$$", FieldType = typeof(char[]))]
 	[PlugField(FieldId = "System.Char System.String.m_firstChar", IsExternalValue = true)]
 	public static class StringImpl {

@@ -121,6 +121,8 @@ namespace Cosmos.Compiler.Builder {
         }
 
         private void OnLogMessage(LogSeverityEnum aSeverity, string aMessage) {
+            if (aSeverity == LogSeverityEnum.Informational) {
+                return; }
             if (LogMessage != null) { LogMessage(aSeverity, aMessage); }
         }
     
