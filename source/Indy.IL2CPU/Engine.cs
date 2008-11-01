@@ -178,13 +178,13 @@ namespace Indy.IL2CPU {
                 }
                 InitializePlugs(aPlugs);
                 using (mAssembler) {
+                    mAssembler.Initialize();
                     //mAssembler.OutputType = Assembler.Win32.Assembler.OutputTypeEnum.Console;
                     //foreach (string xPlug in aPlugs) {
                     //this.I
                     List<Assembly> xAppDefs = new List<Assembly>();
                     xAppDefs.Add(mCrawledAssembly);
                     mAssembler.MainGroup = "main";
-                    mAssembler.CurrentGroup = "main";
                     AssemblyEqualityComparer xComparer = new AssemblyEqualityComparer();
                     foreach (Assembly xAsm in AppDomain.CurrentDomain.GetAssemblies()) {
                         Assembly xAssemblyDef = Assembly.LoadFrom(xAsm.Location);
@@ -192,19 +192,6 @@ namespace Indy.IL2CPU {
                             xAppDefs.Add(xAssemblyDef);
                         }
                     }
-                    //for (int i = 0; i < xAppDefs.Count; i++) {
-                    //    Assembly xCurDef = xAppDefs[i];
-                    //    foreach (ModuleDefinition xModDef in xCurDef.Modules) {
-                    //        foreach (AssemblyNameReference xAssemblyNameRef in xModDef.AssemblyReferences) {
-                    //            Assembly xReffedAssemblyDef = mCrawledAssembly.Resolver.Resolve(xAssemblyNameRef);
-                    //            if (xReffedAssemblyDef != null) {
-                    //                if (!xAppDefs.Contains(xReffedAssemblyDef, new AssemblyEqualityComparer())) {
-                    //                    xAppDefs.Add(xReffedAssemblyDef);
-                    //                }
-                    //            }
-                    //        }
-                    //    }
-                    //}
                     mMap.Initialize(mAssembler, xAppDefs);
                     //!String.IsNullOrEmpty(aDebugSymbols);
                     IL.Op.QueueMethod += QueueMethod;
@@ -294,9 +281,7 @@ namespace Indy.IL2CPU {
                                     break;
                                 }
                             } while (true);
-                            mAssembler.CurrentGroup = "main";
                         // initialize the runtime engine
-                        mAssembler.CurrentGroup = "main";
                         MainEntryPointOp xEntryPointOp = (MainEntryPointOp)GetOpFromType(mMap.MainEntryPointOp,
                                                                                          null,
                                                                                          null);
@@ -337,7 +322,9 @@ namespace Indy.IL2CPU {
                             }
                         }
                     } finally {
-                        mAssembler.Flush();
+                        using (StreamWriter xOutput = new StreamWriter(aGetFileNameForGroup("main"))) {
+                            mAssembler.FlushText(xOutput);
+                        }
                         IL.Op.QueueMethod -= QueueMethod;
                         IL.Op.QueueStaticField -= QueueStaticField;
                     }
@@ -393,7 +380,6 @@ namespace Indy.IL2CPU {
                     //ProgressChanged.Invoke(String.Format("Scanning method: {0}", xCurrentMethod.GetFullName()));
                     EmitDependencyGraphLine(true, xCurrentMethod.GetFullName());
                     try {
-                        mAssembler.CurrentGroup = GetGroupForType(xCurrentMethod.DeclaringType);
                         RegisterType(xCurrentMethod.DeclaringType);
                         using (mMethodsLocker.AcquireReaderLock()) {
                             mMethods[xCurrentMethod].PreProcessed = true;
@@ -1088,10 +1074,9 @@ namespace Indy.IL2CPU {
                 }
                 CompilingStaticFields(i, xCount);
                 //ProgressChanged.Invoke(String.Format("Processing static field: {0}", xCurrentField.GetFullName()));
-                mAssembler.CurrentGroup = GetGroupForType(xCurrentField.DeclaringType);
                 string xFieldName = xCurrentField.GetFullName();
                 xFieldName = DataMember.GetStaticFieldName(xCurrentField);
-                if (mAssembler.DataMembers.Count(x => x.Value.Name == xFieldName) == 0) {
+                if (mAssembler.DataMembers.Count(x => x.Name == xFieldName) == 0) {
                     var xItem = (from item in xCurrentField.GetCustomAttributes(false)
                                  where item.GetType().FullName == "ManifestResourceStreamAttribute"
                                  select item).FirstOrDefault();
@@ -1127,14 +1112,12 @@ namespace Indy.IL2CPU {
                                 }
                             }
                         }
-                        mAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>("ManifestResourceStreams",
-                                                                                        new DataMember("___" + xFieldName + "___Contents",
-                                                                                                       "incbin",
-                                                                                                       "\"" + xFileName + "\"")));
-                        mAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>("ManifestResourceStreams",
-                                                                                        new DataMember(xFieldName,
-                                                                                                       "dd",
-                                                                                                       "___" + xFieldName + "___Contents")));
+                        mAssembler.DataMembers.Add(new DataMember("___" + xFieldName + "___Contents",
+                                                                  "incbin",
+                                                                  "\"" + xFileName + "\""));
+                        mAssembler.DataMembers.Add(new DataMember(xFieldName,
+                                                                  "dd",
+                                                                  "___" + xFieldName + "___Contents"));
                     } else {
                         RegisterType(xCurrentField.FieldType);
                         int xTheSize;
@@ -1178,8 +1161,7 @@ namespace Indy.IL2CPU {
                             }
                         }
                         xTheData = xTheData.TrimEnd(',');
-                        mAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>(
-                         mAssembler.CurrentGroup, new DataMember(xFieldName, theType, xTheData)));
+                        mAssembler.DataMembers.Add(new DataMember(xFieldName, theType, xTheData));
                     }
                 }
                 using (mStaticFieldsLocker.AcquireReaderLock()) {
@@ -1210,7 +1192,6 @@ namespace Indy.IL2CPU {
                 OnDebugLog(LogSeverityEnum.Informational, "Processing method {0}", xCurrentMethod.GetFullName());
                 try {
                     EmitDependencyGraphLine(true, xCurrentMethod.GetFullName());
-                    mAssembler.CurrentGroup = GetGroupForType(xCurrentMethod.DeclaringType);
                     RegisterType(xCurrentMethod.DeclaringType);
                     if (xCurrentMethod.IsAbstract) {
                         using (mMethodsLocker.AcquireReaderLock()) {

@@ -51,10 +51,9 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
                 //xFieldData += "((__ISR_Handler_" + i.ToString("X2") + " shr 24) and 0xFF),";
                 xFieldData += "0,0,0,0,0,0,0,0,";
             }
-            aAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>(aAssembler.CurrentGroup,
-                                                                            new DataMember(xFieldName,
-                                                                                           "db",
-                                                                                           xFieldData.TrimEnd(','))));
+            aAssembler.DataMembers.Add(new DataMember(xFieldName,
+                                                      "db",
+                                                      xFieldData.TrimEnd(',')));
             xFieldData = "";
             for (int i = 0; i < 26;i++ ) {
                 xFieldData += "0,";
@@ -80,10 +79,9 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
             new Label("______AFTER__IDT__TABLE__INIT__");
             xFieldName = "_NATIVE_IDT_Pointer";
             xFieldData = "0x07FF,0,0"; //(_NATIVE_IDT_Contents and 0xFFFF),(_NATIVE_IDT_Contents shr 16)";
-            aAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>(aAssembler.CurrentGroup,
-                                                                            new DataMember(xFieldName,
-                                                                                           "dw",
-                                                                                           xFieldData)));
+            aAssembler.DataMembers.Add(new DataMember(xFieldName,
+                                                      "dw",
+                                                      xFieldData));
             new CPUx86.Move("dword [_NATIVE_IDT_Pointer + 2]",
                             "_NATIVE_IDT_Contents");
 

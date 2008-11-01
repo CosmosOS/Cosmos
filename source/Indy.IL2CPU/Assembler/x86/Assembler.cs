@@ -22,161 +22,162 @@ namespace Indy.IL2CPU.Assembler.X86 {
 			return aGroup.Replace('-','_').Replace('.', '_');
 		}
 
-		protected override void EmitCodeSectionHeader(string aGroup, TextWriter aOutputWriter) {
-			base.EmitCodeSectionHeader(aGroup, aOutputWriter);
-            using (var xAsm = new RawAssembler()) {
-			    aOutputWriter.WriteLine("section .text");
-			    if (aGroup == MainGroup) {
-				    aOutputWriter.WriteLine("global Kernel_Start");
-				    aOutputWriter.WriteLine("Kernel_Start: ");
-				    aOutputWriter.WriteLine("");
-				    aOutputWriter.WriteLine("; MultiBoot-compliant loader (e.g. GRUB or X.exe) provides info in registers: ");
-				    aOutputWriter.WriteLine("; EBX=multiboot_info ");
-				    aOutputWriter.WriteLine("; EAX=0x2BADB002 - check if it's really Multiboot loader ");
-				    aOutputWriter.WriteLine("");
-				    aOutputWriter.WriteLine("                ;- copy mb info - some stuff for you  ");
-				    //aOutputWriter.WriteLine("								mov mb_info, ebx");
-				    aOutputWriter.WriteLine("				add ebx, 4");
-				    aOutputWriter.WriteLine("				mov dword eax, [ebx]");
-				    aOutputWriter.WriteLine("				mov dword [MultiBootInfo_Memory_Low], eax");
-				    aOutputWriter.WriteLine("				add ebx, 4");
-				    aOutputWriter.WriteLine("				mov dword eax, [ebx]");
-				    aOutputWriter.WriteLine("				mov dword [MultiBootInfo_Memory_High], eax");
-				    aOutputWriter.WriteLine("");
-				    aOutputWriter.WriteLine("                mov esp,Kernel_Stack ");
-				    aOutputWriter.WriteLine("");
-				    aOutputWriter.WriteLine("; some more startups todo");
-				    aOutputWriter.WriteLine("				 cli");
-				    //aOutputWriter.WriteLine("				 push ebx");
-				    if (mComNumber > 0) {
-					    UInt16 xComAddr = mComPortAddresses[mComNumber - 1];
-                        // 9600 baud, 8 databits, no parity, 1 stopbit
-					    aOutputWriter.WriteLine("mov dx, 0x{0}", (xComAddr + 1).ToString("X"));
-					    aOutputWriter.WriteLine("mov al, 0x00");
-					    aOutputWriter.WriteLine("out DX, AL"); // disable all interrupts
-					    aOutputWriter.WriteLine("mov dx, 0x{0}", (xComAddr + 3).ToString("X"));
-					    aOutputWriter.WriteLine("mov al, 0x80");
-					    aOutputWriter.WriteLine("out DX, AL");  // Enable DLAB (set baud rate divisor)
-					    aOutputWriter.WriteLine("mov dx, 0x{0}", (xComAddr + 0).ToString("X"));
-					    aOutputWriter.WriteLine("mov al, 0x0C");
-					    aOutputWriter.WriteLine("out DX, AL");  // Set divisor (lo byte)
-					    aOutputWriter.WriteLine("mov dx, 0x{0}", (xComAddr + 1).ToString("X"));
-					    aOutputWriter.WriteLine("mov al, 0x00");
-					    aOutputWriter.WriteLine("out DX, AL");  //			  (hi byte)
-					    aOutputWriter.WriteLine("mov dx, 0x{0}", (xComAddr + 3).ToString("X"));
-					    aOutputWriter.WriteLine("mov al, 0x03");
-					    aOutputWriter.WriteLine("out DX, AL");  // 8 bits, no parity, one stop bit
-					    aOutputWriter.WriteLine("mov dx, 0x{0}", (xComAddr + 2).ToString("X"));
-					    aOutputWriter.WriteLine("mov al, 0xC7");
-					    aOutputWriter.WriteLine("out DX, AL");  // Enable FIFO, clear them, with 14-byte threshold
-					    aOutputWriter.WriteLine("mov dx, 0x{0}", (xComAddr + 4).ToString("X"));
-					    aOutputWriter.WriteLine("mov al, 0x03");
-					    aOutputWriter.WriteLine("out DX, AL");  // IRQ-s enabled, RTS/DSR set
-				    }
-
-                    // SSE init
-                    // CR4[bit 9]=1, CR4[bit 10]=1, CR0[bit 2]=0, CR0[bit 1]=1
-
-                    aOutputWriter.WriteLine("mov eax, cr4");
-                    aOutputWriter.WriteLine("or eax, 0x100");
-                    aOutputWriter.WriteLine("mov cr4, eax");
-
-                    aOutputWriter.WriteLine("mov eax, cr4");
-                    aOutputWriter.WriteLine("or eax, 0x200");
-                    aOutputWriter.WriteLine("mov cr4, eax");
-
-                    aOutputWriter.WriteLine("mov eax, cr0");
-                    aOutputWriter.WriteLine("and eax, 0xfffffffd");
-                    aOutputWriter.WriteLine("mov cr0, eax");
-
-                    aOutputWriter.WriteLine("mov eax, cr0");
-                    aOutputWriter.WriteLine("or eax, 0x1");
-                    aOutputWriter.WriteLine("mov cr0, eax");
-                    // END SSE INIT
-
-				    aOutputWriter.WriteLine("				 call " + EntryPointName);
-				    aOutputWriter.WriteLine("			.loop:");
-				    aOutputWriter.WriteLine("				 cli");
-				    aOutputWriter.WriteLine("				 hlt");
-				    aOutputWriter.WriteLine("				 jmp .loop");
-				    aOutputWriter.WriteLine("                 ");
-                    aOutputWriter.WriteLine("            DEBUG_STUB_:");
-                    aOutputWriter.WriteLine("                 ret");
-				    if (mComNumber > 0) {
-                        var xStub = new DebugStub();
-                        xStub.Main(mComPortAddresses[mComNumber - 1]);
-                    }
-                }
-                aOutputWriter.WriteLine(xAsm.GetContents());
+        public override void Initialize() {
+            base.Initialize();
+            if (mComNumber > 0) {
+                new Define("DEBUGSTUB");
             }
+            new Label("Kernel_Start");
+            new Comment("MultiBoot-compliant loader (e.g. GRUB or X.exe) provides info in registers: ");
+            new Comment("EBX=multiboot_info ");
+            new Comment("EAX=0x2BADB002 - check if it's really Multiboot loader ");
+            new Comment("                ;- copy mb info - some stuff for you  ");
+            new Add(Registers.EBX,
+                    "4");
+            new Move(Registers.EAX,
+                     Registers.AtEBX);
+            new Move("[MultiBootInfo_Memory_Low]", Registers.EAX);
+            new Add(Registers.EBX,
+                    "4");
+            new Move(Registers.EAX,
+                     Registers.AtEBX);
+            new Move("[MultiBootInfo_Memory_High]", Registers.EAX);
+            new Move(Registers.ESP,
+                     "Kernel_Stack");
+            new Comment("some more startups todo");
+            new ClrInterruptFlag();
+            if (mComNumber > 0) {
+                UInt16 xComAddr = mComPortAddresses[mComNumber - 1];
+                // 9600 baud, 8 databits, no parity, 1 stopbit
+                new Move(Registers.DX,
+                         xComAddr + 1);
+                new Move(Registers.AL,
+                         0);
+                new Out(Registers.DX,
+                        Registers.AL); // disable interrupts for serial stuff
+                new Move(Registers.DX,
+                         xComAddr + 3);
+                new Move(Registers.AL,
+                         0x80);
+                new Out(Registers.DX,
+                        Registers.AL); // Enable DLAB (set baud rate divisor)
+                new Move(Registers.DX,
+                         xComAddr);
+                new Move(Registers.AL,
+                         0x0C);
+                new Out(Registers.DX,
+                        Registers.AL); // Set divisor (lo byte)
+                new Move(Registers.DX,
+                         xComAddr + 1);
+                new Move(Registers.AL,
+                         0x00);
+                new Out(Registers.DX,
+                        Registers.AL); //			  (hi byte)
+                new Move(Registers.DX,
+                         xComAddr + 3);
+                new Move(Registers.AL,
+                         "0x03");
+                new Out(Registers.DX,
+                        Registers.AL); // 8 bits, no parity, one stop bit
+                new Move(Registers.DX,
+                         xComAddr + 2);
+                new Move(Registers.AL,
+                         0xC7);
+                new Out(Registers.DX,
+                        Registers.AL); // Enable FIFO, clear them, with 14-byte threshold
+                new Move(Registers.DX,
+                         xComAddr + 4);
+                new Move(Registers.AL,
+                         0x03);
+                new Out(Registers.DX,
+                        Registers.AL); // IRQ-s enabled, RTS/DSR set
+            }
+
+            // SSE init
+            // CR4[bit 9]=1, CR4[bit 10]=1, CR0[bit 2]=0, CR0[bit 1]=1
+            new Move(Registers.EAX,
+                     Registers.CR4);
+            new Or(Registers.EAX,
+                   0x100);
+            new Move(Registers.EAX,
+                     Registers.CR4);
+
+            new Move(Registers.EAX,
+                     Registers.CR4);
+            new Or(Registers.EAX,
+                   0x200);
+            new Move(Registers.EAX,
+                     Registers.CR4);
+
+            new Move(Registers.EAX,
+                     Registers.CR0);
+            new And(Registers.EAX,
+                    0xfffffffd);
+            new Move(Registers.EAX,
+                     Registers.CR0);
+
+            new Move(Registers.EAX,
+                     Registers.CR0);
+            new And(Registers.EAX,
+                    0x1);
+            new Move(Registers.EAX,
+                     Registers.CR0);
+            // END SSE INIT
+
+            new Call(EntryPointName);
+            new Label(".loop");
+            new ClrInterruptFlag();
+            new Halt();
+            new Jump(".loop");
+            new Label("DEBUG_STUB_");
+            new Return();
+            if (mComNumber > 0) {
+                var xStub = new DebugStub();
+                xStub.Main(mComPortAddresses[mComNumber - 1]);
+            }
+            //aOutputWriter.WriteLine("section .data");
+            var xFlags = 0x10003;
+            DataMembers.AddRange(new DataMember[]{
+                    new DataMember("MultibootSignature",
+                                   "dd",
+                                   "0x1BADB002"),
+                    new DataMember("MultibootFlags",
+                                   "dd",
+                                   xFlags.ToString()),
+                    new DataMember("MultibootChecksum",
+                                   "dd",
+                                   "0x" + (0-(xFlags + 0x1BADB002)).ToString("X")),
+                    new DataMember("MultibootHeaderAddr", "dd", "MultibootSignature"),
+                    new DataMember("MultibootLoadAddr", "dd", "MultibootSignature"),
+                    new DataMember("MultibootLoadEndAddr", "dd", "0"),
+                    new DataMember("MultibootBSSEndAddr", "dd", "0"),
+                    new DataMember("MultibootEntryAddr", "dd", "Kernel_Start"),
+                    new DataMember("MultiBootInfo_Memory_High",
+                                   "dd",
+                                   "0"),
+                    new DataMember("MultiBootInfo_Memory_Low",
+                                   "dd",
+                                   "0")});
+            DebugStub.EmitDataSection();
         }
 
-		protected override void EmitDataSectionHeader(string aGroup, TextWriter aOutputWriter) {
-			base.EmitDataSectionHeader(aGroup, aOutputWriter);
-			if (aGroup == MainGroup) {
-				aOutputWriter.WriteLine("section .data");
-				aOutputWriter.WriteLine("_start:  ");
-				aOutputWriter.WriteLine("; multiboot header ");
-				aOutputWriter.WriteLine("MBFLAGS equ 0x03 ; 4KB aligned modules etc., full memory info,  ");
-				aOutputWriter.WriteLine("                        ; use special header (see below) ");
-				aOutputWriter.WriteLine("dd 0x1BADB002           ; multiboot signature ");
-				aOutputWriter.WriteLine("dd MBFLAGS              ; 4kb page aligment for modules, supply memory info ");
-				aOutputWriter.WriteLine("dd -0x1BADB002-MBFLAGS  ; checksum=-(FLAGS+0x1BADB002) ");
-				aOutputWriter.WriteLine("; other data - that is the additional (optional) header which helps to load  ");
-				aOutputWriter.WriteLine("; the kernel. ");
-				aOutputWriter.WriteLine("; end of header ");
-				aOutputWriter.WriteLine("MultiBootInfo_Memory_High dd 0");
-				aOutputWriter.WriteLine("MultiBootInfo_Memory_Low dd 0");
-				if (Signature != null && Signature.Length > 0) {
-					aOutputWriter.WriteLine("{0} db {1}", SignatureLabelName, Signature.Aggregate<byte, string>("", (r, b) => r + b + ",") + "0");
-				}
-				DebugStub.EmitDataSection(aOutputWriter);
-            }
-		}
+	    protected override void BeforeFlush() {
+            base.BeforeFlush();
+            DataMembers.AddRange(new DataMember[]{
+                    new DataMember("Before_Kernel_Stack",
+                                   new byte[0x50000]),
+                    new DataMember("Kernel_Stack",
+                                   new byte[1]),
+                    new DataMember("_end_data",
+                                   new byte[1])});
+            new Label("_end_code");
+        }
 
-		protected override void EmitDataSectionFooter(string aGroup, TextWriter aOutputWriter) {
-			base.EmitDataSectionFooter(aGroup, aOutputWriter);
-			if (aGroup == MainGroup) {
-				aOutputWriter.WriteLine("");
-				aOutputWriter.WriteLine(";--- bss --- place r*, d* ? directives here, so that you'll have a BSS. ");
-				aOutputWriter.WriteLine("");
-				aOutputWriter.WriteLine("Before_Kernel_Stack:");
-				//aOutputWriter.WriteLine("times 50000 resb 0        ; our own stack ");
-				aOutputWriter.WriteLine("TIMES 0x50000 db 0");
-				aOutputWriter.WriteLine("Kernel_Stack: ");
-				aOutputWriter.WriteLine("");
-				aOutputWriter.WriteLine("");
-				aOutputWriter.WriteLine("_end:   ; end of BSS - here's the virtual and logical end.");
-			}
-		}
-		
-		protected override void EmitHeader(string aGroup, TextWriter aOutputWriter) {
-			aOutputWriter.WriteLine("use32           ; the kernel will be run in 32-bit protected mode, ");
-			aOutputWriter.WriteLine("");
-			aOutputWriter.WriteLine("%ifdef {0}", GetValidGroupName(aGroup));
-			aOutputWriter.WriteLine("%else");
-			aOutputWriter.WriteLine("  %define {0} 1", GetValidGroupName(aGroup));
-            if (mComNumber > 0) {
-    			aOutputWriter.WriteLine("%define DEBUGSTUB 1");
-            }
-			aOutputWriter.WriteLine("");
-            EmitIncludes(aGroup, aOutputWriter);
-		}
-
-		protected override void EmitIncludes(string aGroup, TextWriter aOutputWriter) {
-			foreach (string xInclude in (from item in Includes
-										 where String.Equals(item.Key, aGroup, StringComparison.InvariantCultureIgnoreCase)
-										 select item.Value).Distinct(StringComparer.InvariantCultureIgnoreCase)) {
-				aOutputWriter.WriteLine("%include '{0}'", xInclude);
-			}
-		}
-
-		protected override void EmitFooter(string aGroup, TextWriter aOutputWriter) {
-			if (aGroup == MainGroup) {
-				aOutputWriter.WriteLine("_end_data:      ; -- end of CODE+DATA ");
-			}
-			aOutputWriter.WriteLine("%endif");
-		}
-
+        public override void FlushText(TextWriter aOutput) {
+            aOutput.WriteLine("use32");
+            aOutput.WriteLine("%define NASM_COMPILATION 1");
+            aOutput.WriteLine("global Kernel_Start");
+            base.FlushText(aOutput);
+        }
 	}
 }

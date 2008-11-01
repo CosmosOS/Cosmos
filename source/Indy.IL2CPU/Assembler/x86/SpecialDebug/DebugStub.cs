@@ -15,22 +15,40 @@ namespace Indy.IL2CPU.Assembler.X86 {
         public enum Status { Run = 0, Break = 1 }
         
         // A bit of a hack as a static? Other ideas?
-        public static void EmitDataSection(System.IO.TextWriter aWriter) {
-             // Tracing: 0=Off, 1=On
-            aWriter.WriteLine("DebugTraceMode dd 0");
+        public static void EmitDataSection() {
+            Assembler.CurrentInstance.Peek().DataMembers.AddRange(new DataMember[]{
+            // Tracing: 0=Off, 1=On
+            new DataMember("DebugTraceMode",
+                           "dd",
+                           "0"),
             // enum Status
-            aWriter.WriteLine("DebugStatus dd 0"); 
+            new DataMember("DebugStatus",
+                           "dd",
+                           "0"),
             // 0 = Not in, 1 = already running
-            aWriter.WriteLine("DebugRunning dd 0"); 
+            new DataMember("DebugRunning",
+                           "dd",
+                           "0"),
             // Nesting control for non steppable routines
-            aWriter.WriteLine("DebugSuspendLevel dd 0");
+            new DataMember("DebugSuspendLevel",
+                           "dd",
+                           "0"),
             // Nesting control for non steppable routines 
-            aWriter.WriteLine("DebugResumeLevel dd 0"); 
+            new DataMember("DebugResumeLevel",
+                           "dd",
+                           "0"),
             // Last EIP value
-            aWriter.WriteLine("DebugEIP dd 0"); 
-            aWriter.WriteLine("InterruptsEnabledFlag dd 0");
+            new DataMember("DebugEIP",
+                           "dd",
+                           "0"),
+            new DataMember("InterruptsEnabledFlag",
+                           "dd",
+                           "0"),
             // If set to 1, on next trace a break will occur
-            aWriter.WriteLine("DebugBreakOnNextTrace dd 0");
+            new DataMember("DebugBreakOnNextTrace",
+                           "dd",
+                           "0"),
+        });
         }
 
         protected void Commands() {

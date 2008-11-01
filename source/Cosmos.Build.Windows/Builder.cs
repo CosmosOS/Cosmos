@@ -142,7 +142,7 @@ namespace Cosmos.Compiler.Builder {
                                1,
                                xParam.aOutputDir);
             }catch(Exception E) {
-                
+             OnLogMessage(LogSeverityEnum.Error, E.ToString());   
             }
             CompileCompleted.Invoke();
         }

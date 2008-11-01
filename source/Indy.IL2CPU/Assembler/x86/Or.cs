@@ -8,6 +8,8 @@ namespace Indy.IL2CPU.Assembler.X86 {
 	public class Or: Instruction {
 		private string mDestination;
 		private string mSource;
+        public Or(string aDestination, int aValue):this(aDestination, aValue.ToString()) {
+        }
 		public Or(string aDestination, string aSource) {
 			mDestination = aDestination;
 			mSource = aSource;

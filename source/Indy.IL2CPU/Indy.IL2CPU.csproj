@@ -80,11 +80,13 @@
     <Compile Include="Assembler\Assembler.cs" />
     <Compile Include="Assembler\Comment.cs" />
     <Compile Include="Assembler\DataMember.cs" />
+    <Compile Include="Assembler\Define.cs" />
+    <Compile Include="Assembler\EndIfDefined.cs" />
+    <Compile Include="Assembler\IfDefined.cs" />
     <Compile Include="Assembler\ImportMember.cs" />
     <Compile Include="Assembler\ImportMethodMember.cs" />
     <Compile Include="Assembler\Instruction.cs" />
     <Compile Include="Assembler\Label.cs" />
-    <Compile Include="Assembler\Literal.cs" />
     <Compile Include="Assembler\OpCodeAttribute.cs" />
     <Compile Include="Assembler\RawAssembler.cs" />
     <Compile Include="Assembler\ReaderWriterLocker.cs" />
@@ -351,6 +353,7 @@
     <Compile Include="Assembler\x86\SubWithCarry.cs" />
     <Compile Include="Assembler\x86\Test.cs" />
     <Compile Include="Assembler\x86\Wait.cs" />
+    <Compile Include="Assembler\x86\Xchg.cs" />
     <Compile Include="Assembler\x86\XLAT.cs" />
     <Compile Include="Assembler\x86\Xor.cs" />
     <Compile Include="Assembler\x86\X\Address.cs" />

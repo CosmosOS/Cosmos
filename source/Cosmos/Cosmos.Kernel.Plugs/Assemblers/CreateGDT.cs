@@ -20,8 +20,8 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 			////xFieldData = "0x17, (_NATIVE_GDT_Contents and 0xFFFF), (_NATIVE_GDT_Contents shr 16)";
 			//aAssembler.DataMembers.Add(new KeyValuePair<string, DataMember> (aAssembler.CurrentGroup,new DataMember(xFieldName, "dw", "0x37,0,0")));
 
-            aAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>(aAssembler.CurrentGroup, new DataMember(xFieldName, "db", xFieldData)));
-            aAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>(aAssembler.CurrentGroup, new DataMember("_NATIVE_GDT_Pointer", "dw", "0x17,0,0")));
+            aAssembler.DataMembers.Add(new DataMember(xFieldName, "db", xFieldData));
+            aAssembler.DataMembers.Add(new DataMember("_NATIVE_GDT_Pointer", "dw", "0x17,0,0"));
 
 			new CPUx86.Move(Registers.EAX, "_NATIVE_GDT_Pointer");
 			new CPUx86.Move("dword [_NATIVE_GDT_Pointer + 2]", "_NATIVE_GDT_Contents");

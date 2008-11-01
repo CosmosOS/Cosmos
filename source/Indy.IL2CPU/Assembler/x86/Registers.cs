@@ -25,9 +25,15 @@ namespace Indy.IL2CPU.Assembler.X86 {
 		public const string ESP = "esp";
 		public const string AtESP = "[esp]";
 		public const string EBP = "ebp";
+	    public const string AtEBP = "[EBP]";
 		public const string EDI = "edi";
 		public const string AtEDI = "[edi]";
 		public const string ESI = "esi";
 		public const string AtESI = "[esi]";
+	    public const string CR0 = "CR0";
+        public const string CR1 = "CR1";
+        public const string CR2 = "CR2";
+        public const string CR3 = "CR3";
+        public const string CR4 = "CR4";
 	}
 }

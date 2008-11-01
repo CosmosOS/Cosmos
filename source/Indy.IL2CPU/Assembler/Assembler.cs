@@ -66,9 +66,8 @@ namespace Indy.IL2CPU.Assembler {
         }
 
         public const string EntryPointName = "__ENGINE_ENTRYPOINT__";
-        protected List<KeyValuePair<string, Instruction>> mInstructions = new List<KeyValuePair<string, Instruction>>();
-        private List<KeyValuePair<string, DataMember>> mDataMembers = new List<KeyValuePair<string, DataMember>>();
-        private List<KeyValuePair<string, string>> mIncludes = new List<KeyValuePair<string, string>>();
+        protected internal List<Instruction> mInstructions = new List<Instruction>();
+        private List<DataMember> mDataMembers = new List<DataMember>();
         public readonly Stack<StackContent> StackContents = new Stack<StackContent>();
 
         private static ReaderWriterLocker mCurrentInstanceLocker = new ReaderWriterLocker();
@@ -125,12 +124,8 @@ namespace Indy.IL2CPU.Assembler {
             throw new NotImplementedException("After multi-threaded refactorings, this hasn't been implemented again, yet");
         }
 
-        public List<KeyValuePair<string, DataMember>> DataMembers {
+        public List<DataMember> DataMembers {
             get { return mDataMembers; }
-        }
-
-        public List<KeyValuePair<string, string>> Includes {
-            get { return mIncludes; }
         }
 
         public void Dispose() {
@@ -143,100 +138,53 @@ namespace Indy.IL2CPU.Assembler {
 
         public void Add(params Instruction[] aReaders) {
             foreach (Instruction xInstruction in aReaders) {
-                mInstructions.Add(new KeyValuePair<string, Instruction>(CurrentGroup, xInstruction));
+                mInstructions.Add(xInstruction);
             }
         }
 
-        public string CurrentGroup {
-            get;
-            set;
+        public virtual void Initialize() {
+
         }
 
-        protected abstract void EmitHeader(string aGroup,
-                                           TextWriter aOutputWriter);
-
-        private IEnumerable<string> GetAllGroupNames() {
-            List<string> xNames = new List<string>();
-            xNames.AddRange((from item in mMergedInstructions
-                             where !xNames.Contains(item.Key,
-                                                    StringComparer.InvariantCultureIgnoreCase)
-                             select item.Key));
-            xNames.AddRange((from item in mDataMembers
-                             where !xNames.Contains(item.Key,
-                                                    StringComparer.InvariantCultureIgnoreCase)
-                             select item.Key));
-            xNames.AddRange((from item in mIncludes
-                             where !xNames.Contains(item.Key,
-                                                    StringComparer.InvariantCultureIgnoreCase)
-                             select item.Key));
-            xNames.RemoveAll(x => String.IsNullOrEmpty(x));
-            return xNames;
+        /// <summary>
+        /// allows to emit footers to the code and datamember sections
+        /// </summary>
+        protected virtual void BeforeFlush() {
         }
 
-        protected List<KeyValuePair<string, Instruction>> mMergedInstructions;
 
-        public virtual void Flush() {
-            mMergedInstructions = new List<KeyValuePair<string, Instruction>>();
-            using(Assembler.mCurrentInstanceLocker.AcquireReaderLock()) {
-                foreach(var xItem in mCurrentInstance.Values) {
-                    if(xItem.Count >0) {
+        public virtual void FlushText(TextWriter aOutput) {
+            using (Assembler.mCurrentInstanceLocker.AcquireReaderLock()) {
+                foreach (var xItem in mCurrentInstance.Values) {
+                    if (xItem.Count > 0) {
                         var xAsm = xItem.Peek();
                         if (xAsm != this) {
                             mDataMembers.AddRange(xAsm.mDataMembers);
-                            mIncludes.AddRange(xAsm.mIncludes);
+                            mInstructions.AddRange(xAsm.mInstructions);
                         }
                     }
                 }
             }
-            mMergedInstructions.AddRange(mInstructions);
-            var xAllGroupNames = GetAllGroupNames();
-            foreach (string xGroup in GetAllGroupNames()) {
-                using (StreamWriter xOutputWriter = new StreamWriter(mGetFileNameForGroup(xGroup))) {
-                    // write .asm header
-                    if (xGroup == MainGroup) {
-                        foreach (string xTheGroup in xAllGroupNames) {
-                            if (xGroup != xTheGroup) {
-                                mIncludes.Add(new KeyValuePair<string, string>(xGroup,
-                                                                               mGetFileNameForGroup(xTheGroup)));
-                            }
-                        }
-                    }
-                    EmitHeader(xGroup, xOutputWriter);
-                    xOutputWriter.WriteLine();
-                    if (mDataMembers.Count > 0) {
-                        EmitDataSectionHeader(xGroup, xOutputWriter);
-                        xOutputWriter.WriteLine();
-                        foreach (DataMember xMember in (from item in mDataMembers
-                                                        where String.Equals(item.Key,
-                                                                            xGroup,
-                                                                            StringComparison.InvariantCultureIgnoreCase)
-                                                        select item.Value)) {
-                            xOutputWriter.WriteLine("\t" + xMember);
-                        }
-                        EmitDataSectionFooter(xGroup,
-                                              xOutputWriter);
-                        xOutputWriter.WriteLine();
-                    }
-                    if (mMergedInstructions.Count > 0) {
-                        EmitCodeSection(xGroup,
-                                        xOutputWriter,
-                                        mMergedInstructions);
-                    }
-                    EmitFooter(xGroup, xOutputWriter);
+            BeforeFlush();
+            if (mDataMembers.Count > 0) {
+                aOutput.WriteLine();
+                foreach (DataMember xMember in mDataMembers) {
+                    aOutput.WriteLine("\t" + xMember);
                 }
+                aOutput.WriteLine();
             }
+            if (mInstructions.Count > 0) {
+                EmitCodeSection(aOutput,
+                                mInstructions);
+            }
+            EmitFooter(aOutput);
         }
 
-        protected void EmitCodeSection(string aGroup, TextWriter aOutputWriter
-         , List<KeyValuePair<string, Instruction>> aInstructions) {
-            EmitCodeSectionHeader(aGroup, aOutputWriter);
+        protected void EmitCodeSection(TextWriter aOutputWriter, List<Instruction> aInstructions) {
+            EmitCodeSectionHeader(aOutputWriter);
             aOutputWriter.WriteLine();
             string xMainLabel = "";
-            foreach (Instruction x in (from item in aInstructions
-                                       where String.Equals(item.Key,
-                                                           aGroup,
-                                                           StringComparison.InvariantCultureIgnoreCase)
-             select item.Value)) {
+            foreach (Instruction x in aInstructions) {
                 string prefix = "\t\t\t";
                 Label xLabel = x as Label;
                 if (xLabel != null) {
@@ -258,26 +206,23 @@ namespace Indy.IL2CPU.Assembler {
                 }
                 aOutputWriter.WriteLine(prefix + x);
             }
-            EmitCodeSectionFooter(aGroup, aOutputWriter);
+            EmitCodeSectionFooter(aOutputWriter);
             aOutputWriter.WriteLine();
         }
 
-        protected virtual void EmitIncludes(string aGroup,
-                                            TextWriter aOutputWriter) {
+        protected virtual void EmitIncludes(TextWriter aOutputWriter) {
         }
 
-        protected virtual void EmitCodeSectionHeader(string aGroup,
-                                                     TextWriter aOutputWriter) {
+        protected virtual void EmitCodeSectionHeader(TextWriter aOutputWriter) {
         }
 
-        protected virtual void EmitCodeSectionFooter(string aGroup,
-                                                     TextWriter aOutputWriter) {
+        protected virtual void EmitCodeSectionFooter(TextWriter aOutputWriter) {
         }
 
-        protected virtual void EmitDataSectionHeader(string aGroup, TextWriter aOutputWriter) { }
+        protected virtual void EmitDataSectionHeader(TextWriter aOutputWriter) { }
 
-        protected virtual void EmitDataSectionFooter(string aGroup, TextWriter aOutputWriter) { }
-        protected virtual void EmitFooter(string aGroup, TextWriter aOutputWriter) {  }
+        protected virtual void EmitDataSectionFooter(TextWriter aOutputWriter) { }
+        protected virtual void EmitFooter(TextWriter aOutputWriter) {  }
         public string MainGroup { get; set; }
     }
 }

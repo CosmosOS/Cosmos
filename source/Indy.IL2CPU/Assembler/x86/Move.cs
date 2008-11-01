@@ -30,6 +30,10 @@ namespace Indy.IL2CPU.Assembler.X86 {
             Source = aSource.ToString();
         }
 
+        public Move(string aDestination, Int32 aSource) {
+            Destination = aDestination;
+            Source = aSource.ToString();
+        }
         public override string ToString() {
 			if (String.IsNullOrEmpty(Size)) {
 				return "mov " + Destination + ", " + Source;

@@ -133,9 +133,12 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System.Assemblers
 			new CPUx86.Compare(Registers.EDX, 0);
 			new CPUx86.JumpIfEqual(".noReturn");
 			//may have to expand the return... idk
-			new CPU.Literal("xchg [ebp+8],edx");//shift stack down to make room for return value & put a dummy value in for ret 4 to clean up :)... what a hack...
-			new CPU.Literal("xchg [ebp+4],edx");
-			new CPU.Literal("xchg [ebp],edx");//saved eip
+		    new CPUx86.Xchg("[ebp+8]",
+		                    Registers.EDX);
+            new CPUx86.Xchg("[ebp+4]",
+                            Registers.EDX);
+            new CPUx86.Xchg(Registers.AtEBP,
+                            Registers.EDX);
 			new CPUx86.Pushd(Registers.EDX);//ebp
 			new CPUx86.Move("[esp+12]", Registers.EDI);
 			new CPU.Label(".noReturn");

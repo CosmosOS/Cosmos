@@ -8,6 +8,16 @@ namespace Indy.IL2CPU.Assembler.X86 {
 	public class And: Instruction {
 		private string mDestination;
 		private string mSource;
+
+        public And(string aDestination, int aValue):this(aDestination, aValue.ToString()) {
+            
+        }
+
+        public And(string aDestination, uint aValue)
+            : this(aDestination, aValue.ToString()) {
+
+        }
+
 		public And(string aDestination, string aSource) {
 			mDestination = aDestination;
 			mSource = aSource;

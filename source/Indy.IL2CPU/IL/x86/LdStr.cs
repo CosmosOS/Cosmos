@@ -46,8 +46,8 @@ namespace Indy.IL2CPU.IL.X86 {
 				xRefByteArray.Append(aLiteral.Length);
 				xRefByteArray.Append(",");
 				xRefByteArray.Append(aLiteral.Length);
-				aAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>(aAssembler.CurrentGroup, new DataMember(xDataName, "dd", xRefByteArray.ToString())));
-				aAssembler.DataMembers.Add(new KeyValuePair<string, DataMember>(aAssembler.CurrentGroup, xDataMember=new DataMember(xDataName + "__Contents", "db", xDataVal)));
+				aAssembler.DataMembers.Add(new DataMember(xDataName, "dd", xRefByteArray.ToString()));
+				aAssembler.DataMembers.Add(xDataMember=new DataMember(xDataName + "__Contents", "db", xDataVal));
 				mDataMemberMap.Add(xDataVal, xDataMember);
 				return xDataName;
 			} else {

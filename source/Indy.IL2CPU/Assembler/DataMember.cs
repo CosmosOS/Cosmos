@@ -25,7 +25,17 @@ namespace Indy.IL2CPU.Assembler {
 			DefaultValue = aDefaultValue;
 		}
 
-		public string Name {
+        public byte[] RawDefaultValue {
+            get;
+            set;
+        }
+
+        public DataMember(string aName, byte[] aDefaultValue) {
+            Name = aName;
+            RawDefaultValue = aDefaultValue;
+        }
+
+	    public string Name {
 			get;
 			private set;
 		}
@@ -38,6 +48,23 @@ namespace Indy.IL2CPU.Assembler {
 		}
 
 		public override string ToString() {
+            if(RawDefaultValue!=null) {
+                if ((from item in RawDefaultValue
+                     group item by item into i
+                     select i).Count() > 1 || RawDefaultValue.Length<250) {
+                    StringBuilder xSB = new StringBuilder();
+                    xSB.AppendFormat("{0} db ", Name);
+                    for (int i = 0; i < (RawDefaultValue.Length - 1); i++) {
+                        xSB.AppendFormat("{0}, ",
+                                         RawDefaultValue[i]);
+                    }
+                    xSB.Append(RawDefaultValue.Last());
+                    return xSB.ToString();
+                } else {
+                    //aOutputWriter.WriteLine("TIMES 0x50000 db 0");
+                    return Name + ": TIMES " + RawDefaultValue.Count() + " db " + RawDefaultValue[0];
+                }
+            }
 			return Name + " " + DataType + " " + DefaultValue;
 		}
 

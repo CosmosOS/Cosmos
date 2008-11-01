@@ -23,33 +23,33 @@ namespace Cosmos.Kernel.Plugs {
 
     public class DebuggerAsm : X86.X.Y86 {
         public void Break() {
-            Quote("%ifdef DEBUGSTUB");
+            IfDefined("DEBUGSTUB");
             Memory["DebugBreakOnNextTrace", 32] = 1;
-            Quote("%endif");
+            EndIfDefined(); // DEBUGSTUB
         }
 
         public void SendText() {
-            Quote("%ifdef DEBUGSTUB");
+            IfDefined("DEBUGSTUB");
             PushAll32();
             Call("DebugStub_SendText");
             PopAll32();
-            Quote("%endif");
+            EndIfDefined(); // DEBUGSTUB
         }
 
         public void TraceOff() {
-            Quote("%ifdef DEBUGSTUB");
+            IfDefined("DEBUGSTUB");
             PushAll32();
             Call("DebugStub_TraceOff");
             PopAll32();
-            Quote("%endif");
+            EndIfDefined(); // DEBUGSTUB
         }
 
         public void TraceOn() {
-            Quote("%ifdef DEBUGSTUB");
+            IfDefined("DEBUGSTUB");
             PushAll32();
             Call("DebugStub_TraceOn");
             PopAll32();
-            Quote("%endif");
+            EndIfDefined(); // DEBUGSTUB
         }
     }
 
