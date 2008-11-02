@@ -136,40 +136,33 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 xStub.Main(mComPortAddresses[mComNumber - 1]);
             }
             //aOutputWriter.WriteLine("section .data");
-            var xFlags = 0x10003;
+            uint xFlags = 0x10003;
             DataMembers.AddRange(new DataMember[]{
                     new DataMember("MultibootSignature",
-                                   "dd",
-                                   "0x1BADB002"),
+                                   new uint[]{0x1BADB002}),
                     new DataMember("MultibootFlags",
-                                   "dd",
-                                   xFlags.ToString()),
+                                   xFlags),
                     new DataMember("MultibootChecksum",
-                                   "dd",
-                                   "0x" + (0-(xFlags + 0x1BADB002)).ToString("X")),
-                    new DataMember("MultibootHeaderAddr", "dd", "MultibootSignature"),
-                    new DataMember("MultibootLoadAddr", "dd", "MultibootSignature"),
-                    new DataMember("MultibootLoadEndAddr", "dd", "0"),
-                    new DataMember("MultibootBSSEndAddr", "dd", "0"),
-                    new DataMember("MultibootEntryAddr", "dd", "Kernel_Start"),
-                    new DataMember("MultiBootInfo_Memory_High",
-                                   "dd",
-                                   "0"),
-                    new DataMember("MultiBootInfo_Memory_Low",
-                                   "dd",
-                                   "0")});
-            DebugStub.EmitDataSection();
-        }
-
-	    protected override void BeforeFlush() {
-            base.BeforeFlush();
-            DataMembers.AddRange(new DataMember[]{
+                                   (int)(0-(xFlags + 0x1BADB002))),
+                    new DataMember("MultibootHeaderAddr", new ElementReference("MultibootSignature")),
+                    new DataMember("MultibootLoadAddr", new ElementReference("MultibootSignature")),
+                    new DataMember("MultibootLoadEndAddr", 0),
+                    new DataMember("MultibootBSSEndAddr", 0),
+                    new DataMember("MultibootEntryAddr", new ElementReference("Kernel_Start")),
+                    new DataMember("MultiBootInfo_Memory_High", 0),
+                    new DataMember("MultiBootInfo_Memory_Low", 0),
                     new DataMember("Before_Kernel_Stack",
                                    new byte[0x50000]),
                     new DataMember("Kernel_Stack",
-                                   new byte[1]),
+                                   new byte[0])});
+            DebugStub.EmitDataSection();
+        }
+
+	    protected override void OnBeforeFlush() {
+            base.OnBeforeFlush();
+            DataMembers.AddRange(new DataMember[]{
                     new DataMember("_end_data",
-                                   new byte[1])});
+                                   new byte[0])});
             new Label("_end_code");
         }
 

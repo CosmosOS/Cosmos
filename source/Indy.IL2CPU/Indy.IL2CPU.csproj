@@ -78,9 +78,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assembler\Assembler.cs" />
+    <Compile Include="Assembler\BaseAssemblerElement.cs" />
     <Compile Include="Assembler\Comment.cs" />
     <Compile Include="Assembler\DataMember.cs" />
     <Compile Include="Assembler\Define.cs" />
+    <Compile Include="Assembler\ElementReference.cs" />
     <Compile Include="Assembler\EndIfDefined.cs" />
     <Compile Include="Assembler\IfDefined.cs" />
     <Compile Include="Assembler\ImportMember.cs" />

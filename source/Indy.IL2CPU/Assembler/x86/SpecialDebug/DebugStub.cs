@@ -17,38 +17,23 @@ namespace Indy.IL2CPU.Assembler.X86 {
         // A bit of a hack as a static? Other ideas?
         public static void EmitDataSection() {
             Assembler.CurrentInstance.Peek().DataMembers.AddRange(new DataMember[]{
-            // Tracing: 0=Off, 1=On
-            new DataMember("DebugTraceMode",
-                           "dd",
-                           "0"),
-            // enum Status
-            new DataMember("DebugStatus",
-                           "dd",
-                           "0"),
-            // 0 = Not in, 1 = already running
-            new DataMember("DebugRunning",
-                           "dd",
-                           "0"),
-            // Nesting control for non steppable routines
-            new DataMember("DebugSuspendLevel",
-                           "dd",
-                           "0"),
-            // Nesting control for non steppable routines 
-            new DataMember("DebugResumeLevel",
-                           "dd",
-                           "0"),
-            // Last EIP value
-            new DataMember("DebugEIP",
-                           "dd",
-                           "0"),
-            new DataMember("InterruptsEnabledFlag",
-                           "dd",
-                           "0"),
-            // If set to 1, on next trace a break will occur
-            new DataMember("DebugBreakOnNextTrace",
-                           "dd",
-                           "0"),
-        });
+                // Tracing: 0=Off, 1=On
+                new DataMember("DebugTraceMode", 0),
+                // enum Status
+                new DataMember("DebugStatus", 0),
+                    
+                // 0 = Not in, 1 = already running
+                new DataMember("DebugRunning", 0),
+                // Nesting control for non steppable routines
+                new DataMember("DebugSuspendLevel", 0),
+                // Nesting control for non steppable routines 
+                new DataMember("DebugResumeLevel", 0),
+                // Last EIP value
+                new DataMember("DebugEIP", 0),
+                new DataMember("InterruptsEnabledFlag", 0),
+                // If set to 1, on next trace a break will occur
+                new DataMember("DebugBreakOnNextTrace", 0),
+             });
         }
 
         protected void Commands() {

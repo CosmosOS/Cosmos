@@ -60,10 +60,18 @@ namespace Indy.IL2CPU.Assembler {
 
 		public Label(string aName) {
 			mName = aName;
-			if (!aName.StartsWith(".")) {
-				LastFullLabel = aName;
-			}
+            if (!aName.StartsWith(".")) {
+                LastFullLabel = aName;
+                QualifiedName = aName;
+            } else {
+                QualifiedName = LastFullLabel + aName;
+            }
 		}
+
+        public string QualifiedName {
+            get;
+            private set;
+        }
 
 		public override string ToString() {
 			return Name + ":";
@@ -84,5 +92,18 @@ namespace Indy.IL2CPU.Assembler {
 		public Label(MethodBase aMethod)
 			: this(GenerateLabelName(aMethod)) {
 		}
+
+        public override bool IsComplete(Assembler aAssembler) {
+            return true;
+        }
+
+        public override bool DetermineSize(Assembler aAssembler, out ulong aSize) {
+            aSize = 0;
+            return true;
+        }
+
+        public override byte[] GetData(Assembler aAssembler) {
+            return new byte[0];
+        }
 	}
 }

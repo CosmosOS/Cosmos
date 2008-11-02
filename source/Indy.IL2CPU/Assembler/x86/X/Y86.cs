@@ -42,6 +42,10 @@ namespace Indy.IL2CPU.Assembler.X86.X {
             new X86.Call(aLabel);
         }
 
+        public void Define(string aSymbol) {
+            new Define(aSymbol);
+        }
+
         public void IfDefined(string aSymbol) {
             new IfDefined(aSymbol);
         }

@@ -128,6 +128,10 @@ namespace Indy.IL2CPU.Assembler {
             get { return mDataMembers; }
         }
 
+        public List<Instruction> Instructions {
+            get { return mInstructions; }
+        }
+
         public void Dispose() {
             // MtW: I know, IDisposable usage for this isn't really nice, but for now this should be fine.
             //		Anyhow, we need a way to clear the CurrentInstance property
@@ -143,17 +147,15 @@ namespace Indy.IL2CPU.Assembler {
         }
 
         public virtual void Initialize() {
-
         }
 
         /// <summary>
         /// allows to emit footers to the code and datamember sections
         /// </summary>
-        protected virtual void BeforeFlush() {
+        protected virtual void OnBeforeFlush() {
         }
 
-
-        public virtual void FlushText(TextWriter aOutput) {
+        private void BeforeFlush() {
             using (Assembler.mCurrentInstanceLocker.AcquireReaderLock()) {
                 foreach (var xItem in mCurrentInstance.Values) {
                     if (xItem.Count > 0) {
@@ -165,6 +167,115 @@ namespace Indy.IL2CPU.Assembler {
                     }
                 }
             }
+            OnBeforeFlush();
+            CleanupCode();
+        }
+
+        /// <summary>
+        /// Cleans up the Instructions list. it evaluates all conditionals. 
+        /// </summary>
+        protected void CleanupCode() {
+            int xCurrentIdx = 0;
+            int xIfLevelsToSkip = 0;
+            var xDefines = new List<string>();
+            while (xCurrentIdx < mInstructions.Count) {
+                var xCurrentInstruction = mInstructions[xCurrentIdx];
+                var xIfDefined = xCurrentInstruction as IfDefined;
+                var xEndIfDefined = xCurrentInstruction as EndIfDefined;
+                var xDefine = xCurrentInstruction as Define;
+                var xComment = xCurrentInstruction as Comment;
+                if (xComment != null) {
+                    mInstructions.RemoveAt(xCurrentIdx);
+                    continue;
+                }
+                if(xIfDefined!=null){
+                    if(xIfLevelsToSkip>0){
+                        xIfLevelsToSkip++;
+                    } else {
+                        if (!xDefines.Contains(xIfDefined.Symbol.ToLowerInvariant())) {
+                            xIfLevelsToSkip++;
+                        }
+                    }
+                    mInstructions.RemoveAt(xCurrentIdx);
+                    continue;
+                }
+                if (xEndIfDefined != null) {
+                    if (xIfLevelsToSkip > 0) {
+                        xIfLevelsToSkip--;                        
+                    }
+                    mInstructions.RemoveAt(xCurrentIdx);
+                    continue;
+                }
+                if (xIfLevelsToSkip > 0) {
+                    mInstructions.RemoveAt(xCurrentIdx);
+                    continue;
+                }
+                if (xDefine != null) {
+                    if (!xDefines.Contains(xDefine.Symbol.ToLowerInvariant())) {
+                        xDefines.Add(xDefine.Symbol.ToLowerInvariant());
+                    }
+                    mInstructions.RemoveAt(xCurrentIdx);
+                    continue;
+                }
+                xCurrentIdx++;
+            }
+        }
+
+        public virtual void FlushBinary(Stream aOutput, ulong aBaseAddress) {
+            BeforeFlush();
+            bool xSituationChanged = false;
+            var xAssemblerItems = new List<BaseAssemblerElement>();
+            xAssemblerItems.AddRange(mDataMembers.Cast<BaseAssemblerElement>());
+            xAssemblerItems.AddRange(mInstructions.Cast<BaseAssemblerElement>());
+            
+            var xIncompleteItems = new List<BaseAssemblerElement>(xAssemblerItems);
+            var xCurrentAddresss = aBaseAddress;
+            do {
+                xSituationChanged = false; 
+                int xIdx = 0;
+                while (xIdx < xIncompleteItems.Count) {
+                    var xCurrentItem = xIncompleteItems[xIdx];
+                    xCurrentItem.StartAddress = xCurrentAddresss;
+                    ulong xSize = 0;
+                    if (xCurrentItem.DetermineSize(this, out xSize)) {
+                        xSituationChanged = true;
+                        Console.WriteLine("Size of '{0}' = {1}", xCurrentItem, xSize);
+                        xCurrentAddresss += xSize;
+                        xIncompleteItems.RemoveAt(xIdx);
+                        continue;
+                    } else {
+                        break;
+                    }
+                }
+            } while (xSituationChanged);
+            if (!xSituationChanged && xIncompleteItems.Count > 0) {
+                throw new Exception("Not all Elements are able to determine size!");
+            }
+            xIncompleteItems = new List<BaseAssemblerElement>(xAssemblerItems);
+            do {
+                int xIdx = 0;
+                xSituationChanged = false;
+                while (xIdx < xIncompleteItems.Count) {
+                    var xCurrentItem = xIncompleteItems[xIdx];
+                    if (xCurrentItem.IsComplete(this)) {
+                        xSituationChanged = true;
+                        xIncompleteItems.RemoveAt(xIdx);
+                        continue;
+                    } else {
+                        break;
+                    }
+                }
+            } while (xSituationChanged);
+            if (!xSituationChanged && xIncompleteItems.Count > 0) {
+                throw new Exception("Not all Elements are complete!");
+            }
+            foreach (var xItem in xAssemblerItems) {
+                var xBuff = xItem.GetData(this);
+                aOutput.Write(xBuff, 0, xBuff.Length);
+            }
+        }
+
+        public virtual void FlushText(TextWriter aOutput) {
             BeforeFlush();
             if (mDataMembers.Count > 0) {
                 aOutput.WriteLine();
@@ -174,55 +285,47 @@ namespace Indy.IL2CPU.Assembler {
                 aOutput.WriteLine();
             }
             if (mInstructions.Count > 0) {
-                EmitCodeSection(aOutput,
-                                mInstructions);
-            }
-            EmitFooter(aOutput);
-        }
-
-        protected void EmitCodeSection(TextWriter aOutputWriter, List<Instruction> aInstructions) {
-            EmitCodeSectionHeader(aOutputWriter);
-            aOutputWriter.WriteLine();
-            string xMainLabel = "";
-            foreach (Instruction x in aInstructions) {
-                string prefix = "\t\t\t";
-                Label xLabel = x as Label;
-                if (xLabel != null) {
-                    string xFullName;
-                    if (xLabel.Name[0] != '.') {
-                        xMainLabel = xLabel.Name;
-                        xFullName = xMainLabel;
-                    } else {
-                        xFullName = xMainLabel + xLabel.Name;
+                string xMainLabel="";
+                foreach (Instruction x in mInstructions) {
+                    string prefix = "\t\t\t";
+                    Label xLabel = x as Label;
+                    if (xLabel != null) {
+                        string xFullName;
+                        if (xLabel.Name[0] != '.') {
+                            xMainLabel = xLabel.Name;
+                            xFullName = xMainLabel;
+                        } else {
+                            xFullName = xMainLabel + xLabel.Name;
+                        }
+                        aOutput.WriteLine();
+                        if (x.ToString()[0] == '.') {
+                            prefix = "\t\t";
+                        } else {
+                            prefix = "\t";
+                        }
+                        aOutput.WriteLine(prefix + xFullName.Replace(".", "__DOT__") + ":");
+                        continue;
                     }
-                    aOutputWriter.WriteLine();
-                    if (x.ToString()[0] == '.') {
-                        prefix = "\t\t";
-                    } else {
-                        prefix = "\t";
-                    }
-                    aOutputWriter.WriteLine(prefix + xFullName.Replace(".", "__DOT__") + ":");
-                    continue;
+                    aOutput.WriteLine(prefix + x);
                 }
-                aOutputWriter.WriteLine(prefix + x);
             }
-            EmitCodeSectionFooter(aOutputWriter);
-            aOutputWriter.WriteLine();
         }
 
-        protected virtual void EmitIncludes(TextWriter aOutputWriter) {
+        public BaseAssemblerElement TryResolveReference(ElementReference aReference) {
+            foreach (var xInstruction in mInstructions) {
+                var xLabel = xInstruction as Label;
+                if (xLabel != null) {
+                    if (xLabel.QualifiedName.Equals(aReference.Name, StringComparison.InvariantCultureIgnoreCase)) {
+                        return xLabel;
+                    }
+                }
+            }
+            foreach (var xDataMember in mDataMembers) {
+                if (xDataMember.Name.Equals(aReference.Name, StringComparison.InvariantCultureIgnoreCase)) {
+                    return xDataMember;
+                }
+            }
+            return null;
         }
-
-        protected virtual void EmitCodeSectionHeader(TextWriter aOutputWriter) {
-        }
-
-        protected virtual void EmitCodeSectionFooter(TextWriter aOutputWriter) {
-        }
-
-        protected virtual void EmitDataSectionHeader(TextWriter aOutputWriter) { }
-
-        protected virtual void EmitDataSectionFooter(TextWriter aOutputWriter) { }
-        protected virtual void EmitFooter(TextWriter aOutputWriter) {  }
-        public string MainGroup { get; set; }
     }
 }

@@ -184,7 +184,6 @@ namespace Indy.IL2CPU {
                     //this.I
                     List<Assembly> xAppDefs = new List<Assembly>();
                     xAppDefs.Add(mCrawledAssembly);
-                    mAssembler.MainGroup = "main";
                     AssemblyEqualityComparer xComparer = new AssemblyEqualityComparer();
                     foreach (Assembly xAsm in AppDomain.CurrentDomain.GetAssemblies()) {
                         Assembly xAssemblyDef = Assembly.LoadFrom(xAsm.Location);

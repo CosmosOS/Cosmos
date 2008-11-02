@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 
 namespace Indy.IL2CPU.Assembler {
-	public abstract class Instruction {
+	public abstract class Instruction: BaseAssemblerElement {
 		protected uint mOpCode;
 		protected string mMnemonic;
 
@@ -33,5 +33,24 @@ namespace Indy.IL2CPU.Assembler {
 				Assembler.CurrentInstance.Peek().Add(this);
 			}
 		}
-	}
+
+        public override ulong? ActualAddress {
+            get { 
+                // TODO: for now, we dont have any data alignment
+                return StartAddress;
+            }
+        }
+
+        public override bool DetermineSize(Assembler aAssembler, out ulong aSize) {
+            throw new NotImplementedException("Method not implemented for instruction " + this.GetType().FullName.Substring(typeof(Instruction).Namespace.Length+1));
+        }
+
+        public override bool IsComplete(Assembler aAssembler) {
+            throw new NotImplementedException("Method not implemented for instruction " + this.GetType().FullName.Substring(typeof(Instruction).Namespace.Length + 1));
+        }
+
+        public override byte[] GetData(Assembler aAssembler) {
+            throw new NotImplementedException("Method not implemented for instruction " + this.GetType().FullName.Substring(typeof(Instruction).Namespace.Length + 1));
+        }
+    }
 }
