@@ -7,60 +7,64 @@ using Asm = Indy.IL2CPU.Assembler.Assembler;
 using System.Collections.Generic;
 
 namespace Indy.IL2CPU.IL.X86 {
-	[OpCode(OpCodeEnum.Ldstr)]
-	public class LdStr: Op {
-		private static Dictionary<string, DataMember> mDataMemberMap = new Dictionary<string, DataMember>();
-		public readonly string LiteralStr;
-		public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
-		    Engine.RegisterType(typeof(string));
+    [OpCode(OpCodeEnum.Ldstr)]
+    public class LdStr : Op {
+        private static Dictionary<string, DataMember> mDataMemberMap = new Dictionary<string, DataMember>();
+        public readonly string LiteralStr;
+        public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
+            Engine.RegisterType(typeof(string));
         }
 
         public LdStr(ILReader aReader, MethodInformation aMethodInfo)
-			: base(aReader, aMethodInfo) {
-			LiteralStr = aReader.OperandValueStr;
-		}
+            : base(aReader, aMethodInfo) {
+            LiteralStr = aReader.OperandValueStr;
+        }
 
-		public LdStr(string aLiteralStr)
-			: base(null, null) {
-			LiteralStr = aLiteralStr;
-		}
+        public LdStr(string aLiteralStr)
+            : base(null, null) {
+            LiteralStr = aLiteralStr;
+        }
 
-		public static string GetContentsArrayName(Assembler.Assembler aAssembler, string aLiteral) {
-			Encoding xEncoding = Encoding.Unicode;
-			var xDataByteArray = new StringBuilder();
-			xDataByteArray.Append(BitConverter.GetBytes(Engine.RegisterType(Engine.GetType("mscorlib", "System.Array"))).Aggregate("", (r, b) => r + b + ","));
-			xDataByteArray.Append(BitConverter.GetBytes((uint)InstanceTypeEnum.StaticEmbeddedArray).Aggregate("", (r, b) => r + b + ","));
-			xDataByteArray.Append(BitConverter.GetBytes(aLiteral.Length).Aggregate("", (r, b) => r + b + ","));
-			xDataByteArray.Append(BitConverter.GetBytes((int)2).Aggregate("", (r, b) => r + b + ","));
-			xDataByteArray.Append(xEncoding.GetBytes(aLiteral).Aggregate("", (r, b) => r + b + ","));
-			string xDataVal = xDataByteArray.ToString().TrimEnd(',');
-			DataMember xDataMember = null;
-			if (!mDataMemberMap.TryGetValue(xDataVal, out xDataMember)) {
-				string xDataName = aAssembler.GetIdentifier("StringLiteral");					  
-				StringBuilder xRefByteArray = new StringBuilder();
-				xRefByteArray.Append("0x" + ((uint)Engine.RegisterType(Engine.GetType("mscorlib", "System.String"))).ToString("X"));
-				xRefByteArray.Append(",0x" + ((uint)InstanceTypeEnum.StaticEmbeddedObject).ToString("X") + ",");
-				xRefByteArray.Append("0x" + (1).ToString("X") + ",");
-				xRefByteArray.Append(xDataName + "__Contents,");
-				xRefByteArray.Append(xDataName + "__Contents + 16,");
-				xRefByteArray.Append(aLiteral.Length);
-				xRefByteArray.Append(",");
-				xRefByteArray.Append(aLiteral.Length);
-				aAssembler.DataMembers.Add(new DataMember(xDataName, "dd", xRefByteArray.ToString()));
-				aAssembler.DataMembers.Add(xDataMember=new DataMember(xDataName + "__Contents", "db", xDataVal));
-				mDataMemberMap.Add(xDataVal, xDataMember);
-				return xDataName;
-			} else {
-				return xDataMember.Name.Substring(0, xDataMember.Name.Length - "__Contents".Length);
-			}
-		}
+        public static string GetContentsArrayName(Assembler.Assembler aAssembler, string aLiteral) {
+            Encoding xEncoding = Encoding.Unicode;
+            byte[] xByteArray = new byte[16 + xEncoding.GetByteCount(aLiteral)];
+            var xTemp = BitConverter.GetBytes(Engine.RegisterType(Engine.GetType("mscorlib",
+                                                                                 "System.Array")));
+            Array.Copy(xTemp, 0, xByteArray, 0, 4);
+            xTemp = BitConverter.GetBytes((uint)InstanceTypeEnum.StaticEmbeddedArray);
+            Array.Copy(xTemp, 0, xByteArray, 4, 4);
+            xTemp = BitConverter.GetBytes(aLiteral.Length);
+            Array.Copy(xTemp, 0, xByteArray, 8, 4);
+            xTemp = BitConverter.GetBytes(2);
+            Array.Copy(xTemp, 0, xByteArray, 12, 4);
+            xTemp = xEncoding.GetBytes(aLiteral);
+            Array.Copy(xTemp, 0, xByteArray, 16, xTemp.Length);
+            DataMember xDataMember = null;
+            if (!mDataMemberMap.TryGetValue(aLiteral, out xDataMember)) {
+                string xDataName = aAssembler.GetIdentifier("StringLiteral");
+                object[] xObjectData = new object[7];
+                xObjectData[0] = ((uint)Engine.RegisterType(Engine.GetType("mscorlib", "System.String")));
+                xObjectData[1] = ((uint)InstanceTypeEnum.StaticEmbeddedObject);
+                xObjectData[2] = 1;
+                xObjectData[3] = new ElementReference(xDataName + "__Contents");
+                xObjectData[4] = new ElementReference(xDataName + "__Contents", 16);
+                xObjectData[5] = aLiteral.Length;
+                xObjectData[6] = aLiteral.Length;
+                aAssembler.DataMembers.Add(new DataMember(xDataName, xObjectData));
+                aAssembler.DataMembers.Add(xDataMember = new DataMember(xDataName + "__Contents", xByteArray));
+                mDataMemberMap.Add(aLiteral, xDataMember);
+                return xDataName;
+            } else {
+                return xDataMember.Name.Substring(0, xDataMember.Name.Length - "__Contents".Length);
+            }
+        }
 
-		public override void DoAssemble() {
-			string xDataName = GetContentsArrayName(Assembler, LiteralStr);
-			new Comment("String Value: " + LiteralStr);
-			new CPUx86.Move(CPUx86.Registers.EAX, xDataName);
-			new CPUx86.Pushd(CPUx86.Registers.EAX);
-			Assembler.StackContents.Push(new StackContent(4, typeof(string)));
-		}
-	}
+        public override void DoAssemble() {
+            string xDataName = GetContentsArrayName(Assembler, LiteralStr);
+            new Comment("String Value: " + LiteralStr);
+            new CPUx86.Move(CPUx86.Registers.EAX, xDataName);
+            new CPUx86.Pushd(CPUx86.Registers.EAX);
+            Assembler.StackContents.Push(new StackContent(4, typeof(string)));
+        }
+    }
 }

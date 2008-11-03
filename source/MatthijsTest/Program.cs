@@ -55,6 +55,7 @@ namespace MatthijsTest {
             //    Console.WriteLine("' not found!");
             //}
             Console.WriteLine("Cosmos booted!");
+            Console.WriteLine("Cosmos booted!");
         }
 
         private static void HandleSendBroadCast(string command) {

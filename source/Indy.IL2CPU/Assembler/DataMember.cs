@@ -120,7 +120,10 @@ namespace Indy.IL2CPU.Assembler {
                     if (xElementRef == null) {
                         return aItem.ToString();
                     } else {
-                        return xElementRef.Name;
+                        if (xElementRef.Offset == 0) {
+                            return xElementRef.Name;
+                        }
+                        return xElementRef.Name + " + " + xElementRef.Offset;
                     }
                 };
                 for (int i = 0; i < (UntypedDefaultValue.Length - 1); i++) {
