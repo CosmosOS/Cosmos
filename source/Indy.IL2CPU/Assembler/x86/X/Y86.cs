@@ -42,6 +42,7 @@ namespace Indy.IL2CPU.Assembler.X86.X {
             new X86.Call(aLabel);
         }
 
+
         public void Define(string aSymbol) {
             new Define(aSymbol);
         }
@@ -117,5 +118,8 @@ namespace Indy.IL2CPU.Assembler.X86.X {
             new X86.ClrInterruptFlag();
         }
 
+        public ElementReference Reference(string aDataName) {
+            return new ElementReference(aDataName);
+        }
     }
 }

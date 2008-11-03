@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Text;
 using Indy.IL2CPU.Assembler;
+using Indy.IL2CPU.Assembler.X86.X;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using Asm = Indy.IL2CPU.Assembler.Assembler;
 using System.Collections.Generic;
@@ -60,10 +61,11 @@ namespace Indy.IL2CPU.IL.X86 {
         }
 
         public override void DoAssemble() {
+            var Y = new Y86();
             string xDataName = GetContentsArrayName(Assembler, LiteralStr);
             new Comment("String Value: " + LiteralStr);
-            new CPUx86.Move(CPUx86.Registers.EAX, xDataName);
-            new CPUx86.Pushd(CPUx86.Registers.EAX);
+            Y.EAX = Y.Reference(xDataName);
+            Y.EAX.Push();
             Assembler.StackContents.Push(new StackContent(4, typeof(string)));
         }
     }

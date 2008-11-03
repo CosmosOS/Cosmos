@@ -19,5 +19,10 @@ namespace Indy.IL2CPU.Assembler.X86.X {
             new X86.Move(ToString(), aValue);
         }
 
+        protected void Move(ElementReference aReference) {
+            new X86.Move(Registers.EAX,
+                         aReference);
+        }
+
     }
 }

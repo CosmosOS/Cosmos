@@ -44,6 +44,11 @@ namespace Indy.IL2CPU.Assembler.X86 {
             }
         }
 
+        public Move(string aDestination, ElementReference aReference) {
+            Destination = aDestination;
+            Source = aReference.Name;
+        }
+
         public Move(string aDestination, UInt32 aSource) {
             Destination = aDestination;
             Source = aSource.ToString();
