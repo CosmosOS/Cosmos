@@ -1085,38 +1085,39 @@ namespace Indy.IL2CPU {
                         xManifestResourceName = (string)xItemType.GetField("ResourceName").GetValue(xItem);
                     }
                     if (xManifestResourceName != null) {
-                        RegisterType(xCurrentField.FieldType);
-                        string xFileName = Path.Combine(mOutputDir,
-                                                        (xCurrentField.DeclaringType.Assembly.FullName + "__" + xManifestResourceName).Replace(",",
-                                                                                                                                               "_") + ".res");
-                        using (var xStream = xCurrentField.DeclaringType.Assembly.GetManifestResourceStream(xManifestResourceName)) {
-                            if (xStream == null) {
-                                throw new Exception("Resource '" + xManifestResourceName + "' not found!");
-                            }
-                            using (var xTarget = File.Create(xFileName)) {
-                                // todo: abstract this array code out.
-                                xTarget.Write(BitConverter.GetBytes(Engine.RegisterType(Engine.GetType("mscorlib",
-                                                                                                       "System.Array"))),
-                                              0,
-                                              4);
-                                xTarget.Write(BitConverter.GetBytes((uint)InstanceTypeEnum.StaticEmbeddedArray),
-                                              0,
-                                              4);
-                                xTarget.Write(BitConverter.GetBytes((int)xStream.Length), 0, 4);
-                                xTarget.Write(BitConverter.GetBytes((int)1), 0, 4);
-                                var xBuff = new byte[128];
-                                while (xStream.Position < xStream.Length) {
-                                    int xBytesRead = xStream.Read(xBuff, 0, 128);
-                                    xTarget.Write(xBuff, 0, xBytesRead);
-                                }
-                            }
-                        }
-                        mAssembler.DataMembers.Add(new DataMember("___" + xFieldName + "___Contents",
-                                                                  "incbin",
-                                                                  "\"" + xFileName + "\""));
-                        mAssembler.DataMembers.Add(new DataMember(xFieldName,
-                                                                  "dd",
-                                                                  "___" + xFieldName + "___Contents"));
+                        //RegisterType(xCurrentField.FieldType);
+                        //string xFileName = Path.Combine(mOutputDir,
+                        //                                (xCurrentField.DeclaringType.Assembly.FullName + "__" + xManifestResourceName).Replace(",",
+                        //                                                                                                                       "_") + ".res");
+                        //using (var xStream = xCurrentField.DeclaringType.Assembly.GetManifestResourceStream(xManifestResourceName)) {
+                        //    if (xStream == null) {
+                        //        throw new Exception("Resource '" + xManifestResourceName + "' not found!");
+                        //    }
+                        //    using (var xTarget = File.Create(xFileName)) {
+                        //        // todo: abstract this array code out.
+                        //        xTarget.Write(BitConverter.GetBytes(Engine.RegisterType(Engine.GetType("mscorlib",
+                        //                                                                               "System.Array"))),
+                        //                      0,
+                        //                      4);
+                        //        xTarget.Write(BitConverter.GetBytes((uint)InstanceTypeEnum.StaticEmbeddedArray),
+                        //                      0,
+                        //                      4);
+                        //        xTarget.Write(BitConverter.GetBytes((int)xStream.Length), 0, 4);
+                        //        xTarget.Write(BitConverter.GetBytes((int)1), 0, 4);
+                        //        var xBuff = new byte[128];
+                        //        while (xStream.Position < xStream.Length) {
+                        //            int xBytesRead = xStream.Read(xBuff, 0, 128);
+                        //            xTarget.Write(xBuff, 0, xBytesRead);
+                        //        }
+                        //    }
+                        //}
+                        //mAssembler.DataMembers.Add(new DataMember("___" + xFieldName + "___Contents",
+                        //                                          "incbin",
+                        //                                          "\"" + xFileName + "\""));
+                        //mAssembler.DataMembers.Add(new DataMember(xFieldName,
+                        //                                          "dd",
+                        //                                          "___" + xFieldName + "___Contents"));
+                        throw new NotImplementedException();
                     } else {
                         RegisterType(xCurrentField.FieldType);
                         int xTheSize;
@@ -1127,40 +1128,23 @@ namespace Indy.IL2CPU {
                         } else {
                             xTheSize = 4;
                         }
-                        if (xTheSize == 4) {
-                            theType = "dd";
-                            xTheSize = 1;
-                        } else if (xTheSize == 2) {
-                            theType = "dw";
-                            xTheSize = 1;
-                        }
-                        string xTheData = "";
+                        byte[] xData = new byte[xTheSize];
                         try {
                             object xValue = xCurrentField.GetValue(null);
                             if (xValue != null) {
                                 try {
                                     if (xValue.GetType().IsValueType) {
-                                        StringBuilder xSB = new StringBuilder(xTheSize * 3);
                                         for (int x = 0; x < xTheSize; x++) {
-                                            xSB.Append(Marshal.ReadByte(xValue, x) + ",");
+                                            xData[x] = Marshal.ReadByte(xValue,
+                                                                        x);
                                         }
-                                        xTheData = xSB.Remove(xSB.Length - 1, 1).ToString();
                                     }
                                 } catch {
                                 }
                             }
                         } catch {
                         }
-                        if (xTheSize == 0) {
-                            throw new Exception("Field '" + xCurrentField.ToString() + "' doesn't have a valid size!");
-                        }
-                        if (String.IsNullOrEmpty(xTheData)) {
-                            for (uint x = 0; x < xTheSize; x++) {
-                                xTheData += "0,";
-                            }
-                        }
-                        xTheData = xTheData.TrimEnd(',');
-                        mAssembler.DataMembers.Add(new DataMember(xFieldName, theType, xTheData));
+                        mAssembler.DataMembers.Add(new DataMember(xFieldName, xData));
                     }
                 }
                 using (mStaticFieldsLocker.AcquireReaderLock()) {

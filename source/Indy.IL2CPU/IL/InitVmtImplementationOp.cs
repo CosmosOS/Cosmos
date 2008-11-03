@@ -85,8 +85,17 @@ namespace Indy.IL2CPU.IL {
 					xDataByteArray.Append("0,");
 				}
 			}
-			Assembler.DataMembers.Add(new DataMember(xTheName + "__Contents", "db", xDataByteArray.ToString().TrimEnd(',')));
-			Assembler.DataMembers.Add(new DataMember(xTheName, "dd", xTheName + "__Contents"));
+            var xData = new byte[16 + (VTableEntrySize * VTableEntrySize)];
+		    var xTemp = BitConverter.GetBytes(ArrayTypeId);
+            Array.Copy(xTemp, 0, xData, 0, 4);
+            xTemp = BitConverter.GetBytes(0x80000002);
+            Array.Copy(xTemp, 0, xData, 4, 4);
+            xTemp = BitConverter.GetBytes(mTypes.Count);
+            Array.Copy(xTemp, 0, xData, 8, 4);
+            xTemp = BitConverter.GetBytes(VTableEntrySize);
+            Array.Copy(xTemp, 0, xData, 12, 4);
+			Assembler.DataMembers.Add(new DataMember(xTheName + "__Contents", xData));
+			Assembler.DataMembers.Add(new DataMember(xTheName, new ElementReference(xTheName + "__Contents")));
 			Pushd("0" + mTypes.Count.ToString("X") + "h");
 			Call(LoadTypeTableRef);
 			for (int i = 0; i < mTypes.Count; i++) {
@@ -202,12 +211,18 @@ namespace Indy.IL2CPU.IL {
                             {
                                 xDataByteArray.Append("0,0,0,0,");
                             }
-                            string xDataValue = xDataByteArray.ToString();
+                            xData = new byte[16 + (xEmittedMethods.Count * 4)];
+                            xTemp = BitConverter.GetBytes(ArrayTypeId);
+                            Array.Copy(xTemp, 0, xData, 0, 4);
+                            xTemp = BitConverter.GetBytes(0x80000002); // embedded array
+                            Array.Copy(xTemp, 0, xData, 4, 4);
+                            xTemp = BitConverter.GetBytes(xEmittedMethods.Count); // embedded array
+                            Array.Copy(xTemp, 0, xData, 8, 4);
                             string xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(mTypes[i].FullName) + "__MethodIndexesArray";
-                            Assembler.DataMembers.Add(new DataMember(xDataName, "db", xDataValue.TrimEnd(',')));
+                            Assembler.DataMembers.Add(new DataMember(xDataName, xData));
                             Pushd(xDataName);
                             xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(mTypes[i].FullName) + "__MethodAddressesArray";
-                            Assembler.DataMembers.Add(new DataMember(xDataName, "db", xDataValue.TrimEnd(',')));
+                            Assembler.DataMembers.Add(new DataMember(xDataName, xData));
                             Pushd(xDataName);
                             xDataByteArray.Remove(0, xDataByteArray.Length);
                             xDataByteArray.Append(BitConverter.GetBytes(ArrayTypeId).Aggregate("", (r, b) => r + b + ","));
@@ -215,8 +230,17 @@ namespace Indy.IL2CPU.IL {
                             xDataByteArray.Append(BitConverter.GetBytes((mTypes[i].FullName + ", " + mTypes[i].Module.Assembly.GetName().FullName).Length).Aggregate("", (r, b) => r + b + ","));
                             xDataByteArray.Append(BitConverter.GetBytes((uint)2).Aggregate("", (r, b) => r + b + ","));
                             xDataByteArray.Append(Encoding.Unicode.GetBytes(mTypes[i].FullName + ", " + mTypes[i].Module.Assembly.GetName().FullName).Aggregate("", (b, x) => b + x + ",") + "0");
+                            xData = new byte[16 + Encoding.Unicode.GetByteCount(mTypes[i].FullName + ", " + mTypes[i].Module.Assembly.GetName().FullName)];
+                            xTemp = BitConverter.GetBytes(ArrayTypeId);
+                            Array.Copy(xTemp, 0, xData, 0, 4);
+                            xTemp = BitConverter.GetBytes(0x80000002); // embedded array
+                            Array.Copy(xTemp, 0, xData, 4, 4);
+                            xTemp = BitConverter.GetBytes((mTypes[i].FullName + ", " + mTypes[i].Module.Assembly.GetName().FullName).Length);
+                            Array.Copy(xTemp, 0, xData, 8, 4);
+                            xTemp = BitConverter.GetBytes(2); // embedded array
+                            Array.Copy(xTemp, 0, xData, 12, 4);
                             xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(mTypes[i].FullName);
-                            mAssembler.DataMembers.Add(new DataMember(xDataName, "db", xDataByteArray.ToString()));
+                            mAssembler.DataMembers.Add(new DataMember(xDataName, xData));
                             Pushd(xDataName);
                             //Pushd("0");
                             Call(SetTypeInfoRef);

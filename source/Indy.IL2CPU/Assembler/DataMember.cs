@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
+using System.IO;
 
 namespace Indy.IL2CPU.Assembler {
 	public class DataMember: BaseAssemblerElement, IComparable<DataMember> {
@@ -19,14 +20,15 @@ namespace Indy.IL2CPU.Assembler {
 			return xTempResult;
 		}
 
-        [Obsolete]
-		public DataMember(string aName, string aDataType, string aDefaultValue) {
-			Name = aName;
-			DataType = aDataType;
-			DefaultValue = aDefaultValue;
-		}
+        public DataMember(string aName, Stream aData) {
+            Name = aName;
+            RawDefaultValue = new byte[aData.Length];
+            aData.Read(RawDefaultValue,
+                       0,
+                       RawDefaultValue.Length);
+        }
 
-        public byte[] RawDefaultValue {
+	    public byte[] RawDefaultValue {
             get;
             set;
         }
@@ -84,13 +86,6 @@ namespace Indy.IL2CPU.Assembler {
 			private set;
 		}
 
-		public readonly string DataType;
-
-		public string DefaultValue {
-			get;
-			private set;
-		}
-
 		public override string ToString() {
             if(RawDefaultValue!=null) {
                 if(RawDefaultValue.Length==0) {
@@ -133,7 +128,7 @@ namespace Indy.IL2CPU.Assembler {
                 xSB.Append(xGetTextForItem(UntypedDefaultValue.Last()));
                 return xSB.ToString();
             }
-			return Name + " " + DataType + " " + DefaultValue;
+            throw new Exception("Situation unsupported!");
 		}
 
 		public int CompareTo(DataMember other) {

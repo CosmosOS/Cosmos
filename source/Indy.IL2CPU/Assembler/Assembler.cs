@@ -183,11 +183,6 @@ namespace Indy.IL2CPU.Assembler {
                 var xIfDefined = xCurrentInstruction as IfDefined;
                 var xEndIfDefined = xCurrentInstruction as EndIfDefined;
                 var xDefine = xCurrentInstruction as Define;
-                var xComment = xCurrentInstruction as Comment;
-                if (xComment != null) {
-                    mInstructions.RemoveAt(xCurrentIdx);
-                    continue;
-                }
                 if(xIfDefined!=null){
                     if(xIfLevelsToSkip>0){
                         xIfLevelsToSkip++;
