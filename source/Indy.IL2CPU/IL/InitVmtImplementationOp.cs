@@ -75,17 +75,7 @@ namespace Indy.IL2CPU.IL {
 											  where item == xDataMember
 											  select item).First());
 			}
-			StringBuilder xDataByteArray = new StringBuilder();
-			xDataByteArray.Append(BitConverter.GetBytes(ArrayTypeId).Aggregate("", (r, b) => r + b + ","));
-			xDataByteArray.Append(BitConverter.GetBytes((uint)0x80000002).Aggregate("", (r, b) => r + b + ","));
-			xDataByteArray.Append(BitConverter.GetBytes(mTypes.Count).Aggregate("", (r, b) => r + b + ","));
-			xDataByteArray.Append(BitConverter.GetBytes(VTableEntrySize).Aggregate("", (r, b) => r + b + ","));
-			for (uint i = 0; i < mTypes.Count; i++) {
-				for (int j = 0; j < VTableEntrySize; j++) {
-					xDataByteArray.Append("0,");
-				}
-			}
-            var xData = new byte[16 + (VTableEntrySize * VTableEntrySize)];
+            var xData = new byte[16 + (mTypes.Count * VTableEntrySize)];
 		    var xTemp = BitConverter.GetBytes(ArrayTypeId);
             Array.Copy(xTemp, 0, xData, 0, 4);
             xTemp = BitConverter.GetBytes(0x80000002);
@@ -202,15 +192,6 @@ namespace Indy.IL2CPU.IL {
 
                             Pushd("0" + xBaseIndex.Value.ToString("X") + "h");
                             //Pushd("0" + xEmittedMethods.Count.ToString("X") + "h");
-                            xDataByteArray.Remove(0, xDataByteArray.Length);
-                            xDataByteArray.Append(BitConverter.GetBytes(ArrayTypeId).Aggregate("", (r, b) => r + b + ","));
-                            xDataByteArray.Append(BitConverter.GetBytes(0x80000002 /* EmbeddedArray */).Aggregate("", (r, b) => r + b + ","));
-                            xDataByteArray.Append(BitConverter.GetBytes(xEmittedMethods.Count).Aggregate("", (r, b) => r + b + ","));
-                            xDataByteArray.Append("0,0,0,0,");
-                            for (uint j = 0; j < xEmittedMethods.Count; j++)
-                            {
-                                xDataByteArray.Append("0,0,0,0,");
-                            }
                             xData = new byte[16 + (xEmittedMethods.Count * 4)];
                             xTemp = BitConverter.GetBytes(ArrayTypeId);
                             Array.Copy(xTemp, 0, xData, 0, 4);
@@ -224,12 +205,6 @@ namespace Indy.IL2CPU.IL {
                             xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(mTypes[i].FullName) + "__MethodAddressesArray";
                             Assembler.DataMembers.Add(new DataMember(xDataName, xData));
                             Pushd(xDataName);
-                            xDataByteArray.Remove(0, xDataByteArray.Length);
-                            xDataByteArray.Append(BitConverter.GetBytes(ArrayTypeId).Aggregate("", (r, b) => r + b + ","));
-                            xDataByteArray.Append(BitConverter.GetBytes(0x80000002 /* EmbeddedArray */).Aggregate("", (r, b) => r + b + ","));
-                            xDataByteArray.Append(BitConverter.GetBytes((mTypes[i].FullName + ", " + mTypes[i].Module.Assembly.GetName().FullName).Length).Aggregate("", (r, b) => r + b + ","));
-                            xDataByteArray.Append(BitConverter.GetBytes((uint)2).Aggregate("", (r, b) => r + b + ","));
-                            xDataByteArray.Append(Encoding.Unicode.GetBytes(mTypes[i].FullName + ", " + mTypes[i].Module.Assembly.GetName().FullName).Aggregate("", (b, x) => b + x + ",") + "0");
                             xData = new byte[16 + Encoding.Unicode.GetByteCount(mTypes[i].FullName + ", " + mTypes[i].Module.Assembly.GetName().FullName)];
                             xTemp = BitConverter.GetBytes(ArrayTypeId);
                             Array.Copy(xTemp, 0, xData, 0, 4);
