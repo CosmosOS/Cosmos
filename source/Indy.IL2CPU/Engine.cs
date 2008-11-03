@@ -1133,6 +1133,7 @@ namespace Indy.IL2CPU {
                             object xValue = xCurrentField.GetValue(null);
                             if (xValue != null) {
                                 try {
+                                    xData = new byte[xTheSize];
                                     if (xValue.GetType().IsValueType) {
                                         for (int x = 0; x < xTheSize; x++) {
                                             xData[x] = Marshal.ReadByte(xValue,
