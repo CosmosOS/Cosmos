@@ -90,6 +90,14 @@
     <Compile Include="Assembler\EndIfDefined.cs" />
     <Compile Include="Assembler\IfDefined.cs" />
     <Compile Include="Assembler\IfNotDefined.cs" />
+    <Compile Include="Assembler\x86\Registers_Old.cs" />
+    <Compile Include="Assembler\x86\_Infra\Instruction.cs" />
+    <Compile Include="Assembler\x86\_Infra\InstructionWithDestination.cs" />
+    <Compile Include="Assembler\x86\_Infra\InstructionWithDestinationAndSize.cs" />
+    <Compile Include="Assembler\x86\_Infra\InstructionWithDestinationAndSource.cs" />
+    <Compile Include="Assembler\_Infra\IDefine.cs" />
+    <Compile Include="Assembler\_Infra\IEndIfDefined.cs" />
+    <Compile Include="Assembler\_Infra\IIfDefined.cs" />
     <Compile Include="Assembler\_Infra\IIfNotDefined.cs" />
     <Compile Include="Assembler\ImportMember.cs" />
     <Compile Include="Assembler\ImportMethodMember.cs" />
@@ -99,9 +107,6 @@
     <Compile Include="Assembler\RawAssembler.cs" />
     <Compile Include="Assembler\ReaderWriterLocker.cs" />
     <Compile Include="Assembler\StackContent.cs" />
-    <Compile Include="Assembler\x86\186-188AndUp\Bound.cs" />
-    <Compile Include="Assembler\x86\186-188AndUp\EnterStackFrame.cs" />
-    <Compile Include="Assembler\x86\186-188AndUp\LeaveStackFrame.cs" />
     <Compile Include="Assembler\x86\286AndUp\Lgdt.cs" />
     <Compile Include="Assembler\x86\286AndUp\Lidt.cs" />
     <Compile Include="Assembler\x86\286AndUp\LoadGDT.cs" />
@@ -141,7 +146,6 @@
     <Compile Include="Assembler\x86\InByte.cs" />
     <Compile Include="Assembler\x86\Inc.cs" />
     <Compile Include="Assembler\x86\InDWord.cs" />
-    <Compile Include="Assembler\x86\Instruction.cs" />
     <Compile Include="Assembler\x86\Interrupt.cs" />
     <Compile Include="Assembler\x86\InterruptReturn.cs" />
     <Compile Include="Assembler\x86\InWord.cs" />
@@ -175,9 +179,7 @@
     <Compile Include="Assembler\x86\Or.cs" />
     <Compile Include="Assembler\x86\Out.cs" />
     <Compile Include="Assembler\x86\Pop.cs" />
-    <Compile Include="Assembler\x86\Popd.cs" />
     <Compile Include="Assembler\x86\Push.cs" />
-    <Compile Include="Assembler\x86\Pushd.cs" />
     <Compile Include="Assembler\x86\Registers.cs" />
     <Compile Include="Assembler\x86\Repeat.cs" />
     <Compile Include="Assembler\x86\RepeatBase.cs" />
@@ -224,6 +226,7 @@
     <Compile Include="Assembler\x86\X\RegisterESI.cs" />
     <Compile Include="Assembler\x86\X\RegisterESP.cs" />
     <Compile Include="Assembler\x86\X\Y86.cs" />
+    <Compile Include="Assembler\_Infra\InfraExtensions.cs" />
     <Compile Include="CustomImplementation\AssemblerImpl.cs" />
     <Compile Include="CustomImplementation\Microsoft\Win32\RegistryKeyImpl.cs" />
     <Compile Include="CustomImplementation\System\ArrayImpl.cs" />
@@ -505,6 +508,7 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Assembler\x86\186-188AndUp\" />
     <Folder Include="Assembler\x86\286Exclusive\" />
     <Folder Include="Assembler\x86\386Exclusive\" />
     <Folder Include="Assembler\x86\3DNow!2\Geode\" />

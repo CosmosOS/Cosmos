@@ -54,13 +54,16 @@ namespace MatthijsTest {
             //    Console.WriteLine(xCommand);
             //    Console.WriteLine("' not found!");
             //}
-            Console.WriteLine("Cosmos booted!");
-            try {
-                Console.WriteLine("Line 2");
-            }catch(Exception E) {
-                Console.WriteLine("Error Occurred! ");
-            }
-            Console.WriteLine("Cosmos booted!");
+            //Console.WriteLine("Cosmos booted!");
+            //try {
+            //    Console.WriteLine("Line 2");
+            //}catch(Exception E) {
+            //    Console.WriteLine("Error Occurred! ");
+            //}
+            //Console.WriteLine("Cosmos booted!");
+            Console.Write("Number test: ");
+            Console.WriteLine(55);
+            //Indy.IL2CPU.VTablesImpl.
         }
 
         private static void HandleSendBroadCast(string command) {
