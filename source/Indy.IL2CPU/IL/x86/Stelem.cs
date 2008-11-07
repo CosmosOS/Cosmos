@@ -5,7 +5,7 @@ using System.Linq;
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(OpCodeEnum.Stelem)]
 	public class Stelem: Op {
-		private int mElementSize;
+		private uint mElementSize;
 		public Stelem(ILReader aReader, MethodInformation aMethodInfo)
 			: base(aReader, aMethodInfo) {
 			Type xType = aReader.OperandValueType;

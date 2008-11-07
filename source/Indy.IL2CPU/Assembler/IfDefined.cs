@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler {
     [OpCode(0xFFFFFFFF, "%ifdef")]
-    public class IfDefined: Instruction {
+    public class IfDefined: Instruction, IIfDefined {
         public string Symbol {
             get;
             set;
@@ -16,7 +16,7 @@ namespace Indy.IL2CPU.Assembler {
         }
 
         public override string ToString() {
-            return "%ifdef " + Symbol;
+            return this.GetAsText();
         }
     }
 }

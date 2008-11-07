@@ -67,10 +67,5 @@ namespace Cosmos.Kernel.Plugs {
         public static void Interrupt30(ref uint aEAX, ref uint aEBX, ref uint aECX, ref uint aEDX) {
             aEAX = 0;
         }
-
-        [PlugMethod(Assembler = typeof(Assemblers.LoadTSS))]
-        public static void LoadTSS() {
-            //
-        }
     }
 }

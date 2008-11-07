@@ -25,11 +25,10 @@ namespace Indy.IL2CPU.IL.X86 {
                     break;
                 }
                 case 8: {
-                    new CPUx86.Pop("eax");
-                    new CPUx86.Add("esp",
-                                   "4");
-                    new CPUx86.Push("eax");
-                    //new CPUx86.Pop(CPUx86.Registers.EAX);
+                        new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+                        new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
+                    new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                    //new CPUx86.Pop(CPUx86.Registers_Old.EAX);
                     //new CPUx86.SignExtendAX(4);
                     ////all bits of EDX == sign (EAX)
                     //new CPUx86.Pop("EBX");

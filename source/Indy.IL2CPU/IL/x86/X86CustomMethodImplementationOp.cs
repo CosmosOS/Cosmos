@@ -27,13 +27,13 @@ namespace Indy.IL2CPU.IL.X86 {
 		protected override void Assemble_System_UInt32___Indy_IL2CPU_CustomImplementation_System_StringImpl_GetStorage___System_UInt32___() {
 			// arg 0 == this
 			AssembleOp(new Ldarg(MethodInfo, 0));
-			new Indy.IL2CPU.Assembler.X86.Pop(CPUx86.Registers.EAX);
-			int xStorageSize;
+            new Indy.IL2CPU.Assembler.X86.Pop { DestinationReg = CPUx86.Registers.EAX };
+			uint xStorageSize;
 			Dictionary<string, TypeInformation.Field> xFields = Engine.GetTypeFieldInfo(typeof (string), out xStorageSize);
-			new Indy.IL2CPU.Assembler.X86.Add(CPUx86.Registers.EAX, "0" + xFields["$$Storage$$"].Offset.ToString("X") + "h");
-			new Indy.IL2CPU.Assembler.X86.Move(CPUx86.Registers.EAX, CPUx86.Registers.AtEAX);
-			new Indy.IL2CPU.Assembler.X86.Add(CPUx86.Registers.EAX, "12");
-			new Indy.IL2CPU.Assembler.X86.Pushd(CPUx86.Registers.EAX);
+            new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = (uint)xFields["$$Storage$$"].Offset };
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true };
+            new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 12 };
+            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
 		}
 
 		private void AssembleOp(X86.Op aOp) {
@@ -47,7 +47,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			AssembleOp(new Ldarg(MethodInfo, 0));
 			AssembleOp(new Ldarg(MethodInfo, 1));
 			AssembleOp(new Ldelem_I4(null, MethodInfo));
-			new Indy.IL2CPU.Assembler.X86.Pop(CPUx86.Registers.EAX);
+            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
 		}
 
 		protected override void Assemble_System_Void___System_Array_SetValue___System_Object__System_Int32___() {
@@ -62,9 +62,9 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		protected override void Assemble_System_Int32_System_Array_get_Length____() {
 			AssembleOp(new Ldarg(MethodInfo, 0));
-			new Indy.IL2CPU.Assembler.X86.Popd(CPUx86.Registers.EAX);
-			new Indy.IL2CPU.Assembler.X86.Pushd("[eax + 8]");
-			new Indy.IL2CPU.Assembler.X86.Popd(CPUx86.Registers.EAX);
+            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+            new Indy.IL2CPU.Assembler.X86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 8 };
+            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
 		}
 	}
 }

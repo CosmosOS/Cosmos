@@ -34,20 +34,20 @@ namespace Indy.IL2CPU.IL.X86 {
 			if (xStackItem.Size > 4)
 			{
 				new CPUx86.Xor("esi", "esi");
-				new CPUx86.Add("esi", "1");
+                new CPUx86.Add { DestinationReg = CPUx86.Registers.ESI, SourceValue = 1 };
 				new CPUx86.Xor("edi", "edi");
 				//esi = 1
-				new CPUx86.Pop(CPUx86.Registers.EAX);
-				new CPUx86.Pop(CPUx86.Registers.EDX);
-				//value2: EDX:EAX
-				new CPUx86.Pop("ebx");
-				new CPUx86.Pop("ecx");
-				//value1: ECX:EBX
+                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
+                //value2: EDX:EAX
+                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
+                new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
+                //value1: ECX:EBX
 				new CPUx86.Sub("ebx", "eax");
 				new CPUx86.SubWithCarry("ecx", "edx");
 				//result = value1 - value2
 				new CPUx86.ConditionalMove(Condition.Above, "edi", "esi");
-				new CPUx86.Push("edi");
+                new CPUx86.Push { DestinationReg = Registers.EDI };
 
 				//new CPUx86.JumpIfAbove(LabelTrue);
 				//new CPUx86.Push("00h");
@@ -58,17 +58,17 @@ namespace Indy.IL2CPU.IL.X86 {
 
 			} else
 			{
-                new CPUx86.Pop(CPUx86.Registers.EAX);
-                new CPUx86.Compare(CPUx86.Registers.EAX, CPUx86.Registers.AtESP);
+                new CPUx86.Pop{DestinationReg=CPUx86.Registers.EAX};
+                new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
                 new CPUx86.JumpIfGreater(LabelTrue);
                 new CPUx86.Jump(LabelFalse);
                 new CPU.Label(LabelTrue);
-                new CPUx86.Add(CPUx86.Registers.ESP, "4");
-                new CPUx86.Push("01h");
+                new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
+                new CPUx86.Push { DestinationValue = 1 };
                 new CPUx86.Jump(NextInstructionLabel);
                 new CPU.Label(LabelFalse);
-                new CPUx86.Add(CPUx86.Registers.ESP, "4");
-                new CPUx86.Push("00h");
+                new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
+                new CPUx86.Push { DestinationValue = 0 };
                 new CPUx86.Jump(NextInstructionLabel);
 			}
 		}

@@ -9,7 +9,7 @@ using Indy.IL2CPU.Assembler;
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(OpCodeEnum.Sizeof)]
 	public class Sizeof: Op {
-		private int mTheSize;
+		private uint mTheSize;
         public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
             Type xTypeRef = aReader.OperandValueType;
             if (xTypeRef == null)
@@ -26,7 +26,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			Engine.GetTypeFieldInfo(xTypeRef, out mTheSize);
 		}
 		public override void DoAssemble() {
-			new CPU.Pushd("0" + mTheSize.ToString("X") + "h");
+            new CPU.Push { DestinationValue =mTheSize};
 			Assembler.StackContents.Push(new StackContent(4, typeof(int)));
 		}
 	}

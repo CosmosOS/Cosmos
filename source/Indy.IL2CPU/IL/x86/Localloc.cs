@@ -37,10 +37,15 @@ namespace Indy.IL2CPU.IL.X86 {
 		    mLocallocOffset += aMethodInfo.LocalsSize;
 
 		}
-		public override void DoAssemble() {
+        public override void DoAssemble() {
             new CPUx86.Call(new CPU.Label(RuntimeEngineRefs.Heap_AllocNewObjectRef).Name);
-		    new CPUx86.Move("[ebp - " + mLocallocOffset + "]",
-		                    Registers.AtESP);
-		}
+            new CPUx86.Move {
+                DestinationReg = CPUx86.Registers.EBP,
+                DestinationIsIndirect = true,
+                DestinationDisplacement = mLocallocOffset,
+                SourceReg = Registers.ESP,
+                SourceIsIndirect = true
+            };
+        }
 	}
 }

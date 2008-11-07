@@ -31,7 +31,7 @@ namespace Indy.IL2CPU.IL {
 		public MethodBase SetTypeInfoRef;				   
 		public MethodBase SetMethodInfoRef;
 		public FieldInfo TypesFieldRef;
-		public int VTableEntrySize; 
+		public uint VTableEntrySize; 
 		public uint ArrayTypeId;
 		public IList<MethodBase> Methods;
 		public event GetMethodIdentifierEventHandler GetMethodIdentifier;
@@ -45,7 +45,8 @@ namespace Indy.IL2CPU.IL {
 			}
 		}
 
-		protected abstract void Pushd(string aValue);
+		protected abstract void Push(uint aValue);
+        protected abstract void Push(string aLabelName);
 		protected abstract void Call(MethodBase aMethod);
 
 		public override void DoAssemble() {
@@ -86,7 +87,7 @@ namespace Indy.IL2CPU.IL {
             Array.Copy(xTemp, 0, xData, 12, 4);
 			Assembler.DataMembers.Add(new DataMember(xTheName + "__Contents", xData));
 			Assembler.DataMembers.Add(new DataMember(xTheName, new ElementReference(xTheName + "__Contents")));
-			Pushd("0" + mTypes.Count.ToString("X") + "h");
+			Push((uint)mTypes.Count);
 			Call(LoadTypeTableRef);
 			for (int i = 0; i < mTypes.Count; i++) {
                 if (mDebugMode)
@@ -158,7 +159,7 @@ namespace Indy.IL2CPU.IL {
                         }
                         if (!xType.IsInterface)
                         {
-                            Pushd("0" + i.ToString("X") + "h");
+                            Push((uint)i);
                         }
                         int? xBaseIndex = null;
                         if (xType.BaseType == null)
@@ -190,8 +191,8 @@ namespace Indy.IL2CPU.IL {
                         if (!xType.IsInterface)
                         {
 
-                            Pushd("0" + xBaseIndex.Value.ToString("X") + "h");
-                            //Pushd("0" + xEmittedMethods.Count.ToString("X") + "h");
+                            Push((uint)xBaseIndex.Value);
+                            //Push("0" + xEmittedMethods.Count.ToString("X") + "h");
                             xData = new byte[16 + (xEmittedMethods.Count * 4)];
                             xTemp = BitConverter.GetBytes(ArrayTypeId);
                             Array.Copy(xTemp, 0, xData, 0, 4);
@@ -201,10 +202,10 @@ namespace Indy.IL2CPU.IL {
                             Array.Copy(xTemp, 0, xData, 8, 4);
                             string xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(mTypes[i].FullName) + "__MethodIndexesArray";
                             Assembler.DataMembers.Add(new DataMember(xDataName, xData));
-                            Pushd(xDataName);
+                            Push(xDataName);
                             xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(mTypes[i].FullName) + "__MethodAddressesArray";
                             Assembler.DataMembers.Add(new DataMember(xDataName, xData));
-                            Pushd(xDataName);
+                            Push(xDataName);
                             xData = new byte[16 + Encoding.Unicode.GetByteCount(mTypes[i].FullName + ", " + mTypes[i].Module.Assembly.GetName().FullName)];
                             xTemp = BitConverter.GetBytes(ArrayTypeId);
                             Array.Copy(xTemp, 0, xData, 0, 4);
@@ -216,8 +217,8 @@ namespace Indy.IL2CPU.IL {
                             Array.Copy(xTemp, 0, xData, 12, 4);
                             xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(mTypes[i].FullName);
                             mAssembler.DataMembers.Add(new DataMember(xDataName, xData));
-                            Pushd(xDataName);
-                            //Pushd("0");
+                            Push(xDataName);
+                            //Push("0");
                             Call(SetTypeInfoRef);
                         }
                         for (int j = 0; j < xEmittedMethods.Count; j++)
@@ -265,16 +266,16 @@ namespace Indy.IL2CPU.IL {
                                     if (xNewMethod == null) { System.Diagnostics.Debugger.Break(); }
                                     xMethod = xNewMethod;
                                 }
-                                Pushd("0" + i.ToString("X") + "h");
-                                Pushd("0" + j.ToString("X") + "h");
+                                Push("0" + i.ToString("X") + "h");
+                                Push("0" + j.ToString("X") + "h");
 
-                                Pushd("0" + xMethodId.ToString("X") + "h");
-                                Pushd(Label.GenerateLabelName(xMethod));
+                                Push("0" + xMethodId.ToString("X") + "h");
+                                Push(Label.GenerateLabelName(xMethod));
                                 //xDataValue = Encoding.ASCII.GetBytes(GetFullName(xMethod)).Aggregate("", (b, x) => b + x + ",") + "0";
                                 //xDataName = "____SYSTEM____METHOD___" + DataMember.FilterStringForIncorrectChars(GetFullName(xMethod));
                                 //mAssembler.DataMembers.Add(new DataMember(xDataName, "db", xDataValue));
-                                //Pushd(xDataName);
-                                Pushd("0");
+                                //Push(xDataName);
+                                Push("0");
                                 Call(SetMethodInfoRef);
                             }
                         }

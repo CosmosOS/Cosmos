@@ -299,7 +299,7 @@ namespace Indy.IL2CPU {
                         }
                         xEntryPointOp.Call(xEntryPoint);
                         if (xEntryPoint.ReturnType == typeof(void)) {
-                            xEntryPointOp.Pushd("0");
+                            xEntryPointOp.Push(0);
                         }
                         // todo: implement support for returncodes?
                         xEntryPointOp.Call(RuntimeEngineRefs.FinalizeApplicationRef);
@@ -937,7 +937,7 @@ namespace Indy.IL2CPU {
         /// <remarks>For classes, this is the pointer size.</remarks>
         /// <param name="aType"></param>
         /// <returns></returns>
-        public static int GetFieldStorageSize(Type aType) {
+        public static uint GetFieldStorageSize(Type aType) {
             if (aType.FullName == "System.Void") {
                 return 0;
             }
@@ -992,11 +992,11 @@ namespace Indy.IL2CPU {
                 StructLayoutAttribute xSLA = aType.StructLayoutAttribute;
                 if (xSLA != null) {
                     if (xSLA.Size > 0) {
-                        return xSLA.Size;
+                        return (uint)xSLA.Size;
                     }
                 }
             }
-            int xResult;
+            uint xResult;
             GetTypeFieldInfo(aType,
                              out xResult);
             return xResult;
@@ -1120,7 +1120,7 @@ namespace Indy.IL2CPU {
                         throw new NotImplementedException();
                     } else {
                         RegisterType(xCurrentField.FieldType);
-                        int xTheSize;
+                        uint xTheSize;
                         string theType = "db";
                         Type xFieldTypeDef = xCurrentField.FieldType;
                         if (!xFieldTypeDef.IsClass || xFieldTypeDef.IsValueType) {
@@ -1341,7 +1341,7 @@ namespace Indy.IL2CPU {
                                     }
                                     
                                     // Possibly emit Tracer call
-                                    EmitTracer(xOp, xCurrentMethod.DeclaringType.Namespace, xReader.Position,
+                                    EmitTracer(xOp, xCurrentMethod.DeclaringType.Namespace, (int)xReader.Position,
                                         xCodeOffsets, xLabel);
                                     
                                     using (mSymbolsLocker.AcquireWriterLock()) {
@@ -1357,7 +1357,7 @@ namespace Indy.IL2CPU {
                                             xMLSymbol.AssemblyFile = xCurrentMethod.DeclaringType.Assembly.Location;
                                             xMLSymbol.MethodToken = xCurrentMethod.MetadataToken;
                                             xMLSymbol.TypeToken = xCurrentMethod.DeclaringType.MetadataToken;
-                                            xMLSymbol.ILOffset = xReader.Position;
+                                            xMLSymbol.ILOffset = (int)xReader.Position;
                                             mSymbols.Add(xMLSymbol);
                                         }
                                     }
@@ -1675,7 +1675,7 @@ namespace Indy.IL2CPU {
 
         public static TypeInformation GetTypeInfo(Type aType) {
             TypeInformation xTypeInfo;
-            int xObjectStorageSize;
+            uint xObjectStorageSize;
             Dictionary<string, TypeInformation.Field> xTypeFields = GetTypeFieldInfo(aType,
                                                                                      out xObjectStorageSize);
             xTypeInfo = new TypeInformation(xObjectStorageSize,
@@ -1714,7 +1714,7 @@ namespace Indy.IL2CPU {
                                                               if (xBody != null) {
                                                                   xVars = new MethodInformation.Variable[xBody.LocalVariables.Count];
                                                                   foreach (LocalVariableInfo xVarDef in xBody.LocalVariables) {
-                                                                      int xVarSize = GetFieldStorageSize(xVarDef.LocalType);
+                                                                      int xVarSize = (int)GetFieldStorageSize(xVarDef.LocalType);
                                                                       if ((xVarSize % 4) != 0) {
                                                                           xVarSize += 4 - (xVarSize % 4);
                                                                       }
@@ -1734,7 +1734,7 @@ namespace Indy.IL2CPU {
                                                                   ParameterInfo[] xParameters = aCurrentMethodForArguments.GetParameters();
                                                                   xArgs = new MethodInformation.Argument[xParameters.Length + 1];
                                                                   xCurOffset = 0;
-                                                                  int xArgSize;
+                                                                  uint xArgSize;
                                                                   for (int i = xArgs.Length - 1; i > 0; i--) {
                                                                       ParameterInfo xParamDef = xParameters[i - 1];
                                                                       xArgSize = GetFieldStorageSize(xParamDef.ParameterType);
@@ -1755,7 +1755,7 @@ namespace Indy.IL2CPU {
                                                                                                                 !xParamDef.ParameterType.IsValueType,
                                                                                                                 GetTypeInfo(xParamDef.ParameterType),
                                                                                                                 xParamDef.ParameterType);
-                                                                      xCurOffset += xArgSize;
+                                                                      xCurOffset += (int)xArgSize;
                                                                   }
                                                                   xArgSize = 4;
                                                                   // this
@@ -1771,7 +1771,7 @@ namespace Indy.IL2CPU {
                                                                   xCurOffset = 0;
                                                                   for (int i = xArgs.Length - 1; i >= 0; i--) {
                                                                       ParameterInfo xParamDef = xParameters[i]; //xArgs.Length - i - 1];
-                                                                      int xArgSize = GetFieldStorageSize(xParamDef.ParameterType);
+                                                                      uint xArgSize = GetFieldStorageSize(xParamDef.ParameterType);
                                                                       if ((xArgSize % 4) != 0) {
                                                                           xArgSize += 4 - (xArgSize % 4);
                                                                       }
@@ -1789,7 +1789,7 @@ namespace Indy.IL2CPU {
                                                                                                                 !xParamDef.ParameterType.IsValueType,
                                                                                                                 GetTypeInfo(xParamDef.ParameterType),
                                                                                                                 xParamDef.ParameterType);
-                                                                      xCurOffset += xArgSize;
+                                                                      xCurOffset += (int)xArgSize;
                                                                   }
                                                               }
                                                               int xResultSize = 0;
@@ -1797,13 +1797,13 @@ namespace Indy.IL2CPU {
                                                               MethodInfo xMethInfo = aCurrentMethodForArguments as MethodInfo;
                                                               Type xReturnType = typeof(void);
                                                               if (xMethInfo != null) {
-                                                                  xResultSize = GetFieldStorageSize(xMethInfo.ReturnType);
+                                                                  xResultSize = (int)GetFieldStorageSize(xMethInfo.ReturnType);
                                                                   xReturnType = xMethInfo.ReturnType;
                                                               }
                                                               xMethodInfo = new MethodInformation(aMethodName,
                                                                                                   xVars,
                                                                                                   xArgs,
-                                                                                                  xResultSize,
+                                                                                                  (uint)xResultSize,
                                                                                                   !aCurrentMethodForArguments.IsStatic,
                                                                                                   aTypeInfo,
                                                                                                   aCurrentMethodForArguments,
@@ -1815,7 +1815,7 @@ namespace Indy.IL2CPU {
         }
 
         public static Dictionary<string, TypeInformation.Field> GetTypeFieldInfo(MethodBase aCurrentMethod,
-                                                                                 out int aObjectStorageSize) {
+                                                                                 out uint aObjectStorageSize) {
             Type xCurrentInspectedType = aCurrentMethod.DeclaringType;
             return GetTypeFieldInfo(xCurrentInspectedType,
                                     out aObjectStorageSize);
@@ -1823,7 +1823,7 @@ namespace Indy.IL2CPU {
 
         private static void GetTypeFieldInfoImpl(List<KeyValuePair<string, TypeInformation.Field>> aTypeFields,
                                                  Type aType,
-                                                 ref int aObjectStorageSize) {
+                                                 ref uint aObjectStorageSize) {
             Type xActualType = aType;
             Dictionary<string, PlugFieldAttribute> xCurrentPlugFieldList = new Dictionary<string, PlugFieldAttribute>();
             do {
@@ -1865,7 +1865,7 @@ namespace Indy.IL2CPU {
                     if ((xFieldType.IsClass && !xFieldType.IsValueType) || (xPlugFieldAttr != null && xPlugFieldAttr.IsExternalValue)) {
                         xFieldSize = 4;
                     } else {
-                        xFieldSize = GetFieldStorageSize(xFieldType);
+                        xFieldSize = (int)GetFieldStorageSize(xFieldType);
                     }
                     //}
                     if ((from item in aTypeFields
@@ -1873,13 +1873,13 @@ namespace Indy.IL2CPU {
                          select item).Count() > 0) {
                         continue;
                     }
-                    int xOffset = aObjectStorageSize;
+                    int xOffset = (int)aObjectStorageSize;
                     FieldOffsetAttribute xOffsetAttrib = xField.GetCustomAttributes(typeof(FieldOffsetAttribute),
                                                                                     true).FirstOrDefault() as FieldOffsetAttribute;
                     if (xOffsetAttrib != null) {
                         xOffset = xOffsetAttrib.Value;
                     } else {
-                        aObjectStorageSize += xFieldSize;
+                        aObjectStorageSize += (uint)xFieldSize;
                         xOffset = -1;
                     }
                     aTypeFields.Insert(0,
@@ -1906,10 +1906,10 @@ namespace Indy.IL2CPU {
                     if (xItem.IsExternalValue||(xFieldType.IsClass && !xFieldType.IsValueType)) {
                         xFieldSize = 4;
                     } else {
-                        xFieldSize = GetFieldStorageSize(xFieldType);
+                        xFieldSize = (int)GetFieldStorageSize(xFieldType);
                     }
-                    int xOffset = aObjectStorageSize;
-                    aObjectStorageSize += xFieldSize;
+                    int xOffset = (int)aObjectStorageSize;
+                    aObjectStorageSize += (uint)xFieldSize;
                     aTypeFields.Insert(0,
                                        new KeyValuePair<string, TypeInformation.Field>(xItem.FieldId,
                                                                                        new TypeInformation.Field(xFieldSize,
@@ -1926,7 +1926,7 @@ namespace Indy.IL2CPU {
         }
 
         public static Dictionary<string, TypeInformation.Field> GetTypeFieldInfo(Type aType,
-                                                                                 out int aObjectStorageSize) {
+                                                                                 out uint aObjectStorageSize) {
             var xTypeFields = new List<KeyValuePair<string, TypeInformation.Field>>();
             aObjectStorageSize = 0;
             GetTypeFieldInfoImpl(xTypeFields,
@@ -1935,12 +1935,12 @@ namespace Indy.IL2CPU {
             if (aType.IsExplicitLayout) {
                 var xStructLayout = aType.StructLayoutAttribute;
                 if (xStructLayout.Size == 0) {
-                    aObjectStorageSize = (from item in xTypeFields
+                    aObjectStorageSize = (uint)((from item in xTypeFields
                                           let xSize = item.Value.Offset + item.Value.Size
                                           orderby xSize descending
-                                          select xSize).FirstOrDefault();
+                                          select xSize).FirstOrDefault());
                 } else {
-                    aObjectStorageSize = xStructLayout.Size;
+                    aObjectStorageSize = (uint)xStructLayout.Size;
                 }
             }
             int xOffset = 0;
@@ -2053,7 +2053,7 @@ namespace Indy.IL2CPU {
         }
 
         /// <summary>
-        /// Registers a type and returns the Type identifier
+        /// Registers_Old a type and returns the Type identifier
         /// </summary>
         /// <param name="aType"></param>
         /// <returns></returns>

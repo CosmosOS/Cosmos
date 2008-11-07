@@ -20,7 +20,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public override void DoAssemble() {
-			new CPU.Pushd(mDataName);
+            new CPU.Push { DestinationRef = new ElementReference(mDataName) };
 			Assembler.StackContents.Push(new StackContent(4, true, false, false));
 		}
 	}

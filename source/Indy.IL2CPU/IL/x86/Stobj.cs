@@ -11,20 +11,20 @@ namespace Indy.IL2CPU.IL.X86 {
 		public override void DoAssemble() {
 			int xFieldSize = Assembler.StackContents.Pop().Size;
 			Assembler.StackContents.Pop();
-			new CPUx86.Move("ecx", "[esp + " + xFieldSize + "]");
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = xFieldSize };
 			for (int i = 0; i < (xFieldSize / 4); i++) {
-				new CPUx86.Pop("eax");
-				new CPUx86.Move("dword [ecx + 0x" + (i * 4).ToString("X") + "]", "eax");
+                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+                new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = i * 4, SourceReg = CPUx86.Registers.EAX };
 			}
 			switch (xFieldSize % 4) {
 				case 1: {
-						new CPUx86.Pop("eax");
-						new CPUx86.Move("byte [ecx + " + ((xFieldSize / 4) * 4) + "]", "al");
+                        new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+                        new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = ((xFieldSize / 4) * 4), SourceReg = CPUx86.Registers.AL };
 						break;
 					}
 				case 2: {
-						new CPUx86.Pop("eax");
-						new CPUx86.Move("word [ecx + " + ((xFieldSize / 4) * 4) + "]", "ax");
+                        new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+                        new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = ((xFieldSize / 4) * 4), SourceReg = CPUx86.Registers.AX };
 						break;
 					}
 				case 0: {
@@ -33,7 +33,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				default:
 					throw new Exception("Remainder size " + (xFieldSize % 4) + " not supported!");
 			}
-			new CPUx86.Add("esp", "4");
+            new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
 		}
 	}
 }

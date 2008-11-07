@@ -13,12 +13,12 @@ namespace Indy.IL2CPU.Assembler.X86.X {
         }
 
         public static implicit operator RegisterEBP(UInt32 aValue) {
-            Instance.Move(aValue.ToString());
+            Instance.Move(aValue);
             return Instance;
         }
 
         public static implicit operator RegisterEBP(RegisterESP aValue) {
-            Instance.Move(aValue.ToString());
+            Instance.Move(aValue.GetId());
             return Instance;
         }
     }

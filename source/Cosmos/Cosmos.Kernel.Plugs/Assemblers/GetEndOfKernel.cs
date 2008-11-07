@@ -10,7 +10,7 @@ using HW = Cosmos.Hardware;
 namespace Cosmos.Kernel.Plugs.Assemblers {
 	public class GetEndOfKernel: AssemblerMethod {
 		public override void Assemble(Assembler aAssembler) {
-			new CPUx86.Pushd("_end_code");
+            new CPUx86.Push { DestinationRef = new ElementReference("_end_code") };
 		}
 	}
 }

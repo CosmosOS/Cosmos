@@ -20,16 +20,16 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			if (xSize > 4)
 			{
-				new CPUx86.Popd("eax");
-				new CPUx86.Popd("ebx");
+                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
 				new CPUx86.Xor("eax", "eax");
 				new CPUx86.JumpIfNotZero(TargetLabel);
 				new CPUx86.Xor("ebx", "ebx");
 				new CPUx86.JumpIfNotZero(TargetLabel);
 			} else
 			{
-				new CPUx86.Popd(CPUx86.Registers.EAX);
-				new CPUx86.Compare(CPUx86.Registers.EAX, "0");
+                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+                new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
 				new CPUx86.JumpIfNotEqual(TargetLabel);
 			}
 		}

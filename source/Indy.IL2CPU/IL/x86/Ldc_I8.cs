@@ -23,8 +23,8 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 		public override void DoAssemble() {
 			string theValue = mValue.ToString("X16");
-			new CPU.Pushd("0" + theValue.Substring(0, 8) + "h");
-			new CPU.Pushd("0" + theValue.Substring(8) + "h");
+            new CPU.Push { DestinationValue = BitConverter.ToUInt32(BitConverter.GetBytes(mValue), 0) };
+            new CPU.Push { DestinationValue = BitConverter.ToUInt32(BitConverter.GetBytes(mValue), 4) };
 			Assembler.StackContents.Push(new StackContent(8, typeof(long)));
 		}
 	}

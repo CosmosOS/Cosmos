@@ -18,16 +18,16 @@ namespace Indy.IL2CPU.IL.X86 {
 				case 1:
 				case 2:
 				case 4:
-					new CPUx86.Pop(CPUx86.Registers.ECX);
-					new CPUx86.Pop(CPUx86.Registers.EAX);
-					new CPUx86.Sub(CPUx86.Registers.EAX, CPUx86.Registers.ECX);
-					new CPUx86.Push(CPUx86.Registers.EAX);
+                    new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX }; 
+                    new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+					new CPUx86.Sub(CPUx86.Registers_Old.EAX, CPUx86.Registers_Old.ECX);
+                    new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
 					break;
 				case 8:
-					new CPUx86.Pop(CPUx86.Registers.EAX);
-					new CPUx86.Pop(CPUx86.Registers.EDX);
-					new CPUx86.Sub("[esp]", CPUx86.Registers.EAX);
-					new CPUx86.SubWithCarry("[esp + 4]", CPUx86.Registers.EDX);
+                    new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+                    new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
+                    new CPUx86.Sub("[esp]", CPUx86.Registers_Old.EAX);
+					new CPUx86.SubWithCarry("[esp + 4]", CPUx86.Registers_Old.EDX);
 					break;
 				default:
 					throw new NotSupportedException(string.Format("sub operationd doesn't support size {0}", stackTop.Size));

@@ -25,18 +25,18 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 		          , 0xFF,0xFF,0,0,0,0x93,0xCF,0}));
             aAssembler.DataMembers.Add(new DataMember("_NATIVE_GDT_Pointer", new ushort[]{0x17,0,0}));
 
-			new CPUx86.Move(Registers.EAX, "_NATIVE_GDT_Pointer");
-			new CPUx86.Move("dword [_NATIVE_GDT_Pointer + 2]", "_NATIVE_GDT_Contents");
+            new CPUx86.Move { DestinationReg = Registers.EAX, SourceRef = new ElementReference("_NATIVE_GDT_Pointer") };
+            new CPUx86.Move { DestinationRef = new ElementReference("_NATIVE_GDT_Pointer"), DestinationIsIndirect = true, DestinationDisplacement = 2, SourceRef = new ElementReference("_NATIVE_GDT_Contents") };
             
 			new Label(".RegisterGDT");
-            new CPUx86.Move(Registers.EAX, "_NATIVE_GDT_Pointer");
-			new CPUNative.Lgdt(Registers.AtEAX);
-			new CPUx86.Move(Registers.AX, "0x10");
-			new CPUx86.Move("ds", Registers.AX);
-            new CPUx86.Move("es", Registers.AX);
-            new CPUx86.Move("fs", Registers.AX);
-            new CPUx86.Move("gs", Registers.AX);
-            new CPUx86.Move("ss", Registers.AX);				 
+            new CPUx86.Move { DestinationReg = Registers.EAX, SourceRef = new ElementReference("_NATIVE_GDT_Pointer") };
+			new CPUNative.Lgdt(Registers_Old.AtEAX);
+            new CPUx86.Move { DestinationReg = Registers.AX, SourceValue = 0x10 };
+			new CPUx86.Move{DestinationReg=Registers.DS, SourceReg=Registers.AX};
+            new CPUx86.Move{DestinationReg=Registers.ES, SourceReg=Registers.AX};
+            new CPUx86.Move{DestinationReg=Registers.FS, SourceReg=Registers.AX};
+            new CPUx86.Move{DestinationReg=Registers.GS, SourceReg=Registers.AX};
+            new CPUx86.Move { DestinationReg = Registers.SS, SourceReg = Registers.AX };
             // Force reload of code segement
 			new CPUx86.Jump("0x8:flush__GDT__table");
 			new Label("flush__GDT__table");

@@ -129,13 +129,5 @@ namespace Cosmos.Kernel {
         public static bool IsVirtual8086Mode() {
             return false;
         }
-
-        public static unsafe byte* GetTSS() {
-            return null;
-        }
-
-        public static void LoadTSS() {
-            //
-        }
 	}
 }

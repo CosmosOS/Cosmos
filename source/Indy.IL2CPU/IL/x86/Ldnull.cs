@@ -12,7 +12,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			: base(aReader, aMethodInfo) {
 		}
 		public override void DoAssemble() {
-			new CPU.Pushd("0");
+            new CPU.Push { DestinationValue = 0 };
 			Assembler.StackContents.Push(new StackContent(4, typeof(uint)));
 		}
 	}

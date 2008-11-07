@@ -19,9 +19,9 @@ namespace Indy.IL2CPU.IL.X86 {
 				case 2:
 				case 4: {
 						Assembler.StackContents.Pop();
-						new CPUx86.Pop(CPUx86.Registers.EAX);
-						new CPUx86.Pushd("0");
-						new CPUx86.Pushd(CPUx86.Registers.EAX);
+                        new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+                        new CPUx86.Push { DestinationValue = 0 };
+                        new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
 						Assembler.StackContents.Push(new StackContent(8, typeof(ulong)));
 						break;
 					}

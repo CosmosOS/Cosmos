@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler {
     [OpCode(0xFFFFFFFF, "%define")]
-    public class Define: Instruction {
+    public class Define: Instruction, IDefine {
         public string Symbol {
             get;
             set;
@@ -16,7 +16,7 @@ namespace Indy.IL2CPU.Assembler {
         }
 
         public override string ToString() {
-            return "%define " + Symbol + " 1";
+            return this.GetAsText();
         }
     }
 }

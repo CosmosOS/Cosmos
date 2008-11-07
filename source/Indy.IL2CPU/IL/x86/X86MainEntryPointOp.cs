@@ -15,8 +15,8 @@ namespace Indy.IL2CPU.IL.X86 {
 			: base(aReader, aMethodInfo) {
 		}
 
-		public override void Pushd(string aValue) {
-			new CPUx86.Pushd(aValue);
+		public override void Push(uint aValue) {
+            new CPUx86.Push { DestinationValue = aValue };
 		}
 
 		private int xLabelId = 0;
@@ -24,7 +24,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		public override void Call(MethodBase aMethod) {
 			Engine.QueueMethod(aMethod);
 			Call(CPU.Label.GenerateLabelName(aMethod));
-			new CPUx86.Test(CPUx86.Registers.ECX, 2);
+			new CPUx86.Test(CPUx86.Registers_Old.ECX, 2);
 			string xLabel = ".Call_Part2_" + xLabelId++.ToString();
 			new CPUx86.JumpIfEqual(xLabel);
 			//new CPUx86.Call("_CODE_REQUESTED_BREAK_");
@@ -34,7 +34,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			MethodInfo xMethodInfo = aMethod as MethodInfo;
 			if (xMethodInfo != null) {
 				if (!xMethodInfo.ReturnType.FullName.StartsWith("System.Void")) {
-					new CPUx86.Pushd(CPUx86.Registers.EAX);
+                    new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
 				}
 			}
 		}

@@ -11,9 +11,9 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 		public override void DoAssemble() {
 			Assembler.StackContents.Pop();
-			new CPUx86.Pop(CPUx86.Registers.EAX);
-			new CPUx86.Pushd("[eax + 4]");
-			new CPUx86.Pushd(CPUx86.Registers.AtEAX);
+            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4 };
+            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true};
 			Assembler.StackContents.Push(new StackContent(8, typeof(long)));
 		}
 	}

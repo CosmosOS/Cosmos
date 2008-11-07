@@ -17,7 +17,7 @@ namespace Indy.IL2CPU.Assembler.X86.X {
         // Also useful for Memory conversion - Can find attribute
         // of descendant? or no?
         public static implicit operator RegisterAL(byte aValue) {
-            Instance.Move(aValue.ToString());
+            Instance.Move(aValue);
             return Instance;
         }
 
@@ -27,7 +27,7 @@ namespace Indy.IL2CPU.Assembler.X86.X {
         }
 
         public static implicit operator RegisterAL(MemoryAction aAction) {
-            new X86.Move(Name, aAction.ToString());
+            Instance.Move(aAction);
             return Instance;
         }
 

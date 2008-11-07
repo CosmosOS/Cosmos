@@ -154,7 +154,7 @@ namespace Indy.IL2CPU.IL.X86
 						//IL.X86.Op.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
 
 						Engine.QueueMethod(InvokeMulticastRef);
-						new CPUx86.Push(Label.GenerateLabelName(InvokeMulticastRef));
+                        new CPUx86.Push { DestinationRef = new ElementReference(Label.GenerateLabelName(InvokeMulticastRef)) };
 						break;
 					}
 				case "System_MulticastDelegate___System_Delegate_InternalAllocLike___System_Delegate___":
@@ -180,18 +180,20 @@ namespace Indy.IL2CPU.IL.X86
 							//
 							var xInvokeMethod = aMethodInfo.TypeInfo.TypeDef.GetMethod("Invoke");
 							var xDelegateMethodInfo = Engine.GetMethodInfo(xInvokeMethod, xInvokeMethod, xInvokeMethod.Name, aMethodInfo.TypeInfo, aMethodInfo.DebugMode);
-							int xArgSize = (from item in xDelegateMethodInfo.Arguments
-											select item.Size + (item.Size % 4 == 0
-																	? 0
-																	: (4 - (item.Size % 4)))).Take(xDelegateMethodInfo.Arguments.Length).Sum();
-							new CPUx86.Push((xArgSize - 4).ToString());
+							uint xArgSize  = 0;
+                            foreach (var xArg in xDelegateMethodInfo.Arguments) {
+                                xArgSize += xArg.Size + (xArg.Size % 4 == 0
+                                                                    ? 0
+                                                                    : (4 - (xArg.Size % 4)));
+                            }
+                            new CPUx86.Push { DestinationValue = (xArgSize - 4) };
 							new CPU.Label(".SetArgSize");
 							aAssembler.StackContents.Push(new StackContent(4));
 							Stfld.Stfld(aAssembler, aMethodInfo.TypeInfo, aMethodInfo.TypeInfo.Fields["$$ArgSize$$"]);
 							if (xDelegateMethodInfo.ReturnType != typeof(void))
 							{
 								Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
-								new CPUx86.Pushd("1");
+                                new CPUx86.Push { DestinationValue = 1 };
 								aAssembler.StackContents.Push(new StackContent(4));
 								Stfld.Stfld(aAssembler, aMethodInfo.TypeInfo, aMethodInfo.TypeInfo.Fields["$$ReturnsValue$$"]);
 							}
@@ -213,7 +215,7 @@ namespace Indy.IL2CPU.IL.X86
 							//Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
 							//Ldarg.Ldfld(aAssembler, aMethodInfo.TypeInfo, "System.IntPtr System.Delegate._methodPtr");
 							//new CPUx86.Pop("eax");
-							//new CPUx86.Call(CPUx86.Registers.EAX);
+							//new CPUx86.Call(CPUx86.Registers_Old.EAX);
 							//new CPUx86.Add("esp",
 							//               "4");
 							Engine.QueueMethod(InvokeMulticastRef);
@@ -223,7 +225,7 @@ namespace Indy.IL2CPU.IL.X86
 							xGetInvocationListMethod = typeof(Delegate).GetMethod("GetInvocationList");
 							Engine.QueueMethod(xGetInvocationListMethod);
 
-							//							new CPUx86.Pop(CPUx86.Registers.EAX);
+							//							new CPUx86.Pop(CPUx86.Registers_Old.EAX);
 							//new CPUx86.Move("esp", "ebp");
 							break;
 						}
@@ -240,18 +242,18 @@ namespace Indy.IL2CPU.IL.X86
 			//   1: value
 			//   2: comparand
 			Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[2]);
-			new CPUx86.Pop(CPUx86.Registers.EAX);
+            new Assembler.X86.Pop { DestinationReg = Assembler.X86.Registers.EAX };
 			Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[1]);
-			new CPUx86.Pop(CPUx86.Registers.EDX);
+            new Assembler.X86.Pop { DestinationReg = Assembler.X86.Registers.EDX };
 			Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
-			new CPUx86.Pop(CPUx86.Registers.ECX);
-			new CPUx86.Pushd(CPUx86.Registers.AtECX);
-			new CPUx86.Pop(CPUx86.Registers.ECX);
-			new CPUx86.CmpXchg(CPUx86.Registers.ECX, CPUx86.Registers.EDX);
+            new Assembler.X86.Pop { DestinationReg = Assembler.X86.Registers.ECX };
+            new CPUx86.Push { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true };
+            new Assembler.X86.Pop { DestinationReg = Assembler.X86.Registers.ECX };
+			new CPUx86.CmpXchg(CPUx86.Registers_Old.ECX, CPUx86.Registers_Old.EDX);
 			Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
-			new CPUx86.Pop(CPUx86.Registers.EAX);
-			new CPUx86.Move(CPUx86.Registers.EAX, CPUx86.Registers.ECX);
-			new CPUx86.Pushd(CPUx86.Registers.EAX);
+            new Assembler.X86.Pop { DestinationReg = Assembler.X86.Registers.EAX };
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ECX };
+            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
 		}
 
 		public override void EmitOpDebugHeader(Indy.IL2CPU.Assembler.Assembler aAssembler, uint aOpId, string aOpLabel) {

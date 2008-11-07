@@ -13,12 +13,12 @@ namespace Indy.IL2CPU.IL.X86 {
         private readonly string mNormalAddress;
         private readonly string mMethodDescription;
         private readonly int mThisOffset;
-        private readonly int mArgumentCount;
-        private readonly int mReturnSize;
+        private readonly uint mArgumentCount;
+        private readonly uint mReturnSize;
         private readonly string mLabelName;
         private readonly MethodInformation mCurrentMethodInfo;
         private readonly MethodInformation mTargetMethodInfo;
-        private readonly int mCurrentILOffset;
+        private readonly uint mCurrentILOffset;
         private readonly int mExtraStackSpace;
 
         public static void ScanOp(ILReader aReader,
@@ -69,7 +69,7 @@ namespace Indy.IL2CPU.IL.X86 {
             }
             mMethodIdentifier = Engine.GetMethodIdentifier(xMethodDef);
             Engine.QueueMethod(VTablesImplRefs.GetMethodAddressForTypeRef);
-            mArgumentCount = mTargetMethodInfo.Arguments.Length;
+            mArgumentCount = (uint)mTargetMethodInfo.Arguments.Length;
             mReturnSize = mTargetMethodInfo.ReturnSize;
             mThisOffset = mTargetMethodInfo.Arguments[0].Offset;
             if (mTargetMethodInfo.ExtraStackSize > 0) {
@@ -80,20 +80,24 @@ namespace Indy.IL2CPU.IL.X86 {
         }
 
         public override void DoAssemble() {
+            new Comment("ThisOffset = " + mThisOffset);
             Action xEmitCleanup = delegate() {
                                       foreach (MethodInformation.Argument xArg in mTargetMethodInfo.Arguments) {
-                                          new CPUx86.Add("esp",
-                                                         xArg.Size.ToString());
+                                          new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = xArg.Size };
                                       }
                                   };
             if (!String.IsNullOrEmpty(mNormalAddress)) {
                 EmitCompareWithNull(Assembler,
                                     mCurrentMethodInfo,
-                                    "[esp + 0x" + mThisOffset.ToString("X") + "]",
+                                    delegate(CPUx86.Compare c){
+                                        c.DestinationReg = CPUx86.Registers.ESP;
+                                        c.DestinationIsIndirect = true;
+                                        c.DestinationDisplacement = mThisOffset;
+                                    },
                                     mLabelName,
                                     mLabelName + "_AfterNullRefCheck",
                                     xEmitCleanup,
-                                    mCurrentILOffset);
+                                    (int)mCurrentILOffset);
                 new CPU.Label(mLabelName + "_AfterNullRefCheck");
                 if (mExtraStackSpace > 0) {
                     new CPUx86.Sub("esp",
@@ -110,16 +114,19 @@ namespace Indy.IL2CPU.IL.X86 {
                 //Assembler.Add(new CPUx86.Pushd("eax"));
                 EmitCompareWithNull(Assembler,
                                     mCurrentMethodInfo,
-                                    "[esp + 0x" + mThisOffset.ToString("X") + "]",
+                                    delegate(CPUx86.Compare c) {
+                                        c.DestinationReg = CPUx86.Registers.ESP;
+                                        c.DestinationIsIndirect = true;
+                                        c.DestinationDisplacement = mThisOffset;
+                                    }, 
                                     mLabelName,
                                     mLabelName + "_AfterNullRefCheck",
                                     xEmitCleanup,
-                                    mCurrentILOffset);
+                                    (int)mCurrentILOffset);
                 new CPU.Label(mLabelName + "_AfterNullRefCheck");
-                new CPUx86.Move(CPUx86.Registers.EAX,
-                                "[esp + 0x" + mThisOffset.ToString("X") + "]");
-                new CPUx86.Pushd(CPUx86.Registers.AtEAX);
-                new CPUx86.Pushd("0" + mMethodIdentifier.ToString("X") + "h");
+                new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = mThisOffset };
+                new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
+                new CPUx86.Push { DestinationValue = (uint)mMethodIdentifier };
                 new CPUx86.Call(CPU.Label.GenerateLabelName(VTablesImplRefs.GetMethodAddressForTypeRef));
 
                 /*
@@ -143,10 +150,8 @@ namespace Indy.IL2CPU.IL.X86 {
                      * $esp + 4                 Params
                      * $esp + mThisOffset + 4   This
                      */
-                    new CPUx86.Move("eax",
-                                    "[esp + " + (mThisOffset + 4) + "]");
-                    new CPUx86.Compare("dword [eax + 4]",
-                                       ((int)InstanceTypeEnum.BoxedValueType).ToString());
+                    new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = mThisOffset + 4 };
+                    new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = ((uint)InstanceTypeEnum.BoxedValueType), Size = 32 };
                     /*
                      * On the stack now:
                      * $esp                 Params
@@ -155,7 +160,7 @@ namespace Indy.IL2CPU.IL.X86 {
                      * EAX contains the method to call
                      */
                     new CPUx86.JumpIfNotEqual(mLabelName + "_NOT_BOXED_THIS");
-                    new CPUx86.Pop("ecx");
+                    new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
                     /*
                      * On the stack now:
                      * $esp                 Params
@@ -163,8 +168,7 @@ namespace Indy.IL2CPU.IL.X86 {
                      * 
                      * ECX contains the method to call
                      */
-                    new CPUx86.Move("eax",
-                                    "[esp + " + (mThisOffset) + "]");
+                    new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = mThisOffset };
                     /*
                      * On the stack now:
                      * $esp                 Params
@@ -173,10 +177,8 @@ namespace Indy.IL2CPU.IL.X86 {
                      * ECX contains the method to call
                      * EAX contains $This, but boxed
                      */
-                    new CPUx86.Add("eax",
-                                   ObjectImpl.FieldDataOffset.ToString());
-                    new CPUx86.Move("[esp + " + mThisOffset + "]",
-                                    "eax");
+                    new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = (uint)ObjectImpl.FieldDataOffset };
+                    new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = mThisOffset, SourceReg = CPUx86.Registers.EAX };
                     /*
                      * On the stack now:
                      * $esp                 Params
@@ -184,7 +186,7 @@ namespace Indy.IL2CPU.IL.X86 {
                      * 
                      * ECX contains the method to call
                      */
-                    new CPUx86.Push("ecx");
+                    new CPUx86.Push { DestinationReg = CPUx86.Registers.ECX };
                     /*
                      * On the stack now:
                      * $esp                    Method to call
@@ -193,7 +195,7 @@ namespace Indy.IL2CPU.IL.X86 {
                      */
                 }
                 new CPU.Label(mLabelName + "_NOT_BOXED_THIS");
-                new CPUx86.Pop("eax");
+                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
                 if (mExtraStackSpace > 0) { 
                     new CPUx86.Sub("esp",
                                    mExtraStackSpace.ToString());
@@ -215,8 +217,7 @@ namespace Indy.IL2CPU.IL.X86 {
                                    }
                                    for (int i = 0; i < xResultSize / 4; i++)
                                    {
-                                       new CPUx86.Add("esp",
-                                                      "4");
+                                       new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
                                    }
                                });
 
@@ -225,7 +226,9 @@ namespace Indy.IL2CPU.IL.X86 {
             for (int i = 0; i < mArgumentCount; i++) {
                 Assembler.StackContents.Pop();
             }
-            Assembler.StackContents.Push(new StackContent(mReturnSize));
+            if (mReturnSize > 0) {
+                Assembler.StackContents.Push(new StackContent((int)mReturnSize));
+            }
         }
     }
 }

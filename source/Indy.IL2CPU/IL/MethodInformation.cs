@@ -15,9 +15,9 @@ namespace Indy.IL2CPU.IL {
                             Type aVariableType) {
                 Offset = aOffset;
                 Size = aSize;
-                VirtualAddresses = new string[Size / 4];
+                VirtualAddresses = new int[Size / 4];
                 for (int i = 0; i < (Size / 4); i++) {
-                    VirtualAddresses[i] = "ebp - 0" + (Offset + ((i + 1) * 4) + 0).ToString("X") + "h";
+                    VirtualAddresses[i] =0-(Offset + ((i + 1) * 4) + 0);
                 }
                 IsReferenceType = aIsReferenceTypeField;
                 VariableType = aVariableType;
@@ -31,7 +31,7 @@ namespace Indy.IL2CPU.IL {
             /// <summary>
             /// Gives the list of addresses to access this variable. This field contains multiple entries if the <see cref="Size"/> is larger than 4.
             /// </summary>
-            public readonly string[] VirtualAddresses;
+            public readonly int[] VirtualAddresses;
         }
 
         public struct Argument {
@@ -41,14 +41,14 @@ namespace Indy.IL2CPU.IL {
                 Out
             }
 
-            public Argument(int aSize,
+            public Argument(uint aSize,
                             int aOffset,
                             KindEnum aKind,
                             bool aIsReferenceType,
                 TypeInformation aTypeInfo,
                             Type aArgumentType) {
                 mSize = aSize;
-                mVirtualAddresses = new string[mSize / 4];
+                mVirtualAddresses = new int[mSize / 4];
                 mKind = aKind;
                 mArgumentType = aArgumentType;
                 mIsReferenceType = aIsReferenceType;
@@ -57,9 +57,9 @@ namespace Indy.IL2CPU.IL {
                 Offset = aOffset;
             }
 
-            private string[] mVirtualAddresses;
+            private int[] mVirtualAddresses;
 
-            public string[] VirtualAddresses {
+            public int[] VirtualAddresses {
                 get {
                     return mVirtualAddresses;
                 }
@@ -68,9 +68,9 @@ namespace Indy.IL2CPU.IL {
                 }
             }
 
-            private int mSize;
+            private uint mSize;
 
-            public int Size {
+            public uint Size {
                 get {
                     return mSize;
                 }
@@ -100,7 +100,7 @@ namespace Indy.IL2CPU.IL {
                     if (mOffset != value) {
                         mOffset = value;
                         for (int i = 0; i < (mSize / 4); i++) {
-                            mVirtualAddresses[i] = "ebp + 0" + (mOffset + ((i + 1) * 4) + 4).ToString("X") + "h";
+                            mVirtualAddresses[i] = (mOffset + ((i + 1) * 4) + 4);
                         }
                     }
                 }
@@ -134,7 +134,7 @@ namespace Indy.IL2CPU.IL {
         public MethodInformation(string aLabelName,
                                  Variable[] aLocals,
                                  Argument[] aArguments,
-                                 int aReturnSize,
+                                 uint aReturnSize,
                                  bool aIsInstanceMethod,
                                  TypeInformation aTypeInfo,
                                  MethodBase aMethod,
@@ -168,8 +168,10 @@ namespace Indy.IL2CPU.IL {
                 xRoundedSize += (4 - (ReturnSize % 4));
             }
 
-            ExtraStackSize = xRoundedSize - (from item in aArguments
-                                             select item.Size).Sum();
+            ExtraStackSize = (int)xRoundedSize;
+            foreach (var xItem in aArguments) {
+                ExtraStackSize -= (int)xItem.Size;
+            }
             if (ExtraStackSize > 0) {
                 for (int i = 0; i < Arguments.Length; i++) {
                     Arguments[i].Offset += ExtraStackSize;
@@ -189,7 +191,7 @@ namespace Indy.IL2CPU.IL {
         public readonly string LabelName;
         public readonly Variable[] Locals;
         public readonly Argument[] Arguments;
-        public readonly int ReturnSize;
+        public readonly uint ReturnSize;
         public readonly Type ReturnType;
         public readonly bool IsInstanceMethod;
         public readonly TypeInformation TypeInfo;

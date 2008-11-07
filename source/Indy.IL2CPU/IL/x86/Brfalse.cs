@@ -30,8 +30,8 @@ namespace Indy.IL2CPU.IL.X86 {
 
 			if (xStackContent.Size > 4)
 			{
-				new CPUx86.Popd("eax");
-				new CPUx86.Popd("ebx");
+                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
 				new CPUx86.Xor("eax", "eax");
 				new CPUx86.JumpIfNotZero(LabelFalse);
 				new CPUx86.Xor("ebx", "ebx");
@@ -40,8 +40,8 @@ namespace Indy.IL2CPU.IL.X86 {
 				new CPU.Label(LabelFalse);
 			} else
 			{
-				new CPUx86.Popd(CPUx86.Registers.EAX);
-				new CPUx86.Compare(CPUx86.Registers.EAX, "0");
+                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+                new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
 				new CPUx86.JumpIfEqual(TargetLabel);
 			}
 		}

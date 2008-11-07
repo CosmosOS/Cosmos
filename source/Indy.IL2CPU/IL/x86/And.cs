@@ -22,20 +22,20 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			if (xSize > 4)
 			{
-				new CPU.Pop(CPU.Registers.EAX);
-				new CPU.Pop("ebx");
-				new CPU.Pop(CPU.Registers.EDX);
-				new CPU.Pop("ecx");
-				new CPU.And(CPU.Registers.EAX, CPU.Registers.EDX);
+                new CPU.Pop { DestinationReg = CPU.Registers.EAX };
+                new CPU.Pop { DestinationReg = CPU.Registers.EBX };
+                new CPU.Pop { DestinationReg = CPU.Registers.EDX };
+                new CPU.Pop { DestinationReg = CPU.Registers.ECX };
+				new CPU.And(CPU.Registers_Old.EAX, CPU.Registers_Old.EDX);
 				new CPU.And("ebx", "ecx");
-				new CPU.Pushd("ebx");
-				new CPU.Pushd(CPU.Registers.EAX);
+                new CPU.Push { DestinationReg = CPU.Registers.EBX };
+                new CPU.Push { DestinationReg = CPU.Registers.EAX };
 			}else
 			{
-				new CPU.Pop(CPU.Registers.EAX);
-				new CPU.Pop(CPU.Registers.EDX);
-				new CPU.And(CPU.Registers.EAX, CPU.Registers.EDX);
-				new CPU.Pushd(CPU.Registers.EAX);
+                new CPU.Pop { DestinationReg = CPU.Registers.EAX };
+                new CPU.Pop { DestinationReg = CPU.Registers.EDX };
+				new CPU.And(CPU.Registers_Old.EAX, CPU.Registers_Old.EDX);
+                new CPU.Push { DestinationReg = CPU.Registers.EAX };
 			}
 			Assembler.StackContents.Push(xStackContent);
 		}

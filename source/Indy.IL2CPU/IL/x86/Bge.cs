@@ -24,23 +24,23 @@ namespace Indy.IL2CPU.IL.X86 {
 #warning Code checking: strange code seems to be generated. Read the following comments:
 			//Jump right after JumpIfGreaterOrEquals to the same label
 			//my offer is:
-			new CPUx86.Pop(CPUx86.Registers.EBX);
-			new CPUx86.Pop(CPUx86.Registers.EAX);
-			new CPUx86.Compare(CPUx86.Registers.EAX, CPUx86.Registers.EBX);
+			new CPUx86.Pop{DestinationReg = CPUx86.Registers.EBX};
+            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+            new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceReg=CPUx86.Registers.EBX };
 			new CPUx86.JumpIfGreaterOrEquals(LabelTrue);
 			new CPUx86.Jump(LabelFalse);
 			new CPU.Label(LabelTrue);
 			new CPUx86.Jump(TargetLabel);
 			new CPU.Label(LabelFalse);
-			//new CPUx86.Pop(CPUx86.Registers.EAX);
-			//new CPUx86.Compare(CPUx86.Registers.EAX, CPUx86.Registers.AtESP);
+			//new CPUx86.Pop(CPUx86.Registers_Old.EAX);
+			//new CPUx86.Compare(CPUx86.Registers_Old.EAX, CPUx86.Registers_Old.AtESP);
 			//new CPUx86.JumpIfGreaterOrEquals(LabelTrue);
 			//new CPUx86.Jump(LabelTrue);
 			//new CPU.Label(LabelTrue);
-			//new CPUx86.Add(CPUx86.Registers.ESP, "4");
+			//new CPUx86.Add(CPUx86.Registers_Old.ESP, "4");
 			//new CPUx86.Jump(TargetLabel);
 			//new CPU.Label(LabelFalse);
-			//new CPUx86.Add(CPUx86.Registers.ESP, "4");
+			//new CPUx86.Add(CPUx86.Registers_Old.ESP, "4");
 		}
 
 		private void DoAssemble64Bit() {
@@ -48,11 +48,11 @@ namespace Indy.IL2CPU.IL.X86 {
 			string BaseLabel = CurInstructionLabel + "__";
 			string LabelTrue = BaseLabel + "True";
 			string LabelFalse = BaseLabel + "False";
-			new CPUx86.Pop(CPUx86.Registers.EAX);
-			new CPUx86.Pop(CPUx86.Registers.EDX);
+			new CPUx86.Pop{DestinationReg = CPUx86.Registers.EAX};
+            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
 			//value2: EDX:EAX
-			new CPUx86.Pop("ebx");
-			new CPUx86.Pop("ecx");
+            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
+            new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
 			//value1: ECX:EBX
 			new CPUx86.Sub("ebx", "eax");
 			new CPUx86.SubWithCarry("ecx", "edx");

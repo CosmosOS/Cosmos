@@ -13,12 +13,12 @@ namespace Indy.IL2CPU.Assembler.X86.X {
         }
 
         public static implicit operator RegisterEDX(MemoryAction aAction) {
-            Instance.Move(aAction.ToString());
+            Instance.Move(aAction);
             return Instance;
         }
 
         public static implicit operator RegisterEDX(UInt32 aValue) {
-            Instance.Move(aValue.ToString());
+            Instance.Move(aValue);
             return Instance;
         }
     }

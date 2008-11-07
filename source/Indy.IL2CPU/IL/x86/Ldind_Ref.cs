@@ -11,8 +11,8 @@ namespace Indy.IL2CPU.IL.X86 {
 			: base(aReader, aMethodInfo) {
 		}
 		public override void DoAssemble() {
-			new CPU.Pop("eax");
-			new CPU.Pushd("[eax]");
+            new CPU.Pop { DestinationReg = CPU.Registers.EAX };
+            new CPU.Push { DestinationReg = CPU.Registers.EAX, DestinationIsIndirect = true };
 		}
 	}
 }

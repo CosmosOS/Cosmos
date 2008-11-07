@@ -28,12 +28,12 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		public static void AssembleHeader(Assembler.Assembler aAssembler, string aLabelName, MethodInformation.Variable[] aLocals, MethodInformation.Argument[] aArguments, bool aDebugMode, bool aIsNonDebuggable) {
 			new CPU.Label(aLabelName);
-			new CPUx86.Pushd(CPUx86.Registers.EBP);
+            new CPUx86.Push { DestinationReg = CPUx86.Registers.EBP };
 #if EXT_DEBUG
 				new CPUx86.Move("edi", LdStr.GetContentsArrayName(aAssembler, aLabelName) + "__Contents");
 				new CPUx86.Add("edi", "0x10");
 #endif
-			new CPUx86.Move(CPUx86.Registers.EBP, CPUx86.Registers.ESP);
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.EBP, SourceReg = CPUx86.Registers.ESP };
 			//new CPUx86.Push("0");
 			//if (!(aLabelName.Contains("Cosmos.Kernel.Serial") || aLabelName.Contains("Cosmos.Kernel.Heap"))) {
 			//    new CPUx86.Push(LdStr.GetContentsArrayName(aAssembler, aLabelName));
@@ -44,7 +44,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			foreach (var xLocal in aLocals) {
 				aAssembler.StackContents.Push(new StackContent(xLocal.Size, xLocal.VariableType));
 				for (int i = 0; i < (xLocal.Size / 4); i++) {
-					new CPUx86.Pushd("0");
+					new CPUx86.Push{DestinationValue=0};
 				}
 			}
 			if(aDebugMode&& aIsNonDebuggable) {

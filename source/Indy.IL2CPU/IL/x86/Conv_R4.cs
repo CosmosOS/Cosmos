@@ -19,9 +19,9 @@ namespace Indy.IL2CPU.IL.X86 {
 			//            break;
 			//        }
 			//    case 8: {
-			//            new CPUx86.Pop(CPUx86.Registers.EAX);
-			//            new CPUx86.Pop(CPUx86.Registers.ECX);
-			//            new CPUx86.Pushd(CPUx86.Registers.EAX);
+			//            new CPUx86.Pop(CPUx86.Registers_Old.EAX);
+			//            new CPUx86.Pop(CPUx86.Registers_Old.ECX);
+			//            new CPUx86.Pushd(CPUx86.Registers_Old.EAX);
 			//            Assembler.StackContents.Push(4);
 			//            break;
 			//        }

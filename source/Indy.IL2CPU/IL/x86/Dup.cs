@@ -11,8 +11,8 @@ namespace Indy.IL2CPU.IL.X86 {
 		public override void DoAssemble() {
 			var xStackContent = Assembler.StackContents.Peek();
 			for (int i = 0; i < ((xStackContent.Size / 4) + (xStackContent.Size % 4 == 0 ? 0 : 1)) ; i++) {
-				new CPUx86.Move(CPUx86.Registers.EAX, "[esp " + (i > 0 ? "+" + (i * 4) : "") + "]");
-				new CPUx86.Pushd(CPUx86.Registers.EAX);
+                new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceDisplacement=i*4, SourceIsIndirect=true };
+                new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
 			}
 			Assembler.StackContents.Push(xStackContent);
 		}

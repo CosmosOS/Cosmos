@@ -12,7 +12,7 @@ namespace Indy.IL2CPU.IL {
 
 		public abstract void Enter(string aName);
 		public abstract void Exit();
-		public abstract void Pushd(string aValue);
+		public abstract void Push(uint aValue);
 		public abstract void Call(MethodBase aMethod);
 		public abstract void Call(string aLabelName);
 

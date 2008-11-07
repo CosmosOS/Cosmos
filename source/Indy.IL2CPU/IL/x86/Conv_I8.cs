@@ -15,10 +15,10 @@ namespace Indy.IL2CPU.IL.X86 {
 				case 1:
 				case 2:
 				case 4:
-					new CPUx86.Pop(CPUx86.Registers.EAX); 
+                    new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX }; 
 					new CPUx86.SignExtendAX(4);
-					new CPUx86.Pushd("EDX");
-                    new CPUx86.Pushd("EAX");
+                    new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX };
+                    new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
                     break;
 				case 8:
 					new CPUx86.Noop();

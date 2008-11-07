@@ -14,10 +14,10 @@ namespace Indy.IL2CPU.IL.X86 {
 				throw new Exception("Floats not supported");
 			}
 			int xSize = Math.Max(Assembler.StackContents.Pop().Size, Assembler.StackContents.Pop().Size);
-			new CPUx86.Pop(CPUx86.Registers.EAX);
-			new CPUx86.Pop(CPUx86.Registers.EDX);
-			new CPUx86.Xor(CPUx86.Registers.EAX, CPUx86.Registers.EDX);
-			new CPUx86.Pushd(CPUx86.Registers.EAX);
+			new CPUx86.Pop{DestinationReg = CPUx86.Registers.EAX};
+            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
+			new CPUx86.Xor(CPUx86.Registers_Old.EAX, CPUx86.Registers_Old.EDX);
+            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
 			Assembler.StackContents.Push(new StackContent(xSize));
 		}
 	}

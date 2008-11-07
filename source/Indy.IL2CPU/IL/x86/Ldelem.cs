@@ -5,7 +5,7 @@ using System.Linq;
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(OpCodeEnum.Ldelem)]
 	public class Ldelem: Op {
-		private int mElementSize;
+		private uint mElementSize;
         
         public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
         {

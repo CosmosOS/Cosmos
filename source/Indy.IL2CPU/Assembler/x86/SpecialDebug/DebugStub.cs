@@ -124,7 +124,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             
             // Write Length
             ESI = EBP;
-            new Add("ESI", 12);
+            new Add { DestinationReg = Registers.ESI, SourceValue = 12 };
             ECX = Memory[ESI];
             Call("WriteByteToComPort");
             Call("WriteByteToComPort");
@@ -135,10 +135,10 @@ namespace Indy.IL2CPU.Assembler.X86 {
             ECX.Compare(0);
                 JumpIf(Flags.Equal, "DebugStub_SendTextExit");
             Call("WriteByteToComPort");
-            new X86.Dec("ECX");
+            new X86.Dec { DestinationReg = Registers.ECX };
             // We are storing as 16 bits, but for now I will transmit 8 bits
             // So we inc again to skip the 0
-            new X86.Inc("ESI");
+            new X86.Inc { DestinationReg = Registers.ESI };
             Jump("DebugStub_SendTextWriteChar");
    
             Label = "DebugStub_SendTextExit";
@@ -189,8 +189,8 @@ namespace Indy.IL2CPU.Assembler.X86 {
             AL = Memory[ESI];
             // Send the byte
             Port[DX] = AL;
-            
-            new Inc("ESI");
+
+            new Inc { DestinationReg = Registers.ESI };
             Return();
         }
 

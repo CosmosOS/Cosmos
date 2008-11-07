@@ -5,11 +5,20 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86.X {
     public class MemoryAction {
-        protected string mValue;
-        public bool IsRegister = false;
-
+        public readonly uint? Value;
+        public readonly Guid Register;
+        public readonly ElementReference Reference;
+        public readonly int Displacement;
+        
         public override string ToString() {
-            return mValue;
+            if (Value.HasValue) {
+                return Value.Value.ToString();
+            } else {
+                if (Reference != null) {
+                    return Reference.ToString();
+                }
+                return Registers.GetRegisterName(Register);
+            }
         }
 
         public static implicit operator MemoryAction(UInt32 aValue) {
@@ -17,39 +26,48 @@ namespace Indy.IL2CPU.Assembler.X86.X {
         }
 
         public static implicit operator MemoryAction(Register aRegister) {
-            return new MemoryAction(aRegister.ToString(), true);
+            return new MemoryAction(aRegister.GetId());
         }
 
         public static MemoryAction operator ++(MemoryAction aTarget) {
-            new X86.Inc(SizeToString(aTarget.mSize), aTarget.ToString());
+            aTarget.ApplyToDest(new X86.Inc());
             return null;
         }
 
         public static MemoryAction operator --(MemoryAction aTarget) {
-            new X86.Dec(SizeToString(aTarget.mSize), aTarget.ToString());
+            aTarget.ApplyToDest(new X86.Dec());
             return null;
         }
 
-        protected byte mSize = 0;
-
+        public bool IsIndirect { get; set; }
         // For registers
-        public MemoryAction(string aValue, bool aIsRegister) {
-            mValue = aValue;
-            IsRegister = aIsRegister;
+        public MemoryAction(Guid aRegister) {
+            Register = aRegister;
+        }
+
+        public MemoryAction(Guid aRegister, int aDisplacement):this(aRegister) {
+            Displacement = aDisplacement;
         }
         // This form used for reading memory - Addresses are passed in
-        public MemoryAction(string aValue) {
-            mValue = aValue;
+        public MemoryAction(ElementReference aValue, int aDisplacement)
+            : this(aValue) {
+            Displacement = aDisplacement;
         }
-        public MemoryAction(string aValue, byte aSize) {
-            mValue = aValue;
-            mSize = aSize;
+        public MemoryAction(ElementReference aValue) {
+            Reference = aValue;
         }
 
         // For constants/literals
-        public MemoryAction(UInt32 aValue) {
-            mValue = aValue.ToString();
+        public MemoryAction(UInt32 aValue, int aDisplacement)
+            : this(aValue) {
+            Displacement = aDisplacement;
         }
+
+        public MemoryAction(UInt32 aValue) {
+            Value = aValue;
+        }
+
+        public byte Size { get; set; }
 
         public static string SizeToString(byte aSize) {
             switch (aSize) {
@@ -70,8 +88,24 @@ namespace Indy.IL2CPU.Assembler.X86.X {
         // variant and if possible to self usage, ie no assignments. May however result 
         // in too many class variants to be worth while.
         public void Compare(UInt32 aValue) {
-            new Compare(SizeToString(mSize), ToString(), aValue);
+            ApplyToDestAndSource(new Compare());
         }
 
+        private void ApplyToDest(InstructionWithDestinationAndSize aDest) {
+            aDest.Size = Size;
+            aDest.DestinationReg = Register;
+            aDest.DestinationRef = Reference;
+            aDest.DestinationIsIndirect = IsIndirect;
+            aDest.DestinationDisplacement = Displacement;
+        }
+
+        private void ApplyToDestAndSource(InstructionWithDestinationAndSource aInstruction) {
+            aInstruction.Size = Size;
+            aInstruction.DestinationReg = Register;
+            aInstruction.DestinationRef = Reference;
+            aInstruction.DestinationIsIndirect = IsIndirect;
+            aInstruction.DestinationDisplacement = Displacement;
+            aInstruction.SourceValue = Value.GetValueOrDefault();
+        }
     }
 }

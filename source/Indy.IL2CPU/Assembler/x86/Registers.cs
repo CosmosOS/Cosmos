@@ -1,39 +1,70 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
-	public static class Registers {
-		public const string EAX = "eax";
-		public const string AX = "ax";
-		public const string AL = "al";
-		public const string AH = "ah";
-		public const string EBX = "ebx";
-		public const string BX = "bx";
-		public const string BL = "bl";
-		public const string BH = "bh";
-		public const string ECX = "ecx";
-		public const string CX = "cx";
-		public const string CL = "cl";
-		public const string CH = "ch";
-		public const string EDX = "edx";
-		public const string DX = "dx";
-		public const string DL = "dl";
-		public const string DH = "dh";
-		public const string AtEAX = "[eax]";
-		public const string AtEBX = "[ebx]";
-		public const string AtECX = "[ecx]";
-		public const string AtEDX = "[edx]";
-		public const string ESP = "esp";
-		public const string AtESP = "[esp]";
-		public const string EBP = "ebp";
-	    public const string AtEBP = "[EBP]";
-		public const string EDI = "edi";
-		public const string AtEDI = "[edi]";
-		public const string ESI = "esi";
-		public const string AtESI = "[esi]";
-	    public const string CR0 = "CR0";
-        public const string CR1 = "CR1";
-        public const string CR2 = "CR2";
-        public const string CR3 = "CR3";
-        public const string CR4 = "CR4";
-	}
+    public static class Registers {
+        public static readonly Guid EAX = new Guid("{e1d2ed1d-d0e7-4020-91fa-fc3e9fabed49}");
+        public static readonly Guid AX = new Guid("{b42db635-46ea-4ebd-8444-7a05bdc35e59}");
+        public static readonly Guid AH = new Guid("{deedc4ae-260f-4b2b-9d11-c8cb8f03d481}");
+        public static readonly Guid AL = new Guid("{aba6031f-2b28-448e-b447-0c82139a513d}");
+        public static readonly Guid EBX = new Guid("{1cba44f4-8ed0-4f51-8cb2-e206fda0179c}");
+        public static readonly Guid BX = new Guid("{a78c11c5-d96e-4192-b2f6-73c9c0e5e001}");
+        public static readonly Guid BH = new Guid("{f9264fa9-4884-49d8-aa00-522f456b4955}");
+        public static readonly Guid BL = new Guid("{74873218-cb95-4623-91f4-528d736c9202}");
+        public static readonly Guid ECX = new Guid("{0301c5a0-51f9-4915-9151-6db72240333d}");
+        public static readonly Guid CX = new Guid("{0b912ac1-7c9a-4099-bb1c-a65e4682d9ce}");
+        public static readonly Guid CH = new Guid("{d24a53bc-0346-42d5-9206-f94c83e3e1a4}");
+        public static readonly Guid CL = new Guid("{bf9623f1-f631-440d-bbb8-ec49c956ac6d}");
+        public static readonly Guid EDX = new Guid("{a1307efb-ebbe-40b4-a081-2a12376c0ea5}");
+        public static readonly Guid DX = new Guid("{1310d3c8-4c0c-4a24-b3cc-4ca8bd7b2fbe}");
+        public static readonly Guid DH = new Guid("{2cbad390-bb54-4515-84ba-72c24b143034}");
+        public static readonly Guid DL = new Guid("{59d64c55-a0e9-4d55-838d-61bb96caa1ab}");
+        public static readonly Guid CS = new Guid("{ab247b99-a49d-4b01-931a-62a9f252fb82}");
+        public static readonly Guid DS = new Guid("{6c10fb28-0ac1-44bf-99ff-2023a744f8ed}");
+        public static readonly Guid ES = new Guid("{2482da91-e1e3-472f-880c-16232887d2ae}");
+        public static readonly Guid FS = new Guid("{582c5557-5c46-4fa1-a8c6-082573d47de2}");
+        public static readonly Guid GS = new Guid("{440e590c-2d2a-43f4-a8b0-d93f2a7a66d1}");
+        public static readonly Guid SS = new Guid("{2e34c648-22f8-4002-a780-96cbd843e18b}");
+        public static readonly Guid ESP = new Guid("{eecce0ba-9182-4319-a4cb-458a15171be5}");
+        public static readonly Guid EBP = new Guid("{20867aa8-a7e5-4940-a5df-7a266eb57efa}");
+        public static readonly Guid ESI = new Guid("{ab49b4e5-cc33-45bd-94f7-3188c916a153}");
+        public static readonly Guid EDI = new Guid("{0ccba916-8a8c-46d7-aee9-211d95a140c9}");
+        public static readonly Guid EFLAGS = new Guid("{eec47a09-9b12-45d1-afaa-a94e7d06a146}");
+        public static readonly Guid CR0 = new Guid("{eec47a09-9b12-45d1-afaa-a94e7d06a147}");
+        public static readonly Guid CR1 = new Guid("{eec47a09-9b12-45d1-afaa-a94e7d06a148}");
+        public static readonly Guid CR2 = new Guid("{eec47a09-9b12-45d1-afaa-a94e7d06a149}");
+        public static readonly Guid CR3 = new Guid("{eec47a09-9b12-45d1-afaa-a94e7d06a14a}");
+        public static readonly Guid CR4 = new Guid("{eec47a09-9b12-45d1-afaa-a94e7d06a14b}");
+
+        public static string GetRegisterName(Guid aRegister) {
+            var xType = typeof(Registers);
+            foreach (var xField in xType.GetFields()) {
+                var xFieldId = (Guid)xField.GetValue(null);
+                if (xFieldId == aRegister) { return xField.Name; }
+            }
+            throw new Exception("Register '" + aRegister + "' not valid!");
+        }
+
+        public static Guid GetRegister(string aName) {
+            var xType = typeof(Registers);
+            var xField = xType.GetField(aName);
+            return (Guid)xField.GetValue(null);
+        }
+
+        public static byte GetSize(Guid aRegister) {
+            if (Is32Bit(aRegister)) { return 32; }
+            if (Is16Bit(aRegister)) { return 16; }
+            return 8;
+        }
+
+        public static bool Is32Bit(Guid aRegister) {
+            return aRegister == EAX || aRegister == EBX || aRegister == ECX || aRegister == EDX || aRegister == ESP || aRegister == EBP || aRegister == ESI || aRegister == EDI || aRegister == EFLAGS || aRegister == CR0 || aRegister == CR1 || aRegister == CR2 || aRegister == CR3 || aRegister == CR4;
+        }
+
+        public static bool Is16Bit(Guid aRegister) {
+            return aRegister == AX || aRegister == BX || aRegister == CX || aRegister == DX || aRegister == CS  || aRegister == DS || aRegister == ES || aRegister == FS || aRegister == GS || aRegister == SS;
+        }
+    }
 }

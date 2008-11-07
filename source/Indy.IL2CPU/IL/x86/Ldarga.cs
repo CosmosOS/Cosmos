@@ -8,7 +8,7 @@ using Indy.IL2CPU.Assembler;
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(OpCodeEnum.Ldarga)]
 	public class Ldarga: Op {
-		private string mAddress;
+		private int mAddress;
 		protected void SetArgIndex(int aIndex, MethodInformation aMethodInfo) {
 			mAddress = aMethodInfo.Arguments[aIndex].VirtualAddresses.First();
 		}
@@ -28,10 +28,9 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 		}
 		public override void DoAssemble() {
-			string[] mAddressParts = mAddress.Split('+');
-			new CPU.Pushd(mAddressParts[0]);
+            new CPU.Push { DestinationReg = CPU.Registers.EBP };
 			Assembler.StackContents.Push(new StackContent(4, typeof(uint)));
-			new CPU.Pushd(mAddressParts[1]);
+            new CPU.Push { DestinationValue = (uint)mAddress };
 			Assembler.StackContents.Push(new StackContent(4, typeof(uint)));
 			Add(Assembler);
 		}

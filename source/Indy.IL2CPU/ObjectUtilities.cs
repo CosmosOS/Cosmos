@@ -30,7 +30,7 @@ namespace Indy.IL2CPU {
 			return IsArray(aType.BaseType);
 		}
 
-		public static int GetObjectStorageSize(Type aType) {
+		public static uint GetObjectStorageSize(Type aType) {
 			if (aType == null) {
 				throw new ArgumentNullException("aType");
 			}

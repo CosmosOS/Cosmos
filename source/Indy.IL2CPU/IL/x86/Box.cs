@@ -8,7 +8,7 @@ using CPUx86 = Indy.IL2CPU.Assembler.X86;
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(OpCodeEnum.Box)]
 	public class Box: Op {
-		private int mTheSize;
+		private uint mTheSize;
 		private int mTypeId;
 
         public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
@@ -42,22 +42,22 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public override void DoAssemble() {
-			int xSize = mTheSize;
+			uint xSize = mTheSize;
 			if (mTheSize % 4 != 0) {
 				xSize += 4 - (mTheSize % 4);
 			}
-            new CPUx86.Pushd("0x" + (ObjectImpl.FieldDataOffset + xSize).ToString("X").ToUpper());
+            new CPUx86.Push { DestinationValue = (ObjectImpl.FieldDataOffset + xSize) };
             new CPUx86.Call(CPU.Label.GenerateLabelName(GCImplementationRefs.AllocNewObjectRef));
-            new CPUx86.Pop("eax");
-            new CPUx86.Move("dword", "[eax]", "0x" + mTypeId.ToString("X"));
-            new CPUx86.Move("dword", "[eax + 4]", "0x" + InstanceTypeEnum.BoxedValueType.ToString("X"));
+            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX }; 
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, SourceValue = (uint)mTypeId, Size=32 };
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = (uint)InstanceTypeEnum.BoxedValueType, Size=32 };
             new CPU.Comment("xSize is " + xSize);
             for (int i = 0; i < (xSize / 4); i++)
             {
-                new CPUx86.Pop(CPUx86.Registers.EDX);
-                new CPUx86.Move("dword", "[eax + 0x" + (ObjectImpl.FieldDataOffset + (i * 4)).ToString("X") + "]", "edx");
+                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
+                new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = (ObjectImpl.FieldDataOffset + (i * 4)), SourceReg = CPUx86.Registers.EDX, Size=32 };
             }
-            new CPUx86.Push("eax");
+            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
             Assembler.StackContents.Pop();
             Assembler.StackContents.Push(new StackContent(4, false, false, false));
 		} 

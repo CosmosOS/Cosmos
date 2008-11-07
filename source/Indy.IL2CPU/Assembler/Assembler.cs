@@ -168,6 +168,9 @@ namespace Indy.IL2CPU.Assembler {
                 }
             }
             OnBeforeFlush();
+            mAllAssemblerElements = new List<BaseAssemblerElement>();
+            mAllAssemblerElements.AddRange(mDataMembers.Cast<BaseAssemblerElement>());
+            mAllAssemblerElements.AddRange(mInstructions.Cast<BaseAssemblerElement>());
             CleanupCode();
         }
 
@@ -178,11 +181,12 @@ namespace Indy.IL2CPU.Assembler {
             int xCurrentIdx = 0;
             int xIfLevelsToSkip = 0;
             var xDefines = new List<string>();
-            while (xCurrentIdx < mInstructions.Count) {
-                var xCurrentInstruction = mInstructions[xCurrentIdx];
-                var xIfDefined = xCurrentInstruction as IfDefined;
-                var xEndIfDefined = xCurrentInstruction as EndIfDefined;
-                var xDefine = xCurrentInstruction as Define;
+            while (xCurrentIdx < mAllAssemblerElements.Count) {
+                var xCurrentInstruction = mAllAssemblerElements[xCurrentIdx];
+                var xIfDefined = xCurrentInstruction as IIfDefined;
+                var xEndIfDefined = xCurrentInstruction as IEndIfDefined;
+                var xDefine = xCurrentInstruction as IDefine;
+                var xIfNotDefined = xCurrentInstruction as IIfNotDefined;
                 if(xIfDefined!=null){
                     if(xIfLevelsToSkip>0){
                         xIfLevelsToSkip++;
@@ -191,39 +195,48 @@ namespace Indy.IL2CPU.Assembler {
                             xIfLevelsToSkip++;
                         }
                     }
-                    mInstructions.RemoveAt(xCurrentIdx);
+                    mAllAssemblerElements.RemoveAt(xCurrentIdx);
+                    continue;
+                }
+                if (xIfNotDefined != null) {
+                    if (xIfLevelsToSkip > 0) {
+                        xIfLevelsToSkip++;
+                    } else {
+                        if (xDefines.Contains(xIfNotDefined.Symbol.ToLower())) {
+                            xIfLevelsToSkip++;
+                        }
+                    }
+                    mAllAssemblerElements.RemoveAt(xCurrentIdx);
                     continue;
                 }
                 if (xEndIfDefined != null) {
                     if (xIfLevelsToSkip > 0) {
                         xIfLevelsToSkip--;                        
                     }
-                    mInstructions.RemoveAt(xCurrentIdx);
+                    mAllAssemblerElements.RemoveAt(xCurrentIdx);
                     continue;
                 }
                 if (xIfLevelsToSkip > 0) {
-                    mInstructions.RemoveAt(xCurrentIdx);
+                    mAllAssemblerElements.RemoveAt(xCurrentIdx);
                     continue;
                 }
                 if (xDefine != null) {
                     if (!xDefines.Contains(xDefine.Symbol.ToLowerInvariant())) {
                         xDefines.Add(xDefine.Symbol.ToLowerInvariant());
                     }
-                    mInstructions.RemoveAt(xCurrentIdx);
+                    mAllAssemblerElements.RemoveAt(xCurrentIdx);
                     continue;
                 }
                 xCurrentIdx++;
             }
         }
 
+        private List<BaseAssemblerElement> mAllAssemblerElements;
+
         public virtual void FlushBinary(Stream aOutput, ulong aBaseAddress) {
             BeforeFlush();
             bool xSituationChanged = false;
-            var xAssemblerItems = new List<BaseAssemblerElement>();
-            xAssemblerItems.AddRange(mDataMembers.Cast<BaseAssemblerElement>());
-            xAssemblerItems.AddRange(mInstructions.Cast<BaseAssemblerElement>());
-            
-            var xIncompleteItems = new List<BaseAssemblerElement>(xAssemblerItems);
+            var xIncompleteItems = new List<BaseAssemblerElement>(mAllAssemblerElements);
             var xCurrentAddresss = aBaseAddress;
             do {
                 xSituationChanged = false; 
@@ -246,7 +259,7 @@ namespace Indy.IL2CPU.Assembler {
             if (!xSituationChanged && xIncompleteItems.Count > 0) {
                 throw new Exception("Not all Elements are able to determine size!");
             }
-            xIncompleteItems = new List<BaseAssemblerElement>(xAssemblerItems);
+            xIncompleteItems = new List<BaseAssemblerElement>(mAllAssemblerElements);
             do {
                 int xIdx = 0;
                 xSituationChanged = false;
@@ -264,7 +277,7 @@ namespace Indy.IL2CPU.Assembler {
             if (!xSituationChanged && xIncompleteItems.Count > 0) {
                 throw new Exception("Not all Elements are complete!");
             }
-            foreach (var xItem in xAssemblerItems) {
+            foreach (var xItem in mAllAssemblerElements) {
                 var xBuff = xItem.GetData(this);
                 aOutput.Write(xBuff, 0, xBuff.Length);
             }

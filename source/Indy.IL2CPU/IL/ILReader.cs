@@ -21,14 +21,14 @@ namespace Indy.IL2CPU.IL {
 		private byte[] mOperand;
 		private bool mHasOperand;
 
-		public int Position {
+		public uint Position {
 			get;
 			private set;
 		}
 
-		public int NextPosition {
+		public uint NextPosition {
 			get {
-				return (int)mStream.Position;
+				return (uint)mStream.Position;
 			}
 		}
 

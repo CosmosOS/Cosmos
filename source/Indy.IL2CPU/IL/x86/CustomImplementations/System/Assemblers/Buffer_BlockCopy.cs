@@ -18,18 +18,18 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System.Assemblers {
 		 *			int count); [ebp + 8]
 		 */
 		public override void Assemble(Indy.IL2CPU.Assembler.Assembler aAssembler) {
-			new CPUx86.Move("esi", "[ebp + 24]"); // src
-			new CPUx86.Add("esi", "16");
-			new CPUx86.Move("eax", "[ebp + 20]");
-			new CPUx86.Add("esi", "eax");
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.ESI, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 24 };
+            new CPUx86.Add { DestinationReg = Registers.ESI, SourceValue = 16 };
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 20 };
+			new CPUx86.Add{DestinationReg = Registers.ESI, SourceReg=Registers.EAX};
 
-			new CPUx86.Move("edi", "[ebp + 16]");
-			new CPUx86.Add("edi", "16");
-			new CPUx86.Move("eax", "[ebp + 12]");
-			new CPUx86.Add("edi", "eax");
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 16 };
+            new CPUx86.Add { DestinationReg = Registers.EDI, SourceValue = 16 };
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 12 };
+            new CPUx86.Add { DestinationReg = Registers.EDI, SourceReg = Registers.EAX };
 
-			new CPUx86.Move("ecx", "[ebp + 8]");
-			new CPUx86.RepeatMovsb();
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 8 };
+            new CPUx86.RepeatMovsb();
 		}
 	}
 }

@@ -5,31 +5,32 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86.X {
     public class AddressIndirect : Address {
-        protected Register32 mBaseRegister;
-        protected UInt32 mDisplacement = 0;
-        protected uint mBaseAddress;
+        public readonly Guid Register;
+        public readonly ElementReference Reference;
+        public readonly uint Address;
+        public readonly int Displacement;
 
-        public AddressIndirect(Register32 aBaseRegister, UInt32 aDisplacement) {
-            mBaseRegister = aBaseRegister;
-            mDisplacement = aDisplacement;
+        public AddressIndirect(Register32 aBaseRegister, Int32 aDisplacement) {
+            Register = Registers.GetRegister(aBaseRegister.GetName());
+            Displacement = aDisplacement;
         }
-        public AddressIndirect(uint aBaseAddress, uint aDisplacement) {
-            mBaseAddress = aBaseAddress;
-            mDisplacement = aDisplacement;
+        public AddressIndirect(uint aBaseAddress, int aDisplacement) {
+            Address = aBaseAddress;
+            Displacement = aDisplacement;
         }
 
         public override string ToString() {
-            if (mBaseRegister != null) {
-                if (mDisplacement == 0) {
-                    return "[" + mBaseRegister.ToString() + "]";
+            if (Register != null) {
+                if (Displacement == 0) {
+                    return "[" + Registers.GetRegisterName(Register) + "]";
                 } else {
-                    return "[" + mBaseRegister.ToString() + " + " + mDisplacement + "]";
+                    return "[" + Registers.GetRegisterName(Register) + " + " + Displacement + "]";
                 }
             } else {
-                if (mDisplacement == 0) {
-                    return "[" + mBaseAddress.ToString() + "]";
+                if (Displacement == 0) {
+                    return "[" + Address.ToString() + "]";
                 } else {
-                    return "[" + mBaseAddress.ToString() + " + " + mDisplacement + "]";
+                    return "[" + Address.ToString() + " + " + Displacement + "]";
                 }
             }
         }

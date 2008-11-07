@@ -11,8 +11,8 @@ namespace Indy.IL2CPU.IL.X86 {
 		public override void DoAssemble() {
 			throw new Exception("Floats not supported yet");
 			//Assembler.StackContents.Pop();
-			//new CPUx86.Pop(CPUx86.Registers.EAX);
-			//new CPUx86.Pushd(CPUx86.Registers.EAX);
+			//new CPUx86.Pop(CPUx86.Registers_Old.EAX);
+			//new CPUx86.Pushd(CPUx86.Registers_Old.EAX);
 			//Assembler.StackContents.Push(4);
 		}
 	}

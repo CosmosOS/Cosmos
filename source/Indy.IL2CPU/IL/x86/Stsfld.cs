@@ -10,7 +10,7 @@ namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(OpCodeEnum.Stsfld)]
 	public class Stsfld: Op {
 		private string mDataName;
-		private int mSize;
+		private uint mSize;
 		private Type mDataType;
 		private bool mNeedsGC;
 		private string mBaseLabel;
@@ -32,24 +32,24 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		public override void DoAssemble() {
 			if (mNeedsGC) {
-				new CPUx86.Pushd("[" + mDataName + "]");
+                new CPUx86.Push { DestinationRef = new ElementReference(mDataName), DestinationIsIndirect = true };
 				Engine.QueueMethod(GCImplementationRefs.DecRefCountRef);
 				new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef));
 			}
 			for (int i = 0; i < (mSize / 4); i++) {
-				new CPUx86.Pop(CPUx86.Registers.EAX);
-				new CPUx86.Move("dword [" + mDataName + " + 0x" + ((i * 4)).ToString("X") + "]", "eax");
+                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+                new CPUx86.Move { DestinationRef = new ElementReference(mDataName, i * 4), DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
 			}
 			switch (mSize % 4) {
 				case 1: {
-						new CPUx86.Pop(CPUx86.Registers.EAX);
-						new CPUx86.Move("byte [" + mDataName + " + " + ((mSize/4)*4)  + "]", "al");
+                        new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+                        new CPUx86.Move { DestinationRef = new ElementReference(mDataName, (int)((mSize / 4) * 4)), DestinationIsIndirect = true, SourceReg = CPUx86.Registers.AL };
 						break;
 					}
 				case 2: {
-						new CPUx86.Pop(CPUx86.Registers.EAX);
-						new CPUx86.Move("word [" + mDataName + " + " + ((mSize / 4) * 4) + "]", "ax");
-						break;
+                        new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+                        new CPUx86.Move { DestinationRef = new ElementReference(mDataName, (int)((mSize / 4) * 4)), DestinationIsIndirect = true, SourceReg = CPUx86.Registers.AX };
+                        break;
 					}
 				case 0: {
 						break;

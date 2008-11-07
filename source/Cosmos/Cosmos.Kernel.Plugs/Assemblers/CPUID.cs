@@ -17,8 +17,8 @@ namespace Cosmos.Kernel.Plugs.Assemblers
             //; 	ReturnSize: 4
         public override void Assemble(Assembler aAssembler)
         {
-            /*
-            new CPUx86.Pushfd();
+            
+            /*new CPUx86.Pushfd();
             new CPUx86.Pop("eax");
             new CPUx86.Move("ecx", "eax");
 
@@ -42,9 +42,8 @@ namespace Cosmos.Kernel.Plugs.Assemblers
             new CPUx86.Push("ecx");
             new CPUx86.Popfd();
 
-            new CPUx86.Push("eax");
-            /*/
-            new CPUx86.Pushd("1");
+            new CPUx86.Push("eax");*/
+            new CPUx86.Push { DestinationValue = 0 };
         }
     }
     public class GetCPUIDInternal : AssemblerMethod
@@ -63,16 +62,16 @@ namespace Cosmos.Kernel.Plugs.Assemblers
         public override void Assemble(Assembler aAssembler)
         {
             new CPUx86.ClrInterruptFlag();
-            new CPUx86.Move("eax", "[ebp + 08h]");
+            new CPUx86.Move { DestinationReg = Registers.EAX, SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 8 };
             new CPUx86.CpuId();
-            new CPUx86.Move("edi", "[ebp + 18h]");
-            new CPUx86.Move("[edi]", "edx");
-            new CPUx86.Move("edi", "[ebp + 14h]");
-            new CPUx86.Move("[edi]", "ecx");
-            new CPUx86.Move("edi", "[ebp + 10h]");
-            new CPUx86.Move("[edi]", "ebx");
-            new CPUx86.Move("edi", "[ebp + 0ch]");
-            new CPUx86.Move("[edi]", "eax");
+            new CPUx86.Move { DestinationReg = Registers.EDI, SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x18 };
+            new CPUx86.Move { DestinationReg = Registers.EDI, DestinationIsIndirect = true, SourceReg = Registers.EDX };
+            new CPUx86.Move { DestinationReg = Registers.EDI, SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x14 };
+            new CPUx86.Move { DestinationReg = Registers.EDI, DestinationIsIndirect = true, SourceReg = Registers.ECX };
+            new CPUx86.Move { DestinationReg = Registers.EDI, SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x10 };
+            new CPUx86.Move { DestinationReg = Registers.EDI, DestinationIsIndirect = true, SourceReg = Registers.EBX };
+            new CPUx86.Move { DestinationReg = Registers.EDI, SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0xC };
+            new CPUx86.Move { DestinationReg = Registers.EDI, DestinationIsIndirect = true, SourceReg = Registers.EAX };
             new CPUx86.Sti();
         }
     }

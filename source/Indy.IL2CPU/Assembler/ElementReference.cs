@@ -24,5 +24,13 @@ namespace Indy.IL2CPU.Assembler {
             get;
             set;
         }
+
+        public override string ToString() {
+            if (Offset != 0) {
+                return Name + " + " + Offset;
+            }else {
+                return Name;
+            }
+        }
     }
 }

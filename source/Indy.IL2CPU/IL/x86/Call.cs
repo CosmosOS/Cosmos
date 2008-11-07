@@ -12,14 +12,14 @@ namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(OpCodeEnum.Call)]
 	public class Call: Op {
 		private string LabelName;
-		private int mResultSize;
-		private int? TotalArgumentSize = null;
+		private uint mResultSize;
+		private uint? TotalArgumentSize = null;
 		private bool mIsDebugger_Break = false;
-		private int[] ArgumentSizes = new int[0];
+		private uint[] ArgumentSizes = new uint[0];
 		private MethodInformation mMethodInfo;
 		private MethodInformation mTargetMethodInfo;
 		private string mNextLabelName;
-		private int mCurrentILOffset;
+		private uint mCurrentILOffset;
 
         public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
             MethodBase xMethod = aReader.OperandValueMethod;
@@ -37,9 +37,9 @@ namespace Indy.IL2CPU.IL.X86 {
         }
 
 	    public Call(MethodBase aMethod,
-	                int aCurrentILOffset,
+	                uint aCurrentILOffset,
 	                bool aDebugMode,
-	                int aExtraStackSpace,
+	                uint aExtraStackSpace,
 	                string aNormalNext): base(null, null)
         {
             if (aMethod == null)
@@ -50,11 +50,11 @@ namespace Indy.IL2CPU.IL.X86 {
 	        mNextLabelName = aNormalNext;
         }
 
-		public Call(MethodBase aMethod, int aCurrentILOffset, bool aDebugMode,string aNormalNext)
+		public Call(MethodBase aMethod, uint aCurrentILOffset, bool aDebugMode,string aNormalNext)
 			: this(aMethod, aCurrentILOffset, aDebugMode, 0, aNormalNext) {
 		}
 
-		public static void EmitExceptionLogic(Assembler.Assembler aAssembler, int aCurrentOpOffset, MethodInformation aMethodInfo, string aNextLabel, bool aDoTest, Action aCleanup) {
+		public static void EmitExceptionLogic(Assembler.Assembler aAssembler, uint aCurrentOpOffset, MethodInformation aMethodInfo, string aNextLabel, bool aDoTest, Action aCleanup) {
 			string xJumpTo = MethodFooterOp.EndOfMethodLabelNameException;
 			if (aMethodInfo != null && aMethodInfo.CurrentHandler != null) {
                 // todo add support for nested handlers, see comment in Engine.cs
@@ -80,7 +80,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				//new CPUx86.Call("_CODE_REQUESTED_BREAK_");
 				new CPUx86.Jump(xJumpTo);
 			} else {
-				new CPUx86.Test(CPUx86.Registers.ECX, 2);
+				new CPUx86.Test(CPUx86.Registers_Old.ECX, 2);
 				if (aCleanup != null) {
 					new CPUx86.JumpIfEqual(aNextLabel);
 					aCleanup();
@@ -91,7 +91,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 		}
 
-		private void Initialize(MethodBase aMethod, int aCurrentILOffset, bool aDebugMode) {
+		private void Initialize(MethodBase aMethod, uint aCurrentILOffset, bool aDebugMode) {
 			mIsDebugger_Break = aMethod.GetFullName() == "System.Void  System.Diagnostics.Debugger.Break()";
 		    if (mIsDebugger_Break) {
 				return;
@@ -105,7 +105,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			LabelName = CPU.Label.GenerateLabelName(aMethod);
 			Engine.QueueMethod(aMethod);
 			bool needsCleanup = false;
-			List<int> xArgumentSizes = new List<int>();
+			List<uint> xArgumentSizes = new List<uint>();
 			ParameterInfo[] xParams = aMethod.GetParameters();
 			foreach (ParameterInfo xParam in xParams) {
 				xArgumentSizes.Add(Engine.GetFieldStorageSize(xParam.ParameterType));
@@ -121,7 +121,10 @@ namespace Indy.IL2CPU.IL.X86 {
 				}
 			}
 			if (needsCleanup) {
-				TotalArgumentSize = ArgumentSizes.Sum();
+                TotalArgumentSize = 0;
+                foreach (var xArgSize in ArgumentSizes) {
+                    TotalArgumentSize += xArgSize;
+                }
 			}
 			// todo: add support for other argument sizes
 		}
@@ -135,7 +138,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			}else {
 			    mNextLabelName = X86MethodFooterOp.EndOfMethodLabelNameNormal;
 			}
-		    Initialize(xMethod, (int)aReader.Position,aMethodInfo.DebugMode);
+		    Initialize(xMethod, (uint)aReader.Position,aMethodInfo.DebugMode);
 		}
         public void Assemble(string aMethod, int aArgumentCount) {
             if (mTargetMethodInfo.ExtraStackSize > 0) {
@@ -157,8 +160,7 @@ namespace Indy.IL2CPU.IL.X86 {
                                        xResultSize += 4 - (xResultSize % 4);
                                    }
                                    for(int i = 0; i< xResultSize/4;i++) {
-                                       new CPUx86.Add("esp",
-                                                      "4");
+                                       new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
                                    }
                                });
             for (int i = 0; i < aArgumentCount; i++) {
@@ -168,7 +170,7 @@ namespace Indy.IL2CPU.IL.X86 {
                 return;
             }
 
-            Assembler.StackContents.Push(new StackContent(mResultSize,
+            Assembler.StackContents.Push(new StackContent((int)mResultSize,
                                                           ((MethodInfo)mTargetMethodInfo.Method).ReturnType));
         }
 

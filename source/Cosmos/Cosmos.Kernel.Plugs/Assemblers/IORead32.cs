@@ -12,9 +12,9 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
         public override void Assemble(Assembler aAssembler) {
             //TODO: This is a lot of work to read a port. We need to have some kind of inline ASM option that can emit a single out instruction
             //TODO: Also make an attribute that forces normal inlining fo a method
-            new CPUx86.Move(Registers.EDX, "[ebp + 0x08]");
-            new CPUNative.InDWord(Registers.EAX, Registers.DX);
-            new CPUx86.Push(Registers.EAX);
+            new CPUx86.Move { DestinationReg = Registers.EDX, SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x8 }; 
+            new CPUNative.InDWord(Registers_Old.EAX, Registers_Old.DX);
+            new CPUx86.Push { DestinationReg = Registers.EAX };
         }
     }
 }

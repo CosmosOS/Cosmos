@@ -44,14 +44,15 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			Type xTypeRef = aReader.OperandValueType;
 			if(xTypeRef!=null) {
-				mTokenAddress = "0" + Engine.RegisterType(xTypeRef).ToString("X") + "h";
-				return;
+                throw new Exception("Type Tokens not supported atm!");
+//				mTokenAddress = "0" + Engine.RegisterType(xTypeRef).ToString("X") + "h";
+				//return;
 			}
 			throw new Exception("Token type not supported yet!");
 		}
 
 		public override void DoAssemble() {
-			new CPU.Pushd(mTokenAddress);
+            new CPU.Push { DestinationRef = new ElementReference(mTokenAddress) };
 			Assembler.StackContents.Push(new StackContent(4, typeof(uint)));
 		}
 	}

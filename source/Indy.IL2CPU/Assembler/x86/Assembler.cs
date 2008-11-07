@@ -32,96 +32,80 @@ namespace Indy.IL2CPU.Assembler.X86 {
             new Comment("EBX=multiboot_info ");
             new Comment("EAX=0x2BADB002 - check if it's really Multiboot loader ");
             new Comment("                ;- copy mb info - some stuff for you  ");
-            new Add(Registers.EBX,
-                    "4");
-            new Move(Registers.EAX,
-                     Registers.AtEBX);
-            new Move("[MultiBootInfo_Memory_Low]", Registers.EAX);
-            new Add(Registers.EBX,
-                    "4");
-            new Move(Registers.EAX,
-                     Registers.AtEBX);
-            new Move("[MultiBootInfo_Memory_High]", Registers.EAX);
-            new Move(Registers.ESP,
-                     "Kernel_Stack");
+            new Add { DestinationReg = Registers.EBX, SourceValue = 4 };
+            new Move {
+                DestinationReg = Registers.EAX,
+                SourceReg = Registers.EBX,
+                SourceIsIndirect = true
+            };
+            new Move { DestinationRef = new ElementReference("MultiBootInfo_Memory_Low"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
+            new Add { DestinationReg = Registers.EBX, SourceValue = 4 };
+            new Move {
+                DestinationReg = Registers.EAX,
+                SourceReg = Registers.EBX,
+                SourceIsIndirect = true
+            };
+            new Move { DestinationRef = new ElementReference("MultiBootInfo_Memory_High"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
+            new Move {
+                DestinationReg = Registers.ESP,
+                SourceRef = new ElementReference("Kernel_Stack")
+            };
             new Comment("some more startups todo");
             new ClrInterruptFlag();
             if (mComNumber > 0) {
                 UInt16 xComAddr = mComPortAddresses[mComNumber - 1];
                 // 9600 baud, 8 databits, no parity, 1 stopbit
-                new Move(Registers.DX,
-                         xComAddr + 1);
-                new Move(Registers.AL,
-                         0);
-                new Out(Registers.DX,
-                        Registers.AL); // disable interrupts for serial stuff
-                new Move(Registers.DX,
-                         xComAddr + 3);
-                new Move(Registers.AL,
-                         0x80);
-                new Out(Registers.DX,
-                        Registers.AL); // Enable DLAB (set baud rate divisor)
-                new Move(Registers.DX,
-                         xComAddr);
-                new Move(Registers.AL,
-                         0x0C);
-                new Out(Registers.DX,
-                        Registers.AL); // Set divisor (lo byte)
-                new Move(Registers.DX,
-                         xComAddr + 1);
-                new Move(Registers.AL,
-                         0x00);
-                new Out(Registers.DX,
-                        Registers.AL); //			  (hi byte)
-                new Move(Registers.DX,
-                         xComAddr + 3);
-                new Move(Registers.AL,
-                         "0x03");
-                new Out(Registers.DX,
-                        Registers.AL); // 8 bits, no parity, one stop bit
-                new Move(Registers.DX,
-                         xComAddr + 2);
-                new Move(Registers.AL,
-                         0xC7);
-                new Out(Registers.DX,
-                        Registers.AL); // Enable FIFO, clear them, with 14-byte threshold
-                new Move(Registers.DX,
-                         xComAddr + 4);
-                new Move(Registers.AL,
-                         0x03);
-                new Out(Registers.DX,
-                        Registers.AL); // IRQ-s enabled, RTS/DSR set
+                new Move { DestinationReg = Registers.DX, SourceValue = (uint)xComAddr + 1 };
+                new Move { DestinationReg = Registers.AL, SourceValue = 0 };
+                new Out(Registers_Old.DX,
+                        Registers_Old.AL); // disable interrupts for serial stuff
+                new Move { DestinationReg = Registers.DX, SourceValue = (uint)xComAddr + 3 };
+                new Move { DestinationReg = Registers.AL, SourceValue = 0x80 };
+                new Out(Registers_Old.DX,
+                        Registers_Old.AL); // Enable DLAB (set baud rate divisor)
+                new Move { DestinationReg = Registers.DX, SourceValue = (uint)xComAddr };
+                new Move { DestinationReg = Registers.AL, SourceValue = 0xC };
+                new Out(Registers_Old.DX,
+                        Registers_Old.AL); // Set divisor (lo byte)
+                new Move { DestinationReg = Registers.DX, SourceValue = (uint)xComAddr + 1 };
+                new Move { DestinationReg = Registers.AL, SourceValue = 0x0 };
+                new Out(Registers_Old.DX,
+                        Registers_Old.AL); //			  (hi byte)
+                new Move { DestinationReg = Registers.DX, SourceValue = (uint)xComAddr + 3 };
+                new Move { DestinationReg = Registers.AL, SourceValue = 0x3 };
+                new Out(Registers_Old.DX,
+                        Registers_Old.AL); // 8 bits, no parity, one stop bit
+                new Move { DestinationReg = Registers.DX, SourceValue = (uint)xComAddr + 2 };
+                new Move { DestinationReg = Registers.AL, SourceValue = 0xC7 };
+                new Out(Registers_Old.DX,
+                        Registers_Old.AL); // Enable FIFO, clear them, with 14-byte threshold
+                new Move { DestinationReg = Registers.DX, SourceValue = (uint)xComAddr + 4 };
+                new Move { DestinationReg = Registers.AL, SourceValue = 0x3 };
+                new Out(Registers_Old.DX,
+                        Registers_Old.AL); // IRQ-s enabled, RTS/DSR set
             }
 
             // SSE init
             // CR4[bit 9]=1, CR4[bit 10]=1, CR0[bit 2]=0, CR0[bit 1]=1
-            new Move(Registers.EAX,
-                     Registers.CR4);
-            new Or(Registers.EAX,
+            new Move { DestinationReg = Registers.EAX, SourceReg = Registers.CR4 };
+            new Or(Registers_Old.EAX,
                    0x100);
-            new Move(Registers.EAX,
-                     Registers.CR4);
-
-            new Move(Registers.EAX,
-                     Registers.CR4);
-            new Or(Registers.EAX,
+            new Move { DestinationReg = Registers.CR4, SourceReg = Registers.EAX };
+            new Move { DestinationReg = Registers.EAX, SourceReg = Registers.CR4 };
+            new Or(Registers_Old.EAX,
                    0x200);
-            new Move(Registers.EAX,
-                     Registers.CR4);
+            new Move { DestinationReg = Registers.CR4, SourceReg = Registers.EAX };
+            new Move { DestinationReg = Registers.EAX, SourceReg = Registers.CR0 };
 
-            new Move(Registers.EAX,
-                     Registers.CR0);
-            new And(Registers.EAX,
+            new And(Registers_Old.EAX,
                     0xfffffffd);
-            new Move(Registers.EAX,
-                     Registers.CR0);
+            new Move { DestinationReg = Registers.CR0, SourceReg = Registers.EAX };
+            new Move { DestinationReg = Registers.EAX, SourceReg = Registers.CR0 };
 
-            new Move(Registers.EAX,
-                     Registers.CR0);
-            new And(Registers.EAX,
-                    0x1);
-            new Move(Registers.EAX,
-                     Registers.CR0);
+            new And(Registers_Old.EAX,
+                    1);
+            new Move { DestinationReg = Registers.CR0, SourceReg = Registers.EAX };
+
             // END SSE INIT
 
             new Call(EntryPointName);
@@ -137,24 +121,25 @@ namespace Indy.IL2CPU.Assembler.X86 {
             }
             //aOutputWriter.WriteLine("section .data");
             uint xFlags = 0x10003;
-            DataMembers.AddRange(new DataMember[]{
-                    new DataMember("MultibootSignature",
-                                   new uint[]{0x1BADB002}),
-                    new DataMember("MultibootFlags",
-                                   xFlags),
-                    new DataMember("MultibootChecksum",
-                                   (int)(0-(xFlags + 0x1BADB002))),
-                    new DataMember("MultibootHeaderAddr", new ElementReference("MultibootSignature")),
-                    new DataMember("MultibootLoadAddr", new ElementReference("MultibootSignature")),
-                    new DataMember("MultibootLoadEndAddr", 0),
-                    new DataMember("MultibootBSSEndAddr", 0),
-                    new DataMember("MultibootEntryAddr", new ElementReference("Kernel_Start")),
-                    new DataMember("MultiBootInfo_Memory_High", 0),
-                    new DataMember("MultiBootInfo_Memory_Low", 0),
-                    new DataMember("Before_Kernel_Stack",
-                                   new byte[0x50000]),
-                    new DataMember("Kernel_Stack",
-                                   new byte[0])});
+            DataMembers.Add(new DataMember("MultibootSignature",
+                                   new uint[] { 0x1BADB002 }));
+            DataMembers.Add(new DataMember("MultibootFlags",
+                           xFlags));
+            DataMembers.Add(new DataMember("MultibootChecksum",
+                                               (int)(0 - (xFlags + 0x1BADB002))));
+            DataMembers.Add(new DataIfNotDefined("NASM_COMPILATION"));
+            DataMembers.Add(new DataMember("MultibootHeaderAddr", new ElementReference("MultibootSignature")));
+            DataMembers.Add(new DataMember("MultibootLoadAddr", new ElementReference("MultibootSignature")));
+            DataMembers.Add(new DataMember("MultibootLoadEndAddr", 0));
+            DataMembers.Add(new DataMember("MultibootBSSEndAddr", 0));
+            DataMembers.Add(new DataMember("MultibootEntryAddr", new ElementReference("Kernel_Start")));
+            DataMembers.Add(new DataEndIfDefined());
+            DataMembers.Add(new DataMember("MultiBootInfo_Memory_High", 0));
+            DataMembers.Add(new DataMember("MultiBootInfo_Memory_Low", 0));
+            DataMembers.Add(new DataMember("Before_Kernel_Stack",
+                           new byte[0x50000]));
+            DataMembers.Add(new DataMember("Kernel_Stack",
+                           new byte[0]));
             DebugStub.EmitDataSection();
         }
 
@@ -168,8 +153,10 @@ namespace Indy.IL2CPU.Assembler.X86 {
 
         public override void FlushText(TextWriter aOutput) {
             aOutput.WriteLine("use32");
-            aOutput.WriteLine("%define NASM_COMPILATION 1");
-            aOutput.WriteLine("global Kernel_Start");
+            //aOutput.WriteLine("%define NASM_COMPILATION 1");
+            //aOutput.WriteLine("global Kernel_Start");
+            aOutput.WriteLine("[map all main.map]");
+            aOutput.WriteLine("org 0x500000");
             base.FlushText(aOutput);
         }
 	}

@@ -8,13 +8,13 @@ namespace Indy.IL2CPU.IL.X86
 {
     public class X86MethodFooterOp : MethodFooterOp
     {
-        public readonly int TotalArgsSize = 0;
-        public readonly int ReturnSize = 0;
+        public readonly uint TotalArgsSize = 0;
+        public readonly uint ReturnSize = 0;
         public readonly MethodInformation.Variable[] Locals;
         public readonly MethodInformation.Argument[] Args;
         public readonly bool DebugMode;
         public readonly bool MethodIsNonDebuggable;
-        public readonly int LocAllocItemCount;
+        public readonly uint LocAllocItemCount;
 
         public X86MethodFooterOp(ILReader aReader, MethodInformation aMethodInfo)
             : base(aReader, aMethodInfo)
@@ -35,26 +35,29 @@ namespace Indy.IL2CPU.IL.X86
                     System.Diagnostics.Debugger.Break();
                 }
                 if (aMethodInfo.MethodData.ContainsKey(Localloc.LocAllocCountMethodDataEntry)) {
-                    LocAllocItemCount = (int)aMethodInfo.MethodData[Localloc.LocAllocCountMethodDataEntry];
+                    LocAllocItemCount = (uint)aMethodInfo.MethodData[Localloc.LocAllocCountMethodDataEntry];
                 }
             }
         }
 
         public override void DoAssemble()
         {
-            AssembleFooter(ReturnSize, Assembler, Locals, Args, (from item in Args
-                                                                 select item.Size).Sum(), DebugMode, MethodIsNonDebuggable, LocAllocItemCount);
+            uint xArgSize = 0;
+            foreach (var xItem in Args) {
+                xArgSize += xItem.Size;
+            }
+            AssembleFooter(ReturnSize, Assembler, Locals, Args, xArgSize, DebugMode, MethodIsNonDebuggable, LocAllocItemCount);
         }
 
-        public static void AssembleFooter(int aReturnSize, Assembler.Assembler aAssembler, MethodInformation.Variable[] aLocals, MethodInformation.Argument[] aArgs, int aTotalArgsSize, bool aDebugMode, bool aIsNonDebuggable, int aLocAllocItemCount)
+        public static void AssembleFooter(uint aReturnSize, Assembler.Assembler aAssembler, MethodInformation.Variable[] aLocals, MethodInformation.Argument[] aArgs, uint aTotalArgsSize, bool aDebugMode, bool aIsNonDebuggable, uint aLocAllocItemCount)
         {
-            int xReturnSize = aReturnSize;
+            uint xReturnSize = aReturnSize;
             if (xReturnSize % 4 > 0)
             {
                 xReturnSize += 4 - xReturnSize % 4;
             }
             new Label(EndOfMethodLabelNameNormal);
-            new CPUx86.Move("ecx", "0");
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceValue = 0 };
             if (aReturnSize > 0)
             {
                 //var xArgSize = (from item in aArgs
@@ -79,14 +82,18 @@ namespace Indy.IL2CPU.IL.X86
                     //}
 
                     // new code:
-                    xOffset = (from item in aArgs
-                               select item.Offset + item.Size).First();
+                    xOffset = (int)((from item in aArgs
+                               select item.Offset + item.Size).First());
                 }
                 for (int i = 0; i < xReturnSize / 4; i++)
                 {
-                    new Assembler.X86.Pop(Registers.EAX);
-                    new CPUx86.Move("[ebp + " + (xOffset + ((i + 1) * 4) + 4 - xReturnSize) + "]",
-                                    Registers.EAX);
+                    new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX }; 
+                    new CPUx86.Move {
+                        DestinationReg = CPUx86.Registers.EBP,
+                        DestinationIsIndirect = true,
+                        DestinationDisplacement = (int)(xOffset + ((i + 1) * 4) + 4 - xReturnSize),
+                        SourceReg = Registers.EAX
+                    };
                 }
             }
             new CPUx86.Jump(EndOfMethodLabelNameException);
@@ -104,7 +111,7 @@ namespace Indy.IL2CPU.IL.X86
                  select 1).Count() > 0 || (from xArg in aArgs
                                            where xArg.IsReferenceType
                                            select 1).Count() > 0) {
-                new CPUx86.Push("ecx");
+                new CPUx86.Push { DestinationReg = Registers.ECX };
                 Engine.QueueMethod(GCImplementationRefs.DecRefCountRef);
                 foreach (MethodInformation.Variable xLocal in aLocals) {
                     if (xLocal.IsReferenceType) {
@@ -122,16 +129,16 @@ namespace Indy.IL2CPU.IL.X86
                         new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef));
                     }
                 }
-                new CPUx86.Pop("ecx");
+                new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
             }
             for (int j = aLocals.Length - 1; j >= 0; j--)
             {
                 int xLocalSize = aLocals[j].Size;
-                new CPUx86.Add(CPUx86.Registers.ESP, "0x" + xLocalSize.ToString("X"));
+                new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = (uint)xLocalSize };
             }
-            //new CPUx86.Add(CPUx86.Registers.ESP, "0x4");
-            new CPUx86.Popd(CPUx86.Registers.EBP);
-            new CPUx86.Return(aTotalArgsSize - xReturnSize);
+            //new CPUx86.Add(CPUx86.Registers_Old.ESP, "0x4");
+            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBP };
+            new CPUx86.Return((int)(aTotalArgsSize - xReturnSize));
         }
     }
 }

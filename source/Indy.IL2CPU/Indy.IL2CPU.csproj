@@ -80,11 +80,17 @@
     <Compile Include="Assembler\Assembler.cs" />
     <Compile Include="Assembler\BaseAssemblerElement.cs" />
     <Compile Include="Assembler\Comment.cs" />
+    <Compile Include="Assembler\DataDefine.cs" />
+    <Compile Include="Assembler\DataEndIfDefined.cs" />
+    <Compile Include="Assembler\DataIfDefined.cs" />
+    <Compile Include="Assembler\DataIfNotDefined.cs" />
     <Compile Include="Assembler\DataMember.cs" />
     <Compile Include="Assembler\Define.cs" />
     <Compile Include="Assembler\ElementReference.cs" />
     <Compile Include="Assembler\EndIfDefined.cs" />
     <Compile Include="Assembler\IfDefined.cs" />
+    <Compile Include="Assembler\IfNotDefined.cs" />
+    <Compile Include="Assembler\_Infra\IIfNotDefined.cs" />
     <Compile Include="Assembler\ImportMember.cs" />
     <Compile Include="Assembler\ImportMethodMember.cs" />
     <Compile Include="Assembler\Instruction.cs" />
@@ -363,7 +369,6 @@
     <Compile Include="IL\x86\CustomImplementations\System\ExceptionImpl.cs" />
     <Compile Include="IL\x86\CustomImplementations\System\MulticastDelegateImpl.cs" />
     <Compile Include="IL\x86\CustomImplementations\System\MulticastDelegateImplRefs.cs" />
-    <Compile Include="IL\x86\CustomImplementations\System\ObjectImpl.cs" />
     <Compile Include="IL\x86\CustomImplementations\System\ObjectImplRefs.cs" />
     <Compile Include="IL\x86\CustomImplementations\MS\System\StringImpl.cs" />
     <Compile Include="IL\x86\Div.cs" />

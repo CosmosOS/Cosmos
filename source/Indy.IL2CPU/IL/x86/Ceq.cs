@@ -20,17 +20,17 @@ namespace Indy.IL2CPU.IL.X86 {
 			string BaseLabel = CurInstructionLabel + "__";
 			string LabelTrue = BaseLabel + "True";
 			string LabelFalse = BaseLabel + "False";
-			new CPUx86.Pop(CPUx86.Registers.EAX);
-			new CPUx86.Compare(CPUx86.Registers.EAX, CPUx86.Registers.AtESP);
+            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+            new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
 			new CPUx86.JumpIfEqual(LabelTrue);
 			new CPUx86.Jump(LabelFalse);
 			new CPU.Label(LabelTrue);
-			new CPUx86.Add(CPUx86.Registers.ESP, "4");
-			new CPUx86.Push("01h");
+			new CPUx86.Add{DestinationReg = CPUx86.Registers.ESP, SourceValue=4};
+            new CPUx86.Push { DestinationValue = 1 };
 			new CPUx86.Jump(NextInstructionLabel);
 			new CPU.Label(LabelFalse);
-			new CPUx86.Add(CPUx86.Registers.ESP, "4");
-			new CPUx86.Push("00h");
+            new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
+			new CPUx86.Push{DestinationValue=0};
 			new CPUx86.Jump(NextInstructionLabel);
 		}
 
@@ -40,26 +40,26 @@ namespace Indy.IL2CPU.IL.X86 {
 			string LabelTrue = BaseLabel + "True";
 			string LabelFalse = BaseLabel + "False";
 
-			new CPUx86.Pop(CPUx86.Registers.EAX);
-			new CPUx86.Compare(CPUx86.Registers.EAX, "[esp + 4]");
+            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+            new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
 
-			new CPUx86.Pop(CPUx86.Registers.EAX);
+            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
 			new CPUx86.JumpIfNotEqual(LabelFalse);
 
-			new CPUx86.Xor(CPUx86.Registers.EAX, "[esp + 4]");
+			new CPUx86.Xor(CPUx86.Registers_Old.EAX, "[esp + 4]");
 			new CPUx86.JumpIfNotZero(LabelFalse);
 
 			//they are equal, eax == 0
-			new CPUx86.Add(CPUx86.Registers.ESP, "8");
-			new CPUx86.Add(CPUx86.Registers.EAX, "1");
-			new CPUx86.Push(CPUx86.Registers.EAX);
+            new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 8 };
+            new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 1 };
+            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
 			new CPUx86.Jump(NextInstructionLabel);
 
 			new CPU.Label(LabelFalse);
 			//eax = 0
-			new CPUx86.Add(CPUx86.Registers.ESP, "8");
-			new CPUx86.Xor(CPUx86.Registers.EAX, CPUx86.Registers.EAX);
-			new CPUx86.Push(CPUx86.Registers.EAX);
+            new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 8 };
+			new CPUx86.Xor(CPUx86.Registers_Old.EAX, CPUx86.Registers_Old.EAX);
+            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
 			new CPUx86.Jump(NextInstructionLabel);
 		}
 

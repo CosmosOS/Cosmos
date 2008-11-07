@@ -44,62 +44,91 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
             aAssembler.DataMembers.Add(new DataMember(xFieldName,
                                                       new byte[8*256]));
             for (int i = 0; i < 256; i++) {
-                new CPUx86.Move(Registers.EAX,
-                                "__ISR_Handler_" + i.ToString("X2"));
-                new CPUx86.Move("[_NATIVE_IDT_Contents + " + ((i*8) + 0) + "]",
-                                Registers.AL);
-                new CPUx86.Move("[_NATIVE_IDT_Contents + " + ((i*8) + 1) + "]",
-                                Registers.AH);
-                new CPUx86.Move("byte [_NATIVE_IDT_Contents + " + ((i*8) + 2) + "]",
-                                "0x8");
-                new CPUx86.Move("byte [_NATIVE_IDT_Contents + " + ((i*8) + 5) + "]",
-                                "0x8E");
+                new CPUx86.Move {
+                    DestinationReg = Registers.EAX,
+                    SourceRef = new ElementReference("__ISR_Handler_" + i.ToString("X2"))
+                };
+                new CPUx86.Move {
+                    DestinationRef = new ElementReference("_NATIVE_IDT_Contents"),
+                    DestinationIsIndirect = true,
+                    DestinationDisplacement = ((i * 8) + 0),
+                    SourceReg = Registers.AL
+                };
+                new CPUx86.Move {
+                    DestinationRef = new ElementReference("_NATIVE_IDT_Contents"),
+                    DestinationIsIndirect = true,
+                    DestinationDisplacement = ((i * 8) + 1),
+                    SourceReg = Registers.AH
+                };
+                new CPUx86.Move {
+                    DestinationRef = new ElementReference("_NATIVE_IDT_Contents"),
+                    DestinationIsIndirect = true,
+                    DestinationDisplacement = ((i * 8) + 2),
+                    SourceValue=0x8,
+                    Size=8
+                };
+                new CPUx86.Move {
+                    DestinationRef = new ElementReference("_NATIVE_IDT_Contents"),
+                    DestinationIsIndirect = true,
+                    DestinationDisplacement = ((i * 8) + 5),
+                    SourceValue = 0x8E,
+                    Size = 8
+                };
                 new CPUx86.ShiftRight("eax",
                                       "16");
-                new CPUx86.Move("[_NATIVE_IDT_Contents + " + ((i*8) + 6) + "]",
-                                Registers.AL);
-                new CPUx86.Move("[_NATIVE_IDT_Contents + " + ((i*8) + 7) + "]",
-                                Registers.AH);
+                new CPUx86.Move {
+                    DestinationRef = new ElementReference("_NATIVE_IDT_Contents"),
+                    DestinationIsIndirect = true,
+                    DestinationDisplacement = ((i * 8) + 6),
+                    SourceReg=Registers.AL
+                };
+                new CPUx86.Move {
+                    DestinationRef = new ElementReference("_NATIVE_IDT_Contents"),
+                    DestinationIsIndirect = true,
+                    DestinationDisplacement = ((i * 8) + 7),
+                    SourceReg = Registers.AH
+                };
             }
             new Label("______AFTER__IDT__TABLE__INIT__");
             xFieldName = "_NATIVE_IDT_Pointer";
             aAssembler.DataMembers.Add(new DataMember(xFieldName,
                                                       new ushort[]{0x7FF, 0, 0}));
-            new CPUx86.Move("dword [_NATIVE_IDT_Pointer + 2]",
-                            "_NATIVE_IDT_Contents");
+            new CPUx86.Move{DestinationRef=new ElementReference("_NATIVE_IDT_Pointer"), DestinationIsIndirect=true, DestinationDisplacement=2, 
+                SourceRef=new ElementReference("_NATIVE_IDT_Contents")};
 
             #endregion
-
-            new CPUx86.Move(Registers.EAX,
-                            "_NATIVE_IDT_Pointer");
+            new CPUx86.Move {
+                DestinationReg = Registers.EAX,
+                SourceRef = new ElementReference("_NATIVE_IDT_Pointer")
+            };
             new Label(".RegisterIDT");
-            new CPUx86.Lidt(Registers.AtEAX);
+            new CPUx86.Lidt(Registers_Old.AtEAX);
             new CPUx86.Break();
             new CPUx86.Jump("__AFTER__ALL__ISR__HANDLER__STUBS__");
             var xInterruptsWithParam = new int[] {8, 10, 11, 12, 13, 14};
             for (int j = 0; j < 256; j++) {
                 new Label("__ISR_Handler_" + j.ToString("X2"));
-                new CPUx86.Move("dword", "[InterruptsEnabledFlag]", 0);
+                new CPUx86.Move { DestinationRef = new ElementReference("InterruptsEnabledFlag"), DestinationIsIndirect = true, SourceValue = 0, Size = 32 };
                 if (Array.IndexOf(xInterruptsWithParam,
                                   j) ==
                     -1) {
-                    new CPUx86.Pushd("0");
+                    new CPUx86.Push { DestinationValue = 0 };
                 }
-                new CPUx86.Pushd("0x" + j.ToString("X"));
+                new CPUx86.Push { DestinationValue = (uint)j };
                 new CPUx86.Pushad();
 
                 new CPUx86.Sub("esp",
                                "4");
-                new CPUx86.Move("eax", "esp"); // preserve old stack address for passing to interrupt handler
+                new CPUx86.Move{DestinationReg=Registers.EAX, SourceReg=Registers.ESP}; // preserve old stack address for passing to interrupt handler
                 
                 // store floating point data
                 new CPUx86.And("esp", "0xfffffff0"); // fxsave needs to be 16-byte alligned
                 new CPUx86.Sub("esp", "512"); // fxsave needs 512 bytes
                 new CPUx86.FXSave("[esp]"); // save the registers
-                new CPUx86.Move("[eax]", "esp");
+                new CPUx86.Move { DestinationReg = Registers.EAX, DestinationIsIndirect = true, SourceReg = Registers.ESP };
 
-                new CPUx86.Push("eax"); // 
-                new CPUx86.Push("eax"); // pass old stack address (pointer to InterruptContext struct) to the interrupt handler
+                new CPUx86.Push { DestinationReg = Registers.EAX }; // 
+                new CPUx86.Push { DestinationReg = Registers.EAX }; // pass old stack address (pointer to InterruptContext struct) to the interrupt handler
                 //new CPUx86.Move("eax",
                 //                "esp");
                 //new CPUx86.Push("eax");
@@ -113,34 +142,31 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
                                             true);
                 }
                 new CPUx86.Call(Label.GenerateLabelName(xHandler));
-                new CPUx86.Pop("eax");
+                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
                 new CPUx86.FXStore("[esp]");
 
-                new CPUx86.Move("esp", "eax"); // this restores the stack for the FX stuff, except the pointer to the FX data
-                new CPUx86.Add("esp", "4"); // "pop" the pointer
+                new CPUx86.Move { DestinationReg = Registers.ESP, SourceReg = Registers.EAX }; // this restores the stack for the FX stuff, except the pointer to the FX data
+                new CPUx86.Add { DestinationReg = Registers.ESP, SourceValue = 4 }; // "pop" the pointer
                 
                 new CPUx86.Popad();
-                
-                new CPUx86.Add("esp",
-                               "8");
+
+                new CPUx86.Add { DestinationReg = Registers.ESP, SourceValue = 8 };
                 new CPUx86.Break();
                 new Label("__ISR_Handler_" + j.ToString("X2") + "_END");
                 // MtW: Appearantly, we dont need to enable interrupts on exit
                 //if (j < 0x20 || j > 0x2F) {
                 //new CPUx86.Sti();
-                new CPUx86.Move("dword", "[InterruptsEnabledFlag]", 1);
+                new CPUx86.Move { DestinationRef = new ElementReference("InterruptsEnabledFlag"), DestinationIsIndirect = true, SourceValue = 1, Size = 32 };
                 //} 
                 new CPUx86.InterruptReturn();
             }
             new Label("__AFTER__ALL__ISR__HANDLER__STUBS__");
             new CPUx86.Noop();
-            new CPUx86.Move("eax",
-                            "[ebp + 8]");
-            new CPUx86.Compare("eax",
-                               "0");
+            new CPUx86.Move { DestinationReg = Registers.EAX, SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 8 };
+            new CPUx86.Compare { DestinationReg = Registers.EAX, SourceValue = 0 };
             new CPUx86.JumpIfZero(".__AFTER_ENABLE_INTERRUPTS");
             new CPUx86.Sti();
-            new CPUx86.Move("dword", "[InterruptsEnabledFlag]", 1);
+            new CPUx86.Move { DestinationRef = new ElementReference("InterruptsEnabledFlag"), DestinationIsIndirect = true, SourceValue = 1, Size = 32 };
             new Label(".__AFTER_ENABLE_INTERRUPTS");
         }
     }

@@ -13,17 +13,17 @@ namespace Indy.IL2CPU.Assembler.X86.X {
         }
 
         public static implicit operator RegisterECX(MemoryAction aAction) {
-            Instance.Move(aAction.ToString());
+            Instance.Move(aAction);
             return Instance;
         }
 
         public static implicit operator RegisterECX(UInt32 aValue) {
-            Instance.Move(aValue.ToString());
+            Instance.Move(aValue);
             return Instance;
         }
 
         public static implicit operator RegisterECX(RegisterEAX aValue) {
-            Instance.Move(aValue.ToString());
+            Instance.Move(aValue.GetId());
             return Instance;
         }
     }

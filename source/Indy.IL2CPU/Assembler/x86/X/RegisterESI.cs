@@ -13,22 +13,22 @@ namespace Indy.IL2CPU.Assembler.X86.X {
         }
 
         public static implicit operator RegisterESI(MemoryAction aAction) {
-            Instance.Move(aAction.ToString());
+            Instance.Move(aAction);
             return Instance;
         }
 
         public static implicit operator RegisterESI(UInt32 aValue) {
-            Instance.Move(aValue.ToString());
+            Instance.Move(aValue);
             return Instance;
         }
 
         public static implicit operator RegisterESI(RegisterESP aValue) {
-            Instance.Move(aValue.ToString());
+            Instance.Move(aValue.GetId());
             return Instance;
         }
 
         public static implicit operator RegisterESI(RegisterEBP aValue) {
-            Instance.Move(aValue.ToString());
+            Instance.Move(aValue);
             return Instance;
         }
     }

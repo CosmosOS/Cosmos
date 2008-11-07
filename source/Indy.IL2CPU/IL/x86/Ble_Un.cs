@@ -32,11 +32,11 @@ namespace Indy.IL2CPU.IL.X86 {
 			string LabelFalse = BaseLabel + "False";
 			if (xSize > 4)
 			{
-				new CPUx86.Pop(CPUx86.Registers.EAX);
-				new CPUx86.Pop(CPUx86.Registers.EDX);
+				new CPUx86.Pop{DestinationReg = CPUx86.Registers.EAX};
+                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
 				//value2: EDX:EAX
-				new CPUx86.Pop("ebx");
-				new CPUx86.Pop("ecx");
+                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
+                new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
 				//value1: ECX:EBX
 				new CPUx86.Sub("ebx", "eax");
 				new CPUx86.SubWithCarry("ecx", "edx");
@@ -44,15 +44,15 @@ namespace Indy.IL2CPU.IL.X86 {
 				new CPUx86.JumpIfBelowOrEqual(TargetLabel);
 			} else
 			{
-				new CPUx86.Pop(CPUx86.Registers.EAX);
-				new CPUx86.Compare(CPUx86.Registers.EAX, CPUx86.Registers.AtESP);
+                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX }; ;
+                new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
 				new CPUx86.JumpIfLessOrEqual(LabelFalse);
 				new CPUx86.Jump(LabelTrue);
 				new CPU.Label(LabelTrue);
-				new CPUx86.Add(CPUx86.Registers.ESP, "4");
+                new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
 				new CPUx86.Jump(TargetLabel);
 				new CPU.Label(LabelFalse);
-				new CPUx86.Add(CPUx86.Registers.ESP, "4");
+                new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
 			}
 		}
 	}

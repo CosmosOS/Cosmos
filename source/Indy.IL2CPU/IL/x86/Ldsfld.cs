@@ -10,7 +10,7 @@ namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(OpCodeEnum.Ldsfld)]
 	public class Ldsfld: Op {
 		private string mDataName;
-		private int mSize;
+		private uint mSize;
 		private bool mNeedsGC;
         public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
             FieldInfo xField = aReader.OperandValueField;
@@ -29,19 +29,19 @@ namespace Indy.IL2CPU.IL.X86 {
 				for (int i = 1; i <= (mSize / 4); i++) {
 					//	Pop("eax");
 					//	Move(Assembler, "dword [" + mDataName + " + 0x" + (i * 4).ToString("X") + "]", "eax");
-					new CPUx86.Pushd("[" + mDataName + " + 0x" + (mSize - (i * 4)).ToString("X") + "]");
+                    new CPUx86.Push { DestinationRef = new ElementReference(mDataName), DestinationIsIndirect = true, DestinationDisplacement = (int)(mSize - (i * 4)) };
 				}
 				switch (mSize % 4) {
 					case 1: {
-							new CPUx86.Move(CPUx86.Registers.EAX, "0");						//mSize - 1
-							new CPUx86.Move(CPUx86.Registers.AL, "[" + mDataName + " + 0x" + (0).ToString("X") + "]");
-							new CPUx86.Push(CPUx86.Registers.EAX);
+                            new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
+                            new CPUx86.Move { DestinationReg = CPUx86.Registers.AL, SourceRef = new ElementReference(mDataName), SourceIsIndirect = true };
+                            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
 							break;
 						}
 					case 2: {
-							new CPUx86.Move(CPUx86.Registers.EAX, "0");
-							new CPUx86.Move(CPUx86.Registers.AX, "[" + mDataName + " + 0x" + (0).ToString("X") + "]");
-							new CPUx86.Push(CPUx86.Registers.EAX);
+                            new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
+                            new CPUx86.Move { DestinationReg = CPUx86.Registers.AX, SourceRef = new ElementReference(mDataName), SourceIsIndirect = true };
+							new CPUx86.Push{DestinationReg=CPUx86.Registers.EAX};
 							break;
 						}
 					case 0: {
@@ -53,15 +53,15 @@ namespace Indy.IL2CPU.IL.X86 {
 			} else {
 				switch (mSize) {
 					case 1: {
-							new CPUx86.Move(CPUx86.Registers.EAX, "0");
-							new CPUx86.Move(CPUx86.Registers.AL, "[" + mDataName + "]");
-							new CPUx86.Push(CPUx86.Registers.EAX);
+                            new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
+                            new CPUx86.Move { DestinationReg = CPUx86.Registers.AL, SourceRef = new ElementReference(mDataName), SourceIsIndirect = true };
+                            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
 							break;
 						}
 					case 2: {
-							new CPUx86.Move(CPUx86.Registers.EAX, "0");
-							new CPUx86.Move(CPUx86.Registers.AX, "[" + mDataName + "]");
-							new CPUx86.Push(CPUx86.Registers.EAX);
+                            new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
+                            new CPUx86.Move { DestinationReg = CPUx86.Registers.AX, SourceRef = new ElementReference(mDataName), SourceIsIndirect = true };
+							new CPUx86.Push{DestinationReg=CPUx86.Registers.EAX};
 							break;
 						}
 					case 0: {
@@ -71,7 +71,7 @@ namespace Indy.IL2CPU.IL.X86 {
 						throw new Exception("Remainder size " + (mSize) + " not supported!");
 				}
 			}
-			Assembler.StackContents.Push(new StackContent(mSize, null));
+			Assembler.StackContents.Push(new StackContent((int)mSize, null));
 			if (mNeedsGC) {
 				new Dup(null, null) {
 					Assembler = this.Assembler

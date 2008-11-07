@@ -16,9 +16,9 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public override void DoAssemble() {
-			new CPUx86.Pop(CPUx86.Registers.EAX);
+            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
 			for(int i = 0; i < mLabels.Length; i++){
-				new CPUx86.Compare(CPUx86.Registers.EAX, "0" + i.ToString("X") + "h");
+                new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceValue =(uint)i };
 				new CPUx86.JumpIfEqual(mLabels[i]);
 			}
 			Assembler.StackContents.Pop();

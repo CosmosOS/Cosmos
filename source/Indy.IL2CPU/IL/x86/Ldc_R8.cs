@@ -14,8 +14,8 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 		public override void DoAssemble() {
 			byte[] xBytes = BitConverter.GetBytes(mValue);
-			new CPU.Pushd("0x" + xBytes.Take(4).Aggregate("", (s, b) => s + b.ToString("X2")));
-			new CPU.Pushd("0x" + xBytes.Skip(4).Aggregate("", (s, b) => s + b.ToString("X2")));
+            new CPU.Push { DestinationValue = BitConverter.ToUInt32(xBytes, 0) };
+            new CPU.Push { DestinationValue = BitConverter.ToUInt32(xBytes, 4) };
 			Assembler.StackContents.Push(new StackContent(8, typeof(Double)));
 		}
 	}

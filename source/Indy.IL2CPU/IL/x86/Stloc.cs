@@ -32,13 +32,13 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		public sealed override void DoAssemble() {
 			if (mNeedsGC) {
-				new CPUx86.Pushd("[" + mLocal.VirtualAddresses[0] + "]");
+                new CPUx86.Push { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = mLocal.VirtualAddresses[0] };
 				Engine.QueueMethod(GCImplementationRefs.DecRefCountRef);
 				new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef));
 			}
-			foreach (string s in mLocal.VirtualAddresses.Reverse()) {
-				new CPUx86.Pop(CPUx86.Registers.EAX);
-				new CPUx86.Move("[" + s + "]", "eax");
+			foreach (int i in mLocal.VirtualAddresses.Reverse()) {
+                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX }; ;
+                new CPUx86.Move { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = i, SourceReg = CPUx86.Registers.EAX };
 			}
 			// no need to inc again, items on the transient stack are also counted
 			Assembler.StackContents.Pop();

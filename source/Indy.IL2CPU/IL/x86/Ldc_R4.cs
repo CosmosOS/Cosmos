@@ -13,7 +13,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			mValue = aReader.OperandValueSingle;
 		}
 		public override void DoAssemble() {
-			new CPU.Pushd("0x" + BitConverter.GetBytes(mValue).Aggregate("", (x, b) => x + b.ToString("X2")));
+			new CPU.Push{DestinationValue=BitConverter.ToUInt32(BitConverter.GetBytes(mValue), 0)};
 			Assembler.StackContents.Push(new StackContent(4, typeof(Single)));
 		}
 	}

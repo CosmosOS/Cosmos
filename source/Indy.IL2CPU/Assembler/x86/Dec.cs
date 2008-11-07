@@ -5,24 +5,12 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
     [OpCode(0xFFFFFFFF, "dec")]
-    public class Dec : Instruction {
-        public readonly string Destination;
-        public readonly string Size;
-
-        public Dec(string aSize, string aDestination) {
-            Size = aSize;
-            Destination = aDestination;
-        }
-
-        public Dec(string aDestination) {
-            Destination = aDestination;
-        }
-
+    public class Dec : InstructionWithDestinationAndSize {
         public override string ToString() {
-            if (String.IsNullOrEmpty(Size)) {
-                return "dec " + Destination;
+            if (Size>0) {
+                return "dec " + SizeToString(Size) + " " + GetDestinationAsString();
             } else {
-                return "dec " + Size + " " + Destination;
+                return "dec " + GetDestinationAsString();
             }
         }
     }

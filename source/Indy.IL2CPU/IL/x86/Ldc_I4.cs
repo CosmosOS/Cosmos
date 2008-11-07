@@ -29,7 +29,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 		}
 		public override sealed void DoAssemble() {
-			new CPU.Pushd("0" + mValue.ToString("X") + "h");
+            new CPU.Push { DestinationValue = (uint)mValue };
 			Assembler.StackContents.Push(new StackContent(4, typeof(int)));
 		}
 	}

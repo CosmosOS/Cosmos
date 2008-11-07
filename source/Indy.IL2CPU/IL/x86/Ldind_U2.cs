@@ -11,10 +11,10 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 		public override void DoAssemble() {
 			Assembler.StackContents.Pop();
-			new CPUx86.Pop(CPUx86.Registers.EAX);
-			new CPUx86.Move(CPUx86.Registers.EDX, "0");
-			new CPUx86.Move(CPUx86.Registers.DX, CPUx86.Registers.AtEAX);
-			new CPUx86.Pushd(CPUx86.Registers.EDX);
+            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.EDX, SourceValue = 0 };
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.DX, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect=true };
+            new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX };
 			Assembler.StackContents.Push(new StackContent(2, typeof(ushort)));
 		}
 	}

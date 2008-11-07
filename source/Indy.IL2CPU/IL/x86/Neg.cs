@@ -9,9 +9,9 @@ namespace Indy.IL2CPU.IL.X86 {
 			: base(aReader, aMethodInfo) {
 		}
 		public override void DoAssemble() {
-			new CPUx86.Pop(CPUx86.Registers.EAX);
-			new CPUx86.Neg(CPUx86.Registers.EAX);
-			new CPUx86.Pushd(CPUx86.Registers.EAX);
+			new CPUx86.Pop{DestinationReg=CPUx86.Registers.EAX};
+			new CPUx86.Neg(CPUx86.Registers_Old.EAX);
+            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
 		}
 	}
 }
