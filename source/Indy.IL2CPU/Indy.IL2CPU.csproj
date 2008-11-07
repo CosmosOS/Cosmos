@@ -90,6 +90,7 @@
     <Compile Include="Assembler\EndIfDefined.cs" />
     <Compile Include="Assembler\IfDefined.cs" />
     <Compile Include="Assembler\IfNotDefined.cs" />
+    <Compile Include="Assembler\x86\JumpToSegment.cs" />
     <Compile Include="Assembler\x86\Registers_Old.cs" />
     <Compile Include="Assembler\x86\_Infra\Instruction.cs" />
     <Compile Include="Assembler\x86\_Infra\InstructionWithDestination.cs" />

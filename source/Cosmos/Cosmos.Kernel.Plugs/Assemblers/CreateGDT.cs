@@ -38,7 +38,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
             new CPUx86.Move{DestinationReg=Registers.GS, SourceReg=Registers.AX};
             new CPUx86.Move { DestinationReg = Registers.SS, SourceReg = Registers.AX };
             // Force reload of code segement
-			new CPUx86.Jump("0x8:flush__GDT__table");
+            new CPUx86.JumpToSegment { Segment = 8, DestinationLabel = "flush__GDT__table" };
 			new Label("flush__GDT__table");
 		}
 	}

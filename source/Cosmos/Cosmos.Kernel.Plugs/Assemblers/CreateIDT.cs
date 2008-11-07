@@ -132,7 +132,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
                 //new CPUx86.Move("eax",
                 //                "esp");
                 //new CPUx86.Push("eax");
-                new CPUx86.Jump("0x8:__ISR_Handler_" + j.ToString("X2") + "_SetCS");
+                new CPUx86.JumpToSegment { Segment = 8, DestinationLabel = "__ISR_Handler_" + j.ToString("X2") + "_SetCS" };
                 new Label("__ISR_Handler_" + j.ToString("X2") + "_SetCS");
                 MethodBase xHandler = GetInterruptHandler((byte) j);
                 if (xHandler == null) {
