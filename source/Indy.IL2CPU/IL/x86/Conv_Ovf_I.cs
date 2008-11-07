@@ -31,7 +31,7 @@ namespace Indy.IL2CPU.IL.X86 {
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
 					//must be equal to EDX
 					new CPUx86.Xor("EBX", "EDX");
-					new CPUx86.JumpIfZero(NextInstructionLabel);
+                    new CPUx86.JumpIfZero { DestinationLabel = NextInstructionLabel };
 					//equals
 					new CPUx86.Interrupt(CPUx86.Interrupt.INTO);
 					break;

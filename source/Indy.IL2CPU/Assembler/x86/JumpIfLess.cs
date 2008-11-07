@@ -9,11 +9,5 @@ namespace Indy.IL2CPU.Assembler.X86 {
 	/// </summary>
 	[OpCode(0xFFFFFFFF, "jl")]
 	public class JumpIfLess: JumpBase {
-		public JumpIfLess(string aAddress)
-			: base(aAddress) {
-		}
-		public override string ToString() {
-			return "jl " + Address;
-		}
 	}
 }

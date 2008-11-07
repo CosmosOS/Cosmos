@@ -104,7 +104,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
             new Label(".RegisterIDT");
             new CPUx86.Lidt(Registers_Old.AtEAX);
             new CPUx86.Break();
-            new CPUx86.Jump("__AFTER__ALL__ISR__HANDLER__STUBS__");
+            new CPUx86.Jump { DestinationLabel = "__AFTER__ALL__ISR__HANDLER__STUBS__" };
             var xInterruptsWithParam = new int[] {8, 10, 11, 12, 13, 14};
             for (int j = 0; j < 256; j++) {
                 new Label("__ISR_Handler_" + j.ToString("X2"));
@@ -141,7 +141,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
                                             "HandleInterrupt_Default",
                                             true);
                 }
-                new CPUx86.Call(Label.GenerateLabelName(xHandler));
+                new CPUx86.Call { DestinationLabel = Label.GenerateLabelName(xHandler) };
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
                 new CPUx86.FXStore("[esp]");
 
@@ -164,7 +164,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
             new CPUx86.Noop();
             new CPUx86.Move { DestinationReg = Registers.EAX, SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 8 };
             new CPUx86.Compare { DestinationReg = Registers.EAX, SourceValue = 0 };
-            new CPUx86.JumpIfZero(".__AFTER_ENABLE_INTERRUPTS");
+            new CPUx86.JumpIfZero { DestinationLabel = ".__AFTER_ENABLE_INTERRUPTS" };
             new CPUx86.Sti();
             new CPUx86.Move { DestinationRef = new ElementReference("InterruptsEnabledFlag"), DestinationIsIndirect = true, SourceValue = 1, Size = 32 };
             new Label(".__AFTER_ENABLE_INTERRUPTS");

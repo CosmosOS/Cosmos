@@ -13,13 +13,5 @@ namespace Indy.IL2CPU.Assembler.X86
 	[OpCode(0xFFFFFFFF, "jg")]
 	public class JumpOnGreater : JumpBase
 	{
-		public JumpOnGreater(string aAddress)
-			: base(aAddress)
-		{
-		}
-		public override string ToString()
-		{
-			return "jg " + Address;
-		}
 	}
 }

@@ -106,11 +106,11 @@ namespace Indy.IL2CPU.Assembler.X86 {
 
             // END SSE INIT
 
-            new Call(EntryPointName);
+            new Call { DestinationLabel = EntryPointName };
             new Label(".loop");
             new ClrInterruptFlag();
             new Halt();
-            new Jump(".loop");
+            new Jump { DestinationLabel = ".loop" };
             new Label("DEBUG_STUB_");
             new Return();
             if (mComNumber > 0) {

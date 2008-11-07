@@ -89,7 +89,7 @@ namespace Indy.IL2CPU.IL.X86
 				Engine.QueueMethod(GCImplementationRefs.IncRefCountRef);
 				int xExtraSize = 20;
                 new Push { DestinationValue = (uint)(xObjectSize + xExtraSize) };
-				new Assembler.X86.Call(Label.GenerateLabelName(GCImplementationRefs.AllocNewObjectRef));
+                new Assembler.X86.Call { DestinationLabel = Label.GenerateLabelName(GCImplementationRefs.AllocNewObjectRef) };
 				Engine.QueueMethod(CPU.Assembler.CurrentExceptionOccurredRef);
 				//new CPUx86.Pushd(CPUx86.Registers_Old.EAX);
 				new Test(Registers_Old.ECX,
@@ -105,7 +105,7 @@ namespace Indy.IL2CPU.IL.X86
                 new Push { DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 32 };
                 new Push { DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 32 };
                 new Push { DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 32 };
-				new Assembler.X86.Call(Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef));
+                new Assembler.X86.Call { DestinationLabel = Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef) };
 				//new CPUx86.Test("ecx", "2");
 				//new CPUx86.JumpIfEquals(aCurrentLabel + "_NO_ERROR_2");
 				//for (int i = 1; i < xCtorInfo.Arguments.Length; i++) {
@@ -114,7 +114,7 @@ namespace Indy.IL2CPU.IL.X86
 				//new CPUx86.Add("esp", "16");
 				//Call.EmitExceptionLogic(aAssembler, aCurrentMethodInformation, aCurrentLabel + "_NO_ERROR_2", false);
 				//new CPU.Label(aCurrentLabel + "_NO_ERROR_2");
-				new Assembler.X86.Call(Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef));
+                new Assembler.X86.Call { DestinationLabel = Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef) };
 				//new CPUx86.Test("ecx", "2");
 				//new CPUx86.JumpIfEquals(aCurrentLabel + "_NO_ERROR_3");
 				//for (int i = 1; i < xCtorInfo.Arguments.Length; i++) {
@@ -145,10 +145,10 @@ namespace Indy.IL2CPU.IL.X86
                         new Push { DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xSize + 4) };
 					}
 				}
-				new Assembler.X86.Call(Label.GenerateLabelName(aCtorDef));
+                new Assembler.X86.Call { DestinationLabel = Label.GenerateLabelName(aCtorDef) };
 				new Test(Registers_Old.ECX,
 						 2);
-				new JumpIfEqual(aCurrentLabel + "_NO_ERROR_4");
+                new JumpIfEqual { DestinationLabel = aCurrentLabel + "_NO_ERROR_4" };
 				for (int i = 1; i < xCtorInfo.Arguments.Length; i++)
 				{
                     new Assembler.X86.Add {

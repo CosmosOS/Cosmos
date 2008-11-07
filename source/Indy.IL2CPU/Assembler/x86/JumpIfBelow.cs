@@ -12,13 +12,5 @@ namespace Indy.IL2CPU.Assembler.X86
 	[OpCode(0xFFFFFFFF, "jb")]
 	public class JumpIfBelow : JumpBase
 	{
-		public JumpIfBelow(string aAddress)
-			: base(aAddress)
-		{
-		}
-		public override string ToString()
-		{
-			return "jb " + Address;
-		}
 	}
 }

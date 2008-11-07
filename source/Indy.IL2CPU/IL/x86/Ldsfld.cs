@@ -75,10 +75,9 @@ namespace Indy.IL2CPU.IL.X86 {
 			if (mNeedsGC) {
 				new Dup(null, null) {
 					Assembler = this.Assembler
-				}.
-				Assemble();
+				}.Assemble();
 				Engine.QueueMethod(GCImplementationRefs.IncRefCountRef);
-				new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef));
+                new CPUx86.Call { DestinationLabel = Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef) };
 				Assembler.StackContents.Pop();
 			}
 		}

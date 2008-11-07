@@ -311,7 +311,7 @@ namespace Indy.IL2CPU.Assembler {
                         } else {
                             prefix = "\t";
                         }
-                        aOutput.WriteLine(prefix + xFullName.Replace(".", "__DOT__") + ":");
+                        aOutput.WriteLine(prefix + Label.FilterStringForIncorrectChars(xFullName) + ":");
                         continue;
                     }
                     aOutput.WriteLine(prefix + x);

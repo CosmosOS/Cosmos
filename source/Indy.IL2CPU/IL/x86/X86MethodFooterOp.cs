@@ -96,15 +96,15 @@ namespace Indy.IL2CPU.IL.X86
                     };
                 }
             }
-            new CPUx86.Jump(EndOfMethodLabelNameException);
+            new CPUx86.Jump { DestinationLabel = EndOfMethodLabelNameException };
             new Label(EndOfMethodLabelNameException);
             for (int i = 0; i < aLocAllocItemCount;i++ )
             {
-                new CPUx86.Call(Label.GenerateLabelName(typeof(RuntimeEngine).GetMethod("Heap_Free")));
+                new CPUx86.Call { DestinationLabel = Label.GenerateLabelName(typeof(RuntimeEngine).GetMethod("Heap_Free")) };
             }
             if (aDebugMode && aIsNonDebuggable)
             {
-                new CPUx86.Call("DebugPoint_DebugResume");
+                new CPUx86.Call { DestinationLabel = "DebugPoint_DebugResume" };
             }
             if ((from xLocal in aLocals
                  where xLocal.IsReferenceType
@@ -118,7 +118,7 @@ namespace Indy.IL2CPU.IL.X86
                         Op.Ldloc(aAssembler,
                                  xLocal,
                                  false);
-                        new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef));
+                        new CPUx86.Call { DestinationLabel = Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef) };
                     }
                 }
                 foreach (MethodInformation.Argument xArg in aArgs) {
@@ -126,7 +126,7 @@ namespace Indy.IL2CPU.IL.X86
                         Op.Ldarg(aAssembler,
                                  xArg,
                                  false);
-                        new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef));
+                        new CPUx86.Call { DestinationLabel = Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef) };
                     }
                 }
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };

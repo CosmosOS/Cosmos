@@ -39,7 +39,7 @@ namespace Indy.IL2CPU.Assembler.X86.X {
         }
 
         public void Call(string aLabel) {
-            new X86.Call(aLabel);
+            new X86.Call { DestinationLabel = aLabel };
         }
 
 
@@ -78,18 +78,18 @@ namespace Indy.IL2CPU.Assembler.X86.X {
         }
 
         public void Jump(string aLabel) {
-            new X86.Jump(aLabel);
+            new X86.Jump { DestinationLabel = aLabel };
         }
 
         public void JumpIf(Flags aFlags, string aLabel) {
             switch (aFlags) {
                 case Flags.Zero:
                 case Flags.Equal:
-                    new X86.JumpIfZero(aLabel);
+                    new X86.JumpIfZero { DestinationLabel = aLabel };
                     break;
                 case Flags.NotZero:
                 case Flags.NotEqual:
-                    new X86.JumpIfNotZero(aLabel);
+                    new X86.JumpIfNotZero { DestinationLabel = aLabel };
                     break;
             }
         }

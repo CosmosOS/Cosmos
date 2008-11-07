@@ -219,7 +219,7 @@ namespace Indy.IL2CPU.IL.X86
 							//new CPUx86.Add("esp",
 							//               "4");
 							Engine.QueueMethod(InvokeMulticastRef);
-							new CPUx86.Call(Label.GenerateLabelName(InvokeMulticastRef));
+                            new CPUx86.Call { DestinationLabel = Label.GenerateLabelName(InvokeMulticastRef) };
 							var xGetInvocationListMethod = typeof(MulticastDelegate).GetMethod("GetInvocationList");
 							Engine.QueueMethod(xGetInvocationListMethod);
 							xGetInvocationListMethod = typeof(Delegate).GetMethod("GetInvocationList");
@@ -257,7 +257,7 @@ namespace Indy.IL2CPU.IL.X86
 		}
 
 		public override void EmitOpDebugHeader(Indy.IL2CPU.Assembler.Assembler aAssembler, uint aOpId, string aOpLabel) {
-			new CPUx86.Call("DebugStub_TracerEntry");
+            new CPUx86.Call { DestinationLabel = "DebugStub_TracerEntry" };
 		}
 
         public override void PreProcess(Indy.IL2CPU.Assembler.Assembler mAssembler)

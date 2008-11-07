@@ -17,17 +17,17 @@ namespace Cosmos.Sys.Plugs.Assemblers
 			new CPUx86.InByte(Registers_Old.AL, "064h");
             new CPUx86.Move { DestinationReg = Registers.AH, SourceReg = Registers.AL };
         	new CPUx86.Test(Registers_Old.AH,1);
-        	new CPUx86.JumpIfZero(".skipClearIO");
+            new CPUx86.JumpIfZero { DestinationLabel = ".skipClearIO" };
 			new CPUx86.InByte(Registers_Old.AL,Registers_Old.DX);
         	new CPUAll.Label(".skipClearIO");
         	new CPUx86.Test(Registers_Old.AH,2);
-        	new JumpIfNotZero(".clearBuffer");
+            new JumpIfNotZero { DestinationLabel = ".clearBuffer" };
             new Move { DestinationReg = Registers.DX, SourceValue = 0x64 };
             new Move { DestinationReg = Registers.AL, SourceValue = 0xfe };
         	new Out(Registers_Old.DX, Registers_Old.AL);
             new CPUAll.Label(".loop");//failed... halt
             new CPUx86.Halt();
-            new CPUx86.Jump(".loop");
+            new CPUx86.Jump { DestinationLabel = ".loop" };
         }
     }
 }

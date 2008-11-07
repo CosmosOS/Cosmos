@@ -28,11 +28,11 @@ namespace Indy.IL2CPU.IL.X86 {
             //new CPUx86.Move("ecx",
                             //"[esp]");
             aInitAddress(new CPUx86.Compare { SourceValue = 0, Size=32 });
-            new CPUx86.JumpIfZero(aCurrentLabel + "_Step1");
-            new CPUx86.Jump(aNextLabel);
+            new CPUx86.JumpIfZero{DestinationLabel=aCurrentLabel + "_Step1"};
+            new CPUx86.Jump { DestinationLabel = aNextLabel };
             //new CPUx86.JumpIfNotEqual(aNextLabel);
             new Label(aCurrentLabel + "_Step1");
-            new CPUx86.Call("DEBUG_STUB_");
+            new CPUx86.Call { DestinationLabel = "DEBUG_STUB_" };
             Type xNullRefExcType = typeof(NullReferenceException);
             Newobj.Assemble(aAssembler,
                             xNullRefExcType.GetConstructor(new Type[0]),
@@ -48,7 +48,7 @@ namespace Indy.IL2CPU.IL.X86 {
                 SourceReg = CPUx86.Registers.EAX
             };
             Engine.QueueMethod(CPU.Assembler.CurrentExceptionOccurredRef);
-            new CPUx86.Call(Label.GenerateLabelName(CPU.Assembler.CurrentExceptionOccurredRef));
+            new CPUx86.Call { DestinationLabel = Label.GenerateLabelName(CPU.Assembler.CurrentExceptionOccurredRef) };
             new CPUx86.Move{DestinationReg=CPUx86.Registers.ECX, SourceValue=3};
             aEmitCleanupMethod();
             Call.EmitExceptionLogic(aAssembler,
@@ -109,7 +109,7 @@ namespace Indy.IL2CPU.IL.X86 {
             if (aAddGCCode && aArg.IsReferenceType) {
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
                 Engine.QueueMethod(GCImplementationRefs.IncRefCountRef);
-                new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef));
+                new CPUx86.Call { DestinationLabel = Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef) };
             }
         }
 
@@ -236,7 +236,7 @@ namespace Indy.IL2CPU.IL.X86 {
             if (aAddGCCode && aField.NeedsGC) {
                 new CPUx86.Push { DestinationReg = Registers.ESP, DestinationIsIndirect = true };
                 Engine.QueueMethod(GCImplementationRefs.IncRefCountRef);
-                new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef));
+                new CPUx86.Call { DestinationLabel = Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef) };
             }
             aAssembler.StackContents.Push(new StackContent(aField.Size,
                                                            aField.FieldType));
@@ -260,7 +260,7 @@ namespace Indy.IL2CPU.IL.X86 {
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
                 new CPUx86.Push { DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = (aField.Offset + aExtraOffset) };
                 Engine.QueueMethod(GCImplementationRefs.DecRefCountRef);
-                new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef));
+                new CPUx86.Call { DestinationLabel = Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef) };
             }
             new CPUx86.Move{DestinationReg=CPUx86.Registers.ECX, SourceReg=CPUx86.Registers.ESP, SourceIsIndirect=true, SourceDisplacement=xRoundedSize};
             new CPUx86.Add {
@@ -291,8 +291,8 @@ namespace Indy.IL2CPU.IL.X86 {
             if (aField.NeedsGC) {
                 new CPUx86.Push { DestinationReg = Registers.ECX };
                 new CPUx86.Push{DestinationReg=Registers.EAX};
-                new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef));
-                new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef));
+                new CPUx86.Call { DestinationLabel = Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef) };
+                new CPUx86.Call { DestinationLabel = Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef) };
             }
             new CPUx86.Add { DestinationReg = Registers.ESP, SourceValue = 4 };
             aAssembler.StackContents.Pop();
@@ -382,7 +382,7 @@ namespace Indy.IL2CPU.IL.X86 {
                 if (aAddGCCode && aLocal.IsReferenceType){
                     new CPUx86.Push { DestinationReg = Registers.EAX };
                     Engine.QueueMethod(GCImplementationRefs.IncRefCountRef);
-                    new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef));
+                    new CPUx86.Call { DestinationLabel = Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef) };
                 }
             }
             aAssembler.StackContents.Push(new StackContent(aLocal.Size,
@@ -398,9 +398,9 @@ namespace Indy.IL2CPU.IL.X86 {
                 new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceRef = new ElementReference(xCurExceptionFieldName), SourceIsIndirect=true };
                 new CPUx86.Push{DestinationReg=Registers.EAX, DestinationIsIndirect=true};
                 new CPUx86.Push { DestinationValue = (uint)Engine.RegisterType(mCatchType) };
-                new CPUx86.Call(Label.GenerateLabelName(VTablesImplRefs.IsInstanceRef));
+                new CPUx86.Call { DestinationLabel = Label.GenerateLabelName(VTablesImplRefs.IsInstanceRef) };
                 new CPUx86.Compare { DestinationReg = Registers.EAX, SourceValue = 0 };
-                new CPUx86.JumpIfEqual(mNextInstructionLabel);
+                new CPUx86.JumpIfEqual { DestinationLabel = mNextInstructionLabel };
             }
             if (mNeedsExceptionPush) {
                 new CPUx86.Push { DestinationRef = new ElementReference(xCurExceptionFieldName), DestinationIsIndirect = true, Size = 32 };

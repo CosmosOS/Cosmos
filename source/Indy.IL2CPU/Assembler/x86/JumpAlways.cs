@@ -9,11 +9,5 @@ namespace Indy.IL2CPU.Assembler.X86 {
 	/// </summary>
 	[OpCode(0xFFFFFFFF, "jmp")]
 	public class Jump: JumpBase {
-		public Jump(string aAddress)
-			: base(aAddress) {
-		}
-		public override string ToString() {
-			return "jmp " + Address;
-		}
 	}
 }

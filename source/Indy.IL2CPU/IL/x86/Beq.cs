@@ -29,8 +29,8 @@ namespace Indy.IL2CPU.IL.X86 {
 				new CPUx86.Pop{DestinationReg = CPUx86.Registers.EAX};
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
                 new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EBX };
-				new CPUx86.JumpIfNotEqual(LabelFalse);
-				new CPUx86.Jump(TargetLabel);
+                new CPUx86.JumpIfNotEqual { DestinationLabel = LabelFalse };
+                new CPUx86.Jump { DestinationLabel = TargetLabel };
 				new CPU.Label(LabelFalse);
 				//new CPUx86.Noop();
 				//new CPUx86.Jump(LabelFalse);
@@ -46,10 +46,10 @@ namespace Indy.IL2CPU.IL.X86 {
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
                 new CPUx86.Xor("eax", "ecx");
-				new CPUx86.JumpIfNotZero(LabelFalse);
+                new CPUx86.JumpIfNotZero { DestinationLabel = LabelFalse };
 				new CPUx86.Xor("ebx", "edx");
-				new CPUx86.JumpIfNotZero(LabelFalse);
-				new CPUx86.Jump(TargetLabel);
+                new CPUx86.JumpIfNotZero { DestinationLabel = LabelFalse };
+                new CPUx86.Jump { DestinationLabel = TargetLabel };
 				new CPU.Label(LabelFalse);
 				//new CPUx86.Noop();
 			}

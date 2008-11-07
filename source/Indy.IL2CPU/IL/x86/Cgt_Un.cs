@@ -60,16 +60,16 @@ namespace Indy.IL2CPU.IL.X86 {
 			{
                 new CPUx86.Pop{DestinationReg=CPUx86.Registers.EAX};
                 new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
-                new CPUx86.JumpIfGreater(LabelTrue);
-                new CPUx86.Jump(LabelFalse);
+                new CPUx86.JumpIfGreater { DestinationLabel = LabelTrue };
+                new CPUx86.Jump { DestinationLabel = LabelFalse };
                 new CPU.Label(LabelTrue);
                 new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
                 new CPUx86.Push { DestinationValue = 1 };
-                new CPUx86.Jump(NextInstructionLabel);
+                new CPUx86.Jump { DestinationLabel = NextInstructionLabel };
                 new CPU.Label(LabelFalse);
                 new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
                 new CPUx86.Push { DestinationValue = 0 };
-                new CPUx86.Jump(NextInstructionLabel);
+                new CPUx86.Jump { DestinationLabel = NextInstructionLabel };
 			}
 		}
 	}

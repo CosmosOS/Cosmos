@@ -48,11 +48,11 @@ namespace Indy.IL2CPU.IL.X86 {
 				
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.ECX };
                 new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
-				new CPUx86.JumpIfLess(LabelTrue);
-				new CPUx86.Jump(LabelFalse);
+                new CPUx86.JumpIfLess { DestinationLabel = LabelTrue };
+                new CPUx86.Jump { DestinationLabel = LabelFalse };
 				new CPU.Label(LabelTrue);
                 new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
-				new CPUx86.Jump(TargetLabel);
+                new CPUx86.Jump { DestinationLabel = TargetLabel };
 				new CPU.Label(LabelFalse);
                 new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
 				break;
@@ -66,7 +66,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				new CPUx86.Sub("ebx", "eax");
 				new CPUx86.SubWithCarry("ecx", "edx");
 				//result = value1 - value2
-				new CPUx86.JumpIfLess(TargetLabel);
+                new CPUx86.JumpIfLess { DestinationLabel = TargetLabel };
 				break;
 			default:
 				throw new NotSupportedException(string.Format("comprasion of {0} byte values", xSize));

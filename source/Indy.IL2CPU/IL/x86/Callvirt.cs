@@ -103,7 +103,7 @@ namespace Indy.IL2CPU.IL.X86 {
                     new CPUx86.Sub("esp",
                                    mExtraStackSpace.ToString());
                 }
-                new CPUx86.Call(mNormalAddress);
+                new CPUx86.Call { DestinationLabel = mNormalAddress };
             } else {
                 /*
                  * On the stack now:
@@ -127,7 +127,7 @@ namespace Indy.IL2CPU.IL.X86 {
                 new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = mThisOffset };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
                 new CPUx86.Push { DestinationValue = (uint)mMethodIdentifier };
-                new CPUx86.Call(CPU.Label.GenerateLabelName(VTablesImplRefs.GetMethodAddressForTypeRef));
+                new CPUx86.Call { DestinationLabel = CPU.Label.GenerateLabelName(VTablesImplRefs.GetMethodAddressForTypeRef) };
 
                 /*
                  * On the stack now:
@@ -159,7 +159,7 @@ namespace Indy.IL2CPU.IL.X86 {
                      * 
                      * EAX contains the method to call
                      */
-                    new CPUx86.JumpIfNotEqual(mLabelName + "_NOT_BOXED_THIS");
+                    new CPUx86.JumpIfNotEqual { DestinationLabel = mLabelName + "_NOT_BOXED_THIS" };
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
                     /*
                      * On the stack now:
@@ -200,7 +200,7 @@ namespace Indy.IL2CPU.IL.X86 {
                     new CPUx86.Sub("esp",
                                    mExtraStackSpace.ToString());
                 }
-                new CPUx86.Call("eax");
+                new CPUx86.Call { DestinationReg = CPUx86.Registers.EAX };
                 new CPU.Label(mLabelName + "__AFTER_NOT_BOXED_THIS");
             }
             Call.EmitExceptionLogic(Assembler,

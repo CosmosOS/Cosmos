@@ -9,11 +9,5 @@ namespace Indy.IL2CPU.Assembler.X86 {
 	/// </summary>
 	[OpCode(0xFFFFFFFF, "jne")]
 	public class JumpIfNotEqual: JumpBase {
-		public JumpIfNotEqual(string aAddress)
-			: base(aAddress) {
-		}
-		public override string ToString() {
-			return "jne near " + Address;
-		}
 	}
 }

@@ -47,7 +47,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				xSize += 4 - (mTheSize % 4);
 			}
             new CPUx86.Push { DestinationValue = (ObjectImpl.FieldDataOffset + xSize) };
-            new CPUx86.Call(CPU.Label.GenerateLabelName(GCImplementationRefs.AllocNewObjectRef));
+            new CPUx86.Call { DestinationLabel = CPU.Label.GenerateLabelName(GCImplementationRefs.AllocNewObjectRef) };
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX }; 
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, SourceValue = (uint)mTypeId, Size=32 };
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = (uint)InstanceTypeEnum.BoxedValueType, Size=32 };

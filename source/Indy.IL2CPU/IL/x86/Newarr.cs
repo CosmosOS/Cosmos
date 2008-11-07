@@ -63,15 +63,15 @@ namespace Indy.IL2CPU.IL.X86 {
 			Add(Assembler);
 			// the total array size is now on the stack.
 			Engine.QueueMethod(GCImplementationRefs.AllocNewObjectRef);
-			new CPUx86.Call(CPU.Label.GenerateLabelName(GCImplementationRefs.AllocNewObjectRef));
+            new CPUx86.Call { DestinationLabel = CPU.Label.GenerateLabelName(GCImplementationRefs.AllocNewObjectRef) };
 			new CPUx86.Push{DestinationReg=CPUx86.Registers.ESP, DestinationIsIndirect=true};
             new CPUx86.Push{DestinationReg=CPUx86.Registers.ESP, DestinationIsIndirect=true};
             new CPUx86.Push{DestinationReg=CPUx86.Registers.ESP, DestinationIsIndirect=true};
             new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
 			//new CPUx86.Pushd(CPUx86.Registers_Old.EDI);
 			Engine.QueueMethod(GCImplementationRefs.IncRefCountRef);
-			new CPUx86.Call(CPU.Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef));
-			new CPUx86.Call(CPU.Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef));
+            new CPUx86.Call { DestinationLabel = CPU.Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef) };
+            new CPUx86.Call { DestinationLabel = CPU.Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef) };
 			//new CPUx86.Pop(CPUx86.Registers_Old.ESI);
 			Assembler.StackContents.Push(new StackContent(4, typeof(Array)));
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
@@ -82,7 +82,7 @@ namespace Indy.IL2CPU.IL.X86 {
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.ESI, Size = 32 };
             new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 4 };
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, SourceValue = (uint)mElementSize, Size = 32 };
-			new CPUx86.Call(mCtorName);
+            new CPUx86.Call { DestinationLabel = mCtorName };
 		}
 	}
 }

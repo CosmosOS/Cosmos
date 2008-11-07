@@ -166,7 +166,6 @@
     <Compile Include="Assembler\x86\JumpIfLessOrEqual.cs" />
     <Compile Include="Assembler\x86\JumpIfNotCarry.cs" />
     <Compile Include="Assembler\x86\JumpIfNotEquals.cs" />
-    <Compile Include="Assembler\x86\JumpIfNotLessOrEqual.cs" />
     <Compile Include="Assembler\x86\JumpIfNotZero.cs" />
     <Compile Include="Assembler\x86\JumpIfZero.cs" />
     <Compile Include="Assembler\x86\JumpOnGreater.cs" />

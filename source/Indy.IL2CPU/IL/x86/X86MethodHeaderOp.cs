@@ -48,7 +48,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				}
 			}
 			if(aDebugMode&& aIsNonDebuggable) {
-			    new CPUx86.Call("DebugPoint_DebugSuspend");
+                new CPUx86.Call { DestinationLabel = "DebugPoint_DebugSuspend" };
 			}
 		}
 	}

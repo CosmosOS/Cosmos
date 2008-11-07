@@ -40,7 +40,11 @@ namespace Indy.IL2CPU.Assembler {
 			xBuilder.Append(")");
 			return xBuilder.ToString();
 		}
-		
+
+        public static string FilterStringForIncorrectChars(string aName) {
+            return DataMember.FilterStringForIncorrectChars(aName.Replace(".", "__DOT__"));
+        }
+
 		private string mName;
 		public string Name {
 			get { return mName; }

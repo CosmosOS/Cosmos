@@ -34,7 +34,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			if (mNeedsGC) {
                 new CPUx86.Push { DestinationRef = new ElementReference(mDataName), DestinationIsIndirect = true };
 				Engine.QueueMethod(GCImplementationRefs.DecRefCountRef);
-				new CPUx86.Call(Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef));
+                new CPUx86.Call { DestinationLabel = Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef) };
 			}
 			for (int i = 0; i < (mSize / 4); i++) {
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };

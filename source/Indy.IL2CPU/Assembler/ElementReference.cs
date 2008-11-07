@@ -12,7 +12,11 @@ namespace Indy.IL2CPU.Assembler {
         }
 
         public ElementReference(string aName) {
-            Name = aName;
+            if (aName.StartsWith(".")) {
+                Name = Label.LastFullLabel + aName;
+            } else {
+                Name = aName;
+            }
         }
 
         public int Offset {
@@ -27,9 +31,9 @@ namespace Indy.IL2CPU.Assembler {
 
         public override string ToString() {
             if (Offset != 0) {
-                return Name + " + " + Offset;
+                return Label.FilterStringForIncorrectChars(Name) + " + " + Offset;
             }else {
-                return Name;
+                return Label.FilterStringForIncorrectChars(Name);
             }
         }
     }

@@ -11,13 +11,5 @@ namespace Indy.IL2CPU.Assembler.X86
 	[OpCode(0xFFFFFFFF, "jge")]
 	public class JumpIfGreaterOrEqual : JumpBase
 	{
-		public JumpIfGreaterOrEqual(string aAddress)
-			: base(aAddress)
-		{
-		}
-		public override string ToString()
-		{
-			return "jge near " + Address;
-		}
 	}
 }

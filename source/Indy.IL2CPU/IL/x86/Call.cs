@@ -78,15 +78,15 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			if (!aDoTest) {
 				//new CPUx86.Call("_CODE_REQUESTED_BREAK_");
-				new CPUx86.Jump(xJumpTo);
+                new CPUx86.Jump { DestinationLabel = xJumpTo };
 			} else {
 				new CPUx86.Test(CPUx86.Registers_Old.ECX, 2);
 				if (aCleanup != null) {
-					new CPUx86.JumpIfEqual(aNextLabel);
+                    new CPUx86.JumpIfEqual { DestinationLabel = aNextLabel };
 					aCleanup();
-					new CPUx86.Jump(xJumpTo);
+                    new CPUx86.Jump { DestinationLabel = xJumpTo };
 				} else {
-					new CPUx86.JumpIfNotEqual(xJumpTo);
+                    new CPUx86.JumpIfNotEqual { DestinationLabel = xJumpTo };
 				}
 			}
 		}
@@ -145,7 +145,7 @@ namespace Indy.IL2CPU.IL.X86 {
                 new CPUx86.Sub("esp",
                                mTargetMethodInfo.ExtraStackSize.ToString());
             }
-            new CPUx86.Call(aMethod);
+            new CPUx86.Call { DestinationLabel = aMethod };
             //if (mResultSize != 0) {
                 //new CPUx86.Pop("eax");
             //}
@@ -175,7 +175,7 @@ namespace Indy.IL2CPU.IL.X86 {
         }
 
 	    protected virtual void HandleDebuggerBreak() {
-	        new CPUx86.Call("DEBUG_STUB_");
+            new CPUx86.Call { DestinationLabel = "DEBUG_STUB_" };
 		}
 
 		public override void DoAssemble() {

@@ -9,11 +9,5 @@ namespace Indy.IL2CPU.Assembler.X86 {
 	/// </summary>
 	[OpCode(0xFFFFFFFF, "jz")]
 	public class JumpIfZero: JumpBase {
-		public JumpIfZero(string aAddress)
-			: base(aAddress) {
-		}
-		public override string ToString() {
-			return "jz " + Address;
-		}
 	}
 }

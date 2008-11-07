@@ -26,10 +26,10 @@ namespace Indy.IL2CPU.IL.X86 {
 			Call(CPU.Label.GenerateLabelName(aMethod));
 			new CPUx86.Test(CPUx86.Registers_Old.ECX, 2);
 			string xLabel = ".Call_Part2_" + xLabelId++.ToString();
-			new CPUx86.JumpIfEqual(xLabel);
+            new CPUx86.JumpIfEqual { DestinationLabel = xLabel };
 			//new CPUx86.Call("_CODE_REQUESTED_BREAK_");
 			Engine.QueueMethod(Engine.GetMethodBase(typeof(Assembler.Assembler), "PrintException"));
-			new CPUx86.Call(CPU.Label.GenerateLabelName(Engine.GetMethodBase(typeof(Assembler.Assembler), "PrintException")));
+			new CPUx86.Call{DestinationLabel=CPU.Label.GenerateLabelName(Engine.GetMethodBase(typeof(Assembler.Assembler), "PrintException"))};
 			new CPU.Label(xLabel);
 			MethodInfo xMethodInfo = aMethod as MethodInfo;
 			if (xMethodInfo != null) {
@@ -41,7 +41,7 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		public override void Call(string aLabelName) {
 			new CPU.Label(mMethodName + "___" + aLabelName);
-			new CPUx86.Call(aLabelName);
+            new CPUx86.Call { DestinationLabel = aLabelName };
 		}
 
 		public override void Enter(string aName) {
