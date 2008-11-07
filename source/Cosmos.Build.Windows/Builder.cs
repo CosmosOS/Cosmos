@@ -280,13 +280,14 @@ namespace Cosmos.Compiler.Builder {
         
         public void Assemble() {
             RemoveFile(BuildPath + "output.obj");
-            Global.Call(ToolsPath + @"nasm\nasm.exe", String.Format("-g -f elf -F stabs -o \"{0}\" \"{1}\"", BuildPath + "output.obj", AsmPath + "main.asm"), BuildPath);
+            Global.Call(ToolsPath + @"nasm\nasm.exe", String.Format("-g -f bin -o \"{0}\" \"{1}\"", BuildPath + "output.obj", AsmPath + "main.asm"), BuildPath);
         }
         
         public void Link() {
-            RemoveFile(BuildPath + "output.bin");
-            Global.Call(ToolsPath + @"cygwin\ld.exe", String.Format("-Ttext 0x500000 -Tdata 0x200000 -e Kernel_Start -o \"{0}\" \"{1}\"", "output.bin", "output.obj"), BuildPath);
-            RemoveFile(BuildPath + "output.obj");
+            //RemoveFile(BuildPath + "output.bin");
+            //Global.Call(ToolsPath + @"cygwin\ld.exe", String.Format("-Ttext 0x500000 -Tdata 0x200000 -e Kernel_Start -o \"{0}\" \"{1}\"", "output.bin", "output.obj"), BuildPath);
+            //RemoveFile(BuildPath + "output.obj");
+            File.Move(Path.Combine(BuildPath, "output.obj"), Path.Combine(BuildPath, "output.bin"));
         }
 
         public void MakeVPC() {
