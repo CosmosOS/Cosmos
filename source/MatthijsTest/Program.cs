@@ -14,6 +14,7 @@ using Cosmos.Sys;
 using Cosmos.Sys.Network;
 using Mono.Terminal;
 using DebugUtil=Cosmos.Hardware.DebugUtil;
+using Indy.IL2CPU;
 
 namespace MatthijsTest {
     public class Program {
@@ -28,10 +29,9 @@ namespace MatthijsTest {
 
         #endregion
 
-        public static void Init() {
+        public static unsafe void Init() {
             bool xTest = false;
-            if (xTest)
-            {
+            if (xTest) {
                 var xBoot = new Cosmos.Sys.Boot();
                 xBoot.Execute();
             }
@@ -61,9 +61,25 @@ namespace MatthijsTest {
             //    Console.WriteLine("Error Occurred! ");
             //}
             //Console.WriteLine("Cosmos booted!");
-            Console.Write("Number test: ");
-            Console.WriteLine(55);
-            //Indy.IL2CPU.VTablesImpl.
+            Console.Write("Total of ");
+            Console.Write(VTablesImpl.mTypes.Length);
+            Console.WriteLine(" types");
+            Console.Write("String has ");
+            Console.Write(VTablesImpl.mTypes[7].MethodIndexes.Length);
+            Console.WriteLine(" Methods:");
+            Console.WriteLine("    (Idx)       (Address)");
+            for (int i = 0; i < VTablesImpl.mTypes[7].MethodIndexes.Length; i++) {
+                Console.Write("    0x");
+                Console.Write(VTablesImpl.mTypes[7].MethodIndexes[i]);
+                Console.Write(" 0x");
+                Console.WriteLine(VTablesImpl.mTypes[7].MethodAddresses[i]);
+            }
+            try {
+                Console.WriteLine("    Done".ToString());
+            } catch (Exception) {
+                Console.WriteLine("Exception occurred");
+            }
+            Console.ReadLine();
         }
 
         private static void HandleSendBroadCast(string command) {

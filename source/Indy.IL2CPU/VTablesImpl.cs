@@ -26,24 +26,24 @@ namespace Indy.IL2CPU {
 		}
 
 		public static void LoadTypeTable(int aTypeCount) {
-			//mTypes = new VTable[aTypeCount];
+			mTypes = new VTable[aTypeCount];
+            if (mTypes == null) {
+                Console.WriteLine("No array exists!");
+            }
 		}
 
-		public static void SetTypeInfo(int aType, int aBaseType, int[] aMethodIndexes, int[] aMethodAddresses, char[] aName) {
+		public static void SetTypeInfo(int aType, int aBaseType, int[] aMethodIndexes, int[] aMethodAddresses, int aMethodCount) {
 			mTypes[aType] = new VTable();
 			mTypes[aType].BaseTypeIdentifier = aBaseType;
 			mTypes[aType].MethodIndexes = aMethodIndexes;
 			mTypes[aType].MethodAddresses = aMethodAddresses;
-			mTypes[aType].Name = aName;
-		}
-
-		public static string GetTypeName(int aType) {
-			return new String(mTypes[aType].Name);
+            mTypes[aType].MethodCount = aMethodCount;
 		}
 
 		public static void SetMethodInfo(int aType, int aMethodIndex, int aMethodIdentifier, int aMethodAddress, char[] aName) {
 			mTypes[aType].MethodIndexes[aMethodIndex] = aMethodIdentifier;
 			mTypes[aType].MethodAddresses[aMethodIndex] = aMethodAddress;
+            mTypes[aType].MethodCount = aMethodIndex + 1;
 		}
 
 		private static void WriteNumber(uint aValue, byte aBitCount) {
@@ -145,7 +145,7 @@ namespace Indy.IL2CPU {
 		[FieldOffset(0)]
 		public int BaseTypeIdentifier;
 		[FieldOffset(4)]
-		public char[] Name;
+		public int MethodCount;
 		[FieldOffset(8)]
 		public int[] MethodIndexes;
 		[FieldOffset(12)]

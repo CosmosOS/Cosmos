@@ -200,6 +200,8 @@ namespace Indy.IL2CPU.IL {
                             Array.Copy(xTemp, 0, xData, 4, 4);
                             xTemp = BitConverter.GetBytes(xEmittedMethods.Count); // embedded array
                             Array.Copy(xTemp, 0, xData, 8, 4);
+                            xTemp = BitConverter.GetBytes(4); // embedded array
+                            Array.Copy(xTemp, 0, xData, 12, 4);
                             string xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(mTypes[i].FullName) + "__MethodIndexesArray";
                             Assembler.DataMembers.Add(new DataMember(xDataName, xData));
                             Push(xDataName);
@@ -217,7 +219,7 @@ namespace Indy.IL2CPU.IL {
                             Array.Copy(xTemp, 0, xData, 12, 4);
                             xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(mTypes[i].FullName);
                             mAssembler.DataMembers.Add(new DataMember(xDataName, xData));
-                            Push(xDataName);
+                            Push((uint)xEmittedMethods.Count);
                             //Push("0");
                             Call(SetTypeInfoRef);
                         }

@@ -14,7 +14,8 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System {
 		//[PlugMethod(Signature = "System_String___System_Exception_GetClassName____")]
 		public static unsafe string GetClassName(uint* aThis) {
 			int xObjectType = (int)*aThis;
-			return VTablesImpl.GetTypeName(xObjectType);
+//			return VTablesImpl.GetTypeName(xObjectType);
+            return "**Not Able to determine Exception Type**";
 	    }
 
         public static string get_Message(Exception aThis, [FieldAccess(Name = "System.String System.Exception._message")]ref string mMessage)

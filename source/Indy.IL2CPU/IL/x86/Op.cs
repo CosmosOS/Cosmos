@@ -269,11 +269,12 @@ namespace Indy.IL2CPU.IL.X86 {
             };
             for (int i = 0; i < (aField.Size / 4); i++) {
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceIsIndirect = true, SourceDisplacement = i * 4, SourceReg = CPUx86.Registers.EAX };
+                new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = i * 4, SourceReg = CPUx86.Registers.EAX };
             }
             switch (aField.Size % 4) {
                 case 1: {
-                        new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX }; new Move { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = ((aField.Size / 4) * 4), SourceReg = CPUx86.Registers.AL };
+                        new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX }; 
+                        new Move { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = ((aField.Size / 4) * 4), SourceReg = CPUx86.Registers.AL };
                     break;
                 }
                 case 2: {
