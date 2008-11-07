@@ -50,6 +50,29 @@ namespace Cosmos.Compiler.Builder {
             if (mOptionsUC.rdioDebugModeNone.IsChecked.Value == false) {
                 xDebugWindow = new DebugWindow();
                 if (mOptionsUC.DebugMode == DebugMode.Source) {
+                    // DOKU
+                    /*
+                     * sample parsing code:
+                     * var xSource = File.ReadAllLines(@"..\main.map");
+		int xIndex = 0;
+		for(xIndex = 0; xIndex < xSource.Length; xIndex++) {
+			if(xSource[xIndex].StartsWith("Real      Virtual   Name")){
+				xIndex++;
+				break;
+			}
+		}
+		for(;xIndex < xSource.Length; xIndex++)
+		{
+			var xLine = xSource[xIndex];
+			if(xLine.Length > 21) 
+			{
+				Console.Write(xLine.Substring(0, 8));
+				Console.Write(" ");
+				Console.WriteLine(xLine.Substring(20));
+			}
+		}
+
+                     */
                     var xLabelByAddressMapping = ObjDump.GetLabelByAddressMapping(
                         mBuilder.BuildPath + "output.bin", mBuilder.ToolsPath + @"cygwin\objdump.exe");
                     var xSourceMappings = SourceInfo.GetSourceInfo(xLabelByAddressMapping

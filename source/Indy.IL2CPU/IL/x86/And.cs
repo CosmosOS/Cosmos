@@ -26,15 +26,15 @@ namespace Indy.IL2CPU.IL.X86 {
                 new CPU.Pop { DestinationReg = CPU.Registers.EBX };
                 new CPU.Pop { DestinationReg = CPU.Registers.EDX };
                 new CPU.Pop { DestinationReg = CPU.Registers.ECX };
-				new CPU.And(CPU.Registers_Old.EAX, CPU.Registers_Old.EDX);
-				new CPU.And("ebx", "ecx");
+                new CPU.And { DestinationReg = CPU.Registers.EAX, SourceReg = CPU.Registers.EDX };
+                new CPU.And { DestinationReg = CPU.Registers.EBX, SourceReg = CPU.Registers.ECX };
                 new CPU.Push { DestinationReg = CPU.Registers.EBX };
                 new CPU.Push { DestinationReg = CPU.Registers.EAX };
 			}else
 			{
                 new CPU.Pop { DestinationReg = CPU.Registers.EAX };
                 new CPU.Pop { DestinationReg = CPU.Registers.EDX };
-				new CPU.And(CPU.Registers_Old.EAX, CPU.Registers_Old.EDX);
+                new CPU.And { DestinationReg = CPU.Registers.EAX, SourceReg = CPU.Registers.EDX }; 
                 new CPU.Push { DestinationReg = CPU.Registers.EAX };
 			}
 			Assembler.StackContents.Push(xStackContent);

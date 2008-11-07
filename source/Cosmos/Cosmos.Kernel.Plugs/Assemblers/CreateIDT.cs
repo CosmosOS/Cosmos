@@ -122,7 +122,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
                 new CPUx86.Move{DestinationReg=Registers.EAX, SourceReg=Registers.ESP}; // preserve old stack address for passing to interrupt handler
                 
                 // store floating point data
-                new CPUx86.And("esp", "0xfffffff0"); // fxsave needs to be 16-byte alligned
+                new CPUx86.And { DestinationReg = Registers.ESP, SourceValue = 0xfffffff0 }; // fxsave needs to be 16-byte alligned
                 new CPUx86.Sub("esp", "512"); // fxsave needs 512 bytes
                 new CPUx86.FXSave("[esp]"); // save the registers
                 new CPUx86.Move { DestinationReg = Registers.EAX, DestinationIsIndirect = true, SourceReg = Registers.ESP };

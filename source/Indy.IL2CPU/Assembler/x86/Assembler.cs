@@ -97,13 +97,11 @@ namespace Indy.IL2CPU.Assembler.X86 {
             new Move { DestinationReg = Registers.CR4, SourceReg = Registers.EAX };
             new Move { DestinationReg = Registers.EAX, SourceReg = Registers.CR0 };
 
-            new And(Registers_Old.EAX,
-                    0xfffffffd);
+            new And { DestinationReg = Registers.EAX, SourceValue = 0xfffffffd };
             new Move { DestinationReg = Registers.CR0, SourceReg = Registers.EAX };
             new Move { DestinationReg = Registers.EAX, SourceReg = Registers.CR0 };
 
-            new And(Registers_Old.EAX,
-                    1);
+            new And { DestinationReg = Registers.EAX, SourceValue = 1 };
             new Move { DestinationReg = Registers.CR0, SourceReg = Registers.EAX };
 
             // END SSE INIT
