@@ -22,7 +22,7 @@ namespace Indy.IL2CPU.Assembler.X86.X {
         }
 
         public static implicit operator RegisterAL(PortNumber aValue) {
-            new X86.In { Size = 8, Port=aValue.Port};
+            new X86.In { Size = 8};
             return Instance;
         }
 

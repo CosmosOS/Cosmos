@@ -6,6 +6,10 @@ using System.Text;
 namespace Indy.IL2CPU.Assembler.X86 {
 [OpCode(0xFFFFFFFF, "in")]
     public class In: Instruction {
+    public In() {
+        Port = null;
+    }
+
         public byte Size {
             get;
             set;

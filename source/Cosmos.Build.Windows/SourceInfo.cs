@@ -7,6 +7,7 @@ using Indy.IL2CPU;
 using Microsoft.Samples.Debugging.CorSymbolStore;
 using System.Diagnostics.SymbolStore;
 using Indy.IL2CPU.IL;
+using System.IO;
 
 namespace Cosmos.Compiler.Builder {
 	public class SourceInfos: SortedList<uint, SourceInfo> {
@@ -40,7 +41,32 @@ namespace Cosmos.Compiler.Builder {
 			get;
 			set;
 		}
-
+        public static SortedList<uint,String> ParseFile(String buildPath)
+        {
+            var xSourceStrings = File.ReadAllLines(buildPath + "main.map");
+            SortedList<uint,String> xSource = new SortedList<uint,String>();
+            uint xIndex = 0;
+            for (xIndex = 0; xIndex < xSourceStrings.Length; xIndex++)
+            {
+                if (xSourceStrings[xIndex].StartsWith("Real      Virtual   Name"))
+                {
+                    xIndex++;
+                    break;
+                }
+            }
+            for (; xIndex < xSourceStrings.Length; xIndex++)
+            {
+                    var xLine = xSourceStrings[xIndex];
+                    if (xLine.Length > 21)
+                    {
+                        uint xAddress = UInt32.Parse(xLine.Substring(0, 8), System.Globalization.NumberStyles.HexNumber);
+                        if (!xSource.ContainsKey(xAddress))
+                            xSource.Add(xAddress, xLine.Substring(20));
+                        else continue;
+                    }
+            }
+            return xSource;
+        }
 		public static int GetIndexClosestSmallerMatch(IList<int> aList, int aValue) {
 			int xIdx = -1;
 			for (int i = 0; i < aList.Count; i++) {
