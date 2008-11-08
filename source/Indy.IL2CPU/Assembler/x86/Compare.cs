@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
 	[OpCode(0xFFFFFFFF, "cmp")]
-	public class Compare: InstructionWithDestinationAndSource {
+	public class Compare: InstructionWithDestinationAndSourceAndSize {
         public override string ToString() {
             if (Size == 0) {
                 return "cmp " + GetDestinationAsString() + ", " + GetSourceAsString();

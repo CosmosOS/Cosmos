@@ -24,13 +24,13 @@ namespace Indy.IL2CPU.IL.X86 {
 			case 2:
 			case 4:
 				new CPUx86.Pop{DestinationReg = CPUx86.Registers.EAX};
-				new CPUx86.MoveAndSignExtend("eax", "al");
-                new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                new CPUx86.MoveAndSignExtend { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.AL };
+				new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
 				break;
 			case 8:
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
-				new CPUx86.MoveAndSignExtend("eax", "al");
+                new CPUx86.MoveAndSignExtend { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.AL };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
 				break;
 			default:

@@ -99,7 +99,7 @@ namespace Indy.IL2CPU.Assembler.X86.X {
             aDest.DestinationDisplacement = Displacement;
         }
 
-        private void ApplyToDestAndSource(InstructionWithDestinationAndSource aInstruction) {
+        private void ApplyToDestAndSource(InstructionWithDestinationAndSourceAndSize aInstruction) {
             aInstruction.Size = Size;
             aInstruction.DestinationReg = Register;
             aInstruction.DestinationRef = Reference;

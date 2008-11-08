@@ -336,8 +336,7 @@ namespace Indy.IL2CPU.IL.X86 {
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
                 new CPUx86.Add { DestinationReg = Registers.ESP, DestinationIsIndirect = true, SourceReg = Registers.EAX };
-                new CPUx86.AddWithCarry("[esp + 4]",
-                                        "edx");
+                new CPUx86.AddWithCarry { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceReg = Registers.EDX };
             } else {
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
                 new CPUx86.Add { DestinationReg = Registers.ESP, DestinationIsIndirect = true, SourceReg = Registers.EAX };

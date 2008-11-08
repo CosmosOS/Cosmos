@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
-	[OpCode(0xFFFFFFFF, "mov")]
-	public class Move: InstructionWithDestinationAndSourceAndSize {
-	}
+    [OpCode(0xFFFFFFFF, "cmovb")]
+    public class MoveIfBelow: Move {
+    }
 }

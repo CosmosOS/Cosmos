@@ -46,15 +46,15 @@ namespace Indy.IL2CPU.IL.X86 {
 				new CPUx86.Sub("ebx", "eax");
 				new CPUx86.SubWithCarry("ecx", "edx");
 				//result = value1 - value2
-				new CPUx86.ConditionalMove(Condition.Above, "edi", "esi");
-                new CPUx86.Push { DestinationReg = Registers.EDI };
+				//new CPUx86.ConditionalMove(Condition.Above, "edi", "esi");
+                //new CPUx86.Push { DestinationReg = Registers.EDI };
 
-				//new CPUx86.JumpIfAbove(LabelTrue);
-				//new CPUx86.Push("00h");
-				//new CPUx86.Jump(NextInstructionLabel);
+                new CPUx86.JumpIfAbove { DestinationLabel = LabelTrue };
+                new CPUx86.Push { DestinationValue = 0 };
+                new CPUx86.Jump { DestinationLabel = NextInstructionLabel };
 
-				//new CPU.Label(LabelTrue);
-				//new CPUx86.Push("01h");
+				new CPU.Label(LabelTrue);
+				new CPUx86.Push{DestinationValue=1};
 
 			} else
 			{

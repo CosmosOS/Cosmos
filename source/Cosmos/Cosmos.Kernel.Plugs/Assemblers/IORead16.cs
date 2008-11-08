@@ -15,8 +15,8 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
             //TODO: Do we need to clear rest of EAX first?
 			//    MTW: technically not, as in other places, it _should_ be working with AL too..
             new CPUx86.Move { DestinationReg = Registers.EAX, SourceValue = 0 };
-			new CPUx86.InWord(Registers_Old.AX, Registers_Old.DX);
-            new CPUx86.Push { DestinationReg = Registers.EAX };
+            new CPUx86.In { Size = 16 };
+			new CPUx86.Push { DestinationReg = Registers.EAX };
         }
     }
 }

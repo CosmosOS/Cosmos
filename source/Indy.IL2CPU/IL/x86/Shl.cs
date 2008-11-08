@@ -15,7 +15,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			var xStackItem_Value = Assembler.StackContents.Pop();
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, SourceValue = 0 };
             new CPUx86.Move { DestinationReg = CPUx86.Registers.CL, SourceReg = CPUx86.Registers.AL };
-			new CPUx86.ShiftLeft(CPUx86.Registers_Old.EDX, CPUx86.Registers_Old.EBX, CPUx86.Registers_Old.CL);
+            new CPUx86.ShiftLeft { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EBX };
             new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX };
 			Assembler.StackContents.Push(xStackItem_Value);
 		}

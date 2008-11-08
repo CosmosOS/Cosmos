@@ -5,22 +5,6 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
     public class InstructionWithDestinationAndSize : InstructionWithDestination {
-        public static string SizeToString(byte aSize) {
-            switch (aSize) {
-                case 8:
-                    return "byte";
-                case 16:
-                    return "word";
-                case 32:
-                    return "dword";
-                case 64:
-                    return "qword";
-                default:
-                    throw new Exception("Invalid size: " + aSize);
-            }
-        }
-
-
         private void DetermineSize() {
             if (mSize == 0) {
                 if (DestinationReg != Guid.Empty && !DestinationIsIndirect) {

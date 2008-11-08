@@ -11,7 +11,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		public override void DoAssemble() {
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
-			new CPUx86.Or(CPUx86.Registers_Old.EAX, CPUx86.Registers_Old.EDX);
+            new CPUx86.Or { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EDX };
             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
 			Assembler.StackContents.Pop();
 		}

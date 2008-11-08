@@ -7,7 +7,7 @@ namespace Indy.IL2CPU.Assembler.X86.X {
     public class Ports {
         public PortNumber this[byte aPort] {
             get { 
-                return new PortNumber(aPort.ToString());
+                return new PortNumber(aPort);
             }
             set {
                 new X86.Out("DX", aPort.ToString());
@@ -16,7 +16,7 @@ namespace Indy.IL2CPU.Assembler.X86.X {
 
         public PortNumber this[RegisterDX aDX] {
             get {
-                return new PortNumber("DX");
+                return new PortNumber(aDX.GetId());
             }
             set { 
                 new X86.Out("DX", value.ToString());  

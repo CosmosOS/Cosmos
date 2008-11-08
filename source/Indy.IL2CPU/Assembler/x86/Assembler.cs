@@ -88,12 +88,10 @@ namespace Indy.IL2CPU.Assembler.X86 {
             // SSE init
             // CR4[bit 9]=1, CR4[bit 10]=1, CR0[bit 2]=0, CR0[bit 1]=1
             new Move { DestinationReg = Registers.EAX, SourceReg = Registers.CR4 };
-            new Or(Registers_Old.EAX,
-                   0x100);
+            new Or { DestinationReg = Registers.EAX, SourceValue = 0x100 };
             new Move { DestinationReg = Registers.CR4, SourceReg = Registers.EAX };
             new Move { DestinationReg = Registers.EAX, SourceReg = Registers.CR4 };
-            new Or(Registers_Old.EAX,
-                   0x200);
+            new Or { DestinationReg = Registers.EAX, SourceValue = 0x200 };
             new Move { DestinationReg = Registers.CR4, SourceReg = Registers.EAX };
             new Move { DestinationReg = Registers.EAX, SourceReg = Registers.CR0 };
 
@@ -118,6 +116,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 xStub.Main(mComPortAddresses[mComNumber - 1]);
             }
             //aOutputWriter.WriteLine("section .data");
+            DataMembers.Add(new DataIfNotDefined("NASM_COMPILATION"));
             uint xFlags = 0x10003;
             DataMembers.Add(new DataMember("MultibootSignature",
                                    new uint[] { 0x1BADB002 }));
@@ -125,12 +124,20 @@ namespace Indy.IL2CPU.Assembler.X86 {
                            xFlags));
             DataMembers.Add(new DataMember("MultibootChecksum",
                                                (int)(0 - (xFlags + 0x1BADB002))));
-            DataMembers.Add(new DataIfNotDefined("NASM_COMPILATION"));
             DataMembers.Add(new DataMember("MultibootHeaderAddr", new ElementReference("MultibootSignature")));
             DataMembers.Add(new DataMember("MultibootLoadAddr", new ElementReference("MultibootSignature")));
             DataMembers.Add(new DataMember("MultibootLoadEndAddr", 0));
             DataMembers.Add(new DataMember("MultibootBSSEndAddr", 0));
             DataMembers.Add(new DataMember("MultibootEntryAddr", new ElementReference("Kernel_Start")));
+            DataMembers.Add(new DataEndIfDefined());
+            DataMembers.Add(new DataIfDefined("NASM_COMPILATION"));
+            xFlags = 0x00003;
+            DataMembers.Add(new DataMember("MultibootSignature",
+                                   new uint[] { 0x1BADB002 }));
+            DataMembers.Add(new DataMember("MultibootFlags",
+                           xFlags));
+            DataMembers.Add(new DataMember("MultibootChecksum",
+                                               (int)(0 - (xFlags + 0x1BADB002))));
             DataMembers.Add(new DataEndIfDefined());
             DataMembers.Add(new DataMember("MultiBootInfo_Memory_High", 0));
             DataMembers.Add(new DataMember("MultiBootInfo_Memory_Low", 0));

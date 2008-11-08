@@ -15,8 +15,8 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
             new CPUx86.Move { DestinationReg = Registers.EDX, SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x8 };
             //TODO: Do we need to clear rest of EAX first?
 			//    MTW: technically not, as in other places, it _should_ be working with AL too..
-            new CPUx86.Move { DestinationReg = Registers.EAX, SourceValue=0}; 
-            new CPUNative.InByte(Registers_Old.AL, Registers_Old.DX);
+            new CPUx86.Move { DestinationReg = Registers.EAX, SourceValue=0};
+            new CPUNative.In { Size = 8 };
             new CPUx86.Push { DestinationReg = Registers.EAX };
         }
     }

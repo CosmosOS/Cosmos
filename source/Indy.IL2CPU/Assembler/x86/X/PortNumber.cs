@@ -5,14 +5,23 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86.X {
     public class PortNumber {
-        string mPort;
+        public readonly byte Port;
+        public readonly Guid Register;
 
-        public PortNumber(string aPort) {
-            mPort = aPort;
+        public PortNumber(byte aPort) {
+            Port = aPort;
+        }
+
+        public PortNumber(Guid aRegister) {
+            Register = aRegister;
         }
 
         public override string ToString() {
-            return mPort;
+            if (Register == Guid.Empty) {
+                return Port.ToString();
+            } else {
+                return Registers.GetRegisterName(Register);
+            }
         }
 
     }
