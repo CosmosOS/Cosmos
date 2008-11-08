@@ -34,9 +34,9 @@ namespace Indy.IL2CPU.IL.X86 {
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
 				//value1 = EDX:ECX
-				new CPUx86.Xor("eax", "ecx");
+                new CPUx86.Xor { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ECX };
                 new CPUx86.JumpIfNotZero { DestinationLabel = TargetLabel };
-				new CPUx86.Xor("ebx", "edx");
+                new CPUx86.Xor { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.EDX };
                 new CPUx86.JumpIfNotZero { DestinationLabel = TargetLabel };
 			} else
 			{

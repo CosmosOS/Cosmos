@@ -24,7 +24,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		public override void Call(MethodBase aMethod) {
 			Engine.QueueMethod(aMethod);
 			Call(CPU.Label.GenerateLabelName(aMethod));
-			new CPUx86.Test(CPUx86.Registers_Old.ECX, 2);
+            new CPUx86.Test { DestinationReg = CPUx86.Registers.ECX, SourceValue = 2 };
 			string xLabel = ".Call_Part2_" + xLabelId++.ToString();
             new CPUx86.JumpIfEqual { DestinationLabel = xLabel };
 			//new CPUx86.Call("_CODE_REQUESTED_BREAK_");

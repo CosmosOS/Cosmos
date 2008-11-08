@@ -27,7 +27,7 @@ namespace Indy.IL2CPU.IL.X86 {
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
                     new CPUx86.Sub("[esp]", CPUx86.Registers_Old.EAX);
-					new CPUx86.SubWithCarry("[esp + 4]", CPUx86.Registers_Old.EDX);
+                    new CPUx86.SubWithCarry { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceReg = CPUx86.Registers.EDX };
 					break;
 				default:
 					throw new NotSupportedException(string.Format("sub operationd doesn't support size {0}", stackTop.Size));

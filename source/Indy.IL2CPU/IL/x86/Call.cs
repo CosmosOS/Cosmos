@@ -80,7 +80,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				//new CPUx86.Call("_CODE_REQUESTED_BREAK_");
                 new CPUx86.Jump { DestinationLabel = xJumpTo };
 			} else {
-				new CPUx86.Test(CPUx86.Registers_Old.ECX, 2);
+                new CPUx86.Test { DestinationReg = CPUx86.Registers.ECX, SourceValue = 2 };
 				if (aCleanup != null) {
                     new CPUx86.JumpIfEqual { DestinationLabel = aNextLabel };
 					aCleanup();

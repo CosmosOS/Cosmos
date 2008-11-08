@@ -92,8 +92,7 @@ namespace Indy.IL2CPU.IL.X86
                 new Assembler.X86.Call { DestinationLabel = Label.GenerateLabelName(GCImplementationRefs.AllocNewObjectRef) };
 				Engine.QueueMethod(CPU.Assembler.CurrentExceptionOccurredRef);
 				//new CPUx86.Pushd(CPUx86.Registers_Old.EAX);
-				new Test(Registers_Old.ECX,
-						 2);
+                new Test { DestinationReg = Registers.ECX, SourceValue = 2 };
 				//new CPUx86.JumpIfEquals(aCurrentLabel + "_NO_ERROR_1");
 				//for (int i = 1; i < xCtorInfo.Arguments.Length; i++) {
 				//    new CPUx86.Add(CPUx86.Registers_Old.ESP, (xCtorInfo.Arguments[i].Size % 4 == 0 ? xCtorInfo.Arguments[i].Size : ((xCtorInfo.Arguments[i].Size / 4) * 4) + 1).ToString());
@@ -146,8 +145,7 @@ namespace Indy.IL2CPU.IL.X86
 					}
 				}
                 new Assembler.X86.Call { DestinationLabel = Label.GenerateLabelName(aCtorDef) };
-				new Test(Registers_Old.ECX,
-						 2);
+                new Test { DestinationReg = Registers.ECX, SourceValue = 2 };
                 new JumpIfEqual { DestinationLabel = aCurrentLabel + "_NO_ERROR_4" };
 				for (int i = 1; i < xCtorInfo.Arguments.Length; i++)
 				{

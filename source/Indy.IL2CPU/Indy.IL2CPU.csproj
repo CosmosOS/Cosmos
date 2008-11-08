@@ -124,7 +124,6 @@
     <Compile Include="Assembler\x86\386AndUp\Pushad.cs" />
     <Compile Include="Assembler\x86\386AndUp\Pushfd.cs" />
     <Compile Include="Assembler\x86\386AndUp\SignExtendAX.cs" />
-    <Compile Include="Assembler\x86\486AndUp\CmpAndXchg.cs" />
     <Compile Include="Assembler\x86\486AndUp\CmpXchg.cs" />
     <Compile Include="Assembler\x86\486AndUp\CpuId.cs" />
     <Compile Include="Assembler\x86\486AndUp\XchgAndAdd.cs" />

@@ -15,7 +15,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			}
 			if (xStackItem.Size == 8) {
 				//TODO: implement proper div support for 8byte values!
-				new CPUx86.Xor(CPUx86.Registers_Old.EDX, CPUx86.Registers_Old.EDX);
+                new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EDX };
 				new CPUx86.Pop{DestinationReg = CPUx86.Registers.ECX};
                 new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
@@ -25,7 +25,7 @@ namespace Indy.IL2CPU.IL.X86 {
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
 
 			} else {
-				new CPUx86.Xor(CPUx86.Registers_Old.EDX, CPUx86.Registers_Old.EDX);
+                new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EDX };
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
 				new CPUx86.Pop{DestinationReg = CPUx86.Registers.EAX};
 				new CPUx86.Divide(CPUx86.Registers_Old.ECX);

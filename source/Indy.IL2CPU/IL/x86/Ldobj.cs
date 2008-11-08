@@ -28,15 +28,13 @@ namespace Indy.IL2CPU.IL.X86 {
             }
             switch (mSize % 4) {
                 case 1: {
-                    new CPUx86.Xor("ebx",
-                                   "ebx");
+                        new CPUx86.Xor { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.EBX };
                     new CPUx86.Move { DestinationReg = CPUx86.Registers.BL, SourceIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
                     new CPUx86.Push { DestinationReg = Registers.EBX };
                     break;
                 }
                 case 2: {
-                    new CPUx86.Xor("ebx",
-                                   "ebx");
+                        new CPUx86.Xor { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.EBX };
                     new CPUx86.Move { DestinationReg = CPUx86.Registers.BX, SourceIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
                     new CPUx86.Push{DestinationReg=Registers.EBX};
                     break;

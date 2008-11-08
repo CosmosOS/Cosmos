@@ -11,7 +11,7 @@ namespace Indy.IL2CPU.Assembler.X86.X {
         }
 
         public void Test(byte aValue) {
-            new X86.Test(ToString(), aValue);
+            new X86.Test { DestinationReg = GetId(), SourceValue = aValue, Size = Registers.GetSize(GetId()) };
         }
     }
 }

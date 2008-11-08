@@ -51,7 +51,7 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System.Assemblers
             new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = MethodInfo.Arguments[0].VirtualAddresses[0] };//addrof the delegate
 			new CPU.Comment("ecx points to the size of the delegated methods arguments");
             new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true, SourceDisplacement = (MethodInfo.Arguments[0].TypeInfo.Fields["$$ArgSize$$"].Offset + 12) };//the size of the arguments to the method? + 12??? -- 12 is the size of the current call stack.. i think
-			new CPUx86.Xor("edx", "edx");//make sure edx is 0
+            new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EDX }; ;//make sure edx is 0
 			new CPU.Label(".BEGIN_OF_LOOP");
             new CPUx86.Compare { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EBX };//are we at the end of this list
             new CPUx86.JumpIfEqual { DestinationLabel = ".END_OF_INVOKE_" };//then we better stop
@@ -133,12 +133,9 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System.Assemblers
             new CPUx86.Compare { DestinationReg = Registers.EDX, SourceValue = 0 };
             new CPUx86.JumpIfEqual { DestinationLabel = ".noReturn" };
 			//may have to expand the return... idk
-		    new CPUx86.Xchg("[ebp+8]",
-		                    Registers_Old.EDX);
-            new CPUx86.Xchg("[ebp+4]",
-                            Registers_Old.EDX);
-            new CPUx86.Xchg(Registers_Old.AtEBP,
-                            Registers_Old.EDX);
+            new CPUx86.Xchg { DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 8, SourceReg = Registers.EDX };
+            new CPUx86.Xchg{DestinationReg=Registers.EBP, DestinationIsIndirect=true, DestinationDisplacement=4, SourceReg=Registers.EDX};
+            new CPUx86.Xchg { DestinationReg = Registers.EBP, DestinationIsIndirect = true, SourceReg = Registers.EDX };
             new CPUx86.Push { DestinationReg = Registers.EDX };//ebp
             new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 12, SourceReg = CPUx86.Registers.EDI };
 			new CPU.Label(".noReturn");

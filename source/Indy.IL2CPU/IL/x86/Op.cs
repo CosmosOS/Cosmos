@@ -145,8 +145,7 @@ namespace Indy.IL2CPU.IL.X86 {
 
         public static void Multiply(Assembler.Assembler aAssembler) {
             StackContent xStackContent = aAssembler.StackContents.Pop();
-            new CPUx86.Xor("edx",
-                           "edx");
+            new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EDX };
             if (xStackContent.IsFloat) {
                 throw new Exception("Float support not yet supported!");
             } else {
@@ -359,8 +358,7 @@ namespace Indy.IL2CPU.IL.X86 {
                     new CPUx86.Push { DestinationReg = Registers.EAX };
                 }
             } else {
-                new CPUx86.Xor("eax",
-                               "eax");
+                new CPUx86.Xor { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EAX };
 
                 switch (Engine.GetFieldStorageSize(aLocal.VariableType)) {
                     case 1: {

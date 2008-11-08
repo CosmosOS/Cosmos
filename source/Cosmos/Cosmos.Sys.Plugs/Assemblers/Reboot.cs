@@ -16,11 +16,11 @@ namespace Cosmos.Sys.Plugs.Assemblers
         	new CPUAll.Label(".clearBuffer");
             new CPUx86.In { Size = 16, Port = 0x64 };
             new CPUx86.Move { DestinationReg = Registers.AH, SourceReg = Registers.AL };
-        	new CPUx86.Test(Registers_Old.AH,1);
+            new CPUx86.Test { DestinationReg = Registers.AH, SourceValue = 1 };
             new CPUx86.JumpIfZero { DestinationLabel = ".skipClearIO" };
             new CPUx86.In { Size = 16 };
         	new CPUAll.Label(".skipClearIO");
-        	new CPUx86.Test(Registers_Old.AH,2);
+            new CPUx86.Test { DestinationReg = Registers.AH, SourceValue = 2 };
             new JumpIfNotZero { DestinationLabel = ".clearBuffer" };
             new Move { DestinationReg = Registers.DX, SourceValue = 0x64 };
             new Move { DestinationReg = Registers.AL, SourceValue = 0xfe };

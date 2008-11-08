@@ -31,9 +31,9 @@ namespace Indy.IL2CPU.IL.X86 {
 			string LabelFalse = BaseLabel + "False";
 			if (xSize > 4)
 			{
-				new CPUx86.Xor("esi", "esi");
+                new CPUx86.Xor { DestinationReg = CPUx86.Registers.ESI, SourceReg = CPUx86.Registers.ESI };
                 new CPUx86.Add { DestinationReg = Registers.ESI, SourceValue = 1 };
-				new CPUx86.Xor("edi", "edi");
+                new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EDI };
 				//esi = 1
 				new CPUx86.Pop{DestinationReg = CPUx86.Registers.EAX};
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
@@ -42,7 +42,7 @@ namespace Indy.IL2CPU.IL.X86 {
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
 				//value1: ECX:EBX
 				new CPUx86.Sub("ebx", "eax");
-				new CPUx86.SubWithCarry("ecx", "edx");
+                new CPUx86.SubWithCarry { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EDX };
 				//result = value1 - value2
                 new CPUx86.MoveIfBelow { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.ESI };
 				new CPUx86.Push { DestinationReg = Registers.EDI };

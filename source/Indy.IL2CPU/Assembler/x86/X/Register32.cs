@@ -23,7 +23,7 @@ namespace Indy.IL2CPU.Assembler.X86.X {
         }
 
         public void Test(UInt32 aValue) {
-            new X86.Test(ToString(), aValue);
+            new X86.Test { DestinationReg = GetId(), SourceValue = aValue, Size = 32 };
         }
     }
 }

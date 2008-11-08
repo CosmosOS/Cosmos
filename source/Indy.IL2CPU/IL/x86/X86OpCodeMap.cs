@@ -249,7 +249,7 @@ namespace Indy.IL2CPU.IL.X86
             new Assembler.X86.Pop { DestinationReg = Assembler.X86.Registers.ECX };
             new CPUx86.Push { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true };
             new Assembler.X86.Pop { DestinationReg = Assembler.X86.Registers.ECX };
-			new CPUx86.CmpXchg(CPUx86.Registers_Old.ECX, CPUx86.Registers_Old.EDX);
+            new CPUx86.CmpXchg { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EDX };
 			Ldarg.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
             new Assembler.X86.Pop { DestinationReg = Assembler.X86.Registers.EAX };
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ECX };

@@ -35,7 +35,7 @@ namespace Indy.IL2CPU.IL.X86 {
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
                 //value1: ECX:EBX
 				new CPUx86.Sub("ebx", "eax");
-				new CPUx86.SubWithCarry("ecx", "edx");
+                new CPUx86.SubWithCarry { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EDX };
 				//result = value1 - value2
                 new CPUx86.JumpIfGreaterOrEqual { DestinationLabel = TargetLabel };
 			} else {
