@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
 	[OpCode(0xFFFFFFFF, "mul")]
-	public class Multiply: Instruction {
+	public class Multiply: InstructionWithDestinationAndSize {
 		public readonly string Address1;
 		public Multiply(string aAddress1) {
 			Address1 = aAddress1;

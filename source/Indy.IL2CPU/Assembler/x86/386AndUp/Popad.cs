@@ -5,6 +5,6 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
 	[OpCode(0xFFFFFFFF, "popad")]
-	public class Popad: X86.Instruction {
+    public class Popad : X86.Instruction {
 	}
 }

@@ -4,7 +4,7 @@ using System.Linq;
 namespace Indy.IL2CPU.Assembler.X86
 {
     [OpCode(0xF4, "hlt")]
-    public class Halt : New_Instruction
+    public class Halt : Instruction
     {
         public override bool DetermineSize(Indy.IL2CPU.Assembler.Assembler aAssembler, out ulong aSize) {
             aSize = 1;

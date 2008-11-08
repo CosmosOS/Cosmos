@@ -101,7 +101,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
                 SourceRef = new ElementReference("_NATIVE_IDT_Pointer")
             };
             new Label(".RegisterIDT");
-            new CPUx86.Lidt(Registers_Old.AtEAX);
+            new CPUx86.Lidt{DestinationReg=Registers.EAX, DestinationIsIndirect=true};
             new CPUx86.Break();
             new CPUx86.Jump { DestinationLabel = "__AFTER__ALL__ISR__HANDLER__STUBS__" };
             var xInterruptsWithParam = new int[] {8, 10, 11, 12, 13, 14};
@@ -122,7 +122,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
                 // store floating point data
                 new CPUx86.And { DestinationReg = Registers.ESP, SourceValue = 0xfffffff0 }; // fxsave needs to be 16-byte alligned
                 new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = 512 }; // fxsave needs 512 bytes
-                new CPUx86.FXSave("[esp]"); // save the registers
+                new CPUx86.FXSave{DestinationReg=Registers.ESP, DestinationIsIndirect=true}; // save the registers
                 new CPUx86.Move { DestinationReg = Registers.EAX, DestinationIsIndirect = true, SourceReg = Registers.ESP };
 
                 new CPUx86.Push { DestinationReg = Registers.EAX }; // 
@@ -141,7 +141,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
                 }
                 new CPUx86.Call { DestinationLabel = Label.GenerateLabelName(xHandler) };
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                new CPUx86.FXStore("[esp]");
+                new CPUx86.FXStore { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
 
                 new CPUx86.Move { DestinationReg = Registers.ESP, SourceReg = Registers.EAX }; // this restores the stack for the FX stuff, except the pointer to the FX data
                 new CPUx86.Add { DestinationReg = Registers.ESP, SourceValue = 4 }; // "pop" the pointer

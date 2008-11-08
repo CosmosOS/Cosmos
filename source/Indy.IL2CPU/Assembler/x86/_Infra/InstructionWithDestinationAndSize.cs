@@ -27,13 +27,20 @@ namespace Indy.IL2CPU.Assembler.X86 {
         }
         private byte mSize;
         public byte Size {
-            get { return mSize; }
+            get {
+                DetermineSize();
+                return mSize;
+            }
             set {
                 if (value > 0) {
                     SizeToString(value);
                 }
                 mSize = value;
             }
+        }
+
+        public override string ToString() {
+            return base.mMnemonic + " " + SizeToString(Size) + " " + GetDestinationAsString();
         }
     }
 }

@@ -6,13 +6,11 @@ using System.Text;
 namespace Indy.IL2CPU.Assembler.X86
 {
     [OpCode(0xFFFFFFFF, "rcl")]
-    public class RotateThroughCarryLeft: Instruction
+    public class RotateThroughCarryLeft: InstructionWithDestinationAndSize
     {
-        private readonly string mDestination;
-        public RotateThroughCarryLeft(string aDestination) { mDestination = aDestination; }
         public override string ToString()
         {
-            return "rcl " + mDestination + ", cl";
+            return base.ToString() + ", CL";
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
     [OpCode(0xFFFFFFFF, "int")]
-    public class Interrupt : New_Instruction {
+    public class Interrupt : Instruction {
         public readonly string Number;
 
         /// <summary>

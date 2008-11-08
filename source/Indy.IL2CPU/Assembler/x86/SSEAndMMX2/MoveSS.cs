@@ -5,17 +5,7 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86.SSE {
 	[OpCode(0xFFFFFFFF, "movss")]
-    public class MoveSS : Instruction
+    public class MoveSS : InstructionWithDestinationAndSource
     {
-		private string mDestination;
-		private string mSource;
-		public MoveSS(string aDestination, string aSource) {
-			mDestination = aDestination;
-			mSource = aSource;
-		}
-		
-		public override string ToString() {
-			return "movss " + mDestination + ", " + mSource;
-		}
 	}
 }

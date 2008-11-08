@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
 	[OpCode(0xFFFFFFFF, "rep stosb")]
-	public class RepeatStosb: Instruction {
+    public class RepeatStosb : Instruction {
 		//public readonly string Destination;
 		public RepeatStosb() {
 			//	Destination = aDestination;

@@ -114,9 +114,6 @@
     <Compile Include="Assembler\StackContent.cs" />
     <Compile Include="Assembler\x86\286AndUp\Lgdt.cs" />
     <Compile Include="Assembler\x86\286AndUp\Lidt.cs" />
-    <Compile Include="Assembler\x86\286AndUp\LoadGDT.cs" />
-    <Compile Include="Assembler\x86\286AndUp\LoadTR.cs" />
-    <Compile Include="Assembler\x86\286AndUp\StoreMSW.cs" />
     <Compile Include="Assembler\x86\386AndUp\MoveAndSignExtend.cs" />
     <Compile Include="Assembler\x86\386AndUp\MoveAndZeroExtend.cs" />
     <Compile Include="Assembler\x86\386AndUp\Popad.cs" />
@@ -127,10 +124,6 @@
     <Compile Include="Assembler\x86\486AndUp\CmpXchg.cs" />
     <Compile Include="Assembler\x86\486AndUp\CpuId.cs" />
     <Compile Include="Assembler\x86\486AndUp\XchgAndAdd.cs" />
-    <Compile Include="Assembler\x86\AAA.cs" />
-    <Compile Include="Assembler\x86\AAD.cs" />
-    <Compile Include="Assembler\x86\AAM.cs" />
-    <Compile Include="Assembler\x86\AAS.cs" />
     <Compile Include="Assembler\x86\Add.cs" />
     <Compile Include="Assembler\x86\AddWithCarry.cs" />
     <Compile Include="Assembler\x86\And.cs" />
@@ -179,8 +172,6 @@
     <Compile Include="Assembler\x86\Pop.cs" />
     <Compile Include="Assembler\x86\Push.cs" />
     <Compile Include="Assembler\x86\Registers.cs" />
-    <Compile Include="Assembler\x86\Repeat.cs" />
-    <Compile Include="Assembler\x86\RepeatBase.cs" />
     <Compile Include="Assembler\x86\RepeatMovsb.cs" />
     <Compile Include="Assembler\x86\RepeatStosb.cs" />
     <Compile Include="Assembler\x86\RepeatStosd.cs" />

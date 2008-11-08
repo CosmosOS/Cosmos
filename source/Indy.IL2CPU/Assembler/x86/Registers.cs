@@ -37,6 +37,14 @@ namespace Indy.IL2CPU.Assembler.X86 {
         public static readonly Guid CR2 = new Guid("{eec47a09-9b12-45d1-afaa-a94e7d06a149}");
         public static readonly Guid CR3 = new Guid("{eec47a09-9b12-45d1-afaa-a94e7d06a14a}");
         public static readonly Guid CR4 = new Guid("{eec47a09-9b12-45d1-afaa-a94e7d06a14b}");
+        public static readonly Guid XMM0 = new Guid("{D57DED71-D20B-4350-B56D-E2216187B135}");
+        public static readonly Guid XMM1 = new Guid("{3DB5D30F-5C5E-4F80-9D65-C604D5BC175B}");
+        public static readonly Guid XMM2 = new Guid("{BD0E1002-4646-4243-B6AA-C6773F347ED9}");
+        public static readonly Guid XMM3 = new Guid("{7EFD3557-0C49-4E5C-A2EA-05D5AE9C75D5}");
+        public static readonly Guid XMM4 = new Guid("{F8D846DE-6A93-4263-BDF2-FC17913921AB}");
+        public static readonly Guid XMM5 = new Guid("{02829734-AC18-4E56-888D-A92243924292}");
+        public static readonly Guid XMM6 = new Guid("{29356F03-4A37-4C7D-B452-02B0E78C0646}");
+        public static readonly Guid XMM7 = new Guid("{D5334D4A-EF4B-45DF-8E3E-BDFC848D65B1}");
 
         public static string GetRegisterName(Guid aRegister) {
             var xType = typeof(Registers);
@@ -54,9 +62,14 @@ namespace Indy.IL2CPU.Assembler.X86 {
         }
 
         public static byte GetSize(Guid aRegister) {
+            if (Is128Bit(aRegister)) { return 128; }
             if (Is32Bit(aRegister)) { return 32; }
             if (Is16Bit(aRegister)) { return 16; }
             return 8;
+        }
+
+        public static bool Is128Bit(Guid aRegister) {
+            return aRegister == XMM0 || aRegister == XMM1 || aRegister == XMM2 || aRegister == XMM3 || aRegister == XMM4 || aRegister == XMM5 || aRegister == XMM6 || aRegister == XMM7;
         }
 
         public static bool Is32Bit(Guid aRegister) {

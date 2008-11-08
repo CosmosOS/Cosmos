@@ -6,7 +6,7 @@ using System.Text;
 namespace Indy.IL2CPU.Assembler.X86
 {
 	[OpCode(0xFFFFFFFF, "cdq")]
-	public class SignExtendAX : New_Instruction
+	public class SignExtendAX : Instruction
 	{
 		private int mOldSize;
 		public SignExtendAX(int aOldSize)

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
 	[OpCode(0xFFFFFFFF, "out")]
-	public class Out: New_Instruction {
+	public class Out: Instruction {
         public byte Size {
             get;
             set;

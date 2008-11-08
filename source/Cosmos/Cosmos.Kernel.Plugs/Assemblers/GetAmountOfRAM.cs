@@ -13,7 +13,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
             new CPUx86.Move { DestinationReg = Registers.EAX, SourceRef = new ElementReference("MultiBootInfo_Memory_High"), SourceIsIndirect = true };
             new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EDX };
             new CPUx86.Move { DestinationReg = Registers.ECX, SourceValue = 1024 };
-			new CPUx86.Divide("ecx");
+            new CPUx86.Divide { DestinationReg = Registers.ECX };
             new CPUx86.Add { DestinationReg = Registers.EAX, SourceValue = 1 };
             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
 		}

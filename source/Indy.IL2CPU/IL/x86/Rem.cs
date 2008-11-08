@@ -21,7 +21,7 @@ namespace Indy.IL2CPU.IL.X86 {
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX }; // gets devised by ecx
                 new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EDX };
 
-				new CPUx86.Divide(CPUx86.Registers_Old.ECX); // => EAX / ECX 
+                new CPUx86.Divide { DestinationReg = CPUx86.Registers.ECX }; // => EAX / ECX 
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX };
 
 			} else {
@@ -29,7 +29,7 @@ namespace Indy.IL2CPU.IL.X86 {
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX }; // gets devised by ecx
                 new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EDX };
 
-				new CPUx86.Divide(CPUx86.Registers_Old.ECX); // => EAX / ECX 
+                new CPUx86.Divide { DestinationReg = CPUx86.Registers.ECX }; // => EAX / ECX 
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX };
 			}
 			Assembler.StackContents.Push(xStackItem);

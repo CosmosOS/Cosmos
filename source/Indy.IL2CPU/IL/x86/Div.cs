@@ -19,7 +19,7 @@ namespace Indy.IL2CPU.IL.X86 {
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
                 new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-				new CPUx86.IDivide(CPUx86.Registers_Old.ECX);
+                new CPUx86.IDivide { DestinationReg = CPUx86.Registers.ECX };
 				//new CPUx86.Push("0");
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
 
@@ -27,7 +27,7 @@ namespace Indy.IL2CPU.IL.X86 {
                 new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EDX };
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
 				new CPUx86.Pop{DestinationReg = CPUx86.Registers.EAX};
-				new CPUx86.IDivide(CPUx86.Registers_Old.ECX);
+				new CPUx86.IDivide{DestinationReg=CPUx86.Registers.ECX};
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
 			}
 		}

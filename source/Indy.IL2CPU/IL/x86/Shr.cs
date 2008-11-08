@@ -36,7 +36,7 @@ namespace Indy.IL2CPU.IL.X86 {
                 new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.EBX };
                 new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect=true, SourceReg = CPUx86.Registers.EBX };
                 new CPUx86.Move { DestinationReg = CPUx86.Registers.CL, SourceValue = 1 };
-                new CPUx86.RotateThroughCarryRight("dword [esp+4]");
+                new CPUx86.RotateThroughCarryRight { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, Size = 32 };
                 new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 1 };
                 new CPUx86.Jump { DestinationLabel = mLabelName + "__StartLoop" };
 

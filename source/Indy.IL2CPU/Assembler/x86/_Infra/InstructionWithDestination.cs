@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
-    public abstract class InstructionWithDestination : New_Instruction {
+    public abstract class InstructionWithDestination : Instruction {
         public ElementReference DestinationRef {
             get;
             set;
@@ -49,6 +49,10 @@ namespace Indy.IL2CPU.Assembler.X86 {
             } else {
                 return xDest;
             }
+        }
+
+        public override string ToString() {
+            return base.mMnemonic + " " + GetDestinationAsString();
         }
     }
 }

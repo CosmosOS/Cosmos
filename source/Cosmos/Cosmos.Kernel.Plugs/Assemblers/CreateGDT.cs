@@ -30,7 +30,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
             
 			new Label(".RegisterGDT");
             new CPUx86.Move { DestinationReg = Registers.EAX, SourceRef = new ElementReference("_NATIVE_GDT_Pointer") };
-			new CPUNative.Lgdt(Registers_Old.AtEAX);
+            new CPUNative.Lgdt { DestinationReg = Registers.EAX, DestinationIsIndirect = true };
             new CPUx86.Move { DestinationReg = Registers.AX, SourceValue = 0x10 };
 			new CPUx86.Move{DestinationReg=Registers.DS, SourceReg=Registers.AX};
             new CPUx86.Move{DestinationReg=Registers.ES, SourceReg=Registers.AX};

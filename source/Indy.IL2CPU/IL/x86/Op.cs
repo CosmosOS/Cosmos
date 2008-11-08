@@ -321,11 +321,11 @@ namespace Indy.IL2CPU.IL.X86 {
                 }
                 else
                 {
-                    new CPUx86.SSE.MoveSS("xmm0", "[esp]");
+                    new CPUx86.SSE.MoveSS { DestinationReg = Registers.XMM0, SourceReg = Registers.ESP, SourceIsIndirect = true };
                     new CPUx86.Add { DestinationReg = Registers.ESP, SourceValue = 4 };
-                    new CPUx86.SSE.MoveSS("xmm1", "[esp]");
-                    new CPUx86.SSE.AddSS("xmm0", "xmm1");
-                    new CPUx86.SSE.MoveSS("[esp]", "xmm0");
+                    new CPUx86.SSE.MoveSS { DestinationReg = Registers.XMM1, SourceReg = Registers.ESP, SourceIsIndirect = true };
+                    new CPUx86.SSE.AddSS { DestinationReg = Registers.XMM0, SourceReg = Registers.XMM1 };
+                    new CPUx86.SSE.MoveSS { DestinationReg = Registers.ESP, DestinationIsIndirect = true, SourceReg = Registers.XMM0 };
                 }
             }
             if (xSize.Size > 8) {

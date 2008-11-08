@@ -50,5 +50,9 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 return xDest;
             }
         }
+
+        public override string ToString() {
+            return Mnemonic + " " + GetDestinationAsString() + ", " + GetSourceAsString();
+        }
     }
 }
