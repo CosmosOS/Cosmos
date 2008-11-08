@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
-    public abstract class InstructionWithDestination : Instruction {
+    public abstract class InstructionWithDestination : Instruction, IInstructionWithDestination {
         public ElementReference DestinationRef {
             get;
             set;
@@ -30,29 +30,8 @@ namespace Indy.IL2CPU.Assembler.X86 {
             set;
         }
 
-        protected string GetDestinationAsString() {
-            string xDest = "";
-            if (DestinationRef != null) {
-                xDest = DestinationRef.ToString();
-            } else {
-                if (DestinationReg != Guid.Empty) {
-                    xDest = Registers.GetRegisterName(DestinationReg);
-                } else {
-                    xDest = "0x" + DestinationValue.ToString("X").ToUpperInvariant();
-                }
-            }
-            if (DestinationDisplacement != 0) {
-                xDest += " + " + DestinationDisplacement;
-            }
-            if (DestinationIsIndirect) {
-                return "[" + xDest + "]";
-            } else {
-                return xDest;
-            }
-        }
-
         public override string ToString() {
-            return base.mMnemonic + " " + GetDestinationAsString();
+            return base.mMnemonic + " " + this.GetDestinationAsString();
         }
     }
 }

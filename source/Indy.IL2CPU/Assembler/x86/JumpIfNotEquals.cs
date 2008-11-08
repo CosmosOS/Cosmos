@@ -7,7 +7,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
 	/// <summary>
 	/// Represents the JNE opcode
 	/// </summary>
-	[OpCode(0xFFFFFFFF, "jne")]
+    [OpCode("jne")]
 	public class JumpIfNotEqual: JumpBase {
 	}
 }

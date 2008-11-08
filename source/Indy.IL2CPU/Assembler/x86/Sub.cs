@@ -6,7 +6,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
 	/// Subtracts the source operand from the destination operand and 
 	/// replaces the destination operand with the result. 
 	/// </summary>
-	[OpCode(0xFFFFFFFF, "sub")]
+    [OpCode("sub")]
 	public class Sub: InstructionWithDestinationAndSourceAndSize {
 	}
 }

@@ -7,7 +7,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
 	/// <summary>
 	/// Represents the JMP opcode
 	/// </summary>
-	[OpCode(0xFFFFFFFF, "jmp")]
+    [OpCode("jmp")]
 	public class Jump: JumpBase {
 	}
 }

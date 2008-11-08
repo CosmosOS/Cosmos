@@ -4,7 +4,10 @@ using System.Linq;
 using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
-    [OpCode("not")]
-	public class Not: InstructionWithDestinationAndSize {
-	}
+    public interface IInstructionWithSize {
+        byte Size {
+            get;
+            set;
+        }
+    }
 }

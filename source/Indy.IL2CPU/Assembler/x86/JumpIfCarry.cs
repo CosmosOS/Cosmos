@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86
 {
-	[OpCode(0xFFFFFFFF, "jc")]
+    [OpCode("jc")]
 	public class JumpIfCarry : JumpBase
 	{
 	}

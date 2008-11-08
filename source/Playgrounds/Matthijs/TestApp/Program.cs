@@ -13,14 +13,14 @@ namespace TestApp {
             public void DoRender() {
                 Label = "Kernel_Start";
                 EAX = 0xB8000;
-                IfDefined("DefinedSymbol");
-                Memory[0xB8002, 8] = 66;
-                Memory[0xB8003, 8] = 15;
-                IfDefined("UnDefinedSymbol");
-                Memory[0xB8004, 8] = 67;
-                Memory[0xB8005, 8] = 15;
-                EndIfDefined();
-                EndIfDefined();
+                //IfDefined("DefinedSymbol");
+                //Memory[0xB8002, 8] = 66;
+                //Memory[0xB8003, 8] = 15;
+                //IfDefined("UnDefinedSymbol");
+                //Memory[0xB8004, 8] = 67;
+                //Memory[0xB8005, 8] = 15;
+                //EndIfDefined();
+                //EndIfDefined();
                 new Halt();
             }
         }
@@ -42,17 +42,17 @@ namespace TestApp {
                     Directory.CreateDirectory(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
                         "Output"));
                 }
-                using (Stream xOutput = new FileStream(Path.Combine(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
-                                                                                         "Output"),
-                                                                            "TheOutput.out"), FileMode.Create)) {
-                    xAsm.FlushBinary(xOutput, 0x500000);
-                }
-
-                //using (StreamWriter xOutput = new StreamWriter(Path.Combine(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
+                //using (Stream xOutput = new FileStream(Path.Combine(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
                 //                                                                         "Output"),
-                //                                                            "TheOutput.out"))) {
-                //    xAsm.FlushText(xOutput);
+                //                                                            "TheOutput.out"), FileMode.Create)) {
+                //    xAsm.FlushBinary(xOutput, 0x500000);
                 //}
+
+                using (StreamWriter xOutput = new StreamWriter(Path.Combine(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
+                                                                                         "Output"),
+                                                                            "TheOutput.out"))) {
+                    xAsm.FlushText(xOutput);
+                }
 
                 // now the file should have been written
             } catch (Exception E) { Console.WriteLine(E.ToString()); } 

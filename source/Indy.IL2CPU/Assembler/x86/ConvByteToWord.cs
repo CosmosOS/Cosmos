@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86
 {
-    [OpCode(0xFFFFFFFF, "cbw")]
+    [OpCode("cbw")]
     public class ConvByteToWord : Instruction
     {
      

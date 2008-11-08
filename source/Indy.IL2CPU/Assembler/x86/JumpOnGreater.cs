@@ -10,7 +10,7 @@ namespace Indy.IL2CPU.Assembler.X86
 	/// if (DEST > SOURCE) jump (signed)
 	/// </summary>
 #warning this instruction should be renamed to JumpIfGreater after corresponding obsolete instruction is deleted
-	[OpCode(0xFFFFFFFF, "jg")]
+    [OpCode("jg")]
 	public class JumpOnGreater : JumpBase
 	{
 	}

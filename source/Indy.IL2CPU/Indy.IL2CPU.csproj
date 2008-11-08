@@ -95,6 +95,10 @@
     <Compile Include="Assembler\x86\MoveIfBelow.cs" />
     <Compile Include="Assembler\x86\MoveIfLess.cs" />
     <Compile Include="Assembler\x86\Registers_Old.cs" />
+    <Compile Include="Assembler\x86\_Infra\Extensions.cs" />
+    <Compile Include="Assembler\x86\_Infra\IInstructionWithDestination.cs" />
+    <Compile Include="Assembler\x86\_Infra\IInstructionWithSize.cs" />
+    <Compile Include="Assembler\x86\_Infra\IInstructionWithSource.cs" />
     <Compile Include="Assembler\x86\_Infra\Instruction.cs" />
     <Compile Include="Assembler\x86\_Infra\InstructionWithDestination.cs" />
     <Compile Include="Assembler\x86\_Infra\InstructionWithDestinationAndSize.cs" />

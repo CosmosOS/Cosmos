@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Indy.IL2CPU.Assembler {
-    [OpCode(0xFFFFFFFF, "%ifdef")]
+    [OpCode("%ifdef")]
     public class IfDefined: Instruction, IIfDefined {
         public string Symbol {
             get;

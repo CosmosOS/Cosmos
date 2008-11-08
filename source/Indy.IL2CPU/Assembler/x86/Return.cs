@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
-	[OpCode(0xFFFFFFFF, "ret")]
+    [OpCode("ret")]
 	public class Return: Instruction{
 		public readonly int Argument;
 

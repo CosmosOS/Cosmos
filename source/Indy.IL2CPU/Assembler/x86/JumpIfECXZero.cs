@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
-    [OpCode(0x000000, "jecxz")]
+    [OpCode("jecxz")]
     public class JumpIfECXZero : JumpBase {
     }
 }

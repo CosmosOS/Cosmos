@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
-	[OpCode(0xFFFFFFFF, "rep movsb")]
+    [OpCode("rep movsb")]
 	public class RepeatMovsb: Instruction {
 		//public readonly string Destination;
 		public RepeatMovsb() {

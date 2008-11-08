@@ -52,7 +52,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
         }
 
         public override string ToString() {
-            return Mnemonic + " " + GetDestinationAsString() + ", " + GetSourceAsString();
+            return Mnemonic + " " + this.GetDestinationAsString() + ", " + GetSourceAsString();
         }
     }
 }

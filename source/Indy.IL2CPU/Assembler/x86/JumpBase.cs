@@ -5,14 +5,6 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
 	public abstract class JumpBase: InstructionWithDestination {
-        public override string ToString() {
-            // always use near for now
-            if (Mnemonic == "call") {
-                return Mnemonic + " " + GetDestinationAsString();
-            }
-            return Mnemonic + " near " + GetDestinationAsString();
-        }
-
         public string DestinationLabel {
             get {
                 if (DestinationRef != null) {

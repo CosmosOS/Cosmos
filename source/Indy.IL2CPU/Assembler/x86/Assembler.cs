@@ -154,7 +154,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             //aOutput.WriteLine("%define NASM_COMPILATION 1");
             //aOutput.WriteLine("global Kernel_Start");
             aOutput.WriteLine("[map all main.map]");
-            aOutput.WriteLine("org 0x500000");
+            //aOutput.WriteLine("org 0x500000");
             base.FlushText(aOutput);
         }
 	}

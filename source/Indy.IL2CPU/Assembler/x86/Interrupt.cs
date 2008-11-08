@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
-    [OpCode(0xFFFFFFFF, "int")]
+    [OpCode("int")]
     public class Interrupt : Instruction {
         public readonly string Number;
 

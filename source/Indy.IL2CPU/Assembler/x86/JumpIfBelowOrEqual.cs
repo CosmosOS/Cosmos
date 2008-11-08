@@ -8,7 +8,7 @@ namespace Indy.IL2CPU.Assembler.X86
 	/// <summary>
 	/// Represents the JBE opcode
 	/// </summary>
-	[OpCode(0xFFFFFFFF, "jbe")]
+    [OpCode("jbe")]
 	public class JumpIfBelowOrEqual : JumpBase
 	{
 	}

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
-	[OpCode(0xFFFFFFFF, "shr")]
+    [OpCode("shr")]
 	public class ShiftRight: InstructionWithDestination {
         public byte? Count {
             get;
@@ -13,9 +13,9 @@ namespace Indy.IL2CPU.Assembler.X86 {
 
 		public override string ToString() {
             if (Count.HasValue) {
-                return "shr " + GetDestinationAsString() + ", " + Count.Value.ToString();
+                return "shr " + this.GetDestinationAsString() + ", " + Count.Value.ToString();
             } else {
-                return "shr " + GetDestinationAsString() + ", CL";
+                return "shr " + this.GetDestinationAsString() + ", CL";
             }
 		}
 	}

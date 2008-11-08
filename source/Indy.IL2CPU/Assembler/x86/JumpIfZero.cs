@@ -7,7 +7,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
 	/// <summary>
 	/// Represents the JZ opcode
 	/// </summary>
-	[OpCode(0xFFFFFFFF, "jz")]
+    [OpCode("jz")]
 	public class JumpIfZero: JumpBase {
 	}
 }

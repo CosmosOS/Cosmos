@@ -8,7 +8,7 @@ namespace Indy.IL2CPU.Assembler.X86
 	/// <summary>
 	/// Represents the JGE opcode
 	/// </summary>
-	[OpCode(0xFFFFFFFF, "jge")]
+    [OpCode("jge")]
 	public class JumpIfGreaterOrEqual : JumpBase
 	{
 	}
