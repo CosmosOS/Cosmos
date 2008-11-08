@@ -7,16 +7,6 @@ namespace Indy.IL2CPU.Assembler.X86 {
 	/// replaces the destination operand with the result. 
 	/// </summary>
 	[OpCode(0xFFFFFFFF, "sub")]
-	public class Sub: Instruction {
-		public readonly string Destination, Source;
-
-		public Sub(string aDestination, string aSource) {
-			Destination = aDestination;
-			Source = aSource;
-		}
-
-		public override string ToString() {
-			return string.Format("sub {0}, {1}", Destination, Source);
-		}
+	public class Sub: InstructionWithDestinationAndSourceAndSize {
 	}
 }

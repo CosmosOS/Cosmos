@@ -5,17 +5,26 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
 	[OpCode(0xFFFFFFFF, "out")]
-	public class Out: X86.Instruction {
-		public readonly string Port;
-		public readonly string Data;
+	public class Out: New_Instruction {
+        public byte Size {
+            get;
+            set;
+        }
 
-		public Out(string aPort, string aData) {
-			Port = aPort;
-			Data = aData;
-		}
+        public byte? Port {
+            get;
+            set;
+        }
 
-		public override string ToString() {
-			return "out " + Port + ", " + Data;
-		}
+        public override string ToString() {
+            string xData = "";
+            switch(Size){
+                case 8: xData = "al"; break;
+                case 16: xData = "ax"; break;
+                case 32: xData = "eax"; break;
+                default: throw new Exception("Size " + Size + " not supported in OUT instruction");
+            }
+            return "out " + (Port.HasValue ? Port.ToString() : "DX") + ", " + xData;
+        }
 	}
 }

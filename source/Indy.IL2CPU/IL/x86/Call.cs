@@ -142,8 +142,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
         public void Assemble(string aMethod, int aArgumentCount) {
             if (mTargetMethodInfo.ExtraStackSize > 0) {
-                new CPUx86.Sub("esp",
-                               mTargetMethodInfo.ExtraStackSize.ToString());
+                new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = (uint)mTargetMethodInfo.ExtraStackSize };
             }
             new CPUx86.Call { DestinationLabel = aMethod };
             //if (mResultSize != 0) {

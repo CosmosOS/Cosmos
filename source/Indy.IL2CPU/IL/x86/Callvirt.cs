@@ -100,8 +100,7 @@ namespace Indy.IL2CPU.IL.X86 {
                                     (int)mCurrentILOffset);
                 new CPU.Label(mLabelName + "_AfterNullRefCheck");
                 if (mExtraStackSpace > 0) {
-                    new CPUx86.Sub("esp",
-                                   mExtraStackSpace.ToString());
+                    new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = (uint)mExtraStackSpace };
                 }
                 new CPUx86.Call { DestinationLabel = mNormalAddress };
             } else {
@@ -196,9 +195,8 @@ namespace Indy.IL2CPU.IL.X86 {
                 }
                 new CPU.Label(mLabelName + "_NOT_BOXED_THIS");
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                if (mExtraStackSpace > 0) { 
-                    new CPUx86.Sub("esp",
-                                   mExtraStackSpace.ToString());
+                if (mExtraStackSpace > 0) {
+                    new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = (uint)mExtraStackSpace };
                 }
                 new CPUx86.Call { DestinationReg = CPUx86.Registers.EAX };
                 new CPU.Label(mLabelName + "__AFTER_NOT_BOXED_THIS");

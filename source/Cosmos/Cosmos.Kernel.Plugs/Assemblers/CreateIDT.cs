@@ -74,8 +74,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
                     SourceValue = 0x8E,
                     Size = 8
                 };
-                new CPUx86.ShiftRight("eax",
-                                      "16");
+                new CPUx86.ShiftRight { DestinationReg = Registers.EAX, Count = 16 };
                 new CPUx86.Move {
                     DestinationRef = new ElementReference("_NATIVE_IDT_Contents"),
                     DestinationIsIndirect = true,
@@ -117,13 +116,12 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
                 new CPUx86.Push { DestinationValue = (uint)j };
                 new CPUx86.Pushad();
 
-                new CPUx86.Sub("esp",
-                               "4");
+                new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
                 new CPUx86.Move{DestinationReg=Registers.EAX, SourceReg=Registers.ESP}; // preserve old stack address for passing to interrupt handler
                 
                 // store floating point data
                 new CPUx86.And { DestinationReg = Registers.ESP, SourceValue = 0xfffffff0 }; // fxsave needs to be 16-byte alligned
-                new CPUx86.Sub("esp", "512"); // fxsave needs 512 bytes
+                new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = 512 }; // fxsave needs 512 bytes
                 new CPUx86.FXSave("[esp]"); // save the registers
                 new CPUx86.Move { DestinationReg = Registers.EAX, DestinationIsIndirect = true, SourceReg = Registers.ESP };
 

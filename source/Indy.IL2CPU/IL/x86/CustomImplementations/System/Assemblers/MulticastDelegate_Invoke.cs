@@ -75,7 +75,7 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System.Assemblers
 			new CPU.Label(".NO_THIS");
 
 			new CPU.Comment("make space for us to copy the arguments too");
-			new CPUx86.Sub("esp", "ecx");
+            new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceReg = CPUx86.Registers.ECX };
 			new CPU.Comment("move the current delegate to edi");
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true };
 			new CPU.Comment("move the methodptr from that delegate to edi ");

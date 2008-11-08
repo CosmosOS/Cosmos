@@ -216,8 +216,7 @@ namespace Indy.IL2CPU.IL.X86
                     xExtraArgSize = 0;
                 }
                 if(xExtraArgSize>0) {
-                    new CPUx86.Sub("esp",
-                                   xExtraArgSize.ToString());
+                    new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = (uint)xExtraArgSize };
                 }
                 new CPUx86.Push { DestinationReg = Registers.ESP };
                 aAssembler.StackContents.Push(new StackContent(4));

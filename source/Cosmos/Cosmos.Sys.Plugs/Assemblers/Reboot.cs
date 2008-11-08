@@ -24,7 +24,7 @@ namespace Cosmos.Sys.Plugs.Assemblers
             new JumpIfNotZero { DestinationLabel = ".clearBuffer" };
             new Move { DestinationReg = Registers.DX, SourceValue = 0x64 };
             new Move { DestinationReg = Registers.AL, SourceValue = 0xfe };
-        	new Out(Registers_Old.DX, Registers_Old.AL);
+            new Out { Size = 8 };
             new CPUAll.Label(".loop");//failed... halt
             new CPUx86.Halt();
             new CPUx86.Jump { DestinationLabel = ".loop" };

@@ -10,7 +10,7 @@ namespace Indy.IL2CPU.Assembler.X86.X {
                 return new PortNumber(aPort);
             }
             set {
-                new X86.Out("DX", aPort.ToString());
+                new X86.Out { Port = aPort, Size = 16 };
             }
         }
 
@@ -18,8 +18,8 @@ namespace Indy.IL2CPU.Assembler.X86.X {
             get {
                 return new PortNumber(aDX.GetId());
             }
-            set { 
-                new X86.Out("DX", value.ToString());  
+            set {
+                new X86.Out { Port = value.Port, Size = 16 };
             }
         }
     }
