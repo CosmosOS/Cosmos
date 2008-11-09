@@ -11,18 +11,12 @@ namespace TestApp {
     class Program {
         class Renderer : Y86 {
             public void DoRender() {
-                Label = "Kernel_Start";
-                EBX = 0xB8000;
-                Memory[EBX, 8] = 65;
-                //IfDefined("DefinedSymbol");
-                //Memory[0xB8002, 8] = 66;
-                //Memory[0xB8003, 8] = 15;
-                //IfDefined("UnDefinedSymbol");
-                //Memory[0xB8004, 8] = 67;
-                //Memory[0xB8005, 8] = 15;
-                //EndIfDefined();
-                //EndIfDefined();
-                new Halt();
+                new Move { DestinationReg = Registers.EAX, SourceValue = 1 };
+                new Move { DestinationReg = Registers.EBX, SourceValue = 2 };
+                new Move { DestinationReg = Registers.ECX, SourceValue = 3 };
+                new Move { DestinationReg = Registers.EDX, SourceValue = 4 };
+                new Move { DestinationReg = Registers.ESI, SourceValue = 5 };
+                new Move { DestinationReg = Registers.EDI, SourceValue = 6 };
             }
         }
         static void Main(string[] args) {
@@ -42,10 +36,10 @@ namespace TestApp {
                 using (Stream xOutput = new FileStream(Path.Combine(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
                                                                                          "Output"),
                                                                             "TheOutput.bin"), FileMode.Create)) {
-                    xAsm.FlushBinary(xOutput, 0x500000);
+                    xAsm.FlushBinary(xOutput, 0x200000);
                 } 
 
-                //using (StreamWriter xOutput = new StreamWriter(Path.Combine(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
+                //using (var xOutput = new StreamWriter(Path.Combine(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
                 //                                                                         "Output"),
                 //                                                            "TheOutput.asm"))) {
                 //    xAsm.FlushText(xOutput);

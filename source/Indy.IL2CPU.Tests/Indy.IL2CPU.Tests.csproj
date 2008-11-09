@@ -5,29 +5,26 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{6110AD07-EB07-4A99-BB73-7A69AF5732F1}</ProjectGuid>
+    <ProjectGuid>{014A572A-70CA-4BDE-80AF-A4F6F92DB1E3}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Cosmos.Sys.Plugs</RootNamespace>
-    <AssemblyName>Cosmos.Sys.Plugs</AssemblyName>
+    <RootNamespace>Indy.IL2CPU.Tests</RootNamespace>
+    <AssemblyName>Indy.IL2CPU.Tests</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>Cosmos.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\..\build\Tools\Cosmos.Sys.Plugs\</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -38,55 +35,33 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="nunit.framework, Version=2.4.1.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\libraries\nunit\nunit.framework.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Xml.Linq">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data.DataSetExtensions">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assemblers\Reboot.cs" />
-    <Compile Include="Deboot.cs" />
+    <Compile Include="Assembler\X86\BaseTest.cs" />
+    <Compile Include="Assembler\X86\MoveTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="VFS\DirectoryImpl.cs" />
-    <Compile Include="VFS\DirectoryInfoImpl.cs" />
-    <Compile Include="VFS\DriveInfoImpl.cs" />
-    <Compile Include="VFS\FileImpl.cs" />
-    <Compile Include="VFS\FileInfoImpl.cs" />
-    <Compile Include="VFS\FileSystemInfoImpl.cs" />
-    <Compile Include="VFS\PathImpl.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Cosmos.Kernel.FileSystems\Cosmos.Sys.FileSystem.csproj">
-      <Project>{5C293BB9-FB42-495E-AAD9-D15888631CA4}</Project>
-      <Name>Cosmos.Sys.FileSystem</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\IL2CPU\Cosmos.IL2CPU.Debug\Cosmos.Compiler.Debug.csproj">
-      <Project>{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}</Project>
-      <Name>Cosmos.Compiler.Debug</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Indy.IL2CPU\Indy.IL2CPU.csproj">
+    <ProjectReference Include="..\Indy.IL2CPU\Indy.IL2CPU.csproj">
       <Project>{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}</Project>
       <Name>Indy.IL2CPU</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Cosmos.Kernel\Cosmos.Kernel.csproj">
-      <Project>{A1F83D9F-2D44-4264-A08B-416797123018}</Project>
-      <Name>Cosmos.Kernel</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Cosmos.System\Cosmos.Sys.csproj">
-      <Project>{819DB8FC-5DA1-461F-83C9-2F5C88088C94}</Project>
-      <Name>Cosmos.Sys</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Cosmos.snk" />
+    <Content Include="Assembler\X86\VerificationData\MoveTests\ImmediateToRegister32.asm" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assembler\X86\VerificationData\MoveTests\ImmediateToRegister32.bin" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
