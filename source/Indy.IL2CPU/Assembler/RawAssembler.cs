@@ -6,6 +6,6 @@ using System.IO;
 
 namespace Indy.IL2CPU.Assembler {
 	public class RawAssembler : Assembler {
-		public RawAssembler() : base(null) { }
+		public RawAssembler() : base() { }
 	}
 }

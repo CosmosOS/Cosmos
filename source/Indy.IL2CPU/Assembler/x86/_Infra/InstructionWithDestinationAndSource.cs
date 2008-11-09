@@ -15,7 +15,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             set;
         }
 
-        public uint SourceValue {
+        public uint? SourceValue {
             get;
             set;
         }
@@ -38,7 +38,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 if (SourceReg != Guid.Empty) {
                     xDest = Registers.GetRegisterName(SourceReg);
                 } else {
-                    xDest = "0x" + SourceValue.ToString("X").ToUpperInvariant();
+                    xDest = "0x" + SourceValue.GetValueOrDefault().ToString("X").ToUpperInvariant();
                 }
             }
             if (SourceDisplacement != 0) {

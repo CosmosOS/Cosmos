@@ -92,8 +92,6 @@ namespace Indy.IL2CPU.Assembler {
             }
         }
 
-        private Func<string, string> mGetFileNameForGroup;
-
         private uint mDataMemberCounter = 0;
 
         public string GetIdentifier(string aPrefix) {
@@ -101,27 +99,9 @@ namespace Indy.IL2CPU.Assembler {
             return aPrefix + mDataMemberCounter.ToString("X8").ToUpper();
         }
 
-        public Assembler(Func<string, string> aGetFileNameForGroup) {
-            mGetFileNameForGroup = aGetFileNameForGroup;
+        public Assembler() {
             CurrentInstance.Push(this);
             //mInstructions.AddComplexIndexDefinition(
-        }
-
-        public List<KeyValuePair<string, Instruction>> GetInstructions() {
-//using (mInstructionsLocker.AcquireReaderLock()) {
-//    if(mInstructions.ContainsKey(Thread.CurrentThread.ManagedThreadId)) {
-//        return mInstructions[Thread.CurrentThread.ManagedThreadId];
-//    }
-//}
-//            using(mInstructionsLocker.AcquireWriterLock()) {
-//                // do this check again, between the two locks, the situation might have changed.
-//                if (mInstructions.ContainsKey(Thread.CurrentThread.ManagedThreadId))
-//                {
-//                    return mInstructions[Thread.CurrentThread.ManagedThreadId];
-//                }
-//                var xResult = new
-//            }
-            throw new NotImplementedException("After multi-threaded refactorings, this hasn't been implemented again, yet");
         }
 
         public List<DataMember> DataMembers {
@@ -294,7 +274,9 @@ namespace Indy.IL2CPU.Assembler {
             }
             if (mInstructions.Count > 0) {
                 string xMainLabel="";
-                foreach (Instruction x in mInstructions) {
+                for(int i = 0; i < mInstructions.Count;i++){
+                //foreach (Instruction x in mInstructions) {
+                    var x = mInstructions[i];
                     string prefix = "\t\t\t";
                     Label xLabel = x as Label;
                     if (xLabel != null) {

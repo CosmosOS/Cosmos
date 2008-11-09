@@ -8,7 +8,7 @@ namespace Indy.IL2CPU.Assembler.X86
     {
         public static void InitializeEncodingData(Instruction.InstructionData aData) {
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
-                OpCode= new byte[0xF4]
+                OpCode= new byte[]{0xF4}
             });
         }
     }

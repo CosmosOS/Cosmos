@@ -13,7 +13,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 if (aThis.DestinationReg != Guid.Empty) {
                     xDest = Registers.GetRegisterName(aThis.DestinationReg);
                 } else {
-                    xDest = "0x" + aThis.DestinationValue.ToString("X").ToUpperInvariant();
+                    xDest = "0x" + aThis.DestinationValue.GetValueOrDefault().ToString("X").ToUpperInvariant();
                 }
             }
             if (aThis.DestinationDisplacement != 0) {

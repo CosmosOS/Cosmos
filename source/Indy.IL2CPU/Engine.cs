@@ -167,10 +167,9 @@ namespace Indy.IL2CPU {
                 switch (aTargetPlatform) {
                     case TargetPlatformEnum.X86: {
                         mMap = new Indy.IL2CPU.IL.X86.X86OpCodeMap();
-                        mAssembler = new Assembler.X86.Assembler(aGetFileNameForGroup,
-                                                                 ((aDebugMode != DebugMode.None) && (aDebugMode != DebugMode.MLUsingGDB))
-                                                                     ? aDebugComNumber
-                                                                     : (byte)0);
+                        mAssembler = new Assembler.X86.CosmosAssembler(((aDebugMode != DebugMode.None) && (aDebugMode != DebugMode.MLUsingGDB))
+                                                                            ? aDebugComNumber
+                                                                            : (byte)0);
                         break;
                     }
                     default:

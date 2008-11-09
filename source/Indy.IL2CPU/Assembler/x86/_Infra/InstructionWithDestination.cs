@@ -15,7 +15,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             set;
         }
 
-        public uint DestinationValue {
+        public uint? DestinationValue {
             get;
             set;
         }

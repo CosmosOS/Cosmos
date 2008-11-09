@@ -233,7 +233,7 @@ namespace Indy.IL2CPU.IL.X86 {
                         throw new Exception("Remainder size " + (aField.Size) + " not supported!");
                 }
             if (aAddGCCode && aField.NeedsGC) {
-                new CPUx86.Push { DestinationReg = Registers.ESP, DestinationIsIndirect = true };
+                new CPUx86.Push {Size=32, DestinationReg = Registers.ESP, DestinationIsIndirect = true };
                 Engine.QueueMethod(GCImplementationRefs.IncRefCountRef);
                 new CPUx86.Call { DestinationLabel = Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef) };
             }

@@ -13,7 +13,8 @@ namespace Indy.IL2CPU.Assembler.X86.X {
         //TODO: Add registers as needed, not all are here yet
         public RegisterEAX EAX = RegisterEAX.Instance;
         public RegisterAL AL = RegisterAL.Instance;
-
+        
+        public RegisterEBX EBX = RegisterEBX.Instance;
         public RegisterECX ECX = RegisterECX.Instance;
 
         public RegisterEDX EDX = RegisterEDX.Instance;
