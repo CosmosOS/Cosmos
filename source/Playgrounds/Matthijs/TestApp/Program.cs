@@ -12,14 +12,14 @@ namespace TestApp {
     class Program {
         class Renderer : Y86 {
             public void DoRender() {
-                new Move { Size = 8, DestinationReg = Registers.EAX, DestinationIsIndirect = true, SourceValue = 65 };
-                new Move { Size = 8, DestinationReg = Registers.EBX, DestinationIsIndirect = true, SourceValue = 66 };
-                new Move { Size = 8, DestinationReg = Registers.ECX, DestinationIsIndirect = true, SourceValue = 67 };
-                new Move { Size = 8, DestinationReg = Registers.EDX, DestinationIsIndirect = true, SourceValue = 68 };
-                new Move { Size = 8, DestinationReg = Registers.EDI, DestinationIsIndirect = true, SourceValue = 69 };
-                new Move { Size = 8, DestinationReg = Registers.ESI, DestinationIsIndirect = true, SourceValue = 70 };
-                new Move { Size = 8, DestinationReg = Registers.ESP, DestinationIsIndirect = true, SourceValue = 71 };
-                new Move { Size = 8, DestinationReg = Registers.EBP, DestinationIsIndirect = true, SourceValue = 72 };
+                new Move { DestinationReg = Registers.AX, SourceValue = 1 };
+                new Move { DestinationReg = Registers.BX, SourceValue = 2 };
+                new Move { DestinationReg = Registers.CX, SourceValue = 3 };
+                new Move { DestinationReg = Registers.DX, SourceValue = 4 };
+                new Move { DestinationReg = Registers.SI, SourceValue = 5 };
+                new Move { DestinationReg = Registers.DI, SourceValue = 6 };
+                new Move { DestinationReg = Registers.SP, SourceValue = 6 };
+                new Move { DestinationReg = Registers.BP, SourceValue = 6 };
             }
         }
         static void Main(string[] args) {

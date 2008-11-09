@@ -7,8 +7,25 @@ using System.Reflection;
 
 namespace Indy.IL2CPU.Assembler.X86 {
     public abstract class Instruction : Indy.IL2CPU.Assembler.Instruction {
+        [Flags]
+        public enum InstructionSizes {
+            None,
+            Byte,
+            Word,
+            DWord,
+            QWord,
+        }
+
+        public enum InstructionSize {
+            None,
+            Byte,
+            Word,
+            DWord,
+            QWord,
+        }
         public class InstructionData {
             public class InstructionEncodingOption {
+
                 public byte[] OpCode;
 
                 /// <summary>
@@ -17,14 +34,12 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 /// </summary>
                 public bool NeedsModRMByte;
 
-                /// <summary>
-                /// true is large, false small. if null, this option is not specific to a given size
-                /// </summary>
-                public bool? OperandSize;
+                public InstructionSizes AllowedSizes;
+                public InstructionSize DefaultSize = InstructionSize.DWord;
                 /// <summary>
                 /// the indx in OpCode where the OperandSize bit is encoded
                 /// </summary>
-                public byte OperandSizeByte;
+                public byte? OperandSizeByte;
                 /// <summary>
                 /// the amount of bits the operandsize bit gets shifted to left, if neccessary
                 /// </summary>
@@ -76,7 +91,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             /// <summary>
             /// True if by default large (32bit), false if small (16bit)
             /// </summary>
-            public bool? DefaultSize;
+            //public InstructionSize DefaultSize = InstructionSize.DWord;
             public List<InstructionEncodingOption> EncodingOptions = new List<InstructionEncodingOption>();
         }
 
@@ -209,13 +224,23 @@ namespace Indy.IL2CPU.Assembler.X86 {
             //        aSize++;
             //    }
             //}
-            if (aInstructionData.DefaultSize.HasValue && aInstructionData.DefaultSize.Value) {
-                if (aInstruction.Size < 16) {
-                    aSize += 1;
-                }
+            if (xTheEncodingOption.DefaultSize == InstructionSize.DWord && aInstruction.Size == 16) {
+                aSize += 1;
+            }
+            if (xTheEncodingOption.DefaultSize == InstructionSize.Word && aInstruction.Size == 32) {
+                aSize += 1;
             }
 
             return true;
+        }
+
+        private static bool SizeIsSelected(InstructionSizes aSizes, byte aSize) {
+            switch(aSize) {
+                case 8: return (aSizes & InstructionSizes.Byte) != 0;
+                case 16: return (aSizes & InstructionSizes.Byte) != 0;
+                case 32: return (aSizes & InstructionSizes.Byte) != 0;
+                default: throw new NotImplementedException();
+            }
         }
 
         private static InstructionData.InstructionEncodingOption GetInstructionEncodingOption(InstructionWithDestinationAndSourceAndSize aInstruction, InstructionData aInstructionData) {
@@ -297,17 +322,20 @@ namespace Indy.IL2CPU.Assembler.X86 {
             if(xSize==0) {
                 return new byte[0];
             }
-            int xExtraOffset = 0;
-            if (aInstructionData.DefaultSize.HasValue && aInstructionData.DefaultSize.Value) {
-                if (aInstruction.Size < 16) {
-                    xExtraOffset = 1;
-                }
-            }
             var xBuffer = new byte[xSize];
-            Array.Copy(xEncodingOption.OpCode, 0, xBuffer, xExtraOffset, xEncodingOption.OpCode.Length);
-            if (xExtraOffset == 1) {
-                throw new Exception("OperandSize prefix needed!");
+            int xExtraOffset = 0;
+            int xOpCodeOffset = 0;
+            if (xEncodingOption.DefaultSize == InstructionSize.DWord && aInstruction.Size == 16) {
+                xOpCodeOffset += 1;
+                xExtraOffset++;
+                xBuffer[0] = 0x66;
             }
+            if (xEncodingOption.DefaultSize == InstructionSize.Word && aInstruction.Size == 32) {
+                xOpCodeOffset += 1;
+                xExtraOffset++;
+                xBuffer[0] = 0x66;
+            }
+            Array.Copy(xEncodingOption.OpCode, 0, xBuffer, xExtraOffset, xEncodingOption.OpCode.Length);
             byte? xSIB = null;
             if (xEncodingOption.NeedsModRMByte) {
                 xBuffer[xEncodingOption.OpCode.Length] = EncodeModRMByte(aInstruction.DestinationReg, aInstruction.DestinationIsIndirect, aInstruction.DestinationDisplacement > 0, aInstruction.DestinationDisplacement > 255, out xSIB);
@@ -322,7 +350,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 // todo: add more ModRM stuff
             }
             if (aInstruction.DestinationReg != Guid.Empty) {
-                xBuffer[xEncodingOption.DestinationRegByte] |= (byte)(EncodeRegister(aInstruction.DestinationReg) << xEncodingOption.DestinationRegBitShiftLeft);
+                xBuffer[xEncodingOption.DestinationRegByte + xExtraOffset] |= (byte)(EncodeRegister(aInstruction.DestinationReg) << xEncodingOption.DestinationRegBitShiftLeft);
             }
             if(xSIB!=null) {
                 xBuffer[xEncodingOption.OpCode.Length + 1] = xSIB.Value;
@@ -336,9 +364,9 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 }
                 Array.Copy(BitConverter.GetBytes(aInstruction.SourceValue.Value), 0, xBuffer, xOffset, aInstruction.Size / 8);
             }
-            if(aInstructionData.DefaultSize.HasValue) {
-                if(!aInstructionData.DefaultSize.Value && aInstruction.Size > 16) {
-                    xBuffer[xEncodingOption.OperandSizeByte] |= (byte)(1 << xEncodingOption.OperandSizeBitShiftLeft);
+            if (xEncodingOption.OperandSizeByte.HasValue) {
+                if (aInstruction.Size > 8) {
+                    xBuffer[xEncodingOption.OperandSizeByte.Value + xExtraOffset] |= (byte)(1 << xEncodingOption.OperandSizeBitShiftLeft);
                 }
             }
 
