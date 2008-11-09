@@ -37,7 +37,7 @@ namespace Indy.IL2CPU.Tests.Assembler.X86 {
                     using (var xOut = new StringWriter()) {
                         Assembler.FlushText(xOut);
                         using (var xReader = new StreamReader(typeof(BaseTest).Assembly.GetManifestResourceStream(xManStreamName + ".asm"))) {
-                            Assert.AreEqual(xReader.ReadToEnd().Replace(' ', '_').Replace('\t', '_'), xOut.ToString().Replace(' ', '_').Replace('\t', '_'));
+                            Assert.AreEqual(xReader.ReadToEnd(), xOut.ToString());
                         }
                     }
                 }

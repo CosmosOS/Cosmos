@@ -1,4 +1,4 @@
-﻿#define BINARY
+﻿//#define BINARY
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,14 +12,14 @@ namespace TestApp {
     class Program {
         class Renderer : Y86 {
             public void DoRender() {
-                new Move { DestinationReg = Registers.AX, SourceValue = 1 };
-                new Move { DestinationReg = Registers.BX, SourceValue = 2 };
-                new Move { DestinationReg = Registers.CX, SourceValue = 3 };
-                new Move { DestinationReg = Registers.DX, SourceValue = 4 };
-                new Move { DestinationReg = Registers.SI, SourceValue = 5 };
-                new Move { DestinationReg = Registers.DI, SourceValue = 6 };
-                new Move { DestinationReg = Registers.SP, SourceValue = 6 };
-                new Move { DestinationReg = Registers.BP, SourceValue = 6 };
+                new Move { DestinationReg = Registers.AL, SourceValue = 1 };
+                new Move { DestinationReg = Registers.BL, SourceValue = 2 };
+                new Move { DestinationReg = Registers.CL, SourceValue = 3 };
+                new Move { DestinationReg = Registers.DL, SourceValue = 4 };
+                new Move { DestinationReg = Registers.AH, SourceValue = 1 };
+                new Move { DestinationReg = Registers.BH, SourceValue = 2 };
+                new Move { DestinationReg = Registers.CH, SourceValue = 3 };
+                new Move { DestinationReg = Registers.DH, SourceValue = 4 };
             }
         }
         static void Main(string[] args) {

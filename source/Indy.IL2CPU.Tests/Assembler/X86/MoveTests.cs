@@ -35,6 +35,19 @@ namespace Indy.IL2CPU.Tests.Assembler.X86 {
         }
 
         [Test]
+        public void TestImmediateToRegister8() {
+            new Move { DestinationReg = Registers.AL, SourceValue = 1 };
+            new Move { DestinationReg = Registers.BL, SourceValue = 2 };
+            new Move { DestinationReg = Registers.CL, SourceValue = 3 };
+            new Move { DestinationReg = Registers.DL, SourceValue = 4 };
+            new Move { DestinationReg = Registers.AH, SourceValue = 1 };
+            new Move { DestinationReg = Registers.BH, SourceValue = 2 };
+            new Move { DestinationReg = Registers.CH, SourceValue = 3 };
+            new Move { DestinationReg = Registers.DH, SourceValue = 4 };
+            Verify();
+        }
+
+        [Test]
         public void TestImmediateToMemorySimple8() {
             new Move { Size = 8, DestinationReg = Registers.EAX, DestinationIsIndirect = true, SourceValue = 65 };
             new Move { Size = 8, DestinationReg = Registers.EBX, DestinationIsIndirect = true, SourceValue = 66 };
