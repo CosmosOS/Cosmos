@@ -31,6 +31,10 @@ namespace Indy.IL2CPU.Assembler.X86 {
         public static readonly Guid EBP = new Guid("{20867aa8-a7e5-4940-a5df-7a266eb57efa}");
         public static readonly Guid ESI = new Guid("{ab49b4e5-cc33-45bd-94f7-3188c916a153}");
         public static readonly Guid EDI = new Guid("{0ccba916-8a8c-46d7-aee9-211d95a140c9}");
+        public static readonly Guid SI = new Guid("{c6278940-2584-474b-a197-7666c92f9b0b}");
+        public static readonly Guid DI = new Guid("{59b80ecd-e523-4209-b9e7-dfba33c909dd}");
+        public static readonly Guid SP = new Guid("{d45d1bba-48da-4766-9c32-c976e568de07}");
+        public static readonly Guid BP = new Guid("{1b7705ba-6ae2-456d-8a01-a6520a678d36}");
         public static readonly Guid EFLAGS = new Guid("{eec47a09-9b12-45d1-afaa-a94e7d06a146}");
         public static readonly Guid CR0 = new Guid("{eec47a09-9b12-45d1-afaa-a94e7d06a147}");
         public static readonly Guid CR1 = new Guid("{eec47a09-9b12-45d1-afaa-a94e7d06a148}");
@@ -77,7 +81,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
         }
 
         public static bool Is16Bit(Guid aRegister) {
-            return aRegister == AX || aRegister == BX || aRegister == CX || aRegister == DX || aRegister == CS  || aRegister == DS || aRegister == ES || aRegister == FS || aRegister == GS || aRegister == SS;
+            return aRegister == AX || aRegister == BX || aRegister == CX || aRegister == DX || aRegister == CS || aRegister == DS || aRegister == ES || aRegister == FS || aRegister == GS || aRegister == SS || aRegister == SI || aRegister == DI || aRegister == SP || aRegister == BP;
         }
     }
 }

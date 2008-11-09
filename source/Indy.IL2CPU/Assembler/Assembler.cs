@@ -227,7 +227,7 @@ namespace Indy.IL2CPU.Assembler {
                     ulong xSize = 0;
                     if (xCurrentItem.DetermineSize(this, out xSize)) {
                         xSituationChanged = true;
-                        Console.WriteLine("Size of '{0}' = {1}", xCurrentItem, xSize);
+                        //Console.WriteLine("Size of '{0}' = {1}", xCurrentItem, xSize);
                         xCurrentAddresss += xSize;
                         xIncompleteItems.RemoveAt(xIdx);
                         continue;

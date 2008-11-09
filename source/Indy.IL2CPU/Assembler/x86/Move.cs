@@ -24,6 +24,15 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 OperandSizeBitShiftLeft = 0,
                 SourceImmediate = true
             });  // immediate to memory
+            aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
+                OpCode = new byte[] { 0xC6 },
+                NeedsModRMByte=true,
+                OperandSizeByte = 0,
+                OperandSizeBitShiftLeft = 0,
+                SourceImmediate = true,
+                DestinationRegByte=1,
+                DestinationMemory = true
+            });  // immediate to memory
         }
 	}
 }

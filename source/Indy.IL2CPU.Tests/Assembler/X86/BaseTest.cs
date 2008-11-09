@@ -32,13 +32,21 @@ namespace Indy.IL2CPU.Tests.Assembler.X86 {
                 if (xName.StartsWith("Test")) {
                     xName = xName.Substring(4);
                 }
-                xManStreamName += "." + xName + ".bin";
-                using (var xVerificationData = typeof(BaseTest).Assembly.GetManifestResourceStream(xManStreamName)) {
+                xManStreamName += "." + xName;
+                if(typeof(BaseTest).Assembly.GetManifestResourceNames().Contains(xManStreamName + ".asm")) {
+                    using (var xOut = new StringWriter()) {
+                        Assembler.FlushText(xOut);
+                        using (var xReader = new StreamReader(typeof(BaseTest).Assembly.GetManifestResourceStream(xManStreamName + ".asm"))) {
+                            Assert.AreEqual(xReader.ReadToEnd().Replace(' ', '_').Replace('\t', '_'), xOut.ToString().Replace(' ', '_').Replace('\t', '_'));
+                        }
+                    }
+                }
+                using (var xVerificationData = typeof(BaseTest).Assembly.GetManifestResourceStream(xManStreamName + ".bin")) {
                     if (xVerificationData == null) {
                         Assert.Fail("VerificationData not found! Did you forget to mark the file as Embedded Resource?");
                     }
                     xVerificationData.Position = 0;
-                    if (xVerificationData.Length != xMS.Length) {
+                    if (xVerificationData.Length != xMS.Length) { 
                         Assert.Fail("Wrong data emitted");
                     }
                     while (true) {

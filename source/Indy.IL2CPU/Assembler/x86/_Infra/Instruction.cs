@@ -118,7 +118,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                         xInstructionsWithEncodingOptions++;
                     }
                 }
-                Console.WriteLine("Total Instructions = {0}, Instructions with encoding data = {1}", mInstructionDatas.Count, xInstructionsWithEncodingOptions);
+//                Console.WriteLine("Total Instructions = {0}, Instructions with encoding data = {1}", mInstructionDatas.Count, xInstructionsWithEncodingOptions);
             }
         }
 
@@ -135,7 +135,6 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 case 64:
                     return "qword";
                 default:
-                    return "non-existing size!!";
                     throw new Exception("Invalid size: " + aSize);
             }
         }
@@ -178,13 +177,38 @@ namespace Indy.IL2CPU.Assembler.X86 {
             aSize = (ulong)xTheEncodingOption.OpCode.Length;
             if (xTheEncodingOption.NeedsModRMByte) {
                 aSize += 1;
+                byte? xSIB = null;
+                EncodeModRMByte(aInstruction.DestinationReg, aInstruction.DestinationIsIndirect, aInstruction.DestinationDisplacement > 0, aInstruction.DestinationDisplacement > 255, out xSIB);
+                if (xSIB != null) {
+                    aSize++;
+                }
             }
-            if (aInstruction.DestinationValue.HasValue || aInstruction.DestinationRef != null) {
+            if (aInstruction.DestinationValue.HasValue) {
+                aSize += (ulong)aInstruction.Size / 8;
+            }
+            if(aInstruction.DestinationRef != null) {
                 aSize += 4;
             }
-            if (aInstruction.SourceValue.HasValue || aInstruction.SourceRef != null) {
+            if (aInstruction.SourceValue.HasValue) {
+                aSize += (ulong)aInstruction.Size / 8;
+            }
+            if (aInstruction.SourceRef != null) {
                 aSize += 4;
             }
+            //if(aInstruction.DestinationReg != Guid.Empty) {
+            //    byte? xSIB;
+            //    EncodeRegister(aInstruction.DestinationReg);
+            //    //if (xSIB.HasValue) {
+            //    //    aSize++;
+            //    //}
+            //}
+            //if (aInstruction.SourceReg != Guid.Empty) {
+            //    byte? xSIB;
+            //    EncodeRegister(aInstruction.SourceReg, out xSIB);
+            //    if (xSIB.HasValue) {
+            //        aSize++;
+            //    }
+            //}
             if (aInstructionData.DefaultSize.HasValue && aInstructionData.DefaultSize.Value) {
                 if (aInstruction.Size < 16) {
                     aSize += 1;
@@ -198,13 +222,15 @@ namespace Indy.IL2CPU.Assembler.X86 {
             InstructionData.InstructionEncodingOption xTheEncodingOption = null;
             for (int i = 0; i < aInstructionData.EncodingOptions.Count; i++) {
                 var xEncodingOption = aInstructionData.EncodingOptions[i];
-                if (!((xEncodingOption.DestinationReg.HasValue && aInstruction.DestinationReg != Guid.Empty) ||
-                     (!xEncodingOption.DestinationReg.HasValue && aInstruction.DestinationReg == Guid.Empty))) {
+                if (!(((xEncodingOption.DestinationMemory || xEncodingOption.DestinationReg.HasValue) && aInstruction.DestinationReg != Guid.Empty) ||
+                     (!(xEncodingOption.DestinationMemory || xEncodingOption.DestinationReg.HasValue) && aInstruction.DestinationReg == Guid.Empty))) {
                     // mismatch
                     continue;
                 }
-                if (!((xEncodingOption.DestinationMemory && (aInstruction.DestinationValue != null && aInstruction.DestinationIsIndirect)) ||
-                      (!xEncodingOption.DestinationMemory && (aInstruction.DestinationValue == null && !aInstruction.DestinationIsIndirect))) && aInstruction.DestinationIsIndirect) {
+                if ((!((xEncodingOption.DestinationMemory && (aInstruction.DestinationValue != null && aInstruction.DestinationIsIndirect)) ||
+                      (!xEncodingOption.DestinationMemory && (aInstruction.DestinationValue == null && !aInstruction.DestinationIsIndirect))) &&
+                     !((xEncodingOption.DestinationMemory && (aInstruction.DestinationReg != Guid.Empty && aInstruction.DestinationIsIndirect)) ||
+                      (!xEncodingOption.DestinationMemory && (aInstruction.DestinationReg != Guid.Empty && !aInstruction.DestinationIsIndirect)))) && aInstruction.DestinationIsIndirect) {
                     continue;
                 }
                 if (!((xEncodingOption.DestinationImmediate && aInstruction.DestinationValue != null) ||
@@ -266,20 +292,14 @@ namespace Indy.IL2CPU.Assembler.X86 {
 
         private static byte[] GetData(Indy.IL2CPU.Assembler.Assembler aAssembler, InstructionWithDestinationAndSourceAndSize aInstruction, InstructionData aInstructionData) {
             var xEncodingOption = GetInstructionEncodingOption(aInstruction, aInstructionData);
-            var xSize = xEncodingOption.OpCode.Length;
-            if (xEncodingOption.NeedsModRMByte) {
-                xSize += 1;
-            }
-            if (aInstruction.DestinationValue.HasValue || aInstruction.DestinationRef != null) {
-                xSize += 4;
-            }
-            if (aInstruction.SourceValue.HasValue || aInstruction.SourceRef != null) {
-                xSize += 4;
+            ulong xSize = 0;
+            Instruction.DetermineSize(aInstruction, aInstructionData, out xSize);
+            if(xSize==0) {
+                return new byte[0];
             }
             int xExtraOffset = 0;
             if (aInstructionData.DefaultSize.HasValue && aInstructionData.DefaultSize.Value) {
                 if (aInstruction.Size < 16) {
-                    xSize += 1;
                     xExtraOffset = 1;
                 }
             }
@@ -288,17 +308,25 @@ namespace Indy.IL2CPU.Assembler.X86 {
             if (xExtraOffset == 1) {
                 throw new Exception("OperandSize prefix needed!");
             }
+            byte? xSIB = null;
             if (xEncodingOption.NeedsModRMByte) {
-                if(aInstruction.DestinationReg != Guid.Empty && !aInstruction.DestinationIsIndirect) {
-                    xBuffer[xEncodingOption.OpCode.Length] |= 0xC0;    
-                }
-                if(aInstruction.DestinationReg != Guid.Empty && aInstruction.DestinationIsIndirect) {
-                    //
-                }
+                xBuffer[xEncodingOption.OpCode.Length] = EncodeModRMByte(aInstruction.DestinationReg, aInstruction.DestinationIsIndirect, aInstruction.DestinationDisplacement > 0, aInstruction.DestinationDisplacement > 255, out xSIB);
+                //byte 
+                // = EncodeModRMByte()
+                //if(aInstruction.DestinationReg != Guid.Empty && !aInstruction.DestinationIsIndirect) {
+                //    xBuffer[xEncodingOption.OpCode.Length] |= 0xC0;    
+                //}
+                //if(aInstruction.DestinationReg != Guid.Empty && aInstruction.DestinationIsIndirect) {
+                //    //
+                //}
                 // todo: add more ModRM stuff
             }
             if (aInstruction.DestinationReg != Guid.Empty) {
                 xBuffer[xEncodingOption.DestinationRegByte] |= (byte)(EncodeRegister(aInstruction.DestinationReg) << xEncodingOption.DestinationRegBitShiftLeft);
+            }
+            if(xSIB!=null) {
+                xBuffer[xEncodingOption.OpCode.Length + 1] = xSIB.Value;
+                xExtraOffset++;
             }
             // todo: add more options
             if (aInstruction.SourceValue.HasValue) {
@@ -306,7 +334,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 if(xEncodingOption.NeedsModRMByte) {
                     xOffset++;
                 }
-                Array.Copy(BitConverter.GetBytes(aInstruction.SourceValue.Value), 0, xBuffer, xOffset, 4);
+                Array.Copy(BitConverter.GetBytes(aInstruction.SourceValue.Value), 0, xBuffer, xOffset, aInstruction.Size / 8);
             }
             if(aInstructionData.DefaultSize.HasValue) {
                 if(!aInstructionData.DefaultSize.Value && aInstruction.Size > 16) {
@@ -319,11 +347,27 @@ namespace Indy.IL2CPU.Assembler.X86 {
             return xBuffer;
         }
 
+        private static byte EncodeModRMByte(Guid aRegister, bool aIndirect, bool aOffset, bool aOffsetIs32Bit, out byte? aSIB) {
+            byte xModRM = 0;
+            xModRM |= EncodeRegister(aRegister);
+            aSIB = null;
+            if(!aOffset) {
+                if (aRegister == Registers.EBP) {
+                    xModRM |= 1 << 6;
+                    aSIB = 0;
+                }
+                if(aRegister == Registers.ESP) {
+                    aSIB = 0x24;
+                }
+            }
+            if(aOffset) {
+                throw new NotImplementedException("Add support for offsets");
+            }
+            return xModRM;
+        }
+
         private static byte EncodeRegister(Guid aRegister) {
             // todo: implement support for other registers
-            if (!Registers.Is32Bit(aRegister)) {
-                throw new Exception("Register not supported!");
-            }
             if (aRegister == Registers.EAX) return 0x0;
             if (aRegister == Registers.ECX) return 0x1;
             if (aRegister == Registers.EDX) return 0x2;
@@ -332,6 +376,24 @@ namespace Indy.IL2CPU.Assembler.X86 {
             if (aRegister == Registers.EBP) return 0x5;
             if (aRegister == Registers.ESI) return 0x6;
             if (aRegister == Registers.EDI) return 0x7;
+
+            if (aRegister == Registers.AX) return 0x0;
+            if (aRegister == Registers.CX) return 0x1;
+            if (aRegister == Registers.DX) return 0x2;
+            if (aRegister == Registers.BX) return 0x3;
+            if (aRegister == Registers.SP) return 0x4;
+            if (aRegister == Registers.BP) return 0x5;
+            if (aRegister == Registers.SI) return 0x6;
+            if (aRegister == Registers.DI) return 0x7;
+
+            if (aRegister == Registers.AL) return 0x0;
+            if (aRegister == Registers.CL) return 0x1;
+            if (aRegister == Registers.DL) return 0x2;
+            if (aRegister == Registers.BL) return 0x3;
+            if (aRegister == Registers.AH) return 0x4;
+            if (aRegister == Registers.CH) return 0x5;
+            if (aRegister == Registers.DH) return 0x6;
+            if (aRegister == Registers.BH) return 0x7;
             throw new Exception("Register not supported!");
         }
 
