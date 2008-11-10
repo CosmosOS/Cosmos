@@ -8,6 +8,18 @@ using Indy.IL2CPU.Assembler.X86;
 namespace Indy.IL2CPU.Tests.Assembler.X86 {
     [TestFixture]
     public class MoveTests: BaseTest {
+        /*
+         * situations to cover:
+         * immediate to memory indirect + byte (8bit, 16bit, 32bit)
+         * immediate to memory indirect + dword (8bit, 16bit, 32bit)
+         * register to memory indirect + byte (8bit, 16bit, 32bit)
+         * register to memory indirect + dword (8bit, 16bit, 32bit)
+         * immediate to memoryreg  indirect + byte (8bit, 16bit, 32bit)
+         * immediate to memoryreg  indirect + dword (8bit, 16bit, 32bit)
+         * register to memoryreg  indirect + byte (8bit, 16bit, 32bit)
+         * register to memoryreg indirect + dword (8bit, 16bit, 32bit)
+         * register to register (8bit, 16bit, 32bit)
+         */
         [Test]
         public void TestImmediateToRegister32() {
             new Move { DestinationReg = Registers.EAX, SourceValue = 1 };
@@ -70,6 +82,19 @@ namespace Indy.IL2CPU.Tests.Assembler.X86 {
             new Move { Size = 16, DestinationReg = Registers.ESI, DestinationIsIndirect = true, SourceValue = 70 };
             new Move { Size = 16, DestinationReg = Registers.ESP, DestinationIsIndirect = true, SourceValue = 71 };
             new Move { Size = 16, DestinationReg = Registers.EBP, DestinationIsIndirect = true, SourceValue = 72 };
+            Verify();
+        }
+
+        [Test]
+        public void TestImmediateToMemorySimple32() {
+            new Move { Size = 32, DestinationReg = Registers.EAX, DestinationIsIndirect = true, SourceValue = 65 };
+            new Move { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, SourceValue = 66 };
+            new Move { Size = 32, DestinationReg = Registers.ECX, DestinationIsIndirect = true, SourceValue = 67 };
+            new Move { Size = 32, DestinationReg = Registers.EDX, DestinationIsIndirect = true, SourceValue = 68 };
+            new Move { Size = 32, DestinationReg = Registers.EDI, DestinationIsIndirect = true, SourceValue = 69 };
+            new Move { Size = 32, DestinationReg = Registers.ESI, DestinationIsIndirect = true, SourceValue = 70 };
+            new Move { Size = 32, DestinationReg = Registers.ESP, DestinationIsIndirect = true, SourceValue = 71 };
+            new Move { Size = 32, DestinationReg = Registers.EBP, DestinationIsIndirect = true, SourceValue = 72 };
             Verify();
         }
     }
