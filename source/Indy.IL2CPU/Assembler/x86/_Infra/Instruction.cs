@@ -317,6 +317,9 @@ namespace Indy.IL2CPU.Assembler.X86 {
 
         private static byte[] GetData(Indy.IL2CPU.Assembler.Assembler aAssembler, InstructionWithDestinationAndSourceAndSize aInstruction, InstructionData aInstructionData) {
             var xEncodingOption = GetInstructionEncodingOption(aInstruction, aInstructionData);
+            if(aInstruction.ToString() == "mov word [ESP], 0x47") {
+             Console.Write("");   
+            }
             ulong xSize = 0;
             Instruction.DetermineSize(aInstruction, aInstructionData, out xSize);
             if(xSize==0) {
@@ -338,7 +341,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             Array.Copy(xEncodingOption.OpCode, 0, xBuffer, xExtraOffset, xEncodingOption.OpCode.Length);
             byte? xSIB = null;
             if (xEncodingOption.NeedsModRMByte) {
-                xBuffer[xEncodingOption.OpCode.Length] = EncodeModRMByte(aInstruction.DestinationReg, aInstruction.DestinationIsIndirect, aInstruction.DestinationDisplacement > 0, aInstruction.DestinationDisplacement > 255, out xSIB);
+                xBuffer[xEncodingOption.OpCode.Length + xExtraOffset] = EncodeModRMByte(aInstruction.DestinationReg, aInstruction.DestinationIsIndirect, aInstruction.DestinationDisplacement > 0, aInstruction.DestinationDisplacement > 255, out xSIB);
                 //byte 
                 // = EncodeModRMByte()
                 //if(aInstruction.DestinationReg != Guid.Empty && !aInstruction.DestinationIsIndirect) {
@@ -349,11 +352,11 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 //}
                 // todo: add more ModRM stuff
             }
-            if (aInstruction.DestinationReg != Guid.Empty) {
+            if (aInstruction.DestinationReg != Guid.Empty && !xEncodingOption.NeedsModRMByte) {
                 xBuffer[xEncodingOption.DestinationRegByte + xExtraOffset] |= (byte)(EncodeRegister(aInstruction.DestinationReg) << xEncodingOption.DestinationRegBitShiftLeft);
             }
             if(xSIB!=null) {
-                xBuffer[xEncodingOption.OpCode.Length + 1] = xSIB.Value;
+                xBuffer[xEncodingOption.OpCode.Length + xExtraOffset + 1] = xSIB.Value;
                 xExtraOffset++;
             }
             // todo: add more options
@@ -366,7 +369,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             }
             if (xEncodingOption.OperandSizeByte.HasValue) {
                 if (aInstruction.Size > 8) {
-                    xBuffer[xEncodingOption.OperandSizeByte.Value + xExtraOffset] |= (byte)(1 << xEncodingOption.OperandSizeBitShiftLeft);
+                    xBuffer[xEncodingOption.OperandSizeByte.Value + xOpCodeOffset] |= (byte)(1 << xEncodingOption.OperandSizeBitShiftLeft);
                 }
             }
 
