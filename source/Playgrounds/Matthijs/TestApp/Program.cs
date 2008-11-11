@@ -1,4 +1,4 @@
-﻿//#define BINARY
+﻿#define BINARY
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,14 +12,70 @@ namespace TestApp {
     class Program {
         class Renderer : Y86 {
             public void DoRender() {
-                new Move { Size = 32, DestinationReg = Registers.EAX, DestinationIsIndirect = true, SourceValue = 65 };
-                new Move { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, SourceValue = 66 };
-                new Move { Size = 32, DestinationReg = Registers.ECX, DestinationIsIndirect = true, SourceValue = 67 };
-                new Move { Size = 32, DestinationReg = Registers.EDX, DestinationIsIndirect = true, SourceValue = 68 };
-                new Move { Size = 32, DestinationReg = Registers.EDI, DestinationIsIndirect = true, SourceValue = 69 };
-                new Move { Size = 32, DestinationReg = Registers.ESI, DestinationIsIndirect = true, SourceValue = 70 };
-                new Move { Size = 32, DestinationReg = Registers.ESP, DestinationIsIndirect = true, SourceValue = 71 };
-                new Move { Size = 32, DestinationReg = Registers.EBP, DestinationIsIndirect = true, SourceValue = 72 };
+                new Move { DestinationReg = Registers.AL, SourceReg = Registers.AL };
+                new Move { DestinationReg = Registers.AL, SourceReg = Registers.AH };
+                new Move { DestinationReg = Registers.AL, SourceReg = Registers.BL };
+                new Move { DestinationReg = Registers.AL, SourceReg = Registers.BH };
+                new Move { DestinationReg = Registers.AL, SourceReg = Registers.CL };
+                new Move { DestinationReg = Registers.AL, SourceReg = Registers.CH };
+                new Move { DestinationReg = Registers.AL, SourceReg = Registers.DL };
+                new Move { DestinationReg = Registers.AL, SourceReg = Registers.DH };
+                new Move { DestinationReg = Registers.AH, SourceReg = Registers.AL };
+                new Move { DestinationReg = Registers.AH, SourceReg = Registers.AH };
+                new Move { DestinationReg = Registers.AH, SourceReg = Registers.BL };
+                new Move { DestinationReg = Registers.AH, SourceReg = Registers.BH };
+                new Move { DestinationReg = Registers.AH, SourceReg = Registers.CL };
+                new Move { DestinationReg = Registers.AH, SourceReg = Registers.CH };
+                new Move { DestinationReg = Registers.AH, SourceReg = Registers.DL };
+                new Move { DestinationReg = Registers.AH, SourceReg = Registers.DH };
+                new Move { DestinationReg = Registers.BL, SourceReg = Registers.AL };
+                new Move { DestinationReg = Registers.BL, SourceReg = Registers.AH };
+                new Move { DestinationReg = Registers.BL, SourceReg = Registers.BL };
+                new Move { DestinationReg = Registers.BL, SourceReg = Registers.BH };
+                new Move { DestinationReg = Registers.BL, SourceReg = Registers.CL };
+                new Move { DestinationReg = Registers.BL, SourceReg = Registers.CH };
+                new Move { DestinationReg = Registers.BL, SourceReg = Registers.DL };
+                new Move { DestinationReg = Registers.BL, SourceReg = Registers.DH };
+                new Move { DestinationReg = Registers.BH, SourceReg = Registers.AL };
+                new Move { DestinationReg = Registers.BH, SourceReg = Registers.AH };
+                new Move { DestinationReg = Registers.BH, SourceReg = Registers.BL };
+                new Move { DestinationReg = Registers.BH, SourceReg = Registers.BH };
+                new Move { DestinationReg = Registers.BH, SourceReg = Registers.CL };
+                new Move { DestinationReg = Registers.BH, SourceReg = Registers.CH };
+                new Move { DestinationReg = Registers.BH, SourceReg = Registers.DL };
+                new Move { DestinationReg = Registers.BH, SourceReg = Registers.DH };
+                new Move { DestinationReg = Registers.CL, SourceReg = Registers.AL };
+                new Move { DestinationReg = Registers.CL, SourceReg = Registers.AH };
+                new Move { DestinationReg = Registers.CL, SourceReg = Registers.BL };
+                new Move { DestinationReg = Registers.CL, SourceReg = Registers.BH };
+                new Move { DestinationReg = Registers.CL, SourceReg = Registers.CL };
+                new Move { DestinationReg = Registers.CL, SourceReg = Registers.CH };
+                new Move { DestinationReg = Registers.CL, SourceReg = Registers.DL };
+                new Move { DestinationReg = Registers.CL, SourceReg = Registers.DH };
+                new Move { DestinationReg = Registers.CH, SourceReg = Registers.AL };
+                new Move { DestinationReg = Registers.CH, SourceReg = Registers.AH };
+                new Move { DestinationReg = Registers.CH, SourceReg = Registers.BL };
+                new Move { DestinationReg = Registers.CH, SourceReg = Registers.BH };
+                new Move { DestinationReg = Registers.CH, SourceReg = Registers.CL };
+                new Move { DestinationReg = Registers.CH, SourceReg = Registers.CH };
+                new Move { DestinationReg = Registers.CH, SourceReg = Registers.DL };
+                new Move { DestinationReg = Registers.CH, SourceReg = Registers.DH };
+                new Move { DestinationReg = Registers.DL, SourceReg = Registers.AL };
+                new Move { DestinationReg = Registers.DL, SourceReg = Registers.AH };
+                new Move { DestinationReg = Registers.DL, SourceReg = Registers.BL };
+                new Move { DestinationReg = Registers.DL, SourceReg = Registers.BH };
+                new Move { DestinationReg = Registers.DL, SourceReg = Registers.CL };
+                new Move { DestinationReg = Registers.DL, SourceReg = Registers.CH };
+                new Move { DestinationReg = Registers.DL, SourceReg = Registers.DL };
+                new Move { DestinationReg = Registers.DL, SourceReg = Registers.DH };
+                new Move { DestinationReg = Registers.DH, SourceReg = Registers.AL };
+                new Move { DestinationReg = Registers.DH, SourceReg = Registers.AH };
+                new Move { DestinationReg = Registers.DH, SourceReg = Registers.BL };
+                new Move { DestinationReg = Registers.DH, SourceReg = Registers.BH };
+                new Move { DestinationReg = Registers.DH, SourceReg = Registers.CL };
+                new Move { DestinationReg = Registers.DH, SourceReg = Registers.CH };
+                new Move { DestinationReg = Registers.DH, SourceReg = Registers.DL };
+                new Move { DestinationReg = Registers.DH, SourceReg = Registers.DH };
 
             }
         }

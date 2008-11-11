@@ -53,7 +53,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 /// <summary>
                 /// the index in OpCode where the DestinationReg bit is encoded
                 /// </summary>
-                public byte DestinationRegByte;
+                public byte? DestinationRegByte;
                 /// <summary>
                 /// the amount of bits the DestinationReg bits gets shifted to left, if neccessary
                 /// </summary>
@@ -75,11 +75,19 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 /// </summary>
                 public Guid? SourceReg;
                 /// <summary>
-                /// is this EncodingOption valid for situations where the Destination operand is memory?
+                /// the index in OpCode where the SourceReg bit is encoded
+                /// </summary>
+                public byte? SourceRegByte;
+                /// <summary>
+                /// the amount of bits the SourceReg bits gets shifted to left, if necessary
+                /// </summary>
+                public byte SourceRegBitShiftLeft;
+                /// <summary>
+                /// is this EncodingOption valid for situations where the Source operand is memory?
                 /// </summary>
                 public bool SourceMemory;
                 /// <summary>
-                /// is this EncodingOption valid for situations where the Destination is an immediate value
+                /// is this EncodingOption valid for situations where the Source is an immediate value
                 /// </summary>
                 public bool SourceImmediate;
 
@@ -352,8 +360,11 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 //}
                 // todo: add more ModRM stuff
             }
-            if (aInstruction.DestinationReg != Guid.Empty && !xEncodingOption.NeedsModRMByte) {
-                xBuffer[xEncodingOption.DestinationRegByte + xExtraOffset] |= (byte)(EncodeRegister(aInstruction.DestinationReg) << xEncodingOption.DestinationRegBitShiftLeft);
+            if (aInstruction.DestinationReg != Guid.Empty && xEncodingOption.DestinationRegByte.HasValue && !xEncodingOption.NeedsModRMByte) {
+                xBuffer[xEncodingOption.DestinationRegByte.Value + xExtraOffset] |= (byte)(EncodeRegister(aInstruction.DestinationReg) << xEncodingOption.DestinationRegBitShiftLeft);
+            }
+            if (aInstruction.SourceReg != Guid.Empty && xEncodingOption.SourceRegByte.HasValue) {
+                xBuffer[xEncodingOption.SourceRegByte.Value + xExtraOffset] |= (byte)(EncodeRegister(aInstruction.SourceReg) << xEncodingOption.SourceRegBitShiftLeft);
             }
             if(xSIB!=null) {
                 xBuffer[xEncodingOption.OpCode.Length + xExtraOffset + 1] = xSIB.Value;

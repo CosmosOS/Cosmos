@@ -91,6 +91,20 @@
   <ItemGroup>
     <EmbeddedResource Include="Assembler\X86\VerificationData\MoveTests\ImmediateToMemorySimple32.bin" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assembler\X86\VerificationData\MoveTests\RegisterToRegister16.bin" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\MoveTests\RegisterToRegister32.bin" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assembler\X86\VerificationData\MoveTests\RegisterToRegister16.asm" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\MoveTests\RegisterToRegister32.asm" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assembler\X86\VerificationData\MoveTests\RegisterToRegister8.bin" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assembler\X86\VerificationData\MoveTests\RegisterToRegister8.asm" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

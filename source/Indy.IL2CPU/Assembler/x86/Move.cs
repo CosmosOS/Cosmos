@@ -6,13 +6,13 @@ using System.Text;
 namespace Indy.IL2CPU.Assembler.X86 {
     [OpCode("mov")]
 	public class Move: InstructionWithDestinationAndSourceAndSize {
-        public static void InitializeEncodingData(Instruction.InstructionData aData){
+        public static void InitializeEncodingData(Instruction.InstructionData aData) {
             //aData.DefaultSize = InstructionSize.DWord;
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0xB0 },
                 //NeedsModRMByte=true,
-                AllowedSizes=InstructionSizes.DWord,
-                OperandSizeByte=0,
+                AllowedSizes = InstructionSizes.DWord,
+                OperandSizeByte = 0,
                 OperandSizeBitShiftLeft = 3,
                 DestinationReg = Guid.Empty,
                 DestinationRegByte = 0,
@@ -27,9 +27,15 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 SourceImmediate = true,
                 DestinationRegByte = 1,
                 DestinationMemory = true,
-                DestinationReg=Registers.ESP
-                
+                DestinationReg = Registers.ESP
             });  // immediate to memory
+            aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
+                OpCode = new byte[] { 0x88, 0xC0 },
+                OperandSizeByte = 0,
+                SourceReg=Guid.Empty,
+                DestinationRegByte = 1,
+                DestinationReg=Guid.Empty,
+            });
         }
 	}
 }
