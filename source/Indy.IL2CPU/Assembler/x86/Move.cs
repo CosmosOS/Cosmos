@@ -25,7 +25,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 OperandSizeByte = 0,
                 OperandSizeBitShiftLeft = 0,
                 SourceImmediate = true,
-                DestinationRegByte = 1,
+                //DestinationRegByte = 1,
                 DestinationMemory = true,
                 DestinationReg = Registers.ESP
             });  // immediate to memory
@@ -33,8 +33,10 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 OpCode = new byte[] { 0x88, 0xC0 },
                 OperandSizeByte = 0,
                 SourceReg=Guid.Empty,
+                SourceRegByte=1,
+                SourceRegBitShiftLeft = 3,
                 DestinationRegByte = 1,
-                DestinationReg=Guid.Empty,
+                DestinationReg=Guid.Empty
             });
         }
 	}

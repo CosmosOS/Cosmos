@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
-    public abstract class InstructionWithDestinationAndSourceAndSize : InstructionWithDestinationAndSource {
+    public abstract class InstructionWithDestinationAndSourceAndSize : InstructionWithDestinationAndSource, IInstructionWithSize {
         // todo: do all instructions with two operands have a size?
         private byte mSize;
         public byte Size {

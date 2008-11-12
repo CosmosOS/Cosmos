@@ -6,6 +6,7 @@ using System.Text;
 using System.Reflection;
 
 namespace Indy.IL2CPU.Assembler.X86 {
+    // todo: cache the EncodingOption and InstructionData instances..
     public abstract class Instruction : Indy.IL2CPU.Assembler.Instruction {
         [Flags]
         public enum InstructionSizes {
@@ -147,6 +148,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
 
         protected Instruction() { 
         }
+
         protected static string SizeToString(byte aSize) {
             switch (aSize) {
                 case 8:
@@ -162,86 +164,272 @@ namespace Indy.IL2CPU.Assembler.X86 {
             }
         }
 
-        public override bool DetermineSize(Indy.IL2CPU.Assembler.Assembler aAssembler, out ulong aSize) {
-            InstructionData xInstructionData = null;
+        private static bool GetEffectiveInstructionInfo(Instruction aInstruction, IInstructionWithDestination aInstructionWithDestination, IInstructionWithSize aInstructionWithSize, IInstructionWithSource aInstructionWithSource, out InstructionData aInstructionData, out InstructionData.InstructionEncodingOption aEncodingOption) {
             using (mInstructionDatasLocker.AcquireReaderLock()) {
-                mInstructionDatas.TryGetValue(this.GetType(), out xInstructionData);
+                mInstructionDatas.TryGetValue(aInstruction.GetType(), out aInstructionData);
             }
-            if (xInstructionData == null) {
-                return base.DetermineSize(aAssembler, out aSize);
-            }
-            var xWithDestAndSourceAndSize = this as InstructionWithDestinationAndSourceAndSize;
-            if (xWithDestAndSourceAndSize != null) {
-                return DetermineSize(xWithDestAndSourceAndSize, xInstructionData, out aSize);
-            }
-            var xWithDestAndSource = this as InstructionWithDestinationAndSource;
-            if (xWithDestAndSource != null) {
-                return base.DetermineSize(aAssembler, out aSize);
-            }
-            var xWithDestAndSize = this as InstructionWithDestinationAndSize;
-            if (xWithDestAndSize != null) {
-                return base.DetermineSize(aAssembler, out aSize);
+            if (aInstructionData == null) {
+                aEncodingOption = null;
+                aInstructionData=null;
+                return false;
             } 
-            var xWithDest = this as InstructionWithDestination;
-            if (xWithDest != null) {
-                return base.DetermineSize(aAssembler, out aSize);
-            }
-            if (xInstructionData.EncodingOptions.Count > 0) {
-                // todo: improve
-                aSize = (ulong)xInstructionData.EncodingOptions[0].OpCode.Length;
-                return true;
-            }
-            aSize = 0;
-            return false;
-        }
-
-        private static bool DetermineSize(InstructionWithDestinationAndSourceAndSize aInstruction, InstructionData aInstructionData, out ulong aSize) {
-            var xTheEncodingOption = GetInstructionEncodingOption(aInstruction, aInstructionData);
-            aSize = (ulong)xTheEncodingOption.OpCode.Length;
-            if (xTheEncodingOption.NeedsModRMByte) {
-                aSize += 1;
-                byte? xSIB = null;
-                EncodeModRMByte(aInstruction.DestinationReg, aInstruction.DestinationIsIndirect, aInstruction.DestinationDisplacement > 0, aInstruction.DestinationDisplacement > 255, out xSIB);
-                if (xSIB != null) {
-                    aSize++;
+            aEncodingOption=null;
+            for (int i = 0; i < aInstructionData.EncodingOptions.Count; i++) {
+                var xEncodingOption = aInstructionData.EncodingOptions[i];
+                if (!(((xEncodingOption.DestinationMemory || xEncodingOption.DestinationReg.HasValue) && aInstructionWithDestination.DestinationReg != Guid.Empty) ||
+                     (!(xEncodingOption.DestinationMemory || xEncodingOption.DestinationReg.HasValue) && aInstructionWithDestination.DestinationReg == Guid.Empty))) {
+                    // mismatch
+                    continue;
                 }
+                if ((!((xEncodingOption.DestinationMemory && (aInstructionWithDestination.DestinationValue != null && aInstructionWithDestination.DestinationIsIndirect)) ||
+                      (!xEncodingOption.DestinationMemory && (aInstructionWithDestination.DestinationValue == null && !aInstructionWithDestination.DestinationIsIndirect))) &&
+                     !((xEncodingOption.DestinationMemory && (aInstructionWithDestination.DestinationReg != Guid.Empty && aInstructionWithDestination.DestinationIsIndirect)) ||
+                      (!xEncodingOption.DestinationMemory && (aInstructionWithDestination.DestinationReg != Guid.Empty && !aInstructionWithDestination.DestinationIsIndirect)))) && aInstructionWithDestination.DestinationIsIndirect) {
+                    continue;
+                }
+                if (!((xEncodingOption.DestinationImmediate && aInstructionWithDestination.DestinationValue != null) ||
+                    (!xEncodingOption.DestinationImmediate && aInstructionWithDestination.DestinationValue == null))) {
+                    continue;
+                }
+                if (!((xEncodingOption.SourceReg.HasValue && aInstructionWithSource.SourceReg != Guid.Empty) ||
+                     (!xEncodingOption.SourceReg.HasValue && aInstructionWithSource.SourceReg == Guid.Empty))) {
+                    // mismatch
+                    continue;
+                }
+                if (!((xEncodingOption.SourceMemory && (aInstructionWithSource.SourceValue != null && aInstructionWithSource.SourceIsIndirect)) ||
+                      (!xEncodingOption.SourceMemory && (aInstructionWithSource.SourceValue == null && !aInstructionWithSource.SourceIsIndirect))) && aInstructionWithSource.SourceIsIndirect) {
+                    continue;
+                }
+                if (!((xEncodingOption.SourceImmediate && aInstructionWithSource.SourceValue != null) ||
+                    (!xEncodingOption.SourceImmediate && aInstructionWithSource.SourceValue == null))) {
+                    continue;
+                }
+                aEncodingOption = xEncodingOption;
+                break;
             }
-            if (aInstruction.DestinationValue.HasValue) {
-                aSize += (ulong)aInstruction.Size / 8;
+            if (aEncodingOption == null) {
+                throw new Exception("No valid EncodingOption found!");
             }
-            if(aInstruction.DestinationRef != null) {
-                aSize += 4;
-            }
-            if (aInstruction.SourceValue.HasValue) {
-                aSize += (ulong)aInstruction.Size / 8;
-            }
-            if (aInstruction.SourceRef != null) {
-                aSize += 4;
-            }
-            //if(aInstruction.DestinationReg != Guid.Empty) {
-            //    byte? xSIB;
-            //    EncodeRegister(aInstruction.DestinationReg);
-            //    //if (xSIB.HasValue) {
-            //    //    aSize++;
-            //    //}
-            //}
-            //if (aInstruction.SourceReg != Guid.Empty) {
-            //    byte? xSIB;
-            //    EncodeRegister(aInstruction.SourceReg, out xSIB);
-            //    if (xSIB.HasValue) {
-            //        aSize++;
-            //    }
-            //}
-            if (xTheEncodingOption.DefaultSize == InstructionSize.DWord && aInstruction.Size == 16) {
-                aSize += 1;
-            }
-            if (xTheEncodingOption.DefaultSize == InstructionSize.Word && aInstruction.Size == 32) {
-                aSize += 1;
-            }
-
             return true;
         }
 
+        private static bool DetermineSize(Indy.IL2CPU.Assembler.Assembler aAssembler, out ulong aSize, Instruction aInstruction, IInstructionWithDestination aInstructionWithDestination, IInstructionWithSize aInstructionWithSize, IInstructionWithSource aInstructionWithSource, InstructionData aInstructionData, InstructionData.InstructionEncodingOption aEncodingOption) {
+            aSize = (ulong)aEncodingOption.OpCode.Length;
+            if (aEncodingOption.NeedsModRMByte) {
+                aSize += 1;
+                if(aInstructionWithDestination!=null && (aInstructionWithDestination.DestinationReg == Registers.EBP || aInstructionWithDestination.DestinationReg == Registers.ESP)) {
+                    aSize++;
+                }
+                else {
+                    if (aInstructionWithSource != null && (aInstructionWithSource.SourceReg == Registers.EBP || aInstructionWithSource.SourceReg == Registers.ESP)) {
+                        aSize++;
+                    }
+                }
+            }
+            if (aInstructionWithDestination!= null && aInstructionWithDestination.DestinationValue.HasValue) {
+                aSize += (ulong)aInstructionWithSize.Size / 8;
+            }
+            if (aInstructionWithDestination != null && aInstructionWithDestination.DestinationRef != null) {
+                aSize += 4;
+            }
+            if (aInstructionWithSource != null && aInstructionWithSource.SourceValue.HasValue) {
+                aSize += (ulong)aInstructionWithSize.Size / 8;
+            }
+            if (aInstructionWithSource!=null && aInstructionWithSource.SourceRef != null) {
+                aSize += 4;
+            }
+            if (aEncodingOption.DefaultSize == InstructionSize.DWord && aInstructionWithSize!=null &&  aInstructionWithSize.Size == 16) {
+                aSize += 1;
+            }
+            if (aEncodingOption.DefaultSize == InstructionSize.Word && aInstructionWithSize != null && aInstructionWithSize.Size == 32) {
+                aSize += 1;
+            }
+            aInstruction.mDataSize=aSize;
+            return true;
+        }
+        public override bool DetermineSize(Indy.IL2CPU.Assembler.Assembler aAssembler, out ulong aSize) {
+            var xInstructionWithDestination = this as IInstructionWithDestination;
+            var xInstructionWithSource = this as IInstructionWithSource;
+            var xInstructionWithSize = this as IInstructionWithSize;
+            InstructionData xInstructionData = null;
+            InstructionData.InstructionEncodingOption xEncodingOption = null;
+            if(!GetEffectiveInstructionInfo(this, xInstructionWithDestination, xInstructionWithSize, xInstructionWithSource, out xInstructionData, out xEncodingOption )) {
+                return base.DetermineSize(aAssembler, out aSize);
+            }
+            return DetermineSize(aAssembler, out aSize, this, xInstructionWithDestination, xInstructionWithSize, xInstructionWithSource, xInstructionData, xEncodingOption);
+        }
+
+        public override bool IsComplete(Indy.IL2CPU.Assembler.Assembler aAssembler) {
+            var xWithDest = this as IInstructionWithDestination;
+            var xWithSource = this as IInstructionWithSource;
+            var xWithSize = this as IInstructionWithSize;
+            ulong xAddress;
+            if (xWithDest != null) {
+                if (xWithDest.DestinationRef != null && !xWithDest.DestinationRef.Resolve(aAssembler, out xAddress)) {
+                    return false;
+                }
+            }
+            if(xWithSource != null) {
+                if (xWithSource.SourceRef != null && !xWithSource.SourceRef.Resolve(aAssembler, out xAddress)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private ulong? mDataSize;
+
+        public override ulong? ActualAddress {
+            get {
+                if (!StartAddress.HasValue) {
+                    return null;
+                }
+                if (!mDataSize.HasValue) {
+                    return null;
+                }
+                return StartAddress.Value + mDataSize.Value;
+            }
+        }
+
+        public override byte[] GetData(Indy.IL2CPU.Assembler.Assembler aAssembler) {
+            var xInstructionWithDestination = this as IInstructionWithDestination;
+            var xInstructionWithSource = this as IInstructionWithSource;
+            var xInstructionWithSize = this as IInstructionWithSize;
+            InstructionData xInstructionData = null;
+            InstructionData.InstructionEncodingOption xEncodingOption = null;
+            if (!GetEffectiveInstructionInfo(this, xInstructionWithDestination, xInstructionWithSize, xInstructionWithSource, out xInstructionData, out xEncodingOption)) {
+                return base.GetData(aAssembler);
+            }
+            return GetData(aAssembler, this, xInstructionWithDestination, xInstructionWithSize, xInstructionWithSource, xInstructionData, xEncodingOption);
+        }
+
+        private byte[] GetData(Indy.IL2CPU.Assembler.Assembler aAssembler, Instruction aInstruction, IInstructionWithDestination aInstructionWithDestination, IInstructionWithSize aInstructionWithSize, IInstructionWithSource aInstructionWithSource, InstructionData aInstructionData, InstructionData.InstructionEncodingOption aEncodingOption) {
+            if (aInstruction.ToString() == "mov word [ESP], 0x47") {
+                Console.Write("");
+            }
+            ulong xSize = 0;
+            Instruction.DetermineSize(aAssembler, out xSize, aInstruction, aInstructionWithDestination, aInstructionWithSize, aInstructionWithSource, aInstructionData, aEncodingOption);
+            if (xSize == 0) {
+                return new byte[0];
+            }
+            var xBuffer = new byte[xSize];
+            int xExtraOffset = 0;
+            int xOpCodeOffset = 0;
+            if (aInstructionWithSize != null) {
+                if (aEncodingOption.DefaultSize == InstructionSize.DWord && aInstructionWithSize.Size == 16) {
+                    xOpCodeOffset += 1;
+                    xExtraOffset++;
+                    xBuffer[0] = 0x66;
+                }
+                if (aEncodingOption.DefaultSize == InstructionSize.Word && aInstructionWithSize.Size == 32) {
+                    xOpCodeOffset += 1;
+                    xExtraOffset++;
+                    xBuffer[0] = 0x66;
+                }
+            }
+            Array.Copy(aEncodingOption.OpCode, 0, xBuffer, xExtraOffset, aEncodingOption.OpCode.Length);
+            if (aInstructionWithDestination != null) {
+                if (aInstructionWithDestination.DestinationReg != Guid.Empty && aEncodingOption.DestinationRegByte.HasValue && !aEncodingOption.NeedsModRMByte) {
+                    xBuffer[aEncodingOption.DestinationRegByte.Value + xExtraOffset] |= (byte)(EncodeRegister(aInstructionWithDestination.DestinationReg) << aEncodingOption.DestinationRegBitShiftLeft);
+                }
+            }
+            if (aInstructionWithSource != null) {
+                if (aInstructionWithSource.SourceReg != Guid.Empty && aEncodingOption.SourceRegByte.HasValue) {
+                    xBuffer[aEncodingOption.SourceRegByte.Value + xExtraOffset] |= (byte)(EncodeRegister(aInstructionWithSource.SourceReg) << aEncodingOption.SourceRegBitShiftLeft);
+                }
+            }
+            if (aEncodingOption.NeedsModRMByte) {
+                xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] = 0;
+                byte xModRM = 0;
+                if (aInstructionWithDestination != null) {
+                    xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= EncodeRegister(aInstructionWithDestination.DestinationReg);
+                    byte? xSIB = null;
+                    //if (!aInstructionWithDestination.DestinationIsIndirect) {
+                        if (aInstructionWithDestination.DestinationReg == Registers.EBP) {
+                            xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= 1 << 6;
+                            xSIB = 0;
+                        }
+                        if (aInstructionWithDestination.DestinationReg == Registers.ESP) {
+                            xSIB = 0x24;
+                        }
+                        //xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= 3 << 6;
+                    //}
+                    if(aInstructionWithSource != null && aInstructionWithSource.SourceReg!=Guid.Empty) {
+                        xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |=(byte)(EncodeRegister(aInstructionWithSource.SourceReg) << 3);
+                    }
+                    //SBArray.Resize(ref xBuffer, xBuffer.Length + 1);
+                    if (aInstructionWithDestination.DestinationIsIndirect && aInstructionWithDestination.DestinationDisplacement > 0) {
+                        throw new NotImplementedException("Add support for offsets");
+                    }
+                    if(xSIB != null){
+                        xExtraOffset++;
+                        xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] = xSIB.Value;
+                    }
+                }
+                //EncodeModRMByte(aInstruction.DestinationReg, aInstruction.DestinationIsIndirect, aInstruction.DestinationDisplacement > 0, aInstruction.DestinationDisplacement > 255, out xSIB);
+                
+            }
+            
+            // todo: add more options
+            if (aInstructionWithSource.SourceValue.HasValue) {
+                int xOffset = aEncodingOption.OpCode.Length + xExtraOffset;
+                if (aEncodingOption.NeedsModRMByte) {
+                    xOffset++;
+                }
+                var xInstrSize = 0;
+                if(aInstructionWithSize!=null) {
+                    xInstrSize = aInstructionWithSize.Size/8;   
+                }else {
+                    throw new NotImplementedException("size not known");
+                }
+                Array.Copy(BitConverter.GetBytes(aInstructionWithSource.SourceValue.Value), 0, xBuffer, xOffset, xInstrSize);
+            }
+            if (aInstructionWithSize != null) {
+                if (aEncodingOption.OperandSizeByte.HasValue) {
+                    if (aInstructionWithSize.Size > 8) {
+                        xBuffer[aEncodingOption.OperandSizeByte.Value + xOpCodeOffset] |= (byte)(1 << aEncodingOption.OperandSizeBitShiftLeft);
+                    }
+                }
+            }
+
+
+            //
+            return xBuffer;
+        }
+
+        private static byte EncodeRegister(Guid aRegister) {
+            // todo: implement support for other registers
+            if (aRegister == Registers.EAX) return 0x0;
+            if (aRegister == Registers.ECX) return 0x1;
+            if (aRegister == Registers.EDX) return 0x2;
+            if (aRegister == Registers.EBX) return 0x3;
+            if (aRegister == Registers.ESP) return 0x4;
+            if (aRegister == Registers.EBP) return 0x5;
+            if (aRegister == Registers.ESI) return 0x6;
+            if (aRegister == Registers.EDI) return 0x7;
+
+            if (aRegister == Registers.AX) return 0x0;
+            if (aRegister == Registers.CX) return 0x1;
+            if (aRegister == Registers.DX) return 0x2;
+            if (aRegister == Registers.BX) return 0x3;
+            if (aRegister == Registers.SP) return 0x4;
+            if (aRegister == Registers.BP) return 0x5;
+            if (aRegister == Registers.SI) return 0x6;
+            if (aRegister == Registers.DI) return 0x7;
+
+            if (aRegister == Registers.AL) return 0x0;
+            if (aRegister == Registers.CL) return 0x1;
+            if (aRegister == Registers.DL) return 0x2;
+            if (aRegister == Registers.BL) return 0x3;
+            if (aRegister == Registers.AH) return 0x4;
+            if (aRegister == Registers.CH) return 0x5;
+            if (aRegister == Registers.DH) return 0x6;
+            if (aRegister == Registers.BH) return 0x7;
+            throw new Exception("Register not supported!");
+        }
+
+
+        /*
         private static bool SizeIsSelected(InstructionSizes aSizes, byte aSize) {
             switch(aSize) {
                 case 8: return (aSizes & InstructionSizes.Byte) != 0;
@@ -249,47 +437,6 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 case 32: return (aSizes & InstructionSizes.Byte) != 0;
                 default: throw new NotImplementedException();
             }
-        }
-
-        private static InstructionData.InstructionEncodingOption GetInstructionEncodingOption(InstructionWithDestinationAndSourceAndSize aInstruction, InstructionData aInstructionData) {
-            InstructionData.InstructionEncodingOption xTheEncodingOption = null;
-            for (int i = 0; i < aInstructionData.EncodingOptions.Count; i++) {
-                var xEncodingOption = aInstructionData.EncodingOptions[i];
-                if (!(((xEncodingOption.DestinationMemory || xEncodingOption.DestinationReg.HasValue) && aInstruction.DestinationReg != Guid.Empty) ||
-                     (!(xEncodingOption.DestinationMemory || xEncodingOption.DestinationReg.HasValue) && aInstruction.DestinationReg == Guid.Empty))) {
-                    // mismatch
-                    continue;
-                }
-                if ((!((xEncodingOption.DestinationMemory && (aInstruction.DestinationValue != null && aInstruction.DestinationIsIndirect)) ||
-                      (!xEncodingOption.DestinationMemory && (aInstruction.DestinationValue == null && !aInstruction.DestinationIsIndirect))) &&
-                     !((xEncodingOption.DestinationMemory && (aInstruction.DestinationReg != Guid.Empty && aInstruction.DestinationIsIndirect)) ||
-                      (!xEncodingOption.DestinationMemory && (aInstruction.DestinationReg != Guid.Empty && !aInstruction.DestinationIsIndirect)))) && aInstruction.DestinationIsIndirect) {
-                    continue;
-                }
-                if (!((xEncodingOption.DestinationImmediate && aInstruction.DestinationValue != null) ||
-                    (!xEncodingOption.DestinationImmediate && aInstruction.DestinationValue == null))) {
-                    continue;
-                }
-                if (!((xEncodingOption.SourceReg.HasValue && aInstruction.SourceReg != Guid.Empty) ||
-                     (!xEncodingOption.SourceReg.HasValue && aInstruction.SourceReg == Guid.Empty))) {
-                    // mismatch
-                    continue;
-                }
-                if (!((xEncodingOption.SourceMemory && (aInstruction.SourceValue != null && aInstruction.SourceIsIndirect)) ||
-                      (!xEncodingOption.SourceMemory && (aInstruction.SourceValue == null && !aInstruction.SourceIsIndirect))) && aInstruction.SourceIsIndirect) {
-                    continue;
-                }
-                if (!((xEncodingOption.SourceImmediate && aInstruction.SourceValue != null) ||
-                    (!xEncodingOption.SourceImmediate && aInstruction.SourceValue == null))) {
-                    continue;
-                }
-                xTheEncodingOption = xEncodingOption;
-                break;
-            }
-            if (xTheEncodingOption == null) {
-                throw new Exception("No valid EncodingOption found!");
-            }
-            return xTheEncodingOption;
         }
 
         public override byte[] GetData(Indy.IL2CPU.Assembler.Assembler aAssembler) {
@@ -408,92 +555,11 @@ namespace Indy.IL2CPU.Assembler.X86 {
             return xModRM;
         }
 
-        private static byte EncodeRegister(Guid aRegister) {
-            // todo: implement support for other registers
-            if (aRegister == Registers.EAX) return 0x0;
-            if (aRegister == Registers.ECX) return 0x1;
-            if (aRegister == Registers.EDX) return 0x2;
-            if (aRegister == Registers.EBX) return 0x3;
-            if (aRegister == Registers.ESP) return 0x4;
-            if (aRegister == Registers.EBP) return 0x5;
-            if (aRegister == Registers.ESI) return 0x6;
-            if (aRegister == Registers.EDI) return 0x7;
-
-            if (aRegister == Registers.AX) return 0x0;
-            if (aRegister == Registers.CX) return 0x1;
-            if (aRegister == Registers.DX) return 0x2;
-            if (aRegister == Registers.BX) return 0x3;
-            if (aRegister == Registers.SP) return 0x4;
-            if (aRegister == Registers.BP) return 0x5;
-            if (aRegister == Registers.SI) return 0x6;
-            if (aRegister == Registers.DI) return 0x7;
-
-            if (aRegister == Registers.AL) return 0x0;
-            if (aRegister == Registers.CL) return 0x1;
-            if (aRegister == Registers.DL) return 0x2;
-            if (aRegister == Registers.BL) return 0x3;
-            if (aRegister == Registers.AH) return 0x4;
-            if (aRegister == Registers.CH) return 0x5;
-            if (aRegister == Registers.DH) return 0x6;
-            if (aRegister == Registers.BH) return 0x7;
-            throw new Exception("Register not supported!");
-        }
-
-        private ulong? mDataSize;
-
-        public override bool IsComplete(Indy.IL2CPU.Assembler.Assembler aAssembler) {
-            var xWithDestAndSourceAndSize = this as InstructionWithDestinationAndSourceAndSize;
-            if (xWithDestAndSourceAndSize != null) {
-                ulong xAddress;
-                if (xWithDestAndSourceAndSize.DestinationRef != null && !xWithDestAndSourceAndSize.DestinationRef.Resolve(aAssembler, out xAddress)) {
-                    return false;
-                }
-                if (xWithDestAndSourceAndSize.DestinationRef != null && !xWithDestAndSourceAndSize.SourceRef.Resolve(aAssembler, out xAddress)) {
-                    return false;
-                }
-            }
-            var xWithDestAndSource = this as InstructionWithDestinationAndSource;
-            if (xWithDestAndSource != null) {
-                ulong xAddress;
-                if (xWithDestAndSource.DestinationRef != null && !xWithDestAndSource.DestinationRef.Resolve(aAssembler, out xAddress)) {
-                    return false;
-                }
-                if (xWithDestAndSource.DestinationRef != null && !xWithDestAndSource.SourceRef.Resolve(aAssembler, out xAddress)) {
-                    return false;
-                }
-            }
-            var xWithDestAndSize = this as InstructionWithDestinationAndSize;
-            if (xWithDestAndSize != null) {
-                ulong xAddress;
-                if (xWithDestAndSize.DestinationRef != null && !xWithDestAndSize.DestinationRef.Resolve(aAssembler, out xAddress)) {
-                    return false;
-                }
-            }
-            var xWithDest = this as InstructionWithDestination;
-            if (xWithDest != null) {
-                ulong xAddress;
-                if (xWithDest.DestinationRef!=null && !xWithDest.DestinationRef.Resolve(aAssembler, out xAddress)) {
-                    return false;
-                }
-            }
-            
-            return true;
-        }
-
-        public override ulong? ActualAddress {
-            get {
-                if (!StartAddress.HasValue) {
-                    return null;
-                }
-                if(!mDataSize.HasValue){
-                    return null;
-                }
-                return StartAddress.Value + mDataSize.Value;
-            }
-        }
+        
 
         private static bool IsLargeRegister(Guid aRegister) {
             return Registers.Is32Bit(aRegister);
         }
+         */ 
     }
 }
