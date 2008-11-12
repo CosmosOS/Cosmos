@@ -302,5 +302,122 @@ namespace Indy.IL2CPU.Tests.Assembler.X86 {
             new Move { DestinationReg = Registers.DH, SourceReg = Registers.DH };
             Verify();
         }
+
+        [Test]
+        public void TestImmediateToMemory8BitOffset32BitData() {
+            new Move { DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, SourceValue = 65, Size = 32 };
+            new Move { DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, SourceValue = 65, Size = 32 };
+            new Move { DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, SourceValue = 65, Size = 32 };
+            new Move { DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, SourceValue = 65, Size = 32 };
+            new Move { DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, SourceValue = 65, Size = 32 };
+            new Move { DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, SourceValue = 65, Size = 32 };
+            new Move { DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, SourceValue = 65, Size = 32 };
+            new Move { DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, SourceValue = 65, Size = 32 };
+            Verify();
+        }
+
+        [Test]
+        public void TestImmediateToMemory8BitOffset16BitData() {
+            new Move { DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, SourceValue = 65, Size = 16 };
+            new Move { DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, SourceValue = 65, Size = 16 };
+            new Move { DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, SourceValue = 65, Size = 16 };
+            new Move { DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, SourceValue = 65, Size = 16 };
+            new Move { DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, SourceValue = 65, Size = 16 };
+            new Move { DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, SourceValue = 65, Size = 16 };
+            new Move { DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, SourceValue = 65, Size = 16 };
+            new Move { DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, SourceValue = 65, Size = 16 };
+            Verify();
+        }
+
+        [Test]
+        public void TestImmediateToMemory8BitOffset8BitData() {
+            new Move { DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, SourceValue = 65, Size = 8 };
+            new Move { DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, SourceValue = 65, Size = 8 };
+            new Move { DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, SourceValue = 65, Size = 8 };
+            new Move { DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, SourceValue = 65, Size = 8 };
+            new Move { DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, SourceValue = 65, Size = 8 };
+            new Move { DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, SourceValue = 65, Size = 8 };
+            new Move { DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, SourceValue = 65, Size = 8 };
+            new Move { DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, SourceValue = 65, Size = 8 };
+            Verify();
+        }
+
+        [Test]
+        public void TestImmediateToMemory16BitOffset32BitData() {
+            new Move { DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 1203, SourceValue = 65, Size = 32 };
+            new Move { DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 1203, SourceValue = 65, Size = 32 };
+            new Move { DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 1203, SourceValue = 65, Size = 32 };
+            new Move { DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 1203, SourceValue = 65, Size = 32 };
+            new Move { DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 1203, SourceValue = 65, Size = 32 };
+            new Move { DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 1203, SourceValue = 65, Size = 32 };
+            new Move { DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 1203, SourceValue = 65, Size = 32 };
+            new Move { DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 1203, SourceValue = 65, Size = 32 };
+            Verify();
+        }
+
+        [Test]
+        public void TestImmediateToMemory16BitOffset16BitData() {
+            new Move { DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 1203, SourceValue = 65, Size = 16 };
+            new Move { DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 1203, SourceValue = 65, Size = 16 };
+            new Move { DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 1203, SourceValue = 65, Size = 16 };
+            new Move { DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 1203, SourceValue = 65, Size = 16 };
+            new Move { DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 1203, SourceValue = 65, Size = 16 };
+            new Move { DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 1203, SourceValue = 65, Size = 16 };
+            new Move { DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 1203, SourceValue = 65, Size = 16 };
+            new Move { DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 1203, SourceValue = 65, Size = 16 };
+            Verify();
+        }
+
+        [Test]
+        public void TestImmediateToMemory16BitOffset8BitData() {
+            new Move { DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 1203, SourceValue = 65, Size = 8 };
+            new Move { DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 1203, SourceValue = 65, Size = 8 };
+            new Move { DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 1203, SourceValue = 65, Size = 8 };
+            new Move { DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 1203, SourceValue = 65, Size = 8 };
+            new Move { DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 1203, SourceValue = 65, Size = 8 };
+            new Move { DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 1203, SourceValue = 65, Size = 8 };
+            new Move { DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 1203, SourceValue = 65, Size = 8 };
+            new Move { DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 1203, SourceValue = 65, Size = 8 };
+            Verify();
+        }
+
+        [Test]
+        public void TestImmediateToMemory32BitOffset32BitData() {
+            new Move { DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x56781203, SourceValue = 65, Size = 32 };
+            new Move { DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x56781203, SourceValue = 65, Size = 32 };
+            new Move { DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x56781203, SourceValue = 65, Size = 32 };
+            new Move { DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x56781203, SourceValue = 65, Size = 32 };
+            new Move { DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x56781203, SourceValue = 65, Size = 32 };
+            new Move { DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x56781203, SourceValue = 65, Size = 32 };
+            new Move { DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x56781203, SourceValue = 65, Size = 32 };
+            new Move { DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x56781203, SourceValue = 65, Size = 32 };
+            Verify();
+        }
+
+        [Test]
+        public void TestImmediateToMemory32BitOffset16BitData() {
+            new Move { DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x56781203, SourceValue = 65, Size = 16 };
+            new Move { DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x56781203, SourceValue = 65, Size = 16 };
+            new Move { DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x56781203, SourceValue = 65, Size = 16 };
+            new Move { DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x56781203, SourceValue = 65, Size = 16 };
+            new Move { DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x56781203, SourceValue = 65, Size = 16 };
+            new Move { DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x56781203, SourceValue = 65, Size = 16 };
+            new Move { DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x56781203, SourceValue = 65, Size = 16 };
+            new Move { DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x56781203, SourceValue = 65, Size = 16 };
+            Verify();
+        }
+
+        [Test]
+        public void TestImmediateToMemory32BitOffset8BitData() {
+            new Move { DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x56781203, SourceValue = 65, Size = 8 };
+            new Move { DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x56781203, SourceValue = 65, Size = 8 };
+            new Move { DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x56781203, SourceValue = 65, Size = 8 };
+            new Move { DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x56781203, SourceValue = 65, Size = 8 };
+            new Move { DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x56781203, SourceValue = 65, Size = 8 };
+            new Move { DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x56781203, SourceValue = 65, Size = 8 };
+            new Move { DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x56781203, SourceValue = 65, Size = 8 };
+            new Move { DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x56781203, SourceValue = 65, Size = 8 };
+            Verify();
+        }
     }
 }

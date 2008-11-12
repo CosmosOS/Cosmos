@@ -17,7 +17,11 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 }
             }
             if (aThis.DestinationDisplacement != 0) {
-                xDest += " + " + aThis.DestinationDisplacement;
+                if (aThis.DestinationDisplacement > 255) {
+                    xDest += " + 0x" + aThis.DestinationDisplacement.ToString("X");
+                }else {
+                    xDest += " + " + aThis.DestinationDisplacement;
+                }
             }
             if (aThis.DestinationIsIndirect) {
                 return "[" + xDest + "]";

@@ -1,4 +1,4 @@
-﻿#define BINARY
+﻿//#define BINARY
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,14 +12,15 @@ namespace TestApp {
     class Program {
         class Renderer : Y86 {
             public void DoRender() {
-                //new Move { Size = 32, DestinationReg = Registers.EAX, DestinationIsIndirect = true, SourceValue = 65 };
-                //new Move { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, SourceValue = 66 };
-                //new Move { Size = 32, DestinationReg = Registers.ECX, DestinationIsIndirect = true, SourceValue = 67 };
-                //new Move { Size = 32, DestinationReg = Registers.EDX, DestinationIsIndirect = true, SourceValue = 68 };
-                //new Move { Size = 32, DestinationReg = Registers.EDI, DestinationIsIndirect = true, SourceValue = 69 };
-                //new Move { Size = 32, DestinationReg = Registers.ESI, DestinationIsIndirect = true, SourceValue = 70 };
-                new Move { Size = 32, DestinationReg = Registers.ESP, DestinationIsIndirect = true, SourceValue = 71 };
-               // new Move { Size = 32, DestinationReg = Registers.EBP, DestinationIsIndirect = true, SourceValue = 72 };
+                new Move { DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, SourceValue = 65, Size = 32 };
+                new Move { DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, SourceValue = 65, Size = 32 };
+                new Move { DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, SourceValue = 65, Size = 32 };
+                new Move { DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, SourceValue = 65, Size = 32 };
+                new Move { DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, SourceValue = 65, Size = 32 };
+                new Move { DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, SourceValue = 65, Size = 32 };
+                new Move { DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, SourceValue = 65, Size = 32 };
+                new Move { DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, SourceValue = 65, Size = 32 };
+ 
             }
         }
         static void Main(string[] args) {

@@ -1,0 +1,10 @@
+use32
+org 0x200000
+			mov word [EAX + 0x56781203], 0x41
+			mov word [EBX + 0x56781203], 0x41
+			mov word [ECX + 0x56781203], 0x41
+			mov word [EDX + 0x56781203], 0x41
+			mov word [ESI + 0x56781203], 0x41
+			mov word [EDI + 0x56781203], 0x41
+			mov word [EBP + 0x56781203], 0x41
+			mov word [ESP + 0x56781203], 0x41
