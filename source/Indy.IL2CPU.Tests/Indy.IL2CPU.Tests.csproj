@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assembler\X86\BaseTest.cs" />
+    <Compile Include="Assembler\X86\HaltTests.cs" />
     <Compile Include="Assembler\X86\MoveTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -134,6 +135,12 @@
     <EmbeddedResource Include="Assembler\X86\VerificationData\MoveTests\ImmediateToMemory32BitOffset16BitData.asm" />
     <EmbeddedResource Include="Assembler\X86\VerificationData\MoveTests\ImmediateToMemory32BitOffset32BitData.asm" />
     <EmbeddedResource Include="Assembler\X86\VerificationData\MoveTests\ImmediateToMemory32BitOffset8BitData.asm" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assembler\X86\VerificationData\HaltTests\It.asm" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assembler\X86\VerificationData\HaltTests\It.bin" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

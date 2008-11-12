@@ -1,0 +1,16 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Indy.IL2CPU.Assembler.X86;
+using NUnit.Framework;
+
+namespace Indy.IL2CPU.Tests.Assembler.X86 {
+    [TestFixture]
+    public class HaltTests: BaseTest {
+        public void TestIt() {
+            new Halt();
+            Verify();
+        }
+    }
+}
