@@ -371,18 +371,20 @@ namespace Indy.IL2CPU.Assembler.X86 {
             }
             
             // todo: add more options
-            if (aInstructionWithSource.SourceValue.HasValue) {
-                int xOffset = aEncodingOption.OpCode.Length + xExtraOffset;
-                if (aEncodingOption.NeedsModRMByte) {
-                    xOffset++;
+            if (aInstructionWithSource != null) {
+                if (aInstructionWithSource.SourceValue.HasValue) {
+                    int xOffset = aEncodingOption.OpCode.Length + xExtraOffset;
+                    if (aEncodingOption.NeedsModRMByte) {
+                        xOffset++;
+                    }
+                    var xInstrSize = 0;
+                    if (aInstructionWithSize != null) {
+                        xInstrSize = aInstructionWithSize.Size / 8;
+                    } else {
+                        throw new NotImplementedException("size not known");
+                    }
+                    Array.Copy(BitConverter.GetBytes(aInstructionWithSource.SourceValue.Value), 0, xBuffer, xOffset, xInstrSize);
                 }
-                var xInstrSize = 0;
-                if(aInstructionWithSize!=null) {
-                    xInstrSize = aInstructionWithSize.Size/8;   
-                }else {
-                    throw new NotImplementedException("size not known");
-                }
-                Array.Copy(BitConverter.GetBytes(aInstructionWithSource.SourceValue.Value), 0, xBuffer, xOffset, xInstrSize);
             }
             if (aInstructionWithSize != null) {
                 if (aEncodingOption.OperandSizeByte.HasValue) {
