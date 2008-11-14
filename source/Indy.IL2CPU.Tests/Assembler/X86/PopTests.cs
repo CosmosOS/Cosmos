@@ -30,7 +30,7 @@ namespace Indy.IL2CPU.Tests.Assembler.X86
         }
 
         [Test]
-        public void Memory()
+        public void MemorySimple32()
         {
             /*changed Pop to Instruction without size
              new Pop { Size = 16, DestinationIsIndirect = true};
@@ -50,6 +50,26 @@ namespace Indy.IL2CPU.Tests.Assembler.X86
             new Pop { DestinationReg = Registers.ESI };
             new Pop { DestinationReg = Registers.ESP };
             new Pop { DestinationReg = Registers.EBP };
+            Verify();
+        }
+
+        [Test]
+        public void Memory32BitOffset32()
+        {
+            /*changed Pop to Instruction without size
+             new Pop { Size = 16, DestinationIsIndirect = true};
+            */
+            new Pop { DestinationIsIndirect = true, DestinationDisplacement = 70000, DestinationValue = 65 };
+            Verify();
+        }
+
+        [Test]
+        public void Memory16BitOffset32()
+        {
+            /*changed Pop to Instruction without size
+             new Pop { Size = 16, DestinationIsIndirect = true};
+            */
+            new Pop { DestinationIsIndirect = true, DestinationDisplacement = 203, DestinationValue = 65 };
             Verify();
         }
 

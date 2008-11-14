@@ -14,6 +14,8 @@ namespace Indy.IL2CPU.Tests.Assembler.X86
          * situations to Push to:
          * registers (32 bit)
          * memory (32 bit)
+         * memory with 16 bit offset (32 bit)
+         * memory with 32 bit offset (32 bit)
          * immediate (8bit, 16bit, 32bit)
          * segment registers
          * The 16 bit for registers and memory are not covered
@@ -52,12 +54,32 @@ namespace Indy.IL2CPU.Tests.Assembler.X86
         }*/
 
         [Test]
-        public void Memory()
+        public void MemorySimple32()
         {
             /*changed Push to Instruction without size
              new Push { Size = 16, DestinationIsIndirect = true};
             */
             new Push { DestinationIsIndirect = true , DestinationValue=65 };
+            Verify();
+        }
+
+        [Test]
+        public void Memory32BitOffset32()
+        {
+            /*changed Push to Instruction without size
+             new Push { Size = 16, DestinationIsIndirect = true};
+            */
+            new Push { DestinationIsIndirect = true, DestinationDisplacement=70000, DestinationValue = 65 };
+            Verify();
+        }
+
+        [Test]
+        public void Memory16BitOffset32()
+        {
+            /*changed Push to Instruction without size
+             new Push { Size = 16, DestinationIsIndirect = true};
+            */
+            new Push { DestinationIsIndirect = true, DestinationDisplacement=203, DestinationValue = 65 };
             Verify();
         }
 
