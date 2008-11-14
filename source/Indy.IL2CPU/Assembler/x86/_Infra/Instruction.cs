@@ -176,33 +176,37 @@ namespace Indy.IL2CPU.Assembler.X86 {
             aEncodingOption=null;
             for (int i = 0; i < aInstructionData.EncodingOptions.Count; i++) {
                 var xEncodingOption = aInstructionData.EncodingOptions[i];
-                if (!(((xEncodingOption.DestinationMemory || xEncodingOption.DestinationReg.HasValue) && aInstructionWithDestination.DestinationReg != Guid.Empty) ||
-                     (!(xEncodingOption.DestinationMemory || xEncodingOption.DestinationReg.HasValue) && aInstructionWithDestination.DestinationReg == Guid.Empty))) {
-                    // mismatch
-                    continue;
+                if (aInstructionWithDestination != null) {
+                    if (!(((xEncodingOption.DestinationMemory || xEncodingOption.DestinationReg.HasValue) && aInstructionWithDestination.DestinationReg != Guid.Empty) ||
+                         (!(xEncodingOption.DestinationMemory || xEncodingOption.DestinationReg.HasValue) && aInstructionWithDestination.DestinationReg == Guid.Empty))) {
+                        // mismatch
+                        continue;
+                    }
+                    if ((!((xEncodingOption.DestinationMemory && (aInstructionWithDestination.DestinationValue != null && aInstructionWithDestination.DestinationIsIndirect)) ||
+                          (!xEncodingOption.DestinationMemory && (aInstructionWithDestination.DestinationValue == null && !aInstructionWithDestination.DestinationIsIndirect))) &&
+                         !((xEncodingOption.DestinationMemory && (aInstructionWithDestination.DestinationReg != Guid.Empty && aInstructionWithDestination.DestinationIsIndirect)) ||
+                          (!xEncodingOption.DestinationMemory && (aInstructionWithDestination.DestinationReg != Guid.Empty && !aInstructionWithDestination.DestinationIsIndirect)))) && aInstructionWithDestination.DestinationIsIndirect) {
+                        continue;
+                    }
+                    if (!((xEncodingOption.DestinationImmediate && aInstructionWithDestination.DestinationValue != null) ||
+                        (!xEncodingOption.DestinationImmediate && aInstructionWithDestination.DestinationValue == null))) {
+                        continue;
+                    }
                 }
-                if ((!((xEncodingOption.DestinationMemory && (aInstructionWithDestination.DestinationValue != null && aInstructionWithDestination.DestinationIsIndirect)) ||
-                      (!xEncodingOption.DestinationMemory && (aInstructionWithDestination.DestinationValue == null && !aInstructionWithDestination.DestinationIsIndirect))) &&
-                     !((xEncodingOption.DestinationMemory && (aInstructionWithDestination.DestinationReg != Guid.Empty && aInstructionWithDestination.DestinationIsIndirect)) ||
-                      (!xEncodingOption.DestinationMemory && (aInstructionWithDestination.DestinationReg != Guid.Empty && !aInstructionWithDestination.DestinationIsIndirect)))) && aInstructionWithDestination.DestinationIsIndirect) {
-                    continue;
-                }
-                if (!((xEncodingOption.DestinationImmediate && aInstructionWithDestination.DestinationValue != null) ||
-                    (!xEncodingOption.DestinationImmediate && aInstructionWithDestination.DestinationValue == null))) {
-                    continue;
-                }
-                if (!((xEncodingOption.SourceReg.HasValue && aInstructionWithSource.SourceReg != Guid.Empty) ||
-                     (!xEncodingOption.SourceReg.HasValue && aInstructionWithSource.SourceReg == Guid.Empty))) {
-                    // mismatch
-                    continue;
-                }
-                if (!((xEncodingOption.SourceMemory && (aInstructionWithSource.SourceValue != null && aInstructionWithSource.SourceIsIndirect)) ||
-                      (!xEncodingOption.SourceMemory && (aInstructionWithSource.SourceValue == null && !aInstructionWithSource.SourceIsIndirect))) && aInstructionWithSource.SourceIsIndirect) {
-                    continue;
-                }
-                if (!((xEncodingOption.SourceImmediate && aInstructionWithSource.SourceValue != null) ||
-                    (!xEncodingOption.SourceImmediate && aInstructionWithSource.SourceValue == null))) {
-                    continue;
+                if (aInstructionWithSource != null) {
+                    if (!((xEncodingOption.SourceReg.HasValue && aInstructionWithSource.SourceReg != Guid.Empty) ||
+                         (!xEncodingOption.SourceReg.HasValue && aInstructionWithSource.SourceReg == Guid.Empty))) {
+                        // mismatch
+                        continue;
+                    }
+                    if (!((xEncodingOption.SourceMemory && (aInstructionWithSource.SourceValue != null && aInstructionWithSource.SourceIsIndirect)) ||
+                          (!xEncodingOption.SourceMemory && (aInstructionWithSource.SourceValue == null && !aInstructionWithSource.SourceIsIndirect))) && aInstructionWithSource.SourceIsIndirect) {
+                        continue;
+                    }
+                    if (!((xEncodingOption.SourceImmediate && aInstructionWithSource.SourceValue != null) ||
+                        (!xEncodingOption.SourceImmediate && aInstructionWithSource.SourceValue == null))) {
+                        continue;
+                    }
                 }
                 aEncodingOption = xEncodingOption;
                 break;

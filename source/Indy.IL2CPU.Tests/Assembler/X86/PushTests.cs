@@ -17,7 +17,7 @@ namespace Indy.IL2CPU.Tests.Assembler.X86
          * memory with 16 bit offset (32 bit)
          * memory with 32 bit offset (32 bit)
          * immediate (8bit, 16bit, 32bit)
-         * segment registers
+         * segment registers are not covered
          * The 16 bit for registers and memory are not covered
          */
         [Test]
