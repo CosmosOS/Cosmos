@@ -54,11 +54,11 @@ namespace Indy.IL2CPU.IL.X86 {
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.ESI};
             new CPUx86.Push { DestinationReg = CPUx86.Registers.ESI };
 			//Assembler.StackSizes.Push(xElementCountSize);
-            new CPUx86.Push { Size=32,DestinationValue = mElementSize };
+            new CPUx86.Push { DestinationValue = mElementSize };
 			Assembler.StackContents.Push(new StackContent(4, typeof(uint)));
 			Multiply(Assembler);
 			// the total items size is now on the stack
-            new CPUx86.Push { Size=32,DestinationValue = (ObjectImpl.FieldDataOffset + 4) };
+            new CPUx86.Push { DestinationValue = (ObjectImpl.FieldDataOffset + 4) };
 			Assembler.StackContents.Push(new StackContent(4, typeof(uint)));
 			Add(Assembler);
 			// the total array size is now on the stack.

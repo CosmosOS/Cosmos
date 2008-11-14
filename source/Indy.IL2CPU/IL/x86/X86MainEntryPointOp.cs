@@ -16,7 +16,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public override void Push(uint aValue) {
-            new CPUx86.Push {Size=32, DestinationValue = aValue };
+            new CPUx86.Push {DestinationValue = aValue };
 		}
 
 		private int xLabelId = 0;

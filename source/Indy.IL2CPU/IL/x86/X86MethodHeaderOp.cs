@@ -44,7 +44,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			foreach (var xLocal in aLocals) {
 				aAssembler.StackContents.Push(new StackContent(xLocal.Size, xLocal.VariableType));
 				for (int i = 0; i < (xLocal.Size / 4); i++) {
-					new CPUx86.Push{Size=32,DestinationValue=0};
+					new CPUx86.Push{DestinationValue=0};
 				}
 			}
 			if(aDebugMode&& aIsNonDebuggable) {

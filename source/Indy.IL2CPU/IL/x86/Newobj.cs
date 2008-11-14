@@ -100,10 +100,10 @@ namespace Indy.IL2CPU.IL.X86
 				//new CPUx86.Add("esp", "4");
 				//Call.EmitExceptionLogic(aAssembler, aCurrentMethodInformation, aCurrentLabel + "_NO_ERROR_1", false);
 				//new CPU.Label(aCurrentLabel + "_NO_ERROR_1");
-                new Push { DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size=32 };
-                new Push { DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 32 };
-                new Push { DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 32 };
-                new Push { DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 32 };
+                new Push { DestinationReg = Registers.ESP, DestinationIsIndirect = true};
+                new Push { DestinationReg = Registers.ESP, DestinationIsIndirect = true};
+                new Push { DestinationReg = Registers.ESP, DestinationIsIndirect = true};
+                new Push { DestinationReg = Registers.ESP, DestinationIsIndirect = true};
                 new Assembler.X86.Call { DestinationLabel = Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef) };
 				//new CPUx86.Test("ecx", "2");
 				//new CPUx86.JumpIfEquals(aCurrentLabel + "_NO_ERROR_2");
@@ -222,7 +222,7 @@ namespace Indy.IL2CPU.IL.X86
                 aAssembler.StackContents.Push(new StackContent(4));
                 //at this point, we need to move copy all arguments over. 
                 for(int i = 0; i<(xArgSize/4);i++) {
-                    new CPUx86.Push { DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xStorageSize + 4), Size=32 }; // + 4 because the ptr is pushed too
+                    new CPUx86.Push { DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xStorageSize + 4)}; // + 4 because the ptr is pushed too
                     new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xStorageSize + 4 + 4), SourceValue = 0, Size = 32 };
                 }
 			    var xCall = new Call(aCtorDef,

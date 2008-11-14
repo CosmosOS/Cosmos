@@ -50,6 +50,8 @@
     <Compile Include="Assembler\X86\BaseTest.cs" />
     <Compile Include="Assembler\X86\HaltTests.cs" />
     <Compile Include="Assembler\X86\MoveTests.cs" />
+    <Compile Include="Assembler\X86\PopTests.cs" />
+    <Compile Include="Assembler\X86\PushTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -141,6 +143,26 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Assembler\X86\VerificationData\HaltTests\It.bin" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assembler\X86\VerificationData\PopTests\Memory.asm" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\PopTests\SegmentRegisters.asm" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Assembler\X86\VerificationData\PopTests\Memory.bin" />
+    <None Include="Assembler\X86\VerificationData\PopTests\Registers32.asm" />
+    <None Include="Assembler\X86\VerificationData\PopTests\Registers32.bin" />
+    <None Include="Assembler\X86\VerificationData\PopTests\SegmentRegisters.bin" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\PushTests\Immediate16.bin" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\PushTests\Immediate16.asm" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\PushTests\Immediate32.bin" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\PushTests\Immediate32.asm" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\PushTests\Immediate8.bin" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\PushTests\Immediate8.asm" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\PushTests\Memory.bin" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\PushTests\Memory.asm" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\PushTests\Registers32.bin" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\PushTests\Registers32.asm" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
