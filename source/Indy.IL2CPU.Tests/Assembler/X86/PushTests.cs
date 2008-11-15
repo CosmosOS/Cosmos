@@ -10,6 +10,7 @@ namespace Indy.IL2CPU.Tests.Assembler.X86
     [TestFixture]
     public class PushTests : BaseTest
     {
+
         /*
          * situations to Push to:
          * registers (32 bit)

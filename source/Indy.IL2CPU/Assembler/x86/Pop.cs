@@ -11,13 +11,14 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 NeedsModRMByte = false,
                 DestinationReg = Guid.Empty,
                 DestinationRegByte = 0
-            });
+            }); // pop to register
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 AllowedSizes =  InstructionSizes.DWord,
                 OpCode = new byte[]{0x8F},
                 NeedsModRMByte=true,
-                DestinationMemory=true
-            });
+                DestinationMemory=true,
+                DefaultSize = InstructionSize.DWord
+            }); // pop to memory
         }
         public override string ToString()
         {
