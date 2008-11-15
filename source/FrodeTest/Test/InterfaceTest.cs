@@ -14,7 +14,9 @@ namespace FrodeTest.Test
     {
         public string Execute()
         {
-            Console.WriteLine("Inside Execute in Interface implementor...");
+            //Console.WriteLine("Inside Execute in Interface implementor...");
+            
+            Check.OK();
             return "Interfaces WORKS";
         }
 
@@ -36,15 +38,19 @@ namespace FrodeTest.Test
     {
         public static void RunTest()
         {
-            Test.Dummy dummy = new FrodeTest.Test.Dummy();
-            Console.WriteLine(dummy.Execute());
-            dummy.Property = "Using class";
-            Console.WriteLine("Property get: " + dummy.Property);
+            var dummy = new Dummy();
+            Check.Text = "Method in interface";
+            Check.Validate(dummy.Execute() == "Interfaces WORKS");
 
-            IDummyInterface dmy = new FrodeTest.Test.Dummy();
-            Console.WriteLine(dmy.Execute());
+            dummy.Property = "Using class";
+            //Console.WriteLine("Property get: " + dummy.Property);
+            Check.Validate(dummy.Property == "Using class");
+
+            IDummyInterface dmy = new Dummy();
+            Check.Text = "Interrface";
+            Check.Validate(dmy.Execute() == "Interfaces WORKS");
             dmy.Property = "Using interface";
-            Console.WriteLine("Property is: " + dmy.Property);
+            Check.Validate(dmy.Property == "Using interface");
         }
     }
 }

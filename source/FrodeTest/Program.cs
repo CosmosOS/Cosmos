@@ -25,11 +25,11 @@ namespace FrodeTest
             Console.WriteLine("*** COSMOS Operating System - Frode's Test Suite ***");
             try
             {
-                System.IO.DriveInfo d = new System.IO.DriveInfo("0");
-                Console.WriteLine(d.DriveFormat);
-                System.IO.DriveInfo[] drives = System.IO.DriveInfo.GetDrives();
-                Console.WriteLine("Drives: " + drives.Length);
-                Console.WriteLine(drives[0].DriveFormat);
+                //System.IO.DriveInfo d = new System.IO.DriveInfo("0");
+                //Console.WriteLine(d.DriveFormat);
+                //System.IO.DriveInfo[] drives = System.IO.DriveInfo.GetDrives();
+                //Console.WriteLine("Drives: " + drives.Length);
+                //Console.WriteLine(drives[0].DriveFormat);
                 //Testing \\-string bug
                 //Console.Write('1');
                 //PrintBackslash();
@@ -44,16 +44,16 @@ namespace FrodeTest
                 //Console.WriteLine(@"\");
 
                 //TEST FRAMEWORK
-                //Console.WriteLine("---- RUNNING PREDEFINED TESTS ----");
-                //Test.ConsoleTest.RunTest();
-                //Test.StringTest.RunTest();
+                Console.WriteLine("---- RUNNING PREDEFINED TESTS ----");
+                Test.ConsoleTest.RunTest();
+                Test.StringTest.RunTest();
                 //Test.IPv4AddressTest.RunTest();
                 //Test.BasicTest.RunTest();
                 //Test.SwitchTest.RunTest();
                 //Console.ReadLine();
-                //Test.BoolTest.RunTest();
-                //Test.InterfaceTest.RunTest();
-                //Test.ExtensionMethodsTest.RunTest();
+                Test.BoolTest.RunTest();
+                Test.InterfaceTest.RunTest();
+                Test.ExtensionMethodsTest.RunTest();
                 //Test.BinaryHelperTest.RunTest();
                 //Test.TransmitStatusDescriptorTest.RunTest();
                 //Test.PacketHeaderTest.RunTest();

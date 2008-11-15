@@ -18,18 +18,20 @@ namespace FrodeTest
                 Fail();
         }
 
-        public static void OK()
+        public static bool OK()
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("OK [" + Text + "]");
             Console.ForegroundColor = ConsoleColor.White;
+            return true;
         }
 
-        public static void Fail()
+        public static bool Fail()
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("FAIL [" + Text + "]");
             Console.ForegroundColor = ConsoleColor.White;
+            return false;
         }
 
         internal static void SetHeadingText(string heading)
