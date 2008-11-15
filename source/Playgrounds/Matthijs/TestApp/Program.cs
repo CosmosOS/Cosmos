@@ -12,7 +12,7 @@ namespace TestApp {
     class Program {
         class Renderer : Y86 {
             public void DoRender() {
-                new Push { DestinationValue = 300000 };
+                new Push { DestinationIsIndirect = true, DestinationValue = 65 };
             }
         }
         static void Main(string[] args) {

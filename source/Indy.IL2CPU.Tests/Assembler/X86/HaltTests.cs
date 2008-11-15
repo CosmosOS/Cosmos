@@ -8,6 +8,7 @@ using NUnit.Framework;
 namespace Indy.IL2CPU.Tests.Assembler.X86 {
     [TestFixture]
     public class HaltTests: BaseTest {
+        [Test]
         public void TestIt() {
             new Halt();
             Verify();
