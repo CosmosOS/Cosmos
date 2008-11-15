@@ -17,7 +17,9 @@ namespace FrodeTest.Test
                           where word == "LinqWorks"
                           select word);
 
-            Console.WriteLine(result.Last());
+            //Console.WriteLine(result.Last());
+            Check.Text = "Linq";
+            Check.Validate(result.Last().Equals("LinqWorks"));
         }
     }
 }

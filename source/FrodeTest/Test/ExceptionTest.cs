@@ -13,11 +13,11 @@ namespace FrodeTest.Test {
 
         public static void RunTest() {
 
-            string[] strings = new string[2];
+            var strings = new string[2];
             strings[0] = "Hello";
             strings[1] = "World";
 
-            string result = strings[CauseException()]; //Kills Qemu
+            var result = strings[CauseException()]; //Kills Qemu
 
             //try {
             //    ThrowStaticExceptionReturnVoid(); //OK}

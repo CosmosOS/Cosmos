@@ -45,16 +45,17 @@ namespace FrodeTest
 
                 //TEST FRAMEWORK
                 Console.WriteLine("---- RUNNING PREDEFINED TESTS ----");
-                Test.ConsoleTest.RunTest();
-                Test.StringTest.RunTest();
+                //Test.ConsoleTest.RunTest();
+                //Test.StringTest.RunTest();
                 //Test.IPv4AddressTest.RunTest();
                 //Test.BasicTest.RunTest();
                 //Test.SwitchTest.RunTest();
                 //Console.ReadLine();
-                Test.BoolTest.RunTest();
-                Test.InterfaceTest.RunTest();
-                Test.ExtensionMethodsTest.RunTest();
+                //Test.BoolTest.RunTest();
+                //Test.InterfaceTest.RunTest();
+                //Test.ExtensionMethodsTest.RunTest();
                 //Test.BinaryHelperTest.RunTest();
+                Test.BitConverterTest.RunTest();
                 //Test.TransmitStatusDescriptorTest.RunTest();
                 //Test.PacketHeaderTest.RunTest();
                 //Test.RAMBusTest.RunTest();

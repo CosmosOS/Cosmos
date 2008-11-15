@@ -9,10 +9,11 @@ namespace FrodeTest.Test
     {
         public static void RunTest()
         {
-            Console.WriteLine("Testing C# 3.0 Extension Methods");
+            Console.WriteLine("-- Testing Extension methods --");
 
-            Int32 number = 10;
-            Console.WriteLine("Trippling " + number + " gives " + number.Tripple());
+            const int number = 10;
+            Check.Text = "Extension Method";
+            Check.Validate(number.Tripple() == 30);
         }
     }
 
