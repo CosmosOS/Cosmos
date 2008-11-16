@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="Assembler\X86\BaseTest.cs" />
     <Compile Include="Assembler\X86\AddTests.cs" />
+    <Compile Include="Assembler\X86\SubTests.cs" />
     <Compile Include="Assembler\X86\HaltTests.cs" />
     <Compile Include="Assembler\X86\MoveTests.cs" />
     <Compile Include="Assembler\X86\PopTests.cs" />
@@ -214,6 +215,46 @@
     <EmbeddedResource Include="Assembler\X86\VerificationData\AddTests\RegisterToRegister16.bin" />
     <EmbeddedResource Include="Assembler\X86\VerificationData\AddTests\RegisterToRegister32.bin" />
     <EmbeddedResource Include="Assembler\X86\VerificationData\AddTests\RegisterToRegister8.bin" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assembler\X86\VerificationData\SubTests\ImmediateToMemory16BitOffset16BitData.asm" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\SubTests\ImmediateToMemory16BitOffset32BitData.asm" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\SubTests\ImmediateToMemory16BitOffset8BitData.asm" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\SubTests\ImmediateToMemory32BitOffset16BitData.asm" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\SubTests\ImmediateToMemory32BitOffset32BitData.asm" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\SubTests\ImmediateToMemory32BitOffset8BitData.asm" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\SubTests\ImmediateToMemory8BitOffset16BitData.asm" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\SubTests\ImmediateToMemory8BitOffset32BitData.asm" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\SubTests\ImmediateToMemory8BitOffset8BitData.asm" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\SubTests\ImmediateToMemorySimple16.asm" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\SubTests\ImmediateToMemorySimple32.asm" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\SubTests\ImmediateToMemorySimple8.asm" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\SubTests\ImmediateToRegister16.asm" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\SubTests\ImmediateToRegister32.asm" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\SubTests\ImmediateToRegister8.asm" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\SubTests\RegisterToRegister16.asm" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\SubTests\RegisterToRegister32.asm" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\SubTests\RegisterToRegister8.asm" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assembler\X86\VerificationData\SubTests\ImmediateToMemory16BitOffset16BitData.bin" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\SubTests\ImmediateToMemory16BitOffset32BitData.bin" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\SubTests\ImmediateToMemory16BitOffset8BitData.bin" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\SubTests\ImmediateToMemory32BitOffset16BitData.bin" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\SubTests\ImmediateToMemory32BitOffset32BitData.bin" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\SubTests\ImmediateToMemory32BitOffset8BitData.bin" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\SubTests\ImmediateToMemory8BitOffset16BitData.bin" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\SubTests\ImmediateToMemory8BitOffset32BitData.bin" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\SubTests\ImmediateToMemory8BitOffset8BitData.bin" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\SubTests\ImmediateToMemorySimple16.bin" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\SubTests\ImmediateToMemorySimple32.bin" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\SubTests\ImmediateToMemorySimple8.bin" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\SubTests\ImmediateToRegister16.bin" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\SubTests\ImmediateToRegister32.bin" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\SubTests\ImmediateToRegister8.bin" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\SubTests\RegisterToRegister16.bin" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\SubTests\RegisterToRegister32.bin" />
+    <EmbeddedResource Include="Assembler\X86\VerificationData\SubTests\RegisterToRegister8.bin" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

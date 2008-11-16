@@ -12,14 +12,11 @@ namespace TestApp {
     class Program {
         class Renderer : Y86 {
             public void DoRender() {
-                //new Add { DestinationReg = Registers.AL, SourceValue = 1 };
-                new Add { DestinationReg = Registers.BL, SourceValue = 2 };
-                new Add { DestinationReg = Registers.CL, SourceValue = 3 };
-                new Add { DestinationReg = Registers.DL, SourceValue = 4 };
-                new Add { DestinationReg = Registers.AH, SourceValue = 1 };
-                new Add { DestinationReg = Registers.BH, SourceValue = 2 };
-                new Add { DestinationReg = Registers.CH, SourceValue = 3 };
-                new Add { DestinationReg = Registers.DH, SourceValue = 4 };
+                new Sub { Size = 8, DestinationReg = Registers.EBX, DestinationIsIndirect = true, SourceValue = 65 };
+                new Sub { Size = 16, DestinationReg = Registers.EBX, DestinationIsIndirect = true, SourceValue = 66 };
+                new Sub { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, SourceValue = 66 };
+            
+            
             }
         }
         static void Main(string[] args) {

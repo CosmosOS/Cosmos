@@ -506,8 +506,9 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 }
             }
             if (aInstructionWithSize != null) {
-                if (aEncodingOption.OperandSizeByte.HasValue) {
-                    if (aInstructionWithSize.Size > 8) {
+                if (aEncodingOption.OperandSizeByte.HasValue) 
+                {
+                    if(aInstructionWithSize.Size != 8) {
                         xBuffer[aEncodingOption.OperandSizeByte.Value + xOpCodeOffset] |= (byte)(1 << aEncodingOption.OperandSizeBitShiftLeft);
                     }
                 }

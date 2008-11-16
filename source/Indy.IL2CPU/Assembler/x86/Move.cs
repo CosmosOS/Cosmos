@@ -11,7 +11,8 @@ namespace Indy.IL2CPU.Assembler.X86 {
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0xB0 },
                 //NeedsModRMByte=true,
-                AllowedSizes = InstructionSizes.DWord,
+                DefaultSize = InstructionSize.DWord,
+                AllowedSizes = InstructionSizes.Byte | InstructionSizes.Word | InstructionSizes.DWord,
                 OperandSizeByte = 0,
                 OperandSizeBitShiftLeft = 3,
                 DestinationReg = Guid.Empty,

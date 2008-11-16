@@ -1,0 +1,10 @@
+use32
+org 0x200000
+			sub word [EAX + 0x56781203], 0x41
+			sub word [EBX + 0x56781203], 0x41
+			sub word [ECX + 0x56781203], 0x41
+			sub word [EDX + 0x56781203], 0x41
+			sub word [ESI + 0x56781203], 0x41
+			sub word [EDI + 0x56781203], 0x41
+			sub word [EBP + 0x56781203], 0x41
+			sub word [ESP + 0x56781203], 0x41

@@ -1,0 +1,10 @@
+use32
+org 0x200000
+			sub dword [EAX + 0x56781203], 0x41
+			sub dword [EBX + 0x56781203], 0x41
+			sub dword [ECX + 0x56781203], 0x41
+			sub dword [EDX + 0x56781203], 0x41
+			sub dword [ESI + 0x56781203], 0x41
+			sub dword [EDI + 0x56781203], 0x41
+			sub dword [EBP + 0x56781203], 0x41
+			sub dword [ESP + 0x56781203], 0x41

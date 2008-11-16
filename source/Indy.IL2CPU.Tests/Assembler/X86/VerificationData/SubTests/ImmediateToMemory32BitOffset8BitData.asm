@@ -1,0 +1,10 @@
+use32
+org 0x200000
+			sub byte [EAX + 0x56781203], 0x41
+			sub byte [EBX + 0x56781203], 0x41
+			sub byte [ECX + 0x56781203], 0x41
+			sub byte [EDX + 0x56781203], 0x41
+			sub byte [ESI + 0x56781203], 0x41
+			sub byte [EDI + 0x56781203], 0x41
+			sub byte [EBP + 0x56781203], 0x41
+			sub byte [ESP + 0x56781203], 0x41
