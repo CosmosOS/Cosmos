@@ -27,7 +27,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 SourceImmediate = true,
                 //DestinationRegByte = 1,
                 DestinationMemory = true,
-                DestinationReg = Registers.ESP
+                DestinationReg = Guid.Empty
             });  // immediate to memory
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0x88, 0xC0 },
@@ -37,7 +37,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 SourceRegBitShiftLeft = 3,
                 DestinationRegByte = 1,
                 DestinationReg=Guid.Empty
-            });
+            }); // register to register
         }
 	}
 }

@@ -11,10 +11,10 @@ namespace Indy.IL2CPU.Assembler.X86 {
         [Flags]
         public enum InstructionSizes {
             None,
-            Byte,
-            Word,
-            DWord,
-            QWord,
+            Byte=8,
+            Word=16,
+            DWord=32,
+            QWord = 64,
         }
 
         public enum InstructionSize {
@@ -189,10 +189,45 @@ namespace Indy.IL2CPU.Assembler.X86 {
                         (!xEncodingOption.DestinationImmediate && (aInstructionWithDestination.DestinationValue == null || aInstructionWithDestination.DestinationIsIndirect)))) {
                         continue;
                     }
+                    if (xEncodingOption.DestinationReg.HasValue && xEncodingOption.DestinationReg != Guid.Empty && aInstructionWithDestination.DestinationReg != Guid.Empty && aInstructionWithDestination.DestinationIsIndirect == xEncodingOption.DestinationMemory) {
+                        if (xEncodingOption.DestinationReg != aInstructionWithDestination.DestinationReg) {
+                                switch (xEncodingOption.DefaultSize) {
+                                    case InstructionSize.Byte: {
+                                            if ((xEncodingOption.AllowedSizes & InstructionSizes.Byte) != 0) {
+                                                var xTheActualReg = Registers.Get8BitRegistersForRegister(aInstructionWithDestination.DestinationReg);
+                                                if (xTheActualReg != xEncodingOption.DestinationReg.Value) {
+                                                    continue;
+                                                }
+                                            }
+                                            break;
+                                        }
+                                    case InstructionSize.Word: {
+                                            if ((xEncodingOption.AllowedSizes & InstructionSizes.Word) != 0) {
+                                                var xTheActualReg = Registers.Get16BitRegisterForRegister(aInstructionWithDestination.DestinationReg);
+                                                if (xTheActualReg != xEncodingOption.DestinationReg.Value) {
+                                                    continue;
+                                                }
+                                            }
+                                            break;
+                                        }
+                                    case InstructionSize.DWord: {
+                                            if ((xEncodingOption.AllowedSizes & InstructionSizes.DWord) != 0) {
+                                                var xTheActualReg = Registers.Get32BitRegisterForRegister(aInstructionWithDestination.DestinationReg);
+                                                if (xTheActualReg != xEncodingOption.DestinationReg.Value) {
+                                                    continue;
+                                                }
+                                            }
+                                            break;
+                                        }
+                                    default:
+                                        throw new Exception("InstructionSize not implemented yet!");
+                                }
+                        }
+                    }
                 }
                 if (aInstructionWithSource != null) {
                     if (!(((xEncodingOption.SourceMemory || xEncodingOption.SourceReg.HasValue) && (aInstructionWithSource.SourceReg != Guid.Empty || aInstructionWithSource.SourceValue.HasValue)) ||
-     (!(xEncodingOption.SourceMemory || xEncodingOption.SourceReg.HasValue) && aInstructionWithSource.SourceReg == Guid.Empty && aInstructionWithSource.SourceValue.HasValue))) {
+                         (!(xEncodingOption.SourceMemory || xEncodingOption.SourceReg.HasValue) && aInstructionWithSource.SourceReg == Guid.Empty && aInstructionWithSource.SourceValue.HasValue))) {
                         // mismatch
                         continue;
                     }
@@ -333,9 +368,6 @@ namespace Indy.IL2CPU.Assembler.X86 {
         }
 
         private static byte[] GetData(Indy.IL2CPU.Assembler.Assembler aAssembler, Instruction aInstruction, IInstructionWithDestination aInstructionWithDestination, IInstructionWithSize aInstructionWithSize, IInstructionWithSource aInstructionWithSource, InstructionData aInstructionData, InstructionData.InstructionEncodingOption aEncodingOption) {
-            if (aInstruction.ToString() == "mov word [ESP], 0x47") {
-                Console.Write("");
-            }
             ulong xSize = 0;
             Instruction.DetermineSize(aAssembler, out xSize, aInstruction, aInstructionWithDestination, aInstructionWithSize, aInstructionWithSource, aInstructionData, aEncodingOption);
             if (xSize == 0) {

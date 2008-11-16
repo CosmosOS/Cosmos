@@ -49,6 +49,94 @@ namespace Indy.IL2CPU.Assembler.X86 {
         public static readonly Guid XMM5 = new Guid("{02829734-AC18-4E56-888D-A92243924292}");
         public static readonly Guid XMM6 = new Guid("{29356F03-4A37-4C7D-B452-02B0E78C0646}");
         public static readonly Guid XMM7 = new Guid("{D5334D4A-EF4B-45DF-8E3E-BDFC848D65B1}");
+        /// <summary>
+        /// Key = 32bit (eg EAX), value = 16 bit (eg AX)
+        /// </summary>
+        private static SortedList<Guid, Guid> m32BitTo16BitMapping = new SortedList<Guid, Guid>();
+        /// <summary>
+        /// Key = 32bit (eg EAX), value = 16 bit (eg AL). 
+        /// 
+        /// </summary>
+        private static SortedList<Guid, Guid> m32BitTo8BitMapping = new SortedList<Guid, Guid>();
+        private static SortedList<Guid, Guid> m16BitTo8BitMapping = new SortedList<Guid, Guid>();
+
+        static Registers() {
+            m32BitTo16BitMapping.Add(EAX, AX);
+            m32BitTo16BitMapping.Add(EBX, BX);
+            m32BitTo16BitMapping.Add(ECX, CX);
+            m32BitTo16BitMapping.Add(EDX, DX);
+            m32BitTo16BitMapping.Add(ESI, SI);
+            m32BitTo16BitMapping.Add(EDI, DI);
+            m32BitTo16BitMapping.Add(EBP, BP);
+            m32BitTo16BitMapping.Add(ESP, SP);
+
+            m32BitTo8BitMapping.Add(EAX, AL );
+            m32BitTo8BitMapping.Add(EBX, BL );
+            m32BitTo8BitMapping.Add(ECX, CL );
+            m32BitTo8BitMapping.Add(EDX, DL );
+
+            m16BitTo8BitMapping.Add(AX, AL);
+            m16BitTo8BitMapping.Add(BX, BL);
+            m16BitTo8BitMapping.Add(CX, CL);
+            m16BitTo8BitMapping.Add(DX, DL);
+        }
+
+        public static Guid Get8BitRegistersForRegister(Guid aReg) {
+            if(Is32Bit(aReg)) {
+                if(m32BitTo8BitMapping.ContainsKey(aReg)) {
+                    return m32BitTo8BitMapping[aReg];
+                }
+                return Guid.Empty;
+            }
+            if(Is16Bit(aReg)) {
+                if (m16BitTo8BitMapping.ContainsKey(aReg)) {
+                    return m16BitTo8BitMapping[aReg];
+                }
+                return Guid.Empty;
+            }
+            if(Is128Bit(aReg)) {
+                throw new Exception("128bit registers don't have 8bit variants!");
+            }
+            return aReg;
+        }
+
+        public static Guid Get16BitRegisterForRegister(Guid aReg) {
+            if (Is32Bit(aReg)) {
+                if (m32BitTo16BitMapping.ContainsKey(aReg)) {
+                    return m32BitTo16BitMapping[aReg];
+                }
+                return Guid.Empty;
+            }
+            if (Is128Bit(aReg)) {
+                throw new Exception("128bit registers don't have 8bit variants!");
+            }
+            if (Is16Bit(aReg)) {
+                return aReg;
+            }
+            if (m16BitTo8BitMapping.ContainsKey(aReg)) {
+                return m16BitTo8BitMapping[aReg];
+            }
+            return aReg;
+        }
+
+        public static Guid Get32BitRegisterForRegister(Guid aReg) {
+            if(Is32Bit(aReg)) {
+                return aReg;
+            }
+            if(Is128Bit(aReg)) {
+                throw new Exception("128bit registers don't have 32bit variants!");
+            }
+            if(Is16Bit(aReg)) {
+                if(m32BitTo16BitMapping.ContainsValue(aReg)) {
+                    return m32BitTo16BitMapping.Keys[m32BitTo16BitMapping.IndexOfValue(aReg)];
+                }
+                return Guid.Empty;
+            }
+            if (m32BitTo8BitMapping.ContainsValue(aReg)) {
+                return m32BitTo8BitMapping.Keys[m32BitTo8BitMapping.IndexOfValue(aReg)];
+            }
+            return Guid.Empty;
+        }
 
         public static string GetRegisterName(Guid aRegister) {
             var xType = typeof(Registers);
@@ -69,8 +157,23 @@ namespace Indy.IL2CPU.Assembler.X86 {
             if (Is128Bit(aRegister)) { return 128; }
             if (Is32Bit(aRegister)) { return 32; }
             if (Is16Bit(aRegister)) { return 16; }
-            return 8;
+            if (Is8Bit(aRegister)) { return 8; }
+            throw new NotImplementedException();
         }
+
+        public static bool Is8Bit(Guid aRegister) {
+            return 
+                aRegister == AL ||
+                aRegister == AH ||
+                aRegister == BL ||
+                aRegister == BH ||
+                aRegister == CL ||
+                aRegister == CH ||
+                aRegister == DL ||
+                aRegister == DH;
+        }
+
+        //public static Guid Get 
 
         public static bool Is128Bit(Guid aRegister) {
             return aRegister == XMM0 || aRegister == XMM1 || aRegister == XMM2 || aRegister == XMM3 || aRegister == XMM4 || aRegister == XMM5 || aRegister == XMM6 || aRegister == XMM7;

@@ -163,7 +163,8 @@ namespace Indy.IL2CPU.Tests.Assembler.X86 {
             new Move { DestinationReg = Registers.ESP, SourceReg = Registers.EDI };
             new Move { DestinationReg = Registers.ESP, SourceReg = Registers.ESI };
             new Move { DestinationReg = Registers.ESP, SourceReg = Registers.EBP };
-            new Move { DestinationReg = Registers.ESP, SourceReg = Registers.ESP };    
+            new Move { DestinationReg = Registers.ESP, SourceReg = Registers.ESP };
+            Verify();
         }
 
         [Test]
@@ -232,6 +233,7 @@ namespace Indy.IL2CPU.Tests.Assembler.X86 {
             new Move { DestinationReg = Registers.SP, SourceReg = Registers.SI };
             new Move { DestinationReg = Registers.SP, SourceReg = Registers.BP };
             new Move { DestinationReg = Registers.SP, SourceReg = Registers.SP };
+            Verify();
         }
 
         [Test]

@@ -12,7 +12,14 @@ namespace TestApp {
     class Program {
         class Renderer : Y86 {
             public void DoRender() {
-                new Push { DestinationIsIndirect = true, DestinationValue = 65 };
+                //new Add { DestinationReg = Registers.AL, SourceValue = 1 };
+                new Add { DestinationReg = Registers.BL, SourceValue = 2 };
+                new Add { DestinationReg = Registers.CL, SourceValue = 3 };
+                new Add { DestinationReg = Registers.DL, SourceValue = 4 };
+                new Add { DestinationReg = Registers.AH, SourceValue = 1 };
+                new Add { DestinationReg = Registers.BH, SourceValue = 2 };
+                new Add { DestinationReg = Registers.CH, SourceValue = 3 };
+                new Add { DestinationReg = Registers.DH, SourceValue = 4 };
             }
         }
         static void Main(string[] args) {
