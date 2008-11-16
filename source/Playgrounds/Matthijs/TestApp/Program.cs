@@ -12,7 +12,7 @@ namespace TestApp {
     class Program {
         class Renderer : Y86 {
             public void DoRender() {
-                new Add { DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 1203, SourceValue = 65, Size = 32 };
+                new Move { DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, SourceValue = 65, Size = 32 };
             }
         }
         static void Main(string[] args) {

@@ -271,8 +271,8 @@ namespace Indy.IL2CPU.Assembler.X86 {
                     //}
                 }
                 if (aInstructionWithDestination != null && aInstructionWithDestination.DestinationIsIndirect && aInstructionWithDestination.DestinationDisplacement > 0) {
-                    if (aInstructionWithDestination.DestinationDisplacement < 256) {
-                        aSize += 4; // for now use 16bit displacement
+                    if (aInstructionWithDestination.DestinationDisplacement < 128) {
+                        aSize += 1; // for now use 16bit displacement
                     } else {
                         if (aInstructionWithDestination.DestinationDisplacement <= Int16.MaxValue) {
                             aSize += 4;
@@ -460,11 +460,16 @@ namespace Indy.IL2CPU.Assembler.X86 {
                             xBuffer[aEncodingOption.OpCode.Length + xExtraOffset + xSIBOffset] = xSIB.Value;
                         }
                         // todo: optimize for different displacement sizes
-
-                        xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= 2 << 6; // for now use 8bit value
-                        xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] &= 0xBF; // clear the 1 << 6
-                        Array.Copy(BitConverter.GetBytes(aInstructionWithDestination.DestinationDisplacement), 0, xBuffer, aEncodingOption.OpCode.Length + xExtraOffset + xSIBOffset + 1, 4);
-                        xExtraOffset += 4;
+                        if (aInstructionWithDestination.DestinationDisplacement < 128) {
+                            xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= 2 << 5; // for now use 8bit value
+                            Array.Copy(BitConverter.GetBytes((byte)aInstructionWithDestination.DestinationDisplacement), 0, xBuffer, aEncodingOption.OpCode.Length + xExtraOffset + xSIBOffset + 1, 1);
+                            xExtraOffset += 1;
+                        } else {
+                            xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= 2 << 6; // for now use 8bit value
+                            xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] &= 0xBF; // clear the 1 << 6
+                            Array.Copy(BitConverter.GetBytes(aInstructionWithDestination.DestinationDisplacement), 0, xBuffer, aEncodingOption.OpCode.Length + xExtraOffset + xSIBOffset + 1, 4);
+                            xExtraOffset += 4;
+                        }
                         //}
                         if (xSIB != null) {
                             xExtraOffset++;
