@@ -19,21 +19,30 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 OpCode = new byte[] { 0x80, 0xC0 },
                 AllowedSizes = InstructionSizes.Byte | InstructionSizes.Word | InstructionSizes.DWord,
                 DefaultSize = InstructionSize.DWord,
-                OperandSizeByte=0,
-                DestinationReg=Guid.Empty,
+                OperandSizeByte = 0,
+                DestinationReg = Guid.Empty,
                 DestinationRegByte = 1,
-                SourceImmediate=true
+                SourceImmediate = true
             }); // immediate to reg
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0, 0xC0 },
-                AllowedSizes=InstructionSizes.DWord,
-                DefaultSize=InstructionSize.DWord,
+                AllowedSizes = InstructionSizes.DWord,
+                DefaultSize = InstructionSize.DWord,
                 OperandSizeByte = 0,
                 DestinationReg = Guid.Empty,
                 DestinationRegByte = 1,
                 SourceReg = Guid.Empty,
                 SourceRegByte = 1,
                 SourceRegBitShiftLeft = 3
+            }); // register to register
+            aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
+                OpCode = new byte[] { 0x80 },
+                NeedsModRMByte = true,
+                OperandSizeByte = 0,
+                AllowedSizes = InstructionSizes.Byte | InstructionSizes.Word | InstructionSizes.DWord,
+                DefaultSize = InstructionSize.DWord,
+                DestinationMemory = true,
+                SourceImmediate = true
             });
         }
 	}
