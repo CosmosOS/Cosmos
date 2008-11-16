@@ -39,6 +39,22 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 DestinationRegByte = 1,
                 DestinationReg=Guid.Empty
             }); // register to register
+
+            aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
+                OpCode = new byte[] { 0x88 },
+                OperandSizeByte = 0,
+                NeedsModRMByte = true,
+                SourceReg = Registers.EAX,
+                DestinationMemory = true
+            }); // register to memory (eax)
+            aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
+                OpCode = new byte[] { 0x88 },
+                OperandSizeByte = 0,
+                NeedsModRMByte = true,
+                SourceReg=Guid.Empty,
+                DestinationMemory = true
+            }); // register to memory
+
         }
 	}
 }

@@ -21,8 +21,6 @@ namespace Indy.IL2CPU.Tests.Assembler.X86 {
 
         protected void Verify() {
             using (var xMS = new MemoryStream()) {
-                Assembler.FlushBinary(xMS, 0x200000);
-                xMS.Position = 0;
                 string xManStreamName = typeof(BaseTest).Namespace;
                 xManStreamName += ".VerificationData.";
                 xManStreamName += this.GetType().FullName.Substring(typeof(BaseTest).Namespace.Length + 1);
@@ -45,6 +43,8 @@ namespace Indy.IL2CPU.Tests.Assembler.X86 {
                     if (xVerificationData == null) {
                         Assert.Fail("VerificationData not found! Did you forget to mark the file as Embedded Resource?");
                     }
+                    Assembler.FlushBinary(xMS, 0x200000);
+                    xMS.Position = 0;
                     xVerificationData.Position = 0;
                     if (xVerificationData.Length != xMS.Length) { 
                         Assert.Fail("Wrong data emitted");

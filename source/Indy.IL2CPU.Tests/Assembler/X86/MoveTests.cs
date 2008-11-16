@@ -10,16 +10,739 @@ namespace Indy.IL2CPU.Tests.Assembler.X86 {
     public class MoveTests: BaseTest {
         /*
          * situations to cover:
-         * immediate to memory indirect + byte (8bit, 16bit, 32bit)
-         * immediate to memory indirect + dword (8bit, 16bit, 32bit)
-         * register to memory indirect + byte (8bit, 16bit, 32bit)
          * register to memory indirect + dword (8bit, 16bit, 32bit)
-         * immediate to memoryreg  indirect + byte (8bit, 16bit, 32bit)
-         * immediate to memoryreg  indirect + dword (8bit, 16bit, 32bit)
          * register to memoryreg  indirect + byte (8bit, 16bit, 32bit)
          * register to memoryreg indirect + dword (8bit, 16bit, 32bit)
-         * register to register (8bit, 16bit, 32bit)
          */
+        [Test]
+        public void TestImmediateToMemoryReg8BitOffset8() {
+            new Move { DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 65, SourceValue = 70, Size=8 };
+            new Move { DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 65, SourceValue = 70, Size = 8 };
+            new Move { DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 65, SourceValue = 70, Size = 8 };
+            new Move { DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 65, SourceValue = 70, Size = 8 };
+            new Move { DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 65, SourceValue = 70, Size = 8 };
+            new Move { DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 65, SourceValue = 70, Size = 8 };
+            new Move { DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 65, SourceValue = 70, Size = 8 };
+            new Move { DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 65, SourceValue = 70, Size = 8 };
+        }
+
+        [Test]
+        public void TestImmediateToMemoryReg16BitOffset8() {
+            new Move { DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 650, SourceValue = 70, Size = 8 };
+            new Move { DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 650, SourceValue = 70, Size = 8 };
+            new Move { DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 650, SourceValue = 70, Size = 8 };
+            new Move { DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 650, SourceValue = 70, Size = 8 };
+            new Move { DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 650, SourceValue = 70, Size = 8 };
+            new Move { DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 650, SourceValue = 70, Size = 8 };
+            new Move { DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 650, SourceValue = 70, Size = 8 };
+            new Move { DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 650, SourceValue = 70, Size = 8 };
+        }
+
+        [Test]
+        public void TestImmediateToMemoryReg32BitOffset8() {
+            new Move { DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 650000, SourceValue = 70, Size = 8 };
+            new Move { DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 650000, SourceValue = 70, Size = 8 };
+            new Move { DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 650000, SourceValue = 70, Size = 8 };
+            new Move { DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 650000, SourceValue = 70, Size = 8 };
+            new Move { DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 650000, SourceValue = 70, Size = 8 };
+            new Move { DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 650000, SourceValue = 70, Size = 8 };
+            new Move { DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 650000, SourceValue = 70, Size = 8 };
+            new Move { DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 650000, SourceValue = 70, Size = 8 };
+        }
+
+        [Test]
+        public void TestImmediateToMemoryReg8BitOffset16() {
+            new Move { DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 65, SourceValue = 70, Size = 16 };
+            new Move { DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 65, SourceValue = 70, Size = 16 };
+            new Move { DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 65, SourceValue = 70, Size = 16 };
+            new Move { DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 65, SourceValue = 70, Size = 16 };
+            new Move { DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 65, SourceValue = 70, Size = 16 };
+            new Move { DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 65, SourceValue = 70, Size = 16 };
+            new Move { DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 65, SourceValue = 70, Size = 16 };
+            new Move { DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 65, SourceValue = 70, Size = 16 };
+        }
+
+        [Test]
+        public void TestImmediateToMemoryReg16BitOffset16() {
+            new Move { DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 650, SourceValue = 70, Size = 16 };
+            new Move { DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 650, SourceValue = 70, Size = 16 };
+            new Move { DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 650, SourceValue = 70, Size = 16 };
+            new Move { DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 650, SourceValue = 70, Size = 16 };
+            new Move { DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 650, SourceValue = 70, Size = 16 };
+            new Move { DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 650, SourceValue = 70, Size = 16 };
+            new Move { DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 650, SourceValue = 70, Size = 16 };
+            new Move { DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 650, SourceValue = 70, Size = 16 };
+        }
+
+        [Test]
+        public void TestImmediateToMemoryReg32BitOffset16() {
+            new Move { DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 650000, SourceValue = 70, Size = 16 };
+            new Move { DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 650000, SourceValue = 70, Size = 16 };
+            new Move { DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 650000, SourceValue = 70, Size = 16 };
+            new Move { DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 650000, SourceValue = 70, Size = 16 };
+            new Move { DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 650000, SourceValue = 70, Size = 16 };
+            new Move { DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 650000, SourceValue = 70, Size = 16 };
+            new Move { DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 650000, SourceValue = 70, Size = 16 };
+            new Move { DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 650000, SourceValue = 70, Size = 16 };
+        }
+
+        [Test]
+        public void TestImmediateToMemoryReg8BitOffset32() {
+            new Move { DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 65, SourceValue = 70, Size = 32 };
+            new Move { DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 65, SourceValue = 70, Size = 32 };
+            new Move { DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 65, SourceValue = 70, Size = 32 };
+            new Move { DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 65, SourceValue = 70, Size = 32 };
+            new Move { DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 65, SourceValue = 70, Size = 32 };
+            new Move { DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 65, SourceValue = 70, Size = 32 };
+            new Move { DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 65, SourceValue = 70, Size = 32 };
+            new Move { DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 65, SourceValue = 70, Size = 32 };
+        }
+
+        [Test]
+        public void TestImmediateToMemoryReg16BitOffset32() {
+            new Move { DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 650, SourceValue = 70, Size = 32 };
+            new Move { DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 650, SourceValue = 70, Size = 32 };
+            new Move { DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 650, SourceValue = 70, Size = 32 };
+            new Move { DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 650, SourceValue = 70, Size = 32 };
+            new Move { DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 650, SourceValue = 70, Size = 32 };
+            new Move { DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 650, SourceValue = 70, Size = 32 };
+            new Move { DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 650, SourceValue = 70, Size = 32 };
+            new Move { DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 650, SourceValue = 70, Size = 32 };
+        }
+
+        [Test]
+        public void TestImmediateToMemoryReg32BitOffset32() {
+            new Move { DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 650000, SourceValue = 70, Size = 32 };
+            new Move { DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 650000, SourceValue = 70, Size = 32 };
+            new Move { DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 650000, SourceValue = 70, Size = 32 };
+            new Move { DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 650000, SourceValue = 70, Size = 32 };
+            new Move { DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 650000, SourceValue = 70, Size = 32 };
+            new Move { DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 650000, SourceValue = 70, Size = 32 };
+            new Move { DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 650000, SourceValue = 70, Size = 32 };
+            new Move { DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 650000, SourceValue = 70, Size = 32 };
+        }
+
+        [Test]
+        public void TestRegisterToMemory32BitOffset32() {
+            new Move { Size = 32, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EAX };
+            new Move { Size = 32, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EBX };
+            new Move { Size = 32, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ECX };
+            new Move { Size = 32, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EDX };
+            new Move { Size = 32, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EDI };
+            new Move { Size = 32, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ESI };
+            new Move { Size = 32, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EBP };
+            new Move { Size = 32, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ESP };
+            new Move { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EAX };
+            new Move { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EBX };
+            new Move { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ECX };
+            new Move { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EDX };
+            new Move { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EDI };
+            new Move { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ESI };
+            new Move { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EBP };
+            new Move { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ESP };
+            new Move { Size = 32, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EAX };
+            new Move { Size = 32, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EBX };
+            new Move { Size = 32, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ECX };
+            new Move { Size = 32, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EDX };
+            new Move { Size = 32, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EDI };
+            new Move { Size = 32, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ESI };
+            new Move { Size = 32, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EBP };
+            new Move { Size = 32, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ESP };
+            new Move { Size = 32, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EAX };
+            new Move { Size = 32, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EBX };
+            new Move { Size = 32, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ECX };
+            new Move { Size = 32, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EDX };
+            new Move { Size = 32, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EDI };
+            new Move { Size = 32, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ESI };
+            new Move { Size = 32, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EBP };
+            new Move { Size = 32, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ESP };
+            new Move { Size = 32, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EAX };
+            new Move { Size = 32, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EBX };
+            new Move { Size = 32, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ECX };
+            new Move { Size = 32, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EDX };
+            new Move { Size = 32, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EDI };
+            new Move { Size = 32, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ESI };
+            new Move { Size = 32, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EBP };
+            new Move { Size = 32, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ESP };
+            new Move { Size = 32, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EAX };
+            new Move { Size = 32, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EBX };
+            new Move { Size = 32, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ECX };
+            new Move { Size = 32, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EDX };
+            new Move { Size = 32, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EDI };
+            new Move { Size = 32, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ESI };
+            new Move { Size = 32, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EBP };
+            new Move { Size = 32, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ESP };
+            new Move { Size = 32, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EAX };
+            new Move { Size = 32, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EBX };
+            new Move { Size = 32, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ECX };
+            new Move { Size = 32, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EDX };
+            new Move { Size = 32, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EDI };
+            new Move { Size = 32, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ESI };
+            new Move { Size = 32, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EBP };
+            new Move { Size = 32, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ESP };
+            new Move { Size = 32, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EAX };
+            new Move { Size = 32, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EBX };
+            new Move { Size = 32, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ECX };
+            new Move { Size = 32, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EDX };
+            new Move { Size = 32, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EDI };
+            new Move { Size = 32, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ESI };
+            new Move { Size = 32, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EBP };
+            new Move { Size = 32, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ESP };
+            Verify();
+        }
+
+        [Test]
+        public void TestRegisterToMemory32BitOffset16() {
+            new Move { Size = 16, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.AX };
+            new Move { Size = 16, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.BX };
+            new Move { Size = 16, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.CX };
+            new Move { Size = 16, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.DX };
+            new Move { Size = 16, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.DI };
+            new Move { Size = 16, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.SI };
+            new Move { Size = 16, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.BP };
+            new Move { Size = 16, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.SP };
+            new Move { Size = 16, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.AX };
+            new Move { Size = 16, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.BX };
+            new Move { Size = 16, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.CX };
+            new Move { Size = 16, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.DX };
+            new Move { Size = 16, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.DI };
+            new Move { Size = 16, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.SI };
+            new Move { Size = 16, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.BP };
+            new Move { Size = 16, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.SP };
+            new Move { Size = 16, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.AX };
+            new Move { Size = 16, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.BX };
+            new Move { Size = 16, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.CX };
+            new Move { Size = 16, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.DX };
+            new Move { Size = 16, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.DI };
+            new Move { Size = 16, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.SI };
+            new Move { Size = 16, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.BP };
+            new Move { Size = 16, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.SP };
+            new Move { Size = 16, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.AX };
+            new Move { Size = 16, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.BX };
+            new Move { Size = 16, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.CX };
+            new Move { Size = 16, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.DX };
+            new Move { Size = 16, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.DI };
+            new Move { Size = 16, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.SI };
+            new Move { Size = 16, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.BP };
+            new Move { Size = 16, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.SP };
+            new Move { Size = 16, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.AX };
+            new Move { Size = 16, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.BX };
+            new Move { Size = 16, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.CX };
+            new Move { Size = 16, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.DX };
+            new Move { Size = 16, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.DI };
+            new Move { Size = 16, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.SI };
+            new Move { Size = 16, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.BP };
+            new Move { Size = 16, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.SP };
+            new Move { Size = 16, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.AX };
+            new Move { Size = 16, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.BX };
+            new Move { Size = 16, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.CX };
+            new Move { Size = 16, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.DX };
+            new Move { Size = 16, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.DI };
+            new Move { Size = 16, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.SI };
+            new Move { Size = 16, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.BP };
+            new Move { Size = 16, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.SP };
+            new Move { Size = 16, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.AX };
+            new Move { Size = 16, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.BX };
+            new Move { Size = 16, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.CX };
+            new Move { Size = 16, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.DX };
+            new Move { Size = 16, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.DI };
+            new Move { Size = 16, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.SI };
+            new Move { Size = 16, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.BP };
+            new Move { Size = 16, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.SP };
+            new Move { Size = 16, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.AX };
+            new Move { Size = 16, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.BX };
+            new Move { Size = 16, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.CX };
+            new Move { Size = 16, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.DX };
+            new Move { Size = 16, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.DI };
+            new Move { Size = 16, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.SI };
+            new Move { Size = 16, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.BP };
+            new Move { Size = 16, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.SP };
+            Verify();
+        }
+
+        [Test]
+        public void TestRegisterToMemory32BitOffset8() {
+            new Move { Size = 8, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.AL };
+            new Move { Size = 8, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.BL };
+            new Move { Size = 8, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.CL };
+            new Move { Size = 8, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.DL };
+            new Move { Size = 8, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.AH };
+            new Move { Size = 8, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.BH };
+            new Move { Size = 8, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.CH };
+            new Move { Size = 8, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.DH };
+            new Move { Size = 8, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.AL };
+            new Move { Size = 8, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.BL };
+            new Move { Size = 8, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.CL };
+            new Move { Size = 8, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.DL };
+            new Move { Size = 8, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.AH };
+            new Move { Size = 8, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.BH };
+            new Move { Size = 8, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.CH };
+            new Move { Size = 8, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.DH };
+            new Move { Size = 8, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.AL };
+            new Move { Size = 8, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.BL };
+            new Move { Size = 8, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.CL };
+            new Move { Size = 8, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.DL };
+            new Move { Size = 8, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.AH };
+            new Move { Size = 8, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.BH };
+            new Move { Size = 8, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.CH };
+            new Move { Size = 8, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.DH };
+            new Move { Size = 8, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.AL };
+            new Move { Size = 8, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.BL };
+            new Move { Size = 8, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.CL };
+            new Move { Size = 8, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.DL };
+            new Move { Size = 8, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.AH };
+            new Move { Size = 8, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.BH };
+            new Move { Size = 8, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.CH };
+            new Move { Size = 8, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.DH };
+            new Move { Size = 8, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.AL };
+            new Move { Size = 8, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.BL };
+            new Move { Size = 8, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.CL };
+            new Move { Size = 8, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.DL };
+            new Move { Size = 8, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.AH };
+            new Move { Size = 8, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.BH };
+            new Move { Size = 8, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.CH };
+            new Move { Size = 8, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.DH };
+            new Move { Size = 8, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.AL };
+            new Move { Size = 8, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.BL };
+            new Move { Size = 8, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.CL };
+            new Move { Size = 8, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.DL };
+            new Move { Size = 8, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.AH };
+            new Move { Size = 8, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.BH };
+            new Move { Size = 8, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.CH };
+            new Move { Size = 8, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.DH };
+            new Move { Size = 8, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.AL };
+            new Move { Size = 8, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.BL };
+            new Move { Size = 8, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.CL };
+            new Move { Size = 8, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.DL };
+            new Move { Size = 8, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.AH };
+            new Move { Size = 8, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.BH };
+            new Move { Size = 8, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.CH };
+            new Move { Size = 8, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.DH };
+            new Move { Size = 8, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.AL };
+            new Move { Size = 8, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.BL };
+            new Move { Size = 8, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.CL };
+            new Move { Size = 8, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.DL };
+            new Move { Size = 8, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.AH };
+            new Move { Size = 8, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.BH };
+            new Move { Size = 8, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.CH };
+            new Move { Size = 8, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.DH };
+            Verify();
+        }
+
+        [Test]
+        public void TestRegisterToMemory16BitOffset32() {
+            new Move { Size = 32, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EAX };
+            new Move { Size = 32, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EBX };
+            new Move { Size = 32, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.ECX };
+            new Move { Size = 32, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EDX };
+            new Move { Size = 32, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EDI };
+            new Move { Size = 32, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.ESI };
+            new Move { Size = 32, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EBP };
+            new Move { Size = 32, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.ESP };
+            new Move { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EAX };
+            new Move { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EBX };
+            new Move { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.ECX };
+            new Move { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EDX };
+            new Move { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EDI };
+            new Move { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.ESI };
+            new Move { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EBP };
+            new Move { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.ESP };
+            new Move { Size = 32, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EAX };
+            new Move { Size = 32, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EBX };
+            new Move { Size = 32, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.ECX };
+            new Move { Size = 32, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EDX };
+            new Move { Size = 32, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EDI };
+            new Move { Size = 32, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.ESI };
+            new Move { Size = 32, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EBP };
+            new Move { Size = 32, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.ESP };
+            new Move { Size = 32, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EAX };
+            new Move { Size = 32, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EBX };
+            new Move { Size = 32, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.ECX };
+            new Move { Size = 32, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EDX };
+            new Move { Size = 32, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EDI };
+            new Move { Size = 32, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.ESI };
+            new Move { Size = 32, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EBP };
+            new Move { Size = 32, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.ESP };
+            new Move { Size = 32, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EAX };
+            new Move { Size = 32, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EBX };
+            new Move { Size = 32, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.ECX };
+            new Move { Size = 32, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EDX };
+            new Move { Size = 32, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EDI };
+            new Move { Size = 32, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.ESI };
+            new Move { Size = 32, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EBP };
+            new Move { Size = 32, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.ESP };
+            new Move { Size = 32, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EAX };
+            new Move { Size = 32, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EBX };
+            new Move { Size = 32, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.ECX };
+            new Move { Size = 32, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EDX };
+            new Move { Size = 32, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EDI };
+            new Move { Size = 32, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.ESI };
+            new Move { Size = 32, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EBP };
+            new Move { Size = 32, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.ESP };
+            new Move { Size = 32, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EAX };
+            new Move { Size = 32, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EBX };
+            new Move { Size = 32, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.ECX };
+            new Move { Size = 32, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EDX };
+            new Move { Size = 32, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EDI };
+            new Move { Size = 32, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.ESI };
+            new Move { Size = 32, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EBP };
+            new Move { Size = 32, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.ESP };
+            new Move { Size = 32, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EAX };
+            new Move { Size = 32, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EBX };
+            new Move { Size = 32, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.ECX };
+            new Move { Size = 32, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EDX };
+            new Move { Size = 32, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EDI };
+            new Move { Size = 32, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.ESI };
+            new Move { Size = 32, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.EBP };
+            new Move { Size = 32, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.ESP };
+            Verify();
+        }
+
+        [Test]
+        public void TestRegisterToMemory16BitOffset16() {
+            new Move { Size = 16, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.AX };
+            new Move { Size = 16, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.BX };
+            new Move { Size = 16, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.CX };
+            new Move { Size = 16, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.DX };
+            new Move { Size = 16, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.DI };
+            new Move { Size = 16, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.SI };
+            new Move { Size = 16, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.BP };
+            new Move { Size = 16, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.SP };
+            new Move { Size = 16, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.AX };
+            new Move { Size = 16, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.BX };
+            new Move { Size = 16, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.CX };
+            new Move { Size = 16, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.DX };
+            new Move { Size = 16, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.DI };
+            new Move { Size = 16, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.SI };
+            new Move { Size = 16, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.BP };
+            new Move { Size = 16, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.SP };
+            new Move { Size = 16, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.AX };
+            new Move { Size = 16, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.BX };
+            new Move { Size = 16, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.CX };
+            new Move { Size = 16, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.DX };
+            new Move { Size = 16, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.DI };
+            new Move { Size = 16, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.SI };
+            new Move { Size = 16, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.BP };
+            new Move { Size = 16, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.SP };
+            new Move { Size = 16, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.AX };
+            new Move { Size = 16, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.BX };
+            new Move { Size = 16, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.CX };
+            new Move { Size = 16, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.DX };
+            new Move { Size = 16, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.DI };
+            new Move { Size = 16, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.SI };
+            new Move { Size = 16, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.BP };
+            new Move { Size = 16, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.SP };
+            new Move { Size = 16, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.AX };
+            new Move { Size = 16, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.BX };
+            new Move { Size = 16, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.CX };
+            new Move { Size = 16, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.DX };
+            new Move { Size = 16, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.DI };
+            new Move { Size = 16, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.SI };
+            new Move { Size = 16, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.BP };
+            new Move { Size = 16, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.SP };
+            new Move { Size = 16, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.AX };
+            new Move { Size = 16, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.BX };
+            new Move { Size = 16, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.CX };
+            new Move { Size = 16, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.DX };
+            new Move { Size = 16, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.DI };
+            new Move { Size = 16, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.SI };
+            new Move { Size = 16, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.BP };
+            new Move { Size = 16, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.SP };
+            new Move { Size = 16, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.AX };
+            new Move { Size = 16, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.BX };
+            new Move { Size = 16, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.CX };
+            new Move { Size = 16, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.DX };
+            new Move { Size = 16, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.DI };
+            new Move { Size = 16, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.SI };
+            new Move { Size = 16, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.BP };
+            new Move { Size = 16, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.SP };
+            new Move { Size = 16, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.AX };
+            new Move { Size = 16, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.BX };
+            new Move { Size = 16, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.CX };
+            new Move { Size = 16, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.DX };
+            new Move { Size = 16, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.DI };
+            new Move { Size = 16, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.SI };
+            new Move { Size = 16, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.BP };
+            new Move { Size = 16, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.SP };
+            Verify();
+        }
+
+        [Test]
+        public void TestRegisterToMemory16BitOffset8() {
+            new Move { Size = 8, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.AL };
+            new Move { Size = 8, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.BL };
+            new Move { Size = 8, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.CL };
+            new Move { Size = 8, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.DL };
+            new Move { Size = 8, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.AH };
+            new Move { Size = 8, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.BH };
+            new Move { Size = 8, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.CH };
+            new Move { Size = 8, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.DH };
+            new Move { Size = 8, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.AL };
+            new Move { Size = 8, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.BL };
+            new Move { Size = 8, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.CL };
+            new Move { Size = 8, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.DL };
+            new Move { Size = 8, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.AH };
+            new Move { Size = 8, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.BH };
+            new Move { Size = 8, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.CH };
+            new Move { Size = 8, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.DH };
+            new Move { Size = 8, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.AL };
+            new Move { Size = 8, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.BL };
+            new Move { Size = 8, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.CL };
+            new Move { Size = 8, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.DL };
+            new Move { Size = 8, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.AH };
+            new Move { Size = 8, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.BH };
+            new Move { Size = 8, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.CH };
+            new Move { Size = 8, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.DH };
+            new Move { Size = 8, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.AL };
+            new Move { Size = 8, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.BL };
+            new Move { Size = 8, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.CL };
+            new Move { Size = 8, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.DL };
+            new Move { Size = 8, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.AH };
+            new Move { Size = 8, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.BH };
+            new Move { Size = 8, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.CH };
+            new Move { Size = 8, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.DH };
+            new Move { Size = 8, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.AL };
+            new Move { Size = 8, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.BL };
+            new Move { Size = 8, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.CL };
+            new Move { Size = 8, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.DL };
+            new Move { Size = 8, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.AH };
+            new Move { Size = 8, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.BH };
+            new Move { Size = 8, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.CH };
+            new Move { Size = 8, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.DH };
+            new Move { Size = 8, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.AL };
+            new Move { Size = 8, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.BL };
+            new Move { Size = 8, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.CL };
+            new Move { Size = 8, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.DL };
+            new Move { Size = 8, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.AH };
+            new Move { Size = 8, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.BH };
+            new Move { Size = 8, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.CH };
+            new Move { Size = 8, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.DH };
+            new Move { Size = 8, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.AL };
+            new Move { Size = 8, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.BL };
+            new Move { Size = 8, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.CL };
+            new Move { Size = 8, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.DL };
+            new Move { Size = 8, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.AH };
+            new Move { Size = 8, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.BH };
+            new Move { Size = 8, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.CH };
+            new Move { Size = 8, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.DH };
+            new Move { Size = 8, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.AL };
+            new Move { Size = 8, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.BL };
+            new Move { Size = 8, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.CL };
+            new Move { Size = 8, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.DL };
+            new Move { Size = 8, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.AH };
+            new Move { Size = 8, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.BH };
+            new Move { Size = 8, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.CH };
+            new Move { Size = 8, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x650, SourceReg = Registers.DH };
+            Verify();
+        }
+
+        [Test]
+        public void TestRegisterToMemory8BitOffset32() {
+            new Move { Size = 32, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EAX };
+            new Move { Size = 32, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EBX };
+            new Move { Size = 32, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.ECX };
+            new Move { Size = 32, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EDX };
+            new Move { Size = 32, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EDI };
+            new Move { Size = 32, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.ESI };
+            new Move { Size = 32, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EBP };
+            new Move { Size = 32, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.ESP };
+            new Move { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EAX };
+            new Move { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EBX };
+            new Move { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.ECX };
+            new Move { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EDX };
+            new Move { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EDI };
+            new Move { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.ESI };
+            new Move { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EBP };
+            new Move { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.ESP };
+            new Move { Size = 32, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EAX };
+            new Move { Size = 32, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EBX };
+            new Move { Size = 32, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.ECX };
+            new Move { Size = 32, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EDX };
+            new Move { Size = 32, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EDI };
+            new Move { Size = 32, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.ESI };
+            new Move { Size = 32, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EBP };
+            new Move { Size = 32, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.ESP };
+            new Move { Size = 32, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EAX };
+            new Move { Size = 32, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EBX };
+            new Move { Size = 32, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.ECX };
+            new Move { Size = 32, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EDX };
+            new Move { Size = 32, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EDI };
+            new Move { Size = 32, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.ESI };
+            new Move { Size = 32, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EBP };
+            new Move { Size = 32, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.ESP };
+            new Move { Size = 32, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EAX };
+            new Move { Size = 32, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EBX };
+            new Move { Size = 32, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.ECX };
+            new Move { Size = 32, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EDX };
+            new Move { Size = 32, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EDI };
+            new Move { Size = 32, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.ESI };
+            new Move { Size = 32, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EBP };
+            new Move { Size = 32, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.ESP };
+            new Move { Size = 32, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EAX };
+            new Move { Size = 32, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EBX };
+            new Move { Size = 32, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.ECX };
+            new Move { Size = 32, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EDX };
+            new Move { Size = 32, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EDI };
+            new Move { Size = 32, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.ESI };
+            new Move { Size = 32, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EBP };
+            new Move { Size = 32, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.ESP };
+            new Move { Size = 32, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EAX };
+            new Move { Size = 32, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EBX };
+            new Move { Size = 32, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.ECX };
+            new Move { Size = 32, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EDX };
+            new Move { Size = 32, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EDI };
+            new Move { Size = 32, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.ESI };
+            new Move { Size = 32, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EBP };
+            new Move { Size = 32, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.ESP };
+            new Move { Size = 32, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EAX };
+            new Move { Size = 32, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EBX };
+            new Move { Size = 32, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.ECX };
+            new Move { Size = 32, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EDX };
+            new Move { Size = 32, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EDI };
+            new Move { Size = 32, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.ESI };
+            new Move { Size = 32, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.EBP };
+            new Move { Size = 32, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.ESP };
+            Verify();
+        }
+
+        [Test]
+        public void TestRegisterToMemory8BitOffset16() {
+            new Move { Size = 16, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.AX };
+            new Move { Size = 16, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.BX };
+            new Move { Size = 16, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.CX };
+            new Move { Size = 16, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.DX };
+            new Move { Size = 16, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.DI };
+            new Move { Size = 16, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.SI };
+            new Move { Size = 16, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.BP };
+            new Move { Size = 16, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.SP };
+            new Move { Size = 16, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.AX };
+            new Move { Size = 16, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.BX };
+            new Move { Size = 16, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.CX };
+            new Move { Size = 16, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.DX };
+            new Move { Size = 16, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.DI };
+            new Move { Size = 16, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.SI };
+            new Move { Size = 16, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.BP };
+            new Move { Size = 16, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.SP };
+            new Move { Size = 16, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.AX };
+            new Move { Size = 16, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.BX };
+            new Move { Size = 16, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.CX };
+            new Move { Size = 16, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.DX };
+            new Move { Size = 16, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.DI };
+            new Move { Size = 16, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.SI };
+            new Move { Size = 16, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.BP };
+            new Move { Size = 16, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.SP };
+            new Move { Size = 16, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.AX };
+            new Move { Size = 16, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.BX };
+            new Move { Size = 16, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.CX };
+            new Move { Size = 16, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.DX };
+            new Move { Size = 16, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.DI };
+            new Move { Size = 16, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.SI };
+            new Move { Size = 16, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.BP };
+            new Move { Size = 16, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.SP };
+            new Move { Size = 16, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.AX };
+            new Move { Size = 16, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.BX };
+            new Move { Size = 16, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.CX };
+            new Move { Size = 16, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.DX };
+            new Move { Size = 16, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.DI };
+            new Move { Size = 16, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.SI };
+            new Move { Size = 16, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.BP };
+            new Move { Size = 16, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.SP };
+            new Move { Size = 16, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.AX };
+            new Move { Size = 16, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.BX };
+            new Move { Size = 16, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.CX };
+            new Move { Size = 16, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.DX };
+            new Move { Size = 16, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.DI };
+            new Move { Size = 16, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.SI };
+            new Move { Size = 16, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.BP };
+            new Move { Size = 16, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.SP };
+            new Move { Size = 16, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.AX };
+            new Move { Size = 16, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.BX };
+            new Move { Size = 16, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.CX };
+            new Move { Size = 16, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.DX };
+            new Move { Size = 16, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.DI };
+            new Move { Size = 16, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.SI };
+            new Move { Size = 16, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.BP };
+            new Move { Size = 16, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.SP };
+            new Move { Size = 16, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.AX };
+            new Move { Size = 16, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.BX };
+            new Move { Size = 16, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.CX };
+            new Move { Size = 16, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.DX };
+            new Move { Size = 16, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.DI };
+            new Move { Size = 16, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.SI };
+            new Move { Size = 16, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.BP };
+            new Move { Size = 16, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.SP };
+            Verify();
+        }
+
+        [Test]
+        public void TestRegisterToMemory8BitOffset8() {
+            new Move { Size = 8, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.AL };
+            new Move { Size = 8, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.BL };
+            new Move { Size = 8, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.CL };
+            new Move { Size = 8, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.DL };
+            new Move { Size = 8, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.AH };
+            new Move { Size = 8, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.BH };
+            new Move { Size = 8, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.CH };
+            new Move { Size = 8, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.DH };
+            new Move { Size = 8, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.AL };
+            new Move { Size = 8, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.BL };
+            new Move { Size = 8, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.CL };
+            new Move { Size = 8, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.DL };
+            new Move { Size = 8, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.AH };
+            new Move { Size = 8, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.BH };
+            new Move { Size = 8, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.CH };
+            new Move { Size = 8, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.DH };
+            new Move { Size = 8, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.AL };
+            new Move { Size = 8, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.BL };
+            new Move { Size = 8, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.CL };
+            new Move { Size = 8, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.DL };
+            new Move { Size = 8, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.AH };
+            new Move { Size = 8, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.BH };
+            new Move { Size = 8, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.CH };
+            new Move { Size = 8, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.DH };
+            new Move { Size = 8, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.AL };
+            new Move { Size = 8, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.BL };
+            new Move { Size = 8, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.CL };
+            new Move { Size = 8, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.DL };
+            new Move { Size = 8, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.AH };
+            new Move { Size = 8, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.BH };
+            new Move { Size = 8, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.CH };
+            new Move { Size = 8, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.DH };
+            new Move { Size = 8, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.AL };
+            new Move { Size = 8, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.BL };
+            new Move { Size = 8, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.CL };
+            new Move { Size = 8, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.DL };
+            new Move { Size = 8, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.AH };
+            new Move { Size = 8, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.BH };
+            new Move { Size = 8, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.CH };
+            new Move { Size = 8, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.DH };
+            new Move { Size = 8, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.AL };
+            new Move { Size = 8, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.BL };
+            new Move { Size = 8, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.CL };
+            new Move { Size = 8, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.DL };
+            new Move { Size = 8, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.AH };
+            new Move { Size = 8, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.BH };
+            new Move { Size = 8, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.CH };
+            new Move { Size = 8, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.DH };
+            new Move { Size = 8, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.AL };
+            new Move { Size = 8, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.BL };
+            new Move { Size = 8, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.CL };
+            new Move { Size = 8, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.DL };
+            new Move { Size = 8, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.AH };
+            new Move { Size = 8, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.BH };
+            new Move { Size = 8, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.CH };
+            new Move { Size = 8, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.DH };
+            new Move { Size = 8, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.AL };
+            new Move { Size = 8, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.BL };
+            new Move { Size = 8, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.CL };
+            new Move { Size = 8, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.DL };
+            new Move { Size = 8, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.AH };
+            new Move { Size = 8, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.BH };
+            new Move { Size = 8, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.CH };
+            new Move { Size = 8, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65, SourceReg = Registers.DH };
+            Verify();
+        }
+
         [Test]
         public void TestImmediateToRegister32() {
             new Move { DestinationReg = Registers.EAX, SourceValue = 1 };
