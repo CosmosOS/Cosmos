@@ -16,24 +16,24 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 SourceImmediate = true
             }); // immediate to reg, shortcut for EAX/AX/AL
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
-                OpCode = new byte[] { 0x80, 0xC0 },
+                OpCode = new byte[] { 0x80 },
                 AllowedSizes = InstructionSizes.Byte | InstructionSizes.Word | InstructionSizes.DWord,
                 DefaultSize = InstructionSize.DWord,
+                NeedsModRMByte = true,
+                InitialModRMByteValue = 0xC0,
                 OperandSizeByte = 0,
                 DestinationReg = Guid.Empty,
-                DestinationRegByte = 1,
                 SourceImmediate = true
             }); // immediate to reg
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
-                OpCode = new byte[] { 0, 0xC0 },
+                OpCode = new byte[] { 0 },
                 AllowedSizes = InstructionSizes.DWord,
                 DefaultSize = InstructionSize.DWord,
+                NeedsModRMByte = true,
+                InitialModRMByteValue = 0xC0,
                 OperandSizeByte = 0,
                 DestinationReg = Guid.Empty,
-                DestinationRegByte = 1,
                 SourceReg = Guid.Empty,
-                SourceRegByte = 1,
-                SourceRegBitShiftLeft = 3
             }); // register to register
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0x80 },
@@ -43,7 +43,16 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 DefaultSize = InstructionSize.DWord,
                 DestinationMemory = true,
                 SourceImmediate = true
-            });
+            }); // immediate to memory
+            aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
+                OpCode = new byte[] { 0x00 },
+                NeedsModRMByte = true,
+                OperandSizeByte = 0,
+                AllowedSizes = InstructionSizes.Byte | InstructionSizes.Word | InstructionSizes.DWord,
+                DefaultSize = InstructionSize.DWord,
+                DestinationMemory = true,
+                SourceReg = Guid.Empty
+            }); // register to memory
         }
 	}
 }

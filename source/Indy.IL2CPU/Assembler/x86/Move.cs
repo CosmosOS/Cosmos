@@ -31,12 +31,11 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 DestinationReg = Guid.Empty
             });  // immediate to memory
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
-                OpCode = new byte[] { 0x88, 0xC0 },
+                OpCode = new byte[] { 0x88  },
                 OperandSizeByte = 0,
+                NeedsModRMByte=true,
+                InitialModRMByteValue=0xC0,
                 SourceReg=Guid.Empty,
-                SourceRegByte=1,
-                SourceRegBitShiftLeft = 3,
-                DestinationRegByte = 1,
                 DestinationReg=Guid.Empty
             }); // register to register
 

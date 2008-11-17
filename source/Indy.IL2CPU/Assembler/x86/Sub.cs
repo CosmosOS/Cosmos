@@ -10,15 +10,17 @@ namespace Indy.IL2CPU.Assembler.X86 {
     public class Sub : InstructionWithDestinationAndSourceAndSize {
         public static void InitializeEncodingData(Instruction.InstructionData aData) {
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
-                OpCode = new byte[] { 0x28, 0xC0 },
+                OpCode = new byte[] { 0x28},
+                NeedsModRMByte=true,
+                InitialModRMByteValue = 0xC0,
                 OperandSizeByte = 0,
                 AllowedSizes = InstructionSizes.Byte | InstructionSizes.Word | InstructionSizes.DWord,
                 DefaultSize = InstructionSize.DWord,
                 DestinationReg = Guid.Empty,
-                DestinationRegByte = 1,
+                //DestinationRegByte = 1,
                 SourceReg = Guid.Empty,
-                SourceRegByte = 1,
-                SourceRegBitShiftLeft = 3
+                //SourceRegByte = 1,
+                //SourceRegBitShiftLeft = 3
             }); // register to register
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[]{0x2C},
@@ -47,6 +49,16 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 SourceImmediate=true,
                 DestinationMemory=true
             }); // immediate to memory
+            aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
+                OpCode = new byte[] { 0x28 },
+                OperandSizeByte = 0,
+                AllowedSizes = InstructionSizes.Byte | InstructionSizes.Word | InstructionSizes.DWord,
+                DefaultSize = InstructionSize.DWord,
+                NeedsModRMByte = true,
+                //InitialModRMByteValue = 0x28,
+                SourceReg = Guid.Empty,
+                DestinationMemory = true
+            }); // register to memory
         }
     }
 }

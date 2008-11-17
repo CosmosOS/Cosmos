@@ -12,7 +12,8 @@ namespace TestApp {
     class Program {
         class Renderer : Y86 {
             public void DoRender() {
-                new Move { DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, SourceValue = 65, Size = 32 };
+                new Move { DestinationReg = Registers.ESP, SourceReg = Registers.EBX };
+                new Move { DestinationReg = Registers.ESP, SourceReg = Registers.ECX };
             }
         }
         static void Main(string[] args) {
