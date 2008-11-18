@@ -13,72 +13,16 @@ namespace TestApp {
         class Renderer : Y86 {
             public void DoRender() {
                 #region code
-                new Add { Size = 32, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EAX };
-            new Add { Size = 32, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EBX };
-            new Add { Size = 32, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ECX };
-            new Add { Size = 32, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EDX };
-            new Add { Size = 32, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EDI };
-            new Add { Size = 32, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ESI };
-            new Add { Size = 32, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EBP };
-            new Add { Size = 32, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ESP };
-            new Add { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EAX };
-            new Add { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EBX };
-            new Add { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ECX };
-            new Add { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EDX };
-            new Add { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EDI };
-            new Add { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ESI };
-            new Add { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EBP };
-            new Add { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ESP };
-            new Add { Size = 32, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EAX };
-            new Add { Size = 32, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EBX };
-            new Add { Size = 32, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ECX };
-            new Add { Size = 32, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EDX };
-            new Add { Size = 32, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EDI };
-            new Add { Size = 32, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ESI };
-            new Add { Size = 32, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EBP };
-            new Add { Size = 32, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ESP };
-            new Add { Size = 32, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EAX };
-            new Add { Size = 32, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EBX };
-            new Add { Size = 32, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ECX };
-            new Add { Size = 32, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EDX };
-            new Add { Size = 32, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EDI };
-            new Add { Size = 32, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ESI };
-            new Add { Size = 32, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EBP };
-            new Add { Size = 32, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ESP };
-            new Add { Size = 32, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EAX };
-            new Add { Size = 32, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EBX };
-            new Add { Size = 32, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ECX };
-            new Add { Size = 32, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EDX };
-            new Add { Size = 32, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EDI };
-            new Add { Size = 32, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ESI };
-            new Add { Size = 32, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EBP };
-            new Add { Size = 32, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ESP };
-            new Add { Size = 32, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EAX };
-            new Add { Size = 32, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EBX };
-            new Add { Size = 32, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ECX };
-            new Add { Size = 32, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EDX };
-            new Add { Size = 32, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EDI };
-            new Add { Size = 32, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ESI };
-            new Add { Size = 32, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EBP };
-            new Add { Size = 32, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ESP };
-            new Add { Size = 32, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EAX };
-            new Add { Size = 32, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EBX };
-            new Add { Size = 32, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ECX };
-            new Add { Size = 32, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EDX };
-            new Add { Size = 32, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EDI };
-            new Add { Size = 32, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ESI };
-            new Add { Size = 32, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EBP };
-            new Add { Size = 32, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ESP };
-            new Add { Size = 32, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EAX };
-            new Add { Size = 32, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EBX };
-            new Add { Size = 32, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ECX };
-            new Add { Size = 32, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EDX };
-            new Add { Size = 32, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EDI };
-            new Add { Size = 32, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ESI };
-            new Add { Size = 32, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.EBP };
-            new Add { Size = 32, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 0x65000, SourceReg = Registers.ESP };
-#endregion
-            
+                new Add { Size = 32, DestinationReg = Registers.EAX, DestinationIsIndirect = true, SourceValue = 65 };
+                new Add { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, SourceValue = 66 };
+                new Add { Size = 32, DestinationReg = Registers.ECX, DestinationIsIndirect = true, SourceValue = 67 };
+                new Add { Size = 32, DestinationReg = Registers.EDX, DestinationIsIndirect = true, SourceValue = 68 };
+                new Add { Size = 32, DestinationReg = Registers.EDI, DestinationIsIndirect = true, SourceValue = 69 };
+                new Add { Size = 32, DestinationReg = Registers.ESI, DestinationIsIndirect = true, SourceValue = 70 };
+                new Add { Size = 32, DestinationReg = Registers.ESP, DestinationIsIndirect = true, SourceValue = 71 };
+                new Add { Size = 32, DestinationReg = Registers.EBP, DestinationIsIndirect = true, SourceValue = 72 };
+                #endregion
+
             }
         }
         static void Main(string[] args) {
