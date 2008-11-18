@@ -17,10 +17,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 AllowedSizes = InstructionSizes.Byte | InstructionSizes.Word | InstructionSizes.DWord,
                 DefaultSize = InstructionSize.DWord,
                 DestinationReg = Guid.Empty,
-                //DestinationRegByte = 1,
                 SourceReg = Guid.Empty,
-                //SourceRegByte = 1,
-                //SourceRegBitShiftLeft = 3
             }); // register to register
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[]{0x2C},
