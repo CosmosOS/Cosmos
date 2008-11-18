@@ -258,7 +258,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 aSize += 1;
                 bool xSIB = false;
                 if (aInstructionWithDestination != null &&
-                    (((aInstructionWithDestination.DestinationReg == Registers.EBP || aInstructionWithDestination.DestinationReg == Registers.ESP) && aInstructionWithDestination.DestinationIsIndirect) /*||
+                    (((/*aInstructionWithDestination.DestinationReg == Registers.EBP ||*/ aInstructionWithDestination.DestinationReg == Registers.ESP) && aInstructionWithDestination.DestinationIsIndirect) /*||
                      aInstructionWithDestination.DestinationReg == Registers.ESP*/)) {
                     aSize++;
                     xSIB = true;
@@ -413,7 +413,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                     }
                     byte? xSIB = null;
                     if (aInstructionWithDestination.DestinationIsIndirect) {
-                        if (((aInstructionWithDestination.DestinationReg == Registers.EBP || aInstructionWithDestination.DestinationReg == Registers.ESP) && (aInstructionWithDestination.DestinationIsIndirect))) {
+                        if (((/*aInstructionWithDestination.DestinationReg == Registers.EBP ||*/ aInstructionWithDestination.DestinationReg == Registers.ESP) && (aInstructionWithDestination.DestinationIsIndirect))) {
                             if (aInstructionWithDestination.DestinationReg == Registers.EBP) {
                                 xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= 1 << 6;
                                 xSIB = 0;
