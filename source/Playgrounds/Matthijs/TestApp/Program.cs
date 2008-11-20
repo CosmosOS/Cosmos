@@ -1,4 +1,4 @@
-﻿#define BINARY
+﻿//#define BINARY
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,14 +13,70 @@ namespace TestApp {
         class Renderer : Y86 {
             public void DoRender() {
                 #region code
-                new Add { Size = 32, DestinationReg = Registers.EAX, DestinationIsIndirect = true, SourceValue = 65 };
-                new Add { Size = 32, DestinationReg = Registers.EBX, DestinationIsIndirect = true, SourceValue = 66 };
-                new Add { Size = 32, DestinationReg = Registers.ECX, DestinationIsIndirect = true, SourceValue = 67 };
-                new Add { Size = 32, DestinationReg = Registers.EDX, DestinationIsIndirect = true, SourceValue = 68 };
-                new Add { Size = 32, DestinationReg = Registers.EDI, DestinationIsIndirect = true, SourceValue = 69 };
-                new Add { Size = 32, DestinationReg = Registers.ESI, DestinationIsIndirect = true, SourceValue = 70 };
-                new Add { Size = 32, DestinationReg = Registers.ESP, DestinationIsIndirect = true, SourceValue = 71 };
-                new Add { Size = 32, DestinationReg = Registers.EBP, DestinationIsIndirect = true, SourceValue = 72 };
+                new Move { DestinationReg = Registers.AL, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EAX };
+                new Move { DestinationReg = Registers.BL, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EAX };
+                new Move { DestinationReg = Registers.CL, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EAX };
+                new Move { DestinationReg = Registers.DL, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EAX };
+                new Move { DestinationReg = Registers.AH, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EAX };
+                new Move { DestinationReg = Registers.BH, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EAX };
+                new Move { DestinationReg = Registers.CH, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EAX };
+                new Move { DestinationReg = Registers.DH, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EAX };
+                new Move { DestinationReg = Registers.AL, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EBX };
+                new Move { DestinationReg = Registers.BL, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EBX };
+                new Move { DestinationReg = Registers.CL, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EBX };
+                new Move { DestinationReg = Registers.DL, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EBX };
+                new Move { DestinationReg = Registers.AH, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EBX };
+                new Move { DestinationReg = Registers.BH, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EBX };
+                new Move { DestinationReg = Registers.CH, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EBX };
+                new Move { DestinationReg = Registers.DH, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EBX };
+                new Move { DestinationReg = Registers.AL, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.ECX };
+                new Move { DestinationReg = Registers.BL, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.ECX };
+                new Move { DestinationReg = Registers.CL, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.ECX };
+                new Move { DestinationReg = Registers.DL, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.ECX };
+                new Move { DestinationReg = Registers.AH, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.ECX };
+                new Move { DestinationReg = Registers.BH, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.ECX };
+                new Move { DestinationReg = Registers.CH, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.ECX };
+                new Move { DestinationReg = Registers.DH, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.ECX };
+                new Move { DestinationReg = Registers.AL, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EDX };
+                new Move { DestinationReg = Registers.BL, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EDX };
+                new Move { DestinationReg = Registers.CL, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EDX };
+                new Move { DestinationReg = Registers.DL, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EDX };
+                new Move { DestinationReg = Registers.AH, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EDX };
+                new Move { DestinationReg = Registers.BH, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EDX };
+                new Move { DestinationReg = Registers.CH, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EDX };
+                new Move { DestinationReg = Registers.DH, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EDX };
+                new Move { DestinationReg = Registers.AL, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.ESI };
+                new Move { DestinationReg = Registers.BL, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.ESI };
+                new Move { DestinationReg = Registers.CL, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.ESI };
+                new Move { DestinationReg = Registers.DL, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.ESI };
+                new Move { DestinationReg = Registers.AH, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.ESI };
+                new Move { DestinationReg = Registers.BH, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.ESI };
+                new Move { DestinationReg = Registers.CH, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.ESI };
+                new Move { DestinationReg = Registers.DH, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.ESI };
+                new Move { DestinationReg = Registers.AL, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EDI };
+                new Move { DestinationReg = Registers.BL, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EDI };
+                new Move { DestinationReg = Registers.CL, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EDI };
+                new Move { DestinationReg = Registers.DL, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EDI };
+                new Move { DestinationReg = Registers.AH, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EDI };
+                new Move { DestinationReg = Registers.BH, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EDI };
+                new Move { DestinationReg = Registers.CH, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EDI };
+                new Move { DestinationReg = Registers.DH, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EDI };
+                new Move { DestinationReg = Registers.AL, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EBP };
+                new Move { DestinationReg = Registers.BL, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EBP };
+                new Move { DestinationReg = Registers.CL, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EBP };
+                new Move { DestinationReg = Registers.DL, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EBP };
+                new Move { DestinationReg = Registers.AH, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EBP };
+                new Move { DestinationReg = Registers.BH, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EBP };
+                new Move { DestinationReg = Registers.CH, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EBP };
+                new Move { DestinationReg = Registers.DH, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.EBP };
+                new Move { DestinationReg = Registers.AL, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.ESP };
+                new Move { DestinationReg = Registers.BL, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.ESP };
+                new Move { DestinationReg = Registers.CL, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.ESP };
+                new Move { DestinationReg = Registers.DL, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.ESP };
+                new Move { DestinationReg = Registers.AH, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.ESP };
+                new Move { DestinationReg = Registers.BH, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.ESP };
+                new Move { DestinationReg = Registers.CH, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.ESP };
+                new Move { DestinationReg = Registers.DH, SourceIsIndirect = true, SourceDisplacement = 0x56781203, SourceReg = Registers.ESP };
                 #endregion
 
             }

@@ -11,9 +11,9 @@ namespace Indy.IL2CPU.Assembler.X86 {
         [Flags]
         public enum InstructionSizes {
             None,
-            Byte=8,
-            Word=16,
-            DWord=32,
+            Byte = 8,
+            Word = 16,
+            DWord = 32,
             QWord = 64,
         }
 
@@ -171,7 +171,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             }
             aEncodingOption = null;
             for (int i = 0; i < aInstructionData.EncodingOptions.Count; i++) {
-                
+
                 var xEncodingOption = aInstructionData.EncodingOptions[i];
                 if (aInstructionWithDestination != null) {
                     if (!(((xEncodingOption.DestinationMemory || xEncodingOption.DestinationReg.HasValue) && (aInstructionWithDestination.DestinationReg != Guid.Empty || aInstructionWithDestination.DestinationValue.HasValue)) ||
@@ -191,37 +191,37 @@ namespace Indy.IL2CPU.Assembler.X86 {
                     }
                     if (xEncodingOption.DestinationReg.HasValue && xEncodingOption.DestinationReg != Guid.Empty && aInstructionWithDestination.DestinationReg != Guid.Empty && aInstructionWithDestination.DestinationIsIndirect == xEncodingOption.DestinationMemory) {
                         if (xEncodingOption.DestinationReg != aInstructionWithDestination.DestinationReg) {
-                                switch (xEncodingOption.DefaultSize) {
-                                    case InstructionSize.Byte: {
-                                            if ((xEncodingOption.AllowedSizes & InstructionSizes.Byte) != 0) {
-                                                var xTheActualReg = Registers.Get8BitRegistersForRegister(aInstructionWithDestination.DestinationReg);
-                                                if (xTheActualReg != xEncodingOption.DestinationReg.Value) {
-                                                    continue;
-                                                }
+                            switch (xEncodingOption.DefaultSize) {
+                                case InstructionSize.Byte: {
+                                        if ((xEncodingOption.AllowedSizes & InstructionSizes.Byte) != 0) {
+                                            var xTheActualReg = Registers.Get8BitRegistersForRegister(aInstructionWithDestination.DestinationReg);
+                                            if (xTheActualReg != xEncodingOption.DestinationReg.Value) {
+                                                continue;
                                             }
-                                            break;
                                         }
-                                    case InstructionSize.Word: {
-                                            if ((xEncodingOption.AllowedSizes & InstructionSizes.Word) != 0) {
-                                                var xTheActualReg = Registers.Get16BitRegisterForRegister(aInstructionWithDestination.DestinationReg);
-                                                if (xTheActualReg != xEncodingOption.DestinationReg.Value) {
-                                                    continue;
-                                                }
+                                        break;
+                                    }
+                                case InstructionSize.Word: {
+                                        if ((xEncodingOption.AllowedSizes & InstructionSizes.Word) != 0) {
+                                            var xTheActualReg = Registers.Get16BitRegisterForRegister(aInstructionWithDestination.DestinationReg);
+                                            if (xTheActualReg != xEncodingOption.DestinationReg.Value) {
+                                                continue;
                                             }
-                                            break;
                                         }
-                                    case InstructionSize.DWord: {
-                                            if ((xEncodingOption.AllowedSizes & InstructionSizes.DWord) != 0) {
-                                                var xTheActualReg = Registers.Get32BitRegisterForRegister(aInstructionWithDestination.DestinationReg);
-                                                if (xTheActualReg != xEncodingOption.DestinationReg.Value) {
-                                                    continue;
-                                                }
+                                        break;
+                                    }
+                                case InstructionSize.DWord: {
+                                        if ((xEncodingOption.AllowedSizes & InstructionSizes.DWord) != 0) {
+                                            var xTheActualReg = Registers.Get32BitRegisterForRegister(aInstructionWithDestination.DestinationReg);
+                                            if (xTheActualReg != xEncodingOption.DestinationReg.Value) {
+                                                continue;
                                             }
-                                            break;
                                         }
-                                    default:
-                                        throw new Exception("InstructionSize not implemented yet!");
-                                }
+                                        break;
+                                    }
+                                default:
+                                    throw new Exception("InstructionSize not implemented yet!");
+                            }
                         }
                     }
                 }
@@ -259,7 +259,8 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 bool xSIB = false;
                 if (aInstructionWithDestination != null &&
                     (((/*aInstructionWithDestination.DestinationReg == Registers.EBP ||*/ aInstructionWithDestination.DestinationReg == Registers.ESP) && aInstructionWithDestination.DestinationIsIndirect) /*||
-                     aInstructionWithDestination.DestinationReg == Registers.ESP*/)) {
+                     aInstructionWithDestination.DestinationReg == Registers.ESP*/
+                                                                                  )) {
                     aSize++;
                     xSIB = true;
                 } else {
@@ -267,13 +268,13 @@ namespace Indy.IL2CPU.Assembler.X86 {
                         aSize++;
                         xSIB = true;
                     } else {
-                        if (aInstructionWithSource != null &&
-                            ((aInstructionWithSource.SourceReg == Registers.EBP && (aInstructionWithSource.SourceReg != Guid.Empty && aInstructionWithSource.SourceIsIndirect)) /*||
-                         aInstructionWithSource.SourceReg == Registers.ESP*/
-                                                                                )) {
-                            aSize++;
-                            xSIB = true;
-                        }
+                        //if (aInstructionWithSource != null &&
+                        //    ((/*aInstructionWithSource.SourceReg == Registers.EBP &&*/ (aInstructionWithSource.SourceReg != Guid.Empty && aInstructionWithSource.SourceIsIndirect)) /*||
+                        // aInstructionWithSource.SourceReg == Registers.ESP*/
+                        //                                                        )) {
+                        //    aSize++;
+                        //    xSIB = true;
+                        //}
                     }
                 }
                 if (aInstructionWithDestination != null && aInstructionWithDestination.DestinationIsIndirect && aInstructionWithDestination.DestinationDisplacement > 0) {
@@ -281,6 +282,20 @@ namespace Indy.IL2CPU.Assembler.X86 {
                         aSize += 1; // for now use 16bit displacement
                     } else {
                         if (aInstructionWithDestination.DestinationDisplacement <= Int16.MaxValue) {
+                            aSize += 4;
+                        } else {
+                            aSize += 4;
+                        }
+                    }
+                    if (xSIB) {
+                        // aSize -= 1;
+                    }
+                }
+                if (aInstructionWithSource != null && aInstructionWithSource.SourceIsIndirect && aInstructionWithSource.SourceDisplacement > 0) {
+                    if (aInstructionWithSource.SourceDisplacement < 128) {
+                        aSize += 1; // for now use 16bit displacement
+                    } else {
+                        if (aInstructionWithSource.SourceDisplacement <= Int16.MaxValue) {
                             aSize += 4;
                         } else {
                             aSize += 4;
@@ -458,45 +473,115 @@ namespace Indy.IL2CPU.Assembler.X86 {
                         }
                     }
 
+                    if (aInstructionWithSource != null && aInstructionWithSource.SourceIsIndirect) {
+                        if (((/*aInstructionWithSource.SourceReg == Registers.EBP ||*/ aInstructionWithSource.SourceReg == Registers.ESP) && (aInstructionWithSource.SourceIsIndirect))) {
+                            if (aInstructionWithSource.SourceReg == Registers.EBP) {
+                                xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= 1 << 6;
+                                xSIB = 0;
+                            }
+                            if (aInstructionWithSource.SourceReg == Registers.ESP) {
+                                xSIB = 0x24;
+                            }
+                        } else {
+                            if (!(aInstructionWithSource != null &&
+                                ((aInstructionWithSource.SourceReg == Registers.EBP && !(aInstructionWithSource.SourceReg != Guid.Empty && aInstructionWithSource.SourceIsIndirect)) ||
+                                 aInstructionWithSource.SourceReg == Registers.ESP)) && (aInstructionWithSource.SourceReg == Guid.Empty && aInstructionWithSource.SourceIsIndirect)) {
+                                // todo: fix for 16bit mode, it should then be 0x36
+                                //xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= 0x5;
+                                //ulong xAddress = 0;
+                                //if (!(aInstructionWithSource.SourceRef != null && aInstructionWithSource.SourceRef.Resolve(aAssembler, out xAddress))) {
+                                //    if (aInstructionWithSource.SourceValue.HasValue) {
+                                //        xAddress = aInstructionWithSource.SourceValue.Value;
+                                //    }
+                                //}
+                                //xAddress += (ulong)aInstructionWithSource.SourceDisplacement;
+                                //Array.Copy(BitConverter.GetBytes((uint)xAddress), 0, xBuffer, aEncodingOption.OpCode.Length + xExtraOffset + 1, 4);
+                                //xExtraOffset += 4;
+                                // todo: fix for 16bit mode, it should then be 0x36
+                                xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= 0x5;
+
+                                ulong xAddress = 0;
+                                if (!(aInstructionWithSource.SourceRef != null && aInstructionWithSource.SourceRef.Resolve(aAssembler, out xAddress))) {
+                                    if (aInstructionWithSource.SourceValue.HasValue) {
+                                        xAddress = aInstructionWithSource.SourceValue.Value;
+                                    }
+                                }
+                                xAddress += (ulong)aInstructionWithSource.SourceDisplacement;
+                                Array.Copy(BitConverter.GetBytes((uint)xAddress), 0, xBuffer, aEncodingOption.OpCode.Length + xExtraOffset + 1, 4);
+                                xExtraOffset += 4;
+                            }
+                        }
+                    }
+
                     if (aInstructionWithDestination != null && aInstructionWithDestination.DestinationReg == Registers.EBP && aInstructionWithDestination.DestinationIsIndirect && aInstructionWithDestination.DestinationDisplacement == 0) {
                         xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= 0x40;
                         xExtraOffset++;
                     }
-                        //}
-                        if (aInstructionWithSource != null && aInstructionWithSource.SourceReg != Guid.Empty && aEncodingOption.SourceRegByte != null) {
-                            xBuffer[aEncodingOption.OpCode.Length + xExtraOffset - 1 + aEncodingOption.SourceRegByte.Value] |= (byte)(EncodeRegister(aInstructionWithSource.SourceReg) << aEncodingOption.SourceRegBitShiftLeft);
+                    //}
+                    if (aInstructionWithSource != null && aInstructionWithSource.SourceReg != Guid.Empty && aEncodingOption.SourceRegByte != null) {
+                        xBuffer[aEncodingOption.OpCode.Length + xExtraOffset - 1 + aEncodingOption.SourceRegByte.Value] |= (byte)(EncodeRegister(aInstructionWithSource.SourceReg) << aEncodingOption.SourceRegBitShiftLeft);
+                    }
+                    //SBArray.Resize(ref xBuffer, xBuffer.Length + 1);
+                    if (aInstructionWithDestination.DestinationReg != Guid.Empty && aInstructionWithDestination.DestinationIsIndirect && aInstructionWithDestination.DestinationDisplacement > 0) {
+                        var xSIBOffset = 0;
+                        if (xSIB != null) {
+                            //xExtraOffset++;
+                            xSIBOffset = 1;
+                            xBuffer[aEncodingOption.OpCode.Length + xExtraOffset + xSIBOffset] = xSIB.Value;
                         }
-                        //SBArray.Resize(ref xBuffer, xBuffer.Length + 1);
-                        if (aInstructionWithDestination.DestinationReg != Guid.Empty && aInstructionWithDestination.DestinationIsIndirect && aInstructionWithDestination.DestinationDisplacement > 0) {
-                            var xSIBOffset = 0;
-                            if (xSIB != null) {
-                                //xExtraOffset++;
-                                xSIBOffset = 1;
-                                xBuffer[aEncodingOption.OpCode.Length + xExtraOffset + xSIBOffset] = xSIB.Value;
-                            }
-                            //xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= 3 << 6;
-                            // todo: optimize for different displacement sizes
-                            if (aInstructionWithDestination.DestinationDisplacement < 128) {
-                                xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= 2 << 5; // for now use 8bit value
-                                Array.Copy(BitConverter.GetBytes((byte)aInstructionWithDestination.DestinationDisplacement), 0, xBuffer, aEncodingOption.OpCode.Length + xExtraOffset + xSIBOffset + 1, 1);
-                                xExtraOffset += 1;
-                            } else {
-                                xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= 2 << 6; // for now use 8bit value
-                                xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] &= 0xBF; // clear the 1 << 6
-                                Array.Copy(BitConverter.GetBytes(aInstructionWithDestination.DestinationDisplacement), 0, xBuffer, aEncodingOption.OpCode.Length + xExtraOffset + xSIBOffset + 1, 4);
-                                xExtraOffset += 4;
-                            }
-                            //}
-                            if (xSIB != null) {
-                                xExtraOffset++;
-                            }
+                        //xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= 3 << 6;
+                        // todo: optimize for different displacement sizes
+                        if (aInstructionWithDestination.DestinationDisplacement < 128) {
+                            xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= 2 << 5; // for now use 8bit value
+                            Array.Copy(BitConverter.GetBytes((byte)aInstructionWithDestination.DestinationDisplacement), 0, xBuffer, aEncodingOption.OpCode.Length + xExtraOffset + xSIBOffset + 1, 1);
+                            xExtraOffset += 1;
                         } else {
-                            if (xSIB != null) {
-                                xExtraOffset++;
-                                xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] = xSIB.Value;
-                            }
-
+                            xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= 2 << 6; // for now use 8bit value
+                            xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] &= 0xBF; // clear the 1 << 6
+                            Array.Copy(BitConverter.GetBytes(aInstructionWithDestination.DestinationDisplacement), 0, xBuffer, aEncodingOption.OpCode.Length + xExtraOffset + xSIBOffset + 1, 4);
+                            xExtraOffset += 4;
                         }
+                        //}
+                        if (xSIB != null) {
+                            xExtraOffset++;
+                        }
+                    } else {
+                        if (xSIB != null) {
+                            xExtraOffset++;
+                            xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] = xSIB.Value;
+                        }
+
+                    }
+                     if (aInstructionWithSource.SourceReg != Guid.Empty && aInstructionWithSource.SourceIsIndirect && aInstructionWithSource.SourceDisplacement > 0) {
+                        var xSIBOffset = 0;
+                        if (xSIB != null) {
+                            //xExtraOffset++;
+                            xSIBOffset = 1;
+                            xBuffer[aEncodingOption.OpCode.Length + xExtraOffset + xSIBOffset] = xSIB.Value;
+                        }
+                        //xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= 3 << 6;
+                        // todo: optimize for different displacement sizes
+                        if (aInstructionWithSource.SourceDisplacement < 128) {
+                            xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= 2 << 5; // for now use 8bit value
+                            Array.Copy(BitConverter.GetBytes((byte)aInstructionWithSource.SourceDisplacement), 0, xBuffer, aEncodingOption.OpCode.Length + xExtraOffset + xSIBOffset + 1, 1);
+                            xExtraOffset += 1;
+                        } else {
+                            xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= 2 << 6; // for now use 8bit value
+                            xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] &= 0xBF; // clear the 1 << 6
+                            Array.Copy(BitConverter.GetBytes(aInstructionWithSource.SourceDisplacement), 0, xBuffer, aEncodingOption.OpCode.Length + xExtraOffset + xSIBOffset + 1, 4);
+                            xExtraOffset += 4;
+                        }
+                        //}
+                        if (xSIB != null) {
+                            xExtraOffset++;
+                        }
+                    } else {
+                        if (xSIB != null) {
+                            xExtraOffset++;
+                            xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] = xSIB.Value;
+                        }
+
+                    }
                 }
                 //EncodeModRMByte(aInstruction.DestinationReg, aInstruction.DestinationIsIndirect, aInstruction.DestinationDisplacement > 0, aInstruction.DestinationDisplacement > 255, out xSIB);
 
@@ -535,15 +620,14 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 }
             }
             if (aInstructionWithSize != null) {
-                if (aEncodingOption.OperandSizeByte.HasValue) 
-                {
-                    if(aInstructionWithSize.Size != 8) {
+                if (aEncodingOption.OperandSizeByte.HasValue) {
+                    if (aInstructionWithSize.Size != 8) {
                         xBuffer[aEncodingOption.OperandSizeByte.Value + xOpCodeOffset] |= (byte)(1 << aEncodingOption.OperandSizeBitShiftLeft);
                     }
                 }
             }
 
-            if(aEncodingOption.ModifyBytes != null) {
+            if (aEncodingOption.ModifyBytes != null) {
                 aEncodingOption.ModifyBytes(xBuffer, aInstruction);
             }
             //
