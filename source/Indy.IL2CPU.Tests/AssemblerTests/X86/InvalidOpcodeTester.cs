@@ -22,6 +22,23 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
             public int[] InvalidSizes;
         }
 
+        public class TestState {
+            public string Instruction;
+            public byte Size;
+            public bool HasDest;
+            public Guid DestReg;
+            public uint DestValue;
+            public bool DestIsIndirect;
+            public int DestDisplacement;
+            public bool HasSource;
+            public Guid SourceReg;
+            public uint SourceValue;
+            public bool SourceIsIndirect;
+            public int SourceDisplacement;
+            public bool Success;
+            public string Message;
+        }
+
         class Constraints
         {
             public bool TestMem32=true;
@@ -44,9 +61,34 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
             get;
             private set;
         }
+        private static List<TestState> mTestStates;
+        private static void WriteStatusEntry(string aInstruction, byte aSize, bool aHasDest, Guid aDestReg, uint aDestValue, bool aDestIsIndirect, int aDestDisplacement,
+            bool aHasSource, Guid aSourceReg, uint aSourceValue, bool aSourceIsIndirect, int aSourceDisplacement, bool aSuccess, string aMessage) {
+            mTestStates.Add(new TestState {
+                Instruction = aInstruction,
+                Size=aSize,
+                HasDest=aHasDest,
+                DestReg=aDestReg,
+                DestValue=aDestValue,
+                DestIsIndirect=aDestIsIndirect,
+                DestDisplacement = aDestDisplacement,
+                HasSource=aHasSource,
+                SourceReg=aSourceReg,
+                SourceValue = aSourceValue,
+                SourceIsIndirect = aSourceIsIndirect,
+                SourceDisplacement=aSourceDisplacement,
+                Success = aSuccess,
+                Message = aMessage
+            });
+        }
+
+        public static void Main() {
+            Execute();
+        }
 
         private static void Execute()
         {
+            Console.TreatControlCAsInput=true;
             //Pre-initialization
             if (!Directory.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
                                                                                          "Output")))
@@ -59,71 +101,134 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
             nasmPath = nasmPath.Substring(0, xPos) + @"Build\Tools\NAsm\nasm.exe";
 
             opcodesException = new Dictionary<Type, ConstraintsContainer>();
-            //public Constraints(bool testMem32, bool testMem16, bool testImmediate8, bool testImmediate16, bool testImmediate32, bool testCR, List<Guid> invalidDestRegisters)
-            opcodesException.Add(typeof(Pop), new ConstraintsContainer { DestInfo = new Constraints { InvalidRegisters = Registers.Get8BitRegisters().Union(Registers.Get16BitRegisters()) } });
-            //opcodesException.Add(typeof(Assembler.X86.));
-            //
+            AddExceptions();
+
             x86Assembler=new Assembler.X86.Assembler();
             x86Assembler.Initialize();
             x86Assembler.Instructions.Clear();
             x86Assembler.DataMembers.Clear();
+            mTestStates = new List<TestState>();
             //Determine opcodes
             Assembly xAsm = Assembly.Load("Indy.IL2CPU");
-            foreach (Type type in xAsm.GetTypes())
-            {
-                try
-                {
+            try {
+                foreach (Type type in xAsm.GetTypes()) {
                     if (type.IsAbstract)
                         continue;
-                    else
-                    {
-                        if (type.BaseType == typeof(Assembler.X86.InstructionWithDestination))
-                        {
-                            Console.WriteLine("Testing " + type.ToString());
+                    else {
+                        if (type.BaseType == typeof(Assembler.X86.InstructionWithDestination)) {
                             TestInstructionWithDestination(type);
-                        }
-                        else if (type.BaseType == typeof(Assembler.X86.InstructionWithDestinationAndSize))
-                        {
-                            Console.WriteLine("Testing " + type.ToString());
+                        } else if (type.BaseType == typeof(Assembler.X86.InstructionWithDestinationAndSize)) {
                             TestInstructionWithDestinationAndSize(type);
-                        }
-                        else if (type.BaseType == typeof(Assembler.X86.InstructionWithDestinationAndSource))
-                        {
-                            Console.WriteLine("Testing " + type.ToString());
+                        } else if (type.BaseType == typeof(Assembler.X86.InstructionWithDestinationAndSource)) {
                             TestInstructionWithDestinationAndSource(type);
-                        }
-                        else if (type.BaseType == typeof(Assembler.X86.InstructionWithDestinationAndSourceAndSize))
-                        {
-                            Console.WriteLine("Testing " + type.ToString());
+                        } else if (type.BaseType == typeof(Assembler.X86.InstructionWithDestinationAndSourceAndSize)) {
                             TestInstructionWithDestinationAndSourceAndSize(type);
-                        }
-                        else if (type.BaseType == typeof(Assembler.X86.Instruction))
-                        {
-                            Console.WriteLine("Testing " + type.ToString());
+                        } else if (type.BaseType == typeof(Assembler.X86.Instruction)) {
                             TestSimpleInstruction(type);
                         }
                     }
-
                 }
-                catch (Exception e)
-                {
-                    Console.Beep();
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine(type.ToString() + ": " + e.Message);
-                    //Console.ReadLine();
-                    
-                }
-                finally
-                {
-                    x86Assembler.Instructions.Clear();
-                    x86Assembler.DataMembers.Clear();
-                    Console.ResetColor();
-                }
+            }catch(AbortException){
+                Console.WriteLine("Testing interrupted, still generating test results page.");
+            }catch(Exception E){
+                throw new Exception("Error while testing", E);
+            } finally {
+                // output results to html
+                var xFile = Path.Combine(Path.GetDirectoryName(typeof(InvalidOpcodeTester).Assembly.Location), "TestResults.html");
+                GenerateHtml(xFile);
+                Console.WriteLine("Tests finished. Results have been written to '{0}'", xFile);
+                Console.ReadLine();
             }
-            //Define constraints
-            Console.WriteLine("Tests finished!");
-            Console.ReadLine();
         }
+
+        public class AbortException: Exception {
+         //   
+        }
+
+        private static void GenerateHtml(string aFile) {
+            using(var xWriter = new StreamWriter(aFile, false)) {
+                xWriter.WriteLine("<html><body>");
+                xWriter.WriteLine("<h1>Failing Tests:</h1><br/>");
+                Action<IEnumerable<TestState>> WriteList = delegate(IEnumerable<TestState> aList) {
+                    foreach (var xItem in aList) {
+                        xWriter.WriteLine("<tr>");
+                        xWriter.WriteLine("<td>{0}</td>", xItem.Instruction);
+                        xWriter.WriteLine("<td>{0}</td>", xItem.Size);
+                        if (xItem.HasDest) {
+                            if (xItem.DestReg == Guid.Empty) {
+                                xWriter.WriteLine("<td></td>");
+                            } else {
+                                xWriter.WriteLine("<td>{0}</td>", Registers.GetRegisterName(xItem.DestReg));
+                            }
+                            xWriter.WriteLine("<td>{0}</td>", xItem.DestValue);
+                            xWriter.WriteLine("<td>{0}</td>", xItem.DestIsIndirect);
+                            xWriter.WriteLine("<td>{0}</td>", xItem.DestDisplacement);
+                        }else {
+                            xWriter.WriteLine("<td></td>");
+                            xWriter.WriteLine("<td></td>");
+                            xWriter.WriteLine("<td></td>");
+                            xWriter.WriteLine("<td></td>");
+                        }
+                        if (xItem.HasSource) {
+                            if (xItem.SourceReg == Guid.Empty) {
+                                xWriter.WriteLine("<td></td>");
+                            } else {
+                                xWriter.WriteLine("<td>{0}</td>", Registers.GetRegisterName(xItem.SourceReg));
+                            }
+                            xWriter.WriteLine("<td>{0}</td>", xItem.SourceValue);
+                            xWriter.WriteLine("<td>{0}</td>", xItem.SourceIsIndirect);
+                            xWriter.WriteLine("<td>{0}</td>", xItem.SourceDisplacement);
+                        } else {
+                            xWriter.WriteLine("<td></td>");
+                            xWriter.WriteLine("<td></td>");
+                            xWriter.WriteLine("<td></td>");
+                            xWriter.WriteLine("<td></td>");
+                        }
+                        xWriter.WriteLine("<td>{0}</td>", xItem.Message);
+                        xWriter.WriteLine("</tr>");
+                    }
+                };
+                xWriter.WriteLine("<table>");
+                xWriter.WriteLine("<thead>");
+                xWriter.WriteLine("<th>Instruction</th>");
+                xWriter.WriteLine("<th>Size</th>");
+                xWriter.WriteLine("<th>DestReg</th>");
+                xWriter.WriteLine("<th>DestValue</th>");
+                xWriter.WriteLine("<th>DestIsIndirect</th>");
+                xWriter.WriteLine("<th>DestDisplacement</th>");
+                xWriter.WriteLine("<th>SourceReg</th>");
+                xWriter.WriteLine("<th>SourceValue</th>");
+                xWriter.WriteLine("<th>SourceIsIndirect</th>");
+                xWriter.WriteLine("<th>SourceDisplacement</th>");
+                xWriter.WriteLine("</thead>");
+                xWriter.WriteLine("<tbody>");
+                WriteList((from item in mTestStates
+                           where !item.Success
+                           select item));
+                xWriter.WriteLine("</tbody></table>");
+                xWriter.WriteLine("<h1>Passing tests:</h1></br>");
+                xWriter.WriteLine("<table>");
+                xWriter.WriteLine("<thead>");
+                xWriter.WriteLine("<th>Instruction</th>");
+                xWriter.WriteLine("<th>Size</th>");
+                xWriter.WriteLine("<th>DestReg</th>");
+                xWriter.WriteLine("<th>DestValue</th>");
+                xWriter.WriteLine("<th>DestIsIndirect</th>");
+                xWriter.WriteLine("<th>DestDisplacement</th>");
+                xWriter.WriteLine("<th>SourceReg</th>");
+                xWriter.WriteLine("<th>SourceValue</th>");
+                xWriter.WriteLine("<th>SourceIsIndirect</th>");
+                xWriter.WriteLine("<th>SourceDisplacement</th>");
+                xWriter.WriteLine("</thead>");
+                xWriter.WriteLine("<tbody>");
+                WriteList((from item in mTestStates
+                           where item.Success
+                           select item));
+                xWriter.WriteLine("</tbody></table>");
+                xWriter.Flush();
+            }
+        }
+
         private static void TestInstructionWithDestination(Type type)
         {
             TestInstructionWithDestination(type, 0, null);
@@ -474,8 +579,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                     var xInstruction = (IInstructionWithSource)aInstruction;
                     xInstruction.SourceValue = 65;
                     xInstruction.SourceIsIndirect = true;
-                }
-                );
+                });
                 //offset 8
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.Write("\t\t --> 8bit offset: ");
@@ -932,70 +1036,82 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                 Console.WriteLine("Wrong data emitted");
         }
 
-        private static bool Verify()
-        {
+        private static bool Verify() {
 
             String tempPath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
                                                                                          "Output");
             var xNasmWriter = new StreamWriter(Path.Combine(tempPath, "TheOutput.asm"), false);
-            FileStream xNasmReader=null;
-            try{
-            var xIndy86MS = new MemoryStream();
-            x86Assembler.FlushText(xNasmWriter);
-            xNasmWriter.Close();
-            ProcessStartInfo pinfo = new ProcessStartInfo();
-            pinfo.Arguments = "TheOutput.asm" + " -o " + "TheOutput.bin";
-            pinfo.WorkingDirectory=tempPath;
-            pinfo.FileName = nasmPath;
-            Process xProc = Process.Start(pinfo);
-            xProc.WaitForExit();
-            xNasmReader = File.OpenRead(Path.Combine(tempPath, "TheOutput.bin"));
-            x86Assembler.FlushBinary(xIndy86MS,0x200000);
-            x86Assembler.Instructions.Clear();
-            x86Assembler.DataMembers.Clear();
-            xIndy86MS.Position = 0;
-            if (xNasmReader.Length != xIndy86MS.Length)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                xNasmReader.Close();
-                x86Assembler.Instructions.Clear();
-                x86Assembler.DataMembers.Clear();
-                return false;
-            }
-            while (true)
-            {
-                var xVerData = xNasmReader.ReadByte();
-                var xActualData = xIndy86MS.ReadByte();
-                if (xVerData != xActualData)
-                {
+            FileStream xNasmReader = null;
+            bool xResult = false;
+            string xMessage=null;
+            try {
+                var xIndy86MS = new MemoryStream();
+                x86Assembler.FlushText(xNasmWriter);
+                xNasmWriter.Close();
+                ProcessStartInfo pinfo = new ProcessStartInfo();
+                pinfo.Arguments = "TheOutput.asm" + " -o " + "TheOutput.bin";
+                pinfo.WorkingDirectory = tempPath;
+                pinfo.FileName = nasmPath;
+                pinfo.UseShellExecute^= true;
+                pinfo.CreateNoWindow=true;
+                Process xProc = Process.Start(pinfo);
+                xProc.WaitForExit();
+                xNasmReader = File.OpenRead(Path.Combine(tempPath, "TheOutput.bin"));
+                x86Assembler.FlushBinary(xIndy86MS, 0x200000);
+                xIndy86MS.Position = 0;
+                if (xNasmReader.Length != xIndy86MS.Length) {
                     Console.ForegroundColor = ConsoleColor.Red;
                     xNasmReader.Close();
-                    x86Assembler.Instructions.Clear();
-                    x86Assembler.DataMembers.Clear();
-                    return false;
+                    goto WriteResult;
                 }
-                if (xVerData == -1)
-                {
-                    break;
+                while (true) {
+                    var xVerData = xNasmReader.ReadByte();
+                    var xActualData = xIndy86MS.ReadByte();
+                    if (xVerData != xActualData) {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        xNasmReader.Close();
+                        goto WriteResult;
+                    }
+                    if (xVerData == -1) {
+                        break;
+                    }
                 }
-            }
-            xNasmReader.Close();
-            x86Assembler.Instructions.Clear();
-            x86Assembler.DataMembers.Clear();
-            Console.ForegroundColor = ConsoleColor.Green;
-            return true;
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
-            finally
-            {
-                if(xNasmReader!=null)
+                xNasmReader.Close();
+                Console.ForegroundColor = ConsoleColor.Green;
+                xResult=true;
+                WriteResult:
+                return xResult;
+            } catch (Exception e) {
+                xMessage = e.Message; 
+            } finally {
+                var xInstrWithSize = x86Assembler.Instructions[0] as IInstructionWithSize;
+                var xInstrWithDest = x86Assembler.Instructions[0] as IInstructionWithDestination;
+                var xInstrWithSource = x86Assembler.Instructions[0] as IInstructionWithSource;
+                WriteStatusEntry(x86Assembler.Instructions[0].Mnemonic,
+                    xInstrWithSize == null ? (byte)0 : xInstrWithSize.Size,
+                    xInstrWithDest != null,
+                    xInstrWithDest != null ? xInstrWithDest.DestinationReg : Guid.Empty,
+                    xInstrWithDest != null ? xInstrWithDest.DestinationValue.GetValueOrDefault() : 0,
+                    xInstrWithDest != null && xInstrWithDest.DestinationIsIndirect,
+                    xInstrWithDest != null ? xInstrWithDest.DestinationDisplacement : 0,
+                    xInstrWithSource != null,
+                    xInstrWithSource != null ? xInstrWithSource.SourceReg : Guid.Empty,
+                    xInstrWithSource != null ? xInstrWithSource.SourceValue.GetValueOrDefault() : 0,
+                    xInstrWithSource != null ? xInstrWithSource.SourceIsIndirect : false,
+                    xInstrWithSource != null ? xInstrWithSource.SourceDisplacement : 0,
+                    xResult,
+                    xMessage);
+                if (xNasmReader != null)
                     xNasmReader.Close();
                 if (xNasmWriter != null)
                     xNasmWriter.Close();
+                x86Assembler.Instructions.Clear();
+                x86Assembler.DataMembers.Clear();
+                if(Console.KeyAvailable) {
+                    throw new AbortException();
+                }
             }
+            return xResult;
         }
         private static void addSegmentRegisters(List<Guid> list)
         {
@@ -1050,9 +1166,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                 Console.Write("OK!");
             else
             {
-                Console.Beep();
                 Console.Write("Wrong data emitted");
-                Console.ReadLine();
             }
             Console.WriteLine();
         }

@@ -53,6 +53,7 @@
     <Compile Include="AssemblerTests\X86\AddTests.cs" />
     <Compile Include="AssemblerTests\X86\BaseTest.cs" />
     <Compile Include="AssemblerTests\X86\HaltTests.cs" />
+    <Compile Include="AssemblerTests\X86\InvalidOpcodeTester.Exceptions.cs" />
     <Compile Include="AssemblerTests\X86\MoveTests.cs" />
     <Compile Include="AssemblerTests\X86\PopTests.cs" />
     <Compile Include="AssemblerTests\X86\PushTests.cs" />
