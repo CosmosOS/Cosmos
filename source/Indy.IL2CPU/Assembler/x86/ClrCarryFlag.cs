@@ -8,6 +8,12 @@ namespace Indy.IL2CPU.Assembler.X86
     [OpCode("clc")]
     public class ClrCarryFlag : Instruction
     {
-
+        public static void InitializeEncodingData(Instruction.InstructionData aData)
+        {
+            aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption
+            {
+                OpCode = new byte[] { 0xF8 }
+            });
+        }
     }
 }

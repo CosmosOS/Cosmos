@@ -186,5 +186,73 @@ namespace Indy.IL2CPU.Assembler.X86 {
         public static bool Is16Bit(Guid aRegister) {
             return aRegister == AX || aRegister == BX || aRegister == CX || aRegister == DX || aRegister == CS || aRegister == DS || aRegister == ES || aRegister == FS || aRegister == GS || aRegister == SS || aRegister == SI || aRegister == DI || aRegister == SP || aRegister == BP;
         }
+
+        public static List<Guid> GetRegisters()
+        {
+            List<Guid> registers = new List<Guid>();
+            var xType = typeof(Registers);
+            foreach (var xField in xType.GetFields())
+            {
+                var xFieldId = (Guid)xField.GetValue(null);
+                registers.Add(xFieldId);
+            }
+            return registers;
+        }
+
+        public static List<Guid> Get8BitRegisters() {
+            var xResult = new List<Guid>();
+            foreach(var xItem in GetRegisters()) {
+                if(Is8Bit(xItem)) {
+                    xResult.Add(xItem);
+                }
+            }
+            return xResult;
+        }
+
+        public static List<Guid> Get16BitRegisters() {
+            var xResult = new List<Guid>();
+            foreach (var xItem in GetRegisters()) {
+                if (Is16Bit(xItem)) {
+                    xResult.Add(xItem);
+                }
+            }
+            return xResult;
+        }
+
+        public static List<Guid> Get32BitRegisters() {
+            var xResult = new List<Guid>();
+            foreach (var xItem in GetRegisters()) {
+                if (Is32Bit(xItem)) {
+                    xResult.Add(xItem);
+                }
+            }
+            return xResult;
+        }
+
+        public static List<Guid> getCRs()
+        {
+            List<Guid> registers = new List<Guid>();
+            registers.Add(EFLAGS);
+            registers.Add(CR0);
+            registers.Add(CR1);
+            registers.Add(CR2);
+            registers.Add(CR3);
+            registers.Add(CR4);
+            return registers;
+        }
+        public static List<Guid> getXMMs()
+        {
+            List<Guid> registers = new List<Guid>();
+            registers.Add(XMM0);
+            registers.Add(XMM1);
+            registers.Add(XMM2);
+            registers.Add(XMM3);
+            registers.Add(XMM4);
+            registers.Add(XMM5);
+            registers.Add(XMM6);
+            registers.Add(XMM7);
+            return registers;
+        }
+
     }
 }

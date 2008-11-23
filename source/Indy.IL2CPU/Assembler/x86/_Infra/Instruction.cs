@@ -552,7 +552,8 @@ namespace Indy.IL2CPU.Assembler.X86 {
                         }
 
                     }
-                     if (aInstructionWithSource.SourceReg != Guid.Empty && aInstructionWithSource.SourceIsIndirect && aInstructionWithSource.SourceDisplacement > 0) {
+                    if (aInstructionWithSource!=null && aInstructionWithSource.SourceReg != Guid.Empty && aInstructionWithSource.SourceIsIndirect && aInstructionWithSource.SourceDisplacement > 0)
+                    {
                         var xSIBOffset = 0;
                         if (xSIB != null) {
                             //xExtraOffset++;

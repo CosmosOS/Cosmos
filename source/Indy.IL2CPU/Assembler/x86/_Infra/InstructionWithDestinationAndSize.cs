@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
-    public class InstructionWithDestinationAndSize : InstructionWithDestination, IInstructionWithSize {
+    public abstract class InstructionWithDestinationAndSize : InstructionWithDestination, IInstructionWithSize {
         private byte mSize;
         public byte Size {
             get {

@@ -5,7 +5,7 @@ using System.Text;
 using NUnit.Framework;
 using Indy.IL2CPU.Assembler.X86;
 
-namespace Indy.IL2CPU.Tests.Assembler.X86 {
+namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
     [TestFixture]
     public class AddTests : BaseTest {
         /*

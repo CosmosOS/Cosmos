@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
-    public class InstructionWithDestinationAndSource : InstructionWithDestination, IInstructionWithSource {
+    public abstract class InstructionWithDestinationAndSource : InstructionWithDestination, IInstructionWithSource {
         public ElementReference SourceRef {
             get;
             set;

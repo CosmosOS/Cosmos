@@ -6,7 +6,7 @@ using System.Text;
 using NUnit.Framework;
 using System.IO;
 
-namespace Indy.IL2CPU.Tests.Assembler.X86 {
+namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
     public abstract class BaseTest {
         public Indy.IL2CPU.Assembler.X86.Assembler Assembler {
             get;
