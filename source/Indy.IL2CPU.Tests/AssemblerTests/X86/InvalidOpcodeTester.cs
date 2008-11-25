@@ -405,6 +405,12 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                     if (xRegistersToSkip.Contains(xReg)) {
                         continue;
                     }
+                    if (!Registers.Is32Bit(xReg)) {
+                        continue;
+                    }
+                    if(Registers.IsCR(xReg)) {
+                        continue;
+                    }
                     //memory 8 bits
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     if (!opcodesException.ContainsKey(type) || (opcodesException.ContainsKey(type) && opcodesException[type].DestInfo.TestMem8)) {
@@ -531,12 +537,16 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                     continue;
                 if (Registers.getCRs().Contains(register) && (!opcodesException.ContainsKey(type) || (opcodesException.ContainsKey(type) && (!opcodesException[type].DestInfo.TestCR))))
                     continue;
-                if (Registers.GetRegisters().Contains(register) && (!opcodesException.ContainsKey(type) || (opcodesException.ContainsKey(type) && (!opcodesException[type].DestInfo.InvalidRegisters.Contains(register)))))
+                if (Registers.GetRegisters().Contains(register) && 
+                    (!opcodesException.ContainsKey(type) ||
+                            (opcodesException.ContainsKey(type) && opcodesException[type].DestInfo.InvalidRegisters != null && (!opcodesException[type].DestInfo.InvalidRegisters.Contains(register)))))
                     continue;
-                xInstruction = CreateInstruction<IInstructionWithDestination>(type, size);
-                aInitInstruction(xInstruction);
-                xInstruction.DestinationReg = register;
-                computeResult();
+                if (size == 0 || Registers.GetSize(register) == size) {
+                    xInstruction = CreateInstruction<IInstructionWithDestination>(type, size);
+                    aInitInstruction(xInstruction);
+                    xInstruction.DestinationReg = register;
+                    computeResult();
+                }
             }
         }
 
@@ -1037,7 +1047,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
         }
 
         private static bool Verify() {
-
             String tempPath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
                                                                                          "Output");
             var xNasmWriter = new StreamWriter(Path.Combine(tempPath, "TheOutput.asm"), false);
@@ -1047,38 +1056,52 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
             try {
                 var xIndy86MS = new MemoryStream();
                 x86Assembler.FlushText(xNasmWriter);
+                xNasmWriter.Flush();
+                if(xNasmWriter.BaseStream.Length==0) {
+                    throw new Exception("No content found");
+                }
                 xNasmWriter.Close();
                 ProcessStartInfo pinfo = new ProcessStartInfo();
                 pinfo.Arguments = "TheOutput.asm" + " -o " + "TheOutput.bin";
                 pinfo.WorkingDirectory = tempPath;
                 pinfo.FileName = nasmPath;
-                pinfo.UseShellExecute^= true;
+                pinfo.UseShellExecute ^= true;
                 pinfo.CreateNoWindow=true;
+                pinfo.RedirectStandardOutput = true;
+                pinfo.RedirectStandardError=true;
                 Process xProc = Process.Start(pinfo);
                 xProc.WaitForExit();
-                xNasmReader = File.OpenRead(Path.Combine(tempPath, "TheOutput.bin"));
-                x86Assembler.FlushBinary(xIndy86MS, 0x200000);
-                xIndy86MS.Position = 0;
-                if (xNasmReader.Length != xIndy86MS.Length) {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    xNasmReader.Close();
+                if (xProc.ExitCode != 0) {
+                    xResult=false;
+                    xMessage="Error while invoking nasm.exe: \r\n" + xProc.StandardOutput.ReadToEnd() + "\r\n" + xProc.StandardError.ReadToEnd();
                     goto WriteResult;
-                }
-                while (true) {
-                    var xVerData = xNasmReader.ReadByte();
-                    var xActualData = xIndy86MS.ReadByte();
-                    if (xVerData != xActualData) {
+                } else {
+                    xNasmReader = File.OpenRead(Path.Combine(tempPath, "TheOutput.bin"));
+                    x86Assembler.FlushBinary(xIndy86MS, 0x200000);
+                    xIndy86MS.Position = 0;
+                    if (xNasmReader.Length != xIndy86MS.Length) {
                         Console.ForegroundColor = ConsoleColor.Red;
                         xNasmReader.Close();
+                        xMessage = "Binary size mismatch";
                         goto WriteResult;
                     }
-                    if (xVerData == -1) {
-                        break;
+                    while (true) {
+                        var xVerData = xNasmReader.ReadByte();
+                        var xActualData = xIndy86MS.ReadByte();
+                        if (xVerData != xActualData) {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            xNasmReader.Close();
+                            xMessage = "Binary data mismatch";
+                            goto WriteResult;
+                        }
+                        if (xVerData == -1) {
+                            break;
+                        }
                     }
+                    xNasmReader.Close();
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    xResult = true;
                 }
-                xNasmReader.Close();
-                Console.ForegroundColor = ConsoleColor.Green;
-                xResult=true;
                 WriteResult:
                 return xResult;
             } catch (Exception e) {
@@ -1108,6 +1131,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                 x86Assembler.Instructions.Clear();
                 x86Assembler.DataMembers.Clear();
                 if(Console.KeyAvailable) {
+                    Console.Read();
                     throw new AbortException();
                 }
             }

@@ -307,7 +307,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 }
             }
             if (aInstructionWithDestination != null && aInstructionWithSize != null) {
-                if (aInstructionWithDestination != null && aInstructionWithDestination.DestinationValue.HasValue) {
+                if (aInstructionWithDestination.DestinationValue.HasValue && !aInstructionWithDestination.DestinationIsIndirect) {
                     aSize += (ulong)aInstructionWithSize.Size / 8;
                 }
             }
@@ -577,9 +577,11 @@ namespace Indy.IL2CPU.Assembler.X86 {
                             xExtraOffset++;
                         }
                     } else {
-                        if (xSIB != null) {
-                            xExtraOffset++;
-                            xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] = xSIB.Value;
+                        if (aInstructionWithSource != null) {
+                            if (xSIB != null) {
+                                xExtraOffset++;
+                                xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] = xSIB.Value;
+                            }
                         }
 
                     }

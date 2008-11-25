@@ -35,7 +35,6 @@ namespace Indy.IL2CPU.Assembler.X86 {
         public static readonly Guid DI = new Guid("{59b80ecd-e523-4209-b9e7-dfba33c909dd}");
         public static readonly Guid SP = new Guid("{d45d1bba-48da-4766-9c32-c976e568de07}");
         public static readonly Guid BP = new Guid("{1b7705ba-6ae2-456d-8a01-a6520a678d36}");
-        public static readonly Guid EFLAGS = new Guid("{eec47a09-9b12-45d1-afaa-a94e7d06a146}");
         public static readonly Guid CR0 = new Guid("{eec47a09-9b12-45d1-afaa-a94e7d06a147}");
         public static readonly Guid CR1 = new Guid("{eec47a09-9b12-45d1-afaa-a94e7d06a148}");
         public static readonly Guid CR2 = new Guid("{eec47a09-9b12-45d1-afaa-a94e7d06a149}");
@@ -98,6 +97,10 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 throw new Exception("128bit registers don't have 8bit variants!");
             }
             return aReg;
+        }
+
+        public static bool IsCR(Guid aReg) {
+            return aReg == CR0 ||aReg == CR1 ||aReg == CR2 ||aReg == CR3 ||aReg == CR4;
         }
 
         public static Guid Get16BitRegisterForRegister(Guid aReg) {
@@ -180,7 +183,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
         }
 
         public static bool Is32Bit(Guid aRegister) {
-            return aRegister == EAX || aRegister == EBX || aRegister == ECX || aRegister == EDX || aRegister == ESP || aRegister == EBP || aRegister == ESI || aRegister == EDI || aRegister == EFLAGS || aRegister == CR0 || aRegister == CR1 || aRegister == CR2 || aRegister == CR3 || aRegister == CR4;
+            return aRegister == EAX || aRegister == EBX || aRegister == ECX || aRegister == EDX || aRegister == ESP || aRegister == EBP || aRegister == ESI || aRegister == EDI || aRegister == CR0 || aRegister == CR1 || aRegister == CR2 || aRegister == CR3 || aRegister == CR4;
         }
 
         public static bool Is16Bit(Guid aRegister) {
@@ -196,6 +199,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 var xFieldId = (Guid)xField.GetValue(null);
                 registers.Add(xFieldId);
             }
+
             return registers;
         }
 
@@ -232,7 +236,6 @@ namespace Indy.IL2CPU.Assembler.X86 {
         public static List<Guid> getCRs()
         {
             List<Guid> registers = new List<Guid>();
-            registers.Add(EFLAGS);
             registers.Add(CR0);
             registers.Add(CR1);
             registers.Add(CR2);
