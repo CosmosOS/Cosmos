@@ -12,19 +12,22 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 DestinationReg = Guid.Empty,
                 DestinationRegByte = 0,
                 DestinationRegBitShiftLeft = 0,
-                DefaultSize = InstructionSize.DWord
+                DefaultSize = InstructionSize.DWord,
+                AllowedSizes=InstructionSizes.DWord | InstructionSizes.Word
             }); // register
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0x6A },
                 DestinationImmediate = true,
-                DefaultSize = InstructionSize.DWord
+                DefaultSize = InstructionSize.DWord,
+                AllowedSizes = InstructionSizes.DWord | InstructionSizes.Word
             }); // immediate
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0xFF },
                 NeedsModRMByte = true,
                 DestinationMemory = true,
                 InitialModRMByteValue = 0x30,
-                DefaultSize = InstructionSize.DWord
+                DefaultSize = InstructionSize.DWord,
+                AllowedSizes = InstructionSizes.DWord | InstructionSizes.Word
             }); // pop to memory
         }
 
@@ -32,10 +35,5 @@ namespace Indy.IL2CPU.Assembler.X86 {
             //Changed without size
             //Size = 32;
         }
-        public override string ToString() {
-            return this.mMnemonic + " dword " + this.GetDestinationAsString();
-        }
-
-
     }
 }

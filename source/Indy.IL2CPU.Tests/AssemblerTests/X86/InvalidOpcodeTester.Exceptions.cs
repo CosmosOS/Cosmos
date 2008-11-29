@@ -22,10 +22,21 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
             opcodesException.Add(typeof(Not), new ConstraintsContainer {
                 DestInfo = new Constraints { TestImmediate16 = false, TestImmediate32 = false, TestImmediate8 = false, TestCR = false, TestSegments=false }
             });
+            opcodesException.Add(typeof(Out), new ConstraintsContainer {
+                DestInfo = new Constraints{TestImmediate16=false, TestImmediate32=false, InvalidRegisters = (from item in Registers.GetRegisters() where item != Registers.DX select item), TestCR=false, TestMem16=false, TestMem32=false, TestMem8=false, TestSegments=false},
+                SourceInfo = new Constraints { TestImmediate16 = false, TestImmediate32 = false, TestImmediate8 = false, InvalidRegisters = (from item in Registers.GetRegisters() where item != Registers.EAX || item == Registers.AX || item == Registers.AL select item), TestCR=false, TestMem16=false, TestMem32=false, TestMem8=false, TestSegments=false}
+            });
             opcodesException.Add(typeof(Pop), new ConstraintsContainer {
                 DestInfo = new Constraints { TestImmediate16 = false, TestImmediate32 = false, TestImmediate8 = false, TestCR = false, TestSegments = false, 
                     InvalidRegisters=Registers.Get8BitRegisters(), TestMem8=false },
                 InvalidSizes = Instruction.InstructionSizes.Byte
+            });
+            opcodesException.Add(typeof(Push), new ConstraintsContainer {
+                DestInfo = new Constraints { TestImmediate16 = false, TestImmediate32 = false, TestImmediate8 = false, TestCR = false, TestSegments = false, InvalidRegisters = Registers.Get8BitRegisters(), TestMem8 = false},
+                InvalidSizes = Instruction.InstructionSizes.Byte
+            });
+            opcodesException.Add(typeof(Push), new ConstraintsContainer {
+                DestInfo = new Constraints { TestImmediate16 = true, TestImmediate32 = false, TestImmediate8 = false, TestCR = false, TestSegments = false, TestMem8 = false, TestMem16=false, TestMem32=false, TestRegisters=false }
             });
             opcodesException.Add(typeof(ShiftLeft), new ConstraintsContainer {
                 DestInfo = new Constraints { TestImmediate16 = false, TestImmediate32 = false, TestImmediate8 = false, TestCR = false, TestSegments = false},

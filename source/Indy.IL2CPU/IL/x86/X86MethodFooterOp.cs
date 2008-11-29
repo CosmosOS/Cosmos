@@ -138,7 +138,7 @@ namespace Indy.IL2CPU.IL.X86
             }
             //new CPUx86.Add(CPUx86.Registers_Old.ESP, "0x4");
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBP };
-            new CPUx86.Return((int)(aTotalArgsSize - xReturnSize));
+            new CPUx86.Return { DestinationValue = (uint)(aTotalArgsSize - xReturnSize) };
         }
     }
 }

@@ -115,20 +115,24 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
             Assembly xAsm = Assembly.Load("Indy.IL2CPU");
             try {
                 foreach (Type type in xAsm.GetTypes()) {
-                    if (type.IsAbstract)
+                    if (type.IsAbstract) {
                         continue;
-                    else {
-                        if (type.BaseType == typeof(Assembler.X86.InstructionWithDestination)) {
-                            TestInstructionWithDestination(type);
-                        } else if (type.BaseType == typeof(Assembler.X86.InstructionWithDestinationAndSize)) {
-                            TestInstructionWithDestinationAndSize(type);
-                        } else if (type.BaseType == typeof(Assembler.X86.InstructionWithDestinationAndSource)) {
-                            TestInstructionWithDestinationAndSource(type);
-                        } else if (type.BaseType == typeof(Assembler.X86.InstructionWithDestinationAndSourceAndSize)) {
-                            TestInstructionWithDestinationAndSourceAndSize(type);
-                        } else if (type.BaseType == typeof(Assembler.X86.Instruction)) {
-                            TestSimpleInstruction(type);
-                        }
+                    }
+                    if(!type.IsSubclassOf(typeof(Instruction))) {
+                        continue;
+                    }
+
+                    Console.WriteLine("Testing " + type.Name);
+                    if (type.BaseType == typeof(Assembler.X86.InstructionWithDestination)) {
+                        TestInstructionWithDestination(type);
+                    } else if (type.BaseType == typeof(Assembler.X86.InstructionWithDestinationAndSize)) {
+                        TestInstructionWithDestinationAndSize(type);
+                    } else if (type.BaseType == typeof(Assembler.X86.InstructionWithDestinationAndSource)) {
+                        TestInstructionWithDestinationAndSource(type);
+                    } else if (type.BaseType == typeof(Assembler.X86.InstructionWithDestinationAndSourceAndSize)) {
+                        TestInstructionWithDestinationAndSourceAndSize(type);
+                    } else if (type.BaseType == typeof(Assembler.X86.Instruction)) {
+                        TestSimpleInstruction(type);
                     }
                 }
             }catch(AbortException){
@@ -303,7 +307,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
 
         private static void TestInstructionWithDestination(Type type, byte size, Action<IInstructionWithDestination> aInitInstruction)
         {
-            Console.ForegroundColor=ConsoleColor.Yellow;
             if(aInitInstruction==null) {
                 aInitInstruction = delegate { };
             }
@@ -314,44 +317,34 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                 xInstruction = CreateInstruction<IInstructionWithDestination>(type, size);
                 xInstruction.DestinationValue = 30;
                 aInitInstruction(xInstruction);
-                Console.Write("\t --> Immediate 8: ");
                 computeResult();
             }
             
             //Test Immediate 16
-            Console.ForegroundColor = ConsoleColor.Yellow;
             if (!opcodesException.ContainsKey(type) || (opcodesException.ContainsKey(type) && opcodesException[type].DestInfo.TestImmediate16))
             {
                 xInstruction = CreateInstruction<IInstructionWithDestination>(type, size);
                 aInitInstruction(xInstruction);
                 xInstruction.DestinationValue = 300;
-                Console.Write("\t --> Immediate 16: ");
                 computeResult();
             }
             //Test Immediate 32
-            Console.ForegroundColor = ConsoleColor.Yellow;
             if (!opcodesException.ContainsKey(type) || (opcodesException.ContainsKey(type) && opcodesException[type].DestInfo.TestImmediate32))
             {
                 xInstruction = CreateInstruction<IInstructionWithDestination>(type, size);
                 aInitInstruction(xInstruction);
                 xInstruction.DestinationValue = 300000;
-                Console.Write("\t --> Immediate 32: ");
                 computeResult();
             }
             //memory 8 bits
-            Console.ForegroundColor = ConsoleColor.Yellow;
             if (!opcodesException.ContainsKey(type) || (opcodesException.ContainsKey(type) && opcodesException[type].DestInfo.TestMem8)) {
                 //no offset
-                Console.WriteLine("\t --> Mem");
-                Console.Write("\t\t --> no offset: ");
                 xInstruction = CreateInstruction<IInstructionWithDestination>(type, size);
                 aInitInstruction(xInstruction);
                 xInstruction.DestinationValue = 65;
                 xInstruction.DestinationIsIndirect = true;
                 computeResult();
                 //offset 8
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write("\t\t --> 8bit offset: ");
                 xInstruction = CreateInstruction<IInstructionWithDestination>(type, size);
                 aInitInstruction(xInstruction);
                 xInstruction.DestinationValue = 65;
@@ -359,8 +352,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                 xInstruction.DestinationDisplacement = 203;
                 computeResult();
                 //offset 16
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write("\t\t --> 16bit offset: ");
                 xInstruction = CreateInstruction<IInstructionWithDestination>(type, size);
                 aInitInstruction(xInstruction);
                 xInstruction.DestinationValue = 65;
@@ -368,8 +359,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                 xInstruction.DestinationDisplacement = 2030;
                 computeResult();
                 //offset 32
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write("\t\t --> 32bit offset");
                 xInstruction = CreateInstruction<IInstructionWithDestination>(type, size);
                 aInitInstruction(xInstruction);
                 xInstruction.DestinationValue = 65;
@@ -378,20 +367,15 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                 computeResult();
             }
             //memory 16 bits
-            Console.ForegroundColor = ConsoleColor.Yellow;
             if (!opcodesException.ContainsKey(type) || (opcodesException.ContainsKey(type) && opcodesException[type].DestInfo.TestMem16))
             {   
                 //no offset
-                Console.WriteLine("\t --> Mem16");
-                Console.Write("\t\t --> no offset: ");
                 xInstruction = CreateInstruction<IInstructionWithDestination>(type, size);
                 aInitInstruction(xInstruction);
                 xInstruction.DestinationValue = 650;
                 xInstruction.DestinationIsIndirect=true;
                 computeResult();
                 //offset 8
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write("\t\t --> 8bit offset: ");
                 xInstruction = CreateInstruction<IInstructionWithDestination>(type, size);
                 aInitInstruction(xInstruction);
                 xInstruction.DestinationValue = 650;
@@ -399,8 +383,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                 xInstruction.DestinationDisplacement = 203;
                 computeResult();
                 //offset 16
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write("\t\t --> 16bit offset: ");
                 xInstruction = CreateInstruction<IInstructionWithDestination>(type, size);
                 aInitInstruction(xInstruction);
                 xInstruction.DestinationValue = 650;
@@ -408,8 +390,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                 xInstruction.DestinationDisplacement = 2003;
                 computeResult();
                 //offset 32
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write("\t\t --> 32bit offset");
                 xInstruction = CreateInstruction<IInstructionWithDestination>(type, size);
                 aInitInstruction(xInstruction);
                 xInstruction.DestinationValue = 650;
@@ -420,16 +400,12 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
             // mem32
             if (!opcodesException.ContainsKey(type) || (opcodesException.ContainsKey(type) && opcodesException[type].DestInfo.TestMem32)) {
                 //no offset
-                Console.WriteLine("\t --> Mem32");
-                Console.Write("\t\t --> no offset: ");
                 xInstruction = CreateInstruction<IInstructionWithDestination>(type, size);
                 aInitInstruction(xInstruction);
                 xInstruction.DestinationValue = 650000;
                 xInstruction.DestinationIsIndirect = true;
                 computeResult();
                 //offset 8
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write("\t\t --> 8bit offset: ");
                 xInstruction = CreateInstruction<IInstructionWithDestination>(type, size);
                 aInitInstruction(xInstruction);
                 xInstruction.DestinationValue = 650000;
@@ -437,8 +413,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                 xInstruction.DestinationDisplacement = 203;
                 computeResult();
                 //offset 16
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write("\t\t --> 16bit offset: ");
                 xInstruction = CreateInstruction<IInstructionWithDestination>(type, size);
                 aInitInstruction(xInstruction);
                 xInstruction.DestinationValue = 650000;
@@ -446,8 +420,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                 xInstruction.DestinationDisplacement = 2003;
                 computeResult();
                 //offset 32
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write("\t\t --> 32bit offset");
                 xInstruction = CreateInstruction<IInstructionWithDestination>(type, size);
                 aInitInstruction(xInstruction);
                 xInstruction.DestinationValue = 650000;
@@ -471,19 +443,14 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                         continue;
                     }
                     //memory 8 bits
-                    Console.ForegroundColor = ConsoleColor.Yellow;
                     if (!opcodesException.ContainsKey(type) || (opcodesException.ContainsKey(type) && opcodesException[type].DestInfo.TestMem8)) {
                         //no offset
-                        Console.WriteLine("\t --> Reg-Mem8");
-                        Console.Write("\t\t --> no offset: ");
                         xInstruction = CreateInstruction<IInstructionWithDestination>(type, size);
                         aInitInstruction(xInstruction);
                         xInstruction.DestinationReg = xReg;
                         xInstruction.DestinationIsIndirect = true;
                         computeResult();
                         //offset 8
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.Write("\t\t --> 8bit offset: ");
                         xInstruction = CreateInstruction<IInstructionWithDestination>(type, size);
                         aInitInstruction(xInstruction);
                         xInstruction.DestinationReg = xReg;
@@ -491,8 +458,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                         xInstruction.DestinationDisplacement = 203;
                         computeResult();
                         //offset 16
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.Write("\t\t --> 16bit offset: ");
                         xInstruction = CreateInstruction<IInstructionWithDestination>(type, size);
                         aInitInstruction(xInstruction);
                         xInstruction.DestinationReg = xReg;
@@ -500,8 +465,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                         xInstruction.DestinationDisplacement = 2030;
                         computeResult();
                         //offset 32
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.Write("\t\t --> 32bit offset");
                         xInstruction = CreateInstruction<IInstructionWithDestination>(type, size);
                         aInitInstruction(xInstruction);
                         xInstruction.DestinationReg = xReg;
@@ -510,19 +473,14 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                         computeResult();
                     }
                     //memory 16 bits
-                    Console.ForegroundColor = ConsoleColor.Yellow;
                     if (!opcodesException.ContainsKey(type) || (opcodesException.ContainsKey(type) && opcodesException[type].DestInfo.TestMem16)) {
                         //no offset
-                        Console.WriteLine("\t --> Reg-Mem16");
-                        Console.Write("\t\t --> no offset: ");
                         xInstruction = CreateInstruction<IInstructionWithDestination>(type, size);
                         aInitInstruction(xInstruction);
                         xInstruction.DestinationReg = xReg;
                         xInstruction.DestinationIsIndirect = true;
                         computeResult();
                         //offset 8
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.Write("\t\t --> 8bit offset: ");
                         xInstruction = CreateInstruction<IInstructionWithDestination>(type, size);
                         aInitInstruction(xInstruction);
                         xInstruction.DestinationReg = xReg;
@@ -530,8 +488,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                         xInstruction.DestinationDisplacement = 203;
                         computeResult();
                         //offset 16
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.Write("\t\t --> 16bit offset: ");
                         xInstruction = CreateInstruction<IInstructionWithDestination>(type, size);
                         aInitInstruction(xInstruction);
                         xInstruction.DestinationReg = xReg;
@@ -539,8 +495,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                         xInstruction.DestinationDisplacement = 2003;
                         computeResult();
                         //offset 32
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.Write("\t\t --> 32bit offset");
                         xInstruction = CreateInstruction<IInstructionWithDestination>(type, size);
                         aInitInstruction(xInstruction);
                         xInstruction.DestinationReg = xReg;
@@ -551,16 +505,12 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                     // mem32
                     if (!opcodesException.ContainsKey(type) || (opcodesException.ContainsKey(type) && opcodesException[type].DestInfo.TestMem32)) {
                         //no offset
-                        Console.WriteLine("\t --> Reg-Mem32");
-                        Console.Write("\t\t --> no offset: ");
                         xInstruction = CreateInstruction<IInstructionWithDestination>(type, size);
                         aInitInstruction(xInstruction);
                         xInstruction.DestinationReg = xReg;
                         xInstruction.DestinationIsIndirect = true;
                         computeResult();
                         //offset 8
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.Write("\t\t --> 8bit offset: ");
                         xInstruction = CreateInstruction<IInstructionWithDestination>(type, size);
                         aInitInstruction(xInstruction);
                         xInstruction.DestinationReg = xReg;
@@ -568,8 +518,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                         xInstruction.DestinationDisplacement = 203;
                         computeResult();
                         //offset 16
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.Write("\t\t --> 16bit offset: ");
                         xInstruction = CreateInstruction<IInstructionWithDestination>(type, size);
                         aInitInstruction(xInstruction);
                         xInstruction.DestinationReg = xReg;
@@ -577,8 +525,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                         xInstruction.DestinationDisplacement = 2003;
                         computeResult();
                         //offset 32
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.Write("\t\t --> 32bit offset");
                         xInstruction = CreateInstruction<IInstructionWithDestination>(type, size);
                         aInitInstruction(xInstruction);
                         xInstruction.DestinationReg = xReg;
@@ -589,8 +535,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                 }
             }
 
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("\tRegisters");
             foreach (Guid register in Registers.GetRegisters()) {
                 if (!type.Namespace.Contains("SSE") && (Registers.getXMMs().Contains(register)))
                     continue;
@@ -613,10 +557,8 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
         }
 
         private static void TestInstructionWithSource(Type type, byte size) {
-            Console.ForegroundColor = ConsoleColor.Yellow;
             //Test Immediate 8
             if (!opcodesException.ContainsKey(type) || (opcodesException.ContainsKey(type) && opcodesException[type].SourceInfo.TestImmediate8)) {
-                Console.Write("\t --> Immediate 8: ");
                 TestInstructionWithDestination(type, size, delegate(IInstructionWithDestination aInstruction) {
                     var xInstruction = (IInstructionWithSource)aInstruction;
                     xInstruction.SourceValue = 30;
@@ -624,37 +566,28 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
             }
 
             //Test Immediate 16
-            Console.ForegroundColor = ConsoleColor.Yellow;
             if (!opcodesException.ContainsKey(type) || (opcodesException.ContainsKey(type) && opcodesException[type].SourceInfo.TestImmediate16)) {
-                Console.Write("\t --> Immediate 16: ");
                 TestInstructionWithDestination(type, size, delegate(IInstructionWithDestination aInstruction) {
                     var xInstruction = (IInstructionWithSource)aInstruction;
                     xInstruction.SourceValue = 300;
                 });
             }
             //Test Immediate 32
-            Console.ForegroundColor = ConsoleColor.Yellow;
             if (!opcodesException.ContainsKey(type) || (opcodesException.ContainsKey(type) && opcodesException[type].SourceInfo.TestImmediate32)) {
-                Console.Write("\t --> Immediate 32: ");
                 TestInstructionWithDestination(type, size, delegate(IInstructionWithDestination aInstruction) {
                     var xInstruction = (IInstructionWithSource)aInstruction;
                     xInstruction.SourceValue = 300000;
                 });
             }
             //memory 8 bits
-            Console.ForegroundColor = ConsoleColor.Yellow;
             if (!opcodesException.ContainsKey(type) || (opcodesException.ContainsKey(type) && opcodesException[type].SourceInfo.TestMem8)) {
                 //no offset
-                Console.WriteLine("\t --> Mem");
-                Console.Write("\t\t --> no offset: ");
                 TestInstructionWithDestination(type, size, delegate(IInstructionWithDestination aInstruction) {
                     var xInstruction = (IInstructionWithSource)aInstruction;
                     xInstruction.SourceValue = 65;
                     xInstruction.SourceIsIndirect = true;
                 });
                 //offset 8
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write("\t\t --> 8bit offset: ");
                 TestInstructionWithDestination(type, size, delegate(IInstructionWithDestination aInstruction) {
                     var xInstruction = (IInstructionWithSource)aInstruction;
                     xInstruction.SourceValue = 65;
@@ -662,8 +595,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                     xInstruction.SourceDisplacement = 203;
                 });
                 //offset 16
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write("\t\t --> 16bit offset: ");
                 TestInstructionWithDestination(type, size, delegate(IInstructionWithDestination aInstruction) {
                     var xInstruction = (IInstructionWithSource)aInstruction;
                     xInstruction.SourceValue = 65;
@@ -671,8 +602,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                     xInstruction.SourceDisplacement = 2030;
                 });
                 //offset 32
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write("\t\t --> 32bit offset");
                 TestInstructionWithDestination(type, size, delegate(IInstructionWithDestination aInstruction) {
                     var xInstruction = (IInstructionWithSource)aInstruction;
                     xInstruction.SourceValue = 65;
@@ -681,19 +610,14 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                 });
             }
             //memory 16 bits
-            Console.ForegroundColor = ConsoleColor.Yellow;
             if (!opcodesException.ContainsKey(type) || (opcodesException.ContainsKey(type) && opcodesException[type].SourceInfo.TestMem16)) {
                 //no offset
-                Console.WriteLine("\t --> Mem16");
-                Console.Write("\t\t --> no offset: ");
                 TestInstructionWithDestination(type, size, delegate(IInstructionWithDestination aInstruction) {
                     var xInstruction = (IInstructionWithSource)aInstruction;
                     xInstruction.SourceValue = 650;
                     xInstruction.SourceIsIndirect = true;
                 });
                 //offset 8
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write("\t\t --> 8bit offset: ");
                 TestInstructionWithDestination(type, size, delegate(IInstructionWithDestination aInstruction) {
                     var xInstruction = (IInstructionWithSource)aInstruction;
                     xInstruction.SourceValue = 650;
@@ -701,8 +625,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                     xInstruction.SourceDisplacement = 203;
                 });
                 //offset 16
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write("\t\t --> 16bit offset: ");
                 TestInstructionWithDestination(type, size, delegate(IInstructionWithDestination aInstruction) {
                     var xInstruction = (IInstructionWithSource)aInstruction;
                     xInstruction.SourceValue = 650;
@@ -710,8 +632,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                     xInstruction.SourceDisplacement = 2003;
                 });
                 //offset 32
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write("\t\t --> 32bit offset");
                 TestInstructionWithDestination(type, size, delegate(IInstructionWithDestination aInstruction) {
                     var xInstruction = (IInstructionWithSource)aInstruction;
                     xInstruction.SourceValue = 650;
@@ -722,16 +642,12 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
             // mem32
             if (!opcodesException.ContainsKey(type) || (opcodesException.ContainsKey(type) && opcodesException[type].SourceInfo.TestMem32)) {
                 //no offset
-                Console.WriteLine("\t --> Mem32");
-                Console.Write("\t\t --> no offset: ");
                 TestInstructionWithDestination(type, size, delegate(IInstructionWithDestination aInstruction) {
                     var xInstruction = (IInstructionWithSource)aInstruction;
                     xInstruction.SourceValue = 650000;
                     xInstruction.SourceIsIndirect = true;
                 });
                 //offset 8
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write("\t\t --> 8bit offset: ");
                 TestInstructionWithDestination(type, size, delegate(IInstructionWithDestination aInstruction) {
                     var xInstruction = (IInstructionWithSource)aInstruction;
                     xInstruction.SourceValue = 650000;
@@ -739,8 +655,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                     xInstruction.SourceDisplacement = 203;
                 });
                 //offset 16
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write("\t\t --> 16bit offset: ");
                 TestInstructionWithDestination(type, size, delegate(IInstructionWithDestination aInstruction) {
                     var xInstruction = (IInstructionWithSource)aInstruction;
                     xInstruction.SourceValue = 650000;
@@ -748,8 +662,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                     xInstruction.SourceDisplacement = 2003;
                 });
                 //offset 32
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write("\t\t --> 32bit offset");
                 TestInstructionWithDestination(type, size, delegate(IInstructionWithDestination aInstruction) {
                     var xInstruction = (IInstructionWithSource)aInstruction;
                     xInstruction.SourceValue = 650000;
@@ -767,19 +679,14 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                         continue;
                     }
                     //memory 8 bits
-                    Console.ForegroundColor = ConsoleColor.Yellow;
                     if (!opcodesException.ContainsKey(type) || (opcodesException.ContainsKey(type) && opcodesException[type].SourceInfo.TestMem8)) {
                         //no offset
-                        Console.WriteLine("\t --> Reg-Mem8");
-                        Console.Write("\t\t --> no offset: ");
                         TestInstructionWithDestination(type, size, delegate(IInstructionWithDestination aInstruction) {
                             var xInstruction = (IInstructionWithSource)aInstruction;
                             xInstruction.SourceReg = xReg;
                             xInstruction.SourceIsIndirect = true;
                         });
                         //offset 8
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.Write("\t\t --> 8bit offset: ");
                         TestInstructionWithDestination(type, size, delegate(IInstructionWithDestination aInstruction) {
                             var xInstruction = (IInstructionWithSource)aInstruction;
                             xInstruction.SourceReg = xReg;
@@ -787,8 +694,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                             xInstruction.SourceDisplacement = 203;
                         });
                         //offset 16
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.Write("\t\t --> 16bit offset: ");
                         TestInstructionWithDestination(type, size, delegate(IInstructionWithDestination aInstruction) {
                             var xInstruction = (IInstructionWithSource)aInstruction;
                             xInstruction.SourceReg = xReg;
@@ -796,8 +701,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                             xInstruction.SourceDisplacement = 2030;
                         });
                         //offset 32
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.Write("\t\t --> 32bit offset");
                         TestInstructionWithDestination(type, size, delegate(IInstructionWithDestination aInstruction) {
                             var xInstruction = (IInstructionWithSource)aInstruction;
                             xInstruction.SourceReg = xReg;
@@ -806,19 +709,14 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                         });
                     }
                     //memory 16 bits
-                    Console.ForegroundColor = ConsoleColor.Yellow;
                     if (!opcodesException.ContainsKey(type) || (opcodesException.ContainsKey(type) && opcodesException[type].SourceInfo.TestMem16)) {
                         //no offset
-                        Console.WriteLine("\t --> Reg-Mem16");
-                        Console.Write("\t\t --> no offset: ");
                         TestInstructionWithDestination(type, size, delegate(IInstructionWithDestination aInstruction) {
                             var xInstruction = (IInstructionWithSource)aInstruction;
                             xInstruction.SourceReg = xReg;
                             xInstruction.SourceIsIndirect = true;
                         });
                         //offset 8
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.Write("\t\t --> 8bit offset: ");
                         TestInstructionWithDestination(type, size, delegate(IInstructionWithDestination aInstruction) {
                             var xInstruction = (IInstructionWithSource)aInstruction;
                             xInstruction.SourceReg = xReg;
@@ -826,8 +724,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                             xInstruction.SourceDisplacement = 203;
                         });
                         //offset 16
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.Write("\t\t --> 16bit offset: ");
                         TestInstructionWithDestination(type, size, delegate(IInstructionWithDestination aInstruction) {
                             var xInstruction = (IInstructionWithSource)aInstruction;
                             xInstruction.SourceReg = xReg;
@@ -835,8 +731,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                             xInstruction.SourceDisplacement = 2003;
                         });
                         //offset 32
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.Write("\t\t --> 32bit offset");
                         TestInstructionWithDestination(type, size, delegate(IInstructionWithDestination aInstruction) {
                             var xInstruction = (IInstructionWithSource)aInstruction;
                             xInstruction.SourceReg = xReg;
@@ -847,16 +741,12 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                     // mem32
                     if (!opcodesException.ContainsKey(type) || (opcodesException.ContainsKey(type) && opcodesException[type].SourceInfo.TestMem32)) {
                         //no offset
-                        Console.WriteLine("\t --> Reg-Mem32");
-                        Console.Write("\t\t --> no offset: ");
                         TestInstructionWithDestination(type, size, delegate(IInstructionWithDestination aInstruction) {
                             var xInstruction = (IInstructionWithSource)aInstruction;
                             xInstruction.SourceReg = xReg;
                             xInstruction.SourceIsIndirect = true;
                         });
                         //offset 8
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.Write("\t\t --> 8bit offset: ");
                         TestInstructionWithDestination(type, size, delegate(IInstructionWithDestination aInstruction) {
                             var xInstruction = (IInstructionWithSource)aInstruction;
                             xInstruction.SourceReg = xReg;
@@ -864,8 +754,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                             xInstruction.SourceDisplacement = 203;
                         });
                         //offset 16
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.Write("\t\t --> 16bit offset: ");
                         TestInstructionWithDestination(type, size, delegate(IInstructionWithDestination aInstruction) {
                             var xInstruction = (IInstructionWithSource)aInstruction;
                             xInstruction.SourceReg = xReg;
@@ -873,8 +761,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                             xInstruction.SourceDisplacement = 2003;
                         });
                         //offset 32
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.Write("\t\t --> 32bit offset");
                         TestInstructionWithDestination(type, size, delegate(IInstructionWithDestination aInstruction) {
                             var xInstruction = (IInstructionWithSource)aInstruction;
                             xInstruction.SourceReg = xReg;
@@ -885,8 +771,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                 }
             }
 
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("\tRegisters");
             foreach (Guid register in Registers.GetRegisters()) {
                 if (!type.Namespace.Contains("SSE") && (Registers.getXMMs().Contains(register)))
                     continue;
@@ -904,18 +788,12 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
         private static void TestInstructionWithDestinationAndSize(Type type)
         {
             if (!opcodesException.ContainsKey(type) || ((opcodesException[type].InvalidSizes & Instruction.InstructionSizes.Byte) == 0)){
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine("-->Size 8");
                 TestInstructionWithDestination(type, 8, null);
             }
             if (!opcodesException.ContainsKey(type) || ((opcodesException[type].InvalidSizes & Instruction.InstructionSizes.Word) == 0)) {
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine("-->Size 16");
                 TestInstructionWithDestination(type, 16, null);
             }
             if (!opcodesException.ContainsKey(type) || ((opcodesException[type].InvalidSizes & Instruction.InstructionSizes.DWord) == 0)) {
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine("-->Size 32");
                 TestInstructionWithDestination(type, 32, null);
             }
         }
@@ -935,24 +813,15 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
 
         private static void TestInstructionWithDestinationAndSourceAndSize(Type type)
         {
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("-->Size 8");
             TestInstructionWithDestinationAndSource(type, 8);
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("-->Size 16");
             TestInstructionWithDestinationAndSource(type, 16);
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("-->Size 32");
             TestInstructionWithDestinationAndSource(type, 32);
         }   
 
         private static void TestSimpleInstruction(Type type)
         {
             var test = CreateInstruction<object>(type, 0);
-            if (Verify())
-                Console.WriteLine("Ok!");
-            else
-                Console.WriteLine("Wrong data emitted");
+            Verify();
         }
 
         private static bool Verify() {
@@ -989,7 +858,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                     x86Assembler.FlushBinary(xIndy86MS, 0x200000);
                     xIndy86MS.Position = 0;
                     if (xNasmReader.Length != xIndy86MS.Length) {
-                        Console.ForegroundColor = ConsoleColor.Red;
                         xNasmReader.Close();
                         xMessage = "Binary size mismatch";
                         goto WriteResult;
@@ -998,7 +866,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                         var xVerData = xNasmReader.ReadByte();
                         var xActualData = xIndy86MS.ReadByte();
                         if (xVerData != xActualData) {
-                            Console.ForegroundColor = ConsoleColor.Red;
                             xNasmReader.Close();
                             xMessage = "Binary data mismatch";
                             goto WriteResult;
@@ -1008,7 +875,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                         }
                     }
                     xNasmReader.Close();
-                    Console.ForegroundColor = ConsoleColor.Green;
                     xResult = true;
                 }
                 WriteResult:
@@ -1019,7 +885,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                 var xInstrWithSize = x86Assembler.Instructions[0] as IInstructionWithSize;
                 var xInstrWithDest = x86Assembler.Instructions[0] as IInstructionWithDestination;
                 var xInstrWithSource = x86Assembler.Instructions[0] as IInstructionWithSource;
-                WriteStatusEntry(x86Assembler.Instructions[0].Mnemonic,
+                WriteStatusEntry((String.IsNullOrEmpty(x86Assembler.Instructions[0].Mnemonic) ? x86Assembler.Instructions[0].GetType().FullName : x86Assembler.Instructions[0].Mnemonic),
                     xInstrWithSize == null ? (byte)0 : xInstrWithSize.Size,
                     xInstrWithDest != null,
                     xInstrWithDest != null ? xInstrWithDest.DestinationReg : Guid.Empty,
@@ -1095,13 +961,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
         }
         private static void computeResult()
         {
-            if (Verify())
-                Console.Write("OK!");
-            else
-            {
-                Console.Write("Wrong data emitted");
-            }
-            Console.WriteLine();
+            Verify();
         }
     }
 }

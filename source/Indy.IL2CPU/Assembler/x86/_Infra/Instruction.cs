@@ -330,6 +330,21 @@ namespace Indy.IL2CPU.Assembler.X86 {
                     }
                 }
             }
+            if (aInstructionWithDestination != null) {
+                if (aInstructionWithDestination.DestinationValue.HasValue && !aInstructionWithDestination.DestinationIsIndirect) {
+                    var xInstrSize = 0;
+                    if (aInstructionWithSize != null) {
+                        xInstrSize = aInstructionWithSize.Size / 8;
+                    } else {
+                        //                        throw new NotImplementedException("size not known");
+                        xInstrSize = (int)aEncodingOption.DefaultSize / 8;
+                    }
+                    if (aEncodingOption.DestinationImmediateSize != InstructionSize.None) {
+                        xInstrSize = ((byte)aEncodingOption.DestinationImmediateSize) / 8;
+                    }
+aSize+=(ulong)xInstrSize;
+                }
+            }
             if (aInstructionWithDestination != null && aInstructionWithSize != null) {
                 if (aInstructionWithDestination.DestinationValue.HasValue && !aInstructionWithDestination.DestinationIsIndirect) {
                     var xSize = aInstructionWithSize.Size;

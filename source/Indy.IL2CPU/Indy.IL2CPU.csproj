@@ -181,7 +181,6 @@
     <Compile Include="Assembler\x86\RepeatMovsb.cs" />
     <Compile Include="Assembler\x86\RepeatStos.cs" />
     <Compile Include="Assembler\x86\Return.cs" />
-    <Compile Include="Assembler\x86\RotateThroughCarryLeft.cs" />
     <Compile Include="Assembler\x86\RotateThroughCarryRight.cs" />
     <Compile Include="Assembler\x86\SetInterruptFlag.cs" />
     <Compile Include="Assembler\x86\ShiftLeft.cs" />

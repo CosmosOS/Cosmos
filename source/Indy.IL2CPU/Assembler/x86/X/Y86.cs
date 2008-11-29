@@ -108,7 +108,7 @@ namespace Indy.IL2CPU.Assembler.X86.X {
         }
         
         public void Return(UInt16 aBytes) {
-            new X86.Return(aBytes);
+            new X86.Return { DestinationValue = aBytes };
         }
 
         public void EnableInterrupts() {

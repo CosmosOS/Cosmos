@@ -29,7 +29,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 case 32: xReg = "eax"; break;
 
             }
-            return base.ToString() + ", " + xReg;
+            return Mnemonic + " " + this.GetDestinationAsString() + ", " + xReg;
         }
 	}
 }
