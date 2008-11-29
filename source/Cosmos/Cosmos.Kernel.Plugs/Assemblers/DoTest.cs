@@ -9,7 +9,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 		public override void Assemble(Indy.IL2CPU.Assembler.Assembler aAssembler) {
             new CPUx86.Call { DestinationLabel = "_CODE_REQUESTED_BREAK_" };
 			new Label("DO_THE_TEST");
-			new CPUx86.Interrupt(0x35);
+            new CPUx86.Interrupt { DestinationValue = 0x35 };
 		}
 	}
 }

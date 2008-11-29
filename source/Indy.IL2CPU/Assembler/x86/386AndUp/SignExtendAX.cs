@@ -6,16 +6,11 @@ using System.Text;
 namespace Indy.IL2CPU.Assembler.X86
 {
     [OpCode("cdq")]
-	public class SignExtendAX : Instruction
+	public class SignExtendAX : InstructionWithSize
 	{
-		private int mOldSize;
-		public SignExtendAX(int aOldSize)
-		{
-			mOldSize = aOldSize;
-		}
 		public override string ToString()
 		{
-			switch (mOldSize)
+			switch (Size)
 			{
 			case 4:
 				return "cdq";

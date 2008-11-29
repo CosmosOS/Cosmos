@@ -3,26 +3,23 @@ using System.Linq;
 
 namespace Indy.IL2CPU.Assembler.X86 {
     [OpCode("pop")]
-	public class Pop: InstructionWithDestination{
+	public class Pop: InstructionWithDestinationAndSize{
         public static void InitializeEncodingData(Instruction.InstructionData aData) {
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
-                AllowedSizes = InstructionSizes.DWord,
+                AllowedSizes = InstructionSizes.DWord | InstructionSizes.Word,
                 OpCode = new byte[] { 0x58 },
                 NeedsModRMByte = false,
                 DestinationReg = Guid.Empty,
+                DefaultSize=InstructionSize.DWord,
                 DestinationRegByte = 0
             }); // pop to register
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
-                AllowedSizes =  InstructionSizes.DWord,
+                AllowedSizes =  InstructionSizes.DWord | InstructionSizes.Word,
                 OpCode = new byte[]{0x8F},
                 NeedsModRMByte=true,
                 DestinationMemory=true,
                 DefaultSize = InstructionSize.DWord
             }); // pop to memory
-        }
-        public override string ToString()
-        {
-            return base.mMnemonic + " dword " + this.GetDestinationAsString();
         }
 	}
 

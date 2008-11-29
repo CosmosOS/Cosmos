@@ -10,7 +10,7 @@ namespace Indy.IL2CPU.Assembler.X86.X {
                 return new PortNumber(aPort);
             }
             set {
-                new X86.Out { Port = aPort, Size = 16 };
+                new X86.Out { DestinationValue = aPort, Size = 16 };
             }
         }
 

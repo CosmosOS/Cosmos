@@ -14,7 +14,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		public static void Assemble(CPU.Assembler aAssembler, uint aElementSize) {
 			new CPUx86.Pop{DestinationReg=CPUx86.Registers.EAX};
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EDX, SourceValue = aElementSize };
-			new CPUx86.Multiply(CPUx86.Registers_Old.EDX);
+            new CPUx86.Multiply { DestinationReg = CPUx86.Registers.EDX };
             new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = (ObjectImpl.FieldDataOffset + 4) };
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
             new CPUx86.Add { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EAX };

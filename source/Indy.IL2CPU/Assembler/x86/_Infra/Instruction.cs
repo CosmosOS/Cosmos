@@ -15,6 +15,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             Word = 16,
             DWord = 32,
             QWord = 64,
+            All = Byte | Word| DWord
         }
 
         public enum InstructionSize {
@@ -22,7 +23,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             Byte = 8,
             Word = 16,
             DWord = 32,
-            QWord = 64,
+            QWord = 64
         }
         public class InstructionData {
             public class InstructionEncodingOption {
@@ -37,7 +38,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 public bool NeedsModRMByte;
                 public byte InitialModRMByteValue;
 
-                public InstructionSizes AllowedSizes;
+                public InstructionSizes AllowedSizes = InstructionSizes.All;
                 public InstructionSize DefaultSize = InstructionSize.DWord;
                 /// <summary>
                 /// the indx in OpCode where the OperandSize bit is encoded
@@ -71,6 +72,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 /// is this EncodingOption valid for situations where the Destination is an immediate value
                 /// </summary>
                 public bool DestinationImmediate;
+                public InstructionSize DestinationImmediateSize = InstructionSize.None;
 
                 /// <summary>
                 /// is this EncodingOption valid for situations where the Source is a register?
@@ -171,8 +173,12 @@ namespace Indy.IL2CPU.Assembler.X86 {
             }
             aEncodingOption = null;
             for (int i = 0; i < aInstructionData.EncodingOptions.Count; i++) {
-
                 var xEncodingOption = aInstructionData.EncodingOptions[i];
+                if(aInstructionWithSize!=null) {
+                    if(((byte)xEncodingOption.AllowedSizes & aInstructionWithSize.Size) != aInstructionWithSize.Size ) {
+                        continue;
+                    }
+                }
                 if (aInstructionWithDestination != null) {
                     if (!(((xEncodingOption.DestinationMemory || xEncodingOption.DestinationReg.HasValue) && (aInstructionWithDestination.DestinationReg != Guid.Empty || aInstructionWithDestination.DestinationValue.HasValue)) ||
                          (!(xEncodingOption.DestinationMemory || xEncodingOption.DestinationReg.HasValue) && aInstructionWithDestination.DestinationReg == Guid.Empty && aInstructionWithDestination.DestinationValue.HasValue))) {
@@ -224,6 +230,19 @@ namespace Indy.IL2CPU.Assembler.X86 {
                             }
                         }
                     }
+                    if ((aInstructionWithDestination.DestinationReg != Guid.Empty && !aInstructionWithDestination.DestinationIsIndirect) &&
+                        !xEncodingOption.DestinationReg.HasValue) {
+                        continue;
+                    }
+                    //if(!((xEncodingOption.DestinationReg.HasValue && aInstructionWithDestination.DestinationReg != Guid.Empty && (aInstructionWithDestination.DestinationIsIndirect == xEncodingOption.DestinationMemory)) ||
+                    //    (!(xEncodingOption.DestinationReg.HasValue && (aInstructionWithDestination.DestinationReg == Guid.Empty && (aInstructionWithDestination.DestinationIsIndirect == xEncodingOption.DestinationMemory)))))) {
+                    //    continue;
+                    //}
+                    //     (!(xEncodingOption.DestinationReg.HasValue && (aInstructionWithDestination.DestinationReg==Guid.Empty) && aInstructionWithDestination.DestinationIsIndirect))
+                    //    )) {
+                    //    continue;
+                    //}
+
                 }
                 if (aInstructionWithSource != null) {
                     if (!(((xEncodingOption.SourceMemory || xEncodingOption.SourceReg.HasValue) && (aInstructionWithSource.SourceReg != Guid.Empty || aInstructionWithSource.SourceValue.HasValue)) ||
@@ -253,6 +272,11 @@ namespace Indy.IL2CPU.Assembler.X86 {
         }
 
         private static bool DetermineSize(Indy.IL2CPU.Assembler.Assembler aAssembler, out ulong aSize, Instruction aInstruction, IInstructionWithDestination aInstructionWithDestination, IInstructionWithSize aInstructionWithSize, IInstructionWithSource aInstructionWithSource, InstructionData aInstructionData, InstructionData.InstructionEncodingOption aEncodingOption) {
+            if(aInstructionWithSize!=null) {
+                if(aInstructionWithSize.Size == 0) {
+                    aInstructionWithSize.Size = (byte)aEncodingOption.DefaultSize;
+                }
+            }
             aSize = (ulong)aEncodingOption.OpCode.Length;
             if (aEncodingOption.NeedsModRMByte) {
                 aSize += 1;
@@ -308,7 +332,11 @@ namespace Indy.IL2CPU.Assembler.X86 {
             }
             if (aInstructionWithDestination != null && aInstructionWithSize != null) {
                 if (aInstructionWithDestination.DestinationValue.HasValue && !aInstructionWithDestination.DestinationIsIndirect) {
-                    aSize += (ulong)aInstructionWithSize.Size / 8;
+                    var xSize = aInstructionWithSize.Size;
+                    if(aEncodingOption.DestinationImmediateSize!=InstructionSize.None) {
+                        xSize = (byte)aEncodingOption.DestinationImmediateSize;
+                    }
+                    aSize += (ulong)xSize / 8;
                 }
             }
             if (aInstructionWithDestination != null && aInstructionWithDestination.DestinationRef != null) {
@@ -320,7 +348,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             if (aInstructionWithSource != null && aInstructionWithSource.SourceRef != null) {
                 aSize += 4;
             }
-            if (aInstructionWithDestination != null && (aInstructionWithDestination.DestinationValue.HasValue && !(aInstructionWithDestination.DestinationIsIndirect && aInstructionWithDestination.DestinationDisplacement > 0))) {
+            if (aInstructionWithDestination != null && (aInstructionWithDestination.DestinationValue.HasValue && !(aInstructionWithDestination.DestinationIsIndirect && aInstructionWithDestination.DestinationDisplacement > 0) && aInstructionWithDestination.DestinationIsIndirect)) {
                 aSize += (ulong)aEncodingOption.DefaultSize / 8;
             }
             if (aEncodingOption.DefaultSize == InstructionSize.DWord && aInstructionWithSize != null && aInstructionWithSize.Size == 16) {
@@ -602,6 +630,9 @@ namespace Indy.IL2CPU.Assembler.X86 {
                     } else {
                         //                        throw new NotImplementedException("size not known");
                         xInstrSize = (int)aEncodingOption.DefaultSize / 8;
+                    }
+                    if(aEncodingOption.DestinationImmediateSize != InstructionSize.None) {
+                        xInstrSize = ((byte)aEncodingOption.DestinationImmediateSize) / 8;
                     }
                     Array.Copy(BitConverter.GetBytes(xValue), 0, xBuffer, xOffset, xInstrSize);
                 }

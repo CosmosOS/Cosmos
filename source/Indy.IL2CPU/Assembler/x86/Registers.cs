@@ -182,6 +182,10 @@ namespace Indy.IL2CPU.Assembler.X86 {
             return aRegister == XMM0 || aRegister == XMM1 || aRegister == XMM2 || aRegister == XMM3 || aRegister == XMM4 || aRegister == XMM5 || aRegister == XMM6 || aRegister == XMM7;
         }
 
+        public static bool IsSegment(Guid aRegister) {
+            return aRegister == CS || aRegister == DS || aRegister == ES || aRegister == FS || aRegister == GS || aRegister == SS;
+        }
+
         public static bool Is32Bit(Guid aRegister) {
             return aRegister == EAX || aRegister == EBX || aRegister == ECX || aRegister == EDX || aRegister == ESP || aRegister == EBP || aRegister == ESI || aRegister == EDI || aRegister == CR0 || aRegister == CR1 || aRegister == CR2 || aRegister == CR3 || aRegister == CR4;
         }

@@ -74,7 +74,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
                     SourceValue = 0x8E,
                     Size = 8
                 };
-                new CPUx86.ShiftRight { DestinationReg = Registers.EAX, Count = 16 };
+                new CPUx86.ShiftRight { DestinationReg = Registers.EAX, SourceValue = 16 };
                 new CPUx86.Move {
                     DestinationRef = new ElementReference("_NATIVE_IDT_Contents"),
                     DestinationIsIndirect = true,

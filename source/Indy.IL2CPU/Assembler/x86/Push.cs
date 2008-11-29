@@ -5,27 +5,26 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
     [OpCode("push")]
-    public class Push : InstructionWithDestination {
+    public class Push : InstructionWithDestinationAndSize {
         public static void InitializeEncodingData(Instruction.InstructionData aData) {
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0x50 },
-                AllowedSizes = InstructionSizes.DWord,
                 DestinationReg = Guid.Empty,
                 DestinationRegByte = 0,
-                DestinationRegBitShiftLeft = 0
+                DestinationRegBitShiftLeft = 0,
+                DefaultSize = InstructionSize.DWord
             }); // register
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
-                OpCode = new byte[] { 0x68 },
-                AllowedSizes = InstructionSizes.DWord,
-                DestinationImmediate = true
+                OpCode = new byte[] { 0x6A },
+                DestinationImmediate = true,
+                DefaultSize = InstructionSize.DWord
             }); // immediate
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
-                AllowedSizes = InstructionSizes.DWord,
                 OpCode = new byte[] { 0xFF },
                 NeedsModRMByte = true,
                 DestinationMemory = true,
-                DefaultSize = InstructionSize.DWord,
-                InitialModRMByteValue = 0x30
+                InitialModRMByteValue = 0x30,
+                DefaultSize = InstructionSize.DWord
             }); // pop to memory
         }
 

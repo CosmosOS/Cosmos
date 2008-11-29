@@ -28,7 +28,7 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System.Runtime.CompilerServic
 			new Assembler.X86.Push{DestinationReg=Assembler.X86.Registers.EDI, DestinationIsIndirect=true};
             new Assembler.X86.Add { DestinationReg = Assembler.X86.Registers.EDI, SourceValue = 4 };
             new Assembler.X86.Move { DestinationReg = Assembler.X86.Registers.EAX, SourceReg = Assembler.X86.Registers.EDI, SourceIsIndirect = true };
-			new Assembler.X86.Multiply("dword [esp]");
+			new Assembler.X86.Multiply{DestinationReg=Assembler.X86.Registers.ESP, DestinationIsIndirect=true, Size=32};
             new Assembler.X86.Pop { DestinationReg = Assembler.X86.Registers.ECX };
             new Assembler.X86.Move { DestinationReg = Assembler.X86.Registers.ECX, SourceReg = Assembler.X86.Registers.EAX };
             new Assembler.X86.Move { DestinationReg = Assembler.X86.Registers.EAX, SourceValue = 0 };

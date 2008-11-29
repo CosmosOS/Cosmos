@@ -1,4 +1,4 @@
-﻿//#define BINARY
+﻿#define BINARY
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +12,7 @@ namespace TestApp {
     class Program {
         class Renderer : Y86 {
             public void DoRender() {
-                new Not { DestinationReg = Registers.CR0, DestinationIsIndirect = true, Size = 8 };
+                new Push {Size=8, DestinationValue = 30 };
             }
         }
         static void Main(string[] args) {
@@ -34,7 +34,7 @@ namespace TestApp {
                                                                                          "Output"),
                                                                             "TheOutput.bin"), FileMode.Create)) {
                     xAsm.FlushBinary(xOutput, 0x200000);
-                } 
+                }
 #else
                 using (var xOutput = new StreamWriter(Path.Combine(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
                                                                                          "Output"),

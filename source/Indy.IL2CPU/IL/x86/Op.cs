@@ -152,13 +152,13 @@ namespace Indy.IL2CPU.IL.X86 {
                 if (xStackContent.Size > 4) {
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
                     new CPUx86.Add { DestinationReg = Registers.ESP, SourceValue = 4 };
-                    new CPUx86.Multiply("dword [esp]");
+                    new CPUx86.Multiply { DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 32 };
                     new CPUx86.Add { DestinationReg = Registers.ESP, SourceValue = 8 };
                     new Push{DestinationValue=0};
                     new Push { DestinationReg = CPUx86.Registers.EAX };
                 } else {
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                    new CPUx86.Multiply("dword [esp]");
+                    new CPUx86.Multiply { DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 32 };
                     new CPUx86.Add { DestinationReg = Registers.ESP, SourceValue = 4 };
                     new Push { DestinationReg = Registers.EAX };
                 }

@@ -7,6 +7,8 @@ using Indy.IL2CPU.Assembler.X86;
 using System.Reflection;
 using System.IO;
 using System.Diagnostics;
+using System.Xml;
+using Instruction=Indy.IL2CPU.Assembler.X86.Instruction;
 
 namespace Indy.IL2CPU.Tests.AssemblerTests.X86
 {
@@ -19,7 +21,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
         class ConstraintsContainer {
             public Constraints SourceInfo;
             public Constraints DestInfo;
-            public int[] InvalidSizes;
+            public Instruction.InstructionSizes InvalidSizes = Instruction.InstructionSizes.None;
         }
 
         public class TestState {
@@ -49,6 +51,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
             public bool TestImmediate32=true;
             public bool TestRegisters = true;
             public bool TestCR=true;
+            public bool TestSegments = true;
             public IEnumerable<Guid> InvalidRegisters;
         }
 
@@ -136,6 +139,8 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                 // output results to html
                 var xFile = Path.Combine(Path.GetDirectoryName(typeof(InvalidOpcodeTester).Assembly.Location), "TestResults.html");
                 GenerateHtml(xFile);
+                xFile = Path.Combine(Path.GetDirectoryName(typeof(InvalidOpcodeTester).Assembly.Location), "TestResults.xml");
+                GenerateXml(xFile);
                 Console.WriteLine("Tests finished. Results have been written to '{0}'", xFile);
                 Console.ReadLine();
             }
@@ -143,6 +148,57 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
 
         public class AbortException: Exception {
          //   
+        }
+
+        private static void GenerateXml(string aFile) {
+            using(var xWriter = XmlWriter.Create(aFile)) {
+                xWriter.WriteStartDocument();
+                xWriter.WriteStartElement("TestResults");
+                {
+                    foreach (var xItem in mTestStates) {
+                        xWriter.WriteStartElement("TestCase");
+                        {
+                            xWriter.WriteAttributeString("Instruction", xItem.Instruction);
+                            xWriter.WriteAttributeString("Size", xItem.Size.ToString());
+                            if (xItem.HasDest) {
+                                if (xItem.DestReg == Guid.Empty) {
+                                    xWriter.WriteAttributeString("DestinationReg", "");
+                                } else {
+                                    xWriter.WriteAttributeString("DestinationReg", Registers.GetRegisterName(xItem.DestReg));
+                                }
+                                xWriter.WriteAttributeString("DestinationValue", xItem.DestValue.ToString());
+                                xWriter.WriteAttributeString("DestinationIsIndirect", xItem.DestIsIndirect.ToString());
+                                xWriter.WriteAttributeString("DestinationDisplacement", xItem.DestDisplacement.ToString());
+                            } else {
+                                xWriter.WriteAttributeString("DestinationReg", "");
+                                xWriter.WriteAttributeString("DestinationValue", "");
+                                xWriter.WriteAttributeString("DestinationIsIndirect", "");
+                                xWriter.WriteAttributeString("DestinationDisplacement", "");
+                            }
+                            if (xItem.HasSource) {
+                                if (xItem.SourceReg == Guid.Empty) {
+                                    xWriter.WriteAttributeString("SourceReg", "");
+                                } else {
+                                    xWriter.WriteAttributeString("SourceReg", Registers.GetRegisterName(xItem.SourceReg));
+                                }
+                                xWriter.WriteAttributeString("SourceValue", xItem.SourceValue.ToString());
+                                xWriter.WriteAttributeString("SourceIsIndirect", xItem.SourceIsIndirect.ToString());
+                                xWriter.WriteAttributeString("SourceDisplacement", xItem.SourceDisplacement.ToString());
+                            } else {
+                                xWriter.WriteAttributeString("SourceReg", "");
+                                xWriter.WriteAttributeString("SourceValue", "");
+                                xWriter.WriteAttributeString("SourceIsIndirect", "");
+                                xWriter.WriteAttributeString("SourceDisplacement", "");
+                            }
+                            xWriter.WriteAttributeString("Message", xItem.Message);
+                            xWriter.WriteAttributeString("Succeeded", xItem.Success.ToString());
+                        }
+                        xWriter.WriteEndElement();
+                    }
+                }
+                xWriter.WriteEndElement(); // 
+                xWriter.WriteEndDocument();
+            }
         }
 
         private static void GenerateHtml(string aFile) {
@@ -235,6 +291,9 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
         }
 
         private static T CreateInstruction<T>(Type t, byte aSize) {
+            if(t.GetConstructor(new Type[0])==null) {
+                throw new Exception("Type '" + t.FullName + "' doesnt have a parameterless constructor!");
+            }
             var xResult = (T)Activator.CreateInstance(t);
             if(aSize!=0) {
                 ((IInstructionWithSize)xResult).Size = aSize;
@@ -537,10 +596,13 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                     continue;
                 if (Registers.getCRs().Contains(register) && (!opcodesException.ContainsKey(type) || (opcodesException.ContainsKey(type) && (!opcodesException[type].DestInfo.TestCR))))
                     continue;
-                if (Registers.GetRegisters().Contains(register) && 
-                    (!opcodesException.ContainsKey(type) ||
-                            (opcodesException.ContainsKey(type) && opcodesException[type].DestInfo.InvalidRegisters != null && (!opcodesException[type].DestInfo.InvalidRegisters.Contains(register)))))
+                if ((!opcodesException.ContainsKey(type) ||
+                     (opcodesException.ContainsKey(type) && opcodesException[type].DestInfo.InvalidRegisters != null && 
+                       (opcodesException[type].DestInfo.InvalidRegisters.Contains(register)))))
                     continue;
+                if(Registers.IsSegment(register) && !(opcodesException.ContainsKey(type) && opcodesException[type].DestInfo.TestSegments)) {
+                    continue;
+                }
                 if (size == 0 || Registers.GetSize(register) == size) {
                     xInstruction = CreateInstruction<IInstructionWithDestination>(type, size);
                     aInitInstruction(xInstruction);
@@ -841,15 +903,21 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
 
         private static void TestInstructionWithDestinationAndSize(Type type)
         {
-            Console.ForegroundColor=ConsoleColor.Cyan;
-            Console.WriteLine("-->Size 8");
-            TestInstructionWithDestination(type, 8, null);
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("-->Size 16");
-            TestInstructionWithDestination(type, 16, null);
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("-->Size 32");
-            TestInstructionWithDestination(type, 32, null);
+            if (!opcodesException.ContainsKey(type) || ((opcodesException[type].InvalidSizes & Instruction.InstructionSizes.Byte) == 0)){
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("-->Size 8");
+                TestInstructionWithDestination(type, 8, null);
+            }
+            if (!opcodesException.ContainsKey(type) || ((opcodesException[type].InvalidSizes & Instruction.InstructionSizes.Word) == 0)) {
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("-->Size 16");
+                TestInstructionWithDestination(type, 16, null);
+            }
+            if (!opcodesException.ContainsKey(type) || ((opcodesException[type].InvalidSizes & Instruction.InstructionSizes.DWord) == 0)) {
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("-->Size 32");
+                TestInstructionWithDestination(type, 32, null);
+            }
         }
 
         private static void TestInstructionWithDestinationAndSource(Type type)
@@ -862,166 +930,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
             PropertyInfo source = type.GetProperty("SourceValue");
             PropertyInfo sindirect = type.GetProperty("SourceIsIndirect");
             PropertyInfo sreg = type.GetProperty("SourceReg");
-         /*
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            //Test Immediate 8-->reg
-            if (!opcodesException.ContainsKey(type) || (opcodesException.ContainsKey(type) && opcodesException[type].testImmediate8))
-            {
-                var test = Activator.CreateInstance(type);
-                dest.SetValue(test, (UInt32)30, new object[0]);
-                if (size != 0)
-                    psize.SetValue(test, size, new object[0]);
-                Console.Write("\t --> Immediate 8: ");
-                if (Verify())
-                    Console.Write("OK!");
-                else
-                    Console.Write("Wrong data emitted");
-                Console.WriteLine();
-            }
-
-            //Test Immediate 16
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            if (!opcodesException.ContainsKey(type) || (opcodesException.ContainsKey(type) && opcodesException[type].testImmediate16))
-            {
-                var test = Activator.CreateInstance(type);
-                if (size != 0)
-                    psize.SetValue(test, size, new object[0]);
-                dest.SetValue(test, (UInt32)300, new object[0]);
-                Console.Write("\t --> Immediate 16: ");
-                if (Verify())
-                    Console.Write("OK!");
-                else
-                    Console.Write("Wrong data emitted");
-                Console.WriteLine();
-            }
-            //Test Immediate 32
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            if (!opcodesException.ContainsKey(type) || (opcodesException.ContainsKey(type) && opcodesException[type].testImmediate16))
-            {
-                var test = Activator.CreateInstance(type);
-                if (size != 0)
-                    psize.SetValue(test, size, new object[0]);
-                dest.SetValue(test, (UInt32)300000, new object[0]);
-                Console.Write("\t --> Immediate 32: ");
-                if (Verify())
-                    Console.Write("OK!");
-                else
-                    Console.Write("Wrong data emitted");
-                Console.WriteLine();
-            }
-            //memory 16 bits
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            if (!opcodesException.ContainsKey(type) || (opcodesException.ContainsKey(type) && opcodesException[type].testMem16))
-            {
-                //no offset
-                Console.WriteLine("\t --> Mem16");
-                Console.Write("\t\t --> no offset: ");
-                var test = Activator.CreateInstance(type);
-                if (size != 0)
-                    psize.SetValue(test, size, new object[0]);
-                dest.SetValue(test, (UInt32)65, new object[0]);
-                dindirect.SetValue(test, true, new object[0]);
-                if (Verify())
-                    Console.Write("OK!");
-                else
-                    Console.Write("Wrong data emitted");
-                Console.WriteLine();
-                //offset 16
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write("\t\t --> 16bit offset: ");
-                test = Activator.CreateInstance(type);
-                if (size != 0)
-                    psize.SetValue(test, size, new object[0]);
-                dest.SetValue(test, (UInt32)65, new object[0]);
-                dindirect.SetValue(test, true, new object[0]);
-                displacement.SetValue(test, 203, new object[0]);
-                if (Verify())
-                    Console.Write("OK!");
-                else
-                    Console.Write("Wrong data emitted");
-                Console.WriteLine();
-                //offset 32
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write("\t\t --> 32bit offset");
-                test = Activator.CreateInstance(type);
-                if (size != 0)
-                    psize.SetValue(test, size, new object[0]);
-                dest.SetValue(test, (UInt32)65, new object[0]);
-                dindirect.SetValue(test, true, new object[0]);
-                displacement.SetValue(test, 70000, new object[0]);
-                if (Verify())
-                    Console.Write("OK!");
-                else
-                    Console.Write("Wrong data emitted");
-                Console.WriteLine();
-            }
-
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            if (!opcodesException.ContainsKey(type) || (opcodesException.ContainsKey(type) && opcodesException[type].testMem32))
-            {
-                //no offset
-                Console.WriteLine("\t --> Mem32");
-                Console.Write("\t\t --> no offset: ");
-                var test = Activator.CreateInstance(type);
-                if (size != 0)
-                    psize.SetValue(test, size, new object[0]);
-                dest.SetValue(test, (UInt32)70000, new object[0]);
-                dindirect.SetValue(test, true, new object[0]);
-                //if (Verify())
-                //    Console.Write("OK!");
-                //else
-                //    Console.Write("Wrong data emitted");
-                Console.WriteLine();
-                //offset 16
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write("\t\t --> 16bit offset: ");
-                test = Activator.CreateInstance(type);
-                if (size != 0)
-                    psize.SetValue(test, size, new object[0]);
-                dest.SetValue(test, (UInt32)70000, new object[0]);
-                dindirect.SetValue(test, true, new object[0]);
-                displacement.SetValue(test, (Int16)203, new object[0]);
-                if (Verify())
-                    Console.Write("OK!");
-                else
-                    Console.Write("Wrong data emitted");
-                Console.WriteLine();
-                //offset 32
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write("\t\t --> 32bit offset");
-                test = Activator.CreateInstance(type);
-                if (size != 0)
-                    psize.SetValue(test, size, new object[0]);
-                dest.SetValue(test, (UInt32)70000, new object[0]);
-                dindirect.SetValue(test, true, new object[0]);
-                displacement.SetValue(test, (Int32)70000, new object[0]);
-                if (Verify())
-                    Console.Write("OK!");
-                else
-                    Console.Write("Wrong data emitted");
-                Console.WriteLine();
-            }
-            var testReg = Activator.CreateInstance(type);
-            Console.WriteLine("\tRegisters");
-            foreach (Guid register in Registers.getRegisters())
-            {
-                if (!type.Namespace.Contains("SSE") && (Registers.getXMMs().Contains(register)))
-                    continue;
-                if (Registers.getCRs().Contains(register) && (!opcodesException.ContainsKey(type) || (opcodesException.ContainsKey(type) && (!opcodesException[type].testCR))))
-                    continue;
-                if (Registers.getRegisters().Contains(register) && (!opcodesException.ContainsKey(type) || (opcodesException.ContainsKey(type) && (!opcodesException[type].invalidDestRegisters.Contains(register)))))
-                    continue;
-                if (size != 0)
-                    psize.SetValue(testReg, size, new object[0]);
-                dreg.SetValue(testReg, register, new object[0]);
-                Console.Write("\t\t" + Registers.GetRegisterName(register) + ": ");
-                dest.SetValue(testReg, (UInt32)8, new object[0]);
-                if (Verify())
-                    Console.WriteLine("Ok!");
-                else
-                    Console.WriteLine("Wrong data emitted");
-                Console.WriteLine();
-            }*/
+         
         }
 
         private static void TestInstructionWithDestinationAndSourceAndSize(Type type)
@@ -1039,7 +948,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
 
         private static void TestSimpleInstruction(Type type)
         {
-            var test = Activator.CreateInstance(type);
+            var test = CreateInstruction<object>(type, 0);
             if (Verify())
                 Console.WriteLine("Ok!");
             else

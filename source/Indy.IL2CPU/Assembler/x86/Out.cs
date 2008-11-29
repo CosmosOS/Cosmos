@@ -5,26 +5,31 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
     [OpCode("out")]
-	public class Out: Instruction {
-        public byte Size {
-            get;
-            set;
-        }
+	public class Out: InstructionWithDestinationAndSize {
+        public static void InitializeEncodingData(Instruction.InstructionData aData) {
+            aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
+                OpCode = new byte[] { 0xE6 },
+                OperandSizeByte=0,
+                DestinationImmediate=true,
+                DestinationImmediateSize=InstructionSize.Byte
 
-        public byte? Port {
-            get;
-            set;
+            }); // fixed port (immediate)
+            aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
+                OpCode = new byte[] { 0xEE },
+                OperandSizeByte = 0,
+                DestinationReg=Registers.DX
+            }); // fixed port (register)
         }
 
         public override string ToString() {
-            string xData = "";
-            switch(Size){
-                case 8: xData = "al"; break;
-                case 16: xData = "ax"; break;
-                case 32: xData = "eax"; break;
-                default: throw new Exception("Size " + Size + " not supported in OUT instruction");
+            string xReg = "";
+            switch(Size) {
+                case 8: xReg = "al";break;
+                case 16: xReg = "ax"; break;
+                case 32: xReg = "eax"; break;
+
             }
-            return "out " + (Port.HasValue ? Port.ToString() : "DX") + ", " + xData;
+            return base.ToString() + ", " + xReg;
         }
 	}
 }
