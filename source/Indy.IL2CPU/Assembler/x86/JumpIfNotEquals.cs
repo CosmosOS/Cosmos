@@ -9,5 +9,6 @@ namespace Indy.IL2CPU.Assembler.X86 {
 	/// </summary>
     [OpCode("jne")]
 	public class JumpIfNotEqual: JumpBase {
+
 	}
 }

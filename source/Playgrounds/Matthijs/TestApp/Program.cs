@@ -12,7 +12,7 @@ namespace TestApp {
     class Program {
         class Renderer : Y86 {
             public void DoRender() {
-                new Out { Size=8,DestinationValue = 30};
+                new In { Size=32,DestinationReg = Registers.AL, SourceValue=30};
             }
         }
         static void Main(string[] args) {

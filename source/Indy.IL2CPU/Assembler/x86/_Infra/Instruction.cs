@@ -95,6 +95,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 /// is this EncodingOption valid for situations where the Source is an immediate value
                 /// </summary>
                 public bool SourceImmediate;
+                public InstructionSize SourceImmediateSize = InstructionSize.None;
 
             }
 
@@ -342,23 +343,33 @@ namespace Indy.IL2CPU.Assembler.X86 {
                     if (aEncodingOption.DestinationImmediateSize != InstructionSize.None) {
                         xInstrSize = ((byte)aEncodingOption.DestinationImmediateSize) / 8;
                     }
-aSize+=(ulong)xInstrSize;
+                    aSize += (ulong)xInstrSize;
                 }
             }
-            if (aInstructionWithDestination != null && aInstructionWithSize != null) {
-                if (aInstructionWithDestination.DestinationValue.HasValue && !aInstructionWithDestination.DestinationIsIndirect) {
-                    var xSize = aInstructionWithSize.Size;
-                    if(aEncodingOption.DestinationImmediateSize!=InstructionSize.None) {
-                        xSize = (byte)aEncodingOption.DestinationImmediateSize;
-                    }
-                    aSize += (ulong)xSize / 8;
-                }
-            }
+            //if (aInstructionWithDestination != null && aInstructionWithSize != null) {
+            //    if (aInstructionWithDestination.DestinationValue.HasValue && !aInstructionWithDestination.DestinationIsIndirect) {
+            //        var xSize = aInstructionWithSize.Size;
+            //        if(aEncodingOption.DestinationImmediateSize!=InstructionSize.None) {
+            //            xSize = (byte)aEncodingOption.DestinationImmediateSize;
+            //        }
+            //        aSize += (ulong)xSize / 8;
+            //    }
+            //}
             if (aInstructionWithDestination != null && aInstructionWithDestination.DestinationRef != null) {
                 aSize += 4;
             }
             if (aInstructionWithSource != null && aInstructionWithSource.SourceValue.HasValue) {
-                aSize += (ulong)aInstructionWithSize.Size / 8;
+                var xInstrSize = 0;
+                if (aInstructionWithSize != null) {
+                    xInstrSize = aInstructionWithSize.Size / 8;
+                } else {
+                    //                        throw new NotImplementedException("size not known");
+                    xInstrSize = (int)aEncodingOption.DefaultSize / 8;
+                }
+                if (aEncodingOption.SourceImmediateSize != InstructionSize.None) {
+                    xInstrSize = ((byte)aEncodingOption.SourceImmediateSize) / 8;
+                }
+                aSize += (ulong)xInstrSize;
             }
             if (aInstructionWithSource != null && aInstructionWithSource.SourceRef != null) {
                 aSize += 4;
@@ -659,11 +670,15 @@ aSize+=(ulong)xInstrSize;
                     if (aEncodingOption.NeedsModRMByte) {
                         xOffset++;
                     }
-                    var xInstrSize = 0;
+                    int xInstrSize = 0;
                     if (aInstructionWithSize != null) {
                         xInstrSize = aInstructionWithSize.Size / 8;
                     } else {
-                        throw new NotImplementedException("size not known");
+                        //                        throw new NotImplementedException("size not known");
+                        xInstrSize = (int)aEncodingOption.DefaultSize / 8;
+                    }
+                    if (aEncodingOption.SourceImmediateSize != InstructionSize.None) {
+                        xInstrSize = ((byte)aEncodingOption.SourceImmediateSize) / 8;
                     }
                     Array.Copy(BitConverter.GetBytes(aInstructionWithSource.SourceValue.Value), 0, xBuffer, xOffset, xInstrSize);
                 }

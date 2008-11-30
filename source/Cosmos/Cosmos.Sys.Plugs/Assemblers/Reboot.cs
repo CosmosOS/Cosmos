@@ -14,7 +14,7 @@ namespace Cosmos.Sys.Plugs.Assemblers
             new CPUx86.Move { DestinationReg = Registers.DX, SourceValue = 0x60 };
     /* Clear all keyboard buffers (output and command buffers) */
         	new CPUAll.Label(".clearBuffer");
-            new CPUx86.In { Size = 16, Port = 0x64 };
+            new CPUx86.In { Size = 16, DestinationValue = 0x64 };
             new CPUx86.Move { DestinationReg = Registers.AH, SourceReg = Registers.AL };
             new CPUx86.Test { DestinationReg = Registers.AH, SourceValue = 1 };
             new CPUx86.JumpIfZero { DestinationLabel = ".skipClearIO" };

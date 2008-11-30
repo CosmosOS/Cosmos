@@ -90,7 +90,7 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System.Assemblers
 			new CPU.Comment("we allocated argsize on the stack once");
 			new CPU.Comment("add 32 for the Pushad + 16 for the current stack + 4 for the return value");
             new CPUx86.Add { DestinationReg = Registers.ESI, SourceValue = 52 };
-			new CPUx86.RepeatMovsb();
+			new CPUx86.RepeatMovs{Size=8};
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDI };
             new CPUx86.Call { DestinationReg = CPUx86.Registers.EDI };
 			new CPU.Comment("store return -- return stored into edi after popad");

@@ -29,7 +29,7 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System.Assemblers {
             new CPUx86.Add { DestinationReg = Registers.EDI, SourceReg = Registers.EAX };
 
             new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 8 };
-            new CPUx86.RepeatMovsb();
+            new CPUx86.RepeatMovs{Size=8};
 		}
 	}
 }

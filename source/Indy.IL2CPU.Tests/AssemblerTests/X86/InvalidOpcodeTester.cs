@@ -121,18 +121,29 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                     if(!type.IsSubclassOf(typeof(Instruction))) {
                         continue;
                     }
-
+                    if(type == typeof(Jump)) {
+                        System.Diagnostics.Debugger.Break();
+                    }
                     Console.WriteLine("Testing " + type.Name);
-                    if (type.BaseType == typeof(Assembler.X86.InstructionWithDestination)) {
-                        TestInstructionWithDestination(type);
-                    } else if (type.BaseType == typeof(Assembler.X86.InstructionWithDestinationAndSize)) {
-                        TestInstructionWithDestinationAndSize(type);
-                    } else if (type.BaseType == typeof(Assembler.X86.InstructionWithDestinationAndSource)) {
-                        TestInstructionWithDestinationAndSource(type);
-                    } else if (type.BaseType == typeof(Assembler.X86.InstructionWithDestinationAndSourceAndSize)) {
+                    if (type.IsSubclassOf(typeof(Assembler.X86.InstructionWithDestinationAndSourceAndSize))) {
                         TestInstructionWithDestinationAndSourceAndSize(type);
-                    } else if (type.BaseType == typeof(Assembler.X86.Instruction)) {
+                        continue;
+                    }
+                    if (type.IsSubclassOf(typeof(Assembler.X86.InstructionWithDestinationAndSource))) {
+                        TestInstructionWithDestinationAndSource(type);
+                        continue;
+                    }
+                    if (type.IsSubclassOf(typeof(Assembler.X86.InstructionWithDestinationAndSize))) {
+                        TestInstructionWithDestinationAndSize(type);
+                        continue;
+                    }
+                    if (type.IsSubclassOf(typeof(Assembler.X86.InstructionWithDestination))) {
+                        TestInstructionWithDestination(type);
+                        continue;
+                    }
+                    if (type.IsSubclassOf(typeof(Assembler.X86.Instruction))) {
                         TestSimpleInstruction(type);
+                        continue;
                     }
                 }
             }catch(AbortException){
@@ -427,19 +438,19 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                 xInstruction.DestinationDisplacement = 70000;
                 computeResult();
             }
-            if(!opcodesException.ContainsKey(type) || opcodesException[type].DestInfo.TestRegisters) {
+            if (!opcodesException.ContainsKey(type) || opcodesException[type].DestInfo.TestRegisters) {
                 var xRegistersToSkip = new List<Guid>();
-                if (opcodesException.ContainsKey(type) && opcodesException[type].DestInfo.InvalidRegisters!=null) {
+                if (opcodesException.ContainsKey(type) && opcodesException[type].DestInfo.InvalidRegisters != null) {
                     xRegistersToSkip.AddRange(opcodesException[type].DestInfo.InvalidRegisters);
                 }
-                foreach(var xReg in Registers.GetRegisters()) {
+                foreach (var xReg in Registers.GetRegisters()) {
                     if (xRegistersToSkip.Contains(xReg)) {
                         continue;
                     }
                     if (!Registers.Is32Bit(xReg)) {
                         continue;
                     }
-                    if(Registers.IsCR(xReg)) {
+                    if (Registers.IsCR(xReg)) {
                         continue;
                     }
                     //memory 8 bits
@@ -533,25 +544,24 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                         computeResult();
                     }
                 }
-            }
-
-            foreach (Guid register in Registers.GetRegisters()) {
-                if (!type.Namespace.Contains("SSE") && (Registers.getXMMs().Contains(register)))
-                    continue;
-                if (Registers.getCRs().Contains(register) && (!opcodesException.ContainsKey(type) || (opcodesException.ContainsKey(type) && (!opcodesException[type].DestInfo.TestCR))))
-                    continue;
-                if ((!opcodesException.ContainsKey(type) ||
-                     (opcodesException.ContainsKey(type) && opcodesException[type].DestInfo.InvalidRegisters != null && 
-                       (opcodesException[type].DestInfo.InvalidRegisters.Contains(register)))))
-                    continue;
-                if(Registers.IsSegment(register) && !(opcodesException.ContainsKey(type) && opcodesException[type].DestInfo.TestSegments)) {
-                    continue;
-                }
-                if (size == 0 || Registers.GetSize(register) == size) {
-                    xInstruction = CreateInstruction<IInstructionWithDestination>(type, size);
-                    aInitInstruction(xInstruction);
-                    xInstruction.DestinationReg = register;
-                    computeResult();
+                foreach (Guid register in Registers.GetRegisters()) {
+                    if (!type.Namespace.Contains("SSE") && (Registers.getXMMs().Contains(register)))
+                        continue;
+                    if (Registers.getCRs().Contains(register) && (!opcodesException.ContainsKey(type) || (opcodesException.ContainsKey(type) && (!opcodesException[type].DestInfo.TestCR))))
+                        continue;
+                    if ((!opcodesException.ContainsKey(type) ||
+                         (opcodesException.ContainsKey(type) && opcodesException[type].DestInfo.InvalidRegisters != null &&
+                           (opcodesException[type].DestInfo.InvalidRegisters.Contains(register)))))
+                        continue;
+                    if (Registers.IsSegment(register) && !(opcodesException.ContainsKey(type) && opcodesException[type].DestInfo.TestSegments)) {
+                        continue;
+                    }
+                    if (size == 0 || Registers.GetSize(register) == size) {
+                        xInstruction = CreateInstruction<IInstructionWithDestination>(type, size);
+                        aInitInstruction(xInstruction);
+                        xInstruction.DestinationReg = register;
+                        computeResult();
+                    }
                 }
             }
         }
@@ -880,7 +890,9 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                 WriteResult:
                 return xResult;
             } catch (Exception e) {
-                xMessage = e.Message; 
+                if (e.Message != "No valid EncodingOption found!") {
+                    xMessage = e.ToString();
+                }else{ xMessage = e.Message;}
             } finally {
                 var xInstrWithSize = x86Assembler.Instructions[0] as IInstructionWithSize;
                 var xInstrWithDest = x86Assembler.Instructions[0] as IInstructionWithDestination;

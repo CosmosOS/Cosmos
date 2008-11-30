@@ -6,6 +6,13 @@ using System.Text;
 namespace Indy.IL2CPU.Assembler.X86 {
     [OpCode("lgdt")]
     public class Lgdt : InstructionWithDestination {
-		
+        public static void InitializeEncodingData(Instruction.InstructionData aData) {
+            aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
+                OpCode = new byte[] { 0x0F, 0x01 },
+                NeedsModRMByte = true,
+                InitialModRMByteValue = 0x10,
+                DestinationMemory = true
+            });
+        }
 	}
 }
