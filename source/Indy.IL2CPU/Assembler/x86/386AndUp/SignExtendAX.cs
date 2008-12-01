@@ -12,9 +12,9 @@ namespace Indy.IL2CPU.Assembler.X86
 		{
 			switch (Size)
 			{
-			case 4:
+			case 32:
 				return "cdq";
-			case 2:
+			case 16:
 				return "cwd";
 			default:
 				throw new NotSupportedException();

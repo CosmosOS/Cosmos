@@ -16,12 +16,14 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 DestinationRef = new ElementReference(value);
             }
         }
-
+        protected bool mNear = true;
         public override string ToString() {
             var xResult = base.ToString();
-            if (!xResult.StartsWith(Mnemonic + " near", StringComparison.InvariantCultureIgnoreCase)) {
-                if (xResult.StartsWith(Mnemonic)) {
-                    return Mnemonic + " near " + xResult.Substring(Mnemonic.Length + 1);
+            if (mNear) {
+                if (!xResult.StartsWith(Mnemonic + " near", StringComparison.InvariantCultureIgnoreCase)) {
+                    if (xResult.StartsWith(Mnemonic)) {
+                        return Mnemonic + " near " + xResult.Substring(Mnemonic.Length + 1);
+                    }
                 }
             }
             return xResult;

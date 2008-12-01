@@ -23,5 +23,10 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 DestinationReg=Registers.EAX
             }); // fixed port (register)
         }
+
+        public In() {
+            DestinationReg = Registers.EAX;
+            SourceReg = Registers.DX;
+        }
     }
 }

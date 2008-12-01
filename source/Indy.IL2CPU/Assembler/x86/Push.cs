@@ -32,8 +32,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
         }
 
         public Push() {
-            //Changed without size
-            //Size = 32;
+            Size = 32;
         }
     }
 }

@@ -23,5 +23,10 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 DefaultSize=InstructionSize.DWord
             }); // fixed port (register)
         }
+        public Out() {
+
+            DestinationReg = Registers.DX;
+            SourceReg = Registers.EAX;
+        }
 	}
 }
