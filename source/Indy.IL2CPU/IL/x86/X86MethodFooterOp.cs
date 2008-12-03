@@ -98,10 +98,6 @@ namespace Indy.IL2CPU.IL.X86
             }
             new CPUx86.Jump { DestinationLabel = EndOfMethodLabelNameException };
             new Label(EndOfMethodLabelNameException);
-            if (Label.LastFullLabel.StartsWith("System_UInt32__Cosmos_Kernel_CPU_GetEndOfKernel")) {
-                System.Diagnostics.Debugger.Break();
-            }
-            //System_UInt32__Cosmos_Kernel_CPU_GetEndOfKernel____DOT__END__OF__METHOD_EXCEPTION
             for (int i = 0; i < aLocAllocItemCount;i++ )
             {
                 new CPUx86.Call { DestinationLabel = Label.GenerateLabelName(typeof(RuntimeEngine).GetMethod("Heap_Free")) };
