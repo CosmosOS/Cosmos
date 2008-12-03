@@ -86,11 +86,11 @@ namespace Indy.IL2CPU.Assembler.X86.X {
             switch (aFlags) {
                 case Flags.Zero:
                 case Flags.Equal:
-                    new X86.JumpIfZero { DestinationLabel = aLabel };
+                    new X86.ConditionalJump { Condition = X86.ConditionalTestEnum.Zero, DestinationLabel = aLabel };
                     break;
                 case Flags.NotZero:
                 case Flags.NotEqual:
-                    new X86.JumpIfNotZero { DestinationLabel = aLabel };
+                    new X86.ConditionalJump { Condition = X86.ConditionalTestEnum.NotZero, DestinationLabel = aLabel };
                     break;
             }
         }

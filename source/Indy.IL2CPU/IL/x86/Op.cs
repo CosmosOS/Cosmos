@@ -28,7 +28,7 @@ namespace Indy.IL2CPU.IL.X86 {
             //new CPUx86.Move("ecx",
                             //"[esp]");
             aInitAddress(new CPUx86.Compare { SourceValue = 0, Size=32 });
-            new CPUx86.JumpIfZero{DestinationLabel=aCurrentLabel + "_Step1"};
+            new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = aCurrentLabel + "_Step1" };
             new CPUx86.Jump { DestinationLabel = aNextLabel };
             //new CPUx86.JumpIfNotEqual(aNextLabel);
             new Label(aCurrentLabel + "_Step1");
@@ -397,7 +397,7 @@ namespace Indy.IL2CPU.IL.X86 {
                 new CPUx86.Push { DestinationValue = (uint)Engine.RegisterType(mCatchType) };
                 new CPUx86.Call { DestinationLabel = Label.GenerateLabelName(VTablesImplRefs.IsInstanceRef) };
                 new CPUx86.Compare { DestinationReg = Registers.EAX, SourceValue = 0 };
-                new CPUx86.JumpIfEqual { DestinationLabel = mNextInstructionLabel };
+                new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = mNextInstructionLabel };
             }
             if (mNeedsExceptionPush) {
                 new CPUx86.Push { DestinationRef = new ElementReference(xCurExceptionFieldName), DestinationIsIndirect = true};

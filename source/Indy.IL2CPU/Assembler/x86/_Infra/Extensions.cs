@@ -50,5 +50,43 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 }
             }
         }
+
+        public static string GetMnemonic(this ConditionalTestEnum aThis) {
+            switch (aThis) {
+                case ConditionalTestEnum.Overflow:
+                    return "o";
+                case ConditionalTestEnum.NoOverflow:
+                    return "no";
+                case ConditionalTestEnum.Below:
+                    return "b";
+                case ConditionalTestEnum.NotBelow:
+                    return "nb";
+                case ConditionalTestEnum.Equal:
+                    return "e";
+                case ConditionalTestEnum.NotEqual:
+                    return "ne";
+                case ConditionalTestEnum.BelowOrEqual:
+                    return "be";
+                case ConditionalTestEnum.NotBelowOrEqual:
+                    return "nbe";
+                case ConditionalTestEnum.Sign:
+                    return "s";
+                case ConditionalTestEnum.NotSign:
+                    return "ns";
+                case ConditionalTestEnum.Parity:
+                    return "p";
+                case ConditionalTestEnum.NotParity:
+                    return "np";
+                case ConditionalTestEnum.LessThan:
+                    return "l";
+                case ConditionalTestEnum.NotLessThan:
+                    return "nl";
+                case ConditionalTestEnum.LessThanOrEqualTo:
+                    return "le";
+                case ConditionalTestEnum.NotLessThanOrEqualTo:
+                    return "nle";
+                default: throw new NotImplementedException();
+            }
+        }
     }
 }

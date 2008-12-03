@@ -22,7 +22,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			string LabelFalse = BaseLabel + "False";
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
             new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
-            new CPUx86.JumpIfEqual { DestinationLabel = LabelTrue };
+            new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = LabelTrue };
             new CPUx86.Jump { DestinationLabel = LabelFalse };
 			new CPU.Label(LabelTrue);
 			new CPUx86.Add{DestinationReg = CPUx86.Registers.ESP, SourceValue=4};
@@ -44,10 +44,10 @@ namespace Indy.IL2CPU.IL.X86 {
             new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
 
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-            new CPUx86.JumpIfNotEqual { DestinationLabel = LabelFalse };
+            new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotEqual, DestinationLabel = LabelFalse };
 
             new CPUx86.Xor { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
-            new CPUx86.JumpIfNotZero { DestinationLabel = LabelFalse };
+            new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotZero, DestinationLabel = LabelFalse };
 
 			//they are equal, eax == 0
             new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 8 };

@@ -146,7 +146,7 @@ namespace Indy.IL2CPU.IL.X86
 				}
                 new Assembler.X86.Call { DestinationLabel = Label.GenerateLabelName(aCtorDef) };
                 new Test { DestinationReg = Registers.ECX, SourceValue = 2 };
-                new JumpIfEqual { DestinationLabel = aCurrentLabel + "_NO_ERROR_4" };
+                new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = aCurrentLabel + "_NO_ERROR_4" };
 				for (int i = 1; i < xCtorInfo.Arguments.Length; i++)
 				{
                     new Assembler.X86.Add {

@@ -51,7 +51,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			string mReturnNullLabel = mThisLabel + "_ReturnNull";
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
             new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-            new CPUx86.JumpIfZero { DestinationLabel = mReturnNullLabel };
+            new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = mReturnNullLabel };
             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
 			new CPUx86.Push{DestinationValue=(uint)mTypeId};
 			Assembler.StackContents.Push(new StackContent(4, typeof(object)));
@@ -65,7 +65,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			Assembler.StackContents.Pop();
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
             new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-            new CPUx86.JumpIfNotEqual { DestinationLabel = mNextOpLabel };
+            new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotEqual, DestinationLabel = mNextOpLabel };
 			new CPU.Label(mReturnNullLabel);
             new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
             Newobj.Assemble(Assembler, typeof(InvalidCastException).GetConstructor(new Type[0]), Engine.RegisterType(typeof(InvalidCastException)), mThisLabel, mMethodInfo, mCurrentILOffset, mThisLabel + "_After_NewException");

@@ -158,7 +158,7 @@ namespace Indy.IL2CPU.IL.X86 {
                      * 
                      * EAX contains the method to call
                      */
-                    new CPUx86.JumpIfNotEqual { DestinationLabel = mLabelName + "_NOT_BOXED_THIS" };
+                    new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotEqual, DestinationLabel = mLabelName + "_NOT_BOXED_THIS" };
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
                     /*
                      * On the stack now:

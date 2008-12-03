@@ -162,7 +162,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
             new CPUx86.Noop();
             new CPUx86.Move { DestinationReg = Registers.EAX, SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 8 };
             new CPUx86.Compare { DestinationReg = Registers.EAX, SourceValue = 0 };
-            new CPUx86.JumpIfZero { DestinationLabel = ".__AFTER_ENABLE_INTERRUPTS" };
+            new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = ".__AFTER_ENABLE_INTERRUPTS" };
             new CPUx86.Sti();
             new CPUx86.Move { DestinationRef = new ElementReference("InterruptsEnabledFlag"), DestinationIsIndirect = true, SourceValue = 1, Size = 32 };
             new Label(".__AFTER_ENABLE_INTERRUPTS");

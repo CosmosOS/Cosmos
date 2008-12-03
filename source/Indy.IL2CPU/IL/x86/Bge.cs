@@ -27,7 +27,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			new CPUx86.Pop{DestinationReg = CPUx86.Registers.EBX};
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
             new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceReg=CPUx86.Registers.EBX };
-            new CPUx86.JumpIfGreaterOrEquals { DestinationLabel = LabelTrue };
+            new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.GreaterThanOrEqualTo, DestinationLabel = LabelTrue };
             new CPUx86.Jump { DestinationLabel = LabelFalse };
 			new CPU.Label(LabelTrue);
             new CPUx86.Jump { DestinationLabel = TargetLabel };
@@ -57,7 +57,7 @@ namespace Indy.IL2CPU.IL.X86 {
             new CPUx86.Sub { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.EAX };
             new CPUx86.SubWithCarry { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EDX };
 			//result = value1 - value2
-            new CPUx86.JumpIfGreaterOrEqual { DestinationLabel = TargetLabel };
+            new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.GreaterThanOrEqualTo, DestinationLabel = TargetLabel };
 		}
 
 		public override void DoAssemble() {

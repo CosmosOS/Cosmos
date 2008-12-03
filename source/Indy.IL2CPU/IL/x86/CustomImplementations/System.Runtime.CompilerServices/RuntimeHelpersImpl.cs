@@ -41,7 +41,7 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System.Runtime.CompilerServic
             new Assembler.X86.Add { DestinationReg = Assembler.X86.Registers.ESI, SourceValue = 1 };
             new Assembler.X86.Add { DestinationReg = Assembler.X86.Registers.EDI, SourceValue = 1 };
 			new Assembler.X86.Compare { DestinationReg = Assembler.X86.Registers.EAX, SourceReg = Assembler.X86.Registers.ECX };
-            new Assembler.X86.JumpIfEqual { DestinationLabel = ".EndLoop" };
+            new Assembler.X86.ConditionalJump { Condition = Assembler.X86.ConditionalTestEnum.Equal, DestinationLabel = ".EndLoop" };
             new Assembler.X86.Jump { DestinationLabel = ".StartLoop" };
 
 			new Assembler.Label(".EndLoop");

@@ -82,11 +82,11 @@ namespace Indy.IL2CPU.IL.X86 {
 			} else {
                 new CPUx86.Test { DestinationReg = CPUx86.Registers.ECX, SourceValue = 2 };
 				if (aCleanup != null) {
-                    new CPUx86.JumpIfEqual { DestinationLabel = aNextLabel };
+                    new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = aNextLabel };
 					aCleanup();
                     new CPUx86.Jump { DestinationLabel = xJumpTo };
 				} else {
-                    new CPUx86.JumpIfNotEqual { DestinationLabel = xJumpTo };
+                    new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotEqual, DestinationLabel = xJumpTo };
 				}
 			}
 		}

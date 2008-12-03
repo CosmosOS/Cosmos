@@ -38,12 +38,12 @@ namespace Indy.IL2CPU.IL.X86 {
                 new CPUx86.Sub { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.EAX };
                 new CPUx86.SubWithCarry { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EDX };
 				//result = value1 - value2
-                new CPUx86.JumpOnGreater { DestinationLabel = TargetLabel };
+                new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.GreaterThan, DestinationLabel = TargetLabel };
 			}else
 			{
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
 				new CPUx86.Compare{DestinationReg=CPUx86.Registers.EAX, SourceReg=CPUx86.Registers.ESP, SourceIsIndirect=true};
-                new CPUx86.JumpIfGreater { DestinationLabel = LabelTrue };
+                new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Below, DestinationLabel = LabelTrue };
                 new CPUx86.Jump { DestinationLabel = LabelFalse };
 				new CPU.Label(LabelTrue);
                 new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };

@@ -52,7 +52,7 @@ namespace Indy.IL2CPU.IL.X86 {
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.ECX };
                 new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
-                new CPUx86.JumpIfLess { DestinationLabel = LabelTrue };
+                new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.LessThan, DestinationLabel = LabelTrue };
                 new CPUx86.Jump { DestinationLabel = LabelFalse };
 				new CPU.Label(LabelTrue);
                 new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
