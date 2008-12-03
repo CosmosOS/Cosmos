@@ -1,4 +1,4 @@
-﻿#define BINARY
+﻿//#define BINARY
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +12,8 @@ namespace TestApp {
     class Program {
         class Renderer : Y86 {
             public void DoRender() {
-                new In { Size=32,DestinationReg = Registers.AL, SourceValue=30};
+                //new In { Size=32,DestinationReg = Registers.AL, SourceValue=30};
+                new Out { DestinationValue = 0x5, SourceReg=Registers.AX};
             }
         }
         static void Main(string[] args) {

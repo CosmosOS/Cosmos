@@ -13,5 +13,9 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 DestinationImmediateSize=InstructionSize.Word
             });
         }
+
+        public override string ToString() {
+            return base.mMnemonic + " " + this.GetDestinationAsString();
+        }
     }
 }

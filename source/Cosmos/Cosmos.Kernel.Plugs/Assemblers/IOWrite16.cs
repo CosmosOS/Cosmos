@@ -13,7 +13,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
             //TODO: This is a lot of work to write to a single port. We need to have some kind of inline ASM option that can emit a single out instruction
             new CPUx86.Move { DestinationReg = Registers.EDX, SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0xC };
             new CPUx86.Move { DestinationReg = Registers.EAX, SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x8 };
-            new Out { Size = 16 };
+            new Out { DestinationReg = Registers.DX, SourceReg = Registers.AX };
 		}
 	}
 }

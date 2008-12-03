@@ -20,7 +20,7 @@ namespace Indy.IL2CPU.IL.X86 {
                 new CPUx86.Pop{DestinationReg = CPUx86.Registers.EAX}; // shift amount
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX }; // value
                 new CPUx86.Move { DestinationReg = CPUx86.Registers.CL, SourceReg = CPUx86.Registers.AL };
-                new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.EBX };
+                new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.EBX, SourceReg=CPUx86.Registers.CL };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EBX };
                 Assembler.StackContents.Push(xStackItem_Value);
                 return;
@@ -33,7 +33,7 @@ namespace Indy.IL2CPU.IL.X86 {
                 new CPUx86.JumpIfEqual { DestinationLabel = mLabelName + "__EndLoop" };
                 new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect=true };
                 new CPUx86.Move { DestinationReg = CPUx86.Registers.CL, SourceValue = 1 };
-                new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.EBX };
+                new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.CL };
                 new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect=true, SourceReg = CPUx86.Registers.EBX };
                 new CPUx86.Move { DestinationReg = CPUx86.Registers.CL, SourceValue = 1 };
                 new CPUx86.RotateThroughCarryRight { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, Size = 32, SourceReg=CPUx86.Registers.CL };

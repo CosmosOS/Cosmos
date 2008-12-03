@@ -98,6 +98,10 @@ namespace Indy.IL2CPU.IL.X86
             }
             new CPUx86.Jump { DestinationLabel = EndOfMethodLabelNameException };
             new Label(EndOfMethodLabelNameException);
+            if (Label.LastFullLabel.StartsWith("System_UInt32__Cosmos_Kernel_CPU_GetEndOfKernel")) {
+                System.Diagnostics.Debugger.Break();
+            }
+            //System_UInt32__Cosmos_Kernel_CPU_GetEndOfKernel____DOT__END__OF__METHOD_EXCEPTION
             for (int i = 0; i < aLocAllocItemCount;i++ )
             {
                 new CPUx86.Call { DestinationLabel = Label.GenerateLabelName(typeof(RuntimeEngine).GetMethod("Heap_Free")) };
@@ -138,7 +142,11 @@ namespace Indy.IL2CPU.IL.X86
             }
             //new CPUx86.Add(CPUx86.Registers_Old.ESP, "0x4");
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBP };
-            new CPUx86.Return { DestinationValue = (uint)(aTotalArgsSize - xReturnSize) };
+            var xRetSize = ((int)aTotalArgsSize) - ((int)xReturnSize);
+            if(xRetSize<0) {
+                xRetSize = 0;
+            }
+            new CPUx86.Return { DestinationValue = (uint)xRetSize };
         }
     }
 }

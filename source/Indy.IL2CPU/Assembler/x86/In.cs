@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
     [OpCode("in")]
-    public class In : InstructionWithDestinationAndSourceAndSize {
+    public class In : InstructionWithDestinationAndSource {
         public static void InitializeEncodingData(Instruction.InstructionData aData) {
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0xE4 },
@@ -22,11 +22,6 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 DefaultSize = InstructionSize.DWord,
                 DestinationReg=Registers.EAX
             }); // fixed port (register)
-        }
-
-        public In() {
-            DestinationReg = Registers.EAX;
-            SourceReg = Registers.DX;
         }
     }
 }
