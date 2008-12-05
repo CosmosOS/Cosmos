@@ -101,6 +101,7 @@
     <Compile Include="Assembler\x86\_Infra\Extensions.cs" />
     <Compile Include="Assembler\x86\_Infra\IInstructionWithCondition.cs" />
     <Compile Include="Assembler\x86\_Infra\IInstructionWithDestination.cs" />
+    <Compile Include="Assembler\x86\_Infra\IInstructionWithPrefix.cs" />
     <Compile Include="Assembler\x86\_Infra\IInstructionWithSize.cs" />
     <Compile Include="Assembler\x86\_Infra\IInstructionWithSource.cs" />
     <Compile Include="Assembler\x86\_Infra\Instruction.cs" />

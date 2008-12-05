@@ -279,6 +279,15 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 }
             }
             aSize = (ulong)aEncodingOption.OpCode.Length;
+            var xInstrWithPrefixes = aInstruction as IInstructionWithPrefix;
+            if (xInstrWithPrefixes != null) {
+                if ((xInstrWithPrefixes.Prefixes & InstructionPrefixes.Repeat) != 0) {
+                    aSize++;
+                }
+                if ((xInstrWithPrefixes.Prefixes & InstructionPrefixes.Lock) != 0) {
+                    aSize++;
+                }
+            }
             if (aEncodingOption.NeedsModRMByte) {
                 aSize += 1;
                 bool xSIB = false;
@@ -451,16 +460,27 @@ namespace Indy.IL2CPU.Assembler.X86 {
             var xBuffer = new byte[xSize];
             int xExtraOffset = 0;
             int xOpCodeOffset = 0;
+            var xInstrWithPrefixes = aInstruction as IInstructionWithPrefix;
+            if (xInstrWithPrefixes != null) {
+                if ((xInstrWithPrefixes.Prefixes & InstructionPrefixes.Repeat) != 0) {
+                    xOpCodeOffset += 1;
+                    xBuffer[xExtraOffset] = 0xF3;
+                    xExtraOffset++;
+                }
+                if ((xInstrWithPrefixes.Prefixes & InstructionPrefixes.Lock) != 0) {
+                    throw new NotImplementedException();
+                }
+            }
             if (aInstructionWithSize != null) {
                 if (aEncodingOption.DefaultSize == InstructionSize.DWord && aInstructionWithSize.Size == 16) {
                     xOpCodeOffset += 1;
+                    xBuffer[xExtraOffset] = 0x66;
                     xExtraOffset++;
-                    xBuffer[0] = 0x66;
                 }
                 if (aEncodingOption.DefaultSize == InstructionSize.Word && aInstructionWithSize.Size == 32) {
                     xOpCodeOffset += 1;
+                    xBuffer[xExtraOffset] = 0x66;
                     xExtraOffset++;
-                    xBuffer[0] = 0x66;
                 }
             }
             Array.Copy(aEncodingOption.OpCode, 0, xBuffer, xExtraOffset, aEncodingOption.OpCode.Length);
