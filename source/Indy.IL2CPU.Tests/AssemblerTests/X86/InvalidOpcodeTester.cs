@@ -121,9 +121,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                     if(!type.IsSubclassOf(typeof(Instruction))) {
                         continue;
                     }
-                    if(type == typeof(Jump)) {
-                        System.Diagnostics.Debugger.Break();
-                    }
                     Console.WriteLine("Testing " + type.Name);
                     if (type.IsSubclassOf(typeof(Assembler.X86.InstructionWithDestinationAndSourceAndSize))) {
                         TestInstructionWithDestinationAndSourceAndSize(type);
@@ -139,6 +136,10 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                     }
                     if (type.IsSubclassOf(typeof(Assembler.X86.InstructionWithDestination))) {
                         TestInstructionWithDestination(type);
+                        continue;
+                    }
+                    if (type.IsSubclassOf(typeof(Assembler.X86.InstructionWithSize))) {
+                        TestInstructionWithSize(type);
                         continue;
                     }
                     if (type.IsSubclassOf(typeof(Assembler.X86.Instruction))) {
@@ -158,6 +159,25 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                 GenerateXml(xFile);
                 Console.WriteLine("Tests finished. Results have been written to '{0}'", xFile);
                 Console.ReadLine();
+            }
+        }
+
+        private static void TestInstructionWithSize(Type type) {
+            ConstraintsContainer xInfo=null;
+            if (opcodesException.ContainsKey(type)) {
+                xInfo = opcodesException[type];
+            }
+            if (!(xInfo != null && ((xInfo.InvalidSizes & Instruction.InstructionSizes.DWord) != 0))) {
+                var xInstruction = CreateInstruction<IInstructionWithSize>(type, 32);
+                computeResult();
+            }
+            if (!(xInfo != null && ((xInfo.InvalidSizes & Instruction.InstructionSizes.Word) != 0))) {
+                var xInstruction = CreateInstruction<IInstructionWithSize>(type, 16);
+                computeResult();
+            }
+            if (!(xInfo != null && ((xInfo.InvalidSizes & Instruction.InstructionSizes.Byte) != 0))) {
+                var xInstruction = CreateInstruction<IInstructionWithSize>(type, 8);
+                computeResult();
             }
         }
 

@@ -469,6 +469,18 @@ namespace Indy.IL2CPU.Assembler.X86 {
                     xBuffer[aEncodingOption.DestinationRegByte.Value + xExtraOffset] |= (byte)(EncodeRegister(aInstructionWithDestination.DestinationReg) << aEncodingOption.DestinationRegBitShiftLeft);
                 }
             }
+            if (aInstruction is IInstructionWithCondition) {
+                var xCond = (IInstructionWithCondition)aInstruction;
+                if (aEncodingOption.OpCode.Length == 1) {
+                    xBuffer[xExtraOffset] |= (byte)xCond.Condition;
+                } else {
+                    if (aEncodingOption.OpCode.Length == 2) {
+                        xBuffer[xExtraOffset + 1] |= (byte)xCond.Condition;
+                    } else {
+                        throw new NotImplementedException();
+                    }
+                }
+            }
             //if (aInstructionWithSource != null && aInstructionWithSource.SourceReg != Guid.Empty) {
             //    var xIdx = aEncodingOption.OpCode.Length + xExtraOffset;
             //    if(xIdx >= xBuffer.Length) {

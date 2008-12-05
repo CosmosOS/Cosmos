@@ -10,7 +10,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0xF3, 0xAA },
                 OperandSizeByte=1,
-                DefaultSize=InstructionSize.Word
+                DefaultSize=InstructionSize.DWord
             });
         }
 
