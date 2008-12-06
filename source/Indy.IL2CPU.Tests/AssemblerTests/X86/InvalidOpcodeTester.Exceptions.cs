@@ -7,6 +7,9 @@ using Indy.IL2CPU.Assembler.X86;
 namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
     partial class InvalidOpcodeTester {
         private static void AddExceptions() {
+            opcodesException.Add(typeof(ConditionalJump), new ConstraintsContainer {
+                DestInfo = new Constraints { TestImmediate32 = true, TestImmediate16 = false, TestImmediate8 = false, TestMem8 = false, TestMem16 = false, TestMem32 = false, TestRegisters = false }
+            });
             opcodesException.Add(typeof(Dec), new ConstraintsContainer {
                 DestInfo = new Constraints { TestImmediate16 = false, TestImmediate32 = false, TestImmediate8 = false, TestCR = false, TestSegments = false }
             });

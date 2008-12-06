@@ -395,6 +395,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             aInstruction.mDataSize = aSize;
             return true;
         }
+
         public override bool DetermineSize(Indy.IL2CPU.Assembler.Assembler aAssembler, out ulong aSize) {
             var xInstructionWithDestination = this as IInstructionWithDestination;
             var xInstructionWithSource = this as IInstructionWithSource;
@@ -425,7 +426,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             return true;
         }
 
-        private ulong? mDataSize;
+        protected ulong? mDataSize;
 
         public override ulong? ActualAddress {
             get {
@@ -452,12 +453,10 @@ namespace Indy.IL2CPU.Assembler.X86 {
         }
 
         private static byte[] GetData(Indy.IL2CPU.Assembler.Assembler aAssembler, Instruction aInstruction, IInstructionWithDestination aInstructionWithDestination, IInstructionWithSize aInstructionWithSize, IInstructionWithSource aInstructionWithSource, InstructionData aInstructionData, InstructionData.InstructionEncodingOption aEncodingOption) {
-            ulong xSize = 0;
-            Instruction.DetermineSize(aAssembler, out xSize, aInstruction, aInstructionWithDestination, aInstructionWithSize, aInstructionWithSource, aInstructionData, aEncodingOption);
-            if (xSize == 0) {
-                return new byte[0];
+            var xBuffer = new byte[aInstruction.mDataSize.Value];
+            if (xBuffer.Length == 0) {
+                return xBuffer;
             }
-            var xBuffer = new byte[xSize];
             int xExtraOffset = 0;
             int xOpCodeOffset = 0;
             var xInstrWithPrefixes = aInstruction as IInstructionWithPrefix;

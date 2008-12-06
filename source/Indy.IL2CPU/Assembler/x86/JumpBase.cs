@@ -17,6 +17,29 @@ namespace Indy.IL2CPU.Assembler.X86 {
             }
         }
         protected bool mNear = true;
+        protected bool mCorrectAddress = true;
+	    protected virtual bool IsRelativeJump {
+	        get {
+	            return true;
+	        }
+	    }
+        public override byte[] GetData(Indy.IL2CPU.Assembler.Assembler aAssembler) {
+            if (mCorrectAddress) {
+                if(IsRelativeJump) {
+                    if (DestinationValue.HasValue) {
+                        var xCurAddress = ActualAddress;
+                        var xOrigValue = DestinationValue.Value;
+                        DestinationValue = (uint)(xOrigValue - xCurAddress.Value);
+                        try {
+                            return base.GetData(aAssembler);
+                        } finally {
+                            DestinationValue = xOrigValue;
+                        }
+                    }
+                }
+            }
+            return base.GetData(aAssembler);
+        }
         public override string ToString() {
             var xResult = base.ToString();
             if (mNear) {

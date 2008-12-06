@@ -9,6 +9,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Xml;
 using Instruction=Indy.IL2CPU.Assembler.X86.Instruction;
+using System.Reflection.Emit;
 
 namespace Indy.IL2CPU.Tests.AssemblerTests.X86
 {
@@ -326,9 +327,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
         }
 
         private static T CreateInstruction<T>(Type t, byte aSize) {
-            if(t.GetConstructor(new Type[0])==null) {
-                throw new Exception("Type '" + t.FullName + "' doesnt have a parameterless constructor!");
-            }
             var xResult = (T)Activator.CreateInstance(t);
             if(aSize!=0) {
                 ((IInstructionWithSize)xResult).Size = aSize;
@@ -862,50 +860,51 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
             bool xResult = false;
             string xMessage=null;
             try {
-                var xIndy86MS = new MemoryStream();
-                x86Assembler.FlushText(xNasmWriter);
-                xNasmWriter.Flush();
-                if(xNasmWriter.BaseStream.Length==0) {
-                    throw new Exception("No content found");
-                }
-                xNasmWriter.Close();
-                ProcessStartInfo pinfo = new ProcessStartInfo();
-                pinfo.Arguments = "TheOutput.asm" + " -o " + "TheOutput.bin";
-                pinfo.WorkingDirectory = tempPath;
-                pinfo.FileName = nasmPath;
-                pinfo.UseShellExecute ^= true;
-                pinfo.CreateNoWindow=true;
-                pinfo.RedirectStandardOutput = true;
-                pinfo.RedirectStandardError=true;
-                Process xProc = Process.Start(pinfo);
-                xProc.WaitForExit();
-                if (xProc.ExitCode != 0) {
-                    xResult=false;
-                    xMessage="Error while invoking nasm.exe: \r\n" + xProc.StandardOutput.ReadToEnd() + "\r\n" + xProc.StandardError.ReadToEnd();
-                    goto WriteResult;
-                } else {
-                    xNasmReader = File.OpenRead(Path.Combine(tempPath, "TheOutput.bin"));
-                    x86Assembler.FlushBinary(xIndy86MS, 0x200000);
-                    xIndy86MS.Position = 0;
-                    if (xNasmReader.Length != xIndy86MS.Length) {
-                        xNasmReader.Close();
-                        xMessage = "Binary size mismatch";
-                        goto WriteResult;
+                using (var xIndy86MS = new FileStream(Path.Combine(tempPath, "TheOutput.bin"), FileMode.Create)) {
+                    x86Assembler.FlushText(xNasmWriter);
+                    xNasmWriter.Flush();
+                    if (xNasmWriter.BaseStream.Length == 0) {
+                        throw new Exception("No content found");
                     }
-                    while (true) {
-                        var xVerData = xNasmReader.ReadByte();
-                        var xActualData = xIndy86MS.ReadByte();
-                        if (xVerData != xActualData) {
+                    xNasmWriter.Close();
+                    ProcessStartInfo pinfo = new ProcessStartInfo();
+                    pinfo.Arguments = "TheOutput.asm" + " -o " + "TheOutput";
+                    pinfo.WorkingDirectory = tempPath;
+                    pinfo.FileName = nasmPath;
+                    pinfo.UseShellExecute ^= true;
+                    pinfo.CreateNoWindow = true;
+                    pinfo.RedirectStandardOutput = true;
+                    pinfo.RedirectStandardError = true;
+                    Process xProc = Process.Start(pinfo);
+                    xProc.WaitForExit();
+                    if (xProc.ExitCode != 0) {
+                        xResult = false;
+                        xMessage = "Error while invoking nasm.exe: \r\n" + xProc.StandardOutput.ReadToEnd() + "\r\n" + xProc.StandardError.ReadToEnd();
+                        goto WriteResult;
+                    } else {
+                        xNasmReader = File.OpenRead(Path.Combine(tempPath, "TheOutput"));
+                        x86Assembler.FlushBinary(xIndy86MS, 0x200000);
+                        xIndy86MS.Position = 0;
+                        if (xNasmReader.Length != xIndy86MS.Length) {
                             xNasmReader.Close();
-                            xMessage = "Binary data mismatch";
+                            xMessage = "Binary size mismatch";
                             goto WriteResult;
                         }
-                        if (xVerData == -1) {
-                            break;
+                        while (true) {
+                            var xVerData = xNasmReader.ReadByte();
+                            var xActualData = xIndy86MS.ReadByte();
+                            if (xVerData != xActualData) {
+                                xNasmReader.Close();
+                                xMessage = "Binary data mismatch";
+                                goto WriteResult;
+                            }
+                            if (xVerData == -1) {
+                                break;
+                            }
                         }
+                        xNasmReader.Close();
+                        xResult = true;
                     }
-                    xNasmReader.Close();
-                    xResult = true;
                 }
                 WriteResult:
                 return xResult;

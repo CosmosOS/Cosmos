@@ -1,5 +1,4 @@
-﻿#define BINARY
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,9 +11,9 @@ namespace TestApp {
     class Program {
         class Renderer : Y86 {
             public void DoRender() {
-                new RepeatStos { Size = 8 };
-                new RepeatStos { Size = 16 };
-                new RepeatStos { Size = 32 };
+                new Jump { DestinationValue = 30 };
+                new Jump { DestinationValue = 300 };
+                new Jump { DestinationValue = 300000 };
             }
         }
         static void Main(string[] args) {
@@ -31,21 +30,17 @@ namespace TestApp {
                     Directory.CreateDirectory(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
                         "Output"));
                 }
-#if BINARY
-                using (Stream xOutput = new FileStream(Path.Combine(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
-                                                                                         "Output"),
-                                                                            "TheOutput.bin"), FileMode.Create)) {
-                    xAsm.FlushBinary(xOutput, 0x200000);
-                }
-#else
                 using (var xOutput = new StreamWriter(Path.Combine(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
                                                                                          "Output"),
                                                                             "TheOutput.asm"))) {
                     xAsm.FlushText(xOutput);
                 }
-#endif
-
-                // now the file should have been written
+                using (Stream xOutput = new FileStream(Path.Combine(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
+                                                                                         "Output"),
+                                                                            "TheOutput.bin"), FileMode.Create)) {
+                    xAsm.FlushBinary(xOutput, 0x200000);
+                }
+                // now the files should have been written
             } catch (Exception E) { Console.WriteLine(E.ToString()); } 
             finally {
                 Console.WriteLine("Finished");
