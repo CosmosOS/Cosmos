@@ -26,7 +26,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
         public override byte[] GetData(Indy.IL2CPU.Assembler.Assembler aAssembler) {
             if (mCorrectAddress) {
                 if(IsRelativeJump) {
-                    if (DestinationValue.HasValue) {
+                    if (DestinationValue.HasValue && !DestinationIsIndirect) {
                         var xCurAddress = ActualAddress;
                         var xOrigValue = DestinationValue.Value;
                         DestinationValue = (uint)(xOrigValue - xCurAddress.Value);

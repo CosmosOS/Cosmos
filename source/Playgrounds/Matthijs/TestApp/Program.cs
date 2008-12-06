@@ -11,9 +11,9 @@ namespace TestApp {
     class Program {
         class Renderer : Y86 {
             public void DoRender() {
-                new Jump { DestinationValue = 30 };
-                new Jump { DestinationValue = 300 };
-                new Jump { DestinationValue = 300000 };
+                new Jump { DestinationValue = 30, DestinationIsIndirect=true };
+                new Jump { DestinationValue = 300, DestinationIsIndirect = true };
+                new Jump { DestinationValue = 300000, DestinationIsIndirect = true };
             }
         }
         static void Main(string[] args) {
