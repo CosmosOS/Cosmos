@@ -53,6 +53,13 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 DestinationMemory = true,
                 SourceReg = Guid.Empty
             }); // register to memory
+            aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
+                OpCode=new byte[]{0x02},
+                NeedsModRMByte = true,
+                OperandSizeByte=0,
+                DestinationReg=Guid.Empty,
+                SourceMemory=true
+            }); // memory to register
         }
 	}
 }

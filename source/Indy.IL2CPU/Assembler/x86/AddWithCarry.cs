@@ -8,5 +8,8 @@ namespace Indy.IL2CPU.Assembler.X86
     [OpCode("adc")]
 	public class AddWithCarry : InstructionWithDestinationAndSourceAndSize
 	{
+        public void test() {
+            //Sourcei
+        }
 	}
 }
