@@ -38,6 +38,11 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
             opcodesException.Add(typeof(Lidt), new ConstraintsContainer {
                 DestInfo = new Constraints { TestImmediate16 = false, TestImmediate32 = false, TestImmediate8 = false, TestCR = false, TestSegments = false, TestMem8 = false, TestMem16 = false, TestMem32 = true, TestRegisters = false }
             });
+            opcodesException.Add(typeof(Move), new ConstraintsContainer {
+                DestInfo = new Constraints { TestImmediate16 = false, TestImmediate32 = false, TestImmediate8 = false, TestCR = false, TestSegments = false },
+                SourceInfo = new Constraints { TestImmediate16 = false, TestImmediate32 = false, TestImmediate8 = false, TestCR = false, TestSegments = false },
+                MemToMem=false
+            });
             opcodesException.Add(typeof(Neg), new ConstraintsContainer {
                 DestInfo = new Constraints { TestImmediate16 = false, TestImmediate32 = false, TestImmediate8 = false, TestCR = false, TestSegments = false }
             });
@@ -67,6 +72,10 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
             opcodesException.Add(typeof(ShiftRight), new ConstraintsContainer {
                 DestInfo = new Constraints { TestImmediate16 = false, TestImmediate32 = false, TestImmediate8 = false, TestCR = false, TestSegments = false },
                 SourceInfo = new Constraints{TestCR=false, TestMem16=false, TestMem32=false, TestMem8=false, InvalidRegisters= from item in Registers.GetRegisters()where item != Registers.CL select item, TestImmediate16=false, TestImmediate32=false}
+            });
+            opcodesException.Add(typeof(Xchg), new ConstraintsContainer {
+                DestInfo=new Constraints{TestImmediate16=false, TestImmediate32=false, TestImmediate8=false},
+                SourceInfo = new Constraints { TestMem16 = false, TestMem32 = false, TestMem8 = false, TestImmediate16 = false, TestImmediate32 = false, TestImmediate8 = false }
             });
         }
     }

@@ -6,21 +6,22 @@ using Indy.IL2CPU.Assembler.X86;
 using System.IO;
 using System.Reflection;
 using Indy.IL2CPU.Assembler.X86.X;
+using Indy.IL2CPU.Tests.AssemblerTests.X86;
 
 namespace TestApp {
     class Program {
         class Renderer : Y86 {
             public void DoRender() {
-                new Jump { DestinationValue = 30, DestinationIsIndirect=true };
-                new Jump { DestinationValue = 300, DestinationIsIndirect = true };
-                new Jump { DestinationValue = 300000, DestinationIsIndirect = true };
+                new Move { DestinationReg = Registers.AH, SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203 };
+                new Move { DestinationReg = Registers.AH, SourceReg = Registers.EAX, SourceIsIndirect = true };
+                new Move { DestinationReg = Registers.AH, SourceReg=Registers.ESP, SourceIsIndirect=true };
             }
         }
         static void Main(string[] args) {
             try {
                 var xAsm = new Assembler();
                 xAsm.Initialize();
-                //xAsm.DataMembers.Add(new Indy.IL2CPU.Assembler.DataMember("TestData", new byte[]{65, 66, 67, 68,69,70, 71, 72, 73, 74}));
+                //xAsm.DataMembers.Add(new Indy.IL2CPU.Assembler.DataMember("TestData", new byte[] { 65, 66, 67, 68, 69, 70, 71, 72, 73, 74 }));
                 xAsm.Instructions.Clear();
                 xAsm.DataMembers.Clear();
                 var xRenderer = new Renderer();
@@ -40,11 +41,22 @@ namespace TestApp {
                                                                             "TheOutput.bin"), FileMode.Create)) {
                     xAsm.FlushBinary(xOutput, 0x200000);
                 }
-                // now the files should have been written
+                //InvalidOpcodeTester.Initialize();
+                //InvalidOpcodeTester.ExecuteSingle(typeof(Move), 0);
+                //InvalidOpcodeTester.GenerateHtml(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
+                //                                                                         "Output.html"));
+                //InvalidOpcodeTester.GenerateXml(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
+                //                                                                         "Output.xml"));
+            }catch(InvalidOpcodeTester.AbortException){
+                InvalidOpcodeTester.GenerateHtml(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
+                                                                                         "Output.html"));
+                InvalidOpcodeTester.GenerateXml(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
+                                                                                         "Output.xml"));
             } catch (Exception E) { Console.WriteLine(E.ToString()); } 
             finally {
                 Console.WriteLine("Finished");
                 Console.ReadLine();
+                                    Console.ReadLine();
             }
         }
     }
