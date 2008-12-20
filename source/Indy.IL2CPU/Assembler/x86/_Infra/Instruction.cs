@@ -541,14 +541,18 @@ namespace Indy.IL2CPU.Assembler.X86 {
                                     xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= (byte)(EncodeRegister(aInstructionWithSource.SourceReg));
                                 }
                             } else {
-                                xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= (byte)(EncodeRegister(aInstructionWithSource.SourceReg) << 3);
+                                if (aEncodingOption.ReverseRegisters) {
+                                    xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= (byte)(EncodeRegister(aInstructionWithSource.SourceReg)<<3);
+                                } else {
+                                    xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= (byte)(EncodeRegister(aInstructionWithSource.SourceReg));
+                                }
                             }
                         } else {
                             if (aInstructionWithDestination.DestinationReg != Guid.Empty) {
                                 if (aEncodingOption.ReverseRegisters) {
-                                    xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= (byte)(EncodeRegister(aInstructionWithDestination.DestinationReg) << 3);
+                                    xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= (byte)(EncodeRegister(aInstructionWithDestination.DestinationReg));
                                 } else {
-                                    xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= EncodeRegister(aInstructionWithDestination.DestinationReg);
+                                    xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= (byte)(EncodeRegister(aInstructionWithDestination.DestinationReg) << 3);
                                 }
                             }
                         }
