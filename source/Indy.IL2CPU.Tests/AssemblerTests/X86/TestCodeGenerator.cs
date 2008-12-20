@@ -13,6 +13,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
             public Constraints DestInfo;
             public Instruction.InstructionSizes InvalidSizes = Instruction.InstructionSizes.None;
             public bool MemToMem = false;
+            public bool ImmediateToImmediate = false;
         }
 
         public class TestState {
@@ -74,6 +75,18 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                 return;
             }
             if (!aType.IsSubclassOf(typeof(Instruction))) {
+                return;
+            }
+            if (!Instruction.HasEncodingOptions(aType)) {
+                WriteTestFixtureHeader(aType, aOutput);
+                {
+                    aOutput.WriteLine("[Test]");
+                    aOutput.WriteLine("[Category(\"MissingEncodingOptions\")]");
+                    aOutput.WriteLine("public void DoTest(){");
+                    aOutput.WriteLine("Assert.Fail(\"No Encoding Options specified\");");
+                    aOutput.WriteLine("}");
+                }
+                WriteTestFixtureFooter(aType, aOutput);
                 return;
             }
             if (aType.IsSubclassOf(typeof(Assembler.X86.InstructionWithDestinationAndSourceAndSize))) {
@@ -176,13 +189,15 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
             WriteTestFixtureHeader(aType, aOutput);
             {
                 foreach (var xItem in GetDestinationPossibilities(aType)) {
-                    WriteTestMethodHeader(xItem.Key, aOutput);
-                    {
-                        foreach (var xLine in xItem.Value) {
-                            aOutput.WriteLine("\t\t\tnew global::{0}{{{1}}};", aType.FullName, xLine);
+                    if (xItem.Value.Length > 0) {
+                        WriteTestMethodHeader(xItem.Key, aOutput);
+                        {
+                            foreach (var xLine in xItem.Value) {
+                                aOutput.WriteLine("\t\t\tnew global::{0}{{{1}}};", aType.FullName, xLine);
+                            }
                         }
+                        WriteTestMethodFooter(xItem.Key, aOutput);
                     }
-                    WriteTestMethodFooter(xItem.Key, aOutput);
                 }
             }
             WriteTestFixtureFooter(aType, aOutput);
@@ -269,6 +284,9 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
             {
                 foreach (var xSize in new byte[] { 8, 16, 32 }) {
                     foreach (var xItem in GetDestinationWithSizePossibilities(aType, xSize)) {
+                        if (xItem.Value.Length == 0) {
+                            continue;
+                        }
                         WriteTestMethodHeader(xItem.Key + "Size" + xSize, aOutput);
                         {
                             foreach (var xLine in xItem.Value) {
@@ -289,20 +307,11 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
             }
             if (!opcodesException.ContainsKey(aType) || opcodesException[aType].DestInfo == null || opcodesException[aType].DestInfo.TestMem32) {
                 yield return new KeyValuePair<string, string[]>("8BitMemoryAddressDestination",
-                    new string[] { "DestinationValue = 65, DestinationIsIndirect = true", 
-                    "DestinationValue = 65, DestinationIsIndirect = true, DestinationDisplacement=203",
-                    "DestinationValue = 65, DestinationIsIndirect = true, DestinationDisplacement=2030",
-                    "DestinationValue = 65, DestinationIsIndirect = true, DestinationDisplacement=203000"});
+                    new string[] { "DestinationValue = 65, DestinationIsIndirect = true"});
                 yield return new KeyValuePair<string, string[]>("16BitMemoryAddressDestination",
-                    new string[] { "DestinationValue = 650, DestinationIsIndirect = true", 
-                    "DestinationValue = 650, DestinationIsIndirect = true, DestinationDisplacement=203",
-                    "DestinationValue = 650, DestinationIsIndirect = true, DestinationDisplacement=2030",
-                    "DestinationValue = 650, DestinationIsIndirect = true, DestinationDisplacement=203000"});
+                    new string[] { "DestinationValue = 650, DestinationIsIndirect = true"});
                 yield return new KeyValuePair<string, string[]>("32BitMemoryAddressDestination",
-                    new string[] { "DestinationValue = 650000, DestinationIsIndirect = true", 
-                    "DestinationValue = 650000, DestinationIsIndirect = true, DestinationDisplacement=203",
-                    "DestinationValue = 650000, DestinationIsIndirect = true, DestinationDisplacement=2030",
-                    "DestinationValue = 650000, DestinationIsIndirect = true, DestinationDisplacement=203000"});
+                    new string[] { "DestinationValue = 650000, DestinationIsIndirect = true"});
             }
             if (!opcodesException.ContainsKey(aType) || opcodesException[aType].DestInfo.TestRegisters) {
                 var xRegistersToSkip = new List<Guid>();
@@ -363,20 +372,11 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
             }
             if (!opcodesException.ContainsKey(aType) || opcodesException[aType].SourceInfo == null || opcodesException[aType].SourceInfo.TestMem32) {
                 yield return new KeyValuePair<string, string[]>("8BitMemoryAddressSource",
-                    new string[] { "SourceValue = 65, SourceIsIndirect = true", 
-                    "SourceValue = 65, SourceIsIndirect = true, SourceDisplacement=203",
-                    "SourceValue = 65, SourceIsIndirect = true, SourceDisplacement=2030",
-                    "SourceValue = 65, SourceIsIndirect = true, SourceDisplacement=203000"});
+                    new string[] { "SourceValue = 65, SourceIsIndirect = true"});
                 yield return new KeyValuePair<string, string[]>("16BitMemoryAddressSource",
-                    new string[] { "SourceValue = 650, SourceIsIndirect = true", 
-                    "SourceValue = 650, SourceIsIndirect = true, SourceDisplacement=203",
-                    "SourceValue = 650, SourceIsIndirect = true, SourceDisplacement=2030",
-                    "SourceValue = 650, SourceIsIndirect = true, SourceDisplacement=203000"});
+                    new string[] { "SourceValue = 650, SourceIsIndirect = true"});
                 yield return new KeyValuePair<string, string[]>("32BitMemoryAddressSource",
-                    new string[] { "SourceValue = 650000, SourceIsIndirect = true", 
-                    "SourceValue = 650000, SourceIsIndirect = true, SourceDisplacement=203",
-                    "SourceValue = 650000, SourceIsIndirect = true, SourceDisplacement=2030",
-                    "SourceValue = 650000, SourceIsIndirect = true, SourceDisplacement=203000"});
+                    new string[] { "SourceValue = 650000, SourceIsIndirect = true"});
             }
             if (!opcodesException.ContainsKey(aType) || opcodesException[aType].SourceInfo.TestRegisters) {
                 var xRegistersToSkip = new List<Guid>();
@@ -454,30 +454,12 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                             //memory 8 bits address
                             //no offset
                             String.Format("DestinationValue = 65, DestinationIsIndirect = true"),
-                            //offset 8
-                            String.Format("DestinationValue = 65, DestinationIsIndirect = true, DestinationDisplacement = 203"),
-                            //offset 16
-                            String.Format("DestinationValue = 65, DestinationIsIndirect = true, DestinationDisplacement = 2030"),
-                            //offset 32
-                            String.Format("DestinationValue = 65, DestinationIsIndirect = true, DestinationDisplacement = 203000"),
                             //memory 16 bits address
                             //no offset
                             String.Format("DestinationValue = 650, DestinationIsIndirect = true"),
-                            //offset 8
-                            String.Format("DestinationValue = 650, DestinationIsIndirect = true, DestinationDisplacement = 203"),
-                            //offset 16
-                            String.Format("DestinationValue = 650, DestinationIsIndirect = true, DestinationDisplacement = 2030"),
-                            //offset 32
-                            String.Format("DestinationValue = 650, DestinationIsIndirect = true, DestinationDisplacement = 203000"),
                             // memory 32 bits address
                             //no offset
-                            String.Format("DestinationValue = 650000, DestinationIsIndirect = true"),
-                            //offset 8
-                            String.Format("DestinationValue = 650000, DestinationIsIndirect = true, DestinationDisplacement = 203"),
-                            //offset 16
-                            String.Format("DestinationValue = 650000, DestinationIsIndirect = true, DestinationDisplacement = 2030"),
-                            //offset 32
-                            String.Format("DestinationValue = 650000, DestinationIsIndirect = true, DestinationDisplacement = 203000")});
+                            String.Format("DestinationValue = 650000, DestinationIsIndirect = true")});
             }
             if (!opcodesException.ContainsKey(aType) || opcodesException[aType].DestInfo.TestRegisters) {
                 var xRegistersToSkip = new List<Guid>();
@@ -557,30 +539,13 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                             //memory 8 bits address
                             //no offset
                             String.Format("SourceValue = 65, SourceIsIndirect = true"),
-                            //offset 8
-                            String.Format("SourceValue = 65, SourceIsIndirect = true, SourceDisplacement = 203"),
-                            //offset 16
-                            String.Format("SourceValue = 65, SourceIsIndirect = true, SourceDisplacement = 2030"),
-                            //offset 32
-                            String.Format("SourceValue = 65, SourceIsIndirect = true, SourceDisplacement = 203000"),
                             //memory 16 bits address
                             //no offset
                             String.Format("SourceValue = 650, SourceIsIndirect = true"),
-                            //offset 8
-                            String.Format("SourceValue = 650, SourceIsIndirect = true, SourceDisplacement = 203"),
-                            //offset 16
-                            String.Format("SourceValue = 650, SourceIsIndirect = true, SourceDisplacement = 2030"),
-                            //offset 32
-                            String.Format("SourceValue = 650, SourceIsIndirect = true, SourceDisplacement = 203000"),
                             // memory 32 bits address
                             //no offset
                             String.Format("SourceValue = 650000, SourceIsIndirect = true"),
-                            //offset 8
-                            String.Format("SourceValue = 650000, SourceIsIndirect = true, SourceDisplacement = 203"),
-                            //offset 16
-                            String.Format("SourceValue = 650000, SourceIsIndirect = true, SourceDisplacement = 2030"),
-                            //offset 32
-                            String.Format("SourceValue = 650000, SourceIsIndirect = true, SourceDisplacement = 203000")});
+                    });
             }
             if (!opcodesException.ContainsKey(aType) || opcodesException[aType].SourceInfo.TestRegisters) {
                 var xRegistersToSkip = new List<Guid>();
@@ -641,10 +606,21 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
             {
                 foreach (var xSourceItem in GetSourcePossibilities(aType)) {
                     foreach (var xDestItem in GetDestinationPossibilities(aType)) {
-                        if (opcodesException.ContainsKey(aType) && !opcodesException[aType].MemToMem) {
-                            if (xSourceItem.Key.Contains("Memory") && xDestItem.Key.Contains("Memory")) {
-                                continue;
+                        if (opcodesException.ContainsKey(aType)) {
+                            if (!opcodesException[aType].MemToMem) {
+                                if (xSourceItem.Key.Contains("Memory") && xDestItem.Key.Contains("Memory")) {
+                                    continue;
+                                }
                             }
+                            if(!opcodesException[aType].ImmediateToImmediate) {
+                                if (xSourceItem.Key.Contains("Value") && xDestItem.Key.Contains("Value") &&
+                                    !xSourceItem.Key.Contains("IsIndirect") && !xDestItem.Key.Contains("IsIndirect")) {
+                                    continue;
+                                }  
+                            }
+                        }
+                        if(xSourceItem.Value.Length ==0) {
+                            continue;
                         }
                         WriteTestMethodHeader(xSourceItem.Key + xDestItem.Key, aOutput);
                         {
@@ -669,10 +645,21 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                 foreach(var xSize in new byte[] {8, 16, 32}){
                     foreach (var xSourceItem in GetSourceWithSizePossibilities(aType, xSize)) {
                         foreach (var xDestItem in GetDestinationWithSizePossibilities(aType, xSize)) {
-                            if (opcodesException.ContainsKey(aType) && !opcodesException[aType].MemToMem) {
-                                if (xSourceItem.Key.Contains("Memory") && xDestItem.Key.Contains("Memory")) {
-                                    continue;
+                            if (opcodesException.ContainsKey(aType)) {
+                                if (!opcodesException[aType].MemToMem) {
+                                    if (xSourceItem.Key.Contains("Memory") && xDestItem.Key.Contains("Memory")) {
+                                        continue;
+                                    }
                                 }
+                                if (!opcodesException[aType].ImmediateToImmediate) {
+                                    if (xSourceItem.Key.Contains("Value") && xDestItem.Key.Contains("Value") &&
+                                        !xSourceItem.Key.Contains("IsIndirect") && !xDestItem.Key.Contains("IsIndirect")) {
+                                        continue;
+                                    }
+                                }
+                            }
+                            if (xSourceItem.Value.Length == 0) {
+                                continue;
                             }
                             WriteTestMethodHeader(xSourceItem.Key + xDestItem.Key + "Size" + xSize, aOutput);
                             {

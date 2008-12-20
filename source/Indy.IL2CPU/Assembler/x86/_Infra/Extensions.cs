@@ -7,6 +7,11 @@ namespace Indy.IL2CPU.Assembler.X86 {
     public static class InfraExtensions {
         public static string GetDestinationAsString(this IInstructionWithDestination aThis) {
             string xDest = "";
+            if((aThis.DestinationValue.HasValue ||aThis.DestinationRef != null) && 
+                aThis.DestinationIsIndirect && 
+                aThis.DestinationReg!=Guid.Empty) {
+                throw new Exception("[Scale*index+base] style addressing not supported at the moment");
+            }
             if (aThis.DestinationRef != null) {
                 xDest = aThis.DestinationRef.ToString();
             } else {

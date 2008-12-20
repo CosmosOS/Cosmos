@@ -88,8 +88,9 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                 SourceInfo = new Constraints{TestCR=false, TestMem16=false, TestMem32=false, TestMem8=false, InvalidRegisters= from item in Registers.GetRegisters()where item != Registers.CL select item, TestImmediate16=false, TestImmediate32=false}
             });
             opcodesException.Add(typeof(Xchg), new ConstraintsContainer {
-                DestInfo=new Constraints{TestImmediate16=false, TestImmediate32=false, TestImmediate8=false},
-                SourceInfo = new Constraints { TestMem16 = false, TestMem32 = false, TestMem8 = false, TestImmediate16 = false, TestImmediate32 = false, TestImmediate8 = false }
+                DestInfo = new Constraints { TestImmediate16 = false, TestImmediate32 = false, TestImmediate8 = false },
+                SourceInfo = new Constraints { TestMem16 = false, TestMem32 = false, TestMem8 = false, TestImmediate16 = false, TestImmediate32 = false, TestImmediate8 = false },
+                ImmediateToImmediate=false
             });
         }
     }
