@@ -37,6 +37,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 /// </summary>
                 public bool NeedsModRMByte;
                 public byte InitialModRMByteValue;
+                public bool ReverseRegisters = false;
 
                 public InstructionSizes AllowedSizes = InstructionSizes.All;
                 public InstructionSize DefaultSize = InstructionSize.DWord;
@@ -540,7 +541,11 @@ namespace Indy.IL2CPU.Assembler.X86 {
                             }
                         } else {
                             if (aInstructionWithDestination.DestinationReg != Guid.Empty) {
-                                xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= EncodeRegister(aInstructionWithDestination.DestinationReg);
+                                if (aEncodingOption.ReverseRegisters) {
+                                    xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= (byte)(EncodeRegister(aInstructionWithDestination.DestinationReg) << 3);
+                                } else {
+                                    xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= EncodeRegister(aInstructionWithDestination.DestinationReg);
+                                }
                             }
                         }
                         byte? xSIB = null;
@@ -556,7 +561,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                             } else {
                                 if (!(aInstructionWithSource != null &&
                                     ((aInstructionWithSource.SourceReg == Registers.EBP && !(aInstructionWithSource.SourceReg != Guid.Empty && aInstructionWithSource.SourceIsIndirect)) ||
-                                     aInstructionWithSource.SourceReg == Registers.ESP)) && (aInstructionWithDestination.DestinationReg == Guid.Empty && aInstructionWithDestination.DestinationIsIndirect)) {
+                                     aInstructionWithSource.SourceReg == Registers.ESP))) {
                                     // todo: fix for 16bit mode, it should then be 0x36
                                     //xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= 0x5;
                                     //ulong xAddress = 0;
