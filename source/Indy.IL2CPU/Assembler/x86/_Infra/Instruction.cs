@@ -316,7 +316,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                             aSize++;
                             xSIB = true;
                         } else {
-                            if (aInstructionWithDestination != null && (aInstructionWithDestination.DestinationReg == Registers.ESP || aInstructionWithDestination.DestinationReg == Registers.EBP) && aInstructionWithDestination.DestinationIsIndirect) {
+                            if (aInstructionWithDestination != null && (aInstructionWithDestination.DestinationReg == Registers.ESP/* || aInstructionWithDestination.DestinationReg == Registers.EBP*/) && aInstructionWithDestination.DestinationIsIndirect) {
                                 aSize++;
                                 xSIB = true;
                             }
