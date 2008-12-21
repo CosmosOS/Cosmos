@@ -102,7 +102,6 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
             };
             new Label(".RegisterIDT");
             new CPUx86.Lidt{DestinationReg=Registers.EAX, DestinationIsIndirect=true};
-            new CPUx86.Break();
             new CPUx86.Jump { DestinationLabel = "__AFTER__ALL__ISR__HANDLER__STUBS__" };
             var xInterruptsWithParam = new int[] {8, 10, 11, 12, 13, 14};
             for (int j = 0; j < 256; j++) {
@@ -149,7 +148,6 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
                 new CPUx86.Popad();
 
                 new CPUx86.Add { DestinationReg = Registers.ESP, SourceValue = 8 };
-                new CPUx86.Break();
                 new Label("__ISR_Handler_" + j.ToString("X2") + "_END");
                 // MtW: Appearantly, we dont need to enable interrupts on exit
                 //if (j < 0x20 || j > 0x2F) {

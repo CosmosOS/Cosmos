@@ -173,7 +173,6 @@
     <Compile Include="Assembler\x86\SetInterruptFlag.cs" />
     <Compile Include="Assembler\x86\ShiftLeft.cs" />
     <Compile Include="Assembler\x86\ShiftRight.cs" />
-    <Compile Include="Assembler\x86\SpecialDebug\Break.cs" />
     <Compile Include="Assembler\x86\SpecialDebug\DebugStub.cs" />
     <Compile Include="Assembler\x86\SSEAndMMX2\AddSS.cs" />
     <Compile Include="Assembler\x86\SSEAndMMX2\FXSave.cs" />

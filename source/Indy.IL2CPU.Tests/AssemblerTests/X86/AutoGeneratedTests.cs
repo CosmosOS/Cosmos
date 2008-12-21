@@ -12942,14 +12942,6 @@ Assert.Fail("No Encoding Options specified");
 }
 	}
 	[TestFixture]
-	public partial class BreakTests: BaseTest {
-		[Test]
-		public void TestInstruction() {
-			new global::Indy.IL2CPU.Assembler.X86.Break();
-			Verify();
-		}
-	}
-	[TestFixture]
 	public partial class OutTests: BaseTest {
 	}
 	[TestFixture]

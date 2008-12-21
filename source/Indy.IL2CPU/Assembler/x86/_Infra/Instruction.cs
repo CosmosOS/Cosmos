@@ -282,6 +282,11 @@ namespace Indy.IL2CPU.Assembler.X86 {
         }
 
         private static bool DetermineSize(Indy.IL2CPU.Assembler.Assembler aAssembler, out ulong aSize, Instruction aInstruction, IInstructionWithDestination aInstructionWithDestination, IInstructionWithSize aInstructionWithSize, IInstructionWithSource aInstructionWithSource, InstructionData aInstructionData, InstructionData.InstructionEncodingOption aEncodingOption) {
+            if (aInstructionData.EncodingOptions.Count == 1 &&
+                aInstructionWithDestination == null && aInstructionWithSize == null && aInstructionWithSource == null) {
+                aSize = (ulong)aEncodingOption.OpCode.LongLength;
+                return true;
+            }
             if (aInstructionWithSize != null) {
                 if (aInstructionWithSize.Size == 0) {
                     aInstructionWithSize.Size = (byte)aEncodingOption.DefaultSize;
