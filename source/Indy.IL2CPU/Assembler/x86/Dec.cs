@@ -12,7 +12,8 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 NeedsModRMByte = true,
                 InitialModRMByteValue=0x8,
                 OperandSizeByte=0,
-                DestinationMemory=true
+                DestinationMemory=true,
+                ReverseRegisters=true
             }); //memory
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode=new byte[]{0x48},
@@ -25,6 +26,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 NeedsModRMByte = true,
                 InitialModRMByteValue = 0xC8,
                 OperandSizeByte = 0,
+                ReverseRegisters=true,
                 DestinationReg = Guid.Empty
             }); // reg
         }
