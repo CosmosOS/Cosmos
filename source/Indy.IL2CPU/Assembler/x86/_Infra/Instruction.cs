@@ -25,6 +25,13 @@ namespace Indy.IL2CPU.Assembler.X86 {
             DWord = 32,
             QWord = 64
         }
+        [Flags]
+        public enum OperandMemoryKinds { 
+            Default = Address | IndirectReg | IndirectRegOffset,
+            Address = 1,
+            IndirectReg = 2,
+            IndirectRegOffset = 4
+        }
         public class InstructionData {
             public class InstructionEncodingOption {
                 public Action<byte[], Instruction> ModifyBytes;
@@ -92,6 +99,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 /// is this EncodingOption valid for situations where the Source operand is memory?
                 /// </summary>
                 public bool SourceMemory;
+                public OperandMemoryKinds SourceMemoryKinds = OperandMemoryKinds.Default;
                 /// <summary>
                 /// is this EncodingOption valid for situations where the Source is an immediate value
                 /// </summary>
@@ -270,6 +278,11 @@ namespace Indy.IL2CPU.Assembler.X86 {
                     if (!((xEncodingOption.SourceImmediate && aInstructionWithSource.SourceValue != null && !aInstructionWithSource.SourceIsIndirect) ||
                         (!xEncodingOption.SourceImmediate && (aInstructionWithSource.SourceValue == null || aInstructionWithSource.SourceIsIndirect)))) {
                         continue;
+                    }
+                    if (xEncodingOption.SourceMemory) {
+                        if (((xEncodingOption.SourceMemoryKinds & OperandMemoryKinds.IndirectReg) == 0 ||(xEncodingOption.SourceMemoryKinds & OperandMemoryKinds.IndirectRegOffset) == 0 )  && aInstructionWithSource.SourceReg != Guid.Empty) {
+                            continue;
+                        }
                     }
                 }
                 aEncodingOption = xEncodingOption;

@@ -56,6 +56,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 OpCode = new byte[] { 0xA0 },
                 OperandSizeByte = 0,
                 SourceMemory = true,
+                SourceMemoryKinds = OperandMemoryKinds.Address,
                 DestinationReg = Registers.EAX,
                 SourceImmediateSize = InstructionSize.DWord
             }); // memory to register (eax)
