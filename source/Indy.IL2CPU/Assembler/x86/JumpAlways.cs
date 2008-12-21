@@ -19,6 +19,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 OpCode = new byte[] { 0xFF },
                 DestinationMemory = true,
                 AllowedSizes = InstructionSizes.DWord,
+                ReverseRegisters = true,
                 NeedsModRMByte=true,
                 InitialModRMByteValue = 0x20
             }); // indirect at memory
@@ -26,6 +27,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 OpCode = new byte[] { 0xFF },
                 DestinationReg = Guid.Empty,
                 AllowedSizes = InstructionSizes.DWord,
+                ReverseRegisters=true,
                 NeedsModRMByte = true,
                 InitialModRMByteValue = 0xE0
             }); // indirect at register

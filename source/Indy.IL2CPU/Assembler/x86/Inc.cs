@@ -18,12 +18,14 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 DestinationReg = Guid.Empty,
                 NeedsModRMByte=true,
                 InitialModRMByteValue=0xC0,
+                ReverseRegisters=true,
                 OperandSizeByte=0
             }); // reg
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0xFE },
                 DestinationMemory=true,
                 NeedsModRMByte = true,
+                ReverseRegisters = true,
                 OperandSizeByte = 0
             }); // memory
         }

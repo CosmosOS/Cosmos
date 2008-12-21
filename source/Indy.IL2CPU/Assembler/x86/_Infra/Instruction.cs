@@ -848,6 +848,22 @@ namespace Indy.IL2CPU.Assembler.X86 {
                         }
                         Array.Copy(BitConverter.GetBytes(aInstructionWithSource.SourceValue.Value), 0, xBuffer, xOffset, xInstrSize);
                     }
+                    if (aInstructionWithSource.SourceValue.HasValue && aInstructionWithSource.SourceIsIndirect && aEncodingOption.SourceMemory && !aEncodingOption.NeedsModRMByte) {
+                        int xOffset = aEncodingOption.OpCode.Length + xExtraOffset;
+                        int xInstrSize = 0;
+                        if (aInstructionWithSize != null) {
+                            xInstrSize = aInstructionWithSize.Size / 8;
+                        } else {
+                            //                        throw new NotImplementedException("size not known");
+                            xInstrSize = (int)aEncodingOption.DefaultSize / 8;
+                        }
+                        if (aEncodingOption.SourceImmediateSize != InstructionSize.None) {
+                            xInstrSize = ((byte)aEncodingOption.SourceImmediateSize) / 8;
+                        }
+                        var xAddress = aInstructionWithSource.SourceValue.Value;
+                        xAddress += (uint)aInstructionWithSource.SourceDisplacement;
+                        Array.Copy(BitConverter.GetBytes(xAddress), 0, xBuffer, xOffset, xInstrSize);
+                    }
                 }
                 if (aInstructionWithSize != null) {
                     if (aEncodingOption.OperandSizeByte.HasValue) {
