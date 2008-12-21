@@ -14,6 +14,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 OpCode = new byte[] { 0xF6 },
                 NeedsModRMByte=true,
                 InitialModRMByteValue = 0xF0,
+                ReverseRegisters=true,
                 OperandSizeByte=0,
                 DestinationReg=Guid.Empty
             });// register
@@ -21,6 +22,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 OpCode = new byte[] {0xF6},
                 NeedsModRMByte=true,
                 InitialModRMByteValue = 0x30,
+                ReverseRegisters = true,
                 OperandSizeByte = 0,
                 DestinationMemory=true
             }); // memory
