@@ -26,7 +26,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 SourceImmediate = true
             }); // immediate to reg
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
-                OpCode = new byte[] { 0x01 },
+                OpCode = new byte[] { 0x00 },
                 AllowedSizes = InstructionSizes.DWord | InstructionSizes.Word | InstructionSizes.Byte,
                 DefaultSize = InstructionSize.DWord,
                 NeedsModRMByte = true,
