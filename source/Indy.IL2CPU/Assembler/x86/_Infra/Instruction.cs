@@ -601,9 +601,30 @@ namespace Indy.IL2CPU.Assembler.X86 {
                                         xAddress += (ulong)aInstructionWithDestination.DestinationDisplacement;
                                         Array.Copy(BitConverter.GetBytes((uint)xAddress), 0, xBuffer, aEncodingOption.OpCode.Length + xExtraOffset + 1, 4);
                                         xExtraOffset += 4;
+                                    } else {
+                                        if (aInstructionWithDestination != null && aInstructionWithSource != null &&
+                                            aInstructionWithDestination.DestinationValue.HasValue && aInstructionWithDestination.DestinationIsIndirect &&
+                                            aInstructionWithSource.SourceReg != Guid.Empty && !aInstructionWithSource.SourceIsIndirect) {
+                                            if (aEncodingOption.ReverseRegisters) {
+                                                xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= (byte)(EncodeRegister(aInstructionWithSource.SourceReg) << 3);
+                                            } else {
+                                                xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= (byte)(EncodeRegister(aInstructionWithSource.SourceReg));
+                                            }
+                                            xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= 0x5;
+                                            ulong xAddress = 0;
+                                            if (!(aInstructionWithDestination.DestinationRef != null && aInstructionWithDestination.DestinationRef.Resolve(aAssembler, out xAddress))) {
+                                                if (aInstructionWithDestination.DestinationValue.HasValue) {
+                                                    xAddress = aInstructionWithDestination.DestinationValue.Value;
+                                                }
+                                            }
+                                            xAddress += (ulong)aInstructionWithDestination.DestinationDisplacement;
+                                            Array.Copy(BitConverter.GetBytes((uint)xAddress), 0, xBuffer, aEncodingOption.OpCode.Length + xExtraOffset + 1, 4);
+                                            xExtraOffset += 4;
+                                        }
                                     }
                                 }
                             }
+                            Console.Write("");
                         }
 
                         if (aInstructionWithSource != null && aInstructionWithSource.SourceIsIndirect) {
