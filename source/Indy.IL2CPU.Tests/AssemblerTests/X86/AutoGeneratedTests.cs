@@ -3937,14 +3937,6 @@ Assert.Fail("No Encoding Options specified");
 		[Test]
 		public void TestImmediateSourceImmediateDestinationSize8() {
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationValue = 300000, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationValue = 300000, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationValue = 300000, Size = 8};
 			Verify();
 		}
 		[Test]
@@ -3952,12 +3944,6 @@ Assert.Fail("No Encoding Options specified");
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationValue = 65, DestinationIsIndirect = true, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationValue = 650, DestinationIsIndirect = true, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationValue = 650000, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationValue = 65, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationValue = 650, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationValue = 650000, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationValue = 65, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationValue = 650, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationValue = 650000, DestinationIsIndirect = true, Size = 8};
 			Verify();
 		}
 		[Test]
@@ -3966,14 +3952,6 @@ Assert.Fail("No Encoding Options specified");
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
 			Verify();
 		}
 		[Test]
@@ -3982,14 +3960,6 @@ Assert.Fail("No Encoding Options specified");
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EBX, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EBX, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
 			Verify();
 		}
 		[Test]
@@ -3998,14 +3968,6 @@ Assert.Fail("No Encoding Options specified");
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.ECX, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.ECX, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
 			Verify();
 		}
 		[Test]
@@ -4014,14 +3976,6 @@ Assert.Fail("No Encoding Options specified");
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EDX, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EDX, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
 			Verify();
 		}
 		[Test]
@@ -4030,14 +3984,6 @@ Assert.Fail("No Encoding Options specified");
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
 			Verify();
 		}
 		[Test]
@@ -4046,14 +3992,6 @@ Assert.Fail("No Encoding Options specified");
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EBP, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EBP, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
 			Verify();
 		}
 		[Test]
@@ -4062,14 +4000,6 @@ Assert.Fail("No Encoding Options specified");
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.ESI, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.ESI, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
 			Verify();
 		}
 		[Test]
@@ -4078,27 +4008,13 @@ Assert.Fail("No Encoding Options specified");
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EDI, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EDI, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
 			Verify();
 		}
 		[Test]
 		public void TestMemorySourceImmediateDestinationSize8() {
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 65, SourceIsIndirect = true, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 65, SourceIsIndirect = true, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 65, SourceIsIndirect = true, DestinationValue = 300000, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 650, SourceIsIndirect = true, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 650, SourceIsIndirect = true, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 650, SourceIsIndirect = true, DestinationValue = 300000, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 650000, SourceIsIndirect = true, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 650000, SourceIsIndirect = true, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 650000, SourceIsIndirect = true, DestinationValue = 300000, Size = 8};
 			Verify();
 		}
 		[Test]
@@ -4245,17 +4161,9 @@ Assert.Fail("No Encoding Options specified");
 		[Test]
 		public void TestMemoryAtRegisterEAXSourceImmediateDestinationSize8() {
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationValue = 300000, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300000, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300000, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300000, Size = 8};
 			Verify();
 		}
 		[Test]
@@ -4437,17 +4345,9 @@ Assert.Fail("No Encoding Options specified");
 		[Test]
 		public void TestMemoryAtRegisterEBXSourceImmediateDestinationSize8() {
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBX, SourceIsIndirect = true, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBX, SourceIsIndirect = true, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBX, SourceIsIndirect = true, DestinationValue = 300000, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300000, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300000, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300000, Size = 8};
 			Verify();
 		}
 		[Test]
@@ -4629,17 +4529,9 @@ Assert.Fail("No Encoding Options specified");
 		[Test]
 		public void TestMemoryAtRegisterECXSourceImmediateDestinationSize8() {
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ECX, SourceIsIndirect = true, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ECX, SourceIsIndirect = true, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ECX, SourceIsIndirect = true, DestinationValue = 300000, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300000, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300000, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300000, Size = 8};
 			Verify();
 		}
 		[Test]
@@ -4821,17 +4713,9 @@ Assert.Fail("No Encoding Options specified");
 		[Test]
 		public void TestMemoryAtRegisterEDXSourceImmediateDestinationSize8() {
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDX, SourceIsIndirect = true, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDX, SourceIsIndirect = true, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDX, SourceIsIndirect = true, DestinationValue = 300000, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300000, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300000, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300000, Size = 8};
 			Verify();
 		}
 		[Test]
@@ -5013,17 +4897,9 @@ Assert.Fail("No Encoding Options specified");
 		[Test]
 		public void TestMemoryAtRegisterESPSourceImmediateDestinationSize8() {
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationValue = 300000, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300000, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300000, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300000, Size = 8};
 			Verify();
 		}
 		[Test]
@@ -5205,17 +5081,9 @@ Assert.Fail("No Encoding Options specified");
 		[Test]
 		public void TestMemoryAtRegisterEBPSourceImmediateDestinationSize8() {
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBP, SourceIsIndirect = true, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBP, SourceIsIndirect = true, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBP, SourceIsIndirect = true, DestinationValue = 300000, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300000, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300000, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300000, Size = 8};
 			Verify();
 		}
 		[Test]
@@ -5397,17 +5265,9 @@ Assert.Fail("No Encoding Options specified");
 		[Test]
 		public void TestMemoryAtRegisterESISourceImmediateDestinationSize8() {
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESI, SourceIsIndirect = true, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESI, SourceIsIndirect = true, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESI, SourceIsIndirect = true, DestinationValue = 300000, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300000, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300000, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300000, Size = 8};
 			Verify();
 		}
 		[Test]
@@ -5589,17 +5449,9 @@ Assert.Fail("No Encoding Options specified");
 		[Test]
 		public void TestMemoryAtRegisterEDISourceImmediateDestinationSize8() {
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDI, SourceIsIndirect = true, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDI, SourceIsIndirect = true, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDI, SourceIsIndirect = true, DestinationValue = 300000, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300000, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300000, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300000, Size = 8};
 			Verify();
 		}
 		[Test]
@@ -5780,169 +5632,85 @@ Assert.Fail("No Encoding Options specified");
 		}
 		[Test]
 		public void TestImmediateSourceImmediateDestinationSize16() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationValue = 30, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationValue = 300000, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationValue = 30, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationValue = 300000, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationValue = 30, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationValue = 300000, Size = 16};
 			Verify();
 		}
 		[Test]
 		public void TestImmediateSourceMemoryDestinationSize16() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationValue = 65, DestinationIsIndirect = true, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationValue = 650, DestinationIsIndirect = true, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationValue = 650000, DestinationIsIndirect = true, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationValue = 65, DestinationIsIndirect = true, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationValue = 650, DestinationIsIndirect = true, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationValue = 650000, DestinationIsIndirect = true, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationValue = 65, DestinationIsIndirect = true, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationValue = 650, DestinationIsIndirect = true, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationValue = 650000, DestinationIsIndirect = true, Size = 16};
 			Verify();
 		}
 		[Test]
 		public void TestImmediateSourceMemoryAtRegisterEAXDestinationSize16() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
 			Verify();
 		}
 		[Test]
 		public void TestImmediateSourceMemoryAtRegisterEBXDestinationSize16() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EBX, DestinationIsIndirect = true, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EBX, DestinationIsIndirect = true, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EBX, DestinationIsIndirect = true, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
 			Verify();
 		}
 		[Test]
 		public void TestImmediateSourceMemoryAtRegisterECXDestinationSize16() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.ECX, DestinationIsIndirect = true, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.ECX, DestinationIsIndirect = true, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.ECX, DestinationIsIndirect = true, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
 			Verify();
 		}
 		[Test]
 		public void TestImmediateSourceMemoryAtRegisterEDXDestinationSize16() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EDX, DestinationIsIndirect = true, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EDX, DestinationIsIndirect = true, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EDX, DestinationIsIndirect = true, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
 			Verify();
 		}
 		[Test]
 		public void TestImmediateSourceMemoryAtRegisterESPDestinationSize16() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
 			Verify();
 		}
 		[Test]
 		public void TestImmediateSourceMemoryAtRegisterEBPDestinationSize16() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EBP, DestinationIsIndirect = true, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EBP, DestinationIsIndirect = true, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EBP, DestinationIsIndirect = true, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
 			Verify();
 		}
 		[Test]
 		public void TestImmediateSourceMemoryAtRegisterESIDestinationSize16() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.ESI, DestinationIsIndirect = true, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.ESI, DestinationIsIndirect = true, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.ESI, DestinationIsIndirect = true, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
 			Verify();
 		}
 		[Test]
 		public void TestImmediateSourceMemoryAtRegisterEDIDestinationSize16() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EDI, DestinationIsIndirect = true, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EDI, DestinationIsIndirect = true, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EDI, DestinationIsIndirect = true, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
 			Verify();
 		}
 		[Test]
 		public void TestMemorySourceImmediateDestinationSize16() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 65, SourceIsIndirect = true, DestinationValue = 30, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 65, SourceIsIndirect = true, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 65, SourceIsIndirect = true, DestinationValue = 300000, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 650, SourceIsIndirect = true, DestinationValue = 30, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 650, SourceIsIndirect = true, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 650, SourceIsIndirect = true, DestinationValue = 300000, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 650000, SourceIsIndirect = true, DestinationValue = 30, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 650000, SourceIsIndirect = true, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 650000, SourceIsIndirect = true, DestinationValue = 300000, Size = 16};
 			Verify();
 		}
 		[Test]
@@ -6088,18 +5856,10 @@ Assert.Fail("No Encoding Options specified");
 		}
 		[Test]
 		public void TestMemoryAtRegisterEAXSourceImmediateDestinationSize16() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationValue = 30, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationValue = 300000, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 30, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300000, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 30, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300000, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 30, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300000, Size = 16};
 			Verify();
 		}
 		[Test]
@@ -6280,18 +6040,10 @@ Assert.Fail("No Encoding Options specified");
 		}
 		[Test]
 		public void TestMemoryAtRegisterEBXSourceImmediateDestinationSize16() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBX, SourceIsIndirect = true, DestinationValue = 30, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBX, SourceIsIndirect = true, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBX, SourceIsIndirect = true, DestinationValue = 300000, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 30, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300000, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 30, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300000, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 30, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300000, Size = 16};
 			Verify();
 		}
 		[Test]
@@ -6472,18 +6224,10 @@ Assert.Fail("No Encoding Options specified");
 		}
 		[Test]
 		public void TestMemoryAtRegisterECXSourceImmediateDestinationSize16() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ECX, SourceIsIndirect = true, DestinationValue = 30, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ECX, SourceIsIndirect = true, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ECX, SourceIsIndirect = true, DestinationValue = 300000, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 30, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300000, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 30, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300000, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 30, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300000, Size = 16};
 			Verify();
 		}
 		[Test]
@@ -6664,18 +6408,10 @@ Assert.Fail("No Encoding Options specified");
 		}
 		[Test]
 		public void TestMemoryAtRegisterEDXSourceImmediateDestinationSize16() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDX, SourceIsIndirect = true, DestinationValue = 30, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDX, SourceIsIndirect = true, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDX, SourceIsIndirect = true, DestinationValue = 300000, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 30, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300000, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 30, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300000, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 30, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300000, Size = 16};
 			Verify();
 		}
 		[Test]
@@ -6856,18 +6592,10 @@ Assert.Fail("No Encoding Options specified");
 		}
 		[Test]
 		public void TestMemoryAtRegisterESPSourceImmediateDestinationSize16() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationValue = 30, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationValue = 300000, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 30, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300000, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 30, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300000, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 30, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300000, Size = 16};
 			Verify();
 		}
 		[Test]
@@ -7048,18 +6776,10 @@ Assert.Fail("No Encoding Options specified");
 		}
 		[Test]
 		public void TestMemoryAtRegisterEBPSourceImmediateDestinationSize16() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBP, SourceIsIndirect = true, DestinationValue = 30, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBP, SourceIsIndirect = true, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBP, SourceIsIndirect = true, DestinationValue = 300000, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 30, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300000, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 30, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300000, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 30, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300000, Size = 16};
 			Verify();
 		}
 		[Test]
@@ -7240,18 +6960,10 @@ Assert.Fail("No Encoding Options specified");
 		}
 		[Test]
 		public void TestMemoryAtRegisterESISourceImmediateDestinationSize16() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESI, SourceIsIndirect = true, DestinationValue = 30, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESI, SourceIsIndirect = true, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESI, SourceIsIndirect = true, DestinationValue = 300000, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 30, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300000, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 30, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300000, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 30, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300000, Size = 16};
 			Verify();
 		}
 		[Test]
@@ -7432,18 +7144,10 @@ Assert.Fail("No Encoding Options specified");
 		}
 		[Test]
 		public void TestMemoryAtRegisterEDISourceImmediateDestinationSize16() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDI, SourceIsIndirect = true, DestinationValue = 30, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDI, SourceIsIndirect = true, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDI, SourceIsIndirect = true, DestinationValue = 300000, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 30, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300000, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 30, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300000, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 30, Size = 16};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300000, Size = 16};
 			Verify();
 		}
 		[Test]
@@ -7624,25 +7328,11 @@ Assert.Fail("No Encoding Options specified");
 		}
 		[Test]
 		public void TestImmediateSourceImmediateDestinationSize32() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationValue = 300, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationValue = 300, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationValue = 300, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationValue = 300000, Size = 32};
 			Verify();
 		}
 		[Test]
 		public void TestImmediateSourceMemoryDestinationSize32() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationValue = 65, DestinationIsIndirect = true, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationValue = 650, DestinationIsIndirect = true, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationValue = 650000, DestinationIsIndirect = true, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationValue = 65, DestinationIsIndirect = true, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationValue = 650, DestinationIsIndirect = true, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationValue = 650000, DestinationIsIndirect = true, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationValue = 65, DestinationIsIndirect = true, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationValue = 650, DestinationIsIndirect = true, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationValue = 650000, DestinationIsIndirect = true, Size = 32};
@@ -7650,14 +7340,6 @@ Assert.Fail("No Encoding Options specified");
 		}
 		[Test]
 		public void TestImmediateSourceMemoryAtRegisterEAXDestinationSize32() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
@@ -7666,14 +7348,6 @@ Assert.Fail("No Encoding Options specified");
 		}
 		[Test]
 		public void TestImmediateSourceMemoryAtRegisterEBXDestinationSize32() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EBX, DestinationIsIndirect = true, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EBX, DestinationIsIndirect = true, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EBX, DestinationIsIndirect = true, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
@@ -7682,14 +7356,6 @@ Assert.Fail("No Encoding Options specified");
 		}
 		[Test]
 		public void TestImmediateSourceMemoryAtRegisterECXDestinationSize32() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.ECX, DestinationIsIndirect = true, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.ECX, DestinationIsIndirect = true, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.ECX, DestinationIsIndirect = true, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
@@ -7698,14 +7364,6 @@ Assert.Fail("No Encoding Options specified");
 		}
 		[Test]
 		public void TestImmediateSourceMemoryAtRegisterEDXDestinationSize32() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EDX, DestinationIsIndirect = true, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EDX, DestinationIsIndirect = true, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EDX, DestinationIsIndirect = true, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
@@ -7714,14 +7372,6 @@ Assert.Fail("No Encoding Options specified");
 		}
 		[Test]
 		public void TestImmediateSourceMemoryAtRegisterESPDestinationSize32() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
@@ -7730,14 +7380,6 @@ Assert.Fail("No Encoding Options specified");
 		}
 		[Test]
 		public void TestImmediateSourceMemoryAtRegisterEBPDestinationSize32() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EBP, DestinationIsIndirect = true, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EBP, DestinationIsIndirect = true, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EBP, DestinationIsIndirect = true, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
@@ -7746,14 +7388,6 @@ Assert.Fail("No Encoding Options specified");
 		}
 		[Test]
 		public void TestImmediateSourceMemoryAtRegisterESIDestinationSize32() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.ESI, DestinationIsIndirect = true, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.ESI, DestinationIsIndirect = true, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.ESI, DestinationIsIndirect = true, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
@@ -7762,14 +7396,6 @@ Assert.Fail("No Encoding Options specified");
 		}
 		[Test]
 		public void TestImmediateSourceMemoryAtRegisterEDIDestinationSize32() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EDI, DestinationIsIndirect = true, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 30, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EDI, DestinationIsIndirect = true, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EDI, DestinationIsIndirect = true, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 300000, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
@@ -7778,14 +7404,8 @@ Assert.Fail("No Encoding Options specified");
 		}
 		[Test]
 		public void TestMemorySourceImmediateDestinationSize32() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 65, SourceIsIndirect = true, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 65, SourceIsIndirect = true, DestinationValue = 300, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 65, SourceIsIndirect = true, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 650, SourceIsIndirect = true, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 650, SourceIsIndirect = true, DestinationValue = 300, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 650, SourceIsIndirect = true, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 650000, SourceIsIndirect = true, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 650000, SourceIsIndirect = true, DestinationValue = 300, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceValue = 650000, SourceIsIndirect = true, DestinationValue = 300000, Size = 32};
 			Verify();
 		}
@@ -7932,17 +7552,9 @@ Assert.Fail("No Encoding Options specified");
 		}
 		[Test]
 		public void TestMemoryAtRegisterEAXSourceImmediateDestinationSize32() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationValue = 300, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300000, Size = 32};
 			Verify();
 		}
@@ -8124,17 +7736,9 @@ Assert.Fail("No Encoding Options specified");
 		}
 		[Test]
 		public void TestMemoryAtRegisterEBXSourceImmediateDestinationSize32() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBX, SourceIsIndirect = true, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBX, SourceIsIndirect = true, DestinationValue = 300, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBX, SourceIsIndirect = true, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300000, Size = 32};
 			Verify();
 		}
@@ -8316,17 +7920,9 @@ Assert.Fail("No Encoding Options specified");
 		}
 		[Test]
 		public void TestMemoryAtRegisterECXSourceImmediateDestinationSize32() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ECX, SourceIsIndirect = true, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ECX, SourceIsIndirect = true, DestinationValue = 300, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ECX, SourceIsIndirect = true, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300000, Size = 32};
 			Verify();
 		}
@@ -8508,17 +8104,9 @@ Assert.Fail("No Encoding Options specified");
 		}
 		[Test]
 		public void TestMemoryAtRegisterEDXSourceImmediateDestinationSize32() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDX, SourceIsIndirect = true, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDX, SourceIsIndirect = true, DestinationValue = 300, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDX, SourceIsIndirect = true, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300000, Size = 32};
 			Verify();
 		}
@@ -8700,17 +8288,9 @@ Assert.Fail("No Encoding Options specified");
 		}
 		[Test]
 		public void TestMemoryAtRegisterESPSourceImmediateDestinationSize32() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationValue = 300, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300000, Size = 32};
 			Verify();
 		}
@@ -8892,17 +8472,9 @@ Assert.Fail("No Encoding Options specified");
 		}
 		[Test]
 		public void TestMemoryAtRegisterEBPSourceImmediateDestinationSize32() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBP, SourceIsIndirect = true, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBP, SourceIsIndirect = true, DestinationValue = 300, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBP, SourceIsIndirect = true, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300000, Size = 32};
 			Verify();
 		}
@@ -9084,17 +8656,9 @@ Assert.Fail("No Encoding Options specified");
 		}
 		[Test]
 		public void TestMemoryAtRegisterESISourceImmediateDestinationSize32() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESI, SourceIsIndirect = true, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESI, SourceIsIndirect = true, DestinationValue = 300, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESI, SourceIsIndirect = true, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300000, Size = 32};
 			Verify();
 		}
@@ -9276,17 +8840,9 @@ Assert.Fail("No Encoding Options specified");
 		}
 		[Test]
 		public void TestMemoryAtRegisterEDISourceImmediateDestinationSize32() {
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDI, SourceIsIndirect = true, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDI, SourceIsIndirect = true, DestinationValue = 300, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDI, SourceIsIndirect = true, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 30, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.Sub{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300000, Size = 32};
 			Verify();
 		}
@@ -13154,12 +12710,6 @@ Assert.Fail("No Encoding Options specified");
 			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 30, DestinationValue = 65, DestinationIsIndirect = true, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 30, DestinationValue = 650, DestinationIsIndirect = true, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 30, DestinationValue = 650000, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationValue = 65, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationValue = 650, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationValue = 650000, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationValue = 65, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationValue = 650, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationValue = 650000, DestinationIsIndirect = true, Size = 8};
 			Verify();
 		}
 		[Test]
@@ -13168,14 +12718,6 @@ Assert.Fail("No Encoding Options specified");
 			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 30, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 30, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 30, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
 			Verify();
 		}
 		[Test]
@@ -13184,14 +12726,6 @@ Assert.Fail("No Encoding Options specified");
 			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 30, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 30, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 30, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.EBX, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.EBX, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
 			Verify();
 		}
 		[Test]
@@ -13200,14 +12734,6 @@ Assert.Fail("No Encoding Options specified");
 			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 30, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 30, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 30, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.ECX, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.ECX, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
 			Verify();
 		}
 		[Test]
@@ -13216,14 +12742,6 @@ Assert.Fail("No Encoding Options specified");
 			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 30, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 30, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 30, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.EDX, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.EDX, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
 			Verify();
 		}
 		[Test]
@@ -13232,14 +12750,6 @@ Assert.Fail("No Encoding Options specified");
 			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 30, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 30, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 30, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
 			Verify();
 		}
 		[Test]
@@ -13248,14 +12758,6 @@ Assert.Fail("No Encoding Options specified");
 			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 30, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 30, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 30, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.EBP, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.EBP, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
 			Verify();
 		}
 		[Test]
@@ -13264,14 +12766,6 @@ Assert.Fail("No Encoding Options specified");
 			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 30, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 30, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 30, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.ESI, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.ESI, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
 			Verify();
 		}
 		[Test]
@@ -13280,14 +12774,6 @@ Assert.Fail("No Encoding Options specified");
 			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 30, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 30, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 30, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.EDI, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.EDI, DestinationIsIndirect = true, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
 			Verify();
 		}
 		[Test]
@@ -13300,22 +12786,6 @@ Assert.Fail("No Encoding Options specified");
 			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 30, DestinationReg = Registers.CL, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 30, DestinationReg = Registers.DH, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 30, DestinationReg = Registers.DL, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.AH, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.AL, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.BH, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.BL, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.CH, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.CL, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.DH, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300, DestinationReg = Registers.DL, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.AH, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.AL, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.BH, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.BL, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.CH, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.CL, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.DH, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.ShiftLeft{SourceValue = 300000, DestinationReg = Registers.DL, Size = 8};
 			Verify();
 		}
 		[Test]

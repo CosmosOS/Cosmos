@@ -64,6 +64,9 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                 xOutput.WriteLine("namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {");
 
                 foreach (Type type in typeof(Instruction).Assembly.GetTypes()) {
+                    if (type == typeof(ShiftLeft)) {
+                        System.Diagnostics.Debugger.Break();
+                    }
                     GenerateSingle(type, xOutput);
                 }
                 xOutput.WriteLine("}");
@@ -432,16 +435,16 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
         private static IEnumerable<KeyValuePair<string, string[]>> GetDestinationWithSizePossibilities(Type aType, byte aSize) {
             var xItems = new List<string>();
             {
-                if (ShouldTestImmediateDestination(aType, aSize)) {
+                if (aSize == 8 && ShouldTestImmediateDestination(aType, aSize)) {
                     //Test Immediate 8
                     xItems.Add(String.Format("DestinationValue = 30"));
                 }
 
-                if (ShouldTestImmediateDestination(aType, aSize)) {
+                if (aSize == 16 && ShouldTestImmediateDestination(aType, aSize)) {
                     //Test Immediate 16
                     xItems.Add(String.Format("DestinationValue = 300"));
                 }
-                if (ShouldTestImmediateDestination(aType, aSize)) {
+                if (aSize == 32 && ShouldTestImmediateDestination(aType, aSize)) {
                     //Test Immediate 32
                     xItems.Add(String.Format("DestinationValue = 300000"));
                 }
@@ -517,16 +520,16 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
         private static IEnumerable<KeyValuePair<string, string[]>> GetSourceWithSizePossibilities(Type aType, byte aSize) {
             var xItems = new List<string>();
             {
-                if (ShouldTestImmediateSource(aType, aSize)) {
+                if (aSize == 8 && ShouldTestImmediateSource(aType, aSize)) {
                     //Test Immediate 8
                     xItems.Add(String.Format("SourceValue = 30"));
                 }
 
-                if (ShouldTestImmediateSource(aType, aSize)) {
+                if (aSize == 16 && ShouldTestImmediateSource(aType, aSize)) {
                     //Test Immediate 16
                     xItems.Add(String.Format("SourceValue = 300"));
                 }
-                if (ShouldTestImmediateSource(aType, aSize)) {
+                if (aSize == 32 && ShouldTestImmediateSource(aType, aSize)) {
                     //Test Immediate 32
                     xItems.Add(String.Format("SourceValue = 300000"));
                 }
