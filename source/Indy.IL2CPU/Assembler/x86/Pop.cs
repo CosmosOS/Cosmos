@@ -11,6 +11,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 NeedsModRMByte = false,
                 DestinationReg = Guid.Empty,
                 DefaultSize=InstructionSize.DWord,
+                ReverseRegisters=true,
                 DestinationRegByte = 0
             }); // pop to register
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
@@ -18,6 +19,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 OpCode = new byte[]{0x8F},
                 NeedsModRMByte=true,
                 DestinationMemory=true,
+                ReverseRegisters = true,
                 DefaultSize = InstructionSize.DWord
             }); // pop to memory
         }

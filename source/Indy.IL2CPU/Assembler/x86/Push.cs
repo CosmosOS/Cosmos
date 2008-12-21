@@ -12,6 +12,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 DestinationReg = Guid.Empty,
                 DestinationRegByte = 0,
                 DestinationRegBitShiftLeft = 0,
+                ReverseRegisters=true,
                 DefaultSize = InstructionSize.DWord,
                 AllowedSizes=InstructionSizes.DWord | InstructionSizes.Word
             }); // register
@@ -26,6 +27,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 NeedsModRMByte = true,
                 DestinationMemory = true,
                 InitialModRMByteValue = 0x30,
+                ReverseRegisters = true,
                 DefaultSize = InstructionSize.DWord,
                 AllowedSizes = InstructionSizes.DWord | InstructionSizes.Word
             }); // pop to memory

@@ -97,6 +97,7 @@
     <Compile Include="Assembler\x86\JumpToSegment.cs" />
     <Compile Include="Assembler\x86\MoveIfBelow.cs" />
     <Compile Include="Assembler\x86\MoveIfLess.cs" />
+    <Compile Include="Assembler\x86\Movs.cs" />
     <Compile Include="Assembler\x86\X\RegisterEBX.cs" />
     <Compile Include="Assembler\x86\_Infra\Extensions.cs" />
     <Compile Include="Assembler\x86\_Infra\IInstructionWithCondition.cs" />
@@ -155,8 +156,6 @@
     <Compile Include="Assembler\x86\JumpBase.cs" />
     <Compile Include="Assembler\x86\JumpIfECXZero.cs" />
     <Compile Include="Assembler\x86\Move.cs" />
-    <Compile Include="Assembler\x86\MoveSB.cs" />
-    <Compile Include="Assembler\x86\MoveSW.cs" />
     <Compile Include="Assembler\x86\Multiply.cs" />
     <Compile Include="Assembler\x86\Neg.cs" />
     <Compile Include="Assembler\x86\Noop.cs" />
@@ -166,7 +165,6 @@
     <Compile Include="Assembler\x86\Pop.cs" />
     <Compile Include="Assembler\x86\Push.cs" />
     <Compile Include="Assembler\x86\Registers.cs" />
-    <Compile Include="Assembler\x86\RepeatMovs.cs" />
     <Compile Include="Assembler\x86\RepeatStos.cs" />
     <Compile Include="Assembler\x86\Return.cs" />
     <Compile Include="Assembler\x86\RotateThroughCarryRight.cs" />

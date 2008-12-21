@@ -12,6 +12,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 NeedsModRMByte=true,
                 InitialModRMByteValue = 0xE0,
                 OperandSizeByte=0,
+                ReverseRegisters = true,
                 DestinationReg=Guid.Empty,
                 SourceReg=Registers.CL
             }); // register by CL
@@ -19,6 +20,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 OpCode = new byte[] { 0xD2 },
                 NeedsModRMByte = true,
                 InitialModRMByteValue = 0x20,
+                ReverseRegisters = true,
                 OperandSizeByte = 0,
                 DestinationMemory=true,
                 SourceReg = Registers.CL
@@ -29,15 +31,19 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 InitialModRMByteValue = 0xE0,
                 OperandSizeByte = 0,
                 DestinationReg = Guid.Empty,
-                SourceImmediate=true
+                ReverseRegisters = true,
+                SourceImmediate=true,
+                SourceImmediateSize=InstructionSize.Byte
             }); // register by immediate
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0xC0 },
                 NeedsModRMByte = true,
                 InitialModRMByteValue = 0x20,
                 OperandSizeByte = 0,
+                ReverseRegisters=true,
                 DestinationMemory = true,
-                SourceImmediate = true
+                SourceImmediate = true,
+                SourceImmediateSize = InstructionSize.Byte
             }); // memory by immediate
         }
 	}

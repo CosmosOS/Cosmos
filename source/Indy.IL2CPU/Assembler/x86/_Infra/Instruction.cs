@@ -545,6 +545,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 }
                 int xExtraOffset = 0;
                 int xOpCodeOffset = 0;
+                
                 var xInstrWithPrefixes = aInstruction as IInstructionWithPrefix;
                 if (xInstrWithPrefixes != null) {
                     if ((xInstrWithPrefixes.Prefixes & InstructionPrefixes.Repeat) != 0) {
@@ -781,7 +782,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                             // todo: optimize for different displacement sizes
                             if (aInstructionWithDestination.DestinationDisplacement < 128) {
                                 xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= 2 << 5; // for now use 8bit value               
-                                Array.Copy(BitConverter.GetBytes((byte)aInstructionWithDestination.DestinationDisplacement), 0, xBuffer, aEncodingOption.OpCode.Length + xExtraOffset + xSIBOffset + 1, 1);
+                                Array.Copy(BitConverter.GetBytes((byte)aInstructionWithDestination.DestinationDisplacement), 0, xBuffer, aEncodingOption.OpCode.Length + xExtraOffset + xSIBOffset+1, 1);
                                 xExtraOffset += 1;
                             } else {
                                 xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= 2 << 6; // for now use 8bit value
@@ -933,6 +934,9 @@ namespace Indy.IL2CPU.Assembler.X86 {
                         if (aEncodingOption.SourceImmediateSize != InstructionSize.None) {
                             xInstrSize = ((byte)aEncodingOption.SourceImmediateSize) / 8;
                         }
+                        if ((xOffset + xInstrSize) < (xBuffer.Length)) {
+                            xOffset = xBuffer.Length - xInstrSize;
+                        }
                         Array.Copy(BitConverter.GetBytes(aInstructionWithSource.SourceValue.Value), 0, xBuffer, xOffset, xInstrSize);
                     }
                     if (aInstructionWithSource.SourceValue.HasValue && aInstructionWithSource.SourceIsIndirect && aEncodingOption.SourceMemory && !aEncodingOption.NeedsModRMByte) {
@@ -949,6 +953,9 @@ namespace Indy.IL2CPU.Assembler.X86 {
                         }
                         var xAddress = aInstructionWithSource.SourceValue.Value;
                         xAddress += (uint)aInstructionWithSource.SourceDisplacement;
+                        if ((xOffset + xInstrSize) < (xBuffer.Length)) {
+                            xOffset = xBuffer.Length - xInstrSize;
+                        }
                         Array.Copy(BitConverter.GetBytes(xAddress), 0, xBuffer, xOffset, xInstrSize);
                     }
                 }
