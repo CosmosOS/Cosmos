@@ -34,6 +34,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 OpCode = new byte[] { 0x88  },
                 OperandSizeByte = 0,
                 NeedsModRMByte=true,
+                ReverseRegisters=true,
                 InitialModRMByteValue=0xC0,
                 SourceReg=Guid.Empty,
                 DestinationReg=Guid.Empty
