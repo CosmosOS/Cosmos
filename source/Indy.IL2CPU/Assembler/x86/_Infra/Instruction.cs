@@ -633,6 +633,20 @@ namespace Indy.IL2CPU.Assembler.X86 {
                                     xAddress += (ulong)aInstructionWithDestination.DestinationDisplacement;
                                     Array.Copy(BitConverter.GetBytes((uint)xAddress), 0, xBuffer, aEncodingOption.OpCode.Length + xExtraOffset + 1, 4);
                                     xExtraOffset += 4;
+                                    xHandled = true;
+                                }
+                                if (!xHandled && aInstructionWithSource == null && aInstructionWithDestination.DestinationValue.HasValue) {
+                                    xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= 0x5;
+                                    ulong xAddress = 0;
+                                    if (!(aInstructionWithDestination.DestinationRef != null && aInstructionWithDestination.DestinationRef.Resolve(aAssembler, out xAddress))) {
+                                        if (aInstructionWithDestination.DestinationValue.HasValue) {
+                                            xAddress = aInstructionWithDestination.DestinationValue.Value;
+                                        }
+                                    }
+                                    xAddress += (ulong)aInstructionWithDestination.DestinationDisplacement;
+                                    Array.Copy(BitConverter.GetBytes((uint)xAddress), 0, xBuffer, aEncodingOption.OpCode.Length + xExtraOffset + 1, 4);
+                                    xExtraOffset += 4;
+                                    xHandled = true;
                                 }
                             }
                             Console.Write("");
