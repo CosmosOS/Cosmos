@@ -39,18 +39,19 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 DestinationReg=Guid.Empty
             }); // register to register
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
-                OpCode = new byte[] { 0x88 },
+                OpCode = new byte[] { 0xA2 },
                 OperandSizeByte = 0,
-                NeedsModRMByte = true,
                 SourceReg = Registers.EAX,
                 DestinationMemory = true,
-                ReverseRegisters=true
+                DestinationMemoryKinds = OperandMemoryKinds.Address,
+                DestinationImmediateSize=InstructionSize.DWord,
+                ReverseRegisters=false
             }); // register to memory (eax)
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0x88 },
                 OperandSizeByte = 0,
                 NeedsModRMByte = true,
-                ReverseRegisters=false,
+                ReverseRegisters=true,
                 SourceReg=Guid.Empty,
                 DestinationMemory = true
             }); // register to memory

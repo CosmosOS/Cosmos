@@ -76,6 +76,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 /// is this EncodingOption valid for situations where the Destination operand is memory?
                 /// </summary>
                 public bool DestinationMemory;
+                public OperandMemoryKinds DestinationMemoryKinds = OperandMemoryKinds.Default;
                 /// <summary>
                 /// is this EncodingOption valid for situations where the Destination is an immediate value
                 /// </summary>
@@ -252,6 +253,11 @@ namespace Indy.IL2CPU.Assembler.X86 {
                         !xEncodingOption.DestinationReg.HasValue) {
                         continue;
                     }
+                    if (xEncodingOption.DestinationMemory) {
+                        if (((xEncodingOption.DestinationMemoryKinds & OperandMemoryKinds.IndirectReg) == 0 || (xEncodingOption.DestinationMemoryKinds & OperandMemoryKinds.IndirectRegOffset) == 0) && aInstructionWithDestination.DestinationReg != Guid.Empty) {
+                            continue;
+                        }
+                    }
                     //if(!((xEncodingOption.DestinationReg.HasValue && aInstructionWithDestination.DestinationReg != Guid.Empty && (aInstructionWithDestination.DestinationIsIndirect == xEncodingOption.DestinationMemory)) ||
                     //    (!(xEncodingOption.DestinationReg.HasValue && (aInstructionWithDestination.DestinationReg == Guid.Empty && (aInstructionWithDestination.DestinationIsIndirect == xEncodingOption.DestinationMemory)))))) {
                     //    continue;
@@ -282,6 +288,41 @@ namespace Indy.IL2CPU.Assembler.X86 {
                     if (xEncodingOption.SourceMemory) {
                         if (((xEncodingOption.SourceMemoryKinds & OperandMemoryKinds.IndirectReg) == 0 ||(xEncodingOption.SourceMemoryKinds & OperandMemoryKinds.IndirectRegOffset) == 0 )  && aInstructionWithSource.SourceReg != Guid.Empty) {
                             continue;
+                        }
+                    }
+                    if (xEncodingOption.SourceReg.HasValue && xEncodingOption.SourceReg != Guid.Empty && aInstructionWithSource.SourceReg != Guid.Empty && aInstructionWithSource.SourceIsIndirect == xEncodingOption.SourceMemory) {
+                        if (xEncodingOption.SourceReg != aInstructionWithSource.SourceReg) {
+                            switch (xEncodingOption.DefaultSize) {
+                                case InstructionSize.Byte: {
+                                        if ((xEncodingOption.AllowedSizes & InstructionSizes.Byte) != 0) {
+                                            var xTheActualReg = Registers.Get8BitRegistersForRegister(aInstructionWithSource.SourceReg);
+                                            if (xTheActualReg != xEncodingOption.SourceReg.Value) {
+                                                continue;
+                                            }
+                                        }
+                                        break;
+                                    }
+                                case InstructionSize.Word: {
+                                        if ((xEncodingOption.AllowedSizes & InstructionSizes.Word) != 0) {
+                                            var xTheActualReg = Registers.Get16BitRegisterForRegister(aInstructionWithSource.SourceReg);
+                                            if (xTheActualReg != xEncodingOption.SourceReg.Value) {
+                                                continue;
+                                            }
+                                        }
+                                        break;
+                                    }
+                                case InstructionSize.DWord: {
+                                        if ((xEncodingOption.AllowedSizes & InstructionSizes.DWord) != 0) {
+                                            var xTheActualReg = Registers.Get32BitRegisterForRegister(aInstructionWithSource.SourceReg);
+                                            if (xTheActualReg != xEncodingOption.SourceReg.Value) {
+                                                continue;
+                                            }
+                                        }
+                                        break;
+                                    }
+                                default:
+                                    throw new Exception("InstructionSize not implemented yet!");
+                            }
                         }
                     }
                 }
@@ -662,7 +703,6 @@ namespace Indy.IL2CPU.Assembler.X86 {
                                     xHandled = true;
                                 }
                             }
-                            Console.Write("");
                         }
 
                         if (aInstructionWithSource != null && aInstructionWithSource.SourceIsIndirect) {
@@ -840,6 +880,40 @@ namespace Indy.IL2CPU.Assembler.X86 {
                             xInstrSize = ((byte)aEncodingOption.DestinationImmediateSize) / 8;
                         }
                         Array.Copy(BitConverter.GetBytes(xValue), 0, xBuffer, xOffset, xInstrSize);
+                    } else {
+                        if (aInstructionWithDestination.DestinationValue.HasValue && !aInstructionWithDestination.DestinationIsIndirect) {
+                            int xOffset = aEncodingOption.OpCode.Length + xExtraOffset;
+                            if (aEncodingOption.NeedsModRMByte) {
+                                xOffset++;
+                            }
+                            int xInstrSize = 0;
+                            if (aInstructionWithSize != null) {
+                                xInstrSize = aInstructionWithSize.Size / 8;
+                            } else {
+                                //                        throw new NotImplementedException("size not known");
+                                xInstrSize = (int)aEncodingOption.DefaultSize / 8;
+                            }
+                            if (aEncodingOption.DestinationImmediateSize != InstructionSize.None) {
+                                xInstrSize = ((byte)aEncodingOption.DestinationImmediateSize) / 8;
+                            }
+                            Array.Copy(BitConverter.GetBytes(aInstructionWithDestination.DestinationValue.Value), 0, xBuffer, xOffset, xInstrSize);
+                        }
+                        if (aInstructionWithDestination.DestinationValue.HasValue && aInstructionWithDestination.DestinationIsIndirect && aEncodingOption.DestinationMemory && !aEncodingOption.NeedsModRMByte) {
+                            int xOffset = aEncodingOption.OpCode.Length + xExtraOffset;
+                            int xInstrSize = 0;
+                            if (aInstructionWithSize != null) {
+                                xInstrSize = aInstructionWithSize.Size / 8;
+                            } else {
+                                //                        throw new NotImplementedException("size not known");
+                                xInstrSize = (int)aEncodingOption.DefaultSize / 8;
+                            }
+                            if (aEncodingOption.DestinationImmediateSize != InstructionSize.None) {
+                                xInstrSize = ((byte)aEncodingOption.DestinationImmediateSize) / 8;
+                            }
+                            var xAddress = aInstructionWithDestination.DestinationValue.Value;
+                            xAddress += (uint)aInstructionWithDestination.DestinationDisplacement;
+                            Array.Copy(BitConverter.GetBytes(xAddress), 0, xBuffer, xOffset, xInstrSize);
+                        }
                     }
                 }
                 // todo: add more options
