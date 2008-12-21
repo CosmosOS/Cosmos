@@ -703,7 +703,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                                 xSIB = null;
                             }
                             int xCorrecting = 0;
-                            if (aInstructionWithDestination != null && aInstructionWithDestination.DestinationReg != Guid.Empty && (/*aInstructionWithSource.SourceReg == Registers.EBP || */aInstructionWithSource.SourceReg == Registers.ESP)) {
+                            if (aInstructionWithDestination != null && aInstructionWithDestination.DestinationReg != Guid.Empty && aInstructionWithSource!=null &&  (/*aInstructionWithSource.SourceReg == Registers.EBP || */aInstructionWithSource.SourceReg == Registers.ESP)) {
                                 xCorrecting = -1;
                             }
                             //xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= 3 << 6;
