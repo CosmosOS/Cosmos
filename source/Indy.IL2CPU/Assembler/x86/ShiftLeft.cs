@@ -12,9 +12,10 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 NeedsModRMByte=true,
                 InitialModRMByteValue = 0xE0,
                 OperandSizeByte=0,
-                //ReverseRegisters = true,
+                ReverseRegisters = true,
                 DestinationReg=Guid.Empty,
-                SourceReg=Registers.CL
+                SourceReg=Registers.CL,
+                SourceRegByte=-1
             }); // register by CL
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0xD2 },

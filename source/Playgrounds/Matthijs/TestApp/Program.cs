@@ -12,15 +12,14 @@ namespace TestApp {
     class Program {
         class Renderer : Y86 {
             public void DoRender() {
-                new global::Indy.IL2CPU.Assembler.X86.ShiftLeft { SourceValue = 30, DestinationValue = 65, DestinationIsIndirect = true, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.ShiftLeft { SourceValue = 30, DestinationValue = 650, DestinationIsIndirect = true, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.ShiftLeft { SourceValue = 30, DestinationValue = 650000, DestinationIsIndirect = true, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.ShiftLeft { SourceValue = 300, DestinationValue = 65, DestinationIsIndirect = true, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.ShiftLeft { SourceValue = 300, DestinationValue = 650, DestinationIsIndirect = true, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.ShiftLeft { SourceValue = 300, DestinationValue = 650000, DestinationIsIndirect = true, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.ShiftLeft { SourceValue = 300000, DestinationValue = 65, DestinationIsIndirect = true, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.ShiftLeft { SourceValue = 300000, DestinationValue = 650, DestinationIsIndirect = true, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.ShiftLeft { SourceValue = 300000, DestinationValue = 650000, DestinationIsIndirect = true, Size = 8 };
+                new global::Indy.IL2CPU.Assembler.X86.ShiftLeft { SourceReg = Registers.CL, DestinationReg = Registers.AH, Size = 8 };
+                new global::Indy.IL2CPU.Assembler.X86.ShiftLeft { SourceReg = Registers.CL, DestinationReg = Registers.AL, Size = 8 };
+                new global::Indy.IL2CPU.Assembler.X86.ShiftLeft { SourceReg = Registers.CL, DestinationReg = Registers.BH, Size = 8 };
+                new global::Indy.IL2CPU.Assembler.X86.ShiftLeft { SourceReg = Registers.CL, DestinationReg = Registers.BL, Size = 8 };
+                new global::Indy.IL2CPU.Assembler.X86.ShiftLeft { SourceReg = Registers.CL, DestinationReg = Registers.CH, Size = 8 };
+                new global::Indy.IL2CPU.Assembler.X86.ShiftLeft { SourceReg = Registers.CL, DestinationReg = Registers.CL, Size = 8 };
+                new global::Indy.IL2CPU.Assembler.X86.ShiftLeft { SourceReg = Registers.CL, DestinationReg = Registers.DH, Size = 8 };
+                new global::Indy.IL2CPU.Assembler.X86.ShiftLeft { SourceReg = Registers.CL, DestinationReg = Registers.DL, Size = 8 };
             }
         }
         static void Main(string[] args) {
