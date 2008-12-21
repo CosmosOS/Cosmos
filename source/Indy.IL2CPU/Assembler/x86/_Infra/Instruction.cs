@@ -377,9 +377,11 @@ namespace Indy.IL2CPU.Assembler.X86 {
                     aSize += (ulong)xInstrSize;
                 }
             }
-            if (aInstructionWithSource.SourceIsIndirect) {
-                if (aInstructionWithSource.SourceValue.HasValue) {
-                    aSize += 4;
+            if(aInstructionWithSource != null){
+                if (aInstructionWithSource.SourceIsIndirect) {
+                    if (aInstructionWithSource.SourceValue.HasValue) {
+                        aSize += 4;
+                    }
                 }
             }
             //if (aInstructionWithDestination != null && aInstructionWithSize != null) {
