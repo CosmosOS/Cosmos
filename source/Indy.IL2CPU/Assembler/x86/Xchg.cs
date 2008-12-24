@@ -13,7 +13,17 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 DefaultSize = InstructionSize.DWord,
                 DestinationReg = Registers.EAX,
                 SourceReg = Guid.Empty,
-                SourceRegByte = 0
+                SourceRegByte = 0,
+                ReverseRegisters=false
+            }); // (E)AX with reg
+            aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
+                OpCode = new byte[] { 0x90 },
+                AllowedSizes = InstructionSizes.DWord | InstructionSizes.Word,
+                DefaultSize = InstructionSize.DWord,
+                DestinationReg = Guid.Empty,
+                DestinationRegByte=0,
+                SourceReg = Registers.EAX,
+                ReverseRegisters = false
             }); // (E)AX with reg
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0x86, 0xC0 },
@@ -23,7 +33,8 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 DestinationRegBitShiftLeft = 3,
                 SourceReg = Guid.Empty,
                 SourceRegByte = 1,
-                DefaultSize = InstructionSize.DWord
+                DefaultSize = InstructionSize.DWord,
+                ReverseRegisters=true
             }); // register with register
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0x86 },
@@ -31,6 +42,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 OperandSizeByte = 0,
                 DestinationMemory = true,
                 SourceReg = Guid.Empty,
+                ReverseRegisters=true,
                 DefaultSize = InstructionSize.DWord
             }); // memory with reg
         }

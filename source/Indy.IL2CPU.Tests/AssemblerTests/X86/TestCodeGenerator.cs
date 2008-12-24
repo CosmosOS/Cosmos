@@ -64,9 +64,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                 xOutput.WriteLine("namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {");
 
                 foreach (Type type in typeof(Instruction).Assembly.GetTypes()) {
-                    if (type == typeof(ShiftLeft)) {
-                        System.Diagnostics.Debugger.Break();
-                    }
                     GenerateSingle(type, xOutput);
                 }
                 xOutput.WriteLine("}");
@@ -655,7 +652,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                                     }
                                 }
                                 if (!opcodesException[aType].ImmediateToImmediate) {
-                                    if (xSourceItem.Key.Contains("Value") && xDestItem.Key.Contains("Value") &&
+                                    if (xSourceItem.Key.Contains("Immediate") && xDestItem.Key.Contains("Immediate") &&
                                         !xSourceItem.Key.Contains("IsIndirect") && !xDestItem.Key.Contains("IsIndirect")) {
                                         continue;
                                     }
