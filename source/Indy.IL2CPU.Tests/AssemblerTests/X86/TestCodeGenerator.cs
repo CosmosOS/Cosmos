@@ -64,9 +64,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                 xOutput.WriteLine("namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {");
 
                 foreach (Type type in typeof(Instruction).Assembly.GetTypes()) {
-                    if (type == typeof(AddWithCarry)) {
-                        System.Diagnostics.Debugger.Break();
-                    }
                     GenerateSingle(type, xOutput);
                 }
                 xOutput.WriteLine("}");
@@ -80,18 +77,18 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
             if (!aType.IsSubclassOf(typeof(Instruction))) {
                 return;
             }
-            if (!Instruction.HasEncodingOptions(aType)) {
-                WriteTestFixtureHeader(aType, aOutput);
-                {
-                    aOutput.WriteLine("[Test]");
-                    aOutput.WriteLine("[Category(\"MissingEncodingOptions\")]");
-                    aOutput.WriteLine("public void DoTest(){");
-                    aOutput.WriteLine("Assert.Fail(\"No Encoding Options specified\");");
-                    aOutput.WriteLine("}");
-                }
-                WriteTestFixtureFooter(aType, aOutput);
-                return;
-            }
+            //if (!Instruction.HasEncodingOptions(aType)) {
+            //    WriteTestFixtureHeader(aType, aOutput);
+            //    {
+            //        aOutput.WriteLine("[Test]");
+            //        aOutput.WriteLine("[Category(\"MissingEncodingOptions\")]");
+            //        aOutput.WriteLine("public void DoTest(){");
+            //        aOutput.WriteLine("Assert.Fail(\"No Encoding Options specified\");");
+            //        aOutput.WriteLine("}");
+            //    }
+            //    WriteTestFixtureFooter(aType, aOutput);
+            //    return;
+            //}
             if (aType.IsSubclassOf(typeof(Assembler.X86.InstructionWithDestinationAndSourceAndSize))) {
                 GenerateInstructionWithDestinationAndSourceAndSize(aType, aOutput);
                 return;
@@ -133,9 +130,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
         }
 
         private static void WriteTestMethodHeader(string aName, StreamWriter aOutput) {
-            if (aName == "ImmediateSourceImmediateDestinationSize16") {
-                System.Diagnostics.Debugger.Break();
-            }
             aOutput.WriteLine("\t\t[Test]");
             aOutput.WriteLine("\t\tpublic void Test{0}() {{", aName);
         }
@@ -617,14 +611,23 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                                     continue;
                                 }
                             }
-                            if(!opcodesException[aType].ImmediateToImmediate) {
+                            if (!opcodesException[aType].ImmediateToImmediate) {
                                 if (xSourceItem.Key.Contains("Value") && xDestItem.Key.Contains("Value") &&
                                     !xSourceItem.Key.Contains("IsIndirect") && !xDestItem.Key.Contains("IsIndirect")) {
                                     continue;
-                                }  
+                                }
+                            }
+                        } else {
+                            // if no exceptions known for this opcode, we dont emit tests for Memory to Memory and Immediate to Immediate
+                            if (xSourceItem.Key.Contains("Memory") && xDestItem.Key.Contains("Memory")) {
+                                continue;
+                            }
+                            if (xSourceItem.Key.Contains("Value") && xDestItem.Key.Contains("Value") &&
+                                !xSourceItem.Key.Contains("IsIndirect") && !xDestItem.Key.Contains("IsIndirect")) {
+                                continue;
                             }
                         }
-                        if(xSourceItem.Value.Length ==0) {
+                        if (xSourceItem.Value.Length == 0 || xDestItem.Value.Length == 0) {
                             continue;
                         }
                         WriteTestMethodHeader(xSourceItem.Key + xDestItem.Key, aOutput);
@@ -657,13 +660,22 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                                     }
                                 }
                                 if (!opcodesException[aType].ImmediateToImmediate) {
-                                    if (xSourceItem.Key.Contains("Immediate") && xDestItem.Key.Contains("Immediate") &&
+                                    if (xSourceItem.Key.Contains("Value") && xDestItem.Key.Contains("Value") &&
                                         !xSourceItem.Key.Contains("IsIndirect") && !xDestItem.Key.Contains("IsIndirect")) {
                                         continue;
                                     }
                                 }
+                            } else {
+                                // if no exceptions known for this opcode, we dont emit tests for Memory to Memory and Immediate to Immediate
+                                if (xSourceItem.Key.Contains("Memory") && xDestItem.Key.Contains("Memory")) {
+                                    continue;
+                                }
+                                if (xSourceItem.Key.Contains("Immediate") && xDestItem.Key.Contains("Immediate") &&
+                                    !xSourceItem.Key.Contains("IsIndirect") && !xDestItem.Key.Contains("IsIndirect")) {
+                                    continue;
+                                }
                             }
-                            if (xSourceItem.Value.Length == 0) {
+                            if (xSourceItem.Value.Length == 0 || xDestItem.Value.Length == 0) {
                                 continue;
                             }
                             WriteTestMethodHeader(xSourceItem.Key + xDestItem.Key + "Size" + xSize, aOutput);

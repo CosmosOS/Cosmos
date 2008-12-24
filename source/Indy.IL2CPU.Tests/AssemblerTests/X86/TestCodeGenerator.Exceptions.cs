@@ -22,6 +22,10 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                 SourceInfo = new Constraints { TestImmediate16 = false, TestImmediate32 = false, TestImmediate8 = false, TestCR = false, TestSegments = false },
                 MemToMem = false
             });
+            opcodesException.Add(typeof(And), new ConstraintsContainer {
+                DestInfo = new Constraints {TestImmediate8=false, TestImmediate32=false, TestImmediate16=false },
+                SourceInfo = new Constraints { }
+            });
             opcodesException.Add(typeof(ConditionalJump), new ConstraintsContainer {
                 DestInfo = new Constraints { TestImmediate32 = true, TestImmediate16 = false, TestImmediate8 = false, TestMem8 = false, TestMem16 = false, TestMem32 = false, TestRegisters = false }
             });

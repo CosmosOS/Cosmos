@@ -297,6 +297,9 @@ namespace Indy.IL2CPU.Assembler.X86 {
                             aInstructionWithSource.SourceReg != Guid.Empty && aInstructionWithSource.SourceDisplacement > 0) {
                             continue;
                         }
+                        if (!aInstructionWithSource.SourceIsIndirect) {
+                            continue;
+                        }
                     }
                     if (xEncodingOption.SourceReg.HasValue && xEncodingOption.SourceReg != Guid.Empty && aInstructionWithSource.SourceReg != Guid.Empty && aInstructionWithSource.SourceIsIndirect == xEncodingOption.SourceMemory) {
                         if (xEncodingOption.SourceReg != aInstructionWithSource.SourceReg) {
