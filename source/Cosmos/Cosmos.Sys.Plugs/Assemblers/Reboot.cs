@@ -11,20 +11,19 @@ namespace Cosmos.Sys.Plugs.Assemblers
         public override void Assemble(Assembler aAssembler)
         {
         	new CPUx86.ClrInterruptFlag();
-            new CPUx86.Move { DestinationReg = Registers.DX, SourceValue = 0x60 };
     /* Clear all keyboard buffers (output and command buffers) */
-        	new CPUAll.Label(".clearBuffer");
+            new CPUAll.Label(".waitBuffer");
             new CPUx86.In { SourceValue = 0x64, DestinationReg=Registers.AL };
-            new CPUx86.Move { DestinationReg = Registers.AH, SourceReg = Registers.AL };
-            new CPUx86.Test { DestinationReg = Registers.AX, SourceValue = 1 };
-            new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = ".skipClearIO" };
-            new CPUx86.In { DestinationReg = Registers.AL, SourceReg=Registers.DX };
-        	new CPUAll.Label(".skipClearIO");
-            new CPUx86.Test { DestinationReg = Registers.AH, SourceValue = 2 };
-            new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotZero, DestinationLabel = ".clearBuffer" };
-            new Move { DestinationReg = Registers.DX, SourceValue = 0x64 };
-            new Move { DestinationReg = Registers.AL, SourceValue = 0xfe };
-            new Out {DestinationReg = Registers.DX, SourceReg = Registers.AL };
+            new CPUx86.Test { DestinationReg = Registers.AL, SourceValue = 2 };
+            new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotEqual, DestinationLabel = ".waitBuffer" };
+            new CPUx86.Move{DestinationReg=Registers.AL, SourceValue=0xD1 };
+            new CPUx86.Out { SourceReg = Registers.AL, DestinationValue = 0x64 };
+            new CPUAll.Label(".clearBuffer");
+            new CPUx86.In { SourceValue = 0x64, DestinationReg = Registers.AL };
+            new CPUx86.Test { DestinationReg = Registers.AL, SourceValue = 2 };
+            new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotEqual, DestinationLabel = ".clearBuffer" };
+            new CPUx86.Move { DestinationReg=Registers.AL, SourceValue=0xFE };
+            new CPUx86.Out { SourceReg = Registers.AL, DestinationValue = 0x60 };
             new CPUAll.Label(".loop");//failed... halt
             new CPUx86.Halt();
             new CPUx86.Jump { DestinationLabel = ".loop" };
