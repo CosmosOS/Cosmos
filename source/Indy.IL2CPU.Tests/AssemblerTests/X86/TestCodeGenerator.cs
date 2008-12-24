@@ -77,6 +77,9 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
             if (!aType.IsSubclassOf(typeof(Instruction))) {
                 return;
             }
+            if (aType == typeof(In)) {
+                System.Diagnostics.Debugger.Break();
+            }
             //if (!Instruction.HasEncodingOptions(aType)) {
             //    WriteTestFixtureHeader(aType, aOutput);
             //    {
@@ -300,17 +303,31 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
         }
 
         private static IEnumerable<KeyValuePair<string, string[]>> GetDestinationPossibilities(Type aType) {
-            if (!opcodesException.ContainsKey(aType) || opcodesException[aType].DestInfo == null || opcodesException[aType].DestInfo.TestImmediate32) {
+            var xResult = new List<string>();
+            bool xFlag = true;
+            if (opcodesException.ContainsKey(aType) && opcodesException[aType].DestInfo != null) {
+                xFlag = false;
+            }
+            if (xFlag || opcodesException[aType].DestInfo.TestImmediate32) {
+                xResult.Add("DestinationValue = 300000");
+            }
+            if (xFlag || opcodesException[aType].DestInfo.TestImmediate16) {
+                xResult.Add("DestinationValue=30000");
+            }
+            if (xFlag || opcodesException[aType].DestInfo.TestImmediate8) {
+                xResult.Add("DestinationValue=30");
+            }
+            if (xResult.Count > 0) {
                 yield return new KeyValuePair<string, string[]>("ImmediateDestination",
-                    new string[] { "DestinationValue = 30", "DestinationValue = 300", "DestinationValue = 300000" });
+                    xResult.ToArray());
             }
             if (!opcodesException.ContainsKey(aType) || opcodesException[aType].DestInfo == null || opcodesException[aType].DestInfo.TestMem32) {
                 yield return new KeyValuePair<string, string[]>("8BitMemoryAddressDestination",
-                    new string[] { "DestinationValue = 65, DestinationIsIndirect = true"});
+                    new string[] { "DestinationValue = 65, DestinationIsIndirect = true" });
                 yield return new KeyValuePair<string, string[]>("16BitMemoryAddressDestination",
-                    new string[] { "DestinationValue = 650, DestinationIsIndirect = true"});
+                    new string[] { "DestinationValue = 650, DestinationIsIndirect = true" });
                 yield return new KeyValuePair<string, string[]>("32BitMemoryAddressDestination",
-                    new string[] { "DestinationValue = 650000, DestinationIsIndirect = true"});
+                    new string[] { "DestinationValue = 650000, DestinationIsIndirect = true" });
             }
             if (!opcodesException.ContainsKey(aType) || opcodesException[aType].DestInfo.TestRegisters) {
                 var xRegistersToSkip = new List<Guid>();
@@ -371,11 +388,11 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
             }
             if (!opcodesException.ContainsKey(aType) || opcodesException[aType].SourceInfo == null || opcodesException[aType].SourceInfo.TestMem32) {
                 yield return new KeyValuePair<string, string[]>("8BitMemoryAddressSource",
-                    new string[] { "SourceValue = 65, SourceIsIndirect = true"});
+                    new string[] { "SourceValue = 65, SourceIsIndirect = true" });
                 yield return new KeyValuePair<string, string[]>("16BitMemoryAddressSource",
-                    new string[] { "SourceValue = 650, SourceIsIndirect = true"});
+                    new string[] { "SourceValue = 650, SourceIsIndirect = true" });
                 yield return new KeyValuePair<string, string[]>("32BitMemoryAddressSource",
-                    new string[] { "SourceValue = 650000, SourceIsIndirect = true"});
+                    new string[] { "SourceValue = 650000, SourceIsIndirect = true" });
             }
             if (!opcodesException.ContainsKey(aType) || opcodesException[aType].SourceInfo.TestRegisters) {
                 var xRegistersToSkip = new List<Guid>();
@@ -417,9 +434,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                     if (Registers.IsSegment(register) && !(opcodesException.ContainsKey(aType) && opcodesException[aType].SourceInfo.TestSegments)) {
                         continue;
                     }
-                    if (Registers.GetSize(register) == 32) {
-                        xItems.Add("SourceReg = Registers." + Registers.GetRegisterName(register));
-                    }
+                    xItems.Add("SourceReg = Registers." + Registers.GetRegisterName(register));
                 }
                 if (xItems.Count > 0) {
                     yield return new KeyValuePair<string, string[]>("RegisterSource",
@@ -650,7 +665,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
         private static void GenerateInstructionWithDestinationAndSourceAndSize(Type aType, StreamWriter aOutput) {
             WriteTestFixtureHeader(aType, aOutput);
             {
-                foreach(var xSize in new byte[] {8, 16, 32}){
+                foreach (var xSize in new byte[] { 8, 16, 32 }) {
                     foreach (var xSourceItem in GetSourceWithSizePossibilities(aType, xSize)) {
                         foreach (var xDestItem in GetDestinationWithSizePossibilities(aType, xSize)) {
                             if (opcodesException.ContainsKey(aType)) {

@@ -16,8 +16,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 DefaultSize=InstructionSize.DWord
             }); // fixed port (immediate)
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
-                OpCode = new byte[] { 0xEC },
-                OperandSizeByte = 0,
+                OpCode = new byte[] { 0xED },
                 SourceReg = Registers.DX,
                 DefaultSize = InstructionSize.DWord,
                 DestinationReg=Registers.EAX

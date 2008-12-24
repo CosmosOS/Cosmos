@@ -154,7 +154,6 @@
     <Compile Include="Assembler\x86\InterruptReturn.cs" />
     <Compile Include="Assembler\x86\JumpAlways.cs" />
     <Compile Include="Assembler\x86\JumpBase.cs" />
-    <Compile Include="Assembler\x86\JumpIfECXZero.cs" />
     <Compile Include="Assembler\x86\Move.cs" />
     <Compile Include="Assembler\x86\Multiply.cs" />
     <Compile Include="Assembler\x86\Neg.cs" />

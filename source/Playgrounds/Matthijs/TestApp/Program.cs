@@ -12,70 +12,7 @@ namespace TestApp {
     class Program {
         class Renderer : Y86 {
             public void DoRender() {
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.AH, DestinationReg = Registers.AH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.AH, DestinationReg = Registers.AL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.AH, DestinationReg = Registers.BH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.AH, DestinationReg = Registers.BL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.AH, DestinationReg = Registers.CH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.AH, DestinationReg = Registers.CL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.AH, DestinationReg = Registers.DH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.AH, DestinationReg = Registers.DL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.AL, DestinationReg = Registers.AH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.AL, DestinationReg = Registers.AL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.AL, DestinationReg = Registers.BH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.AL, DestinationReg = Registers.BL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.AL, DestinationReg = Registers.CH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.AL, DestinationReg = Registers.CL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.AL, DestinationReg = Registers.DH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.AL, DestinationReg = Registers.DL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.BH, DestinationReg = Registers.AH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.BH, DestinationReg = Registers.AL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.BH, DestinationReg = Registers.BH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.BH, DestinationReg = Registers.BL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.BH, DestinationReg = Registers.CH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.BH, DestinationReg = Registers.CL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.BH, DestinationReg = Registers.DH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.BH, DestinationReg = Registers.DL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.BL, DestinationReg = Registers.AH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.BL, DestinationReg = Registers.AL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.BL, DestinationReg = Registers.BH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.BL, DestinationReg = Registers.BL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.BL, DestinationReg = Registers.CH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.BL, DestinationReg = Registers.CL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.BL, DestinationReg = Registers.DH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.BL, DestinationReg = Registers.DL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.CH, DestinationReg = Registers.AH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.CH, DestinationReg = Registers.AL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.CH, DestinationReg = Registers.BH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.CH, DestinationReg = Registers.BL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.CH, DestinationReg = Registers.CH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.CH, DestinationReg = Registers.CL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.CH, DestinationReg = Registers.DH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.CH, DestinationReg = Registers.DL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.CL, DestinationReg = Registers.AH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.CL, DestinationReg = Registers.AL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.CL, DestinationReg = Registers.BH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.CL, DestinationReg = Registers.BL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.CL, DestinationReg = Registers.CH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.CL, DestinationReg = Registers.CL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.CL, DestinationReg = Registers.DH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.CL, DestinationReg = Registers.DL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.DH, DestinationReg = Registers.AH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.DH, DestinationReg = Registers.AL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.DH, DestinationReg = Registers.BH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.DH, DestinationReg = Registers.BL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.DH, DestinationReg = Registers.CH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.DH, DestinationReg = Registers.CL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.DH, DestinationReg = Registers.DH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.DH, DestinationReg = Registers.DL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.DL, DestinationReg = Registers.AH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.DL, DestinationReg = Registers.AL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.DL, DestinationReg = Registers.BH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.DL, DestinationReg = Registers.BL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.DL, DestinationReg = Registers.CH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.DL, DestinationReg = Registers.CL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.DL, DestinationReg = Registers.DH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.CmpXchg { SourceReg = Registers.DL, DestinationReg = Registers.DL, Size = 8 };
+                new global::Indy.IL2CPU.Assembler.X86.In { SourceReg = Registers.DX, DestinationReg = Registers.EAX };
             }
         }
         static void Main(string[] args) {
@@ -103,7 +40,7 @@ namespace TestApp {
                     xAsm.FlushBinary(xOutput, 0x200000);
                 }
                 
-                //TestCodeGenerator.Execute();
+//                TestCodeGenerator.Execute();
 
                 //InvalidOpcodeTester.Initialize();
                 //InvalidOpcodeTester.ExecuteSingle(typeof(Move), 0);

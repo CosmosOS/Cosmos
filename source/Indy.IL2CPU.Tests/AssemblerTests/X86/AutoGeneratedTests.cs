@@ -10231,15 +10231,15 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
 	public partial class MoveAndZeroExtendTests: BaseTest {
 		[Test]
 		public void TestImmediateSourceImmediateDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceValue = 30, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceValue = 30, DestinationValue = 300};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceValue = 30, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceValue = 300, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceValue = 300, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceValue = 30, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceValue = 30, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceValue = 300, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceValue = 300000, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceValue = 300000, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceValue = 300, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceValue = 300, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceValue = 300000, DestinationValue = 300000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceValue = 300000, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceValue = 300000, DestinationValue=30};
 			Verify();
 		}
 		[Test]
@@ -10393,151 +10393,151 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
 		}
 		[Test]
 		public void Test8BitMemoryAddressSourceImmediateDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceValue = 65, SourceIsIndirect = true, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceValue = 65, SourceIsIndirect = true, DestinationValue = 300};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceValue = 65, SourceIsIndirect = true, DestinationValue = 300000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceValue = 65, SourceIsIndirect = true, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceValue = 65, SourceIsIndirect = true, DestinationValue=30};
 			Verify();
 		}
 		[Test]
 		public void Test16BitMemoryAddressSourceImmediateDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceValue = 650, SourceIsIndirect = true, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceValue = 650, SourceIsIndirect = true, DestinationValue = 300};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceValue = 650, SourceIsIndirect = true, DestinationValue = 300000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceValue = 650, SourceIsIndirect = true, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceValue = 650, SourceIsIndirect = true, DestinationValue=30};
 			Verify();
 		}
 		[Test]
 		public void Test32BitMemoryAddressSourceImmediateDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceValue = 650000, SourceIsIndirect = true, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceValue = 650000, SourceIsIndirect = true, DestinationValue = 300};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceValue = 650000, SourceIsIndirect = true, DestinationValue = 300000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceValue = 650000, SourceIsIndirect = true, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceValue = 650000, SourceIsIndirect = true, DestinationValue=30};
 			Verify();
 		}
 		[Test]
 		public void TestMemoryAtRegisterEAXSourceImmediateDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, DestinationValue = 300};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 300000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue=30};
 			Verify();
 		}
 		[Test]
 		public void TestMemoryAtRegisterEBXSourceImmediateDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, DestinationValue = 300};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 300000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue=30};
 			Verify();
 		}
 		[Test]
 		public void TestMemoryAtRegisterECXSourceImmediateDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, DestinationValue = 300};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 300000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue=30};
 			Verify();
 		}
 		[Test]
 		public void TestMemoryAtRegisterEDXSourceImmediateDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, DestinationValue = 300};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 300000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue=30};
 			Verify();
 		}
 		[Test]
 		public void TestMemoryAtRegisterESPSourceImmediateDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, DestinationValue = 300};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 300000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue=30};
 			Verify();
 		}
 		[Test]
 		public void TestMemoryAtRegisterEBPSourceImmediateDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, DestinationValue = 300};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 300000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue=30};
 			Verify();
 		}
 		[Test]
 		public void TestMemoryAtRegisterESISourceImmediateDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, DestinationValue = 300};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 300000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue=30};
 			Verify();
 		}
 		[Test]
 		public void TestMemoryAtRegisterEDISourceImmediateDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, DestinationValue = 300};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 300000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndZeroExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue=30};
 			Verify();
 		}
 	}
@@ -13077,8 +13077,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
 	public partial class ConditionalJumpTests: BaseTest {
 		[Test]
 		public void TestImmediateDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.ConditionalJump{DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.ConditionalJump{DestinationValue = 300};
 			new global::Indy.IL2CPU.Assembler.X86.ConditionalJump{DestinationValue = 300000};
 			Verify();
 		}
@@ -13087,9 +13085,9 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
 	public partial class JumpTests: BaseTest {
 		[Test]
 		public void TestImmediateDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.Jump{DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.Jump{DestinationValue = 300};
 			new global::Indy.IL2CPU.Assembler.X86.Jump{DestinationValue = 300000};
+			new global::Indy.IL2CPU.Assembler.X86.Jump{DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.Jump{DestinationValue=30};
 			Verify();
 		}
 		[Test]
@@ -13428,8 +13426,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
 	public partial class CallTests: BaseTest {
 		[Test]
 		public void TestImmediateDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.Call{DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.Call{DestinationValue = 300};
 			new global::Indy.IL2CPU.Assembler.X86.Call{DestinationValue = 300000};
 			Verify();
 		}
@@ -13527,6 +13523,11 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
 	}
 	[TestFixture]
 	public partial class OutTests: BaseTest {
+		[Test]
+		public void TestRegisterSourceImmediateDestination() {
+			new global::Indy.IL2CPU.Assembler.X86.Out{SourceReg = Registers.EAX, DestinationValue=30};
+			Verify();
+		}
 	}
 	[TestFixture]
 	public partial class CompareTests: BaseTest {
@@ -13602,74 +13603,715 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
 			Verify();
 		}
 		[Test]
-		public void TestMemorySourceImmediateDestinationSize8() {
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 65, SourceIsIndirect = true, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650, SourceIsIndirect = true, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650000, SourceIsIndirect = true, DestinationValue = 30, Size = 8};
+		public void TestImmediateSourceRegisterDestinationSize8() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 30, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 30, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 30, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 30, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 30, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 30, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 30, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 30, DestinationReg = Registers.DL, Size = 8};
 			Verify();
 		}
 		[Test]
-		public void TestMemoryAtRegisterEAXSourceImmediateDestinationSize8() {
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 30, Size = 8};
+		public void TestMemorySourceRegisterDestinationSize8() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 65, SourceIsIndirect = true, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 65, SourceIsIndirect = true, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 65, SourceIsIndirect = true, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 65, SourceIsIndirect = true, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 65, SourceIsIndirect = true, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 65, SourceIsIndirect = true, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 65, SourceIsIndirect = true, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 65, SourceIsIndirect = true, DestinationReg = Registers.DL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650, SourceIsIndirect = true, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650, SourceIsIndirect = true, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650, SourceIsIndirect = true, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650, SourceIsIndirect = true, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650, SourceIsIndirect = true, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650, SourceIsIndirect = true, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650, SourceIsIndirect = true, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650, SourceIsIndirect = true, DestinationReg = Registers.DL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650000, SourceIsIndirect = true, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650000, SourceIsIndirect = true, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650000, SourceIsIndirect = true, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650000, SourceIsIndirect = true, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650000, SourceIsIndirect = true, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650000, SourceIsIndirect = true, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650000, SourceIsIndirect = true, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650000, SourceIsIndirect = true, DestinationReg = Registers.DL, Size = 8};
 			Verify();
 		}
 		[Test]
-		public void TestMemoryAtRegisterEBXSourceImmediateDestinationSize8() {
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 30, Size = 8};
+		public void TestMemoryAtRegisterEAXSourceRegisterDestinationSize8() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationReg = Registers.DL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.DL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.DL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.DL, Size = 8};
 			Verify();
 		}
 		[Test]
-		public void TestMemoryAtRegisterECXSourceImmediateDestinationSize8() {
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 30, Size = 8};
+		public void TestMemoryAtRegisterEBXSourceRegisterDestinationSize8() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, DestinationReg = Registers.DL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.DL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.DL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.DL, Size = 8};
 			Verify();
 		}
 		[Test]
-		public void TestMemoryAtRegisterEDXSourceImmediateDestinationSize8() {
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 30, Size = 8};
+		public void TestMemoryAtRegisterECXSourceRegisterDestinationSize8() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, DestinationReg = Registers.DL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.DL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.DL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.DL, Size = 8};
 			Verify();
 		}
 		[Test]
-		public void TestMemoryAtRegisterESPSourceImmediateDestinationSize8() {
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 30, Size = 8};
+		public void TestMemoryAtRegisterEDXSourceRegisterDestinationSize8() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, DestinationReg = Registers.DL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.DL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.DL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.DL, Size = 8};
 			Verify();
 		}
 		[Test]
-		public void TestMemoryAtRegisterEBPSourceImmediateDestinationSize8() {
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 30, Size = 8};
+		public void TestMemoryAtRegisterESPSourceRegisterDestinationSize8() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationReg = Registers.DL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.DL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.DL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.DL, Size = 8};
 			Verify();
 		}
 		[Test]
-		public void TestMemoryAtRegisterESISourceImmediateDestinationSize8() {
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 30, Size = 8};
+		public void TestMemoryAtRegisterEBPSourceRegisterDestinationSize8() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, DestinationReg = Registers.DL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.DL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.DL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.DL, Size = 8};
 			Verify();
 		}
 		[Test]
-		public void TestMemoryAtRegisterEDISourceImmediateDestinationSize8() {
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 30, Size = 8};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 30, Size = 8};
+		public void TestMemoryAtRegisterESISourceRegisterDestinationSize8() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, DestinationReg = Registers.DL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.DL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.DL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.DL, Size = 8};
+			Verify();
+		}
+		[Test]
+		public void TestMemoryAtRegisterEDISourceRegisterDestinationSize8() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, DestinationReg = Registers.DL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.DL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.DL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.DL, Size = 8};
+			Verify();
+		}
+		[Test]
+		public void TestRegisterSourceMemoryDestinationSize8() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationValue = 65, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationValue = 650, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationValue = 650000, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationValue = 65, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationValue = 650, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationValue = 650000, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationValue = 65, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationValue = 650, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationValue = 650000, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationValue = 65, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationValue = 650, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationValue = 650000, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationValue = 65, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationValue = 650, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationValue = 650000, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationValue = 65, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationValue = 650, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationValue = 650000, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationValue = 65, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationValue = 650, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationValue = 650000, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationValue = 65, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationValue = 650, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationValue = 650000, DestinationIsIndirect = true, Size = 8};
+			Verify();
+		}
+		[Test]
+		public void TestRegisterSourceMemoryAtRegisterEAXDestinationSize8() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			Verify();
+		}
+		[Test]
+		public void TestRegisterSourceMemoryAtRegisterEBXDestinationSize8() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.EBX, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.EBX, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.EBX, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.EBX, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.EBX, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.EBX, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.EBX, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.EBX, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			Verify();
+		}
+		[Test]
+		public void TestRegisterSourceMemoryAtRegisterECXDestinationSize8() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.ECX, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.ECX, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.ECX, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.ECX, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.ECX, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.ECX, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.ECX, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.ECX, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			Verify();
+		}
+		[Test]
+		public void TestRegisterSourceMemoryAtRegisterEDXDestinationSize8() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.EDX, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.EDX, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.EDX, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.EDX, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.EDX, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.EDX, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.EDX, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.EDX, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			Verify();
+		}
+		[Test]
+		public void TestRegisterSourceMemoryAtRegisterESPDestinationSize8() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			Verify();
+		}
+		[Test]
+		public void TestRegisterSourceMemoryAtRegisterEBPDestinationSize8() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.EBP, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.EBP, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.EBP, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.EBP, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.EBP, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.EBP, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.EBP, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.EBP, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			Verify();
+		}
+		[Test]
+		public void TestRegisterSourceMemoryAtRegisterESIDestinationSize8() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.ESI, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.ESI, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.ESI, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.ESI, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.ESI, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.ESI, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.ESI, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.ESI, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			Verify();
+		}
+		[Test]
+		public void TestRegisterSourceMemoryAtRegisterEDIDestinationSize8() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.EDI, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.EDI, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.EDI, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.EDI, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.EDI, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.EDI, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.EDI, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.EDI, DestinationIsIndirect = true, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 8};
+			Verify();
+		}
+		[Test]
+		public void TestRegisterSourceRegisterDestinationSize8() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AH, DestinationReg = Registers.DL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AL, DestinationReg = Registers.DL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BH, DestinationReg = Registers.DL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BL, DestinationReg = Registers.DL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CH, DestinationReg = Registers.DL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CL, DestinationReg = Registers.DL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DH, DestinationReg = Registers.DL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DL, DestinationReg = Registers.DL, Size = 8};
 			Verify();
 		}
 		[Test]
@@ -13744,74 +14386,715 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
 			Verify();
 		}
 		[Test]
-		public void TestMemorySourceImmediateDestinationSize16() {
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 65, SourceIsIndirect = true, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650, SourceIsIndirect = true, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650000, SourceIsIndirect = true, DestinationValue = 300, Size = 16};
+		public void TestImmediateSourceRegisterDestinationSize16() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 300, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 300, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 300, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 300, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 300, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 300, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 300, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 300, DestinationReg = Registers.BP, Size = 16};
 			Verify();
 		}
 		[Test]
-		public void TestMemoryAtRegisterEAXSourceImmediateDestinationSize16() {
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300, Size = 16};
+		public void TestMemorySourceRegisterDestinationSize16() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 65, SourceIsIndirect = true, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 65, SourceIsIndirect = true, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 65, SourceIsIndirect = true, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 65, SourceIsIndirect = true, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 65, SourceIsIndirect = true, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 65, SourceIsIndirect = true, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 65, SourceIsIndirect = true, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 65, SourceIsIndirect = true, DestinationReg = Registers.BP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650, SourceIsIndirect = true, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650, SourceIsIndirect = true, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650, SourceIsIndirect = true, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650, SourceIsIndirect = true, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650, SourceIsIndirect = true, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650, SourceIsIndirect = true, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650, SourceIsIndirect = true, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650, SourceIsIndirect = true, DestinationReg = Registers.BP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650000, SourceIsIndirect = true, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650000, SourceIsIndirect = true, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650000, SourceIsIndirect = true, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650000, SourceIsIndirect = true, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650000, SourceIsIndirect = true, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650000, SourceIsIndirect = true, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650000, SourceIsIndirect = true, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650000, SourceIsIndirect = true, DestinationReg = Registers.BP, Size = 16};
 			Verify();
 		}
 		[Test]
-		public void TestMemoryAtRegisterEBXSourceImmediateDestinationSize16() {
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300, Size = 16};
+		public void TestMemoryAtRegisterEAXSourceRegisterDestinationSize16() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationReg = Registers.BP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.BP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.BP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.BP, Size = 16};
 			Verify();
 		}
 		[Test]
-		public void TestMemoryAtRegisterECXSourceImmediateDestinationSize16() {
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300, Size = 16};
+		public void TestMemoryAtRegisterEBXSourceRegisterDestinationSize16() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, DestinationReg = Registers.BP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.BP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.BP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.BP, Size = 16};
 			Verify();
 		}
 		[Test]
-		public void TestMemoryAtRegisterEDXSourceImmediateDestinationSize16() {
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300, Size = 16};
+		public void TestMemoryAtRegisterECXSourceRegisterDestinationSize16() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, DestinationReg = Registers.BP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.BP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.BP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.BP, Size = 16};
 			Verify();
 		}
 		[Test]
-		public void TestMemoryAtRegisterESPSourceImmediateDestinationSize16() {
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300, Size = 16};
+		public void TestMemoryAtRegisterEDXSourceRegisterDestinationSize16() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, DestinationReg = Registers.BP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.BP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.BP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.BP, Size = 16};
 			Verify();
 		}
 		[Test]
-		public void TestMemoryAtRegisterEBPSourceImmediateDestinationSize16() {
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300, Size = 16};
+		public void TestMemoryAtRegisterESPSourceRegisterDestinationSize16() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationReg = Registers.BP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.BP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.BP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.BP, Size = 16};
 			Verify();
 		}
 		[Test]
-		public void TestMemoryAtRegisterESISourceImmediateDestinationSize16() {
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300, Size = 16};
+		public void TestMemoryAtRegisterEBPSourceRegisterDestinationSize16() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, DestinationReg = Registers.BP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.BP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.BP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.BP, Size = 16};
 			Verify();
 		}
 		[Test]
-		public void TestMemoryAtRegisterEDISourceImmediateDestinationSize16() {
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300, Size = 16};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300, Size = 16};
+		public void TestMemoryAtRegisterESISourceRegisterDestinationSize16() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, DestinationReg = Registers.BP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.BP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.BP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.BP, Size = 16};
+			Verify();
+		}
+		[Test]
+		public void TestMemoryAtRegisterEDISourceRegisterDestinationSize16() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, DestinationReg = Registers.BP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.BP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.BP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.BP, Size = 16};
+			Verify();
+		}
+		[Test]
+		public void TestRegisterSourceMemoryDestinationSize16() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationValue = 65, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationValue = 650, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationValue = 650000, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationValue = 65, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationValue = 650, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationValue = 650000, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationValue = 65, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationValue = 650, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationValue = 650000, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationValue = 65, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationValue = 650, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationValue = 650000, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationValue = 65, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationValue = 650, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationValue = 650000, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationValue = 65, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationValue = 650, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationValue = 650000, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationValue = 65, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationValue = 650, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationValue = 650000, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationValue = 65, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationValue = 650, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationValue = 650000, DestinationIsIndirect = true, Size = 16};
+			Verify();
+		}
+		[Test]
+		public void TestRegisterSourceMemoryAtRegisterEAXDestinationSize16() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			Verify();
+		}
+		[Test]
+		public void TestRegisterSourceMemoryAtRegisterEBXDestinationSize16() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.EBX, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.EBX, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.EBX, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.EBX, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.EBX, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.EBX, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.EBX, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.EBX, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			Verify();
+		}
+		[Test]
+		public void TestRegisterSourceMemoryAtRegisterECXDestinationSize16() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.ECX, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.ECX, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.ECX, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.ECX, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.ECX, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.ECX, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.ECX, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.ECX, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			Verify();
+		}
+		[Test]
+		public void TestRegisterSourceMemoryAtRegisterEDXDestinationSize16() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.EDX, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.EDX, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.EDX, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.EDX, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.EDX, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.EDX, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.EDX, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.EDX, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			Verify();
+		}
+		[Test]
+		public void TestRegisterSourceMemoryAtRegisterESPDestinationSize16() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			Verify();
+		}
+		[Test]
+		public void TestRegisterSourceMemoryAtRegisterEBPDestinationSize16() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.EBP, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.EBP, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.EBP, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.EBP, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.EBP, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.EBP, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.EBP, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.EBP, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			Verify();
+		}
+		[Test]
+		public void TestRegisterSourceMemoryAtRegisterESIDestinationSize16() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.ESI, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.ESI, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.ESI, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.ESI, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.ESI, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.ESI, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.ESI, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.ESI, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			Verify();
+		}
+		[Test]
+		public void TestRegisterSourceMemoryAtRegisterEDIDestinationSize16() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.EDI, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.EDI, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.EDI, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.EDI, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.EDI, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.EDI, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.EDI, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.EDI, DestinationIsIndirect = true, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16};
+			Verify();
+		}
+		[Test]
+		public void TestRegisterSourceRegisterDestinationSize16() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.AX, DestinationReg = Registers.BP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BX, DestinationReg = Registers.BP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.CX, DestinationReg = Registers.BP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DX, DestinationReg = Registers.BP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SI, DestinationReg = Registers.BP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.DI, DestinationReg = Registers.BP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.SP, DestinationReg = Registers.BP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.BP, DestinationReg = Registers.BP, Size = 16};
 			Verify();
 		}
 		[Test]
@@ -13886,74 +15169,715 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
 			Verify();
 		}
 		[Test]
-		public void TestMemorySourceImmediateDestinationSize32() {
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 65, SourceIsIndirect = true, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650, SourceIsIndirect = true, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650000, SourceIsIndirect = true, DestinationValue = 300000, Size = 32};
+		public void TestImmediateSourceRegisterDestinationSize32() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 300000, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 300000, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 300000, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 300000, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 300000, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 300000, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 300000, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 300000, DestinationReg = Registers.EDI, Size = 32};
 			Verify();
 		}
 		[Test]
-		public void TestMemoryAtRegisterEAXSourceImmediateDestinationSize32() {
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300000, Size = 32};
+		public void TestMemorySourceRegisterDestinationSize32() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 65, SourceIsIndirect = true, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 65, SourceIsIndirect = true, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 65, SourceIsIndirect = true, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 65, SourceIsIndirect = true, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 65, SourceIsIndirect = true, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 65, SourceIsIndirect = true, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 65, SourceIsIndirect = true, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 65, SourceIsIndirect = true, DestinationReg = Registers.EDI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650, SourceIsIndirect = true, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650, SourceIsIndirect = true, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650, SourceIsIndirect = true, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650, SourceIsIndirect = true, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650, SourceIsIndirect = true, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650, SourceIsIndirect = true, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650, SourceIsIndirect = true, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650, SourceIsIndirect = true, DestinationReg = Registers.EDI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650000, SourceIsIndirect = true, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650000, SourceIsIndirect = true, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650000, SourceIsIndirect = true, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650000, SourceIsIndirect = true, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650000, SourceIsIndirect = true, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650000, SourceIsIndirect = true, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650000, SourceIsIndirect = true, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceValue = 650000, SourceIsIndirect = true, DestinationReg = Registers.EDI, Size = 32};
 			Verify();
 		}
 		[Test]
-		public void TestMemoryAtRegisterEBXSourceImmediateDestinationSize32() {
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300000, Size = 32};
+		public void TestMemoryAtRegisterEAXSourceRegisterDestinationSize32() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationReg = Registers.EDI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EDI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EDI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EDI, Size = 32};
 			Verify();
 		}
 		[Test]
-		public void TestMemoryAtRegisterECXSourceImmediateDestinationSize32() {
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300000, Size = 32};
+		public void TestMemoryAtRegisterEBXSourceRegisterDestinationSize32() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, DestinationReg = Registers.EDI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EDI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EDI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EDI, Size = 32};
 			Verify();
 		}
 		[Test]
-		public void TestMemoryAtRegisterEDXSourceImmediateDestinationSize32() {
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300000, Size = 32};
+		public void TestMemoryAtRegisterECXSourceRegisterDestinationSize32() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, DestinationReg = Registers.EDI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EDI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EDI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EDI, Size = 32};
 			Verify();
 		}
 		[Test]
-		public void TestMemoryAtRegisterESPSourceImmediateDestinationSize32() {
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300000, Size = 32};
+		public void TestMemoryAtRegisterEDXSourceRegisterDestinationSize32() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, DestinationReg = Registers.EDI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EDI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EDI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EDI, Size = 32};
 			Verify();
 		}
 		[Test]
-		public void TestMemoryAtRegisterEBPSourceImmediateDestinationSize32() {
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300000, Size = 32};
+		public void TestMemoryAtRegisterESPSourceRegisterDestinationSize32() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationReg = Registers.EDI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EDI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EDI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EDI, Size = 32};
 			Verify();
 		}
 		[Test]
-		public void TestMemoryAtRegisterESISourceImmediateDestinationSize32() {
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300000, Size = 32};
+		public void TestMemoryAtRegisterEBPSourceRegisterDestinationSize32() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, DestinationReg = Registers.EDI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EDI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EDI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EDI, Size = 32};
 			Verify();
 		}
 		[Test]
-		public void TestMemoryAtRegisterEDISourceImmediateDestinationSize32() {
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300000, Size = 32};
-			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300000, Size = 32};
+		public void TestMemoryAtRegisterESISourceRegisterDestinationSize32() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, DestinationReg = Registers.EDI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EDI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EDI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EDI, Size = 32};
+			Verify();
+		}
+		[Test]
+		public void TestMemoryAtRegisterEDISourceRegisterDestinationSize32() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, DestinationReg = Registers.EDI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.EDI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.EDI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.EDI, Size = 32};
+			Verify();
+		}
+		[Test]
+		public void TestRegisterSourceMemoryDestinationSize32() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationValue = 65, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationValue = 650, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationValue = 650000, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationValue = 65, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationValue = 650, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationValue = 650000, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationValue = 65, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationValue = 650, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationValue = 650000, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationValue = 65, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationValue = 650, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationValue = 650000, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationValue = 65, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationValue = 650, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationValue = 650000, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationValue = 65, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationValue = 650, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationValue = 650000, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationValue = 65, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationValue = 650, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationValue = 650000, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationValue = 65, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationValue = 650, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationValue = 650000, DestinationIsIndirect = true, Size = 32};
+			Verify();
+		}
+		[Test]
+		public void TestRegisterSourceMemoryAtRegisterEAXDestinationSize32() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			Verify();
+		}
+		[Test]
+		public void TestRegisterSourceMemoryAtRegisterEBXDestinationSize32() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.EBX, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.EBX, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.EBX, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.EBX, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.EBX, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.EBX, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.EBX, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.EBX, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			Verify();
+		}
+		[Test]
+		public void TestRegisterSourceMemoryAtRegisterECXDestinationSize32() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.ECX, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.ECX, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.ECX, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.ECX, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.ECX, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.ECX, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.ECX, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.ECX, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			Verify();
+		}
+		[Test]
+		public void TestRegisterSourceMemoryAtRegisterEDXDestinationSize32() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.EDX, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.EDX, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.EDX, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.EDX, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.EDX, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.EDX, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.EDX, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.EDX, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.EDX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			Verify();
+		}
+		[Test]
+		public void TestRegisterSourceMemoryAtRegisterESPDestinationSize32() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.ESP, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			Verify();
+		}
+		[Test]
+		public void TestRegisterSourceMemoryAtRegisterEBPDestinationSize32() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.EBP, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.EBP, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.EBP, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.EBP, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.EBP, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.EBP, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.EBP, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.EBP, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			Verify();
+		}
+		[Test]
+		public void TestRegisterSourceMemoryAtRegisterESIDestinationSize32() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.ESI, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.ESI, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.ESI, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.ESI, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.ESI, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.ESI, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.ESI, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.ESI, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			Verify();
+		}
+		[Test]
+		public void TestRegisterSourceMemoryAtRegisterEDIDestinationSize32() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.EDI, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.EDI, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.EDI, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.EDI, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.EDI, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.EDI, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.EDI, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.EDI, DestinationIsIndirect = true, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			Verify();
+		}
+		[Test]
+		public void TestRegisterSourceRegisterDestinationSize32() {
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EAX, DestinationReg = Registers.EDI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBX, DestinationReg = Registers.EDI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ECX, DestinationReg = Registers.EDI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDX, DestinationReg = Registers.EDI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESP, DestinationReg = Registers.EDI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EBP, DestinationReg = Registers.EDI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.ESI, DestinationReg = Registers.EDI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.Compare{SourceReg = Registers.EDI, DestinationReg = Registers.EDI, Size = 32};
 			Verify();
 		}
 	}
@@ -13969,15 +15893,15 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
 	public partial class MoveAndSignExtendTests: BaseTest {
 		[Test]
 		public void TestImmediateSourceImmediateDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceValue = 30, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceValue = 30, DestinationValue = 300};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceValue = 30, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceValue = 300, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceValue = 300, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceValue = 30, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceValue = 30, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceValue = 300, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceValue = 300000, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceValue = 300000, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceValue = 300, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceValue = 300, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceValue = 300000, DestinationValue = 300000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceValue = 300000, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceValue = 300000, DestinationValue=30};
 			Verify();
 		}
 		[Test]
@@ -14131,156 +16055,161 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
 		}
 		[Test]
 		public void Test8BitMemoryAddressSourceImmediateDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceValue = 65, SourceIsIndirect = true, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceValue = 65, SourceIsIndirect = true, DestinationValue = 300};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceValue = 65, SourceIsIndirect = true, DestinationValue = 300000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceValue = 65, SourceIsIndirect = true, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceValue = 65, SourceIsIndirect = true, DestinationValue=30};
 			Verify();
 		}
 		[Test]
 		public void Test16BitMemoryAddressSourceImmediateDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceValue = 650, SourceIsIndirect = true, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceValue = 650, SourceIsIndirect = true, DestinationValue = 300};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceValue = 650, SourceIsIndirect = true, DestinationValue = 300000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceValue = 650, SourceIsIndirect = true, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceValue = 650, SourceIsIndirect = true, DestinationValue=30};
 			Verify();
 		}
 		[Test]
 		public void Test32BitMemoryAddressSourceImmediateDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceValue = 650000, SourceIsIndirect = true, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceValue = 650000, SourceIsIndirect = true, DestinationValue = 300};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceValue = 650000, SourceIsIndirect = true, DestinationValue = 300000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceValue = 650000, SourceIsIndirect = true, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceValue = 650000, SourceIsIndirect = true, DestinationValue=30};
 			Verify();
 		}
 		[Test]
 		public void TestMemoryAtRegisterEAXSourceImmediateDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, DestinationValue = 300};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 300000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EAX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue=30};
 			Verify();
 		}
 		[Test]
 		public void TestMemoryAtRegisterEBXSourceImmediateDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, DestinationValue = 300};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 300000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue=30};
 			Verify();
 		}
 		[Test]
 		public void TestMemoryAtRegisterECXSourceImmediateDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, DestinationValue = 300};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 300000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ECX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue=30};
 			Verify();
 		}
 		[Test]
 		public void TestMemoryAtRegisterEDXSourceImmediateDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, DestinationValue = 300};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 300000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDX, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue=30};
 			Verify();
 		}
 		[Test]
 		public void TestMemoryAtRegisterESPSourceImmediateDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, DestinationValue = 300};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 300000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESP, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue=30};
 			Verify();
 		}
 		[Test]
 		public void TestMemoryAtRegisterEBPSourceImmediateDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, DestinationValue = 300};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 300000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EBP, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue=30};
 			Verify();
 		}
 		[Test]
 		public void TestMemoryAtRegisterESISourceImmediateDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, DestinationValue = 300};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 300000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.ESI, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue=30};
 			Verify();
 		}
 		[Test]
 		public void TestMemoryAtRegisterEDISourceImmediateDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, DestinationValue = 300};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, SourceDisplacement = 203, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue = 300000};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 300};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, SourceDisplacement = 2030, DestinationValue=30};
 			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue = 300000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue=30000};
+			new global::Indy.IL2CPU.Assembler.X86.MoveAndSignExtend{SourceReg = Registers.EDI, SourceIsIndirect=true, SourceDisplacement = 203000, DestinationValue=30};
 			Verify();
 		}
 	}
 	[TestFixture]
 	public partial class ReturnTests: BaseTest {
+		[Test]
+		public void TestImmediateDestination() {
+			new global::Indy.IL2CPU.Assembler.X86.Return{DestinationValue=30000};
+			Verify();
+		}
 	}
 	[TestFixture]
 	public partial class CpuIdTests: BaseTest {
@@ -14757,8 +16686,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
 	public partial class InterruptTests: BaseTest {
 		[Test]
 		public void TestImmediateDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.Interrupt{DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.Interrupt{DestinationValue = 300};
 			new global::Indy.IL2CPU.Assembler.X86.Interrupt{DestinationValue = 300000};
 			Verify();
 		}
@@ -18043,6 +19970,11 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
 	}
 	[TestFixture]
 	public partial class InTests: BaseTest {
+		[Test]
+		public void TestRegisterSourceRegisterDestination() {
+			new global::Indy.IL2CPU.Assembler.X86.In{SourceReg = Registers.DX, DestinationReg = Registers.EAX};
+			Verify();
+		}
 	}
 	[TestFixture]
 	public partial class FXStoreTests: BaseTest {
@@ -19870,11 +21802,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
 	[TestFixture]
 	public partial class IDivideTests: BaseTest {
 		[Test]
-		public void TestImmediateDestinationSize8() {
-			new global::Indy.IL2CPU.Assembler.X86.IDivide{DestinationValue = 30, Size = 8};
-			Verify();
-		}
-		[Test]
 		public void TestMemoryDestinationSize8() {
 			new global::Indy.IL2CPU.Assembler.X86.IDivide{DestinationValue = 65, DestinationIsIndirect = true, Size = 8};
 			new global::Indy.IL2CPU.Assembler.X86.IDivide{DestinationValue = 650, DestinationIsIndirect = true, Size = 8};
@@ -19946,8 +21873,15 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
 			Verify();
 		}
 		[Test]
-		public void TestImmediateDestinationSize16() {
-			new global::Indy.IL2CPU.Assembler.X86.IDivide{DestinationValue = 300, Size = 16};
+		public void TestRegisterDestinationSize8() {
+			new global::Indy.IL2CPU.Assembler.X86.IDivide{DestinationReg = Registers.AH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.IDivide{DestinationReg = Registers.AL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.IDivide{DestinationReg = Registers.BH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.IDivide{DestinationReg = Registers.BL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.IDivide{DestinationReg = Registers.CH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.IDivide{DestinationReg = Registers.CL, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.IDivide{DestinationReg = Registers.DH, Size = 8};
+			new global::Indy.IL2CPU.Assembler.X86.IDivide{DestinationReg = Registers.DL, Size = 8};
 			Verify();
 		}
 		[Test]
@@ -20022,8 +21956,15 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
 			Verify();
 		}
 		[Test]
-		public void TestImmediateDestinationSize32() {
-			new global::Indy.IL2CPU.Assembler.X86.IDivide{DestinationValue = 300000, Size = 32};
+		public void TestRegisterDestinationSize16() {
+			new global::Indy.IL2CPU.Assembler.X86.IDivide{DestinationReg = Registers.AX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.IDivide{DestinationReg = Registers.BX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.IDivide{DestinationReg = Registers.CX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.IDivide{DestinationReg = Registers.DX, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.IDivide{DestinationReg = Registers.SI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.IDivide{DestinationReg = Registers.DI, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.IDivide{DestinationReg = Registers.SP, Size = 16};
+			new global::Indy.IL2CPU.Assembler.X86.IDivide{DestinationReg = Registers.BP, Size = 16};
 			Verify();
 		}
 		[Test]
@@ -20095,6 +22036,18 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
 			new global::Indy.IL2CPU.Assembler.X86.IDivide{DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.IDivide{DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.IDivide{DestinationReg = Registers.EDI, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 32};
+			Verify();
+		}
+		[Test]
+		public void TestRegisterDestinationSize32() {
+			new global::Indy.IL2CPU.Assembler.X86.IDivide{DestinationReg = Registers.EAX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.IDivide{DestinationReg = Registers.EBX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.IDivide{DestinationReg = Registers.ECX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.IDivide{DestinationReg = Registers.EDX, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.IDivide{DestinationReg = Registers.ESP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.IDivide{DestinationReg = Registers.EBP, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.IDivide{DestinationReg = Registers.ESI, Size = 32};
+			new global::Indy.IL2CPU.Assembler.X86.IDivide{DestinationReg = Registers.EDI, Size = 32};
 			Verify();
 		}
 	}
@@ -20779,95 +22732,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
 			new global::Indy.IL2CPU.Assembler.X86.SubWithCarry{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203, DestinationValue = 300000, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.SubWithCarry{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationValue = 300000, Size = 32};
 			new global::Indy.IL2CPU.Assembler.X86.SubWithCarry{SourceReg = Registers.EDI, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationValue = 300000, Size = 32};
-			Verify();
-		}
-	}
-	[TestFixture]
-	public partial class JumpIfECXZeroTests: BaseTest {
-		[Test]
-		public void TestImmediateDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationValue = 30};
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationValue = 300};
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationValue = 300000};
-			Verify();
-		}
-		[Test]
-		public void Test8BitMemoryAddressDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationValue = 65, DestinationIsIndirect = true};
-			Verify();
-		}
-		[Test]
-		public void Test16BitMemoryAddressDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationValue = 650, DestinationIsIndirect = true};
-			Verify();
-		}
-		[Test]
-		public void Test32BitMemoryAddressDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationValue = 650000, DestinationIsIndirect = true};
-			Verify();
-		}
-		[Test]
-		public void TestMemoryAtRegisterEAXDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationReg = Registers.EAX, DestinationIsIndirect=true};
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationReg = Registers.EAX, DestinationIsIndirect=true, DestinationDisplacement = 203};
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationReg = Registers.EAX, DestinationIsIndirect=true, DestinationDisplacement = 2030};
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationReg = Registers.EAX, DestinationIsIndirect=true, DestinationDisplacement = 203000};
-			Verify();
-		}
-		[Test]
-		public void TestMemoryAtRegisterEBXDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationReg = Registers.EBX, DestinationIsIndirect=true};
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationReg = Registers.EBX, DestinationIsIndirect=true, DestinationDisplacement = 203};
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationReg = Registers.EBX, DestinationIsIndirect=true, DestinationDisplacement = 2030};
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationReg = Registers.EBX, DestinationIsIndirect=true, DestinationDisplacement = 203000};
-			Verify();
-		}
-		[Test]
-		public void TestMemoryAtRegisterECXDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationReg = Registers.ECX, DestinationIsIndirect=true};
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationReg = Registers.ECX, DestinationIsIndirect=true, DestinationDisplacement = 203};
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationReg = Registers.ECX, DestinationIsIndirect=true, DestinationDisplacement = 2030};
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationReg = Registers.ECX, DestinationIsIndirect=true, DestinationDisplacement = 203000};
-			Verify();
-		}
-		[Test]
-		public void TestMemoryAtRegisterEDXDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationReg = Registers.EDX, DestinationIsIndirect=true};
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationReg = Registers.EDX, DestinationIsIndirect=true, DestinationDisplacement = 203};
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationReg = Registers.EDX, DestinationIsIndirect=true, DestinationDisplacement = 2030};
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationReg = Registers.EDX, DestinationIsIndirect=true, DestinationDisplacement = 203000};
-			Verify();
-		}
-		[Test]
-		public void TestMemoryAtRegisterESPDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationReg = Registers.ESP, DestinationIsIndirect=true};
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationReg = Registers.ESP, DestinationIsIndirect=true, DestinationDisplacement = 203};
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationReg = Registers.ESP, DestinationIsIndirect=true, DestinationDisplacement = 2030};
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationReg = Registers.ESP, DestinationIsIndirect=true, DestinationDisplacement = 203000};
-			Verify();
-		}
-		[Test]
-		public void TestMemoryAtRegisterEBPDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationReg = Registers.EBP, DestinationIsIndirect=true};
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationReg = Registers.EBP, DestinationIsIndirect=true, DestinationDisplacement = 203};
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationReg = Registers.EBP, DestinationIsIndirect=true, DestinationDisplacement = 2030};
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationReg = Registers.EBP, DestinationIsIndirect=true, DestinationDisplacement = 203000};
-			Verify();
-		}
-		[Test]
-		public void TestMemoryAtRegisterESIDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationReg = Registers.ESI, DestinationIsIndirect=true};
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationReg = Registers.ESI, DestinationIsIndirect=true, DestinationDisplacement = 203};
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationReg = Registers.ESI, DestinationIsIndirect=true, DestinationDisplacement = 2030};
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationReg = Registers.ESI, DestinationIsIndirect=true, DestinationDisplacement = 203000};
-			Verify();
-		}
-		[Test]
-		public void TestMemoryAtRegisterEDIDestination() {
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationReg = Registers.EDI, DestinationIsIndirect=true};
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationReg = Registers.EDI, DestinationIsIndirect=true, DestinationDisplacement = 203};
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationReg = Registers.EDI, DestinationIsIndirect=true, DestinationDisplacement = 2030};
-			new global::Indy.IL2CPU.Assembler.X86.JumpIfECXZero{DestinationReg = Registers.EDI, DestinationIsIndirect=true, DestinationDisplacement = 203000};
 			Verify();
 		}
 	}
