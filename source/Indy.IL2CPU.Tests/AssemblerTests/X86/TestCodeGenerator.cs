@@ -64,6 +64,9 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                 xOutput.WriteLine("namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {");
 
                 foreach (Type type in typeof(Instruction).Assembly.GetTypes()) {
+                    if (type == typeof(AddWithCarry)) {
+                        System.Diagnostics.Debugger.Break();
+                    }
                     GenerateSingle(type, xOutput);
                 }
                 xOutput.WriteLine("}");
@@ -130,7 +133,9 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
         }
 
         private static void WriteTestMethodHeader(string aName, StreamWriter aOutput) {
-           
+            if (aName == "ImmediateSourceImmediateDestinationSize16") {
+                System.Diagnostics.Debugger.Break();
+            }
             aOutput.WriteLine("\t\t[Test]");
             aOutput.WriteLine("\t\tpublic void Test{0}() {{", aName);
         }

@@ -12,38 +12,38 @@ namespace TestApp {
     class Program {
         class Renderer : Y86 {
             public void DoRender() {
-                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.AX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 16 };
-                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.AX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16 };
-                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.AX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16 };
-                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.AX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16 };
-                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.BX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 16 };
-                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.BX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16 };
-                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.BX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16 };
-                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.BX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16 };
-                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.CX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 16 };
-                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.CX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16 };
-                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.CX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16 };
-                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.CX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16 };
-                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.DX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 16 };
-                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.DX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16 };
-                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.DX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16 };
-                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.DX, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16 };
-                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.SI, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 16 };
-                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.SI, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16 };
-                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.SI, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16 };
-                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.SI, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16 };
-                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.DI, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 16 };
-                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.DI, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16 };
-                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.DI, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16 };
-                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.DI, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16 };
-                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.SP, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 16 };
-                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.SP, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16 };
-                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.SP, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16 };
-                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.SP, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16 };
-                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.BP, DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 16 };
-                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.BP, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16 };
-                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.BP, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16 };
-                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.BP, DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16 };
+                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationReg = Registers.AX, Size = 16 };
+                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationReg = Registers.BX, Size = 16 };
+                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationReg = Registers.CX, Size = 16 };
+                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationReg = Registers.DX, Size = 16 };
+                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationReg = Registers.SI, Size = 16 };
+                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationReg = Registers.DI, Size = 16 };
+                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationReg = Registers.SP, Size = 16 };
+                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.EAX, SourceIsIndirect = true, DestinationReg = Registers.BP, Size = 16 };
+                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.AX, Size = 16 };
+                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.BX, Size = 16 };
+                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.CX, Size = 16 };
+                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.DX, Size = 16 };
+                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.SI, Size = 16 };
+                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.DI, Size = 16 };
+                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.SP, Size = 16 };
+                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.BP, Size = 16 };
+                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.AX, Size = 16 };
+                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.BX, Size = 16 };
+                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.CX, Size = 16 };
+                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.DX, Size = 16 };
+                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.SI, Size = 16 };
+                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.DI, Size = 16 };
+                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.SP, Size = 16 };
+                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.BP, Size = 16 };
+                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.AX, Size = 16 };
+                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.BX, Size = 16 };
+                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.CX, Size = 16 };
+                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.DX, Size = 16 };
+                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.SI, Size = 16 };
+                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.DI, Size = 16 };
+                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.SP, Size = 16 };
+                new global::Indy.IL2CPU.Assembler.X86.Xchg { SourceReg = Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.BP, Size = 16 };
             }
         }
         static void Main(string[] args) {
@@ -71,7 +71,7 @@ namespace TestApp {
                     xAsm.FlushBinary(xOutput, 0x200000);
                 }
                 
-                //TestCodeGenerator.Execute();
+//                TestCodeGenerator.Execute();
 
                 //InvalidOpcodeTester.Initialize();
                 //InvalidOpcodeTester.ExecuteSingle(typeof(Move), 0);

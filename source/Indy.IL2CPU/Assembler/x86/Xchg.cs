@@ -45,6 +45,15 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 ReverseRegisters=true,
                 DefaultSize = InstructionSize.DWord
             }); // memory with reg
+            aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
+                OpCode = new byte[] { 0x86 },
+                NeedsModRMByte = true,
+                OperandSizeByte = 0,
+                SourceMemory = true,
+                DestinationReg = Guid.Empty,
+                ReverseRegisters = false,
+                DefaultSize = InstructionSize.DWord
+            }); // memory with reg
         }
     }
 }
