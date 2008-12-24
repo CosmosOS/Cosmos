@@ -26,6 +26,14 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                 DestInfo = new Constraints {TestImmediate8=false, TestImmediate32=false, TestImmediate16=false },
                 SourceInfo = new Constraints { }
             });
+            opcodesException.Add(typeof(Call), new ConstraintsContainer{
+                DestInfo=new Constraints{ TestImmediate16=false, TestImmediate8=false, TestMem16=false, TestMem8=false, InvalidRegisters=Registers.Get8BitRegisters().Union(Registers.Get16BitRegisters())},
+                InvalidSizes=Instruction.InstructionSizes.Byte | Instruction.InstructionSizes.Word
+            });
+            opcodesException.Add(typeof(CmpXchg), new ConstraintsContainer {
+                DestInfo = new Constraints { TestImmediate32 = false, TestImmediate16 = false, TestImmediate8 = false },
+                SourceInfo = new Constraints { TestImmediate32 = false, TestImmediate16 = false, TestImmediate8 = false, TestMem8 = false, TestMem16 = false, TestMem32 = false, TestRegisters = true }
+            });
             opcodesException.Add(typeof(ConditionalJump), new ConstraintsContainer {
                 DestInfo = new Constraints { TestImmediate32 = true, TestImmediate16 = false, TestImmediate8 = false, TestMem8 = false, TestMem16 = false, TestMem32 = false, TestRegisters = false }
             });
