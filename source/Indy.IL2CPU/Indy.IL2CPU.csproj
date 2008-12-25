@@ -91,12 +91,11 @@
     <Compile Include="Assembler\IfDefined.cs" />
     <Compile Include="Assembler\IfNotDefined.cs" />
     <Compile Include="Assembler\x86\ConditionalJump.cs" />
+    <Compile Include="Assembler\x86\ConditionalMove.cs" />
     <Compile Include="Assembler\x86\CosmosAssembler.cs" />
     <Compile Include="Assembler\x86\Enums.cs" />
     <Compile Include="Assembler\x86\In.cs" />
     <Compile Include="Assembler\x86\JumpToSegment.cs" />
-    <Compile Include="Assembler\x86\MoveIfBelow.cs" />
-    <Compile Include="Assembler\x86\MoveIfLess.cs" />
     <Compile Include="Assembler\x86\Movs.cs" />
     <Compile Include="Assembler\x86\X\RegisterEBX.cs" />
     <Compile Include="Assembler\x86\_Infra\Extensions.cs" />
@@ -125,8 +124,6 @@
     <Compile Include="Assembler\StackContent.cs" />
     <Compile Include="Assembler\x86\286AndUp\Lgdt.cs" />
     <Compile Include="Assembler\x86\286AndUp\Lidt.cs" />
-    <Compile Include="Assembler\x86\386AndUp\MoveAndSignExtend.cs" />
-    <Compile Include="Assembler\x86\386AndUp\MoveAndZeroExtend.cs" />
     <Compile Include="Assembler\x86\386AndUp\Popad.cs" />
     <Compile Include="Assembler\x86\386AndUp\Popfd.cs" />
     <Compile Include="Assembler\x86\386AndUp\Pushad.cs" />

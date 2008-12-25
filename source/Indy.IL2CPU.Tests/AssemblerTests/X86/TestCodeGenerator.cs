@@ -77,9 +77,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
             if (!aType.IsSubclassOf(typeof(Instruction))) {
                 return;
             }
-            if (aType == typeof(In)) {
-                System.Diagnostics.Debugger.Break();
-            }
             //if (!Instruction.HasEncodingOptions(aType)) {
             //    WriteTestFixtureHeader(aType, aOutput);
             //    {
@@ -93,7 +90,11 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
             //    return;
             //}
             if (aType.IsSubclassOf(typeof(Assembler.X86.InstructionWithDestinationAndSourceAndSize))) {
-                GenerateInstructionWithDestinationAndSourceAndSize(aType, aOutput);
+                if(aType.GetInterfaces().Contains(typeof(IInstructionWithCondition))){
+                    GenerateInstructionWithDestinationAndSourceAndSizeAndCondition(aType, aOutput);
+                }else{
+                    GenerateInstructionWithDestinationAndSourceAndSize(aType, aOutput);
+                }
                 return;
             }
             if (aType.IsSubclassOf(typeof(Assembler.X86.InstructionWithDestinationAndSource))) {
@@ -656,6 +657,68 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                             }
                         }
                         WriteTestMethodFooter(xSourceItem.Key + xDestItem.Key, aOutput);
+                    }
+                }
+            }
+            WriteTestFixtureFooter(aType, aOutput);
+        }
+
+        private static IEnumerable<KeyValuePair<string, string[]>> GetConditionPossibilities(Type aType) {
+            foreach (var xValue in Enum.GetNames(typeof(ConditionalTestEnum))) {
+                yield return new KeyValuePair<string, string[]>("Condition" + xValue, new string[] { "Condition = ConditionalTestEnum." + xValue });
+            }
+        }
+
+        private static void GenerateInstructionWithDestinationAndSourceAndSizeAndCondition(Type aType, StreamWriter aOutput) {
+            WriteTestFixtureHeader(aType, aOutput);
+            {
+                foreach (var xSize in new byte[] { 8, 16, 32 }) {
+                    if (opcodesException.ContainsKey(aType)) {
+                        if ((opcodesException[aType].InvalidSizes & ((Instruction.InstructionSizes)xSize)) == ((Instruction.InstructionSizes)xSize)) {
+                            continue;
+                        }
+                    }
+                    foreach (var xCondition in GetConditionPossibilities(aType)) {
+                        foreach (var xSourceItem in GetSourceWithSizePossibilities(aType, xSize)) {
+                            foreach (var xDestItem in GetDestinationWithSizePossibilities(aType, xSize)) {
+                                if (opcodesException.ContainsKey(aType)) {
+                                    if (!opcodesException[aType].MemToMem) {
+                                        if (xSourceItem.Key.Contains("Memory") && xDestItem.Key.Contains("Memory")) {
+                                            continue;
+                                        }
+                                    }
+                                    if (!opcodesException[aType].ImmediateToImmediate) {
+                                        if (xSourceItem.Key.Contains("Value") && xDestItem.Key.Contains("Value") &&
+                                            !xSourceItem.Key.Contains("IsIndirect") && !xDestItem.Key.Contains("IsIndirect")) {
+                                            continue;
+                                        }
+                                    }
+                                } else {
+                                    // if no exceptions known for this opcode, we dont emit tests for Memory to Memory and Immediate to Immediate
+                                    if (xSourceItem.Key.Contains("Memory") && xDestItem.Key.Contains("Memory")) {
+                                        continue;
+                                    }
+                                    if (xSourceItem.Key.Contains("Immediate") && xDestItem.Key.Contains("Immediate") &&
+                                        !xSourceItem.Key.Contains("IsIndirect") && !xDestItem.Key.Contains("IsIndirect")) {
+                                        continue;
+                                    }
+                                }
+                                if (xSourceItem.Value.Length == 0 || xDestItem.Value.Length == 0 || xCondition.Value.Length == 0) {
+                                    continue;
+                                }
+                                WriteTestMethodHeader(xCondition.Key + xSourceItem.Key + xDestItem.Key + "Size" + xSize, aOutput);
+                                {
+                                    foreach (var xCondLine in xCondition.Value) {
+                                        foreach (var xSourceLine in xSourceItem.Value) {
+                                            foreach (var xLine in xDestItem.Value) {
+                                                aOutput.WriteLine("\t\t\tnew global::{0}{{{1}, {2}, Size = {3}, {4}}};", aType.FullName, xSourceLine, xLine, xSize, xCondLine);
+                                            }
+                                        }
+                                    }
+                                }
+                                WriteTestMethodFooter(xSourceItem.Key + xDestItem.Key + "Size" + xSize, aOutput);
+                            }
+                        }
                     }
                 }
             }

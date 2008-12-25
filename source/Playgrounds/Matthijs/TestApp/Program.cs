@@ -1,4 +1,5 @@
-﻿using System;
+﻿#define GenerateTests
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,11 +13,43 @@ namespace TestApp {
     class Program {
         class Renderer : Y86 {
             public void DoRender() {
-                new global::Indy.IL2CPU.Assembler.X86.In { SourceReg = Registers.DX, DestinationReg = Registers.EAX };
+                new global::Indy.IL2CPU.Assembler.X86.ConditionalMove { SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationReg = Registers.AH, Size = 8, Condition = ConditionalTestEnum.NotGreaterThan };
+                new global::Indy.IL2CPU.Assembler.X86.ConditionalMove { SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationReg = Registers.AL, Size = 8, Condition = ConditionalTestEnum.NotGreaterThan };
+                new global::Indy.IL2CPU.Assembler.X86.ConditionalMove { SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationReg = Registers.BH, Size = 8, Condition = ConditionalTestEnum.NotGreaterThan };
+                new global::Indy.IL2CPU.Assembler.X86.ConditionalMove { SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationReg = Registers.BL, Size = 8, Condition = ConditionalTestEnum.NotGreaterThan };
+                new global::Indy.IL2CPU.Assembler.X86.ConditionalMove { SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationReg = Registers.CH, Size = 8, Condition = ConditionalTestEnum.NotGreaterThan };
+                new global::Indy.IL2CPU.Assembler.X86.ConditionalMove { SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationReg = Registers.CL, Size = 8, Condition = ConditionalTestEnum.NotGreaterThan };
+                new global::Indy.IL2CPU.Assembler.X86.ConditionalMove { SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationReg = Registers.DH, Size = 8, Condition = ConditionalTestEnum.NotGreaterThan };
+                new global::Indy.IL2CPU.Assembler.X86.ConditionalMove { SourceReg = Registers.ESP, SourceIsIndirect = true, DestinationReg = Registers.DL, Size = 8, Condition = ConditionalTestEnum.NotGreaterThan };
+                new global::Indy.IL2CPU.Assembler.X86.ConditionalMove { SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.AH, Size = 8, Condition = ConditionalTestEnum.NotGreaterThan };
+                new global::Indy.IL2CPU.Assembler.X86.ConditionalMove { SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.AL, Size = 8, Condition = ConditionalTestEnum.NotGreaterThan };
+                new global::Indy.IL2CPU.Assembler.X86.ConditionalMove { SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.BH, Size = 8, Condition = ConditionalTestEnum.NotGreaterThan };
+                new global::Indy.IL2CPU.Assembler.X86.ConditionalMove { SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.BL, Size = 8, Condition = ConditionalTestEnum.NotGreaterThan };
+                new global::Indy.IL2CPU.Assembler.X86.ConditionalMove { SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.CH, Size = 8, Condition = ConditionalTestEnum.NotGreaterThan };
+                new global::Indy.IL2CPU.Assembler.X86.ConditionalMove { SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.CL, Size = 8, Condition = ConditionalTestEnum.NotGreaterThan };
+                new global::Indy.IL2CPU.Assembler.X86.ConditionalMove { SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.DH, Size = 8, Condition = ConditionalTestEnum.NotGreaterThan };
+                new global::Indy.IL2CPU.Assembler.X86.ConditionalMove { SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203, DestinationReg = Registers.DL, Size = 8, Condition = ConditionalTestEnum.NotGreaterThan };
+                new global::Indy.IL2CPU.Assembler.X86.ConditionalMove { SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.AH, Size = 8, Condition = ConditionalTestEnum.NotGreaterThan };
+                new global::Indy.IL2CPU.Assembler.X86.ConditionalMove { SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.AL, Size = 8, Condition = ConditionalTestEnum.NotGreaterThan };
+                new global::Indy.IL2CPU.Assembler.X86.ConditionalMove { SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.BH, Size = 8, Condition = ConditionalTestEnum.NotGreaterThan };
+                new global::Indy.IL2CPU.Assembler.X86.ConditionalMove { SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.BL, Size = 8, Condition = ConditionalTestEnum.NotGreaterThan };
+                new global::Indy.IL2CPU.Assembler.X86.ConditionalMove { SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.CH, Size = 8, Condition = ConditionalTestEnum.NotGreaterThan };
+                new global::Indy.IL2CPU.Assembler.X86.ConditionalMove { SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.CL, Size = 8, Condition = ConditionalTestEnum.NotGreaterThan };
+                new global::Indy.IL2CPU.Assembler.X86.ConditionalMove { SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.DH, Size = 8, Condition = ConditionalTestEnum.NotGreaterThan };
+                new global::Indy.IL2CPU.Assembler.X86.ConditionalMove { SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 2030, DestinationReg = Registers.DL, Size = 8, Condition = ConditionalTestEnum.NotGreaterThan };
+                new global::Indy.IL2CPU.Assembler.X86.ConditionalMove { SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.AH, Size = 8, Condition = ConditionalTestEnum.NotGreaterThan };
+                new global::Indy.IL2CPU.Assembler.X86.ConditionalMove { SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.AL, Size = 8, Condition = ConditionalTestEnum.NotGreaterThan };
+                new global::Indy.IL2CPU.Assembler.X86.ConditionalMove { SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.BH, Size = 8, Condition = ConditionalTestEnum.NotGreaterThan };
+                new global::Indy.IL2CPU.Assembler.X86.ConditionalMove { SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.BL, Size = 8, Condition = ConditionalTestEnum.NotGreaterThan };
+                new global::Indy.IL2CPU.Assembler.X86.ConditionalMove { SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.CH, Size = 8, Condition = ConditionalTestEnum.NotGreaterThan };
+                new global::Indy.IL2CPU.Assembler.X86.ConditionalMove { SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.CL, Size = 8, Condition = ConditionalTestEnum.NotGreaterThan };
+                new global::Indy.IL2CPU.Assembler.X86.ConditionalMove { SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.DH, Size = 8, Condition = ConditionalTestEnum.NotGreaterThan };
+                new global::Indy.IL2CPU.Assembler.X86.ConditionalMove { SourceReg = Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 203000, DestinationReg = Registers.DL, Size = 8, Condition = ConditionalTestEnum.NotGreaterThan };
             }
         }
         static void Main(string[] args) {
             try {
+#if !GenerateTests
                 var xAsm = new Assembler();
                 xAsm.Initialize();
                 //xAsm.DataMembers.Add(new Indy.IL2CPU.Assembler.DataMember("TestData", new byte[] { 65, 66, 67, 68, 69, 70, 71, 72, 73, 74 }));
@@ -39,8 +72,9 @@ namespace TestApp {
                                                                             "TheOutput.bin"), FileMode.Create)) {
                     xAsm.FlushBinary(xOutput, 0x200000);
                 }
-                
-//                TestCodeGenerator.Execute();
+#else
+                TestCodeGenerator.Execute();
+#endif
 
                 //InvalidOpcodeTester.Initialize();
                 //InvalidOpcodeTester.ExecuteSingle(typeof(Move), 0);

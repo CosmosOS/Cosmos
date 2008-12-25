@@ -15,7 +15,9 @@ namespace Indy.IL2CPU.Assembler.X86
 			case 32:
 				return "cdq";
 			case 16:
-				return "cwd";
+				return "cwde";
+                case 8:
+                return "cbw";
 			default:
 				throw new NotSupportedException();
 			}
