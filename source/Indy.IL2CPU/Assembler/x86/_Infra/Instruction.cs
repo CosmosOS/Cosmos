@@ -347,88 +347,173 @@ namespace Indy.IL2CPU.Assembler.X86 {
         }
 
         private static bool DetermineSize(Indy.IL2CPU.Assembler.Assembler aAssembler, out ulong aSize, Instruction aInstruction, IInstructionWithDestination aInstructionWithDestination, IInstructionWithSize aInstructionWithSize, IInstructionWithSource aInstructionWithSource, InstructionData aInstructionData, InstructionData.InstructionEncodingOption aEncodingOption) {
-            if (aInstructionData.EncodingOptions.Count == 1 &&
-                aInstructionWithDestination == null && aInstructionWithSize == null && aInstructionWithSource == null) {
-                aSize = (ulong)aEncodingOption.OpCode.LongLength;
-                return true;
-            }
-            if (aInstructionWithSize != null) {
-                if (aInstructionWithSize.Size == 0) {
-                    aInstructionWithSize.Size = (byte)aEncodingOption.DefaultSize;
-                }
-            }
-            aSize = (ulong)aEncodingOption.OpCode.Length;
+            aSize = 0;
             var xInstrWithPrefixes = aInstruction as IInstructionWithPrefix;
             if (xInstrWithPrefixes != null) {
                 if ((xInstrWithPrefixes.Prefixes & InstructionPrefixes.Repeat) != 0) {
                     aSize++;
                 }
                 if ((xInstrWithPrefixes.Prefixes & InstructionPrefixes.Lock) != 0) {
+                    throw new NotImplementedException();
+                }
+            }
+            if (aInstructionWithSize != null) {
+                if (aEncodingOption.DefaultSize == InstructionSize.DWord && aInstructionWithSize.Size == 16) {
+                    aSize++;
+                }
+                if (aEncodingOption.DefaultSize == InstructionSize.Word && aInstructionWithSize.Size == 32) {
+                    aSize++;
+                }
+                if (aEncodingOption.DefaultSize == InstructionSize.Byte && aInstructionWithSize.Size == 16) {
                     aSize++;
                 }
             }
+            aSize += (ulong)aEncodingOption.OpCode.LongLength;
+            #region ModRM byte
             if (aEncodingOption.NeedsModRMByte) {
-                aSize += 1;
-                bool xSIB = false;
-                if (aInstructionWithDestination != null &&
-                    (((aInstructionWithDestination.DestinationReg == Registers.EBP || aInstructionWithDestination.DestinationReg == Registers.ESP) && aInstructionWithDestination.DestinationIsIndirect && aInstructionWithDestination.DestinationDisplacement==0) /*||
-                     aInstructionWithDestination.DestinationReg == Registers.ESP*/
-                                                                                  )) {
-                    aSize++;
-                    xSIB = true;
-                } else {
-                    if (aInstructionWithDestination != null && (aInstructionWithDestination.DestinationReg == Registers.ESP || aInstructionWithDestination.DestinationReg == Registers.EBP) && aInstructionWithDestination.DestinationIsIndirect && aInstructionWithDestination.DestinationDisplacement == 0) {
-                        aSize++;
-                        xSIB = true;
-                    } else {
-                        if (aInstructionWithSource != null &&
-                            ((((aInstructionWithSource.SourceReg == Registers.ESP || aInstructionWithSource.SourceReg == Registers.EBP) && aInstructionWithSource.SourceIsIndirect/* && aInstructionWithSource.SourceDisplacement==0*/)))) {
-                            aSize++;
-                            xSIB = true;
-                        } else {
-                            if (aInstructionWithDestination != null && (aInstructionWithDestination.DestinationReg == Registers.ESP/* || aInstructionWithDestination.DestinationReg == Registers.EBP*/) && aInstructionWithDestination.DestinationIsIndirect) {
+                aSize++;
+                if (aInstructionWithDestination != null) {
+                    byte? xSIB = null;
+                    if (!(aInstructionWithSource != null && aInstructionWithSource.SourceReg != Guid.Empty)) {
+                        if (aInstructionWithDestination.DestinationReg != Guid.Empty) {
+                            if (aInstructionWithDestination.DestinationReg == Registers.ESP && aInstructionWithDestination.DestinationIsIndirect && aInstructionWithDestination.DestinationDisplacement == 0) {
+                                xSIB = 0x24;
+                            }
+                        }
+                    }
+                    if (aInstructionWithDestination.DestinationIsIndirect) {
+                        if (((aInstructionWithDestination.DestinationReg == Registers.EBP || aInstructionWithDestination.DestinationReg == Registers.ESP) && (aInstructionWithDestination.DestinationIsIndirect) && aInstructionWithDestination.DestinationDisplacement == 0)) {
+                            if (aInstructionWithDestination.DestinationReg == Registers.EBP) {
+                                xSIB = 0;
+                            }
+                            if (aInstructionWithDestination.DestinationReg == Registers.ESP) {
                                 aSize++;
-                                xSIB = true;
+                                xSIB = 0x24;
+                            }
+                        } else {
+                            bool xHandled = false;
+                            if (!(aInstructionWithSource != null &&
+                                ((aInstructionWithSource.SourceReg == Registers.EBP && !(aInstructionWithSource.SourceReg != Guid.Empty && aInstructionWithSource.SourceIsIndirect)) ||
+                                 aInstructionWithSource.SourceReg == Registers.ESP))
+                                ) {
+                                if (aInstructionWithDestination.DestinationValue != null && aInstructionWithDestination.DestinationReg != Guid.Empty) {
+                                    aSize += 4;
+                                    xHandled = true;
+                                }
+                            }
+                            if (!xHandled && aInstructionWithDestination != null && aInstructionWithSource != null &&
+                                    aInstructionWithDestination.DestinationValue.HasValue && aInstructionWithDestination.DestinationIsIndirect &&
+                                    aInstructionWithSource.SourceReg != Guid.Empty && !aInstructionWithSource.SourceIsIndirect) {
+                                aSize+= 4;
+                                xHandled = true;
+                            }
+                            if (!xHandled && aInstructionWithSource == null && aInstructionWithDestination.DestinationValue.HasValue) {
+                                aSize+= 4;
+                                xHandled = true;
+                            }
+                            if (!xHandled && aInstructionWithSource != null && aInstructionWithDestination.DestinationValue.HasValue &&
+                                aInstructionWithDestination.DestinationIsIndirect && aInstructionWithSource.SourceValue.HasValue && !aInstructionWithSource.SourceIsIndirect) {
+                                aSize += 4;
+                                xHandled = true;
                             }
                         }
                     }
-                }
-                if (aInstructionWithDestination != null && aInstructionWithDestination.DestinationIsIndirect && aInstructionWithDestination.DestinationDisplacement > 0) {
-                    if (aInstructionWithDestination.DestinationDisplacement < 128) {
-                        aSize += 1; // for now use 16bit displacement
+
+                    if (aInstructionWithSource != null && aInstructionWithSource.SourceIsIndirect) {
+                        //xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= EncodeRegister(aInstructionWithSource.SourceReg);
+                        if (((aInstructionWithSource.SourceReg == Registers.EBP || aInstructionWithSource.SourceReg == Registers.ESP) && (aInstructionWithSource.SourceIsIndirect))) {
+                            if (aInstructionWithSource.SourceReg == Registers.EBP && aInstructionWithSource.SourceDisplacement == 0) {
+                                aSize++;
+                                xSIB = 0;
+                            }
+                            if (aInstructionWithSource.SourceReg == Registers.ESP) {
+                                aSize++;
+                                xSIB = 0x24;
+                            }
+                        } else {
+                            if (!(aInstructionWithSource != null &&
+                                ((aInstructionWithSource.SourceReg == Registers.EBP && !(aInstructionWithSource.SourceReg != Guid.Empty && aInstructionWithSource.SourceIsIndirect)) ||
+                                 aInstructionWithSource.SourceReg == Registers.ESP)) && (aInstructionWithSource.SourceReg == Guid.Empty && aInstructionWithSource.SourceIsIndirect)) {
+                                aSize+= 4;
+                            }
+                        }
+                    }
+
+                    if (aInstructionWithDestination != null && aInstructionWithDestination.DestinationReg == Registers.EBP && aInstructionWithDestination.DestinationIsIndirect && aInstructionWithDestination.DestinationDisplacement == 0) {
+                        aSize++;
+                    }
+                    if (aInstructionWithDestination.DestinationReg != Guid.Empty && aInstructionWithDestination.DestinationIsIndirect &&
+                        aInstructionWithDestination.DestinationDisplacement > 0) {
+                        var xSIBOffset = 0;
+                        if (aInstructionWithDestination.DestinationReg == Registers.ESP) {
+                            xSIB = 0x24;
+                        }
+                        if (xSIB != null) {
+                            //xExtraOffset++;
+                            aSize++;
+                            xSIB = null;
+                        }
+                        //xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= 3 << 6;
+                        // todo: optimize for different displacement sizes
+                        if (aInstructionWithDestination.DestinationDisplacement < 128) {
+                            aSize++;                            
+                        } else {
+                            aSize += 4;
+                        }
                     } else {
-                        if (aInstructionWithDestination.DestinationDisplacement <= Int16.MaxValue) {
-                            aSize += 4;
-                        } else {
-                            aSize += 4;
+                        if (aInstructionWithDestination.DestinationReg == Registers.ESP && aInstructionWithDestination.DestinationIsIndirect &&
+                            aInstructionWithDestination.DestinationDisplacement == 0 && aInstructionWithSource == null) {
+                            //aSize++;
                         }
                     }
-                    if (xSIB) {
-                        // aSize -= 1;
-                    }
-                }
-                if (aInstructionWithSource != null && aInstructionWithSource.SourceIsIndirect) {
-                    if (aInstructionWithSource.SourceReg == Registers.EBP && aInstructionWithSource.SourceDisplacement > 0) {
-                        aSize--;
-                    }
-                    if (aInstructionWithSource.SourceDisplacement > 0) {
+
+                    if (aInstructionWithSource != null && aInstructionWithSource.SourceReg != Guid.Empty && aInstructionWithSource.SourceIsIndirect && aInstructionWithSource.SourceDisplacement > 0) {
+                        var xSIBOffset = 0;
+                        if (aInstructionWithSource.SourceReg == Registers.ESP) {
+                            xSIB = 0x24;
+                        }
+                        if (xSIB != null) {
+                            //aSize++;
+                            xSIB = null;
+                        }
                         if (aInstructionWithSource.SourceDisplacement < 128) {
-                            aSize += 1; // for now use 8bit displacement
+                            aSize+= 1;
                         } else {
-                            if (aInstructionWithSource.SourceDisplacement <= Int16.MaxValue) {
-                                aSize += 4;
-                            } else {
-                                aSize += 4;
+                            aSize+= 4;
+                        }
+                        //}
+                        if (xSIB != null) {
+                            aSize++;
+                        }
+                    } else {
+                        if (aInstructionWithSource != null) {
+                            if (xSIB != null) {
+                                //xExtraOffset++;
+                                //aSize++;
+                                // todo: nie tnodig?
                             }
                         }
                     }
-                    if (xSIB) {
-                        // aSize -= 1;
-                    }
                 }
+                //EncodeModRMByte(aInstruction.DestinationReg, aInstruction.DestinationIsIndirect, aInstruction.DestinationDisplacement > 0, aInstruction.DestinationDisplacement > 255, out xSIB);
+            } else {
+                //if (aInstructionWithDestination != null) {
+                //    if (aEncodingOption.DestinationRegByte.HasValue) {
+                //        xBuffer[xExtraOffset + aEncodingOption.DestinationRegByte.Value] |= (byte)(EncodeRegister(aInstructionWithDestination.DestinationReg) << aEncodingOption.DestinationRegBitShiftLeft);
+                //    }
+                //}
+                //if (aInstructionWithSource != null) {
+                //    if (aEncodingOption.SourceRegByte.HasValue && aEncodingOption.SourceRegByte.Value > -1) {
+                //        xBuffer[xExtraOffset + aEncodingOption.SourceRegByte.Value] |= (byte)(EncodeRegister(aInstructionWithSource.SourceReg) << aEncodingOption.SourceRegBitShiftLeft);
+                //    }
+                //}
             }
+#endregion ModRM byte
             if (aInstructionWithDestination != null) {
                 if (aInstructionWithDestination.DestinationValue.HasValue && !aInstructionWithDestination.DestinationIsIndirect) {
+                    if (aEncodingOption.NeedsModRMByte) {
+                        //aSize++;
+                    }
                     var xInstrSize = 0;
                     if (aInstructionWithSize != null) {
                         xInstrSize = aInstructionWithSize.Size / 8;
@@ -440,54 +525,74 @@ namespace Indy.IL2CPU.Assembler.X86 {
                         xInstrSize = ((byte)aEncodingOption.DestinationImmediateSize) / 8;
                     }
                     aSize += (ulong)xInstrSize;
-                }
-            }
-            if(aInstructionWithSource != null){
-                if (aInstructionWithSource.SourceIsIndirect) {
-                    if (aInstructionWithSource.SourceValue.HasValue) {
-                        aSize += 4;
+                } else {
+                    if (aInstructionWithDestination.DestinationValue.HasValue && !aInstructionWithDestination.DestinationIsIndirect) {
+                        int xInstrSize = 0;
+                        if (aInstructionWithSize != null) {
+                            xInstrSize = aInstructionWithSize.Size / 8;
+                        } else {
+                            //                        throw new NotImplementedException("size not known");
+                            xInstrSize = (int)aEncodingOption.DefaultSize / 8;
+                        }
+                        if (aEncodingOption.DestinationImmediateSize != InstructionSize.None) {
+                            xInstrSize = ((byte)aEncodingOption.DestinationImmediateSize) / 8;
+                        }
+                        aSize += (ulong)xInstrSize;
+                    }
+                    if (aInstructionWithDestination.DestinationValue.HasValue && aInstructionWithDestination.DestinationIsIndirect && aEncodingOption.DestinationMemory && !aEncodingOption.NeedsModRMByte) {
+                        int xInstrSize = 0;
+                        if (aInstructionWithSize != null) {
+                            xInstrSize = aInstructionWithSize.Size / 8;
+                        } else {
+                            //                        throw new NotImplementedException("size not known");
+                            xInstrSize = (int)aEncodingOption.DefaultSize / 8;
+                        }
+                        if (aEncodingOption.DestinationImmediateSize != InstructionSize.None) {
+                            xInstrSize = ((byte)aEncodingOption.DestinationImmediateSize) / 8;
+                        }
+                        aSize += (ulong)xInstrSize;
                     }
                 }
             }
-            //if (aInstructionWithDestination != null && aInstructionWithSize != null) {
-            //    if (aInstructionWithDestination.DestinationValue.HasValue && !aInstructionWithDestination.DestinationIsIndirect) {
-            //        var xSize = aInstructionWithSize.Size;
-            //        if(aEncodingOption.DestinationImmediateSize!=InstructionSize.None) {
-            //            xSize = (byte)aEncodingOption.DestinationImmediateSize;
-            //        }
-            //        aSize += (ulong)xSize / 8;
-            //    }
-            //}
-            if (aInstructionWithDestination != null && aInstructionWithDestination.DestinationRef != null) {
-                aSize += 4;
-            }
-            if (aInstructionWithSource != null && aInstructionWithSource.SourceValue.HasValue && !aInstructionWithSource.SourceIsIndirect) {
-                var xInstrSize = 0;
-                if (aInstructionWithSize != null) {
-                    xInstrSize = aInstructionWithSize.Size / 8;
-                } else {
-                    //                        throw new NotImplementedException("size not known");
-                    xInstrSize = (int)aEncodingOption.DefaultSize / 8;
+            // todo: add more options
+            if (aInstructionWithSource != null) {
+                if (aInstructionWithSource.SourceValue.HasValue && !aInstructionWithSource.SourceIsIndirect) {
+                    if (aEncodingOption.NeedsModRMByte) {
+                        //aSize++;
+                        // todo: niet nodig?
+                    }
+                    int xInstrSize = 0;
+                    if (aInstructionWithSize != null) {
+                        xInstrSize = aInstructionWithSize.Size / 8;
+                    } else {
+                        //                        throw new NotImplementedException("size not known");
+                        xInstrSize = (int)aEncodingOption.DefaultSize / 8;
+                    }
+                    if (aEncodingOption.SourceImmediateSize != InstructionSize.None) {
+                        xInstrSize = ((byte)aEncodingOption.SourceImmediateSize) / 8;
+                    }
+                    aSize += (ulong)xInstrSize;
                 }
-                if (aEncodingOption.SourceImmediateSize != InstructionSize.None) {
-                    xInstrSize = ((byte)aEncodingOption.SourceImmediateSize) / 8;
+                if (aInstructionWithSource.SourceValue.HasValue && aInstructionWithSource.SourceIsIndirect && aEncodingOption.SourceMemory && !aEncodingOption.NeedsModRMByte) {
+                    int xInstrSize = 0;
+                    if (aInstructionWithSize != null) {
+                        xInstrSize = aInstructionWithSize.Size / 8;
+                    } else {
+                        //                        throw new NotImplementedException("size not known");
+                        xInstrSize = (int)aEncodingOption.DefaultSize / 8;
+                    }
+                    if (aEncodingOption.SourceImmediateSize != InstructionSize.None) {
+                        xInstrSize = ((byte)aEncodingOption.SourceImmediateSize) / 8;
+                    }
+                    aSize += (ulong)xInstrSize;
                 }
-                aSize += (ulong)xInstrSize;
             }
-            if (aInstructionWithSource != null && aInstructionWithSource.SourceRef != null) {
-                aSize += 4;
-            }
-            if (aInstructionWithDestination != null && (aInstructionWithDestination.DestinationValue.HasValue && !(aInstructionWithDestination.DestinationIsIndirect && aInstructionWithDestination.DestinationDisplacement > 0) && aInstructionWithDestination.DestinationIsIndirect)) {
-                aSize += (ulong)aEncodingOption.DefaultSize / 8;
-            }
-            if (aEncodingOption.DefaultSize == InstructionSize.DWord && aInstructionWithSize != null && aInstructionWithSize.Size == 16) {
-                aSize += 1;
-            }
-            if (aEncodingOption.DefaultSize == InstructionSize.Word && aInstructionWithSize != null && aInstructionWithSize.Size == 32) {
-                aSize += 1;
-            }
-            if (aEncodingOption.DefaultSize == InstructionSize.Byte && aInstructionWithSize.Size == 16) {
-                aSize++;
+            if (aInstructionWithSize != null) {
+                if (aEncodingOption.OperandSizeByte.HasValue) {
+                    if (aInstructionWithSize.Size != 8) {
+//                        xBuffer[aEncodingOption.OperandSizeByte.Value + xOpCodeOffset] |= (byte)(1 << aEncodingOption.OperandSizeBitShiftLeft);
+                    }
+                }
             }
             aInstruction.mDataSize = aSize;
             return true;

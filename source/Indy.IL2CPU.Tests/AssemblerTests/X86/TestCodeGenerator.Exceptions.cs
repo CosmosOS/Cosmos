@@ -89,6 +89,9 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                 DestInfo = new Constraints { TestImmediate16 = false, TestImmediate32 = false, TestImmediate8 = false, TestRegisters = false },
                 SourceInfo = new Constraints { TestImmediate16 = false, TestImmediate32 = false, TestImmediate8 = false, TestRegisters = false }
             });
+            opcodesException.Add(typeof(Multiply), new ConstraintsContainer {
+                DestInfo = new Constraints { TestImmediate16 = false, TestImmediate32 = false, TestImmediate8 = false, TestCR = false, TestSegments = false }
+            });
             opcodesException.Add(typeof(Neg), new ConstraintsContainer {
                 DestInfo = new Constraints { TestImmediate16 = false, TestImmediate32 = false, TestImmediate8 = false, TestCR = false, TestSegments = false }
             });

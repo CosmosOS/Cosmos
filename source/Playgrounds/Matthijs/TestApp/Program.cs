@@ -13,9 +13,11 @@ namespace TestApp {
     class Program {
         class Renderer : Y86 {
             public void DoRender() {
-                new Movs { Prefixes = InstructionPrefixes.None, Size = 32 };
-                new Movs { Prefixes = InstructionPrefixes.None, Size = 16 };
-                new Movs { Prefixes = InstructionPrefixes.None, Size = 8 };
+                new global::Indy.IL2CPU.Assembler.X86.Multiply { DestinationReg = Registers.EAX, DestinationIsIndirect = true, Size = 16 };
+                new global::Indy.IL2CPU.Assembler.X86.Multiply { DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203, Size = 16 };
+                new global::Indy.IL2CPU.Assembler.X86.Multiply { DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 2030, Size = 16 };
+                new global::Indy.IL2CPU.Assembler.X86.Multiply { DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 203000, Size = 16 };
+
             }
         }
         static void Main(string[] args) {
