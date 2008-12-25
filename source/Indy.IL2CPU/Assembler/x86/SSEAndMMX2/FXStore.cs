@@ -12,7 +12,8 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 OpCode = new byte[] { 0x0F, 0xAE },
                 NeedsModRMByte=true,
                 InitialModRMByteValue=0x08,
-                DestinationMemory = true
+                DestinationMemory = true,
+                ReverseRegisters=true
             });
         }
 	}

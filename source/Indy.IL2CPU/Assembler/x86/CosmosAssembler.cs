@@ -53,25 +53,25 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 // 9600 baud, 8 databits, no parity, 1 stopbit
                 new Move { DestinationReg = Registers.DX, SourceValue = (uint)xComAddr + 1 };
                 new Move { DestinationReg = Registers.AL, SourceValue = 0 };
-                new Out { DestinationReg = Registers.DX, SourceReg = Registers.AL }; // disable interrupts for serial stuff
+                new Out { DestinationReg = Registers.AL }; // disable interrupts for serial stuff
                 new Move { DestinationReg = Registers.DX, SourceValue = (uint)xComAddr + 3 };
                 new Move { DestinationReg = Registers.AL, SourceValue = 0x80 };
-                new Out { DestinationReg = Registers.DX, SourceReg = Registers.AL }; // Enable DLAB (set baud rate divisor)
+                new Out { DestinationReg =Registers.AL }; // Enable DLAB (set baud rate divisor)
                 new Move { DestinationReg = Registers.DX, SourceValue = (uint)xComAddr };
                 new Move { DestinationReg = Registers.AL, SourceValue = 0xC };
-                new Out { DestinationReg = Registers.DX, SourceReg = Registers.AL }; // Set divisor (lo byte)
+                new Out { DestinationReg = Registers.AL }; // Set divisor (lo byte)
                 new Move { DestinationReg = Registers.DX, SourceValue = (uint)xComAddr + 1 };
                 new Move { DestinationReg = Registers.AL, SourceValue = 0x0 };
-                new Out { DestinationReg = Registers.DX, SourceReg = Registers.AL }; //			  (hi byte)
+                new Out { DestinationReg =Registers.AL }; //			  (hi byte)
                 new Move { DestinationReg = Registers.DX, SourceValue = (uint)xComAddr + 3 };
                 new Move { DestinationReg = Registers.AL, SourceValue = 0x3 };
-                new Out { DestinationReg = Registers.DX, SourceReg = Registers.AL }; // 8 bits, no parity, one stop bit
+                new Out { DestinationReg =Registers.AL }; // 8 bits, no parity, one stop bit
                 new Move { DestinationReg = Registers.DX, SourceValue = (uint)xComAddr + 2 };
                 new Move { DestinationReg = Registers.AL, SourceValue = 0xC7 };
-                new Out { DestinationReg = Registers.DX, SourceReg = Registers.AL }; // Enable FIFO, clear them, with 14-byte threshold
+                new Out { DestinationReg =Registers.AL }; // Enable FIFO, clear them, with 14-byte threshold
                 new Move { DestinationReg = Registers.DX, SourceValue = (uint)xComAddr + 4 };
                 new Move { DestinationReg = Registers.AL, SourceValue = 0x3 };
-                new Out { DestinationReg = Registers.DX, SourceReg = Registers.AL }; // IRQ-s enabled, RTS/DSR set
+                new Out { DestinationReg =Registers.AL }; // IRQ-s enabled, RTS/DSR set
             }
 
             // SSE init

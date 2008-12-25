@@ -161,7 +161,7 @@
     <Compile Include="Assembler\x86\Pop.cs" />
     <Compile Include="Assembler\x86\Push.cs" />
     <Compile Include="Assembler\x86\Registers.cs" />
-    <Compile Include="Assembler\x86\RepeatStos.cs" />
+    <Compile Include="Assembler\x86\Stos.cs" />
     <Compile Include="Assembler\x86\Return.cs" />
     <Compile Include="Assembler\x86\RotateThroughCarryRight.cs" />
     <Compile Include="Assembler\x86\SetInterruptFlag.cs" />

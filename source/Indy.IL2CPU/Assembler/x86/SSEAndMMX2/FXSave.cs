@@ -10,7 +10,8 @@ namespace Indy.IL2CPU.Assembler.X86 {
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0x0F, 0xAE },
                 NeedsModRMByte = true,
-                DestinationMemory = true
+                DestinationMemory = true,
+                ReverseRegisters=true
             });
         }
 	}

@@ -6,7 +6,7 @@ using System.Text;
 namespace Indy.IL2CPU.Assembler.X86 {
     public abstract class InstructionWithDestinationAndSourceAndSize : InstructionWithDestinationAndSource, IInstructionWithSize {
         // todo: do all instructions with two operands have a size?
-        private byte mSize;
+        protected byte mSize;
         public byte Size {
             get{
                 DetermineSize();
@@ -19,7 +19,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             }
         }
 
-        private void DetermineSize() {
+        protected virtual void DetermineSize() {
             if (mSize == 0) {
                 if (DestinationReg != Guid.Empty && !DestinationIsIndirect) {
                     if (Registers.Is16Bit(DestinationReg)) {

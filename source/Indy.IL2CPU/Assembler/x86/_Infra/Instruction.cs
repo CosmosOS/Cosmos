@@ -198,6 +198,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                         continue;
                     }
                 }
+#region Check Destination
                 if (aInstructionWithDestination != null) {
                     if (!(((xEncodingOption.DestinationMemory || xEncodingOption.DestinationReg.HasValue) && (aInstructionWithDestination.DestinationReg != Guid.Empty || aInstructionWithDestination.DestinationValue.HasValue)) ||
                          (!(xEncodingOption.DestinationMemory || xEncodingOption.DestinationReg.HasValue) && aInstructionWithDestination.DestinationReg == Guid.Empty && aInstructionWithDestination.DestinationValue.HasValue))) {
@@ -270,8 +271,9 @@ namespace Indy.IL2CPU.Assembler.X86 {
                     //    )) {
                     //    continue;
                     //}
-
                 }
+#endregion Check Destination
+#region Check Source
                 if (aInstructionWithSource != null) {
                     if (!(((xEncodingOption.SourceMemory || xEncodingOption.SourceReg.HasValue) && (aInstructionWithSource.SourceReg != Guid.Empty || aInstructionWithSource.SourceValue.HasValue)) ||
                          (!(xEncodingOption.SourceMemory || xEncodingOption.SourceReg.HasValue) && aInstructionWithSource.SourceReg == Guid.Empty && aInstructionWithSource.SourceValue.HasValue))) {
@@ -337,6 +339,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                         }
                     }
                 }
+#endregion
                 aEncodingOption = xEncodingOption;
                 break;
             }

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
     [OpCode("stos")]
-    public class RepeatStos : InstructionWithSize, IInstructionWithPrefix {
+    public class Stos : InstructionWithSize, IInstructionWithPrefix {
         public static void InitializeEncodingData(Instruction.InstructionData aData) {
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0xAA },
@@ -21,9 +21,9 @@ namespace Indy.IL2CPU.Assembler.X86 {
 
         public override string ToString() {
             var xPref = "";
-            //if ((Prefixes & InstructionPrefixes.Repeat) != 0) {
+            if ((Prefixes & InstructionPrefixes.Repeat) != 0) {
                 xPref = "rep ";
-            //} Doku: looking for the prefix seems not to work correctly.
+            }
             switch (Size) {
                 case 32:
                     return xPref + "stosd";

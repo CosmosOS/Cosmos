@@ -21,13 +21,13 @@ namespace Indy.IL2CPU.Assembler.X86.X {
             return Instance;
         }
 
-        public static implicit operator RegisterAL(PortNumber aValue) {
-            new X86.In { DestinationReg = Registers.AL, SourceReg = aValue.Register, DestinationValue = aValue.Port };
+        public static implicit operator RegisterAL(MemoryAction aAction) {
+            Instance.Move(aAction);
             return Instance;
         }
 
-        public static implicit operator RegisterAL(MemoryAction aAction) {
-            Instance.Move(aAction);
+        public static implicit operator RegisterAL(PortNumber aPort) {
+            new X86.In { DestinationReg = Registers.AL };
             return Instance;
         }
 

@@ -22,7 +22,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
             new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Below, DestinationLabel = ".step3" };
 			new CPUx86.StoreWordInString();
 			new CPUAll.Label(".step3");
-			new CPUx86.RepeatStos{Size=32};						
+			new CPUx86.Stos{Size=32, Prefixes=InstructionPrefixes.Repeat};
 		}
 	}
 }

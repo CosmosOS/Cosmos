@@ -389,7 +389,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                 yield return new KeyValuePair<string, string[]>("32BitMemoryAddressDestination",
                     new string[] { "DestinationValue = 650000, DestinationIsIndirect = true" });
             }
-            if (!opcodesException.ContainsKey(aType) || opcodesException[aType].DestInfo.TestRegisters) {
+            if (!opcodesException.ContainsKey(aType) || opcodesException[aType].DestInfo.TestMem32) {
                 var xRegistersToSkip = new List<Guid>();
                 if (opcodesException.ContainsKey(aType) && opcodesException[aType].DestInfo.InvalidRegisters != null) {
                     xRegistersToSkip.AddRange(opcodesException[aType].DestInfo.InvalidRegisters);
@@ -416,6 +416,8 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                             String.Format("DestinationReg = Registers.{0}, DestinationIsIndirect=true, DestinationDisplacement = 203000", Registers.GetRegisterName(xReg))});
                     }
                 }
+            }
+            if(!opcodesException.ContainsKey(aType) || opcodesException[aType].DestInfo.TestRegisters) {
                 var xItems = new List<string>();
                 foreach (Guid register in Registers.GetRegisters()) {
                     if (!aType.Namespace.Contains("SSE") && (Registers.getXMMs().Contains(register)))
@@ -429,9 +431,12 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                     if (Registers.IsSegment(register) && !(opcodesException.ContainsKey(aType) && opcodesException[aType].DestInfo.TestSegments)) {
                         continue;
                     }
-                    if (Registers.GetSize(register) == 32) {
-                        xItems.Add("DestinationReg = Registers." + Registers.GetRegisterName(register));
+                    if (!opcodesException.ContainsKey(aType) || opcodesException[aType].DestInfo.InvalidRegisters.Count() == 0) {
+                        if (Registers.GetSize(register) != 32) {
+                            continue;
+                        }
                     }
+                    xItems.Add("DestinationReg = Registers." + Registers.GetRegisterName(register));
                 }
                 if (xItems.Count > 0) {
                     yield return new KeyValuePair<string, string[]>("RegisterDestination",
@@ -454,7 +459,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                 yield return new KeyValuePair<string, string[]>("32BitMemoryAddressSource",
                     new string[] { "SourceValue = 650000, SourceIsIndirect = true" });
             }
-            if (!opcodesException.ContainsKey(aType) || opcodesException[aType].SourceInfo.TestRegisters) {
+            if (!opcodesException.ContainsKey(aType) || opcodesException[aType].SourceInfo.TestMem32) {
                 var xRegistersToSkip = new List<Guid>();
                 if (opcodesException.ContainsKey(aType) && opcodesException[aType].SourceInfo.InvalidRegisters != null) {
                     xRegistersToSkip.AddRange(opcodesException[aType].SourceInfo.InvalidRegisters);
@@ -481,6 +486,8 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                             String.Format("SourceReg = Registers.{0}, SourceIsIndirect=true, SourceDisplacement = 203000", Registers.GetRegisterName(xReg))});
                     }
                 }
+            }
+            if(!opcodesException.ContainsKey(aType) || opcodesException[aType].SourceInfo.TestRegisters) {
                 var xItems = new List<string>();
                 foreach (Guid register in Registers.GetRegisters()) {
                     if (!aType.Namespace.Contains("SSE") && (Registers.getXMMs().Contains(register)))
@@ -493,6 +500,11 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                         continue;
                     if (Registers.IsSegment(register) && !(opcodesException.ContainsKey(aType) && opcodesException[aType].SourceInfo.TestSegments)) {
                         continue;
+                    }
+                    if (!opcodesException.ContainsKey(aType) || opcodesException[aType].SourceInfo.InvalidRegisters.Count() == 0) {
+                        if (Registers.GetSize(register) != 32) {
+                            continue;
+                        }
                     }
                     xItems.Add("SourceReg = Registers." + Registers.GetRegisterName(register));
                 }
@@ -678,6 +690,9 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
         private static void GenerateInstructionWithDestinationAndSource(Type aType, StreamWriter aOutput) {
             WriteTestFixtureHeader(aType, aOutput);
             {
+                if (aType == typeof(Out)) {
+                    System.Diagnostics.Debugger.Break();
+                }
                 foreach (var xSourceItem in GetSourcePossibilities(aType)) {
                     foreach (var xDestItem in GetDestinationPossibilities(aType)) {
                         if (opcodesException.ContainsKey(aType)) {
