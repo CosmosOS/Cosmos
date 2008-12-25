@@ -14,6 +14,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
             public Instruction.InstructionSizes InvalidSizes = Instruction.InstructionSizes.None;
             public bool MemToMem = false;
             public bool ImmediateToImmediate = false;
+            public InstructionPrefixes ValidPrefixes = InstructionPrefixes.None;
         }
 
         public class TestState {
@@ -90,9 +91,9 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
             //    return;
             //}
             if (aType.IsSubclassOf(typeof(Assembler.X86.InstructionWithDestinationAndSourceAndSize))) {
-                if(aType.GetInterfaces().Contains(typeof(IInstructionWithCondition))){
+                if (aType.GetInterfaces().Contains(typeof(IInstructionWithCondition))) {
                     GenerateInstructionWithDestinationAndSourceAndSizeAndCondition(aType, aOutput);
-                }else{
+                } else {
                     GenerateInstructionWithDestinationAndSourceAndSize(aType, aOutput);
                 }
                 return;
@@ -113,8 +114,12 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                 return;
             }
             if (aType.IsSubclassOf(typeof(Assembler.X86.InstructionWithSize))) {
-                GenerateInstructionWithSize(aType,
-                                        aOutput);
+                if (aType.GetInterfaces().Contains(typeof(IInstructionWithPrefix))) {
+                    GenerateInstructionWithSizeAndPrefixes(aType, aOutput);
+                } else {
+                    GenerateInstructionWithSize(aType,
+                                                aOutput);
+                }
                 return;
             }
             if (aType.IsSubclassOf(typeof(Assembler.X86.Instruction))) {
@@ -152,6 +157,60 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                     aOutput.WriteLine("\t\t\tnew global::{0}();", aType.FullName);
                 }
                 WriteTestMethodFooter("Instruction", aOutput);
+            }
+            WriteTestFixtureFooter(aType, aOutput);
+        }
+
+        // todo: prefixes should be combined too. 
+        private static IEnumerable<KeyValuePair<string, string[]>> GetPrefixPossibilities(Type aType) {
+            if (!opcodesException.ContainsKey(aType) || opcodesException[aType].ValidPrefixes == InstructionPrefixes.None) {
+                yield return new KeyValuePair<string, string[]>("PrefixNone", new[] { "Prefixes = InstructionPrefixes.None" });
+                yield break;
+            }
+            var xResult = new List<string>();
+            foreach (InstructionPrefixes xValue in Enum.GetValues(typeof(InstructionPrefixes))) {
+                if ((opcodesException[aType].ValidPrefixes & xValue) == xValue) {
+                    yield return new KeyValuePair<string, string[]>("Prefix" + xValue.ToString(), new[] { "Prefixes = InstructionPrefixes." + xValue.ToString() });
+                }
+            }
+        }
+
+        private static void GenerateInstructionWithSizeAndPrefixes(Type aType, StreamWriter aOutput) {
+            ConstraintsContainer xInfo = null;
+            if (opcodesException.ContainsKey(aType)) {
+                xInfo = opcodesException[aType];
+            }
+            WriteTestFixtureHeader(aType, aOutput);
+            {
+                foreach (var xPrefix in GetPrefixPossibilities(aType)) {
+                    if (!(xInfo != null && ((xInfo.InvalidSizes & Instruction.InstructionSizes.DWord) != 0))) {
+                        WriteTestMethodHeader(xPrefix.Key + "InstructionSize32", aOutput);
+                        {
+                            foreach (var xPrefixLine in xPrefix.Value) {
+                                aOutput.WriteLine("\t\t\tnew global::{0}{{Size = 32, {1}}};", aType.FullName, xPrefixLine);
+                            }
+                        }
+                        WriteTestMethodFooter(xPrefix.Key + "InstructionSize32", aOutput);
+                    }
+                    if (!(xInfo != null && ((xInfo.InvalidSizes & Instruction.InstructionSizes.Word) != 0))) {
+                        WriteTestMethodHeader(xPrefix.Key + "InstructionSize16", aOutput);
+                        {
+                            foreach (var xPrefixLine in xPrefix.Value) {
+                                aOutput.WriteLine("\t\t\tnew global::{0}{{Size = 16, {1}}};", aType.FullName, xPrefixLine);
+                            }
+                        }
+                        WriteTestMethodFooter(xPrefix.Key + "InstructionSize16", aOutput);
+                    }
+                    if (!(xInfo != null && ((xInfo.InvalidSizes & Instruction.InstructionSizes.Byte) != 0))) {
+                        WriteTestMethodHeader(xPrefix.Key + "InstructionSize8", aOutput);
+                        {
+                            foreach (var xPrefixLine in xPrefix.Value) {
+                                aOutput.WriteLine("\t\t\tnew global::{0}{{Size = 8, {1}}};", aType.FullName, xPrefixLine);
+                            }
+                        }
+                        WriteTestMethodFooter(xPrefix.Key + "InstructionSize8", aOutput);
+                    }
+                }
             }
             WriteTestFixtureFooter(aType, aOutput);
         }

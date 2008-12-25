@@ -486,6 +486,9 @@ namespace Indy.IL2CPU.Assembler.X86 {
             if (aEncodingOption.DefaultSize == InstructionSize.Word && aInstructionWithSize != null && aInstructionWithSize.Size == 32) {
                 aSize += 1;
             }
+            if (aEncodingOption.DefaultSize == InstructionSize.Byte && aInstructionWithSize.Size == 16) {
+                aSize++;
+            }
             aInstruction.mDataSize = aSize;
             return true;
         }
@@ -575,6 +578,11 @@ namespace Indy.IL2CPU.Assembler.X86 {
                         xExtraOffset++;
                     }
                     if (aEncodingOption.DefaultSize == InstructionSize.Word && aInstructionWithSize.Size == 32) {
+                        xOpCodeOffset += 1;
+                        xBuffer[xExtraOffset] = 0x66;
+                        xExtraOffset++;
+                    }
+                    if (aEncodingOption.DefaultSize == InstructionSize.Byte && aInstructionWithSize.Size == 16) {
                         xOpCodeOffset += 1;
                         xBuffer[xExtraOffset] = 0x66;
                         xExtraOffset++;

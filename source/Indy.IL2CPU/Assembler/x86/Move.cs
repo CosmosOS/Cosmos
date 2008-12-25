@@ -7,7 +7,6 @@ namespace Indy.IL2CPU.Assembler.X86 {
     [OpCode("mov")]
 	public class Move: InstructionWithDestinationAndSourceAndSize {
         public static void InitializeEncodingData(Instruction.InstructionData aData) {
-            //aData.DefaultSize = InstructionSize.DWord;
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0xB0 },
                 //NeedsModRMByte=true,

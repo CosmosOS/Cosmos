@@ -5,29 +5,25 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
     [OpCode("movs")]
-    public class Movs : InstructionWithSize, IInstructionWithPrefix
-    {
-        public InstructionPrefixes Prefixes
-        {
+    public class Movs : InstructionWithSize, IInstructionWithPrefix {
+        public static void InitializeEncodingData(Instruction.InstructionData aData) {
+            aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
+                OpCode = new byte[] { 0xA4 },
+                OperandSizeByte = 0,                
+                DefaultSize = InstructionSize.Byte
+            });
+        }
+        public InstructionPrefixes Prefixes {
             get;
             set;
         }
 
-        public byte Size
-        {
-            get;
-            set;
-        }
-
-        public override string ToString()
-        {
+        public override string ToString() {
             var xPref = "";
-            if ((Prefixes & InstructionPrefixes.Repeat) != 0)
-            {
+            if ((Prefixes & InstructionPrefixes.Repeat) != 0) {
                 xPref = "rep ";
             }
-            switch (Size)
-            {
+            switch (Size) {
                 case 32:
                     return xPref + "movsd";
                 case 16:
