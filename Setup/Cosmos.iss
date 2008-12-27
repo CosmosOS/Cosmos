@@ -4,8 +4,8 @@
 
 [Setup]
 AppName=Cosmos User Kit
-AppVerName=Cosmos User Kit 1.1
-AppCopyright=Copyright © 2007-2008 The Cosmos Project
+AppVerName=Cosmos User Kit Milestone 3
+AppCopyright=Copyright © 2007-2009 The Cosmos Project
 AppPublisher=Cosmos Project
 AppPublisherURL=http://www.gocosmos.org/
 AppSupportURL=http://www.gocosmos.org/
