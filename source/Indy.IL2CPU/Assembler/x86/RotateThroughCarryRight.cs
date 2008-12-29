@@ -16,17 +16,16 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 SourceRegByte = 0,
                 SourceRegBitShiftLeft = 6,
             }); // register by CL
-            //aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
-            //    OpCode = new byte[] { 0xD2 },
-            //    DestinationReg = Guid.Empty,
-            //    DestinationRegByte = 1,
-            //    OperandSizeByte = 0,
-            //    NeedsModRMByte = true,
-            //    InitialModRMByteValue = 0xD8,
-            //    SourceReg=Registers.CL,
-            //    SourceRegByte=0,
-            //    SourceRegBitShiftLeft=6
-            //}); // register by CL
+            aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
+                OpCode = new byte[] { 0xD2 },
+                NeedsModRMByte=true,
+                InitialModRMByteValue = 0x18,
+                DestinationMemory = true,
+                OperandSizeByte = 0,
+                SourceReg = Registers.CL,
+                SourceRegByte = -1,
+                ReverseRegisters=true
+            }); // memory by CL
         }
     }
 }

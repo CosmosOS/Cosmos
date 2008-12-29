@@ -143,7 +143,8 @@ namespace Indy.IL2CPU {
                             IEnumerable<string> aPlugs,
                             DebugMode aDebugMode,
                             byte aDebugComNumber,
-                            string aOutputDir) {
+                            string aOutputDir,
+                            bool aUseBinaryEmission) {
             mCurrent = this;
             try {
                 if (aGetFileNameForGroup == null) {
@@ -320,8 +321,14 @@ namespace Indy.IL2CPU {
                             }
                         }
                     } finally {
-                        using (StreamWriter xOutput = new StreamWriter(aGetFileNameForGroup("main"))) {
-                            mAssembler.FlushText(xOutput);
+                        if (!aUseBinaryEmission) {
+                            using (StreamWriter xOutput = new StreamWriter(aGetFileNameForGroup("main"))) {
+                                mAssembler.FlushText(xOutput);
+                            }
+                        } else {
+                            using (Stream xOutStream = new FileStream(Path.Combine(aOutputDir, "output.bin"), FileMode.Create)) {
+                                mAssembler.FlushBinary(xOutStream, 0x200000);
+                            }
                         }
                         IL.Op.QueueMethod -= QueueMethod;
                         IL.Op.QueueStaticField -= QueueStaticField;

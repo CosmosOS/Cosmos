@@ -135,7 +135,12 @@ namespace Indy.IL2CPU.Assembler {
         protected virtual void OnBeforeFlush() {
         }
 
+        private bool mFlushInitializationDone = false;
         private void BeforeFlush() {
+            if (mFlushInitializationDone) {
+                return;
+            }
+            mFlushInitializationDone = true;
             using (Assembler.mCurrentInstanceLocker.AcquireReaderLock()) {
                 foreach (var xItem in mCurrentInstance.Values) {
                     if (xItem.Count > 0) {
@@ -143,6 +148,7 @@ namespace Indy.IL2CPU.Assembler {
                         if (xAsm != this) {
                             mDataMembers.AddRange(xAsm.mDataMembers);
                             mInstructions.AddRange(xAsm.mInstructions);
+                            xItem.Pop();
                         }
                     }
                 }
@@ -167,6 +173,10 @@ namespace Indy.IL2CPU.Assembler {
                 var xEndIfDefined = xCurrentInstruction as IEndIfDefined;
                 var xDefine = xCurrentInstruction as IDefine;
                 var xIfNotDefined = xCurrentInstruction as IIfNotDefined;
+                if (xCurrentInstruction is Comment) {
+                    mAllAssemblerElements.RemoveAt(xCurrentIdx);
+                    continue;
+                }
                 if(xIfDefined!=null){
                     if(xIfLevelsToSkip>0){
                         xIfLevelsToSkip++;
@@ -213,6 +223,14 @@ namespace Indy.IL2CPU.Assembler {
 
         private List<BaseAssemblerElement> mAllAssemblerElements;
 
+        public void FlushDebug(StreamWriter aOutput) {
+            BeforeFlush();
+            for(int i = 0; i < mAllAssemblerElements.Count;i++){
+                var xItem = mAllAssemblerElements[i];
+                aOutput.WriteLine("{0} - '{1}'", (mAllAssemblerElements.Count - i), xItem.ToString());
+            }
+        }
+
         public virtual void FlushBinary(Stream aOutput, ulong aBaseAddress) {
             BeforeFlush();
             bool xSituationChanged = false;
@@ -255,6 +273,10 @@ namespace Indy.IL2CPU.Assembler {
                 }
             } while (xSituationChanged);
             if (!xSituationChanged && xIncompleteItems.Count > 0) {
+                Console.Write("");
+                foreach (var xItem in xIncompleteItems) {
+                    xItem.IsComplete(this);
+                }
                 throw new Exception("Not all Elements are complete!");
             }
             foreach (var xItem in mAllAssemblerElements) {

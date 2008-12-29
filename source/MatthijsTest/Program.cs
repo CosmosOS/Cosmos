@@ -35,51 +35,12 @@ namespace MatthijsTest {
                 var xBoot = new Cosmos.Sys.Boot();
                 xBoot.Execute();
             }
-            //while(true) {
-            //    Console.Write("/0/>");
-            //    string xCommand = Console.ReadLine();
-            //    if(xCommand.StartsWith("dir")) {
-            //        HandleDir();
-            //        continue;
-            //    }
-            //    if (xCommand.StartsWith("type ")) {
-            //        HandleType(xCommand);
-            //        continue;
-            //    }
-            //    if(xCommand.StartsWith("net broadcast ")) {
-            //        HandleSendBroadCast(xCommand);
-            //        return;
-            //    }
-            //    Console.Write("Command '");
-            //    Console.WriteLine(xCommand);
-            //    Console.WriteLine("' not found!");
-            //}
-            //Console.WriteLine("Cosmos booted!");
-            //try {
-            //    Console.WriteLine("Line 2");
-            //}catch(Exception E) {
-            //    Console.WriteLine("Error Occurred! ");
-            //}
-            //Console.WriteLine("Cosmos booted!");
-            Console.Write("Total of ");
-            Console.Write(VTablesImpl.mTypes.Length);
-            Console.WriteLine(" types");
-            Console.Write("String has ");
-            Console.Write(VTablesImpl.mTypes[7].MethodIndexes.Length);
-            Console.WriteLine(" Methods:");
-            Console.WriteLine("    (Idx)       (Address)");
-            for (int i = 0; i < VTablesImpl.mTypes[7].MethodIndexes.Length; i++) {
-                Console.Write("    0x");
-                Console.Write(VTablesImpl.mTypes[7].MethodIndexes[i]);
-                Console.Write(" 0x");
-                Console.WriteLine(VTablesImpl.mTypes[7].MethodAddresses[i]);
-            }
-            try {
-                Console.WriteLine("    Done".ToString());
-            } catch (Exception) {
-                Console.WriteLine("Exception occurred");
-            }
-            Console.ReadLine();
+            Console.WriteLine("Hello, World!");
+            Cosmos.Sys.Deboot.Reboot();
+            // test reboot:
+            CPU.ClearInterruptsTable();
+            uint a = 0, b = 0, c = 0, d = 0;
+            CPU.Interrupt30(ref a, ref b, ref c, ref d);
         }
 
         private static void HandleSendBroadCast(string command) {

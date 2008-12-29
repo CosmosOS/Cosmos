@@ -65,7 +65,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 /// <summary>
                 /// the index in OpCode where the DestinationReg bit is encoded
                 /// </summary>
-                public byte? DestinationRegByte;
+                public sbyte? DestinationRegByte;
                 /// <summary>
                 /// the amount of bits the DestinationReg bits gets shifted to left, if neccessary
                 /// </summary>
@@ -183,6 +183,12 @@ namespace Indy.IL2CPU.Assembler.X86 {
         }
 
         private static bool GetEffectiveInstructionInfo(Instruction aInstruction, IInstructionWithDestination aInstructionWithDestination, IInstructionWithSize aInstructionWithSize, IInstructionWithSource aInstructionWithSource, out InstructionData aInstructionData, out InstructionData.InstructionEncodingOption aEncodingOption) {
+            if (aInstruction.mEncodingOption != null) {
+                aEncodingOption = aInstruction.mEncodingOption;
+                aInstructionData = aInstruction.mInstructionData;
+                return true;
+                
+            }
             using (mInstructionDatasLocker.AcquireReaderLock()) {
                 mInstructionDatas.TryGetValue(aInstruction.GetType(), out aInstructionData);
             }
@@ -191,6 +197,9 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 return false;
             }
             aEncodingOption = null;
+            if (aInstruction.ToString() == "mov dword EAX, 0x0") {
+                Console.Write("");
+            }
             for (int i = 0; i < aInstructionData.EncodingOptions.Count; i++) {
                 var xEncodingOption = aInstructionData.EncodingOptions[i];
                 if(aInstructionWithSize!=null) {
@@ -344,10 +353,15 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 break;
             }
             if (aEncodingOption == null) {
+                mDebugGetEffectiveEncoding = false;
+                //GetEffectiveInstructionInfo(aInstruction, aInstructionWithDestination, aInstructionWithSize, aInstructionWithSource, out aInstructionData, out aEncodingOption);
                 throw new Exception("No valid EncodingOption found!");
             }
+            aInstruction.mInstructionData = aInstructionData;
+            aInstruction.mEncodingOption = aEncodingOption;
             return true;
         }
+        private static bool mDebugGetEffectiveEncoding = true;
 
         private static bool DetermineSize(Indy.IL2CPU.Assembler.Assembler aAssembler, out ulong aSize, Instruction aInstruction, IInstructionWithDestination aInstructionWithDestination, IInstructionWithSize aInstructionWithSize, IInstructionWithSource aInstructionWithSource, InstructionData aInstructionData, InstructionData.InstructionEncodingOption aEncodingOption) {
             aSize = 0;
@@ -634,7 +648,8 @@ namespace Indy.IL2CPU.Assembler.X86 {
         }
 
         protected ulong? mDataSize;
-
+        protected Instruction.InstructionData.InstructionEncodingOption mEncodingOption;
+        protected InstructionData mInstructionData;
         public override ulong? ActualAddress {
             get {
                 if (!StartAddress.HasValue) {
@@ -698,7 +713,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 }
                 Array.Copy(aEncodingOption.OpCode, 0, xBuffer, xExtraOffset, aEncodingOption.OpCode.Length);
                 if (aInstructionWithDestination != null) {
-                    if (aInstructionWithDestination.DestinationReg != Guid.Empty && aEncodingOption.DestinationRegByte.HasValue && !aEncodingOption.NeedsModRMByte) {
+                    if (aInstructionWithDestination.DestinationReg != Guid.Empty && aEncodingOption.DestinationRegByte.HasValue && aEncodingOption.DestinationRegByte.Value >-1 && !aEncodingOption.NeedsModRMByte) {
                         xBuffer[aEncodingOption.DestinationRegByte.Value + xExtraOffset] |= (byte)(EncodeRegister(aInstructionWithDestination.DestinationReg) << aEncodingOption.DestinationRegBitShiftLeft);
                     }
                 }
@@ -1002,7 +1017,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                     //EncodeModRMByte(aInstruction.DestinationReg, aInstruction.DestinationIsIndirect, aInstruction.DestinationDisplacement > 0, aInstruction.DestinationDisplacement > 255, out xSIB);
                 } else {
                     if (aInstructionWithDestination != null) {
-                        if (aEncodingOption.DestinationRegByte.HasValue) {
+                        if (aEncodingOption.DestinationRegByte.HasValue && aEncodingOption.DestinationRegByte.Value> -1) {
                             xBuffer[xExtraOffset + aEncodingOption.DestinationRegByte.Value] |= (byte)(EncodeRegister(aInstructionWithDestination.DestinationReg) << aEncodingOption.DestinationRegBitShiftLeft);
                         }
                     }
@@ -1154,6 +1169,18 @@ namespace Indy.IL2CPU.Assembler.X86 {
             if (aRegister == Registers.CH) return 0x5;
             if (aRegister == Registers.DH) return 0x6;
             if (aRegister == Registers.BH) return 0x7;
+            if (aRegister == Registers.CR0) return 0x0;
+            if (aRegister == Registers.CR2) return 0x2;
+            if (aRegister == Registers.CR3) return 0x3;
+            if (aRegister == Registers.CR4) return 0x4;
+
+            if (aRegister == Registers.ES) return 0x0;
+            if (aRegister == Registers.CS) return 0x1;
+            if (aRegister == Registers.SS) return 0x2;
+            if (aRegister == Registers.DS) return 0x3;
+            if (aRegister == Registers.FS) return 0x4;
+            if (aRegister == Registers.GS) return 0x5;
+
             throw new Exception("Register not supported!");
         }
 

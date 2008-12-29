@@ -237,7 +237,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             return xResult;
         }
 
-        public static List<Guid> getCRs()
+        public static List<Guid> GetCRs()
         {
             List<Guid> registers = new List<Guid>();
             registers.Add(CR0);

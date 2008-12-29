@@ -133,6 +133,9 @@
 
                     <CheckBox Margin="0,10,0,0" Name="chbxCompileIL" IsChecked="True">Compile IL.</CheckBox>
                     <TextBlock TextWrapping="Wrap" Margin="35,0">Warning: This is an advanced option and normally should remain checked.</TextBlock>
+                    
+                    <CheckBox Margin="0,10,0,0" Name="chbxUseInternalAssembler" IsChecked="False">Use Internal Assembler</CheckBox>
+                    <TextBlock TextWrapping="Wrap" Margin="35,0">Warning: At this moment, this is an experimental feature, and should not be checked. Also, this is not persisted!</TextBlock>
                 </StackPanel>
 
             </StackPanel>

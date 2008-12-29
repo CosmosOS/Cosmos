@@ -12,6 +12,9 @@ namespace Indy.IL2CPU.Assembler {
         }
 
         public ElementReference(string aName) {
+            if (aName == "00h") {
+                Console.Write("");
+            }
             if (aName.StartsWith(".")) {
                 Name = Label.LastFullLabel + aName;
             } else {
@@ -26,6 +29,13 @@ namespace Indy.IL2CPU.Assembler {
                 aAddress = mActualAddress.Value;
                 return true;
             }
+            var xItems = (from item in aAssembler.Instructions
+                 let xLabel = item as Label
+                 where xLabel != null && xLabel.QualifiedName.Equals(Name, StringComparison.InvariantCultureIgnoreCase)
+                 select item).ToArray();
+            if (xItems.Count() > 1) {
+                Console.Write("");
+            }
             BaseAssemblerElement xElement = (from item in aAssembler.Instructions
                                              let xLabel = item as Label
                                              where xLabel != null && xLabel.QualifiedName.Equals(Name, StringComparison.InvariantCultureIgnoreCase)
@@ -38,7 +48,7 @@ namespace Indy.IL2CPU.Assembler {
 
             if (xElement != null) {
                 if (xElement.ActualAddress.HasValue) {
-                    mActualAddress = xElement.ActualAddress.Value + (uint)Offset;
+                    mActualAddress = (ulong)((long)xElement.ActualAddress.Value + Offset);
                     aAddress = mActualAddress.Value;
                     return true;
                 }

@@ -78,8 +78,34 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
             });
             opcodesException.Add(typeof(Move), new ConstraintsContainer {
                 DestInfo = new Constraints { TestImmediate16 = false, TestImmediate32 = false, TestImmediate8 = false, TestCR = false, TestSegments = false },
-                SourceInfo = new Constraints { TestImmediate16 = false, TestImmediate32 = false, TestImmediate8 = false, TestCR = false, TestSegments = false },
+                SourceInfo = new Constraints { TestCR = false, TestSegments = false },
                 MemToMem=false
+            });
+            opcodesException.Add(typeof(MoveCR), new ConstraintsContainer {
+                DestInfo = new Constraints { TestImmediate16 = false, TestImmediate32 = false, TestImmediate8 = false, TestCR = true, TestSegments = false, TestMem16 = false, TestMem32 = false, TestMem8 = false, InvalidRegisters = (from item in Registers.GetRegisters() where item == Registers.CR1 || Registers.GetSize(item) != 32 select item) },
+                SourceInfo = new Constraints { TestImmediate16 = false, TestImmediate32 = false, TestImmediate8 = false, TestCR = true, TestSegments = false, TestMem16 = false, TestMem32 = false, TestMem8 = false, InvalidRegisters = (from item in Registers.GetRegisters() where item == Registers.CR1 || Registers.GetSize(item) != 32 select item) },
+                CRToCR = false,
+                TestIsValid = delegate(string aTest) {
+                    bool xSourceRegIsCR = false;
+                    xSourceRegIsCR |= aTest.Contains("SourceReg = Registers.CR0");
+                    xSourceRegIsCR |= aTest.Contains("SourceReg = Registers.CR1");
+                    xSourceRegIsCR |= aTest.Contains("SourceReg = Registers.CR2");
+                    xSourceRegIsCR |= aTest.Contains("SourceReg = Registers.CR3");
+                    xSourceRegIsCR |= aTest.Contains("SourceReg = Registers.CR4");
+                    bool xDestinationRegIsCR = false;
+                    xDestinationRegIsCR |= aTest.Contains("DestinationReg = Registers.CR0");
+                    xDestinationRegIsCR |= aTest.Contains("DestinationReg = Registers.CR1");
+                    xDestinationRegIsCR |= aTest.Contains("DestinationReg = Registers.CR2");
+                    xDestinationRegIsCR |= aTest.Contains("DestinationReg = Registers.CR3");
+                    xDestinationRegIsCR |= aTest.Contains("DestinationReg = Registers.CR4");
+                    if(xSourceRegIsCR && xDestinationRegIsCR){
+                        return false;
+                    }
+                    if (!(xSourceRegIsCR || xDestinationRegIsCR)) {
+                        return false;
+                    }
+                    return true;
+                }
             });
             opcodesException.Add(typeof(Movs), new ConstraintsContainer {
                 ValidPrefixes = InstructionPrefixes.Repeat
@@ -117,7 +143,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                 DestInfo = new Constraints { TestImmediate16 = true, TestImmediate32 = false, TestImmediate8 = false, TestCR = false, TestSegments = false, TestMem8 = false, TestMem16=false, TestMem32=false, TestRegisters=false }
             });
             opcodesException.Add(typeof(RotateThroughCarryRight), new ConstraintsContainer {
-                DestInfo = new Constraints { TestImmediate16 = false, TestImmediate32 = false, TestImmediate8 = false, TestCR = false, TestSegments = false, TestMem8=false, TestMem16=false, TestMem32=false },
+                DestInfo = new Constraints { TestImmediate16 = false, TestImmediate32 = false, TestImmediate8 = false, TestCR = false, TestSegments = false, TestMem8 = true, TestMem16 = true, TestMem32 = true },
                 SourceInfo = new Constraints { TestImmediate16 = false, TestImmediate32 = false, TestImmediate8 = false, TestCR = false, TestMem16 = false, TestMem32 = false, TestMem8 = false, InvalidRegisters = from item in Registers.GetRegisters() where item != Registers.CL select item}
             });
             opcodesException.Add(typeof(ShiftLeft), new ConstraintsContainer {

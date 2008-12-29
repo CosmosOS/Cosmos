@@ -107,6 +107,9 @@ namespace Cosmos.Compiler.Builder {
             rdioPXE.Checked += new RoutedEventHandler(TargetChanged);
             rdioUSB.Checked += new RoutedEventHandler(TargetChanged);
 
+            rdioMSNET.Checked += new RoutedEventHandler(FrameworkChanged);
+            rdioProjectMono.Checked += new RoutedEventHandler(FrameworkChanged);
+
             tblkBuildPath.Text = aBuildPath;
             tblkISOPath.Text = aBuildPath + "Cosmos.iso";
 
@@ -138,6 +141,11 @@ namespace Cosmos.Compiler.Builder {
             LoadOptions();
             // Call here for when this dialog is bypassed, others read these values
             UpdateProperties();
+        }
+
+        void FrameworkChanged(object sender, RoutedEventArgs e) {
+            var xIsUsingMSNet = rdioMSNET.IsChecked.Value;
+            chbxUseInternalAssembler.IsEnabled = xIsUsingMSNet;
         }
 
         void OptionsUC_Loaded(object sender, RoutedEventArgs e) {

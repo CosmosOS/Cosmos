@@ -14,7 +14,9 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
             public Instruction.InstructionSizes InvalidSizes = Instruction.InstructionSizes.None;
             public bool MemToMem = false;
             public bool ImmediateToImmediate = false;
+            public bool CRToCR = false;
             public InstructionPrefixes ValidPrefixes = InstructionPrefixes.None;
+            public Func<string, bool> TestIsValid;
         }
 
         public class TestState {
@@ -148,6 +150,19 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
             aOutput.WriteLine("\t\t}");
         }
 
+        private static void WriteTestLine(StreamWriter aOutput, Type aType, string aFormat, params object[] aParams) {
+            string xLine = string.Format(aFormat, aParams);
+            if (opcodesException.ContainsKey(aType)) {
+                var xData = opcodesException[aType];
+                if (xData.TestIsValid != null) {
+                    if (!xData.TestIsValid(xLine)) {
+                        return;
+                    }
+                }
+            }
+            aOutput.WriteLine(xLine);
+        }
+
 
         private static void GenerateSimpleInstruction(Type aType, StreamWriter aOutput) {
             WriteTestFixtureHeader(aType, aOutput);
@@ -187,7 +202,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                         WriteTestMethodHeader(xPrefix.Key + "InstructionSize32", aOutput);
                         {
                             foreach (var xPrefixLine in xPrefix.Value) {
-                                aOutput.WriteLine("\t\t\tnew global::{0}{{Size = 32, {1}}};", aType.FullName, xPrefixLine);
+                                WriteTestLine(aOutput, aType, "\t\t\tnew global::{0}{{Size = 32, {1}}};", aType.FullName, xPrefixLine);
                             }
                         }
                         WriteTestMethodFooter(xPrefix.Key + "InstructionSize32", aOutput);
@@ -196,7 +211,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                         WriteTestMethodHeader(xPrefix.Key + "InstructionSize16", aOutput);
                         {
                             foreach (var xPrefixLine in xPrefix.Value) {
-                                aOutput.WriteLine("\t\t\tnew global::{0}{{Size = 16, {1}}};", aType.FullName, xPrefixLine);
+                                WriteTestLine(aOutput, aType, "\t\t\tnew global::{0}{{Size = 16, {1}}};", aType.FullName, xPrefixLine);
                             }
                         }
                         WriteTestMethodFooter(xPrefix.Key + "InstructionSize16", aOutput);
@@ -205,7 +220,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                         WriteTestMethodHeader(xPrefix.Key + "InstructionSize8", aOutput);
                         {
                             foreach (var xPrefixLine in xPrefix.Value) {
-                                aOutput.WriteLine("\t\t\tnew global::{0}{{Size = 8, {1}}};", aType.FullName, xPrefixLine);
+                                WriteTestLine(aOutput, aType, "\t\t\tnew global::{0}{{Size = 8, {1}}};", aType.FullName, xPrefixLine);
                             }
                         }
                         WriteTestMethodFooter(xPrefix.Key + "InstructionSize8", aOutput);
@@ -225,21 +240,21 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                 if (!(xInfo != null && ((xInfo.InvalidSizes & Instruction.InstructionSizes.DWord) != 0))) {
                     WriteTestMethodHeader("InstructionSize32", aOutput);
                     {
-                        aOutput.WriteLine("\t\t\tnew global::{0}{{Size = 32}};", aType.FullName);
+                        WriteTestLine(aOutput, aType, "\t\t\tnew global::{0}{{Size = 32}};", aType.FullName);
                     }
                     WriteTestMethodFooter("InstructionSize32", aOutput);
                 }
                 if (!(xInfo != null && ((xInfo.InvalidSizes & Instruction.InstructionSizes.Word) != 0))) {
                     WriteTestMethodHeader("InstructionSize16", aOutput);
                     {
-                        aOutput.WriteLine("\t\t\tnew global::{0}{{Size = 16}};", aType.FullName);
+                        WriteTestLine(aOutput, aType, "\t\t\tnew global::{0}{{Size = 16}};", aType.FullName);
                     }
                     WriteTestMethodFooter("InstructionSize16", aOutput);
                 }
                 if (!(xInfo != null && ((xInfo.InvalidSizes & Instruction.InstructionSizes.Byte) != 0))) {
                     WriteTestMethodHeader("InstructionSize8", aOutput);
                     {
-                        aOutput.WriteLine("\t\t\tnew global::{0}{{Size = 8}};", aType.FullName);
+                        WriteTestLine(aOutput, aType, "\t\t\tnew global::{0}{{Size = 8}};", aType.FullName);
                     }
                     WriteTestMethodFooter("InstructionSize8", aOutput);
                 }
@@ -255,7 +270,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                         WriteTestMethodHeader(xItem.Key, aOutput);
                         {
                             foreach (var xLine in xItem.Value) {
-                                aOutput.WriteLine("\t\t\tnew global::{0}{{{1}}};", aType.FullName, xLine);
+                                WriteTestLine(aOutput, aType, "\t\t\tnew global::{0}{{{1}}};", aType.FullName, xLine);
                             }
                         }
                         WriteTestMethodFooter(xItem.Key, aOutput);
@@ -352,7 +367,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                         WriteTestMethodHeader(xItem.Key + "Size" + xSize, aOutput);
                         {
                             foreach (var xLine in xItem.Value) {
-                                aOutput.WriteLine("\t\t\tnew global::{0}{{{1}, Size = {2}}};", aType.FullName, xLine, xSize);
+                                WriteTestLine(aOutput, aType, "\t\t\tnew global::{0}{{{1}, Size = {2}}};", aType.FullName, xLine, xSize);
                             }
                         }
                         WriteTestMethodFooter(xItem.Key + "Size" + xSize, aOutput);
@@ -422,7 +437,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                 foreach (Guid register in Registers.GetRegisters()) {
                     if (!aType.Namespace.Contains("SSE") && (Registers.getXMMs().Contains(register)))
                         continue;
-                    if (Registers.getCRs().Contains(register) && (!opcodesException.ContainsKey(aType) || (opcodesException.ContainsKey(aType) && (!opcodesException[aType].DestInfo.TestCR))))
+                    if (Registers.GetCRs().Contains(register) && (!opcodesException.ContainsKey(aType) || (opcodesException.ContainsKey(aType) && (!opcodesException[aType].DestInfo.TestCR))))
                         continue;
                     if ((!opcodesException.ContainsKey(aType) ||
                          (opcodesException.ContainsKey(aType) && opcodesException[aType].DestInfo.InvalidRegisters != null &&
@@ -492,7 +507,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                 foreach (Guid register in Registers.GetRegisters()) {
                     if (!aType.Namespace.Contains("SSE") && (Registers.getXMMs().Contains(register)))
                         continue;
-                    if (Registers.getCRs().Contains(register) && (!opcodesException.ContainsKey(aType) || (opcodesException.ContainsKey(aType) && (!opcodesException[aType].SourceInfo.TestCR))))
+                    if (Registers.GetCRs().Contains(register) && (!opcodesException.ContainsKey(aType) || (opcodesException.ContainsKey(aType) && (!opcodesException[aType].SourceInfo.TestCR))))
                         continue;
                     if ((!opcodesException.ContainsKey(aType) ||
                          (opcodesException.ContainsKey(aType) && opcodesException[aType].SourceInfo.InvalidRegisters != null &&
@@ -581,7 +596,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                 foreach (Guid register in Registers.GetRegisters()) {
                     if (!aType.Namespace.Contains("SSE") && (Registers.getXMMs().Contains(register)))
                         continue;
-                    if (Registers.getCRs().Contains(register) && (!opcodesException.ContainsKey(aType) || (opcodesException.ContainsKey(aType) && (!opcodesException[aType].DestInfo.TestCR))))
+                    if (Registers.GetCRs().Contains(register) && (!opcodesException.ContainsKey(aType) || (opcodesException.ContainsKey(aType) && (!opcodesException[aType].DestInfo.TestCR))))
                         continue;
                     if ((!opcodesException.ContainsKey(aType) ||
                          (opcodesException.ContainsKey(aType) && opcodesException[aType].DestInfo.InvalidRegisters != null &&
@@ -667,7 +682,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                 foreach (Guid register in Registers.GetRegisters()) {
                     if (!aType.Namespace.Contains("SSE") && (Registers.getXMMs().Contains(register)))
                         continue;
-                    if (Registers.getCRs().Contains(register) && (!opcodesException.ContainsKey(aType) || (opcodesException.ContainsKey(aType) && (!opcodesException[aType].SourceInfo.TestCR))))
+                    if (Registers.GetCRs().Contains(register) && (!opcodesException.ContainsKey(aType) || (opcodesException.ContainsKey(aType) && (!opcodesException[aType].SourceInfo.TestCR))))
                         continue;
                     if ((!opcodesException.ContainsKey(aType) ||
                          (opcodesException.ContainsKey(aType) && opcodesException[aType].SourceInfo.InvalidRegisters != null &&
@@ -707,6 +722,23 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                                     continue;
                                 }
                             }
+                            if (!opcodesException[aType].CRToCR) {
+                                bool xSourceContainsCR = false;
+                                xSourceContainsCR |= xSourceItem.Key.Contains("CR0");
+                                xSourceContainsCR |= xSourceItem.Key.Contains("CR1");
+                                xSourceContainsCR |= xSourceItem.Key.Contains("CR2");
+                                xSourceContainsCR |= xSourceItem.Key.Contains("CR3");
+                                xSourceContainsCR |= xSourceItem.Key.Contains("CR4");
+                                bool xDestContainsCR = false;
+                                xDestContainsCR |= xDestItem.Key.Contains("CR0");
+                                xDestContainsCR |= xDestItem.Key.Contains("CR1");
+                                xDestContainsCR |= xDestItem.Key.Contains("CR2");
+                                xDestContainsCR |= xDestItem.Key.Contains("CR3");
+                                xDestContainsCR |= xDestItem.Key.Contains("CR4");
+                                if (xSourceContainsCR && xDestContainsCR) {
+                                    continue;
+                                }
+                            }
                         } else {
                             // if no exceptions known for this opcode, we dont emit tests for Memory to Memory and Immediate to Immediate
                             if (xSourceItem.Key.Contains("Memory") && xDestItem.Key.Contains("Memory")) {
@@ -725,7 +757,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                             foreach (var xSourceLine in xSourceItem.Value) {
                                 {
                                     foreach (var xLine in xDestItem.Value) {
-                                        aOutput.WriteLine("\t\t\tnew global::{0}{{{1}, {2}}};", aType.FullName, xSourceLine, xLine);
+                                        WriteTestLine(aOutput, aType, "\t\t\tnew global::{0}{{{1}, {2}}};", aType.FullName, xSourceLine, xLine);
                                     }
                                 }
                             }
@@ -785,7 +817,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                                     foreach (var xCondLine in xCondition.Value) {
                                         foreach (var xSourceLine in xSourceItem.Value) {
                                             foreach (var xLine in xDestItem.Value) {
-                                                aOutput.WriteLine("\t\t\tnew global::{0}{{{1}, {2}, Size = {3}, {4}}};", aType.FullName, xSourceLine, xLine, xSize, xCondLine);
+                                                WriteTestLine(aOutput, aType, "\t\t\tnew global::{0}{{{1}, {2}, Size = {3}, {4}}};", aType.FullName, xSourceLine, xLine, xSize, xCondLine);
                                             }
                                         }
                                     }
@@ -834,7 +866,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                             {
                                 foreach (var xSourceLine in xSourceItem.Value) {
                                     foreach (var xLine in xDestItem.Value) {
-                                        aOutput.WriteLine("\t\t\tnew global::{0}{{{1}, {2}, Size = {3}}};", aType.FullName, xSourceLine, xLine, xSize);
+                                        WriteTestLine(aOutput, aType, "\t\t\tnew global::{0}{{{1}, {2}, Size = {3}}};", aType.FullName, xSourceLine, xLine, xSize);
                                     }
                                 }
                             }

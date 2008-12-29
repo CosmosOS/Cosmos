@@ -268,16 +268,16 @@ namespace Indy.IL2CPU.IL {
                                     if (xNewMethod == null) { System.Diagnostics.Debugger.Break(); }
                                     xMethod = xNewMethod;
                                 }
-                                Push("0" + i.ToString("X") + "h");
-                                Push("0" + j.ToString("X") + "h");
+                                Push((uint)i);
+                                Push((uint)j);
 
-                                Push("0" + xMethodId.ToString("X") + "h");
+                                Push((uint)xMethodId);
                                 Push(Label.GenerateLabelName(xMethod));
                                 //xDataValue = Encoding.ASCII.GetBytes(GetFullName(xMethod)).Aggregate("", (b, x) => b + x + ",") + "0";
                                 //xDataName = "____SYSTEM____METHOD___" + DataMember.FilterStringForIncorrectChars(GetFullName(xMethod));
                                 //mAssembler.DataMembers.Add(new DataMember(xDataName, "db", xDataValue));
                                 //Push(xDataName);
-                                Push("0");
+                                Push(0);
                                 Call(SetMethodInfoRef);
                             }
                         }

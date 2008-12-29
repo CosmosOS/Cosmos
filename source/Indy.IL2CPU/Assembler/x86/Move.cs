@@ -8,6 +8,79 @@ namespace Indy.IL2CPU.Assembler.X86 {
 	public class Move: InstructionWithDestinationAndSourceAndSize {
         public static void InitializeEncodingData(Instruction.InstructionData aData) {
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
+                OpCode = new byte[] { 0x0F, 0x22, 0xC0 },
+                DestinationReg = Registers.CR0,
+                //DestinationRegByte = -1,
+                SourceReg = Guid.Empty,
+                SourceRegByte = 2
+            });
+            aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
+                OpCode = new byte[] { 0x0F, 0x22, 0xD0 },
+                DestinationReg = Registers.CR2,
+                //DestinationRegByte = -1,
+                SourceReg = Guid.Empty,
+                SourceRegByte = 2
+            });
+            aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
+                OpCode = new byte[] { 0x0F, 0x22, 0xD8 },
+                DestinationReg = Registers.CR3,
+                //DestinationRegByte = -1,
+                SourceReg = Guid.Empty,
+                SourceRegByte = 2
+            });
+            aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
+                OpCode = new byte[] { 0x0F, 0x22, 0xE0 },
+                DestinationReg = Registers.CR4,
+                //DestinationRegByte = -1,
+                SourceReg = Guid.Empty,
+                SourceRegByte = 2
+            });
+            aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
+                OpCode = new byte[] { 0x0F, 0x22, 0xE0 },
+                DestinationReg = Guid.Empty,
+                DestinationRegByte = 2,
+                DestinationRegBitShiftLeft=0,
+                SourceReg = Registers.CR0,
+                SourceRegByte = 2,
+                SourceRegBitShiftLeft=3
+            }); // CR to register
+            aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
+                OpCode = new byte[] { 0x0F, 0x22, 0xE0 },
+                DestinationReg = Guid.Empty,
+                DestinationRegByte = 2,
+                DestinationRegBitShiftLeft = 0,
+                SourceReg = Registers.CR1,
+                SourceRegByte = 2,
+                SourceRegBitShiftLeft = 3
+            }); // CR to register
+            aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
+                OpCode = new byte[] { 0x0F, 0x22, 0xE0 },
+                DestinationReg = Guid.Empty,
+                DestinationRegByte = 2,
+                DestinationRegBitShiftLeft = 0,
+                SourceReg = Registers.CR2,
+                SourceRegByte = 2,
+                SourceRegBitShiftLeft = 3
+            }); // CR to register
+            aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
+                OpCode = new byte[] { 0x0F, 0x22, 0xE0 },
+                DestinationReg = Guid.Empty,
+                DestinationRegByte = 2,
+                DestinationRegBitShiftLeft = 0,
+                SourceReg = Registers.CR3,
+                SourceRegByte = 2,
+                SourceRegBitShiftLeft = 3
+            }); // CR to register
+            aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
+                OpCode = new byte[] { 0x0F, 0x22, 0xE0 },
+                DestinationReg = Guid.Empty,
+                DestinationRegByte = 2,
+                DestinationRegBitShiftLeft = 0,
+                SourceReg = Registers.CR4,
+                SourceRegByte = 2,
+                SourceRegBitShiftLeft = 3
+            }); // CR to register
+            aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0xB0 },
                 //NeedsModRMByte=true,
                 DefaultSize = InstructionSize.DWord,
@@ -21,13 +94,13 @@ namespace Indy.IL2CPU.Assembler.X86 {
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0xC6 },
                 NeedsModRMByte = true,
-                AllowedSizes = InstructionSizes.Word,
+                //AllowedSizes = InstructionSizes.Word,
                 OperandSizeByte = 0,
                 OperandSizeBitShiftLeft = 0,
                 SourceImmediate = true,
                 //DestinationRegByte = 1,
-                DestinationMemory = true,
-                DestinationReg = Guid.Empty
+                ReverseRegisters=true,
+                DestinationMemory = true
             });  // immediate to memory
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0x88  },

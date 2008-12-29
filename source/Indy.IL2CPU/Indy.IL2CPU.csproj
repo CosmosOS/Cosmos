@@ -96,6 +96,7 @@
     <Compile Include="Assembler\x86\Enums.cs" />
     <Compile Include="Assembler\x86\In.cs" />
     <Compile Include="Assembler\x86\JumpToSegment.cs" />
+    <Compile Include="Assembler\x86\MoveCR.cs" />
     <Compile Include="Assembler\x86\Movs.cs" />
     <Compile Include="Assembler\x86\X\RegisterEBX.cs" />
     <Compile Include="Assembler\x86\_Infra\Extensions.cs" />

@@ -56,6 +56,32 @@ namespace Indy.IL2CPU.Assembler.X86 {
             }
         }
 
+        public override bool IsComplete(Indy.IL2CPU.Assembler.Assembler aAssembler) {
+            if (SourceRef != null) {
+                ulong xAddress;
+                return base.IsComplete(aAssembler) && SourceRef.Resolve(aAssembler, out xAddress);
+            }
+            return base.IsComplete(aAssembler);
+        }
+
+        public override bool DetermineSize(Indy.IL2CPU.Assembler.Assembler aAssembler, out ulong aSize) {
+            if (SourceRef != null) {
+                SourceValue = 0xFFFFFFFF;
+            }
+            return base.DetermineSize(aAssembler, out aSize);
+        }
+
+        public override byte[] GetData(Indy.IL2CPU.Assembler.Assembler aAssembler) {
+            if (SourceRef != null) {
+                ulong xAddress = 0;
+                if (!SourceRef.Resolve(aAssembler, out xAddress)) {
+                    throw new Exception("Cannot resolve SourceRef!");
+                }
+                SourceValue = (uint)xAddress;
+            }
+            return base.GetData(aAssembler);
+        }
+
         public override string ToString() {
             return Mnemonic + " " + this.GetDestinationAsString() + ", " + GetSourceAsString();
         }

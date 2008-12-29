@@ -20,7 +20,7 @@ namespace Cosmos.Compiler.Builder {
         public readonly string ToolsPath;
         public readonly string AsmPath;
         public readonly Engine Engine = new Engine();
-        
+        public bool UseInternalAssembler = false;
         public Builder() {
             BuildPath = GetBuildPath();
             ToolsPath = BuildPath + @"Tools\";
@@ -140,9 +140,10 @@ namespace Cosmos.Compiler.Builder {
                                xParam.aPlugs,
                                xParam.aDebugMode,
                                1,
-                               xParam.aOutputDir);
+                               xParam.aOutputDir,
+                               UseInternalAssembler);
             }catch(Exception E) {
-             OnLogMessage(LogSeverityEnum.Error, E.ToString());   
+                OnLogMessage(LogSeverityEnum.Error, E.ToString());   
             }
             CompileCompleted.Invoke();
         }

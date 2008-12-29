@@ -559,7 +559,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                 foreach (Guid register in Registers.GetRegisters()) {
                     if (!type.Namespace.Contains("SSE") && (Registers.getXMMs().Contains(register)))
                         continue;
-                    if (Registers.getCRs().Contains(register) && (!opcodesException.ContainsKey(type) || (opcodesException.ContainsKey(type) && (!opcodesException[type].DestInfo.TestCR))))
+                    if (Registers.GetCRs().Contains(register) && (!opcodesException.ContainsKey(type) || (opcodesException.ContainsKey(type) && (!opcodesException[type].DestInfo.TestCR))))
                         continue;
                     if ((!opcodesException.ContainsKey(type) ||
                          (opcodesException.ContainsKey(type) && opcodesException[type].DestInfo.InvalidRegisters != null &&
@@ -857,7 +857,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
             foreach (Guid register in Registers.GetRegisters()) {
                 if (!type.Namespace.Contains("SSE") && (Registers.getXMMs().Contains(register)))
                     continue;
-                if (Registers.getCRs().Contains(register) && 
+                if (Registers.GetCRs().Contains(register) && 
                     (!opcodesException.ContainsKey(type) || (opcodesException.ContainsKey(type) && (!opcodesException[type].SourceInfo.TestCR))))
                     continue;
                 if (Registers.GetRegisters().Contains(register) && 

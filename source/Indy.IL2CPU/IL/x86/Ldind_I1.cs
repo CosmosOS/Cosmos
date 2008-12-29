@@ -13,7 +13,7 @@ namespace Indy.IL2CPU.IL.X86 {
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
 		    new CPUx86.Move {
 		                            DestinationReg = CPUx86.Registers.EAX,
-		                            DestinationValue = 0
+		                            SourceValue = 0
 		                    };
 			new CPUx86.Move{DestinationReg=CPUx86.Registers.AL, SourceReg=CPUx86.Registers.ECX, SourceIsIndirect=true};
 			new CPUx86.Push{DestinationReg=CPUx86.Registers.EAX};

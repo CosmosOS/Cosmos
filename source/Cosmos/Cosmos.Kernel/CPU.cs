@@ -21,6 +21,10 @@ namespace Cosmos.Kernel {
             return 0;
         }
 
+        public static void ClearInterruptsTable() {
+            //plugged
+        }
+
         // Plugged
         public static void CreateGDT() { }
 
@@ -121,13 +125,13 @@ namespace Cosmos.Kernel {
             
         }
 
+        public static void DisableInterrupts() {
+            // plugged
+        }
+
         // plugged
         public static void Interrupt30(ref uint aEAX, ref uint aEBX, ref uint aECX, ref uint aEDX) {
             aEAX = 0;
-        }
-
-        public static bool IsVirtual8086Mode() {
-            return false;
         }
 	}
 }

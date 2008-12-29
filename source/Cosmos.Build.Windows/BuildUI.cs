@@ -30,6 +30,7 @@ namespace Cosmos.Compiler.Builder {
             // Call IL2CPU
             if (mOptionsUC.chbxCompileIL.IsChecked.Value) {
                 var xBuildUC = new BuildUC();
+                mBuilder.UseInternalAssembler = mOptionsUC.chbxUseInternalAssembler.IsChecked.Value;
                 mMainWindow.LoadControl(xBuildUC);
                 xBuildUC.CompileCompleted += new Action(BuildUC_CompileCompleted);
                 xBuildUC.BeginBuild(mBuilder, mOptionsUC.DebugMode, mOptionsUC.ComPort);
@@ -40,10 +41,12 @@ namespace Cosmos.Compiler.Builder {
             if (mOptionsUC.chbxCompileIL.IsChecked.Value) {
                 // We always show the window now since when its shown its
                 // for a short time and not in "paralell" as it was before.
-                ShowWindow(mConsoleWindow, 1);
-                mBuilder.Assemble();
-                mBuilder.Link();
-                ShowWindow(mConsoleWindow, 0);
+                if (!mOptionsUC.chbxUseInternalAssembler.IsChecked.Value) {
+                    ShowWindow(mConsoleWindow, 1);
+                    mBuilder.Assemble();
+                    mBuilder.Link();
+                    ShowWindow(mConsoleWindow, 0);
+                }
             }
                 
             DebugWindow xDebugWindow = null;

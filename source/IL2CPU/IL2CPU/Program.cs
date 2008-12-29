@@ -179,7 +179,8 @@ namespace IL2CPU {
                                     xPlugs,
                                     xDebugMode,
                                     xComport,
-                                    xOutputDir);
+                                    xOutputDir,
+                                    false);
                     xLogStream.WriteByte((byte)LogChannelCommand.EndOfProcessing);
                     xLogStream.Flush();
 

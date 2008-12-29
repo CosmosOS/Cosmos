@@ -15,5 +15,18 @@ namespace Indy.IL2CPU.Assembler {
 		public override string ToString() {
 			return "; " + Text;
 		}
+
+        public override bool DetermineSize(Assembler aAssembler, out ulong aSize) {
+            aSize = 0;
+            return true;
+        }
+
+        public override bool IsComplete(Assembler aAssembler) {
+            return true;
+        }
+
+        public override byte[] GetData(Assembler aAssembler) {
+            return new byte[0];
+        }
 	}
 }
