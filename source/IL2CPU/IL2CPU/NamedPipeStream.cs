@@ -227,7 +227,7 @@ namespace IL2CPU {
         /// <summary>
         /// Opens the client side of a pipe.
         /// </summary>
-        /// <param name="pipe">Full path to the pipe, e.g. '\\.\pipe\mypipe'</param>
+        /// <param name="pipename">Full path to the pipe, e.g. '\\.\pipe\mypipe'</param>
         /// <param name="mode">Read,Write, or ReadWrite - must be compatible with server-side creation mode</param>
         public void Open(string pipename, FileAccess mode) {
 
@@ -259,6 +259,7 @@ namespace IL2CPU {
         /// Create a named pipe instance.
         /// </summary>
         /// <param name="pipeName">Local name (the part after \\.\pipe\)</param>
+        /// <param name="mode"></param>
         public static NamedPipeStream Create(string pipeName, ServerMode mode) {
             IntPtr handle = IntPtr.Zero;
             string name = @"\\.\pipe\" + pipeName;
