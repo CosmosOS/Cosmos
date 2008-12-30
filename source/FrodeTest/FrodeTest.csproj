@@ -71,6 +71,7 @@
     <Compile Include="Test\BitConverterTest.cs" />
     <Compile Include="Test\BoolTest.cs" />
     <Compile Include="Test\ConsoleTest.cs" />
+    <Compile Include="Test\GenericTest.cs" />
     <Compile Include="Test\DirectoryInfoTest.cs" />
     <Compile Include="Test\DirectoryTest.cs" />
     <Compile Include="Test\Ethernet2FrameTest.cs" />

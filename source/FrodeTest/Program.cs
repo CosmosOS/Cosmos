@@ -55,8 +55,9 @@ namespace FrodeTest
                 //Test.InterfaceTest.RunTest();
                 //Test.ExtensionMethodsTest.RunTest();
                 //Test.BinaryHelperTest.RunTest();
-                Test.BitConverterTest.RunTest();
-                Test.MathTest.RunTest();
+                //Test.BitConverterTest.RunTest();
+                //Test.MathTest.RunTest();
+                Test.GenericTest.RunTest();
                 //Test.TransmitStatusDescriptorTest.RunTest();
                 //Test.PacketHeaderTest.RunTest();
                 //Test.RAMBusTest.RunTest();
