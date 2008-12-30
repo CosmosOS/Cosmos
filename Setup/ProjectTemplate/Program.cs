@@ -18,7 +18,7 @@ namespace $safeprojectname$ {
             new Cosmos.Sys.Boot().Execute();
 
             //Your custom implementation
-			Console.WriteLine("Welcome to COSMOS! You just booted C# code. Please edit Program.cs to fit your needs");
+			Console.WriteLine("Welcome to COSMOS! You just booted C# code.");
 
             //Shutdown
             Cosmos.Sys.Deboot.ShutDown();
