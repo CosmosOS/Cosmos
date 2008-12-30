@@ -32,39 +32,70 @@ namespace Cosmos.Compiler.Builder {
         
         /// <summary>
         /// Retrieves the path to the Build directory.
-        /// Looks first in the Registry. If no match found there it will use the Current Directory to calculate the
-        /// path to the Build directory.
+        /// First looks in the .xml file in %AppData%\Cosmos.
+        /// Secondly searches Registry.
+        /// If no match found there either it will use the Current Directory to calculate the path to the Build directory.
         /// </summary>
         /// <returns>Full path to the Build directory.</returns>
-        protected static string GetBuildPath() {
-            try { 
-                string xResult = "";
+        protected static string GetBuildPath()
+        {
+            try
+            {
+                //string xResult = "";
                 Options.Load();
+
+                //Primary look in .XML
+                if (!String.IsNullOrEmpty(Options.BuildPath))
+                {
+                    if (Directory.Exists(Options.BuildPath))
+                        return Options.BuildPath;
+                    else
+                        Options.BuildPath = String.Empty; //Reset the path if it doesn't exist.
+                }
+
+                //Fallback to Registry
+                if (String.IsNullOrEmpty(Options.BuildPath))
+                {
+                    RegistryKey key = Registry.CurrentUser.OpenSubKey(@"Software\Cosmos");
+                    if (key != null)
+                    {
+                        var xRegPath = key.GetValue("Build Path", String.Empty).ToString();
+                        if (!String.IsNullOrEmpty(xRegPath))
+                        {
+                            if (!Directory.Exists(xRegPath))
+                                throw new DirectoryNotFoundException(
+                                    "Found path to Build Path in registry, but directory does not exist.");
+                            Options.BuildPath = xRegPath;
+                        }
+                    }
+                }
+
+                //Fallback to calculating from current dir
                 if (string.IsNullOrEmpty(Options.BuildPath))
                 {
-                    xResult = Directory.GetCurrentDirectory().ToLowerInvariant();
-                    int xPos = xResult.LastIndexOf("source");
+                    var xCalculatedPath = Directory.GetCurrentDirectory().ToLowerInvariant();
+                    int xPos = xCalculatedPath.LastIndexOf("source");
                     if (xPos == -1)
                     {
                         throw new Exception("Unable to find directory named 'source' when using CurrentDirectory.");
                     }
-                    xResult = xResult.Substring(0, xPos) + @"Build\";
-                    Options.BuildPath = xResult;
-                }else {
-                    xResult = Options.BuildPath;
+                    xCalculatedPath = xCalculatedPath.Substring(0, xPos) + @"Build\";
+                    Options.BuildPath = xCalculatedPath;
                 }
 
-                if (string.IsNullOrEmpty(xResult)) {
-                    throw new Exception("Cannot find Cosmos build path!");
-                }
-                if (!xResult.EndsWith(@"\"))
-                {
-                    xResult = xResult + @"\";
-                }
-                Options.BuildPath = xResult;
+                //If path not in .xml, Registry and also unable to calculate
+                if (string.IsNullOrEmpty(Options.BuildPath))
+                    throw new DirectoryNotFoundException("Unable to find Cosmos Build Path!");
+
+                //Make sure path has a trailing slash
+                if (!Options.BuildPath.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                    Options.BuildPath += Path.DirectorySeparatorChar;
+
                 Options.Save();
-                return xResult;
-            } catch (Exception E) {
+                return Options.BuildPath;
+            }
+            catch (Exception E)
+            {
                 throw new Exception("Error while getting Cosmos Build Path!", E);
             }
         }

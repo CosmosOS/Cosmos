@@ -79,6 +79,9 @@ namespace Cosmos.Compiler.Builder {
             }
         }
 
+        /// <summary>
+        /// Retrieves settings from %AppData%\Cosmos\BuilderConfig.xml
+        /// </summary>
         public static void Load() {
             var xDoc = new XmlDocument();
             var xFileName = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
@@ -88,6 +91,7 @@ namespace Cosmos.Compiler.Builder {
                 return;
             }
             xDoc.Load(xFileName);
+            BuildPath = ReadValue(xDoc, "BuildPath", "");
             TraceAssemblies = ReadEnum(xDoc,
                                        "DebugTraceAssemblies",
                                        Indy.IL2CPU.TraceAssemblies.Cosmos);
@@ -154,35 +158,22 @@ namespace Cosmos.Compiler.Builder {
                                                          xWriter.WriteValue(aValue??"");
                                                          xWriter.WriteEndElement();
                                                      };
-                xWriteValue("DebugTraceAssemblies",
-                            TraceAssemblies.ToString());
-                xWriteValue("Target",
-                            Target);
-                xWriteValue("DebugPort",
-                            DebugPort);
-                xWriteValue("DebugMode",
-                            DebugMode.ToString());
-                xWriteValue("UseGDB",
-                            UseGDB.ToString());
-                xWriteValue("UseHDImage",
-                            CreateHDImage.ToString());
-                xWriteValue("UseTAP",
-                            UseNetworkTAP.ToString());
-                xWriteValue("NetworkCard",
-                            NetworkCard);
-                xWriteValue("AudioCard",
-                            AudioCard);
-                xWriteValue("VMWareEdition",
-                            VMWareEdition);
-                xWriteValue("USBDevice",
-                            USBDevice);
-                xWriteValue("ShowOptions",
-                            ShowOptions.ToString());
-                xWriteValue("CompileIL",
-                            CompileIL.ToString());
-                xWriteValue("dotNETFrameworkImplementation",
-                            dotNETFrameworkImplementation.ToString());
-                xWriteValue("DebugComMode", DebugComMode.ToString());
+                xWriteValue("BuildPath", BuildPath);
+                xWriteValue("DebugTraceAssemblies", TraceAssemblies.ToString());
+                xWriteValue("Target", Target);
+                xWriteValue("DebugPort", DebugPort);
+                xWriteValue("DebugMode", DebugMode.ToString());
+                xWriteValue("UseGDB", UseGDB.ToString());
+                xWriteValue("UseHDImage", CreateHDImage.ToString());
+                xWriteValue("UseTAP", UseNetworkTAP.ToString());
+                xWriteValue("NetworkCard", NetworkCard);
+                xWriteValue("AudioCard", AudioCard);
+                xWriteValue("VMWareEdition", VMWareEdition);
+                xWriteValue("USBDevice", USBDevice);
+                xWriteValue("ShowOptions", ShowOptions.ToString());
+                xWriteValue("CompileIL", CompileIL.ToString());
+                xWriteValue("dotNETFrameworkImplementation", dotNETFrameworkImplementation.ToString());
+                xWriteValue("DebugComMode", DebugComMode);
                 xWriter.WriteEndDocument();
                 xWriter.Flush();
             }
