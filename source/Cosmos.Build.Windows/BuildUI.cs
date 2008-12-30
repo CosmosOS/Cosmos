@@ -195,6 +195,5 @@ namespace Cosmos.Compiler.Builder {
             var xBuildUI = new BuildUI();
             xBuildUI.Execute();
         }
-        
     }
 }

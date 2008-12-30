@@ -36,11 +36,8 @@ namespace MatthijsTest {
                 xBoot.Execute();
             }
             Console.WriteLine("Hello, World!");
-            Cosmos.Sys.Deboot.Reboot();
-            // test reboot:
-            CPU.ClearInterruptsTable();
-            uint a = 0, b = 0, c = 0, d = 0;
-            CPU.Interrupt30(ref a, ref b, ref c, ref d);
+            Cosmos.Sys.Deboot.ShutDown();
+            
         }
 
         private static void HandleSendBroadCast(string command) {

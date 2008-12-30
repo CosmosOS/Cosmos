@@ -12,7 +12,7 @@ namespace Cosmos.Hardware {
             PIC.Init();
 
             Console.WriteLine("    Init Serial");
-            Serial.InitSerial(0);
+            //Serial.InitSerial(0); // MtW: disabled, screws up debugging
             //PIT.Initialize(Tick);
 
             //HW.Interrupts.IRQ01 += new Interrupts.InterruptDelegate(Cosmos.Hardware.Keyboard.HandleKeyboardInterrupt);

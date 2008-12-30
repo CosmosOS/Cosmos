@@ -288,12 +288,14 @@ namespace Cosmos.Compiler.Builder {
             CompileCompleted.Invoke();
         }
 
+        // MtW: added as field, so that it can be reused by the test runner
+        public Assembly TargetAssembly = Assembly.GetEntryAssembly();
+
         public void BeginCompile(DebugMode aDebugMode, byte aDebugComport) {
             if (!Directory.Exists(AsmPath)) {
                 Directory.CreateDirectory(AsmPath);
             }
-            Assembly xTarget = System.Reflection.Assembly.GetEntryAssembly();
-            var xEngineParams = new PassedEngineValue(xTarget.Location, TargetPlatformEnum.X86
+            var xEngineParams = new PassedEngineValue(TargetAssembly.Location, TargetPlatformEnum.X86
                 , new string[] {
                     Path.Combine(Path.Combine(ToolsPath, "Cosmos.Kernel.Plugs"), "Cosmos.Kernel.Plugs.dll"), 
                     Path.Combine(Path.Combine(ToolsPath, "Cosmos.Hardware.Plugs"), "Cosmos.Hardware.Plugs.dll"), 

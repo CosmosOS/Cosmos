@@ -18,7 +18,7 @@ namespace Cosmos.Sys.Plugs.Assemblers
             new CPUx86.Test { DestinationReg = Registers.AL, SourceValue = 2 };
             new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotEqual, DestinationLabel = ".waitBuffer" };
             new CPUx86.Move { DestinationReg = Registers.AL, SourceValue = 0xD1 };
-            new CPUx86.Move { DestinationReg = Registers.DX, SourceValue = 064 };
+            new CPUx86.Move { DestinationReg = Registers.DX, SourceValue = 0x64 };
             new CPUx86.Out { DestinationReg= Registers.AL};
             new CPUAll.Label(".clearBuffer");
             new CPUx86.Move { SourceValue = 0x64, DestinationReg = Registers.DX };
