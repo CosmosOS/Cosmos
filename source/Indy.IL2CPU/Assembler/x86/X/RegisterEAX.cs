@@ -31,5 +31,9 @@ namespace Indy.IL2CPU.Assembler.X86.X {
             Instance.Move(aValue.GetId());
             return Instance;
         }
+        public static implicit operator PortNumber(RegisterEAX aEAX)
+        {
+            return new PortNumber(aEAX.GetId());
+        }
     }
 }

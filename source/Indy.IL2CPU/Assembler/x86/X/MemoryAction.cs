@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86.X {
     public class MemoryAction {
-        public readonly uint? Value;
+        public uint? Value;
         public readonly Guid Register;
         public readonly ElementReference Reference;
         public readonly int Displacement;
@@ -88,6 +88,7 @@ namespace Indy.IL2CPU.Assembler.X86.X {
         // variant and if possible to self usage, ie no assignments. May however result 
         // in too many class variants to be worth while.
         public void Compare(UInt32 aValue) {
+            Value = aValue;
             ApplyToDestAndSource(new Compare());
         }
 

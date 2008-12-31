@@ -98,6 +98,8 @@
     <Compile Include="Assembler\x86\JumpToSegment.cs" />
     <Compile Include="Assembler\x86\MoveCR.cs" />
     <Compile Include="Assembler\x86\Movs.cs" />
+    <Compile Include="Assembler\x86\X\PortNumber.cs" />
+    <Compile Include="Assembler\x86\X\RegisterAX.cs" />
     <Compile Include="Assembler\x86\X\RegisterEBX.cs" />
     <Compile Include="Assembler\x86\_Infra\Extensions.cs" />
     <Compile Include="Assembler\x86\_Infra\IInstructionWithCondition.cs" />
@@ -186,7 +188,6 @@
     <Compile Include="Assembler\x86\X\AddressIndirect.cs" />
     <Compile Include="Assembler\x86\X\Memory.cs" />
     <Compile Include="Assembler\x86\X\MemoryAction.cs" />
-    <Compile Include="Assembler\x86\X\PortNumber.cs" />
     <Compile Include="Assembler\x86\X\Ports.cs" />
     <Compile Include="Assembler\x86\X\Register.cs" />
     <Compile Include="Assembler\x86\X\Register08.cs" />

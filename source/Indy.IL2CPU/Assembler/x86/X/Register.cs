@@ -23,7 +23,10 @@ namespace Indy.IL2CPU.Assembler.X86.X {
         }
 
         protected void Move(MemoryAction aAction) {
-            new X86.Move { DestinationReg = GetId(), SourceReg = aAction.Register, SourceValue = aAction.Value.GetValueOrDefault(), SourceDisplacement = aAction.Displacement, SourceIsIndirect = aAction.IsIndirect, SourceRef = aAction.Reference, Size = Registers.GetSize(GetId()) };
+            uint? xSourceValue = aAction.Value.GetValueOrDefault();
+            if (xSourceValue == 0)
+                xSourceValue = null;
+            new X86.Move { DestinationReg = GetId(), SourceReg = aAction.Register, SourceValue = xSourceValue, SourceDisplacement = aAction.Displacement, SourceIsIndirect = aAction.IsIndirect, SourceRef = aAction.Reference, Size = Registers.GetSize(GetId()) };
         }
 
         protected void Move(Guid aRegister) {
@@ -36,6 +39,11 @@ namespace Indy.IL2CPU.Assembler.X86.X {
 
         public string GetName() {
             return GetType().Name.Substring("Register".Length);
+        }
+        public bool isPort(){
+            if (GetId().Equals(Registers.AX) || GetId().Equals(Registers.AL) || GetId().Equals(Registers.EAX))
+                return true;
+            return false;
         }
     }
 }

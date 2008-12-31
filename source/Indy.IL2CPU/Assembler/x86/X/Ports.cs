@@ -10,7 +10,10 @@ namespace Indy.IL2CPU.Assembler.X86.X {
                 return new PortNumber(aDX.GetId());
             }
             set {
-                new X86.Out {DestinationReg=Registers.EAX};
+                if (value.Register == Registers.EAX || value.Register == Registers.AX || value.Register == Registers.AL)
+                    new X86.Out { DestinationReg = value.Register };
+                else
+                    throw new Exception("Invalid destination register for OUT");
             }
         }
     }
