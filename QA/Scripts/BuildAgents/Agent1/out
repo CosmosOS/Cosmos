@@ -1,0 +1,494 @@
+NAnt 0.85 (Build 0.85.2478.0; release; 14-10-2006)
+Copyright (C) 2001-2006 Gerry Shaw
+http://nant.sourceforge.net
+
+[loadtasks] Scanning directory "D:\.NET\Cosmos\repos\QA\Scripts\BuildAgents\Agent1\tasks" for extension assemblies.
+[loadtasks] Scanning assembly "NAnt.CompressionTasks" for extensions.
+[loadtasks] Creating TaskBuilder for GUnzip
+[loadtasks] Adding task 'gunzip' from d:\tools\nant\NAnt.CompressionTasks.dll:NAnt.Compression.Tasks.GUnzip
+[loadtasks] Creating TaskBuilder for TarTask
+[loadtasks] Adding task 'tar' from d:\tools\nant\NAnt.CompressionTasks.dll:NAnt.Compression.Tasks.TarTask
+[loadtasks] Creating TaskBuilder for UnZipTask
+[loadtasks] Adding task 'unzip' from d:\tools\nant\NAnt.CompressionTasks.dll:NAnt.Compression.Tasks.UnZipTask
+[loadtasks] Creating TaskBuilder for ZipTask
+[loadtasks] Adding task 'zip' from d:\tools\nant\NAnt.CompressionTasks.dll:NAnt.Compression.Tasks.ZipTask
+[loadtasks] Scanning assembly "NAnt.Contrib.Tasks" for extensions.
+[loadtasks] Creating TaskBuilder for Deploy
+[loadtasks] Adding task 'btsdeploy' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.BizTalk.Deploy
+[loadtasks] Creating TaskBuilder for Export
+[loadtasks] Adding task 'btsexport' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.BizTalk.Export
+[loadtasks] Creating TaskBuilder for Host
+[loadtasks] Adding task 'btshost' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.BizTalk.Host
+[loadtasks] Creating TaskBuilder for Import
+[loadtasks] Adding task 'btsimport' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.BizTalk.Import
+[loadtasks] Creating TaskBuilder for Orchestration
+[loadtasks] Adding task 'btsorchestration' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.BizTalk.Orchestration
+[loadtasks] Creating TaskBuilder for Reset
+[loadtasks] Adding task 'btsreset' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.BizTalk.Reset
+[loadtasks] Creating TaskBuilder for SendPort
+[loadtasks] Adding task 'btssendport' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.BizTalk.SendPort
+[loadtasks] Creating TaskBuilder for Unbind
+[loadtasks] Adding task 'btsunbind' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.BizTalk.Unbind
+[loadtasks] Creating TaskBuilder for Undeploy
+[loadtasks] Adding task 'btsundeploy' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.BizTalk.Undeploy
+[loadtasks] Creating TaskBuilder for ClearCaseCatCs
+[loadtasks] Adding task 'cccatcs' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.ClearCase.ClearCaseCatCs
+[loadtasks] Creating TaskBuilder for ClearCaseCheckIn
+[loadtasks] Adding task 'cccheckin' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.ClearCase.ClearCaseCheckIn
+[loadtasks] Creating TaskBuilder for ClearCaseCheckOut
+[loadtasks] Adding task 'cccheckout' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.ClearCase.ClearCaseCheckOut
+[loadtasks] Creating TaskBuilder for ClearCaseLock
+[loadtasks] Adding task 'cclock' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.ClearCase.ClearCaseLock
+[loadtasks] Creating TaskBuilder for ClearCaseMkElem
+[loadtasks] Adding task 'ccmkelem' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.ClearCase.ClearCaseMkElem
+[loadtasks] Creating TaskBuilder for ClearCaseMkLabel
+[loadtasks] Adding task 'ccmklabel' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.ClearCase.ClearCaseMkLabel
+[loadtasks] Creating TaskBuilder for ClearCaseMkLbType
+[loadtasks] Adding task 'ccmklbtype' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.ClearCase.ClearCaseMkLbType
+[loadtasks] Creating TaskBuilder for ClearCaseRmType
+[loadtasks] Adding task 'ccrmtype' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.ClearCase.ClearCaseRmType
+[loadtasks] Creating TaskBuilder for ClearCaseUnCheckOut
+[loadtasks] Adding task 'ccuncheckout' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.ClearCase.ClearCaseUnCheckOut
+[loadtasks] Creating TaskBuilder for ClearCaseUnLock
+[loadtasks] Adding task 'ccunlock' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.ClearCase.ClearCaseUnLock
+[loadtasks] Creating TaskBuilder for ClearCaseUpdate
+[loadtasks] Adding task 'ccupdate' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.ClearCase.ClearCaseUpdate
+[loadtasks] Creating TaskBuilder for GrepTask
+[loadtasks] Adding task 'grep' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.Grep.GrepTask
+[loadtasks] Creating TaskBuilder for CheckpointTask
+[loadtasks] Adding task 'mkscheckpoint' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.Mks.CheckpointTask
+[loadtasks] Creating TaskBuilder for GetTask
+[loadtasks] Adding task 'mksget' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.Mks.GetTask
+[loadtasks] Creating TaskBuilder for ChangesTask
+[loadtasks] Adding task 'mkschanges' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.Mks.ChangesTask
+[loadtasks] Creating TaskBuilder for MsiTask
+[loadtasks] Adding task 'msi' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.Msi.MsiTask
+[loadtasks] Creating TaskBuilder for MsmTask
+[loadtasks] Adding task 'msm' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.Msi.MsmTask
+[loadtasks] Creating TaskBuilder for NUnit2ReportTask
+[loadtasks] Adding task 'nunit2report' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.NUnit2Report.NUnit2ReportTask
+[loadtasks] Creating TaskBuilder for PVCSAddFilesTask
+[loadtasks] Adding task 'pvcsaddfiles' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.PVCS.PVCSAddFilesTask
+[loadtasks] Creating TaskBuilder for PVCSAddUserTask
+[loadtasks] Adding task 'pvcsadduser' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.PVCS.PVCSAddUserTask
+[loadtasks] Creating TaskBuilder for PVCSAssignGroupTask
+[loadtasks] Adding task 'pvcsassigngroup' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.PVCS.PVCSAssignGroupTask
+[loadtasks] Creating TaskBuilder for PVCSChangeGroupTask
+[loadtasks] Adding task 'pvcschangegroup' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.PVCS.PVCSChangeGroupTask
+[loadtasks] Creating TaskBuilder for PVCSCreateProjectTask
+[loadtasks] Adding task 'pvcscreateproject' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.PVCS.PVCSCreateProjectTask
+[loadtasks] Creating TaskBuilder for PVCSDeleteGroupTask
+[loadtasks] Adding task 'pvcsdeletegroup' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.PVCS.PVCSDeleteGroupTask
+[loadtasks] Creating TaskBuilder for PVCSDeleteLabelTask
+[loadtasks] Adding task 'pvcsdeletelabel' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.PVCS.PVCSDeleteLabelTask
+[loadtasks] Creating TaskBuilder for PVCSDeleteTask
+[loadtasks] Adding task 'pvcsdelete' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.PVCS.PVCSDeleteTask
+[loadtasks] Creating TaskBuilder for PVCSDeleteUsersTask
+[loadtasks] Adding task 'pvcsdeleteusers' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.PVCS.PVCSDeleteUsersTask
+[loadtasks] Creating TaskBuilder for PVCSGetTask
+[loadtasks] Adding task 'pvcsget' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.PVCS.PVCSGetTask
+[loadtasks] Creating TaskBuilder for PVCSLabelTask
+[loadtasks] Adding task 'pvcslabel' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.PVCS.PVCSLabelTask
+[loadtasks] Creating TaskBuilder for PVCSLockTask
+[loadtasks] Adding task 'pvcslock' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.PVCS.PVCSLockTask
+[loadtasks] Creating TaskBuilder for PVCSPromoteGroupTask
+[loadtasks] Adding task 'pvcspromotegroup' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.PVCS.PVCSPromoteGroupTask
+[loadtasks] Creating TaskBuilder for PVCSPutTask
+[loadtasks] Adding task 'pvcsput' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.PVCS.PVCSPutTask
+[loadtasks] Creating TaskBuilder for PVCSRenameLabelTask
+[loadtasks] Adding task 'pvcsrenamelabel' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.PVCS.PVCSRenameLabelTask
+[loadtasks] Creating TaskBuilder for PVCSUnlockTask
+[loadtasks] Adding task 'pvcsunlock' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.PVCS.PVCSUnlockTask
+[loadtasks] Creating TaskBuilder for P4Add
+[loadtasks] Adding task 'p4add' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.Perforce.P4Add
+[loadtasks] Creating TaskBuilder for P4Change
+[loadtasks] Adding task 'p4change' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.Perforce.P4Change
+[loadtasks] Creating TaskBuilder for P4Client
+[loadtasks] Adding task 'p4client' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.Perforce.P4Client
+[loadtasks] Creating TaskBuilder for P4Delete
+[loadtasks] Adding task 'p4delete' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.Perforce.P4Delete
+[loadtasks] Creating TaskBuilder for P4Edit
+[loadtasks] Adding task 'p4edit' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.Perforce.P4Edit
+[loadtasks] Creating TaskBuilder for P4Info
+[loadtasks] Adding task 'p4info' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.Perforce.P4Info
+[loadtasks] Creating TaskBuilder for P4Label
+[loadtasks] Adding task 'p4label' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.Perforce.P4Label
+[loadtasks] Creating TaskBuilder for P4Labelsync
+[loadtasks] Adding task 'p4labelsync' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.Perforce.P4Labelsync
+[loadtasks] Creating TaskBuilder for P4Print
+[loadtasks] Adding task 'p4print' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.Perforce.P4Print
+[loadtasks] Creating TaskBuilder for P4Reopen
+[loadtasks] Adding task 'p4reopen' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.Perforce.P4Reopen
+[loadtasks] Creating TaskBuilder for P4Revert
+[loadtasks] Adding task 'p4revert' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.Perforce.P4Revert
+[loadtasks] Creating TaskBuilder for P4Set
+[loadtasks] Adding task 'p4set' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.Perforce.P4Set
+[loadtasks] Creating TaskBuilder for P4Submit
+[loadtasks] Adding task 'p4submit' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.Perforce.P4Submit
+[loadtasks] Creating TaskBuilder for P4Sync
+[loadtasks] Adding task 'p4sync' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.Perforce.P4Sync
+[loadtasks] Creating TaskBuilder for AddTask
+[loadtasks] Adding task 'vssadd' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.SourceSafe.AddTask
+[loadtasks] Creating TaskBuilder for CheckinTask
+[loadtasks] Adding task 'vsscheckin' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.SourceSafe.CheckinTask
+[loadtasks] Creating TaskBuilder for CheckoutTask
+[loadtasks] Adding task 'vsscheckout' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.SourceSafe.CheckoutTask
+[loadtasks] Creating TaskBuilder for DeleteTask
+[loadtasks] Adding task 'vssdelete' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.SourceSafe.DeleteTask
+[loadtasks] Creating TaskBuilder for DiffTask
+[loadtasks] Adding task 'vssdiff' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.SourceSafe.DiffTask
+[loadtasks] Creating TaskBuilder for GetTask
+[loadtasks] Adding task 'vssget' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.SourceSafe.GetTask
+[loadtasks] Creating TaskBuilder for History
+[loadtasks] Adding task 'vsshistory' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.SourceSafe.History
+[loadtasks] Creating TaskBuilder for LabelTask
+[loadtasks] Adding task 'vsslabel' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.SourceSafe.LabelTask
+[loadtasks] Creating TaskBuilder for UndoCheckoutTask
+[loadtasks] Adding task 'vssundocheckout' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.SourceSafe.UndoCheckoutTask
+[loadtasks] Creating TaskBuilder for StarTeamAutoLabel
+[loadtasks] Adding task 'stautolabel' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.StarTeam.StarTeamAutoLabel
+[loadtasks] Creating TaskBuilder for StarTeamCheckin
+[loadtasks] Adding task 'stcheckin' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.StarTeam.StarTeamCheckin
+[loadtasks] Creating TaskBuilder for StarTeamCheckout
+[loadtasks] Adding task 'stcheckout' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.StarTeam.StarTeamCheckout
+[loadtasks] Creating TaskBuilder for StarTeamLabel
+[loadtasks] Adding task 'stlabel' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.StarTeam.StarTeamLabel
+[loadtasks] Creating TaskBuilder for StarTeamList
+[loadtasks] Adding task 'stlist' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.StarTeam.StarTeamList
+[loadtasks] Creating TaskBuilder for SSCMBatch
+[loadtasks] Adding task 'sscmbatch' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.SurroundSCM.SSCMBatch
+[loadtasks] Creating TaskBuilder for SSCMBranch
+[loadtasks] Adding task 'sscmbranch' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.SurroundSCM.SSCMBranch
+[loadtasks] Creating TaskBuilder for SSCMCheckin
+[loadtasks] Adding task 'sscmcheckin' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.SurroundSCM.SSCMCheckin
+[loadtasks] Creating TaskBuilder for SSCMCheckout
+[loadtasks] Adding task 'sscmcheckout' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.SurroundSCM.SSCMCheckout
+[loadtasks] Creating TaskBuilder for SSCMFreeze
+[loadtasks] Adding task 'sscmfreeze' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.SurroundSCM.SSCMFreeze
+[loadtasks] Creating TaskBuilder for SSCMGet
+[loadtasks] Adding task 'sscmget' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.SurroundSCM.SSCMGet
+[loadtasks] Creating TaskBuilder for SSCMLabel
+[loadtasks] Adding task 'sscmlabel' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.SurroundSCM.SSCMLabel
+[loadtasks] Creating TaskBuilder for SSCMUnFreeze
+[loadtasks] Adding task 'sscmunfreeze' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.SurroundSCM.SSCMUnFreeze
+[loadtasks] Creating TaskBuilder for SvnCheckoutTask
+[loadtasks] Adding task 'svn-checkout' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.Svn.SvnCheckoutTask
+[loadtasks] Creating TaskBuilder for SvnTask
+[loadtasks] Adding task 'svn' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.Svn.SvnTask
+[loadtasks] Creating TaskBuilder for SvnUpdateTask
+[loadtasks] Adding task 'svn-update' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.Svn.SvnUpdateTask
+[loadtasks] Creating TaskBuilder for ApplicationPool
+[loadtasks] Adding task 'iisapppool' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.Web.ApplicationPool
+[loadtasks] Creating TaskBuilder for CreateVirtualDirectory
+[loadtasks] Adding task 'mkiisdir' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.Web.CreateVirtualDirectory
+[loadtasks] Creating TaskBuilder for DeleteVirtualDirectory
+[loadtasks] Adding task 'deliisdir' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.Web.DeleteVirtualDirectory
+[loadtasks] Creating TaskBuilder for VirtualDirectoryInfo
+[loadtasks] Adding task 'iisdirinfo' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.Web.VirtualDirectoryInfo
+[loadtasks] Creating TaskBuilder for ADSIGetPropertyTask
+[loadtasks] Adding task 'adsigetprop' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.ADSIGetPropertyTask
+[loadtasks] Creating TaskBuilder for ADSISetPropertyTask
+[loadtasks] Adding task 'adsisetprop' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.ADSISetPropertyTask
+[loadtasks] Creating TaskBuilder for Astyle
+[loadtasks] Adding task 'astyle' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.Astyle
+[loadtasks] Creating TaskBuilder for COMRegisterTask
+[loadtasks] Adding task 'comregister' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.COMRegisterTask
+[loadtasks] Creating TaskBuilder for ChangeDirectory
+[loadtasks] Adding task 'cd' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.ChangeDirectory
+[loadtasks] Creating TaskBuilder for ChecksumTask
+[loadtasks] Adding task 'checksum' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.ChecksumTask
+[loadtasks] Creating TaskBuilder for ChooseTask
+[loadtasks] Adding task 'choose' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.ChooseTask
+[loadtasks] Creating TaskBuilder for CodeStatsTask
+[loadtasks] Adding task 'codestats' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.CodeStatsTask
+[loadtasks] Creating TaskBuilder for ConcatTask
+[loadtasks] Adding task 'concat' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.ConcatTask
+[loadtasks] Creating TaskBuilder for DependsTask
+[loadtasks] Adding task 'depends' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.DependsTask
+[loadtasks] Creating TaskBuilder for DicsoTask
+[loadtasks] Adding task 'disco' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.DicsoTask
+[loadtasks] Creating TaskBuilder for FxCopTask
+[loadtasks] Adding task 'fxcop' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.FxCopTask
+[loadtasks] Creating TaskBuilder for GacInstallTask
+[loadtasks] Adding task 'gac-install' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.GacInstallTask
+[loadtasks] Creating TaskBuilder for GacTask
+[loadtasks] Adding task 'gac' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.GacTask
+[loadtasks] Creating TaskBuilder for GacUninstallTask
+[loadtasks] Adding task 'gac-uninstall' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.GacUninstallTask
+[loadtasks] Creating TaskBuilder for HxCompTask
+[loadtasks] Adding task 'hxcomp' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.HxCompTask
+[loadtasks] Creating TaskBuilder for HxRegTask
+[loadtasks] Adding task 'hxreg' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.HxRegTask
+[loadtasks] Creating TaskBuilder for IniReadTask
+[loadtasks] Adding task 'iniread' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.IniReadTask
+[loadtasks] Creating TaskBuilder for IniWriteTask
+[loadtasks] Adding task 'iniwrite' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.IniWriteTask
+[loadtasks] Creating TaskBuilder for MsbuildTask
+[loadtasks] Adding task 'msbuild' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.MsbuildTask
+[loadtasks] Creating TaskBuilder for MgmtClassGenTask
+[loadtasks] Adding task 'mgmtclassgen' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.MgmtClassGenTask
+[loadtasks] Creating TaskBuilder for NGenTask
+[loadtasks] Adding task 'ngen' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.NGenTask
+[loadtasks] Creating TaskBuilder for NUnitReportTask
+[loadtasks] Adding task 'nunitreport' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.NUnitReportTask
+[loadtasks] Creating TaskBuilder for RecordTask
+[loadtasks] Adding task 'record' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.RecordTask
+[loadtasks] Creating TaskBuilder for RegasmTask
+[loadtasks] Adding task 'regasm' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.RegasmTask
+[loadtasks] Creating TaskBuilder for ScpTask
+[loadtasks] Adding task 'scp' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.ScpTask
+[loadtasks] Creating TaskBuilder for SlingshotTask
+[loadtasks] Adding task 'slingshot' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.SlingshotTask
+[loadtasks] Creating TaskBuilder for SqlTask
+[loadtasks] Adding task 'sql' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.SqlTask
+[loadtasks] Creating TaskBuilder for TryCatchTask
+[loadtasks] Adding task 'trycatch' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.TryCatchTask
+[loadtasks] Creating TaskBuilder for TypedCollectionTask
+[loadtasks] Adding task 'typedcollection' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.TypedCollectionTask
+[loadtasks] Creating TaskBuilder for ValidateXmlTask
+[loadtasks] Adding task 'validatexml' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.ValidateXmlTask
+[loadtasks] Creating TaskBuilder for Vb6Task
+[loadtasks] Adding task 'vb6' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.Vb6Task
+[loadtasks] Creating TaskBuilder for VersionTask
+[loadtasks] Adding task 'version' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.VersionTask
+[loadtasks] Creating TaskBuilder for WsdlTask
+[loadtasks] Adding task 'wsdl' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.WsdlTask
+[loadtasks] Creating TaskBuilder for XsdTask
+[loadtasks] Adding task 'xsd' from d:\tools\nant\NAnt.Contrib.Tasks.dll:NAnt.Contrib.Tasks.XsdTask
+[loadtasks] Scanning assembly "NAnt.DotNetTasks" for extensions.
+[loadtasks] Creating TaskBuilder for AssemblyInfoTask
+[loadtasks] Adding task 'asminfo' from d:\tools\nant\NAnt.DotNetTasks.dll:NAnt.DotNet.Tasks.AssemblyInfoTask
+[loadtasks] Creating TaskBuilder for AssemblyLinkerTask
+[loadtasks] Adding task 'al' from d:\tools\nant\NAnt.DotNetTasks.dll:NAnt.DotNet.Tasks.AssemblyLinkerTask
+[loadtasks] Creating TaskBuilder for CscTask
+[loadtasks] Adding task 'csc' from d:\tools\nant\NAnt.DotNetTasks.dll:NAnt.DotNet.Tasks.CscTask
+[loadtasks] Creating TaskBuilder for DelaySignTask
+[loadtasks] Adding task 'delay-sign' from d:\tools\nant\NAnt.DotNetTasks.dll:NAnt.DotNet.Tasks.DelaySignTask
+[loadtasks] Creating TaskBuilder for IlasmTask
+[loadtasks] Adding task 'ilasm' from d:\tools\nant\NAnt.DotNetTasks.dll:NAnt.DotNet.Tasks.IlasmTask
+[loadtasks] Creating TaskBuilder for JscTask
+[loadtasks] Adding task 'jsc' from d:\tools\nant\NAnt.DotNetTasks.dll:NAnt.DotNet.Tasks.JscTask
+[loadtasks] Creating TaskBuilder for LicenseTask
+[loadtasks] Adding task 'license' from d:\tools\nant\NAnt.DotNetTasks.dll:NAnt.DotNet.Tasks.LicenseTask
+[loadtasks] Creating TaskBuilder for NDocTask
+[loadtasks] Adding task 'ndoc' from d:\tools\nant\NAnt.DotNetTasks.dll:NAnt.DotNet.Tasks.NDocTask
+[loadtasks] Creating TaskBuilder for RegsvcsTask
+[loadtasks] Adding task 'regsvcs' from d:\tools\nant\NAnt.DotNetTasks.dll:NAnt.DotNet.Tasks.RegsvcsTask
+[loadtasks] Creating TaskBuilder for ResGenTask
+[loadtasks] Adding task 'resgen' from d:\tools\nant\NAnt.DotNetTasks.dll:NAnt.DotNet.Tasks.ResGenTask
+[loadtasks] Creating TaskBuilder for ScriptTask
+[loadtasks] Adding task 'script' from d:\tools\nant\NAnt.DotNetTasks.dll:NAnt.DotNet.Tasks.ScriptTask
+[loadtasks] Creating TaskBuilder for VbcTask
+[loadtasks] Adding task 'vbc' from d:\tools\nant\NAnt.DotNetTasks.dll:NAnt.DotNet.Tasks.VbcTask
+[loadtasks] Creating TaskBuilder for VjcTask
+[loadtasks] Adding task 'vjc' from d:\tools\nant\NAnt.DotNetTasks.dll:NAnt.DotNet.Tasks.VjcTask
+[loadtasks] Scanning assembly "NAnt.NUnit1Tasks" for extensions.
+[loadtasks] Creating TaskBuilder for NUnitTask
+[loadtasks] Adding task 'nunit' from d:\tools\nant\NAnt.NUnit1Tasks.dll:NAnt.NUnit1.Tasks.NUnitTask
+[loadtasks] Scanning assembly "NAnt.NUnit2Tasks" for extensions.
+[loadtasks] Creating TaskBuilder for NUnit2Task
+[loadtasks] Adding task 'nunit2' from d:\tools\nant\NAnt.NUnit2Tasks.dll:NAnt.NUnit2.Tasks.NUnit2Task
+[loadtasks] Scanning assembly "NAnt.SourceControlTasks" for extensions.
+[loadtasks] Creating TaskBuilder for ChangeLogTask
+[loadtasks] Adding task 'cvs-changelog' from d:\tools\nant\NAnt.SourceControlTasks.dll:NAnt.SourceControl.Tasks.ChangeLogTask
+[loadtasks] Creating TaskBuilder for CheckoutTask
+[loadtasks] Adding task 'cvs-checkout' from d:\tools\nant\NAnt.SourceControlTasks.dll:NAnt.SourceControl.Tasks.CheckoutTask
+[loadtasks] Creating TaskBuilder for CvsPass
+[loadtasks] Adding task 'cvs-pass' from d:\tools\nant\NAnt.SourceControlTasks.dll:NAnt.SourceControl.Tasks.CvsPass
+[loadtasks] Creating TaskBuilder for CvsTask
+[loadtasks] Adding task 'cvs' from d:\tools\nant\NAnt.SourceControlTasks.dll:NAnt.SourceControl.Tasks.CvsTask
+[loadtasks] Creating TaskBuilder for ExportTask
+[loadtasks] Adding task 'cvs-export' from d:\tools\nant\NAnt.SourceControlTasks.dll:NAnt.SourceControl.Tasks.ExportTask
+[loadtasks] Creating TaskBuilder for RTagTask
+[loadtasks] Adding task 'cvs-rtag' from d:\tools\nant\NAnt.SourceControlTasks.dll:NAnt.SourceControl.Tasks.RTagTask
+[loadtasks] Creating TaskBuilder for TagTask
+[loadtasks] Adding task 'cvs-tag' from d:\tools\nant\NAnt.SourceControlTasks.dll:NAnt.SourceControl.Tasks.TagTask
+[loadtasks] Creating TaskBuilder for UpdateTask
+[loadtasks] Adding task 'cvs-update' from d:\tools\nant\NAnt.SourceControlTasks.dll:NAnt.SourceControl.Tasks.UpdateTask
+[loadtasks] Scanning assembly "NAnt.VisualCppTasks" for extensions.
+[loadtasks] Creating TaskBuilder for ClTask
+[loadtasks] Adding task 'cl' from d:\tools\nant\NAnt.VisualCppTasks.dll:NAnt.VisualCpp.Tasks.ClTask
+[loadtasks] Creating TaskBuilder for LibTask
+[loadtasks] Adding task 'lib' from d:\tools\nant\NAnt.VisualCppTasks.dll:NAnt.VisualCpp.Tasks.LibTask
+[loadtasks] Creating TaskBuilder for LinkTask
+[loadtasks] Adding task 'link' from d:\tools\nant\NAnt.VisualCppTasks.dll:NAnt.VisualCpp.Tasks.LinkTask
+[loadtasks] Creating TaskBuilder for McTask
+[loadtasks] Adding task 'mc' from d:\tools\nant\NAnt.VisualCppTasks.dll:NAnt.VisualCpp.Tasks.McTask
+[loadtasks] Creating TaskBuilder for MidlTask
+[loadtasks] Adding task 'midl' from d:\tools\nant\NAnt.VisualCppTasks.dll:NAnt.VisualCpp.Tasks.MidlTask
+[loadtasks] Creating TaskBuilder for RcTask
+[loadtasks] Adding task 'rc' from d:\tools\nant\NAnt.VisualCppTasks.dll:NAnt.VisualCpp.Tasks.RcTask
+[loadtasks] Scanning assembly "NAnt.VSNetTasks" for extensions.
+[loadtasks] Creating TaskBuilder for SolutionTask
+[loadtasks] Adding task 'solution' from d:\tools\nant\NAnt.VSNetTasks.dll:NAnt.VSNet.Tasks.SolutionTask
+[loadtasks] Scanning assembly "NAnt.Win32Tasks" for extensions.
+[loadtasks] Creating TaskBuilder for AxImpTask
+[loadtasks] Adding task 'aximp' from d:\tools\nant\NAnt.Win32Tasks.dll:NAnt.Win32.Tasks.AxImpTask
+[loadtasks] Creating TaskBuilder for ReadRegistryTask
+[loadtasks] Adding task 'readregistry' from d:\tools\nant\NAnt.Win32Tasks.dll:NAnt.Win32.Tasks.ReadRegistryTask
+[loadtasks] Creating TaskBuilder for RegAsmTask
+[loadtasks] Creating TaskBuilder for TlbExpTask
+[loadtasks] Adding task 'tlbexp' from d:\tools\nant\NAnt.Win32Tasks.dll:NAnt.Win32.Tasks.TlbExpTask
+[loadtasks] Creating TaskBuilder for TlbImpTask
+[loadtasks] Adding task 'tlbimp' from d:\tools\nant\NAnt.Win32Tasks.dll:NAnt.Win32.Tasks.TlbImpTask
+[loadtasks] Scanning assembly "NAnt.Core" for extensions.
+[loadtasks] Creating FilterBuilder for "ExpandProperties".
+[loadtasks] Adding filter "expandproperties" from d:\tools\nant\NAnt.Core.dll:NAnt.Core.Filters.ExpandProperties.
+[loadtasks] Creating FilterBuilder for "ReplaceString".
+[loadtasks] Adding filter "replacestring" from d:\tools\nant\NAnt.Core.dll:NAnt.Core.Filters.ReplaceString.
+[loadtasks] Creating FilterBuilder for "ReplaceTokens".
+[loadtasks] Adding filter "replacetokens" from d:\tools\nant\NAnt.Core.dll:NAnt.Core.Filters.ReplaceTokens.
+[loadtasks] Creating FilterBuilder for "TabsToSpaces".
+[loadtasks] Adding filter "tabstospaces" from d:\tools\nant\NAnt.Core.dll:NAnt.Core.Filters.TabsToSpaces.
+[loadtasks] Creating TaskBuilder for AttribTask
+[loadtasks] Adding task 'attrib' from d:\tools\nant\NAnt.Core.dll:NAnt.Core.Tasks.AttribTask
+[loadtasks] Creating TaskBuilder for AvailableTask
+[loadtasks] Adding task 'available' from d:\tools\nant\NAnt.Core.dll:NAnt.Core.Tasks.AvailableTask
+[loadtasks] Creating TaskBuilder for CallTask
+[loadtasks] Adding task 'call' from d:\tools\nant\NAnt.Core.dll:NAnt.Core.Tasks.CallTask
+[loadtasks] Creating TaskBuilder for CopyTask
+[loadtasks] Adding task 'copy' from d:\tools\nant\NAnt.Core.dll:NAnt.Core.Tasks.CopyTask
+[loadtasks] Creating TaskBuilder for DeleteTask
+[loadtasks] Adding task 'delete' from d:\tools\nant\NAnt.Core.dll:NAnt.Core.Tasks.DeleteTask
+[loadtasks] Creating TaskBuilder for DescriptionTask
+[loadtasks] Adding task 'description' from d:\tools\nant\NAnt.Core.dll:NAnt.Core.Tasks.DescriptionTask
+[loadtasks] Creating TaskBuilder for EchoTask
+[loadtasks] Adding task 'echo' from d:\tools\nant\NAnt.Core.dll:NAnt.Core.Tasks.EchoTask
+[loadtasks] Creating TaskBuilder for ExecTask
+[loadtasks] Adding task 'exec' from d:\tools\nant\NAnt.Core.dll:NAnt.Core.Tasks.ExecTask
+[loadtasks] Creating TaskBuilder for FailTask
+[loadtasks] Adding task 'fail' from d:\tools\nant\NAnt.Core.dll:NAnt.Core.Tasks.FailTask
+[loadtasks] Creating TaskBuilder for GetTask
+[loadtasks] Adding task 'get' from d:\tools\nant\NAnt.Core.dll:NAnt.Core.Tasks.GetTask
+[loadtasks] Creating TaskBuilder for IfTask
+[loadtasks] Adding task 'if' from d:\tools\nant\NAnt.Core.dll:NAnt.Core.Tasks.IfTask
+[loadtasks] Creating TaskBuilder for IfNotTask
+[loadtasks] Adding task 'ifnot' from d:\tools\nant\NAnt.Core.dll:NAnt.Core.Tasks.IfNotTask
+[loadtasks] Creating TaskBuilder for IncludeTask
+[loadtasks] Adding task 'include' from d:\tools\nant\NAnt.Core.dll:NAnt.Core.Tasks.IncludeTask
+[loadtasks] Creating TaskBuilder for LoadFileTask
+[loadtasks] Adding task 'loadfile' from d:\tools\nant\NAnt.Core.dll:NAnt.Core.Tasks.LoadFileTask
+[loadtasks] Creating TaskBuilder for LoadTasksTask
+[loadtasks] Adding task 'loadtasks' from d:\tools\nant\NAnt.Core.dll:NAnt.Core.Tasks.LoadTasksTask
+[loadtasks] Creating TaskBuilder for LoopTask
+[loadtasks] Adding task 'foreach' from d:\tools\nant\NAnt.Core.dll:NAnt.Core.Tasks.LoopTask
+[loadtasks] Creating TaskBuilder for MailTask
+[loadtasks] Adding task 'mail' from d:\tools\nant\NAnt.Core.dll:NAnt.Core.Tasks.MailTask
+[loadtasks] Creating TaskBuilder for MkDirTask
+[loadtasks] Adding task 'mkdir' from d:\tools\nant\NAnt.Core.dll:NAnt.Core.Tasks.MkDirTask
+[loadtasks] Creating TaskBuilder for MoveTask
+[loadtasks] Adding task 'move' from d:\tools\nant\NAnt.Core.dll:NAnt.Core.Tasks.MoveTask
+[loadtasks] Creating TaskBuilder for NAntSchemaTask
+[loadtasks] Adding task 'nantschema' from d:\tools\nant\NAnt.Core.dll:NAnt.Core.Tasks.NAntSchemaTask
+[loadtasks] Creating TaskBuilder for NAntTask
+[loadtasks] Adding task 'nant' from d:\tools\nant\NAnt.Core.dll:NAnt.Core.Tasks.NAntTask
+[loadtasks] Creating TaskBuilder for PropertyTask
+[loadtasks] Adding task 'property' from d:\tools\nant\NAnt.Core.dll:NAnt.Core.Tasks.PropertyTask
+[loadtasks] Creating TaskBuilder for RegexTask
+[loadtasks] Adding task 'regex' from d:\tools\nant\NAnt.Core.dll:NAnt.Core.Tasks.RegexTask
+[loadtasks] Creating TaskBuilder for SetEnvTask
+[loadtasks] Adding task 'setenv' from d:\tools\nant\NAnt.Core.dll:NAnt.Core.Tasks.SetEnvTask
+[loadtasks] Creating TaskBuilder for SleepTask
+[loadtasks] Adding task 'sleep' from d:\tools\nant\NAnt.Core.dll:NAnt.Core.Tasks.SleepTask
+[loadtasks] Creating TaskBuilder for StyleTask
+[loadtasks] Adding task 'style' from d:\tools\nant\NAnt.Core.dll:NAnt.Core.Tasks.StyleTask
+[loadtasks] Creating TaskBuilder for SysInfoTask
+[loadtasks] Adding task 'sysinfo' from d:\tools\nant\NAnt.Core.dll:NAnt.Core.Tasks.SysInfoTask
+[loadtasks] Creating TaskBuilder for TStampTask
+[loadtasks] Adding task 'tstamp' from d:\tools\nant\NAnt.Core.dll:NAnt.Core.Tasks.TStampTask
+[loadtasks] Creating TaskBuilder for TouchTask
+[loadtasks] Adding task 'touch' from d:\tools\nant\NAnt.Core.dll:NAnt.Core.Tasks.TouchTask
+[loadtasks] Creating TaskBuilder for UpToDateTask
+[loadtasks] Adding task 'uptodate' from d:\tools\nant\NAnt.Core.dll:NAnt.Core.Tasks.UpToDateTask
+[loadtasks] Creating TaskBuilder for XmlPeekTask
+[loadtasks] Adding task 'xmlpeek' from d:\tools\nant\NAnt.Core.dll:NAnt.Core.Tasks.XmlPeekTask
+[loadtasks] Creating TaskBuilder for XmlPokeTask
+[loadtasks] Adding task 'xmlpoke' from d:\tools\nant\NAnt.Core.dll:NAnt.Core.Tasks.XmlPokeTask
+Framework 'net-1.0' is invalid and has not been loaded : The 'System.dll' assembly does not exist in framework assembly directory 'c:\WINDOWS\Microsoft.NET\Framework\v1.0.3705'..
+System.ArgumentException: The 'System.dll' assembly does not exist in framework assembly directory 'c:\WINDOWS\Microsoft.NET\Framework\v1.0.3705'.
+   at NAnt.Core.FrameworkInfo..ctor(String name, String family, String description, Version version, Version clrVersion, String frameworkDir, String sdkDir, String frameworkAssemblyDir, String runtimeEngine, Project project)
+   at NAnt.Core.ProjectSettingsLoader.ProcessFrameworks(XmlNode platformNode)
+
+Framework 'net-1.1' is invalid and has not been loaded : The 'System.dll' assembly does not exist in framework assembly directory 'c:\WINDOWS\Microsoft.NET\Framework\v1.1.4322'..
+System.ArgumentException: The 'System.dll' assembly does not exist in framework assembly directory 'c:\WINDOWS\Microsoft.NET\Framework\v1.1.4322'.
+   at NAnt.Core.FrameworkInfo..ctor(String name, String family, String description, Version version, Version clrVersion, String frameworkDir, String sdkDir, String frameworkAssemblyDir, String runtimeEngine, Project project)
+   at NAnt.Core.ProjectSettingsLoader.ProcessFrameworks(XmlNode platformNode)
+
+Framework 'netcf-1.0' is invalid and has not been loaded : Registry Value Not Found! - key='SOFTWARE\Microsoft\.NETCompactFramework\\sdkInstallRoot';hive='LocalMachine';.
+Registry Value Not Found! - key='SOFTWARE\Microsoft\.NETCompactFramework\\sdkInstallRoot';hive='LocalMachine';:
+NAnt.Core.BuildException: Registry Value Not Found! - key='SOFTWARE\Microsoft\.NETCompactFramework\\sdkInstallRoot';hive='LocalMachine';
+   at NAnt.Win32.Tasks.ReadRegistryTask.ExecuteTask()
+   at NAnt.Core.Task.Execute()
+   at NAnt.Core.Project.InitializeProjectDocument(XmlDocument doc)
+   at NAnt.Core.Project.Execute()
+   at NAnt.Core.ProjectSettingsLoader.ProcessFrameworks(XmlNode platformNode)
+
+Framework 'netcf-2.0' is invalid and has not been loaded : Registry Value Not Found! - key='SOFTWARE\Microsoft\.NETFramework\\sdkInstallRootv2.0';hive='LocalMachine';.
+Registry Value Not Found! - key='SOFTWARE\Microsoft\.NETFramework\\sdkInstallRootv2.0';hive='LocalMachine';:
+NAnt.Core.BuildException: Registry Value Not Found! - key='SOFTWARE\Microsoft\.NETFramework\\sdkInstallRootv2.0';hive='LocalMachine';
+   at NAnt.Win32.Tasks.ReadRegistryTask.ExecuteTask()
+   at NAnt.Core.Task.Execute()
+   at NAnt.Core.Project.InitializeProjectDocument(XmlDocument doc)
+   at NAnt.Core.Project.Execute()
+   at NAnt.Core.ProjectSettingsLoader.ProcessFrameworks(XmlNode platformNode)
+
+Framework 'mono-1.0' is invalid and has not been loaded : Framework directory 'C:\Program Files\Mono-2.0.1\lib\mono/1.0' does not exist..
+System.ArgumentException: Framework directory 'C:\Program Files\Mono-2.0.1\lib\mono/1.0' does not exist.
+   at NAnt.Core.FrameworkInfo..ctor(String name, String family, String description, Version version, Version clrVersion, String frameworkDir, String sdkDir, String frameworkAssemblyDir, String runtimeEngine, Project project)
+   at NAnt.Core.ProjectSettingsLoader.ProcessFrameworks(XmlNode platformNode)
+
+Framework 'mono-2.0' is invalid and has not been loaded : Framework directory 'C:\Program Files\Mono-2.0.1\lib\mono/1.0' does not exist..
+System.ArgumentException: Framework directory 'C:\Program Files\Mono-2.0.1\lib\mono/1.0' does not exist.
+   at NAnt.Core.FrameworkInfo..ctor(String name, String family, String description, Version version, Version clrVersion, String frameworkDir, String sdkDir, String frameworkAssemblyDir, String runtimeEngine, Project project)
+   at NAnt.Core.ProjectSettingsLoader.ProcessFrameworks(XmlNode platformNode)
+
+Framework 'mono-2.0' is invalid and has not been loaded : Framework directory 'C:\Program Files\Mono-2.0.1\lib\mono/1.0' does not exist..
+System.ArgumentException: Framework directory 'C:\Program Files\Mono-2.0.1\lib\mono/1.0' does not exist.
+   at NAnt.Core.FrameworkInfo..ctor(String name, String family, String description, Version version, Version clrVersion, String frameworkDir, String sdkDir, String frameworkAssemblyDir, String runtimeEngine, Project project)
+   at NAnt.Core.ProjectSettingsLoader.ProcessFrameworks(XmlNode platformNode)
+
+Framework 'mono-2.0' is invalid and has not been loaded : Framework directory 'C:\Program Files\Mono-2.0.1\lib\mono/1.0' does not exist..
+System.ArgumentException: Framework directory 'C:\Program Files\Mono-2.0.1\lib\mono/1.0' does not exist.
+   at NAnt.Core.FrameworkInfo..ctor(String name, String family, String description, Version version, Version clrVersion, String frameworkDir, String sdkDir, String frameworkAssemblyDir, String runtimeEngine, Project project)
+   at NAnt.Core.ProjectSettingsLoader.ProcessFrameworks(XmlNode platformNode)
+
+Framework 'sscli-1.0' is invalid and has not been loaded : Framework directory 'C:\sscli\build\v1.x86fstchk.rotor' does not exist..
+System.ArgumentException: Framework directory 'C:\sscli\build\v1.x86fstchk.rotor' does not exist.
+   at NAnt.Core.FrameworkInfo..ctor(String name, String family, String description, Version version, Version clrVersion, String frameworkDir, String sdkDir, String frameworkAssemblyDir, String runtimeEngine, Project project)
+   at NAnt.Core.ProjectSettingsLoader.ProcessFrameworks(XmlNode platformNode)
+
+[loadtasks] Scanning assembly "NAnt.MSNetTasks" for extensions.
+[loadtasks] Creating TaskBuilder for IldasmTask
+[loadtasks] Adding task 'ildasm' from d:\tools\nant\NAnt.MSNetTasks.dll:NAnt.MSNet.Tasks.IldasmTask
+[loadtasks] WeakReference for project is dead.
+[loadtasks] WeakReference for project is dead.
+[loadtasks] WeakReference for project is dead.
+[loadtasks] WeakReference for project is dead.
+[loadtasks] Creating TaskBuilder for ServiceControllerTask
+[loadtasks] Adding task 'servicecontroller' from d:\tools\nant\NAnt.MSNetTasks.dll:NAnt.MSNet.Tasks.ServiceControllerTask
+[loadtasks] WeakReference for project is dead.
+[loadtasks] WeakReference for project is dead.
+[loadtasks] WeakReference for project is dead.
+[loadtasks] WeakReference for project is dead.
+Buildfile: file:///D:/.NET/Cosmos/repos/QA/Scripts/BuildAgents/Agent1/OnCheckin.build
+Target framework: Microsoft .NET Framework 3.5
+Base Directory: D:\.NET\Cosmos\repos\QA\Scripts\BuildAgents\Agent1.
+
+
+BUILD FAILED
+
+D:\.NET\Cosmos\repos\QA\Scripts\BuildAgents\Agent1\OnCheckin.build(9,4):
+NUnitDir property not specified!:
+NAnt.Core.BuildException: D:\.NET\Cosmos\repos\QA\Scripts\BuildAgents\Agent1\OnCheckin.build(9,4):
+NUnitDir property not specified!
+   at NAnt.Core.Tasks.FailTask.ExecuteTask()
+   at NAnt.Core.Task.Execute()
+   at NAnt.Core.TaskContainer.ExecuteChildTasks()
+   at NAnt.Core.Tasks.IfTask.ExecuteTask()
+   at NAnt.Core.Task.Execute()
+   at NAnt.Core.Project.InitializeProjectDocument(XmlDocument doc)
+   at NAnt.Core.Project.Execute()
+   at NAnt.Core.Project.Run()
+
+Total time: 0 seconds.
+

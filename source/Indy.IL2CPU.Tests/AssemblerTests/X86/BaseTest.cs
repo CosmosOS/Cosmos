@@ -25,6 +25,11 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
             mNasmPath = Directory.GetCurrentDirectory();
             int xPos = mNasmPath.LastIndexOf("source", StringComparison.InvariantCultureIgnoreCase);
             mNasmPath = mNasmPath.Substring(0, xPos) + @"Build\Tools\NAsm\nasm.exe";
+            if (!File.Exists(mNasmPath)) {
+                mNasmPath = Directory.GetCurrentDirectory();
+                xPos = mNasmPath.LastIndexOf("BuildOutput", StringComparison.InvariantCultureIgnoreCase);
+                mNasmPath = mNasmPath.Substring(0, xPos) + @"Build\Tools\NAsm\nasm.exe";
+            }
         }
 
         /*protected void Verify() {

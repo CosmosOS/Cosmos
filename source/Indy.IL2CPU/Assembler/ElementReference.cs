@@ -25,35 +25,68 @@ namespace Indy.IL2CPU.Assembler {
         private ulong? mActualAddress;
 
         private static ReaderWriterLockSlim mCacheLocker = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
-        private static SortedList<string, BaseAssemblerElement> mCache = new SortedList<string, BaseAssemblerElement>();
+        private static Dictionary<string, BaseAssemblerElement> mCache;// = new SortedList<string, BaseAssemblerElement>(StringComparer.InvariantCultureIgnoreCase);
+        private static int? mThreadId = null;
 
         private static BaseAssemblerElement DoResolve(Assembler aAssembler, string aName) {
+            if(!mThreadId.HasValue) {
+                mThreadId = Thread.CurrentThread.ManagedThreadId;
+            }else {
+                if(mThreadId.Value != Thread.CurrentThread.ManagedThreadId) {
+                    throw new Exception("Called from multiple threads");
+                }
+            }
             mCacheLocker.EnterReadLock();
             try {
-                BaseAssemblerElement xTempResult;
-                if (mCache.TryGetValue(aName, out xTempResult)) {
-                    return xTempResult;
+                if (mCache != null) {
+                    BaseAssemblerElement xTempResult;
+                    if (mCache.TryGetValue(aName, out xTempResult)) {
+                        return xTempResult;
+                    }
                 }
             } finally {
                 mCacheLocker.ExitReadLock();
             }
             mCacheLocker.EnterWriteLock();
             try {
+                if(mCache == null) {
+                    mCache = new Dictionary<string, BaseAssemblerElement>(StringComparer.InvariantCultureIgnoreCase);
+                    foreach (var xInstruction in aAssembler.mAllAssemblerElements) {
+                        var xLabel = xInstruction as Label;
+                        if (xLabel != null) {
+                            mCache.Add(xLabel.QualifiedName, xLabel);
+                        }
+                        var xDataMember = xInstruction as DataMember;
+                        if (xDataMember != null) {
+                            if (mCache.ContainsKey(xDataMember.Name)) {
+                                Console.Write("");
+                            }
+                            mCache.Add(xDataMember.Name, xDataMember);
+                        }
+                    }
+                }
                 BaseAssemblerElement xTempResult;
                 if (mCache.TryGetValue(aName, out xTempResult)) {
                     return xTempResult;
                 }
-                xTempResult = (from item in aAssembler.Instructions
-                               let xLabel = item as Label
-                               where xLabel != null && xLabel.QualifiedName.Equals(aName, StringComparison.InvariantCultureIgnoreCase)
-                               select item).SingleOrDefault();
-                if (xTempResult == null) {
-                    xTempResult = (from item in aAssembler.DataMembers
-                                where item.Name.Equals(aName, StringComparison.InvariantCultureIgnoreCase)
-                                select item).SingleOrDefault();
-                }
-                mCache.Add(aName, xTempResult);
-                return xTempResult;
+                throw new Exception("Cannot resolve ElementReference to '" + aName + "'!");
+                //foreach(var xInstruction in aAssembler.Instructions ) {
+                //    var xLabel = xInstruction as Label;
+                //    if(xLabel!=null) {
+                //        if(aName.Equals(xLabel.Name, StringComparison.InvariantCultureIgnoreCase)) {
+                //            xTempResult = xLabel;
+                //            break;
+                //        }
+                //    }
+                //}
+                //if (xTempResult == null) {
+                //    foreach (var xDataMember in aAssembler.DataMembers) {
+                //        if (aName.Equals(xDataMember.Name, StringComparison.InvariantCultureIgnoreCase)) {
+                //            xTempResult = xDataMember;
+                //            break;
+                //        }
+                //    }
+                //}
             } finally {
                 mCacheLocker.ExitWriteLock();
             }

@@ -221,7 +221,7 @@ namespace Indy.IL2CPU.Assembler {
             }
         }
 
-        private List<BaseAssemblerElement> mAllAssemblerElements;
+        internal List<BaseAssemblerElement> mAllAssemblerElements;
 
         public void FlushDebug(StreamWriter aOutput) {
             BeforeFlush();
@@ -272,13 +272,6 @@ namespace Indy.IL2CPU.Assembler {
                     }
                 }
             } while (xSituationChanged);
-            if (!xSituationChanged && xIncompleteItems.Count > 0) {
-                Console.Write("");
-                foreach (var xItem in xIncompleteItems) {
-                    xItem.IsComplete(this);
-                }
-                throw new Exception("Not all Elements are complete!");
-            }
             foreach (var xItem in mAllAssemblerElements) {
                 var xBuff = xItem.GetData(this);
                 aOutput.Write(xBuff, 0, xBuff.Length);
