@@ -21,11 +21,13 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
             Assembler.DataMembers.Clear();
         }
         private static string mNasmPath;
-        static BaseTest(){
+        static BaseTest() {
+            System.Diagnostics.Debugger.Break();
             mNasmPath = Directory.GetCurrentDirectory();
             int xPos = mNasmPath.LastIndexOf("source", StringComparison.InvariantCultureIgnoreCase);
-            mNasmPath = mNasmPath.Substring(0, xPos) + @"Build\Tools\NAsm\nasm.exe";
-            if (!File.Exists(mNasmPath)) {
+            if (xPos != -1) {
+                mNasmPath = mNasmPath.Substring(0, xPos) + @"Build\Tools\NAsm\nasm.exe";
+            } else {
                 mNasmPath = Directory.GetCurrentDirectory();
                 xPos = mNasmPath.LastIndexOf("BuildOutput", StringComparison.InvariantCultureIgnoreCase);
                 mNasmPath = mNasmPath.Substring(0, xPos) + @"Build\Tools\NAsm\nasm.exe";
