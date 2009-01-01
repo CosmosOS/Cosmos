@@ -37,9 +37,10 @@ namespace Indy.IL2CPU.Assembler.X86.X {
             set {
                 if (value.Register!=Guid.Empty) {
                     var xAddrDirect = aAddress as AddressDirect;
+
                     if (xAddrDirect != null) {
                         if (xAddrDirect.Label != null) {
-                            new X86.Move { DestinationRef = new ElementReference(xAddrDirect.Label), DestinationIsIndirect=true, SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
+                            new X86.Move { DestinationRef = new ElementReference(xAddrDirect.Label), DestinationIsIndirect=true, SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
                         } else {
                             new X86.Move { DestinationValue = xAddrDirect.Address, SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
                         }

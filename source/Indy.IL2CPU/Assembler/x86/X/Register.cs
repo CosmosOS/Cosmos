@@ -23,10 +23,7 @@ namespace Indy.IL2CPU.Assembler.X86.X {
         }
 
         protected void Move(MemoryAction aAction) {
-            uint? xSourceValue = aAction.Value.GetValueOrDefault();
-            if (xSourceValue == 0)
-                xSourceValue = null;
-            new X86.Move { DestinationReg = GetId(), SourceReg = aAction.Register, SourceValue = xSourceValue, SourceDisplacement = aAction.Displacement, SourceIsIndirect = aAction.IsIndirect, SourceRef = aAction.Reference, Size = Registers.GetSize(GetId()) };
+            new X86.Move { DestinationReg = GetId(), SourceReg = aAction.Register, SourceDisplacement = aAction.Displacement, SourceIsIndirect = aAction.IsIndirect, SourceRef = aAction.Reference, Size = Registers.GetSize(GetId()) };
         }
 
         protected void Move(Guid aRegister) {
