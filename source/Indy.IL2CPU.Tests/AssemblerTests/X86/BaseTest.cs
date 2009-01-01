@@ -22,7 +22,6 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
         }
         private static string mNasmPath;
         static BaseTest() {
-            System.Diagnostics.Debugger.Break();
             mNasmPath = Directory.GetCurrentDirectory();
             int xPos = mNasmPath.LastIndexOf("source", StringComparison.InvariantCultureIgnoreCase);
             if (xPos != -1) {
