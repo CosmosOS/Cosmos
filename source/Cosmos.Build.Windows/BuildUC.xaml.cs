@@ -84,5 +84,14 @@ namespace Cosmos.Compiler.Builder {
                      });
         }
 
+        private void listErrors_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
+            if(listErrors.SelectedItem==null){
+                return;
+            }
+            if (MessageBox.Show("Do you want to copy the selected message to the clipboard", "", MessageBoxButton.YesNo) == MessageBoxResult.Yes) {
+                Clipboard.SetText((string)listErrors.SelectedItem);
+            }
+        }
+
     }
 }

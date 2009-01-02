@@ -19,7 +19,7 @@
         </StackPanel>
         <DockPanel Margin="0,125,0,65" Grid.RowSpan="3" Grid.ColumnSpan="2">
             <Label x:Name="warningLabel" DockPanel.Dock="Top" FontWeight="bold" Content="Warnings &amp; Errors"/>
-            <ListBox x:Name="listErrors" />
+            <ListBox x:Name="listErrors"  MouseDoubleClick="listErrors_MouseDoubleClick"/>
         </DockPanel>
     </Grid>
 </UserControl>
