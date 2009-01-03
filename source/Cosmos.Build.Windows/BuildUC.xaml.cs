@@ -17,16 +17,20 @@ using Indy.IL2CPU;
 using System.Collections.ObjectModel;
 using System.Windows.Threading;
 
-namespace Cosmos.Compiler.Builder {
+namespace Cosmos.Compiler.Builder
+{
 
-    public partial class BuildUC : UserControl {
-        public BuildUC() {
+    public partial class BuildUC : UserControl
+    {
+        public BuildUC()
+        {
             InitializeComponent();
         }
 
         protected Builder mBuilder;
-        
-        public void BeginBuild(Builder aBuilder, DebugMode aDebugMode, byte aComPort) {
+
+        public void BeginBuild(Builder aBuilder, DebugMode aDebugMode, byte aComPort)
+        {
             mBuilder = aBuilder;
             aBuilder.CompilingMethods += new Action<int, int>(Engine_CompilingMethods);
             aBuilder.CompilingStaticFields += new Action<int, int>(Engine_CompilingStaticFields);
@@ -35,8 +39,10 @@ namespace Cosmos.Compiler.Builder {
             aBuilder.BeginCompile(aDebugMode, aComPort);
         }
 
-        protected void aBuilder_LogMessage(LogSeverityEnum aSeverity, string aMessage) {
-            var xAction = (Action)delegate() {
+        protected void aBuilder_LogMessage(LogSeverityEnum aSeverity, string aMessage)
+        {
+            var xAction = (Action)delegate()
+            {
                 listErrors.Items.Add(String.Format("{0} - {1}",
                                                aSeverity,
                                                aMessage));
@@ -45,11 +51,13 @@ namespace Cosmos.Compiler.Builder {
             // and continue to come in and tie up the main thread after the engine completes
             // and the window is closed
             Dispatcher.Invoke(xAction);
-            
+
         }
 
-        protected void Engine_CompilingStaticFields(int aValue, int aMax) {
-            var xAction = (Action)delegate() { 
+        protected void Engine_CompilingStaticFields(int aValue, int aMax)
+        {
+            var xAction = (Action)delegate()
+            {
                 progStaticFieldsProcessed.Maximum = aMax;
                 progStaticFieldsProcessed.Value = aValue;
             };
@@ -59,9 +67,12 @@ namespace Cosmos.Compiler.Builder {
             Dispatcher.Invoke(xAction);
         }
 
-        protected void Engine_CompilingMethods(int aValue, int aMax) {
-            var xAction = (Action)delegate() { 
-                if (progMethodsScanned.Value < 100) {
+        protected void Engine_CompilingMethods(int aValue, int aMax)
+        {
+            var xAction = (Action)delegate()
+            {
+                if (progMethodsScanned.Value < 100)
+                {
                     progMethodsScanned.Value = 100;
                 }
                 progMethodsProcessed.Maximum = aMax;
@@ -75,22 +86,25 @@ namespace Cosmos.Compiler.Builder {
 
         public event Action CompileCompleted;
 
-        protected void aBuilder_CompileCompleted() {
+        protected void aBuilder_CompileCompleted()
+        {
             Dispatcher.BeginInvoke(
-             (Action)delegate() {
-                         if (listErrors.Items.Count == 0) {
-                             CompileCompleted.Invoke();
-                         }
-                     });
+             (Action)delegate()
+            {
+                if (listErrors.Items.Count == 0)
+                {
+                    CompileCompleted.Invoke();
+                }
+            });
         }
 
-        private void listErrors_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
-            if(listErrors.SelectedItem==null){
+        private void listErrors_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (listErrors.SelectedItem == null)
+            {
                 return;
             }
-            if (MessageBox.Show("Do you want to copy the selected message to the clipboard", "", MessageBoxButton.YesNo) == MessageBoxResult.Yes) {
-                Clipboard.SetText((string)listErrors.SelectedItem);
-            }
+            Clipboard.SetText((string)listErrors.SelectedItem);
         }
 
     }
