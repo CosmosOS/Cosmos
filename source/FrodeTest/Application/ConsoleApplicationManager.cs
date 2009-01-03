@@ -18,6 +18,7 @@ namespace FrodeTest.Application
             mApplications.Add(new dir());
             mApplications.Add(new drives());
             mApplications.Add(new help());
+            mApplications.Add(new lspci());
             mApplications.Add(new net());
             mApplications.Add(new ping());
             mApplications.Add(new reboot());

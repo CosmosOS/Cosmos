@@ -43,6 +43,8 @@ namespace FrodeTest
                 ////Console.Write("\\");
                 //Console.WriteLine(@"\");
 
+                Shell.Session.Run();
+
                 //TEST FRAMEWORK
                 Console.WriteLine("---- RUNNING PREDEFINED TESTS ----");
                 //Test.ConsoleTest.RunTest();

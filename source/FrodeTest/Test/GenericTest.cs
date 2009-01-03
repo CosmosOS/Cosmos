@@ -11,8 +11,8 @@ namespace FrodeTest.Test
         {
             Check.SetHeadingText("Testing System.Collections.Generic");
 
-            Check.Text = "Dictionary<UInt32, string>";
-            Check.Validate(TestDictionary() == "Hello");
+            //Check.Text = "Dictionary<UInt32, string>";
+            //Check.Validate(TestDictionary() == "Hello");
             Check.Text = "List<string>.Count";
             Check.Validate(TestListCount() == 2);
         }

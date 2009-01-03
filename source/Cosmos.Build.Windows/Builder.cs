@@ -386,7 +386,7 @@ namespace Cosmos.Compiler.Builder {
                 // CD ROM image
                 + " -cdrom \"" + BuildPath + "Cosmos.iso\""
                 // Boot CD ROM
-                + " -boot d"
+                + " -boot d
                 // Audio hardware
                 + (String.IsNullOrEmpty(aAudioCard as String) ? "" : " -soundhw " + aAudioCard)
                 // Setup serial port
