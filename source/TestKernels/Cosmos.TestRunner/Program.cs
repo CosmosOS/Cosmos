@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml;
 using Cosmos.Compiler.Builder;
 using Indy.IL2CPU;
 using System.IO;
@@ -12,35 +13,48 @@ using System.Net;
 
 namespace Cosmos.TestRunner {
     public static class Program {
-        private static List<Type> TestKernels;
+        private static List<KeyValuePair<Type, int>> TestKernels;
 
         private static void Initialize() {
-            TestKernels = new List<Type>();
-            TestKernels.Add(typeof(Cosmos.SimpleTest.Program));
+            TestKernels = new List<KeyValuePair<Type, int>>();
+            TestKernels.Add(new KeyValuePair<Type, int>(typeof(Cosmos.SimpleTest.Program), 2));
         }
 
+        private class TestResults{
+            public string Name;
+            public string Message;
+            public bool Succeeded;
+
+        }
         public static void Main() {
             try {
                 Initialize();
-                // for now, just build all kernels.
+                var xResults = new List<TestResults>();
                 foreach (var xItem in TestKernels) {
                     //xItem.Assembly.Location
                     var xBuilder = new Builder() {
                         BuildPath = Options.BuildPath,
                         UseInternalAssembler = false
                     };
-                    xBuilder.TargetAssembly = xItem.Assembly;
+                    xBuilder.TargetAssembly = xItem.Key.Assembly;
                     var xEvent = new AutoResetEvent(false);
                     xBuilder.CompileCompleted += delegate { xEvent.Set(); };
-                    xBuilder.BeginCompile(DebugMode.None, 99, false);
+                    xBuilder.BeginCompile(DebugMode.None, 0, false);
                     xEvent.WaitOne();
                     xBuilder.Assemble();
                     xBuilder.Link();
                     xBuilder.MakeISO();
                     var xISOFile = Path.Combine(xBuilder.BuildPath, "Cosmos.iso");
                     // run qemu
-                    RunKernel(xItem, xBuilder);
+                    string xMessage;
+                    var xReturn = RunKernel(xItem.Key, xBuilder, xItem.Value, out xMessage);
+                    xResults.Add(new TestResults {
+                        Name = xItem.Key.Assembly.GetName().Name,
+                        Message = xMessage,
+                        Succeeded = xReturn
+                    });
                 }
+                WriteResults(xResults);
             } catch (Exception E) {
                 Console.WriteLine(E.ToString());
             } finally {
@@ -49,13 +63,91 @@ namespace Cosmos.TestRunner {
             }
         }
 
-        private static void RunKernel(Type aType, Builder aBuilder) {
+        private static void WriteResults(List<TestResults> results) {
+            using (var xOut = XmlWriter.Create(Path.Combine(Environment.CurrentDirectory, "TestKernel-results.xml"))) {
+                xOut.WriteStartDocument(false);
+                xOut.WriteStartElement("test-results");
+                {
+                    xOut.WriteAttributeString("name", "CosmosTestKernels");
+                    xOut.WriteAttributeString("total", results.Count.ToString());
+                    xOut.WriteAttributeString("failures", (from item in results
+                                                           where !item.Succeeded
+                                                           select item).Count().ToString());
+                    xOut.WriteAttributeString("not-run", "0");
+                    xOut.WriteAttributeString("date", DateTime.Now.ToString("yyyy-mm-dd"));
+                    xOut.WriteAttributeString("time", DateTime.Now.ToString("hh:nn:ss"));
+                    xOut.WriteStartElement("environment");
+                    {
+                        xOut.WriteAttributeString("nunit-version", "10.0.0.0");
+                        xOut.WriteAttributeString("clr-version", "2.0.50727.3053");
+                        xOut.WriteAttributeString("os-version", "Cosmos");
+                        xOut.WriteAttributeString("platform", "Win32NT");
+                        xOut.WriteAttributeString("cwd", Environment.CurrentDirectory);
+                        xOut.WriteAttributeString("machine-name", "cosmos");
+                        xOut.WriteAttributeString("user", "cosmos");
+                        xOut.WriteAttributeString("user-domain", "cosmos");
+                    }
+                    xOut.WriteEndElement(); // environment
+                    xOut.WriteStartElement("culture-info");
+                    {
+                        xOut.WriteAttributeString("current-culture", "en-US");
+                        xOut.WriteAttributeString("current-uiculture", "en-US");
+                    }
+                    xOut.WriteEndElement(); // culture-info
+                    xOut.WriteStartElement("test-suite");
+                    {
+                        xOut.WriteAttributeString("name", "CosmosTestKernels");
+                        xOut.WriteAttributeString("success", (!(from item in results
+                                                                where !item.Succeeded
+                                                                select item).Any()).ToString());
+                        xOut.WriteAttributeString("time", "0.000");
+                        xOut.WriteAttributeString("asserts", results.Count.ToString());
+                        xOut.WriteStartElement("results");
+                        {
+                            foreach (var xItem in results) {
+                                xOut.WriteStartElement("test-case");
+                                {
+                                    xOut.WriteAttributeString("name", xItem.Name);
+                                    xOut.WriteAttributeString("executed", "True");
+                                    xOut.WriteAttributeString("success", xItem.Succeeded.ToString());
+                                    xOut.WriteAttributeString("time", "0.000");
+                                    xOut.WriteAttributeString("asserts", "1");
+                                    if (!xItem.Succeeded) {
+                                        xOut.WriteStartElement("failure");
+                                        {
+                                            xOut.WriteStartElement("message");
+                                            {
+                                                xOut.WriteCData(xItem.Message);
+                                            }
+                                            xOut.WriteEndElement(); // message
+                                            xOut.WriteStartElement("stack-trace");
+                                            {
+                                                xOut.WriteCData("(No stack information available)");
+                                            }
+                                            xOut.WriteEndElement(); // stack-trace
+                                        }
+                                        xOut.WriteEndElement(); // failure
+                                    }
+                                } xOut.WriteEndElement();// test-case
+                            }
+                        }
+                        xOut.WriteEndElement();// results
+                    }
+                    xOut.WriteEndElement(); // test-suite
+                } xOut.WriteEndElement(); // test results
+            }
+        }
+
+        private static bool RunKernel(Type aType, Builder aBuilder, int aExpectedTests, out string aInfo) {
             //From v0.9.1 Qemu requires forward slashes in path
             var xBuildPath = aBuilder.BuildPath.Replace('\\', '/');
             var xTestEvent = new AutoResetEvent(false);
             var xTcpServer = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             xTcpServer.Bind(new IPEndPoint(IPAddress.Loopback, 8544));
             xTcpServer.Listen(10);
+            aInfo = "";
+            int xTestsSucceeded = 0;
+            int xTestsFailed = 0;
             using (var xDebug = new FileStream(@"d:\debug", FileMode.Create)) {
                 #region test
                 var xListenThread = new Thread(delegate() {
@@ -103,12 +195,18 @@ namespace Cosmos.TestRunner {
                                         break;
                                     case CommandEnum.TestRunCompleted:
                                         Console.WriteLine("\tKernel Tests Completed!");
+
                                         xTestEvent.Set();
                                         return;
                                     case CommandEnum.TestCompleted:
                                         var xTest = xReceiveString();
                                         xReceiveString(); // for now discard description
                                         var xResult = xInputStream.ReadByte() == 1;
+                                        if(xResult) {
+                                            xTestsSucceeded++;
+                                        }else {
+                                            xTestsFailed++;
+                                        }
                                         break;
                                     case CommandEnum.String:
                                         Console.WriteLine("\t\tMessage = '{0}'", xReceiveString());
@@ -141,17 +239,32 @@ namespace Cosmos.TestRunner {
                     // COM0 - used for test result reporting
                     + " -serial tcp:127.0.0.1:8544,nodelay"
                     , aBuilder.ToolsPath + @"qemu", false, true);
-                while (!xProcess.HasExited) {
+                int xTimeout = 120000;
+                while (!xProcess.HasExited && xTimeout > 0) {
                     if (xTestEvent.WaitOne(1000)) {
                         break;
                     }
+                    xTimeout -= 1000;
                 }
                 if (!xProcess.HasExited) {
                     xProcess.Kill();
+                    return false;
                 } else {
                     if (xProcess.ExitCode != 0) {
                         Console.WriteLine(xProcess.StandardError.ReadToEnd());
                         Console.WriteLine(xProcess.StandardOutput.ReadToEnd());
+                        return false;
+                    }else {
+                        if(xTestsFailed>0) {
+                            aInfo = String.Format("{0} tests succeeded, {1} tests failed", xTestsSucceeded, xTestsFailed);
+                            return false;
+                        } else {
+                            if(xTestsSucceeded!=aExpectedTests) {
+                                aInfo = String.Format("{0} tests expected, {1} tests ran", aExpectedTests, xTestsSucceeded);
+                                return false;
+                            }
+                            return true;
+                        }
                     }
                 }
             }

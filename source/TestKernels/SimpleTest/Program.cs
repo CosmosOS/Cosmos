@@ -17,7 +17,7 @@ namespace Cosmos.SimpleTest {
             }
             TestReporter.Initialize();
             TestReporter.WriteTestResult("SimpleTest", "Simple test to show that harness is working", true);
-            TestReporter.WriteTestResult("SimpleTest1", "Simple test to show that harness is working", false);
+            TestReporter.WriteTestResult("SimpleTest1", "Simple test to show that harness is working", true);
             TestReporter.TestsCompleted();
             Console.WriteLine("Done");
             for (; ; )
