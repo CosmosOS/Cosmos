@@ -98,11 +98,12 @@ namespace Indy.IL2CPU.Assembler.X86 {
             new ClrInterruptFlag();
             new Halt();
             new Jump { DestinationLabel = ".loop" };
-            new Label("DEBUG_STUB_");
-            new Return();
             if (mComNumber > 0) {
                 var xStub = new DebugStub();
                 xStub.Main(mComPortAddresses[mComNumber - 1]);
+            }else {
+                new Label("DebugStub_Step");
+                new Return();
             }
             //aOutputWriter.WriteLine("section .data");
             DataMembers.Add(new DataIfNotDefined("NASM_COMPILATION"));

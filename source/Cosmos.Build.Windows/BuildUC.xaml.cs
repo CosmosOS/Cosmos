@@ -29,14 +29,14 @@ namespace Cosmos.Compiler.Builder
 
         protected Builder mBuilder;
 
-        public void BeginBuild(Builder aBuilder, DebugMode aDebugMode, byte aComPort)
+        public void BeginBuild(Builder aBuilder, DebugMode aDebugMode, byte aComPort, bool aGDB)
         {
             mBuilder = aBuilder;
             aBuilder.CompilingMethods += new Action<int, int>(Engine_CompilingMethods);
             aBuilder.CompilingStaticFields += new Action<int, int>(Engine_CompilingStaticFields);
             aBuilder.CompileCompleted += aBuilder_CompileCompleted;
             aBuilder.LogMessage += aBuilder_LogMessage;
-            aBuilder.BeginCompile(aDebugMode, aComPort);
+            aBuilder.BeginCompile(aDebugMode, aComPort, aGDB);
         }
 
         protected void aBuilder_LogMessage(LogSeverityEnum aSeverity, string aMessage)

@@ -13,12 +13,14 @@ namespace Indy.IL2CPU {
         public byte aDebugComNumber;
         public string aOutputDir;
         public TraceAssemblies TraceAssemblies;
+        public bool GDBDebug;
         
         public PassedEngineValue(string aAssembly,
          TargetPlatformEnum aTargetPlatform,
          IEnumerable<string> aPlugs,
          DebugMode aDebugMode,
          byte aDebugComNumber,
+            bool aGDBDebug,
          string aOutputDir
          , TraceAssemblies aTraceAssemblies) {
             this.aAssembly = aAssembly;
@@ -27,6 +29,7 @@ namespace Indy.IL2CPU {
             this.aDebugMode = aDebugMode;
             this.aDebugComNumber = aDebugComNumber;
             this.aOutputDir = aOutputDir;
+            GDBDebug= aGDBDebug;
             this.TraceAssemblies = aTraceAssemblies;
         }
     }

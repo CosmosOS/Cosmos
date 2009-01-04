@@ -32,7 +32,7 @@ namespace Cosmos.TestRunner {
                     xBuilder.TargetAssembly = xItem.Assembly;
                     var xEvent = new AutoResetEvent(false);
                     xBuilder.CompileCompleted += delegate { xEvent.Set(); };
-                    xBuilder.BeginCompile(DebugMode.None, 99);
+                    xBuilder.BeginCompile(DebugMode.None, 99, false);
                     xEvent.WaitOne();
                     xBuilder.Assemble();
                     xBuilder.Link();

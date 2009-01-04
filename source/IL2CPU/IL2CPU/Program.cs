@@ -215,6 +215,7 @@ namespace IL2CPU
                                                           g + ".asm"),
                                         xPlugs,
                                         xDebugMode,
+                                        false,
                                         xComport,
                                         xOutputDir,
                                         false);

@@ -170,6 +170,7 @@ namespace Cosmos.Compiler.Builder {
                                                  g + ".asm"),
                                xParam.aPlugs,
                                xParam.aDebugMode,
+                               xParam.GDBDebug,
                                1,
                                xParam.aOutputDir,
                                UseInternalAssembler);
@@ -291,7 +292,7 @@ namespace Cosmos.Compiler.Builder {
         // MtW: added as field, so that it can be reused by the test runner
         public Assembly TargetAssembly = Assembly.GetEntryAssembly();
 
-        public void BeginCompile(DebugMode aDebugMode, byte aDebugComport) {
+        public void BeginCompile(DebugMode aDebugMode, byte aDebugComport, bool aGDB) {
             if (!Directory.Exists(AsmPath)) {
                 Directory.CreateDirectory(AsmPath);
             }
@@ -301,7 +302,7 @@ namespace Cosmos.Compiler.Builder {
                     Path.Combine(Path.Combine(ToolsPath, "Cosmos.Hardware.Plugs"), "Cosmos.Hardware.Plugs.dll"), 
                     Path.Combine(Path.Combine(ToolsPath, "Cosmos.Sys.Plugs"), "Cosmos.Sys.Plugs.dll")
                 }
-                 , aDebugMode, aDebugComport, AsmPath, Options.TraceAssemblies);
+                 , aDebugMode, aDebugComport, aGDB, AsmPath, Options.TraceAssemblies);
 
             if (Options.dotNETFrameworkImplementation == dotNETFrameworkImplementationEnum.Microsoft) {
                 var xThread = new Thread(new ParameterizedThreadStart(ThreadExecute));
@@ -386,7 +387,7 @@ namespace Cosmos.Compiler.Builder {
                 // CD ROM image
                 + " -cdrom \"" + BuildPath + "Cosmos.iso\""
                 // Boot CD ROM
-                + " -boot d
+                + " -boot d"
                 // Audio hardware
                 + (String.IsNullOrEmpty(aAudioCard as String) ? "" : " -soundhw " + aAudioCard)
                 // Setup serial port

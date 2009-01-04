@@ -142,6 +142,7 @@ namespace Indy.IL2CPU {
                             Func<string, string> aGetFileNameForGroup,
                             IEnumerable<string> aPlugs,
                             DebugMode aDebugMode,
+            bool aGDBDebug,
                             byte aDebugComNumber,
                             string aOutputDir,
                             bool aUseBinaryEmission) {

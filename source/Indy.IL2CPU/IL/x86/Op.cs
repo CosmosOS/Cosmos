@@ -32,7 +32,6 @@ namespace Indy.IL2CPU.IL.X86 {
             new CPUx86.Jump { DestinationLabel = aNextLabel };
             //new CPUx86.JumpIfNotEqual(aNextLabel);
             new Label(aCurrentLabel + "_Step1");
-            new CPUx86.Call { DestinationLabel = "DEBUG_STUB_" };
             Type xNullRefExcType = typeof(NullReferenceException);
             Newobj.Assemble(aAssembler,
                             xNullRefExcType.GetConstructor(new Type[0]),

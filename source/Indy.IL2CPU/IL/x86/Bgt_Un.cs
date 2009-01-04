@@ -58,6 +58,7 @@ namespace Indy.IL2CPU.IL.X86 {
                 new CPUx86.SubWithCarry { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EDX };
 				//result = value1 - value2
                 new CPUx86.ConditionalJump{Condition=CPUx86.ConditionalTestEnum.Above,DestinationLabel = TargetLabel };
+                return;
 			}
 
 			throw new NotSupportedException();

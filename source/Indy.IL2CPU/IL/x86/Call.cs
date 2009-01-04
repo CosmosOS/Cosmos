@@ -174,7 +174,7 @@ namespace Indy.IL2CPU.IL.X86 {
         }
 
 	    protected virtual void HandleDebuggerBreak() {
-            new CPUx86.Call { DestinationLabel = "DEBUG_STUB_" };
+            new CPUx86.Call { DestinationLabel = "DebugStub_Step" };
 		}
 
 		public override void DoAssemble() {

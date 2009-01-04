@@ -33,7 +33,7 @@ namespace Cosmos.Compiler.Builder {
                 mBuilder.UseInternalAssembler = mOptionsUC.chbxUseInternalAssembler.IsChecked.Value;
                 mMainWindow.LoadControl(xBuildUC);
                 xBuildUC.CompileCompleted += new Action(BuildUC_CompileCompleted);
-                xBuildUC.BeginBuild(mBuilder, mOptionsUC.DebugMode, mOptionsUC.ComPort);
+                xBuildUC.BeginBuild(mBuilder, mOptionsUC.DebugMode, mOptionsUC.ComPort, mOptionsUC.chbxQEMUUseGDB.IsChecked.GetValueOrDefault());
             }
         }
 
