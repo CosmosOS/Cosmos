@@ -77,7 +77,10 @@ namespace Cosmos.Compiler.Builder {
                     int xPos = xCalculatedPath.LastIndexOf("source");
                     if (xPos == -1)
                     {
+											xPos = xCalculatedPath.LastIndexOf("BuildOutput");
+											if(xPos == -1) {
                         throw new Exception("Unable to find directory named 'source' when using CurrentDirectory.");
+                      }
                     }
                     xCalculatedPath = xCalculatedPath.Substring(0, xPos) + @"Build\";
                     Options.BuildPath = xCalculatedPath;
