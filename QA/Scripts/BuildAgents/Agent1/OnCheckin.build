@@ -35,4 +35,7 @@
 	<exec program="${path::combine(NUnitDir, 'nunit-console.exe')}" failonerror="false" workingdir="${CosmosSlnBuildOutputDir}">
 		<arg line="Indy.IL2CPU.Tests.dll /exclude=NOTWORKING /xml=&quot;${path::combine(BuildResultsDir, 'UnitTests-Results.xml')}&quot;"/>
 	</exec>
+	
+	<exec program="${path::combine(BuildResultsDir, 'Cosmos.TestRunner.exe')}" failonerror="false" workingdir="${BuildResultsDir}">
+	</exec>
 </project>
