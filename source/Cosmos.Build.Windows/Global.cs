@@ -54,6 +54,8 @@ namespace Cosmos.Compiler.Builder {
 													Console.WriteLine();
 													Console.WriteLine("Press any key to continue");
 													Console.ReadLine();
+												} else {
+													throw new Exception("Error while running program");
 												}
                     } else {
                         throw new Exception("Call failed");
