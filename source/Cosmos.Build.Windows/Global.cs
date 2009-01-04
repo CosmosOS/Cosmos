@@ -45,10 +45,16 @@ namespace Cosmos.Compiler.Builder {
                         Console.WriteLine("Error when executing: " + xStartInfo.FileName + " " + 
                             xStartInfo.Arguments + " from directory " + xStartInfo.WorkingDirectory);
                         Console.Write(xProcess.StandardOutput.ReadToEnd());
-                        System.Windows.Forms.MessageBox.Show(xProcess.StandardError.ReadToEnd());
-                        Console.WriteLine();
-                        Console.WriteLine("Press any key to continue");
-                        Console.ReadLine();
+                        if (Environment.UserInteractive) {
+													System.Windows.Forms.MessageBox.Show(xProcess.StandardError.ReadToEnd());
+												} else {
+													Console.Write(xProcess.StandardError.ReadToEnd());
+												}
+                        if (Environment.UserInteractive) {
+													Console.WriteLine();
+													Console.WriteLine("Press any key to continue");
+													Console.ReadLine();
+												}
                     } else {
                         throw new Exception("Call failed");
                     }
