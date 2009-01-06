@@ -30,7 +30,7 @@ namespace Cosmos.TestRunner {
         /// <summary>
         /// Determines if the test runner should run the kernel using qemu, or only compile (Basically useful for profiling purposes)
         /// </summary>
-        private const bool RunKernel = true;
+        private const bool NeedsToRunKernel = true;
         public static void Main() {
             try {
                 Initialize();
@@ -49,7 +49,7 @@ namespace Cosmos.TestRunner {
                         xBuilder.CompileCompleted += delegate { xEvent.Set(); };
                         xBuilder.BeginCompile(DebugMode.None, 0, false);
                         xEvent.WaitOne();
-                        if (RunKernel) {
+                        if (NeedsToRunKernel) {
                             xBuilder.Assemble();
                             xBuilder.Link();
                             xBuilder.MakeISO();
@@ -161,7 +161,7 @@ namespace Cosmos.TestRunner {
             aInfo = "";
             int xTestsSucceeded = 0;
             int xTestsFailed = 0;
-            using (var xDebug = new FileStream(@"d:\debug", FileMode.Create)) {
+            //using (var xDebug = new FileStream(@"d:\debug", FileMode.Create)) {
                 #region test
                 var xListenThread = new Thread(delegate() {
                     var xClientSocket = xTcpServer.Accept();
@@ -174,11 +174,6 @@ namespace Cosmos.TestRunner {
                                 xInputStream.Seek(0, SeekOrigin.End);
                                 xInputStream.Write(xRecvBuff, 0, xTempInt);
                                 xInputStream.Position = xCurPosition;
-                                if (xTempInt > 0) {
-                                    xDebug.Write(xRecvBuff, 0, xTempInt);
-                                    xDebug.Flush();
-                                    Console.WriteLine("Debug: BufferSize = {0}", xInputStream.Length);
-                                }
                             }
                         });
                         var xReceiveString = new Func<string>(delegate {
@@ -280,7 +275,7 @@ namespace Cosmos.TestRunner {
                         }
                     }
                 }
-            }
+            //}
         }
     }
 }
