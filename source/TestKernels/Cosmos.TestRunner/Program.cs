@@ -26,6 +26,11 @@ namespace Cosmos.TestRunner {
             public bool Succeeded;
 
         }
+
+        /// <summary>
+        /// Determines if the test runner should run the kernel using qemu, or only compile (Basically useful for profiling purposes)
+        /// </summary>
+        private const bool RunKernel = true;
         public static void Main() {
             try {
                 Initialize();
@@ -35,25 +40,30 @@ namespace Cosmos.TestRunner {
                     string xMessage;
                     bool xReturn;
                     try {
-											var xBuilder = new Builder() {
-													BuildPath = Options.BuildPath,
-													UseInternalAssembler = false
-											};
-											xBuilder.TargetAssembly = xItem.Key.Assembly;
-											var xEvent = new AutoResetEvent(false);
-											xBuilder.CompileCompleted += delegate { xEvent.Set(); };
-											xBuilder.BeginCompile(DebugMode.None, 0, false);
-											xEvent.WaitOne();
-											xBuilder.Assemble();
-											xBuilder.Link();
-											xBuilder.MakeISO();
-											var xISOFile = Path.Combine(xBuilder.BuildPath, "Cosmos.iso");
-											// run qemu
-											xReturn = RunKernel(xItem.Key, xBuilder, xItem.Value, out xMessage);
-										} catch (Exception E){
-											xMessage = E.ToString();
-											xReturn = false;
-										}
+                        var xBuilder = new Builder() {
+                            BuildPath = Options.BuildPath,
+                            UseInternalAssembler = false
+                        };
+                        xBuilder.TargetAssembly = xItem.Key.Assembly;
+                        var xEvent = new AutoResetEvent(false);
+                        xBuilder.CompileCompleted += delegate { xEvent.Set(); };
+                        xBuilder.BeginCompile(DebugMode.None, 0, false);
+                        xEvent.WaitOne();
+                        if (RunKernel) {
+                            xBuilder.Assemble();
+                            xBuilder.Link();
+                            xBuilder.MakeISO();
+                            var xISOFile = Path.Combine(xBuilder.BuildPath, "Cosmos.iso");
+                            // run qemu
+                            xReturn = RunKernel(xItem.Key, xBuilder, xItem.Value, out xMessage);
+                        } else {
+                            xReturn = true;
+                            xMessage = "";
+                        }
+                    } catch (Exception E) {
+                        xMessage = E.ToString();
+                        xReturn = false;
+                    }
                     xResults.Add(new TestResults {
                         Name = xItem.Key.Assembly.GetName().Name,
                         Message = xMessage,
@@ -63,7 +73,7 @@ namespace Cosmos.TestRunner {
                 WriteResults(xResults);
             } catch (Exception E) {
                 Console.WriteLine(E.ToString());
-						}
+            }
         }
 
         private static void WriteResults(List<TestResults> results) {
