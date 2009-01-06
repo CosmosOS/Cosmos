@@ -1,6 +1,6 @@
 ﻿<Window x:Class="Cosmos.Compiler.Builder.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Title="Cosmos Builder" Height="300" Width="300"
-    Icon="/Cosmos.Compiler.Builder;component/Cosmos.ico" WindowState="Maximized">
+    Title="Cosmos Builder" Height="700" Width="650"
+    Icon="/Cosmos.Compiler.Builder;component/Cosmos.ico">
 </Window>
