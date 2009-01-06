@@ -44,6 +44,7 @@ namespace Cosmos.TestRunner {
                             BuildPath = Options.BuildPath,
                             UseInternalAssembler = false
                         };
+                        Console.WriteLine("BuildPath = '{0}'", Options.BuildPath);
                         xBuilder.TargetAssembly = xItem.Key.Assembly;
                         var xEvent = new AutoResetEvent(false);
                         xBuilder.CompileCompleted += delegate { xEvent.Set(); };
