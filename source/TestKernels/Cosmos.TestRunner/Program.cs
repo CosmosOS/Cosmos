@@ -48,6 +48,9 @@ namespace Cosmos.TestRunner {
                         xBuilder.TargetAssembly = xItem.Key.Assembly;
                         var xEvent = new AutoResetEvent(false);
                         xBuilder.CompileCompleted += delegate { xEvent.Set(); };
+                        xBuilder.LogMessage += delegate(LogSeverityEnum aSeverity, string aMessage) {
+Console.WriteLine("Log: {0} - {1}", aSeverity, aMessage);
+                        };
                         xBuilder.BeginCompile(DebugMode.None, 0, false);
                         xEvent.WaitOne();
                         if (NeedsToRunKernel) {
