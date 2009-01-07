@@ -251,7 +251,7 @@ Console.WriteLine("Log: {0} - {1}", aSeverity, aMessage);
                     // with the packet overhead
                     //
                     // COM0 - used for test result reporting
-                    + " -serial tcp:127.0.0.1:8544,nodelay"
+                    + " -serial tcp:127.0.0.1:8544"
                     , aBuilder.ToolsPath + @"qemu", false, true);
                 int xTimeout = 120000;
                 while (!xProcess.HasExited && xTimeout > 0) {
