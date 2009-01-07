@@ -299,12 +299,22 @@ namespace Cosmos.Compiler.Builder {
             if (!Directory.Exists(AsmPath)) {
                 Directory.CreateDirectory(AsmPath);
             }
-            var xEngineParams = new PassedEngineValue(TargetAssembly.Location, TargetPlatformEnum.X86
-                , new string[] {
+            string[] xPlugs;
+            if(File.Exists(Path.Combine(Path.Combine(ToolsPath, "Cosmos.Kernel.Plugs"), "Cosmos.Kernel.Plugs.dll"))) {
+                xPlugs = new string[] {
                     Path.Combine(Path.Combine(ToolsPath, "Cosmos.Kernel.Plugs"), "Cosmos.Kernel.Plugs.dll"), 
                     Path.Combine(Path.Combine(ToolsPath, "Cosmos.Hardware.Plugs"), "Cosmos.Hardware.Plugs.dll"), 
                     Path.Combine(Path.Combine(ToolsPath, "Cosmos.Sys.Plugs"), "Cosmos.Sys.Plugs.dll")
-                }
+                }; 
+            }else {
+                xPlugs = new string[] {
+                    Path.Combine(Path.GetDirectoryName(typeof(Builder).Assembly.Location), "Cosmos.Kernel.Plugs.dll"), 
+                    Path.Combine(Path.GetDirectoryName(typeof(Builder).Assembly.Location), "Cosmos.Hardware.Plugs.dll"), 
+                    Path.Combine(Path.GetDirectoryName(typeof(Builder).Assembly.Location), "Cosmos.Sys.Plugs.dll")
+                };
+            }
+            var xEngineParams = new PassedEngineValue(TargetAssembly.Location, TargetPlatformEnum.X86
+                , xPlugs
                  , aDebugMode, aDebugComport, aGDB, AsmPath, Options.TraceAssemblies);
 
             if (Options.dotNETFrameworkImplementation == dotNETFrameworkImplementationEnum.Microsoft) {
