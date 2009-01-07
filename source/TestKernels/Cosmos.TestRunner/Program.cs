@@ -236,9 +236,9 @@ Console.WriteLine("Log: {0} - {1}", aSeverity, aMessage);
                 #endregion
                 xListenThread.IsBackground = true;
                 xListenThread.Start();
-                Console.WriteLine("Now listeningm hit enter to start qemu");
-                Console.ReadLine();
-                Thread.Sleep(250);
+                //Console.WriteLine("Now listeningm hit enter to start qemu");
+                //Console.ReadLine();
+                Thread.Sleep(1000);
                 var xProcess = Global.Call(aBuilder.ToolsPath + @"qemu\qemu.exe",
                     " -L ."
                     // CD ROM image
