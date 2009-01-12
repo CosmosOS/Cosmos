@@ -167,8 +167,7 @@ namespace Indy.IL2CPU.Assembler {
                     var xRef = aAssembler.TryResolveReference(xReference);
                     if (xRef == null) {
                         return false;
-                    }
-                    if (!xRef.IsComplete(aAssembler)) {
+                    } else if (!xRef.IsComplete(aAssembler)) {
                         return false;
                     }
                 }

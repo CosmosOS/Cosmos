@@ -233,25 +233,21 @@ namespace Indy.IL2CPU.Assembler {
 
         public virtual void FlushBinary(Stream aOutput, ulong aBaseAddress) {
             BeforeFlush();
-            bool xSituationChanged = false;
+
             var xCurrentAddresss = aBaseAddress;
+            ulong xSize = 0;
             foreach (var xItem in mAllAssemblerElements) {
                 xItem.StartAddress = xCurrentAddresss;
-                ulong xSize = 0;
                 if (!xItem.DetermineSize(this, out xSize)) {
                     throw new Exception("Element of unknown size encountered.");
                 }
-                //Console.WriteLine("Size of '{0}' = {1}", xCurrentItem, xSize);
                 xCurrentAddresss += xSize;
             }
 
             foreach (var xItem in mAllAssemblerElements) {
                 if (!xItem.IsComplete(this)) {
-                    break;
+                    throw new Exception("Incomplete element encountered.");
                 }
-            } 
-
-            foreach (var xItem in mAllAssemblerElements) {
                 var xBuff = xItem.GetData(this);
                 aOutput.Write(xBuff, 0, xBuff.Length);
             }
