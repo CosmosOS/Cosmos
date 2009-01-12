@@ -234,42 +234,22 @@ namespace Indy.IL2CPU.Assembler {
         public virtual void FlushBinary(Stream aOutput, ulong aBaseAddress) {
             BeforeFlush();
             bool xSituationChanged = false;
-            var xIncompleteItems = new List<BaseAssemblerElement>(mAllAssemblerElements);
             var xCurrentAddresss = aBaseAddress;
-            do {
-                xSituationChanged = false; 
-                int xIdx = 0;
-                while (xIdx < xIncompleteItems.Count) {
-                    var xCurrentItem = xIncompleteItems[xIdx];
-                    xCurrentItem.StartAddress = xCurrentAddresss;
-                    ulong xSize = 0;
-                    if (!xCurrentItem.DetermineSize(this, out xSize)) {
-                        break;
-                    }
-                    xSituationChanged = true;
-                    //Console.WriteLine("Size of '{0}' = {1}", xCurrentItem, xSize);
-                    xCurrentAddresss += xSize;
-                    xIncompleteItems.RemoveAt(xIdx);
+            foreach (var xItem in mAllAssemblerElements) {
+                xItem.StartAddress = xCurrentAddresss;
+                ulong xSize = 0;
+                if (!xItem.DetermineSize(this, out xSize)) {
+                    throw new Exception("Element of unknown size encountered.");
                 }
-            } while (xSituationChanged);
-            
-            if (!xSituationChanged && xIncompleteItems.Count > 0) {
-                throw new Exception("Not all Elements are able to determine size!");
+                //Console.WriteLine("Size of '{0}' = {1}", xCurrentItem, xSize);
+                xCurrentAddresss += xSize;
             }
-            xIncompleteItems = new List<BaseAssemblerElement>(mAllAssemblerElements);
-            
-            do {
-                int xIdx = 0;
-                xSituationChanged = false;
-                while (xIdx < xIncompleteItems.Count) {
-                    var xCurrentItem = xIncompleteItems[xIdx];
-                    if (!xCurrentItem.IsComplete(this)) {
-                        break;
-                    }
-                    xSituationChanged = true;
-                    xIncompleteItems.RemoveAt(xIdx);
+
+            foreach (var xItem in mAllAssemblerElements) {
+                if (!xItem.IsComplete(this)) {
+                    break;
                 }
-            } while (xSituationChanged);
+            } 
 
             foreach (var xItem in mAllAssemblerElements) {
                 var xBuff = xItem.GetData(this);
