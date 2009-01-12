@@ -322,13 +322,15 @@ namespace Indy.IL2CPU {
                             }
                         }
                     } finally {
-                        if (!aUseBinaryEmission) {
-                            using (StreamWriter xOutput = new StreamWriter(aGetFileNameForGroup("main"))) {
-                                mAssembler.FlushText(xOutput);
-                            }
-                        } else {
+                        if (aUseBinaryEmission) {
                             using (Stream xOutStream = new FileStream(Path.Combine(aOutputDir, "output.bin"), FileMode.Create)) {
                                 mAssembler.FlushBinary(xOutStream, 0x200000);
+                            }
+                        }
+                        else
+                        {
+                            using (StreamWriter xOutput = new StreamWriter(aGetFileNameForGroup("main"))) {
+                                mAssembler.FlushText(xOutput);
                             }
                         }
                         IL.Op.QueueMethod -= QueueMethod;

@@ -169,8 +169,7 @@ namespace Cosmos.Compiler.Builder {
                 Engine.DebugLog += OnLogMessage;
                 Engine.Execute(xParam.aAssembly,
                                xParam.aTargetPlatform,
-                               g => Path.Combine(AsmPath,
-                                                 g + ".asm"),
+                               g => Path.Combine(AsmPath, g + ".asm"),
                                xParam.aPlugs,
                                xParam.aDebugMode,
                                xParam.GDBDebug,
@@ -307,20 +306,20 @@ namespace Cosmos.Compiler.Builder {
                     Path.Combine(Path.Combine(ToolsPath, "Cosmos.Sys.Plugs"), "Cosmos.Sys.Plugs.dll")
                 }; 
             }else {
+                string xPath = Path.GetDirectoryName(typeof(Builder).Assembly.Location);
                 xPlugs = new string[] {
-                    Path.Combine(Path.GetDirectoryName(typeof(Builder).Assembly.Location), "Cosmos.Kernel.Plugs.dll"), 
-                    Path.Combine(Path.GetDirectoryName(typeof(Builder).Assembly.Location), "Cosmos.Hardware.Plugs.dll"), 
-                    Path.Combine(Path.GetDirectoryName(typeof(Builder).Assembly.Location), "Cosmos.Sys.Plugs.dll")
+                    Path.Combine(xPath, "Cosmos.Kernel.Plugs.dll"), 
+                    Path.Combine(xPath, "Cosmos.Hardware.Plugs.dll"), 
+                    Path.Combine(xPath, "Cosmos.Sys.Plugs.dll")
                 };
             }
             var xEngineParams = new PassedEngineValue(TargetAssembly.Location, TargetPlatformEnum.X86
-                , xPlugs
-                 , aDebugMode, aDebugComport, aGDB, AsmPath, Options.TraceAssemblies);
+                , xPlugs, aDebugMode, aDebugComport, aGDB, AsmPath, Options.TraceAssemblies);
 
             if (Options.dotNETFrameworkImplementation == dotNETFrameworkImplementationEnum.Microsoft) {
                 var xThread = new Thread(new ParameterizedThreadStart(ThreadExecute));
                 xThread.Start(xEngineParams);
-            }else {
+            } else {
                 var xThread = new Thread(MonoThreadExecute);
                 xThread.Start(xEngineParams);
             }
