@@ -243,35 +243,34 @@ namespace Indy.IL2CPU.Assembler {
                     var xCurrentItem = xIncompleteItems[xIdx];
                     xCurrentItem.StartAddress = xCurrentAddresss;
                     ulong xSize = 0;
-                    if (xCurrentItem.DetermineSize(this, out xSize)) {
-                        xSituationChanged = true;
-                        //Console.WriteLine("Size of '{0}' = {1}", xCurrentItem, xSize);
-                        xCurrentAddresss += xSize;
-                        xIncompleteItems.RemoveAt(xIdx);
-                        continue;
-                    } else {
+                    if (!xCurrentItem.DetermineSize(this, out xSize)) {
                         break;
                     }
+                    xSituationChanged = true;
+                    //Console.WriteLine("Size of '{0}' = {1}", xCurrentItem, xSize);
+                    xCurrentAddresss += xSize;
+                    xIncompleteItems.RemoveAt(xIdx);
                 }
             } while (xSituationChanged);
+            
             if (!xSituationChanged && xIncompleteItems.Count > 0) {
                 throw new Exception("Not all Elements are able to determine size!");
             }
             xIncompleteItems = new List<BaseAssemblerElement>(mAllAssemblerElements);
+            
             do {
                 int xIdx = 0;
                 xSituationChanged = false;
                 while (xIdx < xIncompleteItems.Count) {
                     var xCurrentItem = xIncompleteItems[xIdx];
-                    if (xCurrentItem.IsComplete(this)) {
-                        xSituationChanged = true;
-                        xIncompleteItems.RemoveAt(xIdx);
-                        continue;
-                    } else {
+                    if (!xCurrentItem.IsComplete(this)) {
                         break;
                     }
+                    xSituationChanged = true;
+                    xIncompleteItems.RemoveAt(xIdx);
                 }
             } while (xSituationChanged);
+
             foreach (var xItem in mAllAssemblerElements) {
                 var xBuff = xItem.GetData(this);
                 aOutput.Write(xBuff, 0, xBuff.Length);
