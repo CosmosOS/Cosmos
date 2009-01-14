@@ -228,7 +228,6 @@ namespace Indy.IL2CPU.Assembler {
             BeforeFlush();
 
             var xCurrentAddresss = aBaseAddress;
-            ulong xSize = 0;
             foreach (var xItem in mAllAssemblerElements) {
                 xItem.UpdateAddress(this, ref xCurrentAddresss);
             }
