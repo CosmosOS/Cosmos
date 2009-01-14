@@ -38,11 +38,11 @@ namespace Indy.IL2CPU.Assembler.X86 {
             return base.IsComplete(aAssembler);
         }
 
-        public override bool DetermineSize(Indy.IL2CPU.Assembler.Assembler aAssembler, out ulong aSize) {
+        public override void UpdateAddress(Indy.IL2CPU.Assembler.Assembler aAssembler, ref ulong aAddresss) {
             if (DestinationRef != null) {
                 DestinationValue = 0xFFFFFFFF;
             }
-            return base.DetermineSize(aAssembler, out aSize);
+            base.UpdateAddress(aAssembler, ref aAddresss);
         }
 
 

@@ -143,18 +143,15 @@ namespace Indy.IL2CPU.Assembler {
             }
         }
 
-        public override bool DetermineSize(Assembler aAssembler, out ulong aSize) {
+        public override void UpdateAddress(Assembler aAssembler, ref ulong xAddress) {
+            base.UpdateAddress(aAssembler, ref xAddress);
             if (RawDefaultValue != null) {
-                aSize = (ulong)RawDefaultValue.LongLength;
-                return true;
+                xAddress += (ulong)RawDefaultValue.LongLength;
             }
             if (UntypedDefaultValue != null) {
                 // TODO: what to do with 64bit target platforms? right now we only support 32bit
-                aSize = (ulong)(UntypedDefaultValue.LongLength * 4);
-                return true;
+                xAddress += (ulong)(UntypedDefaultValue.LongLength * 4);
             }
-            aSize = 0;
-            return false;
         }
 
         public override bool IsComplete(Assembler aAssembler) {
@@ -186,6 +183,9 @@ namespace Indy.IL2CPU.Assembler {
                         var xTheRef = aAssembler.TryResolveReference(xRef);
                         if (xTheRef == null) {
                             throw new Exception("Reference not found!");
+                        }
+                        if (!xTheRef.ActualAddress.HasValue) {
+                            Console.Write("");
                         }
                         xTemp = BitConverter.GetBytes(xTheRef.ActualAddress.Value);
                     } else {

@@ -101,9 +101,8 @@ namespace Indy.IL2CPU.Assembler {
             return true;
         }
 
-        public override bool DetermineSize(Assembler aAssembler, out ulong aSize) {
-            aSize = 0;
-            return true;
+        public override void UpdateAddress(Assembler aAssembler, ref ulong aAddress) {
+            base.UpdateAddress(aAssembler, ref aAddress);
         }
 
         public override byte[] GetData(Assembler aAssembler) {

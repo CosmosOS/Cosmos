@@ -615,18 +615,21 @@ namespace Indy.IL2CPU.Assembler.X86 {
             return true;
         }
 
-        public override bool DetermineSize(Indy.IL2CPU.Assembler.Assembler aAssembler, out ulong aSize) {
+        public override void UpdateAddress(Indy.IL2CPU.Assembler.Assembler aAssembler, ref ulong aAddress) {
+            base.UpdateAddress(aAssembler, ref aAddress);
             var xInstructionWithDestination = this as IInstructionWithDestination;
             var xInstructionWithSource = this as IInstructionWithSource;
             var xInstructionWithSize = this as IInstructionWithSize;
             InstructionData xInstructionData = null;
             InstructionData.InstructionEncodingOption xEncodingOption = null;
             if (!GetEffectiveInstructionInfo(this, xInstructionWithDestination, xInstructionWithSize, xInstructionWithSource, out xInstructionData, out xEncodingOption)) {
-                return base.DetermineSize(aAssembler, out aSize);
+                return;
             }
-            var xResult = DetermineSize(aAssembler, out aSize, this, xInstructionWithDestination, xInstructionWithSize, xInstructionWithSource, xInstructionData, xEncodingOption);
-            mDataSize = aSize;
-            return xResult;
+            ulong aSize = 0;
+            if (!DetermineSize(aAssembler, out aSize, this, xInstructionWithDestination, xInstructionWithSize, xInstructionWithSource, xInstructionData, xEncodingOption)) {
+                throw new Exception("Unable to determine size");
+            }
+            aAddress += aSize; 
         }
 
         public override bool IsComplete(Indy.IL2CPU.Assembler.Assembler aAssembler) {

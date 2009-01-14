@@ -19,7 +19,9 @@ namespace Indy.IL2CPU.Assembler {
             get;
         }
 
-        public abstract bool DetermineSize(Assembler aAssembler, out ulong aSize);
+        public virtual void UpdateAddress(Assembler aAssembler, ref ulong aAddress) {
+            StartAddress = aAddress;
+        }
 
         public abstract bool IsComplete(Assembler aAssembler);
         public abstract byte[] GetData(Assembler aAssembler);

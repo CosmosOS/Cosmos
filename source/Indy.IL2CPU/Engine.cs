@@ -16,6 +16,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics.SymbolStore;
 using Microsoft.Samples.Debugging.CorSymbolStore;
 using System.Threading;
+using System.Diagnostics;
 
 namespace Indy.IL2CPU {
     public enum DebugMode { None, IL, Source, MLUsingGDB }
@@ -324,7 +325,14 @@ namespace Indy.IL2CPU {
                     } finally {
                         if (aUseBinaryEmission) {
                             using (Stream xOutStream = new FileStream(Path.Combine(aOutputDir, "output.bin"), FileMode.Create)) {
-                                mAssembler.FlushBinary(xOutStream, 0x200000);
+                                Stopwatch xSW = new Stopwatch();
+                                xSW.Start();
+                                try {
+                                    mAssembler.FlushBinary(xOutStream, 0x200000);
+                                } finally {
+                                    xSW.Stop();
+                                    Debug.WriteLine(String.Format("Binary Emission took: {0}", xSW.Elapsed));
+                                }
                             }
                         }
                         else

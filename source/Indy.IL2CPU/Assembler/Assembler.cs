@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using System.Threading;
+using System.Diagnostics;
 
 namespace Indy.IL2CPU.Assembler {
     public abstract class Assembler : IDisposable {
@@ -167,58 +168,50 @@ namespace Indy.IL2CPU.Assembler {
             int xCurrentIdx = 0;
             int xIfLevelsToSkip = 0;
             var xDefines = new List<string>();
-            while (xCurrentIdx < mAllAssemblerElements.Count) {
-                var xCurrentInstruction = mAllAssemblerElements[xCurrentIdx];
+            var xNewAssemblerElements = new List<BaseAssemblerElement>();
+            foreach (var xCurrentInstruction in mAllAssemblerElements) {
                 var xIfDefined = xCurrentInstruction as IIfDefined;
                 var xEndIfDefined = xCurrentInstruction as IEndIfDefined;
                 var xDefine = xCurrentInstruction as IDefine;
                 var xIfNotDefined = xCurrentInstruction as IIfNotDefined;
                 if (xCurrentInstruction is Comment) {
-                    mAllAssemblerElements.RemoveAt(xCurrentIdx);
                     continue;
                 }
-                if(xIfDefined!=null){
-                    if(xIfLevelsToSkip>0){
+                if (xIfDefined != null) {
+                    if (xIfLevelsToSkip > 0) {
                         xIfLevelsToSkip++;
-                    } else {
-                        if (!xDefines.Contains(xIfDefined.Symbol.ToLowerInvariant())) {
-                            xIfLevelsToSkip++;
-                        }
+                    } else if (!xDefines.Contains(xIfDefined.Symbol.ToLowerInvariant())) {
+                        xIfLevelsToSkip++;
                     }
-                    mAllAssemblerElements.RemoveAt(xCurrentIdx);
                     continue;
                 }
                 if (xIfNotDefined != null) {
                     if (xIfLevelsToSkip > 0) {
                         xIfLevelsToSkip++;
-                    } else {
-                        if (xDefines.Contains(xIfNotDefined.Symbol.ToLower())) {
-                            xIfLevelsToSkip++;
-                        }
+                    } else if (xDefines.Contains(xIfNotDefined.Symbol.ToLower())) {
+                        xIfLevelsToSkip++;
                     }
-                    mAllAssemblerElements.RemoveAt(xCurrentIdx);
                     continue;
                 }
                 if (xEndIfDefined != null) {
                     if (xIfLevelsToSkip > 0) {
-                        xIfLevelsToSkip--;                        
+                        xIfLevelsToSkip--;
                     }
-                    mAllAssemblerElements.RemoveAt(xCurrentIdx);
                     continue;
                 }
                 if (xIfLevelsToSkip > 0) {
-                    mAllAssemblerElements.RemoveAt(xCurrentIdx);
                     continue;
                 }
                 if (xDefine != null) {
-                    if (!xDefines.Contains(xDefine.Symbol.ToLowerInvariant())) {
-                        xDefines.Add(xDefine.Symbol.ToLowerInvariant());
+                    var xSymbol = xDefine.Symbol.ToLowerInvariant();
+                    if (!xDefines.Contains(xSymbol)) {
+                        xDefines.Add(xSymbol);
                     }
-                    mAllAssemblerElements.RemoveAt(xCurrentIdx);
                     continue;
                 }
-                xCurrentIdx++;
+                xNewAssemblerElements.Add(xCurrentInstruction);
             }
+            mAllAssemblerElements = xNewAssemblerElements;
         }
 
         internal List<BaseAssemblerElement> mAllAssemblerElements;
@@ -237,11 +230,7 @@ namespace Indy.IL2CPU.Assembler {
             var xCurrentAddresss = aBaseAddress;
             ulong xSize = 0;
             foreach (var xItem in mAllAssemblerElements) {
-                xItem.StartAddress = xCurrentAddresss;
-                if (!xItem.DetermineSize(this, out xSize)) {
-                    throw new Exception("Element of unknown size encountered.");
-                }
-                xCurrentAddresss += xSize;
+                xItem.UpdateAddress(this, ref xCurrentAddresss);
             }
 
             foreach (var xItem in mAllAssemblerElements) {

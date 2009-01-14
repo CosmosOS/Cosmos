@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
     [OpCode("jmp")]
-    public class JumpToSegment: Instruction {
+    public class JumpToSegment: IL2CPU.Assembler.Instruction {
         public ElementReference DestinationRef {
             get;
             set;
@@ -41,9 +41,9 @@ namespace Indy.IL2CPU.Assembler.X86 {
             return DestinationRef == null || DestinationRef.Resolve(aAssembler, out xAddress);
         }
 
-        public override bool DetermineSize(Indy.IL2CPU.Assembler.Assembler aAssembler, out ulong aSize) {
-            aSize = 7;
-            return true;
+        public override void UpdateAddress(Indy.IL2CPU.Assembler.Assembler aAssembler, ref ulong aAddress) {
+            base.UpdateAddress(aAssembler, ref aAddress);
+            aAddress += 7;
         }
 
         public override byte[] GetData(Indy.IL2CPU.Assembler.Assembler aAssembler) {

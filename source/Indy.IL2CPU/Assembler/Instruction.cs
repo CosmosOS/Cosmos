@@ -35,8 +35,8 @@ namespace Indy.IL2CPU.Assembler {
             }
         }
 
-        public override bool DetermineSize(Assembler aAssembler, out ulong aSize) {
-            throw new NotImplementedException("Method not implemented for instruction " + this.GetType().FullName.Substring(typeof(Instruction).Namespace.Length+1));
+        public override void UpdateAddress(Assembler aAssembler, ref ulong aAddress) {
+            base.UpdateAddress(aAssembler, ref aAddress);
         }
 
         public override bool IsComplete(Assembler aAssembler) {
