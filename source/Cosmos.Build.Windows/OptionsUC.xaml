@@ -1,144 +1,235 @@
 ﻿<UserControl x:Class="Cosmos.Compiler.Builder.OptionsUC"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Height="Auto" Width="600">
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Width="600" Height="Auto">
+
+    <UserControl.Resources>
+        <Style x:Key="sectionTitle" TargetType="{x:Type Label}">
+            <Setter Property="Background" Value="LightGray" />
+            <Setter Property="Padding" Value="5" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="FontSize" Value="13" />
+        </Style>
+
+        <Style x:Key="sectionBody" TargetType="Panel">
+            <Setter Property="Margin" Value="7" />
+        </Style>
+
+        <Style x:Key="subsectionTitle" TargetType="{x:Type Label}">
+            <Setter Property="FontWeight" Value="Bold" />
+        </Style>
+
+        <Style TargetType="RadioButton">
+            <Setter Property="Margin" Value="5, 5, 10, 5" />
+        </Style>
+
+        <Style TargetType="CheckBox">
+            <Setter Property="Margin" Value="5, 5, 10, 5" />
+        </Style>
+
+        <Style TargetType="ComboBox">
+            <Setter Property="Height" Value="23" />
+            <Setter Property="MinWidth" Value="60" />
+        </Style>
+
+        <Style TargetType="Button">
+            <Setter Property="Width" Value="75" />
+            <Setter Property="Height" Value="23" />
+        </Style>
+    </UserControl.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <DockPanel Grid.Row="0">
-            <StackPanel DockPanel.Dock="Right" Width="75">
-                <Button Name="butnBuild" Margin="5" IsDefault="True">_Build</Button>
-                <Button Name="butnCancel" Margin="5" IsCancel="True">_Cancel</Button>
-            </StackPanel>
-            <Image Source="/Cosmos.Compiler.Builder;component/Logo-1.png" Width="150" />
-        </DockPanel>
+
+        <Border Grid.Row="0" Background="Gray">
+            <Image Source="/Cosmos.Compiler.Builder;component/Logo-1.png" Width="150" HorizontalAlignment="Center"
+                   Margin="20, 10, 10, 8"/>
+        </Border>
 
         <ScrollViewer Grid.Row="1" CanContentScroll="False" ScrollViewer.VerticalScrollBarVisibility="Auto">
-            <StackPanel>
-                <Label Margin="0,10" Background="LightGray" FontWeight="Bold">Status</Label>
-                <TextBlock TextWrapping="Wrap" Margin="10,0" FontWeight="Bold">Current build path:</TextBlock>
-                <TextBlock TextWrapping="Wrap" Margin="20,0" Name="tblkBuildPath">Build Path</TextBlock>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
 
-                <Label Margin="0,10" Background="LightGray" FontWeight="Bold">Target</Label>
-                <WrapPanel>
-                    <StackPanel>
-                        <TextBlock Margin="10,0,0,0">Emulators &amp; Virtualization</TextBlock>
-                        <WrapPanel Margin="20,0,0,0">
-                            <RadioButton Name="rdioQEMU" GroupName="Target" Margin="10, 0, 0, 0">_QEMU</RadioButton>
-                            <RadioButton Name="rdioVMWare" GroupName="Target" Margin="10, 0, 0, 0">VM_Ware</RadioButton>
-                            <RadioButton Name="rdioVPC" GroupName="Target" Margin="10,0,0,0">Virtual _PC</RadioButton>
-                        </WrapPanel>
+                <StackPanel Grid.Row="0">
+                    <Label Style="{StaticResource sectionTitle}">Status</Label>
+                    <StackPanel Style="{StaticResource sectionBody}">
+                        <Label Grid.Row="0" Style="{StaticResource subsectionTitle}">Current build path:</Label>
+                        <TextBlock Grid.Row="1" TextWrapping="Wrap" Margin="25, 0, 0, 5" Name="tblkBuildPath">Build Path</TextBlock>
                     </StackPanel>
-                    <StackPanel Margin="10,0,0,0">
-                        <TextBlock Margin="10,0,0,0">Hardware</TextBlock>
-                        <WrapPanel Margin="20,0,0,0">
-                            <RadioButton GroupName="Target"	Name="rdioISO" Margin="10, 0, 0, 0">_ISO</RadioButton>
-                            <RadioButton GroupName="Target" Name="rdioPXE" Margin="10, 0, 0, 0">_Network (PXE)</RadioButton>
-                            <RadioButton GroupName="Target" Name="rdioUSB" Margin="10, 0, 0, 0">_USB Device</RadioButton>
+
+                    <Label Style="{StaticResource sectionTitle}">Target</Label>
+                    <WrapPanel Style="{StaticResource sectionBody}">
+                        <StackPanel>
+                            <Label Style="{StaticResource subsectionTitle}">Emulators &amp; Virtualization</Label>
+                            <WrapPanel Margin="20,0,0,0">
+                                <RadioButton Name="rdioQEMU" GroupName="Target">_QEMU</RadioButton>
+                                <RadioButton Name="rdioVMWare" GroupName="Target">VM_Ware</RadioButton>
+                                <RadioButton Name="rdioVPC" GroupName="Target">Virtual _PC</RadioButton>
+                            </WrapPanel>
+                        </StackPanel>
+                        <StackPanel Margin="20,0,0,0">
+                            <Label Style="{StaticResource subsectionTitle}">Hardware</Label>
+                            <WrapPanel Margin="20,0,0,0">
+                                <RadioButton GroupName="Target"	Name="rdioISO">_ISO</RadioButton>
+                                <RadioButton GroupName="Target" Name="rdioPXE">_Network (PXE)</RadioButton>
+                                <RadioButton GroupName="Target" Name="rdioUSB">_USB Device</RadioButton>
+                            </WrapPanel>
+                        </StackPanel>
+                    </WrapPanel>
+
+                    <Label Style="{StaticResource sectionTitle}">.NET Framework</Label>
+                    <Grid Style="{StaticResource sectionBody}">
+                        <WrapPanel Margin="20, 0, 0, 0">
+                            <RadioButton GroupName="FrameworkImplementation" Name="rdioMSNET">Microsoft</RadioButton>
+                            <RadioButton GroupName="FrameworkImplementation" Name="rdioProjectMono">Mono</RadioButton>
                         </WrapPanel>
-                    </StackPanel>
-                </WrapPanel>
-                <Label Margin="0,10" Background="LightGray" FontWeight="Bold">.NET Framework</Label>
-                <WrapPanel Margin="20,0">
-                    <RadioButton GroupName="FrameworkImplementation" Name="rdioMSNET"  Margin="10,0,0,0">Microsoft</RadioButton>
-                    <RadioButton GroupName="FrameworkImplementation" Name="rdioProjectMono" Margin="10,0,0,0">Mono</RadioButton>
-                </WrapPanel>
+                    </Grid>
+
                     <StackPanel Name="spnlDebugger">
-                    <Label Margin="0,10,0,0" Background="LightGray" FontWeight="Bold">Cosmos Debugger</Label>
-                    <WrapPanel>
-                        <StackPanel>
-                            <TextBlock Margin="10,0,0,0">Source Level</TextBlock>
-                            <WrapPanel Margin="20,0,0,0">
-                                <RadioButton Name="rdioDebugModeNone" GroupName="DebugMode" Margin="10,0,0,0" IsChecked="True">None</RadioButton>
-                                <RadioButton Name="rdioDebugModeIL" GroupName="DebugMode" Margin="10, 0, 0, 0">IL</RadioButton>
-                                <RadioButton Name="rdioDebugModeSource" GroupName="DebugMode" Margin="10,0,0,0">Source</RadioButton>
+                        <Label Style="{StaticResource sectionTitle}">Cosmos Debugger</Label>
+                        <StackPanel Style="{StaticResource sectionBody}">
+                            <WrapPanel>
+                                <StackPanel>
+                                    <Label Style="{StaticResource subsectionTitle}">Source Level</Label>
+                                    <WrapPanel Margin="20,0,0,0">
+                                        <RadioButton Name="rdioDebugModeNone" GroupName="DebugMode" IsChecked="True">None</RadioButton>
+                                        <RadioButton Name="rdioDebugModeIL" GroupName="DebugMode">IL</RadioButton>
+                                        <RadioButton Name="rdioDebugModeSource" GroupName="DebugMode">Source</RadioButton>
+                                    </WrapPanel>
+                                </StackPanel>
+                                <StackPanel Margin="10, 0, 0, 0">
+                                    <Label Style="{StaticResource subsectionTitle}">Traced Assemblies</Label>
+                                    <WrapPanel Margin="20,0,0,0">
+                                        <RadioButton Name="rdioDebugAssembliesAll" GroupName="DebugAsseblies">All</RadioButton>
+                                        <RadioButton Name="rdioDebugAssembliesCosmos" GroupName="DebugAsseblies" IsChecked="True">Cosmos + User</RadioButton>
+                                        <RadioButton Name="rdioDebugAssembliesUser" GroupName="DebugAsseblies">User Only</RadioButton>
+                                    </WrapPanel>
+                                </StackPanel>
+                            </WrapPanel>
+                            <WrapPanel Name="wpnlDebugPort" Margin="0, 10, 0, 0"  ToolTip="This is the COM-port on the machine running the debugger">
+                                <Label Margin="0,0,10,0">COM Port:</Label>
+                                <ComboBox Name="cmboDebugPort"/>
                             </WrapPanel>
                         </StackPanel>
-                        <StackPanel>
-                            <TextBlock Margin="10,0,0,0">Traced Assemblies</TextBlock>
-                            <WrapPanel Margin="20,0,0,0">
-                                <RadioButton Name="rdioDebugAssembliesAll" GroupName="DebugAsseblies" Margin="10,0,0,0">All</RadioButton>
-                                <RadioButton Name="rdioDebugAssembliesCosmos" GroupName="DebugAsseblies" Margin="10, 0, 0, 0" IsChecked="True">Cosmos + User</RadioButton>
-                                <RadioButton Name="rdioDebugAssembliesUser" GroupName="DebugAsseblies" Margin="10,0,0,0">User Only</RadioButton>
+                    </StackPanel>
+
+                    <StackPanel Name="DebugComMode">
+                        <Label Style="{StaticResource sectionTitle}">Debug communication mode</Label>
+                        <StackPanel Orientation="Horizontal" Style="{StaticResource sectionBody}">
+                            <Label Margin="0, 0, 10, 0">Mode:</Label>
+                            <ComboBox Margin="0, 2" Name="cmbDebugComMode" HorizontalAlignment="Left" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel Name="spnlPXE">
+                        <Label Style="{StaticResource sectionTitle}">PXE Network Boot</Label>
+                        <Grid Style="{StaticResource sectionBody}">
+                            <TextBlock TextWrapping="Wrap">
+                            After building, start up another PC with network boot enabled and Cosmos will boot
+                            on to it automatically.
+                            </TextBlock>
+                        </Grid>
+                    </StackPanel>
+
+                    <StackPanel Name="spnlUSB">
+                        <Label Style="{StaticResource sectionTitle}">USB Boot</Label>
+                        <StackPanel Style="{StaticResource sectionBody}">
+                            <TextBlock Margin="10,10,10,0" TextWrapping="Wrap">
+                            Please choose a USB drive or stick that is formatted as FAT or FAT32. Note that
+                            selecting this device will overwrite the Master Boot Record (MBR) on the USB drive.
+                            Because of this take care to select the proper device. After a succesful build,
+                            you can then use this device to boot a physical machine. You may need to select the
+                            BIOS boot menu, use a multi boot utility, or change the BIOS boot sequence.
+                            </TextBlock>
+                            <TextBlock Margin="10,10,10,0" TextWrapping="Wrap">
+                            Only removable drives formatted as FAT or FAT32 will be listed. If you do not see your
+                            device, check its format.
+                            </TextBlock>
+                            <WrapPanel Margin="10,10,0,0">
+                                <Label Margin="-5,0,10,0">USB Device on drive letter:</Label>
+                                <ComboBox Name="cmboUSBDevice"/>
                             </WrapPanel>
                         </StackPanel>
-                        <WrapPanel Name="wpnlDebugPort" Margin="30,10,0,0" ToolTip="This is the COM-port on the machine running the debugger">
-                            <Label Margin="0,0,10,0">COM Port:</Label>
-                            <ComboBox Name="cmboDebugPort"/>
+                    </StackPanel>
+
+                    <StackPanel Name="spnlQEMU" Visibility="Collapsed">
+                        <Label Style="{StaticResource sectionTitle}">QEMU Emulator</Label>
+                        <StackPanel Style="{StaticResource sectionBody}">
+                            <WrapPanel>
+                                <CheckBox Name="chbxQEMUUseGDB" IsChecked="False">Enable GDB</CheckBox>
+                                <CheckBox Name="chbxQEMUUseHD" IsChecked="False">Enable hard disk images</CheckBox>
+                            </WrapPanel>
+                            <Grid Margin="10,10,0,0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+
+                                <Label Grid.Row="0" Grid.Column="0" Margin="0,0,10,0">Network Card:</Label>
+                                <ComboBox Grid.Row="0" Grid.Column="1" Margin="5" Name="cmboNetworkCards" SelectedIndex="1" />
+                                <CheckBox Name="chckQEMUUseNetworkTAP" Grid.Row="0" Grid.Column="2" IsChecked="False" HorizontalAlignment="Center">
+                                    Enable network TAP. The TAP must be named CosmosTAP.
+                                </CheckBox>
+
+                                <Label Grid.Row="1" Grid.Column="0" Margin="0,0,10,0">Audio Card:</Label>
+                                <ComboBox Name="cmboAudioCards" Grid.Row="1" Grid.Column="1" Margin="5" SelectedIndex="1" />
+                            </Grid>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel Name="spnlVMWare">
+                        <Label Style="{StaticResource sectionTitle}">VMWare</Label>
+                        <WrapPanel Style="{StaticResource sectionBody}">
+                            <RadioButton Name="rdVMWareWorkstation" GroupName="VMWareVersion" IsChecked="True">Workstation</RadioButton>
+                            <RadioButton Name="rdVMWareServer" GroupName="VMWareVersion">Server</RadioButton>
                         </WrapPanel>
-                    </WrapPanel>
+                    </StackPanel>
+
+                    <StackPanel Name="spnlVPC">
+                        <Label Style="{StaticResource sectionTitle}">Microsoft Virtual PC, Virtual Server &amp; Hyper-V</Label>
+                        <Grid Style="{StaticResource sectionBody}">
+                            <TextBlock TextWrapping="Wrap">No options are available for Virtual PC.</TextBlock>
+                        </Grid>
+                    </StackPanel>
+
+                    <StackPanel Name="spnlISO">
+                        <Label Style="{StaticResource sectionTitle}">ISO Image</Label>
+                        <StackPanel Style="{StaticResource sectionBody}">
+                            <Label Style="{StaticResource subsectionTitle}">ISO image will be output as:</Label>
+                            <TextBlock TextWrapping="Wrap" Margin="25, 0, 0, 5" Name="tblkISOPath">ISO Path</TextBlock>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <Label Style="{StaticResource sectionTitle}">Miscellaneous</Label>
+                    <StackPanel Style="{StaticResource sectionBody}">
+                        <CheckBox IsChecked="True" Name="chbxShowOptions">Always show this window</CheckBox>
+                        <TextBlock TextWrapping="Wrap" Margin="35,0">If unchecked, this screen will not be shown on each build and the last options will be used. To redisplay this window, hold down the Control key.</TextBlock>
+
+                        <CheckBox Name="chbxCompileIL" IsChecked="True">Compile IL</CheckBox>
+                        <TextBlock TextWrapping="Wrap" Margin="35,0">Warning: This is an advanced option and normally should remain checked.</TextBlock>
+
+                        <CheckBox Name="chbxUseInternalAssembler" IsChecked="False">Use Internal _Assembler</CheckBox>
+                        <TextBlock TextWrapping="Wrap" Margin="35,0">Warning: This is an experimental feature, and should not be checked. Also, this is not persisted!</TextBlock>
+                    </StackPanel>
                 </StackPanel>
 
-                <StackPanel Visibility="Collapsed" Name="spnlQEMU">
-                    <Label Margin="0,10,0,0" Background="LightGray" FontWeight="Bold">QEMU Emulator</Label>
-                    <WrapPanel>
-                        <CheckBox Name="chbxQEMUUseGDB" Margin="10,10,30,0" IsChecked="False">Enable GDB</CheckBox>
-                        <CheckBox Name="chbxQEMUUseHD" Margin="10,10,30,0" IsChecked="False">Enable hard disk images</CheckBox>
-                    </WrapPanel>
-                    <WrapPanel Margin="10,10,0,0">
-                        <Label Margin="0,0,10,0">Network Card:</Label>
-                        <ComboBox Margin="0,0,30,0" Name="cmboNetworkCards" SelectedIndex="1"/>
-                        <CheckBox Name="chckQEMUUseNetworkTAP" IsChecked="False">Enable network TAP. The TAP must be named CosmosTAP.</CheckBox>
-                    </WrapPanel>
-                    <WrapPanel Margin="10,10,0,0">
-                        <Label Margin="0,0,10,0">Audio Card:</Label>
-                        <ComboBox Name="cmboAudioCards" SelectedIndex="1"/>
-                    </WrapPanel>
+                <StackPanel Grid.Row="1" Margin="15, 15, 15, 10" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                    <Button Name="butnBuild" Margin="5" IsDefault="True">_Build</Button>
+                    <Button Name="butnCancel" Margin="5" IsCancel="True">_Cancel</Button>
                 </StackPanel>
-                <StackPanel Name="DebugComMode">
-                    <Label Background="LightGray" FontWeight="Bold">Debug communication mode</Label>
-                    <ComboBox Height="23" Name="cmbDebugComMode"/>
-                </StackPanel>
-                <StackPanel Name="spnlPXE">
-                    <Label Margin="0,10,0,0" Background="LightGray" FontWeight="Bold">PXE Network Boot</Label>
-                    <TextBlock Margin="10,10,10,0" TextWrapping="Wrap">After building, start up another PC with network boot enabled and Cosmos will boot on to it automatically.</TextBlock>
-                </StackPanel>
-
-                <StackPanel Name="spnlUSB">
-                    <Label Margin="0,10,0,0" Background="LightGray" FontWeight="Bold">USB Boot</Label>
-                    <TextBlock Margin="10,10,10,0" TextWrapping="Wrap">Please choose a USB drive or stick that is formatted as FAT or FAT32. Note that selecting this device will overwrite the Master Boot Record (MBR) on the USB drive. Because of this take care to select the proper device. After a succesful build, you can then use this device to boot a physical machine. You may need to select the BIOS boot menu, use a multi boot utility, or change the BIOS boot sequence.</TextBlock>
-                    <TextBlock Margin="10,10,10,0" TextWrapping="Wrap">Only removable drives formatted as FAT or FAT32 will be listed. If you do not see your device, check its format.</TextBlock>
-                    <WrapPanel Margin="10,10,0,0">
-                        <Label Margin="0,0,10,0">USB Device on drive letter:</Label>
-                        <ComboBox Name="cmboUSBDevice"/>
-                    </WrapPanel>
-                </StackPanel>
-
-
-                <StackPanel Name="spnlVMWare">
-                    <Label Margin="0,10,0,0" Background="LightGray" FontWeight="Bold">VMWare</Label>
-                    <WrapPanel Margin="10,10,0,0">
-                        <RadioButton Name="rdVMWareWorkstation" GroupName="VMWareVersion" IsChecked="True">Workstation</RadioButton>
-                        <RadioButton Name="rdVMWareServer" Margin="10, 0, 0, 0" GroupName="VMWareVersion">Server</RadioButton>
-                    </WrapPanel>
-                </StackPanel>
-
-                <StackPanel Name="spnlVPC">
-                    <Label Margin="0,10,0,0" Background="LightGray" FontWeight="Bold">Microsoft Virtual PC, Virtual Server &amp; Hyper-V</Label>
-                    <TextBlock Margin="10,10,10,0" TextWrapping="Wrap">No options are available for Virtual PC.</TextBlock>
-                </StackPanel>
-
-                <StackPanel Name="spnlISO">
-                    <Label Margin="0,10,0,0" Background="LightGray" FontWeight="Bold">ISO Image</Label>
-                    <TextBlock TextWrapping="Wrap" Margin="10,10,0,0">ISO image will be output as:</TextBlock>
-                    <TextBlock TextWrapping="Wrap" Margin="20,0" Name="tblkISOPath">ISO Path</TextBlock>
-                </StackPanel>
-
-                <Label Margin="0,10,0,0" Background="LightGray" FontWeight="Bold">Miscellaneous</Label>
-                <StackPanel Margin="10,10,0,0">
-                    <CheckBox IsChecked="True" Name="chbxShowOptions">Always show this window</CheckBox>
-                    <TextBlock TextWrapping="Wrap" Margin="35,0">If unchecked, this screen will not be shown on each build and the last options will be used. To redisplay this window, hold down the Control key.</TextBlock>
-
-                    <CheckBox Margin="0,10,0,0" Name="chbxCompileIL" IsChecked="True">Compile IL</CheckBox>
-                    <TextBlock TextWrapping="Wrap" Margin="35,0">Warning: This is an advanced option and normally should remain checked.</TextBlock>
-                    
-                    <CheckBox Margin="0,10,0,0" Name="chbxUseInternalAssembler" IsChecked="False">Use Internal _Assembler</CheckBox>
-                    <TextBlock TextWrapping="Wrap" Margin="35,0">Warning: This is an experimental feature, and should not be checked. Also, this is not persisted!</TextBlock>
-                </StackPanel>
-
-            </StackPanel>
+            </Grid>
         </ScrollViewer>
     </Grid>
 </UserControl>
