@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
+using System.Text;
 
 namespace CosmosFlatFileUpdater {
     internal class Program {
@@ -10,10 +10,10 @@ namespace CosmosFlatFileUpdater {
             if((File.GetAttributes(Path.Combine(xBaseCosmosSourceDir,"Cosmos.Flat.sln")) & FileAttributes.ReadOnly) != 0) {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Please make Cosmos.Flat.sln read-write! Press a key to close");
-                Console.ReadLine();
+                Console.ReadKey();
                 return;
             }
-            using (var xOutput = new StreamWriter(Path.Combine(xBaseCosmosSourceDir,"Cosmos.Flat.New.sln"))) {
+            using (var xOutput = new StreamWriter(Path.Combine(xBaseCosmosSourceDir,"Cosmos.Flat.New.sln"), false, Encoding.UTF8)) {
                 var xLinesToSkip = 0;
                 var xSkipTo = "";
                 foreach (var xLine in xLines) {
@@ -46,7 +46,7 @@ namespace CosmosFlatFileUpdater {
                     xOutput.WriteLine(xLine);
                 }
                 Console.WriteLine("Done updating Cosmos.Flat.sln! Press a key to close");
-                Console.ReadLine();
+                Console.ReadKey();
             }
         }
     }
