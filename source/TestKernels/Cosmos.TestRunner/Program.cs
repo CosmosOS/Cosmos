@@ -49,7 +49,7 @@ namespace Cosmos.TestRunner {
                         var xEvent = new AutoResetEvent(false);
                         xBuilder.CompileCompleted += delegate { xEvent.Set(); };
                         xBuilder.LogMessage += delegate(LogSeverityEnum aSeverity, string aMessage) {
-Console.WriteLine("Log: {0} - {1}", aSeverity, aMessage);
+                            Console.WriteLine("Log: {0} - {1}", aSeverity, aMessage);
                         };
                         xBuilder.BeginCompile(DebugMode.None, 0, false);
                         xEvent.WaitOne();
@@ -165,10 +165,10 @@ Console.WriteLine("Log: {0} - {1}", aSeverity, aMessage);
             aInfo = "";
             int xTestsSucceeded = 0;
             int xTestsFailed = 0;
+            Socket xClientSocket = null; ;
             //using (var xDebug = new FileStream(@"d:\debug", FileMode.Create)) {
                 #region test
                 var xListenThread = new Thread(delegate() {
-                    var xClientSocket = xTcpServer.Accept();
                     using (var xInputStream = new MemoryStream()) {
                         var xCurPosition = xInputStream.Position;
                         var xReceiveInput = new Action(delegate {
@@ -234,11 +234,6 @@ Console.WriteLine("Log: {0} - {1}", aSeverity, aMessage);
                     }
                 });
                 #endregion
-                xListenThread.IsBackground = true;
-                xListenThread.Start();
-                //Console.WriteLine("Now listeningm hit enter to start qemu");
-                //Console.ReadLine();
-                Thread.Sleep(5000);
                 var xProcess = Global.Call(aBuilder.ToolsPath + @"qemu\qemu.exe",
                     " -L ."
                     // CD ROM image
@@ -251,8 +246,13 @@ Console.WriteLine("Log: {0} - {1}", aSeverity, aMessage);
                     // with the packet overhead
                     //
                     // COM0 - used for test result reporting
-                    + " -serial tcp:127.0.0.1:8544 "
+                    + " -serial tcp:127.0.0.1:8544,server "
                     , aBuilder.ToolsPath + @"qemu", false, true);
+                throw new Exception("Todo: implement switching of roles: qemu as server, testrunner as client");
+                do {
+                    xClientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                    //xClientSocket.Connect(
+                } while (xClientSocket == null);
                 int xTimeout = 120000;
                 while (!xProcess.HasExited && xTimeout > 0) {
                     if (xTestEvent.WaitOne(1000)) {

@@ -105,8 +105,7 @@ namespace Indy.IL2CPU.Assembler {
             base.UpdateAddress(aAssembler, ref aAddress);
         }
 
-        public override byte[] GetData(Assembler aAssembler) {
-            return new byte[0];
+        public override void WriteData(Assembler aAssembler, System.IO.Stream aOutput) {
         }
 	}
 }

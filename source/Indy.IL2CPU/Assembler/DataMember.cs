@@ -205,5 +205,43 @@ namespace Indy.IL2CPU.Assembler {
             }
             return RawDefaultValue;
         }
+
+        public override void WriteData(Assembler aAssembler, Stream aOutput) {
+            if (UntypedDefaultValue != null &&
+                UntypedDefaultValue.LongLength > 0) {
+                //var xBuff = (byte[])Array.CreateInstance(typeof(byte), UntypedDefaultValue.LongLength * 4);
+                for (int i = 0; i < UntypedDefaultValue.Length; i++) {
+                    var xRef = UntypedDefaultValue[i] as ElementReference;
+                    //byte[] xTemp;
+                    if (xRef != null) {
+                        var xTheRef = aAssembler.TryResolveReference(xRef);
+                        if (xTheRef == null) {
+                            throw new Exception("Reference not found!");
+                        }
+                        if (!xTheRef.ActualAddress.HasValue) {
+                            Console.Write("");
+                        }
+                        aOutput.Write(BitConverter.GetBytes(xTheRef.ActualAddress.Value), 0, 4);
+                        //xTemp = BitConverter.GetBytes();
+                    } else {
+                        if (UntypedDefaultValue[i] is int) {
+                            aOutput.Write(BitConverter.GetBytes((int)UntypedDefaultValue[i]), 0, 4);
+                            //xTemp = BitConverter.GetBytes((int)UntypedDefaultValue[i]);
+                        } else {
+                            if (UntypedDefaultValue[i] is uint) {
+                                aOutput.Write(BitConverter.GetBytes((uint)UntypedDefaultValue[i]), 0, 4);
+
+                                //xTemp = BitConverter.GetBytes((uint)UntypedDefaultValue[i]);
+                            } else {
+                                throw new Exception("Invalid value inside UntypedDefaultValue");
+                            }
+                        }
+                    }
+                    //Array.Copy(xTemp, 0, xBuff, i * 4, 4);
+                }
+            } else {
+                aOutput.Write(RawDefaultValue, 0, RawDefaultValue.Length);
+            }
+        }
     }
 }

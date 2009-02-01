@@ -231,13 +231,14 @@ namespace Indy.IL2CPU.Assembler {
             foreach (var xItem in mAllAssemblerElements) {
                 xItem.UpdateAddress(this, ref xCurrentAddresss);
             }
-
+            aOutput.SetLength(aOutput.Length + (long)(xCurrentAddresss - aBaseAddress));
             foreach (var xItem in mAllAssemblerElements) {
                 if (!xItem.IsComplete(this)) {
                     throw new Exception("Incomplete element encountered.");
                 }
-                var xBuff = xItem.GetData(this);
-                aOutput.Write(xBuff, 0, xBuff.Length);
+                //var xBuff = xItem.GetData(this);
+                //aOutput.Write(xBuff, 0, xBuff.Length);
+                xItem.WriteData(this, aOutput);
             }
         }
 

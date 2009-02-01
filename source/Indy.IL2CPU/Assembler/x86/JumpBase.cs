@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 
 namespace Indy.IL2CPU.Assembler.X86 {
 	public abstract class JumpBase: InstructionWithDestination {
@@ -23,7 +24,8 @@ namespace Indy.IL2CPU.Assembler.X86 {
 	            return true;
 	        }
 	    }
-        public override byte[] GetData(Indy.IL2CPU.Assembler.Assembler aAssembler) {
+        
+        public override void WriteData(Indy.IL2CPU.Assembler.Assembler aAssembler, Stream aOutput) {
             if (mCorrectAddress) {
                 if(IsRelativeJump) {
                     if (DestinationValue.HasValue && !DestinationIsIndirect) {
@@ -31,14 +33,15 @@ namespace Indy.IL2CPU.Assembler.X86 {
                         var xOrigValue = DestinationValue.Value;
                         DestinationValue = (uint)(xOrigValue - xCurAddress.Value);
                         try {
-                            return base.GetData(aAssembler);
+                            base.WriteData(aAssembler, aOutput);
+                            return;
                         } finally {
                             DestinationValue = xOrigValue;
                         }
                     }
                 }
             }
-            return base.GetData(aAssembler);
+            base.WriteData(aAssembler, aOutput);
         }
         public override string ToString() {
             var xResult = base.ToString();

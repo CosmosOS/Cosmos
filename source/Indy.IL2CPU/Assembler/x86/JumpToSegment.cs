@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
     [OpCode("jmp")]
-    public class JumpToSegment: IL2CPU.Assembler.Instruction {
+    public class JumpToSegment : IL2CPU.Assembler.Instruction {
         public ElementReference DestinationRef {
             get;
             set;
@@ -46,16 +46,15 @@ namespace Indy.IL2CPU.Assembler.X86 {
             aAddress += 7;
         }
 
-        public override byte[] GetData(Indy.IL2CPU.Assembler.Assembler aAssembler) {
-            var xResult = new byte[7];
-            xResult[0] = 0xEA;
+        //public override byte[] GetData(Indy.IL2CPU.Assembler.Assembler aAssembler) {
+        public override void WriteData(Indy.IL2CPU.Assembler.Assembler aAssembler, System.IO.Stream aOutput) {
+            aOutput.WriteByte(0xEA);
             ulong xAddress = 0;
             if (DestinationRef != null && DestinationRef.Resolve(aAssembler, out xAddress)) {
                 xAddress = (ulong)(((long)xAddress) + DestinationRef.Offset);
             }
-            Array.Copy(BitConverter.GetBytes((uint)(xAddress)), 0, xResult, 1, 4);
-            Array.Copy(BitConverter.GetBytes(Segment), 0, xResult, 5, 2);
-            return xResult;
+            aOutput.Write(BitConverter.GetBytes((uint)(xAddress)), 0, 4);
+            aOutput.Write(BitConverter.GetBytes(Segment), 0, 2);
         }
     }
 }
