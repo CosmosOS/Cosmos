@@ -11,16 +11,20 @@ using System.Net.Sockets;
 using CommandEnum = Cosmos.TestKernelHelpers.TestReporter.CommandEnum;
 using System.Net;
 
-namespace Cosmos.TestRunner {
-    public static class Program {
+namespace Cosmos.TestRunner
+{
+    public static class Program
+    {
         private static List<KeyValuePair<Type, int>> TestKernels;
 
-        private static void Initialize() {
+        private static void Initialize()
+        {
             TestKernels = new List<KeyValuePair<Type, int>>();
             TestKernels.Add(new KeyValuePair<Type, int>(typeof(Cosmos.SimpleTest.Program), 2));
         }
 
-        private class TestResults{
+        private class TestResults
+        {
             public string Name;
             public string Message;
             public bool Succeeded;
@@ -31,16 +35,21 @@ namespace Cosmos.TestRunner {
         /// Determines if the test runner should run the kernel using qemu, or only compile (Basically useful for profiling purposes)
         /// </summary>
         private const bool NeedsToRunKernel = true;
-        public static void Main() {
-            try {
+        public static void Main()
+        {
+            try
+            {
                 Initialize();
                 var xResults = new List<TestResults>();
-                foreach (var xItem in TestKernels) {
+                foreach (var xItem in TestKernels)
+                {
                     //xItem.Assembly.Location
                     string xMessage;
                     bool xReturn;
-                    try {
-                        var xBuilder = new Builder() {
+                    try
+                    {
+                        var xBuilder = new Builder()
+                        {
                             BuildPath = Options.BuildPath,
                             UseInternalAssembler = false
                         };
@@ -48,40 +57,51 @@ namespace Cosmos.TestRunner {
                         xBuilder.TargetAssembly = xItem.Key.Assembly;
                         var xEvent = new AutoResetEvent(false);
                         xBuilder.CompileCompleted += delegate { xEvent.Set(); };
-                        xBuilder.LogMessage += delegate(LogSeverityEnum aSeverity, string aMessage) {
+                        xBuilder.LogMessage += delegate(LogSeverityEnum aSeverity, string aMessage)
+                        {
                             Console.WriteLine("Log: {0} - {1}", aSeverity, aMessage);
                         };
                         xBuilder.BeginCompile(DebugMode.None, 0, false);
                         xEvent.WaitOne();
-                        if (NeedsToRunKernel) {
+                        if (NeedsToRunKernel)
+                        {
                             xBuilder.Assemble();
                             xBuilder.Link();
                             xBuilder.MakeISO();
                             var xISOFile = Path.Combine(xBuilder.BuildPath, "Cosmos.iso");
                             // run qemu
                             xReturn = RunKernel(xItem.Key, xBuilder, xItem.Value, out xMessage);
-                        } else {
+                        }
+                        else
+                        {
                             xReturn = true;
                             xMessage = "";
                         }
-                    } catch (Exception E) {
+                    }
+                    catch (Exception E)
+                    {
                         xMessage = E.ToString();
                         xReturn = false;
                     }
-                    xResults.Add(new TestResults {
+                    xResults.Add(new TestResults
+                    {
                         Name = xItem.Key.Assembly.GetName().Name,
                         Message = xMessage,
                         Succeeded = xReturn
                     });
                 }
                 WriteResults(xResults);
-            } catch (Exception E) {
+            }
+            catch (Exception E)
+            {
                 Console.WriteLine(E.ToString());
             }
         }
 
-        private static void WriteResults(List<TestResults> results) {
-            using (var xOut = XmlWriter.Create(Path.Combine(Environment.CurrentDirectory, "TestKernel-results.xml"))) {
+        private static void WriteResults(List<TestResults> results)
+        {
+            using (var xOut = XmlWriter.Create(Path.Combine(Environment.CurrentDirectory, "TestKernel-results.xml")))
+            {
                 xOut.WriteStartDocument(false);
                 xOut.WriteStartElement("test-results");
                 {
@@ -121,7 +141,8 @@ namespace Cosmos.TestRunner {
                         xOut.WriteAttributeString("asserts", results.Count.ToString());
                         xOut.WriteStartElement("results");
                         {
-                            foreach (var xItem in results) {
+                            foreach (var xItem in results)
+                            {
                                 xOut.WriteStartElement("test-case");
                                 {
                                     xOut.WriteAttributeString("name", xItem.Name);
@@ -129,7 +150,8 @@ namespace Cosmos.TestRunner {
                                     xOut.WriteAttributeString("success", xItem.Succeeded.ToString());
                                     xOut.WriteAttributeString("time", "0.000");
                                     xOut.WriteAttributeString("asserts", "1");
-                                    if (!xItem.Succeeded) {
+                                    if (!xItem.Succeeded)
+                                    {
                                         xOut.WriteStartElement("failure");
                                         {
                                             xOut.WriteStartElement("message");
@@ -155,133 +177,189 @@ namespace Cosmos.TestRunner {
             }
         }
 
-        private static bool RunKernel(Type aType, Builder aBuilder, int aExpectedTests, out string aInfo) {
+        private static bool RunKernel(Type aType, Builder aBuilder, int aExpectedTests, out string aInfo)
+        {
             //From v0.9.1 Qemu requires forward slashes in path
             var xBuildPath = aBuilder.BuildPath.Replace('\\', '/');
             var xTestEvent = new AutoResetEvent(false);
-            var xTcpServer = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            xTcpServer.Bind(new IPEndPoint(IPAddress.Loopback, 8544));
-            xTcpServer.Listen(10);
             aInfo = "";
             int xTestsSucceeded = 0;
             int xTestsFailed = 0;
             Socket xClientSocket = null; ;
             //using (var xDebug = new FileStream(@"d:\debug", FileMode.Create)) {
-                #region test
-                var xListenThread = new Thread(delegate() {
-                    using (var xInputStream = new MemoryStream()) {
-                        var xCurPosition = xInputStream.Position;
-                        var xReceiveInput = new Action(delegate {
-                            if (xClientSocket.Poll(5000, SelectMode.SelectRead) && xClientSocket.Available > 0) {
-                                byte[] xRecvBuff = new byte[1024];
-                                var xTempInt = xClientSocket.Receive(xRecvBuff);
-                                xInputStream.Seek(0, SeekOrigin.End);
-                                xInputStream.Write(xRecvBuff, 0, xTempInt);
-                                xInputStream.Position = xCurPosition;
-                            }
-                        });
-                        var xReceiveString = new Func<string>(delegate {
-                            xReceiveInput();
-                            var xLengthBytes = new byte[4];
-                            if (xInputStream.Read(xLengthBytes, 0, 4) != 4) {
-                                throw new Exception("Not enough bytes read!");
-                            }
-                            int xLength = BitConverter.ToInt32(xLengthBytes, 0);
-                            xReceiveInput();
-                            var xStringBytes = new byte[xLength];
-                            if (xInputStream.Read(xStringBytes, 0, xLength) != xLength) {
-                                throw new Exception("WRong number of bytes read!");
-                            }
-                            return Encoding.ASCII.GetString(xStringBytes);
-                        });
-                        do {
-                            if (xInputStream.Length > (xCurPosition + 4)) {
-                                var xCommandBytes = new byte[4];
-                                if (xInputStream.Read(xCommandBytes, 0, 4) != 4) {
-                                    throw new Exception("Incorrect bytecount received!");
-                                }
-                                var xCommand = (CommandEnum)BitConverter.ToUInt32(xCommandBytes, 0);
-                                switch (xCommand) {
-                                    case CommandEnum.Initialized:
-                                        Console.WriteLine("\tKernel Booted!");
-                                        break;
-                                    case CommandEnum.TestRunCompleted:
-                                        Console.WriteLine("\tKernel Tests Completed!");
-
-                                        xTestEvent.Set();
-                                        return;
-                                    case CommandEnum.TestCompleted:
-                                        var xTest = xReceiveString();
-                                        xReceiveString(); // for now discard description
-                                        var xResult = xInputStream.ReadByte() == 1;
-                                        if(xResult) {
-                                            xTestsSucceeded++;
-                                        }else {
-                                            xTestsFailed++;
-                                        }
-                                        break;
-                                    case CommandEnum.String:
-                                        Console.WriteLine("\t\tMessage = '{0}'", xReceiveString());
-                                        break;
-                                    default:
-                                        throw new Exception("Command '" + xCommand + "' not handled!");
-                                }
-                            } else {
-                                xReceiveInput();
-                            }
-                            Thread.Sleep(25);
-                        } while (true);
-                    }
-                });
-                #endregion
-                var xProcess = Global.Call(aBuilder.ToolsPath + @"qemu\qemu.exe",
-                    " -L ."
-                    // CD ROM image
-                    + " -cdrom \"" + aBuilder.BuildPath.Replace('\\', '/') + "Cosmos.iso\""
-                    // Boot CD ROM
-                    + " -boot d"
-                    // Setup serial port
-                    // Might allow serial file later for post debugging of CPU
-                    // etc since serial to TCP on a byte level is likely highly innefficient
-                    // with the packet overhead
-                    //
-                    // COM0 - used for test result reporting
-                    + " -serial tcp:127.0.0.1:8544,server "
-                    , aBuilder.ToolsPath + @"qemu", false, true);
-                throw new Exception("Todo: implement switching of roles: qemu as server, testrunner as client");
-                do {
-                    xClientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                    //xClientSocket.Connect(
-                } while (xClientSocket == null);
-                int xTimeout = 120000;
-                while (!xProcess.HasExited && xTimeout > 0) {
-                    if (xTestEvent.WaitOne(1000)) {
-                        break;
-                    }
-                    xTimeout -= 1000;
-                }
-                if (!xProcess.HasExited) {
-                    xProcess.Kill();
-                    return false;
-                } else {
-                    if (xProcess.ExitCode != 0) {
-                        Console.WriteLine(xProcess.StandardError.ReadToEnd());
-                        Console.WriteLine(xProcess.StandardOutput.ReadToEnd());
-                        return false;
-                    }else {
-                        if(xTestsFailed>0) {
-                            aInfo = String.Format("{0} tests succeeded, {1} tests failed", xTestsSucceeded, xTestsFailed);
-                            return false;
-                        } else {
-                            if(xTestsSucceeded!=aExpectedTests) {
-                                aInfo = String.Format("{0} tests expected, {1} tests ran", aExpectedTests, xTestsSucceeded);
-                                return false;
-                            }
-                            return true;
+            #region test
+            var xListenThread = new Thread(delegate()
+            {
+                using (var xInputStream = new MemoryStream())
+                {
+                    var xCurPosition = xInputStream.Position;
+                    var xReceiveInput = new Action(delegate
+                    {
+                        if (xClientSocket.Poll(5000, SelectMode.SelectRead) && xClientSocket.Available > 0)
+                        {
+                            byte[] xRecvBuff = new byte[1024];
+                            var xTempInt = xClientSocket.Receive(xRecvBuff);
+                            xInputStream.Seek(0, SeekOrigin.End);
+                            xInputStream.Write(xRecvBuff, 0, xTempInt);
+                            xInputStream.Position = xCurPosition;
                         }
+                    });
+                    var xReceiveString = new Func<string>(delegate
+                    {
+                        xReceiveInput();
+                        var xLengthBytes = new byte[4];
+                        if (xInputStream.Read(xLengthBytes, 0, 4) != 4)
+                        {
+                            throw new Exception("Not enough bytes read!");
+                        }
+                        int xLength = BitConverter.ToInt32(xLengthBytes, 0);
+                        xReceiveInput();
+                        var xStringBytes = new byte[xLength];
+                        if (xInputStream.Read(xStringBytes, 0, xLength) != xLength)
+                        {
+                            throw new Exception("WRong number of bytes read!");
+                        }
+                        return Encoding.ASCII.GetString(xStringBytes);
+                    });
+                    do
+                    {
+                        if (xInputStream.Length > (xCurPosition + 4))
+                        {
+                            var xCommandBytes = new byte[4];
+                            if (xInputStream.Read(xCommandBytes, 0, 4) != 4)
+                            {
+                                throw new Exception("Incorrect bytecount received!");
+                            }
+                            var xCommand = (CommandEnum)BitConverter.ToUInt32(xCommandBytes, 0);
+                            switch (xCommand)
+                            {
+                                case CommandEnum.Initialized:
+                                    Console.WriteLine("\tKernel Booted!");
+                                    break;
+                                case CommandEnum.TestRunCompleted:
+                                    Console.WriteLine("\tKernel Tests Completed!");
+
+                                    xTestEvent.Set();
+                                    return;
+                                case CommandEnum.TestCompleted:
+                                    var xTest = xReceiveString();
+                                    xReceiveString(); // for now discard description
+                                    var xResult = xInputStream.ReadByte() == 1;
+                                    if (xResult)
+                                    {
+                                        xTestsSucceeded++;
+                                    }
+                                    else
+                                    {
+                                        xTestsFailed++;
+                                    }
+                                    break;
+                                case CommandEnum.String:
+                                    Console.WriteLine("\t\tMessage = '{0}'", xReceiveString());
+                                    break;
+                                default:
+                                    throw new Exception("Command '" + xCommand + "' not handled!");
+                            }
+                        }
+                        else
+                        {
+                            xReceiveInput();
+                        }
+                        Thread.Sleep(25);
+                    } while (true);
+                }
+            });
+            #endregion
+            var xProcess = Global.Call(aBuilder.ToolsPath + @"qemu\qemu.exe",
+                " -L ."
+                // CD ROM image
+                + " -cdrom \"" + aBuilder.BuildPath.Replace('\\', '/') + "Cosmos.iso\""
+                // Boot CD ROM
+                + " -boot d"
+                // Setup serial port
+                // Might allow serial file later for post debugging of CPU
+                // etc since serial to TCP on a byte level is likely highly innefficient
+                // with the packet overhead
+                //
+                // COM0 - used for test result reporting
+                + " -serial tcp:127.0.0.1:8544,server "
+                , aBuilder.ToolsPath + @"qemu", false, true);
+            // Variable to tell how many times we tried to connect to the serial port of QEMU
+            Int32 Tries = 0;
+            // Create the socket.
+            xClientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            do
+            {
+                try
+                {
+                    // Try to connect to the endpoint.
+                    xClientSocket.Connect(new IPEndPoint(IPAddress.Loopback, 8544));
+                }
+                catch (SocketException e)
+                {
+                    // If the connection goes wrong, show the error message, increment 
+                    // Tries and sleep for 10 seconds.
+                    Console.WriteLine("Connection to the Serial port failed. We have tried " + Tries.ToString() + " times." + Environment.NewLine + e.Message);
+                    Tries++;
+                    Thread.Sleep(10000);
+                }
+            } while ((!xClientSocket.Connected) && (Tries < 5));
+
+            // If it is connected...
+            if (xClientSocket.Connected)
+            {
+                // ...show the message and start the test thread.
+                Console.WriteLine("Connected to the serial port after " + Tries.ToString() + " tries");
+                xListenThread.Start();
+            }
+            //...otherwise...
+            else
+            {
+                // ...kill QEMU and close the app.
+                xProcess.Kill();
+                return false;
+            }
+
+            int xTimeout = 120000;
+            while (!xProcess.HasExited && xTimeout > 0)
+            {
+                if (xTestEvent.WaitOne(1000))
+                {
+                    break;
+                }
+                xTimeout -= 1000;
+            }
+            if (!xProcess.HasExited)
+            {
+                xProcess.Kill();
+                return false;
+            }
+            else
+            {
+                if (xProcess.ExitCode != 0)
+                {
+                    Console.WriteLine(xProcess.StandardError.ReadToEnd());
+                    Console.WriteLine(xProcess.StandardOutput.ReadToEnd());
+                    return false;
+                }
+                else
+                {
+                    if (xTestsFailed > 0)
+                    {
+                        aInfo = String.Format("{0} tests succeeded, {1} tests failed", xTestsSucceeded, xTestsFailed);
+                        return false;
+                    }
+                    else
+                    {
+                        if (xTestsSucceeded != aExpectedTests)
+                        {
+                            aInfo = String.Format("{0} tests expected, {1} tests ran", aExpectedTests, xTestsSucceeded);
+                            return false;
+                        }
+                        return true;
                     }
                 }
-            //}
+            }
         }
     }
 }
