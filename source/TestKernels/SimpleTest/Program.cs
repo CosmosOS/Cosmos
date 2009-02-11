@@ -20,8 +20,7 @@ namespace Cosmos.SimpleTest {
             TestReporter.WriteTestResult("SimpleTest1", "Simple test to show that harness is working", true);
             TestReporter.TestsCompleted();
             Console.WriteLine("Done");
-            for (; ; )
-                ;
+            Cosmos.Sys.Deboot.ShutDown();
         }
     }
 }

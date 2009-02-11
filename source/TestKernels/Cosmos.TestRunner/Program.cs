@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Xml;
 using Cosmos.Compiler.Builder;
 using Indy.IL2CPU;
-using System.IO;
-using System.Threading;
-using System.Net.Sockets;
 using CommandEnum = Cosmos.TestKernelHelpers.TestReporter.CommandEnum;
-using System.Net;
 
 namespace Cosmos.TestRunner
 {
@@ -40,7 +40,7 @@ namespace Cosmos.TestRunner
             try
             {
                 Initialize();
-                var xResults = new List<TestResults>();
+                List<TestResults> xResults = new List<TestResults>();
                 foreach (var xItem in TestKernels)
                 {
                     //xItem.Assembly.Location
@@ -111,8 +111,8 @@ namespace Cosmos.TestRunner
                                                            where !item.Succeeded
                                                            select item).Count().ToString());
                     xOut.WriteAttributeString("not-run", "0");
-                    xOut.WriteAttributeString("date", DateTime.Now.ToString("yyyy-mm-dd"));
-                    xOut.WriteAttributeString("time", DateTime.Now.ToString("hh:nn:ss"));
+                    xOut.WriteAttributeString("date", DateTime.Now.ToString("yyyy-MM-dd"));
+                    xOut.WriteAttributeString("time", DateTime.Now.ToString("hh:mm:ss"));
                     xOut.WriteStartElement("environment");
                     {
                         xOut.WriteAttributeString("nunit-version", "10.0.0.0");
@@ -180,14 +180,14 @@ namespace Cosmos.TestRunner
         private static bool RunKernel(Type aType, Builder aBuilder, int aExpectedTests, out string aInfo)
         {
             //From v0.9.1 Qemu requires forward slashes in path
-            var xBuildPath = aBuilder.BuildPath.Replace('\\', '/');
-            var xTestEvent = new AutoResetEvent(false);
+            String xBuildPath = aBuilder.BuildPath.Replace('\\', '/');
+            AutoResetEvent xTestEvent = new AutoResetEvent(false);
             aInfo = "";
             int xTestsSucceeded = 0;
             int xTestsFailed = 0;
-            Socket xClientSocket = null; ;
-            //using (var xDebug = new FileStream(@"d:\debug", FileMode.Create)) {
-            #region test
+            Socket xClientSocket = null;
+
+            #region TestThread
             var xListenThread = new Thread(delegate()
             {
                 using (var xInputStream = new MemoryStream())
@@ -242,17 +242,15 @@ namespace Cosmos.TestRunner
                                     xTestEvent.Set();
                                     return;
                                 case CommandEnum.TestCompleted:
-                                    var xTest = xReceiveString();
-                                    xReceiveString(); // for now discard description
+                                    String xTest = xReceiveString();
+                                    String xDescr = xReceiveString();
+
                                     var xResult = xInputStream.ReadByte() == 1;
+                                    Console.WriteLine("\t" + xTest + " : " + xDescr + Environment.NewLine + "\tExecution Result : " + Convert.ToBoolean(xResult));
                                     if (xResult)
-                                    {
                                         xTestsSucceeded++;
-                                    }
                                     else
-                                    {
                                         xTestsFailed++;
-                                    }
                                     break;
                                 case CommandEnum.String:
                                     Console.WriteLine("\t\tMessage = '{0}'", xReceiveString());
@@ -284,6 +282,7 @@ namespace Cosmos.TestRunner
                 // COM0 - used for test result reporting
                 + " -serial tcp:127.0.0.1:8544,server "
                 , aBuilder.ToolsPath + @"qemu", false, true);
+
             // Variable to tell how many times we tried to connect to the serial port of QEMU
             Int32 Tries = 0;
             // Create the socket.
@@ -299,17 +298,18 @@ namespace Cosmos.TestRunner
                 {
                     // If the connection goes wrong, show the error message, increment 
                     // Tries and sleep for 10 seconds.
-                    Console.WriteLine("Connection to the Serial port failed. We have tried " + Tries.ToString() + " times." + Environment.NewLine + e.Message);
+                    Console.WriteLine("\tConnection to the Serial port failed. We have tried " + Tries.ToString() + " times." + Environment.NewLine + e.Message);
                     Tries++;
                     Thread.Sleep(10000);
                 }
+              // It tries to connect until it is connected or 50 seconds have passed from the first try.
             } while ((!xClientSocket.Connected) && (Tries < 5));
 
             // If it is connected...
             if (xClientSocket.Connected)
             {
                 // ...show the message and start the test thread.
-                Console.WriteLine("Connected to the serial port after " + Tries.ToString() + " tries");
+                Console.WriteLine("\tConnected to the serial port after " + Tries.ToString() + " tries");
                 xListenThread.Start();
             }
             //...otherwise...
@@ -320,44 +320,49 @@ namespace Cosmos.TestRunner
                 return false;
             }
 
+            // Wait for 120 seconds until all the tests are completed.
+            // The completion is checked through an AutoResetEvent.
+            Boolean ExitedNormally = false;
             int xTimeout = 120000;
-            while (!xProcess.HasExited && xTimeout > 0)
+            while ((ExitedNormally == false) && (xTimeout > 0))
             {
                 if (xTestEvent.WaitOne(1000))
-                {
-                    break;
-                }
+                    ExitedNormally = true;
                 xTimeout -= 1000;
             }
-            if (!xProcess.HasExited)
+
+            // If some error caused the QEmu Process to be closed...
+            if (xProcess.HasExited)
             {
-                xProcess.Kill();
+                // ...write everything that happened on the window and close the app.
+                Console.WriteLine(xProcess.StandardError.ReadToEnd());
+                Console.WriteLine(xProcess.StandardOutput.ReadToEnd());
                 return false;
             }
             else
             {
-                if (xProcess.ExitCode != 0)
+                // If the QEmu process after 120 seconds still haven't completed the tests...
+                if (!ExitedNormally)
                 {
-                    Console.WriteLine(xProcess.StandardError.ReadToEnd());
-                    Console.WriteLine(xProcess.StandardOutput.ReadToEnd());
+                    // ...something has gone wrong, so kill the process and close the app showing a message of error.
+                    xProcess.Kill();
+                    Console.WriteLine("Error : The QEmu process is not closed after 120 seconds of wait.");
                     return false;
                 }
+                // ...otherwise...
                 else
                 {
-                    if (xTestsFailed > 0)
+                    // Kill the process (QEmu does not close by itself even if the virtual machine is halted)
+                    xProcess.Kill();
+
+                    String OperationResult = String.Format("{0} tests expected, {1} tests succeeded, {2} tests failed", aExpectedTests, xTestsSucceeded, xTestsFailed);
+                    Console.WriteLine(OperationResult);
+                    if ((xTestsFailed > 0) || (xTestsSucceeded + xTestsFailed != aExpectedTests))
                     {
-                        aInfo = String.Format("{0} tests succeeded, {1} tests failed", xTestsSucceeded, xTestsFailed);
+                        aInfo = OperationResult;
                         return false;
                     }
-                    else
-                    {
-                        if (xTestsSucceeded != aExpectedTests)
-                        {
-                            aInfo = String.Format("{0} tests expected, {1} tests ran", aExpectedTests, xTestsSucceeded);
-                            return false;
-                        }
-                        return true;
-                    }
+                    return true;
                 }
             }
         }
