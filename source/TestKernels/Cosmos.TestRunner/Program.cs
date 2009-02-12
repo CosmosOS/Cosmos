@@ -357,12 +357,20 @@ namespace Cosmos.TestRunner
 
                     String OperationResult = String.Format("{0} tests expected, {1} tests succeeded, {2} tests failed", aExpectedTests, xTestsSucceeded, xTestsFailed);
                     Console.WriteLine(OperationResult);
-                    if ((xTestsFailed > 0) || (xTestsSucceeded + xTestsFailed != aExpectedTests))
+                    if (xTestsFailed > 0)
                     {
-                        aInfo = OperationResult;
+                        aInfo = String.Format("{0} tests succeeded, {1} tests failed", xTestsSucceeded, xTestsFailed);
                         return false;
                     }
-                    return true;
+                    else
+                    {
+                        if (xTestsSucceeded != aExpectedTests)
+                        {
+                            aInfo = String.Format("{0} tests expected, {1} tests ran", aExpectedTests, xTestsSucceeded);
+                            return false;
+                        }
+                        return true;
+                    }
                 }
             }
         }
