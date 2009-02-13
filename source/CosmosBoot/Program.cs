@@ -18,9 +18,9 @@ namespace CosmosBoot {
 
             Console.WriteLine("Congratulations! You just booted C# code.");
             Console.WriteLine("Edit Program.cs to create your own Operating System.");
-            while (true) {
-                // Put your code here
-            }
+            Console.WriteLine("Press a key to shutdown...");
+            Console.Read();
+            Cosmos.Sys.Deboot.ShutDown();
 		}
 	}
 }

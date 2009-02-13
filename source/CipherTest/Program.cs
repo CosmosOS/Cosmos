@@ -110,7 +110,7 @@ namespace CipherTest
 				Cosmos.Sys.Deboot.Reboot();
 			}
 			else
-				Cosmos.Sys.Deboot.Halt();
+				Cosmos.Sys.Deboot.ShutDown();
 		}
 		public static int return2()
 		{

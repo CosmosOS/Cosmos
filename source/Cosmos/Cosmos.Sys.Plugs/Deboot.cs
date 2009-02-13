@@ -10,6 +10,10 @@ namespace Cosmos.Sys.Plugs
         {
 
         }
+        [PlugMethod(Assembler = typeof(Assemblers.ShutDown))]
+        public static void ShutDown()
+        {
 
+        }
     }
 }

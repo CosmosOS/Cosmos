@@ -25,7 +25,7 @@ namespace Cosmos.Playground.Kudzu {
             Console.WriteLine("Done - Waiting");
             Console.ReadLine();
             //TODO: Make this automatically called after Init if no other shut downs are called
-            Cosmos.Sys.Deboot.Halt();
+            Cosmos.Sys.Deboot.ShutDown();
 		}
 
         public static void DoLoop() {

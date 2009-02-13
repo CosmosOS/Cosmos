@@ -5,17 +5,9 @@ using System.Text;
 
 namespace Cosmos.Sys {
     public class Deboot {
-        public static void Halt() {
-            Console.WriteLine("Cosmos: Halting system.");
-            while (true)
-            {
-                Cosmos.Kernel.CPU.Halt();
-            }
-        }
-
+        //plugged
         public static void ShutDown() {
-            //TODO: For now we just call Halt
-            Halt();
+            
         }
 
         //Plugged
