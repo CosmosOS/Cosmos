@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ACPIManager.cs" />
     <Compile Include="Audio\Devices\ES1370\Managers\AK4531Manager.cs" />
     <Compile Include="Audio\Devices\ES1370\Registers\UartFIFORegister.cs" />
     <Compile Include="Audio\Devices\Generic\Components\ADCEntity.cs" />
