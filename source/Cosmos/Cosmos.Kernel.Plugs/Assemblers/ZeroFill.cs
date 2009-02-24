@@ -9,7 +9,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 	public class ZeroFill: AssemblerMethod {
 
 		//		public static void ZeroFill(uint aStartAddress, uint aLength) {}
-		public override void Assemble(Assembler aAssembler) {
+		public override void Assemble(Indy.IL2CPU.Assembler.Assembler aAssembler) {
             new ClrDirFlag();
             new CPUx86.Move { DestinationReg = Registers.EDI, SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0xC }; //address
             new CPUx86.Move { DestinationReg = Registers.ECX, SourceReg = Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x8 }; //length

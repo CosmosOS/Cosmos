@@ -13,77 +13,70 @@ namespace TestApp {
     class Program {
         class Renderer : Y86 {
             public void DoRender() {
-                new global::Indy.IL2CPU.Assembler.X86.Move { SourceValue = 65, SourceIsIndirect = true, DestinationReg = Registers.AH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.Move { SourceValue = 65, SourceIsIndirect = true, DestinationReg = Registers.AL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.Move { SourceValue = 65, SourceIsIndirect = true, DestinationReg = Registers.BH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.Move { SourceValue = 65, SourceIsIndirect = true, DestinationReg = Registers.BL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.Move { SourceValue = 65, SourceIsIndirect = true, DestinationReg = Registers.CH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.Move { SourceValue = 65, SourceIsIndirect = true, DestinationReg = Registers.CL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.Move { SourceValue = 65, SourceIsIndirect = true, DestinationReg = Registers.DH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.Move { SourceValue = 65, SourceIsIndirect = true, DestinationReg = Registers.DL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.Move { SourceValue = 650, SourceIsIndirect = true, DestinationReg = Registers.AH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.Move { SourceValue = 650, SourceIsIndirect = true, DestinationReg = Registers.AL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.Move { SourceValue = 650, SourceIsIndirect = true, DestinationReg = Registers.BH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.Move { SourceValue = 650, SourceIsIndirect = true, DestinationReg = Registers.BL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.Move { SourceValue = 650, SourceIsIndirect = true, DestinationReg = Registers.CH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.Move { SourceValue = 650, SourceIsIndirect = true, DestinationReg = Registers.CL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.Move { SourceValue = 650, SourceIsIndirect = true, DestinationReg = Registers.DH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.Move { SourceValue = 650, SourceIsIndirect = true, DestinationReg = Registers.DL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.Move { SourceValue = 650000, SourceIsIndirect = true, DestinationReg = Registers.AH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.Move { SourceValue = 650000, SourceIsIndirect = true, DestinationReg = Registers.AL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.Move { SourceValue = 650000, SourceIsIndirect = true, DestinationReg = Registers.BH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.Move { SourceValue = 650000, SourceIsIndirect = true, DestinationReg = Registers.BL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.Move { SourceValue = 650000, SourceIsIndirect = true, DestinationReg = Registers.CH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.Move { SourceValue = 650000, SourceIsIndirect = true, DestinationReg = Registers.CL, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.Move { SourceValue = 650000, SourceIsIndirect = true, DestinationReg = Registers.DH, Size = 8 };
-                new global::Indy.IL2CPU.Assembler.X86.Move { SourceValue = 650000, SourceIsIndirect = true, DestinationReg = Registers.DL, Size = 8 };
+
             }
         }
         static void Main(string[] args) {
-            try {
-#if !GenerateTests
-                var xAsm = new Assembler();
-                xAsm.Initialize();
-                //xAsm.DataMembers.Add(new Indy.IL2CPU.Assembler.DataMember("TestData", new byte[] { 65, 66, 67, 68, 69, 70, 71, 72, 73, 74 }));
-                xAsm.Instructions.Clear();
-                xAsm.DataMembers.Clear();
-                var xRenderer = new Renderer();
-                xRenderer.DoRender();
-                if (!Directory.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
-                                                                                         "Output"))) {
-                    Directory.CreateDirectory(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
-                        "Output"));
-                }
-                using (var xOutput = new StreamWriter(Path.Combine(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
-                                                                                         "Output"),
-                                                                            "TheOutput.asm"))) {
-                    xAsm.FlushText(xOutput);
-                }
-                using (Stream xOutput = new FileStream(Path.Combine(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
-                                                                                         "Output"),
-                                                                            "TheOutput.bin"), FileMode.Create)) {
-                    xAsm.FlushBinary(xOutput, 0x200000);
-                }
-#else
-                TestCodeGenerator.Execute();
-#endif
+            //            try {
+            //#if !GenerateTests
+            //                var xAsm = new Assembler();
+            //                xAsm.Initialize();
+            //                //xAsm.DataMembers.Add(new Indy.IL2CPU.Assembler.DataMember("TestData", new byte[] { 65, 66, 67, 68, 69, 70, 71, 72, 73, 74 }));
+            //                xAsm.Instructions.Clear();
+            //                xAsm.DataMembers.Clear();
+            //                var xRenderer = new Renderer();
+            //                xRenderer.DoRender();
+            //                if (!Directory.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
+            //                                                                                         "Output"))) {
+            //                    Directory.CreateDirectory(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
+            //                        "Output"));
+            //                }
+            //                using (var xOutput = new StreamWriter(Path.Combine(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
+            //                                                                                         "Output"),
+            //                                                                            "TheOutput.asm"))) {
+            //                    xAsm.FlushText(xOutput);
+            //                }
+            //                using (Stream xOutput = new FileStream(Path.Combine(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
+            //                                                                                         "Output"),
+            //                                                                            "TheOutput.bin"), FileMode.Create)) {
+            //                    xAsm.FlushBinary(xOutput, 0x200000);
+            //                }
+            //#else
+            //                TestCodeGenerator.Execute();
+            //#endif
 
-                //InvalidOpcodeTester.Initialize();
-                //InvalidOpcodeTester.ExecuteSingle(typeof(Move), 0);
-                //InvalidOpcodeTester.GenerateHtml(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
-                //                                                                         "Output.html"));
-                //InvalidOpcodeTester.GenerateXml(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
-                //                                                                         "Output.xml"));
-            }catch(InvalidOpcodeTester.AbortException){
-                InvalidOpcodeTester.GenerateHtml(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
-                                                                                         "Output.html"));
-                InvalidOpcodeTester.GenerateXml(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
-                                                                                         "Output.xml"));
-            } catch (Exception E) { Console.WriteLine(E.ToString()); } 
-            finally {
-                Console.WriteLine("Finished");
+            //                //InvalidOpcodeTester.Initialize();
+            //                //InvalidOpcodeTester.ExecuteSingle(typeof(Move), 0);
+            //                //InvalidOpcodeTester.GenerateHtml(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
+            //                //                                                                         "Output.html"));
+            //                //InvalidOpcodeTester.GenerateXml(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
+            //                //                                                                         "Output.xml"));
+            //            }catch(InvalidOpcodeTester.AbortException){
+            //                InvalidOpcodeTester.GenerateHtml(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
+            //                                                                                         "Output.html"));
+            //                InvalidOpcodeTester.GenerateXml(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
+            //                                                                                         "Output.xml"));
+            //            } catch (Exception E) { Console.WriteLine(E.ToString()); } 
+            //            finally {
+            //                Console.WriteLine("Finished");
+            //                Console.ReadLine();
+            //                                    Console.ReadLine();
+            //            }
+
+            //
+            try {
+                var xMyArray = new int[2, 2];
+                var xArrayType = xMyArray.GetType();
+                Console.WriteLine(xArrayType.FullName);
+                if (!xArrayType.IsArray) {
+                    return;
+                }
+                Console.WriteLine("Is Array");
+            } catch (Exception E) {
+                Console.WriteLine("Error: " + E.ToString());
+            } finally {
+                Console.WriteLine("Done.");
                 Console.ReadLine();
-                                    Console.ReadLine();
             }
         }
     }

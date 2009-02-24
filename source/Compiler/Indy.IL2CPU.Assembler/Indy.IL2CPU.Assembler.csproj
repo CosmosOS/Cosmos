@@ -1,0 +1,216 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{5A1E9D16-BF71-4D8E-9389-3476056E4566}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Indy.IL2CPU.Assembler</RootNamespace>
+    <AssemblyName>Indy.IL2CPU.Assembler</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>Cosmos.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Assembler.cs" />
+    <Compile Include="BaseAssemblerElement.cs" />
+    <Compile Include="Comment.cs" />
+    <Compile Include="DataDefine.cs" />
+    <Compile Include="DataEndIfDefined.cs" />
+    <Compile Include="DataIfDefined.cs" />
+    <Compile Include="DataIfNotDefined.cs" />
+    <Compile Include="DataMember.cs" />
+    <Compile Include="Define.cs" />
+    <Compile Include="ElementReference.cs" />
+    <Compile Include="EndIfDefined.cs" />
+    <Compile Include="IfDefined.cs" />
+    <Compile Include="IfNotDefined.cs" />
+    <Compile Include="ImportMember.cs" />
+    <Compile Include="ImportMethodMember.cs" />
+    <Compile Include="Instruction.cs" />
+    <Compile Include="Label.cs" />
+    <Compile Include="OpCodeAttribute.cs" />
+    <Compile Include="RawAssembler.cs" />
+    <Compile Include="ReaderWriterLocker.cs" />
+    <Compile Include="StackContent.cs" />
+    <Compile Include="TypeComparer.cs" />
+    <Compile Include="X86\286AndUp\Lgdt.cs" />
+    <Compile Include="X86\286AndUp\Lidt.cs" />
+    <Compile Include="X86\386AndUp\Popad.cs" />
+    <Compile Include="X86\386AndUp\Popfd.cs" />
+    <Compile Include="X86\386AndUp\Pushad.cs" />
+    <Compile Include="X86\386AndUp\Pushfd.cs" />
+    <Compile Include="X86\386AndUp\SignExtendAX.cs" />
+    <Compile Include="X86\486AndUp\CmpXchg.cs" />
+    <Compile Include="X86\486AndUp\CpuId.cs" />
+    <Compile Include="X86\486AndUp\XchgAndAdd.cs" />
+    <Compile Include="X86\Add.cs" />
+    <Compile Include="X86\AddWithCarry.cs" />
+    <Compile Include="X86\And.cs" />
+    <Compile Include="X86\Assembler.cs" />
+    <Compile Include="X86\Call.cs" />
+    <Compile Include="X86\ClrCarryFlag.cs" />
+    <Compile Include="X86\ClrDirFlag.cs" />
+    <Compile Include="X86\ClrInterruptFlag.cs" />
+    <Compile Include="X86\Compare.cs" />
+    <Compile Include="X86\ConditionalJump.cs" />
+    <Compile Include="X86\ConditionalMove.cs" />
+    <Compile Include="X86\ConvByteToWord.cs" />
+    <Compile Include="X86\Dec.cs" />
+    <Compile Include="X86\Divide.cs" />
+    <Compile Include="X86\Enums.cs" />
+    <Compile Include="X86\Halt.cs" />
+    <Compile Include="X86\IDivide.cs" />
+    <Compile Include="X86\In.cs" />
+    <Compile Include="X86\Inc.cs" />
+    <Compile Include="X86\Interrupt.cs" />
+    <Compile Include="X86\InterruptReturn.cs" />
+    <Compile Include="X86\JumpAlways.cs" />
+    <Compile Include="X86\JumpBase.cs" />
+    <Compile Include="X86\JumpToSegment.cs" />
+    <Compile Include="X86\Move.cs" />
+    <Compile Include="X86\MoveCR.cs" />
+    <Compile Include="X86\Movs.cs" />
+    <Compile Include="X86\Multiply.cs" />
+    <Compile Include="X86\Neg.cs" />
+    <Compile Include="X86\Noop.cs" />
+    <Compile Include="X86\Not.cs" />
+    <Compile Include="X86\Or.cs" />
+    <Compile Include="X86\Out.cs" />
+    <Compile Include="X86\Pop.cs" />
+    <Compile Include="X86\Push.cs" />
+    <Compile Include="X86\Registers.cs" />
+    <Compile Include="X86\Return.cs" />
+    <Compile Include="X86\RotateThroughCarryRight.cs" />
+    <Compile Include="X86\SetInterruptFlag.cs" />
+    <Compile Include="X86\ShiftLeft.cs" />
+    <Compile Include="X86\ShiftRight.cs" />
+    <Compile Include="X86\SSEAndMMX2\AddSS.cs" />
+    <Compile Include="X86\SSEAndMMX2\FXSave.cs" />
+    <Compile Include="X86\SSEAndMMX2\FXStore.cs" />
+    <Compile Include="X86\SSEAndMMX2\MoveSS.cs" />
+    <Compile Include="X86\StoreByteInString.cs" />
+    <Compile Include="X86\StoreSD.cs" />
+    <Compile Include="X86\StoreWordInString.cs" />
+    <Compile Include="X86\Stos.cs" />
+    <Compile Include="X86\Sub.cs" />
+    <Compile Include="X86\SubWithCarry.cs" />
+    <Compile Include="X86\Test.cs" />
+    <Compile Include="X86\Xchg.cs" />
+    <Compile Include="X86\Xor.cs" />
+    <Compile Include="X86\X\Address.cs" />
+    <Compile Include="X86\X\AddressDirect.cs" />
+    <Compile Include="X86\X\AddressIndirect.cs" />
+    <Compile Include="X86\X\Memory.cs" />
+    <Compile Include="X86\X\MemoryAction.cs" />
+    <Compile Include="X86\X\PortNumber.cs" />
+    <Compile Include="X86\X\Ports.cs" />
+    <Compile Include="X86\X\Register.cs" />
+    <Compile Include="X86\X\Register08.cs" />
+    <Compile Include="X86\X\Register16.cs" />
+    <Compile Include="X86\X\Register32.cs" />
+    <Compile Include="X86\X\RegisterAL.cs" />
+    <Compile Include="X86\X\RegisterAX.cs" />
+    <Compile Include="X86\X\RegisterDX.cs" />
+    <Compile Include="X86\X\RegisterEAX.cs" />
+    <Compile Include="X86\X\RegisterEBP.cs" />
+    <Compile Include="X86\X\RegisterEBX.cs" />
+    <Compile Include="X86\X\RegisterECX.cs" />
+    <Compile Include="X86\X\RegisterEDX.cs" />
+    <Compile Include="X86\X\RegisterESI.cs" />
+    <Compile Include="X86\X\RegisterESP.cs" />
+    <Compile Include="X86\X\Y86.cs" />
+    <Compile Include="X86\_Infra\Extensions.cs" />
+    <Compile Include="X86\_Infra\IInstructionWithCondition.cs" />
+    <Compile Include="X86\_Infra\IInstructionWithDestination.cs" />
+    <Compile Include="X86\_Infra\IInstructionWithPrefix.cs" />
+    <Compile Include="X86\_Infra\IInstructionWithSize.cs" />
+    <Compile Include="X86\_Infra\IInstructionWithSource.cs" />
+    <Compile Include="X86\_Infra\Instruction.cs" />
+    <Compile Include="X86\_Infra\InstructionWithDestination.cs" />
+    <Compile Include="X86\_Infra\InstructionWithDestinationAndSize.cs" />
+    <Compile Include="X86\_Infra\InstructionWithDestinationAndSource.cs" />
+    <Compile Include="X86\_Infra\InstructionWithDestinationAndSourceAndSize.cs" />
+    <Compile Include="X86\_Infra\InstructionWithSize.cs" />
+    <Compile Include="_Infra\IDefine.cs" />
+    <Compile Include="_Infra\IEndIfDefined.cs" />
+    <Compile Include="_Infra\IIfDefined.cs" />
+    <Compile Include="_Infra\IIfNotDefined.cs" />
+    <Compile Include="_Infra\InfraExtensions.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Cosmos.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
+    <Folder Include="X86\186-188AndUp\" />
+    <Folder Include="X86\286Exclusive\" />
+    <Folder Include="X86\386Exclusive\" />
+    <Folder Include="X86\3DNow!2\Geode\" />
+    <Folder Include="X86\3DNow!\" />
+    <Folder Include="X86\8086Exclusive\" />
+    <Folder Include="X86\AMD-MMX\" />
+    <Folder Include="X86\AMD-V_AndUp\" />
+    <Folder Include="X86\Cyrix-EMMX\" />
+    <Folder Include="X86\K6-2AndUp\" />
+    <Folder Include="X86\MMX\" />
+    <Folder Include="X86\PentiumAndUp\" />
+    <Folder Include="X86\PentiumMMXAndUp\" />
+    <Folder Include="X86\PentiumProAndUp\" />
+    <Folder Include="X86\SSE2\" />
+    <Folder Include="X86\SSE3\" />
+    <Folder Include="X86\SSE4a\" />
+    <Folder Include="X86\SSE4dot1\" />
+    <Folder Include="X86\SSE4dot2\" />
+    <Folder Include="X86\SSSE3\" />
+    <Folder Include="X86\VTAndUp\" />
+    <Folder Include="X86\x87\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
