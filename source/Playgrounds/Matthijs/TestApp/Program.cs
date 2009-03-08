@@ -3,11 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Indy.IL2CPU.Assembler.X86;
+using Indy.IL2CPU.Assembler;
 using System.IO;
 using System.Reflection;
+using Indy.IL2CPU.Assembler.X86;
 using Indy.IL2CPU.Assembler.X86.X;
 using Indy.IL2CPU.Tests.AssemblerTests.X86;
+using Assembler=Indy.IL2CPU.Assembler.X86.Assembler;
 
 namespace TestApp {
     class Program {
@@ -16,62 +18,48 @@ namespace TestApp {
 
             }
         }
+        private static void Render(ELFAssembler aAssembler) {
+            aAssembler.Instructions.Clear();
+            aAssembler.DataMembers.Clear();
+            aAssembler.DataMembers.Add(new DataMember("Magic", 0x1BADB002) { IsGlobal = true, Alignment = 4 });
+            aAssembler.DataMembers.Add(new DataMember("Flags", 0x00000003) { IsGlobal = true, Alignment = 4 });
+            aAssembler.DataMembers.Add(new DataMember("Checksum", 0 - 0x1BADB005) { IsGlobal = true, Alignment = 4 });
+            aAssembler.DataMembers.Add(new DataMember("MyData", new byte[1] { 65 }) { IsGlobal = true });
+            var xItem = new Move {
+                DestinationValue = 0xB8000,
+                DestinationIsIndirect = true,
+                SourceValue = 65,
+                Size = 8
+            };
+            //4byte: magic
+            // 4byte flags
+            // 4byte checksum
+            aAssembler.StartLabel = new Label("_the_start") { IsGlobal = true };
+            new Move {
+                DestinationValue = 0xB8000,
+                DestinationIsIndirect = true,
+                SourceValue = 66,
+                Size = 8
+            };
+            new Label("_before_end");
+            new Halt();
+            new Jump { DestinationLabel = "_before_end" };
+        }
+
         static void Main(string[] args) {
-            //            try {
-            //#if !GenerateTests
-            //                var xAsm = new Assembler();
-            //                xAsm.Initialize();
-            //                //xAsm.DataMembers.Add(new Indy.IL2CPU.Assembler.DataMember("TestData", new byte[] { 65, 66, 67, 68, 69, 70, 71, 72, 73, 74 }));
-            //                xAsm.Instructions.Clear();
-            //                xAsm.DataMembers.Clear();
-            //                var xRenderer = new Renderer();
-            //                xRenderer.DoRender();
-            //                if (!Directory.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
-            //                                                                                         "Output"))) {
-            //                    Directory.CreateDirectory(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
-            //                        "Output"));
-            //                }
-            //                using (var xOutput = new StreamWriter(Path.Combine(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
-            //                                                                                         "Output"),
-            //                                                                            "TheOutput.asm"))) {
-            //                    xAsm.FlushText(xOutput);
-            //                }
-            //                using (Stream xOutput = new FileStream(Path.Combine(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
-            //                                                                                         "Output"),
-            //                                                                            "TheOutput.bin"), FileMode.Create)) {
-            //                    xAsm.FlushBinary(xOutput, 0x200000);
-            //                }
-            //#else
-            //                TestCodeGenerator.Execute();
-            //#endif
-
-            //                //InvalidOpcodeTester.Initialize();
-            //                //InvalidOpcodeTester.ExecuteSingle(typeof(Move), 0);
-            //                //InvalidOpcodeTester.GenerateHtml(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
-            //                //                                                                         "Output.html"));
-            //                //InvalidOpcodeTester.GenerateXml(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
-            //                //                                                                         "Output.xml"));
-            //            }catch(InvalidOpcodeTester.AbortException){
-            //                InvalidOpcodeTester.GenerateHtml(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
-            //                                                                                         "Output.html"));
-            //                InvalidOpcodeTester.GenerateXml(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
-            //                                                                                         "Output.xml"));
-            //            } catch (Exception E) { Console.WriteLine(E.ToString()); } 
-            //            finally {
-            //                Console.WriteLine("Finished");
-            //                Console.ReadLine();
-            //                                    Console.ReadLine();
-            //            }
-
-            //
             try {
-                var xMyArray = new int[2, 2];
-                var xArrayType = xMyArray.GetType();
-                Console.WriteLine(xArrayType.FullName);
-                if (!xArrayType.IsArray) {
-                    return;
+
+                var xAssembler = new ELFAssembler();
+                Render(xAssembler);
+                using (var xOutText = new StreamWriter(@"D:\.NET\Cosmos\ELFOut\asm\output.asm")) {
+                    xAssembler.FlushText(xOutText);
                 }
-                Console.WriteLine("Is Array");
+                xAssembler = new ELFAssembler();
+                Render(xAssembler);
+                using (var xOutBin = new FileStream(@"D:\.NET\Cosmos\ELFOut\bin\output.bin", FileMode.Create)) {
+                    xAssembler.FlushBinary(xOutBin, 0);
+                }
+
             } catch (Exception E) {
                 Console.WriteLine("Error: " + E.ToString());
             } finally {

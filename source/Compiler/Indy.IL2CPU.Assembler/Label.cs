@@ -78,7 +78,11 @@ namespace Indy.IL2CPU.Assembler {
         }
 
 		public override string ToString() {
-			return Name + ":";
+            if (IsGlobal) {
+                return "global " + Name + "\r\n" + Name + ":";
+            } else {
+                return Name + ":";
+            }
 		}
 
 		public static string GenerateLabelName(MethodBase aMethod) {
@@ -103,6 +107,11 @@ namespace Indy.IL2CPU.Assembler {
 
         public override void UpdateAddress(Assembler aAssembler, ref ulong aAddress) {
             base.UpdateAddress(aAssembler, ref aAddress);
+        }
+
+        public bool IsGlobal {
+            get;
+            set;
         }
 
         public override void WriteData(Assembler aAssembler, System.IO.Stream aOutput) {

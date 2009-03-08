@@ -137,7 +137,7 @@ namespace Indy.IL2CPU.Assembler {
         }
 
         private bool mFlushInitializationDone = false;
-        private void BeforeFlush() {
+        protected void BeforeFlush() {
             if (mFlushInitializationDone) {
                 return;
             }

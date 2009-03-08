@@ -32,6 +32,10 @@ namespace Indy.IL2CPU.Assembler {
             get;
             set;
         }
+        public uint Alignment {
+            get;
+            set;
+        }
 
         private object[] UntypedDefaultValue;
 
@@ -43,6 +47,7 @@ namespace Indy.IL2CPU.Assembler {
         public DataMember(string aName, byte[] aDefaultValue) {
             Name = aName;
             RawDefaultValue = aDefaultValue;
+            //UntypedDefaultValue = aDefaultValue;
         }
 
         public DataMember(string aName, short[] aDefaultValue) {
@@ -52,6 +57,7 @@ namespace Indy.IL2CPU.Assembler {
                 Array.Copy(BitConverter.GetBytes(aDefaultValue[i]), 0,
                             RawDefaultValue, i * 2, 2);
             }
+            //UntypedDefaultValue = aDefaultValue;
         }
 
         public DataMember(string aName, params ushort[] aDefaultValue) {
@@ -61,24 +67,27 @@ namespace Indy.IL2CPU.Assembler {
                 Array.Copy(BitConverter.GetBytes(aDefaultValue[i]), 0,
                             RawDefaultValue, i * 2, 2);
             }
+            //UntypedDefaultValue = aDefaultValue;
         }
 
         public DataMember(string aName, params uint[] aDefaultValue) {
             Name = aName;
-            RawDefaultValue = new byte[aDefaultValue.Length * 4];
-            for (int i = 0; i < aDefaultValue.Length; i++) {
-                Array.Copy(BitConverter.GetBytes(aDefaultValue[i]), 0,
-                            RawDefaultValue, i * 4, 4);
-            }
+            //RawDefaultValue = new byte[aDefaultValue.Length * 4];
+            //for (int i = 0; i < aDefaultValue.Length; i++) {
+            //    Array.Copy(BitConverter.GetBytes(aDefaultValue[i]), 0,
+            //                RawDefaultValue, i * 4, 4);
+            //}
+            UntypedDefaultValue = aDefaultValue.Cast<object>().ToArray();
         }
 
         public DataMember(string aName, params int[] aDefaultValue) {
             Name = aName;
-            RawDefaultValue = new byte[aDefaultValue.Length * 4];
-            for (int i = 0; i < aDefaultValue.Length; i++) {
-                Array.Copy(BitConverter.GetBytes(aDefaultValue[i]), 0,
-                            RawDefaultValue, i * 4, 4);
-            }
+            //RawDefaultValue = new byte[aDefaultValue.Length * 4];
+            //for (int i = 0; i < aDefaultValue.Length; i++) {
+            //    Array.Copy(BitConverter.GetBytes(aDefaultValue[i]), 0,
+            //                RawDefaultValue, i * 4, 4);
+            //}
+            UntypedDefaultValue = aDefaultValue.Cast<object>().ToArray();
         }
 
         public string Name {
@@ -95,6 +104,9 @@ namespace Indy.IL2CPU.Assembler {
                      group item by item into i
                      select i).Count() > 1 || RawDefaultValue.Length<250) {
                     StringBuilder xSB = new StringBuilder();
+                    if(IsGlobal) {
+                        xSB.AppendLine("global " + Name + "\r\n");
+                    }
                     xSB.AppendFormat("{0} db ", Name);
                     for (int i = 0; i < (RawDefaultValue.Length - 1); i++) {
                         xSB.AppendFormat("{0}, ",
@@ -104,11 +116,14 @@ namespace Indy.IL2CPU.Assembler {
                     return xSB.ToString();
                 } else {
                     //aOutputWriter.WriteLine("TIMES 0x50000 db 0");
-                    return Name + ": TIMES " + RawDefaultValue.Count() + " db " + RawDefaultValue[0];
+                    return "global " + Name + "\r\n" + Name + ": TIMES " + RawDefaultValue.Count() + " db " + RawDefaultValue[0];
                 }
             }
             if (UntypedDefaultValue != null) {
                 StringBuilder xSB = new StringBuilder();
+                if (IsGlobal) {
+                    xSB.AppendLine("global " + Name + "\r\n");
+                }
                 xSB.AppendFormat("{0} dd ", Name);
                 Func<object, string> xGetTextForItem = delegate(object aItem) {
                     var xElementRef = aItem as ElementReference;
@@ -135,6 +150,10 @@ namespace Indy.IL2CPU.Assembler {
 			return String.Compare(Name, other.Name);
 		}
 
+        public bool IsGlobal {
+            get;
+            set;
+        }
 
         public override ulong? ActualAddress {
             get { 
@@ -144,6 +163,11 @@ namespace Indy.IL2CPU.Assembler {
         }
 
         public override void UpdateAddress(Assembler aAssembler, ref ulong xAddress) {
+            if (Alignment > 0) {
+                if (xAddress % Alignment != 0) {
+                    xAddress += Alignment - (xAddress % Alignment);
+                }
+            }
             base.UpdateAddress(aAssembler, ref xAddress);
             if (RawDefaultValue != null) {
                 xAddress += (ulong)RawDefaultValue.LongLength;
