@@ -462,6 +462,7 @@ namespace Cosmos.Hardware {
                     HandleInterrupt_20(ref xCtx);
                     HandleInterrupt_21(ref xCtx);
                     HandleInterrupt_25(ref xCtx);
+                    HandleInterrupt_29(ref xCtx);
                     HandleInterrupt_2B(ref xCtx);
                     HandleInterrupt_2E(ref xCtx);
                     HandleInterrupt_2F(ref xCtx);

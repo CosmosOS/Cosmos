@@ -72,6 +72,7 @@
     <Compile Include="Audio\PCMStream.cs" />
     <Compile Include="BlockDevice.cs" />
     <Compile Include="Enums.cs" />
+    <Compile Include="Network\Devices\AMDPCNetII\AMDPCNet.cs" />
     <Compile Include="USB\USBHost.cs" />
     <Compile Include="USB\USBHostOHCI.cs" />
     <Compile Include="USB\USBHostOHCIRegisters.cs" />
