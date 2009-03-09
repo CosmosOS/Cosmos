@@ -229,6 +229,10 @@ DebugUtil.SendMessage("RTL8139", aText);
                 return valueReg.Mac;
             }
         }
+        public override bool Ready
+        {
+            get { return this.IsEnabled; }
+        }
 
         /// <summary>
         /// Returns a text with the hardware revision model. F.instance RTL8139C+ or RTL8139.
@@ -319,6 +323,11 @@ DebugUtil.SendMessage("RTL8139", aText);
         }
 
         public override bool ReceiveBytes(byte[] buffer, int offset, int max)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override byte[] ReceivePacket()
         {
             throw new NotImplementedException();
         }

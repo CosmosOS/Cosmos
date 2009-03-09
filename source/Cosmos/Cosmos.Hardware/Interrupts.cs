@@ -190,6 +190,16 @@ namespace Cosmos.Hardware {
             PIC.SignalSecondary();
         }
 
+        //IRQ 09 - (Added for AMD PCNet network card)
+        public static InterruptDelegate IRQ09;
+
+        public static void HandleInterrupt_29(ref InterruptContext aContext) {
+            if (IRQ09 != null) {
+                IRQ09(ref aContext);
+            }
+            PIC.SignalSecondary();
+        }
+
         //IRQ 11 - (Added for RTL8139 network card)
         public static InterruptDelegate IRQ11;
 

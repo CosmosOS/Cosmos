@@ -12,9 +12,15 @@ namespace Cosmos.Hardware.Network
             get;
         }
 
+        public abstract bool Ready
+        {
+            get;
+        }
+
         public abstract bool QueueBytes(byte[] buffer, int offset, int length);
 
         public abstract bool ReceiveBytes(byte[] buffer, int offset, int max);
+        public abstract byte[] ReceivePacket();
 
         public abstract int BytesAvailable();
 

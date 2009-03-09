@@ -80,6 +80,12 @@ namespace Cosmos.Hardware.Network
             return (GetType().FullName + "|" + this.ToString()).GetHashCode();
         }
 
+        public UInt64 ToNumber()
+        {
+            return (UInt64)(bytes[0] | (bytes[1] << 8) | (bytes[2] << 16) | (bytes[3] << 24) |
+                (bytes[4] << 32) | (bytes[5] << 40));
+        }
+
         public override string ToString()
         {
             string address = string.Empty;
