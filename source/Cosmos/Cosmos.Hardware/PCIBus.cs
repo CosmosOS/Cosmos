@@ -6489,7 +6489,7 @@ namespace Cosmos.Hardware {
         /// <param name="aBus">The bus number to enumerate</param>
         /// <param name="rDevices">The list of Devices</param>
         private static void EnumerateBus(byte aBus, ref List<PCIDevice> rDevices) {
-            //Console.WriteLine("Enumerate " + Bus ); 
+            //Console.WriteLine("Enumerate " + aBus ); 
             for (byte xSlot = 0; xSlot < 32; xSlot++) {                
                 byte xMaxFunctions = 1;
                 for (byte xFunction = 0; xFunction < xMaxFunctions; xFunction++) {
@@ -6756,7 +6756,7 @@ namespace Cosmos.Hardware {
                     IOMaps[i] = new Kernel.MemoryAddressSpace(address, size);
                     //Console.WriteLine("register " + i + " - " + size + "b mem");
 
-                    NeedsIO = true;
+                    NeedsMemory = true;
                 }
                 else if ((address & PCI_BASE_ADDRESS_SPACE) == PCI_BASE_ADDRESS_SPACE_IO)
                 {
@@ -6764,7 +6764,7 @@ namespace Cosmos.Hardware {
                     IOMaps[i] = new Kernel.IOAddressSpace(address-1, size);
                     //Console.WriteLine("register " + i + " - " + size + "b io");
 
-                    NeedsMemory = true;
+                    NeedsIO = true;
                 }
             }
 
@@ -6814,7 +6814,7 @@ namespace Cosmos.Hardware {
         /// <summary>
         /// The Vendor ID
         /// </summary>
-        public UInt32 VendorID { get { return Read16(0x0); } }
+        public UInt16 VendorID { get { return Read16(0x0); } }
         /// <summary>
         /// The Device ID
         /// </summary>
@@ -6833,7 +6833,7 @@ namespace Cosmos.Hardware {
         /// <summary>
         /// The Revision ID of this PCI Device
         /// </summary>
-        public byte RevisionID { get { return Read8(0x8); } }
+        public UInt16 RevisionID { get { return Read16(0x8); } }
         /// <summary>
         /// The Programming Interface Number of this PCI Device
         /// </summary>
@@ -6906,7 +6906,7 @@ namespace Cosmos.Hardware {
         /// </summary>
         public void EnableDevice()
         {
-            Command = Command & ((NeedsIO ? PCICommand.IO : 0) & PCICommand.Master & (NeedsMemory ? PCICommand.Memort : 0));
+            Command = Command | ((NeedsIO ? PCICommand.IO : 0) | PCICommand.Master | (NeedsMemory ? PCICommand.Memort : 0));
         }
 
         private UInt32 GetAddress(byte aRegister)
@@ -6919,7 +6919,7 @@ namespace Cosmos.Hardware {
                 // Bits 10-8
                 | (((UInt32)Function & 0x07) << 8)
                 // Bits 7-0
-                | ((UInt32)aRegister & 0xFF)
+                | ((UInt32)aRegister & 0xFC)
                 // Enable bit - must be set
                 | 0x80000000);
         }
@@ -6933,13 +6933,13 @@ namespace Cosmos.Hardware {
         protected UInt16 Read16(byte aRegister)
         {
             Kernel.CPUBus.Write32(ConfigAddr, GetAddress(aRegister));
-            return Kernel.CPUBus.Read16(ConfigData);
+            return (UInt16)(Kernel.CPUBus.Read32(ConfigData) >> ((aRegister % 4) * 8) & 0xFFFF);
         }
 
         protected byte Read8(byte aRegister)
         {
             Kernel.CPUBus.Write32(ConfigAddr, GetAddress(aRegister));
-            return Kernel.CPUBus.Read8(ConfigData);
+            return (byte)(Kernel.CPUBus.Read32(ConfigData) >> ((aRegister % 4) * 8) & 0xFF);
         }
 
         protected void Write32(byte aRegister, UInt32 value)
