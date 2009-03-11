@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Cosmos.Kernel;
+using Cosmos.Kernel.ManagedMemory;
 
 namespace Cosmos.Hardware.Network.Devices.AMDPCNetII
 {
@@ -13,10 +14,9 @@ namespace Cosmos.Hardware.Network.Devices.AMDPCNetII
 
         protected List<byte[]> mRxBuffers;
         protected List<byte[]> mTxBuffers;
-        private UInt32 mTxDescriptorAddress;
-        private UInt32 mRxDescriptorAddress;
-        private UInt32 mInitBlockAddress;
-
+        private ManagedUInt32Array mTxDescriptor;
+        private ManagedUInt32Array mRxDescriptor;
+        private ManagedUInt32Array mInitBlock;
         protected Queue<byte[]> mRecvBuffer;
         protected Queue<byte[]> mTransmitBuffer;
 
@@ -55,35 +55,30 @@ namespace Cosmos.Hardware.Network.Devices.AMDPCNetII
 
             // Allocate 32 bytes for the 28 byte Initialization block that has to be aligned to a 4 byte boundary
             UInt32 address = Heap.MemAlloc(0x20);
-            mInitBlockAddress = address + (4 - (address % 4));
+            mInitBlock = new ManagedUInt32Array(7); // 7 UInt32's, aligned on a 4byte boundary
             /*Console.Write("Allocated 32 bytes for initialization block @ 0x" + address.ToHex(8));
             Console.WriteLine("(Aligned to 0x" + aligned_address.ToHex(8) + ")");*/
 
-            // Allocate 320 bytes for the 16 RX and TX Descriptor rings. These addresses have to be aligned on a 16-byte boundary
+            // Allocate 80 uints for the 16 RX and TX Descriptor rings. These addresses have to be aligned on a 16-byte boundary
             UInt32 rd_address = Heap.MemAlloc(0x140);
-            UInt32 tx_address = Heap.MemAlloc(0x140);
-            mRxDescriptorAddress = rd_address + (16 - (rd_address % 16));
-            mTxDescriptorAddress = tx_address + (16 - (tx_address % 16));
+            mTxDescriptor = new ManagedUInt32Array(80, 16);
+            mRxDescriptor = new ManagedUInt32Array(80, 16);
             /*Console.Write("Allocated 320 bytes for RX ring descriptors @ 0x" + rd_address.ToHex(8));
             Console.WriteLine("(Aligned to 0x" + mRxDescriptorAddress.ToHex(8) + ")");
             Console.Write("Allocated 320 bytes for TX ring descriptors @ 0x" + tx_address.ToHex(8));
             Console.WriteLine("(Aligned to 0x" + mTxDescriptorAddress.ToHex(8) + ")");*/
 
             // Fill in the Initialization block
-            unsafe
-            {
-                uint* init_block = (uint*)mInitBlockAddress;
-                init_block[0] = (0x04 << 28) | (0x04 << 30); // 16 RX and 16 TX Ring Descriptors
-                init_block[1] = (uint)(eeprom_mac[0] | (eeprom_mac[1] << 8) | (eeprom_mac[2] << 16) | (eeprom_mac[3] << 24));
-                init_block[2] = (uint)(eeprom_mac[4] | (eeprom_mac[5] << 8)); // Fill in the hardware MAC address
-                init_block[3] = 0x00;
-                init_block[4] = 0x00;
-                init_block[5] = mRxDescriptorAddress; // Base of the RX Ring Descriptors
-                init_block[6] = mTxDescriptorAddress; // Base of the TX Ring Descriptors
-            }
+            mInitBlock[0] = (0x4 << 28) | (0x4 << 30);
+            mInitBlock[1] = (uint)(eeprom_mac[0] | (eeprom_mac[1] << 8) | (eeprom_mac[2] << 16) | (eeprom_mac[3] << 24));
+            mInitBlock[2] = (uint)(eeprom_mac[4] | (eeprom_mac[5] << 8)); // Fill in the hardware MAC address
+            mInitBlock[3] = 0x0;
+            mInitBlock[4] = 0x0;
+            mInitBlock[5] = (uint)mRxDescriptor.Address;
+            mInitBlock[6] = (uint)mTxDescriptor.Address;
 
             // Write the Initialization blocks address to the registers on the card
-            InitializationBlockAddress = mInitBlockAddress;
+            InitializationBlockAddress = (uint)mInitBlock.Address;
             // Set the device to PCNet-PCI II Controller mode (full 32-bit mode)
             SoftwareStyleRegister = 0x03;
 
@@ -96,24 +91,42 @@ namespace Cosmos.Hardware.Network.Devices.AMDPCNetII
             {
                 for (int rxd = 0; rxd < 16; rxd++)
                 {
-                    uint* rd_desc = (uint*)(mRxDescriptorAddress + (rxd * 16));
+                    int xOffset = rxd * 4;
                     byte[] buffer = new byte[2048];
-                    rd_desc[2] = GetMemoryAddress(ref buffer);
+                    mRxDescriptor[xOffset + 2] = GetMemoryAddress(ref buffer);
                     UInt16 buffer_len = (UInt16)(~buffer.Length);
                     buffer_len++;
-                    rd_desc[1] = (UInt32)(buffer_len & 0x0FFF);
-                    rd_desc[1] |= 0xF000;
-                    rd_desc[1] |= 0x80000000;
+                    mRxDescriptor[xOffset + 1] = (UInt32)(buffer_len & 0x0FFF);
+                    mRxDescriptor[xOffset + 1] |= 0xF000;
+                    mRxDescriptor[xOffset + 1] |= 0x80000000;
                     mRxBuffers.Add(buffer);
                 }
                 for (int txd = 0; txd < 16; txd++)
                 {
-                    uint* tx_desc = (uint*)(mTxDescriptorAddress + (txd * 16));
+                    int xOffset = txd * 4;
                     byte[] buffer = new byte[2048];
-                    tx_desc[2] = GetMemoryAddress(ref buffer);
+                    mTxDescriptor[xOffset + 2] = GetMemoryAddress(ref buffer);
                     mTxBuffers.Add(buffer);
                 }
             }
+        }
+
+        /// <summary>
+        /// Retrieve all AMD PCNet network cards found on computer.
+        /// </summary>
+        /// <returns>List of all AMD PCNet cards</returns>
+        public static List<AMDPCNet> FindAll()
+        {
+            List<AMDPCNet> found = new List<AMDPCNet>();
+            foreach (PCIDevice device in Cosmos.Hardware.PCIBus.Devices)
+            {
+                //DebugWriteLine("VendorID: " + device.VendorID + " - DeviceID: " + device.DeviceID);
+                if ((device.VendorID == 0x1022) && (device.DeviceID == 0x2000))
+                {
+                    found.Add(new AMDPCNet(device));
+                }
+            }
+            return found;
         }
 
         protected void HandleNetworkInterrupt(ref Interrupts.InterruptContext aContext)
@@ -340,8 +353,8 @@ namespace Cosmos.Hardware.Network.Devices.AMDPCNetII
             {
                 for (int txd = 0; txd < 16; txd++)
                 {
-                    uint* tx_desc = (uint*)(mTxDescriptorAddress + (txd * 16));
-                    if ((tx_desc[1] & (uint)BinaryHelper.BitPos.BIT31) == 0)
+                    var xOffset = txd * 4;
+                    if ((mTxDescriptor[xOffset + 1] & (uint)BinaryHelper.BitPos.BIT31) == 0)
                     {
                         for (int b = 0; b < aData.Length; b++)
                         {
@@ -349,9 +362,9 @@ namespace Cosmos.Hardware.Network.Devices.AMDPCNetII
                         }
                         UInt16 buffer_len = (UInt16)(~aData.Length);
                         buffer_len++;
-                        tx_desc[1] = (UInt32)(buffer_len & 0x0FFF);
-                        tx_desc[1] |= (uint)(BinaryHelper.BitPos.BIT25 | BinaryHelper.BitPos.BIT24) | 0xF000;
-                        tx_desc[1] |= (uint)BinaryHelper.BitPos.BIT31;
+                        mTxDescriptor[xOffset + 1] = (UInt32)(buffer_len & 0x0FFF);
+                        mTxDescriptor[xOffset + 1] |= (uint)(BinaryHelper.BitPos.BIT25 | BinaryHelper.BitPos.BIT24) | 0xF000;
+                        mTxDescriptor[xOffset + 1] |= (uint)BinaryHelper.BitPos.BIT31;
                         return true;
                     }
                 }
@@ -375,18 +388,18 @@ namespace Cosmos.Hardware.Network.Devices.AMDPCNetII
             {
                 for (int rxd = 0; rxd < 16; rxd++)
                 {
-                    uint* rd_desc = (uint*)(mRxDescriptorAddress + (rxd * 16));
-                    status = rd_desc[1];
+                    var xOffset = rxd * 4;
+                    status = mRxDescriptor[xOffset + 1];
                     if ((status & 0x80000000) == 0)
                     {
-                        recv_size = (UInt16)(rd_desc[0] & 0xFFF);
+                        recv_size = (UInt16)(mRxDescriptor[xOffset + 0] & 0xFFF);
                         recv_data = new byte[recv_size];
                         for (int b = 0; b < recv_size; b++)
                         {
                             recv_data[b] = mRxBuffers[rxd][b];
                         }
                         mRecvBuffer.Enqueue(recv_data);
-                        rd_desc[1] |= 0x80000000;
+                        mRxDescriptor[xOffset + 1] |= 0x80000000;
                     }
                 }
             }
