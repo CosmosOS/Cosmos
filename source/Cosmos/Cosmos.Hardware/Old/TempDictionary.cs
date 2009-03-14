@@ -66,6 +66,19 @@ namespace Cosmos.Hardware
             return false;
         }
 
+        public bool ContainsKey(UInt32 key)
+        {
+            for (int i = 0; i < items.Count; i++)
+            {
+                if (items[i].Key == key)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public bool TrySetValue(UInt32 key, Value value)
         {
             for (int i = 0; i < items.Count; i++)
