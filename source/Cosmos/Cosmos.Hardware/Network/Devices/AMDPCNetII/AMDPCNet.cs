@@ -19,6 +19,7 @@ namespace Cosmos.Hardware.Network.Devices.AMDPCNetII
         private ManagedUInt32Array mInitBlock;
         protected Queue<byte[]> mRecvBuffer;
         protected Queue<byte[]> mTransmitBuffer;
+        private int mNextTXDesc;
 
         // Initialize a new instance of the AMD PCNet device driver
         public AMDPCNet(PCIDevice device)
@@ -109,6 +110,9 @@ namespace Cosmos.Hardware.Network.Devices.AMDPCNetII
                     mTxBuffers.Add(buffer);
                 }
             }
+
+            // Set TX Descriptor 0 as the first one to use... Increment this when we use one to use them in a circular fashion
+            mNextTXDesc = 0;
         }
 
         /// <summary>
@@ -351,22 +355,25 @@ namespace Cosmos.Hardware.Network.Devices.AMDPCNetII
         {
             unsafe
             {
-                for (int txd = 0; txd < 16; txd++)
+                int txd = mNextTXDesc++;
+                if (mNextTXDesc >= 16)
                 {
-                    var xOffset = txd * 4;
-                    if ((mTxDescriptor[xOffset + 1] & (uint)BinaryHelper.BitPos.BIT31) == 0)
+                    mNextTXDesc = 0;
+                }
+
+                var xOffset = txd * 4;
+                if ((mTxDescriptor[xOffset + 1] & (uint)BinaryHelper.BitPos.BIT31) == 0)
+                {
+                    for (int b = 0; b < aData.Length; b++)
                     {
-                        for (int b = 0; b < aData.Length; b++)
-                        {
-                            mTxBuffers[txd][b] = aData[b];
-                        }
-                        UInt16 buffer_len = (UInt16)(~aData.Length);
-                        buffer_len++;
-                        mTxDescriptor[xOffset + 1] = (UInt32)(buffer_len & 0x0FFF);
-                        mTxDescriptor[xOffset + 1] |= (uint)(BinaryHelper.BitPos.BIT25 | BinaryHelper.BitPos.BIT24) | 0xF000;
-                        mTxDescriptor[xOffset + 1] |= (uint)BinaryHelper.BitPos.BIT31;
-                        return true;
+                        mTxBuffers[txd][b] = aData[b];
                     }
+                    UInt16 buffer_len = (UInt16)(~aData.Length);
+                    buffer_len++;
+                    mTxDescriptor[xOffset + 1] = (UInt32)(buffer_len & 0x0FFF);
+                    mTxDescriptor[xOffset + 1] |= (uint)(BinaryHelper.BitPos.BIT25 | BinaryHelper.BitPos.BIT24) | 0xF000;
+                    mTxDescriptor[xOffset + 1] |= (uint)BinaryHelper.BitPos.BIT31;
+                    return true;
                 }
             }
 
@@ -379,7 +386,6 @@ namespace Cosmos.Hardware.Network.Devices.AMDPCNetII
             UInt16 recv_size;
             byte[] recv_data;
 
-            Debug.Debugger.Break();
             if (mRecvBuffer == null)
             {
                 mRecvBuffer = new Queue<byte[]>();

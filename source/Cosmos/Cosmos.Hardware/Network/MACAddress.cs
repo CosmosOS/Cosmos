@@ -7,7 +7,9 @@ namespace Cosmos.Hardware.Network
 {
     public class MACAddress : IComparable
     {
-        public byte[] bytes= new byte[6];
+        public static MACAddress Broadcast = new MACAddress(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF });
+
+        public byte[] bytes = new byte[6];
 
         public MACAddress(byte[] address)
         {
@@ -21,6 +23,24 @@ namespace Cosmos.Hardware.Network
             bytes[4] = address[4];
             bytes[5] = address[5];
 
+        }
+
+        /// <summary>
+        /// Create a MAC address from a byte buffer starting at the specified offset
+        /// </summary>
+        /// <param name="buffer">byte buffer</param>
+        /// <param name="offset">offset in buffer to start from</param>
+        public MACAddress(byte[] buffer, int offset)
+        {
+            if (buffer == null || buffer.Length < (offset + 6))
+                throw new ArgumentException("buffer does not contain enough data starting at offset", "buffer");
+
+            bytes[0] = buffer[offset];
+            bytes[1] = buffer[offset + 1];
+            bytes[2] = buffer[offset + 2];
+            bytes[3] = buffer[offset + 3];
+            bytes[4] = buffer[offset + 4];
+            bytes[5] = buffer[offset + 5];
         }
 
         public MACAddress(MACAddress m) : this(m.bytes)
@@ -82,8 +102,8 @@ namespace Cosmos.Hardware.Network
 
         public UInt64 ToNumber()
         {
-            return (UInt64)(bytes[0] | (bytes[1] << 8) | (bytes[2] << 16) | (bytes[3] << 24) |
-                (bytes[4] << 32) | (bytes[5] << 40));
+            return (UInt64)((bytes[0] << 40) | (bytes[1] << 32) | (bytes[2] << 24) | (bytes[3] << 16) |
+                (bytes[4] << 8) | (bytes[5] << 0));
         }
 
         public override string ToString()
