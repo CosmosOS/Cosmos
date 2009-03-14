@@ -47,10 +47,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AMDPCNet.cs" />
-    <Compile Include="ARPPacket.cs" />
+    <Compile Include="TCPIP_Stack\ARPCache.cs" />
+    <Compile Include="TCPIP_Stack\ARPPacket.cs" />
     <Compile Include="PCITest.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TCPIP.cs" />
+    <Compile Include="TCPIP_Stack\ARPPacket_EthernetIPv4.cs" />
+    <Compile Include="TCPIP_Stack\ARPReply_EthernetIPv4.cs" />
+    <Compile Include="TCPIP_Stack\ARPRequest_EthernetIPv4.cs" />
+    <Compile Include="TCPIP_Stack\EthernetPacket.cs" />
+    <Compile Include="TCPIP_Stack\ICMPEchoReply.cs" />
+    <Compile Include="TCPIP_Stack\ICMPEchoRequest.cs" />
+    <Compile Include="TCPIP_Stack\ICMPPacket.cs" />
+    <Compile Include="TCPIP_Stack\IPPacket.cs" />
+    <Compile Include="TCPIP_Stack\IPv4Address.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cosmos.Build.Windows\Cosmos.Compiler.Builder.csproj">

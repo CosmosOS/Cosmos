@@ -4,6 +4,7 @@ using HW = Cosmos.Hardware;
 using Cosmos.Kernel;
 using System.Collections.Generic;
 using Cosmos.Sys.Network;
+using Cosmos.Playground.SSchocke.TCPIP_Stack;
 
 namespace Cosmos.Playground.SSchocke {
     class Program
@@ -29,7 +30,7 @@ namespace Cosmos.Playground.SSchocke {
             {
                 if ((dev.VendorID == 0x1022) && (dev.DeviceID == 0x2000))
                 {
-                    nic = new AMDPCNet(dev);
+                    nic = new HW.Network.Devices.AMDPCNetII.AMDPCNet(dev);
                     Console.WriteLine("Found AMD PCNet NIC on PCI " + dev.Bus + ":" + dev.Slot + ":" + dev.Function);
                     Console.WriteLine("NIC IRQ: " + dev.InterruptLine);
                     Console.WriteLine("NIC MAC Address: " + nic.MACAddress.ToString());
@@ -38,36 +39,20 @@ namespace Cosmos.Playground.SSchocke {
             }
             //PCITest.Test();
 
-            ARPPacket packet = new ARPPacket(nic.MACAddress.bytes);
-            var xBytes = packet.GetData();
-            Console.Write("Transmit Buffer: ");
-            WriteBinaryBuffer(xBytes);
+            TCPIP.OurAddress = new IPv4Address(192, 168, 20, 123);
 
             Console.WriteLine("Initializing NIC...");
             nic.Enable();
-            bool sent = false;
             while(true)
             {
-                if ((nic.Ready == true) && (sent == false))
-                {
-                    Console.WriteLine("Sending Packet...");
-                    nic.QueueBytes(xBytes, 0, xBytes.Length);
-                    sent = true;
-                }
-                //Console.WriteLine("Status=" + nic.StatusRegister.ToHex(4));
-                //Console.WriteLine("Status=" + nic.StatusRegister.ToHex(4) + ", BurstBus=" + nic.BurstBusControlRegister.ToHex(4));
-                //Console.WriteLine("Mode=" + nic.ModeRegister.ToHex(4) + ", SWStyle=" + nic.SoftwareStyleRegister.ToHex(4));
-                //Console.WriteLine("TXDesc0[0]=" + nic.GetTXDesc0()[0].ToHex(8) + ",TXDesc0[1]=" + nic.GetTXDesc0()[1].ToHex(8));
-                //Console.WriteLine("TXDesc0[2]=" + nic.GetTXDesc0()[2].ToHex(8) + ",TXDesc0[3]=" + nic.GetTXDesc0()[3].ToHex(8));
-                //Console.Read();
                 while (nic.BytesAvailable() > 0)
                 {
                     byte[] data = nic.ReceivePacket();
-                    Console.WriteLine("Recv Data: Length=" + data.Length);
-                    Console.Write("Data: ");
-                    WriteBinaryBuffer(data);
+
+                    TCPIP.HandlePacket(nic, data);
                 }
             }
+
             Console.WriteLine("Press a key to shutdown...");
             Console.Read();
             Cosmos.Sys.Deboot.ShutDown();
