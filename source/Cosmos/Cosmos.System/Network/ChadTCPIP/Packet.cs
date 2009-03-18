@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Cosmos.Sys.Network {
+namespace Cosmos.Sys.Network
+{
     public abstract class Packet {
         protected byte[] mData;
 

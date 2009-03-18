@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using HW = Cosmos.Hardware;
 
-namespace Cosmos.Playground.SSchocke.TCPIP_Stack
+namespace Cosmos.Sys.Network.TCPIP.ICMP
 {
     public class ICMPPacket : IPPacket
     {
@@ -13,15 +10,18 @@ namespace Cosmos.Playground.SSchocke.TCPIP_Stack
 
         public ICMPPacket(byte[] rawData)
             : base(rawData)
+        {}
+
+        protected override void initFields()
         {
-            icmpType = rawData[this.dataOffset];
-            icmpCode = rawData[this.dataOffset + 1];
-            icmpCRC = (UInt16)((rawData[this.dataOffset + 2] << 8) | rawData[this.dataOffset + 3]);
+            base.initFields();
+            icmpType = mRawData[this.dataOffset];
+            icmpCode = mRawData[this.dataOffset + 1];
+            icmpCRC = (UInt16)((mRawData[this.dataOffset + 2] << 8) | mRawData[this.dataOffset + 3]);
         }
 
-        public ICMPPacket(HW.Network.MACAddress srcMAC, HW.Network.MACAddress destMAC,
-            IPv4Address source, IPv4Address dest, byte type, byte code, UInt16 id, UInt16 seq, UInt16 icmpDataSize)
-            : base(srcMAC, destMAC, icmpDataSize, 1, source, dest)
+        public ICMPPacket(IPv4Address source, IPv4Address dest, byte type, byte code, UInt16 id, UInt16 seq, UInt16 icmpDataSize)
+            : base(icmpDataSize, 1, source, dest)
         {
             mRawData[this.dataOffset] = type;
             mRawData[this.dataOffset + 1] = code;
@@ -35,6 +35,7 @@ namespace Cosmos.Playground.SSchocke.TCPIP_Stack
             icmpCRC = CalcICMPCRC((UInt16)(icmpDataSize + 8));
             mRawData[this.dataOffset + 2] = (byte)((icmpCRC >> 8) & 0xFF);
             mRawData[this.dataOffset + 3] = (byte)((icmpCRC >> 0) & 0xFF);
+            initFields();
         }
 
         protected UInt16 CalcICMPCRC(UInt16 length)

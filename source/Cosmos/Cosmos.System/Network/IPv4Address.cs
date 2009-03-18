@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-//using System.Linq;
 using System.Text;
 
-namespace Cosmos.Playground.SSchocke.TCPIP_Stack
+namespace Cosmos.Sys.Network
 {
     public class IPv4Address : IComparable
     {
+        public static IPv4Address Zero = new IPv4Address(0, 0, 0, 0);
+
         public byte[] address = new byte[4];
 
         public IPv4Address(byte aFirst, byte aSecond, byte aThird, byte aFourth)

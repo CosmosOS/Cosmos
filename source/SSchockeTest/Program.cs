@@ -4,7 +4,6 @@ using HW = Cosmos.Hardware;
 using Cosmos.Kernel;
 using System.Collections.Generic;
 using Cosmos.Sys.Network;
-using Cosmos.Playground.SSchocke.TCPIP_Stack;
 
 namespace Cosmos.Playground.SSchocke {
     class Program
@@ -37,20 +36,16 @@ namespace Cosmos.Playground.SSchocke {
                     break;
                 }
             }
-            //PCITest.Test();
-
-            TCPIP.OurAddress = new IPv4Address(192, 168, 20, 123);
-
             Console.WriteLine("Initializing NIC...");
             nic.Enable();
-            while(true)
-            {
-                while (nic.BytesAvailable() > 0)
-                {
-                    byte[] data = nic.ReceivePacket();
 
-                    TCPIP.HandlePacket(nic, data);
-                }
+            Console.WriteLine("Initializing TCP Stack...");
+            TCPIPStack.Init();
+            TCPIPStack.ConfigIP(nic, new IPv4Config(new IPv4Address(192, 168, 20, 123), new IPv4Address(255, 255, 255, 0)));
+
+            while (true)
+            {
+                TCPIPStack.Update();
             }
 
             Console.WriteLine("Press a key to shutdown...");
@@ -58,13 +53,13 @@ namespace Cosmos.Playground.SSchocke {
             Cosmos.Sys.Deboot.ShutDown();
 		}
 
-        private static void WriteBinaryBuffer(byte[] buffer)
+        /*private static void WriteBinaryBuffer(byte[] buffer)
         {
             foreach (byte b in buffer)
             {
                 Console.Write(b.ToHex(2) + " ");
             }
             Console.WriteLine();
-        }
+        }*/
 	}
 }

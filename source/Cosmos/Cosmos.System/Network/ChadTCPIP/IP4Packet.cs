@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Cosmos.Sys.Network {
+namespace Cosmos.Sys.Network
+{
     // http://en.wikipedia.org/wiki/IPv4
     public abstract class IP4Packet : Packet {
         protected byte mHeaderSize = 20;

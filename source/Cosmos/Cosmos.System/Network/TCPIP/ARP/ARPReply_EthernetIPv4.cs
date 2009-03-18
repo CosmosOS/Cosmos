@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using HW = Cosmos.Hardware;
+﻿using HW = Cosmos.Hardware;
 
-namespace Cosmos.Playground.SSchocke.TCPIP_Stack
+namespace Cosmos.Sys.Network.TCPIP.ARP
 {
     public class ARPReply_EthernetIPv4 : ARPPacket_EthernetIPv4
     {
@@ -12,8 +9,7 @@ namespace Cosmos.Playground.SSchocke.TCPIP_Stack
         {}
 
         public ARPReply_EthernetIPv4(HW.Network.MACAddress ourMAC, IPv4Address ourIP, HW.Network.MACAddress targetMAC, IPv4Address targetIP)
-            : base(targetMAC, ourMAC, 2, ourMAC, ourIP,targetMAC,targetIP, 42)
-        {
-        }
+            : base(2, ourMAC, ourIP, targetMAC, targetIP, 42)
+        {}
     }
 }

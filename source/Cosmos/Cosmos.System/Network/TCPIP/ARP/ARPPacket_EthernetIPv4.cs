@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using HW = Cosmos.Hardware;
 
-namespace Cosmos.Playground.SSchocke.TCPIP_Stack
+namespace Cosmos.Sys.Network.TCPIP.ARP
 {
     public abstract class ARPPacket_EthernetIPv4 : ARPPacket
     {
@@ -14,16 +12,20 @@ namespace Cosmos.Playground.SSchocke.TCPIP_Stack
 
         public ARPPacket_EthernetIPv4(byte[] rawData)
             : base(rawData)
+        {}
+
+        protected override void initFields()
         {
-            mSenderMAC = new HW.Network.MACAddress(rawData, 22);
-            mSenderIP = new IPv4Address(rawData, 28);
-            mTargetMAC = new HW.Network.MACAddress(rawData, 32);
-            mTargetIP = new IPv4Address(rawData, 38);
+            base.initFields();
+            mSenderMAC = new HW.Network.MACAddress(mRawData, 22);
+            mSenderIP = new IPv4Address(mRawData, 28);
+            mTargetMAC = new HW.Network.MACAddress(mRawData, 32);
+            mTargetIP = new IPv4Address(mRawData, 38);
         }
 
-        protected ARPPacket_EthernetIPv4(HW.Network.MACAddress dest, HW.Network.MACAddress src, UInt16 operation, 
-            HW.Network.MACAddress senderMAC, IPv4Address senderIP, HW.Network.MACAddress targetMAC, IPv4Address targetIP, int packet_size)
-            : base(dest, src, 1, 0x0800, 6, 4, operation, packet_size)
+        protected ARPPacket_EthernetIPv4(UInt16 operation, HW.Network.MACAddress senderMAC, IPv4Address senderIP, 
+            HW.Network.MACAddress targetMAC, IPv4Address targetIP, int packet_size)
+            : base(targetMAC, senderMAC, 1, 0x0800, 6, 4, operation, packet_size)
         {
             for (int i = 0; i < 6; i++)
             {
@@ -35,6 +37,8 @@ namespace Cosmos.Playground.SSchocke.TCPIP_Stack
                 mRawData[28 + i] = senderIP.address[i];
                 mRawData[38 + i] = targetIP.address[i];
             }
+
+            initFields();
         }
 
         public HW.Network.MACAddress SenderMAC

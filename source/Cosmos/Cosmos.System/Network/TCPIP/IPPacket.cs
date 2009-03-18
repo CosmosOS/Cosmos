@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using HW = Cosmos.Hardware;
 
-namespace Cosmos.Playground.SSchocke.TCPIP_Stack
+namespace Cosmos.Sys.Network.TCPIP
 {
     public class IPPacket : EthernetPacket
     {
@@ -23,23 +21,31 @@ namespace Cosmos.Playground.SSchocke.TCPIP_Stack
 
         public IPPacket(byte[] rawData)
             : base(rawData)
+        {}
+
+        protected override void initFields()
         {
-            ipVersion = (byte)((rawData[14] & 0xF0) >> 4);
-            ipHeaderLength = (byte)(rawData[14] & 0x0F);
-            tos = rawData[15];
-            ipLength = (UInt16)((rawData[16] << 8) | rawData[17]);
-            fragmentID = (UInt16)((rawData[18] << 8) | rawData[19]);
-            flags = (byte)((rawData[20] & 0xE0) >> 5);
-            fragmentOffset = (UInt16)(((rawData[20] & 0x1F) << 8) | rawData[21]);
-            ttl = rawData[22];
-            proto = rawData[23];
-            ipCRC = (UInt16)((rawData[24] << 8) | rawData[25]);
-            sourceIP = new IPv4Address(rawData, 26);
-            destIP = new IPv4Address(rawData, 30);
+            base.initFields();
+            ipVersion = (byte)((mRawData[14] & 0xF0) >> 4);
+            ipHeaderLength = (byte)(mRawData[14] & 0x0F);
+            tos = mRawData[15];
+            ipLength = (UInt16)((mRawData[16] << 8) | mRawData[17]);
+            fragmentID = (UInt16)((mRawData[18] << 8) | mRawData[19]);
+            flags = (byte)((mRawData[20] & 0xE0) >> 5);
+            fragmentOffset = (UInt16)(((mRawData[20] & 0x1F) << 8) | mRawData[21]);
+            ttl = mRawData[22];
+            proto = mRawData[23];
+            ipCRC = (UInt16)((mRawData[24] << 8) | mRawData[25]);
+            sourceIP = new IPv4Address(mRawData, 26);
+            destIP = new IPv4Address(mRawData, 30);
             dataOffset = (UInt16)(14 + HeaderLength);
         }
 
-        protected IPPacket(HW.Network.MACAddress srcMAC, HW.Network.MACAddress destMAC, UInt16 dataLength, byte protocol,
+        protected IPPacket(UInt16 dataLength, byte protocol, IPv4Address source, IPv4Address dest)
+            : this(HW.Network.MACAddress.None, HW.Network.MACAddress.None, dataLength, protocol, source, dest)
+        { }
+
+        private IPPacket(HW.Network.MACAddress srcMAC, HW.Network.MACAddress destMAC, UInt16 dataLength, byte protocol,
             IPv4Address source, IPv4Address dest)
             : base(destMAC, srcMAC, 0x0800, dataLength + 14 + 20)
         {
@@ -49,7 +55,7 @@ namespace Cosmos.Playground.SSchocke.TCPIP_Stack
             ipHeaderLength = 5;
             mRawData[16] = (byte)((ipLength >> 8) & 0xFF);
             mRawData[17] = (byte)((ipLength >> 0) & 0xFF);
-            fragmentID = TCPIP.NextIPFragmentID();
+            fragmentID = TCPIPStack.NextIPFragmentID();
             mRawData[18] = (byte)((fragmentID >> 8) & 0xFF);
             mRawData[19] = (byte)((fragmentID >> 0) & 0xFF);
             mRawData[20] = 0x00;
@@ -66,7 +72,8 @@ namespace Cosmos.Playground.SSchocke.TCPIP_Stack
             ipCRC = CalcIPCRC(20);
             mRawData[24] = (byte)((ipCRC >> 8) & 0xFF);
             mRawData[25] = (byte)((ipCRC >> 0) & 0xFF);
-            dataOffset = 34;
+
+            initFields();
         }
 
         protected UInt16 CalcOcCRC(UInt16 offset, UInt16 length)
