@@ -4,6 +4,8 @@ using System.Text;
 
 namespace Cosmos.Hardware.Network
 {    
+    public delegate void DataReceivedHandler(byte[] packetData);
+
     public abstract class NetworkDevice : Device
     {
 
@@ -15,6 +17,13 @@ namespace Cosmos.Hardware.Network
         public abstract bool Ready
         {
             get;
+        }
+
+        public DataReceivedHandler DataReceived;
+
+        public virtual bool QueueBytes(byte[] buffer)
+        {
+            return QueueBytes(buffer, 0, buffer.Length);
         }
 
         public abstract bool QueueBytes(byte[] buffer, int offset, int length);

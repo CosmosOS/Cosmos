@@ -8,6 +8,7 @@ namespace Cosmos.Hardware.Network
     public class MACAddress : IComparable
     {
         public static MACAddress Broadcast = new MACAddress(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF });
+        public static MACAddress None = new MACAddress(new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
 
         public byte[] bytes = new byte[6];
 

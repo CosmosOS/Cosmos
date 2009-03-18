@@ -137,8 +137,6 @@ namespace Cosmos.Hardware.Network.Devices.AMDPCNetII
         {
             UInt32 cur_status = StatusRegister;
 
-            StatusRegister = cur_status;
-            //Console.WriteLine("AMD PCNet Driver Interrupt - Status=" + cur_status.ToHex(4));
             if ((cur_status & 0x100) != 0)
             {
                 mInitDone = true;
@@ -158,6 +156,8 @@ namespace Cosmos.Hardware.Network.Devices.AMDPCNetII
             {
                 ReadRawData();
             }
+
+            StatusRegister = cur_status;
         }
 
         public bool InitDone
@@ -404,7 +404,15 @@ namespace Cosmos.Hardware.Network.Devices.AMDPCNetII
                         {
                             recv_data[b] = mRxBuffers[rxd][b];
                         }
-                        mRecvBuffer.Enqueue(recv_data);
+                        if (DataReceived != null)
+                        {
+                            DataReceived(recv_data);
+                        }
+                        else
+                        {
+                            mRecvBuffer.Enqueue(recv_data);
+                        }
+
                         mRxDescriptor[xOffset + 1] |= 0x80000000;
                     }
                 }
