@@ -48,6 +48,16 @@ namespace Cosmos.Kernel {
             return ConvertToHex(aValue).PadLeft(aWidth, '0');
         }
 
+        public static string ToHex(this ulong aValue)
+        {
+            return ConvertToHex(aValue);
+        }
+
+        public static string ToHex(this ulong aValue, int aWidth)
+        {
+            return ConvertToHex(aValue).PadLeft(aWidth, '0');
+        }
+
         #endregion 
 
         #region Prefix/Suffix
@@ -70,14 +80,26 @@ namespace Cosmos.Kernel {
         {
             string xHex = string.Empty;
 
-            while (num >= 16)
+            while (num != 0)
             {
                 //Note; char is converted to string because Cosmos crashes when adding char and string. Frode, 7.june.
                 xHex = SingleDigitToHex((byte)(num & 0xf)).ToString() + xHex;
-                num = num / 16;
+                num = num >> 4;
             }
 
-            xHex = SingleDigitToHex((byte)(num & 0xf)).ToString() + xHex;
+            return xHex;
+        }
+
+        private static string ConvertToHex(UInt64 num)
+        {
+            string xHex = string.Empty;
+
+            while (num != 0)
+            {
+                //Note; char is converted to string because Cosmos crashes when adding char and string. Frode, 7.june.
+                xHex = SingleDigitToHex((byte)(num & 0xf)).ToString() + xHex;
+                num = num >> 4;
+            }
 
             return xHex;
         }
