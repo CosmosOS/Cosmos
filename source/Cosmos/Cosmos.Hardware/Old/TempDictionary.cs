@@ -91,5 +91,17 @@ namespace Cosmos.Hardware
             }
             return false;
         }
+
+        public void Remove(UInt32 key)
+        {
+            for (int i = 0; i < items.Count; i++)
+            {
+                if (items[i].Key == key)
+                {
+                    items.RemoveAt(i);
+                    break;
+                }
+            }
+        }
     }
 }

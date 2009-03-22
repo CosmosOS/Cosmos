@@ -3,9 +3,17 @@ using System.Collections.Generic;
 using HW = Cosmos.Hardware;
 using ARP = Cosmos.Sys.Network.TCPIP.ARP;
 using ICMP = Cosmos.Sys.Network.TCPIP.ICMP;
+using UDP = Cosmos.Sys.Network.TCPIP.UDP;
 
 namespace Cosmos.Sys.Network
 {
+    /// <summary>
+    /// Data Received function delegate for both UDP and TCP protocols
+    /// </summary>
+    /// <param name="source"><see cref="IPv4EndPoint"/> endpoint that data was received from</param>
+    /// <param name="data">Data received in the packet</param>
+    public delegate void DataReceived(IPv4EndPoint source, byte[] data);
+
     /// <summary>
     /// Implements a TCP/IP Stack on top of Cosmos
     /// </summary>
@@ -15,6 +23,7 @@ namespace Cosmos.Sys.Network
 
         private static HW.TempDictionary<HW.Network.NetworkDevice> addressMap;
         private static List<IPv4Config> ipConfigs;
+        private static HW.TempDictionary<DataReceived> udpClients;
 
         /// <summary>
         /// Initialize the TCP/IP Stack variables
@@ -23,6 +32,7 @@ namespace Cosmos.Sys.Network
         {
             addressMap = new HW.TempDictionary<HW.Network.NetworkDevice>();
             ipConfigs = new List<IPv4Config>();
+            udpClients = new HW.TempDictionary<DataReceived>();
         }
 
         /// <summary>
@@ -63,6 +73,51 @@ namespace Cosmos.Sys.Network
             TCPIP.IPv4OutgoingBuffer.AddPacket(request);
         }
 
+        /// <summary>
+        /// Subscribe to a UDP port to listen to data received on a specific port number
+        /// <remarks>Only one listener allowed</remarks>
+        /// </summary>
+        /// <param name="port">Port number to listen on</param>
+        /// <param name="callback"><see cref="DataReceived"/> delegate to call when data is received</param>
+        public static void SubscribeUDPPort(UInt16 port, DataReceived callback)
+        {
+            if (udpClients.ContainsKey(port) == true)
+            {
+                throw new ArgumentException("Port is already subscribed to", "port");
+            }
+
+            udpClients.Add(port, callback);
+        }
+
+        /// <summary>
+        /// Unsubscribe from existing subscription to a UDP port
+        /// </summary>
+        /// <param name="port">Port number to unsubscribe from</param>
+        public static void UnsubscribeUDPPort(UInt16 port)
+        {
+            udpClients.Remove(port);
+        }
+
+        /// <summary>
+        /// Send a UDP packet to a destination device
+        /// </summary>
+        /// <param name="dest">IP address of destination</param>
+        /// <param name="srcPort">Source port</param>
+        /// <param name="destPort">Destination port to send data to</param>
+        /// <param name="data">Data to be sent</param>
+        public static void SendUDP(IPv4Address dest, UInt16 srcPort, UInt16 destPort, byte[] data)
+        {
+            IPv4Address source = FindNetwork(dest);
+            if (source == null)
+            {
+                Console.WriteLine("Destination Network Unreachable!!");
+                return;
+            }
+
+            UDP.UDPPacket outgoing = new UDP.UDPPacket(source, dest, srcPort, destPort, data);
+            TCPIP.IPv4OutgoingBuffer.AddPacket(outgoing);
+        }
+
         internal static UInt16 NextIPFragmentID()
         {
             return sNextFragmentID++;
@@ -96,8 +151,28 @@ namespace Cosmos.Sys.Network
                     case 1:
                         IPv4_ICMPHandler(packetData);
                         break;
+                    case 17:
+                        IPv4_UDPHandler(packetData);
+                        break;
                 }
             }
+        }
+
+        private static void IPv4_UDPHandler(byte[] packetData)
+        {
+            UDP.UDPPacket udp_packet = new UDP.UDPPacket(packetData);
+            if (udpClients.ContainsKey(udp_packet.DestinationPort) == true)
+            {
+                DataReceived dlgt = udpClients[udp_packet.DestinationPort];
+                if (dlgt != null)
+                {
+                    dlgt(new IPv4EndPoint(udp_packet.SourceIP, udp_packet.SourcePort), udp_packet.UDP_Data);
+                }
+            }
+            /*byte[] abba = new byte[] { (byte)'a', (byte)'b', (byte)'b', (byte)'a' };
+
+            UDP.UDPPacket reply = new UDP.UDPPacket(udp_packet.DestinationIP, udp_packet.SourceIP, 1234, 1534, abba);
+            TCPIP.IPv4OutgoingBuffer.AddPacket(reply);*/
         }
 
         private static void IPv4_ICMPHandler(byte[] packetData)

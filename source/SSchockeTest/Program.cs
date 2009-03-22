@@ -43,6 +43,8 @@ namespace Cosmos.Playground.SSchocke {
             TCPIPStack.Init();
             TCPIPStack.ConfigIP(nic, new IPv4Config(new IPv4Address(192, 168, 20, 123), new IPv4Address(255, 255, 255, 0)));
 
+            Console.WriteLine("Subscribing to UDP Port 1234...");
+            TCPIPStack.SubscribeUDPPort(1234, UDP1234_RecvData);
             while (true)
             {
                 TCPIPStack.Update();
@@ -52,6 +54,13 @@ namespace Cosmos.Playground.SSchocke {
             Console.Read();
             Cosmos.Sys.Deboot.ShutDown();
 		}
+
+        private static void UDP1234_RecvData(IPv4EndPoint source, byte[] data)
+        {
+            Console.WriteLine("Received data on UDP port 1234 from " + source.ToString());
+
+            TCPIPStack.SendUDP(source.IPAddress, 1234, 1534, data);
+        }
 
         /*private static void WriteBinaryBuffer(byte[] buffer)
         {

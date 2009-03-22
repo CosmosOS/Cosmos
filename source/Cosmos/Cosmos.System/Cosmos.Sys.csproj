@@ -27,6 +27,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\Cosmos.Sys.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -63,7 +64,9 @@
     <Compile Include="Network\TCPIP\ICMP\ICMPEchoRequest.cs" />
     <Compile Include="Network\TCPIP\ICMP\ICMPPacket.cs" />
     <Compile Include="Network\TCPIP\IPPacket.cs" />
+    <Compile Include="Network\IPv4EndPoint.cs" />
     <Compile Include="Network\TCPIP\IPv4OutgoingBuffer.cs" />
+    <Compile Include="Network\TCPIP\UDP\UDPPacket.cs" />
     <Compile Include="VFSManager.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Network\ChadTCPIP\EthernetPacket.cs" />
