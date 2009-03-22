@@ -20,6 +20,10 @@ namespace Cosmos.Hardware {
             Interrupts.Init();
             Kernel.CPU.CreateIDT(true);
 
+            //Doku: See ACPIManager class
+            //Console.WriteLine("    Init ACPI");
+            //ACPIManager.Init();
+
             Console.WriteLine("    Init PCIBus");
             PCIBus.Init();
 

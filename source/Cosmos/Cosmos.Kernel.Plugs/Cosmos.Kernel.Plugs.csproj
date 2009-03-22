@@ -67,7 +67,6 @@
     <Compile Include="Assemblers\IOWrite32.cs" />
     <Compile Include="Assemblers\IOWrite8.cs" />
     <Compile Include="Assemblers\ZeroFill.cs" />
-    <Compile Include="CultureInfo.cs" />
     <Compile Include="Debugger.cs" />
     <Compile Include="GCImplementationImpl.cs" />
     <Compile Include="Hardware\PC\Bus\CPUBus.cs" />

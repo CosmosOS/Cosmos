@@ -145,6 +145,10 @@ namespace Cosmos.Compiler.Builder {
             {
                 mBuilder.MakeUSB(mOptionsUC.cmboUSBDevice.Text[0]);
             }
+            else if (mOptionsUC.rdioVHD.IsChecked.Value)
+            {
+                mBuilder.MakeVHD();
+            }
 
             // Problems around with DebugWindow getting stuck, this seems to work
             mMainWindow.Hide();

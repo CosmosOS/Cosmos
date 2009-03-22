@@ -59,7 +59,8 @@ namespace Cosmos.Compiler.Builder {
             spnlPXE.Visibility = aSender == rdioPXE ? Visibility.Visible : Visibility.Collapsed;
             spnlUSB.Visibility = aSender == rdioUSB ? Visibility.Visible : Visibility.Collapsed;
             spnlVMWare.Visibility = aSender == rdioVMWare ? Visibility.Visible : Visibility.Collapsed;
-            wpnlDebugPort.Visibility = (aSender == rdioUSB||aSender==rdioISO || aSender == rdioPXE ) ? Visibility.Visible : Visibility.Collapsed;
+            spnlVHD.Visibility = aSender == rdioVHD ? Visibility.Visible : Visibility.Collapsed;
+            wpnlDebugPort.Visibility = (aSender == rdioVHD || aSender == rdioUSB || aSender == rdioISO || aSender == rdioPXE || aSender == rdioVHD) ? Visibility.Visible : Visibility.Collapsed;
         }
         
         public Action Proceed;
@@ -187,6 +188,8 @@ namespace Cosmos.Compiler.Builder {
                 Options.Target = "PXE";
             } else if (rdioUSB.IsChecked.Value) {
                 Options.Target = "USB";
+            } else if (rdioVHD.IsChecked.Value) {
+                Options.Target = "VHD";
             }
             Options.DebugPort = cmboDebugPort.Text;
 
@@ -244,6 +247,9 @@ namespace Cosmos.Compiler.Builder {
                     case "USB":
                         rdioUSB.IsChecked = true;
                         break;
+                    case "VHD":
+                        rdioVHD.IsChecked = true;
+                        break;
                 }
 
                 // Misc
@@ -291,7 +297,6 @@ namespace Cosmos.Compiler.Builder {
                 // Combo is lazy loaded, so we just store it for later
                 mLastSelectedUSBDrive = Options.USBDevice;
             }
-
         
     }
 }

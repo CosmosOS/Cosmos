@@ -85,6 +85,8 @@
     <Compile Include="Assembler\X86\SpecialDebug\DebugStub.cs" />
     <Compile Include="CustomImplementation\AssemblerImpl.cs" />
     <Compile Include="CustomImplementation\Microsoft\Win32\RegistryKeyImpl.cs" />
+    <Compile Include="CustomImplementation\System\ArgumentExceptionImpl.cs" />
+    <Compile Include="CustomImplementation\System\ArgumentOutOfRangeExceptionImpl.cs" />
     <Compile Include="CustomImplementation\System\ArrayImpl.cs" />
     <Compile Include="CustomImplementation\System\ArrayImplRefs.cs" />
     <Compile Include="CustomImplementation\System\DelegateImpl.cs" />

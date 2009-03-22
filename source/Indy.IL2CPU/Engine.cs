@@ -99,7 +99,6 @@ namespace Indy.IL2CPU {
         protected DebugLogHandler mDebugLog;
         protected OpCodeMap mMap;
         protected Assembler.Assembler mAssembler;
-        
         public TraceAssemblies TraceAssemblies { get; set; }
 
         private SortedList<string, MethodBase> mPlugMethods;
@@ -124,7 +123,8 @@ namespace Indy.IL2CPU {
         private List<MLDebugSymbol> mSymbols = new List<MLDebugSymbol>();
         private ReaderWriterLocker mSymbolsLocker = new ReaderWriterLocker();
         private string mOutputDir;
-
+        public event Action<string> ChangingCurrentMethod;
+        public event Action<string> ChangingInnerMethod;
         public event Action<int, int> CompilingMethods;
         public event Action<int, int> CompilingStaticFields;
 
@@ -136,7 +136,14 @@ namespace Indy.IL2CPU {
         /// <param name="aAssembly">The assembly of which to crawl the entry-point method.</param>
         /// <param name="aTargetPlatform">The platform to target when assembling the code.</param>
         /// <param name="aOutput"></param>
-        
+        public void Simulate(IEnumerable<string> aPlugs)
+        {
+            mMap = new Indy.IL2CPU.IL.X86.X86OpCodeMap();
+            mAssembler = new Assembler.X86.CosmosAssembler((byte)0);
+            InitializePlugs(aPlugs);
+            ScanAllMethods();
+        }
+
         //TODO: Way too many params, these should be properties
         public void Execute(string aAssembly,
                             TargetPlatformEnum aTargetPlatform,
@@ -163,7 +170,9 @@ namespace Indy.IL2CPU {
                 Type xEntryPointType = xEntryPoint.DeclaringType;
                 xEntryPoint = xEntryPointType.GetMethod("Init", new Type[0]);
                 mDebugComport = aDebugComNumber;
-                AppDomain.CurrentDomain.AppendPrivatePath(Path.GetDirectoryName(mCrawledAssembly.Location));
+                AppDomainSetup xAppDomainSetup = new AppDomainSetup();
+                //xAppDomainSetup.PrivateBinPath=
+                //AppDomain.CurrentDomain.AppendPrivatePath(Path.GetDirectoryName(mCrawledAssembly.Location));
                 //List<string> xSearchDirs = new List<string>(new string[] { Path.GetDirectoryName(aAssembly), aAssemblyDir });
                 //xSearchDirs.AddRange((from item in aPlugs
                 //                      select Path.GetDirectoryName(item)).Distinct());
@@ -354,29 +363,43 @@ namespace Indy.IL2CPU {
         private int mThreadCount = 1;// Environment.ProcessorCount;
         private AutoResetEvent[] mThreadEvents = new AutoResetEvent[1];//new AutoResetEvent[mThreadCount];
 
-        private void ScanAllMethods() {
-            for (int i = 0; i < mThreadCount; i++) {
-                mThreadEvents[i] = new AutoResetEvent(false);
-                var xThread = new Thread(DoScanMethods);
-                xThread.Start(i);
+        private void ScanAllMethods()
+        {
+            //Doku: work with a thread if someone is monitoring
+            if (ChangingCurrentMethod != null && ChangingInnerMethod != null)
+            {
+                DoScanMethods(0);
             }
-            int xFinishedThreads = 0;
-            while (xFinishedThreads < mThreadCount) {
-                for (int i = 0; i < mThreadCount; i++) {
-                    if (mThreadEvents[i] != null) {
-                        if (mThreadEvents[i].WaitOne(10, false)) {
-                            mThreadEvents[i].Close();
-                            mThreadEvents[i] = null;
-                            xFinishedThreads++;
+            else
+            {
+                for (int i = 0; i < mThreadCount; i++)
+                {
+                    mThreadEvents[i] = new AutoResetEvent(false);
+                    var xThread = new Thread(DoScanMethods);
+                    xThread.Start(i);
+                }
+                int xFinishedThreads = 0;
+                while (xFinishedThreads < mThreadCount)
+                {
+                    for (int i = 0; i < mThreadCount; i++)
+                    {
+                        if (mThreadEvents[i] != null)
+                        {
+                            if (mThreadEvents[i].WaitOne(10, false))
+                            {
+                                mThreadEvents[i].Close();
+                                mThreadEvents[i] = null;
+                                xFinishedThreads++;
+                            }
                         }
                     }
                 }
             }
         }
 
-        private void DoScanMethods(object aData) {
+        private void DoScanMethods(object data) {
             //ProgressChanged.Invoke("Scanning methods");
-            int xThreadIndex = (int)aData;
+            int xThreadIndex = (int)data;
             try {
                 int xIndex = -1;
                 MethodBase xCurrentMethod;
@@ -393,6 +416,8 @@ namespace Indy.IL2CPU {
                     if (xCurrentMethod == null) {
                         break;
                     }
+                    if (ChangingCurrentMethod!=null)
+                        ChangingCurrentMethod.Invoke(xCurrentMethod.GetFullName());
                     //ProgressChanged.Invoke(String.Format("Scanning method: {0}", xCurrentMethod.GetFullName()));
                     EmitDependencyGraphLine(true, xCurrentMethod.GetFullName());
                     try {
@@ -419,7 +444,14 @@ namespace Indy.IL2CPU {
                         }
                         MethodBase xCustomImplementation = GetCustomMethodImplementation(xMethodName);
                         if (xCustomImplementation != null) {
-                            QueueMethod(xCustomImplementation);
+                            try
+                            {
+                                QueueMethod(xCustomImplementation);
+                            }
+                            catch (Exception e)
+                            {
+                                throw new Exception("Method " + xCurrentMethod.GetFullName() + " has called " + e.Message + "! Probably it needs to be plugged");
+                            }
                             using (mMethodsLocker.AcquireReaderLock()) {
                                 mMethods[xCurrentMethod].Implementation = xCustomImplementation;
                             }
@@ -463,7 +495,14 @@ namespace Indy.IL2CPU {
                     foreach (Type xType in mTypes) {
                         foreach (MethodBase xMethod in xType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)) {
                             if (xMethod.IsStatic) {
-                                QueueMethod(xMethod);
+                                try
+                                {
+                                    QueueMethod(xMethod);
+                                }
+                                catch (Exception e)
+                                {
+                                    throw new Exception("Method " + xCurrentMethod.GetFullName() + " has called " + e.Message + "! Probably it needs to be plugged");
+                                }
                             }
                         }
                     }
@@ -687,10 +726,18 @@ namespace Indy.IL2CPU {
                                             mTypesEqualityComparer)) {
                     xCheckedTypes.Add(xCurrentType);
                 }
-                QueueMethod(GetUltimateBaseMethod(xMethod,
+                MethodBase toBeQueuedMethod = GetUltimateBaseMethod(xMethod,
                                                   (from item in xMethod.GetParameters()
                                                    select item.ParameterType).ToArray(),
-                                                  xCurrentType));
+                                                  xCurrentType);
+                try
+                {
+                    QueueMethod(toBeQueuedMethod);
+                }
+                catch (Exception e)
+                {
+                    throw new Exception("Method " + xMethod.GetFullName() + " has called " + e.Message + "! Probably it needs to be plugged");
+                }
             }
             using (mTypesLocker.AcquireReaderLock()) {
                 foreach (Type xType in mTypes) {
@@ -738,7 +785,7 @@ namespace Indy.IL2CPU {
                                     xNeedsRegistering = mMethods.ContainsKey(xBaseMethod);
                                 }
                                 if (xNeedsRegistering) {
-                                    QueueMethod(xMethod);
+                                        QueueMethod(xMethod);
                                 }
                             }
                         }
@@ -1028,7 +1075,7 @@ namespace Indy.IL2CPU {
             // more importnat the optimizations would not offer much benefit
 
             // Determine if a new DebugStub should be emitted
-            bool xEmit = false;
+            //bool xEmit = false;
             // Skip NOOP's so we dont have breakpoints on them
             //TODO: Each IL op should exist in IL, and descendants in IL.X86.
             // Because of this we have this hack
@@ -1138,7 +1185,7 @@ namespace Indy.IL2CPU {
                     } else {
                         RegisterType(xCurrentField.FieldType);
                         uint xTheSize;
-                        string theType = "db";
+                        //string theType = "db";
                         Type xFieldTypeDef = xCurrentField.FieldType;
                         if (!xFieldTypeDef.IsClass || xFieldTypeDef.IsValueType) {
                             xTheSize = GetFieldStorageSize(xCurrentField.FieldType);
@@ -2035,6 +2082,21 @@ namespace Indy.IL2CPU {
             if (mCurrent == null) {
                 throw new Exception("ERROR: No Current Engine found!");
             }
+            if (mCurrent.ChangingInnerMethod != null)
+                mCurrent.ChangingInnerMethod.Invoke(aMethod.GetFullName());
+            //Doku: it is not complete..it should check if a method is from P/Invoked Namespace and it checks it has pluuged
+            /*string xInnerMethodName = aMethod.GetFullName();
+            string xPattern=" System.";
+            int xPosIn = xInnerMethodName.IndexOf(xPattern,0);
+            //get method name and namespace
+            string xNameSpaceAndMethod=xInnerMethodName.Substring(xPosIn+xPattern.Length);
+            if (xNameSpaceAndMethod.StartsWith("Globalization.") || xNameSpaceAndMethod.StartsWith("Net.") || xNameSpaceAndMethod.StartsWith("Reflection.") || xNameSpaceAndMethod.StartsWith("Xml."))
+            {
+               string xMethodSignature=xInnerMethodName.Replace('.','_');
+               xMethodSignature = xInnerMethodName.Replace(" ", "__");
+                
+               //throw new Exception(xInnerMethodName);
+            }*/
             if (!aMethod.IsStatic) {
                 RegisterType(aMethod.DeclaringType);
             }

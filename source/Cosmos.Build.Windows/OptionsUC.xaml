@@ -1,7 +1,7 @@
 ﻿<UserControl x:Class="Cosmos.Compiler.Builder.OptionsUC"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             Width="600" Height="Auto">
+             Width="607" Height="Auto">
 
     <UserControl.Resources>
         <Style x:Key="sectionTitle" TargetType="{x:Type Label}">
@@ -75,11 +75,12 @@
                             </WrapPanel>
                         </StackPanel>
                         <StackPanel Margin="20,0,0,0">
-                            <Label Style="{StaticResource subsectionTitle}">Hardware</Label>
+                            <Label Style="{StaticResource subsectionTitle}">Native</Label>
                             <WrapPanel Margin="20,0,0,0">
                                 <RadioButton GroupName="Target"	Name="rdioISO">_ISO</RadioButton>
                                 <RadioButton GroupName="Target" Name="rdioPXE">_Network (PXE)</RadioButton>
                                 <RadioButton GroupName="Target" Name="rdioUSB">_USB Device</RadioButton>
+                                <RadioButton GroupName="Target" Name="rdioVHD" IsEnabled="False">_VHD</RadioButton>
                             </WrapPanel>
                         </StackPanel>
                     </WrapPanel>
@@ -202,6 +203,15 @@
                         <Grid Style="{StaticResource sectionBody}">
                             <TextBlock TextWrapping="Wrap">No options are available for Virtual PC.</TextBlock>
                         </Grid>
+                    </StackPanel>
+                    
+                   
+                    <StackPanel Name="spnlVHD">
+                        <Label Style="{StaticResource sectionTitle}">VHD</Label>
+                        <WrapPanel Style="{StaticResource sectionBody}">
+                            <CheckBox Name="chbxBM" IsChecked="False">Add vhd on Windows Boot Manager (only Windows 7 for now)</CheckBox>
+                        </WrapPanel>
+                        
                     </StackPanel>
 
                     <StackPanel Name="spnlISO">

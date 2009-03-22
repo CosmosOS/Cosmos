@@ -7,6 +7,6 @@ namespace Cosmos.Hardware.Audio.Devices.Generic.Components
 {
     public abstract class ADCEntity
     {
-        private ADCEntity adcEntity;
+        //private ADCEntity adcEntity;
     }
 }

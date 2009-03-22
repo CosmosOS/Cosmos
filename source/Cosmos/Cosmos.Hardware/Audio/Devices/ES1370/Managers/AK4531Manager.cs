@@ -8,8 +8,8 @@ namespace Cosmos.Hardware.Audio.Devices.ES1370.Managers
     class AK4531Manager : Cosmos.Hardware.Audio.Devices.Generic.Managers.DACManager
     {
         private Kernel.MemoryAddressSpace xMem;
-            private char[] buffer;
-            bool dacEnabled;
+            //private char[] buffer;
+            //bool dacEnabled;
             public AK4531Manager(Cosmos.Hardware.Audio.Devices.ES1370.Components.DACak4531 dacEntity, Kernel.MemoryAddressSpace aMem, byte dacPage,byte dacAddress, byte dacByteSize) : base(dacEntity)
             {
                 xMem = aMem;

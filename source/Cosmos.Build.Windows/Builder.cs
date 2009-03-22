@@ -294,18 +294,19 @@ namespace Cosmos.Compiler.Builder {
         // MtW: added as field, so that it can be reused by the test runner
         public Assembly TargetAssembly = Assembly.GetEntryAssembly();
 
-        public void BeginCompile(DebugMode aDebugMode, byte aDebugComport, bool aGDB) {
-            if (!Directory.Exists(AsmPath)) {
-                Directory.CreateDirectory(AsmPath);
-            }
+        public string[] GetPlugs()
+        {
             string[] xPlugs;
-            if(File.Exists(Path.Combine(Path.Combine(ToolsPath, "Cosmos.Kernel.Plugs"), "Cosmos.Kernel.Plugs.dll"))) {
+            if (File.Exists(Path.Combine(Path.Combine(ToolsPath, "Cosmos.Kernel.Plugs"), "Cosmos.Kernel.Plugs.dll")))
+            {
                 xPlugs = new string[] {
                     Path.Combine(Path.Combine(ToolsPath, "Cosmos.Kernel.Plugs"), "Cosmos.Kernel.Plugs.dll"), 
                     Path.Combine(Path.Combine(ToolsPath, "Cosmos.Hardware.Plugs"), "Cosmos.Hardware.Plugs.dll"), 
                     Path.Combine(Path.Combine(ToolsPath, "Cosmos.Sys.Plugs"), "Cosmos.Sys.Plugs.dll")
-                }; 
-            }else {
+                };
+            }
+            else
+            {
                 string xPath = Path.GetDirectoryName(typeof(Builder).Assembly.Location);
                 xPlugs = new string[] {
                     Path.Combine(xPath, "Cosmos.Kernel.Plugs.dll"), 
@@ -313,6 +314,14 @@ namespace Cosmos.Compiler.Builder {
                     Path.Combine(xPath, "Cosmos.Sys.Plugs.dll")
                 };
             }
+            return xPlugs;
+        }
+
+        public void BeginCompile(DebugMode aDebugMode, byte aDebugComport, bool aGDB) {
+            if (!Directory.Exists(AsmPath)) {
+                Directory.CreateDirectory(AsmPath);
+            }
+            string[] xPlugs = GetPlugs();
             var xEngineParams = new PassedEngineValue(TargetAssembly.Location, TargetPlatformEnum.X86
                 , xPlugs, aDebugMode, aDebugComport, aGDB, AsmPath, Options.TraceAssemblies);
 
@@ -454,6 +463,13 @@ namespace Cosmos.Compiler.Builder {
             File.Move(BuildPath + "output.bin", xPath + @"Boot\output.bin");
             // *Must* set working dir so tftpd32 will set itself to proper dir
             Global.Call(xPath + "tftpd32.exe", "", xPath, false, true);
+        }
+
+        public void MakeVHD()
+        {
+            Environment.SetEnvironmentVariable("CosmosBuildPath", BuildPath);
+            Global.Call(Environment.GetEnvironmentVariable("WinDir")+ "\\system32\\diskpart /s "+BuildPath+"diskpart_script", "", BuildPath,true,false);
+            Environment.SetEnvironmentVariable("CosmosBuildPath","");
         }
     }
 }

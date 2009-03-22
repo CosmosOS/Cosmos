@@ -13,7 +13,7 @@ namespace Indy.IL2CPU {
 		}
 
 		public static void InitializeEngine() {
-            int xTest = 5;
+            //int xTest = 5;
 			// for replacement by the architecture
 		}
 
