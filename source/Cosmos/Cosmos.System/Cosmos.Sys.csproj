@@ -70,7 +70,6 @@
     <Compile Include="Network\TCPIP\TCP\TCPConnection.cs" />
     <Compile Include="Network\TCPIP\TCP\TCPPacket.cs" />
     <Compile Include="Network\TCPIP\UDP\UDPPacket.cs" />
-    <Compile Include="Network\TcpListener.cs" />
     <Compile Include="VFSManager.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Network\ChadTCPIP\EthernetPacket.cs" />
