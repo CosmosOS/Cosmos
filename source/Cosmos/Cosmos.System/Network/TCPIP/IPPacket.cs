@@ -78,11 +78,16 @@ namespace Cosmos.Sys.Network.TCPIP
 
         protected UInt16 CalcOcCRC(UInt16 offset, UInt16 length)
         {
+            return IPPacket.CalcOcCRC(this.RawData, offset, length);
+        }
+
+        protected static UInt16 CalcOcCRC(byte[] buffer, UInt16 offset, int length)
+        {
             UInt32 crc = 0;
 
-            for (UInt16 w = offset; w < offset+length; w += 2)
+            for (UInt16 w = offset; w < offset + length; w += 2)
             {
-                crc += (UInt16)((mRawData[w] << 8) | mRawData[w + 1]);
+                crc += (UInt16)((buffer[w] << 8) | buffer[w + 1]);
             }
 
             crc = (~((crc & 0xFFFF) + (crc >> 16)));

@@ -4,6 +4,7 @@ using HW = Cosmos.Hardware;
 using Cosmos.Kernel;
 using System.Collections.Generic;
 using Cosmos.Sys.Network;
+using System.Text;
 
 namespace Cosmos.Playground.SSchocke {
     class Program
@@ -15,6 +16,9 @@ namespace Cosmos.Playground.SSchocke {
             BuildUI.Run();
         }
 		#endregion
+
+        static String webPage;
+        static String error404;
 
 		// Main entry point of the kernel
 		public static void Init() {
@@ -43,8 +47,27 @@ namespace Cosmos.Playground.SSchocke {
             TCPIPStack.Init();
             TCPIPStack.ConfigIP(nic, new IPv4Config(new IPv4Address(192, 168, 20, 123), new IPv4Address(255, 255, 255, 0)));
 
-            Console.WriteLine("Subscribing to UDP Port 1234...");
-            TCPIPStack.SubscribeUDPPort(1234, UDP1234_RecvData);
+            Console.WriteLine("Initializing TCP Port 80...");
+            TCPIPStack.AddTcpListener(80, WebServerConnect);
+
+            #region Setup WebServer strings
+            webPage = "<html><body><h1>It works! This is a web page being hosted by your Cosmos Operating System</h1></body></html>";
+            int webPageLength = webPage.Length;
+
+            webPage = "HTTP/1.1 200 OK\r\n";
+            webPage += "Content-Length: " + webPageLength + "\r\n";
+            webPage += "Content-Type: text/html\r\n\r\n";
+            webPage += "<html><body><h1>It works! This is a web page being hosted by your Cosmos Operating System</h1></body></html>";
+
+            error404 = "<html><body>404 URL Not found</html>";
+            int error404Length = error404.Length;
+
+            error404 = "HTTP/1.1 404 Not Found\r\n";
+            error404 += "Content-Length: " + error404Length + "\r\n";
+            error404 += "Content-Type: text/html\r\n\r\n";
+            error404 += "<html><body>404 URL Not found</html>";
+            #endregion
+
             while (true)
             {
                 TCPIPStack.Update();
@@ -55,20 +78,30 @@ namespace Cosmos.Playground.SSchocke {
             Cosmos.Sys.Deboot.ShutDown();
 		}
 
-        private static void UDP1234_RecvData(IPv4EndPoint source, byte[] data)
+        private static void WebServerConnect(TcpClient client)
         {
-            Console.WriteLine("Received data on UDP port 1234 from " + source.ToString());
-
-            TCPIPStack.SendUDP(source.IPAddress, 1234, 1534, data);
+            Console.WriteLine("Client(" + client.RemoteEndpoint.ToString() + ") Connected to port 80...");
+            client.DataReceived = WebServer_RecvData;
         }
 
-        /*private static void WriteBinaryBuffer(byte[] buffer)
+        private static void WebServer_RecvData(TcpClient client, byte[] data)
         {
-            foreach (byte b in buffer)
+            Console.WriteLine("Received request from " + client.RemoteEndpoint.ToString());
+            StringBuilder sb = new StringBuilder(data.Length);
+            for (int b = 0; b < data.Length; b++)
             {
-                Console.Write(b.ToHex(2) + " ");
+                sb.Append((char)data[b]);
             }
-            Console.WriteLine();
-        }*/
+            String dataString = sb.ToString();
+
+            if (dataString.StartsWith("GET / ") == true)
+            {
+                client.SendString(webPage);
+            }
+            else
+            {
+                client.SendString(error404);
+            }
+        }
 	}
 }

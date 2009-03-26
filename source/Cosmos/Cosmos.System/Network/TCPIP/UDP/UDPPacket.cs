@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Cosmos.Sys.Network.TCPIP.UDP
 {
@@ -32,6 +29,8 @@ namespace Cosmos.Sys.Network.TCPIP.UDP
             {
                 mRawData[this.dataOffset + 8 + b] = data[b];
             }
+
+            initFields();
         }
 
         protected override void initFields()

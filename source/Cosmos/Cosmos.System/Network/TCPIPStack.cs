@@ -4,15 +4,28 @@ using HW = Cosmos.Hardware;
 using ARP = Cosmos.Sys.Network.TCPIP.ARP;
 using ICMP = Cosmos.Sys.Network.TCPIP.ICMP;
 using UDP = Cosmos.Sys.Network.TCPIP.UDP;
+using TCP = Cosmos.Sys.Network.TCPIP.TCP;
 
 namespace Cosmos.Sys.Network
 {
     /// <summary>
-    /// Data Received function delegate for both UDP and TCP protocols
+    /// Data Received function delegate for UDP protocol
     /// </summary>
-    /// <param name="source"><see cref="IPv4EndPoint"/> endpoint that data was received from</param>
+    /// <param name="source"><see cref="IPv4EndPoint"/>Endpoint that data was received from</param>
     /// <param name="data">Data received in the packet</param>
     public delegate void DataReceived(IPv4EndPoint source, byte[] data);
+
+    /// <summary>
+    /// New TCP Client connection delegate
+    /// </summary>
+    /// <param name="client">Instance of the <see cref="TcpClient"/> that represents the connection</param>
+    public delegate void ClientConnected(TcpClient client);
+    /// <summary>
+    /// TCP Client Data Received delegate
+    /// </summary>
+    /// <param name="client"><see cref="TcpClient"/> instance that data was received on</param>
+    /// <param name="data">Byte buffer of the received data</param>
+    public delegate void ClientDataReceived(TcpClient client, byte[] data);
 
     /// <summary>
     /// Implements a TCP/IP Stack on top of Cosmos
@@ -24,6 +37,8 @@ namespace Cosmos.Sys.Network
         private static HW.TempDictionary<HW.Network.NetworkDevice> addressMap;
         private static List<IPv4Config> ipConfigs;
         private static HW.TempDictionary<DataReceived> udpClients;
+        private static HW.TempDictionary<ClientConnected> tcpListeners;
+        private static List<TCP.TCPConnection> tcpSockets;
 
         /// <summary>
         /// Initialize the TCP/IP Stack variables
@@ -33,6 +48,8 @@ namespace Cosmos.Sys.Network
             addressMap = new HW.TempDictionary<HW.Network.NetworkDevice>();
             ipConfigs = new List<IPv4Config>();
             udpClients = new HW.TempDictionary<DataReceived>();
+            tcpListeners = new HW.TempDictionary<ClientConnected>();
+            tcpSockets = new List<TCP.TCPConnection>();
         }
 
         /// <summary>
@@ -118,6 +135,21 @@ namespace Cosmos.Sys.Network
             TCPIP.IPv4OutgoingBuffer.AddPacket(outgoing);
         }
 
+        /// <summary>
+        /// Add a TCP listener to the specified port
+        /// </summary>
+        /// <param name="port">Port number to listen on</param>
+        /// <param name="connectCallback">Callback function that is called when a new client connects</param>
+        public static void AddTcpListener(UInt16 port, ClientConnected connectCallback)
+        {
+            if (tcpListeners.ContainsKey(port) == true)
+            {
+                throw new ArgumentException("Port is already subscribed to", "port");
+            }
+
+            tcpListeners.Add(port, connectCallback);
+        }
+
         internal static UInt16 NextIPFragmentID()
         {
             return sNextFragmentID++;
@@ -151,9 +183,84 @@ namespace Cosmos.Sys.Network
                     case 1:
                         IPv4_ICMPHandler(packetData);
                         break;
+                    case 6:
+                        IPv4_TCPHandler(packetData);
+                        break;
                     case 17:
                         IPv4_UDPHandler(packetData);
                         break;
+                }
+            }
+        }
+
+        private static void IPv4_TCPHandler(byte[] packetData)
+        {
+            TCP.TCPPacket tcp_packet = new TCP.TCPPacket(packetData);
+            if (tcp_packet.Syn == true)
+            {
+                if (tcpListeners.ContainsKey(tcp_packet.DestinationPort) == true)
+                {
+                    TCP.TCPConnection connection = new TCP.TCPConnection(tcp_packet.SourceIP, tcp_packet.SourcePort, tcp_packet.DestinationIP, 
+                        tcp_packet.DestinationPort, tcp_packet.SequenceNumber, TCP.TCPConnection.State.SYN_RECVD);
+
+                    tcpSockets.Add(connection);
+
+                    TCP.TCPPacket syn_ack = new TCP.TCPPacket(connection, connection.LocalSequenceNumber, 
+                                                                ++connection.RemoteSequenceNumber, 0x12, 8192);
+                    TCPIP.IPv4OutgoingBuffer.AddPacket(syn_ack);
+
+                    ClientConnected connectCallback = tcpListeners[tcp_packet.DestinationPort];
+
+                    connectCallback(new TcpClient(connection));
+
+                    return;
+                }
+            }
+
+            TCP.TCPConnection active_connection = null;
+            for (int c = 0; c < tcpSockets.Count; c++)
+            {
+                if ((tcpSockets[c].RemoteIP.CompareTo(tcp_packet.SourceIP) == 0) &&
+                    (tcpSockets[c].RemotePort == tcp_packet.SourcePort) &&
+                    (tcpSockets[c].LocalPort == tcp_packet.DestinationPort))
+                {
+                    active_connection = tcpSockets[c];
+                    break;
+                }
+            }
+
+            if (active_connection == null)
+            {
+                TCP.TCPPacket reset_packet = new TCP.TCPPacket(tcp_packet.DestinationIP, tcp_packet.SourceIP, tcp_packet.DestinationPort,
+                                                                tcp_packet.SourcePort, 0, (tcp_packet.SequenceNumber + 1), 0x14, 8192);
+                TCPIP.IPv4OutgoingBuffer.AddPacket(reset_packet);
+                return;
+            }
+
+            if (active_connection.ConnectionState == TCP.TCPConnection.State.SYN_RECVD)
+            {
+                if ((tcp_packet.Ack == true) && ((active_connection.LocalSequenceNumber + 1) == tcp_packet.AckNumber))
+                {
+                    active_connection.LocalSequenceNumber++;
+                    active_connection.ConnectionState = TCP.TCPConnection.State.ESTABLISHED;
+                }
+            }
+            else if (active_connection.ConnectionState == TCP.TCPConnection.State.ESTABLISHED)
+            {
+                if (tcp_packet.Ack == true)
+                {
+                    active_connection.LocalSequenceNumber = tcp_packet.AckNumber;
+                }
+
+                if (tcp_packet.TCP_DataLength > 0)
+                {
+                    active_connection.RemoteSequenceNumber += tcp_packet.TCP_DataLength;
+
+                    TCP.TCPPacket ack = new TCP.TCPPacket(active_connection, active_connection.LocalSequenceNumber,
+                                                        active_connection.RemoteSequenceNumber, 0x10, 8192);
+                    TCPIP.IPv4OutgoingBuffer.AddPacket(ack);
+
+                    active_connection.client.dataReceived(tcp_packet.TCP_Data);
                 }
             }
         }
@@ -169,10 +276,6 @@ namespace Cosmos.Sys.Network
                     dlgt(new IPv4EndPoint(udp_packet.SourceIP, udp_packet.SourcePort), udp_packet.UDP_Data);
                 }
             }
-            /*byte[] abba = new byte[] { (byte)'a', (byte)'b', (byte)'b', (byte)'a' };
-
-            UDP.UDPPacket reply = new UDP.UDPPacket(udp_packet.DestinationIP, udp_packet.SourceIP, 1234, 1534, abba);
-            TCPIP.IPv4OutgoingBuffer.AddPacket(reply);*/
         }
 
         private static void IPv4_ICMPHandler(byte[] packetData)
@@ -206,7 +309,7 @@ namespace Cosmos.Sys.Network
 
                     if (addressMap.ContainsKey(arp_request.TargetIP.To32BitNumber()) == true)
                     {
-                        Console.WriteLine("ARP Request Recvd from " + arp_request.SenderIP.ToString());
+                        //Console.WriteLine("ARP Request Recvd from " + arp_request.SenderIP.ToString());
                         HW.Network.NetworkDevice nic = addressMap[arp_request.TargetIP.To32BitNumber()];
 
                         ARP.ARPReply_EthernetIPv4 reply =
@@ -223,7 +326,7 @@ namespace Cosmos.Sys.Network
                     ARP.ARPReply_EthernetIPv4 arp_reply = new ARP.ARPReply_EthernetIPv4(packetData);
                     ARP.ARPCache.Update(arp_reply.SenderIP, arp_reply.SenderMAC);
 
-                    Console.WriteLine("ARP Reply Recvd for IP=" + arp_reply.SenderIP.ToString());
+                    //Console.WriteLine("ARP Reply Recvd for IP=" + arp_reply.SenderIP.ToString());
                     TCPIP.IPv4OutgoingBuffer.ARPCache_Update(arp_reply);
                 }
             }

@@ -53,6 +53,7 @@
     <Compile Include="Deboot.cs" />
     <Compile Include="Network\IPv4Address.cs" />
     <Compile Include="Network\IPv4Config.cs" />
+    <Compile Include="Network\TcpClient.cs" />
     <Compile Include="Network\TCPIPStack.cs" />
     <Compile Include="Network\TCPIP\ARP\ARPCache.cs" />
     <Compile Include="Network\TCPIP\ARP\ARPPacket.cs" />
@@ -66,7 +67,10 @@
     <Compile Include="Network\TCPIP\IPPacket.cs" />
     <Compile Include="Network\IPv4EndPoint.cs" />
     <Compile Include="Network\TCPIP\IPv4OutgoingBuffer.cs" />
+    <Compile Include="Network\TCPIP\TCP\TCPConnection.cs" />
+    <Compile Include="Network\TCPIP\TCP\TCPPacket.cs" />
     <Compile Include="Network\TCPIP\UDP\UDPPacket.cs" />
+    <Compile Include="Network\TcpListener.cs" />
     <Compile Include="VFSManager.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Network\ChadTCPIP\EthernetPacket.cs" />
