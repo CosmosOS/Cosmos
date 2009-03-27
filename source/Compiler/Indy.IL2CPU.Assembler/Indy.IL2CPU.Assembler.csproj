@@ -142,6 +142,7 @@
     <Compile Include="X86\SSEAndMMX2\FXSave.cs" />
     <Compile Include="X86\SSEAndMMX2\FXStore.cs" />
     <Compile Include="X86\SSEAndMMX2\MoveSS.cs" />
+    <Compile Include="X86\SSEAndMMX2\SubSS.cs" />
     <Compile Include="X86\StoreByteInString.cs" />
     <Compile Include="X86\StoreSD.cs" />
     <Compile Include="X86\StoreWordInString.cs" />
