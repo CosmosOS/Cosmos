@@ -1,4 +1,5 @@
-﻿using HW = Cosmos.Hardware;
+﻿using System;
+using HW = Cosmos.Hardware;
 
 namespace Cosmos.Sys.Network.TCPIP.ARP
 {
@@ -23,13 +24,19 @@ namespace Cosmos.Sys.Network.TCPIP.ARP
         public static void Update(IPv4Address ipAddress, HW.Network.MACAddress macAddress)
         {
             ensureCacheExists();
-            if (cache.ContainsKey(ipAddress.To32BitNumber()) == false)
+            UInt32 ip_hash = ipAddress.To32BitNumber();
+            if (ip_hash == 0)
             {
-                cache.Add(ipAddress.To32BitNumber(), macAddress);
+                return;
+            }
+
+            if (cache.ContainsKey(ip_hash) == false)
+            {
+                cache.Add(ip_hash, macAddress);
             }
             else
             {
-                cache[ipAddress.To32BitNumber()] = macAddress;
+                cache[ip_hash] = macAddress;
             }
         }
 

@@ -157,9 +157,8 @@ namespace Cosmos.Sys.Network
 
         internal static void HandlePacket(byte[] packetData)
         {
-            TCPIP.EthernetPacket packet = new TCPIP.EthernetPacket(packetData);
-
-            switch (packet.Type)
+            UInt16 etherType = (UInt16)((packetData[12] << 8) | packetData[13]);
+            switch (etherType)
             {
                 case 0x0806:
                     ARPHandler(packetData);
@@ -173,10 +172,10 @@ namespace Cosmos.Sys.Network
         private static void IPv4Handler(byte[] packetData)
         {
             TCPIP.IPPacket ip_packet = new TCPIP.IPPacket(packetData);
-
             ARP.ARPCache.Update(ip_packet.SourceIP, ip_packet.SourceMAC);
 
-            if( addressMap.ContainsKey(ip_packet.DestinationIP.To32BitNumber()) == true )
+            if ((addressMap.ContainsKey(ip_packet.DestinationIP.To32BitNumber()) == true) ||
+                (ip_packet.DestinationIP.address[3] == 255))
             {
                 switch (ip_packet.Protocol)
                 {
@@ -304,7 +303,6 @@ namespace Cosmos.Sys.Network
                 if ((arp_packet.HardwareType == 1) && (arp_packet.ProtocolType == 0x0800))
                 {
                     ARP.ARPRequest_EthernetIPv4 arp_request = new ARP.ARPRequest_EthernetIPv4(packetData);
-
                     ARP.ARPCache.Update(arp_request.SenderIP, arp_request.SenderMAC);
 
                     if (addressMap.ContainsKey(arp_request.TargetIP.To32BitNumber()) == true)

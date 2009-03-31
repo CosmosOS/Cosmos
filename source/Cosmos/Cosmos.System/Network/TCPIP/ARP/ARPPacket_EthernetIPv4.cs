@@ -3,14 +3,14 @@ using HW = Cosmos.Hardware;
 
 namespace Cosmos.Sys.Network.TCPIP.ARP
 {
-    public abstract class ARPPacket_EthernetIPv4 : ARPPacket
+    internal abstract class ARPPacket_EthernetIPv4 : ARPPacket
     {
         protected HW.Network.MACAddress mSenderMAC;
         protected HW.Network.MACAddress mTargetMAC;
         protected IPv4Address mSenderIP;
         protected IPv4Address mTargetIP;
 
-        public ARPPacket_EthernetIPv4(byte[] rawData)
+        internal ARPPacket_EthernetIPv4(byte[] rawData)
             : base(rawData)
         {}
 
@@ -41,21 +41,27 @@ namespace Cosmos.Sys.Network.TCPIP.ARP
             initFields();
         }
 
-        public HW.Network.MACAddress SenderMAC
+        internal HW.Network.MACAddress SenderMAC
         {
             get { return this.mSenderMAC; }
         }
-        public HW.Network.MACAddress TargetMAC
+        internal HW.Network.MACAddress TargetMAC
         {
             get { return this.mTargetMAC; }
         }
-        public IPv4Address SenderIP
+        internal IPv4Address SenderIP
         {
             get { return this.mSenderIP; }
         }
-        public IPv4Address TargetIP
+        internal IPv4Address TargetIP
         {
             get { return this.mTargetIP; }
+        }
+
+        public override string ToString()
+        {
+            return "IPv4 Ethernet ARP Packet SenderMAC=" + mSenderMAC + ", TargetMAC=" + mTargetMAC + ", SenderIP=" + mSenderIP +
+                ", TargetIP=" + mTargetIP + ", Operation=" + aOperation;
         }
     }
 }

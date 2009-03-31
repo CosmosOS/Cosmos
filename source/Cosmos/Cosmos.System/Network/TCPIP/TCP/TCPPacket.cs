@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Cosmos.Kernel;
 
 namespace Cosmos.Sys.Network.TCPIP.TCP
 {
-    public class TCPPacket : IPPacket
+    internal class TCPPacket : IPPacket
     {
         private const byte CWR = 0x80;
         private const byte ECE = 0x40;
@@ -128,63 +129,63 @@ namespace Cosmos.Sys.Network.TCPIP.TCP
             tcpDataOffset = (UInt16)(this.dataOffset + (this.tcpHeaderDWords * 4));
         }
 
-        public UInt16 DestinationPort
+        internal UInt16 DestinationPort
         {
             get { return this.destPort; }
         }
-        public UInt16 SourcePort
+        internal UInt16 SourcePort
         {
             get { return this.sourcePort; }
         }
-        public UInt32 SequenceNumber
+        internal UInt32 SequenceNumber
         {
             get { return this.seqNum; }
         }
-        public UInt32 AckNumber
+        internal UInt32 AckNumber
         {
             get { return this.ackNum; }
         }
-        public byte TCP_Flags
+        internal byte TCP_Flags
         {
             get { return this.tcpFlags; }
         }
-        public UInt16 WindowSize
+        internal UInt16 WindowSize
         {
             get { return this.windowSize; }
         }
-        public UInt16 TCPCRC
+        internal UInt16 TCPCRC
         {
             get { return this.tcpChecksum; }
         }
-        public UInt16 TCP_Length
+        internal UInt16 TCP_Length
         {
             get { return (UInt16)(this.ipLength - this.HeaderLength); }
         }
-        public UInt16 TCP_HeaderLength
+        internal UInt16 TCP_HeaderLength
         {
             get { return (UInt16)(this.tcpHeaderDWords * 4); }
         }
-        public UInt16 TCP_HeaderWords
+        internal UInt16 TCP_HeaderWords
         {
             get { return this.tcpHeaderDWords; }
         }
-        public UInt16 TCP_DataLength
+        internal UInt16 TCP_DataLength
         {
             get { return (UInt16)(this.TCP_Length - this.TCP_HeaderLength); }
         }
-        public bool Syn
+        internal bool Syn
         {
             get { return ((this.tcpFlags & SYN) != 0); }
         }
-        public bool Fin
+        internal bool Fin
         {
             get { return ((this.tcpFlags & FIN) != 0); }
         }
-        public bool Ack
+        internal bool Ack
         {
             get { return ((this.tcpFlags & ACK) != 0); }
         }
-        public byte[] TCP_Data
+        internal byte[] TCP_Data
         {
             get
             {
@@ -197,6 +198,12 @@ namespace Cosmos.Sys.Network.TCPIP.TCP
 
                 return data;
             }
+        }
+
+        public override string ToString()
+        {
+            return "TCP Packet Src=" + sourceIP + ":" + sourcePort + ", Dest=" + destIP + ":" + destPort +
+                ",Flags=" + tcpFlags.ToHex(2) + ",SeqNo=" + seqNum + ",AckNum=" + ackNum + ", DataLen=" + TCP_DataLength;
         }
     }
 }

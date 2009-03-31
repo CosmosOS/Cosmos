@@ -417,7 +417,7 @@ namespace Cosmos.Compiler.Builder {
                 // with the packet overhead
                 //
                 // COM1
-                + (aDebugger ? " "+aDebugComMode : " -serial null")
+                + (aDebugger ? " " + aDebugComMode : " -serial null")
                 // COM2
                 + " -serial file:\"" + BuildPath + "COM2-output.dbg\""
                 // Enable acceleration if we are not using GDB
@@ -425,8 +425,7 @@ namespace Cosmos.Compiler.Builder {
                 // Ethernet card
                 + (String.IsNullOrEmpty(aNetworkCard as String) ? "" : string.Format(" -net nic,model={0},macaddr=52:54:00:12:34:57", aNetworkCard))
                 //+ " -redir tcp:5555::23" //use f.instance 'telnet localhost 5555' or 'http://localhost:5555/' to access machine
-                + (String.IsNullOrEmpty(aNetworkCard as String) ? "" :(aUseNetworkTap ? " -net tap,ifname=CosmosTAP" : "") //requires TAP installed on development computer
-                + " -net user\"")
+                + (String.IsNullOrEmpty(aNetworkCard as String) ? "" : (aUseNetworkTap ? " -net tap,ifname=CosmosTAP" : " -net user")) //requires TAP installed on development computer
                 , ToolsPath + @"qemu", false, true);
 
             if (aGDB) {

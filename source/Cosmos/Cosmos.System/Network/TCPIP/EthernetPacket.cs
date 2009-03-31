@@ -1,16 +1,17 @@
 ﻿using System;
 using HW = Cosmos.Hardware;
+using Cosmos.Kernel;
 
 namespace Cosmos.Sys.Network.TCPIP
 {
-    public class EthernetPacket
+    internal class EthernetPacket
     {
         protected byte[] mRawData;
         protected HW.Network.MACAddress srcMAC;
         protected HW.Network.MACAddress destMAC;
-        protected UInt16 aType;
+        protected UInt16 aEtherType;
 
-        public EthernetPacket(byte[] rawData)
+        internal EthernetPacket(byte[] rawData)
         {
             mRawData = rawData;
             initFields();
@@ -20,7 +21,7 @@ namespace Cosmos.Sys.Network.TCPIP
         {
             destMAC = new HW.Network.MACAddress(mRawData, 0);
             srcMAC = new HW.Network.MACAddress(mRawData, 6);
-            aType = (UInt16)((mRawData[12] << 8) | mRawData[13]);
+            aEtherType = (UInt16)((mRawData[12] << 8) | mRawData[13]);
         }
 
         protected EthernetPacket(UInt16 type, int packet_size)
@@ -42,7 +43,7 @@ namespace Cosmos.Sys.Network.TCPIP
             initFields();
         }
 
-        public HW.Network.MACAddress SourceMAC
+        internal HW.Network.MACAddress SourceMAC
         {
             get { return this.srcMAC; }
             set
@@ -54,7 +55,7 @@ namespace Cosmos.Sys.Network.TCPIP
                 initFields();
             }
         }
-        public HW.Network.MACAddress DestinationMAC
+        internal HW.Network.MACAddress DestinationMAC
         {
             get { return this.destMAC; }
             set
@@ -66,12 +67,12 @@ namespace Cosmos.Sys.Network.TCPIP
                 initFields();
             }
         }
-        public UInt16 Type
+        internal UInt16 EthernetType
         {
-            get { return this.aType; }
+            get { return this.aEtherType; }
         }
 
-        public byte[] GetBytes()
+        internal byte[] GetBytes()
         {
             return this.mRawData;
         }
@@ -79,6 +80,11 @@ namespace Cosmos.Sys.Network.TCPIP
         internal byte[] RawData
         {
             get { return this.mRawData; }
+        }
+
+        public override string ToString()
+        {
+            return "Ethernet Packet : Src=" + srcMAC + ", Dest=" + destMAC + ", Type=" + aEtherType.ToHex(4);
         }
     }
 }

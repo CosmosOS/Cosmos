@@ -3,7 +3,7 @@ using HW = Cosmos.Hardware;
 
 namespace Cosmos.Sys.Network.TCPIP
 {
-    public class IPPacket : EthernetPacket
+    internal class IPPacket : EthernetPacket
     {
         protected byte ipVersion;
         protected byte ipHeaderLength;
@@ -19,7 +19,7 @@ namespace Cosmos.Sys.Network.TCPIP
         protected IPv4Address destIP;
         protected UInt16 dataOffset;
 
-        public IPPacket(byte[] rawData)
+        internal IPPacket(byte[] rawData)
             : base(rawData)
         {}
 
@@ -100,57 +100,62 @@ namespace Cosmos.Sys.Network.TCPIP
             return CalcOcCRC(14, headerLength);
         }
 
-        public byte IPVersion
+        internal byte IPVersion
         {
             get { return this.ipVersion; }
         }
-        public UInt16 HeaderLength
+        internal UInt16 HeaderLength
         {
             get { return (UInt16)(this.ipHeaderLength * 4); }
         }
-        public byte TypeOfService
+        internal byte TypeOfService
         {
             get { return this.tos; }
         }
-        public UInt16 IPLength
+        internal UInt16 IPLength
         {
             get { return this.ipLength; }
         }
-        public UInt16 FragmentID
+        internal UInt16 FragmentID
         {
             get { return this.fragmentID; }
         }
-        public UInt16 FragmentOffset
+        internal UInt16 FragmentOffset
         {
             get { return this.fragmentOffset; }
         }
-        public byte Flags
+        internal byte Flags
         {
             get { return this.flags; }
         }
-        public byte TTL
+        internal byte TTL
         {
             get { return this.ttl; }
         }
-        public byte Protocol
+        internal byte Protocol
         {
             get { return this.proto; }
         }
-        public UInt16 IPCRC
+        internal UInt16 IPCRC
         {
             get { return this.ipCRC; }
         }
-        public IPv4Address SourceIP
+        internal IPv4Address SourceIP
         {
             get { return this.sourceIP; }
         }
-        public IPv4Address DestinationIP
+        internal IPv4Address DestinationIP
         {
             get { return this.destIP; }
         }
-        public UInt16 DataLength
+        internal UInt16 DataLength
         {
             get { return (UInt16)(this.ipLength - this.HeaderLength); }
+        }
+
+        public override string ToString()
+        {
+            return "IP Packet Src=" + sourceIP + ", Dest=" + destIP + ", Protocol=" + proto + ", TTL=" + ttl + ", DataLen=" + DataLength;
         }
     }
 }

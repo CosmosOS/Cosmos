@@ -26,26 +26,27 @@ namespace Cosmos.Playground.SSchocke {
             xBoot.Execute();
 
             Console.WriteLine("Congratulations! You just booted SSchocke's C# code.");
-            Console.WriteLine("Scanning for AMD PCNET Networks Cards...");
+
+            //PCITest.Test();
 
             HW.Network.NetworkDevice nic = null;
-            foreach (HW.PCIDevice dev in HW.PCIBus.Devices)
+
+            if (HW.Network.NetworkDevice.NetworkDevices.Count < 1)
             {
-                if ((dev.VendorID == 0x1022) && (dev.DeviceID == 0x2000))
-                {
-                    nic = new HW.Network.Devices.AMDPCNetII.AMDPCNet(dev);
-                    Console.WriteLine("Found AMD PCNet NIC on PCI " + dev.Bus + ":" + dev.Slot + ":" + dev.Function);
-                    Console.WriteLine("NIC IRQ: " + dev.InterruptLine);
-                    Console.WriteLine("NIC MAC Address: " + nic.MACAddress.ToString());
-                    break;
-                }
+                Console.WriteLine("No Network Interface found!!");
+                Console.WriteLine("Press a key to shutdown...");
+                Console.Read();
+                Cosmos.Sys.Deboot.ShutDown();
             }
+
+            nic = HW.Network.NetworkDevice.NetworkDevices[0];
+
             Console.WriteLine("Initializing NIC...");
             nic.Enable();
 
             Console.WriteLine("Initializing TCP Stack...");
             TCPIPStack.Init();
-            TCPIPStack.ConfigIP(nic, new IPv4Config(new IPv4Address(192, 168, 20, 123), new IPv4Address(255, 255, 255, 0)));
+            TCPIPStack.ConfigIP(nic, new IPv4Config(new IPv4Address(192, 168, 21, 123), new IPv4Address(255, 255, 255, 0)));
 
             Console.WriteLine("Initializing TCP Port 80...");
             TCPIPStack.AddTcpListener(80, WebServerConnect);

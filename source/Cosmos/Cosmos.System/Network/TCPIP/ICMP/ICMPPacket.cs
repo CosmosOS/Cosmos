@@ -2,7 +2,7 @@
 
 namespace Cosmos.Sys.Network.TCPIP.ICMP
 {
-    public class ICMPPacket : IPPacket
+    internal class ICMPPacket : IPPacket
     {
         protected byte icmpType;
         protected byte icmpCode;
@@ -20,7 +20,7 @@ namespace Cosmos.Sys.Network.TCPIP.ICMP
             icmpCRC = (UInt16)((mRawData[this.dataOffset + 2] << 8) | mRawData[this.dataOffset + 3]);
         }
 
-        public ICMPPacket(IPv4Address source, IPv4Address dest, byte type, byte code, UInt16 id, UInt16 seq, UInt16 icmpDataSize)
+        internal ICMPPacket(IPv4Address source, IPv4Address dest, byte type, byte code, UInt16 id, UInt16 seq, UInt16 icmpDataSize)
             : base(icmpDataSize, 1, source, dest)
         {
             mRawData[this.dataOffset] = type;
@@ -43,24 +43,24 @@ namespace Cosmos.Sys.Network.TCPIP.ICMP
             return CalcOcCRC(this.dataOffset, length);
         }
 
-        public byte ICMP_Type
+        internal byte ICMP_Type
         {
             get { return this.icmpType; }
         }
-        public byte ICMP_Code
+        internal byte ICMP_Code
         {
             get { return this.icmpCode; }
         }
-        public UInt16 ICMP_CRC
+        internal UInt16 ICMP_CRC
         {
             get { return this.icmpCRC; }
         }
-        public UInt16 ICMP_DataLength
+        internal UInt16 ICMP_DataLength
         {
             get { return (UInt16)(this.DataLength - 8); }
         }
 
-        public byte[] GetICMPData()
+        internal byte[] GetICMPData()
         {
             byte[] data = new byte[ICMP_DataLength];
 
@@ -70,6 +70,11 @@ namespace Cosmos.Sys.Network.TCPIP.ICMP
             }
 
             return data;
+        }
+
+        public override string ToString()
+        {
+            return "ICMP Packet Src=" + sourceIP + ", Dest=" + destIP + ", Type=" + icmpType + ", Code=" + icmpCode;
         }
     }
 }

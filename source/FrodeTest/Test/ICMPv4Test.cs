@@ -44,10 +44,10 @@ namespace FrodeTest.Test
                 , EthernetPacket.PacketType.IP);
 
             //Send EthernetPacket using RTL8139 network card
-            var nic = Cosmos.Hardware.Network.Devices.RTL8139.RTL8139.FindAll()[0];
-            nic.InitializeDriver();
+            var nic = Cosmos.Hardware.Network.NetworkDevice.NetworkDevices[0];
+            nic.Enable();
 
-            nic.TransmitBytes(xEthernet.GetData());
+            nic.QueueBytes(xEthernet.GetData());
         }
     }
 }

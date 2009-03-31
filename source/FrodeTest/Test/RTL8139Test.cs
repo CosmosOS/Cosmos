@@ -12,7 +12,7 @@ namespace FrodeTest.Test
         {
             // Testing RTL8139 PCI networkcard
             //Load card
-            var xNics = RTL8139.FindAll();
+            var xNics = Cosmos.Hardware.Network.NetworkDevice.NetworkDevices;
             if (xNics.Count == 0)
             {
                 Console.WriteLine("No network cards found");
@@ -22,12 +22,11 @@ namespace FrodeTest.Test
             var xNic = xNics[0];
 
             xNic.Enable();
-            xNic.InitializeDriver();
 
             byte[] xNetworkData = { (byte)'a' };
             //var xPingOut = new ICMPPacket(1, 2, ICMPPacket.ICMPType.EchoRequest, xPingData, 0);
 
-            xNic.TransmitBytes(xNetworkData);
+            xNic.QueueBytes(xNetworkData);
         }
     }
 }

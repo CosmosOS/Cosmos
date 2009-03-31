@@ -2,18 +2,18 @@
 
 namespace Cosmos.Sys.Network.TCPIP.UDP
 {
-    public class UDPPacket : IPPacket
+    internal class UDPPacket : IPPacket
     {
         protected UInt16 sourcePort;
         protected UInt16 destPort;
         protected UInt16 udpLen;
         protected UInt16 udpCRC;
 
-        public UDPPacket(byte[] rawData)
+        internal UDPPacket(byte[] rawData)
             : base(rawData)
         {}
 
-        public UDPPacket(IPv4Address source, IPv4Address dest, UInt16 srcPort, UInt16 destPort, byte[] data)
+        internal UDPPacket(IPv4Address source, IPv4Address dest, UInt16 srcPort, UInt16 destPort, byte[] data)
             : base((UInt16)(data.Length+8), 17, source, dest)
         {
             mRawData[this.dataOffset + 0] = (byte)((srcPort >> 8) & 0xFF);
@@ -42,23 +42,23 @@ namespace Cosmos.Sys.Network.TCPIP.UDP
             udpCRC = (UInt16)((mRawData[this.dataOffset + 6] << 8) | mRawData[this.dataOffset + 7]);
         }
 
-        public UInt16 DestinationPort
+        internal UInt16 DestinationPort
         {
             get { return this.destPort; }
         }
-        public UInt16 SourcePort
+        internal UInt16 SourcePort
         {
             get { return this.sourcePort; }
         }
-        public UInt16 UDP_Length
+        internal UInt16 UDP_Length
         {
             get { return this.udpLen; }
         }
-        public UInt16 UDP_DataLength
+        internal UInt16 UDP_DataLength
         {
             get { return (UInt16)(this.udpLen - 8); }
         }
-        public byte[] UDP_Data
+        internal byte[] UDP_Data
         {
             get
             {
@@ -71,6 +71,11 @@ namespace Cosmos.Sys.Network.TCPIP.UDP
 
                 return data;
             }
+        }
+
+        public override string ToString()
+        {
+            return "UDP Packet Src=" + sourceIP + ":" + sourcePort + ", Dest=" + destIP + ":" + destPort + ", DataLen=" + UDP_DataLength;
         }
     }
 }

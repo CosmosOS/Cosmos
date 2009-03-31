@@ -27,11 +27,10 @@ namespace Cosmos.Demo.RemoteRocketLauncher {
         public static void Init() {
             var xBoot = new Cosmos.Sys.Boot();
             xBoot.Execute();
-            var xNICs = Cosmos.Hardware.Network.Devices.RTL8139.RTL8139.FindAll();
+            var xNICs = Cosmos.Hardware.Network.NetworkDevice.NetworkDevices;
             var xNIC = xNICs[0];
 
             xNIC.Enable();
-            xNIC.InitializeDriver();
             while (true) {
                 char xCommand = (char)Console.Read();
                 switch (xCommand) {
@@ -104,15 +103,14 @@ namespace Cosmos.Demo.RemoteRocketLauncher {
                 , 0x525400123457, 0xFFFFFFFFFFFF
                 , EthernetPacket.PacketType.IP);
 
-            Cosmos.Hardware.Network.Devices.RTL8139.RTL8139.DebugOutput = false;
-            var xNICs = Cosmos.Hardware.Network.Devices.RTL8139.RTL8139.FindAll();
+            var xNICs = Cosmos.Hardware.Network.NetworkDevice.NetworkDevices;
             var xNIC = xNICs[0];
 
             //xNIC.Enable();
             //xNIC.InitializeDriver();
 
             var xBytes = xEthernet.GetData();
-            xNIC.TransmitBytes(xBytes);
+            xNIC.QueueBytes(xBytes);
         }
     }
 }

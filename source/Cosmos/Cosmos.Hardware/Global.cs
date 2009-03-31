@@ -34,6 +34,12 @@ namespace Cosmos.Hardware {
             Console.WriteLine("    Init ATA");
             Storage.ATA.ATA.Initialize();
             //Device.Add(new PC.Bus.CPU.Keyboard());
+
+            Network.Devices.RTL8139.RTL8139.InitDriver();
+            Network.Devices.AMDPCNetII.AMDPCNet.InitDriver();
+
+            Console.WriteLine("    Init Device Drivers");
+            Device.DriversInit();
         }
 
         public static uint TickCount {

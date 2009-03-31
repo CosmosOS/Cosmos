@@ -12,8 +12,22 @@ namespace Cosmos.Hardware {
 			Other,
 			Keyboard,
 			Mouse,
-			Storage
+			Storage,
+            Network
 		};
+
+        public delegate void InitializeDriver();
+
+        static protected List<InitializeDriver> mDriverInits = new List<InitializeDriver>();
+
+        public static void DriversInit()
+        {
+            for( int d=0; d<mDriverInits.Count; d++)
+            {
+                InitializeDriver dlgt = mDriverInits[d];
+                dlgt();
+            }
+        }
 
 		public Device() {
 		}
@@ -25,12 +39,14 @@ namespace Cosmos.Hardware {
 			}
 		}
 
-		static public void Add(Device aDevice) {
-			if (aDevice == null) {
-				throw new ArgumentNullException("aDevice");
-			}
-			mDevices.Add(aDevice);
-		}
+        static public void Add(Device aDevice)
+        {
+            if (aDevice == null)
+            {
+                throw new ArgumentNullException("aDevice");
+            }
+            mDevices.Add(aDevice);
+        }
 
         private static string DeviceTypeToString(DeviceType aType) {
             switch (aType) {

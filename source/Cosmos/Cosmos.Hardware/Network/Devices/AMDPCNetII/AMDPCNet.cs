@@ -113,24 +113,37 @@ namespace Cosmos.Hardware.Network.Devices.AMDPCNetII
 
             // Set TX Descriptor 0 as the first one to use... Increment this when we use one to use them in a circular fashion
             mNextTXDesc = 0;
+
+            // Setup our Receive and Transmit Queues
+            mTransmitBuffer = new Queue<byte[]>();
+            mRecvBuffer = new Queue<byte[]>();
+        }
+
+        public static void InitDriver()
+        {
+            Device.mDriverInits.Add(FindAll);
         }
 
         /// <summary>
         /// Retrieve all AMD PCNet network cards found on computer.
         /// </summary>
         /// <returns>List of all AMD PCNet cards</returns>
-        public static List<AMDPCNet> FindAll()
+        public static void FindAll()
         {
-            List<AMDPCNet> found = new List<AMDPCNet>();
+            Console.WriteLine("Scanning for AMD PCNet cards...");
             foreach (PCIDevice device in Cosmos.Hardware.PCIBus.Devices)
             {
-                //DebugWriteLine("VendorID: " + device.VendorID + " - DeviceID: " + device.DeviceID);
                 if ((device.VendorID == 0x1022) && (device.DeviceID == 0x2000))
                 {
-                    found.Add(new AMDPCNet(device));
+                    AMDPCNet nic = new AMDPCNet(device);
+
+                    Console.WriteLine("Found AMD PCNet NIC on PCI " + device.Bus + ":" + device.Slot + ":" + device.Function);
+                    Console.WriteLine("NIC IRQ: " + device.InterruptLine);
+                    Console.WriteLine("NIC MAC Address: " + nic.MACAddress.ToString());
+
+                    NetworkDevice.Add(nic);
                 }
             }
-            return found;
         }
 
         protected void HandleNetworkInterrupt(ref Interrupts.InterruptContext aContext)
@@ -273,11 +286,6 @@ namespace Cosmos.Hardware.Network.Devices.AMDPCNetII
 
         public override bool QueueBytes(byte[] buffer, int offset, int length)
         {
-            if (mTransmitBuffer == null)
-            {
-                mTransmitBuffer = new Queue<byte[]>();
-            }
-
             byte[] data = new byte[length];
             for (int b = 0; b < length; b++)
             {
@@ -304,7 +312,7 @@ namespace Cosmos.Hardware.Network.Devices.AMDPCNetII
 
         public override byte[] ReceivePacket()
         {
-            if ((mRecvBuffer == null) || (mRecvBuffer.Count < 1))
+            if (mRecvBuffer.Count < 1)
             {
                 return null;
             }
@@ -315,7 +323,7 @@ namespace Cosmos.Hardware.Network.Devices.AMDPCNetII
 
         public override int BytesAvailable()
         {
-            if ((mRecvBuffer == null) || (mRecvBuffer.Count < 1))
+            if (mRecvBuffer.Count < 1)
             {
                 return 0;
             }
@@ -386,10 +394,6 @@ namespace Cosmos.Hardware.Network.Devices.AMDPCNetII
             UInt16 recv_size;
             byte[] recv_data;
 
-            if (mRecvBuffer == null)
-            {
-                mRecvBuffer = new Queue<byte[]>();
-            }
             unsafe
             {
                 for (int rxd = 0; rxd < 16; rxd++)

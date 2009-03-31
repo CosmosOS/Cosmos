@@ -23,8 +23,8 @@ namespace Cosmos.Playground.Kudzu {
                 , 0x525400123457, 0xFFFFFFFFFFFF
                 , EthernetPacket.PacketType.IP);
 
-            Cosmos.Hardware.Network.Devices.RTL8139.RTL8139.DebugOutput = false;
-            var xNICs = Cosmos.Hardware.Network.Devices.RTL8139.RTL8139.FindAll();
+            Cosmos.Hardware.Network.Devices.RTL8139.RTL8139_Old.DebugOutput = false;
+            var xNICs = Cosmos.Hardware.Network.Devices.RTL8139.RTL8139_Old.FindAll();
             var xNIC = xNICs[0];
 
             Console.WriteLine(xNIC.Name);

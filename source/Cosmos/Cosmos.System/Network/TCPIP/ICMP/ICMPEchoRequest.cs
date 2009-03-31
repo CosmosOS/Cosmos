@@ -2,16 +2,16 @@
 
 namespace Cosmos.Sys.Network.TCPIP.ICMP
 {
-    public class ICMPEchoRequest : ICMPPacket
+    internal class ICMPEchoRequest : ICMPPacket
     {
         protected UInt16 icmpID;
         protected UInt16 icmpSequence;
 
-        public ICMPEchoRequest(byte[] rawData)
+        internal ICMPEchoRequest(byte[] rawData)
             : base(rawData)
         {}
 
-        public ICMPEchoRequest(IPv4Address source, IPv4Address dest, UInt16 id, UInt16 sequence)
+        internal ICMPEchoRequest(IPv4Address source, IPv4Address dest, UInt16 id, UInt16 sequence)
             : base(source, dest, 8, 0, id, sequence, 40)
         {
             for (byte b = 8; b < this.ICMP_DataLength; b++)
@@ -33,13 +33,18 @@ namespace Cosmos.Sys.Network.TCPIP.ICMP
             icmpSequence = (UInt16)((mRawData[this.dataOffset + 6] << 8) | mRawData[this.dataOffset + 7]);
         }
 
-        public UInt16 ICMP_ID
+        internal UInt16 ICMP_ID
         {
             get { return this.icmpID; }
         }
-        public UInt16 ICMP_Sequence
+        internal UInt16 ICMP_Sequence
         {
             get { return this.icmpSequence; }
-        } 
+        }
+
+        public override string ToString()
+        {
+            return "ICMP Echo Request Src=" + sourceIP + ", Dest=" + destIP + ", ID=" + icmpID + ", Sequence=" + icmpSequence;
+        }
     }
 }

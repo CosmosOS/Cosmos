@@ -49,7 +49,7 @@ namespace FrodeTest.Test
             Console.Write(ipv4Packet.ToString());
 
             //Send the Packet
-            var nics = Cosmos.Hardware.Network.Devices.RTL8139.RTL8139.FindAll();
+            var nics = Cosmos.Hardware.Network.NetworkDevice.NetworkDevices;
             if (nics.Count == 0)
             {
                 Console.WriteLine("No networkcard RTL8139 found");
@@ -58,7 +58,6 @@ namespace FrodeTest.Test
 
             var nic = nics[0];
             nic.Enable();
-            nic.InitializeDriver();
 
             Ethernet2Frame frame = new Ethernet2Frame();
             //byte[] mDest = new byte[6];
@@ -84,8 +83,8 @@ namespace FrodeTest.Test
             frame.Source = nic.MACAddress;
             frame.Payload = ipv4Packet.RawBytes();
 
-            //nic.TransmitBytes(frame.RawBytes());
-            nic.TransmitFrame(frame);
+            nic.QueueBytes(frame.RawBytes());
+            //nic.TransmitFrame(frame);
 
         }
     }

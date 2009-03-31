@@ -38,12 +38,12 @@ namespace FrodeTest.Test
             frame.Source = new MACAddress(src);
             frame.Payload = data;
 
-            RTL8139 nic = RTL8139.FindAll()[0];
+            NetworkDevice nic = Cosmos.Hardware.Network.NetworkDevice.NetworkDevices[0];
             if (nic == null)
                 Console.WriteLine("No RTL8139C+ network card found");
 
-            nic.InitializeDriver();
-            nic.TransmitBytes(frame.RawBytes());
+            nic.Enable();
+            nic.QueueBytes(frame.RawBytes());
         }
     }
 }

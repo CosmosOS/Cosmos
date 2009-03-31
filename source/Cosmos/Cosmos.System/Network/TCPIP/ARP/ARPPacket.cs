@@ -3,7 +3,7 @@ using HW = Cosmos.Hardware;
 
 namespace Cosmos.Sys.Network.TCPIP.ARP
 {
-    public class ARPPacket : EthernetPacket
+    internal class ARPPacket : EthernetPacket
     {
         protected UInt16 aHardwareType;
         protected UInt16 aProtocolType;
@@ -11,7 +11,7 @@ namespace Cosmos.Sys.Network.TCPIP.ARP
         protected byte aProtocolLen;
         protected UInt16 aOperation;
 
-        public ARPPacket(byte[] rawData)
+        internal ARPPacket(byte[] rawData)
             : base(rawData)
         {}
 
@@ -41,17 +41,23 @@ namespace Cosmos.Sys.Network.TCPIP.ARP
             initFields();
         }
 
-        public UInt16 Operation
+        internal UInt16 Operation
         {
             get { return this.aOperation; }
         }
-        public UInt16 HardwareType
+        internal UInt16 HardwareType
         {
             get { return this.aHardwareType; }
         }
-        public UInt16 ProtocolType
+        internal UInt16 ProtocolType
         {
             get { return this.aProtocolType; }
+        }
+
+        public override string ToString()
+        {
+            return "ARP Packet Src=" + srcMAC + ", Dest=" + destMAC + ", HWType=" + aHardwareType + ", Protocol=" + aProtocolType + 
+                ", Operation=" + Operation;
         }
     }
 }

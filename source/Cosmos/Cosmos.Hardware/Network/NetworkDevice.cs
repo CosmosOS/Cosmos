@@ -8,6 +8,10 @@ namespace Cosmos.Hardware.Network
 
     public abstract class NetworkDevice : Device
     {
+        protected NetworkDevice()
+        {
+            mType = DeviceType.Network;
+        }
 
         public abstract MACAddress MACAddress
         {
@@ -34,6 +38,25 @@ namespace Cosmos.Hardware.Network
         public abstract int BytesAvailable();
 
         public abstract bool IsSendBufferFull();
-        public abstract bool IsReceiveBufferFull();        
+        public abstract bool IsReceiveBufferFull();
+
+        public static List<NetworkDevice> NetworkDevices
+        {
+            get
+            {
+                List<NetworkDevice> netDevices = new List<NetworkDevice>();
+
+                for (int d = 0; d < Devices.Count; d++)
+                {
+                    Device dev = Devices[d];
+                    if (dev.Type == DeviceType.Network)
+                    {
+                        netDevices.Add((NetworkDevice)dev);
+                    }
+                }
+
+                return netDevices;
+            }
+        }
     }
 }

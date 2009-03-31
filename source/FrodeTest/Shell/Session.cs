@@ -9,7 +9,7 @@ namespace FrodeTest.Shell
 {
     public class Session
     {
-        static Cosmos.Hardware.Network.Devices.RTL8139.RTL8139 nic = null;
+        static Cosmos.Hardware.Network.NetworkDevice nic = null;
 
         /// <summary>
         /// Starts an interactive session where user can input commands.
@@ -62,17 +62,15 @@ namespace FrodeTest.Shell
             }
             else if (command.Equals("load"))
             {
-                var list = RTL8139.FindAll();
+                var list = Cosmos.Hardware.Network.NetworkDevice.NetworkDevices;
                 if (list.Count != 0)
                 {
                     nic = list[0];
                     Console.WriteLine("Enabling network card!");
                     Console.WriteLine(nic.Name);
-                    Console.WriteLine("Revision: " + nic.HardwareRevision);
                     Console.WriteLine("MAC: " + nic.MACAddress);
 
                     nic.Enable();
-                    nic.InitializeDriver();
                 }
                 else
                 {
@@ -105,7 +103,7 @@ namespace FrodeTest.Shell
                 else
                 {
                     Console.WriteLine("Data in RX Buffer:");
-                    foreach (byte item in nic.ReadReceiveBuffer())
+                    foreach (byte item in nic.ReceivePacket())
                     {
                         Console.Write(item.ToHex() + ":");
                     }
@@ -120,23 +118,17 @@ namespace FrodeTest.Shell
                 else
                 {
                     Console.WriteLine("Network card: " + nic.Name);
-                    Console.WriteLine("Hardware revision: " + nic.HardwareRevision);
                     Console.WriteLine("MAC Address: " + nic.MACAddress);
                     Console.WriteLine();
-                    Console.WriteLine("Loopback enabled?: " + nic.LoopbackMode.ToString());
                     Console.WriteLine("NIC enabled?: " + nic.IsEnabled.ToString());
-                    Console.WriteLine("Promiscuous mode?: " + nic.PromiscuousMode.ToString());
 
                     int xByteCount = 0;
-                    foreach (byte b in nic.ReadReceiveBuffer())
+                    foreach (byte b in nic.ReceivePacket())
                     {
                         if (b != 0x00)
                             xByteCount++;
                     }
                     Console.WriteLine("Read buffer contains " + xByteCount.ToString() + " non-zero bytes with data.");
-                    Console.WriteLine("Read buffer empty flag? : " + nic.IsReceiveBufferEmpty());
-
-                    nic.DisplayDebugInfo();
                 }
             }
             else if (command.Equals("dump"))
@@ -147,7 +139,7 @@ namespace FrodeTest.Shell
                 }
                 else
                 {
-                    nic.DumpRegisters();
+                    //nic.DumpRegisters();
                 }
             }
             else if (command.Equals("reset"))
@@ -157,8 +149,8 @@ namespace FrodeTest.Shell
                 else
                 {
                     //nic.TimerCount = 1;
-                    nic.SoftReset();
-                    nic.InitializeDriver();
+                    //nic.SoftReset();
+                    //nic.InitializeDriver();
                     Console.WriteLine("NIC has been reset");
                 }
             }
@@ -177,13 +169,13 @@ namespace FrodeTest.Shell
             }
             else if (command.Equals("loop"))
             {
-                Console.WriteLine("Toggeling loopback mode from : " + nic.LoopbackMode.ToString());
-                nic.LoopbackMode = !nic.LoopbackMode;
-                Console.WriteLine("to: " + nic.LoopbackMode.ToString());
+                //Console.WriteLine("Toggeling loopback mode from : " + nic.LoopbackMode.ToString());
+                //nic.LoopbackMode = !nic.LoopbackMode;
+                //Console.WriteLine("to: " + nic.LoopbackMode.ToString());
             }
             else if (command.Equals("prom"))
             {
-                nic.PromiscuousMode = !nic.PromiscuousMode;
+                //nic.PromiscuousMode = !nic.PromiscuousMode;
             }
             else
             {

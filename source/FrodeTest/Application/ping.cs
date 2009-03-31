@@ -20,14 +20,13 @@ namespace FrodeTest.Application
             uint xSourceIP = 1; //TODO
 
             //Send ICMP Ping Request packet towards that host
-            var xNic = RTL8139.FindAll()[0];
+            var xNic = Cosmos.Hardware.Network.NetworkDevice.NetworkDevices[0];
             xNic.Enable();
-            xNic.InitializeDriver();
 
             byte[] xPingData = {(byte)'a', (byte)'b', (byte)'c', (byte)'d', (byte)'e', (byte)'f'};
             var xPingOut = new ICMPPacket(xSourceIP, xDestinationIP, ICMPPacket.ICMPType.EchoRequest, xPingData, 0);
 
-            if (xNic.TransmitBytes(xPingOut.GetData()))
+            if (xNic.QueueBytes(xPingOut.GetData()))
             {
                 DebugUtil.SendMessage("ping.cs", "Leaving Execute");
                 return 0;
