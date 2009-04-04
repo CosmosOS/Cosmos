@@ -28,6 +28,12 @@ namespace Cosmos.Sys.Network
     public delegate void ClientDataReceived(TcpClient client, byte[] data);
 
     /// <summary>
+    /// TCP Client disconnection delegate
+    /// </summary>
+    /// <param name="client">Instance of the <see cref="TcpClient"/> that represents the connection</param>
+    public delegate void ClientDisconnected(TcpClient client);
+
+    /// <summary>
     /// Implements a TCP/IP Stack on top of Cosmos
     /// </summary>
     public static class TCPIPStack
@@ -38,7 +44,7 @@ namespace Cosmos.Sys.Network
         private static List<IPv4Config> ipConfigs;
         private static HW.TempDictionary<DataReceived> udpClients;
         private static HW.TempDictionary<ClientConnected> tcpListeners;
-        private static List<TCP.TCPConnection> tcpSockets;
+        internal static List<TCP.TCPConnection> tcpSockets;
 
         /// <summary>
         /// Initialize the TCP/IP Stack variables
@@ -244,6 +250,19 @@ namespace Cosmos.Sys.Network
                     active_connection.ConnectionState = TCP.TCPConnection.State.ESTABLISHED;
                 }
             }
+            else if (active_connection.ConnectionState == TCP.TCPConnection.State.SYN_SENT)
+            {
+                if ((tcp_packet.Syn == true) && (tcp_packet.Ack == true) && ((active_connection.LocalSequenceNumber + 1) == tcp_packet.AckNumber))
+                {
+                    active_connection.LocalSequenceNumber++;
+                    active_connection.RemoteSequenceNumber = tcp_packet.SequenceNumber + 1;
+                    active_connection.ConnectionState = TCP.TCPConnection.State.ESTABLISHED;
+
+                    TCP.TCPPacket ack = new TCP.TCPPacket(active_connection, active_connection.LocalSequenceNumber,
+                                                        active_connection.RemoteSequenceNumber, 0x10, 8192);
+                    TCPIP.IPv4OutgoingBuffer.AddPacket(ack);
+                }
+            }
             else if (active_connection.ConnectionState == TCP.TCPConnection.State.ESTABLISHED)
             {
                 if (tcp_packet.Ack == true)
@@ -260,6 +279,11 @@ namespace Cosmos.Sys.Network
                     TCPIP.IPv4OutgoingBuffer.AddPacket(ack);
 
                     active_connection.client.dataReceived(tcp_packet.TCP_Data);
+                }
+
+                if (tcp_packet.Fin == true)
+                {
+                    active_connection.client.disconnect();
                 }
             }
         }
@@ -353,6 +377,33 @@ namespace Cosmos.Sys.Network
             }
 
             return default_gw;
+        }
+
+        internal static bool IsLocalAddress(IPv4Address destIP)
+        {
+            for (int c = 0; c < ipConfigs.Count; c++)
+            {
+                if ((ipConfigs[c].IPAddress.To32BitNumber() & ipConfigs[c].SubnetMask.To32BitNumber()) ==
+                    (destIP.To32BitNumber() & ipConfigs[c].SubnetMask.To32BitNumber()))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        internal static IPv4Address FindRoute(IPv4Address destIP)
+        {
+            for (int c = 0; c < ipConfigs.Count; c++)
+            {
+                if (ipConfigs[c].DefaultGateway.CompareTo(IPv4Address.Zero) != 0)
+                {
+                    return ipConfigs[c].DefaultGateway;
+                }
+            }
+
+            return null;
         }
     }
 }

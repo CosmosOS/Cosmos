@@ -46,10 +46,17 @@ namespace Cosmos.Playground.SSchocke {
 
             Console.WriteLine("Initializing TCP Stack...");
             TCPIPStack.Init();
-            TCPIPStack.ConfigIP(nic, new IPv4Config(new IPv4Address(192, 168, 21, 123), new IPv4Address(255, 255, 255, 0)));
+            TCPIPStack.ConfigIP(nic, new IPv4Config(new IPv4Address(192, 168, 20, 123), 
+                                                    new IPv4Address(255, 255, 255, 0), 
+                                                    new IPv4Address(192, 168, 20, 100)));
 
             Console.WriteLine("Initializing TCP Port 80...");
             TCPIPStack.AddTcpListener(80, WebServerConnect);
+
+            Console.WriteLine("Setup outgoing connection...");
+            TcpClient webClient = new TcpClient(new IPv4Address(196, 38, 235, 2), 80);
+            webClient.DataReceived = WebClient_RecvData;
+            webClient.Disconnect = WebClientDisconnect;
 
             #region Setup WebServer strings
             webPage = "<html><body><h1>It works! This is a web page being hosted by your Cosmos Operating System</h1></body></html>";
@@ -69,9 +76,15 @@ namespace Cosmos.Playground.SSchocke {
             error404 += "<html><body>404 URL Not found</html>";
             #endregion
 
+            bool requestDone = false;
             while (true)
             {
                 TCPIPStack.Update();
+                if ((requestDone == false) && (webClient.Connected == true))
+                {
+                    webClient.SendString("GET /\r\n");
+                    requestDone = true;
+                }
             }
 
             Console.WriteLine("Press a key to shutdown...");
@@ -83,6 +96,13 @@ namespace Cosmos.Playground.SSchocke {
         {
             Console.WriteLine("Client(" + client.RemoteEndpoint.ToString() + ") Connected to port 80...");
             client.DataReceived = WebServer_RecvData;
+            client.Disconnect = WebServerDisconnect;
+        }
+
+        private static void WebServerDisconnect(TcpClient client)
+        {
+            Console.WriteLine("Client(" + client.RemoteEndpoint.ToString() + ") disconnected...");
+            client.Close();
         }
 
         private static void WebServer_RecvData(TcpClient client, byte[] data)
@@ -104,5 +124,24 @@ namespace Cosmos.Playground.SSchocke {
                 client.SendString(error404);
             }
         }
-	}
+
+        private static void WebClient_RecvData(TcpClient client, byte[] data)
+        {
+            Console.WriteLine("Received reply from " + client.RemoteEndpoint.ToString());
+            StringBuilder sb = new StringBuilder(data.Length);
+            for (int b = 0; b < data.Length; b++)
+            {
+                sb.Append((char)data[b]);
+            }
+            String dataString = sb.ToString();
+
+            Console.WriteLine(dataString);
+        }
+
+        private static void WebClientDisconnect(TcpClient client)
+        {
+            Console.WriteLine("Disconnect from " + client.RemoteEndpoint.ToString() + "...");
+            client.Close();
+        }
+    }
 }

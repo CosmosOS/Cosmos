@@ -1,4 +1,5 @@
 ﻿using Cosmos.Sys.Network.TCPIP.TCP;
+using System;
 
 namespace Cosmos.Sys.Network
 {
@@ -9,6 +10,27 @@ namespace Cosmos.Sys.Network
     {
         internal TCPConnection connection;
         internal ClientDataReceived dataCallback;
+        internal ClientDisconnected disconnectCallback;
+
+        protected static UInt16 NextLocalPort = 33000;
+
+        public TcpClient(IPv4Address dest, UInt16 port)
+        {
+            IPv4Address source = TCPIPStack.FindNetwork(dest);
+            if( source == null )
+            {
+                throw new ArgumentException("Destination host unreachable", "dest");
+            }
+
+            this.connection = new TCPConnection(dest, port, source, NextLocalPort++, 0x5656, TCPConnection.State.SYN_SENT);
+            this.connection.client = this;
+
+            TCPIPStack.tcpSockets.Add(connection);
+
+            TCPPacket packet = new TCPPacket(connection, connection.LocalSequenceNumber, 0, 0x02, 8192);
+
+            TCPIP.IPv4OutgoingBuffer.AddPacket(packet);
+        }
 
         internal TcpClient(TCPConnection connection)
         {
@@ -23,6 +45,15 @@ namespace Cosmos.Sys.Network
         {
             get { return this.dataCallback; }
             set { this.dataCallback = value; }
+        }
+
+        /// <summary>
+        /// Data Received callback function
+        /// </summary>
+        public ClientDisconnected Disconnect
+        {
+            get { return this.disconnectCallback; }
+            set { this.disconnectCallback = value; }
         }
 
         /// <summary>
@@ -52,6 +83,18 @@ namespace Cosmos.Sys.Network
             TCPIP.IPv4OutgoingBuffer.AddPacket(packet);
         }
 
+        /// <summary>
+        /// Close down an active connection
+        /// </summary>
+        public void Close()
+        {
+            TCPPacket packet = new TCPPacket(connection, connection.LocalSequenceNumber, connection.RemoteSequenceNumber, 0x11, 8192);
+
+            TCPIP.IPv4OutgoingBuffer.AddPacket(packet);
+
+            connection.ConnectionState = TCPConnection.State.TIMEWAIT;
+        }
+
         internal void dataReceived(byte[] data)
         {
             if (this.dataCallback != null)
@@ -73,6 +116,22 @@ namespace Cosmos.Sys.Network
         public IPv4EndPoint LocalEndpoint
         {
             get { return this.connection.LocalEndpoint; }
+        }
+
+        /// <summary>
+        /// Returns true if the current connection is active
+        /// </summary>
+        public bool Connected
+        {
+            get { return (this.connection.ConnectionState == TCPConnection.State.ESTABLISHED); }
+        }
+
+        internal void disconnect()
+        {
+            if (this.disconnectCallback != null)
+            {
+                this.disconnectCallback(this);
+            }
         }
     }
 }
