@@ -15,7 +15,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         protected MACAddress mac;
         protected bool mInitDone;
 
-        protected byte[] rxBuffer;
+        protected ManagedMemorySpace rxBuffer;
         protected int rxBufferOffset;
         protected UInt16 capr;
 
@@ -57,15 +57,9 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             this.mac = new MACAddress(eeprom_mac);
 
             // Get a receive buffer and assign it to the card
-            rxBuffer = new byte[RxBufferSize + 2048 + 16 + 4];
-            UInt32 rxBufferAddress = GetMemoryAddress(ref rxBuffer);
-            while (rxBufferAddress % 4 != 0)
-            {
-                rxBufferAddress++;
-                rxBufferOffset++;
-            }
+            rxBuffer = new ManagedMemorySpace(RxBufferSize + 2048 + 16, 4);
 
-            RBStartRegister = rxBufferAddress;
+            RBStartRegister = rxBuffer.Offset;
 
             // Setup receive Configuration
             RecvConfigRegister = 0xF381;
@@ -114,7 +108,8 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             {
                 while ((CommandRegister & 0x01) == 0)
                 {
-                    UInt32 packetHeader = BitConverter.ToUInt32(rxBuffer, rxBufferOffset + capr);
+                    //UInt32 packetHeader = BitConverter.ToUInt32(rxBuffer, rxBufferOffset + capr);
+                    UInt32 packetHeader = rxBuffer.Read32(capr);
                     UInt16 packetLen = (UInt16)(packetHeader >> 16);
                     if ((packetHeader & 0x3E) != 0x00)
                     {
@@ -327,9 +322,9 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
         {
             int recv_size = packetLen - 4;
             byte[] recv_data = new byte[recv_size];
-            for (int b = 0; b < recv_size; b++)
+            for (uint b = 0; b < recv_size; b++)
             {
-                recv_data[b] = rxBuffer[rxBufferOffset + capr + 4 + b];
+                recv_data[b] = rxBuffer[(uint)(capr + 4 + b)];
             }
             if (DataReceived != null)
             {
@@ -360,47 +355,39 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
 
         protected bool SendBytes(ref byte[] aData)
         {
-            unsafe
+            int txd = mNextTXDesc++;
+            if (mNextTXDesc >= 4)
             {
-                int txd = mNextTXDesc++;
-                if (mNextTXDesc >= 4)
-                {
-                    mNextTXDesc = 0;
-                }
-
-                switch (txd)
-                {
-                    case 0:
-                        TransmitAddress1Register = GetMemoryAddress(ref aData);
-                        TransmitDescriptor1Register = (UInt32)(aData.Length & 0x0FFF);
-                        break;
-                    case 1:
-                        TransmitAddress2Register = GetMemoryAddress(ref aData);
-                        TransmitDescriptor2Register = (UInt32)(aData.Length & 0x0FFF);
-                        break;
-                    case 2:
-                        TransmitAddress3Register = GetMemoryAddress(ref aData);
-                        TransmitDescriptor3Register = (UInt32)(aData.Length & 0x0FFF);
-                        break;
-                    case 3:
-                        TransmitAddress4Register = GetMemoryAddress(ref aData);
-                        TransmitDescriptor4Register = (UInt32)(aData.Length & 0x0FFF);
-                        break;
-                    default: 
-                        return false;
-                }
-
-                return true;
+                mNextTXDesc = 0;
             }
+
+            ManagedMemorySpace txBuffer = new ManagedMemorySpace(ref aData);
+
+            switch (txd)
+            {
+                case 0:
+                    TransmitAddress1Register = txBuffer.Offset;
+                    TransmitDescriptor1Register = txBuffer.Size;
+                    break;
+                case 1:
+                    TransmitAddress2Register = txBuffer.Offset;
+                    TransmitDescriptor2Register = txBuffer.Size;
+                    break;
+                case 2:
+                    TransmitAddress3Register = txBuffer.Offset;
+                    TransmitDescriptor3Register = txBuffer.Size;
+                    break;
+                case 3:
+                    TransmitAddress4Register = txBuffer.Offset;
+                    TransmitDescriptor4Register = txBuffer.Size;
+                    break;
+                default:
+                    return false;
+            }
+
+            return true;
         }
 
-        private unsafe UInt32 GetMemoryAddress(ref byte[] bytearray)
-        {
-            fixed (byte* bodystart = bytearray)
-            {
-                return (UInt32)bodystart;
-            }
-        }
         #endregion
     }
 }
