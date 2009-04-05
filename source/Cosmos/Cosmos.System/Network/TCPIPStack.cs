@@ -214,10 +214,6 @@ namespace Cosmos.Sys.Network
                                                                 ++connection.RemoteSequenceNumber, 0x12, 8192);
                     TCPIP.IPv4OutgoingBuffer.AddPacket(syn_ack);
 
-                    ClientConnected connectCallback = tcpListeners[tcp_packet.DestinationPort];
-
-                    connectCallback(new TcpClient(connection));
-
                     return;
                 }
             }
@@ -248,6 +244,10 @@ namespace Cosmos.Sys.Network
                 {
                     active_connection.LocalSequenceNumber++;
                     active_connection.ConnectionState = TCP.TCPConnection.State.ESTABLISHED;
+
+                    ClientConnected connectCallback = tcpListeners[tcp_packet.DestinationPort];
+
+                    connectCallback(new TcpClient(active_connection));
                 }
             }
             else if (active_connection.ConnectionState == TCP.TCPConnection.State.SYN_SENT)
