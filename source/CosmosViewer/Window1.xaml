@@ -1,0 +1,12 @@
+﻿<Window x:Class="CosmosViewer.Window1"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Cosmos Remote Viewer" Closing="Window_Closing"
+        Width="Auto" Height="Auto" SizeToContent="WidthAndHeight">
+    <StackPanel Orientation="Vertical">
+        <Menu>
+            <MenuItem Header="Connect" Click="MenuItem_Click"/>
+        </Menu>
+        <Canvas Name="drawingArea" Background="Black" Width="320" Height="240"/>
+    </StackPanel>
+</Window>
