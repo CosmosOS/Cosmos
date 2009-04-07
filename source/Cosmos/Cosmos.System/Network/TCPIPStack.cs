@@ -211,7 +211,10 @@ namespace Cosmos.Sys.Network
                     tcpSockets.Add(connection);
 
                     TCP.TCPPacket syn_ack = new TCP.TCPPacket(connection, connection.LocalSequenceNumber, 
-                                                                ++connection.RemoteSequenceNumber, 0x12, 8192);
+                                                                ++connection.RemoteSequenceNumber, 0x12, 8192, 2);
+                    syn_ack.AddMSSOption(1360);
+                    syn_ack.AddSACKOption();
+
                     TCPIP.IPv4OutgoingBuffer.AddPacket(syn_ack);
 
                     return;
@@ -267,7 +270,7 @@ namespace Cosmos.Sys.Network
             {
                 if (tcp_packet.Ack == true)
                 {
-                    active_connection.LocalSequenceNumber = tcp_packet.AckNumber;
+                    //active_connection.LocalSequenceNumber = tcp_packet.AckNumber;
                 }
 
                 if (tcp_packet.TCP_DataLength > 0)

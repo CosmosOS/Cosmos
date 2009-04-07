@@ -26,6 +26,9 @@ namespace Cosmos.Sys.Network.TCPIP.TCP
         protected UInt16 tcpChecksum;
         protected UInt16 urgentPointer;
         protected UInt16 tcpDataOffset;
+        protected int numOptions;
+        protected int optionsLength;
+        protected byte optionsOffset = 20;
 
         internal TCPPacket(byte[] rawData)
             : base(rawData)
@@ -36,20 +39,28 @@ namespace Cosmos.Sys.Network.TCPIP.TCP
                     ackNum, tcpFlags, winSize)
         { }
 
+        internal TCPPacket(TCPConnection connection, UInt32 seqNum, UInt32 ackNum, byte tcpFlags, UInt16 winSize, byte optionCount)
+            : this(connection.LocalIP, connection.RemoteIP, connection.LocalPort, connection.RemotePort, seqNum,
+                    ackNum, tcpFlags, winSize, null, 0, (optionCount * 4))
+        { }
+
         internal TCPPacket(IPv4Address source, IPv4Address dest, UInt16 srcPort, UInt16 destPort,
             UInt32 seqNum, UInt32 ackNum, byte tcpFlags, UInt16 winSize)
-            : this(source, dest, srcPort, destPort, seqNum, ackNum, tcpFlags, winSize, null, 0)
+            : this(source, dest, srcPort, destPort, seqNum, ackNum, tcpFlags, winSize, null, 0, 0)
         { }
 
         internal TCPPacket(IPv4Address source, IPv4Address dest, UInt16 srcPort, UInt16 destPort,
             UInt32 seqNum, UInt32 ackNum, byte tcpFlags, UInt16 winSize, byte[] data)
-            : this(source, dest, srcPort, destPort, seqNum, ackNum, tcpFlags, winSize, data, data.Length)
+            : this(source, dest, srcPort, destPort, seqNum, ackNum, tcpFlags, winSize, data, data.Length, 0)
         { }
 
         internal TCPPacket(IPv4Address source, IPv4Address dest, UInt16 srcPort, UInt16 destPort, 
-            UInt32 seqNum, UInt32 ackNum, byte tcpFlags, UInt16 winSize, byte[] data, int dataLength)
-            : base((UInt16)(dataLength + 20), 6, source, dest)
+            UInt32 seqNum, UInt32 ackNum, byte tcpFlags, UInt16 winSize, byte[] data, int dataLength, int optionLength)
+            : base((UInt16)(dataLength + 20 + optionLength), 6, source, dest)
         {
+            numOptions = optionLength / 4;
+            this.optionsLength = optionLength;
+
             mRawData[this.dataOffset + 0] = (byte)((srcPort >> 8) & 0xFF);
             mRawData[this.dataOffset + 1] = (byte)((srcPort >> 0) & 0xFF);
             mRawData[this.dataOffset + 2] = (byte)((destPort >> 8) & 0xFF);
@@ -62,7 +73,7 @@ namespace Cosmos.Sys.Network.TCPIP.TCP
             mRawData[this.dataOffset + 9] = (byte)((ackNum >> 16) & 0xFF);
             mRawData[this.dataOffset + 10] = (byte)((ackNum >> 8) & 0xFF);
             mRawData[this.dataOffset + 11] = (byte)((ackNum >> 0) & 0xFF);
-            mRawData[this.dataOffset + 12] = 0x50;
+            mRawData[this.dataOffset + 12] = (byte)((5 + numOptions) << 4);
             mRawData[this.dataOffset + 13] = tcpFlags;
             mRawData[this.dataOffset + 14] = (byte)((winSize >> 8) & 0xFF);
             mRawData[this.dataOffset + 15] = (byte)((winSize >> 0) & 0xFF);
@@ -71,15 +82,22 @@ namespace Cosmos.Sys.Network.TCPIP.TCP
             mRawData[this.dataOffset + 18] = 0x00;
             mRawData[this.dataOffset + 19] = 0x00;
 
+            initFields();
             if (data != null)
             {
                 for (int b = 0; b < data.Length; b++)
                 {
-                    mRawData[this.dataOffset + 20 + b] = data[b];
+                    mRawData[this.tcpDataOffset + b] = data[b];
                 }
             }
-            initFields();
 
+            RecalcCRC();
+        }
+
+        private void RecalcCRC()
+        {
+            mRawData[this.dataOffset + 16] = 0x00;
+            mRawData[this.dataOffset + 17] = 0x00;
             tcpChecksum = this.CalcTCPCRC();
             mRawData[this.dataOffset + 16] = (byte)((tcpChecksum >> 8) & 0xFF);
             mRawData[this.dataOffset + 17] = (byte)((tcpChecksum >> 0) & 0xFF);
@@ -89,21 +107,21 @@ namespace Cosmos.Sys.Network.TCPIP.TCP
         {
             UInt16 crc;
 
-            byte[] tempHeader = new byte[32 + TCP_DataLength];
+            byte[] tempHeader = new byte[32 + TCP_DataLength + optionsLength];
             for (int b = 0; b < 8; b++)
             {
                 tempHeader[b] = mRawData[26 + b];
             }
             tempHeader[9] = 6;
-            tempHeader[10] = (byte)(this.TCP_Length << 8);
+            tempHeader[10] = (byte)(this.TCP_Length >> 8);
             tempHeader[11] = (byte)(this.TCP_Length & 0xFF);
-            for (int b = 0; b < 20; b++)
+            for (int b = 0; b < 20 + optionsLength; b++)
             {
                 tempHeader[12 + b] = mRawData[this.dataOffset + b];
             }
             for (int b = 0; b < this.TCP_DataLength; b++)
             {
-                tempHeader[32 + b] = mRawData[this.dataOffset + 20 + b];
+                tempHeader[32 + optionsLength + b] = mRawData[this.tcpDataOffset + b];
             }
 
             crc = IPPacket.CalcOcCRC(tempHeader, 0, tempHeader.Length);
@@ -204,6 +222,25 @@ namespace Cosmos.Sys.Network.TCPIP.TCP
         {
             return "TCP Packet Src=" + sourceIP + ":" + sourcePort + ", Dest=" + destIP + ":" + destPort +
                 ",Flags=" + tcpFlags.ToHex(2) + ",SeqNo=" + seqNum + ",AckNum=" + ackNum + ", DataLen=" + TCP_DataLength;
+        }
+
+        internal void AddMSSOption(int mss)
+        {
+            mRawData[this.dataOffset + optionsOffset] = 0x02;
+            mRawData[this.dataOffset + optionsOffset + 1] = 0x04;
+            mRawData[this.dataOffset + optionsOffset + 2] = (byte)(mss >> 8);
+            mRawData[this.dataOffset + optionsOffset + 3] = (byte)(mss & 0xFF);
+            optionsOffset += 4;
+            RecalcCRC();
+        }
+        internal void AddSACKOption()
+        {
+            mRawData[this.dataOffset + optionsOffset] = 0x01;
+            mRawData[this.dataOffset + optionsOffset + 1] = 0x01;
+            mRawData[this.dataOffset + optionsOffset + 2] = 0x04;
+            mRawData[this.dataOffset + optionsOffset + 3] = 0x02;
+            optionsOffset += 4;
+            RecalcCRC();
         }
     }
 }

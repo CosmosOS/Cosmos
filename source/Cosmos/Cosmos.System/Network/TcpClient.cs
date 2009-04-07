@@ -12,6 +12,8 @@ namespace Cosmos.Sys.Network
         internal ClientDataReceived dataCallback;
         internal ClientDisconnected disconnectCallback;
 
+        internal UInt16 mss = 1360;
+
         protected static UInt16 NextLocalPort = 33000;
 
         public TcpClient(IPv4Address dest, UInt16 port)
@@ -77,10 +79,48 @@ namespace Cosmos.Sys.Network
         /// <param name="data">Byte buffer with data to send</param>
         public void SendData(byte[] data)
         {
-            TCPPacket packet = new TCPPacket(connection.LocalIP, connection.RemoteIP, connection.LocalPort, connection.RemotePort,
-                connection.LocalSequenceNumber, connection.RemoteSequenceNumber, 0x18, 8192, data);
+            if (data.Length < mss)
+            {
+                TCPPacket packet = new TCPPacket(connection.LocalIP, connection.RemoteIP, connection.LocalPort, connection.RemotePort,
+                    connection.LocalSequenceNumber, connection.RemoteSequenceNumber, 0x18, 8192, data);
 
-            TCPIP.IPv4OutgoingBuffer.AddPacket(packet);
+                TCPIP.IPv4OutgoingBuffer.AddPacket(packet);
+
+                connection.LocalSequenceNumber += (uint)data.Length;
+
+                return;
+            }
+
+            int remaining_bytes = data.Length;
+            int data_idx = 0;
+            byte[] new_buffer;
+            byte tcp_flags = 0x10;
+            while (remaining_bytes > 0)
+            {
+                if (remaining_bytes > mss)
+                {
+                    new_buffer = new byte[mss];
+                }
+                else
+                {
+                    new_buffer = new byte[remaining_bytes];
+                    tcp_flags = 0x18;
+                }
+
+                for (int b = 0; b < new_buffer.Length; b++)
+                {
+                    new_buffer[b] = data[data_idx];
+                    data_idx++;
+                    remaining_bytes--;
+                }
+
+                TCPPacket packet = new TCPPacket(connection.LocalIP, connection.RemoteIP, connection.LocalPort, connection.RemotePort,
+                    connection.LocalSequenceNumber, connection.RemoteSequenceNumber, tcp_flags, 8192, new_buffer);
+
+                TCPIP.IPv4OutgoingBuffer.AddPacket(packet);
+
+                connection.LocalSequenceNumber += (uint)new_buffer.Length;
+            }
         }
 
         /// <summary>
@@ -88,7 +128,7 @@ namespace Cosmos.Sys.Network
         /// </summary>
         public void Close()
         {
-            TCPPacket packet = new TCPPacket(connection, connection.LocalSequenceNumber, connection.RemoteSequenceNumber, 0x11, 8192);
+            TCPPacket packet = new TCPPacket(connection, connection.LocalSequenceNumber, connection.RemoteSequenceNumber + 1, 0x11, 8192);
 
             TCPIP.IPv4OutgoingBuffer.AddPacket(packet);
 
