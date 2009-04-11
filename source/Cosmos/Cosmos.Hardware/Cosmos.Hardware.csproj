@@ -75,6 +75,7 @@
     <Compile Include="Enums.cs" />
     <Compile Include="Network\Devices\AMDPCNetII\AMDPCNet.cs" />
     <Compile Include="Network\Devices\RTL8139\RTL8139.cs" />
+    <Compile Include="Network\Devices\ViaRhine\VT6102.cs" />
     <Compile Include="USB\USBHost.cs" />
     <Compile Include="USB\USBHostOHCI.cs" />
     <Compile Include="USB\USBHostOHCIRegisters.cs" />

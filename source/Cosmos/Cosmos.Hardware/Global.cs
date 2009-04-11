@@ -37,6 +37,7 @@ namespace Cosmos.Hardware {
 
             Network.Devices.RTL8139.RTL8139.InitDriver();
             Network.Devices.AMDPCNetII.AMDPCNet.InitDriver();
+            Network.Devices.ViaRhine.VT6102.InitDriver();
 
             Console.WriteLine("    Init Device Drivers");
             Device.DriversInit();
