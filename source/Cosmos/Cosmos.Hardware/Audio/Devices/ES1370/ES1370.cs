@@ -77,7 +77,8 @@ namespace Cosmos.Hardware.Audio.Devices.ES1370
 
         public void InitializeDriver()
         {
-            Cosmos.Hardware.Interrupts.IRQ05 = new Cosmos.Hardware.Interrupts.InterruptDelegate(this.HandleAudioInterrupt);
+            //Cosmos.Hardware.Interrupts.IRQ05 = new Cosmos.Hardware.Interrupts.InterruptDelegate(this.HandleAudioInterrupt);
+            Cosmos.Hardware.Interrupts.AddIRQHandler(5, this.HandleAudioInterrupt);
         }
 
         #endregion

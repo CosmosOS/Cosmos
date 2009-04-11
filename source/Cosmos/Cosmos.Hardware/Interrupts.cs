@@ -120,6 +120,32 @@ namespace Cosmos.Hardware {
 
         }
 
+        private static TempDictionary<InterruptDelegate> mIRQ_Handlers;
+
+        public static void AddIRQHandler(byte IRQ, InterruptDelegate handler)
+        {
+            if (mIRQ_Handlers == null)
+            {
+                mIRQ_Handlers = new TempDictionary<InterruptDelegate>();
+            }
+
+            if( mIRQ_Handlers.ContainsKey(IRQ) == false )
+            {
+                mIRQ_Handlers.Add(IRQ, handler);
+            } else {
+                mIRQ_Handlers[IRQ] = handler;
+            }
+        }
+
+        private static void IRQ(uint irq,ref InterruptContext aContext)
+        {
+            InterruptDelegate callback;
+            if(mIRQ_Handlers.TryGetValue(irq, out callback) == true)
+            {
+                callback(ref aContext);
+            }
+        }
+
         public static void HandleInterrupt_Default(ref InterruptContext aContext) {
             //Console.Write("Interrupt ");
             //WriteNumber(aContext.Interrupt, 32);
@@ -159,14 +185,15 @@ namespace Cosmos.Hardware {
             PIC.SignalPrimary();
         }
 
-        public static InterruptDelegate IRQ01;
+        //public static InterruptDelegate IRQ01;
         //IRQ 1 - Keyboard. Reserved for the system. Cannot be altered even if no keyboard is present or needed.
         public static void HandleInterrupt_21(ref InterruptContext aContext) {
             //Change area
             //
             // Triggers IL2CPU error
             DebugUtil.LogInterruptOccurred(ref aContext);
-            IRQ01(ref aContext);
+            IRQ(1, ref aContext);
+            //mIRQ_Handlers[1](ref aContext);
             //
             // Old keyboard
             //Cosmos.Hardware.Keyboard.HandleKeyboardInterrupt();
@@ -180,28 +207,39 @@ namespace Cosmos.Hardware {
         }
 
         //IRQ 5 - (Added for ES1370 AudioPCI)
-        public static InterruptDelegate IRQ05;
+        //public static InterruptDelegate IRQ05;
 
         public static void HandleInterrupt_25(ref InterruptContext aContext) {
-            if (IRQ05 != null) {
-                IRQ05(ref aContext);
-            }
+            IRQ(5,ref aContext);
 
             PIC.SignalSecondary();
         }
 
         //IRQ 09 - (Added for AMD PCNet network card)
-        public static InterruptDelegate IRQ09;
+        //public static InterruptDelegate IRQ09;
 
         public static void HandleInterrupt_29(ref InterruptContext aContext) {
-            if (IRQ09 != null) {
-                IRQ09(ref aContext);
-            }
+            IRQ(9,ref aContext);
+            PIC.SignalSecondary();
+        }
+
+        //IRQ 10 - (Added for VIA Rhine network card)
+        //public static InterruptDelegate IRQ10;
+
+        public static void HandleInterrupt_2A(ref InterruptContext aContext)
+        {
+            //Debugging....
+            //DebugUtil.LogInterruptOccurred_Old(aContext);
+            //Cosmos.Hardware.DebugUtil.SendMessage("Interrupts", "Interrupt 2B handler (for RTL)");
+            //Console.WriteLine("IRQ 11 raised!");
+
+            IRQ(10,ref aContext);
+
             PIC.SignalSecondary();
         }
 
         //IRQ 11 - (Added for RTL8139 network card)
-        public static InterruptDelegate IRQ11;
+        //public static InterruptDelegate IRQ11;
 
         public static void HandleInterrupt_2B(ref InterruptContext aContext) {
             //Debugging....
@@ -209,9 +247,19 @@ namespace Cosmos.Hardware {
             //Cosmos.Hardware.DebugUtil.SendMessage("Interrupts", "Interrupt 2B handler (for RTL)");
             //Console.WriteLine("IRQ 11 raised!");
 
-            if (IRQ11 != null) {
-                IRQ11(ref aContext);
-            }
+            IRQ(11,ref aContext);
+
+            PIC.SignalSecondary();
+        }
+
+        public static void HandleInterrupt_2C(ref InterruptContext aContext)
+        {
+            //Debugging....
+            //DebugUtil.LogInterruptOccurred_Old(aContext);
+            //Cosmos.Hardware.DebugUtil.SendMessage("Interrupts", "Interrupt 2B handler (for RTL)");
+            Console.WriteLine("IRQ 12 raised!");
+
+            IRQ(12, ref aContext);
 
             PIC.SignalSecondary();
         }
@@ -463,7 +511,9 @@ namespace Cosmos.Hardware {
                     HandleInterrupt_21(ref xCtx);
                     HandleInterrupt_25(ref xCtx);
                     HandleInterrupt_29(ref xCtx);
+                    HandleInterrupt_2A(ref xCtx);
                     HandleInterrupt_2B(ref xCtx);
+                    HandleInterrupt_2C(ref xCtx);
                     HandleInterrupt_2E(ref xCtx);
                     HandleInterrupt_2F(ref xCtx);
                     HandleInterrupt_30(ref xCtx);

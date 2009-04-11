@@ -119,6 +119,30 @@ namespace Cosmos.Kernel {
             a = 0;
         }
 
+        /// <summary>
+        /// Forced simple reboot of PC
+        /// </summary>
+        public static void Reboot()
+        {
+            // Disable all interrupts
+            DisableInterrupts();
+
+            byte temp;
+
+            // Clear all keyboard buffers
+            do
+            {
+                temp = CPUBus.Read8(0x64); // Empty user data
+                if ((temp & 0x01) != 0)
+                {
+                    CPUBus.Read8(0x60); // Empty keyboard data
+                }
+            } while ((temp & 0x02) != 0);
+
+            CPUBus.Write8(0x64, 0xFE); // Pulse CPU Reset line
+            Halt(); // If it didn't work, Halt the CPU
+        }
+
         //Plugged
         public static void Halt()
         {

@@ -59,6 +59,8 @@ namespace Cosmos.Hardware
         private static bool mEscaped;
         private static List<KeyMapping> mKeys;
         private static bool mShiftState;
+        private static bool mCtrlState;
+        private static bool mAltState;
 
         protected static void HandleScancode(byte aScancode, bool aReleased)
         {
@@ -76,8 +78,23 @@ namespace Cosmos.Hardware
                         mShiftState = !aReleased;
                         break;
                     }
+                case 0x1D:
+                    {
+                        mCtrlState = !aReleased;
+                        break;
+                    }
+                case 0x38:
+                    {
+                        mAltState = !aReleased;
+                        break;
+                    }
                 default:
                     {
+                        if ((mCtrlState) && (mAltState) && (xTheScancode == 0x53))
+                        {
+                            Console.WriteLine("Detected Ctrl-Alt-Delete! Rebooting System...");
+                            Cosmos.Kernel.CPU.Reboot();
+                        }
                         if (mShiftState)
                         {
                             xTheScancode = xTheScancode << 16;
@@ -124,7 +141,8 @@ namespace Cosmos.Hardware
 
                 // Old
                 Keyboard.Initialize(HandleScancode);
-                Interrupts.IRQ01 += HandleKeyboardInterrupt;
+                //Interrupts.IRQ01 += HandleKeyboardInterrupt;
+                Interrupts.AddIRQHandler(1, HandleKeyboardInterrupt);
                 // New
                 // TODO: Need to add support for mult keyboards. ie one in PS2 and one in USB, or even more
                 //var xKeyboard = (HW.SerialDevice)(HW.Device.Find(HW.Device.DeviceType.Keyboard)[0]);

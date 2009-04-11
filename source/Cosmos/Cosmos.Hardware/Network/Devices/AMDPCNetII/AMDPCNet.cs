@@ -31,7 +31,8 @@ namespace Cosmos.Hardware.Network.Devices.AMDPCNetII
             pciCard = device;
 
             // Setup interrupt handling
-            Interrupts.IRQ09 += HandleNetworkInterrupt;
+            //Interrupts.IRQ09 += HandleNetworkInterrupt;
+            Interrupts.AddIRQHandler(device.InterruptLine, HandleNetworkInterrupt);
 
             // Get IO Address from PCI Bus
             io = pciCard.GetAddressSpace(0) as Kernel.IOAddressSpace;
@@ -347,9 +348,6 @@ namespace Cosmos.Hardware.Network.Devices.AMDPCNetII
         #endregion
 
         #region Helper Functions
-        /// <summary>
-        /// Get the 32-bit address where the bytearray is stored.
-        /// </summary>
         protected bool SendBytes(ref byte[] aData)
         {
             int txd = mNextTXDesc++;
@@ -366,8 +364,10 @@ namespace Cosmos.Hardware.Network.Devices.AMDPCNetII
                 {
                     mTxBuffers[txd][b] = aData[b];
                 }
-                UInt16 buffer_len = (UInt16)(~aData.Length);
+                UInt16 buffer_len = (UInt16)(aData.Length < 64 ? 64 : aData.Length);
+                buffer_len = (UInt16)(~buffer_len);
                 buffer_len++;
+
                 UInt32 flags = (UInt32)(buffer_len & 0x0FFF) | 0x0300F000 | 0x80000000;
 
                 mTxDescriptor.Write32(xOffset + 4, flags);

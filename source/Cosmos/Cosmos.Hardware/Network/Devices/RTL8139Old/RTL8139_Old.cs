@@ -98,7 +98,9 @@ DebugUtil.SendMessage("RTL8139", aText);
             rcr.PromiscuousMode = true;
             
             //Enable IRQ Interrupt
-            Cosmos.Hardware.Interrupts.IRQ11 += HandleNetworkInterrupt;
+            //Cosmos.Hardware.Interrupts.IRQ11 += HandleNetworkInterrupt;
+            Interrupts.AddIRQHandler(pciCard.InterruptLine, HandleNetworkInterrupt);
+
             InitIRQMaskRegister();
             mInstance = this;
             //DebugWriteLine("Listening for IRQ" + pciCard.InterruptLine + ".");

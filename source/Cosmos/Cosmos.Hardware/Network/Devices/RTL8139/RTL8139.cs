@@ -33,7 +33,8 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             pciCard = device;
 
             // Setup interrupt handling
-            Interrupts.IRQ11 += HandleNetworkInterrupt;
+            //Interrupts.IRQ11 += HandleNetworkInterrupt;
+            Interrupts.AddIRQHandler(device.InterruptLine, HandleNetworkInterrupt);
 
             // Get IO Address from PCI Bus
             io = pciCard.GetAddressSpace(0) as Kernel.IOAddressSpace;
@@ -361,7 +362,19 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
                 mNextTXDesc = 0;
             }
 
-            ManagedMemorySpace txBuffer = new ManagedMemorySpace(ref aData);
+            ManagedMemorySpace txBuffer;
+            if (aData.Length < 64)
+            {
+                txBuffer = new ManagedMemorySpace(64);
+                for (uint b = 0; b < aData.Length; b++)
+                {
+                    txBuffer[b] = aData[b];
+                }
+            }
+            else
+            {
+                txBuffer = new ManagedMemorySpace(ref aData);
+            }
 
             switch (txd)
             {
