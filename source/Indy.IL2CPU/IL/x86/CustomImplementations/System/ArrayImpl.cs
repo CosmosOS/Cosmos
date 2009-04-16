@@ -28,8 +28,7 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System {
             return aThis.Length;
         }
 
-
-		[PlugMethod(Signature = "System_Boolean__System_Array_TrySZBinarySearch_System_Array__System_Int32__System_Int32__System_Object__System_Int32__")]
+        [PlugMethod(Signature="System_Boolean__System_Array_TrySZBinarySearch_System_Array__System_Int32__System_Int32__System_Object__System_Int32__")]
 		public static unsafe bool TrySZBinarySearch(uint* aArray, uint sourceIndex, uint count, uint value, out uint retVal) {
 			return TrySZIndexOf(aArray, sourceIndex, count, value, out retVal);
 		}
@@ -76,7 +75,7 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System {
 
 		public static unsafe int GetLowerBound(int* aThis, int aDimension) {
 			if (aDimension != 0) {
-				throw new NotSupportedException("Multidimensional arrays not supported yet!");
+				//throw new NotSupportedException("Multidimensional arrays not supported yet!");
 			}
             return 0;
 		}
@@ -100,7 +99,10 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System {
 			throw new NotSupportedException("GetValue not supported in this situation!");
 		}
 
-        public static unsafe object GetValue(Array aThis, params int[] aIndices) { throw new NotImplementedException("Multidimensional arrays not supported yet!"); }
+        public static unsafe object GetValue(Array aThis, params int[] aIndices)
+        { 
+            throw new NotImplementedException("Multidimensional arrays not supported yet!");
+        }
 
 		[PlugMethod(Signature = "System_Void__System_Array_SetValue_System_Object__System_Int32_")]
 		public static unsafe void SetValue(uint* aThis, uint aValue, int aIndex) {

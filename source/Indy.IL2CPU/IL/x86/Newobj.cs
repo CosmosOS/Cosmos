@@ -19,6 +19,7 @@ namespace Indy.IL2CPU.IL.X86
 		public string CurrentLabel;
 		public uint ILOffset;
 		public MethodInformation MethodInformation;
+        public readonly bool RefsMultiArray;
 
         public static void ScanOp(MethodBase aCtor) {
             Call.ScanOp(aCtor);
@@ -38,6 +39,7 @@ namespace Indy.IL2CPU.IL.X86
 				   aMethodInfo)
 		{
 			CtorDef = aReader.OperandValueMethod;
+            RefsMultiArray = (CtorDef.DeclaringType.IsArray && CtorDef.DeclaringType.GetArrayRank() > 1);
 			CurrentLabel = GetInstructionLabel(aReader);
 			MethodInformation = aMethodInfo;
 			ILOffset = aReader.Position;
@@ -48,6 +50,14 @@ namespace Indy.IL2CPU.IL.X86
 
 		public override void DoAssemble()
 		{
+            if (RefsMultiArray)
+            {
+                //TODO: Redefine CtorDef to point to a consructor we provide that handles the MultiArray ctor.
+                //This will probably need to be dynamically generated once for each unique type of MultiArray
+                //     and paramaters on the stack will need to be dynamically consumed by this ctor in order
+                //     to accomidate many varing ranks and sizes of Arrays. 
+            }
+
 			Assemble(Assembler,
 					 CtorDef,
 					 Engine.RegisterType(CtorDef.DeclaringType),
@@ -56,14 +66,16 @@ namespace Indy.IL2CPU.IL.X86
                      (int)ILOffset, mNextLabel);
 		}
 
-		public static void Assemble(Assembler.Assembler aAssembler,
-									MethodBase aCtorDef,
-									int aTypeId,
-									string aCurrentLabel,
-									MethodInformation aCurrentMethodInformation,
-									int aCurrentILOffset,
-            string aNextLabel)
-		{
+		public static void Assemble(
+            Assembler.Assembler aAssembler,
+			MethodBase aCtorDef,
+			int aTypeId,
+			string aCurrentLabel,
+			MethodInformation aCurrentMethodInformation,
+			int aCurrentILOffset,
+            string aNextLabel
+        )
+        {
 			if (aCtorDef != null)
 			{
 				Engine.QueueMethod(aCtorDef);
@@ -144,6 +156,7 @@ namespace Indy.IL2CPU.IL.X86
                         new Push { DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xSize + 4) };
 					}
 				}
+                
                 new Assembler.X86.Call { DestinationLabel = Label.GenerateLabelName(aCtorDef) };
                 new Test { DestinationReg = Registers.ECX, SourceValue = 2 };
                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = aCurrentLabel + "_NO_ERROR_4" };
