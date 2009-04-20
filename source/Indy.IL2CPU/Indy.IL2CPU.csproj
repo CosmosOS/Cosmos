@@ -346,6 +346,7 @@
     <Compile Include="IL\x86\X86MethodHeaderOp.cs" />
     <Compile Include="IL\x86\X86OpCodeMap.cs" />
     <Compile Include="IL\x86\Xor.cs" />
+    <Compile Include="DynamicMethodEmit.cs" />
     <Compile Include="PassedEngineValue.cs" />
     <Compile Include="Plugs\AssemblerMethod.cs" />
     <Compile Include="Plugs\FieldAccessAttribute.cs" />

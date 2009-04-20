@@ -1432,27 +1432,67 @@ namespace Indy.IL2CPU
 
         private ISymbolReader GetSymbolReaderForAssembly(Assembly aAssembly)
         {
-            return SymbolAccess.GetReaderForFile(aAssembly.Location);
+            try
+            {
+                return SymbolAccess.GetReaderForFile(aAssembly.Location);
+            }
+            catch (NotSupportedException)
+            {
+                return null;
+            }
         }
 
         private void ProcessAllMethods()
         {
             int i = -1;
             int xCount = 0;
+
+            int EMITi = 0;
+            List<MethodBase> EMITdefs = null;
+            bool EMITmode = false;
+
             while (true)
             {
-                i++;
+                if (EMITmode)
+                {
+                    EMITi++;
+                }
+                else
+                {
+                    i++;
+                }
                 MethodBase xCurrentMethod;
                 using (mMethodsLocker.AcquireReaderLock())
                 {
                     xCount = mMethods.Count;
-                    if (i == xCount)
+                    EMITmode = (i == xCount);
+                    if (EMITmode)
                     {
-                        break;
+                        if (EMITdefs == null)
+                        {
+                            EMITdefs = new List<MethodBase>();
+                            Assembly EMITassm = (from assm in AppDomain.CurrentDomain.GetAssemblies() where assm.GetName().Name == "IndyIL2CPU_EmitAssm" select assm).FirstOrDefault<Assembly>();
+                            foreach (Type EMITtype in EMITassm.GetTypes())
+                            {
+                                EMITdefs.AddRange(from method in EMITtype.GetMethods() where method.Name.StartsWith("Emit") select method as MethodBase);
+                            }
+                        }
+
+                        if (EMITi == EMITdefs.Count)
+                            break;
+
+                        xCurrentMethod = EMITdefs[EMITi];
+                        CompilingMethods(EMITi, EMITdefs.Count);
                     }
-                    xCurrentMethod = mMethods.Keys.ElementAt(i);
+                    else
+                    {
+                        xCurrentMethod = mMethods.Keys.ElementAt(i);
+                        if (DynamicMethodEmit.GetHasDynamicMethod(xCurrentMethod))
+                            continue;
+                        CompilingMethods(i, xCount);
+                    }
                 }
-                CompilingMethods(i, xCount);
+
                 OnDebugLog(LogSeverityEnum.Informational, "Processing method {0}", xCurrentMethod.GetFullName());
                 try
                 {
@@ -1475,7 +1515,14 @@ namespace Indy.IL2CPU
                     SortedList<string, object> xMethodScanInfo;
                     using (mMethodsLocker.AcquireReaderLock())
                     {
-                        xMethodScanInfo = mMethods[xCurrentMethod].Info;
+                        if (EMITmode)
+                        {
+                            xMethodScanInfo = new QueuedMethodInformation().Info;
+                        }
+                        else
+                        {
+                            xMethodScanInfo = mMethods[xCurrentMethod].Info;
+                        }
                     }
                     MethodInformation xMethodInfo = GetMethodInfo(xCurrentMethod, xCurrentMethod
                      , xMethodName, xTypeInfo, mDebugMode != DebugMode.None, xMethodScanInfo);
@@ -1642,8 +1689,7 @@ namespace Indy.IL2CPU
                                     #endregion
 
                                     xMethodInfo.CurrentHandler = xCurrentHandler;
-                                    xOp = GetOpFromType(mMap.GetOpForOpCode(xReader.OpCode), xReader
-                                     , xMethodInfo);
+                                    xOp = GetOpFromType(mMap.GetOpForOpCode(xReader.OpCode), xReader, xMethodInfo);
 
                                     xOp.Assembler = mAssembler;
                                     new Comment("StackItems = " + mAssembler.StackContents.Count);
@@ -1676,7 +1722,14 @@ namespace Indy.IL2CPU
                                                                               : (item.Size + (4 - (item.Size % 4)))
                                                               select xSize).Sum();
                                             xMLSymbol.StackDifference = xMethodInfo.LocalsSize + xStackSize;
-                                            xMLSymbol.AssemblyFile = xCurrentMethod.DeclaringType.Assembly.Location;
+                                            try
+                                            {
+                                                xMLSymbol.AssemblyFile = xCurrentMethod.DeclaringType.Assembly.Location;
+                                            }
+                                            catch (NotSupportedException)
+                                            {
+                                                xMLSymbol.AssemblyFile = "DYNAMIC: " + xCurrentMethod.DeclaringType.Assembly.FullName;
+                                            }
                                             xMLSymbol.MethodToken = xCurrentMethod.MetadataToken;
                                             xMLSymbol.TypeToken = xCurrentMethod.DeclaringType.MetadataToken;
                                             xMLSymbol.ILOffset = (int)xReader.Position;
@@ -1693,7 +1746,7 @@ namespace Indy.IL2CPU
                                     //    xInstructionInfos.Add(xInstructionInfo);
                                     //}
                                 }
-                                if (mSymbols != null)
+                                if (mSymbols != null && !EMITmode)
                                 {
                                     MLDebugSymbol[] xSymbols;
                                     using (mSymbolsLocker.AcquireReaderLock())
@@ -1729,9 +1782,12 @@ namespace Indy.IL2CPU
                     xOp.Assembler = mAssembler;
                     xOp.Assemble();
                     mAssembler.StackContents.Clear();
-                    using (mMethodsLocker.AcquireReaderLock())
+                    if (!EMITmode)
                     {
-                        mMethods[xCurrentMethod].Processed = true;
+                        using (mMethodsLocker.AcquireReaderLock())
+                        {
+                            mMethods[xCurrentMethod].Processed = true;
+                        }
                     }
                 }
                 catch (Exception e)
@@ -1741,7 +1797,14 @@ namespace Indy.IL2CPU
                     throw;
                 }
             }
-            CompilingMethods(i, xCount);
+            if (EMITmode)
+            {
+                CompilingMethods(EMITi, EMITdefs.Count);
+            }
+            else
+            {
+                CompilingMethods(i, xCount);
+            }
         }
 
         private IList<Assembly> GetPlugAssemblies()
