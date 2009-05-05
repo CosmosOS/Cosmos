@@ -1,9 +1,10 @@
 ﻿using System;
 
-namespace Cosmos.Kernel {
-
+namespace Cosmos.Kernel
+{
     public static class Heap
     {
+        public static bool EnableDebug = true;
         private static uint mStart;
         private static uint mStartAddress;        
         private static uint mLength;
@@ -93,34 +94,42 @@ namespace Cosmos.Kernel {
         private static bool mDebugDisplayInitialized = false;
 
         // this method displays the used/total memory of the heap on the first line of the text screen
-        private static void UpdateDebugDisplay() {
-            if (!mDebugDisplayInitialized) {
-                mDebugDisplayInitialized = true;
-                int xOldPositionLeft = Console.CursorLeft;
-                int xOldPositionTop = Console.CursorTop;
-                Console.CursorLeft = 0;
-                Console.CursorTop = 0;
-                Console.Write("[Heap Usage: ");
-                WriteNumber(mStartAddress,
-                            32);
-                Console.Write("/");
-                WriteNumber(mEndOfRam,
-                            32);
-                Console.Write("] bytes");
-                while(Console.CursorLeft < (Console.WindowWidth-1)) {
-                    Console.Write(" ");
+        private static void UpdateDebugDisplay()
+        {
+            if (EnableDebug)
+            {
+                if (!mDebugDisplayInitialized)
+                {
+                    mDebugDisplayInitialized = true;
+                    int xOldPositionLeft = Console.CursorLeft;
+                    int xOldPositionTop = Console.CursorTop;
+                    Console.CursorLeft = 0;
+                    Console.CursorTop = 0;
+                    Console.Write("[Heap Usage: ");
+                    WriteNumber(mStartAddress,
+                                32);
+                    Console.Write("/");
+                    WriteNumber(mEndOfRam,
+                                32);
+                    Console.Write("] bytes");
+                    while (Console.CursorLeft < (Console.WindowWidth-1))
+                    {
+                        Console.Write(" ");
+                    }
+                    Console.CursorLeft = xOldPositionLeft;
+                    Console.CursorTop = xOldPositionTop;
                 }
-                Console.CursorLeft = xOldPositionLeft;
-                Console.CursorTop = xOldPositionTop;
-            }else {
-                int xOldPositionLeft = Console.CursorLeft;
-                int xOldPositionTop = Console.CursorTop;
-                Console.CursorLeft = 13;
-                Console.CursorTop = 0;
-                WriteNumber(mStartAddress,
-                            32);
-                Console.CursorLeft = xOldPositionLeft;
-                Console.CursorTop = xOldPositionTop;
+                else
+                {
+                    int xOldPositionLeft = Console.CursorLeft;
+                    int xOldPositionTop = Console.CursorTop;
+                    Console.CursorLeft = 13;
+                    Console.CursorTop = 0;
+                    WriteNumber(mStartAddress,
+                                32);
+                    Console.CursorLeft = xOldPositionLeft;
+                    Console.CursorTop = xOldPositionTop;
+                }
             }
         }
 
