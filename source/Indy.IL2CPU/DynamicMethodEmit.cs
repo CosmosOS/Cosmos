@@ -6,19 +6,63 @@ using System.Collections.Generic;
 
 namespace Indy.IL2CPU
 {
+    /// <summary>
+    /// Provides Compile-Time Service which enables the emission of dynamic methods.
+    /// </summary>
+    /// <remarks>
+    /// If a method has a variable number (or type) of parameters which depend on its context,
+    /// this feature can be used to improve code-reuse and optimize performance.
+    /// </remarks>
+    /// <example>
+    /// To create a dynamic method emitter, one must create two classes derived from:
+    ///     CEmittedMethodInfo
+    ///     CMethodEmitterInfo
+    /// And register the CMethodEmitterInfo in the DynamicMethodEmit constructior.
+    /// </example>
     public class DynamicMethodEmit
     {
+        /// <summary>
+        /// Provides information about an emitted method, including the ability to find if
+        /// that particular emitted method overides another method.
+        /// </summary>
         public abstract class CEmittedMethodInfo
         {
+            /// <summary>
+            /// Returns true if the emitted method can override the provided method.
+            /// </summary>
+            /// <param name="method">The method to check overridability for.</param>
+            /// <returns>True, if this method is suitable, otherwise, false.</returns>
             public abstract bool GetHandlesMethod(MethodBase method);
+            /// <summary>
+            /// Gets the MethodInfo of the emitted method which can overide the provided method.
+            /// </summary>
+            /// <param name="method">The method to retrieve an overide for.</param>
+            /// <returns>The MethodInfo of the emitted method which can overide the provided method.</returns>
             public abstract MethodInfo GetHandlerForMethod(MethodBase method);
         }
+        /// <summary>
+        /// Provides information about a method emitter, including the ability to find if that
+        /// particular method emitter can emit a method overides another method.
+        /// </summary>
         public abstract class CMethodEmitterInfo
         {
+            /// <summary>
+            /// Returns true if this emitter can emit a method which overides the provided method.
+            /// </summary>
+            /// <param name="method">The method to check overrideability of.</param>
+            /// <returns>True, if this emitter can emit a method which overides the provided method, otherwise, false.</returns>
             public abstract bool GetEmittsMethod(MethodBase method);
+            /// <summary>
+            /// Emitts a method which can overide the provided method.
+            /// </summary>
+            /// <param name="method">The method to overide.</param>
+            /// <returns>The MethodInfo of the emitted method which can override the provided method.</returns>
             public abstract MethodInfo EmitMethod(MethodBase method);
         }
 
+        /// <summary>
+        /// CEmittedMethodInfo for Multidimensional Arrays
+        /// </summary>
         public class MAMGroup : CEmittedMethodInfo
         {
             public Type arrayType;
@@ -60,6 +104,9 @@ namespace Indy.IL2CPU
                 }
             }
         }
+        /// <summary>
+        /// CMethodEmitterInfo for Multidimensional Arrays
+        /// </summary>
         public class MAMEmitter : CMethodEmitterInfo
         {
             private static void EmitRecursiveFillArray(int ranknum, int maxranks, Type arrayType, ILGenerator EmitIL)
@@ -203,15 +250,49 @@ namespace Indy.IL2CPU
             }
         }
 
+        /// <summary>
+        /// Operating instance of the DynamicMethodEmit class.
+        /// </summary>
         public static DynamicMethodEmit Instance = new DynamicMethodEmit(AppDomain.CurrentDomain);
 
+        /// <summary>
+        /// AppDomain into which emission is occuring.
+        /// </summary>
         public readonly AppDomain EmitDomain;
+        /// <summary>
+        /// Assembly into which emission is occuring.
+        /// </summary>
         public readonly AssemblyBuilder EmitAssm;
+        /// <summary>
+        /// Module into which emission is occuring.
+        /// </summary>
         public readonly ModuleBuilder EmitModu;
+
+        /// <summary>
+        /// Container Type of the methods which are currently being emitted.
+        /// </summary>
         public TypeBuilder EmitContType;
+        /// <summary>
+        /// Number of Emitted menthods in the current Container Type.
+        /// </summary>
         private int EmitCount = 0;
+        /// <summary>
+        /// Current number of Container Types.
+        /// </summary>
         private int TypeCount = 0;
+        /// <summary>
+        /// List of all the currently emitted methods.
+        /// </summary>
+        /// <remarks>
+        /// If a CEmittedMethodInfo is to be used, it must be present in this list.
+        /// </remarks>
         List<CEmittedMethodInfo> CEMIs = new List<CEmittedMethodInfo>();
+        /// <summary>
+        /// List of all the method emitters.
+        /// </summary>
+        /// <remarks>
+        /// If a CMethodEmitterInfo is to be used, it must be present in this list.
+        /// </remarks>
         List<CMethodEmitterInfo> CMEIs = new List<CMethodEmitterInfo>();
 
         public DynamicMethodEmit(AppDomain aEmitDomain)
@@ -220,11 +301,17 @@ namespace Indy.IL2CPU
             EmitAssm = EmitDomain.DefineDynamicAssembly(new AssemblyName() { Name = "IndyIL2CPU_EmitAssm" }, AssemblyBuilderAccess.RunAndSave);
             EmitModu = EmitAssm.DefineDynamicModule("IndyIL2CPU_EmitAssm");
 
-            CMEIs.Add(new MAMEmitter());
+            //Register CMethodEmitterInfos Here
+            CMEIs.Add(new MAMEmitter());    //Multidimensional Arrays
 
             Instance = this;
         }
 
+        /// <summary>
+        /// Begins a type to which emission will occur.
+        /// After all desired methods have been emitted,
+        /// call EndType() to get the MethodInfos.
+        /// </summary>
         public static void BeginType()
         {
             Instance.EmitContType = Instance.EmitModu.DefineType(
@@ -233,6 +320,10 @@ namespace Indy.IL2CPU
             );
             Instance.EmitCount = 0;
         }
+        /// <summary>
+        /// Finializes emission of a type.
+        /// </summary>
+        /// <returns>MethodInfos of the emitted methods.</returns>
         public static MethodInfo[] EndType()
         {
             Type t = Instance.EmitContType.CreateType();
@@ -244,6 +335,10 @@ namespace Indy.IL2CPU
             return mbs;
         }
 
+        /// <summary>
+        /// Returns true if DynamicMethodEmit Instance currently contains an emitter which can overide the provided Method.
+        /// <param name="method">The method to search for an overide emitter for.</param>
+        /// <returns>True if a suitable emitter was found, otherwise, false.</returns>
         public static bool GetHasDynamicMethod(MethodBase method)
         {
             foreach (CMethodEmitterInfo cmei in Instance.CMEIs)
@@ -254,6 +349,15 @@ namespace Indy.IL2CPU
 
             return false;
         }
+        /// <summary>
+        /// Returns the MethodInfo of the method which can overide the provided method,
+        /// generating it if nessecary.
+        /// </summary>
+        /// <param name="method">The method to overide.</param>
+        /// <returns>The MethodInfo of the suitable override.</returns>
+        /// <exception cref="System.NotImplementedException">
+        /// Thrown if a sutiable override could not be found or generated.
+        /// </exception>
         public static MethodInfo GetDynamicMethod(MethodBase method)
         {
             foreach (CEmittedMethodInfo cemi in Instance.CEMIs)
