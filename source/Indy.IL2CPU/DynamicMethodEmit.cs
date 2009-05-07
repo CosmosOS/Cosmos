@@ -235,7 +235,7 @@ namespace Indy.IL2CPU
 
             public override MethodInfo EmitMethod(MethodBase method)
             {
-                Type arrayType = Type.GetType(method.DeclaringType.FullName.Split('[')[0]);
+                Type arrayType = Type.GetType(method.DeclaringType.AssemblyQualifiedName.Split('[')[0] + method.DeclaringType.AssemblyQualifiedName.Split(']')[1]);
                 int Ranks = method.DeclaringType.GetArrayRank();
 
                 BeginType();
