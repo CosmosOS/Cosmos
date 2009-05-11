@@ -18,6 +18,7 @@ namespace Cosmos.Playground.Xenni
 
             Console.WriteLine("");
             Console.WriteLine("Press Any Key to Test MultiArrays ...");
+            Cosmos.Debug.Debugger.Break();
             Console.Read();
             Console.WriteLine("");
             Console.WriteLine("");
@@ -92,10 +93,12 @@ namespace Cosmos.Playground.Xenni
                     Console.WriteLine("; expected '" + value + "' but got '" + stovalue + "'");
                 }
             }
+            
             Console.WriteLine("");
             Console.WriteLine("");
 
             Console.WriteLine("Write All, Read All [Sequential Values]");
+
             int[,,,] WARAArray = new int[3, 3, 3, 3];
 
             for (int x = 2;x >= 0;x--)
@@ -145,7 +148,6 @@ namespace Cosmos.Playground.Xenni
                     }
                 }
             }
-
             Console.WriteLine("");
             Console.WriteLine("");
             Console.WriteLine("Press Any Key to Restart ...");
