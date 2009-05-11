@@ -62,6 +62,28 @@ namespace Cosmos.Hardware
         private static bool mCtrlState;
         private static bool mAltState;
 
+        public static bool ShiftPressed
+        {
+            get
+            {
+                return mShiftState;
+            }
+        }
+        public static bool CtrlPressed
+        {
+            get
+            {
+                return mCtrlState;
+            }
+        }
+        public static bool AltPressed
+        {
+            get
+            {
+                return mAltState;
+            }
+        }
+
         protected static void HandleScancode(byte aScancode, bool aReleased)
         {
             uint xTheScancode = aScancode;
@@ -130,7 +152,7 @@ namespace Cosmos.Hardware
             {
                 aValue = (byte)(aValue ^ 0x80);
             }
-            HandleScancode(aValue, xReleased);
+            mHandleKeyboardKey(aValue, xReleased);
         }
 
         private static unsafe void CheckInit()
@@ -296,7 +318,7 @@ namespace Cosmos.Hardware
             mKeys = aKeys;
         }
 
-        private static bool GetCharValue(uint aScanCode, out char aValue)
+        public static bool GetCharValue(uint aScanCode, out char aValue)
         {
             for (int i = 0; i < mKeys.Count; i++)
             {
@@ -321,6 +343,23 @@ namespace Cosmos.Hardware
                 CPU.Halt();
             }
             return xResult;
+        }
+        public static bool GetChar(out char c)
+        {
+            CheckInit();
+
+            c = '\0';
+
+            if (mBuffer.Count > 0)
+            {
+                GetCharValue(mBuffer.Dequeue(), out c);
+
+                return true;
+            }
+            else
+            { 
+                return false;
+            }
         }
 
         /// <summary>
