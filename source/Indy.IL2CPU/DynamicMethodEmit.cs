@@ -71,14 +71,16 @@ namespace Indy.IL2CPU
             public MethodInfo mbctor;
             public MethodInfo mbget;
             public MethodInfo mbset;
+            public MethodInfo mbaddr;
 
-            public MAMGroup(Type a, int r, MethodInfo c, MethodInfo g, MethodInfo s)
+            public MAMGroup(Type t, int r, MethodInfo c, MethodInfo g, MethodInfo s, MethodInfo a)
             {
-                arrayType = a;
+                arrayType = t;
                 Ranks = r;
                 mbctor = c;
                 mbget = g;
                 mbset = s;
+                mbaddr = a;
             }
 
             public override bool GetHandlesMethod(MethodBase method)
@@ -99,6 +101,8 @@ namespace Indy.IL2CPU
                         return mbget;
                     case "Set":
                         return mbset;
+                    case "Address":
+                        return mbaddr;
                     default:
                         throw new NotImplementedException("MultiArray method '" + method.Name + "' is not defined!");
                 }
@@ -224,6 +228,26 @@ namespace Indy.IL2CPU
                 EmitIL.Emit(OpCodes.Stelem, arrayType);
                 EmitIL.Emit(OpCodes.Ret);
             }
+            public static void Emit_MultiArray_Address(Type arrayType, int Ranks)
+            {
+                String MethodName = "Emit" + (Instance.EmitCount++);
+
+                MethodBuilder EmitMeth = Instance.EmitContType.DefineMethod(MethodName, MethodAttributes.Public | MethodAttributes.Static);
+
+                Type[] MethodParams = new Type[Ranks + 1];
+                MethodParams[0] = arrayType.MakeArrayType(Ranks);
+                for (int i = 1;i <= Ranks;i++)
+                    MethodParams[i] = typeof(int);
+                EmitMeth.SetParameters(MethodParams);
+                EmitMeth.SetReturnType(arrayType.MakePointerType());
+
+                ILGenerator EmitIL = EmitMeth.GetILGenerator();
+
+                EmitWalkArrays(Ranks - 1, EmitIL);
+
+                EmitIL.Emit(OpCodes.Ldelem, arrayType.MakePointerType());
+                EmitIL.Emit(OpCodes.Ret);
+            }
 
             public override bool GetEmittsMethod(MethodBase method)
             {
@@ -242,9 +266,10 @@ namespace Indy.IL2CPU
                 Emit_MultiArray_Ctor(arrayType, Ranks);
                 Emit_MultiArray_Get(arrayType, Ranks);
                 Emit_MultiArray_Set(arrayType, Ranks);
+                Emit_MultiArray_Address(arrayType, Ranks);
                 MethodInfo[] mbs = EndType();
 
-                Instance.CEMIs.Add(new MAMGroup(arrayType, Ranks, mbs[0], mbs[1], mbs[2]));
+                Instance.CEMIs.Add(new MAMGroup(arrayType, Ranks, mbs[0], mbs[1], mbs[2], mbs[3]));
 
                 return GetDynamicMethod(method);
             }
