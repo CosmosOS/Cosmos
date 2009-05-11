@@ -42,9 +42,10 @@ namespace Cosmos.Kernel.Plugs
             if (aDuration <= 0)
                 throw new ArgumentOutOfRangeException("Duration must be more than 0");
 
-            PIT.PlaySound(aFrequency);
-            PIT.Wait((uint)aDuration);
-            PIT.MuteSound();
+            PIT.EnableSound();
+            PIT.T2Frequency = aFrequency;
+            PIT.Wait(aDuration);
+            PIT.DisableSound();
         }
 
         public static int get_CursorLeft()
