@@ -157,7 +157,7 @@ namespace Cosmos.Demo.Nibbles
             }             
         }
 
-        private static void Wait(uint milliseconds)
+        private static void Wait(int milliseconds)
         {
             Cosmos.Hardware.PIT.Wait(milliseconds);
         }
