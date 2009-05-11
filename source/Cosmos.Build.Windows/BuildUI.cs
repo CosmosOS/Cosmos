@@ -174,10 +174,21 @@ namespace Cosmos.Compiler.Builder {
             
             var xApp = new System.Windows.Application();
             xApp.Startup += new StartupEventHandler(xApp_Startup);
-            // If an exception occurs here, something bad happened in final stages of build.
-            // Or you forgot to close QEMU last time and this happens when debugging and you try
-            // to run QEMU again.
-            xApp.Run();        
+            
+            try
+            {
+                xApp.Run();
+            }
+            catch (Exception ex)
+            {
+                if (MessageBox.Show("Build encountered a fatil error!\n\nIgnore Error?", "Cosmos Builder", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes) == MessageBoxResult.No)
+                {
+                    // If an exception occurs here, something bad happened in final stages of build.
+                    // Or you forgot to close QEMU last time and this happens when debugging and you try
+                    // to run QEMU again.
+                    throw ex;
+                }
+            }
         }
 
         void xApp_Startup(object sender, StartupEventArgs e) {
