@@ -216,6 +216,15 @@ namespace Cosmos.Hardware
         {
             IOWriteByte(0x61, (byte)(IOReadByte(0x61) & 0xFC));
         }
+        public static void PlaySound(int aFreq)
+        {
+            EnableSound();
+            T2Frequency = (uint)aFreq;
+        }
+        public static void MuteSound()
+        {
+            DisableSound();
+        }
 
         private static void SignalWait()
         {
@@ -225,6 +234,18 @@ namespace Cosmos.Hardware
         public static void Wait(int TimeoutMS)
         {
             WaitNS(TimeoutMS * 1000000);
+        }
+        public static void Wait(uint TimeoutMS)
+        {
+            WaitSignaled = false;
+
+            PITUtil.SoftwareTimer stwait = new PITUtil.SoftwareTimer(TimeoutMS, 1000000);
+            stwait.HandleTrigger = SignalWait;
+ 
+            while (!WaitSignaled)
+            {
+                CPU.Halt();
+            }
         }
         public static void WaitNS(int TimeoutNS)
         {
@@ -285,6 +306,12 @@ namespace Cosmos.Hardware
                     return;
                 }
             }
+        }
+
+        public static void Init()
+        {
+            T0RateGen = true;
+            T0Countdown = _T0Countdown;
         }
     }
 

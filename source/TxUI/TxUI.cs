@@ -2,6 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using Cosmos.Hardware;
+using Cosmos.Kernel;
 
 namespace Cosmos.Playground.Xenni.TxUI
 {
@@ -192,7 +193,7 @@ namespace Cosmos.Playground.Xenni.TxUI
                     default:
                         if (FocusTarget == null || !FocusTarget.OnKeyPress(c))
                         {
-                            Console.Beep();
+                            Console.Beep(2048, 500);
                         }
                         break;
             }
@@ -211,6 +212,8 @@ namespace Cosmos.Playground.Xenni.TxUI
                 {
                     OnUIFrame();
                 }
+
+                CPU.Halt();
 
                 while (Keyboard.GetChar(out c))
                 {
