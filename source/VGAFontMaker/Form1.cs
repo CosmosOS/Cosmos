@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Runtime.InteropServices;
 
 namespace VGAFontMaker
 {
@@ -317,6 +318,46 @@ namespace VGAFontMaker
             textBox1.Text = sb.ToString();
             Clipboard.SetText(sb.ToString());
 
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                Bitmap b = new Bitmap(openFileDialog1.FileName);
+                
+                StringBuilder s = new StringBuilder();
+
+                s.Append("int width = " + b.Width + ";\r\nint height = "+ b.Height + ";\r\n");
+
+                s.Append("byte[] pal = new byte[] {");
+
+                foreach (var c in b.Palette.Entries)
+                {
+                    s.Append(c.R + ","+c.G +"," + c.R +",");
+                }
+                s.Remove(s.Length - 1, 1);
+                s.Append("};\r\n");
+
+                s.Append("byte[] data= new byte[] {");
+
+                var l = b.LockBits(new Rectangle(0,0,b.Width,b.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format8bppIndexed);
+
+                byte[] bits = new byte[l.Stride * l.Height];
+                Marshal.Copy(l.Scan0, bits, 0, bits.Length);
+
+                for (int y = 0;y < b.Height; y++)
+                    for (int x = 0; x < b.Width; x++)
+                    {
+                        s.Append(bits[y * l.Stride + x] + ",");
+                    }
+
+                s.Remove(s.Length - 1, 1);
+                s.Append("};\r\n");
+
+                textBox1.Text = s.ToString();
+
+            }
         }
     }
 }

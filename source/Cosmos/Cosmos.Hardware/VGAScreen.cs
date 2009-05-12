@@ -39,10 +39,6 @@ namespace Cosmos.Hardware
         private const ushort VGA_NUM_REGS = (1 + VGA_NUM_SEQ_REGS + VGA_NUM_CRTC_REGS +
                         VGA_NUM_GC_REGS + VGA_NUM_AC_REGS);
 
-        private static void outportb(ushort port, byte value)
-        {
-            CPUBus.Write8(port, value);
-        }
         private static byte inportb(ushort port)
         {
             return CPUBus.Read8(port);
@@ -57,48 +53,48 @@ namespace Cosmos.Hardware
                 byte i;
 
                 /* write MISCELLANEOUS reg */
-                outportb(VGA_MISC_WRITE, *regs);
+                CPUBus.Write8(VGA_MISC_WRITE, *regs);
                 regs++;
                 /* write SEQUENCER regs */
                 for (i = 0; i < VGA_NUM_SEQ_REGS; i++)
                 {
-                    outportb(VGA_SEQ_INDEX, i);
-                    outportb(VGA_SEQ_DATA, *regs);
+                    CPUBus.Write8(VGA_SEQ_INDEX, i);
+                    CPUBus.Write8(VGA_SEQ_DATA, *regs);
                     regs++;
                 }
                 /* unlock CRTC registers */
-                outportb(VGA_CRTC_INDEX, 0x03);
-                outportb(VGA_CRTC_DATA, (byte)(inportb(VGA_CRTC_DATA) | 0x80));
-                outportb(VGA_CRTC_INDEX, 0x11);
-                outportb(VGA_CRTC_DATA, (byte)(inportb(VGA_CRTC_DATA) & 0x7f));
+                CPUBus.Write8(VGA_CRTC_INDEX, 0x03);
+                CPUBus.Write8(VGA_CRTC_DATA, (byte)(inportb(VGA_CRTC_DATA) | 0x80));
+                CPUBus.Write8(VGA_CRTC_INDEX, 0x11);
+                CPUBus.Write8(VGA_CRTC_DATA, (byte)(inportb(VGA_CRTC_DATA) & 0x7f));
                 /* make sure they remain unlocked */
                 regs[0x03] |= 0x80;
                 regs[0x11] &= 0x7f;
                 /* write CRTC regs */
                 for (i = 0; i < VGA_NUM_CRTC_REGS; i++)
                 {
-                    outportb(VGA_CRTC_INDEX, i);
-                    outportb(VGA_CRTC_DATA, *regs);
+                    CPUBus.Write8(VGA_CRTC_INDEX, i);
+                    CPUBus.Write8(VGA_CRTC_DATA, *regs);
                     regs++;
                 }
                 /* write GRAPHICS CONTROLLER regs */
                 for (i = 0; i < VGA_NUM_GC_REGS; i++)
                 {
-                    outportb(VGA_GC_INDEX, i);
-                    outportb(VGA_GC_DATA, *regs);
+                    CPUBus.Write8(VGA_GC_INDEX, i);
+                    CPUBus.Write8(VGA_GC_DATA, *regs);
                     regs++;
                 }
                 /* write ATTRIBUTE CONTROLLER regs */
                 for (i = 0; i < VGA_NUM_AC_REGS; i++)
                 {
                     inportb(VGA_INSTAT_READ);
-                    outportb(VGA_AC_INDEX, i);
-                    outportb(VGA_AC_WRITE, *regs);
+                    CPUBus.Write8(VGA_AC_INDEX, i);
+                    CPUBus.Write8(VGA_AC_WRITE, *regs);
                     regs++;
                 }
                 /* lock 16-color palette and unblank display */
                 inportb(VGA_INSTAT_READ);
-                outportb(VGA_AC_INDEX, 0x20);
+                CPUBus.Write8(VGA_AC_INDEX, 0x20);
             }
         }
         private static void set_plane(byte p)
@@ -108,11 +104,11 @@ namespace Cosmos.Hardware
             p &= 3;
             pmask = (byte)(1 << p);
             /* set read plane */
-            outportb(VGA_GC_INDEX, 4);
-            outportb(VGA_GC_DATA, p);
+            CPUBus.Write8(VGA_GC_INDEX, 4);
+            CPUBus.Write8(VGA_GC_DATA, p);
             /* set write plane */
-            outportb(VGA_SEQ_INDEX, 2);
-            outportb(VGA_SEQ_DATA, pmask);
+            CPUBus.Write8(VGA_SEQ_INDEX, 2);
+            CPUBus.Write8(VGA_SEQ_DATA, pmask);
         }
 
         int offset = 0xb8000;
@@ -120,7 +116,7 @@ namespace Cosmos.Hardware
         {
             int seg;
 
-            outportb(VGA_GC_INDEX, 6);
+            CPUBus.Write8(VGA_GC_INDEX, 6);
             seg = inportb(VGA_GC_DATA);
             seg >>= 2;
             seg &= 3;
@@ -146,27 +142,27 @@ namespace Cosmos.Hardware
 
             /* save registers
         set_plane() modifies GC 4 and SEQ 2, so save them as well */
-            outportb(VGA_SEQ_INDEX, 2);
+            CPUBus.Write8(VGA_SEQ_INDEX, 2);
             seq2 = inportb(VGA_SEQ_DATA);
 
-            outportb(VGA_SEQ_INDEX, 4);
+            CPUBus.Write8(VGA_SEQ_INDEX, 4);
             seq4 = inportb(VGA_SEQ_DATA);
             /* turn off even-odd addressing (set flat addressing)
             assume: chain-4 addressing already off */
-            outportb(VGA_SEQ_DATA, (byte)(seq4 | 0x04));
+            CPUBus.Write8(VGA_SEQ_DATA, (byte)(seq4 | 0x04));
 
-            outportb(VGA_GC_INDEX, 4);
+            CPUBus.Write8(VGA_GC_INDEX, 4);
             gc4 = inportb(VGA_GC_DATA);
 
-            outportb(VGA_GC_INDEX, 5);
+            CPUBus.Write8(VGA_GC_INDEX, 5);
             gc5 = inportb(VGA_GC_DATA);
             /* turn off even-odd addressing */
-            outportb(VGA_GC_DATA, (byte)(gc5 & ~0x10));
+            CPUBus.Write8(VGA_GC_DATA, (byte)(gc5 & ~0x10));
 
-            outportb(VGA_GC_INDEX, 6);
+            CPUBus.Write8(VGA_GC_INDEX, 6);
             gc6 = inportb(VGA_GC_DATA);
             /* turn off even-odd addressing */
-            outportb(VGA_GC_DATA, (byte)(gc6 & ~0x02));
+            CPUBus.Write8(VGA_GC_DATA, (byte)(gc6 & ~0x02));
             /* write font to plane P4 */
             set_plane(2);
             /* write font 0 */
@@ -177,16 +173,16 @@ namespace Cosmos.Hardware
 
 
             /* restore registers */
-            outportb(VGA_SEQ_INDEX, 2);
-            outportb(VGA_SEQ_DATA, seq2);
-            outportb(VGA_SEQ_INDEX, 4);
-            outportb(VGA_SEQ_DATA, seq4);
-            outportb(VGA_GC_INDEX, 4);
-            outportb(VGA_GC_DATA, gc4);
-            outportb(VGA_GC_INDEX, 5);
-            outportb(VGA_GC_DATA, gc5);
-            outportb(VGA_GC_INDEX, 6);
-            outportb(VGA_GC_DATA, gc6);
+            CPUBus.Write8(VGA_SEQ_INDEX, 2);
+            CPUBus.Write8(VGA_SEQ_DATA, seq2);
+            CPUBus.Write8(VGA_SEQ_INDEX, 4);
+            CPUBus.Write8(VGA_SEQ_DATA, seq4);
+            CPUBus.Write8(VGA_GC_INDEX, 4);
+            CPUBus.Write8(VGA_GC_DATA, gc4);
+            CPUBus.Write8(VGA_GC_INDEX, 5);
+            CPUBus.Write8(VGA_GC_DATA, gc5);
+            CPUBus.Write8(VGA_GC_INDEX, 6);
+            CPUBus.Write8(VGA_GC_DATA, gc6);
         }
 
         public static SetPixelDelegate SetPixel = new SetPixelDelegate(SetPixelNoMode);
@@ -276,7 +272,7 @@ namespace Cosmos.Hardware
                 *address = (byte)(((byte)((*address) & 0xf0)) | (byte)c);
             }
         }
-        private static unsafe void SetPixel320x200x8(uint x, uint y, uint c)
+        public static unsafe void SetPixel320x200x8(uint x, uint y, uint c)
         {
             *(byte*)(0xa0000 + y * 320 + x) = (byte)(c & 0xff);
         }
@@ -340,27 +336,45 @@ namespace Cosmos.Hardware
             }
         }
 
-        private static Color[] _Palette = new Color[255];
+        public static unsafe void Clear(int colour)
+        {
+            for (uint y = 0; y < PixelHeight; y++)
+            {
+                for (uint x = 0; x < PixelWidth; x++)
+                {
+                    *(byte*)(0xa0000 + y * 320 + x) = (byte)(colour) ;
+                }
+            }
+        }
+
+        private static Color[] _Palette = new Color[256];
         public static Color GetPaletteEntry(int index)
         {
             return _Palette[index];
         }
         public static void SetPaletteEntry(int index, Color color)
         {
-            _Palette[index] = color;
-            outportb(0x3C8, (byte)index);
-            outportb(0x3C9, color.R);
-            outportb(0x3C9, color.G);
-            outportb(0x3C9, color.B);
+            //_Palette[index] = color;
+            CPUBus.Write8(0x3C8, (byte)index);
+            CPUBus.Write8(0x3C9, color.R);
+            CPUBus.Write8(0x3C9, color.G);
+            CPUBus.Write8(0x3C9, color.B);
+        }
+
+        public static void SetPalette(int index, byte[] pallete)
+        {
+            CPUBus.Write8(0x3C8, (byte)index);
+            for (int i=0;i<pallete.Length; i++)
+                CPUBus.Write8(0x3C9, (byte)(pallete[i] >> 2));
         }
 
         public static void SetPaletteEntry(int index, byte r, byte g, byte b)
         {
-            _Palette[index] = Color.FromArgb(index, r, g, b);
-            outportb(0x3C8, (byte)index);
-            outportb(0x3C9, r);
-            outportb(0x3C9, g);
-            outportb(0x3C9, b);
+            //_Palette[index] = Color.FromArgb(index, r, g, b);
+            CPUBus.Write8(0x3C8, (byte)index);
+            CPUBus.Write8(0x3C9, r);
+            CPUBus.Write8(0x3C9, g);
+            CPUBus.Write8(0x3C9, b);
         }
 
 
@@ -1109,5 +1123,10 @@ namespace Cosmos.Hardware
 	0x01, 0x00, 0x0F, 0x00, 0x00
 };
         #endregion
+
+        public static unsafe MemoryAddressSpace GetAddressSpace()
+        {
+            return new MemoryAddressSpace(0xa0000, (uint)(PixelHeight * PixelWidth));
+        }
     }
 }
