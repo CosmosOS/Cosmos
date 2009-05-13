@@ -241,7 +241,7 @@ namespace Cosmos.Hardware
 
             PixelWidth = 320;
             PixelHeight = 200;
-            Colours = 256;
+            Colors = 256;
             SetPixel = new SetPixelDelegate(SetPixel320x200x8);
         }
         public static void SetMode640x480x4()
@@ -250,7 +250,7 @@ namespace Cosmos.Hardware
 
             PixelWidth = 640;
             PixelHeight = 480;
-            Colours = 16;
+            Colors = 16;
             SetPixel = new SetPixelDelegate(SetPixel640x480x4);
         }
 
@@ -290,7 +290,7 @@ namespace Cosmos.Hardware
             private set;
             get;
         }
-        public static int Colours
+        public static int Colors
         {
             private set;
             get;
@@ -300,7 +300,7 @@ namespace Cosmos.Hardware
         {
             SetMode320x200x8();
 
-            if (Colours == 256)
+            if (Colors == 256)
             {
                 for (byte i = 0; i < 64; i++)
                 {
@@ -313,9 +313,9 @@ namespace Cosmos.Hardware
             }
             else
             {
-                for (byte i = 0; i < Colours; i++)
+                for (byte i = 0; i < Colors; i++)
                 {
-                    byte ii = (byte)((int)i * 64 / Colours);
+                    byte ii = (byte)((int)i * 64 / Colors);
                     SetPaletteEntry(i, ii, ii, ii);
                 }
             }
