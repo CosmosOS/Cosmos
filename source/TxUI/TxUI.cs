@@ -21,6 +21,7 @@ namespace Cosmos.Playground.Xenni.TxUI
             public char Character;
             public ConsoleColor ForeColor;
             public ConsoleColor BackColor;
+            public bool Changed = true;
         }
 
         public bool OveridePresent = false;
@@ -81,8 +82,15 @@ namespace Cosmos.Playground.Xenni.TxUI
             {
                 for (int y = 0;y < Height;y++)
                 {
+                    if (!RenderTarget[x][y].Changed)
+                    {
+                        continue;
+                    }
+
                     TextScreen.SetColors(RenderTarget[x][y].ForeColor, RenderTarget[x][y].BackColor);
                     TextScreen.PutChar(y, x, RenderTarget[x][y].Character);
+
+                    RenderTarget[x][y].Changed = false;
                 }
             }
         }
@@ -140,6 +148,8 @@ namespace Cosmos.Playground.Xenni.TxUI
             FocusTarget = null;
         }
 
+        public bool EnableCursor = true;
+
         public void OnKeyStateChange(char c)
         {
                 if (Controls.Count == 0)
@@ -193,7 +203,7 @@ namespace Cosmos.Playground.Xenni.TxUI
                     default:
                         if (FocusTarget == null || !FocusTarget.OnKeyPress(c))
                         {
-                            Console.Beep(2048, 500);
+                            Console.Beep(2048, 250);
                         }
                         break;
             }
@@ -317,22 +327,49 @@ namespace Cosmos.Playground.Xenni.TxUI
             }
         }
 
-        public abstract void Draw();
-        public virtual void OnResize() { TxUIManager.Instance.DrawAll(); TxUIManager.Instance.Present(); }
-        public virtual void OnMove() { TxUIManager.Instance.DrawAll(); TxUIManager.Instance.Present(); }
-        public virtual void OnFocus() { TextScreen.CurrentRow = Y; TextScreen.CurrentChar = X; }
-        public virtual void OnDefocus() { TextScreen.CurrentRow = -1; TextScreen.CurrentChar = -1; }
-        public virtual bool OnKeyPress(char c) { return false; }
+        internal abstract void Draw();
+        internal virtual void OnResize()
+        {
+            TxUIManager.Instance.DrawAll();
+            TxUIManager.Instance.Present();
+        }
+        internal virtual void OnMove()
+        {
+            TxUIManager.Instance.DrawAll();
+            TxUIManager.Instance.Present();
+        }
+        internal virtual void OnFocus()
+        {
+            if (TxUIManager.Instance.EnableCursor)
+            {
+                TextScreen.CurrentRow = Y;
+                TextScreen.CurrentChar = X;
+            }
+            else
+            {
+                TextScreen.CurrentRow = -1;
+                TextScreen.CurrentChar = -1;
+            }
+        }
+        internal virtual void OnDefocus()
+        {
+            TextScreen.CurrentRow = -1;
+            TextScreen.CurrentChar = -1;
+        }
+        internal virtual bool OnKeyPress(char c)
+        {
+            return false;
+        }
 
-        public void SetPoint(int x, int y, TxUIManager.PointInfo info)
+        protected void SetPoint(int x, int y, TxUIManager.PointInfo info)
         {
             TxUIManager.Instance.SetPoint(x + X, y + Y, info);
         }
-        public void SetPoint(int x, int y, ConsoleColor fore, ConsoleColor back, char c)
+        protected void SetPoint(int x, int y, ConsoleColor fore, ConsoleColor back, char c)
         {
             TxUIManager.Instance.SetPoint(x + X, y + Y, fore, back, c);
         }
-        public TxUIManager.PointInfo GetPoint(int x, int y)
+        protected TxUIManager.PointInfo GetPoint(int x, int y)
         {
             return TxUIManager.Instance.GetPoint(x + X, y + Y);
         }
@@ -344,14 +381,23 @@ namespace Cosmos.Playground.Xenni.TxUI
         public ConsoleColor ForeColor = ConsoleColor.White;
         public ConsoleColor BackColor = ConsoleColor.Black;
 
-        public override void Draw()
+        internal override void Draw()
         {
             char[] cText = Text.ToCharArray();
 
-            for (int i = 0;i < Math.Min(cText.Length, Width);i++)
-                SetPoint(i, 0, ForeColor, BackColor, cText[i]);
+            for (int i = 0;i < Width;i++)
+            {
+                if (i < cText.Length)
+                {
+                    SetPoint(i, 0, ForeColor, BackColor, cText[i]);
+                }
+                else
+                {
+                    SetPoint(i, 0, ForeColor, BackColor, ' ');
+                }
+            }
         }
-        public override void OnResize()
+        internal override void OnResize()
         {
             if (Width < 1)
                 Width = 1;
@@ -379,28 +425,32 @@ namespace Cosmos.Playground.Xenni.TxUI
 
         private bool SupressColorEval = false;
 
-        public override void OnDefocus()
+        internal override void OnDefocus()
         {
             Draw();
             TxUIManager.Instance.Present();
 
             base.OnDefocus();
         }
-        public override void OnFocus()
+        internal override void OnFocus()
         {
             Draw();
             TxUIManager.Instance.Present();
 
+            TxUIManager.Instance.EnableCursor = false;
             base.OnFocus();
+            TxUIManager.Instance.EnableCursor = true;
         }
-        public override void OnResize()
+        internal override void OnResize()
         {
             if (Width < 1)
                 Width = 1;
-            if (Height != 1)
+            if (Height < 1)
                 Height = 1;
+
+            base.OnResize();
         }
-        public override bool OnKeyPress(char c)
+        internal override bool OnKeyPress(char c)
         {
             if (c == ' ')
             {
@@ -423,7 +473,7 @@ namespace Cosmos.Playground.Xenni.TxUI
 
             return base.OnKeyPress(c);
         }
-        public override void Draw()
+        internal override void Draw()
         {
             char[] cText = Text.ToCharArray();
 
@@ -441,8 +491,302 @@ namespace Cosmos.Playground.Xenni.TxUI
                 }
             }
 
-            for (int i = 0;i < Math.Min(cText.Length, Width);i++)
-                SetPoint(i, 0, _Fore, _Back, cText[i]);
+            int spaceabove = (Height / 2);
+            int spacebelow = Height - (1 + spaceabove);
+
+            for (int y = 0;y < spaceabove;y++)
+            {
+                for (int x = 0;x < Width;x++)
+                {
+                    SetPoint(x, y, _Fore, _Back, ' ');
+                }
+            }
+
+            for (int x = 0;x < Width;x++)
+            {
+                if (x < cText.Length)
+                {
+                    SetPoint(x, spaceabove, _Fore, _Back, cText[x]);
+                }
+                else
+                {
+                    SetPoint(x, spaceabove, _Fore, _Back, ' ');
+                }
+            }
+
+            for (int y = 0;y < spacebelow;y++)
+            {
+                for (int x = 0;x < Width;x++)
+                {
+                    SetPoint(x, y + spaceabove + 1, _Fore, _Back, ' ');
+                }
+            }
+        }
+    }
+
+    public class TxEditbox : TxCtrl
+    {
+        public ConsoleColor UForeColor = ConsoleColor.White;
+        public ConsoleColor UBackColor = ConsoleColor.Gray;
+        public ConsoleColor FForeColor = ConsoleColor.White;
+        public ConsoleColor FBackColor = ConsoleColor.Black;
+
+        internal override void OnDefocus()
+        {
+            Draw();
+            TxUIManager.Instance.Present();
+
+            base.OnDefocus();
+        }
+        internal override void OnFocus()
+        {
+            _CursorPosX = 0;
+            _CursorPosY = 0;
+
+            Draw();
+            TxUIManager.Instance.Present();
+
+            base.OnFocus();
+        }
+        internal override void OnResize()
+        {
+            if (Width < 1)
+                Width = 1;
+            if (Height < 1)
+                Height = 1;
+
+            if (Lines.Length != Height)
+            {
+                String[] newlines = new String[Height];
+
+                for (int i = 0;i < Lines.Length;i++)
+                {
+                    newlines[i] = Lines[i];
+                }
+                for (int i = Lines.Length;i < Height;i++)
+                {
+                    newlines[i] = "";
+                }
+
+                Lines = newlines;
+            }
+
+            for (int i = 0;i < Lines.Length;i++)
+            {
+                if (Lines[i].Length > Width)
+                {
+                    Lines[i] = Lines[i].Substring(0, Width);
+                }
+            }
+
+            if (this.HasFocus)
+            {
+                CursorPosX = 0;
+                CursorPosY = 0;
+            }
+
+            base.OnResize();
+        }
+        internal override bool OnKeyPress(char c)
+        {
+            switch (c)
+            {
+                case 'q':
+                    if (!Keyboard.AltPressed)
+                    {
+                        goto default;
+                    }
+                    CursorPosX--;
+                    break;
+                case 'e':
+                    if (!Keyboard.AltPressed)
+                    {
+                        goto default;
+                    }
+                    CursorPosX++;
+                    break;
+                case 'd':
+                    if (!Keyboard.AltPressed)
+                    {
+                        goto default;
+                    }
+                    if (_CursorPosX == 0)
+                    {
+                        Console.Beep(2048, 250);
+                        break;
+                    }
+                    Lines[_CursorPosY] = Lines[_CursorPosY].Substring(0, _CursorPosX - 1) + Lines[_CursorPosY].Substring(_CursorPosX, Lines[_CursorPosY].Length - _CursorPosX);
+                    CursorPosX--;
+
+                    if (OnTextChanged != null)
+                        OnTextChanged();
+
+                    Draw();
+                    TxUIManager.Instance.Present();
+
+                    break;
+                case 'w':
+                    if (!Keyboard.AltPressed)
+                    {
+                        goto default;
+                    }
+                    if (_CursorPosY == 0)
+                    {
+                        Console.Beep(2048, 250);
+                        break;
+                    }
+
+                    CursorPosY--;
+
+                    if (_CursorPosX > Lines[_CursorPosY].Length)
+                    {
+                        CursorPosX = Lines[_CursorPosY].Length;
+                    }
+                    break;
+                case 's':
+                    if (!Keyboard.AltPressed)
+                    {
+                        goto default;
+                    }
+                    if (_CursorPosY == (Height - 1))
+                    {
+                        Console.Beep(2048, 250);
+                        break;
+                    }
+
+                    CursorPosY++;
+
+                    if (_CursorPosX > Lines[_CursorPosY].Length)
+                    {
+                        CursorPosX = Lines[_CursorPosY].Length;
+                    }
+                    break;
+                default:
+                    if (_CursorPosX == Width || Lines[_CursorPosY].Length == Width)
+                    {
+                        Console.Beep(2048, 250);
+                        break;
+                    }
+                    Lines[_CursorPosY] = Lines[_CursorPosY].Substring(0, _CursorPosX) + c.ToString() + Lines[_CursorPosY].Substring(_CursorPosX, Lines[_CursorPosY].Length - _CursorPosX);
+                    CursorPosX++;
+
+                    if (OnTextChanged != null)
+                        OnTextChanged();
+
+                    Draw();
+                    TxUIManager.Instance.Present();
+
+                    break;
+            }
+
+            base.OnKeyPress(c);
+            return true;
+        }
+
+        private int _CursorPosX = 0;
+        private int _CursorPosY = 0;
+        public int CursorPosX
+        {
+            get
+            {
+                return _CursorPosX;
+            }
+            set
+            {
+                if (value < 0)
+                {
+                    value = 0;
+                    Console.Beep(2048, 250);
+                }
+                if (value > Width)
+                {
+                    value = Width;
+                    Console.Beep(2048, 250);
+                }
+                if (value > Lines[_CursorPosY].Length)
+                {
+                    value = Lines[_CursorPosY].Length;
+                    Console.Beep(2048, 250);
+                }
+
+                _CursorPosX = value;
+                TextScreen.CurrentChar = (X + _CursorPosX);
+            }
+        }
+        public int CursorPosY
+        {
+            get
+            {
+                return _CursorPosY;
+            }
+            set
+            {
+                if (value < 0)
+                {
+                    value = 0;
+                    Console.Beep(2048, 250);
+                }
+                if (value >= Height)
+                {
+                    value = (Height - 1);
+                    Console.Beep(2048, 250);
+                }
+
+                _CursorPosY = value;
+                TextScreen.CurrentRow = (Y + _CursorPosY);
+            }
+        }
+
+        public delegate void dOnTextChanged();
+        public dOnTextChanged OnTextChanged = null;
+
+        private String[] Lines = new String[0];
+
+        internal override void Draw()
+        {
+            ConsoleColor ForeColor = (HasFocus ? FForeColor : UForeColor);
+            ConsoleColor BackColor = (HasFocus ? FBackColor : UBackColor);
+
+            for (int y = 0;y < Height;y++)
+            {
+                char[] cText = Lines[y].ToCharArray();
+                for (int x = 0;x < Width;x++)
+                {
+                    if (x < cText.Length)
+                    {
+                        SetPoint(x, y, ForeColor, BackColor, cText[x]);
+                    }
+                    else
+                    {
+                        SetPoint(x, y, ForeColor, BackColor, ' ');
+                    }
+                }
+            }
+        }
+
+        public String this[int indx]
+        {
+            get
+            {
+                return Lines[indx];
+            }
+            set
+            {
+                Lines[indx] = value;
+            }
+        }
+        public String Text
+        {
+            get
+            {
+                String txt = "";
+                for (int i = 0;i < Lines.Length;i++)
+                {
+                    txt = txt + Lines[i] + "\n";
+                }
+
+                return txt.Trim('\n');
+            }
         }
     }
 }
