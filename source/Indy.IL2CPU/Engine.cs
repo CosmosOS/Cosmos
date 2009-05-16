@@ -22,7 +22,7 @@ namespace Indy.IL2CPU
 {
     public enum DebugMode { None, IL, Source, MLUsingGDB }
 
-    public class MethodBaseComparer : IComparer<MethodBase>
+    public class MethodBaseComparer : IComparer<MethodBase>, IEqualityComparer<MethodBase>
 
     {
         #region IComparer<MethodBase> Members
@@ -35,6 +35,16 @@ namespace Indy.IL2CPU
         }
 
         #endregion
+
+        public bool Equals(MethodBase x, MethodBase y)
+        {
+            return Compare(x, y) == 0;
+        }
+
+        public int GetHashCode(MethodBase obj)
+        {
+            return obj.GetFullName().GetHashCode();
+        }
     }
 
 
@@ -141,6 +151,7 @@ namespace Indy.IL2CPU
         /// Contains a list of all methods. This includes methods to be processed and already processed.
         /// </summary>
         protected IDictionary<MethodBase, QueuedMethodInformation> mMethods = new SortedList<MethodBase, QueuedMethodInformation>(new MethodBaseComparer());
+        //protected IDictionary<MethodBase, QueuedMethodInformation> mMethods = new SortedList<MethodBase, QueuedMethodInformation>(new MethodBaseComparer());
         protected ReaderWriterLocker mMethodsLocker = new ReaderWriterLocker();
 
         /// <summary>

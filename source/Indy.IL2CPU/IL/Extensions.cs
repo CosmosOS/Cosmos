@@ -1,4 +1,4 @@
-﻿//#define old
+﻿#define old
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -10,8 +10,8 @@ namespace System
     public static class Extensions
     {
 #if !old
-        private static readonly Dictionary<RuntimeMethodHandle, string> mMethod_FullNameCache =
-            new Dictionary<RuntimeMethodHandle, string>();
+        private static readonly Dictionary<IntPtr, string> mMethod_FullNameCache =
+            new Dictionary<IntPtr, string>();
 
         private static readonly ReaderWriterLockSlim mMethod_FullNameCache_Locker = new ReaderWriterLockSlim();
 
@@ -20,9 +20,18 @@ namespace System
             mMethod_FullNameCache_Locker.EnterReadLock();
             try
             {
-                if (mMethod_FullNameCache.ContainsKey(aMethod.MethodHandle))
+                if (mMethod_FullNameCache.ContainsKey(aMethod.MethodHandle.Value))
                 {
-                    return mMethod_FullNameCache[aMethod.MethodHandle];
+                    var xResult = mMethod_FullNameCache[aMethod.MethodHandle.Value];
+                    if (aMethod.GetHashCode() == 2031104736)
+                    {
+                        ;
+                    }
+                    if(!xResult.Equals(GenerateFullName(aMethod)))
+                    {
+                        throw new Exception("");
+                    }
+                    return mMethod_FullNameCache[aMethod.MethodHandle.Value];
                 }
             }
             finally
@@ -32,12 +41,17 @@ namespace System
             mMethod_FullNameCache_Locker.EnterWriteLock();
             try
             {
-                if (mMethod_FullNameCache.ContainsKey(aMethod.MethodHandle))
+                if (mMethod_FullNameCache.ContainsKey(aMethod.MethodHandle.Value))
                 {
-                    return mMethod_FullNameCache[aMethod.MethodHandle];
+                    var xResult = mMethod_FullNameCache[aMethod.MethodHandle.Value];
+                    if (!xResult.Equals(GenerateFullName(aMethod)))
+                    {
+                        throw new Exception("");
+                    }
+                    return mMethod_FullNameCache[aMethod.MethodHandle.Value];
                 }
                 var xName = GenerateFullName(aMethod);
-                mMethod_FullNameCache.Add(aMethod.MethodHandle, xName);
+                mMethod_FullNameCache.Add(aMethod.MethodHandle.Value, xName);
                 return xName;
             }
             finally

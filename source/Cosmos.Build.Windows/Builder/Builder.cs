@@ -415,9 +415,7 @@ namespace Cosmos.Compiler.Builder
                                1,
                                xParam.aOutputDir,
                                (Cosmos.Compiler.Builder.BuildOptions.Load()).UseInternalAssembler); //HACK
-
                 LogTime("Engine execute finish");
-
             }
             catch (Exception E)
             {
