@@ -92,24 +92,32 @@ namespace Cosmos.Compiler.Builder
 
         void mBuilder_BuildCompleted()
         {
+            mainWindow.Dispatcher.Invoke(new Action(PostBuildUI)); 
+           
+
+            mainWindow.ThreadedClose();  //HACK //TODO consider making the controller survive the window. 
+        }
+
+
+        void PostBuildUI()
+        {
+
             new ConsoleWindow().HideWindow();
 
             //HACK need to fire Debugger window in event 
 
             // Problems around with DebugWindow getting stuck, this seems to work
             //mMainWindow.Hide();
-            if (mBuilder.DebugWindow!= null)
+            if (mBuilder.DebugWindow != null)
             {
                 // Beginnings of experiment to host QEMU
                 //if (xQEMU != null) {
                 //    IntPtr xDbgHandle = new WindowInteropHelper(Application.Current.MainWindow).Handle;
                 //    SetParent(xQEMU.MainWindowHandle, xDbgHandle);
                 //}
-                mBuilder.DebugWindow.ShowDialog();
+                mBuilder.DebugWindow.Show();
             }
             //mMainWindow.Close();
-
-            mainWindow.ThreadedClose();  //HACK //TODO consider making the controller survive the window. 
         }
 
 

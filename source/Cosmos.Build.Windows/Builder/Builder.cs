@@ -29,8 +29,8 @@ namespace Cosmos.Compiler.Builder
         public event Action<BuildProgress> BuildProgress;
         public event Action<LogSeverityEnum, string> LogMessage;
 
-        private DebugWindow xDebugWindow = null; //HACK pass in event
-        public DebugWindow DebugWindow { get { return xDebugWindow; } }
+        private DebugWindowController xDebugWindow = null; //HACK pass in event
+        public DebugWindowController DebugWindow { get { return xDebugWindow; } }
 
 
         private readonly BuildProgress currentProgress = new BuildProgress();
@@ -305,7 +305,7 @@ namespace Cosmos.Compiler.Builder
         }
 
 
-        private void ProcessDebug(BuildOptions options, ref DebugWindow xDebugWindow, ref Process xQEMU)
+        private void ProcessDebug(BuildOptions options, ref DebugWindowController xDebugWindow, ref Process xQEMU)
         {
 
             if (options.DebugMode == DebugMode.Source)
@@ -377,9 +377,10 @@ namespace Cosmos.Compiler.Builder
 
                 }
 
-                //HACK MUST BE UI
-                //xDebugWindow = new DebugWindow();
-                //xDebugWindow.SetSourceInfoMap(xSourceMappings, xDebugConnector);
+                //TODO handle passing to UI better
+                xDebugWindow = new DebugWindowController();
+                xDebugWindow.mSourceMappings = xSourceMappings; 
+                xDebugWindow.mDebugConnector = xDebugConnector;
             }
             else
             {

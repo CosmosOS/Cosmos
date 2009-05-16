@@ -155,6 +155,7 @@
       <DependentUpon>DebugWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="UI\DebugWindowController.cs" />
     <Compile Include="UI\IBuildProgressUC.cs">
       <SubType>Code</SubType>
     </Compile>

@@ -19,7 +19,7 @@ namespace Cosmos.Compiler.Builder
 
         string BuildPath {get;}
 
-        DebugWindow DebugWindow {get;}   //HACK pass in event
+        DebugWindowController DebugWindow { get; }   //HACK pass in event
 
 
         //string[] GetPlugs();
