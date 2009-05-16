@@ -50,10 +50,10 @@ namespace Cosmos.TestRunner
                     {
                         var xBuilder = new Builder()
                         {
-                            BuildPath = Options.BuildPath,
-                            UseInternalAssembler = false
+                            //BuildPath = xBuilder.B,
+                            //UseInternalAssembler = false
                         };
-                        Console.WriteLine("BuildPath = '{0}'", Options.BuildPath);
+                        Console.WriteLine("BuildPath = '{0}'", xBuilder.BuildPath);
                         xBuilder.TargetAssembly = xItem.Key.Assembly;
                         var xEvent = new AutoResetEvent(false);
                         xBuilder.CompileCompleted += delegate { xEvent.Set(); };
@@ -61,18 +61,28 @@ namespace Cosmos.TestRunner
                         {
                             Console.WriteLine("Log: {0} - {1}", aSeverity, aMessage);
                         };
+
+                        //var options = Cosmos.Compiler.Builder.BuildOptions.Load();
+
+                        //options.DebugMode = DebugMode.None;
+                        //options.DebugPortId = 0;
+                        //options.UseGDB = false; 
+
                         xBuilder.BeginCompile(DebugMode.None, 0, false);
+
+                        //  xBuilder.BeginCompile(options);
                         xEvent.WaitOne();
-                        if (NeedsToRunKernel)
-                        {
-                            xBuilder.Assemble();
-                            xBuilder.Link();
-                            xBuilder.MakeISO();
-                            var xISOFile = Path.Combine(xBuilder.BuildPath, "Cosmos.iso");
-                            // run qemu
-                            xReturn = RunKernel(xItem.Key, xBuilder, xItem.Value, out xMessage);
-                        }
-                        else
+                        //if (NeedsToRunKernel)  //HACK! always false hardcode
+                        //{
+                        //   
+                        //    xBuilder.Assemble();
+                        //    xBuilder.Link();
+                        //    xBuilder.MakeISO();
+                        //    var xISOFile = Path.Combine(xBuilder.BuildPath, "Cosmos.iso");
+                        //    // run qemu
+                        //    xReturn = RunKernel(xItem.Key, xBuilder, xItem.Value, out xMessage);
+                        //}
+                        //else
                         {
                             xReturn = true;
                             xMessage = "";
@@ -302,7 +312,7 @@ namespace Cosmos.TestRunner
                     Tries++;
                     Thread.Sleep(10000);
                 }
-              // It tries to connect until it is connected or 50 seconds have passed from the first try.
+                // It tries to connect until it is connected or 50 seconds have passed from the first try.
             } while ((!xClientSocket.Connected) && (Tries < 5));
 
             // If it is connected...
