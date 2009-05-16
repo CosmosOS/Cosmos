@@ -23,6 +23,7 @@ namespace Indy.IL2CPU
     public enum DebugMode { None, IL, Source, MLUsingGDB }
 
     public class MethodBaseComparer : IComparer<MethodBase>
+
     {
         #region IComparer<MethodBase> Members
 
@@ -133,8 +134,8 @@ namespace Indy.IL2CPU
         protected Assembler.Assembler mAssembler;
         public TraceAssemblies TraceAssemblies { get; set; }
 
-        private SortedList<string, MethodBase> mPlugMethods;
-        private SortedList<Type, Dictionary<string, PlugFieldAttribute>> mPlugFields;
+        private IDictionary<string, MethodBase> mPlugMethods;
+        private IDictionary<Type, Dictionary<string, PlugFieldAttribute>> mPlugFields;
 
         /// <summary>
         /// Contains a list of all methods. This includes methods to be processed and already processed.

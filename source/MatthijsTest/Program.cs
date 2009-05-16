@@ -36,7 +36,7 @@ namespace MatthijsTest {
                 xBoot.Execute();
             }
             Console.WriteLine("Hello, World!");
-            Cosmos.Sys.Deboot.ShutDown();
+            //Cosmos.Sys.Deboot.ShutDown();
             
         }
 
