@@ -14,7 +14,11 @@
         <StackPanel Margin="0,0,0,71" Grid.ColumnSpan="2">
             <Label Content="Scanning methods:"/>
             <!--<ProgressBar x:Name="progMethodsScanned" Height="15" Margin="15,0" Maximum="100" Value="50" />-->
-            <TextBlock x:Name="progMethodsScanned" Text="0" Margin="15,0"></TextBlock>
+            <Border Height="20" Width="70" HorizontalAlignment="Left" Margin="15,0" VerticalAlignment="Stretch" BorderBrush="Black" BorderThickness="1,1,1,1" Background="#00E82A2A">
+                <TextBlock x:Name="progMethodsScanned" Text="0" TextAlignment="Center"   Width="74"></TextBlock>
+            </Border>
+            
+          
             <Label Content="Processing methods:"/>
             <ProgressBar x:Name="progMethodsProcessed" Height="15" Margin="15,0"/>
             <Label Content="Processing static fields:"/>
