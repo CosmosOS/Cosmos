@@ -1,0 +1,28 @@
+﻿<Window x:Class="Cosmos.Compiler.Builder.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:build="clr-namespace:Cosmos.Compiler.Builder"
+        Title="Cosmos Builder" WindowStartupLocation="CenterScreen"    
+        MinHeight="500" MaxHeight="{x:Static SystemParameters.MaximizedPrimaryScreenHeight}" SizeToContent="WidthAndHeight"
+        Icon="/Cosmos.Compiler.Builder;component/Cosmos.ico">
+    <StackPanel Orientation="Vertical" Name="dockPanel" >
+
+        <StackPanel Orientation="Horizontal" >
+            <StackPanel Orientation="Vertical" >
+                <build:OptionsUC x:Name="optionsUC" MaxHeight="600" ></build:OptionsUC>
+              
+            </StackPanel>
+
+            <build:BuildUC  x:Name="buildUC" Visibility="Collapsed"></build:BuildUC>
+
+        </StackPanel>
+        <StackPanel Grid.Row="1" Margin="15, 15, 15, 10" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom">
+            <Button Name="butnBuild" Margin="5" IsDefault="True">_Build</Button>
+            <Button Name="butnCancel" Margin="5" IsCancel="True">_Cancel</Button>
+
+        </StackPanel>
+        <Expander Header="Log"   Name="logExpander"  ExpandDirection="Down">
+            <ListBox x:Name="listInformation" Height="Auto"  MinHeight="200"/>
+        </Expander>
+    </StackPanel>
+</Window>

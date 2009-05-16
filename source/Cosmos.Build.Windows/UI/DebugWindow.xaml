@@ -1,0 +1,72 @@
+﻿<Window x:Class="Cosmos.Compiler.Builder.DebugWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Windows="clr-namespace:Cosmos.Compiler.Builder"
+    xmlns:local="clr-namespace:Cosmos.Compiler.Builder" 
+        Title="Cosmos Debugger" Height="351" Width="551" Icon="/Cosmos.Compiler.Builder;component/Cosmos.ico"
+    WindowState="Maximized">
+    <Window.Resources>
+        <RoutedCommand x:Key="StepCommand" />
+        <RoutedCommand x:Key="TestCommand" />
+        <RoutedCommand x:Key="TraceCommand" />
+        <RoutedCommand x:Key="BreakCommand" />
+        <RoutedCommand x:Key="ClearCommand" />
+    </Window.Resources>
+    <Window.InputBindings>
+        <KeyBinding Command="{StaticResource StepCommand}" Key="F11"/>
+        <KeyBinding Command="{StaticResource TraceCommand}" Modifiers="Control" Key="T"/>
+        <KeyBinding Command="{StaticResource BreakCommand}" Key="F5"/>
+        <KeyBinding Command="{StaticResource ClearCommand}" Modifiers="Control" Key="L"/>
+    </Window.InputBindings>
+    <Window.CommandBindings>
+        <CommandBinding Command="{StaticResource StepCommand}" Executed="ExecuteStepCommand" CanExecute="StepCanExecute"/>
+        <CommandBinding Command="{StaticResource TestCommand}" Executed="ExecuteTestCommand"/>
+        <CommandBinding Command="{StaticResource TraceCommand}" Executed="ExecuteTraceCommand" CanExecute="TraceCanExecute"/>
+        <CommandBinding Command="{StaticResource BreakCommand}" Executed="ExecuteBreakCommand" CanExecute="BreakCanExecute"/>
+        <CommandBinding Command="{StaticResource ClearCommand}" Executed="ExecuteClearCommand" CanExecute="ClearCanExecute"/>
+    </Window.CommandBindings>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="5" />
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <DockPanel Grid.Row="0" Grid.Column="0">
+            <ToolBarTray Background="White" DockPanel.Dock="Top">
+                <ToolBar Band="1" BandIndex="1">
+                    <Button Name="butnLogClear" ToolTip="Ctrl-L" Command="{StaticResource ClearCommand}">Clear</Button>
+                    <Separator/>
+                </ToolBar>
+            </ToolBarTray>
+            <ListBox x:Name="listLog">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Margin="0,5">
+                            <WrapPanel>
+                                <TextBlock Margin="0,3,0,0" Text="{Binding Path=EIP, StringFormat=X8}" FontFamily="Courier"/>
+                                <TextBlock Margin="5,0,0,0" Text="{Binding Path=Type}"/>
+                            </WrapPanel>
+                            <TextBlock Margin="10,0,0,0" TextWrapping="Wrap" Text="{Binding Path=SourceFile}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </DockPanel>
+        <GridSplitter Grid.Row="0" Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
+        <DockPanel Grid.Row="0" Grid.Column="2">
+            <ToolBarTray Background="White" DockPanel.Dock="Top">
+                <ToolBar Band="1" BandIndex="1">
+                    <Button Name="butnBreak" ToolTip="F5" Command="{StaticResource BreakCommand}">Break</Button>
+                    <Separator/>
+                    <Button Name="butnStep" ToolTip="F11" Command="{StaticResource StepCommand}">Step</Button>
+                    <Separator/>
+                    <Button Name="butnTrace" ToolTip="Ctrl-T" Command="{StaticResource TraceCommand}">Trace</Button>
+                    <Separator/>
+                    <Button Visibility="Hidden" Name="butnTest" Command="{StaticResource TestCommand}">Test</Button>
+                </ToolBar>
+            </ToolBarTray>
+            <Label Name="lablSourceFilename" DockPanel.Dock="Top">Source File Name</Label>
+            <FlowDocumentScrollViewer Name="fdsvSource" />
+        </DockPanel>
+    </Grid>
+</Window>

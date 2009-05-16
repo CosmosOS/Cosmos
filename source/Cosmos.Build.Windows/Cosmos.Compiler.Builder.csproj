@@ -14,10 +14,14 @@
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
-    <SccProjectName>SAK</SccProjectName>
-    <SccLocalPath>SAK</SccLocalPath>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccProvider>SAK</SccProvider>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>Cosmos.snk</AssemblyOriginatorKeyFile>
     <ApplicationIcon>Cosmos.ico</ApplicationIcon>
@@ -77,27 +81,47 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="BuildUC.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="MainWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="OptionsUC.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="DebugWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Builder.cs" />
-    <Compile Include="BuildUC.xaml.cs">
-      <DependentUpon>BuildUC.xaml</DependentUpon>
+    <Compile Include="Builder\AssembleStep.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Builder\Builder.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Builder\BuilderStep.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Builder\BuildFileUtils.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Builder\BuildOptions.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Builder\IBuilder.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Builder\LinkStep.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Builder\MakeISOStep.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Builder\MakePXEStep.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Builder\MakeQEMUStep.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Builder\MakeUSBStep.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Builder\MakeVHDStep.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Builder\MakeVMWareStep.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Builder\MakeVPCStep.cs">
+      <SubType>Code</SubType>
     </Compile>
     <Compile Include="DebugConnectorPipeClient.cs" />
     <Compile Include="DebugConnectorTCPClient.cs" />
@@ -107,18 +131,8 @@
     <Compile Include="DebugConnectorStream.cs" />
     <Compile Include="DebugConnectorTCPServer.cs" />
     <Compile Include="KeyState.cs" />
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="ObjDump.cs" />
-    <Compile Include="Options.cs" />
-    <Compile Include="OptionsUC.xaml.cs">
-      <DependentUpon>OptionsUC.xaml</DependentUpon>
-    </Compile>
     <Compile Include="BuildUI.cs" />
-    <Compile Include="DebugWindow.xaml.cs">
-      <DependentUpon>DebugWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Global.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
@@ -134,6 +148,37 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="SourceInfo.cs" />
+    <Compile Include="UI\BuildUC.xaml.cs">
+      <DependentUpon>BuildUC.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UI\ConsoleWIndow.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UI\DebugWindow.xaml.cs">
+      <DependentUpon>DebugWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UI\IBuildProgressUC.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UI\IMainWindow.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UI\IOptionsUC.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UI\MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UI\MainWindowController.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UI\OptionsUC.xaml.cs">
+      <DependentUpon>OptionsUC.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -165,6 +210,24 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Logo-1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="UI\BuildUC.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\DebugWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\MainWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\OptionsUC.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

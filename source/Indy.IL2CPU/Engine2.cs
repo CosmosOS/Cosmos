@@ -20,114 +20,11 @@ using System.Diagnostics;
 
 namespace Indy.IL2CPU
 {
-    public enum DebugMode { None, IL, Source, MLUsingGDB }
 
-    public class MethodBaseComparer : IComparer<MethodBase>
+
+    public class Engine2
     {
-        #region IComparer<MethodBase> Members
 
-        public int Compare(MethodBase x,
-                           MethodBase y)
-        {
-            return x.GetFullName().CompareTo(y.GetFullName());
-            //return x.Name.CompareTo(y.Name);
-        }
-
-        #endregion
-    }
-
-
-    public class StringMethodBaseComparer : IComparer<string>
-    {
-        #region IComparer<MethodBase> Members
-
-        public int Compare(string x,
-                           string y)
-        {
-            return x.CompareTo(y);
-            //return x.Name.CompareTo(y.Name);
-        }
-
-        #endregion
-    }
-
-    public class FieldInfoComparer : IComparer<FieldInfo>
-    {
-        #region IComparer<FieldInfo> Members
-
-        public int Compare(FieldInfo x,
-                           FieldInfo y)
-        {
-            return x.GetFullName().CompareTo(y.GetFullName());
-        }
-
-        #endregion
-    }
-
-    public class TypeComparer : IComparer<Type>
-    {
-        public int Compare(Type x,
-                           Type y)
-        {
-            return x.AssemblyQualifiedName.CompareTo(y.AssemblyQualifiedName);
-        }
-    }
-
-    public class TypeEqualityComparer : IEqualityComparer<Type>
-    {
-        public bool Equals(Type x,
-                           Type y)
-        {
-            return x.FullName.Equals(y.FullName);
-        }
-
-        public int GetHashCode(Type obj)
-        {
-            return obj.FullName.GetHashCode();
-        }
-    }
-
-    public class AssemblyEqualityComparer : IEqualityComparer<Assembly>
-    {
-        public bool Equals(Assembly x,
-                           Assembly y)
-        {
-            return x.GetName().FullName.Equals(y.GetName().FullName);
-        }
-
-        public int GetHashCode(Assembly obj)
-        {
-            return obj.GetName().FullName.GetHashCode();
-        }
-    }
-
-    public enum LogSeverityEnum : byte { Warning = 0, Error = 1, Informational = 2, Performance = 3 }
-
-    public delegate void DebugLogHandler(LogSeverityEnum aSeverity, string aMessage);
-
-    public enum TargetPlatformEnum { X86 }
-
-    public enum TraceAssemblies { All, Cosmos, User };
-
-    public class QueuedMethodInformation
-    {
-        public bool Processed;
-        public bool PreProcessed;
-        public int Index;
-        public MLDebugSymbol[] Instructions;
-        public readonly SortedList<string, object> Info = new SortedList<string, object>(StringComparer.InvariantCultureIgnoreCase);
-        public MethodBase Implementation;
-        public string FullName; 
-    }
-
-    public class QueuedStaticFieldInformation
-    {
-        public bool Processed;
-    }
-
-    public class Engine
-    {
-        protected static Engine mCurrent;
            protected DebugLogHandler mDebugLog;
         protected OpCodeMap mMap;
         protected Assembler.Assembler mAssembler;
@@ -190,7 +87,7 @@ namespace Indy.IL2CPU
             Assembly mCrawledAssembly;
 
 
-            mCurrent = this;
+
             try
             {
                 if (aGetFileNameForGroup == null)
@@ -436,7 +333,7 @@ namespace Indy.IL2CPU
             }
             finally
             {
-                mCurrent = null;
+               
             }
         }
 
@@ -797,7 +694,7 @@ namespace Indy.IL2CPU
 						var xTypeFields = new List<DebugSymbolsAssemblyTypeField>();
 						var xTypeInfo = GetTypeInfo(xType);
 						xDbgType.StorageSize = GetFieldStorageSize(xType);
-						foreach (var xField in xType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static)) {
+						foreach (var xField in xType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.buildPath)) {
 							var xDbgField = new DebugSymbolsAssemblyTypeField();
 							xDbgField.Name = xField.Name;
 							xDbgField.IsStatic = xField.IsStatic;
@@ -824,7 +721,7 @@ namespace Indy.IL2CPU
 						}
 						xDbgType.Field = xTypeFields.ToArray();
 						var xTypeMethods = new List<DebugSymbolsAssemblyTypeMethod>();
-						foreach (var xMethod in xType.GetMethods(BindingFlags.ExactBinding | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance).Cast<MethodBase>().Union(xType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance))) {
+						foreach (var xMethod in xType.GetMethods(BindingFlags.ExactBinding | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.buildPath | BindingFlags.Instance).Cast<MethodBase>().Union(xType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.buildPath | BindingFlags.Instance))) {
 							var xIdxMethods = mMethods.IndexOfKey(xMethod);
 							if (xIdxMethods == -1) {
 								continue;
@@ -1147,7 +1044,7 @@ namespace Indy.IL2CPU
             }
         }
 
-        private static MethodBase GetUltimateBaseMethod(MethodBase aMethod,
+        private MethodBase GetUltimateBaseMethod(MethodBase aMethod,
                                                         Type[] aMethodParams,
                                                         Type aCurrentInspectedType)
         {
@@ -1217,7 +1114,7 @@ namespace Indy.IL2CPU
         }
 
         //todo: remove?
-        public static MethodBase GetDefinitionFromMethodBase2(MethodBase aRef)
+        public MethodBase GetDefinitionFromMethodBase2(MethodBase aRef)
         {
             Type xTypeDef;
             bool xIsArray = false;
@@ -1317,7 +1214,7 @@ namespace Indy.IL2CPU
         /// <remarks>For classes, this is the pointer size.</remarks>
         /// <param name="aType"></param>
         /// <returns></returns>
-        public static uint GetFieldStorageSize(Type aType)
+        public uint GetFieldStorageSize(Type aType)
         {
             if (aType.FullName == "System.Void")
             {
@@ -1391,7 +1288,7 @@ namespace Indy.IL2CPU
             return xResult;
         }
 
-        private static string GetGroupForType(Type aType)
+        private string GetGroupForType(Type aType)
         {
             return aType.Module.Assembly.GetName().Name;
         }
@@ -2292,7 +2189,7 @@ namespace Indy.IL2CPU
             return null;
         }
 
-        public static TypeInformation GetTypeInfo(Type aType)
+        public TypeInformation GetTypeInfo(Type aType)
         {
             TypeInformation xTypeInfo;
             uint xObjectStorageSize;
@@ -2305,7 +2202,7 @@ namespace Indy.IL2CPU
             return xTypeInfo;
         }
 
-        public static MethodInformation GetMethodInfo(MethodBase aCurrentMethodForArguments,
+        public MethodInformation GetMethodInfo(MethodBase aCurrentMethodForArguments,
                                                       MethodBase aCurrentMethodForLocals,
                                                       string aMethodName,
                                                       TypeInformation aTypeInfo,
@@ -2319,7 +2216,7 @@ namespace Indy.IL2CPU
                                  null);
         }
 
-        public static MethodInformation GetMethodInfo(MethodBase aCurrentMethodForArguments,
+        public MethodInformation GetMethodInfo(MethodBase aCurrentMethodForArguments,
                                                       MethodBase aCurrentMethodForLocals,
                                                       string aMethodName,
                                                       TypeInformation aTypeInfo,
@@ -2455,7 +2352,7 @@ namespace Indy.IL2CPU
             return xMethodInfo;
         }
 
-        public static Dictionary<string, TypeInformation.Field> GetTypeFieldInfo(MethodBase aCurrentMethod,
+        public Dictionary<string, TypeInformation.Field> GetTypeFieldInfo(MethodBase aCurrentMethod,
                                                                                  out uint aObjectStorageSize)
         {
             Type xCurrentInspectedType = aCurrentMethod.DeclaringType;
@@ -2463,7 +2360,7 @@ namespace Indy.IL2CPU
                                     out aObjectStorageSize);
         }
 
-        private static void GetTypeFieldInfoImpl(List<KeyValuePair<string, TypeInformation.Field>> aTypeFields,
+        private void GetTypeFieldInfoImpl(List<KeyValuePair<string, TypeInformation.Field>> aTypeFields,
                                                  Type aType,
                                                  ref uint aObjectStorageSize)
         {
@@ -2471,9 +2368,9 @@ namespace Indy.IL2CPU
             Dictionary<string, PlugFieldAttribute> xCurrentPlugFieldList = new Dictionary<string, PlugFieldAttribute>();
             do
             {
-                if (mCurrent.mPlugFields.ContainsKey(aType))
+                if (mPlugFields.ContainsKey(aType))
                 {
-                    var xOrigList = mCurrent.mPlugFields[aType];
+                    var xOrigList = mPlugFields[aType];
                     foreach (var item in xOrigList)
                     {
                         xCurrentPlugFieldList.Add(item.Key,
@@ -2565,7 +2462,7 @@ namespace Indy.IL2CPU
                     }
                     if (xFieldType == null)
                     {
-                        Engine.mCurrent.OnDebugLog(LogSeverityEnum.Error, "Plugged field {0} not found! (On Type {1})", xItem.FieldId, aType.AssemblyQualifiedName);
+                        OnDebugLog(LogSeverityEnum.Error, "Plugged field {0} not found! (On Type {1})", xItem.FieldId, aType.AssemblyQualifiedName);
                     }
                     if (xItem.IsExternalValue || (xFieldType.IsClass && !xFieldType.IsValueType))
                     {
@@ -2595,7 +2492,7 @@ namespace Indy.IL2CPU
             } while (true);
         }
 
-        public static Dictionary<string, TypeInformation.Field> GetTypeFieldInfo(Type aType,
+        private Dictionary<string, TypeInformation.Field> GetTypeFieldInfo(Type aType,
                                                                                  out uint aObjectStorageSize)
         {
             var xTypeFields = new List<KeyValuePair<string, TypeInformation.Field>>();
@@ -2639,38 +2536,31 @@ namespace Indy.IL2CPU
             return (Op)Activator.CreateInstance(aType, aReader, aMethodInfo);
         }
 
-        public static void QueueStaticField(FieldInfo aField)
+        private void QueueStaticField(FieldInfo aField)
         {
-            if (mCurrent == null)
+            using (mStaticFieldsLocker.AcquireReaderLock())
             {
-                throw new Exception("ERROR: No Current Engine found!");
-            }
-            using (mCurrent.mStaticFieldsLocker.AcquireReaderLock())
-            {
-                if (mCurrent.mStaticFields.ContainsKey(aField))
+                if (mStaticFields.ContainsKey(aField))
                 {
                     return;
                 }
             }
-            using (mCurrent.mStaticFieldsLocker.AcquireWriterLock())
+            using (mStaticFieldsLocker.AcquireWriterLock())
             {
-                if (!mCurrent.mStaticFields.ContainsKey(aField))
+                if (!mStaticFields.ContainsKey(aField))
                 {
-                    mCurrent.mStaticFields.Add(aField,
+                    mStaticFields.Add(aField,
                                                new QueuedStaticFieldInformation());
                 }
             }
         }
 
-        public static void QueueStaticField(string aAssembly,
+        private void QueueStaticField(string aAssembly,
                                             string aType,
                                             string aField,
                                             out string aFieldName)
         {
-            if (mCurrent == null)
-            {
-                throw new Exception("ERROR: No Current Engine found!");
-            }
+       
             Type xTypeDef = GetType(aAssembly,
                                     aType);
             var xFieldDef = xTypeDef.GetField(aField);
@@ -2686,13 +2576,10 @@ namespace Indy.IL2CPU
                                                                     aField));
         }
 
-        public static void QueueStaticField(FieldInfo aField,
+        private void QueueStaticField(FieldInfo aField,
                                             out string aDataName)
         {
-            if (mCurrent == null)
-            {
-                throw new Exception("ERROR: No Current Engine found!");
-            }
+           
             if (!aField.IsStatic)
             {
                 throw new Exception("Cannot add an instance field to the StaticField queue!");
@@ -2704,14 +2591,11 @@ namespace Indy.IL2CPU
         // MtW: 
         //		Right now, we only support one engine at a time per AppDomain. This might be changed
         //		later. See for example NHibernate does this with the ICurrentSessionContext interface
-        public static void QueueMethod(MethodBase aMethod)
+        private void QueueMethod(MethodBase aMethod)
         {
-            if (mCurrent == null)
-            {
-                throw new Exception("ERROR: No Current Engine found!");
-            }
-            if (mCurrent.ChangingInnerMethod != null)
-                mCurrent.ChangingInnerMethod.Invoke(aMethod.GetFullName());
+           
+            if (ChangingInnerMethod != null)
+                ChangingInnerMethod.Invoke(aMethod.GetFullName());
             //Doku: it is not complete..it should check if a method is from P/Invoked Namespace and it checks it has pluuged
             /*string xInnerMethodName = aMethod.GetFullName();
             string xPattern=" System.";
@@ -2729,18 +2613,18 @@ namespace Indy.IL2CPU
             {
                 RegisterType(aMethod.DeclaringType);
             }
-            using (mCurrent.mMethodsLocker.AcquireReaderLock())
+            using (mMethodsLocker.AcquireReaderLock())
             {
-                if (mCurrent.mMethods.ContainsKey(aMethod))
+                if (mMethods.ContainsKey(aMethod))
                 {
                     return;
                 }
             }
-            using (mCurrent.mMethodsLocker.AcquireWriterLock())
+            using (mMethodsLocker.AcquireWriterLock())
             {
-                if (!mCurrent.mMethods.ContainsKey(aMethod))
+                if (!mMethods.ContainsKey(aMethod))
                 {
-                    if (mCurrent.mMethods is ReadOnlyDictionary<MethodBase, QueuedMethodInformation>)
+                    if (mMethods is ReadOnlyDictionary<MethodBase, QueuedMethodInformation>)
                     {
                         EmitDependencyGraphLine(false,
                                                 aMethod.GetFullName());
@@ -2748,23 +2632,23 @@ namespace Indy.IL2CPU
                     }
                     EmitDependencyGraphLine(false,
                                             aMethod.GetFullName());
-                    mCurrent.mMethods.Add(aMethod,
+                    mMethods.Add(aMethod,
                                           new QueuedMethodInformation()
                                           {
                                               Processed = false,
                                               PreProcessed = false,
-                                              Index = mCurrent.mMethods.Count
+                                              Index = mMethods.Count
                                           });
                 }
             }
         }
 
-        public static int GetMethodIdentifier(MethodBase aMethod)
+        private int GetMethodIdentifier(MethodBase aMethod)
         {
             QueueMethod(aMethod);
-            using (mCurrent.mMethodsLocker.AcquireReaderLock())
+            using (mMethodsLocker.AcquireReaderLock())
             {
-                return mCurrent.mMethods[aMethod].Index;
+                return mMethods[aMethod].Index;
             }
         }
 
@@ -2773,16 +2657,13 @@ namespace Indy.IL2CPU
         /// </summary>
         /// <param name="aType"></param>
         /// <returns></returns>
-        public static int RegisterType(Type aType)
+        private int RegisterType(Type aType)
         {
             if (aType == null)
             {
                 throw new ArgumentNullException("aType");
             }
-            if (mCurrent == null)
-            {
-                throw new Exception("ERROR: No Current Engine found!");
-            }
+          
             if (aType.IsArray || aType.IsPointer)
             {
                 if (aType.IsArray && aType.GetArrayRank() != 1)
@@ -2798,22 +2679,22 @@ namespace Indy.IL2CPU
                     aType = aType.GetElementType();
                 }
             }
-            using (mCurrent.mTypesLocker.AcquireReaderLock())
+            using (mTypesLocker.AcquireReaderLock())
             {
-                var xItem = mCurrent.mTypes.FirstOrDefault(x => x.FullName.Equals(aType.FullName));
+                var xItem = mTypes.FirstOrDefault(x => x.FullName.Equals(aType.FullName));
                 if (xItem != null)
                 {
-                    return mCurrent.mTypes.IndexOf(xItem);
+                    return mTypes.IndexOf(xItem);
                 }
             }
             Type xFoundItem;
-            using (mCurrent.mTypesLocker.AcquireWriterLock())
+            using (mTypesLocker.AcquireWriterLock())
             {
-                xFoundItem = mCurrent.mTypes.FirstOrDefault(x => x.FullName.Equals(aType.FullName));
+                xFoundItem = mTypes.FirstOrDefault(x => x.FullName.Equals(aType.FullName));
 
                 if (xFoundItem == null)
                 {
-                    mCurrent.mTypes.Add(aType);
+                    mTypes.Add(aType);
                     if (aType.FullName != "System.Object" && aType.BaseType != null)
                     {
                         Type xCurInspectedType = aType.BaseType;
@@ -2823,21 +2704,21 @@ namespace Indy.IL2CPU
                 }
                 else
                 {
-                    return mCurrent.mTypes.IndexOf(xFoundItem);
+                    return mTypes.IndexOf(xFoundItem);
                 }
             }
         }
 
-        //public static Assembly GetCrawledAssembly()
+        //private Assembly GetCrawledAssembly()
         //{
         //    if (mCurrent == null)
         //    {
         //        throw new Exception("ERROR: No Current Engine found!");
         //    }
-        //    return mCurrent.mCrawledAssembly;
+        //    return mCrawledAssembly;
         //}
 
-        public static void QueueMethod2(string aAssembly,
+        private void QueueMethod2(string aAssembly,
                                         string aType,
                                         string aMethod)
         {
@@ -2848,7 +2729,7 @@ namespace Indy.IL2CPU
                          out xMethodDef);
         }
 
-        public static void QueueMethod2(string aAssembly,
+        private void QueueMethod2(string aAssembly,
                                         string aType,
                                         string aMethod,
                                         out MethodBase aMethodDef)
@@ -2910,13 +2791,13 @@ namespace Indy.IL2CPU
 
         private SortedList<string, Assembly> mAssemblyDefCache = new SortedList<string, Assembly>();
 
-        public static Type GetType(string aAssembly,
+        public Type GetType(string aAssembly,
                                    string aType)
         {
             Assembly xAssemblyDef;
-            if (mCurrent.mAssemblyDefCache.ContainsKey(aAssembly))
+            if (mAssemblyDefCache.ContainsKey(aAssembly))
             {
-                xAssemblyDef = mCurrent.mAssemblyDefCache[aAssembly];
+                xAssemblyDef = mAssemblyDefCache[aAssembly];
             }
             else
             {
@@ -2935,9 +2816,9 @@ namespace Indy.IL2CPU
                 //					Console.WriteLine("Using AssemblyFactory for '{0}'", aAssembly);
                 //					xAssemblyDef = AssemblyFactory.GetAssembly(xAssembly.Location);
                 //				} else {
-                //					xAssemblyDef = mCurrent.mCrawledAssembly.Resolver.Resolve(aAssembly);
+                //					xAssemblyDef = mCrawledAssembly.Resolver.Resolve(aAssembly);
                 //				}
-                //				mCurrent.mAssemblyDefCache.Add(aAssembly, xAssemblyDef);
+                //				mAssemblyDefCache.Add(aAssembly, xAssemblyDef);
                 if (String.IsNullOrEmpty(aAssembly) || aAssembly == typeof(Engine).Assembly.GetName().Name || aAssembly == typeof(Engine).Assembly.GetName().FullName)
                 {
                     aAssembly = typeof(Engine).Assembly.FullName;
@@ -2948,13 +2829,9 @@ namespace Indy.IL2CPU
                            aType);
         }
 
-        public static Type GetType(Assembly aAssembly,
+        public Type GetType(Assembly aAssembly,
                                    string aType)
         {
-            if (mCurrent == null)
-            {
-                throw new Exception("ERROR: No Current Engine found!");
-            }
             string xActualTypeName = aType;
             if (xActualTypeName.Contains("<") && xActualTypeName.Contains(">"))
             {
@@ -2971,7 +2848,7 @@ namespace Indy.IL2CPU
             throw new Exception("Type '" + aType + "' not found in assembly '" + aAssembly + "'!");
         }
 
-        public static MethodBase GetMethodBase(Type aType,
+        public MethodBase GetMethodBase(Type aType,
                                                string aMethod,
                                                params string[] aParamTypes)
         {
@@ -3027,47 +2904,43 @@ namespace Indy.IL2CPU
             }
             throw new Exception("Method not found!");
         }
-        public static IEnumerable<Assembly> GetAllAssemblies()
+        public IEnumerable<Assembly> GetAllAssemblies()
         {
-            using (mCurrent.mMethodsLocker.AcquireReaderLock())
+            using (mMethodsLocker.AcquireReaderLock())
             {
-                return (from item in mCurrent.mMethods.Keys
+                return (from item in mMethods.Keys
                         select item.DeclaringType.Module.Assembly).Distinct(new AssemblyEqualityComparer()).ToArray();
             }
         }
 
         private int mInstructionsToSkip = 0;
 
-        public static void SetInstructionsToSkip(int aCount)
+        public  void SetInstructionsToSkip(int aCount)
         {
-            if (mCurrent == null)
-            {
-                throw new Exception("No Current Engine!");
-            }
-            mCurrent.mInstructionsToSkip = aCount;
+            mInstructionsToSkip = aCount;
         }
 
         #region Dependency graph code
 
         private static bool mEmitDependencyGraph = false;
 
-        public static void EmitDependencyGraphLine(bool aIsContainer, string aMessage)
+        private void EmitDependencyGraphLine(bool aIsContainer, string aMessage)
         {
         }
 
-        static Engine()
-        {
-            mEmitDependencyGraph = Environment.GetEnvironmentVariables().Contains("CosmosDependencyGraph") || Environment.MachineName.Equals("laptop-matthijs",
-                                                                                                                                             StringComparison.InvariantCultureIgnoreCase);
-            if (mEmitDependencyGraph)
-            {
-                File.Delete(@"d:\dependencygraph.txt");
-            }
-            RunningOnMono = Type.GetType("Mono.Runtime") != null;
-        }
+        //static Engine()
+        //{
+        //    mEmitDependencyGraph = Environment.GetEnvironmentVariables().Contains("CosmosDependencyGraph") || Environment.MachineName.Equals("laptop-matthijs",
+        //                                                                                                                                     StringComparison.InvariantCultureIgnoreCase);
+        //    if (mEmitDependencyGraph)
+        //    {
+        //        File.Delete(@"d:\dependencygraph.txt");
+        //    }
+        //    RunningOnMono = Type.GetType("Mono.Runtime") != null;
+        //}
 
         #endregion
 
-        public static readonly bool RunningOnMono;
+        private readonly bool RunningOnMono;
     }
 }
