@@ -212,8 +212,7 @@ namespace Cosmos.Compiler.Builder
                 MonoCompile(xEngineParams); 
 
             //SIGNAL END COMPILE
-            CompileCompleted.Invoke();
-            LogTime("Compile complete");
+            OnCompileCompleted();
 
             if (options.CompileIL)
             {
@@ -242,8 +241,22 @@ namespace Cosmos.Compiler.Builder
             LogTime("Thread execute finish"); 
 
             //SIGNAL END
-            BuildCompleted.Invoke();
+            OnBuildCompleted();
             
+        }
+
+        private void OnCompileCompleted()
+        {
+            if (CompileCompleted != null)
+                CompileCompleted.Invoke();
+            LogTime("Compile complete");
+        }
+
+        private void OnBuildCompleted()
+        {
+            if ( BuildCompleted != null)
+                BuildCompleted.Invoke();
+            LogTime("Build complete");
         }
 
         private static Process ProcessNonDebugBuilds(BuildOptions options, Process xQEMU)
