@@ -150,7 +150,7 @@ namespace Indy.IL2CPU
         /// <summary>
         /// Contains a list of all methods. This includes methods to be processed and already processed.
         /// </summary>
-        protected IDictionary<MethodBase, QueuedMethodInformation> mMethods = new SortedList<MethodBase, QueuedMethodInformation>(new MethodBaseComparer());
+        protected IDictionary<MethodBase, QueuedMethodInformation> mMethods = new Dictionary<MethodBase, QueuedMethodInformation>(new MethodBaseComparer());
         //protected IDictionary<MethodBase, QueuedMethodInformation> mMethods = new SortedList<MethodBase, QueuedMethodInformation>(new MethodBaseComparer());
         protected ReaderWriterLocker mMethodsLocker = new ReaderWriterLocker();
 
@@ -507,15 +507,34 @@ namespace Indy.IL2CPU
             {
                 xIndex++;
                // using (mMethodsLocker.AcquireReaderLock())
+
+                xCurrentMethod = null;
+                foreach (var method in mMethods)
                 {
-                    xCurrentMethod = (from item in mMethods.Keys
-                                      where !mMethods[item].PreProcessed
-                                      select item).FirstOrDefault();
+
+                    if (method.Value.PreProcessed == false)
+                    {
+                        xCurrentMethod = method.Key;
+                        break;
+                    }
                 }
+
                 if (xCurrentMethod == null)
                 {
                     break;
                 }
+
+
+                //{
+                //    xCurrentMethod = (from item in mMethods.Keys
+                //                      where !mMethods[item].PreProcessed
+                //                      select item).FirstOrDefault();
+
+                //}
+                //if (xCurrentMethod == null)
+                //{
+                //    break;
+                //}
                 if (ChangingCurrentMethod != null)
                     ChangingCurrentMethod.Invoke(xCurrentMethod.GetFullName());
                 //ProgressChanged.Invoke(String.Format("Scanning method: {0}", xCurrentMethod.GetFullName()));
@@ -1505,9 +1524,13 @@ namespace Indy.IL2CPU
                 xFieldName = DataMember.GetStaticFieldName(xCurrentField);
                 if (mAssembler.DataMembers.Count(x => x.Name == xFieldName) == 0)
                 {
-                    var xItem = (from item in xCurrentField.GetCustomAttributes(false)
+                    var xItemList = (from item in xCurrentField.GetCustomAttributes(false)
                                  where item.GetType().FullName == "ManifestResourceStreamAttribute"
-                                 select item).FirstOrDefault();
+                                 select item).ToList();
+                    
+                    object xItem = null; 
+                    if ( xItemList.Count > 0 )
+                        xItem = xItemList[0];
                     string xManifestResourceName = null;
                     if (xItem != null)
                     {
