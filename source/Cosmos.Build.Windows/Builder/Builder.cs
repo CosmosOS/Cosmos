@@ -263,6 +263,9 @@ namespace Cosmos.Compiler.Builder
         {
             switch (options.Target)
             {
+
+                case "None":
+                    break;
                 case "QEMU":
                     var qemu = new MakeQEMUStep(options);
                     qemu.Execute();
@@ -615,12 +618,13 @@ namespace Cosmos.Compiler.Builder
         }
 
         [Obsolete]
-        public void BeginCompile(DebugMode mode , byte portId , bool useGDB)
+        public void BeginCompile(DebugMode mode , byte portId , bool useGDB , string target)
         {
             var options = Cosmos.Compiler.Builder.BuildOptions.Load();
             options.DebugMode = mode;
             options.DebugPortId = portId;
-            options.UseGDB = useGDB; 
+            options.UseGDB = useGDB;
+            options.Target = target;
             
             BeginCompile(options);
         }

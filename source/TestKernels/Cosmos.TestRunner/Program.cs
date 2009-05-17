@@ -56,33 +56,41 @@ namespace Cosmos.TestRunner
                         Console.WriteLine("BuildPath = '{0}'", xBuilder.BuildPath);
                         xBuilder.TargetAssembly = xItem.Key.Assembly;
                         var xEvent = new AutoResetEvent(false);
-                        xBuilder.CompileCompleted += delegate { xEvent.Set(); };
+                        xBuilder.BuildCompleted += delegate { xEvent.Set(); };
                         xBuilder.LogMessage += delegate(LogSeverityEnum aSeverity, string aMessage)
                         {
                             Console.WriteLine("Log: {0} - {1}", aSeverity, aMessage);
                         };
 
-                        //var options = Cosmos.Compiler.Builder.BuildOptions.Load();
+                        var options = Cosmos.Compiler.Builder.BuildOptions.Load();
 
-                        //options.DebugMode = DebugMode.None;
-                        //options.DebugPortId = 0;
-                        //options.UseGDB = false; 
+                        options.DebugMode = DebugMode.None;
+                        options.DebugPortId = 0;
+                        options.UseGDB = false;
 
-                        xBuilder.BeginCompile(DebugMode.None, 0, false);
+                        options.CompileIL = true; 
+                        options.UseInternalAssembler = false; // force externel assemble and link
+                        
+                        options.Target = "ISO"; 
+
+                        xBuilder.BeginCompile(options);
 
                         //  xBuilder.BeginCompile(options);
                         xEvent.WaitOne();
-                        //if (NeedsToRunKernel)  //HACK! always false hardcode
-                        //{
-                        //   
-                        //    xBuilder.Assemble();
-                        //    xBuilder.Link();
-                        //    xBuilder.MakeISO();
-                        //    var xISOFile = Path.Combine(xBuilder.BuildPath, "Cosmos.iso");
-                        //    // run qemu
-                        //    xReturn = RunKernel(xItem.Key, xBuilder, xItem.Value, out xMessage);
-                        //}
-                        //else
+                        if (NeedsToRunKernel)  //HACK! always false hardcode
+                        {
+
+                            //new AssembleStep(options).Execute();
+                            //new LinkStep(options).Execute();
+
+
+                            new MakeISOStep(options).Execute();
+
+                            //var xISOFile = Path.Combine(xBuilder.BuildPath, "Cosmos.iso");
+                            // run qemu
+                            xReturn = RunKernel(xItem.Key, xBuilder, xItem.Value, out xMessage);
+                        }
+                        else
                         {
                             xReturn = true;
                             xMessage = "";
@@ -101,6 +109,7 @@ namespace Cosmos.TestRunner
                     });
                 }
                 WriteResults(xResults);
+                Console.WriteLine("Finished Test:" + DateTime.Now.ToLongTimeString()); 
             }
             catch (Exception E)
             {
@@ -293,6 +302,8 @@ namespace Cosmos.TestRunner
                 + " -serial tcp:127.0.0.1:8544,server "
                 , aBuilder.ToolsPath + @"qemu", false, true);
 
+            System.Threading.Thread.Sleep(500);  //give it time to launch
+
             // Variable to tell how many times we tried to connect to the serial port of QEMU
             Int32 Tries = 0;
             // Create the socket.
@@ -310,7 +321,7 @@ namespace Cosmos.TestRunner
                     // Tries and sleep for 10 seconds.
                     Console.WriteLine("\tConnection to the Serial port failed. We have tried " + Tries.ToString() + " times." + Environment.NewLine + e.Message);
                     Tries++;
-                    Thread.Sleep(10000);
+                    Thread.Sleep(5000);
                 }
                 // It tries to connect until it is connected or 50 seconds have passed from the first try.
             } while ((!xClientSocket.Connected) && (Tries < 5));
