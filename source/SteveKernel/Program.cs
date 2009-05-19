@@ -22,24 +22,14 @@ namespace SteveKernel
             var xBoot = new Cosmos.Sys.Boot();
             xBoot.Execute();
 
+            int addr = (int)VBE3.FindPM();
 
+            if (addr != 0)
+                Console.WriteLine("Found @ " + addr.ToHex(8));
 
-
-
-            //ACPIManager.Init();
-
-            //Console.ReadLine();
-
-
-            //int addr = (int)VBE3.FindPM();
-            int addr = (int)ACPIManager.RSDPAddress();
-
+            Console.ReadLine();
+            
             Cosmos.Kernel.DebugMemoryViewer.View(addr);
-
-
-
-
-
 
         }
 
