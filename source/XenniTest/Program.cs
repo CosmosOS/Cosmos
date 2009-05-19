@@ -18,7 +18,6 @@ namespace Cosmos.Playground.Xenni
 
             Console.WriteLine("");
             Console.WriteLine("Press Any Key to Test MultiArrays ...");
-            Cosmos.Debug.Debugger.Break();
             Console.Read();
             Console.WriteLine("");
             Console.WriteLine("");

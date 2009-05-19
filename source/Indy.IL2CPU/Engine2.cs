@@ -1538,7 +1538,7 @@ namespace Indy.IL2CPU
                             break;
 
                         xCurrentMethod = EMITdefs[EMITi];
-                        CompilingMethods(EMITi, EMITdefs.Count);
+                        //CompilingMethods(EMITi, EMITdefs.Count); //Causes Bug in new Engine ... should be fixed later! -Xenni
                     }
                     else
                     {
@@ -1855,6 +1855,7 @@ namespace Indy.IL2CPU
             }
 
             //BUG //HACK
+            //This should not be a bug, see above comment. -Xenni
             //if (EMITmode)
             //{
             //    CompilingMethods(EMITi, EMITdefs.Count); //cant see the point of sending 0,0 prob bug
