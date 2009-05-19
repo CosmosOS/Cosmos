@@ -331,10 +331,12 @@ namespace VGAFontMaker
                 s.Append("int width = " + b.Width + ";\r\nint height = "+ b.Height + ";\r\n");
 
                 s.Append("byte[] pal = new byte[] {");
-
+                int line = 0;
                 foreach (var c in b.Palette.Entries)
                 {
                     s.Append(c.R + ","+c.G +"," + c.R +",");
+                    if (++line % 50 == 0)
+                        s.Append("\r\n");
                 }
                 s.Remove(s.Length - 1, 1);
                 s.Append("};\r\n");
@@ -350,6 +352,8 @@ namespace VGAFontMaker
                     for (int x = 0; x < b.Width; x++)
                     {
                         s.Append(bits[y * l.Stride + x] + ",");
+                        if (++line % 50 == 0)
+                            s.Append("\r\n");
                     }
 
                 s.Remove(s.Length - 1, 1);
