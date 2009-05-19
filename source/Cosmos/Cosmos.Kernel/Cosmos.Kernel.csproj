@@ -55,7 +55,6 @@
     <Compile Include="AddressSpace.cs" />
     <Compile Include="CPU.cs" />
     <Compile Include="CPUBus.cs" />
-    <Compile Include="DebugMemoryViewer.cs" />
     <Compile Include="Extension\Binary.cs" />
     <Compile Include="Extension\Hex.cs" />
     <Compile Include="GC.cs" />

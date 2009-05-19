@@ -29,7 +29,7 @@ namespace SteveKernel
 
             Console.ReadLine();
             
-            Cosmos.Kernel.DebugMemoryViewer.View(addr);
+            Cosmos.Debug.Debugger.ViewMemory(addr);
 
         }
 
