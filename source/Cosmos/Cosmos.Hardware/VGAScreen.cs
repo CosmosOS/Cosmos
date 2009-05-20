@@ -258,9 +258,9 @@ namespace Cosmos.Hardware
         {
             throw new Exception("No video mode set!");
         }
-        private static unsafe void SetPixel640x480x4(uint x, uint y, uint c)
+        public static unsafe void SetPixel640x480x4(uint x, uint y, uint c)
         {
-            byte* address = (byte*)(0xa0000 + y * 320 + x / 2);
+            byte* address = (byte*)(0xa0000 + y * 320 + x >> 1);
 
             c = c & 0xf;
             if ((x & 1) == 0)
@@ -275,6 +275,10 @@ namespace Cosmos.Hardware
         public static unsafe void SetPixel320x200x8(uint x, uint y, uint c)
         {
             *(byte*)(0xa0000 + y * 320 + x) = (byte)(c & 0xff);
+        }
+        public static unsafe uint GetPixel320x200x8(uint x, uint y)
+        {
+            return *(byte*)(0xa0000 + y * 320 + x);
         }
 
         private MemoryAddressSpace mr = new MemoryAddressSpace(0xa0000, 0x10000);

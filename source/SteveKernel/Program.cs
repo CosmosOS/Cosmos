@@ -22,16 +22,45 @@ namespace SteveKernel
             var xBoot = new Cosmos.Sys.Boot();
             xBoot.Execute();
 
-            int addr = (int)VBE3.FindPM();
-
-            if (addr != 0)
-                Console.WriteLine("Found @ " + addr.ToHex(8));
-
-            Console.ReadLine();
-            
-            Cosmos.Debug.Debugger.ViewMemory(addr);
+            MouseDemo();
 
         }
 
+        private static void MouseDemo()
+        {
+            VGAScreen.SetMode320x200x8();
+
+            VGAScreen.SetPaletteEntry(0, 0, 0, 0);
+            VGAScreen.SetPaletteEntry(1, 63, 0, 0);
+            VGAScreen.SetPaletteEntry(2, 63, 63, 63);
+
+            VGAScreen.Clear(0);
+
+            uint x = (uint)Mouse.X;
+            uint y = (uint)Mouse.Y;
+            uint oc = 0;
+
+            while (true)
+            {
+                uint mx = (uint)Mouse.X;
+                uint my = (uint)Mouse.Y;
+
+                if (mx != x || my != y)
+                {
+                    if (Mouse.Buttons == Mouse.MouseState.Left)
+                        VGAScreen.SetPixel320x200x8(x, y, 1);
+                    else if (Mouse.Buttons == Mouse.MouseState.Right)
+                        VGAScreen.SetPixel320x200x8(x, y, 0);
+                    else
+                        VGAScreen.SetPixel320x200x8(x, y, oc);
+
+                    x = mx;
+                    y = my;
+                    oc = VGAScreen.GetPixel320x200x8(x, y);
+
+                    VGAScreen.SetPixel320x200x8(x, y, 2);
+                }
+            }
+        }
     }
 }
