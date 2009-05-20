@@ -161,6 +161,10 @@ namespace Cosmos.Playground.Xenni.TxUI
                 switch (c)
                 {
                     case '`':
+                        if (Keyboard.AltPressed)
+                        {
+                            goto default;
+                        }
                         if (FocusTarget == null)
                         {
                             Focus(Controls[Controls.Count - 1]);
@@ -180,6 +184,10 @@ namespace Cosmos.Playground.Xenni.TxUI
                         Focus(Controls[csel]);
                         break;
                     case '\t':
+                        if (Keyboard.AltPressed)
+                        {
+                            goto default;
+                        }
                         if (FocusTarget == null)
                         {
                             Focus(Controls[0]);
@@ -198,6 +206,10 @@ namespace Cosmos.Playground.Xenni.TxUI
                         Focus(Controls[csel]);
                         break;
                     case '~':
+                        if (Keyboard.AltPressed)
+                        {
+                            goto default;
+                        }
                         Defocus();
                         break;
                     default:
@@ -605,11 +617,7 @@ namespace Cosmos.Playground.Xenni.TxUI
                     }
                     CursorPosX++;
                     break;
-                case 'd':
-                    if (!Keyboard.AltPressed)
-                    {
-                        goto default;
-                    }
+                case '\u0968':
                     if (_CursorPosX == 0)
                     {
                         Console.Beep(2048, 250);
