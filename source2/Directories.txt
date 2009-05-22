@@ -1,0 +1,8 @@
+Builder
+-Code for builder, but not including IL2CPU which late r will be used to run on Cosmos as well. Builder should contain only parts for making ISO images, MS Build Task, etc
+
+Debugger
+-All debugger parts including VS Port supplier
+
+VSIP
+-Visual Studio Integration
