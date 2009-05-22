@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Microsoft.VisualStudio.Project.Automation.OAFileItem">
+    <Position X="4.75" Y="4.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAJAAAAAAMAAAAAAAAAAAAAAAAAACgBABAAAAAAA=</HashCode>
+      <FileName>Automation\OAFileItem.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Microsoft.VisualStudio.Project.Automation.OANavigableProjectItems" Collapsed="true">
+    <Position X="3.75" Y="1.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AEQAAAAAEABACBAAAAgASAQkCAgAIAAAAgAAAAAAACQ=</HashCode>
+      <FileName>Automation\OANavigableProjectItems.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Microsoft.VisualStudio.Project.Automation.OAProject" Collapsed="true">
+    <Position X="1.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAJQAAABEUIIhQAAcCAQAAAkAAAAAIBgFCABCAAA=</HashCode>
+      <FileName>Automation\OAProject.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Microsoft.VisualStudio.Project.Automation.OAProjectItem&lt;T&gt;" Collapsed="true">
+    <Position X="6.25" Y="3" Width="1.75" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AQQAQJAAAABEYAAgQACMDCQBCAkAAAACgBAFAAECAAA=</HashCode>
+      <FileName>Automation\OAProjectItem.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Microsoft.VisualStudio.Project.Automation.OAProjectItems" Collapsed="true">
+    <Position X="4" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAEAAAAAAAAAAgAAAggAAAAAAAAAAAAAAAACA=</HashCode>
+      <FileName>Automation\OAProjectItems.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Microsoft.VisualStudio.Project.Automation.OAProperties" Collapsed="true">
+    <Position X="8.75" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAYAAAACABAAABAAIAAAQCQEAAIAAAAIAAAAAAECAAA=</HashCode>
+      <FileName>Automation\OAProperties.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Microsoft.VisualStudio.Project.Automation.OAProperty" Collapsed="true">
+    <Position X="8.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQSAAAAAABAAQAJgAAAQQAQAgAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>Automation\OAProperty.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Microsoft.VisualStudio.Project.Automation.OANestedProjectItem">
+    <Position X="1.75" Y="4.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAAAAAAAAAAAAAAACAAAAAACAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Automation\OANestedProjectItem.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Microsoft.VisualStudio.Project.Automation.OAReferenceFolderItem">
+    <Position X="10" Y="4.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQ=</HashCode>
+      <FileName>Automation\OAReferenceFolderItem.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Microsoft.VisualStudio.Project.Automation.OASolutionFolder&lt;T&gt;" Collapsed="true">
+    <Position X="11" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AUQAAAAAAAAAAAAAAAAAQAAgAAIAAAAAAAQAAAAEAAA=</HashCode>
+      <FileName>Automation\OASolutionFolder.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Microsoft.VisualStudio.Project.Automation.OAReferenceItem">
+    <Position X="7.25" Y="4.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAYAAAAAAAAAQAAAEAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Automation\OAReferenceItem.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Tahoma" Size="8.25" />
+</ClassDiagram>
