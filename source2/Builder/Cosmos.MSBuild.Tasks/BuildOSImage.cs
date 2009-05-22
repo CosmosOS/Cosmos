@@ -5,14 +5,16 @@ using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 //using Cosmos.Compiler.Builder;
 
-namespace Cosmos.MSBuild.Tasks
-{
-	public class BuildOSImage : Task
-	{
+namespace Cosmos.MSBuild.Tasks {
+	
+  public class BuildOSImage : Task {
+
 		private Boolean buildFailed;
-		public override bool Execute()
-		{
+
+		public override bool Execute() {
 			buildFailed = false;
+      Log.LogMessage(MessageImportance.High, "Building Cosmos System Image");
+      return true;
 
 			this.KernelAssemblyFile = (new System.IO.FileInfo(this.KernelAssemblyFile)).FullName;
 

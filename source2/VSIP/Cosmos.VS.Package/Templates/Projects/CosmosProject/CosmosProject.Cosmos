@@ -34,4 +34,23 @@
   </ItemGroup>
 
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+
+  <Target Name="BeforeBuild">
+  </Target>
+
+  <!-- 
+  We have to read from registry becasue MSBuild process wont see changes to 
+  env variables. But by reading the env var key, we allow support for both env
+  var and registry as some scenarios we can read env var but not registry
+  (ie .bat files)
+  -->
+  <PropertyGroup>
+    <Cosmos>$(Registry:HKEY_CURRENT_USER\Environment@Cosmos)</Cosmos>
+  </PropertyGroup>
+  <UsingTask TaskName="Cosmos.MSBuild.Tasks.BuildOSImage" AssemblyFile="$(Cosmos)\source2\Builder\Cosmos.MSBuild.Tasks\bin\Debug\Cosmos.MSBuild.Tasks.dll" />
+  <Target Name="AfterBuild">
+    <Message Text="Using Cosmos Path: $(Cosmos)" Importance="high" />
+    <BuildOSImage KernelAssemblyFile="$(BaseOutputPath)$(OutputPath)$(AssemblyName).exe" />
+  </Target>
+
 </Project>

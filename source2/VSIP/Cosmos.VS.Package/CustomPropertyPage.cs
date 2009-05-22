@@ -13,9 +13,7 @@ using Help = Microsoft.VisualStudio.VSHelp.Help;
 using IServiceProvider = System.IServiceProvider;
 
 namespace Cosmos.VS.Package {
-    [ComVisible(true)] 
-    public partial class CustomPropertyPage : UserControl, IPropertyPage 
-    { 
+    public partial class CustomPropertyPage : UserControl, IPropertyPage { 
         private ProjectNode _projectMgr; 
         private ProjectConfig[] _projectConfigs; 
         private IPropertyPageSite _site; 
@@ -23,10 +21,7 @@ namespace Cosmos.VS.Package {
         private string _title; 
         private string _helpKeyword; 
 
-        #region Constructors 
- 
-        public CustomPropertyPage() 
-        { 
+        public CustomPropertyPage() { 
             _projectMgr = null; 
             _projectConfigs = null; 
             _site = null; 
@@ -35,11 +30,6 @@ namespace Cosmos.VS.Package {
             _helpKeyword = string.Empty; 
         } 
 
-        #endregion 
-
-
-        #region Properties 
- 
         public virtual string Title 
         { 
             get 
@@ -107,11 +97,7 @@ namespace Cosmos.VS.Package {
 	            } 
 	        } 
 	
-	        #endregion 
-	
-	
-	        #region Methods 
-	 
+
 	        protected virtual void FillProperties() 
 	        {} 
 	 
@@ -161,12 +147,6 @@ namespace Cosmos.VS.Package {
 	            return defaultValue; 
 	        } 
 	
-	        
-	        #endregion 
-	
-	
-	        #region IPropertyPage Members  
-	 
 	        void IPropertyPage.SetPageSite(IPropertyPageSite pPageSite) 
 	        { 
 	            _site = pPageSite; 
@@ -198,32 +178,22 @@ namespace Cosmos.VS.Package {
 	            pPageInfo[0] = info; 
 	        } 
 	 
-	        void IPropertyPage.SetObjects(uint count, object[] punk) 
-	        { 
-	            if (count > 0) 
-	            { 
-	                if (punk[0] is ProjectConfig) 
-	                { 
+	        void IPropertyPage.SetObjects(uint count, object[] punk) { 
+	            if (count > 0) { 
+	                if (punk[0] is ProjectConfig) { 
 	                    ArrayList configs = new ArrayList(); 
-	 
-	                    for(int i = 0; i < count; i++) 
-	                    { 
+	                    for(int i = 0; i < count; i++) { 
 	                        ProjectConfig config = (ProjectConfig)punk[i]; 
-	 
-	                        if (_projectMgr == null) 
-	                        { 
+	                        if (_projectMgr == null) { 
 	                            _projectMgr = config.ProjectMgr; 
 	                        } 
-	 
 	                        configs.Add(config); 
 	                    } 
-	 
 	                    _projectConfigs = (ProjectConfig[])configs.ToArray(typeof(ProjectConfig)); 
-	                } 
-	                else if (punk[0] is NodeProperties) 
-	                { 
-	                    if (_projectMgr == null) 
-	                    { 
+
+                  // For ProjectNodes we will get one of these
+	                } else if (punk[0] is NodeProperties) { 
+	                    if (_projectMgr == null) { 
 	                        _projectMgr = (punk[0] as NodeProperties).Node.ProjectMgr; 
 	                    } 
 	 
@@ -242,28 +212,22 @@ namespace Cosmos.VS.Package {
 	                            uint[] actual = new uint[1]; 
 	                            provider.GetCfgs(expected[0], configs, actual, null); 
 	 
-	                            foreach(ProjectConfig config in configs) 
-	                            { 
-	                                if (!configsMap.ContainsKey(config.ConfigName)) 
-	                                { 
+	                            foreach(ProjectConfig config in configs) { 
+	                                if (!configsMap.ContainsKey(config.ConfigName)) { 
 	                                    configsMap.Add(config.ConfigName, config); 
 	                                } 
 	                            } 
 	                        } 
 	                    } 
 	 
-	                    if (configsMap.Count > 0) 
-	                    { 
-	                        if (_projectConfigs == null) 
-	                        { 
+	                    if (configsMap.Count > 0) { 
+	                        if (_projectConfigs == null) { 
 	                            _projectConfigs = new ProjectConfig[configsMap.Keys.Count]; 
 	                        } 
 	                        configsMap.Values.CopyTo(_projectConfigs, 0); 
 	                    } 
 	                } 
-	            } 
-	            else 
-	            { 
+	            } else  { 
 	                _projectMgr = null; 
 	            } 
 	 
@@ -343,7 +307,6 @@ namespace Cosmos.VS.Package {
 	            return (NativeMethods.IsDialogMessageA(Handle, ref msg)) ? 0 : 1; 
 	        } 
 	
-	        #endregion 
 	    } 
 }
 

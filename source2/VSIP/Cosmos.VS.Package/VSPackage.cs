@@ -48,6 +48,7 @@ namespace Cosmos.VS.Package {
 
   // Property Pages
   [ProvideObject(typeof(PropPageEnvironment), RegisterUsing = RegistrationMethod.CodeBase)]
+  [ProvideObject(typeof(PropPageTest), RegisterUsing = RegistrationMethod.CodeBase)]
   
   [Guid(Guids.guidProjectPkgString)]
   public sealed class VSProject : ProjectPackage {
@@ -64,7 +65,7 @@ namespace Cosmos.VS.Package {
 
         // This is used in the MSBuild files to locate Cosmos tasks
         // Will likely be used by other things in the future as well
-        protected void SetCosmosVar() {
+        private void SetCosmosVar() {
           string xPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
           int xPos = xPath.LastIndexOf(@"\source2\", StringComparison.InvariantCultureIgnoreCase);
           xPath = xPath.Substring(0, xPos);

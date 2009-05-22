@@ -38,6 +38,7 @@ namespace Cosmos.VS.Package {
       //1E78F8DB-6C07-4D61-A18F-7514010ABD56 - Build Events
       return new Guid[] {
           typeof(PropPageEnvironment).GUID,
+          typeof(PropPageTest).GUID,
       };
     }
 

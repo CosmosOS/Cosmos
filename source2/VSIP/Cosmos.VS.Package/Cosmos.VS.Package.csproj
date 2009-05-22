@@ -78,6 +78,7 @@
     <Compile Include="PropPageEnvironment.Designer.cs">
       <DependentUpon>PropPageEnvironment.cs</DependentUpon>
     </Compile>
+    <Compile Include="PropPageTest.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
