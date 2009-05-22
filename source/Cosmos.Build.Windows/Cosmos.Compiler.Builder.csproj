@@ -189,6 +189,10 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\source2\Builder\Cosmos.Builder.Common\Cosmos.Builder.Common.csproj">
+      <Project>{2915B786-408A-4475-B092-03F5735429E7}</Project>
+      <Name>Cosmos.Builder.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\IL2CPU\Cosmos.IL2CPU.Debug\Cosmos.Compiler.Debug.csproj">
       <Project>{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}</Project>
       <Name>Cosmos.Compiler.Debug</Name>
