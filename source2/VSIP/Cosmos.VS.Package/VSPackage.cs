@@ -62,6 +62,15 @@ namespace Cosmos.VS.Package {
             Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
         }
 
+        // This is used in the MSBuild files to locate Cosmos tasks
+        // Will likely be used by other things in the future as well
+        protected void SetCosmosVar() {
+          string xPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+          int xPos = xPath.LastIndexOf(@"\source2\", StringComparison.InvariantCultureIgnoreCase);
+          xPath = xPath.Substring(0, xPos);
+          System.Environment.SetEnvironmentVariable("Cosmos", xPath, EnvironmentVariableTarget.User);
+        }
+
         /////////////////////////////////////////////////////////////////////////////
         // Overriden Package Implementation
 
@@ -70,9 +79,11 @@ namespace Cosmos.VS.Package {
         /// where you can put all the initilaization code that rely on services provided by VisualStudio.
         /// </summary>
         protected override void Initialize() {
-            Trace.WriteLine (string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
-            base.Initialize();
-            this.RegisterProjectFactory(new VSProjectFactory(this));
+          SetCosmosVar();
+
+          Trace.WriteLine (string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
+          base.Initialize();
+          this.RegisterProjectFactory(new VSProjectFactory(this));
         }
 
     }
