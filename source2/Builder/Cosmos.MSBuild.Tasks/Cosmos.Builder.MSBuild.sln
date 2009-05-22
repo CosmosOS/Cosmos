@@ -1,15 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.MSBuild.Tasks", "Cosmos.MSBuild.Tasks.csproj", "{71E5DE71-F7C1-4B61-B5BE-4FD64682BDB0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Builder.MSBuild", "Cosmos.Builder.MSBuild.csproj", "{71E5DE71-F7C1-4B61-B5BE-4FD64682BDB0}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
 		SccNumberOfProjects = 2
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
-		SccProjectUniqueName0 = Cosmos.MSBuild.Tasks.csproj
 		SccLocalPath0 = .
+		SccProjectUniqueName1 = Cosmos.Builder.MSBuild.csproj
 		SccLocalPath1 = .
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
