@@ -6,7 +6,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Cosmos.VSPkg</RootNamespace>
+    <RootNamespace>Cosmos.VS.Package</RootNamespace>
     <AssemblyName>SimpleProject</AssemblyName>
     <SignAssembly>False</SignAssembly>
     <AssemblyOriginatorKeyFile>Key.snk</AssemblyOriginatorKeyFile>
@@ -66,7 +66,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomPropertyPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CustomPropertyPage.Designer.cs">
+      <DependentUpon>CustomPropertyPage.cs</DependentUpon>
+    </Compile>
     <Compile Include="Guids.cs" />
+    <Compile Include="PropPageEnvironment.cs">
+    </Compile>
+    <Compile Include="PropPageEnvironment.Designer.cs">
+      <DependentUpon>PropPageEnvironment.cs</DependentUpon>
+    </Compile>
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -93,6 +104,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\Cosmos.ico" />
+    <EmbeddedResource Include="PropPageEnvironment.resx">
+      <DependentUpon>PropPageEnvironment.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\CosmosProjectNode.bmp" />
     <Content Include="Templates\Projects\CosmosProject\CosmosProject.ico" />
   </ItemGroup>

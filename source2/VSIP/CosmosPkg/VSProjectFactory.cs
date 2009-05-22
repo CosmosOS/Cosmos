@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Project;
 using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 
-namespace Cosmos.VSPkg {
+namespace Cosmos.VS.Package {
   [Guid(Guids.guidProjectFactoryString)]
   class VSProjectFactory : ProjectFactory {
     private VSProject package;

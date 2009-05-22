@@ -5,7 +5,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.IO;
 
-namespace Cosmos.VSPkg {
+namespace Cosmos.VS.Package {
   public class VSProjectNode : ProjectNode {
     internal static int imageIndex;
     public override int ImageIndex {
@@ -42,7 +42,7 @@ namespace Cosmos.VSPkg {
     }
 
     static VSProjectNode() {
-      imageList = Utilities.GetImageList(typeof(VSProjectNode).Assembly.GetManifestResourceStream("Cosmos.VSPkg.Resources.CosmosProjectNode.bmp"));
+      imageList = Utilities.GetImageList(typeof(VSProjectNode).Assembly.GetManifestResourceStream("Cosmos.VS.Package.Resources.CosmosProjectNode.bmp"));
     }
 
     public override Guid ProjectGuid {

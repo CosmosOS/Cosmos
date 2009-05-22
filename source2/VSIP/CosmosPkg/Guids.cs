@@ -1,7 +1,6 @@
 ﻿using System;
 
-namespace Cosmos.VSPkg
-{
+namespace Cosmos.VS.Package {
     static class Guids {
         public const string guidProjectPkgString = "4cae44ed-88b9-4b7c-822b-b040f18fcee3";
         public const string guidProjectCmdSetString = "c119efe0-fb56-44a1-b9f0-31247afb207f";
