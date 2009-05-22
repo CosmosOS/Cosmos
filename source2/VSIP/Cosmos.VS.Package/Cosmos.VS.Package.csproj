@@ -91,7 +91,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="Templates\Projects\CosmosProject\AssemblyInfo.cs" />
     <None Include="Templates\Projects\CosmosProject\Program.cs" />
-    <None Include="Templates\Projects\CosmosProject\CosmosProject.Cosmos" />
+    <None Include="Templates\Projects\CosmosProject\Bootable Project.Cosmos" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx">
@@ -109,7 +109,7 @@
       <DependentUpon>PropPageEnvironment.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\CosmosProjectNode.bmp" />
-    <Content Include="Templates\Projects\CosmosProject\CosmosProject.ico" />
+    <Content Include="Templates\Projects\CosmosProject\Bootable Project.ico" />
   </ItemGroup>
   <PropertyGroup>
     <!--
