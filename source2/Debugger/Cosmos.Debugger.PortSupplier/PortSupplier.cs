@@ -5,7 +5,7 @@ using System.Text;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System.Runtime.InteropServices;
 
-namespace Cosmos.Debugger.PortSupplier {
+namespace Cosmos.VS.Debugger.PortSupplier {
 
   [Guid("83689638-F0EA-46c6-A03E-4D3F8C96328A")]
   public class PortSupplier : IDebugPortSupplier2 {

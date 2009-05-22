@@ -8,8 +8,8 @@
     <ProjectGuid>{AEC0F292-50AF-40C2-88FB-0426A62610F5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Cosmos.Debugger.PortSupplier</RootNamespace>
-    <AssemblyName>Cosmos.Debugger.PortSupplier</AssemblyName>
+    <RootNamespace>Cosmos.VS.Debugger.PortSupplier</RootNamespace>
+    <AssemblyName>Cosmos.VS.Debugger.PortSupplier</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
