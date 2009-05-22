@@ -35,14 +35,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Cosmos.Compiler.Builder, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Cosmos.Build.Windows\bin\Debug\Cosmos.Compiler.Builder.dll</HintPath>
-    </Reference>
-    <Reference Include="Indy.IL2CPU, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Indy.IL2CPU\bin\Debug\Indy.IL2CPU.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Microsoft.Build.Utilities" />
     <Reference Include="System" />
@@ -55,6 +47,12 @@
   <ItemGroup>
     <Compile Include="BuildOSImage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Cosmos.Builder.Common\Cosmos.Builder.Common.csproj">
+      <Project>{2915B786-408A-4475-B092-03F5735429E7}</Project>
+      <Name>Cosmos.Builder.Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
