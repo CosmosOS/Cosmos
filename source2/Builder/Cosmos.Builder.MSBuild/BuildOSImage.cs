@@ -7,7 +7,7 @@ using Microsoft.Build.Utilities;
 
 namespace Cosmos.Builder.MSBuild {
 	
-  public class BuildOSImage : Task {
+  public class BuildImage : Task {
 
 		private Boolean buildFailed;
 

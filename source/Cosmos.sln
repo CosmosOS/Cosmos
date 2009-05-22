@@ -154,9 +154,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Steve", "Steve", "{9FDB0A12
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Builder.Common", "..\source2\Builder\Cosmos.Builder.Common\Cosmos.Builder.Common.csproj", "{2915B786-408A-4475-B092-03F5735429E7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Builder.MSBuild", "..\source2\Builder\Cosmos.Builder.MSBuild\Cosmos.Builder.MSBuild.csproj", "{71E5DE71-F7C1-4B61-B5BE-4FD64682BDB0}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 52
+		SccNumberOfProjects = 53
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -364,6 +366,10 @@ Global
 		SccProjectTopLevelParentUniqueName51 = Cosmos.sln
 		SccProjectName51 = ../source2/Builder/Cosmos.Builder.Common
 		SccLocalPath51 = ..\\source2\\Builder\\Cosmos.Builder.Common
+		SccProjectUniqueName52 = ..\\source2\\Builder\\Cosmos.Builder.MSBuild\\Cosmos.Builder.MSBuild.csproj
+		SccProjectTopLevelParentUniqueName52 = Cosmos.sln
+		SccProjectName52 = ../source2/Builder/Cosmos.Builder.MSBuild
+		SccLocalPath52 = ..\\source2\\Builder\\Cosmos.Builder.MSBuild
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -570,6 +576,10 @@ Global
 		{2915B786-408A-4475-B092-03F5735429E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2915B786-408A-4475-B092-03F5735429E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2915B786-408A-4475-B092-03F5735429E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71E5DE71-F7C1-4B61-B5BE-4FD64682BDB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71E5DE71-F7C1-4B61-B5BE-4FD64682BDB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71E5DE71-F7C1-4B61-B5BE-4FD64682BDB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71E5DE71-F7C1-4B61-B5BE-4FD64682BDB0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -583,6 +593,7 @@ Global
 		{BE896274-5F06-430F-AAC4-D74CAEEB28F5} = {4070490F-A3FD-4E97-A89D-A1C96EF7BD37}
 		{5A1E9D16-BF71-4D8E-9389-3476056E4566} = {4070490F-A3FD-4E97-A89D-A1C96EF7BD37}
 		{2915B786-408A-4475-B092-03F5735429E7} = {4070490F-A3FD-4E97-A89D-A1C96EF7BD37}
+		{71E5DE71-F7C1-4B61-B5BE-4FD64682BDB0} = {4070490F-A3FD-4E97-A89D-A1C96EF7BD37}
 		{6F91B8C3-1A78-49D7-B915-F13EDFDAFDB3} = {21E68B7D-F1DC-46E2-9CFA-0A7C6D77D42E}
 		{4DE8EC69-B412-41C4-BCD9-1E032984E888} = {21E68B7D-F1DC-46E2-9CFA-0A7C6D77D42E}
 		{EBF602FE-8AFC-408D-A9F1-560C35651090} = {21E68B7D-F1DC-46E2-9CFA-0A7C6D77D42E}
