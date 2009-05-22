@@ -74,6 +74,7 @@
     </Compile>
     <Compile Include="Guids.cs" />
     <Compile Include="PropPageEnvironment.cs">
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="PropPageEnvironment.Designer.cs">
       <DependentUpon>PropPageEnvironment.cs</DependentUpon>
@@ -110,6 +111,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\CosmosProjectNode.bmp" />
     <Content Include="Templates\Projects\CosmosProject\Bootable Project.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Builder\Cosmos.Builder.Common\Cosmos.Builder.Common.csproj">
+      <Project>{2915B786-408A-4475-B092-03F5735429E7}</Project>
+      <Name>Cosmos.Builder.Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <!--
