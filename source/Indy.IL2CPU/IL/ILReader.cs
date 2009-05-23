@@ -5,8 +5,8 @@ using System.Reflection;
 using System.IO;
 
 namespace Indy.IL2CPU.IL {
-	public partial class ILReader {
-		private readonly MethodBody mBody;
+	public partial class ILReader: IDisposable {
+		private MethodBody mBody;
 		private MemoryStream mStream;
 		private MethodBase mMethod;
 		private Module mModule;
@@ -15,7 +15,18 @@ namespace Indy.IL2CPU.IL {
 			mMethod = aMethod;
 			mModule = mMethod.Module;
 			mStream = new MemoryStream(mBody.GetILAsByteArray());
+            GC.SuppressFinalize(mStream);
 		}
+
+        public void Dispose()
+        {
+            mStream.Dispose();
+            GC.ReRegisterForFinalize(mStream);
+            mStream = null;
+            mBody = null;
+            mMethod = null;
+            mModule = null;
+        }
 
 		private OpCodeEnum mOpCode;
 		private byte[] mOperand;

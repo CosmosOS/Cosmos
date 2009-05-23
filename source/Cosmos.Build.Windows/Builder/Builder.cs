@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using Microsoft.Win32;
 using Indy.IL2CPU;
-using Indy.IL2CPU.IL.X86;
+//using Indy.IL2CPU.IL.X86;
 using IL2CPU;
 using System.IO.Pipes;
 
@@ -43,7 +43,8 @@ namespace Cosmos.Compiler.Builder
             ToolsPath = BuildPath + @"Tools\";
             AsmPath = ToolsPath + @"asm\";
             // MtW: leave this here, otherwise VS wont copy required dependencies!
-            typeof(X86OpCodeMap).Equals(null);
+            throw new Exception("remove comment here");
+            //typeof(X86OpCodeMap).Equals(null);
 
             //TODO static hack
             BuilderStep.Completed += new Action<string, object>(BuilderStep_Completed);

@@ -174,7 +174,7 @@ namespace Indy.IL2CPU.Compiler
         private void CompileAssembly(Assembly aAssembly)
         {
             Console.Write(new String('-', Console.BufferWidth));
-            Console.WriteLine("Starting compilation of assembly: " + aAssembly.GetName().Name);
+            Console.WriteLine("Starting compilation of assembly: " + aAssembly.FullName);
             var xCompiler = new AssemblyCompiler();
             xCompiler.DebugLog = delegate(LogSeverityEnum aSeverity, string aMessage) { this.DebugLog(aSeverity, aMessage); };
             xCompiler.IsEntrypointAssembly = aAssembly == mEntryAssembly;
@@ -184,14 +184,14 @@ namespace Indy.IL2CPU.Compiler
             {
                 foreach (var xRef in mAllAssemblies)
                 {
-                    xCompiler.AssemblyReferences.Add(xRef.GetName().FullName);
+                    xCompiler.AssemblyReferences.Add(xRef.FullName);
                 }
             }
             // todo: move this out to a property/event
             xCompiler.OpCodeMap = GetOpCodeMap();
             xCompiler.Plugs.AddRange(Plugs);
             xCompiler.Types.AddRange(mGenericTypeInstancesToGenerate[aAssembly]);
-            xCompiler.Methods.AddRange(Convert(mGenericMethodInstancesToGenerate[aAssembly]));
+            xCompiler.Methods.AddRange(mGenericMethodInstancesToGenerate[aAssembly]);
             xCompiler.Execute();
             SaveAssembler(aAssembly, xCompiler.Assembler);
         }

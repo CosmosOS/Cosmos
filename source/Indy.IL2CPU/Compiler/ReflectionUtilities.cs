@@ -11,7 +11,7 @@ namespace Indy.IL2CPU.Compiler
         public static Type GetType(string aAssembly,
                                    string aType)
         {
-            if (String.IsNullOrEmpty(aAssembly) || aAssembly == typeof(ReflectionUtilities).Assembly.GetName().Name || aAssembly == typeof(ReflectionUtilities).Assembly.GetName().FullName)
+            if (String.IsNullOrEmpty(aAssembly) || aAssembly == typeof(ReflectionUtilities).Assembly.GetName().Name || aAssembly == typeof(ReflectionUtilities).Assembly.FullName)
             {
                 aAssembly = typeof(ReflectionUtilities).Assembly.FullName;
             }

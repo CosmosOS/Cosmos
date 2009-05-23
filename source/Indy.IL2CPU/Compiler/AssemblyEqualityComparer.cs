@@ -11,12 +11,12 @@ namespace Indy.IL2CPU.Compiler
         public bool Equals(Assembly x,
                            Assembly y)
         {
-            return x.GetName().FullName.Equals(y.GetName().FullName);
+            return x.FullName.Equals(y.FullName);
         }
 
         public int GetHashCode(Assembly obj)
         {
-            return obj.GetName().FullName.GetHashCode();
+            return obj.FullName.GetHashCode();
         }
     }
 }

@@ -25,7 +25,7 @@ namespace Indy.IL2CPU.Compiler
             Plugs = new List<string>();
             AssemblyReferences = new List<string>();
             Types = new List<Type>();
-            Methods = new List<RuntimeMethodHandle>();
+            Methods = new List<MethodBase>();
             StaticFields = new List<FieldInfo>();
         }
 
@@ -111,28 +111,23 @@ namespace Indy.IL2CPU.Compiler
 
             for (int i = 0 ; i < typesToProcess ;i++)
             {
-                var xType = Types[0]; 
+                var xType = Types[i]; 
 
                 foreach (var xMethod in xType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.DeclaredOnly))
                 {
-                    RuntimeMethodHandle handle = xMethod.MethodHandle;
-                    Methods.Add(handle);
-
-                    
+                    Methods.Add(xMethod);
                 }
                 foreach (var xCtor in xType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.DeclaredOnly))
                 {
-                    //Methods.Add(xCtor);
-                    RuntimeMethodHandle handle = xCtor.MethodHandle;
-                    Methods.Add(handle);
+                    Methods.Add(xCtor);
                 }
                 foreach (var xField in xType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly))
                 {
                     StaticFields.Add(xField);
                 }
 
-                //BK Test 
-                Types.RemoveAt(0); 
+                ////BK Test 
+                //Types.RemoveAt(0); 
             }
         }
 
@@ -254,18 +249,25 @@ namespace Indy.IL2CPU.Compiler
             }
         }
 
-        public List<RuntimeMethodHandle> Methods;
+        public List<MethodBase> Methods;
         public List<Type> Types;
         public List<FieldInfo> StaticFields;
 
         private int mInstructionsToSkip = 0;
         private void CompileAllMethods()
         {
+            long xCount = 0;
+            Console.WriteLine("Before compiling, amount of methods: {0}", Methods.Count);
             // all methods are in Methods, so we just need to iterate over them.
-            foreach (var xCurrentMethodField in Methods)
+            foreach (var xCurrentMethod in Methods)
             {
-
-                MethodBase xCurrentMethod = MethodInfo.GetMethodFromHandle(xCurrentMethodField, xCurrentMethodField.);
+                if (xCount % 100 == 0)
+                {
+                    Console.Write(new String('-', Console.BufferWidth));
+                    Console.WriteLine(xCount / 100);
+                    GC.Collect();
+                }
+                xCount++;
 
                 if (Console.KeyAvailable)
                 {
@@ -297,19 +299,21 @@ namespace Indy.IL2CPU.Compiler
                 #region Prescan method
                 try
                 {
-                    ILReader xReader = new ILReader(xCurrentMethod);
-                    MethodBody xBody = xCurrentMethod.GetMethodBody();
-                    // todo: add better detection of implementation state
-
-                    if (xBody != null)
+                    using (ILReader xReader = new ILReader(xCurrentMethod))
                     {
-                        mInstructionsToSkip = 0;
-                        Assembler.StackContents.Clear();
+                        MethodBody xBody = xCurrentMethod.GetMethodBody();
+                        // todo: add better detection of implementation state
 
-                        var xInstructionInfos = new List<DebugSymbolsAssemblyTypeMethodInstruction>();
-                        while (xReader.Read())
+                        if (xBody != null)
                         {
-                            OpCodeMap.ScanILCode(xReader, xMethodInfo, xMethodScanInfo);
+                            mInstructionsToSkip = 0;
+                            Assembler.StackContents.Clear();
+
+                            var xInstructionInfos = new List<DebugSymbolsAssemblyTypeMethodInstruction>();
+                            while (xReader.Read())
+                            {
+                                OpCodeMap.ScanILCode(xReader, xMethodInfo, xMethodScanInfo);
+                            }
                         }
                     }
                 }
@@ -385,7 +389,6 @@ namespace Indy.IL2CPU.Compiler
                         {
                             mInstructionsToSkip = 0;
                             Assembler.StackContents.Clear();
-                            var xReader = new ILReader(xCurrentMethod);
                             if (xMethodInfo.LabelName == "_BBE9E9A7F7761F7DC23F15255BBB0FF7")
                             {
                                 Console.Write("");
@@ -418,61 +421,26 @@ namespace Indy.IL2CPU.Compiler
                                 }
                             }
                             // Scan each IL op in the method
-                            xReader = new ILReader(xCurrentMethod);
-                            while (xReader.Read())
+                            using (var xReader = new ILReader(xCurrentMethod))
                             {
-                                ExceptionHandlingClause xCurrentHandler = null;
-
-                                #region Exception handling support code
-                                // todo: add support for nested handlers using a stack or so..
-                                foreach (ExceptionHandlingClause xHandler in xBody.ExceptionHandlingClauses)
+                                while (xReader.Read())
                                 {
-                                    if (xHandler.TryOffset > 0)
+                                    ExceptionHandlingClause xCurrentHandler = null;
+
+                                    #region Exception handling support code
+                                    // todo: add support for nested handlers using a stack or so..
+                                    foreach (ExceptionHandlingClause xHandler in xBody.ExceptionHandlingClauses)
                                     {
-                                        if (xHandler.TryOffset <= xReader.NextPosition && (xHandler.TryLength + xHandler.TryOffset) > xReader.NextPosition)
+                                        if (xHandler.TryOffset > 0)
                                         {
-                                            if (xCurrentHandler == null)
-                                            {
-                                                xCurrentHandler = xHandler;
-                                                continue;
-                                            }
-                                            else if (xHandler.TryOffset > xCurrentHandler.TryOffset && (xHandler.TryLength + xHandler.TryOffset) < (xCurrentHandler.TryLength + xCurrentHandler.TryOffset))
-                                            {
-                                                // only replace if the current found handler is narrower
-                                                xCurrentHandler = xHandler;
-                                                continue;
-                                            }
-                                        }
-                                    }
-                                    if (xHandler.HandlerOffset > 0)
-                                    {
-                                        if (xHandler.HandlerOffset <= xReader.NextPosition && (xHandler.HandlerOffset + xHandler.HandlerLength) > xReader.NextPosition)
-                                        {
-                                            if (xCurrentHandler == null)
-                                            {
-                                                xCurrentHandler = xHandler;
-                                                continue;
-                                            }
-                                            else if (xHandler.HandlerOffset > xCurrentHandler.HandlerOffset && (xHandler.HandlerOffset + xHandler.HandlerLength) < (xCurrentHandler.HandlerOffset + xCurrentHandler.HandlerLength))
-                                            {
-                                                // only replace if the current found handler is narrower
-                                                xCurrentHandler = xHandler;
-                                                continue;
-                                            }
-                                        }
-                                    }
-                                    if ((xHandler.Flags & ExceptionHandlingClauseOptions.Filter) > 0)
-                                    {
-                                        if (xHandler.FilterOffset > 0)
-                                        {
-                                            if (xHandler.FilterOffset <= xReader.NextPosition)
+                                            if (xHandler.TryOffset <= xReader.NextPosition && (xHandler.TryLength + xHandler.TryOffset) > xReader.NextPosition)
                                             {
                                                 if (xCurrentHandler == null)
                                                 {
                                                     xCurrentHandler = xHandler;
                                                     continue;
                                                 }
-                                                else if (xHandler.FilterOffset > xCurrentHandler.FilterOffset)
+                                                else if (xHandler.TryOffset > xCurrentHandler.TryOffset && (xHandler.TryLength + xHandler.TryOffset) < (xCurrentHandler.TryLength + xCurrentHandler.TryOffset))
                                                 {
                                                     // only replace if the current found handler is narrower
                                                     xCurrentHandler = xHandler;
@@ -480,60 +448,97 @@ namespace Indy.IL2CPU.Compiler
                                                 }
                                             }
                                         }
+                                        if (xHandler.HandlerOffset > 0)
+                                        {
+                                            if (xHandler.HandlerOffset <= xReader.NextPosition && (xHandler.HandlerOffset + xHandler.HandlerLength) > xReader.NextPosition)
+                                            {
+                                                if (xCurrentHandler == null)
+                                                {
+                                                    xCurrentHandler = xHandler;
+                                                    continue;
+                                                }
+                                                else if (xHandler.HandlerOffset > xCurrentHandler.HandlerOffset && (xHandler.HandlerOffset + xHandler.HandlerLength) < (xCurrentHandler.HandlerOffset + xCurrentHandler.HandlerLength))
+                                                {
+                                                    // only replace if the current found handler is narrower
+                                                    xCurrentHandler = xHandler;
+                                                    continue;
+                                                }
+                                            }
+                                        }
+                                        if ((xHandler.Flags & ExceptionHandlingClauseOptions.Filter) > 0)
+                                        {
+                                            if (xHandler.FilterOffset > 0)
+                                            {
+                                                if (xHandler.FilterOffset <= xReader.NextPosition)
+                                                {
+                                                    if (xCurrentHandler == null)
+                                                    {
+                                                        xCurrentHandler = xHandler;
+                                                        continue;
+                                                    }
+                                                    else if (xHandler.FilterOffset > xCurrentHandler.FilterOffset)
+                                                    {
+                                                        // only replace if the current found handler is narrower
+                                                        xCurrentHandler = xHandler;
+                                                        continue;
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
+                                    #endregion
+
+                                    xMethodInfo.CurrentHandler = xCurrentHandler;
+                                    xOp = GetOpFromType(OpCodeMap.GetOpForOpCode(xReader.OpCode), xReader, xMethodInfo);
+
+                                    xOp.Assembler = Assembler;
+                                    new Comment("StackItems = " + Assembler.StackContents.Count);
+                                    foreach (var xStackContent in Assembler.StackContents)
+                                    {
+                                        new Comment("    " + xStackContent.Size);
+                                    }
+
+                                    // Create label for current point
+                                    string xLabel = Op.GetInstructionLabel(xReader);
+                                    if (xLabel.StartsWith("."))
+                                    {
+                                        xLabel = DataMember.FilterStringForIncorrectChars(
+                                            Label.LastFullLabel + "__DOT__" + xLabel.Substring(1));
+                                    }
+
+                                    // Possibly emit Tracer call
+                                    EmitTracer(xOp, xCurrentMethod.DeclaringType.Namespace, (int)xReader.Position,
+                                        xCodeOffsets, xLabel);
+
+                                    //using (mSymbolsLocker.AcquireWriterLock())
+                                    //{
+                                    //    if (mSymbols != null)
+                                    //    {
+                                    //        var xMLSymbol = new MLDebugSymbol();
+                                    //        xMLSymbol.LabelName = xLabel;
+                                    //        int xStackSize = (from item in mAssembler.StackContents
+                                    //                          let xSize = (item.Size % 4 == 0)
+                                    //                                          ? item.Size
+                                    //                                          : (item.Size + (4 - (item.Size % 4)))
+                                    //                          select xSize).Sum();
+                                    //        xMLSymbol.StackDifference = xMethodInfo.LocalsSize + xStackSize;
+                                    //        try
+                                    //        {
+                                    //            xMLSymbol.AssemblyFile = xCurrentMethod.DeclaringType.Assembly.Location;
+                                    //        }
+                                    //        catch (NotSupportedException)
+                                    //        {
+                                    //            xMLSymbol.AssemblyFile = "DYNAMIC: " + xCurrentMethod.DeclaringType.Assembly.FullName;
+                                    //        }
+                                    //        xMLSymbol.MethodToken = xCurrentMethod.MetadataToken;
+                                    //        xMLSymbol.TypeToken = xCurrentMethod.DeclaringType.MetadataToken;
+                                    //        xMLSymbol.ILOffset = (int)xReader.Position;
+                                    //        mSymbols.Add(xMLSymbol);
+                                    //    }
+                                    //}
+                                    xOp.SetServiceProvider(this);
+                                    xOp.Assemble();
                                 }
-                                #endregion
-
-                                xMethodInfo.CurrentHandler = xCurrentHandler;
-                                xOp = GetOpFromType(OpCodeMap.GetOpForOpCode(xReader.OpCode), xReader, xMethodInfo);
-
-                                xOp.Assembler = Assembler;
-                                new Comment("StackItems = " + Assembler.StackContents.Count);
-                                foreach (var xStackContent in Assembler.StackContents)
-                                {
-                                    new Comment("    " + xStackContent.Size);
-                                }
-
-                                // Create label for current point
-                                string xLabel = Op.GetInstructionLabel(xReader);
-                                if (xLabel.StartsWith("."))
-                                {
-                                    xLabel = DataMember.FilterStringForIncorrectChars(
-                                        Label.LastFullLabel + "__DOT__" + xLabel.Substring(1));
-                                }
-
-                                // Possibly emit Tracer call
-                                EmitTracer(xOp, xCurrentMethod.DeclaringType.Namespace, (int)xReader.Position,
-                                    xCodeOffsets, xLabel);
-
-                                //using (mSymbolsLocker.AcquireWriterLock())
-                                //{
-                                //    if (mSymbols != null)
-                                //    {
-                                //        var xMLSymbol = new MLDebugSymbol();
-                                //        xMLSymbol.LabelName = xLabel;
-                                //        int xStackSize = (from item in mAssembler.StackContents
-                                //                          let xSize = (item.Size % 4 == 0)
-                                //                                          ? item.Size
-                                //                                          : (item.Size + (4 - (item.Size % 4)))
-                                //                          select xSize).Sum();
-                                //        xMLSymbol.StackDifference = xMethodInfo.LocalsSize + xStackSize;
-                                //        try
-                                //        {
-                                //            xMLSymbol.AssemblyFile = xCurrentMethod.DeclaringType.Assembly.Location;
-                                //        }
-                                //        catch (NotSupportedException)
-                                //        {
-                                //            xMLSymbol.AssemblyFile = "DYNAMIC: " + xCurrentMethod.DeclaringType.Assembly.FullName;
-                                //        }
-                                //        xMLSymbol.MethodToken = xCurrentMethod.MetadataToken;
-                                //        xMLSymbol.TypeToken = xCurrentMethod.DeclaringType.MetadataToken;
-                                //        xMLSymbol.ILOffset = (int)xReader.Position;
-                                //        mSymbols.Add(xMLSymbol);
-                                //    }
-                                //}
-                                xOp.SetServiceProvider(this);
-                                xOp.Assemble();
                             }
                             //if (mSymbols != null && !EMITmode)
                             //{
