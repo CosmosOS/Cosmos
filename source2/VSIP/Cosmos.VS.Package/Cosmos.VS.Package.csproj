@@ -128,6 +128,7 @@
     <Compile Include="VMOptionsQemu.Designer.cs">
       <DependentUpon>VMOptionsQemu.cs</DependentUpon>
     </Compile>
+    <Compile Include="VsConfigProvider.cs" />
     <Compile Include="VSProjectFactory.cs" />
     <Compile Include="VSProjectNode.cs" />
     <Compile Include="VSPackage.cs" />

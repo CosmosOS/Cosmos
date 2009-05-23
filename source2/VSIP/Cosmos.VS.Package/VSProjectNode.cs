@@ -26,6 +26,10 @@ namespace Cosmos.VS.Package {
 
     private static ImageList imageList;
 
+    protected override ConfigProvider CreateConfigProvider() {
+      return new VsConfigProvider(this);
+    }
+
     protected override Guid[] GetConfigurationIndependentPropertyPages() {
       // Default C# property pages
       // Unfortunately just adding them to the list does not work.
