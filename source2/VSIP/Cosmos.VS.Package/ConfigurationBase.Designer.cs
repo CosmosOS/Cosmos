@@ -108,8 +108,6 @@
 			this.comboConfiguration.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboConfiguration.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.comboConfiguration.FormattingEnabled = true;
-			this.comboConfiguration.Items.AddRange(new object[] {
-            "Active (Debug)"});
 			this.comboConfiguration.Location = new System.Drawing.Point(99, 3);
 			this.comboConfiguration.Name = "comboConfiguration";
 			this.comboConfiguration.Size = new System.Drawing.Size(147, 23);

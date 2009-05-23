@@ -13,11 +13,16 @@ using Help = Microsoft.VisualStudio.VSHelp.Help;
 using IServiceProvider = System.IServiceProvider;
 
 namespace Cosmos.VS.Package {
-    public partial class CustomPropertyPage : UserControl, IPropertyPage { 
+    public partial class CustomPropertyPage : UserControl, IPropertyPage {
+
+		private static List<CustomPropertyPage> _pageList = new List<CustomPropertyPage>();
+		protected static CustomPropertyPage[] Pages
+		{ get { return CustomPropertyPage._pageList.ToArray(); } }
+
         private ProjectNode _projectMgr; 
         private ProjectConfig[] _projectConfigs; 
         private IPropertyPageSite _site; 
-        private bool _dirty; 
+        private bool _dirty;
         private string _title; 
         private string _helpKeyword;
 		private Microsoft.VisualStudio.Project.Automation.OAProject _project;
@@ -27,7 +32,8 @@ namespace Cosmos.VS.Package {
             _projectConfigs = null;
 			_project = null;
             _site = null; 
-            _dirty = false; 
+            _dirty = false;
+			this.IgnoreDirty = false;
             _title = string.Empty; 
             _helpKeyword = string.Empty;
         }
@@ -64,24 +70,30 @@ namespace Cosmos.VS.Package {
             } 
         } 
  
-        protected bool IsDirty 
+        public bool IsDirty 
         { 
             get 
             { 
                 return _dirty; 
             } 
             set 
-            { 
-                if (_dirty != value) 
-                { 
-                    _dirty = value; 
-                    if (_site != null) 
-                    { 
-                        _site.OnStatusChange((uint)(_dirty ? PropPageStatus.Dirty : PropPageStatus.Clean)); 
-                    } 
-                } 
+            {
+				if (this.IgnoreDirty == false)
+				{
+					if (_dirty != value)
+					{
+						_dirty = value;
+						if (_site != null)
+						{
+							_site.OnStatusChange((uint)(_dirty ? PropPageStatus.Dirty : PropPageStatus.Clean));
+						}
+					}
+				}
             } 
-	        } 
+		}
+
+		protected bool IgnoreDirty
+		{ get; set; }
 	 
 	        protected ProjectNode ProjectMgr 
 	        { 
@@ -106,12 +118,11 @@ namespace Cosmos.VS.Package {
 					return _project;
 				}
 			}
-	
 
 	        protected virtual void FillProperties() 
 	        {} 
 	 
-	        protected virtual void ApplyChanges() 
+	        public virtual void ApplyChanges() 
 	        {} 
 	 
 	        protected virtual void Initialize() 
@@ -167,11 +178,14 @@ namespace Cosmos.VS.Package {
 	            CreateControl(); 
 	            Initialize(); 
 	            NativeMethods.SetParent(Handle, hWndParent);
+
+				CustomPropertyPage._pageList.Add(this);
 				FillProperties();
 	        } 
 	 
 	        void IPropertyPage.Deactivate() 
-	        { 
+	        {
+				CustomPropertyPage._pageList.Remove(this);
 	            Dispose(); 
 	        } 
 	 

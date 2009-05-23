@@ -140,6 +140,7 @@
 			this.buttonOutputBrowse.TabIndex = 1;
 			this.buttonOutputBrowse.Text = "...";
 			this.buttonOutputBrowse.UseVisualStyleBackColor = true;
+			this.buttonOutputBrowse.Click += new System.EventHandler(this.buttonOutputBrowse_Click);
 			// 
 			// textOutputPath
 			// 
@@ -201,11 +202,12 @@
 			this.checkUseInternalAssembler.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
 						| System.Windows.Forms.AnchorStyles.Left)));
 			this.checkUseInternalAssembler.AutoSize = true;
+			this.tableBuildOptions.SetColumnSpan(this.checkUseInternalAssembler, 2);
 			this.checkUseInternalAssembler.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.checkUseInternalAssembler.Location = new System.Drawing.Point(22, 165);
 			this.checkUseInternalAssembler.Margin = new System.Windows.Forms.Padding(22, 12, 3, 3);
 			this.checkUseInternalAssembler.Name = "checkUseInternalAssembler";
-			this.checkUseInternalAssembler.Size = new System.Drawing.Size(122, 19);
+			this.checkUseInternalAssembler.Size = new System.Drawing.Size(146, 19);
 			this.checkUseInternalAssembler.TabIndex = 10;
 			this.checkUseInternalAssembler.Text = "Use Internal Assembler";
 			this.checkUseInternalAssembler.UseVisualStyleBackColor = true;
@@ -227,7 +229,6 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.Controls.Add(this.tableBuildOptions);
 			this.Name = "BuildOptionsPropertyPage";
-			this.Size = new System.Drawing.Size(492, 288);
 			this.Title = "Build";
 			this.Controls.SetChildIndex(this.tableBuildOptions, 0);
 			this.tableBuildOptions.ResumeLayout(false);

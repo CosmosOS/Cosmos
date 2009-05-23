@@ -110,11 +110,23 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="SubPropertyPageBase.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SubPropertyPageBase.Designer.cs">
+      <DependentUpon>SubPropertyPageBase.cs</DependentUpon>
+    </Compile>
     <Compile Include="TitleDivision.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="TitleDivision.Designer.cs">
       <DependentUpon>TitleDivision.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UnsavedConfigurationChanges.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UnsavedConfigurationChanges.Designer.cs">
+      <DependentUpon>UnsavedConfigurationChanges.cs</DependentUpon>
     </Compile>
     <Compile Include="VMOptionsPropertyPage.cs">
       <SubType>UserControl</SubType>
@@ -171,8 +183,14 @@
       <DependentUpon>PropPageEnvironment.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\CosmosProjectNode.bmp" />
+    <EmbeddedResource Include="SubPropertyPageBase.resx">
+      <DependentUpon>SubPropertyPageBase.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="TitleDivision.resx">
       <DependentUpon>TitleDivision.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UnsavedConfigurationChanges.resx">
+      <DependentUpon>UnsavedConfigurationChanges.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="VMOptionsPropertyPage.resx">
       <DependentUpon>VMOptionsPropertyPage.cs</DependentUpon>

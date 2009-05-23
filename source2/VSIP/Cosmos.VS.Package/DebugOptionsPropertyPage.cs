@@ -18,33 +18,47 @@ namespace Cosmos.VS.Package
 			InitializeComponent();
 
 			//TODO: Remove test call.
-			this.SetConfiguration(new DebugOptionsQemu());
+			this.SetSubPropertyPage(new DebugOptionsQemu(this));
 		}
 
-		protected void SetConfiguration(Control configuration)
+		protected override void FillProperties()
+		{
+			base.FillProperties();
+			if ((this.Controls.Count > 0) && (this.Controls[0] is SubPropertyPageBase))
+			{ ((SubPropertyPageBase)this.Controls[0]).FillProperties(); }
+		}
+
+		public override void ApplyChanges()
+		{
+			base.ApplyChanges();
+			if ((this.Controls.Count > 0) && (this.Controls[0] is SubPropertyPageBase))
+			{ ((SubPropertyPageBase)this.Controls[0]).ApplyChanges(); }
+		}
+
+		protected void SetSubPropertyPage(SubPropertyPageBase subpage)
 		{
 			this.panelDebugConfig.SuspendLayout();
 
 			this.panelDebugConfig.Controls.Clear();
 
-			if (configuration != null)
+			if (subpage != null)
 			{
-				this.panelDebugConfig.Controls.Add(configuration);
+				this.panelDebugConfig.Controls.Add(subpage);
 
-				configuration.Location = new Point(0, 0);
-				configuration.Anchor = AnchorStyles.Top;
+				subpage.Location = new Point(0, 0);
+				subpage.Anchor = AnchorStyles.Top;
 
 				//page should also be the right width.
 				//if( configuration.Size.Width <= this.ClientSize.Width )
 				//{
-				configuration.Size = new Size(this.ClientSize.Width, configuration.Size.Height);
-				configuration.Anchor = configuration.Anchor | AnchorStyles.Left | AnchorStyles.Right;
+				subpage.Size = new Size(this.ClientSize.Width, subpage.Size.Height);
+				subpage.Anchor = subpage.Anchor | AnchorStyles.Left | AnchorStyles.Right;
 				//}
 
-				if (configuration.Size.Height <= this.ClientSize.Height)
+				if (subpage.Size.Height <= this.ClientSize.Height)
 				{
-					configuration.Size = new Size(configuration.Size.Width, this.ClientSize.Height);
-					configuration.Anchor = configuration.Anchor | AnchorStyles.Bottom;
+					subpage.Size = new Size(subpage.Size.Width, this.ClientSize.Height);
+					subpage.Anchor = subpage.Anchor | AnchorStyles.Bottom;
 				}
 
 				this.panelDebugConfig.Visible = true;

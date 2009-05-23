@@ -10,9 +10,9 @@ using Cosmos.Builder.Common;
 
 namespace Cosmos.VS.Package
 {
-	public partial class VMOptionsQemu : UserControl
+	public partial class VMOptionsQemu : SubPropertyPageBase
 	{
-		public VMOptionsQemu()
+		public VMOptionsQemu(CustomPropertyPage owner) : base(owner)
 		{
 			InitializeComponent();
 

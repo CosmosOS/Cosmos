@@ -10,10 +10,11 @@ using Cosmos.Builder.Common;
 
 namespace Cosmos.VS.Package
 {
-	public partial class DebugOptionsQemu : UserControl
+	public partial class DebugOptionsQemu : SubPropertyPageBase
 	{
-		public DebugOptionsQemu()
+		public DebugOptionsQemu(CustomPropertyPage owner) : base(owner)
 		{
+
 			InitializeComponent();
 
 			this.comboCommunication.Items.AddRange(EnumValue.GetEnumValues(typeof(DebugQemuCommunication)));
