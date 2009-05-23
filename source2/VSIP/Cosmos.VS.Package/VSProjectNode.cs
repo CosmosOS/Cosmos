@@ -41,6 +41,7 @@ namespace Cosmos.VS.Package {
           //typeof(PropPageTest).GUID,
 		  typeof(BuildOptionsPropertyPage).GUID,
 		  typeof(DebugOptionsPropertyPage).GUID,
+		  typeof(VMOptionsPropertyPage).GUID,
       };
     }
 

@@ -51,6 +51,7 @@ namespace Cosmos.VS.Package {
   //[ProvideObject(typeof(PropPageTest), RegisterUsing = RegistrationMethod.CodeBase)]
   [ProvideObject(typeof(BuildOptionsPropertyPage), RegisterUsing = RegistrationMethod.CodeBase)]
  [ProvideObject(typeof(DebugOptionsPropertyPage), RegisterUsing = RegistrationMethod.CodeBase)]
+	[ProvideObject(typeof(VMOptionsPropertyPage), RegisterUsing = RegistrationMethod.CodeBase)]
   [Guid(Guids.guidProjectPkgString)]
   public sealed class VSProject : ProjectPackage {
         /// <summary>
