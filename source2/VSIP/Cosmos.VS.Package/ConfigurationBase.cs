@@ -35,6 +35,18 @@ namespace Cosmos.VS.Package
 			this.comboConfiguration.SelectedIndexChanged += new EventHandler(comboConfiguration_SelectedIndexChanged);
 		}
 
+		protected override void Dispose(bool disposing)
+		{
+			if (disposing)
+			{
+				if (components != null) { components.Dispose(); }
+
+				ConfigurationBase.ProjectConfigurationChanged -= new EventHandler<ProjectConfigurationChangedEventArgs>(ConfigurationBase_ProjectConfigurationChanged);
+				this.comboConfiguration.SelectedIndexChanged -= new EventHandler(comboConfiguration_SelectedIndexChanged);
+			}
+			base.Dispose(disposing);
+		}
+
 		void comboConfiguration_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			Boolean skipEvent = false;
