@@ -27,8 +27,8 @@ namespace Cosmos.VS.Package {
             _site = null; 
             _dirty = false; 
             _title = string.Empty; 
-            _helpKeyword = string.Empty; 
-        } 
+            _helpKeyword = string.Empty;
+        }
 
         public virtual string Title 
         { 
@@ -149,15 +149,17 @@ namespace Cosmos.VS.Package {
 	
 	        void IPropertyPage.SetPageSite(IPropertyPageSite pPageSite) 
 	        { 
-	            _site = pPageSite; 
+	            _site = pPageSite;
 	        } 
 	 
 	        void IPropertyPage.Activate(IntPtr hWndParent, RECT[] pRect, int bModal) 
 	        { 
 	            CreateControl(); 
 	            Initialize(); 
-	            NativeMethods.SetParent(Handle, hWndParent); 
-	            FillProperties(); 
+	            NativeMethods.SetParent(Handle, hWndParent);
+
+				this.Size = new Size(620, 288);
+				FillProperties(); 
 	        } 
 	 
 	        void IPropertyPage.Deactivate() 
