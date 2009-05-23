@@ -33,7 +33,7 @@
 			this.labelArchitecture = new System.Windows.Forms.Label();
 			this.comboArchitecture = new System.Windows.Forms.ComboBox();
 			this.comboConfiguration = new System.Windows.Forms.ComboBox();
-			this.titleDivision1 = new Cosmos.VS.Package.TitleDivision();
+			this.titleDivision = new Cosmos.VS.Package.TitleDivision();
 			this.label2 = new System.Windows.Forms.Label();
 			this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
 			this.panel2 = new System.Windows.Forms.Panel();
@@ -54,7 +54,7 @@
 			this.tableConfigurationBase.Controls.Add(this.labelArchitecture, 2, 0);
 			this.tableConfigurationBase.Controls.Add(this.comboArchitecture, 3, 0);
 			this.tableConfigurationBase.Controls.Add(this.comboConfiguration, 1, 0);
-			this.tableConfigurationBase.Controls.Add(this.titleDivision1, 0, 1);
+			this.tableConfigurationBase.Controls.Add(this.titleDivision, 0, 1);
 			this.tableConfigurationBase.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.tableConfigurationBase.Location = new System.Drawing.Point(0, 0);
 			this.tableConfigurationBase.Margin = new System.Windows.Forms.Padding(0);
@@ -115,17 +115,17 @@
 			this.comboConfiguration.Size = new System.Drawing.Size(154, 23);
 			this.comboConfiguration.TabIndex = 4;
 			// 
-			// titleDivision1
+			// titleDivision
 			// 
-			this.titleDivision1.BackColor = System.Drawing.Color.Transparent;
-			this.tableConfigurationBase.SetColumnSpan(this.titleDivision1, 4);
-			this.titleDivision1.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.titleDivision1.LineColor = System.Drawing.SystemColors.ControlDark;
-			this.titleDivision1.Location = new System.Drawing.Point(3, 32);
-			this.titleDivision1.Name = "titleDivision1";
-			this.titleDivision1.Size = new System.Drawing.Size(614, 6);
-			this.titleDivision1.TabIndex = 5;
-			this.titleDivision1.Title = "";
+			this.titleDivision.BackColor = System.Drawing.Color.Transparent;
+			this.tableConfigurationBase.SetColumnSpan(this.titleDivision, 4);
+			this.titleDivision.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.titleDivision.LineColor = System.Drawing.SystemColors.ControlDark;
+			this.titleDivision.Location = new System.Drawing.Point(3, 32);
+			this.titleDivision.Name = "titleDivision";
+			this.titleDivision.Size = new System.Drawing.Size(614, 6);
+			this.titleDivision.TabIndex = 5;
+			this.titleDivision.Title = "";
 			// 
 			// label2
 			// 
@@ -190,7 +190,7 @@
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
 		private System.Windows.Forms.Panel panel2;
-		private TitleDivision titleDivision1;
+		private TitleDivision titleDivision;
 		protected System.Windows.Forms.ComboBox comboArchitecture;
 		protected System.Windows.Forms.ComboBox comboConfiguration;
 	}
