@@ -66,11 +66,35 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BuildOptionsPropertyPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="BuildOptionsPropertyPage.Designer.cs">
+      <DependentUpon>BuildOptionsPropertyPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ConfigurationBase.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ConfigurationBase.Designer.cs">
+      <DependentUpon>ConfigurationBase.cs</DependentUpon>
+    </Compile>
     <Compile Include="CustomPropertyPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="CustomPropertyPage.Designer.cs">
       <DependentUpon>CustomPropertyPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DebugOptionsPropertyPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DebugOptionsPropertyPage.Designer.cs">
+      <DependentUpon>DebugOptionsPropertyPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DebugOptionsQemu.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DebugOptionsQemu.Designer.cs">
+      <DependentUpon>DebugOptionsQemu.cs</DependentUpon>
     </Compile>
     <Compile Include="Guids.cs" />
     <Compile Include="PropPageEnvironment.cs">
@@ -86,6 +110,12 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="TitleDivision.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TitleDivision.Designer.cs">
+      <DependentUpon>TitleDivision.cs</DependentUpon>
+    </Compile>
     <Compile Include="VSProjectFactory.cs" />
     <Compile Include="VSProjectNode.cs" />
     <Compile Include="VSPackage.cs" />
@@ -105,11 +135,31 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="bin\Images\alert.png" />
+    <None Include="bin\Images\alert1.png" />
     <Content Include="Resources\Cosmos.ico" />
+    <EmbeddedResource Include="BuildOptionsPropertyPage.resx">
+      <DependentUpon>BuildOptionsPropertyPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ConfigurationBase.resx">
+      <DependentUpon>ConfigurationBase.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CustomPropertyPage.resx">
+      <DependentUpon>CustomPropertyPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DebugOptionsPropertyPage.resx">
+      <DependentUpon>DebugOptionsPropertyPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DebugOptionsQemu.resx">
+      <DependentUpon>DebugOptionsQemu.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="PropPageEnvironment.resx">
       <DependentUpon>PropPageEnvironment.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\CosmosProjectNode.bmp" />
+    <EmbeddedResource Include="TitleDivision.resx">
+      <DependentUpon>TitleDivision.cs</DependentUpon>
+    </EmbeddedResource>
     <Content Include="Templates\Projects\CosmosProject\Bootable Project.ico" />
   </ItemGroup>
   <ItemGroup>

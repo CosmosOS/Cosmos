@@ -37,8 +37,10 @@ namespace Cosmos.VS.Package {
       //F8D6553F-F752-4DBF-ACB6-F291B744A792 - Signing
       //1E78F8DB-6C07-4D61-A18F-7514010ABD56 - Build Events
       return new Guid[] {
-          typeof(PropPageEnvironment).GUID,
-          typeof(PropPageTest).GUID,
+         // typeof(PropPageEnvironment).GUID,
+          //typeof(PropPageTest).GUID,
+		  typeof(BuildOptionsPropertyPage).GUID,
+		  typeof(DebugOptionsPropertyPage).GUID,
       };
     }
 
