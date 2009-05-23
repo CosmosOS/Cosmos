@@ -10,6 +10,10 @@ namespace Cosmos.VS.Package {
 
     public VsProjectConfig(ProjectNode project, string configuration) : base(project, configuration) { }
 
+    public override int DebugLaunch(uint grfLaunch) {
+      return base.DebugLaunch(grfLaunch);
+    }
+
   }
 
 }
