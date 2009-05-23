@@ -152,6 +152,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TxUI", "TxUI\TxUI.csproj", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Steve", "Steve", "{9FDB0A12-6D62-41CF-917F-62A94A03472D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU.X86", "Compiler\Indy.IL2CPU.X86\Indy.IL2CPU.X86.csproj", "{5E70F7D9-388A-43C2-8D9B-A4C382A8278D}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Builder.Common", "..\source2\Builder\Cosmos.Builder.Common\Cosmos.Builder.Common.csproj", "{2915B786-408A-4475-B092-03F5735429E7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Builder.MSBuild", "..\source2\Builder\Cosmos.Builder.MSBuild\Cosmos.Builder.MSBuild.csproj", "{71E5DE71-F7C1-4B61-B5BE-4FD64682BDB0}"
@@ -362,6 +364,10 @@ Global
 		SccProjectTopLevelParentUniqueName50 = Cosmos.sln
 		SccProjectName50 = TxUI
 		SccLocalPath50 = TxUI
+		SccProjectUniqueName51 = Compiler\\Indy.IL2CPU.X86\\Indy.IL2CPU.X86.csproj
+		SccProjectTopLevelParentUniqueName51 = Cosmos.sln
+		SccProjectName51 = Compiler/Indy.IL2CPU.X86
+		SccLocalPath51 = Compiler\\Indy.IL2CPU.X86
 		SccProjectUniqueName51 = ..\\source2\\Builder\\Cosmos.Builder.Common\\Cosmos.Builder.Common.csproj
 		SccProjectTopLevelParentUniqueName51 = Cosmos.sln
 		SccProjectName51 = ../source2/Builder/Cosmos.Builder.Common
@@ -572,6 +578,10 @@ Global
 		{16D4E345-DF23-4095-A6D5-80D0538FC904}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{16D4E345-DF23-4095-A6D5-80D0538FC904}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{16D4E345-DF23-4095-A6D5-80D0538FC904}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E70F7D9-388A-43C2-8D9B-A4C382A8278D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E70F7D9-388A-43C2-8D9B-A4C382A8278D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E70F7D9-388A-43C2-8D9B-A4C382A8278D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E70F7D9-388A-43C2-8D9B-A4C382A8278D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2915B786-408A-4475-B092-03F5735429E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2915B786-408A-4475-B092-03F5735429E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2915B786-408A-4475-B092-03F5735429E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -592,6 +602,7 @@ Global
 		{8142656B-0A4B-4E05-BBE4-AA31CE7B18FA} = {4070490F-A3FD-4E97-A89D-A1C96EF7BD37}
 		{BE896274-5F06-430F-AAC4-D74CAEEB28F5} = {4070490F-A3FD-4E97-A89D-A1C96EF7BD37}
 		{5A1E9D16-BF71-4D8E-9389-3476056E4566} = {4070490F-A3FD-4E97-A89D-A1C96EF7BD37}
+		{5E70F7D9-388A-43C2-8D9B-A4C382A8278D} = {4070490F-A3FD-4E97-A89D-A1C96EF7BD37}
 		{2915B786-408A-4475-B092-03F5735429E7} = {4070490F-A3FD-4E97-A89D-A1C96EF7BD37}
 		{71E5DE71-F7C1-4B61-B5BE-4FD64682BDB0} = {4070490F-A3FD-4E97-A89D-A1C96EF7BD37}
 		{6F91B8C3-1A78-49D7-B915-F13EDFDAFDB3} = {21E68B7D-F1DC-46E2-9CFA-0A7C6D77D42E}

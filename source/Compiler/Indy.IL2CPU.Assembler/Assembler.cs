@@ -169,6 +169,9 @@ namespace Indy.IL2CPU.Assembler {
             int xIfLevelsToSkip = 0;
             var xDefines = new List<string>();
             var xNewAssemblerElements = new List<BaseAssemblerElement>();
+            Console.WriteLine("Assembler Element Count: {0}", mAllAssemblerElements.Count);
+            Console.WriteLine("Memory in use: {0}", System.Diagnostics.Process.GetCurrentProcess().WorkingSet64);
+            //Console.ReadLine();
             foreach (var xCurrentInstruction in mAllAssemblerElements) {
                 var xIfDefined = xCurrentInstruction as IIfDefined;
                 var xEndIfDefined = xCurrentInstruction as IEndIfDefined;

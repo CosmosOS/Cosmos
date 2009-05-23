@@ -12,6 +12,10 @@ namespace Indy.IL2CPU.Assembler {
         }
 
         public ElementReference(string aName) {
+            if (String.IsNullOrEmpty(aName))
+            {
+                throw new ArgumentNullException("aName");
+            }
             if (aName == "00h") {
                 Console.Write("");
             }

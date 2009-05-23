@@ -69,6 +69,10 @@ namespace System
 
         private static string GenerateFullName(MethodBase aMethod)
         {
+            if (aMethod == null)
+            {
+                throw new ArgumentNullException("aMethod");
+            }
             var xBuilder = new StringBuilder();
             var xParts = aMethod.ToString().Split(' ');
             var xParts2 = xParts.Skip(1).ToArray();

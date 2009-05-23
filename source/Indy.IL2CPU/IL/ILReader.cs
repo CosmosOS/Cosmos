@@ -285,20 +285,25 @@ namespace Indy.IL2CPU.IL {
 			}
 			return xResult;
 		}
-
+        //private byte[] mOperandBuff = new byte[8];
 		private byte[] ReadOperand(byte aOperandSize) {
-			byte[] xBytes = new byte[aOperandSize / 8];
+            //if (aOperandSize > 64)
+            //{
+            //    Console.Write("");
+            //}
+            var mOperandBuff = new byte[aOperandSize/8];
 			int index = 0;
+            //Array.Clear(mOperandBuff, 0, 8);
 			while (aOperandSize > 0) {
 				int xByteValueInt = mStream.ReadByte();
 				if (xByteValueInt == -1) {
 					break;
 				}
-				xBytes[index] = (byte)xByteValueInt;
+                mOperandBuff[index] = (byte)xByteValueInt;
 				index += 1;
 				aOperandSize -= 8;
 			}
-			return xBytes;
+            return mOperandBuff;
 		}
 
 		private static Int32 GetInt32FromOperandByteArray(byte[] aData) {

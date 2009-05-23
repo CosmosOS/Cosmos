@@ -22,7 +22,7 @@ namespace Cosmos.Compiler.Builder
                 
         public readonly string ToolsPath;
         public readonly string AsmPath;
-        public readonly Engine Engine = new Engine();
+        //public readonly Engine Engine = new Engine();
 
         public event Action CompileCompleted;
         public event Action BuildCompleted;
@@ -413,36 +413,37 @@ namespace Cosmos.Compiler.Builder
         private void RunEngine(object aParam)
         {
             var xParam = (PassedEngineValue)aParam;
-            Engine.TraceAssemblies = xParam.TraceAssemblies;
-            Engine.CompilingMethods += OnCompilingMethods;
-            Engine.CompilingStaticFields += OnCompilingStaticFields;
-            try
-            {
-                Engine.DebugLog += OnLogMessage;
+            //Engine.TraceAssemblies = xParam.TraceAssemblies;
+            //Engine.CompilingMethods += OnCompilingMethods;
+            //Engine.CompilingStaticFields += OnCompilingStaticFields;
+            //try
+            //{
+            //    Engine.DebugLog += OnLogMessage;
 
-                LogTime("Engine execute start");
-                currentProgress.Step = "Engine Execute";
-                Engine.Execute(xParam.aAssembly,
-                               xParam.aTargetPlatform,
-                               g => Path.Combine(AsmPath, g + ".asm"),
-                               xParam.aPlugs,
-                               xParam.aDebugMode,
-                               xParam.GDBDebug,
-                               1,
-                               xParam.aOutputDir,
-                               (Cosmos.Compiler.Builder.BuildOptions.Load()).UseInternalAssembler); //HACK
-                LogTime("Engine execute finish");
-            }
-            catch (Exception E)
-            {
-                OnLogMessage(LogSeverityEnum.Error, E.ToString());
-            }
-            finally
-            {
-                Engine.CompilingMethods -= OnCompilingMethods;
-                Engine.CompilingStaticFields -= OnCompilingStaticFields;
+            //    LogTime("Engine execute start");
+            //    currentProgress.Step = "Engine Execute";
+            //    Engine.Execute(xParam.aAssembly,
+            //                   xParam.aTargetPlatform,
+            //                   g => Path.Combine(AsmPath, g + ".asm"),
+            //                   xParam.aPlugs,
+            //                   xParam.aDebugMode,
+            //                   xParam.GDBDebug,
+            //                   1,
+            //                   xParam.aOutputDir,
+            //                   (Cosmos.Compiler.Builder.BuildOptions.Load()).UseInternalAssembler); //HACK
+            //    LogTime("Engine execute finish");
+            //}
+            //catch (Exception E)
+            //{
+            //    OnLogMessage(LogSeverityEnum.Error, E.ToString());
+            //}
+            //finally
+            //{
+            //    Engine.CompilingMethods -= OnCompilingMethods;
+            //    Engine.CompilingStaticFields -= OnCompilingStaticFields;
 
-            }
+            //}
+            throw new Exception("Fix building!");
 
         }
 

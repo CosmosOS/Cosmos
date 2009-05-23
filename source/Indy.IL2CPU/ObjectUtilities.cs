@@ -29,15 +29,5 @@ namespace Indy.IL2CPU {
 			}
 			return IsArray(aType.BaseType);
 		}
-
-		public static uint GetObjectStorageSize(Type aType) {
-			if (aType == null) {
-				throw new ArgumentNullException("aType");
-			}
-			var xTypeInfo = Engine.GetTypeInfo(aType);
-		    return xTypeInfo.NeedsGC
-		               ? xTypeInfo.StorageSize + ObjectImpl.FieldDataOffset
-		               : xTypeInfo.StorageSize;
-		}
 	}
 }

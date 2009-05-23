@@ -25,6 +25,27 @@ namespace Indy.IL2CPU.IL {
 			get;
 		}
 
+        public void SetServiceProvider(IServiceProvider aProvider)
+        {
+            mServiceProvider = aProvider;
+        }
+
+        protected IServiceProvider GetServiceProvider()
+        {
+            return mServiceProvider;
+        }
+
+        private IServiceProvider mServiceProvider;
+
+        protected T GetService<T>()
+        {
+            if (mServiceProvider == null)
+            {
+                throw new Exception("No ServiceProvider specified!");
+            }
+            return mServiceProvider.GetService<T>();
+        }
+
 		protected abstract Type GetMethodHeaderOp();
 		protected abstract Type GetMethodFooterOp();
 		protected abstract Type GetCustomMethodImplementationProxyOp();

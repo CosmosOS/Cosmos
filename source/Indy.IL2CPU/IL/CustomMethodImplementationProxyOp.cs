@@ -42,7 +42,6 @@ namespace Indy.IL2CPU.IL {
 				}
 			}
 			CallProxiedMethod();
-			DoQueueMethod(ProxiedMethod);
 		}
 	}
 }

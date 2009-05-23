@@ -231,7 +231,7 @@ namespace Cosmos.TestRunner
                         {
                             throw new Exception("Not enough bytes read!");
                         }
-                        int xLength = BitConverter.ToInt32(xLengthBytes, 0);
+                        int xLength = (int) BitConverter.ToUInt32(xLengthBytes, 0);
                         xReceiveInput();
                         var xStringBytes = new byte[xLength];
                         if (xInputStream.Read(xStringBytes, 0, xLength) != xLength)

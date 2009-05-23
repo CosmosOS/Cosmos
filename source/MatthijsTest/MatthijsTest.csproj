@@ -38,17 +38,10 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="mono-curses, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\3PLibraryPlugs\mono-curses.Plugs\mono-curses.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
-    <Reference Include="System.Data" />
-    <Reference Include="System.Security" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
@@ -74,10 +67,6 @@
     <ProjectReference Include="..\Cosmos\Cosmos.System\Cosmos.Sys.csproj">
       <Project>{819DB8FC-5DA1-461F-83C9-2F5C88088C94}</Project>
       <Name>Cosmos.Sys</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Indy.IL2CPU\Indy.IL2CPU.csproj">
-      <Project>{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}</Project>
-      <Name>Indy.IL2CPU</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

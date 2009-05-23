@@ -1,0 +1,283 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{5E70F7D9-388A-43C2-8D9B-A4C382A8278D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Indy.IL2CPU</RootNamespace>
+    <AssemblyName>Indy.IL2CPU.X86</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <StartupObject>
+    </StartupObject>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>Cosmos.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <ItemGroup>
+    <Compile Include="Assembler\X86\CosmosAssembler.cs" />
+    <Compile Include="Assembler\X86\SpecialDebug\DebugStub.cs" />
+    <Compile Include="IL\x86\Add.cs" />
+    <Compile Include="IL\x86\Add_Ovf.cs" />
+    <Compile Include="IL\x86\Add_Ovf_Un.cs" />
+    <Compile Include="IL\x86\And.cs" />
+    <Compile Include="IL\x86\Arglist.cs" />
+    <Compile Include="IL\x86\Beq.cs" />
+    <Compile Include="IL\x86\Bge.cs" />
+    <Compile Include="IL\x86\Bge_Un.cs" />
+    <Compile Include="IL\x86\Bgt.cs" />
+    <Compile Include="IL\x86\Bgt_Un.cs" />
+    <Compile Include="IL\x86\Ble.cs" />
+    <Compile Include="IL\x86\Ble_Un.cs" />
+    <Compile Include="IL\x86\Blt.cs" />
+    <Compile Include="IL\x86\Blt_Un.cs" />
+    <Compile Include="IL\x86\Bne_Un.cs" />
+    <Compile Include="IL\x86\Box.cs" />
+    <Compile Include="IL\x86\Br.cs" />
+    <Compile Include="IL\x86\Break.cs" />
+    <Compile Include="IL\x86\Brfalse.cs" />
+    <Compile Include="IL\x86\Brtrue.cs" />
+    <Compile Include="IL\x86\Call.cs" />
+    <Compile Include="IL\x86\Calli.cs" />
+    <Compile Include="IL\x86\Callvirt.cs" />
+    <Compile Include="IL\x86\Castclass.cs" />
+    <Compile Include="IL\x86\Ceq.cs" />
+    <Compile Include="IL\x86\Cgt.cs" />
+    <Compile Include="IL\x86\Cgt_Un.cs" />
+    <Compile Include="IL\x86\Ckfinite.cs" />
+    <Compile Include="IL\x86\Clt.cs" />
+    <Compile Include="IL\x86\Clt_Un.cs" />
+    <Compile Include="IL\x86\Constrained.cs" />
+    <Compile Include="IL\x86\Conv_I.cs" />
+    <Compile Include="IL\x86\Conv_I1.cs" />
+    <Compile Include="IL\x86\Conv_I2.cs" />
+    <Compile Include="IL\x86\Conv_I4.cs" />
+    <Compile Include="IL\x86\Conv_I8.cs" />
+    <Compile Include="IL\x86\Conv_Ovf_I.cs" />
+    <Compile Include="IL\x86\Conv_Ovf_I1.cs" />
+    <Compile Include="IL\x86\Conv_Ovf_I1_Un.cs" />
+    <Compile Include="IL\x86\Conv_Ovf_I2.cs" />
+    <Compile Include="IL\x86\Conv_Ovf_I2_Un.cs" />
+    <Compile Include="IL\x86\Conv_Ovf_I4.cs" />
+    <Compile Include="IL\x86\Conv_Ovf_I4_Un.cs" />
+    <Compile Include="IL\x86\Conv_Ovf_I8.cs" />
+    <Compile Include="IL\x86\Conv_Ovf_I8_Un.cs" />
+    <Compile Include="IL\x86\Conv_Ovf_I_Un.cs" />
+    <Compile Include="IL\x86\Conv_Ovf_U.cs" />
+    <Compile Include="IL\x86\Conv_Ovf_U1.cs" />
+    <Compile Include="IL\x86\Conv_Ovf_U1_Un.cs" />
+    <Compile Include="IL\x86\Conv_Ovf_U2.cs" />
+    <Compile Include="IL\x86\Conv_Ovf_U2_Un.cs" />
+    <Compile Include="IL\x86\Conv_Ovf_U4.cs" />
+    <Compile Include="IL\x86\Conv_Ovf_U4_Un.cs" />
+    <Compile Include="IL\x86\Conv_Ovf_U8.cs" />
+    <Compile Include="IL\x86\Conv_Ovf_U8_Un.cs" />
+    <Compile Include="IL\x86\Conv_Ovf_U_Un.cs" />
+    <Compile Include="IL\x86\Conv_R4.cs" />
+    <Compile Include="IL\x86\Conv_R8.cs" />
+    <Compile Include="IL\x86\Conv_R_Un.cs" />
+    <Compile Include="IL\x86\Conv_U.cs" />
+    <Compile Include="IL\x86\Conv_U1.cs" />
+    <Compile Include="IL\x86\Conv_U2.cs" />
+    <Compile Include="IL\x86\Conv_U4.cs" />
+    <Compile Include="IL\x86\Conv_U8.cs" />
+    <Compile Include="IL\x86\Cpblk.cs" />
+    <Compile Include="IL\x86\Cpobj.cs" />
+    <Compile Include="IL\x86\CustomImplementations\Diagnostics\BreakAssembler.cs" />
+    <Compile Include="IL\x86\CustomImplementations\Diagnostics\DebuggerImpl.cs" />
+    <Compile Include="IL\x86\CustomImplementations\Diagnostics\DebugImpl.cs" />
+    <Compile Include="IL\x86\CustomImplementations\Diagnostics\DebugImplRefs.cs" />
+    <Compile Include="IL\x86\CustomImplementations\Mono\System\StringImpl.cs" />
+    <Compile Include="IL\x86\CustomImplementations\MS\System\StringImpl.cs" />
+    <Compile Include="IL\x86\CustomImplementations\System.Runtime.CompilerServices\RuntimeHelpersImpl.cs" />
+    <Compile Include="IL\x86\CustomImplementations\System\ArrayImpl.cs" />
+    <Compile Include="IL\x86\CustomImplementations\System\Assemblers\Array_InternalCopy.cs" />
+    <Compile Include="IL\x86\CustomImplementations\System\Assemblers\Buffer_BlockCopy.cs" />
+    <Compile Include="IL\x86\CustomImplementations\System\Assemblers\MulticastDelegate_Invoke.cs" />
+    <Compile Include="IL\x86\CustomImplementations\System\Buffer.cs" />
+    <Compile Include="IL\x86\CustomImplementations\System\DelegateImpl.cs" />
+    <Compile Include="IL\x86\CustomImplementations\System\EnumImpl.cs" />
+    <Compile Include="IL\x86\CustomImplementations\System\EventHandlerImpl.cs" />
+    <Compile Include="IL\x86\CustomImplementations\System\EventHandlerImplRefs.cs" />
+    <Compile Include="IL\x86\CustomImplementations\System\ExceptionImpl.cs" />
+    <Compile Include="IL\x86\CustomImplementations\System\MulticastDelegateImpl.cs" />
+    <Compile Include="IL\x86\CustomImplementations\System\MulticastDelegateImplRefs.cs" />
+    <Compile Include="IL\x86\CustomImplementations\System\ObjectImplRefs.cs" />
+    <Compile Include="IL\x86\Div.cs" />
+    <Compile Include="IL\x86\Div_Un.cs" />
+    <Compile Include="IL\x86\Dup.cs" />
+    <Compile Include="IL\x86\Endfilter.cs" />
+    <Compile Include="IL\x86\Endfinally.cs" />
+    <Compile Include="IL\x86\Initblk.cs" />
+    <Compile Include="IL\x86\Initobj.cs" />
+    <Compile Include="IL\x86\Isinst.cs" />
+    <Compile Include="IL\x86\Jmp.cs" />
+    <Compile Include="IL\x86\Ldarg.cs" />
+    <Compile Include="IL\x86\Ldarga.cs" />
+    <Compile Include="IL\x86\Ldc_I4.cs" />
+    <Compile Include="IL\x86\Ldc_I8.cs" />
+    <Compile Include="IL\x86\Ldc_R4.cs" />
+    <Compile Include="IL\x86\Ldc_R8.cs" />
+    <Compile Include="IL\x86\Ldelem.cs" />
+    <Compile Include="IL\x86\Ldelema.cs" />
+    <Compile Include="IL\x86\Ldelem_I.cs" />
+    <Compile Include="IL\x86\Ldelem_I1.cs" />
+    <Compile Include="IL\x86\Ldelem_I2.cs" />
+    <Compile Include="IL\x86\Ldelem_I4.cs" />
+    <Compile Include="IL\x86\Ldelem_I8.cs" />
+    <Compile Include="IL\x86\Ldelem_R4.cs" />
+    <Compile Include="IL\x86\Ldelem_R8.cs" />
+    <Compile Include="IL\x86\Ldelem_Ref.cs" />
+    <Compile Include="IL\x86\Ldelem_U1.cs" />
+    <Compile Include="IL\x86\Ldelem_U2.cs" />
+    <Compile Include="IL\x86\Ldelem_U4.cs" />
+    <Compile Include="IL\x86\Ldfld.cs" />
+    <Compile Include="IL\x86\Ldflda.cs" />
+    <Compile Include="IL\x86\Ldftn.cs" />
+    <Compile Include="IL\x86\Ldind_I.cs" />
+    <Compile Include="IL\x86\Ldind_I1.cs" />
+    <Compile Include="IL\x86\Ldind_I2.cs" />
+    <Compile Include="IL\x86\Ldind_I4.cs" />
+    <Compile Include="IL\x86\Ldind_I8.cs" />
+    <Compile Include="IL\x86\Ldind_R4.cs" />
+    <Compile Include="IL\x86\Ldind_R8.cs" />
+    <Compile Include="IL\x86\Ldind_Ref.cs" />
+    <Compile Include="IL\x86\Ldind_U1.cs" />
+    <Compile Include="IL\x86\Ldind_U2.cs" />
+    <Compile Include="IL\x86\Ldind_U4.cs" />
+    <Compile Include="IL\x86\Ldlen.cs" />
+    <Compile Include="IL\x86\Ldloc.cs" />
+    <Compile Include="IL\x86\Ldloca.cs" />
+    <Compile Include="IL\x86\Ldnull.cs" />
+    <Compile Include="IL\x86\Ldobj.cs" />
+    <Compile Include="IL\x86\Ldsfld.cs" />
+    <Compile Include="IL\x86\Ldsflda.cs" />
+    <Compile Include="IL\x86\LdStr.cs" />
+    <Compile Include="IL\x86\Ldtoken.cs" />
+    <Compile Include="IL\x86\Ldvirtftn.cs" />
+    <Compile Include="IL\x86\Leave.cs" />
+    <Compile Include="IL\x86\Localloc.cs" />
+    <Compile Include="IL\x86\Mkrefany.cs" />
+    <Compile Include="IL\x86\Mul.cs" />
+    <Compile Include="IL\x86\Mul_Ovf.cs" />
+    <Compile Include="IL\x86\Mul_Ovf_Un.cs" />
+    <Compile Include="IL\x86\Neg.cs" />
+    <Compile Include="IL\x86\Newarr.cs" />
+    <Compile Include="IL\x86\Newobj.cs" />
+    <Compile Include="IL\x86\Nop.cs" />
+    <Compile Include="IL\x86\Not.cs" />
+    <Compile Include="IL\x86\Op.cs" />
+    <Compile Include="IL\x86\Or.cs" />
+    <Compile Include="IL\x86\Pop.cs" />
+    <Compile Include="IL\x86\Readonly.cs" />
+    <Compile Include="IL\x86\Refanytype.cs" />
+    <Compile Include="IL\x86\Refanyval.cs" />
+    <Compile Include="IL\x86\Rem.cs" />
+    <Compile Include="IL\x86\Rem_Un.cs" />
+    <Compile Include="IL\x86\Ret.cs" />
+    <Compile Include="IL\x86\Rethrow.cs" />
+    <Compile Include="IL\x86\Shl.cs" />
+    <Compile Include="IL\x86\Shr.cs" />
+    <Compile Include="IL\x86\Shr_Un.cs" />
+    <Compile Include="IL\x86\Sizeof.cs" />
+    <Compile Include="IL\x86\Starg.cs" />
+    <Compile Include="IL\x86\Stelem.cs" />
+    <Compile Include="IL\x86\Stelem_I.cs" />
+    <Compile Include="IL\x86\Stelem_I1.cs" />
+    <Compile Include="IL\x86\Stelem_I2.cs" />
+    <Compile Include="IL\x86\Stelem_I4.cs" />
+    <Compile Include="IL\x86\Stelem_I8.cs" />
+    <Compile Include="IL\x86\Stelem_R4.cs" />
+    <Compile Include="IL\x86\Stelem_R8.cs" />
+    <Compile Include="IL\x86\Stelem_Ref.cs" />
+    <Compile Include="IL\x86\Stfld.cs" />
+    <Compile Include="IL\x86\Stind_I.cs" />
+    <Compile Include="IL\x86\Stind_I1.cs" />
+    <Compile Include="IL\x86\Stind_I2.cs" />
+    <Compile Include="IL\x86\Stind_I4.cs" />
+    <Compile Include="IL\x86\Stind_I8.cs" />
+    <Compile Include="IL\x86\Stind_R4.cs" />
+    <Compile Include="IL\x86\Stind_R8.cs" />
+    <Compile Include="IL\x86\Stind_Ref.cs" />
+    <Compile Include="IL\x86\Stloc.cs" />
+    <Compile Include="IL\x86\Stobj.cs" />
+    <Compile Include="IL\x86\Stsfld.cs" />
+    <Compile Include="IL\x86\Sub.cs" />
+    <Compile Include="IL\x86\Sub_Ovf.cs" />
+    <Compile Include="IL\x86\Sub_Ovf_Un.cs" />
+    <Compile Include="IL\x86\Switch.cs" />
+    <Compile Include="IL\x86\Throw.cs" />
+    <Compile Include="IL\x86\Unaligned.cs" />
+    <Compile Include="IL\x86\Unbox.cs" />
+    <Compile Include="IL\x86\Unbox_Any.cs" />
+    <Compile Include="IL\x86\Volatile.cs" />
+    <Compile Include="IL\x86\X86CustomMethodImplementationOp.cs" />
+    <Compile Include="IL\x86\X86CustomMethodImplementationProxyOp.cs" />
+    <Compile Include="IL\x86\X86InitVmtImplementationOp.cs" />
+    <Compile Include="IL\x86\X86MainEntryPointOp.cs" />
+    <Compile Include="IL\x86\X86MethodFooterOp.cs" />
+    <Compile Include="IL\x86\X86MethodHeaderOp.cs" />
+    <Compile Include="IL\x86\X86OpCodeMap.cs" />
+    <Compile Include="IL\x86\Xor.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\IL2CPU\Cosmos.IL2CPU.Debug\Cosmos.Compiler.Debug.csproj">
+      <Project>{9998B4EA-385E-4DA2-8905-2BBEB5B2C6E2}</Project>
+      <Name>Cosmos.Compiler.Debug</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Indy.IL2CPU\Indy.IL2CPU.csproj">
+      <Project>{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}</Project>
+      <Name>Indy.IL2CPU</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Indy.IL2CPU.Assembler\Indy.IL2CPU.Assembler.csproj">
+      <Project>{5A1E9D16-BF71-4D8E-9389-3476056E4566}</Project>
+      <Name>Indy.IL2CPU.Assembler</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Cosmos.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="IL\x86\CustomImplementations\Generic\" />
+  </ItemGroup>
+</Project>

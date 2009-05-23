@@ -1,5 +1,4 @@
-﻿//#define GenerateTests
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,59 +9,51 @@ using Indy.IL2CPU.Assembler.X86;
 using Indy.IL2CPU.Assembler.X86.X;
 using Indy.IL2CPU.Tests.AssemblerTests.X86;
 using Assembler=Indy.IL2CPU.Assembler.X86.Assembler;
+using Indy.IL2CPU.Compiler;
+using Indy.IL2CPU.IL.X86;
+using Cosmos.Compiler.Builder;
+using Indy.IL2CPU;
 
 namespace TestApp {
     class Program {
-        class Renderer : Y86 {
-            public void DoRender() {
-
-            }
-        }
-        private static void Render(ELFAssembler aAssembler) {
-            aAssembler.Instructions.Clear();
-            aAssembler.DataMembers.Clear();
-            aAssembler.DataMembers.Add(new DataMember("Magic", 0x1BADB002) { IsGlobal = true, Alignment = 4 });
-            aAssembler.DataMembers.Add(new DataMember("Flags", 0x00000003) { IsGlobal = true, Alignment = 4 });
-            aAssembler.DataMembers.Add(new DataMember("Checksum", 0 - 0x1BADB005) { IsGlobal = true, Alignment = 4 });
-            aAssembler.DataMembers.Add(new DataMember("MyData", new byte[1] { 65 }) { IsGlobal = true });
-            var xItem = new Move {
-                DestinationValue = 0xB8000,
-                DestinationIsIndirect = true,
-                SourceValue = 65,
-                Size = 8
-            };
-            //4byte: magic
-            // 4byte flags
-            // 4byte checksum
-            aAssembler.StartLabel = new Label("_the_start") { IsGlobal = true };
-            new Move {
-                DestinationValue = 0xB8000,
-                DestinationIsIndirect = true,
-                SourceValue = 66,
-                Size = 8
-            };
-            new Label("_before_end");
-            new Halt();
-            new Jump { DestinationLabel = "_before_end" };
-        }
-
         static void Main(string[] args) {
-            try {
-
-                var xAssembler = new ELFAssembler();
-                Render(xAssembler);
-                using (var xOutText = new StreamWriter(@"D:\.NET\Cosmos\ELFOut\asm\output.asm")) {
-                    xAssembler.FlushText(xOutText);
-                }
-                xAssembler = new ELFAssembler();
-                Render(xAssembler);
-                using (var xOutBin = new FileStream(@"D:\.NET\Cosmos\ELFOut\bin\output.bin", FileMode.Create)) {
-                    xAssembler.FlushBinary(xOutBin, 0);
-                }
-
-            } catch (Exception E) {
+            try
+            {
+                var xCompileHelper = new CompilerHelper();
+                xCompileHelper.GetCacheStateFile += new Func<Assembly, string>(delegate(Assembly aAssembly)
+                {
+                    return @"e:\Cosmos\source\Playgrounds\Matthijs\TestApp\bin\Debug\out\" + aAssembly.GetName().Name + ".cachestate";
+                });
+                xCompileHelper.GetChecksumFile += new Func<Assembly, string>(delegate(Assembly aAssembly)
+                {
+                    return @"e:\Cosmos\source\Playgrounds\Matthijs\TestApp\bin\Debug\out\" + aAssembly.GetName().Name + ".checksum";
+                });
+                xCompileHelper.GetOpCodeMap += new Func<Indy.IL2CPU.IL.OpCodeMap>(delegate { return new X86OpCodeMap(); });
+                xCompileHelper.SkipList.Add(typeof(Builder).Assembly);
+                xCompileHelper.GetAssembler += new Func<Assembly, bool, Indy.IL2CPU.Assembler.Assembler>(
+                    delegate(Assembly aAssembly, bool aIsMain)
+                    {
+                        return new Assembler();
+                    });
+                xCompileHelper.SaveAssembler += new Action<Assembly, Indy.IL2CPU.Assembler.Assembler>(delegate(Assembly aAssembly, Indy.IL2CPU.Assembler.Assembler aAssembler)
+                {
+                    using (var xOut = new StreamWriter(@"e:\Cosmos\source\Playgrounds\Matthijs\TestApp\bin\Debug\out\" + aAssembly.GetName().Name + ".out", false))
+                    {
+                        aAssembler.FlushText(xOut);
+                    }
+                });
+                xCompileHelper.DebugLog += delegate(LogSeverityEnum aSeverity, string aMessage) { Console.WriteLine("{0}: {1}", aSeverity, aMessage); };
+                xCompileHelper.Plugs.Add(Path.Combine(Path.Combine(@"e:\Cosmos\Build\Tools", "Cosmos.Kernel.Plugs"), "Cosmos.Kernel.Plugs.dll"));
+                xCompileHelper.Plugs.Add(Path.Combine(Path.Combine(@"e:\Cosmos\Build\Tools", "Cosmos.Hardware.Plugs"), "Cosmos.Hardware.Plugs.dll"));
+                xCompileHelper.Plugs.Add(Path.Combine(Path.Combine(@"e:\Cosmos\Build\Tools", "Cosmos.Sys.Plugs"), "Cosmos.Sys.Plugs.dll"));
+                xCompileHelper.CompileExe(typeof(MatthijsTest.Program).Assembly);
+            }
+            catch (Exception E)
+            {
                 Console.WriteLine("Error: " + E.ToString());
-            } finally {
+            }
+            finally
+            {
                 Console.WriteLine("Done.");
                 Console.ReadLine();
             }

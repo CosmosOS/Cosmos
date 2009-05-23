@@ -32,6 +32,29 @@ namespace Indy.IL2CPU.IL {
 			DoAssemble();
 		}
 
+        public void SetServiceProvider(IServiceProvider aProvider)
+        {
+            if (mServiceProvider != null) { throw new Exception("Can only set ServiceProvider once!"); }
+            if (aProvider == null) { throw new Exception("ServiceProvider cannot be null!"); }
+            mServiceProvider = aProvider;
+        }
+
+        protected IServiceProvider GetServiceProvider()
+        {
+            return mServiceProvider;
+        }
+
+        private IServiceProvider mServiceProvider;
+
+        protected T GetService<T>()
+        {
+            if (mServiceProvider == null)
+            {
+                throw new Exception("No ServiceProvider specified!");
+            }
+            return mServiceProvider.GetService<T>();
+        }
+
 		protected virtual void AssembleHeader() {
 		}
 

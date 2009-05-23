@@ -128,7 +128,7 @@ namespace Indy.IL2CPU.Assembler {
                 Func<object, string> xGetTextForItem = delegate(object aItem) {
                     var xElementRef = aItem as ElementReference;
                     if (xElementRef == null) {
-                        return aItem.ToString();
+                        return (aItem??0).ToString();
                     } else {
                         if (xElementRef.Offset == 0) {
                             return xElementRef.Name;

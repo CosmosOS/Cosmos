@@ -18,9 +18,15 @@ namespace Indy.IL2CPU.IL {
 	}
 	public abstract class CustomMethodImplementationOp: Op {
 		public MethodInformation MethodInfo;
+        private string mNextLabel;
+	    private string mCurLabel;
+	    private uint mCurOffset;
 		public CustomMethodImplementationOp(ILReader aILReader , MethodInformation aMethodInfo)
 			: base(aILReader, aMethodInfo) {
 			MethodInfo = aMethodInfo;
+            mCurOffset = aILReader.Position;
+            mCurLabel = IL.Op.GetInstructionLabel(aILReader);
+            mNextLabel = IL.Op.GetInstructionLabel(aILReader.NextPosition);
 		}
 		public CustomMethodEnum Method {
 			get;
@@ -28,7 +34,7 @@ namespace Indy.IL2CPU.IL {
 		}
 
 		protected abstract void Assemble_System_Object___System_Array_GetValue___System_Int32___();
-		protected abstract void Assemble_System_Void___System_Array_SetValue___System_Object__System_Int32___();
+        protected abstract void Assemble_System_Void___System_Array_SetValue___System_Object__System_Int32___(string aCurrentLabel, MethodInformation aCurrentMethodInfo, uint aCurrentOffset, string aNextLabel);
 		protected abstract void Assemble_System_UInt32___Indy_IL2CPU_CustomImplementation_System_StringImpl_GetStorage___System_UInt32___();
 
 		public sealed override void DoAssemble() {
@@ -37,7 +43,7 @@ namespace Indy.IL2CPU.IL {
 					Assemble_System_Object___System_Array_GetValue___System_Int32___();
 					break;
 				case CustomMethodEnum.System_Void___System_Array_SetValue___System_Object__System_Int32___:
-					Assemble_System_Void___System_Array_SetValue___System_Object__System_Int32___();
+					Assemble_System_Void___System_Array_SetValue___System_Object__System_Int32___(mCurLabel, MethodInfo, mCurOffset, mNextLabel);
 					break;
 				case CustomMethodEnum.System_UInt32___Indy_IL2CPU_CustomImplementation_System_StringImpl_GetStorage___System_UInt32___:
 					Assemble_System_UInt32___Indy_IL2CPU_CustomImplementation_System_StringImpl_GetStorage___System_UInt32___();
