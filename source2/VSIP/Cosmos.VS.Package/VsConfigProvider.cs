@@ -8,6 +8,10 @@ namespace Cosmos.VS.Package {
   public class VsConfigProvider : ConfigProvider {
 	
     public VsConfigProvider(ProjectNode manager) : base(manager) {}
+
+    protected override ProjectConfig CreateProjectConfiguration(string configName) {
+      return new VsProjectConfig(ProjectMgr, configName);
+    }
   
   }
 }
