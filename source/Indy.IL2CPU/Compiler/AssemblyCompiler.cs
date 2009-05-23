@@ -25,7 +25,7 @@ namespace Indy.IL2CPU.Compiler
             Plugs = new List<string>();
             AssemblyReferences = new List<string>();
             Types = new List<Type>();
-            Methods = new List<MethodBase>();
+            Methods = new List<RuntimeMethodHandle>();
             StaticFields = new List<FieldInfo>();
         }
 
@@ -105,20 +105,34 @@ namespace Indy.IL2CPU.Compiler
             {
                 Types.Add(xType);
             }
-            foreach (var xType in Types)
+
+
+            int typesToProcess = Types.Count;
+
+            for (int i = 0 ; i < typesToProcess ;i++)
             {
+                var xType = Types[0]; 
+
                 foreach (var xMethod in xType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.DeclaredOnly))
                 {
-                    Methods.Add(xMethod);
+                    RuntimeMethodHandle handle = xMethod.MethodHandle;
+                    Methods.Add(handle);
+
+                    
                 }
                 foreach (var xCtor in xType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.DeclaredOnly))
                 {
-                    Methods.Add(xCtor);
+                    //Methods.Add(xCtor);
+                    RuntimeMethodHandle handle = xCtor.MethodHandle;
+                    Methods.Add(handle);
                 }
                 foreach (var xField in xType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly))
                 {
                     StaticFields.Add(xField);
                 }
+
+                //BK Test 
+                Types.RemoveAt(0); 
             }
         }
 
@@ -240,7 +254,7 @@ namespace Indy.IL2CPU.Compiler
             }
         }
 
-        public List<MethodBase> Methods;
+        public List<RuntimeMethodHandle> Methods;
         public List<Type> Types;
         public List<FieldInfo> StaticFields;
 
@@ -248,8 +262,11 @@ namespace Indy.IL2CPU.Compiler
         private void CompileAllMethods()
         {
             // all methods are in Methods, so we just need to iterate over them.
-            foreach (var xCurrentMethod in Methods)
+            foreach (var xCurrentMethodField in Methods)
             {
+
+                MethodBase xCurrentMethod = MethodInfo.GetMethodFromHandle(xCurrentMethodField, xCurrentMethodField.);
+
                 if (Console.KeyAvailable)
                 {
                     throw new Exception("Temporary abort");

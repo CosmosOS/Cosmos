@@ -191,10 +191,26 @@ namespace Indy.IL2CPU.Compiler
             xCompiler.OpCodeMap = GetOpCodeMap();
             xCompiler.Plugs.AddRange(Plugs);
             xCompiler.Types.AddRange(mGenericTypeInstancesToGenerate[aAssembly]);
-            xCompiler.Methods.AddRange(mGenericMethodInstancesToGenerate[aAssembly]);
+            xCompiler.Methods.AddRange(Convert(mGenericMethodInstancesToGenerate[aAssembly]));
             xCompiler.Execute();
             SaveAssembler(aAssembly, xCompiler.Assembler);
         }
+
+
+
+
+
+        //HACK fix up Generics 
+        private List<RuntimeMethodHandle> Convert(IEnumerable<MethodBase> source)
+        {
+            List<RuntimeMethodHandle> result = new List<RuntimeMethodHandle>();
+
+            foreach (var method in source)
+                result.Add(method.MethodHandle);
+
+            return result; 
+        }
+
 
         private void DoFullRecompile()
         {
