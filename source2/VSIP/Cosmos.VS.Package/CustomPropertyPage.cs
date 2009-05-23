@@ -19,11 +19,13 @@ namespace Cosmos.VS.Package {
         private IPropertyPageSite _site; 
         private bool _dirty; 
         private string _title; 
-        private string _helpKeyword; 
+        private string _helpKeyword;
+		private Microsoft.VisualStudio.Project.Automation.OAProject _project;
 
         public CustomPropertyPage() { 
             _projectMgr = null; 
-            _projectConfigs = null; 
+            _projectConfigs = null;
+			_project = null;
             _site = null; 
             _dirty = false; 
             _title = string.Empty; 
@@ -95,7 +97,15 @@ namespace Cosmos.VS.Package {
 	            { 
 	                return _projectConfigs; 
 	            } 
-	        } 
+	        }
+
+			protected Microsoft.VisualStudio.Project.Automation.OAProject Project
+			{
+				get
+				{
+					return _project;
+				}
+			}
 	
 
 	        protected virtual void FillProperties() 
@@ -157,9 +167,7 @@ namespace Cosmos.VS.Package {
 	            CreateControl(); 
 	            Initialize(); 
 	            NativeMethods.SetParent(Handle, hWndParent);
-
-				this.Size = new Size(620, 288);
-				FillProperties(); 
+				FillProperties();
 	        } 
 	 
 	        void IPropertyPage.Deactivate() 
@@ -168,14 +176,16 @@ namespace Cosmos.VS.Package {
 	        } 
 	 
 	        void IPropertyPage.GetPageInfo(PROPPAGEINFO[] pPageInfo) { 
-	            PROPPAGEINFO info = new PROPPAGEINFO(); 
-	 
+	            PROPPAGEINFO info = new PROPPAGEINFO();
+
+				this.Size = new Size(492, 288);
+
 	            info.cb = (uint)Marshal.SizeOf(typeof(PROPPAGEINFO)); 
 	            info.dwHelpContext = 0; 
-	            info.pszDocString = null; 
-	            info.pszHelpFile = null; 
+	            info.pszDocString = null;
+	            info.pszHelpFile = null;
 	            info.pszTitle = Title; 
-	            info.SIZE.cx = Width; 
+	            info.SIZE.cx = Width;
 	            info.SIZE.cy = Height; 
 	            pPageInfo[0] = info; 
 	        } 
@@ -238,7 +248,12 @@ namespace Cosmos.VS.Package {
 	            {
 	                FillProperties();
 	            }
-	            */ 
+	            */
+
+				if ((_projectMgr != null) && (_project == null))
+				{
+					_project = new Microsoft.VisualStudio.Project.Automation.OAProject(_projectMgr);
+				}
 	        } 
 	 
 	        void IPropertyPage.Show(uint nCmdShow) 

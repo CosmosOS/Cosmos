@@ -75,7 +75,7 @@
 			this.tableBuildOptions.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableBuildOptions.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableBuildOptions.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			this.tableBuildOptions.Size = new System.Drawing.Size(620, 248);
+			this.tableBuildOptions.Size = new System.Drawing.Size(492, 247);
 			this.tableBuildOptions.TabIndex = 1;
 			// 
 			// titleCompiler
@@ -88,7 +88,7 @@
 			this.titleCompiler.Location = new System.Drawing.Point(3, 99);
 			this.titleCompiler.Margin = new System.Windows.Forms.Padding(3, 12, 3, 12);
 			this.titleCompiler.Name = "titleCompiler";
-			this.titleCompiler.Size = new System.Drawing.Size(614, 15);
+			this.titleCompiler.Size = new System.Drawing.Size(486, 15);
 			this.titleCompiler.TabIndex = 3;
 			this.titleCompiler.Title = "Compiler";
 			// 
@@ -102,7 +102,7 @@
 			this.titleOutput.Location = new System.Drawing.Point(3, 3);
 			this.titleOutput.Margin = new System.Windows.Forms.Padding(3, 3, 3, 12);
 			this.titleOutput.Name = "titleOutput";
-			this.titleOutput.Size = new System.Drawing.Size(614, 15);
+			this.titleOutput.Size = new System.Drawing.Size(486, 15);
 			this.titleOutput.TabIndex = 0;
 			this.titleOutput.Title = "Output";
 			// 
@@ -125,16 +125,16 @@
 			this.panel1.Controls.Add(this.buttonOutputBrowse);
 			this.panel1.Controls.Add(this.textOutputPath);
 			this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.panel1.Location = new System.Drawing.Point(186, 30);
+			this.panel1.Location = new System.Drawing.Point(147, 30);
 			this.panel1.Margin = new System.Windows.Forms.Padding(0);
 			this.panel1.Name = "panel1";
-			this.panel1.Size = new System.Drawing.Size(434, 30);
+			this.panel1.Size = new System.Drawing.Size(345, 30);
 			this.panel1.TabIndex = 2;
 			// 
 			// buttonOutputBrowse
 			// 
 			this.buttonOutputBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.buttonOutputBrowse.Location = new System.Drawing.Point(393, 4);
+			this.buttonOutputBrowse.Location = new System.Drawing.Point(304, 4);
 			this.buttonOutputBrowse.Name = "buttonOutputBrowse";
 			this.buttonOutputBrowse.Size = new System.Drawing.Size(38, 23);
 			this.buttonOutputBrowse.TabIndex = 1;
@@ -147,7 +147,7 @@
 						| System.Windows.Forms.AnchorStyles.Right)));
 			this.textOutputPath.Location = new System.Drawing.Point(4, 4);
 			this.textOutputPath.Name = "textOutputPath";
-			this.textOutputPath.Size = new System.Drawing.Size(383, 22);
+			this.textOutputPath.Size = new System.Drawing.Size(294, 22);
 			this.textOutputPath.TabIndex = 0;
 			// 
 			// labelFramework
@@ -168,7 +168,7 @@
 			// 
 			this.comboFramework.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboFramework.FormattingEnabled = true;
-			this.comboFramework.Location = new System.Drawing.Point(189, 129);
+			this.comboFramework.Location = new System.Drawing.Point(150, 129);
 			this.comboFramework.Name = "comboFramework";
 			this.comboFramework.Size = new System.Drawing.Size(143, 21);
 			this.comboFramework.TabIndex = 8;
@@ -191,7 +191,7 @@
 			// 
 			this.comboTarget.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboTarget.FormattingEnabled = true;
-			this.comboTarget.Location = new System.Drawing.Point(189, 63);
+			this.comboTarget.Location = new System.Drawing.Point(150, 63);
 			this.comboTarget.Name = "comboTarget";
 			this.comboTarget.Size = new System.Drawing.Size(143, 21);
 			this.comboTarget.TabIndex = 12;
@@ -205,7 +205,7 @@
 			this.checkUseInternalAssembler.Location = new System.Drawing.Point(22, 165);
 			this.checkUseInternalAssembler.Margin = new System.Windows.Forms.Padding(22, 12, 3, 3);
 			this.checkUseInternalAssembler.Name = "checkUseInternalAssembler";
-			this.checkUseInternalAssembler.Size = new System.Drawing.Size(146, 19);
+			this.checkUseInternalAssembler.Size = new System.Drawing.Size(122, 19);
 			this.checkUseInternalAssembler.TabIndex = 10;
 			this.checkUseInternalAssembler.Text = "Use Internal Assembler";
 			this.checkUseInternalAssembler.UseVisualStyleBackColor = true;
@@ -227,7 +227,7 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.Controls.Add(this.tableBuildOptions);
 			this.Name = "BuildOptionsPropertyPage";
-			this.Size = new System.Drawing.Size(620, 289);
+			this.Size = new System.Drawing.Size(492, 288);
 			this.Title = "Build";
 			this.Controls.SetChildIndex(this.tableBuildOptions, 0);
 			this.tableBuildOptions.ResumeLayout(false);

@@ -41,7 +41,7 @@
 			this.panelVMConfig.Location = new System.Drawing.Point(0, 41);
 			this.panelVMConfig.Margin = new System.Windows.Forms.Padding(0);
 			this.panelVMConfig.Name = "panelVMConfig";
-			this.panelVMConfig.Size = new System.Drawing.Size(620, 208);
+			this.panelVMConfig.Size = new System.Drawing.Size(492, 247);
 			this.panelVMConfig.TabIndex = 4;
 			this.panelVMConfig.Visible = false;
 			// 
@@ -62,6 +62,7 @@
 			this.Controls.Add(this.panelVMConfig);
 			this.Controls.Add(this.labelNoConfig);
 			this.Name = "VMOptionsPropertyPage";
+			this.Size = new System.Drawing.Size(492, 288);
 			this.Title = "Virtual Machine";
 			this.Controls.SetChildIndex(this.labelNoConfig, 0);
 			this.Controls.SetChildIndex(this.panelVMConfig, 0);

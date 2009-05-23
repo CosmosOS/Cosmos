@@ -51,7 +51,7 @@
 			this.tableDebugQemu.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableDebugQemu.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableDebugQemu.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			this.tableDebugQemu.Size = new System.Drawing.Size(620, 213);
+			this.tableDebugQemu.Size = new System.Drawing.Size(492, 288);
 			this.tableDebugQemu.TabIndex = 0;
 			// 
 			// titleGeneral
@@ -63,7 +63,7 @@
 			this.titleGeneral.Location = new System.Drawing.Point(3, 3);
 			this.titleGeneral.Margin = new System.Windows.Forms.Padding(3, 3, 3, 12);
 			this.titleGeneral.Name = "titleGeneral";
-			this.titleGeneral.Size = new System.Drawing.Size(614, 15);
+			this.titleGeneral.Size = new System.Drawing.Size(486, 15);
 			this.titleGeneral.TabIndex = 0;
 			this.titleGeneral.Title = "General";
 			// 
@@ -79,7 +79,7 @@
 			this.tableGeneral.Name = "tableGeneral";
 			this.tableGeneral.RowCount = 1;
 			this.tableGeneral.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.tableGeneral.Size = new System.Drawing.Size(598, 27);
+			this.tableGeneral.Size = new System.Drawing.Size(470, 27);
 			this.tableGeneral.TabIndex = 1;
 			// 
 			// labelCommunication
@@ -89,7 +89,7 @@
 			this.labelCommunication.Location = new System.Drawing.Point(0, 3);
 			this.labelCommunication.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
 			this.labelCommunication.Name = "labelCommunication";
-			this.labelCommunication.Size = new System.Drawing.Size(179, 21);
+			this.labelCommunication.Size = new System.Drawing.Size(141, 21);
 			this.labelCommunication.TabIndex = 2;
 			this.labelCommunication.Text = "Communication Mode:";
 			this.labelCommunication.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -98,7 +98,7 @@
 			// 
 			this.comboCommunication.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboCommunication.FormattingEnabled = true;
-			this.comboCommunication.Location = new System.Drawing.Point(182, 3);
+			this.comboCommunication.Location = new System.Drawing.Point(144, 3);
 			this.comboCommunication.Name = "comboCommunication";
 			this.comboCommunication.Size = new System.Drawing.Size(265, 21);
 			this.comboCommunication.TabIndex = 13;
@@ -111,7 +111,7 @@
 			this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.Margin = new System.Windows.Forms.Padding(0);
 			this.Name = "DebugOptionsQemu";
-			this.Size = new System.Drawing.Size(620, 213);
+			this.Size = new System.Drawing.Size(492, 288);
 			this.tableDebugQemu.ResumeLayout(false);
 			this.tableGeneral.ResumeLayout(false);
 			this.ResumeLayout(false);

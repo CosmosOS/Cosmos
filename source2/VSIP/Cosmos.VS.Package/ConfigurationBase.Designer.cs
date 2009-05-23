@@ -62,7 +62,7 @@
 			this.tableConfigurationBase.RowCount = 2;
 			this.tableConfigurationBase.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableConfigurationBase.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 10F));
-			this.tableConfigurationBase.Size = new System.Drawing.Size(620, 41);
+			this.tableConfigurationBase.Size = new System.Drawing.Size(492, 41);
 			this.tableConfigurationBase.TabIndex = 0;
 			// 
 			// labelConfiguration
@@ -85,7 +85,7 @@
 						| System.Windows.Forms.AnchorStyles.Left)));
 			this.labelArchitecture.AutoSize = true;
 			this.labelArchitecture.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.labelArchitecture.Location = new System.Drawing.Point(319, 3);
+			this.labelArchitecture.Location = new System.Drawing.Point(255, 3);
 			this.labelArchitecture.Margin = new System.Windows.Forms.Padding(6, 3, 6, 3);
 			this.labelArchitecture.Name = "labelArchitecture";
 			this.labelArchitecture.Size = new System.Drawing.Size(78, 23);
@@ -98,9 +98,9 @@
 			this.comboArchitecture.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboArchitecture.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.comboArchitecture.FormattingEnabled = true;
-			this.comboArchitecture.Location = new System.Drawing.Point(406, 3);
+			this.comboArchitecture.Location = new System.Drawing.Point(342, 3);
 			this.comboArchitecture.Name = "comboArchitecture";
-			this.comboArchitecture.Size = new System.Drawing.Size(154, 23);
+			this.comboArchitecture.Size = new System.Drawing.Size(147, 23);
 			this.comboArchitecture.TabIndex = 3;
 			// 
 			// comboConfiguration
@@ -112,7 +112,7 @@
             "Active (Debug)"});
 			this.comboConfiguration.Location = new System.Drawing.Point(99, 3);
 			this.comboConfiguration.Name = "comboConfiguration";
-			this.comboConfiguration.Size = new System.Drawing.Size(154, 23);
+			this.comboConfiguration.Size = new System.Drawing.Size(147, 23);
 			this.comboConfiguration.TabIndex = 4;
 			// 
 			// titleDivision
@@ -123,7 +123,7 @@
 			this.titleDivision.LineColor = System.Drawing.SystemColors.ControlDark;
 			this.titleDivision.Location = new System.Drawing.Point(3, 32);
 			this.titleDivision.Name = "titleDivision";
-			this.titleDivision.Size = new System.Drawing.Size(614, 6);
+			this.titleDivision.Size = new System.Drawing.Size(486, 6);
 			this.titleDivision.TabIndex = 5;
 			this.titleDivision.Title = "";
 			// 
@@ -174,7 +174,7 @@
 			this.Controls.Add(this.tableConfigurationBase);
 			this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.Name = "ConfigurationBase";
-			this.Size = new System.Drawing.Size(620, 249);
+			this.Size = new System.Drawing.Size(492, 288);
 			this.tableConfigurationBase.ResumeLayout(false);
 			this.tableConfigurationBase.PerformLayout();
 			this.tableLayoutPanel2.ResumeLayout(false);

@@ -51,7 +51,7 @@
 			this.panelDebugConfig.Location = new System.Drawing.Point(0, 41);
 			this.panelDebugConfig.Margin = new System.Windows.Forms.Padding(0);
 			this.panelDebugConfig.Name = "panelDebugConfig";
-			this.panelDebugConfig.Size = new System.Drawing.Size(620, 208);
+			this.panelDebugConfig.Size = new System.Drawing.Size(492, 247);
 			this.panelDebugConfig.TabIndex = 3;
 			this.panelDebugConfig.Visible = false;
 			// 
@@ -63,6 +63,7 @@
 			this.Controls.Add(this.labelNoConfig);
 			this.Font = new System.Drawing.Font("Segoe UI", 8.25F);
 			this.Name = "DebugOptionsPropertyPage";
+			this.Size = new System.Drawing.Size(492, 288);
 			this.Title = "Debug";
 			this.Controls.SetChildIndex(this.labelNoConfig, 0);
 			this.Controls.SetChildIndex(this.panelDebugConfig, 0);
