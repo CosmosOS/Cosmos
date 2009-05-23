@@ -116,6 +116,18 @@
     <Compile Include="TitleDivision.Designer.cs">
       <DependentUpon>TitleDivision.cs</DependentUpon>
     </Compile>
+    <Compile Include="VMOptionsPropertyPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="VMOptionsPropertyPage.Designer.cs">
+      <DependentUpon>VMOptionsPropertyPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VMOptionsQemu.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="VMOptionsQemu.Designer.cs">
+      <DependentUpon>VMOptionsQemu.cs</DependentUpon>
+    </Compile>
     <Compile Include="VSProjectFactory.cs" />
     <Compile Include="VSProjectNode.cs" />
     <Compile Include="VSPackage.cs" />
@@ -159,6 +171,12 @@
     <EmbeddedResource Include="Resources\CosmosProjectNode.bmp" />
     <EmbeddedResource Include="TitleDivision.resx">
       <DependentUpon>TitleDivision.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VMOptionsPropertyPage.resx">
+      <DependentUpon>VMOptionsPropertyPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VMOptionsQemu.resx">
+      <DependentUpon>VMOptionsQemu.cs</DependentUpon>
     </EmbeddedResource>
     <Content Include="Templates\Projects\CosmosProject\Bootable Project.ico" />
   </ItemGroup>
