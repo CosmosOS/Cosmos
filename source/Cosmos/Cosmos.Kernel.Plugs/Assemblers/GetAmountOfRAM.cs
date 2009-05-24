@@ -10,7 +10,7 @@ using HW = Cosmos.Hardware;
 namespace Cosmos.Kernel.Plugs.Assemblers {
 	public class GetAmountOfRAM: AssemblerMethod {
 		public override void Assemble(Assembler aAssembler) {
-            new CPUx86.Move { DestinationReg = Registers.EAX, SourceRef = new ElementReference("MultiBootInfo_Memory_High"), SourceIsIndirect = true };
+            new CPUx86.Move { DestinationReg = Registers.EAX, SourceRef = ElementReference.New("MultiBootInfo_Memory_High"), SourceIsIndirect = true };
             new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EDX };
             new CPUx86.Move { DestinationReg = Registers.ECX, SourceValue = 1024 };
             new CPUx86.Divide { DestinationReg = Registers.ECX };

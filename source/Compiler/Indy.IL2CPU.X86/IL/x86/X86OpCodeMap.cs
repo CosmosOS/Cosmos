@@ -154,7 +154,7 @@ namespace Indy.IL2CPU.IL.X86
 					{
 						//IL.X86.Op.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
 
-                        new CPUx86.Push { DestinationRef = new ElementReference(MethodInfoLabelGenerator.GenerateLabelName(InvokeMulticastRef)) };
+                        new CPUx86.Push { DestinationRef = ElementReference.New(Label.GenerateLabelName(InvokeMulticastRef)) };
 						break;
 					}
 				case "System_MulticastDelegate___System_Delegate_InternalAllocLike___System_Delegate___":

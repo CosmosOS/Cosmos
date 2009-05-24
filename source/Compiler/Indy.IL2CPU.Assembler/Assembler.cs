@@ -119,6 +119,10 @@ namespace Indy.IL2CPU.Assembler {
             mInstructions.Clear();
             mDataMembers.Clear();
             CurrentInstance.Pop();
+            if (mAllAssemblerElements != null)
+            {
+                mAllAssemblerElements.Clear();
+            }
         }
 
         public void Add(params Instruction[] aReaders) {

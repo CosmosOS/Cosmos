@@ -32,7 +32,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public override void DoAssemble() {
-            new CPUx86.Push { DestinationRef = new ElementReference(mFunctionLabel) };
+            new CPUx86.Push { DestinationRef = ElementReference.New(mFunctionLabel) };
 			Assembler.StackContents.Push(new StackContent(4, true, false, false));
 		}
 	}

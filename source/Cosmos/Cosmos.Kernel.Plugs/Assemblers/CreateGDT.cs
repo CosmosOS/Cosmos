@@ -25,11 +25,11 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 		          , 0xFF,0xFF,0,0,0,0x93,0xCF,0}));
             aAssembler.DataMembers.Add(new DataMember("_NATIVE_GDT_Pointer", new ushort[]{0x17,0,0}));
 
-            new CPUx86.Move { DestinationReg = Registers.EAX, SourceRef = new ElementReference("_NATIVE_GDT_Pointer") };
-            new CPUx86.Move { DestinationRef = new ElementReference("_NATIVE_GDT_Pointer"), DestinationIsIndirect = true, DestinationDisplacement = 2, SourceRef = new ElementReference("_NATIVE_GDT_Contents") };
+            new CPUx86.Move { DestinationReg = Registers.EAX, SourceRef = ElementReference.New("_NATIVE_GDT_Pointer") };
+            new CPUx86.Move { DestinationRef = ElementReference.New("_NATIVE_GDT_Pointer"), DestinationIsIndirect = true, DestinationDisplacement = 2, SourceRef = ElementReference.New("_NATIVE_GDT_Contents") };
             
 			new Label(".RegisterGDT");
-            new CPUx86.Move { DestinationReg = Registers.EAX, SourceRef = new ElementReference("_NATIVE_GDT_Pointer") };
+            new CPUx86.Move { DestinationReg = Registers.EAX, SourceRef = ElementReference.New("_NATIVE_GDT_Pointer") };
             new CPUNative.Lgdt { DestinationReg = Registers.EAX, DestinationIsIndirect = true };
             new CPUx86.Move { DestinationReg = Registers.AX, SourceValue = 0x10 };
 			new CPUx86.Move{DestinationReg=Registers.DS, SourceReg=Registers.AX};

@@ -135,8 +135,8 @@ namespace Indy.IL2CPU.IL.X86 {
                 new CPU.Label(mLabelName + "_AfterNullRefCheck");
                 new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = mThisOffset };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
-                new CPUx86.Push { DestinationRef = new ElementReference(mMethodIdentifier), DestinationIsIndirect=true };
-                new CPUx86.Call { DestinationLabel = CPU.MethodInfoLabelGenerator.GenerateLabelName(VTablesImplRefs.GetMethodAddressForTypeRef) };
+                new CPUx86.Push { DestinationRef = ElementReference.New(mMethodIdentifier), DestinationIsIndirect = true };
+                new CPUx86.Call { DestinationLabel = CPU.Label.GenerateLabelName(VTablesImplRefs.GetMethodAddressForTypeRef) };
 
                 /*
                  * On the stack now:

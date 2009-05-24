@@ -40,18 +40,18 @@ namespace Indy.IL2CPU.IL.X86 {
 				for (int i = 1; i <= (xSize / 4); i++) {
 					//	Pop("eax");
 					//	Move(Assembler, "dword [" + mDataName + " + 0x" + (i * 4).ToString("X") + "]", "eax");
-                    new CPUx86.Push { DestinationRef = new ElementReference(mDataName), DestinationIsIndirect = true, DestinationDisplacement = (int)(xSize - (i * 4)) };
+                    new CPUx86.Push { DestinationRef = ElementReference.New(mDataName), DestinationIsIndirect = true, DestinationDisplacement = (int)(xSize - (i * 4)) };
 				}
 				switch (xSize % 4) {
 					case 1: {
                             new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-                            new CPUx86.Move { DestinationReg = CPUx86.Registers.AL, SourceRef = new ElementReference(mDataName), SourceIsIndirect = true };
+                            new CPUx86.Move { DestinationReg = CPUx86.Registers.AL, SourceRef = ElementReference.New(mDataName), SourceIsIndirect = true };
                             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
 							break;
 						}
 					case 2: {
                             new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-                            new CPUx86.Move { DestinationReg = CPUx86.Registers.AX, SourceRef = new ElementReference(mDataName), SourceIsIndirect = true };
+                            new CPUx86.Move { DestinationReg = CPUx86.Registers.AX, SourceRef = ElementReference.New(mDataName), SourceIsIndirect = true };
 							new CPUx86.Push{DestinationReg=CPUx86.Registers.EAX};
 							break;
 						}
@@ -66,13 +66,13 @@ namespace Indy.IL2CPU.IL.X86 {
 				switch (xSize) {
 					case 1: {
                             new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-                            new CPUx86.Move { DestinationReg = CPUx86.Registers.AL, SourceRef = new ElementReference(mDataName), SourceIsIndirect = true };
+                            new CPUx86.Move { DestinationReg = CPUx86.Registers.AL, SourceRef = ElementReference.New(mDataName), SourceIsIndirect = true };
                             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
 							break;
 						}
 					case 2: {
                             new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-                            new CPUx86.Move { DestinationReg = CPUx86.Registers.AX, SourceRef = new ElementReference(mDataName), SourceIsIndirect = true };
+                            new CPUx86.Move { DestinationReg = CPUx86.Registers.AX, SourceRef = ElementReference.New(mDataName), SourceIsIndirect = true };
 							new CPUx86.Push{DestinationReg=CPUx86.Registers.EAX};
 							break;
 						}

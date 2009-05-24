@@ -73,7 +73,7 @@ namespace System
             {
                 throw new ArgumentNullException("aMethod");
             }
-            var xBuilder = new StringBuilder();
+            var xBuilder = new StringBuilder(256);
             var xParts = aMethod.ToString().Split(' ');
             var xParts2 = xParts.Skip(1).ToArray();
             var xMethodInfo = aMethod as MethodInfo;
@@ -112,12 +112,19 @@ namespace System
                 }
             }
             xBuilder.Append(")");
-            return xBuilder.ToString();
+            return String.Intern(xBuilder.ToString());
         }
 
         public static string GetFullName(this FieldInfo aField)
         {
             return aField.FieldType.FullName + " " + aField.DeclaringType.FullName + "." + aField.Name;
+            //var xSB = new StringBuilder(aField.FieldType.FullName.Length + 1 + aField.DeclaringType.FullName.Length + 1 + aField.Name);
+            //xSB.Append(aField.FieldType.FullName);
+            //xSB.Append(" ");
+            //xSB.Append(aField.DeclaringType.FullName);
+            //xSB.Append(".");
+            //xSB.Append(aField.Name);
+            //return String.Intern(xSB.ToString());
         }
     }
 }

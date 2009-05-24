@@ -29,9 +29,9 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 }
             }
             if (aThis.DestinationIsIndirect) {
-                return "[" + xDest + "]";
+                return String.Intern("[" + xDest + "]");
             } else {
-                return xDest;
+                return String.Intern(xDest);
             }
         }
 

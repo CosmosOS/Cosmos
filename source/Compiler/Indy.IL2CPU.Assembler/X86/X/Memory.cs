@@ -10,7 +10,7 @@ namespace Indy.IL2CPU.Assembler.X86.X {
                 var xAddrDirect = aAddress as AddressDirect;
                 if (xAddrDirect != null) {
                     if (xAddrDirect.Label != null) {
-                        return new MemoryAction(new ElementReference(xAddrDirect.Label));
+                        return new MemoryAction(ElementReference.New(xAddrDirect.Label));
                     } else {
                         if (xAddrDirect.Register != Guid.Empty) {
                             return new MemoryAction(xAddrDirect.Register);
@@ -40,7 +40,7 @@ namespace Indy.IL2CPU.Assembler.X86.X {
 
                     if (xAddrDirect != null) {
                         if (xAddrDirect.Label != null) {
-                            new X86.Move { DestinationRef = new ElementReference(xAddrDirect.Label), DestinationIsIndirect=true, SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
+                            new X86.Move { DestinationRef = ElementReference.New(xAddrDirect.Label), DestinationIsIndirect=true, SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
                         } else {
                             new X86.Move { DestinationValue = xAddrDirect.Address, SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
                         }
@@ -56,7 +56,7 @@ namespace Indy.IL2CPU.Assembler.X86.X {
                     var xAddrDirect = aAddress as AddressDirect;
                     if (xAddrDirect != null) {
                         if (xAddrDirect.Label != null) {
-                            new X86.Move { DestinationRef = new ElementReference(xAddrDirect.Label), SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
+                            new X86.Move { DestinationRef = ElementReference.New(xAddrDirect.Label), SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
                         } else {
                             new X86.Move { DestinationValue = xAddrDirect.Address, SourceValue = value.Value.GetValueOrDefault(), SourceRef = value.Reference, SourceReg = value.Register, SourceIsIndirect = value.IsIndirect };
                         }
@@ -90,7 +90,7 @@ namespace Indy.IL2CPU.Assembler.X86.X {
                         if (xAddrDirect != null) {
                             if (xAddrDirect.Label != null) {
                                 new X86.Move {
-                                    DestinationRef = new ElementReference(xAddrDirect.Label),
+                                    DestinationRef = ElementReference.New(xAddrDirect.Label),
                                     SourceValue = value.Value.GetValueOrDefault(),
                                     SourceRef = value.Reference,
                                     SourceReg = value.Register,
@@ -131,7 +131,7 @@ namespace Indy.IL2CPU.Assembler.X86.X {
                         if (xAddrDirect != null) {
                             if (xAddrDirect.Label != null) {
                                 new X86.Move {
-                                    DestinationRef = new ElementReference(xAddrDirect.Label),
+                                    DestinationRef = ElementReference.New(xAddrDirect.Label),
                                     DestinationIsIndirect=true,
                                     SourceValue = value.Value.GetValueOrDefault(),
                                     SourceRef = value.Reference,

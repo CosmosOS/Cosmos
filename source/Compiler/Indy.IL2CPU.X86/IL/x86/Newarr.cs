@@ -88,7 +88,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			//new CPUx86.Pop(CPUx86.Registers_Old.ESI);
 			Assembler.StackContents.Push(new StackContent(4, typeof(Array)));
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-            new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, SourceRef = new ElementReference(GetService<IMetaDataInfoService>().GetTypeIdLabel(typeof(Array))), SourceIsIndirect = true };
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, SourceRef = ElementReference.New(GetService<IMetaDataInfoService>().GetTypeIdLabel(typeof(Array))), SourceIsIndirect = true };
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, SourceReg=CPUx86.Registers.EBX};
             new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 4 };
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, SourceValue = (uint)InstanceTypeEnum.Array, Size = 32 };

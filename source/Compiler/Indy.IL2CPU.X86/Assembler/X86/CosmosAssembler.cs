@@ -34,17 +34,17 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 SourceReg = Registers.EBX,
                 SourceIsIndirect = true
             };
-            new Move { DestinationRef = new ElementReference("MultiBootInfo_Memory_Low"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
+            new Move { DestinationRef = ElementReference.New("MultiBootInfo_Memory_Low"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
             new Add { DestinationReg = Registers.EBX, SourceValue = 4 };
             new Move {
                 DestinationReg = Registers.EAX,
                 SourceReg = Registers.EBX,
                 SourceIsIndirect = true
             };
-            new Move { DestinationRef = new ElementReference("MultiBootInfo_Memory_High"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
+            new Move { DestinationRef = ElementReference.New("MultiBootInfo_Memory_High"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
             new Move {
                 DestinationReg = Registers.ESP,
-                SourceRef = new ElementReference("Kernel_Stack")
+                SourceRef = ElementReference.New("Kernel_Stack")
             };
             new Comment("some more startups todo");
             new ClrInterruptFlag();
@@ -114,11 +114,11 @@ namespace Indy.IL2CPU.Assembler.X86 {
                            xFlags));
             DataMembers.Add(new DataMember("MultibootChecksum",
                                                (int)(0 - (xFlags + 0x1BADB002))));
-            DataMembers.Add(new DataMember("MultibootHeaderAddr", new ElementReference("MultibootSignature")));
-            DataMembers.Add(new DataMember("MultibootLoadAddr", new ElementReference("MultibootSignature")));
+            DataMembers.Add(new DataMember("MultibootHeaderAddr", ElementReference.New("MultibootSignature")));
+            DataMembers.Add(new DataMember("MultibootLoadAddr", ElementReference.New("MultibootSignature")));
             DataMembers.Add(new DataMember("MultibootLoadEndAddr", 0));
             DataMembers.Add(new DataMember("MultibootBSSEndAddr", 0));
-            DataMembers.Add(new DataMember("MultibootEntryAddr", new ElementReference("Kernel_Start")));
+            DataMembers.Add(new DataMember("MultibootEntryAddr", ElementReference.New("Kernel_Start")));
             DataMembers.Add(new DataEndIfDefined());
             DataMembers.Add(new DataIfDefined("NASM_COMPILATION"));
             xFlags = 0x00003;

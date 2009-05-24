@@ -6,24 +6,34 @@ using System.IO;
 
 namespace Indy.IL2CPU.IL {
 	public partial class ILReader: IDisposable {
-		private MethodBody mBody;
-		private MemoryStream mStream;
+        private Stream mStream;
 		private MethodBase mMethod;
 		private Module mModule;
+        private bool mDisposeStream;
 		public ILReader(MethodBase aMethod) {
-			mBody = aMethod.GetMethodBody();
 			mMethod = aMethod;
 			mModule = mMethod.Module;
-			mStream = new MemoryStream(mBody.GetILAsByteArray());
+			mStream = new MemoryStream(aMethod.GetMethodBody().GetILAsByteArray());
             GC.SuppressFinalize(mStream);
+            mDisposeStream = true;
 		}
+
+        public ILReader(MethodBase aMethod, Stream aStream)
+        {
+            mMethod = aMethod;
+            mModule = mMethod.Module;
+            mStream = aStream;
+            mDisposeStream = false;
+        }
 
         public void Dispose()
         {
-            mStream.Dispose();
-            GC.ReRegisterForFinalize(mStream);
+            if (mDisposeStream)
+            {
+                mStream.Dispose();
+                GC.ReRegisterForFinalize(mStream);
+            }
             mStream = null;
-            mBody = null;
             mMethod = null;
             mModule = null;
         }
@@ -296,15 +306,15 @@ namespace Indy.IL2CPU.IL {
 			}
 			return xResult;
 		}
-        //private byte[] mOperandBuff = new byte[8];
+        private byte[] mOperandBuff = new byte[8];
 		private byte[] ReadOperand(byte aOperandSize) {
-            //if (aOperandSize > 64)
-            //{
-            //    Console.Write("");
-            //}
-            var mOperandBuff = new byte[aOperandSize/8];
+            if (aOperandSize > 64)
+            {
+                Console.Write("");
+            }
+            //var mOperandBuff = new byte[aOperandSize/8];
 			int index = 0;
-            //Array.Clear(mOperandBuff, 0, 8);
+            Array.Clear(mOperandBuff, 0, 8);
 			while (aOperandSize > 0) {
 				int xByteValueInt = mStream.ReadByte();
 				if (xByteValueInt == -1) {
@@ -319,7 +329,7 @@ namespace Indy.IL2CPU.IL {
 
 		private static Int32 GetInt32FromOperandByteArray(byte[] aData) {
 			Int32 xResult = 0;
-			for (int i = aData.Length - 1; i >= 0; i--) {
+			for (int i = 3; i >= 0; i--) {
 				xResult = xResult << 8 | aData[i];
 			}
 			return xResult;
@@ -328,5 +338,11 @@ namespace Indy.IL2CPU.IL {
 		private Int32 ReadInt32() {
 			return GetInt32FromOperandByteArray(ReadOperand(32));
 		}
-	}
+
+        public void Restart()
+        {
+            Position = 0;
+            mStream.Position = 0;
+        }
+    }
 }

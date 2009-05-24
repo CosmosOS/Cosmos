@@ -17,7 +17,7 @@ namespace Indy.IL2CPU.Assembler {
 			foreach (char c in IllegalIdentifierChars) {
 				xTempResult = xTempResult.Replace(c, '_');
 			}
-			return xTempResult;
+            return String.Intern(xTempResult);
 		}
 
         public DataMember(string aName, Stream aData) {

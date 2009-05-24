@@ -86,7 +86,7 @@ namespace Indy.IL2CPU.IL {
             xTemp = BitConverter.GetBytes(VTableEntrySize);
             Array.Copy(xTemp, 0, xData, 12, 4);
 			Assembler.DataMembers.Add(new DataMember(xTheName + "__Contents", xData));
-			Assembler.DataMembers.Add(new DataMember(xTheName, new ElementReference(xTheName + "__Contents")));
+			Assembler.DataMembers.Add(new DataMember(xTheName, ElementReference.New(xTheName + "__Contents")));
 			Push((uint)mTypes.Count);
 			Call(LoadTypeTableRef);
 			for (int i = 0; i < mTypes.Count; i++) {

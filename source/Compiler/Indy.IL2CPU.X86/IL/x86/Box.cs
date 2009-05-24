@@ -42,7 +42,7 @@ namespace Indy.IL2CPU.IL.X86 {
             new CPUx86.Push { DestinationValue = (ObjectImpl.FieldDataOffset + xSize) };
             new CPUx86.Call { DestinationLabel = CPU.MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.AllocNewObjectRef) };
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-            new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, SourceRef = new ElementReference(mTypeId), SourceIsIndirect = true };
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, SourceRef = ElementReference.New(mTypeId), SourceIsIndirect = true };
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EBX };
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = (uint)InstanceTypeEnum.BoxedValueType, Size=32 };
             new CPU.Comment("xSize is " + xSize);

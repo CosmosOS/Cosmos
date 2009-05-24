@@ -12,8 +12,8 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 
         public override void Assemble(Indy.IL2CPU.Assembler.Assembler aAssembler) {
             new CPUx86.ClrInterruptFlag();
-            new CPUx86.Move { DestinationRef = new ElementReference("_NATIVE_IDT_Pointer"), DestinationIsIndirect = true, Size = 16, SourceValue = 0 };
-            new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceRef = new ElementReference("_NATIVE_IDT_Pointer") };
+            new CPUx86.Move { DestinationRef = ElementReference.New("_NATIVE_IDT_Pointer"), DestinationIsIndirect = true, Size = 16, SourceValue = 0 };
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceRef = ElementReference.New("_NATIVE_IDT_Pointer") };
             new CPUx86.Lidt { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
             new CPUx86.Sti();
         }

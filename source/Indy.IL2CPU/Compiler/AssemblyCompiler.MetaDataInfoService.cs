@@ -305,10 +305,6 @@ namespace Indy.IL2CPU.Compiler
 
         public TypeInformation GetTypeInfo(Type aType)
         {
-            if (aType.FullName == "System.Collections.Generic.Dictionary`2+Entry[[System.Guid, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]")
-            {
-                Console.Write("");
-            }
             TypeInformation xTypeInfo;
             uint xObjectStorageSize;
             IDictionary<string, TypeInformation.Field> xTypeFields = GetTypeFieldInfo(aType,

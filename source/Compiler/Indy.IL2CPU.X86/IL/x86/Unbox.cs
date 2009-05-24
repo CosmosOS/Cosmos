@@ -39,7 +39,7 @@ namespace Indy.IL2CPU.IL.X86 {
             new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = mReturnNullLabel };
             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
 			Assembler.StackContents.Push(new StackContent(4, typeof(uint)));
-            new CPUx86.Push { DestinationRef = new ElementReference(mTypeIdLabel), DestinationIsIndirect=true };
+            new CPUx86.Push { DestinationRef = ElementReference.New(mTypeIdLabel), DestinationIsIndirect=true };
 			Assembler.StackContents.Push(new StackContent(4, typeof(uint)));
             MethodBase xMethodIsInstance = ReflectionUtilities.GetMethodBase(ReflectionUtilities.GetType("", "Indy.IL2CPU.VTablesImpl"), "IsInstance", "System.Int32", "System.Int32");
 			Op xOp = new Call(xMethodIsInstance, mCurrentILOffset, mDebugMode, mThisLabel + "_After_IsInstance_Call");

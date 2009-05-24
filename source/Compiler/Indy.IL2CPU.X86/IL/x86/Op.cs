@@ -54,7 +54,7 @@ namespace Indy.IL2CPU.IL.X86
             aAssembler.StackContents.Pop();
             new CPUx86.Move
             {
-                DestinationRef = new ElementReference(DataMember.GetStaticFieldName(CPU.Assembler.CurrentExceptionRef)),
+                DestinationRef = ElementReference.New(DataMember.GetStaticFieldName(CPU.Assembler.CurrentExceptionRef)),
                 DestinationIsIndirect = true,
                 SourceReg = CPUx86.Registers.EAX
             };
@@ -506,16 +506,16 @@ namespace Indy.IL2CPU.IL.X86
             if (mNeedsTypeCheck)
             {
                 // call VTablesImpl.IsInstance to see the actual instance name..
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceRef = new ElementReference(xCurExceptionFieldName), SourceIsIndirect = true };
+                new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceRef = ElementReference.New(xCurExceptionFieldName), SourceIsIndirect = true };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
-                new CPUx86.Push { DestinationRef = new ElementReference(GetService<IMetaDataInfoService>().GetTypeIdLabel(mCatchType)), DestinationIsIndirect = true };
-                new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(VTablesImplRefs.IsInstanceRef) };
+                new CPUx86.Push { DestinationRef = ElementReference.New(GetService<IMetaDataInfoService>().GetTypeIdLabel(mCatchType)), DestinationIsIndirect = true };
+                new CPUx86.Call { DestinationLabel = Label.GenerateLabelName(VTablesImplRefs.IsInstanceRef) };
                 new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = mNextInstructionLabel };
             }
             if (mNeedsExceptionPush)
             {
-                new CPUx86.Push { DestinationRef = new ElementReference(xCurExceptionFieldName), DestinationIsIndirect = true };
+                new CPUx86.Push { DestinationRef = ElementReference.New(xCurExceptionFieldName), DestinationIsIndirect = true };
                 Assembler.StackContents.Push(new StackContent(4,
                                                               typeof(Exception)));
             }

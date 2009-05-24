@@ -6,12 +6,39 @@ using System.Threading;
 
 namespace Indy.IL2CPU.Assembler {
     public class ElementReference {
-        public ElementReference(string aName, int aOffset)
+        private static Dictionary<string, ElementReference> mLookup = new Dictionary<string, ElementReference>(StringComparer.InvariantCultureIgnoreCase);
+        public static ElementReference New(string aName, int aOffset)
+        {
+            ElementReference xResult;
+            string xId = String.Intern(aName + "@@" + aOffset);
+            if(mLookup.TryGetValue(xId, out xResult))
+            {
+                return xResult;
+            }
+            if (aOffset == 0)
+            {
+                xResult = new ElementReference(aName);
+            }
+            else
+            {
+                xResult = new ElementReference(aName, aOffset);
+            }
+            mLookup.Add(xId, xResult);
+            return xResult;
+        }
+
+        public static ElementReference New(string aName)
+        {
+            return New(aName, 0);
+        }
+
+        private ElementReference(string aName, int aOffset)
             : this(aName) {
             Offset = aOffset;
         }
 
-        public ElementReference(string aName) {
+        private ElementReference(string aName)
+        {
             if (String.IsNullOrEmpty(aName))
             {
                 throw new ArgumentNullException("aName");

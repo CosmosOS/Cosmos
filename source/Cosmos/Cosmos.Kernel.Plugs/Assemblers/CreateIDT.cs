@@ -46,29 +46,29 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
             for (int i = 0; i < 256; i++) {
                 new CPUx86.Move {
                     DestinationReg = Registers.EAX,
-                    SourceRef = new ElementReference("__ISR_Handler_" + i.ToString("X2"))
+                    SourceRef = ElementReference.New("__ISR_Handler_" + i.ToString("X2"))
                 };
                 new CPUx86.Move {
-                    DestinationRef = new ElementReference("_NATIVE_IDT_Contents"),
+                    DestinationRef = ElementReference.New("_NATIVE_IDT_Contents"),
                     DestinationIsIndirect = true,
                     DestinationDisplacement = ((i * 8) + 0),
                     SourceReg = Registers.AL
                 };
                 new CPUx86.Move {
-                    DestinationRef = new ElementReference("_NATIVE_IDT_Contents"),
+                    DestinationRef = ElementReference.New("_NATIVE_IDT_Contents"),
                     DestinationIsIndirect = true,
                     DestinationDisplacement = ((i * 8) + 1),
                     SourceReg = Registers.AH
                 };
                 new CPUx86.Move {
-                    DestinationRef = new ElementReference("_NATIVE_IDT_Contents"),
+                    DestinationRef = ElementReference.New("_NATIVE_IDT_Contents"),
                     DestinationIsIndirect = true,
                     DestinationDisplacement = ((i * 8) + 2),
                     SourceValue=0x8,
                     Size=8
                 };
                 new CPUx86.Move {
-                    DestinationRef = new ElementReference("_NATIVE_IDT_Contents"),
+                    DestinationRef = ElementReference.New("_NATIVE_IDT_Contents"),
                     DestinationIsIndirect = true,
                     DestinationDisplacement = ((i * 8) + 5),
                     SourceValue = 0x8E,
@@ -76,13 +76,13 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
                 };
                 new CPUx86.ShiftRight { DestinationReg = Registers.EAX, SourceValue = 16 };
                 new CPUx86.Move {
-                    DestinationRef = new ElementReference("_NATIVE_IDT_Contents"),
+                    DestinationRef = ElementReference.New("_NATIVE_IDT_Contents"),
                     DestinationIsIndirect = true,
                     DestinationDisplacement = ((i * 8) + 6),
                     SourceReg=Registers.AL
                 };
                 new CPUx86.Move {
-                    DestinationRef = new ElementReference("_NATIVE_IDT_Contents"),
+                    DestinationRef = ElementReference.New("_NATIVE_IDT_Contents"),
                     DestinationIsIndirect = true,
                     DestinationDisplacement = ((i * 8) + 7),
                     SourceReg = Registers.AH
@@ -92,13 +92,18 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
             xFieldName = "_NATIVE_IDT_Pointer";
             aAssembler.DataMembers.Add(new DataMember(xFieldName,
                                                       new ushort[]{0x7FF, 0, 0}));
-            new CPUx86.Move{DestinationRef=new ElementReference("_NATIVE_IDT_Pointer"), DestinationIsIndirect=true, DestinationDisplacement=2, 
-                SourceRef=new ElementReference("_NATIVE_IDT_Contents")};
+            new CPUx86.Move
+            {
+                DestinationRef = ElementReference.New("_NATIVE_IDT_Pointer"),
+                DestinationIsIndirect = true,
+                DestinationDisplacement = 2,
+                SourceRef = ElementReference.New("_NATIVE_IDT_Contents")
+            };
 
             #endregion
             new CPUx86.Move {
                 DestinationReg = Registers.EAX,
-                SourceRef = new ElementReference("_NATIVE_IDT_Pointer")
+                SourceRef = ElementReference.New("_NATIVE_IDT_Pointer")
             };
             new Label(".RegisterIDT");
             new CPUx86.Lidt{DestinationReg=Registers.EAX, DestinationIsIndirect=true};
@@ -106,7 +111,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
             var xInterruptsWithParam = new int[] {8, 10, 11, 12, 13, 14};
             for (int j = 0; j < 256; j++) {
                 new Label("__ISR_Handler_" + j.ToString("X2"));
-                new CPUx86.Move { DestinationRef = new ElementReference("InterruptsEnabledFlag"), DestinationIsIndirect = true, SourceValue = 0, Size = 32 };
+                new CPUx86.Move { DestinationRef = ElementReference.New("InterruptsEnabledFlag"), DestinationIsIndirect = true, SourceValue = 0, Size = 32 };
                 if (Array.IndexOf(xInterruptsWithParam,
                                   j) ==
                     -1) {
@@ -152,7 +157,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
                 // MtW: Appearantly, we dont need to enable interrupts on exit
                 //if (j < 0x20 || j > 0x2F) {
                 //new CPUx86.Sti();
-                new CPUx86.Move { DestinationRef = new ElementReference("InterruptsEnabledFlag"), DestinationIsIndirect = true, SourceValue = 1, Size = 32 };
+                new CPUx86.Move { DestinationRef = ElementReference.New("InterruptsEnabledFlag"), DestinationIsIndirect = true, SourceValue = 1, Size = 32 };
                 //} 
                 new CPUx86.InterruptReturn();
             }
@@ -162,7 +167,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
             new CPUx86.Compare { DestinationReg = Registers.EAX, SourceValue = 0 };
             new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = ".__AFTER_ENABLE_INTERRUPTS" };
             new CPUx86.Sti();
-            new CPUx86.Move { DestinationRef = new ElementReference("InterruptsEnabledFlag"), DestinationIsIndirect = true, SourceValue = 1, Size = 32 };
+            new CPUx86.Move { DestinationRef = ElementReference.New("InterruptsEnabledFlag"), DestinationIsIndirect = true, SourceValue = 1, Size = 32 };
             new Label(".__AFTER_ENABLE_INTERRUPTS");
         }
     }

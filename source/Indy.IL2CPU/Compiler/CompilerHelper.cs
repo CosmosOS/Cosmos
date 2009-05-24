@@ -178,22 +178,24 @@ namespace Indy.IL2CPU.Compiler
             var xCompiler = new AssemblyCompiler();
             xCompiler.DebugLog = delegate(LogSeverityEnum aSeverity, string aMessage) { this.DebugLog(aSeverity, aMessage); };
             xCompiler.IsEntrypointAssembly = aAssembly == mEntryAssembly;
-            xCompiler.Assembler = GetAssembler(aAssembly, xCompiler.IsEntrypointAssembly);
-            xCompiler.Assembly = aAssembly;
-            if (xCompiler.IsEntrypointAssembly)
+            using (var xAssembler = GetAssembler(aAssembly, xCompiler.IsEntrypointAssembly))
             {
-                foreach (var xRef in mAllAssemblies)
+                xCompiler.Assembler = xAssembler;
+                xCompiler.Assembly = aAssembly;
+                if (xCompiler.IsEntrypointAssembly)
                 {
-                    xCompiler.AssemblyReferences.Add(xRef.FullName);
+                    foreach (var xRef in mAllAssemblies)
+                    {
+                        xCompiler.AssemblyReferences.Add(xRef.FullName);
+                    }
                 }
+                xCompiler.OpCodeMap = GetOpCodeMap();
+                xCompiler.Plugs.AddRange(Plugs);
+                xCompiler.Types.AddRange(mGenericTypeInstancesToGenerate[aAssembly]);
+                xCompiler.Methods.AddRange(mGenericMethodInstancesToGenerate[aAssembly]);
+                xCompiler.Execute();
+                SaveAssembler(aAssembly, xCompiler.Assembler);
             }
-            // todo: move this out to a property/event
-            xCompiler.OpCodeMap = GetOpCodeMap();
-            xCompiler.Plugs.AddRange(Plugs);
-            xCompiler.Types.AddRange(mGenericTypeInstancesToGenerate[aAssembly]);
-            xCompiler.Methods.AddRange(mGenericMethodInstancesToGenerate[aAssembly]);
-            xCompiler.Execute();
-            SaveAssembler(aAssembly, xCompiler.Assembler);
         }
 
 

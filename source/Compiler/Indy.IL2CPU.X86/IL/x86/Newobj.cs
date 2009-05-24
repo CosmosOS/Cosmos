@@ -137,7 +137,7 @@ namespace Indy.IL2CPU.IL.X86
                                      where item.NeedsGC
                                      select item).Count();
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                new Move { DestinationReg = Registers.EBX, SourceRef = new ElementReference(aTypeId), SourceIsIndirect = true };
+                new Move { DestinationReg = Registers.EBX, SourceRef = ElementReference.New(aTypeId), SourceIsIndirect = true };
                 new Move { DestinationReg = Registers.EAX, DestinationIsIndirect = true, SourceReg=CPUx86.Registers.EBX};
                 new Move { DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = (uint)InstanceTypeEnum.NormalObject, Size = 32 };
                 new Move { DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 8, SourceValue = (uint)xGCFieldCount, Size = 32 };

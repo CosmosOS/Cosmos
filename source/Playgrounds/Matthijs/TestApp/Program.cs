@@ -19,14 +19,16 @@ namespace TestApp {
         static void Main(string[] args) {
             try
             {
+                var xBasePath = Path.GetDirectoryName(typeof(Program).Assembly.Location);
                 var xCompileHelper = new CompilerHelper();
+
                 xCompileHelper.GetCacheStateFile += new Func<Assembly, string>(delegate(Assembly aAssembly)
                 {
-                    return @"e:\Cosmos\source\Playgrounds\Matthijs\TestApp\bin\Debug\out\" + aAssembly.GetName().Name + ".cachestate";
+                    return Path.Combine(xBasePath, "out\\" + aAssembly.GetName().Name + ".cachestate");
                 });
                 xCompileHelper.GetChecksumFile += new Func<Assembly, string>(delegate(Assembly aAssembly)
                 {
-                    return @"e:\Cosmos\source\Playgrounds\Matthijs\TestApp\bin\Debug\out\" + aAssembly.GetName().Name + ".checksum";
+                    return Path.Combine(xBasePath, "out\\" + aAssembly.GetName().Name + ".checksum");
                 });
                 xCompileHelper.GetOpCodeMap += new Func<Indy.IL2CPU.IL.OpCodeMap>(delegate { return new X86OpCodeMap(); });
                 xCompileHelper.SkipList.Add(typeof(Builder).Assembly);
@@ -37,26 +39,34 @@ namespace TestApp {
                     });
                 xCompileHelper.SaveAssembler += new Action<Assembly, Indy.IL2CPU.Assembler.Assembler>(delegate(Assembly aAssembly, Indy.IL2CPU.Assembler.Assembler aAssembler)
                 {
-                    using (var xOut = new StreamWriter(@"e:\Cosmos\source\Playgrounds\Matthijs\TestApp\bin\Debug\out\" + aAssembly.GetName().Name + ".out", false))
+                    using (var xOut = new StreamWriter(Path.Combine(xBasePath, "out\\" + aAssembly.GetName().Name + ".out"), false))
                     {
                         aAssembler.FlushText(xOut);
                     }
                 });
                 xCompileHelper.DebugLog += delegate(LogSeverityEnum aSeverity, string aMessage) { Console.WriteLine("{0}: {1}", aSeverity, aMessage); };
-                xCompileHelper.Plugs.Add(Path.Combine(Path.Combine(@"e:\Cosmos\Build\Tools", "Cosmos.Kernel.Plugs"), "Cosmos.Kernel.Plugs.dll"));
-                xCompileHelper.Plugs.Add(Path.Combine(Path.Combine(@"e:\Cosmos\Build\Tools", "Cosmos.Hardware.Plugs"), "Cosmos.Hardware.Plugs.dll"));
-                xCompileHelper.Plugs.Add(Path.Combine(Path.Combine(@"e:\Cosmos\Build\Tools", "Cosmos.Sys.Plugs"), "Cosmos.Sys.Plugs.dll"));
+                xCompileHelper.Plugs.Add(Path.Combine(Path.Combine(xBasePath, "Plugs"), "Cosmos.Kernel.Plugs.dll"));
+                xCompileHelper.Plugs.Add(Path.Combine(Path.Combine(xBasePath, "Plugs"), "Cosmos.Hardware.Plugs.dll"));
+                xCompileHelper.Plugs.Add(Path.Combine(Path.Combine(xBasePath, "Plugs"), "Cosmos.Sys.Plugs.dll"));
                 xCompileHelper.CompileExe(typeof(MatthijsTest.Program).Assembly);
             }
             catch (Exception E)
             {
                 Console.WriteLine("Error: " + E.ToString());
+                if (E.Message == "Temporary abort")
+                {
+                    Terminate = true;
+                }
             }
             finally
             {
                 Console.WriteLine("Done.");
-                Console.ReadLine();
+                if (!Terminate)
+                {
+                    Console.ReadLine();
+                }
             }
         }
+        private static bool Terminate = false;
     }
 }

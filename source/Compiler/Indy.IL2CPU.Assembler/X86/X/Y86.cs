@@ -121,7 +121,7 @@ namespace Indy.IL2CPU.Assembler.X86.X {
         }
 
         public ElementReference Reference(string aDataName) {
-            return new ElementReference(aDataName);
+            return ElementReference.New(aDataName);
         }
     }
 }

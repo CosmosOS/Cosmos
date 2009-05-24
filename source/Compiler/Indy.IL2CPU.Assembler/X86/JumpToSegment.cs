@@ -32,7 +32,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 return String.Empty;
             }
             set {
-                DestinationRef = new ElementReference(value);
+                DestinationRef = ElementReference.New(value);
             }
         }
 

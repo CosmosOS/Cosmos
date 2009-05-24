@@ -50,8 +50,8 @@ namespace Indy.IL2CPU.IL.X86 {
                 //xObjectData[0] = ((uint)Engine.RegisterType(Engine.GetType("mscorlib", "System.String")));
                 xObjectData[1] = ((uint)InstanceTypeEnum.StaticEmbeddedObject);
                 xObjectData[2] = 1;
-                xObjectData[3] = new ElementReference(xDataName + "__Contents");
-                xObjectData[4] = new ElementReference(xDataName + "__Contents", 16);
+                xObjectData[3] = ElementReference.New(xDataName + "__Contents");
+                xObjectData[4] = ElementReference.New(xDataName + "__Contents", 16);
                 xObjectData[5] = aLiteral.Length;
                 xObjectData[6] = aLiteral.Length;
                 aAssembler.DataMembers.Add(new DataMember(xDataName, xObjectData));

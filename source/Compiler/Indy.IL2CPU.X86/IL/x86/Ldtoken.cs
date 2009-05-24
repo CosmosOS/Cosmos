@@ -58,7 +58,7 @@ namespace Indy.IL2CPU.IL.X86 {
             {
                 mTokenAddress = GetService<IMetaDataInfoService>().GetTypeIdLabel(mType);
             }
-            new CPU.Push { DestinationRef = new ElementReference(mTokenAddress) };
+            new CPU.Push { DestinationRef = ElementReference.New(mTokenAddress) };
 			Assembler.StackContents.Push(new StackContent(4, typeof(uint)));
 		}
 	}

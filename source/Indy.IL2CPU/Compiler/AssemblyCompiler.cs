@@ -257,7 +257,8 @@ namespace Indy.IL2CPU.Compiler
         private void CompileAllMethods()
         {
             long xCount = 0;
-            Console.WriteLine("Before compiling, amount of methods: {0}", Methods.Count);
+            Console.Write("Before compiling, amount of methods: ");
+            Console.WriteLine(Methods.Count);
             // all methods are in Methods, so we just need to iterate over them.
             foreach (var xCurrentMethod in Methods)
             {
@@ -265,9 +266,19 @@ namespace Indy.IL2CPU.Compiler
                 {
                     Console.Write(new String('-', Console.BufferWidth));
                     Console.WriteLine(xCount / 100);
-                    GC.Collect();
+//                    GC.Collect();
                 }
                 xCount++;
+
+                if (xCount == 1500)
+                {
+                    Console.Write("Memory in use: ");
+                    //GC.Collect();
+                    Console.WriteLine(System.Diagnostics.Process.GetCurrentProcess().WorkingSet64);
+                    Console.Write("Assembler items: ");
+                    Console.WriteLine((Assembler.Instructions.Count + Assembler.DataMembers.Count));
+                    throw new Exception("Temporary abort");
+                }
 
                 if (Console.KeyAvailable)
                 {
@@ -295,32 +306,6 @@ namespace Indy.IL2CPU.Compiler
                 var xMethodScanInfo = new SortedList<string, object>(StringComparer.InvariantCultureIgnoreCase);
                 MethodInformation xMethodInfo = GetMethodInfo(xCurrentMethod, xCurrentMethod
                              , xMethodName, xTypeInfo, DebugMode != DebugMode.None, xMethodScanInfo);
-
-                #region Prescan method
-                try
-                {
-                    using (ILReader xReader = new ILReader(xCurrentMethod))
-                    {
-                        MethodBody xBody = xCurrentMethod.GetMethodBody();
-                        // todo: add better detection of implementation state
-
-                        if (xBody != null)
-                        {
-                            mInstructionsToSkip = 0;
-                            Assembler.StackContents.Clear();
-
-                            var xInstructionInfos = new List<DebugSymbolsAssemblyTypeMethodInstruction>();
-                            while (xReader.Read())
-                            {
-                                OpCodeMap.ScanILCode(xReader, xMethodInfo, xMethodScanInfo);
-                            }
-                        }
-                    }
-                }
-                catch
-                {
-                }
-                #endregion
 
 #if VERBOSE_DEBUG
                     string comment = "(No Type Info available)";
@@ -387,42 +372,53 @@ namespace Indy.IL2CPU.Compiler
                         // todo: add better detection of implementation state
                         if (xBody != null)
                         {
-                            mInstructionsToSkip = 0;
-                            Assembler.StackContents.Clear();
-                            if (xMethodInfo.LabelName == "_BBE9E9A7F7761F7DC23F15255BBB0FF7")
+                            using (ILReader xReader = new ILReader(xCurrentMethod))
                             {
-                                Console.Write("");
-                            }
-                            var xInstructionInfos = new List<DebugSymbolsAssemblyTypeMethodInstruction>();
-
-                            // Section currently is dead code. Working on matching it up 
-                            // with contents from inside the read
-                            int[] xCodeOffsets = null;
-                            if (DebugMode == DebugMode.Source)
-                            {
-                                var xSymbolReader = GetSymbolReaderForAssembly(xCurrentMethod.DeclaringType.Assembly);
-                                if (xSymbolReader != null)
+                                #region Prescan method
+                                try
                                 {
-                                    var xSmbMethod = xSymbolReader.GetMethod(new SymbolToken(xCurrentMethod.MetadataToken));
-                                    // This gets the Sequence Points.
-                                    // Sequence Points are spots that identify what the compiler/debugger says is a spot
-                                    // that a breakpoint can occur one. Essentially, an atomic source line in C#
-                                    if (xSmbMethod != null)
+                                    Assembler.StackContents.Clear();
+
+                                    while (xReader.Read())
                                     {
-                                        xCodeOffsets = new int[xSmbMethod.SequencePointCount];
-                                        var xCodeDocuments = new ISymbolDocument[xSmbMethod.SequencePointCount];
-                                        var xCodeLines = new int[xSmbMethod.SequencePointCount];
-                                        var xCodeColumns = new int[xSmbMethod.SequencePointCount];
-                                        var xCodeEndLines = new int[xSmbMethod.SequencePointCount];
-                                        var xCodeEndColumns = new int[xSmbMethod.SequencePointCount];
-                                        xSmbMethod.GetSequencePoints(xCodeOffsets, xCodeDocuments
-                                         , xCodeLines, xCodeColumns, xCodeEndLines, xCodeEndColumns);
+                                        OpCodeMap.ScanILCode(xReader, xMethodInfo, xMethodScanInfo);
                                     }
                                 }
-                            }
-                            // Scan each IL op in the method
-                            using (var xReader = new ILReader(xCurrentMethod))
-                            {
+                                catch
+                                {
+                                }
+                                #endregion
+
+                                mInstructionsToSkip = 0;
+                                Assembler.StackContents.Clear();
+                                var xInstructionInfos = new List<DebugSymbolsAssemblyTypeMethodInstruction>();
+
+                                // Section currently is dead code. Working on matching it up 
+                                // with contents from inside the read
+                                int[] xCodeOffsets = null;
+                                if (DebugMode == DebugMode.Source)
+                                {
+                                    var xSymbolReader = GetSymbolReaderForAssembly(xCurrentMethod.DeclaringType.Assembly);
+                                    if (xSymbolReader != null)
+                                    {
+                                        var xSmbMethod = xSymbolReader.GetMethod(new SymbolToken(xCurrentMethod.MetadataToken));
+                                        // This gets the Sequence Points.
+                                        // Sequence Points are spots that identify what the compiler/debugger says is a spot
+                                        // that a breakpoint can occur one. Essentially, an atomic source line in C#
+                                        if (xSmbMethod != null)
+                                        {
+                                            xCodeOffsets = new int[xSmbMethod.SequencePointCount];
+                                            var xCodeDocuments = new ISymbolDocument[xSmbMethod.SequencePointCount];
+                                            var xCodeLines = new int[xSmbMethod.SequencePointCount];
+                                            var xCodeColumns = new int[xSmbMethod.SequencePointCount];
+                                            var xCodeEndLines = new int[xSmbMethod.SequencePointCount];
+                                            var xCodeEndColumns = new int[xSmbMethod.SequencePointCount];
+                                            xSmbMethod.GetSequencePoints(xCodeOffsets, xCodeDocuments
+                                             , xCodeLines, xCodeColumns, xCodeEndLines, xCodeEndColumns);
+                                        }
+                                    }
+                                }
+                                xReader.Restart();
                                 while (xReader.Read())
                                 {
                                     ExceptionHandlingClause xCurrentHandler = null;
@@ -492,11 +488,11 @@ namespace Indy.IL2CPU.Compiler
                                     xOp = GetOpFromType(OpCodeMap.GetOpForOpCode(xReader.OpCode), xReader, xMethodInfo);
 
                                     xOp.Assembler = Assembler;
-                                    new Comment("StackItems = " + Assembler.StackContents.Count);
-                                    foreach (var xStackContent in Assembler.StackContents)
-                                    {
-                                        new Comment("    " + xStackContent.Size);
-                                    }
+                                    //new Comment("StackItems = " + Assembler.StackContents.Count);
+                                    //foreach (var xStackContent in Assembler.StackContents)
+                                    //{
+                                    //    new Comment("    " + xStackContent.Size);
+                                    //}
 
                                     // Create label for current point
                                     string xLabel = Op.GetInstructionLabel(xReader);
@@ -610,7 +606,7 @@ namespace Indy.IL2CPU.Compiler
         private static string GetStrippedMethodBaseFullName(MethodBase aMethod,
                                                     MethodBase aRefMethod)
         {
-            StringBuilder xBuilder = new StringBuilder();
+            StringBuilder xBuilder = new StringBuilder(256);
             string[] xParts = aMethod.ToString().Split(' ');
             string[] xParts2 = xParts.Skip(1).ToArray();
             MethodInfo xMethodInfo = aMethod as MethodInfo;
@@ -653,7 +649,7 @@ namespace Indy.IL2CPU.Compiler
                 xParamAdded = true;
             }
             xBuilder.Append(")");
-            return xBuilder.ToString();
+            return String.Intern(xBuilder.ToString());
         }
 
 
@@ -792,7 +788,7 @@ namespace Indy.IL2CPU.Compiler
             try
             {
                 //Search for related .config file
-                string configFile = aAssembly.Location + ".cosmos-config";
+                string configFile = String.Intern(aAssembly.Location + ".cosmos-config");
                 if (System.IO.File.Exists(configFile))
                 {
                     //Load and parse all PlugAssemblies referred to in the .config file

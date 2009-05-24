@@ -7,7 +7,7 @@ using Indy.IL2CPU.Assembler;
 namespace Cosmos.Kernel.Plugs.Assemblers {
 	public class GetEndOfStack: AssemblerMethod {
 		public override void Assemble(Indy.IL2CPU.Assembler.Assembler aAssembler) {
-            new CPUx86.Push { DestinationRef = new ElementReference("Kernel_Stack") };
+            new CPUx86.Push { DestinationRef = ElementReference.New("Kernel_Stack") };
 		}
 	}
 }

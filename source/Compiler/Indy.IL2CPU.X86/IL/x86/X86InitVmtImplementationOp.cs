@@ -20,7 +20,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
         protected override void Push(string aLabelName) {
-            new CPUx86.Push { DestinationRef = new ElementReference(aLabelName) };
+            new CPUx86.Push { DestinationRef = ElementReference.New(aLabelName) };
         }
 
 		protected override void Call(MethodBase aMethod) {
