@@ -19,6 +19,9 @@ namespace Cosmos.VS.Package {
 		protected static CustomPropertyPage[] Pages
 		{ get { return CustomPropertyPage._pageList.ToArray(); } }
 
+        private Hashtable _propertyTable = new Hashtable();
+        protected Hashtable PropertyTable { get { return _propertyTable; } }
+
         private ProjectNode _projectMgr; 
         private ProjectConfig[] _projectConfigs; 
         private IPropertyPageSite _site; 
@@ -122,8 +125,13 @@ namespace Cosmos.VS.Package {
 	        protected virtual void FillProperties() 
 	        {} 
 	 
-	        public virtual void ApplyChanges() 
-	        {} 
+	        public virtual void ApplyChanges()
+	        {
+	            foreach (object key in PropertyTable.Keys)
+	            {
+	                SetConfigProperty((string)key, (string)PropertyTable[key]);
+	            }
+	        } 
 	 
 	        protected virtual void Initialize() 
 	        {} 
@@ -134,7 +142,28 @@ namespace Cosmos.VS.Package {
 	        protected void MarkPageChanged() 
 	        { 
 	            IsDirty = true; 
-	        } 
+	        }
+
+            public void SetConfigProperty(string name, string value)
+            {
+                CCITracing.TraceCall();
+                if (value == null)
+                {
+                    value = String.Empty;
+                }
+
+                if (this.ProjectMgr != null)
+                {
+                    for (int i = 0, n = this.ProjectConfigs.Length; i < n; i++)
+                    {
+                        ProjectConfig config = ProjectConfigs[i];
+
+                        config.SetConfigurationProperty(name, value);
+                    }
+
+                    this.ProjectMgr.SetProjectFileDirty(true);
+                }
+            }
 	 
 	        protected string GetComboValue(ComboBox comboBox) 
 	        { 

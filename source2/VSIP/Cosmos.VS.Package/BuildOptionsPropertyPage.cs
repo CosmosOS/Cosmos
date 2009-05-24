@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Data;
-using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using Cosmos.Builder.Common;
+using Microsoft.VisualStudio.Project;
+using Microsoft.VisualStudio;
+using System.ComponentModel;
 
 namespace Cosmos.VS.Package
 {
@@ -22,10 +24,14 @@ namespace Cosmos.VS.Package
 			this.comboTarget.Items.AddRange(EnumValue.GetEnumValues(typeof(TargetHost)));
 			this.comboFramework.Items.AddRange(EnumValue.GetEnumValues(typeof(Framework)));
 
-			this.textOutputPath.TextChanged += delegate(Object sender, EventArgs e) { this.IsDirty = true; };
-			this.comboTarget.SelectedIndexChanged += delegate(Object sender, EventArgs e) { this.IsDirty = true; };
-			this.comboFramework.SelectedIndexChanged += delegate(Object sender, EventArgs e) { this.IsDirty = true; };
-			this.checkUseInternalAssembler.CheckedChanged += delegate(Object sender, EventArgs e) { this.IsDirty = true; };
+            this.textOutputPath.TextChanged += 
+                delegate(Object sender, EventArgs e) { OutputPath = textOutputPath.Text; };
+			this.comboTarget.SelectedIndexChanged += 
+                delegate(Object sender, EventArgs e) { Target = (TargetHost)comboTarget.SelectedIndex; };
+			this.comboFramework.SelectedIndexChanged += 
+                delegate(Object sender, EventArgs e) { this.IsDirty = true; };
+			this.checkUseInternalAssembler.CheckedChanged += 
+                delegate(Object sender, EventArgs e) { this.IsDirty = true; };
 		}
 
 		protected override void FillProperties()
@@ -74,5 +80,53 @@ namespace Cosmos.VS.Package
 			if(dialog.ShowDialog() == DialogResult.OK)
 			{ textOutputPath.Text = dialog.SelectedPath; }
 		}
+
+        protected string mOutputPath;
+        [SRCategoryAttribute("Category")]
+        [DisplayName("Target")]
+        [SRDescriptionAttribute("Description")]
+        public string OutputPath
+        {
+            get { return mOutputPath; }
+            set
+            {
+                mOutputPath = value;
+
+                if (PropertyTable.ContainsKey("OutputPath"))
+                {
+                    PropertyTable["OutputPath"] = value;
+                }
+                else
+                {
+                    base.PropertyTable.Add("OutputPath", value);
+                }
+                
+                this.IsDirty = true;
+            }
+        }
+
+	    protected TargetHost mTarget;
+	    [SRCategoryAttribute("Category")]
+	    [DisplayName("Target")]
+	    [SRDescriptionAttribute("Description")]
+	    public TargetHost Target
+	    {
+            get { return mTarget; }
+            set
+            {
+                mTarget = value;
+
+                if (PropertyTable.ContainsKey("BuildTarget"))
+                {
+                    PropertyTable["BuildTarget"] = Enum.GetName(typeof(TargetHost), value);
+                }
+                else
+                {
+                    PropertyTable.Add("BuildTarget", Enum.GetName(typeof(TargetHost), value));
+                }
+
+                this.IsDirty = true;
+            }
+	    }
 	}
 }
