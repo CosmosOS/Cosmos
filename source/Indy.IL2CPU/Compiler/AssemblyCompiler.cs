@@ -265,7 +265,7 @@ namespace Indy.IL2CPU.Compiler
                 if (xCount % 100 == 0)
                 {
                     Console.Write(new String('-', Console.BufferWidth));
-                    Console.WriteLine(xCount / 100);
+                    Console.WriteLine("Processed " +xCount.ToString() + " / " +Methods.Count);
 //                    GC.Collect();
                 }
                 xCount++;
@@ -284,7 +284,7 @@ namespace Indy.IL2CPU.Compiler
                 {
                     throw new Exception("Temporary abort");
                 }
-                TypeInformation xTypeInfo = null;
+               
                 if (xCurrentMethod.IsAbstract)
                 {
                     continue;
@@ -298,14 +298,22 @@ namespace Indy.IL2CPU.Compiler
                 {
                     continue;
                 }
-                if (!xCurrentMethod.IsStatic)
-                {
-                    xTypeInfo = GetTypeInfo(xCurrentMethod.DeclaringType);
-                }
-                var xMethodName = Label.GenerateLabelName(xCurrentMethod);
-                var xMethodScanInfo = new SortedList<string, object>(StringComparer.InvariantCultureIgnoreCase);
-                MethodInformation xMethodInfo = GetMethodInfo(xCurrentMethod, xCurrentMethod
-                             , xMethodName, xTypeInfo, DebugMode != DebugMode.None, xMethodScanInfo);
+
+                ProcessConcreteMethod(xCurrentMethod);
+            }
+        }
+
+        private void ProcessConcreteMethod(MethodBase xCurrentMethod)
+        {
+            TypeInformation xTypeInfo = null;
+            if (!xCurrentMethod.IsStatic)
+            {
+                xTypeInfo = GetTypeInfo(xCurrentMethod.DeclaringType);
+            }
+            var xMethodName = Label.GenerateLabelName(xCurrentMethod);
+            var xMethodScanInfo = new SortedList<string, object>(StringComparer.InvariantCultureIgnoreCase);
+            MethodInformation xMethodInfo = GetMethodInfo(xCurrentMethod, xCurrentMethod
+                         , xMethodName, xTypeInfo, DebugMode != DebugMode.None, xMethodScanInfo);
 
 #if VERBOSE_DEBUG
                     string comment = "(No Type Info available)";
@@ -325,255 +333,254 @@ namespace Indy.IL2CPU.Compiler
                         new Comment(s);
                     }
 #endif
-                Op xOp = GetOpFromType(OpCodeMap.MethodHeaderOp, null, xMethodInfo);
-                xOp.Assembler = Assembler;
-                xOp.SetServiceProvider(this);
-                xOp.Assemble();
-                MethodBase xCustomImplementation = GetCustomMethodImplementation(xMethodName);
-                bool xIsCustomImplementation = (xCustomImplementation != null);
-                // what to do if a method doesn't have a body?
-                bool xContentProduced = false;
-                if (xIsCustomImplementation)
+            Op xOp = GetOpFromType(OpCodeMap.MethodHeaderOp, null, xMethodInfo);
+            xOp.Assembler = Assembler;
+            xOp.SetServiceProvider(this);
+            xOp.Assemble();
+            MethodBase xCustomImplementation = GetCustomMethodImplementation(xMethodName);
+            bool xIsCustomImplementation = (xCustomImplementation != null);
+            // what to do if a method doesn't have a body?
+            bool xContentProduced = false;
+            if (xIsCustomImplementation)
+            {
+                // this is for the support for having extra fields on types, and being able to use
+                // them in custom implementation methods
+                CustomMethodImplementationProxyOp xProxyOp = (CustomMethodImplementationProxyOp)GetOpFromType(OpCodeMap.CustomMethodImplementationProxyOp, null, xMethodInfo);
+                xProxyOp.SetServiceProvider(this);
+                xProxyOp.Assembler = Assembler;
+                xProxyOp.ProxiedMethod = xCustomImplementation;
+                xProxyOp.Assemble();
+                xContentProduced = true;
+            }
+            if (!xContentProduced)
+            {
+                Type xOpType = OpCodeMap.GetOpForCustomMethodImplementation(xMethodName);
+                if (xOpType != null)
                 {
-                    // this is for the support for having extra fields on types, and being able to use
-                    // them in custom implementation methods
-                    CustomMethodImplementationProxyOp xProxyOp = (CustomMethodImplementationProxyOp)GetOpFromType(OpCodeMap.CustomMethodImplementationProxyOp, null, xMethodInfo);
-                    xProxyOp.SetServiceProvider(this);
-                    xProxyOp.Assembler = Assembler;
-                    xProxyOp.ProxiedMethod = xCustomImplementation;
-                    xProxyOp.Assemble();
-                    xContentProduced = true;
-                }
-                if (!xContentProduced)
-                {
-                    Type xOpType = OpCodeMap.GetOpForCustomMethodImplementation(xMethodName);
-                    if (xOpType != null)
+                    Op xMethodOp = GetOpFromType(xOpType, null, xMethodInfo);
+                    if (xMethodOp != null)
                     {
-                        Op xMethodOp = GetOpFromType(xOpType, null, xMethodInfo);
-                        if (xMethodOp != null)
-                        {
-                            xMethodOp.Assembler = Assembler;
-                            xMethodOp.SetServiceProvider(this);
-                            xMethodOp.Assemble();
-                            xContentProduced = true;
-                        }
+                        xMethodOp.Assembler = Assembler;
+                        xMethodOp.SetServiceProvider(this);
+                        xMethodOp.Assemble();
+                        xContentProduced = true;
                     }
                 }
-                if (!xContentProduced)
+            }
+            if (!xContentProduced)
+            {
+                if (OpCodeMap.HasCustomAssembleImplementation(xMethodInfo))
                 {
-                    if (OpCodeMap.HasCustomAssembleImplementation(xMethodInfo))
+                    OpCodeMap.DoCustomAssembleImplementation(Assembler, xMethodInfo);
+                    // No plugs, we need to compile the IL from the method
+                }
+                else
+                {
+                    MethodBody xBody = xCurrentMethod.GetMethodBody();
+                    // todo: add better detection of implementation state
+                    if (xBody != null)
                     {
-                        OpCodeMap.DoCustomAssembleImplementation(Assembler, xMethodInfo);
-                        // No plugs, we need to compile the IL from the method
-                    }
-                    else
-                    {
-                        MethodBody xBody = xCurrentMethod.GetMethodBody();
-                        // todo: add better detection of implementation state
-                        if (xBody != null)
+                        using (ILReader xReader = new ILReader(xCurrentMethod))
                         {
-                            using (ILReader xReader = new ILReader(xCurrentMethod))
+                            #region Prescan method
+                            try
                             {
-                                #region Prescan method
-                                try
-                                {
-                                    Assembler.StackContents.Clear();
+                                Assembler.StackContents.Clear();
 
-                                    while (xReader.Read())
+                                while (xReader.Read())
+                                {
+                                    OpCodeMap.ScanILCode(xReader, xMethodInfo, xMethodScanInfo);
+                                }
+                            }
+                            catch
+                            {
+                            }
+                            #endregion
+
+                            mInstructionsToSkip = 0;
+                            Assembler.StackContents.Clear();
+                            var xInstructionInfos = new List<DebugSymbolsAssemblyTypeMethodInstruction>();
+
+                            // Section currently is dead code. Working on matching it up 
+                            // with contents from inside the read
+                            int[] xCodeOffsets = null;
+                            if (DebugMode == DebugMode.Source)
+                            {
+                                var xSymbolReader = GetSymbolReaderForAssembly(xCurrentMethod.DeclaringType.Assembly);
+                                if (xSymbolReader != null)
+                                {
+                                    var xSmbMethod = xSymbolReader.GetMethod(new SymbolToken(xCurrentMethod.MetadataToken));
+                                    // This gets the Sequence Points.
+                                    // Sequence Points are spots that identify what the compiler/debugger says is a spot
+                                    // that a breakpoint can occur one. Essentially, an atomic source line in C#
+                                    if (xSmbMethod != null)
                                     {
-                                        OpCodeMap.ScanILCode(xReader, xMethodInfo, xMethodScanInfo);
+                                        xCodeOffsets = new int[xSmbMethod.SequencePointCount];
+                                        var xCodeDocuments = new ISymbolDocument[xSmbMethod.SequencePointCount];
+                                        var xCodeLines = new int[xSmbMethod.SequencePointCount];
+                                        var xCodeColumns = new int[xSmbMethod.SequencePointCount];
+                                        var xCodeEndLines = new int[xSmbMethod.SequencePointCount];
+                                        var xCodeEndColumns = new int[xSmbMethod.SequencePointCount];
+                                        xSmbMethod.GetSequencePoints(xCodeOffsets, xCodeDocuments
+                                         , xCodeLines, xCodeColumns, xCodeEndLines, xCodeEndColumns);
                                     }
                                 }
-                                catch
+                            }
+                            xReader.Restart();
+                            while (xReader.Read())
+                            {
+                                ExceptionHandlingClause xCurrentHandler = null;
+
+                                #region Exception handling support code
+                                // todo: add support for nested handlers using a stack or so..
+                                foreach (ExceptionHandlingClause xHandler in xBody.ExceptionHandlingClauses)
                                 {
+                                    if (xHandler.TryOffset > 0)
+                                    {
+                                        if (xHandler.TryOffset <= xReader.NextPosition && (xHandler.TryLength + xHandler.TryOffset) > xReader.NextPosition)
+                                        {
+                                            if (xCurrentHandler == null)
+                                            {
+                                                xCurrentHandler = xHandler;
+                                                continue;
+                                            }
+                                            else if (xHandler.TryOffset > xCurrentHandler.TryOffset && (xHandler.TryLength + xHandler.TryOffset) < (xCurrentHandler.TryLength + xCurrentHandler.TryOffset))
+                                            {
+                                                // only replace if the current found handler is narrower
+                                                xCurrentHandler = xHandler;
+                                                continue;
+                                            }
+                                        }
+                                    }
+                                    if (xHandler.HandlerOffset > 0)
+                                    {
+                                        if (xHandler.HandlerOffset <= xReader.NextPosition && (xHandler.HandlerOffset + xHandler.HandlerLength) > xReader.NextPosition)
+                                        {
+                                            if (xCurrentHandler == null)
+                                            {
+                                                xCurrentHandler = xHandler;
+                                                continue;
+                                            }
+                                            else if (xHandler.HandlerOffset > xCurrentHandler.HandlerOffset && (xHandler.HandlerOffset + xHandler.HandlerLength) < (xCurrentHandler.HandlerOffset + xCurrentHandler.HandlerLength))
+                                            {
+                                                // only replace if the current found handler is narrower
+                                                xCurrentHandler = xHandler;
+                                                continue;
+                                            }
+                                        }
+                                    }
+                                    if ((xHandler.Flags & ExceptionHandlingClauseOptions.Filter) > 0)
+                                    {
+                                        if (xHandler.FilterOffset > 0)
+                                        {
+                                            if (xHandler.FilterOffset <= xReader.NextPosition)
+                                            {
+                                                if (xCurrentHandler == null)
+                                                {
+                                                    xCurrentHandler = xHandler;
+                                                    continue;
+                                                }
+                                                else if (xHandler.FilterOffset > xCurrentHandler.FilterOffset)
+                                                {
+                                                    // only replace if the current found handler is narrower
+                                                    xCurrentHandler = xHandler;
+                                                    continue;
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                                 #endregion
 
-                                mInstructionsToSkip = 0;
-                                Assembler.StackContents.Clear();
-                                var xInstructionInfos = new List<DebugSymbolsAssemblyTypeMethodInstruction>();
+                                xMethodInfo.CurrentHandler = xCurrentHandler;
+                                xOp = GetOpFromType(OpCodeMap.GetOpForOpCode(xReader.OpCode), xReader, xMethodInfo);
 
-                                // Section currently is dead code. Working on matching it up 
-                                // with contents from inside the read
-                                int[] xCodeOffsets = null;
-                                if (DebugMode == DebugMode.Source)
+                                xOp.Assembler = Assembler;
+                                //new Comment("StackItems = " + Assembler.StackContents.Count);
+                                //foreach (var xStackContent in Assembler.StackContents)
+                                //{
+                                //    new Comment("    " + xStackContent.Size);
+                                //}
+
+                                // Create label for current point
+                                string xLabel = Op.GetInstructionLabel(xReader);
+                                if (xLabel.StartsWith("."))
                                 {
-                                    var xSymbolReader = GetSymbolReaderForAssembly(xCurrentMethod.DeclaringType.Assembly);
-                                    if (xSymbolReader != null)
-                                    {
-                                        var xSmbMethod = xSymbolReader.GetMethod(new SymbolToken(xCurrentMethod.MetadataToken));
-                                        // This gets the Sequence Points.
-                                        // Sequence Points are spots that identify what the compiler/debugger says is a spot
-                                        // that a breakpoint can occur one. Essentially, an atomic source line in C#
-                                        if (xSmbMethod != null)
-                                        {
-                                            xCodeOffsets = new int[xSmbMethod.SequencePointCount];
-                                            var xCodeDocuments = new ISymbolDocument[xSmbMethod.SequencePointCount];
-                                            var xCodeLines = new int[xSmbMethod.SequencePointCount];
-                                            var xCodeColumns = new int[xSmbMethod.SequencePointCount];
-                                            var xCodeEndLines = new int[xSmbMethod.SequencePointCount];
-                                            var xCodeEndColumns = new int[xSmbMethod.SequencePointCount];
-                                            xSmbMethod.GetSequencePoints(xCodeOffsets, xCodeDocuments
-                                             , xCodeLines, xCodeColumns, xCodeEndLines, xCodeEndColumns);
-                                        }
-                                    }
+                                    xLabel = DataMember.FilterStringForIncorrectChars(
+                                        Label.LastFullLabel + "__DOT__" + xLabel.Substring(1));
                                 }
-                                xReader.Restart();
-                                while (xReader.Read())
-                                {
-                                    ExceptionHandlingClause xCurrentHandler = null;
 
-                                    #region Exception handling support code
-                                    // todo: add support for nested handlers using a stack or so..
-                                    foreach (ExceptionHandlingClause xHandler in xBody.ExceptionHandlingClauses)
-                                    {
-                                        if (xHandler.TryOffset > 0)
-                                        {
-                                            if (xHandler.TryOffset <= xReader.NextPosition && (xHandler.TryLength + xHandler.TryOffset) > xReader.NextPosition)
-                                            {
-                                                if (xCurrentHandler == null)
-                                                {
-                                                    xCurrentHandler = xHandler;
-                                                    continue;
-                                                }
-                                                else if (xHandler.TryOffset > xCurrentHandler.TryOffset && (xHandler.TryLength + xHandler.TryOffset) < (xCurrentHandler.TryLength + xCurrentHandler.TryOffset))
-                                                {
-                                                    // only replace if the current found handler is narrower
-                                                    xCurrentHandler = xHandler;
-                                                    continue;
-                                                }
-                                            }
-                                        }
-                                        if (xHandler.HandlerOffset > 0)
-                                        {
-                                            if (xHandler.HandlerOffset <= xReader.NextPosition && (xHandler.HandlerOffset + xHandler.HandlerLength) > xReader.NextPosition)
-                                            {
-                                                if (xCurrentHandler == null)
-                                                {
-                                                    xCurrentHandler = xHandler;
-                                                    continue;
-                                                }
-                                                else if (xHandler.HandlerOffset > xCurrentHandler.HandlerOffset && (xHandler.HandlerOffset + xHandler.HandlerLength) < (xCurrentHandler.HandlerOffset + xCurrentHandler.HandlerLength))
-                                                {
-                                                    // only replace if the current found handler is narrower
-                                                    xCurrentHandler = xHandler;
-                                                    continue;
-                                                }
-                                            }
-                                        }
-                                        if ((xHandler.Flags & ExceptionHandlingClauseOptions.Filter) > 0)
-                                        {
-                                            if (xHandler.FilterOffset > 0)
-                                            {
-                                                if (xHandler.FilterOffset <= xReader.NextPosition)
-                                                {
-                                                    if (xCurrentHandler == null)
-                                                    {
-                                                        xCurrentHandler = xHandler;
-                                                        continue;
-                                                    }
-                                                    else if (xHandler.FilterOffset > xCurrentHandler.FilterOffset)
-                                                    {
-                                                        // only replace if the current found handler is narrower
-                                                        xCurrentHandler = xHandler;
-                                                        continue;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                    #endregion
+                                // Possibly emit Tracer call
+                                EmitTracer(xOp, xCurrentMethod.DeclaringType.Namespace, (int)xReader.Position,
+                                    xCodeOffsets, xLabel);
 
-                                    xMethodInfo.CurrentHandler = xCurrentHandler;
-                                    xOp = GetOpFromType(OpCodeMap.GetOpForOpCode(xReader.OpCode), xReader, xMethodInfo);
-
-                                    xOp.Assembler = Assembler;
-                                    //new Comment("StackItems = " + Assembler.StackContents.Count);
-                                    //foreach (var xStackContent in Assembler.StackContents)
-                                    //{
-                                    //    new Comment("    " + xStackContent.Size);
-                                    //}
-
-                                    // Create label for current point
-                                    string xLabel = Op.GetInstructionLabel(xReader);
-                                    if (xLabel.StartsWith("."))
-                                    {
-                                        xLabel = DataMember.FilterStringForIncorrectChars(
-                                            Label.LastFullLabel + "__DOT__" + xLabel.Substring(1));
-                                    }
-
-                                    // Possibly emit Tracer call
-                                    EmitTracer(xOp, xCurrentMethod.DeclaringType.Namespace, (int)xReader.Position,
-                                        xCodeOffsets, xLabel);
-
-                                    //using (mSymbolsLocker.AcquireWriterLock())
-                                    //{
-                                    //    if (mSymbols != null)
-                                    //    {
-                                    //        var xMLSymbol = new MLDebugSymbol();
-                                    //        xMLSymbol.LabelName = xLabel;
-                                    //        int xStackSize = (from item in mAssembler.StackContents
-                                    //                          let xSize = (item.Size % 4 == 0)
-                                    //                                          ? item.Size
-                                    //                                          : (item.Size + (4 - (item.Size % 4)))
-                                    //                          select xSize).Sum();
-                                    //        xMLSymbol.StackDifference = xMethodInfo.LocalsSize + xStackSize;
-                                    //        try
-                                    //        {
-                                    //            xMLSymbol.AssemblyFile = xCurrentMethod.DeclaringType.Assembly.Location;
-                                    //        }
-                                    //        catch (NotSupportedException)
-                                    //        {
-                                    //            xMLSymbol.AssemblyFile = "DYNAMIC: " + xCurrentMethod.DeclaringType.Assembly.FullName;
-                                    //        }
-                                    //        xMLSymbol.MethodToken = xCurrentMethod.MetadataToken;
-                                    //        xMLSymbol.TypeToken = xCurrentMethod.DeclaringType.MetadataToken;
-                                    //        xMLSymbol.ILOffset = (int)xReader.Position;
-                                    //        mSymbols.Add(xMLSymbol);
-                                    //    }
-                                    //}
-                                    xOp.SetServiceProvider(this);
-                                    xOp.Assemble();
-                                }
+                                //using (mSymbolsLocker.AcquireWriterLock())
+                                //{
+                                //    if (mSymbols != null)
+                                //    {
+                                //        var xMLSymbol = new MLDebugSymbol();
+                                //        xMLSymbol.LabelName = xLabel;
+                                //        int xStackSize = (from item in mAssembler.StackContents
+                                //                          let xSize = (item.Size % 4 == 0)
+                                //                                          ? item.Size
+                                //                                          : (item.Size + (4 - (item.Size % 4)))
+                                //                          select xSize).Sum();
+                                //        xMLSymbol.StackDifference = xMethodInfo.LocalsSize + xStackSize;
+                                //        try
+                                //        {
+                                //            xMLSymbol.AssemblyFile = xCurrentMethod.DeclaringType.Assembly.Location;
+                                //        }
+                                //        catch (NotSupportedException)
+                                //        {
+                                //            xMLSymbol.AssemblyFile = "DYNAMIC: " + xCurrentMethod.DeclaringType.Assembly.FullName;
+                                //        }
+                                //        xMLSymbol.MethodToken = xCurrentMethod.MetadataToken;
+                                //        xMLSymbol.TypeToken = xCurrentMethod.DeclaringType.MetadataToken;
+                                //        xMLSymbol.ILOffset = (int)xReader.Position;
+                                //        mSymbols.Add(xMLSymbol);
+                                //    }
+                                //}
+                                xOp.SetServiceProvider(this);
+                                xOp.Assemble();
                             }
-                            //if (mSymbols != null && !EMITmode)
-                            //{
-                            //    MLDebugSymbol[] xSymbols;
-                            //    using (mSymbolsLocker.AcquireReaderLock())
-                            //    {
-                            //        xSymbols = mSymbols.ToArray();
-                            //    }
-                            //    using (mMethodsLocker.AcquireReaderLock())
-                            //    {
-                            //        mMethods[xCurrentMethod].Instructions = xSymbols;
-                            //    }
-                            //}
+                        }
+                        //if (mSymbols != null && !EMITmode)
+                        //{
+                        //    MLDebugSymbol[] xSymbols;
+                        //    using (mSymbolsLocker.AcquireReaderLock())
+                        //    {
+                        //        xSymbols = mSymbols.ToArray();
+                        //    }
+                        //    using (mMethodsLocker.AcquireReaderLock())
+                        //    {
+                        //        mMethods[xCurrentMethod].Instructions = xSymbols;
+                        //    }
+                        //}
+                    }
+                    else
+                    {
+                        if ((xCurrentMethod.Attributes & MethodAttributes.PinvokeImpl) != 0)
+                        {
+                            LogMessage(LogSeverityEnum.Error,
+                                       "Method '{0}' not generated!",
+                                       xCurrentMethod.GetFullName());
+                            new Comment("Method not being generated yet, as it's handled by a PInvoke");
                         }
                         else
                         {
-                            if ((xCurrentMethod.Attributes & MethodAttributes.PinvokeImpl) != 0)
-                            {
-                                LogMessage(LogSeverityEnum.Error,
-                                           "Method '{0}' not generated!",
-                                           xCurrentMethod.GetFullName());
-                                new Comment("Method not being generated yet, as it's handled by a PInvoke");
-                            }
-                            else
-                            {
-                                LogMessage(LogSeverityEnum.Error,
-                                           "Method '{0}' not generated!",
-                                           xCurrentMethod.GetFullName());
-                                new Comment("Method not being generated yet, as it's handled by an iCall");
-                            }
+                            LogMessage(LogSeverityEnum.Error,
+                                       "Method '{0}' not generated!",
+                                       xCurrentMethod.GetFullName());
+                            new Comment("Method not being generated yet, as it's handled by an iCall");
                         }
                     }
                 }
-                xOp = GetOpFromType(OpCodeMap.MethodFooterOp, null, xMethodInfo);
-                xOp.Assembler = Assembler;
-                xOp.SetServiceProvider(this);
-                xOp.Assemble();
-                Assembler.StackContents.Clear();
             }
+            xOp = GetOpFromType(OpCodeMap.MethodFooterOp, null, xMethodInfo);
+            xOp.Assembler = Assembler;
+            xOp.SetServiceProvider(this);
+            xOp.Assemble();
+            Assembler.StackContents.Clear();
         }
 
         private static Op GetOpFromType(Type aType, ILReader aReader, MethodInformation aMethodInfo)
