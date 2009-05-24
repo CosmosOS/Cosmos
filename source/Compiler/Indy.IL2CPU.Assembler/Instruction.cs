@@ -21,7 +21,7 @@ namespace Indy.IL2CPU.Assembler {
 			var xAttribs = GetType().GetCustomAttributes(typeof (OpCodeAttribute), false);
 			if (xAttribs != null && xAttribs.Length > 0) {
 				var xAttrib = (OpCodeAttribute)xAttribs[0];
-				mMnemonic = xAttrib.Mnemonic;
+				mMnemonic = String.Intern(xAttrib.Mnemonic); //Ben Trying it,
 			}
 			if(aAddToAssembler) {
 				Assembler.CurrentInstance.Peek().Add(this);

@@ -9,7 +9,7 @@ namespace Indy.IL2CPU.Assembler {
 			if(aText.StartsWith(";")) {
 				aText = aText.TrimStart(';').TrimStart();
 			}
-			Text = aText;
+			Text = String.Intern(aText);
 		}
 
 		public override string ToString() {

@@ -178,7 +178,8 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 case 64:
                     return "qword";
                 default:
-                    throw new Exception("Invalid size: " + aSize);
+                    return "dword";
+                 //   throw new Exception("Invalid size: " + aSize);
             }
         }
 
@@ -1027,7 +1028,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                         }
 
                         if (aInstructionWithSource != null && aInstructionWithSource.SourceReg != Guid.Empty && aInstructionWithSource.SourceIsIndirect && aInstructionWithSource.SourceDisplacement > 0) {
-                            var xSIBOffset = 0;
+                            //var xSIBOffset = 0;
                             if (aInstructionWithSource.SourceReg == Registers.ESP) {
                                 //                                xExtraOffset++;
                                 xSIB = 0x24;
@@ -1046,9 +1047,9 @@ namespace Indy.IL2CPU.Assembler.X86 {
                             }
                             //xBuffer[aEncodingOption.OpCode.Length + xExtraOffset] |= 3 << 6;
                             // todo: optimize for different displacement sizes
-                            int xCorrecting = 0;
+                          //  int xCorrecting = 0;
                             if (aInstructionWithDestination != null && aInstructionWithDestination.DestinationReg != Guid.Empty && (/*aInstructionWithSource.SourceReg == Registers.EBP || */aInstructionWithSource.SourceReg == Registers.ESP)) {
-                                xCorrecting = -1;
+                               // xCorrecting = -1;
                             }
                             if (aInstructionWithSource.SourceDisplacement < 128) {
                                 xModRM |= 2 << 5;

@@ -144,5 +144,8 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 DestinationReg=Guid.Empty
             }); // memory to register
         }
+
+
+
 	}
 }

@@ -6,17 +6,29 @@ using System.Text;
 namespace Indy.IL2CPU.Assembler.X86 {
     public abstract class InstructionWithDestinationAndSourceAndSize : InstructionWithDestinationAndSource, IInstructionWithSize {
         // todo: do all instructions with two operands have a size?
+        //todo should validate Instructions or use a constructor and no set properties. 
         protected byte mSize;
-        public byte Size {
-            get{
+        
+        //Size in bits
+        public byte Size
+        {
+            get
+            {
                 DetermineSize();
-                return mSize;}
-            set {
-                if (value > 0) {
-                    SizeToString(value);
-                }
-                mSize = value;
+                return mSize;
             }
+            set 
+            {
+                if (value == 0 || value % 8 != 0)
+                    throw new ArgumentException("Size must be greater than 0 and bits in byte sizes");  
+
+              mSize = value;
+
+              //ben will crash on output for size 0 so catch here
+                
+            }
+
+            
         }
 
         protected virtual void DetermineSize() {
@@ -50,9 +62,18 @@ namespace Indy.IL2CPU.Assembler.X86 {
                     return;
                 }
             }
+
         }
 
-        public override string ToString() {
+        public override string ToString()
+        {
+            //HACK see todo at top 
+            if (Size == 0)
+            {
+                Size = 32;
+                Console.WriteLine("ERRROR no size set for Instruction - set to 4 InstructionWithDestinationAndSourceAndSize") ;
+            }
+
             return base.mMnemonic + " " + SizeToString(Size) + " " + this.GetDestinationAsString() + ", " + GetSourceAsString();
         }
     }
