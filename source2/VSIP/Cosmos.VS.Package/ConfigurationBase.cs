@@ -5,17 +5,22 @@ using System.Drawing;
 using System.Data;
 using System.Linq;
 using System.Text;
+using System.Collections;
 using System.Windows.Forms;
 using Cosmos.Builder.Common;
+using Microsoft.VisualStudio.Project;
 
 namespace Cosmos.VS.Package
 {
 	public partial class ConfigurationBase : CustomPropertyPage
 	{
 		private Boolean configIgnoreFill;
-		private Microsoft.VisualStudio.Project.ProjectConfig configCurrentConfig;
+		private ProjectConfig configCurrentConfig;
 		private Int32 configOldIndex;
 		private Boolean configIgnoreConfigChange;
+
+        private Hashtable _propertyTable = new Hashtable();
+        protected Hashtable PropertyTable { get { return _propertyTable; } }
 
 		protected static event EventHandler<ProjectConfigurationChangedEventArgs> ProjectConfigurationChanged;
 
@@ -145,7 +150,12 @@ namespace Cosmos.VS.Package
 				foreach (Microsoft.VisualStudio.Project.ProjectConfig projectConfig in base.ProjectConfigs)
 				{
 					if (String.Equals(projectConfig.ConfigName, selectedConfig, StringComparison.InvariantCulture) == true)
-					{ this.configCurrentConfig = projectConfig; }
+					{
+					    this.configCurrentConfig = projectConfig;
+
+                        if (PropertyTable.Count > 0)
+                            PropertyTable.Clear();
+					}
 				}
 
 				if (this.configCurrentConfig == null) { throw new Exception("Unable to find selected project configuration."); }
@@ -194,6 +204,34 @@ namespace Cosmos.VS.Package
 
 		protected Microsoft.VisualStudio.Project.ProjectConfig CurrentProjectConfig
 		{ get { return this.configCurrentConfig; } }
+
+        public override void ApplyChanges()
+        {
+            base.ApplyChanges();
+
+            foreach (object key in PropertyTable.Keys)
+            {
+                SetConfigProperty((string)key, (string)PropertyTable[key]);
+            }
+        }
+
+        public override void SetConfigProperty(string name, string value)
+        {
+            base.SetConfigProperty(name, value);
+
+            CCITracing.TraceCall();
+            if (value == null)
+            {
+                value = String.Empty;
+            }
+
+            if (this.ProjectMgr != null)
+            {
+                CurrentProjectConfig.SetConfigurationProperty(name, value);
+
+                this.ProjectMgr.SetProjectFileDirty(true);
+            }
+        }
 
 	}
 
