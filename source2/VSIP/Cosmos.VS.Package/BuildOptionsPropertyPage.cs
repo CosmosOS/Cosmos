@@ -57,7 +57,7 @@ namespace Cosmos.VS.Package
 				if( System.IO.Path.IsPathRooted(folderPath) == false )
 				{ folderPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(this.Project.FullName), folderPath); }
 
-				while( (System.IO.Directory.Exists(folderPath)==false) || (String.IsNullOrEmpty(folderPath) == true))
+				while( (System.IO.Directory.Exists(folderPath)==false) || (String.IsNullOrEmpty(folderPath) == false))
 				{
 					Int32 index = -1;
 					index = folderPath.IndexOfAny(new Char[]{System.IO.Path.PathSeparator, System.IO.Path.AltDirectorySeparatorChar});
