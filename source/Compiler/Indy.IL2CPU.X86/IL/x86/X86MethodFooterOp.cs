@@ -101,7 +101,7 @@ namespace Indy.IL2CPU.IL.X86
             new Label(EndOfMethodLabelNameException);
             for (int i = 0; i < aLocAllocItemCount;i++ )
             {
-                new CPUx86.Call { DestinationLabel = Label.GenerateLabelName(typeof(RuntimeEngine).GetMethod("Heap_Free")) };
+                new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(typeof(RuntimeEngine).GetMethod("Heap_Free")) };
             }
             if (aDebugMode && aIsNonDebuggable)
             {
@@ -119,7 +119,7 @@ namespace Indy.IL2CPU.IL.X86
                                  xLocal,
                                  false,
                                  aGetStorageSizeDelegate(xLocal.VariableType));
-                        new CPUx86.Call { DestinationLabel = Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef) };
+                        new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.DecRefCountRef) };
                     }
                 }
                 foreach (MethodInformation.Argument xArg in aArgs) {
@@ -128,7 +128,7 @@ namespace Indy.IL2CPU.IL.X86
                                  xArg,
                                  false);
                         //,                                 aGetStorageSizeDelegate(xArg.ArgumentType)
-                        new CPUx86.Call { DestinationLabel = Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef) };
+                        new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.DecRefCountRef) };
                     }
                 }
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };

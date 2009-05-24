@@ -30,7 +30,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				xStackSize += 4 - xStackSize % 4;
 			}
             new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xStackSize + 4) };
-            new CPUx86.Call { DestinationLabel = IL2CPU.Assembler.Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef) };
+            new CPUx86.Call { DestinationLabel = IL2CPU.Assembler.MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.DecRefCountRef) };
 			new CPUx86.Move{DestinationReg=CPUx86.Registers.EBX, SourceReg=CPUx86.Registers.ESP, SourceIsIndirect=true, SourceDisplacement= (int)xStackSize}; // the index
             new CPUx86.Move{DestinationReg=CPUx86.Registers.ECX, SourceReg=CPUx86.Registers.ESP, SourceIsIndirect=true, SourceDisplacement= (int)xStackSize+4}; // the index
             new CPUx86.Add { DestinationReg = CPUx86.Registers.ECX, SourceValue = (uint)(ObjectImpl.FieldDataOffset + 4) };

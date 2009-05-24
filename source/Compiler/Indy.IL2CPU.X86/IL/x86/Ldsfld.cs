@@ -89,7 +89,7 @@ namespace Indy.IL2CPU.IL.X86 {
 				new Dup(null, null) {
 					Assembler = this.Assembler
 				}.Assemble();
-				new CPUx86.Call { DestinationLabel = Label.GenerateLabelName(GCImplementationRefs.IncRefCountRef) };
+				new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.IncRefCountRef) };
 				Assembler.StackContents.Pop();
 			}
 		}

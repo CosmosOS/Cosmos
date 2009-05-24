@@ -68,6 +68,7 @@
     <Compile Include="ImportMethodMember.cs" />
     <Compile Include="Instruction.cs" />
     <Compile Include="Label.cs" />
+    <Compile Include="MethodInfoLabelGenerator.cs" />
     <Compile Include="OpCodeAttribute.cs" />
     <Compile Include="RawAssembler.cs" />
     <Compile Include="ReaderWriterLocker.cs" />

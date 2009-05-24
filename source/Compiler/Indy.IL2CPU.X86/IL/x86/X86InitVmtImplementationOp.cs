@@ -24,7 +24,7 @@ namespace Indy.IL2CPU.IL.X86 {
         }
 
 		protected override void Call(MethodBase aMethod) {
-            new CPUx86.Call { DestinationLabel = CPU.Label.GenerateLabelName(aMethod) };
+            new CPUx86.Call { DestinationLabel = CPU.MethodInfoLabelGenerator.GenerateLabelName(aMethod) };
 		}
 	}
 }

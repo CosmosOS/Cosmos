@@ -37,7 +37,7 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System.Assemblers
 			var xGetInvocationListMethod = typeof(MulticastDelegate).GetMethod("GetInvocationList");
 			new CPU.Comment("push address of delgate to stack");
             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };//addrof this
-            new CPUx86.Call { DestinationLabel = CPU.Label.GenerateLabelName(xGetInvocationListMethod) };
+            new CPUx86.Call { DestinationLabel = CPU.MethodInfoLabelGenerator.GenerateLabelName(xGetInvocationListMethod) };
 			new CPU.Comment("get address from return value -> eax");
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX }; ;//list
 			new CPU.Comment("eax+=8 is where the offset where an array's count is");

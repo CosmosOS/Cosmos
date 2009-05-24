@@ -23,12 +23,12 @@ namespace Indy.IL2CPU.IL.X86 {
 		private int xLabelId = 0;
 
 		public override void Call(MethodBase aMethod) {
-			Call(CPU.Label.GenerateLabelName(aMethod));
+			Call(CPU.MethodInfoLabelGenerator.GenerateLabelName(aMethod));
             new CPUx86.Test { DestinationReg = CPUx86.Registers.ECX, SourceValue = 2 };
 			string xLabel = ".Call_Part2_" + xLabelId++.ToString();
             new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = xLabel };
 			//new CPUx86.Call("_CODE_REQUESTED_BREAK_");
-			new CPUx86.Call{DestinationLabel=CPU.Label.GenerateLabelName(ReflectionUtilities.GetMethodBase(typeof(Assembler.Assembler), "PrintException"))};
+			new CPUx86.Call{DestinationLabel=CPU.MethodInfoLabelGenerator.GenerateLabelName(ReflectionUtilities.GetMethodBase(typeof(Assembler.Assembler), "PrintException"))};
 			new CPU.Label(xLabel);
 			MethodInfo xMethodInfo = aMethod as MethodInfo;
 			if (xMethodInfo != null) {

@@ -31,7 +31,7 @@ namespace Indy.IL2CPU.IL.X86 {
         //        throw new Exception("Unable to determine Method!");
         //    }
         //    MethodBase xMethodDef = xMethod;
-        //    var xMethodDescription = CPU.Label.GenerateLabelName(xMethodDef);
+        //    var xMethodDescription = CPU.MethodInfoLabelGenerator.GenerateLabelName(xMethodDef);
         //    var xTargetMethodInfo = Engine.GetMethodInfo(xMethodDef,
         //                                                 xMethodDef,
         //                                                 xMethodDescription,
@@ -62,7 +62,7 @@ namespace Indy.IL2CPU.IL.X86 {
         }
 
         public override void DoAssemble() {
-            mMethodDescription = CPU.Label.GenerateLabelName(mMethod);
+            mMethodDescription = CPU.MethodInfoLabelGenerator.GenerateLabelName(mMethod);
             mTargetMethodInfo = GetService<IMetaDataInfoService>().GetMethodInfo(mMethod,
                                                      mMethod,
                                                      mMethodDescription,
@@ -70,7 +70,7 @@ namespace Indy.IL2CPU.IL.X86 {
                                                      mCurrentMethodInfo.DebugMode);
             if (mMethod.IsStatic || !mMethod.IsVirtual || mMethod.IsFinal)
             {
-                mNormalAddress = CPU.Label.GenerateLabelName(mMethod);
+                mNormalAddress = CPU.MethodInfoLabelGenerator.GenerateLabelName(mMethod);
             }
             mMethodIdentifier = GetService<IMetaDataInfoService>().GetMethodIdLabel(mMethod);
             mArgumentCount = (uint)mTargetMethodInfo.Arguments.Length;
@@ -136,7 +136,7 @@ namespace Indy.IL2CPU.IL.X86 {
                 new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = mThisOffset };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
                 new CPUx86.Push { DestinationRef = new ElementReference(mMethodIdentifier), DestinationIsIndirect=true };
-                new CPUx86.Call { DestinationLabel = CPU.Label.GenerateLabelName(VTablesImplRefs.GetMethodAddressForTypeRef) };
+                new CPUx86.Call { DestinationLabel = CPU.MethodInfoLabelGenerator.GenerateLabelName(VTablesImplRefs.GetMethodAddressForTypeRef) };
 
                 /*
                  * On the stack now:

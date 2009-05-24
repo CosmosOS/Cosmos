@@ -39,7 +39,7 @@ namespace Indy.IL2CPU.IL.X86
         //    {
         //        Engine.RegisterType(xParam.ParameterType);
         //    }
-        //    var xTargetMethodInfo = Engine.GetMethodInfo(aTargetMethod, aTargetMethod, Label.GenerateLabelName(aTargetMethod), Engine.GetTypeInfo(aTargetMethod.DeclaringType), false);
+        //    var xTargetMethodInfo = Engine.GetMethodInfo(aTargetMethod, aTargetMethod, MethodInfoLabelGenerator.GenerateLabelName(aTargetMethod), Engine.GetTypeInfo(aTargetMethod.DeclaringType), false);
         //    Engine.RegisterType(xTargetMethodInfo.ReturnType);
         //}
 
@@ -130,13 +130,13 @@ namespace Indy.IL2CPU.IL.X86
                 aMethod = DynamicMethodEmit.GetDynamicMethod(aMethod);
             }
 
-            mTargetMethodInfo = GetService<IMetaDataInfoService>().GetMethodInfo(aMethod, aMethod, Label.GenerateLabelName(aMethod), GetService<IMetaDataInfoService>().GetTypeInfo(aMethod.DeclaringType), aDebugMode);
+            mTargetMethodInfo = GetService<IMetaDataInfoService>().GetMethodInfo(aMethod, aMethod, MethodInfoLabelGenerator.GenerateLabelName(aMethod), GetService<IMetaDataInfoService>().GetTypeInfo(aMethod.DeclaringType), aDebugMode);
             mResultSize = 0;
             if (mTargetMethodInfo != null)
             {
                 mResultSize = mTargetMethodInfo.ReturnSize;
             }
-            LabelName = CPU.Label.GenerateLabelName(aMethod);
+            LabelName = CPU.MethodInfoLabelGenerator.GenerateLabelName(aMethod);
             //if (!HasDynamic)
             //    Engine.QueueMethod(aMethod);
             bool needsCleanup = false;

@@ -154,7 +154,7 @@ namespace Indy.IL2CPU.IL.X86
 					{
 						//IL.X86.Op.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
 
-                        new CPUx86.Push { DestinationRef = new ElementReference(Label.GenerateLabelName(InvokeMulticastRef)) };
+                        new CPUx86.Push { DestinationRef = new ElementReference(MethodInfoLabelGenerator.GenerateLabelName(InvokeMulticastRef)) };
 						break;
 					}
 				case "System_MulticastDelegate___System_Delegate_InternalAllocLike___System_Delegate___":
@@ -219,7 +219,7 @@ namespace Indy.IL2CPU.IL.X86
 							//new CPUx86.Call(CPUx86.Registers_Old.EAX);
 							//new CPUx86.Add("esp",
 							//               "4");
-                            new CPUx86.Call { DestinationLabel = Label.GenerateLabelName(InvokeMulticastRef) };
+                            new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(InvokeMulticastRef) };
 							var xGetInvocationListMethod = typeof(MulticastDelegate).GetMethod("GetInvocationList");
 							xGetInvocationListMethod = typeof(Delegate).GetMethod("GetInvocationList");
 

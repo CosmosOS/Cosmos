@@ -33,7 +33,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		public sealed override void DoAssemble() {
 			if (mNeedsGC) {
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = mLocal.VirtualAddresses[0] };
-                new CPUx86.Call { DestinationLabel = Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef) };
+                new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.DecRefCountRef) };
 			}
 			foreach (int i in mLocal.VirtualAddresses.Reverse()) {
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX }; ;

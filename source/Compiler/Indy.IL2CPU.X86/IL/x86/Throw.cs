@@ -20,7 +20,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		public static void Assemble(Assembler.Assembler aAssembler, MethodInformation aMethodInfo, int aCurrentILOffset) {
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
             new CPUx86.Move { DestinationRef = new CPU.ElementReference(CPU.DataMember.GetStaticFieldName(CPU.Assembler.CurrentExceptionRef)), DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
-            new CPUx86.Call { DestinationLabel = CPU.Label.GenerateLabelName(CPU.Assembler.CurrentExceptionOccurredRef) };
+            new CPUx86.Call { DestinationLabel = CPU.MethodInfoLabelGenerator.GenerateLabelName(CPU.Assembler.CurrentExceptionOccurredRef) };
             new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceValue = 3 };
 			Call.EmitExceptionLogic(aAssembler, (uint)aCurrentILOffset, aMethodInfo, null, false, null);
 			aAssembler.StackContents.Pop();

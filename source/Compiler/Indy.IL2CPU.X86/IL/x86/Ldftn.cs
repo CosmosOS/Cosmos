@@ -28,7 +28,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			if (xMethodRef == null) {
 				throw new Exception("Unable to determine Method!");
 			}
-			mFunctionLabel = CPU.Label.GenerateLabelName(xMethodRef);
+			mFunctionLabel = MethodInfoLabelGenerator.GenerateLabelName(xMethodRef);
 		}
 
 		public override void DoAssemble() {

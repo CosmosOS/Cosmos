@@ -42,7 +42,7 @@ namespace Indy.IL2CPU.IL.X86 {
 
 			if (mNeedsGC) {
                 new CPUx86.Push { DestinationRef = new ElementReference(mDataName), DestinationIsIndirect = true };
-				new CPUx86.Call { DestinationLabel = Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef) };
+				new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.DecRefCountRef) };
 			}
             for (int i = 0; i < (xSize / 4); i++)
             {

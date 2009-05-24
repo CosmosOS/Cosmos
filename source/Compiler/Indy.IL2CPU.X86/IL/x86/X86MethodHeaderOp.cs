@@ -38,7 +38,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			//if (!(aLabelName.Contains("Cosmos.Kernel.Serial") || aLabelName.Contains("Cosmos.Kernel.Heap"))) {
 			//    new CPUx86.Push(LdStr.GetContentsArrayName(aAssembler, aLabelName));
 			//    MethodBase xTempMethod = Engine.GetMethodBase(Engine.GetType("Cosmos.Kernel", "Cosmos.Kernel.Serial"), "Write", "System.Byte", "System.String");
-			//    new CPUx86.Call(Label.GenerateLabelName(xTempMethod));
+			//    new CPUx86.Call(MethodInfoLabelGenerator.GenerateLabelName(xTempMethod));
 			//    Engine.QueueMethod(xTempMethod);
 			//}
 			foreach (var xLocal in aLocals) {
