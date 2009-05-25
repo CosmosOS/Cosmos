@@ -108,9 +108,9 @@ namespace Cosmos.VS.Package
 				{
 					Boolean oldValue = this.configIgnoreFill;
 
-					this.configIgnoreFill = true;
-					this.FillProperties();
-					this.configIgnoreFill = oldValue;
+					configIgnoreFill = true;
+				    FillProperties();
+					configIgnoreFill = oldValue;
 
 					if (this.configIgnoreFill == false)
 					{ ConfigurationBase.OnProjectConfigurationChanged(this, new ProjectConfigurationChangedEventArgs(this.comboConfiguration.SelectedIndex)); }
@@ -161,30 +161,48 @@ namespace Cosmos.VS.Package
 				if (this.configCurrentConfig == null) { throw new Exception("Unable to find selected project configuration."); }
 		}
 
+        protected override void FillConfigs()
+        {
+            base.FillConfigs();
+
+            if (configIgnoreFill == false)
+            {
+                comboConfiguration.Items.Clear();
+
+                comboConfiguration.Items.Add(String.Format("Active ({0})",
+                                                           this.Project.ConfigurationManager.ActiveConfiguration.
+                                                               ConfigurationName));
+                foreach (ProjectConfig projectConfig in ProjectConfigs)
+                {
+                    comboConfiguration.Items.Add(projectConfig.ConfigName);
+                }
+            }
+        }
+
 		protected override void FillProperties()
 		{
 			base.FillProperties();
 
-			if (this.configIgnoreFill == false)
+			if (configIgnoreFill == false)
 			{
-				this.comboConfiguration.Items.Clear();
+                //comboConfiguration.Items.Clear();
 
-				this.comboConfiguration.Items.Add(String.Format("Active ({0})", this.Project.ConfigurationManager.ActiveConfiguration.ConfigurationName));
-				foreach (Microsoft.VisualStudio.Project.ProjectConfig projectConfig in base.ProjectConfigs)
-				{ this.comboConfiguration.Items.Add(projectConfig.ConfigName); }
+                //comboConfiguration.Items.Add(String.Format("Active ({0})", this.Project.ConfigurationManager.ActiveConfiguration.ConfigurationName));
+                //foreach (ProjectConfig projectConfig in ProjectConfigs)
+                //{ comboConfiguration.Items.Add(projectConfig.ConfigName); }
 
 				Boolean foundConfigBase = false;
-				foreach (CustomPropertyPage page in CustomPropertyPage.Pages)
+				foreach (CustomPropertyPage page in Pages)
 				{
-					if ((Object.ReferenceEquals(this, page) == false) && (page is ConfigurationBase))
+					if ((ReferenceEquals(this, page) == false) && (page is ConfigurationBase))
 					{
 						if (((ConfigurationBase)page).comboConfiguration.SelectedIndex > -1)
 						{
-							this.configOldIndex = ((ConfigurationBase)page).configOldIndex;
-							if (this.comboConfiguration.SelectedIndex < 0)
-							{ this.configIgnoreConfigChange = true; }
-							this.comboConfiguration.SelectedIndex = ((ConfigurationBase)page).comboConfiguration.SelectedIndex;
-							this.configIgnoreConfigChange = false;
+							configOldIndex = ((ConfigurationBase)page).configOldIndex;
+							if (comboConfiguration.SelectedIndex < 0)
+							{ configIgnoreConfigChange = true; }
+							comboConfiguration.SelectedIndex = ((ConfigurationBase)page).comboConfiguration.SelectedIndex;
+							configIgnoreConfigChange = false;
 							foundConfigBase = true;
 							break;
 						}

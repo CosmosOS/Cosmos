@@ -120,7 +120,10 @@ namespace Cosmos.VS.Package {
 			}
 
 	        protected virtual void FillProperties() 
-	        {} 
+	        {}
+ 
+            protected virtual void FillConfigs()
+            {}
 	 
 	        public virtual void ApplyChanges()
 	        {} 
@@ -183,6 +186,7 @@ namespace Cosmos.VS.Package {
 	            NativeMethods.SetParent(Handle, hWndParent);
 
 				CustomPropertyPage._pageList.Add(this);
+	            FillConfigs();
 				FillProperties();
 	        } 
 	 

@@ -40,6 +40,9 @@ namespace Cosmos.VS.Package
 			base.FillProperties();
 
 			//TODO: fill in properties
+		    textOutputPath.Text = CurrentProjectConfig.GetConfigurationProperty("OutputPath", true);
+		    comboTarget.SelectedIndex = 
+                (int)Enum.Parse(typeof(TargetHost), CurrentProjectConfig.GetConfigurationProperty("BuildTarget", true));
 
 			base.IgnoreDirty = false;
 		}
