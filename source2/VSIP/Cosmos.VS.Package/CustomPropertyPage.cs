@@ -123,7 +123,8 @@ namespace Cosmos.VS.Package {
 	        {}
  
             protected virtual void FillConfigs()
-            {}
+            {
+            }
 	 
 	        public virtual void ApplyChanges()
 	        {} 
@@ -140,9 +141,10 @@ namespace Cosmos.VS.Package {
 	        }
 
             protected virtual void SetConfigProperty(string name, string value)
-            {}
-	 
-	        protected string GetComboValue(ComboBox comboBox) 
+            {
+            }
+
+        protected string GetComboValue(ComboBox comboBox) 
 	        { 
 	            string selectedItem = comboBox.SelectedItem as string; 
 	            if (selectedItem != null) 

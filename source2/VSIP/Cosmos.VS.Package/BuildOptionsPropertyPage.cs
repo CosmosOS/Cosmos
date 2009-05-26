@@ -25,11 +25,11 @@ namespace Cosmos.VS.Package
 			this.comboTarget.Items.AddRange(EnumValue.GetEnumValues(typeof(TargetHost)));
 			this.comboFramework.Items.AddRange(EnumValue.GetEnumValues(typeof(Framework)));
 
-            this.textOutputPath.TextChanged += 
-                delegate(Object sender, EventArgs e) 
-                    { 
-                        OutputPath = textOutputPath.Text;
-                        IsDirty = true; 
+		    this.textOutputPath.TextChanged +=
+		        delegate(Object sender, EventArgs e)
+		            {
+		                OutputPath = textOutputPath.Text;
+		                IsDirty = true;
                     };
 			this.comboTarget.SelectedIndexChanged += 
                 delegate(Object sender, EventArgs e)
