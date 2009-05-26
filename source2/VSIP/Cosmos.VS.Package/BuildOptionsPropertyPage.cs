@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Drawing;
 using System.Data;
 using System.Text;
@@ -25,13 +26,29 @@ namespace Cosmos.VS.Package
 			this.comboFramework.Items.AddRange(EnumValue.GetEnumValues(typeof(Framework)));
 
             this.textOutputPath.TextChanged += 
-                delegate(Object sender, EventArgs e) { OutputPath = textOutputPath.Text; };
+                delegate(Object sender, EventArgs e) 
+                    { 
+                        OutputPath = textOutputPath.Text;
+                        IsDirty = true; 
+                    };
 			this.comboTarget.SelectedIndexChanged += 
-                delegate(Object sender, EventArgs e) { Target = (TargetHost)comboTarget.SelectedIndex; };
-			this.comboFramework.SelectedIndexChanged += 
-                delegate(Object sender, EventArgs e) { this.IsDirty = true; };
+                delegate(Object sender, EventArgs e)
+                    {
+                        BuildTarget = (TargetHost)comboTarget.SelectedIndex;
+                        IsDirty = true;
+                    };
+			this.comboFramework.SelectedIndexChanged +=
+                delegate(Object sender, EventArgs e)
+                    {
+                        ChoosenFramework = (Framework)comboFramework.SelectedIndex;
+                        IsDirty = true;
+                    };
 			this.checkUseInternalAssembler.CheckedChanged += 
-                delegate(Object sender, EventArgs e) { this.IsDirty = true; };
+                delegate(Object sender, EventArgs e)
+                    {
+                        UseInternalAssembler = checkUseInternalAssembler.Checked;
+                        IsDirty = true;
+                    };
 		}
 
 		protected override void FillProperties()
@@ -40,9 +57,13 @@ namespace Cosmos.VS.Package
 			base.FillProperties();
 
 			//TODO: fill in properties
-		    textOutputPath.Text = CurrentProjectConfig.GetConfigurationProperty("OutputPath", true);
-		    comboTarget.SelectedIndex = 
-                (int)Enum.Parse(typeof(TargetHost), CurrentProjectConfig.GetConfigurationProperty("BuildTarget", true));
+		    OutputPath = GetSetting("OutputPath");
+		    BuildTarget = 
+                (TargetHost)GetEnumValue(typeof(TargetHost), GetSetting("BuildTarget"));
+		    ChoosenFramework =
+		        (Framework)GetEnumValue(typeof(Framework), GetSetting("Framework"));
+		    UseInternalAssembler = 
+                bool.Parse(GetSetting("UseInternalAssembler") ?? "false");
 
 			base.IgnoreDirty = false;
 		}
@@ -86,39 +107,40 @@ namespace Cosmos.VS.Package
 
         protected string mOutputPath;
         [SRCategoryAttribute("Category")]
-        [DisplayName("Target")]
+        [DisplayName("Output Path")]
         [SRDescriptionAttribute("Description")]
         public string OutputPath
         {
             get { return mOutputPath; }
             set
             {
-                mOutputPath = value;
+                string tmp = value;
+
+                tmp = String.IsNullOrEmpty(value) ? String.Empty : value;
 
                 if (PropertyTable.ContainsKey("OutputPath"))
                 {
-                    PropertyTable["OutputPath"] = value;
+                    PropertyTable["OutputPath"] = tmp;
                 }
                 else
                 {
-                    base.PropertyTable.Add("OutputPath", value);
+                    base.PropertyTable.Add("OutputPath", tmp);
                 }
-                
-                this.IsDirty = true;
+
+                mOutputPath = tmp;
+                textOutputPath.Text = tmp;
             }
         }
 
-	    protected TargetHost mTarget;
+	    protected TargetHost mBuildTarget;
 	    [SRCategoryAttribute("Category")]
-	    [DisplayName("Target")]
+	    [DisplayName("Build Target")]
 	    [SRDescriptionAttribute("Description")]
-	    public TargetHost Target
+	    public TargetHost BuildTarget
 	    {
-            get { return mTarget; }
+            get { return mBuildTarget; }
             set
             {
-                mTarget = value;
-
                 if (PropertyTable.ContainsKey("BuildTarget"))
                 {
                     PropertyTable["BuildTarget"] = Enum.GetName(typeof(TargetHost), value);
@@ -128,7 +150,54 @@ namespace Cosmos.VS.Package
                     PropertyTable.Add("BuildTarget", Enum.GetName(typeof(TargetHost), value));
                 }
 
-                this.IsDirty = true;
+                mBuildTarget = value;
+                comboTarget.SelectedIndex = (value == null) ? -1 : (int)value;
+            }
+	    }
+
+	    protected Framework mChoosenFramework;
+	    [SRCategoryAttribute("Category")]
+	    [DisplayName("Framework")]
+	    [SRDescriptionAttribute("Description")]
+	    public Framework ChoosenFramework
+	    {
+            get { return mChoosenFramework; }
+            set
+            {
+                if (PropertyTable.ContainsKey("Framework"))
+                {
+                    PropertyTable["Framework"] = Enum.GetName(typeof (Framework), value);
+                }
+                else
+                {
+                    PropertyTable.Add("Framework", Enum.GetName(typeof(Framework), value));
+                }
+
+                mChoosenFramework = value;
+                comboFramework.SelectedIndex = (value == null) ? -1 : (int)value;
+            }
+	    }
+
+	    protected bool mUseInternalAssembler;
+	    [SRCategoryAttribute("Category")]
+	    [DisplayName("Use Internal Assembler")]
+	    [SRDescriptionAttribute("Description")]
+	    public bool UseInternalAssembler
+	    {
+            get { return mUseInternalAssembler; }
+            set
+            {
+                if (PropertyTable.ContainsKey("UseInternalAssembler"))
+                {
+                    PropertyTable["UseInternalAssembler"] = value.ToString();
+                }
+                else
+                {
+                    PropertyTable.Add("UseInternalAssembler", value.ToString());
+                }
+
+                mUseInternalAssembler = value;
+                checkUseInternalAssembler.Checked = value;
             }
 	    }
 	}

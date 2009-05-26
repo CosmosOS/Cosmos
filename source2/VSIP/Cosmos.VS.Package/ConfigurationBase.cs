@@ -50,7 +50,29 @@ namespace Cosmos.VS.Package
 				this.comboConfiguration.SelectedIndexChanged -= new EventHandler(comboConfiguration_SelectedIndexChanged);
 			}
 			base.Dispose(disposing);
-		}
+        }
+
+        protected string GetSetting(string setting)
+        {
+            try
+            {
+                return CurrentProjectConfig.GetConfigurationProperty(setting, true);
+            }
+            catch (Exception e)
+            {
+                return "";
+            }
+        }
+
+        protected Enum GetEnumValue(Type type, string value)
+        {
+            if (!String.IsNullOrEmpty(value))
+            {
+                return (Enum)Enum.Parse(type, value);
+            }
+
+            return null;
+        }
 
 		void comboConfiguration_SelectedIndexChanged(object sender, EventArgs e)
 		{
@@ -185,12 +207,6 @@ namespace Cosmos.VS.Package
 
 			if (configIgnoreFill == false)
 			{
-                //comboConfiguration.Items.Clear();
-
-                //comboConfiguration.Items.Add(String.Format("Active ({0})", this.Project.ConfigurationManager.ActiveConfiguration.ConfigurationName));
-                //foreach (ProjectConfig projectConfig in ProjectConfigs)
-                //{ comboConfiguration.Items.Add(projectConfig.ConfigName); }
-
 				Boolean foundConfigBase = false;
 				foreach (CustomPropertyPage page in Pages)
 				{
@@ -233,7 +249,7 @@ namespace Cosmos.VS.Package
             }
         }
 
-        public override void SetConfigProperty(string name, string value)
+        protected override void SetConfigProperty(string name, string value)
         {
             base.SetConfigProperty(name, value);
 

@@ -139,7 +139,7 @@ namespace Cosmos.VS.Package {
 	            IsDirty = true; 
 	        }
 
-            public virtual void SetConfigProperty(string name, string value)
+            protected virtual void SetConfigProperty(string name, string value)
             {}
 	 
 	        protected string GetComboValue(ComboBox comboBox) 
