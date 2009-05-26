@@ -1,4 +1,8 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Linq;
+using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Indy.IL2CPU.Assembler {
 	public class Label: Instruction {
@@ -62,14 +66,6 @@ namespace Indy.IL2CPU.Assembler {
 
 
 
-      
-
-        public static string FilterStringForIncorrectChars(string aName)
-        {
-            return DataMember.FilterStringForIncorrectChars(aName.Replace(".", "__DOT__"));
-        }
-
-
     
 
         public static string GetLabel(object aObject)
@@ -105,6 +101,8 @@ namespace Indy.IL2CPU.Assembler {
             get { return mName; }
         }
 
+	    private string mName;
+
         public override string ToString()
         {
             if (IsGlobal)
@@ -119,13 +117,13 @@ namespace Indy.IL2CPU.Assembler {
 
 		public static string GenerateLabelName(MethodBase aMethod) {
 			string xResult = DataMember.FilterStringForIncorrectChars(GetFullName(aMethod));
-			if (xResult.Length > 245) {
+			//if (xResult.Length > 245) {
                 using (var xHash = MD5.Create()) {
                     xResult = xHash.ComputeHash(Encoding.Default.GetBytes(xResult)).Aggregate("_",
                                                                                               (r,
                                                                                                x) => r + x.ToString("X2"));
                 }
-			}
+			//}
             return String.Intern(xResult);
 		}
 

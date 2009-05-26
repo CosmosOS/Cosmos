@@ -55,7 +55,7 @@ namespace TestApp {
                 Console.WriteLine("Error: " + E.ToString());
                 if (E.Message == "Temporary abort")
                 {
-                    Terminate = true;
+Terminate = true;
                 }
             }
             finally

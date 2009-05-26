@@ -37,7 +37,15 @@ namespace MatthijsTest
                 var xBoot = new Cosmos.Sys.Boot();
                 xBoot.Execute();
             }
-            throw new NotImplementedException("Method needs plugging. Signature: bladibladibladibla");
+            byte* xTemp = (byte*) 0x1;
+            for (int i = 0; i < 32 * 1024; i++ )
+            {
+                if (xTemp[i] == 0x50 && xTemp[i+1] == 0x4D && xTemp[i+2] == 0x49 && xTemp[i+3]== 0x44)
+                {
+Console.WriteLine(i.ToString());
+                }
+            }
+            //throw new NotImplementedException("Method needs plugging. Signature: bladibladibladibla");
             Console.WriteLine("Hello, World!");
             //Cosmos.Sys.Deboot.ShutDown();
 
