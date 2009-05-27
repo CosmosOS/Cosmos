@@ -270,15 +270,14 @@ namespace Indy.IL2CPU.Compiler
                 }
                 xCount++;
 
-                if (xCount == 1500)
-                {
-                    Console.Write("Memory in use: ");
-                    //GC.Collect();
-                    Console.WriteLine(System.Diagnostics.Process.GetCurrentProcess().WorkingSet64);
-                    Console.Write("Assembler items: ");
-                    Console.WriteLine((Assembler.Instructions.Count + Assembler.DataMembers.Count));
-                    throw new Exception("Temporary abort");
-                }
+                //if (xCount == 10000)
+                //{
+                //    Console.Write("Memory in use: ");
+                //    //GC.Collect();
+                //    Console.WriteLine(System.Diagnostics.Process.GetCurrentProcess().WorkingSet64);
+                //    Console.Write("Assembler items: ");
+                //    Console.WriteLine((Assembler.Instructions.Count + Assembler.DataMembers.Count));
+                //}
 
                 if (Console.KeyAvailable)
                 {

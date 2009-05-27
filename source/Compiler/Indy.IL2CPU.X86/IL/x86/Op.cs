@@ -306,12 +306,21 @@ namespace Indy.IL2CPU.IL.X86
                         new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
                         break;
                     }
+
+                case 3: //For Release
+                    {
+                        new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
+                        new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true };
+                        new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.EAX, SourceValue = 8 };
+                        new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                        break;
+                    }
                 case 0:
                     {
                         break;
                     }
                 default:
-                    throw new Exception("Remainder size " + (aField.Size) + " not supported!");
+                    throw new Exception("Remainder size "  +aField.FieldType.ToString() + (aField.Size) + " not supported!");
             }
             if (aAddGCCode && aField.NeedsGC)
             {
@@ -370,6 +379,9 @@ namespace Indy.IL2CPU.IL.X86
                         new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = ((aField.Size / 4) * 4), SourceReg = CPUx86.Registers.AX };
                         break;
                     }
+
+                case 3: //TODO 
+                    break;
                 case 0:
                     {
                         break;

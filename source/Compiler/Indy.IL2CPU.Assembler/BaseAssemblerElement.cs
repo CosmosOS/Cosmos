@@ -4,23 +4,58 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace Indy.IL2CPU.Assembler {
-    public abstract class BaseAssemblerElement {
+namespace Indy.IL2CPU.Assembler
+{
+    public abstract class BaseAssemblerElement
+    {
         /// <summary>
         /// Gets/sets the address at which the element could start emitting data. Note that if
         /// the element needs any alignment, start address is unaligned, and the element should 
         /// do the alignment itself. ActualAddress is used for referencing the actual address.
         /// </summary>
-        public virtual ulong? StartAddress {
-            get;
-            set;
+        public virtual ulong? StartAddress
+        {
+            get
+            {
+#if BINARY_COMPILE
+                return startAddress;
+#else
+                return null;
+#endif
+
+            }
+            set
+            {
+#if BINARY_COMPILE
+                startAddress = value;
+#endif
+
+            }
         }
 
-        public abstract ulong? ActualAddress {
-            get;
+        public virtual ulong? ActualAddress
+        {
+            get
+            {
+#if BINARY_COMPILE
+                return actualAddress;
+#else
+                return null;
+#endif
+
+            }
         }
 
-        public virtual void UpdateAddress(Assembler aAssembler, ref ulong aAddress) {
+
+
+        #if BINARY_COMPILE
+        ulong? startAddress;
+        ulong actualAddress;
+        #endif
+
+
+        public virtual void UpdateAddress(Assembler aAssembler, ref ulong aAddress)
+        {
             StartAddress = aAddress;
         }
 
