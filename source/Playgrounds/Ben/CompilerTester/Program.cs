@@ -26,7 +26,7 @@ namespace CompilerTester
             try
             {
                 var xBasePath = Path.GetDirectoryName(typeof(Program).Assembly.Location);
-                var xCompileHelper = new CompilerHelper2();
+                var xCompileHelper = new CompilerHelper();
 
                 xCompileHelper.GetCacheStateFile += new Func<Assembly, string>(delegate(Assembly aAssembly)
                 {
