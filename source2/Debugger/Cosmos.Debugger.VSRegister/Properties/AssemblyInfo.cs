@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Cosmos.VS.Debugger.PortSupplier")]
+[assembly: AssemblyTitle("Cosmos.Debugger.VSRegister")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Cosmos.VS.Debugger.PortSupplier")]
+[assembly: AssemblyProduct("Cosmos.Debugger.VSRegister")]
 [assembly: AssemblyCopyright("Copyright ©  2009")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("c47bf5f8-0822-41dd-acc5-b666255e1b4d")]
+[assembly: Guid("115e3374-62ff-49ae-8de0-c6b17a699315")]
 
 // Version information for an assembly consists of the following four values:
 //

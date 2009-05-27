@@ -21,7 +21,11 @@ namespace Cosmos.VS.Package {
         // http://msdn.microsoft.com/en-us/library/microsoft.visualstudio.shell.interop.vsdebugtargetinfo_members.aspx
         var xInfo = new VsDebugTargetInfo();
         xInfo.cbSize = (uint)Marshal.SizeOf(xInfo);
+
         xInfo.dlo = DEBUG_LAUNCH_OPERATION.DLO_CreateProcess;
+        xInfo.fSendStdoutToOutputWindow = 0; // App keeps its stdout
+        xInfo.grfLaunch = aLaunch; // Just pass through for now.
+        xInfo.bstrRemoteMachine = null; // debug locally
 
         // On first call, reset the cache, following calls will use the cached values
         // Think we will change this to a dummy program when we get our debugger working
@@ -33,11 +37,13 @@ namespace Cosmos.VS.Package {
           xInfo.bstrExe = xProp;
         }
 
-        xInfo.fSendStdoutToOutputWindow = 0;
+        // Select the debugger
         // Managed debugger
-        xInfo.clsidCustom = VSConstants.CLSID_ComPlusOnlyDebugEngine;
-        // Just pass through for now.
-        xInfo.grfLaunch = aLaunch;
+        //xInfo.clsidCustom = VSConstants.CLSID_ComPlusOnlyDebugEngine;
+        // Our debugger - a work in progress
+        xInfo.clsidCustom = new Guid(Cosmos.Debugger.Common.Consts.EngineGUID);
+        // Sample Debug Engine
+        //xInfo.clsidCustom = new Guid("{D951924A-4999-42a0-9217-1EB5233D1D5A}"); 
 
         VsShellUtilities.LaunchDebugger(ProjectMgr.Site, xInfo);
         return VSConstants.S_OK;

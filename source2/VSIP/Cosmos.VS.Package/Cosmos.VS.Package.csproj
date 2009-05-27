@@ -205,6 +205,10 @@
       <Project>{2915B786-408A-4475-B092-03F5735429E7}</Project>
       <Name>Cosmos.Builder.Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Debugger\Cosmos.Debugger.Common\Cosmos.Debugger.Common.csproj">
+      <Project>{AB24E403-54F3-4F67-B5E0-119A7227AAC1}</Project>
+      <Name>Cosmos.Debugger.Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <!--

@@ -1,0 +1,108 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{6D2688FE-6FD8-44A8-B96A-6037457F72A7}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Cosmos.Debugger.VSDebugEngine</RootNamespace>
+    <AssemblyName>Cosmos.Debugger.VSDebugEngine</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <SignAssembly>false</SignAssembly>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.VisualStudio.Debugger.Interop, Version=8.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Microsoft.VisualStudio.Debugger.Interop.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Shell, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AD7.Definitions\AD7Enums.cs" />
+    <Compile Include="AD7.Definitions\AD7Guids.cs" />
+    <Compile Include="AD7.Impl\AD7BoundBreakpoint.cs" />
+    <Compile Include="AD7.Impl\AD7BreakpointResolution.cs" />
+    <Compile Include="AD7.Impl\AD7DocumentContext.cs" />
+    <Compile Include="AD7.Impl\AD7Enums.cs" />
+    <Compile Include="AD7.Impl\AD7Events.cs" />
+    <Compile Include="AD7.Impl\AD7Expression.cs" />
+    <Compile Include="AD7.Impl\AD7ProgramProvider.cs" />
+    <Compile Include="AD7.Impl\AD7StackFrame.cs" />
+    <Compile Include="AD7.Impl\AD7MemoryAddress.cs" />
+    <Compile Include="AD7.Impl\AD7Module.cs" />
+    <Compile Include="AD7.Impl\AD7ProgramNode.cs" />
+    <Compile Include="AD7.Impl\AD7Property.cs" />
+    <Compile Include="AD7.Impl\AD7Thread.cs" />
+    <Compile Include="AD7.Definitions\AD7Hresult.cs" />
+    <Compile Include="AD7.Impl\AD7PendingBreakpoint.cs" />
+    <Compile Include="Engine.Impl\BreakpointManager.cs" />
+    <Compile Include="Engine.Impl\OperationThread.cs" />
+    <Compile Include="AD7.Impl\AD7Engine.cs" />
+    <Compile Include="Engine.Impl\EngineCallback.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Engine.Impl\EngineUtils.cs" />
+    <Compile Include="ResourceStrings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ResourceStrings.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ResourceStrings.resx">
+      <SubType>Designer</SubType>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ResourceStrings.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Cosmos.Debugger.Common\Cosmos.Debugger.Common.csproj">
+      <Project>{AB24E403-54F3-4F67-B5E0-119A7227AAC1}</Project>
+      <Name>Cosmos.Debugger.Common</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+</Project>
