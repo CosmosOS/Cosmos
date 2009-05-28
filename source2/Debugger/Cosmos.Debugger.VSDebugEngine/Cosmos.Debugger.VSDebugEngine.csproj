@@ -88,6 +88,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Builder\Cosmos.Build.Launch\Cosmos.Build.Launch.csproj">
+      <Project>{3B8CD27E-9E91-4472-A4D9-9B3D581A5316}</Project>
+      <Name>Cosmos.Build.Launch</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Cosmos.Debugger.Common\Cosmos.Debugger.Common.csproj">
       <Project>{AB24E403-54F3-4F67-B5E0-119A7227AAC1}</Project>
       <Name>Cosmos.Debugger.Common</Name>

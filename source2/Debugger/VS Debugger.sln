@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Builder.MSBuild", ".
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debugger.VSRegister", "Cosmos.Debugger.VSRegister\Cosmos.Debugger.VSRegister.csproj", "{678E7BC5-0C17-44D6-9BF7-52EE5A6CD22A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Build.Launch", "..\Builder\Cosmos.Build.Launch\Cosmos.Build.Launch.csproj", "{3B8CD27E-9E91-4472-A4D9-9B3D581A5316}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +45,10 @@ Global
 		{678E7BC5-0C17-44D6-9BF7-52EE5A6CD22A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{678E7BC5-0C17-44D6-9BF7-52EE5A6CD22A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{678E7BC5-0C17-44D6-9BF7-52EE5A6CD22A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B8CD27E-9E91-4472-A4D9-9B3D581A5316}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B8CD27E-9E91-4472-A4D9-9B3D581A5316}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B8CD27E-9E91-4472-A4D9-9B3D581A5316}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B8CD27E-9E91-4472-A4D9-9B3D581A5316}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

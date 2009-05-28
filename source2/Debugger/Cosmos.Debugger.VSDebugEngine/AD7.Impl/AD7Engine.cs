@@ -316,47 +316,38 @@ namespace Cosmos.Debugger.VSDebugEngine {
         // (for example, if the debug engine is part of an interpreter and the program being debugged is an interpreted language), 
         // in which case Visual Studio uses the IDebugEngineLaunch2::LaunchSuspended method
         // The IDebugEngineLaunch2::ResumeProcess method is called to start the process after the process has been successfully launched in a suspended state.
-        int IDebugEngineLaunch2.LaunchSuspended(string pszServer, IDebugPort2 port, string exe, string args, string dir, string env, string options, uint launchFlags, uint hStdInput, uint hStdOutput, uint hStdError, IDebugEventCallback2 ad7Callback, out IDebugProcess2 process)
-        {
+        int IDebugEngineLaunch2.LaunchSuspended(string aPszServer, IDebugPort2 aPort, string aExe, string aArgs, string aDir, string aEnv, string aOptions, uint aLaunchFlags, uint aStdInputHandle, uint aStdOutputHandle, uint hStdError, IDebugEventCallback2 aAD7Callback, out IDebugProcess2 aProcess) {
             //Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
             //Debug.Assert(m_pollThread == null);
             //Debug.Assert(m_engineCallback == null);
             //Debug.Assert(m_debuggedProcess == null);
             //Debug.Assert(m_ad7ProgramId == Guid.Empty);
 
-            process = null;
+            aProcess = null;
+            try {
+              m_engineCallback = new EngineCallback(this, aAD7Callback);
+              
+              //string commandLine = EngineUtils.BuildCommandLine(exe, args);
+              //ProcessLaunchInfo processLaunchInfo = new ProcessLaunchInfo(exe, commandLine, dir, env, options, launchFlags, hStdInput, hStdOutput, hStdError);
+              // We are being asked to debug a process when we currently aren't debugging anything
+              m_pollThread = new WorkerThread();
+              // Complete the win32 attach on the poll thread
+              //m_pollThread.RunOperation(new Operation(delegate
+              //{
+                //  m_debuggedProcess = Worker.LaunchProcess(m_engineCallback, processLaunchInfo);
+              //}));
 
-            try
-            {
-                string commandLine = EngineUtils.BuildCommandLine(exe, args);
+              var xTarget = new Cosmos.Build.Launch.Target.QEMU();
 
-                //ProcessLaunchInfo processLaunchInfo = new ProcessLaunchInfo(exe, commandLine, dir, env, options, launchFlags, hStdInput, hStdOutput, hStdError);
+              var xProcessID = new AD_PROCESS_ID();
+              xProcessID.ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_SYSTEM;
+              //adProcessId.dwProcessId = (uint)m_debuggedProcess.Id;
 
-                // We are being asked to debug a process when we currently aren't debugging anything
-                m_pollThread = new WorkerThread();
+              EngineUtils.RequireOk(aPort.GetProcess(xProcessID, out aProcess));
 
-                m_engineCallback = new EngineCallback(this, ad7Callback);
-
-                // Complete the win32 attach on the poll thread
-                m_pollThread.RunOperation(new Operation(delegate
-                {
-                  //  m_debuggedProcess = Worker.LaunchProcess(m_engineCallback, processLaunchInfo);
-                }));
-
-                AD_PROCESS_ID adProcessId = new AD_PROCESS_ID();
-                adProcessId.ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_SYSTEM;
-                //adProcessId.dwProcessId = (uint)m_debuggedProcess.Id;
-
-                EngineUtils.RequireOk(port.GetProcess(adProcessId, out process));
-
-                return VSConstants.S_OK;
+              return VSConstants.S_OK;
             }
-            //catch (ComponentException e)
-            //{
-            //    return e.HResult;
-            //}
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 return EngineUtils.UnexpectedException(e);
             }
         }
