@@ -303,8 +303,8 @@ namespace Cosmos.VS.Package {
 	            if (IsDirty) 
 	            { 
 	                if (ProjectMgr == null) 
-	                { 
-	                    Debug.Assert(false); 
+	                {
+                      System.Diagnostics.Debug.Assert(false); 
 	                    return VSConstants.E_INVALIDARG; 
 	                } 
 	 
