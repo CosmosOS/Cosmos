@@ -5,7 +5,7 @@ using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 //using Cosmos.Compiler.Builder;
 
-namespace Cosmos.Builder.MSBuild {
+namespace Cosmos.Build.MSBuild {
 	
   public class BuildImage : Task {
 
