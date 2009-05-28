@@ -32,9 +32,9 @@ namespace Cosmos.Debugger.VSRegister {
         RegistryKey xKey;
 
         xKey = xVSKey.CreateSubKey(@"AD7Metrics\Engine");
-        xKey = xKey.CreateSubKey(Cosmos.Debugger.Common.Consts.EngineGUID);
-        xKey.SetValue("CLSID", GuidStr(typeof(Cosmos.Debugger.VSDebugEngine.AD7Engine)));
-        xKey.SetValue("ProgramProvider", GuidStr(typeof(Cosmos.Debugger.VSDebugEngine.AD7ProgramProvider)));
+        xKey = xKey.CreateSubKey(Cosmos.Debug.Common.Consts.EngineGUID);
+        xKey.SetValue("CLSID", GuidStr(typeof(Cosmos.Debug.VSDebugEngine.AD7Engine)));
+        xKey.SetValue("ProgramProvider", GuidStr(typeof(Cosmos.Debug.VSDebugEngine.AD7ProgramProvider)));
         xKey.SetValue("Attach", 1);
         xKey.SetValue("AddressBP", 0);
         xKey.SetValue("AutoSelectPriority", 4);
@@ -50,8 +50,8 @@ namespace Cosmos.Debugger.VSRegister {
         xKey.SetValue("guidNativeOnlyEng", "{449EC4CC-30D2-4032-9256-EE18EB41B62B}");
         xKey.SetValue("guidScriptEng", "{F200A7E7-DEA5-11D0-B854-00A0244A1DE2}");
 
-        RegisterCLSID(xVSKey, "Cosmos.Debugger.VSDebugEngine", typeof(Cosmos.Debugger.VSDebugEngine.AD7Engine));
-        RegisterCLSID(xVSKey, "Cosmos.Debugger.VSDebugEngine", typeof(Cosmos.Debugger.VSDebugEngine.AD7ProgramProvider));
+        RegisterCLSID(xVSKey, "Cosmos.Debug.VSDebugEngine", typeof(Cosmos.Debug.VSDebugEngine.AD7Engine));
+        RegisterCLSID(xVSKey, "Cosmos.Debug.VSDebugEngine", typeof(Cosmos.Debug.VSDebugEngine.AD7ProgramProvider));
       }
 
       // Note: On x64 some registry paths are different. This routine does not
