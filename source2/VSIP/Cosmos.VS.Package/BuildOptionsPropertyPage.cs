@@ -7,7 +7,7 @@ using System.Data;
 using System.Text;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
-using Cosmos.Builder.Common;
+using Cosmos.Build.Common;
 using Microsoft.VisualStudio.Project;
 using Microsoft.VisualStudio;
 using System.ComponentModel;
