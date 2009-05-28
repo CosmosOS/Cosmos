@@ -158,11 +158,19 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Builder.Common", "..
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Builder.MSBuild", "..\source2\Builder\Cosmos.Builder.MSBuild\Cosmos.Builder.MSBuild.csproj", "{71E5DE71-F7C1-4B61-B5BE-4FD64682BDB0}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "New Sort", "New Sort", "{8D61B97D-E68E-47C6-AD72-95EA5768D0B2}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "New Sort (source2)", "New Sort (source2)", "{8D61B97D-E68E-47C6-AD72-95EA5768D0B2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{D95021E1-A2C9-4829-819E-ED433AF13162}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Build.Common", "..\source2\Build\Cosmos.Build.Common\Cosmos.Build.Common.csproj", "{0462E82B-8C29-41A9-8265-9C89038ADB29}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Build.Launch", "..\source2\Build\Cosmos.Build.Launch\Cosmos.Build.Launch.csproj", "{3B8CD27E-9E91-4472-A4D9-9B3D581A5316}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Build.MSBuild", "..\source2\Build\Cosmos.Build.MSBuild\Cosmos.Build.MSBuild.csproj", "{BC6AE974-1F18-4A19-A956-5062E4D3FD53}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 53
+		SccNumberOfProjects = 56
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -370,10 +378,22 @@ Global
 		SccProjectTopLevelParentUniqueName51 = Cosmos.sln
 		SccProjectName51 = Compiler/Indy.IL2CPU.X86
 		SccLocalPath51 = Compiler\\Indy.IL2CPU.X86
-		SccProjectUniqueName52 = ..\\source2\\Builder\\Cosmos.Builder.MSBuild\\Cosmos.Builder.MSBuild.csproj
+		SccProjectUniqueName52 = ..\\source2\\Build\\Cosmos.Build.Common\\Cosmos.Build.Common.csproj
 		SccProjectTopLevelParentUniqueName52 = Cosmos.sln
-		SccProjectName52 = ../source2/Builder/Cosmos.Builder.MSBuild
-		SccLocalPath52 = ..\\source2\\Builder\\Cosmos.Builder.MSBuild
+		SccProjectName52 = ../source2/Build/Cosmos.Build.Common
+		SccLocalPath52 = ..\\source2\\Build\\Cosmos.Build.Common
+		SccProjectUniqueName53 = ..\\source2\\Builder\\Cosmos.Builder.MSBuild\\Cosmos.Builder.MSBuild.csproj
+		SccProjectTopLevelParentUniqueName53 = Cosmos.sln
+		SccProjectName53 = ../source2/Builder/Cosmos.Builder.MSBuild
+		SccLocalPath53 = ..\\source2\\Builder\\Cosmos.Builder.MSBuild
+		SccProjectUniqueName54 = ..\\source2\\Build\\Cosmos.Build.Launch\\Cosmos.Build.Launch.csproj
+		SccProjectTopLevelParentUniqueName54 = Cosmos.sln
+		SccProjectName54 = ../source2/Build/Cosmos.Build.Launch
+		SccLocalPath54 = ..\\source2\\Build\\Cosmos.Build.Launch
+		SccProjectUniqueName55 = ..\\source2\\Build\\Cosmos.Build.MSBuild\\Cosmos.Build.MSBuild.csproj
+		SccProjectTopLevelParentUniqueName55 = Cosmos.sln
+		SccProjectName55 = ../source2/Build/Cosmos.Build.MSBuild
+		SccLocalPath55 = ..\\source2\\Build\\Cosmos.Build.MSBuild
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -588,6 +608,18 @@ Global
 		{71E5DE71-F7C1-4B61-B5BE-4FD64682BDB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{71E5DE71-F7C1-4B61-B5BE-4FD64682BDB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{71E5DE71-F7C1-4B61-B5BE-4FD64682BDB0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0462E82B-8C29-41A9-8265-9C89038ADB29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0462E82B-8C29-41A9-8265-9C89038ADB29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0462E82B-8C29-41A9-8265-9C89038ADB29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0462E82B-8C29-41A9-8265-9C89038ADB29}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B8CD27E-9E91-4472-A4D9-9B3D581A5316}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B8CD27E-9E91-4472-A4D9-9B3D581A5316}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B8CD27E-9E91-4472-A4D9-9B3D581A5316}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B8CD27E-9E91-4472-A4D9-9B3D581A5316}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC6AE974-1F18-4A19-A956-5062E4D3FD53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC6AE974-1F18-4A19-A956-5062E4D3FD53}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC6AE974-1F18-4A19-A956-5062E4D3FD53}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC6AE974-1F18-4A19-A956-5062E4D3FD53}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -662,5 +694,9 @@ Global
 		{65F71AEA-EAB9-4E54-9F0C-22023A8F0A10} = {E5644B8E-ABD7-4B71-B7B6-C9F6CE7B1D94}
 		{99C179F7-AAFD-4BBD-BB0C-8256BEE3FB4B} = {12EC019C-B585-490F-84D6-16F000DC4CDB}
 		{16D4E345-DF23-4095-A6D5-80D0538FC904} = {12EC019C-B585-490F-84D6-16F000DC4CDB}
+		{D95021E1-A2C9-4829-819E-ED433AF13162} = {8D61B97D-E68E-47C6-AD72-95EA5768D0B2}
+		{0462E82B-8C29-41A9-8265-9C89038ADB29} = {D95021E1-A2C9-4829-819E-ED433AF13162}
+		{3B8CD27E-9E91-4472-A4D9-9B3D581A5316} = {D95021E1-A2C9-4829-819E-ED433AF13162}
+		{BC6AE974-1F18-4A19-A956-5062E4D3FD53} = {D95021E1-A2C9-4829-819E-ED433AF13162}
 	EndGlobalSection
 EndGlobal
