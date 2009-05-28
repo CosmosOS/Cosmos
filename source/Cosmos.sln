@@ -158,6 +158,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Builder.Common", "..
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Builder.MSBuild", "..\source2\Builder\Cosmos.Builder.MSBuild\Cosmos.Builder.MSBuild.csproj", "{71E5DE71-F7C1-4B61-B5BE-4FD64682BDB0}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "New Sort", "New Sort", "{8D61B97D-E68E-47C6-AD72-95EA5768D0B2}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
 		SccNumberOfProjects = 53
@@ -368,10 +370,6 @@ Global
 		SccProjectTopLevelParentUniqueName51 = Cosmos.sln
 		SccProjectName51 = Compiler/Indy.IL2CPU.X86
 		SccLocalPath51 = Compiler\\Indy.IL2CPU.X86
-		SccProjectUniqueName51 = ..\\source2\\Builder\\Cosmos.Builder.Common\\Cosmos.Builder.Common.csproj
-		SccProjectTopLevelParentUniqueName51 = Cosmos.sln
-		SccProjectName51 = ../source2/Builder/Cosmos.Builder.Common
-		SccLocalPath51 = ..\\source2\\Builder\\Cosmos.Builder.Common
 		SccProjectUniqueName52 = ..\\source2\\Builder\\Cosmos.Builder.MSBuild\\Cosmos.Builder.MSBuild.csproj
 		SccProjectTopLevelParentUniqueName52 = Cosmos.sln
 		SccProjectName52 = ../source2/Builder/Cosmos.Builder.MSBuild
