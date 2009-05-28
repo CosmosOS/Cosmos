@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 
-namespace Cosmos.Builder.Common {
+namespace Cosmos.Build.Common {
 
 	public enum TargetHost
 	{

@@ -6,7 +6,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using Cosmos.Builder.Common;
+using Cosmos.Build.Common;
 
 namespace Cosmos.VS.Package
 {

@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Cosmos.Builder.Common
-{
+namespace Cosmos.Build.Common {
 
-	public class EnumValue
-	{
+	public class EnumValue {
 
 		public static EnumValue[] GetEnumValues(Type enumType)
 		{
@@ -34,7 +32,7 @@ namespace Cosmos.Builder.Common
 		public override string ToString()
 		{
 			if (this.Value != null)
-			{ return Cosmos.Builder.Common.DescriptionAttribute.GetDescription(this.Value); }
+			{ return DescriptionAttribute.GetDescription(this.Value); }
 			return base.ToString();
 		}
 	}

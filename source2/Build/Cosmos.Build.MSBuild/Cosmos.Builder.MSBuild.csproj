@@ -49,9 +49,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Cosmos.Build.Common\Cosmos.Builder.Common.csproj">
+    <ProjectReference Include="..\Cosmos.Build.Common\Cosmos.Build.Common.csproj">
       <Project>{2915B786-408A-4475-B092-03F5735429E7}</Project>
-      <Name>Cosmos.Builder.Common</Name>
+      <Name>Cosmos.Build.Common</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
