@@ -1,0 +1,62 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{99999999-9999-9999-9999-999999999999}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>MyRootNamespace</RootNamespace>
+    <AssemblyName>MyAssemblyName</AssemblyName>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <BuildTarget>QEMU</BuildTarget>
+    <Framework>MicrosoftNET</Framework>
+    <UseInternalAssembler>False</UseInternalAssembler>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>false</DebugSymbols>
+    <OutputPath>bin\Release\</OutputPath>
+    <BuildTarget>QEMU</BuildTarget>
+    <Framework>MicrosoftNET</Framework>
+    <UseInternalAssembler>False</UseInternalAssembler>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="mscorlib" />
+    <Reference Include="System" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Program.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+
+  <Target Name="BeforeBuild">
+  </Target>
+
+  <!-- 
+  We have to read from registry becasue MSBuild process wont see changes to 
+  env variables. But by reading the env var key, we allow support for both env
+  var and registry as some scenarios we can read env var but not registry
+  (ie .bat files)
+  -->
+  <PropertyGroup>
+    <Cosmos>$(Registry:HKEY_CURRENT_USER\Environment@Cosmos)</Cosmos>
+  </PropertyGroup>
+  <UsingTask TaskName="Cosmos.Builder.MSBuild.BuildImage" AssemblyFile="$(Cosmos)\source2\Builder\Cosmos.Builder.MSBuild\bin\Debug\Cosmos.Builder.MSBuild.dll" />
+  <Target Name="AfterBuild">
+    <Message Text="Using Cosmos Path: $(Cosmos)" Importance="high" />
+    <BuildImage KernelAssemblyFile="$(BaseOutputPath)$(OutputPath)$(AssemblyName).exe" />
+  </Target>
+
+</Project>
