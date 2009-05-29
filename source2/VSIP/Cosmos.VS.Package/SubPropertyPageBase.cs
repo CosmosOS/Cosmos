@@ -6,28 +6,46 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Cosmos.Build.Common;
 
 namespace Cosmos.VS.Package
 {
 	public partial class SubPropertyPageBase : UserControl
 	{
-		private CustomPropertyPage subOwner;
+		private CustomPropertyPage subpageOwner;
 
-		public SubPropertyPageBase(CustomPropertyPage owner)
+		public SubPropertyPageBase()
 		{
 			InitializeComponent();
-
-			this.subOwner = owner;
 		}
 
-		protected CustomPropertyPage Owner
-		{ get { return this.subOwner; } }
+		public void SetOwner( CustomPropertyPage owner )
+		{
+			this.subpageOwner = owner;
+		}
+
+		protected Boolean IsDirty
+		{
+			get { return this.subpageOwner.IsDirty; }
+			set { this.subpageOwner.IsDirty = value; }
+		}
+
+		protected Boolean IgnoreDirty
+		{
+			get { return this.subpageOwner.IgnoreDirty; }
+			set { this.subpageOwner.IgnoreDirty = value; }
+		}
+
+		public void SetConfigProperty(String name, String value)
+		{ this.subpageOwner.SetConfigProperty(name, value); }
+
+		public String GetConfigProperty(String name)
+		{ return this.subpageOwner.GetConfigProperty(name); }
+
+		public virtual PropertiesBase Properties
+		{ get{ return null; } }
 
 		public virtual void FillProperties()
 		{}
-
-		public virtual void ApplyChanges()
-		{}
-
 	}
 }

@@ -1,6 +1,6 @@
 ﻿namespace Cosmos.VS.Package
 {
-	partial class UnsavedConfigurationChanges
+	partial class UnsavedConfigChangesDialog
 	{
 		/// <summary>
 		/// Required designer variable.

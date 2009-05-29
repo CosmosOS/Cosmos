@@ -14,271 +14,174 @@ namespace Cosmos.VS.Package
 {
 	public partial class ConfigurationBase : CustomPropertyPage
 	{
-		private Boolean configIgnoreFill;
-		private ProjectConfig configCurrentConfig;
-		private Int32 configOldIndex;
-		private Boolean configIgnoreConfigChange;
+		protected static Int32 CurrentConfigurationIndex = 0;
+		protected static event EventHandler ConfigurationChanged;
 
-        private Hashtable _propertyTable = new Hashtable();
-        protected Hashtable PropertyTable { get { return _propertyTable; } }
-
-		protected static event EventHandler<ProjectConfigurationChangedEventArgs> ProjectConfigurationChanged;
-
-		protected static void OnProjectConfigurationChanged(Object sender, ProjectConfigurationChangedEventArgs e)
-		{ ConfigurationBase.ProjectConfigurationChanged(sender, e); }
-
+		protected static void OnConfigurationChanged(Object sender, EventArgs e)
+		{ ConfigurationBase.ConfigurationChanged(sender, e); }
+	
 		public ConfigurationBase()
 		{
 			InitializeComponent();
-
-			this.configCurrentConfig = null;
-			this.configIgnoreFill = false;
-			this.configIgnoreConfigChange = false;
 			this.comboArchitecture.Items.AddRange(EnumValue.GetEnumValues(typeof(Architecture)));
 
-			ConfigurationBase.ProjectConfigurationChanged += new EventHandler<ProjectConfigurationChangedEventArgs>(ConfigurationBase_ProjectConfigurationChanged);
 			this.comboConfiguration.SelectedIndexChanged += new EventHandler(comboConfiguration_SelectedIndexChanged);
+			ConfigurationBase.ConfigurationChanged += new EventHandler(ConfigurationBase_ConfigurationChanged);
 		}
 
 		protected override void Dispose(bool disposing)
 		{
-			if (disposing)
-			{
-				if (components != null) { components.Dispose(); }
-
-				ConfigurationBase.ProjectConfigurationChanged -= new EventHandler<ProjectConfigurationChangedEventArgs>(ConfigurationBase_ProjectConfigurationChanged);
-				this.comboConfiguration.SelectedIndexChanged -= new EventHandler(comboConfiguration_SelectedIndexChanged);
-			}
 			base.Dispose(disposing);
-        }
 
-        protected string GetSetting(string setting)
-        {
-            try
-            {
-                return CurrentProjectConfig.GetConfigurationProperty(setting, true);
-            }
-            catch (Exception e)
-            {
-                return "";
-            }
-        }
+			this.comboConfiguration.SelectedIndexChanged -= new EventHandler(comboConfiguration_SelectedIndexChanged);
+			ConfigurationBase.ConfigurationChanged -= new EventHandler(ConfigurationBase_ConfigurationChanged);
+		}
 
-        protected Enum GetEnumValue(Type type, string value)
-        {
-            if (!String.IsNullOrEmpty(value))
-            {
-                return (Enum)Enum.Parse(type, value);
-            }
+		void ConfigurationBase_ConfigurationChanged(object sender, EventArgs e)
+		{
+			if (Object.ReferenceEquals(sender, this) == false)
+			{
+				this.projCurrentConfig = null;
 
-            return null;
-        }
+				if (comboConfiguration.Items.Count > 0)
+				{
+					System.Diagnostics.Debug.Print(String.Format("{0}->ConfigurationBase_ConfigurationChanged", this.GetType().Name));
+					comboConfiguration.SelectedIndex = ConfigurationBase.CurrentConfigurationIndex;
+					
+					this.IgnoreDirty = true;
+					this.FillProperties();
+					this.IgnoreDirty = false;
+				}
+			}
+		}
 
 		void comboConfiguration_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			Boolean skipEvent = false;
-
-			if(this.configIgnoreConfigChange == false)
+			if (comboConfiguration.SelectedIndex > -1)
 			{
-				Boolean configIsDirty = false;
-				CustomPropertyPage[] propertyPages = CustomPropertyPage.Pages;
-
-				foreach(CustomPropertyPage page in propertyPages)
-				{ if(page.IsDirty == true){ configIsDirty = true; break; } }
-
-				if( configIsDirty == true )
+				if (comboConfiguration.SelectedIndex != ConfigurationBase.CurrentConfigurationIndex)
 				{
-					UnsavedConfigurationChanges dialog;
-					DialogResult result;
-					
-					dialog = new UnsavedConfigurationChanges();
+					System.Diagnostics.Debug.Print(String.Format("{0}->comboConfiguration_SelectedIndexChanged", this.GetType().Name));
 
-					dialog.Message = String.Format(dialog.Message, (string)this.comboConfiguration.Items[this.configOldIndex]);
-
-					result = dialog.ShowDialog();
-					dialog.Dispose();
-
-					this.configIgnoreConfigChange = true;
-					if(result == DialogResult.Yes)
+					Boolean hasUnsavedChanges = false;
+					CustomPropertyPage[] propPages = CustomPropertyPage.Pages;
+					foreach (CustomPropertyPage page in propPages)
 					{
-						Int32 newIndex = this.comboConfiguration.SelectedIndex;
-						this.comboConfiguration.SelectedIndex = this.configOldIndex;
-
-						foreach(CustomPropertyPage page in propertyPages)
-						{ if (page.IsDirty == true){ page.ApplyChanges(); } }
-
-						this.comboConfiguration.SelectedIndex = newIndex;
-
-					}
-					else if (result == DialogResult.Cancel)
-					{
-
-						this.comboConfiguration.SelectedIndex = this.configOldIndex;
-						skipEvent = true;
-
-					}
-					else
-					{
-						foreach (CustomPropertyPage page in propertyPages)
-						{ if (page.IsDirty == true) { page.IsDirty = false; } }
+						if (page.IsDirty == true)
+						{ hasUnsavedChanges = true; break; }
 					}
 
-					this.configIgnoreConfigChange = false;
-				}
-				
-				if( skipEvent == false )
-				{
-					Boolean oldValue = this.configIgnoreFill;
-
-					configIgnoreFill = true;
-				    FillProperties();
-					configIgnoreFill = oldValue;
-
-					if (this.configIgnoreFill == false)
-					{ ConfigurationBase.OnProjectConfigurationChanged(this, new ProjectConfigurationChangedEventArgs(this.comboConfiguration.SelectedIndex)); }
-				}
-				this.configOldIndex = this.comboConfiguration.SelectedIndex;
-			}
-		}
-
-		void ConfigurationBase_ProjectConfigurationChanged(object sender, ProjectConfigurationChangedEventArgs e)
-		{
-			if ((Object.ReferenceEquals(this, sender) == false) && (this.comboConfiguration.Items.Count > 0))
-			{
-				this.configIgnoreFill = true;
-				this.configIgnoreConfigChange = true;
-
-				this.configOldIndex = this.comboConfiguration.SelectedIndex;
-				this.comboConfiguration.SelectedIndex = e.Index;
-
-				this.configIgnoreConfigChange = false;
-				this.configIgnoreFill = false;
-			}
-		}
-
-		private void FindProjectConfiguration()
-		{
-				String selectedConfig;
-				this.configCurrentConfig = null;
-
-				//the first index of the configuration is always the "Active (n)" settings.
-				if( this.comboConfiguration.SelectedIndex == 0 )
-				{
-					selectedConfig = this.Project.ConfigurationManager.ActiveConfiguration.ConfigurationName;
-				}else{
-					selectedConfig = (String)this.comboConfiguration.SelectedItem;
-				}
-
-				foreach (Microsoft.VisualStudio.Project.ProjectConfig projectConfig in base.ProjectConfigs)
-				{
-					if (String.Equals(projectConfig.ConfigName, selectedConfig, StringComparison.InvariantCulture) == true)
+					if (hasUnsavedChanges == true)
 					{
-					    this.configCurrentConfig = projectConfig;
+						UnsavedConfigChangesDialog dialog = new UnsavedConfigChangesDialog();
+						DialogResult result;
 
-                        if (PropertyTable.Count > 0)
-                            PropertyTable.Clear();
-					}
-				}
+						dialog.Message = String.Format(dialog.Message, comboConfiguration.Items[ConfigurationBase.CurrentConfigurationIndex].ToString());
 
-				if (this.configCurrentConfig == null) { throw new Exception("Unable to find selected project configuration."); }
-		}
+						result = dialog.ShowDialog();
 
-        protected override void FillConfigs()
-        {
-            base.FillConfigs();
-
-            if (configIgnoreFill == false)
-            {
-                comboConfiguration.Items.Clear();
-
-                comboConfiguration.Items.Add(String.Format("Active ({0})",
-                                                           this.Project.ConfigurationManager.ActiveConfiguration.
-                                                               ConfigurationName));
-                foreach (ProjectConfig projectConfig in ProjectConfigs)
-                {
-                    comboConfiguration.Items.Add(projectConfig.ConfigName);
-                }
-            }
-        }
-
-		protected override void FillProperties()
-		{
-			base.FillProperties();
-
-			if (configIgnoreFill == false)
-			{
-				Boolean foundConfigBase = false;
-				foreach (CustomPropertyPage page in Pages)
-				{
-					if ((ReferenceEquals(this, page) == false) && (page is ConfigurationBase))
-					{
-						if (((ConfigurationBase)page).comboConfiguration.SelectedIndex > -1)
+						if (result == DialogResult.Yes)
 						{
-							configOldIndex = ((ConfigurationBase)page).configOldIndex;
-							if (comboConfiguration.SelectedIndex < 0)
-							{ configIgnoreConfigChange = true; }
-							comboConfiguration.SelectedIndex = ((ConfigurationBase)page).comboConfiguration.SelectedIndex;
-							configIgnoreConfigChange = false;
-							foundConfigBase = true;
-							break;
+							foreach (CustomPropertyPage page in propPages)
+							{ page.ApplyChanges(); }
+							hasUnsavedChanges = false;
+
+						} else if (result == DialogResult.No)
+						{
+							foreach (CustomPropertyPage page in propPages)
+							{ page.IsDirty = false; }
+							hasUnsavedChanges = false;
+
+						} else
+						{ comboConfiguration.SelectedIndex = ConfigurationBase.CurrentConfigurationIndex; }
+
+						dialog.Dispose();
+						dialog = null;
+					}
+
+					if (hasUnsavedChanges == false)
+					{
+						this.projCurrentConfig = null;
+
+						ConfigurationBase.CurrentConfigurationIndex = comboConfiguration.SelectedIndex;
+						BuildOptionsPropertyPage.CurrentBuildTarget = EnumValue.Parse(this.GetConfigProperty("BuildTarget"), TargetHost.QEMU);
+						ConfigurationBase.OnConfigurationChanged(this, EventArgs.Empty);
+
+						this.IgnoreDirty = true;
+						this.FillProperties();
+						this.IgnoreDirty = false;
+					}
+				}
+			}
+		}
+
+		private ProjectConfig projCurrentConfig;
+		protected ProjectConfig CurrentConfiguration
+		{
+			get
+			{
+				Int32 index = ConfigurationBase.CurrentConfigurationIndex;
+				if (index > 0)
+				{
+					index--;
+					return this.ProjectConfigs[index];
+				} else {
+					if( this.projCurrentConfig == null )
+					{
+						String activeConfig = this.Project.ConfigurationManager.ActiveConfiguration.ConfigurationName;
+						foreach (ProjectConfig config in this.ProjectConfigs)
+						{
+							if (String.Equals(config.ConfigName, activeConfig, StringComparison.InvariantCulture) == true)
+							{
+								this.projCurrentConfig = config;
+								break;
+							}
 						}
 					}
-				}
-				if ((foundConfigBase == false) || (this.comboConfiguration.SelectedIndex < 0))
-				{
-					this.configOldIndex = 0;
-					this.comboConfiguration.SelectedIndex = 0;
-				}
 
-				this.comboArchitecture.SelectedIndex = 0;
+					return this.projCurrentConfig;
+				}
 			}
-
-			this.FindProjectConfiguration();
 		}
 
-		protected Microsoft.VisualStudio.Project.ProjectConfig CurrentProjectConfig
-		{ get { return this.configCurrentConfig; } }
-
-        public override void ApplyChanges()
-        {
-            base.ApplyChanges();
-
-            foreach (object key in PropertyTable.Keys)
-            {
-                SetConfigProperty((string)key, (string)PropertyTable[key]);
-            }
-        }
-
-        protected override void SetConfigProperty(string name, string value)
-        {
-            base.SetConfigProperty(name, value);
-
-            CCITracing.TraceCall();
-            if (value == null)
-            {
-                value = String.Empty;
-            }
-
-            if (this.ProjectMgr != null)
-            {
-                CurrentProjectConfig.SetConfigurationProperty(name, value);
-
-                this.ProjectMgr.SetProjectFileDirty(true);
-            }
-        }
-
-	}
-
-	public class ProjectConfigurationChangedEventArgs : EventArgs
+		protected override void FillConfigurations()
 		{
-			private Int32 eventConfigIndex;
+			base.FillConfigurations();
 
-			public ProjectConfigurationChangedEventArgs( Int32 configIndex )
+			this.comboConfiguration.Items.Add(String.Format("Active ({0})", base.Project.ConfigurationManager.ActiveConfiguration.ConfigurationName));
+			foreach( ProjectConfig config in base.ProjectConfigs )
+			{ this.comboConfiguration.Items.Add(config.ConfigName); }
+
+			if (this.comboConfiguration.SelectedIndex != ConfigurationBase.CurrentConfigurationIndex)
+			{ this.comboConfiguration.SelectedIndex = ConfigurationBase.CurrentConfigurationIndex; }
+
+			this.comboArchitecture.SelectedIndex = 0;
+
+			if ((Int32)BuildOptionsPropertyPage.CurrentBuildTarget < 0)
+			{ BuildOptionsPropertyPage.CurrentBuildTarget = EnumValue.Parse(this.GetConfigProperty("BuildTarget"), TargetHost.QEMU); }
+		}
+
+		public override void SetConfigProperty(String name, String value)
+		{
+			CCITracing.TraceCall();
+			if (value == null)
+			{ value = String.Empty; }
+
+			if (this.ProjectMgr != null)
 			{
-				this.eventConfigIndex = configIndex;
+				this.CurrentConfiguration.SetConfigurationProperty(name, value);
+				this.ProjectMgr.SetProjectFileDirty(true);
 			}
+		}
 
-			public Int32 Index
-			{ get{ return this.eventConfigIndex; } }
+		public override String GetConfigProperty(String name)
+		{
+			String value;
+
+			value = this.CurrentConfiguration.GetConfigurationProperty(name, true);
+
+			return value;
+		}
+
 	}
 }

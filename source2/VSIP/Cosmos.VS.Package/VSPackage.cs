@@ -47,12 +47,12 @@ namespace Cosmos.VS.Package {
       , NewProjectRequireNewFolderVsTemplate = false)]
 
   // Property Pages
-//[ProvideObject(typeof(PropPageEnvironment), RegisterUsing = RegistrationMethod.CodeBase)]
-  //[ProvideObject(typeof(PropPageTest), RegisterUsing = RegistrationMethod.CodeBase)]
-  [ProvideObject(typeof(BuildOptionsPropertyPage), RegisterUsing = RegistrationMethod.CodeBase)]
- [ProvideObject(typeof(DebugOptionsPropertyPage), RegisterUsing = RegistrationMethod.CodeBase)]
+	//[ProvideObject(typeof(PropPageEnvironment), RegisterUsing = RegistrationMethod.CodeBase)]
+	//[ProvideObject(typeof(PropPageTest), RegisterUsing = RegistrationMethod.CodeBase)]
+	[ProvideObject(typeof(BuildOptionsPropertyPage), RegisterUsing = RegistrationMethod.CodeBase)]
+	[ProvideObject(typeof(DebugOptionsPropertyPage), RegisterUsing = RegistrationMethod.CodeBase)]
 	[ProvideObject(typeof(VMOptionsPropertyPage), RegisterUsing = RegistrationMethod.CodeBase)]
-  [Guid(Guids.guidProjectPkgString)]
+	[Guid(Guids.guidProjectPkgString)]
   public sealed class VSProject : ProjectPackage {
         /// <summary>
         /// Default constructor of the package.

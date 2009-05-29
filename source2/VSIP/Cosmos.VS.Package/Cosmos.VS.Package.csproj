@@ -97,13 +97,6 @@
       <DependentUpon>DebugOptionsQemu.cs</DependentUpon>
     </Compile>
     <Compile Include="Guids.cs" />
-    <Compile Include="PropPageEnvironment.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="PropPageEnvironment.Designer.cs">
-      <DependentUpon>PropPageEnvironment.cs</DependentUpon>
-    </Compile>
-    <Compile Include="PropPageTest.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -122,11 +115,11 @@
     <Compile Include="TitleDivision.Designer.cs">
       <DependentUpon>TitleDivision.cs</DependentUpon>
     </Compile>
-    <Compile Include="UnsavedConfigurationChanges.cs">
+    <Compile Include="UnsavedConfigChangesDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UnsavedConfigurationChanges.Designer.cs">
-      <DependentUpon>UnsavedConfigurationChanges.cs</DependentUpon>
+    <Compile Include="UnsavedConfigChangesDialog.Designer.cs">
+      <DependentUpon>UnsavedConfigChangesDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="VMOptionsPropertyPage.cs">
       <SubType>UserControl</SubType>
@@ -179,9 +172,6 @@
     <EmbeddedResource Include="DebugOptionsQemu.resx">
       <DependentUpon>DebugOptionsQemu.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="PropPageEnvironment.resx">
-      <DependentUpon>PropPageEnvironment.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Resources\CosmosProjectNode.bmp" />
     <EmbeddedResource Include="SubPropertyPageBase.resx">
       <DependentUpon>SubPropertyPageBase.cs</DependentUpon>
@@ -189,8 +179,8 @@
     <EmbeddedResource Include="TitleDivision.resx">
       <DependentUpon>TitleDivision.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UnsavedConfigurationChanges.resx">
-      <DependentUpon>UnsavedConfigurationChanges.cs</DependentUpon>
+    <EmbeddedResource Include="UnsavedConfigChangesDialog.resx">
+      <DependentUpon>UnsavedConfigChangesDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="VMOptionsPropertyPage.resx">
       <DependentUpon>VMOptionsPropertyPage.cs</DependentUpon>

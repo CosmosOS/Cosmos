@@ -11,6 +11,7 @@ using Microsoft.VisualStudio.Project;
 using Microsoft.VisualStudio.Shell.Interop; 
 using Help = Microsoft.VisualStudio.VSHelp.Help; 
 using IServiceProvider = System.IServiceProvider;
+using Cosmos.Build.Common;
 
 namespace Cosmos.VS.Package {
     public partial class CustomPropertyPage : UserControl, IPropertyPage {
@@ -36,7 +37,12 @@ namespace Cosmos.VS.Package {
 			this.IgnoreDirty = false;
             _title = string.Empty; 
             _helpKeyword = string.Empty;
+
+			System.Diagnostics.Debug.Print(String.Format("{0}->Created", this.GetType().Name));
         }
+
+		public virtual PropertiesBase Properties
+		{ get { return null; } }
 
         public virtual string Title 
         { 
@@ -92,7 +98,7 @@ namespace Cosmos.VS.Package {
             } 
 		}
 
-		protected bool IgnoreDirty
+		public bool IgnoreDirty
 		{ get; set; }
 	 
 	        protected ProjectNode ProjectMgr 
@@ -120,17 +126,57 @@ namespace Cosmos.VS.Package {
 			}
 
 	        protected virtual void FillProperties() 
-	        {}
+	        {
+				System.Diagnostics.Debug.Print(String.Format("{0}->FillProperties", this.GetType().Name));
+			}
  
-            protected virtual void FillConfigs()
+            protected virtual void FillConfigurations()
             {
+				System.Diagnostics.Debug.Print(String.Format("{0}->FillConfigs", this.GetType().Name));
             }
 	 
-	        public virtual void ApplyChanges()
-	        {} 
+	        public void ApplyChanges()
+	        {
+				System.Diagnostics.Debug.Print(String.Format("{0}->ApplyChanges", this.GetType().Name));
+
+				if (this.Properties != null)
+				{
+					Dictionary<String, String> properties = this.Properties.GetProperties();
+
+					foreach (KeyValuePair<String, String> pair in properties)
+					{ this.SetConfigProperty(pair.Key, pair.Value); }
+
+					this.IsDirty = false;
+				}
+			}
+
+			public virtual void SetConfigProperty(String name, String value)
+			{
+				CCITracing.TraceCall();
+				if (value == null)
+				{ value = String.Empty; }
+
+				if (this.ProjectMgr != null)
+				{
+					foreach (ProjectConfig config in this.ProjectConfigs)
+					{ config.SetConfigurationProperty(name, value); }
+					this.ProjectMgr.SetProjectFileDirty(true);
+				}
+			}
+
+			public virtual String GetConfigProperty(String name)
+			{
+				String value;
+
+				value = this.ProjectConfigs[0].GetConfigurationProperty(name, true);
+
+				return value;
+			}
 	 
 	        protected virtual void Initialize() 
-	        {} 
+	        {
+				System.Diagnostics.Debug.Print(String.Format("{0}->Initialize", this.GetType().Name));
+			} 
 	 
 	        protected virtual bool CheckInput() 
 	        { return true; } 
@@ -139,10 +185,6 @@ namespace Cosmos.VS.Package {
 	        { 
 	            IsDirty = true; 
 	        }
-
-            protected virtual void SetConfigProperty(string name, string value)
-            {
-            }
 
         protected string GetComboValue(ComboBox comboBox) 
 	        { 
@@ -177,28 +219,40 @@ namespace Cosmos.VS.Package {
 	        } 
 	
 	        void IPropertyPage.SetPageSite(IPropertyPageSite pPageSite) 
-	        { 
+	        {
+				System.Diagnostics.Debug.Print(String.Format("{0}->SetPageSite", this.GetType().Name));
+
 	            _site = pPageSite;
 	        } 
 	 
 	        void IPropertyPage.Activate(IntPtr hWndParent, RECT[] pRect, int bModal) 
-	        { 
+	        {
+				System.Diagnostics.Debug.Print(String.Format("{0}->Activate", this.GetType().Name));
+
 	            CreateControl(); 
 	            Initialize(); 
 	            NativeMethods.SetParent(Handle, hWndParent);
 
 				CustomPropertyPage._pageList.Add(this);
-	            FillConfigs();
+	            FillConfigurations();
+
+				this.IgnoreDirty = true;
 				FillProperties();
+				this.IgnoreDirty = false;
 	        } 
 	 
 	        void IPropertyPage.Deactivate() 
 	        {
+				System.Diagnostics.Debug.Print(String.Format("{0}->Deactivate", this.GetType().Name));
+
 				CustomPropertyPage._pageList.Remove(this);
 	            Dispose(); 
-	        } 
-	 
-	        void IPropertyPage.GetPageInfo(PROPPAGEINFO[] pPageInfo) { 
+	        }
+
+			void IPropertyPage.GetPageInfo(PROPPAGEINFO[] pPageInfo)
+			{
+				System.Diagnostics.Debug.Print(String.Format("{0}->GetPageInfo", this.GetType().Name));
+
 	            PROPPAGEINFO info = new PROPPAGEINFO();
 
 				this.Size = new Size(492, 288);
@@ -213,7 +267,10 @@ namespace Cosmos.VS.Package {
 	            pPageInfo[0] = info; 
 	        } 
 	 
-	        void IPropertyPage.SetObjects(uint count, object[] punk) { 
+	        void IPropertyPage.SetObjects(uint count, object[] punk)
+			{
+				System.Diagnostics.Debug.Print(String.Format("{0}->SetObjects", this.GetType().Name));
+
 	            if (count > 0) { 
 	                if (punk[0] is ProjectConfig) { 
 	                    ArrayList configs = new ArrayList(); 
@@ -280,7 +337,9 @@ namespace Cosmos.VS.Package {
 	        } 
 	 
 	        void IPropertyPage.Show(uint nCmdShow) 
-	        { 
+	        {
+				System.Diagnostics.Debug.Print(String.Format("{0}->Show", this.GetType().Name));
+
 	            Visible = true; 
 	            Show(); 
 	        } 
@@ -299,7 +358,9 @@ namespace Cosmos.VS.Package {
 	        } 
 	 
 	        int IPropertyPage.Apply() 
-	        { 
+	        {
+				System.Diagnostics.Debug.Print(String.Format("{0}->Apply", this.GetType().Name));
+
 	            if (IsDirty) 
 	            { 
 	                if (ProjectMgr == null) 

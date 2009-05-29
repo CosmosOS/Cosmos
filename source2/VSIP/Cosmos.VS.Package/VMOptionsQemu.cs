@@ -12,12 +12,84 @@ namespace Cosmos.VS.Package
 {
 	public partial class VMOptionsQemu : SubPropertyPageBase
 	{
-		public VMOptionsQemu(CustomPropertyPage owner) : base(owner)
+		private VMQemuProperties projProperties;
+
+		public VMOptionsQemu()
 		{
 			InitializeComponent();
 
 			this.comboNetworkCard.Items.AddRange(EnumValue.GetEnumValues(typeof(VMQemuNetworkCard)));
-			this.comboAudioCard.Items.AddRange(EnumValue.GetEnumValues(typeof(VMQemuAudioCard))); 
+			this.comboAudioCard.Items.AddRange(EnumValue.GetEnumValues(typeof(VMQemuAudioCard)));
+
+			this.projProperties = new VMQemuProperties();
+
+			this.CreateUIMonitorEvents();
+		}
+
+		private void CreateUIMonitorEvents()
+		{
+			this.comboNetworkCard.SelectedIndexChanged += delegate(Object sender, EventArgs e)
+			{
+				VMQemuNetworkCard value = (VMQemuNetworkCard)((EnumValue)this.comboNetworkCard.SelectedItem).Value;
+				if (value != this.PageProperties.NetworkCard)
+				{
+					this.PageProperties.NetworkCard = value;
+					this.IsDirty = true;
+				}
+			};
+
+			this.comboAudioCard.SelectedIndexChanged += delegate(Object sender, EventArgs e)
+			{
+				VMQemuAudioCard value = (VMQemuAudioCard)((EnumValue)this.comboAudioCard.SelectedItem).Value;
+				if (value != this.PageProperties.AudioCard)
+				{
+					this.PageProperties.AudioCard = value;
+					this.IsDirty = true;
+				}
+			};
+
+			this.checkNetworkTAP.CheckedChanged += delegate(Object sender, EventArgs e)
+			{
+				Boolean value = this.checkNetworkTAP.Checked;
+				if (value != this.PageProperties.EnableNetworkTAP)
+				{
+					this.PageProperties.EnableNetworkTAP = value;
+					this.IsDirty = true;
+				}
+			};
+
+			this.checkEnableGDB.CheckedChanged += delegate(Object sender, EventArgs e)
+			{
+				Boolean value = this.checkEnableGDB.Checked;
+				if (value != this.PageProperties.EnableGDB)
+				{
+					this.PageProperties.EnableGDB = value;
+					this.IsDirty = true;
+				}
+			};
+		}
+
+		public override PropertiesBase Properties
+		{ get { return this.projProperties; } }
+
+		protected VMQemuProperties PageProperties
+		{ get { return (VMQemuProperties)this.projProperties; } }
+
+		public override void FillProperties()
+		{
+			base.FillProperties();
+
+			this.PageProperties.Reset();
+
+			this.PageProperties.SetProperty("QemuNetworkCard", this.GetConfigProperty("QemuNetworkCard"));
+			this.PageProperties.SetProperty("QemuAudioCard", this.GetConfigProperty("QemuAudioCard"));
+			this.PageProperties.SetProperty("QemuNetworkTAP", this.GetConfigProperty("QemuNetworkTAP"));
+			this.PageProperties.SetProperty("QemuEnableGDB", this.GetConfigProperty("QemuEnableGDB"));
+
+			this.comboNetworkCard.SelectedItem = EnumValue.Find(this.comboNetworkCard.Items, this.PageProperties.NetworkCard);
+			this.comboAudioCard.SelectedItem = EnumValue.Find(this.comboAudioCard.Items, this.PageProperties.AudioCard);
+			this.checkNetworkTAP.Checked = this.PageProperties.EnableNetworkTAP;
+			this.checkEnableGDB.Checked = this.PageProperties.EnableGDB;
 		}
 	}
 }

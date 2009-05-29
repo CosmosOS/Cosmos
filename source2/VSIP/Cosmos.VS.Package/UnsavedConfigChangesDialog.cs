@@ -9,9 +9,9 @@ using System.Windows.Forms;
 
 namespace Cosmos.VS.Package
 {
-	public partial class UnsavedConfigurationChanges : Form
+	public partial class UnsavedConfigChangesDialog : Form
 	{
-		public UnsavedConfigurationChanges()
+		public UnsavedConfigChangesDialog()
 		{
 			InitializeComponent();
 		}

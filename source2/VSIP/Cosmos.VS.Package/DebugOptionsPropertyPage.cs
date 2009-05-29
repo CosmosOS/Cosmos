@@ -7,66 +7,120 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
+using Cosmos.Build.Common;
 
 namespace Cosmos.VS.Package
 {
 	[Guid(Guids.DebugOptionsPropertyPage)]
 	public partial class DebugOptionsPropertyPage : ConfigurationBase
 	{
-		public DebugOptionsPropertyPage()
+
+		private SubPropertyPageBase pageSubPage;
+
+		public DebugOptionsPropertyPage() : base()
 		{
 			InitializeComponent();
 
-			//TODO: Remove test call.
-			this.SetSubPropertyPage(new DebugOptionsQemu(this));
+			BuildOptionsPropertyPage.BuildTargetChanged += new EventHandler(BuildOptionsPropertyPage_BuildTargetChanged);
+		}
+
+		/// <summary> 
+		/// Clean up any resources being used.
+		/// </summary>
+		/// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+		protected override void Dispose(bool disposing)
+		{
+			if (disposing && (components != null))
+			{
+				components.Dispose();
+			}
+
+			BuildOptionsPropertyPage.BuildTargetChanged -= new EventHandler(BuildOptionsPropertyPage_BuildTargetChanged);
+
+			base.Dispose(disposing);
+		}
+
+		void BuildOptionsPropertyPage_BuildTargetChanged(object sender, EventArgs e)
+		{ this.FillProperties(); }
+
+		private void ClearSubPage()
+		{
+			foreach (Control control in this.panelSubPage.Controls)
+			{
+				this.panelSubPage.Controls.Remove(control);
+				control.Dispose();
+			}
+		}
+
+		private void SetSubPropertyPage(TargetHost target)
+		{
+			Boolean subpageChanged = false;
+
+			switch (target)
+			{
+				case TargetHost.QEMU:
+					if ((this.pageSubPage is DebugOptionsQemu) == false)
+					{
+						subpageChanged = true;
+						this.pageSubPage = new DebugOptionsQemu();
+					}
+					break;
+				default:
+					subpageChanged = true;
+					this.pageSubPage = null;
+					break;
+			}
+
+			if( subpageChanged == true)
+			{
+				this.panelSubPage.SuspendLayout();
+
+				this.ClearSubPage();
+				if (this.pageSubPage != null)
+				{
+					this.pageSubPage.SetOwner(this);
+					this.panelSubPage.Controls.Add(pageSubPage);
+
+					this.pageSubPage.Location = new Point(0, 0);
+					this.pageSubPage.Anchor = AnchorStyles.Top;
+
+					this.pageSubPage.Size = new Size(this.ClientSize.Width, this.pageSubPage.Size.Height);
+					this.pageSubPage.Anchor = this.pageSubPage.Anchor | AnchorStyles.Left | AnchorStyles.Right;
+
+					if (this.pageSubPage.Size.Height <= this.ClientSize.Height)
+					{
+						this.pageSubPage.Size = new Size(this.pageSubPage.Size.Width, this.ClientSize.Height);
+						this.pageSubPage.Anchor = this.pageSubPage.Anchor | AnchorStyles.Bottom;
+					}
+
+					this.panelSubPage.Visible = true;
+				} else {
+					this.panelSubPage.Visible = false;
+				}
+
+				this.panelSubPage.ResumeLayout();
+			}
+
 		}
 
 		protected override void FillProperties()
 		{
 			base.FillProperties();
-			if ((this.Controls.Count > 0) && (this.Controls[0] is SubPropertyPageBase))
-			{ ((SubPropertyPageBase)this.Controls[0]).FillProperties(); }
+
+			this.SetSubPropertyPage(BuildOptionsPropertyPage.CurrentBuildTarget);
+
+			if (this.pageSubPage != null)
+			{ this.pageSubPage.FillProperties(); }
 		}
 
-		public override void ApplyChanges()
+		public override PropertiesBase Properties
 		{
-			base.ApplyChanges();
-			if ((this.Controls.Count > 0) && (this.Controls[0] is SubPropertyPageBase))
-			{ ((SubPropertyPageBase)this.Controls[0]).ApplyChanges(); }
-		}
-
-		protected void SetSubPropertyPage(SubPropertyPageBase subpage)
-		{
-			this.panelDebugConfig.SuspendLayout();
-
-			this.panelDebugConfig.Controls.Clear();
-
-			if (subpage != null)
+			get
 			{
-				this.panelDebugConfig.Controls.Add(subpage);
-
-				subpage.Location = new Point(0, 0);
-				subpage.Anchor = AnchorStyles.Top;
-
-				//page should also be the right width.
-				//if( configuration.Size.Width <= this.ClientSize.Width )
-				//{
-				subpage.Size = new Size(this.ClientSize.Width, subpage.Size.Height);
-				subpage.Anchor = subpage.Anchor | AnchorStyles.Left | AnchorStyles.Right;
-				//}
-
-				if (subpage.Size.Height <= this.ClientSize.Height)
-				{
-					subpage.Size = new Size(subpage.Size.Width, this.ClientSize.Height);
-					subpage.Anchor = subpage.Anchor | AnchorStyles.Bottom;
-				}
-
-				this.panelDebugConfig.Visible = true;
+				if (pageSubPage != null)
+				{ return pageSubPage.Properties; }
+				return null;
 			}
-			else
-			{ this.panelDebugConfig.Visible = false; }
-
-			this.panelDebugConfig.ResumeLayout();
 		}
 	}
 }

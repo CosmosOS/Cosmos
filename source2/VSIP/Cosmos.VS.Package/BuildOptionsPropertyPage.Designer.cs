@@ -140,7 +140,7 @@
 			this.buttonOutputBrowse.TabIndex = 1;
 			this.buttonOutputBrowse.Text = "...";
 			this.buttonOutputBrowse.UseVisualStyleBackColor = true;
-			this.buttonOutputBrowse.Click += new System.EventHandler(this.buttonOutputBrowse_Click);
+			this.buttonOutputBrowse.Click += new System.EventHandler(this.OutputBrowse_Click);
 			// 
 			// textOutputPath
 			// 

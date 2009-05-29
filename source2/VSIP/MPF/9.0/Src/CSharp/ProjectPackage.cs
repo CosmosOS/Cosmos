@@ -201,7 +201,9 @@ namespace Microsoft.VisualStudio.Project
 					{
 						string projectGuid = reader.ReadString();
 						string trustlevel = reader.ReadString();
-						this.projectTrustTable.Add(new Guid(projectGuid), (ProjectTrustLevel)Enum.Parse(typeof(ProjectTrustLevel), trustlevel, true));
+						Guid trustKey = new Guid(projectGuid);
+						if (this.projectTrustTable.ContainsKey(trustKey) == false)
+						{ this.projectTrustTable.Add(trustKey, (ProjectTrustLevel)Enum.Parse(typeof(ProjectTrustLevel), trustlevel, true)); }
 					}
 				}
 			}
