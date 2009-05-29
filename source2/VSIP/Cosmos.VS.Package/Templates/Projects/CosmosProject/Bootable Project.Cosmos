@@ -4,8 +4,8 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{99999999-9999-9999-9999-999999999999}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>MyRootNamespace</RootNamespace>
-    <AssemblyName>MyAssemblyName</AssemblyName>
+    <RootNamespace>Cosmos.User.Kernel</RootNamespace>
+    <AssemblyName>CosmosKernel</AssemblyName>
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
 
@@ -53,10 +53,16 @@
   <PropertyGroup>
     <Cosmos>$(Registry:HKEY_CURRENT_USER\Environment@Cosmos)</Cosmos>
   </PropertyGroup>
-  <UsingTask TaskName="Cosmos.Builder.MSBuild.BuildImage" AssemblyFile="$(Cosmos)\source2\Builder\Cosmos.Builder.MSBuild\bin\Debug\Cosmos.Builder.MSBuild.dll" />
+  <UsingTask TaskName="Cosmos.Build.MSBuild.BuildImage" AssemblyFile="$(Cosmos)\source2\Build\Cosmos.Build.MSBuild\bin\Debug\Cosmos.Build.MSBuild.dll" />
   <Target Name="AfterBuild">
     <Message Text="Using Cosmos Path: $(Cosmos)" Importance="high" />
-    <BuildImage KernelAssemblyFile="$(BaseOutputPath)$(OutputPath)$(AssemblyName).exe" />
+	<BuildImage
+		KernelAssembly="$(AssemblyName).$(OutputType)"
+		OutputPath="$(BaseOutputPath)$(OutputPath)"
+		BuildTarget="$(BuildTarget)"
+		Framework="$(Framework)"
+		UseInternalAssembler="$(UseInternalAssembler)"
+	/>
   </Target>
 
 </Project>

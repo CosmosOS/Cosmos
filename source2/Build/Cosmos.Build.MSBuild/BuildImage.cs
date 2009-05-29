@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
-//using Cosmos.Compiler.Builder;
+using Cosmos.Build.Common;
 
 namespace Cosmos.Build.MSBuild {
 	
@@ -11,88 +11,91 @@ namespace Cosmos.Build.MSBuild {
 
 		private Boolean buildFailed;
 
-		public override bool Execute() {
+		public override bool Execute()
+		{
 			buildFailed = false;
-      Log.LogMessage(MessageImportance.High, "Building Cosmos System Image");
-      return true;
 
-			this.KernelAssemblyFile = (new System.IO.FileInfo(this.KernelAssemblyFile)).FullName;
+			Log.LogMessage(MessageImportance.High, "Building Cosmos System Image");
 
-			System.Reflection.Assembly kernelAssembly;
-			//Indy.IL2CPU.DebugMode compileDebugMode;
-			var builtEvent = new System.Threading.AutoResetEvent(false);
+			String buildOutputPath;
+			String buildKernelAssemblyPath;
+			Boolean buildUseInternalAssembler;
+			TargetHost buildTarget;
+			Framework buildFramework;
+
+			if (System.IO.Path.IsPathRooted(this.OutputPath) == false)
+			{ buildOutputPath = (new System.IO.DirectoryInfo(this.OutputPath)).FullName; }
+			else
+			{ buildOutputPath = this.OutputPath; }
+
+			buildKernelAssemblyPath = System.IO.Path.Combine(buildOutputPath, this.KernelAssembly);
+			buildUseInternalAssembler = this.UseInternalAssembler;
+			buildFramework = EnumValue.Parse(this.Framework, Cosmos.Build.Common.Framework.MicrosoftNET);
+			buildTarget = EnumValue.Parse(this.BuildTarget, TargetHost.QEMU);
+
+			Log.LogMessage(MessageImportance.High, "Output Path: {0}", buildOutputPath);
+			Log.LogMessage(MessageImportance.High, "Kernal Assembly: {0}", buildKernelAssemblyPath);
+			Log.LogMessage(MessageImportance.High, "Use Internal Assembler: {0}", buildUseInternalAssembler);
+			Log.LogMessage(MessageImportance.High, "Framework: {0}", buildFramework);
+			Log.LogMessage(MessageImportance.High, "Target: {0}", buildTarget);
+
+			//System.Reflection.Assembly kernelAssembly;
+
+			//var builtEvent = new System.Threading.AutoResetEvent(false);
 			//var builder = new Builder();
 
-			if (String.IsNullOrEmpty(this.BuildPath) == false)
-			{
-				this.BuildPath = (new System.IO.DirectoryInfo(this.BuildPath)).FullName;
-				//builder.BuildPath = this.BuildPath;
-			}
 			//builder.UseInternalAssembler = this.UseInternalAssembler;
-			
-			//compileDebugMode = Indy.IL2CPU.DebugMode.None;
-			if (String.IsNullOrEmpty(this.DebugMode) == false)
-			{
-				//if( Enum.IsDefined(typeof(Indy.IL2CPU.DebugMode), this.DebugMode) == true)
-				//{
-				//	compileDebugMode = (Indy.IL2CPU.DebugMode)Enum.Parse(typeof(Indy.IL2CPU.DebugMode), this.DebugMode, true);
-				//}else{
-				//	Log.LogWarning("Unknown Cosmos debug mode, defaulted to none.");
-				//}
-			}
 
-      //builder.CompileCompleted += delegate { builtEvent.Set(); };
-      //builder.LogMessage += delegate(Indy.IL2CPU.LogSeverityEnum aSeverity, string aMessage)
-      //          {
-      //    switch (aSeverity)
-      //    {
-      //      case Indy.IL2CPU.LogSeverityEnum.Informational:
-      //        Log.LogMessage(aMessage);
-      //        break;
-      //      case Indy.IL2CPU.LogSeverityEnum.Warning:
-      //        Log.LogWarning(aMessage);
-      //        break;
-      //      case Indy.IL2CPU.LogSeverityEnum.Error:
-      //        Log.LogError(aMessage);
-      //        this.buildFailed = true;
-      //        break;
-      //    }
-					
-      //          };
+			//builder.CompileCompleted += delegate { builtEvent.Set(); };
+			//builder.LogMessage += delegate(Indy.IL2CPU.LogSeverityEnum aSeverity, string aMessage)
+			//          {
+			//    switch (aSeverity)
+			//    {
+			//      case Indy.IL2CPU.LogSeverityEnum.Informational:
+			//        Log.LogMessage(aMessage);
+			//        break;
+			//      case Indy.IL2CPU.LogSeverityEnum.Warning:
+			//        Log.LogWarning(aMessage);
+			//        break;
+			//      case Indy.IL2CPU.LogSeverityEnum.Error:
+			//        Log.LogError(aMessage);
+			//        this.buildFailed = true;
+			//        break;
+			//    }
 
-      //kernelAssembly = System.Reflection.Assembly.LoadFile(this.KernelAssemblyFile);
-      //builder.TargetAssembly = kernelAssembly;
+			//          };
 
-      //builder.BeginCompile(compileDebugMode, this.DebugComPort, this.GDB);
-      //builtEvent.WaitOne();
+			//kernelAssembly = System.Reflection.Assembly.LoadFile(this.KernelAssemblyFile);
+			//builder.TargetAssembly = kernelAssembly;
 
-      //if (this.buildFailed == true)
-      //{
-      //  builder.Assemble();
-      //  builder.Link();
-      //  builder.MakeISO();
-      //}
+			//builder.BeginCompile(compileDebugMode, this.DebugComPort, this.GDB);
+			//builtEvent.WaitOne();
 
-			return this.buildFailed;
+			//if (this.buildFailed == true)
+			//{
+			//  builder.Assemble();
+			//  builder.Link();
+			//  builder.MakeISO();
+			//}
+
+			return (this.buildFailed == false);
 		}
 
 		[Required]
-		public string KernelAssemblyFile
+		public string KernelAssembly
 		{ get; set; }
 
-		public string BuildPath
+		[Required]
+		public string OutputPath
 		{ get; set; }
 
 		public Boolean UseInternalAssembler
 		{ get; set; }
 
-		public string DebugMode
+		public string BuildTarget
 		{ get; set; }
 
-		public byte DebugComPort
-		{ get; set; }
-
-		public Boolean GDB
+		public string Framework
 		{ get; set; }
 
 	}
