@@ -49,9 +49,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BuildProperties.cs" />
+    <Compile Include="DebugQemuProperties.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="EnumValue.cs" />
+    <Compile Include="PropertiesBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VMQemuProperties.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="ReadMe.txt" />
