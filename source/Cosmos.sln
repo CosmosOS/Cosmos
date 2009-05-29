@@ -154,10 +154,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Steve", "Steve", "{9FDB0A12
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Indy.IL2CPU.X86", "Compiler\Indy.IL2CPU.X86\Indy.IL2CPU.X86.csproj", "{5E70F7D9-388A-43C2-8D9B-A4C382A8278D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Builder.Common", "..\source2\Builder\Cosmos.Builder.Common\Cosmos.Builder.Common.csproj", "{2915B786-408A-4475-B092-03F5735429E7}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Builder.MSBuild", "..\source2\Builder\Cosmos.Builder.MSBuild\Cosmos.Builder.MSBuild.csproj", "{71E5DE71-F7C1-4B61-B5BE-4FD64682BDB0}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "New Sort (source2)", "New Sort (source2)", "{8D61B97D-E68E-47C6-AD72-95EA5768D0B2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{D95021E1-A2C9-4829-819E-ED433AF13162}"
@@ -196,7 +192,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.Package", "..\sou
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 60
+		SccNumberOfProjects = 59
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -408,34 +404,30 @@ Global
 		SccProjectTopLevelParentUniqueName52 = Cosmos.sln
 		SccProjectName52 = ../source2/Build/Cosmos.Build.Common
 		SccLocalPath52 = ..\\source2\\Build\\Cosmos.Build.Common
-		SccProjectUniqueName53 = ..\\source2\\Builder\\Cosmos.Builder.MSBuild\\Cosmos.Builder.MSBuild.csproj
+		SccProjectUniqueName53 = ..\\source2\\Build\\Cosmos.Build.Launch\\Cosmos.Build.Launch.csproj
 		SccProjectTopLevelParentUniqueName53 = Cosmos.sln
-		SccProjectName53 = ../source2/Builder/Cosmos.Builder.MSBuild
-		SccLocalPath53 = ..\\source2\\Builder\\Cosmos.Builder.MSBuild
-		SccProjectUniqueName54 = ..\\source2\\Build\\Cosmos.Build.Launch\\Cosmos.Build.Launch.csproj
+		SccProjectName53 = ../source2/Build/Cosmos.Build.Launch
+		SccLocalPath53 = ..\\source2\\Build\\Cosmos.Build.Launch
+		SccProjectUniqueName54 = ..\\source2\\Build\\Cosmos.Build.MSBuild\\Cosmos.Build.MSBuild.csproj
 		SccProjectTopLevelParentUniqueName54 = Cosmos.sln
-		SccProjectName54 = ../source2/Build/Cosmos.Build.Launch
-		SccLocalPath54 = ..\\source2\\Build\\Cosmos.Build.Launch
-		SccProjectUniqueName55 = ..\\source2\\Build\\Cosmos.Build.MSBuild\\Cosmos.Build.MSBuild.csproj
+		SccProjectName54 = ../source2/Build/Cosmos.Build.MSBuild
+		SccLocalPath54 = ..\\source2\\Build\\Cosmos.Build.MSBuild
+		SccProjectUniqueName55 = ..\\source2\\Debug\\Cosmos.Debug.Common\\Cosmos.Debug.Common.csproj
 		SccProjectTopLevelParentUniqueName55 = Cosmos.sln
-		SccProjectName55 = ../source2/Build/Cosmos.Build.MSBuild
-		SccLocalPath55 = ..\\source2\\Build\\Cosmos.Build.MSBuild
-		SccProjectUniqueName56 = ..\\source2\\Debug\\Cosmos.Debug.Common\\Cosmos.Debug.Common.csproj
+		SccProjectName55 = ../source2/Debug/Cosmos.Debug.Common
+		SccLocalPath55 = ..\\source2\\Debug\\Cosmos.Debug.Common
+		SccProjectUniqueName56 = ..\\source2\\Debug\\Cosmos.Debug.VSDebugEngine\\Cosmos.Debug.VSDebugEngine.csproj
 		SccProjectTopLevelParentUniqueName56 = Cosmos.sln
-		SccProjectName56 = ../source2/Debug/Cosmos.Debug.Common
-		SccLocalPath56 = ..\\source2\\Debug\\Cosmos.Debug.Common
-		SccProjectUniqueName57 = ..\\source2\\Debug\\Cosmos.Debug.VSDebugEngine\\Cosmos.Debug.VSDebugEngine.csproj
+		SccProjectName56 = ../source2/Debug/Cosmos.Debug.VSDebugEngine
+		SccLocalPath56 = ..\\source2\\Debug\\Cosmos.Debug.VSDebugEngine
+		SccProjectUniqueName57 = ..\\source2\\Debug\\Cosmos.Debug.VSRegister\\Cosmos.Debug.VSRegister.csproj
 		SccProjectTopLevelParentUniqueName57 = Cosmos.sln
-		SccProjectName57 = ../source2/Debug/Cosmos.Debug.VSDebugEngine
-		SccLocalPath57 = ..\\source2\\Debug\\Cosmos.Debug.VSDebugEngine
-		SccProjectUniqueName58 = ..\\source2\\Debug\\Cosmos.Debug.VSRegister\\Cosmos.Debug.VSRegister.csproj
+		SccProjectName57 = ../source2/Debug/Cosmos.Debug.VSRegister
+		SccLocalPath57 = ..\\source2\\Debug\\Cosmos.Debug.VSRegister
+		SccProjectUniqueName58 = ..\\source2\\VSIP\\Cosmos.VS.Package\\Cosmos.VS.Package.csproj
 		SccProjectTopLevelParentUniqueName58 = Cosmos.sln
-		SccProjectName58 = ../source2/Debug/Cosmos.Debug.VSRegister
-		SccLocalPath58 = ..\\source2\\Debug\\Cosmos.Debug.VSRegister
-		SccProjectUniqueName59 = ..\\source2\\VSIP\\Cosmos.VS.Package\\Cosmos.VS.Package.csproj
-		SccProjectTopLevelParentUniqueName59 = Cosmos.sln
-		SccProjectName59 = ../source2/VSIP/Cosmos.VS.Package
-		SccLocalPath59 = ..\\source2\\VSIP\\Cosmos.VS.Package
+		SccProjectName58 = ../source2/VSIP/Cosmos.VS.Package
+		SccLocalPath58 = ..\\source2\\VSIP\\Cosmos.VS.Package
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -642,14 +634,6 @@ Global
 		{5E70F7D9-388A-43C2-8D9B-A4C382A8278D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E70F7D9-388A-43C2-8D9B-A4C382A8278D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5E70F7D9-388A-43C2-8D9B-A4C382A8278D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2915B786-408A-4475-B092-03F5735429E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2915B786-408A-4475-B092-03F5735429E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2915B786-408A-4475-B092-03F5735429E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2915B786-408A-4475-B092-03F5735429E7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{71E5DE71-F7C1-4B61-B5BE-4FD64682BDB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{71E5DE71-F7C1-4B61-B5BE-4FD64682BDB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{71E5DE71-F7C1-4B61-B5BE-4FD64682BDB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{71E5DE71-F7C1-4B61-B5BE-4FD64682BDB0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0462E82B-8C29-41A9-8265-9C89038ADB29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0462E82B-8C29-41A9-8265-9C89038ADB29}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0462E82B-8C29-41A9-8265-9C89038ADB29}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -691,8 +675,6 @@ Global
 		{BE896274-5F06-430F-AAC4-D74CAEEB28F5} = {4070490F-A3FD-4E97-A89D-A1C96EF7BD37}
 		{5A1E9D16-BF71-4D8E-9389-3476056E4566} = {4070490F-A3FD-4E97-A89D-A1C96EF7BD37}
 		{5E70F7D9-388A-43C2-8D9B-A4C382A8278D} = {4070490F-A3FD-4E97-A89D-A1C96EF7BD37}
-		{2915B786-408A-4475-B092-03F5735429E7} = {4070490F-A3FD-4E97-A89D-A1C96EF7BD37}
-		{71E5DE71-F7C1-4B61-B5BE-4FD64682BDB0} = {4070490F-A3FD-4E97-A89D-A1C96EF7BD37}
 		{6F91B8C3-1A78-49D7-B915-F13EDFDAFDB3} = {21E68B7D-F1DC-46E2-9CFA-0A7C6D77D42E}
 		{4DE8EC69-B412-41C4-BCD9-1E032984E888} = {21E68B7D-F1DC-46E2-9CFA-0A7C6D77D42E}
 		{EBF602FE-8AFC-408D-A9F1-560C35651090} = {21E68B7D-F1DC-46E2-9CFA-0A7C6D77D42E}
