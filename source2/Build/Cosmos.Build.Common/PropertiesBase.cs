@@ -79,7 +79,7 @@ namespace Cosmos.Build.Common
 						if (Boolean.TryParse(stringValue, out newValue) == true)
 						{ value = (T)((Object)newValue); }
 
-					}if ((valueTypeName == "UInt16") || (valueTypeName == "UShort")){
+					}else if ((valueTypeName == "UInt16") || (valueTypeName == "UShort")){
 						UInt16 newValue;
 						if (UInt16.TryParse(stringValue, out newValue) == true)
 						{ value = (T)((Object)newValue); }
@@ -95,8 +95,7 @@ namespace Cosmos.Build.Common
 						{ value = (T)((Object)newValue); }
 
 					}else{
-							//why does it keep flowing to this line??!?!?!?
-							//throw new ArgumentException("Unsupported value type.", "T");
+							throw new ArgumentException("Unsupported value type.", "T");
 					}
 				}
 			}
