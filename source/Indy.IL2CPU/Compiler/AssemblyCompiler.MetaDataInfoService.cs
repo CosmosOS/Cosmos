@@ -39,7 +39,14 @@ namespace Indy.IL2CPU.Compiler
                 int xCurOffset = 0;
                 // todo:implement check for body
                 //if (aCurrentMethodForLocals.HasBody) {
-                MethodBody xBody = aCurrentMethodForLocals.GetMethodBody();
+                MethodBody xBody = null;
+                try
+                {
+                    xBody = aCurrentMethodForLocals.GetMethodBody();
+                }catch
+                {
+                    
+                }
                 if (xBody != null)
                 {
                     xVars = new MethodInformation.Variable[xBody.LocalVariables.Count];

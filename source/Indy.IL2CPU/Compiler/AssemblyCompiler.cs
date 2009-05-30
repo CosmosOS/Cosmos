@@ -1,7 +1,9 @@
-﻿using System;
+﻿#define VERBOSE_DEBUG
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security;
 using System.Text;
 using System.Reflection;
 using Indy.IL2CPU.IL;
@@ -311,11 +313,25 @@ namespace Indy.IL2CPU.Compiler
             }
             var xMethodName = Label.GenerateLabelName(xCurrentMethod);
             var xMethodScanInfo = new SortedList<string, object>(StringComparer.InvariantCultureIgnoreCase);
-            MethodInformation xMethodInfo = GetMethodInfo(xCurrentMethod, xCurrentMethod
-                         , xMethodName, xTypeInfo, DebugMode != DebugMode.None, xMethodScanInfo);
-
+            MethodInformation xMethodInfo;
+            try
+            {
+                xMethodInfo = GetMethodInfo(xCurrentMethod, xCurrentMethod
+                                            , xMethodName, xTypeInfo, DebugMode != DebugMode.None, xMethodScanInfo);
+            }catch(VerificationException VE)
+            {
+                LogMessage(LogSeverityEnum.Error,
+                                           "Method '{0}' not generated!",
+                                           xCurrentMethod.GetFullName());
+                new Comment("Method not being generated yet, as it's handled by a PInvoke");
+                return;
+            }
+            catch(Exception E)
+            {
+                throw;
+            }
 #if VERBOSE_DEBUG
-                    string comment = "(No Type Info available)";
+                    var comment = "(No Type Info available)";
                     if (xMethodInfo.TypeInfo != null)
                     {
                         comment = "Type Info:\r\n \r\n" + xMethodInfo.TypeInfo;
@@ -375,7 +391,22 @@ namespace Indy.IL2CPU.Compiler
                 }
                 else
                 {
-                    MethodBody xBody = xCurrentMethod.GetMethodBody();
+                    MethodBody xBody=null;
+                    try
+                    {
+                        xBody = xCurrentMethod.GetMethodBody();
+                    }catch(VerificationException)
+                    {
+                        LogMessage(LogSeverityEnum.Error,
+                                           "Method '{0}' not generated!",
+                                           xCurrentMethod.GetFullName());
+                        new Comment("Method not being generated yet, as it's handled by a PInvoke");
+                        return;
+                    }
+                    catch(Exception)
+                    {
+                        throw;
+                    }
                     // todo: add better detection of implementation state
                     if (xBody != null)
                     {
@@ -393,6 +424,7 @@ namespace Indy.IL2CPU.Compiler
                             }
                             catch
                             {
+                                return;
                             }
                             #endregion
 
@@ -429,14 +461,18 @@ namespace Indy.IL2CPU.Compiler
                             while (xReader.Read())
                             {
                                 ExceptionHandlingClause xCurrentHandler = null;
-
+                                if (xReader != null && xReader.Position == 0x4A)
+                                {
+                                    Console.Write("");
+                                }
                                 #region Exception handling support code
                                 // todo: add support for nested handlers using a stack or so..
+                                // todo: double/triple/quadruple check this logic!!! ideally using unit tests
                                 foreach (ExceptionHandlingClause xHandler in xBody.ExceptionHandlingClauses)
                                 {
                                     if (xHandler.TryOffset > 0)
                                     {
-                                        if (xHandler.TryOffset <= xReader.NextPosition && (xHandler.TryLength + xHandler.TryOffset) > xReader.NextPosition)
+                                        if (xHandler.TryOffset <= xReader.Position && (xHandler.TryLength + xHandler.TryOffset) > xReader.Position)
                                         {
                                             if (xCurrentHandler == null)
                                             {
@@ -453,7 +489,7 @@ namespace Indy.IL2CPU.Compiler
                                     }
                                     if (xHandler.HandlerOffset > 0)
                                     {
-                                        if (xHandler.HandlerOffset <= xReader.NextPosition && (xHandler.HandlerOffset + xHandler.HandlerLength) > xReader.NextPosition)
+                                        if (xHandler.HandlerOffset <= xReader.Position && (xHandler.HandlerOffset + xHandler.HandlerLength) > xReader.Position)
                                         {
                                             if (xCurrentHandler == null)
                                             {
@@ -472,7 +508,7 @@ namespace Indy.IL2CPU.Compiler
                                     {
                                         if (xHandler.FilterOffset > 0)
                                         {
-                                            if (xHandler.FilterOffset <= xReader.NextPosition)
+                                            if (xHandler.FilterOffset <= xReader.Position)
                                             {
                                                 if (xCurrentHandler == null)
                                                 {
@@ -495,11 +531,11 @@ namespace Indy.IL2CPU.Compiler
                                 xOp = GetOpFromType(OpCodeMap.GetOpForOpCode(xReader.OpCode), xReader, xMethodInfo);
 
                                 xOp.Assembler = Assembler;
-                                //new Comment("StackItems = " + Assembler.StackContents.Count);
-                                //foreach (var xStackContent in Assembler.StackContents)
-                                //{
-                                //    new Comment("    " + xStackContent.Size);
-                                //}
+                                new Comment("StackItems = " + Assembler.StackContents.Count);
+                                foreach (var xStackContent in Assembler.StackContents)
+                                {
+                                    new Comment("    " + xStackContent.Size);
+                                }
 
                                 // Create label for current point
                                 string xLabel = Op.GetInstructionLabel(xReader);
@@ -975,6 +1011,8 @@ namespace Indy.IL2CPU.Compiler
                     return 16;
                 case "System.Guid":
                     return 16;
+                case "System.Enum":
+                    return 4;
                 case "System.DateTime":
                     return 8; // todo: check for correct size
             }

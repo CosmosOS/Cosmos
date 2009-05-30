@@ -12,24 +12,32 @@ namespace Indy.IL2CPU.IL.X86 {
 	public class Clt: Op {
 		private readonly string NextInstructionLabel;
 		private readonly string CurInstructionLabel;
-		public Clt(ILReader aReader, MethodInformation aMethodInfo)
+        private uint mCurrentOffset;
+        private MethodInformation mMethodInfo;
+        public Clt(ILReader aReader, MethodInformation aMethodInfo)
 			: base(aReader, aMethodInfo) {
 			NextInstructionLabel = GetInstructionLabel(aReader.NextPosition);
 			CurInstructionLabel = GetInstructionLabel(aReader);
+            mMethodInfo = aMethodInfo;
+            mCurrentOffset = aReader.Position;
 		}
 		public override void DoAssemble() {
-			if (Assembler.StackContents.Peek().IsFloat) {
-				throw new Exception("Floats not yet supported!");
-			}
-			int xSize = Math.Max(Assembler.StackContents.Pop().Size, Assembler.StackContents.Pop().Size);
-			if (xSize > 8) {
-				throw new Exception("StackSizes>8 not supported");
-			}
+            var xStackItem = Assembler.StackContents.Pop();
+            if (xStackItem.IsFloat)
+            {
+                EmitNotImplementedException(Assembler, GetServiceProvider(), "Clt: Floats not yet supported", CurInstructionLabel, mMethodInfo, mCurrentOffset, NextInstructionLabel);
+                return;
+            }
+            if (xStackItem.Size > 8)
+            {
+                EmitNotImplementedException(Assembler, GetServiceProvider(), "Clt: StackSizes>8 not supported", CurInstructionLabel, mMethodInfo, mCurrentOffset, NextInstructionLabel);
+                return;
+            }
 			Assembler.StackContents.Push(new StackContent(1, typeof(bool)));
 			string BaseLabel = CurInstructionLabel + "__";
 			string LabelTrue = BaseLabel + "True";
 			string LabelFalse = BaseLabel + "False";
-			if (xSize > 4)
+            if (xStackItem.Size > 4)
 			{
                 new CPUx86.Xor { DestinationReg = CPUx86.Registers.ESI, SourceReg = CPUx86.Registers.ESI };
                 new CPUx86.Add { DestinationReg = Registers.ESI, SourceValue = 1 };

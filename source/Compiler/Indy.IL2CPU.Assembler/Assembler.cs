@@ -159,24 +159,33 @@ namespace Indy.IL2CPU.Assembler {
                 }
             }
             OnBeforeFlush();
-            mAllAssemblerElements = new List<BaseAssemblerElement>();
-            mAllAssemblerElements.AddRange(mDataMembers.Cast<BaseAssemblerElement>());
-            mAllAssemblerElements.AddRange(mInstructions.Cast<BaseAssemblerElement>());
-            CleanupCode();
+            MergeAllElements();
+        }
+
+        private IEnumerable<BaseAssemblerElement> EnumerateThroughAllElements()
+        {
+            foreach(var xInstr in Instructions)
+            {
+                yield return xInstr;
+            }
+            foreach (var xData in DataMembers)
+            {
+                yield return xData;
+            }
         }
 
         /// <summary>
         /// Cleans up the Instructions list. it evaluates all conditionals. 
         /// </summary>
-        protected void CleanupCode() {
-            int xCurrentIdx = 0;
+        protected void MergeAllElements() {
             int xIfLevelsToSkip = 0;
             var xDefines = new List<string>();
             var xNewAssemblerElements = new List<BaseAssemblerElement>();
-            Console.WriteLine("Assembler Element Count: {0}", mAllAssemblerElements.Count);
+            Console.WriteLine("Assembler Element Count: {0}", (Instructions.Count + DataMembers.Count));
             Console.WriteLine("Memory in use: {0}", System.Diagnostics.Process.GetCurrentProcess().WorkingSet64);
             //Console.ReadLine();
-            foreach (var xCurrentInstruction in mAllAssemblerElements) {
+            foreach (var xCurrentInstruction in EnumerateThroughAllElements())
+            {
                 var xIfDefined = xCurrentInstruction as IIfDefined;
                 var xEndIfDefined = xCurrentInstruction as IEndIfDefined;
                 var xDefine = xCurrentInstruction as IDefine;

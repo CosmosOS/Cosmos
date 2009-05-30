@@ -39,7 +39,7 @@ namespace TestApp {
                     });
                 xCompileHelper.SaveAssembler += new Action<Assembly, Indy.IL2CPU.Assembler.Assembler>(delegate(Assembly aAssembly, Indy.IL2CPU.Assembler.Assembler aAssembler)
                 {
-                    using (var xOut = new StreamWriter(Path.Combine(xBasePath, "out\\" + aAssembly.GetName().Name + ".out"), false))
+                    using (var xOut = new StreamWriter(Path.Combine(xBasePath, "out\\" + aAssembly.GetName().Name + ".out"), false, new UTF8Encoding(false)))
                     {
                         aAssembler.FlushText(xOut);
                     }

@@ -11,7 +11,7 @@ namespace Cosmos.Kernel.ManagedMemory {
         public ManagedByteArray(int aSize, int aAlignment) {
             mUnalignedData = new byte[aSize + aAlignment];
             if (aAlignment > 1) {
-                fixed (void* xFirstElemAddress = &mUnalignedData[0]) {
+                fixed (byte* xFirstElemAddress = &mUnalignedData[0]) {
                     var xPtr = new IntPtr(xFirstElemAddress);
                     Address = xPtr.ToInt64();
                     if (Address % aAlignment != 0) {

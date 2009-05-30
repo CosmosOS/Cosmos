@@ -123,14 +123,38 @@ namespace Indy.IL2CPU.IL.X86
                 return;
             }
             mCurrentILOffset = aCurrentILOffset;
-
+            if (MethodInfoLabelGenerator.GenerateLabelName(aMethod) == "System_IAsyncResult__System_IO_Compression_GZipStream_BeginRead_System_Byte____System_Int32__System_Int32__System_AsyncCallback__System_Object_")
+{
+    Console.WriteLine("");
+}
             bool HasDynamic = DynamicMethodEmit.GetHasDynamicMethod(aMethod);
             if (HasDynamic)
             {
                 aMethod = DynamicMethodEmit.GetDynamicMethod(aMethod);
             }
+            try
+            {
+                mTargetMethodInfo = GetService<IMetaDataInfoService>().GetMethodInfo(aMethod, aMethod,
+                                                                                     MethodInfoLabelGenerator.
+                                                                                         GenerateLabelName(aMethod),
+                                                                                     GetService<IMetaDataInfoService>().
+                                                                                         GetTypeInfo(
+                                                                                         aMethod.DeclaringType),
+                                                                                     aDebugMode);
+            }
+            catch
+            {
+                Console.WriteLine(aMethod.GetFullName());
+                Console.Write("");
+                mTargetMethodInfo = GetService<IMetaDataInfoService>().GetMethodInfo(aMethod, aMethod,
+                                                                                     MethodInfoLabelGenerator.
+                                                                                         GenerateLabelName(aMethod),
+                                                                                     GetService<IMetaDataInfoService>().
+                                                                                         GetTypeInfo(
+                                                                                         aMethod.DeclaringType),
+                                                                                     aDebugMode);
 
-            mTargetMethodInfo = GetService<IMetaDataInfoService>().GetMethodInfo(aMethod, aMethod, MethodInfoLabelGenerator.GenerateLabelName(aMethod), GetService<IMetaDataInfoService>().GetTypeInfo(aMethod.DeclaringType), aDebugMode);
+            }
             mResultSize = 0;
             if (mTargetMethodInfo != null)
             {
@@ -188,7 +212,7 @@ namespace Indy.IL2CPU.IL.X86
         }
         private bool mDebugMode;
 
-        public void Assemble(string aMethod, int aArgumentCount)
+        private void Assemble(string aMethod, int aArgumentCount)
         {
             if (mTargetMethodInfo.ExtraStackSize > 0)
             {

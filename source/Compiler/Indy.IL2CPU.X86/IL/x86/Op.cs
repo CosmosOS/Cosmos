@@ -74,6 +74,10 @@ namespace Indy.IL2CPU.IL.X86
             : base(aReader,
                    aMethodInfo)
         {
+            if (aReader != null && aReader.Position==0x4A)
+            {
+             Console.Write("");
+            }
             if (aMethodInfo != null && aMethodInfo.CurrentHandler != null)
             {
                 mNeedsExceptionPush = ((aMethodInfo.CurrentHandler.HandlerOffset > 0 && aMethodInfo.CurrentHandler.HandlerOffset == aReader.Position) || ((aMethodInfo.CurrentHandler.Flags & ExceptionHandlingClauseOptions.Filter) > 0 && aMethodInfo.CurrentHandler.FilterOffset > 0 && aMethodInfo.CurrentHandler.FilterOffset == aReader.Position)) && (aMethodInfo.CurrentHandler.Flags == ExceptionHandlingClauseOptions.Clause);

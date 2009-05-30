@@ -5,7 +5,7 @@ namespace Indy.IL2CPU.Assembler {
 	public class Comment: Instruction {
 		public readonly string Text;
 
-		public Comment(string aText)  :base(false) //HACK
+		public Comment(string aText)//  :base(false) //HACK
         {
 			if(aText.StartsWith(";")) {
 				aText = aText.TrimStart(';').TrimStart();

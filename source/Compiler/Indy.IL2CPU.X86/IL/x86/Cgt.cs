@@ -12,18 +12,24 @@ namespace Indy.IL2CPU.IL.X86 {
 	public class Cgt: Op {
 		private readonly string NextInstructionLabel;
 		private readonly string CurInstructionLabel;
+	    private uint mCurrentOffset;
+	    private MethodInformation mMethodInfo;
 		public Cgt(ILReader aReader, MethodInformation aMethodInfo)
 			: base(aReader, aMethodInfo) {
 			NextInstructionLabel = GetInstructionLabel(aReader.NextPosition);
 			CurInstructionLabel = GetInstructionLabel(aReader);
+		    mMethodInfo = aMethodInfo;
+		    mCurrentOffset = aReader.Position;
 		}
 		public override void DoAssemble() {
 			var xStackItem= Assembler.StackContents.Pop();
 			if (xStackItem.IsFloat) {
-				throw new Exception("Floats not yet supported!");
+                EmitNotImplementedException(Assembler, GetServiceProvider(), "Cgt: Floats not yet supported", CurInstructionLabel, mMethodInfo,mCurrentOffset, NextInstructionLabel);
+			    return;
 			}
 			if (xStackItem.Size > 8) {
-				throw new Exception("StackSizes>8 not supported");
+                EmitNotImplementedException(Assembler, GetServiceProvider(), "Cgt: StackSizes>8 not supported", CurInstructionLabel, mMethodInfo, mCurrentOffset, NextInstructionLabel);
+			    return;
 			}
 			Assembler.StackContents.Push(new StackContent(4, typeof(bool)));
 			string BaseLabel = CurInstructionLabel + "__";

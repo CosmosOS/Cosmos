@@ -158,11 +158,19 @@ namespace Indy.IL2CPU.Compiler
             {
                 var xTest = this.ScanAssembly(xAsm);
                 if(!xTest.Equals(mCacheStates[xAsm])){
+                    mCacheStates[xAsm] = xTest;
                     xNeedsFullRecompile =true;
                 }
             }
             if (xNeedsFullRecompile)
             {
+                foreach(var xAsm in mAllAssemblies)
+                {
+                 if(!mGenericTypeInstancesToGenerate.ContainsKey(xAsm))
+                 {
+                     ScanAssembly(xAsm);
+                 }
+                }
                 DoFullRecompile();
             }
             else
@@ -173,6 +181,10 @@ namespace Indy.IL2CPU.Compiler
 
         private void CompileAssembly(Assembly aAssembly)
         {
+            if(aAssembly==null)
+            {
+                throw new ArgumentNullException("aAssembly");
+            }
             Console.Write(new String('-', Console.BufferWidth));
             Console.WriteLine("Starting compilation of assembly: " + aAssembly.FullName);
             var xCompiler = new AssemblyCompiler();
@@ -191,10 +203,27 @@ namespace Indy.IL2CPU.Compiler
                 }
                 xCompiler.OpCodeMap = GetOpCodeMap();
                 xCompiler.Plugs.AddRange(Plugs);
+                if(!mGenericTypeInstancesToGenerate.ContainsKey(aAssembly))
+                {
+                    Console.Write("");
+                }
                 xCompiler.Types.AddRange(mGenericTypeInstancesToGenerate[aAssembly]);
                 xCompiler.Methods.AddRange(mGenericMethodInstancesToGenerate[aAssembly]);
-                xCompiler.Execute();
-                SaveAssembler(aAssembly, xCompiler.Assembler);
+                try
+                {
+                    xCompiler.Execute();
+
+                    // update cache state files
+                    mCacheStates[aAssembly].Save(GetCacheStateFile(aAssembly));
+                    var xLastTime = File.GetLastWriteTimeUtc(aAssembly.Location).ToBinary();
+                    var xChecksumFileName = GetChecksumFile(aAssembly);
+                    File.WriteAllText(xChecksumFileName, xLastTime.ToString());
+                }
+                finally
+                {
+                    // todo: at the end, we dont want this, but for now to do debugging, leave it in finally
+                    SaveAssembler(aAssembly, xCompiler.Assembler);
+                }
             }
         }
 
@@ -363,6 +392,8 @@ namespace Indy.IL2CPU.Compiler
                     {
                         if (xChecksum == xLastTime)
                         {
+                            // todo: remove or move to other logging
+                            Console.WriteLine("Assembly '{0}' doesn't need a recompile", xAsm.GetName().Name);
                             continue;
                         }
                     }
