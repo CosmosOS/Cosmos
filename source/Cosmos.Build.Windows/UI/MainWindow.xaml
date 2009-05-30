@@ -3,26 +3,33 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:build="clr-namespace:Cosmos.Compiler.Builder"
         Title="Cosmos Builder" WindowStartupLocation="CenterScreen"    
-        MinHeight="500" MaxHeight="{x:Static SystemParameters.MaximizedPrimaryScreenHeight}" SizeToContent="WidthAndHeight"
-        Icon="/Cosmos.Compiler.Builder;component/Cosmos.ico">
+        Width="650" MinHeight="500" MaxHeight="{x:Static SystemParameters.MaximizedPrimaryScreenHeight}" SizeToContent="Height" 
+        Icon="/Cosmos.Compiler.Builder;component/Cosmos.ico"
+        FocusManager.FocusedElement="{Binding ElementName=buttonPanel}"
+        >
+
+    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" > 
     <StackPanel Orientation="Vertical" Name="dockPanel" >
+        
+        
 
         <StackPanel Orientation="Horizontal" >
             <StackPanel Orientation="Vertical" >
-                <build:OptionsUC x:Name="optionsUC" MaxHeight="600" ></build:OptionsUC>
+                <build:OptionsUC x:Name="optionsUC"  ></build:OptionsUC>
               
             </StackPanel>
 
             <build:BuildUC  x:Name="buildUC" Visibility="Collapsed"></build:BuildUC>
 
         </StackPanel>
-        <StackPanel Grid.Row="1" Margin="15, 15, 15, 10" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom">
+        <StackPanel x:Name="buttonPanel" Grid.Row="1" Margin="15, 15, 15, 10" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" >
             <Button Name="butnBuild" Margin="5" IsDefault="True">_Build</Button>
             <Button Name="butnCancel" Margin="5" IsCancel="True">_Cancel</Button>
 
         </StackPanel>
-        <Expander Header="Log"   Name="logExpander"  ExpandDirection="Down">
+        <Expander Header="Log"   Name="logExpander"  ExpandDirection="Down" Visibility="Collapsed">
             <ListBox x:Name="listInformation" Height="Auto"  MinHeight="200"/>
         </Expander>
     </StackPanel>
+</ScrollViewer>
 </Window>
