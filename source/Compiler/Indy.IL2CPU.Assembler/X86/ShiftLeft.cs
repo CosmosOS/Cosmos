@@ -13,7 +13,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 InitialModRMByteValue = 0xE0,
                 OperandSizeByte=0,
                 ReverseRegisters = true,
-                DestinationReg=Guid.Empty,
+                DestinationRegAny=true,
                 SourceReg=Registers.CL,
                 SourceRegByte=-1
             }); // register by CL
@@ -32,7 +32,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 NeedsModRMByte = true,
                 InitialModRMByteValue = 0xE0,
                 OperandSizeByte = 0,
-                DestinationReg = Guid.Empty,
+                DestinationRegAny = true,
                 ReverseRegisters = true,
                 SourceImmediate=true,
                 SourceImmediateSize=InstructionSize.Byte

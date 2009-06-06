@@ -9,7 +9,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 AllowedSizes = InstructionSizes.DWord | InstructionSizes.Word,
                 OpCode = new byte[] { 0x58 },
                 NeedsModRMByte = false,
-                DestinationReg = Guid.Empty,
+                DestinationRegAny = true,
                 DefaultSize=InstructionSize.DWord,
                 ReverseRegisters=true,
                 DestinationRegByte = 0

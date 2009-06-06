@@ -17,9 +17,5 @@ namespace Indy.IL2CPU.Assembler.X86 {
         public Return() {
             DestinationValue = 0;
         }
-
-        public override string ToString() {
-            return base.mMnemonic + " " + this.GetDestinationAsString();
-        }
     }
 }

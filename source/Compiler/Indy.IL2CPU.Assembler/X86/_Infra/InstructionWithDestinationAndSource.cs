@@ -10,7 +10,8 @@ namespace Indy.IL2CPU.Assembler.X86 {
             set;
         }
 
-        public Guid SourceReg {
+        public RegistersEnum? SourceReg
+        {
             get;
             set;
         }
@@ -34,14 +35,14 @@ namespace Indy.IL2CPU.Assembler.X86 {
             string xDest = "";
             if ((SourceValue.HasValue || SourceRef != null) &&
                 SourceIsIndirect &&
-                SourceReg != Guid.Empty) {
+                SourceReg != null) {
                 throw new Exception("[Scale*index+base] style addressing not supported at the moment");
             }
             if (SourceRef != null) {
                 xDest = SourceRef.ToString();
             } else {
-                if (SourceReg != Guid.Empty) {
-                    xDest = Registers.GetRegisterName(SourceReg);
+                if (SourceReg != null) {
+                    xDest = Registers.GetRegisterName(SourceReg.Value);
                 } else {
                     xDest = "0x" + SourceValue.GetValueOrDefault().ToString("X").ToUpperInvariant();
                 }
@@ -81,9 +82,13 @@ namespace Indy.IL2CPU.Assembler.X86 {
             }
             return base.GetData(aAssembler);
         }
-
-        public override string ToString() {
-            return Mnemonic + " " + this.GetDestinationAsString() + ", " + GetSourceAsString();
+        public override void WriteText(Indy.IL2CPU.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput)
+        {
+            aOutput.Write(mMnemonic);
+            aOutput.Write(" ");
+            aOutput.Write(this.GetDestinationAsString());
+            aOutput.Write(", ");
+            aOutput.Write(this.GetSourceAsString());
         }
     }
 }

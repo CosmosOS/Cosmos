@@ -14,7 +14,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 OpCode = new byte[] { 0xF6, 0xF8 },
                 OperandSizeByte = 0,
                 ReverseRegisters = true,
-                DestinationReg = Guid.Empty,
+                DestinationRegAny = true,
                 DestinationRegByte=1
             });// register
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {

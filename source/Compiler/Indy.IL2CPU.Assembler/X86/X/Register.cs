@@ -6,8 +6,8 @@ using X86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Indy.IL2CPU.Assembler.X86.X {
     public abstract class Register {
-        public Guid GetId() {
-            return Registers.GetRegister(GetName());
+        public RegistersEnum GetId() {
+            return Registers.GetRegister(GetName()).Value;
         }
 
         public void Push() {
@@ -26,7 +26,8 @@ namespace Indy.IL2CPU.Assembler.X86.X {
             new X86.Move { DestinationReg = GetId(), SourceReg = aAction.Register, SourceDisplacement = aAction.Displacement, SourceIsIndirect = aAction.IsIndirect, SourceRef = aAction.Reference, Size = Registers.GetSize(GetId()) };
         }
 
-        protected void Move(Guid aRegister) {
+        protected void Move(RegistersEnum aRegister)
+        {
             new X86.Move { DestinationReg = GetId(), SourceReg = aRegister, Size = Registers.GetSize(GetId()) };
         }
 

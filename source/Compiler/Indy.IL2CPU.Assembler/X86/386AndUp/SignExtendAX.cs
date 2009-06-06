@@ -24,14 +24,18 @@ namespace Indy.IL2CPU.Assembler.X86 {
             });
         }
 
-        public override string ToString() {
+        public override void WriteText(Indy.IL2CPU.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput)
+        {
             switch (Size) {
                 case 32:
-                    return "cdq";
+                    aOutput.Write("cdq");
+                    return;
                 case 16:
-                    return "cwde";
+                    aOutput.Write("cwde");
+                    return;
                 case 8:
-                    return "cbw";
+                    aOutput.Write("cbw");
+                    return;
                 default:
                     throw new NotSupportedException();
             }

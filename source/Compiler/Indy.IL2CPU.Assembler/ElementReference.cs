@@ -82,14 +82,20 @@ namespace Indy.IL2CPU.Assembler {
             try {
                 if(mCache == null) {
                     mCache = new Dictionary<string, BaseAssemblerElement>(StringComparer.InvariantCultureIgnoreCase);
-                    foreach (var xInstruction in aAssembler.mAllAssemblerElements) {
+                    int xMax = aAssembler.AllAssemblerElementCount;
+                    for (int i = 0; i < xMax; i++)
+                    {
+                        var xInstruction = aAssembler.GetAssemblerElement(i);
                         var xLabel = xInstruction as Label;
-                        if (xLabel != null) {
+                        if (xLabel != null)
+                        {
                             mCache.Add(xLabel.QualifiedName, xLabel);
                         }
                         var xDataMember = xInstruction as DataMember;
-                        if (xDataMember != null) {
-                            if (mCache.ContainsKey(xDataMember.Name)) {
+                        if (xDataMember != null)
+                        {
+                            if (mCache.ContainsKey(xDataMember.Name))
+                            {
                                 Console.Write("");
                             }
                             mCache.Add(xDataMember.Name, xDataMember);

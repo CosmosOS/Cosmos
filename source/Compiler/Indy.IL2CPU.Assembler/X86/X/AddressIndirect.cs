@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86.X {
     public class AddressIndirect : Address {
-        public readonly Guid Register;
+        public readonly RegistersEnum? Register;
         public readonly ElementReference Reference;
         public readonly uint Address;
         public readonly int Displacement;
@@ -22,9 +22,9 @@ namespace Indy.IL2CPU.Assembler.X86.X {
         public override string ToString() {
             if (Register != null) {
                 if (Displacement == 0) {
-                    return "[" + Registers.GetRegisterName(Register) + "]";
+                    return "[" + Registers.GetRegisterName(Register.Value) + "]";
                 } else {
-                    return "[" + Registers.GetRegisterName(Register) + " + " + Displacement + "]";
+                    return "[" + Registers.GetRegisterName(Register.Value) + " + " + Displacement + "]";
                 }
             } else {
                 if (Displacement == 0) {

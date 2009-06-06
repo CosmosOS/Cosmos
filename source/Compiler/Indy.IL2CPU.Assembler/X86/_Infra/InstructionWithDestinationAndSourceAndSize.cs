@@ -33,11 +33,11 @@ namespace Indy.IL2CPU.Assembler.X86 {
 
         protected virtual void DetermineSize() {
             if (mSize == 0) {
-                if (DestinationReg != Guid.Empty && !DestinationIsIndirect) {
-                    if (Registers.Is16Bit(DestinationReg)) {
+                if (DestinationReg != null && !DestinationIsIndirect) {
+                    if (Registers.Is16Bit(DestinationReg.Value)) {
                         Size = 16;
                     } else {
-                        if (Registers.Is32Bit(DestinationReg)) {
+                        if (Registers.Is32Bit(DestinationReg.Value)) {
                             Size = 32;
                         } else {
                             Size = 8;
@@ -45,11 +45,11 @@ namespace Indy.IL2CPU.Assembler.X86 {
                     }
                     return;
                 }
-                if (SourceReg != Guid.Empty && !SourceIsIndirect) {
-                    if (Registers.Is16Bit(SourceReg)) {
+                if (SourceReg != null && !SourceIsIndirect) {
+                    if (Registers.Is16Bit(SourceReg.Value)) {
                         Size = 16;
                     } else {
-                        if (Registers.Is32Bit(SourceReg)) {
+                        if (Registers.Is32Bit(SourceReg.Value)) {
                             Size = 32;
                         } else {
                             Size = 8;
@@ -65,16 +65,20 @@ namespace Indy.IL2CPU.Assembler.X86 {
 
         }
 
-        public override string ToString()
+        public override void WriteText(Indy.IL2CPU.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput)
         {
-            //HACK see todo at top 
             if (Size == 0)
             {
                 Size = 32;
                 Console.WriteLine("ERRROR no size set for Instruction - set to 4 InstructionWithDestinationAndSourceAndSize") ;
             }
-
-            return base.mMnemonic + " " + SizeToString(Size) + " " + this.GetDestinationAsString() + ", " + GetSourceAsString();
+            aOutput.Write(mMnemonic);
+            aOutput.Write(" ");
+            aOutput.Write(SizeToString(Size));
+            aOutput.Write(", ");
+            aOutput.Write(this.GetDestinationAsString());
+            aOutput.Write(", ");
+            aOutput.Write(this.GetSourceAsString());
         }
     }
 }

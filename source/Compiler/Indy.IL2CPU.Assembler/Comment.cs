@@ -13,9 +13,11 @@ namespace Indy.IL2CPU.Assembler {
 			Text = String.Intern(aText);
 		}
 
-		public override string ToString() {
-			return "; " + Text;
-		}
+        public override void WriteText(Assembler aAssembler, System.IO.TextWriter aOutput)
+        {
+            aOutput.Write("; ");
+            aOutput.Write(Text);
+        }
 
         public override void UpdateAddress(Assembler aAssembler, ref ulong aAddress) {
             base.UpdateAddress(aAssembler, ref aAddress);

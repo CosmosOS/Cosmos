@@ -12,7 +12,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 NeedsModRMByte=true,
                 InitialModRMByteValue = 0xD8,
                 ReverseRegisters= true,
-                DestinationReg=Guid.Empty,
+                DestinationRegAny=true,
                 OperandSizeByte=0
             }); // register
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {

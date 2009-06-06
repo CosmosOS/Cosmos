@@ -16,7 +16,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 InitialModRMByteValue = 0xF0,
                 ReverseRegisters=true,
                 OperandSizeByte=0,
-                DestinationReg=Guid.Empty
+                DestinationRegAny=true
             });// register
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] {0xF6},

@@ -9,13 +9,13 @@ namespace Indy.IL2CPU.Assembler.X86 {
         public static void InitializeEncodingData(Instruction.InstructionData aData) {
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode=new byte[] {0x40},
-                DestinationReg=Guid.Empty,
+                DestinationRegAny=true,
                 DestinationRegByte=0,
                 AllowedSizes = InstructionSizes.DWord | InstructionSizes.Word
             }); // reg (alt)
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0xFE },
-                DestinationReg = Guid.Empty,
+                DestinationRegAny = true,
                 NeedsModRMByte=true,
                 InitialModRMByteValue=0xC0,
                 ReverseRegisters=true,

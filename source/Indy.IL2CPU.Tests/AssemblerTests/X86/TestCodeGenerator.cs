@@ -35,7 +35,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
             public bool TestRegisters = true;
             public bool TestCR = false;
             public bool TestSegments = false;
-            public IEnumerable<Guid> InvalidRegisters = new Guid[0];
+            public IEnumerable<RegistersEnum> InvalidRegisters = new RegistersEnum[0];
         }
 
         private static Dictionary<Type, ConstraintsContainer> opcodesException;
@@ -405,7 +405,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                     new string[] { "DestinationValue = 650000, DestinationIsIndirect = true" });
             }
             if (!opcodesException.ContainsKey(aType) || opcodesException[aType].DestInfo.TestMem32) {
-                var xRegistersToSkip = new List<Guid>();
+                var xRegistersToSkip = new List<RegistersEnum>();
                 if (opcodesException.ContainsKey(aType) && opcodesException[aType].DestInfo.InvalidRegisters != null) {
                     xRegistersToSkip.AddRange(opcodesException[aType].DestInfo.InvalidRegisters);
                 }
@@ -434,7 +434,8 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
             }
             if(!opcodesException.ContainsKey(aType) || opcodesException[aType].DestInfo.TestRegisters) {
                 var xItems = new List<string>();
-                foreach (Guid register in Registers.GetRegisters()) {
+                foreach (RegistersEnum register in Registers.GetRegisters())
+                {
                     if (!aType.Namespace.Contains("SSE") && (Registers.getXMMs().Contains(register)))
                         continue;
                     if (Registers.GetCRs().Contains(register) && (!opcodesException.ContainsKey(aType) || (opcodesException.ContainsKey(aType) && (!opcodesException[aType].DestInfo.TestCR))))
@@ -475,7 +476,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                     new string[] { "SourceValue = 650000, SourceIsIndirect = true" });
             }
             if (!opcodesException.ContainsKey(aType) || opcodesException[aType].SourceInfo.TestMem32) {
-                var xRegistersToSkip = new List<Guid>();
+                var xRegistersToSkip = new List<RegistersEnum>();
                 if (opcodesException.ContainsKey(aType) && opcodesException[aType].SourceInfo.InvalidRegisters != null) {
                     xRegistersToSkip.AddRange(opcodesException[aType].SourceInfo.InvalidRegisters);
                 }
@@ -504,7 +505,8 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
             }
             if(!opcodesException.ContainsKey(aType) || opcodesException[aType].SourceInfo.TestRegisters) {
                 var xItems = new List<string>();
-                foreach (Guid register in Registers.GetRegisters()) {
+                foreach (RegistersEnum register in Registers.GetRegisters())
+                {
                     if (!aType.Namespace.Contains("SSE") && (Registers.getXMMs().Contains(register)))
                         continue;
                     if (Registers.GetCRs().Contains(register) && (!opcodesException.ContainsKey(aType) || (opcodesException.ContainsKey(aType) && (!opcodesException[aType].SourceInfo.TestCR))))
@@ -563,7 +565,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                             String.Format("DestinationValue = 650000, DestinationIsIndirect = true")});
             }
             if (!opcodesException.ContainsKey(aType) || opcodesException[aType].DestInfo.TestRegisters) {
-                var xRegistersToSkip = new List<Guid>();
+                var xRegistersToSkip = new List<RegistersEnum>();
                 if (opcodesException.ContainsKey(aType) && opcodesException[aType].DestInfo.InvalidRegisters != null) {
                     xRegistersToSkip.AddRange(opcodesException[aType].DestInfo.InvalidRegisters);
                 }
@@ -593,7 +595,8 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                     }
                 }
                 xItems.Clear();
-                foreach (Guid register in Registers.GetRegisters()) {
+                foreach (RegistersEnum register in Registers.GetRegisters())
+                {
                     if (!aType.Namespace.Contains("SSE") && (Registers.getXMMs().Contains(register)))
                         continue;
                     if (Registers.GetCRs().Contains(register) && (!opcodesException.ContainsKey(aType) || (opcodesException.ContainsKey(aType) && (!opcodesException[aType].DestInfo.TestCR))))
@@ -649,7 +652,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                     });
             }
             if (!opcodesException.ContainsKey(aType) || opcodesException[aType].SourceInfo.TestRegisters) {
-                var xRegistersToSkip = new List<Guid>();
+                var xRegistersToSkip = new List<RegistersEnum>();
                 if (opcodesException.ContainsKey(aType) && opcodesException[aType].SourceInfo.InvalidRegisters != null) {
                     xRegistersToSkip.AddRange(opcodesException[aType].SourceInfo.InvalidRegisters);
                 }
@@ -679,7 +682,8 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86 {
                     }
                 }
                 xItems.Clear();
-                foreach (Guid register in Registers.GetRegisters()) {
+                foreach (RegistersEnum register in Registers.GetRegisters())
+                {
                     if (!aType.Namespace.Contains("SSE") && (Registers.getXMMs().Contains(register)))
                         continue;
                     if (Registers.GetCRs().Contains(register) && (!opcodesException.ContainsKey(aType) || (opcodesException.ContainsKey(aType) && (!opcodesException[aType].SourceInfo.TestCR))))

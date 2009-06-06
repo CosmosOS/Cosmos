@@ -9,7 +9,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
         public static void InitializeEncodingData(Instruction.InstructionData aData) {
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0x50 },
-                DestinationReg = Guid.Empty,
+                DestinationRegAny = true,
                 DestinationRegByte = 0,
                 DestinationRegBitShiftLeft = 0,
                 ReverseRegisters=true,

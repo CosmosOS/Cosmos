@@ -12,15 +12,15 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 OperandSizeByte=0,
                 NeedsModRMByte=true,
                 InitialModRMByteValue=0xC0,
-                DestinationReg=Guid.Empty,
-                SourceReg=Guid.Empty,
+                DestinationRegAny=true,
+                SourceRegAny = true,
                 ReverseRegisters=true
             }); // reg with reg
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0x3A },
                 OperandSizeByte = 0,
                 NeedsModRMByte = true,
-                DestinationReg = Guid.Empty,
+                DestinationRegAny = true,
                 SourceMemory = true
             }); // memory with reg
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
@@ -29,7 +29,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 NeedsModRMByte = true,
                 DestinationMemory = true,
                 ReverseRegisters=true,
-                SourceReg = Guid.Empty
+                SourceRegAny = true
             }); // reg with memory
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0x3C },
@@ -43,7 +43,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 OperandSizeByte = 0,
                 NeedsModRMByte = true,
                 InitialModRMByteValue=0xF8,
-                DestinationReg = Guid.Empty,
+                DestinationRegAny = true,
                 SourceImmediate = true,
                 ReverseRegisters=true
             }); // immediate with register

@@ -15,8 +15,9 @@ namespace Indy.IL2CPU.Assembler {
             Symbol = aSymbol;
         }
 
-        public override string ToString() {
-            return this.GetAsText();
+        public override void WriteText(Assembler aAssembler, System.IO.TextWriter aOutput)
+        {
+            aOutput.Write(this.GetAsText());
         }
     }
 }

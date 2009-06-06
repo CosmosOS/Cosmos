@@ -13,9 +13,10 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 DestinationImmediateSize=InstructionSize.Byte
             });
         }
-        public override string ToString() {
-            //if (Number == INTO) return "into";
-            return "int " + DestinationValue;
+        public override void WriteText(Indy.IL2CPU.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput)
+        {
+            aOutput.Write("int ");
+            aOutput.Write(DestinationValue);
         }
     }
 }

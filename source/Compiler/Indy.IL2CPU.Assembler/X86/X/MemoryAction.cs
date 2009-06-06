@@ -6,7 +6,7 @@ using System.Text;
 namespace Indy.IL2CPU.Assembler.X86.X {
     public class MemoryAction {
         public uint? Value;
-        public readonly Guid Register;
+        public readonly RegistersEnum? Register;
         public readonly ElementReference Reference;
         public readonly int Displacement;
         
@@ -17,7 +17,7 @@ namespace Indy.IL2CPU.Assembler.X86.X {
                 if (Reference != null) {
                     return Reference.ToString();
                 }
-                return Registers.GetRegisterName(Register);
+                return Registers.GetRegisterName(Register.Value);
             }
         }
 
@@ -41,11 +41,14 @@ namespace Indy.IL2CPU.Assembler.X86.X {
 
         public bool IsIndirect { get; set; }
         // For registers
-        public MemoryAction(Guid aRegister) {
+        public MemoryAction(RegistersEnum aRegister)
+        {
             Register = aRegister;
         }
 
-        public MemoryAction(Guid aRegister, int aDisplacement):this(aRegister) {
+        public MemoryAction(RegistersEnum aRegister, int aDisplacement)
+            : this(aRegister)
+        {
             Displacement = aDisplacement;
         }
         // This form used for reading memory - Addresses are passed in

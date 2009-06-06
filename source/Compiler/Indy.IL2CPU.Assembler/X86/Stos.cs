@@ -19,18 +19,21 @@ namespace Indy.IL2CPU.Assembler.X86 {
             set;
         }
 
-        public override string ToString() {
-            var xPref = "";
+        public override void WriteText(Indy.IL2CPU.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput)
+        {
             if ((Prefixes & InstructionPrefixes.Repeat) != 0) {
-                xPref = "rep ";
+                aOutput.Write("rep ");
             }
             switch (Size) {
                 case 32:
-                    return xPref + "stosd";
+                    aOutput.Write("stosd");
+                    return;
                 case 16:
-                    return xPref + "stosw";
+                    aOutput.Write("stosw");
+                    return;
                 case 8:
-                    return xPref + "stosb";
+                    aOutput.Write("stosb");
+                    return;
                 default: throw new Exception("Size not supported!");
             }
         }

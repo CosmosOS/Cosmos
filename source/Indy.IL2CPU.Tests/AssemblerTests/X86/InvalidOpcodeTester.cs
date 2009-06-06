@@ -43,7 +43,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
             public bool TestRegisters = true;
             public bool TestCR = false;
             public bool TestSegments = false;
-            public IEnumerable<Guid> InvalidRegisters = new Guid[0];
+            public IEnumerable<RegistersEnum> InvalidRegisters = new RegistersEnum[0];
         }
 
         private const int VerificationLevel = 1;
@@ -427,7 +427,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                 }
             }
             if (!opcodesException.ContainsKey(type) || opcodesException[type].DestInfo.TestRegisters) {
-                var xRegistersToSkip = new List<Guid>();
+                var xRegistersToSkip = new List<RegistersEnum>();
                 if (opcodesException.ContainsKey(type) && opcodesException[type].DestInfo.InvalidRegisters != null) {
                     xRegistersToSkip.AddRange(opcodesException[type].DestInfo.InvalidRegisters);
                 }
@@ -556,7 +556,8 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                         }
                     }
                 }
-                foreach (Guid register in Registers.GetRegisters()) {
+                foreach (RegistersEnum register in Registers.GetRegisters())
+                {
                     if (!type.Namespace.Contains("SSE") && (Registers.getXMMs().Contains(register)))
                         continue;
                     if (Registers.GetCRs().Contains(register) && (!opcodesException.ContainsKey(type) || (opcodesException.ContainsKey(type) && (!opcodesException[type].DestInfo.TestCR))))
@@ -729,7 +730,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                     });
                 }
                 if (!opcodesException.ContainsKey(type) || opcodesException[type].SourceInfo.TestRegisters) {
-                    var xRegistersToSkip = new List<Guid>();
+                    var xRegistersToSkip = new List<RegistersEnum>();
                     if (opcodesException.ContainsKey(type) && opcodesException[type].SourceInfo.InvalidRegisters != null) {
                         xRegistersToSkip.AddRange(opcodesException[type].SourceInfo.InvalidRegisters);
                     }
@@ -854,7 +855,8 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
                     opcodesException[type].DestInfo.TestMem32 = xOrigMem32;
                 }
             }
-            foreach (Guid register in Registers.GetRegisters()) {
+            foreach (RegistersEnum register in Registers.GetRegisters())
+            {
                 if (!type.Namespace.Contains("SSE") && (Registers.getXMMs().Contains(register)))
                     continue;
                 if (Registers.GetCRs().Contains(register) && 
@@ -1004,7 +1006,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
             }
             return xResult;
         }
-        private static void addSegmentRegisters(List<Guid> list)
+        private static void addSegmentRegisters(List<RegistersEnum> list)
         {
             list.Add(Registers.CS);
             list.Add(Registers.DS);
@@ -1014,7 +1016,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
             list.Add(Registers.GS);
         }
 
-        private static void add8BitRegisters(List<Guid> list)
+        private static void add8BitRegisters(List<RegistersEnum> list)
         {
             list.Add(Registers.AL);
             list.Add(Registers.CL);
@@ -1027,7 +1029,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
         }
 
 
-        private static void add16BitRegisters(List<Guid> list)
+        private static void add16BitRegisters(List<RegistersEnum> list)
         {
             addSegmentRegisters(list);
             list.Add(Registers.AX);
@@ -1040,7 +1042,7 @@ namespace Indy.IL2CPU.Tests.AssemblerTests.X86
             list.Add(Registers.SP);
         }
 
-        private static void add32BitRegisters(List<Guid> list)
+        private static void add32BitRegisters(List<RegistersEnum> list)
         {
             list.Add(Registers.EAX);
             list.Add(Registers.EBP);

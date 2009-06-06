@@ -19,8 +19,13 @@ namespace Indy.IL2CPU.Assembler.X86 {
             }
         }
 
-        public override string ToString() {
-            return base.mMnemonic + " " + SizeToString(Size) + " " + this.GetDestinationAsString();
+        public override void  WriteText(Indy.IL2CPU.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput)
+{
+            aOutput.Write(mMnemonic);
+            aOutput.Write(" ");
+            aOutput.Write(SizeToString(Size));
+            aOutput.Write(" ");
+            aOutput.Write(this.GetDestinationAsString());
         }
     }
 }

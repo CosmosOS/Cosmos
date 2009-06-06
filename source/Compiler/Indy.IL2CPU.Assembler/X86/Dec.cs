@@ -17,7 +17,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             }); //memory
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode=new byte[]{0x48},
-                DestinationReg=Guid.Empty,
+                DestinationRegAny=true,
                 DestinationRegByte = 0,
                 AllowedSizes=InstructionSizes.DWord | InstructionSizes.Word
             }); // reg
@@ -27,7 +27,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 InitialModRMByteValue = 0xC8,
                 OperandSizeByte = 0,
                 ReverseRegisters=true,
-                DestinationReg = Guid.Empty
+                DestinationRegAny = true
             }); // reg
         }
     }

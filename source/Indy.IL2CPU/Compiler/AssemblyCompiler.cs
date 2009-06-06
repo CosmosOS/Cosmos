@@ -272,6 +272,12 @@ namespace Indy.IL2CPU.Compiler
                 }
                 xCount++;
 
+                //if(xCount==1500)
+                //{
+                // Console.WriteLine("Temporary aborting, for profiling");
+                //    throw new Exception("Temporary abort");
+                //}
+
                 //if (xCount == 10000)
                 //{
                 //    Console.Write("Memory in use: ");

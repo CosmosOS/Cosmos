@@ -73,16 +73,15 @@ namespace Indy.IL2CPU.Assembler {
 
 	    private string mName;
 
-        public override string ToString()
+        public override void WriteText(Assembler aAssembler, System.IO.TextWriter aOutput)
         {
             if (IsGlobal)
             {
-                return "global " + Name + "\r\n" + Name + ":";
+                aOutput.Write("global ");
+                aOutput.WriteLine(Name);
             }
-            else
-            {
-                return Name + ":";
-            }
+            aOutput.Write(Name);
+            aOutput.Write(":");
 		}
 
 		public static string GenerateLabelName(MethodBase aMethod) {

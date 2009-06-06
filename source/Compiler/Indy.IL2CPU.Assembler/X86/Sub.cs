@@ -16,8 +16,8 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 OperandSizeByte = 0,
                 AllowedSizes = InstructionSizes.Byte | InstructionSizes.Word | InstructionSizes.DWord,
                 DefaultSize = InstructionSize.DWord,
-                DestinationReg = Guid.Empty,
-                SourceReg = Guid.Empty,
+                DestinationRegAny = true,
+                SourceRegAny = true,
                 ReverseRegisters=true
             }); // register to register
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
@@ -33,7 +33,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 OperandSizeByte = 0,
                 AllowedSizes = InstructionSizes.Byte | InstructionSizes.Word | InstructionSizes.DWord,
                 DefaultSize = InstructionSize.DWord,
-                DestinationReg = Guid.Empty,
+                DestinationRegAny = true,
                 DestinationRegByte = 1,
                 SourceImmediate = true
             }); // immediate to register
@@ -55,7 +55,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 DefaultSize = InstructionSize.DWord,
                 NeedsModRMByte = true,
                 //InitialModRMByteValue = 0x28,
-                SourceReg = Guid.Empty,
+                SourceRegAny = true,
                 DestinationMemory = true,
                 ReverseRegisters=true
             }); // register to memory
@@ -66,7 +66,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 DefaultSize = InstructionSize.DWord,
                 NeedsModRMByte = true,
                 SourceMemory = true,
-                DestinationReg = Guid.Empty
+                DestinationRegAny = true
             }); // memory to register
         }
     }

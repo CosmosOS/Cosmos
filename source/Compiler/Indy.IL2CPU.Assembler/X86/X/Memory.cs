@@ -12,8 +12,8 @@ namespace Indy.IL2CPU.Assembler.X86.X {
                     if (xAddrDirect.Label != null) {
                         return new MemoryAction(ElementReference.New(xAddrDirect.Label));
                     } else {
-                        if (xAddrDirect.Register != Guid.Empty) {
-                            return new MemoryAction(xAddrDirect.Register);
+                        if (xAddrDirect.Register != null) {
+                            return new MemoryAction(xAddrDirect.Register.Value);
                         } else {
                             return new MemoryAction(xAddrDirect.Address);
                         }
@@ -24,8 +24,8 @@ namespace Indy.IL2CPU.Assembler.X86.X {
                         if (xAddrIndirect.Reference != null) {
                             return new MemoryAction(xAddrIndirect.Reference, xAddrIndirect.Displacement) { IsIndirect = true };
                         } else {
-                            if (xAddrIndirect.Register != Guid.Empty) {
-                                return new MemoryAction(xAddrIndirect.Register, xAddrIndirect.Displacement) { IsIndirect = true };
+                            if (xAddrIndirect.Register != null) {
+                                return new MemoryAction(xAddrIndirect.Register.Value, xAddrIndirect.Displacement) { IsIndirect = true };
                             } else {
                                 return new MemoryAction(xAddrIndirect.Address, xAddrIndirect.Displacement) { IsIndirect = true };
                             }
@@ -35,7 +35,7 @@ namespace Indy.IL2CPU.Assembler.X86.X {
                 }
             }
             set {
-                if (value.Register!=Guid.Empty) {
+                if (value.Register!=null) {
                     var xAddrDirect = aAddress as AddressDirect;
 
                     if (xAddrDirect != null) {
@@ -85,7 +85,7 @@ namespace Indy.IL2CPU.Assembler.X86.X {
                 // ++ operators return ++
                 // Maybe later change ++ etc to return actions?
                 if (value != null) {
-                    if (value.Register != Guid.Empty) {
+                    if (value.Register != null) {
                         var xAddrDirect = aAddress as AddressDirect;
                         if (xAddrDirect != null) {
                             if (xAddrDirect.Label != null) {

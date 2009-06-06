@@ -15,8 +15,11 @@ namespace Indy.IL2CPU.Assembler.X86 {
             }); // fixed port (register)
         }
 
-        public override string ToString() {
-            return base.mMnemonic + " DX, " + this.GetDestinationAsString();
+        public override void WriteText(Indy.IL2CPU.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput)
+        {
+            aOutput.Write(mMnemonic);
+            aOutput.Write(" DX, ");
+            aOutput.Write(this.GetDestinationAsString());
         }
 	}
 }

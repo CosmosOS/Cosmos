@@ -6,8 +6,9 @@ using System.Text;
 namespace Indy.IL2CPU.Assembler {
     [OpCode("%endif")]
     public class EndIfDefined : Instruction, IEndIfDefined {
-        public override string ToString() {
-            return this.GetAsText();
+        public override void WriteText(Assembler aAssembler, System.IO.TextWriter aOutput)
+        {
+            aOutput.Write(this.GetAsText());
         }
     }
 }

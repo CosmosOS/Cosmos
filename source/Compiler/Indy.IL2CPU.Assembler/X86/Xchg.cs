@@ -12,7 +12,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 AllowedSizes = InstructionSizes.DWord | InstructionSizes.Word,
                 DefaultSize = InstructionSize.DWord,
                 DestinationReg = Registers.EAX,
-                SourceReg = Guid.Empty,
+                SourceRegAny = true,
                 SourceRegByte = 0,
                 ReverseRegisters=false
             }); // (E)AX with reg
@@ -20,7 +20,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 OpCode = new byte[] { 0x90 },
                 AllowedSizes = InstructionSizes.DWord | InstructionSizes.Word,
                 DefaultSize = InstructionSize.DWord,
-                DestinationReg = Guid.Empty,
+                DestinationRegAny = true,
                 DestinationRegByte=0,
                 SourceReg = Registers.EAX,
                 ReverseRegisters = false
@@ -28,10 +28,10 @@ namespace Indy.IL2CPU.Assembler.X86 {
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0x86, 0xC0 },
                 OperandSizeByte = 0,
-                DestinationReg = Guid.Empty,
+                DestinationRegAny = true,
                 DestinationRegByte = 1,
                 DestinationRegBitShiftLeft = 3,
-                SourceReg = Guid.Empty,
+                SourceRegAny = true,
                 SourceRegByte = 1,
                 DefaultSize = InstructionSize.DWord,
                 ReverseRegisters=true
@@ -41,7 +41,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 NeedsModRMByte = true,
                 OperandSizeByte = 0,
                 DestinationMemory = true,
-                SourceReg = Guid.Empty,
+                SourceRegAny = true,
                 ReverseRegisters=true,
                 DefaultSize = InstructionSize.DWord
             }); // memory with reg
@@ -50,7 +50,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 NeedsModRMByte = true,
                 OperandSizeByte = 0,
                 SourceMemory = true,
-                DestinationReg = Guid.Empty,
+                DestinationRegAny = true,
                 ReverseRegisters = false,
                 DefaultSize = InstructionSize.DWord
             }); // memory with reg

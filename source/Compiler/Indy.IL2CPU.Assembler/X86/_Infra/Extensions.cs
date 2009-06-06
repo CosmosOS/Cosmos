@@ -9,14 +9,14 @@ namespace Indy.IL2CPU.Assembler.X86 {
             string xDest = "";
             if((aThis.DestinationValue.HasValue ||aThis.DestinationRef != null) && 
                 aThis.DestinationIsIndirect && 
-                aThis.DestinationReg!=Guid.Empty) {
+                aThis.DestinationReg!=null) {
                 throw new Exception("[Scale*index+base] style addressing not supported at the moment");
             }
             if (aThis.DestinationRef != null) {
                 xDest = aThis.DestinationRef.ToString();
             } else {
-                if (aThis.DestinationReg != Guid.Empty) {
-                    xDest = Registers.GetRegisterName(aThis.DestinationReg);
+                if (aThis.DestinationReg != null) {
+                    xDest = Registers.GetRegisterName(aThis.DestinationReg.Value);
                 } else {
                     xDest = "0x" + aThis.DestinationValue.GetValueOrDefault().ToString("X").ToUpperInvariant();
                 }
@@ -37,11 +37,11 @@ namespace Indy.IL2CPU.Assembler.X86 {
 
         public static void DetermineSize(this IInstructionWithDestination aThis, IInstructionWithSize aThis2, byte aSize) {
             if (aSize == 0) {
-                if (aThis.DestinationReg != Guid.Empty && !aThis.DestinationIsIndirect) {
-                    if (Registers.Is16Bit(aThis.DestinationReg)) {
+                if (aThis.DestinationReg != null && !aThis.DestinationIsIndirect) {
+                    if (Registers.Is16Bit(aThis.DestinationReg.Value)) {
                         aThis2.Size = 16;
                     } else {
-                        if (Registers.Is32Bit(aThis.DestinationReg)) {
+                        if (Registers.Is32Bit(aThis.DestinationReg.Value)) {
                             aThis2.Size = 32;
                         } else {
                             aThis2.Size = 8;

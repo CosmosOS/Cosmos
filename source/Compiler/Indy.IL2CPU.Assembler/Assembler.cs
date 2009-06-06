@@ -119,10 +119,10 @@ namespace Indy.IL2CPU.Assembler {
             mInstructions.Clear();
             mDataMembers.Clear();
             CurrentInstance.Pop();
-            if (mAllAssemblerElements != null)
-            {
-                mAllAssemblerElements.Clear();
-            }
+            //if (mAllAssemblerElements != null)
+            //{
+            //    mAllAssemblerElements.Clear();
+            //}
         }
 
         public void Add(params Instruction[] aReaders) {
@@ -159,96 +159,115 @@ namespace Indy.IL2CPU.Assembler {
                 }
             }
             OnBeforeFlush();
-            MergeAllElements();
+            //MergeAllElements();
         }
 
-        private IEnumerable<BaseAssemblerElement> EnumerateThroughAllElements()
+        //private IEnumerable<BaseAssemblerElement> EnumerateThroughAllElements()
+        //{
+        //    foreach(var xInstr in Instructions)
+        //    {
+        //        yield return xInstr;
+        //    }
+        //    foreach (var xData in DataMembers)
+        //    {
+        //        yield return xData;
+        //    }
+        //}
+
+        ///// <summary>
+        ///// Cleans up the Instructions list. it evaluates all conditionals. 
+        ///// </summary>
+        //protected void MergeAllElements() {
+        //    int xIfLevelsToSkip = 0;
+        //    var xDefines = new List<string>();
+        //    var xNewAssemblerElements = new List<BaseAssemblerElement>((Instructions.Count + DataMembers.Count));
+        //    Console.WriteLine("Assembler Element Count: {0}", (Instructions.Count + DataMembers.Count));
+        //    Console.WriteLine("Memory in use: {0}", System.Diagnostics.Process.GetCurrentProcess().WorkingSet64);
+        //    //Console.ReadLine();
+        //    foreach (var xCurrentInstruction in EnumerateThroughAllElements())
+        //    {
+        //        var xIfDefined = xCurrentInstruction as IIfDefined;
+        //        var xEndIfDefined = xCurrentInstruction as IEndIfDefined;
+        //        var xDefine = xCurrentInstruction as IDefine;
+        //        var xIfNotDefined = xCurrentInstruction as IIfNotDefined;
+        //        if (xCurrentInstruction is Comment) {
+        //            continue;
+        //        }
+        //        if (xIfDefined != null) {
+        //            if (xIfLevelsToSkip > 0) {
+        //                xIfLevelsToSkip++;
+        //            } else if (!xDefines.Contains(xIfDefined.Symbol.ToLowerInvariant())) {
+        //                xIfLevelsToSkip++;
+        //            }
+        //            continue;
+        //        }
+        //        if (xIfNotDefined != null) {
+        //            if (xIfLevelsToSkip > 0) {
+        //                xIfLevelsToSkip++;
+        //            } else if (xDefines.Contains(xIfNotDefined.Symbol.ToLower())) {
+        //                xIfLevelsToSkip++;
+        //            }
+        //            continue;
+        //        }
+        //        if (xEndIfDefined != null) {
+        //            if (xIfLevelsToSkip > 0) {
+        //                xIfLevelsToSkip--;
+        //            }
+        //            continue;
+        //        }
+        //        if (xIfLevelsToSkip > 0) {
+        //            continue;
+        //        }
+        //        if (xDefine != null) {
+        //            var xSymbol = xDefine.Symbol.ToLowerInvariant();
+        //            if (!xDefines.Contains(xSymbol)) {
+        //                xDefines.Add(xSymbol);
+        //            }
+        //            continue;
+        //        }
+        //        xNewAssemblerElements.Add(xCurrentInstruction);
+        //    }
+        //    mAllAssemblerElements = xNewAssemblerElements;
+        //}
+
+        //internal List<BaseAssemblerElement> mAllAssemblerElements;
+        internal int AllAssemblerElementCount
         {
-            foreach(var xInstr in Instructions)
+            get
             {
-                yield return xInstr;
-            }
-            foreach (var xData in DataMembers)
-            {
-                yield return xData;
+                return mInstructions.Count + mDataMembers.Count;
             }
         }
 
-        /// <summary>
-        /// Cleans up the Instructions list. it evaluates all conditionals. 
-        /// </summary>
-        protected void MergeAllElements() {
-            int xIfLevelsToSkip = 0;
-            var xDefines = new List<string>();
-            var xNewAssemblerElements = new List<BaseAssemblerElement>();
-            Console.WriteLine("Assembler Element Count: {0}", (Instructions.Count + DataMembers.Count));
-            Console.WriteLine("Memory in use: {0}", System.Diagnostics.Process.GetCurrentProcess().WorkingSet64);
-            //Console.ReadLine();
-            foreach (var xCurrentInstruction in EnumerateThroughAllElements())
+        public BaseAssemblerElement GetAssemblerElement(int aIndex)
+        {
+            if (aIndex >= mInstructions.Count)
             {
-                var xIfDefined = xCurrentInstruction as IIfDefined;
-                var xEndIfDefined = xCurrentInstruction as IEndIfDefined;
-                var xDefine = xCurrentInstruction as IDefine;
-                var xIfNotDefined = xCurrentInstruction as IIfNotDefined;
-                if (xCurrentInstruction is Comment) {
-                    continue;
-                }
-                if (xIfDefined != null) {
-                    if (xIfLevelsToSkip > 0) {
-                        xIfLevelsToSkip++;
-                    } else if (!xDefines.Contains(xIfDefined.Symbol.ToLowerInvariant())) {
-                        xIfLevelsToSkip++;
-                    }
-                    continue;
-                }
-                if (xIfNotDefined != null) {
-                    if (xIfLevelsToSkip > 0) {
-                        xIfLevelsToSkip++;
-                    } else if (xDefines.Contains(xIfNotDefined.Symbol.ToLower())) {
-                        xIfLevelsToSkip++;
-                    }
-                    continue;
-                }
-                if (xEndIfDefined != null) {
-                    if (xIfLevelsToSkip > 0) {
-                        xIfLevelsToSkip--;
-                    }
-                    continue;
-                }
-                if (xIfLevelsToSkip > 0) {
-                    continue;
-                }
-                if (xDefine != null) {
-                    var xSymbol = xDefine.Symbol.ToLowerInvariant();
-                    if (!xDefines.Contains(xSymbol)) {
-                        xDefines.Add(xSymbol);
-                    }
-                    continue;
-                }
-                xNewAssemblerElements.Add(xCurrentInstruction);
+                return mDataMembers[aIndex - mInstructions.Count];
             }
-            mAllAssemblerElements = xNewAssemblerElements;
+            return mInstructions[aIndex];
         }
-
-        internal List<BaseAssemblerElement> mAllAssemblerElements;
 
         public void FlushDebug(StreamWriter aOutput) {
             BeforeFlush();
-            for(int i = 0; i < mAllAssemblerElements.Count;i++){
-                var xItem = mAllAssemblerElements[i];
-                aOutput.WriteLine("{0} - '{1}'", (mAllAssemblerElements.Count - i), xItem.ToString());
-            }
+            throw new Exception("not implemented");
+//            var xMax = AllAssemblerElementCount;
+//for(int i = 0; i < xMax;i++){
+//                var xItem = GetAssemblerElement()
+//                aOutput.WriteLine("{0} - '{1}'", (mAllAssemblerElements.Count - i), xItem.ToString());
+//            }
         }
 
         public virtual void FlushBinary(Stream aOutput, ulong aBaseAddress) {
             BeforeFlush();
-
+            var xMax = AllAssemblerElementCount;
             var xCurrentAddresss = aBaseAddress;
-            foreach (var xItem in mAllAssemblerElements) {
-                xItem.UpdateAddress(this, ref xCurrentAddresss);
+            for(int i = 0; i <xMax;i++){
+                GetAssemblerElement(i).UpdateAddress(this, ref xCurrentAddresss);
             }
             aOutput.SetLength(aOutput.Length + (long)(xCurrentAddresss - aBaseAddress));
-            foreach (var xItem in mAllAssemblerElements) {
+            for(int i = 0; i <xMax;i++){
+                var xItem = GetAssemblerElement(i);
                 if (!xItem.IsComplete(this)) {
                     throw new Exception("Incomplete element encountered.");
                 }
@@ -263,7 +282,9 @@ namespace Indy.IL2CPU.Assembler {
             if (mDataMembers.Count > 0) {
                 aOutput.WriteLine();
                 foreach (DataMember xMember in mDataMembers) {
-                    aOutput.WriteLine("\t" + xMember);
+                    aOutput.Write("\t");
+                    xMember.WriteText(this, aOutput);
+                    aOutput.WriteLine();
                 }
                 aOutput.WriteLine();
             }
@@ -275,23 +296,30 @@ namespace Indy.IL2CPU.Assembler {
                     string prefix = "\t\t\t";
                     Label xLabel = x as Label;
                     if (xLabel != null) {
-                        string xFullName;
-                        if (xLabel.Name[0] != '.') {
-                            xMainLabel = xLabel.Name;
-                            xFullName = xMainLabel;
-                        } else {
-                            xFullName = xMainLabel + xLabel.Name;
-                        }
-                        aOutput.WriteLine();
-                        if (x.ToString()[0] == '.') {
+                        if (xLabel.Name[0] == '.')
+                        {
                             prefix = "\t\t";
-                        } else {
+                        }
+                        else
+                        {
                             prefix = "\t";
                         }
-                        aOutput.WriteLine(prefix + Label.FilterStringForIncorrectChars(xFullName) + ":");
+                        string xFullName;
+                        aOutput.Write(prefix);
+                        if (xLabel.Name[0] != '.') {
+                            xMainLabel = xLabel.Name;
+                            aOutput.Write(xMainLabel);
+                        } else {
+                            aOutput.Write(xMainLabel);
+                            aOutput.Write(xLabel.Name);
+                        }
+                        aOutput.WriteLine();
+                        //aOutput.WriteLine(prefix + Label.FilterStringForIncorrectChars(xFullName) + ":");
                         continue;
                     }
-                    aOutput.WriteLine(prefix + x);
+                    aOutput.Write(prefix);
+                    x.WriteText(this, aOutput);
+                    aOutput.WriteLine();
                 }
             }
         }

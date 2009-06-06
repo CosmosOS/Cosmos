@@ -11,33 +11,33 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 OpCode = new byte[] { 0x0F, 0x22, 0xC0 },
                 DestinationReg = Registers.CR0,
                 //DestinationRegByte = -1,
-                SourceReg = Guid.Empty,
+                SourceRegAny = true,
                 SourceRegByte = 2
             });
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0x0F, 0x22, 0xD0 },
                 DestinationReg = Registers.CR2,
                 //DestinationRegByte = -1,
-                SourceReg = Guid.Empty,
+                SourceRegAny = true,
                 SourceRegByte = 2
             });
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0x0F, 0x22, 0xD8 },
                 DestinationReg = Registers.CR3,
                 //DestinationRegByte = -1,
-                SourceReg = Guid.Empty,
+                SourceRegAny = true,
                 SourceRegByte = 2
             });
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0x0F, 0x22, 0xE0 },
                 DestinationReg = Registers.CR4,
                 //DestinationRegByte = -1,
-                SourceReg = Guid.Empty,
+                SourceRegAny = true,
                 SourceRegByte = 2
             });
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0x0F, 0x22, 0xE0 },
-                DestinationReg = Guid.Empty,
+                DestinationRegAny = true,
                 DestinationRegByte = 2,
                 DestinationRegBitShiftLeft=0,
                 SourceReg = Registers.CR0,
@@ -46,7 +46,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             }); // CR to register
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0x0F, 0x22, 0xE0 },
-                DestinationReg = Guid.Empty,
+                DestinationRegAny = true,
                 DestinationRegByte = 2,
                 DestinationRegBitShiftLeft = 0,
                 SourceReg = Registers.CR1,
@@ -55,7 +55,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             }); // CR to register
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0x0F, 0x22, 0xE0 },
-                DestinationReg = Guid.Empty,
+                DestinationRegAny = true,
                 DestinationRegByte = 2,
                 DestinationRegBitShiftLeft = 0,
                 SourceReg = Registers.CR2,
@@ -64,7 +64,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             }); // CR to register
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0x0F, 0x22, 0xE0 },
-                DestinationReg = Guid.Empty,
+                DestinationRegAny = true,
                 DestinationRegByte = 2,
                 DestinationRegBitShiftLeft = 0,
                 SourceReg = Registers.CR3,
@@ -73,7 +73,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             }); // CR to register
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0x0F, 0x22, 0xE0 },
-                DestinationReg = Guid.Empty,
+                DestinationRegAny = true,
                 DestinationRegByte = 2,
                 DestinationRegBitShiftLeft = 0,
                 SourceReg = Registers.CR4,
@@ -87,7 +87,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 AllowedSizes = InstructionSizes.Byte | InstructionSizes.Word | InstructionSizes.DWord,
                 OperandSizeByte = 0,
                 OperandSizeBitShiftLeft = 3,
-                DestinationReg = Guid.Empty,
+                DestinationRegAny = true,
                 DestinationRegByte = 0,
                 SourceImmediate = true
             });  // immediate to register
@@ -108,8 +108,8 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 NeedsModRMByte=true,
                 ReverseRegisters=true,
                 InitialModRMByteValue=0xC0,
-                SourceReg=Guid.Empty,
-                DestinationReg=Guid.Empty
+                SourceRegAny = true,
+                DestinationRegAny=true
             }); // register to register
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0xA2 },
@@ -125,7 +125,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 OperandSizeByte = 0,
                 NeedsModRMByte = true,
                 ReverseRegisters=true,
-                SourceReg=Guid.Empty,
+                SourceRegAny = true,
                 DestinationMemory = true
             }); // register to memory
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
@@ -141,7 +141,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 OperandSizeByte=0,
                 NeedsModRMByte = true,
                 SourceMemory=true,
-                DestinationReg=Guid.Empty
+                DestinationRegAny=true
             }); // memory to register
         }
 

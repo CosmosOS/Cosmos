@@ -62,5 +62,12 @@ namespace Indy.IL2CPU.Assembler
         public abstract bool IsComplete(Assembler aAssembler);
         public abstract byte[] GetData(Assembler aAssembler);
         public abstract void WriteData(Assembler aAssembler, Stream aOutput);
+
+        public abstract void WriteText(Assembler aAssembler, TextWriter aOutput);
+
+        public sealed override string ToString()
+        {
+            return base.ToString();
+        }
     }
 }

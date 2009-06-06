@@ -95,58 +95,85 @@ namespace Indy.IL2CPU.Assembler {
 			private set;
 		}
 
-		public override string ToString() {
-            if(RawDefaultValue!=null) {
-                if(RawDefaultValue.Length==0) {
-                    return Name + ":";
+        public override void WriteText(Assembler aAssembler, TextWriter aOutput)
+        {
+            if (RawDefaultValue != null)
+            {
+                if (RawDefaultValue.Length == 0)
+                {
+                    aOutput.Write(Name);
+                    aOutput.Write(":");
                 }
                 if ((from item in RawDefaultValue
-                     group item by item into i
-                     select i).Count() > 1 || RawDefaultValue.Length<250) {
-                    StringBuilder xSB = new StringBuilder();
-                    if(IsGlobal) {
-                        xSB.AppendLine("global " + Name + "\r\n");
+                     group item by item
+                     into i
+                         select i).Count() > 1 || RawDefaultValue.Length < 250)
+                {
+                    if (IsGlobal)
+                    {
+                        aOutput.Write("global ");
+                        aOutput.WriteLine(Name);
                     }
-                    xSB.AppendFormat("{0} db ", Name);
-                    for (int i = 0; i < (RawDefaultValue.Length - 1); i++) {
-                        xSB.AppendFormat("{0}, ",
-                                         RawDefaultValue[i]);
+                    aOutput.Write(Name);
+                    aOutput.Write(" db ");
+                    for (int i = 0; i < (RawDefaultValue.Length - 1); i++)
+                    {
+                        aOutput.Write(RawDefaultValue[i]);
+                        aOutput.Write(", ");
                     }
-                    xSB.Append(RawDefaultValue.Last());
-                    return xSB.ToString();
-                } else {
+                    aOutput.Write(RawDefaultValue.Last());
+                }
+                else
+                {
                     //aOutputWriter.WriteLine("TIMES 0x50000 db 0");
-                    return "global " + Name + "\r\n" + Name + ": TIMES " + RawDefaultValue.Count() + " db " + RawDefaultValue[0];
+                    aOutput.Write("global ");
+                    aOutput.WriteLine(Name);
+                    aOutput.Write(Name);
+                    aOutput.Write(": TIMES ");
+                    aOutput.Write(RawDefaultValue.Length);
+                    aOutput.Write(" db ");
+                    aOutput.Write(RawDefaultValue[0]);
                 }
+                return;
             }
-            if (UntypedDefaultValue != null) {
+            if (UntypedDefaultValue != null)
+            {
                 StringBuilder xSB = new StringBuilder();
-                if (IsGlobal) {
-                    xSB.AppendLine("global " + Name + "\r\n");
+                if (IsGlobal)
+                {
+                    aOutput.Write("global ");
+                    aOutput.WriteLine(Name);
                 }
-                xSB.AppendFormat("{0} dd ", Name);
-                Func<object, string> xGetTextForItem = delegate(object aItem) {
-                    var xElementRef = aItem as ElementReference;
-                    if (xElementRef == null) {
-                        return (aItem??0).ToString();
-                    } else {
-                        if (xElementRef.Offset == 0) {
-                            return xElementRef.Name;
-                        }
-                        return xElementRef.Name + " + " + xElementRef.Offset;
-                    }
-                };
-                for (int i = 0; i < (UntypedDefaultValue.Length - 1); i++) {
-                    xSB.AppendFormat("{0}, ",
-                                     xGetTextForItem(UntypedDefaultValue[i]));
+                aOutput.Write(Name);
+                aOutput.Write(" dd ");
+                Func<object, string> xGetTextForItem = delegate(object aItem)
+                                                           {
+                                                               var xElementRef = aItem as ElementReference;
+                                                               if (xElementRef == null)
+                                                               {
+                                                                   return (aItem ?? 0).ToString();
+                                                               }
+                                                               else
+                                                               {
+                                                                   if (xElementRef.Offset == 0)
+                                                                   {
+                                                                       return xElementRef.Name;
+                                                                   }
+                                                                   return xElementRef.Name + " + " + xElementRef.Offset;
+                                                               }
+                                                           };
+                for (int i = 0; i < (UntypedDefaultValue.Length - 1); i++)
+                {
+                    aOutput.Write(xGetTextForItem(UntypedDefaultValue[i]));
+                    aOutput.Write(", ");
                 }
-                xSB.Append(xGetTextForItem(UntypedDefaultValue.Last()));
-                return xSB.ToString();
+                aOutput.Write(xGetTextForItem(UntypedDefaultValue.Last()));
+                return;
             }
             throw new Exception("Situation unsupported!");
-		}
+        }
 
-		public int CompareTo(DataMember other) {
+	    public int CompareTo(DataMember other) {
 			return String.Compare(Name, other.Name);
 		}
 

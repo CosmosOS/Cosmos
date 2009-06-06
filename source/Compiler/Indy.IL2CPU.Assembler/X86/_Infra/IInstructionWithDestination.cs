@@ -10,7 +10,8 @@ namespace Indy.IL2CPU.Assembler.X86 {
             set;
         }
 
-        Guid DestinationReg {
+        RegistersEnum? DestinationReg
+        {
             get;
             set;
         }

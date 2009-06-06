@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86 {
     [OpCode("jmp")]
-    public class JumpToSegment : IL2CPU.Assembler.Instruction {
+    public class JumpToSegment : IL2CPU.Assembler.X86.Instruction {
         public ElementReference DestinationRef {
             get;
             set;
@@ -16,12 +16,18 @@ namespace Indy.IL2CPU.Assembler.X86 {
             set;
         }
 
-        public override string ToString() {
-            if (DestinationRef != null) {
-                return "jmp " + Segment + ":" + DestinationRef.ToString();
-            } else {
-                return "jmp " + Segment + ":0x0";
-            }
+        public override void WriteText(Indy.IL2CPU.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput)
+        {
+                if (DestinationRef != null) {
+                    aOutput.Write("jmp ");
+                    aOutput.Write(Segment);
+                    aOutput.Write(":");
+                    aOutput.Write(DestinationRef.ToString());
+                } else {
+                    aOutput.Write("jmp ");
+                    aOutput.Write(Segment);
+                    aOutput.Write(":0x0");
+                }
         }
 
         public string DestinationLabel {

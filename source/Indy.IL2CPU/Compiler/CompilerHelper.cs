@@ -225,6 +225,7 @@ namespace Indy.IL2CPU.Compiler
                     SaveAssembler(aAssembly, xCompiler.Assembler);
                 }
             }
+            GC.Collect();
         }
 
 
@@ -245,9 +246,16 @@ namespace Indy.IL2CPU.Compiler
 
         private void DoFullRecompile()
         {
+            int xTest = 0;
             foreach (var xAsm in mAllAssemblies)
             {
                 CompileAssembly(xAsm);
+                xTest++;
+                GC.Collect();
+                //if (xTest == 3)
+                //{
+                //    return;
+                //}
             }
         }
 

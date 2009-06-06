@@ -10,7 +10,8 @@ namespace Indy.IL2CPU.Assembler.X86 {
             set;
         }
 
-        Guid SourceReg {
+        RegistersEnum? SourceReg
+        {
             get;
             set;
         }

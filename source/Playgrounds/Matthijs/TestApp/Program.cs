@@ -49,10 +49,11 @@ namespace TestApp {
                 xCompileHelper.Plugs.Add(Path.Combine(Path.Combine(xBasePath, "Plugs"), "Cosmos.Hardware.Plugs.dll"));
                 xCompileHelper.Plugs.Add(Path.Combine(Path.Combine(xBasePath, "Plugs"), "Cosmos.Sys.Plugs.dll"));
                 xCompileHelper.CompileExe(typeof(MatthijsTest.Program).Assembly);
+
             }
             catch (Exception E)
             {
-                Console.WriteLine("Error: " + E.ToString());
+                Console.WriteLine("Error: " + E.ToString()); Console.ReadLine();
                 if (E.Message == "Temporary abort")
                 {
 Terminate = true;
@@ -61,9 +62,10 @@ Terminate = true;
             finally
             {
                 Console.WriteLine("Done.");
+                GC.Collect();
                 if (!Terminate)
                 {
-                    Console.ReadLine();
+                    //Console.ReadLine();
                 }
             }
         }

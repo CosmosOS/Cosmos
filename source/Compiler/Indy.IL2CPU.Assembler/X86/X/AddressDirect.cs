@@ -7,9 +7,10 @@ namespace Indy.IL2CPU.Assembler.X86.X {
     public class AddressDirect : Address {
         public readonly string Label;
         public readonly uint Address;
-        public readonly Guid Register;
+        public readonly RegistersEnum? Register;
 
-        public AddressDirect(Guid aRegister) {
+        public AddressDirect(RegistersEnum aRegister)
+        {
             Register = aRegister;
         }
 
@@ -25,8 +26,8 @@ namespace Indy.IL2CPU.Assembler.X86.X {
             if (Label == null) {
                 return Address.ToString();
             } else {
-                if (Register != Guid.Empty) {
-                    return Registers.GetRegisterName(Register);
+                if (Register != null) {
+                    return Registers.GetRegisterName(Register.Value);
                 }
                 return Label;
             }

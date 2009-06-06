@@ -10,9 +10,10 @@ namespace Indy.IL2CPU.Assembler {
 			get { return mMnemonic; }
 		}
 
-		public override string ToString() {
-			return Mnemonic;
-		}
+        public override void WriteText(Assembler aAssembler, TextWriter aOutput)
+        {
+            aOutput.Write(mMnemonic);
+        }
 
 		public Instruction():this(true) {
 		}

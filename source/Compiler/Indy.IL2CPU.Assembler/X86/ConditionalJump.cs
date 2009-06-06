@@ -19,9 +19,10 @@ namespace Indy.IL2CPU.Assembler.X86 {
             set;
         }
 
-        public override string ToString() {
-            mMnemonic = "j" + Condition.GetMnemonic();
-            return base.ToString();
+        public override void WriteText(Indy.IL2CPU.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput)
+        {
+            mMnemonic = String.Intern("j" + Condition.GetMnemonic());
+            base.WriteText(aAssembler, aOutput);
         }
     }
 }

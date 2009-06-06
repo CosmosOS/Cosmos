@@ -13,7 +13,5 @@ namespace Indy.IL2CPU.Assembler.X86 {
             get;
             set;
         }
-
-        public override abstract string ToString();
     }
 }

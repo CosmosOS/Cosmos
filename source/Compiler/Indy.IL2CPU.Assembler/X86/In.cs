@@ -14,9 +14,10 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 DestinationReg=Registers.AL
             }); // fixed port (register)
         }
-
-        public override string ToString() {
-            return base.ToString() + ", DX";
+        public override void WriteText(Indy.IL2CPU.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput)
+        {
+            base.WriteText(aAssembler, aOutput);
+            aOutput.Write(", DX");
         }
     }
 }

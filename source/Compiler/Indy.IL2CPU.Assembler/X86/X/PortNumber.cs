@@ -5,9 +5,10 @@ using System.Text;
 
 namespace Indy.IL2CPU.Assembler.X86.X {
     public class PortNumber {
-        public readonly Guid Register;
+        public readonly RegistersEnum Register;
 
-        public PortNumber(Guid aRegister) {
+        public PortNumber(RegistersEnum aRegister)
+        {
             Register = aRegister;
         }
 

@@ -25,7 +25,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             }); // indirect at memory
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0xFF },
-                DestinationReg = Guid.Empty,
+                DestinationRegAny = true,
                 AllowedSizes = InstructionSizes.DWord,
                 ReverseRegisters=true,
                 NeedsModRMByte = true,

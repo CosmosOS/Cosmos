@@ -10,7 +10,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 OperandSizeByte=1,
                 NeedsModRMByte=true,
                 DestinationMemory=true,
-                SourceReg=Guid.Empty,
+                SourceRegAny = true,
                 ReverseRegisters=true
             }); // register to memory
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
@@ -19,8 +19,8 @@ namespace Indy.IL2CPU.Assembler.X86 {
                 NeedsModRMByte=true,
                 ReverseRegisters=true,
                 InitialModRMByteValue = 0xC0,
-                SourceReg=Guid.Empty,
-                DestinationReg=Guid.Empty
+                SourceRegAny = true,
+                DestinationRegAny=true
             }); // register1, register2
         }
 	}

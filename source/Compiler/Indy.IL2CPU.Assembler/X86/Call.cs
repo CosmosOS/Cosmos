@@ -14,7 +14,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             }); // direct value
             aData.EncodingOptions.Add(new InstructionData.InstructionEncodingOption {
                 OpCode = new byte[] { 0xFF, 0xD0 },
-                DestinationReg = Guid.Empty,
+                DestinationRegAny = true,
                 DestinationRegByte=1,
                 AllowedSizes = InstructionSizes.DWord
             }); // register indirect
