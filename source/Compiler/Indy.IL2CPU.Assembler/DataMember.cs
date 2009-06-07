@@ -103,6 +103,7 @@ namespace Indy.IL2CPU.Assembler {
                 {
                     aOutput.Write(Name);
                     aOutput.Write(":");
+                    return;
                 }
                 if ((from item in RawDefaultValue
                      group item by item
