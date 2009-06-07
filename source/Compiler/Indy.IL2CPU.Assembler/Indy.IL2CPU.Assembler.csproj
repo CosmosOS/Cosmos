@@ -62,6 +62,7 @@
     <Compile Include="Define.cs" />
     <Compile Include="ElementReference.cs" />
     <Compile Include="EndIfDefined.cs" />
+    <Compile Include="X86\ExternalLabel.cs" />
     <Compile Include="IfDefined.cs" />
     <Compile Include="IfNotDefined.cs" />
     <Compile Include="ImportMember.cs" />

@@ -55,6 +55,8 @@ namespace Indy.IL2CPU.IL.X86
             {
                 CtorDef = DynamicMethodEmit.GetDynamicMethod(CtorDef);
             }
+            var xAllocInfo = GetService<IMetaDataInfoService>().GetMethodInfo(GCImplementationRefs.AllocNewObjectRef,
+                                                                              false);
             Assemble(
                 Assembler,
                 CtorDef,
@@ -65,7 +67,8 @@ namespace Indy.IL2CPU.IL.X86
                 mNextLabel,
                 GetService<IMetaDataInfoService>().GetTypeInfo(CtorDef.DeclaringType),
                 GetService<IMetaDataInfoService>().GetMethodInfo(CtorDef, false),
-                GetServiceProvider()
+                GetServiceProvider(),
+                xAllocInfo.LabelName
             );
         }
 
@@ -79,7 +82,8 @@ namespace Indy.IL2CPU.IL.X86
             string aNextLabel,
             TypeInformation aCtorDeclTypeInfo,
             MethodInformation aCtorMethodInfo,
-            IServiceProvider aServiceProvider
+            IServiceProvider aServiceProvider,
+            string aAllocMemLabel
         )
         {
             if (aCtorDef != null)
@@ -114,7 +118,10 @@ namespace Indy.IL2CPU.IL.X86
                 new Push { DestinationReg = Registers.ESP, DestinationIsIndirect = true };
                 new Push { DestinationReg = Registers.ESP, DestinationIsIndirect = true };
                 new Push { DestinationReg = Registers.ESP, DestinationIsIndirect = true };
-                new Assembler.X86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.IncRefCountRef) };
+                var xIncRefInfo =
+                    aServiceProvider.GetService<IMetaDataInfoService>().GetMethodInfo(
+                        GCImplementationRefs.IncRefCountRef, false);
+                new Assembler.X86.Call { DestinationLabel = xIncRefInfo.LabelName };
                 //new CPUx86.Test("ecx", "2");
                 //new CPUx86.JumpIfEquals(aCurrentLabel + "_NO_ERROR_2");
                 //for (int i = 1; i < xCtorInfo.Arguments.Length; i++) {
@@ -123,7 +130,7 @@ namespace Indy.IL2CPU.IL.X86
                 //new CPUx86.Add("esp", "16");
                 //Call.EmitExceptionLogic(aAssembler, aCurrentMethodInformation, aCurrentLabel + "_NO_ERROR_2", false);
                 //new CPU.Label(aCurrentLabel + "_NO_ERROR_2");
-                new Assembler.X86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.IncRefCountRef) };
+                new Assembler.X86.Call { DestinationLabel = xIncRefInfo.LabelName };
                 //new CPUx86.Test("ecx", "2");
                 //new CPUx86.JumpIfEquals(aCurrentLabel + "_NO_ERROR_3");
                 //for (int i = 1; i < xCtorInfo.Arguments.Length; i++) {

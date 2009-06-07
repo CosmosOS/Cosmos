@@ -136,7 +136,9 @@ namespace Indy.IL2CPU.IL.X86 {
                 new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = mThisOffset };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
                 new CPUx86.Push { DestinationRef = ElementReference.New(mMethodIdentifier), DestinationIsIndirect = true };
-                new CPUx86.Call { DestinationLabel = CPU.Label.GenerateLabelName(VTablesImplRefs.GetMethodAddressForTypeRef) };
+                var xGetMethodAddrInfo =
+                    GetService<IMetaDataInfoService>().GetMethodInfo(VTablesImplRefs.GetMethodAddressForTypeRef, false);
+                new CPUx86.Call { DestinationLabel = xGetMethodAddrInfo.LabelName};
 
                 /*
                  * On the stack now:

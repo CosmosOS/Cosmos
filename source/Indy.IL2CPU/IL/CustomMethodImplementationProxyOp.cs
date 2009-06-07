@@ -10,7 +10,11 @@ namespace Indy.IL2CPU.IL {
 		public readonly MethodInformation MethodInfo;
 		public CustomMethodImplementationProxyOp(ILReader aReader, MethodInformation aMethodInfo)
 			: base(aReader, aMethodInfo) {
-			MethodInfo = aMethodInfo;
+            if(aMethodInfo==null)
+            {
+Console.Write("");
+            }
+		    MethodInfo = aMethodInfo;
 		}
 
 		public MethodBase ProxiedMethod;
@@ -32,7 +36,11 @@ namespace Indy.IL2CPU.IL {
 					FieldAccessAttribute xFieldAccess = (FieldAccessAttribute)xParam.GetCustomAttributes(typeof(FieldAccessAttribute), true).FirstOrDefault();
 					if (xFieldAccess != null) {
 						Ldarg(0);
-						if (!MethodInfo.TypeInfo.Fields.ContainsKey(xFieldAccess.Name)) {
+                        if(MethodInfo==null || MethodInfo.TypeInfo==null || MethodInfo.TypeInfo.Fields==null||xFieldAccess==null)
+                        {
+                            Console.Write("");
+                        }
+					    if (!MethodInfo.TypeInfo.Fields.ContainsKey(xFieldAccess.Name)) {
 							throw new Exception("Field '" + xFieldAccess.Name + "' not found!");
 						}
 						Ldflda(MethodInfo.TypeInfo, MethodInfo.TypeInfo.Fields[xFieldAccess.Name]);

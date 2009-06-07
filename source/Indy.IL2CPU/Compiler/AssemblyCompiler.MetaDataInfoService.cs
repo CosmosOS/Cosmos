@@ -23,7 +23,7 @@ namespace Indy.IL2CPU.Compiler
 
         public MethodInformation GetMethodInfo(MethodBase aMethod, bool aDebugMode)
         {
-            return GetMethodInfo(aMethod, aMethod, Label.GenerateLabelName(aMethod), GetTypeInfo(aMethod.DeclaringType), aDebugMode);
+            return GetMethodInfo(aMethod, aMethod, MethodInfoLabelGenerator.GenerateLabelName(aMethod), GetTypeInfo(aMethod.DeclaringType), aDebugMode);
         }
 
         public MethodInformation GetMethodInfo(MethodBase aCurrentMethodForArguments,
@@ -33,6 +33,13 @@ namespace Indy.IL2CPU.Compiler
                                               bool aDebugMode,
                                               IDictionary<string, object> aMethodData)
         {
+            if (aCurrentMethodForLocals.DeclaringType.Assembly != this.Assembly)
+            {
+                if (!mExternals.Contains(aMethodName))
+                {
+                    mExternals.Add(aMethodName);
+                }
+            }
             MethodInformation xMethodInfo;
             {
                 MethodInformation.Variable[] xVars = new MethodInformation.Variable[0];
@@ -325,12 +332,28 @@ namespace Indy.IL2CPU.Compiler
 
         public string GetMethodIdLabel(MethodBase aMethod)
         {
-            return Label.FilterStringForIncorrectChars(aMethod.GetFullName() + "__METHOD_ID");
+            var xLabel = Label.FilterStringForIncorrectChars(aMethod.GetFullName() + "__METHOD_ID"); 
+            if (aMethod.DeclaringType.Assembly != Assembly)
+            {
+                if (!mExternals.Contains(xLabel))
+                {
+                    mExternals.Add(xLabel);
+                }
+            }
+            return xLabel;
         }
 
         public string GetTypeIdLabel(Type aType)
         {
-            return Label.FilterStringForIncorrectChars(aType.AssemblyQualifiedName + "__TYPE_ID");
+            var xLabel = Label.FilterStringForIncorrectChars(aType.AssemblyQualifiedName + "__TYPE_ID");
+            if(aType.Assembly != Assembly)
+            {
+                if(!mExternals.Contains(xLabel))
+                {
+                    mExternals.Add(xLabel);
+                }
+            }
+            return xLabel;
         }
 
         public IDictionary<string, TypeInformation.Field> GetTypeFieldInfo(MethodBase aCurrentMethod,
@@ -390,6 +413,19 @@ namespace Indy.IL2CPU.Compiler
             return xTypeInfo.NeedsGC
                        ? xTypeInfo.StorageSize + ObjectImpl.FieldDataOffset
                        : xTypeInfo.StorageSize;
+        }
+
+        public string GetStaticFieldLabel(FieldInfo aField)
+        {
+            var xLabel = DataMember.GetStaticFieldName(aField);
+            if(aField.DeclaringType.Assembly!=Assembly)
+            {
+                if(!mExternals.Contains(xLabel))
+                {
+                    mExternals.Add(xLabel);
+                }
+            }
+            return xLabel;
         }
     }
 }

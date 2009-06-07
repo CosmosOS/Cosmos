@@ -306,13 +306,7 @@ namespace Indy.IL2CPU.Assembler {
                         }
                         string xFullName;
                         aOutput.Write(prefix);
-                        if (xLabel.Name[0] != '.') {
-                            xMainLabel = xLabel.Name;
-                            aOutput.Write(xMainLabel);
-                        } else {
-                            aOutput.Write(xMainLabel);
-                            aOutput.Write(xLabel.Name);
-                        }
+                        x.WriteText(this, aOutput);
                         aOutput.WriteLine();
                         //aOutput.WriteLine(prefix + Label.FilterStringForIncorrectChars(xFullName) + ":");
                         continue;

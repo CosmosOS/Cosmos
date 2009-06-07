@@ -40,6 +40,8 @@ namespace Indy.IL2CPU.IL.X86
             //new CPUx86.JumpIfNotEqual(aNextLabel);
             new CPU.Label(aCurrentLabel + "_Step1");
             Type xNullRefExcType = typeof(NullReferenceException);
+            var xAllocInfo = aServiceProvider.GetService<IMetaDataInfoService>().GetMethodInfo(GCImplementationRefs.AllocNewObjectRef,
+                                                                              false);
             Newobj.Assemble(aAssembler,
                             xNullRefExcType.GetConstructor(new Type[0]),
                             aNullRefExcTypeId,
@@ -49,16 +51,21 @@ namespace Indy.IL2CPU.IL.X86
                             aCurrentLabel + "__After_NullRef_ctor",
                             aNullRefExcTypeInfo,
                             aNullRefExcCtorMethodInfo, 
-                            aServiceProvider);
+                            aServiceProvider,
+                            xAllocInfo.LabelName);
             new CPU.Label(aCurrentLabel + "__After_NullRef_ctor");
             aAssembler.StackContents.Pop();
+            var xCurrExcLabel = aServiceProvider.GetService<IMetaDataInfoService>().GetStaticFieldLabel(CPU.Assembler.CurrentExceptionRef);
             new CPUx86.Move
             {
-                DestinationRef = ElementReference.New(DataMember.GetStaticFieldName(CPU.Assembler.CurrentExceptionRef)),
+                DestinationRef = ElementReference.New(xCurrExcLabel),
                 DestinationIsIndirect = true,
                 SourceReg = CPUx86.Registers.EAX
             };
-            new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(CPU.Assembler.CurrentExceptionOccurredRef) };
+            var xExcOccurrentInfo =
+                aServiceProvider.GetService<IMetaDataInfoService>().GetMethodInfo(
+                    CPU.Assembler.CurrentExceptionOccurredRef, false);
+            new CPUx86.Call { DestinationLabel = xExcOccurrentInfo.LabelName };
             new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceValue = 3 };
             aEmitCleanupMethod();
             Call.EmitExceptionLogic(aAssembler,
@@ -194,7 +201,8 @@ namespace Indy.IL2CPU.IL.X86
             xLdStr.SetServiceProvider(aServiceProvider);
             xLdStr.Assembler = aAssembler;
             xLdStr.Assemble();
-
+            var xAllocInfo = aServiceProvider.GetService<IMetaDataInfoService>().GetMethodInfo(GCImplementationRefs.AllocNewObjectRef,
+                                                                              false);
             Newobj.Assemble(aAssembler,
                             aException.GetConstructor(new Type[] {typeof (string)}),
                             aServiceProvider.GetService<IMetaDataInfoService>().GetTypeIdLabel(aException),
@@ -205,7 +213,8 @@ namespace Indy.IL2CPU.IL.X86
                             aServiceProvider.GetService<IMetaDataInfoService>().GetTypeInfo(aException),
                             aServiceProvider.GetService<IMetaDataInfoService>().GetMethodInfo(
                                 aException.GetConstructor(new Type[] {typeof (string)}), false),
-                            aServiceProvider);
+                            aServiceProvider,
+                            xAllocInfo.LabelName);
         }
 
         public static void Multiply(Assembler.Assembler aAssembler, IServiceProvider aServiceProvider, string aCurrentLabel, MethodInformation aCurrentMethodInfo, uint aCurrentOffset, string aNextLabel)
@@ -525,7 +534,8 @@ namespace Indy.IL2CPU.IL.X86
                 new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceRef = ElementReference.New(xCurExceptionFieldName), SourceIsIndirect = true };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
                 new CPUx86.Push { DestinationRef = ElementReference.New(GetService<IMetaDataInfoService>().GetTypeIdLabel(mCatchType)), DestinationIsIndirect = true };
-                new CPUx86.Call { DestinationLabel = Label.GenerateLabelName(VTablesImplRefs.IsInstanceRef) };
+                var xIsInstInfo = GetService<IMetaDataInfoService>().GetMethodInfo(VTablesImplRefs.IsInstanceRef, false);
+                new CPUx86.Call { DestinationLabel = xIsInstInfo.LabelName };
                 new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = mNextInstructionLabel };
             }

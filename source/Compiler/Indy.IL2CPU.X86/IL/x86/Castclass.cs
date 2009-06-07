@@ -68,6 +68,8 @@ namespace Indy.IL2CPU.IL.X86 {
             new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotEqual, DestinationLabel = mNextOpLabel };
 			new CPU.Label(mReturnNullLabel);
             new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
+            var xAllocInfo = GetService<IMetaDataInfoService>().GetMethodInfo(GCImplementationRefs.AllocNewObjectRef,
+                                                                              false);
             Newobj.Assemble(Assembler, 
                             typeof(InvalidCastException).GetConstructor(new Type[0]), 
                             GetService<IMetaDataInfoService>().GetTypeIdLabel(typeof(InvalidCastException)), 
@@ -77,8 +79,8 @@ namespace Indy.IL2CPU.IL.X86 {
                             mThisLabel + "_After_NewException",
                             GetService<IMetaDataInfoService>().GetTypeInfo(typeof(InvalidCastException)),
                             GetService<IMetaDataInfoService>().GetMethodInfo(typeof(InvalidCastException).GetConstructor(new Type[0]), false),
-                            GetServiceProvider()
-                            );
+                            GetServiceProvider(),
+                            xAllocInfo.LabelName);
             new CPU.Label(mThisLabel + "_After_NewException");
 			Call.EmitExceptionLogic(Assembler, (uint)mCurrentILOffset, mMethodInfo, mNextOpLabel, false, null);
 		}

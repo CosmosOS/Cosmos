@@ -63,9 +63,61 @@ namespace System
 #else
         public static string GetFullName(this MethodBase aMethod)
         {
-            return GenerateFullName(aMethod);
+            var xResult = GenerateFullName(aMethod);
+            if (xResult == "System.Void  System.Array.Sort<>(T[], <T>)")
+            {
+                return GenerateFullName(aMethod);
+            }
+            return xResult;
         }
 #endif
+
+        private static string GetFullName(this Type aType)
+        {
+            if(aType.IsGenericParameter)
+            {
+                return aType.Name;
+            }
+            var xSB = new StringBuilder();
+            if(aType.IsArray)
+            {
+                xSB.Append(aType.GetElementType().GetFullName());
+                xSB.Append("[");
+                int xRank = aType.GetArrayRank();
+                while(xRank > 1)
+                {
+                    xSB.Append(",");
+                    xRank--;
+                }
+                xSB.Append("]");
+                return xSB.ToString();
+            }
+            if(aType.IsByRef && aType.HasElementType)
+            {
+                return "&" + aType.GetElementType().GetFullName();
+            }
+            if (aType.IsGenericType)
+            {
+                xSB.Append(aType.GetGenericTypeDefinition().FullName);
+            }
+            else
+            {
+                xSB.Append(aType.FullName);
+            }
+            if(aType.ContainsGenericParameters)
+            {
+                xSB.Append("<");
+                var xArgs = aType.GetGenericArguments();
+                for(int i = 0; i < xArgs.Length-1;i++)
+                {
+                    xSB.Append(GetFullName(xArgs[i]));
+                    xSB.Append(", ");
+                }      if(xArgs.Length==0){Console.Write("");}
+                xSB.Append(GetFullName(xArgs.Last()));
+                xSB.Append(">");
+            }
+            return xSB.ToString();
+        }
 
         private static string GenerateFullName(MethodBase aMethod)
         {
@@ -79,7 +131,7 @@ namespace System
             var xMethodInfo = aMethod as MethodInfo;
             if (xMethodInfo != null)
             {
-                xBuilder.Append(xMethodInfo.ReturnType.FullName);
+                xBuilder.Append(xMethodInfo.ReturnType.GetFullName());
             }
             else
             {
@@ -94,9 +146,24 @@ namespace System
                 }
             }
             xBuilder.Append("  ");
-            xBuilder.Append(aMethod.DeclaringType.FullName);
+            xBuilder.Append(aMethod.DeclaringType.GetFullName());
             xBuilder.Append(".");
             xBuilder.Append(aMethod.Name);
+            if (aMethod.IsGenericMethod || aMethod.IsGenericMethodDefinition)
+            {
+                var xGenArgs = aMethod.GetGenericArguments();
+                if (xGenArgs.Length > 0)
+                {
+                    xBuilder.Append("<");
+                    for (int i = 0; i < xGenArgs.Length - 1; i++)
+                    {
+                        xBuilder.Append(xGenArgs[i].FullName);
+                        xBuilder.Append(", ");
+                    }
+                    xBuilder.Append(xGenArgs.Last().FullName);
+                    xBuilder.Append(">");
+                }
+            }
             xBuilder.Append("(");
             var xParams = aMethod.GetParameters();
             for (var i = 0; i < xParams.Length; i++)
@@ -105,7 +172,7 @@ namespace System
                 {
                     continue;
                 }
-                xBuilder.Append(xParams[i].ParameterType.FullName);
+                xBuilder.Append(xParams[i].ParameterType.GetFullName());
                 if (i < (xParams.Length - 1))
                 {
                     xBuilder.Append(", ");

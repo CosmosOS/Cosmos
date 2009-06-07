@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows;
 using Indy.IL2CPU.Assembler;
 using System.IO;
 using System.Reflection;
@@ -13,6 +14,7 @@ using Indy.IL2CPU.Compiler;
 using Indy.IL2CPU.IL.X86;
 using Cosmos.Compiler.Builder;
 using Indy.IL2CPU;
+using System.Collections.ObjectModel;
 
 namespace TestApp {
     class Program {
@@ -21,7 +23,9 @@ namespace TestApp {
             {
                 var xBasePath = Path.GetDirectoryName(typeof(Program).Assembly.Location);
                 var xCompileHelper = new CompilerHelper();
-
+                xCompileHelper.SkipList.Add(typeof(ObservableCollection<>).Assembly);
+                xCompileHelper.SkipList.Add(typeof(Window).Assembly);
+                xCompileHelper.SkipList.Add(typeof(EventManager).Assembly);
                 xCompileHelper.GetCacheStateFile += new Func<Assembly, string>(delegate(Assembly aAssembly)
                 {
                     return Path.Combine(xBasePath, "out\\" + aAssembly.GetName().Name + ".cachestate");
@@ -31,7 +35,7 @@ namespace TestApp {
                     return Path.Combine(xBasePath, "out\\" + aAssembly.GetName().Name + ".checksum");
                 });
                 xCompileHelper.GetOpCodeMap += new Func<Indy.IL2CPU.IL.OpCodeMap>(delegate { return new X86OpCodeMap(); });
-                xCompileHelper.SkipList.Add(typeof(Builder).Assembly);
+                //xCompileHelper.SkipList.Add(typeof(Builder).Assembly);
                 xCompileHelper.GetAssembler += new Func<Assembly, bool, Indy.IL2CPU.Assembler.Assembler>(
                     delegate(Assembly aAssembly, bool aIsMain)
                     {

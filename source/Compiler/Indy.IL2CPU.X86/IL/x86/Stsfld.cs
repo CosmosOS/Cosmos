@@ -39,10 +39,13 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		public override void DoAssemble() {
             var xSize = GetService<IMetaDataInfoService>().GetFieldStorageSize(mField.FieldType);
+		    var xDecRefMethodInfo = GetService<IMetaDataInfoService>().GetMethodInfo(GCImplementationRefs.DecRefCountRef,
+		                                                                             false);
+
 
 			if (mNeedsGC) {
                 new CPUx86.Push { DestinationRef = ElementReference.New(mDataName), DestinationIsIndirect = true };
-				new CPUx86.Call { DestinationLabel = Label.GenerateLabelName(GCImplementationRefs.DecRefCountRef) };
+                new CPUx86.Call { DestinationLabel = xDecRefMethodInfo.LabelName};
 			}
             for (int i = 0; i < (xSize / 4); i++)
             {

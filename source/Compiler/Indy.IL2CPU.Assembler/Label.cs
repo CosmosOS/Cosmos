@@ -78,17 +78,11 @@ namespace Indy.IL2CPU.Assembler {
             if (IsGlobal)
             {
                 aOutput.Write("global ");
-                aOutput.WriteLine(Name);
+                aOutput.WriteLine(FilterStringForIncorrectChars(QualifiedName));
             }
-            aOutput.Write(Name);
+            aOutput.Write(FilterStringForIncorrectChars(QualifiedName));
             aOutput.Write(":");
 		}
-
-		public static string GenerateLabelName(MethodBase aMethod) {
-		    return MethodInfoLabelGenerator.GenerateLabelName(aMethod);
-		}
-
-     
 
         public override bool IsComplete(Assembler aAssembler)
         {

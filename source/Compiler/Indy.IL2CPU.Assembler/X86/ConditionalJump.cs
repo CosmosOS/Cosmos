@@ -21,7 +21,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
 
         public override void WriteText(Indy.IL2CPU.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput)
         {
-            mMnemonic = String.Intern("j" + Condition.GetMnemonic());
+            mMnemonic = String.Intern("j" + Condition.GetMnemonic() + " near");
             base.WriteText(aAssembler, aOutput);
         }
     }

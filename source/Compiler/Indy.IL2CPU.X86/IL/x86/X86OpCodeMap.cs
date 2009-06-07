@@ -153,8 +153,8 @@ namespace Indy.IL2CPU.IL.X86
 				case "System_IntPtr__System_Delegate_GetMulticastInvoke__":
 					{
 						//IL.X86.Op.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
-
-                        new CPUx86.Push { DestinationRef = ElementReference.New(Label.GenerateLabelName(InvokeMulticastRef)) };
+					    var xInvokeInfo = GetService<IMetaDataInfoService>().GetMethodInfo(InvokeMulticastRef, false);
+new CPUx86.Push { DestinationRef = ElementReference.New(xInvokeInfo.LabelName) };
 						break;
 					}
 				case "System_MulticastDelegate___System_Delegate_InternalAllocLike___System_Delegate___":

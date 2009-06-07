@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security;
 using System.Text;
 using System.Reflection;
+using Indy.IL2CPU.Assembler.X86;
 using Indy.IL2CPU.IL;
 using Indy.IL2CPU.Plugs;
 using Indy.IL2CPU.Assembler;
@@ -90,8 +91,44 @@ namespace Indy.IL2CPU.Compiler
             EnsureCanExecute();
             Initialize();
             ScanAssembly();
+            DuplicateTest();
             CompileAllMethods();
             CompileAllStaticFields();
+            WriteAllExternals();
+        }
+
+        private void DuplicateTest()
+        {
+            // temp check
+            var xList = new List<string>();
+            var xDuplicateNames = 0;
+            foreach (var xMethod in Methods)
+            {
+                var xName = xMethod.GetFullName();
+                if (xList.Contains(xName))
+                {
+                    xDuplicateNames++;
+                    Console.WriteLine("Duplicate: '{0}'", xName);
+                }
+                else
+                {
+                    xList.Add(xName);
+                }
+            }
+            Console.WriteLine("Total Duplicate Names: {0}", xDuplicateNames);
+            if(xDuplicateNames>0)
+            {
+                Console.ReadLine();
+            }
+        }
+
+        private void WriteAllExternals()
+        {
+            // todo: any more involved?
+            foreach(var xItem in mExternals)
+            {
+                new ExternalLabel(xItem);
+            }
         }
 
         private void Initialize()
@@ -111,17 +148,30 @@ namespace Indy.IL2CPU.Compiler
 
             int typesToProcess = Types.Count;
 
+            var xMethodComparer = new MethodBaseComparer();
+            var xTest = new HashSet<MethodBase>(xMethodComparer);
+
             for (int i = 0 ; i < typesToProcess ;i++)
             {
                 var xType = Types[i]; 
 
                 foreach (var xMethod in xType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.DeclaredOnly))
                 {
+                    if (xTest.Contains(xMethod))
+                    {
+                        continue;
+                    }
+                    xTest.Add(xMethod);
                     Methods.Add(xMethod);
                 }
                 foreach (var xCtor in xType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.DeclaredOnly))
                 {
+                    if (xTest.Contains(xCtor))
+                    {
+                        continue;
+                    }
                     Methods.Add(xCtor);
+                    xTest.Add(xCtor);
                 }
                 foreach (var xField in xType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly))
                 {
@@ -317,7 +367,7 @@ namespace Indy.IL2CPU.Compiler
             {
                 xTypeInfo = GetTypeInfo(xCurrentMethod.DeclaringType);
             }
-            var xMethodName = Label.GenerateLabelName(xCurrentMethod);
+            var xMethodName = MethodInfoLabelGenerator.GenerateLabelName(xCurrentMethod);
             var xMethodScanInfo = new SortedList<string, object>(StringComparer.InvariantCultureIgnoreCase);
             MethodInformation xMethodInfo;
             try
@@ -796,9 +846,9 @@ namespace Indy.IL2CPU.Compiler
                                                                                       null);
                         if (xOrigStrippedSignature == xStrippedSignature)
                         {
-                            if (!mPlugMethods.ContainsKey(Label.GenerateLabelName(xOrigMethodDef)))
+                            if (!mPlugMethods.ContainsKey(MethodInfoLabelGenerator.GenerateLabelName(xOrigMethodDef)))
                             {
-                                mPlugMethods.Add(Label.GenerateLabelName(xOrigMethodDef),
+                                mPlugMethods.Add(MethodInfoLabelGenerator.GenerateLabelName(xOrigMethodDef),
                                                  xMethod);
                             }
                         }
@@ -811,11 +861,11 @@ namespace Indy.IL2CPU.Compiler
                                                                                       null);
                         if (xOrigStrippedSignature == xStrippedSignature)
                         {
-                            if (mPlugMethods.ContainsKey(Label.GenerateLabelName(xOrigMethodDef)))
+                            if (mPlugMethods.ContainsKey(MethodInfoLabelGenerator.GenerateLabelName(xOrigMethodDef)))
                             {
                                 System.Diagnostics.Debugger.Break();
                             }
-                            mPlugMethods.Add(Label.GenerateLabelName(xOrigMethodDef),
+                            mPlugMethods.Add(MethodInfoLabelGenerator.GenerateLabelName(xOrigMethodDef),
                                              xMethod);
                         }
                     }
@@ -1140,5 +1190,7 @@ namespace Indy.IL2CPU.Compiler
             // If we made it this far, emit the Tracer
             OpCodeMap.EmitOpDebugHeader(Assembler, 0, aLabel);
         }
+
+        private List<string> mExternals = new List<string>();
     }
 }

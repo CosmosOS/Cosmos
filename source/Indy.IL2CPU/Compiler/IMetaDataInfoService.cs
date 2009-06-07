@@ -34,10 +34,14 @@ namespace Indy.IL2CPU.Compiler
 
         void LogMessage(LogSeverityEnum aSeverity, string aMessage, params object[] aArgs);
 
+        string GetStaticFieldLabel(FieldInfo aField);
+
         // VMT support
         string GetTypeIdLabel(Type aType);
 
         string GetMethodIdLabel(MethodBase xMethodDef);
+
+
 
     }
 }

@@ -252,10 +252,10 @@ namespace Indy.IL2CPU.Compiler
                 CompileAssembly(xAsm);
                 xTest++;
                 GC.Collect();
-                //if (xTest == 3)
-                //{
-                //    return;
-                //}
+                if (xTest == 2)
+                {
+                    return;
+                }
             }
         }
 
@@ -302,6 +302,10 @@ namespace Indy.IL2CPU.Compiler
             Action<Type> xCheckType = null;
             xCheckType = new Action<Type>(delegate(Type aType)
             {
+                if(aType==null)
+                {
+                    Console.Write("");
+                }
                 if (aType.IsGenericType && !aType.IsGenericTypeDefinition)
                 {
                     // add to the list of the current assembly
@@ -363,6 +367,11 @@ namespace Indy.IL2CPU.Compiler
                             case OpCodeEnum.Call:
                             case OpCodeEnum.Callvirt:
                             case OpCodeEnum.Newobj:
+                                if (xReader.OperandValueMethod.DeclaringType == null)
+                                {
+                                    // todo: what to do?
+                                    break;
+                                }
                                 xCheckType(xReader.OperandValueMethod.DeclaringType);
                                 if (xReader.OperandValueMethod.IsGenericMethod && !xReader.OperandValueMethod.IsGenericMethodDefinition)
                                 {

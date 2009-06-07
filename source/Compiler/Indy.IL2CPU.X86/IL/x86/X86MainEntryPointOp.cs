@@ -49,7 +49,12 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public override void Exit() {
-			X86MethodFooterOp.AssembleFooter(0, Assembler, new MethodInformation.Variable[0], new MethodInformation.Argument[0], 0, false, false, 0, GetService<IMetaDataInfoService>().GetFieldStorageSize);
+            var xDecRefInfo = GetService<IMetaDataInfoService>().GetMethodInfo(GCImplementationRefs.DecRefCountRef,
+                                                                               false);
+            var xHeapFreeInfo =
+                GetService<IMetaDataInfoService>().GetMethodInfo(typeof(RuntimeEngine).GetMethod("Heap_Free"), false);
+			X86MethodFooterOp.AssembleFooter(0, Assembler, new MethodInformation.Variable[0], new MethodInformation.Argument[0], 0, false, false, 0, GetService<IMetaDataInfoService>().GetFieldStorageSize,
+                xDecRefInfo.LabelName, xHeapFreeInfo.LabelName);
 		}
 	}
 }

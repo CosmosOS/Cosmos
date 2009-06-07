@@ -31,10 +31,6 @@ namespace Indy.IL2CPU.IL.X86
                 DebugMode = aMethodInfo.DebugMode;
                 MethodIsNonDebuggable = aMethodInfo.IsNonDebuggable;
                 LocAllocItemCount = 0;
-                if (aMethodInfo.LabelName.Contains("TestMethodThreeParams") || aMethodInfo.LabelName.Contains("TestMethodComplicated"))
-                {
-                    System.Diagnostics.Debugger.Break();
-                }
                 if (aMethodInfo.MethodData.ContainsKey(Localloc.LocAllocCountMethodDataEntry)) {
                     LocAllocItemCount = (int)aMethodInfo.MethodData[Localloc.LocAllocCountMethodDataEntry];
                 }
@@ -47,10 +43,16 @@ namespace Indy.IL2CPU.IL.X86
             foreach (var xItem in Args) {
                 xArgSize += xItem.Size;
             }
-            AssembleFooter(ReturnSize, Assembler, Locals, Args, xArgSize, DebugMode, MethodIsNonDebuggable, (uint)LocAllocItemCount, GetService<IMetaDataInfoService>().GetFieldStorageSize);
+            var xDecRefInfo = GetService<IMetaDataInfoService>().GetMethodInfo(GCImplementationRefs.DecRefCountRef,
+                                                                               false);
+            var xHeapFreeInfo =
+                GetService<IMetaDataInfoService>().GetMethodInfo(typeof (RuntimeEngine).GetMethod("Heap_Free"), false);
+            AssembleFooter(ReturnSize, Assembler, Locals, Args, xArgSize, DebugMode, MethodIsNonDebuggable,
+                           (uint) LocAllocItemCount, GetService<IMetaDataInfoService>().GetFieldStorageSize,
+                           xDecRefInfo.LabelName, xHeapFreeInfo.LabelName);
         }
 
-        public static void AssembleFooter(uint aReturnSize, Assembler.Assembler aAssembler, MethodInformation.Variable[] aLocals, MethodInformation.Argument[] aArgs, uint aTotalArgsSize, bool aDebugMode, bool aIsNonDebuggable, uint aLocAllocItemCount, Func<Type, uint> aGetStorageSizeDelegate)
+        public static void AssembleFooter(uint aReturnSize, Assembler.Assembler aAssembler, MethodInformation.Variable[] aLocals, MethodInformation.Argument[] aArgs, uint aTotalArgsSize, bool aDebugMode, bool aIsNonDebuggable, uint aLocAllocItemCount, Func<Type, uint> aGetStorageSizeDelegate, string aDecRefLabel, string aHeapFreeLabel)
         {
             uint xReturnSize = aReturnSize;
             if (xReturnSize % 4 > 0)
@@ -101,12 +103,13 @@ namespace Indy.IL2CPU.IL.X86
             new Label(EndOfMethodLabelNameException);
             for (int i = 0; i < aLocAllocItemCount;i++ )
             {
-                new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(typeof(RuntimeEngine).GetMethod("Heap_Free")) };
+                new CPUx86.Call { DestinationLabel = aHeapFreeLabel };
             }
             if (aDebugMode && aIsNonDebuggable)
             {
                 new CPUx86.Call { DestinationLabel = "DebugPoint_DebugResume" };
             }
+            
             if ((from xLocal in aLocals
                  where xLocal.IsReferenceType
                  select 1).Count() > 0 || (from xArg in aArgs
@@ -119,7 +122,7 @@ namespace Indy.IL2CPU.IL.X86
                                  xLocal,
                                  false,
                                  aGetStorageSizeDelegate(xLocal.VariableType));
-                        new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.DecRefCountRef) };
+                        new CPUx86.Call { DestinationLabel = aDecRefLabel };
                     }
                 }
                 foreach (MethodInformation.Argument xArg in aArgs) {
@@ -128,7 +131,7 @@ namespace Indy.IL2CPU.IL.X86
                                  xArg,
                                  false);
                         //,                                 aGetStorageSizeDelegate(xArg.ArgumentType)
-                        new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.DecRefCountRef) };
+                        new CPUx86.Call { DestinationLabel = aDecRefLabel };
                     }
                 }
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };

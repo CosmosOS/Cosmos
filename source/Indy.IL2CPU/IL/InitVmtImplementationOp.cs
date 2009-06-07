@@ -5,9 +5,10 @@ using System.Text;
 using Indy.IL2CPU.Assembler;
 using System.Xml;
 using System.Reflection;
+using Indy.IL2CPU.Compiler;
 
 namespace Indy.IL2CPU.IL {
-    public class MethodBaseComparer : IComparer<MethodBase>
+    public class MethodBaseComparer : IComparer<MethodBase>, IEqualityComparer<MethodBase>
     {
         #region IComparer<MethodBase> Members
         public int Compare(MethodBase x, MethodBase y)
@@ -15,6 +16,16 @@ namespace Indy.IL2CPU.IL {
             return x.GetFullName().CompareTo(y.GetFullName());
         }
         #endregion
+
+        public bool Equals(MethodBase x, MethodBase y)
+        {
+            return Compare(x, y) == 0;
+        }
+
+        public int GetHashCode(MethodBase obj)
+        {
+            return obj.GetFullName().GetHashCode();
+        }
     }
 	public abstract class InitVmtImplementationOp: Op {
 		public delegate int GetMethodIdentifierEventHandler(MethodBase aMethod);
@@ -272,7 +283,8 @@ namespace Indy.IL2CPU.IL {
                                 Push((uint)j);
 
                                 Push((uint)xMethodId);
-                                Push(Label.GenerateLabelName(xMethod));
+                                var xTest = GetService<IMetaDataInfoService>().GetMethodInfo(xMethod, false);
+                                Push(xTest.LabelName);
                                 //xDataValue = Encoding.ASCII.GetBytes(GetFullName(xMethod)).Aggregate("", (b, x) => b + x + ",") + "0";
                                 //xDataName = "____SYSTEM____METHOD___" + DataMember.FilterStringForIncorrectChars(GetFullName(xMethod));
                                 //mAssembler.DataMembers.Add(new DataMember(xDataName, "db", xDataValue));

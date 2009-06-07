@@ -123,10 +123,6 @@ namespace Indy.IL2CPU.IL.X86
                 return;
             }
             mCurrentILOffset = aCurrentILOffset;
-            if (MethodInfoLabelGenerator.GenerateLabelName(aMethod) == "System_IAsyncResult__System_IO_Compression_GZipStream_BeginRead_System_Byte____System_Int32__System_Int32__System_AsyncCallback__System_Object_")
-{
-    Console.WriteLine("");
-}
             bool HasDynamic = DynamicMethodEmit.GetHasDynamicMethod(aMethod);
             if (HasDynamic)
             {
