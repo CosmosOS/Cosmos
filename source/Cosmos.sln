@@ -192,9 +192,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.Package", "..\sou
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Albert", "Albert", "{5F424AF3-8D92-4C0F-AD6D-EB5A187F9FE6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Albert", "..\source2\Users\Albert\Albert\Albert.csproj", "{B2D0F851-65FB-4DE9-A55D-5491062F8FE0}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 59
+		SccNumberOfProjects = 60
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -430,6 +432,10 @@ Global
 		SccProjectTopLevelParentUniqueName58 = Cosmos.sln
 		SccProjectName58 = ../source2/VSIP/Cosmos.VS.Package
 		SccLocalPath58 = ..\\source2\\VSIP\\Cosmos.VS.Package
+		SccProjectUniqueName59 = ..\\source2\\Users\\Albert\\Albert\\Albert.csproj
+		SccProjectTopLevelParentUniqueName59 = Cosmos.sln
+		SccProjectName59 = ../source2/Users/Albert/Albert
+		SccLocalPath59 = ..\\source2\\Users\\Albert\\Albert
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -664,6 +670,10 @@ Global
 		{61535AF6-4A1E-4691-B2BC-039851EF4850}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{61535AF6-4A1E-4691-B2BC-039851EF4850}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{61535AF6-4A1E-4691-B2BC-039851EF4850}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2D0F851-65FB-4DE9-A55D-5491062F8FE0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2D0F851-65FB-4DE9-A55D-5491062F8FE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2D0F851-65FB-4DE9-A55D-5491062F8FE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2D0F851-65FB-4DE9-A55D-5491062F8FE0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -754,5 +764,6 @@ Global
 		{9A806542-A3FE-479B-83C2-E3380BC372F3} = {A4478219-065D-4928-BB4D-4358CAD39A03}
 		{5F424AF3-8D92-4C0F-AD6D-EB5A187F9FE6} = {A4478219-065D-4928-BB4D-4358CAD39A03}
 		{61535AF6-4A1E-4691-B2BC-039851EF4850} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
+		{B2D0F851-65FB-4DE9-A55D-5491062F8FE0} = {5F424AF3-8D92-4C0F-AD6D-EB5A187F9FE6}
 	EndGlobalSection
 EndGlobal
