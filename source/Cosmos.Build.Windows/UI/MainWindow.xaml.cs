@@ -80,10 +80,10 @@ namespace Cosmos.Compiler.Builder
         public void AddToLog(string logMsg)
         {
 
-            if (listInformation.Dispatcher.Thread != Thread.CurrentThread)
-                listInformation.Dispatcher.Invoke(new AddLog(AddToLog), logMsg);
-            else
-                listInformation.Items.Add(logMsg);
+            //if (listInformation.Dispatcher.Thread != Thread.CurrentThread)
+            //    listInformation.Dispatcher.Invoke(new AddLog(AddToLog), logMsg);
+            //else
+            //    listInformation.Items.Add(logMsg);
         }
 
         public IOptionUC OptionUC

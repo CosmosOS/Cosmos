@@ -9,27 +9,28 @@
         >
 
     <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" > 
-    <StackPanel Orientation="Vertical" Name="dockPanel" >
-        
-        
+    <DockPanel Name="dockPanel" >
 
-        <StackPanel Orientation="Horizontal" >
-            <StackPanel Orientation="Vertical" >
+            <StackPanel x:Name="buttonPanel" Margin="15, 15, 15, 10" Orientation="Horizontal"  DockPanel.Dock="Bottom" HorizontalAlignment="Left" VerticalAlignment="Bottom" >
+                <Button Name="butnBuild" Margin="5" IsDefault="True">_Build</Button>
+                <Button Name="butnCancel" Margin="5" IsCancel="True">_Cancel</Button>
+
+            </StackPanel>
+
+
+            <Grid >
+
                 <build:OptionsUC x:Name="optionsUC"  ></build:OptionsUC>
               
-            </StackPanel>
+
 
             <build:BuildUC  x:Name="buildUC" Visibility="Collapsed"></build:BuildUC>
 
-        </StackPanel>
-        <StackPanel x:Name="buttonPanel" Grid.Row="1" Margin="15, 15, 15, 10" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" >
-            <Button Name="butnBuild" Margin="5" IsDefault="True">_Build</Button>
-            <Button Name="butnCancel" Margin="5" IsCancel="True">_Cancel</Button>
+        </Grid>
 
-        </StackPanel>
-        <Expander Header="Log"   Name="logExpander"  ExpandDirection="Down" Visibility="Collapsed">
+        <!--<Expander Header="Log"   Name="logExpander"  ExpandDirection="Down" Visibility="Collapsed">
             <ListBox x:Name="listInformation" Height="Auto"  MinHeight="200"/>
-        </Expander>
-    </StackPanel>
+        </Expander>-->
+    </DockPanel>
 </ScrollViewer>
 </Window>
