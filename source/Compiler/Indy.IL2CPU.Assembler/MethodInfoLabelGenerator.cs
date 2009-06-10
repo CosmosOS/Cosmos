@@ -57,7 +57,7 @@ namespace Indy.IL2CPU.Assembler
             {
                 xSB.Append(aType.FullName);
             }
-            if (aType.ContainsGenericParameters)
+            if (aType.IsGenericType)
             {
                 xSB.Append("<");
                 var xArgs = aType.GetGenericArguments();

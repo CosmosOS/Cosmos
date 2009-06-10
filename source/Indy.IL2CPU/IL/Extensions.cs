@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using Indy.IL2CPU.Assembler;
 
 namespace System
 {
@@ -121,65 +122,7 @@ namespace System
 
         private static string GenerateFullName(MethodBase aMethod)
         {
-            if (aMethod == null)
-            {
-                throw new ArgumentNullException("aMethod");
-            }
-            var xBuilder = new StringBuilder(256);
-            var xParts = aMethod.ToString().Split(' ');
-            var xParts2 = xParts.Skip(1).ToArray();
-            var xMethodInfo = aMethod as MethodInfo;
-            if (xMethodInfo != null)
-            {
-                xBuilder.Append(xMethodInfo.ReturnType.GetFullName());
-            }
-            else
-            {
-                var xCtor = aMethod as ConstructorInfo;
-                if (xCtor != null)
-                {
-                    xBuilder.Append(typeof (void).FullName);
-                }
-                else
-                {
-                    xBuilder.Append(xParts[0]);
-                }
-            }
-            xBuilder.Append("  ");
-            xBuilder.Append(aMethod.DeclaringType.GetFullName());
-            xBuilder.Append(".");
-            xBuilder.Append(aMethod.Name);
-            if (aMethod.IsGenericMethod || aMethod.IsGenericMethodDefinition)
-            {
-                var xGenArgs = aMethod.GetGenericArguments();
-                if (xGenArgs.Length > 0)
-                {
-                    xBuilder.Append("<");
-                    for (int i = 0; i < xGenArgs.Length - 1; i++)
-                    {
-                        xBuilder.Append(xGenArgs[i].GetFullName());
-                        xBuilder.Append(", ");
-                    }
-                    xBuilder.Append(xGenArgs.Last().GetFullName());
-                    xBuilder.Append(">");
-                }
-            }
-            xBuilder.Append("(");
-            var xParams = aMethod.GetParameters();
-            for (var i = 0; i < xParams.Length; i++)
-            {
-                if (xParams[i].Name == "aThis" && i == 0)
-                {
-                    continue;
-                }
-                xBuilder.Append(xParams[i].ParameterType.GetFullName());
-                if (i < (xParams.Length - 1))
-                {
-                    xBuilder.Append(", ");
-                }
-            }
-            xBuilder.Append(")");
-            return String.Intern(xBuilder.ToString());
+            return Label.GetFullName(aMethod);
         }
 
         public static string GetFullName(this FieldInfo aField)

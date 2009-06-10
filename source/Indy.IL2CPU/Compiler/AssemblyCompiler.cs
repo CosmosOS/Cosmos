@@ -587,7 +587,7 @@ namespace Indy.IL2CPU.Compiler
                             while (xReader.Read())
                             {
                                 ExceptionHandlingClause xCurrentHandler = null;
-                                if (xReader != null && xReader.Position == 0x4A)
+                                if (xReader.Position == 0x4A)
                                 {
                                     Console.Write("");
                                 }

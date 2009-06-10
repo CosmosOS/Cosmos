@@ -19,19 +19,21 @@ namespace Indy.IL2CPU.IL.X86 {
 		private int mCurrentILOffset;
 		private MethodInformation mMethodInfo;
 
-        //public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
-        //    Type xType = aReader.OperandValueType;
-        //    if (xType == null)
-        //    {
-        //        throw new Exception("Unable to determine Type!");
-        //    }
-        //    Engine.RegisterType(xType);
-        //    Call.ScanOp(Engine.GetMethodBase(typeof(VTablesImpl),
-        //                                     "IsInstance",
-        //                                     "System.Int32",
-        //                                     "System.Int32"));
-        //    Newobj.ScanOp(typeof(InvalidCastException).GetConstructor(new Type[0]));
-        //}
+        public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData, IServiceProvider aProvider)
+        {
+            Type xType = aReader.OperandValueType;
+            if (xType == null)
+            {
+                throw new Exception("Unable to determine Type!");
+            }
+            aProvider.GetService<IMetaDataInfoService>().GetTypeInfo(xType);
+            Engine.RegisterType(xType);
+            Call.ScanOp(Engine.GetMethodBase(typeof(VTablesImpl),
+                                             "IsInstance",
+                                             "System.Int32",
+                                             "System.Int32"), aProvider);
+            Newobj.ScanOp(typeof(InvalidCastException).GetConstructor(new Type[0]), aProvider);
+        }
 
 		public Castclass(ILReader aReader, MethodInformation aMethodInfo)
 			: base(aReader, aMethodInfo) {

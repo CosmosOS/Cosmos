@@ -16,18 +16,19 @@ namespace Indy.IL2CPU.IL.X86 {
         private string mNextLabel;
         private uint mCurOffset;
         private MethodInformation mCurrentMethodInfo;
-        //public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
-        //    Type xTypeRef = aReader.OperandValueType;
-        //    if (xTypeRef == null)
-        //    {
-        //        throw new Exception("No TypeRef found!");
-        //    }
-        //    Engine.RegisterType(xTypeRef);
-        //    Type xArrayType = Engine.GetType("mscorlib", "System.Array");
-        //    Engine.RegisterType(xArrayType);
-        //    MethodBase xCtor = xArrayType.GetConstructors(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance)[0];
-        //    Engine.QueueMethod(xCtor);
-        //}
+        public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData, IServiceProvider aServiceProvider)
+        {
+            Type xTypeRef = aReader.OperandValueType;
+            if (xTypeRef == null)
+            {
+                throw new Exception("No TypeRef found!");
+            }
+            aServiceProvider.GetService<IMetaDataInfoService>().GetTypeInfo(xTypeRef);
+            Type xArrayType = typeof (Array);
+            aServiceProvider.GetService<IMetaDataInfoService>().GetTypeInfo(xTypeRef);
+            MethodBase xCtor = xArrayType.GetConstructors(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance)[0];
+            aServiceProvider.GetService<IMetaDataInfoService>().GetMethodInfo(xCtor, false);
+        }
 
         public Newarr(Type aTypeRef, uint aCurOffset, MethodInformation aCurrentMethodInfo, string aNextLabel)
             : base(null, null)

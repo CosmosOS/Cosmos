@@ -117,21 +117,15 @@ namespace Indy.IL2CPU.IL.X86
             {
                 if (aMethod.LabelName.EndsWith("__ctor_System_Object__System_IntPtr_"))
                 {
-                    //for (int i = 0; i < aMethodInfo.Arguments.Length; i++) {
-                    //    Op.Ldarg(aAssembler, aMethodInfo.Arguments[i]);
-                    //}
-                    //new Call(CustomImplementations.System.EventHandlerImplRefs.CtorRef) {
-                    //    Assembler = aAssembler
-                    //}.Assemble();
-                    //Engine.QueueMethod(CustomImplementations.System.EventHandlerImplRefs.CtorRef);
-                    //Engine.QueueMethod(aMethod.TypeInfo.TypeDef.GetMethod("Invoke"));
+                    GetService<IMetaDataInfoService>().GetMethodInfo(CustomImplementations.System.EventHandlerImplRefs.CtorRef, false);
+                    GetService<IMetaDataInfoService>().GetMethodInfo(aMethod.TypeInfo.TypeDef.GetMethod("Invoke"), false);
                     return;
                 }
                 if (aMethod.Method.Name == "Invoke")
                 {
-                    //Engine.QueueMethod(InvokeMulticastRef);
-                    //Engine.QueueMethod(typeof(MulticastDelegate).GetMethod("GetInvocationList"));
-                    //Engine.QueueMethod(typeof(Delegate).GetMethod("GetInvocationList"));
+                    GetService<IMetaDataInfoService>().GetMethodInfo(InvokeMulticastRef, false);
+                    GetService<IMetaDataInfoService>().GetMethodInfo(typeof(MulticastDelegate).GetMethod("GetInvocationList"), false);
+                    GetService<IMetaDataInfoService>().GetMethodInfo(typeof(Delegate).GetMethod("GetInvocationList"), false);
                     return;
                 }
             }
@@ -261,14 +255,17 @@ new CPUx86.Push { DestinationRef = ElementReference.New(xInvokeInfo.LabelName) }
         public override void PreProcess(Indy.IL2CPU.Assembler.Assembler mAssembler)
         {
             base.PreProcess(mAssembler);
-            throw new NotImplementedException();
-            //RegisterAllUtilityMethods(Engine.QueueMethod);
-            //Engine.QueueMethod(EventHandlerImplRefs.CtorRef);
-            //Engine.QueueMethod(InvokeMulticastRef);
-            //var xGetInvocationListMethod = typeof(MulticastDelegate).GetMethod("GetInvocationList");
-            //Engine.QueueMethod(xGetInvocationListMethod);
-            //xGetInvocationListMethod = typeof(Delegate).GetMethod("GetInvocationList");
-            //Engine.QueueMethod(xGetInvocationListMethod);
+        }
+
+        public override void RegisterAllUtilityMethods()
+        {
+            base.RegisterAllUtilityMethods();
+            GetService<IMetaDataInfoService>().GetMethodInfo(EventHandlerImplRefs.CtorRef, false);
+            GetService<IMetaDataInfoService>().GetMethodInfo(InvokeMulticastRef, false);
+            var xGetInvocationListMethod = typeof(MulticastDelegate).GetMethod("GetInvocationList");
+            GetService<IMetaDataInfoService>().GetMethodInfo(xGetInvocationListMethod, false);
+            xGetInvocationListMethod = typeof(Delegate).GetMethod("GetInvocationList");
+            GetService<IMetaDataInfoService>().GetMethodInfo(xGetInvocationListMethod, false);
         }
 	}
 }

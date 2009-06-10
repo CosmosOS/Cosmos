@@ -12,12 +12,8 @@ namespace Indy.IL2CPU.IL.X86 {
         public const string LocAllocCountMethodDataEntry = "LocAllocCount";
         public const string LocAllicItemMethodDataEntryTemplate = "LocAllocItem_L{0}";
 
-        public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
+        public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData, IServiceProvider aServiceProvider) {
             // xCurrentMethodLocallocCount contains the number of LocAlloc occurrences
-            if (aReader.Position == 258)
-            {
-                Console.Write("");
-            }
             int xCurrentMethodLocallocCount = 0;
             if (aMethodData.ContainsKey(LocAllocCountMethodDataEntry))
             {

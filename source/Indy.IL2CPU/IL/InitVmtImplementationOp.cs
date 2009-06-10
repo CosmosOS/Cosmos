@@ -59,6 +59,7 @@ namespace Indy.IL2CPU.IL {
 		protected abstract void Push(uint aValue);
         protected abstract void Push(string aLabelName);
 		protected abstract void Call(MethodBase aMethod);
+	    protected abstract void Move(string aDestLabelName, int aValue);
 
 		public override void DoAssemble() {
             XmlWriter xDebug=null;
@@ -110,19 +111,18 @@ namespace Indy.IL2CPU.IL {
                     try
                     {
                         Type xType = mTypes[i];
-                        if (xType.FullName == "MatthijsTest.TestImpl") { System.Diagnostics.Debugger.Break(); }
                         // value contains true if the method is an interface method definition
                         SortedList<MethodBase, bool> xEmittedMethods = new SortedList<MethodBase, bool>(new MethodBaseComparer());
                         foreach (MethodBase xMethod in xType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
                         {
-                            if (Methods.Contains(xMethod) && !xMethod.IsAbstract)
+                            if (Methods.Contains(xMethod))//) && !xMethod.IsAbstract)
                             {
                                 xEmittedMethods.Add(xMethod, false);
                             }
                         }
                         foreach (MethodBase xCtor in xType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
                         {
-                            if (Methods.Contains(xCtor) && !xCtor.IsAbstract)
+                            if (Methods.Contains(xCtor))// && !xCtor.IsAbstract)
                             {
                                 xEmittedMethods.Add(xCtor, false);
                             }
@@ -201,7 +201,9 @@ namespace Indy.IL2CPU.IL {
                         }
                         if (!xType.IsInterface)
                         {
-
+                            //Move(GetService<IMetaDataInfoService>().GetTypeIdLabel(xType), i);
+                            Assembler.DataMembers.Add(
+                                new DataMember(GetService<IMetaDataInfoService>().GetTypeIdLabel(xType), new int[] {i}));
                             Push((uint)xBaseIndex.Value);
                             //Push("0" + xEmittedMethods.Count.ToString("X") + "h");
                             xData = new byte[16 + (xEmittedMethods.Count * 4)];
@@ -279,12 +281,25 @@ namespace Indy.IL2CPU.IL {
                                     if (xNewMethod == null) { System.Diagnostics.Debugger.Break(); }
                                     xMethod = xNewMethod;
                                 }
+                                //Move(GetService<IMetaDataInfoService>().GetMethodIdLabel(xMethod), xMethodId);
+                                Assembler.DataMembers.Add(
+                                    new DataMember(GetService<IMetaDataInfoService>().GetMethodIdLabel(xMethod),
+                                                   new int[] {xMethodId}));
+                        
                                 Push((uint)i);
                                 Push((uint)j);
 
                                 Push((uint)xMethodId);
-                                var xTest = GetService<IMetaDataInfoService>().GetMethodInfo(xMethod, false);
-                                Push(xTest.LabelName);
+                                if (xMethod.IsAbstract)
+                                {
+                                    // abstract methods dont have bodies, oiw, are not emitted
+                                    Push(0);
+                                }
+                                else
+                                {
+                                    var xTest = GetService<IMetaDataInfoService>().GetMethodInfo(xMethod, false);
+                                    Push(xTest.LabelName);
+                                }
                                 //xDataValue = Encoding.ASCII.GetBytes(GetFullName(xMethod)).Aggregate("", (b, x) => b + x + ",") + "0";
                                 //xDataName = "____SYSTEM____METHOD___" + DataMember.FilterStringForIncorrectChars(GetFullName(xMethod));
                                 //mAssembler.DataMembers.Add(new DataMember(xDataName, "db", xDataValue));

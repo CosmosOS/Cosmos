@@ -21,19 +21,19 @@ namespace Indy.IL2CPU.IL.X86
         public uint ILOffset;
         public MethodInformation MethodInformation;
 
-        //public static void ScanOp(MethodBase aCtor)
-        //{
-        //    Call.ScanOp(aCtor);
-        //    Call.ScanOp(GCImplementationRefs.AllocNewObjectRef);
-        //    Call.ScanOp(CPU.Assembler.CurrentExceptionOccurredRef);
-        //    Call.ScanOp(GCImplementationRefs.IncRefCountRef);
-        //}
+        public static void ScanOp(MethodBase aCtor, IServiceProvider aProvider)
+        {
+            Call.ScanOp(aCtor, aProvider);
+            Call.ScanOp(GCImplementationRefs.AllocNewObjectRef, aProvider);
+            Call.ScanOp(CPU.Assembler.CurrentExceptionOccurredRef, aProvider);
+            Call.ScanOp(GCImplementationRefs.IncRefCountRef, aProvider);
+        }
 
-        //public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
-        //{
-        //    var xCtorDef = aReader.OperandValueMethod;
-        //    ScanOp(xCtorDef);
-        //}
+        public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData, IServiceProvider aProvider)
+        {
+            var xCtorDef = aReader.OperandValueMethod;
+            ScanOp(xCtorDef, aProvider);
+        }
 
         public Newobj(ILReader aReader,
                       MethodInformation aMethodInfo)

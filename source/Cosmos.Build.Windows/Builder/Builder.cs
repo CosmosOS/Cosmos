@@ -4,6 +4,8 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using Indy.IL2CPU.Assembler.X86;
+using Indy.IL2CPU.IL.X86;
 using Microsoft.Win32;
 using Indy.IL2CPU;
 //using Indy.IL2CPU.IL.X86;
@@ -22,7 +24,7 @@ namespace Cosmos.Compiler.Builder
                 
         public readonly string ToolsPath;
         public readonly string AsmPath;
-        //public readonly Engine Engine = new Engine();
+        public readonly Engine Engine = new Engine();
 
         public event Action CompileCompleted;
         public event Action BuildCompleted;
@@ -43,8 +45,7 @@ namespace Cosmos.Compiler.Builder
             ToolsPath = BuildPath + @"Tools\";
             AsmPath = ToolsPath + @"asm\";
             // MtW: leave this here, otherwise VS wont copy required dependencies!
-            throw new Exception("remove comment here");
-            //typeof(X86OpCodeMap).Equals(null);
+            typeof(X86OpCodeMap).Equals(null);
 
             //TODO static hack
             BuilderStep.Completed += new Action<string, object>(BuilderStep_Completed);
@@ -414,38 +415,40 @@ namespace Cosmos.Compiler.Builder
         private void RunEngine(object aParam)
         {
             var xParam = (PassedEngineValue)aParam;
-            //Engine.TraceAssemblies = xParam.TraceAssemblies;
-            //Engine.CompilingMethods += OnCompilingMethods;
-            //Engine.CompilingStaticFields += OnCompilingStaticFields;
-            //try
-            //{
-            //    Engine.DebugLog += OnLogMessage;
+            Engine.TraceAssemblies = xParam.TraceAssemblies;
+            Engine.CompilingMethods += OnCompilingMethods;
+            Engine.CompilingStaticFields += OnCompilingStaticFields;
+            try
+            {
+                Engine.DebugLog += OnLogMessage;
 
-            //    LogTime("Engine execute start");
-            //    currentProgress.Step = "Engine Execute";
-            //    Engine.Execute(xParam.aAssembly,
-            //                   xParam.aTargetPlatform,
-            //                   g => Path.Combine(AsmPath, g + ".asm"),
-            //                   xParam.aPlugs,
-            //                   xParam.aDebugMode,
-            //                   xParam.GDBDebug,
-            //                   1,
-            //                   xParam.aOutputDir,
-            //                   (Cosmos.Compiler.Builder.BuildOptions.Load()).UseInternalAssembler); //HACK
-            //    LogTime("Engine execute finish");
-            //}
-            //catch (Exception E)
-            //{
-            //    OnLogMessage(LogSeverityEnum.Error, E.ToString());
-            //}
-            //finally
-            //{
-            //    Engine.CompilingMethods -= OnCompilingMethods;
-            //    Engine.CompilingStaticFields -= OnCompilingStaticFields;
+                LogTime("Engine execute start");
+                currentProgress.Step = "Engine Execute";
+                Engine.Execute(xParam.aAssembly,
+                               xParam.aTargetPlatform,
+                               g => Path.Combine(AsmPath, g + ".asm"),
+                               xParam.aPlugs,
+                               xParam.aDebugMode,
+                               xParam.GDBDebug,
+                               1,
+                               xParam.aOutputDir,
+                               (Cosmos.Compiler.Builder.BuildOptions.Load()).UseInternalAssembler,
+                               new Indy.IL2CPU.IL.X86.X86OpCodeMap(),
+                                new CosmosAssembler(((xParam.aDebugMode != DebugMode.None) && (xParam.aDebugMode != DebugMode.MLUsingGDB))
+                                                                            ? xParam.aDebugComNumber
+                                                                            : (byte)0)); //HACK
+                LogTime("Engine execute finish");
+            }
+            catch (Exception E)
+            {
+                OnLogMessage(LogSeverityEnum.Error, E.ToString());
+            }
+            finally
+            {
+                Engine.CompilingMethods -= OnCompilingMethods;
+                Engine.CompilingStaticFields -= OnCompilingStaticFields;
 
-            //}
-            throw new Exception("Fix building!");
-
+            }
         }
 
         private string GetMonoExeFilename()

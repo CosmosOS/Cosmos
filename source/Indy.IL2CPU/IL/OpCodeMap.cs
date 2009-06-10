@@ -10,7 +10,7 @@ using Indy.IL2CPU.Plugs;
 namespace Indy.IL2CPU.IL {
 	public abstract class OpCodeMap {
 		protected readonly SortedList<OpCodeEnum, Type> mMap = new SortedList<OpCodeEnum, Type>();
-        protected readonly SortedList<OpCodeEnum, Action<ILReader, MethodInformation, SortedList<string, object>>> mScanMethods = new SortedList<OpCodeEnum, Action<ILReader, MethodInformation, SortedList<string, object>>>();
+        protected readonly SortedList<OpCodeEnum, Action<ILReader, MethodInformation, SortedList<string, object>, IServiceProvider>> mScanMethods = new SortedList<OpCodeEnum, Action<ILReader, MethodInformation, SortedList<string, object>, IServiceProvider>>();
 
 		protected OpCodeMap() {
 			MethodHeaderOp = GetMethodHeaderOp();								   
@@ -57,7 +57,8 @@ namespace Indy.IL2CPU.IL {
             if(mScanMethods.ContainsKey(aReader.OpCode)) {
                 mScanMethods[aReader.OpCode](aReader,
                                              aMethod,
-                                             aMethodData);
+                                             aMethodData,
+                                             GetServiceProvider());
             }
         }
 
@@ -72,11 +73,21 @@ namespace Indy.IL2CPU.IL {
 				try {
 					mMap.Add(xItem.OpCode, xItem.Type);
 				    var xMethod = xItem.Type.GetMethod("ScanOp",
-				                         new Type[] {typeof(ILReader), typeof(MethodInformation), typeof(SortedList<string, object>)});
-                    if (xMethod != null) {
+				                         new Type[] {typeof(ILReader), typeof(MethodInformation), typeof(SortedList<string, object>), typeof(IServiceProvider)});
+                    if (xMethod != null)
+                    {
                         mScanMethods.Add(xItem.OpCode,
-                                         (Action<ILReader, MethodInformation, SortedList<string, object>>)Delegate.CreateDelegate(typeof(Action<ILReader, MethodInformation, SortedList<string, object>>),
+                                         (Action<ILReader, MethodInformation, SortedList<string, object>, IServiceProvider>)Delegate.CreateDelegate(typeof(Action<ILReader, MethodInformation, SortedList<string, object>, IServiceProvider>),
                                                                                                                                   xMethod));
+                    }
+                    else
+                    {
+                        // todo: remove:
+                        if (xItem.Type.GetMethod("ScanOp") != null)
+                        {
+                            throw new Exception("Class '" + xItem.Type.FullName +
+                                                "' has a ScanOp method with wrong signature!");
+                        }
                     }
 				} catch {
 					Console.WriteLine("Was adding op " + xItem.OpCode);
@@ -145,7 +156,7 @@ namespace Indy.IL2CPU.IL {
 
 		public abstract void EmitOpDebugHeader(Assembler.Assembler aAssembler, uint aOpId, string aOpLabel);
 
-        protected virtual void RegisterAllUtilityMethods(Action<MethodBase> aRegister) {
+        public virtual void RegisterAllUtilityMethods() {
         }
 
 	    public virtual void PreProcess(Indy.IL2CPU.Assembler.Assembler mAssembler)

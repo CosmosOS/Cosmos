@@ -15,6 +15,16 @@ namespace Indy.IL2CPU.IL.X86 {
 			: base(aReader, aMethodInfo) {
 		}
 
+        protected override void Move(string aDestLabelName, int aValue)
+        {
+            new CPUx86.Move
+                {
+                    DestinationRef = ElementReference.New(aDestLabelName),
+                    DestinationIsIndirect = true,
+                    SourceValue = (uint)aValue
+                };
+        }
+
 		protected override void Push(uint aValue) {
             new CPUx86.Push { DestinationValue = aValue };
 		}

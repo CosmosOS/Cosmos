@@ -26,22 +26,22 @@ namespace Indy.IL2CPU.IL.X86
         private uint mCurrentILOffset;
         private MethodBase mMethod;
 
-        //public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData)
-        //{
-        //    MethodBase xMethod = aReader.OperandValueMethod;
-        //    ScanOp(xMethod);
-        //}
+        public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData, IServiceProvider aServiceProvider)
+        {
+            MethodBase xMethod = aReader.OperandValueMethod;
+            ScanOp(xMethod, aServiceProvider);
+        }
 
-        //public static void ScanOp(MethodBase aTargetMethod)
-        //{
-        //    Engine.QueueMethod(aTargetMethod);
-        //    foreach (ParameterInfo xParam in aTargetMethod.GetParameters())
-        //    {
-        //        Engine.RegisterType(xParam.ParameterType);
-        //    }
-        //    var xTargetMethodInfo = Engine.GetMethodInfo(aTargetMethod, aTargetMethod, MethodInfoLabelGenerator.GenerateLabelName(aTargetMethod), Engine.GetTypeInfo(aTargetMethod.DeclaringType), false);
-        //    Engine.RegisterType(xTargetMethodInfo.ReturnType);
-        //}
+        public static void ScanOp(MethodBase aTargetMethod, IServiceProvider provider)
+        {
+            Engine.QueueMethod(aTargetMethod);
+            foreach (ParameterInfo xParam in aTargetMethod.GetParameters())
+            {
+                Engine.RegisterType(xParam.ParameterType);
+            }
+            var xTargetMethodInfo = provider.GetService<IMetaDataInfoService>().GetMethodInfo(aTargetMethod, aTargetMethod, MethodInfoLabelGenerator.GenerateLabelName(aTargetMethod), Engine.GetTypeInfo(aTargetMethod.DeclaringType), false);
+            provider.GetService<IMetaDataInfoService>().GetTypeInfo(xTargetMethodInfo.ReturnType);
+        }
 
         public Call(MethodBase aMethod,
                     uint aCurrentILOffset,

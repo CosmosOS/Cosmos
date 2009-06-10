@@ -23,30 +23,31 @@ namespace Indy.IL2CPU.IL.X86 {
         private int mExtraStackSpace;
         private MethodBase mMethod;
 
-        //public static void ScanOp(ILReader aReader,
-        //                          MethodInformation aMethodInfo,
-        //                          SortedList<string, object> aMethodData) {
-        //    MethodBase xMethod = aReader.OperandValueMethod;
-        //    if (xMethod == null) {
-        //        throw new Exception("Unable to determine Method!");
-        //    }
-        //    MethodBase xMethodDef = xMethod;
-        //    var xMethodDescription = CPU.MethodInfoLabelGenerator.GenerateLabelName(xMethodDef);
-        //    var xTargetMethodInfo = Engine.GetMethodInfo(xMethodDef,
-        //                                                 xMethodDef,
-        //                                                 xMethodDescription,
-        //                                                 null,
-        //                                                 aMethodInfo.DebugMode);
-        //    foreach (var xParam in xMethodDef.GetParameters()) {
-        //        Engine.RegisterType(xParam.ParameterType);
-        //    }
-        //    Engine.RegisterType(xTargetMethodInfo.ReturnType);
-        //    Engine.QueueMethod(xMethodDef);
-        //    Engine.QueueMethod(VTablesImplRefs.GetMethodAddressForTypeRef);
-        //    Engine.QueueMethod(CPU.Assembler.CurrentExceptionOccurredRef);
-        //    Engine.RegisterType(typeof(NullReferenceException));
-        //    Engine.QueueMethod(typeof(NullReferenceException).GetConstructor(new Type[0]));
-        //}
+        public static void ScanOp(ILReader aReader,
+                                  MethodInformation aMethodInfo,
+                                  SortedList<string, object> aMethodData,
+            IServiceProvider aServiceProvider)
+        {
+            MethodBase xMethod = aReader.OperandValueMethod;
+            if (xMethod == null)
+            {
+                throw new Exception("Unable to determine Method!");
+            }
+            MethodBase xMethodDef = xMethod;
+            var xTargetMethodInfo = aServiceProvider.GetService<IMetaDataInfoService>().GetMethodInfo(xMethodDef,
+                                                                                                      false);
+            foreach (var xParam in xMethodDef.GetParameters())
+            {
+                Engine.RegisterType(xParam.ParameterType);
+            }
+            aServiceProvider.GetService<IMetaDataInfoService>().GetTypeInfo(xTargetMethodInfo.ReturnType);
+            aServiceProvider.GetService<IMetaDataInfoService>().GetMethodInfo(xMethodDef, false);
+            aServiceProvider.GetService<IMetaDataInfoService>().GetMethodInfo(VTablesImplRefs.GetMethodAddressForTypeRef, false);
+            aServiceProvider.GetService<IMetaDataInfoService>().GetMethodInfo(typeof(NullReferenceException).GetConstructor(new Type[0]), false);
+            aServiceProvider.GetService<IMetaDataInfoService>().GetMethodInfo(
+                CPU.Assembler.CurrentExceptionOccurredRef, false);
+            aServiceProvider.GetService<IMetaDataInfoService>().GetTypeInfo(typeof (NullReferenceException));
+        }
 
         public Callvirt(ILReader aReader,
                         MethodInformation aMethodInfo)
