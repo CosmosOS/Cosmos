@@ -150,7 +150,7 @@ namespace Indy.IL2CPU.Assembler.X86 {
             aOutput.WriteLine("use32");
             //aOutput.WriteLine("%define NASM_COMPILATION 1");
             //aOutput.WriteLine("global Kernel_Start");
-            //aOutput.WriteLine("[map all main.map]");
+            aOutput.WriteLine("[map all main.map]");
             aOutput.WriteLine("org 0x200000");
             base.FlushText(aOutput);
         }
