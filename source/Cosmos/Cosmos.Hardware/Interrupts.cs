@@ -257,7 +257,9 @@ namespace Cosmos.Hardware {
             //Debugging....
             //DebugUtil.LogInterruptOccurred_Old(aContext);
             //Cosmos.Hardware.DebugUtil.SendMessage("Interrupts", "Interrupt 2B handler (for RTL)");
-            Console.WriteLine("IRQ 12 raised!");
+            //A> Vermeulen
+            //Commented out below
+            //Console.WriteLine("IRQ 12 raised!");
 
             IRQ(12, ref aContext);
 
