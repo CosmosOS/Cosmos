@@ -182,7 +182,7 @@ namespace Cosmos.Compiler.Builder
         {
             // Hide the console window
             consoleWindow = new ConsoleWindow();
-            consoleWindow.HideWindow(); 
+
 
             var xApp = new System.Windows.Application();
             xApp.Startup += new StartupEventHandler(xApp_Startup);
@@ -198,6 +198,7 @@ namespace Cosmos.Compiler.Builder
             mMainWindow = new MainWindow();
          
             mMainWindow.Show();
+            consoleWindow.HideWindow(); 
         }
 
 
