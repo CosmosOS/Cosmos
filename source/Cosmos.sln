@@ -190,9 +190,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "VSIP", "VSIP", "{CD3F5E45-8
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.Package", "..\source2\VSIP\Cosmos.VS.Package\Cosmos.VS.Package.csproj", "{61535AF6-4A1E-4691-B2BC-039851EF4850}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Albert", "Albert", "{5F424AF3-8D92-4C0F-AD6D-EB5A187F9FE6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlbertVermeulen", "Project1\AlbertVermeulen.csproj", "{53A5C77E-8FCE-4B2C-A711-DE496E700182}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 59
+		SccNumberOfProjects = 60
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -428,6 +432,10 @@ Global
 		SccProjectTopLevelParentUniqueName58 = Cosmos.sln
 		SccProjectName58 = ../source2/VSIP/Cosmos.VS.Package
 		SccLocalPath58 = ..\\source2\\VSIP\\Cosmos.VS.Package
+		SccProjectUniqueName59 = Project1\\AlbertVermeulen.csproj
+		SccProjectTopLevelParentUniqueName59 = Cosmos.sln
+		SccProjectName59 = Project1
+		SccLocalPath59 = Project1
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -662,6 +670,10 @@ Global
 		{61535AF6-4A1E-4691-B2BC-039851EF4850}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{61535AF6-4A1E-4691-B2BC-039851EF4850}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{61535AF6-4A1E-4691-B2BC-039851EF4850}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53A5C77E-8FCE-4B2C-A711-DE496E700182}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53A5C77E-8FCE-4B2C-A711-DE496E700182}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53A5C77E-8FCE-4B2C-A711-DE496E700182}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53A5C77E-8FCE-4B2C-A711-DE496E700182}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -750,6 +762,8 @@ Global
 		{678E7BC5-0C17-44D6-9BF7-52EE5A6CD22A} = {FF5BAFDE-AE9D-438D-935A-86B33EE0A758}
 		{9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6} = {A4478219-065D-4928-BB4D-4358CAD39A03}
 		{9A806542-A3FE-479B-83C2-E3380BC372F3} = {A4478219-065D-4928-BB4D-4358CAD39A03}
+		{5F424AF3-8D92-4C0F-AD6D-EB5A187F9FE6} = {A4478219-065D-4928-BB4D-4358CAD39A03}
 		{61535AF6-4A1E-4691-B2BC-039851EF4850} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
+		{53A5C77E-8FCE-4B2C-A711-DE496E700182} = {5F424AF3-8D92-4C0F-AD6D-EB5A187F9FE6}
 	EndGlobalSection
 EndGlobal
