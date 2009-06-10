@@ -8,6 +8,14 @@ namespace Cosmos.Playground.Xenni.TxUI
 {
     public sealed class TxUIManager
     {
+        public static void Beep()
+        {
+            PIT.EnableSound();
+            PIT.T2Frequency = 2048;
+            PIT.Wait(250);
+            PIT.DisableSound();
+        }
+
         public static TxUIManager Instance = null;
         private List<TxCtrl> Controls = new List<TxCtrl>();
         private TxCtrl FocusTarget = null;
@@ -215,7 +223,7 @@ namespace Cosmos.Playground.Xenni.TxUI
                     default:
                         if (FocusTarget == null || !FocusTarget.OnKeyPress(c))
                         {
-                            Console.Beep(2048, 250);
+                            TxUIManager.Beep();
                         }
                         break;
             }
@@ -620,7 +628,7 @@ namespace Cosmos.Playground.Xenni.TxUI
                 case '\u0968':
                     if (_CursorPosX == 0)
                     {
-                        Console.Beep(2048, 250);
+                        TxUIManager.Beep();
                         break;
                     }
                     Lines[_CursorPosY] = Lines[_CursorPosY].Substring(0, _CursorPosX - 1) + Lines[_CursorPosY].Substring(_CursorPosX, Lines[_CursorPosY].Length - _CursorPosX);
@@ -640,7 +648,7 @@ namespace Cosmos.Playground.Xenni.TxUI
                     }
                     if (_CursorPosY == 0)
                     {
-                        Console.Beep(2048, 250);
+                        TxUIManager.Beep();
                         break;
                     }
 
@@ -658,7 +666,7 @@ namespace Cosmos.Playground.Xenni.TxUI
                     }
                     if (_CursorPosY == (Height - 1))
                     {
-                        Console.Beep(2048, 250);
+                        TxUIManager.Beep();
                         break;
                     }
 
@@ -672,7 +680,7 @@ namespace Cosmos.Playground.Xenni.TxUI
                 default:
                     if (_CursorPosX == Width || Lines[_CursorPosY].Length == Width)
                     {
-                        Console.Beep(2048, 250);
+                        TxUIManager.Beep();
                         break;
                     }
                     Lines[_CursorPosY] = Lines[_CursorPosY].Substring(0, _CursorPosX) + c.ToString() + Lines[_CursorPosY].Substring(_CursorPosX, Lines[_CursorPosY].Length - _CursorPosX);
@@ -704,17 +712,17 @@ namespace Cosmos.Playground.Xenni.TxUI
                 if (value < 0)
                 {
                     value = 0;
-                    Console.Beep(2048, 250);
+                    TxUIManager.Beep();
                 }
                 if (value > Width)
                 {
                     value = Width;
-                    Console.Beep(2048, 250);
+                    TxUIManager.Beep();
                 }
                 if (value > Lines[_CursorPosY].Length)
                 {
                     value = Lines[_CursorPosY].Length;
-                    Console.Beep(2048, 250);
+                    TxUIManager.Beep();
                 }
 
                 _CursorPosX = value;
@@ -732,12 +740,12 @@ namespace Cosmos.Playground.Xenni.TxUI
                 if (value < 0)
                 {
                     value = 0;
-                    Console.Beep(2048, 250);
+                    TxUIManager.Beep();
                 }
                 if (value >= Height)
                 {
                     value = (Height - 1);
-                    Console.Beep(2048, 250);
+                    TxUIManager.Beep();
                 }
 
                 _CursorPosY = value;
