@@ -153,11 +153,7 @@ namespace Cosmos.Compiler.Builder
 
         
         private void OnCompilingMethods(int aCur, int aMax)
-        {
-            if (aCur < currentProgress.MethodsProcessed
-                || aMax < currentProgress.MaxMethods)
-                throw new ArgumentException("Trying to set lower"); 
-
+        { 
             currentProgress.MethodsProcessed = aCur;
             currentProgress.MaxMethods = aMax; 
             OnBuildProgressChanged();
