@@ -528,7 +528,17 @@ namespace Indy.IL2CPU
                     }
 
                     //xCurrentMethod.GetMethodImplementationFlags() == MethodImplAttributes.
-                    ILReader xReader = new ILReader(xCurrentMethod);
+
+                    ILReader xReader;
+                    try
+                    {
+                        xReader = new ILReader(xCurrentMethod);
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+
                     MethodBody xBody = xCurrentMethod.GetMethodBody();
                     // todo: add better detection of implementation state
 
@@ -2818,6 +2828,12 @@ namespace Indy.IL2CPU
                 
                //throw new Exception(xInnerMethodName);
             }*/
+
+            if (aMethod.DeclaringType.Assembly.GetName().Name == "IndyIL2CPU_EmitAssm")
+            {
+                return;
+            }
+
             if (!aMethod.IsStatic)
             {
                 RegisterType(aMethod.DeclaringType);
