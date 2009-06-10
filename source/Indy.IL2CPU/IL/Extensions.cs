@@ -64,7 +64,7 @@ namespace System
         public static string GetFullName(this MethodBase aMethod)
         {
             var xResult = GenerateFullName(aMethod);
-            if (xResult == "System.Void  System.Array.Sort<>(T[], <T>)")
+            if (xResult == "System.Int32  System.Array.IndexOf<>(T[], T)")
             {
                 return GenerateFullName(aMethod);
             }
@@ -157,10 +157,10 @@ namespace System
                     xBuilder.Append("<");
                     for (int i = 0; i < xGenArgs.Length - 1; i++)
                     {
-                        xBuilder.Append(xGenArgs[i].FullName);
+                        xBuilder.Append(xGenArgs[i].GetFullName());
                         xBuilder.Append(", ");
                     }
-                    xBuilder.Append(xGenArgs.Last().FullName);
+                    xBuilder.Append(xGenArgs.Last().GetFullName());
                     xBuilder.Append(">");
                 }
             }
@@ -184,7 +184,7 @@ namespace System
 
         public static string GetFullName(this FieldInfo aField)
         {
-            return aField.FieldType.FullName + " " + aField.DeclaringType.FullName + "." + aField.Name;
+            return aField.FieldType.GetFullName() + " " + aField.DeclaringType.GetFullName() + "." + aField.Name;
             //var xSB = new StringBuilder(aField.FieldType.FullName.Length + 1 + aField.DeclaringType.FullName.Length + 1 + aField.Name);
             //xSB.Append(aField.FieldType.FullName);
             //xSB.Append(" ");

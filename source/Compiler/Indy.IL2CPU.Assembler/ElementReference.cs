@@ -10,6 +10,10 @@ namespace Indy.IL2CPU.Assembler {
         public static ElementReference New(string aName, int aOffset)
         {
             ElementReference xResult;
+            if(aName.StartsWith("."))
+            {
+                aName = Label.LastFullLabel + aName;
+            }
             string xId = String.Intern(aName + "@@" + aOffset);
             if(mLookup.TryGetValue(xId, out xResult))
             {

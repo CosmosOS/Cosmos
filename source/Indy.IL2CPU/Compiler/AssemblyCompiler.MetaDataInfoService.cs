@@ -40,6 +40,18 @@ namespace Indy.IL2CPU.Compiler
                     mExternals.Add(aMethodName);
                 }
             }
+            else
+            {
+                if(aCurrentMethodForLocals.IsGenericMethod)
+                {
+                    if (!(from item in Methods
+                          where item.GetFullName() == aMethodName
+                          select item).Any())
+                    {
+                        Methods.Add(aCurrentMethodForLocals);
+                    }
+                }
+            }
             MethodInformation xMethodInfo;
             {
                 MethodInformation.Variable[] xVars = new MethodInformation.Variable[0];
@@ -346,15 +358,22 @@ namespace Indy.IL2CPU.Compiler
         public string GetTypeIdLabel(Type aType)
         {
             var xLabel = Label.FilterStringForIncorrectChars(aType.AssemblyQualifiedName + "__TYPE_ID");
-            if(aType.Assembly != Assembly)
+            if (!mCreatedIDLabels.Contains(xLabel))
             {
-                if(!mExternals.Contains(xLabel))
+                if (aType.Assembly != Assembly)
                 {
                     mExternals.Add(xLabel);
                 }
+                else
+                {
+                    Assembler.DataMembers.Add(new DataMember(xLabel, 0));
+                }
+                mCreatedIDLabels.Add(xLabel);
             }
             return xLabel;
         }
+
+        private HashSet<string> mCreatedIDLabels =new HashSet<string>(StringComparer.InvariantCulture);
 
         public IDictionary<string, TypeInformation.Field> GetTypeFieldInfo(MethodBase aCurrentMethod,
                                                                                  out uint aObjectStorageSize)

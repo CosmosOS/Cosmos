@@ -91,36 +91,33 @@ namespace Indy.IL2CPU.Compiler
             EnsureCanExecute();
             Initialize();
             ScanAssembly();
+            ClearDuplicates();
             DuplicateTest();
             CompileAllMethods();
             CompileAllStaticFields();
             WriteAllExternals();
         }
 
-        private void DuplicateTest()
+        private void ClearDuplicates()
         {
-            // temp check
             var xList = new List<string>();
-            var xDuplicateNames = 0;
-            foreach (var xMethod in Methods)
+            var xIdx = 0;
+            while(xIdx < Methods.Count)
             {
-                var xName = xMethod.GetFullName();
-                if (xList.Contains(xName))
+                var xCur = Methods[xIdx];
+                var xCurName = xCur.GetFullName();
+                if((from item in xList
+                        where item.Equals(xCurName)
+                        select item).Any())
                 {
-                    xDuplicateNames++;
-                    Console.WriteLine("Duplicate: '{0}'", xName);
+                    Methods.RemoveAt(xIdx);
+                    continue;
                 }
-                else
-                {
-                    xList.Add(xName);
-                }
-            }
-            Console.WriteLine("Total Duplicate Names: {0}", xDuplicateNames);
-            if(xDuplicateNames>0)
-            {
-                Console.ReadLine();
+                xList.Add(xCurName);
+                xIdx++;
             }
         }
+
 
         private void WriteAllExternals()
         {
@@ -148,8 +145,13 @@ namespace Indy.IL2CPU.Compiler
 
             int typesToProcess = Types.Count;
 
-            var xMethodComparer = new MethodBaseComparer();
-            var xTest = new HashSet<MethodBase>(xMethodComparer);
+            //var xMethodComparer = new MethodBaseComparer();
+            //Methods.Clear();
+            //var xTest = new List<string>();
+            //foreach(var xItem in Methods)
+            //{
+            //    xTest.Add(xItem.GetFullName());
+            //}
 
             for (int i = 0 ; i < typesToProcess ;i++)
             {
@@ -157,21 +159,31 @@ namespace Indy.IL2CPU.Compiler
 
                 foreach (var xMethod in xType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.DeclaredOnly))
                 {
-                    if (xTest.Contains(xMethod))
-                    {
-                        continue;
-                    }
-                    xTest.Add(xMethod);
+                    var xName = xMethod.GetFullName();
+                    //if((from item in xTest
+                    //        where item.Equals(xName)
+                    //        select item).Any())
+                    //{
+                    //    continue;
+                    //}
+                    //xTest.Add(xName);
                     Methods.Add(xMethod);
                 }
                 foreach (var xCtor in xType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.DeclaredOnly))
                 {
-                    if (xTest.Contains(xCtor))
+                    var xName = xCtor.GetFullName();
+                    //if((from item in xTest
+                    //        where item.Equals(xName)
+                    //        select item).Any())
+                    //{
+                    //    continue;
+                    //} 
+                    if(xName.IndexOf("nullreference", StringComparison.InvariantCultureIgnoreCase)!=-1)
                     {
-                        continue;
+                        Console.Write("");
                     }
                     Methods.Add(xCtor);
-                    xTest.Add(xCtor);
+                    //xTest.Add(xName);
                 }
                 foreach (var xField in xType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly))
                 {
@@ -180,6 +192,41 @@ namespace Indy.IL2CPU.Compiler
 
                 ////BK Test 
                 //Types.RemoveAt(0); 
+            }
+        }
+
+        private void DuplicateTest()
+        {
+            // temp check
+            var xList = new List<string>();
+            var xDuplicateNames = 0;
+            foreach (var xMethod in Methods)
+            {
+                var xName = xMethod.GetFullName();
+                if (xList.Contains(xName))
+                {
+                    xDuplicateNames++;
+                    //Console.WriteLine("Duplicate: '{0}'", xName);
+                    Console.WriteLine("Duplicates:");
+                    var xTest = (from item in Methods
+                                 where item.GetFullName() == xName
+                                 select item);
+                    foreach (var item in xTest)
+                    {
+                        Console.WriteLine(item.ToString());
+                        Console.WriteLine(item.GetFullName());
+                    }
+                    Console.ReadLine();
+                }
+                else
+                {
+                    xList.Add(xName);
+                }
+            }
+            Console.WriteLine("Total Duplicate Names: {0}", xDuplicateNames);
+            if (xDuplicateNames > 0)
+            {
+                Console.ReadLine();
             }
         }
 
@@ -195,8 +242,9 @@ namespace Indy.IL2CPU.Compiler
 
         private void CompileAllStaticFields()
         {
-            foreach (var xField in StaticFields)
+            for (int i = 0; i < StaticFields.Count; i++)
             {
+                var xField = StaticFields[i];
                 if (xField.DeclaringType.IsGenericTypeDefinition)
                 {
                     // the generic type definitions (Nullable<>) shouldnt be emitted
@@ -217,7 +265,7 @@ namespace Indy.IL2CPU.Compiler
                     if (xItem != null)
                     {
                         var xItemType = xItem.GetType();
-                        xManifestResourceName = (string)xItemType.GetField("ResourceName").GetValue(xItem);
+                        xManifestResourceName = (string) xItemType.GetField("ResourceName").GetValue(xItem);
                     }
                     if (xManifestResourceName != null)
                     {
@@ -308,19 +356,36 @@ namespace Indy.IL2CPU.Compiler
         private int mInstructionsToSkip = 0;
         private void CompileAllMethods()
         {
-            long xCount = 0;
             Console.Write("Before compiling, amount of methods: ");
             Console.WriteLine(Methods.Count);
+            var xSkip = 0;
+            var xList = new List<string>();
             // all methods are in Methods, so we just need to iterate over them.
-            foreach (var xCurrentMethod in Methods)
+            for(var xCount = 0; xCount<Methods.Count;xCount++)
             {
+                //if (xCount == 4935)
+                //{
+                //    Console.Write("");
+                //}
+                //Console.WriteLine(xCount);
+                var xCurrentMethod = Methods[xCount];
                 if (xCount % 100 == 0)
                 {
                     Console.Write(new String('-', Console.BufferWidth));
                     Console.WriteLine("Processed " +xCount.ToString() + " / " +Methods.Count);
 //                    GC.Collect();
                 }
-                xCount++;
+                var xName = String.Intern(xCurrentMethod.GetFullName());
+                if(xName.IndexOf("nullreference", StringComparison.InvariantCultureIgnoreCase)!=-1)
+                {
+                    Console.Write("");
+                }
+                if(xList.Contains(xName))
+                {
+                    xSkip ++;
+                    continue;
+                }
+                xList.Add(xName);
 
                 //if(xCount==1500)
                 //{
@@ -357,6 +422,11 @@ namespace Indy.IL2CPU.Compiler
                 }
 
                 ProcessConcreteMethod(xCurrentMethod);
+            }
+            if(xSkip>0)
+            {
+                Console.WriteLine("Skipped method: {0}", xSkip);
+                Console.ReadLine();
             }
         }
 

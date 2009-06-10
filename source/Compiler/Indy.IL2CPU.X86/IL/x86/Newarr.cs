@@ -56,7 +56,7 @@ namespace Indy.IL2CPU.IL.X86 {
 			mElementSize = GetService<IMetaDataInfoService>().GetFieldStorageSize(aTypeRef);
 			Type xArrayType = ReflectionUtilities.GetType("mscorlib", "System.Array");
 			MethodBase xCtor = xArrayType.GetConstructors(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance)[0];
-			mCtorName = CPU.MethodInfoLabelGenerator.GenerateLabelName(xCtor);
+		    mCtorName = GetService<IMetaDataInfoService>().GetMethodInfo(xCtor, false).LabelName;
 		}
 
 		public override void DoAssemble() {
@@ -77,14 +77,15 @@ namespace Indy.IL2CPU.IL.X86 {
 			Assembler.StackContents.Push(new StackContent(4, typeof(uint)));
             Add(Assembler, GetServiceProvider(), mBaseLabel, mCurrentMethodInfo, mCurOffset, mNextLabel);
 			// the total array size is now on the stack.
-            new CPUx86.Call { DestinationLabel = CPU.MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.AllocNewObjectRef) };
+		    new CPUx86.Call { DestinationLabel = CPU.MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.AllocNewObjectRef) };
 			new CPUx86.Push{DestinationReg=CPUx86.Registers.ESP, DestinationIsIndirect=true};
             new CPUx86.Push{DestinationReg=CPUx86.Registers.ESP, DestinationIsIndirect=true};
             new CPUx86.Push{DestinationReg=CPUx86.Registers.ESP, DestinationIsIndirect=true};
             new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
 			//new CPUx86.Pushd(CPUx86.Registers_Old.EDI);
-			new CPUx86.Call { DestinationLabel = CPU.MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.IncRefCountRef) };
-            new CPUx86.Call { DestinationLabel = CPU.MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.IncRefCountRef) };
+            var xIncRef = GetService<IMetaDataInfoService>().GetMethodInfo(GCImplementationRefs.IncRefCountRef, false).LabelName;
+            new CPUx86.Call { DestinationLabel = xIncRef };
+            new CPUx86.Call { DestinationLabel = xIncRef };
 			//new CPUx86.Pop(CPUx86.Registers_Old.ESI);
 			Assembler.StackContents.Push(new StackContent(4, typeof(Array)));
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };

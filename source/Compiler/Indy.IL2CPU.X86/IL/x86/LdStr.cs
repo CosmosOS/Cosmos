@@ -68,7 +68,7 @@ namespace Indy.IL2CPU.IL.X86 {
         public override void DoAssemble() {
             var Y = new Y86();
             string xDataName = GetContentsArrayName(Assembler, LiteralStr);
-            new Comment("String Value: " + LiteralStr);
+            new Comment("String Value: " + LiteralStr.Replace("\r", "\\r").Replace("\n", "\\n"));
             Y.EAX = Y.Reference(xDataName);
             Y.EAX.Push();
             Assembler.StackContents.Push(new StackContent(4, typeof(string)));

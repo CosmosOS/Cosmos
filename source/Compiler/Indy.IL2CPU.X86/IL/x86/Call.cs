@@ -195,6 +195,11 @@ namespace Indy.IL2CPU.IL.X86
         {
             mMethod = aReader.OperandValueMethod;
             mMethodInfo = aMethodInfo;
+            if (aMethodInfo.LabelName == "System_Void__System_Array_Sort_System_Double__System_Double___"
+                && aReader.Position==0x1A)
+            {                            
+                Console.Write("");
+            }
             if (!aReader.EndOfStream)
             {
                 mNextLabelName = GetInstructionLabel(aReader.NextPosition);
