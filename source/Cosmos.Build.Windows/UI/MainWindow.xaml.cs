@@ -24,10 +24,6 @@ namespace Cosmos.Compiler.Builder
         {
             InitializeComponent();
             controller = new MainWindowController(this);
-            //Loaded += delegate(object sender, RoutedEventArgs e) 
-            //{
-            //    this.Activate();
-            //};
             butnBuild.Click += new RoutedEventHandler(butnBuild_Click);
             butnCancel.Click += new RoutedEventHandler(butnCancel_Click);
 
@@ -37,15 +33,14 @@ namespace Cosmos.Compiler.Builder
         void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             controller.Init();
+            this.Activate();
         }
 
         private void butnBuild_Click(object sender, RoutedEventArgs e)
         {
             //MoveFocus TRO CONTROLLER
 
-            //    UpdateOptionsFromUI();
-            //    UpdateProperties();
-            //}
+
             //MainWindow.UIEvents.ProceedButtonPressed();
             butnBuild.Visibility = Visibility.Collapsed;
             controller.StartBuild();
