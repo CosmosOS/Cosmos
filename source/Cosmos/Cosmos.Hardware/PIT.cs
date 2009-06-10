@@ -202,7 +202,7 @@ namespace Cosmos.Hardware
             set
             {
                 if (value > 54918330)
-                    throw new ArgumentException("Delay must be no greater that 54918330");
+                    throw new ArgumentException("Delay must be no greater than 54918330");
 
                 T2Countdown = (ushort)(value / PITDelayNS);
             }
@@ -273,7 +273,7 @@ namespace Cosmos.Hardware
                 {
                     if (hndlr.Recuring)
                     {
-                        hndlr.NSRemaining = ActiveHandlers[i].NanosecondsTimeout;
+                        hndlr.NSRemaining = hndlr.NanosecondsTimeout;
                     }
                     else
                     {
