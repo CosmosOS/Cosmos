@@ -58,7 +58,6 @@ namespace Cosmos.Playground.Xenni.TxUI
             Present();
         }
 
-
         public void SetPoint(int x, int y, PointInfo info)
         {
             RenderTarget[x][y] = info;
@@ -234,7 +233,7 @@ namespace Cosmos.Playground.Xenni.TxUI
         public void Run()
         {
             doRun = true;
-            char c = '\0';
+            Keyboard.KeyMapping c = null;
 
             while (doRun)
             {
@@ -245,9 +244,9 @@ namespace Cosmos.Playground.Xenni.TxUI
 
                 CPU.Halt();
 
-                while (Keyboard.GetChar(out c))
+                while (Keyboard.GetMapping(out c))
                 {
-                    if (c == '\0')
+                    if (c == null)
                     {
                         continue;
                     }
@@ -261,7 +260,7 @@ namespace Cosmos.Playground.Xenni.TxUI
                         );
                     */
 
-                    OnKeyStateChange(c);
+                    OnKeyStateChange(c.Value);
                 }
             }
         }
@@ -611,15 +610,15 @@ namespace Cosmos.Playground.Xenni.TxUI
         {
             switch (c)
             {
-                case 'q':
-                    if (!Keyboard.AltPressed)
+                case '\u2190':
+                    if (Keyboard.AltPressed)
                     {
                         goto default;
                     }
                     CursorPosX--;
                     break;
-                case 'e':
-                    if (!Keyboard.AltPressed)
+                case '\u2192':
+                    if (Keyboard.AltPressed)
                     {
                         goto default;
                     }
@@ -641,8 +640,8 @@ namespace Cosmos.Playground.Xenni.TxUI
                     TxUIManager.Instance.Present();
 
                     break;
-                case 'w':
-                    if (!Keyboard.AltPressed)
+                case '\u2191':
+                    if (Keyboard.AltPressed)
                     {
                         goto default;
                     }
@@ -659,8 +658,9 @@ namespace Cosmos.Playground.Xenni.TxUI
                         CursorPosX = Lines[_CursorPosY].Length;
                     }
                     break;
-                case 's':
-                    if (!Keyboard.AltPressed)
+                case '\u2193':
+                case '\n':
+                    if (Keyboard.AltPressed)
                     {
                         goto default;
                     }
