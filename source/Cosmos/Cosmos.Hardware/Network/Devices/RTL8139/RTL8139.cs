@@ -11,7 +11,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
     public class RTL8139 : NetworkDevice
     {
         protected PCIDevice pciCard;
-        protected IOAddressSpace io;
+        protected AddressSpace io;
         protected MACAddress mac;
         protected bool mInitDone;
 
@@ -37,7 +37,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             Interrupts.AddIRQHandler(device.InterruptLine, HandleNetworkInterrupt);
 
             // Get IO Address from PCI Bus
-            io = pciCard.GetAddressSpace(0) as Kernel.IOAddressSpace;
+            io = pciCard.GetAddressSpace(0);
 
             // Enable the card
             pciCard.EnableDevice();
