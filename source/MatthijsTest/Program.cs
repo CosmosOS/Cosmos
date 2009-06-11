@@ -37,6 +37,15 @@ namespace MatthijsTest
                 var xBoot = new Cosmos.Sys.Boot();
                 xBoot.Execute();
             }
+            object Str = new Program();
+            if (Str is Program)
+            {
+                Console.WriteLine("Wel");
+            }
+            else
+            {
+                Console.WriteLine("Niet");
+            }
 //            byte* xTemp = (byte*) 0x1;
 //            for (int i = 0; i < 32 * 1024; i++ )
 //            {

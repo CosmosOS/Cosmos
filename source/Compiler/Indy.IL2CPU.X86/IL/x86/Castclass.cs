@@ -12,7 +12,7 @@ using Indy.IL2CPU.Compiler;
 namespace Indy.IL2CPU.IL.X86 {
 	[OpCode(OpCodeEnum.Castclass)]
 	public class Castclass: Op {
-		private int mTypeId;
+		private string mTypeId;
 		private string mThisLabel;
 		private string mNextOpLabel;
 		private Type mCastAsType;
@@ -49,13 +49,14 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public override void DoAssemble() {
+            mTypeId = GetService<IMetaDataInfoService>().GetTypeIdLabel(mCastAsType);
 			// todo: throw an exception when the class does not support the cast!
 			string mReturnNullLabel = mThisLabel + "_ReturnNull";
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
             new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
             new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = mReturnNullLabel };
             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
-			new CPUx86.Push{DestinationValue=(uint)mTypeId};
+			new CPUx86.Push{DestinationRef=ElementReference.New(mTypeId), DestinationIsIndirect=true};
 			Assembler.StackContents.Push(new StackContent(4, typeof(object)));
 			Assembler.StackContents.Push(new StackContent(4, typeof(object)));
 			MethodBase xMethodIsInstance = ReflectionUtilities.GetMethodBase(typeof(VTablesImpl), "IsInstance", "System.Int32", "System.Int32");

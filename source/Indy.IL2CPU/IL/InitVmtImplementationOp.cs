@@ -168,6 +168,8 @@ namespace Indy.IL2CPU.IL {
 
                             }
                         }
+                        if (xType == typeof(object))
+                        { Console.Write(""); }
                         if (!xType.IsInterface)
                         {
                             Push((uint)i);

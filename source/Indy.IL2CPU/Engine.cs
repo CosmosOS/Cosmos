@@ -1458,6 +1458,10 @@ namespace Indy.IL2CPU
 
         public string GetTypeIdLabel(Type aType)
         {
+            if (aType.IsArray)
+            {
+                aType = typeof(Array);
+            }
             var xLabel = Label.FilterStringForIncorrectChars(aType.AssemblyQualifiedName + "__TYPE_ID");
             //if (!mCreatedIDLabels.Contains(xLabel))
             //{
