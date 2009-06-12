@@ -11,6 +11,7 @@ using Cosmos.Hardware.Storage;
 namespace Cosmos.Sys {
     public static class VFSManager {
         private static List<Filesystem> mFilesystems;
+        //TODO: Remove when done with ext2 testing.
         public static List<Filesystem> Filesystems { get { return mFilesystems; } }
 
             private static void DetectFilesystem(BlockDevice aDevice) {
