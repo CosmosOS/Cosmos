@@ -73,6 +73,7 @@ namespace Cosmos.Compiler.Builder
             spnlUSB.Visibility = aSender == rdioUSB ? Visibility.Visible : Visibility.Collapsed;
             spnlVMWare.Visibility = aSender == rdioVMWare ? Visibility.Visible : Visibility.Collapsed;
             spnlVHD.Visibility = aSender == rdioVHD ? Visibility.Visible : Visibility.Collapsed;
+            spnlBOCHS.Visibility = aSender == rdioBOCHS ? Visibility.Visible : Visibility.Collapsed;
             wpnlDebugPort.Visibility = (aSender == rdioVHD || aSender == rdioUSB || aSender == rdioISO || aSender == rdioPXE || aSender == rdioVHD) ? Visibility.Visible : Visibility.Collapsed;
         }
 
@@ -116,6 +117,7 @@ namespace Cosmos.Compiler.Builder
             rdioISO.Checked += new RoutedEventHandler(TargetChanged);
             rdioPXE.Checked += new RoutedEventHandler(TargetChanged);
             rdioUSB.Checked += new RoutedEventHandler(TargetChanged);
+            rdioBOCHS.Checked += new RoutedEventHandler(TargetChanged);
 
             rdioMSNET.Checked += new RoutedEventHandler(FrameworkChanged);
             rdioProjectMono.Checked += new RoutedEventHandler(FrameworkChanged);
@@ -221,6 +223,10 @@ namespace Cosmos.Compiler.Builder
             {
                 mOptions.Target = "VHD";
             }
+            else if (rdioBOCHS.IsChecked.Value)
+            {
+                mOptions.Target = "BOCHS";
+            }
             mOptions.DebugPort = cmboDebugPort.Text;
             mOptions.DebugPortId = (byte) cmboDebugPort.SelectedIndex;
 
@@ -298,6 +304,9 @@ namespace Cosmos.Compiler.Builder
                     break;
                 case "VHD":
                     rdioVHD.IsChecked = true;
+                    break;
+                case "BOCHS":
+                    rdioBOCHS.IsChecked = true;
                     break;
             }
 

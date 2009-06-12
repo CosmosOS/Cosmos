@@ -292,6 +292,10 @@ namespace Cosmos.Compiler.Builder
                     new MakePXEStep(options).Execute();
                     break;
 
+                case "BOCHS":
+                    new MakeBOCHSStep(options).Execute();
+                    break;
+
                 default:
                     throw new Exception("build mode not supported: " + options.Target);
 

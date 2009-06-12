@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{1F0EDE86-F6D4-4355-9A97-10E90457770C}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -98,6 +98,7 @@
     <Compile Include="Builder\LinkStep.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Builder\MakeBOCHSStep.cs" />
     <Compile Include="Builder\MakeISOStep.cs">
       <SubType>Code</SubType>
     </Compile>

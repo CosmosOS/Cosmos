@@ -98,18 +98,19 @@
                         <StackPanel>
                             <Label Style="{StaticResource subsectionTitle}">Emulators &amp; Virtualization</Label>
                             <WrapPanel Margin="20,0,0,0">
-                                <RadioButton Name="rdioQEMU" GroupName="Target">_QEMU</RadioButton>
-                                <RadioButton Name="rdioVMWare" GroupName="Target">VM_Ware</RadioButton>
-                                <RadioButton Name="rdioVPC" GroupName="Target">Virtual _PC</RadioButton>
+                                <RadioButton Name="rdioQEMU" GroupName="Target" FontSize="10">_QEMU</RadioButton>
+                                <RadioButton Name="rdioVMWare" GroupName="Target" FontSize="10">VM_Ware</RadioButton>
+                                <RadioButton Name="rdioVPC" GroupName="Target" FontSize="10">Virtual _PC</RadioButton>
+                                <RadioButton Name="rdioBOCHS" GroupName="Target" FontSize="10">_BOCHS</RadioButton>
                             </WrapPanel>
                         </StackPanel>
                         <StackPanel Margin="20,0,0,0">
                             <Label Style="{StaticResource subsectionTitle}">Native</Label>
                             <WrapPanel Margin="20,0,0,0">
-                                <RadioButton GroupName="Target"	Name="rdioISO">_ISO</RadioButton>
-                                <RadioButton GroupName="Target" Name="rdioPXE">_Network (PXE)</RadioButton>
-                                <RadioButton GroupName="Target" Name="rdioUSB">_USB Device</RadioButton>
-                                <RadioButton GroupName="Target" Name="rdioVHD" IsEnabled="False">_VHD</RadioButton>
+                                <RadioButton GroupName="Target"	Name="rdioISO" FontSize="10">_ISO</RadioButton>
+                                <RadioButton GroupName="Target" Name="rdioPXE" FontSize="10">_Network (PXE)</RadioButton>
+                                <RadioButton GroupName="Target" Name="rdioUSB" FontSize="10">_USB Device</RadioButton>
+                                <RadioButton GroupName="Target" Name="rdioVHD" FontSize="10" IsEnabled="False">_VHD</RadioButton>
                             </WrapPanel>
                         </StackPanel>
                     </WrapPanel>
@@ -234,7 +235,13 @@
                         </Grid>
                     </StackPanel>
                     
-                   
+                    <StackPanel Name="spnlBOCHS">
+                        <Label Style="{StaticResource sectionTitle}">BOCHS</Label>
+                        <Grid Style="{StaticResource sectionBody}">
+                            <TextBlock TextWrapping="Wrap">No options are available for BOCHS.</TextBlock>
+                        </Grid>
+                    </StackPanel>
+                    
                     <StackPanel Name="spnlVHD">
                         <Label Style="{StaticResource sectionTitle}">VHD</Label>
                         <WrapPanel Style="{StaticResource sectionBody}">
