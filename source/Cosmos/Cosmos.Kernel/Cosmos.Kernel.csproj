@@ -60,6 +60,8 @@
     <Compile Include="ManagedMemorySpace.cs" />
     <Compile Include="ManagedMemory\ManagedUInt32Array.cs" />
     <Compile Include="ManagedMemory\ManagedByteArray.cs" />
+    <Compile Include="KPaging\PagingStructs.cs" />
+    <Compile Include="KPaging\PagingUtility.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Cosmos.snk" />

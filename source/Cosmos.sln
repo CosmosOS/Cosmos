@@ -200,9 +200,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ext2.Test", "Ext2.Test\Ext2
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KeyboardTest", "KeyboardTest\KeyboardTest.csproj", "{B85E1686-9ADC-4B97-9E6B-482479698D7B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PagingTest", "PagingTest\PagingTest.csproj", "{FC3C6DAB-32C0-4433-B753-08AB7E41106E}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 61
+		SccNumberOfProjects = 62
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -446,6 +448,10 @@ Global
 		SccProjectTopLevelParentUniqueName60 = Cosmos.sln
 		SccProjectName60 = KeyboardTest
 		SccLocalPath60 = KeyboardTest
+		SccProjectUniqueName61 = PagingTest\\PagingTest.csproj
+		SccProjectTopLevelParentUniqueName61 = Cosmos.sln
+		SccProjectName61 = PagingTest
+		SccLocalPath61 = PagingTest
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -692,6 +698,10 @@ Global
 		{B85E1686-9ADC-4B97-9E6B-482479698D7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B85E1686-9ADC-4B97-9E6B-482479698D7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B85E1686-9ADC-4B97-9E6B-482479698D7B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC3C6DAB-32C0-4433-B753-08AB7E41106E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC3C6DAB-32C0-4433-B753-08AB7E41106E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC3C6DAB-32C0-4433-B753-08AB7E41106E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC3C6DAB-32C0-4433-B753-08AB7E41106E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -766,6 +776,7 @@ Global
 		{99C179F7-AAFD-4BBD-BB0C-8256BEE3FB4B} = {12EC019C-B585-490F-84D6-16F000DC4CDB}
 		{16D4E345-DF23-4095-A6D5-80D0538FC904} = {12EC019C-B585-490F-84D6-16F000DC4CDB}
 		{B85E1686-9ADC-4B97-9E6B-482479698D7B} = {12EC019C-B585-490F-84D6-16F000DC4CDB}
+		{FC3C6DAB-32C0-4433-B753-08AB7E41106E} = {12EC019C-B585-490F-84D6-16F000DC4CDB}
 		{D95021E1-A2C9-4829-819E-ED433AF13162} = {8D61B97D-E68E-47C6-AD72-95EA5768D0B2}
 		{FF5BAFDE-AE9D-438D-935A-86B33EE0A758} = {8D61B97D-E68E-47C6-AD72-95EA5768D0B2}
 		{1698DD83-72A3-44CD-B088-4320A4014A95} = {8D61B97D-E68E-47C6-AD72-95EA5768D0B2}
