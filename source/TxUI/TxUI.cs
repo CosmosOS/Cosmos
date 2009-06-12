@@ -11,8 +11,8 @@ namespace Cosmos.Playground.Xenni.TxUI
         public static void Beep()
         {
             PIT.EnableSound();
-            PIT.T2Frequency = 2048;
-            PIT.Wait(250);
+            PIT.T2Frequency = 1536;
+            PIT.Wait(150);
             PIT.DisableSound();
         }
 
@@ -471,7 +471,7 @@ namespace Cosmos.Playground.Xenni.TxUI
         }
         internal override bool OnKeyPress(char c)
         {
-            if (c == ' ')
+            if (c == ' ' || c == '\n')
             {
                 _Fore = PForeColor;
                 _Back = PBackColor;
