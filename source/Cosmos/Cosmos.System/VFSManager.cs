@@ -11,8 +11,9 @@ using Cosmos.Hardware.Storage;
 namespace Cosmos.Sys {
     public static class VFSManager {
         private static List<Filesystem> mFilesystems;
+        public static List<Filesystem> Filesystems { get { return mFilesystems; } }
 
-        private static void DetectFilesystem(BlockDevice aDevice) {
+            private static void DetectFilesystem(BlockDevice aDevice) {
             #region Ext2
             if (Ext2.BlockDeviceContainsExt2(aDevice)) {
                 aDevice.Used = true;

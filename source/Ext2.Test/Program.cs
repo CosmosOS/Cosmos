@@ -1,6 +1,8 @@
 ﻿using System;
+using System.IO;
 using Cosmos.Compiler.Builder;
-using Cosmos.Debug;
+using Cosmos.Hardware;
+using Cosmos.Sys;
 
 namespace Ext2.Test
 {
@@ -19,11 +21,47 @@ namespace Ext2.Test
         public static void Init ()
         {
             var xboot = new Cosmos.Sys.Boot ( ) ;
-            xboot.Execute (  );
+            xboot.Execute ( ) ;
 
-            Console.WriteLine ( "Welcome! You just booted C# code. Please edit Program.cs to fit your needs" );
+            Console.WriteLine ( "Welcome! This project is for ext2 filesystem testing ..." ) ;
+            Console.WriteLine ();
+            Console.WriteLine ();
+
+            Console.Write ( "The system has detected " ) ;
+            Console.Write ( Device.Devices.Count );
+            Console.WriteLine ( " device(s)." );
+            Console.WriteLine ();
+
+            for ( int i = 0 ; i < Device.Devices.Count ; i++ )
+            {
+                Console.Write ( "Device " ) ;
+                Console.Write ( i );
+                Console.Write ( " has been detected as " );
+                Console.Write ( Device.Devices[i].Type.ToString() );
+                Console.WriteLine( "." );
+            }
+
+            Console.WriteLine ();
+            Console.WriteLine ();
+
+            Console.Write ( "The are " );
+            Console.Write ( VFSManager.Filesystems.Count );
+            Console.WriteLine ( " filesystem(s) on this system." );
+            Console.WriteLine ();
+
+            for ( int i = 0 ; i < VFSManager.Filesystems.Count ; i++ )
+            {
+                Console.Write ( "Filesystem " );
+                Console.Write ( i );
+                Console.Write ( " has a block size of " );
+                Console.Write ( VFSManager.Filesystems[i].BlockSize.ToString() );
+                Console.WriteLine ( "." );
+            }
+
+            string [ ] theList = Directory.GetDirectories ( "/0/" ) ;
+
             while ( true )
-                ;
+                    ;
         }
     }
 }

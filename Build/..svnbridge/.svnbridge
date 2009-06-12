@@ -2,4 +2,9 @@
 Cosmos.iso
 main.map
 output.bin
+</Value></Property><Property><Name>svn:ignore</Name><Value>COM2-output.dbg
+Cosmos.iso
+hda.img
+main.map
+output.bin
 </Value></Property></Properties></ItemProperties>

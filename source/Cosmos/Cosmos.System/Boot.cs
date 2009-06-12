@@ -28,7 +28,7 @@ namespace Cosmos.Sys {
             Sys.Global.Init();
 
             // Clear again in case debug information has been written out
-            //Console.Clear();
+            Console.Clear();
         }
 
         public void MtWExecute() {
