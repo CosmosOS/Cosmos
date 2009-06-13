@@ -58,10 +58,18 @@ namespace Ext2.Test
                 Console.WriteLine ( "." );
             }
 
-            string [ ] theList = Directory.GetDirectories ( "/0/" ) ;
+            //string [] tmp = Directory.GetFiles ( "/0/" );
+            string [] tmp = Directory.GetDirectories( "/0/" );
+
+            Console.WriteLine ( tmp.Length.ToString () );
+
+            for ( int i = 0 ; i < tmp.Length ; i++ )
+            {
+                Console.WriteLine ( tmp [ i ] );
+            }
 
             while ( true )
-                    ;
+                ;
         }
     }
 }
