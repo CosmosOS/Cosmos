@@ -28,7 +28,7 @@
 
             <DockPanel  Margin="0,125,0,65" Grid.RowSpan="3" Grid.ColumnSpan="2">
             <Label x:Name="warningLabel" DockPanel.Dock="Top" FontWeight="bold" Content="Warnings &amp; Errors"/>
-            <ListBox x:Name="listErrors" DockPanel.Dock="Bottom" MouseDoubleClick="listErrors_MouseDoubleClick"  />
+            <ListBox x:Name="listErrors" DockPanel.Dock="Bottom" MouseDoubleClick="listErrors_MouseDoubleClick" Height="124" />
             <ListBox x:Name="listInformation" DockPanel.Dock="Bottom"  />
         </DockPanel>
         </StackPanel>

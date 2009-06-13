@@ -7,37 +7,23 @@
         Icon="/Cosmos.Compiler.Builder;component/Cosmos.ico"
         FocusManager.FocusedElement="{Binding ElementName=buttonPanel}"
         >
-
+  <DockPanel>
+    <StackPanel x:Name="buttonPanel" Margin="15, 15, 15, 10" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" DockPanel.Dock="Bottom">
+      <Button Name="butnBuild" Margin="5" IsDefault="True">_Build</Button>
+      <Button Name="butnCancel" Margin="5" IsCancel="True">_Cancel</Button>
+    </StackPanel>
     <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" > 
-    <DockPanel Name="dockPanel" >
-
-            <StackPanel Orientation="Vertical" DockPanel.Dock="Bottom" >
-
-                <Expander Header="Log"   Name="logExpander"  ExpandDirection="Down" Expanded="logExpander_Expanded">
-                    <ListBox x:Name="listInformation" Height="Auto"  MinHeight="200"/>
-                </Expander>
-
-                <StackPanel x:Name="buttonPanel" Margin="15, 15, 15, 10" Orientation="Horizontal"  HorizontalAlignment="Left" VerticalAlignment="Bottom" >
-                <Button Name="butnBuild" Margin="5" IsDefault="True">_Build</Button>
-                <Button Name="butnCancel" Margin="5" IsCancel="True">_Cancel</Button>
-
+      <DockPanel Name="dockPanel" >
+      <StackPanel Orientation="Vertical" DockPanel.Dock="Bottom" >
+              <Expander Header="Log"   Name="logExpander"  ExpandDirection="Down" Expanded="logExpander_Expanded">
+                  <ListBox x:Name="listInformation" Height="Auto"  MinHeight="200"/>
+              </Expander>
             </StackPanel>
-            </StackPanel>
-
-
             <Grid >
-
                 <build:OptionsUC x:Name="optionsUC" Grid.Row="0" ></build:OptionsUC>
-              
-
-
-            <build:BuildUC  x:Name="buildUC" Visibility="Collapsed" Grid.Row="0" ></build:BuildUC>
-
-            
-
+                <build:BuildUC  x:Name="buildUC" Visibility="Collapsed" Grid.Row="0" ></build:BuildUC>
             </Grid>
-
-
     </DockPanel>
 </ScrollViewer>
+</DockPanel>
 </Window>
