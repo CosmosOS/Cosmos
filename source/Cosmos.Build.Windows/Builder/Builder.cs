@@ -303,15 +303,12 @@ namespace Cosmos.Compiler.Builder
         }
 
         [Obsolete("Dont use")]
-        private PassedEngineValue BuildOptionsToEngineParam(BuildOptions options)
-        {
-
+        private PassedEngineValue BuildOptionsToEngineParam(BuildOptions options) {
             DebugMode aDebugMode = options.DebugMode; //TODO fix if not needed
             byte aDebugComport = options.DebugPortId;
             bool aGDB = options.UseGDB;
 
-            if (!Directory.Exists(AsmPath))
-            {
+            if (!Directory.Exists(AsmPath)) {
                 Directory.CreateDirectory(AsmPath);
             }
             string[] xPlugs = GetPlugs();
@@ -592,19 +589,16 @@ namespace Cosmos.Compiler.Builder
         // MtW: added as field, so that it can be reused by the test runner
         public Assembly TargetAssembly = Assembly.GetEntryAssembly();
 
-        public string[] GetPlugs()
-        {
+        public string[] GetPlugs() {
             string[] xPlugs;
-            if (File.Exists(Path.Combine(Path.Combine(ToolsPath, "Cosmos.Kernel.Plugs"), "Cosmos.Kernel.Plugs.dll")))
-            {
+            // Look in tools path first. If not there, look in same location as builder asm
+            if (File.Exists(Path.Combine(Path.Combine(ToolsPath, "Cosmos.Kernel.Plugs"), "Cosmos.Kernel.Plugs.dll"))) {
                 xPlugs = new string[] {
                     Path.Combine(Path.Combine(ToolsPath, "Cosmos.Kernel.Plugs"), "Cosmos.Kernel.Plugs.dll"), 
                     Path.Combine(Path.Combine(ToolsPath, "Cosmos.Hardware.Plugs"), "Cosmos.Hardware.Plugs.dll"), 
                     Path.Combine(Path.Combine(ToolsPath, "Cosmos.Sys.Plugs"), "Cosmos.Sys.Plugs.dll")
                 };
-            }
-            else
-            {
+            } else {
                 string xPath = Path.GetDirectoryName(typeof(Builder).Assembly.Location);
                 xPlugs = new string[] {
                     Path.Combine(xPath, "Cosmos.Kernel.Plugs.dll"), 
