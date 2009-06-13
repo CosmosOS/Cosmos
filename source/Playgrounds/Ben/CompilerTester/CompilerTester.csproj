@@ -65,7 +65,7 @@
       <Project>{1F0EDE86-F6D4-4355-9A97-10E90457770C}</Project>
       <Name>Cosmos.Compiler.Builder</Name>
     </ProjectReference>
-    <ProjectReference Include="..\IL2CPU.PostAssembler\IL2CPU.PostAssembler.csproj">
+    <ProjectReference Include="..\..\..\IL2CPU.PostAssembler\IL2CPU.PostAssembler.csproj">
       <Project>{304961B0-EC78-4809-9121-24F4655E2638}</Project>
       <Name>IL2CPU.PostAssembler</Name>
     </ProjectReference>
