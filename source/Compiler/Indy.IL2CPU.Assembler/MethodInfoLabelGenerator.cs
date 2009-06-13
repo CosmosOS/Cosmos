@@ -25,7 +25,7 @@ namespace Indy.IL2CPU.Assembler
             return xResult;
         }
 
-        private static string GetFullName(Type aType)
+        public static string GetFullName(Type aType)
         {
             if (aType.IsGenericParameter)
             {
@@ -69,6 +69,8 @@ namespace Indy.IL2CPU.Assembler
                 xSB.Append(GetFullName(xArgs.Last()));
                 xSB.Append(">");
             }
+            //xSB.Append(", ");
+            //xSB.Append(aType.Assembly.FullName);
             return xSB.ToString();
         }
 

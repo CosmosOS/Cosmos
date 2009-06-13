@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Indy.IL2CPU.Compiler
+namespace Indy.IL2CPU.Compiler.Old
 {
     partial class AssemblyCompiler: Indy.IL2CPU.IL.IServiceProvider
     {

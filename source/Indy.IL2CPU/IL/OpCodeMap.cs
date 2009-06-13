@@ -62,7 +62,7 @@ namespace Indy.IL2CPU.IL {
             }
         }
 
-	    public virtual void Initialize(Assembler.Assembler aAssembler, IEnumerable<Assembly> aApplicationAssemblies) {
+	    public virtual void Initialize(IEnumerable<Assembly> aApplicationAssemblies) {
 			foreach (var xItem in (from item in ImplementationAssembly.GetTypes()
 								   let xAttrib = item.GetCustomAttributes(typeof(OpCodeAttribute), true).FirstOrDefault() as OpCodeAttribute
 								   where item.IsSubclassOf(typeof(Op)) && xAttrib != null

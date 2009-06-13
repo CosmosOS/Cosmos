@@ -7,7 +7,7 @@ namespace Indy.IL2CPU.Assembler.X86
 {
     public class ExternalLabel: Instruction
     {
-        public ExternalLabel(string aName)
+        public ExternalLabel(string aName):base()
         {
             Name = aName;
         }

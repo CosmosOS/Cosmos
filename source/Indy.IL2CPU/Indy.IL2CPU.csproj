@@ -81,16 +81,20 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Compiler\AssemblyCompiler.MetaDataInfoService.cs" />
-    <Compile Include="Compiler\AssemblyCompiler.ServiceProvider.cs" />
-    <Compile Include="Compiler\AssemblyEqualityComparer.cs" />
-    <Compile Include="Compiler\AssemblyCompiler.cs" />
+    <Compile Include="Compiler\CompilerHelper.AssemblyCompilationInfo.cs" />
     <Compile Include="Compiler\CompilerHelper.cs" />
+    <Compile Include="Compiler\CompilerHelper.MetaDataInfoService.cs" />
+    <Compile Include="Compiler\CompilerHelper.ServiceProvider.cs" />
+    <Compile Include="Compiler\Old\AssemblyCompiler.MetaDataInfoService.cs" />
+    <Compile Include="Compiler\Old\AssemblyCompiler.ServiceProvider.cs" />
+    <Compile Include="Compiler\AssemblyEqualityComparer.cs" />
+    <Compile Include="Compiler\Old\AssemblyCompiler.cs" />
+    <Compile Include="Compiler\Old\CompilerHelper.cs" />
     <Compile Include="Compiler\FieldInfoComparer.cs" />
     <Compile Include="Compiler\IMetaDataInfoService.cs" />
     <Compile Include="Compiler\QueuedMethodInformation.cs" />
     <Compile Include="Compiler\ReflectionUtilities.cs" />
-    <Compile Include="Compiler\Scanner.cs" />
+    <Compile Include="Compiler\Old\Scanner.cs" />
     <Compile Include="Compiler\TypeEqualityComparer.cs" />
     <Compile Include="CustomImplementation\AssemblerImpl.cs" />
     <Compile Include="CustomImplementation\Microsoft\Win32\RegistryKeyImpl.cs" />

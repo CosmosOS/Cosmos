@@ -98,7 +98,7 @@ namespace Cosmos.Hardware.Network
 
         public override int GetHashCode()
         {
-            return (GetType().FullName + "|" + this.ToString()).GetHashCode();
+            return (GetType().AssemblyQualifiedName + "|" + this.ToString()).GetHashCode();
         }
 
         public UInt64 ToNumber()

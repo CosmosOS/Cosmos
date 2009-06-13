@@ -27,7 +27,6 @@ namespace Indy.IL2CPU.IL.X86 {
                 throw new Exception("Unable to determine Type!");
             }
             aProvider.GetService<IMetaDataInfoService>().GetTypeInfo(xType);
-            Engine.RegisterType(xType);
             Call.ScanOp(Engine.GetMethodBase(typeof(VTablesImpl),
                                              "IsInstance",
                                              "System.Int32",

@@ -8,15 +8,15 @@ using Indy.IL2CPU.Assembler;
 using Indy.IL2CPU.Plugs;
 using System.Runtime.InteropServices;
 
-namespace Indy.IL2CPU.Compiler
+namespace Indy.IL2CPU.Compiler.Old
 {
     partial class AssemblyCompiler: IMetaDataInfoService
     {
         public MethodInformation GetMethodInfo(MethodBase aCurrentMethodForArguments,
-                                             MethodBase aCurrentMethodForLocals,
-                                             string aMethodName,
-                                             TypeInformation aTypeInfo,
-                                             bool aDebugMode)
+                                               MethodBase aCurrentMethodForLocals,
+                                               string aMethodName,
+                                               TypeInformation aTypeInfo,
+                                               bool aDebugMode)
         {
             return GetMethodInfo(aCurrentMethodForArguments, aCurrentMethodForLocals, aMethodName, aTypeInfo, aDebugMode, null);
         }
@@ -27,11 +27,11 @@ namespace Indy.IL2CPU.Compiler
         }
 
         public MethodInformation GetMethodInfo(MethodBase aCurrentMethodForArguments,
-                                              MethodBase aCurrentMethodForLocals,
-                                              string aMethodName,
-                                              TypeInformation aTypeInfo,
-                                              bool aDebugMode,
-                                              IDictionary<string, object> aMethodData)
+                                               MethodBase aCurrentMethodForLocals,
+                                               string aMethodName,
+                                               TypeInformation aTypeInfo,
+                                               bool aDebugMode,
+                                               IDictionary<string, object> aMethodData)
         {
             if (aCurrentMethodForLocals.DeclaringType.Assembly != this.Assembly)
             {
@@ -189,8 +189,8 @@ namespace Indy.IL2CPU.Compiler
 
 
         public void GetTypeFieldInfoImpl(List<KeyValuePair<string, TypeInformation.Field>> aTypeFields,
-                                                 Type aType,
-                                                 ref uint aObjectStorageSize)
+                                         Type aType,
+                                         ref uint aObjectStorageSize)
         {
             if (aType == null)
             {
@@ -282,9 +282,9 @@ namespace Indy.IL2CPU.Compiler
                                                                                                                  xFieldType.IsClass && !xFieldType.IsValueType,
                                                                                                                  xFieldType,
                                                                                                                  (xPlugFieldAttr != null && xPlugFieldAttr.IsExternalValue))
-                                                                                       {
-                                                                                           Offset = xOffset
-                                                                                       }));
+                                                                                           {
+                                                                                               Offset = xOffset
+                                                                                           }));
                 }
                 while (xCurrentPlugFieldList.Count > 0)
                 {
@@ -334,7 +334,7 @@ namespace Indy.IL2CPU.Compiler
             TypeInformation xTypeInfo;
             uint xObjectStorageSize;
             IDictionary<string, TypeInformation.Field> xTypeFields = GetTypeFieldInfo(aType,
-                                                                                     out xObjectStorageSize);
+                                                                                      out xObjectStorageSize);
             xTypeInfo = new TypeInformation(xObjectStorageSize,
                                             xTypeFields,
                                             aType,
@@ -376,7 +376,7 @@ namespace Indy.IL2CPU.Compiler
         private HashSet<string> mCreatedIDLabels =new HashSet<string>(StringComparer.InvariantCulture);
 
         public IDictionary<string, TypeInformation.Field> GetTypeFieldInfo(MethodBase aCurrentMethod,
-                                                                                 out uint aObjectStorageSize)
+                                                                           out uint aObjectStorageSize)
         {
             Type xCurrentInspectedType = aCurrentMethod.DeclaringType;
             return GetTypeFieldInfo(xCurrentInspectedType,
@@ -384,7 +384,7 @@ namespace Indy.IL2CPU.Compiler
         }
 
         public IDictionary<string, TypeInformation.Field> GetTypeFieldInfo(Type aType,
-                                                                                 out uint aObjectStorageSize)
+                                                                           out uint aObjectStorageSize)
         {
             var xTypeFields = new List<KeyValuePair<string, TypeInformation.Field>>();
             aObjectStorageSize = 0;

@@ -106,11 +106,15 @@ namespace Indy.IL2CPU.IL {
                 {
                     xDebug.WriteStartElement("Type");
                     xDebug.WriteAttributeString("Id", i.ToString("X"));
-                    xDebug.WriteAttributeString("Name", mTypes[i].FullName);
+                    xDebug.WriteAttributeString("Name", MethodInfoLabelGenerator.GetFullName(mTypes[i]));
                 }
                     try
                     {
                         Type xType = mTypes[i];
+                        if(xType == typeof(ConsoleKey))
+                        {
+                            Console.Write("");
+                        }
                         // value contains true if the method is an interface method definition
                         SortedList<MethodBase, bool> xEmittedMethods = new SortedList<MethodBase, bool>(new MethodBaseComparer());
                         foreach (MethodBase xMethod in xType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
@@ -217,10 +221,10 @@ namespace Indy.IL2CPU.IL {
                             Array.Copy(xTemp, 0, xData, 8, 4);
                             xTemp = BitConverter.GetBytes(4); // embedded array
                             Array.Copy(xTemp, 0, xData, 12, 4);
-                            string xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(mTypes[i].FullName) + "__MethodIndexesArray";
+                            string xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(mTypes[i].AssemblyQualifiedName) + "__MethodIndexesArray";
                             Assembler.DataMembers.Add(new DataMember(xDataName, xData));
                             Push(xDataName);
-                            xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(mTypes[i].FullName) + "__MethodAddressesArray";
+                            xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(mTypes[i].AssemblyQualifiedName) + "__MethodAddressesArray";
                             Assembler.DataMembers.Add(new DataMember(xDataName, xData));
                             Push(xDataName);
                             xData = new byte[16 + Encoding.Unicode.GetByteCount(mTypes[i].FullName + ", " + mTypes[i].Module.Assembly.GetName().FullName)];
@@ -232,7 +236,7 @@ namespace Indy.IL2CPU.IL {
                             Array.Copy(xTemp, 0, xData, 8, 4);
                             xTemp = BitConverter.GetBytes(2); // embedded array
                             Array.Copy(xTemp, 0, xData, 12, 4);
-                            xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(mTypes[i].FullName);
+                            xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(mTypes[i]));
                             mAssembler.DataMembers.Add(new DataMember(xDataName, xData));
                             Push((uint)xEmittedMethods.Count);
                             //Push("0");

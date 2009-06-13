@@ -18,20 +18,32 @@ using System.Collections.ObjectModel;
 
 namespace TestApp {
     class Program {
-        static void Main(string[] args) {
+        static void Main(string[] args)
+        {
             try
             {
-                var xAssembler = new Assembler();
-                xAssembler.DataMembers.Add(new DataMember("Bladibla", new int[]{1}));
-                xAssembler.FlushText(Console.Out);
-
+                var xCompilerHelper = new CompilerHelper();
+                xCompilerHelper.DebugLog +=
+                    ((aSeverity, aMessage) => Console.WriteLine("{0}: {1}", aSeverity, aMessage));
+                xCompilerHelper.GetAssembler += ((arg1, arg2) => new Assembler());
+                xCompilerHelper.GetOpCodeMap += (() => new X86OpCodeMap());
+                xCompilerHelper.SaveAssembler +=new Action<Assembly,Indy.IL2CPU.Assembler.Assembler>(
+                    delegate(Assembly arg1, Indy.IL2CPU.Assembler.Assembler arg2)
+                        {
+                            using (var xOut = new StreamWriter(Path.Combine(@"e:\temp\", arg1.GetName().Name + ".asm")))
+                            {
+                                arg2.FlushText(xOut);
+                            }
+                        });
+                xCompilerHelper.CompileExe(typeof(MatthijsTest.Program).Assembly);
             }
             catch (Exception E)
             {
-                Console.WriteLine("Error: " + E.ToString()); Console.ReadLine();
+                Console.WriteLine("Error: " + E.ToString());
+                Console.ReadLine();
                 if (E.Message == "Temporary abort")
                 {
-Terminate = true;
+                    Terminate = true;
                 }
             }
             finally
@@ -44,6 +56,7 @@ Terminate = true;
                 }
             }
         }
+
         private static bool Terminate = false;
     }
 }

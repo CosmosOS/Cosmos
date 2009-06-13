@@ -427,6 +427,7 @@ namespace Cosmos.Compiler.Builder
                                xParam.aPlugs,
                                xParam.aDebugMode,
                                xParam.GDBDebug,
+                               //xParam.aDebugComNumber,
                                1,
                                xParam.aOutputDir,
                                (Cosmos.Compiler.Builder.BuildOptions.Load()).UseInternalAssembler,

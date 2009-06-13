@@ -12,15 +12,17 @@ namespace Indy.IL2CPU.IL.X86 {
         private Type mType;
 		private string mTypeId;
 
-        //public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
-        //    Type xTypeRef = aReader.OperandValueType as Type;
-        //    if (xTypeRef == null)
-        //    {
-        //        throw new Exception("Couldn't determine Type!");
-        //    } 
-        //    Engine.RegisterType(xTypeRef);
-        //    Engine.QueueMethod(GCImplementationRefs.AllocNewObjectRef);
-        //}
+        public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData,
+            IServiceProvider aServiceProvider)
+        {
+            Type xTypeRef = aReader.OperandValueType as Type;
+            if (xTypeRef == null)
+            {
+                throw new Exception("Couldn't determine Type!");
+            }
+            aServiceProvider.GetService<IMetaDataInfoService>().GetTypeInfo(xTypeRef);
+            aServiceProvider.GetService<IMetaDataInfoService>().GetMethodInfo(GCImplementationRefs.AllocNewObjectRef, false);
+        }
 
 	    public Box(ILReader aReader, MethodInformation aMethodInfo)
 			: base(aReader, aMethodInfo) {

@@ -16,7 +16,7 @@ using System.Diagnostics.SymbolStore;
 using Microsoft.Samples.Debugging.CorSymbolStore;
 
 
-namespace Indy.IL2CPU.Compiler
+namespace Indy.IL2CPU.Compiler.Old
 {
     /// <summary>
     /// This is our new compiler class. It will compile an assembly completely. It doesn't do any scanning, but just compiles each type and method.
@@ -32,7 +32,7 @@ namespace Indy.IL2CPU.Compiler
             StaticFields = new List<FieldInfo>();
         }
 
-#region Settings properties
+        #region Settings properties
 
         public Assembly Assembly
         {
@@ -84,7 +84,7 @@ namespace Indy.IL2CPU.Compiler
 
         public Action<LogSeverityEnum, string> DebugLog;
 
-#endregion Setting Properties
+        #endregion Setting Properties
 
         public void Execute()
         {
@@ -107,8 +107,8 @@ namespace Indy.IL2CPU.Compiler
                 var xCur = Methods[xIdx];
                 var xCurName = xCur.GetFullName();
                 if((from item in xList
-                        where item.Equals(xCurName)
-                        select item).Any())
+                    where item.Equals(xCurName)
+                    select item).Any())
                 {
                     Methods.RemoveAt(xIdx);
                     continue;
@@ -132,7 +132,7 @@ namespace Indy.IL2CPU.Compiler
         {
             InitializePlugs(Plugs);
             OpCodeMap.SetServiceProvider(this);
-            OpCodeMap.Initialize(Assembler, new []{Assembly});
+            OpCodeMap.Initialize(new []{Assembly});
         }
 
         private void ScanAssembly()
@@ -447,8 +447,8 @@ namespace Indy.IL2CPU.Compiler
             }catch(VerificationException VE)
             {
                 LogMessage(LogSeverityEnum.Error,
-                                           "Method '{0}' not generated!",
-                                           xCurrentMethod.GetFullName());
+                           "Method '{0}' not generated!",
+                           xCurrentMethod.GetFullName());
                 new Comment("Method not being generated yet, as it's handled by a PInvoke");
                 return;
             }
@@ -457,22 +457,22 @@ namespace Indy.IL2CPU.Compiler
                 throw;
             }
 #if VERBOSE_DEBUG
-                    var comment = "(No Type Info available)";
-                    if (xMethodInfo.TypeInfo != null)
-                    {
-                        comment = "Type Info:\r\n \r\n" + xMethodInfo.TypeInfo;
-                    }
-                    foreach (string s in comment.Trim().Split(new string[] { "\r\n" }
-                     , StringSplitOptions.RemoveEmptyEntries))
-                    {
-                        new Comment(s);
-                    }
-                    comment = xMethodInfo.ToString();
-                    foreach (string s in comment.Trim().Split(new string[] { "\r\n" }
-                     , StringSplitOptions.RemoveEmptyEntries))
-                    {
-                        new Comment(s);
-                    }
+            var comment = "(No Type Info available)";
+            if (xMethodInfo.TypeInfo != null)
+            {
+                comment = "Type Info:\r\n \r\n" + xMethodInfo.TypeInfo;
+            }
+            foreach (string s in comment.Trim().Split(new string[] { "\r\n" }
+                                                      , StringSplitOptions.RemoveEmptyEntries))
+            {
+                new Comment(s);
+            }
+            comment = xMethodInfo.ToString();
+            foreach (string s in comment.Trim().Split(new string[] { "\r\n" }
+                                                      , StringSplitOptions.RemoveEmptyEntries))
+            {
+                new Comment(s);
+            }
 #endif
             Op xOp = GetOpFromType(OpCodeMap.MethodHeaderOp, null, xMethodInfo);
             xOp.Assembler = Assembler;
@@ -524,8 +524,8 @@ namespace Indy.IL2CPU.Compiler
                     }catch(VerificationException)
                     {
                         LogMessage(LogSeverityEnum.Error,
-                                           "Method '{0}' not generated!",
-                                           xCurrentMethod.GetFullName());
+                                   "Method '{0}' not generated!",
+                                   xCurrentMethod.GetFullName());
                         new Comment("Method not being generated yet, as it's handled by a PInvoke");
                         return;
                     }
@@ -579,7 +579,7 @@ namespace Indy.IL2CPU.Compiler
                                         var xCodeEndLines = new int[xSmbMethod.SequencePointCount];
                                         var xCodeEndColumns = new int[xSmbMethod.SequencePointCount];
                                         xSmbMethod.GetSequencePoints(xCodeOffsets, xCodeDocuments
-                                         , xCodeLines, xCodeColumns, xCodeEndLines, xCodeEndColumns);
+                                                                     , xCodeLines, xCodeColumns, xCodeEndLines, xCodeEndColumns);
                                     }
                                 }
                             }
@@ -673,7 +673,7 @@ namespace Indy.IL2CPU.Compiler
 
                                 // Possibly emit Tracer call
                                 EmitTracer(xOp, xCurrentMethod.DeclaringType.Namespace, (int)xReader.Position,
-                                    xCodeOffsets, xLabel);
+                                           xCodeOffsets, xLabel);
 
                                 //using (mSymbolsLocker.AcquireWriterLock())
                                 //{
@@ -754,7 +754,7 @@ namespace Indy.IL2CPU.Compiler
         private IDictionary<Type, Dictionary<string, PlugFieldAttribute>> mPlugFields;
 
         private Assembly CurrentDomain_AssemblyResolve(object sender,
-                                                      ResolveEventArgs args)
+                                                       ResolveEventArgs args)
         {
             if (File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
                                          args.Name + ".dll")))
@@ -772,7 +772,7 @@ namespace Indy.IL2CPU.Compiler
         }
 
         private static string GetStrippedMethodBaseFullName(MethodBase aMethod,
-                                                    MethodBase aRefMethod)
+                                                            MethodBase aRefMethod)
         {
             StringBuilder xBuilder = new StringBuilder(256);
             string[] xParts = aMethod.ToString().Split(' ');
@@ -1123,7 +1123,7 @@ namespace Indy.IL2CPU.Compiler
                 case "System.UInt64":
                 case "System.Int64":
                     return 8;
-                // for now hardcode IntPtr and UIntPtr to be 32-bit
+                    // for now hardcode IntPtr and UIntPtr to be 32-bit
                 case "System.UIntPtr":
                 case "System.IntPtr":
                     return 4;

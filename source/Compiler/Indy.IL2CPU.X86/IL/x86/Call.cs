@@ -34,12 +34,14 @@ namespace Indy.IL2CPU.IL.X86
 
         public static void ScanOp(MethodBase aTargetMethod, IServiceProvider provider)
         {
-            Engine.QueueMethod(aTargetMethod);
+            provider.GetService<IMetaDataInfoService>().GetMethodInfo(aTargetMethod, false);
             foreach (ParameterInfo xParam in aTargetMethod.GetParameters())
             {
-                Engine.RegisterType(xParam.ParameterType);
+                provider.GetService<IMetaDataInfoService>().GetTypeInfo(xParam.ParameterType);
             }
-            var xTargetMethodInfo = provider.GetService<IMetaDataInfoService>().GetMethodInfo(aTargetMethod, aTargetMethod, MethodInfoLabelGenerator.GenerateLabelName(aTargetMethod), Engine.GetTypeInfo(aTargetMethod.DeclaringType), false);
+            var xTargetMethodInfo = provider.GetService<IMetaDataInfoService>().GetMethodInfo(aTargetMethod, 
+                            aTargetMethod, MethodInfoLabelGenerator.GenerateLabelName(aTargetMethod), 
+                            provider.GetService<IMetaDataInfoService>().GetTypeInfo(aTargetMethod.DeclaringType), false);
             provider.GetService<IMetaDataInfoService>().GetTypeInfo(xTargetMethodInfo.ReturnType);
         }
 

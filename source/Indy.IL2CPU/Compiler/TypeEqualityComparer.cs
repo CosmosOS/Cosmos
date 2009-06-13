@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Indy.IL2CPU.Assembler;
 
 namespace Indy.IL2CPU.Compiler
 {
@@ -10,12 +11,12 @@ namespace Indy.IL2CPU.Compiler
         public bool Equals(Type x,
                            Type y)
         {
-            return x.FullName.Equals(y.FullName);
+            return MethodInfoLabelGenerator.GetFullName(x).Equals(MethodInfoLabelGenerator.GetFullName(y));
         }
 
         public int GetHashCode(Type obj)
         {
-            return obj.FullName.GetHashCode();
+            return MethodInfoLabelGenerator.GetFullName(obj).GetHashCode();
         }
     }
 }

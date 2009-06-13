@@ -39,7 +39,7 @@ namespace Indy.IL2CPU.Compiler
         // VMT support
         string GetTypeIdLabel(Type aType);
 
-        string GetMethodIdLabel(MethodBase xMethodDef);
+        string GetMethodIdLabel(MethodBase aMethodDef);
 
 
 

@@ -162,6 +162,10 @@ namespace Indy.IL2CPU.Assembler.X86 {
         protected Instruction() {
         }
 
+        protected Instruction(bool aAddToAssembler)
+        {
+        }
+
         public static bool HasEncodingOptions(Type aInstruction) {
             using(mInstructionDatasLocker.AcquireReaderLock()) {
                 if(!mInstructionDatas.ContainsKey(aInstruction)) {

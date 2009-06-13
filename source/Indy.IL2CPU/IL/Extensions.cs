@@ -10,68 +10,11 @@ namespace System
 {
     public static class Extensions
     {
-#if !old
-        private static readonly Dictionary<IntPtr, string> mMethod_FullNameCache =
-            new Dictionary<IntPtr, string>();
-
-        private static readonly ReaderWriterLockSlim mMethod_FullNameCache_Locker = new ReaderWriterLockSlim();
-
-        public static string GetFullName(this MethodBase aMethod)
-        {
-            mMethod_FullNameCache_Locker.EnterReadLock();
-            try
-            {
-                if (mMethod_FullNameCache.ContainsKey(aMethod.MethodHandle.Value))
-                {
-                    var xResult = mMethod_FullNameCache[aMethod.MethodHandle.Value];
-                    if (aMethod.GetHashCode() == 2031104736)
-                    {
-                        ;
-                    }
-                    if(!xResult.Equals(GenerateFullName(aMethod)))
-                    {
-                        throw new Exception("");
-                    }
-                    return mMethod_FullNameCache[aMethod.MethodHandle.Value];
-                }
-            }
-            finally
-            {
-                mMethod_FullNameCache_Locker.ExitReadLock();
-            }
-            mMethod_FullNameCache_Locker.EnterWriteLock();
-            try
-            {
-                if (mMethod_FullNameCache.ContainsKey(aMethod.MethodHandle.Value))
-                {
-                    var xResult = mMethod_FullNameCache[aMethod.MethodHandle.Value];
-                    if (!xResult.Equals(GenerateFullName(aMethod)))
-                    {
-                        throw new Exception("");
-                    }
-                    return mMethod_FullNameCache[aMethod.MethodHandle.Value];
-                }
-                var xName = GenerateFullName(aMethod);
-                mMethod_FullNameCache.Add(aMethod.MethodHandle.Value, xName);
-                return xName;
-            }
-            finally
-            {
-                mMethod_FullNameCache_Locker.ExitWriteLock();
-            }
-
-        }
-#else
         public static string GetFullName(this MethodBase aMethod)
         {
             var xResult = GenerateFullName(aMethod);
-            if (xResult == "System.Int32  System.Array.IndexOf<>(T[], T)")
-            {
-                return GenerateFullName(aMethod);
-            }
             return xResult;
         }
-#endif
 
         private static string GetFullName(this Type aType)
         {

@@ -9,7 +9,7 @@ namespace Indy.IL2CPU.Assembler {
 	public class DataMember: BaseAssemblerElement, IComparable<DataMember> {
 		public const string IllegalIdentifierChars = "&.,+$<>{}-`\'/\\ ()[]*!=";
 		public static string GetStaticFieldName(FieldInfo aField) {
-			return FilterStringForIncorrectChars("static_field__" + aField.DeclaringType.FullName + "." + aField.Name);
+			return FilterStringForIncorrectChars("static_field__" + MethodInfoLabelGenerator.GetFullName(aField.DeclaringType) + "." + aField.Name);
 		}
 
 		public static string FilterStringForIncorrectChars(string aName) {

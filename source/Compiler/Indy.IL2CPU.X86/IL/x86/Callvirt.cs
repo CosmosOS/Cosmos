@@ -38,7 +38,7 @@ namespace Indy.IL2CPU.IL.X86 {
                                                                                                       false);
             foreach (var xParam in xMethodDef.GetParameters())
             {
-                Engine.RegisterType(xParam.ParameterType);
+                aServiceProvider.GetService<IMetaDataInfoService>().GetTypeInfo(xParam.ParameterType);
             }
             aServiceProvider.GetService<IMetaDataInfoService>().GetTypeInfo(xTargetMethodInfo.ReturnType);
             aServiceProvider.GetService<IMetaDataInfoService>().GetMethodInfo(xMethodDef, false);

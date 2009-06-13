@@ -160,7 +160,7 @@ namespace Indy.IL2CPU
                             xAppDefs.Add(xAssemblyDef);
                         }
                     }
-                    mMap.Initialize(mAssembler, xAppDefs);
+                    mMap.Initialize(xAppDefs);
                     //!String.IsNullOrEmpty(aDebugSymbols);
                     IL.Op.QueueMethod += QueueMethod;
                     IL.Op.QueueStaticField += QueueStaticField;
@@ -336,6 +336,28 @@ namespace Indy.IL2CPU
                         mMap.PostProcess(mAssembler);
                         ProcessAllStaticFields();
                         GenerateVMT(mDebugMode != DebugMode.None);
+                        // TODO: fix the compiler so that it's not needed anymore
+                        // explanation:
+                        //      right now (06132009) we use the fullname of a type ("System.String") instead of the
+                        //      fully qualified name ("System.String, mscorlib, Version=2.0.0.0") of a type to uniquely
+                        //      identify it. The folowing three types are duplicates in mscorlib and system
+                        //  MtW
+                        var xDeleteItem = new Action<string>(delegate(string obj)
+                        {
+                            for (int i = 0; i < aAssembler.DataMembers.Count; i++)
+                            {
+                                if (aAssembler.DataMembers[i].Name == obj)
+                                {
+                                    aAssembler.DataMembers.RemoveAt(i);
+                                    return;
+                                }
+                            }
+                            throw new Exception("Item not found: maybe this hack isn't neccessary anymore?");
+                        });
+                        xDeleteItem("____SYSTEM____TYPE___System_ThrowHelper");
+                        xDeleteItem("____SYSTEM____TYPE___System_ExceptionResource");
+                        xDeleteItem("____SYSTEM____TYPE___System_ExceptionArgument");
+                        //
                         using (mSymbolsLocker.AcquireReaderLock())
                         {
                             if (mSymbols != null)
@@ -476,6 +498,11 @@ namespace Indy.IL2CPU
                         mMethods[xCurrentMethod].PreProcessed = true;
                     }
                     if (xCurrentMethod.IsAbstract)
+                    {
+                        continue;
+                    }
+                    // EXPERIMENTAL: types on generic type definitions dont need building?
+                    if(xCurrentMethod.IsGenericMethodDefinition || xCurrentMethod.DeclaringType.IsGenericTypeDefinition)
                     {
                         continue;
                     }
@@ -1326,7 +1353,7 @@ namespace Indy.IL2CPU
         /// <remarks>For classes, this is the pointer size.</remarks>
         /// <param name="aType"></param>
         /// <returns></returns>
-        public static uint GetFieldStorageSize(Type aType)
+        public uint GetFieldStorageSize(Type aType)
         {
             if (aType.FullName == "System.Void")
             {
@@ -1369,10 +1396,17 @@ namespace Indy.IL2CPU
                 case "System.DateTime":
                     return 8; // todo: check for correct size
             }
-            if (aType.FullName.EndsWith("*"))
+            try
             {
-                // pointer
-                return 4;
+                if (aType.FullName.EndsWith("*"))
+                {
+                    // pointer
+                    return 4;
+                }
+            }catch
+            {
+                Console.Write("");
+                throw;
             }
             // array
             //TypeSpecification xTypeSpec = aType as TypeSpecification;
@@ -1463,6 +1497,10 @@ namespace Indy.IL2CPU
                 aType = typeof(Array);
             }
             var xLabel = Label.FilterStringForIncorrectChars(aType.AssemblyQualifiedName + "__TYPE_ID");
+            if (xLabel == "System__DOT__ConsoleKey__mscorlib__Version_2__DOT__0__DOT__0__DOT__0__Culture_neutral__PublicKeyToken_b77a5c561934e089__TYPE_ID")
+            {
+                Console.Write("");
+            }
             //if (!mCreatedIDLabels.Contains(xLabel))
             //{
             //    mAssembler.DataMembers.Add(new DataMember(xLabel, 0));
@@ -2390,7 +2428,7 @@ namespace Indy.IL2CPU
             return null;
         }
 
-        public static TypeInformation GetTypeInfo(Type aType)
+        public TypeInformation GetTypeInfo(Type aType)
         {
             TypeInformation xTypeInfo;
             uint xObjectStorageSize;
@@ -2417,7 +2455,7 @@ namespace Indy.IL2CPU
                                  null);
         }
 
-        public static MethodInformation GetMethodInfo(MethodBase aCurrentMethodForArguments,
+        public MethodInformation GetMethodInfo(MethodBase aCurrentMethodForArguments,
                                                       MethodBase aCurrentMethodForLocals,
                                                       string aMethodName,
                                                       TypeInformation aTypeInfo,
@@ -2560,7 +2598,7 @@ namespace Indy.IL2CPU
             return GetFieldStorageSize(aType);
         }
 
-        public static Dictionary<string, TypeInformation.Field> GetTypeFieldInfo(MethodBase aCurrentMethod,
+        public Dictionary<string, TypeInformation.Field> GetTypeFieldInfo(MethodBase aCurrentMethod,
                                                                                  out uint aObjectStorageSize)
         {
             Type xCurrentInspectedType = aCurrentMethod.DeclaringType;
@@ -2568,7 +2606,7 @@ namespace Indy.IL2CPU
                                     out aObjectStorageSize);
         }
 
-        private static void GetTypeFieldInfoImpl(List<KeyValuePair<string, TypeInformation.Field>> aTypeFields,
+        private void GetTypeFieldInfoImpl(List<KeyValuePair<string, TypeInformation.Field>> aTypeFields,
                                                  Type aType,
                                                  ref uint aObjectStorageSize)
         {
@@ -2700,9 +2738,10 @@ namespace Indy.IL2CPU
             } while (true);
         }
 
-        public static Dictionary<string, TypeInformation.Field> GetTypeFieldInfo(Type aType,
+        public Dictionary<string, TypeInformation.Field> GetTypeFieldInfo(Type aType,
                                                                                  out uint aObjectStorageSize)
         {
+            RegisterType(aType);
             var xTypeFields = new List<KeyValuePair<string, TypeInformation.Field>>();
             aObjectStorageSize = 0;
             GetTypeFieldInfoImpl(xTypeFields,
@@ -2882,7 +2921,7 @@ namespace Indy.IL2CPU
         /// </summary>
         /// <param name="aType"></param>
         /// <returns></returns>
-        public static int RegisterType(Type aType)
+        public static void RegisterType(Type aType)
         {
             if (aType == null)
             {
@@ -2909,16 +2948,16 @@ namespace Indy.IL2CPU
             }
             using (mCurrent.mTypesLocker.AcquireReaderLock())
             {
-                var xItem = mCurrent.mTypes.FirstOrDefault(x => x.FullName.Equals(aType.FullName));
+                var xItem = mCurrent.mTypes.FirstOrDefault(x => x.AssemblyQualifiedName.Equals(aType.AssemblyQualifiedName));
                 if (xItem != null)
                 {
-                    return mCurrent.mTypes.IndexOf(xItem);
+                    return;
                 }
             }
             Type xFoundItem;
             using (mCurrent.mTypesLocker.AcquireWriterLock())
             {
-                xFoundItem = mCurrent.mTypes.FirstOrDefault(x => x.FullName.Equals(aType.FullName));
+                xFoundItem = mCurrent.mTypes.FirstOrDefault(x => x.AssemblyQualifiedName.Equals(aType.AssemblyQualifiedName));
 
                 if (xFoundItem == null)
                 {
@@ -2928,11 +2967,11 @@ namespace Indy.IL2CPU
                         Type xCurInspectedType = aType.BaseType;
                         RegisterType(xCurInspectedType);
                     }
-                    return RegisterType(aType);
+                    RegisterType(aType);
                 }
                 else
                 {
-                    return mCurrent.mTypes.IndexOf(xFoundItem);
+                    return;
                 }
             }
         }
