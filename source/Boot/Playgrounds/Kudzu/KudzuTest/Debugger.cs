@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-//using Dbg = Cosmos.Debug;
+using Dbg = Cosmos.Debug;
 
 namespace Cosmos.Playground.Kudzu {
   public class Debugger {
@@ -9,13 +9,13 @@ namespace Cosmos.Playground.Kudzu {
       Random xRandom = new Random((int)(Cosmos.Hardware.Global.TickCount
           + Cosmos.Hardware.RTC.GetSeconds()));
       // Divide by 100, get remainder
-      //Dbg.Debugger.Break();
+      Dbg.Debugger.Break();
       int xMagicNo = xRandom.Next() % 100;
-      //Dbg.Debugger.Send("The magic number is " + xMagicNo);
+      Dbg.Debugger.Send("The magic number is " + xMagicNo);
       Console.WriteLine("Hello world");
-      //Dbg.Debugger.TraceOn();
+      Dbg.Debugger.TraceOn();
       int xDummy = 4;
-      //Dbg.Debugger.TraceOff();
+      Dbg.Debugger.TraceOff();
       Console.ReadLine();
     }
   }
