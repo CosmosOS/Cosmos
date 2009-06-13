@@ -159,7 +159,7 @@ namespace Cosmos.Demo.Nibbles
 
         private static void Wait(int milliseconds)
         {
-            Cosmos.Hardware.PIT.Wait(milliseconds);
+            Cosmos.Hardware.PIT.Wait((uint)milliseconds);
         }
     }
 }

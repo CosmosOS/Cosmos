@@ -231,17 +231,12 @@ namespace Cosmos.Hardware
             WaitSignaled = true;
         }
 
-        public static void Wait(int TimeoutMS)
-        {
-            WaitNS(TimeoutMS * 1000000);
-        }
         public static void Wait(uint TimeoutMS)
         {
             WaitSignaled = false;
 
-            PITUtil.SoftwareTimer stwait = new PITUtil.SoftwareTimer(TimeoutMS, 1000000);
-            stwait.HandleTrigger = SignalWait;
- 
+            RegisterTimer(new PITTimer(SignalWait, (int)(TimeoutMS * 1000000), false));
+
             while (!WaitSignaled)
             {
                 CPU.Halt();
@@ -312,58 +307,6 @@ namespace Cosmos.Hardware
         {
             T0RateGen = true;
             T0Countdown = _T0Countdown;
-        }
-    }
-
-    public class PITUtil
-    {
-        public sealed class SoftwareTimer : IDisposable
-        {
-            private uint _Countdown;
-            private uint _TicksLeft;
-            private int TimerID;
-
-            public delegate void dOnTrigger();
-            public dOnTrigger HandleTrigger;
-
-            private void OnPITTrigger()
-            {
-                _TicksLeft--;
-
-                if (_TicksLeft == 0)
-                {
-                    _TicksLeft = _Countdown;
-                    HandleTrigger();
-                }
-            }
-
-            public SoftwareTimer(uint Countdown, int NSResolution)
-            {
-                _Countdown = Countdown;
-                _TicksLeft = _Countdown;
-
-                TimerID = PIT.RegisterTimer(new PIT.PITTimer(OnPITTrigger, NSResolution, true));
-            }
-            public SoftwareTimer(uint Countdown, uint CountdownLeft, int NSResolution)
-            {
-                _Countdown = Countdown;
-                _TicksLeft = CountdownLeft;
-
-                TimerID = PIT.RegisterTimer(new PIT.PITTimer(OnPITTrigger, NSResolution, true));
-            }
-            ~SoftwareTimer()
-            {
-                Dispose();
-            }
-
-            public void Dispose()
-            {
-                if (TimerID != -1)
-                {
-                    PIT.UnregisterTimer(TimerID);
-                    TimerID = -1;
-                }
-            }
         }
     }
 }

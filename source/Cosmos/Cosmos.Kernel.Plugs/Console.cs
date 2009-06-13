@@ -44,7 +44,7 @@ namespace Cosmos.Kernel.Plugs
 
             PIT.EnableSound();
             PIT.T2Frequency = aFrequency;
-            PIT.Wait(aDuration);
+            PIT.Wait((uint)aDuration);
             PIT.DisableSound();
         }
 
