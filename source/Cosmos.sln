@@ -204,9 +204,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PagingTest", "PagingTest\Pa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Demo.VGASnake", "Cosmos.Demo.VGASnake\Cosmos.Demo.VGASnake.csproj", "{D164E007-B3BE-4F4D-8E30-5D9FBD4022E4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompilerTester", "Playgrounds\Ben\CompilerTester\CompilerTester.csproj", "{A3D40E55-2EA2-4288-B08B-768F076C818B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Bens", "Bens", "{7687ABAD-03E9-4B56-97D1-B181DF6832CD}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 63
+		SccNumberOfProjects = 64
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -458,6 +462,10 @@ Global
 		SccProjectTopLevelParentUniqueName62 = Cosmos.sln
 		SccProjectName62 = Cosmos.Demo.VGASnake
 		SccLocalPath62 = Cosmos.Demo.VGASnake
+		SccProjectUniqueName63 = Playgrounds\\Ben\\CompilerTester\\CompilerTester.csproj
+		SccProjectTopLevelParentUniqueName63 = Cosmos.sln
+		SccProjectName63 = Playgrounds/Ben/CompilerTester
+		SccLocalPath63 = Playgrounds\\Ben\\CompilerTester
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -712,6 +720,10 @@ Global
 		{D164E007-B3BE-4F4D-8E30-5D9FBD4022E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D164E007-B3BE-4F4D-8E30-5D9FBD4022E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D164E007-B3BE-4F4D-8E30-5D9FBD4022E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3D40E55-2EA2-4288-B08B-768F076C818B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3D40E55-2EA2-4288-B08B-768F076C818B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3D40E55-2EA2-4288-B08B-768F076C818B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3D40E55-2EA2-4288-B08B-768F076C818B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -762,6 +774,7 @@ Global
 		{E5644B8E-ABD7-4B71-B7B6-C9F6CE7B1D94} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
 		{12EC019C-B585-490F-84D6-16F000DC4CDB} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
 		{54DD5F71-82C3-44D7-99F0-A93B54C220F7} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
+		{7687ABAD-03E9-4B56-97D1-B181DF6832CD} = {EBF602FE-8AFC-408D-A9F1-560C35651090}
 		{605F8D53-66FA-4BEC-844E-F63209B855C9} = {B2F8734A-DA5C-4F65-BD67-B9E717DC510E}
 		{8C747807-B159-41F0-A720-34EB159F55F5} = {B2F8734A-DA5C-4F65-BD67-B9E717DC510E}
 		{5DC4FE9C-A91A-42C1-A18B-B28E8388A8C4} = {9FDB0A12-6D62-41CF-917F-62A94A03472D}
@@ -808,5 +821,6 @@ Global
 		{61535AF6-4A1E-4691-B2BC-039851EF4850} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
 		{B2D0F851-65FB-4DE9-A55D-5491062F8FE0} = {5F424AF3-8D92-4C0F-AD6D-EB5A187F9FE6}
 		{54ACC512-D568-4F7C-9204-E1A4A285EFF2} = {54DD5F71-82C3-44D7-99F0-A93B54C220F7}
+		{A3D40E55-2EA2-4288-B08B-768F076C818B} = {7687ABAD-03E9-4B56-97D1-B181DF6832CD}
 	EndGlobalSection
 EndGlobal
