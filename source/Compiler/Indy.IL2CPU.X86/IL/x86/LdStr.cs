@@ -10,7 +10,7 @@ using System.Collections.Generic;
 namespace Indy.IL2CPU.IL.X86 {
     [OpCode(OpCodeEnum.Ldstr)]
     public class LdStr : Op {
-        private static Dictionary<string, DataMember> mDataMemberMap = new Dictionary<string, DataMember>();
+        //private static Dictionary<string, DataMember> mDataMemberMap = new Dictionary<string, DataMember>();
         public readonly string LiteralStr;
 
         //public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
@@ -43,8 +43,8 @@ namespace Indy.IL2CPU.IL.X86 {
             xTemp = xEncoding.GetBytes(aLiteral);
             Array.Copy(xTemp, 0, xByteArray, 16, xTemp.Length);
             DataMember xDataMember = null;
-            if (!mDataMemberMap.TryGetValue(aLiteral, out xDataMember))
-            {
+            //if (!mDataMemberMap.TryGetValue(aLiteral, out xDataMember))
+            //{
                 string xDataName = aAssembler.GetIdentifier("StringLiteral");
                 object[] xObjectData = new object[7];
                 //xObjectData[0] = ((uint)Engine.RegisterType(Engine.GetType("mscorlib", "System.String")));
@@ -56,13 +56,13 @@ namespace Indy.IL2CPU.IL.X86 {
                 xObjectData[6] = aLiteral.Length;
                 aAssembler.DataMembers.Add(new DataMember(xDataName, xObjectData));
                 aAssembler.DataMembers.Add(xDataMember = new DataMember(xDataName + "__Contents", xByteArray));
-                mDataMemberMap.Add(aLiteral, xDataMember);
+                //mDataMemberMap.Add(aLiteral, xDataMember);
                 return xDataName;
-            }
-            else
-            {
-                return xDataMember.Name.Substring(0, xDataMember.Name.Length - "__Contents".Length);
-            }
+            //}
+            //else
+            //{
+            //    return xDataMember.Name.Substring(0, xDataMember.Name.Length - "__Contents".Length);
+            //}
         }
 
         public override void DoAssemble() {

@@ -47,6 +47,9 @@ namespace Indy.IL2CPU.IL.X86 {
             aServiceProvider.GetService<IMetaDataInfoService>().GetMethodInfo(
                 CPU.Assembler.CurrentExceptionOccurredRef, false);
             aServiceProvider.GetService<IMetaDataInfoService>().GetTypeInfo(typeof (NullReferenceException));
+            aServiceProvider.GetService<IMetaDataInfoService>().GetStaticFieldLabel(CPU.Assembler.CurrentExceptionRef);
+            aServiceProvider.GetService<IMetaDataInfoService>().GetMethodInfo(
+                    CPU.Assembler.CurrentExceptionOccurredRef, false);
         }
 
         public Callvirt(ILReader aReader,

@@ -65,32 +65,39 @@ namespace Indy.IL2CPU.Compiler
         {
             using(var xCurrentAssembler = GetAssembler(info.Assembly, info.Assembly == mEntryPointAssembly))
             {
-                // emit the methods. 
-                foreach(var xMethod in info.Methods.Values)
+                mCurrentAssemblyCompilationInfo = info;
+                try
                 {
-                    CompileMethod(xMethod, xCurrentAssembler);
-                }
+                    // emit the methods. 
+                    foreach (var xMethod in info.Methods.Values)
+                    {
+                        CompileMethod(xMethod, xCurrentAssembler);
+                    }
 
-                // emit the fields
-                foreach(var xField in info.StaticFields.Values)
-                {
-                    CompileStaticField(xField, xCurrentAssembler);
-                }
-                
-                // emit the method and type id data members
-                foreach(var xIdMember in info.IDLabels)
-                {
-                    xCurrentAssembler.DataMembers.Add(new DataMember(xIdMember, new int[1]));
-                }
+                    // emit the fields
+                    foreach (var xField in info.StaticFields.Values)
+                    {
+                        CompileStaticField(xField, xCurrentAssembler);
+                    }
 
-                // emit externals
-                foreach(var xExternal in info.Externals)
-                {
-                    new ExternalLabel(xExternal);
-                }
+                    // emit the method and type id data members
+                    foreach (var xIdMember in info.IDLabels)
+                    {
+                        xCurrentAssembler.DataMembers.Add(new DataMember(xIdMember, new int[1]));
+                    }
 
-                // todo: implement string init method, vmt init methods, cctor calling method, etc
-                SaveAssembler(info.Assembly, xCurrentAssembler);
+                    // emit externals
+                    foreach (var xExternal in info.Externals)
+                    {
+                        new ExternalLabel(xExternal);
+                    }
+
+                    // todo: implement string init method, vmt init methods, cctor calling method, etc
+                    SaveAssembler(info.Assembly, xCurrentAssembler);
+                }finally
+                {
+                    mCurrentAssemblyCompilationInfo = null;
+                }
             }
         }
 
@@ -719,6 +726,7 @@ namespace Indy.IL2CPU.Compiler
 
         private IDictionary<string, MethodBase> mPlugMethods;
         private IDictionary<Type, Dictionary<string, PlugFieldAttribute>> mPlugFields;
+        private AssemblyCompilationInfo mCurrentAssemblyCompilationInfo = null;
 
         /// <summary>
         ///  contains the code for scanning for new methods, but just one pass.
@@ -733,102 +741,115 @@ namespace Indy.IL2CPU.Compiler
                 {
                     continue;
                 }
-                string xMethodName = Label.GetFullName(xCurrentMethod);
-                TypeInformation xTypeInfo = null;
-                if (!xCurrentMethod.IsStatic)
+                if(!mAssemblyInfos.TryGetValue(xCurrentMethod.DeclaringType.Assembly, out mCurrentAssemblyCompilationInfo))
                 {
-                    xTypeInfo = GetTypeInfo(xCurrentMethod.DeclaringType);
+                    mCurrentAssemblyCompilationInfo = new AssemblyCompilationInfo
+                                                          {Assembly = xCurrentMethod.DeclaringType.Assembly};
+                    mAssemblyInfos.Add(mCurrentAssemblyCompilationInfo.Assembly, mCurrentAssemblyCompilationInfo);
                 }
-                MethodInformation xMethodInfo;
-                // using (mMethodsLocker.AcquireReaderLock())
+                try
                 {
-                    xEmptyDict.Clear();
-                    xMethodInfo = GetMethodInfo(xCurrentMethod,
-                                                xCurrentMethod,
-                                                xMethodName,
-                                                xTypeInfo,
-                                                false, // debug mode
-                                                xEmptyDict);
-                }
-                MethodBase xCustomImplementation = GetCustomMethodImplementation(xMethodName);
-                if (xCustomImplementation != null)
-                {
-                    try
+                    string xMethodName = Label.GetFullName(xCurrentMethod);
+                    TypeInformation xTypeInfo = null;
+                    if (!xCurrentMethod.IsStatic)
                     {
-                        AddMethod(xCustomImplementation);
+                        xTypeInfo = GetTypeInfo(xCurrentMethod.DeclaringType);
                     }
-                    catch (Exception e)
+                    MethodInformation xMethodInfo;
+                    // using (mMethodsLocker.AcquireReaderLock())
                     {
-                        throw new Exception("Method " + xCurrentMethod.GetFullName() + " has called " + e.Message +
-                                            "! Probably it needs to be plugged");
+                        xEmptyDict.Clear();
+                        xMethodInfo = GetMethodInfo(xCurrentMethod,
+                                                    xCurrentMethod,
+                                                    xMethodName,
+                                                    xTypeInfo,
+                                                    false, // debug mode
+                                                    xEmptyDict);
                     }
-                    //   using (mMethodsLocker.AcquireReaderLock())
-                    //{
-                    //    mMethods[xCurrentMethod].Implementation = xCustomImplementation;
-                    //}
-                    continue;
-                }
-                Type xOpType = mCurrentMap.GetOpForCustomMethodImplementation(xMethodName);
-                if (xOpType != null)
-                {
-                    Op xMethodOp = GetOpFromType(xOpType, null, xMethodInfo);
-                    if (xMethodOp != null)
+                    MethodBase xCustomImplementation = GetCustomMethodImplementation(xMethodName);
+                    if (xCustomImplementation != null)
                     {
+                        try
+                        {
+                            AddMethod(xCustomImplementation);
+                        }
+                        catch (Exception e)
+                        {
+                            throw new Exception("Method " + xCurrentMethod.GetFullName() + " has called " + e.Message +
+                                                "! Probably it needs to be plugged");
+                        }
+                        //   using (mMethodsLocker.AcquireReaderLock())
+                        //{
+                        //    mMethods[xCurrentMethod].Implementation = xCustomImplementation;
+                        //}
                         continue;
                     }
-                }
-                if (mCurrentMap.HasCustomAssembleImplementation(xMethodInfo))
-                {
-                    mCurrentMap.ScanCustomAssembleImplementation(xMethodInfo);
-                    continue;
-                }
-
-                //xCurrentMethod.GetMethodImplementationFlags() == MethodImplAttributes.
-                MethodBody xBody = xCurrentMethod.GetMethodBody();
-                // todo: add better detection of implementation state
-                if (xBody != null)
-                {
-                    ILReader xReader = new ILReader(xCurrentMethod);
-                    var xInstructionInfos = new List<DebugSymbolsAssemblyTypeMethodInstruction>();
-                    while (xReader.Read())
+                    Type xOpType = mCurrentMap.GetOpForCustomMethodImplementation(xMethodName);
+                    if (xOpType != null)
                     {
-                        SortedList<string, object> xInfo = new SortedList<string, object>();
-                        // using (mMethodsLocker.AcquireReaderLock())
-                        //{
-                        //    xInfo = mMethods[xCurrentMethod].Info;
-                        //}
-                        mCurrentMap.ScanILCode(xReader, xMethodInfo, xInfo);
-                        switch (xReader.OpCode)
+                        Op xMethodOp = GetOpFromType(xOpType, null, xMethodInfo);
+                        if (xMethodOp != null)
                         {
-                            case OpCodeEnum.Call:
-                            case OpCodeEnum.Callvirt:
-                            case OpCodeEnum.Newobj:
-                            case OpCodeEnum.Ldftn:
-                                AddMethod(xReader.OperandValueMethod);
-                                break;
-                            case OpCodeEnum.Initobj:
-                            case OpCodeEnum.Ldelema:
-                                //Add(xReader.OperandValueType);
-                                break;
-                            case OpCodeEnum.Stsfld:
-                            case OpCodeEnum.Ldsfld:
-                            case OpCodeEnum.Ldsflda:
-                                AddStaticField(xReader.OperandValueField);
-                                break;
-                            case OpCodeEnum.Ldtoken:
-                                if (xReader.OperandValueType != null)
-                                {
-                                    //RegisterType(xReader.OperandValueType);
-                                    break;
-                                }
-                                if (xReader.OperandValueField != null)
-                                {
-                                    AddStaticField(xReader.OperandValueField);
-                                    break;
-                                }
-                                break;
+                            continue;
                         }
                     }
+                    if (mCurrentMap.HasCustomAssembleImplementation(xMethodInfo))
+                    {
+                        mCurrentMap.ScanCustomAssembleImplementation(xMethodInfo);
+                        continue;
+                    }
+
+                    //xCurrentMethod.GetMethodImplementationFlags() == MethodImplAttributes.
+                    MethodBody xBody = xCurrentMethod.GetMethodBody();
+                    // todo: add better detection of implementation state
+                    if (xBody != null)
+                    {
+                        ILReader xReader = new ILReader(xCurrentMethod);
+                        var xInstructionInfos = new List<DebugSymbolsAssemblyTypeMethodInstruction>();
+                        while (xReader.Read())
+                        {
+                            SortedList<string, object> xInfo = new SortedList<string, object>();
+                            // using (mMethodsLocker.AcquireReaderLock())
+                            //{
+                            //    xInfo = mMethods[xCurrentMethod].Info;
+                            //}
+                            mCurrentMap.ScanILCode(xReader, xMethodInfo, xInfo);
+                            switch (xReader.OpCode)
+                            {
+                                case OpCodeEnum.Call:
+                                case OpCodeEnum.Callvirt:
+                                case OpCodeEnum.Newobj:
+                                case OpCodeEnum.Ldftn:
+                                    AddMethod(xReader.OperandValueMethod);
+                                    break;
+                                case OpCodeEnum.Initobj:
+                                case OpCodeEnum.Ldelema:
+                                    //Add(xReader.OperandValueType);
+                                    break;
+                                case OpCodeEnum.Stsfld:
+                                case OpCodeEnum.Ldsfld:
+                                case OpCodeEnum.Ldsflda:
+                                    AddStaticField(xReader.OperandValueField);
+                                    break;
+                                case OpCodeEnum.Ldtoken:
+                                    if (xReader.OperandValueType != null)
+                                    {
+                                        //RegisterType(xReader.OperandValueType);
+                                        break;
+                                    }
+                                    if (xReader.OperandValueField != null)
+                                    {
+                                        AddStaticField(xReader.OperandValueField);
+                                        break;
+                                    }
+                                    break;
+                            }
+                        }
+                    }
+                }
+                finally
+                {
+                    mCurrentAssemblyCompilationInfo = null;
                 }
             }
             mNextMethodToScan = mAllMethods.Count;

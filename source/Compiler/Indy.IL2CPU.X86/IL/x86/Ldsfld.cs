@@ -35,8 +35,8 @@ namespace Indy.IL2CPU.IL.X86 {
         private FieldInfo mField;
 		public override void DoAssemble() {
             var xSize = GetService<IMetaDataInfoService>().GetFieldStorageSize(mField.FieldType);
-            mDataName = DataMember.GetStaticFieldName(mField);
-			if (xSize >= 4) {
+            mDataName = GetService<IMetaDataInfoService>().GetStaticFieldLabel(mField);
+		    if (xSize >= 4) {
 				for (int i = 1; i <= (xSize / 4); i++) {
 					//	Pop("eax");
 					//	Move(Assembler, "dword [" + mDataName + " + 0x" + (i * 4).ToString("X") + "]", "eax");

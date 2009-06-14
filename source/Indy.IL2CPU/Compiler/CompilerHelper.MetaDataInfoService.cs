@@ -322,6 +322,11 @@ namespace Indy.IL2CPU.Compiler
                     mAllMethods.Add(aCurrentMethodForLocals);
                 }
             }
+            if(mCurrentAssemblyCompilationInfo==null){throw new Exception("No Current Assembly Info!");}
+            if(aCurrentMethodForArguments.DeclaringType.Assembly!=mCurrentAssemblyCompilationInfo.Assembly)
+            {
+                mCurrentAssemblyCompilationInfo.ReferenceMethod(aCurrentMethodForArguments);
+            }
             MethodInformation xMethodInfo;
             {
                 MethodInformation.Variable[] xVars = new MethodInformation.Variable[0];
@@ -481,23 +486,33 @@ namespace Indy.IL2CPU.Compiler
         public string GetStaticFieldLabel(FieldInfo aField)
         {
             var xLabel = DataMember.GetStaticFieldName(aField);
-
+            if (aField.DeclaringType.Assembly != mCurrentAssemblyCompilationInfo.Assembly)
+            {
+                mCurrentAssemblyCompilationInfo.ReferenceStaticField(aField);
+            }
             return xLabel;
         }
 
         public string GetTypeIdLabel(Type aType)
         {
             var xLabel = Label.FilterStringForIncorrectChars(aType.AssemblyQualifiedName + "__TYPE_ID");
-            if (!mCreatedIDLabels.Contains(xLabel))
+            if (aType.Assembly != mCurrentAssemblyCompilationInfo.Assembly)
             {
-                AssemblyCompilationInfo xAsmInfo;
-                if(!mAssemblyInfos.TryGetValue(aType.Assembly, out xAsmInfo))
+                mCurrentAssemblyCompilationInfo.ReferenceID(xLabel);
+            }
+            else
+            {
+                if (!mCreatedIDLabels.Contains(xLabel))
                 {
-                    xAsmInfo = new AssemblyCompilationInfo {Assembly = aType.Assembly};
-                    mAssemblyInfos.Add(xAsmInfo.Assembly, xAsmInfo);
+                    AssemblyCompilationInfo xAsmInfo;
+                    if (!mAssemblyInfos.TryGetValue(aType.Assembly, out xAsmInfo))
+                    {
+                        xAsmInfo = new AssemblyCompilationInfo {Assembly = aType.Assembly};
+                        mAssemblyInfos.Add(xAsmInfo.Assembly, xAsmInfo);
+                    }
+                    xAsmInfo.IDLabels.Add(xLabel);
+                    mCreatedIDLabels.Add(xLabel);
                 }
-                xAsmInfo.IDLabels.Add(xLabel);
-                mCreatedIDLabels.Add(xLabel);
             }
             return xLabel;
         }
@@ -507,16 +522,23 @@ namespace Indy.IL2CPU.Compiler
         public string GetMethodIdLabel(MethodBase aMethodDef)
         {
             var xLabel = Label.FilterStringForIncorrectChars(aMethodDef.GetFullName()+ "__METHOD_ID");
-            if (!mCreatedIDLabels.Contains(xLabel))
+            if (aMethodDef.DeclaringType.Assembly != mCurrentAssemblyCompilationInfo.Assembly)
             {
-                AssemblyCompilationInfo xAsmInfo;
-                if (!mAssemblyInfos.TryGetValue(aMethodDef.DeclaringType.Assembly, out xAsmInfo))
+                mCurrentAssemblyCompilationInfo.ReferenceID(xLabel);
+            }
+            else
+            {
+                if (!mCreatedIDLabels.Contains(xLabel))
                 {
-                    xAsmInfo = new AssemblyCompilationInfo { Assembly = aMethodDef.DeclaringType.Assembly };
-                    mAssemblyInfos.Add(xAsmInfo.Assembly, xAsmInfo);
+                    AssemblyCompilationInfo xAsmInfo;
+                    if (!mAssemblyInfos.TryGetValue(aMethodDef.DeclaringType.Assembly, out xAsmInfo))
+                    {
+                        xAsmInfo = new AssemblyCompilationInfo {Assembly = aMethodDef.DeclaringType.Assembly};
+                        mAssemblyInfos.Add(xAsmInfo.Assembly, xAsmInfo);
+                    }
+                    xAsmInfo.IDLabels.Add(xLabel);
+                    mCreatedIDLabels.Add(xLabel);
                 }
-                xAsmInfo.IDLabels.Add(xLabel);
-                mCreatedIDLabels.Add(xLabel);
             }
             return xLabel;
         }

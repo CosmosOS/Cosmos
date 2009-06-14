@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Indy.IL2CPU.Assembler;
 using Indy.IL2CPU.IL;
 
 namespace Indy.IL2CPU.Compiler
@@ -16,7 +17,7 @@ namespace Indy.IL2CPU.Compiler
             public AssemblyCompilationInfo()
             {
                 Methods = new  Dictionary<string, MethodBase>();
-                StaticFields=new Dictionary<string, FieldInfo>();
+                StaticFields = new Dictionary<string, FieldInfo>();
             }
 
             public Assembly Assembly
@@ -48,6 +49,32 @@ namespace Indy.IL2CPU.Compiler
                 {
                     Methods.Add(xName, aMethod);
                 }
+            }
+
+            public void ReferenceMethod(MethodBase aMethod)
+            {
+                var xName = aMethod.GetFullName();
+                if(!Externals.Contains(xName))
+                {
+                    Externals.Add(xName);
+                }
+            }
+
+            public void ReferenceStaticField(FieldInfo aField)
+            {
+                var xName = DataMember.GetStaticFieldName(aField);
+                if (!Externals.Contains(xName))
+                {
+                    Externals.Add(xName);
+                } 
+            }
+
+            public void ReferenceID(string aID)
+            {
+                if (!Externals.Contains(aID))
+                {
+                    Externals.Add(aID);
+                } 
             }
 
             public Dictionary<string, MethodBase> Methods
