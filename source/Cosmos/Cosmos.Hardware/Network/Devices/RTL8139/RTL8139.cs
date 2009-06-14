@@ -78,7 +78,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
 
         public static void InitDriver()
         {
-            Device.mDriverInits.Add(FindAll);
+            Device.AddDriverInit(FindAll);
         }
 
         public static void FindAll()

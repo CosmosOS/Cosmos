@@ -31,33 +31,47 @@ namespace MatthijsTest
 
         public static unsafe void Init()
         {
-            bool xTest = false;
+            bool xTest = true;
             if (xTest)
             {
                 var xBoot = new Cosmos.Sys.Boot();
                 xBoot.Execute();
             }
-            object Str = new Program();
-            if (Str is Program)
-            {
-                Console.WriteLine("Wel");
-            }
-            else
-            {
-                Console.WriteLine("Niet");
-            }
-//            byte* xTemp = (byte*) 0x1;
-//            for (int i = 0; i < 32 * 1024; i++ )
-//            {
-//                if (xTemp[i] == 0x50 && xTemp[i+1] == 0x4D && xTemp[i+2] == 0x49 && xTemp[i+3]== 0x44)
-//                {
-//Console.WriteLine(i.ToString());
-//                }
-//            }
-            //throw new NotImplementedException("Method needs plugging. Signature: bladibladibladibla");
-            Console.WriteLine("Hello, World!");
-            //Cosmos.Sys.Deboot.ShutDown();
+            var xDirectories = Directory.GetDirectories("/0");
 
+            for (int i = 0; i < xDirectories.Length; i++)
+            {
+                Console.WriteLine(xDirectories[i]);
+            }
+            Console.Write("Number of devices: ");
+            Console.WriteLine(Device.Devices.Count.ToString());
+            //var xItem = new Derived();
+            //Console.WriteLine(xItem.Type);
+            //Base xBase = xItem;
+            //Console.WriteLine(xBase.Type);
         }
+
+
+        public abstract class Base
+        {
+            public abstract string Type
+            { get;
+                //{
+                //    return "Base";
+                //}
+            }
+        }
+
+        public class Derived: Base
+        {
+            public override string Type
+            {
+                get
+                {
+                    return "Derived";
+                }
+            }
+        }
+
     }
 }

@@ -121,7 +121,7 @@ namespace Cosmos.Hardware.Network.Devices.AMDPCNetII
 
         public static void InitDriver()
         {
-            Device.mDriverInits.Add(FindAll);
+            Device.AddDriverInit(FindAll);
         }
 
         /// <summary>

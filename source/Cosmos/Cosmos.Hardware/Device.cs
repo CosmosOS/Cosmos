@@ -18,7 +18,15 @@ namespace Cosmos.Hardware {
 
         public delegate void InitializeDriver();
 
-        static protected List<InitializeDriver> mDriverInits = new List<InitializeDriver>();
+        private static List<InitializeDriver> mDriverInits;
+        public static void AddDriverInit(InitializeDriver aInit)
+        {
+            if(mDriverInits==null)
+            {
+                mDriverInits = new List<InitializeDriver>(4);
+            }
+            mDriverInits.Add(aInit);
+        }
 
         public static void DriversInit()
         {
@@ -32,7 +40,7 @@ namespace Cosmos.Hardware {
 		public Device() {
 		}
 
-		static protected List<Device> mDevices = new List<Device>();
+		static protected List<Device> mDevices = new List<Device>(4);
 		static public List<Device> Devices {
 			get {
 				return mDevices;

@@ -115,7 +115,7 @@ namespace Cosmos.Hardware.Network.Devices.ViaRhine
 
         public static void InitDriver()
         {
-            Device.mDriverInits.Add(FindAll);
+            Device.AddDriverInit(FindAll);
         }
 
         /// <summary>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Indy.IL2CPU.Assembler;
 using Indy.IL2CPU.Compiler;
 
 namespace Indy.IL2CPU.IL.X86 {
@@ -26,6 +27,7 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		public override void DoAssemble() {
             var xElementSize = GetService<IMetaDataInfoService>().GetFieldStorageSize(mType);
+            new Comment("Element size: " + xElementSize);
 			Ldelem_Ref.Assemble(Assembler, xElementSize);
 		}
 	}
