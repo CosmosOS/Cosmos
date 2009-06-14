@@ -50,7 +50,6 @@
     <Compile Include="CosmosBuildTarget.cs" />
     <Compile Include="DynamicMethodSystem.cs" />
     <Compile Include="IgnoreWhenBuildingCosmosAttribute.cs" />
-    <Compile Include="InlineMethodAttribute.cs" />
     <Compile Include="Plugs\CPlugOverloaders.cs" />
     <Compile Include="Plugs\PlugUtils.cs" />
     <Compile Include="Plugs\PlugAssemblyAttribute.cs" />

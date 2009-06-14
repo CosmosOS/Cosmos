@@ -38,12 +38,14 @@ namespace Cosmos.BuildEngine
 
             //File Format for Plugs:
             //  Filename: asm/cache/[original method assembly name]~~[original method assembly version]/Plugs/[plug assembly name]~~[plug assembly verson]/[MethodSignature].[data|code].asm
-            //  File Layout: Exactly how it should appear in the master file.
+            //  File Layout: Exactly how it should appear in the master file(s).
             //File Format for Original Methods:
             //  Filename: asm/cache/[assembly name]~~[assembly version]/[MethodSignature].[data|code].asm
-            //  File Layout: Exactly how it should appear in the master file.
+            //  File Layout: Exactly how it should appear in the master file(s).
 
             //Mark the thread as finished and return. Report any errors along the way to the Supervisor.
+            //Scan the method as it is compiled and add any nesecarry dependances to a list for that method.
+            //If the method is completly and always needed, but is not nessecarily referenced, add it to a different list.
         }
 
         public static bool Build<Platform>
@@ -66,11 +68,11 @@ namespace Cosmos.BuildEngine
             //- Search for any "Uncompiled Methods" and attempt to resolve them with the dynamic method system.
             //  These dynamic methods may be cached (as "asm/cache/dynamc/[unique name].[data|code].asm"), but by their nature some may not be cacheable.
             //- If any remain, shove a NotImplementedException in there and pray no one uses it.
-            //- Scan Output Directory for all nessecary data and code sections and assemble them into a master file. (as "asm/master.asm")
-            //     - Scanning should be done so only nessecary code is included.
-            //     - Remember to include PreDataCode,PostDataCode,PostCodeCode in master file.
-            //- Pass master file to assembler.   (as "bin/master.bin")
-            //- Pass assembled binary to target.
+            //- Scan Output Directory for all nessecary data and code sections and assemble them into (a) master file(s). (as "asm/master_[name].asm")
+            //     - Scanning should be done so only nessecary code is included. Cached assemblies will need to be scanned as well, but not recompiled.
+            //     - Remember to include PreDataCode,PostDataCode,PostCodeCode in master file(s).
+            //- Pass master file(s) to assembler.   (assemble as "bin/master_[name].bin")
+            //- Pass assembled binaries to target.
             //- Act upon the target results.
 
             return true;
