@@ -59,7 +59,7 @@ namespace Ext2.Test
             }
 
             //string [] tmp = Directory.GetFiles ( "/0/" );
-            string [] tmp = Directory.GetDirectories( "/0/" );
+            string [] tmp = Directory.GetDirectories( "/1/" );
 
             Console.WriteLine ( tmp.Length.ToString () );
 

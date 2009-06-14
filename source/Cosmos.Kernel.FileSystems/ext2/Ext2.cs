@@ -36,7 +36,17 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
             mGroupDescriptors = new GroupDescriptor[xGroupDescriptorCount];
             var xDescriptorPtr = (GroupDescriptor*)mBufferAddress;
             for (int i = 0; i < xGroupDescriptorCount; i++) {
-                uint xATABlock = 2048 / mBackend.BlockSize;
+                uint xATABlock ;
+
+                if ( BlockSize == 1024 )
+                {
+                    xATABlock = ( BlockSize*2 )/mBackend.BlockSize ;
+                }
+                else
+                {
+                    xATABlock = ( BlockSize )/mBackend.BlockSize ;
+                }
+
                 xATABlock += (uint)(i / 16);
                 if ((i % 16) == 0) {
                     mBackend.ReadBlock(xATABlock,
