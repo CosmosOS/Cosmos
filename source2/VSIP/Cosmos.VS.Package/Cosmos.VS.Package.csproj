@@ -141,7 +141,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="Templates\Projects\CosmosProject\AssemblyInfo.cs" />
     <None Include="Templates\Projects\CosmosProject\Program.cs" />
-    <None Include="Templates\Projects\CosmosProject\Bootable Project.Cosmos" />
+    <None Include="Templates\Projects\CosmosProject\CSharp Kernel.Cosmos" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx">
@@ -156,6 +156,7 @@
   <ItemGroup>
     <None Include="bin\Images\alert.png" />
     <None Include="bin\Images\alert1.png" />
+    <None Include="Templates\Projects\CosmosProject\VB Kernel.Cosmos" />
     <Content Include="Resources\Cosmos.ico" />
     <EmbeddedResource Include="BuildOptionsPropertyPage.resx">
       <DependentUpon>BuildOptionsPropertyPage.cs</DependentUpon>
@@ -188,7 +189,9 @@
     <EmbeddedResource Include="VMOptionsQemu.resx">
       <DependentUpon>VMOptionsQemu.cs</DependentUpon>
     </EmbeddedResource>
-    <Content Include="Templates\Projects\CosmosProject\Bootable Project.ico" />
+    <Content Include="Templates\Projects\CosmosProject\AssemblyInfo.vb" />
+    <Content Include="Templates\Projects\CosmosProject\CSharp Kernel.ico" />
+    <Content Include="Templates\Projects\CosmosProject\Program.vb" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Build\Cosmos.Build.Common\Cosmos.Build.Common.csproj">

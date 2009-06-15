@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<PropertyGroup>
+		<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+		<ProjectGuid>{99999999-9999-9999-9999-999999999999}</ProjectGuid>
+		<SchemaVersion>2.0</SchemaVersion>
+		<OutputType>Exe</OutputType>
+		<RootNamespace>Cosmos.User.Kernel</RootNamespace>
+		<AssemblyName>CosmosKernel</AssemblyName>
+		<OptionExplicit>On</OptionExplicit>
+		<OptionCompare>Binary</OptionCompare>
+		<OptionStrict>On</OptionStrict>
+		<OptionInfer>Off</OptionInfer>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>full</DebugType>
+		<DefineDebug>true</DefineDebug>
+		<DefineTrace>true</DefineTrace>
+		<OutputPath>bin\Debug\</OutputPath>
+		<DocumentationFile>TestConsole.xml</DocumentationFile>
+		<NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+		<BuildTarget>QEMU</BuildTarget>
+		<Framework>MicrosoftNET</Framework>
+		<UseInternalAssembler>False</UseInternalAssembler>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+		<DebugType>none</DebugType>
+		<DefineDebug>false</DefineDebug>
+		<DefineTrace>true</DefineTrace>
+		<Optimize>true</Optimize>
+		<OutputPath>bin\Release\</OutputPath>
+		<DocumentationFile>TestConsole.xml</DocumentationFile>
+		<NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+		<BuildTarget>QEMU</BuildTarget>
+		<Framework>MicrosoftNET</Framework>
+		<UseInternalAssembler>False</UseInternalAssembler>
+	</PropertyGroup>
+	<ItemGroup>
+		<Reference Include="mscorlib" />
+		<Reference Include="System" />
+	</ItemGroup>
+	<ItemGroup>
+		<Import Include="System" />
+	</ItemGroup>
+	<ItemGroup>
+		<Compile Include="AssemblyInfo.vb" />
+		<Compile Include="Program.vb" />
+	</ItemGroup>
+
+	<Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
+
+	<Target Name="BeforeBuild">
+	</Target>
+
+	<!-- 
+	We have to read from registry becasue MSBuild process wont see changes to 
+	env variables. But by reading the env var key, we allow support for both env
+	var and registry as some scenarios we can read env var but not registry
+	(ie .bat files)
+	-->
+	<PropertyGroup>
+	<Cosmos>$(Registry:HKEY_CURRENT_USER\Environment@Cosmos)</Cosmos>
+	</PropertyGroup>
+	<UsingTask TaskName="Cosmos.Build.MSBuild.BuildImage" AssemblyFile="$(Cosmos)\source2\Build\Cosmos.Build.MSBuild\bin\Debug\Cosmos.Build.MSBuild.dll" />
+	<Target Name="AfterBuild">
+		<Message Text="Using Cosmos Path: $(Cosmos)" Importance="high" />
+		<BuildImage
+			KernelAssembly="$(AssemblyName).$(OutputType)"
+			OutputPath="$(BaseOutputPath)$(OutputPath)"
+			BuildTarget="$(BuildTarget)"
+			Framework="$(Framework)"
+			UseInternalAssembler="$(UseInternalAssembler)"
+		/>
+	</Target>
+</Project>
