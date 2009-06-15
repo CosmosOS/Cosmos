@@ -40,11 +40,11 @@ namespace Cosmos.Sys.FileSystem.Ext2 {
 
                 if ( BlockSize == 1024 )
                 {
-                    xATABlock = ( BlockSize*2 )/mBackend.BlockSize ;
+                    xATABlock = ( BlockSize * 2 ) / mBackend.BlockSize ;
                 }
                 else
                 {
-                    xATABlock = ( BlockSize )/mBackend.BlockSize ;
+                    xATABlock = ( BlockSize ) / mBackend.BlockSize ;
                 }
 
                 xATABlock += (uint)(i / 16);

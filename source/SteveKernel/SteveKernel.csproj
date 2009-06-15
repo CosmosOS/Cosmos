@@ -38,9 +38,6 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Cosmos.Kernel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL">
-      <HintPath>..\Cosmos\Cosmos.Kernel\bin\Debug\Cosmos.Kernel.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -65,6 +62,10 @@
     <ProjectReference Include="..\Cosmos\Cosmos.Hardware\Cosmos.Hardware.csproj">
       <Project>{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}</Project>
       <Name>Cosmos.Hardware</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos\Cosmos.Kernel\Cosmos.Kernel.csproj">
+      <Project>{A1F83D9F-2D44-4264-A08B-416797123018}</Project>
+      <Name>Cosmos.Kernel</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos\Cosmos.System\Cosmos.Sys.csproj">
       <Project>{819DB8FC-5DA1-461F-83C9-2F5C88088C94}</Project>
