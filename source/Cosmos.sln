@@ -202,13 +202,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KeyboardTest", "KeyboardTes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Demo.VGASnake", "Cosmos.Demo.VGASnake\Cosmos.Demo.VGASnake.csproj", "{D164E007-B3BE-4F4D-8E30-5D9FBD4022E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.BuildEngine", "Cosmos.BuildEngine\Cosmos.BuildEngine.csproj", "{EA3059BA-FDC3-4810-B091-941E943ED81E}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PagingTest", "PagingTest\PagingTest.csproj", "{EBC60CB1-1726-4348-A05F-D92D856366C2}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 64
+		SccNumberOfProjects = 63
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -456,14 +454,10 @@ Global
 		SccProjectTopLevelParentUniqueName61 = Cosmos.sln
 		SccProjectName61 = Cosmos.Demo.VGASnake
 		SccLocalPath61 = Cosmos.Demo.VGASnake
-		SccProjectUniqueName62 = Cosmos.BuildEngine\\Cosmos.BuildEngine.csproj
+		SccProjectUniqueName62 = PagingTest\\PagingTest.csproj
 		SccProjectTopLevelParentUniqueName62 = Cosmos.sln
-		SccProjectName62 = Cosmos.BuildEngine
-		SccLocalPath62 = Cosmos.BuildEngine
-		SccProjectUniqueName63 = PagingTest\\PagingTest.csproj
-		SccProjectTopLevelParentUniqueName63 = Cosmos.sln
-		SccProjectName63 = PagingTest
-		SccLocalPath63 = PagingTest
+		SccProjectName62 = PagingTest
+		SccLocalPath62 = PagingTest
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -714,10 +708,6 @@ Global
 		{D164E007-B3BE-4F4D-8E30-5D9FBD4022E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D164E007-B3BE-4F4D-8E30-5D9FBD4022E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D164E007-B3BE-4F4D-8E30-5D9FBD4022E4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EA3059BA-FDC3-4810-B091-941E943ED81E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EA3059BA-FDC3-4810-B091-941E943ED81E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EA3059BA-FDC3-4810-B091-941E943ED81E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EA3059BA-FDC3-4810-B091-941E943ED81E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EBC60CB1-1726-4348-A05F-D92D856366C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EBC60CB1-1726-4348-A05F-D92D856366C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EBC60CB1-1726-4348-A05F-D92D856366C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -797,7 +787,6 @@ Global
 		{99C179F7-AAFD-4BBD-BB0C-8256BEE3FB4B} = {12EC019C-B585-490F-84D6-16F000DC4CDB}
 		{16D4E345-DF23-4095-A6D5-80D0538FC904} = {12EC019C-B585-490F-84D6-16F000DC4CDB}
 		{B85E1686-9ADC-4B97-9E6B-482479698D7B} = {12EC019C-B585-490F-84D6-16F000DC4CDB}
-		{EA3059BA-FDC3-4810-B091-941E943ED81E} = {12EC019C-B585-490F-84D6-16F000DC4CDB}
 		{EBC60CB1-1726-4348-A05F-D92D856366C2} = {12EC019C-B585-490F-84D6-16F000DC4CDB}
 		{D95021E1-A2C9-4829-819E-ED433AF13162} = {8D61B97D-E68E-47C6-AD72-95EA5768D0B2}
 		{FF5BAFDE-AE9D-438D-935A-86B33EE0A758} = {8D61B97D-E68E-47C6-AD72-95EA5768D0B2}

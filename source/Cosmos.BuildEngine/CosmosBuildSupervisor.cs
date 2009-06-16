@@ -50,7 +50,7 @@ namespace Cosmos.BuildEngine
 
         public static bool Build<Platform>
             (
-                String BuildDirectory,
+                String BuildDirectory, IEnumerable<BuildOption> BuildOptions, IEnumerable<BuildOption> PlatformOptions,
                 CosmosBuildAssembler Assembler, CosmosBuildTarget Target,
                 IEnumerable<BuildOption> AssemblerOptions, IEnumerable<BuildOption> TargetOptions
             )
@@ -76,6 +76,10 @@ namespace Cosmos.BuildEngine
             //- Act upon the target results.
 
             return true;
+        }
+
+        public static IEnumerable<BuildOption> GetBuildOptions()
+        {
         }
     }
 }
