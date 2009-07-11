@@ -4,6 +4,7 @@ using System.Text;
 using System.Reflection;
 using System.Security.Cryptography;
 using Indy.IL2CPU.Assembler.X86.ELF;
+using System.Diagnostics;
 
 
 namespace Indy.IL2CPU.Assembler
@@ -24,6 +25,61 @@ namespace Indy.IL2CPU.Assembler
             }
             return xResult;
         }
+
+
+        //public static string GenerateLabelName(MethodBase aMethod)
+        //{
+        //    return GenerateLabelNameInt(aMethod).ToString();
+        //}
+
+        //TODO Unicode support
+        public static ulong GenerateLabelNameInt(MethodBase aMethod)
+        {
+
+
+
+            string xResult = DataMember.FilterStringForIncorrectChars(GenerateFullName(aMethod));
+
+
+            var encoding = new System.Text.UTF8Encoding();
+
+            byte[] bytes = encoding.GetBytes(xResult);
+
+
+            var hash = Elf64.Compute(0, 0, bytes);
+
+          //  Debug.WriteLine(" hash: " + hash.ToString() + "  Output : " + xResult ); 
+
+
+            return hash;
+            //ulong result , g = 0 ; 
+
+            //foreach ( char ch in xResult.ToCharArray())
+            //{
+            //    result = (result << 4) + (byte)ch;
+            //    result++;
+            //    g = result & 0xF0000000;
+            //    if (g > 0  ) // wrap
+            //        result = g >> 24;
+
+            //    result &= ~g; 
+
+        }
+        //            unsigned long hash(char *name)
+        //{
+        // unsigned long h = 0, g;
+
+        // while ( *name ) {
+        //  h = ( h << 4 ) + *name++;
+        //  if ( g = h & 0xF0000000 )
+        //  h ^= g >> 24;
+        //  h &= ~g;
+        // }
+
+        // return h;
+        //}
+
+
 
         public static string GetFullName(Type aType)
         {
