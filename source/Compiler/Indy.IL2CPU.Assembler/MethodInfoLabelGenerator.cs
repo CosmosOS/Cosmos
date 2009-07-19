@@ -15,6 +15,12 @@ namespace Indy.IL2CPU.Assembler
         public static string GenerateLabelName(MethodBase aMethod)
         {
             string xResult = DataMember.FilterStringForIncorrectChars(GenerateFullName(aMethod));
+            xResult = GenerateLabelFromFullName(xResult);
+            return xResult;
+        }
+
+        public static string GenerateLabelFromFullName(string xResult)
+        {
             if (xResult.Length > 245)
             {
                 using (var xHash = MD5.Create())
