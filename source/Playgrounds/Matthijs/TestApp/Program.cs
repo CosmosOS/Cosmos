@@ -24,7 +24,6 @@ namespace TestApp {
             {
                 Console.WriteLine(E.ToString());
             }
-            Console.ReadLine();
       }
 
         private static void DoScan(int aIdx)
