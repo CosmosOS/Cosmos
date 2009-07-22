@@ -329,10 +329,6 @@ namespace Cosmos.Compiler.IL
         }
         private byte[] mOperandBuff = new byte[8];
         private byte[] ReadOperand(byte aOperandSize) {
-            if (aOperandSize > 64)
-            {
-                Console.Write("");
-            }
             //var mOperandBuff = new byte[aOperandSize/8];
             int index = 0;
             Array.Clear(mOperandBuff, 0, 8);
