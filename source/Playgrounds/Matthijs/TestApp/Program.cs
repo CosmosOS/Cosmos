@@ -31,7 +31,7 @@ namespace TestApp {
             var xSW = new Stopwatch();
             xSW.Start();
             var xTest = X86Util.GetInstructionCreatorArray();
-            xTest = X86Util.GetInstructionCreatorArray();
+            Console.WriteLine("({1}) Create Array: {0}", xSW.Elapsed, aIdx);
             var xScanner = new Scanner();
             xScanner.Ops = xTest;
             xScanner.Execute(typeof (Program).GetMethod("Entrypoint", BindingFlags.NonPublic | BindingFlags.Static));
