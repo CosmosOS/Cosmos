@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{F708C866-1C9B-4579-8C28-0728ECCFC1ED}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{63F7BFB9-419E-4965-B580-304B9C9FA7D8}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Cosmos.IL2CPU.Profiler</RootNamespace>
-    <AssemblyName>Cosmos.IL2CPU.Profiler</AssemblyName>
+    <RootNamespace>Cosmos.IL2CPU.X86</RootNamespace>
+    <AssemblyName>Cosmos.IL2CPU.X86</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
@@ -49,7 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <None Include="ILOpX86" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

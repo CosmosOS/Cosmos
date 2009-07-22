@@ -232,9 +232,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ARM", "ARM", "{A1BB2C31-193
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU.Profiler", "..\source2\IL2PCU\Cosmos.IL2CPU.Profiler\Cosmos.IL2CPU.Profiler.csproj", "{F708C866-1C9B-4579-8C28-0728ECCFC1ED}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU.X86", "..\source2\IL2PCU\Cosmos.IL2CPU.X86\Cosmos.IL2CPU.X86.csproj", "{63F7BFB9-419E-4965-B580-304B9C9FA7D8}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 69
+		SccNumberOfProjects = 70
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -510,6 +512,10 @@ Global
 		SccProjectTopLevelParentUniqueName68 = Cosmos.sln
 		SccProjectName68 = ../source2/IL2PCU/Cosmos.IL2CPU.Profiler
 		SccLocalPath68 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU.Profiler
+		SccProjectUniqueName69 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU.X86\\Cosmos.IL2CPU.X86.csproj
+		SccProjectTopLevelParentUniqueName69 = Cosmos.sln
+		SccProjectName69 = ../source2/IL2PCU/Cosmos.IL2CPU.X86
+		SccLocalPath69 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU.X86
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -788,6 +794,10 @@ Global
 		{F708C866-1C9B-4579-8C28-0728ECCFC1ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F708C866-1C9B-4579-8C28-0728ECCFC1ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F708C866-1C9B-4579-8C28-0728ECCFC1ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63F7BFB9-419E-4965-B580-304B9C9FA7D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63F7BFB9-419E-4965-B580-304B9C9FA7D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63F7BFB9-419E-4965-B580-304B9C9FA7D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63F7BFB9-419E-4965-B580-304B9C9FA7D8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -898,5 +908,6 @@ Global
 		{ACDA7B14-F893-4C0B-8123-69237038295C} = {4F919509-682D-488E-96F8-3EEC8842F9AD}
 		{0E08AA38-9C89-4D48-B5FF-69195097E0EF} = {4F919509-682D-488E-96F8-3EEC8842F9AD}
 		{0740B762-8664-4BFC-8E6B-F8EE089A3386} = {E9242D3B-4176-424A-B7BD-B9EDCDA6AF68}
+		{63F7BFB9-419E-4965-B580-304B9C9FA7D8} = {DC993118-27B1-4E84-B762-110A1604467B}
 	EndGlobalSection
 EndGlobal
