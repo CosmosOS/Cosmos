@@ -10,7 +10,6 @@ using System.Collections.ObjectModel;
 using Cosmos.Compiler;
 using Cosmos.Compiler.IL;
 
-
 namespace TestApp {
     class Program {
         static void Main(string[] args)

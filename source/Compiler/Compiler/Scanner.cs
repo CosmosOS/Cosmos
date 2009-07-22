@@ -15,10 +15,10 @@ namespace Cosmos.Compiler
     /// </summary>
     public partial class Scanner
     {
-        private HashSet<string> mMethodNames = new HashSet<string>(StringComparer.InvariantCulture);
-        private List<MethodBase> mMethods = new List<MethodBase>();
-        private HashSet<string> mTypeNames = new HashSet<string>(StringComparer.InvariantCulture);
-        private List<Type> mTypes = new List<Type>();
+      private HashSet<MethodBase> mMethodsSet = new HashSet<MethodBase>();
+      private List<MethodBase> mMethods = new List<MethodBase>();
+      private HashSet<Type> mTypesSet = new HashSet<Type>();
+      private List<Type> mTypes = new List<Type>();
 
         private Func<Op>[] mOps;
         public Func<Op>[] Ops
@@ -29,14 +29,10 @@ namespace Cosmos.Compiler
             }
             set
             {
-                if(value != mOps)
-                {
-                    if(value == null)
-                    {
+                if(value != mOps) {
+                    if(value == null) {
                         throw new Exception("Cannot set Ops to null");
-                    }
-                    if(value.Length != 0xFE1F)
-                    {
+                    } else if (value.Length != 0xFE1F) {
                         throw new Exception("Element count mismatch!");
                     }
                     mOps = value;
@@ -51,9 +47,8 @@ namespace Cosmos.Compiler
             //File.WriteAllLines(@"e:\cosmos.dbg", mMethodNames.ToArray());
         }
 
-        private void ScanList()
-        {
-            // dont use a foreach here, the list will change.
+        private void ScanList() {
+          // Cannot use foreach, the list changes as we go
             for(int i = 0; i < mMethods.Count; i++)
             {
                 ScanMethod(mMethods[i]);
@@ -62,22 +57,16 @@ namespace Cosmos.Compiler
 
         private void ScanMethod(MethodBase aMethodBase)
         {
-            // pinvoke methods dont have an embedded implementation
-            if ((aMethodBase.Attributes & MethodAttributes.PinvokeImpl) != 0)
-            {
-                // pinvoke
-                return;
-            }
-            else if (aMethodBase.IsAbstract)
-            {
-                // abstract methods dont have an implementation
-
-                return;
+            if ((aMethodBase.Attributes & MethodAttributes.PinvokeImpl) != 0) {
+              // pinvoke methods dont have an embedded implementation
+              return;
+            } else if (aMethodBase.IsAbstract) {
+              // abstract methods dont have an implementation
+              return;
             }
 
             var xImplFlags = aMethodBase.GetMethodImplementationFlags();
-            if ((xImplFlags & MethodImplAttributes.Native) != 0)
-            {
+            if ((xImplFlags & MethodImplAttributes.Native) != 0) {
                 // native implementations cannot be compiled
                 return;
             }
@@ -85,23 +74,26 @@ namespace Cosmos.Compiler
             try
             {
                 var xBody = aMethodBase.GetMethodBody();
-                if (xBody == null)
-                {
+                if (xBody == null) {
                     return;
                 }
-                using(var xReader = new ILReader(aMethodBase, xBody))
-                {
-                    while(xReader.Read())
-                    {
-                        InstructionCount++;
+                using(var xReader = new ILReader(aMethodBase, xBody)) {
+                    while(xReader.Read()) {
+                        // Kudzu:
+                        // Uncomment for debugging - has a small but noticable 
+                        // impact on runtime. Could be coincidental, but ran
+                        // tests several times with and with out and without
+                        // was consistently 0.5 secs faster on the Atom.
+                        // Does not make much sense though as its only used 13000
+                        // times or so, so possibly the compiling in is affecting
+                        // some CPU cache hit or other?
+                        //InstructionCount++;
                         var xCreate = mOps[(ushort) xReader.OpCode];
-                        if(xCreate==null)
-                        {
+                        if(xCreate == null) {
                             LogMissingOp(xReader.OpCode);
                             continue;
                         }
                         var xOp = xCreate();
-                        QueueMethodCallCount = 0;
                         xOp.Scan(xReader, this);
                         // TEMP
                         //if (xReader.OperandValueMethod!=null)
@@ -113,53 +105,35 @@ namespace Cosmos.Compiler
                         //}
                     }
                 }
-            }catch(Exception E)
-            {
+            } catch(Exception E) {
                 throw new Exception("Error getting body!", E);
             }
         }
 
-
-        private int QueueMethodCallCount = 0;
-        public void QueueMethod(MethodBase aMethod)
-        {
-            QueueMethodCallCount++;
-            var xName = aMethod.GetFullName();
-            if (!mMethodNames.Contains(xName))
-            {
-                mMethodNames.Add(xName);
-                mMethods.Add(aMethod);
-                QueueType(aMethod.DeclaringType);
-            }
+        public void QueueMethod(MethodBase aMethod) {
+          if (!mMethodsSet.Contains(aMethod)) {
+            mMethodsSet.Add(aMethod);
+            mMethods.Add(aMethod);
+            QueueType(aMethod.DeclaringType);
+          }
         }
 
-        public void QueueType(Type type)
-        {
-            if(type == null)
-            {
-                return;
-            }
-            if (!mTypeNames.Contains(type.GetFullName()))
-            {
-                QueueType(type.BaseType);
-                foreach (
-                    var xMethod in type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
-                {
-                    if (xMethod.DeclaringType != type)
-                    {
-                        continue;
-                    }
-                    if (xMethod.IsVirtual)
-                    {
-                        QueueMethod(xMethod);
-                    }
+        public void QueueType(Type aType) {
+          if (aType != null) {
+            if (!mTypesSet.Contains(aType)) {
+              mTypesSet.Add(aType);
+              mTypes.Add(aType);
+              QueueType(aType.BaseType);
+              foreach (var xMethod in aType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)) {
+                if (xMethod.DeclaringType == aType) {
+                  if (xMethod.IsVirtual) {
+                    QueueMethod(xMethod);
+                  }
                 }
-                mTypeNames.Add(type.GetFullName());
-                mTypes.Add(type);
+              }
             }
+          }
         }
-
-        //private void
 
         public int MethodCount
         {
