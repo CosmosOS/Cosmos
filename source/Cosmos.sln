@@ -208,9 +208,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.ILScanner",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Compiler", "Compiler\Compiler\Compiler.csproj", "{36005A2F-CB53-46D3-9AE4-2AF8548C4DA9}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IL2CPU", "IL2CPU", "{35CABD9D-5C85-419A-B6C9-561EAD97A553}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU", "..\source2\IL2PCU\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj", "{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 65
+		SccNumberOfProjects = 66
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -462,14 +466,18 @@ Global
 		SccProjectTopLevelParentUniqueName62 = Cosmos.sln
 		SccProjectName62 = PagingTest
 		SccLocalPath62 = PagingTest
-		SccProjectUniqueName63 = Compiler\\ILScanner\\Cosmos.Compiler.ILScanner.csproj
+		SccProjectUniqueName63 = Compiler\\Compiler\\Compiler.csproj
 		SccProjectTopLevelParentUniqueName63 = Cosmos.sln
-		SccProjectName63 = Compiler/ILScanner
-		SccLocalPath63 = Compiler\\ILScanner
-		SccProjectUniqueName64 = Compiler\\Compiler\\Compiler.csproj
+		SccProjectName63 = Compiler/Compiler
+		SccLocalPath63 = Compiler\\Compiler
+		SccProjectUniqueName64 = Compiler\\ILScanner\\Cosmos.Compiler.ILScanner.csproj
 		SccProjectTopLevelParentUniqueName64 = Cosmos.sln
-		SccProjectName64 = Compiler/Compiler
-		SccLocalPath64 = Compiler\\Compiler
+		SccProjectName64 = Compiler/ILScanner
+		SccLocalPath64 = Compiler\\ILScanner
+		SccProjectUniqueName65 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU\\Cosmos.IL2CPU.csproj
+		SccProjectTopLevelParentUniqueName65 = Cosmos.sln
+		SccProjectName65 = ../source2/IL2PCU/Cosmos.IL2CPU
+		SccLocalPath65 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -732,6 +740,10 @@ Global
 		{36005A2F-CB53-46D3-9AE4-2AF8548C4DA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{36005A2F-CB53-46D3-9AE4-2AF8548C4DA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{36005A2F-CB53-46D3-9AE4-2AF8548C4DA9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -792,8 +804,8 @@ Global
 		{819DB8FC-5DA1-461F-83C9-2F5C88088C94} = {0CB1AFCD-F3D2-48A6-A6D1-103F6364B666}
 		{6110AD07-EB07-4A99-BB73-7A69AF5732F1} = {0CB1AFCD-F3D2-48A6-A6D1-103F6364B666}
 		{5C293BB9-FB42-495E-AAD9-D15888631CA4} = {0CB1AFCD-F3D2-48A6-A6D1-103F6364B666}
-		{30057B5B-8BEE-4712-8243-9A42DF8A0C76} = {9AB7CE5D-C1E5-49AD-9CCB-53863FBCDFAF}
 		{1E31A694-81BB-4628-B704-DA190E7E94CA} = {9AB7CE5D-C1E5-49AD-9CCB-53863FBCDFAF}
+		{30057B5B-8BEE-4712-8243-9A42DF8A0C76} = {9AB7CE5D-C1E5-49AD-9CCB-53863FBCDFAF}
 		{86689365-73B3-4AF5-9E63-4BC2D2C4DC85} = {079D6377-44C2-4155-B73A-E634E8F1BF6E}
 		{D5FAEE65-F23D-40A4-9F03-1928A3C3F81B} = {079D6377-44C2-4155-B73A-E634E8F1BF6E}
 		{1325C57A-B64D-4DE9-9FA0-5C0C5464D85D} = {97AC0D14-645F-4BC2-B5A6-A4CA1C6198D4}
@@ -818,6 +830,7 @@ Global
 		{A4478219-065D-4928-BB4D-4358CAD39A03} = {8D61B97D-E68E-47C6-AD72-95EA5768D0B2}
 		{74E81F2A-F4BD-4532-803B-3003378BA2F1} = {8D61B97D-E68E-47C6-AD72-95EA5768D0B2}
 		{CD3F5E45-8B24-424F-ADF1-0211712F4CB7} = {8D61B97D-E68E-47C6-AD72-95EA5768D0B2}
+		{35CABD9D-5C85-419A-B6C9-561EAD97A553} = {8D61B97D-E68E-47C6-AD72-95EA5768D0B2}
 		{0462E82B-8C29-41A9-8265-9C89038ADB29} = {D95021E1-A2C9-4829-819E-ED433AF13162}
 		{3B8CD27E-9E91-4472-A4D9-9B3D581A5316} = {D95021E1-A2C9-4829-819E-ED433AF13162}
 		{BC6AE974-1F18-4A19-A956-5062E4D3FD53} = {D95021E1-A2C9-4829-819E-ED433AF13162}
@@ -830,5 +843,6 @@ Global
 		{61535AF6-4A1E-4691-B2BC-039851EF4850} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
 		{B2D0F851-65FB-4DE9-A55D-5491062F8FE0} = {5F424AF3-8D92-4C0F-AD6D-EB5A187F9FE6}
 		{54ACC512-D568-4F7C-9204-E1A4A285EFF2} = {54DD5F71-82C3-44D7-99F0-A93B54C220F7}
+		{239E33A7-F0C3-4801-85CA-4D8F89A31DC0} = {35CABD9D-5C85-419A-B6C9-561EAD97A553}
 	EndGlobalSection
 EndGlobal
