@@ -4,6 +4,6 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.IL2CPU.X86 {
-  public class Class1 {
+  public class ILOpX86 : Cosmos.IL2CPU.ILOp {
   }
 }
