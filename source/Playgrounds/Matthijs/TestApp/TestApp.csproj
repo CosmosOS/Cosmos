@@ -61,10 +61,6 @@
       <Project>{36005A2F-CB53-46D3-9AE4-2AF8548C4DA9}</Project>
       <Name>Compiler %28Compiler\Compiler%29</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Compiler\ILScanner\Cosmos.Compiler.ILScanner.csproj">
-      <Project>{274D8041-055A-4FE3-9784-505519BAF614}</Project>
-      <Name>Cosmos.Compiler.ILScanner</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

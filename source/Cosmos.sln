@@ -204,8 +204,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Demo.VGASnake", "Cos
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PagingTest", "PagingTest\PagingTest.csproj", "{EBC60CB1-1726-4348-A05F-D92D856366C2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.ILScanner", "Compiler\ILScanner\Cosmos.Compiler.ILScanner.csproj", "{274D8041-055A-4FE3-9784-505519BAF614}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Compiler", "Compiler\Compiler\Compiler.csproj", "{36005A2F-CB53-46D3-9AE4-2AF8548C4DA9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IL2CPU", "IL2CPU", "{35CABD9D-5C85-419A-B6C9-561EAD97A553}"
@@ -236,7 +234,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU.X86", "..\sou
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 70
+		SccNumberOfProjects = 69
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -504,18 +502,14 @@ Global
 		SccProjectTopLevelParentUniqueName66 = Cosmos.sln
 		SccProjectName66 = ../source2/Assembler/X86/Cosmos.Assembler.X86
 		SccLocalPath66 = ..\\source2\\Assembler\\X86\\Cosmos.Assembler.X86
-		SccProjectUniqueName67 = Compiler\\ILScanner\\Cosmos.Compiler.ILScanner.csproj
+		SccProjectUniqueName67 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU.Profiler\\Cosmos.IL2CPU.Profiler.csproj
 		SccProjectTopLevelParentUniqueName67 = Cosmos.sln
-		SccProjectName67 = Compiler/ILScanner
-		SccLocalPath67 = Compiler\\ILScanner
-		SccProjectUniqueName68 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU.Profiler\\Cosmos.IL2CPU.Profiler.csproj
+		SccProjectName67 = ../source2/IL2PCU/Cosmos.IL2CPU.Profiler
+		SccLocalPath67 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU.Profiler
+		SccProjectUniqueName68 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU.X86\\Cosmos.IL2CPU.X86.csproj
 		SccProjectTopLevelParentUniqueName68 = Cosmos.sln
-		SccProjectName68 = ../source2/IL2PCU/Cosmos.IL2CPU.Profiler
-		SccLocalPath68 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU.Profiler
-		SccProjectUniqueName69 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU.X86\\Cosmos.IL2CPU.X86.csproj
-		SccProjectTopLevelParentUniqueName69 = Cosmos.sln
-		SccProjectName69 = ../source2/IL2PCU/Cosmos.IL2CPU.X86
-		SccLocalPath69 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU.X86
+		SccProjectName68 = ../source2/IL2PCU/Cosmos.IL2CPU.X86
+		SccLocalPath68 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU.X86
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -770,10 +764,6 @@ Global
 		{EBC60CB1-1726-4348-A05F-D92D856366C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EBC60CB1-1726-4348-A05F-D92D856366C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EBC60CB1-1726-4348-A05F-D92D856366C2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{274D8041-055A-4FE3-9784-505519BAF614}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{274D8041-055A-4FE3-9784-505519BAF614}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{274D8041-055A-4FE3-9784-505519BAF614}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{274D8041-055A-4FE3-9784-505519BAF614}.Release|Any CPU.Build.0 = Release|Any CPU
 		{36005A2F-CB53-46D3-9AE4-2AF8548C4DA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{36005A2F-CB53-46D3-9AE4-2AF8548C4DA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{36005A2F-CB53-46D3-9AE4-2AF8548C4DA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -811,7 +801,6 @@ Global
 		{BE896274-5F06-430F-AAC4-D74CAEEB28F5} = {4070490F-A3FD-4E97-A89D-A1C96EF7BD37}
 		{5A1E9D16-BF71-4D8E-9389-3476056E4566} = {4070490F-A3FD-4E97-A89D-A1C96EF7BD37}
 		{5E70F7D9-388A-43C2-8D9B-A4C382A8278D} = {4070490F-A3FD-4E97-A89D-A1C96EF7BD37}
-		{274D8041-055A-4FE3-9784-505519BAF614} = {4070490F-A3FD-4E97-A89D-A1C96EF7BD37}
 		{36005A2F-CB53-46D3-9AE4-2AF8548C4DA9} = {4070490F-A3FD-4E97-A89D-A1C96EF7BD37}
 		{6F91B8C3-1A78-49D7-B915-F13EDFDAFDB3} = {21E68B7D-F1DC-46E2-9CFA-0A7C6D77D42E}
 		{4DE8EC69-B412-41C4-BCD9-1E032984E888} = {21E68B7D-F1DC-46E2-9CFA-0A7C6D77D42E}
