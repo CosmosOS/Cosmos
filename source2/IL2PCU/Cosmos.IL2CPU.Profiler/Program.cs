@@ -20,17 +20,17 @@ namespace Cosmos.IL2CPU.Profiler {
       var xSW = new Stopwatch();
       xSW.Start();
       
-      var xTest = X86Util.GetInstructionCreatorArray();
+      //var xTest = X86Util.GetInstructionCreatorArray();
       Console.WriteLine("({1}) Create Array: {0}", xSW.Elapsed, aIdx);
 
-      var xScanner = new Scanner();
-      xScanner.Ops = xTest;
-      xScanner.Execute(typeof(Program).GetMethod("ScannerEntryPoint", BindingFlags.NonPublic | BindingFlags.Static));
+      //var xScanner = new Scanner();
+      //xScanner.Ops = xTest;
+      //xScanner.Execute(typeof(Program).GetMethod("ScannerEntryPoint", BindingFlags.NonPublic | BindingFlags.Static));
 
       xSW.Stop();
       Console.WriteLine("({1}) Total time : {0}", xSW.Elapsed, aIdx);
-      Console.WriteLine("({1}) Method count: {0}", xScanner.MethodCount, aIdx);
-      Console.WriteLine("({1}) Instruction count: {0}", xScanner.InstructionCount, aIdx);
+      //Console.WriteLine("({1}) Method count: {0}", xScanner.MethodCount, aIdx);
+      //Console.WriteLine("({1}) Instruction count: {0}", xScanner.InstructionCount, aIdx);
     }
 
     // This is a dummy entry point for the scanner to start at.

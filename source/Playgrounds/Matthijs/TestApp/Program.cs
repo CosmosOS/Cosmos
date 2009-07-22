@@ -101,6 +101,5 @@ namespace TestApp {
             xObj.ToString();
         }
 
-        private static bool Terminate = false;
     }
 }
