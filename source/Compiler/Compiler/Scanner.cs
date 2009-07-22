@@ -53,6 +53,7 @@ namespace Cosmos.Compiler
 
         private void ScanList()
         {
+            // dont use a foreach here, the list will change.
             for(int i = 0; i < mMethods.Count; i++)
             {
                 ScanMethod(mMethods[i]);
@@ -67,10 +68,10 @@ namespace Cosmos.Compiler
                 // pinvoke
                 return;
             }
-
-            // abstract methods dont have an implementation
-            if(aMethodBase.IsAbstract)
+            else if (aMethodBase.IsAbstract)
             {
+                // abstract methods dont have an implementation
+
                 return;
             }
 
