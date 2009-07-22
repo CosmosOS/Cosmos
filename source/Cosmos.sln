@@ -212,11 +212,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IL2CPU", "IL2CPU", "{35CABD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU", "..\source2\IL2PCU\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj", "{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU.ILScanner", "..\source2\IL2PCU\Cosmos.IL2CPU.ILScanner\Cosmos.IL2CPU.ILScanner.csproj", "{E8BBA981-BCEA-4564-942C-2B5B14835BD3}"
-EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 67
+		SccNumberOfProjects = 66
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -480,10 +478,6 @@ Global
 		SccProjectTopLevelParentUniqueName65 = Cosmos.sln
 		SccProjectName65 = Compiler/ILScanner
 		SccLocalPath65 = Compiler\\ILScanner
-		SccProjectUniqueName66 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU.ILScanner\\Cosmos.IL2CPU.ILScanner.csproj
-		SccProjectTopLevelParentUniqueName66 = Cosmos.sln
-		SccProjectName66 = ../source2/IL2PCU/Cosmos.IL2CPU.ILScanner
-		SccLocalPath66 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU.ILScanner
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -750,10 +744,6 @@ Global
 		{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E8BBA981-BCEA-4564-942C-2B5B14835BD3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E8BBA981-BCEA-4564-942C-2B5B14835BD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E8BBA981-BCEA-4564-942C-2B5B14835BD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E8BBA981-BCEA-4564-942C-2B5B14835BD3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -854,6 +844,5 @@ Global
 		{B2D0F851-65FB-4DE9-A55D-5491062F8FE0} = {5F424AF3-8D92-4C0F-AD6D-EB5A187F9FE6}
 		{54ACC512-D568-4F7C-9204-E1A4A285EFF2} = {54DD5F71-82C3-44D7-99F0-A93B54C220F7}
 		{239E33A7-F0C3-4801-85CA-4D8F89A31DC0} = {35CABD9D-5C85-419A-B6C9-561EAD97A553}
-		{E8BBA981-BCEA-4564-942C-2B5B14835BD3} = {35CABD9D-5C85-419A-B6C9-561EAD97A553}
 	EndGlobalSection
 EndGlobal
