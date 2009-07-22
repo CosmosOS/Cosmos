@@ -1,4 +1,4 @@
-Contains a standalone assembler library which is independent of target platform.
+﻿Contains a standalone assembler library which is independent of target platform.
 Is used by IL2CPU, but is not dependent on it and can run on its own.
 
 Cosmos.Assembler

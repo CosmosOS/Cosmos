@@ -213,9 +213,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU", "..\source2\IL2PCU\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj", "{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assembler", "Assembler", "{4F919509-682D-488E-96F8-3EEC8842F9AD}"
-	ProjectSection(SolutionItems) = preProject
-		ReadMe.txt = ReadMe.txt
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "X86", "X86", "{E9242D3B-4176-424A-B7BD-B9EDCDA6AF68}"
 EndProject
@@ -226,6 +223,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Assembler", "..\source2\Assembler\Cosmos.Assembler\Cosmos.Assembler.csproj", "{0E08AA38-9C89-4D48-B5FF-69195097E0EF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Assembler.X86", "..\source2\Assembler\X86\Cosmos.Assembler.X86\Cosmos.Assembler.X86.csproj", "{0740B762-8664-4BFC-8E6B-F8EE089A3386}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "X86", "X86", "{DC993118-27B1-4E84-B762-110A1604467B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "X64", "X64", "{148AFF76-B587-45EC-B392-551E156D388B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ARM", "ARM", "{A1BB2C31-193E-4885-AFE2-EB7D3781767B}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
@@ -489,18 +492,18 @@ Global
 		SccProjectTopLevelParentUniqueName64 = Cosmos.sln
 		SccProjectName64 = ../source2/IL2PCU/Cosmos.IL2CPU
 		SccLocalPath64 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU
-		SccProjectUniqueName65 = Compiler\\ILScanner\\Cosmos.Compiler.ILScanner.csproj
+		SccProjectUniqueName65 = ..\\source2\\Assembler\\Cosmos.Assembler\\Cosmos.Assembler.csproj
 		SccProjectTopLevelParentUniqueName65 = Cosmos.sln
-		SccProjectName65 = Compiler/ILScanner
-		SccLocalPath65 = Compiler\\ILScanner
-		SccProjectUniqueName66 = ..\\source2\\Assembler\\Cosmos.Assembler\\Cosmos.Assembler.csproj
+		SccProjectName65 = ../source2/Assembler/Cosmos.Assembler
+		SccLocalPath65 = ..\\source2\\Assembler\\Cosmos.Assembler
+		SccProjectUniqueName66 = ..\\source2\\Assembler\\X86\\Cosmos.Assembler.X86\\Cosmos.Assembler.X86.csproj
 		SccProjectTopLevelParentUniqueName66 = Cosmos.sln
-		SccProjectName66 = ../source2/Assembler/Cosmos.Assembler
-		SccLocalPath66 = ..\\source2\\Assembler\\Cosmos.Assembler
-		SccProjectUniqueName67 = ..\\source2\\Assembler\\X86\\Cosmos.Assembler.X86\\Cosmos.Assembler.X86.csproj
+		SccProjectName66 = ../source2/Assembler/X86/Cosmos.Assembler.X86
+		SccLocalPath66 = ..\\source2\\Assembler\\X86\\Cosmos.Assembler.X86
+		SccProjectUniqueName67 = Compiler\\ILScanner\\Cosmos.Compiler.ILScanner.csproj
 		SccProjectTopLevelParentUniqueName67 = Cosmos.sln
-		SccProjectName67 = ../source2/Assembler/X86/Cosmos.Assembler.X86
-		SccLocalPath67 = ..\\source2\\Assembler\\X86\\Cosmos.Assembler.X86
+		SccProjectName67 = Compiler/ILScanner
+		SccLocalPath67 = Compiler\\ILScanner
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -876,6 +879,9 @@ Global
 		{B2D0F851-65FB-4DE9-A55D-5491062F8FE0} = {5F424AF3-8D92-4C0F-AD6D-EB5A187F9FE6}
 		{54ACC512-D568-4F7C-9204-E1A4A285EFF2} = {54DD5F71-82C3-44D7-99F0-A93B54C220F7}
 		{239E33A7-F0C3-4801-85CA-4D8F89A31DC0} = {35CABD9D-5C85-419A-B6C9-561EAD97A553}
+		{DC993118-27B1-4E84-B762-110A1604467B} = {35CABD9D-5C85-419A-B6C9-561EAD97A553}
+		{148AFF76-B587-45EC-B392-551E156D388B} = {35CABD9D-5C85-419A-B6C9-561EAD97A553}
+		{A1BB2C31-193E-4885-AFE2-EB7D3781767B} = {35CABD9D-5C85-419A-B6C9-561EAD97A553}
 		{E9242D3B-4176-424A-B7BD-B9EDCDA6AF68} = {4F919509-682D-488E-96F8-3EEC8842F9AD}
 		{6B0A77CA-96AD-43B0-973C-24729CE1D85F} = {4F919509-682D-488E-96F8-3EEC8842F9AD}
 		{ACDA7B14-F893-4C0B-8123-69237038295C} = {4F919509-682D-488E-96F8-3EEC8842F9AD}
