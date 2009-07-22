@@ -71,7 +71,7 @@ namespace Cosmos.Compiler.ILScanner
             return String.Intern(xBuilder.ToString());
         }
 
-        private static string GetFullName(Type aType)
+        public static string GetFullName(this Type aType)
         {   
             if (aType == null)
             {

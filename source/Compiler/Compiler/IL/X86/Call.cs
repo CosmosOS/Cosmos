@@ -7,6 +7,7 @@ namespace Cosmos.Compiler.IL.X86
 	{
         public override void Scan(ILReader aReader, Scanner aScanner)
         {
+            base.Scan(aReader, aScanner);
             aScanner.QueueMethod(aReader.OperandValueMethod);
         }
 

@@ -5,7 +5,11 @@ namespace Cosmos.Compiler.IL.X86
 	[OpCode(OpCodeEnum.Ldstr)]
 	public class Ldstr: Op
 	{
-
+        public override void Scan(ILReader aReader, Scanner aScanner)
+        {
+            base.Scan(aReader, aScanner);
+            aScanner.QueueType(typeof (string));
+        }
 
 
 		#region Old code

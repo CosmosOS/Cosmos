@@ -5,6 +5,11 @@ namespace Cosmos.Compiler.IL.X86
 	[OpCode(OpCodeEnum.Ldc_I4)]
 	public class Ldc_I4: Op
 	{
+        public override void Scan(ILReader aReader, Scanner aScanner)
+        {
+            base.Scan(aReader, aScanner);
+            aScanner.QueueType(typeof(int));
+        }
 
 
 

@@ -17,39 +17,29 @@ namespace TestApp {
         {
             try
             {
-                //var xSW = new Stopwatch();
-                //xSW.Start();
-                var xTest = X86Util.GetInstructionCreatorArray();
-                //xSW.Stop();
-                //Console.WriteLine("Time to create InstructionArray (1): {0}", xSW.Elapsed);
-                //xSW.Reset();
-                //xSW.Start();
-                xTest = X86Util.GetInstructionCreatorArray();
-                //xSW.Stop();
-                //Console.WriteLine("Time to create InstructionArray (2): {0}", xSW.Elapsed);
-                //xSW.Reset();
-                var xScanner = new Scanner();
-                xScanner.Ops = xTest;
-                //xSW.Start();
-                xScanner.Execute(typeof (Program).GetMethod("Entrypoint", BindingFlags.NonPublic | BindingFlags.Static));
-                //xSW.Stop();
-                //Console.WriteLine("Scan time (1): {0}", xSW.Elapsed);
-                //xSW.Reset();
-                //xScanner = new Scanner();
-                //xScanner.Ops = xTest;
-                //xSW.Start();
-                //xScanner.Execute(typeof(Program).GetMethod("Entrypoint", BindingFlags.NonPublic | BindingFlags.Static));
-                //xSW.Stop();
-                //Console.WriteLine("Scan time (2): {0}", xSW.Elapsed);
-                Console.WriteLine("Method count: {0}", xScanner.MethodCount);
-                //Console.WriteLine("Done");
-                //Gen();
+                DoScan(1);
+                //DoScan(2);
             }
             catch(Exception E)
             {
                 Console.WriteLine(E.ToString());
                 Console.ReadLine();
             }
+        }
+
+        private static void DoScan(int aIdx)
+        {
+            var xSW = new Stopwatch();
+            xSW.Start();
+            var xTest = X86Util.GetInstructionCreatorArray();
+            xTest = X86Util.GetInstructionCreatorArray();
+            var xScanner = new Scanner();
+            xScanner.Ops = xTest;
+            xScanner.Execute(typeof (Program).GetMethod("Entrypoint", BindingFlags.NonPublic | BindingFlags.Static));
+            xSW.Stop();
+            Console.WriteLine("({1}) Scan time : {0}", xSW.Elapsed, aIdx);
+            Console.WriteLine("({1}) Method count: {0}", xScanner.MethodCount, aIdx);
+            Console.WriteLine("({1}) Instruction count: {0}", xScanner.InstructionCount, aIdx);
         }
 
         private static void Gen()
@@ -108,6 +98,9 @@ namespace TestApp {
         private static void Entrypoint()
         {
             Console.WriteLine("Hello, World!");
+            var xInt = 0;
+            object xObj = xInt;
+            xObj.ToString();
         }
 
         private static bool Terminate = false;
