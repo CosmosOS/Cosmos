@@ -402,6 +402,7 @@ namespace Indy.IL2CPU
             {
                 mCurrent = null;
             }
+            File.WriteAllText(@"e:\cosmos.dbg", String.Format("Instruction count = {0}", mInstructionCount));
         }
 
         // EDIT BELOW TO CHANGE THREAD COUNT:
@@ -1920,6 +1921,7 @@ namespace Indy.IL2CPU
                                 // Scan each IL op in the method
                                 while (xReader.Read())
                                 {
+                                    mInstructionCount++;
                                     ExceptionHandlingClause xCurrentHandler = null;
 
                                     #region Exception handling support code
@@ -2103,6 +2105,8 @@ namespace Indy.IL2CPU
                 CompilingMethods(i, xCount);
             }
         }
+
+        private static int mInstructionCount = 0;
 
         private IList<Assembly> GetPlugAssemblies()
         {
