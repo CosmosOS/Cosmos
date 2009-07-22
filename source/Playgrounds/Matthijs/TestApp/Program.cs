@@ -23,9 +23,9 @@ namespace TestApp {
             catch(Exception E)
             {
                 Console.WriteLine(E.ToString());
-                Console.ReadLine();
             }
-        }
+            Console.ReadLine();
+      }
 
         private static void DoScan(int aIdx)
         {
