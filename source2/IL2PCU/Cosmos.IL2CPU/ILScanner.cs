@@ -7,6 +7,17 @@ using System.Text;
 
 namespace Cosmos.IL2CPU {
   public class ILScanner {
+    //Note: We have both HashSet and List because HashSet.Contains is much faster
+    // than List.Contains. Also in the future we may remove items from the List
+    // which have already been processed yet need to keep them in HashSet.
+    //TODO: When we go threaded, these two should be encapselated into a single
+    // class with thread safety.
+    //TODO: These store the MethodBase which also have the IL for the body in memory
+    // For large asms this could eat lot of RAM. Should convert this to remove
+    // items from the list after they are processed but keep them in HashSet so we
+    // know they are already done. Currently HashSet uses a refernece though, so we
+    // need to hash on some UID instead of the refernce. Do not use strings, they are
+    // super slow.
     private HashSet<MethodBase> mMethodsSet = new HashSet<MethodBase>();
     private List<MethodBase> mMethods = new List<MethodBase>();
     private HashSet<Type> mTypesSet = new HashSet<Type>();
