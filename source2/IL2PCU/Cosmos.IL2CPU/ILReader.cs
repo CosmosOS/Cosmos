@@ -39,7 +39,7 @@ namespace Cosmos.IL2CPU {
             mModule = null;
         }
 
-        private ILOp.Codes mOpCode;
+        private ILOp.Code mOpCode;
         private byte[] mOperand;
         private bool mHasOperand;
 
@@ -66,7 +66,7 @@ namespace Cosmos.IL2CPU {
             }
         }
 
-        public ILOp.Codes OpCode {
+        public ILOp.Code OpCode {
             get {
                 return mOpCode;
             }
@@ -248,7 +248,7 @@ namespace Cosmos.IL2CPU {
         public bool Read() {
             Position = NextPosition;
             int xByteValueInt = mStream.ReadByte();
-            ILOp.Codes xOpCode;
+            ILOp.Code xOpCode;
             if (xByteValueInt == -1) {
                 return false;
             }
@@ -258,9 +258,9 @@ namespace Cosmos.IL2CPU {
                 if (xByteValueInt == -1) {
                     return false;
                 }
-                xOpCode = (ILOp.Codes)(xByteValue << 8 | xByteValueInt);
+                xOpCode = (ILOp.Code)(xByteValue << 8 | xByteValueInt);
             } else {
-              xOpCode = (ILOp.Codes)xByteValue;
+              xOpCode = (ILOp.Code)xByteValue;
             }
             byte xOperandSize = ILOp.GetOperandSize(xOpCode);
             mOperand = null;
@@ -287,7 +287,7 @@ namespace Cosmos.IL2CPU {
                         mOperand = BitConverter.GetBytes(xTempOperand.Value);
                     }
                 }
-                if (mOpCode == ILOp.Codes.Switch) {
+                if (mOpCode == ILOp.Code.Switch) {
                     int[] xBranchLocations1 = new int[ReadInt32()];
                     for (int i = 0; i < xBranchLocations1.Length; i++) {
                         xBranchLocations1[i] = ReadInt32();

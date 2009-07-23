@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="ILOp.cs" />
     <Compile Include="ILReader.cs" />
+    <Compile Include="OpCodeAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ILScanner.cs" />
   </ItemGroup>

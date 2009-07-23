@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
@@ -17,17 +18,21 @@ namespace Cosmos.IL2CPU.Profiler {
       }
     }
 
-    //TODO: Need to change this to use some real dummy ops so the methods and types get walked properly
+    //TODO: Encapselate this so it can be used for all projects with ops.
     private static Func<ILOp>[] DummyOps() {
       var xResult = new Func<ILOp>[0xFE1F];
-      var xTemp = new DynamicMethod("CreateOp", typeof(ILOp), new Type[0], true);
-      var xGen = xTemp.GetILGenerator();
-      var xCtor = typeof(ILOpProfiler).GetConstructor(new Type[0]);
-      xGen.Emit(OpCodes.Newobj, xCtor);
-      xGen.Emit(OpCodes.Ret);
-      var xDelegate = (Func<ILOp>)xTemp.CreateDelegate(typeof(Func<ILOp>));
-      for (int i = 0; i < xResult.Length; i++) {
-        xResult[i] = xDelegate;
+      foreach (var xType in typeof(Program).Assembly.GetExportedTypes()) {
+        if (xType.IsSubclassOf(typeof(ILOpProfiler))) {
+          var xAttrib = xType.GetCustomAttributes(typeof(OpCodeAttribute), false).FirstOrDefault() as OpCodeAttribute;
+          if (xAttrib != null) {
+            var xTemp = new DynamicMethod("Create_" + xAttrib.OpCode + "_Obj", typeof(ILOp), new Type[0], true);
+            var xGen = xTemp.GetILGenerator();
+            var xCtor = xType.GetConstructor(new Type[0]);
+            xGen.Emit(OpCodes.Newobj, xCtor);
+            xGen.Emit(OpCodes.Ret);
+            xResult[(ushort)xAttrib.OpCode] = (Func<ILOp>)xTemp.CreateDelegate(typeof(Func<ILOp>));
+          }
+        }
       }
       return xResult;
     }
