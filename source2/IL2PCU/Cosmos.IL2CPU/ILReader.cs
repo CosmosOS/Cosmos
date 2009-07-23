@@ -72,20 +72,6 @@ namespace Cosmos.IL2CPU {
 
         private bool mIsShortcut;
 
-      //private uint? mOperandValueBranchPosition;
-        //public uint OperandValueBranchPosition {
-        //    get {
-        //        if (mOperandValueBranchPosition == null) {
-        //            if (mIsShortcut) {
-        //              mOperandValueBranchPosition = (uint?)(NextPosition + (sbyte)OperandValueInt32);
-        //            } else {
-        //              mOperandValueBranchPosition = (uint?)(NextPosition + OperandValueInt32);
-        //            }
-        //        }
-        //        return mOperandValueBranchPosition.Value;
-        //    }
-        //}
-
         private FieldInfo mOperandValueField;
         public FieldInfo OperandValueField {
             get {
@@ -200,16 +186,20 @@ namespace Cosmos.IL2CPU {
           }
           
           // Get OpCode
-          byte xOpCodeByte1 = ReadByte();
           ILOp.Code xOpCode;
-          if (xOpCodeByte1 == 0xFE) {
-            xOpCode = (ILOp.Code)(xOpCodeByte1 << 8 | ReadByte());
+          if (mBody[mPosition] == 0xFE) {
+            xOpCode = (ILOp.Code)(mBody[mPosition] << 8 | mBody[mPosition + 1]);
+            // TODO: Eliminate this and use indexing below for data, and increment all at once
+            mPosition = mPosition + 2;
           } else {
-            xOpCode = (ILOp.Code)xOpCodeByte1;
+            xOpCode = (ILOp.Code)mBody[mPosition];
+            mPosition++;
           }
 
           byte xOperandSize = ILOp.GetOperandSize(xOpCode);
-            mOperand = null;
+          mOpCode = ILOp.ExpandShortcut(xOpCode);
+          
+          mOperand = null;
             mOperandValueStr = null;
             mOperandValueMethod = null;
             mOperandValueField = null;
@@ -219,7 +209,6 @@ namespace Cosmos.IL2CPU {
             //mOperandValueBranchPosition = null;
             OperandValueBranchLocations = null;
             mOperandValueDouble = null;
-            mOpCode = ILOp.ExpandShortcut(xOpCode);
             mIsShortcut = mOpCode != xOpCode;
             if (xOperandSize > 0) {
               //TODO: Will we always use the Int32 result? Copying to array and then again seems wasteful
@@ -252,20 +241,12 @@ namespace Cosmos.IL2CPU {
             return true;
         }
 
-        private Int64 ReadInt64() {
-          //TODO: Improve or eliminate
-          long xResult = 0;
-            byte xOperandSize = 8;
-            byte[] xBytes = new byte[xOperandSize];
-            while (xOperandSize > 0) {
-                xBytes[xOperandSize - 1] = ReadByte();
-                xOperandSize--;
-            }
-            for (int i = 0; i < xBytes.Length; i++) {
-                xResult = xResult << 8 | xBytes[i];
-            }
-            return xResult;
-        }
+      private Int64 ReadInt64() {
+        long xResult = (mBody[mPosition + 7] << 56 | mBody[mPosition + 6] << 48 | mBody[mPosition + 5] << 40 | mBody[mPosition + 4] << 32
+          | mBody[mPosition + 3] << 24 | mBody[mPosition + 2] << 16 | mBody[mPosition + 1] << 8 | mBody[mPosition]);
+        mPosition = mPosition + 8;
+        return xResult;
+      }
 
       private byte[] mOperandBuff = new byte[8];
       //TODO: If we need further peformance, this function is one of the bigger users of time
@@ -287,8 +268,9 @@ namespace Cosmos.IL2CPU {
         }
 
         private Int32 ReadInt32() {
-          //TODO: Improve or eliminate
-            return GetInt32FromOperandByteArray(ReadOperand(4));
+            Int32 xResult = (mBody[mPosition + 3] << 24 | mBody[mPosition + 2] << 16 | mBody[mPosition + 1] << 8 | mBody[mPosition]);
+            mPosition = mPosition + 4;
+            return xResult;
         }
 
     }
