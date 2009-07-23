@@ -49,39 +49,41 @@ namespace Cosmos.IL2CPU {
         var xBody = aMethod.GetMethodBody().GetILAsByteArray();
         int xPos = 0;
 
-        //TODO: Can likely elminate enum after this is complete
         //TODO: Move op info compeltely out of ILOp
         while (xPos < xBody.Length) {
+          ILOpCode.Code xOpCodeVal;
+          Func<ILOpCode> xILOpCodeCreate;
+          int xOpCodeSize = 1; //TODO: Remove this after we have better logic
+          if (xBody[xPos] == 0xFE) {
+            xOpCodeVal = (ILOpCode.Code)(0xFE00 | xBody[xPos + 1]);
+            xILOpCodeCreate = mOpCodesHi[xBody[xPos + 1]];
+            xOpCodeSize = 2;
+          } else {
+            xOpCodeVal = (ILOpCode.Code)xBody[xPos];
+            xILOpCodeCreate = mOpCodesLo[xBody[xPos]];
+          }
+
+          // Get arguments before Shortcut expansion.
+          //TODO: Are all shortcuts wo arguments? if so we can skip this step for shortcuts
+          int xOperandSize = ILOpCode.GetOperandSize(xOpCodeVal);
+          xPos = xPos + xOpCodeSize + xOperandSize;
+
+          // TODO: Optimize this. Can possibly fill slots in the mOpCodesHi
+          // with the target op, or a translator fuction in the delegate
+          var xOpCodeValFinal = ILOpCode.ExpandShortcut(xOpCodeVal);
+          if (xOpCodeValFinal != xOpCodeVal) {
+            if ((int)xOpCodeValFinal >= (int)0xFE00) {
+              xILOpCodeCreate = mOpCodesHi[((int)xOpCodeValFinal) & 0xFF];
+            } else {
+              xILOpCodeCreate = mOpCodesLo[(int)xOpCodeValFinal];
+            }
+          }
+
+          var xOpCode = xILOpCodeCreate();
+          xResult.Add(xOpCode);
+
         }
 
-        //var xOpCodeValue = (ushort)xReader.OpCode;
-        //Func<ILOpCode> xCreate;
-        //if (xOpCodeValue <= 0xFF) {
-        //  xCreate = mOpCodesLo[xOpCodeValue];
-        //} else {
-        //  xCreate = mOpCodesHi[xOpCodeValue & 0xFF];
-        //}
-        //if (xCreate == null) {
-        //  throw new Exception("Unrecognized IL Operation");
-        //}
-        //var xOp = xCreate();
-
-
-        //public bool Read() {
-          
-        //  // Get OpCode
-        //  ILOp.Code xOpCode;
-        //  if (mBody[mPosition] == 0xFE) {
-        //    xOpCode = (ILOp.Code)(mBody[mPosition] << 8 | mBody[mPosition + 1]);
-        //    // TODO: Eliminate this and use indexing below for data, and increment all at once
-        //    mPosition = mPosition + 2;
-        //  } else {
-        //    xOpCode = (ILOp.Code)mBody[mPosition];
-        //    mPosition++;
-        //  }
-
-        //  byte xOperandSize = ILOp.GetOperandSize(xOpCode);
-        //  mOpCode = ILOp.ExpandShortcut(xOpCode);
           
         //  mOperand = null;
         //    mOperandValueStr = null;
