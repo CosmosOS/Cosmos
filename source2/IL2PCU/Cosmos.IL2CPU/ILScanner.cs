@@ -23,30 +23,34 @@ namespace Cosmos.IL2CPU {
     private HashSet<Type> mTypesSet = new HashSet<Type>();
     private List<Type> mTypes = new List<Type>();
 
-    //TODO: This consumes 64k x 4 = 256 k. Not much, but all the ops seem in the low range.
-    // Are the 16 bit ones all modifiers / prefixes?
-    //TODO: We can shrink this down, since all calls are FE00 - 00FF
-    // We can split it into 2 because the scanner has to read one byte at a time
-    // or we can change it to a signed int, and then add x0200 to the value.
+    // We split this into two arrays since we have to read
+    // a byte at a time anways. In the future if we need to 
+    // back to a unifed array, instead of 64k entries 
+    // we can change it to a signed int, and then add x0200 to the value.
     // This will reduce array size down to 768 entries.
-    protected Func<ILOpCode>[] mOpCodes;
+    protected Func<ILOpCode>[] mOpCodesLo = new Func<ILOpCode>[256];
+    protected Func<ILOpCode>[] mOpCodesHi = new Func<ILOpCode>[256];
 
-    public ILScanner() {
+    public ILScanner(Type aAssemblerBaseOp) {
       LoadOpCodes();
     }
 
     protected void LoadOpCodes() {
-      mOpCodes = new Func<ILOpCode>[0xFE1F];
       foreach (var xType in typeof(ILOpCode).Assembly.GetExportedTypes()) {
         if (xType.IsSubclassOf(typeof(ILOpCode))) {
           var xAttrib = xType.GetCustomAttributes(typeof(OpCodeAttribute), false).FirstOrDefault() as OpCodeAttribute;
-          if (xAttrib != null) {
-            var xTemp = new DynamicMethod("Create_" + xAttrib.OpCode + "_Obj", typeof(ILOpCode), new Type[0], true);
-            var xGen = xTemp.GetILGenerator();
-            var xCtor = xType.GetConstructor(new Type[0]);
-            xGen.Emit(OpCodes.Newobj, xCtor);
-            xGen.Emit(OpCodes.Ret);
-            mOpCodes[(ushort)xAttrib.OpCode] = (Func<ILOpCode>)xTemp.CreateDelegate(typeof(Func<ILOpCode>));
+          var xTemp = new DynamicMethod("Create_" + xAttrib.OpCode + "_Obj", typeof(ILOpCode), new Type[0], true);
+          var xGen = xTemp.GetILGenerator();
+          var xCtor = xType.GetConstructor(new Type[0]);
+          xGen.Emit(OpCodes.Newobj, xCtor);
+          xGen.Emit(OpCodes.Ret);
+
+          var xDeleg = (Func<ILOpCode>)xTemp.CreateDelegate(typeof(Func<ILOpCode>));
+          var xOpCodeValue = (ushort)xAttrib.OpCode;
+          if (xOpCodeValue <= 0xFF ) {
+            mOpCodesLo[xOpCodeValue] = xDeleg;
+          } else {
+            mOpCodesHi[xOpCodeValue & 0xFF] = xDeleg;
           }
         }
       }
@@ -81,16 +85,14 @@ namespace Cosmos.IL2CPU {
       }
       var xReader = new ILReader(aMethodBase, xBody);
       while (xReader.Read()) {
-        // Kudzu:
-        // Uncomment for debugging - has a small but noticable 
-        // impact on runtime. Could be coincidental, but ran
-        // tests several times with and with out and without
-        // was consistently 0.5 secs faster on the Atom.
-        // Does not make much sense though as its only used 13000
-        // times or so, so possibly the compiling in is affecting
-        // some CPU cache hit or other?
         //InstructionCount++;
-        var xCreate = mOpCodes[(ushort)xReader.OpCode];
+        var xOpCodeValue = (ushort)xReader.OpCode;
+        Func<ILOpCode> xCreate;
+        if (xOpCodeValue <= 0xFF) {
+          xCreate = mOpCodesLo[xOpCodeValue];
+        } else {
+          xCreate = mOpCodesHi[xOpCodeValue & 0xFF];
+        }
         if (xCreate == null) {
           throw new Exception("Unrecognized IL Operation");
         }
