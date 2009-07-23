@@ -8,17 +8,21 @@ namespace Cosmos.IL2CPU {
         private MethodBase mMethod;
         private Module mModule;
         private bool mDisposeStream;
+
         public ILReader(MethodBase aMethod):this(aMethod, aMethod.GetMethodBody()) {
         }
 
-        public ILReader(MethodBase aMethod, MethodBody aBody)
-        {
-            mMethod = aMethod;
-            mModule = mMethod.Module;
-            mStream = new MemoryStream(aBody.GetILAsByteArray());
-            GC.SuppressFinalize(mStream);
-            mDisposeStream = true;
+        public ILReader(MethodBase aMethod, MethodBody aBody) {
+          mMethod = aMethod;
+          mModule = mMethod.Module;
+          //TODO: Why do we convert a small array of bytes in memory to a memory stream only to convert back to individual bytes?
+          // Instead lets work on the array itself
+          mStream = new MemoryStream(aBody.GetILAsByteArray());
+          //TODO: Why do we suppress finalize here?
+          GC.SuppressFinalize(mStream);
+          mDisposeStream = true;
         }
+
         public ILReader(MethodBase aMethod, Stream aStream)
         {
             mMethod = aMethod;
@@ -27,12 +31,11 @@ namespace Cosmos.IL2CPU {
             mDisposeStream = false;
         }
 
-        public void Dispose()
-        {
-            if (mDisposeStream)
-            {
-                mStream.Dispose();
-                GC.ReRegisterForFinalize(mStream);
+        public void Dispose() {
+            if (mDisposeStream) {
+              mStream.Dispose();
+              //TODO: See comment above about supress finalize
+              GC.ReRegisterForFinalize(mStream);
             }
             mStream = null;
             mMethod = null;
@@ -41,7 +44,6 @@ namespace Cosmos.IL2CPU {
 
         private ILOp.Code mOpCode;
         private byte[] mOperand;
-        private bool mHasOperand;
 
         public uint Position {
             get;
@@ -51,18 +53,6 @@ namespace Cosmos.IL2CPU {
         public uint NextPosition {
             get {
                 return (uint)mStream.Position;
-            }
-        }
-
-        public bool EndOfStream {
-            get {
-                return mStream.Position == mStream.Length;
-            }
-        }
-
-        public bool HasOperand {
-            get {
-                return mHasOperand;
             }
         }
 
@@ -241,23 +231,22 @@ namespace Cosmos.IL2CPU {
         }
 
         public bool Read() {
-            Position = NextPosition;
-            int xByteValueInt = mStream.ReadByte();
-            ILOp.Code xOpCode;
-            if (xByteValueInt == -1) {
-                return false;
-            }
-            byte xByteValue = (byte)xByteValueInt;
-            if (xByteValue == 0xFE) {
-                xByteValueInt = mStream.ReadByte();
-                if (xByteValueInt == -1) {
-                    return false;
-                }
-                xOpCode = (ILOp.Code)(xByteValue << 8 | xByteValueInt);
-            } else {
-              xOpCode = (ILOp.Code)xByteValue;
-            }
-            byte xOperandSize = ILOp.GetOperandSize(xOpCode);
+          Position = NextPosition;
+          // End of stream
+          if (mStream.Position == mStream.Length) {
+            return false;
+          }
+          
+          // Get OpCode
+          byte xOpCodeByte1 = (byte)mStream.ReadByte();
+          ILOp.Code xOpCode;
+          if (xOpCodeByte1 == 0xFE) {
+            xOpCode = (ILOp.Code)(xOpCodeByte1 << 8 | (byte)mStream.ReadByte());
+          } else {
+            xOpCode = (ILOp.Code)xOpCodeByte1;
+          }
+
+          byte xOperandSize = ILOp.GetOperandSize(xOpCode);
             mOperand = null;
             mOperandValueStr = null;
             mOperandValueMethod = null;
@@ -270,8 +259,7 @@ namespace Cosmos.IL2CPU {
             mOperandValueDouble = null;
             mOpCode = ILOp.ExpandShortcut(xOpCode);
             mIsShortcut = mOpCode != xOpCode;
-            mHasOperand = xOperandSize > 0;
-            if (mHasOperand) {
+            if (xOperandSize > 0) {
               //TODO: Will we always use the Int32 result? Copying to array and then again seems wasteful
               // Probably better to make typed reads for each type
                 mOperand = ReadOperand(xOperandSize);
@@ -280,7 +268,6 @@ namespace Cosmos.IL2CPU {
                 if (mOpCode != xOpCode) {
                   long? xTempOperand = ILOp.GetShortcutOperand(xOpCode);
                     if (xTempOperand != null) {
-                        mHasOperand = true;
                         mOperand = BitConverter.GetBytes(xTempOperand.Value);
                     }
                 }
@@ -341,10 +328,5 @@ namespace Cosmos.IL2CPU {
             return GetInt32FromOperandByteArray(ReadOperand(4));
         }
 
-        public void Restart()
-        {
-            Position = 0;
-            mStream.Position = 0;
-        }
     }
 }

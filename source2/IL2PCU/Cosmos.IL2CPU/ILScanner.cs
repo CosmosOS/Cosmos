@@ -76,7 +76,6 @@ namespace Cosmos.IL2CPU {
             // times or so, so possibly the compiling in is affecting
             // some CPU cache hit or other?
             //InstructionCount++;
-
             var xCreate = mOps[(ushort)xReader.OpCode];
             if (xCreate == null) {
               throw new Exception("Unrecognized IL Operation");
