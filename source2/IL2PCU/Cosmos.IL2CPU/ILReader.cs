@@ -92,27 +92,22 @@ namespace Cosmos.IL2CPU {
         public MethodBase OperandValueMethod {
             get {
                 if (mOperandValueMethod == null) {
-                    if (((OperandValueInt32 & 0x6000000) == 0x6000000)
-                    || ((OperandValueInt32 & 0x2b000000) == 0x2b000000)
-                        || ((OperandValueInt32 & 0xa000000) == 0xA000000))
-                    {
-                        try
-                        {
+                  var xValue = OperandValueInt32;
+                  if (((xValue & 0x6000000) == 0x6000000)
+                    || ((xValue & 0x2b000000) == 0x2b000000)
+                    || ((xValue & 0xa000000) == 0xA000000)) {
+                        try {
                             Type[] xTypeGenArgs = null;
                             Type[] xMethodGenArgs = null;
-                            if (mMethod.DeclaringType.IsGenericType)
-                            {
+                            if (mMethod.DeclaringType.IsGenericType) {
                                 xTypeGenArgs = mMethod.DeclaringType.GetGenericArguments();
                             }
-                            if (mMethod.IsGenericMethod)
-                            {
+                            if (mMethod.IsGenericMethod) {
                                 xMethodGenArgs = mMethod.GetGenericArguments();
                             }
-                            mOperandValueMethod = mModule.ResolveMethod(OperandValueInt32, xTypeGenArgs, xMethodGenArgs);
-                        }catch
-                        {
-                            
-                        }
+                          // http://msdn.microsoft.com/en-us/library/ms145421(VS.85).aspx
+                          mOperandValueMethod = mModule.ResolveMethod(OperandValueInt32, xTypeGenArgs, xMethodGenArgs);
+                        } catch { }
                     }
                 }
                 return mOperandValueMethod;
@@ -277,7 +272,8 @@ namespace Cosmos.IL2CPU {
             mIsShortcut = mOpCode != xOpCode;
             mHasOperand = xOperandSize > 0;
             if (mHasOperand) {
-              //TODO: Why transfer to array then to a var?
+              //TODO: Will we always use the Int32 result? Copying to array and then again seems wasteful
+              // Probably better to make typed reads for each type
                 mOperand = ReadOperand(xOperandSize);
                 mOperandValueInt32 = GetInt32FromOperandByteArray(mOperand);
             } else {
