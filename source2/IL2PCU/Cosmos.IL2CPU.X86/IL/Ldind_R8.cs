@@ -2,7 +2,7 @@ using System;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
-	[Cosmos.IL2CPU.OpCode(ILOp.Code.Ldind_R8)]
+	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldind_R8)]
 	public class Ldind_R8: ILOpX86
 	{
 
@@ -15,7 +15,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using Indy.IL2CPU.Assembler;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOp.Code.Ldind_R8)]
+		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldind_R8)]
 		// 	public class Ldind_R8: ILOpX86 {
 		// 		public Ldind_R8(ILReader aReader, MethodInformation aMethodInfo)
 		// 			: base(aReader, aMethodInfo) {

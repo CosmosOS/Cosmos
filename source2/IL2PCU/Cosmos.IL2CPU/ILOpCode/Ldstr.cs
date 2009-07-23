@@ -2,7 +2,7 @@ using System;
 
 namespace Cosmos.IL2CPU.ILOpCodes
 {
-	[Cosmos.IL2CPU.OpCode(ILOp.Code.Ldstr)]
+	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldstr)]
 	public class Ldstr: ILOpCode
 	{
         public override void Scan(ILReader aReader, ILScanner aScanner)
@@ -23,7 +23,7 @@ namespace Cosmos.IL2CPU.ILOpCodes
 		// using System.Collections.Generic;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		//     [Cosmos.IL2CPU.OpCode(ILOp.Code.Ldstr)]
+		//     [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldstr)]
 		//     public class LdStr : ILOpCode {
 		//         //private static Dictionary<string, DataMember> mDataMemberMap = new Dictionary<string, DataMember>();
 		//         public readonly string LiteralStr;

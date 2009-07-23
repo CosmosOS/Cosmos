@@ -2,7 +2,7 @@ using System;
 
 namespace Cosmos.IL2CPU.ILOpCodes
 {
-	[Cosmos.IL2CPU.OpCode(ILOp.Code.Ldarga)]
+	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldarga)]
 	public class Ldarga: ILOpCode
 	{
 
@@ -17,7 +17,7 @@ namespace Cosmos.IL2CPU.ILOpCodes
 		// using Indy.IL2CPU.Assembler;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOp.Code.Ldarga)]
+		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldarga)]
 		// 	public class Ldarga: ILOpCode {
 		// 		private int mAddress;
 		//         private string mNextLabel;

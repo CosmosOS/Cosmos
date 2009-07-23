@@ -2,7 +2,7 @@ using System;
 
 namespace Cosmos.IL2CPU.ILOpCodes
 {
-	[Cosmos.IL2CPU.OpCode(ILOp.Code.Bgt_Un)]
+	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Bgt_Un)]
 	public class Bgt_Un: ILOpCode
 	{
 
@@ -17,7 +17,7 @@ namespace Cosmos.IL2CPU.ILOpCodes
 		// using CPUx86 = Indy.IL2CPU.Assembler.X86;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOp.Code.Bgt_Un)]
+		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Bgt_Un)]
 		// 	public class Bgt_Un: ILOpCode {
 		// 		public readonly string TargetLabel;
 		// 		public readonly string CurInstructionLabel;

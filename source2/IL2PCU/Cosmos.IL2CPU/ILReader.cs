@@ -1,28 +1,143 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 
 namespace Cosmos.IL2CPU {
     public class ILReader {
-        private byte[] mBody;
-        private MethodBase mMethod;
-        private Module mModule;
+      // We split this into two arrays since we have to read
+      // a byte at a time anways. In the future if we need to 
+      // back to a unifed array, instead of 64k entries 
+      // we can change it to a signed int, and then add x0200 to the value.
+      // This will reduce array size down to 768 entries.
+      protected Func<ILOpCode>[] mOpCodesLo = new Func<ILOpCode>[256];
+      protected Func<ILOpCode>[] mOpCodesHi = new Func<ILOpCode>[256];
+      
+      public ILReader(Type aAssemblerBaseOp) {
+        LoadOpCodes(aAssemblerBaseOp);
+      }
 
-        public ILReader(MethodBase aMethod):this(aMethod, aMethod.GetMethodBody()) {
+      protected void LoadOpCodes(Type aAssemblerBaseOp) {
+        foreach (var xType in typeof(ILOpCode).Assembly.GetExportedTypes()) {
+          if (xType.IsSubclassOf(typeof(ILOpCode))) {
+            var xAttrib = xType.GetCustomAttributes(typeof(OpCodeAttribute), false).FirstOrDefault() as OpCodeAttribute;
+            var xTemp = new DynamicMethod("Create_" + xAttrib.OpCode + "_Obj", typeof(ILOpCode), new Type[0], true);
+            var xGen = xTemp.GetILGenerator();
+            var xCtor = xType.GetConstructor(new Type[0]);
+            xGen.Emit(OpCodes.Newobj, xCtor);
+            xGen.Emit(OpCodes.Ret);
+
+            var xDeleg = (Func<ILOpCode>)xTemp.CreateDelegate(typeof(Func<ILOpCode>));
+            var xOpCodeValue = (ushort)xAttrib.OpCode;
+            if (xOpCodeValue <= 0xFF) {
+              mOpCodesLo[xOpCodeValue] = xDeleg;
+            } else {
+              mOpCodesHi[xOpCodeValue & 0xFF] = xDeleg;
+            }
+          }
+        }
+      }
+      
+      public List<ILOpCode> ProcessMethod(MethodBase aMethod) {
+        //TODO: remove
+        mMethod = aMethod;
+        mModule = aMethod.Module;
+        
+        var xResult = new List<ILOpCode>();
+        var xBody = aMethod.GetMethodBody().GetILAsByteArray();
+        int xPos = 0;
+
+        //TODO: Can likely elminate enum after this is complete
+        //TODO: Move op info compeltely out of ILOp
+        while (xPos < xBody.Length) {
         }
 
-        public ILReader(MethodBase aMethod, MethodBody aBody) {
-          mMethod = aMethod;
-          mModule = mMethod.Module;
-          mBody = aBody.GetILAsByteArray();
-        }
+        //var xOpCodeValue = (ushort)xReader.OpCode;
+        //Func<ILOpCode> xCreate;
+        //if (xOpCodeValue <= 0xFF) {
+        //  xCreate = mOpCodesLo[xOpCodeValue];
+        //} else {
+        //  xCreate = mOpCodesHi[xOpCodeValue & 0xFF];
+        //}
+        //if (xCreate == null) {
+        //  throw new Exception("Unrecognized IL Operation");
+        //}
+        //var xOp = xCreate();
 
-        private ILOp.Code mOpCode;
+
+        //public bool Read() {
+          
+        //  // Get OpCode
+        //  ILOp.Code xOpCode;
+        //  if (mBody[mPosition] == 0xFE) {
+        //    xOpCode = (ILOp.Code)(mBody[mPosition] << 8 | mBody[mPosition + 1]);
+        //    // TODO: Eliminate this and use indexing below for data, and increment all at once
+        //    mPosition = mPosition + 2;
+        //  } else {
+        //    xOpCode = (ILOp.Code)mBody[mPosition];
+        //    mPosition++;
+        //  }
+
+        //  byte xOperandSize = ILOp.GetOperandSize(xOpCode);
+        //  mOpCode = ILOp.ExpandShortcut(xOpCode);
+          
+        //  mOperand = null;
+        //    mOperandValueStr = null;
+        //    mOperandValueMethod = null;
+        //    mOperandValueField = null;
+        //    mOperandValueSingle = null;
+        //    mOperandValueType = null;
+        //    mOperandValueInt32 = null;
+        //    //mOperandValueBranchPosition = null;
+        //    OperandValueBranchLocations = null;
+        //    mOperandValueDouble = null;
+        //    mIsShortcut = mOpCode != xOpCode;
+        //    if (xOperandSize > 0) {
+        //      //TODO: Will we always use the Int32 result? Copying to array and then again seems wasteful
+        //      // Probably better to make typed reads for each type
+        //        mOperand = ReadOperand(xOperandSize);
+        //        mOperandValueInt32 = GetInt32FromOperandByteArray(mOperand);
+        //    } else {
+        //        if (mOpCode != xOpCode) {
+        //          long? xTempOperand = ILOp.GetShortcutOperand(xOpCode);
+        //            if (xTempOperand != null) {
+        //                mOperand = BitConverter.GetBytes(xTempOperand.Value);
+        //            }
+        //        }
+        //        if (mOpCode == ILOpCode.Code.Switch) {
+        //            int[] xBranchLocations1 = new int[ReadInt32()];
+        //            for (int i = 0; i < xBranchLocations1.Length; i++) {
+        //                xBranchLocations1[i] = ReadInt32();
+        //            }
+        //            uint[] xResult = new uint[xBranchLocations1.Length];
+        //            for (int i = 0; i < xBranchLocations1.Length; i++) {
+        //                if ((mPosition + xBranchLocations1[i]) < 0) {
+        //                    xResult[i] = (uint)xBranchLocations1[i];
+        //                } else {
+        //                    xResult[i] = (uint)(mPosition + xBranchLocations1[i]);
+        //                }
+        //            }
+        //            OperandValueBranchLocations = xResult;
+        //        }
+        //    }
+        //    return true;
+        //}
+
+      return xResult;
+      }
+
+      private byte[] mBody;
+      private MethodBase mMethod;
+      private Module mModule;
+
+      private ILOpCode.Code mOpCode;
         private byte[] mOperand;
 
         protected int mPosition = 0;
 
-        public ILOp.Code OpCode {
+        public ILOpCode.Code OpCode {
             get {
                 return mOpCode;
             }
@@ -177,68 +292,6 @@ namespace Cosmos.IL2CPU {
           var xResult = mBody[mPosition];
           mPosition++;
           return xResult;
-        }
-
-        public bool Read() {
-          // End of stream
-          if (mPosition == mBody.Length) {
-            return false;
-          }
-          
-          // Get OpCode
-          ILOp.Code xOpCode;
-          if (mBody[mPosition] == 0xFE) {
-            xOpCode = (ILOp.Code)(mBody[mPosition] << 8 | mBody[mPosition + 1]);
-            // TODO: Eliminate this and use indexing below for data, and increment all at once
-            mPosition = mPosition + 2;
-          } else {
-            xOpCode = (ILOp.Code)mBody[mPosition];
-            mPosition++;
-          }
-
-          byte xOperandSize = ILOp.GetOperandSize(xOpCode);
-          mOpCode = ILOp.ExpandShortcut(xOpCode);
-          
-          mOperand = null;
-            mOperandValueStr = null;
-            mOperandValueMethod = null;
-            mOperandValueField = null;
-            mOperandValueSingle = null;
-            mOperandValueType = null;
-            mOperandValueInt32 = null;
-            //mOperandValueBranchPosition = null;
-            OperandValueBranchLocations = null;
-            mOperandValueDouble = null;
-            mIsShortcut = mOpCode != xOpCode;
-            if (xOperandSize > 0) {
-              //TODO: Will we always use the Int32 result? Copying to array and then again seems wasteful
-              // Probably better to make typed reads for each type
-                mOperand = ReadOperand(xOperandSize);
-                mOperandValueInt32 = GetInt32FromOperandByteArray(mOperand);
-            } else {
-                if (mOpCode != xOpCode) {
-                  long? xTempOperand = ILOp.GetShortcutOperand(xOpCode);
-                    if (xTempOperand != null) {
-                        mOperand = BitConverter.GetBytes(xTempOperand.Value);
-                    }
-                }
-                if (mOpCode == ILOp.Code.Switch) {
-                    int[] xBranchLocations1 = new int[ReadInt32()];
-                    for (int i = 0; i < xBranchLocations1.Length; i++) {
-                        xBranchLocations1[i] = ReadInt32();
-                    }
-                    uint[] xResult = new uint[xBranchLocations1.Length];
-                    for (int i = 0; i < xBranchLocations1.Length; i++) {
-                        if ((mPosition + xBranchLocations1[i]) < 0) {
-                            xResult[i] = (uint)xBranchLocations1[i];
-                        } else {
-                            xResult[i] = (uint)(mPosition + xBranchLocations1[i]);
-                        }
-                    }
-                    OperandValueBranchLocations = xResult;
-                }
-            }
-            return true;
         }
 
       private Int64 ReadInt64() {

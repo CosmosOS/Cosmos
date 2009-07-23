@@ -2,7 +2,7 @@ using System;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
-	[Cosmos.IL2CPU.OpCode(ILOp.Code.Shr)]
+	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Shr)]
 	public class Shr: ILOpX86
 	{
 
@@ -15,7 +15,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
 		//     // todo: Improve 8byte support
-		// 	[Cosmos.IL2CPU.OpCode(ILOp.Code.Shr)]
+		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Shr)]
 		// 	public class Shr: ILOpX86 {
 		//         private string mLabelName;
 		// 		public Shr(ILReader aReader, MethodInformation aMethodInfo)

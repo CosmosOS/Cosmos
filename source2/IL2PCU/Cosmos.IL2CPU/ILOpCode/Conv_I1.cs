@@ -2,7 +2,7 @@ using System;
 
 namespace Cosmos.IL2CPU.ILOpCodes
 {
-	[Cosmos.IL2CPU.OpCode(ILOp.Code.Conv_I1)]
+	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Conv_I1)]
 	public class Conv_I1: ILOpCode
 	{
 
@@ -17,7 +17,7 @@ namespace Cosmos.IL2CPU.ILOpCodes
 		// 
 		// namespace Indy.IL2CPU.IL.X86
 		// {
-		//     [Cosmos.IL2CPU.OpCode(ILOp.Code.Conv_I1)]
+		//     [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Conv_I1)]
 		//     public class Conv_I1 : ILOpCode
 		//     {
 		//         private string mNextLabel;

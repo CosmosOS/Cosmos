@@ -2,7 +2,7 @@ using System;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
-	[Cosmos.IL2CPU.OpCode(ILOp.Code.Div)]
+	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Div)]
 	public class Div: ILOpX86
 	{
 
@@ -14,7 +14,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using CPUx86 = Indy.IL2CPU.Assembler.X86;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOp.Code.Div)]
+		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Div)]
 		// 	public class Div: ILOpX86 {
 		//         private string mNextLabel;
 		// 	    private string mCurLabel;

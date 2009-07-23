@@ -2,7 +2,7 @@ using System;
 
 namespace Cosmos.IL2CPU.ILOpCodes
 {
-	[Cosmos.IL2CPU.OpCode(ILOp.Code.Xor)]
+	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Xor)]
 	public class Xor: ILOpCode
 	{
 
@@ -15,7 +15,7 @@ namespace Cosmos.IL2CPU.ILOpCodes
 		// using Indy.IL2CPU.Assembler;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOp.Code.Xor)]
+		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Xor)]
 		// 	public class Xor: ILOpCode {
 		// 		public Xor(ILReader aReader, MethodInformation aMethodInfo)
 		// 			: base(aReader, aMethodInfo) {

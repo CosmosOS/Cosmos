@@ -2,7 +2,7 @@ using System;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
-	[Cosmos.IL2CPU.OpCode(ILOp.Code.Ldobj)]
+	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldobj)]
 	public class Ldobj: ILOpX86
 	{
 
@@ -16,7 +16,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using Indy.IL2CPU.Compiler;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		//     [Cosmos.IL2CPU.OpCode(ILOp.Code.Ldobj)]
+		//     [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldobj)]
 		//     public class Ldobj : ILOpX86 {
 		//         private Type xType;
 		// 

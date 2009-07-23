@@ -2,7 +2,7 @@ using System;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
-	[Cosmos.IL2CPU.OpCode(ILOp.Code.Call)]
+	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Call)]
 	public class Call: ILOpX86
 	{
 
@@ -22,7 +22,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 
 		// namespace Indy.IL2CPU.IL.X86
 		// {
-		//     [Cosmos.IL2CPU.OpCode(ILOp.Code.Call)]
+		//     [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Call)]
 		//     public class Call : ILOpX86
 		//     {
 		//         private string LabelName;

@@ -2,7 +2,7 @@ using System;
 
 namespace Cosmos.IL2CPU.ILOpCodes
 {
-	[Cosmos.IL2CPU.OpCode(ILOp.Code.Ldc_I8)]
+	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldc_I8)]
 	public class Ldc_I8: ILOpCode
 	{
 
@@ -16,7 +16,7 @@ namespace Cosmos.IL2CPU.ILOpCodes
 		// using System.Diagnostics;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOp.Code.Ldc_I8)]
+		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldc_I8)]
 		// 	public class Ldc_I8: ILOpCode {
 		// 		private readonly long mValue;
 		// 		public Ldc_I8(ILReader aReader, MethodInformation aMethodInfo)

@@ -2,7 +2,7 @@ using System;
 
 namespace Cosmos.IL2CPU.ILOpCodes
 {
-	[Cosmos.IL2CPU.OpCode(ILOp.Code.Dup)]
+	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Dup)]
 	public class Dup: ILOpCode
 	{
 
@@ -14,7 +14,7 @@ namespace Cosmos.IL2CPU.ILOpCodes
 		// using CPUx86 = Indy.IL2CPU.Assembler.X86;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOp.Code.Dup)]
+		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Dup)]
 		// 	public class Dup: ILOpCode {
 		// 		public Dup(ILReader aReader, MethodInformation aMethodInfo)
 		// 			: base(aReader, aMethodInfo) {

@@ -2,7 +2,7 @@ using System;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
-	[Cosmos.IL2CPU.OpCode(ILOp.Code.Ldc_I4)]
+	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldc_I4)]
 	public class Ldc_I4: ILOpX86
 	{
 
@@ -15,7 +15,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using System.Collections.Generic;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOp.Code.Ldc_I4)]
+		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldc_I4)]
 		// 	public class Ldc_I4: ILOpX86 {
 		// 		private int mValue;
 		// 		protected void SetValue(int aValue) {

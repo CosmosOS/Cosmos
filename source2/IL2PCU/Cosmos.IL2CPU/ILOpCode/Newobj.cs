@@ -2,7 +2,7 @@ using System;
 
 namespace Cosmos.IL2CPU.ILOpCodes
 {
-	[Cosmos.IL2CPU.OpCode(ILOp.Code.Newobj)]
+	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Newobj)]
 	public class Newobj: ILOpCode
 	{
         public override void Scan(ILReader aReader, ILScanner aScanner)
@@ -28,7 +28,7 @@ namespace Cosmos.IL2CPU.ILOpCodes
 		// 
 		// namespace Indy.IL2CPU.IL.X86
 		// {
-		//     [Cosmos.IL2CPU.OpCode(ILOp.Code.Newobj)]
+		//     [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Newobj)]
 		//     public class Newobj : ILOpCode
 		//     {
 		//         public MethodBase CtorDef;

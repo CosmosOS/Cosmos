@@ -2,7 +2,7 @@ using System;
 
 namespace Cosmos.IL2CPU.ILOpCodes
 {
-	[Cosmos.IL2CPU.OpCode(ILOp.Code.Cpobj)]
+	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Cpobj)]
 	public class Cpobj: ILOpCode
 	{
 
@@ -16,7 +16,7 @@ namespace Cosmos.IL2CPU.ILOpCodes
 		// using CPU = Indy.IL2CPU.Assembler.X86;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOp.Code.Cpobj)]
+		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Cpobj)]
 		// 	public class Cpobj: ILOpCode {
 		// 		public Cpobj(ILReader aReader, MethodInformation aMethodInfo)
 		// 			: base(aReader, aMethodInfo) {

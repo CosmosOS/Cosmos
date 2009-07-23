@@ -2,7 +2,7 @@ using System;
 
 namespace Cosmos.IL2CPU.ILOpCodes
 {
-	[Cosmos.IL2CPU.OpCode(ILOp.Code.Stloc)]
+	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Stloc)]
 	public class Stloc: ILOpCode
 	{
 
@@ -17,7 +17,7 @@ namespace Cosmos.IL2CPU.ILOpCodes
 		// using CPUx86 = Indy.IL2CPU.Assembler.X86;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOp.Code.Stloc)]
+		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Stloc)]
 		// 	public class Stloc: ILOpCode {
 		// 		private bool mNeedsGC = false;
 		// 		private MethodInformation.Variable mLocal;

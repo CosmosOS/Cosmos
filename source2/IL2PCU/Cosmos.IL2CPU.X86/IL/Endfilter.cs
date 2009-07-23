@@ -2,7 +2,7 @@ using System;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
-	[Cosmos.IL2CPU.OpCode(ILOp.Code.Endfilter)]
+	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Endfilter)]
 	public class Endfilter: ILOpX86
 	{
 
@@ -16,7 +16,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using CPU = Indy.IL2CPU.Assembler.X86;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOp.Code.Endfilter)]
+		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Endfilter)]
 		// 	public class Endfilter: ILOpX86 {
 		// 		public Endfilter(ILReader aReader, MethodInformation aMethodInfo)
 		// 			: base(aReader, aMethodInfo) {

@@ -2,7 +2,7 @@ using System;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
-	[Cosmos.IL2CPU.OpCode(ILOp.Code.Localloc)]
+	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Localloc)]
 	public class Localloc: ILOpX86
 	{
 
@@ -18,7 +18,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using CPUx86 = Indy.IL2CPU.Assembler.X86;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOp.Code.Localloc)]
+		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Localloc)]
 		// 	public class Localloc: ILOpX86 {
 		//         public const string LocAllocCountMethodDataEntry = "LocAllocCount";
 		//         public const string LocAllicItemMethodDataEntryTemplate = "LocAllocItem_L{0}";

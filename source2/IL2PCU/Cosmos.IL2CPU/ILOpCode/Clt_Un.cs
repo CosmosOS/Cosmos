@@ -2,7 +2,7 @@ using System;
 
 namespace Cosmos.IL2CPU.ILOpCodes
 {
-	[Cosmos.IL2CPU.OpCode(ILOp.Code.Clt_Un)]
+	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Clt_Un)]
 	public class Clt_Un: ILOpCode
 	{
 
@@ -19,7 +19,7 @@ namespace Cosmos.IL2CPU.ILOpCodes
 		// using Indy.IL2CPU.Assembler.X86;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOp.Code.Clt_Un)]
+		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Clt_Un)]
 		// 	public class Clt_Un: ILOpCode {
 		// 		private readonly string NextInstructionLabel;
 		// 		private readonly string CurInstructionLabel;

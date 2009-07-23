@@ -2,7 +2,7 @@ using System;
 
 namespace Cosmos.IL2CPU.ILOpCodes
 {
-	[Cosmos.IL2CPU.OpCode(ILOp.Code.Ldind_I2)]
+	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldind_I2)]
 	public class Ldind_I2: ILOpCode
 	{
 
@@ -17,7 +17,7 @@ namespace Cosmos.IL2CPU.ILOpCodes
 		// using Indy.IL2CPU.Assembler;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOp.Code.Ldind_I2)]
+		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldind_I2)]
 		// 	public class Ldind_I2: ILOpCode {
 		// 		public Ldind_I2(ILReader aReader, MethodInformation aMethodInfo)
 		// 			: base(aReader, aMethodInfo) {

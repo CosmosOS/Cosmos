@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Reflection.Emit;
 using System.Text;
 
 namespace Cosmos.IL2CPU {
@@ -22,38 +21,10 @@ namespace Cosmos.IL2CPU {
     private List<MethodBase> mMethods = new List<MethodBase>();
     private HashSet<Type> mTypesSet = new HashSet<Type>();
     private List<Type> mTypes = new List<Type>();
-
-    // We split this into two arrays since we have to read
-    // a byte at a time anways. In the future if we need to 
-    // back to a unifed array, instead of 64k entries 
-    // we can change it to a signed int, and then add x0200 to the value.
-    // This will reduce array size down to 768 entries.
-    protected Func<ILOpCode>[] mOpCodesLo = new Func<ILOpCode>[256];
-    protected Func<ILOpCode>[] mOpCodesHi = new Func<ILOpCode>[256];
+    protected ILReader mReader;
 
     public ILScanner(Type aAssemblerBaseOp) {
-      LoadOpCodes();
-    }
-
-    protected void LoadOpCodes() {
-      foreach (var xType in typeof(ILOpCode).Assembly.GetExportedTypes()) {
-        if (xType.IsSubclassOf(typeof(ILOpCode))) {
-          var xAttrib = xType.GetCustomAttributes(typeof(OpCodeAttribute), false).FirstOrDefault() as OpCodeAttribute;
-          var xTemp = new DynamicMethod("Create_" + xAttrib.OpCode + "_Obj", typeof(ILOpCode), new Type[0], true);
-          var xGen = xTemp.GetILGenerator();
-          var xCtor = xType.GetConstructor(new Type[0]);
-          xGen.Emit(OpCodes.Newobj, xCtor);
-          xGen.Emit(OpCodes.Ret);
-
-          var xDeleg = (Func<ILOpCode>)xTemp.CreateDelegate(typeof(Func<ILOpCode>));
-          var xOpCodeValue = (ushort)xAttrib.OpCode;
-          if (xOpCodeValue <= 0xFF ) {
-            mOpCodesLo[xOpCodeValue] = xDeleg;
-          } else {
-            mOpCodesHi[xOpCodeValue & 0xFF] = xDeleg;
-          }
-        }
-      }
+      mReader = new ILReader(aAssemblerBaseOp);
     }
 
     public void Execute(MethodInfo aEntry) {
@@ -79,25 +50,10 @@ namespace Cosmos.IL2CPU {
         return;
       }
 
-      var xBody = aMethodBase.GetMethodBody();
-      if (xBody == null) {
-        return;
-      }
-      var xReader = new ILReader(aMethodBase, xBody);
-      while (xReader.Read()) {
+      var xOpCodes = mReader.ProcessMethod(aMethodBase);
+      foreach (var xOpCode in xOpCodes) {
         //InstructionCount++;
-        var xOpCodeValue = (ushort)xReader.OpCode;
-        Func<ILOpCode> xCreate;
-        if (xOpCodeValue <= 0xFF) {
-          xCreate = mOpCodesLo[xOpCodeValue];
-        } else {
-          xCreate = mOpCodesHi[xOpCodeValue & 0xFF];
-        }
-        if (xCreate == null) {
-          throw new Exception("Unrecognized IL Operation");
-        }
-        var xOp = xCreate();
-        xOp.Scan(xReader, this);
+        //xOpCode.Scan(xReader, this);
       }
     }
 

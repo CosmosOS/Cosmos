@@ -1,7 +1,7 @@
 using System;
 
 namespace Cosmos.IL2CPU.ILOpCodes {
-	[Cosmos.IL2CPU.OpCode(ILOp.Code.Call)]
+	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Call)]
 	public class Call: ILOpCode
 	{
     //TODO: Lets lock down this method signature. The current arguments are not a good final choice.
@@ -42,7 +42,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
 		// 
 		// namespace Indy.IL2CPU.IL.X86
 		// {
-		//     [Cosmos.IL2CPU.OpCode(ILOp.Code.Call)]
+		//     [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Call)]
 		//     public class Call : ILOpCode
 		//     {
 		//         private string LabelName;

@@ -2,7 +2,7 @@ using System;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
-	[Cosmos.IL2CPU.OpCode(ILOp.Code.Ldtoken)]
+	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldtoken)]
 	public class Ldtoken: ILOpX86
 	{
 
@@ -20,7 +20,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using Indy.IL2CPU.Compiler;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOp.Code.Ldtoken)]
+		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldtoken)]
 		// 	public class Ldtoken: ILOpX86 {
 		// 		private string mTokenAddress;
 		// 

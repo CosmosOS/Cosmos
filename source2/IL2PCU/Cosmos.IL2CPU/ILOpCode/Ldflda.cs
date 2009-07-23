@@ -2,7 +2,7 @@ using System;
 
 namespace Cosmos.IL2CPU.ILOpCodes
 {
-	[Cosmos.IL2CPU.OpCode(ILOp.Code.Ldflda)]
+	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldflda)]
 	public class Ldflda: ILOpCode
 	{
 
@@ -19,7 +19,7 @@ namespace Cosmos.IL2CPU.ILOpCodes
 		// using Indy.IL2CPU.Compiler;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOp.Code.Ldflda)]
+		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldflda)]
 		// 	public class Ldflda: ILOpCode {
 		//         private Type mType;
 		// 		private TypeInformation mTypeInfo;

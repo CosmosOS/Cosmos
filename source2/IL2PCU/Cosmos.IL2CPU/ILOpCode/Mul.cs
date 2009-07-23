@@ -2,7 +2,7 @@ using System;
 
 namespace Cosmos.IL2CPU.ILOpCodes
 {
-	[Cosmos.IL2CPU.OpCode(ILOp.Code.Mul)]
+	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Mul)]
 	public class Mul: ILOpCode
 	{
 
@@ -16,7 +16,7 @@ namespace Cosmos.IL2CPU.ILOpCodes
 		// using CPU = Indy.IL2CPU.Assembler.X86;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOp.Code.Mul)]
+		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Mul)]
 		// 	public class Mul: ILOpCode {
 		// 	    private string mNextLabel;
 		// 	    private string mCurLabel;

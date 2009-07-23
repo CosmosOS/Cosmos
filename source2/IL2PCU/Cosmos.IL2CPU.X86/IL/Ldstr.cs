@@ -2,7 +2,7 @@ using System;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
-	[Cosmos.IL2CPU.OpCode(ILOp.Code.Ldstr)]
+	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldstr)]
 	public class Ldstr: ILOpX86
 	{
 
@@ -18,7 +18,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using System.Collections.Generic;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		//     [Cosmos.IL2CPU.OpCode(ILOp.Code.Ldstr)]
+		//     [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldstr)]
 		//     public class LdStr : ILOpX86 {
 		//         //private static Dictionary<string, DataMember> mDataMemberMap = new Dictionary<string, DataMember>();
 		//         public readonly string LiteralStr;

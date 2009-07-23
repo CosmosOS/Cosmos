@@ -2,7 +2,7 @@ using System;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
-	[Cosmos.IL2CPU.OpCode(ILOp.Code.Stfld)]
+	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Stfld)]
 	public class Stfld: ILOpX86
 	{
 
@@ -20,7 +20,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using Indy.IL2CPU.Compiler;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOp.Code.Stfld)]
+		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Stfld)]
 		// 	public class Stfld: ILOpX86 {
 		// 		private TypeInformation.Field mField;
 		// 		private TypeInformation mType;

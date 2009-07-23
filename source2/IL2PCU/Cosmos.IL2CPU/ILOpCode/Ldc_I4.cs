@@ -2,7 +2,7 @@ using System;
 
 namespace Cosmos.IL2CPU.ILOpCodes
 {
-	[Cosmos.IL2CPU.OpCode(ILOp.Code.Ldc_I4)]
+	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldc_I4)]
 	public class Ldc_I4: ILOpCode
 	{
         public override void Scan(ILReader aReader, ILScanner aScanner)
@@ -21,7 +21,7 @@ namespace Cosmos.IL2CPU.ILOpCodes
 		// using System.Collections.Generic;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOp.Code.Ldc_I4)]
+		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldc_I4)]
 		// 	public class Ldc_I4: ILOpCode {
 		// 		private int mValue;
 		// 		protected void SetValue(int aValue) {

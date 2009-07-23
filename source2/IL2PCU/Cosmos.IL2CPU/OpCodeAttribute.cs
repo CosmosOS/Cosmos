@@ -7,9 +7,9 @@ namespace Cosmos.IL2CPU {
 
     [AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = false)]
     public class OpCodeAttribute : Attribute {
-      public readonly ILOp.Code OpCode;
+      public readonly ILOpCode.Code OpCode;
 
-      public OpCodeAttribute(ILOp.Code aOpCode) {
+      public OpCodeAttribute(ILOpCode.Code aOpCode) {
         OpCode = aOpCode;
       }
     }

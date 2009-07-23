@@ -2,7 +2,7 @@ using System;
 
 namespace Cosmos.IL2CPU.ILOpCodes
 {
-	[Cosmos.IL2CPU.OpCode(ILOp.Code.Stelem)]
+	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Stelem)]
 	public class Stelem: ILOpCode
 	{
 
@@ -16,7 +16,7 @@ namespace Cosmos.IL2CPU.ILOpCodes
 		// using Indy.IL2CPU.Compiler;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOp.Code.Stelem)]
+		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Stelem)]
 		// 	public class Stelem: ILOpCode {
 		// 		private Type mType;
 		// 		private string mNextLabel;
