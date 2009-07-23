@@ -32,6 +32,10 @@ namespace Cosmos.IL2CPU {
     }
 
     protected void LoadOps(Type aOpBaseType) {
+      //TODO: We can shrink this down, since all calls are FE00 - 00FF
+      // We can split it into 2 because the scanner has to read one byte at a time
+      // or we can change it to a signed int, and then add x0200 to the value.
+      // This will reduce array size down to 768 entries.
       mOps = new Func<ILOp>[0xFE1F];
       foreach (var xType in aOpBaseType.Assembly.GetExportedTypes()) {
         if (xType.IsSubclassOf(aOpBaseType)) {
