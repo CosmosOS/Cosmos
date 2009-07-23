@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Cosmos.Compiler.IL {
+  //TODO: Combine with info for this and other parts with System.Reflection.Emit.OpCodes
+  // Can we enumerate them somehow? We dont need this enum as they are all in .Value
 	public enum OpCodeEnum: ushort {
 		Nop = 0x0000,
 		Break = 0x0001,
