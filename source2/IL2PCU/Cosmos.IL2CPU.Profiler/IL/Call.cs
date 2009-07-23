@@ -10,6 +10,7 @@ namespace Cosmos.IL2CPU.Profiler.IL
     // - Some methods need to pass information back to scanner. Can we make a list of these needs?
     //    - QueueMethod
     //    - QueueType
+		//    - QueueStaticField
     //    - What else?
     // - Ability to read operand arguments. Operands are 8 bytes maximum. Reading from a buffer into new vars is inefficient. 
     //   Can we determine all the argument combinatioins, ie int, int + int, int64 and make an enum and attribute that scanner can
