@@ -25,28 +25,28 @@ namespace Cosmos.IL2CPU {
 
     //TODO: This consumes 64k x 4 = 256 k. Not much, but all the ops seem in the low range.
     // Are the 16 bit ones all modifiers / prefixes?
-    protected Func<ILOp>[] mOps;
+    //TODO: We can shrink this down, since all calls are FE00 - 00FF
+    // We can split it into 2 because the scanner has to read one byte at a time
+    // or we can change it to a signed int, and then add x0200 to the value.
+    // This will reduce array size down to 768 entries.
+    protected Func<ILOpCode>[] mOpCodes;
 
-    public ILScanner(Type aOpBaseType) {
-      LoadOps(aOpBaseType);
+    public ILScanner() {
+      LoadOpCodes();
     }
 
-    protected void LoadOps(Type aOpBaseType) {
-      //TODO: We can shrink this down, since all calls are FE00 - 00FF
-      // We can split it into 2 because the scanner has to read one byte at a time
-      // or we can change it to a signed int, and then add x0200 to the value.
-      // This will reduce array size down to 768 entries.
-      mOps = new Func<ILOp>[0xFE1F];
-      foreach (var xType in aOpBaseType.Assembly.GetExportedTypes()) {
-        if (xType.IsSubclassOf(aOpBaseType)) {
+    protected void LoadOpCodes() {
+      mOpCodes = new Func<ILOpCode>[0xFE1F];
+      foreach (var xType in typeof(ILOpCode).Assembly.GetExportedTypes()) {
+        if (xType.IsSubclassOf(typeof(ILOpCode))) {
           var xAttrib = xType.GetCustomAttributes(typeof(OpCodeAttribute), false).FirstOrDefault() as OpCodeAttribute;
           if (xAttrib != null) {
-            var xTemp = new DynamicMethod("Create_" + xAttrib.OpCode + "_Obj", typeof(ILOp), new Type[0], true);
+            var xTemp = new DynamicMethod("Create_" + xAttrib.OpCode + "_Obj", typeof(ILOpCode), new Type[0], true);
             var xGen = xTemp.GetILGenerator();
             var xCtor = xType.GetConstructor(new Type[0]);
             xGen.Emit(OpCodes.Newobj, xCtor);
             xGen.Emit(OpCodes.Ret);
-            mOps[(ushort)xAttrib.OpCode] = (Func<ILOp>)xTemp.CreateDelegate(typeof(Func<ILOp>));
+            mOpCodes[(ushort)xAttrib.OpCode] = (Func<ILOpCode>)xTemp.CreateDelegate(typeof(Func<ILOpCode>));
           }
         }
       }
@@ -90,7 +90,7 @@ namespace Cosmos.IL2CPU {
         // times or so, so possibly the compiling in is affecting
         // some CPU cache hit or other?
         //InstructionCount++;
-        var xCreate = mOps[(ushort)xReader.OpCode];
+        var xCreate = mOpCodes[(ushort)xReader.OpCode];
         if (xCreate == null) {
           throw new Exception("Unrecognized IL Operation");
         }

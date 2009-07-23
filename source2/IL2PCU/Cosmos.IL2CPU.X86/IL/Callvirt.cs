@@ -5,11 +5,6 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOp.Code.Callvirt)]
 	public class Callvirt: ILOpX86
 	{
-        public override void Scan(ILReader aReader, ILScanner aScanner)
-        {
-            base.Scan(aReader, aScanner);
-            aScanner.QueueMethod(aReader.OperandValueMethod);
-        }
 
 
 		#region Old code

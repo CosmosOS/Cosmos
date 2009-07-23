@@ -5,27 +5,6 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOp.Code.Call)]
 	public class Call: ILOpX86
 	{
-    //TODO: Lets lock down this method signature. The current arguments are not a good final choice.
-    // Requirements
-    // - Some methods need to pass information back to scanner. Can we make a list of these needs?
-    //    - QueueMethod
-    //    - QueueType
-    //    - What else?
-    // - Ability to read operand arguments. Operands are 8 bytes maximum. Reading from a buffer into new vars is inefficient. 
-    //   Can we determine all the argument combinatioins, ie int, int + int, int64 and make an enum and attribute that scanner can
-    //   use to preparse the arguments in the most efficient manner.
-    //TODO: 
-    // - Change the scan method to use constructor arguments and force constructor dependency. Pass data in contructor, then use separate assemble
-    // method? This would allow whole methods to be created and then assembled in one go. Is there any advantage to this versus immediate assembly?
-    // Could be used later to optimize per method, would give an optimizer a chance to look at the ops in a single method. I had planned to allow this
-    // by pattern matching before the ops were created though.
-    // - If not separate methods, will ops be disposed of immediately after create? If so is there any use in instantiating them in the first place?
-    // Would a static be more appropriate?
-    // - Pass scanner and reader in base constructor and then have empty argument assemble method? Requires more copying of pointer to heap though.
-        public override void Scan(ILReader aReader, ILScanner aScanner) {
-            base.Scan(aReader, aScanner);
-            aScanner.QueueMethod(aReader.OperandValueMethod);
-        }
 
 
 		#region Old code

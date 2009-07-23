@@ -5,10 +5,6 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOp.Code.Newobj)]
 	public class Newobj: ILOpX86
 	{
-        public override void Scan(ILReader aReader, ILScanner aScanner)
-        {
-            aScanner.QueueMethod(aReader.OperandValueMethod);
-        }
 
 
 

@@ -239,9 +239,6 @@ namespace Cosmos.IL2CPU {
       #endregion
     }
 
-    //TODO: Rename or chnage to constructor dependency
-    public abstract void Scan(ILReader aReader, ILScanner aScanner);
-
     //TODO: Change this to a preinitialized array
     public static byte GetOperandSize(Code aOpCode) {
       switch (aOpCode) {

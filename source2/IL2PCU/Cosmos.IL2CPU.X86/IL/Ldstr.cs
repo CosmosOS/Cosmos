@@ -5,11 +5,6 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOp.Code.Ldstr)]
 	public class Ldstr: ILOpX86
 	{
-        public override void Scan(ILReader aReader, ILScanner aScanner)
-        {
-            base.Scan(aReader, aScanner);
-            aScanner.QueueType(typeof (string));
-        }
 
 
 		#region Old code

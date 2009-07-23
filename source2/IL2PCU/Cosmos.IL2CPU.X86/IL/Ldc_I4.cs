@@ -5,12 +5,6 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOp.Code.Ldc_I4)]
 	public class Ldc_I4: ILOpX86
 	{
-        public override void Scan(ILReader aReader, ILScanner aScanner)
-        {
-            base.Scan(aReader, aScanner);
-            aScanner.QueueType(typeof(int));
-        }
-
 
 
 		#region Old code
