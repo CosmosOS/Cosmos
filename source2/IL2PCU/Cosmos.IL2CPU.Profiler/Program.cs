@@ -10,11 +10,7 @@ namespace Cosmos.IL2CPU.Profiler {
   class Program {
 
     static void Main(string[] args) {
-      try {
-          DoScan();
-      } catch(Exception E) {
-          Console.WriteLine(E.ToString());
-      }
+      DoScan();
     }
 
     private static void DoScan() {

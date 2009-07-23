@@ -3,11 +3,10 @@ using System.IO;
 using System.Reflection;
 
 namespace Cosmos.IL2CPU {
-    public class ILReader : IDisposable {
-        private Stream mStream;
+    public class ILReader {
+        private byte[] mBody;
         private MethodBase mMethod;
         private Module mModule;
-        private bool mDisposeStream;
 
         public ILReader(MethodBase aMethod):this(aMethod, aMethod.GetMethodBody()) {
         }
@@ -15,46 +14,13 @@ namespace Cosmos.IL2CPU {
         public ILReader(MethodBase aMethod, MethodBody aBody) {
           mMethod = aMethod;
           mModule = mMethod.Module;
-          //TODO: Why do we convert a small array of bytes in memory to a memory stream only to convert back to individual bytes?
-          // Instead lets work on the array itself
-          mStream = new MemoryStream(aBody.GetILAsByteArray());
-          //TODO: Why do we suppress finalize here?
-          GC.SuppressFinalize(mStream);
-          mDisposeStream = true;
-        }
-
-        public ILReader(MethodBase aMethod, Stream aStream)
-        {
-            mMethod = aMethod;
-            mModule = mMethod.Module;
-            mStream = aStream;
-            mDisposeStream = false;
-        }
-
-        public void Dispose() {
-            if (mDisposeStream) {
-              mStream.Dispose();
-              //TODO: See comment above about supress finalize
-              GC.ReRegisterForFinalize(mStream);
-            }
-            mStream = null;
-            mMethod = null;
-            mModule = null;
+          mBody = aBody.GetILAsByteArray();
         }
 
         private ILOp.Code mOpCode;
         private byte[] mOperand;
 
-        public uint Position {
-            get;
-            private set;
-        }
-
-        public uint NextPosition {
-            get {
-                return (uint)mStream.Position;
-            }
-        }
+        protected int mPosition = 0;
 
         public ILOp.Code OpCode {
             get {
@@ -104,30 +70,21 @@ namespace Cosmos.IL2CPU {
             }
         }
 
-        private uint? mOperandValueBranchPosition;
         private bool mIsShortcut;
-        public uint OperandValueBranchPosition {
-            get {
-                if (mOperandValueBranchPosition == null) {
-                    //sbyte xTemp = (sbyte)mOperand;
-                    //if (xTemp == mOperand) {
-                    //    mOperandValueBranchPosition = NextPosition + xTemp;
-                    //} else {
-                    //						if (mStream.Length < (NextPosition + mOperand + 1)) {
-                    //							mOperandValueBranchPosition = (uint)mOperand;
-                    //						} else {
-                    //							mOperandValueBranchPosition = (uint)(NextPosition + mOperand);
-                    //						}
-                    if (mIsShortcut) {
-                      mOperandValueBranchPosition = (uint?)(NextPosition + (sbyte)OperandValueInt32);
-                    } else {
-                      mOperandValueBranchPosition = (uint?)(NextPosition + OperandValueInt32);
-                    }
-                    //}
-                }
-                return mOperandValueBranchPosition.Value;
-            }
-        }
+
+      //private uint? mOperandValueBranchPosition;
+        //public uint OperandValueBranchPosition {
+        //    get {
+        //        if (mOperandValueBranchPosition == null) {
+        //            if (mIsShortcut) {
+        //              mOperandValueBranchPosition = (uint?)(NextPosition + (sbyte)OperandValueInt32);
+        //            } else {
+        //              mOperandValueBranchPosition = (uint?)(NextPosition + OperandValueInt32);
+        //            }
+        //        }
+        //        return mOperandValueBranchPosition.Value;
+        //    }
+        //}
 
         private FieldInfo mOperandValueField;
         public FieldInfo OperandValueField {
@@ -230,18 +187,23 @@ namespace Cosmos.IL2CPU {
             }
         }
 
+        protected byte ReadByte() {
+          var xResult = mBody[mPosition];
+          mPosition++;
+          return xResult;
+        }
+
         public bool Read() {
-          Position = NextPosition;
           // End of stream
-          if (mStream.Position == mStream.Length) {
+          if (mPosition == mBody.Length) {
             return false;
           }
           
           // Get OpCode
-          byte xOpCodeByte1 = (byte)mStream.ReadByte();
+          byte xOpCodeByte1 = ReadByte();
           ILOp.Code xOpCode;
           if (xOpCodeByte1 == 0xFE) {
-            xOpCode = (ILOp.Code)(xOpCodeByte1 << 8 | (byte)mStream.ReadByte());
+            xOpCode = (ILOp.Code)(xOpCodeByte1 << 8 | ReadByte());
           } else {
             xOpCode = (ILOp.Code)xOpCodeByte1;
           }
@@ -254,7 +216,7 @@ namespace Cosmos.IL2CPU {
             mOperandValueSingle = null;
             mOperandValueType = null;
             mOperandValueInt32 = null;
-            mOperandValueBranchPosition = null;
+            //mOperandValueBranchPosition = null;
             OperandValueBranchLocations = null;
             mOperandValueDouble = null;
             mOpCode = ILOp.ExpandShortcut(xOpCode);
@@ -278,10 +240,10 @@ namespace Cosmos.IL2CPU {
                     }
                     uint[] xResult = new uint[xBranchLocations1.Length];
                     for (int i = 0; i < xBranchLocations1.Length; i++) {
-                        if ((NextPosition + xBranchLocations1[i]) < 0) {
+                        if ((mPosition + xBranchLocations1[i]) < 0) {
                             xResult[i] = (uint)xBranchLocations1[i];
                         } else {
-                            xResult[i] = (uint)(NextPosition + xBranchLocations1[i]);
+                            xResult[i] = (uint)(mPosition + xBranchLocations1[i]);
                         }
                     }
                     OperandValueBranchLocations = xResult;
@@ -291,15 +253,12 @@ namespace Cosmos.IL2CPU {
         }
 
         private Int64 ReadInt64() {
-            long xResult = 0;
+          //TODO: Improve or eliminate
+          long xResult = 0;
             byte xOperandSize = 8;
             byte[] xBytes = new byte[xOperandSize];
             while (xOperandSize > 0) {
-                int xByteValueInt = mStream.ReadByte();
-                if (xByteValueInt == -1) {
-                    break;
-                }
-                xBytes[xOperandSize - 1] = (byte)xByteValueInt;
+                xBytes[xOperandSize - 1] = ReadByte();
                 xOperandSize--;
             }
             for (int i = 0; i < xBytes.Length; i++) {
@@ -312,7 +271,10 @@ namespace Cosmos.IL2CPU {
       //TODO: If we need further peformance, this function is one of the bigger users of time
       // We can load more data at a time, and use an index into larger buffers
       private byte[] ReadOperand(byte aOperandSize) {
-        mStream.Read(mOperandBuff, 0, aOperandSize);
+        for (int i = 0; i < aOperandSize; i++) {
+          //TODO: can do better than readbyte, can do locally
+          mOperandBuff[i] = ReadByte();
+        }
         return mOperandBuff;
       }
 
@@ -325,6 +287,7 @@ namespace Cosmos.IL2CPU {
         }
 
         private Int32 ReadInt32() {
+          //TODO: Improve or eliminate
             return GetInt32FromOperandByteArray(ReadOperand(4));
         }
 

@@ -60,32 +60,27 @@ namespace Cosmos.IL2CPU {
         return;
       }
 
-      try {
-        var xBody = aMethodBase.GetMethodBody();
-        if (xBody == null) {
-          return;
+      var xBody = aMethodBase.GetMethodBody();
+      if (xBody == null) {
+        return;
+      }
+      var xReader = new ILReader(aMethodBase, xBody);
+      while (xReader.Read()) {
+        // Kudzu:
+        // Uncomment for debugging - has a small but noticable 
+        // impact on runtime. Could be coincidental, but ran
+        // tests several times with and with out and without
+        // was consistently 0.5 secs faster on the Atom.
+        // Does not make much sense though as its only used 13000
+        // times or so, so possibly the compiling in is affecting
+        // some CPU cache hit or other?
+        //InstructionCount++;
+        var xCreate = mOps[(ushort)xReader.OpCode];
+        if (xCreate == null) {
+          throw new Exception("Unrecognized IL Operation");
         }
-        using (var xReader = new ILReader(aMethodBase, xBody)) {
-          while (xReader.Read()) {
-            // Kudzu:
-            // Uncomment for debugging - has a small but noticable 
-            // impact on runtime. Could be coincidental, but ran
-            // tests several times with and with out and without
-            // was consistently 0.5 secs faster on the Atom.
-            // Does not make much sense though as its only used 13000
-            // times or so, so possibly the compiling in is affecting
-            // some CPU cache hit or other?
-            //InstructionCount++;
-            var xCreate = mOps[(ushort)xReader.OpCode];
-            if (xCreate == null) {
-              throw new Exception("Unrecognized IL Operation");
-            }
-            var xOp = xCreate();
-            xOp.Scan(xReader, this);
-          }
-        }
-      } catch (Exception E) {
-        throw new Exception("Error getting body!", E);
+        var xOp = xCreate();
+        xOp.Scan(xReader, this);
       }
     }
 
