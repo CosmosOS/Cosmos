@@ -11,47 +11,23 @@ namespace Cosmos.IL2CPU.Profiler {
 
     static void Main(string[] args) {
       try {
-          DoScan(1);
-          //DoScan(2);
+          DoScan();
       } catch(Exception E) {
           Console.WriteLine(E.ToString());
       }
     }
 
-    //TODO: Encapselate this so it can be used for all projects with ops.
-    private static Func<ILOp>[] DummyOps() {
-      var xResult = new Func<ILOp>[0xFE1F];
-      foreach (var xType in typeof(Program).Assembly.GetExportedTypes()) {
-        if (xType.IsSubclassOf(typeof(ILOpProfiler))) {
-          var xAttrib = xType.GetCustomAttributes(typeof(OpCodeAttribute), false).FirstOrDefault() as OpCodeAttribute;
-          if (xAttrib != null) {
-            var xTemp = new DynamicMethod("Create_" + xAttrib.OpCode + "_Obj", typeof(ILOp), new Type[0], true);
-            var xGen = xTemp.GetILGenerator();
-            var xCtor = xType.GetConstructor(new Type[0]);
-            xGen.Emit(OpCodes.Newobj, xCtor);
-            xGen.Emit(OpCodes.Ret);
-            xResult[(ushort)xAttrib.OpCode] = (Func<ILOp>)xTemp.CreateDelegate(typeof(Func<ILOp>));
-          }
-        }
-      }
-      return xResult;
-    }
-
-    private static void DoScan(int aIdx) {
+    private static void DoScan() {
       var xSW = new Stopwatch();
       xSW.Start();
 
-      var xOps = DummyOps();
-      Console.WriteLine("({1}) Create Array: {0}", xSW.Elapsed, aIdx);
-
-      var xScanner = new ILScanner();
-      xScanner.Ops = xOps;
+      var xScanner = new ILScanner(typeof(ILOpProfiler));
       xScanner.Execute(typeof(Program).GetMethod("ScannerEntryPoint", BindingFlags.NonPublic | BindingFlags.Static));
 
       xSW.Stop();
-      Console.WriteLine("({1}) Total time : {0}", xSW.Elapsed, aIdx);
-      Console.WriteLine("({1}) Method count: {0}", xScanner.MethodCount, aIdx);
-      //Console.WriteLine("({1}) Instruction count: {0}", xScanner.InstructionCount, aIdx);
+      Console.WriteLine("Total time : {0}", xSW.Elapsed);
+      Console.WriteLine("Method count: {0}", xScanner.MethodCount);
+      //Console.WriteLine("Instruction count: {0}", xScanner.InstructionCount);
     }
 
     // This is a dummy entry point for the scanner to start at.

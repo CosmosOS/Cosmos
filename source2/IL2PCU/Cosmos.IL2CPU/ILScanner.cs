@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Text;
 
 namespace Cosmos.IL2CPU {
@@ -13,19 +14,25 @@ namespace Cosmos.IL2CPU {
 
     //TODO: This consumes 64k x 4 = 256 k. Not much, but all the ops seem in the low range.
     // Are the 16 bit ones all modifiers / prefixes?
-    private Func<ILOp>[] mOps;
-    public Func<ILOp>[] Ops {
-      get {
-        return mOps;
-      }
-      set {
-        if (value != mOps) {
-          if (value == null) {
-            throw new Exception("Cannot set Ops to null");
-          } else if (value.Length != 0xFE1F) {
-            throw new Exception("Element count mismatch!");
+    protected Func<ILOp>[] mOps;
+
+    public ILScanner(Type aOpBaseType) {
+      LoadOps(aOpBaseType);
+    }
+
+    protected void LoadOps(Type aOpBaseType) {
+      mOps = new Func<ILOp>[0xFE1F];
+      foreach (var xType in aOpBaseType.Assembly.GetExportedTypes()) {
+        if (xType.IsSubclassOf(aOpBaseType)) {
+          var xAttrib = xType.GetCustomAttributes(typeof(OpCodeAttribute), false).FirstOrDefault() as OpCodeAttribute;
+          if (xAttrib != null) {
+            var xTemp = new DynamicMethod("Create_" + xAttrib.OpCode + "_Obj", typeof(ILOp), new Type[0], true);
+            var xGen = xTemp.GetILGenerator();
+            var xCtor = xType.GetConstructor(new Type[0]);
+            xGen.Emit(OpCodes.Newobj, xCtor);
+            xGen.Emit(OpCodes.Ret);
+            mOps[(ushort)xAttrib.OpCode] = (Func<ILOp>)xTemp.CreateDelegate(typeof(Func<ILOp>));
           }
-          mOps = value;
         }
       }
     }
