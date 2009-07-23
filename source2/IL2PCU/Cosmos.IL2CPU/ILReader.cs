@@ -133,10 +133,10 @@ namespace Cosmos.IL2CPU {
                     //						} else {
                     //							mOperandValueBranchPosition = (uint)(NextPosition + mOperand);
                     //						}
-                    if (!mIsShortcut) {
-                        mOperandValueBranchPosition = (uint?)(NextPosition + OperandValueInt32);
+                    if (mIsShortcut) {
+                      mOperandValueBranchPosition = (uint?)(NextPosition + (sbyte)OperandValueInt32);
                     } else {
-                        mOperandValueBranchPosition = (uint?)(NextPosition + (sbyte)OperandValueInt32);
+                      mOperandValueBranchPosition = (uint?)(NextPosition + OperandValueInt32);
                     }
                     //}
                 }
@@ -277,6 +277,7 @@ namespace Cosmos.IL2CPU {
             mIsShortcut = mOpCode != xOpCode;
             mHasOperand = xOperandSize > 0;
             if (mHasOperand) {
+              //TODO: Why transfer to array then to a var?
                 mOperand = ReadOperand(xOperandSize);
                 mOperandValueInt32 = GetInt32FromOperandByteArray(mOperand);
             } else {
@@ -306,40 +307,31 @@ namespace Cosmos.IL2CPU {
             return true;
         }
 
-
         private Int64 ReadInt64() {
             long xResult = 0;
-            byte xOperandSize = 64;
-            byte[] xBytes = new byte[xOperandSize / 8];
+            byte xOperandSize = 8;
+            byte[] xBytes = new byte[xOperandSize];
             while (xOperandSize > 0) {
                 int xByteValueInt = mStream.ReadByte();
                 if (xByteValueInt == -1) {
                     break;
                 }
-                xBytes[(xOperandSize / 8) - 1] = (byte)xByteValueInt;
-                xOperandSize -= 8;
+                xBytes[xOperandSize - 1] = (byte)xByteValueInt;
+                xOperandSize--;
             }
             for (int i = 0; i < xBytes.Length; i++) {
                 xResult = xResult << 8 | xBytes[i];
             }
             return xResult;
         }
-        private byte[] mOperandBuff = new byte[8];
-        private byte[] ReadOperand(byte aOperandSize) {
-            //var mOperandBuff = new byte[aOperandSize/8];
-            int index = 0;
-            Array.Clear(mOperandBuff, 0, 8);
-            while (aOperandSize > 0) {
-                int xByteValueInt = mStream.ReadByte();
-                if (xByteValueInt == -1) {
-                    break;
-                }
-                mOperandBuff[index] = (byte)xByteValueInt;
-                index += 1;
-                aOperandSize -= 8;
-            }
-            return mOperandBuff;
-        }
+
+      private byte[] mOperandBuff = new byte[8];
+      //TODO: If we need further peformance, this function is one of the bigger users of time
+      // We can load more data at a time, and use an index into larger buffers
+      private byte[] ReadOperand(byte aOperandSize) {
+        mStream.Read(mOperandBuff, 0, aOperandSize);
+        return mOperandBuff;
+      }
 
         private static Int32 GetInt32FromOperandByteArray(byte[] aData) {
             Int32 xResult = 0;
@@ -350,7 +342,7 @@ namespace Cosmos.IL2CPU {
         }
 
         private Int32 ReadInt32() {
-            return GetInt32FromOperandByteArray(ReadOperand(32));
+            return GetInt32FromOperandByteArray(ReadOperand(4));
         }
 
         public void Restart()

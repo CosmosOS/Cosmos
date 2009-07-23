@@ -416,14 +416,14 @@ namespace Cosmos.IL2CPU {
         case Code.Starg_S:
         case Code.Stloc_S:
         case Code.Unaligned:
-          return 8;
+          return 1;
         case Code.Ldarg:
         case Code.Ldarga:
         case Code.Ldloc:
         case Code.Ldloca:
         case Code.Starg:
         case Code.Stloc:
-          return 16;
+          return 2;
         case Code.Beq:
         case Code.Bge:
         case Code.Bge_Un:
@@ -472,10 +472,10 @@ namespace Cosmos.IL2CPU {
         case Code.Stsfld:
         case Code.Unbox:
         case Code.Unbox_Any:
-          return 32;
+          return 4;
         case Code.Ldc_I8:
         case Code.Ldc_R8:
-          return 64;
+          return 8;
         default:
           throw new NotSupportedException("OpCode not supported: " + aOpCode.ToString());
       }
@@ -533,7 +533,7 @@ namespace Cosmos.IL2CPU {
       }
     }
     
-    //TODO: Change to preinitialized array
+    //TODO: Change to preinitialized array.  Only need a small array.
     public static Code ExpandShortcut(Code aOpCode) {
           switch (aOpCode) {
               case Code.Beq_S:
