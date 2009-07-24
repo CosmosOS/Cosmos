@@ -30,10 +30,26 @@ namespace Cosmos.IL2CPU {
     protected ConstructorInfo[] mILOpsLo = new ConstructorInfo[256];
     protected ConstructorInfo[] mILOpsHi = new ConstructorInfo[256];
 
-    public ILScanner(Type aAssemblerBaseOp) {
+    public ILScanner(Type aAssemblerBaseOp) : this(aAssemblerBaseOp, false) {
+    }
+
+    public ILScanner(Type aAssemblerBaseOp, bool aProfileMode) {
       mReader = new ILReader();
-      LoadILOps(aAssemblerBaseOp);
-      foreach(var xCode in Enum.GetValues(typeof(ILOpCode.Code))) {
+      if (aProfileMode) {
+        LoadILOpsForProfiling(aAssemblerBaseOp);
+      } else {
+        LoadILOps(aAssemblerBaseOp);
+      }
+    }
+
+    protected void LoadILOpsForProfiling(Type aAssemblerBaseOp) {
+      var xCtor = aAssemblerBaseOp.GetConstructors()[0];
+      foreach (var xCode in Enum.GetValues(typeof(ILOpCode.Code))) {
+        if ((uint)xCode <= 0xFF) {
+          mILOpsLo[(uint)xCode] = xCtor;
+        } else {
+          mILOpsHi[(uint)xCode & 0xFF] = xCtor;
+        }
       }
     }
 

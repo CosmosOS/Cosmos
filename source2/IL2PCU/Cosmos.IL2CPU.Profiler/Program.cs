@@ -17,7 +17,7 @@ namespace Cosmos.IL2CPU.Profiler {
       var xSW = new Stopwatch();
       xSW.Start();
 
-      var xScanner = new ILScanner(null);
+      var xScanner = new ILScanner(typeof(ILOpProfiler), true);
       xScanner.Execute(typeof(Program).GetMethod("ScannerEntryPoint", BindingFlags.NonPublic | BindingFlags.Static));
 
       xSW.Stop();
