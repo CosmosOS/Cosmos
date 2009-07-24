@@ -12,15 +12,6 @@ namespace Cosmos.IL2CPU {
   //TODO: Change this to an abstract class and make constructor protected
   public class ILOpCode {
 
-    public readonly Code OpCode;
-
-    public ILOpCode(Code aOpCode) {
-      OpCode = aOpCode;
-    }
-
-    //TODO: Use System.Reflection.Emit.OpCodes where possible, but we still need these
-    //enums because they are used in attributes and other places that we need
-    //compile time values
     public enum Code : ushort {
       #region Values
       Nop = 0x0000,
@@ -252,55 +243,10 @@ namespace Cosmos.IL2CPU {
       #endregion
     }
 
-    public static long? GetShortcutOperand(Code aOpCode) {
-      switch (aOpCode) {
-        case Code.Ldarg_0:
-          return 0;
-        case Code.Ldarg_1:
-          return 1;
-        case Code.Ldarg_2:
-          return 2;
-        case Code.Ldarg_3:
-          return 3;
-        case Code.Ldc_I4_0:
-          return 0;
-        case Code.Ldc_I4_1:
-          return 1;
-        case Code.Ldc_I4_2:
-          return 2;
-        case Code.Ldc_I4_3:
-          return 3;
-        case Code.Ldc_I4_4:
-          return 4;
-        case Code.Ldc_I4_5:
-          return 5;
-        case Code.Ldc_I4_6:
-          return 6;
-        case Code.Ldc_I4_7:
-          return 7;
-        case Code.Ldc_I4_8:
-          return 8;
-        case Code.Ldc_I4_M1:
-          return -1;
-        case Code.Ldloc_0:
-          return 0;
-        case Code.Ldloc_1:
-          return 1;
-        case Code.Ldloc_2:
-          return 2;
-        case Code.Ldloc_3:
-          return 3;
-        case Code.Stloc_0:
-          return 0;
-        case Code.Stloc_1:
-          return 1;
-        case Code.Stloc_2:
-          return 2;
-        case Code.Stloc_3:
-          return 3;
-        default:
-          return null;
-      }
+    public readonly Code OpCode;
+
+    public ILOpCode(Code aOpCode) {
+      OpCode = aOpCode;
     }
 
   }

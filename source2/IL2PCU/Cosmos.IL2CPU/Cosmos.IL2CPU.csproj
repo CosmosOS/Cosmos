@@ -53,6 +53,7 @@
     <Compile Include="ILOpCode.cs" />
     <Compile Include="ILOpCodes\InlineI.cs" />
     <Compile Include="ILOpCodes\InlineNone.cs" />
+    <Compile Include="ILOpCodes\InlineVar.cs" />
     <Compile Include="ILReader.cs" />
     <Compile Include="OpCodeAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

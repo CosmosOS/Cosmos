@@ -58,12 +58,10 @@ namespace Cosmos.IL2CPU {
           }
 
           //TODO: Need to look at OpCode operandtype and queue for these:
+          // probably dont need to look by op, but can do by operand instead.
           // Call: QueueMethod(aReader.OperandValueMethod);
           // Callvirt: QueueMethod(aReader.OperandValueMethod);
           // Newobj: QueueMethod(aReader.OperandValueMethod);
-
-          // Get arguments before Shortcut expansion.
-          //TODO: Are all shortcuts wo arguments? if so we can skip this step for shortcuts
 
           ILOpCode xILOpCode = null;
           switch (xOpCode.OperandType) {
@@ -81,7 +79,7 @@ namespace Cosmos.IL2CPU {
 
             // The operand is a 32-bit integer.
             case OperandType.InlineI:
-              xILOpCode = new ILOpCodes.InlineI(xOpCodeVal, ReadInt32(xIL, xPos));
+              xILOpCode = new ILOpCodes.InlineI(xOpCodeVal, ReadUInt32(xIL, xPos));
               xPos = xPos + 4;
               break;
 
@@ -122,7 +120,7 @@ namespace Cosmos.IL2CPU {
               break;
 
             case OperandType.InlineSwitch: {
-                int xCount = (int)ReadInt32(xIL, xPos);
+                int xCount = (int)ReadUInt32(xIL, xPos);
                 int[] xBranchLocations = new int[xCount];
                 uint[] xBranchValues = new uint[xCount];
                 for (int i = 0; i < xCount; i++) {
@@ -153,7 +151,7 @@ namespace Cosmos.IL2CPU {
 
             // 16-bit integer containing the ordinal of a local variable or an argument.
             case OperandType.InlineVar:
-              xILOpCode = new ILOpCode(xOpCodeVal);
+              xILOpCode = new ILOpCodes.InlineVar(xOpCodeVal, ReadUInt16(xIL, xPos));
               xPos = xPos + 2;
               break;
 
@@ -175,7 +173,7 @@ namespace Cosmos.IL2CPU {
               xPos = xPos + 4;
               break;
 
-            // 8-bit integer containing the ordinal of a local variable or an argumenta.
+            // 8-bit integer containing the ordinal of a local variable or an argument.
             case OperandType.ShortInlineVar:
               xILOpCode = new ILOpCode(xOpCodeVal);
               xPos = xPos + 4;
@@ -186,9 +184,12 @@ namespace Cosmos.IL2CPU {
           }
 
           #region Expand shortcuts
+          // This region expands shortcut ops into full ops
+          // This elminates the amount of code required in the assemblers
+          // by allowing them to ignore the shortcuts
           switch (xOpCodeVal) {
             case ILOpCode.Code.Beq_S:
-              xILOpCode = new ILOpCodes.InlineNone(ILOpCode.Code.Beq);
+              //xILOpCode = new ILOpCodes.xxx(ILOpCode.Code.Beq, xILOpCode.value);
               break;
 
             case ILOpCode.Code.Bge_S:
@@ -240,19 +241,19 @@ namespace Cosmos.IL2CPU {
               break;
 
             case ILOpCode.Code.Ldarg_0:
-              //return Code.Ldarg;
+              xILOpCode = new ILOpCodes.InlineVar(ILOpCode.Code.Ldarg, 0);
               break;
 
             case ILOpCode.Code.Ldarg_1:
-              //return Code.Ldarg;
+              xILOpCode = new ILOpCodes.InlineVar(ILOpCode.Code.Ldarg, 1);
               break;
 
             case ILOpCode.Code.Ldarg_2:
-              //return Code.Ldarg;
+              xILOpCode = new ILOpCodes.InlineVar(ILOpCode.Code.Ldarg, 2);
               break;
 
             case ILOpCode.Code.Ldarg_3:
-              //return Code.Ldarg;
+              xILOpCode = new ILOpCodes.InlineVar(ILOpCode.Code.Ldarg, 3);
               break;
 
             case ILOpCode.Code.Ldarg_S:
@@ -368,8 +369,12 @@ namespace Cosmos.IL2CPU {
         return xResult;
       }
 
-      private UInt32 ReadInt32(byte[] aBytes, int aPos) {
+      private UInt32 ReadUInt32(byte[] aBytes, int aPos) {
         return (UInt32)(aBytes[aPos + 3] << 24 | aBytes[aPos + 2] << 16 | aBytes[aPos + 1] << 8 | aBytes[aPos]);
+      }
+
+      private UInt16 ReadUInt16(byte[] aBytes, int aPos) {
+        return (UInt16)(aBytes[aPos + 1] << 8 | aBytes[aPos]);
       }
 
       //mOperandValueStr = mModule.ResolveString(OperandValueInt32);

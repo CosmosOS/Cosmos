@@ -33,22 +33,25 @@ namespace Cosmos.IL2CPU {
     public ILScanner(Type aAssemblerBaseOp) : this(aAssemblerBaseOp, false) {
     }
 
-    public ILScanner(Type aAssemblerBaseOp, bool aProfileMode) {
+    public ILScanner(Type aAssemblerBaseOp, bool aSingleILOp) {
       mReader = new ILReader();
-      if (aProfileMode) {
-        LoadILOpsForProfiling(aAssemblerBaseOp);
+      if (aSingleILOp) {
+        LoadILOp(aAssemblerBaseOp);
       } else {
         LoadILOps(aAssemblerBaseOp);
       }
     }
 
-    protected void LoadILOpsForProfiling(Type aAssemblerBaseOp) {
+    protected void LoadILOp(Type aAssemblerBaseOp) {
       var xCtor = aAssemblerBaseOp.GetConstructors()[0];
-      foreach (var xCode in Enum.GetValues(typeof(ILOpCode.Code))) {
-        if ((uint)xCode <= 0xFF) {
-          mILOpsLo[(uint)xCode] = xCtor;
+      // Don't change the type in the foreach to a var, its necessary as it is now
+      // to typecast it, so we can then recast to an int.
+      foreach (ILOpCode.Code xCode in Enum.GetValues(typeof(ILOpCode.Code))) {
+        int xCodeValue = (int)xCode;
+        if (xCodeValue <= 0xFF) {
+          mILOpsLo[xCodeValue] = xCtor;
         } else {
-          mILOpsHi[(uint)xCode & 0xFF] = xCtor;
+          mILOpsHi[xCodeValue & 0xFF] = xCtor;
         }
       }
     }
@@ -101,12 +104,16 @@ namespace Cosmos.IL2CPU {
         foreach (var xOpCode in xOpCodes) {
           //InstructionCount++;
           ConstructorInfo xCtor;
-          if ((uint)xOpCode.OpCode <= 0xFF) {
-            xCtor = mILOpsLo[(uint)xOpCode.OpCode];
+          uint xOpCodeVal = (uint)xOpCode.OpCode;
+          if (xOpCodeVal <= 0xFF) {
+            xCtor = mILOpsLo[xOpCodeVal];
           } else {
-            xCtor = mILOpsHi[(uint)xOpCode.OpCode];
+            xCtor = mILOpsHi[xOpCodeVal & 0xFF];
           }
-          var xILOp = xCtor.Invoke(new object[] {xOpCode});
+          // TODO: Remove this if when all shortcut espansions are working again
+          if (xCtor != null) {
+            var xILOp = xCtor.Invoke(new object[] { xOpCode });
+          }
         }
       }
     }
