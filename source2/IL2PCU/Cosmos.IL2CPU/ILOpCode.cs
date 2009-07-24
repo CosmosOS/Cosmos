@@ -12,10 +12,10 @@ namespace Cosmos.IL2CPU {
   //TODO: Change this to an abstract class and make constructor protected
   public class ILOpCode {
 
-    public readonly Code Value;
+    public readonly Code OpCode;
 
-    public ILOpCode(Code aValue) {
-      Value = aValue;
+    public ILOpCode(Code aOpCode) {
+      OpCode = aOpCode;
     }
 
     //TODO: Use System.Reflection.Emit.OpCodes where possible, but we still need these

@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="ILOp.cs" />
     <Compile Include="ILOpCode.cs" />
+    <Compile Include="ILOpCodes\InlineI.cs" />
     <Compile Include="ILOpCodes\InlineNone.cs" />
     <Compile Include="ILReader.cs" />
     <Compile Include="OpCodeAttribute.cs" />

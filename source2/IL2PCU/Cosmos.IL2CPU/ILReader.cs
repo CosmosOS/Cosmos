@@ -96,7 +96,7 @@ namespace Cosmos.IL2CPU {
             // The operand is a 32-bit integer.
             case OperandType.InlineI:
               xOperandSize = 4;
-              xILOpCode = new ILOpCode(xOpCodeVal);
+              xILOpCode = new ILOpCodes.InlineI(xOpCodeVal, ReadInt32(xIL, 1));
               break;
             // The operand is a 64-bit integer.
             case OperandType.InlineI8:
@@ -131,7 +131,7 @@ namespace Cosmos.IL2CPU {
               break;
 
             case OperandType.InlineSwitch: {
-                int xCount = ReadInt32(xIL, 1);
+                int xCount = (int)ReadInt32(xIL, 1);
                 int[] xBranchLocations = new int[xCount];
                 uint[] xBranchValues = new uint[xCount];
                 for (int i = 0; i < xCount; i++) {
@@ -204,8 +204,8 @@ namespace Cosmos.IL2CPU {
         return xResult;
       }
 
-      private Int32 ReadInt32(byte[] aBytes, int aPos) {
-        return (aBytes[aPos + 3] << 24 | aBytes[aPos + 2] << 16 | aBytes[aPos + 1] << 8 | aBytes[aPos]);
+      private UInt32 ReadInt32(byte[] aBytes, int aPos) {
+        return (UInt32)(aBytes[aPos + 3] << 24 | aBytes[aPos + 2] << 16 | aBytes[aPos + 1] << 8 | aBytes[aPos]);
       }
 
       //mOperandValueStr = mModule.ResolveString(OperandValueInt32);
