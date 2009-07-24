@@ -28,7 +28,12 @@ namespace Cosmos.IL2CPU {
     }
 
     public void Execute(MethodInfo aEntry) {
+      // IL Operations implicitly require these types
+      QueueType(typeof(string));
+      QueueType(typeof(int));
+
       QueueMethod(aEntry);
+
       // Cannot use foreach, the list changes as we go
       for (int i = 0; i < mMethods.Count; i++) {
         ScanMethod(mMethods[i]);
@@ -51,9 +56,11 @@ namespace Cosmos.IL2CPU {
       }
 
       var xOpCodes = mReader.ProcessMethod(aMethodBase);
-      foreach (var xOpCode in xOpCodes) {
-        //InstructionCount++;
-        //xOpCode.Scan(xReader, this);
+      if (xOpCodes != null) {
+        foreach (var xOpCode in xOpCodes) {
+          //InstructionCount++;
+          //xOpCode.Scan(xReader, this);
+        }
       }
     }
 
