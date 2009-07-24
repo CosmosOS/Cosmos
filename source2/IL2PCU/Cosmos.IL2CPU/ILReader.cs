@@ -199,16 +199,183 @@ namespace Cosmos.IL2CPU {
               throw new Exception("Unknown OperandType");
           }
 
-          // TODO: Optimize this. Can possibly fill slots in the mOpCodesHi
-          // with the target op, or a translator fuction in the delegate
-          var xOpCodeValFinal = ILOpCode.ExpandShortcut(xOpCodeVal);
-          if (xOpCodeValFinal != xOpCodeVal) {
-            if ((int)xOpCodeValFinal >= (int)0xFE00) {
-              xOpCode = mOpCodesHi[(int)xOpCodeValFinal & 0xFF];
-            } else {
-              xOpCode = mOpCodesLo[(int)xOpCodeValFinal];
-            }
+          #region Expand shortcuts
+          switch (xOpCodeVal) {
+            case ILOpCode.Code.Beq_S:
+              xILOpCode = new ILOpCodes.InlineNone(ILOpCode.Code.Beq);
+              break;
+
+            case ILOpCode.Code.Bge_S:
+              //return Code.Bge;
+              break;
+
+            case ILOpCode.Code.Bge_Un_S:
+              //return Code.Bge_Un;
+              break;
+
+            case ILOpCode.Code.Bgt_S:
+              //return Code.Bgt;
+              break;
+
+            case ILOpCode.Code.Bgt_Un_S:
+              //return Code.Bgt_Un;
+              break;
+
+            case ILOpCode.Code.Ble_S:
+              //return Code.Ble;
+              break;
+
+            case ILOpCode.Code.Ble_Un_S:
+              //return Code.Ble_Un;
+              break;
+
+            case ILOpCode.Code.Blt_S:
+              //return Code.Blt;
+              break;
+
+            case ILOpCode.Code.Blt_Un_S:
+              //return Code.Blt_Un;
+              break;
+
+            case ILOpCode.Code.Bne_Un_S:
+              //return Code.Bne_Un;
+              break;
+
+            case ILOpCode.Code.Br_S:
+              //return Code.Br;
+              break;
+
+            case ILOpCode.Code.Brfalse_S:
+              //return Code.Brfalse;
+              break;
+
+            case ILOpCode.Code.Brtrue_S:
+              //return Code.Brtrue;
+              break;
+
+            case ILOpCode.Code.Ldarg_0:
+              //return Code.Ldarg;
+              break;
+
+            case ILOpCode.Code.Ldarg_1:
+              //return Code.Ldarg;
+              break;
+
+            case ILOpCode.Code.Ldarg_2:
+              //return Code.Ldarg;
+              break;
+
+            case ILOpCode.Code.Ldarg_3:
+              //return Code.Ldarg;
+              break;
+
+            case ILOpCode.Code.Ldarg_S:
+              //return Code.Ldarg;
+              break;
+
+            case ILOpCode.Code.Ldarga_S:
+              //return Code.Ldarga;
+              break;
+
+            case ILOpCode.Code.Ldc_I4_0:
+              //return Code.Ldc_I4;
+              break;
+
+            case ILOpCode.Code.Ldc_I4_1:
+              //return Code.Ldc_I4;
+              break;
+
+            case ILOpCode.Code.Ldc_I4_2:
+              //return Code.Ldc_I4;
+              break;
+
+            case ILOpCode.Code.Ldc_I4_3:
+              //return Code.Ldc_I4;
+              break;
+
+            case ILOpCode.Code.Ldc_I4_4:
+              //return Code.Ldc_I4;
+              break;
+
+            case ILOpCode.Code.Ldc_I4_5:
+              //return Code.Ldc_I4;
+              break;
+
+            case ILOpCode.Code.Ldc_I4_6:
+              //return Code.Ldc_I4;
+              break;
+
+            case ILOpCode.Code.Ldc_I4_7:
+              //return Code.Ldc_I4;
+              break;
+
+            case ILOpCode.Code.Ldc_I4_8:
+              //return Code.Ldc_I4;
+              break;
+
+            case ILOpCode.Code.Ldc_I4_M1:
+              //return Code.Ldc_I4;
+              break;
+
+            case ILOpCode.Code.Ldc_I4_S:
+              //return Code.Ldc_I4;
+              break;
+
+            case ILOpCode.Code.Ldloc_0:
+              //return Code.Ldloc;
+              break;
+
+            case ILOpCode.Code.Ldloc_1:
+              //return Code.Ldloc;
+              break;
+
+            case ILOpCode.Code.Ldloc_2:
+              //return Code.Ldloc;
+              break;
+
+            case ILOpCode.Code.Ldloc_3:
+              //return Code.Ldloc;
+              break;
+
+            case ILOpCode.Code.Ldloc_S:
+              //return Code.Ldloc;
+              break;
+
+            case ILOpCode.Code.Ldloca_S:
+              //return Code.Ldloca;
+              break;
+
+            case ILOpCode.Code.Leave_S:
+              //return Code.Leave;
+              break;
+
+            case ILOpCode.Code.Starg_S:
+              //return Code.Starg;
+              break;
+
+            case ILOpCode.Code.Stloc_0:
+              //return Code.Stloc;
+              break;
+
+            case ILOpCode.Code.Stloc_1:
+              //return Code.Stloc;
+              break;
+
+            case ILOpCode.Code.Stloc_2:
+              //return Code.Stloc;
+              break;
+
+            case ILOpCode.Code.Stloc_3:
+              //return Code.Stloc;
+              break;
+
+            case ILOpCode.Code.Stloc_S:
+              //return Code.Stloc;
+              break;
+
           }
+#endregion
+
 
           xResult.Add(xILOpCode);
         }

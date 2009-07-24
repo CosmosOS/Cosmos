@@ -252,25 +252,6 @@ namespace Cosmos.IL2CPU {
       #endregion
     }
 
-    //TODO: Lets lock down this method signature. The current arguments are not a good final choice.
-    // Requirements
-    // - Some methods need to pass information back to scanner. Can we make a list of these needs?
-    //    - QueueMethod
-    //    - QueueType
-    //    - What else?
-    // - Ability to read operand arguments. Operands are 8 bytes maximum. Reading from a buffer into new vars is inefficient. 
-    //   Can we determine all the argument combinatioins, ie int, int + int, int64 and make an enum and attribute that scanner can
-    //   use to preparse the arguments in the most efficient manner.
-    //TODO: 
-    // - Change the scan method to use constructor arguments and force constructor dependency. Pass data in contructor, then use separate assemble
-    // method? This would allow whole methods to be created and then assembled in one go. Is there any advantage to this versus immediate assembly?
-    // Could be used later to optimize per method, would give an optimizer a chance to look at the ops in a single method. I had planned to allow this
-    // by pattern matching before the ops were created though.
-    // - If not separate methods, will ops be disposed of immediately after create? If so is there any use in instantiating them in the first place?
-    // Would a static be more appropriate?
-    // - Pass scanner and reader in base constructor and then have empty argument assemble method? Requires more copying of pointer to heap though.
-
-    //TODO: Change to a preinitialized array
     public static long? GetShortcutOperand(Code aOpCode) {
       switch (aOpCode) {
         case Code.Ldarg_0:
@@ -322,98 +303,5 @@ namespace Cosmos.IL2CPU {
       }
     }
 
-    //TODO: Change to preinitialized array.  Only need a small array.
-    public static Code ExpandShortcut(Code aOpCode) {
-      switch (aOpCode) {
-        case Code.Beq_S:
-          return Code.Beq;
-        case Code.Bge_S:
-          return Code.Bge;
-        case Code.Bge_Un_S:
-          return Code.Bge_Un;
-        case Code.Bgt_S:
-          return Code.Bgt;
-        case Code.Bgt_Un_S:
-          return Code.Bgt_Un;
-        case Code.Ble_S:
-          return Code.Ble;
-        case Code.Ble_Un_S:
-          return Code.Ble_Un;
-        case Code.Blt_S:
-          return Code.Blt;
-        case Code.Blt_Un_S:
-          return Code.Blt_Un;
-        case Code.Bne_Un_S:
-          return Code.Bne_Un;
-        case Code.Br_S:
-          return Code.Br;
-        case Code.Brfalse_S:
-          return Code.Brfalse;
-        case Code.Brtrue_S:
-          return Code.Brtrue;
-        case Code.Ldarg_0:
-          return Code.Ldarg;
-        case Code.Ldarg_1:
-          return Code.Ldarg;
-        case Code.Ldarg_2:
-          return Code.Ldarg;
-        case Code.Ldarg_3:
-          return Code.Ldarg;
-        case Code.Ldarg_S:
-          return Code.Ldarg;
-        case Code.Ldarga_S:
-          return Code.Ldarga;
-        case Code.Ldc_I4_0:
-          return Code.Ldc_I4;
-        case Code.Ldc_I4_1:
-          return Code.Ldc_I4;
-        case Code.Ldc_I4_2:
-          return Code.Ldc_I4;
-        case Code.Ldc_I4_3:
-          return Code.Ldc_I4;
-        case Code.Ldc_I4_4:
-          return Code.Ldc_I4;
-        case Code.Ldc_I4_5:
-          return Code.Ldc_I4;
-        case Code.Ldc_I4_6:
-          return Code.Ldc_I4;
-        case Code.Ldc_I4_7:
-          return Code.Ldc_I4;
-        case Code.Ldc_I4_8:
-          return Code.Ldc_I4;
-        case Code.Ldc_I4_M1:
-          return Code.Ldc_I4;
-        case Code.Ldc_I4_S:
-          return Code.Ldc_I4;
-        case Code.Ldloc_0:
-          return Code.Ldloc;
-        case Code.Ldloc_1:
-          return Code.Ldloc;
-        case Code.Ldloc_2:
-          return Code.Ldloc;
-        case Code.Ldloc_3:
-          return Code.Ldloc;
-        case Code.Ldloc_S:
-          return Code.Ldloc;
-        case Code.Ldloca_S:
-          return Code.Ldloca;
-        case Code.Leave_S:
-          return Code.Leave;
-        case Code.Starg_S:
-          return Code.Starg;
-        case Code.Stloc_0:
-          return Code.Stloc;
-        case Code.Stloc_1:
-          return Code.Stloc;
-        case Code.Stloc_2:
-          return Code.Stloc;
-        case Code.Stloc_3:
-          return Code.Stloc;
-        case Code.Stloc_S:
-          return Code.Stloc;
-        default:
-          return aOpCode;
-      }
-    }
   }
 }
