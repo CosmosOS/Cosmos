@@ -18,6 +18,8 @@ namespace Cosmos.IL2CPU {
     // need to hash on some UID instead of the refernce. Do not use strings, they are
     // super slow.
     private HashSet<MethodBase> mMethodsSet = new HashSet<MethodBase>();
+		// we also need a List`1, to provide an easy way to do scanning. a list doesn't
+		// change position of it's elements.
     private List<MethodBase> mMethods = new List<MethodBase>();
     private HashSet<Type> mTypesSet = new HashSet<Type>();
     private HashSet<FieldInfo> mFieldsSet = new HashSet<FieldInfo>();
