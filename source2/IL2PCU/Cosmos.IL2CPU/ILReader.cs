@@ -31,20 +31,6 @@ namespace Cosmos.IL2CPU {
         }
       }
 
-      //protected void LoadILOpCodes(Type aAssemblerBaseOp) {
-      //  foreach (var xType in aAssemblerBaseOp.Assembly.GetExportedTypes()) {
-      //    if (xType.IsSubclassOf(aAssemblerBaseOp)) {
-      //      var xAttrib = (OpCodeAttribute)xType.GetCustomAttributes(typeof(OpCodeAttribute), false)[0];
-      //      var xOpCodeValue = (ushort)xAttrib.OpCode;
-      //      if (xOpCodeValue <= 0xFF) {
-      //        mILOpCodesLo[xOpCodeValue] = xType;
-      //      } else {
-      //        mILOpCodesHi[xOpCodeValue & 0xFF] = xType;
-      //      }
-      //    }
-      //  }
-      //}
-      
       public List<ILOpCode> ProcessMethod(MethodBase aMethod) {
         var xResult = new List<ILOpCode>();
         var xBody = aMethod.GetMethodBody();

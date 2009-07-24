@@ -25,8 +25,31 @@ namespace Cosmos.IL2CPU {
     private HashSet<FieldInfo> mFieldsSet = new HashSet<FieldInfo>();
     protected ILReader mReader;
 
+    // TODO: Investigate this and see if Matthi's emit way
+    // is a lot faster than calling GetConstructor than invoke
+    protected ConstructorInfo[] mILOpsLo = new ConstructorInfo[256];
+    protected ConstructorInfo[] mILOpsHi = new ConstructorInfo[256];
+
     public ILScanner(Type aAssemblerBaseOp) {
       mReader = new ILReader();
+      LoadILOps(aAssemblerBaseOp);
+      foreach(var xCode in Enum.GetValues(typeof(ILOpCode.Code))) {
+      }
+    }
+
+    protected void LoadILOps(Type aAssemblerBaseOp) {
+      foreach (var xType in aAssemblerBaseOp.Assembly.GetExportedTypes()) {
+        if (xType.IsSubclassOf(aAssemblerBaseOp)) {
+          var xAttrib = (OpCodeAttribute)xType.GetCustomAttributes(typeof(OpCodeAttribute), false)[0];
+          var xOpCode = (ushort)xAttrib.OpCode;
+          var xCtor = xType.GetConstructors()[0];
+          if (xOpCode <= 0xFF) {
+            mILOpsLo[xOpCode] = xCtor;
+          } else {
+            mILOpsHi[xOpCode & 0xFF] = xCtor;
+          }
+        }
+      }
     }
 
     public void Execute(MethodInfo aEntry) {
@@ -61,7 +84,13 @@ namespace Cosmos.IL2CPU {
       if (xOpCodes != null) {
         foreach (var xOpCode in xOpCodes) {
           //InstructionCount++;
-          //xOpCode.Scan(xReader, this);
+          ConstructorInfo xCtor;
+          if ((uint)xOpCode.OpCode <= 0xFF) {
+            xCtor = mILOpsLo[(uint)xOpCode.OpCode];
+          } else {
+            xCtor = mILOpsHi[(uint)xOpCode.OpCode];
+          }
+          var xILOp = xCtor.Invoke(new object[] {xOpCode});
         }
       }
     }
