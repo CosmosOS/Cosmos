@@ -24,7 +24,7 @@ namespace Cosmos.IL2CPU {
     protected ILReader mReader;
 
     public ILScanner(Type aAssemblerBaseOp) {
-      mReader = new ILReader(aAssemblerBaseOp);
+      mReader = new ILReader();
     }
 
     public void Execute(MethodInfo aEntry) {
@@ -66,6 +66,7 @@ namespace Cosmos.IL2CPU {
 
     public void QueueMethod(MethodBase aMethod) {
       if (!mMethodsSet.Contains(aMethod)) {
+
         mMethodsSet.Add(aMethod);
         mMethods.Add(aMethod);
         QueueType(aMethod.DeclaringType);

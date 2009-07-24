@@ -14,14 +14,8 @@ namespace Cosmos.IL2CPU {
       // This will reduce array size down to 768 entries.
       protected OpCode[] mOpCodesLo = new OpCode[256];
       protected OpCode[] mOpCodesHi = new OpCode[256];
-      protected Type[] mILOpCodesLo = new Type[256];
-      protected Type[] mILOpCodesHi = new Type[256];
       
-      public ILReader(Type aAssemblerBaseOp) {
-        // Profiler passes null
-        if (aAssemblerBaseOp != null) {
-          LoadILOpCodes(aAssemblerBaseOp);
-        }
+      public ILReader() {
         LoadOpCodes();
       }
 
@@ -37,24 +31,26 @@ namespace Cosmos.IL2CPU {
         }
       }
 
-      protected void LoadILOpCodes(Type aAssemblerBaseOp) {
-        foreach (var xType in aAssemblerBaseOp.Assembly.GetExportedTypes()) {
-          if (xType.IsSubclassOf(aAssemblerBaseOp)) {
-            var xAttrib = (OpCodeAttribute)xType.GetCustomAttributes(typeof(OpCodeAttribute), false)[0];
-            var xOpCodeValue = (ushort)xAttrib.OpCode;
-            if (xOpCodeValue <= 0xFF) {
-              mILOpCodesLo[xOpCodeValue] = xType;
-            } else {
-              mILOpCodesHi[xOpCodeValue & 0xFF] = xType;
-            }
-          }
-        }
-      }
+      //protected void LoadILOpCodes(Type aAssemblerBaseOp) {
+      //  foreach (var xType in aAssemblerBaseOp.Assembly.GetExportedTypes()) {
+      //    if (xType.IsSubclassOf(aAssemblerBaseOp)) {
+      //      var xAttrib = (OpCodeAttribute)xType.GetCustomAttributes(typeof(OpCodeAttribute), false)[0];
+      //      var xOpCodeValue = (ushort)xAttrib.OpCode;
+      //      if (xOpCodeValue <= 0xFF) {
+      //        mILOpCodesLo[xOpCodeValue] = xType;
+      //      } else {
+      //        mILOpCodesHi[xOpCodeValue & 0xFF] = xType;
+      //      }
+      //    }
+      //  }
+      //}
       
       public List<ILOpCode> ProcessMethod(MethodBase aMethod) {
         var xResult = new List<ILOpCode>();
         var xBody = aMethod.GetMethodBody();
+
         // Some methods return no body. Not sure why.. have to investigate
+        // They arent abstracts or icalls...
         if (xBody == null) {
           return null;
         }
@@ -62,7 +58,6 @@ namespace Cosmos.IL2CPU {
         var xIL = xBody.GetILAsByteArray();
         int xPos = 0;
 
-        //TODO: Move op info compeltely out of ILOp
         while (xPos < xIL.Length) {
           ILOpCode.Code xOpCodeVal;
           Type xILOpCodeType;
@@ -70,12 +65,10 @@ namespace Cosmos.IL2CPU {
           int xOpCodeSize = 1; //TODO: Remove this after we have better logic
           if (xIL[xPos] == 0xFE) {
             xOpCodeVal = (ILOpCode.Code)(0xFE00 | xIL[xPos + 1]);
-            xILOpCodeType = mILOpCodesHi[xIL[xPos + 1]];
             xOpCode = mOpCodesHi[xIL[xPos + 1]];
             xOpCodeSize = 2;
           } else {
             xOpCodeVal = (ILOpCode.Code)xIL[xPos];
-            xILOpCodeType = mILOpCodesLo[xIL[xPos]];
             xOpCode = mOpCodesLo[xIL[xPos]];
           }
 
@@ -103,7 +96,82 @@ namespace Cosmos.IL2CPU {
           } else {
             // Get arguments before Shortcut expansion.
             //TODO: Are all shortcuts wo arguments? if so we can skip this step for shortcuts
-            int xOperandSize = ILOpCode.GetOperandSize(xOpCodeVal);
+
+            //TODO: case statements can eb consolidated, but later
+            // this will be expanded to handle the ILOpCode creations, so don't consolidate
+            int xOperandSize;
+            switch (xOpCode.OperandType) {
+              // The operand is a 32-bit integer branch target.
+              case OperandType.InlineBrTarget:
+                xOperandSize = 4;
+                break;
+              // The operand is a 32-bit metadata token.
+              case OperandType.InlineField:
+                xOperandSize = 4;
+                break;
+              // The operand is a 32-bit integer.
+              case OperandType.InlineI:
+                xOperandSize = 4;
+                break;
+              // The operand is a 64-bit integer.
+              case OperandType.InlineI8:
+                xOperandSize = 8;
+                break;
+              // The operand is a 32-bit metadata token.
+              case OperandType.InlineMethod:
+                xOperandSize = 4;
+                break;
+              // No operand.
+              case OperandType.InlineNone:
+                xOperandSize = 0;
+                break;
+              // The operand is a 64-bit IEEE floating point number.
+              case OperandType.InlineR:
+                xOperandSize = 8;
+                break;
+              // The operand is a 32-bit metadata signature token.
+              case OperandType.InlineSig:
+                xOperandSize = 4;
+                break;
+              // The operand is a 32-bit metadata string token.
+              case OperandType.InlineString:
+                xOperandSize = 4;
+                break;
+              // The operand is the 32-bit integer argument to a switch instruction.
+              case OperandType.InlineSwitch:
+                xOperandSize = 4;
+                break;
+              // The operand is a FieldRef, MethodRef, or TypeRef token.
+              case OperandType.InlineTok:
+                xOperandSize = 4;
+                break;
+              // The operand is a 32-bit metadata token.
+              case OperandType.InlineType:
+                xOperandSize = 4;
+                break;
+              // OperandType.OperandType.OperandType.The operand is 16-bit integer containing the ordinal of a local variable or an argument.
+              case OperandType.InlineVar:
+                xOperandSize =  2;
+                break;
+              // The operand is an 8-bit integer branch target.
+              case OperandType.ShortInlineBrTarget:
+                xOperandSize = 1;
+                break;
+              // The operand is an 8-bit integer.
+              case OperandType.ShortInlineI:
+                xOperandSize = 1;
+                break;
+              // The operand is a 32-bit IEEE floating point number.
+              case OperandType.ShortInlineR:
+                xOperandSize =  4;
+                break;
+              // The operand is an 8-bit integer containing the ordinal of a local variable or an argumenta.
+              case OperandType.ShortInlineVar:
+                xOperandSize =  1;
+                break;
+              default:
+                throw new Exception("Unknown OperandType");
+            }
             xPos = xPos + xOpCodeSize + xOperandSize;
           }
 
@@ -112,74 +180,21 @@ namespace Cosmos.IL2CPU {
           var xOpCodeValFinal = ILOpCode.ExpandShortcut(xOpCodeVal);
           if (xOpCodeValFinal != xOpCodeVal) {
             if ((int)xOpCodeValFinal >= (int)0xFE00) {
-              xILOpCodeType = mILOpCodesHi[((int)xOpCodeValFinal) & 0xFF];
               xOpCode = mOpCodesHi[(int)xOpCodeValFinal & 0xFF];
             } else {
-              xILOpCodeType = mILOpCodesLo[(int)xOpCodeValFinal];
               xOpCode = mOpCodesLo[(int)xOpCodeValFinal];
             }
           }
 
-          // Profiler has no ILOps
-          //TODO: Find a way to have the profiler use this too without the overhead of a dummy class tree
-          // Special LoadOps? Also remove if null in ctor for profiler in this class
-          if (xILOpCodeType != null) {
-            var xCtor = xILOpCodeType.GetConstructor(new Type[] { typeof(OpCode), typeof(Type) });
-            // TODO: Change this back to the emit way of creating delegates which is faster
-            // Has to be done at two levels now though, so its a lot tricker
-            // TODO: Can probably eliminate ILOpCode now completely and use OpCode only + our enum
-            // then can also change back to the emit code easily
-            var xILOpCode = (ILOpCode)xCtor.Invoke(new object[] { OpCodes.Nop, xILOpCodeType });
-            xResult.Add(xILOpCode);
-          }
+          var xILOpCode = new ILOpCode(xOpCodeVal);
+          xResult.Add(xILOpCode);
         }
-         
-        //  mOperand = null;
-        //    mOperandValueStr = null;
-        //    mOperandValueMethod = null;
-        //    mOperandValueField = null;
-        //    mOperandValueSingle = null;
-        //    mOperandValueType = null;
-        //    mOperandValueInt32 = null;
-        //    OperandValueBranchLocations = null;
-        //    mOperandValueDouble = null;
-        //    if (xOperandSize > 0) {
-        //      //TODO: Will we always use the Int32 result? Copying to array and then again seems wasteful
-        //      // Probably better to make typed reads for each type
-        //        mOperand = ReadOperand(xOperandSize);
-        //        mOperandValueInt32 = GetInt32FromOperandByteArray(mOperand);
-        //    } else {
-        //        if (mOpCode != xOpCode) {
-        //          long? xTempOperand = ILOp.GetShortcutOperand(xOpCode);
-        //            if (xTempOperand != null) {
-        //                mOperand = BitConverter.GetBytes(xTempOperand.Value);
-        //            }
-        //        }
-        //        if (mOpCode == ILOpCode.Code.Switch) {
-        //            int[] xBranchLocations1 = new int[ReadInt32()];
-        //            for (int i = 0; i < xBranchLocations1.Length; i++) {
-        //                xBranchLocations1[i] = ReadInt32();
-        //            }
-        //            uint[] xResult = new uint[xBranchLocations1.Length];
-        //            for (int i = 0; i < xBranchLocations1.Length; i++) {
-        //                if ((mPosition + xBranchLocations1[i]) < 0) {
-        //                    xResult[i] = (uint)xBranchLocations1[i];
-        //                } else {
-        //                    xResult[i] = (uint)(mPosition + xBranchLocations1[i]);
-        //                }
-        //            }
-        //            OperandValueBranchLocations = xResult;
-        //        }
-        //    }
-        //    return true;
-        //}
-
         return xResult;
       }
 
-        private Int32 ReadInt32(byte[] aBytes, int aPos) {
-          return (aBytes[aPos + 3] << 24 | aBytes[aPos + 2] << 16 | aBytes[aPos + 1] << 8 | aBytes[aPos]);
-        }
+      private Int32 ReadInt32(byte[] aBytes, int aPos) {
+        return (aBytes[aPos + 3] << 24 | aBytes[aPos + 2] << 16 | aBytes[aPos + 1] << 8 | aBytes[aPos]);
+      }
 
       //mOperandValueStr = mModule.ResolveString(OperandValueInt32);
 
@@ -308,15 +323,6 @@ namespace Cosmos.IL2CPU {
       //  mPosition = mPosition + 8;
       //  return xResult;
       //}
-
-        //private static Int32 GetInt32FromOperandByteArray(byte[] aData) {
-        //    Int32 xResult = 0;
-        //    for (int i = 3; i >= 0; i--) {
-        //        xResult = xResult << 8 | aData[i];
-        //    }
-        //    return xResult;
-        //}
-
 
     }
 }
