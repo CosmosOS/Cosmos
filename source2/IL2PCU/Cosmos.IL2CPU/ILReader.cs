@@ -77,103 +77,116 @@ namespace Cosmos.IL2CPU {
           // Callvirt: QueueMethod(aReader.OperandValueMethod);
           // Newobj: QueueMethod(aReader.OperandValueMethod);
 
-          // TODO: Move all this parsing and moving forward logic into the ILOpCode instances. 
-          // Default behaviour for most, but ones like switch should override.
-          if (xOpCodeVal == ILOpCode.Code.Switch) {
-            int xCount = ReadInt32(xIL, 1);
-            int[] xBranchLocations = new int[xCount];
-            uint[] xBranchValues = new uint[xCount];
-            for (int i = 0; i < xCount; i++) {
-              xBranchLocations[i] = xIL[i + 5];
-              //xBranchValues[i] = 
-              //                if ((mPosition + xBranchLocations1[i]) < 0) {
-              //                    xResult[i] = (uint)xBranchLocations1[i];
-              //                } else {
-              //                    xResult[i] = (uint)(mPosition + xBranchLocations1[i]);
-              //                }
-              xPos = xOpCodeSize + 4 + xCount * 4;
-            }
-          } else {
-            // Get arguments before Shortcut expansion.
-            //TODO: Are all shortcuts wo arguments? if so we can skip this step for shortcuts
+          // Get arguments before Shortcut expansion.
+          //TODO: Are all shortcuts wo arguments? if so we can skip this step for shortcuts
 
-            //TODO: case statements can eb consolidated, but later
-            // this will be expanded to handle the ILOpCode creations, so don't consolidate
-            int xOperandSize;
-            switch (xOpCode.OperandType) {
-              // The operand is a 32-bit integer branch target.
-              case OperandType.InlineBrTarget:
-                xOperandSize = 4;
+          int xOperandSize;
+          ILOpCode xILOpCode = null;
+          switch (xOpCode.OperandType) {
+            // The operand is a 32-bit integer branch target.
+            case OperandType.InlineBrTarget:
+              xOperandSize = 4;
+              xILOpCode = new ILOpCode(xOpCodeVal);
+              break;
+            // The operand is a 32-bit metadata token.
+            case OperandType.InlineField:
+              xOperandSize = 4;
+              xILOpCode = new ILOpCode(xOpCodeVal);
+              break;
+            // The operand is a 32-bit integer.
+            case OperandType.InlineI:
+              xOperandSize = 4;
+              xILOpCode = new ILOpCode(xOpCodeVal);
+              break;
+            // The operand is a 64-bit integer.
+            case OperandType.InlineI8:
+              xOperandSize = 8;
+              xILOpCode = new ILOpCode(xOpCodeVal);
+              break;
+            // The operand is a 32-bit metadata token.
+            case OperandType.InlineMethod:
+              xOperandSize = 4;
+              xILOpCode = new ILOpCode(xOpCodeVal);
+              break;
+            // No operand.
+            case OperandType.InlineNone:
+              xOperandSize = 0;
+              xILOpCode = new ILOpCodes.InlineNone(xOpCodeVal);
+              xILOpCode = new ILOpCode(xOpCodeVal);
+              break;
+            // The operand is a 64-bit IEEE floating point number.
+            case OperandType.InlineR:
+              xOperandSize = 8;
+              xILOpCode = new ILOpCode(xOpCodeVal);
+              break;
+            // The operand is a 32-bit metadata signature token.
+            case OperandType.InlineSig:
+              xOperandSize = 4;
+              xILOpCode = new ILOpCode(xOpCodeVal);
+              break;
+            // The operand is a 32-bit metadata string token.
+            case OperandType.InlineString:
+              xOperandSize = 4;
+              xILOpCode = new ILOpCode(xOpCodeVal);
+              break;
+
+            case OperandType.InlineSwitch: {
+                int xCount = ReadInt32(xIL, 1);
+                int[] xBranchLocations = new int[xCount];
+                uint[] xBranchValues = new uint[xCount];
+                for (int i = 0; i < xCount; i++) {
+                  xBranchLocations[i] = xIL[i + 5];
+                  //xBranchValues[i] = 
+                  //                if ((mPosition + xBranchLocations1[i]) < 0) {
+                  //                    xResult[i] = (uint)xBranchLocations1[i];
+                  //                } else {
+                  //                    xResult[i] = (uint)(mPosition + xBranchLocations1[i]);
+                  //                }
+                }
+                xOperandSize = 4 + xCount * 4;
+                xILOpCode = new ILOpCode(xOpCodeVal);
                 break;
-              // The operand is a 32-bit metadata token.
-              case OperandType.InlineField:
-                xOperandSize = 4;
-                break;
-              // The operand is a 32-bit integer.
-              case OperandType.InlineI:
-                xOperandSize = 4;
-                break;
-              // The operand is a 64-bit integer.
-              case OperandType.InlineI8:
-                xOperandSize = 8;
-                break;
-              // The operand is a 32-bit metadata token.
-              case OperandType.InlineMethod:
-                xOperandSize = 4;
-                break;
-              // No operand.
-              case OperandType.InlineNone:
-                xOperandSize = 0;
-                break;
-              // The operand is a 64-bit IEEE floating point number.
-              case OperandType.InlineR:
-                xOperandSize = 8;
-                break;
-              // The operand is a 32-bit metadata signature token.
-              case OperandType.InlineSig:
-                xOperandSize = 4;
-                break;
-              // The operand is a 32-bit metadata string token.
-              case OperandType.InlineString:
-                xOperandSize = 4;
-                break;
-              // The operand is the 32-bit integer argument to a switch instruction.
-              case OperandType.InlineSwitch:
-                xOperandSize = 4;
-                break;
-              // The operand is a FieldRef, MethodRef, or TypeRef token.
-              case OperandType.InlineTok:
-                xOperandSize = 4;
-                break;
-              // The operand is a 32-bit metadata token.
-              case OperandType.InlineType:
-                xOperandSize = 4;
-                break;
-              // OperandType.OperandType.OperandType.The operand is 16-bit integer containing the ordinal of a local variable or an argument.
-              case OperandType.InlineVar:
-                xOperandSize =  2;
-                break;
-              // The operand is an 8-bit integer branch target.
-              case OperandType.ShortInlineBrTarget:
-                xOperandSize = 1;
-                break;
-              // The operand is an 8-bit integer.
-              case OperandType.ShortInlineI:
-                xOperandSize = 1;
-                break;
-              // The operand is a 32-bit IEEE floating point number.
-              case OperandType.ShortInlineR:
-                xOperandSize =  4;
-                break;
-              // The operand is an 8-bit integer containing the ordinal of a local variable or an argumenta.
-              case OperandType.ShortInlineVar:
-                xOperandSize =  1;
-                break;
-              default:
-                throw new Exception("Unknown OperandType");
-            }
-            xPos = xPos + xOpCodeSize + xOperandSize;
+              }
+
+            // The operand is a FieldRef, MethodRef, or TypeRef token.
+            case OperandType.InlineTok:
+              xOperandSize = 4;
+              xILOpCode = new ILOpCode(xOpCodeVal);
+              break;
+            // The operand is a 32-bit metadata token.
+            case OperandType.InlineType:
+              xOperandSize = 4;
+              xILOpCode = new ILOpCode(xOpCodeVal);
+              break;
+            // OperandType.OperandType.OperandType.The operand is 16-bit integer containing the ordinal of a local variable or an argument.
+            case OperandType.InlineVar:
+              xOperandSize =  2;
+              xILOpCode = new ILOpCode(xOpCodeVal);
+              break;
+            // The operand is an 8-bit integer branch target.
+            case OperandType.ShortInlineBrTarget:
+              xOperandSize = 1;
+              xILOpCode = new ILOpCode(xOpCodeVal);
+              break;
+            // The operand is an 8-bit integer.
+            case OperandType.ShortInlineI:
+              xOperandSize = 1;
+              xILOpCode = new ILOpCode(xOpCodeVal);
+              break;
+            // The operand is a 32-bit IEEE floating point number.
+            case OperandType.ShortInlineR:
+              xOperandSize =  4;
+              xILOpCode = new ILOpCode(xOpCodeVal);
+              break;
+            // The operand is an 8-bit integer containing the ordinal of a local variable or an argumenta.
+            case OperandType.ShortInlineVar:
+              xOperandSize =  1;
+              xILOpCode = new ILOpCode(xOpCodeVal);
+              break;
+            default:
+              throw new Exception("Unknown OperandType");
           }
+          xPos = xPos + xOpCodeSize + xOperandSize;
 
           // TODO: Optimize this. Can possibly fill slots in the mOpCodesHi
           // with the target op, or a translator fuction in the delegate
@@ -186,7 +199,6 @@ namespace Cosmos.IL2CPU {
             }
           }
 
-          var xILOpCode = new ILOpCode(xOpCodeVal);
           xResult.Add(xILOpCode);
         }
         return xResult;

@@ -9,6 +9,7 @@ namespace Cosmos.IL2CPU {
   //   Include reference to ILOp, the scanner should do that
   //   Include referense to System.Reflection.Emit, this is metadata
   //     only needed by reader and not ILOpCode
+  //TODO: Change this to an abstract class and make constructor protected
   public class ILOpCode {
 
     public readonly Code Value;
