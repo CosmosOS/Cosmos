@@ -20,7 +20,7 @@ namespace Cosmos.IL2CPU {
     private HashSet<MethodBase> mMethodsSet = new HashSet<MethodBase>();
     private List<MethodBase> mMethods = new List<MethodBase>();
     private HashSet<Type> mTypesSet = new HashSet<Type>();
-    private List<Type> mTypes = new List<Type>();
+    private HashSet<FieldInfo> mFieldsSet = new HashSet<FieldInfo>();
     protected ILReader mReader;
 
     public ILScanner(Type aAssemblerBaseOp) {
@@ -70,14 +70,36 @@ namespace Cosmos.IL2CPU {
         mMethodsSet.Add(aMethod);
         mMethods.Add(aMethod);
         QueueType(aMethod.DeclaringType);
+				var xMethodInfo = aMethod as MethodInfo;
+				if (xMethodInfo != null)
+				{
+					QueueType(xMethodInfo.ReturnType);
+				}
+				foreach (var xParam in aMethod.GetParameters())
+				{
+					QueueType(xParam.ParameterType);
+				}
       }
     }
+
+		public void QueueStaticField(FieldInfo aFieldInfo)
+		{
+			if (!mFieldsSet.Contains(aFieldInfo))
+			{
+				if (!aFieldInfo.IsStatic)
+				{
+					throw new Exception("Cannot queue instance fields!");
+				}
+				mFieldsSet.Add(aFieldInfo);
+				QueueType(aFieldInfo.DeclaringType);
+				QueueType(aFieldInfo.FieldType);
+			}
+		}
 
     public void QueueType(Type aType) {
       if (aType != null) {
         if (!mTypesSet.Contains(aType)) {
           mTypesSet.Add(aType);
-          mTypes.Add(aType);
           QueueType(aType.BaseType);
           foreach (var xMethod in aType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)) {
             if (xMethod.DeclaringType == aType) {
@@ -86,6 +108,14 @@ namespace Cosmos.IL2CPU {
               }
             }
           }
+					// queue static constructor
+					foreach (var xCctor in aType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public))
+					{
+						if (xCctor.DeclaringType == aType)
+						{
+							QueueMethod(xCctor);
+						}
+					}
         }
       }
     }
