@@ -5,8 +5,9 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldelem_Ref)]
 	public class Ldelem_Ref: ILOpX86
 	{
-
-
+		public Ldelem_Ref(ILOpCode aOpCode):base(aOpCode)
+		{
+		}
 
 		#region Old code
 		// using System;
@@ -16,8 +17,8 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using Indy.IL2CPU.Assembler;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldelem_Ref)]
-		// 	public class Ldelem_Ref: ILOpX86 {
+		// 	[OpCode(OpCodeEnum.Ldelem_Ref)]
+		// 	public class Ldelem_Ref: Op {
 		// 		public Ldelem_Ref(ILReader aReader, MethodInformation aMethodInfo)
 		// 			: base(aReader, aMethodInfo) {
 		// 		}
@@ -66,6 +67,6 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 		}
 		// 	}
 		// }
-		#endregion
+		#endregion Old code
 	}
 }

@@ -5,8 +5,9 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Sizeof)]
 	public class Sizeof: ILOpX86
 	{
-
-
+		public Sizeof(ILOpCode aOpCode):base(aOpCode)
+		{
+		}
 
 		#region Old code
 		// using System;
@@ -19,8 +20,8 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using Indy.IL2CPU.Compiler;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Sizeof)]
-		// 	public class Sizeof: ILOpX86 {
+		// 	[OpCode(OpCodeEnum.Sizeof)]
+		// 	public class Sizeof: Op {
 		//         private Type mType;
 		// 
 		//         //public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
@@ -46,6 +47,6 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 		}
 		// 	}
 		// }
-		#endregion
+		#endregion Old code
 	}
 }

@@ -5,8 +5,9 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldfld)]
 	public class Ldfld: ILOpX86
 	{
-
-
+		public Ldfld(ILOpCode aOpCode):base(aOpCode)
+		{
+		}
 
 		#region Old code
 		// using System;
@@ -19,8 +20,8 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using Indy.IL2CPU.Compiler;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldfld)]
-		// 	public class Ldfld: ILOpX86 {
+		// 	[OpCode(OpCodeEnum.Ldfld)]
+		// 	public class Ldfld: Op {
 		//         private Type mDeclaringType;
 		// 		private TypeInformation.Field mFieldInfo;
 		// 		private readonly TypeInformation mTypeInfo;
@@ -61,6 +62,6 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 		}
 		// 	}
 		// }
-		#endregion
+		#endregion Old code
 	}
 }

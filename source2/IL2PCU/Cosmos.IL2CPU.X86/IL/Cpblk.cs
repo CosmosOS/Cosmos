@@ -5,8 +5,9 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Cpblk)]
 	public class Cpblk: ILOpX86
 	{
-
-
+		public Cpblk(ILOpCode aOpCode):base(aOpCode)
+		{
+		}
 
 		#region Old code
 		// using System;
@@ -16,8 +17,8 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using CPU = Indy.IL2CPU.Assembler.X86;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Cpblk)]
-		// 	public class Cpblk: ILOpX86 {
+		// 	[OpCode(OpCodeEnum.Cpblk)]
+		// 	public class Cpblk: Op {
 		// 		public Cpblk(ILReader aReader, MethodInformation aMethodInfo)
 		// 			: base(aReader, aMethodInfo) {
 		// 		}
@@ -26,6 +27,6 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 		}
 		// 	}
 		// }
-		#endregion
+		#endregion Old code
 	}
 }

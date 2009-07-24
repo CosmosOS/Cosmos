@@ -5,8 +5,9 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldelema)]
 	public class Ldelema: ILOpX86
 	{
-
-
+		public Ldelema(ILOpCode aOpCode):base(aOpCode)
+		{
+		}
 
 		#region Old code
 		// using System;
@@ -19,8 +20,8 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using Indy.IL2CPU.Compiler;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldelema)]
-		// 	public class Ldelema: ILOpX86 {
+		// 	[OpCode(OpCodeEnum.Ldelema)]
+		// 	public class Ldelema: Op {
 		//         private Type mType;
 		// 		public Ldelema(ILReader aReader, MethodInformation aMethodInfo)
 		// 			: base(aReader, aMethodInfo) {
@@ -46,6 +47,6 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 		}
 		// 	}
 		// }
-		#endregion
+		#endregion Old code
 	}
 }

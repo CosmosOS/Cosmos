@@ -5,8 +5,9 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldlen)]
 	public class Ldlen: ILOpX86
 	{
-
-
+		public Ldlen(ILOpCode aOpCode):base(aOpCode)
+		{
+		}
 
 		#region Old code
 		// using System;
@@ -15,8 +16,8 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using Indy.IL2CPU.Assembler;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldlen)]
-		// 	public class Ldlen: ILOpX86 {
+		// 	[OpCode(OpCodeEnum.Ldlen)]
+		// 	public class Ldlen: Op {
 		// 		public Ldlen(ILReader aReader, MethodInformation aMethodInfo)
 		// 			: base(aReader, aMethodInfo) {
 		// 		}
@@ -29,6 +30,6 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 		}
 		// 	}
 		// }
-		#endregion
+		#endregion Old code
 	}
 }

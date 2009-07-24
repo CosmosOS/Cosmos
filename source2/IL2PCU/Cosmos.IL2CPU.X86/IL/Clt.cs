@@ -5,8 +5,9 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Clt)]
 	public class Clt: ILOpX86
 	{
-
-
+		public Clt(ILOpCode aOpCode):base(aOpCode)
+		{
+		}
 
 		#region Old code
 		// using System;
@@ -19,8 +20,8 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using Indy.IL2CPU.Assembler.X86;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Clt)]
-		// 	public class Clt: ILOpX86 {
+		// 	[OpCode(OpCodeEnum.Clt)]
+		// 	public class Clt: Op {
 		// 		private readonly string NextInstructionLabel;
 		// 		private readonly string CurInstructionLabel;
 		//         private uint mCurrentOffset;
@@ -85,6 +86,6 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 		}
 		// 	}
 		// }
-		#endregion
+		#endregion Old code
 	}
 }

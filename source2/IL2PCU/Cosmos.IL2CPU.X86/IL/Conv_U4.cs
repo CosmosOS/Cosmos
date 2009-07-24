@@ -5,8 +5,9 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Conv_U4)]
 	public class Conv_U4: ILOpX86
 	{
-
-
+		public Conv_U4(ILOpCode aOpCode):base(aOpCode)
+		{
+		}
 
 		#region Old code
 		// using System;
@@ -15,8 +16,8 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using Indy.IL2CPU.Assembler;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Conv_U4)]
-		// 	public class Conv_U4: ILOpX86 {
+		// 	[OpCode(OpCodeEnum.Conv_U4)]
+		// 	public class Conv_U4: Op {
 		//         private string mNextLabel;
 		// 	    private string mCurLabel;
 		// 	    private uint mCurOffset;
@@ -59,6 +60,6 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 		}
 		// 	}
 		// }
-		#endregion
+		#endregion Old code
 	}
 }

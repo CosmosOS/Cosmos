@@ -5,8 +5,9 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Shr)]
 	public class Shr: ILOpX86
 	{
-
-
+		public Shr(ILOpCode aOpCode):base(aOpCode)
+		{
+		}
 
 		#region Old code
 		// using System;
@@ -15,8 +16,8 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
 		//     // todo: Improve 8byte support
-		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Shr)]
-		// 	public class Shr: ILOpX86 {
+		// 	[OpCode(OpCodeEnum.Shr)]
+		// 	public class Shr: Op {
 		//         private string mLabelName;
 		// 		public Shr(ILReader aReader, MethodInformation aMethodInfo)
 		// 			: base(aReader, aMethodInfo) {
@@ -59,6 +60,6 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 		}
 		// 	}
 		// }
-		#endregion
+		#endregion Old code
 	}
 }

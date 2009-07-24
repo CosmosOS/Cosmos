@@ -5,8 +5,9 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Blt)]
 	public class Blt: ILOpX86
 	{
-
-
+		public Blt(ILOpCode aOpCode):base(aOpCode)
+		{
+		}
 
 		#region Old code
 		// using System;
@@ -17,8 +18,8 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using CPUx86 = Indy.IL2CPU.Assembler.X86;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Blt)]
-		// 	public class Blt: ILOpX86 {
+		// 	[OpCode(OpCodeEnum.Blt)]
+		// 	public class Blt: Op {
 		// 		public readonly string TargetLabel;
 		// 		public readonly string CurInstructionLabel;
 		// 		public readonly string NextInstructionLabel;
@@ -99,6 +100,6 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 		}
 		// 	}
 		// }
-		#endregion
+		#endregion Old code
 	}
 }

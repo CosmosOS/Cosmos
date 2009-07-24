@@ -5,8 +5,9 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Stsfld)]
 	public class Stsfld: ILOpX86
 	{
-
-
+		public Stsfld(ILOpCode aOpCode):base(aOpCode)
+		{
+		}
 
 		#region Old code
 		// using System;
@@ -19,8 +20,8 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using Indy.IL2CPU.Compiler;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Stsfld)]
-		// 	public class Stsfld: ILOpX86 {
+		// 	[OpCode(OpCodeEnum.Stsfld)]
+		// 	public class Stsfld: Op {
 		// 		private string mDataName;
 		// 		private Type mDataType;
 		// 		private bool mNeedsGC;
@@ -87,6 +88,6 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 		}
 		// 	}
 		// }
-		#endregion
+		#endregion Old code
 	}
 }

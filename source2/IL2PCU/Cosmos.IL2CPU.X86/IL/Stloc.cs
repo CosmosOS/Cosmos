@@ -5,8 +5,9 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Stloc)]
 	public class Stloc: ILOpX86
 	{
-
-
+		public Stloc(ILOpCode aOpCode):base(aOpCode)
+		{
+		}
 
 		#region Old code
 		// using System;
@@ -17,8 +18,8 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using CPUx86 = Indy.IL2CPU.Assembler.X86;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Stloc)]
-		// 	public class Stloc: ILOpX86 {
+		// 	[OpCode(OpCodeEnum.Stloc)]
+		// 	public class Stloc: Op {
 		// 		private bool mNeedsGC = false;
 		// 		private MethodInformation.Variable mLocal;
 		// 		private string mBaseLabel;
@@ -55,6 +56,6 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 		}
 		// 	}
 		// }
-		#endregion
+		#endregion Old code
 	}
 }

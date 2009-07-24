@@ -5,73 +5,75 @@ using System.IO.Compression;
 using System.Net;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
-using Cosmos.Compiler.Builder;
-using Cosmos.Sys.FileSystem;
-using Cosmos.Sys.FileSystem.Ext2;
-using Cosmos.Hardware;
-using Cosmos.Kernel;
-using Cosmos.Sys;
-using Cosmos.Sys.Network;
+using Cosmos.IL2CPU;
+using System.Reflection;
+using System.Diagnostics;
+using Cosmos.IL2CPU.X86;
+
 
 namespace MatthijsTest
 {
-    public class Program
-    {
-        #region Cosmos Builder logic
+	public class Program
+	{
+		//private static Stopwatch mSW = new Stopwatch();
+		//private static void Measure(string aName, Action aAction)
+		//{
+		//  mSW.Start();
+		//  aAction();
+		//  mSW.Stop();
+		//  Console.WriteLine("{0} took: {1}", aName, mSW.Elapsed);
+		//}
+		public static void Main()
+		{
+			//  var xAssemblerBaseOp = typeof(ILOpX86);
+			//  var xScanner = new ILScanner(xAssemblerBaseOp);
+			//  var xMethod = typeof(Program).GetMethod("CompileTest", BindingFlags.Public | BindingFlags.Static);
+			//  Measure("Compiling", () => xScanner.Execute(xMethod));
+			GenCode();
+		}
 
-        // Most users wont touch this. This will call the Cosmos Build tool
-        [STAThread]
-        private static void Main(string[] args)
-        {
-            //Init();
-            BuildUI.Run();
-        }
-
-        #endregion
-
-        public static unsafe void Init()
-        {
-            bool xTest = true;
-            if (xTest)
-            {
-                var xBoot = new Cosmos.Sys.Boot();
-                xBoot.Execute();
-            }
-            var xDirectories = Directory.GetDirectories("/0");
-
-            for (int i = 0; i < xDirectories.Length; i++)
-            {
-                Console.WriteLine(xDirectories[i]);
-            }
-            Console.Write("Number of devices: ");
-            Console.WriteLine(Device.Devices.Count.ToString());
-            //var xItem = new Derived();
-            //Console.WriteLine(xItem.Type);
-            //Base xBase = xItem;
-            //Console.WriteLine(xBase.Type);
-        }
+		//public static void CompileTest()
+		//{
+		//}
 
 
-        public abstract class Base
-        {
-            public abstract string Type
-            { get;
-                //{
-                //    return "Base";
-                //}
-            }
-        }
+		public static void GenCode()
+		{
+			throw new Exception("Watch out. enable this exception again after use.");
+			foreach (var xFile in Directory.GetFiles(@"E:\Cosmos\Temp", "*.cs"))
+			{
+				using (var xWriter = new StreamWriter(@"E:\Cosmos\source2\IL2PCU\Cosmos.IL2CPU.X86\IL\" + Path.GetFileName(xFile)))
+				{
+					xWriter.WriteLine("using System;");
+					xWriter.WriteLine();
+					xWriter.WriteLine("namespace Cosmos.IL2CPU.X86.IL");
+					xWriter.WriteLine("{");
+					xWriter.WriteLine("\t[Cosmos.IL2CPU.OpCode(ILOpCode.Code.{0})]", Path.GetFileNameWithoutExtension(xFile));
+					xWriter.WriteLine("\tpublic class {0}: ILOpX86", Path.GetFileNameWithoutExtension(xFile));
+					xWriter.WriteLine("\t{");
+					xWriter.WriteLine("\t\tpublic {0}(ILOpCode aOpCode):base(aOpCode)", Path.GetFileNameWithoutExtension(xFile));
+					xWriter.WriteLine("\t\t{");
+					xWriter.WriteLine("\t\t}");
+					xWriter.WriteLine();
+					xWriter.WriteLine("\t\t#region Old code");
+					foreach (var xLine in File.ReadAllLines(xFile))
+					{
+						xWriter.WriteLine("\t\t// {0}", xLine);
+					}
+					xWriter.WriteLine("\t\t#endregion Old code");
+					xWriter.WriteLine("\t}");
+					xWriter.WriteLine("}");
 
-        public class Derived: Base
-        {
-            public override string Type
-            {
-                get
-                {
-                    return "Derived";
-                }
-            }
-        }
+//            using System;
 
-    }
+//namespace Cosmos.IL2CPU.X86.IL
+//{
+//  [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Add)]
+//  public class Add: ILOpX86
+//  {
+				}
+			}
+		}
+
+	}
 }

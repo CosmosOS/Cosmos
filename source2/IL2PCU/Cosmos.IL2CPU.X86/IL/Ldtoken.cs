@@ -5,8 +5,9 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldtoken)]
 	public class Ldtoken: ILOpX86
 	{
-
-
+		public Ldtoken(ILOpCode aOpCode):base(aOpCode)
+		{
+		}
 
 		#region Old code
 		// using System;
@@ -20,8 +21,8 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using Indy.IL2CPU.Compiler;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldtoken)]
-		// 	public class Ldtoken: ILOpX86 {
+		// 	[OpCode(OpCodeEnum.Ldtoken)]
+		// 	public class Ldtoken: Op {
 		// 		private string mTokenAddress;
 		// 
 		//         //public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
@@ -74,6 +75,6 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 		}
 		// 	}
 		// }
-		#endregion
+		#endregion Old code
 	}
 }

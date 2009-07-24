@@ -5,8 +5,9 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldind_U2)]
 	public class Ldind_U2: ILOpX86
 	{
-
-
+		public Ldind_U2(ILOpCode aOpCode):base(aOpCode)
+		{
+		}
 
 		#region Old code
 		// using System;
@@ -15,8 +16,8 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using Indy.IL2CPU.Assembler;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldind_U2)]
-		// 	public class Ldind_U2: ILOpX86 {
+		// 	[OpCode(OpCodeEnum.Ldind_U2)]
+		// 	public class Ldind_U2: Op {
 		// 		public Ldind_U2(ILReader aReader, MethodInformation aMethodInfo)
 		// 			: base(aReader, aMethodInfo) {
 		// 		}
@@ -30,6 +31,6 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 		}
 		// 	}
 		// }
-		#endregion
+		#endregion Old code
 	}
 }

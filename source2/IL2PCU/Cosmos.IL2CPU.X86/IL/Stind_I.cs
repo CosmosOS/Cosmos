@@ -5,8 +5,9 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Stind_I)]
 	public class Stind_I: ILOpX86
 	{
-
-
+		public Stind_I(ILOpCode aOpCode):base(aOpCode)
+		{
+		}
 
 		#region Old code
 		// using System;
@@ -17,8 +18,8 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using CPUx86 = Indy.IL2CPU.Assembler.X86;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Stind_I)]
-		// 	public class Stind_I: ILOpX86 {
+		// 	[OpCode(OpCodeEnum.Stind_I)]
+		// 	public class Stind_I: Op {
 		// 		public Stind_I(ILReader aReader, MethodInformation aMethodInfo)
 		// 			: base(aReader, aMethodInfo) {
 		// 		}
@@ -67,6 +68,6 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 		}
 		// 	}
 		// }
-		#endregion
+		#endregion Old code
 	}
 }

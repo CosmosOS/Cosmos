@@ -5,8 +5,9 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Brtrue)]
 	public class Brtrue: ILOpX86
 	{
-
-
+		public Brtrue(ILOpCode aOpCode):base(aOpCode)
+		{
+		}
 
 		#region Old code
 		// using System;
@@ -16,8 +17,8 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using CPUx86 = Indy.IL2CPU.Assembler.X86;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Brtrue)]
-		// 	public class Brtrue: ILOpX86 {
+		// 	[OpCode(OpCodeEnum.Brtrue)]
+		// 	public class Brtrue: Op {
 		// 		public readonly string TargetLabel;
 		// 		public Brtrue(ILReader aReader, MethodInformation aMethodInfo)
 		// 			: base(aReader, aMethodInfo) {
@@ -46,6 +47,6 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 		}
 		// 	}
 		// }
-		#endregion
+		#endregion Old code
 	}
 }

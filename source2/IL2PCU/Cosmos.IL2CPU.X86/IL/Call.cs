@@ -5,7 +5,9 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Call)]
 	public class Call: ILOpX86
 	{
-
+		public Call(ILOpCode aOpCode):base(aOpCode)
+		{
+		}
 
 		#region Old code
 		// using System;
@@ -22,8 +24,8 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 
 		// namespace Indy.IL2CPU.IL.X86
 		// {
-		//     [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Call)]
-		//     public class Call : ILOpX86
+		//     [OpCode(OpCodeEnum.Call)]
+		//     public class Call : Op
 		//     {
 		//         private string LabelName;
 		//         private uint mResultSize;
@@ -284,6 +286,6 @@ namespace Cosmos.IL2CPU.X86.IL
 		//         }
 		//     }
 		// }
-		#endregion
+		#endregion Old code
 	}
 }

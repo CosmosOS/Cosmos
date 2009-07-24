@@ -5,7 +5,9 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldc_I4)]
 	public class Ldc_I4: ILOpX86
 	{
-
+		public Ldc_I4(ILOpCode aOpCode):base(aOpCode)
+		{
+		}
 
 		#region Old code
 		// using System;
@@ -15,8 +17,8 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using System.Collections.Generic;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldc_I4)]
-		// 	public class Ldc_I4: ILOpX86 {
+		// 	[OpCode(OpCodeEnum.Ldc_I4)]
+		// 	public class Ldc_I4: Op {
 		// 		private int mValue;
 		// 		protected void SetValue(int aValue) {
 		// 			mValue = aValue;
@@ -44,6 +46,6 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 		}
 		// 	}
 		// }
-		#endregion
+		#endregion Old code
 	}
 }

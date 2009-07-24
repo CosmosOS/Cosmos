@@ -5,8 +5,9 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Newobj)]
 	public class Newobj: ILOpX86
 	{
-
-
+		public Newobj(ILOpCode aOpCode):base(aOpCode)
+		{
+		}
 
 		#region Old code
 		// using System;
@@ -24,8 +25,8 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 
 		// namespace Indy.IL2CPU.IL.X86
 		// {
-		//     [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Newobj)]
-		//     public class Newobj : ILOpX86
+		//     [OpCode(OpCodeEnum.Newobj)]
+		//     public class Newobj : Op
 		//     {
 		//         public MethodBase CtorDef;
 		//         public string CurrentLabel;
@@ -274,6 +275,6 @@ namespace Cosmos.IL2CPU.X86.IL
 		//         }
 		//     }
 		// }
-		#endregion
+		#endregion Old code
 	}
 }

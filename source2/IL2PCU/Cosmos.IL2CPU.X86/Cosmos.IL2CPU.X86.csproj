@@ -181,14 +181,6 @@
     <Compile Include="IL\Not.cs" />
     <Compile Include="IL\Or.cs" />
     <Compile Include="IL\Pop.cs" />
-    <Compile Include="IL\Prefix1.cs" />
-    <Compile Include="IL\Prefix2.cs" />
-    <Compile Include="IL\Prefix3.cs" />
-    <Compile Include="IL\Prefix4.cs" />
-    <Compile Include="IL\Prefix5.cs" />
-    <Compile Include="IL\Prefix6.cs" />
-    <Compile Include="IL\Prefix7.cs" />
-    <Compile Include="IL\Prefixref.cs" />
     <Compile Include="IL\Readonly.cs" />
     <Compile Include="IL\Refanytype.cs" />
     <Compile Include="IL\Refanyval.cs" />
@@ -226,7 +218,6 @@
     <Compile Include="IL\Sub_Ovf.cs" />
     <Compile Include="IL\Sub_Ovf_Un.cs" />
     <Compile Include="IL\Switch.cs" />
-    <Compile Include="IL\Tailcall.cs" />
     <Compile Include="IL\Throw.cs" />
     <Compile Include="IL\Unaligned.cs" />
     <Compile Include="IL\Unbox.cs" />

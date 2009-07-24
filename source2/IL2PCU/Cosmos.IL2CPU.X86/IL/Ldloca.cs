@@ -5,8 +5,9 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldloca)]
 	public class Ldloca: ILOpX86
 	{
-
-
+		public Ldloca(ILOpCode aOpCode):base(aOpCode)
+		{
+		}
 
 		#region Old code
 		// using System;
@@ -16,8 +17,8 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using Indy.IL2CPU.Assembler;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldloca)]
-		// 	public class Ldloca: ILOpX86 {
+		// 	[OpCode(OpCodeEnum.Ldloca)]
+		// 	public class Ldloca: Op {
 		// 		private int mAddress;
 		// 		protected void SetLocalIndex(int aIndex, MethodInformation aMethodInfo) {
 		// 			mAddress = aMethodInfo.Locals[aIndex].VirtualAddresses.LastOrDefault();
@@ -48,6 +49,6 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 		}
 		// 	}
 		// }
-		#endregion
+		#endregion Old code
 	}
 }

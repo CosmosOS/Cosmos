@@ -3,9 +3,11 @@ using System;
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldstr)]
-	public class Ldstr: ILOpX86
+	public class LdStr: ILOpX86
 	{
-
+		public LdStr(ILOpCode aOpCode):base(aOpCode)
+		{
+		}
 
 		#region Old code
 		// using System;
@@ -18,8 +20,8 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using System.Collections.Generic;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		//     [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldstr)]
-		//     public class LdStr : ILOpX86 {
+		//     [OpCode(OpCodeEnum.Ldstr)]
+		//     public class LdStr : Op {
 		//         //private static Dictionary<string, DataMember> mDataMemberMap = new Dictionary<string, DataMember>();
 		//         public readonly string LiteralStr;
 		// 
@@ -85,6 +87,6 @@ namespace Cosmos.IL2CPU.X86.IL
 		//         }
 		//     }
 		// }
-		#endregion
+		#endregion Old code
 	}
 }

@@ -5,8 +5,9 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Bge)]
 	public class Bge: ILOpX86
 	{
-
-
+		public Bge(ILOpCode aOpCode):base(aOpCode)
+		{
+		}
 
 		#region Old code
 		// using System;
@@ -18,8 +19,8 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using Indy.IL2CPU.Assembler;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Bge)]
-		// 	public class Bge: ILOpX86 {
+		// 	[OpCode(OpCodeEnum.Bge)]
+		// 	public class Bge: Op {
 		// 		public readonly string TargetLabel;
 		// 		public readonly string CurInstructionLabel;
 		//         private string mNextLabel;
@@ -100,6 +101,6 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 		}
 		// 	}
 		// }
-		#endregion
+		#endregion Old code
 	}
 }

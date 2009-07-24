@@ -5,8 +5,9 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldc_I8)]
 	public class Ldc_I8: ILOpX86
 	{
-
-
+		public Ldc_I8(ILOpCode aOpCode):base(aOpCode)
+		{
+		}
 
 		#region Old code
 		// using System;
@@ -16,8 +17,8 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using System.Diagnostics;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldc_I8)]
-		// 	public class Ldc_I8: ILOpX86 {
+		// 	[OpCode(OpCodeEnum.Ldc_I8)]
+		// 	public class Ldc_I8: Op {
 		// 		private readonly long mValue;
 		// 		public Ldc_I8(ILReader aReader, MethodInformation aMethodInfo)
 		// 			: base(aReader, aMethodInfo)
@@ -40,6 +41,6 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 		}
 		// 	}
 		// }
-		#endregion
+		#endregion Old code
 	}
 }

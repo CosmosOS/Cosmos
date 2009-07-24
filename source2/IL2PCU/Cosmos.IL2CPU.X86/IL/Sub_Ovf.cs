@@ -5,8 +5,9 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Sub_Ovf)]
 	public class Sub_Ovf: ILOpX86
 	{
-
-
+		public Sub_Ovf(ILOpCode aOpCode):base(aOpCode)
+		{
+		}
 
 		#region Old code
 		// using System;
@@ -16,8 +17,8 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using CPU = Indy.IL2CPU.Assembler.X86;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Sub_Ovf)]
-		// 	public class Sub_Ovf: ILOpX86 {
+		// 	[OpCode(OpCodeEnum.Sub_Ovf)]
+		// 	public class Sub_Ovf: Op {
 		// 		private string mCurrentLabel;
 		// 	    private string mNextLabel;
 		// 	    private uint mCurrentOffset;
@@ -37,6 +38,6 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 		}
 		// 	}
 		// }
-		#endregion
+		#endregion Old code
 	}
 }

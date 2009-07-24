@@ -5,8 +5,9 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldarg)]
 	public class Ldarg: ILOpX86
 	{
-
-
+		public Ldarg(ILOpCode aOpCode):base(aOpCode)
+		{
+		}
 
 		#region Old code
 		// using System;
@@ -16,8 +17,8 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using CPU = Indy.IL2CPU.Assembler.X86;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldarg)]
-		// 	public class Ldarg: ILOpX86 {
+		// 	[OpCode(OpCodeEnum.Ldarg)]
+		// 	public class Ldarg: Op {
 		// 		private MethodInformation.Argument mArgument;
 		// 		protected void SetArgIndex(int aIndex, MethodInformation aMethodInfo) {
 		// 			mArgument = aMethodInfo.Arguments[aIndex];
@@ -46,6 +47,6 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 		}
 		// 	}
 		// }
-		#endregion
+		#endregion Old code
 	}
 }

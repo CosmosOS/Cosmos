@@ -5,8 +5,9 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Leave)]
 	public class Leave: ILOpX86
 	{
-
-
+		public Leave(ILOpCode aOpCode):base(aOpCode)
+		{
+		}
 
 		#region Old code
 		// using System;
@@ -16,8 +17,8 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using CPU = Indy.IL2CPU.Assembler.X86;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Leave)]
-		// 	public class Leave: ILOpX86 {public readonly string TargetLabel;
+		// 	[OpCode(OpCodeEnum.Leave)]
+		// 	public class Leave: Op {public readonly string TargetLabel;
 		// 	public Leave(ILReader aReader, MethodInformation aMethodInfo)
 		// 			: base(aReader, aMethodInfo) {
 		// 			TargetLabel = GetInstructionLabel(aReader.OperandValueBranchPosition);
@@ -27,6 +28,6 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 		}
 		// 	}
 		// }
-		#endregion
+		#endregion Old code
 	}
 }

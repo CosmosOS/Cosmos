@@ -5,8 +5,9 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldobj)]
 	public class Ldobj: ILOpX86
 	{
-
-
+		public Ldobj(ILOpCode aOpCode):base(aOpCode)
+		{
+		}
 
 		#region Old code
 		// using System;
@@ -16,8 +17,8 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using Indy.IL2CPU.Compiler;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		//     [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldobj)]
-		//     public class Ldobj : ILOpX86 {
+		//     [OpCode(OpCodeEnum.Ldobj)]
+		//     public class Ldobj : Op {
 		//         private Type xType;
 		// 
 		//         public Ldobj(ILReader aReader,
@@ -62,6 +63,6 @@ namespace Cosmos.IL2CPU.X86.IL
 		//         }
 		//     }
 		// }
-		#endregion
+		#endregion Old code
 	}
 }

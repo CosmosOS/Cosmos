@@ -5,8 +5,9 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ceq)]
 	public class Ceq: ILOpX86
 	{
-
-
+		public Ceq(ILOpCode aOpCode):base(aOpCode)
+		{
+		}
 
 		#region Old code
 		// using System;
@@ -17,8 +18,8 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using Indy.IL2CPU.Assembler;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ceq)]
-		// 	public class Ceq: ILOpX86 {
+		// 	[OpCode(OpCodeEnum.Ceq)]
+		// 	public class Ceq: Op {
 		// 		private readonly string NextInstructionLabel;
 		// 		private readonly string CurInstructionLabel;
 		// 		public Ceq(ILReader aReader, MethodInformation aMethodInfo)
@@ -91,6 +92,6 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 		}
 		// 	}
 		// }
-		#endregion
+		#endregion Old code
 	}
 }
