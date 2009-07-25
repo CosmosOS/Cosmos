@@ -31,6 +31,12 @@ namespace Cosmos.IL2CPU {
       }
     }
 
+    protected void CheckBranch(int aTarget, int aMethodSize) {
+      if (aTarget < 0 || aTarget >= aMethodSize) {
+        throw new Exception("Branch jumps outside method.");
+      }
+    }
+
     public List<ILOpCode> ProcessMethod(MethodBase aMethod) {
       var xResult = new List<ILOpCode>();
       var xBody = aMethod.GetMethodBody();
@@ -46,6 +52,7 @@ namespace Cosmos.IL2CPU {
       while (xPos < xIL.Length) {
         ILOpCode.Code xOpCodeVal;
         OpCode xOpCode;
+        int xOpPos = xPos;
         if (xIL[xPos] == 0xFE) {
           xOpCodeVal = (ILOpCode.Code)(0xFE00 | xIL[xPos + 1]);
           xOpCode = mOpCodesHi[xIL[xPos + 1]];
@@ -66,41 +73,39 @@ namespace Cosmos.IL2CPU {
           //TODO: Branches could be outside the current method -
           // do we need to support this? Maybe add a check inside here
           // and see if it pops up or not?
-          // 8-bit integer branch target.
-          case OperandType.ShortInlineBrTarget:
-            //TODO: Complete this section
-            xILOpCode = new ILOpCodes.OpBranch(xOpCodeVal, xIL[xPos]);
-            xPos = xPos + 1;
-            break;
-          // The operand is a 32-bit integer branch target.
-          case OperandType.InlineBrTarget:
-            //TODO: Complete this section
-            xILOpCode = new ILOpCodes.OpBranch(xOpCodeVal, ReadUInt32(xIL, xPos));
-            xPos = xPos + 4;
-            break;
+          //TODO: What to store in OpBranch? Calc pos within the method?
+          case OperandType.ShortInlineBrTarget: {
+              int xTarget = xOpPos + (sbyte)xIL[xPos];
+              CheckBranch(xTarget, xIL.Length);
+              xILOpCode = new ILOpCodes.OpBranch(xOpCodeVal, xTarget);
+              xPos = xPos + 1;
+              break;
+            }
+          case OperandType.InlineBrTarget: {
+              int xTarget = xOpPos + (Int32)ReadUInt32(xIL, xPos);
+              CheckBranch(xTarget, xIL.Length);
+              xILOpCode = new ILOpCodes.OpBranch(xOpCodeVal, xTarget);
+              xPos = xPos + 4;
+              break;
+            }
 
-          // The operand is an 8-bit integer.
           case OperandType.ShortInlineI:
             xILOpCode = new ILOpCodes.OpInt(xOpCodeVal, xIL[xPos]);
             xPos = xPos + 1;
             break;
-          // The operand is a 32-bit integer.
           case OperandType.InlineI:
             xILOpCode = new ILOpCodes.OpInt(xOpCodeVal, ReadUInt32(xIL, xPos));
             xPos = xPos + 4;
             break;
-          // The operand is a 64-bit integer.
           case OperandType.InlineI8:
             xILOpCode = new ILOpCodes.OpInt64(xOpCodeVal, ReadUInt64(xIL, xPos));
             xPos = xPos + 8;
             break;
 
-          // 32-bit IEEE floating point number.
           case OperandType.ShortInlineR:
             xILOpCode = new ILOpCodes.OpSingle(xOpCodeVal, BitConverter.ToSingle(xIL, xPos));
             xPos = xPos + 4;
             break;
-          // 64-bit IEEE floating point number.
           case OperandType.InlineR:
             xILOpCode = new ILOpCodes.OpDouble(xOpCodeVal, BitConverter.ToDouble(xIL, xPos));
             xPos = xPos + 8;
@@ -159,7 +164,6 @@ namespace Cosmos.IL2CPU {
             xPos = xPos + 4;
             break;
 
-          // 32-bit metadata string token.
           case OperandType.InlineString:
             xILOpCode = new ILOpCodes.OpString(xOpCodeVal, aMethod.Module.ResolveString((int)ReadUInt32(xIL, xPos)));
             xPos = xPos + 4;
@@ -211,12 +215,10 @@ namespace Cosmos.IL2CPU {
               break;
             }
 
-          // 8-bit integer containing the ordinal of a local variable or an argument.
           case OperandType.ShortInlineVar:
             xILOpCode = new ILOpCodes.OpVar(xOpCodeVal, xIL[xPos]);
             xPos = xPos + 1;
             break;
-          // 16-bit integer containing the ordinal of a local variable or an argument.
           case OperandType.InlineVar:
             xILOpCode = new ILOpCodes.OpVar(xOpCodeVal, ReadUInt16(xIL, xPos));
             xPos = xPos + 2;
