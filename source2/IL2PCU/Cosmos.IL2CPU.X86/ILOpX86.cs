@@ -8,5 +8,9 @@ namespace Cosmos.IL2CPU.X86 {
 		protected ILOpX86(ILOpCode aOpCode):base(aOpCode)
 		{
 		}
+
+    //TODO: remove this when all descendants implement this
+    public override void Assemble() {
+    }
   }
 }

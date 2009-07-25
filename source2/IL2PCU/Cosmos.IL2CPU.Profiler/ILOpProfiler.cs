@@ -8,5 +8,7 @@ namespace Cosmos.IL2CPU.Profiler {
     public ILOpProfiler(ILOpCode aOpCode)
       : base(aOpCode) {
     }
+
+    public override void Assemble() { }
   }
 }

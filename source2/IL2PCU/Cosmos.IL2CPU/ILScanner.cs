@@ -116,15 +116,20 @@ namespace Cosmos.IL2CPU {
           } else {
             xCtor = mILOpsHi[xOpCodeVal & 0xFF];
           }
-          // TODO: Remove this if when all shortcut espansions are working again
+          // TODO: Remove this if when all shortcut expansions are working again
           if (xCtor != null) {
             var xILOp = xCtor.Invoke(new object[] { xOpCode });
+            // What to pass to execute? Passing whole scanner may be inappropriate
+            // Op needs info about branch targets for example
+            // are all branches within method? Maybe ILOpCode can include offset and 
+            // ILOp can reconcile from that and no need to pass anything?
+            //xILOp.Execute(this);
           }
         }
       }
     }
 
-    public void QueueMethod(MethodBase aMethod) {
+    protected void QueueMethod(MethodBase aMethod) {
       if (!mMethodsSet.Contains(aMethod)) {
         mMethodsSet.Add(aMethod);
         mMethods.Add(aMethod);
@@ -139,7 +144,7 @@ namespace Cosmos.IL2CPU {
       }
     }
 
-		public void QueueStaticField(FieldInfo aFieldInfo) {
+    protected void QueueStaticField(FieldInfo aFieldInfo) {
 			if (!mFieldsSet.Contains(aFieldInfo)) {
 				if (!aFieldInfo.IsStatic) {
 					throw new Exception("Cannot queue instance fields!");
@@ -150,7 +155,7 @@ namespace Cosmos.IL2CPU {
 			}
 		}
 
-    public void QueueType(Type aType) {
+    protected void QueueType(Type aType) {
       if (aType != null) {
         if (!mTypesSet.Contains(aType)) {
           mTypesSet.Add(aType);
