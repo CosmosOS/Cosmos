@@ -102,7 +102,7 @@ namespace Cosmos.IL2CPU {
       var xOpCodes = mReader.ProcessMethod(aMethodBase);
       if (xOpCodes != null) {
         foreach (var xOpCode in xOpCodes) {
-          //TODO: Scan for fields and methods in xOpCode
+          //TODO: Scan for fields, types and methods in xOpCode
           // Dont need to look at opcode, but operatndtype
           // Call: QueueMethod(aReader.OperandValueMethod);
           // Callvirt: QueueMethod(aReader.OperandValueMethod);
@@ -126,28 +126,22 @@ namespace Cosmos.IL2CPU {
 
     public void QueueMethod(MethodBase aMethod) {
       if (!mMethodsSet.Contains(aMethod)) {
-
         mMethodsSet.Add(aMethod);
         mMethods.Add(aMethod);
         QueueType(aMethod.DeclaringType);
 				var xMethodInfo = aMethod as MethodInfo;
-				if (xMethodInfo != null)
-				{
+				if (xMethodInfo != null) {
 					QueueType(xMethodInfo.ReturnType);
 				}
-				foreach (var xParam in aMethod.GetParameters())
-				{
+				foreach (var xParam in aMethod.GetParameters()) {
 					QueueType(xParam.ParameterType);
 				}
       }
     }
 
-		public void QueueStaticField(FieldInfo aFieldInfo)
-		{
-			if (!mFieldsSet.Contains(aFieldInfo))
-			{
-				if (!aFieldInfo.IsStatic)
-				{
+		public void QueueStaticField(FieldInfo aFieldInfo) {
+			if (!mFieldsSet.Contains(aFieldInfo)) {
+				if (!aFieldInfo.IsStatic) {
 					throw new Exception("Cannot queue instance fields!");
 				}
 				mFieldsSet.Add(aFieldInfo);
@@ -171,8 +165,7 @@ namespace Cosmos.IL2CPU {
 					// queue static constructor
 					foreach (var xCctor in aType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public))
 					{
-						if (xCctor.DeclaringType == aType)
-						{
+						if (xCctor.DeclaringType == aType) {
 							QueueMethod(xCctor);
 						}
 					}

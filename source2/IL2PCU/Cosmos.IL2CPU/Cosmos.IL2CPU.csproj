@@ -57,6 +57,7 @@
     <Compile Include="ILOpCodes\OpInt.cs" />
     <Compile Include="ILOpCodes\OpMethod.cs" />
     <Compile Include="ILOpCodes\OpNone.cs" />
+    <Compile Include="ILOpCodes\OpString.cs" />
     <Compile Include="ILOpCodes\OpVar.cs" />
     <Compile Include="ILReader.cs" />
     <Compile Include="OpCodeAttribute.cs" />
