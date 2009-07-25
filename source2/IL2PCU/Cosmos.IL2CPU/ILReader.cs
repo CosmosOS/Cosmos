@@ -40,9 +40,19 @@ namespace Cosmos.IL2CPU {
     public List<ILOpCode> ProcessMethod(MethodBase aMethod) {
       var xResult = new List<ILOpCode>();
       var xBody = aMethod.GetMethodBody();
+      // Cache for use in field and method resolution
+      Type[] xTypeGenArgs = null;
+      Type[] xMethodGenArgs = null;
+      if (aMethod.DeclaringType.IsGenericType) {
+        xTypeGenArgs = aMethod.DeclaringType.GetGenericArguments();
+      }
+      if (aMethod.IsGenericMethod) {
+        xMethodGenArgs = aMethod.GetGenericArguments();
+      }
 
       // Some methods return no body. Not sure why.. have to investigate
       // They arent abstracts or icalls...
+      // MtW: how about externs (pinvoke, etc)
       if (xBody == null) {
         return null;
       }
@@ -73,7 +83,6 @@ namespace Cosmos.IL2CPU {
           //TODO: Branches could be outside the current method -
           // do we need to support this? Maybe add a check inside here
           // and see if it pops up or not?
-          //TODO: What to store in OpBranch? Calc pos within the method?
           case OperandType.ShortInlineBrTarget: {
               int xTarget = xOpPos + (sbyte)xIL[xPos];
               CheckBranch(xTarget, xIL.Length);
@@ -82,6 +91,7 @@ namespace Cosmos.IL2CPU {
               break;
             }
           case OperandType.InlineBrTarget: {
+            //todo: fix this, branches are relative to the next op, not current.
               int xTarget = xOpPos + (Int32)ReadUInt32(xIL, xPos);
               CheckBranch(xTarget, xIL.Length);
               xILOpCode = new ILOpCodes.OpBranch(xOpCodeVal, xTarget);
@@ -115,16 +125,6 @@ namespace Cosmos.IL2CPU {
           case OperandType.InlineField: {
               //TODO: Complete this section
               //public FieldInfo OperandValueField {
-              //                Type[] xTypeGenArgs = null;
-              //                Type[] xMethodGenArgs = null;
-              //                if (mMethod.DeclaringType.IsGenericType)
-              //                {
-              //                    xTypeGenArgs = mMethod.DeclaringType.GetGenericArguments();
-              //                }
-              //                if (mMethod.IsGenericMethod)
-              //                {
-              //                    xMethodGenArgs = mMethod.GetGenericArguments();
-              //                }
               //                mOperandValueField = mModule.ResolveField(OperandValueInt32,
               //                                                          xTypeGenArgs,
               //                                                          xMethodGenArgs);
@@ -136,23 +136,8 @@ namespace Cosmos.IL2CPU {
 
           // The operand is a 32-bit metadata token.
           case OperandType.InlineMethod: {
-              //TODO: Complete this section
-              UInt32 xValue = ReadUInt32(xIL, xPos);
-              if (((xValue & 0x6000000) == 0x6000000)
-                || ((xValue & 0x2b000000) == 0x2b000000)
-                || ((xValue & 0xa000000) == 0xA000000)) {
-                //Type[] xTypeGenArgs = null;
-                //Type[] xMethodGenArgs = null;
-                //if (mMethod.DeclaringType.IsGenericType) {
-                //  xTypeGenArgs = mMethod.DeclaringType.GetGenericArguments();
-                //}
-                //if (mMethod.IsGenericMethod) {
-                //  xMethodGenArgs = mMethod.GetGenericArguments();
-                //}
-                // http://msdn.microsoft.com/en-us/library/ms145421(VS.85).aspx
-                //Value = mModule.ResolveMethod(OperandValueInt32, xTypeGenArgs, xMethodGenArgs);
-              }
-              xILOpCode = new ILOpCodes.OpMethod(xOpCodeVal, null);
+              var xValue = aMethod.Module.ResolveMethod((int)ReadUInt32(xIL, xPos), xTypeGenArgs, xMethodGenArgs);
+              xILOpCode = new ILOpCodes.OpMethod(xOpCodeVal, xValue);
               xPos = xPos + 4;
               break;
             }
