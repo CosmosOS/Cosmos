@@ -9,8 +9,7 @@ namespace Cosmos.IL2CPU {
   //   Include reference to ILOp, the scanner should do that
   //   Include referense to System.Reflection.Emit, this is metadata
   //     only needed by reader and not ILOpCode
-  //TODO: Change this to an abstract class and make constructor protected
-  public class ILOpCode {
+  public abstract class ILOpCode {
 
     public enum Code : ushort {
       #region Values
@@ -245,7 +244,7 @@ namespace Cosmos.IL2CPU {
 
     public readonly Code OpCode;
 
-    public ILOpCode(Code aOpCode) {
+    protected ILOpCode(Code aOpCode) {
       OpCode = aOpCode;
     }
 

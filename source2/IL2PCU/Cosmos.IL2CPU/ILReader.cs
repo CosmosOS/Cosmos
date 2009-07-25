@@ -66,13 +66,13 @@ namespace Cosmos.IL2CPU {
           // 8-bit integer branch target.
           case OperandType.ShortInlineBrTarget:
             //TODO: Complete this section
-            xILOpCode = new ILOpCode(xOpCodeVal);
+            xILOpCode = new ILOpCodes.OpBranch(xOpCodeVal, 0);
             xPos = xPos + 1;
             break;
           // The operand is a 32-bit integer branch target.
           case OperandType.InlineBrTarget:
             //TODO: Complete this section
-            xILOpCode = new ILOpCode(xOpCodeVal);
+            xILOpCode = new ILOpCodes.OpBranch(xOpCodeVal, 0);
             xPos = xPos + 4;
             break;
 
@@ -121,7 +121,7 @@ namespace Cosmos.IL2CPU {
               //                                                          xTypeGenArgs,
               //                                                          xMethodGenArgs);
               //        return mOperandValueField;
-              xILOpCode = new ILOpCode(xOpCodeVal);
+              xILOpCode = new ILOpCodes.OpField(xOpCodeVal, 0);
               xPos = xPos + 4;
               break;
             }
@@ -144,8 +144,7 @@ namespace Cosmos.IL2CPU {
                 // http://msdn.microsoft.com/en-us/library/ms145421(VS.85).aspx
                 //Value = mModule.ResolveMethod(OperandValueInt32, xTypeGenArgs, xMethodGenArgs);
               }
-              //xILOpCode = new ILOpCodes.OpMethod(xOpCodeVal, xValue);
-              xILOpCode = new ILOpCode(xOpCodeVal);
+              xILOpCode = new ILOpCodes.OpMethod(xOpCodeVal, null);
               xPos = xPos + 4;
               break;
             }
@@ -153,7 +152,7 @@ namespace Cosmos.IL2CPU {
           // 32-bit metadata signature token.
           case OperandType.InlineSig:
             //TODO: Complete this section
-            xILOpCode = new ILOpCode(xOpCodeVal);
+            xILOpCode = new ILOpCodes.OpSig(xOpCodeVal, 0);
             xPos = xPos + 4;
             break;
 
@@ -177,7 +176,7 @@ namespace Cosmos.IL2CPU {
                 //                    xResult[i] = (uint)(mPosition + xBranchLocations1[i]);
                 //                }
               }
-              xILOpCode = new ILOpCode(xOpCodeVal);
+              xILOpCode = new ILOpCodes.OpSwitch(xOpCodeVal);
               xPos = xPos + 4 + xCount * 4;
               break;
             }
@@ -185,7 +184,7 @@ namespace Cosmos.IL2CPU {
           // The operand is a FieldRef, MethodRef, or TypeRef token.
           case OperandType.InlineTok:
             //TODO: Complete this section
-            xILOpCode = new ILOpCode(xOpCodeVal);
+            xILOpCode = new ILOpCodes.OpToken(xOpCodeVal, 0);
             xPos = xPos + 4;
             break;
 
@@ -204,7 +203,7 @@ namespace Cosmos.IL2CPU {
               //                                                        xTypeGenArgs,
               //                                                        xMethodGenArgs);
               //        return mOperandValueType;
-              xILOpCode = new ILOpCode(xOpCodeVal);
+              xILOpCode = new ILOpCodes.OpType(xOpCodeVal, null);
               xPos = xPos + 4;
               break;
             }
