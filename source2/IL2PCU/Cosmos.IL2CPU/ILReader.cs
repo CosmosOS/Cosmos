@@ -88,26 +88,20 @@ namespace Cosmos.IL2CPU {
             break;
           // The operand is a 64-bit integer.
           case OperandType.InlineI8:
-            //TODO: Complete this section
-            xILOpCode = new ILOpCode(xOpCodeVal);
+            xILOpCode = new ILOpCodes.OpInt64(xOpCodeVal, ReadUInt64(xIL, xPos));
             xPos = xPos + 8;
             break;
 
           // 32-bit IEEE floating point number.
           case OperandType.ShortInlineR:
-            //TODO: Complete this section
-            //            mOperandValueSingle = BitConverter.ToSingle(Operand, 0);
-            xILOpCode = new ILOpCode(xOpCodeVal);
+            xILOpCode = new ILOpCodes.OpSingle(xOpCodeVal, BitConverter.ToSingle(xIL, xPos));
             xPos = xPos + 4;
             break;
           // 64-bit IEEE floating point number.
-          case OperandType.InlineR: {
-              //TODO: Complete this section
-              // mOperandValueDouble = BitConverter.ToDouble(Operand, 0);
-              xILOpCode = new ILOpCode(xOpCodeVal);
-              xPos = xPos + 8;
-              break;
-            }
+          case OperandType.InlineR:
+            xILOpCode = new ILOpCodes.OpDouble(xOpCodeVal, BitConverter.ToDouble(xIL, xPos));
+            xPos = xPos + 8;
+            break;
 
           // The operand is a 32-bit metadata token.
           case OperandType.InlineField: {
@@ -239,51 +233,39 @@ namespace Cosmos.IL2CPU {
           case ILOpCode.Code.Beq_S:
             //TODO: xILOpCode = new ILOpCodes.xxx(ILOpCode.Code.Beq, xILOpCode.value);
             break;
-
           case ILOpCode.Code.Bge_S:
             //TODO: return Code.Bge;
             break;
-
           case ILOpCode.Code.Bge_Un_S:
             //return Code.Bge_Un;
             break;
-
           case ILOpCode.Code.Bgt_S:
             //TODO: return Code.Bgt;
             break;
-
           case ILOpCode.Code.Bgt_Un_S:
             //return Code.Bgt_Un;
             break;
-
           case ILOpCode.Code.Ble_S:
             //TODO: return Code.Ble;
             break;
-
           case ILOpCode.Code.Ble_Un_S:
             //TODO: return Code.Ble_Un;
             break;
-
           case ILOpCode.Code.Blt_S:
             //TODO: return Code.Blt;
             break;
-
           case ILOpCode.Code.Blt_Un_S:
             //TODO: return Code.Blt_Un;
             break;
-
           case ILOpCode.Code.Bne_Un_S:
             //TODO: return Code.Bne_Un;
             break;
-
           case ILOpCode.Code.Br_S:
             //TODO: return Code.Br;
             break;
-
           case ILOpCode.Code.Brfalse_S:
             //TODO: return Code.Brfalse;
             break;
-
           case ILOpCode.Code.Brtrue_S:
             //TODO: return Code.Brtrue;
             break;
@@ -300,7 +282,6 @@ namespace Cosmos.IL2CPU {
           case ILOpCode.Code.Ldarg_3:
             xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldarg, 3);
             break;
-
           case ILOpCode.Code.Ldarg_S:
             xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldarg, ((ILOpCodes.OpVar)xILOpCode).Value);
             break;
@@ -360,7 +341,7 @@ namespace Cosmos.IL2CPU {
             break;
 
           case ILOpCode.Code.Ldloca_S:
-            //TODO: return Code.Ldloca;
+            xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldloca, ((ILOpCodes.OpVar)xILOpCode).Value);
             break;
 
           case ILOpCode.Code.Leave_S:
@@ -394,12 +375,20 @@ namespace Cosmos.IL2CPU {
       return xResult;
     }
 
+    // We could use BitConvertor, unfortuantely they "hardcoded" endianness. Its fine for reading IL now...
+    // but they essentially do the same as we do, just a bit slower.
+    private UInt16 ReadUInt16(byte[] aBytes, int aPos) {
+      return (UInt16)(aBytes[aPos + 1] << 8 | aBytes[aPos]);
+    }
+
     private UInt32 ReadUInt32(byte[] aBytes, int aPos) {
       return (UInt32)(aBytes[aPos + 3] << 24 | aBytes[aPos + 2] << 16 | aBytes[aPos + 1] << 8 | aBytes[aPos]);
     }
 
-    private UInt16 ReadUInt16(byte[] aBytes, int aPos) {
-      return (UInt16)(aBytes[aPos + 1] << 8 | aBytes[aPos]);
+    private UInt64 ReadUInt64(byte[] aBytes, int aPos) {
+      return (UInt64)(
+        aBytes[aPos + 7] << 56 | aBytes[aPos + 6] << 48 | aBytes[aPos + 5] << 40 | aBytes[aPos + 4] << 32
+        | aBytes[aPos + 3] << 24 | aBytes[aPos + 2] << 16 | aBytes[aPos + 1] << 8 | aBytes[aPos]);
     }
 
   }
