@@ -62,7 +62,6 @@ namespace Cosmos.IL2CPU {
       while (xPos < xIL.Length) {
         ILOpCode.Code xOpCodeVal;
         OpCode xOpCode;
-        int xOpPos = xPos;
         if (xIL[xPos] == 0xFE) {
           xOpCodeVal = (ILOpCode.Code)(0xFE00 | xIL[xPos + 1]);
           xOpCode = mOpCodesHi[xIL[xPos + 1]];
@@ -84,7 +83,7 @@ namespace Cosmos.IL2CPU {
           // do we need to support this? Maybe add a check inside here
           // and see if it pops up or not?
           case OperandType.ShortInlineBrTarget: {
-              int xTarget = xOpPos + (sbyte)xIL[xPos];
+              int xTarget = xPos + 1 + (sbyte)xIL[xPos];
               CheckBranch(xTarget, xIL.Length);
               xILOpCode = new ILOpCodes.OpBranch(xOpCodeVal, xTarget);
               xPos = xPos + 1;
@@ -92,7 +91,7 @@ namespace Cosmos.IL2CPU {
             }
           case OperandType.InlineBrTarget: {
             //todo: fix this, branches are relative to the next op, not current.
-              int xTarget = xOpPos + (Int32)ReadUInt32(xIL, xPos);
+              int xTarget = xPos + 4 + (Int32)ReadUInt32(xIL, xPos);
               CheckBranch(xTarget, xIL.Length);
               xILOpCode = new ILOpCodes.OpBranch(xOpCodeVal, xTarget);
               xPos = xPos + 4;
