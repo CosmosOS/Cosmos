@@ -102,6 +102,12 @@ namespace Cosmos.IL2CPU {
       var xOpCodes = mReader.ProcessMethod(aMethodBase);
       if (xOpCodes != null) {
         foreach (var xOpCode in xOpCodes) {
+          //TODO: Scan for fields and methods in xOpCode
+          // Dont need to look at opcode, but operatndtype
+          // Call: QueueMethod(aReader.OperandValueMethod);
+          // Callvirt: QueueMethod(aReader.OperandValueMethod);
+          // Newobj: QueueMethod(aReader.OperandValueMethod);
+
           //InstructionCount++;
           ConstructorInfo xCtor;
           uint xOpCodeVal = (uint)xOpCode.OpCode;

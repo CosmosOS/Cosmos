@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.IL2CPU.ILOpCodes {
-  public class InlineI : ILOpCode {
-    public readonly UInt32 Value;
+  public class OpVar : ILOpCode {
+    public readonly UInt16 Value;
 
-    public InlineI(Code aOpCode, UInt32 aValue)
+    public OpVar(Code aOpCode, UInt16 aValue)
       : base(aOpCode) {
       Value = aValue;
     }

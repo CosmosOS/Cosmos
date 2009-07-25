@@ -45,7 +45,6 @@ namespace Cosmos.IL2CPU {
         int xPos = 0;
         while (xPos < xIL.Length) {
           ILOpCode.Code xOpCodeVal;
-          Type xILOpCodeType;
           OpCode xOpCode;
           if (xIL[xPos] == 0xFE) {
             xOpCodeVal = (ILOpCode.Code)(0xFE00 | xIL[xPos + 1]);
@@ -57,18 +56,50 @@ namespace Cosmos.IL2CPU {
             xPos++;
           }
 
-          //TODO: Need to look at OpCode operandtype and queue for these:
-          // probably dont need to look by op, but can do by operand instead.
-          // Call: QueueMethod(aReader.OperandValueMethod);
-          // Callvirt: QueueMethod(aReader.OperandValueMethod);
-          // Newobj: QueueMethod(aReader.OperandValueMethod);
-
           ILOpCode xILOpCode = null;
           switch (xOpCode.OperandType) {
+            // No operand.
+            case OperandType.InlineNone:
+              xILOpCode = new ILOpCodes.OpNone(xOpCodeVal);
+              xILOpCode = new ILOpCode(xOpCodeVal);
+              break;
+
+            // 8-bit integer branch target.
+            case OperandType.ShortInlineBrTarget:
+              xILOpCode = new ILOpCode(xOpCodeVal);
+              xPos = xPos + 1;
+              break;
             // The operand is a 32-bit integer branch target.
             case OperandType.InlineBrTarget:
               xILOpCode = new ILOpCode(xOpCodeVal);
               xPos = xPos + 4;
+              break;
+
+            // The operand is an 8-bit integer.
+            case OperandType.ShortInlineI:
+              xILOpCode = new ILOpCodes.OpInt(xOpCodeVal, xIL[xPos]);
+              xPos = xPos + 1;
+              break;
+            // The operand is a 32-bit integer.
+            case OperandType.InlineI:
+              xILOpCode = new ILOpCodes.OpInt(xOpCodeVal, ReadUInt32(xIL, xPos));
+              xPos = xPos + 4;
+              break;
+            // The operand is a 64-bit integer.
+            case OperandType.InlineI8:
+              xILOpCode = new ILOpCode(xOpCodeVal);
+              xPos = xPos + 8;
+              break;
+
+            // 32-bit IEEE floating point number.
+            case OperandType.ShortInlineR:
+              xILOpCode = new ILOpCode(xOpCodeVal);
+              xPos = xPos + 4;
+              break;
+            // 64-bit IEEE floating point number.
+            case OperandType.InlineR:
+              xILOpCode = new ILOpCode(xOpCodeVal);
+              xPos = xPos + 8;
               break;
 
             // The operand is a 32-bit metadata token.
@@ -77,35 +108,28 @@ namespace Cosmos.IL2CPU {
               xPos = xPos + 4;
               break;
 
-            // The operand is a 32-bit integer.
-            case OperandType.InlineI:
-              xILOpCode = new ILOpCodes.InlineI(xOpCodeVal, ReadUInt32(xIL, xPos));
-              xPos = xPos + 4;
-              break;
-
-            // The operand is a 64-bit integer.
-            case OperandType.InlineI8:
-              xILOpCode = new ILOpCode(xOpCodeVal);
-              xPos = xPos + 8;
-              break;
-
             // The operand is a 32-bit metadata token.
-            case OperandType.InlineMethod:
-              xILOpCode = new ILOpCode(xOpCodeVal);
-              xPos = xPos + 4;
-              break;
-
-            // No operand.
-            case OperandType.InlineNone:
-              xILOpCode = new ILOpCodes.InlineNone(xOpCodeVal);
-              xILOpCode = new ILOpCode(xOpCodeVal);
-              break;
-
-            // 64-bit IEEE floating point number.
-            case OperandType.InlineR:
-              xILOpCode = new ILOpCode(xOpCodeVal);
-              xPos = xPos + 8;
-              break;
+            case OperandType.InlineMethod: {
+                UInt32 xValue = ReadUInt32(xIL, xPos);
+                if (((xValue & 0x6000000) == 0x6000000)
+                  || ((xValue & 0x2b000000) == 0x2b000000)
+                  || ((xValue & 0xa000000) == 0xA000000)) {
+                  //Type[] xTypeGenArgs = null;
+                  //Type[] xMethodGenArgs = null;
+                  //if (mMethod.DeclaringType.IsGenericType) {
+                  //  xTypeGenArgs = mMethod.DeclaringType.GetGenericArguments();
+                  //}
+                  //if (mMethod.IsGenericMethod) {
+                  //  xMethodGenArgs = mMethod.GetGenericArguments();
+                  //}
+                  // http://msdn.microsoft.com/en-us/library/ms145421(VS.85).aspx
+                  //Value = mModule.ResolveMethod(OperandValueInt32, xTypeGenArgs, xMethodGenArgs);
+                }
+                //xILOpCode = new ILOpCodes.OpMethod(xOpCodeVal, xValue);
+                xILOpCode = new ILOpCode(xOpCodeVal);
+                xPos = xPos + 4;
+                break;
+              }
 
             // 32-bit metadata signature token.
             case OperandType.InlineSig:
@@ -149,34 +173,15 @@ namespace Cosmos.IL2CPU {
               xPos = xPos + 4;
               break;
 
-            // 16-bit integer containing the ordinal of a local variable or an argument.
-            case OperandType.InlineVar:
-              xILOpCode = new ILOpCodes.InlineVar(xOpCodeVal, ReadUInt16(xIL, xPos));
-              xPos = xPos + 2;
-              break;
-
-            // 8-bit integer branch target.
-            case OperandType.ShortInlineBrTarget:
-              xILOpCode = new ILOpCode(xOpCodeVal);
-              xPos = xPos + 1;
-              break;
-
-            // The operand is an 8-bit integer.
-            case OperandType.ShortInlineI:
-              xILOpCode = new ILOpCode(xOpCodeVal);
-              xPos = xPos + 1;
-              break;
-
-            // 32-bit IEEE floating point number.
-            case OperandType.ShortInlineR:
-              xILOpCode = new ILOpCode(xOpCodeVal);
-              xPos = xPos + 4;
-              break;
-
             // 8-bit integer containing the ordinal of a local variable or an argument.
             case OperandType.ShortInlineVar:
-              xILOpCode = new ILOpCode(xOpCodeVal);
-              xPos = xPos + 4;
+              xILOpCode = new ILOpCodes.OpVar(xOpCodeVal, xIL[xPos]);
+              xPos = xPos + 1;
+              break;
+            // 16-bit integer containing the ordinal of a local variable or an argument.
+            case OperandType.InlineVar:
+              xILOpCode = new ILOpCodes.OpVar(xOpCodeVal, ReadUInt16(xIL, xPos));
+              xPos = xPos + 2;
               break;
 
             default:
@@ -241,19 +246,19 @@ namespace Cosmos.IL2CPU {
               break;
 
             case ILOpCode.Code.Ldarg_0:
-              xILOpCode = new ILOpCodes.InlineVar(ILOpCode.Code.Ldarg, 0);
+              xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldarg, 0);
               break;
 
             case ILOpCode.Code.Ldarg_1:
-              xILOpCode = new ILOpCodes.InlineVar(ILOpCode.Code.Ldarg, 1);
+              xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldarg, 1);
               break;
 
             case ILOpCode.Code.Ldarg_2:
-              xILOpCode = new ILOpCodes.InlineVar(ILOpCode.Code.Ldarg, 2);
+              xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldarg, 2);
               break;
 
             case ILOpCode.Code.Ldarg_3:
-              xILOpCode = new ILOpCodes.InlineVar(ILOpCode.Code.Ldarg, 3);
+              xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldarg, 3);
               break;
 
             case ILOpCode.Code.Ldarg_S:
@@ -363,7 +368,6 @@ namespace Cosmos.IL2CPU {
           }
 #endregion
 
-
           xResult.Add(xILOpCode);
         }
         return xResult;
@@ -378,31 +382,6 @@ namespace Cosmos.IL2CPU {
       }
 
       //mOperandValueStr = mModule.ResolveString(OperandValueInt32);
-
-        //public MethodBase OperandValueMethod {
-        //    get {
-        //        if (mOperandValueMethod == null) {
-        //          var xValue = OperandValueInt32;
-        //          if (((xValue & 0x6000000) == 0x6000000)
-        //            || ((xValue & 0x2b000000) == 0x2b000000)
-        //            || ((xValue & 0xa000000) == 0xA000000)) {
-        //                try {
-        //                    Type[] xTypeGenArgs = null;
-        //                    Type[] xMethodGenArgs = null;
-        //                    if (mMethod.DeclaringType.IsGenericType) {
-        //                        xTypeGenArgs = mMethod.DeclaringType.GetGenericArguments();
-        //                    }
-        //                    if (mMethod.IsGenericMethod) {
-        //                        xMethodGenArgs = mMethod.GetGenericArguments();
-        //                    }
-        //                  // http://msdn.microsoft.com/en-us/library/ms145421(VS.85).aspx
-        //                  mOperandValueMethod = mModule.ResolveMethod(OperandValueInt32, xTypeGenArgs, xMethodGenArgs);
-        //                } catch { }
-        //            }
-        //        }
-        //        return mOperandValueMethod;
-        //    }
-        //}
 
         //public FieldInfo OperandValueField {
         //    get {
@@ -452,31 +431,6 @@ namespace Cosmos.IL2CPU {
         //    }
         //}
 
-        //public int OperandValueInt32 {
-        //    get
-        //    {
-        //        if (mOperandValueInt32 == null)
-        //        {
-        //            if(Operand == null)
-        //            {
-        //                return 0;
-        //            }
-        //            if (!mIsShortcut)
-        //            {
-        //                byte[] xData = new byte[4];
-        //                Array.Copy(Operand, xData, Math.Min(4, Operand.Length));
-        //                mOperandValueInt32 = BitConverter.ToInt32(xData, 0);
-        //            }
-        //            else
-        //            {
-        //                sbyte xShortValue = (sbyte) Operand[0];
-        //                mOperandValueInt32 = xShortValue;
-        //            }
-        //        }
-        //        return mOperandValueInt32.Value;
-        //    }
-        //}
-
         //private Single? mOperandValueSingle;
         //public Single OperandValueSingle {
         //    get {
@@ -496,14 +450,5 @@ namespace Cosmos.IL2CPU {
         //        return mOperandValueDouble.Value;
         //    }
         //}
-
-
-      //private Int64 ReadInt64() {
-      //  long xResult = (mBody[mPosition + 7] << 56 | mBody[mPosition + 6] << 48 | mBody[mPosition + 5] << 40 | mBody[mPosition + 4] << 32
-      //    | mBody[mPosition + 3] << 24 | mBody[mPosition + 2] << 16 | mBody[mPosition + 1] << 8 | mBody[mPosition]);
-      //  mPosition = mPosition + 8;
-      //  return xResult;
-      //}
-
     }
 }
