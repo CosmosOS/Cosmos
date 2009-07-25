@@ -5,8 +5,11 @@ using System.Text;
 
 namespace Cosmos.IL2CPU.ILOpCodes {
   public class OpSwitch : ILOpCode {
-    public OpSwitch(Code aOpCode)
+    public readonly int[] BranchLocations;
+
+    public OpSwitch(Code aOpCode, int[] aBranchLocations)
       : base(aOpCode) {
+      BranchLocations = aBranchLocations;
     }
   }
 }

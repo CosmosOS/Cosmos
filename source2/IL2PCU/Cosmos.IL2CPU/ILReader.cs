@@ -79,10 +79,10 @@ namespace Cosmos.IL2CPU {
             xILOpCode = new ILOpCodes.OpNone(xOpCodeVal);
             break;
 
-          //TODO: Branches could be outside the current method -
-          // do we need to support this? Maybe add a check inside here
-          // and see if it pops up or not?
           case OperandType.ShortInlineBrTarget: {
+              // By calculating target, we assume all branches are within a method
+              // So far at least wtih csc, its true. We check it with CheckBranch
+              // just in case.
               int xTarget = xPos + 1 + (sbyte)xIL[xPos];
               CheckBranch(xTarget, xIL.Length);
               xILOpCode = new ILOpCodes.OpBranch(xOpCodeVal, xTarget);
@@ -90,7 +90,6 @@ namespace Cosmos.IL2CPU {
               break;
             }
           case OperandType.InlineBrTarget: {
-            //todo: fix this, branches are relative to the next op, not current.
               int xTarget = xPos + 4 + (Int32)ReadUInt32(xIL, xPos);
               CheckBranch(xTarget, xIL.Length);
               xILOpCode = new ILOpCodes.OpBranch(xOpCodeVal, xTarget);
@@ -122,13 +121,8 @@ namespace Cosmos.IL2CPU {
 
           // The operand is a 32-bit metadata token.
           case OperandType.InlineField: {
-              //TODO: Complete this section
-              //public FieldInfo OperandValueField {
-              //                mOperandValueField = mModule.ResolveField(OperandValueInt32,
-              //                                                          xTypeGenArgs,
-              //                                                          xMethodGenArgs);
-              //        return mOperandValueField;
-              xILOpCode = new ILOpCodes.OpField(xOpCodeVal, 0);
+              var xValue = aMethod.Module.ResolveField((int)ReadUInt32(xIL, xPos), xTypeGenArgs, xMethodGenArgs);
+              xILOpCode = new ILOpCodes.OpField(xOpCodeVal, xValue);
               xPos = xPos + 4;
               break;
             }
@@ -143,8 +137,8 @@ namespace Cosmos.IL2CPU {
 
           // 32-bit metadata signature token.
           case OperandType.InlineSig:
-            //TODO: Complete this section
-            xILOpCode = new ILOpCodes.OpSig(xOpCodeVal, 0);
+            //TODO: What are these used for? A breakpoint causes no breaks with current tests...
+            xILOpCode = new ILOpCodes.OpSig(xOpCodeVal, ReadUInt32(xIL, xPos));
             xPos = xPos + 4;
             break;
 
@@ -154,47 +148,29 @@ namespace Cosmos.IL2CPU {
             break;
 
           case OperandType.InlineSwitch: {
-              //TODO: Complete this section
               int xCount = (int)ReadUInt32(xIL, xPos);
+              xPos = xPos + 4;
+              int xNextOpPos = xPos + xCount * 4;
               int[] xBranchLocations = new int[xCount];
-              uint[] xBranchValues = new uint[xCount];
               for (int i = 0; i < xCount; i++) {
-                xBranchLocations[i] = xIL[xPos + i + 5];
-                //xBranchValues[i] = 
-                //                if ((mPosition + xBranchLocations1[i]) < 0) {
-                //                    xResult[i] = (uint)xBranchLocations1[i];
-                //                } else {
-                //                    xResult[i] = (uint)(mPosition + xBranchLocations1[i]);
-                //                }
+                xBranchLocations[i] = xNextOpPos + (int)ReadUInt32(xIL, xPos + i * 4);
+                CheckBranch(xBranchLocations[i], xIL.Length);
               }
-              xILOpCode = new ILOpCodes.OpSwitch(xOpCodeVal);
-              xPos = xPos + 4 + xCount * 4;
+              xILOpCode = new ILOpCodes.OpSwitch(xOpCodeVal, xBranchLocations);
+              xPos = xNextOpPos;
               break;
             }
 
           // The operand is a FieldRef, MethodRef, or TypeRef token.
           case OperandType.InlineTok:
-            //TODO: Complete this section
-            xILOpCode = new ILOpCodes.OpToken(xOpCodeVal, 0);
+            xILOpCode = new ILOpCodes.OpToken(xOpCodeVal, ReadUInt32(xIL, xPos));
             xPos = xPos + 4;
             break;
 
           // 32-bit metadata token.
           case OperandType.InlineType: {
-              //TODO: Complete this section
-              //                Type[] xTypeGenArgs = null;
-              //                Type[] xMethodGenArgs = null;
-              //                if (mMethod.DeclaringType.IsGenericType) {
-              //                    xTypeGenArgs = mMethod.DeclaringType.GetGenericArguments();
-              //                }
-              //                if (mMethod.IsGenericMethod) {
-              //                    xMethodGenArgs = mMethod.GetGenericArguments();
-              //                }
-              //                mOperandValueType = mModule.ResolveType(OperandValueInt32,
-              //                                                        xTypeGenArgs,
-              //                                                        xMethodGenArgs);
-              //        return mOperandValueType;
-              xILOpCode = new ILOpCodes.OpType(xOpCodeVal, null);
+              var xValue = aMethod.Module.ResolveType((int)ReadUInt32(xIL, xPos), xTypeGenArgs, xMethodGenArgs);
+              xILOpCode = new ILOpCodes.OpType(xOpCodeVal, xValue);
               xPos = xPos + 4;
               break;
             }
