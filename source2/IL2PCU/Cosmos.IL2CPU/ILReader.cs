@@ -63,16 +63,19 @@ namespace Cosmos.IL2CPU {
             xILOpCode = new ILOpCodes.OpNone(xOpCodeVal);
             break;
 
+          //TODO: Branches could be outside the current method -
+          // do we need to support this? Maybe add a check inside here
+          // and see if it pops up or not?
           // 8-bit integer branch target.
           case OperandType.ShortInlineBrTarget:
             //TODO: Complete this section
-            xILOpCode = new ILOpCodes.OpBranch(xOpCodeVal, 0);
+            xILOpCode = new ILOpCodes.OpBranch(xOpCodeVal, xIL[xPos]);
             xPos = xPos + 1;
             break;
           // The operand is a 32-bit integer branch target.
           case OperandType.InlineBrTarget:
             //TODO: Complete this section
-            xILOpCode = new ILOpCodes.OpBranch(xOpCodeVal, 0);
+            xILOpCode = new ILOpCodes.OpBranch(xOpCodeVal, ReadUInt32(xIL, xPos));
             xPos = xPos + 4;
             break;
 

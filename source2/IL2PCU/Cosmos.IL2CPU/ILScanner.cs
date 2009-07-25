@@ -119,7 +119,7 @@ namespace Cosmos.IL2CPU {
           // TODO: Remove this if when all shortcut expansions are completed
           if (xCtor != null) {
             var xILOp = xCtor.Invoke(new object[] { xOpCode });
-            // What to pass to execute? Passing whole scanner may be inappropriate
+            // What to pass to Execute method? Passing whole scanner is inappropriate
             // Op needs info about branch targets for example
             // are all branches within method? 
             //inherited execute in ILOpX6 for example can emit this label
