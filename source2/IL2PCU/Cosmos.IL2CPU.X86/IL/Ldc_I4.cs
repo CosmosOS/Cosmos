@@ -11,7 +11,7 @@ namespace Cosmos.IL2CPU.X86.IL {
 
     public override void Execute(uint aMethodUID) {
       new CPU.Push { DestinationValue = ((OpInt)OpCode).Value };
-      ((CPU.Assembler)Indy.IL2CPU.Assembler.Assembler.CurrentInstance.Peek()).StackContents.Push(new StackContent(4, typeof(int)));
+      Asmblr.StackContents.Push(new StackContent(4, typeof(int)));
     }
 
 	}

@@ -5,21 +5,14 @@ using System.Reflection.Emit;
 using System.Text;
 
 namespace Cosmos.IL2CPU {
-  public class Assembler {
+  public abstract class Assembler {
 
     protected delegate ILOp ILOpCreateDelegate(ILOpCode aOpCode);
     protected ILOpCreateDelegate[] mILOpsLo = new ILOpCreateDelegate[256];
     protected ILOpCreateDelegate[] mILOpsHi = new ILOpCreateDelegate[256];
 
-    public Assembler(Type aAssemblerBaseOp) : this(aAssemblerBaseOp, false) {
-    }
-
-    public Assembler(Type aAssemblerBaseOp, bool aSingleILOp) {
-      if (aSingleILOp) {
-        LoadILOp(aAssemblerBaseOp);
-      } else {
-        LoadILOps(aAssemblerBaseOp);
-      }
+    public Assembler() {
+      InitILOps();
     }
 
     public void ProcessMethod(UInt32 aMethodUID, List<ILOpCode> aOpCodes) {
@@ -36,6 +29,7 @@ namespace Cosmos.IL2CPU {
       }
     }
 
+    // http://blogs.msdn.com/haibo_luo/archive/2005/11/17/494009.aspx
     protected ILOpCreateDelegate CreateCtorDelegate(Type aType) {
       var xMethod = new DynamicMethod("", typeof(ILOp), new Type[] { typeof(ILOpCode) }, typeof(ILScanner).Module);
       var xGen = xMethod.GetILGenerator();
@@ -45,23 +39,9 @@ namespace Cosmos.IL2CPU {
       return (ILOpCreateDelegate)xMethod.CreateDelegate(typeof(ILOpCreateDelegate));
     }
 
-    protected void LoadILOp(Type aAssemblerBaseOp) {
-      // http://blogs.msdn.com/haibo_luo/archive/2005/11/17/494009.aspx
-      //
-      var xDelegate = CreateCtorDelegate(aAssemblerBaseOp);
-      // Don't change the type in the foreach to a var, its necessary as it is now
-      // to typecast it, so we can then recast to an int.
-      foreach (ILOpCode.Code xCode in Enum.GetValues(typeof(ILOpCode.Code))) {
-        int xCodeValue = (int)xCode;
-        if (xCodeValue <= 0xFF) {
-          mILOpsLo[xCodeValue] = xDelegate;
-        } else {
-          mILOpsHi[xCodeValue & 0xFF] = xDelegate;
-        }
-      }
-    }
+    protected abstract void InitILOps();
 
-    protected void LoadILOps(Type aAssemblerBaseOp) {
+    protected void InitILOps(Type aAssemblerBaseOp) {
       foreach (var xType in aAssemblerBaseOp.Assembly.GetExportedTypes()) {
         if (xType.IsSubclassOf(aAssemblerBaseOp)) {
           var xAttrib = (OpCodeAttribute)xType.GetCustomAttributes(typeof(OpCodeAttribute), false)[0];

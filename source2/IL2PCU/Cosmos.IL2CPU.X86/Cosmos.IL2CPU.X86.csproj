@@ -49,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assembler.cs" />
     <Compile Include="ILOp.cs" />
     <Compile Include="IL\Add.cs" />
     <Compile Include="IL\Add_Ovf.cs" />
