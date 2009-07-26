@@ -1,12 +1,59 @@
 using System;
+using Indy.IL2CPU.Assembler;
+using CPU = Indy.IL2CPU.Assembler.X86;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Beq)]
 	public class Beq: ILOp
 	{
+		private int mTarget;
 		public Beq(ILOpCode aOpCode):base(aOpCode)
 		{
+			mTarget = aOpCode.Position + ((ILOpCodes.OpBranch)aOpCode).Value;
+		}
+
+		public override void Execute(uint aMethodUID)
+		{
+			var xStackContent = Asmblr.StackContents.Pop();
+			Asmblr.StackContents.Pop();
+			if (xStackContent.Size > 8)
+			{
+				throw new Exception("StackSize>8 not supported");
+			}
+			string BaseLabel = "_" + aMethodUID + "_" + OpCode.Position + "__";
+			string LabelTrue = BaseLabel + "True";
+			string LabelFalse = BaseLabel + "False";
+			if (xStackContent.Size <= 4)
+			{
+				new CPU.Pop { DestinationReg = CPU.Registers.EAX };
+				new CPU.Pop { DestinationReg = CPU.Registers.EBX };
+				new CPU.Compare { DestinationReg = CPU.Registers.EAX, SourceReg = CPU.Registers.EBX };
+				new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.NotEqual, DestinationLabel = LabelFalse };
+				new CPU.Jump { DestinationLabel = "_" + aMethodUID + "_" + mTarget};
+				new Label(LabelFalse);
+				//new CPUx86.Noop();
+				//new CPUx86.Jump(LabelFalse);
+				//new CPU.Label(LabelTrue);
+				//new CPUx86.Add(CPUx86.Registers_Old.ESP, "4");
+				//new CPUx86.Jump(TargetLabel);
+				//new CPU.Label(LabelFalse);
+				//new CPUx86.Add(CPUx86.Registers_Old.ESP, "4");
+			}
+			else
+			{
+				new CPU.Pop { DestinationReg = CPU.Registers.EAX };
+				new CPU.Pop { DestinationReg = CPU.Registers.EBX };
+				new CPU.Pop { DestinationReg = CPU.Registers.ECX };
+				new CPU.Pop { DestinationReg = CPU.Registers.EDX };
+				new CPU.Xor { DestinationReg = CPU.Registers.EAX, SourceReg = CPU.Registers.ECX };
+				new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.NotZero, DestinationLabel = LabelFalse };
+				new CPU.Xor { DestinationReg = CPU.Registers.EBX, SourceReg = CPU.Registers.EDX };
+				new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.NotZero, DestinationLabel = LabelFalse };
+				new CPU.Jump { DestinationLabel = "_" + aMethodUID + "_" + mTarget };
+				new Label(LabelFalse);
+				//new CPUx86.Noop();
+			}
 		}
 
     public override void Execute(uint aMethodUID) {
