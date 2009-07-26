@@ -4,6 +4,6 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.IL2CPU.X86 {
-  class Assembler {
+  public abstract class Assembler : Cosmos.IL2CPU.Assembler {
   }
 }

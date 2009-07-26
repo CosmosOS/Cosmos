@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.IL2CPU {
   public abstract class ILOp {
-    public readonly Assembler Assembler;
+    protected readonly Assembler Assembler;
 		protected ILOp(Assembler aAsmblr) {
       Assembler = aAsmblr;
 		}

@@ -34,9 +34,7 @@ namespace Cosmos.IL2CPU.X86.IL
 				//new CPUx86.Jump(TargetLabel);
 				//new CPU.Label(LabelFalse);
 				//new CPUx86.Add(CPUx86.Registers_Old.ESP, "4");
-			}
-			else
-			{
+			} else {
 				new CPU.Pop { DestinationReg = CPU.Registers.EAX };
 				new CPU.Pop { DestinationReg = CPU.Registers.EBX };
 				new CPU.Pop { DestinationReg = CPU.Registers.ECX };

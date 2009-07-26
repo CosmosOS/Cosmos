@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.IL2CPU.X86 {
-  public class AssemblerNasm : Cosmos.IL2CPU.Assembler {
+  public class AssemblerNasm : Assembler {
 
     protected override void InitILOps() {
       InitILOps(typeof(ILOp));
