@@ -1,4 +1,5 @@
 using System;
+using CPUx86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -10,27 +11,9 @@ namespace Cosmos.IL2CPU.X86.IL
 		}
 
     public override void Execute(uint aMethodUID, ILOpCode aOpCode) {
-      //TODO: Implement this Op
+      //TODO: Return
+      // Need to jump to end of method. Assembler can emit this label for now
+      //new CPU.Jump { DestinationLabel = MethodFooterOp.EndOfMethodLabelNameNormal };
     }
-
-    
-		// using System;
-		// using System.IO;
-		// 
-		// 
-		// using CPU = Indy.IL2CPU.Assembler.X86;
-		// 
-		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[OpCode(OpCodeEnum.Ret)]
-		// 	public class Ret: Op {
-		// 		public Ret(ILReader aReader, MethodInformation aMethodInfo)
-		// 			: base(aReader, aMethodInfo) {
-		// 		}
-		// 		public override void DoAssemble() {
-		//             new CPU.Jump { DestinationLabel = MethodFooterOp.EndOfMethodLabelNameNormal };
-		// 		}
-		// 	}
-		// }
-		
 	}
 }

@@ -11,7 +11,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		}
 
     public override void Execute(uint aMethodUID, ILOpCode aOpCode) {
-      //todo: implement correct Volatile support
+      throw new Exception("TODO: Volatile");
     }
 
 	}

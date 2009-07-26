@@ -1,4 +1,5 @@
 using System;
+using CPUx86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Cosmos.IL2CPU.X86.IL
 {

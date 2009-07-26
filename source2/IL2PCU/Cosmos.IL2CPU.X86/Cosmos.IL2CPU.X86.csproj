@@ -60,11 +60,8 @@
     <Compile Include="IL\Arglist.cs" />
     <Compile Include="IL\Branch.cs" />
     <Compile Include="IL\Bge_Un.cs" />
-    <Compile Include="IL\Bgt.cs" />
     <Compile Include="IL\Bgt_Un.cs" />
-    <Compile Include="IL\Ble.cs" />
     <Compile Include="IL\Ble_Un.cs" />
-    <Compile Include="IL\Blt.cs" />
     <Compile Include="IL\Blt_Un.cs" />
     <Compile Include="IL\Bne_Un.cs" />
     <Compile Include="IL\Box.cs" />

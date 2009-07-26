@@ -6,6 +6,9 @@ namespace Cosmos.IL2CPU.X86.IL
 {
   [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Beq)]
   [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Bge)]
+  [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Bgt)]
+  [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ble)]
+  [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Blt)]
   public class Branch : ILOp {
 
     public Branch(Cosmos.IL2CPU.Assembler aAsmblr) : base(aAsmblr) {
@@ -21,35 +24,40 @@ namespace Cosmos.IL2CPU.X86.IL
       CPU.ConditionalTestEnum xTestOp;
       switch (aOpCode.OpCode) {
         case ILOpCode.Code.Beq:
-          xTestOp = CPU.ConditionalTestEnum.NotZero;
+          xTestOp = CPU.ConditionalTestEnum.Zero;
           break;
         case ILOpCode.Code.Bge:
           xTestOp = CPU.ConditionalTestEnum.GreaterThanOrEqualTo;
           break;
+        case ILOpCode.Code.Bgt:
+          xTestOp = CPU.ConditionalTestEnum.GreaterThan;
+          break;
+        case ILOpCode.Code.Ble:
+          xTestOp = CPU.ConditionalTestEnum.LessThanOrEqualTo;
+          break;
+        case ILOpCode.Code.Blt:
+          xTestOp = CPU.ConditionalTestEnum.LessThan;
+          break;
         default:
-          throw new Exception("Unknown OpCode for branch.");
+          throw new Exception("Unknown OpCode for conditional branch.");
           break;
       }
 
-			string BaseLabel = "_" + aMethodUID + "_" + ((ILOpCodes.OpBranch)aOpCode).Value + "__";
-			string LabelFalse = BaseLabel + "False";
 			if (xStackContent.Size <= 4) {
 				new CPU.Pop { DestinationReg = CPU.Registers.EAX };
 				new CPU.Pop { DestinationReg = CPU.Registers.EBX };
 				new CPU.Compare { DestinationReg = CPU.Registers.EAX, SourceReg = CPU.Registers.EBX };
-        new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = LabelFalse };
+        new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AssemblerNasm.TmpBranchLabel(aMethodUID, aOpCode) };
 			} else {
 				new CPU.Pop { DestinationReg = CPU.Registers.EAX };
 				new CPU.Pop { DestinationReg = CPU.Registers.EBX };
 				new CPU.Pop { DestinationReg = CPU.Registers.ECX };
 				new CPU.Pop { DestinationReg = CPU.Registers.EDX };
 				new CPU.Xor { DestinationReg = CPU.Registers.EAX, SourceReg = CPU.Registers.ECX };
-        new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = LabelFalse };
+        new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AssemblerNasm.TmpBranchLabel(aMethodUID, aOpCode) };
 				new CPU.Xor { DestinationReg = CPU.Registers.EBX, SourceReg = CPU.Registers.EDX };
-        new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = LabelFalse };
+        new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AssemblerNasm.TmpBranchLabel(aMethodUID, aOpCode) };
 			}
-      new CPU.Jump { DestinationLabel = "_" + aMethodUID + "_" + ((ILOpCodes.OpBranch)aOpCode).Value };
-      new Label(LabelFalse);
     }
 
 	}
