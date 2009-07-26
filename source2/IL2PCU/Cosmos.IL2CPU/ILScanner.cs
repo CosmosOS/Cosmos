@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Text;
 
 namespace Cosmos.IL2CPU {
@@ -23,8 +24,9 @@ namespace Cosmos.IL2CPU {
     private HashSet<FieldInfo> mFieldsSet = new HashSet<FieldInfo>();
     protected ILReader mReader;
 
-    protected ConstructorInfo[] mILOpsLo = new ConstructorInfo[256];
-    protected ConstructorInfo[] mILOpsHi = new ConstructorInfo[256];
+    protected delegate ILOp ILOpCreateDelegate(ILOpCode aOpCode);
+    protected ILOpCreateDelegate[] mILOpsLo = new ILOpCreateDelegate[256];
+    protected ILOpCreateDelegate[] mILOpsHi = new ILOpCreateDelegate[256];
 
     public ILScanner(Type aAssemblerBaseOp) : this(aAssemblerBaseOp, false) {
     }
@@ -38,27 +40,27 @@ namespace Cosmos.IL2CPU {
       }
     }
 
+    protected ILOpCreateDelegate CreateCtorDelegate(Type aType) {
+      var xMethod = new DynamicMethod("", typeof(ILOp), new Type[] { typeof(ILOpCode) }, typeof(ILScanner).Module);
+      var xGen = xMethod.GetILGenerator();
+      xGen.Emit(OpCodes.Ldarg_1);
+      xGen.Emit(OpCodes.Newobj, aType.GetConstructor(new Type[] { typeof(ILOpCode) }));
+      xGen.Emit(OpCodes.Ret);
+      return (ILOpCreateDelegate)xMethod.CreateDelegate(typeof(ILOpCreateDelegate));
+    }
+
     protected void LoadILOp(Type aAssemblerBaseOp) {
-      //TODO: Contructor.Invoke nearly doubles scanner time. Comment it out and
-      // profiler runs about twice as fast. See if we can speed this up
       // http://blogs.msdn.com/haibo_luo/archive/2005/11/17/494009.aspx
-      //TODO: Need to modify it to pass the arguments too for the contructor, then profile it and see if its much faster
-      //mOps = new Func<ILOp>[0xFE1F];
-      //      var xTemp = new DynamicMethod("Create_" + xAttrib.OpCode + "_Obj", typeof(ILOp), new Type[0], true);
-      //      var xGen = xTemp.GetILGenerator();
-      //      var xCtor = xType.GetConstructor(new Type[0]);
-      //      xGen.Emit(OpCodes.Newobj, xCtor);
-      //      xGen.Emit(OpCodes.Ret);
-      //      mOps[(ushort)xAttrib.OpCode] = (Func<ILOp>)xTemp.CreateDelegate(typeof(Func<ILOp>));
-      var xCtor = aAssemblerBaseOp.GetConstructors()[0];
+      //
+      var xDelegate = CreateCtorDelegate(aAssemblerBaseOp);
       // Don't change the type in the foreach to a var, its necessary as it is now
       // to typecast it, so we can then recast to an int.
       foreach (ILOpCode.Code xCode in Enum.GetValues(typeof(ILOpCode.Code))) {
         int xCodeValue = (int)xCode;
         if (xCodeValue <= 0xFF) {
-          mILOpsLo[xCodeValue] = xCtor;
+          mILOpsLo[xCodeValue] = xDelegate;
         } else {
-          mILOpsHi[xCodeValue & 0xFF] = xCtor;
+          mILOpsHi[xCodeValue & 0xFF] = xDelegate;
         }
       }
     }
@@ -68,11 +70,11 @@ namespace Cosmos.IL2CPU {
         if (xType.IsSubclassOf(aAssemblerBaseOp)) {
           var xAttrib = (OpCodeAttribute)xType.GetCustomAttributes(typeof(OpCodeAttribute), false)[0];
           var xOpCode = (ushort)xAttrib.OpCode;
-          var xCtor = xType.GetConstructors()[0];
+          var xDelegate = CreateCtorDelegate(xType);
           if (xOpCode <= 0xFF) {
-            mILOpsLo[xOpCode] = xCtor;
+            mILOpsLo[xOpCode] = xDelegate;
           } else {
-            mILOpsHi[xOpCode & 0xFF] = xCtor;
+            mILOpsHi[xOpCode & 0xFF] = xDelegate;
           }
         }
       }
@@ -117,14 +119,14 @@ namespace Cosmos.IL2CPU {
             QueueType(((ILOpCodes.OpType)xOpCode).Value);
           }
 
-          ConstructorInfo xCtor;
+          ILOpCreateDelegate xCtor;
           uint xOpCodeVal = (uint)xOpCode.OpCode;
           if (xOpCodeVal <= 0xFF) {
             xCtor = mILOpsLo[xOpCodeVal];
           } else {
             xCtor = mILOpsHi[xOpCodeVal & 0xFF];
           }
-          var xILOp = (ILOp)xCtor.Invoke(new object[] { xOpCode });
+          var xILOp = xCtor(xOpCode);
           xILOp.Execute(0);
         }
       }
