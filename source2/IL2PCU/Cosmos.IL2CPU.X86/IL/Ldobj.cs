@@ -5,11 +5,11 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldobj)]
 	public class Ldobj: ILOp
 	{
-		public Ldobj(ILOpCode aOpCode):base(aOpCode)
+		public Ldobj(Cosmos.IL2CPU.Assembler aAsmblr):base(aAsmblr)
 		{
 		}
 
-    public override void Execute(uint aMethodUID) {
+    public override void Execute(uint aMethodUID, ILOpCode aOpCode) {
       throw new Exception("TODO:");
     }
 

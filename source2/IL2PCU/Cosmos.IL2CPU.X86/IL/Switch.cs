@@ -5,11 +5,11 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Switch)]
 	public class Switch: ILOp
 	{
-		public Switch(ILOpCode aOpCode):base(aOpCode)
+		public Switch(Cosmos.IL2CPU.Assembler aAsmblr):base(aAsmblr)
 		{
 		}
 
-    public override void Execute(uint aMethodUID) {
+    public override void Execute(uint aMethodUID, ILOpCode aOpCode) {
       throw new Exception("TODO:");
     }
 

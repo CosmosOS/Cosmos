@@ -5,11 +5,11 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Add_Ovf_Un)]
 	public class Add_Ovf_Un: ILOp
 	{
-		public Add_Ovf_Un(ILOpCode aOpCode):base(aOpCode)
+		public Add_Ovf_Un(Cosmos.IL2CPU.Assembler aAsmblr):base(aAsmblr)
 		{
 		}
 
-		public override void Execute(uint aMethodUID)
+		public override void Execute(uint aMethodUID, ILOpCode aOpCode)
 		{
 			throw new NotImplementedException("Add_Ovf_Un not implemented");
 		}

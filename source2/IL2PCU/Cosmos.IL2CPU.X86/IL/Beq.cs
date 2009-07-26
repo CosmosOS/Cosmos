@@ -7,21 +7,20 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Beq)]
 	public class Beq: ILOp
 	{
-		private int mTarget;
-		public Beq(ILOpCode aOpCode):base(aOpCode)
+
+    public Beq(Cosmos.IL2CPU.Assembler aAsmblr) : base(aAsmblr)
 		{
-			mTarget = aOpCode.Position + ((ILOpCodes.OpBranch)aOpCode).Value;
 		}
 
-		public override void Execute(uint aMethodUID)
+    public override void Execute(uint aMethodUID, ILOpCode aOpCode)
 		{
-			var xStackContent = Asmblr.StackContents.Pop();
-			Asmblr.StackContents.Pop();
+			var xStackContent = OldAsmblr.StackContents.Pop();
+			OldAsmblr.StackContents.Pop();
 			if (xStackContent.Size > 8)
 			{
 				throw new Exception("StackSize>8 not supported");
 			}
-			string BaseLabel = "_" + aMethodUID + "_" + OpCode.Position + "__";
+			string BaseLabel = "_" + aMethodUID + "_" + ((ILOpCodes.OpBranch)aOpCode).Value + "__";
 			string LabelTrue = BaseLabel + "True";
 			string LabelFalse = BaseLabel + "False";
 			if (xStackContent.Size <= 4)
@@ -30,7 +29,7 @@ namespace Cosmos.IL2CPU.X86.IL
 				new CPU.Pop { DestinationReg = CPU.Registers.EBX };
 				new CPU.Compare { DestinationReg = CPU.Registers.EAX, SourceReg = CPU.Registers.EBX };
 				new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.NotEqual, DestinationLabel = LabelFalse };
-				new CPU.Jump { DestinationLabel = "_" + aMethodUID + "_" + mTarget};
+        new CPU.Jump { DestinationLabel = "_" + aMethodUID + "_" + ((ILOpCodes.OpBranch)aOpCode).Value };
 				new Label(LabelFalse);
 				//new CPUx86.Noop();
 				//new CPUx86.Jump(LabelFalse);
@@ -50,7 +49,7 @@ namespace Cosmos.IL2CPU.X86.IL
 				new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.NotZero, DestinationLabel = LabelFalse };
 				new CPU.Xor { DestinationReg = CPU.Registers.EBX, SourceReg = CPU.Registers.EDX };
 				new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.NotZero, DestinationLabel = LabelFalse };
-				new CPU.Jump { DestinationLabel = "_" + aMethodUID + "_" + mTarget };
+        new CPU.Jump { DestinationLabel = "_" + aMethodUID + "_" + ((ILOpCodes.OpBranch)aOpCode).Value };
 				new Label(LabelFalse);
 				//new CPUx86.Noop();
 			}

@@ -5,11 +5,11 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Conv_Ovf_I4_Un)]
 	public class Conv_Ovf_I4_Un: ILOp
 	{
-		public Conv_Ovf_I4_Un(ILOpCode aOpCode):base(aOpCode)
+		public Conv_Ovf_I4_Un(Cosmos.IL2CPU.Assembler aAsmblr):base(aAsmblr)
 		{
 		}
 
-    public override void Execute(uint aMethodUID) {
+    public override void Execute(uint aMethodUID, ILOpCode aOpCode) {
       throw new Exception("TODO:");
     }
 

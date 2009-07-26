@@ -7,18 +7,18 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.And)]
 	public class And: ILOp
 	{
-		public And(ILOpCode aOpCode):base(aOpCode)
+		public And(Cosmos.IL2CPU.Assembler aAsmblr):base(aAsmblr)
 		{
 		}
 
-		public override void Execute(uint aMethodUID)
+		public override void Execute(uint aMethodUID, ILOpCode aOpCode)
 		{
-			StackContent xStackContent = Asmblr.StackContents.Peek();
+      StackContent xStackContent = OldAsmblr.StackContents.Peek();
 			if (xStackContent.IsFloat)
 			{
 				throw new Exception("Floats not yet supported!");
 			}
-			int xSize = Math.Max(Asmblr.StackContents.Pop().Size, Asmblr.StackContents.Pop().Size);
+      int xSize = Math.Max(OldAsmblr.StackContents.Pop().Size, OldAsmblr.StackContents.Pop().Size);
 			if (xSize > 8)
 			{
 				throw new Exception("StackSize>8 not supported");
@@ -41,7 +41,7 @@ namespace Cosmos.IL2CPU.X86.IL
 				new CPU.And { DestinationReg = CPU.Registers.EAX, SourceReg = CPU.Registers.EDX };
 				new CPU.Push { DestinationReg = CPU.Registers.EAX };
 			}
-			Asmblr.StackContents.Push(xStackContent);			
+      OldAsmblr.StackContents.Push(xStackContent);			
 		}
 
 		#region Old code

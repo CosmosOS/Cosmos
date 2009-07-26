@@ -8,11 +8,11 @@ using StackContent = Indy.IL2CPU.Assembler.StackContent;
 namespace Cosmos.IL2CPU.X86.IL {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldc_I4)]
 	public class Ldc_I4: ILOp {
-		public Ldc_I4(ILOpCode aOpCode):base(aOpCode) {}
+		public Ldc_I4(Cosmos.IL2CPU.Assembler aAsmblr):base(aAsmblr) {}
 
-    public override void Execute(uint aMethodUID) {
-			new CPU.Push { DestinationValue = ((OpInt)OpCode).Value };
-      Asmblr.StackContents.Push(new StackContent(4, typeof(int)));
+    public override void Execute(uint aMethodUID, ILOpCode aOpCode) {
+			new CPU.Push { DestinationValue = ((OpInt)aOpCode).Value };
+      OldAsmblr.StackContents.Push(new StackContent(4, typeof(int)));
     }
 
 	}

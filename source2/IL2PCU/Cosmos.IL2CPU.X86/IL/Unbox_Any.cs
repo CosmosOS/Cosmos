@@ -6,11 +6,11 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Unbox_Any)]
 	public class Unbox_Any: ILOp
 	{
-		public Unbox_Any(ILOpCode aOpCode):base(aOpCode)
+		public Unbox_Any(Cosmos.IL2CPU.Assembler aAsmblr):base(aAsmblr)
 		{
 		}
 
-    public override void Execute(uint aMethodUID) {
+    public override void Execute(uint aMethodUID, ILOpCode aOpCode) {
       throw new Exception("TODO:");
     }
 

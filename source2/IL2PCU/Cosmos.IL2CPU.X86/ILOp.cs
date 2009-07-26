@@ -6,12 +6,14 @@ using CPU = Indy.IL2CPU.Assembler.X86;
 
 namespace Cosmos.IL2CPU.X86 {
   public abstract class ILOp : Cosmos.IL2CPU.ILOp {
-    
-    protected ILOp(ILOpCode aOpCode):base(aOpCode) {
-      Asmblr = ((CPU.Assembler)Indy.IL2CPU.Assembler.Assembler.CurrentInstance.Peek());
+
+    protected ILOp(Cosmos.IL2CPU.Assembler aAsmblr)
+      : base(aAsmblr) {
+      OldAsmblr = ((CPU.Assembler)Indy.IL2CPU.Assembler.Assembler.CurrentInstance.Peek());
 		}
 
-    protected readonly CPU.Assembler Asmblr;
+    //TODO: Temp hack for old assembler. Remove later.
+    protected readonly CPU.Assembler OldAsmblr;
 
   }
 }
