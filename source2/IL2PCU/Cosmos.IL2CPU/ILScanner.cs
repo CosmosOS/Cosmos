@@ -21,6 +21,7 @@ namespace Cosmos.IL2CPU {
     private HashSet<MethodBase> mMethodsSet = new HashSet<MethodBase>();
     private List<MethodBase> mMethods = new List<MethodBase>();
     private HashSet<Type> mTypesSet = new HashSet<Type>();
+    private List<Type> mTypes = new List<Type>();
 
     protected ILReader mReader;
     protected Assembler mAsmblr;
@@ -37,6 +38,43 @@ namespace Cosmos.IL2CPU {
       for (int i = 0; i < mMethods.Count; i++) {
 				ScanMethod(mMethods[i], (UInt32)i);
       }
+
+      // ie 
+      //   var xSB = new StringBuilder("test");
+      //   object x = xSB;
+      //   string y = xSB.ToString();
+      //
+      // Now that we did a full normal scan, rescan and find all virtuals
+      // and for each virtual scan all included types and include descendant overrides.
+      // I think we need to scan for ancestor calls too...
+      // This process will add more classes etc.. so the process will need to be repeated
+      // until no more new methods are found.
+      //
+      //TODO: Speed this up somehow....
+      int xMethodCount;
+      do {
+        xMethodCount = mMethods.Count;
+        // Cannot use foreach, the list changes as we go
+        for (int i = 0; i < mMethods.Count; i++) {
+          var xMethod = mMethods[i];
+          if (xMethod.IsVirtual) {
+            foreach (var xType in mTypes) {
+              // Find ancestors and descendants
+              if (xType.IsSubclassOf(xMethod.DeclaringType) || xMethod.DeclaringType.IsSubclassOf(xType)) {
+                var xParams = xMethod.GetParameters();
+                var xParamTypes = new Type[xParams.Length];
+                for (int j = 0; j < xParams.Length; j++) {
+                  xParamTypes[j] = xParams[j].ParameterType;
+                }
+                var xNewMethod = xType.GetMethod(xMethod.Name, xParamTypes);
+                if (xNewMethod != null) {
+                  QueueMethod(xNewMethod);
+                }
+              }
+            }
+          }
+        }
+      } while (xMethodCount != mMethods.Count);
     }
 
     private void ScanMethod(MethodBase aMethodBase, UInt32 aMethodUID) {
@@ -102,15 +140,10 @@ namespace Cosmos.IL2CPU {
     protected void QueueType(Type aType) {
       if (!mTypesSet.Contains(aType)) {
         mTypesSet.Add(aType);
+        mTypes.Add(aType);
         if (aType.BaseType != null) {
           QueueType(aType.BaseType);
         }
-				// TODO: dont we need to do the VMT scan?
-        // ie 
-        //   var xSB = new StringBuilder("test");
-        //   object x = xSB;
-        //   string y = xSB.ToString();
-        //
 				// queue static constructor
 				foreach (var xCctor in aType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)) {
 					if (xCctor.DeclaringType == aType) {
