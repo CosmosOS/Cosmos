@@ -116,6 +116,17 @@ namespace Cosmos.IL2CPU {
           }
           //TODO: This invoke nearly doubles scanner time. Comment it out and
           // profiler runs about twice as fast. See if we can speed this up
+          // http://blogs.msdn.com/haibo_luo/archive/2005/11/17/494009.aspx
+          #region Emit Method
+          //TODO: Need to modify it to pass the arguments too for the contructor, then profile it and see if its much faster
+          //mOps = new Func<ILOp>[0xFE1F];
+          //      var xTemp = new DynamicMethod("Create_" + xAttrib.OpCode + "_Obj", typeof(ILOp), new Type[0], true);
+          //      var xGen = xTemp.GetILGenerator();
+          //      var xCtor = xType.GetConstructor(new Type[0]);
+          //      xGen.Emit(OpCodes.Newobj, xCtor);
+          //      xGen.Emit(OpCodes.Ret);
+          //      mOps[(ushort)xAttrib.OpCode] = (Func<ILOp>)xTemp.CreateDelegate(typeof(Func<ILOp>));
+          #endregion
           var xILOp = (ILOp)xCtor.Invoke(new object[] { xOpCode });
           xILOp.Execute(0);
         }
