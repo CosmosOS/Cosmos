@@ -43,26 +43,6 @@ namespace Cosmos.IL2CPU.X86.IL
 			}
       OldAsmblr.StackContents.Push(xStackContent);			
 		}
-
-		
-		// using System;
-		// using System.IO;
-		// 
-		// 
-		// using CPU = Indy.IL2CPU.Assembler.X86;
-		// using Indy.IL2CPU.Assembler;
-		// 
-		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[OpCode(OpCodeEnum.And)]
-		// 	public class And: Op {
-		// 		public And(ILReader aReader, MethodInformation aMethodInfo)
-		// 			: base(aReader, aMethodInfo) {
-		// 		}
-		// 		public override void DoAssemble() {
-		// 			
-		// 		}
-		// 	}
-		// }
 		
 	}
 }
