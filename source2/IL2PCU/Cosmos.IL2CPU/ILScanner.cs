@@ -75,6 +75,7 @@ namespace Cosmos.IL2CPU {
         mMethodsSet.Add(aMethod);
         mMethods.Add(aMethod);
         //TODO: Might still need this one, see after we get assembly output again
+        //Im hoping the operand walking we have now ill include this on its own.
         //QueueType(aMethod.DeclaringType);
 
         //var xMethodInfo = aMethod as MethodInfo;
@@ -105,6 +106,11 @@ namespace Cosmos.IL2CPU {
           QueueType(aType.BaseType);
         }
 				// TODO: dont we need to do the VMT scan?
+        // ie 
+        //   var xSB = new StringBuilder("test");
+        //   object x = xSB;
+        //   string y = xSB.ToString();
+        //
 				// queue static constructor
 				foreach (var xCctor in aType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)) {
 					if (xCctor.DeclaringType == aType) {
