@@ -17,8 +17,10 @@ namespace Cosmos.IL2CPU.Profiler {
       var xSW = new Stopwatch();
       xSW.Start();
 
-      var xScanner = new ILScanner(typeof(ILOpProfiler), true);
-      xScanner.Execute(typeof(Program).GetMethod("ScannerEntryPoint", BindingFlags.NonPublic | BindingFlags.Static));
+      var xAsmblr = new ILAssembler(typeof(ILOpProfiler), true);
+      var xScanner = new ILScanner(xAsmblr);
+      var xEntryPoint = typeof(Program).GetMethod("ScannerEntryPoint", BindingFlags.NonPublic | BindingFlags.Static);
+      xScanner.Execute(xEntryPoint);
 
       xSW.Stop();
       Console.WriteLine("Total time : {0}", xSW.Elapsed);

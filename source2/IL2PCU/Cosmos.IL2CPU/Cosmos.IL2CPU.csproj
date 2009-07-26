@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ILAssembler.cs" />
     <Compile Include="ILOp.cs" />
     <Compile Include="ILOpCode.cs" />
     <Compile Include="ILOpCodes\OpBranch.cs" />
