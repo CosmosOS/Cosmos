@@ -9,6 +9,6 @@ namespace Cosmos.IL2CPU.Profiler {
       : base(aOpCode) {
     }
 
-    public override void Assemble() { }
+    public override void Execute(UInt32 aMethodUID) { }
   }
 }

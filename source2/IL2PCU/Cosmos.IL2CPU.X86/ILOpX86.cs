@@ -10,7 +10,7 @@ namespace Cosmos.IL2CPU.X86 {
 		}
 
     //TODO: remove this when all descendants implement this
-    public override void Assemble() {
+    public override void Execute(UInt32 aMethodUID) {
     }
   }
 }
