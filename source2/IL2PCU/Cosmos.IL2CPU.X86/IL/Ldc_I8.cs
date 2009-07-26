@@ -9,7 +9,11 @@ namespace Cosmos.IL2CPU.X86.IL
 		{
 		}
 
-		#region Old code
+    public override void Execute(uint aMethodUID) {
+      throw new Exception("TODO:");
+    }
+
+    #region Old code
 		// using System;
 		// using System.IO;
 		// using CPU = Indy.IL2CPU.Assembler.X86;

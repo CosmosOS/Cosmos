@@ -3,7 +3,6 @@ using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using System.Reflection;
 using Indy.IL2CPU.Assembler;
-using Indy.IL2CPU.Compiler;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
