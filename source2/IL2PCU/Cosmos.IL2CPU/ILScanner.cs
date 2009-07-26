@@ -21,7 +21,7 @@ namespace Cosmos.IL2CPU {
     private HashSet<MethodBase> mMethodsSet = new HashSet<MethodBase>();
     private List<MethodBase> mMethods = new List<MethodBase>();
     private HashSet<Type> mTypesSet = new HashSet<Type>();
-    private HashSet<FieldInfo> mFieldsSet = new HashSet<FieldInfo>();
+    //private HashSet<FieldInfo> mFieldsSet = new HashSet<FieldInfo>();
     protected ILReader mReader;
 
     protected delegate ILOp ILOpCreateDelegate(ILOpCode aOpCode);
@@ -81,10 +81,6 @@ namespace Cosmos.IL2CPU {
     }
 
     public void Execute(MethodInfo aEntry) {
-      // IL Operations implicitly require these types
-      QueueType(typeof(string));
-      QueueType(typeof(int));
-
       QueueMethod(aEntry);
 
       // Cannot use foreach, the list changes as we go
@@ -136,48 +132,40 @@ namespace Cosmos.IL2CPU {
       if (!mMethodsSet.Contains(aMethod)) {
         mMethodsSet.Add(aMethod);
         mMethods.Add(aMethod);
-        QueueType(aMethod.DeclaringType);
-				var xMethodInfo = aMethod as MethodInfo;
-				if (xMethodInfo != null) {
-					QueueType(xMethodInfo.ReturnType);
-				}
-				foreach (var xParam in aMethod.GetParameters()) {
-					QueueType(xParam.ParameterType);
-				}
+        //QueueType(aMethod.DeclaringType);
+        //var xMethodInfo = aMethod as MethodInfo;
+        //if (xMethodInfo != null) {
+        //  QueueType(xMethodInfo.ReturnType);
+        //}
+        //foreach (var xParam in aMethod.GetParameters()) {
+        //  QueueType(xParam.ParameterType);
+        //}
       }
     }
 
-    protected void QueueStaticField(FieldInfo aFieldInfo) {
-			if (!mFieldsSet.Contains(aFieldInfo)) {
-				if (!aFieldInfo.IsStatic) {
-					throw new Exception("Cannot queue instance fields!");
-				}
-				mFieldsSet.Add(aFieldInfo);
-				QueueType(aFieldInfo.DeclaringType);
-				QueueType(aFieldInfo.FieldType);
-			}
-		}
+    //protected void QueueStaticField(FieldInfo aFieldInfo) {
+    //  if (!mFieldsSet.Contains(aFieldInfo)) {
+    //    if (!aFieldInfo.IsStatic) {
+    //      throw new Exception("Cannot queue instance fields!");
+    //    }
+    //    mFieldsSet.Add(aFieldInfo);
+    //    QueueType(aFieldInfo.DeclaringType);
+    //    QueueType(aFieldInfo.FieldType);
+    //  }
+    //}
 
     protected void QueueType(Type aType) {
-      if (aType != null) {
-        if (!mTypesSet.Contains(aType)) {
-          mTypesSet.Add(aType);
+      if (!mTypesSet.Contains(aType)) {
+        mTypesSet.Add(aType);
+        if (aType.BaseType != null) {
           QueueType(aType.BaseType);
-          foreach (var xMethod in aType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)) {
-            if (xMethod.DeclaringType == aType) {
-              if (xMethod.IsVirtual) {
-                QueueMethod(xMethod);
-              }
-            }
-          }
-					// queue static constructor
-					foreach (var xCctor in aType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public))
-					{
-						if (xCctor.DeclaringType == aType) {
-							QueueMethod(xCctor);
-						}
-					}
         }
+				// queue static constructor
+				foreach (var xCctor in aType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)) {
+					if (xCctor.DeclaringType == aType) {
+						QueueMethod(xCctor);
+					}
+				}
       }
     }
 
