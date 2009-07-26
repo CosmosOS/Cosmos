@@ -3,7 +3,7 @@ using System;
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Jmp)]
-	public class Jmp: ILOpX86
+	public class Jmp: ILOp
 	{
 		public Jmp(ILOpCode aOpCode):base(aOpCode)
 		{

@@ -3,7 +3,7 @@ using System;
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Beq)]
-	public class Beq: ILOpX86
+	public class Beq: ILOp
 	{
 		public Beq(ILOpCode aOpCode):base(aOpCode)
 		{

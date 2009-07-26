@@ -3,7 +3,7 @@ using System;
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Localloc)]
-	public class Localloc: ILOpX86
+	public class Localloc: ILOp
 	{
 		public Localloc(ILOpCode aOpCode):base(aOpCode)
 		{

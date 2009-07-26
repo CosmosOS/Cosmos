@@ -3,7 +3,7 @@ using System;
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Stloc)]
-	public class Stloc: ILOpX86
+	public class Stloc: ILOp
 	{
 		public Stloc(ILOpCode aOpCode):base(aOpCode)
 		{

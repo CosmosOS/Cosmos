@@ -3,7 +3,7 @@ using System;
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Switch)]
-	public class Switch: ILOpX86
+	public class Switch: ILOp
 	{
 		public Switch(ILOpCode aOpCode):base(aOpCode)
 		{

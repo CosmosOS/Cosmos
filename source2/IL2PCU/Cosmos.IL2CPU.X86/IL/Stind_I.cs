@@ -3,7 +3,7 @@ using System;
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Stind_I)]
-	public class Stind_I: ILOpX86
+	public class Stind_I: ILOp
 	{
 		public Stind_I(ILOpCode aOpCode):base(aOpCode)
 		{

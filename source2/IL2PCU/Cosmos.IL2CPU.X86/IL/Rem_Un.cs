@@ -3,7 +3,7 @@ using System;
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Rem_Un)]
-	public class Rem_Un: ILOpX86
+	public class Rem_Un: ILOp
 	{
 		public Rem_Un(ILOpCode aOpCode):base(aOpCode)
 		{

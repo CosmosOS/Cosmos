@@ -3,7 +3,7 @@ using System;
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Arglist)]
-	public class Arglist: ILOpX86
+	public class Arglist: ILOp
 	{
 		public Arglist(ILOpCode aOpCode):base(aOpCode)
 		{

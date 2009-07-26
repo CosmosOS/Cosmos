@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Reflection;
-using Indy.IL2CPU.Assembler.X86;
 using Cosmos.IL2CPU;
 using Cosmos.IL2CPU.X86;
+using Indy.IL2CPU.Assembler.X86;
 using S = Cosmos.Hardware.TextScreen;
 
 namespace HelloWorld {
@@ -17,7 +17,7 @@ namespace HelloWorld {
       //TODO: Move new build logic into new sort.
       // Build stuff is all UI, launching QEMU, making ISO etc.
       // IL2CPU should only contain scanning and assembling of binary files
-      var xAsmblr = new ILAssembler(typeof(ILOpX86));
+      var xAsmblr = new Cosmos.IL2CPU.Assembler(typeof(Cosmos.IL2CPU.X86.ILOp));
       var xScanner = new ILScanner(xAsmblr);
       var xEntryPoint = typeof(Program).GetMethod("Init", BindingFlags.Public | BindingFlags.Static);
 

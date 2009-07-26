@@ -3,7 +3,7 @@ using System;
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Cpblk)]
-	public class Cpblk: ILOpX86
+	public class Cpblk: ILOp
 	{
 		public Cpblk(ILOpCode aOpCode):base(aOpCode)
 		{

@@ -3,7 +3,7 @@ using System;
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Callvirt)]
-	public class Callvirt: ILOpX86
+	public class Callvirt: ILOp
 	{
 		public Callvirt(ILOpCode aOpCode):base(aOpCode)
 		{

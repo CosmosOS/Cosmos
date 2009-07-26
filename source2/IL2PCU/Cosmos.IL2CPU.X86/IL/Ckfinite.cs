@@ -3,7 +3,7 @@ using System;
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ckfinite)]
-	public class Ckfinite: ILOpX86
+	public class Ckfinite: ILOp
 	{
 		public Ckfinite(ILOpCode aOpCode):base(aOpCode)
 		{

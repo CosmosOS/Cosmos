@@ -3,7 +3,7 @@ using System;
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Mkrefany)]
-	public class Mkrefany: ILOpX86
+	public class Mkrefany: ILOp
 	{
 		public Mkrefany(ILOpCode aOpCode):base(aOpCode)
 		{

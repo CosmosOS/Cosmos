@@ -3,7 +3,7 @@ using System;
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldind_R4)]
-	public class Ldind_R4: ILOpX86
+	public class Ldind_R4: ILOp
 	{
 		public Ldind_R4(ILOpCode aOpCode):base(aOpCode)
 		{

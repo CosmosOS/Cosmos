@@ -3,7 +3,7 @@ using System;
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Dup)]
-	public class Dup: ILOpX86
+	public class Dup: ILOp
 	{
 		public Dup(ILOpCode aOpCode):base(aOpCode)
 		{

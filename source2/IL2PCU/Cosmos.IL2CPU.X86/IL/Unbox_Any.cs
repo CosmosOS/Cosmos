@@ -3,7 +3,7 @@ using System;
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Unbox_Any)]
-	public class Unbox_Any: ILOpX86
+	public class Unbox_Any: ILOp
 	{
 		public Unbox_Any(ILOpCode aOpCode):base(aOpCode)
 		{

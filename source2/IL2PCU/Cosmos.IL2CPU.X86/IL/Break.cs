@@ -3,7 +3,7 @@ using System;
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Break)]
-	public class Break: ILOpX86
+	public class Break: ILOp
 	{
 		public Break(ILOpCode aOpCode):base(aOpCode)
 		{

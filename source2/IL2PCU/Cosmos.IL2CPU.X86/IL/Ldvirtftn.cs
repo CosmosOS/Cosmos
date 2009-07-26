@@ -3,7 +3,7 @@ using System;
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldvirtftn)]
-	public class Ldvirtftn: ILOpX86
+	public class Ldvirtftn: ILOp
 	{
 		public Ldvirtftn(ILOpCode aOpCode):base(aOpCode)
 		{

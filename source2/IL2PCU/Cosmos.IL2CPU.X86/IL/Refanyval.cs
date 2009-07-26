@@ -3,7 +3,7 @@ using System;
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Refanyval)]
-	public class Refanyval: ILOpX86
+	public class Refanyval: ILOp
 	{
 		public Refanyval(ILOpCode aOpCode):base(aOpCode)
 		{

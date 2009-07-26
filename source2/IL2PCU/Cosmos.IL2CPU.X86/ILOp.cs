@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.IL2CPU.X86 {
-  public abstract class ILOpX86 : Cosmos.IL2CPU.ILOp {
-		protected ILOpX86(ILOpCode aOpCode):base(aOpCode)
+  public abstract class ILOp : Cosmos.IL2CPU.ILOp {
+		protected ILOp(ILOpCode aOpCode):base(aOpCode)
 		{
 		}
 

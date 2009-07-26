@@ -3,7 +3,7 @@ using System;
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Rethrow)]
-	public class Rethrow: ILOpX86
+	public class Rethrow: ILOp
 	{
 		public Rethrow(ILOpCode aOpCode):base(aOpCode)
 		{

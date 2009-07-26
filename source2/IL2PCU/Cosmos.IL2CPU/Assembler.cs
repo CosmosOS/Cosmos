@@ -5,16 +5,16 @@ using System.Reflection.Emit;
 using System.Text;
 
 namespace Cosmos.IL2CPU {
-  public class ILAssembler {
+  public class Assembler {
 
     protected delegate ILOp ILOpCreateDelegate(ILOpCode aOpCode);
     protected ILOpCreateDelegate[] mILOpsLo = new ILOpCreateDelegate[256];
     protected ILOpCreateDelegate[] mILOpsHi = new ILOpCreateDelegate[256];
 
-    public ILAssembler(Type aAssemblerBaseOp) : this(aAssemblerBaseOp, false) {
+    public Assembler(Type aAssemblerBaseOp) : this(aAssemblerBaseOp, false) {
     }
 
-    public ILAssembler(Type aAssemblerBaseOp, bool aSingleILOp) {
+    public Assembler(Type aAssemblerBaseOp, bool aSingleILOp) {
       if (aSingleILOp) {
         LoadILOp(aAssemblerBaseOp);
       } else {

@@ -3,7 +3,7 @@ using System;
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Volatile)]
-	public class Volatile: ILOpX86
+	public class Volatile: ILOp
 	{
 		public Volatile(ILOpCode aOpCode):base(aOpCode)
 		{

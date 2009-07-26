@@ -3,7 +3,7 @@ using System;
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Add_Ovf_Un)]
-	public class Add_Ovf_Un: ILOpX86
+	public class Add_Ovf_Un: ILOp
 	{
 		public Add_Ovf_Un(ILOpCode aOpCode):base(aOpCode)
 		{

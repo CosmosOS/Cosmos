@@ -3,7 +3,7 @@ using System;
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Bgt_Un)]
-	public class Bgt_Un: ILOpX86
+	public class Bgt_Un: ILOp
 	{
 		public Bgt_Un(ILOpCode aOpCode):base(aOpCode)
 		{

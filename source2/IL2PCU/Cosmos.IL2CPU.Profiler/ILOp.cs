@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.IL2CPU.Profiler {
-  public class ILOpProfiler : Cosmos.IL2CPU.ILOp {
-    public ILOpProfiler(ILOpCode aOpCode)
+  public class ILOp : Cosmos.IL2CPU.ILOp {
+    public ILOp(ILOpCode aOpCode)
       : base(aOpCode) {
     }
 

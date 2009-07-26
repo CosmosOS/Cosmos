@@ -22,9 +22,9 @@ namespace Cosmos.IL2CPU {
     private HashSet<Type> mTypesSet = new HashSet<Type>();
 
     protected ILReader mReader;
-    protected ILAssembler mAsmblr;
+    protected Assembler mAsmblr;
 
-    public ILScanner(ILAssembler aAsmblr) {
+    public ILScanner(Assembler aAsmblr) {
       mAsmblr = aAsmblr;
       mReader = new ILReader();
     }

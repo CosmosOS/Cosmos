@@ -3,7 +3,7 @@ using System;
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Leave)]
-	public class Leave: ILOpX86
+	public class Leave: ILOp
 	{
 		public Leave(ILOpCode aOpCode):base(aOpCode)
 		{

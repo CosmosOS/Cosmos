@@ -3,7 +3,7 @@ using System;
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Conv_U1)]
-	public class Conv_U1: ILOpX86
+	public class Conv_U1: ILOp
 	{
 		public Conv_U1(ILOpCode aOpCode):base(aOpCode)
 		{

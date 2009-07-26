@@ -3,7 +3,7 @@ using System;
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Or)]
-	public class Or: ILOpX86
+	public class Or: ILOp
 	{
 		public Or(ILOpCode aOpCode):base(aOpCode)
 		{

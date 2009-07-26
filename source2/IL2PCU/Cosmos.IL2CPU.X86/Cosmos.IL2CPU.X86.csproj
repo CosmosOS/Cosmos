@@ -49,7 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ILOpX86.cs" />
+    <Compile Include="ILOp.cs" />
     <Compile Include="IL\Add.cs" />
     <Compile Include="IL\Add_Ovf.cs" />
     <Compile Include="IL\Add_Ovf_Un.cs" />

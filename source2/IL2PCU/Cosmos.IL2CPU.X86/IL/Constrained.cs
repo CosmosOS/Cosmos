@@ -3,7 +3,7 @@ using System;
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Constrained)]
-	public class Constrained: ILOpX86
+	public class Constrained: ILOp
 	{
 		public Constrained(ILOpCode aOpCode):base(aOpCode)
 		{

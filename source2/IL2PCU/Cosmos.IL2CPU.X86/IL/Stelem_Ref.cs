@@ -3,7 +3,7 @@ using System;
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Stelem_Ref)]
-	public class Stelem_Ref: ILOpX86
+	public class Stelem_Ref: ILOp
 	{
 		public Stelem_Ref(ILOpCode aOpCode):base(aOpCode)
 		{

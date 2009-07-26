@@ -3,7 +3,7 @@ using System;
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Readonly)]
-	public class Readonly: ILOpX86
+	public class Readonly: ILOp
 	{
 		public Readonly(ILOpCode aOpCode):base(aOpCode)
 		{
