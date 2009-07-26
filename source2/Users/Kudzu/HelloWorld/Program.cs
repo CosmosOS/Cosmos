@@ -25,10 +25,10 @@ namespace HelloWorld {
       using (var xOldAsmblr = new CosmosAssembler(0)) {
         //InitializePlugs(aPlugs);
         xScanner.Execute(xEntryPoint);
+
 				var xPath = Path.GetDirectoryName(typeof(Program).Assembly.Location);
-				xPath = Path.Combine(xPath, "Output.asm");
-				using (var xOut = File.CreateText(xPath))
-				{
+				xPath = Path.Combine(xPath, @"..\..\Output.asm");
+				using (var xOut = File.CreateText(xPath)) {
 					xOldAsmblr.FlushText(xOut);
 				}
       }
