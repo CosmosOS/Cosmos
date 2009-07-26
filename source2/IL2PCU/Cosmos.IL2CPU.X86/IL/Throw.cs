@@ -1,4 +1,6 @@
 using System;
+using CPU = Indy.IL2CPU.Assembler;
+using CPUx86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -9,14 +11,10 @@ namespace Cosmos.IL2CPU.X86.IL
 		{
 		}
 
-		#region Old code
-		// using System;
-		// using System.IO;
-		// using System.Linq;
-		// using Indy.IL2CPU.Compiler;
-		// using CPU = Indy.IL2CPU.Assembler;
-		// using CPUx86 = Indy.IL2CPU.Assembler.X86;
-		// 
+    public override void Execute(uint aMethodUID) {
+      throw new Exception("TODO:");
+    }
+
 		// namespace Indy.IL2CPU.IL.X86 {
 		// 	[OpCode(OpCodeEnum.Throw)]
 		// 	public class Throw: Op {
@@ -44,6 +42,5 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 		}
 		// 	}
 		// }
-		#endregion Old code
 	}
 }
