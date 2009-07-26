@@ -8,8 +8,8 @@ namespace Cosmos.IL2CPU.ILOpCodes {
   public class OpField : ILOpCode {
     public readonly FieldInfo Value;
 
-    public OpField(Code aOpCode, FieldInfo aValue)
-      : base(aOpCode) {
+    public OpField(Code aOpCode, int aPos, FieldInfo aValue)
+      : base(aOpCode, aPos) {
       Value = aValue;
     }
   }

@@ -7,8 +7,8 @@ namespace Cosmos.IL2CPU.ILOpCodes {
   public class OpString : ILOpCode {
     public readonly string Value;
 
-    public OpString(Code aOpCode, string aValue)
-      : base(aOpCode) {
+    public OpString(Code aOpCode, int aPos, string aValue)
+      : base(aOpCode, aPos) {
       Value = aValue;
     }
   }

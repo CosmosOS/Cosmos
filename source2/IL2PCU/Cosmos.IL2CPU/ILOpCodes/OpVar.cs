@@ -7,8 +7,8 @@ namespace Cosmos.IL2CPU.ILOpCodes {
   public class OpVar : ILOpCode {
     public readonly UInt16 Value;
 
-    public OpVar(Code aOpCode, UInt16 aValue)
-      : base(aOpCode) {
+    public OpVar(Code aOpCode, int aPos, UInt16 aValue)
+      : base(aOpCode, aPos) {
       Value = aValue;
     }
   }

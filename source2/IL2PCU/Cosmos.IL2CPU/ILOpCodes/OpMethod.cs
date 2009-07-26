@@ -8,8 +8,8 @@ namespace Cosmos.IL2CPU.ILOpCodes {
   public class OpMethod : ILOpCode {
     public readonly MethodBase Value;
 
-    public OpMethod(Code aOpCode, MethodBase aValue)
-      : base(aOpCode) {
+    public OpMethod(Code aOpCode, int aPos, MethodBase aValue)
+      : base(aOpCode, aPos) {
       Value = aValue;
     }
   }
