@@ -40,6 +40,17 @@ namespace Cosmos.IL2CPU {
     }
 
     protected void LoadILOp(Type aAssemblerBaseOp) {
+      //TODO: Contructor.Invoke nearly doubles scanner time. Comment it out and
+      // profiler runs about twice as fast. See if we can speed this up
+      // http://blogs.msdn.com/haibo_luo/archive/2005/11/17/494009.aspx
+      //TODO: Need to modify it to pass the arguments too for the contructor, then profile it and see if its much faster
+      //mOps = new Func<ILOp>[0xFE1F];
+      //      var xTemp = new DynamicMethod("Create_" + xAttrib.OpCode + "_Obj", typeof(ILOp), new Type[0], true);
+      //      var xGen = xTemp.GetILGenerator();
+      //      var xCtor = xType.GetConstructor(new Type[0]);
+      //      xGen.Emit(OpCodes.Newobj, xCtor);
+      //      xGen.Emit(OpCodes.Ret);
+      //      mOps[(ushort)xAttrib.OpCode] = (Func<ILOp>)xTemp.CreateDelegate(typeof(Func<ILOp>));
       var xCtor = aAssemblerBaseOp.GetConstructors()[0];
       // Don't change the type in the foreach to a var, its necessary as it is now
       // to typecast it, so we can then recast to an int.
@@ -114,19 +125,6 @@ namespace Cosmos.IL2CPU {
           } else {
             xCtor = mILOpsHi[xOpCodeVal & 0xFF];
           }
-          //TODO: This invoke nearly doubles scanner time. Comment it out and
-          // profiler runs about twice as fast. See if we can speed this up
-          // http://blogs.msdn.com/haibo_luo/archive/2005/11/17/494009.aspx
-          #region Emit Method
-          //TODO: Need to modify it to pass the arguments too for the contructor, then profile it and see if its much faster
-          //mOps = new Func<ILOp>[0xFE1F];
-          //      var xTemp = new DynamicMethod("Create_" + xAttrib.OpCode + "_Obj", typeof(ILOp), new Type[0], true);
-          //      var xGen = xTemp.GetILGenerator();
-          //      var xCtor = xType.GetConstructor(new Type[0]);
-          //      xGen.Emit(OpCodes.Newobj, xCtor);
-          //      xGen.Emit(OpCodes.Ret);
-          //      mOps[(ushort)xAttrib.OpCode] = (Func<ILOp>)xTemp.CreateDelegate(typeof(Func<ILOp>));
-          #endregion
           var xILOp = (ILOp)xCtor.Invoke(new object[] { xOpCode });
           xILOp.Execute(0);
         }
