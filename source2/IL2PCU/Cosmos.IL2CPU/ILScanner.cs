@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 
 namespace Cosmos.IL2CPU {
-  public class ILScanner {
+	public class ILScanner {
     //Note: We have both HashSet and List because HashSet.Contains is much faster
     // than List.Contains. Also in the future we may remove items from the List
     // which have already been processed yet need to keep them in HashSet.
@@ -17,6 +17,7 @@ namespace Cosmos.IL2CPU {
     // know they are already done. Currently HashSet uses a reference though, so we
     // need to hash on some UID instead of the refernce. Do not use strings, they are
     // super slow.
+		//	TODO: We need to scan for static fields too. 
     private HashSet<MethodBase> mMethodsSet = new HashSet<MethodBase>();
     private List<MethodBase> mMethods = new List<MethodBase>();
     private HashSet<Type> mTypesSet = new HashSet<Type>();
@@ -103,6 +104,7 @@ namespace Cosmos.IL2CPU {
         if (aType.BaseType != null) {
           QueueType(aType.BaseType);
         }
+				// TODO: dont we need to do the VMT scan?
 				// queue static constructor
 				foreach (var xCctor in aType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)) {
 					if (xCctor.DeclaringType == aType) {
