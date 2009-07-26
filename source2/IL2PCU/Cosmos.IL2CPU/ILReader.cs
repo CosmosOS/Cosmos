@@ -75,9 +75,83 @@ namespace Cosmos.IL2CPU {
         ILOpCode xILOpCode = null;
         switch (xOpCode.OperandType) {
           // No operand.
-          case OperandType.InlineNone:
-            xILOpCode = new ILOpCodes.OpNone(xOpCodeVal);
+          case OperandType.InlineNone: {
+              // These shortcut translation regions expand shortcut ops into full ops
+              // This elminates the amount of code required in the assemblers
+              // by allowing them to ignore the shortcuts
+              switch (xOpCodeVal) {
+                case ILOpCode.Code.Ldarg_0:
+                  xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldarg, 0);
+                  break;
+                case ILOpCode.Code.Ldarg_1:
+                  xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldarg, 1);
+                  break;
+                case ILOpCode.Code.Ldarg_2:
+                  xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldarg, 2);
+                  break;
+                case ILOpCode.Code.Ldarg_3:
+                  xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldarg, 3);
+                  break;
+                case ILOpCode.Code.Ldc_I4_0:
+                  xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, 0);
+                  break;
+                case ILOpCode.Code.Ldc_I4_1:
+                  xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, 1);
+                  break;
+                case ILOpCode.Code.Ldc_I4_2:
+                  xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, 2);
+                  break;
+                case ILOpCode.Code.Ldc_I4_3:
+                  xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, 3);
+                  break;
+                case ILOpCode.Code.Ldc_I4_4:
+                  xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, 4);
+                  break;
+                case ILOpCode.Code.Ldc_I4_5:
+                  xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, 5);
+                  break;
+                case ILOpCode.Code.Ldc_I4_6:
+                  xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, 6);
+                  break;
+                case ILOpCode.Code.Ldc_I4_7:
+                  xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, 7);
+                  break;
+                case ILOpCode.Code.Ldc_I4_8:
+                  xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, 8);
+                  break;
+                case ILOpCode.Code.Ldc_I4_M1:
+                  xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, 0xFFFFFFFF);
+                  break;
+                case ILOpCode.Code.Ldloc_0:
+                  xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldloc, 0);
+                  break;
+                case ILOpCode.Code.Ldloc_1:
+                  xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldloc, 1);
+                  break;
+                case ILOpCode.Code.Ldloc_2:
+                  xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldloc, 2);
+                  break;
+                case ILOpCode.Code.Ldloc_3:
+                  xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldloc, 3);
+                  break;
+                case ILOpCode.Code.Stloc_0:
+                  xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Stloc, 0);
+                  break;
+                case ILOpCode.Code.Stloc_1:
+                  xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Stloc, 1);
+                  break;
+                case ILOpCode.Code.Stloc_2:
+                  xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Stloc, 2);
+                  break;
+                case ILOpCode.Code.Stloc_3:
+                  xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Stloc, 3);
+                  break;
+                default:
+                  xILOpCode = new ILOpCodes.OpNone(xOpCodeVal);
+                  break;
+            }
             break;
+          }
 
           case OperandType.ShortInlineBrTarget: {
               // By calculating target, we assume all branches are within a method
@@ -85,7 +159,53 @@ namespace Cosmos.IL2CPU {
               // just in case.
               int xTarget = xPos + 1 + (sbyte)xIL[xPos];
               CheckBranch(xTarget, xIL.Length);
-              xILOpCode = new ILOpCodes.OpBranch(xOpCodeVal, xTarget);
+              switch (xOpCodeVal) {
+                case ILOpCode.Code.Beq_S:
+                  xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Beq, xTarget);
+                  break;
+                case ILOpCode.Code.Bge_S:
+                  xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Bge, xTarget);
+                  break;
+                case ILOpCode.Code.Bge_Un_S:
+                  xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Bge_Un, xTarget);
+                  break;
+                case ILOpCode.Code.Bgt_S:
+                  xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Bgt, xTarget);
+                  break;
+                case ILOpCode.Code.Bgt_Un_S:
+                  xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Bgt_Un, xTarget);
+                  break;
+                case ILOpCode.Code.Ble_S:
+                  xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Ble, xTarget);
+                  break;
+                case ILOpCode.Code.Ble_Un_S:
+                  xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Ble_Un, xTarget);
+                  break;
+                case ILOpCode.Code.Blt_S:
+                  xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Blt, xTarget);
+                  break;
+                case ILOpCode.Code.Blt_Un_S:
+                  xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Blt_Un, xTarget);
+                  break;
+                case ILOpCode.Code.Bne_Un_S:
+                  xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Bne_Un, xTarget);
+                  break;
+                case ILOpCode.Code.Br_S:
+                  xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Br, xTarget);
+                  break;
+                case ILOpCode.Code.Brfalse_S:
+                  xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Brfalse, xTarget);
+                  break;
+                case ILOpCode.Code.Brtrue_S:
+                  xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Brtrue, xTarget);
+                  break;
+                case ILOpCode.Code.Leave_S:
+                  xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Leave, xTarget);
+                  break;
+                default:
+                  xILOpCode = new ILOpCodes.OpBranch(xOpCodeVal, xTarget);
+                  break;
+              }
               xPos = xPos + 1;
               break;
             }
@@ -98,7 +218,14 @@ namespace Cosmos.IL2CPU {
             }
 
           case OperandType.ShortInlineI:
-            xILOpCode = new ILOpCodes.OpInt(xOpCodeVal, xIL[xPos]);
+            switch (xOpCodeVal) {
+              case ILOpCode.Code.Ldc_I4_S:
+                xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, xIL[xPos]);
+                break;
+              default:
+                xILOpCode = new ILOpCodes.OpInt(xOpCodeVal, xIL[xPos]);
+                break;
+            }
             xPos = xPos + 1;
             break;
           case OperandType.InlineI:
@@ -176,7 +303,29 @@ namespace Cosmos.IL2CPU {
             }
 
           case OperandType.ShortInlineVar:
-            xILOpCode = new ILOpCodes.OpVar(xOpCodeVal, xIL[xPos]);
+            switch (xOpCodeVal) {
+              case ILOpCode.Code.Ldloc_S:
+                xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldloc, xIL[xPos]);
+                break;
+              case ILOpCode.Code.Ldloca_S:
+                xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldloca, xIL[xPos]);
+                break;
+              case ILOpCode.Code.Ldarg_S:
+                xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldarg, xIL[xPos]);
+                break;
+              case ILOpCode.Code.Ldarga_S:
+                xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldarga, xIL[xPos]);
+                break;
+              case ILOpCode.Code.Starg_S:
+                xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Starg, xIL[xPos]);
+                break;
+              case ILOpCode.Code.Stloc_S:
+                xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Stloc, xIL[xPos]);
+                break;
+              default:
+                xILOpCode = new ILOpCodes.OpVar(xOpCodeVal, xIL[xPos]);
+                break;
+            }
             xPos = xPos + 1;
             break;
           case OperandType.InlineVar:
@@ -187,153 +336,6 @@ namespace Cosmos.IL2CPU {
           default:
             throw new Exception("Unknown OperandType");
         }
-
-        //TODO: Complete these shortcuts
-        #region Expand shortcuts
-        // This region expands shortcut ops into full ops
-        // This elminates the amount of code required in the assemblers
-        // by allowing them to ignore the shortcuts
-        switch (xOpCodeVal) {
-          case ILOpCode.Code.Beq_S:
-            //TODO: xILOpCode = new ILOpCodes.xxx(ILOpCode.Code.Beq, xILOpCode.value);
-            break;
-          case ILOpCode.Code.Bge_S:
-            //TODO: return Code.Bge;
-            break;
-          case ILOpCode.Code.Bge_Un_S:
-            //return Code.Bge_Un;
-            break;
-          case ILOpCode.Code.Bgt_S:
-            //TODO: return Code.Bgt;
-            break;
-          case ILOpCode.Code.Bgt_Un_S:
-            //return Code.Bgt_Un;
-            break;
-          case ILOpCode.Code.Ble_S:
-            //TODO: return Code.Ble;
-            break;
-          case ILOpCode.Code.Ble_Un_S:
-            //TODO: return Code.Ble_Un;
-            break;
-          case ILOpCode.Code.Blt_S:
-            //TODO: return Code.Blt;
-            break;
-          case ILOpCode.Code.Blt_Un_S:
-            //TODO: return Code.Blt_Un;
-            break;
-          case ILOpCode.Code.Bne_Un_S:
-            //TODO: return Code.Bne_Un;
-            break;
-          case ILOpCode.Code.Br_S:
-            //TODO: return Code.Br;
-            break;
-          case ILOpCode.Code.Brfalse_S:
-            //TODO: return Code.Brfalse;
-            break;
-          case ILOpCode.Code.Brtrue_S:
-            //TODO: return Code.Brtrue;
-            break;
-
-          case ILOpCode.Code.Ldarg_0:
-            xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldarg, 0);
-            break;
-          case ILOpCode.Code.Ldarg_1:
-            xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldarg, 1);
-            break;
-          case ILOpCode.Code.Ldarg_2:
-            xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldarg, 2);
-            break;
-          case ILOpCode.Code.Ldarg_3:
-            xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldarg, 3);
-            break;
-          case ILOpCode.Code.Ldarg_S:
-            xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldarg, ((ILOpCodes.OpVar)xILOpCode).Value);
-            break;
-
-          case ILOpCode.Code.Ldarga_S:
-            xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldarga, ((ILOpCodes.OpVar)xILOpCode).Value);
-            break;
-
-          case ILOpCode.Code.Ldc_I4_0:
-            xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, 0);
-            break;
-          case ILOpCode.Code.Ldc_I4_1:
-            xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, 1);
-            break;
-          case ILOpCode.Code.Ldc_I4_2:
-            xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, 2);
-            break;
-          case ILOpCode.Code.Ldc_I4_3:
-            xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, 3);
-            break;
-          case ILOpCode.Code.Ldc_I4_4:
-            xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, 4);
-            break;
-          case ILOpCode.Code.Ldc_I4_5:
-            xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, 5);
-            break;
-          case ILOpCode.Code.Ldc_I4_6:
-            xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, 6);
-            break;
-          case ILOpCode.Code.Ldc_I4_7:
-            xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, 7);
-            break;
-          case ILOpCode.Code.Ldc_I4_8:
-            xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, 8);
-            break;
-          case ILOpCode.Code.Ldc_I4_M1:
-            xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, 0xFFFFFFFF);
-            break;
-          case ILOpCode.Code.Ldc_I4_S:
-            xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, ((ILOpCodes.OpInt)xILOpCode).Value);
-            break;
-
-          case ILOpCode.Code.Ldloc_0:
-            xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldloc, 0);
-            break;
-          case ILOpCode.Code.Ldloc_1:
-            xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldloc, 1);
-            break;
-          case ILOpCode.Code.Ldloc_2:
-            xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldloc, 2);
-            break;
-          case ILOpCode.Code.Ldloc_3:
-            xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldloc, 3);
-            break;
-          case ILOpCode.Code.Ldloc_S:
-            xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldloc, ((ILOpCodes.OpVar)xILOpCode).Value);
-            break;
-
-          case ILOpCode.Code.Ldloca_S:
-            xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldloca, ((ILOpCodes.OpVar)xILOpCode).Value);
-            break;
-
-          case ILOpCode.Code.Leave_S:
-            //TODO: return Code.Leave;
-            break;
-
-          case ILOpCode.Code.Starg_S:
-            //TODO: return Code.Starg;
-            break;
-
-          case ILOpCode.Code.Stloc_0:
-            xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Stloc, 0);
-            break;
-          case ILOpCode.Code.Stloc_1:
-            xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Stloc, 1);
-            break;
-          case ILOpCode.Code.Stloc_2:
-            xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Stloc, 2);
-            break;
-          case ILOpCode.Code.Stloc_3:
-            xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Stloc, 3);
-            break;
-          case ILOpCode.Code.Stloc_S:
-            xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Stloc, ((ILOpCodes.OpVar)xILOpCode).Value);
-            break;
-        }
-#endregion
-
         xResult.Add(xILOpCode);
       }
       return xResult;
