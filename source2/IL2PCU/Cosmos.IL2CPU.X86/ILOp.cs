@@ -13,8 +13,5 @@ namespace Cosmos.IL2CPU.X86 {
 
     protected readonly CPU.Assembler Asmblr;
 
-    //TODO: remove this when all descendants implement this
-    public override void Execute(UInt32 aMethodUID) {
-    }
   }
 }
