@@ -55,6 +55,14 @@
       <Project>{819DB8FC-5DA1-461F-83C9-2F5C88088C94}</Project>
       <Name>Cosmos.Sys</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\IL2PCU\Cosmos.IL2CPU.X86\Cosmos.IL2CPU.X86.csproj">
+      <Project>{63F7BFB9-419E-4965-B580-304B9C9FA7D8}</Project>
+      <Name>Cosmos.IL2CPU.X86</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\IL2PCU\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj">
+      <Project>{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}</Project>
+      <Name>Cosmos.IL2CPU</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

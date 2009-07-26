@@ -1,6 +1,9 @@
 ﻿using System;
-using Cosmos.Compiler.Builder;
+using System.Reflection;
+using Cosmos.IL2CPU;
+using Cosmos.IL2CPU.X86;
 using S = Cosmos.Hardware.TextScreen;
+
 namespace HelloWorld {
 	class Program {
 		#region Cosmos Builder logic
@@ -12,8 +15,9 @@ namespace HelloWorld {
       //TODO: Move new build logic into new sort.
       // Build stuff is all UI, launching QEMU, making ISO etc.
       // IL2CPU should only contain scanning and assembling of binary files
-      var xScanner = new ILScanner(typeof(ILOpProfiler), true);
-      xScanner.Execute(typeof(Program).GetMethod("ScannerEntryPoint", BindingFlags.NonPublic | BindingFlags.Static));
+      var xScanner = new ILScanner(typeof(ILOpX86));
+      var xEntryPoint = typeof(Program).GetMethod("Init", BindingFlags.Public | BindingFlags.Static);
+      xScanner.Execute(xEntryPoint);
     }
 		#endregion
 
