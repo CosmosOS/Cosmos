@@ -30,6 +30,8 @@ namespace Cosmos.IL2CPU {
     }
 
     // http://blogs.msdn.com/haibo_luo/archive/2005/11/17/494009.aspx
+    // TODO: The ops are very minimalistic, we can probably do better by converting them to instances
+    // and passing all data across execute. They have no instance data that needs preserved between calls, etc.
     protected ILOpCreateDelegate CreateCtorDelegate(Type aType) {
       var xMethod = new DynamicMethod("", typeof(ILOp), new Type[] { typeof(ILOpCode) }, typeof(ILScanner).Module);
       var xGen = xMethod.GetILGenerator();

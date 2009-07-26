@@ -12,7 +12,8 @@ namespace Cosmos.IL2CPU.X86.IL
 
 		public override void Execute(uint aMethodUID)
 		{
-			Add(Asmblr);
+      throw new Exception("TODO:");
+			//Add(Asmblr);
 		}
 	}
 }
