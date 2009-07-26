@@ -8,21 +8,20 @@ using System.IO;
 
 namespace HelloWorld {
 	class Program {
-		#region Cosmos Builder logic
+		//#region Cosmos Builder logic
 		// Most users wont touch this. This will call the Cosmos Build tool
 		[STAThread]
 		static void Main(string[] args) {
       //Indy.IL2CPU.Engine.Execute()
       // which is called from Builder.RunEngine()
 
-      //TODO: Move new build logic into new sort.
-      // Build stuff is all UI, launching QEMU, making ISO etc.
-      // IL2CPU should only contain scanning and assembling of binary files
-      var xAsmblr = new Cosmos.IL2CPU.X86.AssemblerNasm();
-      var xScanner = new ILScanner(xAsmblr);
-      var xEntryPoint = typeof(Program).GetMethod("Init", BindingFlags.Public | BindingFlags.Static);
-
       using (var xOldAsmblr = new CosmosAssembler(0)) {
+        //TODO: Move new build logic into "new sort".
+        // Build stuff is all UI, launching QEMU, making ISO etc.
+        // IL2CPU should only contain scanning and assembling of binary files
+        var xAsmblr = new Cosmos.IL2CPU.X86.AssemblerNasm();
+        var xScanner = new ILScanner(xAsmblr);
+        var xEntryPoint = typeof(Program).GetMethod("Init", BindingFlags.Public | BindingFlags.Static);
         //InitializePlugs(aPlugs);
         xScanner.Execute(xEntryPoint);
 
@@ -33,7 +32,7 @@ namespace HelloWorld {
 				}
       }
     }
-		#endregion
+		//#endregion
 
 		// Main entry point of the kernel
 		public static void Init() {
