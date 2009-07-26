@@ -58,8 +58,7 @@
     <Compile Include="IL\Add_Ovf_Un.cs" />
     <Compile Include="IL\And.cs" />
     <Compile Include="IL\Arglist.cs" />
-    <Compile Include="IL\Beq.cs" />
-    <Compile Include="IL\Bge.cs" />
+    <Compile Include="IL\Branch.cs" />
     <Compile Include="IL\Bge_Un.cs" />
     <Compile Include="IL\Bgt.cs" />
     <Compile Include="IL\Bgt_Un.cs" />

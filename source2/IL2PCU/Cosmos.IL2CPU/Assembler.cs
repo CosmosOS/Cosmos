@@ -32,14 +32,16 @@ namespace Cosmos.IL2CPU {
     protected void InitILOps(Type aAssemblerBaseOp) {
       foreach (var xType in aAssemblerBaseOp.Assembly.GetExportedTypes()) {
         if (xType.IsSubclassOf(aAssemblerBaseOp)) {
-          var xAttrib = (OpCodeAttribute)xType.GetCustomAttributes(typeof(OpCodeAttribute), false)[0];
-          var xOpCode = (ushort)xAttrib.OpCode;
-          var xCtor = xType.GetConstructor(new Type[] {typeof(Assembler)});
-          var xILOp = (ILOp)xCtor.Invoke(new Object[] {this});
-          if (xOpCode <= 0xFF) {
-            mILOpsLo[xOpCode] = xILOp;
-          } else {
-            mILOpsHi[xOpCode & 0xFF] = xILOp;
+          var xAttribs = (OpCodeAttribute[])xType.GetCustomAttributes(typeof(OpCodeAttribute), false);
+          foreach(var xAttrib in xAttribs) {
+            var xOpCode = (ushort)xAttrib.OpCode;
+            var xCtor = xType.GetConstructor(new Type[] {typeof(Assembler)});
+            var xILOp = (ILOp)xCtor.Invoke(new Object[] {this});
+            if (xOpCode <= 0xFF) {
+              mILOpsLo[xOpCode] = xILOp;
+            } else {
+              mILOpsHi[xOpCode & 0xFF] = xILOp;
+            }
           }
         }
       }

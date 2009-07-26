@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.IL2CPU {
 
-    [AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = true)]
     public class OpCodeAttribute : Attribute {
       public readonly ILOpCode.Code OpCode;
 
