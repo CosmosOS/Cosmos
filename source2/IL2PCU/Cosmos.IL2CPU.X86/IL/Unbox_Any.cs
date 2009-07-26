@@ -11,7 +11,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		}
 
     public override void Execute(uint aMethodUID) {
-      base.Execute(aMethodUID);
+      throw new Exception("TODO:");
     }
 
   }
