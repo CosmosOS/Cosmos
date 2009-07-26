@@ -5,19 +5,15 @@ using CPU = Indy.IL2CPU.Assembler.X86;
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Beq)]
-	public class Beq: ILOp
-	{
+	public class Beq: ILOp {
 
-    public Beq(Cosmos.IL2CPU.Assembler aAsmblr) : base(aAsmblr)
-		{
+    public Beq(Cosmos.IL2CPU.Assembler aAsmblr) : base(aAsmblr) {
 		}
 
-    public override void Execute(uint aMethodUID, ILOpCode aOpCode)
-		{
+    public override void Execute(uint aMethodUID, ILOpCode aOpCode) {
 			var xStackContent = OldAsmblr.StackContents.Pop();
 			OldAsmblr.StackContents.Pop();
-			if (xStackContent.Size > 8)
-			{
+			if (xStackContent.Size > 8) {
 				throw new Exception("StackSize>8 not supported");
 			}
 			string BaseLabel = "_" + aMethodUID + "_" + ((ILOpCodes.OpBranch)aOpCode).Value + "__";
