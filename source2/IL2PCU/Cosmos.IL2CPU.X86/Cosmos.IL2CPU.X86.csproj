@@ -49,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assembler.cs" />
     <Compile Include="AssemblerBin.cs" />
     <Compile Include="AssemblerNasm.cs" />
     <Compile Include="ILOp.cs" />
