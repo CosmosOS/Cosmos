@@ -15,7 +15,7 @@ namespace Cosmos.IL2CPU {
     //TODO: These store the MethodBase which also have the IL for the body in memory
     // For large asms this could eat lot of RAM. Should convert this to remove
     // items from the list after they are processed but keep them in HashSet so we
-    // know they are already done. Currently HashSet uses a refernece though, so we
+    // know they are already done. Currently HashSet uses a reference though, so we
     // need to hash on some UID instead of the refernce. Do not use strings, they are
     // super slow.
     private HashSet<MethodBase> mMethodsSet = new HashSet<MethodBase>();
