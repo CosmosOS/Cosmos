@@ -216,9 +216,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU.Profiler", ".
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU.X86", "..\source2\IL2PCU\Cosmos.IL2CPU.X86\Cosmos.IL2CPU.X86.csproj", "{63F7BFB9-419E-4965-B580-304B9C9FA7D8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelloWorld", "..\source2\Users\Kudzu\HelloWorld\HelloWorld.csproj", "{28D7710D-5930-40BE-BB71-D30F01294EDF}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 67
+		SccNumberOfProjects = 68
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -486,6 +488,10 @@ Global
 		SccProjectTopLevelParentUniqueName66 = Cosmos.sln
 		SccProjectName66 = ../source2/IL2PCU/Cosmos.IL2CPU.X86
 		SccLocalPath66 = ..\\source2\\IL2PCU\\Cosmos.IL2CPU.X86
+		SccProjectUniqueName67 = ..\\source2\\Users\\Kudzu\\HelloWorld\\HelloWorld.csproj
+		SccProjectTopLevelParentUniqueName67 = Cosmos.sln
+		SccProjectName67 = ../source2/Users/Kudzu/HelloWorld
+		SccLocalPath67 = ..\\source2\\Users\\Kudzu\\HelloWorld
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -756,6 +762,10 @@ Global
 		{63F7BFB9-419E-4965-B580-304B9C9FA7D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{63F7BFB9-419E-4965-B580-304B9C9FA7D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{63F7BFB9-419E-4965-B580-304B9C9FA7D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28D7710D-5930-40BE-BB71-D30F01294EDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28D7710D-5930-40BE-BB71-D30F01294EDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28D7710D-5930-40BE-BB71-D30F01294EDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28D7710D-5930-40BE-BB71-D30F01294EDF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -850,6 +860,7 @@ Global
 		{9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6} = {A4478219-065D-4928-BB4D-4358CAD39A03}
 		{9A806542-A3FE-479B-83C2-E3380BC372F3} = {A4478219-065D-4928-BB4D-4358CAD39A03}
 		{5F424AF3-8D92-4C0F-AD6D-EB5A187F9FE6} = {A4478219-065D-4928-BB4D-4358CAD39A03}
+		{28D7710D-5930-40BE-BB71-D30F01294EDF} = {9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6}
 		{61535AF6-4A1E-4691-B2BC-039851EF4850} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
 		{B2D0F851-65FB-4DE9-A55D-5491062F8FE0} = {5F424AF3-8D92-4C0F-AD6D-EB5A187F9FE6}
 		{54ACC512-D568-4F7C-9204-E1A4A285EFF2} = {54DD5F71-82C3-44D7-99F0-A93B54C220F7}
