@@ -7,10 +7,10 @@ using System.Collections.Generic;
 namespace Cosmos.IL2CPU.X86.IL {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldc_I4)]
 	public class Ldc_I4: ILOp {
-		public Ldc_I4(ILOpCode aOpCode):base(aOpCode) { }
+		public Ldc_I4(ILOpCode aOpCode):base(aOpCode) {}
 
     public override void Execute(uint aMethodUID) {
-      new CPU.Push { DestinationValue = ((OpInt)OpCode).Value };
+			new CPU.Push { DestinationValue = ((OpInt)OpCode).Value };
       Asmblr.StackContents.Push(new StackContent(4, typeof(int)));
     }
 

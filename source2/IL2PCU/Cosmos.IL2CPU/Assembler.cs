@@ -24,7 +24,7 @@ namespace Cosmos.IL2CPU {
         } else {
           xCtor = mILOpsHi[xOpCodeVal & 0xFF];
         }
-        var xILOp = xCtor(xOpCode);
+				var xILOp = xCtor(xOpCode);
         xILOp.Execute(aMethodUID);
       }
     }
@@ -33,7 +33,7 @@ namespace Cosmos.IL2CPU {
     protected ILOpCreateDelegate CreateCtorDelegate(Type aType) {
       var xMethod = new DynamicMethod("", typeof(ILOp), new Type[] { typeof(ILOpCode) }, typeof(ILScanner).Module);
       var xGen = xMethod.GetILGenerator();
-      xGen.Emit(OpCodes.Ldarg_1);
+      xGen.Emit(OpCodes.Ldarg_0);
       xGen.Emit(OpCodes.Newobj, aType.GetConstructor(new Type[] { typeof(ILOpCode) }));
       xGen.Emit(OpCodes.Ret);
       return (ILOpCreateDelegate)xMethod.CreateDelegate(typeof(ILOpCreateDelegate));

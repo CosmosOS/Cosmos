@@ -23,7 +23,6 @@ namespace HelloWorld {
 
       using (var xOldAsmblr = new CosmosAssembler(0)) {
         //InitializePlugs(aPlugs);
-
         xScanner.Execute(xEntryPoint);
       }
     }

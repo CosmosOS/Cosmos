@@ -35,7 +35,7 @@ namespace Cosmos.IL2CPU {
 
       // Cannot use foreach, the list changes as we go
       for (int i = 0; i < mMethods.Count; i++) {
-        ScanMethod(mMethods[i], (UInt32)i);
+				ScanMethod(mMethods[i], (UInt32)i);
       }
     }
 
