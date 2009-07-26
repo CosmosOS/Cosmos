@@ -89,11 +89,11 @@ namespace Cosmos.IL2CPU {
 
       // Cannot use foreach, the list changes as we go
       for (int i = 0; i < mMethods.Count; i++) {
-        ScanMethod(mMethods[i]);
+        ScanMethod(mMethods[i], (UInt32)i);
       }
     }
 
-    private void ScanMethod(MethodBase aMethodBase) {
+    private void ScanMethod(MethodBase aMethodBase, UInt32 aMethodUID) {
       if ((aMethodBase.Attributes & MethodAttributes.PinvokeImpl) != 0) {
         // pinvoke methods dont have an embedded implementation
         return;
@@ -127,7 +127,7 @@ namespace Cosmos.IL2CPU {
             xCtor = mILOpsHi[xOpCodeVal & 0xFF];
           }
           var xILOp = xCtor(xOpCode);
-          xILOp.Execute(0);
+          xILOp.Execute(aMethodUID);
         }
       }
     }
