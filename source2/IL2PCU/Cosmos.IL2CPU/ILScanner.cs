@@ -23,7 +23,6 @@ namespace Cosmos.IL2CPU {
     private HashSet<FieldInfo> mFieldsSet = new HashSet<FieldInfo>();
     protected ILReader mReader;
 
-    // is a lot faster than calling GetConstructor than invoke
     protected ConstructorInfo[] mILOpsLo = new ConstructorInfo[256];
     protected ConstructorInfo[] mILOpsHi = new ConstructorInfo[256];
 
