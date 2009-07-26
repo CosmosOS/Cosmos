@@ -12,7 +12,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		}
 
     public override void Execute(uint aMethodUID, ILOpCode aOpCode) {
-      throw new Exception("TODO:");
+      //TODO: Implement this Op
     }
 
 		// namespace Indy.IL2CPU.IL.X86 {

@@ -44,7 +44,7 @@ namespace Cosmos.IL2CPU.X86.IL
       OldAsmblr.StackContents.Push(xStackContent);			
 		}
 
-		#region Old code
+		
 		// using System;
 		// using System.IO;
 		// 
@@ -63,6 +63,6 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 		}
 		// 	}
 		// }
-		#endregion Old code
+		
 	}
 }

@@ -14,7 +14,7 @@ namespace Cosmos.IL2CPU.X86.IL
 			throw new NotImplementedException("Arglist not yet implemented!");
 		}
 
-		#region Old code
+		
 		// using System;
 		// using System.IO;
 		// 
@@ -41,6 +41,6 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 		}
 		// 	}
 		// }
-		#endregion Old code
+		
 	}
 }

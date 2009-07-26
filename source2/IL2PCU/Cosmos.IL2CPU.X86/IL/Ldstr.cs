@@ -10,10 +10,10 @@ namespace Cosmos.IL2CPU.X86.IL
 		}
 
     public override void Execute(uint aMethodUID, ILOpCode aOpCode) {
-      throw new Exception("TODO:");
+      //TODO: Implement this Op
     }
 
-    #region Old code
+    
 		// using System;
 		// using System.Linq;
 		// using System.Text;
@@ -91,6 +91,6 @@ namespace Cosmos.IL2CPU.X86.IL
 		//         }
 		//     }
 		// }
-		#endregion Old code
+		
 	}
 }
