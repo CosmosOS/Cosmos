@@ -29,23 +29,23 @@ namespace Cosmos.Kernel.MM
         private uint m_pageSize ; 
         uint m_pages;
 
-        LinkedList<PageRegion> m_availableMemoryRegions  ;  //small at front , big at back 
+        LinkedList<PageAllocation> m_availableMemoryRegions  ;  //small at front , big at back 
 
         //TODO extend exisitng space support
 
 
-         internal MemoryPageTable( UIntPtr baseAddress, uint pages) : this (baseAddress, pages, 1 << 20 , new LinkedListWithNodeMemoryReuse<PageRegion>(pages/2)) //1 M
+         internal MemoryPageTable( UIntPtr baseAddress, uint pages) : this (baseAddress, pages, 1 << 20 , new LinkedListWithNodeMemoryReuse<PageAllocation>(pages/2)) //1 M
          {
 
          }
 
          internal MemoryPageTable(UIntPtr baseAddress, uint pages , uint pageSize)
-             : this(baseAddress, pages, pageSize, new LinkedListWithNodeMemoryReuse<PageRegion>(pages / 2)) //1 M
+             : this(baseAddress, pages, pageSize, new LinkedListWithNodeMemoryReuse<PageAllocation>(pages / 2)) //1 M
          {
 
          }
 
-        internal MemoryPageTable(UIntPtr baseAddress, uint pages, uint pageSize , LinkedList<PageRegion> list )
+        internal MemoryPageTable(UIntPtr baseAddress, uint pages, uint pageSize , LinkedList<PageAllocation> list )
         {
             //TODO Guards.
 
@@ -61,7 +61,7 @@ namespace Cosmos.Kernel.MM
         {
             InitPageTable();
 
-            PageRegion allRegion = new PageRegion(m_baseAddress, m_pages);
+            PageAllocation allRegion = new PageAllocation(m_baseAddress, m_pages);
             m_availableMemoryRegions.AddFirst(allRegion);
 
 
@@ -121,7 +121,7 @@ namespace Cosmos.Kernel.MM
                                                 PageSharing sharing,
                                                  uint pid)
         {
-            PageRegion candidate = FindSmallestMatchingNode(pages);
+            PageAllocation candidate = FindSmallestMatchingNode(pages);
 
 
             var result = candidate.Address;
@@ -171,7 +171,7 @@ namespace Cosmos.Kernel.MM
                 if (entry.pid == process.Pid) 
                 {
                     var ptr = PageTableToMemoryAddress(i);
-                    DeAllocateMemory( new PageRegion( ptr   ,1  ) , entry.pid);
+                    DeAllocateMemory( new PageAllocation( ptr   ,1  ) , entry.pid);
                 }
             }
 
@@ -179,7 +179,7 @@ namespace Cosmos.Kernel.MM
 
 
 
-        internal void DeAllocateMemory(PageRegion region ,uint pid)
+        internal void DeAllocateMemory(PageAllocation region ,uint pid)
         {
 
             // see if owned by process
@@ -226,7 +226,7 @@ namespace Cosmos.Kernel.MM
       //  void FreePages(Process process);
 
         //TODO non 0 allignement
-        internal unsafe bool IsAdjacent(PageRegion region1 , PageRegion region2)
+        internal unsafe bool IsAdjacent(PageAllocation region1 , PageAllocation region2)
         {
             byte* region1Addr = (byte*)region1.Address;
             byte* region2Addr = (byte*)region2.Address;
@@ -266,7 +266,7 @@ namespace Cosmos.Kernel.MM
             return new UIntPtr(ptr);
         }
 
-        private PageRegion FindSmallestMatchingNode(uint pages)
+        private PageAllocation FindSmallestMatchingNode(uint pages)
         {
 
 
@@ -287,7 +287,7 @@ namespace Cosmos.Kernel.MM
 
 
         //this does not check for adjoining regions
-        private void AddNode(PageRegion region)
+        private void AddNode(PageAllocation region)
         {
             
             var node = m_availableMemoryRegions.First;                
@@ -311,20 +311,20 @@ namespace Cosmos.Kernel.MM
         /// find adjacent regions and see if we can join and if join repeat 
         /// </summary>
         /// <param name="region"></param>
-        private void AddAndMergeNode(PageRegion region)
+        private void AddAndMergeNode(PageAllocation region)
         {
             if ( TryMerge(region) == false) // no merge need to add
                 AddNode(region); 
         }
 
-        private bool TryMerge(PageRegion region)
+        private bool TryMerge(PageAllocation region)
         {
             bool result = true;
             bool regionMerged = false;
 
             while (result == true)
             {
-                PageRegion combinedRegion;
+                PageAllocation combinedRegion;
 
                 result = ParseForAdjacent(region, out combinedRegion);
                 if (result == true)
@@ -336,7 +336,7 @@ namespace Cosmos.Kernel.MM
             return regionMerged;
         }
 
-        unsafe private bool ParseForAdjacent(PageRegion region , out PageRegion  combinedRegion)
+        unsafe private bool ParseForAdjacent(PageAllocation region , out PageAllocation  combinedRegion)
         {
             var node = m_availableMemoryRegions.First;
 
@@ -364,7 +364,7 @@ namespace Cosmos.Kernel.MM
                 node = node.Next;
             }
 
-            combinedRegion = new PageRegion();
+            combinedRegion = new PageAllocation();
             return false;
         }
 

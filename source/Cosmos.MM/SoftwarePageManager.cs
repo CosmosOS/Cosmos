@@ -149,7 +149,7 @@ namespace Cosmos.Kernel.MM
             }
         }
 
-        void IPagingManager.FreePages(Cosmos.Kernel.Dispatch.Process process, PageRegion region)
+        void IPagingManager.FreePages(Cosmos.Kernel.Dispatch.Process process, PageAllocation region)
         {
             try
             {

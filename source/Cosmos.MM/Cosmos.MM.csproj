@@ -52,7 +52,6 @@
     <Compile Include="HardwarePageManager.cs" />
     <Compile Include="IPagingManager.cs" />
     <Compile Include="LinkedListWIthNodeReuse.cs" />
-    <Compile Include="MemoryDetails.cs" />
     <Compile Include="MemoryManager.cs" />
     <Compile Include="MemoryManagerService.cs" />
     <Compile Include="MemoryPageTable.cs" />
@@ -63,6 +62,10 @@
     <Compile Include="SoftwarePageManager.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Cosmos.Messages\Cosmos.IPC.csproj">
+      <Project>{B45A6D94-337F-429D-B7CA-AB2AD3744899}</Project>
+      <Name>Cosmos.IPC</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Cosmos.Util\Cosmos.Util.csproj">
       <Project>{5591FFF4-4129-44F7-AF65-82630083C360}</Project>
       <Name>Cosmos.Util</Name>

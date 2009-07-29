@@ -132,7 +132,7 @@ namespace Cosmos.Kernel.MM
             throw new InvalidOperationException("SimplePageManager Does not support deallocating memory"); 
         }
 
-        void IPagingManager.FreePages(Cosmos.Kernel.Dispatch.Process process, PageRegion region)
+        void IPagingManager.FreePages(Cosmos.Kernel.Dispatch.Process process, PageAllocation region)
         {
             throw new InvalidOperationException("SimplePageManager Does not support deallocating memory"); 
         }

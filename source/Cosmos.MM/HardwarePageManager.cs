@@ -72,7 +72,7 @@ namespace Cosmos.Kernel.MM
             throw new NotImplementedException();
         }
 
-        void IPagingManager.FreePages(Cosmos.Kernel.Dispatch.Process process, PageRegion region)
+        void IPagingManager.FreePages(Cosmos.Kernel.Dispatch.Process process, PageAllocation region)
         {
             throw new NotImplementedException();
         }

@@ -22,7 +22,7 @@ namespace Cosmos.Kernel.MM
         UIntPtr RequestPages(MemoryAllocationRequest request);
 
         void FreePages(Process process);
-        void FreePages(Process process, PageRegion region);
+        void FreePages(Process process, PageAllocation region);
 
         PageEntry QueryPage(UIntPtr page);
 
@@ -30,13 +30,13 @@ namespace Cosmos.Kernel.MM
     }
 
 
-    internal struct PageRegion
+    internal struct PageAllocation  
     {
         internal UIntPtr Address;
         internal uint NumPages;
 
 
-        internal PageRegion(UIntPtr address, uint numPages)
+        internal PageAllocation(UIntPtr address, uint numPages)
         {
             Address = address;
             NumPages = numPages;
@@ -50,7 +50,6 @@ namespace Cosmos.Kernel.MM
 
 
 
-    public enum MemoryPressure : byte { None, Low, Medium, High, Critical }
-    public enum PageType : byte { Unknown , Kernel, IO, Paged }
-    public enum PageSharing : byte { Unknown, Private, SharedRead }
+
+
 }

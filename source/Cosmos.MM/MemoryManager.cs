@@ -155,7 +155,7 @@ namespace Cosmos.Kernel.MM
         private void ProcessFree(FreeMemoryRequest query)
         {
             if (query.Pages > 0)
-                m_pagedMemory.FreePages(query.Sender, new PageRegion() { Address = query.Address, NumPages = query.Pages });
+                m_pagedMemory.FreePages(query.Sender, new PageAllocation() { Address = query.Address, NumPages = query.Pages });
             else
                 m_pagedMemory.FreePages(query.Sender);
 
