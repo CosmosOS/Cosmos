@@ -31,7 +31,7 @@ namespace Cosmos.IL2CPU {
       mReader = new ILReader();
     }
 
-    public void Execute(MethodInfo aEntry) {
+    public void Execute(System.Reflection.MethodInfo aEntry) {
       QueueMethod(aEntry);
 
       // Cannot use foreach, the list changes as we go
@@ -96,7 +96,8 @@ namespace Cosmos.IL2CPU {
       if (xOpCodes != null) {
         // Call ProcessMethod first, in a threaded environment it will
         // allow more threads to work slightly sooner
-        mAsmblr.ProcessMethod(aMethodUID, xOpCodes);
+        var xMethod = new MethodInfo(aMethodUID);
+        mAsmblr.ProcessMethod(xMethod, xOpCodes);
         foreach (var xOpCode in xOpCodes) {
           //InstructionCount++;
           if (xOpCode is ILOpCodes.OpMethod) {

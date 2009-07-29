@@ -10,7 +10,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		{
 		}
 
-    public override void Execute(uint aMethodUID, ILOpCode aOpCode) {
+    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
       var xStackContent = OldAsmblr.StackContents.Peek();
       for (int i = 0; i < ((xStackContent.Size / 4) + (xStackContent.Size % 4 == 0 ? 0 : 1)); i++) {
         new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceDisplacement = i * 4, SourceIsIndirect = true };

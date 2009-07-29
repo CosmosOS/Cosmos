@@ -10,8 +10,8 @@ namespace Cosmos.IL2CPU.X86.IL
 		{
 		}
 
-    public override void Execute(uint aMethodUID, ILOpCode aOpCode) {
-      new CPU.Jump { DestinationLabel = "_" + aMethodUID + "_" + ((ILOpCodes.OpBranch)aOpCode).Value };
+    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
+      new CPU.Jump { DestinationLabel = "_" + aMethod.UID + "_" + ((ILOpCodes.OpBranch)aOpCode).Value };
     }
 		
 	}

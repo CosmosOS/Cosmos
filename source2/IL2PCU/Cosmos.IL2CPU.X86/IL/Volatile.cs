@@ -10,7 +10,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		{
 		}
 
-    public override void Execute(uint aMethodUID, ILOpCode aOpCode) {
+    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
       //TODO: Volatile
     }
 

@@ -14,7 +14,7 @@ namespace Cosmos.IL2CPU {
       InitILOps();
     }
 
-    public void ProcessMethod(UInt32 aMethodUID, List<ILOpCode> aOpCodes) {
+    public void ProcessMethod(MethodInfo aMethod, List<ILOpCode> aOpCodes) {
       foreach (var xOpCode in aOpCodes) {
         ILOp xILOp;
         uint xOpCodeVal = (uint)xOpCode.OpCode;
@@ -23,7 +23,7 @@ namespace Cosmos.IL2CPU {
         } else {
           xILOp = mILOpsHi[xOpCodeVal & 0xFF];
         }
-        xILOp.Execute(aMethodUID, xOpCode);
+        xILOp.Execute(aMethod, xOpCode);
       }
     }
 

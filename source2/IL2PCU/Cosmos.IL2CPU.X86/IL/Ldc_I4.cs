@@ -10,7 +10,7 @@ namespace Cosmos.IL2CPU.X86.IL {
 	public class Ldc_I4: ILOp {
 		public Ldc_I4(Cosmos.IL2CPU.Assembler aAsmblr):base(aAsmblr) {}
 
-    public override void Execute(uint aMethodUID, ILOpCode aOpCode) {
+    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
 			new CPU.Push { DestinationValue = ((OpInt)aOpCode).Value };
       OldAsmblr.StackContents.Push(new StackContent(4, typeof(int)));
     }

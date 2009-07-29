@@ -11,7 +11,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		{
 		}
 
-		public override void Execute(uint aMethodUID, ILOpCode aOpCode)
+		public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
 		{
       StackContent xStackContent = OldAsmblr.StackContents.Peek();
 			if (xStackContent.IsFloat)

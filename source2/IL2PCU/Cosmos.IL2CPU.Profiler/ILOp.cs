@@ -6,7 +6,7 @@ namespace Cosmos.IL2CPU.Profiler {
       : base(aAsmblr) {
     }
 
-    public override void Execute(uint aMethodUID, ILOpCode aOpCode) {
+    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
       // Do Nothing
     }
   }

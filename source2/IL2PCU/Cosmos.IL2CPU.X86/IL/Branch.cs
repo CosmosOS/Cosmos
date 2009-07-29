@@ -14,7 +14,7 @@ namespace Cosmos.IL2CPU.X86.IL
     public Branch(Cosmos.IL2CPU.Assembler aAsmblr) : base(aAsmblr) {
 		}
 
-    public override void Execute(uint aMethodUID, ILOpCode aOpCode) {
+    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
 			var xStackContent = OldAsmblr.StackContents.Pop();
 			OldAsmblr.StackContents.Pop();
 			if (xStackContent.Size > 8) {
@@ -47,16 +47,16 @@ namespace Cosmos.IL2CPU.X86.IL
 				new CPU.Pop { DestinationReg = CPU.Registers.EAX };
 				new CPU.Pop { DestinationReg = CPU.Registers.EBX };
 				new CPU.Compare { DestinationReg = CPU.Registers.EAX, SourceReg = CPU.Registers.EBX };
-        new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AssemblerNasm.TmpBranchLabel(aMethodUID, aOpCode) };
+        new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
 			} else {
 				new CPU.Pop { DestinationReg = CPU.Registers.EAX };
 				new CPU.Pop { DestinationReg = CPU.Registers.EBX };
 				new CPU.Pop { DestinationReg = CPU.Registers.ECX };
 				new CPU.Pop { DestinationReg = CPU.Registers.EDX };
 				new CPU.Xor { DestinationReg = CPU.Registers.EAX, SourceReg = CPU.Registers.ECX };
-        new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AssemblerNasm.TmpBranchLabel(aMethodUID, aOpCode) };
+        new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
 				new CPU.Xor { DestinationReg = CPU.Registers.EBX, SourceReg = CPU.Registers.EDX };
-        new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AssemblerNasm.TmpBranchLabel(aMethodUID, aOpCode) };
+        new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
 			}
     }
 

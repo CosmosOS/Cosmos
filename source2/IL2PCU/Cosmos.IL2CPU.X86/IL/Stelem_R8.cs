@@ -10,7 +10,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		{
 		}
 
-    public override void Execute(uint aMethodUID, ILOpCode aOpCode) {
+    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
       //TODO: Implement this Op
       //             Stelem_Ref.Assemble(Assembler, 8, GetServiceProvider(), mCurLabel, mMethodInformation, mCurOffset, mNextLabel);
     }

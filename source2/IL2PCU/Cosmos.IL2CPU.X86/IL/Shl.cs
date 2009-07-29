@@ -10,7 +10,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		{
 		}
 
-    public override void Execute(uint aMethodUID, ILOpCode aOpCode) {
+    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
       new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX }; // shift amount
       var xStackItem_ShiftAmount = OldAsmblr.StackContents.Pop();
       new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX }; // value
