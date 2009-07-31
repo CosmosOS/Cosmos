@@ -55,15 +55,22 @@
     <Compile Include="MM\AllocationResponse.cs" />
     <Compile Include="MM\FreeMemoryRequest.cs" />
     <Compile Include="MM\MemoryAllocationRequest.cs" />
+    <Compile Include="MM\MemoryDetails.cs" />
     <Compile Include="MM\MemoryInformationRequest.cs" />
     <Compile Include="MM\MemoryInformationResponse.cs" />
     <Compile Include="MM\MMMessage.cs" />
-    <Compile Include="MM\QueryPageRequest.cs" />
-    <Compile Include="MM\QueryResultMessage.cs" />
+    <Compile Include="MM\PageType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Design.txt" />
+    <None Include="CapabilityInvoke.rtf" />
+    <None Include="Design.rtf" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Cosmos\Cosmos.Kernel\Cosmos.Kernel.csproj">
+      <Project>{A1F83D9F-2D44-4264-A08B-416797123018}</Project>
+      <Name>Cosmos.Kernel</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

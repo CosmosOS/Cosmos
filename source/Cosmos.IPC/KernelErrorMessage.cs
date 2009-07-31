@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 
-namespace Cosmos.Kernel.API
+namespace Cosmos.Kernel.IPC
 {
 
     /// </summary>

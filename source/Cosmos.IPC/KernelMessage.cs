@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text;
 
 
-namespace Cosmos.Kernel.API
+
+namespace Cosmos.Kernel.IPC
 {
     /// <summary>
     /// Why use a message ? In small projects its anoying but as the system grows benefits are huge.
@@ -19,8 +20,7 @@ namespace Cosmos.Kernel.API
     /// </summary>
     public abstract class KernelMessage
     {
-        public Process Sender; //TODO replace with key
-        public Process Destination; 
+  
 
 
         /// <summary>
@@ -33,11 +33,7 @@ namespace Cosmos.Kernel.API
 
        
 
-        public void Send(Process dest)
-        {
-            Destination = dest;
-            Send(); 
-        }
+      
 
         
         /// <summary>
