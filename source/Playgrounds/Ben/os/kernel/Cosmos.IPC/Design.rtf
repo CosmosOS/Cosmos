@@ -21,6 +21,11 @@ All messaging is Asynchronous. \par
 User apps , Kernel and Services are treated identically. \par
 64 bit first class citizen support\par
 First class NUMA multi processor support. \par
+Heavy degree of isolation ( eg internal data types and very moduler)\par
+A Heavy setup cost low run cost approach \par
+Solid OO/modular design\par
+App to App is a 1 st class citizen\par
+\par
 \par
 \par
 \par
@@ -40,6 +45,9 @@ Asynchronous nature allows fast low latency traversal if services are scheduled.
 \par
 Alternatively it can provide high latency high troughput , by not scheduling immediately and then processing a large number of messages. \par
 As the clients are Asynch we dont need to reply immediately. \par
+\par
+Many OS have fast kernel calls but slow IPC , this is a killer for Micro kernels.\par
+\par
 \par
 \b - Easy to maintain / Flexible\b0  \par
 \par
@@ -167,7 +175,7 @@ Client Thread\par
             Message Created on Shared Memory Heap [Cosmos.SharedMemory]\par
 \par
 \par
-\tab queue.SendMessage(message, bool yield) (Cosmos.IPC)\par
+\tab queue.SendMessage(message, bool yield) (Ben.IPC)\par
 \tab     \tab\tab ProcessMessage(message)\par
 \tab\tab if ( yield) \par
             \tab Jump to dispatcher.yieldcurrentThread.       \par
@@ -242,7 +250,7 @@ but this is dependent on the app stack not IPC.\par
 \par
 \b Stack per thread ?\b0\par
 \par
-Each thread has its own stack . Calling another app will get a new stack\par
+Obviously each thread has its own stack . Calling another app will get a new stack\par
 \par
 \b Why do we need a syscall and cant do a  simple call? \b0\par
 \par
@@ -278,7 +286,7 @@ This is almost a kerneless OS , the only thing in the kernel is the Shared Memor
 \par
 \b Why use C# structures like queues ?\b0\par
 \par
-Basically a GC is always available ( Kernel or client) and for readability and extention purposes these structures work best.  Also implementing most things as pointer lists / queues is really premature optomization. I think for the majority of these things the easy abbility to just plug in a new class and hence algorithm will outweigh the benefits of an optomized pointer algortihm . Did i mention less bugs...\par
+Basically a GC is always available ( Kernel or client) and for readability and extention purposes these structures work best.  Also implementing most things as pointer lists / queues is really premature optomization. I think for the majority of these things the easy abbility to just plug in a new class and hence algorithm will outweigh the benefits of an optomized pointer algortihm . Did i mention less bugs with mature code...\par
 \par
 \b What happens if the queue needs to grow durring a syscall ?\b0\par
 \par
