@@ -136,9 +136,34 @@ ADD  R1, DWORD [ObjectSize]\par
 The GC is called directly by the appropriate thread without CDC.\par
 \par
 \par
-\b How does the GC work on private classes and capabilities ? \b0\par
+\b How does the GC work on private classes and capabilities ? \par
 \par
-It uses pointers and walks the heap.\par
+\b0 It uses pointers and walks the heap.\b\par
+\par
+Service types\par
+\par
+\b0 A Service is any App Domain that receives communication from another App Domain.  Device Drivers are services as they at least communicate with the HAL.  By Implementing ISystemService they can be managed by the system ( eg , stopped , started , monitored , restarted if not responding etc)\par
+\par
+\par
+3 Types \par
+\par
+1) Asynch Messaging with Task Switch. The system has in build messaging for more secure communication. This involves exposing a public interface which the caller uses.  ( Since messages require exposing a queue and access requires a granted reference running them on the caller thread is not viable ( since the read from queue is not made public) .\par
+2) RPC with no Task Switch. It is possible to communicate by directly modifying objects accessed through either  public static or which are exposed via the App Domain. Locking must be used and great care in terms of gardbage collecting . Recommended for simple apps that dont require security or servers that dont require a lot of threads. eg a Cache Service which is called by the file system.\par
+3) RPC  with Task Switch . When the caller calls ( as per 2) , a thread of the service is called with the paramaters ( which may be pointers) on the stack . Shared data must be locked. \par
+\par
+The OS mainly uses 1) . \par
+\par
+\b System Assemblies. \b0  \par
+\par
+This is a special case as its not an app domain but a Re-Entrant Assembly can be called from any thread with no risk.  The GC functions as one ( though its nor re-entrant) \par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
 \par
 }
  
