@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
+using Indy.IL2CPU.Assembler;
 
 namespace Indy.IL2CPU.Compiler
 {
@@ -13,7 +14,7 @@ namespace Indy.IL2CPU.Compiler
         public int Compare(FieldInfo x,
                            FieldInfo y)
         {
-            return x.GetFullName().CompareTo(y.GetFullName());
+					return DataMember.GetStaticFieldName(x).CompareTo(DataMember.GetStaticFieldName(y));
         }
 
         #endregion

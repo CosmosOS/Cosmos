@@ -284,6 +284,13 @@ namespace Indy.IL2CPU
                                     xTypesOut.WriteLine(xType.AssemblyQualifiedName);
                                 }
                             }
+														using (var xFieldsOut = new StreamWriter(@"e:\fields.txt", false))
+														{
+															foreach (var xField in mStaticFields)
+															{
+																xFieldsOut.WriteLine(DataMember.GetStaticFieldName(xField.Key));
+															}
+														}
                         }
                         // END MTW DEBUG
                         // initialize the runtime engine
@@ -740,6 +747,13 @@ namespace Indy.IL2CPU
                             mAssembler.StackContents.Clear();
                             ILReader xReader = new ILReader(xCurrentMethod);
                             var xInstructionInfos = new List<DebugSymbolsAssemblyTypeMethodInstruction>();
+														if (xCurrentMethod.DeclaringType.FullName.Contains("List`1"))
+														{
+															if (xCurrentMethod.Name == ".cctor")
+															{
+																Console.Write("");
+															}
+														}
                             while (xReader.Read())
                             {
                                 SortedList<string, object> xInfo = null;
@@ -1621,6 +1635,10 @@ namespace Indy.IL2CPU
                     }
                     xCurrentField = mStaticFields.Keys.ElementAt(i);
                 }
+								if (DataMember.GetStaticFieldName(xCurrentField) == "static_field__System_Collections_Generic_List_1_Cosmos_Hardware_TempDictionary_1_DictionaryItem_Cosmos_Sys_Network_DataReceived____emptyArray")
+								{
+									Console.Write("");
+								}
                 CompilingStaticFields(i, xCount);
                 //ProgressChanged.Invoke(String.Format("Processing static field: {0}", xCurrentField.GetFullName()));
                 string xFieldName = xCurrentField.GetFullName();
@@ -1883,6 +1901,13 @@ namespace Indy.IL2CPU
                         }
                         else
                         {
+													if (xCurrentMethod.DeclaringType.FullName.Contains("List`1"))
+													{
+														if (xCurrentMethod.Name == ".cctor")
+														{
+															Console.Write("");
+														}
+													}
                             MethodBody xBody = xCurrentMethod.GetMethodBody();
                             // todo: add better detection of implementation state
                             if (xBody != null)

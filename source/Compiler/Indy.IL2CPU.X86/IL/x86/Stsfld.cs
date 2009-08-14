@@ -19,10 +19,11 @@ namespace Indy.IL2CPU.IL.X86 {
 	    private uint mCurOffset;
 	    private MethodInformation mMethodInformation;
 
-        //public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
-        //    FieldInfo xField = aReader.OperandValueField;
-        //    Engine.QueueStaticField(xField);
-        //}
+			public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData, IServiceProvider aProvider)
+			{
+				FieldInfo xField = aReader.OperandValueField;
+				Engine.QueueStaticField(xField);
+			}
         private FieldInfo mField;
 		public Stsfld(ILReader aReader, MethodInformation aMethodInfo)
 			: base(aReader, aMethodInfo) {

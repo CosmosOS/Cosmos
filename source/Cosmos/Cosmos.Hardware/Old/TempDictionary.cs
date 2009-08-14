@@ -18,18 +18,18 @@ namespace Cosmos.Hardware
                 set { key = value; }
             }
 
-            Value value;
+            Value _value;
 
             public Value Value
             {
-                get { return value; }
-                set { value = this.value; }
+                get { return _value; }
+                set { value = this._value; }
             }
 
-            public DictionaryItem(UInt32 key, Value value)
+            public DictionaryItem(UInt32 key, Value avalue)
             {
                 this.key = key;
-                this.value = value;
+                this._value = avalue;
             }
         }
 

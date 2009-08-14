@@ -17,10 +17,11 @@ namespace Indy.IL2CPU.IL.X86 {
 	    private uint mCurOffset;
 	    private MethodInformation mMethodInformation;
 
-        //public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
-        //    FieldInfo xField = aReader.OperandValueField;
-        //    Engine.QueueStaticField(xField);
-        //}
+			public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData, IServiceProvider aProvider)
+			{
+				FieldInfo xField = aReader.OperandValueField;
+				Engine.QueueStaticField(xField);
+			}
 
 		public Ldsfld(ILReader aReader, MethodInformation aMethodInfo)
 			: base(aReader, aMethodInfo) {
@@ -36,6 +37,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		public override void DoAssemble() {
             var xSize = GetService<IMetaDataInfoService>().GetFieldStorageSize(mField.FieldType);
             mDataName = GetService<IMetaDataInfoService>().GetStaticFieldLabel(mField);
+			
 		    if (xSize >= 4) {
 				for (int i = 1; i <= (xSize / 4); i++) {
 					//	Pop("eax");

@@ -48,13 +48,37 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\source2\IL2PCU\Cosmos.IL2CPU.X86\Cosmos.IL2CPU.X86.csproj">
-      <Project>{63F7BFB9-419E-4965-B580-304B9C9FA7D8}</Project>
-      <Name>Cosmos.IL2CPU.X86</Name>
+    <ProjectReference Include="..\Compiler\Indy.IL2CPU.Assembler\Indy.IL2CPU.Assembler.csproj">
+      <Project>{5A1E9D16-BF71-4D8E-9389-3476056E4566}</Project>
+      <Name>Indy.IL2CPU.Assembler</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\source2\IL2PCU\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj">
-      <Project>{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}</Project>
-      <Name>Cosmos.IL2CPU</Name>
+    <ProjectReference Include="..\Compiler\Indy.IL2CPU.X86\Indy.IL2CPU.X86.csproj">
+      <Project>{5E70F7D9-388A-43C2-8D9B-A4C382A8278D}</Project>
+      <Name>Indy.IL2CPU.X86</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Build.Windows\Cosmos.Compiler.Builder.csproj">
+      <Project>{1F0EDE86-F6D4-4355-9A97-10E90457770C}</Project>
+      <Name>Cosmos.Compiler.Builder</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Kernel.FileSystems\Cosmos.Sys.FileSystem.csproj">
+      <Project>{5C293BB9-FB42-495E-AAD9-D15888631CA4}</Project>
+      <Name>Cosmos.Sys.FileSystem</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos\Cosmos.Hardware\Cosmos.Hardware.csproj">
+      <Project>{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}</Project>
+      <Name>Cosmos.Hardware</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos\Cosmos.Kernel\Cosmos.Kernel.csproj">
+      <Project>{A1F83D9F-2D44-4264-A08B-416797123018}</Project>
+      <Name>Cosmos.Kernel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos\Cosmos.System\Cosmos.Sys.csproj">
+      <Project>{819DB8FC-5DA1-461F-83C9-2F5C88088C94}</Project>
+      <Name>Cosmos.Sys</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Indy.IL2CPU\Indy.IL2CPU.csproj">
+      <Project>{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}</Project>
+      <Name>Indy.IL2CPU</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
