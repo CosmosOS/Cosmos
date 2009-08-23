@@ -211,9 +211,33 @@ namespace Cosmos.Kernel {
         {
             (*(UInt32*)(this.Offset + offset)) = value;
         }
-        public override void Write64Unchecked( UInt32 offset, UInt64 value )
+        public override void Write64Unchecked(UInt32 offset, UInt64 value)
         {
-            ( *( UInt64* )( this.Offset + offset ) ) = value;
+            (*(UInt64*)(this.Offset + offset)) = value;
+        }
+
+        public void CopyFrom(MemoryAddressSpace src)
+        {
+            for (uint x = 0; x < src.Size; x++)
+            {
+                (*(byte*)(this.Offset + x)) = *(byte*)(src.Offset + x);
+            }
+        }
+
+        public void CopyFrom(MemoryAddressSpace src, uint srcOffset, uint dstOffset, uint bytes)
+        {
+            for (uint x = 0; x < bytes; x++)
+            {
+                (*(byte*)(this.Offset + dstOffset + x)) = *(byte*)(src.Offset + srcOffset + x);
+            }
+        }
+
+        public void SetMem(byte data)
+        {
+            for (uint x = 0; x < this.Size; x++)
+            {
+                (*(byte*)(this.Offset + x)) = data;
+            }
         }
     }
 
