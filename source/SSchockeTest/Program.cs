@@ -26,8 +26,9 @@ namespace Cosmos.Playground.SSchocke {
             Console.WriteLine("Congratulations! You just booted SSchocke's C# code.");
 
             //PCITest.Test();
-            NetworkTest.Test();
+            //NetworkTest.Test();
             //FloatTest.Test();
+            VMWareSVGA.Test();
 
             Cosmos.Sys.Deboot.ShutDown();
 		}
