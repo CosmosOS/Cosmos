@@ -170,7 +170,7 @@ namespace Cosmos.Kernel {
             return *(UInt32*)(this.Offset + offset);
         }
 
-        public override UInt64 Read32Unchecked( UInt64 offset )
+        public override UInt64 Read64Unchecked( UInt32 offset )
         {
             return *( UInt64* )( this.Offset + offset );
         }

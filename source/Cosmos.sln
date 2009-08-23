@@ -218,9 +218,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU.X86", "..\sou
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelloWorld", "..\source2\Users\Kudzu\HelloWorld\HelloWorld.csproj", "{28D7710D-5930-40BE-BB71-D30F01294EDF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Hardware.SMBIOS", "Cosmos.Hardware.SMBIOS\Cosmos.Hardware.SMBIOS.csproj", "{B2F76E27-EAE1-4ECF-8A33-77B2CFBB9367}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 68
+		SccNumberOfProjects = 69
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs04.codeplex.com/
 		SccLocalPath0 = .
@@ -492,6 +494,10 @@ Global
 		SccProjectTopLevelParentUniqueName67 = Cosmos.sln
 		SccProjectName67 = ../source2/Users/Kudzu/HelloWorld
 		SccLocalPath67 = ..\\source2\\Users\\Kudzu\\HelloWorld
+		SccProjectUniqueName68 = Cosmos.Hardware.SMBIOS\\Cosmos.Hardware.SMBIOS.csproj
+		SccProjectTopLevelParentUniqueName68 = Cosmos.sln
+		SccProjectName68 = Cosmos.Hardware.SMBIOS
+		SccLocalPath68 = Cosmos.Hardware.SMBIOS
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -766,6 +772,10 @@ Global
 		{28D7710D-5930-40BE-BB71-D30F01294EDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{28D7710D-5930-40BE-BB71-D30F01294EDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{28D7710D-5930-40BE-BB71-D30F01294EDF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2F76E27-EAE1-4ECF-8A33-77B2CFBB9367}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2F76E27-EAE1-4ECF-8A33-77B2CFBB9367}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2F76E27-EAE1-4ECF-8A33-77B2CFBB9367}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2F76E27-EAE1-4ECF-8A33-77B2CFBB9367}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -788,6 +798,7 @@ Global
 		{0CB1AFCD-F3D2-48A6-A6D1-103F6364B666} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
 		{BCB66614-20FE-4184-B214-FD42844AD8A6} = {F18343D8-D22D-485B-A583-83C09A0C92B1}
 		{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755} = {F18343D8-D22D-485B-A583-83C09A0C92B1}
+		{B2F76E27-EAE1-4ECF-8A33-77B2CFBB9367} = {F18343D8-D22D-485B-A583-83C09A0C92B1}
 		{7BAB58BF-E8A1-4623-B6BF-4B90A0505226} = {E16DB75B-0F1D-4813-9103-F8FB6E7BAE2A}
 		{5784365C-ED22-42EB-BB8A-F3E09428D5B8} = {E16DB75B-0F1D-4813-9103-F8FB6E7BAE2A}
 		{26E45503-4490-4E38-A8C5-14159B25D6D1} = {E16DB75B-0F1D-4813-9103-F8FB6E7BAE2A}
