@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="Assembler.cs" />
     <Compile Include="BaseAssemblerElement.cs" />
+    <Compile Include="Comment.cs" />
     <Compile Include="DataMember.cs" />
     <Compile Include="ElementReference.cs" />
     <Compile Include="ILOp.cs" />
