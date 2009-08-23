@@ -11,7 +11,34 @@ namespace Cosmos.IL2CPU.X86.IL
 		}
 
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
-      //TODO: Implement this Op
+        if( Assembler.StackContents.Peek().IsFloat )
+        {
+            //EmitNotImplementedException( Assembler, GetServiceProvider(), "Rem: Float support not yet implemented!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
+            throw new NotImplementedException();
+        }
+        StackContent xStackItem = Assembler.StackContents.Peek();
+        int xSize = Math.Max( Assembler.StackContents.Pop().Size, Assembler.StackContents.Pop().Size );
+        if( xSize > 4 )
+        {
+            new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
+            new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
+            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX }; // gets devised by ecx
+            new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EDX };
+
+            new CPUx86.Divide { DestinationReg = CPUx86.Registers.ECX }; // => EAX / ECX 
+            new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX };
+
+        }
+        else
+        {
+            new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
+            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX }; // gets devised by ecx
+            new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EDX };
+
+            new CPUx86.Divide { DestinationReg = CPUx86.Registers.ECX }; // => EAX / ECX 
+            new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX };
+        }
+        Assembler.StackContents.Push( xStackItem );
     }
 
     

@@ -1,5 +1,5 @@
 using System;
-
+using CPUx86 = Indy.IL2CPU.Assembler.X86;
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Conv_U8)]
@@ -10,7 +10,34 @@ namespace Cosmos.IL2CPU.X86.IL
 		}
 
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
-      //TODO: Implement this Op
+        if( Assembler.StackContents.Peek().IsFloat )
+        {
+            //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_U8: Floats are not yet supported", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
+            throw new NotImplementedException();
+        }
+        int xSource = Assembler.StackContents.Peek().Size;
+        switch( xSource )
+        {
+            case 1:
+            case 2:
+            case 4:
+                {
+                    Assembler.StackContents.Pop();
+                    new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+                    new CPUx86.Push { DestinationValue = 0 };
+                    new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                    Assembler.StackContents.Push( new StackContent( 8, typeof( ulong ) ) );
+                    break;
+                }
+            case 8:
+                {
+                    new CPUx86.Noop();
+                    break;
+                }
+            default:
+                //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_U8: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
+                throw new NotImplementedException();
+        }
     }
 
     
