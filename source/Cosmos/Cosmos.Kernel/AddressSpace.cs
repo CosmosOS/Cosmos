@@ -67,7 +67,7 @@ namespace Cosmos.Kernel {
         /// </summary>
         /// <param name="offset">The offset to read from</param>
         /// <returns>64 bits of data read</returns>
-        public abstract UInt64 Read64Unchecked( UInt64 offset );
+        public abstract UInt64 Read64Unchecked( UInt32 offset );
 
         /// <summary>
         /// Writes 8 bits from a given offset if it is within the valid range.
