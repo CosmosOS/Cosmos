@@ -53,6 +53,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assembler.cs" />
+    <Compile Include="BaseAssemblerElement.cs" />
+    <Compile Include="DataMember.cs" />
+    <Compile Include="ElementReference.cs" />
     <Compile Include="ILOp.cs" />
     <Compile Include="ILOpCode.cs" />
     <Compile Include="ILOpCodes\OpBranch.cs" />
@@ -70,13 +73,28 @@
     <Compile Include="ILOpCodes\OpType.cs" />
     <Compile Include="ILOpCodes\OpVar.cs" />
     <Compile Include="ILReader.cs" />
+    <Compile Include="Instruction.cs" />
+    <Compile Include="Label.cs" />
     <Compile Include="MethodInfo.cs" />
+    <Compile Include="MethodInfoLabelGenerator.cs" />
     <Compile Include="OpCodeAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ILScanner.cs" />
+    <Compile Include="ReaderWriterLocker.cs" />
+    <Compile Include="StackContent.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\source\Compiler\Indy.IL2CPU.Assembler\Indy.IL2CPU.Assembler.csproj">
+      <Project>{5A1E9D16-BF71-4D8E-9389-3476056E4566}</Project>
+      <Name>Indy.IL2CPU.Assembler</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\source\Compiler\Indy.IL2CPU.X86\Indy.IL2CPU.X86.csproj">
+      <Project>{5E70F7D9-388A-43C2-8D9B-A4C382A8278D}</Project>
+      <Name>Indy.IL2CPU.X86</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
