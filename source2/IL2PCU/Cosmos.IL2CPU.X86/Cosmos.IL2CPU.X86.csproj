@@ -59,11 +59,6 @@
     <Compile Include="IL\And.cs" />
     <Compile Include="IL\Arglist.cs" />
     <Compile Include="IL\Branch.cs" />
-    <Compile Include="IL\Bge_Un.cs" />
-    <Compile Include="IL\Bgt_Un.cs" />
-    <Compile Include="IL\Ble_Un.cs" />
-    <Compile Include="IL\Blt_Un.cs" />
-    <Compile Include="IL\Bne_Un.cs" />
     <Compile Include="IL\Box.cs" />
     <Compile Include="IL\Br.cs" />
     <Compile Include="IL\Break.cs" />
@@ -113,6 +108,7 @@
     <Compile Include="IL\Conv_U2.cs" />
     <Compile Include="IL\Conv_U4.cs" />
     <Compile Include="IL\Conv_U8.cs" />
+    <Compile Include="IL\Branch_Un.cs" />
     <Compile Include="IL\Cpblk.cs" />
     <Compile Include="IL\Cpobj.cs" />
     <Compile Include="IL\Div.cs" />
