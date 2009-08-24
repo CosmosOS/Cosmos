@@ -122,20 +122,40 @@ namespace Cosmos.IL2CPU
 
         public void ProcessMethod( MethodInfo aMethod, List<ILOpCode> aOpCodes )
         {
-            foreach( var xOpCode in aOpCodes )
+            if( aOpCodes.Count == 0 )
+                return;
+
+            ILOpCode xOpCode = aOpCodes[0];
+            ILOpCode xNextOpCode = null;
+            ILOp xILOp = null;
+            uint xOpCodeVal = 0;
+
+            for( int i = 1; i < aOpCodes.Count; i++ )
             {
-                ILOp xILOp;
-                uint xOpCodeVal = ( uint )xOpCode.OpCode;
+                xNextOpCode = aOpCodes[i];
+                
+                xOpCodeVal = ( uint )xOpCode.OpCode;
+
                 if( xOpCodeVal <= 0xFF )
-                {
                     xILOp = mILOpsLo[ xOpCodeVal ];
-                }
                 else
-                {
                     xILOp = mILOpsHi[ xOpCodeVal & 0xFF ];
-                }
-                xILOp.Execute( aMethod, xOpCode );
+
+                xILOp.Execute( aMethod, xOpCode, xNextOpCode );
+
+                xOpCode = xNextOpCode; 
+                
             }
+
+            //Process last ILOp
+            xOpCodeVal = ( uint )xOpCode.OpCode;
+
+            if( xOpCodeVal <= 0xFF )
+                xILOp = mILOpsLo[ xOpCodeVal ];
+            else
+                xILOp = mILOpsHi[ xOpCodeVal & 0xFF ];
+
+            xILOp.Execute( aMethod, xOpCode );
         }
 
         protected abstract void InitILOps();

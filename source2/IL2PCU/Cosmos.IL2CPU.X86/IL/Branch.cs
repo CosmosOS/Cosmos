@@ -9,6 +9,13 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Bgt )]
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ble )]
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Blt )]
+    [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Bne_Un )]
+    [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Bge_Un )]
+    [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Bgt_Un )]
+    [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ble_Un )]
+    [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Blt_Un )]
+    [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Brfalse )]
+    [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Brtrue )]
     public class Branch : ILOp
     {
 
@@ -43,6 +50,27 @@ namespace Cosmos.IL2CPU.X86.IL
                     break;
                 case ILOpCode.Code.Blt:
                     xTestOp = CPU.ConditionalTestEnum.LessThan;
+                    break;
+                case ILOpCode.Code.Bne_Un:
+                    xTestOp = CPU.ConditionalTestEnum.NotEqual;
+                    break;
+                case ILOpCode.Code.Bge_Un:
+                    xTestOp = CPU.ConditionalTestEnum.AboveOrEqual;
+                    break;
+                case ILOpCode.Code.Bgt_Un:
+                    xTestOp = CPU.ConditionalTestEnum.Above;
+                    break;
+                case ILOpCode.Code.Ble_Un:
+                    xTestOp = CPU.ConditionalTestEnum.BelowOrEqual;
+                    break;
+                case ILOpCode.Code.Blt_Un:
+                    xTestOp = CPU.ConditionalTestEnum.Below;
+                    break;
+                case ILOpCode.Code.Brfalse:
+                    xTestOp = CPU.ConditionalTestEnum.Zero;
+                    break;
+                case ILOpCode.Code.Brtrue:
+                    xTestOp = CPU.ConditionalTestEnum.NotZero;
                     break;
                 default:
                     throw new Exception( "Unknown OpCode for conditional branch." );

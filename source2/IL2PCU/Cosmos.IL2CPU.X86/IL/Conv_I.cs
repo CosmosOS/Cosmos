@@ -19,18 +19,11 @@ namespace Cosmos.IL2CPU.X86.IL
                 case 1:
                 case 2:
                 case 4:
-                    {
                         new CPUx86.Noop();
                         break;
-                    }
                 case 8:
-                    {
-                        //    					new CPUx86.Pop(CPUx86.Registers_Old.EAX);
                         new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
-                        //						new CPUx86.Pushd(CPUx86.Registers_Old.EAX);
                         break;
-
-                    }
                 default:
                     //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_I: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
                     throw new NotImplementedException();
