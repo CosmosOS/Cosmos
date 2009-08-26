@@ -6723,6 +6723,7 @@ namespace Cosmos.Hardware {
             this.Bus = bus;
             this.Slot = slot;
             this.Function = function;
+            this.Claimed = false;
         }
 
         private bool NeedsIO = false;
@@ -6789,6 +6790,10 @@ namespace Cosmos.Hardware {
             return IOMaps[index];
         }
 
+        /// <summary>
+        /// Has this device been claimed a driver
+        /// </summary>
+        public bool Claimed { get; set; }
         /// <summary>
         /// The bus the device is on
         /// </summary>

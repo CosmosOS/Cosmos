@@ -228,7 +228,7 @@ namespace Cosmos.Playground.SSchocke
             Console.WriteLine("Scanning for VMWare SVGA cards...");
             foreach (PCIDevice device in Cosmos.Hardware.PCIBus.Devices)
             {
-                if ((device.VendorID == 0x15AD) && (device.DeviceID == 0x0405))
+                if ((device.VendorID == 0x15AD) && (device.DeviceID == 0x0405) && (device.Claimed == false))
                 {
                     Console.WriteLine("Found VMWare SVGA on PCI " + device.Bus + ":" + device.Slot + ":" + device.Function);
                     Console.WriteLine("VGA IRQ: " + device.InterruptLine);
@@ -335,6 +335,8 @@ namespace Cosmos.Playground.SSchocke
                 Console.WriteLine("FIFO Size too small... something is wrong!!");
                 return;
             }
+
+            this.pciDev.Claimed = true;
 
             if (deviceVersionID >= SVGA_ID_1)
             {

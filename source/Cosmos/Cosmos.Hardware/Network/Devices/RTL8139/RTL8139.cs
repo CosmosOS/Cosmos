@@ -32,6 +32,9 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             }
             pciCard = device;
 
+            // We are handling this device
+            pciCard.Claimed = true;
+
             // Setup interrupt handling
             //Interrupts.IRQ11 += HandleNetworkInterrupt;
             Interrupts.AddIRQHandler(device.InterruptLine, HandleNetworkInterrupt);
@@ -87,7 +90,7 @@ namespace Cosmos.Hardware.Network.Devices.RTL8139
             foreach (PCIDevice device in Cosmos.Hardware.PCIBus.Devices)
             {
                 //DebugWriteLine("VendorID: " + device.VendorID + " - DeviceID: " + device.DeviceID);
-                if ((device.VendorID == 0x10EC) && (device.DeviceID == 0x8139))
+                if ((device.VendorID == 0x10EC) && (device.DeviceID == 0x8139) && (device.Claimed == false))
                 {
                     RTL8139 nic = new RTL8139(device);
 

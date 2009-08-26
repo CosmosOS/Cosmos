@@ -26,6 +26,9 @@ namespace Cosmos.Hardware.Network.Devices.ViaRhine
             }
             pciCard = device;
 
+            // We are handling this device
+            pciCard.Claimed = true;
+
             // Setup interrupt handling
             //Interrupts.IRQ10 += HandleNetworkInterrupt;
             Interrupts.AddIRQHandler(device.InterruptLine, HandleNetworkInterrupt);
@@ -127,7 +130,7 @@ namespace Cosmos.Hardware.Network.Devices.ViaRhine
             Console.WriteLine("Scanning for VIA Rhine-II cards...");
             foreach (PCIDevice device in Cosmos.Hardware.PCIBus.Devices)
             {
-                if ((device.VendorID == 0x1106) && (device.DeviceID == 0x3065))
+                if ((device.VendorID == 0x1106) && (device.DeviceID == 0x3065) && (device.Claimed == false))
                 {
                     VT6102 nic = new VT6102(device);
 

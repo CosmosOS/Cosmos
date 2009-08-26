@@ -30,6 +30,9 @@ namespace Cosmos.Hardware.Network.Devices.AMDPCNetII
             }
             pciCard = device;
 
+            // We are handling this device
+            pciCard.Claimed = true;
+
             // Setup interrupt handling
             //Interrupts.IRQ09 += HandleNetworkInterrupt;
             Interrupts.AddIRQHandler(device.InterruptLine, HandleNetworkInterrupt);
@@ -133,7 +136,7 @@ namespace Cosmos.Hardware.Network.Devices.AMDPCNetII
             Console.WriteLine("Scanning for AMD PCNet cards...");
             foreach (PCIDevice device in Cosmos.Hardware.PCIBus.Devices)
             {
-                if ((device.VendorID == 0x1022) && (device.DeviceID == 0x2000))
+                if ((device.VendorID == 0x1022) && (device.DeviceID == 0x2000) && (device.Claimed == false))
                 {
                     AMDPCNet nic = new AMDPCNet(device);
 
