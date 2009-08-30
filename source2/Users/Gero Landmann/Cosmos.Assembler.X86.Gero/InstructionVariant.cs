@@ -5,6 +5,9 @@ using System.Text;
 
 namespace Cosmos.Assembler.X86
 {
+    /// <summary>
+    /// This class represents a variant of a intructions with a specific asm code and specific operands
+    /// </summary>
     public class InstructionVariant
     {
         //public Action<byte[], Instruction> ModifyBytes;
@@ -30,6 +33,30 @@ namespace Cosmos.Assembler.X86
 
         public BitSize AllowedSizes = BitSize.Default;
         public BitSize DefaultSize = BitSize.Bits32;
+
+        public string ToString( InstructionOutputFormat aFormat )
+        {
+            string Instruction = "";
+            string tmp;
+            switch( aFormat )
+            {
+                case InstructionOutputFormat.ASM:
+
+                    tmp = Size.ToString();
+                    if( tmp == "" )
+                        return Instruction;
+
+                    Instruction += tmp + " ";
+
+
+
+
+                    return Instruction;
+            }
+
+            return "Format not supported.";
+        }
+
         /// <summary>
         /// The index in OpCode where the OperandSize bit is encoded
         /// </summary>

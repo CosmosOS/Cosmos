@@ -35,5 +35,10 @@ namespace Cosmos.Assembler.X86
         /// is this EncodingOption valid for situations where the Operand is an immediate value
         /// </summary>
         public BitSize ImmediateSize = BitSize.None;
+
+        public override string ToString()
+        {
+            return base.ToString();
+        }
     }
 }

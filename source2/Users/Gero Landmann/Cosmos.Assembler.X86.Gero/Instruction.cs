@@ -5,6 +5,9 @@ using System.Text;
 
 namespace Cosmos.Assembler.X86
 {
+    /// <summary>
+    /// This class represents a intructions and has information about all variants for it
+    /// </summary>
     public abstract class Instruction
     {
         public InstructionEnum AsmInstruction { get; protected set; }
