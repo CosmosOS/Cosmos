@@ -78,9 +78,7 @@ namespace Cosmos.IL2CPU
             //}
         }
 
-        #region Methods
-
-        public BaseAssemblerElement GetAssemblerElement( int aIndex )
+         public BaseAssemblerElement GetAssemblerElement( int aIndex )
         {
             if( aIndex >= mInstructions.Count )
             {
@@ -133,25 +131,20 @@ namespace Cosmos.IL2CPU
               xOpCodeVal = ( uint )xOpCode.OpCode;
               if (xOpCodeVal <= 0xFF) {
                 xILOp = mILOpsLo[xOpCodeVal];
-              }
-              else
-              {
+              } else {
                 xILOp = mILOpsHi[xOpCodeVal & 0xFF];
               }
+              xILOp.Execute(aMethod, xOpCode);
           }
         }
 
         protected abstract void InitILOps();
 
-        protected void InitILOps( Type aAssemblerBaseOp )
-        {
-            foreach( var xType in aAssemblerBaseOp.Assembly.GetExportedTypes() )
-            {
-                if( xType.IsSubclassOf( aAssemblerBaseOp ) )
-                {
+        protected void InitILOps( Type aAssemblerBaseOp ) {
+            foreach( var xType in aAssemblerBaseOp.Assembly.GetExportedTypes() ) {
+                if( xType.IsSubclassOf( aAssemblerBaseOp ) ) {
                     var xAttribs = ( OpCodeAttribute[] )xType.GetCustomAttributes( typeof( OpCodeAttribute ), false );
-                    foreach( var xAttrib in xAttribs )
-                    {
+                    foreach( var xAttrib in xAttribs ) {
                         var xOpCode = ( ushort )xAttrib.OpCode;
                         var xCtor = xType.GetConstructor( new Type[] { typeof( Assembler ) } );
                         var xILOp = ( ILOp )xCtor.Invoke( new Object[] { this } );
@@ -164,6 +157,6 @@ namespace Cosmos.IL2CPU
                 }
             }
         }
-        #endregion
+ 
     }
 }
