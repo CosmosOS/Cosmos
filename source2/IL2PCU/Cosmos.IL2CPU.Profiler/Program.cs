@@ -9,6 +9,9 @@ using System.Text;
 namespace Cosmos.IL2CPU.Profiler {
   class Program {
 
+    // This program profiles the scanning engine.
+    // In the future it may profile other aspects as well.
+
     static void Main(string[] args) {
       DoScan();
     }
