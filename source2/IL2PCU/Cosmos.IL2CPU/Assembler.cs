@@ -123,18 +123,15 @@ namespace Cosmos.IL2CPU
             return;
           }
 
-          ILOpCode xOpCode = aOpCodes[0];
-          ILOp xILOp = null;
-          uint xOpCodeVal = 0;
-
-          for( int i = 1; i < aOpCodes.Count; i++ ) {
-              xOpCodeVal = ( uint )xOpCode.OpCode;
-              if (xOpCodeVal <= 0xFF) {
-                xILOp = mILOpsLo[xOpCodeVal];
-              } else {
-                xILOp = mILOpsHi[xOpCodeVal & 0xFF];
-              }
-              xILOp.Execute(aMethod, xOpCode);
+          foreach( var xOpCode in aOpCodes) {
+            uint xOpCodeVal = (uint)xOpCode.OpCode;
+            ILOp xILOp;
+            if (xOpCodeVal <= 0xFF) {
+              xILOp = mILOpsLo[xOpCodeVal];
+            } else {
+              xILOp = mILOpsHi[xOpCodeVal & 0xFF];
+            }
+            xILOp.Execute(aMethod, xOpCode);
           }
         }
 
