@@ -216,9 +216,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Hardware.SMBIOS", "C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Gero Landmann", "Gero Landmann", "{2DF5F17F-4890-4856-ADFD-4DE23282C3B7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Assembler", "..\source2\Users\Gero Landmann\Cosmos.Assembler\Cosmos.Assembler.csproj", "{0740B762-8664-4BFC-8E6B-F8EE089A3386}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Assembler.X86.Generator", "..\source2\Users\Gero Landmann\Cosmos.Assembler.X86\Cosmos.Assembler.X86.Generator.csproj", "{F067606C-9FAC-45A5-ADB9-FA1358F11BB2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Assembler.X86.Gero", "..\source2\Users\Gero Landmann\Cosmos.Assembler.X86.Gero\Cosmos.Assembler.X86.Gero.csproj", "{6658FCE0-7032-4B7B-BD95-F2765C393442}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
@@ -490,14 +490,14 @@ Global
 		SccProjectTopLevelParentUniqueName66 = Cosmos.sln
 		SccProjectName66 = Cosmos.Hardware.SMBIOS
 		SccLocalPath66 = Cosmos.Hardware.SMBIOS
-		SccProjectUniqueName67 = ..\\source2\\Users\\Gero\u0020Landmann\\Cosmos.Assembler\\Cosmos.Assembler.csproj
+		SccProjectUniqueName67 = ..\\source2\\Users\\Gero\u0020Landmann\\Cosmos.Assembler.X86\\Cosmos.Assembler.X86.Generator.csproj
 		SccProjectTopLevelParentUniqueName67 = Cosmos.sln
-		SccProjectName67 = ../source2/Users/Gero\u0020Landmann/Cosmos.Assembler
-		SccLocalPath67 = ..\\source2\\Users\\Gero\u0020Landmann\\Cosmos.Assembler
-		SccProjectUniqueName68 = ..\\source2\\Users\\Gero\u0020Landmann\\Cosmos.Assembler.X86\\Cosmos.Assembler.X86.Generator.csproj
+		SccProjectName67 = ../source2/Users/Gero\u0020Landmann/Cosmos.Assembler.X86
+		SccLocalPath67 = ..\\source2\\Users\\Gero\u0020Landmann\\Cosmos.Assembler.X86
+		SccProjectUniqueName68 = ..\\source2\\Users\\Gero\u0020Landmann\\Cosmos.Assembler.X86.Gero\\Cosmos.Assembler.X86.Gero.csproj
 		SccProjectTopLevelParentUniqueName68 = Cosmos.sln
-		SccProjectName68 = ../source2/Users/Gero\u0020Landmann/Cosmos.Assembler.X86
-		SccLocalPath68 = ..\\source2\\Users\\Gero\u0020Landmann\\Cosmos.Assembler.X86
+		SccProjectName68 = ../source2/Users/Gero\u0020Landmann/Cosmos.Assembler.X86.Gero
+		SccLocalPath68 = ..\\source2\\Users\\Gero\u0020Landmann\\Cosmos.Assembler.X86.Gero
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -768,14 +768,14 @@ Global
 		{B2F76E27-EAE1-4ECF-8A33-77B2CFBB9367}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B2F76E27-EAE1-4ECF-8A33-77B2CFBB9367}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B2F76E27-EAE1-4ECF-8A33-77B2CFBB9367}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0740B762-8664-4BFC-8E6B-F8EE089A3386}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0740B762-8664-4BFC-8E6B-F8EE089A3386}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0740B762-8664-4BFC-8E6B-F8EE089A3386}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0740B762-8664-4BFC-8E6B-F8EE089A3386}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F067606C-9FAC-45A5-ADB9-FA1358F11BB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F067606C-9FAC-45A5-ADB9-FA1358F11BB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F067606C-9FAC-45A5-ADB9-FA1358F11BB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F067606C-9FAC-45A5-ADB9-FA1358F11BB2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6658FCE0-7032-4B7B-BD95-F2765C393442}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6658FCE0-7032-4B7B-BD95-F2765C393442}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6658FCE0-7032-4B7B-BD95-F2765C393442}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6658FCE0-7032-4B7B-BD95-F2765C393442}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -878,7 +878,7 @@ Global
 		{239E33A7-F0C3-4801-85CA-4D8F89A31DC0} = {35CABD9D-5C85-419A-B6C9-561EAD97A553}
 		{F708C866-1C9B-4579-8C28-0728ECCFC1ED} = {35CABD9D-5C85-419A-B6C9-561EAD97A553}
 		{63F7BFB9-419E-4965-B580-304B9C9FA7D8} = {35CABD9D-5C85-419A-B6C9-561EAD97A553}
-		{0740B762-8664-4BFC-8E6B-F8EE089A3386} = {2DF5F17F-4890-4856-ADFD-4DE23282C3B7}
 		{F067606C-9FAC-45A5-ADB9-FA1358F11BB2} = {2DF5F17F-4890-4856-ADFD-4DE23282C3B7}
+		{6658FCE0-7032-4B7B-BD95-F2765C393442} = {2DF5F17F-4890-4856-ADFD-4DE23282C3B7}
 	EndGlobalSection
 EndGlobal
