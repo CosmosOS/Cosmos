@@ -9,6 +9,7 @@ namespace Cosmos.IL2CPU.X86.IL
             : base( aAsmblr )
         {
         }
+
         public static void Assemble( Assembler aAssembler, uint aElementSize )
         {
             throw new NotImplementedException();

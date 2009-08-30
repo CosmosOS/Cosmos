@@ -17,10 +17,5 @@ namespace Cosmos.IL2CPU
         // could be used for other things, profiling, analysis, reporting, etc
         public abstract void Execute( MethodInfo aMethod, ILOpCode aOpCode );
 
-
-        public virtual void Execute( MethodInfo aMethod, ILOpCode aOpCode, ILOpCode aNextOpCode )
-        {
-            Execute( aMethod, aOpCode); 
-        }
     }
 }

@@ -15,38 +15,38 @@ namespace Cosmos.IL2CPU.X86.IL
             //TODO: What if the last ILOp in a method was Conv_Ovf_I ?
         }
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode, ILOpCode aNextOpCode )
-        {
-            var xSource = Assembler.StackContents.Pop();
-            switch( xSource.Size )
-            {
-                case 1:
-                case 2:
-                case 4:
-                    {
-                        new CPUx86.Noop();
-                        break;
-                    }
-                case 8:
-                    {
-                        new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                        new CPUx86.SignExtendAX { Size = 32 };
-                        //all bits of EDX == sign (EAX)
-                        new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
-                        //must be equal to EDX
-                        new CPUx86.Xor { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.EDX };
-                        new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = AssemblerNasm.TmpPosLabel( aMethod, aNextOpCode ) };
-                        //equals
-                        new CPUx86.Interrupt { DestinationValue = 4 };
-                        break;
+        //public override void Execute( MethodInfo aMethod, ILOpCode aOpCode, ILOpCode aNextOpCode )
+        //{
+        //    var xSource = Assembler.StackContents.Pop();
+        //    switch( xSource.Size )
+        //    {
+        //        case 1:
+        //        case 2:
+        //        case 4:
+        //            {
+        //                new CPUx86.Noop();
+        //                break;
+        //            }
+        //        case 8:
+        //            {
+        //                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+        //                new CPUx86.SignExtendAX { Size = 32 };
+        //                //all bits of EDX == sign (EAX)
+        //                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
+        //                //must be equal to EDX
+        //                new CPUx86.Xor { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.EDX };
+        //                new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = AssemblerNasm.TmpPosLabel( aMethod, aNextOpCode ) };
+        //                //equals
+        //                new CPUx86.Interrupt { DestinationValue = 4 };
+        //                break;
 
-                    }
-                default:
-                    //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_Ovf_I: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
-                    throw new NotImplementedException(); 
-            }
-            Assembler.StackContents.Push( new StackContent( 4, true, false, false ) );
-        }
+        //            }
+        //        default:
+        //            //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_Ovf_I: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
+        //            throw new NotImplementedException(); 
+        //    }
+        //    Assembler.StackContents.Push( new StackContent( 4, true, false, false ) );
+        //}
 
 
         // using System;

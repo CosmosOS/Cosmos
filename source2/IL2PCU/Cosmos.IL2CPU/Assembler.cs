@@ -120,42 +120,25 @@ namespace Cosmos.IL2CPU
             }
         }
 
-        public void ProcessMethod( MethodInfo aMethod, List<ILOpCode> aOpCodes )
-        {
-            if( aOpCodes.Count == 0 )
-                return;
+        public void ProcessMethod( MethodInfo aMethod, List<ILOpCode> aOpCodes ) {
+          if (aOpCodes.Count == 0) {
+            return;
+          }
 
-            ILOpCode xOpCode = aOpCodes[0];
-            ILOpCode xNextOpCode = null;
-            ILOp xILOp = null;
-            uint xOpCodeVal = 0;
+          ILOpCode xOpCode = aOpCodes[0];
+          ILOp xILOp = null;
+          uint xOpCodeVal = 0;
 
-            for( int i = 1; i < aOpCodes.Count; i++ )
-            {
-                xNextOpCode = aOpCodes[i];
-                
-                xOpCodeVal = ( uint )xOpCode.OpCode;
-
-                if( xOpCodeVal <= 0xFF )
-                    xILOp = mILOpsLo[ xOpCodeVal ];
-                else
-                    xILOp = mILOpsHi[ xOpCodeVal & 0xFF ];
-
-                xILOp.Execute( aMethod, xOpCode, xNextOpCode );
-
-                xOpCode = xNextOpCode; 
-                
-            }
-
-            //Process last ILOp
-            xOpCodeVal = ( uint )xOpCode.OpCode;
-
-            if( xOpCodeVal <= 0xFF )
-                xILOp = mILOpsLo[ xOpCodeVal ];
-            else
-                xILOp = mILOpsHi[ xOpCodeVal & 0xFF ];
-
-            xILOp.Execute( aMethod, xOpCode );
+          for( int i = 1; i < aOpCodes.Count; i++ ) {
+              xOpCodeVal = ( uint )xOpCode.OpCode;
+              if (xOpCodeVal <= 0xFF) {
+                xILOp = mILOpsLo[xOpCodeVal];
+              }
+              else
+              {
+                xILOp = mILOpsHi[xOpCodeVal & 0xFF];
+              }
+          }
         }
 
         protected abstract void InitILOps();
@@ -172,12 +155,9 @@ namespace Cosmos.IL2CPU
                         var xOpCode = ( ushort )xAttrib.OpCode;
                         var xCtor = xType.GetConstructor( new Type[] { typeof( Assembler ) } );
                         var xILOp = ( ILOp )xCtor.Invoke( new Object[] { this } );
-                        if( xOpCode <= 0xFF )
-                        {
+                        if( xOpCode <= 0xFF ) {
                             mILOpsLo[ xOpCode ] = xILOp;
-                        }
-                        else
-                        {
+                        } else {
                             mILOpsHi[ xOpCode & 0xFF ] = xILOp;
                         }
                     }
