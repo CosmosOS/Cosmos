@@ -49,7 +49,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 			new CPUx86.Move { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EBP };
 		//             new CPUx86.Sub { DestinationReg = CPUx86.Registers.EDX, SourceValue = (uint)(Address * -1) };
 		//             new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX };
-		// 			Assembler.StackContents.Push(new StackContent(4, true, false, false));
+		// 			Assembler.Stack.Push(new StackContent(4, true, false, false));
 		// 		}
 		// 	}
 		// }

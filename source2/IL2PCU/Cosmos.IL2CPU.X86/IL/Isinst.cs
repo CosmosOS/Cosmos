@@ -70,9 +70,9 @@ namespace Cosmos.IL2CPU.X86.IL
 		//             new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = mReturnNullLabel };
 		//             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
 		//             new CPUx86.Push { DestinationRef = ElementReference.New(mTypeId), DestinationIsIndirect=true };
-		//             Assembler.StackContents.Push(new StackContent(4,
+		//             Assembler.Stack.Push(new StackContent(4,
 		//                                                           typeof(object)));
-		//             Assembler.StackContents.Push(new StackContent(4,
+		//             Assembler.Stack.Push(new StackContent(4,
 		//                                                           typeof(object)));
 		//             MethodBase xMethodIsInstance = ReflectionUtilities.GetMethodBase(typeof(VTablesImpl),
 		//                                                                 "IsInstance",
@@ -86,7 +86,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		//             xOp.SetServiceProvider(GetServiceProvider());
 		//             xOp.Assemble();
 		//             new Label(mThisLabel + "_After_IsInstance_Call");
-		//             Assembler.StackContents.Pop();
+		//             Assembler.Stack.Pop();
 		//             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
 		//             new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
 		//             new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotEqual, DestinationLabel = mNextOpLabel };

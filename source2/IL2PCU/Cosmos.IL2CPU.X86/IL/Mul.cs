@@ -12,7 +12,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            StackContent xStackContent = Assembler.StackContents.Pop();
+            var xStackContent = Assembler.Stack.Pop();
             new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EDX };
             if( xStackContent.IsFloat )
             {

@@ -32,7 +32,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 			byte[] xBytes = BitConverter.GetBytes(mValue);
 		//             new CPU.Push { DestinationValue = BitConverter.ToUInt32(xBytes, 0) };
 		//             new CPU.Push { DestinationValue = BitConverter.ToUInt32(xBytes, 4) };
-		// 			Assembler.StackContents.Push(new StackContent(8, typeof(Double)));
+		// 			Assembler.Stack.Push(new StackContent(8, typeof(Double)));
 		// 		}
 		// 	}
 		// }

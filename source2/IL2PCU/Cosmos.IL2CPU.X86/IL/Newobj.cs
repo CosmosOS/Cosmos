@@ -116,7 +116,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		//                 uint xObjectSize = aCtorDeclTypeInfo.StorageSize;
 		//                 for (int i = 1; i < aCtorMethodInfo.Arguments.Length; i++)
 		//                 {
-		//                     aAssembler.StackContents.Pop();
+		//                     aAssembler.Stack.Pop();
 		//                 }
 		//                 int xExtraSize = 20;
 		//                 new Push { DestinationValue = (uint)(xObjectSize + xExtraSize) };
@@ -217,7 +217,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		//                     };
 		//                 }
 		//                 new Push { DestinationReg=Registers.EAX };
-		//                 aAssembler.StackContents.Push(new StackContent(4,
+		//                 aAssembler.Stack.Push(new StackContent(4,
 		//                                                                aCtorDef.DeclaringType));
 		//             }
 		//             else
@@ -259,7 +259,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		//                     new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = (uint)xExtraArgSize };
 		//                 }
 		//                 new CPUx86.Push { DestinationReg = Registers.ESP };
-		//                 aAssembler.StackContents.Push(new StackContent(4));
+		//                 aAssembler.Stack.Push(new StackContent(4));
 		//                 //at this point, we need to move copy all arguments over. 
 		//                 for (int i = 0;i<(xArgSize/4);i++)
 		//                 {
@@ -273,7 +273,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		//                 xCall.SetServiceProvider(aServiceProvider);
 		//                 xCall.Assembler = aAssembler;
 		//                 xCall.Assemble();
-		//                 aAssembler.StackContents.Push(new StackContent((int)xStorageSize,
+		//                 aAssembler.Stack.Push(new StackContent((int)xStorageSize,
 		//                                                                aCtorDef.DeclaringType));
 		//             }
 		//         }

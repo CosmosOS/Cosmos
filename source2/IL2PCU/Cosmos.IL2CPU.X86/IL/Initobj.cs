@@ -20,7 +20,7 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 //GetService<IMetaDataInfoService>().GetTypeFieldInfo( mType, out mObjSize );
             }
-            Assembler.StackContents.Pop();
+            Assembler.Stack.Pop();
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
             for( int i = 0; i < ( mObjSize / 4 ); i++ )
             {
@@ -89,7 +89,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //             {
         //                 GetService<IMetaDataInfoService>().GetTypeFieldInfo(mType, out mObjSize);
         //             }
-        // 			Assembler.StackContents.Pop();
+        // 			Assembler.Stack.Pop();
         //             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
         // 			for (int i = 0; i < (mObjSize / 4); i++) {
         //                 new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = i * 4, SourceValue = 0, Size=32 };

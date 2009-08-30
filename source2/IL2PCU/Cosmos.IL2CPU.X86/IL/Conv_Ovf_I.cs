@@ -17,7 +17,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         //public override void Execute( MethodInfo aMethod, ILOpCode aOpCode, ILOpCode aNextOpCode )
         //{
-        //    var xSource = Assembler.StackContents.Pop();
+        //    var xSource = Assembler.Stack.Pop();
         //    switch( xSource.Size )
         //    {
         //        case 1:
@@ -45,7 +45,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //            //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_Ovf_I: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
         //            throw new NotImplementedException(); 
         //    }
-        //    Assembler.StackContents.Push( new StackContent( 4, true, false, false ) );
+        //    Assembler.Stack.Push( new StackContent( 4, true, false, false ) );
         //}
 
 
@@ -72,7 +72,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //             mNextLabel = IL.Op.GetInstructionLabel(aReader.NextPosition);
         // 		}
         // 		public override void DoAssemble() {
-        // 			var xSource = Assembler.StackContents.Pop();
+        // 			var xSource = Assembler.Stack.Pop();
         // 			switch (xSource.Size)
         // 			{
         // 			case 1:
@@ -100,7 +100,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //                 EmitNotImplementedException(Assembler, GetServiceProvider(), "Conv_Ovf_I: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel);
         //                 break;
         // 			}
-        // 			Assembler.StackContents.Push(new StackContent(4, true, false, false));
+        // 			Assembler.Stack.Push(new StackContent(4, true, false, false));
         // 		}
         // 	}
         // }

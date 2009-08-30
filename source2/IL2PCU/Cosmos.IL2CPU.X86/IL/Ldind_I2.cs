@@ -16,8 +16,8 @@ namespace Cosmos.IL2CPU.X86.IL
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EDX, SourceValue = 0 };
             new CPUx86.Move { DestinationReg = CPUx86.Registers.DX, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true };
             new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX };
-            Assembler.StackContents.Pop();
-            Assembler.StackContents.Push( new StackContent( 2, typeof( short ) ) );
+            Assembler.Stack.Pop();
+            Assembler.Stack.Push( 2, typeof( short ) ) ;
         }
 
 
@@ -39,8 +39,8 @@ namespace Cosmos.IL2CPU.X86.IL
         //             new CPUx86.Move { DestinationReg = CPUx86.Registers.EDX, SourceValue = 0 };
         // 			new CPUx86.Move{DestinationReg = CPUx86.Registers.DX, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect=true};
         //             new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX };
-        // 			Assembler.StackContents.Pop();
-        // 			Assembler.StackContents.Push(new StackContent(2, typeof(short)));
+        // 			Assembler.Stack.Pop();
+        // 			Assembler.Stack.Push(new StackContent(2, typeof(short)));
         // 		}
         // 	}
         // }

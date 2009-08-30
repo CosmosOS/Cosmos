@@ -12,12 +12,12 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            Assembler.StackContents.Pop();
+            Assembler.Stack.Pop();
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EDX, SourceValue = 0 };
             new CPUx86.Move { DestinationReg = CPUx86.Registers.DX, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true };
             new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX };
-            Assembler.StackContents.Push( new StackContent( 2, typeof( ushort ) ) );
+            Assembler.Stack.Push( 2, typeof( ushort ) );
         }
 
 

@@ -72,8 +72,8 @@ namespace Cosmos.IL2CPU.X86.IL
         //                 new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = (ObjectImpl.FieldDataOffset + (i * 4)), SourceReg = CPUx86.Registers.EDX, Size=32 };
         //             }
         //             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
-        //             Assembler.StackContents.Pop();
-        //             Assembler.StackContents.Push(new StackContent(4, false, false, false));
+        //             Assembler.Stack.Pop();
+        //             Assembler.Stack.Push(new StackContent(4, false, false, false));
         // 		} 
         // 	}
         // }

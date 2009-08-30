@@ -11,13 +11,13 @@ namespace Cosmos.IL2CPU.X86.IL
 		}
 
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
-        if( Assembler.StackContents.Peek().IsFloat )
+        if( Assembler.Stack.Peek().IsFloat )
         {
             //EmitNotImplementedException( Assembler, GetServiceProvider(), "Rem: Float support not yet implemented!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
             throw new NotImplementedException();
         }
-        StackContent xStackItem = Assembler.StackContents.Peek();
-        int xSize = Math.Max( Assembler.StackContents.Pop().Size, Assembler.StackContents.Pop().Size );
+        var xStackItem = Assembler.Stack.Peek();
+        int xSize = Math.Max( Assembler.Stack.Pop().Size, Assembler.Stack.Pop().Size );
         if( xSize > 4 )
         {
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
@@ -38,7 +38,7 @@ namespace Cosmos.IL2CPU.X86.IL
             new CPUx86.Divide { DestinationReg = CPUx86.Registers.ECX }; // => EAX / ECX 
             new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX };
         }
-        Assembler.StackContents.Push( xStackItem );
+        Assembler.Stack.Push( xStackItem );
     }
 
     
@@ -62,12 +62,12 @@ namespace Cosmos.IL2CPU.X86.IL
 		//             mNextLabel = IL.Op.GetInstructionLabel(aReader.NextPosition);
 		// 		}
 		// 		public override void DoAssemble() {
-		// 			if (Assembler.StackContents.Peek().IsFloat) {
+		// 			if (Assembler.Stack.Peek().IsFloat) {
 		//                 EmitNotImplementedException(Assembler, GetServiceProvider(), "Rem: Float support not yet implemented!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel);
 		//                 return;
 		// 			}
-		// 			StackContent xStackItem = Assembler.StackContents.Peek();
-		// 			int xSize = Math.Max(Assembler.StackContents.Pop().Size, Assembler.StackContents.Pop().Size);
+		// 			StackContent xStackItem = Assembler.Stack.Peek();
+		// 			int xSize = Math.Max(Assembler.Stack.Pop().Size, Assembler.Stack.Pop().Size);
 		// 			if (xSize > 4) {
 		//                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
 		//                 new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
@@ -85,7 +85,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		//                 new CPUx86.Divide { DestinationReg = CPUx86.Registers.ECX }; // => EAX / ECX 
 		//                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX };
 		// 			}
-		// 			Assembler.StackContents.Push(xStackItem);
+		// 			Assembler.Stack.Push(xStackItem);
 		// 		}
 		// 	}
 		// }

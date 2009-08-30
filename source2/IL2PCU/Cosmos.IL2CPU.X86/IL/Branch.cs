@@ -26,8 +26,8 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            var xStackContent = Assembler.StackContents.Pop();
-            Assembler.StackContents.Pop();
+            var xStackContent = Assembler.Stack.Pop();
+            Assembler.Stack.Pop();
             if( xStackContent.Size > 8 )
             {
                 throw new Exception( "StackSize > 8 not supported" );

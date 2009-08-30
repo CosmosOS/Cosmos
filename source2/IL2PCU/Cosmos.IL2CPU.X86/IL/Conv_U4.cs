@@ -13,7 +13,7 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
             // todo: WARNING: not implemented correctly!
-            var xStackItem = Assembler.StackContents.Pop();
+            var xStackItem = Assembler.Stack.Pop();
             if( xStackItem.IsFloat )
             {
                 //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_U4: Floats not yet supported", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
@@ -43,7 +43,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_U4: SourceSize " + xStackItem.Size + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
                     throw new NotImplementedException();
             }
-            Assembler.StackContents.Push( new StackContent( 4, typeof( uint ) ) );
+            Assembler.Stack.Push(4, typeof( uint ) ) ;
         }
 
 
@@ -68,7 +68,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 		}
         // 		public override void DoAssemble() {
         // 			// todo: WARNING: not implemented correctly!
-        // 			var xStackItem = Assembler.StackContents.Pop();
+        // 			var xStackItem = Assembler.Stack.Pop();
         // 			if (xStackItem.IsFloat) {
         //                 EmitNotImplementedException(Assembler, GetServiceProvider(), "Conv_U4: Floats not yet supported", mCurLabel, mMethodInformation, mCurOffset, mNextLabel);
         // 				return;
@@ -93,7 +93,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //                     EmitNotImplementedException(Assembler, GetServiceProvider(), "Conv_U4: SourceSize " + xStackItem.Size + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel);
         //                     return;
         // 			}
-        // 			Assembler.StackContents.Push(new StackContent(4, typeof(uint)));
+        // 			Assembler.Stack.Push(new StackContent(4, typeof(uint)));
         // 		}
         // 	}
         // }

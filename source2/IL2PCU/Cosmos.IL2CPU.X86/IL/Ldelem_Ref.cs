@@ -58,9 +58,9 @@ namespace Cosmos.IL2CPU.X86.IL
                     }
                 }
             }
-            aAssembler.StackContents.Pop();
-            aAssembler.StackContents.Pop();
-            aAssembler.StackContents.Push( new StackContent( ( int )aElementSize, true, false, false ) );
+            aAssembler.Stack.Pop();
+            aAssembler.Stack.Pop();
+            aAssembler.Stack.Push(  ( int )aElementSize, true, false, false ) ;
         }
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
@@ -115,9 +115,9 @@ namespace Cosmos.IL2CPU.X86.IL
         // 					}
         // 				}
         // 			}
-        // 			aAssembler.StackContents.Pop();
-        // 			aAssembler.StackContents.Pop();
-        // 			aAssembler.StackContents.Push(new StackContent((int)aElementSize, true, false, false));
+        // 			aAssembler.Stack.Pop();
+        // 			aAssembler.Stack.Pop();
+        // 			aAssembler.Stack.Push(new StackContent((int)aElementSize, true, false, false));
         // 		}
         // 
         // 		public override void DoAssemble() {

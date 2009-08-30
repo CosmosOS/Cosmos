@@ -22,7 +22,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 //string DestLabel = "_" + aMethod.UID + "_" + OpSw.BranchLocations[ i ] + "__";
                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = "_" + aMethod.UID + "_" + OpSw.BranchLocations[ i ] + "__" };
             }
-            Assembler.StackContents.Pop();
+            Assembler.Stack.Pop();
         }
 
 
@@ -49,7 +49,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //                 new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceValue =(uint)i };
         //                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = mLabels[i] };
         // 			}
-        // 			Assembler.StackContents.Pop();
+        // 			Assembler.Stack.Pop();
         // 		}
         // 	}
         // }

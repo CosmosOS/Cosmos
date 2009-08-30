@@ -56,7 +56,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		//                 new CPUx86.Move { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = i, SourceReg = CPUx86.Registers.EAX };
 		// 			}
 		// 			// no need to inc again, items on the transient stack are also counted
-		// 			Assembler.StackContents.Pop();
+		// 			Assembler.Stack.Pop();
 		// 		}
 		// 	}
 		// }

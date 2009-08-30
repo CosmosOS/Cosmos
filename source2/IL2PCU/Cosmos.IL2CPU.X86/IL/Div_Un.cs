@@ -12,7 +12,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            var xStackItem = Assembler.StackContents.Pop();
+            var xStackItem = Assembler.Stack.Pop();
             if( xStackItem.IsFloat )
             {
                 throw new NotImplementedException( "Floats not yet supported!" );
@@ -52,7 +52,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 			: base(aReader, aMethodInfo) {
         // 		}
         // 		public override void DoAssemble() {
-        // 			var xStackItem= Assembler.StackContents.Pop();
+        // 			var xStackItem= Assembler.Stack.Pop();
         // 			if (xStackItem.IsFloat) {
         // 				throw new Exception("Floats not yet supported!");
         // 			}

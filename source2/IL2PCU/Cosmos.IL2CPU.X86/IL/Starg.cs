@@ -40,7 +40,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 				new CPUx86.Pop{DestinationReg=CPUx86.Registers.EAX};
 		//                 new CPUx86.Move { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = mAddresses[i], SourceReg = CPUx86.Registers.EAX };
 		// 			}
-		// 			Assembler.StackContents.Pop();
+		// 			Assembler.Stack.Pop();
 		// 		}
 		// 	}
 		// }

@@ -87,7 +87,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		//             new Comment("String Value: " + LiteralStr.Replace("\r", "\\r").Replace("\n", "\\n"));
 		//             Y.EAX = Y.Reference(xDataName);
 		//             Y.EAX.Push();
-		//             Assembler.StackContents.Push(new StackContent(4, typeof(string)));
+		//             Assembler.Stack.Push(new StackContent(4, typeof(string)));
 		//         }
 		//     }
 		// }

@@ -17,7 +17,7 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
             throw new NotImplementedException(); 
-            StackContent xValue = Assembler.StackContents.Pop();
+            var xValue = Assembler.Stack.Pop();
             if( xValue.Size > 4 )
             {
                 //EmitNotImplementedException( Assembler, aServiceProvider, "Doubles not yet supported (add)", aCurrentLabel, aCurrentMethodInfo, aCurrentOffset, aNextLabel );

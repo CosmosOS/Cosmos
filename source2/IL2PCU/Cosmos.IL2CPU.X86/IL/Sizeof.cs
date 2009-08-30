@@ -48,7 +48,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		//             uint xSize;
 		//             GetService<IMetaDataInfoService>().GetTypeFieldInfo(mType, out xSize);
 		//             new CPU.Push { DestinationValue =xSize};
-		// 			Assembler.StackContents.Push(new StackContent(4, typeof(int)));
+		// 			Assembler.Stack.Push(new StackContent(4, typeof(int)));
 		// 		}
 		// 	}
 		// }

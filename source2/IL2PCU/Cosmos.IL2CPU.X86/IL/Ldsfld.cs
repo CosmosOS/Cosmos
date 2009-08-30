@@ -102,13 +102,13 @@ namespace Cosmos.IL2CPU.X86.IL
         //                         break;
         // 				}
         // 			}
-        // 			Assembler.StackContents.Push(new StackContent((int)xSize, null));
+        // 			Assembler.Stack.Push(new StackContent((int)xSize, null));
         // 			if (mNeedsGC) {
         // 				new Dup(null, null) {
         // 					Assembler = this.Assembler
         // 				}.Assemble();
         // 				new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.IncRefCountRef) };
-        // 				Assembler.StackContents.Pop();
+        // 				Assembler.Stack.Pop();
         // 			}
         // 		}
         // 	}

@@ -12,7 +12,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            var xSource = Assembler.StackContents.Pop();
+            var xSource = Assembler.Stack.Pop();
             switch( xSource.Size )
             {
                 case 1:
@@ -30,7 +30,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_Ovf_I8: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
                     throw new NotImplementedException();
             }
-            Assembler.StackContents.Push( new StackContent( 8, true, false, true ) );
+            Assembler.Stack.Push( 8, true, false, true );
         }
 
 
@@ -54,7 +54,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //             mNextLabel = IL.Op.GetInstructionLabel(aReader.NextPosition);
         // 		}
         // 		public override void DoAssemble() {
-        //             var xSource = Assembler.StackContents.Pop();
+        //             var xSource = Assembler.Stack.Pop();
         //             switch (xSource.Size)
         //             {
         //                 case 1:
@@ -72,7 +72,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //                     EmitNotImplementedException(Assembler, GetServiceProvider(), "Conv_Ovf_I8: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel);
         //                     break;
         //             }
-        //             Assembler.StackContents.Push(new StackContent(8, true, false, true));
+        //             Assembler.Stack.Push(new StackContent(8, true, false, true));
         // 		}
         // 	}
         // }

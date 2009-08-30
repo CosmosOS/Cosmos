@@ -13,7 +13,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            StackContent xSize = Assembler.StackContents.Pop();
+            var xSize = Assembler.Stack.Pop();
             if( xSize.IsFloat )
             {
 

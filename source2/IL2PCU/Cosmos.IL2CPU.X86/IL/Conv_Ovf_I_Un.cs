@@ -41,7 +41,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		//         }
 		// 
 		//         public override void DoAssemble() {
-		//             var xSource = Assembler.StackContents.Pop();
+		//             var xSource = Assembler.Stack.Pop();
 		//             switch (xSource.Size) {
 		//                 case 1:
 		//                 case 2:
@@ -68,7 +68,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		//                     EmitNotImplementedException(Assembler, GetServiceProvider(), "Conv_Ovf_I_Un: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel);
 		//                     break;
 		//             }
-		//             Assembler.StackContents.Push(new StackContent(4,
+		//             Assembler.Stack.Push(new StackContent(4,
 		//                                                           true,
 		//                                                           false,
 		//                                                           false));

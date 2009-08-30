@@ -12,8 +12,8 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            int xFieldSize = Assembler.StackContents.Pop().Size;
-            Assembler.StackContents.Pop();
+            int xFieldSize = Assembler.Stack.Pop().Size;
+            Assembler.Stack.Pop();
             new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = xFieldSize };
             for( int i = 0; i < ( xFieldSize / 4 ); i++ )
             {
@@ -56,8 +56,8 @@ namespace Cosmos.IL2CPU.X86.IL
         // 			: base(aReader, aMethodInfo) {
         // 		}
         // 		public override void DoAssemble() {
-        // 			int xFieldSize = Assembler.StackContents.Pop().Size;
-        // 			Assembler.StackContents.Pop();
+        // 			int xFieldSize = Assembler.Stack.Pop().Size;
+        // 			Assembler.Stack.Pop();
         //             new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = xFieldSize };
         // 			for (int i = 0; i < (xFieldSize / 4); i++) {
         //                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };

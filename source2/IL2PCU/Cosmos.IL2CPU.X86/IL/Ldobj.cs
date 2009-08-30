@@ -13,7 +13,7 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
             throw new NotImplementedException();
-            StackContent xSize = Assembler.StackContents.Pop();
+            var xSize = Assembler.Stack.Pop();
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
             for( int i = 1; i <= ( xSize.Size / 4 ); i++ )
             {
@@ -43,10 +43,10 @@ namespace Cosmos.IL2CPU.X86.IL
                 default:
                         throw new Exception( "Remainder not supported!" );
             }
-            //Assembler.StackContents.Pop();
+            //Assembler.Stack.Pop();
 
             //TODO: Push type not number
-            //Assembler.StackContents.Push( new StackContent( ( int )xSize.Size, true, false, false ) );
+            //Assembler.Stack.Push( new StackContent( ( int )xSize.Size, true, false, false ) );
         }
 
 
@@ -97,8 +97,8 @@ namespace Cosmos.IL2CPU.X86.IL
         //                     throw new Exception("Remainder not supported!");
         //                 }
         //             }
-        //             Assembler.StackContents.Pop();
-        //             Assembler.StackContents.Push(new StackContent((int)xSize,
+        //             Assembler.Stack.Pop();
+        //             Assembler.Stack.Push(new StackContent((int)xSize,
         //                                                           xType));
         //         }
         //     }

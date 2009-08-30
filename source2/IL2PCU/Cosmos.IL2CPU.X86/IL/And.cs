@@ -14,12 +14,12 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            StackContent xStackContent = Assembler.StackContents.Peek();
+            var xStackContent = Assembler.Stack.Peek();
 
             if( xStackContent.IsFloat )
                 throw new NotImplementedException( "Floats not yet supported!" );
             
-            int xSize = Math.Max( Assembler.StackContents.Pop().Size, Assembler.StackContents.Pop().Size );
+            int xSize = Math.Max( Assembler.Stack.Pop().Size, Assembler.Stack.Pop().Size );
             if( xSize > 8 )
                 throw new NotImplementedException( "StackSize>8 not supported" );
             
@@ -41,7 +41,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 new CPU.And { DestinationReg = CPU.Registers.EAX, SourceReg = CPU.Registers.EDX };
                 new CPU.Push { DestinationReg = CPU.Registers.EAX };
             }
-            Assembler.StackContents.Push( xStackContent );
+            Assembler.Stack.Push( xStackContent );
         }
 
     }

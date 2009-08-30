@@ -13,7 +13,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            var stackTop = Assembler.StackContents.Pop();
+            var stackTop = Assembler.Stack.Pop();
 
             if( stackTop.IsFloat )
             {

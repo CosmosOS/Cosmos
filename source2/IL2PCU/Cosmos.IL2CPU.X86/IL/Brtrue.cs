@@ -32,7 +32,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 		}
         // 
         // 		public override void DoAssemble() {
-        // 			int xSize = Assembler.StackContents.Pop().Size;
+        // 			int xSize = Assembler.Stack.Pop().Size;
         // 			if (xSize > 8) {
         // 				throw new Exception("StackSize>8 not supported");
         // 			}

@@ -30,7 +30,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 		}
 		// 		public override void DoAssemble() {
 		// 			new CPU.Push{DestinationValue=BitConverter.ToUInt32(BitConverter.GetBytes(mValue), 0)};
-		// 			Assembler.StackContents.Push(new StackContent(4, typeof(Single)));
+		// 			Assembler.Stack.Push(new StackContent(4, typeof(Single)));
 		// 		}
 		// 	}
 		// }

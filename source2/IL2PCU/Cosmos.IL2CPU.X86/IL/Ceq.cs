@@ -34,7 +34,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 			CurInstructionLabel = GetInstructionLabel(aReader);
         // 		}
         // 		private void Assemble4Byte() {
-        // 			Assembler.StackContents.Push(new StackContent(4, typeof(bool)));
+        // 			Assembler.Stack.Push(new StackContent(4, typeof(bool)));
         // 			string BaseLabel = CurInstructionLabel + "__";
         // 			string LabelTrue = BaseLabel + "True";
         // 			string LabelFalse = BaseLabel + "False";
@@ -53,7 +53,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 		}
         // 
         // 		private void Assemble8Byte() {
-        // 			Assembler.StackContents.Push(new StackContent(4, typeof(bool)));
+        // 			Assembler.Stack.Push(new StackContent(4, typeof(bool)));
         // 			string BaseLabel = CurInstructionLabel + "__";
         // 			string LabelTrue = BaseLabel + "True";
         // 			string LabelFalse = BaseLabel + "False";
@@ -82,7 +82,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 		}
         // 
         // 		public override void DoAssemble() {
-        // 			int xSize = Math.Max(Assembler.StackContents.Pop().Size, Assembler.StackContents.Pop().Size);
+        // 			int xSize = Math.Max(Assembler.Stack.Pop().Size, Assembler.Stack.Pop().Size);
         // 			if (xSize > 8) {
         // 				throw new Exception("StackSizes>8 not supported");
         // 			}

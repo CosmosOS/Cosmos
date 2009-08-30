@@ -32,7 +32,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		//             new CPUx86.Call { DestinationLabel = aExceptionOccurredLabel };
 		//             new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceValue = 3 };
 		// 			Call.EmitExceptionLogic(aAssembler, (uint)aCurrentILOffset, aMethodInfo, null, false, null);
-		// 			aAssembler.StackContents.Pop();
+		// 			aAssembler.Stack.Pop();
 		// 		}
 		// 	
 		// 		public override void DoAssemble() {

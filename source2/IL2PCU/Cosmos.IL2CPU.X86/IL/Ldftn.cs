@@ -49,7 +49,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 
 		// 		public override void DoAssemble() {
 		//             new CPUx86.Push { DestinationRef = ElementReference.New(mFunctionLabel) };
-		// 			Assembler.StackContents.Push(new StackContent(4, true, false, false));
+		// 			Assembler.Stack.Push(new StackContent(4, true, false, false));
 		// 		}
 		// 	}
 		// }

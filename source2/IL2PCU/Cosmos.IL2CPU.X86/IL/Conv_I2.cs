@@ -13,7 +13,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            StackContent xSource = Assembler.StackContents.Pop();
+            var xSource = Assembler.Stack.Pop();
             if( xSource.IsFloat )
             {
                 //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_I2: Floats not yet implemented", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
@@ -38,7 +38,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 default:
                     throw new NotImplementedException( "SourceSize " + xSource + " not supported!" );
             }
-            Assembler.StackContents.Push( new StackContent( 2, true, false, true ) );
+            Assembler.Stack.Push( 2, true, false, true ) ;
         }
 
 
@@ -63,7 +63,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //             mNextLabel = IL.Op.GetInstructionLabel(aReader.NextPosition);
         // 		}
         // 		public override void DoAssemble() {
-        // 			StackContent xSource = Assembler.StackContents.Pop();
+        // 			StackContent xSource = Assembler.Stack.Pop();
         // 			if (xSource.IsFloat) {
         //                 EmitNotImplementedException(Assembler, GetServiceProvider(), "Conv_I2: Floats not yet implemented", mCurLabel, mMethodInformation, mCurOffset, mNextLabel);
         //                 return;
@@ -86,7 +86,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 				default:
         // 					throw new Exception("SourceSize " + xSource + " not supported!");
         // 			}
-        // 			Assembler.StackContents.Push(new StackContent(2, true, false, true));
+        // 			Assembler.Stack.Push(new StackContent(2, true, false, true));
         // 		}
         // 	}
         // }

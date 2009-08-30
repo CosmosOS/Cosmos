@@ -12,7 +12,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            var xStackContent = Assembler.StackContents.Pop();
+            var xStackContent = Assembler.Stack.Pop();
             switch( xStackContent.Size )
             {
                 case 1:
@@ -62,7 +62,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //             mNextLabel = IL.Op.GetInstructionLabel(aReader.NextPosition);
         // 		}
         // 		public override void DoAssemble() {
-        // 			var xStackContent = Assembler.StackContents.Pop();
+        // 			var xStackContent = Assembler.Stack.Pop();
         // 			switch (xStackContent.Size) {
         // 				case 1:
         // 				case 2: {
@@ -84,7 +84,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //                     EmitNotImplementedException(Assembler, GetServiceProvider(), "Conv_U: SourceSize " + xStackContent.Size + "not supported yet!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel);
         //                     return;
         // 			}
-        // 			Assembler.StackContents.Push(new StackContent(4, true, false, false));
+        // 			Assembler.Stack.Push(new StackContent(4, true, false, false));
         // 		}
         // 	}
         // }

@@ -262,14 +262,14 @@ namespace Cosmos.IL2CPU.X86.IL
         //                                });
         //             for (int i = 0;i < aArgumentCount;i++)
         //             {
-        //                 Assembler.StackContents.Pop();
+        //                 Assembler.Stack.Pop();
         //             }
         //             if (mResultSize == 0)
         //             {
         //                 return;
         //             }
         // 
-        //             Assembler.StackContents.Push(new StackContent((int)mResultSize,
+        //             Assembler.Stack.Push(new StackContent((int)mResultSize,
         //                                                           ((MethodInfo)mTargetMethodInfo.Method).ReturnType));
         //         }
         // 

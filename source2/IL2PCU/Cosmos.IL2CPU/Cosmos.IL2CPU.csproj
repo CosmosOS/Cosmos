@@ -82,7 +82,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ILScanner.cs" />
     <Compile Include="ReaderWriterLocker.cs" />
-    <Compile Include="StackContent.cs" />
+    <Compile Include="StackContents.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="ReadMe.txt" />

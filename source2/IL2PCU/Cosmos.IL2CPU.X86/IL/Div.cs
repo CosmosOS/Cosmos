@@ -13,7 +13,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            var xSize = Assembler.StackContents.Pop();
+            var xSize = Assembler.Stack.Pop();
             if( xSize.IsFloat )
             {
                 //EmitNotSupportedException( Assembler, GetServiceProvider(), "Floats not yet supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
@@ -61,7 +61,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //             mNextLabel = IL.Op.GetInstructionLabel(aReader.NextPosition);
         // 		}
         // 		public override void DoAssemble() {
-        // 			var xSize = Assembler.StackContents.Pop();
+        // 			var xSize = Assembler.Stack.Pop();
         // 			if (xSize.IsFloat) {
         //                 EmitNotSupportedException(Assembler, GetServiceProvider(), "Floats not yet supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel);
         //                 return;

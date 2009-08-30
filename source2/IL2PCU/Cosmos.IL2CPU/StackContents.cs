@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Cosmos.IL2CPU
-{
-    public sealed class StackContent
-    {
-        public StackContent( int aSize )
-        {
+namespace Cosmos.IL2CPU {
+
+  public class StackContents {
+    #region class Item
+    public sealed class Item {
+        public Item( int aSize ) {
             Size = aSize;
         }
 
-        public StackContent( int aSize, Type aType )
+        public Item( int aSize, Type aType )
             : this( aSize )
         {
             IsNumber = ( aType == typeof( byte )
@@ -35,7 +35,7 @@ namespace Cosmos.IL2CPU
             ContentType = aType;
         }
 
-        public StackContent( int aSize, bool aIsNumber, bool aIsFloat, bool aIsSigned )
+        public Item( int aSize, bool aIsNumber, bool aIsFloat, bool aIsSigned )
             : this( aSize )
         {
             IsNumber = aIsNumber;
@@ -49,4 +49,36 @@ namespace Cosmos.IL2CPU
         public readonly Type ContentType = null;
         public readonly bool IsBox = false;
     }
+    #endregion
+
+    public StackContents() {
+    }
+
+    private Stack<Item> mStack = new Stack<Item>();
+
+    public Item Peek() {
+      return mStack.Peek();
+    }
+
+    public Item Pop() {
+      return mStack.Pop();
+    }
+
+    public void Push(Item aItem) {
+      mStack.Push(aItem);
+    }
+
+    public void Push(int aSize) {
+      mStack.Push(new Item(aSize));
+    }
+
+    public void Push(int aSize, Type aType) {
+      mStack.Push(new Item(aSize, aType));
+    }
+
+    public void Push(int aSize, bool aIsNumber, bool aIsFloat, bool aIsSigned) {
+      mStack.Push(new Item(aSize, aIsNumber, aIsFloat, aIsSigned));
+    }
+
+ }
 }

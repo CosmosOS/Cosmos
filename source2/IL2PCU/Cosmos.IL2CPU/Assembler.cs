@@ -5,23 +5,18 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Threading;
 
-namespace Cosmos.IL2CPU
-{
-    public abstract class Assembler
-    {
-        #region Fields
+namespace Cosmos.IL2CPU {
+    public abstract class Assembler {
+      protected ILOp[] mILOpsLo = new ILOp[ 256 ];
+      protected ILOp[] mILOpsHi = new ILOp[ 256 ];
 
-        protected ILOp[] mILOpsLo = new ILOp[ 256 ];
-        protected ILOp[] mILOpsHi = new ILOp[ 256 ];
-
-        public readonly Stack<StackContent> StackContents = new Stack<StackContent>();
+      // Contains info on the current stack structure. What type are on the stack, etc
+      public readonly StackContents Stack = new StackContents();
 
         private static ReaderWriterLocker mCurrentInstanceLocker = new ReaderWriterLocker();
         private static SortedList<int, Stack<Assembler>> mCurrentInstance = new SortedList<int, Stack<Assembler>>();
         protected internal List<Instruction> mInstructions = new List<Instruction>();
         private List<DataMember> mDataMembers = new List<DataMember>();
-
-        #endregion
 
         #region Properties
 

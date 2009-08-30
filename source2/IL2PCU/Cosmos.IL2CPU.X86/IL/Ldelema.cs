@@ -13,9 +13,9 @@ namespace Cosmos.IL2CPU.X86.IL
         public static void Assemble( Assembler aAssembler, uint aElementSize )
         {
             throw new NotImplementedException();
-            aAssembler.StackContents.Pop();
-            aAssembler.StackContents.Pop();
-            aAssembler.StackContents.Push( new StackContent( 4, typeof( uint ) ) );
+            aAssembler.Stack.Pop();
+            aAssembler.Stack.Pop();
+            aAssembler.Stack.Push( 4, typeof( uint ) );
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EDX, SourceValue = aElementSize };
             new CPUx86.Multiply { DestinationReg = CPUx86.Registers.EDX };
@@ -28,7 +28,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            StackContent xSize = Assembler.StackContents.Pop();
+            var xSize = Assembler.Stack.Pop();
 
             Assemble( Assembler, ( uint )xSize.Size );
         }
@@ -53,9 +53,9 @@ namespace Cosmos.IL2CPU.X86.IL
         // 		}
         // 
         // 		public static void Assemble(CPU.Assembler aAssembler, uint aElementSize) {
-        // 			aAssembler.StackContents.Pop();
-        // 			aAssembler.StackContents.Pop();
-        // 			aAssembler.StackContents.Push(new StackContent(4, typeof(uint)));
+        // 			aAssembler.Stack.Pop();
+        // 			aAssembler.Stack.Pop();
+        // 			aAssembler.Stack.Push(new StackContent(4, typeof(uint)));
         //             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
         //             new CPUx86.Move { DestinationReg = CPUx86.Registers.EDX, SourceValue = aElementSize };
         // 			new CPUx86.Multiply{DestinationReg=CPUx86.Registers.EDX};

@@ -86,17 +86,17 @@ namespace Cosmos.IL2CPU.X86.IL
         // 
         // 			new CPU.Comment("Element Size = " + mElementSize);
         // 			// element count is on the stack
-        // 			int xElementCountSize = Assembler.StackContents.Pop().Size;
+        // 			int xElementCountSize = Assembler.Stack.Pop().Size;
         //             new CPUx86.Pop { DestinationReg = CPUx86.Registers.ESI};
         //             new CPUx86.Push { DestinationReg = CPUx86.Registers.ESI };
         // 			//Assembler.StackSizes.Push(xElementCountSize);
         //             new CPUx86.Push { DestinationValue = mElementSize };
-        // 			Assembler.StackContents.Push(new StackContent(4, typeof(uint)));
+        // 			Assembler.Stack.Push(new StackContent(4, typeof(uint)));
         //             Multiply(Assembler, GetServiceProvider(),
         //                 mBaseLabel, mCurrentMethodInfo, (uint)mCurOffset, mNextLabel);
         // 			// the total items size is now on the stack
         //             new CPUx86.Push { DestinationValue = (ObjectImpl.FieldDataOffset + 4) };
-        // 			Assembler.StackContents.Push(new StackContent(4, typeof(uint)));
+        // 			Assembler.Stack.Push(new StackContent(4, typeof(uint)));
         //             Add(Assembler, GetServiceProvider(), mBaseLabel, mCurrentMethodInfo, mCurOffset, mNextLabel);
         // 			// the total array size is now on the stack.
         // 		    new CPUx86.Call { DestinationLabel = CPU.MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.AllocNewObjectRef) };
@@ -109,7 +109,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //             new CPUx86.Call { DestinationLabel = xIncRef };
         //             new CPUx86.Call { DestinationLabel = xIncRef };
         // 			//new CPUx86.Pop(CPUx86.Registers_Old.ESI);
-        // 			Assembler.StackContents.Push(new StackContent(4, typeof(Array)));
+        // 			Assembler.Stack.Push(new StackContent(4, typeof(Array)));
         //             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
         //             new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, SourceRef = ElementReference.New(GetService<IMetaDataInfoService>().GetTypeIdLabel(typeof(Array))), SourceIsIndirect = true };
         //             new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, SourceReg=CPUx86.Registers.EBX};

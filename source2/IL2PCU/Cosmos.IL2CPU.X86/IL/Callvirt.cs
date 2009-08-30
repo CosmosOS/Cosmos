@@ -256,10 +256,10 @@ namespace Cosmos.IL2CPU.X86.IL
         //             new CPU.Label(mLabelName + "__NO_EXCEPTION_AFTER_CALL");
         //             new CPU.Comment("Argument Count = " + mArgumentCount.ToString());
         //             for (int i = 0; i < mArgumentCount; i++) {
-        //                 Assembler.StackContents.Pop();
+        //                 Assembler.Stack.Pop();
         //             }
         //             if (mReturnSize > 0) {
-        //                 Assembler.StackContents.Push(new StackContent((int)mReturnSize));
+        //                 Assembler.Stack.Push(new StackContent((int)mReturnSize));
         //             }
         //         }
         //     }

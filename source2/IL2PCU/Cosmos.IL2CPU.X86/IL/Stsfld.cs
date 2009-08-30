@@ -88,7 +88,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		//                     break;
 		// 
 		// 			}
-		// 			Assembler.StackContents.Pop();
+		// 			Assembler.Stack.Pop();
 		// 		}
 		// 	}
 		// }

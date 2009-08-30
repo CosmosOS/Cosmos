@@ -46,9 +46,9 @@ namespace Cosmos.IL2CPU.X86.IL
 		//             new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
 		//             new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = mReturnNullLabel };
 		//             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
-		// 			Assembler.StackContents.Push(new StackContent(4, typeof(uint)));
+		// 			Assembler.Stack.Push(new StackContent(4, typeof(uint)));
 		//             new CPUx86.Push { DestinationRef = ElementReference.New(mTypeIdLabel), DestinationIsIndirect=true };
-		// 			Assembler.StackContents.Push(new StackContent(4, typeof(uint)));
+		// 			Assembler.Stack.Push(new StackContent(4, typeof(uint)));
 		//             MethodBase xMethodIsInstance = ReflectionUtilities.GetMethodBase(ReflectionUtilities.GetType("", "Indy.IL2CPU.VTablesImpl"), "IsInstance", "System.Int32", "System.Int32");
 		// 			Op xOp = new Call(xMethodIsInstance, mCurrentILOffset, mDebugMode, mThisLabel + "_After_IsInstance_Call");
 		// 			xOp.Assembler = Assembler;
@@ -56,7 +56,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 			xOp.Assemble();
 		// 		    new Label(mThisLabel + "_After_IsInstance_Call");
 		//             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-		// 			Assembler.StackContents.Pop();
+		// 			Assembler.Stack.Pop();
 		//             new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
 		//             new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = mReturnNullLabel };
 		//             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
@@ -68,12 +68,12 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 			for (int i = xItems - 1; i >= 0; i--) {
 		//                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = ((i * 4) + ObjectImpl.FieldDataOffset) };
 		// 			}
-		// 			Assembler.StackContents.Push(new StackContent((int)xTypeSize, mType));
+		// 			Assembler.Stack.Push(new StackContent((int)xTypeSize, mType));
 		//             new CPUx86.Jump { DestinationLabel = mNextOpLabel };
 		// 			new CPU.Label(mReturnNullLabel);
 		//             new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
 		//             new CPUx86.Push { DestinationValue = 0 };
-		// 			Assembler.StackContents.Push(new StackContent(4, typeof(object)));
+		// 			Assembler.Stack.Push(new StackContent(4, typeof(object)));
 		// 		}
 		// 	}
 		// }

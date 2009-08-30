@@ -15,8 +15,8 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
             string xLabelName = AssemblerNasm.TmpPosLabel( aMethod, aOpCode );
-            var xStackItem_ShiftAmount = Assembler.StackContents.Pop();
-            var xStackItem_Value = Assembler.StackContents.Pop();
+            var xStackItem_ShiftAmount = Assembler.Stack.Pop();
+            var xStackItem_Value = Assembler.Stack.Pop();
             if( xStackItem_Value.IsFloat )
             {
                 throw new NotImplementedException( "Floats not yet supported!" );
@@ -28,7 +28,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 new CPUx86.Move { DestinationReg = CPUx86.Registers.CL, SourceReg = CPUx86.Registers.AL };
                 new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.CL };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EBX };
-                Assembler.StackContents.Push( xStackItem_Value );
+                Assembler.Stack.Push( xStackItem_Value );
             }
             else if( xStackItem_Value.Size <= 8 )
             {
@@ -47,7 +47,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 new CPUx86.Jump { DestinationLabel = xLabelName + "__StartLoop" };
 
                 new CPU.Label( xLabelName + "__EndLoop" );
-                Assembler.StackContents.Push( xStackItem_Value );
+                Assembler.Stack.Push( xStackItem_Value );
             }
         }
 

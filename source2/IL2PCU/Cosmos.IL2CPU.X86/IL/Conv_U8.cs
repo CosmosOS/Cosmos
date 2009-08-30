@@ -10,23 +10,23 @@ namespace Cosmos.IL2CPU.X86.IL
 		}
 
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
-        if( Assembler.StackContents.Peek().IsFloat )
+        if( Assembler.Stack.Peek().IsFloat )
         {
             //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_U8: Floats are not yet supported", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
             throw new NotImplementedException();
         }
-        int xSource = Assembler.StackContents.Peek().Size;
+        int xSource = Assembler.Stack.Peek().Size;
         switch( xSource )
         {
             case 1:
             case 2:
             case 4:
                 {
-                    Assembler.StackContents.Pop();
+                    Assembler.Stack.Pop();
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
                     new CPUx86.Push { DestinationValue = 0 };
                     new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
-                    Assembler.StackContents.Push( new StackContent( 8, typeof( ulong ) ) );
+                    Assembler.Stack.Push( 8, typeof( ulong ) );
                     break;
                 }
             case 8:
@@ -61,20 +61,20 @@ namespace Cosmos.IL2CPU.X86.IL
 		//             mNextLabel = IL.Op.GetInstructionLabel(aReader.NextPosition);
 		// 		}
 		// 		public override void DoAssemble() {
-		// 			if (Assembler.StackContents.Peek().IsFloat) {
+		// 			if (Assembler.Stack.Peek().IsFloat) {
 		//                 EmitNotImplementedException(Assembler, GetServiceProvider(), "Conv_U8: Floats are not yet supported", mCurLabel, mMethodInformation, mCurOffset, mNextLabel);
 		//                 return;
 		// 			}
-		// 			int xSource = Assembler.StackContents.Peek().Size;
+		// 			int xSource = Assembler.Stack.Peek().Size;
 		// 			switch (xSource) {
 		// 				case 1:
 		// 				case 2:
 		// 				case 4: {
-		// 						Assembler.StackContents.Pop();
+		// 						Assembler.Stack.Pop();
 		//                         new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
 		//                         new CPUx86.Push { DestinationValue = 0 };
 		//                         new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
-		// 						Assembler.StackContents.Push(new StackContent(8, typeof(ulong)));
+		// 						Assembler.Stack.Push(new StackContent(8, typeof(ulong)));
 		// 						break;
 		// 					}
 		// 				case 8: {

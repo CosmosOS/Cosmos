@@ -37,7 +37,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 		public override void DoAssemble() {
 		//             EmitNotImplementedException(Assembler, GetServiceProvider(), "Conv_R4: Floats not yet supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel);
 		//             return;
-		// 			//int xSource = Assembler.StackContents.Pop();
+		// 			//int xSource = Assembler.Stack.Pop();
 		// 			//switch (xSource) {
 		// 			//    case 1:
 		// 			//    case 2: {
@@ -47,7 +47,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 			//            new CPUx86.Pop(CPUx86.Registers_Old.EAX);
 		// 			//            new CPUx86.Pop(CPUx86.Registers_Old.ECX);
 		// 			//            new CPUx86.Pushd(CPUx86.Registers_Old.EAX);
-		// 			//            Assembler.StackContents.Push(4);
+		// 			//            Assembler.Stack.Push(4);
 		// 			//            break;
 		// 			//        }
 		// 			//    case 4: {

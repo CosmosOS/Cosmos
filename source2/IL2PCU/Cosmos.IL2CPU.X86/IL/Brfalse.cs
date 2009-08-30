@@ -34,7 +34,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 		}
         // 
         // 		public override void DoAssemble() {
-        // 			var xStackContent = Assembler.StackContents.Pop();
+        // 			var xStackContent = Assembler.Stack.Pop();
         // 			if (xStackContent.IsFloat) {
         // 				throw new Exception("Floats not yet supported!");
         // 			}

@@ -58,9 +58,9 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 		}
 		// 		public override void DoAssemble() {
 		//             new CPU.Push { DestinationReg = CPU.Registers.EBP };
-		// 			Assembler.StackContents.Push(new StackContent(4, typeof(uint)));
+		// 			Assembler.Stack.Push(new StackContent(4, typeof(uint)));
 		//             new CPU.Push { DestinationValue = (uint)mAddress };
-		// 			Assembler.StackContents.Push(new StackContent(4, typeof(uint)));
+		// 			Assembler.Stack.Push(new StackContent(4, typeof(uint)));
 		// 			Add(Assembler, GetServiceProvider(), mCurLabel, mMethodInformation, mCurOffset, mNextLabel);
 		// 		}
 		// 	}

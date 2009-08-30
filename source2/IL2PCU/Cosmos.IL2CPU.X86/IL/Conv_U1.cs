@@ -12,12 +12,12 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            if( Assembler.StackContents.Peek().IsFloat )
+            if( Assembler.Stack.Peek().IsFloat )
             {
                 //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_I1: Floats not yet implemented!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
                 throw new NotImplementedException();
             }
-            int xSource = Assembler.StackContents.Pop().Size;
+            int xSource = Assembler.Stack.Pop().Size;
             switch( xSource )
             {
                 case 2:
@@ -43,7 +43,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_I1: SourceSize " + xSource + " not supported", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
                     throw new NotImplementedException();
             }
-            Assembler.StackContents.Push( new StackContent( 1, typeof( byte ) ) );
+            Assembler.Stack.Push( 1, typeof( byte ) ) ;
         }
 
 
@@ -67,11 +67,11 @@ namespace Cosmos.IL2CPU.X86.IL
         //             mNextLabel = IL.Op.GetInstructionLabel(aReader.NextPosition);
         // 		}
         // 		public override void DoAssemble() {
-        // 			if (Assembler.StackContents.Peek().IsFloat) {
+        // 			if (Assembler.Stack.Peek().IsFloat) {
         // 				EmitNotImplementedException(Assembler, GetServiceProvider(), "Conv_I1: Floats not yet implemented!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel);
         //                 return;
         // 			}
-        // 			int xSource = Assembler.StackContents.Pop().Size;
+        // 			int xSource = Assembler.Stack.Pop().Size;
         // 			switch (xSource) {
         // 				case 2:
         // 				case 4: {
@@ -93,7 +93,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //                     EmitNotImplementedException(Assembler, GetServiceProvider(), "Conv_I1: SourceSize " + xSource + " not supported", mCurLabel, mMethodInformation, mCurOffset, mNextLabel);
         //                     return;
         // 			}
-        // 			Assembler.StackContents.Push(new StackContent(1, typeof(byte)));
+        // 			Assembler.Stack.Push(new StackContent(1, typeof(byte)));
         // 		}
         // 	}
         // }

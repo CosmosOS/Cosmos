@@ -12,10 +12,10 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            Assembler.StackContents.Pop();
+            Assembler.Stack.Pop();
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, Size = 32 };
-            Assembler.StackContents.Push( new StackContent( 4, typeof( Single ) ) );
+            Assembler.Stack.Push( 4, typeof( Single ) );
         }
 
 
@@ -31,10 +31,10 @@ namespace Cosmos.IL2CPU.X86.IL
         // 			: base(aReader, aMethodInfo) {
         // 		}
         // 		public override void DoAssemble() {
-        //             Assembler.StackContents.Pop();
+        //             Assembler.Stack.Pop();
         //             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
         //             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect=true, Size=32 };
-        //             Assembler.StackContents.Push(new StackContent(4, typeof(Single)));
+        //             Assembler.Stack.Push(new StackContent(4, typeof(Single)));
         // 		}
         // 	}
         // }

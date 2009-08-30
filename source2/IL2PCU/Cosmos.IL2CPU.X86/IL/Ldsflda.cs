@@ -41,7 +41,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 		public override void DoAssemble() {
 		// 		    mDataName = GetService<IMetaDataInfoService>().GetStaticFieldLabel(mField);
 		//             new CPU.Push { DestinationRef = ElementReference.New(mDataName) };
-		// 			Assembler.StackContents.Push(new StackContent(4, true, false, false));
+		// 			Assembler.Stack.Push(new StackContent(4, true, false, false));
 		// 		}
 		// 	}
 		// }

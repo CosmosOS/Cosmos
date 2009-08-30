@@ -36,7 +36,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		//             mNextLabel = IL.Op.GetInstructionLabel(aReader.NextPosition);
 		// 		}
 		// 		public override void DoAssemble() {
-		// 			var xStackItem = Assembler.StackContents.Peek();
+		// 			var xStackItem = Assembler.Stack.Peek();
 		// 			switch (xStackItem.Size) {
 		// 				case 1:
 		// 				case 2:
@@ -44,8 +44,8 @@ namespace Cosmos.IL2CPU.X86.IL
 		//                         new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
 		//                         new CPUx86.Push { DestinationValue = 0 };
 		//                         new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
-		// 						Assembler.StackContents.Pop();
-		// 						Assembler.StackContents.Push(new StackContent(8, typeof(Double)));
+		// 						Assembler.Stack.Pop();
+		// 						Assembler.Stack.Push(new StackContent(8, typeof(Double)));
 		// 
 		// 						break;
 		// 					}

@@ -38,7 +38,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		//             mCurrentOffset = aReader.Position;
 		// 		}
 		// 		public override void DoAssemble() {
-		//             var xStackItem = Assembler.StackContents.Pop();
+		//             var xStackItem = Assembler.Stack.Pop();
 		//             if (xStackItem.IsFloat)
 		//             {
 		//                 EmitNotImplementedException(Assembler, GetServiceProvider(), "Clt: Floats not yet supported", CurInstructionLabel, mMethodInfo, mCurrentOffset, NextInstructionLabel);
@@ -49,7 +49,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		//                 EmitNotImplementedException(Assembler, GetServiceProvider(), "Clt: StackSizes>8 not supported", CurInstructionLabel, mMethodInfo, mCurrentOffset, NextInstructionLabel);
 		//                 return;
 		//             }
-		// 			Assembler.StackContents.Push(new StackContent(1, typeof(bool)));
+		// 			Assembler.Stack.Push(new StackContent(1, typeof(bool)));
 		// 			string BaseLabel = CurInstructionLabel + "__";
 		// 			string LabelTrue = BaseLabel + "True";
 		// 			string LabelFalse = BaseLabel + "False";
