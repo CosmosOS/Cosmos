@@ -67,10 +67,6 @@
       <Project>{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}</Project>
       <Name>Indy.IL2CPU</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Assembler\X86\Cosmos.Assembler.X86\Cosmos.Assembler.X86.csproj">
-      <Project>{0740B762-8664-4BFC-8E6B-F8EE089A3386}</Project>
-      <Name>Cosmos.Assembler.X86</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\IL2PCU\Cosmos.IL2CPU.X86\Cosmos.IL2CPU.X86.csproj">
       <Project>{63F7BFB9-419E-4965-B580-304B9C9FA7D8}</Project>
       <Name>Cosmos.IL2CPU.X86</Name>
