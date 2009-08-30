@@ -25,7 +25,7 @@ namespace Cosmos.Assembler.X86
         /// </summary>
         public byte RegisterBitShiftLeft;
 
-        public byte[] NasmData;
+        
 
         /// <summary>
         /// is this EncodingOption valid for situations where the Operand is memory?

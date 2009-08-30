@@ -25,13 +25,13 @@ namespace Cosmos.Assembler.X86
         /// <summary>
         /// Key = 32bit (eg EAX), value = 16 bit (eg AX)
         /// </summary>
-        private static Dictionary<RegistersEnum, RegistersEnum> m32BitTo16BitMapping = new Dictionary<RegistersEnum, RegistersEnum>();
+        //private static Dictionary<RegistersEnum, RegistersEnum> m32BitTo16BitMapping = new Dictionary<RegistersEnum, RegistersEnum>();
         /// <summary>
         /// Key = 32bit (eg EAX), value = 16 bit (eg AL). 
         /// 
         /// </summary>
-        private static Dictionary<RegistersEnum, RegistersEnum> m32BitTo8BitMapping = new Dictionary<RegistersEnum, RegistersEnum>();
-        private static Dictionary<RegistersEnum, RegistersEnum> m16BitTo8BitMapping = new Dictionary<RegistersEnum, RegistersEnum>();
+        //private static Dictionary<RegistersEnum, RegistersEnum> m32BitTo8BitMapping = new Dictionary<RegistersEnum, RegistersEnum>();
+        //private static Dictionary<RegistersEnum, RegistersEnum> m16BitTo8BitMapping = new Dictionary<RegistersEnum, RegistersEnum>();
 
         private static Dictionary<RegistersEnum, string> mRegToName = new Dictionary<RegistersEnum, string>();
         private static Dictionary<string, RegistersEnum> mNameToReg = new Dictionary<string, RegistersEnum>();
@@ -94,10 +94,10 @@ namespace Cosmos.Assembler.X86
             {
                 return aReg;
             }
-            if( m16BitTo8BitMapping.ContainsKey( aReg ) )
-            {
-                return m16BitTo8BitMapping[ aReg ];
-            }
+            //if( m16BitTo8BitMapping.ContainsKey( aReg ) )
+            //{
+            //    return m16BitTo8BitMapping[ aReg ];
+            //}
             return aReg;
         }
 

@@ -56,7 +56,6 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="ExternalLabel.cs" />
     <Compile Include="IInstructionData.cs" />
-    <Compile Include="ImmediateSize.cs" />
     <Compile Include="Instruction.cs" />
     <Compile Include="InstructionData.cs" />
     <Compile Include="InstructionEnum.cs" />

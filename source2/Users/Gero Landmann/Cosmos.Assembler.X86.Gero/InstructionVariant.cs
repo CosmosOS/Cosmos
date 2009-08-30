@@ -9,7 +9,8 @@ namespace Cosmos.Assembler.X86
     {
         //public Action<byte[], Instruction> ModifyBytes;
 
-        public byte[] OpCode;
+        //public byte[] OpCode;
+        public byte[] NasmData;
 
         public List<Operand> AllowedOperandData { get; set; }
 
