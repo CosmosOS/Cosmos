@@ -11,8 +11,7 @@ namespace Cosmos.IL2CPU.X86.IL
     {
         public Ldc_I8( Cosmos.IL2CPU.Assembler aAsmblr ) : base( aAsmblr ) { }
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
-        {
+        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode ) {
             new CPUx86.Push { DestinationValue = ( ( OpInt )aOpCode ).Value };
             Assembler.StackContents.Push( new StackContent( 8, typeof( long ) ) );
         }
