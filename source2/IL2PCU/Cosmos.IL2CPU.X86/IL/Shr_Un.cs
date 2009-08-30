@@ -11,7 +11,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		}
 
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
-      //TODO: Implement this Op
+      throw new NotImplementedException();
     }
 
 	}
