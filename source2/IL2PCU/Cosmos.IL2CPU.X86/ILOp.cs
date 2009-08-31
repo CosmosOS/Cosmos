@@ -18,7 +18,16 @@ namespace Cosmos.IL2CPU.X86
             Assembler = ( Assembler )aAsmblr;
         }
 
-		protected uint GetStackCountForLocal(MethodInfo aMethod, LocalVariableInfo aField)
+        protected void Jump_Exception(MethodInfo aMethod) {
+          // todo: port to numeric labels
+          new CPU.Jump { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) + "___EXCEPTION___EXIT" };
+        }
+
+        protected void Jump_End(MethodInfo aMethod) {
+          throw new NotImplementedException();
+        }
+
+        protected uint GetStackCountForLocal(MethodInfo aMethod, LocalVariableInfo aField)
 		{
 			var xSize = GetFieldStorageSize(aField.LocalType);
 			var xResult = xSize / 4;

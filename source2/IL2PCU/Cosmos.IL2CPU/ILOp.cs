@@ -17,7 +17,7 @@ namespace Cosmos.IL2CPU
         // could be used for other things, profiling, analysis, reporting, etc
         public abstract void Execute( MethodInfo aMethod, ILOpCode aOpCode );
 
-		protected static uint GetFieldStorageSize(Type aType)
+     protected static uint GetFieldStorageSize(Type aType)
 		{
 			if (aType.FullName == "System.Void")
 			{

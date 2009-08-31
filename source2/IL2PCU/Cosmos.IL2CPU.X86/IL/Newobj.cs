@@ -112,11 +112,10 @@ namespace Cosmos.IL2CPU.X86.IL
 									  let xQSize = Align(GetFieldStorageSize(item.GetType()), 4)
 									  select (int)xQSize).Take(xParams.Length - 1).Sum()));
 
-				for (int i = 1; i < xParams.Length; i++)
-				{
-					new Comment(String.Format("Arg {0}: {1}", i, GetFieldStorageSize(xParams[i].GetType())));
-					for (int j = 0; j < GetFieldStorageSize(xParams[i].GetType()); j += 4)
-					{
+				foreach (var xParam in xParams) {
+          uint xParamSize = GetFieldStorageSize(xParams.GetType());
+					new Comment(String.Format("Arg {0}: {1}", xParam.Name, xParamSize));
+          for (int i = 0; i < xParamSize; i += 4) {
 						new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xSize + 4) };
 					}
 				}
@@ -142,7 +141,7 @@ namespace Cosmos.IL2CPU.X86.IL
 				{
 					new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = (uint)xStackInt.Size };
 				}
-				JumpToExceptionExit(aMethod);
+				Jump_Exception(aMethod);
 
 				new Label(xCurrentLabel + "_NO_ERROR_4");
 				new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
@@ -219,17 +218,6 @@ namespace Cosmos.IL2CPU.X86.IL
 				//                                                                aCtorDef.DeclaringType));
 				throw new NotImplementedException();
 			}
-		}
-
-		private void JumpToExceptionExit(MethodInfo aMethod)
-		{
-			// todo: port to numeric labels
-			new CPUx86.Jump{DestinationLabel= MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) + "___EXCEPTION___EXIT"};
-		}
-
-		private void JumpToExit(MethodInfo aMethod)
-		{
-			throw new NotImplementedException();
 		}
 
 		private uint Align(uint aSize, uint aAlign)

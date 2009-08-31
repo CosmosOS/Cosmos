@@ -1,4 +1,11 @@
 using System;
+// using System.Collections.Generic;
+// using System.Linq;
+// using CPU = Indy.IL2CPU.Assembler;
+// using CPUx86 = Indy.IL2CPU.Assembler.X86;
+// using System.Reflection;
+// using Indy.IL2CPU.Assembler;
+// using Indy.IL2CPU.Compiler;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -10,23 +17,11 @@ namespace Cosmos.IL2CPU.X86.IL
         {
         }
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
-        {
+        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode ) {
             throw new NotImplementedException();
         }
 
 
-        // using System;
-        // using System.Collections.Generic;
-        // using System.Linq;
-        // using CPU = Indy.IL2CPU.Assembler;
-        // using CPUx86 = Indy.IL2CPU.Assembler.X86;
-        // using System.Reflection;
-        // using Indy.IL2CPU.Assembler;
-        // using Indy.IL2CPU.Compiler;
-        // 
-        // namespace Indy.IL2CPU.IL.X86 {
-        //     [OpCode(OpCodeEnum.Callvirt)]
         //     public class Callvirt : Op {
         //         private string mMethodIdentifier;
         //         private string mNormalAddress;
