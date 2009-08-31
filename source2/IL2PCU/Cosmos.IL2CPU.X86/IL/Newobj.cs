@@ -1,7 +1,8 @@
 using System;
+using System.Linq;
 using Indy.IL2CPU;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
-using Cosmos.IL2CPU.ILOpCodes;  
+using Cosmos.IL2CPU.ILOpCodes;
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Newobj )]
@@ -14,7 +15,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            OpMethod xMethod = ( OpMethod )aOpCode; 
+            OpMethod xMethod = ( OpMethod )aOpCode;
             // Is this checking for plugs?
             // if (DynamicMethodEmit.GetHasDynamicMethod(CtorDef)) {
             //   CtorDef = DynamicMethodEmit.GetDynamicMethod(CtorDef);
@@ -60,6 +61,7 @@ namespace Cosmos.IL2CPU.X86.IL
             //             }
 
             var xType = xMethod.Value.DeclaringType;
+
             // If not ValueType, then we need gc
             if( !xType.IsValueType )
             {
@@ -79,73 +81,87 @@ namespace Cosmos.IL2CPU.X86.IL
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
-                //                 var xIncRefInfo =
-                //                     aServiceProvider.GetService<IMetaDataInfoService>().GetMethodInfo(
-                //                         GCImplementationRefs.IncRefCountRef, false);
+                //var xIncRefInfo = aServiceProvider.GetService<IMetaDataInfoService>().GetMethodInfo( GCImplementationRefs.IncRefCountRef, false );
                 // TODO: Why call incref twice?
                 //                 new Assembler.X86.Call { DestinationLabel = xIncRefInfo.LabelName };
-                //                 new Assembler.X86.Call { DestinationLabel = xIncRefInfo.LabelName };
+                //                 new CPUx86.Call { DestinationLabel = xIncRefInfo.LabelName };
+
+                new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName( GCImplementationRefs.IncRefCountRef ) };
+
                 uint xObjSize = 0;
-                //                 int xGCFieldCount = (from item in aCtorDeclTypeInfo.Fields.Values
-                //                                      where item.NeedsGC
-                //                                      select item).Count();
-                //                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                //                 new Move { DestinationReg = Registers.EBX, SourceRef = ElementReference.New(aTypeId), SourceIsIndirect = true };
-                //                 new Move { DestinationReg = Registers.EAX, DestinationIsIndirect = true, SourceReg=CPUx86.Registers.EBX};
-                //                 new Move { DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = (uint)InstanceTypeEnum.NormalObject, Size = 32 };
-                //                 new Move { DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 8, SourceValue = (uint)xGCFieldCount, Size = 32 };
-                //                 uint xSize = (uint)(((from item in aCtorMethodInfo.Arguments
-                //                                       let xQSize = item.Size + (item.Size % 4 == 0
-                //                                                             ? 0
-                //                                                             : (4 - (item.Size % 4)))
-                //                                       select (int)xQSize).Take(aCtorMethodInfo.Arguments.Length - 1).Sum()));
-                //                 for (int i = 1; i < aCtorMethodInfo.Arguments.Length; i++)
-                //                 {
-                //                     new Comment(String.Format("Arg {0}: {1}", i, aCtorMethodInfo.Arguments[i].Size));
-                //                     for (int j = 0; j < aCtorMethodInfo.Arguments[i].Size; j += 4)
-                //                     {
-                //                         new Push { DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xSize + 4) };
-                //                     }
-                //                 }
-                // 
-                //                 new Assembler.X86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(aCtorDef) };
-                //                 new Test { DestinationReg = Registers.ECX, SourceValue = 2 };
-                //                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = aCurrentLabel + "_NO_ERROR_4" };
-                //                 for (int i = 1;i < aCtorMethodInfo.Arguments.Length;i++)
-                //                 {
-                //                     new Assembler.X86.Add
-                //                     {
-                //                         DestinationReg = Registers.ESP,
-                //                         SourceValue = (aCtorMethodInfo.Arguments[i].Size % 4 == 0
-                //                              ? aCtorMethodInfo.Arguments[i].Size
-                //                              : ((aCtorMethodInfo.Arguments[i].Size / 4) * 4) + 1)
-                //                     };
-                //                 }
-                //                 new Assembler.X86.Add { DestinationReg = Registers.ESP, SourceValue = 4 };
-                //                 foreach (StackContent xStackInt in aAssembler.StackContents)
-                //                 {
-                //                     new Assembler.X86.Add { DestinationReg = Registers.ESP, SourceValue=(uint)xStackInt.Size };
-                //                 }
-                //                 Call.EmitExceptionLogic(aAssembler,
-                //                                         (uint)aCurrentILOffset,
-                //                                         aCurrentMethodInformation,
-                //                                         aCurrentLabel + "_NO_ERROR_4",
-                //                                         false,
-                //                                         null);
-                //                 new Label(aCurrentLabel + "_NO_ERROR_4");
-                //                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                //                 for (int i = 1; i < aCtorMethodInfo.Arguments.Length; i++)
-                //                 {
-                //                     new Assembler.X86.Add
-                //                     {
-                //                         DestinationReg = Registers.ESP,
-                //                         SourceValue = (aCtorMethodInfo.Arguments[i].Size % 4 == 0
-                //                              ? aCtorMethodInfo.Arguments[i].Size
-                //                              : ((aCtorMethodInfo.Arguments[i].Size / 4) * 4) + 1)
-                //                     };
-                //                 }
-                //                 new Push { DestinationReg=Registers.EAX };
-                //                 aAssembler.Stack.Push(new StackContent(4, aCtorDef.DeclaringType));
+                //int xGCFieldCount = ( from item in aCtorDeclTypeInfo.Fields.Values
+                //where item.NeedsGC
+                //select item ).Count();
+
+                //int xGCFieldCount = ( from item in aCtorDeclTypeInfo.Fields.Values
+                //where item.NeedsGC
+                //select item ).Count();
+                int xGCFieldCount = xType.GetFields().Count( x => x.FieldType.IsValueType );
+
+                string strTypeId = xMethod.Value.DeclaringType.FullName;
+
+                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+                new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, SourceRef = Indy.IL2CPU.Assembler.ElementReference.New( strTypeId ), SourceIsIndirect = true };
+                new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EBX };
+                new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = ( uint )InstanceTypeEnum.NormalObject, Size = 32 };
+                new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 8, SourceValue = ( uint )xGCFieldCount, Size = 32 };
+                uint xSize = ( uint )( ( ( from item in xParams
+                                           let xQSize = Align(GetFieldStorageSize( item.GetType() ), 4 )
+                                           select ( int )xQSize ).Take( xParams.Length - 1 ).Sum() ) );
+
+                for( int i = 1; i < xParams.Length; i++ )
+                {
+                    new Comment( String.Format( "Arg {0}: {1}", i, GetFieldStorageSize( xParams[i].GetType() ) ) );
+                    for( int j = 0; j < GetFieldStorageSize( xParams[ i ].GetType() ); j += 4 )
+                    {
+                        new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = ( int )( xSize + 4 ) };
+                    }
+                }
+
+                new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName( xMethod.Value ) };
+                new CPUx86.Test { DestinationReg = CPUx86.Registers.ECX, SourceValue = 2 };
+                new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = aCurrentLabel + "_NO_ERROR_4" };
+
+                //for( int i = 1; i < aCtorMethodInfo.Arguments.Length; i++ )
+                //{
+                //    new CPUx86.Add
+                //    {
+                //        DestinationReg = CPUx86.Registers.ESP,
+                //        SourceValue = ( aCtorMethodInfo.Arguments[ i ].Size % 4 == 0
+                //             ? aCtorMethodInfo.Arguments[ i ].Size
+                //             : ( ( aCtorMethodInfo.Arguments[ i ].Size / 4 ) * 4 ) + 1 )
+                //    };
+                //}
+                PushAlignedParameterSize( xMethod.Value );  
+
+                new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
+                foreach( StackContent xStackInt in Assembler.Stack )
+                {
+                    new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = ( uint )xStackInt.Size };
+                }
+                //Call.EmitExceptionLogic( aAssembler,
+                //                        ( uint )aCurrentILOffset,
+                //                        aCurrentMethodInformation,
+                //                        aCurrentLabel + "_NO_ERROR_4",
+                //                        false,
+                //                        null );
+                new Label( aCurrentLabel + "_NO_ERROR_4" );
+                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+
+                //for( int i = 1; i < aCtorMethodInfo.Arguments.Length; i++ )
+                //{
+                //    new CPUx86.Add
+                //    {
+                //        DestinationReg = CPUx86.Registers.ESP,
+                //        SourceValue = ( aCtorMethodInfo.Arguments[ i ].Size % 4 == 0
+                //             ? aCtorMethodInfo.Arguments[ i ].Size
+                //             : ( ( aCtorMethodInfo.Arguments[ i ].Size / 4 ) * 4 ) + 1 )
+                //    };
+                //}
+                PushAlignedParameterSize( xMethod.Value ); 
+
+                new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                Assembler.Stack.Push( 4, xMethod.Value.DeclaringType );
                 throw new NotImplementedException();
             }
             else
@@ -207,6 +223,23 @@ namespace Cosmos.IL2CPU.X86.IL
             }
         }
 
+        private uint Align( uint aSize, uint aAlign )
+        {
+            return aSize % 4 == 0 ? aSize : ( ( aSize / aAlign ) * aAlign ) + 1;
+        }
+
+        private void PushAlignedParameterSize( System.Reflection.MethodBase aMethod )
+        {
+            System.Reflection.ParameterInfo[] xParams = aMethod.GetParameters();
+
+            uint xSize;
+
+            for( int i = 1; i < xParams.Length; i++ )
+            {
+                xSize = GetFieldStorageSize( xParams[ i ].GetType() );
+                new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = Align( xSize, 4 ) };
+            }
+        }
         // using System.Collections.Generic;
         // using System.Diagnostics;
         // using System.Linq;
