@@ -60,6 +60,24 @@ namespace Cosmos.IL2CPU {
             CurrentInstance.Push( this );
         }
 
+		public static ulong ConstructLabel(uint aMethod, uint aOpCode, byte aSubLabel)
+		{
+			/* Explanation:
+			 * * This method generates labels. labels are 64bit:
+			 * * First 24 bits (high to low) is the method number
+			 * * then 32 bits is the opcode offset in the il
+			 * * then 8 bits for a sub label.
+			 */
+			if (aMethod > 0x00FFFFFF)
+			{
+				throw new Exception("Error Method id too high!");
+			}
+			ulong xResult = aMethod << 40;
+			xResult |= aOpCode << 8;
+			xResult |= aSubLabel;
+			return xResult;
+		}
+
         public void Dispose()
         {
             // MtW: I know, IDisposable usage for this isn't really nice, but for now this should be fine.
@@ -117,6 +135,11 @@ namespace Cosmos.IL2CPU {
           if (aOpCodes.Count == 0) {
             return;
           }
+			// todo: MtW: how to do this? we need some extra space.
+			//		see ConstructLabel for extra info
+			if(aMethod.UID > 0x00FFFFFF){
+				throw new Exception("For now, too much methods");
+			}
 
           foreach( var xOpCode in aOpCodes) {
             uint xOpCodeVal = (uint)xOpCode.OpCode;
@@ -129,6 +152,8 @@ namespace Cosmos.IL2CPU {
             xILOp.Execute(aMethod, xOpCode);
           }
         }
+
+
 
         protected abstract void InitILOps();
 
