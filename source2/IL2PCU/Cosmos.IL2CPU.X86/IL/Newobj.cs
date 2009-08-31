@@ -1,4 +1,6 @@
 using System;
+using Indy.IL2CPU;
+using CPUx86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -54,49 +56,27 @@ namespace Cosmos.IL2CPU.X86.IL
       //                 throw new ArgumentNullException("aCtorDef");
       //             }
 
-      // Instance versus static ctor?
-      //             if (aCtorDeclTypeInfo.NeedsGC) {
-      //                 uint xObjectSize = aCtorDeclTypeInfo.StorageSize;
-      //                 for (int i = 1; i < aCtorMethodInfo.Arguments.Length; i++) {
-      //                     aAssembler.Stack.Pop();
-      //                 }
-      //                 int xExtraSize = 20;
-      //                 new Push { DestinationValue = (uint)(xObjectSize + xExtraSize) };
-      //                 new Assembler.X86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.AllocNewObjectRef) };
-      //                 //new CPUx86.Pushd(CPUx86.Registers_Old.EAX);
-      //                 new Test { DestinationReg = Registers.ECX, SourceValue = 2 };
-      //                 //new CPUx86.JumpIfEquals(aCurrentLabel + "_NO_ERROR_1");
-      //                 //for (int i = 1; i < xCtorInfo.Arguments.Length; i++) {
-      //                 //    new CPUx86.Add(CPUx86.Registers_Old.ESP, (xCtorInfo.Arguments[i].Size % 4 == 0 ? xCtorInfo.Arguments[i].Size : ((xCtorInfo.Arguments[i].Size / 4) * 4) + 1).ToString());
-      //                 //}
-      //                 //new CPUx86.Add("esp", "4");
-      //                 //Call.EmitExceptionLogic(aAssembler, aCurrentMethodInformation, aCurrentLabel + "_NO_ERROR_1", false);
-      //                 //new CPU.Label(aCurrentLabel + "_NO_ERROR_1");
-      //                 new Push { DestinationReg = Registers.ESP, DestinationIsIndirect = true };
-      //                 new Push { DestinationReg = Registers.ESP, DestinationIsIndirect = true };
-      //                 new Push { DestinationReg = Registers.ESP, DestinationIsIndirect = true };
-      //                 new Push { DestinationReg = Registers.ESP, DestinationIsIndirect = true };
+      var xType = aMethod.MethodBase.DeclaringType;
+      // If not ValueType, then we need gc
+      if (!xType.IsValueType) {
+        uint xObjSize = GetFieldStorageSize(xType);
+        var xParams = aMethod.MethodBase.GetParameters();
+        for (int i = 1; i < xParams.Length; i++) {
+          Assembler.Stack.Pop();
+        }
+        int xExtraSize = 20;
+        new CPUx86.Push { DestinationValue = (uint)(xObjSize + xExtraSize) };
+        new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.AllocNewObjectRef) };
+        new CPUx86.Test { DestinationReg = CPUx86.Registers.ECX, SourceValue = 2 };
+        new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
+        new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
+        new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
+        new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
       //                 var xIncRefInfo =
       //                     aServiceProvider.GetService<IMetaDataInfoService>().GetMethodInfo(
       //                         GCImplementationRefs.IncRefCountRef, false);
       //                 new Assembler.X86.Call { DestinationLabel = xIncRefInfo.LabelName };
-      //                 //new CPUx86.Test("ecx", "2");
-      //                 //new CPUx86.JumpIfEquals(aCurrentLabel + "_NO_ERROR_2");
-      //                 //for (int i = 1; i < xCtorInfo.Arguments.Length; i++) {
-      //                 //    new CPUx86.Add(CPUx86.Registers_Old.ESP, (xCtorInfo.Arguments[i].Size % 4 == 0 ? xCtorInfo.Arguments[i].Size : ((xCtorInfo.Arguments[i].Size / 4) * 4) + 1).ToString());
-      //                 //}
-      //                 //new CPUx86.Add("esp", "16");
-      //                 //Call.EmitExceptionLogic(aAssembler, aCurrentMethodInformation, aCurrentLabel + "_NO_ERROR_2", false);
-      //                 //new CPU.Label(aCurrentLabel + "_NO_ERROR_2");
       //                 new Assembler.X86.Call { DestinationLabel = xIncRefInfo.LabelName };
-      //                 //new CPUx86.Test("ecx", "2");
-      //                 //new CPUx86.JumpIfEquals(aCurrentLabel + "_NO_ERROR_3");
-      //                 //for (int i = 1; i < xCtorInfo.Arguments.Length; i++) {
-      //                 //    new CPUx86.Add(CPUx86.Registers_Old.ESP, (xCtorInfo.Arguments[i].Size % 4 == 0 ? xCtorInfo.Arguments[i].Size : ((xCtorInfo.Arguments[i].Size / 4) * 4) + 1).ToString());
-      //                 //}
-      //                 //new CPUx86.Add("esp", "12");
-      //                 //Call.EmitExceptionLogic(aAssembler, aCurrentMethodInformation, aCurrentLabel + "_NO_ERROR_3", false);
-      //                 //new CPU.Label(aCurrentLabel + "_NO_ERROR_3");
       //                 uint xObjSize = 0;
       //                 int xGCFieldCount = (from item in aCtorDeclTypeInfo.Fields.Values
       //                                      where item.NeedsGC
@@ -146,8 +126,6 @@ namespace Cosmos.IL2CPU.X86.IL
       //                                         null);
       //                 new Label(aCurrentLabel + "_NO_ERROR_4");
       //                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-      //                 //				aAssembler.StackSizes.Pop();
-      //                 //	new CPUx86.Add(CPUx86.Registers_Old.ESP, "4");
       //                 for (int i = 1; i < aCtorMethodInfo.Arguments.Length; i++)
       //                 {
       //                     new Assembler.X86.Add
@@ -159,9 +137,8 @@ namespace Cosmos.IL2CPU.X86.IL
       //                     };
       //                 }
       //                 new Push { DestinationReg=Registers.EAX };
-      //                 aAssembler.Stack.Push(new StackContent(4,
-      //                                                                aCtorDef.DeclaringType));
-      //             } else {
+      //                 aAssembler.Stack.Push(new StackContent(4, aCtorDef.DeclaringType));
+      } else {
       //                 /*
       //                  * Current sitation on stack:
       //                  *   $ESP       Arg
@@ -215,7 +192,7 @@ namespace Cosmos.IL2CPU.X86.IL
       //                 xCall.Assemble();
       //                 aAssembler.Stack.Push(new StackContent((int)xStorageSize,
       //                                                                aCtorDef.DeclaringType));
-      //             }
+      }
       throw new NotImplementedException();
     }
 
@@ -269,6 +246,74 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 
 		//         private string mNextLabel;
 		// }
-		
-	}
+
+    //TODO: Likely this is used by other things besides newobj
+    // and thus should be moved to a different location
+    private uint GetFieldStorageSize(Type aType) {
+      if (aType.FullName == "System.Void") {
+        return 0;
+      } else if ((!aType.IsValueType && aType.IsClass) || aType.IsInterface) {
+        return 4;
+      }
+      switch (aType.FullName) {
+        case "System.Char":
+          return 2;
+        case "System.Byte":
+        case "System.SByte":
+          return 1;
+        case "System.UInt16":
+        case "System.Int16":
+          return 2;
+        case "System.UInt32":
+        case "System.Int32":
+          return 4;
+        case "System.UInt64":
+        case "System.Int64":
+          return 8;
+        //TODO: for now hardcode IntPtr and UIntPtr to be 32-bit
+        case "System.UIntPtr":
+        case "System.IntPtr":
+          return 4;
+        case "System.Boolean":
+          return 1;
+        case "System.Single":
+          return 4;
+        case "System.Double":
+          return 8;
+        case "System.Decimal":
+          return 16;
+        case "System.Guid":
+          return 16;
+        case "System.Enum":
+          return 4;
+        case "System.DateTime":
+          return 8;
+      }
+      if (aType.FullName != null && aType.FullName.EndsWith("*")) {
+        // pointer
+        return 4;
+      }
+      // array
+      //TypeSpecification xTypeSpec = aType as TypeSpecification;
+      //if (xTypeSpec != null) {
+      //    return 4;
+      //}
+      if (aType.IsEnum) {
+        return GetFieldStorageSize(aType.GetField("value__").FieldType);
+      }
+      if (aType.IsValueType) {
+        var xSla = aType.StructLayoutAttribute;
+        if (xSla != null) {
+          if (xSla.Size > 0) {
+            return (uint)xSla.Size;
+          }
+        }
+      }
+      uint xResult;
+      //GetTypeFieldInfo(aType,  out xResult);
+      throw new Exception("TODO");
+      return xResult;
+    }
+  
+  }
 }
