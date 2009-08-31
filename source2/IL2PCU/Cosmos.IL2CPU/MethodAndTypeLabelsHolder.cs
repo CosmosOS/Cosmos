@@ -7,6 +7,6 @@ namespace Cosmos.IL2CPU
 {
 	public static class MethodAndTypeLabelsHolder
 	{
-		//public static readonly uint 
+		public static string GC_IncRefLabel;
 	}
 }

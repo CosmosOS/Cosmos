@@ -15,28 +15,6 @@ namespace Cosmos.IL2CPU.X86.IL
 		{
 		}
 
-		private uint GetStackCount(MethodInfo aMethod, LocalVariableInfo aField)
-		{
-			var xSize = GetFieldStorageSize(aField.LocalType);
-			var xResult = xSize / 4;
-			if (xSize % 4 == 0)
-			{
-				xResult++;
-			}
-			return xResult;
-		}
-
-		private uint GetEBPOffsetForLocal(MethodInfo aMethod, OpVar aOp)
-		{
-			var xBody = aMethod.MethodBase.GetMethodBody();
-			uint xOffset = 0;
-			foreach (var xField in xBody.LocalVariables)
-			{
-				xOffset += GetStackCount(aMethod, xField);
-			}
-			return xOffset;
-		}
-
 		public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
 		{
 			var xField = aOpCode as ILOpCodes.OpVar;
@@ -47,7 +25,7 @@ namespace Cosmos.IL2CPU.X86.IL
 				new CPUx86.Push { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement =(int) xEBPOffset };
 				new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.DecRefCountRef) };
 			}
-			for (int i = (int)GetStackCount(aMethod, xFieldInfo) - 1; i >= 0; i--)
+			for (int i = (int)GetStackCountForLocal(aMethod, xFieldInfo) - 1; i >= 0; i--)
 			{
 				new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX }; ;
 				new CPUx86.Move { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement =(int)( xEBPOffset + (i * 4)), SourceReg = CPUx86.Registers.EAX };
