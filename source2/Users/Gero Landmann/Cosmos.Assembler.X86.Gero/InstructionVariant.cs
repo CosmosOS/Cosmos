@@ -42,7 +42,8 @@ namespace Cosmos.Assembler.X86
             {
                 case InstructionOutputFormat.ASM:
 
-                    tmp = Size.ToString();
+								throw new Exception("Fix");
+                    //tmp = Size.ToString();
                     if( tmp == "" )
                         return Instruction;
 

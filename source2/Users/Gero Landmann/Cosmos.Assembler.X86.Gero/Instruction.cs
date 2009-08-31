@@ -30,6 +30,6 @@ namespace Cosmos.Assembler.X86
             return null;
         }
 
-        public abstract bool Initialize() { return false;  }
+				public abstract bool Initialize();
     }
 }

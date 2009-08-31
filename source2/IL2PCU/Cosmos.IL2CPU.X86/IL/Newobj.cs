@@ -120,7 +120,8 @@ namespace Cosmos.IL2CPU.X86.IL
 
                 new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName( xMethod.Value ) };
                 new CPUx86.Test { DestinationReg = CPUx86.Registers.ECX, SourceValue = 2 };
-                new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = aCurrentLabel + "_NO_ERROR_4" };
+                //new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = aCurrentLabel + "_NO_ERROR_4" };
+								throw new Exception("Notimpl");
 
                 //for( int i = 1; i < aCtorMethodInfo.Arguments.Length; i++ )
                 //{
@@ -135,17 +136,17 @@ namespace Cosmos.IL2CPU.X86.IL
                 PushAlignedParameterSize( xMethod.Value );  
 
                 new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
-                foreach( StackContent xStackInt in Assembler.Stack )
-                {
-                    new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = ( uint )xStackInt.Size };
-                }
+								//foreach( StackContent xStackInt in Assembler.Stack )
+								//{
+								//    new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = ( uint )xStackInt.Size };
+								//}
                 //Call.EmitExceptionLogic( aAssembler,
                 //                        ( uint )aCurrentILOffset,
                 //                        aCurrentMethodInformation,
                 //                        aCurrentLabel + "_NO_ERROR_4",
                 //                        false,
                 //                        null );
-                new Label( aCurrentLabel + "_NO_ERROR_4" );
+                //new Label( aCurrentLabel + "_NO_ERROR_4" );
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
 
                 //for( int i = 1; i < aCtorMethodInfo.Arguments.Length; i++ )
