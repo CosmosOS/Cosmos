@@ -59,141 +59,145 @@ namespace Cosmos.IL2CPU.X86.IL
       var xType = aMethod.MethodBase.DeclaringType;
       // If not ValueType, then we need gc
       if (!xType.IsValueType) {
-        uint xObjSize = GetFieldStorageSize(xType);
         var xParams = aMethod.MethodBase.GetParameters();
         for (int i = 1; i < xParams.Length; i++) {
           Assembler.Stack.Pop();
         }
+        
+        uint xMemSize = GetFieldStorageSize(xType);
         int xExtraSize = 20;
-        new CPUx86.Push { DestinationValue = (uint)(xObjSize + xExtraSize) };
+        new CPUx86.Push { DestinationValue = (uint)(xMemSize + xExtraSize) };
+
         new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.AllocNewObjectRef) };
         new CPUx86.Test { DestinationReg = CPUx86.Registers.ECX, SourceValue = 2 };
         new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
         new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
         new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
         new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
-      //                 var xIncRefInfo =
-      //                     aServiceProvider.GetService<IMetaDataInfoService>().GetMethodInfo(
-      //                         GCImplementationRefs.IncRefCountRef, false);
-      //                 new Assembler.X86.Call { DestinationLabel = xIncRefInfo.LabelName };
-      //                 new Assembler.X86.Call { DestinationLabel = xIncRefInfo.LabelName };
-      //                 uint xObjSize = 0;
-      //                 int xGCFieldCount = (from item in aCtorDeclTypeInfo.Fields.Values
-      //                                      where item.NeedsGC
-      //                                      select item).Count();
-      //                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-      //                 new Move { DestinationReg = Registers.EBX, SourceRef = ElementReference.New(aTypeId), SourceIsIndirect = true };
-      //                 new Move { DestinationReg = Registers.EAX, DestinationIsIndirect = true, SourceReg=CPUx86.Registers.EBX};
-      //                 new Move { DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = (uint)InstanceTypeEnum.NormalObject, Size = 32 };
-      //                 new Move { DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 8, SourceValue = (uint)xGCFieldCount, Size = 32 };
-      //                 uint xSize = (uint)(((from item in aCtorMethodInfo.Arguments
-      //                                       let xQSize = item.Size + (item.Size % 4 == 0
-      //                                                             ? 0
-      //                                                             : (4 - (item.Size % 4)))
-      //                                       select (int)xQSize).Take(aCtorMethodInfo.Arguments.Length - 1).Sum()));
-      //                 for (int i = 1; i < aCtorMethodInfo.Arguments.Length; i++)
-      //                 {
-      //                     new Comment(String.Format("Arg {0}: {1}", i, aCtorMethodInfo.Arguments[i].Size));
-      //                     for (int j = 0; j < aCtorMethodInfo.Arguments[i].Size; j += 4)
-      //                     {
-      //                         new Push { DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xSize + 4) };
-      //                     }
-      //                 }
-      // 
-      //                 new Assembler.X86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(aCtorDef) };
-      //                 new Test { DestinationReg = Registers.ECX, SourceValue = 2 };
-      //                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = aCurrentLabel + "_NO_ERROR_4" };
-      //                 for (int i = 1;i < aCtorMethodInfo.Arguments.Length;i++)
-      //                 {
-      //                     new Assembler.X86.Add
-      //                     {
-      //                         DestinationReg = Registers.ESP,
-      //                         SourceValue = (aCtorMethodInfo.Arguments[i].Size % 4 == 0
-      //                              ? aCtorMethodInfo.Arguments[i].Size
-      //                              : ((aCtorMethodInfo.Arguments[i].Size / 4) * 4) + 1)
-      //                     };
-      //                 }
-      //                 new Assembler.X86.Add { DestinationReg = Registers.ESP, SourceValue = 4 };
-      //                 foreach (StackContent xStackInt in aAssembler.StackContents)
-      //                 {
-      //                     new Assembler.X86.Add { DestinationReg = Registers.ESP, SourceValue=(uint)xStackInt.Size };
-      //                 }
-      //                 Call.EmitExceptionLogic(aAssembler,
-      //                                         (uint)aCurrentILOffset,
-      //                                         aCurrentMethodInformation,
-      //                                         aCurrentLabel + "_NO_ERROR_4",
-      //                                         false,
-      //                                         null);
-      //                 new Label(aCurrentLabel + "_NO_ERROR_4");
-      //                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-      //                 for (int i = 1; i < aCtorMethodInfo.Arguments.Length; i++)
-      //                 {
-      //                     new Assembler.X86.Add
-      //                     {
-      //                         DestinationReg = Registers.ESP,
-      //                         SourceValue = (aCtorMethodInfo.Arguments[i].Size % 4 == 0
-      //                              ? aCtorMethodInfo.Arguments[i].Size
-      //                              : ((aCtorMethodInfo.Arguments[i].Size / 4) * 4) + 1)
-      //                     };
-      //                 }
-      //                 new Push { DestinationReg=Registers.EAX };
-      //                 aAssembler.Stack.Push(new StackContent(4, aCtorDef.DeclaringType));
+        //                 var xIncRefInfo =
+        //                     aServiceProvider.GetService<IMetaDataInfoService>().GetMethodInfo(
+        //                         GCImplementationRefs.IncRefCountRef, false);
+        // TODO: Why call incref twice?
+        //                 new Assembler.X86.Call { DestinationLabel = xIncRefInfo.LabelName };
+        //                 new Assembler.X86.Call { DestinationLabel = xIncRefInfo.LabelName };
+        uint xObjSize = 0;
+        //                 int xGCFieldCount = (from item in aCtorDeclTypeInfo.Fields.Values
+        //                                      where item.NeedsGC
+        //                                      select item).Count();
+        //                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+        //                 new Move { DestinationReg = Registers.EBX, SourceRef = ElementReference.New(aTypeId), SourceIsIndirect = true };
+        //                 new Move { DestinationReg = Registers.EAX, DestinationIsIndirect = true, SourceReg=CPUx86.Registers.EBX};
+        //                 new Move { DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = (uint)InstanceTypeEnum.NormalObject, Size = 32 };
+        //                 new Move { DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 8, SourceValue = (uint)xGCFieldCount, Size = 32 };
+        //                 uint xSize = (uint)(((from item in aCtorMethodInfo.Arguments
+        //                                       let xQSize = item.Size + (item.Size % 4 == 0
+        //                                                             ? 0
+        //                                                             : (4 - (item.Size % 4)))
+        //                                       select (int)xQSize).Take(aCtorMethodInfo.Arguments.Length - 1).Sum()));
+        //                 for (int i = 1; i < aCtorMethodInfo.Arguments.Length; i++)
+        //                 {
+        //                     new Comment(String.Format("Arg {0}: {1}", i, aCtorMethodInfo.Arguments[i].Size));
+        //                     for (int j = 0; j < aCtorMethodInfo.Arguments[i].Size; j += 4)
+        //                     {
+        //                         new Push { DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xSize + 4) };
+        //                     }
+        //                 }
+        // 
+        //                 new Assembler.X86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(aCtorDef) };
+        //                 new Test { DestinationReg = Registers.ECX, SourceValue = 2 };
+        //                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = aCurrentLabel + "_NO_ERROR_4" };
+        //                 for (int i = 1;i < aCtorMethodInfo.Arguments.Length;i++)
+        //                 {
+        //                     new Assembler.X86.Add
+        //                     {
+        //                         DestinationReg = Registers.ESP,
+        //                         SourceValue = (aCtorMethodInfo.Arguments[i].Size % 4 == 0
+        //                              ? aCtorMethodInfo.Arguments[i].Size
+        //                              : ((aCtorMethodInfo.Arguments[i].Size / 4) * 4) + 1)
+        //                     };
+        //                 }
+        //                 new Assembler.X86.Add { DestinationReg = Registers.ESP, SourceValue = 4 };
+        //                 foreach (StackContent xStackInt in aAssembler.StackContents)
+        //                 {
+        //                     new Assembler.X86.Add { DestinationReg = Registers.ESP, SourceValue=(uint)xStackInt.Size };
+        //                 }
+        //                 Call.EmitExceptionLogic(aAssembler,
+        //                                         (uint)aCurrentILOffset,
+        //                                         aCurrentMethodInformation,
+        //                                         aCurrentLabel + "_NO_ERROR_4",
+        //                                         false,
+        //                                         null);
+        //                 new Label(aCurrentLabel + "_NO_ERROR_4");
+        //                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+        //                 for (int i = 1; i < aCtorMethodInfo.Arguments.Length; i++)
+        //                 {
+        //                     new Assembler.X86.Add
+        //                     {
+        //                         DestinationReg = Registers.ESP,
+        //                         SourceValue = (aCtorMethodInfo.Arguments[i].Size % 4 == 0
+        //                              ? aCtorMethodInfo.Arguments[i].Size
+        //                              : ((aCtorMethodInfo.Arguments[i].Size / 4) * 4) + 1)
+        //                     };
+        //                 }
+        //                 new Push { DestinationReg=Registers.EAX };
+        //                 aAssembler.Stack.Push(new StackContent(4, aCtorDef.DeclaringType));
+        throw new NotImplementedException();
       } else {
-      //                 /*
-      //                  * Current sitation on stack:
-      //                  *   $ESP       Arg
-      //                  *   $ESP+..    other items
-      //                  *   
-      //                  * What should happen:
-      //                  *  + The stack should be increased to allow space to contain:
-      //                  *         + .ctor arguments
-      //                  *         + struct _pointer_ (ref to start of emptied space)
-      //                  *         + empty space for struct
-      //                  *  + arguments should be copied to the new place
-      //                  *  + old place where arguments were should be cleared
-      //                  *  + pointer should be set
-      //                  *  + call .ctor
-      //                  */                
-      //                 var xStorageSize = aCtorDeclTypeInfo.StorageSize;
-      //                 if (xStorageSize % 4 != 0)
-      //                 {
-      //                     xStorageSize += 4 - (xStorageSize % 4);
-      //                 }
-      //                 uint xArgSize = 0;
-      //                 foreach (var xArg in aCtorMethodInfo.Arguments.Skip(1))
-      //                 {
-      //                     xArgSize += xArg.Size + (xArg.Size % 4 == 0
-      //                                                             ? 0
-      //                                                             : (4 - (xArg.Size % 4)));
-      //                 }
-      //                 int xExtraArgSize = (int)(xStorageSize - xArgSize);
-      //                 if (xExtraArgSize < 0)
-      //                 {
-      //                     xExtraArgSize = 0;
-      //                 }
-      //                 if (xExtraArgSize>0)
-      //                 {
-      //                     new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = (uint)xExtraArgSize };
-      //                 }
-      //                 new CPUx86.Push { DestinationReg = Registers.ESP };
-      //                 aAssembler.Stack.Push(new StackContent(4));
-      //                 //at this point, we need to move copy all arguments over. 
-      //                 for (int i = 0;i<(xArgSize/4);i++)
-      //                 {
-      //                     new CPUx86.Push { DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xStorageSize + 4) }; // + 4 because the ptr is pushed too
-      //                     new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xStorageSize + 4 + 4), SourceValue = 0, Size = 32 };
-      //                 }
-      //                 var xCall = new Call(aCtorDef,
-      //                                      (uint)aCurrentILOffset,
-      //                                      true,
-      //                                      aNextLabel);
-      //                 xCall.SetServiceProvider(aServiceProvider);
-      //                 xCall.Assembler = aAssembler;
-      //                 xCall.Assemble();
-      //                 aAssembler.Stack.Push(new StackContent((int)xStorageSize,
-      //                                                                aCtorDef.DeclaringType));
+        //                 /*
+        //                  * Current sitation on stack:
+        //                  *   $ESP       Arg
+        //                  *   $ESP+..    other items
+        //                  *   
+        //                  * What should happen:
+        //                  *  + The stack should be increased to allow space to contain:
+        //                  *         + .ctor arguments
+        //                  *         + struct _pointer_ (ref to start of emptied space)
+        //                  *         + empty space for struct
+        //                  *  + arguments should be copied to the new place
+        //                  *  + old place where arguments were should be cleared
+        //                  *  + pointer should be set
+        //                  *  + call .ctor
+        //                  */                
+        //                 var xStorageSize = aCtorDeclTypeInfo.StorageSize;
+        //                 if (xStorageSize % 4 != 0)
+        //                 {
+        //                     xStorageSize += 4 - (xStorageSize % 4);
+        //                 }
+        //                 uint xArgSize = 0;
+        //                 foreach (var xArg in aCtorMethodInfo.Arguments.Skip(1))
+        //                 {
+        //                     xArgSize += xArg.Size + (xArg.Size % 4 == 0
+        //                                                             ? 0
+        //                                                             : (4 - (xArg.Size % 4)));
+        //                 }
+        //                 int xExtraArgSize = (int)(xStorageSize - xArgSize);
+        //                 if (xExtraArgSize < 0)
+        //                 {
+        //                     xExtraArgSize = 0;
+        //                 }
+        //                 if (xExtraArgSize>0)
+        //                 {
+        //                     new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = (uint)xExtraArgSize };
+        //                 }
+        //                 new CPUx86.Push { DestinationReg = Registers.ESP };
+        //                 aAssembler.Stack.Push(new StackContent(4));
+        //                 //at this point, we need to move copy all arguments over. 
+        //                 for (int i = 0;i<(xArgSize/4);i++)
+        //                 {
+        //                     new CPUx86.Push { DestinationReg = Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xStorageSize + 4) }; // + 4 because the ptr is pushed too
+        //                     new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xStorageSize + 4 + 4), SourceValue = 0, Size = 32 };
+        //                 }
+        //                 var xCall = new Call(aCtorDef,
+        //                                      (uint)aCurrentILOffset,
+        //                                      true,
+        //                                      aNextLabel);
+        //                 xCall.SetServiceProvider(aServiceProvider);
+        //                 xCall.Assembler = aAssembler;
+        //                 xCall.Assemble();
+        //                 aAssembler.Stack.Push(new StackContent((int)xStorageSize,
+        //                                                                aCtorDef.DeclaringType));
+        throw new NotImplementedException();
       }
-      throw new NotImplementedException();
     }
 
 		// using System.Collections.Generic;
