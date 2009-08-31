@@ -89,15 +89,11 @@ namespace Cosmos.IL2CPU
             } while( xMethodCount != mMethods.Count );
         }
 
-        private void ScanMethod( MethodBase aMethodBase, UInt32 aMethodUID )
-        {
-            if( ( aMethodBase.Attributes & MethodAttributes.PinvokeImpl ) != 0 )
-            {
+        private void ScanMethod(MethodBase aMethodBase, UInt32 aMethodUID) {
+            if ((aMethodBase.Attributes & MethodAttributes.PinvokeImpl) != 0) {
                 // pinvoke methods dont have an embedded implementation
                 return;
-            }
-            else if( aMethodBase.IsAbstract )
-            {
+            } else if( aMethodBase.IsAbstract ) {
                 // abstract methods dont have an implementation
                 return;
             }
@@ -109,24 +105,22 @@ namespace Cosmos.IL2CPU
                 return;
             }
 
-            var xOpCodes = mReader.ProcessMethod( aMethodBase );
-            if( xOpCodes != null )
-            {
+            var xOpCodes = mReader.ProcessMethod(aMethodBase);
+            if (xOpCodes != null) {
                 // Call ProcessMethod first, in a threaded environment it will
                 // allow more threads to work slightly sooner
-                var xMethod = new MethodInfo( aMethodUID );
-                mAsmblr.ProcessMethod( xMethod, xOpCodes );
-                foreach( var xOpCode in xOpCodes )
-                {
-                    //InstructionCount++;
-                    if( xOpCode is ILOpCodes.OpMethod )
-                    {
-                        QueueMethod( ( ( ILOpCodes.OpMethod )xOpCode ).Value );
-                    }
-                    else if( xOpCode is ILOpCodes.OpType )
-                    {
-                        QueueType( ( ( ILOpCodes.OpType )xOpCode ).Value );
-                    }
+                var xMethod = new MethodInfo(aMethodBase, aMethodUID);
+              
+                // Assemble the method
+                mAsmblr.ProcessMethod(xMethod, xOpCodes);
+
+                foreach (var xOpCode in xOpCodes) {
+                  //InstructionCount++;
+                  if( xOpCode is ILOpCodes.OpMethod ) {
+                    QueueMethod(((ILOpCodes.OpMethod)xOpCode).Value);
+                  } else if (xOpCode is ILOpCodes.OpType) {
+                    QueueType( ( ( ILOpCodes.OpType )xOpCode ).Value );
+                  }
                 }
             }
         }
