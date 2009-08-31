@@ -80,5 +80,13 @@ namespace Cosmos.IL2CPU {
       mStack.Push(new Item(aSize, aIsNumber, aIsFloat, aIsSigned));
     }
 
+	public IEnumerator<Item> GetEnumerator()
+	{
+		foreach (var item in mStack)
+		{
+			yield return item;
+		}
+	}
+
  }
 }

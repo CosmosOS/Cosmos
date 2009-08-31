@@ -15,5 +15,10 @@ namespace Cosmos.IL2CPU.X86
         {
             Assembler = ( Assembler )aAsmblr;
         }
+
+		protected string GetLabel(MethodInfo aMethod, ILOpCode aOpCode)
+		{
+			return MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) + "__DOT__" + aOpCode.Position.ToString("X8").ToUpper();
+		}
     }
 }

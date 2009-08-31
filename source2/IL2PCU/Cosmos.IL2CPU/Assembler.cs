@@ -11,8 +11,8 @@ namespace Cosmos.IL2CPU {
       protected ILOp[] mILOpsHi = new ILOp[ 256 ];
 
       // Contains info on the current stack structure. What type are on the stack, etc
-      public readonly StackContents Stack = new StackContents();
-
+	  public readonly StackContents Stack = new StackContents();
+	  
         private static ReaderWriterLocker mCurrentInstanceLocker = new ReaderWriterLocker();
         private static SortedList<int, Stack<Assembler>> mCurrentInstance = new SortedList<int, Stack<Assembler>>();
         protected internal List<Instruction> mInstructions = new List<Instruction>();

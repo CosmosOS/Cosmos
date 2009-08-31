@@ -76,6 +76,7 @@
     <Compile Include="ILReader.cs" />
     <Compile Include="Instruction.cs" />
     <Compile Include="Label.cs" />
+    <Compile Include="MethodAndTypeLabelsHolder.cs" />
     <Compile Include="MethodInfo.cs" />
     <Compile Include="MethodInfoLabelGenerator.cs" />
     <Compile Include="OpCodeAttribute.cs" />
