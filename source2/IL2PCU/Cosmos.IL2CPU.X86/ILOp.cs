@@ -57,5 +57,10 @@ namespace Cosmos.IL2CPU.X86
 		{
 			return MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) + "__DOT__" + aOpCode.Position.ToString("X8").ToUpper();
 		}
+
+        protected uint Align( uint aSize, uint aAlign )
+        {
+            return aSize % 4 == 0 ? aSize : ( ( aSize / aAlign ) * aAlign ) + 1;
+        }
     }
 }

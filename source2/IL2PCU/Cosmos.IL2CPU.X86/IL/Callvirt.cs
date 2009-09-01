@@ -30,7 +30,30 @@ namespace Cosmos.IL2CPU.X86.IL
             var xMethodInfo = ( System.Reflection.MethodInfo )( ( ( Cosmos.IL2CPU.ILOpCodes.OpMethod )aOpCode ).Value );
             int xArgCount = xMethodInfo.GetParameters().Length;
             uint xReturnSize = SizeOfType( xMethodInfo.ReturnType );
+            // Extracted from MethodInformation: Calculated offset
+            //             var xRoundedSize = ReturnSize;
+            //if (xRoundedSize % 4 > 0) {
+            //    xRoundedSize += (4 - (ReturnSize % 4));
+            //}
+            
+            
 
+            //ExtraStackSize = (int)xRoundedSize;
+            uint xExtraStackSize = ( uint )Align( xReturnSize, 4 );
+            var xParameters = xMethodInfo.GetParameters(); 
+
+            foreach (var xItem in xParameters) 
+            {
+                xExtraStackSize -= SizeOfType( xItem.GetType() );
+            }
+
+            //if (ExtraStackSize > 0) {
+            //    for (int i = 0; i < Arguments.Length; i++) {
+            //        Arguments[i].Offset += ExtraStackSize;
+            //    }
+            //}
+             
+             
             // This is finding offset to self? It looks like we dont need offsets of other
             // arguments, but only self. If so can calculate without calculating all fields
             // Might have to go to old data structure for the offset...

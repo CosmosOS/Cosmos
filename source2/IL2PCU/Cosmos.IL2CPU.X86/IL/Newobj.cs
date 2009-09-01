@@ -220,11 +220,6 @@ namespace Cosmos.IL2CPU.X86.IL
 			}
 		}
 
-		private uint Align(uint aSize, uint aAlign)
-		{
-			return aSize % 4 == 0 ? aSize : ((aSize / aAlign) * aAlign) + 1;
-		}
-
 		private void PushAlignedParameterSize(System.Reflection.MethodBase aMethod)
 		{
 			System.Reflection.ParameterInfo[] xParams = aMethod.GetParameters();
