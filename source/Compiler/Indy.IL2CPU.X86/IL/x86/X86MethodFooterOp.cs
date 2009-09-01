@@ -48,7 +48,7 @@ namespace Indy.IL2CPU.IL.X86
             var xHeapFreeInfo =
                 GetService<IMetaDataInfoService>().GetMethodInfo(typeof (RuntimeEngine).GetMethod("Heap_Free"), false);
             AssembleFooter(ReturnSize, Assembler, Locals, Args, xArgSize, DebugMode, MethodIsNonDebuggable,
-                           (uint) LocAllocItemCount, GetService<IMetaDataInfoService>().GetFieldStorageSize,
+                           (uint) LocAllocItemCount, GetService<IMetaDataInfoService>().SizeOfType,
                            xDecRefInfo.LabelName, xHeapFreeInfo.LabelName);
         }
 

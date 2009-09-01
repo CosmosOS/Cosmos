@@ -54,7 +54,7 @@ namespace Indy.IL2CPU.IL.X86 {
 
 		private void Initialize(Type aTypeRef, string aBaseLabelName) {
 			Type xTypeDef = aTypeRef;
-			mElementSize = GetService<IMetaDataInfoService>().GetFieldStorageSize(aTypeRef);
+			mElementSize = GetService<IMetaDataInfoService>().SizeOfType(aTypeRef);
 			Type xArrayType = ReflectionUtilities.GetType("mscorlib", "System.Array");
 			MethodBase xCtor = xArrayType.GetConstructors(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance)[0];
 		    mCtorName = GetService<IMetaDataInfoService>().GetMethodInfo(xCtor, false).LabelName;

@@ -66,7 +66,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 		}
         // 
         // 		public override void DoAssemble() {
-        //             var xElementSize = GetService<IMetaDataInfoService>().GetFieldStorageSize(mType);
+        //             var xElementSize = GetService<IMetaDataInfoService>().SizeOfType(mType);
         // 			Assemble(Assembler, xElementSize);
         // 		}
         // 	}

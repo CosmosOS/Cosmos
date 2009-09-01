@@ -11,7 +11,7 @@ namespace Indy.IL2CPU.Compiler
     // Make sure that this interface is cleaned up soon!
     public interface IMetaDataInfoService
     {
-        uint GetFieldStorageSize(Type aType);
+        uint SizeOfType(Type aType);
         IDictionary<string, TypeInformation.Field> GetTypeFieldInfo(MethodBase aCurrentMethod,
                                                                                  out uint aObjectStorageSize);
         IDictionary<string, TypeInformation.Field> GetTypeFieldInfo(Type aType,

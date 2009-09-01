@@ -28,8 +28,9 @@ namespace Cosmos.IL2CPU.X86.IL
             var xNormalAddress = CPU.MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase);
           }
           //             mMethodIdentifier = GetService<IMetaDataInfoService>().GetMethodIdLabel(mMethod);
-          //uint mArgumentCount = (uint)xTargetMethodInfo.Arguments.Length;
-          //             mReturnSize = mTargetMethodInfo.ReturnSize;
+          var xMethodInfo = (System.Reflection.MethodInfo)(aMethod.MethodBase);
+          int xArgCount = xMethodInfo.GetParameters().Length;
+          uint xReturnSize = SizeOfType(xMethodInfo.ReturnType);
           //             mThisOffset = mTargetMethodInfo.Arguments[0].Offset;
           //             if (mTargetMethodInfo.ExtraStackSize > 0)
           //             {

@@ -31,7 +31,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		public override void DoAssemble() {
             mTypeIdLabel = GetService<IMetaDataInfoService>().GetTypeIdLabel(mType);
 			
-            var xTypeSize = GetService<IMetaDataInfoService>().GetFieldStorageSize(mType);
+            var xTypeSize = GetService<IMetaDataInfoService>().SizeOfType(mType);
 			
 			string mReturnNullLabel = mThisLabel + "_ReturnNull";
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };

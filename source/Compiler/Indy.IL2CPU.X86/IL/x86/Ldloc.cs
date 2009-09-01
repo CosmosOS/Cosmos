@@ -28,7 +28,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public sealed override void DoAssemble() {
-			Ldloc(Assembler, mLocal, GetService<IMetaDataInfoService>().GetFieldStorageSize(mLocal.VariableType));
+			Ldloc(Assembler, mLocal, GetService<IMetaDataInfoService>().SizeOfType(mLocal.VariableType));
 		}
 	}
 }

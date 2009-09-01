@@ -166,7 +166,7 @@ namespace Indy.IL2CPU.IL.X86
             ParameterInfo[] xParams = aMethod.GetParameters();
             foreach (ParameterInfo xParam in xParams)
             {
-                xArgumentSizes.Add(GetService<IMetaDataInfoService>().GetFieldStorageSize(xParam.ParameterType));
+                xArgumentSizes.Add(GetService<IMetaDataInfoService>().SizeOfType(xParam.ParameterType));
             }
             if (!aMethod.IsStatic)
             {

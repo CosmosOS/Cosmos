@@ -72,7 +72,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //         }
         // 
         //         public override void DoAssemble() {
-        //             var xSize = GetService<IMetaDataInfoService>().GetFieldStorageSize(xType);
+        //             var xSize = GetService<IMetaDataInfoService>().SizeOfType(xType);
         //             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
         //             for (int i = 1; i <= (xSize / 4); i++) {
         //                 new CPUx86.Push { DestinationReg = Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = (int)(xSize - (i * 4)) };

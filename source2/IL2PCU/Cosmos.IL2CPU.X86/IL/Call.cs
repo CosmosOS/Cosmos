@@ -184,7 +184,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //             ParameterInfo[] xParams = aMethod.GetParameters();
         //             foreach (ParameterInfo xParam in xParams)
         //             {
-        //                 xArgumentSizes.Add(GetService<IMetaDataInfoService>().GetFieldStorageSize(xParam.ParameterType));
+        //                 xArgumentSizes.Add(GetService<IMetaDataInfoService>().SizeOfType(xParam.ParameterType));
         //             }
         //             if (!aMethod.IsStatic)
         //             {

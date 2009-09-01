@@ -52,7 +52,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 		}
         //         private FieldInfo mField;
         // 		public override void DoAssemble() {
-        //             var xSize = GetService<IMetaDataInfoService>().GetFieldStorageSize(mField.FieldType);
+        //             var xSize = GetService<IMetaDataInfoService>().SizeOfType(mField.FieldType);
         //             mDataName = GetService<IMetaDataInfoService>().GetStaticFieldLabel(mField);
         // 		    if (xSize >= 4) {
         // 				for (int i = 1; i <= (xSize / 4); i++) {

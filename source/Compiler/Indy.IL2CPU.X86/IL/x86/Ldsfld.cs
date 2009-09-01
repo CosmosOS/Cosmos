@@ -35,7 +35,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
         private FieldInfo mField;
 		public override void DoAssemble() {
-            var xSize = GetService<IMetaDataInfoService>().GetFieldStorageSize(mField.FieldType);
+            var xSize = GetService<IMetaDataInfoService>().SizeOfType(mField.FieldType);
             mDataName = GetService<IMetaDataInfoService>().GetStaticFieldLabel(mField);
 			
 		    if (xSize >= 4) {

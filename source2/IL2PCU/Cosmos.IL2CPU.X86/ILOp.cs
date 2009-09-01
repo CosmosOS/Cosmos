@@ -29,7 +29,7 @@ namespace Cosmos.IL2CPU.X86
 
         protected uint GetStackCountForLocal(MethodInfo aMethod, LocalVariableInfo aField)
 		{
-			var xSize = GetFieldStorageSize(aField.LocalType);
+			var xSize = SizeOfType(aField.LocalType);
 			var xResult = xSize / 4;
 			if (xSize % 4 == 0)
 			{

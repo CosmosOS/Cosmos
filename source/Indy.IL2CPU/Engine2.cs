@@ -694,7 +694,7 @@ namespace Indy.IL2CPU
 //                        xDbgType.FullName = xType.FullName;
 //                        var xTypeFields = new List<DebugSymbolsAssemblyTypeField>();
 //                        var xTypeInfo = GetTypeInfo(xType);
-//                        xDbgType.StorageSize = GetFieldStorageSize(xType);
+//                        xDbgType.StorageSize = SizeOfType(xType);
 //                        foreach (var xField in xType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.buildPath)) {
 //                            var xDbgField = new DebugSymbolsAssemblyTypeField();
 //                            xDbgField.Name = xField.Name;
@@ -820,7 +820,7 @@ namespace Indy.IL2CPU
 //            {
 //                xInitVmtOp.Methods = mMethods.Keys.ToList();
 //            }
-//            xInitVmtOp.VTableEntrySize = GetFieldStorageSize(GetType("",
+//            xInitVmtOp.VTableEntrySize = SizeOfType(GetType("",
 //                                                                     typeof(VTable).FullName.Replace('+',
 //                                                                                                     '.')));
 //            xInitVmtOp.GetMethodIdentifier += delegate(MethodBase aMethod)
@@ -1215,7 +1215,7 @@ namespace Indy.IL2CPU
 //        /// <remarks>For classes, this is the pointer size.</remarks>
 //        /// <param name="aType"></param>
 //        /// <returns></returns>
-//        public uint GetFieldStorageSize(Type aType)
+//        public uint SizeOfType(Type aType)
 //        {
 //            if (aType.FullName == "System.Void")
 //            {
@@ -1270,7 +1270,7 @@ namespace Indy.IL2CPU
 //            //}
 //            if (aType.IsEnum)
 //            {
-//                return GetFieldStorageSize(aType.GetField("value__").FieldType);
+//                return SizeOfType(aType.GetField("value__").FieldType);
 //            }
 //            if (aType.IsValueType)
 //            {
@@ -1444,7 +1444,7 @@ namespace Indy.IL2CPU
 //                        Type xFieldTypeDef = xCurrentField.FieldType;
 //                        if (!xFieldTypeDef.IsClass || xFieldTypeDef.IsValueType)
 //                        {
-//                            xTheSize = GetFieldStorageSize(xCurrentField.FieldType);
+//                            xTheSize = SizeOfType(xCurrentField.FieldType);
 //                        }
 //                        else
 //                        {
@@ -2236,7 +2236,7 @@ namespace Indy.IL2CPU
 //                    xVars = new MethodInformation.Variable[xBody.LocalVariables.Count];
 //                    foreach (LocalVariableInfo xVarDef in xBody.LocalVariables)
 //                    {
-//                        int xVarSize = (int)GetFieldStorageSize(xVarDef.LocalType);
+//                        int xVarSize = (int)SizeOfType(xVarDef.LocalType);
 //                        if ((xVarSize % 4) != 0)
 //                        {
 //                            xVarSize += 4 - (xVarSize % 4);
@@ -2262,7 +2262,7 @@ namespace Indy.IL2CPU
 //                    for (int i = xArgs.Length - 1; i > 0; i--)
 //                    {
 //                        ParameterInfo xParamDef = xParameters[i - 1];
-//                        xArgSize = GetFieldStorageSize(xParamDef.ParameterType);
+//                        xArgSize = SizeOfType(xParamDef.ParameterType);
 //                        if ((xArgSize % 4) != 0)
 //                        {
 //                            xArgSize += 4 - (xArgSize % 4);
@@ -2304,7 +2304,7 @@ namespace Indy.IL2CPU
 //                    for (int i = xArgs.Length - 1; i >= 0; i--)
 //                    {
 //                        ParameterInfo xParamDef = xParameters[i]; //xArgs.Length - i - 1];
-//                        uint xArgSize = GetFieldStorageSize(xParamDef.ParameterType);
+//                        uint xArgSize = SizeOfType(xParamDef.ParameterType);
 //                        if ((xArgSize % 4) != 0)
 //                        {
 //                            xArgSize += 4 - (xArgSize % 4);
@@ -2331,12 +2331,12 @@ namespace Indy.IL2CPU
 //                    }
 //                }
 //                int xResultSize = 0;
-//                //= GetFieldStorageSize(aCurrentMethodForArguments.ReturnType.ReturnType);
+//                //= SizeOfType(aCurrentMethodForArguments.ReturnType.ReturnType);
 //                MethodInfo xMethInfo = aCurrentMethodForArguments as MethodInfo;
 //                Type xReturnType = typeof(void);
 //                if (xMethInfo != null)
 //                {
-//                    xResultSize = (int)GetFieldStorageSize(xMethInfo.ReturnType);
+//                    xResultSize = (int)SizeOfType(xMethInfo.ReturnType);
 //                    xReturnType = xMethInfo.ReturnType;
 //                }
 //                xMethodInfo = new MethodInformation(aMethodName,
@@ -2419,7 +2419,7 @@ namespace Indy.IL2CPU
 //                    }
 //                    else
 //                    {
-//                        xFieldSize = (int)GetFieldStorageSize(xFieldType);
+//                        xFieldSize = (int)SizeOfType(xFieldType);
 //                    }
 //                    //}
 //                    if ((from item in aTypeFields
@@ -2471,7 +2471,7 @@ namespace Indy.IL2CPU
 //                    }
 //                    else
 //                    {
-//                        xFieldSize = (int)GetFieldStorageSize(xFieldType);
+//                        xFieldSize = (int)SizeOfType(xFieldType);
 //                    }
 //                    int xOffset = (int)aObjectStorageSize;
 //                    aObjectStorageSize += (uint)xFieldSize;

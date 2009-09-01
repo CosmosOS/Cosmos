@@ -25,7 +25,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public override void DoAssemble() {
-            var xElementSize = GetService<IMetaDataInfoService>().GetFieldStorageSize(mType);
+            var xElementSize = GetService<IMetaDataInfoService>().SizeOfType(mType);
 		    new Comment("Element size: " + xElementSize);
             Stelem_Ref.Assemble(Assembler, xElementSize, GetServiceProvider(), mCurLabel, mMethodInformation, mCurOffset, mNextLabel);
 		}

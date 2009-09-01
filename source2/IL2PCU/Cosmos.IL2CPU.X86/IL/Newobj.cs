@@ -72,7 +72,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					Assembler.Stack.Pop();
 				}
 
-				uint xMemSize = GetFieldStorageSize(xType);
+				uint xMemSize = SizeOfType(xType);
 				int xExtraSize = 20;
 				new CPUx86.Push { DestinationValue = (uint)(xMemSize + xExtraSize) };
 
@@ -109,11 +109,11 @@ namespace Cosmos.IL2CPU.X86.IL
 				new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = (uint)InstanceTypeEnum.NormalObject, Size = 32 };
 				new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 8, SourceValue = (uint)xGCFieldCount, Size = 32 };
 				uint xSize = (uint)(((from item in xParams
-									  let xQSize = Align(GetFieldStorageSize(item.GetType()), 4)
+									  let xQSize = Align(SizeOfType(item.GetType()), 4)
 									  select (int)xQSize).Take(xParams.Length - 1).Sum()));
 
 				foreach (var xParam in xParams) {
-          uint xParamSize = GetFieldStorageSize(xParams.GetType());
+          uint xParamSize = SizeOfType(xParams.GetType());
 					new Comment(String.Format("Arg {0}: {1}", xParam.Name, xParamSize));
           for (int i = 0; i < xParamSize; i += 4) {
 						new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xSize + 4) };
@@ -233,7 +233,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
 			for (int i = 1; i < xParams.Length; i++)
 			{
-				xSize = GetFieldStorageSize(xParams[i].GetType());
+				xSize = SizeOfType(xParams[i].GetType());
 				new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = Align(xSize, 4) };
 			}
 		}

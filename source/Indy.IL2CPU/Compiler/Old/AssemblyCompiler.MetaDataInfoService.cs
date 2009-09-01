@@ -71,7 +71,7 @@ namespace Indy.IL2CPU.Compiler.Old
                     xVars = new MethodInformation.Variable[xBody.LocalVariables.Count];
                     foreach (LocalVariableInfo xVarDef in xBody.LocalVariables)
                     {
-                        int xVarSize = (int)GetFieldStorageSize(xVarDef.LocalType);
+                        int xVarSize = (int)SizeOfType(xVarDef.LocalType);
                         if ((xVarSize % 4) != 0)
                         {
                             xVarSize += 4 - (xVarSize % 4);
@@ -97,7 +97,7 @@ namespace Indy.IL2CPU.Compiler.Old
                     for (int i = xArgs.Length - 1; i > 0; i--)
                     {
                         ParameterInfo xParamDef = xParameters[i - 1];
-                        xArgSize = GetFieldStorageSize(xParamDef.ParameterType);
+                        xArgSize = SizeOfType(xParamDef.ParameterType);
                         if ((xArgSize % 4) != 0)
                         {
                             xArgSize += 4 - (xArgSize % 4);
@@ -139,7 +139,7 @@ namespace Indy.IL2CPU.Compiler.Old
                     for (int i = xArgs.Length - 1; i >= 0; i--)
                     {
                         ParameterInfo xParamDef = xParameters[i]; //xArgs.Length - i - 1];
-                        uint xArgSize = GetFieldStorageSize(xParamDef.ParameterType);
+                        uint xArgSize = SizeOfType(xParamDef.ParameterType);
                         if ((xArgSize % 4) != 0)
                         {
                             xArgSize += 4 - (xArgSize % 4);
@@ -165,12 +165,12 @@ namespace Indy.IL2CPU.Compiler.Old
                         xCurOffset += (int)xArgSize;
                     }
                 }
-                int xResultSize = 0;// GetFieldStorageSize(aCurrentMethodForArguments.ReturnType.ReturnType);
+                int xResultSize = 0;// SizeOfType(aCurrentMethodForArguments.ReturnType.ReturnType);
                 MethodInfo xMethInfo = aCurrentMethodForArguments as MethodInfo;
                 Type xReturnType = typeof(void);
                 if (xMethInfo != null)
                 {
-                    xResultSize = (int)GetFieldStorageSize(xMethInfo.ReturnType);
+                    xResultSize = (int)SizeOfType(xMethInfo.ReturnType);
                     xReturnType = xMethInfo.ReturnType;
                 }
                 xMethodInfo = new MethodInformation(aMethodName,
@@ -255,7 +255,7 @@ namespace Indy.IL2CPU.Compiler.Old
                     }
                     else
                     {
-                        xFieldSize = (int)GetFieldStorageSize(xFieldType);
+                        xFieldSize = (int)SizeOfType(xFieldType);
                     }
                     //}
                     if ((from item in aTypeFields
@@ -307,7 +307,7 @@ namespace Indy.IL2CPU.Compiler.Old
                     }
                     else
                     {
-                        xFieldSize = (int)GetFieldStorageSize(xFieldType);
+                        xFieldSize = (int)SizeOfType(xFieldType);
                     }
                     int xOffset = (int)aObjectStorageSize;
                     aObjectStorageSize += (uint)xFieldSize;

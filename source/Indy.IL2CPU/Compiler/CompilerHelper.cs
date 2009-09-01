@@ -164,7 +164,7 @@ namespace Indy.IL2CPU.Compiler
                     Type xFieldTypeDef = aField.FieldType;
                     if (!xFieldTypeDef.IsClass || xFieldTypeDef.IsValueType)
                     {
-                        xTheSize = GetFieldStorageSize(aField.FieldType);
+                        xTheSize = SizeOfType(aField.FieldType);
                     }
                     else
                     {

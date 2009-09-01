@@ -39,7 +39,7 @@ namespace Indy.IL2CPU.IL.X86 {
 		}
 
 		public override void DoAssemble() {
-            var xSize = GetService<IMetaDataInfoService>().GetFieldStorageSize(mField.FieldType);
+            var xSize = GetService<IMetaDataInfoService>().SizeOfType(mField.FieldType);
 		    var xDecRefMethodInfo = GetService<IMetaDataInfoService>().GetMethodInfo(GCImplementationRefs.DecRefCountRef,
 		                                                                             false);
 

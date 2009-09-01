@@ -311,7 +311,7 @@ namespace Indy.IL2CPU.Compiler.Old
                         Type xFieldTypeDef = xField.FieldType;
                         if (!xFieldTypeDef.IsClass || xFieldTypeDef.IsValueType)
                         {
-                            xTheSize = GetFieldStorageSize(xField.FieldType);
+                            xTheSize = SizeOfType(xField.FieldType);
                         }
                         else
                         {
@@ -1097,7 +1097,7 @@ namespace Indy.IL2CPU.Compiler.Old
 
         public readonly bool RunningOnMono;
 
-        public uint GetFieldStorageSize(Type aType)
+        public uint SizeOfType(Type aType)
         {
             if (aType.FullName == "System.Void")
             {
@@ -1154,7 +1154,7 @@ namespace Indy.IL2CPU.Compiler.Old
             //}
             if (aType.IsEnum)
             {
-                return GetFieldStorageSize(aType.GetField("value__").FieldType);
+                return SizeOfType(aType.GetField("value__").FieldType);
             }
             if (aType.IsValueType)
             {

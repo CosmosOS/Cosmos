@@ -18,7 +18,7 @@ namespace Cosmos.IL2CPU.X86.IL
 			var xVar = aMethod.MethodBase.GetMethodBody().LocalVariables[xOpVar.Value];
 			var xStackCount = GetStackCountForLocal(aMethod, xVar);
 			var xEBPOffset = (int)GetEBPOffsetForLocal(aMethod, xOpVar);
-			var xSize = GetFieldStorageSize(xVar.LocalType);
+			var xSize = SizeOfType(xVar.LocalType);
 			if (xStackCount > 1)
 			{
 				for (int i = 0; i < xStackCount; i++)
@@ -91,7 +91,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 		}
 		// 
 		// 		public sealed override void DoAssemble() {
-		// 			Ldloc(Assembler, mLocal, GetService<IMetaDataInfoService>().GetFieldStorageSize(mLocal.VariableType));
+		// 			Ldloc(Assembler, mLocal, GetService<IMetaDataInfoService>().SizeOfType(mLocal.VariableType));
 		// 		}
 		// 	}
 		// }
