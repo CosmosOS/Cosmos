@@ -19,15 +19,16 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            var xMethodDescription = CPU.MethodInfoLabelGenerator.GenerateLabelName( aMethod.MethodBase );
+            var xMethodInfo = ( System.Reflection.MethodInfo )( ( ( Cosmos.IL2CPU.ILOpCodes.OpMethod )aOpCode ).Value );
+            var xMethodDescription = CPU.MethodInfoLabelGenerator.GenerateLabelName( xMethodInfo );
             // mTargetMethodInfo = GetService<IMetaDataInfoService>().GetMethodInfo(mMethod
             //   , mMethod, mMethodDescription, null, mCurrentMethodInfo.DebugMode);
-            if( aMethod.MethodBase.IsStatic || !aMethod.MethodBase.IsVirtual || aMethod.MethodBase.IsFinal )
+            if( xMethodInfo.IsStatic || !xMethodInfo.IsVirtual || xMethodInfo.IsFinal )
             {
-                var xNormalAddress = CPU.MethodInfoLabelGenerator.GenerateLabelName( aMethod.MethodBase );
+                var xNormalAddress = CPU.MethodInfoLabelGenerator.GenerateLabelName( xMethodInfo );
             }
             // mMethodIdentifier = GetService<IMetaDataInfoService>().GetMethodIdLabel(mMethod);
-            var xMethodInfo = ( System.Reflection.MethodInfo )( ( ( Cosmos.IL2CPU.ILOpCodes.OpMethod )aOpCode ).Value );
+           
             int xArgCount = xMethodInfo.GetParameters().Length;
             uint xReturnSize = SizeOfType( xMethodInfo.ReturnType );
             // Extracted from MethodInformation: Calculated offset
@@ -52,8 +53,16 @@ namespace Cosmos.IL2CPU.X86.IL
             //        Arguments[i].Offset += ExtraStackSize;
             //    }
             //}
-             
-             
+
+            //// Above:    Arguments[i].Offset += ExtraStackSize; => Arguments[0].Offset == ExtraStackSize
+            //// below:
+            ////           mThisOffset = mTargetMethodInfo.Arguments[ 0 ].Offset; => mThisOffset == ExtraStackSize
+            ////           mExtraStackSpace = mTargetMethodInfo.ExtraStackSize;
+            ////           if (mExtraStackSpace > 0) {
+            ////                 mThisOffset -= mExtraStackSpace; => mThisOffset == 0 ???
+            ////             }
+            //// First argument in old methodinfo has always an offset of 0 that means mThisOffset is always 0.
+
             // This is finding offset to self? It looks like we dont need offsets of other
             // arguments, but only self. If so can calculate without calculating all fields
             // Might have to go to old data structure for the offset...
@@ -89,9 +98,10 @@ namespace Cosmos.IL2CPU.X86.IL
             //                                     GetServiceProvider()
             //                                     );
             //                 new CPU.Label(mLabelName + "_AfterNullRefCheck");
-            //                 if (mExtraStackSpace > 0) {
-            //                     new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = (uint)mExtraStackSpace };
-            //                 }
+            if( xExtraStackSize > 0 )
+            {
+                new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = ( uint )xExtraStackSize };
+            }
             //                 new CPUx86.Call { DestinationLabel = mNormalAddress };
             //             } else {
             //                 /*
