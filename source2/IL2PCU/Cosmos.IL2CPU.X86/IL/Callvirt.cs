@@ -28,16 +28,19 @@ namespace Cosmos.IL2CPU.X86.IL
           var xMethodInfo = (System.Reflection.MethodInfo)(aMethod.MethodBase);
           int xArgCount = xMethodInfo.GetParameters().Length;
           uint xReturnSize = SizeOfType(xMethodInfo.ReturnType);
+
+          // This is finding offset to self? It looks like we dont need offsets of other
+          // arguments, but only self. If so can calculate without calculating all fields
           // Might have to go to old data structure for the offset...
           // Can we add this method info somehow to the data passed in?
           // mThisOffset = mTargetMethodInfo.Arguments[0].Offset;
 
-          //             if (mTargetMethodInfo.ExtraStackSize > 0)
-          //             {
-          //                 mThisOffset -= mTargetMethodInfo.ExtraStackSize;
-          //             }
           //             mExtraStackSpace = mTargetMethodInfo.ExtraStackSize;
+          //             if (mExtraStackSpace > 0) {
+          //                 mThisOffset -= mExtraStackSpace;
+          //             }
           //             new Comment("ThisOffset = " + mThisOffset);
+
           //             Action xEmitCleanup = delegate() {
           //                                       foreach (MethodInformation.Argument xArg in mTargetMethodInfo.Arguments) {
           //                                           new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = xArg.Size };
