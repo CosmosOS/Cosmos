@@ -41,11 +41,12 @@ namespace Cosmos.IL2CPU.X86.IL
 
             //ExtraStackSize = (int)xRoundedSize;
             uint xExtraStackSize = ( uint )Align( xReturnSize, 4 );
-            var xParameters = xMethodInfo.GetParameters(); 
-
+            var xParameters = xMethodInfo.GetParameters();
+            uint xThisOffset = 0;
             foreach (var xItem in xParameters) 
             {
                 xExtraStackSize -= SizeOfType( xItem.GetType() );
+                xThisOffset += SizeOfType( xItem.GetType() ); // + xExtraStackSize ?
             }
 
             //if (ExtraStackSize > 0) {
@@ -54,26 +55,17 @@ namespace Cosmos.IL2CPU.X86.IL
             //    }
             //}
 
-            //// Above:    Arguments[i].Offset += ExtraStackSize; => Arguments[0].Offset == ExtraStackSize
-            //// below:
-            ////           mThisOffset = mTargetMethodInfo.Arguments[ 0 ].Offset; => mThisOffset == ExtraStackSize
-            ////           mExtraStackSpace = mTargetMethodInfo.ExtraStackSize;
-            ////           if (mExtraStackSpace > 0) {
-            ////                 mThisOffset -= mExtraStackSpace; => mThisOffset == 0 ???
-            ////             }
-            //// First argument in old methodinfo has always an offset of 0 that means mThisOffset is always 0.
-
             // This is finding offset to self? It looks like we dont need offsets of other
             // arguments, but only self. If so can calculate without calculating all fields
             // Might have to go to old data structure for the offset...
             // Can we add this method info somehow to the data passed in?
             // mThisOffset = mTargetMethodInfo.Arguments[0].Offset;
-
+            
             //             mExtraStackSpace = mTargetMethodInfo.ExtraStackSize;
             //             if (mExtraStackSpace > 0) {
             //                 mThisOffset -= mExtraStackSpace;
             //             }
-            //             new Comment("ThisOffset = " + mThisOffset);
+                         new Comment("ThisOffset = " + xThisOffset);
 
             //             Action xEmitCleanup = delegate() {
             //                                       foreach (MethodInformation.Argument xArg in mTargetMethodInfo.Arguments) {
