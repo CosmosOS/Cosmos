@@ -19,19 +19,19 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode ) {
           var xMethodDescription = CPU.MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase);
-          //             mTargetMethodInfo = GetService<IMetaDataInfoService>().GetMethodInfo(mMethod,
-          //                                                      mMethod,
-          //                                                      mMethodDescription,
-          //                                                      null,
-          //                                                      mCurrentMethodInfo.DebugMode);
+          // mTargetMethodInfo = GetService<IMetaDataInfoService>().GetMethodInfo(mMethod
+          //   , mMethod, mMethodDescription, null, mCurrentMethodInfo.DebugMode);
           if (aMethod.MethodBase.IsStatic || !aMethod.MethodBase.IsVirtual || aMethod.MethodBase.IsFinal) {
             var xNormalAddress = CPU.MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase);
           }
-          //             mMethodIdentifier = GetService<IMetaDataInfoService>().GetMethodIdLabel(mMethod);
+          // mMethodIdentifier = GetService<IMetaDataInfoService>().GetMethodIdLabel(mMethod);
           var xMethodInfo = (System.Reflection.MethodInfo)(aMethod.MethodBase);
           int xArgCount = xMethodInfo.GetParameters().Length;
           uint xReturnSize = SizeOfType(xMethodInfo.ReturnType);
-          //             mThisOffset = mTargetMethodInfo.Arguments[0].Offset;
+          // Might have to go to old data structure for the offset...
+          // Can we add this method info somehow to the data passed in?
+          // mThisOffset = mTargetMethodInfo.Arguments[0].Offset;
+
           //             if (mTargetMethodInfo.ExtraStackSize > 0)
           //             {
           //                 mThisOffset -= mTargetMethodInfo.ExtraStackSize;
