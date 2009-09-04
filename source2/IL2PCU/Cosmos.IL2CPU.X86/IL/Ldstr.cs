@@ -1,4 +1,9 @@
 using System;
+using CPU = Indy.IL2CPU.Assembler;
+using System.Text;
+using Indy.IL2CPU;
+using Indy.IL2CPU.Assembler.X86.X;
+using Cosmos.IL2CPU.ILOpCodes;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -10,9 +15,49 @@ namespace Cosmos.IL2CPU.X86.IL
 		}
 
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
-      throw new NotImplementedException();
+      var xOpString = aOpCode as OpString;
+      var Y = new Y86();
+      string xDataName = GetContentsArrayName(xOpString.Value);
+      new Comment("String Value: " + xOpString.Value.Replace("\r", "\\r").Replace("\n", "\\n"));
+      Y.EAX = Y.Reference(xDataName);
+      Y.EAX.Push();
+      Assembler.Stack.Push(4, typeof(string));
     }
 
+    public static string GetContentsArrayName(string aLiteral) {
+      var xAsm= CPU.Assembler.CurrentInstance.Peek();
+
+      Encoding xEncoding = Encoding.Unicode;
+      byte[] xByteArray = new byte[16 + xEncoding.GetByteCount(aLiteral)];
+      //throw new NotImplementedException("Todo: implement literal strings");
+      //var xTemp = BitConverter.GetBytes(Engine.RegisterType(Engine.GetType("mscorlib",
+      //                                                                     "System.Array")));
+      //Array.Copy(xTemp, 0, xByteArray, 0, 4);
+      var xTemp = BitConverter.GetBytes((uint)InstanceTypeEnum.StaticEmbeddedArray);
+      Array.Copy(xTemp, 0, xByteArray, 4, 4);
+      xTemp = BitConverter.GetBytes(aLiteral.Length);
+      Array.Copy(xTemp, 0, xByteArray, 8, 4);
+      xTemp = BitConverter.GetBytes(2);
+      Array.Copy(xTemp, 0, xByteArray, 12, 4);
+      xTemp = xEncoding.GetBytes(aLiteral);
+      Array.Copy(xTemp, 0, xByteArray, 16, xTemp.Length);
+      DataMember xDataMember = null;
+      //if (!mDataMemberMap.TryGetValue(aLiteral, out xDataMember))
+      //{
+      string xDataName = xAsm.GetIdentifier("StringLiteral");
+      object[] xObjectData = new object[7];
+      //xObjectData[0] = ((uint)Engine.RegisterType(Engine.GetType("mscorlib", "System.String")));
+      xObjectData[1] = ((uint)InstanceTypeEnum.StaticEmbeddedObject);
+      xObjectData[2] = 1;
+      xObjectData[3] = ElementReference.New(xDataName + "__Contents");
+      xObjectData[4] = ElementReference.New(xDataName + "__Contents", 16);
+      xObjectData[5] = aLiteral.Length;
+      xObjectData[6] = aLiteral.Length;
+      xAsm.DataMembers.Add(new CPU.DataMember(xDataName, xObjectData));
+      xAsm.DataMembers.Add(new CPU.DataMember(xDataName + "__Contents", xByteArray));
+      //mDataMemberMap.Add(aLiteral, xDataMember);
+      return xDataName;
+    }
     
 		// using System;
 		// using System.Linq;
@@ -43,52 +88,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		//             LiteralStr = aLiteralStr;
 		//         }
 		// 
-		//         public static string GetContentsArrayName(Assembler.Assembler aAssembler, string aLiteral) {
-		//             Encoding xEncoding = Encoding.Unicode;
-		//             byte[] xByteArray = new byte[16 + xEncoding.GetByteCount(aLiteral)];
-		//             //throw new NotImplementedException("Todo: implement literal strings");
-		//             //var xTemp = BitConverter.GetBytes(Engine.RegisterType(Engine.GetType("mscorlib",
-		//             //                                                                     "System.Array")));
-		//             //Array.Copy(xTemp, 0, xByteArray, 0, 4);
-		//             var xTemp = BitConverter.GetBytes((uint)InstanceTypeEnum.StaticEmbeddedArray);
-		//             Array.Copy(xTemp, 0, xByteArray, 4, 4);
-		//             xTemp = BitConverter.GetBytes(aLiteral.Length);
-		//             Array.Copy(xTemp, 0, xByteArray, 8, 4);
-		//             xTemp = BitConverter.GetBytes(2);
-		//             Array.Copy(xTemp, 0, xByteArray, 12, 4);
-		//             xTemp = xEncoding.GetBytes(aLiteral);
-		//             Array.Copy(xTemp, 0, xByteArray, 16, xTemp.Length);
-		//             DataMember xDataMember = null;
-		//             //if (!mDataMemberMap.TryGetValue(aLiteral, out xDataMember))
-		//             //{
-		//                 string xDataName = aAssembler.GetIdentifier("StringLiteral");
-		//                 object[] xObjectData = new object[7];
-		//                 //xObjectData[0] = ((uint)Engine.RegisterType(Engine.GetType("mscorlib", "System.String")));
-		//                 xObjectData[1] = ((uint)InstanceTypeEnum.StaticEmbeddedObject);
-		//                 xObjectData[2] = 1;
-		//                 xObjectData[3] = ElementReference.New(xDataName + "__Contents");
-		//                 xObjectData[4] = ElementReference.New(xDataName + "__Contents", 16);
-		//                 xObjectData[5] = aLiteral.Length;
-		//                 xObjectData[6] = aLiteral.Length;
-		//                 aAssembler.DataMembers.Add(new DataMember(xDataName, xObjectData));
-		//                 aAssembler.DataMembers.Add(xDataMember = new DataMember(xDataName + "__Contents", xByteArray));
-		//                 //mDataMemberMap.Add(aLiteral, xDataMember);
-		//                 return xDataName;
-		//             //}
-		//             //else
-		//             //{
-		//             //    return xDataMember.Name.Substring(0, xDataMember.Name.Length - "__Contents".Length);
-		//             //}
-		//         }
-		// 
-		//         public override void DoAssemble() {
-		//             var Y = new Y86();
-		//             string xDataName = GetContentsArrayName(Assembler, LiteralStr);
-		//             new Comment("String Value: " + LiteralStr.Replace("\r", "\\r").Replace("\n", "\\n"));
-		//             Y.EAX = Y.Reference(xDataName);
-		//             Y.EAX.Push();
-		//             Assembler.Stack.Push(new StackContent(4, typeof(string)));
-		//         }
+
 		//     }
 		// }
 		

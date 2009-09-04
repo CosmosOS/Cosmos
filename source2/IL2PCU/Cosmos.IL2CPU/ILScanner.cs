@@ -110,22 +110,22 @@ namespace Cosmos.IL2CPU
                 // Call ProcessMethod first, in a threaded environment it will
                 // allow more threads to work slightly sooner
                 var xMethod = new MethodInfo(aMethodBase, aMethodUID);
-              
-                // Assemble the method
-                mAsmblr.ProcessMethod(xMethod, xOpCodes);
 
                 foreach (var xOpCode in xOpCodes) {
                   //InstructionCount++;
-                  if( xOpCode is ILOpCodes.OpMethod ) {
-                    QueueMethod(((ILOpCodes.OpMethod)xOpCode).Value);
+                  if (xOpCode is ILOpCodes.OpMethod) {
+                    ((ILOpCodes.OpMethod)xOpCode).ValueUID = QueueMethod(((ILOpCodes.OpMethod)xOpCode).Value);
                   } else if (xOpCode is ILOpCodes.OpType) {
-                    QueueType( ( ( ILOpCodes.OpType )xOpCode ).Value );
+                    QueueType(((ILOpCodes.OpType)xOpCode).Value);
                   }
                 }
+              
+                // Assemble the method
+                mAsmblr.ProcessMethod(xMethod, xOpCodes);
             }
         }
 
-        protected void QueueMethod( MethodBase aMethod )
+        protected uint QueueMethod( MethodBase aMethod )
         {
             if( !mMethodsSet.Contains( aMethod ) )
             {
@@ -143,6 +143,8 @@ namespace Cosmos.IL2CPU
                 //  QueueType(xParam.ParameterType);
                 //}
             }
+          // todo: this is probably slow
+            return (uint)mMethods.IndexOf(aMethod);
         }
 
         //protected void QueueStaticField(FieldInfo aFieldInfo) {

@@ -1,4 +1,6 @@
 using System;
+using Cosmos.IL2CPU.ILOpCodes;
+using CPUx86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -10,7 +12,29 @@ namespace Cosmos.IL2CPU.X86.IL
 		}
 
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
-      throw new NotImplementedException();
+      var xOpVar = (OpVar)aOpCode;
+      uint xAddress = 0;
+      var xBody = aMethod.MethodBase.GetMethodBody();
+      for(int i = 0; i < xOpVar.Value;i++){
+        var xLocal = xBody.LocalVariables[i];
+
+        var xSize = Align(SizeOfType(xLocal.LocalType), 4);
+        xAddress += xSize;
+      }
+      // xAddress contains full size of locals, excluding the actual local
+      xAddress = 4 + xAddress;
+      new CPUx86.Move {
+        DestinationReg = CPUx86.Registers.EAX,
+        SourceReg = CPUx86.Registers.EBP
+      };
+      new CPUx86.Sub {
+        DestinationReg = CPUx86.Registers.EAX,
+        SourceValue = xAddress
+      };
+      new CPUx86.Push {
+        DestinationReg = CPUx86.Registers.EBX,
+      };
+      Assembler.Stack.Push(4);
     }
 
     

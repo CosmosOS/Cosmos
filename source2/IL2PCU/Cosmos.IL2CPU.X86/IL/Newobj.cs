@@ -101,7 +101,7 @@ namespace Cosmos.IL2CPU.X86.IL
 				//select item ).Count();
 				int xGCFieldCount = xType.GetFields().Count(x => x.FieldType.IsValueType);
 
-				string strTypeId = xMethod.Value.DeclaringType.FullName;
+				string strTypeId = "VMT__TYPE_ID_HOLDER__" + xMethod.Value.DeclaringType.FullName;
 
 				new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
 				new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, SourceRef = Indy.IL2CPU.Assembler.ElementReference.New(strTypeId), SourceIsIndirect = true };

@@ -3,6 +3,8 @@ using System;
 // using System.Linq;
 using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using Cosmos.IL2CPU.ILOpCodes;
+using Indy.IL2CPU;
 // using System.Reflection;
 // using Indy.IL2CPU.Assembler;
 // using Indy.IL2CPU.Compiler;
@@ -19,9 +21,8 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            var xMethodInfo = ( System.Reflection.MethodInfo )( ( ( Cosmos.IL2CPU.ILOpCodes.OpMethod )aOpCode ).Value );
-            var xMethodDescription = CPU.MethodInfoLabelGenerator.GenerateLabelName( xMethodInfo );
-
+          var xOpMethod = aOpCode as OpMethod;
+          var xMethodInfo = (System.Reflection.MethodInfo)xOpMethod.Value;
             string xCurrentMethodLabel = CPU.MethodInfoLabelGenerator.GenerateLabelName( aMethod.MethodBase );
 
             // mTargetMethodInfo = GetService<IMetaDataInfoService>().GetMethodInfo(mMethod
@@ -47,17 +48,10 @@ namespace Cosmos.IL2CPU.X86.IL
             uint xExtraStackSize = ( uint )Align( xReturnSize, 4 );
             var xParameters = xMethodInfo.GetParameters();
             uint xThisOffset = 0;
-            foreach( var xItem in xParameters )
-            {
-                xExtraStackSize -= SizeOfType( xItem.GetType() );
-                xThisOffset += SizeOfType( xItem.GetType() ); // + xExtraStackSize ?
+            foreach (var xItem in xParameters) {
+              xExtraStackSize -= SizeOfType(xItem.GetType());
+              xThisOffset += SizeOfType(xItem.GetType());
             }
-
-            //if (ExtraStackSize > 0) {
-            //    for (int i = 0; i < Arguments.Length; i++) {
-            //        Arguments[i].Offset += ExtraStackSize;
-            //    }
-            //}
 
             // This is finding offset to self? It looks like we dont need offsets of other
             // arguments, but only self. If so can calculate without calculating all fields
@@ -65,10 +59,9 @@ namespace Cosmos.IL2CPU.X86.IL
             // Can we add this method info somehow to the data passed in?
             // mThisOffset = mTargetMethodInfo.Arguments[0].Offset;
 
-            //             mExtraStackSpace = mTargetMethodInfo.ExtraStackSize;
-            //             if (mExtraStackSpace > 0) {
-            //                 mThisOffset -= mExtraStackSpace;
-            //             }
+            if (xExtraStackSize > 0) {
+              xThisOffset -= xExtraStackSize;
+                         }
             new Comment( "ThisOffset = " + xThisOffset );
 
             //             Action xEmitCleanup = delegate() {
@@ -94,6 +87,8 @@ namespace Cosmos.IL2CPU.X86.IL
             //                    GetService<IMetaDataInfoService>().GetTypeInfo( typeof( NullReferenceException ) ),
             //                    GetService<IMetaDataInfoService>().GetMethodInfo( typeof( NullReferenceException ).GetConstructor( Type.EmptyTypes ), false ),
             //                    GetServiceProvider() );
+            // todo: add exception support
+#warning todo: add exception support
 
             new CPU.Label( xCurrentMethodLabel + "_AfterNullRefCheck" );
 
@@ -115,16 +110,17 @@ namespace Cosmos.IL2CPU.X86.IL
 
                 new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = (int)xThisOffset };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
-                new CPUx86.Push { DestinationRef = Indy.IL2CPU.Assembler.ElementReference.New( xMethodDescription ), DestinationIsIndirect = true };
-                //var xGetMethodAddrInfo = GetService<IMetaDataInfoService>().GetMethodInfo( VTablesImplRefs.GetMethodAddressForTypeRef, false );
-                new CPUx86.Call { DestinationLabel = xMethodDescription };
+                new CPUx86.Push {
+                  DestinationValue = xOpMethod.ValueUID
+                };
+                new CPUx86.Call {
+                  DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(VTablesImplRefs.GetMethodAddressForTypeRef)
+                };
 
                 /*
                  * On the stack now:
                  * $esp                 Params
-                 * $esp + mThisOffset   This
-                 * 
-                 * EAX contains the method to call
+                 * $esp + mThisOffset   This            
                  */
 
                 //Call.EmitExceptionLogic( Assembler,
@@ -143,6 +139,7 @@ namespace Cosmos.IL2CPU.X86.IL
                      * $esp + 4                 Params
                      * $esp + mThisOffset + 4   This
                      */
+                  // we need to see if $this is a boxed object, and if so, we need to box it
                     new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = (int)(xThisOffset + 4) };
                     //new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = ( ( uint )InstanceTypeEnum.BoxedValueType ), Size = 32 };
                     
