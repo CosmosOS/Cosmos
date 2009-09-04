@@ -1,48 +1,43 @@
 using System;
+// using System.Collections.Generic;
+// using System.IO;
+// using System.Linq;
+// 
+// using IL2CPU=Indy.IL2CPU;
+// using CPU=Indy.IL2CPU.Assembler;
+// using CPUx86=Indy.IL2CPU.Assembler.X86;
+// using System.Reflection;
+// using Indy.IL2CPU.Assembler;
+// using Indy.IL2CPU.Compiler;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Call )]
-    public class Call : ILOp
-    {
-        public Call( Cosmos.IL2CPU.Assembler aAsmblr )
-            : base( aAsmblr )
-        {
-        }
+    public class Call : ILOp {
+      //         private string LabelName;
+      //         private uint mResultSize;
+      //         private uint? TotalArgumentSize = null;
+      //         private bool mIsDebugger_Break = false;
+      //         private uint[] ArgumentSizes = new uint[0];
+      //         private MethodInformation mMethodInfo;
+      //         private MethodInformation mTargetMethodInfo;
+      //         private string mNextLabelName;
+      //         private uint mCurrentILOffset;
+      //         private MethodBase mMethod;
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
-        {
+      public Call(Cosmos.IL2CPU.Assembler aAsmblr) : base( aAsmblr ) {
+      }
+
+        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode ) {
             throw new NotImplementedException();
         }
 
-
-        // using System;
-        // using System.Collections.Generic;
-        // using System.IO;
-        // using System.Linq;
-        // 
-        // using IL2CPU=Indy.IL2CPU;
-        // using CPU=Indy.IL2CPU.Assembler;
-        // using CPUx86=Indy.IL2CPU.Assembler.X86;
-        // using System.Reflection;
-        // using Indy.IL2CPU.Assembler;
-        // using Indy.IL2CPU.Compiler;
         // 
         // namespace Indy.IL2CPU.IL.X86
         // {
         //     [OpCode(OpCodeEnum.Call)]
         //     public class Call : Op
         //     {
-        //         private string LabelName;
-        //         private uint mResultSize;
-        //         private uint? TotalArgumentSize = null;
-        //         private bool mIsDebugger_Break = false;
-        //         private uint[] ArgumentSizes = new uint[0];
-        //         private MethodInformation mMethodInfo;
-        //         private MethodInformation mTargetMethodInfo;
-        //         private string mNextLabelName;
-        //         private uint mCurrentILOffset;
-        //         private MethodBase mMethod;
         // 
         //         public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData, IServiceProvider aServiceProvider)
         //         {
