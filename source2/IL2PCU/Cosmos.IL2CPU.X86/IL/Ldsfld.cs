@@ -1,5 +1,7 @@
 using System;
-
+using Indy.IL2CPU;
+using Cosmos.IL2CPU.ILOpCodes;
+using CPUx86 = Indy.IL2CPU.Assembler.X86;
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldsfld )]
@@ -12,7 +14,97 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            throw new NotImplementedException();
+            var xType = aMethod.MethodBase.DeclaringType;
+            var xOpCode = ( ILOpCodes.OpField )aOpCode;
+            System.Reflection.FieldInfo xField = xOpCode.Value;
+
+            Assembler.Stack.Pop();
+            int aExtraOffset = 0;
+            bool xNeedsGC = xField.FieldType.IsClass && !xField.FieldType.IsValueType;
+            uint xSize = SizeOfType( xField.FieldType );
+            if( xNeedsGC )
+            {
+                aExtraOffset = 12;
+            }
+
+
+            string xDataName = "static_field__" + MethodInfoLabelGenerator.GetFullName( xField.DeclaringType ) + "." + xField.Name;
+            if( xSize >= 4 )
+            {
+                for( int i = 1; i <= ( xSize / 4 ); i++ )
+                {
+                    //	Pop("eax");
+                    //	Move(Assembler, "dword [" + mDataName + " + 0x" + (i * 4).ToString("X") + "]", "eax");
+                    new CPUx86.Push { DestinationRef = Indy.IL2CPU.Assembler.ElementReference.New( xDataName ), DestinationIsIndirect = true, DestinationDisplacement = ( int )( xSize - ( i * 4 ) ) };
+                }
+                switch( xSize % 4 )
+                {
+                    case 1:
+                        {
+                            new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
+                            new CPUx86.Move { DestinationReg = CPUx86.Registers.AL, SourceRef = Indy.IL2CPU.Assembler.ElementReference.New( xDataName ), SourceIsIndirect = true };
+                            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                            break;
+                        }
+                    case 2:
+                        {
+                            new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
+                            new CPUx86.Move { DestinationReg = CPUx86.Registers.AX, SourceRef = Indy.IL2CPU.Assembler.ElementReference.New( xDataName ), SourceIsIndirect = true };
+                            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                            break;
+                        }
+                    case 0:
+                        {
+                            break;
+                        }
+                    default:
+                        //EmitNotImplementedException( Assembler, GetServiceProvider(), "Ldsfld: Remainder size " + ( xSize % 4 ) + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
+                        throw new NotImplementedException(); 
+                        break;
+                }
+            }
+            else
+            {
+                switch( xSize )
+                {
+                    case 1:
+                        {
+                            new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
+                            new CPUx86.Move { DestinationReg = CPUx86.Registers.AL, SourceRef = Indy.IL2CPU.Assembler.ElementReference.New( xDataName ), SourceIsIndirect = true };
+                            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                            break;
+                        }
+                    case 2:
+                        {
+                            new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
+                            new CPUx86.Move { DestinationReg = CPUx86.Registers.AX, SourceRef = Indy.IL2CPU.Assembler.ElementReference.New( xDataName ), SourceIsIndirect = true };
+                            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                            break;
+                        }
+                    case 0:
+                        {
+                            break;
+                        }
+                    default:
+                        //EmitNotImplementedException( Assembler, GetServiceProvider(), "Ldsfld: Remainder size " + ( xSize % 4 ) + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
+                        throw new NotImplementedException();
+                        break;
+                }
+            }
+
+            Assembler.Stack.Push( new StackContents.Item( ( int )xSize, null ) );
+
+            if( xNeedsGC )
+            {
+                //TODO: What does that do?
+                //new Dup( null, null )
+                //{
+                //    Assembler = this.Assembler
+                //}.Assemble();
+
+                new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName( GCImplementationRefs.IncRefCountRef ) };
+                Assembler.Stack.Pop();
+            }
         }
 
 

@@ -58,14 +58,19 @@ namespace Cosmos.IL2CPU.X86.IL
             }
             new Comment( "Type = '" + xField.FieldType.FullName + "', NeedsGC = " + xNeedsGC );
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
-            new CPUx86.Add { DestinationReg = CPUx86.Registers.ECX, SourceValue = ( uint )( aField.Offset + aExtraOffset ) };
-            if( aField.IsExternalField && aDerefExternalField )
-            {
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true };
-            }
+
+            //*******
+            throw new NotImplementedException( " Offset and plugswitch not implemented" );
+            //new CPUx86.Add { DestinationReg = CPUx86.Registers.ECX, SourceValue = ( uint )( aField.Offset + aExtraOffset ) };
+            //if( aField.IsExternalField && aDerefExternalField )
+            //{
+            //    new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true };
+            //}
+            //*******
+            
             for( int i = 1; i <= ( xSize / 4 ); i++ )
             {
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true, SourceDisplacement = ( aField.Size - ( i * 4 ) ) };
+                new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true, SourceDisplacement = (int)( xSize - ( i * 4 ) ) };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
             }
             switch( xSize % 4 )
