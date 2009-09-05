@@ -17,7 +17,7 @@ namespace Cosmos.IL2CPU {
         private static SortedList<int, Stack<Assembler>> mCurrentInstance = new SortedList<int, Stack<Assembler>>();
         protected internal List<Instruction> mInstructions = new List<Instruction>();
         private List<DataMember> mDataMembers = new List<DataMember>();
-
+        private System.IO.TextWriter mLog;
         #region Properties
 
         public static Stack<Assembler> CurrentInstance
@@ -56,6 +56,7 @@ namespace Cosmos.IL2CPU {
 
         public Assembler()
         {
+            mLog = new System.IO.StreamWriter( "Cosmos.Assembler.Log" ); 
             InitILOps();
             CurrentInstance.Push( this );
         }
@@ -149,7 +150,10 @@ namespace Cosmos.IL2CPU {
             } else {
               xILOp = mILOpsHi[xOpCodeVal & 0xFF];
             }
+              mLog.Write ( "[" + xOpCode.ToString() + "] \t Stack start: " + Stack.Count.ToString() );   
             xILOp.Execute(aMethod, xOpCode);
+            mLog.WriteLine( " end: " + Stack.Count.ToString() );
+            mLog.Flush(); 
           }
         }
 

@@ -56,6 +56,8 @@ namespace Cosmos.IL2CPU {
 
     private Stack<Item> mStack = new Stack<Item>();
 
+
+      public int Count {get { return mStack.Count; } }
     public Item Peek() {
       return mStack.Peek();
     }
