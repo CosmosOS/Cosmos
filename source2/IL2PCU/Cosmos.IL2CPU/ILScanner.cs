@@ -23,6 +23,10 @@ namespace Cosmos.IL2CPU {
     // super slow.
     //	TODO: We need to scan for static fields too. 
     private Dictionary<MethodBase, uint> mKnownMethods = new Dictionary<MethodBase, uint>();
+    // We need a separate list because we cannot iterate keys by index, and any functions
+    // to get a list of keys will do a on demand copy, which won't meet our needs either
+    // becuase we have to walk the list dynamically as it grows, which is also why we need to
+    // index it rather than enumerate it with foreach.
     private List<MethodBase> mMethodsToProcess = new List<MethodBase>();
 
     //TODO: Likely change this to be like Methods to be more efficient. Might only need Dictionary
