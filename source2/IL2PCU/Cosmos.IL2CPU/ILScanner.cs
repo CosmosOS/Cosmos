@@ -125,7 +125,8 @@ namespace Cosmos.IL2CPU {
     protected uint QueueMethod(MethodBase aMethod) {
       uint xResult;
       if (!mKnownMethods.TryGetValue(aMethod, out xResult)) {
-        mKnownMethods.Add(aMethod, (uint)mMethodsToProcess.Count);
+        xResult = (uint)mMethodsToProcess.Count;
+        mKnownMethods.Add(aMethod, xResult);
         mMethodsToProcess.Add(aMethod);
         //TODO: Might still need this one, see after we get assembly output again
         //Im hoping the operand walking we have now ill include this on its own.
