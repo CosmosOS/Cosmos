@@ -16,27 +16,27 @@ namespace Cosmos.IL2CPU.X86.IL
 		}
 
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
+      var xType = aMethod.MethodBase.DeclaringType;
+      var xOpCode = (ILOpCodes.OpField)aOpCode;
+      
+      //             if (!xType.Fields.ContainsKey(mFieldId))
+      //             {
+      //                 Console.Write("");
+      //                 xType = GetService<IMetaDataInfoService>().GetTypeInfo(mDeclaringType);
+      //                 xType = GetService<IMetaDataInfoService>().GetTypeInfo(mDeclaringType);
+      //                 xType = GetService<IMetaDataInfoService>().GetTypeInfo(mDeclaringType);
+      //                 xType = GetService<IMetaDataInfoService>().GetTypeInfo(mDeclaringType);
+      //             }
+      //             mFieldInfo = xType.Fields[mFieldId];
+      // 			Ldfld(Assembler, xType, mFieldId);
       throw new NotImplementedException();
     }
 
-		// 
-		// namespace Indy.IL2CPU.IL.X86 {
-		// 	[OpCode(OpCodeEnum.Ldfld)]
 		// 	public class Ldfld: Op {
 		//         private Type mDeclaringType;
 		// 		private TypeInformation.Field mFieldInfo;
 		// 		private readonly TypeInformation mTypeInfo;
 		//         private string mFieldId;
-		// 
-		//         //public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
-		//         //    FieldInfo xField = aReader.OperandValueField;
-		//         //    if (xField == null)
-		//         //    {
-		//         //        throw new Exception("Field not found!");
-		//         //    }
-		//         //    Engine.RegisterType(xField.DeclaringType);
-		//         //    Engine.RegisterType(xField.FieldType);
-		//         //}
 		// 
 		// 		public Ldfld(ILReader aReader, MethodInformation aMethodInfo)
 		// 			: base(aReader, aMethodInfo) {
@@ -47,22 +47,6 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 			mFieldId = xField.GetFullName();
 		//             mDeclaringType = xField.DeclaringType;
 		// 		}
-		// 
-		// 		public override void DoAssemble() {
-		//             var xType = GetService<IMetaDataInfoService>().GetTypeInfo(mDeclaringType);
-		//             if (!xType.Fields.ContainsKey(mFieldId))
-		//             {
-		//                 Console.Write("");
-		//                 xType = GetService<IMetaDataInfoService>().GetTypeInfo(mDeclaringType);
-		//                 xType = GetService<IMetaDataInfoService>().GetTypeInfo(mDeclaringType);
-		//                 xType = GetService<IMetaDataInfoService>().GetTypeInfo(mDeclaringType);
-		//                 xType = GetService<IMetaDataInfoService>().GetTypeInfo(mDeclaringType);
-		//             }
-		//             mFieldInfo = xType.Fields[mFieldId];
-		// 			Ldfld(Assembler, xType, mFieldId);
-		// 		}
-		// 	}
-		// }
 		
 	}
 }
