@@ -1,4 +1,10 @@
 using System;
+// using System.Collections.Generic;
+// using System.IO;
+// 
+// using CPU = Indy.IL2CPU.Assembler;
+// using System.Reflection;
+// using Indy.IL2CPU.Compiler;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -13,15 +19,6 @@ namespace Cosmos.IL2CPU.X86.IL
       throw new NotImplementedException();
     }
 
-    
-		// using System;
-		// using System.Collections.Generic;
-		// using System.IO;
-		// 
-		// 
-		// using CPU = Indy.IL2CPU.Assembler;
-		// using System.Reflection;
-		// using Indy.IL2CPU.Compiler;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {
 		// 	[OpCode(OpCodeEnum.Ldfld)]

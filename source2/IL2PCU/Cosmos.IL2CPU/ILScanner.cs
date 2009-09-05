@@ -125,26 +125,28 @@ namespace Cosmos.IL2CPU
             }
         }
 
-        protected uint QueueMethod( MethodBase aMethod )
-        {
-            if( !mMethodsSet.Contains( aMethod ) )
-            {
-                mMethodsSet.Add( aMethod );
-                mMethods.Add( aMethod );
-                //TODO: Might still need this one, see after we get assembly output again
-                //Im hoping the operand walking we have now ill include this on its own.
-                //QueueType(aMethod.DeclaringType);
+        protected uint QueueMethod(MethodBase aMethod) {
+          uint xResult;
+          if (mMethodsSet.Contains(aMethod)) {
+            // todo: this is probably slow
+            xResult = (uint)(mMethods.IndexOf(aMethod));
+          } else {
+            mMethodsSet.Add(aMethod);
+            xResult = (uint)mMethods.Count;
+            mMethods.Add(aMethod);
+            //TODO: Might still need this one, see after we get assembly output again
+            //Im hoping the operand walking we have now ill include this on its own.
+            //QueueType(aMethod.DeclaringType);
 
-                //var xMethodInfo = aMethod as MethodInfo;
-                //if (xMethodInfo != null) {
-                //  QueueType(xMethodInfo.ReturnType);
-                //}
-                //foreach (var xParam in aMethod.GetParameters()) {
-                //  QueueType(xParam.ParameterType);
-                //}
-            }
-          // todo: this is probably slow
-            return (uint)mMethods.IndexOf(aMethod);
+            //var xMethodInfo = aMethod as MethodInfo;
+            //if (xMethodInfo != null) {
+            //  QueueType(xMethodInfo.ReturnType);
+            //}
+            //foreach (var xParam in aMethod.GetParameters()) {
+            //  QueueType(xParam.ParameterType);
+            //}
+          }
+          return xResult;
         }
 
         //protected void QueueStaticField(FieldInfo aFieldInfo) {
