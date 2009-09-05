@@ -59,9 +59,21 @@ namespace Cosmos.IL2CPU.X86.IL
             new Comment( "Type = '" + xField.FieldType.FullName + "', NeedsGC = " + xNeedsGC );
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
 
-            //*******
-            throw new NotImplementedException( " Offset and plugswitch not implemented" );
-            //new CPUx86.Add { DestinationReg = CPUx86.Registers.ECX, SourceValue = ( uint )( aField.Offset + aExtraOffset ) };
+            uint xOffset = 0;
+
+            var xFields = xField.DeclaringType.GetFields();
+
+            foreach( System.Reflection.FieldInfo xInfo in xFields )
+            {
+                if( xInfo == xField )
+                    break;
+
+                xOffset += SizeOfType( xInfo.FieldType );  
+            }
+            
+            new CPUx86.Add { DestinationReg = CPUx86.Registers.ECX, SourceValue = ( uint )( xOffset + aExtraOffset ) };
+
+            //throw new NotImplementedException( " Plugs not implemented" );
             //if( aField.IsExternalField && aDerefExternalField )
             //{
             //    new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true };

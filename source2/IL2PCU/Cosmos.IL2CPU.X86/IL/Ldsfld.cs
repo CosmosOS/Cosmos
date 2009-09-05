@@ -59,7 +59,7 @@ namespace Cosmos.IL2CPU.X86.IL
                         }
                     default:
                         //EmitNotImplementedException( Assembler, GetServiceProvider(), "Ldsfld: Remainder size " + ( xSize % 4 ) + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
-                        throw new NotImplementedException(); 
+                        throw new NotImplementedException();
                         break;
                 }
             }
@@ -96,11 +96,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
             if( xNeedsGC )
             {
-                //TODO: What does that do?
-                //new Dup( null, null )
-                //{
-                //    Assembler = this.Assembler
-                //}.Assemble();
+                new Dup( Assembler ).Execute( aMethod, aOpCode );
 
                 new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName( GCImplementationRefs.IncRefCountRef ) };
                 Assembler.Stack.Pop();
