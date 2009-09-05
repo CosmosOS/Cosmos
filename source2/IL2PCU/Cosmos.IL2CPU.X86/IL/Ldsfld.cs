@@ -18,7 +18,7 @@ namespace Cosmos.IL2CPU.X86.IL
             var xOpCode = ( ILOpCodes.OpField )aOpCode;
             System.Reflection.FieldInfo xField = xOpCode.Value;
 
-            Assembler.Stack.Pop();
+            //Assembler.Stack.Pop();
             int aExtraOffset = 0;
             bool xNeedsGC = xField.FieldType.IsClass && !xField.FieldType.IsValueType;
             uint xSize = SizeOfType( xField.FieldType );

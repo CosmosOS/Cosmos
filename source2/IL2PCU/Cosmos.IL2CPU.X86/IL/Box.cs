@@ -1,4 +1,8 @@
 using System;
+using Cosmos.IL2CPU.ILOpCodes;
+using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using CPU = Indy.IL2CPU.Assembler;
+using Indy.IL2CPU;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -12,7 +16,25 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            throw new NotImplementedException();
+            OpType xType = ( OpType )aOpCode;
+
+            uint xSize = SizeOfType( xType.Value );
+            string xTypeID = Label.FilterStringForIncorrectChars( typeof( Array ).AssemblyQualifiedName + "__TYPE_ID" );
+            new CPUx86.Push { DestinationValue = ( ObjectImpl.FieldDataOffset + xSize ) };
+            new CPUx86.Call { DestinationLabel = CPU.MethodInfoLabelGenerator.GenerateLabelName( GCImplementationRefs.AllocNewObjectRef ) };
+            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, SourceRef = Indy.IL2CPU.Assembler.ElementReference.New( xTypeID ), SourceIsIndirect = true };
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EBX };
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = ( uint )InstanceTypeEnum.BoxedValueType, Size = 32 };
+            new CPU.Comment( "xSize is " + xSize );
+            for( int i = 0; i < ( xSize / 4 ); i++ )
+            {
+                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
+                new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = ( ObjectImpl.FieldDataOffset + ( i * 4 ) ), SourceReg = CPUx86.Registers.EDX, Size = 32 };
+            }
+            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+            Assembler.Stack.Pop();
+            Assembler.Stack.Push( new StackContents.Item( 4, false, false, false ) );
         }
 
 

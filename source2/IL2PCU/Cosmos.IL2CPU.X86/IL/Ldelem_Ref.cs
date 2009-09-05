@@ -1,5 +1,6 @@
 using System;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using Indy.IL2CPU;
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldelem_Ref )]
@@ -11,13 +12,13 @@ namespace Cosmos.IL2CPU.X86.IL
         }
         public static void Assemble( Assembler aAssembler, uint aElementSize )
         {
-            throw new NotImplementedException(); 
+            
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EDX, SourceValue = aElementSize };
             new CPUx86.Multiply { DestinationReg = CPUx86.Registers.EDX };
 
             //TODO: implement ObjectImpl first
-            //new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = ( ObjectImpl.FieldDataOffset + 4 ) };
+            new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = ( ObjectImpl.FieldDataOffset + 4 ) };
 
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
             new CPUx86.Add { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EAX };

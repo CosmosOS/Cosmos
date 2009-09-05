@@ -1,6 +1,6 @@
 using System;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
-
+using Indy.IL2CPU;
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Stelem_Ref )]
@@ -12,7 +12,6 @@ namespace Cosmos.IL2CPU.X86.IL
         }
         public static void Assemble( Assembler aAssembler, uint aElementSize, MethodInfo aMethod, ILOpCode aOpCode )
         {
-            throw new NotImplementedException();
             // stack - 3 == the array
             // stack - 2 == the index
             // stack - 1 == the new value
@@ -23,14 +22,12 @@ namespace Cosmos.IL2CPU.X86.IL
             }
             new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = ( int )( xStackSize + 4 ) };
 
-            //TODO: Implement GC first
-            //new CPUx86.Call { DestinationLabel = IL2CPU.Assembler.MethodInfoLabelGenerator.GenerateLabelName( GCImplementationRefs.DecRefCountRef ) };
+            new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName( GCImplementationRefs.DecRefCountRef ) };
 
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = ( int )xStackSize }; // the index
             new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = ( int )xStackSize + 4 }; // the index
 
-            //TODO: Implement ObjectImpl first
-            //new CPUx86.Add { DestinationReg = CPUx86.Registers.ECX, SourceValue = ( uint )( ObjectImpl.FieldDataOffset + 4 ) };
+            new CPUx86.Add { DestinationReg = CPUx86.Registers.ECX, SourceValue = ( uint )( ObjectImpl.FieldDataOffset + 4 ) };
 
             new CPUx86.Push { DestinationValue = aElementSize };
             aAssembler.Stack.Push(4, true, false, true ) ;

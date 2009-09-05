@@ -1,5 +1,8 @@
 using System;
-
+using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using CPU = Indy.IL2CPU.Assembler;
+using Indy.IL2CPU;
+using System.Reflection;
 namespace Cosmos.IL2CPU.X86.IL
 {
     /// <summary>
@@ -15,7 +18,48 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            throw new NotImplementedException();
+            Cosmos.IL2CPU.ILOpCodes.OpType xType = ( Cosmos.IL2CPU.ILOpCodes.OpType )aOpCode;
+
+            uint xSize = SizeOfType( xType.Value );
+
+            string xTypeID = Label.FilterStringForIncorrectChars( typeof(Array).AssemblyQualifiedName + "__TYPE_ID" );
+            MethodBase xCtor = typeof( Array ).GetConstructors( BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance )[ 0 ];
+            string xCtorName = MethodInfoLabelGenerator.GenerateLabelName( xCtor );
+
+            new CPU.Comment( "Element Size = " + xSize );
+            // element count is on the stack
+            int xElementCountSize = Assembler.Stack.Pop().Size;
+            new CPUx86.Pop { DestinationReg = CPUx86.Registers.ESI };
+            new CPUx86.Push { DestinationReg = CPUx86.Registers.ESI };
+            //Assembler.StackSizes.Push(xElementCountSize);
+            new CPUx86.Push { DestinationValue = xSize };
+            Assembler.Stack.Push( new StackContents.Item( 4, typeof( uint ) ) );
+            new Mul( Assembler ).Execute( aMethod, aOpCode );
+            // the total items size is now on the stack
+            new CPUx86.Push { DestinationValue = ( ObjectImpl.FieldDataOffset + 4 ) };
+            Assembler.Stack.Push( new StackContents.Item( 4, typeof( uint ) ) );
+            new Add( Assembler ).Execute( aMethod, aOpCode );
+            // the total array size is now on the stack.
+            new CPUx86.Call { DestinationLabel = CPU.MethodInfoLabelGenerator.GenerateLabelName( GCImplementationRefs.AllocNewObjectRef ) };
+            new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
+            new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
+            new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
+            new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
+
+            new CPUx86.Call { DestinationLabel = CPU.MethodInfoLabelGenerator.GenerateLabelName( GCImplementationRefs.IncRefCountRef ) };
+            new CPUx86.Call { DestinationLabel = CPU.MethodInfoLabelGenerator.GenerateLabelName( GCImplementationRefs.IncRefCountRef ) };
+
+            Assembler.Stack.Push( new StackContents.Item( 4, typeof( Array ) ) );
+            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, SourceRef = Indy.IL2CPU.Assembler.ElementReference.New( xTypeID ), SourceIsIndirect = true };
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EBX };
+            new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 4 };
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, SourceValue = ( uint )InstanceTypeEnum.Array, Size = 32 };
+            new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 4 };
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.ESI, Size = 32 };
+            new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 4 };
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, SourceValue = ( uint )xSize, Size = 32 };
+            new CPUx86.Call { DestinationLabel = xCtorName };
         }
 
 

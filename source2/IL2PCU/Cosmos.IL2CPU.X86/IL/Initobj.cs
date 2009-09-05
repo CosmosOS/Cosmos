@@ -12,14 +12,12 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            throw new NotImplementedException(); 
-            uint mObjSize;
-            Type mType;
+            
+            uint mObjSize = 0;
 
-            if( mType.IsValueType )
-            {
-                //GetService<IMetaDataInfoService>().GetTypeFieldInfo( mType, out mObjSize );
-            }
+            Type mType = (( Cosmos.IL2CPU.ILOpCodes.OpType )aOpCode).Value;
+            mObjSize = SizeOfType( mType );
+
             Assembler.Stack.Pop();
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
             for( int i = 0; i < ( mObjSize / 4 ); i++ )
