@@ -122,7 +122,7 @@ namespace Cosmos.IL2CPU {
       }
     }
 
-    protected uint QueueMethod(MethodBase aMethod) {
+    public uint QueueMethod(MethodBase aMethod) {
       uint xResult;
       if (!mKnownMethods.TryGetValue(aMethod, out xResult)) {
         xResult = (uint)mMethodsToProcess.Count;

@@ -5,7 +5,7 @@ using Cosmos.IL2CPU.X86;
 using Indy.IL2CPU.Assembler.X86;
 using S = Cosmos.Hardware.TextScreen;
 using System.IO;
-
+using Indy.IL2CPU; 
 namespace HelloWorld {
 	class Program {
 		//#region Cosmos Builder logic
@@ -20,11 +20,28 @@ namespace HelloWorld {
         // Build stuff is all UI, launching QEMU, making ISO etc.
         // IL2CPU should only contain scanning and assembling of binary files
         var xAsmblr = new Cosmos.IL2CPU.X86.AssemblerNasm();
+        xAsmblr.Initialize(); 
+            
         var xScanner = new ILScanner(xAsmblr);
         var xEntryPoint = typeof(Program).GetMethod("Init", BindingFlags.Public | BindingFlags.Static);
+
+
+                        
+
         //InitializePlugs(aPlugs);
         xScanner.Execute(xEntryPoint);
 
+        //xScanner.Execute( ( System.Reflection.MethodInfo )RuntimeEngineRefs.InitializeApplicationRef );
+        //xScanner.Execute( ( System.Reflection.MethodInfo )RuntimeEngineRefs.FinalizeApplicationRef );
+        ////xScanner.QueueMethod(typeof(CosmosAssembler).GetMethod("PrintException"));
+        //xScanner.Execute( ( System.Reflection.MethodInfo )VTablesImplRefs.LoadTypeTableRef );
+        //xScanner.Execute( ( System.Reflection.MethodInfo )VTablesImplRefs.SetMethodInfoRef );
+        //xScanner.Execute( ( System.Reflection.MethodInfo )VTablesImplRefs.IsInstanceRef );
+        //xScanner.Execute( ( System.Reflection.MethodInfo )VTablesImplRefs.SetTypeInfoRef );
+        //xScanner.Execute( ( System.Reflection.MethodInfo )VTablesImplRefs.GetMethodAddressForTypeRef );
+        //xScanner.Execute( ( System.Reflection.MethodInfo )GCImplementationRefs.IncRefCountRef );
+        //xScanner.Execute( ( System.Reflection.MethodInfo )GCImplementationRefs.DecRefCountRef );
+        //xScanner.Execute( ( System.Reflection.MethodInfo )GCImplementationRefs.AllocNewObjectRef );
 				var xPath = Path.GetDirectoryName(typeof(Program).Assembly.Location);
 				xPath = Path.Combine(xPath, @"..\..\Output.asm");
 				using (var xOut = File.CreateText(xPath)) {
