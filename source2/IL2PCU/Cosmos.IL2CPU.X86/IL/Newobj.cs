@@ -139,10 +139,20 @@ namespace Cosmos.IL2CPU.X86.IL
                 PushAlignedParameterSize( xMethod.Value );
                 // an exception occurred, we need to cleanup the stack, and jump to the exit
                 new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
-                foreach( var xStackInt in Assembler.Stack )
+                new Comment( Assembler, "[ Newobj.Execute cleanup start count = " + Assembler.Stack.Count.ToString() +  " ]" );
+                //foreach( var xStackInt in Assembler.Stack )
+                //{
+                //    new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = ( uint )xStackInt.Size };
+                //}
+
+                uint xESPOffset = 0;
+                foreach( var xParam in xParams )
                 {
-                    new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = ( uint )xStackInt.Size };
+                    xESPOffset += SizeOfType( xParams.GetType() );
                 }
+                new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = xESPOffset };
+
+                new Comment( Assembler, "[ Newobj.Execute cleanup end ]" );
                 Jump_Exception( aMethod );
 
                 new Label( xCurrentLabel + "_NO_ERROR_4" );
@@ -228,12 +238,13 @@ namespace Cosmos.IL2CPU.X86.IL
             System.Reflection.ParameterInfo[] xParams = aMethod.GetParameters();
 
             uint xSize;
-
+            new Comment( Assembler, "[ Newobj.PushAlignedParameterSize start count = " + xParams.Length.ToString() + " ]" );
             for( int i = 1; i < xParams.Length; i++ )
             {
                 xSize = SizeOfType( xParams[ i ].GetType() );
                 new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = Align( xSize, 4 ) };
             }
+            new Comment( Assembler, "[ Newobj.PushAlignedParameterSize end ]" );
         }
         // using System.Collections.Generic;
         // using System.Diagnostics;
