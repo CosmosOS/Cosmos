@@ -32,6 +32,11 @@ namespace Cosmos.IL2CPU.X86.IL {
 
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
       var xOpMethod = aOpCode as OpMethod;
+      if( xOpMethod.Value.IsVirtual )
+      {
+          new Callvirt( Assembler ).Execute( aMethod, aOpCode );
+          return;
+      }
       var xMethodInfo = xOpMethod.Value as System.Reflection.MethodInfo;
       string xCurrentMethodLabel = CPU.MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase);
 
