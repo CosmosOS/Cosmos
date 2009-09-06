@@ -4,12 +4,14 @@ using System.Linq;
 using System.Reflection.Emit;
 using System.Text;
 using System.Threading;
-
+using System.IO;
 namespace Cosmos.IL2CPU {
     public abstract class Assembler {
       protected ILOp[] mILOpsLo = new ILOp[ 256 ];
       protected ILOp[] mILOpsHi = new ILOp[ 256 ];
-
+      public virtual void Initialize()
+      {
+      }
       // Contains info on the current stack structure. What type are on the stack, etc
 	  public readonly StackContents Stack = new StackContents();
 	  
@@ -19,7 +21,15 @@ namespace Cosmos.IL2CPU {
         private List<DataMember> mDataMembers = new List<DataMember>();
         private System.IO.TextWriter mLog;
         #region Properties
+        public List<DataMember> DataMembers
+        {
+            get { return mDataMembers; }
+        }
 
+        public List<Instruction> Instructions
+        {
+            get { return mInstructions; }
+        }
         public static Stack<Assembler> CurrentInstance
         {
             get
@@ -150,18 +160,127 @@ namespace Cosmos.IL2CPU {
             } else {
               xILOp = mILOpsHi[xOpCodeVal & 0xFF];
             }
-              mLog.Write ( "[" + xILOp.ToString() + "] \t Stack start: " + Stack.Count.ToString() );   
+              //mLog.Write ( "[" + xILOp.ToString() + "] \t Stack start: " + Stack.Count.ToString() );
+              new Comment(this, "[" + xILOp.ToString() + "]");
             xILOp.Execute(aMethod, xOpCode);
-            mLog.WriteLine( " end: " + Stack.Count.ToString() );
-            mLog.Flush(); 
+            //mLog.WriteLine( " end: " + Stack.Count.ToString() );
+            //mLog.Flush(); 
           }
         }
+        /// <summary>
+        /// allows to emit footers to the code and datamember sections
+        /// </summary>
+        protected virtual void OnBeforeFlush()
+        {
+        }
+        private uint mDataMemberCounter = 0;
+        public string GetIdentifier( string aPrefix )
+        {
+            mDataMemberCounter++;
+            return aPrefix + mDataMemberCounter.ToString( "X8" ).ToUpper();
+        }
+        private bool mFlushInitializationDone = false;
+        protected void BeforeFlush()
+        {
+            if( mFlushInitializationDone )
+            {
+                return;
+            }
+            mFlushInitializationDone = true;
+            using( Assembler.mCurrentInstanceLocker.AcquireReaderLock() )
+            {
+                foreach( var xItem in mCurrentInstance.Values )
+                {
+                    if( xItem.Count > 0 )
+                    {
+                        var xAsm = xItem.Peek();
+                        if( xAsm != this )
+                        {
+                            mDataMembers.AddRange( xAsm.mDataMembers );
+                            mInstructions.AddRange( xAsm.mInstructions );
+                            xItem.Pop();
+                        }
+                    }
+                }
+            }
+            OnBeforeFlush();
+            //MergeAllElements();
+        }
 
+        public virtual void FlushBinary( Stream aOutput, ulong aBaseAddress )
+        {
+            BeforeFlush();
+            var xMax = AllAssemblerElementCount;
+            var xCurrentAddresss = aBaseAddress;
+            for( int i = 0; i < xMax; i++ )
+            {
+                GetAssemblerElement( i ).UpdateAddress( this, ref xCurrentAddresss );
+            }
+            aOutput.SetLength( aOutput.Length + ( long )( xCurrentAddresss - aBaseAddress ) );
+            for( int i = 0; i < xMax; i++ )
+            {
+                var xItem = GetAssemblerElement( i );
+                if( !xItem.IsComplete( this ) )
+                {
+                    throw new Exception( "Incomplete element encountered." );
+                }
+                //var xBuff = xItem.GetData(this);
+                //aOutput.Write(xBuff, 0, xBuff.Length);
+                xItem.WriteData( this, aOutput );
+            }
+        }
+
+        public virtual void FlushText( TextWriter aOutput )
+        {
+            BeforeFlush();
+            if( mDataMembers.Count > 0 )
+            {
+                aOutput.WriteLine();
+                foreach( DataMember xMember in mDataMembers )
+                {
+                    aOutput.Write( "\t" );
+                    xMember.WriteText( this, aOutput );
+                    aOutput.WriteLine();
+                }
+                aOutput.WriteLine();
+            }
+            if( mInstructions.Count > 0 )
+            {
+                string xMainLabel = "";
+                for( int i = 0; i < mInstructions.Count; i++ )
+                {
+                    //foreach (Instruction x in mInstructions) {
+                    var x = mInstructions[ i ];
+                    string prefix = "\t\t\t";
+                    Label xLabel = x as Label;
+                    if( xLabel != null )
+                    {
+                        if( xLabel.Name[ 0 ] == '.' )
+                        {
+                            prefix = "\t\t";
+                        }
+                        else
+                        {
+                            prefix = "\t";
+                        }
+                        string xFullName;
+                        aOutput.Write( prefix );
+                        x.WriteText( this, aOutput );
+                        aOutput.WriteLine();
+                        //aOutput.WriteLine(prefix + Label.FilterStringForIncorrectChars(xFullName) + ":");
+                        continue;
+                    }
+                    aOutput.Write( prefix );
+                    x.WriteText( this, aOutput );
+                    aOutput.WriteLine();
+                }
+            }
+        }
 
 
         protected abstract void InitILOps();
 
-        protected void InitILOps( Type aAssemblerBaseOp ) {
+        protected virtual void InitILOps( Type aAssemblerBaseOp ) {
             foreach( var xType in aAssemblerBaseOp.Assembly.GetExportedTypes() ) {
                 if( xType.IsSubclassOf( aAssemblerBaseOp ) ) {
                     var xAttribs = ( OpCodeAttribute[] )xType.GetCustomAttributes( typeof( OpCodeAttribute ), false );

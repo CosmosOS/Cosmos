@@ -7,7 +7,8 @@ namespace Cosmos.IL2CPU
     {
         public readonly string Text;
 
-        public Comment( string aText )//  :base(false) //HACK
+        public Comment( Assembler aAssembler, string aText )
+            : base( aAssembler ) //HACK
         {
             if( aText.StartsWith( ";" ) )
             {
@@ -16,6 +17,12 @@ namespace Cosmos.IL2CPU
             Text = String.Intern( aText );
         }
 
+        public new void WriteText( Indy.IL2CPU.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput )
+        {
+            aOutput.Write( "; " );
+            aOutput.Write( Text );
+        }
+        
         public override void WriteText( Assembler aAssembler, System.IO.TextWriter aOutput )
         {
             aOutput.Write( "; " );

@@ -55,8 +55,16 @@
     <Compile Include="Assembler.cs" />
     <Compile Include="BaseAssemblerElement.cs" />
     <Compile Include="Comment.cs" />
+    <Compile Include="DataEndIfDefined.cs" />
+    <Compile Include="DataIfDefined.cs" />
+    <Compile Include="DataIfNotDefined.cs" />
     <Compile Include="DataMember.cs" />
     <Compile Include="ElementReference.cs" />
+    <Compile Include="ElfHash.cs" />
+    <Compile Include="IDefine.cs" />
+    <Compile Include="IEndIfDefined.cs" />
+    <Compile Include="IIfDefined.cs" />
+    <Compile Include="IIfNotDefined.cs" />
     <Compile Include="ILOp.cs" />
     <Compile Include="ILOpCode.cs" />
     <Compile Include="ILOpCodes\OpBranch.cs" />
@@ -74,6 +82,7 @@
     <Compile Include="ILOpCodes\OpType.cs" />
     <Compile Include="ILOpCodes\OpVar.cs" />
     <Compile Include="ILReader.cs" />
+    <Compile Include="InfraExtensions.cs" />
     <Compile Include="Instruction.cs" />
     <Compile Include="Label.cs" />
     <Compile Include="MethodAndTypeLabelsHolder.cs" />
@@ -84,6 +93,7 @@
     <Compile Include="ILScanner.cs" />
     <Compile Include="ReaderWriterLocker.cs" />
     <Compile Include="StackContents.cs" />
+    <Compile Include="TypeComparer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="ReadMe.txt" />

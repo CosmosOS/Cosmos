@@ -23,6 +23,17 @@ namespace Cosmos.IL2CPU
         {
         }
 
+        public Instruction( Assembler aAssembler )
+        {
+            var xAttribs = GetType().GetCustomAttributes( typeof( OpCodeAttribute ), false );
+            if( xAttribs != null && xAttribs.Length > 0 )
+            {
+                var xAttrib = ( OpCodeAttribute )xAttribs[ 0 ];
+                mMnemonic = String.Intern( xAttrib.Mnemonic ); //Ben Trying it,
+            }
+            aAssembler.Add( this );
+        }
+
         public Instruction( bool aAddToAssembler )
         {
             var xAttribs = GetType().GetCustomAttributes( typeof( OpCodeAttribute ), false );
