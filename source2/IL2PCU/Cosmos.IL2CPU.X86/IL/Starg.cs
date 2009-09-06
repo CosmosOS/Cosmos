@@ -20,7 +20,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
  
             OpVar xOpVar = ( OpVar )aOpCode;
             //mAddresses = aMethodInfo.Arguments[ xOpVar.Value ].VirtualAddresses;

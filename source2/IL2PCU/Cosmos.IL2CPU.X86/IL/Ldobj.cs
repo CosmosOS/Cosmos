@@ -1,5 +1,6 @@
 using System;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using Cosmos.IL2CPU.ILOpCodes;
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldobj )]
@@ -12,8 +13,8 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            throw new NotImplementedException();
             var xSize = Assembler.Stack.Pop();
+            OpType xType = ( OpType )aOpCode;
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
             for( int i = 1; i <= ( xSize.Size / 4 ); i++ )
             {
@@ -43,10 +44,10 @@ namespace Cosmos.IL2CPU.X86.IL
                 default:
                         throw new Exception( "Remainder not supported!" );
             }
-            //Assembler.Stack.Pop();
+            Assembler.Stack.Pop();
 
             //TODO: Push type not number
-            //Assembler.Stack.Push( new StackContent( ( int )xSize.Size, true, false, false ) );
+            Assembler.Stack.Push( new StackContents.Item( ( int )xSize.Size, xType.Value  ) );
         }
 
 

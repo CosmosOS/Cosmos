@@ -17,7 +17,8 @@ namespace Cosmos.IL2CPU.X86.IL
             if( xStackContent.IsFloat )
             {
                 //EmitNotSupportedException( aAssembler, aServiceProvider, "Floats are not yet supported!", aCurrentLabel, aCurrentMethodInfo, aCurrentOffset, aNextLabel );
-                throw new NotImplementedException();
+                //throw new NotImplementedException();
+                new Comment( " Insert Mul instructions for float here!" );
             }
             else
             {

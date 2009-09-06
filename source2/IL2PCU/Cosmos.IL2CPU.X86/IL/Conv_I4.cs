@@ -16,7 +16,7 @@ namespace Cosmos.IL2CPU.X86.IL
             if( xSource.IsFloat )
             {
                 //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_I4: Floats not yet implemented", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
-                throw new NotImplementedException(); 
+                //throw new NotImplementedException(); 
             }
             switch( xSource.Size )
             {
