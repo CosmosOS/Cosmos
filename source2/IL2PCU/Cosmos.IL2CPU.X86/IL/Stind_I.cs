@@ -1,5 +1,5 @@
 using System;
-using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using CPUx86 = Cosmos.IL2CPU.X86;
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Stind_I )]
@@ -12,7 +12,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public static void Assemble( Assembler aAssembler, int aSize )
         {
-            new Comment( "address at: [esp + " + aSize + "]" );
+            new Comment(aAssembler,  "address at: [esp + " + aSize + "]" );
             int xStorageSize = aSize;
             if( xStorageSize < 4 )
             {
@@ -68,8 +68,8 @@ namespace Cosmos.IL2CPU.X86.IL
         // using System.IO;
         // 
         // 
-        // using CPU = Indy.IL2CPU.Assembler;
-        // using CPUx86 = Indy.IL2CPU.Assembler.X86;
+        // using CPU = Cosmos.IL2CPU.X86;
+        // using CPUx86 = Cosmos.IL2CPU.X86;
         // 
         // namespace Indy.IL2CPU.IL.X86 {
         // 	[OpCode(OpCodeEnum.Stind_I)]

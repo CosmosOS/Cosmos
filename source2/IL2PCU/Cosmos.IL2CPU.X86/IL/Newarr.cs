@@ -1,6 +1,6 @@
 using System;
-using CPUx86 = Indy.IL2CPU.Assembler.X86;
-using CPU = Indy.IL2CPU.Assembler;
+using CPUx86 = Cosmos.IL2CPU.X86;
+using CPU = Cosmos.IL2CPU.X86;
 using Indy.IL2CPU;
 using System.Reflection;
 namespace Cosmos.IL2CPU.X86.IL
@@ -26,7 +26,7 @@ namespace Cosmos.IL2CPU.X86.IL
             MethodBase xCtor = typeof( Array ).GetConstructors( BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance )[ 0 ];
             string xCtorName = MethodInfoLabelGenerator.GenerateLabelName( xCtor );
 
-            new CPU.Comment( "Element Size = " + xSize );
+            new Comment( Assembler, "Element Size = " + xSize );
             // element count is on the stack
             int xElementCountSize = Assembler.Stack.Pop().Size;
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.ESI };
@@ -51,7 +51,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
             Assembler.Stack.Push( new StackContents.Item( 4, typeof( Array ) ) );
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-            new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, SourceRef = Indy.IL2CPU.Assembler.ElementReference.New( xTypeID ), SourceIsIndirect = true };
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, SourceRef = ElementReference.New( xTypeID ), SourceIsIndirect = true };
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EBX };
             new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 4 };
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, SourceValue = ( uint )InstanceTypeEnum.Array, Size = 32 };
@@ -65,10 +65,10 @@ namespace Cosmos.IL2CPU.X86.IL
 
         // using System;
         // using System.Collections.Generic;
-        // using CPU = Indy.IL2CPU.Assembler;
-        // using CPUx86 = Indy.IL2CPU.Assembler.X86;
+        // using CPU = Cosmos.IL2CPU.X86;
+        // using CPUx86 = Cosmos.IL2CPU.X86;
         // using System.Reflection;
-        // using Indy.IL2CPU.Assembler;
+        // using Cosmos.IL2CPU.X86;
         // using Indy.IL2CPU.Compiler;
         // 
         // namespace Indy.IL2CPU.IL.X86 {

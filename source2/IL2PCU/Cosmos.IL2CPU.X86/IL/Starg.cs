@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using CPU = Indy.IL2CPU.Assembler;
-using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using CPU = Cosmos.IL2CPU.X86;
+using CPUx86 = Cosmos.IL2CPU.X86;
 using System.Reflection;
-using Indy.IL2CPU.Assembler;
+using Cosmos.IL2CPU.X86;
 using Indy.IL2CPU.Compiler;
 using Cosmos.IL2CPU.ILOpCodes;
 using Indy.IL2CPU;
@@ -68,7 +68,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // using System;
         // 
         // 
-        // using CPUx86 = Indy.IL2CPU.Assembler.X86;
+        // using CPUx86 = Cosmos.IL2CPU.X86;
         // 
         // namespace Indy.IL2CPU.IL.X86 {
         // 	[OpCode(OpCodeEnum.Starg)]

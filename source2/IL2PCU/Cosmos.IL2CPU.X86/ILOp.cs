@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using CPU = Indy.IL2CPU.Assembler.X86;
+using CPU = Cosmos.IL2CPU.X86;
 using Cosmos.IL2CPU.ILOpCodes;
 using System.Reflection;
 

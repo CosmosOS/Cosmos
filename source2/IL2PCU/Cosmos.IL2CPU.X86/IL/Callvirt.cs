@@ -1,12 +1,12 @@
 using System;
 // using System.Collections.Generic;
 // using System.Linq;
-using CPU = Indy.IL2CPU.Assembler;
-using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using CPU = Cosmos.IL2CPU.X86;
+using CPUx86 = Cosmos.IL2CPU.X86;
 using Cosmos.IL2CPU.ILOpCodes;
 using Indy.IL2CPU;
 // using System.Reflection;
-// using Indy.IL2CPU.Assembler;
+// using Cosmos.IL2CPU.X86;
 // using Indy.IL2CPU.Compiler;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -62,7 +62,7 @@ namespace Cosmos.IL2CPU.X86.IL
             if (xExtraStackSize > 0) {
               xThisOffset -= xExtraStackSize;
                          }
-            new Comment( "ThisOffset = " + xThisOffset );
+            new Comment( Assembler, "ThisOffset = " + xThisOffset );
 
             //             Action xEmitCleanup = delegate() {
             //                                       foreach (MethodInformation.Argument xArg in mTargetMethodInfo.Arguments) {
@@ -90,7 +90,7 @@ namespace Cosmos.IL2CPU.X86.IL
             // todo: add exception support
 #warning todo: add exception support
 
-            new CPU.Label( xCurrentMethodLabel + "_AfterNullRefCheck" );
+            new Label( xCurrentMethodLabel + "_AfterNullRefCheck" );
 
             if( !String.IsNullOrEmpty( xNormalAddress ) )
             {
@@ -130,7 +130,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 //                        true,
                 //                        xEmitCleanup );
 
-                new CPU.Label( xCurrentMethodLabel + "_AfterAddressCheck" );
+                new Label( xCurrentMethodLabel + "_AfterAddressCheck" );
                 if( xMethodInfo.DeclaringType == typeof( object ) )
                 {
                     /*
@@ -192,14 +192,14 @@ namespace Cosmos.IL2CPU.X86.IL
                      * $esp + mThisOffset + 4  This
                      */
                 }
-                new CPU.Label( xCurrentMethodLabel + "_NOT_BOXED_THIS" );
+                new Label( xCurrentMethodLabel + "_NOT_BOXED_THIS" );
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
                 if( xExtraStackSize > 0 )
                 {
                     new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = xExtraStackSize };
                 }
                 new CPUx86.Call { DestinationReg = CPUx86.Registers.EAX };
-                new CPU.Label( xCurrentMethodLabel + "__AFTER_NOT_BOXED_THIS" );
+                new Label( xCurrentMethodLabel + "__AFTER_NOT_BOXED_THIS" );
             }
             //             Call.EmitExceptionLogic(Assembler,
             //                                mCurrentILOffset,
@@ -219,8 +219,8 @@ namespace Cosmos.IL2CPU.X86.IL
             //                                    }
             //                                });
             // 
-            new CPU.Label( xCurrentMethodLabel + "__NO_EXCEPTION_AFTER_CALL" );
-            new CPU.Comment( "Argument Count = " + xParameters.Length.ToString() );
+            new Label( xCurrentMethodLabel + "__NO_EXCEPTION_AFTER_CALL" );
+            new Comment( Assembler, "Argument Count = " + xParameters.Length.ToString() );
             for( int i = 0; i < xParameters.Length; i++ )
             {
                 Assembler.Stack.Pop();

@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using Indy.IL2CPU;
-using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using CPUx86 = Cosmos.IL2CPU.X86;
 using Cosmos.IL2CPU.ILOpCodes;
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -104,7 +104,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 string strTypeId = "VMT__TYPE_ID_HOLDER__" + xMethod.Value.DeclaringType.FullName;
 
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, SourceRef = Indy.IL2CPU.Assembler.ElementReference.New( strTypeId ), SourceIsIndirect = true };
+                new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, SourceRef = ElementReference.New( strTypeId ), SourceIsIndirect = true };
                 new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EBX };
                 new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = ( uint )InstanceTypeEnum.NormalObject, Size = 32 };
                 new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 8, SourceValue = ( uint )xGCFieldCount, Size = 32 };
@@ -115,7 +115,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 foreach( var xParam in xParams )
                 {
                     uint xParamSize = SizeOfType( xParams.GetType() );
-                    new Comment( String.Format( "Arg {0}: {1}", xParam.Name, xParamSize ) );
+                    new Comment( Assembler, String.Format( "Arg {0}: {1}", xParam.Name, xParamSize ) );
                     for( int i = 0; i < xParamSize; i += 4 )
                     {
                         new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = ( int )( xSize + 4 ) };
@@ -239,12 +239,12 @@ namespace Cosmos.IL2CPU.X86.IL
         // using System.Diagnostics;
         // using System.Linq;
         // using System.Reflection;
-        // using Indy.IL2CPU.Assembler;
-        // using Indy.IL2CPU.Assembler.X86;
-        // using CPU=Indy.IL2CPU.Assembler;
-        // using CPUx86=Indy.IL2CPU.Assembler.X86;
-        // using Asm=Indy.IL2CPU.Assembler;
-        // using Assembler=Indy.IL2CPU.Assembler.Assembler;
+        // using Cosmos.IL2CPU.X86;
+        // using Cosmos.IL2CPU.X86;
+        // using CPU=Cosmos.IL2CPU.X86;
+        // using CPUx86=Cosmos.IL2CPU.X86;
+        // using Asm=Cosmos.IL2CPU.X86;
+        // using Assembler=Assembler;
         // using Indy.IL2CPU.Compiler;
         // 
         // namespace Indy.IL2CPU.IL.X86

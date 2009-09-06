@@ -1,7 +1,7 @@
 using System;
 using Cosmos.IL2CPU;
 using Cosmos.IL2CPU.ILOpCodes;
-using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using CPUx86 = Cosmos.IL2CPU.X86;
 using System.Collections.Generic;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -22,8 +22,8 @@ namespace Cosmos.IL2CPU.X86.IL
     
 		// using System;
 		// using System.IO;
-		// using CPU = Indy.IL2CPU.Assembler.X86;
-		// using Indy.IL2CPU.Assembler;
+		// using CPU = Cosmos.IL2CPU.X86;
+		// using Cosmos.IL2CPU.X86;
 		// using System.Diagnostics;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {

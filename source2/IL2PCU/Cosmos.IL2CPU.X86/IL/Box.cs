@@ -1,7 +1,7 @@
 using System;
 using Cosmos.IL2CPU.ILOpCodes;
-using CPUx86 = Indy.IL2CPU.Assembler.X86;
-using CPU = Indy.IL2CPU.Assembler;
+using CPUx86 = Cosmos.IL2CPU.X86;
+using CPU = Cosmos.IL2CPU.X86;
 using Indy.IL2CPU;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -23,10 +23,10 @@ namespace Cosmos.IL2CPU.X86.IL
             new CPUx86.Push { DestinationValue = ( ObjectImpl.FieldDataOffset + xSize ) };
             new CPUx86.Call { DestinationLabel = CPU.MethodInfoLabelGenerator.GenerateLabelName( GCImplementationRefs.AllocNewObjectRef ) };
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-            new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, SourceRef = Indy.IL2CPU.Assembler.ElementReference.New( xTypeID ), SourceIsIndirect = true };
+            new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, SourceRef = ElementReference.New( xTypeID ), SourceIsIndirect = true };
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EBX };
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = ( uint )InstanceTypeEnum.BoxedValueType, Size = 32 };
-            new CPU.Comment( "xSize is " + xSize );
+            new Comment(Assembler, "xSize is " + xSize );
             for( int i = 0; i < ( xSize / 4 ); i++ )
             {
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
@@ -41,9 +41,9 @@ namespace Cosmos.IL2CPU.X86.IL
         // using System;
         // using System.Collections.Generic;
         // using System.Linq;
-        // using Indy.IL2CPU.Assembler;
-        // using CPU = Indy.IL2CPU.Assembler;
-        // using CPUx86 = Indy.IL2CPU.Assembler.X86;
+        // using Cosmos.IL2CPU.X86;
+        // using CPU = Cosmos.IL2CPU.X86;
+        // using CPUx86 = Cosmos.IL2CPU.X86;
         // using Indy.IL2CPU.Compiler;
         // 
         // namespace Indy.IL2CPU.IL.X86 {

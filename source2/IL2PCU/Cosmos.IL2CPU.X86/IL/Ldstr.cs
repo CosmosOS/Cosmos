@@ -1,8 +1,8 @@
 using System;
-using CPU = Indy.IL2CPU.Assembler;
+using CPU = Cosmos.IL2CPU;
 using System.Text;
 using Indy.IL2CPU;
-using Indy.IL2CPU.Assembler.X86.X;
+using Cosmos.IL2CPU.X86.X;
 using Cosmos.IL2CPU.ILOpCodes;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -18,14 +18,14 @@ namespace Cosmos.IL2CPU.X86.IL
       var xOpString = aOpCode as OpString;
       var Y = new Y86();
       string xDataName = GetContentsArrayName(xOpString.Value);
-      new Comment("String Value: " + xOpString.Value.Replace("\r", "\\r").Replace("\n", "\\n"));
+      new Comment( Assembler, "String Value: " + xOpString.Value.Replace( "\r", "\\r" ).Replace( "\n", "\\n" ) );
       Y.EAX = Y.Reference(xDataName);
       Y.EAX.Push();
       Assembler.Stack.Push(4, typeof(string));
     }
 
     public static string GetContentsArrayName(string aLiteral) {
-      var xAsm= CPU.Assembler.CurrentInstance.Peek();
+      var xAsm = CPU.Assembler.CurrentInstance.Peek();
 
       Encoding xEncoding = Encoding.Unicode;
       byte[] xByteArray = new byte[16 + xEncoding.GetByteCount(aLiteral)];
@@ -62,10 +62,10 @@ namespace Cosmos.IL2CPU.X86.IL
 		// using System;
 		// using System.Linq;
 		// using System.Text;
-		// using Indy.IL2CPU.Assembler;
-		// using Indy.IL2CPU.Assembler.X86.X;
-		// using CPUx86 = Indy.IL2CPU.Assembler.X86;
-		// using Asm = Indy.IL2CPU.Assembler.Assembler;
+		// using Cosmos.IL2CPU.X86;
+		// using Cosmos.IL2CPU.X86.X;
+		// using CPUx86 = Cosmos.IL2CPU.X86;
+		// using Asm = Assembler;
 		// using System.Collections.Generic;
 		// 
 		// namespace Indy.IL2CPU.IL.X86 {

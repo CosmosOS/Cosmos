@@ -5,11 +5,11 @@ using Cosmos.IL2CPU.ILOpCodes;
 // using System.Linq;
 // 
 // using IL2CPU=Indy.IL2CPU;
-using CPU=Indy.IL2CPU.Assembler;
-using CPUx86=Indy.IL2CPU.Assembler.X86;
-using Indy.IL2CPU.Assembler;
+using CPU=Cosmos.IL2CPU.X86;
+using CPUx86=Cosmos.IL2CPU.X86;
+using Cosmos.IL2CPU.X86;
 // using System.Reflection;
-// using Indy.IL2CPU.Assembler;
+// using Cosmos.IL2CPU.X86;
 // using Indy.IL2CPU.Compiler;
 
 namespace Cosmos.IL2CPU.X86.IL {

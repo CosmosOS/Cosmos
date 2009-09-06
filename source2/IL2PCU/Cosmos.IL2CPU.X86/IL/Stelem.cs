@@ -1,5 +1,5 @@
 using System;
-using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using CPUx86 = Cosmos.IL2CPU.X86;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -22,7 +22,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // using System;
         // using System.Collections.Generic;
         // using System.Linq;
-        // using Indy.IL2CPU.Assembler;
+        // using Cosmos.IL2CPU.X86;
         // using Indy.IL2CPU.Compiler;
         // 
         // namespace Indy.IL2CPU.IL.X86 {

@@ -1,5 +1,5 @@
 using System;
-using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using CPUx86 = Cosmos.IL2CPU.X86;
 using Indy.IL2CPU;
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -48,7 +48,7 @@ namespace Cosmos.IL2CPU.X86.IL
             aAssembler.Stack.Pop();
             for( int i = ( int )( aElementSize / 4 ) - 1; i >= 0; i -= 1 )
             {
-                new Comment( "Start 1 dword" );
+                new Comment( aAssembler, "Start 1 dword" );
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
                 new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EBX };
                 new CPUx86.Add { DestinationReg = CPUx86.Registers.ECX, SourceValue = 4 };
@@ -57,14 +57,14 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 case 1:
                     {
-                        new Comment( "Start 1 byte" );
+                        new Comment( aAssembler, "Start 1 byte" );
                         new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
                         new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.BL };
                         break;
                     }
                 case 2:
                     {
-                        new Comment( "Start 1 word" );
+                        new Comment( aAssembler, "Start 1 word" );
                         new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
                         new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.BX };
                         break;
@@ -90,9 +90,9 @@ namespace Cosmos.IL2CPU.X86.IL
 
         // using System;
         // using System.IO;
-        // using CPU = Indy.IL2CPU.Assembler;
-        // using CPUx86 = Indy.IL2CPU.Assembler.X86;
-        // using Indy.IL2CPU.Assembler;
+        // using CPU = Cosmos.IL2CPU.X86;
+        // using CPUx86 = Cosmos.IL2CPU.X86;
+        // using Cosmos.IL2CPU.X86;
         // 
         // namespace Indy.IL2CPU.IL.X86 {
         // 	[OpCode(OpCodeEnum.Stelem_Ref)]

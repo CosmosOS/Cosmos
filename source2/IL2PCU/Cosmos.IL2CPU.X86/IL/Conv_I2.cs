@@ -1,5 +1,5 @@
 using System;
-using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using CPUx86 = Cosmos.IL2CPU.X86;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -44,9 +44,9 @@ namespace Cosmos.IL2CPU.X86.IL
 
         // using System;
         // using System.IO;
-        // using CPU = Indy.IL2CPU.Assembler;
-        // using Indy.IL2CPU.Assembler;
-        // using CPUx86 = Indy.IL2CPU.Assembler.X86;
+        // using CPU = Cosmos.IL2CPU.X86;
+        // using Cosmos.IL2CPU.X86;
+        // using CPUx86 = Cosmos.IL2CPU.X86;
         // 
         // namespace Indy.IL2CPU.IL.X86 {
         // 	[OpCode(OpCodeEnum.Conv_I2)]

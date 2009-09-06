@@ -1,5 +1,5 @@
 using System;
-using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using CPUx86 = Cosmos.IL2CPU.X86;
 using Indy.IL2CPU;
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -25,7 +25,7 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 aExtraOffset = 12;
             }
-            new Comment( "Type = '" + xField.FieldType.FullName + "', NeedsGC = " + xNeedsGC );
+            new Comment( Assembler, "Type = '" + xField.FieldType.FullName + "', NeedsGC = " + xNeedsGC );
 
             uint xOffset = 0;
 
@@ -104,7 +104,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // using System.Linq;
         // 
         // 
-        // using CPU = Indy.IL2CPU.Assembler.X86;
+        // using CPU = Cosmos.IL2CPU.X86;
         // using System.Reflection;
         // using Indy.IL2CPU.Compiler;
         // 

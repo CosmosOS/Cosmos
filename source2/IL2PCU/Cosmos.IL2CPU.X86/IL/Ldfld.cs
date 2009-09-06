@@ -2,11 +2,11 @@ using System;
 // using System.Collections.Generic;
 // using System.IO;
 // 
-// using CPU = Indy.IL2CPU.Assembler;
+// using CPU = Cosmos.IL2CPU.X86;
 // using System.Reflection;
 using Indy.IL2CPU;
 using Cosmos.IL2CPU.ILOpCodes;
-using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using CPUx86 = Cosmos.IL2CPU.X86;
 namespace Cosmos.IL2CPU.X86.IL
 {
     /// <summary>
@@ -56,7 +56,7 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 aExtraOffset = 12;
             }
-            new Comment( "Type = '" + xField.FieldType.FullName + "', NeedsGC = " + xNeedsGC );
+            new Comment( Assembler, "Type = '" + xField.FieldType.FullName + "', NeedsGC = " + xNeedsGC );
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
 
             uint xOffset = 0;

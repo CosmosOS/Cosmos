@@ -1,5 +1,5 @@
 using System;
-using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using CPUx86 = Cosmos.IL2CPU.X86;
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Mul )]
@@ -18,7 +18,7 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 //EmitNotSupportedException( aAssembler, aServiceProvider, "Floats are not yet supported!", aCurrentLabel, aCurrentMethodInfo, aCurrentOffset, aNextLabel );
                 //throw new NotImplementedException();
-                new Comment( " Insert Mul instructions for float here!" );
+                new Comment( Assembler, " Insert Mul instructions for float here!" );
             }
             else
             {
@@ -46,7 +46,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // using System.IO;
         // 
         // 
-        // using CPU = Indy.IL2CPU.Assembler.X86;
+        // using CPU = Cosmos.IL2CPU.X86;
         // 
         // namespace Indy.IL2CPU.IL.X86 {
         // 	[OpCode(OpCodeEnum.Mul)]

@@ -1,6 +1,6 @@
 using System;
-using CPU = Indy.IL2CPU.Assembler;
-using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using CPU = Cosmos.IL2CPU.X86;
+using CPUx86 = Cosmos.IL2CPU.X86;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -34,7 +34,7 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
                 new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-                new CPU.Label( xLabelName + "__StartLoop" );
+                new Label( xLabelName + "__StartLoop" );
                 new CPUx86.Compare { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EAX };
                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = xLabelName + "__EndLoop" };
                 new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
@@ -46,7 +46,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 1 };
                 new CPUx86.Jump { DestinationLabel = xLabelName + "__StartLoop" };
 
-                new CPU.Label( xLabelName + "__EndLoop" );
+                new Label( xLabelName + "__EndLoop" );
                 Assembler.Stack.Push( xStackItem_Value );
             }
         }

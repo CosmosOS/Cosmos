@@ -1,6 +1,6 @@
 using System;
-using CPUx86 = Indy.IL2CPU.Assembler.X86;
-using CPU = Indy.IL2CPU.Assembler;
+using CPUx86 = Cosmos.IL2CPU.X86;
+using CPU = Cosmos.IL2CPU.X86;
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Cgt )]
@@ -52,7 +52,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 new CPUx86.Push { DestinationValue = 0 };
                 //new CPUx86.Jump { DestinationLabel = NextInstructionLabel };
                 Jump_End( aMethod );
-                new CPU.Label( LabelTrue );
+                new Label( LabelTrue );
                 new CPUx86.Push { DestinationValue = 1 };
 
             }
@@ -62,12 +62,12 @@ namespace Cosmos.IL2CPU.X86.IL
                 new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Below, DestinationLabel = LabelTrue };
                 new CPUx86.Jump { DestinationLabel = LabelFalse };
-                new CPU.Label( LabelTrue );
+                new Label( LabelTrue );
                 new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
                 new CPUx86.Push { DestinationValue = 1 };
                 //new CPUx86.Jump { DestinationLabel = NextInstructionLabel };
                 Jump_End( aMethod ); 
-                new CPU.Label( LabelFalse );
+                new Label( LabelFalse );
                 new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
                 new CPUx86.Push { DestinationValue = 0 };
                 //new CPUx86.Jump { DestinationLabel = NextInstructionLabel };
@@ -80,10 +80,10 @@ namespace Cosmos.IL2CPU.X86.IL
         // using System.IO;
         // 
         // 
-        // using CPUx86 = Indy.IL2CPU.Assembler.X86;
-        // using CPU = Indy.IL2CPU.Assembler;
-        // using Indy.IL2CPU.Assembler;
-        // using Indy.IL2CPU.Assembler.X86;
+        // using CPUx86 = Cosmos.IL2CPU.X86;
+        // using CPU = Cosmos.IL2CPU.X86;
+        // using Cosmos.IL2CPU.X86;
+        // using Cosmos.IL2CPU.X86;
         // 
         // namespace Indy.IL2CPU.IL.X86 {
         // 	[OpCode(OpCodeEnum.Cgt)]
@@ -134,7 +134,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.GreaterThan, DestinationLabel = LabelTrue };
         // 				new CPUx86.Push{DestinationValue=0};
         // 				new CPUx86.Jump{DestinationLabel=NextInstructionLabel};
-        // 				new CPU.Label(LabelTrue);
+        // 				new Label(LabelTrue);
         // 				new CPUx86.Push{DestinationValue=1};
         // 
         // 			} else
@@ -143,11 +143,11 @@ namespace Cosmos.IL2CPU.X86.IL
         //                 new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
         //                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Below, DestinationLabel = LabelTrue };
         //                 new CPUx86.Jump { DestinationLabel = LabelFalse };
-        // 				new CPU.Label(LabelTrue);
+        // 				new Label(LabelTrue);
         //                 new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
         // 				new CPUx86.Push{DestinationValue=1};
         //                 new CPUx86.Jump { DestinationLabel = NextInstructionLabel };
-        // 				new CPU.Label(LabelFalse);
+        // 				new Label(LabelFalse);
         // 				new CPUx86.Add{DestinationReg = CPUx86.Registers.ESP, SourceValue=4};
         //                 new CPUx86.Push { DestinationValue = 0 };
         //                 new CPUx86.Jump { DestinationLabel = NextInstructionLabel };

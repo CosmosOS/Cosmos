@@ -19,8 +19,8 @@ namespace Cosmos.IL2CPU.X86.IL
         // using System;
         // using System.IO;
         // 
-        // using CPU = Indy.IL2CPU.Assembler;
-        // using CPUx86 = Indy.IL2CPU.Assembler.X86;
+        // using CPU = Cosmos.IL2CPU.X86;
+        // using CPUx86 = Cosmos.IL2CPU.X86;
         // 
         // namespace Indy.IL2CPU.IL.X86 {
         // 	[OpCode(OpCodeEnum.Brfalse)]
@@ -55,7 +55,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //                 new CPUx86.Xor { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.EBX };
         //                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotZero, DestinationLabel = LabelFalse };
         //                 new CPUx86.Jump { DestinationLabel = TargetLabel };
-        // 				new CPU.Label(LabelFalse);
+        // 				new Label(LabelFalse);
         // 			} else
         // 			{
         //                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };

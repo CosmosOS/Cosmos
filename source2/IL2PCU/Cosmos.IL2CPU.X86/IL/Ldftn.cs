@@ -1,7 +1,7 @@
 using System;
 using Cosmos.IL2CPU.ILOpCodes;
-using CPUx86 = Indy.IL2CPU.Assembler.X86;
-using CPU = Indy.IL2CPU.Assembler;
+using CPUx86 = Cosmos.IL2CPU.X86;
+using CPU = Cosmos.IL2CPU.X86;
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldftn )]
@@ -14,7 +14,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            new CPUx86.Push { DestinationRef = Indy.IL2CPU.Assembler.ElementReference.New( MethodInfoLabelGenerator.GenerateLabelName(((OpMethod)aOpCode).Value ) ) };
+            new CPUx86.Push { DestinationRef = ElementReference.New( MethodInfoLabelGenerator.GenerateLabelName(((OpMethod)aOpCode).Value ) ) };
             Assembler.Stack.Push( new StackContents.Item( 4, true, false, false ) );
         }
 
@@ -24,10 +24,10 @@ namespace Cosmos.IL2CPU.X86.IL
         // using System.Linq;
         // 
         // 
-        // using CPU = Indy.IL2CPU.Assembler;
-        // using CPUx86 = Indy.IL2CPU.Assembler.X86;
+        // using CPU = Cosmos.IL2CPU.X86;
+        // using CPUx86 = Cosmos.IL2CPU.X86;
         // using System.Reflection;
-        // using Indy.IL2CPU.Assembler;
+        // using Cosmos.IL2CPU.X86;
         // 
         // namespace Indy.IL2CPU.IL.X86 {
         // 	[OpCode(OpCodeEnum.Ldftn)]

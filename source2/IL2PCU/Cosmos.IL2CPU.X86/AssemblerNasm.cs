@@ -4,12 +4,13 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.IL2CPU.X86 {
-  public class AssemblerNasm : Assembler {
+    public class AssemblerNasm : CosmosAssembler
+    {
 
     protected override void InitILOps() {
       InitILOps(typeof(ILOp));
     }
-
+    public AssemblerNasm() : base( 0 ) { }
     // These are all temp functions until we move to the new assembler.
     // They are used to clean up the old assembler slightly while retaining compatibiltiy for now
     public static string TmpPosLabel(MethodInfo aMethod, ILOpCode aOpCode) {

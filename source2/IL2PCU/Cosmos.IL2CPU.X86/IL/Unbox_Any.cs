@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using CPU = Indy.IL2CPU.Assembler;
-using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using CPU = Cosmos.IL2CPU.X86;
+using CPUx86 = Cosmos.IL2CPU.X86;
 using System.Reflection;
-using Indy.IL2CPU.Assembler;
+using Cosmos.IL2CPU.X86;
 using Indy.IL2CPU.Compiler;
 using Cosmos.IL2CPU.ILOpCodes;
 using Indy.IL2CPU;
@@ -34,7 +34,7 @@ namespace Cosmos.IL2CPU.X86.IL
             new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = mReturnNullLabel };
             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
             Assembler.Stack.Push( new StackContents.Item( 4, typeof( uint ) ) );
-            new CPUx86.Push { DestinationRef = Indy.IL2CPU.Assembler.ElementReference.New( xTypeID ), DestinationIsIndirect = true };
+            new CPUx86.Push { DestinationRef = ElementReference.New( xTypeID ), DestinationIsIndirect = true };
             Assembler.Stack.Push( new StackContents.Item( 4, typeof( uint ) ) );
             System.Reflection.MethodBase xMethodIsInstance = Indy.IL2CPU.Compiler.ReflectionUtilities.GetMethodBase( typeof( VTablesImpl ), "IsInstance", "System.Int32", "System.Int32" );
             new Call( Assembler ).Execute( aMethod, new OpMethod( ILOpCode.Code.Call, 0, xMethodIsInstance ) );
@@ -58,7 +58,7 @@ namespace Cosmos.IL2CPU.X86.IL
             Assembler.Stack.Push( new StackContents.Item( ( int )xTypeSize, xType.Value ) );
             //new CPUx86.Jump { DestinationLabel = mNextOpLabel };
             Jump_End( aMethod ); 
-            new CPU.Label( mReturnNullLabel );
+            new Label( mReturnNullLabel );
             new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
             new CPUx86.Push { DestinationValue = 0 };
             Assembler.Stack.Push( new StackContents.Item( 4, typeof( object ) ) );

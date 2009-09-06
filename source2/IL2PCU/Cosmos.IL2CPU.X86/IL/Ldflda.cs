@@ -1,5 +1,5 @@
 using System;
-using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using CPUx86 = Cosmos.IL2CPU.X86;
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldflda )]
@@ -57,7 +57,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // using System.IO;
         // 
         // 
-        // using CPUx86 = Indy.IL2CPU.Assembler.X86;	    
+        // using CPUx86 = Cosmos.IL2CPU.X86;	    
         // using System.Reflection;
         // using Indy.IL2CPU.Compiler;
         // 

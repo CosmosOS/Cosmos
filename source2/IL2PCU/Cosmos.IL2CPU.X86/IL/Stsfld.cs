@@ -1,5 +1,5 @@
 using System;
-using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using CPUx86 = Cosmos.IL2CPU.X86;
 using Indy.IL2CPU;
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -26,7 +26,7 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 aExtraOffset = 12;
             }
-            new Comment( "Type = '" + xField.FieldType.FullName + "', NeedsGC = " + xNeedsGC );
+            new Comment( Assembler, "Type = '" + xField.FieldType.FullName + "', NeedsGC = " + xNeedsGC );
 
             uint xOffset = 0;
 
@@ -42,26 +42,26 @@ namespace Cosmos.IL2CPU.X86.IL
             string xDataName = "static_field__" + MethodInfoLabelGenerator.GetFullName( xField.DeclaringType ) + "." + xField.Name;
             if( xNeedsGC )
             {
-                new CPUx86.Push { DestinationRef = Indy.IL2CPU.Assembler.ElementReference.New( xDataName ), DestinationIsIndirect = true };
+                new CPUx86.Push { DestinationRef = ElementReference.New( xDataName ), DestinationIsIndirect = true };
                 new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName( GCImplementationRefs.DecRefCountRef ) };
             }
             for( int i = 0; i < ( xSize / 4 ); i++ )
             {
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                new CPUx86.Move { DestinationRef = Indy.IL2CPU.Assembler.ElementReference.New( xDataName, i * 4 ), DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
+                new CPUx86.Move { DestinationRef = ElementReference.New( xDataName, i * 4 ), DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
             }
             switch( xSize % 4 )
             {
                 case 1:
                     {
                         new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                        new CPUx86.Move { DestinationRef = Indy.IL2CPU.Assembler.ElementReference.New( xDataName, ( int )( ( xSize / 4 ) * 4 ) ), DestinationIsIndirect = true, SourceReg = CPUx86.Registers.AL };
+                        new CPUx86.Move { DestinationRef = ElementReference.New( xDataName, ( int )( ( xSize / 4 ) * 4 ) ), DestinationIsIndirect = true, SourceReg = CPUx86.Registers.AL };
                         break;
                     }
                 case 2:
                     {
                         new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                        new CPUx86.Move { DestinationRef = Indy.IL2CPU.Assembler.ElementReference.New( xDataName, ( int )( ( xSize / 4 ) * 4 ) ), DestinationIsIndirect = true, SourceReg = CPUx86.Registers.AX };
+                        new CPUx86.Move { DestinationRef = ElementReference.New( xDataName, ( int )( ( xSize / 4 ) * 4 ) ), DestinationIsIndirect = true, SourceReg = CPUx86.Registers.AX };
                         break;
                     }
                 case 0:
@@ -81,10 +81,10 @@ namespace Cosmos.IL2CPU.X86.IL
 
     // using System;
     // using System.Collections.Generic;
-    // using Indy.IL2CPU.Assembler;
+    // using Cosmos.IL2CPU.X86;
     // 
     // 
-    // using CPUx86 = Indy.IL2CPU.Assembler.X86;
+    // using CPUx86 = Cosmos.IL2CPU.X86;
     // using System.Reflection;
     // using Indy.IL2CPU.Compiler;
     // 
