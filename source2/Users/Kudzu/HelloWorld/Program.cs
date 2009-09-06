@@ -15,7 +15,7 @@ namespace HelloWorld {
       //Indy.IL2CPU.Engine.Execute()
       // which is called from Builder.RunEngine()
 
-      using (var xOldAsmblr = new CosmosAssembler(0)) {
+      //using (var xOldAsmblr = new AssemblerNasm()) {
         //TODO: Move new build logic into "new sort".
         // Build stuff is all UI, launching QEMU, making ISO etc.
         // IL2CPU should only contain scanning and assembling of binary files
@@ -28,9 +28,9 @@ namespace HelloWorld {
 				var xPath = Path.GetDirectoryName(typeof(Program).Assembly.Location);
 				xPath = Path.Combine(xPath, @"..\..\Output.asm");
 				using (var xOut = File.CreateText(xPath)) {
-					xOldAsmblr.FlushText(xOut);
+                    xAsmblr.FlushText( xOut );
 				}
-      }
+      //}
     }
 		//#endregion
 
