@@ -11,17 +11,27 @@ namespace Cosmos.IL2CPU.X86
 {
     public static class MethodInfoLabelGenerator
     {
+        public static uint LabelCount { get; private set; }
 
         public static string GenerateLabelName(MethodBase aMethod)
         {
             string xResult = DataMember.FilterStringForIncorrectChars(GenerateFullName(aMethod));
-            xResult = GenerateLabelFromFullName(xResult);
+            xResult = GenerateLabelFromFullName(xResult, 254);
+            LabelCount++;
             return xResult;
         }
 
-        public static string GenerateLabelFromFullName(string xResult)
+        public static string GenerateLabelName( MethodBase aMethod, uint maxLength )
         {
-            if (xResult.Length > 245)
+            string xResult = DataMember.FilterStringForIncorrectChars( GenerateFullName( aMethod ) );
+            xResult = GenerateLabelFromFullName( xResult, maxLength );
+            LabelCount++;
+            return xResult;
+        }
+
+        public static string GenerateLabelFromFullName(string xResult, uint maxLength)
+        {
+            if( xResult.Length > maxLength )
             {
                 using (var xHash = MD5.Create())
                 {

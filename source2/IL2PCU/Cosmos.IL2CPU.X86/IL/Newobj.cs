@@ -124,7 +124,8 @@ namespace Cosmos.IL2CPU.X86.IL
 
                 new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName( xMethod.Value ) };
                 new CPUx86.Test { DestinationReg = CPUx86.Registers.ECX, SourceValue = 2 };
-                new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = xCurrentLabel + "_NO_ERROR_4" };
+                string xNoErrorLabel = xCurrentLabel + "_NO_ERROR_" + MethodInfoLabelGenerator.LabelCount.ToString();
+                new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = xNoErrorLabel };
 
                 //for( int i = 1; i < aCtorMethodInfo.Arguments.Length; i++ )
                 //{
@@ -155,7 +156,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 new Comment( Assembler, "[ Newobj.Execute cleanup end ]" );
                 Jump_Exception( aMethod );
 
-                new Label( xCurrentLabel + "_NO_ERROR_4" );
+                new Label( xNoErrorLabel );
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
 
                 //for( int i = 1; i < aCtorMethodInfo.Arguments.Length; i++ )

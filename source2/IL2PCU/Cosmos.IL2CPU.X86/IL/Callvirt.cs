@@ -23,7 +23,7 @@ namespace Cosmos.IL2CPU.X86.IL
         {
           var xOpMethod = aOpCode as OpMethod;
           var xMethodInfo = (System.Reflection.MethodInfo)xOpMethod.Value;
-            string xCurrentMethodLabel = CPU.MethodInfoLabelGenerator.GenerateLabelName( aMethod.MethodBase );
+            string xCurrentMethodLabel = GetLabel( aMethod, aOpCode );
 
             // mTargetMethodInfo = GetService<IMetaDataInfoService>().GetMethodInfo(mMethod
             //   , mMethod, mMethodDescription, null, mCurrentMethodInfo.DebugMode);

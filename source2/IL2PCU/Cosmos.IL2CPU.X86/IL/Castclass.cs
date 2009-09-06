@@ -20,7 +20,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            string xCurrentMethodLabel = CPU.MethodInfoLabelGenerator.GenerateLabelName( aMethod.MethodBase );
+            string xCurrentMethodLabel = GetLabel( aMethod, aOpCode );
             OpType xType = ( OpType )aOpCode;
             string xTypeID = Label.FilterStringForIncorrectChars( xType.Value.AssemblyQualifiedName + "__TYPE_ID" );
 
