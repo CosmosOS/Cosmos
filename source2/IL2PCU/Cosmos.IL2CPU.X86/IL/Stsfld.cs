@@ -71,7 +71,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 default:
                     //EmitNotImplementedException(Assembler, GetServiceProvider(), "Ldsfld: Remainder size " + (xSize % 4) + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel);
                     throw new NotImplementedException();
-                    break;
+                    //break;
 
             }
             Assembler.Stack.Pop();

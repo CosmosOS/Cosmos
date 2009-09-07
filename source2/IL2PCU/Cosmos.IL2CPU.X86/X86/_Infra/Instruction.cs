@@ -470,7 +470,7 @@ namespace Cosmos.IL2CPU.X86 {
                     }
                     if (aInstructionWithDestination.DestinationReg != null && aInstructionWithDestination.DestinationIsIndirect &&
                         aInstructionWithDestination.DestinationDisplacement > 0) {
-                        var xSIBOffset = 0;
+                        //var xSIBOffset = 0;
                         if (aInstructionWithDestination.DestinationReg == Registers.ESP) {
                             xSIB = 0x24;
                         }
@@ -1013,7 +1013,7 @@ namespace Cosmos.IL2CPU.X86 {
                                 aOutput.Position = xOrigPos;
                                 xSIB = null;
                             }
-                            int xCorrecting = 0;
+                            int xCorrecting;// = 0;
                             if (aInstructionWithDestination != null && aInstructionWithDestination.DestinationReg != null && aInstructionWithSource != null && (/*aInstructionWithSource.SourceReg == Registers.EBP || */aInstructionWithSource.SourceReg == Registers.ESP))
                             {
                                 xCorrecting = -1;
@@ -1079,9 +1079,9 @@ namespace Cosmos.IL2CPU.X86 {
                                 //Array.Copy(BitConverter.GetBytes((byte)aInstructionWithSource.SourceDisplacement), 0, xBuffer, aEncodingOption.OpCode.Length + xExtraOffset + xSIBOffset + 1, 1);
                                 xExtraOffset += 1;
                             } else {
-                                int xExtra = 0;
+                                //int xExtra;// = 0;
                                 if ((aEncodingOption.OpCode.Length + xExtraOffset + 1 + 1) < xBufferSize && (aEncodingOption.OpCode.Length + xExtraOffset + 1 + 3) < xBufferSize && xSIB.HasValue) {
-                                    xExtra = 1;
+                                    //xExtra = 1;
                                     aOutput.Position++;
                                 }
                                 if (xSIB.HasValue) {

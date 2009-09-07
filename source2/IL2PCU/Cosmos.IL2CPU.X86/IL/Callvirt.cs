@@ -88,7 +88,6 @@ namespace Cosmos.IL2CPU.X86.IL
             //                    GetService<IMetaDataInfoService>().GetMethodInfo( typeof( NullReferenceException ).GetConstructor( Type.EmptyTypes ), false ),
             //                    GetServiceProvider() );
             // todo: add exception support
-#warning todo: add exception support
 
             new Label( xCurrentMethodLabel + "_AfterNullRefCheck" );
 

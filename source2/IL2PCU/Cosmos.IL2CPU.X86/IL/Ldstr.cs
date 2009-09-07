@@ -41,7 +41,7 @@ namespace Cosmos.IL2CPU.X86.IL
       Array.Copy(xTemp, 0, xByteArray, 12, 4);
       xTemp = xEncoding.GetBytes(aLiteral);
       Array.Copy(xTemp, 0, xByteArray, 16, xTemp.Length);
-      DataMember xDataMember = null;
+      DataMember xDataMember;// = null;
       //if (!mDataMemberMap.TryGetValue(aLiteral, out xDataMember))
       //{
       string xDataName = xAsm.GetIdentifier("StringLiteral");

@@ -212,7 +212,6 @@ namespace Cosmos.IL2CPU {
             }
             if( mInstructions.Count > 0 )
             {
-                string xMainLabel = "";
                 for( int i = 0; i < mInstructions.Count; i++ )
                 {
                     //foreach (Instruction x in mInstructions) {
@@ -229,7 +228,7 @@ namespace Cosmos.IL2CPU {
                         {
                             prefix = "\t";
                         }
-                        string xFullName;
+                        //string xFullName;
                         aOutput.Write( prefix );
                         x.WriteText( this, aOutput );
                         aOutput.WriteLine();

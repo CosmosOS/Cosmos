@@ -111,7 +111,7 @@ namespace Cosmos.Hardware
             CPUBus.Write8(VGA_SEQ_DATA, pmask);
         }
 
-        int offset = 0xb8000;
+        //int offset = 0xb8000;
         static int get_fb_seg()
         {
             int seg;

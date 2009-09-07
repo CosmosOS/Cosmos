@@ -19,7 +19,7 @@ namespace Cosmos.IL2CPU.X86.IL
             System.Reflection.FieldInfo xField = xOpCode.Value;
 
             //Assembler.Stack.Pop();
-            int aExtraOffset = 0;
+            int aExtraOffset;// = 0;
             bool xNeedsGC = xField.FieldType.IsClass && !xField.FieldType.IsValueType;
             uint xSize = SizeOfType( xField.FieldType );
             if( xNeedsGC )
@@ -60,7 +60,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     default:
                         //EmitNotImplementedException( Assembler, GetServiceProvider(), "Ldsfld: Remainder size " + ( xSize % 4 ) + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
                         throw new NotImplementedException();
-                        break;
+                        //break;
                 }
             }
             else
@@ -88,7 +88,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     default:
                         //EmitNotImplementedException( Assembler, GetServiceProvider(), "Ldsfld: Remainder size " + ( xSize % 4 ) + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
                         throw new NotImplementedException();
-                        break;
+                        //break;
                 }
             }
 

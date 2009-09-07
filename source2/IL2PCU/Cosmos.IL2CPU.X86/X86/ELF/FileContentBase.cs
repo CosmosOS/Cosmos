@@ -14,7 +14,6 @@ namespace Cosmos.IL2CPU.X86.ELF {
             if(File == null || File.StringTables.Count == 0) {
                 return "String(" + aStringTable + "," + aString + ")";
             }
-            string xResult;
             return File.StringTables[(int)aStringTable].GetString(aString);
         }
     }

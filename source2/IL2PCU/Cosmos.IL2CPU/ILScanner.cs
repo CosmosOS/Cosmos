@@ -31,7 +31,7 @@ namespace Cosmos.IL2CPU {
     // We also need a separate list becuase Execute is called multiple
     // times to process plugs and so known methods accumulates,
     // but we dont want to reproces old methods from previous Execute calls.
-    private List<MethodBase> mMethodsToProcess = new List<MethodBase>();
+    private List<MethodInfo> mMethodsToProcess = new List<MethodInfo>();
     // ExecuteInternal is called multiple times, we don't want to rescan
     // ones that are "finished" so we update this "pointer"
     private int mMethodsToProcessStart;
@@ -90,7 +90,7 @@ namespace Cosmos.IL2CPU {
       // Cannot use foreach, the list changes as we go
       // and we dont start at 0
       for (int i = mMethodsToProcessStart; i < mMethodsToProcess.Count; i++) {
-        ScanMethod(mMethodsToProcess[i], (UInt32)i);
+        ScanMethod(mMethodsToProcess[i]);
       }
 
       // ie 
@@ -110,17 +110,17 @@ namespace Cosmos.IL2CPU {
         xMethodCount = mMethodsToProcess.Count;
         // Cannot use foreach, the list changes as we go
         for (int i = mMethodsToProcessStart; i < mMethodsToProcess.Count; i++) {
-          var xMethod = mMethodsToProcess[i];
-          if (xMethod.IsVirtual) {
+          var xMethodBase = mMethodsToProcess[i].MethodBase;
+          if (xMethodBase.IsVirtual) {
             foreach (var xType in mTypes) {
               // Find ancestors and descendants
-              if (xType.IsSubclassOf(xMethod.DeclaringType) || xMethod.DeclaringType.IsSubclassOf(xType)) {
-                var xParams = xMethod.GetParameters();
+              if (xType.IsSubclassOf(xMethodBase.DeclaringType) || xMethodBase.DeclaringType.IsSubclassOf(xType)) {
+                var xParams = xMethodBase.GetParameters();
                 var xParamTypes = new Type[xParams.Length];
                 for (int j = 0; j < xParams.Length; j++) {
                   xParamTypes[j] = xParams[j].ParameterType;
                 }
-                var xNewMethod = xType.GetMethod(xMethod.Name, xParamTypes);
+                var xNewMethod = xType.GetMethod(xMethodBase.Name, xParamTypes);
                 if (xNewMethod != null) {
                   QueueMethod(xNewMethod);
                 }
@@ -131,27 +131,26 @@ namespace Cosmos.IL2CPU {
       } while (xMethodCount != mMethodsToProcess.Count);
     }
 
-    private void ScanMethod(MethodBase aMethodBase, UInt32 aMethodUID) {
-      if ((aMethodBase.Attributes & MethodAttributes.PinvokeImpl) != 0) {
+    private void ScanMethod(MethodInfo aMethodInfo) {
+      var xMethodBase = aMethodInfo.MethodBase;
+      if ((xMethodBase.Attributes & MethodAttributes.PinvokeImpl) != 0) {
         // pinvoke methods dont have an embedded implementation
         return;
-      } else if (aMethodBase.IsAbstract) {
+      } else if (xMethodBase.IsAbstract) {
         // abstract methods dont have an implementation
         return;
       }
 
-      var xImplFlags = aMethodBase.GetMethodImplementationFlags();
+      var xImplFlags = xMethodBase.GetMethodImplementationFlags();
       if ((xImplFlags & MethodImplAttributes.Native) != 0) {
         // native implementations cannot be compiled
         return;
       }
-      
-      var xOpCodes = mReader.ProcessMethod(aMethodBase);
-      if (xOpCodes != null) {
-        // Call ProcessMethod first, in a threaded environment it will
-        // allow more threads to work slightly sooner
-        var xMethod = new MethodInfo(aMethodBase, aMethodUID);
 
+      // Call ProcessMethod first, later in a threaded environment it will
+      // allow more threads to work slightly sooner
+      var xOpCodes = mReader.ProcessMethod(xMethodBase);
+      if (xOpCodes != null) {
         foreach (var xOpCode in xOpCodes) {
           //InstructionCount++;
           if (xOpCode is ILOpCodes.OpMethod) {
@@ -162,21 +161,22 @@ namespace Cosmos.IL2CPU {
         }
 
         // Assemble the method
-        mAsmblr.ProcessMethod(xMethod, xOpCodes);
+        mAsmblr.ProcessMethod(aMethodInfo, xOpCodes);
       }
     }
 
-    public uint QueueMethod(MethodBase aMethod) {
+    public uint QueueMethod(MethodBase aMethodBase) {
       uint xResult;
 
       // If already queued, skip it
-      if (mKnownMethods.TryGetValue(aMethod, out xResult)) {
+      if (mKnownMethods.TryGetValue(aMethodBase, out xResult)) {
         return xResult;
       }
       
       xResult = (uint)mMethodsToProcess.Count;
-      mKnownMethods.Add(aMethod, xResult);
-      mMethodsToProcess.Add(aMethod);
+      mKnownMethods.Add(aMethodBase, xResult);
+      var xMethod = new MethodInfo(aMethodBase, xResult);
+      mMethodsToProcess.Add(xMethod);
 
       //TODO: Might still need this one, see after we get assembly output again
       //Im hoping the operand walking we have now ill include this on its own.

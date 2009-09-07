@@ -24,13 +24,13 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 //EmitNotImplementedException( Assembler, GetServiceProvider(), "Clt: Floats not yet supported", CurInstructionLabel, mMethodInfo, mCurrentOffset, NextInstructionLabel );
                 throw new NotImplementedException();
-                return;
+                //return;
             }
             if( xStackItem.Size > 8 )
             {
                 //EmitNotImplementedException( Assembler, GetServiceProvider(), "Clt: StackSizes>8 not supported", CurInstructionLabel, mMethodInfo, mCurrentOffset, NextInstructionLabel );
                 throw new NotImplementedException();
-                return;
+                //return;
             }
             Assembler.Stack.Push( new StackContents.Item( 1, typeof( bool ) ) );
             string BaseLabel = GetLabel( aMethod, aOpCode ) + "__";
