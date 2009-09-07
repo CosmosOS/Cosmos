@@ -66,7 +66,7 @@ namespace Cosmos.IL2CPU {
                     //TODO: public string Signature = null;
                     // Do we need to check signature?
                     //TODO: public Type Assembler = null;
-                    ExecuteInternal(xMethod);
+                    ExecuteInternal(xMethod, true);
                   }
                 }
               }
@@ -79,18 +79,21 @@ namespace Cosmos.IL2CPU {
       // Scan from entry point of this program
       //TODO: Now that we scan plugs first, we might need to put a jump
       // in the asm to jump to the entry point?
-      ExecuteInternal(aStartMethod);
+      ExecuteInternal(aStartMethod, false);
     }
 
-    private void ExecuteInternal(System.Reflection.MethodInfo aStartMethod) {
+    private void ExecuteInternal(System.Reflection.MethodInfo aStartMethod, bool aIsPlug) {
       // See comment at mMethodsToProcessStart declaration
       mMethodsToProcessStart = mMethodsToProcess.Count;
-      QueueMethod(aStartMethod);
+      QueueMethod(aStartMethod, aIsPlug);
 
       // Cannot use foreach, the list changes as we go
       // and we dont start at 0
       for (int i = mMethodsToProcessStart; i < mMethodsToProcess.Count; i++) {
-        ScanMethod(mMethodsToProcess[i]);
+        var xMethod = mMethodsToProcess[i];
+        if (xMethod.Type != MethodInfo.TypeEnum.NeedsPlug) {
+          ScanMethod(xMethod);
+        }
       }
 
       // ie 
@@ -122,7 +125,10 @@ namespace Cosmos.IL2CPU {
                 }
                 var xNewMethod = xType.GetMethod(xMethodBase.Name, xParamTypes);
                 if (xNewMethod != null) {
-                  QueueMethod(xNewMethod);
+                  if (!xNewMethod.IsAbstract) {
+                    // abstract methods dont have an implementation
+                    QueueMethod(xNewMethod, false);
+                  }
                 }
               }
             }
@@ -133,19 +139,6 @@ namespace Cosmos.IL2CPU {
 
     private void ScanMethod(MethodInfo aMethodInfo) {
       var xMethodBase = aMethodInfo.MethodBase;
-      if ((xMethodBase.Attributes & MethodAttributes.PinvokeImpl) != 0) {
-        // pinvoke methods dont have an embedded implementation
-        return;
-      } else if (xMethodBase.IsAbstract) {
-        // abstract methods dont have an implementation
-        return;
-      }
-
-      var xImplFlags = xMethodBase.GetMethodImplementationFlags();
-      if ((xImplFlags & MethodImplAttributes.Native) != 0) {
-        // native implementations cannot be compiled
-        return;
-      }
 
       // Call ProcessMethod first, later in a threaded environment it will
       // allow more threads to work slightly sooner
@@ -154,7 +147,7 @@ namespace Cosmos.IL2CPU {
         foreach (var xOpCode in xOpCodes) {
           //InstructionCount++;
           if (xOpCode is ILOpCodes.OpMethod) {
-            ((ILOpCodes.OpMethod)xOpCode).ValueUID = QueueMethod(((ILOpCodes.OpMethod)xOpCode).Value);
+            ((ILOpCodes.OpMethod)xOpCode).ValueUID = QueueMethod(((ILOpCodes.OpMethod)xOpCode).Value, false);
           } else if (xOpCode is ILOpCodes.OpType) {
             QueueType(((ILOpCodes.OpType)xOpCode).Value);
           }
@@ -165,7 +158,7 @@ namespace Cosmos.IL2CPU {
       }
     }
 
-    public uint QueueMethod(MethodBase aMethodBase) {
+    public uint QueueMethod(MethodBase aMethodBase, bool aIsPlug) {
       uint xResult;
 
       // If already queued, skip it
@@ -175,7 +168,25 @@ namespace Cosmos.IL2CPU {
       
       xResult = (uint)mMethodsToProcess.Count;
       mKnownMethods.Add(aMethodBase, xResult);
-      var xMethod = new MethodInfo(aMethodBase, xResult);
+
+      MethodInfo.TypeEnum xMethodType;
+      if (aIsPlug) {
+        xMethodType = MethodInfo.TypeEnum.Plug;
+      } else {
+        xMethodType = MethodInfo.TypeEnum.Normal;
+        if ((aMethodBase.Attributes & MethodAttributes.PinvokeImpl) != 0) {
+          // pinvoke methods dont have an embedded implementation
+          xMethodType = MethodInfo.TypeEnum.NeedsPlug;
+        } else {
+          var xImplFlags = aMethodBase.GetMethodImplementationFlags();
+          if ((xImplFlags & MethodImplAttributes.Native) != 0) {
+            // native implementations cannot be compiled
+            xMethodType = MethodInfo.TypeEnum.NeedsPlug;
+          }
+        }
+      }
+
+      var xMethod = new MethodInfo(aMethodBase, xResult, xMethodType);
       mMethodsToProcess.Add(xMethod);
 
       //TODO: Might still need this one, see after we get assembly output again
@@ -213,7 +224,7 @@ namespace Cosmos.IL2CPU {
         // queue static constructor
         foreach (var xCctor in aType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)) {
           if (xCctor.DeclaringType == aType) {
-            QueueMethod(xCctor);
+            QueueMethod(xCctor, false);
           }
         }
       }

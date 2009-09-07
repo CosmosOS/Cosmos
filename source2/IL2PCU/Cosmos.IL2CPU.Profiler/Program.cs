@@ -22,6 +22,7 @@ namespace Cosmos.IL2CPU.Profiler {
 
       var xAsmblr = new Assembler();
       var xScanner = new ILScanner(xAsmblr);
+      //TODO: Add plugs into the scanning equation to profile scanning them too
       var xEntryPoint = typeof(Program).GetMethod("ScannerEntryPoint", BindingFlags.NonPublic | BindingFlags.Static);
       xScanner.Execute(xEntryPoint);
 
