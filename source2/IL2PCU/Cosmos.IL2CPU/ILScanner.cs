@@ -58,20 +58,83 @@ namespace Cosmos.IL2CPU {
       //TODO: Move plug scans etc into Scanner
       foreach (var xAsm in AppDomain.CurrentDomain.GetAssemblies()) {
         foreach (var xType in xAsm.GetTypes()) {
-          foreach (var xMethod in xType.GetMethods()) {
-            foreach (var xAttrib in xMethod.GetCustomAttributes(false)) {
-              if (xAttrib is PlugMethodAttribute) {
-                var x = (PlugMethodAttribute)xAttrib;
-                if (x.Enabled) {
+          foreach (var xAttrib1 in xType.GetCustomAttributes(false)) {
+            // Find all classes marked as a Plug
+            if (xAttrib1 is PlugAttribute) {
+              var xTypeAttrib = (PlugAttribute)xAttrib1;
+              
+              // See if there is a custom PlugMethod attribute
+              // Plug implementations must be static and public, so 
+              // we narrow the search to meet these requirements
+              foreach (var xMethod in xType.GetMethods(BindingFlags.Static | BindingFlags.Public)) {
+                PlugMethodAttribute xMethodAttrib = null;
+                foreach (var xAttrib2 in xMethod.GetCustomAttributes(false)) {
+                  if (xAttrib2 is PlugMethodAttribute) {
+                    xMethodAttrib = (PlugMethodAttribute)xAttrib2;
+                  }
+                }
+
+                // See if we need to disable this plug
+                bool xEnabled = true;
+                if (xMethodAttrib != null) {
                   //TODO: Check this against build options
                   //TODO: Two exclusive IsOnly's dont make sense
                   // refactor these as a positive rather than negative
-                  if (!x.IsMonoOnly) {
-                    //TODO: public string Signature = null;
-                    // Do we need to check signature?
-                    //TODO: public Type Assembler = null;
-                    ExecuteInternal(xMethod, true);
+                  if (xMethodAttrib.IsMonoOnly) {
+                    xEnabled = false;
+                  } else {
+                    xEnabled = xMethodAttrib.Enabled;
                   }
+                }
+
+                if (xEnabled) {
+                  // for PlugMethodAttribute:
+                    //TODO: public string Signature;
+                    //[PlugMethod(Signature = "System_Void__Indy_IL2CPU_Assembler_Assembler__cctor__")]
+                    //TODO: public Type Assembler = null;
+                  // Scan the plug implementation
+                  uint xUID = ExecuteInternal(xMethod, true);
+
+                  // Add the method to the list of plugged methods
+                  var xParams = xMethod.GetParameters();
+                  //TODO: Static method plugs dont seem to be separated 
+                  // from instance ones, so the only way seems to be to try
+                  // to match instance first, and if no match try static.
+                  // I really don't like this and feel we need to find
+                  // an explicit way to determine or mark the method 
+                  // implementations.
+                  //
+                  // Plug implementations take this as first argument
+                  // so when matching we don't include it in the search
+                  Type[] xTypesInst = null;
+                  Type[] xTypesStatic = new Type[xParams.Length];
+                  // If 0 params, has to be a static plug so we skip
+                  // any copying and leave xTypesInst = null
+                  // If 1 params, xTypesInst must be converted to Type[0]
+                  if (xParams.Length == 1) {
+                    xTypesInst = new Type[0];
+                    xTypesStatic[0] = xParams[0].ParameterType;
+                  } else if (xParams.Length > 1) {
+                    xTypesInst = new Type[xParams.Length - 1];
+                    for (int i = 0; i <= xTypesInst.Length - 1; i++) {
+                      xTypesInst[i] = xParams[i + 1].ParameterType;
+                    }
+                    for (int i = 0; i <= xTypesStatic.Length - 1; i++) {
+                      xTypesStatic[i] = xParams[i].ParameterType;
+                    }
+                  }
+                  System.Reflection.MethodInfo xTargetMethod = null;
+                  if (xTypesInst != null) {
+                    xTargetMethod = xTypeAttrib.Target.GetMethod(xMethod.Name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesInst, null);
+                  }
+                  // Not an instance method, try static
+                  if (xTargetMethod == null) {
+                    xTargetMethod = xTypeAttrib.Target.GetMethod(xMethod.Name, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesStatic, null);
+                  }
+                  if (xTargetMethod == null) {
+                    throw new Exception("Plug target method not found.");
+                  }
+                  mMethodPlugs.Add(xTargetMethod, xUID);
                 }
               }
             }
@@ -86,10 +149,10 @@ namespace Cosmos.IL2CPU {
       ExecuteInternal(aStartMethod, false);
     }
 
-    private void ExecuteInternal(System.Reflection.MethodInfo aStartMethod, bool aIsPlug) {
+    private uint ExecuteInternal(System.Reflection.MethodInfo aStartMethod, bool aIsPlug) {
       // See comment at mMethodsToProcessStart declaration
       mMethodsToProcessStart = mMethodsToProcess.Count;
-      QueueMethod(aStartMethod, aIsPlug);
+      uint xResult = QueueMethod(aStartMethod, aIsPlug);
 
       // Cannot use foreach, the list changes as we go
       // and we dont start at 0
@@ -139,6 +202,7 @@ namespace Cosmos.IL2CPU {
           }
         }
       } while (xMethodCount != mMethodsToProcess.Count);
+      return xResult;
     }
 
     private void ScanMethod(MethodInfo aMethodInfo) {
