@@ -25,7 +25,7 @@ namespace Cosmos.IL2CPU.X86.IL
     }
 
     public static string GetContentsArrayName(string aLiteral) {
-      var xAsm = CPU.Assembler.CurrentInstance.Peek();
+      var xAsm = CPU.Assembler.CurrentInstance;
 
       Encoding xEncoding = Encoding.Unicode;
       byte[] xByteArray = new byte[16 + xEncoding.GetByteCount(aLiteral)];

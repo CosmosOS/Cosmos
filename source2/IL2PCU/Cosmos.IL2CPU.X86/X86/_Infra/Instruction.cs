@@ -124,10 +124,7 @@ namespace Cosmos.IL2CPU.X86 {
         }
 
         private static SortedList<Type, InstructionData> mInstructionDatas;
-        private static ReaderWriterLocker mInstructionDatasLocker;
         static Instruction() {
-            mInstructionDatasLocker = new ReaderWriterLocker();
-            using (mInstructionDatasLocker.AcquireWriterLock()) {
                 mInstructionDatas = new SortedList<Type, InstructionData>(new TypeComparer());
                 foreach (Type xType in typeof(Instruction).Assembly.GetTypes()) {
                     if (!xType.IsSubclassOf(typeof(Instruction))) {
@@ -157,7 +154,6 @@ namespace Cosmos.IL2CPU.X86 {
                         xMethod.Invoke(null, new object[] { xNewInstructionData });
                     }
                 }
-            }
         }
 
         protected Instruction() {
@@ -168,12 +164,10 @@ namespace Cosmos.IL2CPU.X86 {
         }
 
         public static bool HasEncodingOptions(Type aInstruction) {
-            using(mInstructionDatasLocker.AcquireReaderLock()) {
                 if(!mInstructionDatas.ContainsKey(aInstruction)) {
                     return false;
                 }
                 return mInstructionDatas[aInstruction].EncodingOptions.Count > 0;
-            }
         }
         protected static string SizeToString(byte aSize) {
             switch (aSize) {
@@ -198,9 +192,7 @@ namespace Cosmos.IL2CPU.X86 {
                 return true;
                 
             }
-            using (mInstructionDatasLocker.AcquireReaderLock()) {
                 mInstructionDatas.TryGetValue(aInstruction.GetType(), out aInstructionData);
-            }
             if (aInstructionData == null) {
                 aEncodingOption = null;
                 return false;

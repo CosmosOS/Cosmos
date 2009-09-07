@@ -14,9 +14,8 @@ namespace Cosmos.IL2CPU {
       }
       // Contains info on the current stack structure. What type are on the stack, etc
 	  public readonly StackContents Stack = new StackContents();
-	  
-        private static ReaderWriterLocker mCurrentInstanceLocker = new ReaderWriterLocker();
-        private static SortedList<int, Stack<Assembler>> mCurrentInstance = new SortedList<int, Stack<Assembler>>();
+
+    private static Assembler mCurrentInstance;
         protected internal List<Instruction> mInstructions = new List<Instruction>();
         private List<DataMember> mDataMembers = new List<DataMember>();
         private System.IO.TextWriter mLog;
@@ -30,27 +29,11 @@ namespace Cosmos.IL2CPU {
         {
             get { return mInstructions; }
         }
-        public static Stack<Assembler> CurrentInstance
+        public static Assembler CurrentInstance
         {
             get
             {
-                using( mCurrentInstanceLocker.AcquireReaderLock() )
-                {
-                    if( mCurrentInstance.ContainsKey( Thread.CurrentThread.ManagedThreadId ) )
-                    {
-                        return mCurrentInstance[ Thread.CurrentThread.ManagedThreadId ];
-                    }
-                }
-                using( mCurrentInstanceLocker.AcquireWriterLock() )
-                {
-                    if( mCurrentInstance.ContainsKey( Thread.CurrentThread.ManagedThreadId ) )
-                    {
-                        return mCurrentInstance[ Thread.CurrentThread.ManagedThreadId ];
-                    }
-                    var xResult = new Stack<Assembler>();
-                    mCurrentInstance.Add( Thread.CurrentThread.ManagedThreadId, xResult );
-                    return xResult;
-                }
+            return mCurrentInstance;
             }
         }
 
@@ -68,7 +51,7 @@ namespace Cosmos.IL2CPU {
         {
             mLog = new System.IO.StreamWriter( "Cosmos.Assembler.Log" ); 
             InitILOps();
-            CurrentInstance.Push( this );
+            mCurrentInstance = this;
         }
 
 		public static ulong ConstructLabel(uint aMethod, uint aOpCode, byte aSubLabel)
@@ -95,7 +78,6 @@ namespace Cosmos.IL2CPU {
             //		Anyhow, we need a way to clear the CurrentInstance property
             //mInstructions.Clear();
             //mDataMembers.Clear();
-            CurrentInstance.Pop();
             //if (mAllAssemblerElements != null)
             //{
             //    mAllAssemblerElements.Clear();
@@ -187,22 +169,6 @@ namespace Cosmos.IL2CPU {
                 return;
             }
             mFlushInitializationDone = true;
-            using( Assembler.mCurrentInstanceLocker.AcquireReaderLock() )
-            {
-                foreach( var xItem in mCurrentInstance.Values )
-                {
-                    if( xItem.Count > 0 )
-                    {
-                        var xAsm = xItem.Peek();
-                        if( xAsm != this )
-                        {
-                            mDataMembers.AddRange( xAsm.mDataMembers );
-                            mInstructions.AddRange( xAsm.mInstructions );
-                            xItem.Pop();
-                        }
-                    }
-                }
-            }
             OnBeforeFlush();
             //MergeAllElements();
         }

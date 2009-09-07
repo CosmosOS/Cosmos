@@ -44,7 +44,7 @@ namespace Cosmos.IL2CPU
             }
             if( aAddToAssembler )
             {
-                Assembler.CurrentInstance.Peek().Add( this );
+                Assembler.CurrentInstance.Add( this );
             }
         }
 

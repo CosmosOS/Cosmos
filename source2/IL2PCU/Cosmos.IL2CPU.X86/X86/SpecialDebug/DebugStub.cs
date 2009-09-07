@@ -18,7 +18,7 @@ namespace Cosmos.IL2CPU.X86
         
         // A bit of a hack as a static? Other ideas?
         public static void EmitDataSection() {
-            Assembler.CurrentInstance.Peek().DataMembers.AddRange(new DataMember[]{
+            Assembler.CurrentInstance.DataMembers.AddRange(new DataMember[]{
                 // Tracing: 0=Off, 1=On
                 new DataMember("DebugTraceMode", 0),
                 // enum Status
