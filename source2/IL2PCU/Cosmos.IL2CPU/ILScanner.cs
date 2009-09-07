@@ -32,6 +32,9 @@ namespace Cosmos.IL2CPU {
     // times to process plugs and so known methods accumulates,
     // but we dont want to reproces old methods from previous Execute calls.
     private List<MethodBase> mMethodsToProcess = new List<MethodBase>();
+    // ExecuteInternal is called multiple times, we don't want to rescan
+    // ones that are "finished" so we update this "pointer"
+    private int mMethodsToProcessStart;
 
     //TODO: Likely change this to be like Methods to be more efficient. Might only need Dictionary
     private HashSet<Type> mTypesSet = new HashSet<Type>();
@@ -80,11 +83,13 @@ namespace Cosmos.IL2CPU {
     }
 
     private void ExecuteInternal(System.Reflection.MethodInfo aStartMethod) {
-      mMethodsToProcess.Clear();
+      // See comment at mMethodsToProcessStart declaration
+      mMethodsToProcessStart = mMethodsToProcess.Count;
       QueueMethod(aStartMethod);
 
       // Cannot use foreach, the list changes as we go
-      for (int i = 0; i < mMethodsToProcess.Count; i++) {
+      // and we dont start at 0
+      for (int i = mMethodsToProcessStart; i < mMethodsToProcess.Count; i++) {
         ScanMethod(mMethodsToProcess[i], (UInt32)i);
       }
 
@@ -104,7 +109,7 @@ namespace Cosmos.IL2CPU {
       do {
         xMethodCount = mMethodsToProcess.Count;
         // Cannot use foreach, the list changes as we go
-        for (int i = 0; i < mMethodsToProcess.Count; i++) {
+        for (int i = mMethodsToProcessStart; i < mMethodsToProcess.Count; i++) {
           var xMethod = mMethodsToProcess[i];
           if (xMethod.IsVirtual) {
             foreach (var xType in mTypes) {
