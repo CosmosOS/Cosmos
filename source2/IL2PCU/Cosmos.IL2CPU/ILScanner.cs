@@ -190,11 +190,20 @@ namespace Cosmos.IL2CPU {
         }
       }
 
+      uint xPlugId = 0;
+      MethodInfo xPlug = null;
+      if (mMethodPlugs.TryGetValue(aMethodBase, out xPlugId)) {
+        xPlug = mMethodsToProcess[(int)xPlugId];
+      }
+      
       var xMethod = new MethodInfo(aMethodBase, xResult, xMethodType);
-      mMethodsToProcess.Add(xMethod);
+
+      if (xMethodType == MethodInfo.TypeEnum.Plug) {
+        mMethodPlugs.Add(aMethodBase, xResult);
+      }
 
       //TODO: Might still need this one, see after we get assembly output again
-      //Im hoping the operand walking we have now ill include this on its own.
+      //Im hoping the operand walking we have now will include this on its own.
       //QueueType(aMethod.DeclaringType);
 
       //var xMethodInfo = aMethod as MethodInfo;
@@ -239,6 +248,5 @@ namespace Cosmos.IL2CPU {
         return mMethodsToProcess.Count;
       }
     }
-
   }
 }

@@ -27,7 +27,8 @@ namespace HelloWorld {
       var xEntryPoint = typeof(Program).GetMethod("Init", BindingFlags.Public | BindingFlags.Static);
       xScanner.Execute(xEntryPoint);
 
-      //xScanner.Execute( ( System.Reflection.MethodInfo )RuntimeEngineRefs.InitializeApplicationRef );
+      xScanner.Execute( ( System.Reflection.MethodInfo )RuntimeEngineRefs.InitializeApplicationRef );
+     xScanner.
       //xScanner.Execute( ( System.Reflection.MethodInfo )RuntimeEngineRefs.FinalizeApplicationRef );
       ////xScanner.QueueMethod(typeof(CosmosAssembler).GetMethod("PrintException"));
       //xScanner.Execute( ( System.Reflection.MethodInfo )VTablesImplRefs.LoadTypeTableRef );
