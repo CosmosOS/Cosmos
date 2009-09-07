@@ -35,6 +35,10 @@ namespace Cosmos.IL2CPU {
     // ExecuteInternal is called multiple times, we don't want to rescan
     // ones that are "finished" so we update this "pointer"
     private int mMethodsToProcessStart;
+    // List of plug implementations.
+    // Key: MethodBase of targetted method
+    // Value: index into mMethodsToProcess
+    private Dictionary<MethodBase, uint> mMethodPlugs = new Dictionary<MethodBase, uint>();
 
     //TODO: Likely change this to be like Methods to be more efficient. Might only need Dictionary
     private HashSet<Type> mTypesSet = new HashSet<Type>();
