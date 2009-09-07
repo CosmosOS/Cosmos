@@ -145,7 +145,7 @@ namespace Cosmos.IL2CPU {
         // native implementations cannot be compiled
         return;
       }
-
+      
       var xOpCodes = mReader.ProcessMethod(aMethodBase);
       if (xOpCodes != null) {
         // Call ProcessMethod first, in a threaded environment it will
@@ -168,22 +168,27 @@ namespace Cosmos.IL2CPU {
 
     public uint QueueMethod(MethodBase aMethod) {
       uint xResult;
-      if (!mKnownMethods.TryGetValue(aMethod, out xResult)) {
-        xResult = (uint)mMethodsToProcess.Count;
-        mKnownMethods.Add(aMethod, xResult);
-        mMethodsToProcess.Add(aMethod);
-        //TODO: Might still need this one, see after we get assembly output again
-        //Im hoping the operand walking we have now ill include this on its own.
-        //QueueType(aMethod.DeclaringType);
 
-        //var xMethodInfo = aMethod as MethodInfo;
-        //if (xMethodInfo != null) {
-        //  QueueType(xMethodInfo.ReturnType);
-        //}
-        //foreach (var xParam in aMethod.GetParameters()) {
-        //  QueueType(xParam.ParameterType);
-        //}
+      // If already queued, skip it
+      if (mKnownMethods.TryGetValue(aMethod, out xResult)) {
+        return xResult;
       }
+      
+      xResult = (uint)mMethodsToProcess.Count;
+      mKnownMethods.Add(aMethod, xResult);
+      mMethodsToProcess.Add(aMethod);
+
+      //TODO: Might still need this one, see after we get assembly output again
+      //Im hoping the operand walking we have now ill include this on its own.
+      //QueueType(aMethod.DeclaringType);
+
+      //var xMethodInfo = aMethod as MethodInfo;
+      //if (xMethodInfo != null) {
+      //  QueueType(xMethodInfo.ReturnType);
+      //}
+      //foreach (var xParam in aMethod.GetParameters()) {
+      //  QueueType(xParam.ParameterType);
+      //}
       return xResult;
     }
 
