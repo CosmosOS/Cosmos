@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Indy.IL2CPU.Plugs; 
 
 namespace Cosmos.IL2CPU {
   public class ILScanner {
@@ -27,6 +28,9 @@ namespace Cosmos.IL2CPU {
     // to get a list of keys will do a on demand copy, which won't meet our needs either
     // becuase we have to walk the list dynamically as it grows, which is also why we need to
     // index it rather than enumerate it with foreach.
+    // We also need a separate list becuase Execute is called multiple
+    // times to process plugs and so known methods accumulates,
+    // but we dont want to reproces old methods from previous Execute calls.
     private List<MethodBase> mMethodsToProcess = new List<MethodBase>();
 
     //TODO: Likely change this to be like Methods to be more efficient. Might only need Dictionary
@@ -41,8 +45,43 @@ namespace Cosmos.IL2CPU {
       mReader = new ILReader();
     }
 
-    public void Execute(System.Reflection.MethodInfo aEntry) {
-      QueueMethod(aEntry);
+    public void Execute(System.Reflection.MethodInfo aStartMethod) {
+      // Scan plugs first, so when we scan from 
+      // entry point plugs will be found.
+      //TODO: Move plug scans etc into Scanner
+      foreach (var xAsm in AppDomain.CurrentDomain.GetAssemblies()) {
+        foreach (var xType in xAsm.GetTypes()) {
+          foreach (var xMethod in xType.GetMethods()) {
+            foreach (var xAttrib in xMethod.GetCustomAttributes(false)) {
+              if (xAttrib is PlugMethodAttribute) {
+                var x = (PlugMethodAttribute)xAttrib;
+                if (x.Enabled) {
+                  //TODO: Check this against build options
+                  //TODO: Two exclusive IsOnly's dont make sense
+                  // refactor these as a positive rather than negative
+                  if (!x.IsMonoOnly) {
+                    //TODO: public string Signature = null;
+                    // Do we need to check signature?
+                    //TODO: public Type Assembler = null;
+                    ExecuteInternal(xMethod);
+                  }
+                }
+              }
+            }
+          }
+          //TODO: Look for Field plugs
+        }
+      }
+
+      // Scan from entry point of this program
+      //TODO: Now that we scan plugs first, we might need to put a jump
+      // in the asm to jump to the entry point?
+      ExecuteInternal(aStartMethod);
+    }
+
+    private void ExecuteInternal(System.Reflection.MethodInfo aStartMethod) {
+      mMethodsToProcess.Clear();
+      QueueMethod(aStartMethod);
 
       // Cannot use foreach, the list changes as we go
       for (int i = 0; i < mMethodsToProcess.Count; i++) {

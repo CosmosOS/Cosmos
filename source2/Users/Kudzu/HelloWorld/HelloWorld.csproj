@@ -55,6 +55,10 @@
       <Project>{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755}</Project>
       <Name>Cosmos.Hardware</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\source\Cosmos\Cosmos.Kernel.Plugs\Cosmos.Kernel.Plugs.csproj">
+      <Project>{B168BEDD-C6A6-4E7C-B9A5-0144286E9E42}</Project>
+      <Name>Cosmos.Kernel.Plugs</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\source\Cosmos\Cosmos.Kernel\Cosmos.Kernel.csproj">
       <Project>{A1F83D9F-2D44-4264-A08B-416797123018}</Project>
       <Name>Cosmos.Kernel</Name>

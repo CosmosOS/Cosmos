@@ -106,6 +106,10 @@
       <Project>{5E70F7D9-388A-43C2-8D9B-A4C382A8278D}</Project>
       <Name>Indy.IL2CPU.X86</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\source\Indy.IL2CPU\Indy.IL2CPU.csproj">
+      <Project>{21243B63-9CD0-4573-9C58-AF4B4AEF9D57}</Project>
+      <Name>Indy.IL2CPU</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

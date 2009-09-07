@@ -5,7 +5,8 @@ using Cosmos.IL2CPU.X86;
 using Indy.IL2CPU.Assembler.X86;
 using S = Cosmos.Hardware.TextScreen;
 using System.IO;
-using Indy.IL2CPU; 
+using Indy.IL2CPU;
+
 namespace HelloWorld {
 	class Program {
 		//#region Cosmos Builder logic
@@ -22,8 +23,8 @@ namespace HelloWorld {
       xAsmblr.Initialize(); 
           
       var xScanner = new ILScanner(xAsmblr);
+
       var xEntryPoint = typeof(Program).GetMethod("Init", BindingFlags.Public | BindingFlags.Static);
-      //InitializePlugs(aPlugs);
       xScanner.Execute(xEntryPoint);
 
       //xScanner.Execute( ( System.Reflection.MethodInfo )RuntimeEngineRefs.InitializeApplicationRef );
