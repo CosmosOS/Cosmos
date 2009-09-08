@@ -52,6 +52,7 @@ namespace Cosmos.IL2CPU {
       mReader = new ILReader();
     }
 
+		private const string IllegalIdentifierChars = "&.,+$<>{}-`\'/\\ ()[]*!=";
     private static string GetStrippedMethodBaseFullName(MethodBase aMethod,
                                                         MethodBase aRefMethod) {
       StringBuilder xBuilder = new StringBuilder();
@@ -67,10 +68,10 @@ namespace Cosmos.IL2CPU {
           xBuilder.Append(xParts[0]);
         }
       }
-      xBuilder.Append("  ");
-      xBuilder.Append(".");
+      xBuilder.Append("__");
+      xBuilder.Append("_");
       xBuilder.Append(aMethod.Name);
-      xBuilder.Append("(");
+      xBuilder.Append("_");
       ParameterInfo[] xParams = aMethod.GetParameters();
       bool xParamAdded = false;
       for (int i = 0; i < xParams.Length; i++) {
@@ -81,13 +82,19 @@ namespace Cosmos.IL2CPU {
           continue;
         }
         if (xParamAdded) {
-          xBuilder.Append(", ");
+          xBuilder.Append("__");
         }
         xBuilder.Append(xParams[i].ParameterType.FullName);
         xParamAdded = true;
       }
-      xBuilder.Append(")");
-      return xBuilder.ToString();
+      xBuilder.Append("_");
+
+      //TODO: Redo this whole method, or eliminate later when we redo assembler
+      string xResult = xBuilder.ToString();
+			foreach (char c in IllegalIdentifierChars) {
+				xResult = xResult.Replace(c, '_');
+			}
+      return xResult;
     }
     
     public void Execute(System.Reflection.MethodInfo aStartMethod) {
@@ -121,7 +128,7 @@ namespace Cosmos.IL2CPU {
                   if (xMethodAttrib.IsMonoOnly) {
                     xEnabled = false;
                   } else if (xMethodAttrib.Signature != null) {
-                    // System_Void__Indy_IL2CPU_Assembler_Assembler__cctor__"
+                    // System_Void__Indy_IL2CPU_Assembler_Assembler__cctor__
                     // If signature exists, the search is slow. Signatures
                     // are infrequent though, so for now we just go slow method
                     // and have not optimized or cached this info. When we
