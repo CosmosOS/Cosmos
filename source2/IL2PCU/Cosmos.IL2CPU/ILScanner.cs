@@ -52,6 +52,44 @@ namespace Cosmos.IL2CPU {
       mReader = new ILReader();
     }
 
+    private static string GetStrippedMethodBaseFullName(MethodBase aMethod,
+                                                        MethodBase aRefMethod) {
+      StringBuilder xBuilder = new StringBuilder();
+      string[] xParts = aMethod.ToString().Split(' ');
+      string[] xParts2 = xParts.Skip(1).ToArray();
+      System.Reflection.MethodInfo xMethodInfo = aMethod as System.Reflection.MethodInfo;
+      if (xMethodInfo != null) {
+        xBuilder.Append(xMethodInfo.ReturnType.FullName);
+      } else {
+        if (aMethod is ConstructorInfo) {
+          xBuilder.Append(typeof(void).FullName);
+        } else {
+          xBuilder.Append(xParts[0]);
+        }
+      }
+      xBuilder.Append("  ");
+      xBuilder.Append(".");
+      xBuilder.Append(aMethod.Name);
+      xBuilder.Append("(");
+      ParameterInfo[] xParams = aMethod.GetParameters();
+      bool xParamAdded = false;
+      for (int i = 0; i < xParams.Length; i++) {
+        if (i == 0 && (aRefMethod != null && !aRefMethod.IsStatic)) {
+          continue;
+        }
+        if (xParams[i].IsDefined(typeof(FieldAccessAttribute), true)) {
+          continue;
+        }
+        if (xParamAdded) {
+          xBuilder.Append(", ");
+        }
+        xBuilder.Append(xParams[i].ParameterType.FullName);
+        xParamAdded = true;
+      }
+      xBuilder.Append(")");
+      return xBuilder.ToString();
+    }
+    
     public void Execute(System.Reflection.MethodInfo aStartMethod) {
       // Scan plugs first, so when we scan from 
       // entry point plugs will be found.
@@ -82,6 +120,27 @@ namespace Cosmos.IL2CPU {
                   // refactor these as a positive rather than negative
                   if (xMethodAttrib.IsMonoOnly) {
                     xEnabled = false;
+                  } else if (xMethodAttrib.Signature != null) {
+                    // System_Void__Indy_IL2CPU_Assembler_Assembler__cctor__"
+                    // If signature exists, the search is slow. Signatures
+                    // are infrequent though, so for now we just go slow method
+                    // and have not optimized or cached this info. When we
+                    // redo the plugs, we can fix this.
+                    var xTargetMethods = xTypeAttrib.Target.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+                    foreach (var xTargetMethod in xTargetMethods) {
+                      string sName = GetStrippedMethodBaseFullName(xTargetMethod, null);
+                      if (string.Compare(sName, xMethodAttrib.Signature, true) == 0) {
+                        uint xUID = ExecuteInternal(xMethod, true);
+                        mMethodPlugs.Add(xTargetMethod, xUID);
+                        // Mark as disabled, because we already handled it
+                        xEnabled = false;
+                        break;
+                      }
+                    }
+                    // if still enabled, we didn't find our method
+                    if (xEnabled) {
+                      throw new Exception("Plug target method not found.");
+                    }
                   } else {
                     xEnabled = xMethodAttrib.Enabled;
                   }
