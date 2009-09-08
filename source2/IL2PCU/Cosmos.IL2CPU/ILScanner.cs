@@ -156,6 +156,10 @@ namespace Cosmos.IL2CPU {
                   System.Reflection.MethodBase xTargetMethod = null;
                   // TODO: In future make rule that all ctor plugs are called
                   // ctor by name, or use a new attrib
+                  //TODO: Document all the plug stuff in a document on website
+                  //TODO: To make inclusion of plugs easy, we can make a plugs master
+                  // that references the other default plugs so user exes only 
+                  // need to reference that one.
                   // TODO: Skip FieldAccessAttribute if in impl
                   if (xTypesInst != null) {
                     if (string.Compare(xMethod.Name, "ctor", true) == 0) {
@@ -199,6 +203,12 @@ namespace Cosmos.IL2CPU {
       // and we dont start at 0
       for (int i = mMethodsToProcessStart; i < mMethodsToProcess.Count; i++) {
         var xMethod = mMethodsToProcess[i];
+        //TODO: In assembler, throw exceptino if NeedsPlug is true
+        // but not plug is found
+        // dont do it here, because we might need to resolve against a future plug
+        // which hasnt been scanned yet
+        // Also modify and move this comment so someone doesnt move the
+        // code back into scanner.
         if (xMethod.Type != MethodInfo.TypeEnum.NeedsPlug) {
           ScanMethod(xMethod);
         }
@@ -300,12 +310,8 @@ namespace Cosmos.IL2CPU {
       if (mMethodPlugs.TryGetValue(aMethodBase, out xPlugId)) {
         xPlug = mMethodsToProcess[(int)xPlugId];
       }
-      
-      var xMethod = new MethodInfo(aMethodBase, xResult, xMethodType);
+      var xMethod = new MethodInfo(aMethodBase, xResult, xMethodType, xPlug);
 
-      if (xMethodType == MethodInfo.TypeEnum.Plug) {
-        mMethodPlugs.Add(aMethodBase, xResult);
-      }
 
       //TODO: Might still need this one, see after we get assembly output again
       //Im hoping the operand walking we have now will include this on its own.
