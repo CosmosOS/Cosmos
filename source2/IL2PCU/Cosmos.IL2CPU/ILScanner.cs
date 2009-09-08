@@ -203,12 +203,6 @@ namespace Cosmos.IL2CPU {
       // and we dont start at 0
       for (int i = mMethodsToProcessStart; i < mMethodsToProcess.Count; i++) {
         var xMethod = mMethodsToProcess[i];
-        //TODO: In assembler, throw exceptino if NeedsPlug is true
-        // but not plug is found
-        // dont do it here, because we might need to resolve against a future plug
-        // which hasnt been scanned yet
-        // Also modify and move this comment so someone doesnt move the
-        // code back into scanner.
         if (xMethod.Type != MethodInfo.TypeEnum.NeedsPlug) {
           ScanMethod(xMethod);
         }
