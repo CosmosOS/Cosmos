@@ -179,6 +179,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Users", "Users", "{A4478219-065D-4928-BB4D-4358CAD39A03}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kudzu", "Kudzu", "{9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6}"
+	ProjectSection(SolutionItems) = preProject
+		..\source2\Users\Kudzu\HelloWorld\Test Compile w NASM.bat = ..\source2\Users\Kudzu\HelloWorld\Test Compile w NASM.bat
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Matthijs ter Woord", "Matthijs ter Woord", "{9A806542-A3FE-479B-83C2-E3380BC372F3}"
 EndProject
@@ -490,14 +493,14 @@ Global
 		SccProjectTopLevelParentUniqueName66 = Cosmos.sln
 		SccProjectName66 = Cosmos.Hardware.SMBIOS
 		SccLocalPath66 = Cosmos.Hardware.SMBIOS
-		SccProjectUniqueName67 = ..\\source2\\Users\\Gero\u0020Landmann\\Cosmos.Assembler.X86\\Cosmos.Assembler.X86.Generator.csproj
+		SccProjectUniqueName67 = ..\\source2\\Users\\Gero\u0020Landmann\\Cosmos.Assembler.X86.Gero\\Cosmos.Assembler.X86.Gero.csproj
 		SccProjectTopLevelParentUniqueName67 = Cosmos.sln
-		SccProjectName67 = ../source2/Users/Gero\u0020Landmann/Cosmos.Assembler.X86
-		SccLocalPath67 = ..\\source2\\Users\\Gero\u0020Landmann\\Cosmos.Assembler.X86
-		SccProjectUniqueName68 = ..\\source2\\Users\\Gero\u0020Landmann\\Cosmos.Assembler.X86.Gero\\Cosmos.Assembler.X86.Gero.csproj
+		SccProjectName67 = ../source2/Users/Gero\u0020Landmann/Cosmos.Assembler.X86.Gero
+		SccLocalPath67 = ..\\source2\\Users\\Gero\u0020Landmann\\Cosmos.Assembler.X86.Gero
+		SccProjectUniqueName68 = ..\\source2\\Users\\Gero\u0020Landmann\\Cosmos.Assembler.X86\\Cosmos.Assembler.X86.Generator.csproj
 		SccProjectTopLevelParentUniqueName68 = Cosmos.sln
-		SccProjectName68 = ../source2/Users/Gero\u0020Landmann/Cosmos.Assembler.X86.Gero
-		SccLocalPath68 = ..\\source2\\Users\\Gero\u0020Landmann\\Cosmos.Assembler.X86.Gero
+		SccProjectName68 = ../source2/Users/Gero\u0020Landmann/Cosmos.Assembler.X86
+		SccLocalPath68 = ..\\source2\\Users\\Gero\u0020Landmann\\Cosmos.Assembler.X86
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
