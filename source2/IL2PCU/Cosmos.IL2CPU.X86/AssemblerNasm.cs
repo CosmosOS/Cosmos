@@ -20,6 +20,8 @@ namespace Cosmos.IL2CPU.X86 {
 
     protected override void MethodEnd(MethodInfo aMethod) {
       base.MethodEnd(aMethod);
+      // TODO: This is a temp hack, disable this when we reenable real exception handling
+      new Label(MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) + "___EXCEPTION___EXIT");
     }
 
     protected override void BeforeOp(MethodInfo aMethod, ILOpCode aOpCode) {

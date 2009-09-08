@@ -143,6 +143,7 @@ namespace Cosmos.IL2CPU {
         new Comment(this, "[" + xILOp.ToString() + "]");
         BeforeOp(aMethod, xOpCode);
         xILOp.Execute(aMethod, xOpCode);
+        AfterOp(aMethod, xOpCode);
         //mLog.WriteLine( " end: " + Stack.Count.ToString() );
         //mLog.Flush(); 
       }
@@ -150,6 +151,9 @@ namespace Cosmos.IL2CPU {
     }
 
     protected virtual void BeforeOp(MethodInfo aMethod, ILOpCode aOpCode) {
+    }
+
+    protected virtual void AfterOp(MethodInfo aMethod, ILOpCode aOpCode) {
     }
 
     /// <summary>
