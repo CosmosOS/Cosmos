@@ -22,16 +22,24 @@ namespace Cosmos.IL2CPU.X86 {
       base.MethodEnd(aMethod);
     }
 
+    protected override void BeforeOp(MethodInfo aMethod, ILOpCode aOpCode) {
+      base.BeforeOp(aMethod, aOpCode);
+      new Label(TmpPosLabel(aMethod, aOpCode));
+    }
+
     // These are all temp functions until we move to the new assembler.
     // They are used to clean up the old assembler slightly while retaining compatibiltiy for now
-    public static string TmpPosLabel(MethodInfo aMethod, ILOpCode aOpCode) {
+    public static string TmpPosLabel(MethodInfo aMethod, int xOffset) {
       //TODO: Change to Hex output, will be smaller and slightly faster for NASM
-      return "_" + aMethod.UID + "_" + aOpCode.Position + "__";
+      return "POS_" + aMethod.UID + "_" + xOffset;
+    }
+
+    public static string TmpPosLabel(MethodInfo aMethod, ILOpCode aOpCode) {
+      return TmpPosLabel(aMethod, aOpCode.Position);
     }
 
     public static string TmpBranchLabel(MethodInfo aMethod, ILOpCode aOpCode) {
-      //TODO: Change to Hex output, will be smaller and slightly faster for NASM
-      return "_" + aMethod.UID + "_" + ((ILOpCodes.OpBranch)aOpCode).Value + "__";
+      return TmpPosLabel(aMethod, ((ILOpCodes.OpBranch)aOpCode).Value);
     }
 
   }

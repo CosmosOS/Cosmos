@@ -107,7 +107,9 @@ namespace Cosmos.IL2CPU {
 
     protected virtual void MethodBegin(MethodInfo aMethod) {
       new Comment(this, "---------------------------------------------------------");
-      new Comment(this, "Begin Method: " + aMethod.MethodBase.Name);
+      new Comment(this, "Type: " + aMethod.MethodBase.DeclaringType.ToString());
+      new Comment(this, "Name: " + aMethod.MethodBase.Name);
+      new Comment(this, "Plugged: " + (aMethod.PlugMethod == null ? "No" : "Yes"));
     }
 
     protected virtual void MethodEnd(MethodInfo aMethod) {
@@ -139,11 +141,15 @@ namespace Cosmos.IL2CPU {
         }
         //mLog.Write ( "[" + xILOp.ToString() + "] \t Stack start: " + Stack.Count.ToString() );
         new Comment(this, "[" + xILOp.ToString() + "]");
+        BeforeOp(aMethod, xOpCode);
         xILOp.Execute(aMethod, xOpCode);
         //mLog.WriteLine( " end: " + Stack.Count.ToString() );
         //mLog.Flush(); 
       }
       MethodEnd(aMethod);
+    }
+
+    protected virtual void BeforeOp(MethodInfo aMethod, ILOpCode aOpCode) {
     }
 
     /// <summary>

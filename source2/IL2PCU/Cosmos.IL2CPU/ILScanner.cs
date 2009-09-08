@@ -50,6 +50,7 @@ namespace Cosmos.IL2CPU {
     public ILScanner(Assembler aAsmblr) {
       mAsmblr = aAsmblr;
       mReader = new ILReader();
+      mThrowHelper = typeof(object).Assembly.GetType("System.ThrowHelper");
     }
 
     public void Execute(System.Reflection.MethodInfo aStartMethod) {
@@ -273,9 +274,28 @@ namespace Cosmos.IL2CPU {
         }
 
         // Assemble the method
-        mAsmblr.ProcessMethod(aMethodInfo, xOpCodes);
+        if (aMethodInfo.MethodBase.DeclaringType != mThrowHelper) {
+          mAsmblr.ProcessMethod(aMethodInfo, xOpCodes);
+        }
       }
     }
+
+    // System.ThrowHelper exists in MS .NET twice... 
+    // Its an internal class that exists in both mscorlib and system assemblies.
+    // They are separate types though, so normally the scanner scans both and
+    // then we get conflicting labels. MS included it twice to make exception 
+    // throwing code smaller. They are internal though, so we cannot
+    // reference them directly and only via finding them as they come along.
+    // We find it here, not via QueueType so we only check it here. Later
+    // we might have to checkin QueueType also.
+    // For now we accept both types, and just emit code for only one. This works
+    // with the current Nasm assembler as we resolve by name in the assembler.
+    // However with other assemblers this approach may not work.
+    // If AssemblerNASM adds assembly name to the label, this will allow
+    // both to exist as they do in BCL.
+    // So in the future we might be able to remove this hack, or change
+    // how it works.
+    private Type mThrowHelper;
 
     public uint QueueMethod(MethodBase aMethodBase, bool aIsPlug) {
       uint xResult;
@@ -346,6 +366,8 @@ namespace Cosmos.IL2CPU {
           QueueType(aType.BaseType);
         }
         // queue static constructor
+        //TODO: Should QueueMethod call QueueType with DeclaringType
+        // so its static constructors will get added?
         foreach (var xCctor in aType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)) {
           if (xCctor.DeclaringType == aType) {
             QueueMethod(xCctor, false);
