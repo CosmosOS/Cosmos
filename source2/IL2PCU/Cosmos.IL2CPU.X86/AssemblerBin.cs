@@ -12,9 +12,11 @@ namespace Cosmos.IL2CPU.X86 {
     }
 
     protected override void MethodBegin(MethodInfo aMethod) {
+      base.MethodBegin(aMethod);
     }
 
     protected override void MethodEnd(MethodInfo aMethod) {
+      base.MethodEnd(aMethod);
     }
 
     public AssemblerBin() : base(0) { } 

@@ -10,6 +10,9 @@ using Cosmos.IL2CPU.ILOpCodes;
 using Indy.IL2CPU;
 
 namespace Cosmos.IL2CPU.X86 {
+  // TODO: I think we need to later elminate this class
+  // Much of it is left over from the old build stuff, and info 
+  // here actually belongs else where, not in the assembler
   public abstract class CosmosAssembler : Cosmos.IL2CPU.Assembler 
   {
               //TODO: COM Port info - should be in assembler? Assembler should not know about comports...

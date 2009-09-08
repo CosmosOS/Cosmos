@@ -105,8 +105,14 @@ namespace Cosmos.IL2CPU {
       }
     }
 
-    protected abstract void MethodBegin(MethodInfo aMethod);
-    protected abstract void MethodEnd(MethodInfo aMethod);
+    protected virtual void MethodBegin(MethodInfo aMethod) {
+      new Comment(this, "---------------------------------------------------------");
+      new Comment(this, "Begin Method: " + aMethod.MethodBase.Name);
+    }
+
+    protected virtual void MethodEnd(MethodInfo aMethod) {
+      new Comment(this, "End Method: " + aMethod.MethodBase.Name);
+    }
 
     public void ProcessMethod(MethodInfo aMethod, List<ILOpCode> aOpCodes) {
       // We check this here and not scanner as when scanner makes these

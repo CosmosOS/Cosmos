@@ -14,9 +14,12 @@ namespace Cosmos.IL2CPU.X86 {
     public AssemblerNasm() : base( 0 ) { }
 
     protected override void MethodBegin(MethodInfo aMethod) {
+      base.MethodBegin(aMethod);
+      new Label(aMethod.MethodBase);
     }
 
     protected override void MethodEnd(MethodInfo aMethod) {
+      base.MethodEnd(aMethod);
     }
 
     // These are all temp functions until we move to the new assembler.
