@@ -311,7 +311,7 @@ namespace Cosmos.IL2CPU {
         xPlug = mMethodsToProcess[(int)xPlugId];
       }
       var xMethod = new MethodInfo(aMethodBase, xResult, xMethodType, xPlug);
-
+      mMethodsToProcess.Add(xMethod);
 
       //TODO: Might still need this one, see after we get assembly output again
       //Im hoping the operand walking we have now will include this on its own.
