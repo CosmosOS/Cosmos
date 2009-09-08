@@ -107,6 +107,11 @@ namespace Cosmos.IL2CPU {
             // Find all classes marked as a Plug
             if (xAttrib1 is PlugAttribute) {
               var xTypeAttrib = (PlugAttribute)xAttrib1;
+
+              var xTargetType = xTypeAttrib.Target;
+              if (xTargetType == null) {
+                xTargetType = Type.GetType(xTypeAttrib.TargetName, true);
+              }
               
               // See if there is a custom PlugMethod attribute
               // Plug implementations must be static and public, so 
@@ -133,9 +138,10 @@ namespace Cosmos.IL2CPU {
                     // are infrequent though, so for now we just go slow method
                     // and have not optimized or cached this info. When we
                     // redo the plugs, we can fix this.
-                    var xTargetMethods = xTypeAttrib.Target.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+                    var xTargetMethods = xTargetType.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Cast<MethodBase>().AsQueryable();
+                    xTargetMethods = xTargetMethods.Union(xTargetType.GetConstructors(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic));
                     foreach (var xTargetMethod in xTargetMethods) {
-                      string sName = GetStrippedMethodBaseFullName(xTargetMethod, null);
+                      string sName = DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GenerateFullName(xTargetMethod));
                       if (string.Compare(sName, xMethodAttrib.Signature, true) == 0) {
                         uint xUID = ExecuteInternal(xMethod, true);
                         mMethodPlugs.Add(xTargetMethod, xUID);
@@ -146,6 +152,7 @@ namespace Cosmos.IL2CPU {
                     }
                     // if still enabled, we didn't find our method
                     if (xEnabled) {
+                      // todo: more precise error: imagine having a 100K line project, and this error happens...
                       throw new Exception("Plug target method not found.");
                     }
                   } else {
@@ -154,6 +161,9 @@ namespace Cosmos.IL2CPU {
                 }
 
                 if (xEnabled) {
+                  if (xMethod.GetFullName() == "System_Void__Indy_IL2CPU_ObjectImpl_Ctor__") {
+                    Console.Write("");
+                  }
                   // for PlugMethodAttribute:
                     //TODO: public string Signature;
                     //[PlugMethod(Signature = "System_Void__Indy_IL2CPU_Assembler_Assembler__cctor__")]
@@ -191,11 +201,12 @@ namespace Cosmos.IL2CPU {
                   }
                   System.Reflection.MethodInfo xTargetMethod = null;
                   if (xTypesInst != null) {
-                    xTargetMethod = xTypeAttrib.Target.GetMethod(xMethod.Name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesInst, null);
+                    xTargetMethod = xTargetType.GetMethod(xMethod.Name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesInst, null);
                   }
+                  // todo: add checking for .ctor's here.
                   // Not an instance method, try static
                   if (xTargetMethod == null) {
-                    xTargetMethod = xTypeAttrib.Target.GetMethod(xMethod.Name, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesStatic, null);
+                    xTargetMethod = xTargetType.GetMethod(xMethod.Name, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesStatic, null);
                   }
                   if (xTargetMethod == null) {
                     throw new Exception("Plug target method not found.");

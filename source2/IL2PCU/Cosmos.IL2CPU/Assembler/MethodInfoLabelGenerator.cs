@@ -136,7 +136,7 @@ namespace Cosmos.IL2CPU
             return xSB.ToString();
         }
 
-        private static string GenerateFullName( MethodBase aMethod )
+        public static string GenerateFullName( MethodBase aMethod )
         {
             if( aMethod == null )
             {

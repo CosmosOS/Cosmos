@@ -28,7 +28,7 @@ namespace Indy.IL2CPU {
 		/// </summary>
 		public const int FieldDataOffset = 12;
 		//[MethodAlias(Name = "System_Void___System_Object__ctor____")]
-		public static void Ctor(IntPtr aThis) {
+		public static void Ctor(object aThis) {
 		}
 
 		public static Type GetType(object aThis) {
