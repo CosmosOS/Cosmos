@@ -10,7 +10,7 @@ namespace Indy.IL2CPU.IL.CustomImplementations.System {
 	public static class Int16Impl {
 		//[PlugMethod(Signature = "System_String___System_Int16_ToString____")]
 		public static string ToString(ref short aThis) {
-			return Int32Impl.GetNumberString(aThis);
+			return Int32Impl2.GetNumberString(aThis);
 		}
 
         public static bool TryParse(string s, NumberStyles style, IFormatProvider provider, out short result) {

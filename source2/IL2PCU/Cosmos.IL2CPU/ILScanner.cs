@@ -52,51 +52,6 @@ namespace Cosmos.IL2CPU {
       mReader = new ILReader();
     }
 
-		private const string IllegalIdentifierChars = "&.,+$<>{}-`\'/\\ ()[]*!=";
-    private static string GetStrippedMethodBaseFullName(MethodBase aMethod,
-                                                        MethodBase aRefMethod) {
-      StringBuilder xBuilder = new StringBuilder();
-      string[] xParts = aMethod.ToString().Split(' ');
-      string[] xParts2 = xParts.Skip(1).ToArray();
-      System.Reflection.MethodInfo xMethodInfo = aMethod as System.Reflection.MethodInfo;
-      if (xMethodInfo != null) {
-        xBuilder.Append(xMethodInfo.ReturnType.FullName);
-      } else {
-        if (aMethod is ConstructorInfo) {
-          xBuilder.Append(typeof(void).FullName);
-        } else {
-          xBuilder.Append(xParts[0]);
-        }
-      }
-      xBuilder.Append("__");
-      xBuilder.Append("_");
-      xBuilder.Append(aMethod.Name);
-      xBuilder.Append("_");
-      ParameterInfo[] xParams = aMethod.GetParameters();
-      bool xParamAdded = false;
-      for (int i = 0; i < xParams.Length; i++) {
-        if (i == 0 && (aRefMethod != null && !aRefMethod.IsStatic)) {
-          continue;
-        }
-        if (xParams[i].IsDefined(typeof(FieldAccessAttribute), true)) {
-          continue;
-        }
-        if (xParamAdded) {
-          xBuilder.Append("__");
-        }
-        xBuilder.Append(xParams[i].ParameterType.FullName);
-        xParamAdded = true;
-      }
-      xBuilder.Append("_");
-
-      //TODO: Redo this whole method, or eliminate later when we redo assembler
-      string xResult = xBuilder.ToString();
-			foreach (char c in IllegalIdentifierChars) {
-				xResult = xResult.Replace(c, '_');
-			}
-      return xResult;
-    }
-    
     public void Execute(System.Reflection.MethodInfo aStartMethod) {
       // Scan plugs first, so when we scan from 
       // entry point plugs will be found.
@@ -138,6 +93,8 @@ namespace Cosmos.IL2CPU {
                     // are infrequent though, so for now we just go slow method
                     // and have not optimized or cached this info. When we
                     // redo the plugs, we can fix this.
+                    //
+                    // This merges methods and ctors, improve this later
                     var xTargetMethods = xTargetType.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Cast<MethodBase>().AsQueryable();
                     xTargetMethods = xTargetMethods.Union(xTargetType.GetConstructors(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic));
                     foreach (var xTargetMethod in xTargetMethods) {
@@ -161,9 +118,6 @@ namespace Cosmos.IL2CPU {
                 }
 
                 if (xEnabled) {
-                  if (xMethod.GetFullName() == "System_Void__Indy_IL2CPU_ObjectImpl_Ctor__") {
-                    Console.Write("");
-                  }
                   // for PlugMethodAttribute:
                     //TODO: public string Signature;
                     //[PlugMethod(Signature = "System_Void__Indy_IL2CPU_Assembler_Assembler__cctor__")]
@@ -199,14 +153,23 @@ namespace Cosmos.IL2CPU {
                       xTypesStatic[i] = xParams[i].ParameterType;
                     }
                   }
-                  System.Reflection.MethodInfo xTargetMethod = null;
+                  System.Reflection.MethodBase xTargetMethod = null;
+                  // TODO: In future make rule that all ctor plugs are called
+                  // ctor by name, or use a new attrib
                   if (xTypesInst != null) {
-                    xTargetMethod = xTargetType.GetMethod(xMethod.Name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesInst, null);
+                    if (string.Compare(xMethod.Name, "ctor", true) == 0) {
+                      xTargetMethod = xTargetType.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesInst, null);
+                    } else {
+                      xTargetMethod = xTargetType.GetMethod(xMethod.Name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesInst, null);
+                    }
                   }
-                  // todo: add checking for .ctor's here.
                   // Not an instance method, try static
                   if (xTargetMethod == null) {
-                    xTargetMethod = xTargetType.GetMethod(xMethod.Name, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesStatic, null);
+                    if (string.Compare(xMethod.Name, "ctor", true) == 0) {
+                      xTargetMethod = xTargetType.GetConstructor(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesStatic, null);
+                    } else {
+                      xTargetMethod = xTargetType.GetMethod(xMethod.Name, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesStatic, null);
+                    }
                   }
                   if (xTargetMethod == null) {
                     throw new Exception("Plug target method not found.");

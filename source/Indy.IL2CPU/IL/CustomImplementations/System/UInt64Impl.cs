@@ -8,10 +8,13 @@ namespace Indy.IL2CPU.IL.CustomImplementations.System {
 	[Plug(Target = typeof(UInt64))]
 	public class UInt64Impl {
 		public static string ToString(ref ulong aThis) {
-			return GetNumberString(aThis, false);
+      return UInt64Impl2.GetNumberString(aThis, false);
 		}
+  }
 
-		public static string GetNumberString(ulong aValue, bool aIsNegative) {
+  // See note in UInt32Impl
+  public class UInt64Impl2 {
+    public static string GetNumberString(ulong aValue, bool aIsNegative) {
 			const string xDigits = "0123456789";
 			char[] xResultChars = new char[21];
 			int xCurrentPos = 20;

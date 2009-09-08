@@ -8,10 +8,16 @@ namespace Indy.IL2CPU.IL.CustomImplementations.System {
 	[Plug(Target=typeof(UInt32))]
 	public static class UInt32Impl {
 		public static string ToString(ref uint aThis) {
-			return GetNumberString(aThis, false);
+      return UInt32Impl2.GetNumberString(aThis, false);
 		}
+  }
 
-		public static string GetNumberString(uint aValue, bool aIsNegative) {
+  //TODO: Hacked this because old plug system wasnt implicit, it ignored 
+  // all non matches. Later put this elsewhere, maybe in a base class as a
+  // protected, or use a new attrib to tell the plug scanner to skip.. but 
+  // first option likely is better
+  public static class UInt32Impl2 {
+    public static string GetNumberString(uint aValue, bool aIsNegative) {
 			if (aValue == 0) {
 				if (aIsNegative) {
 					return "-0";
