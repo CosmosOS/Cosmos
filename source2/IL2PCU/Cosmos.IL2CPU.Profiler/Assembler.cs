@@ -20,5 +20,11 @@ namespace Cosmos.IL2CPU.Profiler {
       }
     }
 
+    protected override void MethodBegin(MethodInfo aMethod) {
+    }
+
+    protected override void MethodEnd(MethodInfo aMethod) {
+    }
+
   }
 }

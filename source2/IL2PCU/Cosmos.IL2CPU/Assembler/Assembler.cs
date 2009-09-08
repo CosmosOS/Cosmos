@@ -5,7 +5,9 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Threading;
 using System.IO;
+
 namespace Cosmos.IL2CPU {
+
   public abstract class Assembler {
     protected ILOp[] mILOpsLo = new ILOp[256];
     protected ILOp[] mILOpsHi = new ILOp[256];
@@ -103,6 +105,9 @@ namespace Cosmos.IL2CPU {
       }
     }
 
+    protected abstract void MethodBegin(MethodInfo aMethod);
+    protected abstract void MethodEnd(MethodInfo aMethod);
+
     public void ProcessMethod(MethodInfo aMethod, List<ILOpCode> aOpCodes) {
       // We check this here and not scanner as when scanner makes these
       // plugs may still have not yet been scanned that it will depend on.
@@ -117,6 +122,7 @@ namespace Cosmos.IL2CPU {
         throw new Exception("For now, too much methods");
       }
 
+      MethodBegin(aMethod);
       foreach (var xOpCode in aOpCodes) {
         uint xOpCodeVal = (uint)xOpCode.OpCode;
         ILOp xILOp;
@@ -131,7 +137,9 @@ namespace Cosmos.IL2CPU {
         //mLog.WriteLine( " end: " + Stack.Count.ToString() );
         //mLog.Flush(); 
       }
+      MethodEnd(aMethod);
     }
+
     /// <summary>
     /// allows to emit footers to the code and datamember sections
     /// </summary>

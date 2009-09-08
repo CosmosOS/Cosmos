@@ -8,11 +8,18 @@ namespace Cosmos.IL2CPU.X86 {
     public class ELFAssembler: CosmosAssembler {
         
         public ELFAssembler() : base( 0 ) { }
- 
+
+        protected override void MethodBegin(MethodInfo aMethod) {
+        }
+
+        protected override void MethodEnd(MethodInfo aMethod) {
+        }
+
         protected override void InitILOps()
         {
             InitILOps( typeof( ILOp ) );
         }
+
         public override void FlushText(System.IO.TextWriter aOutput) {
             // dont call base
             BeforeFlush();

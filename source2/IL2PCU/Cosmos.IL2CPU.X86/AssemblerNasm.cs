@@ -10,7 +10,15 @@ namespace Cosmos.IL2CPU.X86 {
     protected override void InitILOps() {
       InitILOps(typeof(ILOp));
     }
+
     public AssemblerNasm() : base( 0 ) { }
+
+    protected override void MethodBegin(MethodInfo aMethod) {
+    }
+
+    protected override void MethodEnd(MethodInfo aMethod) {
+    }
+
     // These are all temp functions until we move to the new assembler.
     // They are used to clean up the old assembler slightly while retaining compatibiltiy for now
     public static string TmpPosLabel(MethodInfo aMethod, ILOpCode aOpCode) {

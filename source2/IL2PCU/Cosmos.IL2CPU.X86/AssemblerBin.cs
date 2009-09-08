@@ -10,6 +10,13 @@ namespace Cosmos.IL2CPU.X86 {
     protected override void InitILOps() {
       InitILOps(typeof(ILOp));
     }
-    public AssemblerBin() : base( 0 ) { } 
+
+    protected override void MethodBegin(MethodInfo aMethod) {
+    }
+
+    protected override void MethodEnd(MethodInfo aMethod) {
+    }
+
+    public AssemblerBin() : base(0) { } 
   }
 }

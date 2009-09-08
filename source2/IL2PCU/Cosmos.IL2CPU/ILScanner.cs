@@ -53,9 +53,15 @@ namespace Cosmos.IL2CPU {
     }
 
     public void Execute(System.Reflection.MethodInfo aStartMethod) {
+      // TODO: New plug system, common plug base which all descend from
+      // It can have a "this" member and then we
+      // can separate static from instance by the static keyword
+      // and ctors can be static "ctor" by name
+      // Will still need plug attrib though to specify target
+      // Also need to handle asm plugs, but those will be different anyways
+      //
       // Scan plugs first, so when we scan from 
       // entry point plugs will be found.
-      //TODO: Move plug scans etc into Scanner
       foreach (var xAsm in AppDomain.CurrentDomain.GetAssemblies()) {
         foreach (var xType in xAsm.GetTypes()) {
           foreach (var xAttrib1 in xType.GetCustomAttributes(false)) {
