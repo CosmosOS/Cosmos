@@ -156,6 +156,7 @@ namespace Cosmos.IL2CPU {
                   System.Reflection.MethodBase xTargetMethod = null;
                   // TODO: In future make rule that all ctor plugs are called
                   // ctor by name, or use a new attrib
+                  // TODO: Skip FieldAccessAttribute if in impl
                   if (xTypesInst != null) {
                     if (string.Compare(xMethod.Name, "ctor", true) == 0) {
                       xTargetMethod = xTargetType.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesInst, null);

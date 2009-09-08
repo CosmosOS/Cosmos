@@ -9,10 +9,6 @@ namespace Indy.IL2CPU.CustomImplementation.System {
 	[Plug(Target = typeof(String))]
 	public static class StringImpl {
 
-		public static string Format(IFormatProvider aFormatProvider, string aFormat, object aArg) {
-			return "Format not implemented";
-		}
-
 		public static string Format(IFormatProvider aFormatProvider, string aFormat, object[] aArgs) {
 			string[] xStrings = new string[1 + 2 + (aArgs.Length * 7) - 1];
 			xStrings[0] = aFormat;

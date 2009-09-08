@@ -49,6 +49,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\source\Cosmos.Hardware.Plugs\Cosmos.Hardware.Plugs.csproj">
+      <Project>{BCB66614-20FE-4184-B214-FD42844AD8A6}</Project>
+      <Name>Cosmos.Hardware.Plugs</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\source\Cosmos\Cosmos.Kernel.Plugs\Cosmos.Kernel.Plugs.csproj">
       <Project>{B168BEDD-C6A6-4E7C-B9A5-0144286E9E42}</Project>
       <Name>Cosmos.Kernel.Plugs</Name>
