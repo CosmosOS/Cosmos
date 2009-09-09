@@ -26,5 +26,26 @@ namespace Cosmos.IL2CPU.Profiler {
     protected override void MethodEnd(MethodInfo aMethod) {
     }
 
+
+    protected override void Push(uint aValue) {
+      throw new NotImplementedException();
+    }
+
+    protected override void Push(string aLabelName) {
+      throw new NotImplementedException();
+    }
+
+    protected override void Call(System.Reflection.MethodBase aMethod) {
+      throw new NotImplementedException();
+    }
+
+    protected override void Move(string aDestLabelName, int aValue) {
+      throw new NotImplementedException();
+    }
+  
+    protected override int GetVTableEntrySize() {
+      return 0;
+    }
+  
   }
 }

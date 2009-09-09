@@ -101,6 +101,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 //select item ).Count();
                 int xGCFieldCount = xType.GetFields().Count( x => x.FieldType.IsValueType );
 
+              // todo: use a cleaner approach here. this class shouldnt assemble the string
                 string strTypeId = "VMT__TYPE_ID_HOLDER__" + xMethod.Value.DeclaringType.FullName;
 
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };

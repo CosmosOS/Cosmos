@@ -198,6 +198,8 @@ namespace Cosmos.IL2CPU {
           }
           //TODO: Look for Field plugs
         }
+        // register any "system" types:
+        QueueType(typeof(Array));
       }
 
       ExecuteInternal( ( System.Reflection.MethodInfo )RuntimeEngineRefs.InitializeApplicationRef, true );

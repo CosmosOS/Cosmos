@@ -165,5 +165,35 @@ namespace Cosmos.IL2CPU.X86 {
             aOutput.WriteLine("org 0x200000");
             base.FlushText(aOutput);
         }
+
+        protected override void Move(string aDestLabelName, int aValue) {
+          new Move {
+            DestinationRef = ElementReference.New(aDestLabelName),
+            DestinationIsIndirect = true,
+            SourceValue = (uint)aValue
+          };
+        }
+
+        protected override void Push(uint aValue) {
+          new Push {
+            DestinationValue = aValue
+          };
+        }
+
+        protected override void Push(string aLabelName) {
+          new Push {
+            DestinationRef = ElementReference.New(aLabelName)
+          };
+        }
+
+        protected override void Call(MethodBase aMethod) {
+          new IL2CPU.X86.Call {
+            DestinationLabel = CPU.MethodInfoLabelGenerator.GenerateLabelName(aMethod)
+          };
+        }
+
+        protected override int GetVTableEntrySize() {
+          return 16; // todo: retrieve from actual type info
+        }
   }
 }
