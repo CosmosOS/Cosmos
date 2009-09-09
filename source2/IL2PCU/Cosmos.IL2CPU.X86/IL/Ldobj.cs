@@ -44,8 +44,6 @@ namespace Cosmos.IL2CPU.X86.IL
                 default:
                         throw new Exception( "Remainder not supported!" );
             }
-            Assembler.Stack.Pop();
-
             //TODO: Push type not number
             Assembler.Stack.Push( new StackContents.Item( ( int )xSize.Size, xType.Value  ) );
         }

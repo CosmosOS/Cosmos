@@ -1,4 +1,5 @@
 using System;
+using Cosmos.IL2CPU.ILOpCodes;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -12,8 +13,9 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            var xSize = Assembler.Stack.Pop();
-            Ldelem_Ref.Assemble( Assembler, (uint)xSize.Size );
+          var xOpType = (OpType)aOpCode;
+          var xSize = SizeOfType(xOpType.Value);
+            Ldelem_Ref.Assemble( Assembler, (uint)xSize);
         }
 
 

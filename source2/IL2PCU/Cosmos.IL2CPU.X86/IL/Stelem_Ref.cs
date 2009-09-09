@@ -15,7 +15,10 @@ namespace Cosmos.IL2CPU.X86.IL
             // stack - 3 == the array
             // stack - 2 == the index
             // stack - 1 == the new value
-            uint xStackSize = aElementSize;
+          aAssembler.Stack.Pop();
+          aAssembler.Stack.Pop();
+          aAssembler.Stack.Pop();
+          uint xStackSize = aElementSize;
             if( xStackSize % 4 != 0 )
             {
                 xStackSize += 4 - xStackSize % 4;
@@ -45,7 +48,6 @@ namespace Cosmos.IL2CPU.X86.IL
             ( new Add( aAssembler ) ).Execute( aMethod, aOpCode );
 
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
-            aAssembler.Stack.Pop();
             for( int i = ( int )( aElementSize / 4 ) - 1; i >= 0; i -= 1 )
             {
                 new Comment( aAssembler, "Start 1 dword" );
@@ -78,9 +80,6 @@ namespace Cosmos.IL2CPU.X86.IL
 
             }
             new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 0x8 };
-            aAssembler.Stack.Pop();
-            aAssembler.Stack.Pop();
-            aAssembler.Stack.Pop();
         }
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {

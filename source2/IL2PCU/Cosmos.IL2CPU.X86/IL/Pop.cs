@@ -13,8 +13,13 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+          // todo: implement exception support.
+          if (Assembler.Stack.Count > 0) {
+            new CPUx86.Pop {
+              DestinationReg = CPUx86.Registers.EAX
+            };
             Assembler.Stack.Pop();
+          }
         }
 
     }

@@ -1,6 +1,7 @@
 using System;
 using CPUx86 = Cosmos.IL2CPU.X86;
 using Indy.IL2CPU;
+using Cosmos.IL2CPU.ILOpCodes;
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldelema )]
@@ -28,9 +29,9 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            var xSize = Assembler.Stack.Pop();
-
-            Assemble( Assembler, ( uint )xSize.Size );
+          var xOpType = (OpType)aOpCode;
+          var xSize = SizeOfType(xOpType.Value);
+            Assemble( Assembler, ( uint )xSize );
         }
 
 

@@ -67,7 +67,7 @@ namespace Cosmos.IL2CPU.X86.IL
             if( !xType.IsValueType )
             {
                 var xParams = xMethod.Value.GetParameters();
-                for( int i = 1; i < xParams.Length; i++ )
+                for( int i = 0; i < xParams.Length; i++ )
                 {
                     Assembler.Stack.Pop();
                 }

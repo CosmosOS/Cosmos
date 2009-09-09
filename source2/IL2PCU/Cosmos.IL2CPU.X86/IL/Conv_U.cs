@@ -38,7 +38,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     //EmitNotImplementedException(Assembler, GetServiceProvider(), "Conv_U: SourceSize " + xStackContent.Size + "not supported yet!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel);
                     throw new NotImplementedException();
             }
-
+            Assembler.Stack.Push(4, typeof(UIntPtr));
         }
 
 
