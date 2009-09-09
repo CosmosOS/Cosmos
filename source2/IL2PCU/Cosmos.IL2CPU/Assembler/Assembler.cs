@@ -140,7 +140,8 @@ namespace Cosmos.IL2CPU {
         } else {
           xILOp = mILOpsHi[xOpCodeVal & 0xFF];
         }
-        //mLog.Write ( "[" + xILOp.ToString() + "] \t Stack start: " + Stack.Count.ToString() );
+        mLog.WriteLine ( "[" + xILOp.ToString() + "] \t Stack start: " + Stack.Count.ToString() );
+        mLog.Flush();
         new Comment(this, "ILOp: " + xILOp.ToString());
         new Comment(this, "ILOpCode: " + xOpCode.OpCode.ToString());
         BeforeOp(aMethod, xOpCode);

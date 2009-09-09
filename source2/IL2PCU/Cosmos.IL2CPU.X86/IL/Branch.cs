@@ -23,7 +23,21 @@ namespace Cosmos.IL2CPU.X86.IL {
 
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
       var xStackContent = Assembler.Stack.Pop();
-      Assembler.Stack.Pop();
+      switch (aOpCode.OpCode) {
+        case ILOpCode.Code.Beq:
+        case ILOpCode.Code.Bge:
+        case ILOpCode.Code.Bgt:
+        case ILOpCode.Code.Bge_Un:
+        case ILOpCode.Code.Bgt_Un:
+        case ILOpCode.Code.Ble:
+        case ILOpCode.Code.Ble_Un:
+        case ILOpCode.Code.Bne_Un:
+        case ILOpCode.Code.Blt:
+        case ILOpCode.Code.Blt_Un:
+          Assembler.Stack.Pop();
+          break;
+      }
+      
       if (xStackContent.Size > 8) {
         throw new Exception("StackSize > 8 not supported");
       }
