@@ -109,6 +109,7 @@ namespace Cosmos.IL2CPU {
       new Comment(this, "---------------------------------------------------------");
       new Comment(this, "Type: " + aMethod.MethodBase.DeclaringType.ToString());
       new Comment(this, "Name: " + aMethod.MethodBase.Name);
+      new Comment(this, aMethod.Type.ToString());
       new Comment(this, "Plugged: " + (aMethod.PlugMethod == null ? "No" : "Yes"));
     }
 
