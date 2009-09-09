@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Indy.IL2CPU;
 using Indy.IL2CPU.Plugs; 
 
 namespace Cosmos.IL2CPU {
@@ -199,17 +200,17 @@ namespace Cosmos.IL2CPU {
         }
       }
 
-      //ExecuteInternal( ( System.Reflection.MethodInfo )RuntimeEngineRefs.InitializeApplicationRef );
-      //ExecuteInternal( ( System.Reflection.MethodInfo )RuntimeEngineRefs.FinalizeApplicationRef );
-      ////xScanner.QueueMethod(typeof(CosmosAssembler).GetMethod("PrintException"));
-      //ExecuteInternal( ( System.Reflection.MethodInfo )VTablesImplRefs.LoadTypeTableRef );
-      //ExecuteInternal( ( System.Reflection.MethodInfo )VTablesImplRefs.SetMethodInfoRef );
-      //ExecuteInternal( ( System.Reflection.MethodInfo )VTablesImplRefs.IsInstanceRef );
-      //ExecuteInternal( ( System.Reflection.MethodInfo )VTablesImplRefs.SetTypeInfoRef );
-      //ExecuteInternal( ( System.Reflection.MethodInfo )VTablesImplRefs.GetMethodAddressForTypeRef );
-      //ExecuteInternal( ( System.Reflection.MethodInfo )GCImplementationRefs.IncRefCountRef );
-      //ExecuteInternal( ( System.Reflection.MethodInfo )GCImplementationRefs.DecRefCountRef );
-      //ExecuteInternal( ( System.Reflection.MethodInfo )GCImplementationRefs.AllocNewObjectRef );
+      ExecuteInternal( ( System.Reflection.MethodInfo )RuntimeEngineRefs.InitializeApplicationRef, true );
+      ExecuteInternal( ( System.Reflection.MethodInfo )RuntimeEngineRefs.FinalizeApplicationRef, true );
+      ////xScanner.QueueMethod(typeof(CosmosAssembler).GetMethod("PrintException"), true);
+      ExecuteInternal( ( System.Reflection.MethodInfo )VTablesImplRefs.LoadTypeTableRef, true );
+      ExecuteInternal( ( System.Reflection.MethodInfo )VTablesImplRefs.SetMethodInfoRef, true );
+      ExecuteInternal( ( System.Reflection.MethodInfo )VTablesImplRefs.IsInstanceRef, true );
+      ExecuteInternal( ( System.Reflection.MethodInfo )VTablesImplRefs.SetTypeInfoRef, true );
+      ExecuteInternal( ( System.Reflection.MethodInfo )VTablesImplRefs.GetMethodAddressForTypeRef, true );
+      ExecuteInternal( ( System.Reflection.MethodInfo )GCImplementationRefs.IncRefCountRef, true );
+      ExecuteInternal( ( System.Reflection.MethodInfo )GCImplementationRefs.DecRefCountRef, true );
+      ExecuteInternal( ( System.Reflection.MethodInfo )GCImplementationRefs.AllocNewObjectRef, true );
 
       // Scan from entry point of this program
       //TODO: Now that we scan plugs first, we might need to put a jump
