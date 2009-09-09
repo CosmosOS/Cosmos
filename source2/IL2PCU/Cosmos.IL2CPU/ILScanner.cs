@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Indy.IL2CPU;
-using Indy.IL2CPU.Plugs; 
+using Indy.IL2CPU.Plugs;
 
 namespace Cosmos.IL2CPU {
   public class ILScanner {
@@ -75,7 +75,7 @@ namespace Cosmos.IL2CPU {
               if (xTargetType == null) {
                 xTargetType = Type.GetType(xTypeAttrib.TargetName, true);
               }
-              
+
               // See if there is a custom PlugMethod attribute
               // Plug implementations must be static and public, so 
               // we narrow the search to meet these requirements
@@ -127,9 +127,9 @@ namespace Cosmos.IL2CPU {
 
                 if (xEnabled) {
                   // for PlugMethodAttribute:
-                    //TODO: public string Signature;
-                    //[PlugMethod(Signature = "System_Void__Indy_IL2CPU_Assembler_Assembler__cctor__")]
-                    //TODO: public Type Assembler = null;
+                  //TODO: public string Signature;
+                  //[PlugMethod(Signature = "System_Void__Indy_IL2CPU_Assembler_Assembler__cctor__")]
+                  //TODO: public Type Assembler = null;
                   // Scan the plug implementation
                   uint xUID = ExecuteInternal(xMethod, true);
 
@@ -198,25 +198,25 @@ namespace Cosmos.IL2CPU {
           }
           //TODO: Look for Field plugs
         }
-        // register any "system" types:
-        QueueType(typeof(Array));
       }
 
-      ExecuteInternal( ( System.Reflection.MethodInfo )RuntimeEngineRefs.InitializeApplicationRef, true );
-      ExecuteInternal( ( System.Reflection.MethodInfo )RuntimeEngineRefs.FinalizeApplicationRef, true );
+      // Manually register certain system types
+      QueueType(typeof(Array));
+
+      // Pull in extra implementations, GC etc.
+      ExecuteInternal((System.Reflection.MethodInfo)RuntimeEngineRefs.InitializeApplicationRef, true);
+      ExecuteInternal((System.Reflection.MethodInfo)RuntimeEngineRefs.FinalizeApplicationRef, true);
       ////xScanner.QueueMethod(typeof(CosmosAssembler).GetMethod("PrintException"), true);
-      ExecuteInternal( ( System.Reflection.MethodInfo )VTablesImplRefs.LoadTypeTableRef, true );
-      ExecuteInternal( ( System.Reflection.MethodInfo )VTablesImplRefs.SetMethodInfoRef, true );
-      ExecuteInternal( ( System.Reflection.MethodInfo )VTablesImplRefs.IsInstanceRef, true );
-      ExecuteInternal( ( System.Reflection.MethodInfo )VTablesImplRefs.SetTypeInfoRef, true );
-      ExecuteInternal( ( System.Reflection.MethodInfo )VTablesImplRefs.GetMethodAddressForTypeRef, true );
-      ExecuteInternal( ( System.Reflection.MethodInfo )GCImplementationRefs.IncRefCountRef, true );
-      ExecuteInternal( ( System.Reflection.MethodInfo )GCImplementationRefs.DecRefCountRef, true );
-      ExecuteInternal( ( System.Reflection.MethodInfo )GCImplementationRefs.AllocNewObjectRef, true );
+      ExecuteInternal((System.Reflection.MethodInfo)VTablesImplRefs.LoadTypeTableRef, true);
+      ExecuteInternal((System.Reflection.MethodInfo)VTablesImplRefs.SetMethodInfoRef, true);
+      ExecuteInternal((System.Reflection.MethodInfo)VTablesImplRefs.IsInstanceRef, true);
+      ExecuteInternal((System.Reflection.MethodInfo)VTablesImplRefs.SetTypeInfoRef, true);
+      ExecuteInternal((System.Reflection.MethodInfo)VTablesImplRefs.GetMethodAddressForTypeRef, true);
+      ExecuteInternal((System.Reflection.MethodInfo)GCImplementationRefs.IncRefCountRef, true);
+      ExecuteInternal((System.Reflection.MethodInfo)GCImplementationRefs.DecRefCountRef, true);
+      ExecuteInternal((System.Reflection.MethodInfo)GCImplementationRefs.AllocNewObjectRef, true);
 
       // Scan from entry point of this program
-      //TODO: Now that we scan plugs first, we might need to put a jump
-      // in the asm to jump to the entry point?
       ExecuteInternal(aStartMethod, false);
     }
 
@@ -323,7 +323,7 @@ namespace Cosmos.IL2CPU {
       if (mKnownMethods.TryGetValue(aMethodBase, out xResult)) {
         return xResult;
       }
-      
+
       xResult = (uint)mMethodsToProcess.Count;
       mKnownMethods.Add(aMethodBase, xResult);
 
@@ -352,17 +352,15 @@ namespace Cosmos.IL2CPU {
       var xMethod = new MethodInfo(aMethodBase, xResult, xMethodType, xPlug);
       mMethodsToProcess.Add(xMethod);
 
-      //TODO: Might still need this one, see after we get assembly output again
-      //Im hoping the operand walking we have now will include this on its own.
-      //QueueType(aMethod.DeclaringType);
+      // Queue Types directly related to method
+      QueueType(aMethodBase.DeclaringType);
+      if (aMethodBase is System.Reflection.MethodInfo) {
+        QueueType(((System.Reflection.MethodInfo)aMethodBase).ReturnType);
+      }
+      foreach (var xParam in aMethodBase.GetParameters()) {
+        QueueType(xParam.ParameterType);
+      }
 
-      //var xMethodInfo = aMethod as MethodInfo;
-      //if (xMethodInfo != null) {
-      //  QueueType(xMethodInfo.ReturnType);
-      //}
-      //foreach (var xParam in aMethod.GetParameters()) {
-      //  QueueType(xParam.ParameterType);
-      //}
       return xResult;
     }
 
