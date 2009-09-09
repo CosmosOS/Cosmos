@@ -195,6 +195,18 @@ namespace Cosmos.IL2CPU {
         }
       }
 
+      //ExecuteInternal( ( System.Reflection.MethodInfo )RuntimeEngineRefs.InitializeApplicationRef );
+      //ExecuteInternal( ( System.Reflection.MethodInfo )RuntimeEngineRefs.FinalizeApplicationRef );
+      ////xScanner.QueueMethod(typeof(CosmosAssembler).GetMethod("PrintException"));
+      //ExecuteInternal( ( System.Reflection.MethodInfo )VTablesImplRefs.LoadTypeTableRef );
+      //ExecuteInternal( ( System.Reflection.MethodInfo )VTablesImplRefs.SetMethodInfoRef );
+      //ExecuteInternal( ( System.Reflection.MethodInfo )VTablesImplRefs.IsInstanceRef );
+      //ExecuteInternal( ( System.Reflection.MethodInfo )VTablesImplRefs.SetTypeInfoRef );
+      //ExecuteInternal( ( System.Reflection.MethodInfo )VTablesImplRefs.GetMethodAddressForTypeRef );
+      //ExecuteInternal( ( System.Reflection.MethodInfo )GCImplementationRefs.IncRefCountRef );
+      //ExecuteInternal( ( System.Reflection.MethodInfo )GCImplementationRefs.DecRefCountRef );
+      //ExecuteInternal( ( System.Reflection.MethodInfo )GCImplementationRefs.AllocNewObjectRef );
+
       // Scan from entry point of this program
       //TODO: Now that we scan plugs first, we might need to put a jump
       // in the asm to jump to the entry point?

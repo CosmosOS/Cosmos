@@ -27,18 +27,6 @@ namespace HelloWorld {
 
         var xEntryPoint = typeof(Program).GetMethod("Init", BindingFlags.Public | BindingFlags.Static);
         xScanner.Execute(xEntryPoint);
-
-        //xScanner.Execute( ( System.Reflection.MethodInfo )RuntimeEngineRefs.InitializeApplicationRef );
-        //xScanner.Execute( ( System.Reflection.MethodInfo )RuntimeEngineRefs.FinalizeApplicationRef );
-        ////xScanner.QueueMethod(typeof(CosmosAssembler).GetMethod("PrintException"));
-        //xScanner.Execute( ( System.Reflection.MethodInfo )VTablesImplRefs.LoadTypeTableRef );
-        //xScanner.Execute( ( System.Reflection.MethodInfo )VTablesImplRefs.SetMethodInfoRef );
-        //xScanner.Execute( ( System.Reflection.MethodInfo )VTablesImplRefs.IsInstanceRef );
-        //xScanner.Execute( ( System.Reflection.MethodInfo )VTablesImplRefs.SetTypeInfoRef );
-        //xScanner.Execute( ( System.Reflection.MethodInfo )VTablesImplRefs.GetMethodAddressForTypeRef );
-        //xScanner.Execute( ( System.Reflection.MethodInfo )GCImplementationRefs.IncRefCountRef );
-        //xScanner.Execute( ( System.Reflection.MethodInfo )GCImplementationRefs.DecRefCountRef );
-        //xScanner.Execute( ( System.Reflection.MethodInfo )GCImplementationRefs.AllocNewObjectRef );
       } finally {
         var xPath = Path.GetDirectoryName(typeof(Program).Assembly.Location);
         xPath = Path.Combine(xPath, @"..\..\Output.asm");
