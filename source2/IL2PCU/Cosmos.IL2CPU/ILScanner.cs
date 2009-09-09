@@ -200,9 +200,6 @@ namespace Cosmos.IL2CPU {
         }
       }
 
-      // Manually register certain system types
-      QueueType(typeof(Array));
-
       // Pull in extra implementations, GC etc.
       ExecuteInternal((System.Reflection.MethodInfo)RuntimeEngineRefs.InitializeApplicationRef, true);
       ExecuteInternal((System.Reflection.MethodInfo)RuntimeEngineRefs.FinalizeApplicationRef, true);
@@ -319,7 +316,7 @@ namespace Cosmos.IL2CPU {
     public uint QueueMethod(MethodBase aMethodBase, bool aIsPlug) {
       uint xResult;
 
-      // If already queued, skip it
+      // If already queued, skip it and return reference to it
       if (mKnownMethods.TryGetValue(aMethodBase, out xResult)) {
         return xResult;
       }
@@ -328,6 +325,7 @@ namespace Cosmos.IL2CPU {
       mKnownMethods.Add(aMethodBase, xResult);
 
       MethodInfo.TypeEnum xMethodType;
+      MethodInfo xPlug = null;
       if (aIsPlug) {
         xMethodType = MethodInfo.TypeEnum.Plug;
       } else {
@@ -342,24 +340,25 @@ namespace Cosmos.IL2CPU {
             xMethodType = MethodInfo.TypeEnum.NeedsPlug;
           }
         }
+
+        // See if method has a plug
+        uint xPlugId = 0;
+        if (mMethodPlugs.TryGetValue(aMethodBase, out xPlugId)) {
+          xPlug = mMethodsToProcess[(int)xPlugId];
+        }
+
+        // Queue Types directly related to method
+        QueueType(aMethodBase.DeclaringType);
+        if (aMethodBase is System.Reflection.MethodInfo) {
+          QueueType(((System.Reflection.MethodInfo)aMethodBase).ReturnType);
+        }
+        foreach (var xParam in aMethodBase.GetParameters()) {
+          QueueType(xParam.ParameterType);
+        }
       }
 
-      uint xPlugId = 0;
-      MethodInfo xPlug = null;
-      if (mMethodPlugs.TryGetValue(aMethodBase, out xPlugId)) {
-        xPlug = mMethodsToProcess[(int)xPlugId];
-      }
       var xMethod = new MethodInfo(aMethodBase, xResult, xMethodType, xPlug);
       mMethodsToProcess.Add(xMethod);
-
-      // Queue Types directly related to method
-      QueueType(aMethodBase.DeclaringType);
-      if (aMethodBase is System.Reflection.MethodInfo) {
-        QueueType(((System.Reflection.MethodInfo)aMethodBase).ReturnType);
-      }
-      foreach (var xParam in aMethodBase.GetParameters()) {
-        QueueType(xParam.ParameterType);
-      }
 
       return xResult;
     }
@@ -376,19 +375,19 @@ namespace Cosmos.IL2CPU {
     //}
 
     protected void QueueType(Type aType) {
-      if (!mTypesSet.Contains(aType)) {
-        mTypesSet.Add(aType);
-        mTypes.Add(aType);
-        if (aType.BaseType != null) {
-          QueueType(aType.BaseType);
-        }
-        // queue static constructor
-        //TODO: Should QueueMethod call QueueType with DeclaringType
-        // so its static constructors will get added?
-        foreach (var xCctor in aType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)) {
-          if (xCctor.DeclaringType == aType) {
-            QueueMethod(xCctor, false);
-          }
+      if (mTypesSet.Contains(aType)) {
+        return;
+      }
+      //+		aType	{Name = "TextInfo" FullName = "System.Globalization.TextInfo"}	System.Type {System.RuntimeType}
+      mTypesSet.Add(aType);
+      mTypes.Add(aType);
+      if (aType.BaseType != null) {
+        QueueType(aType.BaseType);
+      }
+      // queue static constructor
+      foreach (var xCctor in aType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)) {
+        if (xCctor.DeclaringType == aType) {
+          QueueMethod(xCctor, false);
         }
       }
     }
