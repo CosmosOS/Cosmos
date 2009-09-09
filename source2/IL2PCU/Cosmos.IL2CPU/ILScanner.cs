@@ -186,6 +186,10 @@ namespace Cosmos.IL2CPU {
                   if (xTargetMethod == null) {
                     throw new Exception("Plug target method not found.");
                   }
+                  if (mMethodPlugs.ContainsKey(xTargetMethod)) {
+                    var xTheMethod = mMethodsToProcess[(int)mMethodPlugs[xTargetMethod]];
+                    Console.Write("");
+                  }
                   mMethodPlugs.Add(xTargetMethod, xUID);
                 }
               }
@@ -213,7 +217,7 @@ namespace Cosmos.IL2CPU {
       ExecuteInternal(aStartMethod, false);
     }
 
-    private uint ExecuteInternal(System.Reflection.MethodInfo aStartMethod, bool aIsPlug) {
+    public uint ExecuteInternal(System.Reflection.MethodInfo aStartMethod, bool aIsPlug) {
       // See comment at mMethodsToProcessStart declaration
       mMethodsToProcessStart = mMethodsToProcess.Count;
       uint xResult = QueueMethod(aStartMethod, aIsPlug);

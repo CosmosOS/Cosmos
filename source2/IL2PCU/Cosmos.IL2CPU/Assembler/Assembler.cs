@@ -132,6 +132,9 @@ namespace Cosmos.IL2CPU {
       }
 
       MethodBegin(aMethod);
+      Stack.Clear();
+      mLog.WriteLine("Method '{0}'", aMethod.MethodBase.GetFullName());
+      mLog.Flush();
       foreach (var xOpCode in aOpCodes) {
         uint xOpCodeVal = (uint)xOpCode.OpCode;
         ILOp xILOp;
@@ -140,15 +143,14 @@ namespace Cosmos.IL2CPU {
         } else {
           xILOp = mILOpsHi[xOpCodeVal & 0xFF];
         }
-        mLog.WriteLine ( "[" + xILOp.ToString() + "] \t Stack start: " + Stack.Count.ToString() );
+        mLog.WriteLine ( "\t[" + xILOp.ToString() + "] \t Stack start: " + Stack.Count.ToString() );
         mLog.Flush();
-        new Comment(this, "ILOp: " + xILOp.ToString());
-        new Comment(this, "ILOpCode: " + xOpCode.OpCode.ToString());
+        new Comment(this, "[" + xILOp.ToString() + "]");
         BeforeOp(aMethod, xOpCode);
         xILOp.Execute(aMethod, xOpCode);
         AfterOp(aMethod, xOpCode);
-        //mLog.WriteLine( " end: " + Stack.Count.ToString() );
-        //mLog.Flush(); 
+        mLog.WriteLine( " end: " + Stack.Count.ToString() );
+        
       }
       MethodEnd(aMethod);
     }

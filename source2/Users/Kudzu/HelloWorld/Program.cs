@@ -27,6 +27,19 @@ namespace HelloWorld {
 
         var xEntryPoint = typeof(Program).GetMethod("Init", BindingFlags.Public | BindingFlags.Static);
         xScanner.Execute(xEntryPoint);
+
+        //xScanner.Execute( ( System.Reflection.MethodInfo )RuntimeEngineRefs.InitializeApplicationRef );
+        //xScanner.Execute( ( System.Reflection.MethodInfo )RuntimeEngineRefs.FinalizeApplicationRef );
+        ////xScanner.QueueMethod(typeof(CosmosAssembler).GetMethod("PrintException"));
+        //xScanner.Execute( ( System.Reflection.MethodInfo )VTablesImplRefs.LoadTypeTableRef );
+        //xScanner.Execute( ( System.Reflection.MethodInfo )VTablesImplRefs.SetMethodInfoRef );
+        //xScanner.Execute( ( System.Reflection.MethodInfo )VTablesImplRefs.IsInstanceRef );
+        //xScanner.Execute( ( System.Reflection.MethodInfo )VTablesImplRefs.SetTypeInfoRef );
+        xScanner.ExecuteInternal((System.Reflection.MethodInfo)VTablesImplRefs.GetMethodAddressForTypeRef, false);
+        xScanner.ExecuteInternal( ( System.Reflection.MethodInfo )GCImplementationRefs.IncRefCountRef , false);
+        xScanner.ExecuteInternal( ( System.Reflection.MethodInfo )GCImplementationRefs.DecRefCountRef, false );
+        xScanner.ExecuteInternal((System.Reflection.MethodInfo)GCImplementationRefs.AllocNewObjectRef, false);
+        Console.WriteLine("Method Count: {0}", xScanner.MethodCount);
       } finally {
         var xPath = Path.GetDirectoryName(typeof(Program).Assembly.Location);
         xPath = Path.Combine(xPath, @"..\..\Output.asm");

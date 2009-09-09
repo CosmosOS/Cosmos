@@ -59,6 +59,10 @@ namespace Cosmos.IL2CPU {
       return mStack.Peek();
     }
 
+    public void Clear() {
+      mStack.Clear();
+    }
+
     public Item Pop() {
       return mStack.Pop();
     }
