@@ -92,7 +92,7 @@ namespace Cosmos.IL2CPU {
           mLogWriter.WriteLine("<html><body>");
           foreach (var xList in mLogMap) {
             mLogWriter.WriteLine("<p></p>");
-            mLogWriter.WriteLine("<p><a name=\"Item" + xBookmarks[xList.Key].ToString() + "\">");
+            mLogWriter.WriteLine("<p><a href=\"#Item" + xBookmarks[xList.Key].ToString() + "\">");
             if (xList.Key == null) {
               mLogWriter.WriteLine("Unspecified Source");
             } else {
@@ -108,7 +108,7 @@ namespace Cosmos.IL2CPU {
               }
               mLogWriter.Write("<li>");
               if (xHref >= 0) {
-                mLogWriter.Write("<a href=\"#Item" + xHref.ToString() + "\">");
+                mLogWriter.Write("<a name=\"Item" + xHref.ToString() + "\">");
               }
               mLogWriter.Write(LogItemText(xItem.Item));
               if (xHref >= 0) {
