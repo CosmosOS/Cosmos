@@ -186,9 +186,6 @@ namespace Cosmos.IL2CPU {
                   //TODO: Check this against build options
                   //TODO: Two exclusive IsOnly's dont make sense
                   // refactor these as a positive rather than negative
-                  if (xMethod.Name == "GetStorage") {
-                    Console.Write("");
-                  }
                   xEnabled = xMethodAttrib.Enabled;
                   if (xEnabled) {
                     if (xMethodAttrib.IsMonoOnly) {
@@ -240,9 +237,6 @@ namespace Cosmos.IL2CPU {
 
                   // Add the method to the list of plugged methods
                   var xParams = xMethod.GetParameters();
-                  if (xMethod.GetFullName() == "System_Void__Indy_IL2CPU_IL_X86_CustomImplementations_System_EventHandlerImpl_ctor_System_UInt32__System_UInt32___System_UInt32___System_UInt32_") {
-                    Console.Write("");
-                  }
                   //TODO: Static method plugs dont seem to be separated 
                   // from instance ones, so the only way seems to be to try
                   // to match instance first, and if no match try static.
@@ -250,7 +244,7 @@ namespace Cosmos.IL2CPU {
                   // an explicit way to determine or mark the method 
                   // implementations.
                   //
-                  // Plug implementations take this as first argument
+                  // Plug implementations take "this" as first argument
                   // so when matching we don't include it in the search
                   Type[] xTypesInst = null;
                   var xActualParamCount = xParams.Length;

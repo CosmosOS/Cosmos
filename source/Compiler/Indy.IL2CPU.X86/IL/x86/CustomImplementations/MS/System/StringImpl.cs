@@ -75,7 +75,8 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.MS.System {
 		}
 	}
 
-	[Plug(Target = typeof(Indy.IL2CPU.CustomImplementation.System.StringImpl))]
+  //StringImpl2 plugs StringImpl which is also a plug????
+	//[Plug(Target = typeof(Indy.IL2CPU.CustomImplementation.System.StringImpl))]
 	public static class StringImpl2 {
 		public static unsafe uint GetStorage(uint* aStringPtr, [FieldAccess(Name = "$$Storage$$")]ref uint aStorage) {
 			return aStorage;

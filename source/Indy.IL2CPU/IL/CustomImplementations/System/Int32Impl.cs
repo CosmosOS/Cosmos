@@ -23,7 +23,6 @@ namespace Indy.IL2CPU.IL.CustomImplementations.System {
 			}
 			var xResult = UInt32Impl2.GetNumberString((uint)aValue, xIsNegative);
             if(xResult==null) {
-                global::System.Diagnostics.Debugger.Break();
                 return UInt32Impl2.GetNumberString((uint)aValue, xIsNegative);
             }
 		    return xResult;
