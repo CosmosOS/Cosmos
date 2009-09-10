@@ -63,6 +63,18 @@ namespace Cosmos.IL2CPU {
       mLogEnabled = true;
     }
 
+    protected string LogItemText(object aItem) {
+      if (aItem is MethodBase) {
+        var x = (MethodBase)aItem;
+        return x.GetFullName();
+      } else if (aItem is Type) {
+        var x = (Type)aItem;
+        return x.FullName;
+      } else {
+        return aItem.ToString();
+      }
+    }
+
     public void Dispose() {
       if (mLogEnabled) {
         // Create bookmarks, but also a dictionary that
@@ -84,7 +96,7 @@ namespace Cosmos.IL2CPU {
             if (xList.Key == null) {
               mLogWriter.WriteLine("Unspecified Source");
             } else {
-              mLogWriter.WriteLine(xList.Key.ToString());
+              mLogWriter.WriteLine(LogItemText(xList.Key));
             }
             mLogWriter.WriteLine("</a></p>");
 
@@ -98,7 +110,7 @@ namespace Cosmos.IL2CPU {
               if (xHref >= 0) {
                 mLogWriter.Write("<a href=\"#Item" + xHref.ToString() + "\">");
               }
-              mLogWriter.Write(xItem.Item.ToString());
+              mLogWriter.Write(LogItemText(xItem.Item));
               if (xHref >= 0) {
                 mLogWriter.Write("</a>");
               }
