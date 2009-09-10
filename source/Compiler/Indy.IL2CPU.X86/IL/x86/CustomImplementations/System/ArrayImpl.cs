@@ -27,8 +27,7 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System {
             if (aDimension != 0) { throw new NotSupportedException("Multidimensional array's are not yet supported!"); }
             return aThis.Length;
         }
-
-        [PlugMethod(Signature="System_Boolean__System_Array_TrySZBinarySearch_System_Array__System_Int32__System_Int32__System_Object__System_Int32__")]
+        [PlugMethod(Signature="System_Boolean__System_Array_TrySZBinarySearch_System_Array__System_Int32__System_Int32__System_Object___System_Int32_")]
 		public static unsafe bool TrySZBinarySearch(uint* aArray, uint sourceIndex, uint count, uint value, out uint retVal) {
 			return TrySZIndexOf(aArray, sourceIndex, count, value, out retVal);
 		}

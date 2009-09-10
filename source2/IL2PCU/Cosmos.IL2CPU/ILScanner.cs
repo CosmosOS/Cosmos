@@ -191,6 +191,9 @@ namespace Cosmos.IL2CPU {
                     // This merges methods and ctors, improve this later
                     var xTargetMethods = xTargetType.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Cast<MethodBase>().AsQueryable();
                     xTargetMethods = xTargetMethods.Union(xTargetType.GetConstructors(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic));
+                    if (xMethodAttrib.Signature != null && xMethodAttrib.Signature.IndexOf("tryszbinarysearch", StringComparison.InvariantCultureIgnoreCase)!=-1) {
+                      Console.Write("");
+                    }
                     foreach (var xTargetMethod in xTargetMethods) {
                       string sName = DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GenerateFullName(xTargetMethod));
                       if (string.Compare(sName, xMethodAttrib.Signature, true) == 0) {
@@ -221,6 +224,9 @@ namespace Cosmos.IL2CPU {
 
                   // Add the method to the list of plugged methods
                   var xParams = xMethod.GetParameters();
+                  if (xMethod.GetFullName() == "System_Void__Indy_IL2CPU_IL_X86_CustomImplementations_System_EventHandlerImpl_ctor_System_UInt32__System_UInt32___System_UInt32___System_UInt32_") {
+                    Console.Write("");
+                  }
                   //TODO: Static method plugs dont seem to be separated 
                   // from instance ones, so the only way seems to be to try
                   // to match instance first, and if no match try static.
@@ -231,20 +237,40 @@ namespace Cosmos.IL2CPU {
                   // Plug implementations take this as first argument
                   // so when matching we don't include it in the search
                   Type[] xTypesInst = null;
-                  Type[] xTypesStatic = new Type[xParams.Length];
+                  var xActualParamCount = xParams.Length;
+                  foreach (var xParam in xParams) {
+                    if (xParam.GetCustomAttributes(typeof(FieldAccessAttribute), false).Length > 0) {
+                      xActualParamCount--;
+                    }
+                  }
+                  Type[] xTypesStatic = new Type[xActualParamCount];
                   // If 0 params, has to be a static plug so we skip
                   // any copying and leave xTypesInst = null
                   // If 1 params, xTypesInst must be converted to Type[0]
-                  if (xParams.Length == 1) {
+                  if (xActualParamCount == 1) {
                     xTypesInst = new Type[0];
                     xTypesStatic[0] = xParams[0].ParameterType;
-                  } else if (xParams.Length > 1) {
-                    xTypesInst = new Type[xParams.Length - 1];
-                    for (int i = 0; i <= xTypesInst.Length - 1; i++) {
-                      xTypesInst[i] = xParams[i + 1].ParameterType;
+                  } else if (xActualParamCount > 1) {
+                    xTypesInst = new Type[xActualParamCount - 1];
+                    var xCurIdx = 0;
+                    foreach (var xParam in xParams.Skip(1)) {
+                      if (xParam.GetCustomAttributes(typeof(FieldAccessAttribute), false).Length > 0) {
+                        continue;
+                      }
+                      xTypesInst[xCurIdx] = xParam.ParameterType;
+                      xCurIdx++;
                     }
-                    for (int i = 0; i <= xTypesStatic.Length - 1; i++) {
-                      xTypesStatic[i] = xParams[i].ParameterType;
+                    xCurIdx = 0;
+                    foreach (var xParam in xParams) {
+                      if (xParam.GetCustomAttributes(typeof(FieldAccessAttribute), false).Length > 0) {
+                        xCurIdx++;
+                        continue;
+                      }
+                      if (xCurIdx >= xTypesStatic.Length) {
+                        break;
+                      }
+                      xTypesStatic[xCurIdx] = xParam.ParameterType;
+                      xCurIdx++;
                     }
                   }
                   System.Reflection.MethodBase xTargetMethod = null;
@@ -264,7 +290,8 @@ namespace Cosmos.IL2CPU {
                   }
                   // Not an instance method, try static
                   if (xTargetMethod == null) {
-                    if (string.Compare(xMethod.Name, "ctor", true) == 0) {
+                    if (string.Compare(xMethod.Name, "cctor", true) == 0
+                      || string.Compare(xMethod.Name, "ctor", true) == 0) {
                       xTargetMethod = xTargetType.GetConstructor(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesStatic, null);
                     } else {
                       xTargetMethod = xTargetType.GetMethod(xMethod.Name, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesStatic, null);

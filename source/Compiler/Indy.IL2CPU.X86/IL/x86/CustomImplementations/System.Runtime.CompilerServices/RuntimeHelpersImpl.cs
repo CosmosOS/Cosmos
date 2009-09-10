@@ -9,7 +9,7 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System.Runtime.CompilerServic
 	[Plug(Target = typeof(RuntimeHelpers))]
 	public static class RuntimeHelpersImpl {
 		[PlugMethod(Signature = "System_Void__System_Runtime_CompilerServices_RuntimeHelpers__cctor__")]
-		public static void CCtor() {
+		public static void cctor() {
 			//todo: do something
 		}
 

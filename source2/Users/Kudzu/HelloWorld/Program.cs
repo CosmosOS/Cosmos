@@ -13,6 +13,10 @@ namespace HelloWorld {
 		// Most users wont touch this. This will call the Cosmos Build tool
 		[STAThread]
 		static void Main(string[] args) {
+      // enforce assembly linking:
+      var xTheType = typeof(Indy.IL2CPU.IL.X86.CustomImplementations.System.Runtime.CompilerServices.RuntimeHelpersImpl);
+      
+      // end enforce assembly linking
       //Indy.IL2CPU.Engine.Execute()
       // which is called from Builder.RunEngine()
 
