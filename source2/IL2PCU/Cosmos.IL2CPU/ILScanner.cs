@@ -93,7 +93,14 @@ namespace Cosmos.IL2CPU {
         using (mLogWriter = new StreamWriter(mMapPathname, false)) {
           mLogWriter.WriteLine("<html><body>");
           foreach (var xList in mLogMap) {
-            mLogWriter.WriteLine("<p></p>");
+            mLogWriter.WriteLine("<hr>");
+
+            // Emit bookmarks above source, so when clicking links user doesn't need
+            // to constantly scroll up.
+            foreach (var xItem in xList.Value) {
+              mLogWriter.WriteLine("<a name=\"Item" + xBookmarks[xItem.Item].ToString() + "\"></a>");
+            }
+            
             int xHref;
             if (!xBookmarks.TryGetValue(xList.Key, out xHref)) {
               xHref = -1;
@@ -114,11 +121,7 @@ namespace Cosmos.IL2CPU {
 
             mLogWriter.WriteLine("<ul>");
             foreach (var xItem in xList.Value) {
-              mLogWriter.Write("<li>");
-              mLogWriter.Write("<a name=\"Item" + xBookmarks[xItem.Item].ToString() + "\">");
-              mLogWriter.Write(LogItemText(xItem.Item));
-              mLogWriter.Write("</a>");
-              mLogWriter.WriteLine("</li>");
+              mLogWriter.Write("<li>" + LogItemText(xItem.Item) + "</li>");
 
               mLogWriter.WriteLine("<ul>");
               mLogWriter.WriteLine("<li>" + xItem.SrcType + "</<li>");
