@@ -82,8 +82,10 @@ namespace Cosmos.IL2CPU {
         var xBookmarks = new Dictionary<object, int>();
         int xBookmark = 0;
         foreach (var xList in mLogMap) {
-          xBookmarks.Add(xList.Key, xBookmark);
-          xBookmark++;
+          foreach (var xItem in xList.Value) {
+            xBookmarks.Add(xItem.Item, xBookmark);
+            xBookmark++;
+          }
         }
 
         //TODO: Change to output HTML with src each item hyper linked to where
@@ -113,7 +115,7 @@ namespace Cosmos.IL2CPU {
             mLogWriter.WriteLine("<ul>");
             foreach (var xItem in xList.Value) {
               mLogWriter.Write("<li>");
-              mLogWriter.Write("<a name=\"Item" + xBookmarks[xList.Key].ToString() + "\">");
+              mLogWriter.Write("<a name=\"Item" + xBookmarks[xItem.Item].ToString() + "\">");
               mLogWriter.Write(LogItemText(xItem.Item));
               mLogWriter.Write("</a>");
               mLogWriter.WriteLine("</li>");
