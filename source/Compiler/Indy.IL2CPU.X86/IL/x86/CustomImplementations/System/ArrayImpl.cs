@@ -32,7 +32,7 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System {
 			return TrySZIndexOf(aArray, sourceIndex, count, value, out retVal);
 		}
 
-		[PlugMethod(Signature = "System_Boolean__System_Array_TrySZLastIndexOf_System_Array__System_Int32__System_Int32__System_Object__System_Int32__")]
+        [PlugMethod(Signature = "System_Boolean__System_Array_TrySZLastIndexOf_System_Array__System_Int32__System_Int32__System_Object___System_Int32_")]
 		public static unsafe bool TrySZLastIndexOf(uint* aArray, uint sourceIndex, uint count, uint value, out uint retVal) {
 			aArray += 4;
 			for (uint i = (sourceIndex + count); i > sourceIndex; i--) {
@@ -45,18 +45,18 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System {
 			return false;
 		}
 
-		[PlugMethod(Signature = "System_Boolean__System_Array_TrySZIndexOf_System_Array__System_Int32__System_Int32__System_Object__System_Int32__")]
-		public static unsafe bool TrySZIndexOf(uint* aArray, uint sourceIndex, uint count, uint value, out uint retVal) {
-			aArray += 4;
-			for (uint i = sourceIndex; i < (sourceIndex + count); i++) {
-				if (aArray[i] == value) {
-					retVal = i;
-					return true;
-				}
-			}
-			retVal = 0;
-			return false;
-		}
+    //[PlugMethod(Signature = "System_Boolean__System_Array_TrySZIndexOf_System_Array__System_Int32__System_Int32__System_Object__System_Int32__")]
+        private static unsafe bool TrySZIndexOf(uint* aArray, uint sourceIndex, uint count, uint value, out uint retVal) {
+          aArray += 4;
+          for (uint i = sourceIndex; i < (sourceIndex + count); i++) {
+            if (aArray[i] == value) {
+              retVal = i;
+              return true;
+            }
+          }
+          retVal = 0;
+          return false;
+        }
 
 		[PlugMethod(Assembler = typeof(Assemblers.Array_InternalCopy))]
 		public static void Copy(Array sourceArray, int sourceIndex, Array destinationArray, int destinationIndex, int length, bool reliable) {

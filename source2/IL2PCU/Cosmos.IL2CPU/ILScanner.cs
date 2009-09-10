@@ -165,6 +165,10 @@ namespace Cosmos.IL2CPU {
                 xTargetType = Type.GetType(xTypeAttrib.TargetName, true);
               }
 
+              if (xTypeAttrib.IsMonoOnly) {
+                continue;
+              }
+
               // See if there is a custom PlugMethod attribute
               // Plug implementations must be static and public, so 
               // we narrow the search to meet these requirements
@@ -182,38 +186,47 @@ namespace Cosmos.IL2CPU {
                   //TODO: Check this against build options
                   //TODO: Two exclusive IsOnly's dont make sense
                   // refactor these as a positive rather than negative
-                  if (xMethodAttrib.IsMonoOnly) {
-                    xEnabled = false;
-                  } else if (xMethodAttrib.Signature != null) {
-                    // System_Void__Indy_IL2CPU_Assembler_Assembler__cctor__
-                    // If signature exists, the search is slow. Signatures
-                    // are infrequent though, so for now we just go slow method
-                    // and have not optimized or cached this info. When we
-                    // redo the plugs, we can fix this.
-                    //
-                    // This merges methods and ctors, improve this later
-                    var xTargetMethods = xTargetType.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Cast<MethodBase>().AsQueryable();
-                    xTargetMethods = xTargetMethods.Union(xTargetType.GetConstructors(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic));
-                    if (xMethodAttrib.Signature != null && xMethodAttrib.Signature.IndexOf("tryszbinarysearch", StringComparison.InvariantCultureIgnoreCase)!=-1) {
-                      Console.Write("");
-                    }
-                    foreach (var xTargetMethod in xTargetMethods) {
-                      string sName = DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GenerateFullName(xTargetMethod));
-                      if (string.Compare(sName, xMethodAttrib.Signature, true) == 0) {
-                        uint xUID = ExecuteInternal(xType, "Plug", xMethod, true);
-                        mMethodPlugs.Add(xTargetMethod, xUID);
-                        // Mark as disabled, because we already handled it
-                        xEnabled = false;
-                        break;
+                  if (xMethod.Name == "GetStorage") {
+                    Console.Write("");
+                  }
+                  xEnabled = xMethodAttrib.Enabled;
+                  if (xEnabled) {
+                    if (xMethodAttrib.IsMonoOnly) {
+                      xEnabled = false;
+                    } else if (xMethodAttrib.Signature != null) {
+                      // System_Void__Indy_IL2CPU_Assembler_Assembler__cctor__
+                      // If signature exists, the search is slow. Signatures
+                      // are infrequent though, so for now we just go slow method
+                      // and have not optimized or cached this info. When we
+                      // redo the plugs, we can fix this.
+                      //
+                      // This merges methods and ctors, improve this later
+                      var xTargetMethods = xTargetType.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Cast<MethodBase>().AsQueryable();
+                      xTargetMethods = xTargetMethods.Union(xTargetType.GetConstructors(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic));
+                      if (xMethodAttrib.Signature != null && xMethodAttrib.Signature.IndexOf("TrySZIndexOf", StringComparison.InvariantCultureIgnoreCase) != -1) {
+                        Console.Write("");
                       }
+                      foreach (var xTargetMethod in xTargetMethods) {
+                        string sName = DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GenerateFullName(xTargetMethod));
+                        if (xTargetMethod.Name == "TrySZIndexOf") {
+                          Console.Write("");
+                        }
+                        if (string.Compare(sName, xMethodAttrib.Signature, true) == 0) {
+                          uint xUID = ExecuteInternal(xType, "Plug", xMethod, true);
+                          mMethodPlugs.Add(xTargetMethod, xUID);
+                          // Mark as disabled, because we already handled it
+                          xEnabled = false;
+                          break;
+                        }
+                      }
+                      // if still enabled, we didn't find our method
+                      if (xEnabled) {
+                        // todo: more precise error: imagine having a 100K line project, and this error happens...
+                        throw new Exception("Plug target method not found.");
+                      }
+                    } else {
+                      xEnabled = xMethodAttrib.Enabled;
                     }
-                    // if still enabled, we didn't find our method
-                    if (xEnabled) {
-                      // todo: more precise error: imagine having a 100K line project, and this error happens...
-                      throw new Exception("Plug target method not found.");
-                    }
-                  } else {
-                    xEnabled = xMethodAttrib.Enabled;
                   }
                 }
 
