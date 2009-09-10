@@ -66,7 +66,7 @@ namespace Cosmos.IL2CPU {
     protected string LogItemText(object aItem) {
       if (aItem is MethodBase) {
         var x = (MethodBase)aItem;
-        return "Method: " + x.DeclaringType. + "." + x.Name + "<br>" + x.GetFullName();
+        return "Method: " + x.DeclaringType + "." + x.Name + "<br>" + x.GetFullName();
       } else if (aItem is Type) {
         var x = (Type)aItem;
         return "Type: " + x.FullName;
