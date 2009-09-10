@@ -66,12 +66,12 @@ namespace Cosmos.IL2CPU {
     protected string LogItemText(object aItem) {
       if (aItem is MethodBase) {
         var x = (MethodBase)aItem;
-        return x.GetFullName();
+        return "Method: " + x.GetFullName();
       } else if (aItem is Type) {
         var x = (Type)aItem;
-        return x.FullName;
+        return "Type: " + x.FullName;
       } else {
-        return aItem.ToString();
+        return "Other: " + aItem.ToString();
       }
     }
 
