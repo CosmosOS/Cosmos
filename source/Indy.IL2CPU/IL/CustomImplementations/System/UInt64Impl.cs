@@ -5,7 +5,8 @@ using System.Text;
 using Indy.IL2CPU.Plugs;
 
 namespace Indy.IL2CPU.IL.CustomImplementations.System {
-	[Plug(Target = typeof(UInt64))]
+  // Not supported yet
+	//[Plug(Target = typeof(UInt64))]
 	public class UInt64Impl {
 		public static string ToString(ref ulong aThis) {
       return UInt64Impl2.GetNumberString(aThis, false);

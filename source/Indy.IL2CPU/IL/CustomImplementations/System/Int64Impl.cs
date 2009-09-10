@@ -5,7 +5,8 @@ using System.Text;
 using Indy.IL2CPU.Plugs;
 
 namespace Indy.IL2CPU.IL.CustomImplementations.System {
-  [Plug(Target = typeof(Int64))]
+  // Not supported yet, so commentd out.
+  //[Plug(Target = typeof(Int64))]
   public class Int64Impl {
     public static string ToString(ref long aThis) {
       return Int64Impl2.GetNumberString(aThis);

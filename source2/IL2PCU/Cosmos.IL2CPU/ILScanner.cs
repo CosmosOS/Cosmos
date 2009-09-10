@@ -143,16 +143,13 @@ namespace Cosmos.IL2CPU {
       mThrowHelper = typeof(object).Assembly.GetType("System.ThrowHelper");
     }
 
-    public void Execute(System.Reflection.MethodInfo aStartMethod) {
+    protected void LoadPlugs() {
       // TODO: New plug system, common plug base which all descend from
       // It can have a "this" member and then we
       // can separate static from instance by the static keyword
       // and ctors can be static "ctor" by name
       // Will still need plug attrib though to specify target
       // Also need to handle asm plugs, but those will be different anyways
-      //
-      // Scan plugs first, so when we scan from 
-      // entry point plugs will be found.
       foreach (var xAsm in AppDomain.CurrentDomain.GetAssemblies()) {
         foreach (var xType in xAsm.GetTypes()) {
           foreach (var xAttrib1 in xType.GetCustomAttributes(false)) {
@@ -322,6 +319,12 @@ namespace Cosmos.IL2CPU {
           //TODO: Look for Field plugs
         }
       }
+    }
+
+    public void Execute(System.Reflection.MethodInfo aStartMethod) {
+      // Scan plugs first, so when we scan from 
+      // entry point plugs will be found.
+      LoadPlugs();
 
       // Pull in extra implementations, GC etc.
       ExecuteInternal(null, "Explicit Entry", (System.Reflection.MethodInfo)RuntimeEngineRefs.InitializeApplicationRef, true);
