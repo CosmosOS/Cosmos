@@ -16,6 +16,9 @@ namespace HelloWorld {
       //Indy.IL2CPU.Engine.Execute()
       // which is called from Builder.RunEngine()
 
+      var xOutPath = Path.GetDirectoryName(typeof(Program).Assembly.Location);
+      xOutPath = Path.Combine(xOutPath, @"..\..\");
+
       //TODO: Move new build logic into "new sort".
       // Build stuff is all UI, launching QEMU, making ISO etc.
       // IL2CPU should only contain scanning and assembling of binary files
@@ -23,27 +26,16 @@ namespace HelloWorld {
       try {
         xAsmblr.Initialize();
 
-        var xScanner = new ILScanner(xAsmblr);
+        using (var xScanner = new ILScanner(xAsmblr)) {
+          xScanner.EnableLogging(xOutPath + "Scanner Map.txt");
 
-        var xEntryPoint = typeof(Program).GetMethod("Init", BindingFlags.Public | BindingFlags.Static);
-        xScanner.Execute(xEntryPoint);
-        
-        //xScanner.Execute( ( System.Reflection.MethodInfo )RuntimeEngineRefs.InitializeApplicationRef );
-        //xScanner.Execute( ( System.Reflection.MethodInfo )RuntimeEngineRefs.FinalizeApplicationRef );
-        ////xScanner.QueueMethod(typeof(CosmosAssembler).GetMethod("PrintException"));
-        //xScanner.Execute( ( System.Reflection.MethodInfo )VTablesImplRefs.LoadTypeTableRef );
-        //xScanner.Execute( ( System.Reflection.MethodInfo )VTablesImplRefs.SetMethodInfoRef );
-        //xScanner.Execute( ( System.Reflection.MethodInfo )VTablesImplRefs.IsInstanceRef );
-        //xScanner.Execute( ( System.Reflection.MethodInfo )VTablesImplRefs.SetTypeInfoRef );
-        xScanner.ExecuteInternal((System.Reflection.MethodInfo)VTablesImplRefs.GetMethodAddressForTypeRef, false);
-        xScanner.ExecuteInternal( ( System.Reflection.MethodInfo )GCImplementationRefs.IncRefCountRef , false);
-        xScanner.ExecuteInternal( ( System.Reflection.MethodInfo )GCImplementationRefs.DecRefCountRef, false );
-        xScanner.ExecuteInternal((System.Reflection.MethodInfo)GCImplementationRefs.AllocNewObjectRef, false);
-        Console.WriteLine("Method Count: {0}", xScanner.MethodCount);
+          var xEntryPoint = typeof(Program).GetMethod("Init", BindingFlags.Public | BindingFlags.Static);
+          xScanner.Execute(xEntryPoint);
+
+          Console.WriteLine("Method Count: {0}", xScanner.MethodCount);
+        }
       } finally {
-        var xPath = Path.GetDirectoryName(typeof(Program).Assembly.Location);
-        xPath = Path.Combine(xPath, @"..\..\Output.asm");
-        using (var xOut = File.CreateText(xPath)) {
+        using (var xOut = File.CreateText(xOutPath + "Output.asm")) {
           xAsmblr.FlushText(xOut);
         }
       }

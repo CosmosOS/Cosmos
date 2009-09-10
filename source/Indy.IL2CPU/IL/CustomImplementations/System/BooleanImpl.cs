@@ -5,7 +5,7 @@ using System.Text;
 using Indy.IL2CPU.Plugs;
 
 namespace Indy.IL2CPU.IL.CustomImplementations.System {
-  [Plug(Target = typeof(bool))]
+  //[Plug(Target = typeof(bool))]
   public static class BooleanImpl {
     //NOTE; Not used any more??
     //public static string ToString(ref Boolean aThis)

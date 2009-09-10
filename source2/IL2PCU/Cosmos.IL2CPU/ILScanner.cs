@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -7,7 +8,7 @@ using Indy.IL2CPU;
 using Indy.IL2CPU.Plugs;
 
 namespace Cosmos.IL2CPU {
-  public class ILScanner {
+  public class ILScanner : IDisposable {
     // Here are old comments - we moved to a Dictionary + List, which is much better esp
     // now that we need lookups to the indexes
     // List is needed for processing.
@@ -24,7 +25,7 @@ namespace Cosmos.IL2CPU {
     // need to hash on some UID instead of the refernce. Do not use strings, they are
     // super slow.
     //	TODO: We need to scan for static fields too. 
-    private Dictionary<MethodBase, uint> mKnownMethods = new Dictionary<MethodBase, uint>();
+    protected Dictionary<MethodBase, uint> mKnownMethods = new Dictionary<MethodBase, uint>();
     // We need a separate list because we cannot iterate keys by index, and any functions
     // to get a list of keys will do a on demand copy, which won't meet our needs either
     // becuase we have to walk the list dynamically as it grows, which is also why we need to
@@ -32,18 +33,56 @@ namespace Cosmos.IL2CPU {
     // We also need a separate list becuase Execute is called multiple
     // times to process plugs and so known methods accumulates,
     // but we dont want to reproces old methods from previous Execute calls.
-    private List<MethodInfo> mMethodsToProcess = new List<MethodInfo>();
+    protected List<MethodInfo> mMethodsToProcess = new List<MethodInfo>();
     // ExecuteInternal is called multiple times, we don't want to rescan
     // ones that are "finished" so we update this "pointer"
-    private int mMethodsToProcessStart;
+    protected int mMethodsToProcessStart;
     // List of plug implementations.
     // Key: MethodBase of targetted method
     // Value: index into mMethodsToProcess
-    private Dictionary<MethodBase, uint> mMethodPlugs = new Dictionary<MethodBase, uint>();
+    protected Dictionary<MethodBase, uint> mMethodPlugs = new Dictionary<MethodBase, uint>();
 
     //TODO: Likely change this to be like Methods to be more efficient. Might only need Dictionary
-    private HashSet<Type> mTypesSet = new HashSet<Type>();
-    private List<Type> mTypes = new List<Type>();
+    protected HashSet<Type> mTypesSet = new HashSet<Type>();
+    protected List<Type> mTypes = new List<Type>();
+
+    // Logging
+    // Only use for debugging and profiling.
+    protected bool mLogEnabled = false;
+    protected string mMapPathname;
+    protected TextWriter mLogWriter;
+    protected struct LogItem {
+      public string SrcType;
+      public object Item;
+    }
+    protected Dictionary<object, List<LogItem>> mLogMap;
+
+    public void EnableLogging(string aPathname) {
+      mLogMap = new Dictionary<object, List<LogItem>>();
+      mMapPathname = aPathname;
+      mLogEnabled = true;
+    }
+
+    public void Dispose() {
+      if (mLogEnabled) {
+        //TODO: Change to output HTML with src each item hyper linked to where
+        // it is listed under another source
+        using (mLogWriter = new StreamWriter(mMapPathname, false)) {
+          foreach (var xList in mLogMap) {
+            mLogWriter.WriteLine();
+            if (xList.Key == null) {
+              mLogWriter.WriteLine("Unspecified Source");
+            } else {
+              mLogWriter.WriteLine(xList.Key.ToString());
+            }
+            foreach (var xItem in xList.Value) {
+              mLogWriter.WriteLine("  " + xItem.Item.ToString());
+              mLogWriter.WriteLine("    " + xItem.SrcType);
+            }
+          }
+        }
+      }
+    }
 
     protected ILReader mReader;
     protected Assembler mAsmblr;
@@ -108,7 +147,7 @@ namespace Cosmos.IL2CPU {
                     foreach (var xTargetMethod in xTargetMethods) {
                       string sName = DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GenerateFullName(xTargetMethod));
                       if (string.Compare(sName, xMethodAttrib.Signature, true) == 0) {
-                        uint xUID = ExecuteInternal(xMethod, true);
+                        uint xUID = ExecuteInternal(xType, "Plug", xMethod, true);
                         mMethodPlugs.Add(xTargetMethod, xUID);
                         // Mark as disabled, because we already handled it
                         xEnabled = false;
@@ -131,7 +170,7 @@ namespace Cosmos.IL2CPU {
                   //[PlugMethod(Signature = "System_Void__Indy_IL2CPU_Assembler_Assembler__cctor__")]
                   //TODO: public Type Assembler = null;
                   // Scan the plug implementation
-                  uint xUID = ExecuteInternal(xMethod, true);
+                  uint xUID = ExecuteInternal(xType, "Plug", xMethod, true);
 
                   // Add the method to the list of plugged methods
                   var xParams = xMethod.GetParameters();
@@ -201,26 +240,33 @@ namespace Cosmos.IL2CPU {
       }
 
       // Pull in extra implementations, GC etc.
-      ExecuteInternal((System.Reflection.MethodInfo)RuntimeEngineRefs.InitializeApplicationRef, true);
-      ExecuteInternal((System.Reflection.MethodInfo)RuntimeEngineRefs.FinalizeApplicationRef, true);
+      ExecuteInternal(null, "Explicit Entry", (System.Reflection.MethodInfo)RuntimeEngineRefs.InitializeApplicationRef, true);
+      ExecuteInternal(null, "Explicit Entry", (System.Reflection.MethodInfo)RuntimeEngineRefs.FinalizeApplicationRef, true);
       ////xScanner.QueueMethod(typeof(CosmosAssembler).GetMethod("PrintException"), true);
-      ExecuteInternal((System.Reflection.MethodInfo)VTablesImplRefs.LoadTypeTableRef, true);
-      ExecuteInternal((System.Reflection.MethodInfo)VTablesImplRefs.SetMethodInfoRef, true);
-      ExecuteInternal((System.Reflection.MethodInfo)VTablesImplRefs.IsInstanceRef, true);
-      ExecuteInternal((System.Reflection.MethodInfo)VTablesImplRefs.SetTypeInfoRef, true);
-      ExecuteInternal((System.Reflection.MethodInfo)VTablesImplRefs.GetMethodAddressForTypeRef, true);
-      ExecuteInternal((System.Reflection.MethodInfo)GCImplementationRefs.IncRefCountRef, true);
-      ExecuteInternal((System.Reflection.MethodInfo)GCImplementationRefs.DecRefCountRef, true);
-      ExecuteInternal((System.Reflection.MethodInfo)GCImplementationRefs.AllocNewObjectRef, true);
+      ExecuteInternal(null, "Explicit Entry", (System.Reflection.MethodInfo)VTablesImplRefs.LoadTypeTableRef, true);
+      ExecuteInternal(null, "Explicit Entry", (System.Reflection.MethodInfo)VTablesImplRefs.SetMethodInfoRef, true);
+      ExecuteInternal(null, "Explicit Entry", (System.Reflection.MethodInfo)VTablesImplRefs.IsInstanceRef, true);
+      ExecuteInternal(null, "Explicit Entry", (System.Reflection.MethodInfo)VTablesImplRefs.SetTypeInfoRef, true);
+      ExecuteInternal(null, "Explicit Entry", (System.Reflection.MethodInfo)VTablesImplRefs.GetMethodAddressForTypeRef, true);
+      ExecuteInternal(null, "Explicit Entry", (System.Reflection.MethodInfo)GCImplementationRefs.IncRefCountRef, true);
+      ExecuteInternal(null, "Explicit Entry", (System.Reflection.MethodInfo)GCImplementationRefs.DecRefCountRef, true);
+      ExecuteInternal(null, "Explicit Entry", (System.Reflection.MethodInfo)GCImplementationRefs.AllocNewObjectRef, true);
+      //xScanner.Execute( ( System.Reflection.MethodInfo )RuntimeEngineRefs.InitializeApplicationRef );
+      //xScanner.Execute( ( System.Reflection.MethodInfo )RuntimeEngineRefs.FinalizeApplicationRef );
+      ////xScanner.QueueMethod(typeof(CosmosAssembler).GetMethod("PrintException"));
+      //xScanner.Execute( ( System.Reflection.MethodInfo )VTablesImplRefs.LoadTypeTableRef );
+      //xScanner.Execute( ( System.Reflection.MethodInfo )VTablesImplRefs.SetMethodInfoRef );
+      //xScanner.Execute( ( System.Reflection.MethodInfo )VTablesImplRefs.IsInstanceRef );
+      //xScanner.Execute( ( System.Reflection.MethodInfo )VTablesImplRefs.SetTypeInfoRef );
 
       // Scan from entry point of this program
-      ExecuteInternal(aStartMethod, false);
+      ExecuteInternal(null, "Entry Point", aStartMethod, false);
     }
 
-    public uint ExecuteInternal(System.Reflection.MethodInfo aStartMethod, bool aIsPlug) {
+    public uint ExecuteInternal(object aSrc, string aSrcType, System.Reflection.MethodInfo aStartMethod, bool aIsPlug) {
       // See comment at mMethodsToProcessStart declaration
       mMethodsToProcessStart = mMethodsToProcess.Count;
-      uint xResult = QueueMethod(aStartMethod, aIsPlug);
+      uint xResult = QueueMethod(aSrc, aSrcType, aStartMethod, aIsPlug);
 
       // Cannot use foreach, the list changes as we go
       // and we dont start at 0
@@ -262,7 +308,7 @@ namespace Cosmos.IL2CPU {
                 if (xNewMethod != null) {
                   if (!xNewMethod.IsAbstract) {
                     // abstract methods dont have an implementation
-                    QueueMethod(xNewMethod, false);
+                    QueueMethod(xMethodBase.DeclaringType, "SubClass", xNewMethod, false);
                   }
                 }
               }
@@ -283,9 +329,9 @@ namespace Cosmos.IL2CPU {
         foreach (var xOpCode in xOpCodes) {
           //InstructionCount++;
           if (xOpCode is ILOpCodes.OpMethod) {
-            ((ILOpCodes.OpMethod)xOpCode).ValueUID = QueueMethod(((ILOpCodes.OpMethod)xOpCode).Value, false);
+            ((ILOpCodes.OpMethod)xOpCode).ValueUID = QueueMethod(aMethodInfo.MethodBase, "Call", ((ILOpCodes.OpMethod)xOpCode).Value, false);
           } else if (xOpCode is ILOpCodes.OpType) {
-            QueueType(((ILOpCodes.OpType)xOpCode).Value);
+            QueueType(aMethodInfo.MethodBase, "OpCode Value", ((ILOpCodes.OpType)xOpCode).Value);
           }
         }
 
@@ -313,12 +359,16 @@ namespace Cosmos.IL2CPU {
     // how it works.
     private Type mThrowHelper;
 
-    public uint QueueMethod(MethodBase aMethodBase, bool aIsPlug) {
+    public uint QueueMethod(object aSrc, string aSrcType, MethodBase aMethodBase
+      , bool aIsPlug)
+    {
       uint xResult;
 
       // If already queued, skip it and return reference to it
       if (mKnownMethods.TryGetValue(aMethodBase, out xResult)) {
         return xResult;
+      } else if (mLogEnabled) {
+        LogMapPoint(aSrc, aSrcType, aMethodBase);
       }
 
       xResult = (uint)mMethodsToProcess.Count;
@@ -348,12 +398,12 @@ namespace Cosmos.IL2CPU {
         }
 
         // Queue Types directly related to method
-        QueueType(aMethodBase.DeclaringType);
+        QueueType(aMethodBase, "Declaring Type", aMethodBase.DeclaringType);
         if (aMethodBase is System.Reflection.MethodInfo) {
-          QueueType(((System.Reflection.MethodInfo)aMethodBase).ReturnType);
+          QueueType(aMethodBase, "Return Type", ((System.Reflection.MethodInfo)aMethodBase).ReturnType);
         }
         foreach (var xParam in aMethodBase.GetParameters()) {
-          QueueType(xParam.ParameterType);
+          QueueType(aMethodBase, "Parameter", xParam.ParameterType);
         }
       }
 
@@ -374,20 +424,36 @@ namespace Cosmos.IL2CPU {
     //  }
     //}
 
-    protected void QueueType(Type aType) {
+    protected void LogMapPoint(object aSrc, string aSrcType, object aItem) {
+      var xLogItem = new LogItem() {
+        SrcType = aSrcType,
+        Item = aItem
+      };
+      List<LogItem> xList;
+      if (!mLogMap.TryGetValue(aSrc, out xList)) {
+        xList = new List<LogItem>();
+        mLogMap.Add(aSrc, xList);
+      }
+      xList.Add(xLogItem);
+    }
+
+    protected void QueueType(object aSrc, string aSrcType, Type aType) {
       if (mTypesSet.Contains(aType)) {
         return;
+      } else if (mLogEnabled) {
+        LogMapPoint(aSrc, aSrcType, aType);
       }
+
       //+		aType	{Name = "TextInfo" FullName = "System.Globalization.TextInfo"}	System.Type {System.RuntimeType}
       mTypesSet.Add(aType);
       mTypes.Add(aType);
       if (aType.BaseType != null) {
-        QueueType(aType.BaseType);
+        QueueType(aType, "Base Type", aType.BaseType);
       }
       // queue static constructor
       foreach (var xCctor in aType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)) {
         if (xCctor.DeclaringType == aType) {
-          QueueMethod(xCctor, false);
+          QueueMethod(aType, "Static Constructor", xCctor, false);
         }
       }
     }
