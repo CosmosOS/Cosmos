@@ -270,7 +270,7 @@ namespace Cosmos.IL2CPU {
     protected abstract void Move(string aDestLabelName, int aValue);
     protected abstract int GetVTableEntrySize();
 
-    private void GenerateVMTCode(IList<Type> aTypes, IList<MethodBase> aMethods) {
+    public void GenerateVMTCode(IList<Type> aTypes, IList<MethodBase> aMethods) {
       // initialization
       var xSetTypeInfoRef = VTablesImplRefs.SetTypeInfoRef;
       var xSetMethodInfoRef = VTablesImplRefs.SetMethodInfoRef;
@@ -374,11 +374,11 @@ namespace Cosmos.IL2CPU {
           }
         }
         if (!xType.IsInterface) {
-          //Move(GetService<IMetaDataInfoService>().GetTypeIdLabel(xType), i);
+          Move("VMT__TYPE_ID_HOLDER__" + xType.FullName, i);
           Assembler.mCurrentInstance.DataMembers.Add(
               new DataMember("VMT__TYPE_ID_HOLDER__" + xType.FullName, new int[] { i }));
           Push((uint)xBaseIndex.Value);
-          //Push("0" + xEmittedMethods.Count.ToString("X") + "h");
+          Push("0" + xEmittedMethods.Count.ToString("X") + "h");
           xData = new byte[16 + (xEmittedMethods.Count * 4)];
           xTemp = BitConverter.GetBytes(aTypes.IndexOf(typeof(Array)));
           Array.Copy(xTemp, 0, xData, 0, 4);

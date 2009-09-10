@@ -292,6 +292,8 @@ namespace Cosmos.IL2CPU {
 
       // Scan from entry point of this program
       ExecuteInternal(null, "Entry Point", aStartMethod, false);
+      mAsmblr.GenerateVMTCode(mTypes, (from item in mMethodsToProcess
+                                       select item.MethodBase).ToArray());
     }
 
     public uint ExecuteInternal(object aSrc, string aSrcType, System.Reflection.MethodInfo aStartMethod, bool aIsPlug) {
