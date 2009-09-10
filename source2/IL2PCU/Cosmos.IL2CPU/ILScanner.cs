@@ -65,21 +65,52 @@ namespace Cosmos.IL2CPU {
 
     public void Dispose() {
       if (mLogEnabled) {
+        // Create bookmarks, but also a dictionary that
+        // we can find the items in
+        var xBookmarks = new Dictionary<object, int>();
+        int xBookmark = 0;
+        foreach (var xList in mLogMap) {
+          xBookmarks.Add(xList.Key, xBookmark);
+          xBookmark++;
+        }
+
         //TODO: Change to output HTML with src each item hyper linked to where
         // it is listed under another source
         using (mLogWriter = new StreamWriter(mMapPathname, false)) {
+          mLogWriter.WriteLine("<html><body>");
           foreach (var xList in mLogMap) {
-            mLogWriter.WriteLine();
+            mLogWriter.WriteLine("<p></p>");
+            mLogWriter.WriteLine("<p><a name=\"Item" + xBookmarks[xList.Key].ToString() + "\">");
             if (xList.Key == null) {
               mLogWriter.WriteLine("Unspecified Source");
             } else {
               mLogWriter.WriteLine(xList.Key.ToString());
             }
+            mLogWriter.WriteLine("</a></p>");
+
+            mLogWriter.WriteLine("<ul>");
             foreach (var xItem in xList.Value) {
-              mLogWriter.WriteLine("  " + xItem.Item.ToString());
-              mLogWriter.WriteLine("    " + xItem.SrcType);
+              int xHref;
+              if (!xBookmarks.TryGetValue(xItem.Item, out xHref)) {
+                xHref = -1;
+              }
+              mLogWriter.Write("<li>");
+              if (xHref >= 0) {
+                mLogWriter.Write("<a href=\"#Item" + xHref.ToString() + "\">");
+              }
+              mLogWriter.Write(xItem.Item.ToString());
+              if (xHref >= 0) {
+                mLogWriter.Write("</a>");
+              }
+              mLogWriter.WriteLine("</li>");
+
+              mLogWriter.WriteLine("<ul>");
+              mLogWriter.WriteLine("<li>" + xItem.SrcType + "</<li>");
+              mLogWriter.WriteLine("</ul>");
             }
+            mLogWriter.WriteLine("</ul>");
           }
+          mLogWriter.WriteLine("</body></html>");
         }
       }
     }

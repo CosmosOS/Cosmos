@@ -27,7 +27,7 @@ namespace HelloWorld {
         xAsmblr.Initialize();
 
         using (var xScanner = new ILScanner(xAsmblr)) {
-          xScanner.EnableLogging(xOutPath + "Scanner Map.txt");
+          xScanner.EnableLogging(xOutPath + "Scanner Map.html");
 
           var xEntryPoint = typeof(Program).GetMethod("Init", BindingFlags.Public | BindingFlags.Static);
           xScanner.Execute(xEntryPoint);
