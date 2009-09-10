@@ -92,28 +92,30 @@ namespace Cosmos.IL2CPU {
           mLogWriter.WriteLine("<html><body>");
           foreach (var xList in mLogMap) {
             mLogWriter.WriteLine("<p></p>");
-            mLogWriter.WriteLine("<p><a href=\"#Item" + xBookmarks[xList.Key].ToString() + "\">");
+            int xHref;
+            if (!xBookmarks.TryGetValue(xList.Key, out xHref)) {
+              xHref = -1;
+            }
+            mLogWriter.Write("<p>");
+            if (xHref >= 0) {
+              mLogWriter.WriteLine("<a href=\"#Item" + xHref.ToString() + "\">");
+            }
             if (xList.Key == null) {
               mLogWriter.WriteLine("Unspecified Source");
             } else {
               mLogWriter.WriteLine(LogItemText(xList.Key));
             }
+            if (xHref >= 0) {
+              mLogWriter.Write("</a>");
+            }
             mLogWriter.WriteLine("</a></p>");
 
             mLogWriter.WriteLine("<ul>");
             foreach (var xItem in xList.Value) {
-              int xHref;
-              if (!xBookmarks.TryGetValue(xItem.Item, out xHref)) {
-                xHref = -1;
-              }
               mLogWriter.Write("<li>");
-              if (xHref >= 0) {
-                mLogWriter.Write("<a name=\"Item" + xHref.ToString() + "\">");
-              }
+              mLogWriter.Write("<a name=\"Item" + xBookmarks[xList.Key].ToString() + "\">");
               mLogWriter.Write(LogItemText(xItem.Item));
-              if (xHref >= 0) {
-                mLogWriter.Write("</a>");
-              }
+              mLogWriter.Write("</a>");
               mLogWriter.WriteLine("</li>");
 
               mLogWriter.WriteLine("<ul>");
