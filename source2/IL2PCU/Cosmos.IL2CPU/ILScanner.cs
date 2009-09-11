@@ -323,6 +323,10 @@ namespace Cosmos.IL2CPU {
     }
 
     public void Execute(System.Reflection.MethodInfo aStartMethod) {
+      // TODO: Investige using MS CCI instead.
+      // Need to check license, as well as in profiler
+      // http://cciast.codeplex.com/
+      //
       // Scan plugs first, so when we scan from 
       // entry point plugs will be found.
       LoadPlugs();
