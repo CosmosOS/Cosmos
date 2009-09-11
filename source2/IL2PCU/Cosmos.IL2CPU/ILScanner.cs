@@ -371,6 +371,10 @@ namespace Cosmos.IL2CPU {
         var xMethod = mMethodsToProcess[i];
         if (xMethod.Type != MethodInfo.TypeEnum.NeedsPlug) {
           ScanMethod(xMethod);
+        } else {
+          // todo: make this nicer
+          // methods will call the old name, while it's not emitted. that's why we emit a "forwarding label" here.
+          mAsmblr.GenerateMethodForward(xMethod, xMethod.PlugMethod);
         }
       }
       mMethodsToProcessStart = mMethodsToProcess.Count;
@@ -504,7 +508,6 @@ namespace Cosmos.IL2CPU {
 
       xResult = (uint)mMethodsToProcess.Count;
       mKnownMethods.Add(aMethodBase, xResult);
-
       MethodInfo xPlug = null;
       var xMethodType = MethodInfo.TypeEnum.Normal;
       if (aIsPlug) {
@@ -516,7 +519,9 @@ namespace Cosmos.IL2CPU {
           xMethodType = MethodInfo.TypeEnum.NeedsPlug;
         } else {
           var xImplFlags = aMethodBase.GetMethodImplementationFlags();
-          if ((xImplFlags & MethodImplAttributes.Native) != 0) {
+          // todo: prob even more
+          if ((xImplFlags & MethodImplAttributes.Native) != 0 ||
+              (xImplFlags & MethodImplAttributes.InternalCall) != 0) {
             // native implementations cannot be compiled
             xMethodType = MethodInfo.TypeEnum.NeedsPlug;
           }
@@ -530,6 +535,10 @@ namespace Cosmos.IL2CPU {
         if (mMethodPlugs.TryGetValue(aMethodBase, out xPlugId)) {
           xPlug = mMethodsToProcess[(int)xPlugId];
           xMethodType = MethodInfo.TypeEnum.NeedsPlug;
+        } else {
+          if (xMethodType == MethodInfo.TypeEnum.NeedsPlug) {
+            throw new Exception("Method " + aMethodBase.GetFullName() + " needs to be plugged, but wasn't");
+          }
         }
       }
 

@@ -193,6 +193,12 @@ namespace Cosmos.IL2CPU.X86 {
           };
         }
 
+        protected override void Jump(string aLabelName) {
+          new IL2CPU.X86.Jump {
+            DestinationLabel = aLabelName
+          };
+        }
+
         protected override int GetVTableEntrySize() {
           return 16; // todo: retrieve from actual type info
         }

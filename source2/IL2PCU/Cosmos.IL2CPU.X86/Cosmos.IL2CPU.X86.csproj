@@ -49,7 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assembler.cs" />
+    <Compile Include="CosmosAssembler.cs" />
     <Compile Include="AssemblerBin.cs" />
     <Compile Include="AssemblerNasm.cs" />
     <Compile Include="DebugEnums.cs" />

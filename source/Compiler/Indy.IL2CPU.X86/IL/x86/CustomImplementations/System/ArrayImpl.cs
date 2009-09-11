@@ -62,9 +62,10 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System {
 		public static void Copy(Array sourceArray, int sourceIndex, Array destinationArray, int destinationIndex, int length, bool reliable) {
 		}
 
-		public static unsafe int get_Length(int* aThis) {
-			aThis += 2;
-			return *aThis;
+		public static int get_Length(Array aThis) {
+      //aThis += 2;
+      //return *aThis;
+      throw new NotImplementedException("Array.get_Length is not implemented!");
 			//
 		}
 

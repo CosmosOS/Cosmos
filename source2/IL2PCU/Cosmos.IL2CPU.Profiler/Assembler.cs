@@ -42,6 +42,10 @@ namespace Cosmos.IL2CPU.Profiler {
     protected override void Move(string aDestLabelName, int aValue) {
       throw new NotImplementedException();
     }
+
+    protected override void Jump(string aLabelName) {
+      throw new NotImplementedException();
+    }
   
     protected override int GetVTableEntrySize() {
       return 0;

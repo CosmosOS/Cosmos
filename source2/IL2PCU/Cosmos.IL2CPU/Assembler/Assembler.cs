@@ -269,6 +269,7 @@ namespace Cosmos.IL2CPU {
     protected abstract void Push(string aLabelName);
     protected abstract void Call(MethodBase aMethod);
     protected abstract void Move(string aDestLabelName, int aValue);
+    protected abstract void Jump(string aLabelName);
     protected abstract int GetVTableEntrySize();
 
     public void GenerateVMTCode(IList<Type> aTypes, HashSet<Type> aTypesSet, IDictionary<MethodBase, uint> aMethods) {
@@ -546,6 +547,11 @@ namespace Cosmos.IL2CPU {
           DataMembers.Add(new DataMember(xFieldName, xData));
         }
       }      
+    }
+
+    internal void GenerateMethodForward(MethodInfo aFrom, MethodInfo aTo) {
+      new Label(aFrom.MethodBase);
+      Jump(MethodInfoLabelGenerator.GenerateLabelName(aTo.MethodBase));
     }
   }
 }
