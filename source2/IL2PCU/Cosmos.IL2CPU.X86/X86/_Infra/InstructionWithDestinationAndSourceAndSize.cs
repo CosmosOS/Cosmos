@@ -70,7 +70,7 @@ namespace Cosmos.IL2CPU.X86 {
             if (Size == 0)
             {
                 Size = 32;
-                Console.WriteLine("ERRROR no size set for Instruction - set to 4 InstructionWithDestinationAndSourceAndSize") ;
+                //Console.WriteLine("ERRROR no size set for Instruction - set to 4 InstructionWithDestinationAndSourceAndSize") ;
             }
             aOutput.Write(mMnemonic);
             aOutput.Write(" ");
