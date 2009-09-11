@@ -356,12 +356,14 @@ namespace Cosmos.IL2CPU {
 
       // Scan from entry point of this program
       ExecuteInternal(null, "Entry Point", aStartMethod, false);
-      mAsmblr.GenerateVMTCode(mTypes, (from item in mMethodsToProcess
-                                       select item.MethodBase).ToArray());
+      mAsmblr.GenerateVMTCode(mTypes, mTypesSet, mKnownMethods);
     }
 
     public uint ExecuteInternal(object aSrc, string aSrcType, System.Reflection.MethodInfo aStartMethod, bool aIsPlug) {
       // See comment at mMethodsToProcessStart declaration
+      if (aStartMethod.GetFullName().IndexOf("system_object_tostring", StringComparison.InvariantCultureIgnoreCase)!=-1) {
+        Console.Write("");
+      }
       mMethodsToProcessStart = mMethodsToProcess.Count;
       uint xResult = QueueMethod(aSrc, aSrcType, aStartMethod, aIsPlug);
 
@@ -488,10 +490,14 @@ namespace Cosmos.IL2CPU {
           }
         }
 
+        if (aMethodBase.DeclaringType.FullName == "System.SR") {
+          Console.Write("");
+        }
         // See if method has a plug
         uint xPlugId = 0;
         if (mMethodPlugs.TryGetValue(aMethodBase, out xPlugId)) {
           xPlug = mMethodsToProcess[(int)xPlugId];
+          xMethodType = MethodInfo.TypeEnum.NeedsPlug;
         }
 
         // Queue Types directly related to method

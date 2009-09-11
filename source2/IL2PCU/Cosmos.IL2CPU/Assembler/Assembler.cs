@@ -270,7 +270,7 @@ namespace Cosmos.IL2CPU {
     protected abstract void Move(string aDestLabelName, int aValue);
     protected abstract int GetVTableEntrySize();
 
-    public void GenerateVMTCode(IList<Type> aTypes, IList<MethodBase> aMethods) {
+    public void GenerateVMTCode(IList<Type> aTypes, HashSet<Type> aTypesSet, IDictionary<MethodBase, uint> aMethods) {
       // initialization
       var xSetTypeInfoRef = VTablesImplRefs.SetTypeInfoRef;
       var xSetMethodInfoRef = VTablesImplRefs.SetMethodInfoRef;
@@ -306,13 +306,13 @@ namespace Cosmos.IL2CPU {
         // value contains true if the method is an interface method definition
         SortedList<MethodBase, bool> xEmittedMethods = new SortedList<MethodBase, bool>(new MethodBaseComparer());
         foreach (MethodBase xMethod in xType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)) {
-          if (aMethods.Contains(xMethod))//) && !xMethod.IsAbstract)
+          if (aMethods.ContainsKey(xMethod))//) && !xMethod.IsAbstract)
                             {
             xEmittedMethods.Add(xMethod, false);
           }
         }
         foreach (MethodBase xCtor in xType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)) {
-          if (aMethods.Contains(xCtor))// && !xCtor.IsAbstract)
+          if (aMethods.ContainsKey(xCtor))// && !xCtor.IsAbstract)
                             {
             xEmittedMethods.Add(xCtor, false);
           }
@@ -341,7 +341,7 @@ namespace Cosmos.IL2CPU {
               } catch {
               }
             }
-            if (aMethods.Contains(xMethodIntf)) {
+            if (aMethods.ContainsKey(xMethodIntf)) {
               if (!xEmittedMethods.ContainsKey(xMethodIntf)) {
                 xEmittedMethods.Add(xMethodIntf,
                                     true);
@@ -369,14 +369,14 @@ namespace Cosmos.IL2CPU {
           throw new Exception("Base type not found!");
         }
         for (int x = xEmittedMethods.Count - 1; x >= 0; x--) {
-          if (!aMethods.Contains(xEmittedMethods.Keys[x])) {
+          if (!aMethods.ContainsKey(xEmittedMethods.Keys[x])) {
             xEmittedMethods.RemoveAt(x);
           }
         }
         if (!xType.IsInterface) {
-          Move("VMT__TYPE_ID_HOLDER__" + xType.FullName, i);
+          Move("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xType)), i);
           Assembler.mCurrentInstance.DataMembers.Add(
-              new DataMember("VMT__TYPE_ID_HOLDER__" + xType.FullName, new int[] { i }));
+              new DataMember("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xType)), new int[] { i }));
           Push((uint)xBaseIndex.Value);
           Push("0" + xEmittedMethods.Count.ToString("X") + "h");
           xData = new byte[16 + (xEmittedMethods.Count * 4)];
@@ -411,7 +411,7 @@ namespace Cosmos.IL2CPU {
         }
         for (int j = 0; j < xEmittedMethods.Count; j++) {
           MethodBase xMethod = xEmittedMethods.Keys[j];
-          var xMethodId = aMethods.IndexOf(xMethod);
+          var xMethodId = aMethods[xMethod];
           if (!xType.IsInterface) {
             if (xEmittedMethods.Values[j]) {
               var xNewMethod = xType.GetMethod(xMethod.DeclaringType.FullName + "." + xMethod.Name,
