@@ -518,6 +518,11 @@ namespace Cosmos.IL2CPU {
     //}
 
     protected void LogMapPoint(object aSrc, string aSrcType, object aItem) {
+      // Keys cant be null. If null, we just say ILScanner is the source
+      if (aSrc == null) {
+        aSrc = typeof(ILScanner);
+      }
+
       var xLogItem = new LogItem() {
         SrcType = aSrcType,
         Item = aItem
