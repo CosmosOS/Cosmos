@@ -8,6 +8,7 @@ using System.IO;
 using System.Reflection;
 using Indy.IL2CPU;
 using Indy.IL2CPU.IL;
+using System.Runtime.InteropServices;
 
 namespace Cosmos.IL2CPU {
 
@@ -463,6 +464,88 @@ namespace Cosmos.IL2CPU {
           }
         }
       }
+    }
+
+    public void ProcessField(FieldInfo aField) {
+      string xFieldName = MethodInfoLabelGenerator.GetFullName(aField);
+      xFieldName = DataMember.GetStaticFieldName(aField);
+      if (DataMembers.Count(x => x.Name == xFieldName) == 0) {
+        var xItemList = (from item in aField.GetCustomAttributes(false)
+                         where item.GetType().FullName == "ManifestResourceStreamAttribute"
+                         select item).ToList();
+
+        object xItem = null;
+        if (xItemList.Count > 0)
+          xItem = xItemList[0];
+        string xManifestResourceName = null;
+        if (xItem != null) {
+          var xItemType = xItem.GetType();
+          xManifestResourceName = (string)xItemType.GetField("ResourceName").GetValue(xItem);
+        }
+        if (xManifestResourceName != null) {
+          // todo: add support for manifest streams again
+          //RegisterType(xCurrentField.FieldType);
+          //string xFileName = Path.Combine(mOutputDir,
+          //                                (xCurrentField.DeclaringType.Assembly.FullName + "__" + xManifestResourceName).Replace(",",
+          //                                                                                                                       "_") + ".res");
+          //using (var xStream = xCurrentField.DeclaringType.Assembly.GetManifestResourceStream(xManifestResourceName)) {
+          //    if (xStream == null) {
+          //        throw new Exception("Resource '" + xManifestResourceName + "' not found!");
+          //    }
+          //    using (var xTarget = File.Create(xFileName)) {
+          //        // todo: abstract this array code out.
+          //        xTarget.Write(BitConverter.GetBytes(Engine.RegisterType(Engine.GetType("mscorlib",
+          //                                                                               "System.Array"))),
+          //                      0,
+          //                      4);
+          //        xTarget.Write(BitConverter.GetBytes((uint)InstanceTypeEnum.StaticEmbeddedArray),
+          //                      0,
+          //                      4);
+          //        xTarget.Write(BitConverter.GetBytes((int)xStream.Length), 0, 4);
+          //        xTarget.Write(BitConverter.GetBytes((int)1), 0, 4);
+          //        var xBuff = new byte[128];
+          //        while (xStream.Position < xStream.Length) {
+          //            int xBytesRead = xStream.Read(xBuff, 0, 128);
+          //            xTarget.Write(xBuff, 0, xBytesRead);
+          //        }
+          //    }
+          //}
+          //mAssembler.DataMembers.Add(new DataMember("___" + xFieldName + "___Contents",
+          //                                          "incbin",
+          //                                          "\"" + xFileName + "\""));
+          //mAssembler.DataMembers.Add(new DataMember(xFieldName,
+          //                                          "dd",
+          //                                          "___" + xFieldName + "___Contents"));
+          throw new NotImplementedException();
+        } else {
+          uint xTheSize;
+          //string theType = "db";
+          Type xFieldTypeDef = aField.FieldType;
+          if (!xFieldTypeDef.IsClass || xFieldTypeDef.IsValueType) {
+            xTheSize = ILOp.SizeOfType(aField.FieldType);
+          } else {
+            xTheSize = 4;
+          }
+          byte[] xData = new byte[xTheSize];
+          try {
+            object xValue = aField.GetValue(null);
+            if (xValue != null) {
+              try {
+                xData = new byte[xTheSize];
+                if (xValue.GetType().IsValueType) {
+                  for (int x = 0; x < xTheSize; x++) {
+                    xData[x] = Marshal.ReadByte(xValue,
+                                                x);
+                  }
+                }
+              } catch {
+              }
+            }
+          } catch {
+          }
+          DataMembers.Add(new DataMember(xFieldName, xData));
+        }
+      }      
     }
   }
 }

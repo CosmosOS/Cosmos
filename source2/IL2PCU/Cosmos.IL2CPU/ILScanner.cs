@@ -47,6 +47,8 @@ namespace Cosmos.IL2CPU {
     protected HashSet<Type> mTypesSet = new HashSet<Type>();
     protected List<Type> mTypes = new List<Type>();
 
+    protected HashSet<FieldInfo> mStaticFields = new HashSet<FieldInfo>();
+
     // Logging
     // Only use for debugging and profiling.
     protected bool mLogEnabled = false;
@@ -442,6 +444,11 @@ namespace Cosmos.IL2CPU {
             ((ILOpCodes.OpMethod)xOpCode).ValueUID = QueueMethod(aMethodInfo.MethodBase, "Call", ((ILOpCodes.OpMethod)xOpCode).Value, false);
           } else if (xOpCode is ILOpCodes.OpType) {
             QueueType(aMethodInfo.MethodBase, "OpCode Value", ((ILOpCodes.OpType)xOpCode).Value);
+          } else if (xOpCode is ILOpCodes.OpField) {
+            var xOpField = (ILOpCodes.OpField)xOpCode;
+            if (xOpField.Value.IsStatic) {
+              QueueField(aMethodInfo.MethodBase, "OpCode Value", xOpField);
+            }
           }
         }
 
@@ -449,6 +456,17 @@ namespace Cosmos.IL2CPU {
         if (aMethodInfo.MethodBase.DeclaringType != mThrowHelper) {
           mAsmblr.ProcessMethod(aMethodInfo, xOpCodes);
         }
+      }
+    }
+
+    private void QueueField(object aSrc, string aSrcType, Cosmos.IL2CPU.ILOpCodes.OpField xOpField) {
+      // todo: add log map thing?
+      if (!mStaticFields.Contains(xOpField.Value)) {
+        mStaticFields.Add(xOpField.Value);
+        mAsmblr.ProcessField(xOpField.Value);
+
+        QueueType(xOpField.Value, "FieldType", xOpField.Value.FieldType);
+        QueueType(xOpField.Value, "DeclaringType", xOpField.Value.FieldType);
       }
     }
 

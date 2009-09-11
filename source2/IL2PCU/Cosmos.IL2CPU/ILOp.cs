@@ -14,7 +14,7 @@ namespace Cosmos.IL2CPU {
     // could be used for other things, profiling, analysis, reporting, etc
     public abstract void Execute(MethodInfo aMethod, ILOpCode aOpCode);
 
-    protected static uint SizeOfType(Type aType) {
+    public static uint SizeOfType(Type aType) {
       if (aType.FullName == "System.Void") {
         return 0;
       } else if ((!aType.IsValueType && aType.IsClass) || aType.IsInterface) {
