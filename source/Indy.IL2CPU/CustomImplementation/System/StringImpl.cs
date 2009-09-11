@@ -101,6 +101,10 @@ namespace Indy.IL2CPU.CustomImplementation.System {
       return 0;
     }
 
+    public static int IndexOf(string aThis, char value, int startIndex, int count) {
+      throw new Exception("Not implemented");
+    }
+
     [PlugMethod(Enabled = false)]
     public static uint GetStorage(string aString) {
       return 0;

@@ -35,13 +35,20 @@ namespace Cosmos.IL2CPU {
     // times to process plugs and so known methods accumulates,
     // but we dont want to reproces old methods from previous Execute calls.
     protected List<MethodInfo> mMethodsToProcess = new List<MethodInfo>();
-    // ExecuteInternal is called multiple times, we don't want to rescan
-    // ones that are "finished" so we update this "pointer"
-    protected int mMethodsToProcessStart;
+    
     // List of plug implementations.
     // Key: MethodBase of targetted method
     // Value: index into mMethodsToProcess
     protected Dictionary<MethodBase, uint> mMethodPlugs = new Dictionary<MethodBase, uint>();
+
+    // Contains a list of plug implementor classes
+    // Used to collect a full list before resolving them.
+    // A single target may have multiple plugimpl classes, so we cant use Dictionary
+    protected struct PlugImpl {
+      public Type Target;
+      public Type Plug;
+    }
+    protected List<PlugImpl> mPlugImpls = new List<PlugImpl>();
 
     //TODO: Likely change this to be like Methods to be more efficient. Might only need Dictionary
     protected HashSet<Type> mTypesSet = new HashSet<Type>();
@@ -146,13 +153,16 @@ namespace Cosmos.IL2CPU {
       mThrowHelper = typeof(object).Assembly.GetType("System.ThrowHelper");
     }
 
-    protected void LoadPlugs() {
+    protected void FindPlugImpls() {
       // TODO: New plug system, common plug base which all descend from
       // It can have a "this" member and then we
       // can separate static from instance by the static keyword
       // and ctors can be static "ctor" by name
       // Will still need plug attrib though to specify target
       // Also need to handle asm plugs, but those will be different anyways
+      // TODO: Allow whole class plugs? ie, a class that completely replaces another class
+      // and is substituted on the fly? Plug scanner would direct all access to that
+      // class and throw an exception if any method, field, member etc is missing.
       foreach (var xAsm in AppDomain.CurrentDomain.GetAssemblies()) {
         foreach (var xType in xAsm.GetTypes()) {
           foreach (var xAttrib1 in xType.GetCustomAttributes(false)) {
@@ -162,192 +172,196 @@ namespace Cosmos.IL2CPU {
 
               var xTargetType = xTypeAttrib.Target;
               if (xTargetType == null) {
-                xTargetType = Type.GetType(xTypeAttrib.TargetName, true);
+                xTargetType = Type.GetType(xTypeAttrib.TargetName, true, false);
               }
 
-              if (xTypeAttrib.IsMonoOnly) {
-                continue;
-              }
-
-              // See if there is a custom PlugMethod attribute
-              // Plug implementations must be static and public, so 
-              // we narrow the search to meet these requirements
-              foreach (var xMethod in xType.GetMethods(BindingFlags.Static | BindingFlags.Public)) {
-                PlugMethodAttribute xMethodAttrib = null;
-                foreach (var xAttrib2 in xMethod.GetCustomAttributes(false)) {
-                  if (xAttrib2 is PlugMethodAttribute) {
-                    xMethodAttrib = (PlugMethodAttribute)xAttrib2;
-                  }
-                }
-
-                // See if we need to disable this plug
-                bool xEnabled = true;
-                if (xMethodAttrib != null) {
-                  //TODO: Check this against build options
-                  //TODO: Two exclusive IsOnly's dont make sense
-                  // refactor these as a positive rather than negative
-                  xEnabled = xMethodAttrib.Enabled;
-                  if (xEnabled) {
-                    if (xMethodAttrib.IsMonoOnly) {
-                      xEnabled = false;
-                    } else if (xMethodAttrib.Signature != null) {
-                      // System_Void__Indy_IL2CPU_Assembler_Assembler__cctor__
-                      // If signature exists, the search is slow. Signatures
-                      // are infrequent though, so for now we just go slow method
-                      // and have not optimized or cached this info. When we
-                      // redo the plugs, we can fix this.
-                      //
-                      // This merges methods and ctors, improve this later
-                      var xTargetMethods = xTargetType.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Cast<MethodBase>().AsQueryable();
-                      xTargetMethods = xTargetMethods.Union(xTargetType.GetConstructors(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic));
-                      if (xMethodAttrib.Signature != null && xMethodAttrib.Signature.IndexOf("TrySZIndexOf", StringComparison.InvariantCultureIgnoreCase) != -1) {
-                        Console.Write("");
-                      }
-                      foreach (var xTargetMethod in xTargetMethods) {
-                        string sName = DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GenerateFullName(xTargetMethod));
-                        if (xTargetMethod.Name == "TrySZIndexOf") {
-                          Console.Write("");
-                        }
-                        if (string.Compare(sName, xMethodAttrib.Signature, true) == 0) {
-                          uint xUID = ExecuteInternal(xType, "Plug", xMethod, true);
-                          mMethodPlugs.Add(xTargetMethod, xUID);
-                          // Mark as disabled, because we already handled it
-                          xEnabled = false;
-                          break;
-                        }
-                      }
-                      // if still enabled, we didn't find our method
-                      if (xEnabled) {
-                        // todo: more precise error: imagine having a 100K line project, and this error happens...
-                        throw new Exception("Plug target method not found.");
-                      }
-                    } else {
-                      xEnabled = xMethodAttrib.Enabled;
-                    }
-                  }
-                }
-
-                if (xEnabled) {
-                  // for PlugMethodAttribute:
-                  //TODO: public string Signature;
-                  //[PlugMethod(Signature = "System_Void__Indy_IL2CPU_Assembler_Assembler__cctor__")]
-                  //TODO: public Type Assembler = null;
-                  // Scan the plug implementation
-                  uint xUID = ExecuteInternal(xType, "Plug", xMethod, true);
-
-                  // Add the method to the list of plugged methods
-                  var xParams = xMethod.GetParameters();
-                  //TODO: Static method plugs dont seem to be separated 
-                  // from instance ones, so the only way seems to be to try
-                  // to match instance first, and if no match try static.
-                  // I really don't like this and feel we need to find
-                  // an explicit way to determine or mark the method 
-                  // implementations.
-                  //
-                  // Plug implementations take "this" as first argument
-                  // so when matching we don't include it in the search
-                  Type[] xTypesInst = null;
-                  var xActualParamCount = xParams.Length;
-                  foreach (var xParam in xParams) {
-                    if (xParam.GetCustomAttributes(typeof(FieldAccessAttribute), false).Length > 0) {
-                      xActualParamCount--;
-                    }
-                  }
-                  Type[] xTypesStatic = new Type[xActualParamCount];
-                  // If 0 params, has to be a static plug so we skip
-                  // any copying and leave xTypesInst = null
-                  // If 1 params, xTypesInst must be converted to Type[0]
-                  if (xActualParamCount == 1) {
-                    xTypesInst = new Type[0];
-                    xTypesStatic[0] = xParams[0].ParameterType;
-                  } else if (xActualParamCount > 1) {
-                    xTypesInst = new Type[xActualParamCount - 1];
-                    var xCurIdx = 0;
-                    foreach (var xParam in xParams.Skip(1)) {
-                      if (xParam.GetCustomAttributes(typeof(FieldAccessAttribute), false).Length > 0) {
-                        continue;
-                      }
-                      xTypesInst[xCurIdx] = xParam.ParameterType;
-                      xCurIdx++;
-                    }
-                    xCurIdx = 0;
-                    foreach (var xParam in xParams) {
-                      if (xParam.GetCustomAttributes(typeof(FieldAccessAttribute), false).Length > 0) {
-                        xCurIdx++;
-                        continue;
-                      }
-                      if (xCurIdx >= xTypesStatic.Length) {
-                        break;
-                      }
-                      xTypesStatic[xCurIdx] = xParam.ParameterType;
-                      xCurIdx++;
-                    }
-                  }
-                  System.Reflection.MethodBase xTargetMethod = null;
-                  // TODO: In future make rule that all ctor plugs are called
-                  // ctor by name, or use a new attrib
-                  //TODO: Document all the plug stuff in a document on website
-                  //TODO: To make inclusion of plugs easy, we can make a plugs master
-                  // that references the other default plugs so user exes only 
-                  // need to reference that one.
-                  // TODO: Skip FieldAccessAttribute if in impl
-                  if (xTypesInst != null) {
-                    if (string.Compare(xMethod.Name, "ctor", true) == 0) {
-                      xTargetMethod = xTargetType.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesInst, null);
-                    } else {
-                      xTargetMethod = xTargetType.GetMethod(xMethod.Name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesInst, null);
-                    }
-                  }
-                  // Not an instance method, try static
-                  if (xTargetMethod == null) {
-                    if (string.Compare(xMethod.Name, "cctor", true) == 0
-                      || string.Compare(xMethod.Name, "ctor", true) == 0) {
-                      xTargetMethod = xTargetType.GetConstructor(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesStatic, null);
-                    } else {
-                      xTargetMethod = xTargetType.GetMethod(xMethod.Name, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesStatic, null);
-                    }
-                  }
-                  if (xTargetMethod == null) {
-                    throw new Exception("Plug target method not found.");
-                  }
-                  if (mMethodPlugs.ContainsKey(xTargetMethod)) {
-                    var xTheMethod = mMethodsToProcess[(int)mMethodPlugs[xTargetMethod]];
-                    Console.Write("");
-                  }
-                  mMethodPlugs.Add(xTargetMethod, xUID);
-                }
+              if (!xTypeAttrib.IsMonoOnly) {
+                mPlugImpls.Add(new PlugImpl() { Target = xTargetType, Plug = xType });
               }
             }
           }
-          //TODO: Look for Field plugs
         }
       }
     }
 
+    protected void ResolvePlugs() {
+      foreach (var xPlugImpl in mPlugImpls) {
+        // See if there is a custom PlugMethod attribute
+        // Plug implementations must be static and public, so 
+        // we narrow the search to meet these requirements
+        foreach (var xMethod in xPlugImpl.Plug.GetMethods(BindingFlags.Static | BindingFlags.Public)) {
+          PlugMethodAttribute xMethodAttrib = null;
+          foreach (var xAttrib2 in xMethod.GetCustomAttributes(false)) {
+            if (xAttrib2 is PlugMethodAttribute) {
+              xMethodAttrib = (PlugMethodAttribute)xAttrib2;
+            }
+          }
+
+          // See if we need to disable this plug
+          bool xEnabled = true;
+          if (xMethodAttrib != null) {
+            //TODO: Check this against build options
+            //TODO: Two exclusive IsOnly's dont make sense
+            // refactor these as a positive rather than negative
+            xEnabled = xMethodAttrib.Enabled;
+            if (xEnabled) {
+              if (xMethodAttrib.IsMonoOnly) {
+                xEnabled = false;
+              } else if (xMethodAttrib.Signature != null) {
+                // System_Void__Indy_IL2CPU_Assembler_Assembler__cctor__
+                // If signature exists, the search is slow. Signatures
+                // are infrequent though, so for now we just go slow method
+                // and have not optimized or cached this info. When we
+                // redo the plugs, we can fix this.
+                //
+                // This merges methods and ctors, improve this later
+                var xTargetMethods = xPlugImpl.Target.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Cast<MethodBase>().AsQueryable();
+                xTargetMethods = xTargetMethods.Union(xPlugImpl.Target.GetConstructors(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic));
+                if (xMethodAttrib.Signature != null && xMethodAttrib.Signature.IndexOf("TrySZIndexOf", StringComparison.InvariantCultureIgnoreCase) != -1) {
+                  Console.Write("");
+                }
+                foreach (var xTargetMethod in xTargetMethods) {
+                  string sName = DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GenerateFullName(xTargetMethod));
+                  if (xTargetMethod.Name == "TrySZIndexOf") {
+                    Console.Write("");
+                  }
+                  if (string.Compare(sName, xMethodAttrib.Signature, true) == 0) {
+                    uint xUID = QueueMethod(xPlugImpl.Plug, "Plug", xMethod, true);
+                    mMethodPlugs.Add(xTargetMethod, xUID);
+                    // Mark as disabled, because we already handled it
+                    xEnabled = false;
+                    break;
+                  }
+                }
+                // if still enabled, we didn't find our method
+                if (xEnabled) {
+                  // todo: more precise error: imagine having a 100K line project, and this error happens...
+                  throw new Exception("Plug target method not found.");
+                }
+              } else {
+                xEnabled = xMethodAttrib.Enabled;
+              }
+            }
+          }
+
+          if (xEnabled) {
+            // for PlugMethodAttribute:
+            //TODO: public string Signature;
+            //[PlugMethod(Signature = "System_Void__Indy_IL2CPU_Assembler_Assembler__cctor__")]
+            //TODO: public Type Assembler = null;
+            // Scan the plug implementation
+            uint xUID = QueueMethod(xPlugImpl.Plug, "Plug", xMethod, true);
+
+            // Add the method to the list of plugged methods
+            var xParams = xMethod.GetParameters();
+            //TODO: Static method plugs dont seem to be separated 
+            // from instance ones, so the only way seems to be to try
+            // to match instance first, and if no match try static.
+            // I really don't like this and feel we need to find
+            // an explicit way to determine or mark the method 
+            // implementations.
+            //
+            // Plug implementations take "this" as first argument
+            // so when matching we don't include it in the search
+            Type[] xTypesInst = null;
+            var xActualParamCount = xParams.Length;
+            foreach (var xParam in xParams) {
+              if (xParam.GetCustomAttributes(typeof(FieldAccessAttribute), false).Length > 0) {
+                xActualParamCount--;
+              }
+            }
+            Type[] xTypesStatic = new Type[xActualParamCount];
+            // If 0 params, has to be a static plug so we skip
+            // any copying and leave xTypesInst = null
+            // If 1 params, xTypesInst must be converted to Type[0]
+            if (xActualParamCount == 1) {
+              xTypesInst = new Type[0];
+              xTypesStatic[0] = xParams[0].ParameterType;
+            } else if (xActualParamCount > 1) {
+              xTypesInst = new Type[xActualParamCount - 1];
+              var xCurIdx = 0;
+              foreach (var xParam in xParams.Skip(1)) {
+                if (xParam.GetCustomAttributes(typeof(FieldAccessAttribute), false).Length > 0) {
+                  continue;
+                }
+                xTypesInst[xCurIdx] = xParam.ParameterType;
+                xCurIdx++;
+              }
+              xCurIdx = 0;
+              foreach (var xParam in xParams) {
+                if (xParam.GetCustomAttributes(typeof(FieldAccessAttribute), false).Length > 0) {
+                  xCurIdx++;
+                  continue;
+                }
+                if (xCurIdx >= xTypesStatic.Length) {
+                  break;
+                }
+                xTypesStatic[xCurIdx] = xParam.ParameterType;
+                xCurIdx++;
+              }
+            }
+            System.Reflection.MethodBase xTargetMethod = null;
+            // TODO: In future make rule that all ctor plugs are called
+            // ctor by name, or use a new attrib
+            //TODO: Document all the plug stuff in a document on website
+            //TODO: To make inclusion of plugs easy, we can make a plugs master
+            // that references the other default plugs so user exes only 
+            // need to reference that one.
+            // TODO: Skip FieldAccessAttribute if in impl
+            if (xTypesInst != null) {
+              if (string.Compare(xMethod.Name, "ctor", true) == 0) {
+                xTargetMethod = xPlugImpl.Target.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesInst, null);
+              } else {
+                xTargetMethod = xPlugImpl.Target.GetMethod(xMethod.Name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesInst, null);
+              }
+            }
+            // Not an instance method, try static
+            if (xTargetMethod == null) {
+              if (string.Compare(xMethod.Name, "cctor", true) == 0
+                || string.Compare(xMethod.Name, "ctor", true) == 0) {
+                xTargetMethod = xPlugImpl.Target.GetConstructor(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesStatic, null);
+              } else {
+                xTargetMethod = xPlugImpl.Target.GetMethod(xMethod.Name, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesStatic, null);
+              }
+            }
+            if (xTargetMethod == null) {
+              throw new Exception("Plug target method not found.");
+            }
+            if (mMethodPlugs.ContainsKey(xTargetMethod)) {
+              var xTheMethod = mMethodsToProcess[(int)mMethodPlugs[xTargetMethod]];
+              Console.Write("");
+            }
+            mMethodPlugs.Add(xTargetMethod, xUID);
+          }
+        }
+        //TODO: Look for Field plugs
+      }
+    }
+
     public void Execute(System.Reflection.MethodInfo aStartMethod) {
-      // TODO: Investige using MS CCI instead.
+      // TODO: Investigate using MS CCI instead.
       // Need to check license, as well as in profiler
       // http://cciast.codeplex.com/
       //
       // Scan plugs first, so when we scan from 
       // entry point plugs will be found.
-      LoadPlugs();
+      FindPlugImpls();
+      ResolvePlugs();
 
-      // todo: why do all there system methods get registered as a plug, while they are normal methods, just they dont get scanned normally?
       // Pull in extra implementations, GC etc.
-      ExecuteInternal(null, "Explicit Entry", (System.Reflection.MethodInfo)RuntimeEngineRefs.InitializeApplicationRef, true);
-      ExecuteInternal(null, "Explicit Entry", (System.Reflection.MethodInfo)RuntimeEngineRefs.FinalizeApplicationRef, true);
+      QueueMethod(null, "Explicit Entry", (System.Reflection.MethodInfo)RuntimeEngineRefs.InitializeApplicationRef, false);
+      QueueMethod(null, "Explicit Entry", (System.Reflection.MethodInfo)RuntimeEngineRefs.FinalizeApplicationRef, false);
       ////xScanner.QueueMethod(typeof(CosmosAssembler).GetMethod("PrintException"), true);
-      ExecuteInternal(null, "Explicit Entry", (System.Reflection.MethodInfo)VTablesImplRefs.LoadTypeTableRef, true);
-      ExecuteInternal(null, "Explicit Entry", (System.Reflection.MethodInfo)VTablesImplRefs.SetMethodInfoRef, true);
-      ExecuteInternal(null, "Explicit Entry", (System.Reflection.MethodInfo)VTablesImplRefs.IsInstanceRef, true);
-      ExecuteInternal(null, "Explicit Entry", (System.Reflection.MethodInfo)VTablesImplRefs.SetTypeInfoRef, true);
-      ExecuteInternal(null, "Explicit Entry", (System.Reflection.MethodInfo)VTablesImplRefs.GetMethodAddressForTypeRef, true);
-      ExecuteInternal(null, "Explicit Entry", (System.Reflection.MethodInfo)GCImplementationRefs.IncRefCountRef, true);
-      ExecuteInternal(null, "Explicit Entry", (System.Reflection.MethodInfo)GCImplementationRefs.DecRefCountRef, true);
-      ExecuteInternal(null, "Explicit Entry", (System.Reflection.MethodInfo)GCImplementationRefs.AllocNewObjectRef, true);
+      QueueMethod(null, "Explicit Entry", (System.Reflection.MethodInfo)VTablesImplRefs.LoadTypeTableRef, false);
+      QueueMethod(null, "Explicit Entry", (System.Reflection.MethodInfo)VTablesImplRefs.SetMethodInfoRef, false);
+      QueueMethod(null, "Explicit Entry", (System.Reflection.MethodInfo)VTablesImplRefs.IsInstanceRef, false);
+      QueueMethod(null, "Explicit Entry", (System.Reflection.MethodInfo)VTablesImplRefs.SetTypeInfoRef, false);
+      QueueMethod(null, "Explicit Entry", (System.Reflection.MethodInfo)VTablesImplRefs.GetMethodAddressForTypeRef, false);
+      QueueMethod(null, "Explicit Entry", (System.Reflection.MethodInfo)GCImplementationRefs.IncRefCountRef, false);
+      QueueMethod(null, "Explicit Entry", (System.Reflection.MethodInfo)GCImplementationRefs.DecRefCountRef, false);
+      QueueMethod(null, "Explicit Entry", (System.Reflection.MethodInfo)GCImplementationRefs.AllocNewObjectRef, false);
       // for now, to ease runtime exception throwing
-      ExecuteInternal(null, "Explicit Entry", typeof(ExceptionHelper).GetMethod("ThrowNotImplemented", BindingFlags.Static | BindingFlags.Public), false);
+      QueueMethod(null, "Explicit Entry", typeof(ExceptionHelper).GetMethod("ThrowNotImplemented", BindingFlags.Static | BindingFlags.Public), false);
       //xScanner.Execute( ( System.Reflection.MethodInfo )RuntimeEngineRefs.InitializeApplicationRef );
       //xScanner.Execute( ( System.Reflection.MethodInfo )RuntimeEngineRefs.FinalizeApplicationRef );
       ////xScanner.QueueMethod(typeof(CosmosAssembler).GetMethod("PrintException"));
@@ -358,16 +372,10 @@ namespace Cosmos.IL2CPU {
 
       // Scan from entry point of this program
       ExecuteInternal(null, "Entry Point", aStartMethod, false);
-      // ExecuteInternal does NOT scan all methods, which means, that it we can still have pending methods when it returns.
-      DoProcessingPass();
 
-      mAsmblr.GenerateVMTCode(mTypes, mTypesSet, mKnownMethods);
-    }
-
-    private void DoProcessingPass() {
       // Cannot use foreach, the list changes as we go
       // and we dont start at 0
-      for (int i = mMethodsToProcessStart; i < mMethodsToProcess.Count; i++) {
+      for (int i = 0; i < mMethodsToProcess.Count; i++) {
         var xMethod = mMethodsToProcess[i];
         if (xMethod.Type != MethodInfo.TypeEnum.NeedsPlug) {
           ScanMethod(xMethod);
@@ -377,18 +385,16 @@ namespace Cosmos.IL2CPU {
           mAsmblr.GenerateMethodForward(xMethod, xMethod.PlugMethod);
         }
       }
-      mMethodsToProcessStart = mMethodsToProcess.Count;
+
+      mAsmblr.GenerateVMTCode(mTypes, mTypesSet, mKnownMethods);
     }
 
-    public uint ExecuteInternal(object aSrc, string aSrcType, System.Reflection.MethodInfo aStartMethod, bool aIsPlug) {
+    protected uint ExecuteInternal(object aSrc, string aSrcType, System.Reflection.MethodInfo aStartMethod, bool aIsPlug) {
       // See comment at mMethodsToProcessStart declaration
       if (aStartMethod.GetFullName().IndexOf("system_object_tostring", StringComparison.InvariantCultureIgnoreCase)!=-1) {
         Console.Write("");
       }
       uint xResult = QueueMethod(aSrc, aSrcType, aStartMethod, aIsPlug);
-
-      // scan all pending methods
-      DoProcessingPass();
 
       // ie 
       //   var xSB = new StringBuilder("test");
@@ -406,7 +412,7 @@ namespace Cosmos.IL2CPU {
       do {
         xMethodCount = mMethodsToProcess.Count;
         // Cannot use foreach, the list changes as we go
-        for (int i = mMethodsToProcessStart; i < mMethodsToProcess.Count; i++) {
+        for (int i = 0; i < mMethodsToProcess.Count; i++) {
           var xMethodBase = mMethodsToProcess[i].MethodBase;
           if (xMethodBase.IsVirtual) {
             foreach (var xType in mTypes) {
@@ -491,6 +497,9 @@ namespace Cosmos.IL2CPU {
     // how it works.
     private Type mThrowHelper;
 
+    // QueueMethod should only queue the method, and do no processing of the
+    // body or resolution of its contents. It is called during plug resolution
+    // etc and all further resolution should wait until all plugs are loaded.
     public uint QueueMethod(object aSrc, string aSrcType, MethodBase aMethodBase
       , bool aIsPlug)
     {
@@ -535,10 +544,8 @@ namespace Cosmos.IL2CPU {
         if (mMethodPlugs.TryGetValue(aMethodBase, out xPlugId)) {
           xPlug = mMethodsToProcess[(int)xPlugId];
           xMethodType = MethodInfo.TypeEnum.NeedsPlug;
-        } else {
-          if (xMethodType == MethodInfo.TypeEnum.NeedsPlug) {
-            throw new Exception("Method " + aMethodBase.GetFullName() + " needs to be plugged, but wasn't");
-          }
+        } else if (xMethodType == MethodInfo.TypeEnum.NeedsPlug) {
+          throw new Exception("Method [" + aMethodBase.DeclaringType + "." + aMethodBase.Name + "] needs to be plugged, but wasn't");
         }
       }
 
