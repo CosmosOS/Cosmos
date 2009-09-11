@@ -420,6 +420,9 @@ namespace Cosmos.IL2CPU {
 
     private void ScanMethod(MethodInfo aMethodInfo) {
       var xMethodBase = aMethodInfo.MethodBase;
+      if (xMethodBase.GetFullName() == "System_Void__System_Buffer_BlockCopy_System_Array__System_Int32__System_Array__System_Int32__System_Int32_") {
+        Console.Write("");
+      }
 
       // Call ProcessMethod first, later in a threaded environment it will
       // allow more threads to work slightly sooner
@@ -461,6 +464,9 @@ namespace Cosmos.IL2CPU {
     public uint QueueMethod(object aSrc, string aSrcType, MethodBase aMethodBase
       , bool aIsPlug)
     {
+      if (aMethodBase.GetFullName() == "System_Void__System_Buffer_BlockCopy_System_Array__System_Int32__System_Array__System_Int32__System_Int32_") {
+        Console.Write("");
+      }
       uint xResult;
 
       // If already queued, skip it and return reference to it

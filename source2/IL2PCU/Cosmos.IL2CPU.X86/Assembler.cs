@@ -146,6 +146,7 @@ namespace Cosmos.IL2CPU.X86 {
                            new byte[0x50000]));
             DataMembers.Add(new DataMember("Kernel_Stack",
                            new byte[0]));
+            new Label("__ENGINE_ENTRYPOINT__");
             DebugStub.EmitDataSection();
         }
 
