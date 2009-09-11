@@ -356,17 +356,13 @@ namespace Cosmos.IL2CPU {
 
       // Scan from entry point of this program
       ExecuteInternal(null, "Entry Point", aStartMethod, false);
+      // ExecuteInternal does NOT scan all methods, which means, that it we can still have pending methods when it returns.
+      DoProcessingPass();
+
       mAsmblr.GenerateVMTCode(mTypes, mTypesSet, mKnownMethods);
     }
 
-    public uint ExecuteInternal(object aSrc, string aSrcType, System.Reflection.MethodInfo aStartMethod, bool aIsPlug) {
-      // See comment at mMethodsToProcessStart declaration
-      if (aStartMethod.GetFullName().IndexOf("system_object_tostring", StringComparison.InvariantCultureIgnoreCase)!=-1) {
-        Console.Write("");
-      }
-      mMethodsToProcessStart = mMethodsToProcess.Count;
-      uint xResult = QueueMethod(aSrc, aSrcType, aStartMethod, aIsPlug);
-
+    private void DoProcessingPass() {
       // Cannot use foreach, the list changes as we go
       // and we dont start at 0
       for (int i = mMethodsToProcessStart; i < mMethodsToProcess.Count; i++) {
@@ -375,6 +371,18 @@ namespace Cosmos.IL2CPU {
           ScanMethod(xMethod);
         }
       }
+      mMethodsToProcessStart = mMethodsToProcess.Count;
+    }
+
+    public uint ExecuteInternal(object aSrc, string aSrcType, System.Reflection.MethodInfo aStartMethod, bool aIsPlug) {
+      // See comment at mMethodsToProcessStart declaration
+      if (aStartMethod.GetFullName().IndexOf("system_object_tostring", StringComparison.InvariantCultureIgnoreCase)!=-1) {
+        Console.Write("");
+      }
+      uint xResult = QueueMethod(aSrc, aSrcType, aStartMethod, aIsPlug);
+
+      // scan all pending methods
+      DoProcessingPass();
 
       // ie 
       //   var xSB = new StringBuilder("test");
