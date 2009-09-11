@@ -1,4 +1,6 @@
 using System;
+using CPUx86 = Indy.IL2CPU.Assembler.X86;
+using Indy.IL2CPU.IL;
 
 namespace Cosmos.IL2CPU.X86.IL {
   [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Conv_Ovf_I4)]
@@ -8,8 +10,7 @@ namespace Cosmos.IL2CPU.X86.IL {
     }
 
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
-      throw new NotImplementedException();
+      ThrowNowImplementedException("Conv_Ovf_I4 is not yet implemented");
     }
-
   }
 }

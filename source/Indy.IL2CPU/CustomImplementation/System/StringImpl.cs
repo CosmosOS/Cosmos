@@ -28,6 +28,11 @@ namespace Indy.IL2CPU.CustomImplementation.System {
       return String.Concat(xStrings);
     }
 
+    public static bool StartsWith(string aThis, string aSubstring, StringComparison aComparison) {
+      Console.WriteLine("String.StartsWith not working!");
+      throw new NotImplementedException();
+    }
+
     public static string PadHelper(string aThis, int totalWidth, char paddingChar, bool isRightPadded) {
       char[] cs = new char[totalWidth];
 

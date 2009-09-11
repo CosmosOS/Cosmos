@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using Indy.IL2CPU;
 using Indy.IL2CPU.Plugs;
+using Indy.IL2CPU.IL;
 
 namespace Cosmos.IL2CPU {
   public class ILScanner : IDisposable {
@@ -326,6 +327,7 @@ namespace Cosmos.IL2CPU {
       // entry point plugs will be found.
       LoadPlugs();
 
+      // todo: why do all there system methods get registered as a plug, while they are normal methods, just they dont get scanned normally?
       // Pull in extra implementations, GC etc.
       ExecuteInternal(null, "Explicit Entry", (System.Reflection.MethodInfo)RuntimeEngineRefs.InitializeApplicationRef, true);
       ExecuteInternal(null, "Explicit Entry", (System.Reflection.MethodInfo)RuntimeEngineRefs.FinalizeApplicationRef, true);
@@ -338,6 +340,8 @@ namespace Cosmos.IL2CPU {
       ExecuteInternal(null, "Explicit Entry", (System.Reflection.MethodInfo)GCImplementationRefs.IncRefCountRef, true);
       ExecuteInternal(null, "Explicit Entry", (System.Reflection.MethodInfo)GCImplementationRefs.DecRefCountRef, true);
       ExecuteInternal(null, "Explicit Entry", (System.Reflection.MethodInfo)GCImplementationRefs.AllocNewObjectRef, true);
+      // for now, to ease runtime exception throwing
+      ExecuteInternal(null, "Explicit Entry", typeof(ExceptionHelper).GetMethod("ThrowNotImplemented", BindingFlags.Static | BindingFlags.Public), false);
       //xScanner.Execute( ( System.Reflection.MethodInfo )RuntimeEngineRefs.InitializeApplicationRef );
       //xScanner.Execute( ( System.Reflection.MethodInfo )RuntimeEngineRefs.FinalizeApplicationRef );
       ////xScanner.QueueMethod(typeof(CosmosAssembler).GetMethod("PrintException"));

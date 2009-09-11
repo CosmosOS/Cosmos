@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="Assembler\X86\CosmosAssembler.cs" />
     <Compile Include="Assembler\X86\SpecialDebug\DebugStub.cs" />
+    <Compile Include="IL\ExceptionHelper.cs" />
     <Compile Include="IL\x86\Add.cs" />
     <Compile Include="IL\x86\Add_Ovf.cs" />
     <Compile Include="IL\x86\Add_Ovf_Un.cs" />
@@ -259,6 +260,8 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\IL2CPU\Cosmos.IL2CPU.Debug\Cosmos.Compiler.Debug.csproj">

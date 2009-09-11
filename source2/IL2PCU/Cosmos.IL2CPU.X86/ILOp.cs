@@ -5,6 +5,9 @@ using System.Text;
 using CPU = Cosmos.IL2CPU.X86;
 using Cosmos.IL2CPU.ILOpCodes;
 using System.Reflection;
+using Cosmos.IL2CPU.X86.IL;
+using Indy.IL2CPU.IL;
+using CPUx86 = Indy.IL2CPU.Assembler.X86;
 
 namespace Cosmos.IL2CPU.X86
 {
@@ -63,6 +66,14 @@ namespace Cosmos.IL2CPU.X86
         protected uint Align( uint aSize, uint aAlign )
         {
             return aSize % 4 == 0 ? aSize : ( ( aSize / aAlign ) * aAlign ) + 1;
+        }
+        protected void ThrowNowImplementedException(string aMessage) {
+          new CPU.Push {
+            DestinationRef = ElementReference.New(LdStr.GetContentsArrayName("Conv_Ovf_I4 instruction not implemented"))
+          };
+          new CPU.Call {
+            DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(typeof(ExceptionHelper).GetMethod("ThrowNotImplemented", BindingFlags.Static | BindingFlags.Public))
+          };
         }
     }
 }
