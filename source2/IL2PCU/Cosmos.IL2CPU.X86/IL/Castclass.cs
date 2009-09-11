@@ -45,7 +45,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
             new Label( mReturnNullLabel );
             new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
-            string xAllocInfoLabelName = CPU.MethodInfoLabelGenerator.GenerateLabelName( GCImplementationRefs.AllocNewObjectRef );
+            string xAllocInfoLabelName = MethodInfoLabelGenerator.GenerateLabelName( GCImplementationRefs.AllocNewObjectRef );
 #warning TODO: Emit new exceptions
             //new Newobj( Assembler ).Execute( aMethod, aOpCode );
    

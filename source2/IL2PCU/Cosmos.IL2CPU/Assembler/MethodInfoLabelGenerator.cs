@@ -11,11 +11,16 @@ namespace Cosmos.IL2CPU
 {
     public static class MethodInfoLabelGenerator
     {
+      public static uint LabelCount {
+        get;
+        private set;
+      }
 
         public static string GenerateLabelName( MethodBase aMethod )
         {
             string xResult = DataMember.FilterStringForIncorrectChars( GenerateFullName( aMethod ) );
             xResult = GenerateLabelFromFullName( xResult );
+            LabelCount++;
             return xResult;
         }
 
@@ -91,7 +96,7 @@ namespace Cosmos.IL2CPU
         {
             if( aType.IsGenericParameter )
             {
-                return aType.Name;
+              return aType.FullName;
             }
             var xSB = new StringBuilder();
             if( aType.IsArray )
@@ -111,13 +116,13 @@ namespace Cosmos.IL2CPU
             {
                 return "&" + GetFullName( aType.GetElementType() );
             }
-            if( aType.IsGenericType )
+            if( aType.IsGenericType && !aType.IsGenericTypeDefinition )
             {
-                xSB.Append( aType.GetGenericTypeDefinition().FullName );
+                xSB.Append( GetFullName(aType.GetGenericTypeDefinition()));
             }
             else
             {
-                xSB.Append( aType.FullName );
+              xSB.Append(aType.FullName);
             }
             if( aType.IsGenericType )
             {

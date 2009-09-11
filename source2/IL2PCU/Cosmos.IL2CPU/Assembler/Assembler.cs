@@ -374,9 +374,9 @@ namespace Cosmos.IL2CPU {
           }
         }
         if (!xType.IsInterface) {
-          Move("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xType)), i);
+          Move("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name), i);
           Assembler.mCurrentInstance.DataMembers.Add(
-              new DataMember("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xType)), new int[] { i }));
+              new DataMember("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name), new int[] { i }));
           Push((uint)xBaseIndex.Value);
           Push("0" + xEmittedMethods.Count.ToString("X") + "h");
           xData = new byte[16 + (xEmittedMethods.Count * 4)];
@@ -388,10 +388,10 @@ namespace Cosmos.IL2CPU {
           Array.Copy(xTemp, 0, xData, 8, 4);
           xTemp = BitConverter.GetBytes(4); // embedded array
           Array.Copy(xTemp, 0, xData, 12, 4);
-          string xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(aTypes[i].AssemblyQualifiedName) + "__MethodIndexesArray";
+          string xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name) + "__MethodIndexesArray";
           Assembler.mCurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
           Push(xDataName);
-          xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(aTypes[i].AssemblyQualifiedName) + "__MethodAddressesArray";
+          xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name) + "__MethodAddressesArray";
           Assembler.mCurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
           Push(xDataName);
           xData = new byte[16 + Encoding.Unicode.GetByteCount(aTypes[i].FullName + ", " + aTypes[i].Module.Assembly.GetName().FullName)];
@@ -403,7 +403,7 @@ namespace Cosmos.IL2CPU {
           Array.Copy(xTemp, 0, xData, 8, 4);
           xTemp = BitConverter.GetBytes(2); // embedded array
           Array.Copy(xTemp, 0, xData, 12, 4);
-          xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(aTypes[i]));
+          xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name);
           Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
           Push((uint)xEmittedMethods.Count);
           //Push("0");

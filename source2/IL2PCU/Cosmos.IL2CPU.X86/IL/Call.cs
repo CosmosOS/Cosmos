@@ -38,13 +38,13 @@ namespace Cosmos.IL2CPU.X86.IL {
           return;
       }
       var xMethodInfo = xOpMethod.Value as System.Reflection.MethodInfo;
-      string xCurrentMethodLabel = CPU.MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase);
+      string xCurrentMethodLabel = MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase);
 
       // mTargetMethodInfo = GetService<IMetaDataInfoService>().GetMethodInfo(mMethod
       //   , mMethod, mMethodDescription, null, mCurrentMethodInfo.DebugMode);
       string xNormalAddress = "";
       if (xOpMethod.Value.IsStatic || !xOpMethod.Value.IsVirtual || xOpMethod.Value.IsFinal) {
-        xNormalAddress = CPU.MethodInfoLabelGenerator.GenerateLabelName(xOpMethod.Value);
+        xNormalAddress = MethodInfoLabelGenerator.GenerateLabelName(xOpMethod.Value);
       } else {
         throw new Exception("Call: non-concrete method called!");
       }

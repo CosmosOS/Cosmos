@@ -30,7 +30,7 @@ namespace Cosmos.IL2CPU.X86.IL
             string xNormalAddress = "";
             if( xMethodInfo.IsStatic || !xMethodInfo.IsVirtual || xMethodInfo.IsFinal )
             {
-                xNormalAddress = CPU.MethodInfoLabelGenerator.GenerateLabelName( xMethodInfo );
+                xNormalAddress = MethodInfoLabelGenerator.GenerateLabelName( xMethodInfo );
             }
             // mMethodIdentifier = GetService<IMetaDataInfoService>().GetMethodIdLabel(mMethod);
 

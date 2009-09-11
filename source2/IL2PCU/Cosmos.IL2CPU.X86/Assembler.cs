@@ -188,7 +188,7 @@ namespace Cosmos.IL2CPU.X86 {
 
         protected override void Call(MethodBase aMethod) {
           new IL2CPU.X86.Call {
-            DestinationLabel = CPU.MethodInfoLabelGenerator.GenerateLabelName(aMethod)
+            DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(aMethod)
           };
         }
 

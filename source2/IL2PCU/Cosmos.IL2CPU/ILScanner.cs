@@ -473,8 +473,8 @@ namespace Cosmos.IL2CPU {
       xResult = (uint)mMethodsToProcess.Count;
       mKnownMethods.Add(aMethodBase, xResult);
 
-      MethodInfo.TypeEnum xMethodType;
       MethodInfo xPlug = null;
+      var xMethodType = MethodInfo.TypeEnum.Normal;
       if (aIsPlug) {
         xMethodType = MethodInfo.TypeEnum.Plug;
       } else {
@@ -499,7 +499,12 @@ namespace Cosmos.IL2CPU {
           xPlug = mMethodsToProcess[(int)xPlugId];
           xMethodType = MethodInfo.TypeEnum.NeedsPlug;
         }
+      }
 
+      var xMethod = new MethodInfo(aMethodBase, xResult, xMethodType, xPlug);
+      mMethodsToProcess.Add(xMethod);
+
+      if(!aIsPlug) {
         // Queue Types directly related to method
         QueueType(aMethodBase, "Declaring Type", aMethodBase.DeclaringType);
         if (aMethodBase is System.Reflection.MethodInfo) {
@@ -509,10 +514,6 @@ namespace Cosmos.IL2CPU {
           QueueType(aMethodBase, "Parameter", xParam.ParameterType);
         }
       }
-
-      var xMethod = new MethodInfo(aMethodBase, xResult, xMethodType, xPlug);
-      mMethodsToProcess.Add(xMethod);
-
       return xResult;
     }
 
