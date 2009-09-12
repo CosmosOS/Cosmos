@@ -222,14 +222,8 @@ namespace Cosmos.IL2CPU {
                 // This merges methods and ctors, improve this later
                 var xTargetMethods = xPlugImpl.Target.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Cast<MethodBase>().AsQueryable();
                 xTargetMethods = xTargetMethods.Union(xPlugImpl.Target.GetConstructors(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic));
-                if (xMethodAttrib.Signature != null && xMethodAttrib.Signature.IndexOf("TrySZIndexOf", StringComparison.InvariantCultureIgnoreCase) != -1) {
-                  Console.Write("");
-                }
                 foreach (var xTargetMethod in xTargetMethods) {
                   string sName = DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GenerateFullName(xTargetMethod));
-                  if (xTargetMethod.Name == "TrySZIndexOf") {
-                    Console.Write("");
-                  }
                   if (string.Compare(sName, xMethodAttrib.Signature, true) == 0) {
                     uint xUID = QueueMethod(xPlugImpl.Plug, "Plug", xMethod, true);
                     mMethodPlugs.Add(xTargetMethod, new PlugInfo(xUID, xMethodAttrib.Assembler));
@@ -446,9 +440,6 @@ namespace Cosmos.IL2CPU {
 
     private void ScanMethod(MethodInfo aMethodInfo) {
       var xMethodBase = aMethodInfo.MethodBase;
-      if (xMethodBase.GetFullName() == "System_Void__System_Buffer_BlockCopy_System_Array__System_Int32__System_Array__System_Int32__System_Int32_") {
-        Console.Write("");
-      }
 
       // Call ProcessMethod first, later in a threaded environment it will
       // allow more threads to work slightly sooner
@@ -509,9 +500,6 @@ namespace Cosmos.IL2CPU {
     public uint QueueMethod(object aSrc, string aSrcType, MethodBase aMethodBase
       , bool aIsPlug)
     {
-      if (aMethodBase.GetFullName() == "System_Void__System_Buffer_BlockCopy_System_Array__System_Int32__System_Array__System_Int32__System_Int32_") {
-        Console.Write("");
-      }
       uint xResult;
 
       // If already queued, skip it and return reference to it

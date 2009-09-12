@@ -6,6 +6,12 @@ using Indy.IL2CPU.Plugs;
 
 namespace Indy.IL2CPU.X86.Plugs.NEW_PLUGS {
   [Plug(Target=typeof(Delegate), AlsoTargetSubtypes=true)]
+  [PlugField(FieldType = typeof(int), FieldId = "$$ArgSize$$")]
+
   public static class DelegateImpl {
+    public static void Ctor(Delegate aThis, object aObject, IntPtr aMethod, [FieldAccess(Name = "System.Object System.Delegate._target")] ref object aFldTarget, [FieldAccess(Name = "System.IntPtr System.Delegate._methodPtr")] ref IntPtr aFldMethod) {
+      aFldTarget = aObject;
+      aFldMethod = aMethod;
+    }
   }
 }

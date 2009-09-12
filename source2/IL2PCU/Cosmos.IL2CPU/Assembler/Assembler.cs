@@ -146,7 +146,12 @@ namespace Cosmos.IL2CPU {
       if (aMethod.PlugMethodAssembler != null) {
         mLog.WriteLine("Emitted using MethodAssembler", aMethod.MethodBase.GetFullName());
         mLog.Flush();
-        throw new Exception("MethodAssemblers not possible!!");
+        var xAssembler = (AssemblerMethod)Activator.CreateInstance(aMethod.PlugMethodAssembler);
+        var xNeedsMethodInfo = xAssembler as INeedsMethodInfo;
+        if (xNeedsMethodInfo != null) {
+          throw new Exception("Plug cant work, because of INeedsMethodInfo");
+        }
+        xAssembler.AssembleNew(this);
       } else {
         foreach (var xOpCode in aOpCodes) {
           uint xOpCodeVal = (uint)xOpCode.OpCode;
