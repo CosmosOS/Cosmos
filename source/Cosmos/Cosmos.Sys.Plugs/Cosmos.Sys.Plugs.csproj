@@ -65,6 +65,14 @@
     <Compile Include="VFS\PathImpl.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\source2\IL2PCU\Cosmos.IL2CPU.X86\Cosmos.IL2CPU.X86.csproj">
+      <Project>{63F7BFB9-419E-4965-B580-304B9C9FA7D8}</Project>
+      <Name>Cosmos.IL2CPU.X86</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\source2\IL2PCU\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj">
+      <Project>{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}</Project>
+      <Name>Cosmos.IL2CPU</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Compiler\Indy.IL2CPU.Assembler\Indy.IL2CPU.Assembler.csproj">
       <Project>{5A1E9D16-BF71-4D8E-9389-3476056E4566}</Project>
       <Name>Indy.IL2CPU.Assembler</Name>

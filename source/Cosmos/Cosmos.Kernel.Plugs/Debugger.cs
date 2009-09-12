@@ -61,11 +61,18 @@ namespace Cosmos.Kernel.Plugs {
         public override void Assemble(Asm.Assembler aAssembler) {
             new DebuggerAsm().TraceOff();
         }
+
+        public override void AssembleNew(object aAssembler) {
+          throw new NotImplementedException();
+        }
     }
 
     public class DebugTraceOn : AssemblerMethod {
         public override void Assemble(Asm.Assembler aAssembler) {
             new DebuggerAsm().TraceOn();
+        }
+        public override void AssembleNew(object aAssembler) {
+          throw new NotImplementedException();
         }
     }
 
@@ -73,11 +80,17 @@ namespace Cosmos.Kernel.Plugs {
         public override void Assemble(Asm.Assembler aAssembler) {
             new DebuggerAsm().Break();
         }
+        public override void AssembleNew(object aAssembler) {
+          throw new NotImplementedException();
+        }
     }
 
     public class DebugSend : AssemblerMethod {
         public override void Assemble(Asm.Assembler aAssembler) {
             new DebuggerAsm().SendText();
+        }
+        public override void AssembleNew(object aAssembler) {
+          throw new NotImplementedException();
         }
     }
 }

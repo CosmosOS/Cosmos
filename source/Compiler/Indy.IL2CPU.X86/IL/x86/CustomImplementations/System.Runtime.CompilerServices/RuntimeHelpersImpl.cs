@@ -46,5 +46,9 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System.Runtime.CompilerServic
 
 			new Assembler.Label(".EndLoop");
 		}
+
+    public override void AssembleNew(object aAssembler) {
+      throw new NotImplementedException();
+    }
 	}
 }

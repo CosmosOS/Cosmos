@@ -10,11 +10,16 @@ namespace Cosmos.IL2CPU
         public Comment( Assembler aAssembler, string aText )
             : base( aAssembler ) //HACK
         {
-            if( aText.StartsWith( ";" ) )
-            {
-                aText = aText.TrimStart( ';' ).TrimStart();
-            }
-            Text = String.Intern( aText );
+          if (aText.StartsWith(";")) {
+            aText = aText.TrimStart(';').TrimStart();
+          }
+          Text = String.Intern(aText);
+        }
+        public Comment(string aText):base(true) {
+          if (aText.StartsWith(";")) {
+            aText = aText.TrimStart(';').TrimStart();
+          }
+          Text = String.Intern(aText);
         }
 
         public new void WriteText( Indy.IL2CPU.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput )

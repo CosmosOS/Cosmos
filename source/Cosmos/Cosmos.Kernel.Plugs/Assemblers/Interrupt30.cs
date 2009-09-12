@@ -18,5 +18,9 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
         public override void Assemble(Assembler aAssembler) {
             
         }
+
+        public override void AssembleNew(object aAssembler) {
+          
+        }
     }
 }

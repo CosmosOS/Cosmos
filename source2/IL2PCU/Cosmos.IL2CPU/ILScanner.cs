@@ -164,6 +164,10 @@ namespace Cosmos.IL2CPU {
       // and is substituted on the fly? Plug scanner would direct all access to that
       // class and throw an exception if any method, field, member etc is missing.
       foreach (var xAsm in AppDomain.CurrentDomain.GetAssemblies()) {
+        if (xAsm.GetName().Name == "Indy.IL2CPU.X86") {
+          // skip this assembly for now
+          continue;
+        }
         foreach (var xType in xAsm.GetTypes()) {
           foreach (var xAttrib1 in xType.GetCustomAttributes(false)) {
             // Find all classes marked as a Plug

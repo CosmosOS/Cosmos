@@ -147,6 +147,10 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System.Assemblers
 			//new CPUx86.Move("eax", CPUx86.Registers_Old.
 		}
 
+    public override void AssembleNew(object aAssembler) {
+      throw new NotImplementedException();
+    }
+
 		public MethodInformation MethodInfo
 		{
 			get;

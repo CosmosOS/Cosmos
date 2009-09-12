@@ -12,5 +12,9 @@ namespace Indy.IL2CPU.IL.X86LinqTest.CustomImplementations.System.Diagnostics {
 			// TODO - See Cosmos.Debug.Debugger.Break - this should use same plug
             // TODO -pHigh: implement Debugger.Break();
 		}
+
+    public override void AssembleNew(object aAssembler) {
+      throw new NotImplementedException();
+    }
 	}
 }

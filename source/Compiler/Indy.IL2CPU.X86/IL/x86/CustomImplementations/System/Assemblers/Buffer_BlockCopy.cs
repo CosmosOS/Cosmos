@@ -31,5 +31,9 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System.Assemblers {
             new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 8 };
             new Movs { Size = 8, Prefixes = InstructionPrefixes.Repeat };
 		}
+
+    public override void AssembleNew(object aAssembler) {
+      throw new NotImplementedException();
+    }
 	}
 }

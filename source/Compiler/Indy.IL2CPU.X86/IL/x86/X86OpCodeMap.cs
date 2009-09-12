@@ -6,8 +6,8 @@ using System.Reflection;
 using CPU = Indy.IL2CPU.Assembler;
 using CPUx86 = Indy.IL2CPU.Assembler.X86;
 using Indy.IL2CPU.Assembler;
-using Indy.IL2CPU.IL.X86.CustomImplementations.System;
 using Indy.IL2CPU.Compiler;
+using Indy.IL2CPU.IL.X86.CustomImplementations.System;
 
 namespace Indy.IL2CPU.IL.X86
 {
@@ -109,7 +109,11 @@ namespace Indy.IL2CPU.IL.X86
 			}
 		}
 
-		private static readonly MethodBase InvokeMulticastRef = typeof(MulticastDelegateImpl).GetMethod("InvokeMulticast", BindingFlags.Public | BindingFlags.Static);
+    private static readonly MethodBase InvokeMulticastRef;
+    static X86OpCodeMap() {
+      //var xType = 
+      //typeof(MulticastDelegateImpl).GetMethod("InvokeMulticast", BindingFlags.Public | BindingFlags.Static);
+    }
         public override void ScanCustomAssembleImplementation(MethodInformation aMethod)
         {
             base.ScanCustomAssembleImplementation(aMethod);
@@ -123,7 +127,7 @@ namespace Indy.IL2CPU.IL.X86
                 }
                 if (aMethod.Method.Name == "Invoke")
                 {
-                    GetService<IMetaDataInfoService>().GetMethodInfo(InvokeMulticastRef, false);
+                    //GetService<IMetaDataInfoService>().GetMethodInfo(InvokeMulticastRef, false);
                     GetService<IMetaDataInfoService>().GetMethodInfo(typeof(MulticastDelegate).GetMethod("GetInvocationList"), false);
                     GetService<IMetaDataInfoService>().GetMethodInfo(typeof(Delegate).GetMethod("GetInvocationList"), false);
                     return;
@@ -147,8 +151,8 @@ namespace Indy.IL2CPU.IL.X86
 				case "System_IntPtr__System_Delegate_GetMulticastInvoke__":
 					{
 						//IL.X86.Op.Ldarg(aAssembler, aMethodInfo.Arguments[0]);
-					    var xInvokeInfo = GetService<IMetaDataInfoService>().GetMethodInfo(InvokeMulticastRef, false);
-new CPUx86.Push { DestinationRef = ElementReference.New(xInvokeInfo.LabelName) };
+					    //var xInvokeInfo = GetService<IMetaDataInfoService>().GetMethodInfo(InvokeMulticastRef, false);
+//new CPUx86.Push { DestinationRef = ElementReference.New(xInvokeInfo.LabelName) };
 						break;
 					}
 				case "System_MulticastDelegate___System_Delegate_InternalAllocLike___System_Delegate___":

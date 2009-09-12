@@ -14,7 +14,7 @@ namespace HelloWorld {
 		[STAThread]
 		static void Main(string[] args) {
       // enforce assembly linking:
-      var xTheType = typeof(Indy.IL2CPU.IL.X86.CustomImplementations.System.Runtime.CompilerServices.RuntimeHelpersImpl);
+      var xTheType = typeof(Indy.IL2CPU.X86.Plugs.CustomImplementations.System.Runtime.CompilerServices.RuntimeHelpersImpl);
       
       // end enforce assembly linking
       //Indy.IL2CPU.Engine.Execute()
