@@ -39,7 +39,7 @@ namespace Cosmos.IL2CPU {
     // List of plug implementations.
     // Key: MethodBase of targetted method
     // Value: index into mMethodsToProcess
-    protected Dictionary<MethodBase, uint> mMethodPlugs = new Dictionary<MethodBase, uint>();
+    protected Dictionary<MethodBase, PlugInfo> mMethodPlugs = new Dictionary<MethodBase, PlugInfo>();
 
     // Contains a list of plug implementor classes
     // Used to collect a full list before resolving them.
@@ -199,6 +199,7 @@ namespace Cosmos.IL2CPU {
 
           // See if we need to disable this plug
           bool xEnabled = true;
+          Type xAssembler = null;
           if (xMethodAttrib != null) {
             //TODO: Check this against build options
             //TODO: Two exclusive IsOnly's dont make sense
@@ -227,7 +228,7 @@ namespace Cosmos.IL2CPU {
                   }
                   if (string.Compare(sName, xMethodAttrib.Signature, true) == 0) {
                     uint xUID = QueueMethod(xPlugImpl.Plug, "Plug", xMethod, true);
-                    mMethodPlugs.Add(xTargetMethod, xUID);
+                    mMethodPlugs.Add(xTargetMethod, new PlugInfo(xUID, xMethodAttrib.Assembler));
                     // Mark as disabled, because we already handled it
                     xEnabled = false;
                     break;
@@ -241,6 +242,7 @@ namespace Cosmos.IL2CPU {
               } else {
                 xEnabled = xMethodAttrib.Enabled;
               }
+              xAssembler = xMethodAttrib.Assembler;
             }
           }
 
@@ -328,10 +330,10 @@ namespace Cosmos.IL2CPU {
               throw new Exception("Plug target method not found.");
             }
             if (mMethodPlugs.ContainsKey(xTargetMethod)) {
-              var xTheMethod = mMethodsToProcess[(int)mMethodPlugs[xTargetMethod]];
+              var xTheMethod = mMethodsToProcess[(int)mMethodPlugs[xTargetMethod].TargetUID];
               Console.Write("");
             }
-            mMethodPlugs.Add(xTargetMethod, xUID);
+            mMethodPlugs.Add(xTargetMethod, new PlugInfo(xUID, xAssembler));
           }
         }
         //TODO: Look for Field plugs
@@ -518,6 +520,7 @@ namespace Cosmos.IL2CPU {
       xResult = (uint)mMethodsToProcess.Count;
       mKnownMethods.Add(aMethodBase, xResult);
       MethodInfo xPlug = null;
+      Type xPlugAssembler = null;
       var xMethodType = MethodInfo.TypeEnum.Normal;
       if (aIsPlug) {
         xMethodType = MethodInfo.TypeEnum.Plug;
@@ -535,21 +538,21 @@ namespace Cosmos.IL2CPU {
             xMethodType = MethodInfo.TypeEnum.NeedsPlug;
           }
         }
-
-        if (aMethodBase.DeclaringType.FullName == "System.SR") {
-          Console.Write("");
-        }
         // See if method has a plug
+        PlugInfo xPlugInfo = null;
         uint xPlugId = 0;
-        if (mMethodPlugs.TryGetValue(aMethodBase, out xPlugId)) {
+        if (mMethodPlugs.TryGetValue(aMethodBase, out xPlugInfo)) {
+          xPlugId = xPlugInfo.TargetUID;
           xPlug = mMethodsToProcess[(int)xPlugId];
           xMethodType = MethodInfo.TypeEnum.NeedsPlug;
+          xPlugAssembler = xPlugInfo.PlugMethodAssembler;
         } else if (xMethodType == MethodInfo.TypeEnum.NeedsPlug) {
+
           throw new Exception("Method [" + aMethodBase.DeclaringType + "." + aMethodBase.Name + "] needs to be plugged, but wasn't");
         }
       }
 
-      var xMethod = new MethodInfo(aMethodBase, xResult, xMethodType, xPlug);
+      var xMethod = new MethodInfo(aMethodBase, xResult, xMethodType, xPlug, xPlugAssembler);
       mMethodsToProcess.Add(xMethod);
 
       if(!aIsPlug) {

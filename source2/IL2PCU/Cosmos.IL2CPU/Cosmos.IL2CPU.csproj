@@ -89,6 +89,7 @@
     <Compile Include="MethodInfo.cs" />
     <Compile Include="Assembler\MethodInfoLabelGenerator.cs" />
     <Compile Include="OpCodeAttribute.cs" />
+    <Compile Include="PlugInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ILScanner.cs" />
     <Compile Include="StackContents.cs" />

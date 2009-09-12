@@ -9,6 +9,7 @@ using System.Reflection;
 using Indy.IL2CPU;
 using Indy.IL2CPU.IL;
 using System.Runtime.InteropServices;
+using Indy.IL2CPU.Plugs;
 
 namespace Cosmos.IL2CPU {
 
@@ -142,23 +143,28 @@ namespace Cosmos.IL2CPU {
       Stack.Clear();
       mLog.WriteLine("Method '{0}'", aMethod.MethodBase.GetFullName());
       mLog.Flush();
-      foreach (var xOpCode in aOpCodes) {
-        uint xOpCodeVal = (uint)xOpCode.OpCode;
-        ILOp xILOp;
-        if (xOpCodeVal <= 0xFF) {
-          xILOp = mILOpsLo[xOpCodeVal];
-        } else {
-          xILOp = mILOpsHi[xOpCodeVal & 0xFF];
-        }
-        //mLog.WriteLine ( "\t[" + xILOp.ToString() + "] \t Stack start: " + Stack.Count.ToString() );
-        mLog.WriteLine("\t{0} {1}", Stack.Count, xILOp.GetType().Name);
+      if (aMethod.PlugMethodAssembler != null) {
+        mLog.WriteLine("Emitted using MethodAssembler", aMethod.MethodBase.GetFullName());
         mLog.Flush();
-        new Comment(this, "[" + xILOp.ToString() + "]");
-        BeforeOp(aMethod, xOpCode);
-        xILOp.Execute(aMethod, xOpCode);
-        AfterOp(aMethod, xOpCode);
-        //mLog.WriteLine( " end: " + Stack.Count.ToString() );
-
+        throw new Exception("MethodAssemblers not possible!!");
+      } else {
+        foreach (var xOpCode in aOpCodes) {
+          uint xOpCodeVal = (uint)xOpCode.OpCode;
+          ILOp xILOp;
+          if (xOpCodeVal <= 0xFF) {
+            xILOp = mILOpsLo[xOpCodeVal];
+          } else {
+            xILOp = mILOpsHi[xOpCodeVal & 0xFF];
+          }
+          //mLog.WriteLine ( "\t[" + xILOp.ToString() + "] \t Stack start: " + Stack.Count.ToString() );
+          mLog.WriteLine("\t{0} {1}", Stack.Count, xILOp.GetType().Name);
+          mLog.Flush();
+          new Comment(this, "[" + xILOp.ToString() + "]");
+          BeforeOp(aMethod, xOpCode);
+          xILOp.Execute(aMethod, xOpCode);
+          AfterOp(aMethod, xOpCode);
+          //mLog.WriteLine( " end: " + Stack.Count.ToString() );
+        }
       }
       MethodEnd(aMethod);
     }
