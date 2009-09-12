@@ -3,7 +3,6 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using System.Security.Cryptography;
-using Indy.IL2CPU.Assembler;
 using System.Diagnostics;
 
 
