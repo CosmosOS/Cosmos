@@ -477,28 +477,37 @@ namespace Cosmos.IL2CPU {
     private long mItemsHandled = 0;
     protected void ScanQueue() {
       while (mQueue.Count > 0) {
-        if ((mQueue.Count + mItemsHandled) != mItems.Count) {
-          Console.Write("");
+        while (mQueue.Count > 0) {
+          if ((mQueue.Count + mItemsHandled) != mItems.Count) {
+            Console.Write("");
+          }
+          var xItem = mQueue.Dequeue();
+          // Check for MethodBase first, they are more numerous 
+          // and will reduce compares
+          if (xItem is MethodBase) {
+            ScanMethod((MethodBase)xItem, false);
+          } else if (xItem is Type) {
+            ScanType((Type)xItem);
+          } else {
+            throw new Exception("Unknown item found in queue.");
+          }
+          mItemsHandled++;
+          if ((mItemsHandled % 5000) == 0) {
+            Console.WriteLine("ItemsHandled: {0}", mItemsHandled);
+          }
+          if (mItemsHandled == 10000) {
+            throw new Exception("Debug Abort");
+          }
         }
-        var xItem = mQueue.Dequeue();
-        // Check for MethodBase first, they are more numerous 
-        // and will reduce compares
-        if (xItem is MethodBase) {
-          ScanMethod((MethodBase)xItem, false);
-        } else if (xItem is Type) {
-          ScanType((Type)xItem);
-        } else {
-          throw new Exception("Unknown item found in queue.");
-        }
-        mItemsHandled++;
-        if ((mItemsHandled % 5000) == 0) {
-          Console.WriteLine("ItemsHandled: {0}", mItemsHandled);
-        }
-        if (mItemsHandled == 10000) {
-          throw new Exception("Debug Abort");
-        }
+        // We process all items until no more are added.
+        // Then we check virtuals again. If it adds more items
+        // Then we need to repeat the whole process.
+        CheckVirtuals();
       }
       Console.WriteLine("ItemsHandled: {0}", mItemsHandled);
+    }
+
+    protected void CheckVirtuals() {
     }
 
     protected void LogMapPoint(object aSrc, string aSrcType, object aItem) {
