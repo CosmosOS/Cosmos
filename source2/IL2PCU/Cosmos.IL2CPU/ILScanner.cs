@@ -126,7 +126,7 @@ namespace Cosmos.IL2CPU {
       }
     }
 
-    public void Execute(MethodInfo aStartMethod) {
+    public void Execute(System.Reflection.MethodInfo aStartMethod) {
       // TODO: Investigate using MS CCI
       // Need to check license, as well as in profiler
       // http://cciast.codeplex.com/
