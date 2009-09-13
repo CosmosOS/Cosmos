@@ -380,32 +380,6 @@ namespace Cosmos.IL2CPU {
           //if bases are already in, or even better keep only the top 
           //base
         }
-
-        // Look in list of types for ancestors and descendants
-        // with overrides / bases
-        // List changes as we go, cant be foreach
-        //TODO: If its final or sealed, we dont need to search down
-        for (int i = 0; i < mItemsList.Count; i++) {
-          if (mItemsList[i] is Type) {
-            var xType = (Type)mItemsList[i];
-            // If DeclaringType is a ancestor or descendant
-            if (xType.IsSubclassOf(aMethod.DeclaringType)
-              || aMethod.DeclaringType.IsSubclassOf(xType)) {
-              var xNewMethod = xType.GetMethod(aMethod.Name, xParamTypes);
-              if (xNewMethod != null && xNewMethod != aMethod) {
-                if (xNewMethod.IsAbstract) {
-                  // If virtual, we need to add it to mVirtuals.
-                  // Non virtuals will get added when they get scanned.
-                  mVirtuals.Add(xNewMethod);
-                } else {
-                  // Abstract methods dont have an implementation, so only add
-                  // non abstract methods for scanning.
-                  Queue(xNewMethod, aMethod, "Virtual");
-                }
-              }
-            }
-          }
-        }
       }
 
       MethodBase xPlug = null;
@@ -508,6 +482,31 @@ namespace Cosmos.IL2CPU {
     }
 
     protected void CheckVirtuals() {
+      // Look in list of types for ancestors and descendants
+      // with overrides / bases
+      // List changes as we go, cant be foreach
+      //TODO: If its final or sealed, we dont need to search down
+      for (int i = 0; i < mItemsList.Count; i++) {
+        if (mItemsList[i] is Type) {
+          var xType = (Type)mItemsList[i];
+          // If DeclaringType is a ancestor or descendant
+          //if (xType.IsSubclassOf(aMethod.DeclaringType)
+          //  || aMethod.DeclaringType.IsSubclassOf(xType)) {
+          //  var xNewMethod = xType.GetMethod(aMethod.Name, xParamTypes);
+          //  if (xNewMethod != null && xNewMethod != aMethod) {
+          //    if (xNewMethod.IsAbstract) {
+          //      // If virtual, we need to add it to mVirtuals.
+          //      // Non virtuals will get added when they get scanned.
+          //      mVirtuals.Add(xNewMethod);
+          //    } else {
+          //      // Abstract methods dont have an implementation, so only add
+          //      // non abstract methods for scanning.
+          //      Queue(xNewMethod, aMethod, "Virtual");
+          //    }
+          //  }
+          //}
+        }
+      }
     }
 
     protected void LogMapPoint(object aSrc, string aSrcType, object aItem) {
