@@ -443,6 +443,23 @@ namespace Cosmos.IL2CPU {
         xPlug = ResolvePlug(aMethod, xParamTypes);
       }
       if (xPlug == null) {
+        bool xNeedsPlug = false;
+        if ((aMethod.Attributes & MethodAttributes.PinvokeImpl) != 0) {
+          // pinvoke methods dont have an embedded implementation
+          xNeedsPlug = true;
+        } else {
+          var xImplFlags = aMethod.GetMethodImplementationFlags();
+          // todo: prob even more
+          if ((xImplFlags & MethodImplAttributes.Native) != 0 ||
+              (xImplFlags & MethodImplAttributes.InternalCall) != 0) {
+            // native implementations cannot be compiled
+            xNeedsPlug = true;
+          }
+        }
+        if (xNeedsPlug) {
+          throw new Exception("Plug needed.");
+        }
+        
         //TODO: As we scan each method, we could update or put in a new list
         // that has the resolved plug so we don't have to reresolve it again
         // later for compilation.
@@ -907,35 +924,7 @@ namespace Cosmos.IL2CPU {
   //      xMethodType = MethodInfo.TypeEnum.Plug;
   //    } else {
   //      xMethodType = MethodInfo.TypeEnum.Normal;
-  //      if ((aMethodBase.Attributes & MethodAttributes.PinvokeImpl) != 0) {
-  //        // pinvoke methods dont have an embedded implementation
-  //        xMethodType = MethodInfo.TypeEnum.NeedsPlug;
-  //      } else {
-  //        var xImplFlags = aMethodBase.GetMethodImplementationFlags();
-  //        // todo: prob even more
-  //        if ((xImplFlags & MethodImplAttributes.Native) != 0 ||
-  //            (xImplFlags & MethodImplAttributes.InternalCall) != 0) {
-  //          // native implementations cannot be compiled
-  //          xMethodType = MethodInfo.TypeEnum.NeedsPlug;
-  //        }
-  //      }
 
-  //      // See if method has a plug
-  //      PlugInfo xPlugInfo = null;
-  //      uint xPlugId = 0;
-  //      if (mMethodPlugs.TryGetValue(aMethodBase, out xPlugInfo)) {
-  //        xPlugId = xPlugInfo.TargetUID;
-  //        xPlug = mMethodsToProcess[(int)xPlugId];
-  //        xPlugAssembler = xPlugInfo.PlugMethodAssembler;
-  //      } else {
-  //        // See if we need to apply a inheritable plug
-  //        // Do this after explicit plugs to allow precedence
-  //        foreach (var xInheritablePlug in mPlugInheritableImpls) {
-  //          if (aMethodBase.DeclaringType.IsSubclassOf(xInheritablePlug.Target)) {
-
-  //          }
-  //        }
-  //      }
 
   //      if (xMethodType == MethodInfo.TypeEnum.NeedsPlug && xPlug == null && xPlugAssembler == null) {
   //        throw new Exception("Method [" + aMethodBase.DeclaringType + "." + aMethodBase.Name + "] needs to be plugged, but wasn't");
