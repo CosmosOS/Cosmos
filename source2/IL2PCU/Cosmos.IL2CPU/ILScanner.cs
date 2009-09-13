@@ -381,6 +381,14 @@ namespace Cosmos.IL2CPU {
             }
           }
         }
+        // Queue Types directly related to method
+        Queue(aMethod.DeclaringType, aMethod, "Declaring Type");
+        if (aMethod is System.Reflection.MethodInfo) {
+          Queue(((System.Reflection.MethodInfo)aMethod).ReturnType, aMethod, "Return Type");
+        }
+        foreach (var xParam in aMethod.GetParameters()) {
+          Queue(xParam.ParameterType, aMethod, "Parameter");
+        }
       }
     }
 
