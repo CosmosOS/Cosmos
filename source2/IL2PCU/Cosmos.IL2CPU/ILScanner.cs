@@ -90,6 +90,17 @@ namespace Cosmos.IL2CPU {
       }
     }
 
+    protected void ScanPlugs(Dictionary<Type, List<Type>> aPlugs) {
+      foreach (var xImpls in aPlugs.Values) {
+        foreach (var xImpl in xImpls) {
+          foreach (var xMethod in xImpl.GetMethods(BindingFlags.Public | BindingFlags.Static)) {
+            //TODO: Check for disabled, Mono only
+            ScanMethod(xMethod, true);
+          }
+        }
+      }
+    }
+
     public void Execute(System.Reflection.MethodInfo aStartMethod) {
       // TODO: Investigate using MS CCI
       // Need to check license, as well as in profiler
@@ -140,15 +151,11 @@ namespace Cosmos.IL2CPU {
       // -Finally, do compilation
 
       FindPlugImpls();
-      //TODO: When plugs are scanned, we dont add DeclaringType
-      // or search up or down for virtuals
       // Now that we found all plugs, scan them.
       // We have to scan them after we find all plugs, but because
       // plugs can use other plugs
-      foreach (var xPlug in mPlugImpls) {
-      }
-      foreach (var xPlug in mPlugImplsInhrt) {
-      }
+      ScanPlugs(mPlugImpls);
+      ScanPlugs(mPlugImplsInhrt);
 
       //    // Pull in extra implementations, GC etc.
       //    QueueMethod(null, "Explicit Entry", (System.Reflection.MethodInfo)RuntimeEngineRefs.InitializeApplicationRef, false);
@@ -333,9 +340,6 @@ namespace Cosmos.IL2CPU {
           //base
         }
 
-        //TODO: Do we need to queue the types of each param?
-        //TODO: Do we need to queue DeclaringType
-
         // Look in list of types for ancestors and descendants
         // with overrides / bases
         // List changes as we go, cant be foreach
@@ -362,8 +366,12 @@ namespace Cosmos.IL2CPU {
         }
       }
 
-      //TODO: Check to see if method is plugged, if it is we don't scan body
-      var xPlug = ResolvePlug(aMethod, xParamTypes);
+      MethodBase xPlug = null;
+      // Plugs may use plugs, but plugs won't be plugged over themself
+      if (!aIsPlug) {
+        // Check to see if method is plugged, if it is we don't scan body
+        xPlug = ResolvePlug(aMethod, xParamTypes);
+      }
       if (xPlug == null) {
         //TODO: As we scan each method, we could update or put in a new list
         // that has the resolved plug so we don't have to reresolve it again
@@ -391,13 +399,17 @@ namespace Cosmos.IL2CPU {
             }
           }
         }
+
         // Queue Types directly related to method
-        Queue(aMethod.DeclaringType, aMethod, "Declaring Type");
+        if (!aIsPlug) {
+          // Don't queue declaring types of plugs
+          Queue(aMethod.DeclaringType, aMethod, "Declaring Type");
+        }
         if (aMethod is System.Reflection.MethodInfo) {
           Queue(((System.Reflection.MethodInfo)aMethod).ReturnType, aMethod, "Return Type");
         }
-        foreach (var xParam in aMethod.GetParameters()) {
-          Queue(xParam.ParameterType, aMethod, "Parameter");
+        foreach (var xType in xParamTypes) {
+          Queue(xType, aMethod, "Parameter");
         }
       }
     }
