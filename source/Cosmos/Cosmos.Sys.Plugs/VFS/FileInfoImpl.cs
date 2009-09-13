@@ -13,7 +13,7 @@ namespace Cosmos.Sys.Plugs
     public static class FileInfoImpl
     {
         //[PlugMethod(Signature = "System_Void__System_IO_FileInfo__ctor_System_String_")]
-        public static void Cbtor(
+        public static void Ctor(
             FileInfo aThis,
             [FieldAccess(Name = "$$Storage$$")] ref FilesystemEntry aStorage,
             String aFile

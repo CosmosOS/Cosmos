@@ -15,8 +15,6 @@ namespace Cosmos.IL2CPU {
   // how it compares objects.
   public class HashcodeComparer<T>: IEqualityComparer<T> {
 
-    #region IEqualityComparer<T> Members
-
     public bool Equals(T x, T y) {
       return x.GetHashCode() == y.GetHashCode();
     }
@@ -25,8 +23,8 @@ namespace Cosmos.IL2CPU {
       return obj.GetHashCode();
     }
 
-    #endregion
   }
+
   public class ILScanner : IDisposable {
     protected ILReader mReader;
     protected Assembler mAsmblr;
