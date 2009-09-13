@@ -218,7 +218,7 @@ namespace Cosmos.IL2CPU {
           //  // methods will call the old name, while it's not emitted. that's why we emit a "forwarding label" here.
           //  mAsmblr.GenerateMethodForward(xMethod, xMethod.PlugMethod);
           //}
-          //mAsmblr.ProcessMethod(xMethod, 
+          //mAsmblr.ProcessMethod(
         }
         // mAsmblr.GenerateVMTCode(mTypes, mTypesSet, mKnownMethods);
       }
