@@ -126,7 +126,7 @@ namespace Cosmos.IL2CPU {
       }
     }
 
-    public void Execute(System.Reflection.MethodInfo aStartMethod) {
+    public void Execute(MethodInfo aStartMethod) {
       // TODO: Investigate using MS CCI
       // Need to check license, as well as in profiler
       // http://cciast.codeplex.com/
@@ -228,16 +228,6 @@ namespace Cosmos.IL2CPU {
 
     public void Dispose() {
       if (mLogEnabled) {
-        // DEBUG TEST
-        var xNameMap = new HashSet<int>();
-        foreach(var xKey in mLogMap.Keys){
-          if(xNameMap.Contains(LogItemText(xKey).GetHashCode())){
-            Console.WriteLine("Duplicate name");
-          }
-          xNameMap.Add(LogItemText(xKey).GetHashCode());
-        }
-        xNameMap.Clear();
-        // END DEBUG TEST
         // Create bookmarks, but also a dictionary that
         // we can find the items in
         var xBookmarks = new Dictionary<object, int>();
@@ -458,6 +448,7 @@ namespace Cosmos.IL2CPU {
         xPlug = ResolvePlug(aMethod, xParamTypes);
       }
       if (xPlug == null) {
+
         //TODO: As we scan each method, we could update or put in a new list
         // that has the resolved plug so we don't have to reresolve it again
         // later for compilation.
