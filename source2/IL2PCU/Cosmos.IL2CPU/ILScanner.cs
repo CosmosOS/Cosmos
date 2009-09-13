@@ -9,6 +9,10 @@ using Indy.IL2CPU.Plugs;
 using Indy.IL2CPU.IL;
 
 namespace Cosmos.IL2CPU {
+  // This is necessary because HashSet and Dictionary
+  // have troubles when differnet types of objects are stored
+  // in them. I dont remember the exact problem, but something
+  // how it compares objects.
   public class HashcodeComparer<T>: IEqualityComparer<T> {
 
     #region IEqualityComparer<T> Members
