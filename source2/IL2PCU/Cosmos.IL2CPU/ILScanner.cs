@@ -386,6 +386,7 @@ namespace Cosmos.IL2CPU {
         // Look in list of types for ancestors and descendants
         // with overrides / bases
         // List changes as we go, cant be foreach
+        //TODO: If its final or sealed, we dont need to search down
         for (int i = 0; i < mItemsList.Count; i++) {
           if (mItemsList[i] is Type) {
             var xType = (Type)mItemsList[i];
