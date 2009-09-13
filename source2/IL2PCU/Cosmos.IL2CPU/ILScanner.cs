@@ -9,6 +9,20 @@ using Indy.IL2CPU.Plugs;
 using Indy.IL2CPU.IL;
 
 namespace Cosmos.IL2CPU {
+  public class HashcodeComparer<T>: IEqualityComparer<T> {
+
+    #region IEqualityComparer<T> Members
+
+    public bool Equals(T x, T y) {
+      return x.GetHashCode() == y.GetHashCode();
+    }
+
+    public int GetHashCode(T obj) {
+      return obj.GetHashCode();
+    }
+
+    #endregion
+  }
   public class ILScanner : IDisposable {
     protected ILReader mReader;
     protected Assembler mAsmblr;
@@ -20,14 +34,16 @@ namespace Cosmos.IL2CPU {
     // but if foreach is used while its changed, a collection changed
     // exception will occur and copy on demand for each loop has too
     // much overhead.
-    protected HashSet<object> mItems = new HashSet<object>();
+    // we use a custom comparer, because the default one does some intelligent magic, which breaks lookups. is probably related
+    // to comparing different types
+    protected HashSet<object> mItems = new HashSet<object>(new HashcodeComparer<object>());
     protected List<object> mItemsList = new List<object>();
     // Contains items to be scanned, both types and methods
     protected Queue<object> mQueue = new Queue<object>();
     // Virtual methods are nasty and constantly need to be rescanned for
     // overriding methods in new types, so we keep track of them separately. 
     // They are also in the main mItems and mQueue.
-    protected HashSet<MethodBase> mVirtuals = new HashSet<MethodBase>();
+    protected HashSet<MethodBase> mVirtuals = new HashSet<MethodBase>(new HashcodeComparer<MethodBase>());
 
     // Contains a list of plug implementor classes
     // Key = Target Class
@@ -80,9 +96,6 @@ namespace Cosmos.IL2CPU {
     }
 
     protected void Queue(object aItem, object aSrc, string aSrcType) {
-      if (aItem == typeof(Assembly)) {
-        Console.Write("");
-      }
       if (!mItems.Contains(aItem)) {
         if (mLogEnabled) {
           LogMapPoint(aSrc, aSrcType, aItem);
@@ -424,9 +437,6 @@ namespace Cosmos.IL2CPU {
     }
 
     protected void ScanType(Type aType) {
-      if (aType == typeof(Assembly)) {
-        Console.Write("");
-      }
       // Add immediate ancestor type
       // We dont need to crawl up farther, when the BaseType is scanned 
       // it will add its BaseType, and so on.
