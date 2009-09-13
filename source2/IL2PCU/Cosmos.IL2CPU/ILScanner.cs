@@ -457,7 +457,7 @@ namespace Cosmos.IL2CPU {
           }
         }
         if (xNeedsPlug) {
-          throw new Exception("Plug needed.");
+          throw new Exception("Plug needed. " + aMethod.DeclaringType + "." + aMethod.Name);
         }
         
         //TODO: As we scan each method, we could update or put in a new list
