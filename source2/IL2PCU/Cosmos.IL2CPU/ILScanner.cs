@@ -85,6 +85,7 @@ namespace Cosmos.IL2CPU {
           LogMapPoint(aSrc, aSrcType, aItem);
         }
         mItems.Add(aItem);
+        mItemsList.Add(aItem);
         mQueue.Enqueue(aItem);
       }
     }
@@ -326,12 +327,10 @@ namespace Cosmos.IL2CPU {
 
         // Look in list of types for ancestors and descendants
         // with overrides / bases
-        //TODO: Cant be a foreach, collection gets modified
-        // Second problem, hashsets cant be iterated by index
-        // Back to 2 things - a hashset and list?
-        foreach (var xItem in mItems) {
-          if (xItem is Type) {
-            var xType = (Type)xItem;
+        // List changes as we go, cant be foreach
+        for (int i = 0; i < mItemsList.Count; i++) {
+          if (mItemsList[i] is Type) {
+            var xType = (Type)mItemsList[i];
             // If DeclaringType is a ancestor or descendant
             if (xType.IsSubclassOf(aMethod.DeclaringType)
               || aMethod.DeclaringType.IsSubclassOf(xType)) {
