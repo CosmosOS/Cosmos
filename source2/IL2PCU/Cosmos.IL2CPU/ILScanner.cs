@@ -333,7 +333,16 @@ namespace Cosmos.IL2CPU {
       var xParams = aMethod.GetParameters();
       var xParamTypes = new Type[xParams.Length];
       for (int i = 0; i < xParams.Length; i++) {
+        Queue(xParamTypes[i], aMethod, "Parameter");
         xParamTypes[i] = xParams[i].ParameterType;
+      }
+      // Queue Types directly related to method
+      if (!aIsPlug) {
+        // Don't queue declaring types of plugs
+        Queue(aMethod.DeclaringType, aMethod, "Declaring Type");
+      }
+      if (aMethod is System.Reflection.MethodInfo) {
+        Queue(((System.Reflection.MethodInfo)aMethod).ReturnType, aMethod, "Return Type");
       }
 
       // We only need to look in ancestors and descendants if the method is virtual
@@ -407,18 +416,6 @@ namespace Cosmos.IL2CPU {
               }
             }
           }
-        }
-
-        // Queue Types directly related to method
-        if (!aIsPlug) {
-          // Don't queue declaring types of plugs
-          Queue(aMethod.DeclaringType, aMethod, "Declaring Type");
-        }
-        if (aMethod is System.Reflection.MethodInfo) {
-          Queue(((System.Reflection.MethodInfo)aMethod).ReturnType, aMethod, "Return Type");
-        }
-        foreach (var xType in xParamTypes) {
-          Queue(xType, aMethod, "Parameter");
         }
       }
     }
