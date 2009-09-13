@@ -375,7 +375,7 @@ namespace Cosmos.IL2CPU {
         // If its virtual, and its not final or sealed then we
         // need to constanly watch for new descendant types which
         // might have overrides.
-        if (aMethod.IsFinal || aMethod.DeclaringType.IsSealed) {
+        if (!aMethod.IsFinal && !aMethod.DeclaringType.IsSealed) {
           mVirtuals.Add(aMethod);
           //TODO: We end up adding many overrides of each virtual
           //Would be great if we could not add descendant overrides
