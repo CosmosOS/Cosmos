@@ -350,9 +350,6 @@ namespace Cosmos.IL2CPU {
     }
 
     protected void ScanMethod(MethodBase aMethod, bool aIsPlug) {
-      if (aMethod.Name == "ToString" && aMethod.DeclaringType==typeof(object)) {
-        Console.Write("");
-      }
       var xParams = aMethod.GetParameters();
       var xParamTypes = new Type[xParams.Length];
       // Dont use foreach, enum generaly keeps order but
@@ -370,6 +367,7 @@ namespace Cosmos.IL2CPU {
         Queue(((System.Reflection.MethodInfo)aMethod).ReturnType, aMethod, "Return Type");
       }
 
+      // Scan virtuals
       // We only need to look in ancestors and descendants if the method is virtual
       if (aMethod.IsVirtual) {
         // If its virtual, and its not final or sealed then we
