@@ -465,28 +465,33 @@ namespace Cosmos.IL2CPU {
         }
       }
 
-      //TODO: For signature ones, we could cache the attrib. Thats 
-      // why we check for null here
-      if (xAttrib == null) {
-        // TODO: Only allow one, but this code for now takes the last one
-        // if there is more than one
-        foreach (PlugMethodAttribute x in xResult.GetCustomAttributes(typeof(PlugMethodAttribute), false)) {
-          xAttrib = x;
+      // If we found a matching method, check for attributes 
+      // that might disable it.
+      if (xResult != null) {
+        //TODO: For signature ones, we could cache the attrib. Thats 
+        // why we check for null here
+        if (xAttrib == null) {
+          // TODO: Only allow one, but this code for now takes the last one
+          // if there is more than one
+          foreach (PlugMethodAttribute x in xResult.GetCustomAttributes(typeof(PlugMethodAttribute), false)) {
+            xAttrib = x;
+          }
         }
-      }
 
-      // See if we need to disable this plug
-      if (xAttrib != null) {
-        if (!xAttrib.Enabled) {
-          xResult = null;
-        } else if (xAttrib.IsMonoOnly) {
-          //TODO: Check this against build options
-          //TODO: Two exclusive IsOnly's dont make sense
-          // refactor these as a positive rather than negative
-          // Same thing at type plug level
-          xResult = null;
+        // See if we need to disable this plug
+        if (xAttrib != null) {
+          if (!xAttrib.Enabled) {
+            xResult = null;
+          } else if (xAttrib.IsMonoOnly) {
+            //TODO: Check this against build options
+            //TODO: Two exclusive IsOnly's dont make sense
+            // refactor these as a positive rather than negative
+            // Same thing at type plug level
+            xResult = null;
+          }
         }
-      }
+      }      
+      return xResult;
           //Type xAssembler = null;
             //  } else if (xAttrib.Signature != null) {
                 // System_Void__Indy_IL2CPU_Assembler_Assembler__cctor__
@@ -610,8 +615,6 @@ namespace Cosmos.IL2CPU {
            // }
           //}
         //}
-      
-      return xResult;
     }
 
     protected MethodBase ResolvePlug(MethodBase aMethod, Type[] aParamTypes) {
