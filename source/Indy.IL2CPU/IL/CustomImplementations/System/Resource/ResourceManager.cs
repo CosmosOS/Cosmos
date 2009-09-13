@@ -11,13 +11,13 @@ namespace Indy.IL2CPU.IL.CustomImplementations.System.Resources
     [Plug(TargetName="System.Resources.ResourceManager, mscorlib")]
     public static class ResourceManagerImpl
     {
-        public static ResourceSet
-          InternalGetResourceSet( ResourceManager rm,
-            CultureInfo ci, bool createIfNotExists, bool tryParents)
+        //public static ResourceSet
+        //  InternalGetResourceSet( ResourceManager rm,
+        //    CultureInfo ci, bool createIfNotExists, bool tryParents)
 
-        {
-            throw new Exception("System.Resources.ResourceManager.InternalGetResourceSet need pluging properly");
-        }
+        //{
+        //    throw new Exception("System.Resources.ResourceManager.InternalGetResourceSet need pluging properly");
+        //}
 
     }
 }

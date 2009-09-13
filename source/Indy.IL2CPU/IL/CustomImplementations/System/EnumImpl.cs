@@ -17,8 +17,9 @@ namespace Indy.IL2CPU.IL.CustomImplementations.System {
 		}
 
 		//[PlugMethod(Signature = "System_String___System_Enum_ToString____")]
-		public static string ToString(ref uint aThis) {
-			return UInt32Impl.ToString(ref aThis);
+		public static string ToString(Enum aThis) {
+      return "<Enum.ToString> not implemented";
+//			return UInt32Impl.ToString(ref aThis);
 		}
 	}
 }

@@ -12,8 +12,8 @@ namespace Cosmos.Sys.Plugs
     [PlugField(FieldId = "$$Storage$$", FieldType = typeof(FilesystemEntry))]
     public static class FileInfoImpl
     {
-        [PlugMethod(Signature = "System_Void__System_IO_FileInfo__ctor_System_String_")]
-        public static void ctor(
+        //[PlugMethod(Signature = "System_Void__System_IO_FileInfo__ctor_System_String_")]
+        public static void Cbtor(
             FileInfo aThis,
             [FieldAccess(Name = "$$Storage$$")] ref FilesystemEntry aStorage,
             String aFile

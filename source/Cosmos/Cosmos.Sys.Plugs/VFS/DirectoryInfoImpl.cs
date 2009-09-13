@@ -13,23 +13,23 @@ namespace Cosmos.Sys.Plugs
     [PlugField(FieldId = "$$FullPath$$", FieldType = typeof(String))]
     public static class DirectoryInfoImpl
     {
-        [PlugMethod(Signature = "System_Void__System_IO_DirectoryInfo__ctor_System_String_")]
-        public static void ctor(
+        [PlugMethod(/*Signature = "System_Void__System_IO_DirectoryInfo__ctor_System_String_"*/)]
+        public static void Ctor(
             DirectoryInfo aThis,
-            [FieldAccess(Name = "$$Storage$$")] ref FilesystemEntry aStorage,
-            [FieldAccess(Name = "$$FullPath$$")] String aFullPath,
+            //[FieldAccess(Name = "$$Storage$$")] ref FilesystemEntry aStorage,
+            //[FieldAccess(Name = "$$FullPath$$")] String aFullPath,
             String aPath
             )
         {
-            if (aPath == null)
-                throw new ArgumentNullException("aPath is null in DirectoryInfo ctor");
+            //if (aPath == null)
+            //    throw new ArgumentNullException("aPath is null in DirectoryInfo ctor");
 
-            //Search for directory
-            //if (!VFSManager.DirectoryExists(aPath))
-            //    throw new DirectoryNotFoundException("Unable to find directory " + aPath);
+            ////Search for directory
+            ////if (!VFSManager.DirectoryExists(aPath))
+            ////    throw new DirectoryNotFoundException("Unable to find directory " + aPath);
 
-            //If it exists, then get the directory as a FilesystemEntry
-            aStorage = VFSManager.GetDirectoryEntry(aPath);
+            ////If it exists, then get the directory as a FilesystemEntry
+            //aStorage = VFSManager.GetDirectoryEntry(aPath);
             //aFullPath = aPath;
         }
 

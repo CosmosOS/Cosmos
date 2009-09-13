@@ -114,6 +114,10 @@ namespace Indy.IL2CPU.CustomImplementation.System {
     public static char[] GetStorageArray(string aString) {
       return null;
     }
+
+    public static int IndexOf(string aThis, string aSubstring, int aIdx, int aLength, StringComparison aComparison){
+      throw new Exception("Not implemented");
+    }
   }
 
 }

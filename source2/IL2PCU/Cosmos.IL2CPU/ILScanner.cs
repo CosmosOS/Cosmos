@@ -367,6 +367,9 @@ namespace Cosmos.IL2CPU {
     }
 
     protected void ScanMethod(MethodBase aMethod, bool aIsPlug) {
+      if (aMethod.Name == "WriteLine") {
+        Console.Write("");
+      }
       var xParams = aMethod.GetParameters();
       var xParamTypes = new Type[xParams.Length];
       // Dont use foreach, enum generaly keeps order but

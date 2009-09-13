@@ -7,7 +7,7 @@ using Indy.IL2CPU.Plugs;
 namespace Cosmos.Hardware.Plugs.FCL.System
 {
     [Plug(Target = typeof(System.Console))]
-    class Console
+    public class Console
     {
         private static ConsoleColor _background = ConsoleColor.Black;
         private static ConsoleColor _foreground = ConsoleColor.White;

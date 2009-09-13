@@ -32,5 +32,9 @@ namespace Indy.IL2CPU.X86.Plugs.CustomImplementations.System {
       }
       return "<Exception Message from Native Source>";
     }
+
+    public static string ToString(Exception aThis) {
+      return aThis.Message;
+    }
   }
 }

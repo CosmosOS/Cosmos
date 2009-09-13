@@ -16,5 +16,9 @@ namespace Indy.IL2CPU.IL.CustomImplementations.System.Net {
         public static void CCtor() {
             // todo: implement
         }
+
+        public static int GetHashCode(IPAddress aThis) {
+          throw new Exception("IPAddress.GetHashCode Not implemented");
+        }
     }
 }
