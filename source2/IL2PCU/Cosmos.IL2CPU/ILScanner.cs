@@ -14,7 +14,14 @@ namespace Cosmos.IL2CPU {
     protected Assembler mAsmblr;
 
     // Contains known types and methods, both scanned and unscanned
+    // We need both a HashSet and a List. HashSet for speed of checking
+    // to see if we already have it. And mItems contains an indexed list
+    // so we can scan it as it changes. Foreach can work on HashSet,
+    // but if foreach is used while its changed, a collection changed
+    // exception will occur and copy on demand for each loop has too
+    // much overhead.
     protected HashSet<object> mItems = new HashSet<object>();
+    protected List<object> mItemsList = new List<object>();
     // Contains items to be scanned, both types and methods
     protected Queue<object> mQueue = new Queue<object>();
     // Virtual methods are nasty and constantly need to be rescanned for
