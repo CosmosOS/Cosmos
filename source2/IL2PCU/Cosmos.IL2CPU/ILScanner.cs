@@ -399,10 +399,12 @@ namespace Cosmos.IL2CPU {
             xNewVirtMethod = null;
           } else {
             xNewVirtMethod = xVirtType.GetMethod(aMethod.Name, xParamTypes);
-            if (!xNewVirtMethod.IsVirtual) {
-              // This can happen if a virtual "replaces" a non virtual
-              // above it that is not virtual.
-              xNewVirtMethod = null;
+            if (xNewVirtMethod != null) {
+              if (!xNewVirtMethod.IsVirtual) {
+                // This can happen if a virtual "replaces" a non virtual
+                // above it that is not virtual.
+                xNewVirtMethod = null;
+              }
             }
           }
           // We dont bother to add these to Queue, because we have to do a 
@@ -431,10 +433,12 @@ namespace Cosmos.IL2CPU {
               var xType = (Type)mItemsList[i];
               if (xType.IsSubclassOf(xVirtMethod.DeclaringType)) {
                 var xNewMethod = xType.GetMethod(aMethod.Name, xParamTypes);
-                // We need to check IsVirtual, a non virtual could
-                // "replace" a virtual above it?
-                if (xNewMethod.IsVirtual) {
-                  Queue(xNewMethod, aMethod, "Virtual Downscan");
+                if (xNewMethod != null) {
+                  // We need to check IsVirtual, a non virtual could
+                  // "replace" a virtual above it?
+                  if (xNewMethod.IsVirtual) {
+                    Queue(xNewMethod, aMethod, "Virtual Downscan");
+                  }
                 }
               }
             }
@@ -457,11 +461,7 @@ namespace Cosmos.IL2CPU {
         //TODO: Dont queue new items if they are plugged
         // or do we need to queue them with a resolved ref in a new list?
         List<ILOpCode> xOpCodes;
-        try {
-          xOpCodes = mReader.ProcessMethod(aMethod);
-        } catch (Exception E) {
-          throw;
-        }
+        xOpCodes = mReader.ProcessMethod(aMethod);
         if (xOpCodes != null) {
           foreach (var xOpCode in xOpCodes) {
             if (xOpCode is ILOpCodes.OpMethod) {
@@ -514,21 +514,19 @@ namespace Cosmos.IL2CPU {
             xParamTypes[i] = xParams[i].ParameterType;
           }
           var xMethod = aType.GetMethod(xVirt.Name, xParamTypes);
-          // We need to check IsVirtual, a non virtual could
-          // "replace" a virtual above it?
-          if (xMethod.IsVirtual) {
-            Queue(xMethod, aType, "Virtual");
+          if (xMethod != null) {
+            // We need to check IsVirtual, a non virtual could
+            // "replace" a virtual above it?
+            if (xMethod.IsVirtual) {
+              Queue(xMethod, aType, "Virtual");
+            }
           }
         }
       }
     }
 
-    private long mItemsHandled = 0;
     protected void ScanQueue() {
       while (mQueue.Count > 0) {
-        if ((mQueue.Count + mItemsHandled) != mItems.Count) {
-          Console.Write("");
-        }
         var xItem = mQueue.Dequeue();
         // Check for MethodBase first, they are more numerous 
         // and will reduce compares
@@ -539,15 +537,7 @@ namespace Cosmos.IL2CPU {
         } else {
           throw new Exception("Unknown item found in queue.");
         }
-        mItemsHandled++;
-        if ((mItemsHandled % 5000) == 0) {
-          Console.WriteLine("ItemsHandled: {0}", mItemsHandled);
-        }
-        if (mItemsHandled == 10000) {
-          throw new Exception("Debug Abort");
-        }
       }
-      Console.WriteLine("ItemsHandled: {0}", mItemsHandled);
     }
 
     protected void LogMapPoint(object aSrc, string aSrcType, object aItem) {
