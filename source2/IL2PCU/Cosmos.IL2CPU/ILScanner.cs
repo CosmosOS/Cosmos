@@ -304,7 +304,7 @@ namespace Cosmos.IL2CPU {
       }
     }
 
-    protected void ScanMethod(MethodBase aMethod) {
+    protected void ScanMethod(MethodBase aMethod, bool aIsPlug) {
       var xParams = aMethod.GetParameters();
       var xParamTypes = new Type[xParams.Length];
       for (int i = 0; i < xParams.Length; i++) {
@@ -420,7 +420,7 @@ namespace Cosmos.IL2CPU {
         // Check for MethodBase first, they are more numerous 
         // and will reduce compares
         if (xItem is MethodBase) {
-          ScanMethod((MethodBase)xItem);
+          ScanMethod((MethodBase)xItem, false);
         } else if (xItem is Type) {
           ScanType((Type)xItem);
         } else {
