@@ -383,15 +383,62 @@ namespace Cosmos.IL2CPU {
       // Scan virtuals
       // We only need to look in ancestors and descendants if the method is virtual
       if (aMethod.IsVirtual) {
-        // If its virtual, and its not final or sealed then we
-        // need to constanly watch for new descendant types which
-        // might have overrides.
-        if (!aMethod.IsFinal && !aMethod.DeclaringType.IsSealed) {
-          mVirtuals.Add(aMethod);
-          //TODO: We end up adding many overrides of each virtual
-          //Would be great if we could not add descendant overrides
-          //if bases are already in, or even better keep only the top 
-          //base
+        // For virtuals we need to climb up the type tree
+        // and find the top base method. We then add that top
+        // node to the mVirtuals list. We don't need to add the 
+        // types becuase adding DeclaringType will already cause
+        // all ancestor types to be added.
+
+        var xVirtMethod = aMethod;
+        var xVirtType = aMethod.DeclaringType;
+        MethodBase xNewVirtMethod;
+        while (true) {
+          xVirtType = xVirtType.BaseType;
+          if (xVirtType == null) {
+            // We've reached object, can't go farther
+            xNewVirtMethod = null;
+          } else {
+            xNewVirtMethod = xVirtType.GetMethod(aMethod.Name, xParamTypes);
+            if (!xNewVirtMethod.IsVirtual) {
+              // This can happen if a virtual "replaces" a non virtual
+              // above it that is not virtual.
+              xNewVirtMethod = null;
+            }
+          }
+          // We dont bother to add these to Queue, because we have to do a 
+          // full downlevel scan if its a new base virtual anyways.
+          if (xNewVirtMethod == null) {
+            // If its already in the list, we mark it null 
+            // so we dont do a full downlevel scan.
+            if (mVirtuals.Contains(xVirtMethod)) {
+              xVirtMethod = null;
+            }
+            break;
+          }
+          xVirtMethod = xNewVirtMethod;
+        }
+
+        // New virtual base found, we need to downscan it
+        // If it was already in mVirtuals, then ScanType will take
+        // care of new additions.
+        if (xVirtMethod != null) {
+          Queue(xVirtMethod, aMethod, "Virtual Base");
+          mVirtuals.Add(xVirtMethod);
+
+          // List changes as we go, cant be foreach
+          for (int i = 0; i < mItemsList.Count; i++) {
+            if (mItemsList[i] is Type) {
+              var xType = (Type)mItemsList[i];
+              if (xType.IsSubclassOf(xVirtMethod.DeclaringType)) {
+                var xNewMethod = xType.GetMethod(aMethod.Name, xParamTypes);
+                // We need to check IsVirtual, a non virtual could
+                // "replace" a virtual above it?
+                if (xNewMethod.IsVirtual) {
+                  Queue(xNewMethod, aMethod, "Virtual Downscan");
+                }
+              }
+            }
+          }
         }
       }
 
@@ -452,71 +499,55 @@ namespace Cosmos.IL2CPU {
         }
       }
 
-      //TODO: Scan mVirtuals for new possible overrides
+      // For each new type, we need to scan for possible new virtuals
       // in our new type if its a descendant of something in 
       // mVirtuals.
-      //TODO: Is there a better way than rescanning every time like this?
+      foreach (var xVirt in mVirtuals) {
+        // See if our new type is a subclass of any virt's DeclaringTypes
+        // If so our new type might have some virtuals
+        if (aType.IsSubclassOf(xVirt.DeclaringType)) {
+          var xParams = xVirt.GetParameters();
+          var xParamTypes = new Type[xParams.Length];
+          // Dont use foreach, enum generaly keeps order but
+          // isn't guaranteed.
+          for (int i = 0; i < xParams.Length; i++) {
+            xParamTypes[i] = xParams[i].ParameterType;
+          }
+          var xMethod = aType.GetMethod(xVirt.Name, xParamTypes);
+          // We need to check IsVirtual, a non virtual could
+          // "replace" a virtual above it?
+          if (xMethod.IsVirtual) {
+            Queue(xMethod, aType, "Virtual");
+          }
+        }
+      }
     }
 
     private long mItemsHandled = 0;
     protected void ScanQueue() {
       while (mQueue.Count > 0) {
-        while (mQueue.Count > 0) {
-          if ((mQueue.Count + mItemsHandled) != mItems.Count) {
-            Console.Write("");
-          }
-          var xItem = mQueue.Dequeue();
-          // Check for MethodBase first, they are more numerous 
-          // and will reduce compares
-          if (xItem is MethodBase) {
-            ScanMethod((MethodBase)xItem, false);
-          } else if (xItem is Type) {
-            ScanType((Type)xItem);
-          } else {
-            throw new Exception("Unknown item found in queue.");
-          }
-          mItemsHandled++;
-          if ((mItemsHandled % 5000) == 0) {
-            Console.WriteLine("ItemsHandled: {0}", mItemsHandled);
-          }
-          if (mItemsHandled == 10000) {
-            throw new Exception("Debug Abort");
-          }
+        if ((mQueue.Count + mItemsHandled) != mItems.Count) {
+          Console.Write("");
         }
-        // We process all items until no more are added.
-        // Then we check virtuals again. If it adds more items
-        // Then we need to repeat the whole process.
-        CheckVirtuals();
+        var xItem = mQueue.Dequeue();
+        // Check for MethodBase first, they are more numerous 
+        // and will reduce compares
+        if (xItem is MethodBase) {
+          ScanMethod((MethodBase)xItem, false);
+        } else if (xItem is Type) {
+          ScanType((Type)xItem);
+        } else {
+          throw new Exception("Unknown item found in queue.");
+        }
+        mItemsHandled++;
+        if ((mItemsHandled % 5000) == 0) {
+          Console.WriteLine("ItemsHandled: {0}", mItemsHandled);
+        }
+        if (mItemsHandled == 10000) {
+          throw new Exception("Debug Abort");
+        }
       }
       Console.WriteLine("ItemsHandled: {0}", mItemsHandled);
-    }
-
-    protected void CheckVirtuals() {
-      // Look in list of types for ancestors and descendants
-      // with overrides / bases
-      // List changes as we go, cant be foreach
-      //TODO: If its final or sealed, we dont need to search down
-      for (int i = 0; i < mItemsList.Count; i++) {
-        if (mItemsList[i] is Type) {
-          var xType = (Type)mItemsList[i];
-          // If DeclaringType is a ancestor or descendant
-          //if (xType.IsSubclassOf(aMethod.DeclaringType)
-          //  || aMethod.DeclaringType.IsSubclassOf(xType)) {
-          //  var xNewMethod = xType.GetMethod(aMethod.Name, xParamTypes);
-          //  if (xNewMethod != null && xNewMethod != aMethod) {
-          //    if (xNewMethod.IsAbstract) {
-          //      // If virtual, we need to add it to mVirtuals.
-          //      // Non virtuals will get added when they get scanned.
-          //      mVirtuals.Add(xNewMethod);
-          //    } else {
-          //      // Abstract methods dont have an implementation, so only add
-          //      // non abstract methods for scanning.
-          //      Queue(xNewMethod, aMethod, "Virtual");
-          //    }
-          //  }
-          //}
-        }
-      }
     }
 
     protected void LogMapPoint(object aSrc, string aSrcType, object aItem) {
