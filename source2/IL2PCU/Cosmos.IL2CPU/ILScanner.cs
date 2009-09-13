@@ -439,6 +439,14 @@ namespace Cosmos.IL2CPU {
       xList.Add(xLogItem);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="aTargetType"></param>
+    /// <param name="aImpls"></param>
+    /// <param name="aMethod">The target method to be plugged</param>
+    /// <param name="aParamTypes"></param>
+    /// <returns></returns>
     protected MethodBase ResolvePlug(Type aTargetType, List<Type> aImpls
       , MethodBase aMethod, Type[] aParamTypes) 
     {
@@ -466,9 +474,91 @@ namespace Cosmos.IL2CPU {
         // Search for non signature matches first since signature searches are slower
         xResult = xImpl.GetMethod(aMethod.Name, BindingFlags.Static | BindingFlags.Public
           , null, xParamTypes, null);
+        if (xResult == null && aMethod.Name == ".ctor") {
+          xResult = xImpl.GetMethod("Ctor", BindingFlags.Static | BindingFlags.Public
+            , null, xParamTypes, null);
+        }
+        if (xResult == null && aMethod.Name == ".cctor") {
+          xResult = xImpl.GetMethod("CCtor", BindingFlags.Static | BindingFlags.Public
+            , null, xParamTypes, null);
+        }
         if (xResult == null) {
           // Search by signature
           foreach (var xSigMethod in xImpl.GetMethods(BindingFlags.Static | BindingFlags.Public)) {
+            var xParams = xSigMethod.GetParameters();
+            //TODO: Static method plugs dont seem to be separated 
+            // from instance ones, so the only way seems to be to try
+            // to match instance first, and if no match try static.
+            // I really don't like this and feel we need to find
+            // an explicit way to determine or mark the method 
+            // implementations.
+            //
+            // Plug implementations take "this" as first argument
+            // so when matching we don't include it in the search
+            Type[] xTypesInst = null;
+            var xActualParamCount = xParams.Length;
+            foreach (var xParam in xParams) {
+              if (xParam.GetCustomAttributes(typeof(FieldAccessAttribute), false).Length > 0) {
+                xActualParamCount--;
+              }
+            }
+            Type[] xTypesStatic = new Type[xActualParamCount];
+            // If 0 params, has to be a static plug so we skip
+            // any copying and leave xTypesInst = null
+            // If 1 params, xTypesInst must be converted to Type[0]
+            if (xActualParamCount == 1) {
+              xTypesInst = new Type[0];
+              xTypesStatic[0] = xParams[0].ParameterType;
+            } else if (xActualParamCount > 1) {
+              xTypesInst = new Type[xActualParamCount - 1];
+              var xCurIdx = 0;
+              foreach (var xParam in xParams.Skip(1)) {
+                if (xParam.GetCustomAttributes(typeof(FieldAccessAttribute), false).Length > 0) {
+                  continue;
+                }
+                xTypesInst[xCurIdx] = xParam.ParameterType;
+                xCurIdx++;
+              }
+              xCurIdx = 0;
+              foreach (var xParam in xParams) {
+                if (xParam.GetCustomAttributes(typeof(FieldAccessAttribute), false).Length > 0) {
+                  xCurIdx++;
+                  continue;
+                }
+                if (xCurIdx >= xTypesStatic.Length) {
+                  break;
+                }
+                xTypesStatic[xCurIdx] = xParam.ParameterType;
+                xCurIdx++;
+              }
+            }
+            System.Reflection.MethodBase xTargetMethod = null;
+            // TODO: In future make rule that all ctor plugs are called
+            // ctor by name, or use a new attrib
+            //TODO: Document all the plug stuff in a document on website
+            //TODO: To make inclusion of plugs easy, we can make a plugs master
+            // that references the other default plugs so user exes only 
+            // need to reference that one.
+            // TODO: Skip FieldAccessAttribute if in impl
+            if (xTypesInst != null) {
+              if (string.Compare(xSigMethod.Name, "ctor", true) == 0) {
+                xTargetMethod = aTargetType.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesInst, null);
+              } else {
+                xTargetMethod = aTargetType.GetMethod(xSigMethod.Name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesInst, null);
+              }
+            }
+            // Not an instance method, try static
+            if (xTargetMethod == null) {
+              if (string.Compare(xSigMethod.Name, "cctor", true) == 0
+                || string.Compare(xSigMethod.Name, "ctor", true) == 0) {
+                xTargetMethod = aTargetType.GetConstructor(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesStatic, null);
+              } else {
+                xTargetMethod = aTargetType.GetMethod(xSigMethod.Name, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesStatic, null);
+              }
+            }
+            if (xTargetMethod == aMethod) {
+              xResult = xSigMethod;
+            }
           }
         }
       }
@@ -496,6 +586,11 @@ namespace Cosmos.IL2CPU {
             // refactor these as a positive rather than negative
             // Same thing at type plug level
             xResult = null;
+          }else if (xAttrib.Signature != null) {
+            var xName = DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GenerateFullName(xResult));
+            if (string.Compare(xName, xAttrib.Signature, true) != 0) {
+              xResult = null;
+            }
           }
         }
       }      
@@ -766,6 +861,5 @@ namespace Cosmos.IL2CPU {
   //  //    QueueType(aFieldInfo.FieldType);
   //  //  }
   //  //}
-
   }
 }
