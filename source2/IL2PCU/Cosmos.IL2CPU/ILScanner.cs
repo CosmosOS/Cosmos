@@ -94,8 +94,15 @@ namespace Cosmos.IL2CPU {
       foreach (var xImpls in aPlugs.Values) {
         foreach (var xImpl in xImpls) {
           foreach (var xMethod in xImpl.GetMethods(BindingFlags.Public | BindingFlags.Static)) {
-            //TODO: Check for disabled, Mono only
-            ScanMethod(xMethod, true);
+            PlugMethodAttribute xAttrib = null;
+            foreach (PlugMethodAttribute x in xMethod.GetCustomAttributes(typeof(PlugMethodAttribute), false)) {
+              xAttrib = x;
+            }
+            if (xAttrib == null) {
+              ScanMethod(xMethod, true);
+            } else if (xAttrib.Enabled && !xAttrib.IsMonoOnly) {
+              ScanMethod(xMethod, true);
+            }
           }
         }
       }
@@ -277,6 +284,8 @@ namespace Cosmos.IL2CPU {
     }
 
     protected void FindPlugImpls() {
+      // TODO: Cache method list with info - so we dont have to keep
+      // scanning attributes for enabled etc repeatedly
       // TODO: New plug system, common plug base which all descend from
       // It can have a "this" member and then we
       // can separate static from instance by the static keyword
@@ -616,7 +625,7 @@ namespace Cosmos.IL2CPU {
             // refactor these as a positive rather than negative
             // Same thing at type plug level
             xResult = null;
-          }else if (xAttrib.Signature != null) {
+          } else if (xAttrib.Signature != null) {
             var xName = DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GenerateFullName(xResult));
             if (string.Compare(xName, xAttrib.Signature, true) != 0) {
               xResult = null;
