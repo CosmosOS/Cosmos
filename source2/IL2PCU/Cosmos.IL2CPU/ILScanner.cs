@@ -213,6 +213,16 @@ namespace Cosmos.IL2CPU {
 
     public void Dispose() {
       if (mLogEnabled) {
+        // DEBUG TEST
+        var xNameMap = new HashSet<int>();
+        foreach(var xKey in mLogMap.Keys){
+          if(xNameMap.Contains(LogItemText(xKey).GetHashCode())){
+            Console.WriteLine("Duplicate name");
+          }
+          xNameMap.Add(LogItemText(xKey).GetHashCode());
+        }
+        xNameMap.Clear();
+        // END DEBUG TEST
         // Create bookmarks, but also a dictionary that
         // we can find the items in
         var xBookmarks = new Dictionary<object, int>();
@@ -246,6 +256,10 @@ namespace Cosmos.IL2CPU {
             if (xList.Key == null) {
               mLogWriter.WriteLine("Unspecified Source");
             } else {
+              if (xNameMap.Contains(LogItemText(xList.Key).GetHashCode())) {
+                Console.WriteLine("Duplicate");
+              }
+              xNameMap.Add(LogItemText(xList.Key).GetHashCode());
               mLogWriter.WriteLine(LogItemText(xList.Key));
             }
             if (xHref >= 0) {
