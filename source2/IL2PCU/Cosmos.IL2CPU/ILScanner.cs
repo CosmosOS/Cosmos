@@ -80,6 +80,9 @@ namespace Cosmos.IL2CPU {
     }
 
     protected void Queue(object aItem, object aSrc, string aSrcType) {
+      if (aItem == typeof(Assembly)) {
+        Console.Write("");
+      }
       if (!mItems.Contains(aItem)) {
         if (mLogEnabled) {
           LogMapPoint(aSrc, aSrcType, aItem);
@@ -297,7 +300,10 @@ namespace Cosmos.IL2CPU {
       // class and throw an exception if any method, field, member etc is missing.
       foreach (var xAsm in AppDomain.CurrentDomain.GetAssemblies()) {
         if (xAsm.GetName().Name == "Indy.IL2CPU.X86") {
-          //TODO: skip this assembly for now. Why?
+          // skip this assembly for now. at the moment we introduced the AssemblerMethod.AssembleNew method, for allowing those to work
+          // with the Cosmos.IL2CPU* stack, we found we could not use the Indy.IL2CPU.X86 plugs, as they contained some AssemblerMethods. 
+          // This would result in a circular reference, thus we copied them to a new assembly. While the Indy.IL2CPU.X86 assembly is being
+          // referenced, we need to skip it here.
           continue;
         }
         // Find all classes marked as a Plug
@@ -330,13 +336,16 @@ namespace Cosmos.IL2CPU {
     }
 
     protected void ScanMethod(MethodBase aMethod, bool aIsPlug) {
+      if (aMethod.Name == "ToString" && aMethod.DeclaringType==typeof(object)) {
+        Console.Write("");
+      }
       var xParams = aMethod.GetParameters();
       var xParamTypes = new Type[xParams.Length];
       // Dont use foreach, enum generaly keeps order but
       // isn't guaranteed.
       for (int i = 0; i < xParams.Length; i++) {
-        Queue(xParamTypes[i], aMethod, "Parameter");
         xParamTypes[i] = xParams[i].ParameterType;
+        Queue(xParamTypes[i], aMethod, "Parameter");
       }
       // Queue Types directly related to method
       if (!aIsPlug) {
@@ -370,7 +379,7 @@ namespace Cosmos.IL2CPU {
             if (xType.IsSubclassOf(aMethod.DeclaringType)
               || aMethod.DeclaringType.IsSubclassOf(xType)) {
               var xNewMethod = xType.GetMethod(aMethod.Name, xParamTypes);
-              if (xNewMethod != null) {
+              if (xNewMethod != null && xNewMethod != aMethod) {
                 if (xNewMethod.IsAbstract) {
                   // If virtual, we need to add it to mVirtuals.
                   // Non virtuals will get added when they get scanned.
@@ -378,7 +387,7 @@ namespace Cosmos.IL2CPU {
                 } else {
                   // Abstract methods dont have an implementation, so only add
                   // non abstract methods for scanning.
-                  Queue(xNewMethod, aMethod.DeclaringType, "Virtual");
+                  Queue(xNewMethod, aMethod, "Virtual");
                 }
               }
             }
@@ -400,7 +409,12 @@ namespace Cosmos.IL2CPU {
         // Scan the method body for more type and method refs
         //TODO: Dont queue new items if they are plugged
         // or do we need to queue them with a resolved ref in a new list?
-        var xOpCodes = mReader.ProcessMethod(aMethod);
+        List<ILOpCode> xOpCodes;
+        try {
+          xOpCodes = mReader.ProcessMethod(aMethod);
+        } catch (Exception E) {
+          throw;
+        }
         if (xOpCodes != null) {
           foreach (var xOpCode in xOpCodes) {
             if (xOpCode is ILOpCodes.OpMethod) {
@@ -423,6 +437,9 @@ namespace Cosmos.IL2CPU {
     }
 
     protected void ScanType(Type aType) {
+      if (aType == typeof(Assembly)) {
+        Console.Write("");
+      }
       // Add immediate ancestor type
       // We dont need to crawl up farther, when the BaseType is scanned 
       // it will add its BaseType, and so on.
@@ -444,8 +461,12 @@ namespace Cosmos.IL2CPU {
       //TODO: Is there a better way than rescanning every time like this?
     }
 
+    private long mItemsHandled = 0;
     protected void ScanQueue() {
       while (mQueue.Count > 0) {
+        if ((mQueue.Count + mItemsHandled) != mItems.Count) {
+          Console.Write("");
+        }
         var xItem = mQueue.Dequeue();
         // Check for MethodBase first, they are more numerous 
         // and will reduce compares
@@ -456,7 +477,15 @@ namespace Cosmos.IL2CPU {
         } else {
           throw new Exception("Unknown item found in queue.");
         }
+        mItemsHandled++;
+        if ((mItemsHandled % 5000) == 0) {
+          Console.WriteLine("ItemsHandled: {0}", mItemsHandled);
+        }
+        if (mItemsHandled == 10000) {
+          throw new Exception("Debug Abort");
+        }
       }
+      Console.WriteLine("ItemsHandled: {0}", mItemsHandled);
     }
 
     protected void LogMapPoint(object aSrc, string aSrcType, object aItem) {
@@ -490,8 +519,6 @@ namespace Cosmos.IL2CPU {
     {
       //TODO: This method is "reversed" from old - remember that when porting
       MethodBase xResult = null;
-
-      //TODO: Need to search for ctor plugs
 
       // Setup param types for search
       Type[] xParamTypes;
