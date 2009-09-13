@@ -142,6 +142,13 @@ namespace Cosmos.IL2CPU {
       FindPlugImpls();
       //TODO: When plugs are scanned, we dont add DeclaringType
       // or search up or down for virtuals
+      // Now that we found all plugs, scan them.
+      // We have to scan them after we find all plugs, but because
+      // plugs can use other plugs
+      foreach (var xPlug in mPlugImpls) {
+      }
+      foreach (var xPlug in mPlugImplsInhrt) {
+      }
 
     //    // Pull in extra implementations, GC etc.
     //    QueueMethod(null, "Explicit Entry", (System.Reflection.MethodInfo)RuntimeEngineRefs.InitializeApplicationRef, false);
