@@ -5,7 +5,7 @@ using System.Text;
 using Indy.IL2CPU.Plugs;
 
 namespace Indy.IL2CPU.X86.Plugs.NEW_PLUGS {
-  [Plug(Target=typeof(Delegate), AlsoTargetSubtypes=true)]
+  [Plug(Target=typeof(Delegate), Inheritable=true)]
   [PlugField(FieldType = typeof(int), FieldId = "$$ArgSize$$")]
 
   public static class DelegateImpl {
