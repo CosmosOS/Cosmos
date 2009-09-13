@@ -372,7 +372,6 @@ namespace Cosmos.IL2CPU {
       }
 
       // Scan virtuals
-      // We only need to look in ancestors and descendants if the method is virtual
       if (aMethod.IsVirtual) {
         // For virtuals we need to climb up the type tree
         // and find the top base method. We then add that top
@@ -444,7 +443,6 @@ namespace Cosmos.IL2CPU {
         xPlug = ResolvePlug(aMethod, xParamTypes);
       }
       if (xPlug == null) {
-
         //TODO: As we scan each method, we could update or put in a new list
         // that has the resolved plug so we don't have to reresolve it again
         // later for compilation.
