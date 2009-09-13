@@ -332,6 +332,8 @@ namespace Cosmos.IL2CPU {
     protected void ScanMethod(MethodBase aMethod, bool aIsPlug) {
       var xParams = aMethod.GetParameters();
       var xParamTypes = new Type[xParams.Length];
+      // Dont use foreach, enum generaly keeps order but
+      // isn't guaranteed.
       for (int i = 0; i < xParams.Length; i++) {
         Queue(xParamTypes[i], aMethod, "Parameter");
         xParamTypes[i] = xParams[i].ParameterType;
