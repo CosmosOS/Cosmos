@@ -22,7 +22,7 @@ namespace Indy.IL2CPU.X86.Plugs.CustomImplementations.MS.System {
 			}
 		}
 
-		[PlugMethod(Signature = "System_Void__System_String__ctor_System_Char___")]
+		//[PlugMethod(Signature = "System_Void__System_String__ctor_System_Char___")]
 		public static unsafe void Ctor(String aThis, [FieldAccess(Name = "$$Storage$$")] ref Char[] aStorage, Char[] aChars,
 			[FieldAccess(Name = "System.Int32 System.String.m_stringLength")]ref int aStringLength,
 			[FieldAccess(Name = "System.Int32 System.String.m_arrayLength")] ref int aArrayLength,

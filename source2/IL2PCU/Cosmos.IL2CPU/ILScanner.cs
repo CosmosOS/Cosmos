@@ -457,7 +457,7 @@ namespace Cosmos.IL2CPU {
           }
         }
         if (xNeedsPlug) {
-          throw new Exception("Plug needed. " + aMethod.DeclaringType + "." + aMethod.Name);
+          throw new Exception("Plug needed. "+ MethodInfoLabelGenerator.GenerateFullName(aMethod));
         }
         
         //TODO: As we scan each method, we could update or put in a new list
@@ -594,6 +594,10 @@ namespace Cosmos.IL2CPU {
 
       PlugMethodAttribute xAttrib = null;
       foreach (var xImpl in aImpls) {
+        // TODO: cleanup this loop, next statement shouldnt be neccessary
+        if (xResult != null) {
+          break;
+        }
         // Plugs methods must be static, and public
         // Search for non signature matches first since signature searches are slower
         xResult = xImpl.GetMethod(aMethod.Name, BindingFlags.Static | BindingFlags.Public
@@ -607,6 +611,9 @@ namespace Cosmos.IL2CPU {
             , null, xParamTypes, null);
         }
         if (xResult == null) {
+          if (aTargetType == typeof(string) && aMethod.Name == ".ctor") {
+            Console.Write("");
+          }
           // Search by signature
           foreach (var xSigMethod in xImpl.GetMethods(BindingFlags.Static | BindingFlags.Public)) {
             var xParams = xSigMethod.GetParameters();
@@ -682,6 +689,7 @@ namespace Cosmos.IL2CPU {
             }
             if (xTargetMethod == aMethod) {
               xResult = xSigMethod;
+              break;
             }
           }
         }
