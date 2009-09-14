@@ -72,6 +72,7 @@
     <Compile Include="System\MulticastDelegateImpl.cs" />
     <Compile Include="System\MulticastDelegateImplRefs.cs" />
     <Compile Include="System\ObjectImplRefs.cs" />
+    <Compile Include="System\OutOfMemoryExceptionImpl.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\source2\IL2PCU\Cosmos.IL2CPU.X86\Cosmos.IL2CPU.X86.csproj">

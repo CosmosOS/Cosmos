@@ -611,9 +611,6 @@ namespace Cosmos.IL2CPU {
             , null, xParamTypes, null);
         }
         if (xResult == null) {
-          if (aTargetType == typeof(string) && aMethod.Name == ".ctor") {
-            Console.Write("");
-          }
           // Search by signature
           foreach (var xSigMethod in xImpl.GetMethods(BindingFlags.Static | BindingFlags.Public)) {
             var xParams = xSigMethod.GetParameters();
@@ -864,6 +861,9 @@ namespace Cosmos.IL2CPU {
       if (mPlugImpls.TryGetValue(aMethod.DeclaringType, out xImpls)) {
         xResult = ResolvePlug(aMethod.DeclaringType, xImpls, aMethod, aParamTypes);
       }
+      if (aMethod.DeclaringType.IsSubclassOf(typeof(Delegate))) {
+        Console.Write("");
+      }
 
       // Check for inheritable plugs second.
       // We also need to fall through at method level, not just type.
@@ -873,7 +873,11 @@ namespace Cosmos.IL2CPU {
       if (xResult == null) {
         foreach (var xInheritable in mPlugImplsInhrt) {
           if (aMethod.DeclaringType.IsSubclassOf(xInheritable.Key)) {
-            xResult = ResolvePlug(xInheritable.Key, xInheritable.Value, aMethod, aParamTypes);
+            xResult = ResolvePlug(aMethod.DeclaringType/*xInheritable.Key*/, xInheritable.Value, aMethod, aParamTypes);
+            if (xResult != null) {
+              // prevent value overriding.
+              break;
+            }
           }
         }
       }

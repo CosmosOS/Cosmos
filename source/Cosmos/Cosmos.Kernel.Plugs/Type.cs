@@ -10,9 +10,9 @@ namespace Cosmos.Kernel.Plugs {
 		public static void CCtor() {
 		}
 
-        [PlugMethod(Signature = "System_Type__System_Type_GetTypeFromHandle_System_RuntimeTypeHandle_")]
-        public static uint GetTypeFromHandle(uint aHandle) {
-            return aHandle;
+        //[PlugMethod(Signature = "System_Type__System_Type_GetTypeFromHandle_System_RuntimeTypeHandle_")]
+        public static Type GetTypeFromHandle(RuntimeTypeHandle aHandle) {
+            return null;
         }
 
         public static string ToString(Type aThis) {

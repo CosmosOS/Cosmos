@@ -18,5 +18,13 @@ namespace Indy.IL2CPU.IL.CustomImplementations.System
         {
             return "fix me in Indy.IL2CPU.IL.CustomImplementations.System.NumberImpl.FormatDouble";
         }
+
+        public static string FormatInt64(long aValue, string aStr, NumberFormatInfo aFormat) {
+          return "fix me in Indy.IL2CPU.IL.CustomImplementations.System.NumberImpl.FormatInt64";
+        }
+ 
+      public static string FormatUInt64(ulong aValue, string aStr, NumberFormatInfo aFormat) {
+          return "fix me in Indy.IL2CPU.IL.CustomImplementations.System.NumberImpl.FormatUInt64";
+        }
     }
 }

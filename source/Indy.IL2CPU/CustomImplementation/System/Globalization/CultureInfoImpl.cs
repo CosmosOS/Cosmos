@@ -17,7 +17,7 @@ namespace Indy.IL2CPU.CustomImplementation.System.Globalization {
             return null;
         }
 
-        [PlugMethod(Signature = "System_Void__System_Globalization_CultureInfo__cctor__")]
+        //[PlugMethod(Signature = "System_Void__System_Globalization_CultureInfo__cctor__")]
         public static void CCtor()
         {
         }

@@ -7,7 +7,7 @@ namespace Indy.IL2CPU.X86.Plugs.CustomImplementations.MS.System {
 	[PlugField(FieldId = "$$Storage$$", FieldType = typeof(char[]))]
 	[PlugField(FieldId = "System.Char System.String.m_firstChar", IsExternalValue = true)]
 	public static class StringImpl {
-		[PlugMethod(Signature = "System_Void__System_String__ctor_System_Char____System_Int32__System_Int32_")]
+		//[PlugMethod(Signature = "System_Void__System_String__ctor_System_Char____System_Int32__System_Int32_")]
 		public static unsafe void Ctor(String aThis, [FieldAccess(Name = "$$Storage$$")]ref Char[] aStorage, Char[] aChars, int aStartIndex, int aLength,
 			[FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
 			[FieldAccess(Name = "System.Int32 System.String.m_arrayLength")] ref int aArrayLength,
