@@ -10,7 +10,7 @@ using Indy.IL2CPU.Plugs;
 namespace Indy.IL2CPU.X86.Plugs.CustomImplementations.System.Runtime.CompilerServices {
 	[Plug(Target = typeof(RuntimeHelpers))]
 	public static class RuntimeHelpersImpl {
-		[PlugMethod(Signature = "System_Void__System_Runtime_CompilerServices_RuntimeHelpers__cctor__")]
+//		[PlugMethod(Signature = "System_Void__System_Runtime_CompilerServices_RuntimeHelpers__cctor__")]
 		public static void cctor() {
 			//todo: do something
 		}

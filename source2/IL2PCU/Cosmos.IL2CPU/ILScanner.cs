@@ -118,8 +118,13 @@ namespace Cosmos.IL2CPU {
             }
             if (xAttrib == null) {
               ScanMethod(xMethod, true);
-            } else if (xAttrib.Enabled && !xAttrib.IsMonoOnly) {
-              ScanMethod(xMethod, true);
+            } else {
+              if (xAttrib.IsWildcard && xAttrib.Assembler == null) {
+                throw new Exception("Wildcard PlugMethods need to use an assembler for now");
+              }
+              if (xAttrib.Enabled && !xAttrib.IsMonoOnly) {
+                ScanMethod(xMethod, true);
+              }
             }
           }
         }
@@ -351,9 +356,6 @@ namespace Cosmos.IL2CPU {
     }
 
     protected void ScanMethod(MethodBase aMethod, bool aIsPlug) {
-      if (aMethod.Name == "WriteLine") {
-        Console.Write("");
-      }
       var xParams = aMethod.GetParameters();
       var xParamTypes = new Type[xParams.Length];
       // Dont use foreach, enum generaly keeps order but
@@ -613,80 +615,104 @@ namespace Cosmos.IL2CPU {
         if (xResult == null) {
           // Search by signature
           foreach (var xSigMethod in xImpl.GetMethods(BindingFlags.Static | BindingFlags.Public)) {
-            var xParams = xSigMethod.GetParameters();
-            //TODO: Static method plugs dont seem to be separated 
-            // from instance ones, so the only way seems to be to try
-            // to match instance first, and if no match try static.
-            // I really don't like this and feel we need to find
-            // an explicit way to determine or mark the method 
-            // implementations.
-            //
-            // Plug implementations take "this" as first argument
-            // so when matching we don't include it in the search
-            Type[] xTypesInst = null;
-            var xActualParamCount = xParams.Length;
-            foreach (var xParam in xParams) {
-              if (xParam.GetCustomAttributes(typeof(FieldAccessAttribute), false).Length > 0) {
-                xActualParamCount--;
-              }
+            // TODO: Only allow one, but this code for now takes the last one
+            // if there is more than one
+            xAttrib=null;
+            foreach (PlugMethodAttribute x in xSigMethod.GetCustomAttributes(typeof(PlugMethodAttribute), false)) {
+              xAttrib = x;
             }
-            Type[] xTypesStatic = new Type[xActualParamCount];
-            // If 0 params, has to be a static plug so we skip
-            // any copying and leave xTypesInst = null
-            // If 1 params, xTypesInst must be converted to Type[0]
-            if (xActualParamCount == 1) {
-              xTypesInst = new Type[0];
-              xTypesStatic[0] = xParams[0].ParameterType;
-            } else if (xActualParamCount > 1) {
-              xTypesInst = new Type[xActualParamCount - 1];
-              var xCurIdx = 0;
-              foreach (var xParam in xParams.Skip(1)) {
-                if (xParam.GetCustomAttributes(typeof(FieldAccessAttribute), false).Length > 0) {
-                  continue;
-                }
-                xTypesInst[xCurIdx] = xParam.ParameterType;
-                xCurIdx++;
+
+            if (xAttrib != null && xAttrib.IsWildcard) {
+              MethodBase xTargetMethod = null;
+              if (String.Compare(xSigMethod.Name, "Ctor", true) == 0 ||
+                 String.Compare(xSigMethod.Name, "Cctor", true) == 0) {
+                xTargetMethod = aTargetType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance).SingleOrDefault();
+              } else {
+                xTargetMethod = (from item in aTargetType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)
+                                where item.Name == xSigMethod.Name
+                                select item).SingleOrDefault();
               }
-              xCurIdx = 0;
+              if (xTargetMethod == aMethod) {
+                xResult = xSigMethod;
+              }
+            } else {
+
+              var xParams = xSigMethod.GetParameters();
+              //TODO: Static method plugs dont seem to be separated 
+              // from instance ones, so the only way seems to be to try
+              // to match instance first, and if no match try static.
+              // I really don't like this and feel we need to find
+              // an explicit way to determine or mark the method 
+              // implementations.
+              //
+              // Plug implementations take "this" as first argument
+              // so when matching we don't include it in the search
+              Type[] xTypesInst = null;
+              var xActualParamCount = xParams.Length;
               foreach (var xParam in xParams) {
                 if (xParam.GetCustomAttributes(typeof(FieldAccessAttribute), false).Length > 0) {
+                  xActualParamCount--;
+                }
+              }
+              Type[] xTypesStatic = new Type[xActualParamCount];
+              // If 0 params, has to be a static plug so we skip
+              // any copying and leave xTypesInst = null
+              // If 1 params, xTypesInst must be converted to Type[0]
+              if (xActualParamCount == 1) {
+                xTypesInst = new Type[0];
+                xTypesStatic[0] = xParams[0].ParameterType;
+              } else if (xActualParamCount > 1) {
+                xTypesInst = new Type[xActualParamCount - 1];
+                var xCurIdx = 0;
+                foreach (var xParam in xParams.Skip(1)) {
+                  if (xParam.GetCustomAttributes(typeof(FieldAccessAttribute), false).Length > 0) {
+                    continue;
+                  }
+                  xTypesInst[xCurIdx] = xParam.ParameterType;
                   xCurIdx++;
-                  continue;
                 }
-                if (xCurIdx >= xTypesStatic.Length) {
-                  break;
+                xCurIdx = 0;
+                foreach (var xParam in xParams) {
+                  if (xParam.GetCustomAttributes(typeof(FieldAccessAttribute), false).Length > 0) {
+                    xCurIdx++;
+                    continue;
+                  }
+                  if (xCurIdx >= xTypesStatic.Length) {
+                    break;
+                  }
+                  xTypesStatic[xCurIdx] = xParam.ParameterType;
+                  xCurIdx++;
                 }
-                xTypesStatic[xCurIdx] = xParam.ParameterType;
-                xCurIdx++;
               }
-            }
-            System.Reflection.MethodBase xTargetMethod = null;
-            // TODO: In future make rule that all ctor plugs are called
-            // ctor by name, or use a new attrib
-            //TODO: Document all the plug stuff in a document on website
-            //TODO: To make inclusion of plugs easy, we can make a plugs master
-            // that references the other default plugs so user exes only 
-            // need to reference that one.
-            // TODO: Skip FieldAccessAttribute if in impl
-            if (xTypesInst != null) {
-              if (string.Compare(xSigMethod.Name, "ctor", true) == 0) {
-                xTargetMethod = aTargetType.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesInst, null);
-              } else {
-                xTargetMethod = aTargetType.GetMethod(xSigMethod.Name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesInst, null);
+              System.Reflection.MethodBase xTargetMethod = null;
+              // TODO: In future make rule that all ctor plugs are called
+              // ctor by name, or use a new attrib
+              //TODO: Document all the plug stuff in a document on website
+              //TODO: To make inclusion of plugs easy, we can make a plugs master
+              // that references the other default plugs so user exes only 
+              // need to reference that one.
+              // TODO: Skip FieldAccessAttribute if in impl
+              if (xTypesInst != null) {
+                if (string.Compare(xSigMethod.Name, "ctor", true) == 0) {
+                  xTargetMethod = aTargetType.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesInst, null);
+                } else {
+                  xTargetMethod = aTargetType.GetMethod(xSigMethod.Name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesInst, null);
+                }
               }
-            }
-            // Not an instance method, try static
-            if (xTargetMethod == null) {
-              if (string.Compare(xSigMethod.Name, "cctor", true) == 0
-                || string.Compare(xSigMethod.Name, "ctor", true) == 0) {
-                xTargetMethod = aTargetType.GetConstructor(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesStatic, null);
-              } else {
-                xTargetMethod = aTargetType.GetMethod(xSigMethod.Name, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesStatic, null);
+              // Not an instance method, try static
+              if (xTargetMethod == null) {
+                if (string.Compare(xSigMethod.Name, "cctor", true) == 0
+                  || string.Compare(xSigMethod.Name, "ctor", true) == 0) {
+                  xTargetMethod = aTargetType.GetConstructor(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesStatic, null);
+                } else {
+                  xTargetMethod = aTargetType.GetMethod(xSigMethod.Name, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesStatic, null);
+                }
               }
-            }
-            if (xTargetMethod == aMethod) {
-              xResult = xSigMethod;
-              break;
+              if (xTargetMethod == aMethod) {
+                xResult = xSigMethod;
+                break;
+              }
+              xAttrib = null;
             }
           }
         }

@@ -7,7 +7,7 @@ using Indy.IL2CPU.Plugs;
 namespace Indy.IL2CPU.IL.CustomImplementations.System {
 	[Plug(Target = typeof(Enum))]
 	public static class EnumImpl {
-		[PlugMethod(Signature = "System_Void__System_Enum__cctor__")]
+//		[PlugMethod(Signature = "System_Void__System_Enum__cctor__")]
 		public static void Cctor() {
 			//
 		}
