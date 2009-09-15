@@ -20,7 +20,7 @@ namespace Cosmos.Sys.Plugs.Assemblers{
             //TODO: ACPI Way...see http://forum.osdev.org/viewtopic.php?t=16990
         }
 
-        public override void AssembleNew(object aAssembler) {
+        public override void AssembleNew(object aAssembler, object aMethodInfo) {
           //ACPI Way...ONLY QEMu And Boschs
           new CosCPUx86.Move {
             DestinationReg = CosCPUx86.Registers.DX,

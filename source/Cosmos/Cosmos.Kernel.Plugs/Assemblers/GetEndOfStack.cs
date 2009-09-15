@@ -14,7 +14,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
             new CPUx86.Push { DestinationRef = ElementReference.New("Kernel_Stack") };
 		}
 
-    public override void AssembleNew(object aAssembler) {
+    public override void AssembleNew(object aAssembler, object aMethodInfo) {
       new CosCPUx86.Push {
         DestinationRef = CosCPUAll.ElementReference.New("Kernel_Stack")
       };

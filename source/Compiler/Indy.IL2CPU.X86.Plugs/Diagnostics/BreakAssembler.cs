@@ -13,7 +13,7 @@ namespace Indy.IL2CPU.X86.PlugsLinqTest.CustomImplementations.System.Diagnostics
             // TODO -pHigh: implement Debugger.Break();
 		}
 
-    public override void AssembleNew(object aAssembler) {
+    public override void AssembleNew(object aAssembler, object aMethodInfo) {
     }
 	}
 }

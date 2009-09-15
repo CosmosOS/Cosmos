@@ -16,7 +16,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
       //TODO: new InvalPG { DestinationReg = Registers.EAX };
     }
 
-    public override void AssembleNew(object aAssembler) {
+    public override void AssembleNew(object aAssembler, object aMethodInfo) {
       new CosCPUx86.Move { DestinationReg = CosCPUx86.Registers.EAX, SourceReg = CosCPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 0xC };
     }
   }

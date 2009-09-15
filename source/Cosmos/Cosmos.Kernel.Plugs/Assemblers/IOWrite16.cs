@@ -18,7 +18,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
       new CPUx86.Out { DestinationReg = CPUx86.Registers.AX };
     }
 
-    public override void AssembleNew(object aAssembler) {
+    public override void AssembleNew(object aAssembler, object aMethodInfo) {
       //TODO: This is a lot of work to write to a single port. We need to have some kind of inline ASM option that can emit a single out instruction
       new CosCPUx86.Move { DestinationReg = CosCPUx86.Registers.EDX, SourceReg = CosCPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0xC };
       new CosCPUx86.Move { DestinationReg = CosCPUx86.Registers.EAX, SourceReg = CosCPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x8 };

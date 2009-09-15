@@ -21,7 +21,7 @@ namespace Indy.IL2CPU.X86.Plugs.CustomImplementations.System.Runtime.CompilerSer
 	}
 
 	public class InitializeArrayAssembler: AssemblerMethod {
-		public override void AssembleNew(object aAssembler) {
+    public override void AssembleNew(object aAssembler, object aMethodInfo) {
 			// Arguments:
 			//    Array aArray, RuntimeFieldHandle aFieldHandle
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0xC }; // array

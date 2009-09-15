@@ -47,7 +47,7 @@ namespace Indy.IL2CPU.X86.Plugs.CustomImplementations.System.Assemblers {
       new CPUx86.Movs { Size = 8, Prefixes = CPUx86.InstructionPrefixes.Repeat };
     }
 
-    public override void AssembleNew(object aAssembler) {
+    public override void AssembleNew(object aAssembler, object aMethodInfo) {
       new CosCPUx86.Push { DestinationReg = CosCPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x1C };
       new CosCPUx86.Add { DestinationReg = CosCPUx86.Registers.ESP, DestinationIsIndirect = true, SourceValue = 12, Size = 32 }; // pointer is at the element size
       new CosCPUx86.Pop { DestinationReg = CosCPUx86.Registers.EAX };

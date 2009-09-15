@@ -15,7 +15,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
       new CPUx86.ClrInterruptFlag();
     }
 
-    public override void AssembleNew(object aAssembler) {
+    public override void AssembleNew(object aAssembler, object aMethodInfo) {
       new CosCPUx86.ClrInterruptFlag();
     }
   }

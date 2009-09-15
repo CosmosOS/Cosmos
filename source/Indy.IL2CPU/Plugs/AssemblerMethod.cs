@@ -5,6 +5,6 @@ using System.Text;
 namespace Indy.IL2CPU.Plugs {
 	public abstract class AssemblerMethod {
 		public abstract void Assemble(Assembler.Assembler aAssembler);
-    public abstract void AssembleNew(object aAssembler);
+    public abstract void AssembleNew(object aAssembler, object aMethodInfo);
 	}
 }

@@ -21,7 +21,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
       new CPUx86.Sti();
     }
 
-    public override void AssembleNew(object aAssembler) {
+    public override void AssembleNew(object aAssembler, object aMethodInfo) {
       new CPUx86.ClrInterruptFlag();
       new CPUx86.Move { DestinationRef = CPUAll.ElementReference.New("_NATIVE_IDT_Pointer"), DestinationIsIndirect = true, Size = 16, SourceValue = 0 };
       new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceRef = CPUAll.ElementReference.New("_NATIVE_IDT_Pointer") };

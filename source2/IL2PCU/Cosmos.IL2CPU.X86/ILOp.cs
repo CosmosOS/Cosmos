@@ -29,7 +29,7 @@ namespace Cosmos.IL2CPU.X86
         protected void Jump_End(MethodInfo aMethod)
         {
 #warning todo: Jump_End jumps to ___EXCEPTION___EXIT
-            new CPU.Jump { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName( aMethod.MethodBase ) + "___EXCEPTION___EXIT" };
+            new CPU.Jump { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName( aMethod.MethodBase ) + "___EXCEPTION___NORMAL" };
         }
 
         protected uint GetStackCountForLocal(MethodInfo aMethod, LocalVariableInfo aField)
@@ -67,7 +67,7 @@ namespace Cosmos.IL2CPU.X86
         {
             return aSize % 4 == 0 ? aSize : ( ( aSize / aAlign ) * aAlign ) + 1;
         }
-        protected void ThrowNowImplementedException(string aMessage) {
+        protected void ThrowNotImplementedException(string aMessage) {
           new CPU.Push {
             DestinationRef = ElementReference.New(LdStr.GetContentsArrayName("Conv_Ovf_I4 instruction not implemented"))
           };

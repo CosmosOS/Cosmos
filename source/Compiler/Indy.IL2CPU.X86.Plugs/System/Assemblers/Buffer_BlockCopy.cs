@@ -31,7 +31,7 @@ namespace Indy.IL2CPU.X86.Plugs.CustomImplementations.System.Assemblers {
             new CPUx86.Movs { Size = 8, Prefixes = CPUx86.InstructionPrefixes.Repeat };
 		}
 
-    public override void AssembleNew(object aAssembler) {
+    public override void AssembleNew(object aAssembler, object aMethodInfo) {
       new CPUx86.Move { DestinationReg = CPUx86.Registers.ESI, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 24 };
       new CPUx86.Add { DestinationReg = CPUx86.Registers.ESI, SourceValue = 16 };
       new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 20 };

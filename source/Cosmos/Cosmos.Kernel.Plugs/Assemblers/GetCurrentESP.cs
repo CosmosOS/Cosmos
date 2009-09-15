@@ -13,7 +13,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
             new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP };
 		}
 
-    public override void AssembleNew(object aAssembler) {
+    public override void AssembleNew(object aAssembler, object aMethodInfo) {
       new CosCPUx86.Push {
         DestinationReg = CosCPUx86.Registers.ESP
       };

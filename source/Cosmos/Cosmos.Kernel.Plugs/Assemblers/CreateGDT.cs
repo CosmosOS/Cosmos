@@ -44,7 +44,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
       new CPUAll.Label("flush__GDT__table");
     }
 
-    public override void AssembleNew(object aAssembler) {
+    public override void AssembleNew(object aAssembler, object aMethodInfo) {
       string xFieldName = "_NATIVE_GDT_Contents";
       string xFieldData // Null Segment
           = "0,0,0,0,0,0,0,0" // Code Segment

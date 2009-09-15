@@ -22,7 +22,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
       new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
     }
 
-    public override void AssembleNew(object aAssembler) {
+    public override void AssembleNew(object aAssembler, object aMethodInfo) {
       //TODO: This is a lot of work to read a port. We need to have some kind of inline ASM option that can emit a single out instruction
       //TODO: Also make an attribute that forces normal inlining fo a method
       new CosCPUx86.Move { DestinationReg = CosCPUx86.Registers.EDX, SourceReg = CosCPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x8 };

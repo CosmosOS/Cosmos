@@ -15,6 +15,9 @@ namespace Cosmos.IL2CPU.X86 {
 
     protected override void MethodBegin(MethodInfo aMethod) {
       base.MethodBegin(aMethod);
+      if (aMethod.MethodBase.GetFullName() == "System_Void__Cosmos_Kernel_Plugs_Console_Write_System_String_") {
+        Console.Write("");
+      }
       new Label(aMethod.MethodBase);
     }
 

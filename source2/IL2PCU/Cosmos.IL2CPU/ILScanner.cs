@@ -98,6 +98,13 @@ namespace Cosmos.IL2CPU {
     }
 
     protected void Queue(object aItem, object aSrc, string aSrcType) {
+      var xMemInfo = aItem as MemberInfo;
+      if (xMemInfo != null
+        && xMemInfo.DeclaringType != null
+        && xMemInfo.DeclaringType.FullName == "System.ThrowHelper"
+        && xMemInfo.DeclaringType.Assembly.GetName().Name != "mscorlib") {
+        return;
+      }
       if (!mItems.Contains(aItem)) {
         if (mLogEnabled) {
           LogMapPoint(aSrc, aSrcType, aItem);
@@ -218,6 +225,43 @@ namespace Cosmos.IL2CPU {
       foreach (var xItem in mItems) {
         if (xItem is MethodBase) {
           var xMethod = (MethodBase)xItem;
+          var xParams = xMethod.GetParameters();
+          var xParamTypes = new Type[xParams.Length];
+          // Dont use foreach, enum generaly keeps order but
+          // isn't guaranteed.
+          for (int i = 0; i < xParams.Length; i++) {
+            xParamTypes[i] = xParams[i].ParameterType;
+          }
+          var xPlug = ResolvePlug(xMethod, xParamTypes);
+          var xMethodType = MethodInfo.TypeEnum.Normal;
+          Type xPlugAssembler = null;
+          MethodInfo xPlugInfo = null;
+          if (xPlug != null) {
+            xPlugInfo = new MethodInfo(xPlug, (uint)mItemsList.IndexOf(xPlug), MethodInfo.TypeEnum.Plug, null);
+            xMethodType = MethodInfo.TypeEnum.NeedsPlug;
+            PlugMethodAttribute xAttrib = null;
+            foreach (PlugMethodAttribute attrib in xPlug.GetCustomAttributes(typeof(PlugMethodAttribute), true)) {
+              xAttrib = attrib;
+            }
+            if (xAttrib != null) {
+              xPlugAssembler = xAttrib.Assembler;
+            }
+            var xMethodInfo = new MethodInfo(xMethod, (uint)mItemsList.IndexOf(xMethod), xMethodType, xPlugInfo, xPlugAssembler);
+            //var xInstructions = mReader.ProcessMethod(xPlug);
+            //if (xInstructions != null) {
+            //  ProcessInstructions(xInstructions);
+            //  mAsmblr.ProcessMethod(xMethodInfo, xInstructions);
+            //}
+            //mAsmblr.GenerateMethodForward(xMethodInfo, xPlugInfo);
+          } else {
+            var xMethodInfo = new MethodInfo(xMethod, (uint)mItemsList.IndexOf(xMethod), xMethodType, xPlugInfo, xPlugAssembler);
+            var xInstructions = mReader.ProcessMethod(xMethod);
+            if (xInstructions != null) {
+              ProcessInstructions(xInstructions);
+              mAsmblr.ProcessMethod(xMethodInfo, xInstructions);
+            }
+          }
+          
           //if (xMethod.Type != MethodInfo.TypeEnum.NeedsPlug) {
           //  mAsmblr.ProcessMethod(xMethod);
           //} else {
@@ -228,6 +272,20 @@ namespace Cosmos.IL2CPU {
           //mAsmblr.ProcessMethod(
         }
         // mAsmblr.GenerateVMTCode(mTypes, mTypesSet, mKnownMethods);
+      }
+    }
+
+    /// <summary>
+    /// This method changes the opcodes. Changes are:
+    /// * inserting the ValueUID for method ops.
+    /// </summary>
+    /// <param name="aOpCodes"></param>
+    private void ProcessInstructions(List<ILOpCode> aOpCodes) {
+      foreach (var xOpCode in aOpCodes) {
+        var xOpMethod = xOpCode as ILOpCodes.OpMethod;
+        if (xOpMethod != null) {
+          xOpMethod.ValueUID = (uint)mItemsList.IndexOf(xOpMethod.Value);
+        }
       }
     }
 
@@ -374,6 +432,7 @@ namespace Cosmos.IL2CPU {
       }
 
       // Scan virtuals
+      #region Virtuals scan
       if (aMethod.IsVirtual) {
         // For virtuals we need to climb up the type tree
         // and find the top base method. We then add that top
@@ -437,6 +496,7 @@ namespace Cosmos.IL2CPU {
           }
         }
       }
+      #endregion
 
       MethodBase xPlug = null;
       // Plugs may use plugs, but plugs won't be plugged over themself

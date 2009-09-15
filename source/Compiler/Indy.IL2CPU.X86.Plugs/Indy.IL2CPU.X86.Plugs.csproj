@@ -92,6 +92,10 @@
       <Project>{5A1E9D16-BF71-4D8E-9389-3476056E4566}</Project>
       <Name>Indy.IL2CPU.Assembler</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Indy.IL2CPU.X86\Indy.IL2CPU.X86.csproj">
+      <Project>{5E70F7D9-388A-43C2-8D9B-A4C382A8278D}</Project>
+      <Name>Indy.IL2CPU.X86</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Generic\" />

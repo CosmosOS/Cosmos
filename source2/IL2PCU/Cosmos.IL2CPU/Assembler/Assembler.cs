@@ -151,7 +151,7 @@ namespace Cosmos.IL2CPU {
         if (xNeedsMethodInfo != null) {
           throw new Exception("Plug cant work, because of INeedsMethodInfo");
         }
-        xAssembler.AssembleNew(this);
+        xAssembler.AssembleNew(this, aMethod);
       } else {
         foreach (var xOpCode in aOpCodes) {
           uint xOpCodeVal = (uint)xOpCode.OpCode;
@@ -166,6 +166,57 @@ namespace Cosmos.IL2CPU {
           mLog.Flush();
           new Comment(this, "[" + xILOp.ToString() + "]");
           BeforeOp(aMethod, xOpCode);
+          var xNextPosition = xOpCode.Position + 1;
+          #region Exception handling support code
+          ExceptionHandlingClause xCurrentHandler = null;
+          var xBody = aMethod.MethodBase.GetMethodBody();
+          // todo: add support for nested handlers using a stack or so..
+          foreach (ExceptionHandlingClause xHandler in xBody.ExceptionHandlingClauses) {
+            if (xHandler.TryOffset > 0) {
+              if (xHandler.TryOffset <= xNextPosition && (xHandler.TryLength + xHandler.TryOffset) > xNextPosition) {
+                if (xCurrentHandler == null) {
+                  xCurrentHandler = xHandler;
+                  continue;
+                } else if (xHandler.TryOffset > xCurrentHandler.TryOffset && (xHandler.TryLength + xHandler.TryOffset) < (xCurrentHandler.TryLength + xCurrentHandler.TryOffset)) {
+                  // only replace if the current found handler is narrower
+                  xCurrentHandler = xHandler;
+                  continue;
+                }
+              }
+            }
+            if (xHandler.HandlerOffset > 0) {
+              if (xHandler.HandlerOffset <= xNextPosition && (xHandler.HandlerOffset + xHandler.HandlerLength) > xNextPosition) {
+                if (xCurrentHandler == null) {
+                  xCurrentHandler = xHandler;
+                  continue;
+                } else if (xHandler.HandlerOffset > xCurrentHandler.HandlerOffset && (xHandler.HandlerOffset + xHandler.HandlerLength) < (xCurrentHandler.HandlerOffset + xCurrentHandler.HandlerLength)) {
+                  // only replace if the current found handler is narrower
+                  xCurrentHandler = xHandler;
+                  continue;
+                }
+              }
+            }
+            if ((xHandler.Flags & ExceptionHandlingClauseOptions.Filter) > 0) {
+              if (xHandler.FilterOffset > 0) {
+                if (xHandler.FilterOffset <= xNextPosition) {
+                  if (xCurrentHandler == null) {
+                    xCurrentHandler = xHandler;
+                    continue;
+                  } else if (xHandler.FilterOffset > xCurrentHandler.FilterOffset) {
+                    // only replace if the current found handler is narrower
+                    xCurrentHandler = xHandler;
+                    continue;
+                  }
+                }
+              }
+            }
+          }
+          #endregion
+          var xNeedsExceptionPush = (xCurrentHandler != null) && (((xCurrentHandler.HandlerOffset > 0 && xCurrentHandler.HandlerOffset == xOpCode.Position) || ((xCurrentHandler.Flags & ExceptionHandlingClauseOptions.Filter) > 0 && xCurrentHandler.FilterOffset > 0 && xCurrentHandler.FilterOffset == xOpCode.Position)) && (xCurrentHandler.Flags == ExceptionHandlingClauseOptions.Clause));
+          if (xNeedsExceptionPush) {
+            Push(0);
+            Stack.Push(4, typeof(Exception));
+          }
           xILOp.Execute(aMethod, xOpCode);
           AfterOp(aMethod, xOpCode);
           //mLog.WriteLine( " end: " + Stack.Count.ToString() );
@@ -173,6 +224,8 @@ namespace Cosmos.IL2CPU {
       }
       MethodEnd(aMethod);
     }
+
+    //
 
     protected virtual void BeforeOp(MethodInfo aMethod, ILOpCode aOpCode) {
     }

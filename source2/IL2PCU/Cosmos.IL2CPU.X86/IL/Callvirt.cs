@@ -109,8 +109,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
                 new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = (int)xThisOffset };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
-                throw new Exception("TODO");
-                //new CPUx86.Push { DestinationValue = xOpMethod.ValueUID };
+                new CPUx86.Push { DestinationValue = xOpMethod.ValueUID };
                 new CPUx86.Call {
                   DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(VTablesImplRefs.GetMethodAddressForTypeRef)
                 };

@@ -18,7 +18,7 @@ namespace Indy.IL2CPU.X86.Plugs.CustomImplementations.System.Assemblers
 		/// <para>The argument size is available in the <code>$$ArgSize$$</code> field. This value is already rounded to 4byte boundaries</para>
 		/// </summary>
 		/// <param name="aAssembler"></param>
-		public override void AssembleNew(object aAssembler)
+		public override void AssembleNew(object aAssembler, object aMethodInfo)
 		{
 			if (MethodInfo == null)
 			{

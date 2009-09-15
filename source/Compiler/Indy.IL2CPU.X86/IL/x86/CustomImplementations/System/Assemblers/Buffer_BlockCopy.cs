@@ -32,7 +32,7 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System.Assemblers {
             new Movs { Size = 8, Prefixes = InstructionPrefixes.Repeat };
 		}
 
-    public override void AssembleNew(object aAssembler) {
+    public override void AssembleNew(object aAssembler, object aMethodInfo) {
       throw new NotImplementedException();
     }
 	}

@@ -19,7 +19,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
             
         }
 
-        public override void AssembleNew(object aAssembler) {
+        public override void AssembleNew(object aAssembler, object aMethodInfo) {
           
         }
     }

@@ -37,7 +37,7 @@ namespace Cosmos.Sys.Plugs.Assemblers
             new CPUx86.Jump { DestinationLabel = ".loop" };
         }
 
-        public override void AssembleNew(object aAssembler) {
+        public override void AssembleNew(object aAssembler, object aMethodInfo) {
           new CosCPUx86.ClrInterruptFlag();
           /* Clear all keyboard buffers (output and command buffers) */
           new CosCPUAll.Label(".waitBuffer");

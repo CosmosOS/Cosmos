@@ -20,7 +20,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
       new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
     }
 
-    public override void AssembleNew(object aAssembler) {
+    public override void AssembleNew(object aAssembler, object aMethodInfo) {
       new CosCPUx86.Move { DestinationReg = CosCPUx86.Registers.EAX, SourceRef = CosCPUAll.ElementReference.New("MultiBootInfo_Memory_High"), SourceIsIndirect = true };
       new CosCPUx86.Xor { DestinationReg = CosCPUx86.Registers.EDX, SourceReg = CosCPUx86.Registers.EDX };
       new CosCPUx86.Move { DestinationReg = CosCPUx86.Registers.ECX, SourceValue = 1024 };

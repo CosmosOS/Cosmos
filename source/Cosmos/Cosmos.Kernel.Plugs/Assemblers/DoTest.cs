@@ -16,7 +16,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
             new CPUx86.Interrupt { DestinationValue = 0x35 };
 		}
 
-    public override void AssembleNew(object aAssembler) {
+    public override void AssembleNew(object aAssembler, object aMethodInfo) {
       new CosCPUx86.Call {
         DestinationLabel = "_CODE_REQUESTED_BREAK_"
       };

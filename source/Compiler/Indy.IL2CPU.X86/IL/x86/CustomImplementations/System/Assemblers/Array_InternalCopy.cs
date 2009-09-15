@@ -15,7 +15,7 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System.Assemblers {
 		 *			 int length,				ebp + 0xC
 		 *			 bool reliable);			ebp + 0x8
 		 */
-		public override void Assemble(Indy.IL2CPU.Assembler.Assembler aAssembler) {
+    public override void Assemble(Indy.IL2CPU.Assembler.Assembler aAssembler) {
             new CPUx86.Push { DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0x1C };
             new CPUx86.Add { DestinationReg = Registers.ESP, DestinationIsIndirect = true, SourceValue = 12, Size = 32 }; // pointer is at the element size
             new CPUx86.Pop { DestinationReg = Registers.EAX };
@@ -45,7 +45,7 @@ namespace Indy.IL2CPU.IL.X86.CustomImplementations.System.Assemblers {
             new Movs { Size = 8, Prefixes = InstructionPrefixes.Repeat };
 		}
 
-    public override void AssembleNew(object aAssembler) {
+    public override void AssembleNew(object aAssembler, object aMethodInfo) {
       throw new NotImplementedException();
     }
 	}

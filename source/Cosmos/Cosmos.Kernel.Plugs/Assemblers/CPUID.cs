@@ -46,7 +46,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
       new CPUx86.Push { DestinationValue = 0 };
     }
 
-    public override void AssembleNew(object aAssembler) {
+    public override void AssembleNew(object aAssembler, object aMethodInfo) {
       new CosCPUx86.Push { DestinationValue = 0 };
     }
   }
@@ -77,7 +77,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
       new CPUx86.Sti();
     }
 
-    public override void AssembleNew(object aAssembler) {
+    public override void AssembleNew(object aAssembler, object aMethodInfo) {
       new CosCPUx86.ClrInterruptFlag();
       new CosCPUx86.Move { DestinationReg = CosCPUx86.Registers.EAX, SourceReg = CosCPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 8 };
       new CosCPUx86.CpuId();

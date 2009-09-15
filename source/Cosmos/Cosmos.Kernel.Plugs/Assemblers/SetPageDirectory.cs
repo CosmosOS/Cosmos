@@ -15,7 +15,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
       new CPUx86.Move { DestinationReg = CPUx86.Registers.CR3, SourceReg = CPUx86.Registers.EAX };
     }
 
-    public override void AssembleNew(object aAssembler) {
+    public override void AssembleNew(object aAssembler, object aMethodInfo) {
       new CosCPUx86.Move { DestinationReg = CosCPUx86.Registers.EAX, SourceReg = CosCPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 0x8 };
       new CosCPUx86.Move { DestinationReg = CosCPUx86.Registers.CR3, SourceReg = CosCPUx86.Registers.EAX };
     }

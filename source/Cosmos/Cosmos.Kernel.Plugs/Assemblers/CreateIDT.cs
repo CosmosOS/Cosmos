@@ -173,7 +173,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
       new CPUAll.Label(".__AFTER_ENABLE_INTERRUPTS");
     }
 
-    public override void AssembleNew(object aAssembler) {
+    public override void AssembleNew(object aAssembler, object aMethodInfo) {
       #region generate IDT table
 
       string xFieldData = "";

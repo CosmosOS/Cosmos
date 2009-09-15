@@ -28,7 +28,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
       new CPUx86.Stos { Size = 32, Prefixes = CPUx86.InstructionPrefixes.Repeat };
     }
 
-    public override void AssembleNew(object aAssembler) {
+    public override void AssembleNew(object aAssembler, object aMethodInfo) {
       new CosCPUx86.ClrDirFlag();
       new CosCPUx86.Move { DestinationReg = CosCPUx86.Registers.EDI, SourceReg = CosCPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0xC }; //address
       new CosCPUx86.Move { DestinationReg = CosCPUx86.Registers.ECX, SourceReg = CosCPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x8 }; //length
