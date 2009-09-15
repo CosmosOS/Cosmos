@@ -217,6 +217,9 @@ namespace Cosmos.IL2CPU {
       Queue(typeof(Array), null, "Explicit Entry");
       Queue(typeof(Array).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, null, Type.EmptyTypes, null), null, "Explicit Entry");
 
+      var xThrowHelper = Type.GetType("System.ThrowHelper", true);
+      Queue(xThrowHelper.GetMethod("ThrowInvalidOperationException", BindingFlags.NonPublic | BindingFlags.Static), null, "Explicit Entry");
+      
       // Start from entry point of this program
       Queue(aStartMethod, null, "Entry Point");
 

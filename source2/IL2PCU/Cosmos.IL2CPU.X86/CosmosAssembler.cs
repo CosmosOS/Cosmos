@@ -116,6 +116,7 @@ namespace Cosmos.IL2CPU.X86 {
                 new Label("DebugStub_Step");
                 new Return();
             }
+            new Label(EntryPointName);
             //aOutputWriter.WriteLine("section .data");
             DataMembers.Add(new DataIfNotDefined("NASM_COMPILATION"));
             uint xFlags = 0x10003;
