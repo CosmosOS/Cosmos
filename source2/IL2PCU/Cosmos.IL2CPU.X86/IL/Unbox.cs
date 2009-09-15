@@ -24,7 +24,7 @@ namespace Cosmos.IL2CPU.X86.IL
             OpType xType = ( OpType )aOpCode;
             string BaseLabel = GetLabel( aMethod, aOpCode ) + "__";
 
-            string xTypeID = Label.FilterStringForIncorrectChars( xType.Value.AssemblyQualifiedName + "__TYPE_ID" );
+            string xTypeID = GetTypeIDLabel(xType.Value);
 
 
             var xTypeSize = SizeOfType( xType.Value );

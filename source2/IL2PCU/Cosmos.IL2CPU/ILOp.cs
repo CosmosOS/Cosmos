@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Reflection;
 
 namespace Cosmos.IL2CPU {
   public abstract class ILOp {
@@ -13,6 +14,10 @@ namespace Cosmos.IL2CPU {
     // This is called execute and not assemble, as the scanner
     // could be used for other things, profiling, analysis, reporting, etc
     public abstract void Execute(MethodInfo aMethod, ILOpCode aOpCode);
+
+    public static string GetTypeIDLabel(Type aType) {
+      return "VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(aType) + " ASM_IS__" + aType.Assembly.GetName().Name);
+    }
 
     public static uint SizeOfType(Type aType) {
       if (aType.FullName == "System.Void") {

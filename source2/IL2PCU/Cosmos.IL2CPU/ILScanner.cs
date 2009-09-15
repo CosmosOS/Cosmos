@@ -38,7 +38,7 @@ namespace Cosmos.IL2CPU {
     // much overhead.
     // we use a custom comparer, because the default one does some intelligent magic, which breaks lookups. is probably related
     // to comparing different types
-    protected HashSet<object> mItems = new HashSet<object>(new HashcodeComparer<object>());
+    protected OurHashSet<object> mItems = new OurHashSet<object>();//(new HashcodeComparer<object>());
     protected List<object> mItemsList = new List<object>();
     // Contains items to be scanned, both types and methods
     protected Queue<object> mQueue = new Queue<object>();
@@ -46,6 +46,9 @@ namespace Cosmos.IL2CPU {
     // overriding methods in new types, so we keep track of them separately. 
     // They are also in the main mItems and mQueue.
     protected HashSet<MethodBase> mVirtuals = new HashSet<MethodBase>(new HashcodeComparer<MethodBase>());
+
+    protected IDictionary<MethodBase, uint> mMethodUIDs = new Dictionary<MethodBase, uint>();
+    protected IDictionary<Type, uint> mTypeUIDs = new Dictionary<Type, uint>();
 
     // Contains a list of plug implementor classes
     // Key = Target Class
@@ -195,26 +198,24 @@ namespace Cosmos.IL2CPU {
       ScanPlugs(mPlugImplsInhrt);
 
       //    // Pull in extra implementations, GC etc.
-      //    QueueMethod(null, "Explicit Entry", (System.Reflection.MethodInfo)RuntimeEngineRefs.InitializeApplicationRef, false);
-      //    QueueMethod(null, "Explicit Entry", (System.Reflection.MethodInfo)RuntimeEngineRefs.FinalizeApplicationRef, false);
-      //    ////xScanner.QueueMethod(typeof(CosmosAssembler).GetMethod("PrintException"), true);
-      //    QueueMethod(null, "Explicit Entry", (System.Reflection.MethodInfo)VTablesImplRefs.LoadTypeTableRef, false);
-      //    QueueMethod(null, "Explicit Entry", (System.Reflection.MethodInfo)VTablesImplRefs.SetMethodInfoRef, false);
-      //    QueueMethod(null, "Explicit Entry", (System.Reflection.MethodInfo)VTablesImplRefs.IsInstanceRef, false);
-      //    QueueMethod(null, "Explicit Entry", (System.Reflection.MethodInfo)VTablesImplRefs.SetTypeInfoRef, false);
-      //    QueueMethod(null, "Explicit Entry", (System.Reflection.MethodInfo)VTablesImplRefs.GetMethodAddressForTypeRef, false);
-      //    QueueMethod(null, "Explicit Entry", (System.Reflection.MethodInfo)GCImplementationRefs.IncRefCountRef, false);
-      //    QueueMethod(null, "Explicit Entry", (System.Reflection.MethodInfo)GCImplementationRefs.DecRefCountRef, false);
-      //    QueueMethod(null, "Explicit Entry", (System.Reflection.MethodInfo)GCImplementationRefs.AllocNewObjectRef, false);
-      //    // for now, to ease runtime exception throwing
-      //    QueueMethod(null, "Explicit Entry", typeof(ExceptionHelper).GetMethod("ThrowNotImplemented", BindingFlags.Static | BindingFlags.Public), false);
-      //    //xScanner.Execute( ( System.Reflection.MethodInfo )RuntimeEngineRefs.InitializeApplicationRef );
-      //    //xScanner.Execute( ( System.Reflection.MethodInfo )RuntimeEngineRefs.FinalizeApplicationRef );
-      //    ////xScanner.QueueMethod(typeof(CosmosAssembler).GetMethod("PrintException"));
-      //    //xScanner.Execute( ( System.Reflection.MethodInfo )VTablesImplRefs.LoadTypeTableRef );
-      //    //xScanner.Execute( ( System.Reflection.MethodInfo )VTablesImplRefs.SetMethodInfoRef );
-      //    //xScanner.Execute( ( System.Reflection.MethodInfo )VTablesImplRefs.IsInstanceRef );
-      //    //xScanner.Execute( ( System.Reflection.MethodInfo )VTablesImplRefs.SetTypeInfoRef );
+      Queue(RuntimeEngineRefs.InitializeApplicationRef, null, "Explicit Entry");
+      Queue(RuntimeEngineRefs.FinalizeApplicationRef, null, "Explicit Entry");
+      //Queue(typeof(CosmosAssembler).GetMethod("PrintException"), null, "Explicit Entry");
+      Queue(VTablesImplRefs.LoadTypeTableRef, null, "Explicit Entry");
+      Queue(VTablesImplRefs.SetMethodInfoRef, null, "Explicit Entry");
+      Queue(VTablesImplRefs.IsInstanceRef, null, "Explicit Entry");
+      Queue(VTablesImplRefs.SetTypeInfoRef, null, "Explicit Entry");
+      Queue(VTablesImplRefs.GetMethodAddressForTypeRef, null, "Explicit Entry");
+      Queue(GCImplementationRefs.IncRefCountRef, null, "Explicit Entry");
+      Queue(GCImplementationRefs.DecRefCountRef, null, "Explicit Entry");
+      Queue(GCImplementationRefs.AllocNewObjectRef, null, "Explicit Entry");
+    // for now, to ease runtime exception throwing
+      Queue(typeof(ExceptionHelper).GetMethod("ThrowNotImplemented", BindingFlags.Static | BindingFlags.Public), null, "Explicit Entry");
+      Queue(RuntimeEngineRefs.InitializeApplicationRef, null, "Explicit Entry");
+      Queue(RuntimeEngineRefs.FinalizeApplicationRef, null, "Explicit Entry");
+      // register system types:
+      Queue(typeof(Array), null, "Explicit Entry");
+      Queue(typeof(Array).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, null, Type.EmptyTypes, null), null, "Explicit Entry");
 
       // Start from entry point of this program
       Queue(aStartMethod, null, "Entry Point");
@@ -224,6 +225,7 @@ namespace Cosmos.IL2CPU {
       // Now everything is scanned, lets assemble
       foreach (var xItem in mItems) {
         if (xItem is MethodBase) {
+          #region Method handling
           var xMethod = (MethodBase)xItem;
           var xParams = xMethod.GetParameters();
           var xParamTypes = new Type[xParams.Length];
@@ -247,12 +249,12 @@ namespace Cosmos.IL2CPU {
               xPlugAssembler = xAttrib.Assembler;
             }
             var xMethodInfo = new MethodInfo(xMethod, (uint)mItemsList.IndexOf(xMethod), xMethodType, xPlugInfo, xPlugAssembler);
-            //var xInstructions = mReader.ProcessMethod(xPlug);
-            //if (xInstructions != null) {
-            //  ProcessInstructions(xInstructions);
-            //  mAsmblr.ProcessMethod(xMethodInfo, xInstructions);
-            //}
-            //mAsmblr.GenerateMethodForward(xMethodInfo, xPlugInfo);
+            var xInstructions = mReader.ProcessMethod(xPlug);
+            if (xInstructions != null) {
+              //ProcessInstructions(xInstructions);
+              //mAsmblr.ProcessMethod(xPlugInfo, xInstructions);
+            }
+            mAsmblr.GenerateMethodForward(xMethodInfo, xPlugInfo);
           } else {
             var xMethodInfo = new MethodInfo(xMethod, (uint)mItemsList.IndexOf(xMethod), xMethodType, xPlugInfo, xPlugAssembler);
             var xInstructions = mReader.ProcessMethod(xMethod);
@@ -261,18 +263,31 @@ namespace Cosmos.IL2CPU {
               mAsmblr.ProcessMethod(xMethodInfo, xInstructions);
             }
           }
-          
-          //if (xMethod.Type != MethodInfo.TypeEnum.NeedsPlug) {
-          //  mAsmblr.ProcessMethod(xMethod);
-          //} else {
-          //  // todo: make this nicer
-          //  // methods will call the old name, while it's not emitted. that's why we emit a "forwarding label" here.
-          //  mAsmblr.GenerateMethodForward(xMethod, xMethod.PlugMethod);
-          //}
-          //mAsmblr.ProcessMethod(
+          #endregion
         }
-        // mAsmblr.GenerateVMTCode(mTypes, mTypesSet, mKnownMethods);
+        if (xItem is FieldInfo) {
+          var xField = (FieldInfo)xItem;
+          mAsmblr.ProcessField(xField);
+        }
       }
+      var xTypes = new HashSet<Type>();
+      var xMethods = new HashSet<MethodBase>();
+      foreach (var xItem in mItems) {
+        var xMethod = xItem as MethodBase;
+        if(xMethod != null){
+          xMethods.Add(xMethod);
+          continue;
+        }
+        var xType = xItem as Type;
+        if (xType != null) {
+          xTypes.Add(xType);
+          continue;
+        }
+      }
+
+      mAsmblr.GenerateVMTCode(xTypes, xMethods, GetTypeUID, GetMethodUID);
+      
+//      mAsmblr.GenerateVMTCode(mTypes, mTypesSet, mKnownMethods);
     }
 
     /// <summary>
@@ -284,6 +299,7 @@ namespace Cosmos.IL2CPU {
       foreach (var xOpCode in aOpCodes) {
         var xOpMethod = xOpCode as ILOpCodes.OpMethod;
         if (xOpMethod != null) {
+          xOpMethod.Value = (MethodBase)mItems.GetItemInList(xOpMethod.Value);
           xOpMethod.ValueUID = (uint)mItemsList.IndexOf(xOpMethod.Value);
         }
       }
@@ -532,6 +548,7 @@ namespace Cosmos.IL2CPU {
         List<ILOpCode> xOpCodes;
         xOpCodes = mReader.ProcessMethod(aMethod);
         if (xOpCodes != null) {
+          ProcessInstructions(xOpCodes);
           foreach (var xOpCode in xOpCodes) {
             if (xOpCode is ILOpCodes.OpMethod) {
               Queue(((ILOpCodes.OpMethod)xOpCode).Value, aMethod, "Call");
@@ -544,7 +561,7 @@ namespace Cosmos.IL2CPU {
               if (xOpField.Value.IsStatic) {
                 //TODO: Why do we add static fields, but not instance?
                 // AW: instance fields are "added" always, as part of a type, but for static fields, we need to emit a datamember
-                // TODO: Add fields
+                Queue(xOpField.Value, aMethod, "OpCode Value");
               }
             }
           }
@@ -603,6 +620,8 @@ namespace Cosmos.IL2CPU {
           ScanMethod((MethodBase)xItem, false);
         } else if (xItem is Type) {
           ScanType((Type)xItem);
+        }else if (xItem is FieldInfo){
+          // todo: static fields need more processing?
         } else {
           throw new Exception("Unknown item found in queue.");
         }
@@ -808,7 +827,10 @@ namespace Cosmos.IL2CPU {
             }
           }
         }
-      }      
+      }
+      if (xResult != null) {
+        Queue(xResult, null, "Plug Method");
+      }
       return xResult;
           //Type xAssembler = null;
             //  } else if (xAttrib.Signature != null) {
@@ -969,6 +991,32 @@ namespace Cosmos.IL2CPU {
       }
 
       return xResult;
+    }
+
+    protected uint GetMethodUID(MethodBase aMethod) {
+      if (!mItems.Contains(aMethod)) {
+        throw new Exception("Cannot get UID of methods which are not queued!");
+      }
+      if (!mMethodUIDs.ContainsKey(aMethod)) {
+        var xId = (uint)mMethodUIDs.Count;
+        mMethodUIDs.Add(aMethod, xId);
+        return xId;
+      } else {
+        return mMethodUIDs[aMethod];
+      }
+    }
+
+    protected uint GetTypeUID(Type aType) {
+      if (!mItems.Contains(aType)) {
+        throw new Exception("Cannot get UID of types which are not queued!");
+      }
+      if (!mTypeUIDs.ContainsKey(aType)) {
+        var xId = (uint)mTypeUIDs.Count;
+        mTypeUIDs.Add(aType, xId);
+        return xId;
+      } else {
+        return mTypeUIDs[aType];
+      }
     }
 
     // === Old code and comments ======================================================

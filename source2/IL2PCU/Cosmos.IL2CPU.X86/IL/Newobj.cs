@@ -102,7 +102,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 int xGCFieldCount = xType.GetFields().Count( x => x.FieldType.IsValueType );
 
               // todo: use a cleaner approach here. this class shouldnt assemble the string          
-                string strTypeId = "VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xMethod.Value.DeclaringType) + " ASM_IS__" + xMethod.Value.DeclaringType.Assembly.GetName().Name);
+                string strTypeId = GetTypeIDLabel(xMethod.Value.DeclaringType);
 
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
                 new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, SourceRef = ElementReference.New( strTypeId ), SourceIsIndirect = true };

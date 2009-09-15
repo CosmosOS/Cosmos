@@ -22,7 +22,7 @@ namespace Cosmos.IL2CPU.X86.IL
         {
             string xCurrentMethodLabel = GetLabel( aMethod, aOpCode );
             OpType xType = ( OpType )aOpCode;
-            string xTypeID = Label.FilterStringForIncorrectChars( xType.Value.AssemblyQualifiedName + "__TYPE_ID" );
+            string xTypeID = GetTypeIDLabel(xType.Value);
 
             //mTypeId = GetService<IMetaDataInfoService>().GetTypeIdLabel( mCastAsType );
             // todo: throw an exception when the class does not support the cast!

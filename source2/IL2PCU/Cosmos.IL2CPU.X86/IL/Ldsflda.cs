@@ -14,7 +14,7 @@ namespace Cosmos.IL2CPU.X86.IL
         {
             var xOpCode = ( ILOpCodes.OpField )aOpCode;
             System.Reflection.FieldInfo xField = xOpCode.Value;
-            string xDataName = "static_field__" + MethodInfoLabelGenerator.GetFullName( xField.DeclaringType ) + "." + xField.Name;
+            string xDataName =DataMember.GetStaticFieldName(xField);
             new CPUx86.Push { DestinationRef = ElementReference.New( xDataName ) };
             Assembler.Stack.Push( new StackContents.Item( 4, true, false, false ) );
         }

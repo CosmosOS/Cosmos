@@ -19,7 +19,7 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
             OpType xType = ( OpType )aOpCode;
-            string xTypeID = Label.FilterStringForIncorrectChars( xType.Value.AssemblyQualifiedName + "__TYPE_ID" );
+            string xTypeID = GetTypeIDLabel(xType.Value);
             string mReturnNullLabel = GetLabel( aMethod, aOpCode ) + "_ReturnNull";
 
             new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };

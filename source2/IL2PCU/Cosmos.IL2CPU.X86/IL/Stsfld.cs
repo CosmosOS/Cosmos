@@ -39,7 +39,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
                 xOffset += SizeOfType( xInfo.FieldType );
             }
-            string xDataName = "static_field__" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xField.DeclaringType) + "." + xField.Name);
+            string xDataName = DataMember.GetStaticFieldName(xField);
             if( xNeedsGC )
             {
                 new CPUx86.Push { DestinationRef = ElementReference.New( xDataName ), DestinationIsIndirect = true };

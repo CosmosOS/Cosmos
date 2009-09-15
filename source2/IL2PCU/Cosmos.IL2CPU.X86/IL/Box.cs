@@ -19,7 +19,7 @@ namespace Cosmos.IL2CPU.X86.IL
             OpType xType = ( OpType )aOpCode;
 
             uint xSize = SizeOfType( xType.Value );
-            string xTypeID = Label.FilterStringForIncorrectChars( typeof( Array ).AssemblyQualifiedName + "__TYPE_ID" );
+            string xTypeID = GetTypeIDLabel(typeof(Array));
             new CPUx86.Push { DestinationValue = ( ObjectImpl.FieldDataOffset + xSize ) };
             new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName( GCImplementationRefs.AllocNewObjectRef ) };
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };

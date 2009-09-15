@@ -28,7 +28,7 @@ namespace Cosmos.IL2CPU.X86.IL
             }
 
 
-            string xDataName = "static_field__" + MethodInfoLabelGenerator.GetFullName( xField.DeclaringType ) + "." + xField.Name;
+            string xDataName = DataMember.GetStaticFieldName(xField);
             if( xSize >= 4 )
             {
                 for( int i = 1; i <= ( xSize / 4 ); i++ )

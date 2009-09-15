@@ -29,7 +29,7 @@ namespace Cosmos.IL2CPU.X86
         protected void Jump_End(MethodInfo aMethod)
         {
 #warning todo: Jump_End jumps to ___EXCEPTION___EXIT
-            new CPU.Jump { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName( aMethod.MethodBase ) + "___EXCEPTION___NORMAL" };
+          new CPU.Jump { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) + "___NORMAL___EXIT" };
         }
 
         protected uint GetStackCountForLocal(MethodInfo aMethod, LocalVariableInfo aField)

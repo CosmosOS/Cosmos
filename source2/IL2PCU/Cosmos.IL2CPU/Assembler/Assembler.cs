@@ -336,7 +336,7 @@ namespace Cosmos.IL2CPU {
     protected abstract void Jump(string aLabelName);
     protected abstract int GetVTableEntrySize();
 
-    public void GenerateVMTCode(IList<Type> aTypes, HashSet<Type> aTypesSet, IDictionary<MethodBase, uint> aMethods) {
+    public void GenerateVMTCode(HashSet<Type> aTypesSet, HashSet<MethodBase> aMethodsSet, Func<Type, uint> aGetTypeID, Func<MethodBase, uint> aGetMethodUID) {
       // initialization
       var xSetTypeInfoRef = VTablesImplRefs.SetTypeInfoRef;
       var xSetMethodInfoRef = VTablesImplRefs.SetMethodInfoRef;
@@ -355,30 +355,29 @@ namespace Cosmos.IL2CPU {
                                       where item == xDataMember
                                       select item).First());
       }
-      var xData = new byte[16 + (aTypes.Count * GetVTableEntrySize())];
-      var xTemp = BitConverter.GetBytes(aTypes.IndexOf(typeof(Array)));
+      var xData = new byte[16 + (aTypesSet.Count * GetVTableEntrySize())];
+      var xTemp = BitConverter.GetBytes(aGetTypeID(typeof(Array)));
       xTemp = BitConverter.GetBytes(0x80000002);
       Array.Copy(xTemp, 0, xData, 4, 4);
-      xTemp = BitConverter.GetBytes(aTypes.Count);
+      xTemp = BitConverter.GetBytes(aTypesSet.Count);
       Array.Copy(xTemp, 0, xData, 8, 4);
       xTemp = BitConverter.GetBytes(GetVTableEntrySize());
       Array.Copy(xTemp, 0, xData, 12, 4);
       Assembler.mCurrentInstance.DataMembers.Add(new DataMember(xTheName + "__Contents", xData));
       Assembler.mCurrentInstance.DataMembers.Add(new DataMember(xTheName, ElementReference.New(xTheName + "__Contents")));
-      Push((uint)aTypes.Count);
+      Push((uint)aTypesSet.Count);
       Call(xLoadTypeTableRef);
-      for (int i = 0; i < aTypes.Count; i++) {
-        Type xType = aTypes[i];
+      foreach(var xType in aTypesSet){
         // value contains true if the method is an interface method definition
         SortedList<MethodBase, bool> xEmittedMethods = new SortedList<MethodBase, bool>(new MethodBaseComparer());
         foreach (MethodBase xMethod in xType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)) {
-          if (aMethods.ContainsKey(xMethod))//) && !xMethod.IsAbstract)
+          if (aMethodsSet.Contains(xMethod))//) && !xMethod.IsAbstract)
                             {
             xEmittedMethods.Add(xMethod, false);
           }
         }
         foreach (MethodBase xCtor in xType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)) {
-          if (aMethods.ContainsKey(xCtor))// && !xCtor.IsAbstract)
+          if (aMethodsSet.Contains(xCtor))// && !xCtor.IsAbstract)
                             {
             xEmittedMethods.Add(xCtor, false);
           }
@@ -407,7 +406,7 @@ namespace Cosmos.IL2CPU {
               } catch {
               }
             }
-            if (aMethods.ContainsKey(xMethodIntf)) {
+            if (aMethodsSet.Contains(xMethodIntf)) {
               if (!xEmittedMethods.ContainsKey(xMethodIntf)) {
                 xEmittedMethods.Add(xMethodIntf,
                                     true);
@@ -417,16 +416,17 @@ namespace Cosmos.IL2CPU {
           }
         }
         if (!xType.IsInterface) {
-          Push((uint)i);
+          Push(aGetTypeID(xType));
         }
         int? xBaseIndex = null;
         if (xType.BaseType == null) {
-          xBaseIndex = i;
+          xBaseIndex = (int)aGetTypeID(xType);
         } else {
-          for (int t = 0; t < aTypes.Count; t++) {
+          for (int t = 0; t < aTypesSet.Count; t++) {
             // todo: optimize check
-            if (aTypes[t].ToString() == xType.BaseType.ToString()) {
-              xBaseIndex = t;
+            var xItem = aTypesSet.Skip(t).First();
+            if (xItem.ToString() == xType.BaseType.ToString()) {
+              xBaseIndex = (int)aGetTypeID(xItem);
               break;
             }
           }
@@ -435,18 +435,18 @@ namespace Cosmos.IL2CPU {
           throw new Exception("Base type not found!");
         }
         for (int x = xEmittedMethods.Count - 1; x >= 0; x--) {
-          if (!aMethods.ContainsKey(xEmittedMethods.Keys[x])) {
+          if (!aMethodsSet.Contains(xEmittedMethods.Keys[x])) {
             xEmittedMethods.RemoveAt(x);
           }
         }
         if (!xType.IsInterface) {
-          Move("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name), i);
+          Move("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name), (int)aGetTypeID(xType));
           Assembler.mCurrentInstance.DataMembers.Add(
-              new DataMember("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name), new int[] { i }));
+              new DataMember("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name), new int[] { (int)aGetTypeID(xType) }));
           Push((uint)xBaseIndex.Value);
           Push("0" + xEmittedMethods.Count.ToString("X") + "h");
           xData = new byte[16 + (xEmittedMethods.Count * 4)];
-          xTemp = BitConverter.GetBytes(aTypes.IndexOf(typeof(Array)));
+          xTemp = BitConverter.GetBytes(aGetTypeID(typeof(Array)));
           Array.Copy(xTemp, 0, xData, 0, 4);
           xTemp = BitConverter.GetBytes(0x80000002); // embedded array
           Array.Copy(xTemp, 0, xData, 4, 4);
@@ -460,12 +460,12 @@ namespace Cosmos.IL2CPU {
           xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name) + "__MethodAddressesArray";
           Assembler.mCurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
           Push(xDataName);
-          xData = new byte[16 + Encoding.Unicode.GetByteCount(aTypes[i].FullName + ", " + aTypes[i].Module.Assembly.GetName().FullName)];
-          xTemp = BitConverter.GetBytes(aTypes.IndexOf(typeof(Array)));
+          xData = new byte[16 + Encoding.Unicode.GetByteCount(xType.FullName + ", " + xType.Module.Assembly.GetName().FullName)];
+          xTemp = BitConverter.GetBytes(aGetTypeID(typeof(Array)));
           Array.Copy(xTemp, 0, xData, 0, 4);
           xTemp = BitConverter.GetBytes(0x80000002); // embedded array
           Array.Copy(xTemp, 0, xData, 4, 4);
-          xTemp = BitConverter.GetBytes((aTypes[i].FullName + ", " + aTypes[i].Module.Assembly.GetName().FullName).Length);
+          xTemp = BitConverter.GetBytes((xType.FullName + ", " + xType.Module.Assembly.GetName().FullName).Length);
           Array.Copy(xTemp, 0, xData, 8, 4);
           xTemp = BitConverter.GetBytes(2); // embedded array
           Array.Copy(xTemp, 0, xData, 12, 4);
@@ -477,7 +477,7 @@ namespace Cosmos.IL2CPU {
         }
         for (int j = 0; j < xEmittedMethods.Count; j++) {
           MethodBase xMethod = xEmittedMethods.Keys[j];
-          var xMethodId = aMethods[xMethod];
+          var xMethodId = aGetMethodUID(xMethod);
           if (!xType.IsInterface) {
             if (xEmittedMethods.Values[j]) {
               var xNewMethod = xType.GetMethod(xMethod.DeclaringType.FullName + "." + xMethod.Name,
@@ -509,7 +509,7 @@ namespace Cosmos.IL2CPU {
             //    new DataMember(GetService<IMetaDataInfoService>().GetMethodIdLabel(xMethod),
             //                   new int[] { xMethodId }));
 
-            Push((uint)i);
+            Push((uint)aGetTypeID(xType));
             Push((uint)j);
 
             Push((uint)xMethodId);
