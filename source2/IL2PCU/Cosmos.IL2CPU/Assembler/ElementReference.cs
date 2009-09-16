@@ -12,6 +12,9 @@ namespace Cosmos.IL2CPU
         public static ElementReference New( string aName, int aOffset )
         {
             ElementReference xResult;
+            if (aName == null) {
+              Console.Write("");
+            }
             if( aName.StartsWith( "." ) )
             {
                 aName = Label.LastFullLabel + aName;

@@ -15,7 +15,7 @@ namespace Cosmos.IL2CPU.X86.IL {
   [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Blt_Un)]
   [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Brfalse)]
   [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Brtrue)]
-  public class Branch : ILOp {
+  public class Branch: ILOp {
 
     public Branch(Cosmos.IL2CPU.Assembler aAsmblr)
       : base(aAsmblr) {
@@ -23,6 +23,7 @@ namespace Cosmos.IL2CPU.X86.IL {
 
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
       var xStackContent = Assembler.Stack.Pop();
+      var xIsSingleCompare = true;
       switch (aOpCode.OpCode) {
         case ILOpCode.Code.Beq:
         case ILOpCode.Code.Bge:
@@ -35,9 +36,10 @@ namespace Cosmos.IL2CPU.X86.IL {
         case ILOpCode.Code.Blt:
         case ILOpCode.Code.Blt_Un:
           Assembler.Stack.Pop();
+          xIsSingleCompare = false;
           break;
       }
-      
+
       if (xStackContent.Size > 8) {
         throw new Exception("StackSize > 8 not supported");
       }
@@ -83,21 +85,37 @@ namespace Cosmos.IL2CPU.X86.IL {
         default:
           throw new Exception("Unknown OpCode for conditional branch.");
       }
-
-      if (xStackContent.Size <= 4) {
-        new CPU.Pop { DestinationReg = CPU.Registers.EAX };
-        new CPU.Pop { DestinationReg = CPU.Registers.EBX };
-        new CPU.Compare { DestinationReg = CPU.Registers.EAX, SourceReg = CPU.Registers.EBX };
-        new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+      if (!xIsSingleCompare) {
+        if (xStackContent.Size <= 4) {
+          new CPU.Pop { DestinationReg = CPU.Registers.EAX };
+          new CPU.Pop { DestinationReg = CPU.Registers.EBX };
+          new CPU.Compare { DestinationReg = CPU.Registers.EAX, SourceReg = CPU.Registers.EBX };
+          new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+        } else {
+          new CPU.Pop { DestinationReg = CPU.Registers.EAX };
+          new CPU.Pop { DestinationReg = CPU.Registers.EBX };
+          new CPU.Pop { DestinationReg = CPU.Registers.ECX };
+          new CPU.Pop { DestinationReg = CPU.Registers.EDX };
+          new CPU.Xor { DestinationReg = CPU.Registers.EAX, SourceReg = CPU.Registers.ECX };
+          new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+          new CPU.Xor { DestinationReg = CPU.Registers.EBX, SourceReg = CPU.Registers.EDX };
+          new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+        }
       } else {
+        // todo: improve code clarity
+        if (xStackContent.Size > 4) {
+          throw new Exception("Simple branches are not supported yet on operands > 4 bytes!");
+        }
         new CPU.Pop { DestinationReg = CPU.Registers.EAX };
-        new CPU.Pop { DestinationReg = CPU.Registers.EBX };
-        new CPU.Pop { DestinationReg = CPU.Registers.ECX };
-        new CPU.Pop { DestinationReg = CPU.Registers.EDX };
-        new CPU.Xor { DestinationReg = CPU.Registers.EAX, SourceReg = CPU.Registers.ECX };
-        new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
-        new CPU.Xor { DestinationReg = CPU.Registers.EBX, SourceReg = CPU.Registers.EDX };
-        new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+        if (xTestOp == ConditionalTestEnum.Zero) {
+          new CPU.Compare { DestinationReg = CPU.Registers.EAX, SourceValue = 0 };
+          new CPU.ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = AssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+        } else if (xTestOp == ConditionalTestEnum.NotZero) {
+          new CPU.Compare { DestinationReg = CPU.Registers.EAX, SourceValue = 0 };
+          new CPU.ConditionalJump { Condition = ConditionalTestEnum.NotEqual, DestinationLabel = AssemblerNasm.TmpBranchLabel(aMethod, aOpCode) };
+        } else {
+          throw new NotSupportedException("Situation not supported yet!");
+        }
       }
     }
 

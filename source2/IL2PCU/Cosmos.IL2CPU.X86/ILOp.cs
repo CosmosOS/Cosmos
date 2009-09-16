@@ -35,7 +35,7 @@ namespace Cosmos.IL2CPU.X86
 		{
 			var xSize = SizeOfType(aField.LocalType);
 			var xResult = xSize / 4;
-			if (xSize % 4 == 0)
+			if (xSize % 4 != 0)
 			{
 				xResult++;
 			}
@@ -64,7 +64,11 @@ namespace Cosmos.IL2CPU.X86
 
         public static uint Align( uint aSize, uint aAlign )
         {
-            return aSize % 4 == 0 ? aSize : ( ( aSize / aAlign ) * aAlign ) + 1;
+      var xSize = aSize;
+      if ((xSize % aAlign) != 0) {
+        xSize += aAlign - (xSize % aAlign);
+      }
+      return xSize;
         }
         protected void ThrowNotImplementedException(string aMessage) {
           new CPU.Push {

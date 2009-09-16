@@ -51,7 +51,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     {
                         DestinationReg = Registers.EBP,
                         DestinationIsIndirect = true,
-                        DestinationDisplacement = ( int )( xCurArgSize - ( ( i + 1 ) * 4 ) )
+                        DestinationDisplacement = (int)(xOffset + xCurArgSize - ((i + 1) * 4))
                     };
                 }
                 Assembler.Stack.Push( ( int )xCurArgSize, aMethod.MethodBase.DeclaringType );
@@ -83,7 +83,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     {
                         DestinationReg = Registers.EBP,
                         DestinationIsIndirect = true,
-                        DestinationDisplacement = ( int )( xCurArgSize - ( ( i + 1 ) * 4 ) )
+                        DestinationDisplacement = ( int )(xOffset + xCurArgSize - ( ( i + 1 ) * 4 ) )
                     };
                 }
                 Assembler.Stack.Push( ( int )xCurArgSize, xParams[ xCorrectedOpValValue ].ParameterType );

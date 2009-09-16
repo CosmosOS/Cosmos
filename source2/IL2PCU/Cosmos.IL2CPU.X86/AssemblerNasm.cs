@@ -47,13 +47,16 @@ namespace Cosmos.IL2CPU.X86 {
       uint xReturnSize = 0;
       var xMethInfo = aMethod.MethodBase as System.Reflection.MethodInfo;
       if (xMethInfo != null) {
-        xReturnSize = ILOp.SizeOfType(xMethInfo.ReturnType);
-      }
-      if (xReturnSize % 4 > 0) {
-        xReturnSize += 4 - xReturnSize % 4;
+        xReturnSize = ILOp.Align(ILOp.SizeOfType(xMethInfo.ReturnType), 4);
       }
       new Label(MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) + EndOfMethodLabelNameNormal);
       new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceValue = 0 };
+      var xTotalArgsSize = (from item in aMethod.MethodBase.GetParameters()
+                            select (int)ILOp.Align(ILOp.SizeOfType(item.ParameterType), 4)).Sum();
+      if (!aMethod.MethodBase.IsStatic) {
+        xTotalArgsSize += (int)ILOp.Align(ILOp.SizeOfType(aMethod.MethodBase.DeclaringType), 4);
+      }
+
       if (xReturnSize > 0) {
         //var xArgSize = (from item in aArgs
         //                let xSize = item.Size + item.Offset
@@ -67,17 +70,9 @@ namespace Cosmos.IL2CPU.X86 {
         //    xOffset = xArgSize;
         //}
         int xOffset = 4;
-        if (aMethod.MethodBase.GetParameters().Length > 0) {
-          // old code:
-          //xOffset = aArgs.First().Offset + 4;
-          //if (xOffset < 0)
-          //{
-          //    xOffset = 0;
-          //}
-
-          // new code:
-          xOffset = (int)((from item in aMethod.MethodBase.GetParameters()
-                           select (int)ILOp.Align(ILOp.SizeOfType(item.ParameterType), 4)).Sum() + 8);
+        xOffset += xTotalArgsSize;
+        if ((xTotalArgsSize - xReturnSize) < 0) {
+          xOffset += (int)(0 - (xTotalArgsSize - xReturnSize));
         }
         for (int i = 0; i < xReturnSize / 4; i++) {
           new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
@@ -88,6 +83,7 @@ namespace Cosmos.IL2CPU.X86 {
             SourceReg = Registers.EAX
           };
         }
+        // extra stack space is the space reserved for example when a "public static int TestMethod();" method is called, 4 bytes is pushed, to make room for result;
       }
       new Label(MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) + EndOfMethodLabelNameException);
       //for (int i = 0; i < aLocAllocItemCount; i++) {
@@ -124,14 +120,16 @@ namespace Cosmos.IL2CPU.X86 {
       //  // todo: add GC code
       //  new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
       //}
+      if (MethodInfoLabelGenerator.GenerateLabelName(aMethod.MethodBase) == "System_Void__System_Array__ctor__") {
+        
+        Console.Write("");
+      }
       for (int j = aMethod.MethodBase.GetMethodBody().LocalVariables.Count - 1; j >= 0; j--) {
         int xLocalSize = (int)ILOp.Align(ILOp.SizeOfType(aMethod.MethodBase.GetMethodBody().LocalVariables[j].LocalType), 4);
         new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = (uint)xLocalSize };
       }
       //new CPUx86.Add(CPUx86.Registers_Old.ESP, "0x4");
       new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBP };
-      var xTotalArgsSize = (from item in aMethod.MethodBase.GetParameters()
-                            select (int)ILOp.Align(ILOp.SizeOfType(item.ParameterType), 4)).Sum();
       var xRetSize = ((int)xTotalArgsSize) - ((int)xReturnSize);
       if (xRetSize < 0) {
         xRetSize = 0;

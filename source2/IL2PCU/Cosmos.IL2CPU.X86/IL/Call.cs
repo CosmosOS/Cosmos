@@ -8,6 +8,7 @@ using Cosmos.IL2CPU.ILOpCodes;
 using CPU=Cosmos.IL2CPU.X86;
 using CPUx86=Cosmos.IL2CPU.X86;
 using Cosmos.IL2CPU.X86;
+using System.Reflection;
 // using System.Reflection;
 // using Cosmos.IL2CPU.X86;
 // using Indy.IL2CPU.Compiler;
@@ -30,8 +31,35 @@ namespace Cosmos.IL2CPU.X86.IL {
       : base(aAsmblr) {
     }
 
+    public static uint GetStackSizeToReservate(MethodBase aMethod) {
+      if (MethodInfoLabelGenerator.GenerateLabelName(aMethod) == "System_UInt32__Cosmos_Kernel_CPU_get_EndOfKernel__") {
+        Console.Write("");
+      }
+      var xMethodInfo = aMethod as System.Reflection.MethodInfo;
+      uint xReturnSize = 0;
+      if (xMethodInfo != null) {
+        xReturnSize = SizeOfType(xMethodInfo.ReturnType);
+      }
+      if (xReturnSize == 0) {
+        return 0;
+      }
+      // todo: implement exception support
+      uint xExtraStackSize = (uint)Align(xReturnSize, 4);
+      var xParameters = aMethod.GetParameters();
+      foreach (var xItem in xParameters) {
+        xExtraStackSize -= SizeOfType(xItem.GetType());
+      }
+      if (xExtraStackSize > 0) {
+        return xExtraStackSize;
+      }
+      return 0;
+    }
+
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
       var xOpMethod = aOpCode as OpMethod;
+      if (MethodInfoLabelGenerator.GenerateLabelName(xOpMethod.Value) == "System_UInt32__Cosmos_Kernel_CPU_get_EndOfKernel__") {
+        Console.Write("");
+      }
       if( xOpMethod.Value.IsVirtual )
       {
           new Callvirt( Assembler ).Execute( aMethod, aOpCode );
@@ -48,17 +76,10 @@ namespace Cosmos.IL2CPU.X86.IL {
       } else {
         throw new Exception("Call: non-concrete method called!");
       }
-      int xArgCount = xOpMethod.Value.GetParameters().Length;
-      uint xReturnSize = 0;
-      if (xMethodInfo != null) {
-        xReturnSize = SizeOfType(xMethodInfo.ReturnType);
-      }
-      // todo: implement exception support
-      uint xExtraStackSize = (uint)Align(xReturnSize, 4);
       var xParameters = xOpMethod.Value.GetParameters();
-      foreach (var xItem in xParameters) {
-        xExtraStackSize -= SizeOfType(xItem.GetType());
-      }
+      int xArgCount = xParameters.Length;
+      // todo: implement exception support
+      uint xExtraStackSize = GetStackSizeToReservate(xOpMethod.Value);
       if (xExtraStackSize > 0) {
         new CPUx86.Sub {
           DestinationReg = CPUx86.Registers.ESP,
@@ -91,11 +112,11 @@ namespace Cosmos.IL2CPU.X86.IL {
       for (int i = 0; i < xParameters.Length; i++) {
         Assembler.Stack.Pop();
       }
-      if (xReturnSize == 0) {
+      if (xMethodInfo == null || SizeOfType(xMethodInfo.ReturnType) == 0) {
         return;
       }
 
-      Assembler.Stack.Push((int)xReturnSize,
+      Assembler.Stack.Push((int)SizeOfType(xMethodInfo.ReturnType),
                               xMethodInfo.ReturnType);
 
 

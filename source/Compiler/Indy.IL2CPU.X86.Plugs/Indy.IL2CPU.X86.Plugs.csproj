@@ -57,6 +57,7 @@
     <Compile Include="Mono\System\StringImpl.cs" />
     <Compile Include="MS\System\StringImpl.cs" />
     <Compile Include="NEW_PLUGS\DelegateImpl.cs" />
+    <Compile Include="NEW_PLUGS\DoubleImpl.cs" />
     <Compile Include="NEW_PLUGS\InvokeImplAssembler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="System.Runtime.CompilerServices\RuntimeHelpersImpl.cs" />
